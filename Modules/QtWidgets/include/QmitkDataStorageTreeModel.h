@@ -32,6 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include <vector>
 
+class QmitkDataStorageTreeModelInternalItem;
+
 /// \ingroup QmitkModule
 class MITKQTWIDGETS_EXPORT QmitkDataStorageTreeModel : public QAbstractItemModel
 {
@@ -140,79 +142,8 @@ signals:
 
   //# MISC
 protected:
-  ///
-  /// Helper class to represent a tree structure of DataNodes
-  ///
-  class TreeItem
-  {
-  public:
-    ///
-    /// Constructs a new TreeItem with the given DataNode (must not be 0)
-    ///
-    TreeItem(mitk::DataNode *_DataNode, TreeItem *_Parent = 0);
-    ///
-    /// Removes itself as child from its parent-> Does not delete its children
-    /// \sa Delete()
-    ///
-    virtual ~TreeItem();
-    ///
-    /// Find the index of an item
-    ///
-    int IndexOfChild(const TreeItem *item) const;
-    ///
-    /// \return The child at pos index or 0 if it not exists
-    ///
-    TreeItem *GetChild(int index) const;
-    ///
-    /// Find the TreeItem containing a special tree node (recursive tree function)
-    ///
-    TreeItem *Find(const mitk::DataNode *_DataNode) const;
-    ///
-    /// Get the amount of children
-    ///
-    int GetChildCount() const;
-    ///
-    /// \return the index of this node in its parent list
-    ///
-    int GetIndex() const;
-    ///
-    /// \return the parent of this tree item
-    ///
-    TreeItem *GetParent() const;
-    ///
-    /// Return the DataNode associated with this node
-    ///
-    mitk::DataNode::Pointer GetDataNode() const;
-    ///
-    /// Get all children as vector
-    ///
-    std::vector<TreeItem *> GetChildren() const;
 
-    ///
-    /// add another item as a child of this (only if not already in that list)
-    ///
-    void AddChild(TreeItem *item);
-    ///
-    /// remove another item as child from this
-    ///
-    void RemoveChild(TreeItem *item);
-    ///
-    /// inserts a child at the given position. if pos is not in range
-    /// the element is added at the end
-    ///
-    void InsertChild(TreeItem *item, int index = -1);
-    /// Sets the parent on the treeitem
-    void SetParent(TreeItem *_Parent);
-    ///
-    /// Deletes the whole tree branch
-    ///
-    void Delete();
-
-  protected:
-    TreeItem *m_Parent;
-    std::vector<TreeItem *> m_Children;
-    mitk::DataNode::Pointer m_DataNode;
-  };
+  using TreeItem = QmitkDataStorageTreeModelInternalItem;
 
   QList<TreeItem *> ToTreeItemPtrList(const QMimeData *mimeData);
   QList<TreeItem *> ToTreeItemPtrList(const QByteArray &ba);

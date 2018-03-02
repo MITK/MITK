@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPropertyNameHelper.h>
 
 #include "QmitkDataStorageTreeModel.h"
+#include "QmitkDataStorageTreeModelInternalItem.h"
 #include "QmitkNodeDescriptorManager.h"
 #include <QmitkCustomVariants.h>
 #include <QmitkEnums.h>
@@ -400,11 +401,11 @@ QMimeData *QmitkDataStorageTreeModel::mimeDataFromModelIndexList(const QModelInd
     TreeItem *treeItem = static_cast<TreeItem *>(indexes.at(i).internalPointer());
 
     dsTreeItemPtrs << reinterpret_cast<quintptr>(treeItem);
-    dsDataNodePtrs << reinterpret_cast<quintptr>(treeItem->GetDataNode().GetPointer());
+    dsDataNodePtrs << reinterpret_cast<quintptr>(treeItem->GetDataNode());
 
     // --------------- deprecated -----------------
     unsigned long long treeItemAddress = reinterpret_cast<unsigned long long>(treeItem);
-    unsigned long long dataNodeAddress = reinterpret_cast<unsigned long long>(treeItem->GetDataNode().GetPointer());
+    unsigned long long dataNodeAddress = reinterpret_cast<unsigned long long>(treeItem->GetDataNode());
     QTextStream(&treeItemAddresses) << treeItemAddress;
     QTextStream(&dataNodeAddresses) << dataNodeAddress;
 
@@ -888,128 +889,6 @@ QList<QmitkDataStorageTreeModel::TreeItem *> QmitkDataStorageTreeModel::ToTreeIt
     result.push_back(reinterpret_cast<TreeItem *>(treeItemPtr));
   }
   return result;
-}
-
-QmitkDataStorageTreeModel::TreeItem::TreeItem(mitk::DataNode *_DataNode, TreeItem *_Parent)
-  : m_Parent(_Parent), m_DataNode(_DataNode)
-{
-  if (m_Parent)
-    m_Parent->AddChild(this);
-}
-
-QmitkDataStorageTreeModel::TreeItem::~TreeItem()
-{
-  if (m_Parent)
-    m_Parent->RemoveChild(this);
-}
-
-void QmitkDataStorageTreeModel::TreeItem::Delete()
-{
-  while (m_Children.size() > 0)
-    delete m_Children.back();
-
-  delete this;
-}
-
-QmitkDataStorageTreeModel::TreeItem *QmitkDataStorageTreeModel::TreeItem::Find(const mitk::DataNode *_DataNode) const
-{
-  QmitkDataStorageTreeModel::TreeItem *item = 0;
-  if (_DataNode)
-  {
-    if (m_DataNode == _DataNode)
-      item = const_cast<TreeItem *>(this);
-    else
-    {
-      for (std::vector<TreeItem *>::const_iterator it = m_Children.begin(); it != m_Children.end(); ++it)
-      {
-        if (item)
-          break;
-        item = (*it)->Find(_DataNode);
-      }
-    }
-  }
-  return item;
-}
-
-int QmitkDataStorageTreeModel::TreeItem::IndexOfChild(const TreeItem *item) const
-{
-  std::vector<TreeItem *>::const_iterator it = std::find(m_Children.begin(), m_Children.end(), item);
-  return it != m_Children.end() ? std::distance(m_Children.begin(), it) : -1;
-}
-
-QmitkDataStorageTreeModel::TreeItem *QmitkDataStorageTreeModel::TreeItem::GetChild(int index) const
-{
-  return (m_Children.size() > 0 && index >= 0 && index < (int)m_Children.size()) ? m_Children.at(index) : 0;
-}
-
-void QmitkDataStorageTreeModel::TreeItem::AddChild(TreeItem *item)
-{
-  this->InsertChild(item);
-}
-
-void QmitkDataStorageTreeModel::TreeItem::RemoveChild(TreeItem *item)
-{
-  std::vector<TreeItem *>::iterator it = std::find(m_Children.begin(), m_Children.end(), item);
-  if (it != m_Children.end())
-  {
-    m_Children.erase(it);
-    item->SetParent(0);
-  }
-}
-
-int QmitkDataStorageTreeModel::TreeItem::GetChildCount() const
-{
-  return m_Children.size();
-}
-
-int QmitkDataStorageTreeModel::TreeItem::GetIndex() const
-{
-  if (m_Parent)
-    return m_Parent->IndexOfChild(this);
-
-  return 0;
-}
-
-QmitkDataStorageTreeModel::TreeItem *QmitkDataStorageTreeModel::TreeItem::GetParent() const
-{
-  return m_Parent;
-}
-
-mitk::DataNode::Pointer QmitkDataStorageTreeModel::TreeItem::GetDataNode() const
-{
-  return m_DataNode;
-}
-
-void QmitkDataStorageTreeModel::TreeItem::InsertChild(TreeItem *item, int index)
-{
-  std::vector<TreeItem *>::iterator it = std::find(m_Children.begin(), m_Children.end(), item);
-  if (it == m_Children.end())
-  {
-    if (m_Children.size() > 0 && index >= 0 && index < (int)m_Children.size())
-    {
-      it = m_Children.begin();
-      std::advance(it, index);
-      m_Children.insert(it, item);
-    }
-    else
-      m_Children.push_back(item);
-
-    // add parent if necessary
-    if (item->GetParent() != this)
-      item->SetParent(this);
-  }
-}
-
-std::vector<QmitkDataStorageTreeModel::TreeItem *> QmitkDataStorageTreeModel::TreeItem::GetChildren() const
-{
-  return m_Children;
-}
-
-void QmitkDataStorageTreeModel::TreeItem::SetParent(TreeItem *_Parent)
-{
-  m_Parent = _Parent;
-  if (m_Parent)
-    m_Parent->AddChild(this);
 }
 
 void QmitkDataStorageTreeModel::Update()

@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkRemeshingView.h"
 
+#include <berryQtStyleManager.h>
+
 #include <mitkACVD.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
@@ -38,6 +40,8 @@ QmitkRemeshingView::~QmitkRemeshingView()
 void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
 {
   m_Controls.setupUi(parent);
+
+  m_Controls.remeshPushButton->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/Remeshing/RemeshingIcon.svg")));
 
   m_Controls.surfaceComboBox->SetDataStorage(this->GetDataStorage());
   m_Controls.surfaceComboBox->SetPredicate(mitk::NodePredicateAnd::New(

@@ -26,10 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 * @brief The 'QmitkDataStorageDefaultListModel' is a basic list model, derived from the 'QmitkAbstractDataStorageModel'.
 *        It provides functions to accept a data storage and a node predicate in order to customize the model data nodes.
 *        Furthermore it overrides the functions of 'QAbstractItemModel' to create a simple qt list model.
-*        This model can be used inside a 'QmitkDataStorageSelectionConnector'.
+*        This model can be used in conjunction with a 'QmitkDataStorageSelectionConnector'.
 */
 class MITKQTWIDGETS_EXPORT QmitkDataStorageDefaultListModel : public QmitkAbstractDataStorageModel
 {
+  Q_OBJECT
 
 public:
 

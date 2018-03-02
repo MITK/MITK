@@ -42,6 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class MITKQTWIDGETS_EXPORT QmitkAbstractDataStorageModel : public QAbstractItemModel
 {
+  Q_OBJECT
 
 public:
 

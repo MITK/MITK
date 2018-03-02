@@ -333,7 +333,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-      for (int j = 0; j < ranges.size(); ++j)
+      for (std::size_t j = 0; j < ranges.size(); ++j)
       {
         AccessByItk_2(image, localStatistic, outs, ranges[j]);
         for (std::size_t i = 0; i < outs.size(); ++i)

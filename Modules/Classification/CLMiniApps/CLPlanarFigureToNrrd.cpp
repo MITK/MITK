@@ -40,14 +40,13 @@ struct MaskParameter
 };
 
 template < typename TPixel, unsigned int VImageDimension >
-const void CreateNewMask(const itk::Image< TPixel, VImageDimension > *image, MaskParameter param, mitk::Image::Pointer &output)
+void CreateNewMask(const itk::Image< TPixel, VImageDimension > *image, MaskParameter param, mitk::Image::Pointer &output)
 {
   int transform[3][2];
   transform[0][0] = 1; transform[0][1] = 2;
   transform[1][0] = 0; transform[1][1] = 2;
   transform[2][0] = 0; transform[2][1] = 1;
 
-  typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
   typedef itk::Image<unsigned short, 2> Mask2DType;
   typename Mask2DType::Pointer mask = Mask2DType::New();

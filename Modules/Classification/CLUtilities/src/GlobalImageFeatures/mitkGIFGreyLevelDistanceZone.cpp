@@ -238,8 +238,8 @@ void static CalculateFeatures(
   pgMatrix.rowwise().normalize();
   pzMatrix.colwise().normalize();
 
-  for (int i = 0; i < holder.m_NumberOfBins; ++i)
-    for (int j = 0; j < holder.m_NumberOfBins; ++j)
+  for (int i = 0; i < pgzMatrix.rows(); ++i)
+    for (int j = 0; j < pgzMatrix.cols(); ++j)
     {
       if (pgzMatrix(i, j) != pgzMatrix(i, j))
         pgzMatrix(i, j) = 0;

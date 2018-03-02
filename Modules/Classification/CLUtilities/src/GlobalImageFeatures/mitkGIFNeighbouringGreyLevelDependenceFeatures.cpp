@@ -253,7 +253,6 @@ template<typename TPixel, unsigned int VImageDimension>
 void
 CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureListType & featureList, mitk::GIFNeighbouringGreyLevelDependenceFeature::GIFNeighbouringGreyLevelDependenceFeatureConfiguration config)
 {
-  typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> MaskType;
 
   double rangeMin = config.MinimumIntensity;

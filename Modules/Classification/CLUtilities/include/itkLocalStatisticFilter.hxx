@@ -27,9 +27,6 @@ template< class TInputImageType, class TOuputImageType>
 void
 itk::LocalStatisticFilter<TInputImageType, TOuputImageType>::BeforeThreadedGenerateData()
 {
-  typedef itk::MinimumMaximumImageCalculator <TInputImageType>
-    ImageCalculatorFilterType;
-
   InputImagePointer input = this->GetInput(0);
   for (int i = 0; i < m_Bins; ++i)
   {

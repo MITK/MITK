@@ -66,11 +66,6 @@ int main(int argc, char* argv[])
   parser.addArgument("reader", "r", mitkCommandLineParser::Int, "Reader ID", "Reader Name", us::Any(), false);
   parser.addArgument("interpolation", "interp", mitkCommandLineParser::Int, "Reader ID", "Reader Name", us::Any(), false);
 
-  //int selectedAlgorithm = 4;
-  //std::string movingFile = "E:\\Projects\\Myelom\\data\\0001622391R\\00.00.0000\\T2.nrrd";
-  //std::string fixedFile = "E:\\Projects\\Myelom\\data\\0001622391R\\00.00.0000\\0001622391R_00.00.0000_T1KM_Resampled.nrrd";
-
-
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
   QFileInfo fi(argv[0]);
@@ -133,7 +128,7 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer movingImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(movingFile)[0].GetPointer());
   mitk::Image::Pointer fixedImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(fixedFile)[0].GetPointer());
 
-  map::deployment::DLLInfo::ConstPointer dllInfo = dllList[selectedAlgorithm];
+  auto dllInfo = dllList[selectedAlgorithm];
 
   if (!dllInfo)
   {
@@ -164,7 +159,7 @@ int main(int argc, char* argv[])
                                                     fixedImage->GetGeometry()->Clone().GetPointer(), // Ref. Geometry
                                                     false, //!(this->m_allowUnregPixels),
                                                     0, // Error Value
-                                                    mitk::ImageMappingInterpolator::BSpline_3 // Interpolator Type
+                                                    interpolationMode // Interpolator Type
                             );
 
   MITK_INFO << "Well....";

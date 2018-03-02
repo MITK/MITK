@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <mitkFiberBundle.h>
 #include <mitkImageCast.h>
+#include <mitkImageToItk.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateAnd.h>
@@ -106,10 +107,12 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_SeedImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_MaskImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_TargetImageBox->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_PriorImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_StopImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_ForestBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_ExclusionImageBox->SetDataStorage(this->GetDataStorage());
 
+    mitk::TNodePredicateDataType<mitk::PeakImage>::Pointer isPeakImagePredicate = mitk::TNodePredicateDataType<mitk::PeakImage>::New();
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isImagePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
     mitk::TNodePredicateDataType<mitk::TractographyForest>::Pointer isTractographyForest = mitk::TNodePredicateDataType<mitk::TractographyForest>::New();
 
@@ -129,6 +132,8 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_StopImageBox->SetZeroEntryText("--");
     m_Controls->m_TargetImageBox->SetPredicate( mitk::NodePredicateAnd::New(isImagePredicate, dimensionPredicate) );
     m_Controls->m_TargetImageBox->SetZeroEntryText("--");
+    m_Controls->m_PriorImageBox->SetPredicate( isPeakImagePredicate );
+    m_Controls->m_PriorImageBox->SetZeroEntryText("--");
     m_Controls->m_ExclusionImageBox->SetPredicate( mitk::NodePredicateAnd::New(isImagePredicate, dimensionPredicate) );
     m_Controls->m_ExclusionImageBox->SetZeroEntryText("--");
 
@@ -145,6 +150,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_ModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_StopImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_TargetImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_PriorImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_ExclusionImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_MaskImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_FaImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
@@ -420,9 +426,6 @@ void QmitkStreamlineTrackingView::Deactivated()
 void QmitkStreamlineTrackingView::Visible()
 {
   m_Visible = true;
-  QList<mitk::DataNode::Pointer> selection = GetDataManagerSelection();
-  berry::IWorkbenchPart::Pointer nullPart;
-  OnSelectionChanged(nullPart, selection);
 }
 
 void QmitkStreamlineTrackingView::Hidden()
@@ -469,9 +472,6 @@ void QmitkStreamlineTrackingView::OutputStyleSwitched()
 
 void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Pointer , const QList<mitk::DataNode::Pointer>& nodes )
 {
-  if (!m_Visible)
-    return;
-
   std::vector< mitk::DataNode::Pointer > last_nodes = m_InputImageNodes;
   m_InputImageNodes.clear();
   m_InputImages.clear();
@@ -641,9 +641,7 @@ void QmitkStreamlineTrackingView::StartStopTrackingGui(bool start)
 
 void QmitkStreamlineTrackingView::DoFiberTracking()
 {
-  if (m_ThreadIsRunning)
-    return;
-  if (m_InputImages.empty())
+  if (m_ThreadIsRunning || m_InputImages.empty() || !m_Visible)
     return;
   if (m_Controls->m_InteractiveBox->isChecked() && m_SeedPoints.empty())
     return;
@@ -817,6 +815,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
         CasterType::Pointer caster = CasterType::New();
         caster->SetInput(m_InputImages.at(0));
+        caster->SetCopyMemFlag(true);
         caster->Update();
         mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
         m_TrackingHandler = new mitk::TrackingHandlerPeaks();
@@ -879,6 +878,30 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     ItkFloatImageType::Pointer mask = ItkFloatImageType::New();
     mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_TargetImageBox->GetSelectedNode()->GetData()), mask);
     m_Tracker->SetTargetRegions(mask);
+  }
+
+  if (m_Controls->m_PriorImageBox->GetSelectedNode().IsNotNull())
+  {
+    typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
+    CasterType::Pointer caster = CasterType::New();
+    caster->SetInput(dynamic_cast<mitk::PeakImage*>(m_Controls->m_PriorImageBox->GetSelectedNode()->GetData()));
+    caster->SetCopyMemFlag(true);
+    caster->Update();
+    mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
+    mitk::TrackingDataHandler* trackingPriorHandler = new mitk::TrackingHandlerPeaks();
+    dynamic_cast<mitk::TrackingHandlerPeaks*>(trackingPriorHandler)->SetPeakImage(itkImg);
+    dynamic_cast<mitk::TrackingHandlerPeaks*>(trackingPriorHandler)->SetPeakThreshold(m_Controls->m_ScalarThresholdBox->value());
+
+    trackingPriorHandler->SetFlipX(m_Controls->m_FlipXBox->isChecked());
+    trackingPriorHandler->SetFlipY(m_Controls->m_FlipYBox->isChecked());
+    trackingPriorHandler->SetFlipZ(m_Controls->m_FlipZBox->isChecked());
+    trackingPriorHandler->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
+    trackingPriorHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
+
+    m_Tracker->SetTrackingPriorHandler(trackingPriorHandler);
+    m_Tracker->SetTrackingPriorWeight(m_Controls->m_PriorWeightBox->value());
+    m_Tracker->SetTrackingPriorAsMask(m_Controls->m_PriorAsMaskBox->isChecked());
+    m_Tracker->SetIntroduceDirectionsFromPrior(m_Controls->m_NewDirectionsFromPriorBox->isChecked());
   }
 
   if (m_Controls->m_ExclusionImageBox->GetSelectedNode().IsNotNull())

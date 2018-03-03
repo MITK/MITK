@@ -462,7 +462,6 @@ void mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* intera
   }
   // perform translation
   Vector2D moveVector = (positionEvent->GetPointerPositionOnScreen() - m_LastDisplayCoordinate) * invertModifier;
-  moveVector*=sender->GetScaleFactorMMPerDisplayUnit();
   sender->GetCameraController()->MoveBy(moveVector);
   sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
   m_LastDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();

@@ -202,14 +202,22 @@ void mitk::CameraController::MoveCameraToPoint(const mitk::Point2D& planePoint)
   this->Modified();
 }
 
-void mitk::CameraController::MoveBy(const mitk::Vector2D &moveVectorInMM)
+void mitk::CameraController::MoveBy(const mitk::Vector2D &moveVector)
 {
   vtkCamera* camera = this->GetRenderer()->GetVtkRenderer()->GetActiveCamera();
-  
+
+  Point2D camPointDisplay;
+  camPointDisplay[0] = this->GetRenderer()->GetVtkRenderer()->GetCenter()[0];
+  camPointDisplay[1] = this->GetRenderer()->GetVtkRenderer()->GetCenter()[1];
+
+  camPointDisplay += moveVector;
+
+  Point2D camPointPlane;
+  this->GetRenderer()->DisplayToPlane(camPointDisplay, camPointPlane);
+  AdjustConstrainedCameraPosition(camPointPlane);
+
   Point3D worldPoint;
-  Point2D nextCameraPos = GetCameraPositionOnPlane() + moveVectorInMM;
-  AdjustConstrainedCameraPosition(nextCameraPos);
-  this->GetRenderer()->GetCurrentWorldPlaneGeometry()->Map(nextCameraPos, worldPoint);
+  this->GetRenderer()->GetCurrentWorldPlaneGeometry()->Map(camPointPlane, worldPoint);
 
   Vector3D cameraDir = camera->GetDirectionOfProjection();
   camera->SetFocalPoint(worldPoint.GetDataPointer());

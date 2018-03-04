@@ -1,31 +1,13 @@
-berry--QCTabBar::tab:selected
-{
-  background: #323231;
-  color: #adb1b6;
-   border: 0px;
+berry--QCTabBar::tab {
+  background: #2d2d30;
+  color: #d0d0d0;
 }
 
-berry--QCTabBar::tab:selected:hover
-{
-  color: #3399cc;
-    border: 0px;
+berry--QCTabBar::tab:hover {
+  background: #3e3e40;
+  color: #55aaff;
 }
 
-QFrame#ViewFormContentFrame
-{
-  border: 1px solid #1d1d1c;
-}
-
-berry--QCTabBar QToolButton
-{
-  border: none;
-  max-height: 32px;
-}
-
-berry--QCTabBar QToolButton#TabCloseButton
-{
-  border: none;
-  background-color: transparent;
-  width: 12px;
-  height: 12px;
+QFrame#ViewFormContentFrame {
+  border: 1px solid #3f3f46;
 }

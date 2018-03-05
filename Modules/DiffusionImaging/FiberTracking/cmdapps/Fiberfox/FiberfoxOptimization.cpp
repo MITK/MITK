@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkFiberfoxParameters.h>
+#include <random>
 
 using namespace mitk;
 

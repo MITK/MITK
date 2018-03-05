@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
   parser.addArgument("overlap_fraction", "", mitkCommandLineParser::Float, "Overlap fraction:", "Extract by overlap, not by endpoints. Extract fibers that overlap to at least the provided factor (0-1) with the ROI.", -1);
   parser.addArgument("invert", "", mitkCommandLineParser::Bool, "Invert:", "get streamlines not positive for any of the ROI images", false);
   parser.addArgument("interpolate", "", mitkCommandLineParser::Bool, "Interpolate:", "interpolate ROI images", false);
-  parser.addArgument("threshold", "", mitkCommandLineParser::Float, "Threshold:", "positive means ROI image value threshold", false, 0.5);
+  parser.addArgument("threshold", "", mitkCommandLineParser::Float, "Threshold:", "positive means ROI image value threshold", 0.5);
   parser.addArgument("labels", "", mitkCommandLineParser::StringList, "Labels:", "positive means roi image value in labels vector", false);
   parser.addArgument("split_labels", "", mitkCommandLineParser::Bool, "Split labels:", "output a separate tractogram for each label-->label tract", false);
   parser.addArgument("skip_self_connections", "", mitkCommandLineParser::Bool, "Skip self connections:", "ignore streamlines between two identical labels", false);

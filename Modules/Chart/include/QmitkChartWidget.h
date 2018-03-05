@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkC3jsWidget_h
 
 #include <map>
+#include <memory>
 #include <QWidget>
 
 #include <MitkChartExports.h>
@@ -84,21 +85,21 @@ public:
   * \brief Adds 1D data to the widget
   * \details internally, the list is converted to a map with increasing integers keys starting at 0.
   * \param label the name of the data that is also used as identifier.
-  * \param type the chart type that should be used for this data entry
+  * \param chartType the chart type that should be used for this data entry
   * \note the data can be cleared with ClearDiagram()
   * \note If the label name already exists, the name is replaced with a unique one by concatenating numbers to it.
   */
-  void AddData1D(const std::vector<double>& data1D, const std::string& label, ChartType type = ChartType::bar);
+  void AddData1D(const std::vector<double>& data1D, const std::string& label, ChartType chartType = ChartType::bar);
 
   /*!
   * \brief Adds 2D data to the widget. Call repeatedly for displaying multiple charts.
   * \details each entry represents a data point: key: value --> x-value: y-value.
   * \param label the name of the data that is also used as identifier.
-  * \param type the chart type that should be used for this data entry
+  * \param chartType the chart type that should be used for this data entry
   * \note the data can be cleared with ClearDiagram() 
   * \note If the label name already exists, the name is replaced with a unique one by concatenating numbers to it.
   */
-  void AddData2D(const std::map<double, double>& data2D, const std::string& label, ChartType type = ChartType::bar);
+  void AddData2D(const std::map<double, double>& data2D, const std::string& label, ChartType chartType = ChartType::bar);
 
   /*!
   * \brief Removes data from the widget, works for 1D and 2D Data
@@ -135,6 +136,10 @@ public:
   void SetTitle(const std::string &title);
 
   /*!
+  * \brief Changes the chart type for all data entries and reloads the chart
+  */
+  void SetChartTypeForAllDataAndReload(ChartType type);
+  /*!
   * \brief sets the chart type for a data entry
   * \details for available types, see ChartType
   * If an unknown label is given, nothing happens.
@@ -145,11 +150,6 @@ public:
   void SetLegendPosition(LegendPosition position);
 
   void SetShowLegend(bool show);
-
-  /*!
-  * \brief Changes the chart type for all data entries and reloads the chart
-  */
-  void SetChartTypeForAllDataAndReload(ChartType type);
 
   /*!
   * \brief Displays the chart in the widget
@@ -183,7 +183,7 @@ public:
 
 private:
   class Impl;
-  Impl* m_Impl;
+  std::unique_ptr<Impl> m_Impl;
 
 public slots:
   void OnLoadFinished(bool isLoadSuccessfull);

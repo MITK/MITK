@@ -35,12 +35,12 @@ namespace mitk
   public:
 
     FiberBundleVtkReader();
-    virtual ~FiberBundleVtkReader(){}
+    ~FiberBundleVtkReader() override{}
     FiberBundleVtkReader(const FiberBundleVtkReader& other);
-    virtual FiberBundleVtkReader * Clone() const override;
+    FiberBundleVtkReader * Clone() const override;
 
     using mitk::AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+    std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   private:
 

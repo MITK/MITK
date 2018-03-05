@@ -571,7 +571,6 @@ void QmitkDiffusionQuantificationView::TensorQuantification(int method)
     mitk::DataNode* node = m_Controls->m_ImageBox->GetSelectedNode();
 
     typedef mitk::TensorImage::ScalarPixelType    TTensorPixelType;
-    typedef mitk::TensorImage::PixelType          TensorPixelType;
     typedef mitk::TensorImage::ItkTensorImageType TensorImageType;
 
     mitk::Image* vol = static_cast<mitk::Image*>(node->GetData());

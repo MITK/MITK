@@ -183,7 +183,7 @@ namespace mitk {
   protected:
     NavigationToolStorage();
     NavigationToolStorage(mitk::DataStorage::Pointer);
-    ~NavigationToolStorage();
+    ~NavigationToolStorage() override;
 
     std::vector<mitk::NavigationTool::Pointer> m_ToolCollection;
     mitk::DataStorage::Pointer m_DataStorage;

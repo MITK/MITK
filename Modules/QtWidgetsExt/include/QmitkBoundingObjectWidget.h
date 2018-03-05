@@ -33,7 +33,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkBoundingObjectWidget : public QWidget
   Q_OBJECT
 
 public:
-  QmitkBoundingObjectWidget(QWidget *parent = 0, Qt::WindowFlags f = 0);
+  QmitkBoundingObjectWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkBoundingObjectWidget() override;
 
   void SetDataStorage(mitk::DataStorage *dataStorage);

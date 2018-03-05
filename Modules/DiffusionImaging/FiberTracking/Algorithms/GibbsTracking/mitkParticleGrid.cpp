@@ -16,8 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkParticleGrid.h"
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 
 using namespace mitk;
 

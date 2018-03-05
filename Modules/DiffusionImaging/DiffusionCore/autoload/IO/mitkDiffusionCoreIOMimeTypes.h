@@ -31,48 +31,48 @@ public:
   {
   public:
     DiffusionImageNrrdMimeType();
-    virtual bool AppliesTo(const std::string &path) const override;
-    virtual DiffusionImageNrrdMimeType* Clone() const override;
+    bool AppliesTo(const std::string &path) const override;
+    DiffusionImageNrrdMimeType* Clone() const override;
   };
 
   class  DiffusionImageNiftiMimeType : public CustomMimeType
   {
   public:
     DiffusionImageNiftiMimeType();
-    virtual bool AppliesTo(const std::string &path) const override;
-    virtual DiffusionImageNiftiMimeType* Clone() const override;
+    bool AppliesTo(const std::string &path) const override;
+    DiffusionImageNiftiMimeType* Clone() const override;
   };
 
   class  DiffusionImageFslMimeType : public CustomMimeType
   {
   public:
     DiffusionImageFslMimeType();
-    virtual bool AppliesTo(const std::string &path) const override;
-    virtual DiffusionImageFslMimeType* Clone() const override;
+    bool AppliesTo(const std::string &path) const override;
+    DiffusionImageFslMimeType* Clone() const override;
   };
 
   class  DiffusionImageDicomMimeType : public CustomMimeType
   {
   public:
     DiffusionImageDicomMimeType();
-    virtual bool AppliesTo(const std::string &path) const override;
-    virtual DiffusionImageDicomMimeType* Clone() const override;
+    bool AppliesTo(const std::string &path) const override;
+    DiffusionImageDicomMimeType* Clone() const override;
   };
 
   class  PeakImageMimeType : public CustomMimeType
   {
   public:
     PeakImageMimeType();
-    virtual bool AppliesTo(const std::string &path) const override;
-    virtual PeakImageMimeType* Clone() const override;
+    bool AppliesTo(const std::string &path) const override;
+    PeakImageMimeType* Clone() const override;
   };
 
   class  SHImageMimeType : public CustomMimeType
   {
   public:
     SHImageMimeType();
-    virtual bool AppliesTo(const std::string &path) const override;
-    virtual SHImageMimeType* Clone() const override;
+    bool AppliesTo(const std::string &path) const override;
+    SHImageMimeType* Clone() const override;
   };
 
   // Get all Diffusion Mime Types

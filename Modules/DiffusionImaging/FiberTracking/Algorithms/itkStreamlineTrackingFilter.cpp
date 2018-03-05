@@ -14,9 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstdio>
+#include <cstdlib>
 
 #include <omp.h>
 #include "itkStreamlineTrackingFilter.h"
@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionFunctionCollection.h>
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 namespace itk {
 

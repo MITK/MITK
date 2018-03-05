@@ -37,14 +37,14 @@ namespace mitk
     int ExtractSiemensDiffusionInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray );
 
     /** Read the data */
-    virtual void Update() override;
+    void Update() override;
 
   protected:
     /** Default c'tor */
     SiemensMosaicDicomDiffusionImageHeaderReader();
 
     /** Default class d'tor */
-    virtual ~SiemensMosaicDicomDiffusionImageHeaderReader();
+    ~SiemensMosaicDicomDiffusionImageHeaderReader() override;
   };
 
 }

@@ -25,7 +25,7 @@ mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
   DataCollectionImageIterator(DataCollection::Pointer collection, std::string imageName) :
   m_Collection(collection), m_ImageName(imageName), m_IsAtEnd(false),
   m_IteratingImages(true), m_CurrentIndex(0),
-  m_CurrentElement(0), m_CurrentCollectionIterator(0)
+  m_CurrentElement(0), m_CurrentCollectionIterator(nullptr)
 {
   ToBegin();
 }
@@ -47,7 +47,7 @@ void
       mitk::Image *image = dynamic_cast<mitk::Image*>(m_Collection->GetData(m_ImageName).GetPointer());
 
       //TODO: check whether image is valid... image != 0 if empty smart pointer was inserted into collection!!!!
-      if (image != 0)
+      if (image != nullptr)
       {
         typename ImageType::Pointer itkImage = ImageType::New();
         mitk::CastToItkImage(image, itkImage);
@@ -56,7 +56,7 @@ void
       }
     }
     ImageType * image = dynamic_cast<ImageType*>(m_Collection->GetData(m_ImageName).GetPointer());
-    if (image != 0)
+    if (image != nullptr)
     {
       m_IteratingImages = true;
       m_CurrentIterator = ImageIterator(image, image->GetLargestPossibleRegion());
@@ -64,14 +64,14 @@ void
   }
   if (!m_IteratingImages)
   {
-    if (m_CurrentCollectionIterator != 0)
+    if (m_CurrentCollectionIterator != nullptr)
     {
       delete m_CurrentCollectionIterator;
-      m_CurrentCollectionIterator = 0;
+      m_CurrentCollectionIterator = nullptr;
     }
     m_CurrentElement = 0;
     m_CurrentCollectionIterator = GetNextDataCollectionIterator(m_CurrentElement);
-    if (m_CurrentCollectionIterator == 0)
+    if (m_CurrentCollectionIterator == nullptr)
     {
       m_IsAtEnd = true;
     } else
@@ -124,19 +124,19 @@ mitk::DataCollectionImageIterator<TDataType, TImageDimension>*
   mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
   GetNextDataCollectionIterator(size_t start)
 {
-  DataCollectionImageIterator<TDataType, TImageDimension>* iterator = 0;
+  DataCollectionImageIterator<TDataType, TImageDimension>* iterator = nullptr;
   size_t index =start;
-  while (index < m_Collection->Size() && iterator == 0)
+  while (index < m_Collection->Size() && iterator == nullptr)
   {
     DataCollection* collection;
     collection = dynamic_cast<DataCollection*>(m_Collection->GetData(index).GetPointer());
-    if (collection != 0)
+    if (collection != nullptr)
     {
       iterator = new DataCollectionImageIterator<TDataType, TImageDimension>(collection, m_ImageName);
       if (iterator->IsAtEnd())
       {
         delete iterator;
-        iterator = 0;
+        iterator = nullptr;
         ++index;
       }
     }
@@ -193,15 +193,15 @@ void mitk::DataCollectionImageIterator<TDataType, TImageDimension>::NextObject()
 {
   if (m_IteratingImages)
   {
-    if (m_CurrentCollectionIterator != NULL)
+    if (m_CurrentCollectionIterator != nullptr)
     {
       delete m_CurrentCollectionIterator;
-      m_CurrentCollectionIterator = 0;
+      m_CurrentCollectionIterator = nullptr;
     }
     m_IteratingImages = false;
     m_CurrentElement = 0;
     m_CurrentCollectionIterator = GetNextDataCollectionIterator(m_CurrentElement);
-    if (m_CurrentCollectionIterator == NULL)
+    if (m_CurrentCollectionIterator == nullptr)
     {
       m_IsAtEnd = true;
       return;
@@ -215,7 +215,7 @@ void mitk::DataCollectionImageIterator<TDataType, TImageDimension>::NextObject()
       delete m_CurrentCollectionIterator;
       m_CurrentCollectionIterator = GetNextDataCollectionIterator(m_CurrentElement+1);
     }
-    if (m_CurrentCollectionIterator == NULL) //If no collection is known
+    if (m_CurrentCollectionIterator == nullptr) //If no collection is known
     {
       m_IsAtEnd = true;
       return;

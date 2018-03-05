@@ -106,7 +106,7 @@ void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWin
 
   {
     ctkPluginContext* context = mitk::PluginActivator::GetContext();
-    mitk::IDataStorageService* dss = 0;
+    mitk::IDataStorageService* dss = nullptr;
     ctkServiceReference dsRef = context->getServiceReference<mitk::IDataStorageService>();
     if (dsRef)
     {
@@ -180,7 +180,7 @@ void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWin
       mitk::DataStorageEditorInput::Pointer input(new mitk::DataStorageEditorInput(dataStorageRef));
       berry::IEditorPart::Pointer editor = mitk::WorkbenchUtil::OpenEditor(window->GetActivePage(), input, true);
       mitk::IRenderWindowPart* renderEditor = dynamic_cast<mitk::IRenderWindowPart*>(editor.GetPointer());
-      mitk::IRenderingManager* renderingManager = renderEditor == 0 ? 0 : renderEditor->GetRenderingManager();
+      mitk::IRenderingManager* renderingManager = renderEditor == nullptr ? nullptr : renderEditor->GetRenderingManager();
 
       if(dsmodified && renderingManager)
       {

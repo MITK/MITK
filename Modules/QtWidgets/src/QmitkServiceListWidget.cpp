@@ -94,7 +94,7 @@ void QmitkServiceListWidget::InitPrivate(const std::string &namingProperty, cons
 
 bool QmitkServiceListWidget::GetIsServiceSelected()
 {
-  return (this->m_Controls->m_ServiceList->currentItem() != 0);
+  return (this->m_Controls->m_ServiceList->currentItem() != nullptr);
 }
 
 void QmitkServiceListWidget::OnServiceSelectionChanged()

@@ -40,7 +40,7 @@ namespace mitk {
     };
 
     ConnectomicsShortestPathHistogram();
-    virtual ~ConnectomicsShortestPathHistogram();
+    ~ConnectomicsShortestPathHistogram() override;
 
     /** Set the calucaltion mode */
     void SetShortestPathCalculationMode( const ShortestPathCalculationMode & );
@@ -60,7 +60,7 @@ namespace mitk {
     typedef boost::graph_traits< NetworkType >::vertex_iterator IteratorType;
 
     /** @brief Creates a new histogram from the network source. */
-    virtual void ComputeFromConnectomicsNetwork( ConnectomicsNetwork* source ) override;
+    void ComputeFromConnectomicsNetwork( ConnectomicsNetwork* source ) override;
 
     /** Calculate shortest paths ignoring the weight of the edges */
     void CalculateUnweightedUndirectedShortestPaths( NetworkType* boostGraph );

@@ -61,10 +61,10 @@ public:
 
 protected:
     DftImageFilter();
-    ~DftImageFilter() {}
+    ~DftImageFilter() override {}
 
-    void BeforeThreadedGenerateData();
-    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
+    void BeforeThreadedGenerateData() override;
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId) override;
 
 private:
 

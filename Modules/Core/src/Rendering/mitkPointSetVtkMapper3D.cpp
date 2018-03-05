@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTubeFilter.h>
 #include <vtkVectorText.h>
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <mitkPropertyObserver.h>
 #include <vtk_glew.h>

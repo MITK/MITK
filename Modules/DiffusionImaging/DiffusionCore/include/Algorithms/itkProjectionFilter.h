@@ -124,7 +124,7 @@ protected:
   ProjectionFilter();
 
   /** Destructor */
-  virtual ~ProjectionFilter();
+  ~ProjectionFilter() override;
 
   RealImageType::Pointer m_DistanceMap;
 

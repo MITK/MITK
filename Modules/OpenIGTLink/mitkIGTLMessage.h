@@ -89,14 +89,14 @@ namespace mitk {
       * SmartPointers to the same IGTLMessage object since separate DataObjects
       * are still maintained.
       */
-      virtual void Graft(const DataObject *data) override;
+      void Graft(const DataObject *data) override;
 
       /**
       * \brief copy meta data of a IGTLMessage object
       *
       * copies all meta data from IGTLMessage data to this object
       */
-      virtual void CopyInformation(const DataObject* data) override;
+      void CopyInformation(const DataObject* data) override;
 
       /**
       * \brief Prints the object information to the given stream os.
@@ -140,7 +140,7 @@ namespace mitk {
        */
       IGTLMessage(igtl::MessageBase::Pointer message);
 
-      virtual ~IGTLMessage();
+      ~IGTLMessage() override;
 
       /**
       * \brief holds the actual OpenIGTLink message

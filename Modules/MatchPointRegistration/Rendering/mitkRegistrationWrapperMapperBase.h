@@ -42,10 +42,10 @@ public:
     mitkClassMacro(MITKRegistrationWrapperMapperBase, VtkMapper);
 
     //========== essential implementation for mapper ==========
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer);
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false );
     static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
+    void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
     //=========================================================
 
     virtual bool GetGeometryDescription(mitk::BaseRenderer *renderer, mitk::BaseGeometry::ConstPointer& gridDesc, unsigned int& gridFrequ) const = 0;
@@ -73,7 +73,7 @@ public:
         /** \brief Constructor of the local storage. Do as much actions as possible in here to avoid double executions. */
         RegWrapperLocalStorage();
 
-        ~RegWrapperLocalStorage()
+        ~RegWrapperLocalStorage() override
         {
         }
     };
@@ -85,7 +85,7 @@ public:
 protected:
 
     MITKRegistrationWrapperMapperBase();
-    virtual ~MITKRegistrationWrapperMapperBase();
+    ~MITKRegistrationWrapperMapperBase() override;
 
 
 private:

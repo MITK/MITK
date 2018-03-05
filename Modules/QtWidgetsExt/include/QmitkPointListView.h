@@ -42,7 +42,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPointListView : public QListView
   Q_OBJECT
 
 public:
-  QmitkPointListView(QWidget *parent = 0);
+  QmitkPointListView(QWidget *parent = nullptr);
   ~QmitkPointListView() override;
   QLabel *m_TimeStepFaderLabel;
 

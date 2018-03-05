@@ -48,13 +48,13 @@ namespace mitk {
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual void MitkRenderOverlay(BaseRenderer* renderer) override
+    void MitkRenderOverlay(BaseRenderer* renderer) override
     {
       m_ImgMapper->MitkRenderOverlay(renderer);
       m_OdfMapper->MitkRenderOverlay(renderer);
     }
 
-    virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer) override
+    void MitkRenderOpaqueGeometry(BaseRenderer* renderer) override
     {
       m_ImgMapper->MitkRenderOpaqueGeometry(renderer);
       m_OdfMapper->MitkRenderOpaqueGeometry(renderer);
@@ -64,13 +64,13 @@ namespace mitk {
       }
     }
 
-    virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer) override
+    void MitkRenderTranslucentGeometry(BaseRenderer* renderer) override
     {
       m_ImgMapper->MitkRenderTranslucentGeometry(renderer);
       m_OdfMapper->MitkRenderTranslucentGeometry(renderer);
     }
 
-    virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer) override
+    void MitkRenderVolumetricGeometry(BaseRenderer* renderer) override
     {
       m_ImgMapper->MitkRenderVolumetricGeometry(renderer);
       m_OdfMapper->MitkRenderVolumetricGeometry(renderer);
@@ -127,13 +127,13 @@ namespace mitk {
 
   protected:
 
-    virtual void Update(mitk::BaseRenderer* renderer) override
+    void Update(mitk::BaseRenderer* renderer) override
     {
       m_OdfMapper->Update(renderer);
       GenerateDataForRenderer(renderer);
     }
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override
+    void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override
     {
       m_ImgMapper->GenerateDataForRenderer(renderer);
 //      if( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) > 0 )
@@ -144,7 +144,7 @@ namespace mitk {
 
     CompositeMapper();
 
-    virtual ~CompositeMapper();
+    ~CompositeMapper() override;
 
   private:
 

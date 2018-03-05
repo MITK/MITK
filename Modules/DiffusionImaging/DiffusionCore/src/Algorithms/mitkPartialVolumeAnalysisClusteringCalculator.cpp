@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkListSample.h"
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 #define PVA_PI M_PI
 

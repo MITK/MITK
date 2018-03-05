@@ -31,12 +31,12 @@ namespace mitk
   public:
 
     UnspecifiedTrackingTypeInformation();
-    virtual ~UnspecifiedTrackingTypeInformation();
+    ~UnspecifiedTrackingTypeInformation() override;
 
-    virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer,
+    TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer,
       mitk::NavigationToolStorage::Pointer,
       std::string*,
-      std::vector<int>*);
+      std::vector<int>*) override;
 
     static std::string GetTrackingDeviceName();
     static TrackingDeviceData GetDeviceDataUnspecified();

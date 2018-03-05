@@ -52,11 +52,11 @@ namespace mitk
     {
     };
 
-    virtual ~MultiModalAffineDefaultRegistrationAlgorithm()
+    ~MultiModalAffineDefaultRegistrationAlgorithm() override
     {
     };
 
-    void configureAlgorithm()
+    void configureAlgorithm() override
     {
       Superclass::configureAlgorithm();
 
@@ -78,7 +78,7 @@ namespace mitk
     }
 
     void
-      doInterLevelSetup()
+      doInterLevelSetup() override
     {
       Superclass::doInterLevelSetup();
 

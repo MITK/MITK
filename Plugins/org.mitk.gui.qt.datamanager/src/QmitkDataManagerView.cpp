@@ -134,7 +134,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_HelperObjectFilterPredicate = mitk::NodePredicateOr::New(
    mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)),
    mitk::NodePredicateProperty::New("hidden object", mitk::BoolProperty::New(true)));
-  m_NodeWithNoDataFilterPredicate = mitk::NodePredicateData::New(0);
+  m_NodeWithNoDataFilterPredicate = mitk::NodePredicateData::New(nullptr);
 
   m_FilterModel = new QmitkDataStorageFilterProxyModel();
   m_FilterModel->setSourceModel(m_NodeTreeModel);
@@ -797,7 +797,7 @@ void QmitkDataManagerView::ColorChanged()
         if (!color_selected)
         {
           QColor initial(rgb[0] * 255, rgb[1] * 255, rgb[2] * 255);
-          newColor = QColorDialog::getColor(initial, 0, QString(tr("Change color")));
+          newColor = QColorDialog::getColor(initial, nullptr, QString(tr("Change color")));
 
           if ( newColor.isValid() )
           {
@@ -1034,7 +1034,7 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
   }
   std::vector<mitk::DataNode::Pointer> selectedNodes;
 
-  mitk::DataNode::Pointer node = 0;
+  mitk::DataNode::Pointer node = nullptr;
   QString question = tr("Do you really want to remove ");
 
   for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()

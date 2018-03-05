@@ -55,8 +55,8 @@ public:
   typedef typename DiffusionSignalModel< ScalarType >::GradientListType   GradientListType;
 
   /** Actual signal generation **/
-  PixelType SimulateMeasurement(GradientType& fiberDirection);
-  ScalarType SimulateMeasurement(unsigned int dir, GradientType& fiberDirection);
+  PixelType SimulateMeasurement(GradientType& fiberDirection) override;
+  ScalarType SimulateMeasurement(unsigned int dir, GradientType& fiberDirection) override;
 
   void SetRandomizeSticks(bool randomize=true){ m_RandomizeSticks=randomize; } ///< Random stick configuration in each voxel
   bool GetRandomizeSticks() { return m_RandomizeSticks; }

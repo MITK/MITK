@@ -34,7 +34,7 @@ class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkAlgorithmProfileViewer : public Q
   Q_OBJECT
 
 public:
-  QmitkAlgorithmProfileViewer(QWidget *parent = 0);
+  QmitkAlgorithmProfileViewer(QWidget *parent = nullptr);
 
   /**
    * \brief Updates the widget according to the new info.

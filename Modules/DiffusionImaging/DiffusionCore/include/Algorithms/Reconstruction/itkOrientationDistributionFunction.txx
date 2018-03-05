@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _itkOrientationDistributionFunction_txx
 #define _itkOrientationDistributionFunction_txx
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 #include <algorithm>
 #include <vector>
 #include <vnl/algo/vnl_matrix_inverse.h>

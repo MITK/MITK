@@ -51,11 +51,8 @@ namespace mitk
 
       typedef itk::Image<double, 3> FloatImageType;
 
-    /** Returns the selected DetectionMethod */
-    itkGetMacro(Method, DetectionMethod)
-
-      /** Returns the number of extracted points after edge detection */
-      itkGetMacro(NumberOfExtractedPoints, int)
+      /** Returns the selected DetectionMethod */
+      itkGetMacro(Method, DetectionMethod)
 
       /** Sets the DetectionMethod for edge detection and extraction */
       itkSetMacro(Method, DetectionMethod)

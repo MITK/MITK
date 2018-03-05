@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkFibersFromPlanarFiguresFilter.h"
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 // MITK
 #include <itkOrientationDistributionFunction.h>
@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 
 // MISC
-#include <math.h>
+#include <cmath>
 
 namespace itk{
 

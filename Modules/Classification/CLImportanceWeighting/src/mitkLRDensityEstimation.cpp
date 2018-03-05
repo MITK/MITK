@@ -265,7 +265,7 @@ static void EnsureDataImageInCollection(mitk::DataCollection::Pointer collection
   for (std::size_t i = 0; i < collection->Size();++i)
   {
     mitk::DataCollection* newCol = dynamic_cast<mitk::DataCollection*>(collection->GetData(i).GetPointer());
-    if (newCol != 0)
+    if (newCol != nullptr)
     {
       EnsureDataImageInCollection(newCol, origin, target);
     }

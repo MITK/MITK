@@ -64,7 +64,7 @@ const std::map<QAction *, mitk::SliceNavigationController *> QmitkSlicesInterpol
   std::map<QAction *, mitk::SliceNavigationController *> actionToSliceDimension;
   foreach (mitk::SliceNavigationController *slicer, m_ControllerToDeleteObserverTag.keys())
   {
-    actionToSliceDimension[new QAction(QString::fromStdString(slicer->GetViewDirectionAsString()), 0)] = slicer;
+    actionToSliceDimension[new QAction(QString::fromStdString(slicer->GetViewDirectionAsString()), nullptr)] = slicer;
   }
 
   return actionToSliceDimension;
@@ -77,7 +77,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
     m_SurfaceInterpolator(mitk::SurfaceInterpolationController::GetInstance()),
     m_ToolManager(nullptr),
     m_Initialized(false),
-    m_LastSNC(0),
+    m_LastSNC(nullptr),
     m_LastSliceIndex(0),
     m_2DInterpolationEnabled(false),
     m_3DInterpolationEnabled(false),
@@ -463,7 +463,7 @@ void QmitkSlicesInterpolator::OnShowMarkers(bool state)
 
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
-  if (m_ToolManager->GetWorkingData(0) != 0)
+  if (m_ToolManager->GetWorkingData(0) != nullptr)
   {
     m_Segmentation = dynamic_cast<mitk::Image *>(m_ToolManager->GetWorkingData(0)->GetData());
     m_BtnReinit3DInterpolation->setEnabled(true);

@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkFiberCurvatureFilter.h"
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 #include <vtkDoubleArray.h>
 #include <vtkPointData.h>
 #include <boost/progress.hpp>

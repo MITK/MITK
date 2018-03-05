@@ -94,11 +94,11 @@ const vtkImageData*mitk::ShImage::GetVtkImageData(int t, int n) const
   return m_RgbImage->GetVtkImageData(t,n);
 }
 
-template<int ShOrder>
+template<int nShOrder>
 void mitk::ShImage::Construct() const
 {
-  typedef itk::Image<itk::Vector<float, (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder >,3> ImageType;
-  typedef itk::ShToRgbImageFilter<ImageType, ShOrder> FilterType;
+  typedef itk::Image<itk::Vector<float, ( nShOrder * nShOrder + nShOrder + 2)/2 + nShOrder >,3> ImageType;
+  typedef itk::ShToRgbImageFilter<ImageType, nShOrder> FilterType;
   typename FilterType::Pointer filter = FilterType::New();
 
   typename ImageType::Pointer itkvol = ImageType::New();

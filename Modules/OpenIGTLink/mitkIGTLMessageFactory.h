@@ -131,7 +131,7 @@ namespace mitk {
 
   protected:
     IGTLMessageFactory();
-    virtual ~IGTLMessageFactory();
+    ~IGTLMessageFactory() override;
 
     /**
      * \brief Map igt message types and the Clone() methods

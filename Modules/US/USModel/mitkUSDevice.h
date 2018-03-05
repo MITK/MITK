@@ -432,13 +432,13 @@ namespace mitk {
     */
     USDevice(mitk::USImageMetadata::Pointer metadata);
 
-    virtual ~USDevice();
+    ~USDevice() override;
 
     /**
     * \brief Grabs the next frame from the Video input.
     * This method is called internally, whenever Update() is invoked by an Output.
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     std::string GetServicePropertyLabel();
 

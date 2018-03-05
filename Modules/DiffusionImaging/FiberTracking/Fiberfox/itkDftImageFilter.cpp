@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __itkDftImageFilter_txx
 #define __itkDftImageFilter_txx
 
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstdio>
+#include <cstdlib>
 
 #include "itkDftImageFilter.h"
 #include <itkImageRegionConstIterator.h>
@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionIterator.h>
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 namespace itk {
 

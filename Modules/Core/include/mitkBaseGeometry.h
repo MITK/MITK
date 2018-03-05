@@ -234,13 +234,13 @@ namespace mitk
     //## transformation consists of first applying self to the source,
     //## followed by other.
     //## This method also changes m_spacing.
-    void Compose(const TransformType *other, bool pre = 0);
+    void Compose(const TransformType *other, bool pre = false);
 
     //##Documentation
     //## @brief Compose new IndexToWorldTransform with a given vtkMatrix4x4.
     //##
     //## Converts the vtkMatrix4x4 into a itk-transform and calls the previous method.
-    void Compose(const vtkMatrix4x4 *vtkmatrix, bool pre = 0);
+    void Compose(const vtkMatrix4x4 *vtkmatrix, bool pre = false);
 
     //##Documentation
     //## @brief Translate the origin by a vector

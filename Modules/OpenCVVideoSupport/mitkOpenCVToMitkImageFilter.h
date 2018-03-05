@@ -82,9 +82,9 @@ namespace mitk
   protected:
 
     OpenCVToMitkImageFilter(); // purposely hidden
-    virtual ~OpenCVToMitkImageFilter();
+    ~OpenCVToMitkImageFilter() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
   protected:
     Image::Pointer m_Image;

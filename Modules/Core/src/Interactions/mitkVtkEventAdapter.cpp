@@ -18,7 +18,7 @@
 #include "mitkInteractionEventConst.h"
 #include "vtkCommand.h"
 #include <mitkInteractionConst.h> // INTERACTION LEGACY
-#include <string.h>
+#include <cstring>
 
 namespace mitk
 {

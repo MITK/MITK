@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vnl/vnl_matrix_fixed.h"
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 namespace itk
 {

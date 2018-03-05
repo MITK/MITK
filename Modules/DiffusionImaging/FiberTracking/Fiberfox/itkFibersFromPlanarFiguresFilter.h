@@ -51,7 +51,7 @@ public:
     itkCloneMacro(Self)
     itkTypeMacro( FibersFromPlanarFiguresFilter, ProcessObject )
 
-    virtual void Update() override{
+    void Update() override{
         this->GenerateData();
     }
 
@@ -69,7 +69,7 @@ protected:
     void GenerateData() override;
 
     FibersFromPlanarFiguresFilter();
-    virtual ~FibersFromPlanarFiguresFilter();
+    ~FibersFromPlanarFiguresFilter() override;
     void GeneratePoints();
 
     FiberContainerType              m_FiberBundles;    ///< container for the output fiber bundles

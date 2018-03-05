@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkTimerLog.h"
 #include "vtkVolume.h"
 #include "vtkVolumeProperty.h"
-#include <assert.h>
+#include <cassert>
 
 vtkInstantiatorNewMacro(vtkMitkGPUVolumeRayCastMapper);
 vtkCxxSetObjectMacro(vtkMitkGPUVolumeRayCastMapper, MaskInput, vtkImageData);

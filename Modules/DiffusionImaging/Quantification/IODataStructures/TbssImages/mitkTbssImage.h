@@ -96,7 +96,7 @@ namespace mitk
 
     TbssImage();
 
-    virtual ~TbssImage(){}
+    ~TbssImage() override{}
 
     ImageType::Pointer m_Image;
 

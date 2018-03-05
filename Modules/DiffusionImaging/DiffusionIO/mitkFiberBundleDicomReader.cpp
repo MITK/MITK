@@ -68,7 +68,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleDicomReader::Re
     std::string filename = this->GetInputLocation();
 
     OFCondition result;
-    TrcTractographyResults *trc = NULL;
+    TrcTractographyResults *trc = nullptr;
     result = TrcTractographyResults::loadFile(filename.c_str(), trc);
     if (result.bad())
       mitkThrow() << "Unable to load tractography dicom file: " << result.text();
@@ -100,7 +100,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleDicomReader::Re
       {
         vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
         TrcTrack* track = sets[ts]->getTracks()[t];
-        const Float32* vals = NULL;
+        const Float32* vals = nullptr;
         size_t numPoints = track->getTrackData(vals);
 
         for (size_t v = 0; v < numPoints; ++v)

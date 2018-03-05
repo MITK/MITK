@@ -35,17 +35,17 @@ namespace mitk
     typedef mitk::OdfImage InputType;
 
     NrrdOdfImageWriter();
-    virtual ~NrrdOdfImageWriter();
+    ~NrrdOdfImageWriter() override;
 
     using AbstractFileWriter::Write;
-    virtual void Write() override;
+    void Write() override;
 
-    virtual ConfidenceLevel GetConfidenceLevel() const override;
+    ConfidenceLevel GetConfidenceLevel() const override;
 
   protected:
 
     NrrdOdfImageWriter(const NrrdOdfImageWriter& other);
-    virtual mitk::NrrdOdfImageWriter* Clone() const override;
+    mitk::NrrdOdfImageWriter* Clone() const override;
   };
 
 

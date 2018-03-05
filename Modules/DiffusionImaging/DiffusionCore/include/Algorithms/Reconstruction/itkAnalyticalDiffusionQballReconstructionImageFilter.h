@@ -224,13 +224,13 @@ public:
 
 protected:
     AnalyticalDiffusionQballReconstructionImageFilter();
-    ~AnalyticalDiffusionQballReconstructionImageFilter() {};
-    void PrintSelf(std::ostream& os, Indent indent) const;
+    ~AnalyticalDiffusionQballReconstructionImageFilter() override {};
+    void PrintSelf(std::ostream& os, Indent indent) const override;
 
     void ComputeReconstructionMatrix();
-    void BeforeThreadedGenerateData();
+    void BeforeThreadedGenerateData() override;
     void ThreadedGenerateData( const
-                               OutputImageRegionType &outputRegionForThread, ThreadIdType);
+                               OutputImageRegionType &outputRegionForThread, ThreadIdType) override;
 
 private:
 

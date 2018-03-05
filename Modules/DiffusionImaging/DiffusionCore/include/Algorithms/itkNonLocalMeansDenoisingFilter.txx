@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __itkNonLocalMeansDenoisingFilter_txx
 #define __itkNonLocalMeansDenoisingFilter_txx
 
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstdio>
+#include <cstdlib>
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 #include "itkImageRegionIterator.h"
 #include "itkNeighborhoodIterator.h"
@@ -40,7 +40,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
     m_UseJointInformation(false),
     m_UseRicianAdaption(false),
     m_Variance(1),
-    m_Mask(NULL)
+    m_Mask(nullptr)
 {
   this->SetNumberOfRequiredInputs( 1 );
 }
@@ -142,7 +142,7 @@ NonLocalMeansDenoisingFilter< TPixelType >
 
 
   typedef ImageRegionIteratorWithIndex <InputImageType> InputIteratorType;
-  typename InputImageType::Pointer inputImagePointer = NULL;
+  typename InputImageType::Pointer inputImagePointer = nullptr;
   inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
 
   InputIteratorType git(inputImagePointer, outputRegionForThread );

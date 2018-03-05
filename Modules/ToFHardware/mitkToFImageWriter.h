@@ -41,7 +41,7 @@ namespace mitk
 
     ToFImageWriter();
 
-    ~ToFImageWriter();
+    ~ToFImageWriter() override;
 
     mitkClassMacroItkParent( ToFImageWriter , itk::Object );
 
@@ -98,7 +98,7 @@ namespace mitk
     /*!
     \brief Add new data to file.
     */
-    virtual void Add(float* /*distanceFloatData*/, float* /*amplitudeFloatData*/, float* /*intensityFloatData*/, unsigned char* /*rgbData*/=0){};
+    virtual void Add(float* /*distanceFloatData*/, float* /*amplitudeFloatData*/, float* /*intensityFloatData*/, unsigned char* /*rgbData*/=nullptr){};
 
   protected:
 

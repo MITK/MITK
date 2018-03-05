@@ -60,10 +60,10 @@ public:
     protected:
     VectorImageToImageFilter();
     ~VectorImageToImageFilter() {}
-    void PrintSelf(std::ostream& os, Indent indent) const;
+    void PrintSelf(std::ostream& os, Indent indent) const override;
 
     //void BeforeThreadedGenerateData();
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     unsigned int m_Index;
 };

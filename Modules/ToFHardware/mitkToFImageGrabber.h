@@ -193,7 +193,7 @@ namespace mitk
     unsigned long m_DeviceObserverTag; ///< tag of the observer for the ToFCameraDevice
     ToFImageGrabber();
 
-    ~ToFImageGrabber();
+    ~ToFImageGrabber() override;
 
     /*!
     \brief Method generating the outputs of this filter. Called in the updated process of the pipeline.

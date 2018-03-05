@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPAVector.h"
 #include "chrono"
-#include "math.h"
+#include <cmath>
 mitk::pa::Vector::Vector()
 {
   m_Vector.Fill(0);

@@ -57,7 +57,7 @@ namespace mitk {
   protected:
     itkCloneMacro(Self)
     VirtualTrackingTool();
-    virtual ~VirtualTrackingTool();
+    ~VirtualTrackingTool() override;
 
     SplineType::Pointer m_Spline;
     mitk::ScalarType m_SplineLength;

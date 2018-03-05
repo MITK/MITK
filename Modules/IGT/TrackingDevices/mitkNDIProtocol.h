@@ -139,7 +139,7 @@ namespace mitk
     itkBooleanMacro(UseCRC);        ///< Set whether to append a CRC16 checksum to each message
   protected:
     NDIProtocol();
-    virtual ~NDIProtocol();
+    ~NDIProtocol() override;
 
     /**Documentation
     * Reads the reply from the tracking device and checks if it is either "OKAY" or "ERROR##".

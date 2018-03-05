@@ -90,7 +90,7 @@ public:
   /**
    * Set input image
    */
-  virtual void SetInputImage( const TInputImage *image )
+  void SetInputImage( const TInputImage *image ) override
     {
     Superclass::SetInputImage( image );
     this->ComputeBoundingBox();
@@ -141,8 +141,8 @@ public:
   /**
    * Evaluate at the given index
    */
-  virtual OutputType EvaluateAtContinuousIndex(
-    const ContinuousIndexType & cindex ) const
+  OutputType EvaluateAtContinuousIndex(
+    const ContinuousIndexType & cindex ) const override
     {
     return this->EvaluateAtContinuousIndex( cindex, nullptr );
     }
@@ -155,8 +155,8 @@ public:
 
 protected:
   GaussianInterpolateImageFunction();
-  ~GaussianInterpolateImageFunction(){};
-  void PrintSelf( std::ostream& os, Indent indent ) const;
+  ~GaussianInterpolateImageFunction() override{};
+  void PrintSelf( std::ostream& os, Indent indent ) const override;
 
 private:
   GaussianInterpolateImageFunction( const Self& ); //purposely not implemented

@@ -30,10 +30,10 @@ class ShImageSerializer : public BaseDataSerializer
     mitkClassMacro( ShImageSerializer, BaseDataSerializer );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
-    virtual std::string Serialize() override;
+    std::string Serialize() override;
   protected:
     ShImageSerializer();
-    virtual ~ShImageSerializer();
+    ~ShImageSerializer() override;
 };
 } // namespace
 #endif

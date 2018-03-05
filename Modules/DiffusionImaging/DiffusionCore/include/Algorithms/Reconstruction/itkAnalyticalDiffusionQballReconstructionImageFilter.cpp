@@ -24,11 +24,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/vnl_vector.h>
 #include <mitkDiffusionFunctionCollection.h>
 
-#include <stdio.h>
+#include <cstdio>
 #include <locale>
 #include <fstream>
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 #include "itkPointShell.h"
 
 namespace itk {

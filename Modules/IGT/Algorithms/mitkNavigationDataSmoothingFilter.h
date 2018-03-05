@@ -44,9 +44,9 @@ namespace mitk {
 
   protected:
     NavigationDataSmoothingFilter();
-    virtual ~NavigationDataSmoothingFilter();
+    ~NavigationDataSmoothingFilter() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     std::map< int, std::map< int , mitk::Point3D> > m_LastValuesList;
 

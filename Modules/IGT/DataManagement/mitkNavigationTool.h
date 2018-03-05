@@ -159,7 +159,7 @@ namespace mitk {
       * SmartPointers to the same NavigationTool object since separate DataObjects are
       * still maintained.
       */
-    virtual void Graft(const DataObject *data) override;
+    void Graft(const DataObject *data) override;
 
 
     /**
@@ -176,8 +176,8 @@ namespace mitk {
 
     NavigationTool();
     NavigationTool(const NavigationTool &other);
-    ~NavigationTool();
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    ~NavigationTool() override;
+    itk::LightObject::Pointer InternalClone() const override;
 
     //## data structure of a navigation tool object ##
     std::string m_Identifier;

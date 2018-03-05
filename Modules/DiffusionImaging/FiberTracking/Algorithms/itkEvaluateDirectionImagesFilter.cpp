@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/progress.hpp>
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 namespace itk {
 

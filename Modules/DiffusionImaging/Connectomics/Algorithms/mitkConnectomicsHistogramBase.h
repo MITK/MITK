@@ -50,7 +50,7 @@ namespace mitk {
     /** @brief Update the Y maximum to the maximal value in the histogram */
     virtual void UpdateYMax();
     /** @brief Creates a new histogram from the source. */
-    virtual void ComputeFromBaseData( BaseData* source ) override;
+    void ComputeFromBaseData( BaseData* source ) override;
     /** @brief Print values to console. */
     virtual void PrintToConsole( ) const;
     /** @brief Returns whether the histogram can be considered valid. */
@@ -61,7 +61,7 @@ namespace mitk {
     virtual void SetSubject( std::string );
 
     /** @brief Get bin height for the bin between start and end*/
-    virtual float GetRelativeBin( double start, double end ) const override;
+    float GetRelativeBin( double start, double end ) const override;
 
     /** @brief Get the double vector*/
     virtual std::vector< double > GetHistogramVector();
@@ -73,9 +73,9 @@ namespace mitk {
     /** @brief Creates a new histogram from the network source. */
     virtual void ComputeFromConnectomicsNetwork( ConnectomicsNetwork* source ) = 0;
     /** @brief Legacy method, do no use */
-    virtual double GetMin() const override;
+    double GetMin() const override;
     /** @brief Legacy method, do no use */
-    virtual double GetMax() const override;
+    double GetMax() const override;
 
     // Variables
 

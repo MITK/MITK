@@ -64,6 +64,7 @@ namespace mitk
     /** Returns the threshold */
     double GetThreshold();
 
+    /** Returns the number of extracted points after edge detection */
     itkGetMacro(NumberOfExtractedPoints, int)
 
       protected :

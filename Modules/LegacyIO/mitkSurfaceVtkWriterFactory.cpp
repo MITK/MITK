@@ -54,7 +54,7 @@ namespace mitk
     this->RegisterOverride("IOWriter",
                            "SurfaceVtkWriter",
                            "Surface Vtk Writer",
-                           1,
+                           true,
                            mitk::CreateSurfaceWriter<mitk::SurfaceVtkWriter<vtkXMLPolyDataWriter>>::New());
   }
 

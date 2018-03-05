@@ -45,7 +45,7 @@ public:
 
   //# CTORS,DTOR
 public:
-  QmitkDataStorageTreeModel(mitk::DataStorage *_DataStorage, bool _PlaceNewNodesOnTop = false, QObject *parent = 0);
+  QmitkDataStorageTreeModel(mitk::DataStorage *_DataStorage, bool _PlaceNewNodesOnTop = false, QObject *parent = nullptr);
   ~QmitkDataStorageTreeModel() override;
 
   //# GETTER
@@ -149,7 +149,7 @@ protected:
     ///
     /// Constructs a new TreeItem with the given DataNode (must not be 0)
     ///
-    TreeItem(mitk::DataNode *_DataNode, TreeItem *_Parent = 0);
+    TreeItem(mitk::DataNode *_DataNode, TreeItem *_Parent = nullptr);
     ///
     /// Removes itself as child from its parent-> Does not delete its children
     /// \sa Delete()

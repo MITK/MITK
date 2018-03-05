@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QProcess>
 #include <QMainWindow>
 
-ctkPluginContext* QmitkCommonExtPlugin::_context = 0;
+ctkPluginContext* QmitkCommonExtPlugin::_context = nullptr;
 
 void QmitkCommonExtPlugin::start(ctkPluginContext* context)
 {
@@ -70,7 +70,7 @@ void QmitkCommonExtPlugin::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 
-  this->_context = 0;
+  this->_context = nullptr;
 }
 
 ctkPluginContext* QmitkCommonExtPlugin::getContext()

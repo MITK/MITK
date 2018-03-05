@@ -41,12 +41,12 @@ namespace mitk {
       * mitk::USVideoDeviceCustomControls::SetCropArea() with an empty are
       * instead.
       */
-    virtual void SetIsActive(bool isActive) override;
+    void SetIsActive(bool isActive) override;
 
     /**
       * \return if this custom controls are currently activated
       */
-    virtual bool GetIsActive() override;
+    bool GetIsActive() override;
 
     /**
       * \brief Sets the area that will be cropped from the US image.
@@ -85,7 +85,7 @@ namespace mitk {
       * This object will be manipulated by the custom controls methods.
       */
     USVideoDeviceCustomControls(itk::SmartPointer<USVideoDevice> device);
-    virtual ~USVideoDeviceCustomControls();
+    ~USVideoDeviceCustomControls() override;
 
     bool                          m_IsActive;
     USImageVideoSource::Pointer   m_ImageSource;

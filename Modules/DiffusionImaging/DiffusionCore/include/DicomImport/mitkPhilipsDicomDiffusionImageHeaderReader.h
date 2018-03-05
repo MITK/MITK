@@ -33,7 +33,7 @@ namespace mitk
     itkCloneMacro(Self)
 
     /** read in the data */
-    virtual void Update() override;
+    void Update() override;
 
   protected:
 
@@ -41,7 +41,7 @@ namespace mitk
     PhilipsDicomDiffusionImageHeaderReader();
 
     /** Default d'tor */
-    virtual ~PhilipsDicomDiffusionImageHeaderReader();
+    ~PhilipsDicomDiffusionImageHeaderReader() override;
 
   };
 

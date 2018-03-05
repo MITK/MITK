@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <cstdlib>
 #include <ctime>
-#include <math.h>
+#include <cmath>
 
 #include <mitkGeometry3D.h>
 

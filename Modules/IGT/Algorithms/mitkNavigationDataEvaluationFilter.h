@@ -92,14 +92,14 @@ namespace mitk {
   protected:
 
     NavigationDataEvaluationFilter();
-    virtual ~NavigationDataEvaluationFilter();
+    ~NavigationDataEvaluationFilter() override;
 
     /**Documentation
     * \brief filter execute method
     *
     * transforms navigation data
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     /** @brief Creates the member variables which store all the statistical data for every input. */
     void CreateMembersForAllInputs();

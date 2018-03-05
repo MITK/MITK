@@ -34,17 +34,17 @@ namespace mitk
 
     // -------------- AbstractFileReader -------------
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read();
+    std::vector<itk::SmartPointer<BaseData> > Read() override;
 
-    virtual ConfidenceLevel GetReaderConfidenceLevel() const;
+    ConfidenceLevel GetReaderConfidenceLevel() const override;
 
     // -------------- AbstractFileWriter -------------
-    virtual void Write();
-    virtual ConfidenceLevel GetWriterConfidenceLevel() const;
+    void Write() override;
+    ConfidenceLevel GetWriterConfidenceLevel() const override;
 
   private:
     MAPRegistrationWrapperIO(const MAPRegistrationWrapperIO& other);
-    MAPRegistrationWrapperIO* IOClone() const;
+    MAPRegistrationWrapperIO* IOClone() const override;
   };
 
 

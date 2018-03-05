@@ -26,7 +26,7 @@ std::string QmitkUSAbstractCustomWidget::US_DEVICE_PROPKEY_CLASS()
 }
 
 QmitkUSAbstractCustomWidget::QmitkUSAbstractCustomWidget(QWidget* parent)
-  : QWidget(parent), m_PrototypeServiceFactory(0), m_IsClonedForQt(false)
+  : QWidget(parent), m_PrototypeServiceFactory(nullptr), m_IsClonedForQt(false)
 {
 
 }

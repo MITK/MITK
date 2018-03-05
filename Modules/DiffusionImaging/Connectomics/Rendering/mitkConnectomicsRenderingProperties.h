@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ConnectomicsRenderingProperties_H_HEADER_INCLUDED
 #define ConnectomicsRenderingProperties_H_HEADER_INCLUDED
 
-#include <string.h>
+#include <cstring>
 #include "mitkProperties.h"
 #include "mitkStringProperty.h"
 #include "mitkEnumerationProperty.h"

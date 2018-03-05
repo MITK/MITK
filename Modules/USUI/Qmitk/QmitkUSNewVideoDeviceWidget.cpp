@@ -206,7 +206,7 @@ void QmitkUSNewVideoDeviceWidget::OnClickedFinishedEditing()
 
 void QmitkUSNewVideoDeviceWidget::OnClickedCancel()
 {
-  m_TargetDevice = 0;
+  m_TargetDevice = nullptr;
   m_Active = false;
   CleanUpAfterCreatingNewDevice();
   CleanUpAfterEditingOfDevice();
@@ -275,7 +275,7 @@ void QmitkUSNewVideoDeviceWidget::CreateNewDevice()
   m_Controls->m_Model->setText("Unknown Model");
   m_Controls->m_Comment->setText("None");
 
-  m_TargetDevice = 0;
+  m_TargetDevice = nullptr;
   m_Active = true;
 }
 

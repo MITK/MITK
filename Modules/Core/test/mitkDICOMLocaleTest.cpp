@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 
 #include <list>
-#include <locale.h>
+#include <clocale>
 #include <locale>
 
 class mitkDICOMLocaleTestSuite : public mitk::TestFixture

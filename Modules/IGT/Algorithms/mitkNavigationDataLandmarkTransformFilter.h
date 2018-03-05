@@ -126,13 +126,13 @@ namespace mitk {
     * \brief Constructor
     **/
     NavigationDataLandmarkTransformFilter();
-    virtual ~NavigationDataLandmarkTransformFilter();
+    ~NavigationDataLandmarkTransformFilter() override;
 
     /**
     * \brief transforms input NDs according to the calculated LandmarkTransform
     *
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     /**Documentation
     * \brief perform an iterative closest point matching to find corresponding landmarks that will be used for landmark transform calculation

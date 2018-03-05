@@ -36,8 +36,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define _USE_MATH_DEFINES
 
 #include "itkElectrostaticRepulsionDiffusionGradientReductionFilter.h"
-#include <math.h>
-#include <time.h>
+#include <cmath>
+#include <ctime>
 #include <itkImageRegionIterator.h>
 #include <itkImageRegion.h>
 
@@ -97,7 +97,7 @@ void
 ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutputScalarType>
 ::GenerateData()
 {
-    unsigned int randSeed = time(NULL);
+    unsigned int randSeed = time(nullptr);
 
     if(m_InputBValueMap.empty() || m_NumGradientDirections.size()!=m_InputBValueMap.size())
         mitkThrow() << "Vector of the number of desired gradient directions contains more elements than the specified target b-value map.";

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include "mitkIGTTimeStamp.h"
 //#include "mitkIGTHardwareException.h"
 #include "igtlTrackingDataMessage.h"
-#include <stdio.h>
+#include <cstdio>
 
 #include <itksys/SystemTools.hxx>
 #include <itkMutexLockHolder.h>

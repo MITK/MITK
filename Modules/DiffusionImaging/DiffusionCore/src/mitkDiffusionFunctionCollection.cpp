@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkDiffusionFunctionCollection.h"
-#include <math.h>
+#include <cmath>
 #include "mitkNumericTypes.h"
 
 // for Windows

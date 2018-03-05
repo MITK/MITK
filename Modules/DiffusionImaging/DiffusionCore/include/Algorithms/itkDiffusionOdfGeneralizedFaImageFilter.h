@@ -104,12 +104,12 @@ public:
 
 protected:
   DiffusionOdfGeneralizedFaImageFilter();
-  ~DiffusionOdfGeneralizedFaImageFilter() {};
-  void PrintSelf(std::ostream& os, Indent indent) const;
+  ~DiffusionOdfGeneralizedFaImageFilter() override {};
+  void PrintSelf(std::ostream& os, Indent indent) const override;
 
-  void BeforeThreadedGenerateData();
+  void BeforeThreadedGenerateData() override;
   void ThreadedGenerateData( const
-      OutputImageRegionType &outputRegionForThread, ThreadIdType);
+      OutputImageRegionType &outputRegionForThread, ThreadIdType) override;
 
   GfaComputationMethod m_ComputationMethod;
 

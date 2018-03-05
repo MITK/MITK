@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 // #include <QFile>
 #include <tinyxml.h>
-#include <math.h>
+#include <cmath>
 #include <boost/progress.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -399,7 +399,7 @@ bool GibbsTrackingFilter< ItkOdfImageType >::LoadParameters()
 
     TiXmlHandle hDoc(&doc);
     TiXmlElement* pElem;
-    TiXmlHandle hRoot(0);
+    TiXmlHandle hRoot(nullptr);
 
     pElem = hDoc.FirstChildElement().Element();
     hRoot = TiXmlHandle(pElem);

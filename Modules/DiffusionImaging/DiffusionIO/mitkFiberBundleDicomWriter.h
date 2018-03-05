@@ -34,11 +34,11 @@ public:
 
     FiberBundleDicomWriter();
     FiberBundleDicomWriter(const FiberBundleDicomWriter & other);
-    virtual FiberBundleDicomWriter * Clone() const override;
-    virtual ~FiberBundleDicomWriter();
+    FiberBundleDicomWriter * Clone() const override;
+    ~FiberBundleDicomWriter() override;
 
     using mitk::AbstractFileWriter::Write;
-    virtual void Write() override;
+    void Write() override;
 };
 
 

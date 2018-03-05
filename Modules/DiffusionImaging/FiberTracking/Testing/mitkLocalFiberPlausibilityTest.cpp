@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <omp.h>
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
 {

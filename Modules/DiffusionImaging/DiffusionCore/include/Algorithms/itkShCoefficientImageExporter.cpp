@@ -16,9 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __itkShCoefficientImageExporter_cpp
 #define __itkShCoefficientImageExporter_cpp
 
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstdio>
+#include <cstdlib>
 
 #include "itkShCoefficientImageExporter.h"
 #include <itkImageRegionIterator.h>

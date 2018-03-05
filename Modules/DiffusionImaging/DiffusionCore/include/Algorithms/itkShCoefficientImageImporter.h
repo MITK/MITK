@@ -55,7 +55,7 @@ public:
 
 protected:
     ShCoefficientImageImporter();
-    ~ShCoefficientImageImporter(){}
+    ~ShCoefficientImageImporter() override{}
 
     InputImageType::Pointer                   m_InputImage;
     typename CoefficientImageType::Pointer    m_CoefficientImage; ///< mitk style image containing the SH coefficients

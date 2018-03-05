@@ -72,14 +72,14 @@ namespace mitk {
   protected:
 
     NavigationDataTransformFilter();
-    virtual ~NavigationDataTransformFilter();
+    ~NavigationDataTransformFilter() override;
 
     /**Documentation
     * \brief filter execute method
     *
     * transforms navigation data
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     TransformType::Pointer m_Rigid3DTransform; ///< transform which will be applied on navigation data(s)
     bool m_Precompose;

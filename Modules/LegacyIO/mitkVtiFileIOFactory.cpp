@@ -27,7 +27,7 @@ namespace mitk
     this->RegisterOverride("mitkIOAdapter",
                            "mitkVtiFileReader",
                            "mitk Vti Image IO",
-                           1,
+                           true,
                            itk::CreateObjectFunction<IOAdapter<VtiFileReader>>::New());
   }
 

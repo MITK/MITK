@@ -157,7 +157,7 @@ namespace mitk
 
     Impl(int argc, char **argv)
       : m_Argc(argc), m_Argv(argv), m_SingleMode(false), m_SafeMode(true),
-        m_Splashscreen(0), m_SplashscreenClosingCallback(nullptr)
+        m_Splashscreen(nullptr), m_SplashscreenClosingCallback(nullptr)
     {
 #ifdef Q_OS_MAC
       /*
@@ -366,11 +366,11 @@ namespace mitk
 
   BaseApplication::~BaseApplication()
   {
-    if (d->m_Splashscreen != 0)
+    if (d->m_Splashscreen != nullptr)
     {
       delete(d->m_Splashscreen);
     }
-    if (d->m_SplashscreenClosingCallback != 0)
+    if (d->m_SplashscreenClosingCallback != nullptr)
     {
       delete(d->m_SplashscreenClosingCallback);
     }
@@ -733,7 +733,7 @@ namespace mitk
       arguments.push_back(QString::fromStdString(arg));
     }
 
-    if (d->m_Splashscreen != 0)
+    if (d->m_Splashscreen != nullptr)
     {
       // a splash screen is displayed,
       // creating the closing callback

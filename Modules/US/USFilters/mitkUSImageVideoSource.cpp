@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <highgui.h>
 
 //Other
-#include <stdio.h>
+#include <cstdio>
 
 mitk::USImageVideoSource::USImageVideoSource()
   : m_VideoCapture(new cv::VideoCapture()),

@@ -40,7 +40,7 @@ namespace mitk
 
     itkCloneMacro(Self)
     OpenIGTLinkTrackingTool();
-    virtual ~OpenIGTLinkTrackingTool();
+    ~OpenIGTLinkTrackingTool() override;
   };
 }//mitk
 #endif // MITKOpenIGTLinkTrackingTOOL_H_HEADER_INCLUDED_

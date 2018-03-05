@@ -97,7 +97,7 @@ public:
     }
   }
 
-  vtkShaderCallback3D() { this->renderer = 0; }
+  vtkShaderCallback3D() { this->renderer = nullptr; }
 };
 
 mitk::FiberBundleMapper3D::FiberBundleMapper3D()

@@ -73,10 +73,10 @@ public:
 protected:
   MultiTensorImageFilter();
   ~MultiTensorImageFilter() {}
-  void PrintSelf(std::ostream& os, Indent indent) const;
+  void PrintSelf(std::ostream& os, Indent indent) const override;
 
-  void BeforeThreadedGenerateData();
-  void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType);
+  void BeforeThreadedGenerateData() override;
+  void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType) override;
 
   double                            m_B_value;
   std::vector<double>               m_B_values;

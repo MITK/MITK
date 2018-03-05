@@ -30,10 +30,10 @@ class TractographyForestSerializer : public BaseDataSerializer
     mitkClassMacro( TractographyForestSerializer, BaseDataSerializer );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
-    virtual std::string Serialize() override;
+    std::string Serialize() override;
   protected:
     TractographyForestSerializer();
-    virtual ~TractographyForestSerializer();
+    ~TractographyForestSerializer() override;
 };
 } // namespace
 #endif

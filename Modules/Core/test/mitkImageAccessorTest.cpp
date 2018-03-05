@@ -26,8 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMultiThreader.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkTestingMacros.h>
-#include <stdlib.h>
-#include <time.h>
+#include <cstdlib>
+#include <ctime>
 
 struct ThreadData
 {

@@ -63,7 +63,7 @@ private slots:
 
 public:
   QmitkComboBoxStepThrough(QWidget* parent = nullptr);
-  ~QmitkComboBoxStepThrough();
+  ~QmitkComboBoxStepThrough() override;
 
   // --> Overwritten superclass methods
   void addItem( const QString & text, const QVariant & userData = QVariant() );

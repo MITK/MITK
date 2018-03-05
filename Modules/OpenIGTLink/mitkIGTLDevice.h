@@ -321,7 +321,7 @@ namespace mitk {
     void SetState(IGTLDeviceState state);
 
     IGTLDevice();
-    virtual ~IGTLDevice();
+    ~IGTLDevice() override;
 
     /** current object state (Setup, Ready or Running) */
     IGTLDeviceState m_State;

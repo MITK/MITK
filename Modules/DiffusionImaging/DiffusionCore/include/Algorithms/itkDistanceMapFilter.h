@@ -66,7 +66,7 @@ public:
 
   /** Generate Data. The image will be divided into a number of pieces, a number of threads
   will be spawned and Threaded GenerateData() will be called in each thread. */
-  virtual void GenerateData();
+  void GenerateData() override;
 
 
 protected:
@@ -75,7 +75,7 @@ protected:
   DistanceMapFilter();
 
   /** Destructor */
-  virtual ~DistanceMapFilter();
+  ~DistanceMapFilter() override;
 
 
 

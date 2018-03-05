@@ -22,8 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLocaleSwitch.h>
 
 // C-Standard library includes
-#include <locale.h>
-#include <stdlib.h>
+#include <clocale>
+#include <cstdlib>
 
 // STL-related includes
 #include <cstdlib>

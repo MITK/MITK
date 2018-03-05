@@ -77,10 +77,10 @@ public:
 
   /** \brief Checks whether this mapper needs to update itself and generate
    * data. */
-  virtual void Update(mitk::BaseRenderer * renderer);
+  void Update(mitk::BaseRenderer * renderer) override;
 
   //### methods of MITK-VTK rendering pipeline
-  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+  vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
   //### end of methods of MITK-VTK rendering pipeline
 
   /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
@@ -144,7 +144,7 @@ public:
     /** \brief Default constructor of the local storage. */
     LocalStorage();
     /** \brief Default deconstructor of the local storage. */
-    ~LocalStorage();
+    ~LocalStorage() override;
   };
 
   /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
@@ -182,7 +182,7 @@ protected:
   /** Default constructor */
   RegEvaluationMapper2D();
   /** Default deconstructor */
-  virtual ~RegEvaluationMapper2D();
+  ~RegEvaluationMapper2D() override;
 
   /** \brief Does the actual resampling, without rendering the image yet.
     * All the data is generated inside this method. The vtkProp (or Actor)
@@ -196,7 +196,7 @@ protected:
     * \image html cameraPositioning3D.png
     *
     */
-  virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer);
+  void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
   void PrepareContour( mitk::DataNode* datanode, LocalStorage * localStorage );
 

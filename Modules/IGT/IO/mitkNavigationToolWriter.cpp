@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 
 //std headers
-#include <stdio.h>
+#include <cstdio>
 
 mitk::NavigationToolWriter::NavigationToolWriter()
   {
@@ -116,12 +116,12 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
   //Calibration File Name
     thisTool->AddProperty("toolfileName",mitk::StringProperty::New(GetFileWithoutPath(Tool->GetCalibrationFile())));
   //Surface
-    if (Tool->GetDataNode().IsNotNull()) if (Tool->GetDataNode()->GetData() != NULL)
+    if (Tool->GetDataNode().IsNotNull()) if (Tool->GetDataNode()->GetData() != nullptr)
     {
       thisTool->SetData(Tool->GetDataNode()->GetData());
   //Visibility
       bool visible = true;
-      Tool->GetDataNode()->GetVisibility(visible, NULL);
+      Tool->GetDataNode()->GetVisibility(visible, nullptr);
       thisTool->SetVisibility(visible);
     }
 

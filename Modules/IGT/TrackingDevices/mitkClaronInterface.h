@@ -126,7 +126,7 @@ namespace mitk
     /**
     * \brief standard destructor
     */
-    ~ClaronInterface();
+    ~ClaronInterface() override;
 
 
     /** \brief Variable is true if the device is tracking at the moment, false if not.*/

@@ -112,15 +112,15 @@ public:
 
 protected:
   PhotoacousticBModeImageFilter();
-  ~PhotoacousticBModeImageFilter() {}
+  ~PhotoacousticBModeImageFilter() override {}
 
-  virtual void PrintSelf( std::ostream& os, Indent indent ) const ITK_OVERRIDE;
+  void PrintSelf( std::ostream& os, Indent indent ) const ITK_OVERRIDE;
 
-  virtual void GenerateData() ITK_OVERRIDE;
+  void GenerateData() ITK_OVERRIDE;
 
   // These behave like their analogs in FFT1DRealToComplexConjugateImageFilter.
-  virtual void GenerateInputRequestedRegion() ITK_OVERRIDE;
-  virtual void EnlargeOutputRequestedRegion(DataObject *output) ITK_OVERRIDE;
+  void GenerateInputRequestedRegion() ITK_OVERRIDE;
+  void EnlargeOutputRequestedRegion(DataObject *output) ITK_OVERRIDE;
 
   /** Component filters. */
   typedef AnalyticSignalImageFilter< InputImageType, ComplexImageType >                          AnalyticType;

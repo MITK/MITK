@@ -162,7 +162,7 @@ mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration(std::s
   std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator calibrationIterator
     = m_Calibrations.find(calibrationKey);
 
-  if (calibrationIterator == m_Calibrations.end()) { return 0; }
+  if (calibrationIterator == m_Calibrations.end()) { return nullptr; }
 
   return calibrationIterator->second;
 }

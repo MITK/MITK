@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPAVessel.h"
 #include <chrono>
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 #include <thread>
 
 mitk::pa::Vessel::Vessel(VesselProperties::Pointer initialProperties) :

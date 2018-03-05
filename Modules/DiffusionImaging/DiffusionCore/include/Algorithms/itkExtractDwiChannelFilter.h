@@ -59,10 +59,10 @@ public:
 
     protected:
         ExtractDwiChannelFilter();
-    ~ExtractDwiChannelFilter() {}
+    ~ExtractDwiChannelFilter() override {}
 
-    void BeforeThreadedGenerateData();
-    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType );
+    void BeforeThreadedGenerateData() override;
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType ) override;
 
     unsigned int    m_ChannelIndex;
 };

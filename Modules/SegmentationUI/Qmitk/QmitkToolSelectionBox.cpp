@@ -206,7 +206,7 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
 
     // m_LastToolGUI->reparent(nullptr, QPoint(0,0));
     // TODO: reparent <-> setParent, Daniel fragen
-    m_LastToolGUI->setParent(0);
+    m_LastToolGUI->setParent(nullptr);
     delete m_LastToolGUI; // will hopefully notify parent and layouts
     m_LastToolGUI = nullptr;
 
@@ -230,7 +230,7 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
   {
     // mmueller
     // uncheck all other buttons
-    QAbstractButton *tmpBtn = 0;
+    QAbstractButton *tmpBtn = nullptr;
     QList<QAbstractButton *>::iterator it;
     for (int i = 0; i < m_ToolButtonGroup->buttons().size(); ++i)
     {
@@ -474,7 +474,7 @@ void QmitkToolSelectionBox::RecreateButtons()
   int currentButtonID(0);
   m_ButtonIDForToolID.clear();
   m_ToolIDForButtonID.clear();
-  QToolButton *button = 0;
+  QToolButton *button = nullptr;
 
   MITK_DEBUG << "Creating buttons for tools";
   // fill group box with buttons

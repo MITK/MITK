@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSetStatisticsCalculator.h>
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 mitk::NavigationDataEvaluationFilter::NavigationDataEvaluationFilter()
   : mitk::NavigationDataToNavigationDataFilter()

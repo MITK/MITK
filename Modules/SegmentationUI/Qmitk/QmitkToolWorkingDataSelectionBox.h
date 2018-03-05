@@ -64,7 +64,7 @@ public:
     ListDataIfAnyToolMatches
   };
 
-  QmitkToolWorkingDataSelectionBox(QWidget *parent = 0);
+  QmitkToolWorkingDataSelectionBox(QWidget *parent = nullptr);
   ~QmitkToolWorkingDataSelectionBox() override;
 
   mitk::DataStorage *GetDataStorage();

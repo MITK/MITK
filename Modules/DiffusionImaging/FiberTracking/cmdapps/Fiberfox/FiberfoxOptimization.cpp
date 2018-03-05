@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <random>
+
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 #include <mitkProperties.h>

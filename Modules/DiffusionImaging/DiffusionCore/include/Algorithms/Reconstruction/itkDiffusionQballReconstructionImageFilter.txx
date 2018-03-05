@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkPointShell.h"
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 namespace itk {
 
@@ -40,7 +40,7 @@ namespace itk {
     TGradientImagePixelType, TOdfPixelType, NrOdfDirections,
     NrBasisFunctionCenters>
     ::DiffusionQballReconstructionImageFilter() :
-    m_GradientDirectionContainer(NULL),
+    m_GradientDirectionContainer(nullptr),
     m_NumberOfGradientDirections(0),
     m_NumberOfEquatorSamplingPoints(0),
     m_NumberOfBaselineImages(1),
@@ -257,7 +257,7 @@ namespace itk {
           index = i % (m_NumberOfGradientDirections/2);
 
         // init and pushback current input image iterator
-        typename GradientImageType::Pointer gradientImagePointer = NULL;
+        typename GradientImageType::Pointer gradientImagePointer = nullptr;
         // dynamic_cast would be nice, static because of SGI
         gradientImagePointer = static_cast< GradientImageType * >(
           this->ProcessObject::GetInput(index) );
@@ -333,7 +333,7 @@ namespace itk {
       // init input iterator
       typedef ImageRegionConstIterator< GradientImagesType > GradientIteratorType;
       typedef typename GradientImagesType::PixelType         GradientVectorType;
-      typename GradientImagesType::Pointer gradientImagePointer = NULL;
+      typename GradientImagesType::Pointer gradientImagePointer = nullptr;
       // dynamic_cast would be nice, static because of SGI
       gradientImagePointer = static_cast< GradientImagesType * >(
         this->ProcessObject::GetInput(0) );

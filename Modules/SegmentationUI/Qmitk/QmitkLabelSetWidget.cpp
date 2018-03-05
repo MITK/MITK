@@ -539,7 +539,7 @@ void QmitkLabelSetWidget::OnColorButtonClicked()
     int pixelValue = m_Controls.m_LabelSetTableWidget->item(row, 0)->data(Qt::UserRole).toInt();
     const mitk::Color &color = GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetColor();
     QColor initial(color.GetRed() * 255, color.GetGreen() * 255, color.GetBlue() * 255);
-    QColor qcolor = QColorDialog::getColor(initial, 0, QString("Change color"));
+    QColor qcolor = QColorDialog::getColor(initial, nullptr, QString("Change color"));
     if (!qcolor.isValid())
     {
       return;

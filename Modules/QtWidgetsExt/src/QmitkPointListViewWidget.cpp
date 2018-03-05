@@ -42,7 +42,7 @@ QmitkPointListViewWidget::QmitkPointListViewWidget(QWidget *parent)
 
 QmitkPointListViewWidget::~QmitkPointListViewWidget()
 {
-  this->SetPointSet(0); // remove listener
+  this->SetPointSet(nullptr); // remove listener
 }
 
 void QmitkPointListViewWidget::SetPointSet(mitk::PointSet *pointSet)
@@ -107,7 +107,7 @@ void QmitkPointListViewWidget::OnPointSetChanged()
 
 void QmitkPointListViewWidget::OnPointSetDeleted()
 {
-  this->SetPointSet(0);
+  this->SetPointSet(nullptr);
   this->Update();
 }
 

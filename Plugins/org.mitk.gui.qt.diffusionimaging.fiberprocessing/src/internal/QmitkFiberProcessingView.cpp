@@ -626,7 +626,6 @@ template < typename TPixel, unsigned int VImageDimension >
 void QmitkFiberProcessingView::InternalCalculateMaskFromPlanarFigure( itk::Image< TPixel, VImageDimension > *image, unsigned int axis, std::string )
 {
   typedef itk::Image< TPixel, VImageDimension > ImageType;
-  typedef itk::CastImageFilter< ImageType, ItkUCharImageType > CastFilterType;
 
   // Generate mask image as new image with same header as input image and
   // initialize with "1".

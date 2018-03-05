@@ -31,12 +31,12 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual void Update() override;
+    void Update() override;
 
   protected:
 
     GEDicomDiffusionImageHeaderReader();
-    virtual ~GEDicomDiffusionImageHeaderReader();
+    ~GEDicomDiffusionImageHeaderReader() override;
 
   };
 

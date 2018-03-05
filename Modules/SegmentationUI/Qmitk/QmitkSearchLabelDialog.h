@@ -29,7 +29,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSearchLabelDialog : public QDialog
   Q_OBJECT
 
 public:
-  QmitkSearchLabelDialog(QWidget *parent = 0, Qt::WindowFlags f = 0);
+  QmitkSearchLabelDialog(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkSearchLabelDialog() override;
 
   int GetLabelSetWidgetTableIndex();

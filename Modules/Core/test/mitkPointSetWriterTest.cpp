@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 
 #include <iostream>
-#include <time.h>
+#include <ctime>
 
 /**
  *  Test for the class "mitkPointSetFileWriter".

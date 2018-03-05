@@ -49,7 +49,7 @@ namespace mitk
     * @throw mitk::Exception Throws an exception if the client is not in Setup
     * mode or if it cannot connect to the defined host.
     */
-    virtual bool OpenConnection() override;
+    bool OpenConnection() override;
 
     /**
     * \brief Returns the number of connections of this device
@@ -57,13 +57,13 @@ namespace mitk
     * A client can connect to one sever only, therefore, the number is either 0
     * or 1
     */
-    virtual unsigned int GetNumberOfConnections() override;
+    unsigned int GetNumberOfConnections() override;
 
   protected:
     /** Constructor */
     IGTLClient(bool ReadFully);
     /** Destructor */
-    virtual ~IGTLClient();
+    ~IGTLClient() override;
 
     /**
     * \brief Call this method to receive a message.
@@ -71,14 +71,14 @@ namespace mitk
     * The message will be saved in the receive queue. If the connection is lost
     * it will stop the communication.
     */
-    virtual void Receive() override;
+    void Receive() override;
 
     /**
     * \brief Call this method to send a message.
     *
     * The message will be read from the queue.
     */
-    virtual void Send() override;
+    void Send() override;
 
     /**
     * \brief Stops the communication with the given socket.
@@ -87,7 +87,7 @@ namespace mitk
     * the stop of the communication.
     *
     */
-    virtual void StopCommunicationWithSocket(igtl::Socket*) override;
+    void StopCommunicationWithSocket(igtl::Socket*) override;
   };
 } // namespace mitk
 #endif /* MITKIGTLCLIENT_H */

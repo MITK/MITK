@@ -38,7 +38,7 @@ const std::string QmitkNavigationToolCreationWidget::VIEW_ID = "org.mitk.views.n
 QmitkNavigationToolCreationWidget::QmitkNavigationToolCreationWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
   m_ToolToBeEdited = mitk::NavigationTool::New();
   m_FinalTool = mitk::NavigationTool::New();
   m_ToolTransformationWidget = new QmitkInteractiveTransformationWidget();

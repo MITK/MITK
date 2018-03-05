@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 mitk::PlanarEllipse::PlanarEllipse()
   : FEATURE_ID_MAJOR_AXIS(Superclass::AddFeature("Major Axis", "mm")),

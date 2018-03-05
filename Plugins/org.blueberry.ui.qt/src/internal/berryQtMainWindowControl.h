@@ -32,7 +32,7 @@ class QtMainWindowControl : public QMainWindow
 
 public:
 
-  QtMainWindowControl(Shell* shell, QWidget* parent = nullptr, Qt::WindowFlags flags = 0);
+  QtMainWindowControl(Shell* shell, QWidget* parent = nullptr, Qt::WindowFlags flags = nullptr);
 
 protected:
 

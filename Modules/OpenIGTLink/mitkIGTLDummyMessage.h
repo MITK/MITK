@@ -60,7 +60,7 @@ public:
 
 protected:
   IGTLDummyMessage();
-  ~IGTLDummyMessage();
+  ~IGTLDummyMessage() override;
 
   std::string m_dummyString;
 };

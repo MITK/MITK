@@ -74,7 +74,7 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
     ClaronTool();
-    virtual ~ClaronTool();
+    ~ClaronTool() override;
     /** \brief Tool handle variable from tracking device */
     claronToolHandle m_ToolHandle;
     /** \brief  Variable which holds the Tool's calibration name */

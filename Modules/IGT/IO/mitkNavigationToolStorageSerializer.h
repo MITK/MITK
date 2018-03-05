@@ -56,7 +56,7 @@ namespace mitk {
 
   protected:
     NavigationToolStorageSerializer();
-    ~NavigationToolStorageSerializer();
+    ~NavigationToolStorageSerializer() override;
 
    std::string m_ErrorMessage;
 

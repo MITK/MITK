@@ -56,7 +56,7 @@ namespace mitk
   protected:
 
     /** Does the real work. */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     void ReadRoiInfo(itk::MetaDataDictionary dict);
 

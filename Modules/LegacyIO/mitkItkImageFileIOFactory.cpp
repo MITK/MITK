@@ -27,7 +27,7 @@ namespace mitk
     this->RegisterOverride("mitkIOAdapter",
                            "mitkItkImageFileReader",
                            "itk Image IO",
-                           1,
+                           true,
                            itk::CreateObjectFunction<IOAdapter<ItkImageFileReader>>::New());
   }
 

@@ -134,7 +134,7 @@ void QmitkPointListWidget::SetupUi()
   m_LoadPointsBtn->setToolTip("Load list of points from file (REPLACES current content)");
 
   int i;
-  
+
   QBoxLayout *lay1;
   QBoxLayout *lay2;
   QBoxLayout *lay3;
@@ -180,7 +180,7 @@ void QmitkPointListWidget::SetupUi()
 
   // setup Labels
   m_TimeStepDisplay = new QLabel();
-  lay3 = new QHBoxLayout(); 
+  lay3 = new QHBoxLayout();
 
   m_TimeStepDisplay->setMaximumSize(200, 15);
   m_PointListView->m_TimeStepFaderLabel->setMaximumSize(10, 15);
@@ -193,7 +193,7 @@ void QmitkPointListWidget::SetupUi()
   m_TimeStepDisplay->setText("Time Step: ");
   m_PointListModel = new QmitkPointListModel;
   m_PointListView->m_TimeStepFaderLabel->setText(QString("%1").arg((this->m_PointListModel)->GetTimeStep()));
-  
+
   //Add Layouts
 
   lay1->insertWidget(i, m_PointListView);
@@ -204,8 +204,8 @@ void QmitkPointListWidget::SetupUi()
 
 void QmitkPointListWidget::updateTimeStepStatus()
 {
-	m_PointListView->m_TimeStepFaderLabel = new QLabel(this);
-	m_PointListView->m_TimeStepFaderLabel->setVisible(true);
+    m_PointListView->m_TimeStepFaderLabel = new QLabel(this);
+    m_PointListView->m_TimeStepFaderLabel->setVisible(true);
 }
 
 void QmitkPointListWidget::SetPointSet(mitk::PointSet *newPs)
@@ -384,14 +384,14 @@ void QmitkPointListWidget::OnBtnAddPointManually()
 
   if (this->GetPointSet()->IsEmpty())
   {
-	  editPointDialog.SetPoint(pointSet, 0, m_TimeStep);
+      editPointDialog.SetPoint(pointSet, 0, m_TimeStep);
   }
 
   else
   {
-	  mitk::PointSet::PointsIterator maxIt = pointSet->GetMaxId();
-	  mitk::PointSet::PointIdentifier maxId = maxIt->Index();
-	  editPointDialog.SetPoint(pointSet, maxId + 1, m_TimeStep);
+      mitk::PointSet::PointsIterator maxIt = pointSet->GetMaxId();
+      mitk::PointSet::PointIdentifier maxId = maxIt->Index();
+      editPointDialog.SetPoint(pointSet, maxId + 1, m_TimeStep);
   }
 
   editPointDialog.exec();

@@ -23,9 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTrackingDevice.h"
 #include "mitkTrackingTool.h"
 #include "mitkIGTTimeStamp.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
+#include <cstdlib>
+#include <cstdio>
+#include <ctime>
 #include <itksys/SystemTools.hxx>
 #include <itkMutexLockHolder.h>
 #include "mitkCommon.h"
@@ -180,7 +180,7 @@ namespace mitk
     /**
     * \brief Destructor of the class
     */
-    ~OptitrackTrackingTool();
+    ~OptitrackTrackingTool() override;
 
     /**
     * \brief File of the configuration for the tool

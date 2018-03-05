@@ -31,7 +31,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkStandardViews : public QWidget
   Q_OBJECT
 
 public:
-  QmitkStandardViews(QWidget *parent = 0, Qt::WindowFlags f = 0);
+  QmitkStandardViews(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
 
   ~QmitkStandardViews() override;
 

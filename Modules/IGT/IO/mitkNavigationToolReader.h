@@ -56,7 +56,7 @@ namespace mitk {
 
   protected:
     NavigationToolReader();
-    ~NavigationToolReader();
+    ~NavigationToolReader() override;
 
     std::string m_ErrorMessage;
 

@@ -18,9 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTTimeStamp.h"
 #include "mitkIGTException.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
+#include <cstdlib>
+#include <cstdio>
+#include <ctime>
 #include <itksys/SystemTools.hxx>
 #include <itkMutexLockHolder.h>
 #include <random>

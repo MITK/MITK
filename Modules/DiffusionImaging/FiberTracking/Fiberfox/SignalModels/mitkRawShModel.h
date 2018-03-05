@@ -63,8 +63,8 @@ public:
   typedef itk::Matrix< double, 3, 3 >                                     MatrixType;
 
   /** Actual signal generation **/
-  PixelType SimulateMeasurement(GradientType& fiberDirection);
-  ScalarType SimulateMeasurement(unsigned int dir, GradientType& fiberDirection);
+  PixelType SimulateMeasurement(GradientType& fiberDirection) override;
+  ScalarType SimulateMeasurement(unsigned int dir, GradientType& fiberDirection) override;
 
   bool SetShCoefficients(vnl_vector< double > shCoefficients, double b0);
   vnl_matrix<double> SetFiberDirection(GradientType& fiberDirection);

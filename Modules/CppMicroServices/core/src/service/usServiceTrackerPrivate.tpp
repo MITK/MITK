@@ -38,7 +38,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     const ServiceReference<S>& reference,
     ServiceTrackerCustomizer<S,T>* customizer)
   : context(context), customizer(customizer), trackReference(reference),
-    trackedService(0), cachedReference(), cachedService(TTT::DefaultValue()), q_ptr(st)
+    trackedService(nullptr), cachedReference(), cachedService(TTT::DefaultValue()), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
   std::stringstream ss;
@@ -66,7 +66,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     ModuleContext* context, const std::string& clazz,
     ServiceTrackerCustomizer<S,T>* customizer)
       : context(context), customizer(customizer), trackClass(clazz),
-        trackReference(), trackedService(0), cachedReference(),
+        trackReference(), trackedService(nullptr), cachedReference(),
         cachedService(TTT::DefaultValue()), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
@@ -95,10 +95,10 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     ServiceTrackerCustomizer<S,T>* customizer)
       : context(context), filter(filter), customizer(customizer),
         listenerFilter(filter.ToString()), trackReference(),
-        trackedService(0), cachedReference(), cachedService(TTT::DefaultValue()), q_ptr(st)
+        trackedService(nullptr), cachedReference(), cachedService(TTT::DefaultValue()), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
-  if (context == 0)
+  if (context == nullptr)
   {
     throw std::invalid_argument("The module context cannot be null.");
   }

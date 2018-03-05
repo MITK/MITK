@@ -47,7 +47,7 @@ class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkRegistrationManipulationWidget : 
 public:
   QmitkRegistrationManipulationWidget(QWidget *parent = nullptr);
 
-  ~QmitkRegistrationManipulationWidget();
+  ~QmitkRegistrationManipulationWidget() override;
 
   /** Type of transform that can be provided as preceding transform.*/
   typedef map::core::Registration<3, 3> MAPRegistrationType;

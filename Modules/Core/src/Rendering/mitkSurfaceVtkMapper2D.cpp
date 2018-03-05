@@ -309,7 +309,7 @@ void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer *renderer)
   // to the output polydata. The normals will influence the
   // vtkPolyDataMapper lightning. To view a clean cut the lighting has
   // to be disabled.
-  localStorage->m_Actor->GetProperty()->SetLighting(0);
+  localStorage->m_Actor->GetProperty()->SetLighting(false);
 
   // same block for scalar data rendering as in 3D mapper
   mitk::TransferFunctionProperty::Pointer transferFuncProp;

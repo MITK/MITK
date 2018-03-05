@@ -27,7 +27,7 @@ namespace mitk
     this->RegisterOverride("mitkIOAdapter",
                            "mitkVtkVolumeTimeSeriesReader",
                            "mitk Vtk Surface IO",
-                           1,
+                           true,
                            itk::CreateObjectFunction<IOAdapter<VtkVolumeTimeSeriesReader>>::New());
   }
 

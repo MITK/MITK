@@ -32,19 +32,6 @@
     <file>dark/branch_open.png</file>
     <file>dark/Vsepartoolbar.png</file>
     <file>dark/undock.png</file>
-    <file>dark/checkbox_checked_disabled.png</file>
-    <file>dark/checkbox_checked_focus.png</file>
-    <file>dark/checkbox_checked.png</file>
-    <file>dark/checkbox_indeterminate_disabled.png</file>
-    <file>dark/checkbox_indeterminate_focus.png</file>
-    <file>dark/checkbox_indeterminate.png</file>
-    <file>dark/checkbox_unchecked_disabled.png</file>
-    <file>dark/checkbox_unchecked_focus.png</file>
-    <file>dark/checkbox_unchecked.png</file>
-    <file>dark/checkbox_big_checked_disabled.png</file>
-    <file>dark/checkbox_big_checked.png</file>
-    <file>dark/checkbox_big_unchecked_disabled.png</file>
-    <file>dark/checkbox_big_unchecked.png</file>
     <file>dark/radio_checked_disabled.png</file>
     <file>dark/radio_checked_focus.png</file>
     <file>dark/radio_checked.png</file>
@@ -68,6 +55,13 @@
     <file>dark/up-arrow-disabled.svg</file>
     <file>dark/up-arrow-hover.svg</file>
     <file>dark/up-arrow-pressed.svg</file>
+
+    <file>dark/checkbox-unchecked.svg</file>
+    <file>dark/checkbox-unchecked-hover.svg</file>
+    <file>dark/checkbox-unchecked-disabled.svg</file>
+    <file>dark/checkbox-checked.svg</file>
+    <file>dark/checkbox-checked-hover.svg</file>
+    <file>dark/checkbox-checked-disabled.svg</file>
 
     <file>darkstyle.qss</file>
     <file>darkstyle-tab.qss</file>

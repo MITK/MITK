@@ -34,7 +34,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class QmitkDataStorageTreeModelInternalItem;
 
-/// \ingroup QmitkModule
+/** \ingroup QmitkModule
+ @warning This class causes invalid point exception when used with invalid QModelIndex instances.
+ The index validation is not sufficient. This may cause unspecific crashes in situation where
+ this class is used multiple times or with multiple selection models. See https://phabricator.mitk.org/T24348
+ for more information.
+*/
 class MITKQTWIDGETS_EXPORT QmitkDataStorageTreeModel : public QAbstractItemModel
 {
   Q_OBJECT

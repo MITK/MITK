@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="checkbox-checked-hover.svg">
+   sodipodi:docname="radiobutton-unchecked-hover.svg">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -26,18 +26,18 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="32"
-     inkscape:cx="9.021687"
+     inkscape:cx="5.3660997"
      inkscape:cy="1.9319291"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      units="px"
      inkscape:showpageshadow="false"
-     inkscape:window-width="2560"
-     inkscape:window-height="1377"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1" />
+     inkscape:window-width="1264"
+     inkscape:window-height="1361"
+     inkscape:window-x="1280"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -46,7 +46,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -55,19 +55,11 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-1039.3622)">
-    <rect
-       style="fill:#333337;fill-opacity:1;stroke:#434346;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       id="rect4136"
-       width="12"
-       height="12"
-       x="0.5"
-       y="1039.8622" />
-    <rect
-       style="fill:#1c97ea;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       id="rect4684"
-       width="9"
-       height="9"
-       x="2"
-       y="1041.3622" />
+    <circle
+       style="fill:#3f3f46;fill-opacity:1;stroke:#434346;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4134"
+       cx="6.5"
+       cy="1045.8622"
+       r="6" />
   </g>
 </svg>

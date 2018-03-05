@@ -35,8 +35,25 @@ QAbstractButton:hover, QComboBox:hover, QLineEdit:hover {
   background-color: #3f3f46;
 }
 
-QAbstractButton:pressed {
+QAbstractButton:pressed, QAbstractButton:checked {
   background-color: #434346;
+}
+
+QPushButton {
+  border: 1px solid #3f3f46;
+  padding: 4px 8px;
+}
+
+QPushButton:pressed {
+  border: 1px solid #434346;
+}
+
+QPushButton:checked, QToolButton:checked {
+  border: 1px solid #007acc;
+}
+
+QToolButton {
+  padding: 2px 2px;
 }
 
 QAbstractItemView {
@@ -48,6 +65,10 @@ QGroupBox {
   border: 1px solid #434346;
   margin-top: 8px;
   padding-top: 8px;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: #252526;
 }
 
 QGroupBox::title {
@@ -79,15 +100,11 @@ QComboBox::drop-down:hover {
   image: url(":/org.blueberry.ui.qt/dark/down-arrow-pressed.svg");
 }
 
-QCheckBox {
+QCheckBox, QCheckBox:hover, QCheckBox:disabled, QCheckBox:checked, QRadioButton, QRadioButton:hover, QRadioButton:disabled, QRadioButton:checked {
   background-color: none;
 }
 
-QCheckBox:hover {
-  background-color: none;
-}
-
-QCheckBox::indicator {
+QCheckBox::indicator, QRadioButton::indicator {
   height: 13px;
   width: 13px;
 }
@@ -114,6 +131,30 @@ QCheckBox::indicator:checked:hover {
 
 QCheckBox::indicator:checked:disabled {
   image: url(":/org.blueberry.ui.qt/dark/checkbox-checked-disabled.svg");
+}
+
+QRadioButton::indicator:unchecked {
+  image: url(":/org.blueberry.ui.qt/dark/radiobutton-unchecked.svg");
+}
+
+QRadioButton::indicator:unchecked:hover {
+  image: url(":/org.blueberry.ui.qt/dark/radiobutton-unchecked-hover.svg");
+}
+
+QRadioButton::indicator:unchecked:disabled {
+  image: url(":/org.blueberry.ui.qt/dark/radiobutton-unchecked-disabled.svg");
+}
+
+QRadioButton::indicator:checked {
+  image: url(":/org.blueberry.ui.qt/dark/radiobutton-checked.svg");
+}
+
+QRadioButton::indicator:checked:hover {
+  image: url(":/org.blueberry.ui.qt/dark/radiobutton-checked-hover.svg");
+}
+
+QRadioButton::indicator:checked:disabled {
+  image: url(":/org.blueberry.ui.qt/dark/radiobutton-checked-disabled.svg");
 }
 
 QSlider::groove {
@@ -154,20 +195,11 @@ QSlider::handle::vertical {
   height: 8px;
 }
 
-QPushButton {
-  border: 1px solid #3f3f46;
-  padding: 4px 8px;
-}
-
-QPushButton:pressed {
-  border: 1px solid #434346;
-}
-
 QLineEdit:hover {
   border: 1px solid #2b7de1;
 }
 
-QLabel {
+QLabel, QLabel:disabled {
   background-color: none;
 }
 

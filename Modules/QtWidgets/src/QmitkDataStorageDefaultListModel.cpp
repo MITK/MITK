@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt widgets module
 #include "QmitkCustomVariants.h"
 #include "QmitkEnums.h"
+#include "QmitkNodeDescriptorManager.h"
 
 QmitkDataStorageDefaultListModel::QmitkDataStorageDefaultListModel(QObject *parent) : QmitkAbstractDataStorageModel(parent)
 {
@@ -99,13 +100,26 @@ QVariant QmitkDataStorageDefaultListModel::data(const QModelIndex &index, int ro
   }
 
   mitk::DataNode::Pointer dataNode = m_DataNodes.at(index.row());
-  if (Qt::DisplayRole == role)
+  QString nodeName = QString::fromStdString(dataNode->GetName());
+  if (nodeName.isEmpty())
+    nodeName = "unnamed";
+
+  if (role == Qt::DisplayRole)
+    return nodeName;
+  else if (role == Qt::ToolTipRole)
+    return nodeName;
+  else if (role == Qt::DecorationRole)
   {
-    return QVariant(QString::fromStdString(dataNode->GetName()));
+    QmitkNodeDescriptor *nodeDescriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(dataNode);
+    return nodeDescriptor->GetIcon(dataNode);
   }
-  else if (QmitkDataNodeRole == role)
+  else if (role == QmitkDataNodeRole)
   {
-    return QVariant::fromValue<mitk::DataNode::Pointer>(dataNode);
+    return QVariant::fromValue<mitk::DataNode::Pointer>(mitk::DataNode::Pointer(dataNode));
+  }
+  else if (role == QmitkDataNodeRawPointerRole)
+  {
+    return QVariant::fromValue<mitk::DataNode *>(dataNode);
   }
 
   return QVariant();

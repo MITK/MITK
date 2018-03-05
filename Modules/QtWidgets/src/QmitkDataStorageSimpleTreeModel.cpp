@@ -208,10 +208,6 @@ QVariant QmitkDataStorageSimpleTreeModel::data(const QModelIndex &index, int rol
     QmitkNodeDescriptor *nodeDescriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(dataNode);
     return nodeDescriptor->GetIcon(dataNode);
   }
-  else if (role == Qt::CheckStateRole)
-  {
-    return dataNode->IsVisible(0);
-  }
   else if (role == QmitkDataNodeRole)
   {
     return QVariant::fromValue<mitk::DataNode::Pointer>(mitk::DataNode::Pointer(dataNode));

@@ -50,6 +50,8 @@ void QmitkDataStorageTreeInspector::Initialize()
   m_StorageModel->SetNodePredicate(m_NodePredicate);
 
   m_Connector->SetView(m_Controls.view);
+
+  m_Controls.view->expandAll();
 }
 
 void QmitkDataStorageTreeInspector::SetSelectionMode(SelectionMode mode)

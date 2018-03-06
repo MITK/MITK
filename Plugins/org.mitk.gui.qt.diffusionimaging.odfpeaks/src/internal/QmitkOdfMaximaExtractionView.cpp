@@ -15,8 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 //misc
-#define _USE_MATH_DEFINES
-#include <math.h>
 #include <QFileDialog>
 
 // Blueberry
@@ -275,8 +273,8 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction(Image *image)
     return;
   }
 
-  filter->SetAngularThreshold(cos((float)m_Controls->m_AngularThreshold->value()*M_PI / 180));
-  filter->SetClusteringThreshold(cos((float)m_Controls->m_ClusteringAngleBox->value()*M_PI / 180));
+  filter->SetAngularThreshold(cos((float)m_Controls->m_AngularThreshold->value()*itk::Math::pi / 180));
+  filter->SetClusteringThreshold(cos((float)m_Controls->m_ClusteringAngleBox->value()*itk::Math::pi / 180));
   filter->SetMaxNumPeaks(m_Controls->m_MaxNumPeaksBox->value());
   filter->SetPeakThreshold(m_Controls->m_PeakThresholdBox->value());
   filter->SetAbsolutePeakThreshold(m_Controls->m_AbsoluteThresholdBox->value());

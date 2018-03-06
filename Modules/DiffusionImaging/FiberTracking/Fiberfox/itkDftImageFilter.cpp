@@ -26,9 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
 
-#define _USE_MATH_DEFINES
-#include <cmath>
-
 namespace itk {
 
 template< class TPixelType >
@@ -89,7 +86,7 @@ void DftImageFilter< TPixelType >
             else
                 y -= szy/2;
 
-            s += it.Get() * exp( std::complex<TPixelType>(0, -2 * M_PI * (kx*x/szx + ky*y/szy) ) );
+            s += it.Get() * exp( std::complex<TPixelType>(0, -2 * itk::Math::pi * (kx*x/szx + ky*y/szy) ) );
 
             ++it;
         }

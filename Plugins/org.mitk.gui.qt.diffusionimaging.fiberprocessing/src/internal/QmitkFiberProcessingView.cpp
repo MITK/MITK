@@ -56,10 +56,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractsToRgbaImageFilter.h>
 #include <itkFiberExtractionFilter.h>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-
 const std::string QmitkFiberProcessingView::VIEW_ID = "org.mitk.views.fiberprocessing";
 const std::string id_DataManager = "org.mitk.views.datamanager";
 using namespace mitk;
@@ -354,7 +350,7 @@ void QmitkFiberProcessingView::RemoveDir()
     dir[0] = m_Controls->m_ExtractDirX->value();
     dir[1] = m_Controls->m_ExtractDirY->value();
     dir[2] = m_Controls->m_ExtractDirZ->value();
-    fib->RemoveDir(dir,cos((float)m_Controls->m_ExtractAngle->value()*M_PI/180));
+    fib->RemoveDir(dir,cos((float)m_Controls->m_ExtractAngle->value()*itk::Math::pi/180));
   }
   RenderingManager::GetInstance()->RequestUpdateAll();
 }

@@ -30,9 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <mitkCoreObjectFactory.h>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 /*!
 \brief Calculate angular error of a tractogram with respect to the input reference directions.
 */
@@ -142,7 +139,7 @@ int main(int argc, char* argv[])
         itk::TractsToVectorImageFilter<float>::Pointer fOdfFilter = itk::TractsToVectorImageFilter<float>::New();
         fOdfFilter->SetFiberBundle(inputTractogram);
         fOdfFilter->SetMaskImage(itkMaskImage);
-        fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
+        fOdfFilter->SetAngularThreshold(cos(angularThreshold*itk::Math::pi/180));
         fOdfFilter->SetNormalizeVectors(true);
         fOdfFilter->SetUseWorkingCopy(false);
         fOdfFilter->SetSizeThreshold(sizeThreshold);

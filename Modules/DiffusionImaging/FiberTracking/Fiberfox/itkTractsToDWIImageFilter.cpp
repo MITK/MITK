@@ -147,7 +147,7 @@ namespace itk
       coilPositions.push_back(pos);
       m_CoilPointset->InsertPoint(c, pos*1000 + m_Parameters.m_SignalGen.m_ImageOrigin.GetVectorFromOrigin() + center );
 
-      double rz = 360.0/m_Parameters.m_SignalGen.m_NumberOfCoils * M_PI/180;
+      double rz = 360.0/m_Parameters.m_SignalGen.m_NumberOfCoils * itk::Math::pi/180;
       vnl_matrix_fixed< double, 3, 3 > rotZ; rotZ.set_identity();
       rotZ[0][0] = cos(rz);
       rotZ[1][1] = rotZ[0][0];
@@ -782,7 +782,7 @@ namespace itk
 
     if (m_mmRadius>0)
     {
-      m_SegmentVolume = M_PI*m_mmRadius*m_mmRadius*minSpacing/volumeAccuracy;
+      m_SegmentVolume = itk::Math::pi*m_mmRadius*m_mmRadius*minSpacing/volumeAccuracy;
       std::stringstream stream;
       stream << std::fixed << setprecision(2) << max_density * m_SegmentVolume;
       std::string s = stream.str();
@@ -797,7 +797,7 @@ namespace itk
     }
     float voxel_volume = m_WorkingSpacing[0]*m_WorkingSpacing[1]*m_WorkingSpacing[2];
     float new_seg_vol = voxel_volume/max_density;
-    float new_fib_radius = 1000*std::sqrt(new_seg_vol*volumeAccuracy/(minSpacing*M_PI));
+    float new_fib_radius = 1000*std::sqrt(new_seg_vol*volumeAccuracy/(minSpacing*itk::Math::pi));
     std::stringstream stream;
     stream << std::fixed << setprecision(2) << new_fib_radius;
     std::string s = stream.str();

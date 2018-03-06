@@ -317,7 +317,7 @@ ScalarType RawShModel< ScalarType >::SimulateMeasurement(unsigned int dir, Gradi
       for (m=-l; m<=l; m++)
       {
         plm = legendre_p<double>(l,abs(m),cos(sphCoords(dir,0)));
-        mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
+        mag = sqrt((double)(2*l+1)/(4.0*itk::Math::pi)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
         double basis;
 
         if (m<0)
@@ -366,7 +366,7 @@ typename RawShModel< ScalarType >::PixelType RawShModel< ScalarType >::SimulateM
         for (m=-l; m<=l; m++)
         {
           plm = legendre_p<double>(l,abs(m),cos(sphCoords(p,0)));
-          mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
+          mag = sqrt((double)(2*l+1)/(4.0*itk::Math::pi)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
 
           if (m<0)
             shBasis(p,j) = sqrt(2.0)*mag*cos(fabs((double)m)*sphCoords(p,1));

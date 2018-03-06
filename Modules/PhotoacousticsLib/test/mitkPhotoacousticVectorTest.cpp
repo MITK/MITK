@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
-#define _USE_MATH_DEFINES
-#include <cmath>
 
 #include "mitkPAVector.h"
 
@@ -234,7 +232,7 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The vector value at index1 should be equal", m_TestVector->GetElement(1), m_TestReturnVector->GetElement(1));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The vector value at index2 should be equal", m_TestVector->GetElement(2), m_TestReturnVector->GetElement(2));
 
-    m_TestReturnVector->Rotate(M_PI / 4, M_PI / 4);
+    m_TestReturnVector->Rotate(itk::Math::pi / 4, itk::Math::pi / 4);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The vector value at index0 should be not equal", true, m_TestVector->GetElement(0) != m_TestReturnVector->GetElement(0));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("The vector value at index0 should be not equal", true, m_TestVector->GetElement(1) != m_TestReturnVector->GetElement(1));

@@ -34,9 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <TrackingHandlers/mitkTrackingHandlerRandomForest.h>
 #include <mitkDiffusionFunctionCollection.h>
 
-#define _USE_MATH_DEFINES
-#include <cmath>
-
 namespace itk {
 
 
@@ -132,12 +129,12 @@ void StreamlineTrackingFilter::BeforeTracking()
   if (m_AngularThresholdDeg<0)
   {
     if  (m_StepSize/m_MinVoxelSize<=0.966)  // minimum 15° for automatic estimation
-      m_AngularThreshold = std::cos( 0.5 * M_PI * m_StepSize/m_MinVoxelSize );
+      m_AngularThreshold = std::cos( 0.5 * itk::Math::pi * m_StepSize/m_MinVoxelSize );
     else
-      m_AngularThreshold = std::cos( 0.5 * M_PI * 0.966 );
+      m_AngularThreshold = std::cos( 0.5 * itk::Math::pi * 0.966 );
   }
   else
-    m_AngularThreshold = std::cos( m_AngularThresholdDeg*M_PI/180.0 );
+    m_AngularThreshold = std::cos( m_AngularThresholdDeg*itk::Math::pi/180.0 );
   m_TrackingHandler->SetAngularThreshold(m_AngularThreshold);
 
   if (m_TrackingPriorHandler!=nullptr)
@@ -303,7 +300,7 @@ void StreamlineTrackingFilter::BeforeTracking()
   else if (m_EndpointConstraint==EndpointConstraints::NO_EP_IN_TARGET)
     std::cout << "StreamlineTracking - Endpoint constraint: NO_EP_IN_TARGET" << std::endl;
 
-  std::cout << "StreamlineTracking - Angular threshold: " << m_AngularThreshold << " (" << 180*std::acos( m_AngularThreshold )/M_PI << "°)" << std::endl;
+  std::cout << "StreamlineTracking - Angular threshold: " << m_AngularThreshold << " (" << 180*std::acos( m_AngularThreshold )/itk::Math::pi << "°)" << std::endl;
   std::cout << "StreamlineTracking - Stepsize: " << m_StepSize << "mm (" << m_StepSize/m_MinVoxelSize << "*vox)" << std::endl;
   std::cout << "StreamlineTracking - Seeds per voxel: " << m_SeedsPerVoxel << std::endl;
   std::cout << "StreamlineTracking - Max. tract length: " << m_MaxTractLength << "mm" << std::endl;
@@ -348,14 +345,14 @@ std::vector< vnl_vector_fixed<float,3> > StreamlineTrackingFilter::CreateDirecti
 
   std::vector< float > phi; phi.resize(NPoints);
 
-  float C = sqrt(4*M_PI);
+  float C = sqrt(4*itk::Math::pi);
 
   phi[0] = 0.0;
   phi[NPoints-1] = 0.0;
 
   for(int i=0; i<NPoints; i++)
   {
-    theta[i] = acos(-1.0+2.0*i/(NPoints-1.0)) - M_PI / 2.0;
+    theta[i] = acos(-1.0+2.0*i/(NPoints-1.0)) - itk::Math::pi / 2.0;
     if( i>0 && i<NPoints-1)
     {
       phi[i] = (phi[i-1] + C / sqrt(NPoints*(1-(-1.0+2.0*i/(NPoints-1.0))*(-1.0+2.0*i/(NPoints-1.0)))));
@@ -629,7 +626,7 @@ float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool fro
     float angle = std::fabs(dot_product(meanV, vectors.at(c)));
     if (angle>1.0)
       angle = 1.0;
-    dev += acos(angle)*180/M_PI;
+    dev += acos(angle)*180/itk::Math::pi;
   }
   if (vectors.size()>0)
     dev /= vectors.size();

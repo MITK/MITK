@@ -52,21 +52,21 @@ public:
       vnl_vector<float> v1 = s.get_column(p1)-s.get_column(p2); v1.normalize();
       vnl_vector<float> v2 = s.get_column(p3)-s.get_column(p2); v2.normalize();
       a1_s = dot_product(v1,v2);
-      a1_s = std::acos( a1_s ) * 180.0/M_PI;
+      a1_s = std::acos( a1_s ) * 180.0/itk::Math::pi;
     }
 
     {
       vnl_vector<float> v1 = s.get_column(p1)-s.get_column(p3); v1.normalize();
       vnl_vector<float> v2 = s.get_column(p5)-s.get_column(p3); v2.normalize();
       a2_s = dot_product(v1,v2);
-      a2_s = std::acos( a2_s ) * 180.0/M_PI;
+      a2_s = std::acos( a2_s ) * 180.0/itk::Math::pi;
     }
 
     {
       vnl_vector<float> v1 = s.get_column(p3)-s.get_column(p4); v1.normalize();
       vnl_vector<float> v2 = s.get_column(p5)-s.get_column(p4); v2.normalize();
       a3_s = dot_product(v1,v2);
-      a3_s = std::acos( a3_s ) * 180.0/M_PI;
+      a3_s = std::acos( a3_s ) * 180.0/itk::Math::pi;
     }
 
     //
@@ -74,21 +74,21 @@ public:
       vnl_vector<float> v1 = t.get_column(p1)-t.get_column(p2); v1.normalize();
       vnl_vector<float> v2 = t.get_column(p3)-t.get_column(p2); v2.normalize();
       a1_t = dot_product(v1,v2);
-      a1_t = std::acos( a1_t ) * 180.0/M_PI;
+      a1_t = std::acos( a1_t ) * 180.0/itk::Math::pi;
     }
 
     {
       vnl_vector<float> v1 = t.get_column(p1)-t.get_column(p3); v1.normalize();
       vnl_vector<float> v2 = t.get_column(p5)-t.get_column(p3); v2.normalize();
       a2_t = dot_product(v1,v2);
-      a2_t = std::acos( a2_t ) * 180.0/M_PI;
+      a2_t = std::acos( a2_t ) * 180.0/itk::Math::pi;
     }
 
     {
       vnl_vector<float> v1 = t.get_column(p3)-t.get_column(p4); v1.normalize();
       vnl_vector<float> v2 = t.get_column(p5)-t.get_column(p4); v2.normalize();
       a3_t = dot_product(v1,v2);
-      a3_t = std::acos( a3_t ) * 180.0/M_PI;
+      a3_t = std::acos( a3_t ) * 180.0/itk::Math::pi;
     }
 
     float d_direct = 0;

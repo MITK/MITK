@@ -83,7 +83,7 @@ public:
         dir[0] = 0;
         dir[1] = 1;
         dir[2] = 0;
-        fib->RemoveDir(dir,cos(5.0*M_PI/180));
+        fib->RemoveDir(dir,cos(5.0*itk::Math::pi/180));
 
         mitk::FiberBundle::Pointer ref = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/FiberProcessing/remove_direction.fib")).front().GetPointer());
 

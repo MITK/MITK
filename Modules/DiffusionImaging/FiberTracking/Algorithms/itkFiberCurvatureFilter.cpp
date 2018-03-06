@@ -15,8 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "itkFiberCurvatureFilter.h"
 
-#define _USE_MATH_DEFINES
-#include <cmath>
 #include <vtkDoubleArray.h>
 #include <vtkPointData.h>
 #include <boost/progress.hpp>
@@ -118,7 +116,7 @@ void FiberCurvatureFilter::GenerateData()
                     angle = 1.0;
                 if (angle<-1.0)
                     angle = -1.0;
-                dev += acos(angle)*180/M_PI;
+                dev += acos(angle)*180/itk::Math::pi;
             }
             if (vectors.size()>0)
                 dev /= vectors.size();

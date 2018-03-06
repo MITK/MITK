@@ -24,12 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vnl/vnl_vector.h"
 #include "itkPointShell.h"
 
-#define _USE_MATH_DEFINES
-#include <cmath>
-
 namespace itk {
-
-#define QBALL_RECON_PI       M_PI
 
   template< class TReferenceImagePixelType,
   class TGradientImagePixelType,
@@ -478,7 +473,7 @@ namespace itk {
     // set default number of equator sampling points if needed
     if(!this->m_NumberOfEquatorSamplingPoints)
       this->m_NumberOfEquatorSamplingPoints
-        = (int) ceil((double)sqrt(8*QBALL_RECON_PI*this->m_NumberOfGradientDirections));
+        = (int) ceil((double)sqrt(8*itk::Math::pi*this->m_NumberOfGradientDirections));
 
     vnl_matrix<double>* Q =
       new vnl_matrix<double>(3, m_NumberOfGradientDirections);
@@ -523,7 +518,7 @@ namespace itk {
       = new vnl_matrix<double>(3, m_NumberOfEquatorSamplingPoints);
     for(unsigned int i=0; i<m_NumberOfEquatorSamplingPoints; i++)
     {
-      double theta = i * (2*QBALL_RECON_PI / m_NumberOfEquatorSamplingPoints);
+      double theta = i * (2*itk::Math::pi / m_NumberOfEquatorSamplingPoints);
       (*C)(0,i) = cos(theta);
       (*C)(1,i) = sin(theta);
       (*C)(2,i) = NumericTraits<double>::Zero;
@@ -567,7 +562,7 @@ namespace itk {
     vnl_matrix<double> *H_plus
       = new vnl_matrix<double>(NBasisFunctionCenters,m_NumberOfGradientDirections);
 
-    double maxSigma = QBALL_RECON_PI/6;
+    double maxSigma = itk::Math::pi/6;
     double bestSigma = maxSigma;
 
     {
@@ -595,7 +590,7 @@ namespace itk {
                 + (*Q)(2,r)*(*V)(2,c);
               qtv = (qtv<-1.0) ? -1.0 : ( (qtv>1.0) ? 1.0 : qtv);
               double x = acos(qtv);
-              (*tmpH)(r,c) = (1.0/(sigma*sqrt(2.0*QBALL_RECON_PI)))
+              (*tmpH)(r,c) = (1.0/(sigma*sqrt(2.0*itk::Math::pi)))
                 *exp((-x*x)/(2*sigma*sigma));
             }
           }
@@ -651,7 +646,7 @@ namespace itk {
             + (*S)(2,r)*(*V)(2,c);
           stv = (stv<-1.0) ? -1.0 : ( (stv>1.0) ? 1.0 : stv);
           double x = acos(stv);
-          (*G)(r,c) = (1.0/(bestSigma*sqrt(2.0*QBALL_RECON_PI)))
+          (*G)(r,c) = (1.0/(bestSigma*sqrt(2.0*itk::Math::pi)))
             *exp((-x*x)/(2*bestSigma*bestSigma));
         }
       }

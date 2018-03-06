@@ -14,10 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-//misc
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
@@ -2024,12 +2020,12 @@ QmitkFiberfoxView::GradientListType QmitkFiberfoxView::GenerateHalfShell(int NPo
 
   vnl_vector<double> theta; theta.set_size(NPoints);
   vnl_vector<double> phi; phi.set_size(NPoints);
-  double C = sqrt(4*M_PI);
+  double C = sqrt(4*itk::Math::pi);
   phi(0) = 0.0;
   phi(NPoints-1) = 0.0;
   for(int i=0; i<NPoints; i++)
   {
-    theta(i) = acos(-1.0+2.0*i/(NPoints-1.0)) - M_PI / 2.0;
+    theta(i) = acos(-1.0+2.0*i/(NPoints-1.0)) - itk::Math::pi / 2.0;
     if( i>0 && i<NPoints-1)
     {
       phi(i) = (phi(i-1) + C /
@@ -2474,9 +2470,9 @@ void QmitkFiberfoxView::ApplyTransform()
             geom->Translate(world);
 
             // calculate rotation matrix
-            double x = m_Controls->m_XrotBox->value()*M_PI/180;
-            double y = m_Controls->m_YrotBox->value()*M_PI/180;
-            double z = m_Controls->m_ZrotBox->value()*M_PI/180;
+            double x = m_Controls->m_XrotBox->value()*itk::Math::pi/180;
+            double y = m_Controls->m_YrotBox->value()*itk::Math::pi/180;
+            double z = m_Controls->m_ZrotBox->value()*itk::Math::pi/180;
 
             itk::Matrix< double, 3, 3 > rotX; rotX.SetIdentity();
             rotX[1][1] = cos(x);
@@ -2536,9 +2532,9 @@ void QmitkFiberfoxView::ApplyTransform()
       geom->Translate(world);
 
       // calculate rotation matrix
-      double x = m_Controls->m_XrotBox->value()*M_PI/180;
-      double y = m_Controls->m_YrotBox->value()*M_PI/180;
-      double z = m_Controls->m_ZrotBox->value()*M_PI/180;
+      double x = m_Controls->m_XrotBox->value()*itk::Math::pi/180;
+      double y = m_Controls->m_YrotBox->value()*itk::Math::pi/180;
+      double z = m_Controls->m_ZrotBox->value()*itk::Math::pi/180;
       itk::Matrix< double, 3, 3 > rotX; rotX.SetIdentity();
       rotX[1][1] = cos(x);
       rotX[2][2] = rotX[1][1];

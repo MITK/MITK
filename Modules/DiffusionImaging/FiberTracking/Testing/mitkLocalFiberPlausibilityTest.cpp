@@ -31,9 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCoreObjectFactory.h>
 #include <omp.h>
 
-#define _USE_MATH_DEFINES
-#include <cmath>
-
 int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
 {
     omp_set_num_threads(1);
@@ -93,7 +90,7 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         itk::TractsToVectorImageFilter<float>::Pointer fOdfFilter = itk::TractsToVectorImageFilter<float>::New();
         fOdfFilter->SetFiberBundle(inputTractogram);
         fOdfFilter->SetMaskImage(itkMaskImage);
-        fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
+        fOdfFilter->SetAngularThreshold(cos(angularThreshold*itk::Math::pi/180));
         fOdfFilter->SetNormalizationMethod(itk::TractsToVectorImageFilter<float>::NormalizationMethods::SINGLE_VEC_NORM);
         fOdfFilter->SetMaxNumDirections(3);
         fOdfFilter->SetSizeThreshold(0.3);

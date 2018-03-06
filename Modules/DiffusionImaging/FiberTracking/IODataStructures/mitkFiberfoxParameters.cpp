@@ -100,12 +100,12 @@ void mitk::SignalGenerationParameters::GenerateGradientHalfShell()
 
   vnl_vector<double> theta; theta.set_size(NPoints);
   vnl_vector<double> phi; phi.set_size(NPoints);
-  double C = sqrt(4*M_PI);
+  double C = sqrt(4*itk::Math::pi);
   phi(0) = 0.0;
   phi(NPoints-1) = 0.0;
   for(int i=0; i<NPoints; i++)
   {
-    theta(i) = acos(-1.0+2.0*i/(NPoints-1.0)) - M_PI / 2.0;
+    theta(i) = acos(-1.0+2.0*i/(NPoints-1.0)) - itk::Math::pi / 2.0;
     if( i>0 && i<NPoints-1)
     {
       phi(i) = (phi(i-1) + C /

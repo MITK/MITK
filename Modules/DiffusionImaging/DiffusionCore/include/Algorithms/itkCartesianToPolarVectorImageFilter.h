@@ -19,11 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkUnaryFunctorImageFilter.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-#define C2P_PI M_PI
-
 namespace itk
 {
 
@@ -52,11 +47,11 @@ namespace itk
         {
           opoint[0] = sqrt( x[0] * x[0] + x[1] * x[1] + x[2] * x[2] );
           opoint[1] = atan2( x[1], x[0] );
-          opoint[2] = 0.5*C2P_PI - atan( x[2] / sqrt( x[0] * x[0] + x[1] * x[1] ) );
+          opoint[2] = 0.5*itk::Math::pi - atan( x[2] / sqrt( x[0] * x[0] + x[1] * x[1] ) );
 
-          if(symmetric && opoint[1]>C2P_PI)
+          if(symmetric && opoint[1]>itk::Math::pi)
           {
-            opoint[1] = opoint[1] - C2P_PI;
+            opoint[1] = opoint[1] - itk::Math::pi;
           }
         }
         else

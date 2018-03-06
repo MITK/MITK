@@ -27,9 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractsToVectorImageFilter.h>
 #include <mitkCoreObjectFactory.h>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 /*!
 \brief Extract principal fiber directions from a tractogram
 */
@@ -111,7 +108,7 @@ int main(int argc, char* argv[])
     itk::TractsToVectorImageFilter<float>::Pointer fOdfFilter = itk::TractsToVectorImageFilter<float>::New();
     fOdfFilter->SetFiberBundle(inputTractogram);
     fOdfFilter->SetMaskImage(itkMaskImage);
-    fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
+    fOdfFilter->SetAngularThreshold(cos(angularThreshold*itk::Math::pi/180));
     switch (normalization)
     {
     case 1:

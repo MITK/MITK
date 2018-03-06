@@ -138,7 +138,7 @@ void mitk::CLUtil::itkProbabilityMap(const TImageType * sourceImage, double mean
   {
     double x = it.Value();
 
-    double prob = (1.0/(std_dev*std::sqrt(2.0*M_PI))) * std::exp(-(((x-mean)*(x-mean))/(2.0*std_dev*std_dev)));
+    double prob = (1.0/(std_dev*std::sqrt(2.0*itk::Math::pi))) * std::exp(-(((x-mean)*(x-mean))/(2.0*std_dev*std_dev)));
     outit.Set(prob);
     ++it;
     ++outit;

@@ -14,8 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
-#define _USE_MATH_DEFINES
 #include "mitkFiberBundle.h"
 
 #include <mitkPlanarCircle.h>
@@ -39,7 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkParametricSpline.h>
 #include <vtkPolygon.h>
 #include <vtkCleanPolyData.h>
-#include <cmath>
 #include <boost/progress.hpp>
 #include <vtkTransformPolyDataFilter.h>
 #include <mitkTransferFunction.h>
@@ -719,7 +716,7 @@ void mitk::FiberBundle::ColorFibersByCurvature(bool, bool normalize)
           angle = 1.0;
         if (angle<-1.0)
           angle = -1.0;
-        dev += acos(angle)*180/M_PI;
+        dev += acos(angle)*180/itk::Math::pi;
       }
       if (vectors.size()>0)
         dev /= vectors.size();
@@ -1417,9 +1414,9 @@ void mitk::FiberBundle::SetFiberColors(vtkSmartPointer<vtkUnsignedCharArray> fib
 
 itk::Matrix< double, 3, 3 > mitk::FiberBundle::TransformMatrix(itk::Matrix< double, 3, 3 > m, double rx, double ry, double rz)
 {
-  rx = rx*M_PI/180;
-  ry = ry*M_PI/180;
-  rz = rz*M_PI/180;
+  rx = rx*itk::Math::pi/180;
+  ry = ry*itk::Math::pi/180;
+  rz = rz*itk::Math::pi/180;
 
   itk::Matrix< double, 3, 3 > rotX; rotX.SetIdentity();
   rotX[1][1] = cos(rx);
@@ -1448,9 +1445,9 @@ itk::Matrix< double, 3, 3 > mitk::FiberBundle::TransformMatrix(itk::Matrix< doub
 
 itk::Point<float, 3> mitk::FiberBundle::TransformPoint(vnl_vector_fixed< double, 3 > point, double rx, double ry, double rz, double tx, double ty, double tz)
 {
-  rx = rx*M_PI/180;
-  ry = ry*M_PI/180;
-  rz = rz*M_PI/180;
+  rx = rx*itk::Math::pi/180;
+  ry = ry*itk::Math::pi/180;
+  rz = rz*itk::Math::pi/180;
 
   vnl_matrix_fixed< double, 3, 3 > rotX; rotX.set_identity();
   rotX[1][1] = cos(rx);
@@ -1517,9 +1514,9 @@ void mitk::FiberBundle::TransformFibers(itk::ScalableAffineTransform< mitk::Scal
 
 void mitk::FiberBundle::TransformFibers(double rx, double ry, double rz, double tx, double ty, double tz)
 {
-  rx = rx*M_PI/180;
-  ry = ry*M_PI/180;
-  rz = rz*M_PI/180;
+  rx = rx*itk::Math::pi/180;
+  ry = ry*itk::Math::pi/180;
+  rz = rz*itk::Math::pi/180;
 
   vnl_matrix_fixed< double, 3, 3 > rotX; rotX.set_identity();
   rotX[1][1] = cos(rx);
@@ -1579,9 +1576,9 @@ void mitk::FiberBundle::TransformFibers(double rx, double ry, double rz, double 
 
 void mitk::FiberBundle::RotateAroundAxis(double x, double y, double z)
 {
-  x = x*M_PI/180;
-  y = y*M_PI/180;
-  z = z*M_PI/180;
+  x = x*itk::Math::pi/180;
+  y = y*itk::Math::pi/180;
+  z = z*itk::Math::pi/180;
 
   vnl_matrix_fixed< double, 3, 3 > rotX; rotX.set_identity();
   rotX[1][1] = cos(x);

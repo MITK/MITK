@@ -30,9 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCartesianReadout.h>
 #include <mitkDiffusionFunctionCollection.h>
 
-#define _USE_MATH_DEFINES
-#include <cmath>
-
 namespace itk {
 
   template< class ScalarType >
@@ -300,7 +297,7 @@ namespace itk {
             y -= yMaxFov;
 
           // actual DFT term
-          s += f * std::exp( std::complex<ScalarType>(0, 2 * M_PI * (kx*x/xMax + ky*y/yMaxFov + omega*t/1000 )) );
+          s += f * std::exp( std::complex<ScalarType>(0, 2 * itk::Math::pi * (kx*x/xMax + ky*y/yMaxFov + omega*t/1000 )) );
 
           ++it;
         }

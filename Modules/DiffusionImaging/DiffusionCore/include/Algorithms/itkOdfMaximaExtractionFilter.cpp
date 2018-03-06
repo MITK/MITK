@@ -194,7 +194,7 @@ void OdfMaximaExtractionFilter< TOdfPixelType >
     for (int adaptiveStepwidth=0; adaptiveStepwidth<=1; adaptiveStepwidth++)
     {
     phi=0;
-    while (phi<(2*M_PI)) // phi exhaustive search 0..pi
+    while (phi<(2*itk::Math::pi)) // phi exhaustive search 0..pi
     {
         // calculate 4th order SH representtaion of ODF and according derivative
         for (int l=0; l<=4; l=l+2)
@@ -204,18 +204,18 @@ void OdfMaximaExtractionFilter< TOdfPixelType >
                 int j=l*(l+1)/2+m;
                 if (m<0)
                 {
-                    mag = sqrt(((2*l+1)/(2*M_PI))*factorial<double>(l+m)/factorial<double>(l-m));
+                    mag = sqrt(((2*l+1)/(2*itk::Math::pi))*factorial<double>(l+m)/factorial<double>(l-m));
                     Y = mag*cos(m*phi);
                     Yp = -m*mag*sin(m*phi);
                 }
                 else if (m==0)
                 {
-                    Y = sqrt((2*l+1)/(4*M_PI));
+                    Y = sqrt((2*l+1)/(4*itk::Math::pi));
                     Yp = 0;
                 }
                 else
                 {
-                    mag = pow(-1.0,m)*sqrt(((2*l+1)/(2*M_PI))*factorial<double>(l-m)/factorial<double>(l+m));
+                    mag = pow(-1.0,m)*sqrt(((2*l+1)/(2*itk::Math::pi))*factorial<double>(l-m)/factorial<double>(l+m));
                     Y = mag*sin(m*phi);
                     Yp = m*mag*cos(m*phi);
                 }
@@ -246,8 +246,8 @@ void OdfMaximaExtractionFilter< TOdfPixelType >
         for (int n=0; n<tanTheta.size(); n++)
         {
             double tmp = atan(tanTheta[n]); // arcus tangens of root (theta -pi/2..pi/2)
-            double theta = floor(tmp/M_PI); // project theta to 0..pi ...
-            theta = tmp - theta*M_PI;       // ... as the modulo of the division atan(tth[n])/M_PI
+            double theta = floor(tmp/itk::Math::pi); // project theta to 0..pi ...
+            theta = tmp - theta*itk::Math::pi;       // ... as the modulo of the division atan(tth[n])/itk::Math::pi
 
             sn = sin(2*theta); cs = cos(2*theta);
             tmp = ODF_dtheta(sn, cs, A, B, C, D, E, F, G, H);
@@ -421,8 +421,8 @@ void OdfMaximaExtractionFilter< TOdfPixelType >
 
         if( mag<mitk::eps )
         {
-            sphCoords(i,0) = M_PI/2; // theta
-            sphCoords(i,1) = M_PI/2; // phi
+            sphCoords(i,0) = itk::Math::pi/2; // theta
+            sphCoords(i,1) = itk::Math::pi/2; // phi
         }
         else
         {
@@ -450,7 +450,7 @@ vnl_matrix<double> OdfMaximaExtractionFilter< TOdfPixelType >
             for (m=-l; m<=l; m++)
             {
                 plm = legendre_p<double>(l,abs(m),cos(sphCoords(p,0)));
-                mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
+                mag = sqrt((double)(2*l+1)/(4.0*itk::Math::pi)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
 
                 if (m<0)
                     shBasis(p,j) = sqrt(2.0)*mag*cos(fabs((double)m)*sphCoords(p,1));

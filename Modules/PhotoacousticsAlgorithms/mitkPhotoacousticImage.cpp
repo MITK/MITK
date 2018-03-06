@@ -14,8 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#define _USE_MATH_DEFINES
-#include <cmath>
 #include "mitkPhotoacousticImage.h"
 #include "ITKFilter/ITKUltrasound/itkBModeImageFilter.h"
 #include "ITKFilter/itkPhotoacousticBModeImageFilter.h"
@@ -417,11 +415,11 @@ itk::Image<float, 3U>::Pointer mitk::PhotoacousticImage::BPFunction(mitk::Image:
   {
     if (n <= (alpha*(width - 1)) / 2)
     {
-      imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) - 1))) / 2;
+      imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(itk::Math::pi*(2 * n / (alpha*(width - 1)) - 1))) / 2;
     }
     else if (n >= (width - 1)*(1 - alpha / 2) && n <= (width - 1))
     {
-      imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) + 1 - 2 / alpha))) / 2;
+      imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(itk::Math::pi*(2 * n / (alpha*(width - 1)) + 1 - 2 / alpha))) / 2;
     }
     else
     {

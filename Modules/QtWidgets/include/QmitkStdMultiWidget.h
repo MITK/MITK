@@ -464,5 +464,7 @@ protected:
    * gradient background colors with black.
    */
   void FillGradientBackgroundWithBlack();
+
+  void ResetTransformation(mitk::VtkPropRenderer* renderer);
 };
 #endif /*QmitkStdMultiWidget_h*/

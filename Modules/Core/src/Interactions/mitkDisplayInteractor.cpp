@@ -775,6 +775,7 @@ void mitk::DisplayInteractor::Rotate(mitk::StateMachineAction *, mitk::Interacti
     timeGeometry->ExecuteOperation(&rotationOperation);
 
     (*iter)->SendCreatedWorldGeometryUpdate();
+    (*iter)->GetRenderer()->RequestUpdate();
   }
 
   RenderingManager::GetInstance()->RequestUpdateAll();
@@ -845,7 +846,7 @@ void mitk::DisplayInteractor::Swivel(mitk::StateMachineAction *, mitk::Interacti
   m_PreviousRotationAxis = rotationAxis;
   m_PreviousRotationAngle = rotationAngle;
 
-
+  event->GetSender()->RequestUpdate();
   RenderingManager::GetInstance()->RequestUpdateAll();
   return;
 }
@@ -1005,11 +1006,7 @@ void mitk::DisplayInteractor::MirrorCamera(BaseRenderer* renderer, bool horizont
     return;
   }
 
-  vtkCamera* camera = renderer->GetVtkRenderer()->GetActiveCamera();
-  camera->Azimuth(180);
-  if (horizontal) {
-    camera->Roll(180);
-  }
+  renderer->GetCameraRotationController()->Mirror(horizontal);
   renderer->RequestUpdate();
 }
 
@@ -1018,8 +1015,7 @@ void mitk::DisplayInteractor::ResetCamera(BaseRenderer * renderer)
   if (renderer == nullptr) {
     return;
   }
-
-  renderer->GetCameraController()->AdjustCameraToPlane();
+  renderer->GetCameraRotationController()->ResetTransformationAngles();
   renderer->RequestUpdate();
 }
 

@@ -47,6 +47,8 @@ mitk::CameraRotationController::CameraRotationController()
 
   m_Slice->AddObserver(itk::ModifiedEvent(), sliceStepperChangedCommand);
   m_ElevationSlice->AddObserver(itk::ModifiedEvent(), elevateSliceStepperChangedCommand);
+
+  ResetTransformationAngles();
 }
 
 mitk::CameraRotationController::~CameraRotationController()
@@ -97,6 +99,7 @@ void mitk::CameraRotationController::RotateToAngle(double angle)
   }
   if (m_Camera)
   {
+    m_Roll = fmod(m_Roll + angle, 360);
     m_Camera->SetRoll(m_Camera->GetRoll() + angle);
     mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow);
   }
@@ -132,4 +135,35 @@ void mitk::CameraRotationController::AcquireCamera()
       }
     }
   }
+}
+
+void mitk::CameraRotationController::Mirror(bool horizontal)
+{
+  if (!m_Camera)
+  {
+    this->AcquireCamera();
+  }
+  if (m_Camera) {
+    m_Azimuth = fmod(m_Azimuth + 180, 360);
+    if (horizontal) {
+      m_RollMirror = fmod(m_RollMirror + 180, 360);
+    }
+  }
+  //roll and azimuth are set in mitk::CameraRotationController::RotateCameraToTransformationAngles()
+  //when calling mitk::BaseRenderer::RequestUpdate()
+}
+
+void mitk::CameraRotationController::RotateCameraToTransformationAngles()
+{
+  if (m_Camera) {
+    m_Camera->Roll(m_Roll + m_RollMirror);
+    m_Camera->Azimuth(m_Azimuth);
+  }
+}
+
+void mitk::CameraRotationController::ResetTransformationAngles()
+{
+  m_Roll = 0.0;
+  m_RollMirror = 0.0;
+  m_Azimuth = 0.0;
 }

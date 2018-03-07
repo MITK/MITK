@@ -619,6 +619,7 @@ void mitk::BaseRenderer::DrawOverlayMouse(mitk::Point2D& itkNotUsed(p2d))
 
 void mitk::BaseRenderer::RequestUpdate()
 {
+  SetConstrainZoomingAndPanning(true);
   m_RenderingManager->RequestUpdate(this->m_RenderWindow);
 }
 
@@ -789,6 +790,7 @@ void mitk::BaseRenderer::SetConstrainZoomingAndPanning(bool constrain)
   if (m_ConstrainZoomingAndPanning)
   {
     this->GetCameraController()->AdjustCameraToPlane();
+    this->GetCameraRotationController()->RotateCameraToTransformationAngles();
   }
 }
 

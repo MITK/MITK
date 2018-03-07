@@ -2311,6 +2311,10 @@ void QmitkStdMultiWidget::ResetCrosshair()
     // reset interactor to normal slicing
     this->SetWidgetPlaneMode(PLANE_MODE_SLICING);
   }
+
+  ResetTransformation(this->GetRenderWindow1()->GetRenderer());
+  ResetTransformation(this->GetRenderWindow2()->GetRenderer());
+  ResetTransformation(this->GetRenderWindow3()->GetRenderer());
 }
 
 void QmitkStdMultiWidget::EnableColoredRectangles()
@@ -2481,4 +2485,13 @@ void QmitkStdMultiWidget::setAnnotationVisibility(std::vector<bool>& visibility)
 void QmitkStdMultiWidget::setMouseMode(mitk::MouseModeSwitcher::MouseMode mode, const std::string& button)
 {
   m_MouseModeSwitcher->SelectMouseMode(mode, button);
+}
+
+void QmitkStdMultiWidget::ResetTransformation(mitk::VtkPropRenderer* renderer)
+{
+  if (renderer) {
+    if (renderer->GetCameraRotationController()) {
+      renderer->GetCameraRotationController()->ResetTransformationAngles();
+    }
+  }
 }

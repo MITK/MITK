@@ -81,9 +81,6 @@ namespace mitk
      *  world coordinates */
     mitk::BaseGeometry *m_Geometry;
 
-    /** The number of extracted points */
-    int m_NumberOfExtractedPoints;
-
     /** The selected detection method */
     DetectionMethod m_Method;
   };

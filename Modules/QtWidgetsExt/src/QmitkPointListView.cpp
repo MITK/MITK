@@ -46,8 +46,6 @@ QmitkPointListView::QmitkPointListView(QWidget *parent)
   QListView::setToolTip(tooltip);
   this->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  m_TimeStepFaderLabel = new QLabel(this);
-
   this->setMinimumHeight(40);
 
   this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -240,18 +238,7 @@ void QmitkPointListView::wheelEvent(QWheelEvent *event)
                       .arg(currentTS);
   this->setToolTip(tooltip);
 
-  fadeTimeStepIn();
-}
-
-void QmitkPointListView::fadeTimeStepIn()
-{
-  m_TimeStepFaderLabel->setText(QString("%1").arg(this->m_PointListModel->GetTimeStep()));
-  m_TimeStepFaderLabel->setVisible(true);
-}
-
-void QmitkPointListView::fadeTimeStepOut()
-{
-  m_TimeStepFaderLabel->hide();
+  emit SignalTimeStepChanged(currentTS);
 }
 
 void QmitkPointListView::ctxMenu(const QPoint &pos)

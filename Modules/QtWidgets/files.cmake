@@ -38,6 +38,7 @@ QmitkDataStorageComboBoxWithSelectNone.cpp
 QmitkPropertyItem.cpp
 QmitkPropertyItemDelegate.cpp
 QmitkPropertyItemModel.cpp
+QmitkStyleManager.cpp
 )
 
 set(MOC_H_FILES

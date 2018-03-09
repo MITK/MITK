@@ -56,6 +56,10 @@ QToolButton {
   padding: 2px 2px;
 }
 
+QToolBar QToolButton {
+  padding: 4px 4px;
+}
+
 QAbstractItemView {
   alternate-background-color: #1b1b1c;
   background-color: #252526;

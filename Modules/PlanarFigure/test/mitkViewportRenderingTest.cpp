@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRegressionTestImage.h>
 
 // stdlib
-#include <stdlib.h>
+#include <cstdlib>
 
 int mitkViewportRenderingTest(int argc, char *argv[])
 {

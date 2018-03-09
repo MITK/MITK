@@ -65,7 +65,7 @@ namespace mitk {
 
   protected:
     USImageSource();
-    virtual ~USImageSource();
+    ~USImageSource() override;
     /**
     * \brief Set the given OpenCV image matrix to the next image received
     * from the device or file.

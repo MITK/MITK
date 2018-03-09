@@ -33,7 +33,7 @@ namespace mitk {
 
   protected:
     NavigationDataReaderInterface();
-    virtual ~NavigationDataReaderInterface();
+    ~NavigationDataReaderInterface() override;
   };
 }
 

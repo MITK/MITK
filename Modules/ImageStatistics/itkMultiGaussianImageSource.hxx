@@ -29,13 +29,13 @@
 #define __itkMultiGaussianImageSource_hxx
 #include <iostream>
 #include <fstream>
-#include <time.h>
+#include <ctime>
 #include "itkMultiGaussianImageSource.h"
 #include "itkImageRegionIterator.h"
 #include "itkObjectFactory.h"
 #include "itkProgressReporter.h"
 #include "itkDOMNodeXMLWriter.h"
-#include "stdlib.h"
+#include <cstdlib>
 
 namespace itk
 {

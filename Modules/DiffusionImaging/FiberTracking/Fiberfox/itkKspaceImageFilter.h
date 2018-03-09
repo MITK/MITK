@@ -93,13 +93,13 @@ namespace itk{
 
   protected:
     KspaceImageFilter();
-    ~KspaceImageFilter() {}
+    ~KspaceImageFilter() override {}
 
     float CoilSensitivity(VectorType& pos);
 
-    void BeforeThreadedGenerateData();
-    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadID);
-    void AfterThreadedGenerateData();
+    void BeforeThreadedGenerateData() override;
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadID) override;
+    void AfterThreadedGenerateData() override;
 
     VectorType                              m_CoilPosition;
     FiberfoxParameters*                     m_Parameters;

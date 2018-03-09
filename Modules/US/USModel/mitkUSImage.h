@@ -66,7 +66,7 @@ namespace mitk {
       *  The image data is shared, so don't continue to manipulate the original image.
       */
       USImage(mitk::Image::Pointer image);
-      virtual ~USImage();
+      ~USImage() override;
 
 
     };

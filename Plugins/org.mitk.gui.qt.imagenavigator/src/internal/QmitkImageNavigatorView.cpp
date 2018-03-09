@@ -67,12 +67,12 @@ static mitk::DataNode::Pointer GetTopLayerNode(const mitk::DataStorage::SetOfObj
 }
 
 QmitkImageNavigatorView::QmitkImageNavigatorView()
-  : m_AxialStepper(0)
-  , m_SagittalStepper(0)
-  , m_FrontalStepper(0)
-  , m_TimeStepper(0)
-  , m_Parent(0)
-  , m_IRenderWindowPart(0)
+  : m_AxialStepper(nullptr)
+  , m_SagittalStepper(nullptr)
+  , m_FrontalStepper(nullptr)
+  , m_TimeStepper(nullptr)
+  , m_Parent(nullptr)
+  , m_IRenderWindowPart(nullptr)
 {
 }
 
@@ -286,7 +286,7 @@ void QmitkImageNavigatorView::UpdateStatusBar()
 
 void QmitkImageNavigatorView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
-  m_IRenderWindowPart = 0;
+  m_IRenderWindowPart = nullptr;
   m_Parent->setEnabled(false);
 }
 

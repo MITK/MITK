@@ -85,7 +85,7 @@ namespace mitk {
   protected:
     USProbe();
     USProbe(std::string identifier);
-    virtual ~USProbe();
+    ~USProbe() override;
 
     std::string m_Name;
 

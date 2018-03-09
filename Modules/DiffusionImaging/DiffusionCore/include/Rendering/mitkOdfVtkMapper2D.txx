@@ -65,7 +65,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkOpenGLRenderer.h"
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 #include <ciso646>
 
@@ -544,7 +544,7 @@ void  mitk::OdfVtkMapper2D<T,N>
   }
 
 
-  m_Planes[index]->SetTransform( (vtkAbstractTransform*)NULL );
+  m_Planes[index]->SetTransform( (vtkAbstractTransform*)nullptr );
   m_Planes[index]->SetOrigin( dispGeo.vp );
   m_Planes[index]->SetNormal( dispGeo.vnormal );
 
@@ -626,7 +626,7 @@ void  mitk::OdfVtkMapper2D<T,N>
     inversetransform->TransformNormalAtPoint( dispGeo.vp, dispGeo.vnormal, dispGeo.vnormal );
 
     m_ThickPlanes1[index]->count = 0;
-    m_ThickPlanes1[index]->SetTransform((vtkAbstractTransform*)NULL );
+    m_ThickPlanes1[index]->SetTransform((vtkAbstractTransform*)nullptr );
     m_ThickPlanes1[index]->SetPose( dispGeo.vnormal, dispGeo.vp );
     m_ThickPlanes1[index]->SetThickness(dispGeo.d2);
     m_Clippers1[index]->SetClipFunction( m_ThickPlanes1[index] );
@@ -646,7 +646,7 @@ void  mitk::OdfVtkMapper2D<T,N>
     inversetransform->TransformNormalAtPoint( dispGeo.vp, dispGeo.vnormal, dispGeo.vnormal );
 
     m_ThickPlanes2[index]->count = 0;
-    m_ThickPlanes2[index]->SetTransform((vtkAbstractTransform*)NULL );
+    m_ThickPlanes2[index]->SetTransform((vtkAbstractTransform*)nullptr );
     m_ThickPlanes2[index]->SetPose( dispGeo.vnormal, dispGeo.vp );
     m_ThickPlanes2[index]->SetThickness(dispGeo.d1);
     m_Clippers2[index]->SetClipFunction( m_ThickPlanes2[index] );
@@ -716,7 +716,7 @@ bool mitk::OdfVtkMapper2D<T,N>
 {
   mitk::Image::Pointer input  = const_cast<mitk::Image*>(this->GetInput());
   const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
-  if(inputTimeGeometry==NULL || inputTimeGeometry->CountTimeSteps()==0 || !inputTimeGeometry->IsValidTimeStep(this->GetTimestep()))
+  if(inputTimeGeometry==nullptr || inputTimeGeometry->CountTimeSteps()==0 || !inputTimeGeometry->IsValidTimeStep(this->GetTimestep()))
     return false;
 
   if(this->IsPlaneRotated(renderer))
@@ -804,7 +804,7 @@ void mitk::OdfVtkMapper2D<T,N>
   {
     // make sure, that we have point data with more than 1 component (as vectors)
     vtkPointData* pointData = m_VtkImage->GetPointData();
-    if ( pointData == NULL )
+    if ( pointData == nullptr )
     {
       itkWarningMacro( << "m_VtkImage->GetPointData() returns NULL!" );
       return ;
@@ -814,7 +814,7 @@ void mitk::OdfVtkMapper2D<T,N>
       itkWarningMacro( << "m_VtkImage->GetPointData()->GetNumberOfArrays() is 0!" );
       return ;
     }
-    else if ( pointData->GetArrayName( 0 ) == NULL )
+    else if ( pointData->GetArrayName( 0 ) == nullptr )
     {
       m_VtkImage->GetPointData()->GetArray(0)->SetName("vector");
     }
@@ -924,7 +924,7 @@ bool mitk::OdfVtkMapper2D<T,N>
   vnl2vtk( normal.GetVnlVector(), vnormal );
 
   mitk::Image* currentImage = dynamic_cast<mitk::Image* >( this->GetDataNode()->GetData() );
-  if( currentImage == NULL )
+  if( currentImage == nullptr )
     return false;
   mitk::Vector3D imageNormal0 = currentImage->GetSlicedGeometry()->GetAxisVector(0);
   mitk::Vector3D imageNormal1 = currentImage->GetSlicedGeometry()->GetAxisVector(1);

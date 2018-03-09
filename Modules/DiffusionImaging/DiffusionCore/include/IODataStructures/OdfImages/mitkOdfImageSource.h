@@ -43,7 +43,7 @@ public:
    * @param idx the index of the output for which an object should be created
    * @returns the new object
    */
-  virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx ) override;
+  itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx ) override;
 
   /**
    * This is a default implementation to make sure we have something.
@@ -51,11 +51,11 @@ public:
    * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
    * virtual.
    */
-  virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
+  itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
 
 protected:
   OdfImageSource();
-  virtual ~OdfImageSource() {}
+  ~OdfImageSource() override {}
 
 };
 

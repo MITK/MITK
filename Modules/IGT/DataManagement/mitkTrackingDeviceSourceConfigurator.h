@@ -88,7 +88,7 @@ namespace mitk {
 
   protected:
     TrackingDeviceSourceConfigurator(mitk::NavigationToolStorage::Pointer NavigationTools, mitk::TrackingDevice::Pointer TrackingDevice);
-    virtual ~TrackingDeviceSourceConfigurator();
+    ~TrackingDeviceSourceConfigurator() override;
 
     mitk::NavigationToolStorage::Pointer m_NavigationTools;
     mitk::TrackingDevice::Pointer m_TrackingDevice;

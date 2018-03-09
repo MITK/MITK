@@ -40,7 +40,7 @@ namespace mitk
     /*!
     \brief standard ~ctor
     */
-    ~ToFImageCsvWriter();
+    ~ToFImageCsvWriter() override;
 
     mitkClassMacro( ToFImageCsvWriter , ToFImageWriter );
 
@@ -60,7 +60,7 @@ namespace mitk
     \param amplitudeFloatData from amplitude image as float value
     \param intensityFloatData from intensity image as float value
     */
-    void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData=0) override;
+    void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData=nullptr) override;
 
   protected:
 

@@ -233,7 +233,7 @@ namespace mitk
 
     PartialVolumeAnalysisHistogramCalculator();
 
-    virtual ~PartialVolumeAnalysisHistogramCalculator();
+    ~PartialVolumeAnalysisHistogramCalculator() override;
 
     /** \brief Depending on the masking mode, the image and mask from which to
    * calculate statistics is extracted from the original input image and mask

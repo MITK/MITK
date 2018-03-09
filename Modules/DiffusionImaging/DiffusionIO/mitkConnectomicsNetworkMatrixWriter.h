@@ -42,17 +42,17 @@ namespace mitk
     typedef std::vector< mitk::ConnectomicsNetwork::NetworkNode >  VertexVectorType;
 
     ConnectomicsNetworkMatrixWriter();
-    virtual ~ConnectomicsNetworkMatrixWriter();
+    ~ConnectomicsNetworkMatrixWriter() override;
 
     using AbstractFileWriter::Write;
-    virtual void Write();
+    void Write() override;
 
-    mitk::IFileIO::ConfidenceLevel GetConfidenceLevel() const;
+    mitk::IFileIO::ConfidenceLevel GetConfidenceLevel() const override;
 
   protected:
 
     ConnectomicsNetworkMatrixWriter(const ConnectomicsNetworkMatrixWriter& other);
-    virtual mitk::ConnectomicsNetworkMatrixWriter* Clone() const;
+    mitk::ConnectomicsNetworkMatrixWriter* Clone() const override;
 
   };
 

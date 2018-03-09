@@ -30,7 +30,7 @@ NrrdTbssImageIOFactory::NrrdTbssImageIOFactory()
   this->RegisterOverride("mitkIOAdapter",
                          "mitkNrrdTbssImageReader",
                          "mitk Tbss Image IO",
-                         1,
+                         true,
                          itk::CreateObjectFunction<IOAdapter<NrrdTbssVolReaderType> >::New());
 }
 

@@ -54,7 +54,7 @@ public:
 
   itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    QmitkAdaptiveRegionGrowingToolGUI(QWidget *parent = 0);
+    QmitkAdaptiveRegionGrowingToolGUI(QWidget *parent = nullptr);
 
   /** \brief Method to create the connections for the component. This Method is obligatory even if no connections is
    * needed*/

@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
         << "Null Node passed to NodeDisplacementFilter. Ignoring Node....";
       return false;
     }
-    if (node->GetData() == 0)
+    if (node->GetData() == nullptr)
     {
       MITK_WARN("NodeDisplacementFilter")
         << "Empty Node passed to NodeDisplacementFilter. Ignoring Node....";

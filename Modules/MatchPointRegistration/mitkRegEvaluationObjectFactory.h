@@ -30,14 +30,14 @@ namespace mitk {
     mitkClassMacro(RegEvaluationObjectFactory,CoreObjectFactoryBase);
     itkNewMacro(RegEvaluationObjectFactory);
 
-    ~RegEvaluationObjectFactory();
+    ~RegEvaluationObjectFactory() override;
 
-    virtual void SetDefaultProperties(mitk::DataNode* node);
-    virtual const char* GetFileExtensions();
-    virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap();
-    virtual const char* GetSaveFileExtensions();
-    virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap();
-    virtual mitk::Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
+    void SetDefaultProperties(mitk::DataNode* node) override;
+    const char* GetFileExtensions() override;
+    mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
+    const char* GetSaveFileExtensions() override;
+    mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
+    mitk::Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) override;
     void RegisterIOFactories();
   protected:
     std::string m_FileExtensions;

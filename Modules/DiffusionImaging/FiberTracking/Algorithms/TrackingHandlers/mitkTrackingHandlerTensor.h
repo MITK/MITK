@@ -35,16 +35,16 @@ class MITKFIBERTRACKING_EXPORT TrackingHandlerTensor : public TrackingDataHandle
 public:
 
   TrackingHandlerTensor();
-  ~TrackingHandlerTensor();
+  ~TrackingHandlerTensor() override;
 
   typedef TensorImage::PixelType    TensorType;
   typedef TensorImage::ItkTensorImageType ItkTensorImageType;
   typedef itk::Image< vnl_vector_fixed<float,3>, 3>  ItkPDImgType;
 
 
-  void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
-  vnl_vector_fixed<float,3> ProposeDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
-  bool WorldToIndex(itk::Point<float, 3>& pos, itk::Index<3>& index);
+  void InitForTracking() override;     ///< calls InputDataValidForTracking() and creates feature images
+  vnl_vector_fixed<float,3> ProposeDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex) override;  ///< predicts next progression direction at the given position
+  bool WorldToIndex(itk::Point<float, 3>& pos, itk::Index<3>& index) override;
 
   void SetF(float f){ m_F = f; }
   void SetG(float g){ m_G = g; }
@@ -54,7 +54,7 @@ public:
   void ClearTensorImages(){ m_TensorImages.clear(); DataModified(); }
   void SetFaImage( ItkFloatImgType::Pointer img ){ m_FaImage = img; DataModified(); }
   void SetInterpolateTensors( bool interpolateTensors ){ m_InterpolateTensors = interpolateTensors; }
-  void SetMode( MODE m )
+  void SetMode( MODE m ) override
   {
     if (m==MODE::DETERMINISTIC)
       m_Mode = m;
@@ -64,10 +64,10 @@ public:
   int GetNumTensorImages() const { return m_TensorImages.size(); }
 
 
-  ItkUcharImgType::SpacingType GetSpacing(){ return m_FaImage->GetSpacing(); }
-  itk::Point<float,3> GetOrigin(){ return m_FaImage->GetOrigin(); }
-  ItkUcharImgType::DirectionType GetDirection(){ return m_FaImage->GetDirection(); }
-  ItkUcharImgType::RegionType GetLargestPossibleRegion(){ return m_FaImage->GetLargestPossibleRegion(); }
+  ItkUcharImgType::SpacingType GetSpacing() override{ return m_FaImage->GetSpacing(); }
+  itk::Point<float,3> GetOrigin() override{ return m_FaImage->GetOrigin(); }
+  ItkUcharImgType::DirectionType GetDirection() override{ return m_FaImage->GetDirection(); }
+  ItkUcharImgType::RegionType GetLargestPossibleRegion() override{ return m_FaImage->GetLargestPossibleRegion(); }
 
 protected:
 

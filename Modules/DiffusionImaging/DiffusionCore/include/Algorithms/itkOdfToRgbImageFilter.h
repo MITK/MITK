@@ -60,7 +60,7 @@ typename TOutputImage=itk::Image<itk::RGBAPixel<unsigned char>,3> >
   itkCloneMacro(Self)
 
   /** Print internal ivars */
-  void PrintSelf(std::ostream& os, Indent indent) const
+  void PrintSelf(std::ostream& os, Indent indent) const override
   { this->Superclass::PrintSelf( os, indent ); }
 
 #ifdef ITK_USE_CONCEPT_CHECKING
@@ -72,9 +72,9 @@ typename TOutputImage=itk::Image<itk::RGBAPixel<unsigned char>,3> >
 
 protected:
   OdfToRgbImageFilter(){}
-  virtual ~OdfToRgbImageFilter(){}
+  ~OdfToRgbImageFilter() override{}
 
-  void GenerateData()
+  void GenerateData() override
   {
 
     typename InputImageType::Pointer OdfImage = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );

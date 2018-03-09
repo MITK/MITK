@@ -50,7 +50,7 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
     virtual const char* GetToolName() const; ///< every tool has a name thatgit  can be used to identify it.
     virtual void SetToolName(const std::string _arg); ///< Sets the name of the tool
@@ -85,7 +85,7 @@ namespace mitk
 
   protected:
     TrackingTool();
-    virtual ~TrackingTool();
+    ~TrackingTool() override;
 
     std::string m_ToolName;                          ///< every tool has a name that can be used to identify it.
     std::string m_ErrorMessage;                      ///< if a tool is invalid, this member should contain a human readable explanation of why it is invalid

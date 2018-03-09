@@ -41,7 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractsToVectorImageFilter.h>
 #include <itkTractsToFiberEndingsImageFilter.h>
 
-#include <math.h>
 #include <boost/lexical_cast.hpp>
 
 const std::string QmitkFiberQuantificationView::VIEW_ID = "org.mitk.views.fiberquantification";
@@ -134,7 +133,7 @@ void QmitkFiberQuantificationView::CalculateFiberDirections()
 
   // extract directions from fiber bundle
   fOdfFilter->SetFiberBundle(inputTractogram);
-  fOdfFilter->SetAngularThreshold(cos(m_Controls->m_AngularThreshold->value()*M_PI/180));
+  fOdfFilter->SetAngularThreshold(cos(m_Controls->m_AngularThreshold->value()*itk::Math::pi/180));
   switch (m_Controls->m_FiberDirNormBox->currentIndex())
   {
   case 0:

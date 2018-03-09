@@ -35,7 +35,7 @@ namespace mitk
   public:
 
     USUIActivator();
-    virtual ~USUIActivator();
+    ~USUIActivator() override;
 
     /**
       * Custom video device widget is registered as a micro service on module

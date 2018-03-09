@@ -17,17 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __itkDftImageFilter_txx
 #define __itkDftImageFilter_txx
 
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstdio>
+#include <cstdlib>
 
 #include "itkDftImageFilter.h"
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
 
 namespace itk {
 
@@ -89,7 +86,7 @@ void DftImageFilter< TPixelType >
             else
                 y -= szy/2;
 
-            s += it.Get() * exp( std::complex<TPixelType>(0, -2 * M_PI * (kx*x/szx + ky*y/szy) ) );
+            s += it.Get() * exp( std::complex<TPixelType>(0, -2 * itk::Math::pi * (kx*x/szx + ky*y/szy) ) );
 
             ++it;
         }

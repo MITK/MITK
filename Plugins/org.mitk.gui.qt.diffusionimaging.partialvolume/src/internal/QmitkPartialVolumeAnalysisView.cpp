@@ -70,11 +70,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vnl/vnl_vector.h>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-#define PVA_PI M_PI
-
 const std::string QmitkPartialVolumeAnalysisView::VIEW_ID =
         "org.mitk.views.partialvolumeanalysisview";
 
@@ -949,7 +944,7 @@ void QmitkPartialVolumeAnalysisView::ShowClusteringResults()
 
         typedef itk::BinaryThresholdImageFilter< AngularErrorImageType, MaskImageType > ThreshType;
         ThreshType::Pointer thresh = ThreshType::New();
-        thresh->SetUpperThreshold((90-m_Controls->m_SimilarAnglesSlider->value())*(PVA_PI/180.0));
+        thresh->SetUpperThreshold((90-m_Controls->m_SimilarAnglesSlider->value())*(itk::Math::pi/180.0));
         thresh->SetInsideValue(1.0);
         thresh->SetInput(caster->GetOutput());
         thresh->Update();

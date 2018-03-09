@@ -24,11 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/vnl_vector.h>
 #include <mitkDiffusionFunctionCollection.h>
 
-#include <stdio.h>
+#include <cstdio>
 #include <locale>
 #include <fstream>
-#define _USE_MATH_DEFINES
-#include <math.h>
 #include "itkPointShell.h"
 
 namespace itk {
@@ -114,7 +112,7 @@ itk::AnalyticalDiffusionQballReconstructionImageFilter<TReferenceImagePixelType,
   case QBAR_SOLID_ANGLE:
   {
     for(int i=0; i<NrOdfDirections; i++)
-      odf[i] *= M_PI*4/NrOdfDirections;
+      odf[i] *= itk::Math::pi*4/NrOdfDirections;
 
     break;
   }
@@ -357,7 +355,7 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDire
       {
         vnl_vector<TO> coeffs(m_NumberCoefficients);
         coeffs = ( m_CoeffReconstructionMatrix * B );
-        coeffs[0] += 1.0/(2.0*sqrt(M_PI));
+        coeffs[0] += 1.0/(2.0*sqrt(itk::Math::pi));
         odf = ( m_SphericalHarmonicBasisMatrix * coeffs ).data_block();
         coeffPixel = coeffs.data_block();
       }
@@ -376,7 +374,7 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDire
       {
         vnl_vector<TO> coeffs(m_NumberCoefficients);
         coeffs = ( m_CoeffReconstructionMatrix * B );
-        coeffs[0] += 1.0/(2.0*sqrt(M_PI));
+        coeffs[0] += 1.0/(2.0*sqrt(itk::Math::pi));
         coeffPixel = coeffs.data_block();
         odf = ( m_ReconstructionMatrix * B ).data_block();
       }
@@ -564,7 +562,7 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDire
   }
   case QBAR_SOLID_ANGLE:
   {
-    m_CoeffReconstructionMatrix = (float)(1.0/(8.0*M_PI)) * P * L * m_CoeffReconstructionMatrix;
+    m_CoeffReconstructionMatrix = (float)(1.0/(8.0*itk::Math::pi)) * P * L * m_CoeffReconstructionMatrix;
     break;
   }
   case QBAR_NONNEG_SOLID_ANGLE:

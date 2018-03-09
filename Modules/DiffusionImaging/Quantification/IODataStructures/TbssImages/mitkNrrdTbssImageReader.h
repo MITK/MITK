@@ -57,8 +57,8 @@ namespace mitk
   protected:
 
     /** Does the real work. */
-    virtual void GenerateData() override;
-    virtual void GenerateOutputInformation() override;
+    void GenerateData() override;
+    void GenerateOutputInformation() override;
 
 
     std::string m_FileName;

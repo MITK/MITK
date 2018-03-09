@@ -32,7 +32,7 @@ namespace mitk
   {
     public:
       IGTActivator();
-      virtual ~IGTActivator();
+      ~IGTActivator() override;
       void Load(us::ModuleContext*) override;
       void Unload(us::ModuleContext*) override;
 

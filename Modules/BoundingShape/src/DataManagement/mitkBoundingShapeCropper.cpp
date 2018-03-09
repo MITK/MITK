@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStatusBar.h"
 #include "mitkTimeHelper.h"
 
-#include <math.h>
+#include <cmath>
 
 #include "vtkMatrix4x4.h"
 #include "vtkSmartPointer.h"

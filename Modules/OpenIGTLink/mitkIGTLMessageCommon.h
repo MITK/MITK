@@ -62,7 +62,7 @@ namespace mitk {
        */
 //      IGTLMessageCommon(const mitk::IGTLMessageCommon& toCopy);
 
-      virtual ~IGTLMessageCommon();
+      ~IGTLMessageCommon() override;
 
     private:
 

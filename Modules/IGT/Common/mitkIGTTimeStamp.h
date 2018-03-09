@@ -164,7 +164,7 @@ namespace mitk {
 
     IGTTimeStamp();
 
-    virtual ~IGTTimeStamp();
+    ~IGTTimeStamp() override;
 
     double GetCurrentStamp();
 

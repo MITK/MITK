@@ -104,7 +104,7 @@ namespace itk{
 
   protected:
     NonLocalMeansDenoisingFilter();
-    ~NonLocalMeansDenoisingFilter() {}
+    ~NonLocalMeansDenoisingFilter() override {}
 
     /**
      * @brief Calculations which need to be done before the denoising starts
@@ -112,7 +112,7 @@ namespace itk{
      * This method is called before the denoising starts. It calculates the ROI if a mask is used
      * and sets the number of processed voxels to zero.
      */
-    void BeforeThreadedGenerateData();
+    void BeforeThreadedGenerateData() override;
 
     /**
      * @brief Denoising procedure
@@ -122,7 +122,7 @@ namespace itk{
      *
      * @param outputRegionForThread Region to denoise for each thread.
      */
-    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType);
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType) override;
 
 
 

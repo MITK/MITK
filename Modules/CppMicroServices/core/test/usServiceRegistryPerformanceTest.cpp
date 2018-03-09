@@ -29,7 +29,7 @@ US_USE_NAMESPACE
 #ifdef US_PLATFORM_APPLE
 #include <mach/mach_time.h>
 #elif defined(US_PLATFORM_POSIX)
-#include <time.h>
+#include <ctime>
 #include <unistd.h>
 #ifndef _POSIX_MONOTONIC_CLOCK
 #error Monotonic clock support missing on this POSIX platform

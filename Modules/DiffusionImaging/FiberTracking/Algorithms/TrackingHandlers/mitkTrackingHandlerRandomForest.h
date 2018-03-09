@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImpurityLoss.h>
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 namespace mitk
 {
@@ -54,7 +54,7 @@ public:
 
 
   TrackingHandlerRandomForest();
-  ~TrackingHandlerRandomForest();
+  ~TrackingHandlerRandomForest() override;
 
   typedef itk::Image< itk::Vector< float, NumberOfSignalFeatures > , 3 >      DwiFeatureImageType;
   typedef itk::LinearInterpolateImageFunction< DwiFeatureImageType, float >   DwiFeatureImageInterpolatorType;
@@ -78,7 +78,7 @@ public:
 
   void StartTraining();
 
-  void SetMode( MODE m ){ m_Mode = m; }
+  void SetMode( MODE m ) override{ m_Mode = m; }
   void SetForest(mitk::TractographyForest::Pointer forest){ m_Forest = forest; }
   void SetMaxNumWmSamples(int num){ m_MaxNumWmSamples=num; }
   void SetNumPreviousDirections( int num ){ m_NumPreviousDirections=num; }
@@ -90,18 +90,18 @@ public:
   void SetBidirectionalFiberSampling(bool val) { m_BidirectionalFiberSampling = val; }
   void SetZeroDirWmFeatures(bool val) { m_ZeroDirWmFeatures = val; }
 
-  void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
-  vnl_vector_fixed<float,3> ProposeDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
-  bool WorldToIndex(itk::Point<float, 3>& pos, itk::Index<3>& index);
+  void InitForTracking() override;     ///< calls InputDataValidForTracking() and creates feature images
+  vnl_vector_fixed<float,3> ProposeDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex) override;  ///< predicts next progression direction at the given position
+  bool WorldToIndex(itk::Point<float, 3>& pos, itk::Index<3>& index) override;
 
   bool IsForestValid();   ///< true is forest is not null, has more than 0 trees and the correct number of features (NumberOfSignalFeatures + 3)
 
   mitk::TractographyForest::Pointer GetForest(){ return m_Forest; }
 
-  ItkUcharImgType::SpacingType GetSpacing(){ return m_DwiFeatureImages.at(0)->GetSpacing(); }
-  itk::Point<float,3> GetOrigin(){ return m_DwiFeatureImages.at(0)->GetOrigin(); }
-  ItkUcharImgType::DirectionType GetDirection(){ return m_DwiFeatureImages.at(0)->GetDirection(); }
-  ItkUcharImgType::RegionType GetLargestPossibleRegion(){ return m_DwiFeatureImages.at(0)->GetLargestPossibleRegion(); }
+  ItkUcharImgType::SpacingType GetSpacing() override{ return m_DwiFeatureImages.at(0)->GetSpacing(); }
+  itk::Point<float,3> GetOrigin() override{ return m_DwiFeatureImages.at(0)->GetOrigin(); }
+  ItkUcharImgType::DirectionType GetDirection() override{ return m_DwiFeatureImages.at(0)->GetDirection(); }
+  ItkUcharImgType::RegionType GetLargestPossibleRegion() override{ return m_DwiFeatureImages.at(0)->GetLargestPossibleRegion(); }
 
 protected:
 

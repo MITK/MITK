@@ -51,7 +51,7 @@ namespace mitk {
 
     protected:
       PivotCalibration();
-      virtual ~PivotCalibration();
+      ~PivotCalibration() override;
 
       std::vector<mitk::NavigationData::Pointer> m_NavigationDatas;
 

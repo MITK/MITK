@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itksys/SystemTools.hxx"
 
 
-mitk::ToFImageRecorderFilter::ToFImageRecorderFilter(): m_RecordingStarted(false), m_ToFImageWriter(0)
+mitk::ToFImageRecorderFilter::ToFImageRecorderFilter(): m_RecordingStarted(false), m_ToFImageWriter(nullptr)
 {
   m_FileExtension = "";
 }

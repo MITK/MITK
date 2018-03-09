@@ -194,7 +194,7 @@ namespace mitk {
 
 
       TrackingDevice();
-      virtual ~TrackingDevice();
+      ~TrackingDevice() override;
 
     TrackingDeviceData m_Data; ///< current device Data
 

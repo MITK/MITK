@@ -53,7 +53,7 @@ public:
 
 protected:
   USAbstractControlInterface( itk::SmartPointer<USDevice> device );
-  virtual ~USAbstractControlInterface( );
+  ~USAbstractControlInterface( ) override;
 
   itk::SmartPointer<USDevice> m_Device;
 };

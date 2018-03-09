@@ -51,7 +51,7 @@ namespace mitk
   ImageWriterFactory::ImageWriterFactory()
   {
     this->RegisterOverride(
-      "IOWriter", "ImageWriter", "Image Writer", 1, mitk::CreateImageWriter<mitk::ImageWriter>::New());
+      "IOWriter", "ImageWriter", "Image Writer", true, mitk::CreateImageWriter<mitk::ImageWriter>::New());
   }
 
   ImageWriterFactory::~ImageWriterFactory() {}

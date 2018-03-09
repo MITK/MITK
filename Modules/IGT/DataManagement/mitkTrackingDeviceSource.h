@@ -106,11 +106,11 @@ namespace mitk {
     /**
     * \brief Used for pipeline update
     */
-    virtual void UpdateOutputInformation() override;
+    void UpdateOutputInformation() override;
 
   protected:
     TrackingDeviceSource();
-    virtual ~TrackingDeviceSource();
+    ~TrackingDeviceSource() override;
 
     /**
     * \brief filter execute method
@@ -120,7 +120,7 @@ namespace mitk {
     * \warning Will raise a std::out_of_range exception, if tools were added to the
     * tracking device after it was set as input for this filter
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     /**
     * \brief Create the necessary outputs for the TrackingTool objects in m_TrackingDevice

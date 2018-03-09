@@ -39,22 +39,22 @@ namespace mitk
     using RelationUIDType = PropertyRelationRuleBase::RelationUIDType;
     using RelationUIDVectorType = PropertyRelationRuleBase::RelationUIDVectorType;
 
-    virtual RuleIDType GetRuleID() const override { return "TestRule"; };
+    RuleIDType GetRuleID() const override { return "TestRule"; };
 
-    virtual std::string GetDisplayName() const override { return "TestDisplayName"; }
-    virtual std::string GetSourceRoleName() const override { return "source role"; }
-    virtual std::string GetDestinationRoleName() const override { return "destination role"; }
+    std::string GetDisplayName() const override { return "TestDisplayName"; }
+    std::string GetSourceRoleName() const override { return "source role"; }
+    std::string GetDestinationRoleName() const override { return "destination role"; }
 
     using Superclass::GetRuleRootKeyPath;
 
   protected:
     TestRule() = default;
-    virtual ~TestRule() = default;
+    ~TestRule() override = default;
 
     using InstanceIDType = PropertyRelationRuleBase::InstanceIDType;
     using InstanceIDVectorType = PropertyRelationRuleBase::InstanceIDVectorType;
 
-    virtual InstanceIDVectorType GetInstanceID_datalayer(const IPropertyProvider *source,
+    InstanceIDVectorType GetInstanceID_datalayer(const IPropertyProvider *source,
                                                          const IPropertyProvider *destination) const override
     {
       InstanceIDVectorType result;
@@ -88,7 +88,7 @@ namespace mitk
       return result;
     };
 
-    virtual bool HasImplicitDataRelation(const IPropertyProvider *source,
+    bool HasImplicitDataRelation(const IPropertyProvider *source,
                                          const IPropertyProvider *destination) const override
     {
       auto destProp = destination->GetConstProperty("name");
@@ -98,7 +98,7 @@ namespace mitk
              destProp->GetValueAsString() == sourceProp->GetValueAsString();
     };
 
-    virtual void Connect_datalayer(IPropertyOwner *source,
+    void Connect_datalayer(IPropertyOwner *source,
                                    const IPropertyProvider *destination,
                                    const InstanceIDType &instanceID) const override
     {
@@ -110,7 +110,7 @@ namespace mitk
         StringProperty::New(destProp->GetValueAsString()));
     };
 
-    virtual void Disconnect_datalayer(IPropertyOwner *source, const InstanceIDType & /*instanceID*/) const override
+    void Disconnect_datalayer(IPropertyOwner *source, const InstanceIDType & /*instanceID*/) const override
     {
       source->RemoveProperty("referencedName");
     };

@@ -49,15 +49,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ===================================================================*/
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <float.h>
-#include <string.h>
-#include <stdarg.h>
-#include <limits.h>
-#include <locale.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cctype>
+#include <cfloat>
+#include <cstring>
+#include <cstdarg>
+#include <climits>
+#include <clocale>
 #include <mitkLocaleSwitch.h>
 #include "svm.h"
 int libsvm_version = LIBSVM_VERSION;
@@ -2914,7 +2914,7 @@ bool read_model_header(FILE *fp, svm_model* model)
 {
   svm_parameter& param = model->param;
   char cmd[81];
-  while(1)
+  while(true)
   {
     FSCANF(fp,"%80s",cmd);
 
@@ -3001,7 +3001,7 @@ bool read_model_header(FILE *fp, svm_model* model)
     }
     else if(strcmp(cmd,"SV")==0)
     {
-      while(1)
+      while(true)
       {
         int c = getc(fp);
         if(c==EOF || c=='\n') break;
@@ -3059,7 +3059,7 @@ svm_model *svm_load_model(const char *model_file_name)
   while(readline(fp)!=nullptr)
   {
     p = strtok(line,":");
-    while(1)
+    while(true)
     {
       p = strtok(nullptr,":");
       if(p == nullptr)
@@ -3095,7 +3095,7 @@ svm_model *svm_load_model(const char *model_file_name)
       model->sv_coef[k][i] = strtod(p,&endptr);
     }
 
-    while(1)
+    while(true)
     {
       idx = strtok(nullptr, ":");
       val = strtok(nullptr, " \t");

@@ -39,24 +39,24 @@ public:
     // maximum echo at center of each line
     m_NegTEhalf = -dt*(kxMax-(int)kxMax%2)/2;
   }
-  ~CartesianReadout()
+  ~CartesianReadout() override
   {}
 
-  float GetTimeFromMaxEcho(itk::Index< 2 > index)
+  float GetTimeFromMaxEcho(itk::Index< 2 > index) override
   {
     float t = 0;
     t = m_NegTEhalf + (float)index[0]*dt;
     return t;
   }
 
-  float GetRedoutTime(itk::Index< 2 > index)
+  float GetRedoutTime(itk::Index< 2 > index) override
   {
     float t = 0;
     t = (float)index[0]*dt;
     return t;
   }
 
-  itk::Index< 2 > GetActualKspaceIndex(itk::Index< 2 > index)
+  itk::Index< 2 > GetActualKspaceIndex(itk::Index< 2 > index) override
   {
     // reverse phase
     if (!m_Parameters->m_SignalGen.m_ReversePhase)
@@ -65,7 +65,7 @@ public:
     return index;
   }
 
-  void AdjustEchoTime()
+  void AdjustEchoTime() override
   {
     if ( m_Parameters->m_SignalGen.m_tEcho/2 < m_Parameters->m_SignalGen.m_tLine/2 )
     {

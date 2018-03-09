@@ -69,7 +69,7 @@ public:
   itkCloneMacro(Self)
 
   GrabCutOpenCVImageFilter();
-  virtual ~GrabCutOpenCVImageFilter();
+  ~GrabCutOpenCVImageFilter() override;
 
   /**
    * \brief Implementation of the virtual image filtering method.

@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 
-#include <time.h>
+#include <ctime>
 
 /**Documentation
  *  test for the class "NavigationDataVisualizationByBaseDataTransformFilter".
@@ -59,7 +59,7 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
 
   // data valid flag of navigation data
   int val = rand()%2;
-  bool valid(0); // this was uninitialized. how was this test ever meant to work??
+  bool valid(false); // this was uninitialized. how was this test ever meant to work??
   if (val==0)
   {
     valid=false;

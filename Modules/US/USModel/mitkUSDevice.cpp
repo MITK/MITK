@@ -115,28 +115,28 @@ mitk::USAbstractControlInterface::Pointer
 mitk::USDevice::GetControlInterfaceCustom()
 {
   MITK_INFO << "Custom control interface does not exist for this object.";
-  return 0;
+  return nullptr;
 }
 
 mitk::USControlInterfaceBMode::Pointer
 mitk::USDevice::GetControlInterfaceBMode()
 {
   MITK_INFO << "Control interface BMode does not exist for this object.";
-  return 0;
+  return nullptr;
 }
 
 mitk::USControlInterfaceProbes::Pointer
 mitk::USDevice::GetControlInterfaceProbes()
 {
   MITK_INFO << "Control interface Probes does not exist for this object.";
-  return 0;
+  return nullptr;
 }
 
 mitk::USControlInterfaceDoppler::Pointer
 mitk::USDevice::GetControlInterfaceDoppler()
 {
   MITK_INFO << "Control interface Doppler does not exist for this object.";
-  return 0;
+  return nullptr;
 }
 
 void mitk::USDevice::SetManufacturer(std::string manufacturer)

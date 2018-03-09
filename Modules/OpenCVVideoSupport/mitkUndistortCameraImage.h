@@ -100,7 +100,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT UndistortCameraImage : public itk::Object
                                    float in_Dist[4], float ImageSizeX, float ImageSizeY);
 
     UndistortCameraImage();
-    virtual ~UndistortCameraImage();
+    ~UndistortCameraImage() override;
 
   protected:
 

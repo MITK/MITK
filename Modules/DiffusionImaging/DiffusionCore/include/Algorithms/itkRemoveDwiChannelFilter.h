@@ -64,10 +64,10 @@ public:
     protected:
         RemoveDwiChannelFilter();
     ~RemoveDwiChannelFilter() {}
-    void PrintSelf(std::ostream& os, Indent indent) const;
+    void PrintSelf(std::ostream& os, Indent indent) const override;
 
-    void BeforeThreadedGenerateData();
-    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType id );
+    void BeforeThreadedGenerateData() override;
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType id ) override;
 
     std::vector< unsigned int >                 m_ChannelIndices;
     typename DirectionContainerType::Pointer    m_Directions;

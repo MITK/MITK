@@ -83,7 +83,7 @@ namespace mitk {
   ****************************************************************************/
 
   RdfStorePrivate::RdfStorePrivate()
-    : m_World(0), m_Storage(0), m_Model(0)
+    : m_World(nullptr), m_Storage(nullptr), m_Model(nullptr)
   {
     // SetUp base prefixes
     m_Prefixes["rdf"] = RdfUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#");
@@ -140,14 +140,14 @@ namespace mitk {
     m_World = librdf_new_world();
     librdf_world_open(m_World);
 
-    m_Storage = librdf_new_storage(m_World, "memory", 0, 0);
+    m_Storage = librdf_new_storage(m_World, "memory", nullptr, nullptr);
 
     if(!m_Storage)
     {
       mitkThrow() << "RDF Library Error";
     }
 
-    m_Model = librdf_new_model(m_World, m_Storage, 0);
+    m_Model = librdf_new_model(m_World, m_Storage, nullptr);
 
     if(!m_Model)
     {
@@ -227,7 +227,7 @@ namespace mitk {
 
     const std::string completeQuery = this->PrependPrefixes(query);
 
-    librdf_query* rdfQuery = librdf_new_query(m_World, "sparql", 0, (const unsigned char*) completeQuery.c_str(), 0);
+    librdf_query* rdfQuery = librdf_new_query(m_World, "sparql", nullptr, (const unsigned char*) completeQuery.c_str(), nullptr);
 
     if (!rdfQuery) return resultMap;
 
@@ -285,7 +285,7 @@ namespace mitk {
   {
     const std::string completeQuery = this->PrependPrefixes(query);
 
-    librdf_query* rdfQuery = librdf_new_query(m_World, "sparql", 0, (const unsigned char*) completeQuery.c_str(), 0);
+    librdf_query* rdfQuery = librdf_new_query(m_World, "sparql", nullptr, (const unsigned char*) completeQuery.c_str(), nullptr);
 
     if (!rdfQuery)
     {
@@ -337,7 +337,7 @@ namespace mitk {
 
     librdf_uri* baseUri = RdfUriToLibRdfUri(m_BaseUri);
 
-    librdf_serializer* s = librdf_new_serializer(m_World, format.c_str(), 0, 0);
+    librdf_serializer* s = librdf_new_serializer(m_World, format.c_str(), nullptr, nullptr);
 
     if(!s)
     {
@@ -375,7 +375,7 @@ namespace mitk {
 
     librdf_uri* libRdfBaseUri = librdf_new_uri(m_World, (const unsigned char*) baseUri.c_str());
 
-    librdf_parser* p = librdf_new_parser(m_World, format.c_str(), 0, 0);
+    librdf_parser* p = librdf_new_parser(m_World, format.c_str(), nullptr, nullptr);
 
     if(!p)
     {
@@ -424,13 +424,13 @@ namespace mitk {
     librdf_node* object = RdfNodeToLibRdfNode(triple.GetTripleObject());
 
     librdf_statement* statement = librdf_new_statement_from_nodes(m_World, subject, predicate, object);
-    if(!statement) return 0;
+    if(!statement) return nullptr;
     return statement;
   }
 
   librdf_node* RdfStorePrivate::RdfNodeToLibRdfNode(RdfNode node) const
   {
-    librdf_node* newNode = 0;
+    librdf_node* newNode = nullptr;
 
     switch (node.GetType())
     {
@@ -444,11 +444,11 @@ namespace mitk {
         if (node.GetDatatype() != RdfUri())
         {
           librdf_uri* typeUri = RdfUriToLibRdfUri(node.GetDatatype());
-          newNode = librdf_new_node_from_typed_literal(m_World, (const unsigned char*) node.GetValue().c_str(), 0, typeUri);
+          newNode = librdf_new_node_from_typed_literal(m_World, (const unsigned char*) node.GetValue().c_str(), nullptr, typeUri);
         }
         else
         {
-          newNode = librdf_new_node_from_literal(m_World, (const unsigned char*) node.GetValue().c_str(), 0, 0);
+          newNode = librdf_new_node_from_literal(m_World, (const unsigned char*) node.GetValue().c_str(), nullptr, 0);
         }
       }
       break;
@@ -464,7 +464,7 @@ namespace mitk {
   librdf_uri* RdfStorePrivate::RdfUriToLibRdfUri(RdfUri uri) const
   {
     librdf_uri* libUri = librdf_new_uri(m_World, (const unsigned char*) uri.ToString().c_str());
-    if (!libUri) return 0;
+    if (!libUri) return nullptr;
     return libUri;
   }
 

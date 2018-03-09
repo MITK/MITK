@@ -51,7 +51,7 @@ public:
   // qobject_cast<mitk::SomeMicroServiceInterface>(lightObjectToQObjectAdapter)
   void* qt_metacast(const char *_clname) override
   {
-    if (!_clname) return 0;
+    if (!_clname) return nullptr;
     if (!strcmp(_clname, "InterfaceMapToQObjectAdapter"))
       return static_cast<void*>(const_cast<InterfaceMapToQObjectAdapter*>(this));
 
@@ -125,8 +125,8 @@ void org_mitk_core_services_Activator::stop(ctkPluginContext* /*context*/)
   mitk::LoggingBackend::Unregister();
 
   dataStorageService.reset();
-  mitkContext = 0;
-  pluginContext = 0;
+  mitkContext = nullptr;
+  pluginContext = nullptr;
 }
 
 void org_mitk_core_services_Activator::MitkServiceChanged(const us::ServiceEvent event)
@@ -276,7 +276,7 @@ ctkDictionary org_mitk_core_services_Activator::CreateServiceProperties(const us
 }
 
 org_mitk_core_services_Activator::org_mitk_core_services_Activator()
-  : mitkContext(0), pluginContext(0)
+  : mitkContext(nullptr), pluginContext(nullptr)
 {
 }
 

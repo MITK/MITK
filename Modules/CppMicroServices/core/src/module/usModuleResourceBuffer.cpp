@@ -25,7 +25,7 @@
 
 #include <limits>
 #include <cassert>
-#include <stdlib.h>
+#include <cstdlib>
 
 #ifdef US_PLATFORM_WINDOWS
 #define DATA_NEEDS_NEWLINE_CONVERSION 1

@@ -86,7 +86,7 @@ public:
     {
       m_Rng.seed();
       m_RngItk->SetSeed();
-      std::srand(std::time(0));
+      std::srand(std::time(nullptr));
     }
   }
 

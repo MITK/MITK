@@ -30,14 +30,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 QmitkCloseProjectAction::QmitkCloseProjectAction(berry::IWorkbenchWindow::Pointer window)
-  : QAction(0)
+  : QAction(nullptr)
   , m_Window(nullptr)
 {
   this->init(window.GetPointer());
 }
 
 QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
-  : QAction(0)
+  : QAction(nullptr)
   , m_Window(nullptr)
 {
   this->setIcon(icon);
@@ -45,14 +45,14 @@ QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon & icon, berry::IWor
 }
 
 QmitkCloseProjectAction::QmitkCloseProjectAction(berry::IWorkbenchWindow* window)
-  : QAction(0)
+  : QAction(nullptr)
   , m_Window(nullptr)
 {
   this->init(window);
 }
 
 QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon& icon, berry::IWorkbenchWindow* window)
-  : QAction(0)
+  : QAction(nullptr)
   , m_Window(nullptr)
 {
   this->setIcon(icon);
@@ -72,7 +72,7 @@ void QmitkCloseProjectAction::Run()
   try
   {
     ctkPluginContext* context = mitk::PluginActivator::GetContext();
-    mitk::IDataStorageService* dss = 0;
+    mitk::IDataStorageService* dss = nullptr;
     ctkServiceReference dsRef = context->getServiceReference<mitk::IDataStorageService>();
     if (dsRef)
     {

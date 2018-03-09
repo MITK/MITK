@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __itkKspaceImageFilter_txx
 #define __itkKspaceImageFilter_txx
 
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstdio>
+#include <cstdlib>
 
 #include "itkKspaceImageFilter.h"
 #include <itkImageRegionConstIterator.h>
@@ -29,9 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSingleShotEpi.h>
 #include <mitkCartesianReadout.h>
 #include <mitkDiffusionFunctionCollection.h>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
 
 namespace itk {
 
@@ -300,7 +297,7 @@ namespace itk {
             y -= yMaxFov;
 
           // actual DFT term
-          s += f * std::exp( std::complex<ScalarType>(0, 2 * M_PI * (kx*x/xMax + ky*y/yMaxFov + omega*t/1000 )) );
+          s += f * std::exp( std::complex<ScalarType>(0, 2 * itk::Math::pi * (kx*x/xMax + ky*y/yMaxFov + omega*t/1000 )) );
 
           ++it;
         }

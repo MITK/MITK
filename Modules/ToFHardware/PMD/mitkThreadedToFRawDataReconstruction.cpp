@@ -39,10 +39,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #endif
 #include <new>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-#define PI M_PI;
 #define cAir 299704944;
 #define fMod 20000000;
 
@@ -264,8 +260,7 @@ void ThreadedToFRawDataReconstruction::GetAllData(float* dist, float* ampl, floa
     double A7m5 = 0;
     double A8m6 = 0;
     double cair = cAir;
-    double pi = PI;
-    double twoPi = pi + pi;
+    double twoPi = itk::Math::pi + itk::Math::pi;
     long modFreq = fMod;
 
     threadData->m_ThreadDataMutex->Lock();
@@ -280,7 +275,7 @@ void ThreadedToFRawDataReconstruction::GetAllData(float* dist, float* ampl, floa
     int frameheight = threadData->m_FrameHeight;
     threadData->m_ThreadDataMutex->Unlock();
 
-    double intermed1 = cair/(pi*(modFreq << 2));
+    double intermed1 = cair/(itk::Math::pi*(modFreq << 2));
     double intermed2 = intermed1*500;
     int doubleLwidth = linewidth << 1;
     int datasize = doubleLwidth*frameheight << 2;
@@ -302,7 +297,7 @@ void ThreadedToFRawDataReconstruction::GetAllData(float* dist, float* ampl, floa
         A7 = htons(quad3.at(index+1));
         A8 = htons(quad4.at(index+1));
 
-        phi  = atan2((A3 - A1),(A2 - A4)) + pi;
+        phi  = atan2((A3 - A1),(A2 - A4)) + itk::Math::pi;
         phi2 = atan2((A7 - A5),(A6 - A8));
         if(phi2<0) phi2 +=twoPi;
 

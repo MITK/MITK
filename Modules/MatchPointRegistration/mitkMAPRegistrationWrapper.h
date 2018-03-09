@@ -49,25 +49,25 @@ public:
    * Empty implementation, since the MAPRegistrationWrapper doesn't
    * support the requested region concept
    */
-  virtual void SetRequestedRegionToLargestPossibleRegion();
+  void SetRequestedRegionToLargestPossibleRegion() override;
 
   /**
    * Empty implementation, since the MAPRegistrationWrapper doesn't
    * support the requested region concept
    */
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
+  bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
   /**
    * Empty implementation, since the MAPRegistrationWrapper doesn't
    * support the requested region concept
    */
-  virtual bool VerifyRequestedRegion();
+  bool VerifyRequestedRegion() override;
 
   /**
    * Empty implementation, since the MAPRegistrationWrapper doesn't
    * support the requested region concept
    */
-  virtual void SetRequestedRegion(const itk::DataObject*);
+  void SetRequestedRegion(const itk::DataObject*) override;
 
   /*! @brief Gets the number of moving dimensions
   @pre valid registration instance must be set.
@@ -252,10 +252,10 @@ public:
   void SetRegistration(::map::core::RegistrationBase* pReg);
 
 protected:
-    virtual void PrintSelf (std::ostream &os, itk::Indent indent) const;
+    void PrintSelf (std::ostream &os, itk::Indent indent) const override;
 
     MAPRegistrationWrapper();
-    virtual ~MAPRegistrationWrapper();
+    ~MAPRegistrationWrapper() override;
 
     ::map::core::RegistrationBase::Pointer m_spRegistration;
 

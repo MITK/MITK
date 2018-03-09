@@ -1097,7 +1097,7 @@ public:
 
     double vtkpoint[3];
     typename MeshType::PointType itkPhysicalPoint;
-    if (geometryFrame == 0)
+    if (geometryFrame == nullptr)
     {
       for (i = points->Begin(); i != points->End(); ++i)
       {

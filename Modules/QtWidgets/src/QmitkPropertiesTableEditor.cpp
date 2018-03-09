@@ -33,13 +33,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkPropertiesTableEditor::QmitkPropertiesTableEditor(QWidget *parent,
                                                        Qt::WindowFlags f,
                                                        mitk::DataNode::Pointer /*_Node*/)
-  : QWidget(parent, f), m_NodePropertiesTableView(0), m_Model(0)
+  : QWidget(parent, f), m_NodePropertiesTableView(nullptr), m_Model(nullptr)
 {
   // set up empty gui elements
   this->init();
 
   // set up model
-  m_Model = new QmitkPropertiesTableModel(m_NodePropertiesTableView, 0);
+  m_Model = new QmitkPropertiesTableModel(m_NodePropertiesTableView, nullptr);
   m_NodePropertiesTableView->setModel(m_Model);
 }
 
@@ -59,7 +59,7 @@ void QmitkPropertiesTableEditor::SetPropertyList(mitk::PropertyList::Pointer _Li
   }
   else
   {
-    m_Model->SetPropertyList(0);
+    m_Model->SetPropertyList(nullptr);
   }
 }
 

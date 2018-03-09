@@ -147,7 +147,7 @@ namespace mitk
     PhotoacousticOCLBeamformingFilter() {}
 
     /** Destructor */
-    virtual ~PhotoacousticOCLBeamformingFilter() {}
+    ~PhotoacousticOCLBeamformingFilter() override {}
   };
 }
 #endif

@@ -286,7 +286,7 @@ public:
 protected:
   PyramidImageRegistrationMethod();
 
-  ~PyramidImageRegistrationMethod();
+  ~PyramidImageRegistrationMethod() override;
 
   /** Fixed image, used as reference for registration */
   mitk::Image::Pointer m_FixedImage;

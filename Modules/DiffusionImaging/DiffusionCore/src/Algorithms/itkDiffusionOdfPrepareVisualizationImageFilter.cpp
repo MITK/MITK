@@ -29,12 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vnl/vnl_vector.h"
 #include "itkOrientationDistributionFunction.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 namespace itk {
-
-  //#define Odf_RECON_PI       M_PI
 
   template< class TOdfPixelType, int NrOdfDirections>
     DiffusionOdfPrepareVisualizationImageFilter< TOdfPixelType, NrOdfDirections>

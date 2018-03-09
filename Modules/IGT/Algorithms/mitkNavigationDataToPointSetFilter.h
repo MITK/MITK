@@ -80,7 +80,7 @@ namespace mitk {
     /**
     * \brief filter execute method
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     using Superclass::SetInput;
 
@@ -127,7 +127,7 @@ namespace mitk {
   protected:
     NavigationDataToPointSetFilter();
 
-    virtual ~NavigationDataToPointSetFilter();
+    ~NavigationDataToPointSetFilter() override;
 
     /**
     * \brief Generates the output for Mode3D

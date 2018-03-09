@@ -37,7 +37,7 @@ public:
     EXPERIMENT
   };
 
-  QmitkXnatCreateObjectDialog(SpecificType type, QWidget *parent = 0);
+  QmitkXnatCreateObjectDialog(SpecificType type, QWidget *parent = nullptr);
   ~QmitkXnatCreateObjectDialog() override;
 
   // Returns a specific xnat object like SpecificType

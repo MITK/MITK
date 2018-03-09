@@ -95,7 +95,7 @@ public:
     }
   }
 
-  vtkPeakShaderCallback() { this->renderer = 0; }
+  vtkPeakShaderCallback() { this->renderer = nullptr; }
 };
 
 

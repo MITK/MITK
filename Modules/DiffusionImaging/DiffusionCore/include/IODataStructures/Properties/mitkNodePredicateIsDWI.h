@@ -39,11 +39,11 @@ namespace mitk {
 
       //##Documentation
       //## @brief Standard Destructor
-      virtual ~NodePredicateIsDWI();
+      ~NodePredicateIsDWI() override;
 
       //##Documentation
       //## @brief Checks, if the node's data contains a property that is equal to m_ValidProperty
-      virtual bool CheckNode(const mitk::DataNode* node) const override;
+      bool CheckNode(const mitk::DataNode* node) const override;
 
     protected:
       //##Documentation

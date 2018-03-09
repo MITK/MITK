@@ -252,12 +252,12 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state, QmitkStdMultiWidget *stdM
     disconnect(m_MenuWidget, SIGNAL(ChangeCrosshairRotationMode(int)), this, SIGNAL(ChangeCrosshairRotationMode(int)));
 
     delete m_MenuWidget;
-    m_MenuWidget = 0;
+    m_MenuWidget = nullptr;
   }
   else if (m_MenuWidgetActivated && !m_MenuWidget)
   {
     // create render window MenuBar for split, close Window or set new setting.
-    m_MenuWidget = new QmitkRenderWindowMenu(this, 0, m_Renderer, stdMultiWidget);
+    m_MenuWidget = new QmitkRenderWindowMenu(this, nullptr, m_Renderer, stdMultiWidget);
     m_MenuWidget->SetLayoutIndex(m_LayoutIndex);
 
     // create Signal/Slot Connection

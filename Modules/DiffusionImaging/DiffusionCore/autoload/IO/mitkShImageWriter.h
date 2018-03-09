@@ -36,17 +36,17 @@ namespace mitk
     typedef mitk::ShImage InputType;
 
     ShImageWriter();
-    virtual ~ShImageWriter();
+    ~ShImageWriter() override;
 
     using AbstractFileWriter::Write;
-    virtual void Write() override;
+    void Write() override;
 
-    virtual ConfidenceLevel GetConfidenceLevel() const override;
+    ConfidenceLevel GetConfidenceLevel() const override;
 
   protected:
 
     ShImageWriter(const ShImageWriter& other);
-    virtual mitk::ShImageWriter* Clone() const override;
+    mitk::ShImageWriter* Clone() const override;
 
     template <int shOrder>
     void WriteShImage(InputType::ConstPointer input);

@@ -54,7 +54,7 @@ namespace mitk
 
     //////////////////// Functions ///////////////////////
     ConnectomicsSyntheticNetworkGenerator();
-    ~ConnectomicsSyntheticNetworkGenerator();
+    ~ConnectomicsSyntheticNetworkGenerator() override;
 
     /** Generate a default geometry for synthetic images */
     mitk::Geometry3D::Pointer GenerateDefaultGeometry();

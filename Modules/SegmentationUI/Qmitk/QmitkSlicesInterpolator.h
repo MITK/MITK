@@ -81,7 +81,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSlicesInterpolator : public QWidget
   Q_OBJECT
 
 public:
-  QmitkSlicesInterpolator(QWidget *parent = 0, const char *name = 0);
+  QmitkSlicesInterpolator(QWidget *parent = nullptr, const char *name = nullptr);
 
   /**
     To be called once before real use.

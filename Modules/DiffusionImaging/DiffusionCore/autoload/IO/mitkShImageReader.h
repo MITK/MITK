@@ -41,10 +41,10 @@ namespace mitk
 
     ShImageReader(const ShImageReader& other);
     ShImageReader();
-    virtual ~ShImageReader();
+    ~ShImageReader() override;
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+    std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   protected:
 

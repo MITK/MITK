@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Testing
 #include <iostream>
-#include <stdio.h>
+#include <cstdio>
 
 QmitkXnatCreateObjectDialog::QmitkXnatCreateObjectDialog(SpecificType type, QWidget *parent)
   : QDialog(parent), m_Type(type)

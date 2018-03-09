@@ -251,7 +251,7 @@ public:
 
 protected:
   USControlInterfaceBMode( itk::SmartPointer<USDevice> device );
-  virtual ~USControlInterfaceBMode( );
+  ~USControlInterfaceBMode( ) override;
 };
 } // namespace mitk
 

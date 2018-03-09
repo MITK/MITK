@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __itkDiffusionOdfGeneralizedFaImageFilter_txx
 #define __itkDiffusionOdfGeneralizedFaImageFilter_txx
 
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstdio>
+#include <cstdlib>
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 #include "itkImageRegionConstIterator.h"
 #include "itkImageRegionConstIteratorWithIndex.h"
@@ -72,7 +72,7 @@ namespace itk {
     typedef itk::OrientationDistributionFunction<TOdfPixelType,NrOdfDirections> OdfType;
     typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
     typedef typename InputImageType::PixelType         OdfVectorType;
-    typename InputImageType::Pointer inputImagePointer = NULL;
+    typename InputImageType::Pointer inputImagePointer = nullptr;
     inputImagePointer = static_cast< InputImageType * >(
       this->ProcessObject::GetInput(0) );
 

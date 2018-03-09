@@ -49,7 +49,7 @@ namespace mitk
 
   protected:
     IGTLMessageCloneHandler() {}
-    ~IGTLMessageCloneHandler() {}
+    ~IGTLMessageCloneHandler() override {}
 };
 
 /**

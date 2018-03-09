@@ -88,7 +88,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
         void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* image );
 
         ImageToOpenCVImageFilter();
-        ~ImageToOpenCVImageFilter();
+        ~ImageToOpenCVImageFilter() override;
 
         ///
         /// Saves if the filter should copy the data or just reference it

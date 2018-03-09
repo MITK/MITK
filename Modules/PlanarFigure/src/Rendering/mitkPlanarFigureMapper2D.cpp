@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkTextProperty.h"
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
   : m_NodeModified(true), m_NodeModifiedObserverTag(0), m_NodeModifiedObserverAdded(false), m_Initialized(false)

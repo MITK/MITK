@@ -33,7 +33,7 @@ class MITKIGTUI_EXPORT QmitkNDIAuroraWidget : public QmitkNDIAbstractDeviceWidge
 public:
   static const std::string VIEW_ID;
 
-  QmitkNDIAuroraWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkNDIAuroraWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkNDIAuroraWidget() override;
 
   void Initialize() override;
@@ -46,7 +46,7 @@ private:
 protected:
   void ResetOutput() override;
   void AddOutput(std::string s) override;
-  virtual mitk::TrackingDevice::Pointer GetTrackingDevice() override;
+  mitk::TrackingDevice::Pointer GetTrackingDevice() override;
 
   void StoreUISettings() override;
   void LoadUISettings() override;

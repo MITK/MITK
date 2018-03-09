@@ -92,13 +92,13 @@ namespace itk
     void SetNumGradientDirections(std::vector<unsigned int> numDirs){m_NumGradientDirections = numDirs;}
 
 
-    void UpdateOutputInformation();
+    void UpdateOutputInformation() override;
 
   protected:
     ElectrostaticRepulsionDiffusionGradientReductionFilter();
-    ~ElectrostaticRepulsionDiffusionGradientReductionFilter() {}
+    ~ElectrostaticRepulsionDiffusionGradientReductionFilter() override {}
 
-    void GenerateData();
+    void GenerateData() override;
     double Costs(); ///< calculates electrostatic energy of current direction set
 
     GradientDirectionContainerType::Pointer m_GradientDirections;   ///< container for the subsampled output gradient directions

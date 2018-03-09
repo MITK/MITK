@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "itkADCFitFunctor.h"
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include <iomanip>
 #include "vnl/algo/vnl_levenberg_marquardt.h"

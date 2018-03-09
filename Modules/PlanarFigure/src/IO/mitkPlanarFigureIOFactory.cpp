@@ -27,7 +27,7 @@ namespace mitk
     this->RegisterOverride("mitkIOAdapter",
                            "mitkPlanarFigureReader",
                            "mitk PlanarFigure IO",
-                           1,
+                           true,
                            itk::CreateObjectFunction<IOAdapter<PlanarFigureReader>>::New());
   }
 

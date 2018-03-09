@@ -68,7 +68,7 @@ namespace mitk
 
         TiXmlHandle hDoc(&doc);
         TiXmlElement* pElem;
-        TiXmlHandle hRoot(0);
+        TiXmlHandle hRoot(nullptr);
 
         pElem = hDoc.FirstChildElement().Element();
 

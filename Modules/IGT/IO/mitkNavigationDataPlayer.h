@@ -43,7 +43,7 @@ namespace mitk {
     /**
     * \brief Used for pipeline update just to tell the pipeline that we always have to update
     */
-    virtual void UpdateOutputInformation() override;
+    void UpdateOutputInformation() override;
 
     /**
     * \brief This method starts the player.
@@ -77,12 +77,12 @@ namespace mitk {
 
   protected:
     NavigationDataPlayer();
-    virtual ~NavigationDataPlayer();
+    ~NavigationDataPlayer() override;
 
     /**
     * \brief Set outputs to the navigation data object corresponding to current time.
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     PlayerState m_CurPlayerState;
 

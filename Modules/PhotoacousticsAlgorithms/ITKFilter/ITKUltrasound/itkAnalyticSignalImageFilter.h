@@ -106,17 +106,17 @@ public:
 
 protected:
   AnalyticSignalImageFilter();
-  virtual ~AnalyticSignalImageFilter() {}
+  ~AnalyticSignalImageFilter() override {}
 
   void PrintSelf(std::ostream& os, Indent indent) const ITK_OVERRIDE;
 
   // These behave like their analogs in FFT1DRealToComplexConjugateImageFilter.
-  virtual void GenerateInputRequestedRegion() ITK_OVERRIDE;
-  virtual void EnlargeOutputRequestedRegion(DataObject *output) ITK_OVERRIDE;
+  void GenerateInputRequestedRegion() ITK_OVERRIDE;
+  void EnlargeOutputRequestedRegion(DataObject *output) ITK_OVERRIDE;
 
-  virtual void BeforeThreadedGenerateData() ITK_OVERRIDE;
-  virtual void ThreadedGenerateData( const OutputImageRegionType& outputRegionForThread, ThreadIdType threadId ) ITK_OVERRIDE;
-  virtual void AfterThreadedGenerateData() ITK_OVERRIDE;
+  void BeforeThreadedGenerateData() ITK_OVERRIDE;
+  void ThreadedGenerateData( const OutputImageRegionType& outputRegionForThread, ThreadIdType threadId ) ITK_OVERRIDE;
+  void AfterThreadedGenerateData() ITK_OVERRIDE;
 
   typedef FFT1DRealToComplexConjugateImageFilter< InputImageType, OutputImageType > FFTRealToComplexType;
   typedef FFT1DComplexToComplexImageFilter< OutputImageType, OutputImageType >      FFTComplexToComplexType;
@@ -126,7 +126,7 @@ protected:
 
   /** Override to return a splitter that does not split along the direction we
    * are performing the transform. */
-  virtual const ImageRegionSplitterBase* GetImageRegionSplitter() const ITK_OVERRIDE;
+  const ImageRegionSplitterBase* GetImageRegionSplitter() const ITK_OVERRIDE;
 
 private:
   AnalyticSignalImageFilter( const Self& ); // purposely not implemented

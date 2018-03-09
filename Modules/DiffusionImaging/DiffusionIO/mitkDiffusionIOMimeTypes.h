@@ -31,16 +31,16 @@ public:
   {
   public:
     DiffusionImageNrrdMimeType();
-    virtual bool AppliesTo(const std::string &path) const override;
-    virtual DiffusionImageNrrdMimeType* Clone() const override;
+    bool AppliesTo(const std::string &path) const override;
+    DiffusionImageNrrdMimeType* Clone() const override;
   };
 
   class  DiffusionImageNiftiMimeType : public CustomMimeType
   {
   public:
     DiffusionImageNiftiMimeType();
-    virtual bool AppliesTo(const std::string &path) const override;
-    virtual DiffusionImageNiftiMimeType* Clone() const override;
+    bool AppliesTo(const std::string &path) const override;
+    DiffusionImageNiftiMimeType* Clone() const override;
   };
   // Get all Diffusion Mime Types
   static std::vector<CustomMimeType*> Get();
@@ -68,8 +68,8 @@ public:
   {
   public:
     FiberBundleDicomMimeType();
-    virtual bool AppliesTo(const std::string &path) const override;
-    virtual FiberBundleDicomMimeType* Clone() const override;
+    bool AppliesTo(const std::string &path) const override;
+    FiberBundleDicomMimeType* Clone() const override;
   };
 
   static FiberBundleDicomMimeType FIBERBUNDLE_DICOM_MIMETYPE();

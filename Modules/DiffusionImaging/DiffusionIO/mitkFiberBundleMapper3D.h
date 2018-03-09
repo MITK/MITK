@@ -48,10 +48,10 @@ public:
 
     //========== essential implementation for 3D mapper ========
     const FiberBundle* GetInput();
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override; //looks like depricated.. should be replaced bz GetViewProp()
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override; //looks like depricated.. should be replaced bz GetViewProp()
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false );
     static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
     //=========================================================
 
     class  FBXLocalStorage3D : public mitk::Mapper::BaseLocalStorage
@@ -69,7 +69,7 @@ public:
         /** \brief Constructor of the local storage. Do as much actions as possible in here to avoid double executions. */
         FBXLocalStorage3D(); //if u copy&paste from this 2Dmapper, be aware that the implementation of this constructor is in the cpp file
 
-        ~FBXLocalStorage3D()
+        ~FBXLocalStorage3D() override
         {
         }
     };
@@ -81,7 +81,7 @@ public:
 protected:
 
     FiberBundleMapper3D();
-    virtual ~FiberBundleMapper3D();
+    ~FiberBundleMapper3D() override;
     void InternalGenerateData(mitk::BaseRenderer *renderer);
 
     void UpdateShaderParameter(mitk::BaseRenderer*);

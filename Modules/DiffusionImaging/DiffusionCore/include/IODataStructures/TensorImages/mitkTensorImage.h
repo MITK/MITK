@@ -47,14 +47,14 @@ namespace mitk
 
     virtual vtkImageData* GetNonRgbVtkImageData(int t = 0, int n = 0);
 
-    virtual vtkImageData* GetVtkImageData(int t = 0, int n = 0) override;
-    virtual const vtkImageData* GetVtkImageData(int t = 0, int n = 0) const override;
+    vtkImageData* GetVtkImageData(int t = 0, int n = 0) override;
+    const vtkImageData* GetVtkImageData(int t = 0, int n = 0) const override;
 
     virtual void ConstructRgbImage() const;
 
   protected:
     TensorImage();
-    virtual ~TensorImage();
+    ~TensorImage() override;
 
     mutable mitk::Image::Pointer m_RgbImage;
 

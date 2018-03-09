@@ -50,7 +50,7 @@ mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, mitk::USImageMetad
 mitk::USVideoDevice::~USVideoDevice()
 {
   //m_Source->UnRegister();
-  m_Source = 0;
+  m_Source = nullptr;
 }
 
 void mitk::USVideoDevice::Init()
@@ -156,7 +156,7 @@ mitk::USProbe::Pointer mitk::USVideoDevice::GetCurrentProbe()
   }
   else
   {
-    return 0;
+    return nullptr;
   }
 }
 
@@ -168,7 +168,7 @@ mitk::USProbe::Pointer mitk::USVideoDevice::GetProbeByName(std::string name)
       return (*it);
   }
   MITK_INFO << "No probe with given name " << name << " was found.";
-  return 0; //no matching probe was found so 0 is returned
+  return nullptr; //no matching probe was found so 0 is returned
 }
 
 void mitk::USVideoDevice::RemoveProbeByName(std::string name)

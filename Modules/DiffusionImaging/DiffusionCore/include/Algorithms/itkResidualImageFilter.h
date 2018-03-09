@@ -133,13 +133,13 @@ namespace itk
     };
     ~ResidualImageFilter(){};
 
-    void PrintSelf (std::ostream& os, Indent indent) const
+    void PrintSelf (std::ostream& os, Indent indent) const override
     {
       Superclass::PrintSelf (os, indent);
     }
 
 
-    void GenerateData();
+    void GenerateData() override;
 
   private:
 

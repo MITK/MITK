@@ -54,8 +54,8 @@ public:
   typedef typename DiffusionSignalModel< ScalarType >::GradientListType   GradientListType;
 
   /** Actual signal generation **/
-  PixelType SimulateMeasurement(GradientType& fiberDirection);
-  ScalarType SimulateMeasurement(unsigned int dir, GradientType& fiberDirection);
+  PixelType SimulateMeasurement(GradientType& fiberDirection) override;
+  ScalarType SimulateMeasurement(unsigned int dir, GradientType& fiberDirection) override;
 
   void SetDiffusivity1(double d1){ m_KernelTensorMatrix[0][0] = d1; }
   void SetDiffusivity2(double d2){ m_KernelTensorMatrix[1][1] = d2; }

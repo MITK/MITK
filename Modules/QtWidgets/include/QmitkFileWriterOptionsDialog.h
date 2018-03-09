@@ -33,7 +33,7 @@ class QmitkFileWriterOptionsDialog : public QDialog
   Q_OBJECT
 
 public:
-  explicit QmitkFileWriterOptionsDialog(mitk::IOUtil::SaveInfo &saveInfo, QWidget *parent = 0);
+  explicit QmitkFileWriterOptionsDialog(mitk::IOUtil::SaveInfo &saveInfo, QWidget *parent = nullptr);
   ~QmitkFileWriterOptionsDialog() override;
 
   bool ReuseOptions() const;

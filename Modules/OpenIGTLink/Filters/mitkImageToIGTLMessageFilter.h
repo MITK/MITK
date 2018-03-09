@@ -41,7 +41,7 @@ class MITKOPENIGTLINK_EXPORT ImageToIGTLMessageFilter : public IGTLMessageSource
   /**
    * \brief filter execute method
    */
-  virtual void GenerateData() override;
+  void GenerateData() override;
 
   using Superclass::SetInput;
 
@@ -70,7 +70,7 @@ class MITKOPENIGTLINK_EXPORT ImageToIGTLMessageFilter : public IGTLMessageSource
   * would try to copy information from the input Image to the output
   * PointSet, which makes no sense!
   */
-  virtual void GenerateOutputInformation() override{};
+  void GenerateOutputInformation() override{};
 
   /**
    * \brief Connects the input of this filter to the outputs of the given
@@ -84,7 +84,7 @@ class MITKOPENIGTLINK_EXPORT ImageToIGTLMessageFilter : public IGTLMessageSource
  protected:
   ImageToIGTLMessageFilter();
 
-  virtual ~ImageToIGTLMessageFilter() {};
+  ~ImageToIGTLMessageFilter() override {};
 
   /**
   * \brief create output objects for all inputs

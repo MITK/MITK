@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGIFFirstOrderStatistics.h>
 #include <mitkGIFCooccurenceMatrix.h>
 #include <mitkGIFGrayLevelRunLength.h>
-#include <math.h>
+#include <cmath>
 
 #include <mitkImageGenerator.h>
 

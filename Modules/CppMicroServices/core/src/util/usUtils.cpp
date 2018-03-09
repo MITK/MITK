@@ -32,8 +32,8 @@
 #include <typeinfo>
 
 #ifdef US_PLATFORM_POSIX
-  #include <errno.h>
-  #include <string.h>
+  #include <cerrno>
+  #include <cstring>
   #include <dlfcn.h>
   #include <dirent.h>
 #else

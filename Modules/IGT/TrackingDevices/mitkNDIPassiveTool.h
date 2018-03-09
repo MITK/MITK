@@ -65,7 +65,7 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
     NDIPassiveTool();
-    virtual ~NDIPassiveTool();
+    ~NDIPassiveTool() override;
 
     unsigned char* m_SROMData;            ///< content of the srom tool description file
     unsigned int m_SROMDataLength;        ///< length of the  srom tool description file

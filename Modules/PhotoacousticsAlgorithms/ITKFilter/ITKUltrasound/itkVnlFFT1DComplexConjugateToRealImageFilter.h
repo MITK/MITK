@@ -68,10 +68,10 @@ public:
   itkTypeMacro( VnlFFT1DComplexConjugateToRealImageFilter, FFT1DComplexConjugateToRealImageFilter );
 
 protected:
-  virtual void ThreadedGenerateData( const OutputImageRegionType&, ThreadIdType threadID );  // generates output from input
+  void ThreadedGenerateData( const OutputImageRegionType&, ThreadIdType threadID ) override;  // generates output from input
 
   VnlFFT1DComplexConjugateToRealImageFilter() { }
-  virtual ~VnlFFT1DComplexConjugateToRealImageFilter() { }
+  ~VnlFFT1DComplexConjugateToRealImageFilter() override { }
 
 private:
   VnlFFT1DComplexConjugateToRealImageFilter(const Self&); //purposely not implemented

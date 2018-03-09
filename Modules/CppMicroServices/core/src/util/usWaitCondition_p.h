@@ -29,7 +29,7 @@
 
 #ifdef US_PLATFORM_POSIX
 #include <sys/time.h>
-#include <errno.h>
+#include <cerrno>
 #endif
 
 US_BEGIN_NAMESPACE
@@ -137,7 +137,7 @@ template<class MutexHost>
 WaitCondition<MutexHost>::WaitCondition()
 {
   #ifdef US_PLATFORM_POSIX
-    pthread_cond_init(&m_WaitCondition, 0);
+    pthread_cond_init(&m_WaitCondition, nullptr);
   #else
     m_NumberOfWaiters = 0;
     m_WasNotifyAll = 0;

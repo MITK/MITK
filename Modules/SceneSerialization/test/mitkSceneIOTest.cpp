@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurface.h"
 
 #ifndef WIN32
-#include <errno.h>
+#include <cerrno>
 #include <ulimit.h>
 #endif
 

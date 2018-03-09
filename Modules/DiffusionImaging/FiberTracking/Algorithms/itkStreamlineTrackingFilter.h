@@ -144,7 +144,7 @@ public:
     m_TrackingHandler = h;
   }
 
-  virtual void Update() override{
+  void Update() override{
     this->GenerateData();
   }
 
@@ -157,7 +157,7 @@ protected:
   void GenerateData() override;
 
   StreamlineTrackingFilter();
-  ~StreamlineTrackingFilter() {}
+  ~StreamlineTrackingFilter() override {}
 
   bool IsValidFiber(FiberType* fib);  ///< Check endpoints
   void FiberToProbmap(FiberType* fib);

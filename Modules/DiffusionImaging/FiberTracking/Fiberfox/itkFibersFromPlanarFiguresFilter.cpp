@@ -15,9 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "itkFibersFromPlanarFiguresFilter.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 // MITK
 #include <itkOrientationDistributionFunction.h>
 #include <itkDiffusionOdfGeneralizedFaImageFilter.h>
@@ -36,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 
 // MISC
-#include <math.h>
+#include <cmath>
 
 namespace itk{
 
@@ -132,7 +129,7 @@ void FibersFromPlanarFiguresFilter::GenerateData()
             newP[1] = m_2DPoints.at(j)[1];
             double alpha = acos(eDir[0]);
             if (eDir[1]>0)
-                alpha = 2*M_PI-alpha;
+                alpha = 2*itk::Math::pi-alpha;
             vnl_matrix_fixed<double, 2, 2> eRot;
             eRot[0][0] = cos(alpha);
             eRot[1][1] = eRot[0][0];
@@ -201,7 +198,7 @@ void FibersFromPlanarFiguresFilter::GenerateData()
 
                 alpha = acos(eDir[0]);
                 if (eDir[1]>0)
-                    alpha = 2*M_PI-alpha;
+                    alpha = 2*itk::Math::pi-alpha;
                 eRot[0][0] = cos(alpha);
                 eRot[1][1] = eRot[0][0];
                 eRot[1][0] = sin(alpha);

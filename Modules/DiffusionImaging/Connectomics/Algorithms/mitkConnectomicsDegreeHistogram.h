@@ -31,14 +31,14 @@ namespace mitk {
   public:
 
     ConnectomicsDegreeHistogram();
-    virtual ~ConnectomicsDegreeHistogram();
+    ~ConnectomicsDegreeHistogram() override;
 
 
 
   protected:
 
     /** @brief Creates a new histogram from the network source. */
-    virtual void ComputeFromConnectomicsNetwork( ConnectomicsNetwork* source ) override;
+    void ComputeFromConnectomicsNetwork( ConnectomicsNetwork* source ) override;
 
   };
 

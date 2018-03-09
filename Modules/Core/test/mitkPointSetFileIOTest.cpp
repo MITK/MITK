@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itksys/SystemTools.hxx>
 #include <random>
-#include <time.h>
+#include <ctime>
 #include <vector>
 
 // unsigned int numberOfTestPointSets = 1;

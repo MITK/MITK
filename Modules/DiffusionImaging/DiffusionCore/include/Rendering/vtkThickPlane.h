@@ -67,7 +67,7 @@ public:
 
 protected:
   vtkThickPlane();
-  ~vtkThickPlane() {};
+  ~vtkThickPlane() override {};
 
   // Description:
   // Set/get plane normal. Plane is defined by point and normal.

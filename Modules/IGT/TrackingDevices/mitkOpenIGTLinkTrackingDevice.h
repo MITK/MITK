@@ -59,36 +59,36 @@ namespace mitk
     * \return Returns true if the tracking is started. Throws an exception if an error occures.
     * @throw mitk::IGTHardwareException Throws an exception if there is an error during start tracking.
     */
-    virtual bool StartTracking();
+    bool StartTracking() override;
 
     /**
     * \brief Stops the tracking.
     * \return Returns true if the tracking is stopped.
     */
-    virtual bool StopTracking();
+    bool StopTracking() override;
 
     /**
     * \brief Opens the connection to the device. This have to be done before the tracking is started.
     * @throw mitk::IGTHardwareException Throws an exception if there is an error during open connection.
     */
-    virtual bool OpenConnection();
+    bool OpenConnection() override;
 
     /**
     * \brief Closes the connection and clears all resources.
     */
-    virtual bool CloseConnection();
+    bool CloseConnection() override;
 
     /**
     * \return Returns the number of tools which have been added to the device.
     */
-    virtual unsigned int GetToolCount() const;
+    unsigned int GetToolCount() const override;
 
     /**
     * \param toolNumber The number of the tool which should be given back.
     * \return Returns the tool which the number "toolNumber". Returns nullptr, if there is
     * no tool with this number.
     */
-    TrackingTool* GetTool(unsigned int toolNumber)  const;
+    TrackingTool* GetTool(unsigned int toolNumber)  const override;
 
     /**
     * \brief Discover the tools available from the connected OpenIGTLink device and adds these tools to this tracking device. Therefore, a connection
@@ -110,22 +110,22 @@ namespace mitk
     mitk::TrackingTool* AddTool(const char* toolName, const char* fileName);
 
     /** @return Returns true if this device can autodetects its tools. */
-    virtual bool AutoDetectToolsAvailable();
+    bool AutoDetectToolsAvailable() override;
 
     /** Autodetects tools from the current OpenIGTLink connection and returns them as a navigation tool storage.
     *  @return Returns the detected tools. Returns an empty storage if no tools are present
     *          or if OpenIGTLink Connection is not possible
     */
-    virtual mitk::NavigationToolStorage::Pointer AutoDetectTools();
+    mitk::NavigationToolStorage::Pointer AutoDetectTools() override;
 
-    bool IsDeviceInstalled();
+    bool IsDeviceInstalled() override;
 
     itkSetMacro(UpdateRate, int);               ///< Sets the update rate of the device in fps. Default value is 60 fps.
     itkGetConstMacro(UpdateRate, int);          ///< Returns the update rate of the device in fps
 
   protected:
     OpenIGTLinkTrackingDevice();
-    ~OpenIGTLinkTrackingDevice();
+    ~OpenIGTLinkTrackingDevice() override;
 
     /**
     * \brief Adds a tool to the tracking device.

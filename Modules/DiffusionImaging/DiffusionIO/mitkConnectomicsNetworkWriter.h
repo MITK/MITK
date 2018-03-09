@@ -39,15 +39,15 @@ namespace mitk
     typedef std::vector< mitk::ConnectomicsNetwork::NetworkNode >  VertexVectorType;
 
     ConnectomicsNetworkWriter();
-    virtual ~ConnectomicsNetworkWriter();
+    ~ConnectomicsNetworkWriter() override;
 
     using AbstractFileWriter::Write;
-    virtual void Write() override;
+    void Write() override;
 
   protected:
 
     ConnectomicsNetworkWriter(const ConnectomicsNetworkWriter& other);
-    virtual mitk::ConnectomicsNetworkWriter* Clone() const override;
+    mitk::ConnectomicsNetworkWriter* Clone() const override;
 
   };
 

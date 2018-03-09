@@ -109,7 +109,7 @@ struct TrackedTypeTraits<S,T*> : public TrackedTypeTraitsBase<T*,TrackedTypeTrai
 
   static void Dispose(TrackedType& t)
   {
-    t = 0;
+    t = nullptr;
   }
 };
 
@@ -131,7 +131,7 @@ struct TrackedTypeTraits<S,S*>
 
   static void Dispose(TrackedType& t)
   {
-    t = 0;
+    t = nullptr;
   }
 
   static TrackedType ConvertToTrackedType(S* s)
@@ -265,7 +265,7 @@ public:
    */
   ServiceTracker(ModuleContext* context,
                  const ServiceReferenceType& reference,
-                 ServiceTrackerCustomizer<S,T>* customizer = 0);
+                 ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
    * Create a <code>ServiceTracker</code> on the specified class name.
@@ -308,7 +308,7 @@ public:
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
   ServiceTracker(ModuleContext* context, const LDAPFilter& filter,
-                 ServiceTrackerCustomizer<S,T>* customizer = 0);
+                 ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
    * Create a <code>ServiceTracker</code> on the class template
@@ -327,7 +327,7 @@ public:
    *        <code>ServiceTracker</code> will call the
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
-  ServiceTracker(ModuleContext* context, ServiceTrackerCustomizer<S,T>* customizer = 0);
+  ServiceTracker(ModuleContext* context, ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
    * Open this <code>ServiceTracker</code> and begin tracking services.

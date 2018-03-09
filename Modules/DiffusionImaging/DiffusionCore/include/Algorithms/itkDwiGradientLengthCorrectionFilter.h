@@ -44,7 +44,7 @@ public:
 
     void GenerateData() override;
 
-    virtual void Update() override{
+    void Update() override{
         this->GenerateData();
     }
 
@@ -59,7 +59,7 @@ public:
 
     protected:
         DwiGradientLengthCorrectionFilter();
-    ~DwiGradientLengthCorrectionFilter();
+    ~DwiGradientLengthCorrectionFilter() override;
 
     double m_NewBValue;
     double m_ReferenceBValue;

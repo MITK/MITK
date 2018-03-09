@@ -274,15 +274,15 @@ public:
 
 protected:
   DiffusionQballReconstructionImageFilter();
-  ~DiffusionQballReconstructionImageFilter() {};
-  void PrintSelf(std::ostream& os, Indent indent) const;
+  ~DiffusionQballReconstructionImageFilter() override {};
+  void PrintSelf(std::ostream& os, Indent indent) const override;
 
   /** constructs reconstrion matrix according to Tuch's algorithm */
   void ComputeReconstructionMatrix();
 
-  void BeforeThreadedGenerateData();
+  void BeforeThreadedGenerateData() override;
   void ThreadedGenerateData( const
-      OutputImageRegionType &outputRegionForThread, ThreadIdType);
+      OutputImageRegionType &outputRegionForThread, ThreadIdType) override;
 
   /** enum to indicate if the gradient image is specified as a single multi-
    * component image or as several separate images */

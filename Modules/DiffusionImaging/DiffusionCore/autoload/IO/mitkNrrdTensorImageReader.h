@@ -42,10 +42,10 @@ namespace mitk
 
     NrrdTensorImageReader(const NrrdTensorImageReader& other);
     NrrdTensorImageReader();
-    virtual ~NrrdTensorImageReader();
+    ~NrrdTensorImageReader() override;
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+    std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   protected:
 

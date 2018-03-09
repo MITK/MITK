@@ -39,7 +39,7 @@ class GlobalStatic : public MultiThreaded<>
 {
 public:
 
-  GlobalStatic(T* p = 0, bool destroyed = false) : pointer(p), destroyed(destroyed) {}
+  GlobalStatic(T* p = nullptr, bool destroyed = false) : pointer(p), destroyed(destroyed) {}
 
   T* pointer;
   bool destroyed;
@@ -57,7 +57,7 @@ struct DefaultGlobalStaticDeleter
   void operator()(GlobalStatic<T>& globalStatic) const
   {
     delete globalStatic.pointer;
-    globalStatic.pointer = 0;
+    globalStatic.pointer = nullptr;
     globalStatic.destroyed = true;
   }
 };

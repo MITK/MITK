@@ -49,7 +49,7 @@ public:
 
   ToFImageRecorder();
 
-  ~ToFImageRecorder();
+  ~ToFImageRecorder() override;
 
   mitkClassMacroItkParent( ToFImageRecorder , itk::Object );
 

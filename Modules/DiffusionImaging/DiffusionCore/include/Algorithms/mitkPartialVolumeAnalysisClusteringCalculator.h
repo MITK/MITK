@@ -493,7 +493,7 @@ namespace mitk
 
     PartialVolumeAnalysisClusteringCalculator();
 
-    virtual ~PartialVolumeAnalysisClusteringCalculator();
+    ~PartialVolumeAnalysisClusteringCalculator() override;
 
     unsigned int m_MaxIt;
     unsigned int m_StepsNumIntegration;

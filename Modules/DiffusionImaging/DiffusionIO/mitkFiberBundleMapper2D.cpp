@@ -90,7 +90,7 @@ public:
     }
   }
 
-  vtkShaderCallback() { this->renderer = 0; }
+  vtkShaderCallback() { this->renderer = nullptr; }
 };
 
 

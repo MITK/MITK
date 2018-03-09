@@ -100,7 +100,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   {
     for (unsigned int i=0; i<dimY; i++)
     {
-      itk::Index<2> index = { static_cast<itk::IndexValueType>(i), static_cast< itk::IndexValueType >( j) };
+      itk::Index<2> index = { { static_cast<itk::IndexValueType>(i), static_cast< itk::IndexValueType >( j) } };
       float distance = 0.0;
 
       try
@@ -380,7 +380,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(compareToInput,"Testing backward transformation compared to original image with interpixeldistance");
 
   //clean up
-  delete point;
+  delete[] point;
   //  expectedResult->Delete();
 
   MITK_TEST_END();

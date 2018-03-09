@@ -49,7 +49,7 @@ namespace mitk{
     /**
     * \brief Used for pipeline update just to tell the pipeline that we always have to update.
     */
-    virtual void UpdateOutputInformation() override;
+    void UpdateOutputInformation() override;
 
     itkGetMacro(NavigationDataSet, NavigationDataSet::Pointer)
 
@@ -81,12 +81,12 @@ namespace mitk{
 
   protected:
     NavigationDataPlayerBase();
-    virtual ~NavigationDataPlayerBase();
+    ~NavigationDataPlayerBase() override;
 
     /**
     * \brief Every subclass hast to implement this method. See ITK filter documentation for details.
     */
-    virtual void GenerateData() = 0;
+    void GenerateData() override = 0;
 
     /**
     * \brief Initializes the outputs of this NavigationDataSource.

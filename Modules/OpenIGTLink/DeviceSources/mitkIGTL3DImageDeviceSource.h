@@ -39,7 +39,7 @@ namespace mitk {
 
   protected:
     IGTL3DImageDeviceSource();
-    virtual ~IGTL3DImageDeviceSource();
+    ~IGTL3DImageDeviceSource() override;
 
     /**
     * \brief filter execute method
@@ -49,7 +49,7 @@ namespace mitk {
     * \warning Will raise a std::out_of_range exception, if tools were added to
     * the OpenIGTLink device after it was set as input for this filter
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
   };
 } // namespace mitk
 #endif /* MITKIGTLDeviceSource_H_HEADER_INCLUDED_ */

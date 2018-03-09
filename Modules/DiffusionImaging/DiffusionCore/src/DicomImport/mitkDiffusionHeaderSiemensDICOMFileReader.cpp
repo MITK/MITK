@@ -237,7 +237,7 @@ bool mitk::DiffusionHeaderSiemensDICOMFileReader
       values.g_vector.copy_in( &gr_dir_arr[0] );
     }
 
-    if( 1 )
+    if( true )
     {
       m_HeaderInformationList.push_back( values );
       retVal = true;

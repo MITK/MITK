@@ -733,7 +733,6 @@ void QmitkTensorReconstructionView::TensorsToOdf()
     mitk::DataNode::Pointer tensorImageNode = m_Controls->m_OdfBox->GetSelectedNode();
 
     typedef mitk::TensorImage::ScalarPixelType    TTensorPixelType;
-    typedef mitk::TensorImage::PixelType          TensorPixelType;
     typedef mitk::TensorImage::ItkTensorImageType TensorImageType;
 
     TensorImageType::Pointer itkvol = TensorImageType::New();
@@ -809,7 +808,6 @@ void QmitkTensorReconstructionView::DoTensorsToDWI()
       mitk::TensorImage* vol = static_cast<mitk::TensorImage*>(m_Controls->m_DtiBox->GetSelectedNode()->GetData());
 
       typedef mitk::TensorImage::ScalarPixelType      TTensorPixelType;
-      typedef mitk::TensorImage::PixelType            TensorPixelType;
       typedef mitk::TensorImage::ItkTensorImageType   TensorImageType;
 
 

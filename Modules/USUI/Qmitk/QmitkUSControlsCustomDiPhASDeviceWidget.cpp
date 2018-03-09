@@ -57,7 +57,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
   if ( m_ControlInterface.IsNotNull() )
   {
     m_ControlInterface->passGUIOut([this](QString str)->void{
-      if (this && this->ui) {
+      if (this->ui) {
         this->ui->CurrentState->setText(str);
       } });
   }

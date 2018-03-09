@@ -29,7 +29,7 @@ NrrdTbssRoiImageWriterFactory::NrrdTbssRoiImageWriterFactory()
   this->RegisterOverride("IOWriter",
                          "NrrdTbssRoiImageWriter",
                          "NrrdTbssRoiImage ROI Writer",
-                         1,
+                         true,
                          itk::CreateObjectFunction< mitk::NrrdTbssRoiImageWriter >::New());
 }
 

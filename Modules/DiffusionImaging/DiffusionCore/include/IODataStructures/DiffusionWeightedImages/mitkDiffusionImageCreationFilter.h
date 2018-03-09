@@ -84,10 +84,10 @@ public:
    */
   void SetHeaderDescriptor( DiffusionImageHeaderDescriptor header_descriptor );
 
-  virtual void GenerateData() override;
+  void GenerateData() override;
 protected:
   DiffusionImageCreationFilter();
-  ~DiffusionImageCreationFilter();
+  ~DiffusionImageCreationFilter() override;
 
   GradientDirectionContainerType::Pointer InternalGetGradientDirections( );
   MeasurementFrameType InternalGetMeasurementFrame();

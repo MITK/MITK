@@ -61,7 +61,7 @@ typename TOutputImage=itk::Image<itk::RGBAPixel<unsigned char>,3> >
   itkCloneMacro(Self)
 
   /** Print internal ivars */
-  void PrintSelf(std::ostream& os, Indent indent) const
+  void PrintSelf(std::ostream& os, Indent indent) const override
   { this->Superclass::PrintSelf( os, indent ); }
 
 #ifdef ITK_USE_CONCEPT_CHECKING
@@ -73,9 +73,9 @@ typename TOutputImage=itk::Image<itk::RGBAPixel<unsigned char>,3> >
 
 protected:
   ShToRgbImageFilter(){}
-  virtual ~ShToRgbImageFilter(){}
+  ~ShToRgbImageFilter() override{}
 
-  void ThreadedGenerateData( const typename OutputImageType::RegionType &outputRegionForThread, ThreadIdType)
+  void ThreadedGenerateData( const typename OutputImageType::RegionType &outputRegionForThread, ThreadIdType) override
   {
     typename InputImageType::Pointer coeff_image = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
     typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());

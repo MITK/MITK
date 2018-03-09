@@ -95,7 +95,7 @@ public:
 protected:
   DiffusionHeaderDICOMFileReader();
 
-  virtual ~DiffusionHeaderDICOMFileReader();
+  ~DiffusionHeaderDICOMFileReader() override;
 
   DICOMHeaderListType m_HeaderInformationList;
 };

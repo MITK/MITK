@@ -128,19 +128,18 @@ namespace itk
 
     virtual ~TensorImageToDiffusionImageFilter(){}
 
-    void PrintSelf (std::ostream& os, Indent indent) const
+    void PrintSelf (std::ostream& os, Indent indent) const override
     {
       Superclass::PrintSelf (os, indent);
     }
 
-    virtual void BeforeThreadedGenerateData( void );
+    virtual void BeforeThreadedGenerateData( void ) override;
 
-    virtual void ThreadedGenerateData( const
-      OutputImageRegionType &outputRegionForThread, ThreadIdType);
+    virtual void ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, ThreadIdType) override;
 
     //void GenerateData();
 
-    virtual void UpdateOutputInformation();
+    virtual void UpdateOutputInformation() override;
 
 
   private:

@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPropAssembly.h>
 #include <vtkRenderer.h>
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 

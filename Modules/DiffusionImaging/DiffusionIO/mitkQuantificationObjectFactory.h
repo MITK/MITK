@@ -13,19 +13,19 @@ class QuantificationObjectFactory : public CoreObjectFactoryBase
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    ~QuantificationObjectFactory();
+    ~QuantificationObjectFactory() override;
 
-    virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) override;
+    Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) override;
 
-    virtual void SetDefaultProperties(mitk::DataNode* node) override;
+    void SetDefaultProperties(mitk::DataNode* node) override;
 
-    virtual const char* GetFileExtensions() override;
+    const char* GetFileExtensions() override;
 
-    virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
+    mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
 
-    virtual const char* GetSaveFileExtensions() override;
+    const char* GetSaveFileExtensions() override;
 
-    virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
+    mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
 
 protected:
     QuantificationObjectFactory();

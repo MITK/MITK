@@ -36,11 +36,11 @@ public:
 
   itkNewMacro( DiffusionDICOMFileReader )
 
-  virtual void AnalyzeInputFiles() override;
+  void AnalyzeInputFiles() override;
 
-  virtual bool LoadImages() override;
+  bool LoadImages() override;
 
-  virtual bool CanHandleFile(const std::string &filename) override;
+  bool CanHandleFile(const std::string &filename) override;
 
   void SetResolveMosaic( bool flag )
   {
@@ -59,7 +59,7 @@ public:
 
 protected:
   DiffusionDICOMFileReader();
-  virtual ~DiffusionDICOMFileReader();
+  ~DiffusionDICOMFileReader() override;
 
   bool LoadSingleOutputImage( DiffusionHeaderDICOMFileReader::DICOMHeaderListType, DICOMImageBlockDescriptor&, bool);
 

@@ -64,9 +64,9 @@ namespace mitk {
 
   protected:
     NeedleProjectionFilter();
-    virtual ~NeedleProjectionFilter();
+    ~NeedleProjectionFilter() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     mitk::AffineTransform3D::Pointer m_TargetPlane;
 

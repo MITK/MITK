@@ -78,13 +78,13 @@ mitk::TimeFramesRegistrationHelper::Generate()
       RegistrationPointer reg = DoFrameRegistration(movingFrame, targetFrame, mask);
 
       m_Progress += progressDelta;
-      this->InvokeEvent(::mitk::FrameRegistrationEvent(0,
+      this->InvokeEvent(::mitk::FrameRegistrationEvent(nullptr,
                         "Registred frame #" +::map::core::convert::toStr(i)));
 
       mappedFrame = DoFrameMapping(movingFrame, reg, targetFrame);
 
       m_Progress += progressDelta;
-      this->InvokeEvent(::mitk::FrameMappingEvent(0,
+      this->InvokeEvent(::mitk::FrameMappingEvent(nullptr,
                         "Mapped frame #" + ::map::core::convert::toStr(i)));
 
       mitk::ImageReadAccessor accessor(mappedFrame, mappedFrame->GetVolumeData(0, 0, nullptr,

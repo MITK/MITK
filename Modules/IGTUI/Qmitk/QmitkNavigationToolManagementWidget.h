@@ -55,7 +55,7 @@ public:
    */
   void LoadStorage(mitk::NavigationToolStorage::Pointer storageToLoad);
 
-  QmitkNavigationToolManagementWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkNavigationToolManagementWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkNavigationToolManagementWidget() override;
 
 signals:

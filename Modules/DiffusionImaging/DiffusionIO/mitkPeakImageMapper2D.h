@@ -50,15 +50,15 @@ public:
 
 
     /** \brief Checks whether this mapper needs to update itself and generate data. */
-    virtual void Update(mitk::BaseRenderer * renderer) override;
+    void Update(mitk::BaseRenderer * renderer) override;
 
 
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false );
 
-    virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
+    void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
     //### methods of MITK-VTK rendering pipeline
-    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
+    vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
     //### end of methods of MITK-VTK rendering pipeline
 
 
@@ -77,7 +77,7 @@ public:
         /** \brief Constructor of the local storage. Do as much actions as possible in here to avoid double executions. */
         FBXLocalStorage(); //if u copy&paste from this 2Dmapper, be aware that the implementation of this constructor is in the cpp file
 
-        ~FBXLocalStorage()
+        ~FBXLocalStorage() override
         {
         }
     };
@@ -89,10 +89,10 @@ public:
 
 protected:
     PeakImageMapper2D();
-    virtual ~PeakImageMapper2D();
+    ~PeakImageMapper2D() override;
 
     /** Does the actual resampling, without rendering. */
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer*) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer*) override;
 
     void UpdateShaderParameter(mitk::BaseRenderer*);
 

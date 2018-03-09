@@ -34,7 +34,7 @@ class MITKDIFFUSIONCORE_EXPORT DWIVoxelFunctor: public Object
 {
 protected:
   DWIVoxelFunctor(){}
-  virtual ~DWIVoxelFunctor(){}
+  ~DWIVoxelFunctor() override{}
 
 public:
   typedef DWIVoxelFunctor                         Self;

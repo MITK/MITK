@@ -15,13 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkDiffusionFunctionCollection.h"
-#include <math.h>
 #include "mitkNumericTypes.h"
-
-// for Windows
-#ifndef M_PI
-#define M_PI  3.14159265358979323846
-#endif
 
 // Namespace ::SH
 #include <boost/math/special_functions/legendre.hpp>
@@ -49,8 +43,8 @@ void mitk::sh::Cart2Sph(double x, double y, double z, double *spherical)
   rad = sqrt(x*x+y*y+z*z);
   if( rad < mitk::eps )
   {
-    th = M_PI/2;
-    phi = M_PI/2;
+    th = itk::Math::pi/2;
+    phi = itk::Math::pi/2;
   }
   else
   {
@@ -92,7 +86,7 @@ double mitk::sh::Yj(int m, int l, float theta, float phi, bool mrtrix)
   else
   {
     double plm = ::boost::math::legendre_p<float>(l,abs(m),-cos(theta));
-    double mag = sqrt((double)(2*l+1)/(4.0*M_PI)*::boost::math::factorial<float>(l-abs(m))/::boost::math::factorial<float>(l+abs(m)))*plm;
+    double mag = sqrt((double)(2*l+1)/(4.0*itk::Math::pi)*::boost::math::factorial<float>(l-abs(m))/::boost::math::factorial<float>(l+abs(m)))*plm;
     if (m>0)
       return mag*cos(m*phi);
     else if (m==0)

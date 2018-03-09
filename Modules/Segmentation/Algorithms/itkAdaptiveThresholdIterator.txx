@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkAdaptiveThresholdIterator.h"
 #include "mitkProgressBar.h"
-#include <math.h>
+#include <cmath>
 
 namespace itk
 {

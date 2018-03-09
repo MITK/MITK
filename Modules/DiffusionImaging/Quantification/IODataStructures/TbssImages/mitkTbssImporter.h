@@ -76,7 +76,7 @@ namespace mitk
 
     TbssImporter(){}
 
-    virtual ~TbssImporter(){}
+    ~TbssImporter() override{}
 
     DataImageType::Pointer m_Data;
 

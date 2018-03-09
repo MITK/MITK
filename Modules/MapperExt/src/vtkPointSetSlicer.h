@@ -76,7 +76,7 @@ public:
   void CreateDefaultLocator();
 
 protected:
-  vtkPointSetSlicer(vtkPlane *cf = 0);
+  vtkPointSetSlicer(vtkPlane *cf = nullptr);
   ~vtkPointSetSlicer() override;
 
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;

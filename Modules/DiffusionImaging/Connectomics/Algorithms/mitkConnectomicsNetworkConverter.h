@@ -65,7 +65,7 @@ namespace mitk
 
     //////////////////// Functions ///////////////////////
     ConnectomicsNetworkConverter();
-    ~ConnectomicsNetworkConverter();
+    ~ConnectomicsNetworkConverter() override;
 
     /////////////////////// Variables ////////////////////////
     // The connectomics network, which is converted

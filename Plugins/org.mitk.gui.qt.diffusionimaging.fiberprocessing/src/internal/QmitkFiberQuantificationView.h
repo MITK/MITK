@@ -69,8 +69,6 @@ protected:
 
   Ui::QmitkFiberQuantificationViewControls* m_Controls;
 
-  void GenerateStats(); ///< generate statistics of selected fiber bundles
-
   std::vector<mitk::DataNode::Pointer>  m_SelectedFB;       ///< selected fiber bundle nodes
   mitk::Image::Pointer                  m_SelectedImage;
   float                                 m_UpsamplingFactor; ///< upsampling factor for all image generations

@@ -187,65 +187,11 @@ void QmitkFiberQuantificationView::UpdateGui()
 
   m_Controls->m_ProcessFiberBundleButton->setEnabled(!m_SelectedFB.empty());
   m_Controls->m_ExtractFiberPeaks->setEnabled(!m_SelectedFB.empty());
-
-  GenerateStats();
 }
 
 void QmitkFiberQuantificationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& )
 {
   UpdateGui();
-}
-
-void QmitkFiberQuantificationView::GenerateStats()
-{
-  if ( m_SelectedFB.empty() || !m_Visible )
-    return;
-
-  QString stats("");
-
-  for( unsigned int i=0; i<m_SelectedFB.size(); i++ )
-  {
-    mitk::DataNode::Pointer node = m_SelectedFB[i];
-    if (node.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(node->GetData()))
-    {
-      if (i>0)
-        stats += "\n-----------------------------\n";
-      stats += QString(node->GetName().c_str()) + "\n";
-      mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
-      stats += "Number of fibers: "+ QString::number(fib->GetNumFibers()) + "\n";
-      stats += "Number of points: "+ QString::number(fib->GetNumberOfPoints()) + "\n";
-      stats += "Min. length:         "+ QString::number(fib->GetMinFiberLength(),'f',1) + " mm\n";
-      stats += "Max. length:         "+ QString::number(fib->GetMaxFiberLength(),'f',1) + " mm\n";
-      stats += "Mean length:         "+ QString::number(fib->GetMeanFiberLength(),'f',1) + " mm\n";
-      stats += "Median length:       "+ QString::number(fib->GetMedianFiberLength(),'f',1) + " mm\n";
-      stats += "Standard deviation:  "+ QString::number(fib->GetLengthStDev(),'f',1) + " mm\n";
-
-      vtkSmartPointer<vtkFloatArray> weights = fib->GetFiberWeights();
-
-      if (weights!=nullptr)
-      {
-        std::vector< float > weights2;
-        for (int i=0; i<weights->GetSize(); i++)
-          weights2.push_back(weights->GetValue(i));
-
-        std::sort(weights2.begin(), weights2.end());
-
-        stats += "\nFiber weight statistics\n";
-        stats += "Min: " + QString::number(weights2.front()) + "\n";
-        stats += "1% quantile: " + QString::number(weights2.at(weights2.size()*0.01)) + "\n";
-        stats += "5% quantile: " + QString::number(weights2.at(weights2.size()*0.05)) + "\n";
-        stats += "25% quantile: " + QString::number(weights2.at(weights2.size()*0.25)) + "\n";
-        stats += "Median: " + QString::number(weights2.at(weights2.size()*0.5)) + "\n";
-        stats += "75% quantile: " + QString::number(weights2.at(weights2.size()*0.75)) + "\n";
-        stats += "95% quantile: " + QString::number(weights2.at(weights2.size()*0.95)) + "\n";
-        stats += "99% quantile: " + QString::number(weights2.at(weights2.size()*0.99)) + "\n";
-        stats += "Max: " + QString::number(weights2.back()) + "\n";
-      }
-      else
-        stats += "No fiber weight array found.\n";
-    }
-  }
-  this->m_Controls->m_StatsTextEdit->setText(stats);
 }
 
 void QmitkFiberQuantificationView::ProcessSelectedBundles()

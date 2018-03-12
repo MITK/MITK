@@ -2513,7 +2513,7 @@ bool mitk::FiberBundle::Equals(mitk::FiberBundle* fib, double eps)
 
 void mitk::FiberBundle::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
-  os << indent << this->GetNameOfClass() << ":\n";
+  os << this->GetNameOfClass() << ":\n";
   os << indent << "Number of fibers: " << this->GetNumFibers() << std::endl;
   os << indent << "Min. fiber length: " << this->GetMinFiberLength() << std::endl;
   os << indent << "Max. fiber length: " << this->GetMaxFiberLength() << std::endl;
@@ -2526,6 +2526,29 @@ void mitk::FiberBundle::PrintSelf(std::ostream &os, itk::Indent indent) const
   os << indent << "Extent y: " << this->GetGeometry()->GetExtentInMM(1) << "mm" << std::endl;
   os << indent << "Extent z: " << this->GetGeometry()->GetExtentInMM(2) << "mm" << std::endl;
   os << indent << "Diagonal: " << this->GetGeometry()->GetDiagonalLength()  << "mm" << std::endl;
+
+  if (m_FiberWeights!=nullptr)
+  {
+    std::vector< float > weights;
+    for (int i=0; i<m_FiberWeights->GetSize(); i++)
+      weights.push_back(m_FiberWeights->GetValue(i));
+
+    std::sort(weights.begin(), weights.end());
+
+    os << indent << "\nFiber weight statistics" << std::endl;
+    os << indent << "Min: " << weights.front() << std::endl;
+    os << indent << "1% quantile: " << weights.at(weights.size()*0.01) << std::endl;
+    os << indent << "5% quantile: " << weights.at(weights.size()*0.05) << std::endl;
+    os << indent << "25% quantile: " << weights.at(weights.size()*0.25) << std::endl;
+    os << indent << "Median: " << weights.at(weights.size()*0.5) << std::endl;
+    os << indent << "75% quantile: " << weights.at(weights.size()*0.75) << std::endl;
+    os << indent << "95% quantile: " << weights.at(weights.size()*0.95) << std::endl;
+    os << indent << "99% quantile: " << weights.at(weights.size()*0.99) << std::endl;
+    os << indent << "Max: " << weights.back() << std::endl;
+  }
+  else
+    os << indent << "\n\nNo fiber weight array found." << std::endl;
+
   Superclass::PrintSelf(os, indent);
 }
 

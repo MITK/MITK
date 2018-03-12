@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
   parser.addArgument("greedy_add", "", mitkCommandLineParser::Bool, "Greedy:", "if enabled, the candidate tracts are not jointly fitted to the residual image but one after the other employing a greedy scheme", false);
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
   parser.addArgument("dont_filter_outliers", "", mitkCommandLineParser::Bool, "Don't filter outliers:", "don't perform second optimization run with an upper weight bound based on the first weight estimation (95% quantile)", false);
-  parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM, MSE, LocalMSE (default), NONE");
+  parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM, MSE, LocalMSE, GroupLasso, GroupMSE, NONE (default)");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -233,16 +233,7 @@ int main(int argc, char* argv[])
       fitter->SetVerbose(true);
       fitter->SetResampleFibers(false);
       fitter->SetMaskImage(mask);
-
-      if (regu=="MSM")
-        fitter->SetRegularization(VnlCostFunction::REGU::MSM);
-      else if (regu=="MSE")
-        fitter->SetRegularization(VnlCostFunction::REGU::MSE);
-      else if (regu=="Local_MSE")
-        fitter->SetRegularization(VnlCostFunction::REGU::Local_MSE);
-      else if (regu=="NONE")
-        fitter->SetRegularization(VnlCostFunction::REGU::NONE);
-
+      fitter->SetRegularization(VnlCostFunction::REGU::NONE);
       fitter->Update();
       rmse = fitter->GetRMSE();
 
@@ -276,6 +267,10 @@ int main(int argc, char* argv[])
         fitter->SetRegularization(VnlCostFunction::REGU::MSE);
       else if (regu=="Local_MSE")
         fitter->SetRegularization(VnlCostFunction::REGU::Local_MSE);
+      else if (regu=="GroupLasso")
+        fitter->SetRegularization(VnlCostFunction::REGU::GROUP_LASSO);
+      else if (regu=="GroupMSE")
+        fitter->SetRegularization(VnlCostFunction::REGU::GROUP_MSE);
       else if (regu=="NONE")
         fitter->SetRegularization(VnlCostFunction::REGU::NONE);
 

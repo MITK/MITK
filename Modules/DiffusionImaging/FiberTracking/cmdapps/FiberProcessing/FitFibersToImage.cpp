@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
   parser.addArgument("save_weights", "", mitkCommandLineParser::Bool, "Save Weights:", "save fiber weights in a separate text file", false);
   parser.addArgument("dont_filter_outliers", "", mitkCommandLineParser::Bool, "Don't filter outliers:", "don't perform second optimization run with an upper weight bound based on the first weight estimation (95% quantile)", false);
   parser.addArgument("join_tracts", "", mitkCommandLineParser::Bool, "Join output tracts:", "outout tracts are merged into a single tractogram", false);
-  parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM, MSE, LocalMSE (default), NONE");
+  parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM, MSE, LocalMSE (default), GroupLasso, GroupMSE, NONE");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -180,6 +180,10 @@ int main(int argc, char* argv[])
       fitter->SetRegularization(VnlCostFunction::REGU::MSE);
     else if (regu=="Local_MSE")
       fitter->SetRegularization(VnlCostFunction::REGU::Local_MSE);
+    else if (regu=="GroupLasso")
+      fitter->SetRegularization(VnlCostFunction::REGU::GROUP_LASSO);
+    else if (regu=="GroupMSE")
+      fitter->SetRegularization(VnlCostFunction::REGU::GROUP_MSE);
     else if (regu=="NONE")
       fitter->SetRegularization(VnlCostFunction::REGU::NONE);
 

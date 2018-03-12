@@ -86,10 +86,11 @@ void FitFibersToImageFilter::CreateDiffSystem()
   fiber_count = 0;
   vnl_vector<int> voxel_indicator; voxel_indicator.set_size(sz_x*sz_y*sz_z); voxel_indicator.fill(0);
 
+  m_GroupSizes.clear();
   for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
   {
     vtkSmartPointer<vtkPolyData> polydata = m_Tractograms.at(bundle)->GetFiberPolyData();
-
+    m_GroupSizes.push_back(m_Tractograms.at(bundle)->GetNumFibers());
     for (int i=0; i<m_Tractograms.at(bundle)->GetNumFibers(); ++i)
     {
       vtkCell* cell = polydata->GetCell(i);
@@ -224,10 +225,12 @@ void FitFibersToImageFilter::CreatePeakSystem()
   m_NumCoveredDirections = 0;
   fiber_count = 0;
 
+  m_GroupSizes.clear();
   for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
   {
     vtkSmartPointer<vtkPolyData> polydata = m_Tractograms.at(bundle)->GetFiberPolyData();
 
+    m_GroupSizes.push_back(m_Tractograms.at(bundle)->GetNumFibers());
     for (int i=0; i<m_Tractograms.at(bundle)->GetNumFibers(); ++i)
     {
       vtkCell* cell = polydata->GetCell(i);
@@ -341,8 +344,9 @@ void FitFibersToImageFilter::GenerateData()
 
   cost = VnlCostFunction(m_NumUnknowns);
   cost.SetProblem(A, b, init_lambda, m_Regularization);
+  cost.SetGroupSizes(m_GroupSizes);
   m_Weights.set_size(m_NumUnknowns);
-  m_Weights.fill( 0.0 );
+  m_Weights.fill( 1.0/m_NumUnknowns );
   vnl_lbfgsb minimizer(cost);
   vnl_vector<double> l; l.set_size(m_NumUnknowns); l.fill(0);
   vnl_vector<long> bound_selection; bound_selection.set_size(m_NumUnknowns); bound_selection.fill(1);

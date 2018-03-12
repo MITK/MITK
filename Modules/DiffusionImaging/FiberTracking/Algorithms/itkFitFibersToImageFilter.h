@@ -273,8 +273,10 @@ public:
   double f(vnl_vector<double> const &x)
   {
     // RMS error
-    double cost = S->get_rms_error(x);
-    cost *= cost;
+    unsigned int N = m_b.size();
+    vnl_vector<double> d; d.set_size(N);
+    S->multiply(x,d);
+    double cost = (d - m_b).squared_magnitude()/N;
 
     // regularize
     calc_regularization(x, cost);
@@ -293,6 +295,8 @@ public:
     S->multiply(x,d);
     d -= m_b;
 
+    // (f(u(x)))' = f'(u(x)) * u'(x)
+    // d/dx_j = 1/N * Sum_i A_i,j * 2*(A_i,j * x_j - b_i)
     S->transpose_multiply(d, dx);
     dx *= 2.0/N;
 

@@ -279,6 +279,13 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
             if (cPix.real()!=0)
               phase = atan( cPix.imag()/cPix.real() );
 
+            DoubleDwiType::PixelType real_pix = m_OutputImagesReal.at(c)->GetPixel(index3D);
+            real_pix[g] = cPix.real();
+            m_OutputImagesReal.at(c)->SetPixel(index3D, real_pix);
+
+            DoubleDwiType::PixelType imag_pix = m_OutputImagesImag.at(c)->GetPixel(index3D);
+            imag_pix[g] = cPix.imag();
+            m_OutputImagesImag.at(c)->SetPixel(index3D, imag_pix);
 
             DoubleDwiType::PixelType dwiPix = magnitudeDwiImage->GetPixel(index3D);
             DoubleDwiType::PixelType phasePix = m_PhaseImage->GetPixel(index3D);
@@ -514,6 +521,36 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
   temp.SetSize(m_Parameters.m_SignalGen.GetNumVolumes());
   temp.Fill(0.0);
   m_OutputImage->FillBuffer(temp);
+
+  // images containing real and imaginary part of the dMRI signal for each coil
+  m_OutputImagesReal.clear();
+  m_OutputImagesImag.clear();
+  for (int i=0; i<m_Parameters.m_SignalGen.m_NumberOfCoils; ++i)
+  {
+    typename DoubleDwiType::Pointer outputImageReal = DoubleDwiType::New();
+    outputImageReal->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );
+    outputImageReal->SetOrigin( shiftedOrigin );
+    outputImageReal->SetDirection( m_Parameters.m_SignalGen.m_ImageDirection );
+    outputImageReal->SetLargestPossibleRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
+    outputImageReal->SetBufferedRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
+    outputImageReal->SetRequestedRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
+    outputImageReal->SetVectorLength( m_Parameters.m_SignalGen.GetNumVolumes() );
+    outputImageReal->Allocate();
+    outputImageReal->FillBuffer(temp);
+    m_OutputImagesReal.push_back(outputImageReal);
+
+    typename DoubleDwiType::Pointer outputImageImag = DoubleDwiType::New();
+    outputImageImag->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );
+    outputImageImag->SetOrigin( shiftedOrigin );
+    outputImageImag->SetDirection( m_Parameters.m_SignalGen.m_ImageDirection );
+    outputImageImag->SetLargestPossibleRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
+    outputImageImag->SetBufferedRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
+    outputImageImag->SetRequestedRegion( m_Parameters.m_SignalGen.m_CroppedRegion );
+    outputImageImag->SetVectorLength( m_Parameters.m_SignalGen.GetNumVolumes() );
+    outputImageImag->Allocate();
+    outputImageImag->FillBuffer(temp);
+    m_OutputImagesImag.push_back(outputImageImag);
+  }
 
   // Apply in-plane upsampling for Gibbs ringing artifact
   double upsampling = 1;
@@ -768,6 +805,19 @@ void TractsToDWIImageFilter< PixelType >::InitializeFiberData()
   auto caster = itk::CastImageFilter< itk::Image<unsigned char, 3>, itk::Image<float, 3> >::New();
   caster->SetInput(m_TransformedMaskImage);
   caster->Update();
+
+  vtkSmartPointer<vtkFloatArray> weights = m_FiberBundleWorkingCopy->GetFiberWeights();
+  float mean_weight = 0;
+  for (int i=0; i<weights->GetSize(); i++)
+    mean_weight += weights->GetValue(i);
+  mean_weight /= weights->GetSize();
+
+  if (mean_weight>0.000001)
+    for (int i=0; i<weights->GetSize(); i++)
+      m_FiberBundleWorkingCopy->SetFiberWeight(i, weights->GetValue(i)/mean_weight);
+  else
+    PrintToLog("\nWarning: streamlines have VERY low weights. Average weight: " + boost::lexical_cast<std::string>(mean_weight) + ". Possible source of calculation errors.", false, true, true);
+
 
   auto density_calculator = itk::TractDensityImageFilter< itk::Image<float, 3> >::New();
   density_calculator->SetFiberBundle(m_FiberBundleWorkingCopy);

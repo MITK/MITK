@@ -82,6 +82,16 @@ public:
 
     void GenerateData() override;
 
+    std::vector<DoubleDwiType::Pointer> GetOutputImagesReal() const
+    {
+      return m_OutputImagesReal;
+    }
+
+    std::vector<DoubleDwiType::Pointer> GetOutputImagesImag() const
+    {
+      return m_OutputImagesImag;
+    }
+
 protected:
 
     TractsToDWIImageFilter();
@@ -120,6 +130,8 @@ protected:
     typename OutputImageType::Pointer           m_OutputImage;
     typename DoubleDwiType::Pointer             m_PhaseImage;
     typename DoubleDwiType::Pointer             m_KspaceImage;
+    std::vector < typename DoubleDwiType::Pointer > m_OutputImagesReal;
+    std::vector < typename DoubleDwiType::Pointer > m_OutputImagesImag;
     mitk::LevelWindow                           m_LevelWindow;
     std::vector< ItkDoubleImgType::Pointer >    m_VolumeFractions;
     std::string                                 m_StatusText;

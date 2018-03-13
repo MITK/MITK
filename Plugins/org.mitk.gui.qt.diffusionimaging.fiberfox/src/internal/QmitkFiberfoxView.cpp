@@ -160,19 +160,6 @@ void QmitkFiberfoxView::AfterThread()
 
   if (m_Controls->m_VolumeFractionsBox->isChecked())
   {
-    std::vector< itk::TractsToDWIImageFilter< short >::ItkDoubleImgType::Pointer > volumeFractions = m_TractsToDwiFilter->GetVolumeFractions();
-    for (unsigned int k=0; k<volumeFractions.size(); k++)
-    {
-      mitk::Image::Pointer image = mitk::Image::New();
-      image->InitializeByItk(volumeFractions.at(k).GetPointer());
-      image->SetVolume(volumeFractions.at(k)->GetBufferPointer());
-
-      mitk::DataNode::Pointer node = mitk::DataNode::New();
-      node->SetData( image );
-      node->SetName("CompartmentVolume-"+QString::number(k).toStdString());
-      GetDataStorage()->Add(node, parameters.m_Misc.m_ResultNode);
-    }
-
     if (m_TractsToDwiFilter->GetPhaseImage().IsNotNull())
     {
       mitk::Image::Pointer phaseImage = mitk::Image::New();
@@ -201,6 +188,49 @@ void QmitkFiberfoxView::AfterThread()
       node->SetName("Coil Positions");
       node->SetProperty("pointsize", mitk::FloatProperty::New(parameters.m_SignalGen.m_ImageSpacing[0]/4));
       node->SetProperty("color", mitk::ColorProperty::New(0, 1, 0));
+      GetDataStorage()->Add(node, parameters.m_Misc.m_ResultNode);
+    }
+
+    int c = 1;
+    std::vector< itk::TractsToDWIImageFilter< short >::DoubleDwiType::Pointer > output_real = m_TractsToDwiFilter->GetOutputImagesReal();
+    for (auto real : output_real)
+    {
+      mitk::Image::Pointer image = mitk::Image::New();
+      image->InitializeByItk(real.GetPointer());
+      image->SetVolume(real->GetBufferPointer());
+
+      mitk::DataNode::Pointer node = mitk::DataNode::New();
+      node->SetData( image );
+      node->SetName("Coil-"+QString::number(c).toStdString()+"-real");
+      GetDataStorage()->Add(node, parameters.m_Misc.m_ResultNode);
+      ++c;
+    }
+
+    c = 1;
+    std::vector< itk::TractsToDWIImageFilter< short >::DoubleDwiType::Pointer > output_imag = m_TractsToDwiFilter->GetOutputImagesImag();
+    for (auto imag : output_imag)
+    {
+      mitk::Image::Pointer image = mitk::Image::New();
+      image->InitializeByItk(imag.GetPointer());
+      image->SetVolume(imag->GetBufferPointer());
+
+      mitk::DataNode::Pointer node = mitk::DataNode::New();
+      node->SetData( image );
+      node->SetName("Coil-"+QString::number(c).toStdString()+"-imag");
+      GetDataStorage()->Add(node, parameters.m_Misc.m_ResultNode);
+      ++c;
+    }
+
+    std::vector< itk::TractsToDWIImageFilter< short >::ItkDoubleImgType::Pointer > volumeFractions = m_TractsToDwiFilter->GetVolumeFractions();
+    for (unsigned int k=0; k<volumeFractions.size(); k++)
+    {
+      mitk::Image::Pointer image = mitk::Image::New();
+      image->InitializeByItk(volumeFractions.at(k).GetPointer());
+      image->SetVolume(volumeFractions.at(k)->GetBufferPointer());
+
+      mitk::DataNode::Pointer node = mitk::DataNode::New();
+      node->SetData( image );
+      node->SetName("CompartmentVolume-"+QString::number(k).toStdString());
       GetDataStorage()->Add(node, parameters.m_Misc.m_ResultNode);
     }
   }

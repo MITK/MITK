@@ -65,6 +65,27 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Image Spacing X should be 2 with Large IBSI Phantom Image", 2.0, results["Diagnostic::Image Spacing X"], 0.0001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Image Spacing Y should be 2 with Large IBSI Phantom Image", 2.0, results["Diagnostic::Image Spacing Y"], 0.0001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Image Spacing Z should be 2 with Large IBSI Phantom Image", 2.0, results["Diagnostic::Image Spacing Z"], 0.0001);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Image Mean intensity should be 0.6865 with Large IBSI Phantom Image", 0.686508, results["Diagnostic::Image Mean intensity"], 0.0001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Image Minimum intensity should be 0 with Large IBSI Phantom Image", 0, results["Diagnostic::Image Minimum intensity"], 0.0001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Image Maximum intensity should be 9 with Large IBSI Phantom Image", 9, results["Diagnostic::Image Maximum intensity"], 0.0001);
+    
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Mask Dimension X should be 7 with Large IBSI Phantom Image", int(7), int(results["Diagnostic::Mask Dimension X"]));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Mask Dimension Y should be 6 with Large IBSI Phantom Image", int(6), int(results["Diagnostic::Mask Dimension Y"]));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Mask Dimension Z should be 6 with Large IBSI Phantom Image", int(6), int(results["Diagnostic::Mask Dimension Z"]));
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Mask bounding box X should be 5 with Large IBSI Phantom Image", int(5), int(results["Diagnostic::Mask bounding box X"]));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Mask bounding box Y should be 4 with Large IBSI Phantom Image", int(4), int(results["Diagnostic::Mask bounding box Y"]));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Mask bounding box Z should be 4 with Large IBSI Phantom Image", int(4), int(results["Diagnostic::Mask bounding box Z"]));
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Mask Spacing X should be 2 with Large IBSI Phantom Image", 2.0, results["Diagnostic::Mask Spacing X"], 0.0001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Mask Spacing Y should be 2 with Large IBSI Phantom Image", 2.0, results["Diagnostic::Mask Spacing Y"], 0.0001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Mask Spacing Z should be 2 with Large IBSI Phantom Image", 2.0, results["Diagnostic::Mask Spacing Z"], 0.0001);
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Mask Voxel Count should be 74 with Large IBSI Phantom Image", int(74), int(results["Diagnostic::Mask Voxel Count"]));
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Mask Mean intensity should be 2.14865 with Large IBSI Phantom Image", 2.14865, results["Diagnostic::Mask Mean intensity"], 0.0001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Mask Minimum intensity should be 1 with Large IBSI Phantom Image", 1, results["Diagnostic::Mask Minimum intensity"], 0.0001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Mask Maximum intensity should be 6 with Large IBSI Phantom Image", 6, results["Diagnostic::Mask Maximum intensity"], 0.0001);
   }
 
 };

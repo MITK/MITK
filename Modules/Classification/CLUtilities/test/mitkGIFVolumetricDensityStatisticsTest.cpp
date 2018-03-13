@@ -78,6 +78,13 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Surface Volume density axis-aligned bounding box with Large IBSI Phantom Image", 0.87, results["Morphological Density::Surface density axis-aligned bounding box"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Volume oriented minimum bounding box with Large IBSI Phantom Image", 0.87, results["Morphological Density::Volume density oriented minimum bounding box"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Surface Volume oriented minimum bounding box with Large IBSI Phantom Image", 0.86, results["Morphological Density::Surface density oriented minimum bounding box"], 0.01);
+    
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Volume approx. enclosing ellipsoid with Large IBSI Phantom Image", 1.17, results["Morphological Density::Volume density approx. enclosing ellipsoid"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Surface Volume approx. enclosing ellipsoid with Large IBSI Phantom Image", 1.34, results["Morphological Density::Surface density approx. enclosing ellipsoid"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Volume minimum volume enclosing ellipsoid with Large IBSI Phantom Image", 0.24, results["Morphological Density::Volume density approx. minimum volume enclosing ellipsoid"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Surface Volume minimum volume enclosing ellipsoid with Large IBSI Phantom Image", 0.46, results["Morphological Density::Surface density approx. minimum volume enclosing ellipsoid"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Volume convex hull with Large IBSI Phantom Image", 0.96, results["Morphological Density::Volume density convex hull"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Surface Volume convex hull with Large IBSI Phantom Image", 1.03, results["Morphological Density::Surface density convex hull"], 0.01);
    }
 
 };

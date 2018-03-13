@@ -126,7 +126,7 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   featureList.push_back(std::make_pair(prefix + "Mask Spacing X", maskVoxelSpacingX));
   featureList.push_back(std::make_pair(prefix + "Mask Spacing Y", maskVoxelSpacingY));
   featureList.push_back(std::make_pair(prefix + "Mask Spacing Z", maskVoxelSpacingZ));
-  featureList.push_back(std::make_pair(prefix + "Mask Voxel Count ", maskVoxelCount));
+  featureList.push_back(std::make_pair(prefix + "Mask Voxel Count", maskVoxelCount));
   featureList.push_back(std::make_pair(prefix + "Mask Mean intensity", maskMean));
   featureList.push_back(std::make_pair(prefix + "Mask Minimum intensity", maskMinimum));
   featureList.push_back(std::make_pair(prefix + "Mask Maximum intensity", maskMaximum));

@@ -583,10 +583,10 @@ void ClassificationRegionGrow::PredictSegmentation(const mitk::Image::Pointer & 
 
       m_Classifier->GetRandomForest().predictLabels(X, Y);
       ++countPredicted;
-      if ((Y(0, 0) ==  i ) ||
+      if ((std::abs(Y(0, 0)) ==  i ) ||
         ((Y(0, 0) > 1) && (connectAllLabels)))
       {
-        resultSegmentation->SetPixel(currentLocation, Y(0, 0));
+        resultSegmentation->SetPixel(currentLocation, std::abs(Y(0, 0)));
         addNeighbours(listOfStacks[i], currentLocation);
       }
     }

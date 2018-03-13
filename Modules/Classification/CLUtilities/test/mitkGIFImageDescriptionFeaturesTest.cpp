@@ -19,12 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIOUtil.h"
 
 #include <mitkImageCast.h>
-#include <mitkGIFFirstOrderStatistics.h>
-#include <mitkGIFCooccurenceMatrix.h>
-#include <mitkGIFGreyLevelRunLength.h>
 #include <cmath>
 
-#include <mitkImageGenerator.h>
 
 
 class mitkGIFImageDescriptionFeaturesTestSuite : public mitk::TestFixture
@@ -33,22 +29,12 @@ class mitkGIFImageDescriptionFeaturesTestSuite : public mitk::TestFixture
 
   MITK_TEST(FirstOrder_SinglePoint);
   MITK_TEST(FirstOrder_QubicArea);
-  //MITK_TEST(RunLenght_QubicArea);
   MITK_TEST(Coocurrence_QubicArea);
-  //MITK_TEST(TestFirstOrderStatistic);
-  //  MITK_TEST(TestThreadedDecisionForest);
 
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
-  typedef itk::Image<double,3> ImageType;
-  typedef itk::Image<unsigned char,3> MaskType;
-
   mitk::Image::Pointer m_Image,m_Mask,m_Mask1;
-  ImageType::Pointer m_ItkImage;
-  MaskType::Pointer m_ItkMask,m_ItkMask1;
-
   mitk::Image::Pointer m_GradientImage, m_GradientMask;
 
 public:
@@ -177,34 +163,6 @@ public:
 
   void Coocurrence_QubicArea()
   {
-    /*
-    * Expected Matrix: (Direction 0,0,1)
-    * |------------------------|
-    * | 20 | 0  | 0  | 0  | 0  |
-    * |------------------------|
-    * | 0  | 20 | 0  | 0  | 0  |
-    * |------------------------|
-    * | 0  | 0  | 20 | 0  | 0  |
-    * |------------------------|
-    * | 0  | 0  | 0  | 20 | 0  |
-    * |------------------------|
-    * | 0  | 0  | 0  | 0  | 20 |
-    * |------------------------|
-
-    * Expected Matrix: (Direction (1,0,0),(0,1,0))
-    * |------------------------|
-    * | 20 | 0  | 0  | 0  | 0  |
-    * |------------------------|
-    * | 20 | 0  | 0  | 0  | 0  |
-    * |------------------------|
-    * | 20 | 0  | 0  | 0  | 0  |
-    * |------------------------|
-    * | 20 | 0  | 0  | 0  | 0  |
-    * |------------------------|
-    * | 20 | 0  | 0  | 0  | 0  |
-    * |------------------------|
-    */
-
     mitk::GIFCooccurenceMatrix::Pointer calculator = mitk::GIFCooccurenceMatrix::New();
     //calculator->SetHistogramSize(4096);
     //calculator->SetUseCtRange(true);

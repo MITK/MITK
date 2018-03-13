@@ -66,6 +66,34 @@ public:
     }
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 46 features.", std::size_t(46), featureList.size());
 
+    // These values are obtained by a run of the filter.
+    // The might be wrong!
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Mean Value should be 2.15 with Large IBSI Phantom Image", 2.15, results["First Order Histogram::Mean Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Variance Value should be 3.05 with Large IBSI Phantom Image", 3.05, results["First Order Histogram::Variance Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Skewness Value should be 1.08 with Large IBSI Phantom Image", 1.08, results["First Order Histogram::Skewness Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Excess Kurtosis Value should be -0.355 with Large IBSI Phantom Image", -0.355, results["First Order Histogram::Excess Kurtosis Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Median Value should be 1 with Large IBSI Phantom Image", 1.0, results["First Order Histogram::Median Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Minimum Value should be 1 with Large IBSI Phantom Image", 1, results["First Order Histogram::Minimum Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Percentile 10 Value should be 0.648 with Large IBSI Phantom Image", 0.648, results["First Order Histogram::Percentile 10 Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Percentile 90 Value should be 4.475 with Large IBSI Phantom Image", 4.475, results["First Order Histogram::Percentile 90 Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Maximum Value should be 6 with Large IBSI Phantom Image", 6, results["First Order Histogram::Maximum Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Mode Value should be 1 with Large IBSI Phantom Image", 1, results["First Order Histogram::Mode Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Interquantile Range Value should be 2.9 with Large IBSI Phantom Image", 2.911, results["First Order Histogram::Interquantile Range Value"], 0.01);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Range Value should be 5 with Large IBSI Phantom Image", 5, results["First Order Histogram::Range Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Mean Absolute Deviation Value should be 1.55 with Large IBSI Phantom Image", 1.55, results["First Order Histogram::Mean Absolute Deviation Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Robust Mean Absolute Deviation Value should be 1.11 with Large IBSI Phantom Image", 1.11, results["First Order Histogram::Robust Mean Absolute Deviation Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Median Absolute Deviation Value should be 1.14 with Large IBSI Phantom Image", 1.14, results["First Order Histogram::Median Absolute Deviation Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Coefficient of Variation Value should be 0.812 with Large IBSI Phantom Image", 0.812, results["First Order Histogram::Coefficient of Variation Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Quantile coefficient of Dispersion Value should be 0.6 with Large IBSI Phantom Image", 0.6, results["First Order Histogram::Quantile coefficient of Dispersion Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Entropy Value should be 1.27 with Large IBSI Phantom Image", 1.27, results["First Order Histogram::Quantile coefficient of Dispersion Value"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Uniformity Value should be 0.512 with Large IBSI Phantom Image", 0.512, results["First Order Histogram::Uniformity Value"], 0.01);
+    
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Robust Mean Index should be 0.746 with Large IBSI Phantom Image", 0.746, results["First Order Histogram::Robust Mean Index"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Robust Mean Value should be 1.746 with Large IBSI Phantom Image", 1.746, results["First Order Histogram::Robust Mean Index"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Number of Bins should be 6", 6, results["First Order Histogram::Number of Bins"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Bin Size should be 1", 1, results["First Order Histogram::Bin Size"], 0.01);
+
     // These values are taken from the IBSI Initiative to ensure compatibility
     // The values are given with an accuracy of 0.01
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Mean Index should be 2.15 with Large IBSI Phantom Image", 2.15, results["First Order Histogram::Mean Index"], 0.01);

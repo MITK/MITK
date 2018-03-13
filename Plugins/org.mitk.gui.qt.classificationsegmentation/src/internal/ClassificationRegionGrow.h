@@ -98,7 +98,7 @@ protected:
 
   mitk::DataNode::Pointer AddAsDataNode(const mitk::BaseData::Pointer & data_, const std::string & name );
 
-  void ProcessFeatureImages(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image);
+  void ProcessFeatureImages(const mitk::Image::Pointer & raw_image);
   void TrainClassifier(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image);
   void PredictSegmentation(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image);
 

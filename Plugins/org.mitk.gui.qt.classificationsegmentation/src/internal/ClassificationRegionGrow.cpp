@@ -186,7 +186,7 @@ void ClassificationRegionGrow::OnInitializeSession(const mitk::DataNode *)
   OnFeatureSettingsChanged();
 }
 
-void ClassificationRegionGrow::ProcessFeatureImages(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & brain_mask)
+void ClassificationRegionGrow::ProcessFeatureImages(const mitk::Image::Pointer & raw_image)
 {
   typedef itk::Image<double,3> DoubleImageType;
   typedef itk::Image<short,3> ShortImageType;
@@ -396,7 +396,7 @@ void ClassificationRegionGrow::DoAutomSegmentation()
     m_FeatureImageVector.clear();
     for (auto img : imageList)
     {
-      ProcessFeatureImages(img, mask_image);
+      ProcessFeatureImages(img);
     }
     m_CalculateFeatures = false;
     if (m_Controls.checkAddFeaturesToDataManager->isChecked())

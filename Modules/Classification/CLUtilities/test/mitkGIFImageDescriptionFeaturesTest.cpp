@@ -59,6 +59,11 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 22 features.", std::size_t(22), featureList.size());
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Image Dimension X should be 7 with Large IBSI Phantom Image", int(7), int(results["Diagnostic::Image Dimension X"]));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Image Dimension Y should be 6 with Large IBSI Phantom Image", int(6), int(results["Diagnostic::Image Dimension Y"]));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Image Dimension Z should be 6 with Large IBSI Phantom Image", int(6), int(results["Diagnostic::Image Dimension Z"]));
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Image Spacing X should be 2 with Large IBSI Phantom Image", 2.0, results["Diagnostic::Image Spacing X"], 0.0001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Image Spacing Y should be 2 with Large IBSI Phantom Image", 2.0, results["Diagnostic::Image Spacing Y"], 0.0001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Image Spacing Z should be 2 with Large IBSI Phantom Image", 2.0, results["Diagnostic::Image Spacing Z"], 0.0001);
   }
 
   void FirstOrder_SinglePoint()

@@ -42,11 +42,11 @@ QmitkPointListWidget::QmitkPointListWidget(QWidget *parent, int orientation)
     m_LoadPointsBtn(nullptr),
     m_ToggleAddPoint(nullptr),
     m_AddPoint(nullptr),
+	m_TimeStepDisplay(nullptr),
     m_DataInteractor(nullptr),
     m_TimeStep(0),
     m_EditAllowed(true),
-    m_NodeObserverTag(0),
-	m_TimeStepDisplay(nullptr)
+    m_NodeObserverTag(0)
 
 {
   m_PointListView = new QmitkPointListView();

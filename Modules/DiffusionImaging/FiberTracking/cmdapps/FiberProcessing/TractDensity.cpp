@@ -63,6 +63,7 @@ int main(int argc, char* argv[])
   parser.addArgument("normalize", "", mitkCommandLineParser::Bool, "Normalized output:", "normalize output to 0-1", us::Any());
   parser.addArgument("endpoints", "", mitkCommandLineParser::Bool, "Output endpoints image:", "calculate image of fiber endpoints instead of mask", us::Any());
   parser.addArgument("reference_image", "", mitkCommandLineParser::String, "Reference image:", "output image will have geometry of this reference image", us::Any());
+  parser.addArgument("upsampling", "", mitkCommandLineParser::Float, "Upsampling:", "upsampling", 1.0);
 
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -80,6 +81,12 @@ int main(int argc, char* argv[])
   bool normalize = false;
   if (parsedArgs.count("normalize"))
     normalize = us::any_cast<bool>(parsedArgs["normalize"]);
+
+  float upsampling = 1.0;
+  if (parsedArgs.count("upsampling"))
+    upsampling = us::any_cast<float>(parsedArgs["upsampling"]);
+
+  MITK_INFO << "Upsampling: " << upsampling;
 
   std::string reference_image = "";
   if (parsedArgs.count("reference_image"))
@@ -105,6 +112,7 @@ int main(int argc, char* argv[])
       typedef itk::TractsToFiberEndingsImageFilter< OutImageType > ImageGeneratorType;
       ImageGeneratorType::Pointer generator = ImageGeneratorType::New();
       generator->SetFiberBundle(fib);
+      generator->SetUpsamplingFactor(upsampling);
 
       if (ref_img.IsNotNull())
       {
@@ -135,6 +143,7 @@ int main(int argc, char* argv[])
       generator->SetBinaryOutput(binary);
       generator->SetOutputAbsoluteValues(!normalize);
       generator->SetWorkOnFiberCopy(false);
+      generator->SetUpsamplingFactor(upsampling);
 
       if (ref_img.IsNotNull())
       {
@@ -165,6 +174,7 @@ int main(int argc, char* argv[])
       generator->SetBinaryOutput(binary);
       generator->SetOutputAbsoluteValues(!normalize);
       generator->SetWorkOnFiberCopy(false);
+      generator->SetUpsamplingFactor(upsampling);
 
       if (ref_img.IsNotNull())
       {

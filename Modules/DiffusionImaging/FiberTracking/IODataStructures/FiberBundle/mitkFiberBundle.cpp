@@ -1051,7 +1051,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
           container->GetPointIds()->InsertNextId(id);
           newNumPoints++;
         }
-        else if ( (mask->GetPixel(idx) == 0 || !mask->GetLargestPossibleRegion().IsInside(idx)) && invert )
+        else if ( (!mask->GetLargestPossibleRegion().IsInside(idx) || mask->GetPixel(idx) == 0) && invert )
         {
           vtkIdType id = vtkNewPoints->InsertNextPoint(p);
           container->GetPointIds()->InsertNextId(id);
@@ -1060,6 +1060,8 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
         else if (newNumPoints>1)
         {
           vtkNewCells->InsertNextCell(container);
+          if (newFiberWeights->GetSize()<=vtkNewCells->GetNumberOfCells())
+            newFiberWeights->Resize(vtkNewCells->GetNumberOfCells()*2);
           newFiberWeights->SetValue(vtkNewCells->GetNumberOfCells(), fibCopy->GetFiberWeight(i));
 
           newNumPoints = 0;
@@ -1070,6 +1072,9 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
       if (newNumPoints>1)
       {
         vtkNewCells->InsertNextCell(container);
+        if (newFiberWeights->GetSize()<=vtkNewCells->GetNumberOfCells())
+          newFiberWeights->Resize(vtkNewCells->GetNumberOfCells()*2);
+
         newFiberWeights->SetValue(vtkNewCells->GetNumberOfCells(), fibCopy->GetFiberWeight(i));
       }
     }

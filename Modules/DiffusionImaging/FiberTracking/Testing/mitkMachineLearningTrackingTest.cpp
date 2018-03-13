@@ -98,7 +98,8 @@ public:
         mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
 
         //MITK_INFO << mitk::IOUtil::GetTempPath() << "ReferenceTracts.fib";
-        //mitk::IOUtil::Save(outFib, mitk::IOUtil::GetTempPath()+"ReferenceTracts.fib");
+        if (!ref->Equals(outFib))
+          mitk::IOUtil::Save(outFib, mitk::IOUtil::GetTempPath()+"ML_Track1.fib");
 
         CPPUNIT_ASSERT_MESSAGE("Should be equal", ref->Equals(outFib));
     }

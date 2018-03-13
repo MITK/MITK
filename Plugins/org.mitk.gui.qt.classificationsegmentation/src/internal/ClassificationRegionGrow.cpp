@@ -195,11 +195,6 @@ void ClassificationRegionGrow::ProcessFeatureImages(const mitk::Image::Pointer &
   typedef itk::NeighborhoodFunctorImageFilter<DoubleImageType, DoubleImageType, FunctorType> FOSFilerType;
   typedef FOSFilerType::MaskImageType MaskImageType;
 
-  double gaussValue = 2;
-  double hessianValue = 2;
-  double structureTensorInner = 1.8;
-  double structureTensorOuter = 2.4;
-
   // RAW
   if (m_Controls.UseIntensity->isChecked()) {
     m_FeatureImageVector.push_back(raw_image);

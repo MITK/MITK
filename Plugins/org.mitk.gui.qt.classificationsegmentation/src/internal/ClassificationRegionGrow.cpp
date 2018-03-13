@@ -495,7 +495,7 @@ static void addNeighbours(std::stack<itk::Index<3> > &stack, itk::Index<3> idx)
 void ClassificationRegionGrow::PredictSegmentation(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image)
 {
   typedef itk::Image<double, 3> DoubleImageType;
-  typedef itk::Image<short, 3> ShortImageType;
+  typedef itk::Image<unsigned short, 3> ShortImageType;
 
   DoubleImageType::Pointer input;
   ShortImageType::Pointer mask;
@@ -569,21 +569,21 @@ void ClassificationRegionGrow::PredictSegmentation(const mitk::Image::Pointer & 
       {
         continue;
       }
-      if (usedLocation->GetPixel(currentLocation) > i)
+      if (std::abs(usedLocation->GetPixel(currentLocation)) > i)
       {
         continue;
       }
       usedLocation->SetPixel(currentLocation, i+1);
 
 
-      for (int f = 0; f < featureImages.size(); ++f)
+      for (std::size_t f = 0; f < featureImages.size(); ++f)
       {
         currentX(0, f) = featureImages[f]->GetPixel(currentLocation);
       }
 
       m_Classifier->GetRandomForest().predictLabels(X, Y);
       ++countPredicted;
-      if ((Y(0, 0) ==  i) ||
+      if ((Y(0, 0) ==  i ) ||
         ((Y(0, 0) > 1) && (connectAllLabels)))
       {
         resultSegmentation->SetPixel(currentLocation, Y(0, 0));

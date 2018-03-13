@@ -202,7 +202,7 @@ int main(int argc, char* argv[])
       mitk::Image::Pointer image = mitk::Image::New();
       image->InitializeByItk(volumeFractions.at(k).GetPointer());
       image->SetVolume(volumeFractions.at(k)->GetBufferPointer());
-      mitk::IOUtil::Save(image, outName+"_Compartment"+boost::lexical_cast<std::string>(k+1)+".nrrd");
+      mitk::IOUtil::Save(image, outName+"_Compartment"+boost::lexical_cast<std::string>(k+1)+".nii.gz");
     }
 
     if (tractsToDwiFilter->GetPhaseImage().IsNotNull())
@@ -210,7 +210,7 @@ int main(int argc, char* argv[])
       mitk::Image::Pointer image = mitk::Image::New();
       itk::TractsToDWIImageFilter< short >::DoubleDwiType::Pointer itkPhase = tractsToDwiFilter->GetPhaseImage();
       image = mitk::GrabItkImageMemory( itkPhase.GetPointer() );
-      mitk::IOUtil::Save(image, outName+"_Phase.nrrd");
+      mitk::IOUtil::Save(image, outName+"_Phase.nii.gz");
     }
 
     if (tractsToDwiFilter->GetKspaceImage().IsNotNull())
@@ -218,7 +218,29 @@ int main(int argc, char* argv[])
       mitk::Image::Pointer image = mitk::Image::New();
       itk::TractsToDWIImageFilter< short >::DoubleDwiType::Pointer itkImage = tractsToDwiFilter->GetKspaceImage();
       image = mitk::GrabItkImageMemory( itkImage.GetPointer() );
-      mitk::IOUtil::Save(image, outName+"_kSpace.nrrd");
+      mitk::IOUtil::Save(image, outName+"_kSpace.nii.gz");
+    }
+
+    int c = 1;
+    std::vector< itk::TractsToDWIImageFilter< short >::DoubleDwiType::Pointer > output_real = tractsToDwiFilter->GetOutputImagesReal();
+    for (auto real : output_real)
+    {
+      mitk::Image::Pointer image = mitk::Image::New();
+      image->InitializeByItk(real.GetPointer());
+      image->SetVolume(real->GetBufferPointer());
+      mitk::IOUtil::Save(image, outName+"_Coil-"+boost::lexical_cast<std::string>(c)+"-real.nii.gz");
+      ++c;
+    }
+
+    c = 1;
+    std::vector< itk::TractsToDWIImageFilter< short >::DoubleDwiType::Pointer > output_imag = tractsToDwiFilter->GetOutputImagesImag();
+    for (auto imag : output_imag)
+    {
+      mitk::Image::Pointer image = mitk::Image::New();
+      image->InitializeByItk(imag.GetPointer());
+      image->SetVolume(imag->GetBufferPointer());
+      mitk::IOUtil::Save(image, outName+"_Coil-"+boost::lexical_cast<std::string>(c)+"-imag.nii.gz");
+      ++c;
     }
   }
 

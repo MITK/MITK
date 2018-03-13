@@ -448,7 +448,7 @@ void mitk::FiberfoxParameters::SaveParameters(std::string filename)
       {
         try{
           itk::ImageFileWriter<ItkDoubleImgType>::Pointer writer = itk::ImageFileWriter<ItkDoubleImgType>::New();
-          writer->SetFileName(filename+"_VOLUME"+boost::lexical_cast<std::string>(signalModel->m_CompartmentId)+".nrrd");
+          writer->SetFileName(filename+"_VOLUME"+boost::lexical_cast<std::string>(signalModel->m_CompartmentId)+".nii.gz");
           writer->SetInput(signalModel->GetVolumeFractionImage());
           writer->Update();
           MITK_INFO << "Volume fraction image for compartment "+boost::lexical_cast<std::string>(signalModel->m_CompartmentId)+" saved.";
@@ -465,7 +465,7 @@ void mitk::FiberfoxParameters::SaveParameters(std::string filename)
 
   try{
     itk::ImageFileWriter<ItkFloatImgType>::Pointer writer = itk::ImageFileWriter<ItkFloatImgType>::New();
-    writer->SetFileName(filename+"_FMAP.nrrd");
+    writer->SetFileName(filename+"_FMAP.nii.gz");
     writer->SetInput(m_SignalGen.m_FrequencyMap);
     writer->Update();
   }
@@ -475,7 +475,7 @@ void mitk::FiberfoxParameters::SaveParameters(std::string filename)
   }
   try{
     itk::ImageFileWriter<ItkUcharImgType>::Pointer writer = itk::ImageFileWriter<ItkUcharImgType>::New();
-    writer->SetFileName(filename+"_MASK.nrrd");
+    writer->SetFileName(filename+"_MASK.nii.gz");
     writer->SetInput(m_SignalGen.m_MaskImage);
     writer->Update();
   }
@@ -907,10 +907,16 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
         if (signalModel!=nullptr)
         {
           signalModel->SetGradientList(gradients);
+
           try
           {
             itk::ImageFileReader<ItkDoubleImgType>::Pointer reader = itk::ImageFileReader<ItkDoubleImgType>::New();
-            reader->SetFileName(filename+"_VOLUME"+ReadVal<std::string>(v2,"ID","")+".nrrd");
+            if ( itksys::SystemTools::FileExists(filename+"_VOLUME"+ReadVal<std::string>(v2,"ID","")+".nii.gz") )
+              reader->SetFileName(filename+"_VOLUME"+ReadVal<std::string>(v2,"ID","")+".nii.gz");
+            else if ( itksys::SystemTools::FileExists(filename+"_VOLUME"+ReadVal<std::string>(v2,"ID","")+".nii") )
+              reader->SetFileName(filename+"_VOLUME"+ReadVal<std::string>(v2,"ID","")+".nii");
+            else
+              reader->SetFileName(filename+"_VOLUME"+ReadVal<std::string>(v2,"ID","")+".nrrd");
             reader->Update();
             signalModel->SetVolumeFractionImage(reader->GetOutput());
             MITK_INFO << "Volume fraction image loaded for compartment " << signalModel->m_CompartmentId;
@@ -932,6 +938,12 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
   {
     itk::ImageFileReader<ItkFloatImgType>::Pointer reader = itk::ImageFileReader<ItkFloatImgType>::New();
     reader->SetFileName(filename+"_FMAP.nrrd");
+    if ( itksys::SystemTools::FileExists(filename+"_FMAP.nii.gz") )
+      reader->SetFileName(filename+"_FMAP.nii.gz");
+    else if ( itksys::SystemTools::FileExists(filename+"_FMAP.nii") )
+      reader->SetFileName(filename+"_FMAP.nii");
+    else
+      reader->SetFileName(filename+"_FMAP.nrrd");
     reader->Update();
     m_SignalGen.m_FrequencyMap = reader->GetOutput();
     MITK_INFO << "Frequency map loaded.";
@@ -944,7 +956,12 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
   try
   {
     itk::ImageFileReader<ItkUcharImgType>::Pointer reader = itk::ImageFileReader<ItkUcharImgType>::New();
-    reader->SetFileName(filename+"_MASK.nrrd");
+    if ( itksys::SystemTools::FileExists(filename+"_MASK.nii.gz") )
+      reader->SetFileName(filename+"_MASK.nii.gz");
+    else if ( itksys::SystemTools::FileExists(filename+"_MASK.nii") )
+      reader->SetFileName(filename+"_MASK.nii");
+    else
+      reader->SetFileName(filename+"_MASK.nrrd");
     reader->Update();
     m_SignalGen.m_MaskImage = reader->GetOutput();
     m_SignalGen.m_ImageRegion = m_SignalGen.m_MaskImage->GetLargestPossibleRegion();

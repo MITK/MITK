@@ -1018,8 +1018,11 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
   vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
 
+  vtkSmartPointer<vtkFloatArray> newFiberWeights = vtkSmartPointer<vtkFloatArray>::New();
+  newFiberWeights->SetName("FIBER_WEIGHTS");
+  newFiberWeights->SetNumberOfValues(m_NumFibers);
+
   MITK_INFO << "Cutting fibers";
-  std::vector<float> new_weights;
   boost::progress_display disp(m_NumFibers);
   for (int i=0; i<m_NumFibers; i++)
   {
@@ -1054,9 +1057,10 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
           container->GetPointIds()->InsertNextId(id);
           newNumPoints++;
         }
-        else if (newNumPoints>0)
+        else if (newNumPoints>1)
         {
           vtkNewCells->InsertNextCell(container);
+          newFiberWeights->SetValue(vtkNewCells->GetNumberOfCells(), fibCopy->GetFiberWeight(i));
 
           newNumPoints = 0;
           container = vtkSmartPointer<vtkPolyLine>::New();
@@ -1066,7 +1070,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
       if (newNumPoints>1)
       {
         vtkNewCells->InsertNextCell(container);
-        new_weights.push_back(this->GetFiberWeight(i));
+        newFiberWeights->SetValue(vtkNewCells->GetNumberOfCells(), fibCopy->GetFiberWeight(i));
       }
     }
 
@@ -1074,14 +1078,14 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
 
   if (vtkNewCells->GetNumberOfCells()<=0)
     return nullptr;
+  newFiberWeights->Resize(vtkNewCells->GetNumberOfCells());
 
   vtkSmartPointer<vtkPolyData> newPolyData = vtkSmartPointer<vtkPolyData>::New();
   newPolyData->SetPoints(vtkNewPoints);
   newPolyData->SetLines(vtkNewCells);
   mitk::FiberBundle::Pointer newFib = mitk::FiberBundle::New(newPolyData);
+  newFib->SetFiberWeights(newFiberWeights);
   newFib->Compress(0.1);
-  for (unsigned int i=0; i<new_weights.size(); ++i)
-    newFib->SetFiberWeight(i, new_weights.at(i));
   return newFib;
 }
 

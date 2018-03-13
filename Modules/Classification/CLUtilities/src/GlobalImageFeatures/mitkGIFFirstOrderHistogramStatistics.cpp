@@ -222,7 +222,7 @@ CalculateFirstOrderHistogramStatistics(itk::Image<TPixel, VImageDimension>* itkI
   coefficientOfVariationValue = std::sqrt(varianceValue) / meanValue;
   coefficientOfVariationIndex = std::sqrt(varianceIndex) / (meanIndex+1);
   quantileCoefficientOfDispersionValue = (p75Value - p25Value) / (p75Value + p25Value);
-  quantileCoefficientOfDispersionIndex = (p75Index - p25Index) / (p75Index + p25Index);
+  quantileCoefficientOfDispersionIndex = (p75Index - p25Index) / (p75Index + 1.0 + p25Index + 1.0);
   robustMeanAbsoluteDeviationValue /= robustCount;
   robustMeanAbsoluteDeivationIndex /= robustCount;
 
@@ -276,8 +276,7 @@ CalculateFirstOrderHistogramStatistics(itk::Image<TPixel, VImageDimension>* itkI
   featureList.push_back(std::make_pair(params.prefix + "Bin Size", binWidth));
 }
 
-mitk::GIFFirstOrderHistogramStatistics::GIFFirstOrderHistogramStatistics() :
-m_HistogramSize(256), m_UseCtRange(false), m_BinSize(-1)
+mitk::GIFFirstOrderHistogramStatistics::GIFFirstOrderHistogramStatistics()
 {
   SetShortName("foh");
   SetLongName("first-order-histogram");

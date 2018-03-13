@@ -142,7 +142,7 @@ public:
         mitk::FiberBundle::Pointer fib = original->GetDeepCopy();
         fib = fib->RemoveFibersOutside(mask);
         mitk::FiberBundle::Pointer ref = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/FiberProcessing/remove_outside.fib")).front().GetPointer());
-        mitk::IOUtil::Save(fib, mitk::IOUtil::GetTempPath()+"remove_outside.fib");
+//        mitk::IOUtil::Save(fib, mitk::IOUtil::GetTempPath()+"remove_outside.fib");
         CPPUNIT_ASSERT_MESSAGE("Should be equal", ref->Equals(fib));
     }
 
@@ -295,7 +295,7 @@ public:
         mitk::FiberBundle::Pointer fib = original->GetDeepCopy();
         fib->ResampleLinear();
         mitk::FiberBundle::Pointer ref = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/FiberProcessing/modify_resample_linear.fib")).front().GetPointer());
-        mitk::IOUtil::Save(fib, mitk::IOUtil::GetTempPath()+"modify_resample_linear.fib");
+//        mitk::IOUtil::Save(fib, mitk::IOUtil::GetTempPath()+"modify_resample_linear.fib");
         CPPUNIT_ASSERT_MESSAGE("Should be equal", ref->Equals(fib));
     }
 

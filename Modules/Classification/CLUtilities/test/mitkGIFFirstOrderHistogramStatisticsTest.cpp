@@ -80,9 +80,28 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Mode Index should be 1 with Large IBSI Phantom Image", 1, results["First Order Histogram::Mode Index"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Interquantile Range Index should be 3 with Large IBSI Phantom Image", 3, results["First Order Histogram::Interquantile Range Index"], 0.01);
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Range Index should be 3 with Large IBSI Phantom Image", 3, results["First Order Histogram::Interquantile Range Index"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Mean Absolute DeviationIndex should be 3 with Large IBSI Phantom Image", 3, results["First Order Histogram::Interquantile Range Index"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram:: Index should be 3 with Large IBSI Phantom Image", 3, results["First Order Histogram::Interquantile Range Index"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Range Index should be 5 with Large IBSI Phantom Image", 5, results["First Order Histogram::Range Index"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Mean Absolute Deviation Index should be 3 with Large IBSI Phantom Image", 1.55, results["First Order Histogram::Mean Absolute Deviation Index"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Robust Mean Absolute Deviation Index should be 1.11 with Large IBSI Phantom Image", 1.11, results["First Order Histogram::Robust Mean Absolute Deviation Index"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Median Absolute Deviation Index should be 1.14 with Large IBSI Phantom Image", 1.14, results["First Order Histogram::Median Absolute Deviation Index"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Coefficient of Variation Index should be 0.812 with Large IBSI Phantom Image", 0.812, results["First Order Histogram::Coefficient of Variation Index"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Quantile coefficient of Dispersion Index should be 0.6 with Large IBSI Phantom Image", 0.6, results["First Order Histogram::Quantile coefficient of Dispersion Index"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Entropy Index should be 1.27 with Large IBSI Phantom Image", 1.27, results["First Order Histogram::Quantile coefficient of Dispersion Index"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Uniformity Index should be 0.512 with Large IBSI Phantom Image", 0.512, results["First Order Histogram::Uniformity Index"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Maximum Gradient should be 8 with Large IBSI Phantom Image", 8, results["First Order Histogram::Maximum Gradient"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Maximum Gradient Index should be 3 with Large IBSI Phantom Image", 3, results["First Order Histogram::Maximum Gradient Index"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Minimum Gradient should be -50 with Large IBSI Phantom Image", -50, results["First Order Histogram::Minimum Gradient"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Minimum Gradient Index should be 3 with Large IBSI Phantom Image", 1, results["First Order Histogram::Minimum Gradient Index"], 0.01);
+    
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Robust Mean Index should be 3 with Large IBSI Phantom Image", 3, results["First Order Histogram::Interquantile Range Index"], 0.01);
+    
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram:: Index should be 3 with Large IBSI Phantom Image", 3, results["First Order Histogram::Interquantile Range Index"], 0.01);
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram:: Index should be 3 with Large IBSI Phantom Image", 3, results["First Order Histogram::Interquantile Range Index"], 0.01);
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram:: Index should be 3 with Large IBSI Phantom Image", 3, results["First Order Histogram::Interquantile Range Index"], 0.01);
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram:: Index should be 3 with Large IBSI Phantom Image", 3, results["First Order Histogram::Interquantile Range Index"], 0.01);
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram:: Index should be 3 with Large IBSI Phantom Image", 3, results["First Order Histogram::Interquantile Range Index"], 0.01);
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram:: Index should be 3 with Large IBSI Phantom Image", 3, results["First Order Histogram::Interquantile Range Index"], 0.01);
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram:: Index should be 3 with Large IBSI Phantom Image", 3, results["First Order Histogram::Interquantile Range Index"], 0.01);
 
 
     /*CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Image Dimension X should be 7 with Large IBSI Phantom Image", int(7), int(results["Diagnostic::Image Dimension X"]));

@@ -73,7 +73,12 @@ public:
     // They are usually reported with an accuracy of 0.01
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume integrated intensity with Large IBSI Phantom Image", 1195, results["Morphological Density::Volume integrated intensity"], 1.0);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Moran's I index with Large IBSI Phantom Image", 0.0397, results["Morphological Density::Volume Moran's I index"], 0.0001);
-   }   
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Geary's C measure with Large IBSI Phantom Image", 0.974, results["Morphological Density::Volume Geary's C measure"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Volume density axis-aligned bounding box with Large IBSI Phantom Image", 0.87, results["Morphological Density::Volume density axis-aligned bounding box"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Surface Volume density axis-aligned bounding box with Large IBSI Phantom Image", 0.87, results["Morphological Density::Surface density axis-aligned bounding box"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Volume oriented minimum bounding box with Large IBSI Phantom Image", 0.87, results["Morphological Density::Volume density oriented minimum bounding box"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Surface Volume oriented minimum bounding box with Large IBSI Phantom Image", 0.86, results["Morphological Density::Surface density oriented minimum bounding box"], 0.01);
+   }
 
 };
 

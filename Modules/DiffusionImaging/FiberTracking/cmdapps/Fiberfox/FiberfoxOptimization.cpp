@@ -31,34 +31,85 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <mitkFiberfoxParameters.h>
 #include <random>
+#include <mitkTensorImage.h>
+#include <itkTensorDerivedMeasurementsFilter.h>
 
 using namespace mitk;
 
-float CompareDwi(itk::VectorImage< short, 3 >* dwi1, itk::VectorImage< short, 3 >* dwi2)
+float CompareDwi(itk::VectorImage< short, 3 >* dwi1, itk::VectorImage< short, 3 >* dwi2, itk::Image< unsigned char,3 >::Pointer mask)
 {
   typedef itk::VectorImage< short, 3 > DwiImageType;
-  try{
+  try
+  {
     itk::ImageRegionIterator< DwiImageType > it1(dwi1, dwi1->GetLargestPossibleRegion());
     itk::ImageRegionIterator< DwiImageType > it2(dwi2, dwi2->GetLargestPossibleRegion());
+
     unsigned int count = 0;
-    float difference = 0;
+    double error = 0;
     while(!it1.IsAtEnd())
     {
-      for (unsigned int i=0; i<dwi1->GetVectorLength(); ++i)
+      if (mask.IsNull() || (mask.IsNotNull() && mask->GetLargestPossibleRegion().IsInside(it1.GetIndex()) && mask->GetPixel(it1.GetIndex())>0) )
       {
-        difference += abs(it1.Get()[i]-it2.Get()[i]);
-        count++;
+        for (unsigned int i=0; i<dwi1->GetVectorLength(); ++i)
+        {
+          double diff = it1.Get()[i]-it2.Get()[i];
+          error += diff*diff;
+          count++;
+        }
       }
       ++it1;
       ++it2;
     }
-    return difference/count;
+    return error/count;
   }
   catch(...)
   {
     return -1;
   }
   return -1;
+}
+
+float CompareFa(mitk::Image::Pointer dwi1, itk::VectorImage< short, 3 >* dwi2, itk::Image< unsigned char,3 >::Pointer mask, itk::Image< float,3 >::Pointer fa1)
+{
+  typedef itk::TensorDerivedMeasurementsFilter<float> MeasurementsType;
+  typedef itk::Image< float, 3 > FAImageType;
+
+  float bval = static_cast<mitk::FloatProperty*>(dwi1->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue();
+  auto gradient_container = static_cast<mitk::GradientDirectionsProperty*>( dwi1->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
+
+  typedef itk::DiffusionTensor3DReconstructionImageFilter<short, short, float > TensorReconstructionImageFilterType;
+
+  itk::Image< float,3 >::Pointer fa2;
+  {
+    TensorReconstructionImageFilterType::Pointer tensorReconstructionFilter = TensorReconstructionImageFilterType::New();
+    tensorReconstructionFilter->SetBValue(bval);
+    tensorReconstructionFilter->SetGradientImage( gradient_container, dwi2 );
+    tensorReconstructionFilter->Update();
+
+    MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
+    measurementsCalculator->SetInput( tensorReconstructionFilter->GetOutput() );
+    measurementsCalculator->SetMeasure(MeasurementsType::FA);
+    measurementsCalculator->Update();
+    fa2 = measurementsCalculator->GetOutput();
+  }
+
+  itk::ImageRegionIterator< FAImageType > it1(fa1, fa1->GetLargestPossibleRegion());
+  itk::ImageRegionIterator< FAImageType > it2(fa2, fa2->GetLargestPossibleRegion());
+
+  unsigned int count = 0;
+  double error = 0;
+  while(!it1.IsAtEnd())
+  {
+    if (mask.IsNull() || (mask.IsNotNull() && mask->GetLargestPossibleRegion().IsInside(it1.GetIndex()) && mask->GetPixel(it1.GetIndex())>0) )
+    {
+      double diff = it1.Get()-it2.Get();
+      error += diff*diff;
+      ++count;
+    }
+    ++it1;
+    ++it2;
+  }
+  return error/count;
 }
 
 FiberfoxParameters MakeProposalRelaxation(FiberfoxParameters old_params, double temperature)
@@ -243,6 +294,8 @@ int main(int argc, char* argv[])
   parser.addArgument("end_temp", "", mitkCommandLineParser::Float, "End temperature:", "", 0.1);
   parser.addArgument("no_diff", "", mitkCommandLineParser::Bool, "Don't optimize diffusivities:", "Don't optimize diffusivities");
   parser.addArgument("no_relax", "", mitkCommandLineParser::Bool, "Don't optimize relaxation times and signal scale:", "Don't optimize relaxation times and signal scale");
+  parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask image:", "error is only calculated inside the mask image");
+  parser.addArgument("fa_image", "", mitkCommandLineParser::InputFile, "", "");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -272,10 +325,32 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("no_relax"))
     no_relax = true;
 
+  std::string fa_file = "";
+  if (parsedArgs.count("fa_image"))
+    fa_file = us::any_cast<std::string>(parsedArgs["fa_image"]);
+
+  std::string mask_file = "";
+  if (parsedArgs.count("mask"))
+    mask_file = us::any_cast<std::string>(parsedArgs["mask"]);
+
   if (no_relax && no_diff)
   {
     MITK_INFO << "Incompatible options. Nothing to optimize.";
     return EXIT_FAILURE;
+  }
+
+  itk::Image< unsigned char,3 >::Pointer mask = nullptr;
+  if (mask_file.compare("")!=0)
+  {
+    mitk::Image::Pointer mitk_mask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(mask_file)[0].GetPointer());
+    mitk::CastToItkImage(mitk_mask, mask);
+  }
+
+  itk::Image< float,3 >::Pointer fa_image = nullptr;
+  if (fa_file.compare("")!=0)
+  {
+    mitk::Image::Pointer mitk_img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(fa_file)[0].GetPointer());
+    mitk::CastToItkImage(mitk_img, fa_image);
   }
 
   FiberfoxParameters parameters;
@@ -312,13 +387,25 @@ int main(int argc, char* argv[])
     mitk::IOUtil::Save(image, "initial.dwi");
   }
 
+  MITK_INFO << "\n\n**************************************************************************************";
   MITK_INFO << "Iterations: " << iterations;
   MITK_INFO << "start_temp: " << start_temp;
   MITK_INFO << "end_temp: " << end_temp;
   double alpha = log(end_temp/start_temp);
   int accepted = 0;
 
-  float last_diff =  CompareDwi(sim, reference);
+  float last_diff = 9999999;
+  if (fa_image.IsNotNull())
+  {
+    MITK_INFO << "Calculating FA error";
+    last_diff = CompareFa(dwi, sim, mask, fa_image);
+  }
+  else
+  {
+    MITK_INFO << "Calculating raw-image error";
+    last_diff = CompareDwi(sim, reference, mask);
+  }
+  MITK_INFO << "Initial Error: " << last_diff;
   for (int i=0; i<1000; ++i)
   {
     double temperature = start_temp * exp(alpha*(double)i/iterations);
@@ -350,9 +437,15 @@ int main(int argc, char* argv[])
     ItkDwiType::Pointer sim = tractsToDwiFilter->GetOutput();
     std::cout.rdbuf (old);              // <-- restore
 
-    float diff = CompareDwi(sim, reference);
+    float diff = 9999999;
+    if (fa_image.IsNotNull())
+      diff = CompareFa(dwi, sim, mask, fa_image);
+    else
+      diff = CompareDwi(sim, reference, mask);
+    MITK_INFO << "New Error: " << diff;
     if (last_diff<diff)
     {
+      MITK_INFO << "Last Error: " << last_diff;
       MITK_INFO << "Rejected proposal (acc. rate " << (float)accepted/(i+1) << ")";
     }
     else

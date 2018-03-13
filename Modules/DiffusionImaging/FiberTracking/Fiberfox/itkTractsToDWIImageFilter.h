@@ -99,7 +99,7 @@ protected:
     DoubleDwiType::Pointer SimulateKspaceAcquisition(std::vector< DoubleDwiType::Pointer >& images);
 
     /** Generate signal of non-fiber compartments. */
-    void SimulateExtraAxonalSignal(ItkUcharImgType::IndexType index, double intraAxonalVolume, int g=-1);
+    void SimulateExtraAxonalSignal(ItkUcharImgType::IndexType& index, itk::Point<double, 3>& volume_fraction_point, double intraAxonalVolume, int g);
 
     /** Move fibers to simulate headmotion */
     void SimulateMotion(int g=-1);
@@ -108,6 +108,8 @@ protected:
     ItkDoubleImgType::Pointer NormalizeInsideMask(ItkDoubleImgType::Pointer image);
     void InitializeData();
     void InitializeFiberData();
+
+    itk::Point<double, 3> GetMovedPoint(itk::Index<3>& index, bool forward);
 
     // input
     mitk::FiberfoxParameters                    m_Parameters;

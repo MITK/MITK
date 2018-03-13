@@ -236,15 +236,17 @@ int main(int argc, char* argv[])
       fitter->SetRegularization(VnlCostFunction::REGU::NONE);
       fitter->Update();
       rmse = fitter->GetRMSE();
+      vnl_vector<double> rms_diff = fitter->GetRmsDiffPerBundle();
+      logfile << "RMS_DIFF: " << setprecision(5) << rms_diff[0] << " " << name << " RMSE: " << rmse << "\n";
 
       name = ist::GetFilenameWithoutExtension(anchors_file);
       mitk::FiberBundle::Pointer anchor_tracts = fitter->GetTractograms().at(0);
       anchor_tracts->SetFiberColors(255,255,255);
-      mitk::IOUtil::Save(anchor_tracts, out_folder + "0_" + name + ".fib");
+      mitk::IOUtil::Save(anchor_tracts, out_folder + boost::lexical_cast<std::string>((int)(100000*rms_diff[0])) + "_" + name + ".fib");
 
       peak_image = fitter->GetUnderexplainedImage();
       peak_image_writer->SetInput(peak_image);
-      peak_image_writer->SetFileName(out_folder + boost::lexical_cast<std::string>(iteration) + "_" + name + ".nrrd");
+      peak_image_writer->SetFileName(out_folder + "Residual_" + name + ".nii.gz");
       peak_image_writer->Update();
     }
 
@@ -318,9 +320,13 @@ int main(int argc, char* argv[])
           num_voxels = masks_filter->GetNumCoveredVoxels();
         }
 
+        double weight_sum = 0;
+        for (int i=0; i<fib->GetNumFibers(); i++)
+          weight_sum += fib->GetFiberWeight(i);
+
         std::cout.rdbuf (old);              // <-- restore
 
-        logfile << "RMS_DIFF: " << setprecision(5) << rms_diff[c] << " " << bundle_name << " " << num_voxels << "\n";
+        logfile << "RMS_DIFF: " << setprecision(5) << rms_diff[c] << " " << bundle_name << " " << num_voxels << " " << fib->GetNumFibers() << " " << weight_sum << "\n";
         if (best_overlap_index>=0)
           logfile << "Best_overlap: " << setprecision(5) << best_overlap << " " << ist::GetFilenameWithoutExtension(anchor_mask_files.at(best_overlap_index)) << "\n";
         else
@@ -333,6 +339,11 @@ int main(int argc, char* argv[])
       out_fib = out_fib->AddBundles(input_candidates);
       out_fib->ColorFibersByFiberWeights(false, true);
       mitk::IOUtil::Save(out_fib, out_folder + "AllCandidates.fib");
+
+      peak_image = fitter->GetUnderexplainedImage();
+      peak_image_writer->SetInput(peak_image);
+      peak_image_writer->SetFileName(out_folder + "Residual_AllCandidates.nii.gz");
+      peak_image_writer->Update();
     }
     else
     {

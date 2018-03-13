@@ -91,6 +91,18 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Mean Negative Gaussian Curvature with Large IBSI Phantom Image", -0.03, results["Curvature Feature::Mean Negative Gaussian Curvature"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Standard Deviation Negative Gaussian Curvature with Large IBSI Phantom Image", 0.055, results["Curvature Feature::Standard Deviation Negative Gaussian Curvature"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Skewness Negative Gaussian Curvature with Large IBSI Phantom Image", -1.92, results["Curvature Feature::Skewness Negative Gaussian Curvature"], 0.01);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Minimum Minimum Curvature with Large IBSI Phantom Image", -2.19, results["Curvature Feature::Minimum Minimum Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Maximum Minimum Curvature with Large IBSI Phantom Image", 0.35, results["Curvature Feature::Maximum Minimum Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Mean Minimum Curvature with Large IBSI Phantom Image", -0.11, results["Curvature Feature::Mean Minimum Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Standard Deviation Minimum Curvature with Large IBSI Phantom Image", 0.573, results["Curvature Feature::Standard Deviation Minimum Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Skewness Minimum Curvature with Large IBSI Phantom Image", -2.742, results["Curvature Feature::Skewness Minimum Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Mean Positive Minimum Curvature with Large IBSI Phantom Image", 0.161, results["Curvature Feature::Mean Positive Minimum Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Standard Deviation Positive Minimum Curvature with Large IBSI Phantom Image", 0.165, results["Curvature Feature::Standard Deviation Positive Minimum Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Skewness Positive Minimum Curvature with Large IBSI Phantom Image", 0.108, results["Curvature Feature::Skewness Positive Minimum Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Mean Negative Minimum Curvature with Large IBSI Phantom Image", -0.42, results["Curvature Feature::Mean Negative Minimum Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Standard Deviation Negative Minimum Curvature with Large IBSI Phantom Image", 0.733, results["Curvature Feature::Standard Deviation Negative Minimum Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Skewness Negative Minimum Curvature with Large IBSI Phantom Image", -1.73, results["Curvature Feature::Skewness Negative Minimum Curvature"], 0.01);
   }
 //  CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature:: with Large IBSI Phantom Image", 1195, results["Curvature Feature::"], 0.01);
 

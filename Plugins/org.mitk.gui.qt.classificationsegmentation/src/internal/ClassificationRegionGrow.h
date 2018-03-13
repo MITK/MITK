@@ -28,9 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkFirstOrderStatisticsFeatureFunctor.h>
 
 #include <mitkImageCast.h>
-#include <vigra/tensorutilities.hxx>
-#include <vigra/convolution.hxx>
-#include <vigra/multi_array.hxx>
+//#include <vigra/tensorutilities.hxx>
+//#include <vigra/convolution.hxx>
+//#include <vigra/multi_array.hxx>
 #include <mitkPointSet.h>
 #include <itkHistogram.h>
 #include <QFutureWatcher>

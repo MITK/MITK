@@ -276,8 +276,7 @@ CalculateFirstOrderHistogramStatistics(itk::Image<TPixel, VImageDimension>* itkI
   featureList.push_back(std::make_pair(params.prefix + "Bin Size", binWidth));
 }
 
-mitk::GIFFirstOrderHistogramStatistics::GIFFirstOrderHistogramStatistics() :
-m_HistogramSize(256), m_UseCtRange(false), m_BinSize(-1)
+mitk::GIFFirstOrderHistogramStatistics::GIFFirstOrderHistogramStatistics()
 {
   SetShortName("foh");
   SetLongName("first-order-histogram");

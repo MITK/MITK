@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIOUtil.h"
 #include <cmath>
 
-#include <mitkGIFImageDescriptionFeatures.h>
+#include <mitkGIFFirstOrderHistogramStatistics.h>
 
 class mitkGIFFirstOrderHistogramStatisticsTestSuite : public mitk::TestFixture
 {
@@ -47,7 +47,15 @@ public:
 
   void ImageDescription_PhantomTest()
   {
-    mitk::GIFImageDescriptionFeatures::Pointer featureCalculator = mitk::GIFImageDescriptionFeatures::New();
+    mitk::GIFFirstOrderHistogramStatistics::Pointer featureCalculator = mitk::GIFFirstOrderHistogramStatistics::New();
+
+    featureCalculator->SetUseBinsize(true);
+    featureCalculator->SetBinsize(1.0);
+    featureCalculator->SetUseMinimumIntensity(true);
+    featureCalculator->SetUseMaximumIntensity(true);
+    featureCalculator->SetMinimumIntensity(0.5);
+    featureCalculator->SetMaximumIntensity(6.5);
+
     auto featureList = featureCalculator->CalculateFeatures(m_IBSI_Phantom_Image_Large, m_IBSI_Phantom_Mask_Large);
 
     std::map<std::string, double> results;
@@ -58,9 +66,12 @@ public:
     }
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 22 features.", std::size_t(22), featureList.size());
 
-    // These values are calculated obtained by using this filter. Changes, especially with mean values could happen. 
+    // These values are taken from the IBSI Initiative to ensure compatibility
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Mean Index should be 2.15 with Large IBSI Phantom Image", 2.15, results["First Order Histogram::Mean Index"], 0.01);
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Image Dimension X should be 7 with Large IBSI Phantom Image", int(7), int(results["Diagnostic::Image Dimension X"]));
+
+
+    /*CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Image Dimension X should be 7 with Large IBSI Phantom Image", int(7), int(results["Diagnostic::Image Dimension X"]));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Image Dimension Y should be 6 with Large IBSI Phantom Image", int(6), int(results["Diagnostic::Image Dimension Y"]));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Image Dimension Z should be 6 with Large IBSI Phantom Image", int(6), int(results["Diagnostic::Image Dimension Z"]));
     
@@ -87,7 +98,7 @@ public:
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Mask Voxel Count should be 74 with Large IBSI Phantom Image", int(74), int(results["Diagnostic::Mask Voxel Count"]));
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Mask Mean intensity should be 2.14865 with Large IBSI Phantom Image", 2.14865, results["Diagnostic::Mask Mean intensity"], 0.0001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Mask Minimum intensity should be 1 with Large IBSI Phantom Image", 1, results["Diagnostic::Mask Minimum intensity"], 0.0001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Mask Maximum intensity should be 6 with Large IBSI Phantom Image", 6, results["Diagnostic::Mask Maximum intensity"], 0.0001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Mask Maximum intensity should be 6 with Large IBSI Phantom Image", 6, results["Diagnostic::Mask Maximum intensity"], 0.0001);*/
   }
 
 };

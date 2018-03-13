@@ -110,12 +110,6 @@ namespace mitk
 
     itkGetConstMacro(Range,double);
     itkSetMacro(Range, double);
-    itkGetConstMacro(HistogramSize,int);
-    itkSetMacro(HistogramSize, int);
-    itkGetConstMacro(UseCtRange,bool);
-    itkSetMacro(UseCtRange, bool);
-    itkGetConstMacro(BinSize, double);
-    itkSetMacro(BinSize, double);
 
     virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
     virtual void AddArguments(mitkCommandLineParser &parser);
@@ -131,9 +125,6 @@ namespace mitk
 
   private:
     double m_Range;
-    int m_HistogramSize;
-    bool m_UseCtRange;
-    double m_BinSize;
   };
 }
 #endif //mitkGIFFirstOrderHistogramStatistics_h

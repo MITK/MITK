@@ -76,7 +76,7 @@ namespace mitk
     /**
     * \brief Calculates the Cooccurence-Matrix based features for this class.
     */
-    virtual FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature) override;
+    virtual FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask) override;
 
     /**
     * \brief Returns a list of the names of all features that are calculated from this class

@@ -75,8 +75,24 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Skewness Mean Curvature with Large IBSI Phantom Image", -2.55, results["Curvature Feature::Skewness Mean Curvature"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Mean Positive Mean Curvature with Large IBSI Phantom Image", 0.30, results["Curvature Feature::Mean Positive Mean Curvature"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Standard Deviation Positive Mean Curvature with Large IBSI Phantom Image", 0.12, results["Curvature Feature::Standard Deviation Positive Mean Curvature"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Skewness Positive Mean Curvature with Large IBSI Phantom Image", 1195, results["Curvature Feature::Skewness Positive Mean Curvature"], 0.01);
-   }
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Skewness Positive Mean Curvature with Large IBSI Phantom Image", 0.60, results["Curvature Feature::Skewness Positive Mean Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Mean Negative Mean Curvature with Large IBSI Phantom Image", -0.955, results["Curvature Feature::Mean Negative Mean Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Standard Deviation Negative Mean Curvature with Large IBSI Phantom Image", 0.56, results["Curvature Feature::Standard Deviation Negative Mean Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Skewness Negative Mean Curvature with Large IBSI Phantom Image", 0.09, results["Curvature Feature::Skewness Negative Mean Curvature"], 0.01);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Minimum Gaussian Curvature with Large IBSI Phantom Image", -0.211, results["Curvature Feature::Minimum Gaussian Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Maximum Gaussian Curvature with Large IBSI Phantom Image", 1.81, results["Curvature Feature::Maximum Gaussian Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Mean Gaussian Curvature with Large IBSI Phantom Image", 0.14, results["Curvature Feature::Mean Gaussian Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Standard Deviation Gaussian Curvature with Large IBSI Phantom Image", 0.42, results["Curvature Feature::Standard Deviation Gaussian Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Skewness Gaussian Curvature with Large IBSI Phantom Image", 3.51, results["Curvature Feature::Skewness Gaussian Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Mean Positive Gaussian Curvature with Large IBSI Phantom Image", 0.26, results["Curvature Feature::Mean Positive Gaussian Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Standard Deviation Positive Gaussian Curvature with Large IBSI Phantom Image", 0.53, results["Curvature Feature::Standard Deviation Positive Gaussian Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Skewness Positive Gaussian Curvature with Large IBSI Phantom Image", 2.52, results["Curvature Feature::Skewness Positive Gaussian Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Mean Negative Gaussian Curvature with Large IBSI Phantom Image", -0.03, results["Curvature Feature::Mean Negative Gaussian Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Standard Deviation Negative Gaussian Curvature with Large IBSI Phantom Image", 0.055, results["Curvature Feature::Standard Deviation Negative Gaussian Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Skewness Negative Gaussian Curvature with Large IBSI Phantom Image", -1.92, results["Curvature Feature::Skewness Negative Gaussian Curvature"], 0.01);
+  }
+//  CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature:: with Large IBSI Phantom Image", 1195, results["Curvature Feature::"], 0.01);
 
 };
 

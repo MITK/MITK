@@ -32,8 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk image
 #include <mitkImage.h>
 #include <QmitkDataStorageComboBox.h>
-#include <ctkSliderWidget.h>
-#include <mitkPointSet.h>
+//#include <ctkSliderWidget.h>
+//#include <mitkPointSet.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
 #include "mitkVigraRandomForestClassifier.h"
@@ -62,7 +62,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#include <mitkRandomForestAccurecyWeighting.h>
 #include "mitkLabelSetImage.h"
-#include <vigra\multi_array.hxx>
+//#include <vigra\multi_array.hxx>
 
 #include <mitkLookupTable.h>
 #include <mitkLookupTableProperty.h>
@@ -70,7 +70,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QtConcurrentRun>
-#include <mitkPointSetDataInteractor.h>
+//#include <mitkPointSetDataInteractor.h>
 #include <QmitkIOUtil.h>
 const std::string ClassificationRegionGrow::VIEW_ID = "org.mitk.views.ClassificationRegionGrow";
 
@@ -186,7 +186,7 @@ void ClassificationRegionGrow::OnInitializeSession(const mitk::DataNode *)
   OnFeatureSettingsChanged();
 }
 
-void ClassificationRegionGrow::ProcessFeatureImages(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & brain_mask)
+void ClassificationRegionGrow::ProcessFeatureImages(const mitk::Image::Pointer & raw_image)
 {
   typedef itk::Image<double,3> DoubleImageType;
   typedef itk::Image<short,3> ShortImageType;
@@ -194,11 +194,6 @@ void ClassificationRegionGrow::ProcessFeatureImages(const mitk::Image::Pointer &
   typedef itk::Functor::NeighborhoodFirstOrderStatistics<NeighborhoodType, double> FunctorType;
   typedef itk::NeighborhoodFunctorImageFilter<DoubleImageType, DoubleImageType, FunctorType> FOSFilerType;
   typedef FOSFilerType::MaskImageType MaskImageType;
-
-  double gaussValue = 2;
-  double hessianValue = 2;
-  double structureTensorInner = 1.8;
-  double structureTensorOuter = 2.4;
 
   // RAW
   if (m_Controls.UseIntensity->isChecked()) {
@@ -401,12 +396,12 @@ void ClassificationRegionGrow::DoAutomSegmentation()
     m_FeatureImageVector.clear();
     for (auto img : imageList)
     {
-      ProcessFeatureImages(img, mask_image);
+      ProcessFeatureImages(img);
     }
     m_CalculateFeatures = false;
     if (m_Controls.checkAddFeaturesToDataManager->isChecked())
     {
-      for (int i = 0; i < m_FeatureImageVector.size(); ++i)
+      for (std::size_t i = 0; i < m_FeatureImageVector.size(); ++i)
       {
         auto newName = "Feature_" + std::to_string(i);
         AddAsDataNode(m_FeatureImageVector[i].GetPointer(), newName);
@@ -500,7 +495,7 @@ static void addNeighbours(std::stack<itk::Index<3> > &stack, itk::Index<3> idx)
 void ClassificationRegionGrow::PredictSegmentation(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image)
 {
   typedef itk::Image<double, 3> DoubleImageType;
-  typedef itk::Image<short, 3> ShortImageType;
+  typedef itk::Image<unsigned short, 3> ShortImageType;
 
   DoubleImageType::Pointer input;
   ShortImageType::Pointer mask;
@@ -545,7 +540,7 @@ void ClassificationRegionGrow::PredictSegmentation(const mitk::Image::Pointer & 
   {
     auto currentLocation = m_SegmentedOrganLocations.back();
     m_SegmentedOrganLocations.pop_back();
-    auto cValue = mask->GetPixel(currentLocation);
+    std::size_t cValue = std::abs(mask->GetPixel(currentLocation));
     resultSegmentation->SetPixel(currentLocation, cValue);
     usedLocation->SetPixel(currentLocation, 1000);
     while (listOfStacks.size() < cValue+1)
@@ -564,7 +559,7 @@ void ClassificationRegionGrow::PredictSegmentation(const mitk::Image::Pointer & 
   vigra::MultiArrayView<2, double> X(vigra::Shape2(currentX.rows(), currentX.cols()), currentX.data());
   auto outLabel = Eigen::MatrixXi(currentX.rows(), 1);
   vigra::MultiArrayView<2, int> Y(vigra::Shape2(currentX.rows(), 1), outLabel.data());
-  for (int i = 2; i < listOfStacks.size(); ++i)
+  for (std::size_t i = 2; i < listOfStacks.size(); ++i)
   {
     while (listOfStacks[i].size() > 0)
     {
@@ -581,17 +576,17 @@ void ClassificationRegionGrow::PredictSegmentation(const mitk::Image::Pointer & 
       usedLocation->SetPixel(currentLocation, i+1);
 
 
-      for (int f = 0; f < featureImages.size(); ++f)
+      for (std::size_t f = 0; f < featureImages.size(); ++f)
       {
         currentX(0, f) = featureImages[f]->GetPixel(currentLocation);
       }
 
       m_Classifier->GetRandomForest().predictLabels(X, Y);
       ++countPredicted;
-      if ((Y(0, 0) ==  i) ||
+      if ((static_cast<unsigned int>(Y(0, 0)) ==  i ) ||
         ((Y(0, 0) > 1) && (connectAllLabels)))
       {
-        resultSegmentation->SetPixel(currentLocation, Y(0, 0));
+        resultSegmentation->SetPixel(currentLocation, std::abs(Y(0, 0)));
         addNeighbours(listOfStacks[i], currentLocation);
       }
     }

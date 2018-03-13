@@ -401,7 +401,7 @@ void ClassificationRegionGrow::DoAutomSegmentation()
     m_CalculateFeatures = false;
     if (m_Controls.checkAddFeaturesToDataManager->isChecked())
     {
-      for (int i = 0; i < m_FeatureImageVector.size(); ++i)
+      for (std::size_t i = 0; i < m_FeatureImageVector.size(); ++i)
       {
         auto newName = "Feature_" + std::to_string(i);
         AddAsDataNode(m_FeatureImageVector[i].GetPointer(), newName);
@@ -540,7 +540,7 @@ void ClassificationRegionGrow::PredictSegmentation(const mitk::Image::Pointer & 
   {
     auto currentLocation = m_SegmentedOrganLocations.back();
     m_SegmentedOrganLocations.pop_back();
-    auto cValue = mask->GetPixel(currentLocation);
+    std::size_t cValue = std::abs(mask->GetPixel(currentLocation));
     resultSegmentation->SetPixel(currentLocation, cValue);
     usedLocation->SetPixel(currentLocation, 1000);
     while (listOfStacks.size() < cValue+1)
@@ -559,7 +559,7 @@ void ClassificationRegionGrow::PredictSegmentation(const mitk::Image::Pointer & 
   vigra::MultiArrayView<2, double> X(vigra::Shape2(currentX.rows(), currentX.cols()), currentX.data());
   auto outLabel = Eigen::MatrixXi(currentX.rows(), 1);
   vigra::MultiArrayView<2, int> Y(vigra::Shape2(currentX.rows(), 1), outLabel.data());
-  for (int i = 2; i < listOfStacks.size(); ++i)
+  for (std::size_t i = 2; i < listOfStacks.size(); ++i)
   {
     while (listOfStacks[i].size() > 0)
     {

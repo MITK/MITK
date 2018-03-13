@@ -53,7 +53,7 @@ float CompareDwi(itk::VectorImage< short, 3 >* dwi1, itk::VectorImage< short, 3 
         for (unsigned int i=0; i<dwi1->GetVectorLength(); ++i)
         {
           double diff = it1.Get()[i]-it2.Get()[i];
-          error += diff*diff;
+          error += fabs(diff);
           count++;
         }
       }
@@ -103,7 +103,7 @@ float CompareFa(mitk::Image::Pointer dwi1, itk::VectorImage< short, 3 >* dwi2, i
     if (mask.IsNull() || (mask.IsNotNull() && mask->GetLargestPossibleRegion().IsInside(it1.GetIndex()) && mask->GetPixel(it1.GetIndex())>0) )
     {
       double diff = it1.Get()-it2.Get();
-      error += diff*diff;
+      error += fabs(diff);
       ++count;
     }
     ++it1;

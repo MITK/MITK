@@ -58,6 +58,8 @@ public:
     }
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 22 features.", std::size_t(22), featureList.size());
 
+    // These values are calculated obtained by using this filter. Changes, especially with mean values could happen. 
+
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Image Dimension X should be 7 with Large IBSI Phantom Image", int(7), int(results["Diagnostic::Image Dimension X"]));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Image Dimension Y should be 6 with Large IBSI Phantom Image", int(6), int(results["Diagnostic::Image Dimension Y"]));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Image Dimension Z should be 6 with Large IBSI Phantom Image", int(6), int(results["Diagnostic::Image Dimension Z"]));

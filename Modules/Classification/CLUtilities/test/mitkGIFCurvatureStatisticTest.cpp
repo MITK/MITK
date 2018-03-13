@@ -64,29 +64,20 @@ public:
       MITK_INFO << valuePair.first << " : " << valuePair.second;
       results[valuePair.first] = valuePair.second;
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 13 features.", std::size_t(13), featureList.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 44 features.", std::size_t(44), featureList.size());
 
     // These values are obtained by a run of the filter.
     // The might be wrong!
-
-    // These values are obtained in collaboration with IBSI. 
-    // They are usually reported with an accuracy of 0.01
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume integrated intensity with Large IBSI Phantom Image", 1195, results["Morphological Density::Volume integrated intensity"], 1.0);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Moran's I index with Large IBSI Phantom Image", 0.0397, results["Morphological Density::Volume Moran's I index"], 0.0001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Geary's C measure with Large IBSI Phantom Image", 0.974, results["Morphological Density::Volume Geary's C measure"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Volume density axis-aligned bounding box with Large IBSI Phantom Image", 0.87, results["Morphological Density::Volume density axis-aligned bounding box"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Surface Volume density axis-aligned bounding box with Large IBSI Phantom Image", 0.87, results["Morphological Density::Surface density axis-aligned bounding box"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Volume oriented minimum bounding box with Large IBSI Phantom Image", 0.87, results["Morphological Density::Volume density oriented minimum bounding box"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Surface Volume oriented minimum bounding box with Large IBSI Phantom Image", 0.86, results["Morphological Density::Surface density oriented minimum bounding box"], 0.01);
-    
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Volume approx. enclosing ellipsoid with Large IBSI Phantom Image", 1.17, results["Morphological Density::Volume density approx. enclosing ellipsoid"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Surface Volume approx. enclosing ellipsoid with Large IBSI Phantom Image", 1.34, results["Morphological Density::Surface density approx. enclosing ellipsoid"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Volume minimum volume enclosing ellipsoid with Large IBSI Phantom Image", 0.24, results["Morphological Density::Volume density approx. minimum volume enclosing ellipsoid"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Surface Volume minimum volume enclosing ellipsoid with Large IBSI Phantom Image", 0.46, results["Morphological Density::Surface density approx. minimum volume enclosing ellipsoid"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Volume convex hull with Large IBSI Phantom Image", 0.96, results["Morphological Density::Volume density convex hull"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Surface Volume convex hull with Large IBSI Phantom Image", 1.03, results["Morphological Density::Surface density convex hull"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Minimum Mean Curvature with Large IBSI Phantom Image", -1.51, results["Curvature Feature::Minimum Mean Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Maximum Mean Curvature with Large IBSI Phantom Image", 0.51, results["Curvature Feature::Maximum Mean Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Mean Mean Curvature with Large IBSI Phantom Image", 0.095, results["Curvature Feature::Mean Mean Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Standard Deviation Mean Curvature with Large IBSI Phantom Image", 0.45, results["Curvature Feature::Standard Deviation Mean Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Skewness Mean Curvature with Large IBSI Phantom Image", -2.55, results["Curvature Feature::Skewness Mean Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Mean Positive Mean Curvature with Large IBSI Phantom Image", 0.30, results["Curvature Feature::Mean Positive Mean Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Standard Deviation Positive Mean Curvature with Large IBSI Phantom Image", 0.12, results["Curvature Feature::Standard Deviation Positive Mean Curvature"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Skewness Positive Mean Curvature with Large IBSI Phantom Image", 1195, results["Curvature Feature::Skewness Positive Mean Curvature"], 0.01);
    }
 
 };
 
-MITK_TEST_SUITE_REGISTRATION(mitkGIFCurvatureStatisticTestSuite)
+MITK_TEST_SUITE_REGISTRATION(mitkGIFCurvatureStatistic )

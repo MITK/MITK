@@ -419,6 +419,7 @@ void PlanarFigureMaskGenerator::CalculateMask()
     imageGeometry->WorldToIndex( planarFigureGeometry->GetOrigin(), index );
 
     unsigned int slice = index[axis];
+    m_PlanarFigureSlice = slice;
 
     // extract image slice which corresponds to the planarFigure and store it in m_InternalImageSlice
     mitk::Image::Pointer inputImageSlice = extract2DImageSlice(axis, slice);

@@ -49,6 +49,8 @@ class MITKIMAGESTATISTICS_EXPORT PlanarFigureMaskGenerator: public MaskGenerator
      */
     void SetTimeStep(unsigned int timeStep) override;
 
+    itkGetConstMacro(PlanarFigureAxis, unsigned int);
+    itkGetConstMacro(PlanarFigureSlice, unsigned int);
 
     protected:
     PlanarFigureMaskGenerator():Superclass(){
@@ -125,6 +127,7 @@ class MITKIMAGESTATISTICS_EXPORT PlanarFigureMaskGenerator: public MaskGenerator
     mitk::Image::Pointer m_ReferenceImage;
     unsigned int m_PlanarFigureAxis;
     unsigned long m_InternalMaskUpdateTime;
+    unsigned int m_PlanarFigureSlice;
     };
 }
 

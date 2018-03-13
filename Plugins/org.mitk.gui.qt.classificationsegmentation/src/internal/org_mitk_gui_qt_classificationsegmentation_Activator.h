@@ -27,6 +27,7 @@ class org_mitk_gui_qt_classificationsegmentation_Activator :
 {
   Q_OBJECT
   Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_classificationsegmentation")
+//  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_classificationregiongrow")
   Q_INTERFACES(ctkPluginActivator)
 
 public:

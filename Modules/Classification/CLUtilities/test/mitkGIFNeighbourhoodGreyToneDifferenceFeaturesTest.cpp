@@ -87,7 +87,7 @@ public:
     featureCalculator->SetMinimumIntensity(0.5);
     featureCalculator->SetMaximumIntensity(6.5);
 
-    auto featureList = featureCalculator->CalculateFeaturesSlicewise(m_IBSI_Phantom_Image_Large, m_IBSI_Phantom_Mask_Large);
+    auto featureList = featureCalculator->CalculateFeaturesSlicewise(m_IBSI_Phantom_Image_Large, m_IBSI_Phantom_Mask_Large, 2);
 
     std::map<std::string, double> results;
     for (auto valuePair : featureList)
@@ -95,15 +95,15 @@ public:
       MITK_INFO << valuePair.first << " : " << valuePair.second;
       results[valuePair.first] = valuePair.second;
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 5 features.", std::size_t(5), featureList.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 30 features.", std::size_t(30), featureList.size());
 
     // These values are obtained with IBSI
     // Standard accuracy is 0.01
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbourhood Grey Tone Difference::Coarsness with Large IBSI Phantom Image", 0.121, results["Neighbourhood Grey Tone Difference::Coarsness"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbourhood Grey Tone Difference::Contrast with Large IBSI Phantom Image", 0.925, results["Neighbourhood Grey Tone Difference::Contrast"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbourhood Grey Tone Difference::Busyness with Large IBSI Phantom Image", 2.99, results["Neighbourhood Grey Tone Difference::Busyness"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbourhood Grey Tone Difference::Complexity with Large IBSI Phantom Image", 10.4, results["Neighbourhood Grey Tone Difference::Complexity"], 0.1);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbourhood Grey Tone Difference::Strength with Large IBSI Phantom Image", 2.88, results["Neighbourhood Grey Tone Difference::Strength"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Neighbourhood Grey Tone Difference::Coarsness with Large IBSI Phantom Image", 0.121, results["SliceWise Mean Neighbourhood Grey Tone Difference::Coarsness"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Neighbourhood Grey Tone Difference::Contrast with Large IBSI Phantom Image", 0.925, results["SliceWise Mean Neighbourhood Grey Tone Difference::Contrast"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Neighbourhood Grey Tone Difference::Busyness with Large IBSI Phantom Image", 2.99, results["SliceWise Mean Neighbourhood Grey Tone Difference::Busyness"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Neighbourhood Grey Tone Difference::Complexity with Large IBSI Phantom Image", 10.4, results["SliceWise Mean Neighbourhood Grey Tone Difference::Complexity"], 0.1);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Neighbourhood Grey Tone Difference::Strength with Large IBSI Phantom Image", 2.88, results["SliceWise Mean Neighbourhood Grey Tone Difference::Strength"], 0.01);
   }
 
 };

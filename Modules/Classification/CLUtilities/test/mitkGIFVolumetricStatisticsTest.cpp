@@ -49,13 +49,6 @@ public:
   {
     mitk::GIFVolumetricStatistics::Pointer featureCalculator = mitk::GIFVolumetricStatistics::New();
 
-    featureCalculator->SetUseBinsize(true);
-    featureCalculator->SetBinsize(1.0);
-    featureCalculator->SetUseMinimumIntensity(true);
-    featureCalculator->SetUseMaximumIntensity(true);
-    featureCalculator->SetMinimumIntensity(0.5);
-    featureCalculator->SetMaximumIntensity(6.5);
-
     auto featureList = featureCalculator->CalculateFeatures(m_IBSI_Phantom_Image_Large, m_IBSI_Phantom_Mask_Large);
 
     std::map<std::string, double> results;
@@ -78,12 +71,27 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Sphericity (mesh based) with Large IBSI Phantom Image", 0.879, results["Volumetric Features::Sphericity (mesh based)"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Asphericity (mesh based) with Large IBSI Phantom Image", 0.138, results["Volumetric Features::Asphericity (mesh based)"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Ceentre of mass shift with Large IBSI Phantom Image", 0.672, results["Volumetric Features::Centre of mass shift"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Maximum 3D Diameter with Large IBSI Phantom Image", 11.66, results["Volumetric Features::Maximum 3D Diameter"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Maximum 3D diameter with Large IBSI Phantom Image", 11.66, results["Volumetric Features::Maximum 3D diameter"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::PCA Major axis length with Large IBSI Phantom Image", 11.40, results["Volumetric Features::PCA Major axis length"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::PCA Minor axis length with Large IBSI Phantom Image", 9.31, results["Volumetric Features::PCA Minor axis length"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::PCA Least axis length with Large IBSI Phantom Image", 8.54, results["Volumetric Features::PCA Least axis length"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Elongation with Large IBSI Phantom Image", 0.816, results["Volumetric Features::Elongation"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Flatness with Large IBSI Phantom Image", 0.749, results["Volumetric Features::Flatness"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::PCA Elongation with Large IBSI Phantom Image", 0.816, results["Volumetric Features::PCA Elongation"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::PCA Flatness with Large IBSI Phantom Image", 0.749, results["Volumetric Features::PCA Flatness"], 0.01);
+
+    // These values are obtained by running the filter
+    // They might be wrong!
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Voxel Volume with Large IBSI Phantom Image", 8, results["Volumetric Features::Voxel Volume"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Volume (voxel based) with Large IBSI Phantom Image", 592, results["Volumetric Features::Volume (voxel based)"], 0.1);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Surface (voxel based) with Large IBSI Phantom Image", 488, results["Volumetric Features::Surface (voxel based)"], 1.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Centre of mass shift (uncorrected) with Large IBSI Phantom Image", 0.672, results["Volumetric Features::Centre of mass shift (uncorrected)"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Bounding Box Volume with Large IBSI Phantom Image", 288, results["Volumetric Features::Bounding Box Volume"], 1.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Surface to volume ratio (voxel based) with Large IBSI Phantom Image", 0.824, results["Volumetric Features::Surface to volume ratio (voxel based)"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Sphericity (voxel based) with Large IBSI Phantom Image", 0.699, results["Volumetric Features::Sphericity (voxel based)"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Asphericity (voxel based) with Large IBSI Phantom Image", 0.431, results["Volumetric Features::Asphericity (voxel based)"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Compactness 1 (voxel based) with Large IBSI Phantom Image", 0.031, results["Volumetric Features::Compactness 1 (voxel based)"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Compactness 1 old (voxel based) with Large IBSI Phantom Image", 5.388, results["Volumetric Features::Compactness 1 old (voxel based)"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Compactness 2 (voxel based) with Large IBSI Phantom Image", 0.341, results["Volumetric Features::Compactness 2 (voxel based)"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Spherical disproportion (voxel based) with Large IBSI Phantom Image", 1.43, results["Volumetric Features::Spherical disproportion (voxel based)"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);

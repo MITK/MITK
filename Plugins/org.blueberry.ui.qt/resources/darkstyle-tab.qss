@@ -1,13 +1,8 @@
-berry--QCTabBar::tab {
-  background: #2d2d30;
-  color: #d0d0d0;
+berry--QCTabBar::tab:selected {
+  background-color: #434346;
+  border: 1px solid #434346;
 }
 
-berry--QCTabBar::tab:hover {
-  background: #3e3e40;
-  color: #55aaff;
-}
-
-QFrame#ViewFormContentFrame {
-  border: 1px solid #3f3f46;
+#ViewFormContentFrame {
+  border: 1px solid #434346;
 }

@@ -38,46 +38,8 @@ public:
 
 private:
 
-  //  Control toolbar;
   int state;
   int activeState;
-
-  //  Listener menuListener = new Listener() {
-  //    /* (non-Javadoc)
-  //     * @see org.blueberry.swt.widgets.Listener#handleEvent(org.blueberry.swt.widgets.Event)
-  //     */
-  //    public void handleEvent(Event event) {
-  //      Point globalPos = new Point(event.x, event.y);
-  //        handleContextMenu(globalPos, event);
-  //    }
-  //  };
-
-  //    Listener dragListener = new Listener() {
-  //        public void handleEvent(Event e) {
-  //            Point globalPos = ((Control)e.widget).toDisplay(e.x, e.y);
-  //            handleDragStarted(globalPos, e);
-  //        }
-  //    };
-
-  //  MouseListener mouseListener = new MouseAdapter() {
-  //
-  //    // If we single-click on an empty space on the toolbar, move focus to the
-  //    // active control
-  //    public void mouseDown(MouseEvent e) {
-  //      Point p = ((Control)e.widget).toDisplay(e.x, e.y);
-  //
-  //      handleMouseDown(p, e);
-  //    }
-  //
-  //
-  //    // If we double-click on the toolbar, maximize the presentation
-  //    public void mouseDoubleClick(MouseEvent e) {
-  //      Point p = ((Control)e.widget).toDisplay(e.x, e.y);
-  //
-  //      handleDoubleClick(p, e);
-  //    }
-  //  };
-
 
 public:
 
@@ -130,16 +92,6 @@ public:
    * @since 3.1
    */
   virtual QPoint GetSystemMenuLocation();
-
-  //    /**
-  //     * Returns the parent composite that should be used for creating the toolbar.
-  //     * Any control passed into setToolbar must have this composite as its parent.
-  //     *
-  //     * @return the parent composite that should be used for creating the toolbar
-  //     *
-  //     * @since 3.1
-  //     */
-  //    virtual QWidget* GetToolbarParent() = 0;
 
   /**
    * Returns the main control for this folder.
@@ -239,16 +191,6 @@ protected:
   void FireEvent(int id, AbstractTabItem* w);
 
   void FireEvent(int id, AbstractTabItem* w, const QPoint& pos);
-
-  //    void attachSlots(QWidget* theControl) {
-  //        theControl.addListener(SWT.MenuDetect, menuListener);
-  //        theControl.addMouseListener(mouseListener);
-  //
-  //        //TODO DnD
-  //        //PresentationUtil.addDragListener(theControl, dragListener);
-  //
-  //    }
-
 
   void HandleContextMenu(const QPoint& displayPos);
 

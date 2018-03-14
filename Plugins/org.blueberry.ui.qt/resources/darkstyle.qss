@@ -53,11 +53,11 @@ QPushButton:checked, QToolButton:checked {
 }
 
 QToolButton {
-  padding: 2px 2px;
+  padding: 2px;
 }
 
 QToolBar QToolButton {
-  padding: 4px 4px;
+  padding: 4px;
 }
 
 QAbstractItemView {
@@ -414,4 +414,45 @@ QScrollBar::up-arrow:hover {
 
 QScrollBar::up-arrow:pressed {
   image: url(:/org.blueberry.ui.qt/dark/up-arrow-pressed.svg);
+}
+
+QTabWidget::pane {
+  border: 1px solid #434346;
+}
+
+QTabBar::tab {
+  background-color: #434346;
+  border: 1px solid #434346;
+  border-bottom: none;
+  padding: 4px;
+}
+
+QTabBar::tab:middle {
+  border-left: none;
+}
+
+QTabBar::tab:last {
+  border-left: none;
+}
+
+QTabBar::tab:next-selected {
+  border-right: none;
+}
+
+QTabBar::tab:selected {
+  border: 1px solid #434346;
+  border-bottom: none;
+}
+
+QTabBar::tab:!selected {
+  background-color: #2d2d30;
+  margin-top: 4px;
+}
+
+QTabBar::tab:!selected:hover {
+  background-color: #434346;
+}
+
+#TabCloseButton {
+  background-color: none;
 }

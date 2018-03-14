@@ -78,6 +78,15 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Sphericity (mesh based) with Large IBSI Phantom Image", 0.879, results["Volumetric Features::Sphericity (mesh based)"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Asphericity (mesh based) with Large IBSI Phantom Image", 0.138, results["Volumetric Features::Asphericity (mesh based)"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Ceentre of mass shift with Large IBSI Phantom Image", 0.672, results["Volumetric Features::Centre of mass shift"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Maximum 3D Diameter with Large IBSI Phantom Image", 11.66, results["Volumetric Features::Maximum 3D Diameter"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::PCA Major axis length with Large IBSI Phantom Image", 11.40, results["Volumetric Features::PCA Major axis length"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::PCA Minor axis length with Large IBSI Phantom Image", 9.31, results["Volumetric Features::PCA Minor axis length"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::PCA Least axis length with Large IBSI Phantom Image", 8.54, results["Volumetric Features::PCA Least axis length"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Elongation with Large IBSI Phantom Image", 0.816, results["Volumetric Features::Elongation"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Flatness with Large IBSI Phantom Image", 0.749, results["Volumetric Features::Flatness"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);

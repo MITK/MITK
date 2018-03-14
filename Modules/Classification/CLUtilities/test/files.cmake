@@ -5,5 +5,6 @@ set(MODULE_TESTS
   mitkGIFImageDescriptionFeaturesTest
   mitkGIFLocalIntensityTest
   mitkGIFVolumetricDensityStatisticsTest
+  mitkGIFVolumetricStatisticsTest
   #mitkGlobalFeaturesTest.cpp
 )

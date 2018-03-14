@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
+#include <iterator>
 
 static void
 ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask,

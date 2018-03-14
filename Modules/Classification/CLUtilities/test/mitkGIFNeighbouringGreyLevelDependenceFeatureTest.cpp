@@ -65,11 +65,37 @@ public:
       MITK_INFO << valuePair.first << " : " << valuePair.second;
       results[valuePair.first] = valuePair.second;
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 5 features.", std::size_t(5), featureList.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 24 features.", std::size_t(24), featureList.size());
 
     // These values are obtained with IBSI
     // Standard accuracy is 0.01
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbourhood Grey Tone Difference::Coarsness with Large IBSI Phantom Image", 0.0296, results["Neighbourhood Grey Tone Difference::Coarsness"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Low Dependence Emphasis with Large IBSI Phantom Image", 0.045, results["Neighbouring Grey Level Dependence::Low Dependence Emphasis"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::High Dependence Emphasis with Large IBSI Phantom Image", 109, results["Neighbouring Grey Level Dependence::High Dependence Emphasis"], 1.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Low Grey Level Count Emphasis with Large IBSI Phantom Image", 0.693, results["Neighbouring Grey Level Dependence::Low Grey Level Count Emphasis"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::High Grey Level Count Emphasis with Large IBSI Phantom Image", 7.66, results["Neighbouring Grey Level Dependence::High Grey Level Count Emphasis"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Low Dependence Low Grey Level Emphasis with Large IBSI Phantom Image", 0.00963, results["Neighbouring Grey Level Dependence::Low Dependence Low Grey Level Emphasis"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Low Dependence High Grey Level Emphasis with Large IBSI Phantom Image", 0.736, results["Neighbouring Grey Level Dependence::Low Dependence High Grey Level Emphasis"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::High Dependence Low Grey Level Emphasis with Large IBSI Phantom Image", 102, results["Neighbouring Grey Level Dependence::High Dependence Low Grey Level Emphasis"], 1);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::High Dependence High Grey Level Emphasis with Large IBSI Phantom Image", 235, results["Neighbouring Grey Level Dependence::High Dependence High Grey Level Emphasis"], 1);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Grey Level Non-Uniformity with Large IBSI Phantom Image", 37.9, results["Neighbouring Grey Level Dependence::Grey Level Non-Uniformity"], 0.1);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Grey Level Non-Uniformity Normalised with Large IBSI Phantom Image", 0.512, results["Neighbouring Grey Level Dependence::Grey Level Non-Uniformity Normalised"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Dependence Count Non-Uniformity with Large IBSI Phantom Image", 4.86, results["Neighbouring Grey Level Dependence::Dependence Count Non-Uniformity"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Dependence Count Non-Uniformity Normalised with Large IBSI Phantom Image", 0.0657, results["Neighbouring Grey Level Dependence::Dependence Count Non-Uniformity Normalised"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Dependence Count Percentage with Large IBSI Phantom Image", 1, results["Neighbouring Grey Level Dependence::Dependence Count Percentage"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Grey Level Variance with Large IBSI Phantom Image", 3.05, results["Neighbouring Grey Level Dependence::Grey Level Variance"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Dependence Count Variance with Large IBSI Phantom Image", 22.1, results["Neighbouring Grey Level Dependence::Dependence Count Variance"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Dependence Count Entropy with Large IBSI Phantom Image", 4.4, results["Neighbouring Grey Level Dependence::Dependence Count Entropy"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Dependence Count Energy with Large IBSI Phantom Image", 0.0533, results["Neighbouring Grey Level Dependence::Dependence Count Energy"], 0.01);
+
+    // These values are obtained by manually running the tool
+    // Values might be wrong. 
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Grey Level Mean with Large IBSI Phantom Image", 2.15, results["Neighbouring Grey Level Dependence::Grey Level Mean"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Dependence Count Mean with Large IBSI Phantom Image", 9.32, results["Neighbouring Grey Level Dependence::Dependence Count Mean"], 0.1);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Expected Neighbourhood Size with Large IBSI Phantom Image", 26, results["Neighbouring Grey Level Dependence::Expected Neighbourhood Size"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Average Neighbourhood Size with Large IBSI Phantom Image", 14.24, results["Neighbouring Grey Level Dependence::Average Neighbourhood Size"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Average Incomplete Neighbourhood Size with Large IBSI Phantom Image", 14.24, results["Neighbouring Grey Level Dependence::Average Incomplete Neighbourhood Size"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Percentage of complete Neighbourhoods with Large IBSI Phantom Image", 0, results["Neighbouring Grey Level Dependence::Percentage of complete Neighbourhoods"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Percentage of Dependence Neighbour Voxels with Large IBSI Phantom Image", 0.584, results["Neighbouring Grey Level Dependence::Percentage of Dependence Neighbour Voxels"], 0.01);
    }
 
   void ImageDescription_PhantomTest_2D()

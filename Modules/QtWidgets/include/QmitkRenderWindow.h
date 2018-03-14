@@ -161,8 +161,8 @@ private:
 
   // Helper Functions to Convert Qt-Events to Mitk-Events
 
-  mitk::Point2D GetMousePosition(QMouseEvent* me) const;
-  mitk::Point2D GetMousePosition(QWheelEvent* we) const;
+  mitk::Point2D GetMousePosition(QMouseEvent* me);
+  mitk::Point2D GetMousePosition(QWheelEvent* we);
   mitk::InteractionEvent::MouseButtons GetEventButton(QMouseEvent* me) const;
   mitk::InteractionEvent::MouseButtons GetButtonState(QMouseEvent* me) const;
   mitk::InteractionEvent::ModifierKeys GetModifiers(QInputEvent* me) const;
@@ -177,6 +177,8 @@ private:
 
   unsigned int m_LayoutIndex;
   bool m_FullScreenMode;
+
+  mitk::Point2D m_CrosshairPosition;
 };
 
 #endif

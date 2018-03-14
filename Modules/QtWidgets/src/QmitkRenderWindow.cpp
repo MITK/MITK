@@ -50,6 +50,10 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
   newform.setSamples(8);
   this->setFormat(newform);*/
 
+  // init crosshair position by 0/0
+  m_CrosshairPosition[0] = 0;
+  m_CrosshairPosition[1] = 0;
+
   QSurfaceFormat surfaceFormat = windowHandle()->format();
   surfaceFormat.setStencilBufferSize(8);
   windowHandle()->setFormat(surfaceFormat);
@@ -120,6 +124,7 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
     QVTKWidget::mousePressEvent(me);
   }
 
+  m_CrosshairPosition = displayPos;
 
   if (m_ResendQtEvents)
     me->ignore();
@@ -136,6 +141,8 @@ void QmitkRenderWindow::mouseDoubleClickEvent( QMouseEvent *me )
     QVTKWidget::mousePressEvent(me);
   }
 
+  m_CrosshairPosition = displayPos;
+
   if (m_ResendQtEvents)
     me->ignore();
 }
@@ -150,6 +157,8 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
   {
     QVTKWidget::mouseReleaseEvent(me);
   }
+
+  m_CrosshairPosition = displayPos;
 
   if (m_ResendQtEvents)
     me->ignore();
@@ -172,7 +181,26 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 {
-  mitk::Point2D displayPos = GetMousePosition(we);
+  // Note: wheel action should not change x/y camera position, get existing one
+  mitk::Point2D displayPos;
+  if( m_CrosshairPosition[0] == 0 && m_CrosshairPosition[1] == 0 )
+  {
+    // We should take center of render window (we have no access to crosshair)
+    // Mouse cursor position could be anywhere
+    // Note: it's still being not fully correct because crosshair could be moved from center
+    // by scrolling on another projection but editor cursor (crosshair) is not available here
+    // possible solution could be writing cursor position from editors to renderwindows on change
+    // though it's not fully safe, test this solution first
+    displayPos[0] = m_Renderer->GetVtkRenderer()->GetCenter()[0];
+    displayPos[1] = m_Renderer->GetVtkRenderer()->GetCenter()[1];
+    // We need to convert the y component, as the display and vtk have other definitions for the y direction
+    displayPos[1] = m_Renderer->GetSizeY() - displayPos[1];
+  }
+  else
+  {
+    displayPos = m_CrosshairPosition;
+  }
+
   mitk::MouseWheelEvent::Pointer mWheelEvent = mitk::MouseWheelEvent::New(m_Renderer, displayPos, GetButtonState(we),
       GetModifiers(we), GetDelta(we));
 
@@ -340,21 +368,23 @@ void QmitkRenderWindow::dropEvent(QDropEvent * event)
   }
 }
 
-mitk::Point2D QmitkRenderWindow::GetMousePosition(QMouseEvent* me) const
+mitk::Point2D QmitkRenderWindow::GetMousePosition(QMouseEvent* me)
 {
   mitk::Point2D point;
   point[0] = me->x();
-  //We need to convert the y component, as the display and vtk have other definitions for the y direction
+  // We need to convert the y component, as the display and vtk have other definitions for the y direction
   point[1] = m_Renderer->GetSizeY() - me->y();
+
   return point;
 }
 
-mitk::Point2D QmitkRenderWindow::GetMousePosition(QWheelEvent* we) const
+mitk::Point2D QmitkRenderWindow::GetMousePosition(QWheelEvent* we)
 {
   mitk::Point2D point;
   point[0] = we->x();
   //We need to convert the y component, as the display and vtk have other definitions for the y direction
   point[1] = m_Renderer->GetSizeY() - we->y();
+
   return point;
 }
 

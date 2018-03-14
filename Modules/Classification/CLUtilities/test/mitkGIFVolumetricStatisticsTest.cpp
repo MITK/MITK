@@ -64,12 +64,23 @@ public:
       MITK_INFO << valuePair.first << " : " << valuePair.second;
       results[valuePair.first] = valuePair.second;
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 44 features.", std::size_t(44), featureList.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Volume Statistic should calculate 33 features.", std::size_t(33), featureList.size());
 
-    // These values are obtained by a run of the filter.
-    // The might be wrong!
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Minimum Mean Curvature with Large IBSI Phantom Image", -1.51, results["Curvature Feature::Minimum Mean Curvature"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Curvature Feature::Maximum Mean Curvature with Large IBSI Phantom Image", 0.51, results["Curvature Feature::Maximum Mean Curvature"], 0.01);
+    // These values are obtained in cooperation with IBSI
+    // Default accuracy is 0.01
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Volume (mesh based) with Large IBSI Phantom Image", 556, results["Volumetric Features::Volume (mesh based)"], 1.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Volume (voxel based) with Large IBSI Phantom Image", 592, results["Volumetric Features::Volume (voxel based)"], 1.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Surface (mesh based) with Large IBSI Phantom Image", 388, results["Volumetric Features::Surface (mesh based)"], 1.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Surface to volume ratio (mesh based) with Large IBSI Phantom Image", 0.656, results["Volumetric Features::Surface to volume ratio (mesh based)"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Compactness 1 (mesh based) with Large IBSI Phantom Image", 0.0437, results["Volumetric Features::Compactness 1 (mesh based)"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Compactness 2 (mesh based) with Large IBSI Phantom Image", 0.678, results["Volumetric Features::Compactness 2 (mesh based)"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
   }
 
 };

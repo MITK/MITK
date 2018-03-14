@@ -92,12 +92,12 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Compactness 1 old (voxel based) with Large IBSI Phantom Image", 5.388, results["Volumetric Features::Compactness 1 old (voxel based)"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Compactness 2 (voxel based) with Large IBSI Phantom Image", 0.341, results["Volumetric Features::Compactness 2 (voxel based)"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Spherical disproportion (voxel based) with Large IBSI Phantom Image", 1.43, results["Volumetric Features::Spherical disproportion (voxel based)"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features:: with Large IBSI Phantom Image", 1.51, results["Volumetric Features::"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::PCA Major axis length (uncorrected) with Large IBSI Phantom Image", 11.40, results["Volumetric Features::PCA Major axis length (uncorrected)"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::PCA Minor axis length (uncorrected) with Large IBSI Phantom Image", 9.31, results["Volumetric Features::PCA Minor axis length (uncorrected)"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::PCA Least axis length (uncorrected) with Large IBSI Phantom Image", 8.54, results["Volumetric Features::PCA Least axis length (uncorrected)"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::PCA Elongation (uncorrected) with Large IBSI Phantom Image", 0.816, results["Volumetric Features::PCA Elongation (uncorrected)"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::PCA Flatness (uncorrected) with Large IBSI Phantom Image", 0.749, results["Volumetric Features::PCA Flatness (uncorrected)"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Volumetric Features::Compactness 1 old (mesh based) with Large IBSI Phantom Image", 6.278, results["Volumetric Features::Compactness 1 old (mesh based)"], 0.01);
   }
 
 };

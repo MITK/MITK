@@ -368,7 +368,7 @@ void QmitkRenderWindow::dropEvent(QDropEvent * event)
   }
 }
 
-mitk::Point2D QmitkRenderWindow::GetMousePosition(QMouseEvent* me)
+mitk::Point2D QmitkRenderWindow::GetMousePosition(QMouseEvent* me) const
 {
   mitk::Point2D point;
   point[0] = me->x();
@@ -378,7 +378,7 @@ mitk::Point2D QmitkRenderWindow::GetMousePosition(QMouseEvent* me)
   return point;
 }
 
-mitk::Point2D QmitkRenderWindow::GetMousePosition(QWheelEvent* we)
+mitk::Point2D QmitkRenderWindow::GetMousePosition(QWheelEvent* we) const
 {
   mitk::Point2D point;
   point[0] = we->x();

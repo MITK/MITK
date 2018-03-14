@@ -228,7 +228,7 @@ namespace mitk {
     std::string GetIdentifierForCurrentProbe();
     std::string GetCurrentDepthValue();
 
-    itk::SmartPointer<mitk::NavigationDataSource> RebuildFilterPipeline();
+    void RebuildFilterPipeline();
 
     USDevice::Pointer                                      m_UltrasoundDevice;
     itk::SmartPointer<NavigationDataSource>                m_TrackingDeviceDataSource;
@@ -237,6 +237,7 @@ namespace mitk {
     itk::SmartPointer<mitk::NavigationDataSmoothingFilter> m_SmoothingFilter;
     itk::SmartPointer<mitk::NavigationDataDelayFilter>     m_DelayFilter;
     itk::SmartPointer<mitk::NavigationDataDisplacementFilter> m_DisplacementFilter;
+    itk::SmartPointer<mitk::NavigationDataSource> m_LastFilterOfIGTPipeline;
 
     unsigned int m_NumberOfSmoothingValues;
     unsigned int m_DelayCount;

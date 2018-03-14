@@ -55,6 +55,7 @@ mitk::AbstractUltrasoundTrackerDevice::AbstractUltrasoundTrackerDevice(
     m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New()),
     m_DelayFilter(mitk::NavigationDataDelayFilter::New(0)),
     m_DisplacementFilter(mitk::NavigationDataDisplacementFilter::New()),
+    m_LastFilterOfIGTPipeline(nullptr),
     m_NumberOfSmoothingValues(0), m_DelayCount(0),
     m_IsTrackedUltrasoundActive( trackedUltrasoundActive )
 {
@@ -180,7 +181,11 @@ mitk::USImageSource::Pointer mitk::AbstractUltrasoundTrackerDevice::GetUSImageSo
 
 mitk::NavigationDataSource::Pointer mitk::AbstractUltrasoundTrackerDevice::GetNavigationDataSource()
 {
-  return this->RebuildFilterPipeline();
+  if( m_LastFilterOfIGTPipeline.IsNull() )
+  {
+    this->RebuildFilterPipeline();
+  }
+  return m_LastFilterOfIGTPipeline;
 }
 
 bool mitk::AbstractUltrasoundTrackerDevice::GetIsCalibratedForCurrentStatus()
@@ -336,38 +341,6 @@ itk::SmartPointer<mitk::USControlInterfaceDoppler> mitk::AbstractUltrasoundTrack
   return itk::SmartPointer<USControlInterfaceDoppler>();
 }
 
-/*void mitk::AbstractUltrasoundTrackerDevice::UnregisterOnService()
-{
-  if( m_UltrasoundDevice->GetDeviceState() == USDevice::State_Activated )
-  {
-    m_UltrasoundDevice->Deactivate();
-  }
-  if( m_UltrasoundDevice->GetDeviceState() == USDevice::State_Connected )
-  {
-    m_UltrasoundDevice->Disconnect();
-  }
-
-  if( m_ServiceRegistration != nullptr )
-    m_ServiceRegistration.Unregister();
-  m_ServiceRegistration = 0;
-}
-
-void mitk::AbstractUltrasoundTrackerDevice::RegisterAsMicroservice()
-{
-  //Get Context
-  us::ModuleContext* context = us::GetModuleContext();
-
-  //Define ServiceProps
-  //us::ServiceProperties props;
-  mitk::UIDGenerator uidGen =
-    mitk::UIDGenerator("TEST", 16);
-  m_ServiceProperties[US_PROPKEY_ID] = uidGen.GetUID();
-  m_ServiceProperties[US_PROPKEY_DEVICENAME] = m_UltrasoundDevice->GetName();
-  m_ServiceProperties[US_PROPKEY_CLASS] = mitk::AbstractUltrasoundTrackerDevice::DeviceClassIdentifier;
-
-  m_ServiceRegistration = context->RegisterService(this, m_ServiceProperties);
-}*/
-
 void mitk::AbstractUltrasoundTrackerDevice::GenerateData()
 {
 }
@@ -421,35 +394,27 @@ std::string mitk::AbstractUltrasoundTrackerDevice::GetCurrentDepthValue()
   return depth;
 }
 
-mitk::NavigationDataSource::Pointer mitk::AbstractUltrasoundTrackerDevice::RebuildFilterPipeline()
+void mitk::AbstractUltrasoundTrackerDevice::RebuildFilterPipeline()
 {
-  itk::SmartPointer<mitk::NavigationDataSource> filter = m_TrackingDeviceDataSource;
+  m_LastFilterOfIGTPipeline = m_TrackingDeviceDataSource;
 
   if( m_NumberOfSmoothingValues > 0 )
   {
-    for (unsigned int i = 0; i < m_TrackingDeviceDataSource->GetNumberOfOutputs(); i++)
-    {
-      m_SmoothingFilter->SetInput(i, filter->GetOutput(i));
-    }
-    filter = m_SmoothingFilter;
+    m_SmoothingFilter->ConnectTo(m_LastFilterOfIGTPipeline.GetPointer());
+    m_LastFilterOfIGTPipeline = m_SmoothingFilter;
   }
 
   if( m_DelayCount > 0 )
   {
-    for( unsigned int i = 0; i < m_TrackingDeviceDataSource->GetNumberOfOutputs(); i++ )
-    {
-      m_DelayFilter->SetInput(i, filter->GetOutput(i));
-    }
-    filter = m_DelayFilter;
+    m_DelayFilter->ConnectTo(m_LastFilterOfIGTPipeline.GetPointer());
+    m_LastFilterOfIGTPipeline = m_DelayFilter;
   }
 
   if( m_IsTrackedUltrasoundActive )
   {
-    m_DisplacementFilter->ConnectTo(filter.GetPointer());
-    filter = m_DisplacementFilter;
+    m_DisplacementFilter->ConnectTo(m_LastFilterOfIGTPipeline.GetPointer());
+    m_LastFilterOfIGTPipeline = m_DisplacementFilter;
   }
-
-  return filter.GetPointer();
 }
 
 void mitk::AbstractUltrasoundTrackerDevice::UnregisterOnService()

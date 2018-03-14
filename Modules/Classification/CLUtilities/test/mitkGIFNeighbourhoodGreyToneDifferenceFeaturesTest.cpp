@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIOUtil.h"
 #include <cmath>
 
-#include <mitkGIFCurvatureStatistic.h>
+#include <mitkGIFNeighbourhoodGreyToneDifferenceFeatures.h>
 
 class mitkGIFNeighbourhoodGreyToneDifferenceFeaturesTestSuite : public mitk::TestFixture
 {
@@ -47,7 +47,7 @@ public:
 
   void ImageDescription_PhantomTest()
   {
-    mitk::GIFCurvatureStatistic::Pointer featureCalculator = mitk::GIFCurvatureStatistic::New();
+    mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::Pointer featureCalculator = mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::New();
 
     featureCalculator->SetUseBinsize(true);
     featureCalculator->SetBinsize(1.0);

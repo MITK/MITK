@@ -293,7 +293,7 @@ void MatrixFeaturesTo(mitk::NGLDMMatrixFeatures features,
   featureList.push_back(std::make_pair(prefix + "Grey Level Non-Uniformity", features.GreyLevelNonUniformity));
   featureList.push_back(std::make_pair(prefix + "Grey Level Non-Uniformity Normalised", features.GreyLevelNonUniformityNormalised));
   featureList.push_back(std::make_pair(prefix + "Dependence Count Non-Uniformity", features.DependenceCountNonUniformity));
-  featureList.push_back(std::make_pair(prefix + "Dependence Count Non-Uniformtiy Normalised", features.DependenceCountNonUniformityNormalised));
+  featureList.push_back(std::make_pair(prefix + "Dependence Count Non-Uniformity Normalised", features.DependenceCountNonUniformityNormalised));
 
   featureList.push_back(std::make_pair(prefix + "Dependence Count Percentage", features.DependenceCountPercentage));
   featureList.push_back(std::make_pair(prefix + "Grey Level Mean", features.MeanGreyLevelCount));

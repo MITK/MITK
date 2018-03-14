@@ -369,7 +369,7 @@ int main(int argc, char* argv[])
   mitk::GIFImageDescriptionFeatures::Pointer ipCalculator = mitk::GIFImageDescriptionFeatures::New(); // Commented 2, Tested
   mitk::GIFFirstOrderStatistics::Pointer firstOrderCalculator = mitk::GIFFirstOrderStatistics::New(); //Commented 2
   mitk::GIFFirstOrderHistogramStatistics::Pointer firstOrderHistoCalculator = mitk::GIFFirstOrderHistogramStatistics::New(); // Commented 2, Tested
-  mitk::GIFVolumetricStatistics::Pointer volCalculator = mitk::GIFVolumetricStatistics::New();   // Commented 2
+  mitk::GIFVolumetricStatistics::Pointer volCalculator = mitk::GIFVolumetricStatistics::New();   // Commented 2, Tested
   mitk::GIFVolumetricDensityStatistics::Pointer voldenCalculator = mitk::GIFVolumetricDensityStatistics::New(); // Commented 2, Tested
   mitk::GIFCooccurenceMatrix::Pointer coocCalculator = mitk::GIFCooccurenceMatrix::New(); // Commented 2
   mitk::GIFCooccurenceMatrix2::Pointer cooc2Calculator = mitk::GIFCooccurenceMatrix2::New(); //Commented 2

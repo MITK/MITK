@@ -250,7 +250,7 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
 
   double meshVolume = stats->GetVolume();
   double meshSurf = stats->GetSurfaceArea();
-  double pixelVolume = featureList[0].second;
+  double pixelVolume = featureList[1].second;
   double pixelSurface = featureList[3].second;
 
   MITK_INFO << "Surface: " << pixelSurface << " Volume: " << pixelVolume;
@@ -266,7 +266,7 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
 
   double sphericity = std::pow(pi, 1 / 3.0) *std::pow(6 * pixelVolume, 2.0 / 3.0) / meshSurf;
   double sphericityPixel = std::pow(pi, 1 / 3.0) *std::pow(6 * pixelVolume, 2.0 / 3.0) / pixelSurface;
-  double surfaceToVolume = meshSurf / pixelVolume;
+  double surfaceToVolume = meshSurf / meshVolume;
   double surfaceToVolumePixel = pixelSurface / pixelVolume;
   double sphericalDisproportion = meshSurf / 4 / pi / std::pow(3.0 / 4.0 / pi * pixelVolume, 2.0 / 3.0);
   double sphericalDisproportionPixel = pixelSurface / 4 / pi / std::pow(3.0 / 4.0 / pi * pixelVolume, 2.0 / 3.0);

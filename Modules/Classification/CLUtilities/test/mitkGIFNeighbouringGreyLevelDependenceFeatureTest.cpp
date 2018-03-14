@@ -19,14 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIOUtil.h"
 #include <cmath>
 
-#include <mitkGIFNeighbourhoodGreyToneDifferenceFeatures.h>
+#include <mitkGIFNeighbouringGreyLevelDependenceFeatures.h>
 
 class mitkGIFNeighbouringGreyLevelDependenceFeatureTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkGIFNeighbouringGreyLevelDependenceFeatureTestSuite );
 
   MITK_TEST(ImageDescription_PhantomTest_3D);
-  MITK_TEST(ImageDescription_PhantomTest_2D);
+  //MITK_TEST(ImageDescription_PhantomTest_2D);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -48,7 +48,7 @@ public:
 
   void ImageDescription_PhantomTest_3D()
   {
-    mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::Pointer featureCalculator = mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::New();
+    mitk::GIFNeighbouringGreyLevelDependenceFeature::Pointer featureCalculator = mitk::GIFNeighbouringGreyLevelDependenceFeature::New();
 
     featureCalculator->SetUseBinsize(true);
     featureCalculator->SetBinsize(1.0);
@@ -70,15 +70,11 @@ public:
     // These values are obtained with IBSI
     // Standard accuracy is 0.01
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbourhood Grey Tone Difference::Coarsness with Large IBSI Phantom Image", 0.0296, results["Neighbourhood Grey Tone Difference::Coarsness"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbourhood Grey Tone Difference::Contrast with Large IBSI Phantom Image", 0.584, results["Neighbourhood Grey Tone Difference::Contrast"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbourhood Grey Tone Difference::Busyness with Large IBSI Phantom Image", 6.54, results["Neighbourhood Grey Tone Difference::Busyness"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbourhood Grey Tone Difference::Complexity with Large IBSI Phantom Image", 13.5, results["Neighbourhood Grey Tone Difference::Complexity"], 0.1);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbourhood Grey Tone Difference::Strength with Large IBSI Phantom Image", 0.763, results["Neighbourhood Grey Tone Difference::Strength"], 0.01);
    }
 
   void ImageDescription_PhantomTest_2D()
   {
-    mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::Pointer featureCalculator = mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::New();
+    mitk::GIFNeighbouringGreyLevelDependenceFeature::Pointer featureCalculator = mitk::GIFNeighbouringGreyLevelDependenceFeature::New();
 
     featureCalculator->SetUseBinsize(true);
     featureCalculator->SetBinsize(1.0);

@@ -177,6 +177,8 @@ private:
 
   unsigned int m_LayoutIndex;
   bool m_FullScreenMode;
+
+  mitk::Point2D m_CrosshairPosition;
 };
 
 #endif

@@ -16,6 +16,108 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkAbstractGlobalImageFeature.h>
 
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
+
+static void
+ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask,
+  int direction,
+  std::vector<mitk::Image::Pointer> &imageVector,
+  std::vector<mitk::Image::Pointer> &maskVector)
+{
+  typedef itk::Image< double, 2 >                 FloatImage2DType;
+  typedef itk::Image< unsigned short, 2 >          MaskImage2DType;
+  typedef itk::Image< double, 3 >                 FloatImageType;
+  typedef itk::Image< unsigned short, 3 >          MaskImageType;
+
+  FloatImageType::Pointer itkFloat = FloatImageType::New();
+  MaskImageType::Pointer itkMask = MaskImageType::New();
+  mitk::CastToItkImage(mask, itkMask);
+  mitk::CastToItkImage(image, itkFloat);
+
+  int idxA, idxB, idxC;
+  switch (direction)
+  {
+  case 0:
+    idxA = 1; idxB = 2; idxC = 0;
+    break;
+  case 1:
+    idxA = 0; idxB = 2; idxC = 1;
+    break;
+  case 2:
+    idxA = 0; idxB = 1; idxC = 2;
+    break;
+  default:
+    idxA = 1; idxB = 2; idxC = 0;
+    break;
+  }
+
+  auto imageSize = image->GetLargestPossibleRegion().GetSize();
+  FloatImageType::IndexType index3D;
+  FloatImage2DType::IndexType index2D;
+  FloatImage2DType::SpacingType spacing2D;
+  spacing2D[0] = itkFloat->GetSpacing()[idxA];
+  spacing2D[1] = itkFloat->GetSpacing()[idxB];
+
+  for (unsigned int i = 0; i < imageSize[idxC]; ++i)
+  {
+    FloatImage2DType::RegionType region;
+    FloatImage2DType::IndexType start;
+    FloatImage2DType::SizeType size;
+    start[0] = 0; start[1] = 0;
+    size[0] = imageSize[idxA];
+    size[1] = imageSize[idxB];
+    region.SetIndex(start);
+    region.SetSize(size);
+
+    FloatImage2DType::Pointer image2D = FloatImage2DType::New();
+    image2D->SetRegions(region);
+    image2D->Allocate();
+
+    MaskImage2DType::Pointer mask2D = MaskImage2DType::New();
+    mask2D->SetRegions(region);
+    mask2D->Allocate();
+
+    unsigned long voxelsInMask = 0;
+
+    for (unsigned int a = 0; a < imageSize[idxA]; ++a)
+    {
+      for (unsigned int b = 0; b < imageSize[idxB]; ++b)
+      {
+        index3D[idxA] = a;
+        index3D[idxB] = b;
+        index3D[idxC] = i;
+        index2D[0] = a;
+        index2D[1] = b;
+        image2D->SetPixel(index2D, itkFloat->GetPixel(index3D));
+        mask2D->SetPixel(index2D, itkMask->GetPixel(index3D));
+        voxelsInMask += (itkMask->GetPixel(index3D) > 0) ? 1 : 0;
+
+      }
+    }
+
+    image2D->SetSpacing(spacing2D);
+    mask2D->SetSpacing(spacing2D);
+
+    mitk::Image::Pointer tmpFloatImage = mitk::Image::New();
+    tmpFloatImage->InitializeByItk(image2D.GetPointer());
+    mitk::GrabItkImageMemory(image2D, tmpFloatImage);
+
+    mitk::Image::Pointer tmpMaskImage = mitk::Image::New();
+    tmpMaskImage->InitializeByItk(mask2D.GetPointer());
+    mitk::GrabItkImageMemory(mask2D, tmpMaskImage);
+
+    if (voxelsInMask > 0)
+    {
+      imageVector.push_back(tmpFloatImage);
+      maskVector.push_back(tmpMaskImage);
+    }
+  }
+}
+
+
+
+
 std::vector<double> mitk::AbstractGlobalImageFeature::SplitDouble(std::string str, char delimiter) {
   std::vector<double> internal;
   std::stringstream ss(str); // Turn the string into a stream.
@@ -231,4 +333,60 @@ std::string mitk::AbstractGlobalImageFeature::QuantifierParameterString()
   else
     ss << "Bins-" << GetBins();
   return ss.str();
+}
+
+mitk::AbstractGlobalImageFeature::FeatureListType mitk::AbstractGlobalImageFeature::CalculateFeaturesSlicewise(const Image::Pointer & feature, const Image::Pointer &mask, int sliceID)
+{
+  std::vector<mitk::Image::Pointer> imageVector;
+  std::vector<mitk::Image::Pointer> maskVector;
+
+  ExtractSlicesFromImages(feature, mask,sliceID, imageVector, maskVector);
+
+  std::vector<mitk::AbstractGlobalImageFeature::FeatureListType> statVector;
+
+  for (std::size_t index = 0; index < imageVector.size(); ++index)
+  {
+    auto stat = this->CalculateFeatures(imageVector[index], maskVector[index]);
+    statVector.push_back(stat);
+  }
+
+  if (statVector.size() < 1)
+    return FeatureListType();
+
+  FeatureListType statMean, statStd, result;
+  for (std::size_t i = 0; i < statVector[0].size(); ++i)
+  {
+    auto cElement1 = statVector[0][i];
+    cElement1.first = "SliceWise Mean " + cElement1.first;
+    cElement1.second = 0.0;
+    auto cElement2 = statVector[0][i];
+    cElement2.first = "SliceWise Var. " + cElement2.first;
+    cElement2.second = 0.0;
+    statMean.push_back(cElement1);
+    statStd.push_back(cElement2);
+  }
+
+  for (auto cStat : statVector)
+  {
+    for (std::size_t i = 0; i < cStat.size(); ++i)
+    {
+      statMean[i].second += cStat[i].second / (1.0*statVector.size());
+    }
+  }
+
+  for (auto cStat : statVector)
+  {
+    for (std::size_t i = 0; i < cStat.size(); ++i)
+    {
+      statStd[i].second += (cStat[i].second - statMean[i].second)*(cStat[i].second - statMean[i].second) / (1.0*statVector.size());
+    }
+  }
+
+  for (auto cStat : statVector)
+  {
+    std::copy(cStat.begin(), cStat.end(), std::back_inserter(result));
+  }
+  std::copy(statMean.begin(), statMean.end(), std::back_inserter(result));
+  std::copy(statStd.begin(), statStd.end(), std::back_inserter(result));
+  return result;
 }

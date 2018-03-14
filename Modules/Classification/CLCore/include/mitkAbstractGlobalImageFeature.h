@@ -140,6 +140,11 @@ public:
   virtual FeatureListType CalculateFeatures(const Image::Pointer & feature, const Image::Pointer &mask) = 0;
 
   /**
+  * \brief Calculates the given feature Slice-wise. Might not be availble for an individual filter!
+  */
+  FeatureListType CalculateFeaturesSlicewise(const Image::Pointer & feature, const Image::Pointer &mask, int sliceID);
+
+  /**
   * \brief Calculates the feature of this abstact interface. Does not necessarily considers the parameter settings.
   */
   virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList) = 0;

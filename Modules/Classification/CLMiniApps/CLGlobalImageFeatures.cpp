@@ -379,7 +379,7 @@ int main(int argc, char* argv[])
   mitk::GIFGreyLevelDistanceZone::Pointer gldzCalculator = mitk::GIFGreyLevelDistanceZone::New(); //Commented 2
   mitk::GIFLocalIntensity::Pointer lociCalculator = mitk::GIFLocalIntensity::New(); //Commented 2, Tested
   mitk::GIFIntensityVolumeHistogramFeatures::Pointer ivohCalculator = mitk::GIFIntensityVolumeHistogramFeatures::New(); // Commented 2
-  mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::Pointer ngtdCalculator = mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::New(); //Commented 2
+  mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::Pointer ngtdCalculator = mitk::GIFNeighbourhoodGreyToneDifferenceFeatures::New(); //Commented 2, Tested
   mitk::GIFCurvatureStatistic::Pointer curvCalculator = mitk::GIFCurvatureStatistic::New(); //Commented 2, Tested
 
   std::vector<mitk::AbstractGlobalImageFeature::Pointer> features;

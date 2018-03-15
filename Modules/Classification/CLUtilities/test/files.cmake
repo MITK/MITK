@@ -2,6 +2,7 @@ set(MODULE_TESTS
   mitkGIFCurvatureStatisticTest
   mitkGIFFirstOrderHistogramStatisticsTest
   mitkGIFGreyLevelDistanceZoneTest
+  mitkGIFGreyLevelSizeZoneTest
   mitkGIFImageDescriptionFeaturesTest
   mitkGIFLocalIntensityTest
   mitkGIFNeighbourhoodGreyToneDifferenceFeaturesTest

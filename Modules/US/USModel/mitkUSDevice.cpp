@@ -44,6 +44,7 @@ mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   : mitk::ImageSource(),
+  m_OverrideSpacing(false),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
   m_Manufacturer(manufacturer),
@@ -71,6 +72,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
 
 mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
   : mitk::ImageSource(),
+  m_OverrideSpacing(false),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
   m_SpawnAcquireThread(true),
@@ -574,6 +576,27 @@ std::string mitk::USDevice::GetDeviceModel() { return m_Name; }
 
 std::string mitk::USDevice::GetDeviceComment() { return m_Comment; }
 
+void mitk::USDevice::SetSpacing(double xSpacing, double ySpacing)
+{
+  m_Spacing[0] = xSpacing;
+  m_Spacing[1] = ySpacing;
+  m_Spacing[2] = 1;
+
+  m_OverrideSpacing = true;
+
+  if (m_Image.IsNotNull() && m_Image->IsInitialized())
+  {
+    m_Image->GetGeometry()->SetSpacing(m_Spacing);
+  }
+
+  MITK_INFO << "Spacing: " << m_Spacing;
+}
+
+void mitk::USDevice::SetOverrideSpacing(bool overriding)
+{
+  m_OverrideSpacing = overriding;
+}
+
 void mitk::USDevice::GenerateData()
 {
   m_ImageMutex->Lock();
@@ -603,7 +626,12 @@ void mitk::USDevice::GenerateData()
       mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(sliceNumber, 0, 0));
       output->SetSlice(inputReadAccessor.GetData(), sliceNumber);
     }
- }
+  }
+
+  if( m_OverrideSpacing )
+  {
+    m_Image->GetGeometry()->SetSpacing(m_Spacing);
+  }
 
   output->SetGeometry(m_Image->GetGeometry());
   m_ImageMutex->Unlock();

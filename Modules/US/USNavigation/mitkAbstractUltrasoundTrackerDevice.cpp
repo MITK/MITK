@@ -64,12 +64,12 @@ mitk::AbstractUltrasoundTrackerDevice::AbstractUltrasoundTrackerDevice(
   this->RebuildFilterPipeline();
 
   //create a new output (for the image data)
-  mitk::Image::Pointer newOutput = mitk::Image::New();
-  this->SetNthOutput(0, newOutput);
+  //___ mitk::Image::Pointer newOutput = mitk::Image::New();
+  //___ this->SetNthOutput(0, newOutput);
 
   // Combined Modality should not spawn an own acquire thread, because
   // image acquiring is done by the included us device
-  m_UltrasoundDevice->SetSpawnAcquireThread(false);
+  //___ m_UltrasoundDevice->SetSpawnAcquireThread(false);
 }
 
 

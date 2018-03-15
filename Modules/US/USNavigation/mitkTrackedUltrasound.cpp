@@ -88,16 +88,19 @@ mitk::USControlInterfaceDoppler::Pointer mitk::TrackedUltrasound::GetControlInte
 
 void mitk::TrackedUltrasound::GenerateData()
 {
+  //Call Update auf US-Device + evtl. auf Tracker (???)
+  MITK_INFO << "GENERATE DATA TRACKEDULTRASOUND";
   if (m_UltrasoundDevice->GetIsFreezed()) { return; } //if the image is freezed: do nothing
 
-  //get next image from ultrasound image source
-  mitk::Image::Pointer image = m_UltrasoundDevice->GetUSImageSource()->GetNextImage();
-
+  //get actual image from ultrasound image source
+  mitk::Image::Pointer image = m_UltrasoundDevice->GetOutput(); //GetUSImageSource()->GetNextImage();
+  m_UltrasoundDevice->GetUSImageSource()->GetNextImage();
   if (image.IsNull() || !image->IsInitialized()) //check the image
   {
-    MITK_WARN << "Invalid image in USCombinedModality, aborting!";
+    MITK_WARN << "Invalid image in TrackedUltrasound, aborting!";
     return;
   }
+  MITK_INFO << "GetSpacing: " << image->GetGeometry()->GetSpacing();
 
   //get output and initialize it if it wasn't initialized before
   mitk::Image::Pointer output = this->GetOutput();
@@ -119,6 +122,7 @@ void mitk::TrackedUltrasound::GenerateData()
       // transform image according to callibration if one is set
       // for current configuration of probe and depth
       m_DisplacementFilter->SetTransformation(calibrationIterator->second);
+      //Setze Update auf Displacementfilter ????
     }
   }
 }

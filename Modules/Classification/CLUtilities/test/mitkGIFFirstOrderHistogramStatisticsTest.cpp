@@ -30,10 +30,10 @@ class mitkGIFFirstOrderHistogramStatisticsTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-	mitk::Image::Pointer m_IBSI_Phantom_Image_Small;
-	mitk::Image::Pointer m_IBSI_Phantom_Image_Large;
-	mitk::Image::Pointer m_IBSI_Phantom_Mask_Small;
-	mitk::Image::Pointer m_IBSI_Phantom_Mask_Large;
+  mitk::Image::Pointer m_IBSI_Phantom_Image_Small;
+  mitk::Image::Pointer m_IBSI_Phantom_Image_Large;
+  mitk::Image::Pointer m_IBSI_Phantom_Mask_Small;
+  mitk::Image::Pointer m_IBSI_Phantom_Mask_Large;
 
 public:
 
@@ -88,7 +88,7 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Quantile coefficient of Dispersion Value should be 0.626 with Large IBSI Phantom Image", 0.626, results["First Order Histogram::Quantile coefficient of Dispersion Value"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Entropy Value should be 1.27 with Large IBSI Phantom Image", 1.27, results["First Order Histogram::Entropy Value"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Uniformity Value should be 0.512 with Large IBSI Phantom Image", 0.512, results["First Order Histogram::Uniformity Value"], 0.01);
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Robust Mean Index should be 0.746 with Large IBSI Phantom Image", 0.746, results["First Order Histogram::Robust Mean Index"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Robust Mean Value should be 1.746 with Large IBSI Phantom Image", 1.746, results["First Order Histogram::Robust Mean Value"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Histogram::Number of Bins should be 6", 6, results["First Order Histogram::Number of Bins"], 0.01);

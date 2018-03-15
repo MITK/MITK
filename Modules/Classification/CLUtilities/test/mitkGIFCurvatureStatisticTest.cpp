@@ -30,10 +30,10 @@ class mitkGIFCurvatureStatisticTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-	mitk::Image::Pointer m_IBSI_Phantom_Image_Small;
-	mitk::Image::Pointer m_IBSI_Phantom_Image_Large;
-	mitk::Image::Pointer m_IBSI_Phantom_Mask_Small;
-	mitk::Image::Pointer m_IBSI_Phantom_Mask_Large;
+  mitk::Image::Pointer m_IBSI_Phantom_Image_Small;
+  mitk::Image::Pointer m_IBSI_Phantom_Image_Large;
+  mitk::Image::Pointer m_IBSI_Phantom_Mask_Small;
+  mitk::Image::Pointer m_IBSI_Phantom_Mask_Large;
 
 public:
 

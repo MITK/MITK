@@ -54,7 +54,7 @@ public:
    * modality will only be freezed then, if the current tracking data of
    * this output is valid.
    */
-  void SetCombinedModality(mitk::USCombinedModality::Pointer combinedModality, int outputIndex = -1);
+  void SetCombinedModality(mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality, int outputIndex = -1);
 
   /**
    * \brief Try to freeze the combined modality.
@@ -73,7 +73,7 @@ public:
   void Unfreeze();
 
 private:
-  mitk::USCombinedModality::Pointer m_CombinedModality;
+  mitk::AbstractUltrasoundTrackerDevice::Pointer m_CombinedModality;
   int                               m_OutputIndex;
   bool m_FreezeButtonToggle;
 };

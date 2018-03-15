@@ -44,6 +44,7 @@ mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   : mitk::ImageSource(),
+  m_OverrideSpacing(false),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
   m_NumberOfOutputs(1),
@@ -72,6 +73,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
 
 mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
   : mitk::ImageSource(),
+  m_OverrideSpacing(false),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
   m_SpawnAcquireThread(true),
@@ -426,13 +428,14 @@ void mitk::USDevice::SetIsFreezed(bool freeze)
 
 bool mitk::USDevice::GetIsFreezed()
 {
+  /*
   if (!this->GetIsActive())
   {
     MITK_WARN("mitkUSDevice")("mitkUSTelemedDevice")
       << "Cannot get freeze state if the hardware interface is not ready. "
       "Returning false...";
     return false;
-  }
+  }*/
 
   return m_IsFreezed;
 }
@@ -572,6 +575,27 @@ std::string mitk::USDevice::GetDeviceModel() { return m_Name; }
 
 std::string mitk::USDevice::GetDeviceComment() { return m_Comment; }
 
+void mitk::USDevice::SetSpacing(double xSpacing, double ySpacing)
+{
+  m_Spacing[0] = xSpacing;
+  m_Spacing[1] = ySpacing;
+  m_Spacing[2] = 1;
+
+  m_OverrideSpacing = true;
+
+  if (m_Image.IsNotNull() && m_Image->IsInitialized())
+  {
+    m_Image->GetGeometry()->SetSpacing(m_Spacing);
+  }
+
+  MITK_INFO << "Spacing: " << m_Spacing;
+}
+
+void mitk::USDevice::SetOverrideSpacing(bool overriding)
+{
+  m_OverrideSpacing = overriding;
+}
+
 void mitk::USDevice::GenerateData()
 {
   m_ImageMutex->Lock();
@@ -603,8 +627,12 @@ void mitk::USDevice::GenerateData()
 
       output->SetGeometry(image->GetGeometry());
     }
+  if( m_OverrideSpacing )
+  {
+    m_Image->GetGeometry()->SetSpacing(m_Spacing);
   }
-  m_ImageMutex->Unlock();
+
+  }  m_ImageMutex->Unlock();
 };
 
 std::string mitk::USDevice::GetServicePropertyLabel()

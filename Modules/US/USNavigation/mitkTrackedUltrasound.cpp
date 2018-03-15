@@ -14,11 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkUSCombinedModality.h"
-//#include "mitkNavigationDataSource.h"
+#include "mitkTrackedUltrasound.h"
 #include "mitkImageReadAccessor.h"
 #include <mitkNavigationDataSmoothingFilter.h>
 #include <mitkNavigationDataDelayFilter.h>
+#include "mitkNavigationDataDisplacementFilter.h"
 #include "mitkTrackingDeviceSource.h"
 
 // US Control Interfaces
@@ -26,17 +26,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSControlInterfaceBMode.h"
 #include "mitkUSControlInterfaceDoppler.h"
 
-mitk::USCombinedModality::USCombinedModality( USDevice::Pointer usDevice,
+
+mitk::TrackedUltrasound::TrackedUltrasound( USDevice::Pointer usDevice,
                                               NavigationDataSource::Pointer trackingDevice,
                                               bool trackedUltrasoundActive )
   : AbstractUltrasoundTrackerDevice( usDevice, trackingDevice, trackedUltrasoundActive )
 {
 }
 
-mitk::USCombinedModality::~USCombinedModality()
+mitk::TrackedUltrasound::~TrackedUltrasound()
 {
+}
 
-mitk::USAbstractControlInterface::Pointer mitk::USCombinedModality::GetControlInterfaceCustom()
+
+
+
+mitk::USAbstractControlInterface::Pointer mitk::TrackedUltrasound::GetControlInterfaceCustom()
 {
   if (m_UltrasoundDevice.IsNull())
   {
@@ -47,7 +52,7 @@ mitk::USAbstractControlInterface::Pointer mitk::USCombinedModality::GetControlIn
   return m_UltrasoundDevice->GetControlInterfaceCustom();
 }
 
-mitk::USControlInterfaceBMode::Pointer mitk::USCombinedModality::GetControlInterfaceBMode()
+mitk::USControlInterfaceBMode::Pointer mitk::TrackedUltrasound::GetControlInterfaceBMode()
 {
   if (m_UltrasoundDevice.IsNull())
   {
@@ -58,7 +63,7 @@ mitk::USControlInterfaceBMode::Pointer mitk::USCombinedModality::GetControlInter
   return m_UltrasoundDevice->GetControlInterfaceBMode();
 }
 
-mitk::USControlInterfaceProbes::Pointer mitk::USCombinedModality::GetControlInterfaceProbes()
+mitk::USControlInterfaceProbes::Pointer mitk::TrackedUltrasound::GetControlInterfaceProbes()
 {
   if (m_UltrasoundDevice.IsNull())
   {
@@ -69,7 +74,7 @@ mitk::USControlInterfaceProbes::Pointer mitk::USCombinedModality::GetControlInte
   return m_UltrasoundDevice->GetControlInterfaceProbes();
 }
 
-mitk::USControlInterfaceDoppler::Pointer mitk::USCombinedModality::GetControlInterfaceDoppler()
+mitk::USControlInterfaceDoppler::Pointer mitk::TrackedUltrasound::GetControlInterfaceDoppler()
 {
   if (m_UltrasoundDevice.IsNull())
   {
@@ -81,16 +86,21 @@ mitk::USControlInterfaceDoppler::Pointer mitk::USCombinedModality::GetControlInt
 }
 
 
-void mitk::USCombinedModality::GenerateData()
+void mitk::TrackedUltrasound::GenerateData()
 {
+  //Call Update auf US-Device + evtl. auf Tracker (???)
+  MITK_INFO << "GENERATE DATA TRACKEDULTRASOUND";
   if (m_UltrasoundDevice->GetIsFreezed()) { return; } //if the image is freezed: do nothing
-  //get next image from ultrasound image source
+
+  //get actual image from ultrasound image source
   mitk::Image::Pointer image = m_UltrasoundDevice->GetOutput(); //GetUSImageSource()->GetNextImage();
+  m_UltrasoundDevice->GetUSImageSource()->GetNextImage();
   if (image.IsNull() || !image->IsInitialized()) //check the image
   {
-    MITK_WARN << "Invalid image in USCombinedModality, aborting!";
+    MITK_WARN << "Invalid image in TrackedUltrasound, aborting!";
     return;
   }
+  MITK_INFO << "GetSpacing: " << image->GetGeometry()->GetSpacing();
 
   //get output and initialize it if it wasn't initialized before
   mitk::Image::Pointer output = this->GetOutput();
@@ -111,7 +121,8 @@ void mitk::USCombinedModality::GenerateData()
     {
       // transform image according to callibration if one is set
       // for current configuration of probe and depth
-      this->GetOutput()->GetGeometry()->SetIndexToWorldTransform(calibrationIterator->second);
+      m_DisplacementFilter->SetTransformation(calibrationIterator->second);
+      //Setze Update auf Displacementfilter ????
     }
   }
 }

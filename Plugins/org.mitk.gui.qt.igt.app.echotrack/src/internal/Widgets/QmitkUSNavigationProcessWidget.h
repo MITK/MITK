@@ -57,7 +57,7 @@ signals:
   /**
    * \brief Signals a replacement of the combined modality by one of the navigation steps.
    */
-  void SignalCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality>);
+  void SignalCombinedModalityChanged(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice>);
 
   /**
    * \brief Signals a change of the navigation settings.
@@ -79,6 +79,8 @@ signals:
    */
   void SignalNavigationStepFinished(int, bool);
 
+  void SignalNextButtonClicked();
+
   /**
    * \brief Signals the creation of an intermediate result.
    * The result data is given as properties of the data node.
@@ -97,7 +99,7 @@ protected slots:
   void OnStepReady(int);
   void OnStepNoLongerReady(int);
 
-  void OnCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality>);
+  void OnCombinedModalityChanged(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice>);
   void OnSettingsChanged(const itk::SmartPointer<mitk::DataNode>);
 
 public:
@@ -106,6 +108,8 @@ public:
 
   explicit QmitkUSNavigationProcessWidget(QWidget* parent = 0);
   ~QmitkUSNavigationProcessWidget();
+
+  itk::SmartPointer<mitk::DataNode> GetSettingsNode();
 
   /**
    * \brief Setter for the data storage used for storing the navigation progress.
@@ -160,7 +164,7 @@ protected:
   itk::SmartPointer<mitk::DataNode>               m_ImageStreamNode;
   bool                                            m_ImageAlreadySetToNode;
 
-  itk::SmartPointer<mitk::USCombinedModality>     m_CombinedModality;
+  itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice>     m_CombinedModality;
 
   itk::SmartPointer<mitk::NavigationDataSource>   m_LastNavigationDataFilter;
 

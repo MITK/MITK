@@ -117,18 +117,18 @@ public:
     // These values are obtained with IBSI
     // Standard accuracy is 0.01
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Small Zone Emphasis with Large IBSI Phantom Image", 0.363, results["SliceWise Mean Grey Level Size Zone::Small Zone Emphasis"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Large Zone Emphasis with Large IBSI Phantom Image", 43.9, results["SliceWise Mean Grey Level Size Zone::Large Zone Emphasis"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Large Zone Emphasis with Large IBSI Phantom Image", 43.9, results["SliceWise Mean Grey Level Size Zone::Large Zone Emphasis"], 0.1);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Low Grey Level Emphasis with Large IBSI Phantom Image", 0.371, results["SliceWise Mean Grey Level Size Zone::Low Grey Level Emphasis"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::High Grey Level Emphasis with Large IBSI Phantom Image", 16.4, results["SliceWise Mean Grey Level Size Zone::High Grey Level Emphasis"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::High Grey Level Emphasis with Large IBSI Phantom Image", 16.4, results["SliceWise Mean Grey Level Size Zone::High Grey Level Emphasis"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Small Zone Low Grey Level Emphasis with Large IBSI Phantom Image", 0.0259, results["SliceWise Mean Grey Level Size Zone::Small Zone Low Grey Level Emphasis"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Small Zone High Grey Level Emphasis with Large IBSI Phantom Image", 10.3, results["SliceWise Mean Grey Level Size Zone::Small Zone High Grey Level Emphasis"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Small Zone High Grey Level Emphasis with Large IBSI Phantom Image", 10.3, results["SliceWise Mean Grey Level Size Zone::Small Zone High Grey Level Emphasis"], 0.1);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Large Zone Low Grey Level Emphasis with Large IBSI Phantom Image", 40.4, results["SliceWise Mean Grey Level Size Zone::Large Zone Low Grey Level Emphasis"], 1);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Large Zone High Grey Level Emphasis with Large IBSI Phantom Image", 113, results["SliceWise Mean Grey Level Size Zone::Large Zone High Grey Level Emphasis"], 1);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Grey Level Non-Uniformity with Large IBSI Phantom Image", 1.41, results["SliceWise Mean Grey Level Size Zone::Grey Level Non-Uniformity"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Grey Level Non-Uniformity Normalized with Large IBSI Phantom Image", 0.323, results["SliceWise Mean Grey Level Size Zone::Grey Level Non-Uniformity Normalized"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Grey Level Non-Uniformity with Large IBSI Phantom Image", 1.41, results["SliceWise Mean Grey Level Size Zone::Grey Level Non-Uniformity"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Grey Level Non-Uniformity Normalized with Large IBSI Phantom Image", 0.323, results["SliceWise Mean Grey Level Size Zone::Grey Level Non-Uniformity Normalized"], 0.001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Zone Size Non-Uniformity with Large IBSI Phantom Image", 1.49, results["SliceWise Mean Grey Level Size Zone::Zone Size Non-Uniformity"], 0.1);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Zone Size Non-Uniformity Normalized with Large IBSI Phantom Image", 0.333, results["SliceWise Mean Grey Level Size Zone::Zone Size Non-Uniformity Normalized"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Zone Percentage with Large IBSI Phantom Image", 0.24, results["SliceWise Mean Grey Level Size Zone::Zone Percentage"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Zone Percentage with Large IBSI Phantom Image", 0.24, results["SliceWise Mean Grey Level Size Zone::Zone Percentage"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Grey Level Variance with Large IBSI Phantom Image", 3.97, results["SliceWise Mean Grey Level Size Zone::Grey Level Variance"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Zone Size Variance with Large IBSI Phantom Image", 21, results["SliceWise Mean Grey Level Size Zone::Zone Size Variance"], 0.1);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Zone Size Entropy with Large IBSI Phantom Image", 1.93, results["SliceWise Mean Grey Level Size Zone::Zone Size Entropy"], 0.01);
@@ -136,8 +136,8 @@ public:
 
     // These values are obtained by manually running the tool
     // Values might be wrong.
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Grey Level Mean with Large IBSI Phantom Image", 3.6, results["SliceWise Mean Grey Level Size Zone::Grey Level Mean"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Zone Size Mean with Large IBSI Phantom Image", 14.8, results["SliceWise Mean Grey Level Size Zone::Zone Size Mean"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Grey Level Mean with Large IBSI Phantom Image", 3.526, results["SliceWise Mean Grey Level Size Zone::Grey Level Mean"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Grey Level Size Zone::Zone Size Mean with Large IBSI Phantom Image", 4.59524, results["SliceWise Mean Grey Level Size Zone::Zone Size Mean"], 0.001);
   }
 
 };

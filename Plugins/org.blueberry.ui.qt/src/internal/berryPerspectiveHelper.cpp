@@ -282,7 +282,7 @@ void PerspectiveHelper::Activate(QWidget* parent)
   active = true;
 }
 
-void PerspectiveHelper::AddPart(LayoutPart::Pointer part)
+void PerspectiveHelper::AddPart(LayoutPart::Pointer part, bool fixed)
 {
 
   // Look for a placeholder.
@@ -330,12 +330,12 @@ void PerspectiveHelper::AddPart(LayoutPart::Pointer part)
       }
       else
       {
-        mainLayout->AddPart(part);
+        mainLayout->AddPart(part, fixed);
       }
     }
     else
     {
-      mainLayout->AddPart(part);
+      mainLayout->AddPart(part, fixed);
     }
   }
   else

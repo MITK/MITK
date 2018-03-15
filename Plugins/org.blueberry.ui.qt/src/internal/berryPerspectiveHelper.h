@@ -195,7 +195,7 @@ public:
    * then swap the part in. Otherwise, add the part in the bottom right
    * corner of the presentation.
    */
-  void AddPart(LayoutPart::Pointer part);
+  void AddPart(LayoutPart::Pointer part, bool fixed = false);
 
   /**
    * Attaches a part that was previously detached to the mainLayout.

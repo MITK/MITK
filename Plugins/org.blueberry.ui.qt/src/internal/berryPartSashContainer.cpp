@@ -282,10 +282,10 @@ void PartSashContainer::Add(LayoutPart::Pointer child)
     return;
   }
 
-  this->AddEnhanced(child, Constants::RIGHT, 0.5f, this->FindBottomRight());
+  this->AddEnhanced(child, Constants::RIGHT, berry::IPageLayout::DEFAULT_VIEW_RATIO, this->FindBottomRight());
 }
 
-void PartSashContainer::AddPart(LayoutPart::Pointer child)
+void PartSashContainer::AddPart(LayoutPart::Pointer child, bool fixed)
 {
   if (child.IsNull())
   {
@@ -294,7 +294,14 @@ void PartSashContainer::AddPart(LayoutPart::Pointer child)
 
   PartStack::Pointer newFolder = this->CreateStack();
   newFolder->Add(child);
-  this->AddEnhanced(newFolder, Constants::RIGHT, 0.5f, this->FindBottomRight());
+  if (fixed)
+  {
+   this->AddEnhancedFixed(newFolder, Constants::RIGHT, berry::IPageLayout::DEFAULT_VIEW_SIZE, this->FindBottomRight());
+  }
+  else
+  {
+    this->AddEnhanced(newFolder, Constants::RIGHT, berry::IPageLayout::DEFAULT_VIEW_RATIO, this->FindBottomRight());
+  }
 }
 
 void PartSashContainer::AddEnhanced(LayoutPart::Pointer child,
@@ -316,6 +323,16 @@ void PartSashContainer::AddEnhanced(LayoutPart::Pointer child,
   }
 
   this->Add(child, relativePosition, ratioForUpperLeftPart, relative);
+}
+
+void PartSashContainer::AddEnhancedFixed(LayoutPart::Pointer child,
+    int directionConstant, int sizeForNewPart, LayoutPart::Pointer relative)
+{
+  int relativePosition =
+      PageLayout::ConstantToLayoutPosition(directionConstant);
+
+  // last true means right side
+  this->AddFixed(child, relativePosition, sizeForNewPart, relative, true);
 }
 
 void PartSashContainer::Add(LayoutPart::Pointer child, int relationship,
@@ -354,6 +371,51 @@ void PartSashContainer::Add(LayoutPart::Pointer child, int relationship,
 
   int left = (int) (totalSize * ratio);
   int right = totalSize - left;
+
+  this->Add(child, relationship, left, right, relative);
+}
+
+void PartSashContainer::AddFixed(LayoutPart::Pointer child, int relationship,
+    int size, LayoutPart::Pointer relative, bool rightSide)
+{
+  bool isHorizontal = (relationship == IPageLayout::LEFT || relationship
+      == IPageLayout::RIGHT);
+
+  LayoutTree::Pointer node;
+  if (root != 0 && relative != 0)
+  {
+    node = root->Find(relative);
+  }
+
+  QRect bounds;
+  if (this->GetParent() == nullptr)
+  {
+    QWidget* control = this->GetPage()->GetClientComposite();
+    if (control != nullptr)
+    {
+      bounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(control);
+    }
+    else
+    {
+      bounds = QRect(0, 0, 800, 600);
+    }
+    bounds.setX(0);
+    bounds.setY(0);
+  }
+  else
+  {
+    bounds = this->GetBounds();
+  }
+
+  int totalSize = this->MeasureTree(bounds, node, isHorizontal);
+
+  int left = size;
+  int right = totalSize - left;
+  if (rightSide)
+  {
+    left = right;
+    right = size;
+  }
 
   this->Add(child, relationship, left, right, relative);
 }

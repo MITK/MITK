@@ -183,6 +183,12 @@ struct BERRY_UI_QT IPageLayout : public Object
     static const float DEFAULT_VIEW_RATIO; // = 0.5f;
 
     /**
+     * The default view size for Fixed view parts
+     * @since ??
+     */
+    static const int DEFAULT_VIEW_SIZE; // 450
+
+    /**
      * A variable used to represent invalid  ratios.
      * @since 2.0
      */
@@ -243,6 +249,9 @@ struct BERRY_UI_QT IPageLayout : public Object
      *   or the special editor area id returned by <code>getEditorArea</code>
      */
     virtual void AddPlaceholder(const QString& viewId, int relationship, float ratio,
+            const QString& refId) = 0;
+
+    virtual void AddPlaceholderFixed(const QString& viewId, int relationship, int size,
             const QString& refId) = 0;
 
     /**
@@ -436,6 +445,8 @@ struct BERRY_UI_QT IPageLayout : public Object
     virtual void AddStandaloneView(const QString& viewId, bool showTitle,
             int relationship, float ratio, const QString& refId) = 0;
 
+    virtual void AddStandaloneViewFixed(const QString& viewId, bool showTitle,
+            int relationship, int size, const QString& refId) = 0;
     /**
    * Adds a standalone view placeholder to this page layout. A view
    * placeholder is used to define the position of a view before the view
@@ -475,6 +486,8 @@ struct BERRY_UI_QT IPageLayout : public Object
     virtual void AddStandaloneViewPlaceholder(const QString& viewId, int relationship,
       float ratio, const QString& refId, bool showTitle) = 0;
 
+    virtual void AddStandaloneViewPlaceholderFixed(const QString& viewId, int relationship,
+      int size, const QString& refId, bool showTitle) = 0;
 
     /**
    * Returns the perspective descriptor for the perspective being layed out.

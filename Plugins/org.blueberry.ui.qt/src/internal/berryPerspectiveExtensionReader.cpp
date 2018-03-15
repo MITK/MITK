@@ -119,7 +119,7 @@ bool PerspectiveExtensionReader::ProcessShowInPart(
 }
 
 bool PerspectiveExtensionReader::ProcessView(
-    const IConfigurationElement::Pointer& element)
+    const IConfigurationElement::Pointer& element, bool useRatio)
 {
   // Get id, relative, and relationship.
   QString id = element->GetAttribute(WorkbenchRegistryConstants::ATT_ID);
@@ -139,69 +139,68 @@ bool PerspectiveExtensionReader::ProcessView(
   }
 
   if (VAL_FAST != relationship && relative.isEmpty())
-    {
-      this->LogError(element, "Attribute '" + WorkbenchRegistryConstants::ATT_RELATIVE
-          + "' not defined.  This attribute is required when "
-          + WorkbenchRegistryConstants::ATT_RELATIONSHIP + "=\"" + relationship
-          + "\"."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-      return false;
-    }
-
-    // Get relationship details.
-    bool stack = false;
-    //bool fast = false;
-    int intRelation = 0;
-    if (relationship == VAL_LEFT)
-    {
-      intRelation = IPageLayout::LEFT;
-    }
-    else if (relationship == VAL_RIGHT)
-    {
-      intRelation = IPageLayout::RIGHT;
-    }
-    else if (relationship == VAL_TOP)
-    {
-      intRelation = IPageLayout::TOP;
-    }
-    else if (relationship == VAL_BOTTOM)
-    {
-      intRelation = IPageLayout::BOTTOM;
-    }
-    else if (relationship == VAL_STACK)
-    {
-      stack = true;
-    }
-//    else if (relationship == VAL_FAST)
-//    {
-//      fast = true;
-//    }
-    else
-    {
-      return false;
-    }
-
-
-
-  float ratio = 0.5f;
-  QString ratioString = element->GetAttribute(WorkbenchRegistryConstants::ATT_RATIO);
-  if (!ratioString.isEmpty())
   {
-    bool ok = false;
-    ratio = ratioString.toFloat(&ok);
-    if (!ok) return false;
+    this->LogError(element, "Attribute '" + WorkbenchRegistryConstants::ATT_RELATIVE
+        + "' not defined.  This attribute is required when "
+        + WorkbenchRegistryConstants::ATT_RELATIONSHIP + "=\"" + relationship
+        + "\"."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    return false;
+  }
 
-    // If the ratio is outside the allowable range, mark it as invalid.
-    if (ratio < IPageLayout::RATIO_MIN || ratio > IPageLayout::RATIO_MAX)
-    {
-      ratio = IPageLayout::INVALID_RATIO;
-    }
+  // Get relationship details.
+  bool stack = false;
+  //bool fast = false;
+  int intRelation = 0;
+  if (relationship == VAL_LEFT)
+  {
+    intRelation = IPageLayout::LEFT;
+  }
+  else if (relationship == VAL_RIGHT)
+  {
+    intRelation = IPageLayout::RIGHT;
+  }
+  else if (relationship == VAL_TOP)
+  {
+    intRelation = IPageLayout::TOP;
+  }
+  else if (relationship == VAL_BOTTOM)
+  {
+    intRelation = IPageLayout::BOTTOM;
+  }
+  else if (relationship == VAL_STACK)
+  {
+    stack = true;
   }
   else
   {
-    // The ratio has not been specified.
-    ratio = IPageLayout::NULL_RATIO;
+    return false;
   }
 
+  // defaults
+  float ratio = IPageLayout::DEFAULT_VIEW_RATIO;
+  int size = IPageLayout::DEFAULT_VIEW_SIZE;
+
+  if (useRatio)
+  {
+    QString ratioString = element->GetAttribute(WorkbenchRegistryConstants::ATT_RATIO);
+    if (!ratioString.isEmpty())
+    {
+      bool ok = false;
+      ratio = ratioString.toFloat(&ok);
+      if (!ok) return false;
+
+      // If the ratio is outside the allowable range, mark it as invalid.
+      if (ratio < IPageLayout::RATIO_MIN || ratio > IPageLayout::RATIO_MAX)
+      {
+        ratio = IPageLayout::INVALID_RATIO;
+      }
+    }
+    else
+    {
+      // The ratio has not been specified.
+      ratio = IPageLayout::NULL_RATIO;
+    }
+  }
 
   QString strVisible = element->GetAttribute(WorkbenchRegistryConstants::ATT_VISIBLE);
   bool visible = (VAL_TRUE == strVisible);
@@ -238,39 +237,43 @@ bool PerspectiveExtensionReader::ProcessView(
       pageLayout->StackPlaceholder(id, relative);
     }
   }
-//  // If the view is a fast view...
-//  else if (fast)
-//  {
-//    if (ratio == IPageLayout::NULL_RATIO)
-//    {
-//      // The ratio has not been specified.
-//      pageLayout->AddFastView(id);
-//    }
-//    else
-//    {
-//      pageLayout->AddFastView(id, ratio);
-//    }
-//  }
   else
   {
 
     // The view is a regular view.
     // If the ratio is not specified or is invalid, use the default ratio.
-    if (ratio == IPageLayout::NULL_RATIO || ratio == IPageLayout::INVALID_RATIO)
-    {
-      ratio = IPageLayout::DEFAULT_VIEW_RATIO;
+    if (useRatio) {
+      if (ratio == IPageLayout::NULL_RATIO || ratio == IPageLayout::INVALID_RATIO)
+      {
+        ratio = IPageLayout::DEFAULT_VIEW_RATIO;
+      }
     }
 
     if (visible)
     {
       if (VAL_TRUE == standalone)
       {
-        pageLayout->AddStandaloneView(id, VAL_TRUE == showTitle,
-            intRelation, ratio, relative);
+        if (useRatio)
+        {
+          pageLayout->AddStandaloneView(id, VAL_TRUE == showTitle,
+              intRelation, ratio, relative);
+        }
+        else
+        {
+          pageLayout->AddStandaloneViewFixed(id, VAL_TRUE == showTitle,
+              intRelation, size, relative);
+        }
       }
       else
       {
-        pageLayout->AddView(id, intRelation, ratio, relative, minimized);
+        if (useRatio)
+        {
+          pageLayout->AddView(id, intRelation, ratio, relative, minimized);
+        }
+        else
+        {
+          pageLayout->AddViewFixed(id, intRelation, size, relative, minimized);
+        }
       }
     }
     else
@@ -279,12 +282,27 @@ bool PerspectiveExtensionReader::ProcessView(
       // Adding standalone placeholder for standalone views
       if (VAL_TRUE == standalone)
       {
-        pageLayout->AddStandaloneViewPlaceholder(id, intRelation, ratio,
-            relative, VAL_TRUE == showTitle);
+        if (useRatio)
+        {
+          pageLayout->AddStandaloneViewPlaceholder(id, intRelation, ratio,
+              relative, VAL_TRUE == showTitle);
+        }
+        else
+        {
+          pageLayout->AddStandaloneViewPlaceholderFixed(id, intRelation, size,
+              relative, VAL_TRUE == showTitle);
+        }
       }
       else
       {
-        pageLayout->AddPlaceholder(id, intRelation, ratio, relative);
+        if (useRatio)
+        {
+          pageLayout->AddPlaceholder(id, intRelation, ratio, relative);
+        }
+        else
+        {
+          pageLayout->AddPlaceholderFixed(id, intRelation, size, relative);
+        }
       }
     }
   }

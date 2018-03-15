@@ -92,7 +92,7 @@ private:
   /**
    * Process a view
    */
-  bool ProcessView(const IConfigurationElement::Pointer& element);
+  bool ProcessView(const IConfigurationElement::Pointer& element, bool useRatio = false);
 
   /**
    * Process a view shortcut

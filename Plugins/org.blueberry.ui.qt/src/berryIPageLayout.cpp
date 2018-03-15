@@ -52,6 +52,8 @@ const float IPageLayout::RATIO_MAX = 0.95f;
 
 const float IPageLayout::DEFAULT_VIEW_RATIO = 0.5f;
 
+const int IPageLayout::DEFAULT_VIEW_SIZE = 450;
+
 const float IPageLayout::INVALID_RATIO = -1.0;
 
 const float IPageLayout::NULL_RATIO = -2.0;

@@ -30,10 +30,10 @@ class mitkGIFVolumetricDensityStatisticsTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-	mitk::Image::Pointer m_IBSI_Phantom_Image_Small;
-	mitk::Image::Pointer m_IBSI_Phantom_Image_Large;
-	mitk::Image::Pointer m_IBSI_Phantom_Mask_Small;
-	mitk::Image::Pointer m_IBSI_Phantom_Mask_Large;
+  mitk::Image::Pointer m_IBSI_Phantom_Image_Small;
+  mitk::Image::Pointer m_IBSI_Phantom_Image_Large;
+  mitk::Image::Pointer m_IBSI_Phantom_Mask_Small;
+  mitk::Image::Pointer m_IBSI_Phantom_Mask_Large;
 
 public:
 
@@ -69,7 +69,7 @@ public:
     // These values are obtained by a run of the filter.
     // The might be wrong!
 
-    // These values are obtained in collaboration with IBSI. 
+    // These values are obtained in collaboration with IBSI.
     // They are usually reported with an accuracy of 0.01
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume integrated intensity with Large IBSI Phantom Image", 1195, results["Morphological Density::Volume integrated intensity"], 1.0);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Moran's I index with Large IBSI Phantom Image", 0.0397, results["Morphological Density::Volume Moran's I index"], 0.0001);
@@ -78,7 +78,7 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Surface Volume density axis-aligned bounding box with Large IBSI Phantom Image", 0.87, results["Morphological Density::Surface density axis-aligned bounding box"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Volume oriented minimum bounding box with Large IBSI Phantom Image", 0.87, results["Morphological Density::Volume density oriented minimum bounding box"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Surface Volume oriented minimum bounding box with Large IBSI Phantom Image", 0.86, results["Morphological Density::Surface density oriented minimum bounding box"], 0.01);
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Volume approx. enclosing ellipsoid with Large IBSI Phantom Image", 1.17, results["Morphological Density::Volume density approx. enclosing ellipsoid"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Surface Volume approx. enclosing ellipsoid with Large IBSI Phantom Image", 1.34, results["Morphological Density::Surface density approx. enclosing ellipsoid"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Morphological Density::Volume Volume minimum volume enclosing ellipsoid with Large IBSI Phantom Image", 0.24, results["Morphological Density::Volume density approx. minimum volume enclosing ellipsoid"], 0.01);

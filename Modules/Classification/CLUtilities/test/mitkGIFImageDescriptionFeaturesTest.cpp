@@ -30,10 +30,10 @@ class mitkGIFImageDescriptionFeaturesTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-	mitk::Image::Pointer m_IBSI_Phantom_Image_Small;
-	mitk::Image::Pointer m_IBSI_Phantom_Image_Large;
-	mitk::Image::Pointer m_IBSI_Phantom_Mask_Small;
-	mitk::Image::Pointer m_IBSI_Phantom_Mask_Large;
+  mitk::Image::Pointer m_IBSI_Phantom_Image_Small;
+  mitk::Image::Pointer m_IBSI_Phantom_Image_Large;
+  mitk::Image::Pointer m_IBSI_Phantom_Mask_Small;
+  mitk::Image::Pointer m_IBSI_Phantom_Mask_Large;
 
 public:
 
@@ -58,12 +58,12 @@ public:
     }
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 22 features.", std::size_t(22), featureList.size());
 
-    // These values are calculated obtained by using this filter. Changes, especially with mean values could happen. 
+    // These values are calculated obtained by using this filter. Changes, especially with mean values could happen.
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Image Dimension X should be 7 with Large IBSI Phantom Image", int(7), int(results["Diagnostic::Image Dimension X"]));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Image Dimension Y should be 6 with Large IBSI Phantom Image", int(6), int(results["Diagnostic::Image Dimension Y"]));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Image Dimension Z should be 6 with Large IBSI Phantom Image", int(6), int(results["Diagnostic::Image Dimension Z"]));
-    
+
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Image Spacing X should be 2 with Large IBSI Phantom Image", 2.0, results["Diagnostic::Image Spacing X"], 0.0001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Image Spacing Y should be 2 with Large IBSI Phantom Image", 2.0, results["Diagnostic::Image Spacing Y"], 0.0001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Image Spacing Z should be 2 with Large IBSI Phantom Image", 2.0, results["Diagnostic::Image Spacing Z"], 0.0001);
@@ -71,7 +71,7 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Image Mean intensity should be 0.6865 with Large IBSI Phantom Image", 0.686508, results["Diagnostic::Image Mean intensity"], 0.0001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Image Minimum intensity should be 0 with Large IBSI Phantom Image", 0, results["Diagnostic::Image Minimum intensity"], 0.0001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Diagnostic::Image Maximum intensity should be 9 with Large IBSI Phantom Image", 9, results["Diagnostic::Image Maximum intensity"], 0.0001);
-    
+
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Mask Dimension X should be 7 with Large IBSI Phantom Image", int(7), int(results["Diagnostic::Mask Dimension X"]));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Mask Dimension Y should be 6 with Large IBSI Phantom Image", int(6), int(results["Diagnostic::Mask Dimension Y"]));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Diagnostic::Mask Dimension Z should be 6 with Large IBSI Phantom Image", int(6), int(results["Diagnostic::Mask Dimension Z"]));

@@ -31,10 +31,10 @@ class mitkGIFNeighbouringGreyLevelDependenceFeatureTestSuite : public mitk::Test
   CPPUNIT_TEST_SUITE_END();
 
 private:
-	mitk::Image::Pointer m_IBSI_Phantom_Image_Small;
-	mitk::Image::Pointer m_IBSI_Phantom_Image_Large;
-	mitk::Image::Pointer m_IBSI_Phantom_Mask_Small;
-	mitk::Image::Pointer m_IBSI_Phantom_Mask_Large;
+  mitk::Image::Pointer m_IBSI_Phantom_Image_Small;
+  mitk::Image::Pointer m_IBSI_Phantom_Image_Large;
+  mitk::Image::Pointer m_IBSI_Phantom_Mask_Small;
+  mitk::Image::Pointer m_IBSI_Phantom_Mask_Large;
 
 public:
 
@@ -88,7 +88,7 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Dependence Count Energy with Large IBSI Phantom Image", 0.0533, results["Neighbouring Grey Level Dependence::Dependence Count Energy"], 0.01);
 
     // These values are obtained by manually running the tool
-    // Values might be wrong. 
+    // Values might be wrong.
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Grey Level Mean with Large IBSI Phantom Image", 2.15, results["Neighbouring Grey Level Dependence::Grey Level Mean"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Dependence Count Mean with Large IBSI Phantom Image", 9.32, results["Neighbouring Grey Level Dependence::Dependence Count Mean"], 0.1);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Neighbouring Grey Level Dependence::Expected Neighbourhood Size with Large IBSI Phantom Image", 26, results["Neighbouring Grey Level Dependence::Expected Neighbourhood Size"], 0.01);
@@ -140,7 +140,7 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Neighbouring Grey Level Dependence::Dependence Count Energy with Large IBSI Phantom Image", 0.17, results["SliceWise Mean Neighbouring Grey Level Dependence::Dependence Count Energy"], 0.01);
 
     // These values are obtained by manually running the tool
-    // Values might be wrong. 
+    // Values might be wrong.
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Neighbouring Grey Level Dependence::Grey Level Mean with Large IBSI Phantom Image", 2.12, results["SliceWise Mean Neighbouring Grey Level Dependence::Grey Level Mean"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Neighbouring Grey Level Dependence::Dependence Count Mean with Large IBSI Phantom Image", 3.98, results["SliceWise Mean Neighbouring Grey Level Dependence::Dependence Count Mean"], 0.1);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Neighbouring Grey Level Dependence::Expected Neighbourhood Size with Large IBSI Phantom Image", 8, results["SliceWise Mean Neighbouring Grey Level Dependence::Expected Neighbourhood Size"], 0.01);

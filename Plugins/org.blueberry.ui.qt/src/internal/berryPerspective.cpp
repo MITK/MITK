@@ -1712,7 +1712,8 @@ IViewPart::Pointer Perspective::ShowView(const QString& viewId, const QString& s
 //        bool inMaximizedStack = vPart != 0 && vPart.getContainer() == presentation.getMaximizedStack();
 
         // Do the default behavior
-        presentation->AddPart(pane);
+        // true - means it's fix sized / not with ratio 0.5
+        presentation->AddPart(pane, true);
 
 //        // Now, if we're maximized then we have to minimize the new stack
 //        if (presentation.getMaximizedStack() != 0 && !inMaximizedStack)

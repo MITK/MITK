@@ -116,6 +116,32 @@ void PageLayout::AddPart(LayoutPart::Pointer newPart,
   }
 }
 
+void PageLayout::AddPartFixed(LayoutPart::Pointer newPart,
+    const QString& partId, int relationship, int size,
+    const QString& refId)
+{
+  this->SetRefPart(partId, newPart);
+
+  // If the referenced part is inside a folder,
+  // then use the folder as the reference part.
+  LayoutPart::Pointer refPart = this->GetFolderPart(refId);
+  if (refPart == 0)
+  {
+    refPart = this->GetRefPart(refId);
+  }
+
+  // Add it to the layout.
+  if (refPart != 0)
+  {
+    rootLayoutContainer->AddFixed(newPart, this->GetPartSashConst(relationship), size, refPart);
+  }
+  else
+  {
+    WorkbenchPlugin::Log("Reference part does not exist yet: " + refId);
+    rootLayoutContainer->Add(newPart);
+  }
+}
+
 void PageLayout::AddPerspectiveShortcut(const QString& id)
 {
   if (!perspectiveShortcuts.contains(id))
@@ -135,6 +161,21 @@ void PageLayout::AddPlaceholder(const QString& viewId, int relationship,
   // Create the placeholder.
   PartPlaceholder::Pointer newPart(new PartPlaceholder(viewId));
   this->AddPart(newPart, viewId, relationship, ratio, refId);
+  // force creation of the view layout rec
+  this->GetViewLayoutRec(viewId, true);
+}
+
+void PageLayout::AddPlaceholderFixed(const QString& viewId, int relationship,
+    int size, const QString& refId)
+{
+  if (!this->CheckValidPlaceholderId(viewId))
+  {
+    return;
+  }
+
+  // Create the placeholder.
+  PartPlaceholder::Pointer newPart(new PartPlaceholder(viewId));
+  this->AddPartFixed(newPart, viewId, relationship, size, refId);
   // force creation of the view layout rec
   this->GetViewLayoutRec(viewId, true);
 }
@@ -195,6 +236,12 @@ void PageLayout::AddView(const QString& viewId, int relationship,
   this->AddView(viewId, relationship, ratio, refId, minimized, false, true);
 }
 
+void PageLayout::AddViewFixed(const QString& viewId, int relationship,
+    int size, const QString& refId, bool minimized)
+{
+  this->AddViewFixed(viewId, relationship, size, refId, minimized, false, true);
+}
+
 void PageLayout::AddView(const QString& viewId, int relationship,
     float ratio, const QString& refId, bool /*minimized*/, bool standalone,
     bool showTitle)
@@ -235,6 +282,65 @@ void PageLayout::AddView(const QString& viewId, int relationship,
       newFolder->Add(newPart);
       this->SetFolderPart(viewId, newFolder);
       this->AddPart(newFolder, viewId, relationship, ratio, refId);
+      // force creation of the view layout rec
+      this->GetViewLayoutRec(viewId, true);
+
+      // Capture any minimized stacks
+//      if (minimized)
+//      {
+//        // Remember the minimized stacks so we can
+//        // move them to the trim when the Perspective
+//        // activates...
+//        minimizedStacks.add(newFolder);
+//      }
+    }
+  }
+  catch (PartInitException& e)
+  {
+    WorkbenchPlugin::Log(this->GetClassName(), "AddView()", e); //$NON-NLS-1$
+  }
+}
+
+void PageLayout::AddViewFixed(const QString& viewId, int relationship,
+    int size, const QString& refId, bool /*minimized*/, bool standalone,
+    bool showTitle)
+{
+  this->AddShowViewShortcut(viewId);
+  if (this->CheckPartInLayout(viewId))
+  {
+    return;
+  }
+
+  try
+  {
+    // Create the part.
+    LayoutPart::Pointer newPart = this->CreateView(viewId);
+    if (newPart == 0)
+    {
+      this->AddPlaceholderFixed(viewId, relationship, size, refId);
+      LayoutHelper::AddViewActivator(PageLayout::Pointer(this), viewId);
+    }
+    else
+    {
+      int appearance = PresentationFactoryUtil::ROLE_VIEW;
+      if (standalone)
+      {
+        if (showTitle)
+        {
+          appearance = PresentationFactoryUtil::ROLE_STANDALONE;
+        }
+        else
+        {
+          appearance = PresentationFactoryUtil::ROLE_STANDALONE_NOTITLE;
+        }
+      }
+
+      // PartStack for views
+      PartStack::Pointer newFolder(new PartStack(rootLayoutContainer->page,
+          true, appearance, nullptr));
+      newFolder->Add(newPart);
+      this->SetFolderPart(viewId, newFolder);
+      this->AddPartFixed(newFolder, viewId, relationship, size, refId);
       // force creation of the view layout rec
       this->GetViewLayoutRec(viewId, true);
 
@@ -578,6 +684,15 @@ void PageLayout::AddStandaloneView(const QString& viewId, bool showTitle,
   rec->showTitle = showTitle;
 }
 
+void PageLayout::AddStandaloneViewFixed(const QString& viewId, bool showTitle,
+    int relationship, int size, const QString& refId)
+{
+  this->AddViewFixed(viewId, relationship, size, refId, false, true, showTitle);
+  ViewLayoutRec::Pointer rec = this->GetViewLayoutRec(viewId, true);
+  rec->isStandalone = true;
+  rec->showTitle = showTitle;
+}
+
 void PageLayout::AddStandaloneViewPlaceholder(const QString& viewId,
     int relationship, float ratio, const QString& refId, bool showTitle)
 {
@@ -602,6 +717,42 @@ void PageLayout::AddStandaloneViewPlaceholder(const QString& viewId,
       appearance, nullptr)));
   folder->SetID(stackId);
   this->AddPart(folder, stackId, relationship, ratio, refId);
+
+  // Create a wrapper.
+  PlaceholderFolderLayout::Pointer placeHolder(new PlaceholderFolderLayout(this, folder));
+
+  // Add the standalone view immediately
+  placeHolder->AddPlaceholder(viewId);
+
+  ViewLayoutRec::Pointer rec = this->GetViewLayoutRec(viewId, true);
+  rec->isStandalone = true;
+  rec->showTitle = showTitle;
+}
+
+void PageLayout::AddStandaloneViewPlaceholderFixed(const QString& viewId,
+    int relationship, int size, const QString& refId, bool showTitle)
+{
+
+  QString stackId = viewId + ".standalonefolder"; //$NON-NLS-1$
+
+  // Check to see if the view is already in the layout
+  if (!this->CheckValidPlaceholderId(viewId))
+  {
+    return;
+  }
+
+  // Create the folder.
+  ContainerPlaceholder::Pointer folder(new ContainerPlaceholder(""));
+  folder->SetContainer(rootLayoutContainer);
+  int appearance = PresentationFactoryUtil::ROLE_STANDALONE;
+  if (!showTitle)
+  {
+    appearance = PresentationFactoryUtil::ROLE_STANDALONE_NOTITLE;
+  }
+  folder->SetRealContainer(ILayoutContainer::Pointer(new PartStack(rootLayoutContainer->page, true,
+      appearance, nullptr)));
+  folder->SetID(stackId);
+  this->AddPartFixed(folder, stackId, relationship, size, refId);
 
   // Create a wrapper.
   PlaceholderFolderLayout::Pointer placeHolder(new PlaceholderFolderLayout(this, folder));

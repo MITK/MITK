@@ -219,6 +219,9 @@ private:
   void AddPart(LayoutPart::Pointer newPart, const QString& partId,
                int relationship, float ratio, const QString& refId);
 
+  void AddPartFixed(LayoutPart::Pointer newPart, const QString& partId,
+               int relationship, int size, const QString& refId);
+
   /**
    * Adds a perspective shortcut to the Perspective menu.
    * The id must name a perspective extension contributed to the
@@ -234,6 +237,9 @@ public:
    */
 public:
   void AddPlaceholder(const QString& viewId, int relationship, float ratio,
+      const QString& refId) override;
+
+  void AddPlaceholderFixed(const QString& viewId, int relationship, int size,
       const QString& refId) override;
 
   /**
@@ -278,6 +284,9 @@ public:
   void AddView(const QString& viewId, int relationship, float ratio,
       const QString& refId, bool minimized);
 
+  void AddViewFixed(const QString& viewId, int relationship, int size,
+      const QString& refId, bool minimized);
+
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#addView(java.lang.String, int, float, java.lang.String)
    */
@@ -287,9 +296,10 @@ private:
           const QString& refId, bool minimized, bool standalone,
           bool showTitle);
 
-  //    public: List getMinimizedStacks() {
-  //      return minimizedStacks;
-  //    }
+  void
+      AddViewFixed(const QString& viewId, int relationship, int size,
+          const QString& refId, bool minimized, bool standalone,
+          bool showTitle);
 
   /**
    * Verify that the part is already present in the layout
@@ -546,12 +556,18 @@ public:
   void AddStandaloneView(const QString& viewId, bool showTitle,
       int relationship, float ratio, const QString& refId) override;
 
+  void AddStandaloneViewFixed(const QString& viewId, bool showTitle,
+      int relationship, int size, const QString& refId) override;
+
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#addStandaloneViewPlaceholder(java.lang.String, int, float, java.lang.String, boolean)
    */
 public:
   void AddStandaloneViewPlaceholder(const QString& viewId,
       int relationship, float ratio, const QString& refId, bool showTitle) override;
+
+  void AddStandaloneViewPlaceholderFixed(const QString& viewId,
+      int relationship, int size, const QString& refId, bool showTitle) override;
 
   /*
    * (non-Javadoc)

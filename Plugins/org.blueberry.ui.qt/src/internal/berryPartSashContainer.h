@@ -120,7 +120,7 @@ private:
   class SashContainerDropTarget : public AbstractDropTarget {
     private:
 
-      int side;
+    int side;
     int cursor;
 
     // This is a ILayoutPart or ILayoutContainer
@@ -199,7 +199,7 @@ public:
    */
   virtual void Add(LayoutPart::Pointer child) override;
 
-  virtual void AddPart(LayoutPart::Pointer child);
+  virtual void AddPart(LayoutPart::Pointer child, bool fixed = false);
 
   /**
    * Add a part relative to another. For compatibility only. New code should use
@@ -213,6 +213,8 @@ public:
   virtual void Add(LayoutPart::Pointer child, int relationship, float ratio,
           LayoutPart::Pointer relative);
 
+  virtual void AddFixed(LayoutPart::Pointer child, int relationship, int size,
+          LayoutPart::Pointer relative, bool rightSide = false);
 
 protected:
   virtual void DropObject(const QList<PartPane::Pointer>& toDrop,
@@ -235,6 +237,9 @@ protected:
 protected:
   virtual void AddEnhanced(LayoutPart::Pointer child, int swtDirectionConstant,
       float ratioForNewPart, LayoutPart::Pointer relative);
+
+  virtual void AddEnhancedFixed(LayoutPart::Pointer child, int swtDirectionConstant,
+      int sizeForNewPart, LayoutPart::Pointer relative);
 
 protected:
   static int MeasureTree(const QRect& outerBounds,

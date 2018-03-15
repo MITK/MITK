@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QFrame>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QKeyEvent>
 
 namespace berry
@@ -65,41 +64,26 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
   viewForm = new QtControlWidget(parent, nullptr);
   viewForm->setObjectName("ViewForm");
   viewForm->installEventFilter(this);
-  auto   layout = new QVBoxLayout(viewForm);
+  auto   layout = new QVBoxLayout;
   layout->setContentsMargins(0,0,0,0);
   layout->setSpacing(0);
   viewForm->setLayout(layout);
 
   connect(viewForm, SIGNAL(destroyed(QObject*)), this, SLOT(ViewFormDestroyed(QObject*)));
 
-  auto   topControls = new QWidget(viewForm);
-  //topControls->setMinimumSize(0, 24);
-  //topControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  layout->addWidget(topControls);
-  auto   topLayout = new QHBoxLayout(topControls);
-  topLayout->setContentsMargins(0, 0, 0, 0);
-  topLayout->setSpacing(0);
-
-  tabControl = new QCTabBar(topControls);
+  tabControl = new QCTabBar;
   tabControl->installEventFilter(this);
-  //tabControl->setMinimumSize(0, 25);
-  //tabControl->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  topLayout->addWidget(tabControl);
-
-  auto   topRightControls = new QFrame(topControls);
-  topRightControls->setObjectName("TabTopRightControls");
-  //topRightControls->setMinimumSize(6, 25);
-  //topRightControls->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  topLayout->addWidget(topRightControls);
+  tabControl->setMinimumSize(0, 27);
+  tabControl->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+  layout->addWidget(tabControl);
 
   contentFrame = new QFrame(viewForm);
   contentFrame->setObjectName("ViewFormContentFrame");
   contentFrame->installEventFilter(this);
   contentFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  auto   contentFrameLayout = new QVBoxLayout(contentFrame);
-  contentFrameLayout->setContentsMargins(0,0,0,0);
+  auto contentFrameLayout = new QVBoxLayout(contentFrame);
+  contentFrameLayout->setContentsMargins(0, 0, 0, 0);
   contentFrameLayout->setSpacing(0);
-
   layout->addWidget(contentFrame);
 
   this->connect(tabControl, SIGNAL(currentChanged(int)), this,

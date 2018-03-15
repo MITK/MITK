@@ -21,9 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkGIFNeighbouringGreyLevelDependenceFeatures.h>
 
-class mitkGIFNeighbouringGreyLevelDependenceFeatureTestSuite : public mitk::TestFixture
+class mitkmitkGIFGreyLevelDistanceZoneTestTestSuite : public mitk::TestFixture
 {
-  CPPUNIT_TEST_SUITE(mitkGIFNeighbouringGreyLevelDependenceFeatureTestSuite );
+  CPPUNIT_TEST_SUITE(mitkmitkGIFGreyLevelDistanceZoneTestTestSuite );
 
   MITK_TEST(ImageDescription_PhantomTest_3D);
   MITK_TEST(ImageDescription_PhantomTest_2D);
@@ -152,4 +152,4 @@ public:
 
 };
 
-MITK_TEST_SUITE_REGISTRATION(mitkGIFNeighbouringGreyLevelDependenceFeature )
+MITK_TEST_SUITE_REGISTRATION(mitkmitkGIFGreyLevelDistanceZoneTestTestSuite )

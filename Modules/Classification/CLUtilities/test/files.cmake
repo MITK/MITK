@@ -1,5 +1,4 @@
 set(MODULE_TESTS
-  #mitkSmoothedClassProbabilitesTest.cpp
   mitkGIFCurvatureStatisticTest
   mitkGIFFirstOrderHistogramStatisticsTest
   mitkGIFImageDescriptionFeaturesTest
@@ -8,5 +7,6 @@ set(MODULE_TESTS
   mitkGIFNeighbouringGreyLevelDependenceFeatureTest
   mitkGIFVolumetricDensityStatisticsTest
   mitkGIFVolumetricStatisticsTest
+  #mitkSmoothedClassProbabilitesTest.cpp
   #mitkGlobalFeaturesTest.cpp
 )

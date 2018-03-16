@@ -45,7 +45,6 @@ namespace mitk {
       bool ComputePivotResult();
 
       itkGetMacro(ResultPivotPoint,mitk::Point3D);
-      itkGetMacro(ResultPivotRotation,mitk::Quaternion);
       itkGetMacro(ResultRMSError,double);
 
 
@@ -59,7 +58,6 @@ namespace mitk {
       bool ComputePivotAxis();
 
       mitk::Point3D m_ResultPivotPoint;
-      mitk::Quaternion m_ResultPivotRotation;
       double m_ResultRMSError;
 
     };

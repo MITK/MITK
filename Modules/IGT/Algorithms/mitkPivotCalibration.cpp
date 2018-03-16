@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vnl/vnl_vector.h"
 #include <vtkMatrix4x4.h>
 
-mitk::PivotCalibration::PivotCalibration() : m_NavigationDatas(std::vector<mitk::NavigationData::Pointer>()), m_ResultPivotRotation(mitk::Quaternion(0, 0, 0, 1))
+mitk::PivotCalibration::PivotCalibration() : m_NavigationDatas(std::vector<mitk::NavigationData::Pointer>()), m_ResultPivotPoint(mitk::Point3D(0.0))
 {
 
 

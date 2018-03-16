@@ -57,9 +57,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkPolyData.h"
 #include "vtkSelectEnclosedPoints.h"
 #include "vtkSmartPointer.h"
-#include "vtkSphereSource.h"
+#include <vtkSphereSource.h>
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkWarpScalar.h"
+
 
 QmitkUSNavigationStepMarkerIntervention::QmitkUSNavigationStepMarkerIntervention(QWidget *parent)
   : QmitkUSAbstractNavigationStep(parent),
@@ -433,12 +434,12 @@ void QmitkUSNavigationStepMarkerIntervention::OnTargetLeft()
   mitk::Surface::Pointer zone = mitk::Surface::New();
 
   // create a vtk sphere with given radius
-  vtkSphereSource *vtkData = vtkSphereSource::New();
-  vtkData->SetRadius(5);
-  vtkData->SetCenter(0, 0, 0);
-  vtkData->Update();
-  zone->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
+  vtkSmartPointer<vtkSphereSource> vtkSphere = vtkSmartPointer<vtkSphereSource>::New();
+  vtkSphere->SetRadius(5);
+  vtkSphere->SetCenter(0, 0, 0);
+  vtkSphere->Update();
+  zone->SetVtkPolyData(vtkSphere->GetOutput());
+  vtkSphere->Delete();
 
   // set vtk sphere and origin to data node
   node->SetData(zone);

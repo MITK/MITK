@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurface.h"
 #include "mitkInteractionPositionEvent.h"
 
-#include "vtkSphereSource.h"
+#include <vtkSphereSource.h>
 
 const char* mitk::USZonesInteractor::DATANODE_PROPERTY_SIZE = "zone.size";
 const char* mitk::USZonesInteractor::DATANODE_PROPERTY_CREATED = "zone.created";
@@ -47,14 +47,14 @@ void mitk::USZonesInteractor::UpdateSurface(mitk::DataNode::Pointer dataNode)
   mitk::Surface::Pointer zone = mitk::Surface::New();
 
   // create a vtk sphere with given radius
-  vtkSphereSource *vtkData = vtkSphereSource::New();
-  vtkData->SetRadius(radius);
-  vtkData->SetCenter(0, 0, 0);
-  vtkData->SetPhiResolution(20);
-  vtkData->SetThetaResolution(20);
-  vtkData->Update();
-  zone->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
+  vtkSmartPointer<vtkSphereSource> vtkSphere = vtkSmartPointer<vtkSphereSource>::New();
+  vtkSphere->SetRadius(radius);
+  vtkSphere->SetCenter(0, 0, 0);
+  vtkSphere->SetPhiResolution(20);
+  vtkSphere->SetThetaResolution(20);
+  vtkSphere->Update();
+  zone->SetVtkPolyData(vtkSphere->GetOutput());
+  //vtkSphere->Delete();
 
   // set vtk sphere and origin to data node (origin must be set
   // again, because of the new sphere set as data)

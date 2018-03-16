@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk image
 #include <mitkImage.h>
 
+//VTK
+#include "vtkSmartPointer.h"
 const std::string OpenIGTLinkPlugin::VIEW_ID = "org.mitk.views.openigtlinkplugin";
 
 void OpenIGTLinkPlugin::SetFocus()
@@ -145,13 +147,13 @@ void OpenIGTLinkPlugin::ReceivingButtonClicked()
 
       //create small sphere and use it as surface
       mitk::Surface::Pointer mySphere = mitk::Surface::New();
-      vtkSphereSource *vtkData = vtkSphereSource::New();
-      vtkData->SetRadius(2.0f);
-      vtkData->SetCenter(0.0, 0.0, 0.0);
-      vtkData->Update();
+      vtkSmartPointer<vtkSphereSource> vtkSphere = vtkSmartPointer<vtkSphereSource>::New();
+      vtkSphere->SetRadius(2.0f);
+      vtkSphere->SetCenter(0.0, 0.0, 0.0);
+      vtkSphere->Update();
       mySphere->SetProperty("color", mitk::ColorProperty::New(1, 0, 0));
-      mySphere->SetVtkPolyData(vtkData->GetOutput());
-      vtkData->Delete();
+      mySphere->SetVtkPolyData(vtkSphere->GetOutput());
+      //vtkSphere->Delete();
       newNode->SetData(mySphere);
 
       this->GetDataStorage()->Add(newNode);

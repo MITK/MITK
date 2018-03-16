@@ -46,6 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkStdMultiWidgetEditor.h"
 #include "mitkLayoutAnnotationRenderer.h"
 #include "mitkCameraController.h"
+#include <vtkSmartPointer.h>
 
 // scene serialization
 #include <mitkConvert2Dto3DImageFilter.h>
@@ -138,16 +139,16 @@ void QmitkUSNavigationMarkerPlacement::OnChangeAblationZone(int id, int newSize)
   MITK_INFO << "Ablation Zone " << id << " changed, new size: " << newSize;
 
   // create a vtk sphere with given radius
-  vtkSphereSource *vtkData = vtkSphereSource::New();
-  vtkData->SetRadius(newSize / 2);
-  vtkData->SetCenter(0, 0, 0);
-  vtkData->SetPhiResolution(20);
-  vtkData->SetThetaResolution(20);
-  vtkData->Update();
+  vtkSmartPointer<vtkSphereSource> vtkSphere = vtkSmartPointer<vtkSphereSource>::New();
+  vtkSphere->SetRadius(newSize / 2);
+  vtkSphere->SetCenter(0, 0, 0);
+  vtkSphere->SetPhiResolution(20);
+  vtkSphere->SetThetaResolution(20);
+  vtkSphere->Update();
 
   mitk::Surface::Pointer zoneSurface = dynamic_cast<mitk::Surface *>(m_AblationZonesVector.at(id)->GetData());
-  zoneSurface->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
+  zoneSurface->SetVtkPolyData(vtkSphere->GetOutput());
+  //vtkSphere->Delete();
 }
 
 void QmitkUSNavigationMarkerPlacement::OnAddAblationZone(int size)
@@ -163,14 +164,14 @@ void QmitkUSNavigationMarkerPlacement::OnAddAblationZone(int size)
   mitk::Surface::Pointer zone = mitk::Surface::New();
 
   // create a vtk sphere with given radius
-  vtkSphereSource *vtkData = vtkSphereSource::New();
-  vtkData->SetRadius(size / 2);
-  vtkData->SetCenter(0, 0, 0);
-  vtkData->SetPhiResolution(20);
-  vtkData->SetThetaResolution(20);
-  vtkData->Update();
-  zone->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
+  vtkSmartPointer<vtkSphereSource> vtkSphere = vtkSmartPointer<vtkSphereSource>::New();
+  vtkSphere->SetRadius(size / 2);
+  vtkSphere->SetCenter(0, 0, 0);
+  vtkSphere->SetPhiResolution(20);
+  vtkSphere->SetThetaResolution(20);
+  vtkSphere->Update();
+  zone->SetVtkPolyData(vtkSphere->GetOutput());
+  //vtkSphere->Delete();
 
   // set vtk sphere and origin to data node (origin must be set
   // again, because of the new sphere set as data)

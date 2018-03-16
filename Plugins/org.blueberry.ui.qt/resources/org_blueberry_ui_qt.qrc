@@ -49,6 +49,15 @@
     <file>dark/up-arrow-hover.svg</file>
     <file>dark/up-arrow-pressed.svg</file>
 
+    <file>dark/tight-left-arrow.svg</file>
+    <file>dark/tight-left-arrow-disabled.svg</file>
+    <file>dark/tight-left-arrow-hover.svg</file>
+    <file>dark/tight-left-arrow-pressed.svg</file>
+    <file>dark/tight-right-arrow.svg</file>
+    <file>dark/tight-right-arrow-disabled.svg</file>
+    <file>dark/tight-right-arrow-hover.svg</file>
+    <file>dark/tight-right-arrow-pressed.svg</file>
+
     <file>dark/checkbox-unchecked.svg</file>
     <file>dark/checkbox-unchecked-hover.svg</file>
     <file>dark/checkbox-unchecked-disabled.svg</file>

@@ -301,11 +301,11 @@ QScrollBar::handle {
 }
 
 QScrollBar::handle:hover {
-    background-color: #9e9e9e;
+  background-color: #9e9e9e;
 }
 
 QScrollBar::handle:pressed {
-    background-color: #efebef;
+  background-color: #efebef;
 }
 
 QScrollBar::handle:horizontal {
@@ -348,8 +348,8 @@ QScrollBar::sub-line:vertical {
 }
 
 QScrollBar::up-arrow, QScrollBar::right-arrow, QScrollBar:down-arrow, QScrollBar:left-arrow {
-    width: 18px;
-    height: 18px;
+  width: 18px;
+  height: 18px;
 }
 
 QScrollBar::down-arrow {
@@ -455,4 +455,56 @@ QTabBar::tab:!selected:hover {
 
 #TabCloseButton {
   background-color: none;
+}
+
+QTabBar QToolButton::left-arrow {
+  image: url(:/org.blueberry.ui.qt/dark/tight-left-arrow.svg);
+}
+
+QTabBar QToolButton::left-arrow:hover {
+  image: url(:/org.blueberry.ui.qt/dark/tight-left-arrow-hover.svg);
+}
+
+QTabBar QToolButton::left-arrow:pressed {
+  image: url(:/org.blueberry.ui.qt/dark/tight-left-arrow-pressed.svg);
+}
+
+QTabBar QToolButton::left-arrow:disabled {
+  image: url(:/org.blueberry.ui.qt/dark/tight-left-arrow-disabled.svg);
+}
+
+QTabBar QToolButton::right-arrow {
+  image: url(:/org.blueberry.ui.qt/dark/tight-right-arrow.svg);
+}
+
+QTabBar QToolButton::right-arrow:hover {
+  image: url(:/org.blueberry.ui.qt/dark/tight-right-arrow-hover.svg);
+}
+
+QTabBar QToolButton::right-arrow:pressed {
+  image: url(:/org.blueberry.ui.qt/dark/tight-right-arrow-pressed.svg);
+}
+
+QTabBar QToolButton::right-arrow:disabled {
+  image: url(:/org.blueberry.ui.qt/dark/tight-right-arrow-disabled.svg);
+}
+
+QTreeView::branch:closed:has-children:has-siblings,
+QTreeView::branch:closed:has-children:!has-siblings {
+  image: url(:/org.blueberry.ui.qt/dark/right-arrow.svg);
+}
+
+QTreeView::branch:closed:has-children:has-siblings:hover,
+QTreeView::branch:closed:has-children:!has-siblings:hover {
+  image: url(:/org.blueberry.ui.qt/dark/right-arrow-hover.svg);
+}
+
+QTreeView::branch:open:has-children:has-siblings,
+QTreeView::branch:open:has-children:!has-siblings {
+  image: url(:/org.blueberry.ui.qt/dark/down-arrow.svg);
+}
+
+QTreeView::branch:open:has-children:has-siblings:hover,
+QTreeView::branch:open:has-children:!has-siblings:hover {
+  image: url(:/org.blueberry.ui.qt/dark/down-arrow-hover.svg);
 }

@@ -558,3 +558,19 @@ QTreeView::branch:open:has-children:has-siblings:hover,
 QTreeView::branch:open:has-children:!has-siblings:hover {
   image: url(:/org.blueberry.ui.qt/dark/down-arrow-hover.svg);
 }
+
+QTreeView::indicator:unchecked {
+  image: url(:/org.blueberry.ui.qt/dark/checkbox-unchecked.svg);
+}
+
+QTreeView::indicator:unchecked:selected {
+  image: url(:/org.blueberry.ui.qt/dark/checkbox-unchecked-hover.svg);
+}
+
+QTreeView::indicator:checked, QTreeView::indicator:indeterminate {
+  image: url(:/org.blueberry.ui.qt/dark/checkbox-checked.svg);
+}
+
+QTreeView::indicator:checked:selected, QTreeView::indicator:indeterminate:selected {
+  image: url(:/org.blueberry.ui.qt/dark/checkbox-checked-hover.svg);
+}

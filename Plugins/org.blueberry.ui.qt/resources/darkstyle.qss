@@ -60,6 +60,14 @@ QToolBar QToolButton {
   padding: 4px;
 }
 
+QToolButton#qt_toolbar_ext_button {
+  background-color: transparent;
+  border: none;
+  min-width: 12px;
+  padding: 0;
+  qproperty-icon: url(:/org.blueberry.ui.qt/dark/tight-right-arrow-textcolor.svg);
+}
+
 QAbstractItemView {
   alternate-background-color: #1b1b1c;
   background-color: #252526;

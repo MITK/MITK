@@ -58,6 +58,8 @@
     <file>dark/tight-right-arrow-hover.svg</file>
     <file>dark/tight-right-arrow-pressed.svg</file>
 
+    <file>dark/tight-right-arrow-textcolor.svg</file>
+
     <file>dark/checkbox-unchecked.svg</file>
     <file>dark/checkbox-unchecked-hover.svg</file>
     <file>dark/checkbox-unchecked-disabled.svg</file>

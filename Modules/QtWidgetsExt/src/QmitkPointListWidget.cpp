@@ -388,6 +388,7 @@ void QmitkPointListWidget::OnBtnAddPointManually()
   }
 
   editPointDialog.exec();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkPointListWidget::OnListDoubleClick()

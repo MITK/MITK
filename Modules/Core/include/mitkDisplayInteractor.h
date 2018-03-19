@@ -165,9 +165,6 @@ namespace mitk
      */
     virtual void Rotate(StateMachineAction*, InteractionEvent* event);
     
-    virtual void RotateBack(StateMachineAction*, InteractionEvent*);
-    virtual void RotateUp(StateMachineAction*, InteractionEvent*);
-    virtual void RotateDown(StateMachineAction*, InteractionEvent*);
     virtual void RotateClock(StateMachineAction*, InteractionEvent*);
     virtual void RotateBackClock(StateMachineAction*, InteractionEvent*);
 

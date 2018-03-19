@@ -57,18 +57,6 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <transition event_class="MousePressEvent" event_variant="MouseRotationPress" target="mouseCameraRotation">
             <action name="init"/>
         </transition>
-        <transition event_class="InteractionKeyEvent" event_variant="StdArrowRight" target="start" >
-          <action name="rotate" />
-        </transition>
-        <transition event_class="InteractionKeyEvent" event_variant="StdArrowLeft" target="start" >
-          <action name="rotateBack" />
-        </transition>
-        <transition event_class="InteractionKeyEvent" event_variant="StdArrowUp" target="start" >
-          <action name="rotateUp" />
-        </transition>
-        <transition event_class="InteractionKeyEvent" event_variant="StdArrowDown" target="start" >
-          <action name="rotateDown" />
-        </transition>
         <transition event_class="InteractionKeyEvent" event_variant="RotateClock" target="start" >
           <action name="rotateClock" />
         </transition>

@@ -55,11 +55,7 @@ namespace mitk
       {
         us::ServiceProperties props;
         mitk::CustomMimeType* mt = *mimeTypeIter;
-        if (mt->GetName()==mitk::DiffusionCoreIOMimeTypes::PEAK_MIMETYPE_NAME())
-          props[ us::ServiceConstants::SERVICE_RANKING() ] = -1;
-        else if (mt->GetName()==mitk::DiffusionCoreIOMimeTypes::SH_MIMETYPE_NAME())
-          props[ us::ServiceConstants::SERVICE_RANKING() ] = -1;
-        else
+        if (mt->GetName()!=mitk::DiffusionCoreIOMimeTypes::PEAK_MIMETYPE_NAME() && mt->GetName()!=mitk::DiffusionCoreIOMimeTypes::SH_MIMETYPE_NAME())
           props[ us::ServiceConstants::SERVICE_RANKING() ] = 10;
 
         context->RegisterService(*mimeTypeIter, props);

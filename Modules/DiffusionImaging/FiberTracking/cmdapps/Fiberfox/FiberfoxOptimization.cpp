@@ -204,7 +204,13 @@ double UpdateDiffusivity(double d, double temperature)
   double add = 0;
   while (add == 0)
     add = normal_dist(randgen);
-  d += add;
+
+  if (d+add > 0.0025)
+    d -= add;
+  else if ( d+add < 0.0 )
+    d -= add;
+  else
+    d += add;
 
   return d;
 }
@@ -253,6 +259,7 @@ FiberfoxParameters MakeProposalDiff(FiberfoxParameters old_params, double temper
 
   FiberfoxParameters new_params(old_params);
   int prop = uint1(randgen);
+
   switch(prop)
   {
   case 0:

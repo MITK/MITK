@@ -82,12 +82,9 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("endRotation", EndRotation);
   CONNECT_FUNCTION("rotationModeChanged", EndRotation);
   CONNECT_FUNCTION("rotate", Rotate);
-  CONNECT_FUNCTION("rotateBack", RotateBack);
 
   CONNECT_FUNCTION("swivel", Swivel);
 
-  CONNECT_FUNCTION("rotateUp", RotateUp);
-  CONNECT_FUNCTION("rotateDown", RotateDown);
   CONNECT_FUNCTION("rotateClock", RotateClock);
   CONNECT_FUNCTION("rotateBackClock", RotateBackClock);
   CONNECT_FUNCTION("selectObject", SelectObject);
@@ -940,44 +937,6 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
   {
     statusBar->DisplayImageInfoInvalid();
   }
-}
-
-/*
-void mitk::DisplayInteractor::Rotate(StateMachineAction*, InteractionEvent* interactionEvent)
-{
-  BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  mitk::Stepper* slice = sender->GetCameraRotationController()->GetSlice();
-  slice->Next();
-
-  sender->GetRenderingManager()->RequestUpdateAll();
-}
-*/
-
-void mitk::DisplayInteractor::RotateBack(StateMachineAction*, InteractionEvent* interactionEvent)
-{
-  BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  mitk::Stepper* slice = sender->GetCameraRotationController()->GetSlice();
-  slice->Previous();
-
-  sender->GetRenderingManager()->RequestUpdateAll();
-}
-
-void mitk::DisplayInteractor::RotateUp(StateMachineAction*, InteractionEvent* interactionEvent)
-{
-  BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  mitk::Stepper* slice = sender->GetCameraRotationController()->GetElevationSlice();
-  slice->Next();
-
-  sender->GetRenderingManager()->RequestUpdateAll();
-}
-
-void mitk::DisplayInteractor::RotateDown(StateMachineAction*, InteractionEvent* interactionEvent)
-{
-  BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  mitk::Stepper* slice = sender->GetCameraRotationController()->GetElevationSlice();
-  slice->Previous();
-
-  sender->GetRenderingManager()->RequestUpdateAll();
 }
 
 void mitk::DisplayInteractor::RotateClock(StateMachineAction*, InteractionEvent* interactionEvent)

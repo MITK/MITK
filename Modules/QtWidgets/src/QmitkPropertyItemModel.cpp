@@ -387,7 +387,6 @@ bool QmitkPropertyItemModel::setData(const QModelIndex &index, const QVariant &v
 
   auto propertyList = m_PropertyList.Lock();
 
-  propertyList->InvokeEvent(itk::ModifiedEvent());
   propertyList->Modified();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

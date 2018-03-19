@@ -1161,24 +1161,13 @@ void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent,
 
 void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*selected*/, const QItemSelection & /*deselected*/ )
 {
-  QList<mitk::DataNode::Pointer> nodes = m_NodeTreeModel->GetNodeSet();
+  auto selectedNodes = this->GetCurrentSelection();
 
-  foreach(mitk::DataNode::Pointer node, nodes)
+  for (auto node : m_NodeTreeModel->GetNodeSet())
   {
-    if ( node.IsNotNull() )
-      node->SetBoolProperty("selected", false);
+    if (node.IsNotNull())
+      node->SetSelected(selectedNodes.contains(node));
   }
-
-  nodes.clear();
-  nodes = this->GetCurrentSelection();
-
-  foreach(mitk::DataNode::Pointer node, nodes)
-  {
-    if ( node.IsNotNull() )
-      node->SetBoolProperty("selected", true);
-  }
-  //changing the selection does NOT require any rendering processes!
-  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::OnNodeVisibilityChanged()

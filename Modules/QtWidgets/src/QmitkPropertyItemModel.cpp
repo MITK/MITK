@@ -182,6 +182,9 @@ QModelIndex QmitkPropertyItemModel::FindProperty(const mitk::BaseProperty *prope
   if (property == nullptr)
     return QModelIndex();
 
+  if (m_PropertyList.IsExpired())
+    return QModelIndex();
+
   auto propertyMap = m_PropertyList.Lock()->GetMap();
   auto it = std::find_if(propertyMap->begin(), propertyMap->end(), PropertyEqualTo(property));
 

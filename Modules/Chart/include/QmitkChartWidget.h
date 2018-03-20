@@ -186,7 +186,7 @@ private:
   std::unique_ptr<Impl> m_Impl;
 
 public slots:
-  void OnLoadFinished(bool isLoadSuccessfull);
+  void OnLoadFinished(bool isLoadSuccessful);
 
 signals:
   void PageSuccessfullyLoaded();

@@ -53,6 +53,7 @@ void QmitkNavigationToolStorageSelectionWidget::CreateConnections()
   if ( m_Controls )
   {
     connect( (QObject*)(m_Controls->m_ServiceListWidget), SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(NavigationToolStorageSelected(us::ServiceReferenceU)) );
+    connect((QObject*)(m_Controls->m_ServiceListWidget), SIGNAL(ServiceModified(us::ServiceReferenceU)), this, SLOT(NavigationToolStorageSelected(us::ServiceReferenceU)));
 
   }
 

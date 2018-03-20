@@ -134,9 +134,6 @@ void QmitkServiceListWidget::OnServiceEvent(const us::ServiceEvent event)
     case us::ServiceEvent::MODIFIED:
       emit(ServiceModified(event.GetServiceReference()));
 
-      // emiting this signal is necessary to notify the change in toolbox to tool storage
-      emit(ServiceSelectionChanged(event.GetServiceReference()));
-
       // Change service; add a new entry if service wasn't on list before
       if (!this->ChangeServiceOnList(event.GetServiceReference()))
       {

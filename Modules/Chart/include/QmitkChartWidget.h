@@ -181,15 +181,15 @@ public:
   */
   void Reload(bool showSubChart);
 
-private:
-  class Impl;
-  std::unique_ptr<Impl> m_Impl;
-
 public slots:
   void OnLoadFinished(bool isLoadSuccessful);
 
 signals:
   void PageSuccessfullyLoaded();
+
+private:
+  class Impl;
+  std::unique_ptr<Impl> m_Impl;
 };
 
 #endif

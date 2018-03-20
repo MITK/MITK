@@ -461,9 +461,9 @@ void QmitkChartWidget::Clear()
 	m_Impl->ClearJavaScriptChart();
 }
 
-void QmitkChartWidget::OnLoadFinished(bool isLoadSuccessfull)
+void QmitkChartWidget::OnLoadFinished(bool isLoadSuccessful)
 {
-  if(isLoadSuccessfull)
+  if(isLoadSuccessful)
   {
     emit PageSuccessfullyLoaded();
   }

@@ -24,18 +24,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 /*!
-\brief QmitkChartWidget is a widget to display various charts based on the javascript chart library C3js. Currently, bar charts, line charts and pie charts are supported.
+\brief QmitkChartWidget is a widget to display various charts based on the javascript chart library C3js.
 * \details Data is added via AddData1D() or AddData2D().\n
-* There can be multiple charts (of the same type) created by calling AddData1D or AddData2D multiple times.\n\n
+* There can be multiple charts (of different types with different properties) created by calling AddData1D or AddData2D multiple times.\n\n
 * The following chart types are supported:
 * * line chart: http://c3js.org/samples/simple_multiple.html
 * * bar chart: http://c3js.org/samples/chart_bar.html
 * * spline chart: http://c3js.org/samples/chart_spline.html
 * * pie chart: http://c3js.org/samples/chart_pie.html
 * * scatter chart: http://c3js.org/samples/chart_scatter.html
-* \n Technical details: The javascript code is embedded in a QWebEngineView. The actual js code is implemented in resource\Chart.js.
+* * area chart: http://c3js.org/samples/chart_area.html
+* * area spline chart: http://c3js.org/samples/chart_area.html
+*
+* Technical details: The javascript code is embedded in a QWebEngineView. The actual js code is implemented in resource\Chart.js.
 * \sa http://c3js.org for further information about the used javaScript library.
-* \warning Pie is significantly different than the other types. Here, the data given by AddData1D is summed. Each entry represents a different category.
+* \warning We had issues with Qt versions <5.10. So we highly encourage to use Qt 5.10 or newer if this module is used.
 * \ingroup Modules/Chart
 */
 class MITKCHART_EXPORT QmitkChartWidget : public QWidget
@@ -44,7 +47,7 @@ class MITKCHART_EXPORT QmitkChartWidget : public QWidget
 
 public:
   /*!
-  * \brief enum of diagram types. Supported are bar, line, spline (a smoothed line) and pie. 
+  * \brief enum of diagram types.
   */
 	enum class ChartType { 
     bar, /*!< bar chart, see http://c3js.org/samples/chart_bar.html */
@@ -55,9 +58,12 @@ public:
     area_spline, /*!< area-spline chart, see http://c3js.org/samples/chart_area.html*/
     scatter /*!< scatter chart, see http://c3js.org/samples/chart_scatter.html*/
   };
+  /*!
+  * \brief enum of chart style (modifies background and line color).
+  */
   enum class ChartStyle {
-    darkstyle,
-    lightstyle
+    darkstyle, /*!< background color: dark gray, line color: blue */
+    lightstyle /*!< background color: white, line color: blue */
   };
   enum class LineStyle {
     solid,
@@ -69,7 +75,7 @@ public:
   };
 
   /*!
-  * \brief enum of legend position. Supported are bottom, right, inset.
+  * \brief enum of legend position.
   * See http://c3js.org/reference.html#legend-position
   */
   enum class LegendPosition {
@@ -88,6 +94,7 @@ public:
   * \param chartType the chart type that should be used for this data entry
   * \note the data can be cleared with ClearDiagram()
   * \note If the label name already exists, the name is replaced with a unique one by concatenating numbers to it.
+  * \warning Pie chart is significantly different than the other chart types. Here, the data given by AddData1D is summed. Each entry represents a different category.
   */
   void AddData1D(const std::vector<double>& data1D, const std::string& label, ChartType chartType = ChartType::bar);
 
@@ -98,41 +105,50 @@ public:
   * \param chartType the chart type that should be used for this data entry
   * \note the data can be cleared with ClearDiagram() 
   * \note If the label name already exists, the name is replaced with a unique one by concatenating numbers to it.
+  * \warning Pie chart is significantly different than the other chart types. Here, the data given by AddData1D is summed. Each entry represents a different category.
   */
   void AddData2D(const std::map<double, double>& data2D, const std::string& label, ChartType chartType = ChartType::bar);
 
   /*!
   * \brief Removes data from the widget, works for 1D and 2D Data
   * \param label the name of the data that is also used as identifier.
-  * \note the data can be cleared with ClearDiagram()
+  * \note All data can be cleared with ClearDiagram()
   * \throws Invalid Argument Exception when the label cannot be found
   */
   void RemoveData(const std::string& label);
 
   /*!
-  * \brief sets the color of one data entry (identifier is previously assigned label)
-  *  \details the color name can be "red" or a hex number (#FF0000).
-  * Either define all data entries with a color or none. If a mixed approach is used, different data entries could have the same color.
-  * If an unknown label is given, nothing happens.
+  * \brief Sets the color of one data entry (identifier is previously assigned label)
+  * \details the color name can be "red" or a hex number (#FF0000).
+  * \warning Either define all data entries with a color or no data entry. If a mixed approach is used,
+  * C3 choses the color of the data entry (that could be the same as a user defined color).
+  * \note If an unknown label is given, nothing happens.
   *  \sa https://www.w3schools.com/cssref/css_colors.asp
   */
   void SetColor(const std::string& label, const std::string& colorName);
 
   /*!
-  * \brief sets the line style of one data entry (identifier is previously assigned label)
-  *  \details two line styles are possible: LineStyle::solid and LineStyle::dashed.
-  * The default linestyle is solid.
-  * If an unknown label is given, nothing happens.
-  *  \warning only sets the line style if the current chart type is ChartType::line. However, the line style remains also if the chart changes (e.g. new chart type)
+  * \brief Sets the line style of one data entry (identifier is previously assigned label)
+  * \details two line styles are possible: LineStyle::solid and LineStyle::dashed.
+  * The default line style is solid.
+  * \note If an unknown label is given, nothing happens.
+  *  \warning only sets the line style if the current chart type is ChartType::line.
+  *  However, the line style remains also if the chart changes (e.g. new chart type)
   */
   void SetLineStyle(const std::string& label, LineStyle style);
 
+  /*!
+  * \brief Sets the axis scale to either linear (default) or logarithmic.
+  */
   void SetYAxisScale(AxisScale scale);
 
   void SetXAxisLabel(const std::string& label);
 
   void SetYAxisLabel(const std::string& label);
 
+  /*!
+  * \brief Sets a title for the chart.
+  */
   void SetTitle(const std::string &title);
 
   /*!
@@ -140,13 +156,19 @@ public:
   */
   void SetChartTypeForAllDataAndReload(ChartType type);
   /*!
-  * \brief sets the chart type for a data entry
+  * \brief Sets the chart type for a data entry
   * \details for available types, see ChartType
-  * If an unknown label is given, nothing happens.
-  *  \sa DiagramType for available types
+  * \note If an unknown label is given, nothing happens.
+  * \warning Pie chart is significantly different than the other chart types. Here, the data given by AddData1D is summed. Each entry represents a different category.
+  * \sa DiagramType for available types
   */
   void SetChartType(const std::string& label, ChartType type);
 
+  /*!
+  * \brief Sets the legend position.
+  * \details Default position is bottom.
+  * \sa LegendPosition for available types
+  */
   void SetLegendPosition(LegendPosition position);
 
   void SetShowLegend(bool show);
@@ -159,8 +181,10 @@ public:
   void Show(bool showSubChart=false);
 
   /*!
-  * \brief Displays the dataPoints or not
+  * \brief Either displays the dataPoints or not
   * \param showDataPoints if dataPoints are displayed inside the widget or not.
+  * \details: example for not showing points: http://c3js.org/samples/point_show.html
+  * example for showing the points: http://c3js.org/samples/simple_multiple.html
   */
   void SetShowDataPoints(bool showDataPoints);
 

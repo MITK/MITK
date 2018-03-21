@@ -182,7 +182,7 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
   if (levelWindowProperty.IsNull())
     return;
 
-  /* search image than belongs to the property */
+  /* search image that belongs to the property */
   typedef mitk::DataStorage::SetOfObjects NodeSetType;
   NodeSetType::ConstPointer nodes = m_DataStorage->GetAll();
   NodeSetType::ConstIterator it = nodes->Begin();
@@ -195,6 +195,7 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
     if (prop == levelWindowProperty)
     {
       propNode = node;
+      break;
     }
     else
     {

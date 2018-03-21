@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
   parser.addArgument("save_res", "", mitkCommandLineParser::Bool, "Save Residuals:", "save residual images", false);
   parser.addArgument("save_weights", "", mitkCommandLineParser::Bool, "Save Weights:", "save fiber weights in a separate text file", false);
-  parser.addArgument("dont_filter_outliers", "", mitkCommandLineParser::Bool, "Don't filter outliers:", "don't perform second optimization run with an upper weight bound based on the first weight estimation (95% quantile)", false);
+  parser.addArgument("filter_outliers", "", mitkCommandLineParser::Bool, "Filter outliers:", "perform second optimization run with an upper weight bound based on the first weight estimation (99% quantile)", false);
   parser.addArgument("join_tracts", "", mitkCommandLineParser::Bool, "Join output tracts:", "outout tracts are merged into a single tractogram", false);
   parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM, MSE, LocalMSE (default), GroupLasso, GroupMSE, NONE");
 
@@ -119,9 +119,9 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("lambda"))
     lambda = us::any_cast<float>(parsedArgs["lambda"]);
 
-  bool filter_outliers = true;
-  if (parsedArgs.count("dont_filter_outliers"))
-    filter_outliers = !us::any_cast<bool>(parsedArgs["dont_filter_outliers"]);
+  bool filter_outliers = false;
+  if (parsedArgs.count("filter_outliers"))
+    filter_outliers = us::any_cast<bool>(parsedArgs["filter_outliers"]);
 
   try
   {
@@ -193,19 +193,19 @@ int main(int argc, char* argv[])
     {
       itk::ImageFileWriter< PeakImgType >::Pointer writer = itk::ImageFileWriter< PeakImgType >::New();
       writer->SetInput(fitter->GetFittedImage());
-      writer->SetFileName(outRoot + "fitted_image.nrrd");
+      writer->SetFileName(outRoot + "_fitted_image.nrrd");
       writer->Update();
 
       writer->SetInput(fitter->GetResidualImage());
-      writer->SetFileName(outRoot + "residual_image.nrrd");
+      writer->SetFileName(outRoot + "_residual_image.nrrd");
       writer->Update();
 
       writer->SetInput(fitter->GetOverexplainedImage());
-      writer->SetFileName(outRoot + "overexplained_image.nrrd");
+      writer->SetFileName(outRoot + "_overexplained_image.nrrd");
       writer->Update();
 
       writer->SetInput(fitter->GetUnderexplainedImage());
-      writer->SetFileName(outRoot + "underexplained_image.nrrd");
+      writer->SetFileName(outRoot + "_underexplained_image.nrrd");
       writer->Update();
     }
 

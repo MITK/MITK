@@ -33,11 +33,11 @@ class mitkFiberFitTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkFiberFitTestSuite);
-//  MITK_TEST(Fit1);
-//  MITK_TEST(Fit2);
-//  MITK_TEST(Fit3);
-//  MITK_TEST(Fit4);
-//  MITK_TEST(Fit5);
+  MITK_TEST(Fit1);
+  MITK_TEST(Fit2);
+  MITK_TEST(Fit3);
+  MITK_TEST(Fit4);
+  MITK_TEST(Fit5);
   MITK_TEST(Fit6);
   CPPUNIT_TEST_SUITE_END();
 

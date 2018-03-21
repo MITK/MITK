@@ -434,10 +434,12 @@ void QmitkMITKIGTTrackingToolboxView::OnShowHideToolProjectionClicked()
   if (m_Controls->showHideToolProjectionCheckBox->isChecked())
   {
     ShowToolProjection(index);
+    m_Controls->showHideToolAxisCheckBox->setEnabled(true);
   }
   else
   {
     RemoveAllToolProjections();
+    m_Controls->showHideToolAxisCheckBox->setEnabled(false);
   }
   if( m_NeedleProjectionFilter.IsNotNull() )
   {

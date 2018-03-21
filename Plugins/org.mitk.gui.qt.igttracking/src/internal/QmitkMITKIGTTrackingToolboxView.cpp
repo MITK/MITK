@@ -373,7 +373,7 @@ void QmitkMITKIGTTrackingToolboxView::ShowToolProjection(int index)
   {
     m_ToolProjectionNode = mitk::DataNode::New();
     m_ToolProjectionNode->SetName(ToolProjectionName.toStdString());
-    if (index < m_NeedleProjectionFilter->GetNumberOfInputs())
+    if (index < static_cast<int>(m_NeedleProjectionFilter->GetNumberOfInputs()))
     {
       m_NeedleProjectionFilter->SelectInput(index);
       m_NeedleProjectionFilter->Update();

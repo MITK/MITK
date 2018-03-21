@@ -396,7 +396,6 @@ void QmitkMITKIGTTrackingToolboxView::RemoveAllToolProjections()
   {
 
     QString ToolProjectionName = "ToolProjection" + QString::number(i);
-    MITK_WARN << ToolProjectionName;
     mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode(ToolProjectionName.toStdString());
 
     //Deactivate and hide the tool projection

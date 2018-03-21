@@ -291,6 +291,9 @@ namespace mitk {
     /* @return Returns the area that will be cropped from the US image. Is disabled / [0,0,0,0] by default. */
     mitk::USDevice::USImageCropArea GetCropArea();
 
+    /* @return Returns the size of the m_ImageVector of the ultrasound device.*/
+    unsigned int GetSizeOfImageVector();
+
     /** @return Returns the current image source of this device. */
     virtual USImageSource::Pointer GetUSImageSource() = 0;
 

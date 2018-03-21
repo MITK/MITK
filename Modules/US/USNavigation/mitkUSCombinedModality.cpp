@@ -35,6 +35,7 @@ mitk::USCombinedModality::USCombinedModality( USDevice::Pointer usDevice,
 
 mitk::USCombinedModality::~USCombinedModality()
 {
+}
 
 mitk::USAbstractControlInterface::Pointer mitk::USCombinedModality::GetControlInterfaceCustom()
 {

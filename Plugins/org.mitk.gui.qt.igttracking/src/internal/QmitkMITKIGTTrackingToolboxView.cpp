@@ -373,7 +373,7 @@ void QmitkMITKIGTTrackingToolboxView::ShowToolProjection(int index)
   {
     m_ToolProjectionNode = mitk::DataNode::New();
     m_ToolProjectionNode->SetName(ToolProjectionName.toStdString());
-    if (index < m_NeedleProjectionFilter->GetNumberOfInputs())
+    if (index < static_cast<int>(m_NeedleProjectionFilter->GetNumberOfInputs()))
     {
       m_NeedleProjectionFilter->SelectInput(index);
       m_NeedleProjectionFilter->Update();
@@ -394,10 +394,9 @@ void QmitkMITKIGTTrackingToolboxView::RemoveAllToolProjections()
 {
   for (size_t i = 0; i < m_toolStorage->GetToolCount(); i++)
   {
+    QString toolProjectionName = "ToolProjection" + QString::number(i);
 
-    QString ToolProjectionName = "ToolProjection" + QString::number(i);
-    MITK_WARN << ToolProjectionName;
-    mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode(ToolProjectionName.toStdString());
+    mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode(toolProjectionName.toStdString());
 
     //Deactivate and hide the tool projection
     if (!node.IsNull())

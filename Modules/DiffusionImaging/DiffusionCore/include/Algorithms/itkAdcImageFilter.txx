@@ -37,7 +37,7 @@ AdcImageFilter< TInPixelType, TOutPixelType>
   : m_FitSignal(true)
   , m_B_value(0)
 {
-    this->SetNumberOfRequiredInputs( 1 );
+  this->SetNumberOfRequiredInputs( 1 );
 }
 
 template< class TInPixelType, class TOutPixelType >
@@ -45,37 +45,36 @@ void
 AdcImageFilter< TInPixelType, TOutPixelType>
 ::BeforeThreadedGenerateData()
 {
-    typename OutputImageType::Pointer outputImage =
-            static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
-    outputImage->FillBuffer(0.0);
+  typename OutputImageType::Pointer outputImage =
+      static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+  outputImage->FillBuffer(0.0);
 
-    m_B_values.set_size(m_GradientDirections->Size());
-    int nonzero = 0;
-    for (unsigned int i=0; i<m_GradientDirections->Size(); i++)
+  m_B_values.set_size(m_GradientDirections->Size());
+  int nonzero = 0;
+  for (unsigned int i=0; i<m_GradientDirections->Size(); i++)
+  {
+    GradientDirectionType g = m_GradientDirections->GetElement(i);
+    double twonorm = g.two_norm();
+    double b = m_B_value*twonorm*twonorm;
+    m_B_values[i] = b;
+
+    if (g.magnitude()>0.001)
+      nonzero++;
+  }
+
+  m_Nonzero_B_values.set_size(nonzero);
+  nonzero = 0;
+  for (unsigned int i=0; i<m_B_values.size(); i++)
+  {
+    if (m_B_values[i]>1)
     {
-      GradientDirectionType g = m_GradientDirections->GetElement(i);
-      double twonorm = g.two_norm();
-      double b = m_B_value*twonorm*twonorm;
-      m_B_values[i] = b;
-
-      if (g.magnitude()>0.001)
-        nonzero++;
+      m_Nonzero_B_values[nonzero] = m_B_values[i];
+      nonzero++;
     }
+  }
 
-    MITK_INFO << m_B_values;
-    m_Nonzero_B_values.set_size(nonzero);
-    nonzero = 0;
-    for (unsigned int i=0; i<m_B_values.size(); i++)
-    {
-      if (m_B_values[i]>1)
-      {
-        m_Nonzero_B_values[nonzero] = m_B_values[i];
-        nonzero++;
-      }
-    }
-
-    if (m_B_values.size() == m_Nonzero_B_values.size())
-      mitkThrow() << "Unweighted (b=0 s/mm²) image volume missing!";
+  if (m_B_values.size() == m_Nonzero_B_values.size())
+    mitkThrow() << "Unweighted (b=0 s/mm²) image volume missing!";
 
 }
 
@@ -116,86 +115,84 @@ void
 AdcImageFilter< TInPixelType, TOutPixelType>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType )
 {
-    typename OutputImageType::Pointer outputImage =
-            static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+  typename OutputImageType::Pointer outputImage =
+      static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
 
-    ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
-    oit.GoToBegin();
+  ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
+  oit.GoToBegin();
 
-    typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
-    typename InputImageType::Pointer inputImagePointer = NULL;
-    inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
+  typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
+  typename InputImageType::Pointer inputImagePointer = NULL;
+  inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
 
-    InputIteratorType git( inputImagePointer, outputRegionForThread );
-    git.GoToBegin();
-    while( !git.IsAtEnd() )
+  InputIteratorType git( inputImagePointer, outputRegionForThread );
+  git.GoToBegin();
+  while( !git.IsAtEnd() )
+  {
+    typename InputImageType::PixelType pix = git.Get();
+    TOutPixelType outval = 0;
+
+    if (!m_FitSignal)
     {
-        typename InputImageType::PixelType pix = git.Get();
-        TOutPixelType outval = 0;
-
-        if (!m_FitSignal)
+      double S0 = 0;
+      int c = 0;
+      for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
+      {
+        GradientDirectionType g = m_GradientDirections->GetElement(i);
+        if (g.magnitude()<0.001)
         {
-          double S0 = 0;
-          int c = 0;
-          for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
+          if (pix[i]>0)
           {
-              GradientDirectionType g = m_GradientDirections->GetElement(i);
-              if (g.magnitude()<0.001)
-              {
-                  if (pix[i]>0)
-                  {
-                      S0 += pix[i];
-                      c++;
-                  }
-              }
-          }
-          if (c>0)
-              S0 /= c;
-
-          if (S0>0)
-          {
-              c = 0;
-              for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
-              {
-                  GradientDirectionType g = m_GradientDirections->GetElement(i);
-                  if (g.magnitude()>0.001)
-                  {
-                      double twonorm = g.two_norm();
-                      double b = m_B_value*twonorm*twonorm;
-                      if (b>0)
-                      {
-                          double S = pix[i];
-                          if (S>0 && S0>0)
-                          {
-                              outval -= std::log(S/S0)/b;
-                              c++;
-                          }
-                      }
-                  }
-              }
-
-              if (c>0)
-                  outval /= c;
+            S0 += pix[i];
+            c++;
           }
         }
-        else
+      }
+      if (c>0)
+        S0 /= c;
+
+      if (S0>0)
+      {
+        c = 0;
+        for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
         {
-          outval = FitSingleVoxel(pix);
+          GradientDirectionType g = m_GradientDirections->GetElement(i);
+          if (g.magnitude()>0.001)
+          {
+            double twonorm = g.two_norm();
+            double b = m_B_value*twonorm*twonorm;
+            if (b>0)
+            {
+              double S = pix[i];
+              if (S>0 && S0>0)
+              {
+                outval -= std::log(S/S0)/b;
+                c++;
+              }
+            }
+          }
         }
 
-//        if (outval<-0.00001)
-//          outval = -0.00001;
-
-        if (outval==outval && outval<1000)
-            oit.Set( outval );
-//        else
-//          oit.Set( -0.00001 );
-
-        ++oit;
-        ++git;
+        if (c>0)
+          outval /= c;
+      }
+    }
+    else
+    {
+      outval = FitSingleVoxel(pix);
     }
 
-    std::cout << "One Thread finished calculation" << std::endl;
+    //        if (outval<-0.00001)
+    //          outval = -0.00001;
+
+    if (outval==outval && outval<1000)
+      oit.Set( outval );
+    //        else
+    //          oit.Set( -0.00001 );
+
+    ++oit;
+    ++git;
+  }
 }
 
 template< class TInPixelType, class TOutPixelType >
@@ -203,7 +200,7 @@ void
 AdcImageFilter< TInPixelType, TOutPixelType>
 ::PrintSelf(std::ostream& os, Indent indent) const
 {
-    Superclass::PrintSelf(os,indent);
+  Superclass::PrintSelf(os,indent);
 }
 
 }

@@ -286,13 +286,8 @@ void QmitkDiffusionQuantificationView::DoAdcCalculation(bool fit)
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput( itkVectorImagePointer );
 
-    filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>
-                                   ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
-                                   ->GetGradientDirectionsContainer() );
-
-    filter->SetB_value( static_cast<mitk::FloatProperty*>
-                        (image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
-                        ->GetValue() );
+    filter->SetGradientDirections( mitk::DiffusionPropertyHelper::GetGradientContainer(image) );
+    filter->SetB_value( mitk::DiffusionPropertyHelper::GetReferenceBValue(image) );
 
     filter->SetFitSignal(fit);
     filter->Update();

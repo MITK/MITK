@@ -44,7 +44,6 @@ public:
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
     typedef ImageToImageFilter< Image< vcl_complex< TPixelType > >, Image< vcl_complex< TPixelType > > > Superclass;
-    typedef itk::Statistics::MersenneTwisterRandomVariateGenerator RandGenType;
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)

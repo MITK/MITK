@@ -188,6 +188,7 @@ void QmitkUSDeviceManagerWidget::OnDeviceSelectionChanged(
   {
     m_Controls->m_BtnActivate->setEnabled(false);
     m_Controls->m_BtnRemove->setEnabled(false);
+    m_Controls->m_BtnEdit->setEnabled(false);
     return;
   }
   std::string isConnected =

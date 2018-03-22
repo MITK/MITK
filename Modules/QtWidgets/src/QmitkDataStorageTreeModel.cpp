@@ -458,6 +458,16 @@ QVariant QmitkDataStorageTreeModel::data(const QModelIndex &index, int role) con
       nodeName += QString::fromStdString(studyDescription_deprecated->GetValueAsString()) + "\n";
       nodeName += QString::fromStdString(seriesDescription_deprecated->GetValueAsString());
     }
+
+    auto data = dataNode->GetData();
+
+    if (nullptr != data && std::string("LabelSetImage") == data->GetNameOfClass())
+    {
+      auto nameProperty = dataNode->GetProperty("name");
+
+      if (nullptr != nameProperty && !nameProperty->GetValueAsString().empty())
+        nodeName += ": " + QString::fromStdString(nameProperty->GetValueAsString());
+    }
   }
   else
   {

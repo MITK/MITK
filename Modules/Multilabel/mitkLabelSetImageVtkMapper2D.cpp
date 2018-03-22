@@ -526,17 +526,20 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
 
   // check if something important has changed and we need to re-render
 
-  //(localStorage->m_LastDataUpdateTime < node->GetMTime()) // this one is too generic
-  if ((localStorage->m_LastDataUpdateTime < image->GetMTime()) // was the data modified?
-      ||
+  if ((localStorage->m_LastDataUpdateTime < image->GetMTime()) ||
       (localStorage->m_LastDataUpdateTime < image->GetPipelineMTime()) ||
-      (localStorage->m_LastDataUpdateTime <
-       renderer->GetCurrentWorldPlaneGeometryUpdateTime()) // was the geometry modified?
-      ||
+      (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
       (localStorage->m_LastDataUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()))
   {
     this->GenerateDataForRenderer(renderer);
     localStorage->m_LastDataUpdateTime.Modified();
+  }
+  else if ((localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) ||
+           (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) ||
+           (localStorage->m_LastPropertyUpdateTime < image->GetPropertyList()->GetMTime()))
+  {
+    this->GenerateDataForRenderer(renderer);
+    localStorage->m_LastPropertyUpdateTime.Modified();
   }
 }
 

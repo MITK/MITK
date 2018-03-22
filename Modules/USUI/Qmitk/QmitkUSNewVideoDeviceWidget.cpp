@@ -248,7 +248,11 @@ void QmitkUSNewVideoDeviceWidget::OnOpenFileButtonClicked()
 void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
 {
   // If no VideoDevice is given, throw an exception
-  if (device->GetDeviceClass().compare("org.mitk.modules.us.USVideoDevice") !=
+  if (device.IsNull())
+  {
+    mitkThrow() << "No device selected";
+  }
+  else if (device->GetDeviceClass().compare("org.mitk.modules.us.USVideoDevice") !=
     0)
   {
     // TODO Alert if bad path

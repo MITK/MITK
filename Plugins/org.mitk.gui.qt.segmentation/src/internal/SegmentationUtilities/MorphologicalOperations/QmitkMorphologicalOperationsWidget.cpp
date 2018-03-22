@@ -91,7 +91,11 @@ void QmitkMorphologicalOperationsWidget::OnClosingButtonClicked()
   mitk::MorphologicalOperations::StructuralElementType structuralElement = CreateStructerElement_UI();
   try
   {
-    mitk::MorphologicalOperations::Closing(image, m_Controls.spinBoxMorphFactor->value(), structuralElement);
+    int factor = m_Controls.spinBoxMorphFactor->isEnabled()
+      ? m_Controls.spinBoxMorphFactor->value()
+      : 1;
+
+    mitk::MorphologicalOperations::Closing(image, factor, structuralElement);
   }
   catch (const itk::ExceptionObject& exception)
   {
@@ -120,7 +124,11 @@ void QmitkMorphologicalOperationsWidget::OnOpeningButtonClicked()
 
   try
   {
-     mitk::MorphologicalOperations::Opening(image, m_Controls.spinBoxMorphFactor->value(), structuralElement);
+    int factor = m_Controls.spinBoxMorphFactor->isEnabled()
+      ? m_Controls.spinBoxMorphFactor->value()
+      : 1;
+
+     mitk::MorphologicalOperations::Opening(image, factor, structuralElement);
   }
   catch (const itk::ExceptionObject& exception)
   {
@@ -148,7 +156,11 @@ void QmitkMorphologicalOperationsWidget::OnDilatationButtonClicked()
 
   try
   {
-    mitk::MorphologicalOperations::Dilate(image, m_Controls.spinBoxMorphFactor->value(), structuralElement);
+    int factor = m_Controls.spinBoxMorphFactor->isEnabled()
+      ? m_Controls.spinBoxMorphFactor->value()
+      : 1;
+
+    mitk::MorphologicalOperations::Dilate(image, factor, structuralElement);
   }
   catch (const itk::ExceptionObject& exception)
   {
@@ -176,7 +188,11 @@ mitk::MorphologicalOperations::StructuralElementType structuralElement = CreateS
 
   try
   {
-    mitk::MorphologicalOperations::Erode(image, m_Controls.spinBoxMorphFactor->value(), structuralElement);
+    int factor = m_Controls.spinBoxMorphFactor->isEnabled()
+      ? m_Controls.spinBoxMorphFactor->value()
+      : 1;
+
+    mitk::MorphologicalOperations::Erode(image, factor, structuralElement);
   }
   catch (const itk::ExceptionObject& exception)
   {

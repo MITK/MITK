@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkUSControlsCustomDiPhASDeviceWidget::QmitkUSControlsCustomDiPhASDeviceWidget()
   : ui(new Ui::QmitkUSControlsCustomDiPhASDeviceWidget)
 {
-  this->RegisterService();
 }
 
 QmitkUSControlsCustomDiPhASDeviceWidget::QmitkUSControlsCustomDiPhASDeviceWidget(QWidget *parent)

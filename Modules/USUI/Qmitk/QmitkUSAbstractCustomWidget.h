@@ -24,16 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Microservices
 #include <mitkServiceInterface.h>
-#include <usServiceRegistration.h>
-#include <usServiceProperties.h>
-
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
-
-namespace us {
-  struct PrototypeServiceFactory;
-  class ModuleContext;
-}
 
 /**
   * \brief Abstract superclass for all custom control widgets of mitk::USDevice classes.
@@ -122,12 +112,6 @@ public:
   QmitkUSAbstractCustomWidget* CloneForQt(QWidget* parent = 0) const;
 
   /**
-  * \brief Register this widget as microservice using the us::PrototypeServiceFactory. The registered microservice is linked to the US device
-  */
-  us::ServiceRegistration<QmitkUSAbstractCustomWidget> RegisterService(us::ModuleContext * context = us::GetModuleContext());
-  void UnregisterService();
-
-  /**
     * \brief Returns the properties of the micro service.
     * Properties consist of just the device class of the corresponding
     * mitk::USDevice.
@@ -154,8 +138,6 @@ public:
 private:
 
   mitk::USDevice::Pointer         m_Device; ///< USDevice related to the specific widgets
-  us::PrototypeServiceFactory*    m_PrototypeServiceFactory; ///< PrototypeServiceFactory used to register the individual widgets as micro services linked to specific US devices
-  us::ServiceRegistration<QmitkUSAbstractCustomWidget> m_Reg; ///< ServiceRegistration object used to update the service properties or to unregister the service
   bool                            m_IsClonedForQt;
 };
 

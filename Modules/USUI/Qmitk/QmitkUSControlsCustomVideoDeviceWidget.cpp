@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkUSControlsCustomVideoDeviceWidget::QmitkUSControlsCustomVideoDeviceWidget()
   : ui(new Ui::QmitkUSControlsCustomVideoDeviceWidget)
 {
-  this->RegisterService();
 }
 
 

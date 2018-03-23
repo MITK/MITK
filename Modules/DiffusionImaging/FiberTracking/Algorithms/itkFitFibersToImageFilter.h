@@ -94,7 +94,7 @@ public:
   // Regularization: mean absolute magnitude of weight vectors (small weights) L1
   void regu_Lasso(vnl_vector<double> const &x, double& cost)
   {
-    cost += 10000.0*m_Lambda*x.one_norm()/dim;
+    cost += m_Lambda*x.one_norm()/dim;
   }
 
   // Regularization: mean squared deaviation of weights from bundle mean weight (enforce uniform weights PER BUNDLE)
@@ -170,7 +170,7 @@ public:
   {
     for (int i=0; i<dim; ++i)
       if (x[i]>0)
-        dx[i] += 10000.0*m_Lambda/dim;
+        dx[i] += m_Lambda/dim;
   }
 
   void grad_regu_GroupVariance(vnl_vector<double> const &x, vnl_vector<double> &dx)
@@ -403,7 +403,7 @@ protected:
   FitFibersToImageFilter();
   virtual ~FitFibersToImageFilter();
 
-  vnl_vector_fixed<float,3> GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer m_PeakImage , vnl_vector_fixed<float,3> fiber_dir, int& id, double& w );
+  void GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer m_PeakImage , vnl_vector_fixed<float,3> fiber_dir, int& id, double& w, double& peak_mag );
 
   void CreatePeakSystem();
   void CreateDiffSystem();

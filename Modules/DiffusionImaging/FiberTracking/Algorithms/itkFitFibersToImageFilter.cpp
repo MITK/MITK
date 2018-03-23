@@ -179,10 +179,10 @@ void FitFibersToImageFilter::CreateDiffSystem()
   b *= 100.0/m_MeanSignal;  // times 100 because we want to avoid too small values for computational reasons
 
   // NEW FIT
-//  m_MeanTractDensity /= m_NumCoveredDirections;
-//  m_MeanSignal /= m_NumCoveredDirections;
-//  b /= m_MeanSignal;
-//  b *= m_MeanTractDensity;
+  //  m_MeanTractDensity /= m_NumCoveredDirections;
+  //  m_MeanSignal /= m_NumCoveredDirections;
+  //  b /= m_MeanSignal;
+  //  b *= m_MeanTractDensity;
 }
 
 void FitFibersToImageFilter::CreatePeakSystem()
@@ -266,8 +266,9 @@ void FitFibersToImageFilter::CreatePeakSystem()
 
         double w = 1;
         int peak_id = dim_four_size-1;
-        vnl_vector_fixed<float,3> odf_peak = GetClosestPeak(idx4, m_PeakImage, fiber_dir, peak_id, w);
-        float peak_mag = odf_peak.magnitude();
+
+        double peak_mag = 0;
+        GetClosestPeak(idx4, m_PeakImage, fiber_dir, peak_id, w, peak_mag);
 
         int x = idx4[0];
         int y = idx4[1];
@@ -303,10 +304,10 @@ void FitFibersToImageFilter::CreatePeakSystem()
   b *= 100.0/m_MeanSignal;  // times 100 because we want to avoid too small values for computational reasons
 
   // NEW FIT
-//  m_MeanTractDensity /= m_NumCoveredDirections;
-//  m_MeanSignal /= m_NumCoveredDirections;
-//  b /= m_MeanSignal;
-//  b *= m_MeanTractDensity;
+  //  m_MeanTractDensity /= m_NumCoveredDirections;
+  //  m_MeanSignal /= m_NumCoveredDirections;
+  //  b /= m_MeanSignal;
+  //  b *= m_MeanTractDensity;
 }
 
 void FitFibersToImageFilter::CreateScalarSystem()
@@ -410,10 +411,10 @@ void FitFibersToImageFilter::CreateScalarSystem()
   b *= 100.0/m_MeanSignal;  // times 100 because we want to avoid too small values for computational reasons
 
   // NEW FIT
-//  m_MeanTractDensity /= numCoveredVoxels;
-//  m_MeanSignal /= numCoveredVoxels;
-//  b /= m_MeanSignal;
-//  b *= m_MeanTractDensity;
+  //  m_MeanTractDensity /= numCoveredVoxels;
+  //  m_MeanSignal /= numCoveredVoxels;
+  //  b /= m_MeanSignal;
+  //  b *= m_MeanTractDensity;
 }
 
 void FitFibersToImageFilter::GenerateData()
@@ -474,13 +475,22 @@ void FitFibersToImageFilter::GenerateData()
     minimizer.minimize(m_Weights);
     vnl_vector<double> dx; dx.set_size(m_NumUnknowns); dx.fill(0.0);
     cost.calc_regularization_gradient(m_Weights, dx);
-    double r = dx.magnitude()/m_Weights.magnitude();  // wtf???
-    cost.m_Lambda *= m_Lambda*55.0/r;
-    MITK_INFO << r << " - " << m_Lambda*55.0/r;
-    if (cost.m_Lambda>10e7)
+
+    if (m_Weights.magnitude()==0)
     {
       MITK_INFO << "Regularization estimation failed. Using default value.";
-      cost.m_Lambda = fiber_count;
+      cost.m_Lambda = fiber_count*m_Lambda;
+    }
+    else
+    {
+      double r = dx.magnitude()/m_Weights.magnitude();  // wtf???
+      cost.m_Lambda *= m_Lambda*55.0/r;
+      MITK_INFO << r << " - " << m_Lambda*55.0/r;
+      if (cost.m_Lambda>10e7)
+      {
+        MITK_INFO << "Regularization estimation failed. Using default value.";
+        cost.m_Lambda = fiber_count*m_Lambda;
+      }
     }
   }
   MITK_INFO << "Using regularization factor of " << cost.m_Lambda << " (λ: " << m_Lambda << ")";
@@ -893,7 +903,7 @@ void FitFibersToImageFilter::GenerateOutputPeakImages()
       }
 }
 
-vnl_vector_fixed<float,3> FitFibersToImageFilter::GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer peak_image , vnl_vector_fixed<float,3> fiber_dir, int& id, double& w )
+void FitFibersToImageFilter::GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer peak_image , vnl_vector_fixed<float,3> fiber_dir, int& id, double& w, double& peak_mag )
 {
   int m_NumDirs = peak_image->GetLargestPossibleRegion().GetSize()[3]/3;
   vnl_vector_fixed<float,3> out_dir; out_dir.fill(0);
@@ -913,23 +923,15 @@ vnl_vector_fixed<float,3> FitFibersToImageFilter::GetClosestPeak(itk::Index<4> i
     if (mag<mitk::eps)
       continue;
 
-    dir.normalize();
-
-    float a = dot_product(dir, fiber_dir);
-    if (fabs(a)>angle)
+    float a = fabs(dot_product(dir, fiber_dir))/mag;
+    if (a>angle)
     {
-      angle = fabs(a);
+      angle = a;
       w = angle;
-      if (a<0)
-        out_dir = -dir;
-      else
-        out_dir = dir;
-      out_dir *= mag;
+      peak_mag = mag;
       id = i;
     }
   }
-
-  return out_dir;
 }
 
 std::vector<mitk::FiberBundle::Pointer> FitFibersToImageFilter::GetTractograms() const

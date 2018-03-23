@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileWriter.h>
 #include <mitkPeakImage.h>
 #include <itkFitFibersToImageFilter.h>
+#include <mitkTensorModel.h>
+#include <mitkITKImageImport.h>
 
 typedef itksys::SystemTools ist;
 typedef itk::Point<float, 4> PointType4;
@@ -66,7 +68,7 @@ int main(int argc, char* argv[])
 
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("", "i1", mitkCommandLineParser::StringList, "Input tractograms:", "input tractograms (.fib, vtk ascii file format)", us::Any(), false);
-  parser.addArgument("", "i2", mitkCommandLineParser::InputFile, "Input peaks:", "input peak image", us::Any(), false);
+  parser.addArgument("", "i2", mitkCommandLineParser::InputFile, "Input image:", "input image", us::Any(), false);
   parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
 
   parser.addArgument("max_iter", "", mitkCommandLineParser::Int, "Max. iterations:", "maximum number of optimizer iterations", 20);
@@ -75,16 +77,16 @@ int main(int argc, char* argv[])
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
   parser.addArgument("save_res", "", mitkCommandLineParser::Bool, "Save Residuals:", "save residual images", false);
   parser.addArgument("save_weights", "", mitkCommandLineParser::Bool, "Save Weights:", "save fiber weights in a separate text file", false);
-  parser.addArgument("dont_filter_outliers", "", mitkCommandLineParser::Bool, "Don't filter outliers:", "don't perform second optimization run with an upper weight bound based on the first weight estimation (95% quantile)", false);
+  parser.addArgument("filter_outliers", "", mitkCommandLineParser::Bool, "Filter outliers:", "perform second optimization run with an upper weight bound based on the first weight estimation (99% quantile)", false);
   parser.addArgument("join_tracts", "", mitkCommandLineParser::Bool, "Join output tracts:", "outout tracts are merged into a single tractogram", false);
-  parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM, MSE, LocalMSE (default), GroupLasso, GroupMSE, NONE");
+  parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM, Variance, VoxelVariance (default), Lasso, GroupLasso, GroupVariance, NONE");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
   mitkCommandLineParser::StringContainerType fib_files = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["i1"]);
-  std::string peak_file_name = us::any_cast<std::string>(parsedArgs["i2"]);
+  std::string input_image_name = us::any_cast<std::string>(parsedArgs["i2"]);
   std::string outRoot = us::any_cast<std::string>(parsedArgs["o"]);
 
   bool single_fib = true;
@@ -99,7 +101,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("save_weights"))
     save_weights = us::any_cast<bool>(parsedArgs["save_weights"]);
 
-  std::string regu = "LocalMSE";
+  std::string regu = "VoxelVariance";
   if (parsedArgs.count("regu"))
     regu = us::any_cast<std::string>(parsedArgs["regu"]);
 
@@ -119,9 +121,9 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("lambda"))
     lambda = us::any_cast<float>(parsedArgs["lambda"]);
 
-  bool filter_outliers = true;
-  if (parsedArgs.count("dont_filter_outliers"))
-    filter_outliers = !us::any_cast<bool>(parsedArgs["dont_filter_outliers"]);
+  bool filter_outliers = false;
+  if (parsedArgs.count("filter_outliers"))
+    filter_outliers = us::any_cast<bool>(parsedArgs["filter_outliers"]);
 
   try
   {
@@ -132,13 +134,6 @@ int main(int argc, char* argv[])
     std::vector< mitk::FiberBundle::Pointer > input_tracts;
 
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image", "Fiberbundles"}, {});
-    mitk::Image::Pointer inputImage = dynamic_cast<mitk::PeakImage*>(mitk::IOUtil::Load(peak_file_name, &functor)[0].GetPointer());
-
-    typedef mitk::ImageToItk< PeakImgType > CasterType;
-    CasterType::Pointer caster = CasterType::New();
-    caster->SetInput(inputImage);
-    caster->Update();
-    PeakImgType::Pointer peak_image = caster->GetOutput();
 
     std::vector< std::string > fib_names;
     for (auto item : fib_files)
@@ -166,7 +161,42 @@ int main(int argc, char* argv[])
     std::cout.rdbuf (old);              // <-- restore
 
     itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
-    fitter->SetPeakImage(peak_image);
+
+    mitk::BaseData::Pointer inputData = mitk::IOUtil::Load(input_image_name, &functor)[0].GetPointer();
+    mitk::Image::Pointer mitk_image = dynamic_cast<mitk::Image*>(inputData.GetPointer());
+    mitk::PeakImage::Pointer mitk_peak_image = dynamic_cast<mitk::PeakImage*>(inputData.GetPointer());
+    if (mitk_peak_image.IsNotNull())
+    {
+      typedef mitk::ImageToItk< mitk::PeakImage::ItkPeakImageType > CasterType;
+      CasterType::Pointer caster = CasterType::New();
+      caster->SetInput(mitk_peak_image);
+      caster->Update();
+      mitk::PeakImage::ItkPeakImageType::Pointer peak_image = caster->GetOutput();
+      fitter->SetPeakImage(peak_image);
+    }
+    else if (mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(mitk_image))
+    {
+      fitter->SetDiffImage(mitk::DiffusionPropertyHelper::GetItkVectorImage(mitk_image));
+      mitk::TensorModel<>* model = new mitk::TensorModel<>();
+      model->SetBvalue(1000);
+      model->SetDiffusivity1(0.0010);
+      model->SetDiffusivity2(0.00015);
+      model->SetDiffusivity3(0.00015);
+      model->SetGradientList(mitk::DiffusionPropertyHelper::GetGradientContainer(mitk_image));
+      fitter->SetSignalModel(model);
+    }
+    else if (mitk_image->GetDimension()==3)
+    {
+      itk::FitFibersToImageFilter::DoubleImgType::Pointer scalar_image = itk::FitFibersToImageFilter::DoubleImgType::New();
+      mitk::CastToItkImage(mitk_image, scalar_image);
+      fitter->SetScalarImage(scalar_image);
+    }
+    else
+    {
+      MITK_INFO << "Input image invalid. Valid options are peak image, 3D scalar image or raw diffusion-weighted image.";
+      return EXIT_FAILURE;
+    }
+
     fitter->SetTractograms(input_tracts);
     fitter->SetFitIndividualFibers(single_fib);
     fitter->SetMaxIterations(max_iter);
@@ -176,36 +206,91 @@ int main(int argc, char* argv[])
 
     if (regu=="MSM")
       fitter->SetRegularization(VnlCostFunction::REGU::MSM);
-    else if (regu=="MSE")
-      fitter->SetRegularization(VnlCostFunction::REGU::MSE);
-    else if (regu=="Local_MSE")
-      fitter->SetRegularization(VnlCostFunction::REGU::Local_MSE);
+    else if (regu=="Variance")
+      fitter->SetRegularization(VnlCostFunction::REGU::VARIANCE);
+    else if (regu=="Lasso")
+      fitter->SetRegularization(VnlCostFunction::REGU::LASSO);
+    else if (regu=="VoxelVariance")
+      fitter->SetRegularization(VnlCostFunction::REGU::VOXEL_VARIANCE);
     else if (regu=="GroupLasso")
       fitter->SetRegularization(VnlCostFunction::REGU::GROUP_LASSO);
-    else if (regu=="GroupMSE")
-      fitter->SetRegularization(VnlCostFunction::REGU::GROUP_MSE);
+    else if (regu=="GroupVariance")
+      fitter->SetRegularization(VnlCostFunction::REGU::GROUP_VARIANCE);
     else if (regu=="NONE")
       fitter->SetRegularization(VnlCostFunction::REGU::NONE);
 
     fitter->Update();
 
-    if (save_residuals)
+    if (save_residuals && mitk_peak_image.IsNotNull())
     {
       itk::ImageFileWriter< PeakImgType >::Pointer writer = itk::ImageFileWriter< PeakImgType >::New();
       writer->SetInput(fitter->GetFittedImage());
-      writer->SetFileName(outRoot + "fitted_image.nrrd");
+      writer->SetFileName(outRoot + "_fitted.nii.gz");
       writer->Update();
 
       writer->SetInput(fitter->GetResidualImage());
-      writer->SetFileName(outRoot + "residual_image.nrrd");
+      writer->SetFileName(outRoot + "_residual.nii.gz");
       writer->Update();
 
       writer->SetInput(fitter->GetOverexplainedImage());
-      writer->SetFileName(outRoot + "overexplained_image.nrrd");
+      writer->SetFileName(outRoot + "_overexplained.nii.gz");
       writer->Update();
 
       writer->SetInput(fitter->GetUnderexplainedImage());
-      writer->SetFileName(outRoot + "underexplained_image.nrrd");
+      writer->SetFileName(outRoot + "_underexplained.nii.gz");
+      writer->Update();
+    }
+    else if (save_residuals && mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(mitk_image))
+    {
+      {
+        mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( fitter->GetFittedImageDiff().GetPointer() );
+        mitk::DiffusionPropertyHelper::CopyProperties(mitk_image, outImage, true);
+        mitk::DiffusionPropertyHelper propertyHelper( outImage );
+        propertyHelper.InitializeImage();
+        mitk::IOUtil::Save(outImage, "application/vnd.mitk.nii.gz", outRoot + "_fitted_image.nii.gz");
+      }
+
+      {
+        mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( fitter->GetResidualImageDiff().GetPointer() );
+        mitk::DiffusionPropertyHelper::CopyProperties(mitk_image, outImage, true);
+        mitk::DiffusionPropertyHelper propertyHelper( outImage );
+        propertyHelper.InitializeImage();
+        mitk::IOUtil::Save(outImage, "application/vnd.mitk.nii.gz", outRoot + "_residual_image.nii.gz");
+      }
+
+      {
+        mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( fitter->GetOverexplainedImageDiff().GetPointer() );
+        mitk::DiffusionPropertyHelper::CopyProperties(mitk_image, outImage, true);
+        mitk::DiffusionPropertyHelper propertyHelper( outImage );
+        propertyHelper.InitializeImage();
+        mitk::IOUtil::Save(outImage, "application/vnd.mitk.nii.gz", outRoot + "_overexplained_image.nii.gz");
+      }
+
+      {
+        mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( fitter->GetUnderexplainedImageDiff().GetPointer() );
+        mitk::DiffusionPropertyHelper::CopyProperties(mitk_image, outImage, true);
+        mitk::DiffusionPropertyHelper propertyHelper( outImage );
+        propertyHelper.InitializeImage();
+        mitk::IOUtil::Save(outImage, "application/vnd.mitk.nii.gz", outRoot + "_underexplained_image.nii.gz");
+      }
+    }
+    else if (save_residuals)
+    {
+      itk::ImageFileWriter< itk::FitFibersToImageFilter::DoubleImgType >::Pointer writer = itk::ImageFileWriter< itk::FitFibersToImageFilter::DoubleImgType >::New();
+      writer->SetInput(fitter->GetFittedImageScalar());
+      writer->SetFileName(outRoot + "_fitted_image.nii.gz");
+      writer->Update();
+
+      writer->SetInput(fitter->GetResidualImageScalar());
+      writer->SetFileName(outRoot + "_residual_image.nii.gz");
+      writer->Update();
+
+      writer->SetInput(fitter->GetOverexplainedImageScalar());
+      writer->SetFileName(outRoot + "_overexplained_image.nii.gz");
+      writer->Update();
+
+      writer->SetInput(fitter->GetUnderexplainedImageScalar());
+      writer->SetFileName(outRoot + "_underexplained_image.nii.gz");
       writer->Update();
     }
 

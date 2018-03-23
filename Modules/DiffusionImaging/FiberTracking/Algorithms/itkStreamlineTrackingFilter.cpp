@@ -316,7 +316,7 @@ void StreamlineTrackingFilter::BeforeTracking()
   std::cout << "StreamlineTracking - Only frontal samples: " << m_OnlyForwardSamples << std::endl;
 
   if (m_TrackingPriorHandler!=nullptr)
-    std::cout << "StreamlineTracking - Using directional prior for tractography" << std::endl;
+    std::cout << "StreamlineTracking - Using directional prior for tractography (w=" << m_TrackingPriorWeight << ")" << std::endl;
 
   if (m_DemoMode)
   {
@@ -602,6 +602,8 @@ float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool fro
     {
       dist += m_StepSize;
       vnl_vector_fixed< float, 3 > v = fib->at(c);
+      if (dot_product(v,meanV)<0)
+        v = -v;
       vectors.push_back(v);
       meanV += v;
       c++;
@@ -614,6 +616,8 @@ float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool fro
     {
       dist += m_StepSize;
       vnl_vector_fixed< float, 3 > v = fib->at(c);
+      if (dot_product(v,meanV)<0)
+        v = -v;
       vectors.push_back(v);
       meanV += v;
       c--;
@@ -953,9 +957,6 @@ void StreamlineTrackingFilter::AfterTracking()
   MITK_INFO << "Tracking took " << hh.count() << "h, " << mm.count() << "m and " << ss.count() << "s";
 
   m_SeedPoints.clear();
-
-  if (m_TrackingPriorHandler!=nullptr)
-    delete m_TrackingPriorHandler;
 }
 
 void StreamlineTrackingFilter::SetDicomProperties(mitk::FiberBundle::Pointer fib)

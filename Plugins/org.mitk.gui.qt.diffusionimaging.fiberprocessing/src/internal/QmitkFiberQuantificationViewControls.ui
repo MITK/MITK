@@ -17,12 +17,12 @@
    <property name="verticalSpacing">
     <number>25</number>
    </property>
-   <item row="0" column="0">
-    <widget class="QGroupBox" name="groupBox">
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Input Data</string>
+      <string>Fiber-derived images</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
+     <layout class="QGridLayout" name="gridLayout_3">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -35,24 +35,102 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="0" column="1">
-       <widget class="QmitkDataStorageComboBox" name="m_TractBox"/>
-      </item>
-      <item row="1" column="1">
-       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_ImageBox"/>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_5">
+      <item row="1" column="0">
+       <widget class="QCommandLinkButton" name="m_ProcessFiberBundleButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>200</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Perform selected operation on all selected fiber bundles.</string>
+        </property>
         <property name="text">
-         <string>Tractogram:</string>
+         <string>Generate Image</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Reference Image:</string>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="m_UpsamplingSpinBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
+        <property name="toolTip">
+         <string>Upsampling factor</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>10.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QComboBox" name="m_GenerationBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <item>
+         <property name="text">
+          <string>Tract Density Image (TDI)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Normalized TDI</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Binary Envelope</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Fiber Bundle Image</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Fiber Endings Image</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Fiber Endings Pointset</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>
@@ -205,6 +283,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
            <item>
             <property name="text">
              <string>Global maximum</string>
@@ -240,7 +321,7 @@
          <string>Output #Directions per Voxel</string>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -257,12 +338,12 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="groupBox_2">
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Fiber-derived images</string>
+      <string>Input Data</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3">
+     <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -275,106 +356,41 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="1" column="0">
-       <widget class="QCommandLinkButton" name="m_ProcessFiberBundleButton">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>200</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
-        <property name="toolTip">
-         <string>Perform selected operation on all selected fiber bundles.</string>
-        </property>
-        <property name="text">
-         <string>Generate Image</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="m_UpsamplingSpinBox">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="toolTip">
-         <string>Upsampling factor</string>
-        </property>
-        <property name="decimals">
-         <number>1</number>
-        </property>
-        <property name="minimum">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>10.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="value">
-         <double>1.000000000000000</double>
-        </property>
-       </widget>
+       <widget class="QmitkDataStorageComboBox" name="m_TractBox"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_ImageBox"/>
       </item>
       <item row="0" column="0">
-       <widget class="QComboBox" name="m_GenerationBox">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Tractogram:</string>
         </property>
-        <item>
-         <property name="text">
-          <string>Tract Density Image (TDI)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Normalized TDI</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Binary Envelope</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Fiber Bundle Image</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Fiber Endings Image</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Fiber Endings Pointset</string>
-         </property>
-        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Reference Image:</string>
+        </property>
        </widget>
       </item>
      </layout>
     </widget>
+   </item>
+   <item row="3" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

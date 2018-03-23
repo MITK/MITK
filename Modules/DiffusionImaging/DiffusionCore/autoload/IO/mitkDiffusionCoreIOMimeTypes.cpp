@@ -368,10 +368,16 @@ DiffusionCoreIOMimeTypes::PeakImageMimeType::PeakImageMimeType() : CustomMimeTyp
   this->AddExtension("nrrd");
   this->AddExtension("nii");
   this->AddExtension("nii.gz");
+  this->AddExtension("peak");
 }
 
 bool DiffusionCoreIOMimeTypes::PeakImageMimeType::AppliesTo(const std::string &path) const
 {
+  std::string ext = itksys::SystemTools::GetFilenameExtension(path);
+  if (ext==".peak")
+    return true;
+
+  try
   {
     itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
     if ( io->CanReadFile( path.c_str() ) )
@@ -382,6 +388,10 @@ bool DiffusionCoreIOMimeTypes::PeakImageMimeType::AppliesTo(const std::string &p
         return true;
     }
   }
+  catch(...)
+  {}
+
+  try
   {
     itk::NiftiImageIO::Pointer io = itk::NiftiImageIO::New();
     if ( io->CanReadFile( path.c_str() ) )
@@ -392,6 +402,8 @@ bool DiffusionCoreIOMimeTypes::PeakImageMimeType::AppliesTo(const std::string &p
         return true;
     }
   }
+  catch(...)
+  {}
 
   return false;
 }

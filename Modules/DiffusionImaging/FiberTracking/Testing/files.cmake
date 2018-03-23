@@ -9,6 +9,7 @@ SET(MODULE_CUSTOM_TESTS
   mitkFiberfoxSignalGenerationTest.cpp
   mitkMachineLearningTrackingTest.cpp
   mitkFiberProcessingTest.cpp
+  mitkFiberFitTest.cpp
 )
 
 

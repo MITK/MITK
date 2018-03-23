@@ -78,6 +78,8 @@ QmitkStreamlineTrackingView::QmitkStreamlineTrackingView()
   , m_ThreadIsRunning(false)
   , m_DeleteTrackingHandler(false)
   , m_Visible(false)
+  , m_LastPrior("")
+  , m_TrackingPriorHandler(nullptr)
 {
   m_TrackingWorker.moveToThread(&m_TrackingThread);
   connect(&m_TrackingThread, SIGNAL(started()), this, SLOT(BeforeThread()));
@@ -451,6 +453,9 @@ void QmitkStreamlineTrackingView::DeleteTrackingHandler()
     delete m_TrackingHandler;
     m_TrackingHandler = nullptr;
     m_DeleteTrackingHandler = false;
+    m_LastPrior = "";
+    if (m_TrackingPriorHandler != nullptr)
+      delete m_TrackingPriorHandler;
   }
   else if (m_ThreadIsRunning)
   {
@@ -659,12 +664,6 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         StartStopTrackingGui(false);
         return;
       }
-
-//      if (m_FirstTensorProbRun)
-//      {
-//        QMessageBox::information(nullptr, "Information", "Internally calculating ODF from tensor image and performing probabilistic ODF tractography. ODFs are sharpened (min-max normalized and raised to the power of 4). TEND parameters are ignored.");
-//        m_FirstTensorProbRun = false;
-//      }
 
       if (m_TrackingHandler==nullptr)
       {
@@ -878,27 +877,30 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
 
   if (m_Controls->m_PriorImageBox->GetSelectedNode().IsNotNull())
   {
-    typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
-    CasterType::Pointer caster = CasterType::New();
-    caster->SetInput(dynamic_cast<mitk::PeakImage*>(m_Controls->m_PriorImageBox->GetSelectedNode()->GetData()));
-    caster->SetCopyMemFlag(true);
-    caster->Update();
-    mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
-    mitk::TrackingDataHandler* trackingPriorHandler = new mitk::TrackingHandlerPeaks();
-    dynamic_cast<mitk::TrackingHandlerPeaks*>(trackingPriorHandler)->SetPeakImage(itkImg);
-    dynamic_cast<mitk::TrackingHandlerPeaks*>(trackingPriorHandler)->SetPeakThreshold(m_Controls->m_ScalarThresholdBox->value());
+    if (m_LastPrior!=m_Controls->m_PriorImageBox->GetSelectedNode()->GetUID() || m_TrackingPriorHandler==nullptr)
+    {
+      typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
+      CasterType::Pointer caster = CasterType::New();
+      caster->SetInput(dynamic_cast<mitk::PeakImage*>(m_Controls->m_PriorImageBox->GetSelectedNode()->GetData()));
+      caster->SetCopyMemFlag(true);
+      caster->Update();
+      mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
+      m_TrackingPriorHandler = new mitk::TrackingHandlerPeaks();
+      dynamic_cast<mitk::TrackingHandlerPeaks*>(m_TrackingPriorHandler)->SetPeakImage(itkImg);
+      dynamic_cast<mitk::TrackingHandlerPeaks*>(m_TrackingPriorHandler)->SetPeakThreshold(0.0);
+      m_LastPrior = m_Controls->m_PriorImageBox->GetSelectedNode()->GetUID();
+    }
 
-    trackingPriorHandler->SetFlipX(m_Controls->m_FlipXBox->isChecked());
-    trackingPriorHandler->SetFlipY(m_Controls->m_FlipYBox->isChecked());
-    trackingPriorHandler->SetFlipZ(m_Controls->m_FlipZBox->isChecked());
-    trackingPriorHandler->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
-    trackingPriorHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
+    m_TrackingPriorHandler->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
+    m_TrackingPriorHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
 
-    m_Tracker->SetTrackingPriorHandler(trackingPriorHandler);
+    m_Tracker->SetTrackingPriorHandler(m_TrackingPriorHandler);
     m_Tracker->SetTrackingPriorWeight(m_Controls->m_PriorWeightBox->value());
     m_Tracker->SetTrackingPriorAsMask(m_Controls->m_PriorAsMaskBox->isChecked());
     m_Tracker->SetIntroduceDirectionsFromPrior(m_Controls->m_NewDirectionsFromPriorBox->isChecked());
   }
+  else if (m_Controls->m_PriorImageBox->GetSelectedNode().IsNull())
+    m_Tracker->SetTrackingPriorHandler(nullptr);
 
   if (m_Controls->m_ExclusionImageBox->GetSelectedNode().IsNotNull())
   {

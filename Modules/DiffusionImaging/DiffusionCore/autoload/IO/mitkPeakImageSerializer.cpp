@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageFileWriter.h"
 #include <mitkImageToItk.h>
 #include <itksys/SystemTools.hxx>
-
+#include <itkNrrdImageIO.h>
 
 MITK_REGISTER_SERIALIZER(PeakImageSerializer)
 
@@ -47,7 +47,7 @@ std::string mitk::PeakImageSerializer::Serialize()
   std::string filename( this->GetUniqueFilenameInWorkingDirectory() );
   filename += "_";
   filename += m_FilenameHint;
-  filename += ".nrrd";
+  filename += ".peak";
 
   std::string fullname(m_WorkingDirectory);
   fullname += "/";
@@ -64,6 +64,10 @@ std::string mitk::PeakImageSerializer::Serialize()
     itk::ImageFileWriter< PeakImage::ItkPeakImageType >::Pointer writer = itk::ImageFileWriter< PeakImage::ItkPeakImageType >::New();
     writer->SetInput(itk_image);
     writer->SetFileName(fullname);
+    itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+    io->SetFileType( itk::ImageIOBase::Binary );
+    io->UseCompressionOn();
+    writer->SetImageIO(io);
     writer->Update();
   }
   catch (std::exception& e)

@@ -137,7 +137,7 @@ double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dw
 
           double fa_diff = fabs(it2.Get()/fa - 1.0);
           double md_diff = fabs(it4.Get()/it3.Get() - 1.0);
-          error += mod * (fa_diff + md_diff);
+          error += mod*mod * (fa_diff + md_diff);
           count += 2;
         }
       }
@@ -435,7 +435,7 @@ int main(int argc, char* argv[])
     mitk::Image::Pointer mitk_img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(fa_file)[0].GetPointer());
     mitk::CastToItkImage(mitk_img, fa_image);
 
-    int binsPerDimension = 10;
+    int binsPerDimension = 20;
     using ImageToHistogramFilterType = itk::Statistics::MaskedImageToHistogramFilter< itk::Image< double,3 >, itk::Image< unsigned char,3 > >;
 
     ImageToHistogramFilterType::HistogramType::MeasurementVectorType lowerBound(binsPerDimension);

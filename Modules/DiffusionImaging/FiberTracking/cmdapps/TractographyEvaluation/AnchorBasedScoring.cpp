@@ -100,8 +100,8 @@ int main(int argc, char* argv[])
   parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask image:", "scoring is only performed inside the mask image");
   parser.addArgument("greedy_add", "", mitkCommandLineParser::Bool, "Greedy:", "if enabled, the candidate tracts are not jointly fitted to the residual image but one after the other employing a greedy scheme", false);
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
-  parser.addArgument("dont_filter_outliers", "", mitkCommandLineParser::Bool, "Don't filter outliers:", "don't perform second optimization run with an upper weight bound based on the first weight estimation (95% quantile)", false);
-  parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM, MSE, LocalMSE, GroupLasso, GroupMSE, NONE (default)");
+  parser.addArgument("filter_outliers", "", mitkCommandLineParser::Bool, "Filter outliers:", "perform second optimization run with an upper weight bound based on the first weight estimation (99% quantile)", false);
+  parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM, Variance, VoxelVariance, Lasso, GroupLasso, GroupVariance, NONE (default)");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -120,9 +120,9 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("lambda"))
     lambda = us::any_cast<float>(parsedArgs["lambda"]);
 
-  bool filter_outliers = true;
-  if (parsedArgs.count("dont_filter_outliers"))
-    filter_outliers = !us::any_cast<bool>(parsedArgs["dont_filter_outliers"]);
+  bool filter_outliers = false;
+  if (parsedArgs.count("filter_outliers"))
+    filter_outliers = us::any_cast<bool>(parsedArgs["filter_outliers"]);
 
   std::string mask_file = "";
   if (parsedArgs.count("mask"))
@@ -265,14 +265,16 @@ int main(int argc, char* argv[])
 
       if (regu=="MSM")
         fitter->SetRegularization(VnlCostFunction::REGU::MSM);
-      else if (regu=="MSE")
-        fitter->SetRegularization(VnlCostFunction::REGU::MSE);
-      else if (regu=="Local_MSE")
-        fitter->SetRegularization(VnlCostFunction::REGU::Local_MSE);
+      else if (regu=="Variance")
+        fitter->SetRegularization(VnlCostFunction::REGU::VARIANCE);
+      else if (regu=="Lasso")
+        fitter->SetRegularization(VnlCostFunction::REGU::LASSO);
+      else if (regu=="VoxelVariance")
+        fitter->SetRegularization(VnlCostFunction::REGU::VOXEL_VARIANCE);
       else if (regu=="GroupLasso")
         fitter->SetRegularization(VnlCostFunction::REGU::GROUP_LASSO);
-      else if (regu=="GroupMSE")
-        fitter->SetRegularization(VnlCostFunction::REGU::GROUP_MSE);
+      else if (regu=="GroupVariance")
+        fitter->SetRegularization(VnlCostFunction::REGU::GROUP_VARIANCE);
       else if (regu=="NONE")
         fitter->SetRegularization(VnlCostFunction::REGU::NONE);
 

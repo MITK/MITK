@@ -224,9 +224,9 @@ void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject& e)
 
     if (histogram.IsNotNull())
     {
-      bool closedFigure = this->m_CalculationThread->GetStatisticsUpdateSuccessFlag();
+      bool statisticsUpdateSuccessful = this->m_CalculationThread->GetStatisticsUpdateSuccessFlag();
 
-      if (closedFigure)
+      if (statisticsUpdateSuccessful)
       {
 
         auto imageNameLabel = m_Controls->m_SelectedFeatureImageLabel->text().toStdString();

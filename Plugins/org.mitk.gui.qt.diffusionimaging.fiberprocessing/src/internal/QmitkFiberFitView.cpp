@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkNodePredicateDimension.h>
 #include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateOr.h>
 
 const std::string QmitkFiberFitView::VIEW_ID = "org.mitk.views.fiberfit";
 using namespace mitk;
@@ -71,7 +72,7 @@ void QmitkFiberFitView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_TractBox->SetPredicate(isFib);
 
     m_Controls->m_ImageBox->SetDataStorage(this->GetDataStorage());
-    m_Controls->m_ImageBox->SetPredicate( mitk::NodePredicateAnd::New(isImage, is3D) );
+    m_Controls->m_ImageBox->SetPredicate( mitk::NodePredicateOr::New( mitk::NodePredicateAnd::New(isImage, is3D), mitk::TNodePredicateDataType<mitk::PeakImage>::New()) );
 
     DataSelectionChanged();
   }

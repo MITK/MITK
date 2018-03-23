@@ -143,6 +143,8 @@ private:
   bool                                    m_DeleteTrackingHandler;
   QmitkSliceNavigationListener            m_SliceChangeListener;
   bool                                    m_Visible;
+  mitk::Identifiable::UIDType             m_LastPrior;
+  mitk::TrackingDataHandler*              m_TrackingPriorHandler;
 };
 
 

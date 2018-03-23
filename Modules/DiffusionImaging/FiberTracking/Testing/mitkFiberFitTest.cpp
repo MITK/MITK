@@ -196,7 +196,7 @@ public:
     omp_set_num_threads(1);
     fitter->SetLambda(0.1);
     fitter->SetFilterOutliers(false);
-    fitter->SetRegularization(VnlCostFunction::MSE);
+    fitter->SetRegularization(VnlCostFunction::VARIANCE);
     fitter->Update();
 
     std::vector< mitk::FiberBundle::Pointer > output_tracts = fitter->GetTractograms();
@@ -213,7 +213,7 @@ public:
     omp_set_num_threads(1);
     fitter->SetLambda(0.1);
     fitter->SetFilterOutliers(false);
-    fitter->SetRegularization(VnlCostFunction::Local_MSE);
+    fitter->SetRegularization(VnlCostFunction::VOXEL_VARIANCE);
     fitter->Update();
 
     std::vector< mitk::FiberBundle::Pointer > output_tracts = fitter->GetTractograms();
@@ -230,7 +230,7 @@ public:
     omp_set_num_threads(1);
     fitter->SetLambda(0.1);
     fitter->SetFilterOutliers(false);
-    fitter->SetRegularization(VnlCostFunction::GROUP_MSE);
+    fitter->SetRegularization(VnlCostFunction::GROUP_VARIANCE);
     fitter->Update();
 
     std::vector< mitk::FiberBundle::Pointer > output_tracts = fitter->GetTractograms();

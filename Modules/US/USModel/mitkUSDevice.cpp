@@ -372,7 +372,7 @@ void mitk::USDevice::Deactivate()
   if (!this->GetIsActive())
   {
     MITK_WARN("mitkUSDevice")
-      << "Cannot deactivate a device which is not activae.";
+      << "Cannot deactivate a device which is not active.";
     return;
   }
 

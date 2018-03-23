@@ -865,20 +865,12 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     if (m_SelectedImage != nullptr) {
       //all statistics are now computed also on planar figures (lines, paths...)!
     // If a (non-closed) PlanarFigure is selected, display a line profile widget
-      if (m_SelectedPlanarFigure != nullptr) {
-        // Check if the (closed) planar figure is out of bounds and so no image mask could be calculated--> Intensity Profile can not be calculated
-        bool outOfBounds = false;
-        if (m_SelectedPlanarFigure->IsClosed() && m_SelectedImageMask == nullptr)
-        {
-          outOfBounds = true;
-          const QString message("<font color='red'>Planar figure is on a rotated image plane or outside the image bounds.</font>");
-          m_Controls->m_InfoLabel->setText(message);
-        }
+      if (m_SelectedPlanarFigure != nullptr && !m_SelectedPlanarFigure->IsClosed()) {
 
         // check whether PlanarFigure is initialized
         const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_SelectedPlanarFigure->GetPlaneGeometry();
 
-        if (!(planarFigurePlaneGeometry == nullptr || outOfBounds))
+        if (planarFigurePlaneGeometry != nullptr)
         {
           unsigned int timeStep = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
 
@@ -938,8 +930,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
           m_Controls->m_ErrorMessageLabel->hide();
           m_Controls->m_SelectedMaskLabel->setText("None");
           this->m_StatisticsUpdatePending = false;
-          if (!outOfBounds)
-            m_Controls->m_InfoLabel->setText("");
+          m_Controls->m_InfoLabel->setText("");
           return;
         }
       }

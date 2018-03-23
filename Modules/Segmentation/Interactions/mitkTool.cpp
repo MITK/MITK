@@ -285,8 +285,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateSegmentationNode(Image *image,
   segmentationNode->SetData(image);
 
   // name
-  image->SetProperty("name", StringProperty::New(organName));
-  segmentationNode->RemoveProperty("name");
+  segmentationNode->SetProperty("name", StringProperty::New(organName));
 
   // visualization properties
   segmentationNode->SetProperty("binary", BoolProperty::New(true));

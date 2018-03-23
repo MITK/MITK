@@ -111,8 +111,8 @@ void QmitkUltrasoundSupport::CreateQtPartControl(QWidget *parent)
     connect(m_Controls->m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this, SLOT(OnClickedAddNewDevice())); // Change Widget Visibilities
     connect(m_Controls->m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this->m_Controls->m_NewVideoDeviceWidget, SLOT(CreateNewDevice())); // Init NewDeviceWidget
     connect(m_Controls->m_ActiveVideoDevices, SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(OnChangedActiveDevice()));
-	connect(m_Controls->m_RunImageTimer, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()));	
-	connect(m_Controls->m_ShowImageStream, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()));
+    connect(m_Controls->m_RunImageTimer, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()));
+    connect(m_Controls->m_ShowImageStream, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()));
     connect(m_Controls->m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone())); // After NewDeviceWidget finished editing
     connect(m_Controls->m_FrameRatePipeline, SIGNAL(valueChanged(int)), this, SLOT(OnChangedFramerateLimit()));
     connect(m_Controls->m_FrameRate2d, SIGNAL(valueChanged(int)), this, SLOT(OnChangedFramerateLimit()));

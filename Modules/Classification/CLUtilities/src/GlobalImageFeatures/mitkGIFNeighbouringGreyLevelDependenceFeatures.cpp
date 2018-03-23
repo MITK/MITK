@@ -14,6 +14,94 @@
 // STL
 #include <sstream>
 
+namespace mitk
+{
+  struct NGLDMMatrixHolder
+  {
+  public:
+    NGLDMMatrixHolder(double min, double max, int number, int depenence);
+
+    int IntensityToIndex(double intensity);
+    double IndexToMinIntensity(int index);
+    double IndexToMeanIntensity(int index);
+    double IndexToMaxIntensity(int index);
+
+    double m_MinimumRange;
+    double m_MaximumRange;
+    double m_Stepsize;
+    int m_NumberOfDependences;
+    int m_NumberOfBins;
+    Eigen::MatrixXd m_Matrix;
+
+    int m_NeighbourhoodSize;
+    unsigned long m_NumberOfNeighbourVoxels;
+    unsigned long m_NumberOfDependenceNeighbourVoxels;
+    unsigned long m_NumberOfNeighbourhoods;
+    unsigned long m_NumberOfCompleteNeighbourhoods;
+  };
+
+  struct NGLDMMatrixFeatures
+  {
+    NGLDMMatrixFeatures() :
+      LowDependenceEmphasis(0),
+      HighDependenceEmphasis(0),
+      LowGreyLevelCountEmphasis(0),
+      HighGreyLevelCountEmphasis(0),
+      LowDependenceLowGreyLevelEmphasis(0),
+      LowDependenceHighGreyLevelEmphasis(0),
+      HighDependenceLowGreyLevelEmphasis(0),
+      HighDependenceHighGreyLevelEmphasis(0),
+      GreyLevelNonUniformity(0),
+      GreyLevelNonUniformityNormalised(0),
+      DependenceCountNonUniformity(0),
+      DependenceCountNonUniformityNormalised(0),
+      DependenceCountPercentage(0),
+      GreyLevelVariance(0),
+      DependenceCountVariance(0),
+      DependenceCountEntropy(0),
+      DependenceCountEnergy(0),
+      MeanGreyLevelCount(0),
+      MeanDependenceCount(0),
+      ExpectedNeighbourhoodSize(0),
+      AverageNeighbourhoodSize(0),
+      AverageIncompleteNeighbourhoodSize(0),
+      PercentageOfCompleteNeighbourhoods(0),
+      PercentageOfDependenceNeighbours(0)
+    {
+    }
+
+  public:
+    double LowDependenceEmphasis;
+    double HighDependenceEmphasis;
+    double LowGreyLevelCountEmphasis;
+    double HighGreyLevelCountEmphasis;
+    double LowDependenceLowGreyLevelEmphasis;
+    double LowDependenceHighGreyLevelEmphasis;
+    double HighDependenceLowGreyLevelEmphasis;
+    double HighDependenceHighGreyLevelEmphasis;
+
+    double GreyLevelNonUniformity;
+    double GreyLevelNonUniformityNormalised;
+    double DependenceCountNonUniformity;
+    double DependenceCountNonUniformityNormalised;
+
+    double DependenceCountPercentage;
+    double GreyLevelVariance;
+    double DependenceCountVariance;
+    double DependenceCountEntropy;
+    double DependenceCountEnergy;
+    double MeanGreyLevelCount;
+    double MeanDependenceCount;
+
+    double ExpectedNeighbourhoodSize;
+    double AverageNeighbourhoodSize;
+    double AverageIncompleteNeighbourhoodSize;
+    double PercentageOfCompleteNeighbourhoods;
+    double PercentageOfDependenceNeighbours;
+
+  };
+}
+
 static
 void MatrixFeaturesTo(mitk::NGLDMMatrixFeatures features,
                       std::string prefix,

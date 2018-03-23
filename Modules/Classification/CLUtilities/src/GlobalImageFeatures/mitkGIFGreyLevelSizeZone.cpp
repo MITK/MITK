@@ -10,6 +10,73 @@
 
 // STL
 
+namespace mitk
+{
+  struct GreyLevelSizeZoneMatrixHolder
+  {
+  public:
+    GreyLevelSizeZoneMatrixHolder(double min, double max, int number, int maxSize);
+
+    int IntensityToIndex(double intensity);
+    double IndexToMinIntensity(int index);
+    double IndexToMeanIntensity(int index);
+    double IndexToMaxIntensity(int index);
+
+    double m_MinimumRange;
+    double m_MaximumRange;
+    double m_Stepsize;
+    int m_NumberOfBins;
+    int m_MaximumSize;
+    Eigen::MatrixXd m_Matrix;
+
+  };
+
+  struct GreyLevelSizeZoneFeatures
+  {
+    GreyLevelSizeZoneFeatures() :
+      SmallZoneEmphasis(0),
+      LargeZoneEmphasis(0),
+      LowGreyLevelEmphasis(0),
+      HighGreyLevelEmphasis(0),
+      SmallZoneLowGreyLevelEmphasis(0),
+      SmallZoneHighGreyLevelEmphasis(0),
+      LargeZoneLowGreyLevelEmphasis(0),
+      LargeZoneHighGreyLevelEmphasis(0),
+      GreyLevelNonUniformity(0),
+      GreyLevelNonUniformityNormalized(0),
+      ZoneSizeNonUniformity(0),
+      ZoneSizeNoneUniformityNormalized(0),
+      ZonePercentage(0),
+      GreyLevelMean(0),
+      GreyLevelVariance(0),
+      ZoneSizeMean(0),
+      ZoneSizeVariance(0),
+      ZoneSizeEntropy(0)
+    {
+    }
+
+  public:
+    double SmallZoneEmphasis;
+    double LargeZoneEmphasis;
+    double LowGreyLevelEmphasis;
+    double HighGreyLevelEmphasis;
+    double SmallZoneLowGreyLevelEmphasis;
+    double SmallZoneHighGreyLevelEmphasis;
+    double LargeZoneLowGreyLevelEmphasis;
+    double LargeZoneHighGreyLevelEmphasis;
+    double GreyLevelNonUniformity;
+    double GreyLevelNonUniformityNormalized;
+    double ZoneSizeNonUniformity;
+    double ZoneSizeNoneUniformityNormalized;
+    double ZonePercentage;
+    double GreyLevelMean;
+    double GreyLevelVariance;
+    double ZoneSizeMean;
+    double ZoneSizeVariance;
+    double ZoneSizeEntropy;
+  };
+}
+
 static
 void MatrixFeaturesTo(mitk::GreyLevelSizeZoneFeatures features,
                       std::string prefix,

@@ -636,14 +636,6 @@ void mitk::USDevice::GenerateData()
       // copy contents of the given image into the member variable
       mitk::ImageReadAccessor inputReadAccessor(image);
       output->SetImportVolume(inputReadAccessor.GetData());
-
-      //Important: set the spacing before setting the geometry to the output.
-      if (m_OverrideSpacing)
-      {
-        image->GetGeometry()->SetSpacing(m_Spacing);
-        //___MITK_INFO << "------------setSpacing ---- " << m_Spacing;
-      }
-
       output->SetGeometry(image->GetGeometry());
     }
   }  m_ImageMutex->Unlock();

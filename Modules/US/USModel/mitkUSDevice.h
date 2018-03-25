@@ -321,6 +321,14 @@ namespace mitk {
     void SetOverrideSpacing( bool overriding );
 
   protected:
+
+    // Threading-Related
+    itk::ConditionVariable::Pointer m_FreezeBarrier;
+    itk::SimpleMutexLock        m_FreezeMutex;
+    itk::MultiThreader::Pointer m_MultiThreader; ///< itk::MultiThreader used for thread handling
+    itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the image source
+    int m_ThreadID; ///< ID of the started thread
+
     virtual void SetImageVector(std::vector<mitk::Image::Pointer> vec)
     {
       if (this->m_ImageVector != vec)                   
@@ -472,12 +480,6 @@ namespace mitk {
     */
     us::ServiceProperties m_ServiceProperties;
 
-    // Threading-Related
-    itk::ConditionVariable::Pointer m_FreezeBarrier;
-    itk::SimpleMutexLock        m_FreezeMutex;
-    itk::MultiThreader::Pointer m_MultiThreader; ///< itk::MultiThreader used for thread handling
-    itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the image source
-    int m_ThreadID; ///< ID of the started thread
 
     bool m_UnregisteringStarted;
   };

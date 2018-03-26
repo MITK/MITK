@@ -30,7 +30,7 @@ itk::MutexLock::Pointer mitk::DICOMITKSeriesGDCMReader::s_LocaleMutex = itk::Mut
 
 mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( unsigned int decimalPlacesForOrientation, bool simpleVolumeImport )
 : DICOMFileReader()
-, m_FixTiltByShearing( true )
+, m_FixTiltByShearing(m_DefaultFixTiltByShearing)
 , m_SimpleVolumeReading( simpleVolumeImport )
 , m_DecimalPlacesForOrientation( decimalPlacesForOrientation )
 , m_ExternalCache(false)

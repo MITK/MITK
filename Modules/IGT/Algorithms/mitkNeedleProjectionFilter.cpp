@@ -101,7 +101,7 @@ void mitk::NeedleProjectionFilter::GenerateData()
   // If no reference has been set yet, warn and abort
   if (m_SelectedInput == -1)
   {
-    MITK_INFO << "No input has been selected in NeedleProjection Filter. Only forwarding NavigationData...";
+   // MITK_INFO << "No input has been selected in NeedleProjection Filter. Only forwarding NavigationData...";
     return;
   }
 

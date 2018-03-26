@@ -25,7 +25,7 @@ mitk::NeedleProjectionFilter::NeedleProjectionFilter()
   : m_Projection(mitk::PointSet::New()),
   m_OriginalPoints(mitk::PointSet::New()),
   m_ShowToolAxis(false),
-  m_SelectedInput(-1)
+  m_SelectedInput(0)
 {
   // Tool Coordinates: z-axis is chosen as default axis when no axis is specified
 
@@ -101,7 +101,7 @@ void mitk::NeedleProjectionFilter::GenerateData()
   // If no reference has been set yet, warn and abort
   if (m_SelectedInput == -1)
   {
-   // MITK_INFO << "No input has been selected in NeedleProjection Filter. Only forwarding NavigationData...";
+    MITK_INFO << "No input has been selected in NeedleProjection Filter. Only forwarding NavigationData...";
     return;
   }
 

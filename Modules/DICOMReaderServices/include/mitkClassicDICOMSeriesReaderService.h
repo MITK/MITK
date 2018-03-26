@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   /**
-  Service wrapper that auto selects (using the mitk::DICOMFileReaderSelector) the best DICOMFileReader from
+  Service wrapper that directly returns an instance of ClassicDICOMSeriesReader class from
   the DICOMReader module.
   */
 class ClassicDICOMSeriesReaderService : public BaseDICOMReaderService
@@ -31,8 +31,7 @@ public:
   ClassicDICOMSeriesReaderService();
 
 protected:
-  /** Returns the reader instance that should be used. The descission may be based
-  * one the passed relevant file list.*/
+  /** Returns a ClassicDICOMSeriesReader instance.*/
   mitk::DICOMFileReader::Pointer GetReader(const mitk::StringList& relevantFiles) const override;
 
 private:

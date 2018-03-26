@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkRenderWindow.h>
 #include <QmitkChartWidget.h>
 #include <mitkImageCast.h>
+#include <mitkImageStatisticsHolder.h>
 
 // itk includes
 #include "itksys/SystemTools.hxx"
@@ -711,33 +712,23 @@ void QmitkImageStatisticsView::UpdateStatistics()
     }
 
     // check if the segmentation mask is empty
-    if (m_SelectedImageMask != NULL)
+    if (m_SelectedImageMask != nullptr)
     {
-      typedef itk::Image<unsigned char, 3> ItkImageType;
-      typedef itk::ImageRegionConstIteratorWithIndex< ItkImageType > IteratorType;
-
-      ItkImageType::Pointer itkImage;
-
-      mitk::CastToItkImage( m_SelectedImageMask, itkImage );
-
-      bool empty = true;
-      IteratorType it( itkImage, itkImage->GetLargestPossibleRegion() );
-      while ( !it.IsAtEnd() )
-      {
-        ItkImageType::ValueType val = it.Get();
-        if ( val != 0 )
-        {
-          empty = false;
-          break;
+      auto maskStatistics = m_SelectedImageMask->GetStatistics();
+      mitk::ScalarType maskMaxValue = maskStatistics->GetScalarValueMax(0);
+      if (m_SelectedImageMask->GetDimension() == 4) {
+        for (unsigned int curTimestep = 1; curTimestep < m_SelectedImageMask->GetTimeSteps(); curTimestep++) {
+          maskMaxValue = std::max(maskStatistics->GetScalarValueMax(curTimestep), maskMaxValue);
         }
-        ++it;
       }
 
-      if ( empty )
+      bool segmentationIsEmpty = maskMaxValue == 0;
+
+      if (segmentationIsEmpty)
       {
         m_Controls->m_ErrorMessageLabel->setText( "<font color='red'>Empty segmentation mask selected...</font>" );
         m_Controls->m_ErrorMessageLabel->show();
-
+        this->m_StatisticsUpdatePending = false;
         return;
       }
     }

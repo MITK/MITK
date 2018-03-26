@@ -32,7 +32,7 @@ mitk::NeedleProjectionFilter::NeedleProjectionFilter()
   MITK_DEBUG << "Constructor called";
 
   mitk::Point3D toolAxis;
-  mitk::FillVector3D(toolAxis, 0, 0, 1);
+  mitk::FillVector3D(toolAxis, 0, 0, -1);
   m_ToolAxis = toolAxis;
   InitializeOriginalPoints(toolAxis, m_ShowToolAxis);
 

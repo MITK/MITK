@@ -47,6 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCameraController.h>
 #include <mitkDataNodePickingEventObserver.h>
 
+#include <vtkRendererCollection.h>
 #include <vtkTextProperty.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkMitkRectangleProp.h>
@@ -679,9 +680,26 @@ void QmitkStdMultiWidget::SetDecorationProperties( std::string text, mitk::Color
 
   vtkSmartPointer<vtkMitkRectangleProp> frame = m_RectangleProps[widgetNumber];
   frame->SetColor(color[0],color[1],color[2]);
-  if(!renderer->HasViewProp(frame))
-  {
-    renderer->AddViewProp(frame);
+
+  // Take render for visual props
+  vtkRenderer* frameRenderer = nullptr;
+  auto renderers = this->GetRenderWindow(widgetNumber)->GetVtkRenderWindow()->GetRenderers();
+  renderers->InitTraversal();
+  for (vtkRenderer* r = renderers->GetNextItem(); r != nullptr; r = renderers->GetNextItem()) {
+    if (r->GetLayer() == 4) {
+      frameRenderer = r;
+      break;
+    }
+  }
+
+  if (frameRenderer == nullptr) {
+    frameRenderer = vtkRenderer::New();
+    frameRenderer->InteractiveOff();
+    mitk::VtkLayerController::GetInstance(this->GetRenderWindow(widgetNumber)->GetVtkRenderWindow())->InsertForegroundRenderer(frameRenderer, true);
+  }
+
+  if (!frameRenderer->HasViewProp(frame)) {
+    frameRenderer->AddViewProp(frame);
   }
 }
 

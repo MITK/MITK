@@ -48,6 +48,7 @@ set(RESOURCE_FILES
   configurations/3D/simpleinstancenumber_soft.xml
 
   configurations/3DnT/classicreader.xml
+  configurations/3DnT/imageposition.xml
   configurations/3DnT/imageposition_byacquisition.xml
   configurations/3DnT/imageposition_bytriggertime.xml
 )

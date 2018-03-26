@@ -1001,23 +1001,31 @@ void QmitkDataManagerView::SurfaceRepresentationActionToggled( bool /*checked*/ 
 
 void QmitkDataManagerView::ReinitSelectedNodes( bool )
 {
-  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+  auto dataStorage = this->GetDataStorage();
 
-  if (renderWindow == nullptr)
-    renderWindow = this->OpenRenderWindowPart(false);
+  auto selectedNodesIncludedInBoundingBox = mitk::NodePredicateAnd::New(
+    mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false))),
+    mitk::NodePredicateProperty::New("selected", mitk::BoolProperty::New(true)));
 
-  QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();
+  auto nodes = dataStorage->GetSubset(selectedNodesIncludedInBoundingBox);
 
-  foreach(mitk::DataNode::Pointer node, selectedNodes)
+  if (nodes->empty())
+    return;
+
+  if (1 == nodes->Size()) // Special case: If exacly one ...
   {
-    mitk::BaseData::Pointer basedata = node->GetData();
-    if ( basedata.IsNotNull() &&
-      basedata->GetTimeGeometry()->IsValid() )
+    auto image = dynamic_cast<mitk::Image*>(nodes->ElementAt(0)->GetData());
+
+    if (nullptr != image) // ... image is selected, reinit is expected to rectify askew images.
     {
-      renderWindow->GetRenderingManager()->InitializeViews(
-          basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+      mitk::RenderingManager::GetInstance()->InitializeViews(image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+      return;
     }
   }
+
+  auto boundingGeometry = dataStorage->ComputeBoundingGeometry3D(nodes, "visible");
+
+  mitk::RenderingManager::GetInstance()->InitializeViews(boundingGeometry);
 }
 
 void QmitkDataManagerView::RemoveSelectedNodes( bool )

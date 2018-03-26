@@ -137,7 +137,7 @@ double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dw
 
           double fa_diff = fabs(it2.Get()/fa - 1.0);
           double md_diff = fabs(it4.Get()/it3.Get() - 1.0);
-          error += mod*mod * (fa_diff + md_diff);
+          error += mod*mod*mod*mod * (fa_diff + md_diff);
           count += 2;
         }
       }
@@ -210,6 +210,9 @@ FiberfoxParameters MakeProposalRelaxation(FiberfoxParameters old_params, double 
     double add = 0;
     while (add == 0)
       add = normal_dist(randgen);
+
+    if ( (t2+add)*1.5 > new_params.m_NonFiberModelList[model_index]->GetT1() )
+      add = -add;
     t2 += add;
     new_params.m_NonFiberModelList[model_index]->SetT2(t2);
     MITK_INFO << "Proposal T2 (Non-Fiber " << model_index << "): " << t2 << " (" << add << ")";
@@ -224,6 +227,9 @@ FiberfoxParameters MakeProposalRelaxation(FiberfoxParameters old_params, double 
     double add = 0;
     while (add == 0)
       add = normal_dist(randgen);
+
+    if ( (t2+add)*1.5 > new_params.m_FiberModelList[model_index]->GetT1() )
+      add = -add;
     t2 += add;
     new_params.m_FiberModelList[model_index]->SetT2(t2);
     MITK_INFO << "Proposal T2 (Fiber " << model_index << "): " << t2 << " (" << add << ")";
@@ -238,6 +244,9 @@ FiberfoxParameters MakeProposalRelaxation(FiberfoxParameters old_params, double 
     double add = 0;
     while (add == 0)
       add = normal_dist(randgen);
+
+    if ( t1+add < new_params.m_NonFiberModelList[model_index]->GetT2() * 1.5 )
+      add = -add;
     t1 += add;
     new_params.m_NonFiberModelList[model_index]->SetT1(t1);
     MITK_INFO << "Proposal T1 (Non-Fiber " << model_index << "): " << t1 << " (" << add << ")";
@@ -252,6 +261,9 @@ FiberfoxParameters MakeProposalRelaxation(FiberfoxParameters old_params, double 
     double add = 0;
     while (add == 0)
       add = normal_dist(randgen);
+
+    if ( t1+add < new_params.m_FiberModelList[model_index]->GetT2() * 1.5 )
+      add = -add;
     t1 += add;
     new_params.m_FiberModelList[model_index]->SetT1(t1);
     MITK_INFO << "Proposal T1 (Fiber " << model_index << "): " << t1 << " (" << add << ")";

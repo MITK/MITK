@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>474</width>
-    <height>669</height>
+    <height>683</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -93,7 +93,7 @@
       <item row="1" column="1">
        <widget class="QCheckBox" name="m_MetricBox2">
         <property name="text">
-         <string>Euclidean with STDEV</string>
+         <string>Euclidean STDEV</string>
         </property>
        </widget>
       </item>

@@ -25,7 +25,7 @@ mitk::NeedleProjectionFilter::NeedleProjectionFilter()
   : m_Projection(mitk::PointSet::New()),
   m_OriginalPoints(mitk::PointSet::New()),
   m_ShowToolAxis(false),
-  m_SelectedInput(-1)
+  m_SelectedInput(0)
 {
   // Tool Coordinates: z-axis is chosen as default axis when no axis is specified
 

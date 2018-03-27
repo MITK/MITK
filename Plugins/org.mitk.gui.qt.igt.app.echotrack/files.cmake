@@ -108,8 +108,7 @@ set(MOC_H_FILES
 # for example the icon used in the menu and tabs for the
 # plug-in views in the workbench
 set(CACHED_RESOURCE_FILES
-  # resources/icon.xpm //not functional anymore. Delete code?
-  resources/icon2.xpm
+  resources/icon_US_navigation.svg
   resources/icon_US_calibration.svg
   plugin.xml
 )

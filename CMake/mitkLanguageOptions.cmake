@@ -4,9 +4,9 @@
 #
 
 #
-# Currently this will search for Python, 
+# Currently this will search for Python,
 # Java, TCL, Ruby, C#, R, and additionally it give the option to wrap LUA. will be added
-# This script is based on SimpleITK scripts. 
+# This script is based on SimpleITK scripts.
 #
 
 #include(sitkTargetLinkLibrariesWithDynamicLookup)
@@ -16,7 +16,7 @@
 #  SITK_UNDEFINED_SYMBOLS_ALLOWED
 #  )
 
-option(WRAP_DEFAULT "The default initial value for wrapping a language when it is detected on the system." ON)
+option(WRAP_DEFAULT "The default initial value for wrapping a language when it is detected on the system." OFF)
 mark_as_advanced(WRAP_DEFAULT)
 
 #

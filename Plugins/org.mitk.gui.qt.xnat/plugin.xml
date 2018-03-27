@@ -15,6 +15,7 @@
     <view id="org.mitk.views.xnat.treebrowser"
       name="XNAT Tree Browser"
       class="QmitkXnatTreeBrowserView"
+      category="Data"
       icon="resources/xnat_treebrowser_icon.png">
       <description>Search, browse and view the data in a XNAT-Installation</description>
       <keywordReference id="org.mitk.views.xnat.treebrowser.ViewKeyword"/>

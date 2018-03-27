@@ -262,10 +262,6 @@ void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)
   }
   else if( i == 1 )
   {
-    m_CurrentRenderingMode = "Multisampling";
-  }
-  else if( i == 2 )
-  {
     m_CurrentRenderingMode = "DepthPeeling";
   }
 }

@@ -138,6 +138,16 @@ class MITKDICOMREADER_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
 
     bool operator==(const DICOMDatasetSorter& other) const override;
 
+    static bool GetDefaultStrictSorting()
+    {
+      return m_DefaultStrictSorting;
+    }
+
+    static bool GetDefaultExpectDistanceOne()
+    {
+      return m_DefaultExpectDistanceOne;
+    }
+
   protected:
 
     /**
@@ -185,6 +195,9 @@ class MITKDICOMREADER_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
 
     bool m_StrictSorting;
     bool m_ExpectDistanceOne;
+
+    const static bool m_DefaultStrictSorting = false;
+    const static bool m_DefaultExpectDistanceOne = false;
 };
 
 }

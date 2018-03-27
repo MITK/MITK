@@ -30,7 +30,7 @@ itk::MutexLock::Pointer mitk::DICOMITKSeriesGDCMReader::s_LocaleMutex = itk::Mut
 
 mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( unsigned int decimalPlacesForOrientation, bool simpleVolumeImport )
 : DICOMFileReader()
-, m_FixTiltByShearing( true )
+, m_FixTiltByShearing(m_DefaultFixTiltByShearing)
 , m_SimpleVolumeReading( simpleVolumeImport )
 , m_DecimalPlacesForOrientation( decimalPlacesForOrientation )
 , m_ExternalCache(false)
@@ -41,7 +41,7 @@ mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( unsigned int decimalPl
 
 mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( const DICOMITKSeriesGDCMReader& other )
 : DICOMFileReader( other )
-, m_FixTiltByShearing( false )
+, m_FixTiltByShearing( other.m_FixTiltByShearing)
 , m_SortingResultInProgress( other.m_SortingResultInProgress )
 , m_Sorter( other.m_Sorter )
 , m_EquiDistantBlocksSorter( other.m_EquiDistantBlocksSorter->Clone() )

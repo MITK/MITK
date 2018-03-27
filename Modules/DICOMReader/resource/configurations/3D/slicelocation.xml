@@ -3,7 +3,7 @@
   label="Slice Location"
   description="Sort images by Slice Location, require equal distance between locations"
   class="DICOMITKSeriesGDCMReader"
-  version="1"
+  version="2"
   fixTiltByShearing="true">
 <DICOMDatasetSorter class="DICOMTagBasedSorter" strictSorting="true" expectDistanceOne="false">
   <Distinguishing>

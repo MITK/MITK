@@ -3,7 +3,7 @@
   label="Instance Number, consecutive"
   description="Sort images by Instance Number, require equal distances of 1"
   class="DICOMITKSeriesGDCMReader"
-  version="1"
+  version="2"
   fixTiltByShearing="true">
 <DICOMDatasetSorter class="DICOMTagBasedSorter" strictSorting="true" expectDistanceOne="true">
   <Distinguishing>

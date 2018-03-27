@@ -13,13 +13,13 @@
 %define SWIG_ADD_MITK_CLASS(classname, classinclude, nspace)
   // Include the include file in the generated cpp file
   %{
-   #include < classinclude >
+   #include < ## classinclude ## >
   typedef nspace ## :: ## classname classname ## ;
   using nspace ## :: ## classname ;
   %}
 
   // Include the given header, where the class definition is found
-  %include <classinclude>
+  %include < ## classinclude ## >
   using nspace ##:: ## classname ;
 
 
@@ -105,13 +105,13 @@
 %define SWIG_ADD_NONOBJECT_CLASS(classname, classinclude, nspace)
   // Include the include file in the generated cpp file
   %{
-   #include < classinclude >
+   #include < ## classinclude ## >
    typedef nspace ## :: ## classname classname ## ;
    using nspace ## :: ## classname ;
   %}
 
   // Include the given header, where the class definition is found
-  %include <classinclude>
+  %include < ## classinclude ## >
   using nspace ##:: ## classname ;
 
   // Typedef is necessary to overcome ambigiouties resulting in the fact that SWIG
@@ -140,13 +140,13 @@
 %define SWIG_ADD_NONOBJECT_TEMPLATECLASS(classname, classinclude, nspace, tmplstring)
   // Include the include file in the generated cpp file
   %{
-   #include < classinclude >
+   #include < ## classinclude ## >
    typedef nspace ## :: ## classname classname ## ;
    using nspace ## :: ## classname ;
   %}
 
   // Include the given header, where the class definition is found
-  %include <classinclude>
+  %include < ## classinclude ## >
   using nspace ##:: ## classname ;
 
   // Typedef is necessary to overcome ambigiouties resulting in the fact that SWIG
@@ -176,13 +176,13 @@
 %define SWIG_ADD_NONOBJECT_NOVECTOR_CLASS(classname, classinclude, nspace)
   // Include the include file in the generated cpp file
   %{
-   #include < classinclude >
+   #include < ## classinclude ## >
    typedef nspace ## :: ## classname classname ## ;
    using nspace ## :: ## classname ;
   %}
 
   // Include the given header, where the class definition is found
-  %include <classinclude>
+  %include < ## classinclude ## >
   using nspace ##:: ## classname ;
 
   // Typedef is necessary to overcome ambigiouties resulting in the fact that SWIG

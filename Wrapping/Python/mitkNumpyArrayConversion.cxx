@@ -56,6 +56,7 @@ mitk_GetMemoryViewFromImage( PyObject *SWIGUNUSEDPARM(self), PyObject *args )
   Py_buffer                   pyBuffer;
   memset(&pyBuffer, 0, sizeof(Py_buffer));
 
+  unsigned int accumulatorValue = 1;
 
   if( !PyArg_ParseTuple( args, "O", &pyImage ) )
     {
@@ -90,7 +91,7 @@ mitk_GetMemoryViewFromImage( PyObject *SWIGUNUSEDPARM(self), PyObject *args )
     size.push_back( mitkImage->GetPixelType().GetNumberOfComponents() );
   }
 
-  len = std::accumulate( size.begin(), size.end(), unsigned int(1), std::multiplies<unsigned int>() );
+  len = std::accumulate( size.begin(), size.end(), accumulatorValue, std::multiplies<unsigned int>() );
   len *= pixelSize;
 
   if (PyBuffer_FillInfo(&pyBuffer, NULL, (void*)mitkBufferPtr, len, true, PyBUF_CONTIG_RO)!=0)
@@ -128,6 +129,8 @@ mitk_SetImageFromArray( PyObject *SWIGUNUSEDPARM(self), PyObject *args )
   unsigned int dimension = 0;
   std::vector< unsigned int > size;
   size_t len = 1;
+
+  unsigned int accuValue = 1;
 
   // We wish to support both the new PEP3118 buffer interface and the
   // older. So we first try to parse the arguments with the new buffer
@@ -207,7 +210,7 @@ mitk_SetImageFromArray( PyObject *SWIGUNUSEDPARM(self), PyObject *args )
 	  size.push_back(mitkImage->GetPixelType().GetNumberOfComponents());
   }
 
-  len = std::accumulate(size.begin(), size.end(), unsigned int(1), std::multiplies<unsigned int>());
+  len = std::accumulate(size.begin(), size.end(), accuValue, std::multiplies<unsigned int>());
   len *= pixelSize;
 
   if ( buffer_len != len )

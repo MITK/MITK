@@ -1060,7 +1060,6 @@ Alternative: Manually edit the axis using the spinboxes.</string>
         </spacer>
        </item>
       </layout>
-      <zorder>verticalSpacer_5</zorder>
      </widget>
     </widget>
    </item>
@@ -1088,14 +1087,34 @@ Alternative: Manually edit the axis using the spinboxes.</string>
      </item>
     </layout>
    </item>
+   <item>
+    <spacer name="verticalSpacer_6">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
   </layout>
   <zorder>tabWidget</zorder>
   <zorder>label</zorder>
   <zorder>groupBox</zorder>
   <zorder>groupBox_2</zorder>
+  <zorder>verticalSpacer_6</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
+  <customwidget>
+   <class>QmitkToolTrackingStatusWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkToolTrackingStatusWidget.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>QmitkPointListWidget</class>
    <extends>QWidget</extends>
@@ -1106,12 +1125,6 @@ Alternative: Manually edit the axis using the spinboxes.</string>
    <class>QmitkNavigationDataSourceSelectionWidget</class>
    <extends>QWidget</extends>
    <header>QmitkNavigationDataSourceSelectionWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QmitkToolTrackingStatusWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkToolTrackingStatusWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

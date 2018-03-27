@@ -101,9 +101,6 @@ void QmitkFiberQuantificationView::Deactivated()
 void QmitkFiberQuantificationView::Visible()
 {
   m_Visible = true;
-  QList<mitk::DataNode::Pointer> selection = GetDataManagerSelection();
-  berry::IWorkbenchPart::Pointer nullPart;
-  OnSelectionChanged(nullPart, selection);
 }
 
 void QmitkFiberQuantificationView::Hidden()

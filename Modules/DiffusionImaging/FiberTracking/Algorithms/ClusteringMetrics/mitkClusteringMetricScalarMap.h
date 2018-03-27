@@ -39,6 +39,7 @@ public:
   ClusteringMetricScalarMap()
   {
     m_Interpolator = itk::LinearInterpolateImageFunction< ItkFloatImgType, float >::New();
+    this->m_Scale = 30;
   }
   virtual ~ClusteringMetricScalarMap(){}
 

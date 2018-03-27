@@ -17,7 +17,7 @@ http://mitk.org/download/tutorial-data/Pic3D.nrrd (image)
 
  \dontinclude Step8.cpp
  \skipline Part Ia
- \until EnableNavigationControllerEventListening
+ \until SetWidgetPlanesVisibility
 
 
  \ref Step07Page "[Previous step]" \ref Step09Page "[Next step]"

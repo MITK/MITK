@@ -86,7 +86,7 @@ void RegionGrowing(itk::Image<TPixel, VImageDimension> *itkImage, Step6 *step6)
   step6->m_ResultNode->SetProperty("levelwindow", levWinProp);
 
   step6->m_ResultImage = static_cast<mitk::Image *>(step6->m_ResultNode->GetData());
-}
+} //RegionGrowing()
 
 /**
 \example Step6RegionGrowing.txx

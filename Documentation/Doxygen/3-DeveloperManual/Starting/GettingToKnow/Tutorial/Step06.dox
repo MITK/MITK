@@ -39,7 +39,7 @@ This creates a button to start the segmentation and its clicked() signal is conn
 
 \dontinclude Step6.cpp
 
-\skipline QPushButton* startButton
+\skipline QPushButton *startButton
 \skipline connect(startButton
 
 \section AccessMTIKImagesAsITKImagesSection Access MITK images as ITK images
@@ -68,21 +68,20 @@ AccessByItk(mitkImage, MyAccessMethod)
 
 In this step our access method is called RegionGrowing() (defined in \ref Step6RegionGrowing.txx "Step6RegionGrowing.txx"):
 \skipline template
-\until }
-\until }
+\until } //RegionGrowing()
 
 Additionally the access function has to be instantiated for all datatypes and two/three dimensions as some compilers have memory problems without this explicit instantiation, some even need instantiations in separate files for 2D/3D: \n
 For 2D in \ref Step6RegionGrowing1.cpp "Step6RegionGrowing1.cpp" :
 
 \dontinclude Step6RegionGrowing1.cpp
 
-\skipline InstantiateAccessFunctionForFixedDimension_1
+\skipline InstantiateAccessFunctionForFixedDimension
 
 ... and for 3D in \ref Step6RegionGrowing2.cpp "Step6RegionGrowing2.cpp":
 
 \dontinclude Step6RegionGrowing2.cpp
 
-\skipline InstantiateAccessFunctionForFixedDimension_1
+\skipline InstantiateAccessFunctionForFixedDimension
 
 \dontinclude Step6.cpp
 

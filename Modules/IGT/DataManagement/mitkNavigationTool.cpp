@@ -109,17 +109,25 @@ void mitk::NavigationTool::SetToolAxis(mitk::Point3D toolAxis)
   mitk::Vector3D toolAxisFromCalibration;
   mitk::FillVector3D(toolAxisFromCalibration, toolAxis[0], toolAxis[1], toolAxis[2]);
   toolAxisFromCalibration.Normalize();
-  // Determine rotation angle
-  mitk::ScalarType rotationAngle = acos(toolAxisSensorCoordinateSystem*toolAxisFromCalibration);
-  // Determine rotation axis
-  mitk::Vector3D rotationAxis = itk::CrossProduct(toolAxisSensorCoordinateSystem, toolAxisFromCalibration);
-  // Calculate transform
-  itk::AffineTransform<mitk::ScalarType>::Pointer sensorToToolAxisOrientation = itk::AffineTransform<mitk::ScalarType>::New();
-  sensorToToolAxisOrientation->Rotate3D(rotationAxis, rotationAngle);
-  // transfer to quaternion notation. Note that the vnl_quaternion expects the matrix in row major format, hence the transpose
-  mitk::Quaternion toolAxisTransform(sensorToToolAxisOrientation->GetMatrix().GetVnlMatrix().transpose());
-  // Update the tool tip orientation
-  m_ToolAxisOrientation = toolAxisTransform;
+  // if tool axis to be set is different to the default tool axis (0,0,-1) calculate the tool axis orientation, otherwise set it to identity
+  if (toolAxisSensorCoordinateSystem == toolAxisFromCalibration)
+  {
+    m_ToolAxisOrientation = mitk::Quaternion(0,0,0,1);
+  }
+  else
+  {
+    // Determine rotation angle
+    mitk::ScalarType rotationAngle = acos(toolAxisSensorCoordinateSystem*toolAxisFromCalibration);
+    // Determine rotation axis
+    mitk::Vector3D rotationAxis = itk::CrossProduct(toolAxisSensorCoordinateSystem, toolAxisFromCalibration);
+    // Calculate transform
+    itk::AffineTransform<mitk::ScalarType>::Pointer sensorToToolAxisOrientation = itk::AffineTransform<mitk::ScalarType>::New();
+    sensorToToolAxisOrientation->Rotate3D(rotationAxis, rotationAngle);
+    // transfer to quaternion notation. Note that the vnl_quaternion expects the matrix in row major format, hence the transpose
+    mitk::Quaternion toolAxisTransform(sensorToToolAxisOrientation->GetMatrix().GetVnlMatrix().transpose());
+    // Update the tool axis orientation
+    m_ToolAxisOrientation = toolAxisTransform;
+  }
 }
 
 mitk::AffineTransform3D::Pointer mitk::NavigationTool::GetToolTipTransform()

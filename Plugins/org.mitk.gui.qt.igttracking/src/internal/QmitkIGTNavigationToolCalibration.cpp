@@ -547,6 +547,15 @@ void QmitkIGTNavigationToolCalibration::OnToolAxisSpinboxChanged()
   m_CalibratedToolAxis.SetElement(1, m_Controls.m_ToolAxis_Y->value());
   m_CalibratedToolAxis.SetElement(2, m_Controls.m_ToolAxis_Z->value());
   m_ToolToCalibrate->SetToolAxis(m_CalibratedToolAxis);
+  // Update TrackingTool
+  if (m_ComputedToolTipTransformation.IsNull())
+  {
+    m_ComputedToolTipTransformation = mitk::NavigationData::New();
+  }
+  m_ComputedToolTipTransformation->SetPosition(m_ToolToCalibrate->GetToolTipPosition());
+  m_ComputedToolTipTransformation->SetOrientation(m_ToolToCalibrate->GetToolAxisOrientation());
+  ApplyToolTipTransform(m_ComputedToolTipTransformation);
+
   MITK_INFO << "Tool axis changed to " << m_CalibratedToolAxis;
 }
 
@@ -576,8 +585,18 @@ void QmitkIGTNavigationToolCalibration::SetToolToCalibrate()
     mitk::Surface::Pointer ToolSurface = dynamic_cast<mitk::Surface*>(m_ToolToCalibrate->GetDataNode()->GetData())->Clone();
     m_ToolSurfaceInToolCoordinatesDataNode->SetData(ToolSurface);
     m_ToolSurfaceInToolCoordinatesDataNode->GetData()->GetGeometry()->SetIdentity();
-
+    // update tool tip and rotation information for tool tip calibration tab
     UpdateManualToolTipCalibrationView();
+    // update tool axis information for tool axis calibration tab
+    mitk::Point3D toolAxis = m_ToolToCalibrate->GetToolAxis();
+    m_CalibratedToolAxis[0] = toolAxis[0];
+    m_CalibratedToolAxis[1] = toolAxis[1];
+    m_CalibratedToolAxis[2] = toolAxis[2];
+    m_Controls.m_ToolAxis_X->blockSignals(true); m_Controls.m_ToolAxis_Y->blockSignals(true); m_Controls.m_ToolAxis_Z->blockSignals(true);
+    m_Controls.m_ToolAxis_X->setValue(m_CalibratedToolAxis[0]);
+    m_Controls.m_ToolAxis_Y->setValue(m_CalibratedToolAxis[1]);
+    m_Controls.m_ToolAxis_Z->setValue(m_CalibratedToolAxis[2]);
+    m_Controls.m_ToolAxis_X->blockSignals(false); m_Controls.m_ToolAxis_Y->blockSignals(false); m_Controls.m_ToolAxis_Z->blockSignals(false);
 
     //start updating timer for status widgets, etc.
     if (!m_TrackingTimer->isActive()) m_TrackingTimer->start(100);

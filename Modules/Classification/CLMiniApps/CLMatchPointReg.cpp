@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkDicomSeriesReader.h"
 #include "mitkProperties.h"
 
 #include "mitkCommandLineParser.h"

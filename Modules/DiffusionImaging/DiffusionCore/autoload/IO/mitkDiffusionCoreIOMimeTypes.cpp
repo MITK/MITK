@@ -75,14 +75,11 @@ bool DiffusionCoreIOMimeTypes::DiffusionImageNrrdMimeType::AppliesTo(const std::
   }
   //end fix for bug 18572
 
-  std::string ext = this->GetExtension( path );
-  ext = itksys::SystemTools::LowerCase( ext );
-
+  itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
   // Simple NRRD files should only be considered for this mime type if they contain
   // corresponding tags
-  if( ext == ".nrrd" )
+  if( io->CanReadFile(path.c_str()))
   {
-    itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
     io->SetFileName(path);
     try
     {
@@ -435,35 +432,38 @@ DiffusionCoreIOMimeTypes::SHImageMimeType::SHImageMimeType() : CustomMimeType(SH
 bool DiffusionCoreIOMimeTypes::SHImageMimeType::AppliesTo(const std::string &path) const
 {
   {
-    itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
     try
     {
-      io->SetFileName( path.c_str() );
-      io->ReadImageInformation();
-      if ( io->GetPixelType() == itk::ImageIOBase::SCALAR && io->GetNumberOfDimensions()==4)
+      itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+      if (io->CanReadFile(path.c_str()))
       {
-        switch (io->GetDimensions(3))
+        io->SetFileName(path.c_str());
+        io->ReadImageInformation();
+        if (io->GetPixelType() == itk::ImageIOBase::SCALAR && io->GetNumberOfDimensions() == 4)
         {
-        case 6:
-          return true;
-          break;
-        case 15:
-          return true;
-          break;
-        case 28:
-          return true;
-          break;
-        case 45:
-          return true;
-          break;
-        case 66:
-          return true;
-          break;
-        case 91:
-          return true;
-          break;
-        default :
-          return false;
+          switch (io->GetDimensions(3))
+          {
+          case 6:
+            return true;
+            break;
+          case 15:
+            return true;
+            break;
+          case 28:
+            return true;
+            break;
+          case 45:
+            return true;
+            break;
+          case 66:
+            return true;
+            break;
+          case 91:
+            return true;
+            break;
+          default:
+            return false;
+          }
         }
       }
     }

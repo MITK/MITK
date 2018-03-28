@@ -27,10 +27,6 @@ if(TARGET ${TESTDRIVER})
                           ${MITK_DATA_DIR}/US4DCyl.nrrd
   )
 
-  mitkAddCustomModuleTest(mitkDicomSeriesReaderTest_CTImage mitkDicomSeriesReaderTest
-                          ${MITK_DATA_DIR}/TinyCTAbdomen
-                          ${MITK_DATA_DIR}/DICOMReader/Broken-Series
-  )
 
   mitkAddCustomModuleTest(mitkPointSetReaderTest mitkPointSetReaderTest
                           ${MITK_DATA_DIR}/PointSetReaderTestData.mps

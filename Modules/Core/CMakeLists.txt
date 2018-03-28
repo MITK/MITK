@@ -12,9 +12,7 @@ MITK_CREATE_MODULE(
   DEPENDS PUBLIC mbilog CppMicroServices
   PACKAGE_DEPENDS
     PRIVATE tinyxml OpenGL
-    # Remove public GDCM and ITKIOGDCM+... dependencies after mitkDicomSeriesReader was removed
-    PUBLIC  GDCM
-    PUBLIC  ITK|ITKTransform+ITKImageGrid+ITKImageFeature+ITKIOImageBase+ITKIOGDCM+ITKIOHDF5+ITKIOLSM+ITKIOMRC+ITKIOBioRad+ITKIOGE+ITKIOStimulate
+    PUBLIC  ITK|ITKTransform+ITKImageGrid+ITKImageFeature+ITKIOImageBase+ITKIOHDF5+ITKIOLSM+ITKIOMRC+ITKIOBioRad+ITKIOGE+ITKIOStimulate
     # We privately use/link all ITK modules in order to support all IO, Transform, etc.
     # factories from ITK which are registered "automatically" via a factory manager.
     PRIVATE ITK

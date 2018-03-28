@@ -103,7 +103,7 @@ namespace mitk {
   *   - \b "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite )
   *   - \b "binary", mitk::BoolProperty::New( true ), renderer, overwrite )
   *   - \b "outline binary", mitk::BoolProperty::New( false ), renderer, overwrite )
-  *   - \b "texture interpolation", mitk::BoolProperty::New( mitk::DataNodeFactory::m_TextureInterpolationActive ) )
+  *   - \b "texture interpolation", mitk::BoolProperty::New( false ) )
   *   - \b "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() )
   *   - \b "in plane resample extent by geometry", mitk::BoolProperty::New( false ) )
   *   - \b "bounding box", mitk::BoolProperty::New( false ) )

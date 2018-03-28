@@ -55,8 +55,6 @@ void mitk::OrganTypeProperty::AddEnumerationTypes()
 {
   auto newId = static_cast<IdType>(EnumerationProperty::Size());
 
-  // On changes, please also change mitk::DataNodeFactory::DefaultColorForOrgan()
-
   AddEnum("undefined", newId++);
   AddEnum("Ankle", newId++);
   AddEnum("Appendix", newId++);

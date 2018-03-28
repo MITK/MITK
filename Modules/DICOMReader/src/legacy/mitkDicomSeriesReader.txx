@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKDICOMSERIESREADER_TXX_
 #define MITKDICOMSERIESREADER_TXX_
 
-#include <mitkDicomSeriesReader.h>
+#include <legacy/mitkDicomSeriesReader.h>
 
 #include <itkImageSeriesReader.h>
 #include <mitkProperties.h>

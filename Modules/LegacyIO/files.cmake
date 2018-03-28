@@ -4,7 +4,6 @@ set(H_FILES
 
 set(CPP_FILES
   mitkBaseDataIOFactory.cpp
-  mitkDataNodeFactory.cpp
   mitkFileSeriesReader.cpp
   mitkImageWriter.cpp
   mitkImageWriterFactory.cpp

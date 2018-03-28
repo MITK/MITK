@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDICOMFilesHelper.h>
 #include <mitkDICOMTagsOfInterestHelper.h>
 #include <mitkDICOMProperty.h>
-#include <mitkDicomSeriesReader.h>
+#include "legacy/mitkDicomSeriesReader.h"
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkLocaleSwitch.h>
 #include <iostream>
@@ -48,10 +48,10 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
 {
   std::vector<BaseData::Pointer> result;
 
-  //special handling of Philips 3D US DICOM.
-  //Copied from DICOMSeriesReaderService
 
   std::string fileName = this->GetLocalFileName();
+  //special handling of Philips 3D US DICOM.
+  //Copied from DICOMSeriesReaderService
   if (DicomSeriesReader::IsPhilips3DDicom(fileName))
   {
       MITK_INFO << "it is a Philips3D US Dicom file" << std::endl;

@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkExceptionMacro.h>
 #include <mitkFileReaderRegistry.h>
 #include <mitkFileWriterRegistry.h>
-#include <mitkIDataNodeReader.h>
 #include <mitkIMimeTypeProvider.h>
 #include <mitkProgressBar.h>
 #include <mitkStandaloneDataStorage.h>

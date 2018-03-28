@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // uncomment for learning more about the internal sorting mechanisms
 //#define MBILOG_ENABLE_DEBUG
 
-#include <mitkDicomSeriesReader.h>
+#include <legacy/mitkDicomSeriesReader.h>
 #include <mitkImage.h>
 #include <mitkImageCast.h>
 #include <mitkLocaleSwitch.h>

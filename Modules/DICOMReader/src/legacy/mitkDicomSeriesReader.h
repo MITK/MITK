@@ -347,7 +347,7 @@ namespace mitk
 
   class Image;
 
-  class MITKCORE_EXPORT DicomSeriesReader
+  class DicomSeriesReader
   {
   public:
     /**
@@ -396,7 +396,7 @@ namespace mitk
       of this class. Relevant descriptive properties can be used to provide
       the application user with meaningful choices.
     */
-    class MITKCORE_EXPORT ImageBlockDescriptor
+    class ImageBlockDescriptor
     {
     public:
       /// List of files in this group

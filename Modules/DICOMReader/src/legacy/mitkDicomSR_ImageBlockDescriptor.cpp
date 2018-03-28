@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkDicomSeriesReader.h>
+#include <legacy/mitkDicomSeriesReader.h>
 
 #include <gdcmUIDs.h>
 

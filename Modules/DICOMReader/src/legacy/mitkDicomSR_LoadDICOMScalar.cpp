@@ -55,4 +55,4 @@ namespace mitk
 
 } // end namespace mitk
 
-#include <mitkDicomSeriesReader.txx>
+#include <legacy/mitkDicomSeriesReader.txx>

@@ -96,7 +96,6 @@ int QmitkDataStorageTreeModel::rowCount(const QModelIndex &parent) const
 
 Qt::ItemFlags QmitkDataStorageTreeModel::flags(const QModelIndex &index) const
 {
-  mitk::DataNode *dataNode = this->TreeItemFromIndex(index)->GetDataNode();
   if (index.isValid())
   {
     return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable |

@@ -49,7 +49,6 @@ unsigned int mitk::USDevice::GetSizeOfImageVector()
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   : mitk::ImageSource(),
-  m_OverrideSpacing(false),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
   m_NumberOfOutputs(1),
@@ -78,7 +77,6 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
 
 mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
   : mitk::ImageSource(),
-  m_OverrideSpacing(false),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
   m_SpawnAcquireThread(true),
@@ -586,7 +584,6 @@ void mitk::USDevice::SetSpacing(double xSpacing, double ySpacing)
   m_Spacing[1] = ySpacing;
   m_Spacing[2] = 1;
 
-  m_OverrideSpacing = true;
 
   if( m_ImageVector.size() > 0 )
   {
@@ -601,11 +598,6 @@ void mitk::USDevice::SetSpacing(double xSpacing, double ySpacing)
     this->Modified();
   }
   MITK_INFO << "Spacing: " << m_Spacing;
-}
-
-void mitk::USDevice::SetOverrideSpacing(bool overriding)
-{
-  m_OverrideSpacing = overriding;
 }
 
 void mitk::USDevice::GenerateData()

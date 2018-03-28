@@ -81,6 +81,8 @@ namespace mitk {
 
     itkGetMacro(Name, std::string);
     itkSetMacro(Name, std::string);
+    itkGetMacro(CurrentDepth, double);
+    itkSetMacro(CurrentDepth, double);
 
   protected:
     USProbe();
@@ -88,6 +90,7 @@ namespace mitk {
     virtual ~USProbe();
 
     std::string m_Name;
+    double m_CurrentDepth;
 
     // Map containing the depths and the associated spacings as an std::vector with depth as key and spacing as value
     std::map<int, Vector3D> m_DepthsAndSpacings;

@@ -317,8 +317,7 @@ namespace mitk {
 
       void GrabImage();
 
-    void SetSpacing(double xSpacing, double ySpacing);
-    void SetOverrideSpacing( bool overriding );
+    virtual void SetSpacing(double xSpacing, double ySpacing);
 
   protected:
 
@@ -346,7 +345,6 @@ namespace mitk {
 
     // Variables to determine if spacing was calibrated and needs to be applied to the incoming images
     mitk::Vector3D m_Spacing;
-    bool m_OverrideSpacing;
 
     /**
     * \brief Registers an OpenIGTLink device as a microservice so that we can send the images of

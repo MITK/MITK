@@ -37,34 +37,23 @@
 #include "QmitkMimeTypes.h"
 #include "QmitkRenderWindowMenu.h"
 
-QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
-                                     QString name,
-                                     mitk::VtkPropRenderer * /*renderer*/,
-                                     mitk::RenderingManager *renderingManager,
-                                     mitk::BaseRenderer::RenderingMode::Type renderingMode)
-  : QVTKOpenGLWidget(parent), m_ResendQtEvents(true), m_MenuWidget(nullptr), m_MenuWidgetActivated(false), m_LayoutIndex(0)
+QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk::VtkPropRenderer *, mitk::RenderingManager *renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode)
+  : QVTKOpenGLWidget(parent),
+    m_ResendQtEvents(true),
+    m_MenuWidget(nullptr),
+    m_MenuWidgetActivated(false),
+    m_LayoutIndex(0)
 {
   m_InternalRenderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+  m_InternalRenderWindow->SetMultiSamples(0);
+  m_InternalRenderWindow->SetAlphaBitPlanes(mitk::BaseRenderer::RenderingMode::DepthPeeling == renderingMode ? 1 : 0);
+
   this->SetRenderWindow(m_InternalRenderWindow);
 
-  if (renderingMode == mitk::BaseRenderer::RenderingMode::DepthPeeling)
-  {
-    GetRenderWindow()->SetMultiSamples(0);
-    GetRenderWindow()->SetAlphaBitPlanes(1);
-  }
-  else if (renderingMode == mitk::BaseRenderer::RenderingMode::MultiSampling)
-  {
-    GetRenderWindow()->SetMultiSamples(8);
-  }
-  else if (renderingMode == mitk::BaseRenderer::RenderingMode::Standard)
-  {
-    GetRenderWindow()->SetMultiSamples(0);
-  }
+  this->Initialize(renderingManager, name.toStdString().c_str(), renderingMode);
 
-  Initialize(renderingManager, name.toStdString().c_str(), renderingMode); // Initialize mitkRenderWindowBase
-
-  setFocusPolicy(Qt::StrongFocus);
-  setMouseTracking(true);
+  this->setFocusPolicy(Qt::StrongFocus);
+  this->setMouseTracking(true);
 }
 
 QmitkRenderWindow::~QmitkRenderWindow()

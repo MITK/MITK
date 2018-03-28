@@ -64,12 +64,7 @@
      </item>
      <item>
       <property name="text">
-       <string>Enable Multisampling (Antialiasing)</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Enable Depth Peeling</string>
+       <string>Depth Peeling</string>
       </property>
      </item>
     </widget>
@@ -79,8 +74,8 @@
      <property name="text">
       <string>* Changes require restart of MITK.
  Depth Peeling is only supported by Windows.
- For other OS, use Standard Rendering and enable
- the property 'Depth Sorting' in the property list of the surface data node.</string>
+ For other operating systems, use Standard Rendering and enable
+ the property 'Depth Sorting' in the property list of a surface data node.</string>
      </property>
     </widget>
    </item>

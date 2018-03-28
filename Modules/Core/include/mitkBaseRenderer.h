@@ -79,7 +79,6 @@ namespace mitk
       enum Type
       {
         Standard = 0,  // no multi-sampling, no depth-peeling
-        MultiSampling, // multi-sampling (antialiasing), no depth-peeling
         DepthPeeling   // no multi-sampling, depth-peeling is on (order-independant transparency)
       };
     };

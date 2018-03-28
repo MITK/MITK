@@ -99,11 +99,6 @@ Qt::ItemFlags QmitkDataStorageTreeModel::flags(const QModelIndex &index) const
   mitk::DataNode *dataNode = this->TreeItemFromIndex(index)->GetDataNode();
   if (index.isValid())
   {
-    if (DicomPropertiesExists(*dataNode))
-    {
-      return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled |
-             Qt::ItemIsDropEnabled;
-    }
     return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable |
            Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
   }

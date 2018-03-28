@@ -35,13 +35,56 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTensorDerivedMeasurementsFilter.h>
 #include <itkAdcImageFilter.h>
 #include <itkMaskedImageToHistogramFilter.h>
+#include <itkTdiToVolumeFractionFilter.h>
+#include <itkImageFileReader.h>
 
 using namespace mitk;
 
-double CalcErrorSignal(itk::VectorImage< short, 3 >* reference, itk::VectorImage< short, 3 >* simulation, itk::Image< unsigned char,3 >::Pointer mask)
+double CalcErrorSignal(const std::vector<double>& histo_mod, itk::VectorImage< short, 3 >* reference, itk::VectorImage< short, 3 >* simulation, itk::Image< unsigned char,3 >::Pointer mask, itk::Image< double,3 >::Pointer fa)
 {
+  typedef itk::Image< double, 3 > DoubleImageType;
   typedef itk::VectorImage< short, 3 > DwiImageType;
-  try
+  if (fa.IsNotNull())
+  {
+    itk::ImageRegionIterator< DwiImageType > it1(reference, reference->GetLargestPossibleRegion());
+    itk::ImageRegionIterator< DwiImageType > it2(simulation, simulation->GetLargestPossibleRegion());
+    itk::ImageRegionConstIterator< DoubleImageType > it3(fa, fa->GetLargestPossibleRegion());
+
+    unsigned int count = 0;
+    double error = 0;
+    while(!it1.IsAtEnd())
+    {
+      if (mask.IsNull() || (mask.IsNotNull() && mask->GetLargestPossibleRegion().IsInside(it1.GetIndex()) && mask->GetPixel(it1.GetIndex())>0) )
+      {
+        double fa = it3.Get();
+        if (fa>0)
+        {
+          double mod = 1.0;
+          for (int i=histo_mod.size()-1; i>=0; --i)
+            if (fa >= (double)i/histo_mod.size())
+            {
+              mod = histo_mod.at(i);
+              break;
+            }
+
+          for (unsigned int i=0; i<reference->GetVectorLength(); ++i)
+          {
+            if (it1.Get()[i]>0)
+            {
+              double diff = (double)it2.Get()[i]/it1.Get()[i] - 1.0;
+              error += std::pow(mod, 4) * fabs(diff);
+              count++;
+            }
+          }
+        }
+      }
+      ++it1;
+      ++it2;
+      ++it3;
+    }
+    return error/count;
+  }
+  else
   {
     itk::ImageRegionIterator< DwiImageType > it1(reference, reference->GetLargestPossibleRegion());
     itk::ImageRegionIterator< DwiImageType > it2(simulation, simulation->GetLargestPossibleRegion());
@@ -67,18 +110,16 @@ double CalcErrorSignal(itk::VectorImage< short, 3 >* reference, itk::VectorImage
     }
     return error/count;
   }
-  catch(...)
-  {
-    return -1;
-  }
   return -1;
 }
 
-double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dwi1, itk::VectorImage< short, 3 >* dwi2, itk::Image< unsigned char,3 >::Pointer mask, itk::Image< double,3 >::Pointer fa1, itk::Image< double,3 >::Pointer md1)
+double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dwi1, itk::VectorImage< short, 3 >* dwi2, itk::Image< unsigned char,3 >::Pointer mask, itk::Image< double,3 >::Pointer fa1, itk::Image< double,3 >::Pointer md1, bool b0_contrast)
 {
   typedef itk::TensorDerivedMeasurementsFilter<double> MeasurementsType;
   typedef itk::Image< double, 3 > DoubleImageType;
+  typedef  itk::VectorImage< short, 3 > DwiType;
 
+  DwiType::Pointer dwi1_itk = mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi1);
   typedef itk::DiffusionTensor3DReconstructionImageFilter<short, short, double > TensorReconstructionImageFilterType;
   DoubleImageType::Pointer fa2;
   {
@@ -114,6 +155,9 @@ double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dw
   itk::ImageRegionConstIterator< DoubleImageType > it1(fa1, fa1->GetLargestPossibleRegion());
   itk::ImageRegionConstIterator< DoubleImageType > it2(fa2, fa2->GetLargestPossibleRegion());
 
+  itk::ImageRegionConstIterator< itk::VectorImage< short, 3 > > it_diff1(dwi1_itk, dwi1_itk->GetLargestPossibleRegion());
+  itk::ImageRegionConstIterator< itk::VectorImage< short, 3 > > it_diff2(dwi2, dwi2->GetLargestPossibleRegion());
+
   unsigned int count = 0;
   double error = 0;
   if (md1.IsNotNull() && md2.IsNotNull())
@@ -135,16 +179,25 @@ double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dw
               break;
             }
 
-          double fa_diff = fabs(it2.Get()/fa - 1.0);
-          double md_diff = fabs(it4.Get()/it3.Get() - 1.0);
-          error += mod*mod*mod*mod * (fa_diff + md_diff);
+          double fa_diff = std::fabs(it2.Get()/fa - 1.0);
+          double md_diff = std::fabs(it4.Get()/it3.Get() - 1.0);
+          error += std::pow(mod, 4) * (fa_diff + md_diff);
           count += 2;
+
+          if (b0_contrast && it_diff1.Get()[0]>0)
+          {
+            double b0_diff = (double)it_diff2.Get()[0]/it_diff1.Get()[0] - 1.0;
+            error += std::pow(mod, 4) * std::fabs(b0_diff);
+            ++count;
+          }
         }
       }
       ++it1;
       ++it2;
       ++it3;
       ++it4;
+      ++it_diff1;
+      ++it_diff2;
     }
   }
   else
@@ -167,17 +220,28 @@ double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dw
             }
 
           double fa_diff = fabs(it2.Get()/fa - 1.0);
-          error += mod * fa_diff;
+          error += std::pow(mod, 4) * fa_diff;
           ++count;
+
+          if (b0_contrast && it_diff1.Get()[0]>0)
+          {
+            double b0_diff = (double)it_diff2.Get()[0]/it_diff1.Get()[0] - 1.0;
+            error += std::pow(mod, 4) * std::fabs(b0_diff);
+            ++count;
+          }
         }
       }
       ++it1;
       ++it2;
+      ++it_diff1;
+      ++it_diff2;
     }
   }
 
   return error/count;
 }
+
+
 
 FiberfoxParameters MakeProposalRelaxation(FiberfoxParameters old_params, double temperature)
 {
@@ -362,6 +426,48 @@ FiberfoxParameters MakeProposalDiff(FiberfoxParameters old_params, double temper
   return new_params;
 }
 
+FiberfoxParameters MakeProposalVolume(double old_tdi_thr, double old_sqrt, double& new_tdi_thr, double& new_sqrt, FiberfoxParameters old_params, std::vector< itk::Image< double, 3 >::Pointer > frac, double temperature)
+{
+  FiberfoxParameters new_params(old_params);
+
+  MITK_INFO << "Proposal Volume";
+  std::random_device r;
+  std::default_random_engine randgen(r());
+
+  {
+    std::normal_distribution<double> normal_dist(0, old_tdi_thr*0.1*temperature);
+    new_tdi_thr = old_tdi_thr + normal_dist(randgen);
+    while (new_tdi_thr<=0.01)
+      new_tdi_thr = old_tdi_thr + normal_dist(randgen);
+  }
+  {
+    std::normal_distribution<double> normal_dist(0, old_sqrt*0.1*temperature);
+    new_sqrt = old_sqrt + normal_dist(randgen);
+    while (new_sqrt<=0.01)
+      new_sqrt = old_sqrt + normal_dist(randgen);
+  }
+
+  itk::TdiToVolumeFractionFilter< double >::Pointer fraction_generator = itk::TdiToVolumeFractionFilter< double >::New();
+  fraction_generator->SetTdiThreshold(new_tdi_thr);
+  fraction_generator->SetSqrt(new_sqrt);
+  fraction_generator->SetInput(0, frac.at(0));
+  fraction_generator->SetInput(1, frac.at(1));
+  fraction_generator->SetInput(2, frac.at(2));
+  fraction_generator->SetInput(3, frac.at(3));
+  fraction_generator->SetInput(4, frac.at(4));
+  fraction_generator->Update();
+
+  new_params.m_FiberModelList[0]->SetVolumeFractionImage(fraction_generator->GetOutput(0));
+  new_params.m_FiberModelList[1]->SetVolumeFractionImage(fraction_generator->GetOutput(1));
+  new_params.m_NonFiberModelList[0]->SetVolumeFractionImage(fraction_generator->GetOutput(2));
+  new_params.m_NonFiberModelList[1]->SetVolumeFractionImage(fraction_generator->GetOutput(3));
+
+  MITK_INFO << "TDI Threshold: " << new_tdi_thr << " (" << new_tdi_thr-old_tdi_thr << ")";
+  MITK_INFO << "SQRT: " << new_sqrt << " (" << new_sqrt-old_sqrt << ")";
+
+  return new_params;
+}
+
 /*!
 * \brief Command line interface to optimize Fiberfox parameters.
 */
@@ -377,15 +483,26 @@ int main(int argc, char* argv[])
   parser.addArgument("target", "t", mitkCommandLineParser::String, "Target image:", "Approximate target dMRI.", us::Any(), false);
   parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask image:", "Error is only calculated inside the mask image", false);
 
-  parser.addArgument("fa_image", "", mitkCommandLineParser::InputFile, "FA image", "Optimize FA instead of raw signal");
-  parser.addArgument("md_image", "", mitkCommandLineParser::InputFile, "MD image", "Optimize MD in conjunction with FA (recommended when optimizing FA)");
+  parser.addArgument("fa_image", "", mitkCommandLineParser::InputFile, "FA image:", "Optimize FA instead of raw signal");
+  parser.addArgument("md_image", "", mitkCommandLineParser::InputFile, "MD image:", "Optimize MD in conjunction with FA (recommended when optimizing FA)");
 
   parser.addArgument("no_diff", "", mitkCommandLineParser::Bool, "Don't optimize diffusivities:", "Don't optimize diffusivities");
   parser.addArgument("no_relax", "", mitkCommandLineParser::Bool, "Don't optimize relaxation times and signal scale:", "Don't optimize relaxation times and signal scale");
 
+  parser.addArgument("fa_error", "", mitkCommandLineParser::Bool, "", "");
+
   parser.addArgument("iterations", "", mitkCommandLineParser::Int, "Iterations:", "Number of optimizations steps", 1000);
   parser.addArgument("start_temp", "", mitkCommandLineParser::Float, "Start temperature:", "", 1.0);
   parser.addArgument("end_temp", "", mitkCommandLineParser::Float, "End temperature:", "", 0.1);
+
+  parser.addArgument("tdi_threshold", "", mitkCommandLineParser::Float, "", "", 0.75);
+  parser.addArgument("sqrt", "", mitkCommandLineParser::Float, "", "", 1.0);
+
+  parser.addArgument("tdi", "", mitkCommandLineParser::InputFile, "TDI:", "");
+  parser.addArgument("wm", "", mitkCommandLineParser::InputFile, "WM:", "");
+  parser.addArgument("gm", "", mitkCommandLineParser::InputFile, "GM:", "");
+  parser.addArgument("dgm", "", mitkCommandLineParser::InputFile, "DGM:", "");
+  parser.addArgument("csf", "", mitkCommandLineParser::InputFile, "CSF:", "");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -407,6 +524,14 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("end_temp"))
     end_temp = us::any_cast<float>(parsedArgs["end_temp"]);
 
+  float tdi_threshold=0.75;
+  if (parsedArgs.count("tdi_threshold"))
+    tdi_threshold = us::any_cast<float>(parsedArgs["tdi_threshold"]);
+
+  float sqrt=1.0;
+  if (parsedArgs.count("sqrt"))
+    sqrt = us::any_cast<float>(parsedArgs["sqrt"]);
+
   bool no_diff=false;
   if (parsedArgs.count("no_diff"))
     no_diff = true;
@@ -414,6 +539,10 @@ int main(int argc, char* argv[])
   bool no_relax=false;
   if (parsedArgs.count("no_relax"))
     no_relax = true;
+
+  bool fa_error=false;
+  if (parsedArgs.count("fa_error"))
+    fa_error = true;
 
   std::string fa_file = "";
   if (parsedArgs.count("fa_image"))
@@ -433,11 +562,55 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  std::vector< int > possible_proposals;
+  if (!no_diff)
+    possible_proposals.push_back(0);
+  if (!no_relax)
+    possible_proposals.push_back(1);
+
   itk::Image< unsigned char,3 >::Pointer mask = nullptr;
   if (mask_file.compare("")!=0)
   {
     mitk::Image::Pointer mitk_mask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(mask_file)[0].GetPointer());
     mitk::CastToItkImage(mitk_mask, mask);
+  }
+
+  std::vector< itk::Image< double, 3 >::Pointer > fracs;
+  if ( parsedArgs.count("tdi")>0 && parsedArgs.count("wm")>0 && parsedArgs.count("gm")>0 && parsedArgs.count("dgm")>0 && parsedArgs.count("csf")>0 )
+  {
+    MITK_INFO << "Loading fractions";
+    {
+      itk::ImageFileReader< itk::Image< double, 3 > >::Pointer reader = itk::ImageFileReader< itk::Image< double, 3 > >::New();
+      reader->SetFileName( us::any_cast<std::string>(parsedArgs["tdi"]) );
+      reader->Update();
+      fracs.push_back(reader->GetOutput());
+    }
+    {
+      itk::ImageFileReader< itk::Image< double, 3 > >::Pointer reader = itk::ImageFileReader< itk::Image< double, 3 > >::New();
+      reader->SetFileName( us::any_cast<std::string>(parsedArgs["wm"]) );
+      reader->Update();
+      fracs.push_back(reader->GetOutput());
+    }
+    {
+      itk::ImageFileReader< itk::Image< double, 3 > >::Pointer reader = itk::ImageFileReader< itk::Image< double, 3 > >::New();
+      reader->SetFileName( us::any_cast<std::string>(parsedArgs["gm"]) );
+      reader->Update();
+      fracs.push_back(reader->GetOutput());
+    }
+    {
+      itk::ImageFileReader< itk::Image< double, 3 > >::Pointer reader = itk::ImageFileReader< itk::Image< double, 3 > >::New();
+      reader->SetFileName( us::any_cast<std::string>(parsedArgs["dgm"]) );
+      reader->Update();
+      fracs.push_back(reader->GetOutput());
+    }
+    {
+      itk::ImageFileReader< itk::Image< double, 3 > >::Pointer reader = itk::ImageFileReader< itk::Image< double, 3 > >::New();
+      reader->SetFileName( us::any_cast<std::string>(parsedArgs["csf"]) );
+      reader->Update();
+      fracs.push_back(reader->GetOutput());
+    }
+
+    possible_proposals.push_back(2);
   }
 
   std::vector< double > histogram_modifiers;
@@ -523,6 +696,11 @@ int main(int argc, char* argv[])
     mitk::IOUtil::Save(image, "initial.dwi");
   }
 
+
+  double old_tdi_thr = tdi_threshold;
+  double old_sqrt = sqrt;
+  double new_tdi_thr;
+  double new_sqrt;
   MITK_INFO << "\n\n";
   MITK_INFO << "Iterations: " << iterations;
   MITK_INFO << "start_temp: " << start_temp;
@@ -531,15 +709,15 @@ int main(int argc, char* argv[])
   int accepted = 0;
 
   double last_error = 9999999;
-  if (fa_image.IsNotNull())
+  if (fa_error && fa_image.IsNotNull())
   {
     MITK_INFO << "Calculating FA error";
-    last_error = CalcErrorFA(histogram_modifiers, dwi, sim, mask, fa_image, md_image);
+    last_error = CalcErrorFA(histogram_modifiers, dwi, sim, mask, fa_image, md_image, true);
   }
   else
   {
     MITK_INFO << "Calculating raw-image error";
-    last_error = CalcErrorSignal(reference, sim, mask);
+    last_error = CalcErrorSignal(histogram_modifiers, reference, sim, mask, fa_image);
   }
   MITK_INFO << "Initial E = " << last_error;
   MITK_INFO << "\n\n**************************************************************************************";
@@ -551,19 +729,28 @@ int main(int argc, char* argv[])
 
     std::random_device r;
     std::default_random_engine randgen(r());
-    std::uniform_int_distribution<int> uint1(0, 1);
-
+    std::uniform_int_distribution<int> uint1(0, possible_proposals.size()-1);
     FiberfoxParameters proposal(parameters);
     int select = uint1(randgen);
-    if (no_relax)
-      select = 0;
-    else if (no_diff)
-      select = 1;
 
-    if (select==0)
+    switch (possible_proposals.at(select))
+    {
+    case 0:
+    {
       proposal = MakeProposalDiff(proposal, temperature);
-    else
+      break;
+    }
+    case 1:
+    {
       proposal = MakeProposalRelaxation(proposal, temperature);
+      break;
+    }
+    case 2:
+    {
+      proposal = MakeProposalVolume(old_tdi_thr, old_sqrt, new_tdi_thr, new_sqrt, proposal, fracs, temperature);
+      break;
+    }
+    }
 
     std::streambuf *old = cout.rdbuf(); // <-- save
     std::stringstream ss;
@@ -576,10 +763,10 @@ int main(int argc, char* argv[])
     std::cout.rdbuf (old);              // <-- restore
 
     double new_error = 9999999;
-    if (fa_image.IsNotNull())
-      new_error = CalcErrorFA(histogram_modifiers, dwi, sim, mask, fa_image, md_image);
+    if (fa_error && fa_image.IsNotNull())
+      new_error = CalcErrorFA(histogram_modifiers, dwi, sim, mask, fa_image, md_image, true);
     else
-      new_error = CalcErrorSignal(reference, sim, mask);
+      new_error = CalcErrorSignal(histogram_modifiers, reference, sim, mask, fa_image);
     MITK_INFO << "E = " << new_error << "(" << new_error-last_error << ")";
     if (last_error<new_error)
     {
@@ -603,6 +790,9 @@ int main(int argc, char* argv[])
       std::cout.rdbuf (old);              // <-- restore
 
       accepted++;
+
+      old_tdi_thr = new_tdi_thr;
+      old_sqrt = new_sqrt;
 
       MITK_INFO << "Accepted (acc. rate " << (float)accepted/(i+1) << ")";
       parameters = FiberfoxParameters(proposal);

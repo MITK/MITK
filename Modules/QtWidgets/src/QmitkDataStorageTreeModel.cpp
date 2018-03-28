@@ -96,14 +96,8 @@ int QmitkDataStorageTreeModel::rowCount(const QModelIndex &parent) const
 
 Qt::ItemFlags QmitkDataStorageTreeModel::flags(const QModelIndex &index) const
 {
-  mitk::DataNode *dataNode = this->TreeItemFromIndex(index)->GetDataNode();
   if (index.isValid())
   {
-    if (DicomPropertiesExists(*dataNode))
-    {
-      return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled |
-             Qt::ItemIsDropEnabled;
-    }
     return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable |
            Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
   }
@@ -432,37 +426,7 @@ QVariant QmitkDataStorageTreeModel::data(const QModelIndex &index, int role) con
   mitk::DataNode *dataNode = this->TreeItemFromIndex(index)->GetDataNode();
 
   // get name of treeItem (may also be edited)
-  QString nodeName;
-  if (DicomPropertiesExists(*dataNode))
-  {
-    mitk::BaseProperty *seriesDescription =
-      (dataNode->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x103e).c_str()));
-    mitk::BaseProperty *studyDescription =
-      (dataNode->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x1030).c_str()));
-    mitk::BaseProperty *patientsName =
-      (dataNode->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0010).c_str()));
-
-    mitk::BaseProperty *seriesDescription_deprecated = (dataNode->GetProperty("dicom.series.SeriesDescription"));
-    mitk::BaseProperty *studyDescription_deprecated = (dataNode->GetProperty("dicom.study.StudyDescription"));
-    mitk::BaseProperty *patientsName_deprecated = (dataNode->GetProperty("dicom.patient.PatientsName"));
-
-    if (patientsName)
-    {
-      nodeName += QString::fromStdString(patientsName->GetValueAsString()) + "\n";
-      nodeName += QString::fromStdString(studyDescription->GetValueAsString()) + "\n";
-      nodeName += QString::fromStdString(seriesDescription->GetValueAsString());
-    }
-    else
-    { /** Code coveres the deprecated property naming for backwards compatibility */
-      nodeName += QString::fromStdString(patientsName_deprecated->GetValueAsString()) + "\n";
-      nodeName += QString::fromStdString(studyDescription_deprecated->GetValueAsString()) + "\n";
-      nodeName += QString::fromStdString(seriesDescription_deprecated->GetValueAsString());
-    }
-  }
-  else
-  {
-    nodeName = QString::fromStdString(dataNode->GetName());
-  }
+  QString nodeName = QString::fromStdString(dataNode->GetName());
   if (nodeName.isEmpty())
   {
     nodeName = "unnamed";

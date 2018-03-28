@@ -82,6 +82,16 @@ public:
 
     void GenerateData() override;
 
+    std::vector<DoubleDwiType::Pointer> GetOutputImagesReal() const
+    {
+      return m_OutputImagesReal;
+    }
+
+    std::vector<DoubleDwiType::Pointer> GetOutputImagesImag() const
+    {
+      return m_OutputImagesImag;
+    }
+
 protected:
 
     TractsToDWIImageFilter();
@@ -99,7 +109,7 @@ protected:
     DoubleDwiType::Pointer SimulateKspaceAcquisition(std::vector< DoubleDwiType::Pointer >& images);
 
     /** Generate signal of non-fiber compartments. */
-    void SimulateExtraAxonalSignal(ItkUcharImgType::IndexType index, double intraAxonalVolume, int g=-1);
+    void SimulateExtraAxonalSignal(ItkUcharImgType::IndexType& index, itk::Point<double, 3>& volume_fraction_point, double intraAxonalVolume, int g);
 
     /** Move fibers to simulate headmotion */
     void SimulateMotion(int g=-1);
@@ -108,6 +118,8 @@ protected:
     ItkDoubleImgType::Pointer NormalizeInsideMask(ItkDoubleImgType::Pointer image);
     void InitializeData();
     void InitializeFiberData();
+
+    itk::Point<double, 3> GetMovedPoint(itk::Index<3>& index, bool forward);
 
     // input
     mitk::FiberfoxParameters                    m_Parameters;
@@ -118,6 +130,8 @@ protected:
     typename OutputImageType::Pointer           m_OutputImage;
     typename DoubleDwiType::Pointer             m_PhaseImage;
     typename DoubleDwiType::Pointer             m_KspaceImage;
+    std::vector < typename DoubleDwiType::Pointer > m_OutputImagesReal;
+    std::vector < typename DoubleDwiType::Pointer > m_OutputImagesImag;
     mitk::LevelWindow                           m_LevelWindow;
     std::vector< ItkDoubleImgType::Pointer >    m_VolumeFractions;
     std::string                                 m_StatusText;

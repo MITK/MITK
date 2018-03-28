@@ -49,6 +49,10 @@ int main(int argc, char* argv[])
   parser.addArgument("mask0", "m0", mitkCommandLineParser::InputImage, "Input Mask", "The median of the area covered by this mask will be set to 0", us::Any(), false);
   parser.addArgument("mask1", "m1", mitkCommandLineParser::InputImage, "Input Mask", "The median of the area covered by this mask will be set to 1", us::Any(), true);
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output Image", "Target file. The output statistic is appended to this file.", us::Any(), false);
+  parser.addArgument("ignore-outlier", "outlier", mitkCommandLineParser::Bool, "Ignore Outlier", "Ignores the highest and lowest 2% during calculation. Only on single mask normalization.", us::Any(), true);
+  parser.addArgument("value", "v", mitkCommandLineParser::Float, "Target Value", "Target value, the target value (for example median) is set to this value.", us::Any(), true);
+  parser.addArgument("width", "w", mitkCommandLineParser::Float, "Target Width", "Ignores the highest and lowest 2% during calculation. Only on single mask normalization.", us::Any(), true);
+  parser.addArgument("float", "float", mitkCommandLineParser::Bool, "Target Width", "Ignores the highest and lowest 2% during calculation. Only on single mask normalization.", us::Any(), true);
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");
@@ -67,12 +71,28 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
+  bool ignore_outlier = false;
+  if (parsedArgs.count("ignore-outlier"))
+  {
+    ignore_outlier = us::any_cast<bool>(parsedArgs["ignore-outlier"]);
+  }
+
   MITK_INFO << "Mode access";
-  int mode = 5;//us::any_cast<int>(parsedArgs["mode"]);
+  int mode =std::stoi(us::any_cast<std::string>(parsedArgs["mode"]));
+  MITK_INFO << "Mode: " << mode;
 
   MITK_INFO << "Read images";
   mitk::Image::Pointer mask1;
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["image"].ToString())[0].GetPointer());
+
+  if (parsedArgs.count("float"))
+  {
+    typedef itk::Image<float, 3> ImageType;
+    ImageType::Pointer img = ImageType::New();
+    mitk::CastToItkImage(image, img);
+    mitk::CastToMitkImage(img, image);
+  }
+
   mitk::Image::Pointer mask0 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["mask0"].ToString())[0].GetPointer());
   if (mode > 3)
   {
@@ -82,11 +102,23 @@ int main(int argc, char* argv[])
   mitk::MRNormTwoRegionsBasedFilter::Pointer twoRegion = mitk::MRNormTwoRegionsBasedFilter::New();
   mitk::Image::Pointer output;
 
-  //oneRegion->SetInput(image);
+  oneRegion->SetInput(image);
+  oneRegion->SetMask(mask0);
+  oneRegion->SetIgnoreOutlier(ignore_outlier);
   twoRegion->SetInput(image);
-  //oneRegion->SetMask(mask0);
   twoRegion->SetMask1(mask0);
   twoRegion->SetMask2(mask1);
+
+  if (parsedArgs.count("value"))
+  {
+    double target = us::any_cast<float>(parsedArgs["value"]);
+    oneRegion->SetTargetValue(target);
+  }
+  if (parsedArgs.count("width"))
+  {
+    double width = us::any_cast<float>(parsedArgs["width"]);
+    oneRegion->SetTargetValue(width);
+  }
 
   switch (mode)
   {

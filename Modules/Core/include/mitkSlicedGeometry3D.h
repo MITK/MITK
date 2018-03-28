@@ -173,9 +173,13 @@ namespace mitk
 
       itk::LightObject::Pointer InternalClone() const override;
 
+#ifndef SWIG
+
     static const std::string SLICES;
     const static std::string DIRECTION_VECTOR;
     const static std::string EVENLY_SPACED;
+
+#endif // !SWIG
 
     /**
     * \brief Tell this instance how many PlaneGeometries it shall manage. Bounding

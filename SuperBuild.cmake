@@ -239,6 +239,9 @@ foreach(p ${external_projects})
 
   list(APPEND mitk_depends ${${p}_DEPENDS})
 endforeach()
+if (SWIG_EXECUTABLE)
+  list(APPEND mitk_superbuild_ep_args -DSWIG_EXECUTABLE=${SWIG_EXECUTABLE})
+endif()
 
 #-----------------------------------------------------------------------------
 # Set superbuild boolean args

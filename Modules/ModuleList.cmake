@@ -32,6 +32,8 @@ set(MITK_MODULES
   QtWidgetsExt
   Chart
   SegmentationUI
+  MatchPointRegistration
+  MatchPointRegistrationUI
   Classification
   GPGPU
   OpenIGTLink
@@ -62,8 +64,6 @@ set(MITK_MODULES
   XNAT
   TubeGraph
   BiophotonicsHardware
-  MatchPointRegistration
-  MatchPointRegistrationUI
   DiffusionImaging
   TumorInvasionAnalysis
   BoundingShape

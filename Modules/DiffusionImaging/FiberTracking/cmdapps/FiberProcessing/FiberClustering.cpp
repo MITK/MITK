@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkClusteringMetricAnatomic.h>
 #include <mitkClusteringMetricScalarMap.h>
 #include <mitkClusteringMetricInnerAngles.h>
+#include <mitkClusteringMetricLength.h>
 
 mitk::FiberBundle::Pointer LoadFib(std::string filename)
 {
@@ -56,7 +57,8 @@ int main(int argc, char* argv[])
   parser.addArgument("max_clusters", "", mitkCommandLineParser::Int, "Max. clusters:", "");
   parser.addArgument("merge_clusters", "", mitkCommandLineParser::Float, "Merge clusters:", "", -1.0);
   parser.addArgument("output_centroids", "", mitkCommandLineParser::Bool, "Output centroids:", "");
-  parser.addArgument("metrics", "", mitkCommandLineParser::StringList, "Metrics:", "EU_MEAN, EU_STD, EU_MAX, ANAT, MAP, ANGLES");
+  parser.addArgument("metrics", "", mitkCommandLineParser::StringList, "Metrics:", "EU_MEAN, EU_STD, EU_MAX, ANAT, MAP, LENGTH");
+  parser.addArgument("metric_weights", "", mitkCommandLineParser::StringList, "Metric weights:", "add one float weight for each used metric");
   parser.addArgument("input_centroids", "", mitkCommandLineParser::String, "Input centroids:", "");
   parser.addArgument("scalar_map", "", mitkCommandLineParser::String, "Scalar map:", "");
   parser.addArgument("parcellation", "", mitkCommandLineParser::String, "Parcellation:", "");
@@ -97,6 +99,10 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("metrics"))
     metric_strings = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["metrics"]);
 
+  std::vector< std::string > metric_weights = {"1.0"};
+  if (parsedArgs.count("metric_weights"))
+    metric_weights = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["metric_weights"]);
+
   std::string input_centroids = "";
   if (parsedArgs.count("input_centroids"))
     input_centroids = us::any_cast<std::string>(parsedArgs["input_centroids"]);
@@ -112,6 +118,12 @@ int main(int argc, char* argv[])
   std::string file_ending = ".fib";
   if (parsedArgs.count("file_ending"))
     file_ending = us::any_cast<std::string>(parsedArgs["file_ending"]);
+
+  if (metric_strings.size()!=metric_weights.size())
+  {
+    MITK_INFO << "Each metric needs an associated metric weight!";
+    return EXIT_FAILURE;
+  }
 
   try
   {
@@ -143,9 +155,11 @@ int main(int argc, char* argv[])
 
     std::vector< mitk::ClusteringMetric* > metrics;
 
+    int mc = 0;
     for (auto m : metric_strings)
     {
-      MITK_INFO << "Metric: " << m;
+      float w = boost::lexical_cast<float>(metric_weights.at(mc));
+      MITK_INFO << "Metric: " << m << " (w=" << w << ")";
       if (m=="EU_MEAN")
         metrics.push_back({new mitk::ClusteringMetricEuclideanMean()});
       else if (m=="EU_STD")
@@ -154,6 +168,8 @@ int main(int argc, char* argv[])
         metrics.push_back({new mitk::ClusteringMetricEuclideanMax()});
       else if (m=="ANGLES")
         metrics.push_back({new mitk::ClusteringMetricInnerAngles()});
+      else if (m=="LENGTH")
+        metrics.push_back({new mitk::ClusteringMetricLength()});
       else if (m=="MAP" && scalar_map!="")
       {
         mitk::Image::Pointer mitk_map = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(scalar_map)[0].GetPointer());
@@ -181,6 +197,8 @@ int main(int argc, char* argv[])
           metrics.push_back(metric);
         }
       }
+      metrics.back()->SetScale(w);
+      mc++;
     }
 
     if (metrics.empty())

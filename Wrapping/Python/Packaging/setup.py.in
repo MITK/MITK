@@ -1,0 +1,133 @@
+import sys
+import os
+import glob
+import itertools as it
+
+def multiple_file_types(path, *patterns):
+    return it.chain.from_iterable(glob.iglob(os.path.join(path,pattern)) for pattern in patterns)
+
+try:
+    from setuptools import setup, Extension
+    from setuptools.command.build_ext import build_ext as _build_ext
+except ImportError:
+    from distutils.core import setup, Extension
+    from distutils.command.build_ext import build_ext as _build_ext
+
+import re
+
+doc_files = ""
+dependency_paths = "@MITK_RUNTIME_PATH@"
+dependency_files = "@PYTHON_LIB_DEPENDENCIES@"
+binary_module_file = "@TMP_MITK_BINARY_MODULE@"
+
+def get_pep386version():
+    """This method examines the MITK's CMake version variables to make a pep 386 compliant version string when building a version indented for distribution."""
+    sitkMAJOR = "@MITK_VERSION_MAJOR@"
+    sitkMINOR = "@MITK_VERSION_MINOR@"
+    sitkPATCH = "@MITK_VERSION_PATCH@"
+    sitkTWEAK = "@MITK_VERSION_TWEAK@"
+    sitkRC    = "@MITK_VERSION_RC@"
+    sitkPOST  = "@MITK_VERSION_POST@"
+    sitkDEV   = "@MITK_VERSION_DEV@"
+    sitkHASH  = "@MITK_VERSION_HASH@"
+
+
+    version = sitkMAJOR+"."+sitkMINOR
+
+    if sitkPATCH:
+        version += "."+sitkPATCH
+        if sitkTWEAK:
+            version += "."+sitkTWEAK
+
+    if  sitkRC:
+        version += sitkRC
+
+    if sitkPOST:
+        version += ".post"+sitkPOST
+    elif sitkDEV:
+        version += ".dev"+sitkDEV
+
+    # Local Version Identifier
+    if sitkHASH and not "@MITK_BUILD_DISTRIBUTE@" in ['1', 'ON']:
+        version += "+g"+sitkHASH
+
+    return version
+
+class build_ext(_build_ext):
+    """ Override standard command class to build an extension, to
+    simply copy an existing compiled library into the packaging
+    directory structure.
+    """
+
+    def build_extension(self, ext):
+        """
+        """
+        from distutils.errors import DistutilsSetupError
+
+        sources = ext.sources
+        if sources is None or not len(sources) == 1:
+            raise DistutilsSetupError( "Expected only one compiled library." )
+
+        expected_ext_filename = os.path.split(self.get_ext_filename(ext.name))[1]
+
+        ext_file = self.get_ext_fullpath(ext.name)
+
+        abs_sources = list( map(os.path.abspath, sources) )
+
+        module_name=ext.name.split(".")[0]
+        placeholder = self.get_ext_filename("placeholder")
+
+        for current_path in dependency_paths.split(";"):
+           for library_file in multiple_file_types(current_path, "*.pyd","*.so"):
+              if binary_module_file in library_file:
+                 self.copy_file(library_file, ext_file)
+                 continue
+           # Do not copy .so - files manually. They will be later added by auditwheel
+           for library_file in multiple_file_types(current_path, "*.dll"):
+              if "Qt" in library_file:
+                continue
+              library_basename=os.path.basename(library_file)
+              if library_basename not in dependency_files:
+                continue
+              library_target= self.get_ext_fullpath(module_name+".placeholder")
+              self.copy_file(library_file,library_target.replace(placeholder,library_basename))
+
+        #self.copy_file(abs_sources[0], ext_file)
+
+
+setup(
+    name = 'pyMITK',
+    version = get_pep386version(),
+    author = 'Medical Image Computing, DKFZ Heidelberg',
+    author_email = 'm.goetz@dkfz-heidelberg.de',
+    ext_modules=[Extension('pyMITK._pyMITK', [r'@MITK_BINARY_MODULE@'])],
+    packages= ['pyMITK'],
+    package_dir = {'pyMITK':r'@MITK_PYTHON_PACKAGE_DIR@'},
+    download_url = r'https://www.itk.org/MITKDoxygen/html/PyDownloadPage.html',
+    platforms = [],
+    description = r'MITK is a simplified interface to the Insight Toolkit (ITK) for image registration and segmentation',
+    long_description  = 'MITK provides an abstraction layer to ITK that enables developers \
+                         and users to access the powerful features of the InsightToolkit in an easy \
+                         to use manner for biomedical image analysis.',
+    classifiers=[
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python",
+        "Programming Language :: C++",
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Education",
+        "Intended Audience :: Healthcare Industry",
+        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering",
+        "Topic :: Scientific/Engineering :: Medical Science Apps.",
+        "Topic :: Scientific/Engineering :: Information Analysis",
+        "Topic :: Software Development :: Libraries",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: POSIX",
+        "Operating System :: Unix",
+        "Operating System :: MacOS"
+        ],
+    license='Apache',
+    keywords = 'MITK ITK InsightToolkit segmentation registration',
+    url = r'http://mitk.org/',
+    cmdclass={'build_ext':build_ext}
+    )

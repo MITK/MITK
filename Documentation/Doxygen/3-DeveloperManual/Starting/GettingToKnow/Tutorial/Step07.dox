@@ -13,7 +13,7 @@ http://mitk.org/download/tutorial-data/Pic3D.nrrd (image)
  Step7 inherits from Step6. It enhances the method StartRegionGrowing() by processing the result image.
 
  \dontinclude Step7.cpp
- \skipline if(m_ResultImage
+ \skipline if (m_ResultImage
  \until }
 
  \ref Step06Page "[Previous step]" \ref Step08Page "[Next step]" \ref TutorialPage "[Main tutorial page]"

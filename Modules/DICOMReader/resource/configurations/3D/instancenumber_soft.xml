@@ -3,7 +3,7 @@
   label="Instance Number, non-consecutive"
   description="Sort images by Instance Number, do not require consecutive numbers"
   class="DICOMITKSeriesGDCMReader"
-  version="1"
+  version="2"
   fixTiltByShearing="true">
 <DICOMDatasetSorter class="DICOMTagBasedSorter" strictSorting="false" expectDistanceOne="false">
   <Distinguishing>

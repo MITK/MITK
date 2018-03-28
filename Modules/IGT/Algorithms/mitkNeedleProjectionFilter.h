@@ -55,7 +55,7 @@ namespace mitk {
     itkGetMacro(TargetPlane, mitk::AffineTransform3D::Pointer);
     itkSetMacro(TargetPlane, mitk::AffineTransform3D::Pointer);
     itkGetMacro(Projection,  mitk::PointSet::Pointer);
-    /** Sets the tool axis for this filter. The default tool axis is along the x-axis in
+    /** Sets the tool axis for this filter. The default tool axis is along the z-axis in
      *  tool coordinates. */
     void SetToolAxisForFilter(mitk::Point3D point);
     /** Sets whether the tool axis should be visualized. This is required if no surface is available.

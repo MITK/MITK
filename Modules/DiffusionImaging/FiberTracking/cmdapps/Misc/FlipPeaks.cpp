@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPeakImage.h>
 #include <itkFlipPeaksFilter.h>
 #include <mitkImageToItk.h>
+#include <mitkPreferenceListReaderOptionsFunctor.h>
 
 /*!
 \brief Copies transformation matrix of one image to another
@@ -62,7 +63,8 @@ int main(int argc, char* argv[])
 
   try
   {
-    mitk::PeakImage::Pointer image = dynamic_cast<mitk::PeakImage*>(mitk::IOUtil::Load(imageName)[0].GetPointer());
+    mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image"}, {});
+    mitk::PeakImage::Pointer image = dynamic_cast<mitk::PeakImage*>(mitk::IOUtil::Load(imageName, &functor)[0].GetPointer());
 
     typedef mitk::ImageToItk< mitk::PeakImage::ItkPeakImageType > CasterType;
     CasterType::Pointer caster = CasterType::New();

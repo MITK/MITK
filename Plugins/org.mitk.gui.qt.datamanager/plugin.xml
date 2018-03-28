@@ -5,7 +5,7 @@
     <view
       id="org.mitk.views.datamanager"
       name="Data Manager"
-      category="Data handling"
+      category="Data"
       icon="resources/data-manager.svg"
       class="QmitkDataManagerView" />
   </extension>

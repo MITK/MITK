@@ -100,8 +100,8 @@ int main(int argc, char* argv[])
   parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask image:", "scoring is only performed inside the mask image");
   parser.addArgument("greedy_add", "", mitkCommandLineParser::Bool, "Greedy:", "if enabled, the candidate tracts are not jointly fitted to the residual image but one after the other employing a greedy scheme", false);
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
-  parser.addArgument("dont_filter_outliers", "", mitkCommandLineParser::Bool, "Don't filter outliers:", "don't perform second optimization run with an upper weight bound based on the first weight estimation (95% quantile)", false);
-  parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM, MSE, LocalMSE (default), NONE");
+  parser.addArgument("filter_outliers", "", mitkCommandLineParser::Bool, "Filter outliers:", "perform second optimization run with an upper weight bound based on the first weight estimation (99% quantile)", false);
+  parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM, Variance, VoxelVariance, Lasso, GroupLasso, GroupVariance, NONE (default)");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -120,9 +120,9 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("lambda"))
     lambda = us::any_cast<float>(parsedArgs["lambda"]);
 
-  bool filter_outliers = true;
-  if (parsedArgs.count("dont_filter_outliers"))
-    filter_outliers = !us::any_cast<bool>(parsedArgs["dont_filter_outliers"]);
+  bool filter_outliers = false;
+  if (parsedArgs.count("filter_outliers"))
+    filter_outliers = us::any_cast<bool>(parsedArgs["filter_outliers"]);
 
   std::string mask_file = "";
   if (parsedArgs.count("mask"))
@@ -233,27 +233,20 @@ int main(int argc, char* argv[])
       fitter->SetVerbose(true);
       fitter->SetResampleFibers(false);
       fitter->SetMaskImage(mask);
-
-      if (regu=="MSM")
-        fitter->SetRegularization(VnlCostFunction::REGU::MSM);
-      else if (regu=="MSE")
-        fitter->SetRegularization(VnlCostFunction::REGU::MSE);
-      else if (regu=="Local_MSE")
-        fitter->SetRegularization(VnlCostFunction::REGU::Local_MSE);
-      else if (regu=="NONE")
-        fitter->SetRegularization(VnlCostFunction::REGU::NONE);
-
+      fitter->SetRegularization(VnlCostFunction::REGU::NONE);
       fitter->Update();
       rmse = fitter->GetRMSE();
+      vnl_vector<double> rms_diff = fitter->GetRmsDiffPerBundle();
+      logfile << "RMS_DIFF: " << setprecision(5) << rms_diff[0] << " " << name << " RMSE: " << rmse << "\n";
 
       name = ist::GetFilenameWithoutExtension(anchors_file);
       mitk::FiberBundle::Pointer anchor_tracts = fitter->GetTractograms().at(0);
       anchor_tracts->SetFiberColors(255,255,255);
-      mitk::IOUtil::Save(anchor_tracts, out_folder + "0_" + name + ".fib");
+      mitk::IOUtil::Save(anchor_tracts, out_folder + boost::lexical_cast<std::string>((int)(100000*rms_diff[0])) + "_" + name + ".fib");
 
       peak_image = fitter->GetUnderexplainedImage();
       peak_image_writer->SetInput(peak_image);
-      peak_image_writer->SetFileName(out_folder + boost::lexical_cast<std::string>(iteration) + "_" + name + ".nrrd");
+      peak_image_writer->SetFileName(out_folder + "Residual_" + name + ".nii.gz");
       peak_image_writer->Update();
     }
 
@@ -272,10 +265,16 @@ int main(int argc, char* argv[])
 
       if (regu=="MSM")
         fitter->SetRegularization(VnlCostFunction::REGU::MSM);
-      else if (regu=="MSE")
-        fitter->SetRegularization(VnlCostFunction::REGU::MSE);
-      else if (regu=="Local_MSE")
-        fitter->SetRegularization(VnlCostFunction::REGU::Local_MSE);
+      else if (regu=="Variance")
+        fitter->SetRegularization(VnlCostFunction::REGU::VARIANCE);
+      else if (regu=="Lasso")
+        fitter->SetRegularization(VnlCostFunction::REGU::LASSO);
+      else if (regu=="VoxelVariance")
+        fitter->SetRegularization(VnlCostFunction::REGU::VOXEL_VARIANCE);
+      else if (regu=="GroupLasso")
+        fitter->SetRegularization(VnlCostFunction::REGU::GROUP_LASSO);
+      else if (regu=="GroupVariance")
+        fitter->SetRegularization(VnlCostFunction::REGU::GROUP_VARIANCE);
       else if (regu=="NONE")
         fitter->SetRegularization(VnlCostFunction::REGU::NONE);
 
@@ -323,9 +322,13 @@ int main(int argc, char* argv[])
           num_voxels = masks_filter->GetNumCoveredVoxels();
         }
 
+        double weight_sum = 0;
+        for (int i=0; i<fib->GetNumFibers(); i++)
+          weight_sum += fib->GetFiberWeight(i);
+
         std::cout.rdbuf (old);              // <-- restore
 
-        logfile << "RMS_DIFF: " << setprecision(5) << rms_diff[c] << " " << bundle_name << " " << num_voxels << "\n";
+        logfile << "RMS_DIFF: " << setprecision(5) << rms_diff[c] << " " << bundle_name << " " << num_voxels << " " << fib->GetNumFibers() << " " << weight_sum << "\n";
         if (best_overlap_index>=0)
           logfile << "Best_overlap: " << setprecision(5) << best_overlap << " " << ist::GetFilenameWithoutExtension(anchor_mask_files.at(best_overlap_index)) << "\n";
         else
@@ -338,6 +341,11 @@ int main(int argc, char* argv[])
       out_fib = out_fib->AddBundles(input_candidates);
       out_fib->ColorFibersByFiberWeights(false, true);
       mitk::IOUtil::Save(out_fib, out_folder + "AllCandidates.fib");
+
+      peak_image = fitter->GetUnderexplainedImage();
+      peak_image_writer->SetInput(peak_image);
+      peak_image_writer->SetFileName(out_folder + "Residual_AllCandidates.nii.gz");
+      peak_image_writer->Update();
     }
     else
     {

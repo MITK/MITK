@@ -1018,8 +1018,11 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
   vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
 
+  vtkSmartPointer<vtkFloatArray> newFiberWeights = vtkSmartPointer<vtkFloatArray>::New();
+  newFiberWeights->SetName("FIBER_WEIGHTS");
+  newFiberWeights->SetNumberOfValues(m_NumFibers);
+
   MITK_INFO << "Cutting fibers";
-  std::vector<float> new_weights;
   boost::progress_display disp(m_NumFibers);
   for (int i=0; i<m_NumFibers; i++)
   {
@@ -1048,15 +1051,18 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
           container->GetPointIds()->InsertNextId(id);
           newNumPoints++;
         }
-        else if ( (mask->GetPixel(idx) == 0 || !mask->GetLargestPossibleRegion().IsInside(idx)) && invert )
+        else if ( (!mask->GetLargestPossibleRegion().IsInside(idx) || mask->GetPixel(idx) == 0) && invert )
         {
           vtkIdType id = vtkNewPoints->InsertNextPoint(p);
           container->GetPointIds()->InsertNextId(id);
           newNumPoints++;
         }
-        else if (newNumPoints>0)
+        else if (newNumPoints>1)
         {
           vtkNewCells->InsertNextCell(container);
+          if (newFiberWeights->GetSize()<=vtkNewCells->GetNumberOfCells())
+            newFiberWeights->Resize(vtkNewCells->GetNumberOfCells()*2);
+          newFiberWeights->SetValue(vtkNewCells->GetNumberOfCells(), fibCopy->GetFiberWeight(i));
 
           newNumPoints = 0;
           container = vtkSmartPointer<vtkPolyLine>::New();
@@ -1066,7 +1072,10 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
       if (newNumPoints>1)
       {
         vtkNewCells->InsertNextCell(container);
-        new_weights.push_back(this->GetFiberWeight(i));
+        if (newFiberWeights->GetSize()<=vtkNewCells->GetNumberOfCells())
+          newFiberWeights->Resize(vtkNewCells->GetNumberOfCells()*2);
+
+        newFiberWeights->SetValue(vtkNewCells->GetNumberOfCells(), fibCopy->GetFiberWeight(i));
       }
     }
 
@@ -1074,14 +1083,14 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
 
   if (vtkNewCells->GetNumberOfCells()<=0)
     return nullptr;
+  newFiberWeights->Resize(vtkNewCells->GetNumberOfCells());
 
   vtkSmartPointer<vtkPolyData> newPolyData = vtkSmartPointer<vtkPolyData>::New();
   newPolyData->SetPoints(vtkNewPoints);
   newPolyData->SetLines(vtkNewCells);
   mitk::FiberBundle::Pointer newFib = mitk::FiberBundle::New(newPolyData);
+  newFib->SetFiberWeights(newFiberWeights);
   newFib->Compress(0.1);
-  for (unsigned int i=0; i<new_weights.size(); ++i)
-    newFib->SetFiberWeight(i, new_weights.at(i));
   return newFib;
 }
 
@@ -2513,7 +2522,7 @@ bool mitk::FiberBundle::Equals(mitk::FiberBundle* fib, double eps)
 
 void mitk::FiberBundle::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
-  os << indent << this->GetNameOfClass() << ":\n";
+  os << this->GetNameOfClass() << ":\n";
   os << indent << "Number of fibers: " << this->GetNumFibers() << std::endl;
   os << indent << "Min. fiber length: " << this->GetMinFiberLength() << std::endl;
   os << indent << "Max. fiber length: " << this->GetMaxFiberLength() << std::endl;
@@ -2526,6 +2535,29 @@ void mitk::FiberBundle::PrintSelf(std::ostream &os, itk::Indent indent) const
   os << indent << "Extent y: " << this->GetGeometry()->GetExtentInMM(1) << "mm" << std::endl;
   os << indent << "Extent z: " << this->GetGeometry()->GetExtentInMM(2) << "mm" << std::endl;
   os << indent << "Diagonal: " << this->GetGeometry()->GetDiagonalLength()  << "mm" << std::endl;
+
+  if (m_FiberWeights!=nullptr)
+  {
+    std::vector< float > weights;
+    for (int i=0; i<m_FiberWeights->GetSize(); i++)
+      weights.push_back(m_FiberWeights->GetValue(i));
+
+    std::sort(weights.begin(), weights.end());
+
+    os << indent << "\nFiber weight statistics" << std::endl;
+    os << indent << "Min: " << weights.front() << std::endl;
+    os << indent << "1% quantile: " << weights.at(weights.size()*0.01) << std::endl;
+    os << indent << "5% quantile: " << weights.at(weights.size()*0.05) << std::endl;
+    os << indent << "25% quantile: " << weights.at(weights.size()*0.25) << std::endl;
+    os << indent << "Median: " << weights.at(weights.size()*0.5) << std::endl;
+    os << indent << "75% quantile: " << weights.at(weights.size()*0.75) << std::endl;
+    os << indent << "95% quantile: " << weights.at(weights.size()*0.95) << std::endl;
+    os << indent << "99% quantile: " << weights.at(weights.size()*0.99) << std::endl;
+    os << indent << "Max: " << weights.back() << std::endl;
+  }
+  else
+    os << indent << "\n\nNo fiber weight array found." << std::endl;
+
   Superclass::PrintSelf(os, indent);
 }
 

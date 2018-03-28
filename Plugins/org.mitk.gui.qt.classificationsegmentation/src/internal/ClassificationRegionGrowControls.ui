@@ -1,0 +1,593 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ClassificationRegionGrowControls</class>
+ <widget class="QWidget" name="ClassificationRegionGrowControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>352</width>
+    <height>979</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkTemplate</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label_2">
+     <property name="font">
+      <font>
+       <pointsize>17</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+       <stylestrategy>PreferAntialias</stylestrategy>
+       <kerning>true</kerning>
+      </font>
+     </property>
+     <property name="text">
+      <string>Classifier Region Growing</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="m_InputImageLayout">
+     <item>
+      <widget class="QLabel" name="m_InputImageLabel">
+       <property name="font">
+        <font>
+         <italic>true</italic>
+        </font>
+       </property>
+       <property name="text">
+        <string>Basic Image</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="addInputButton">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="removeInputButton">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="m_MaskImageLayout">
+     <item>
+      <widget class="QLabel" name="m_MaskImageLabel">
+       <property name="font">
+        <font>
+         <italic>true</italic>
+        </font>
+       </property>
+       <property name="text">
+        <string>Segmentation Image</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line_3">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCommandLinkButton" name="m_DoAutomaticSecmentation">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>64</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <family>Segoe UI</family>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Update Segmentation</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../resources/ClassificationSegmentation.qrc">
+       <normaloff>:/ClassificationSegmentation/button_process_2.png</normaloff>:/ClassificationSegmentation/button_process_2.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="shortcut">
+      <string>Ctrl+A</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="SelectSimpleParameters">
+     <property name="title">
+      <string>Parameters</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QWidget" name="parameterWidget" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QCheckBox" name="SegmentBackground">
+           <property name="text">
+            <string>Segment Background (First Label)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="localGrowing">
+           <property name="text">
+            <string>Connectness for all labels</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QFormLayout" name="StartingPointLayout">
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="UpdateImage">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>Use existing segmentation as starting point</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="SelectAdvancedParameter">
+     <property name="title">
+      <string>Advanced Parameter</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QGroupBox" name="groupLearningParameter">
+        <property name="title">
+         <string>Learning Parameters</string>
+        </property>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Samples per Tree: </string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QDoubleSpinBox" name="SamplesPerTree">
+           <property name="minimum">
+            <double>0.010000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.660000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Number of Trees: </string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="NumberOfTrees">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>2000</number>
+           </property>
+           <property name="value">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Minimum Samples per Node: </string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QSpinBox" name="MinimumSamplesPerNode">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>200000</number>
+           </property>
+           <property name="value">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Maximum Tree depth:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QSpinBox" name="MaximumTreeDepth">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>2000000</number>
+           </property>
+           <property name="value">
+            <number>100</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupFeatureSelection">
+        <property name="title">
+         <string>Feature Selection</string>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="5" column="4">
+          <widget class="QCheckBox" name="LoG4">
+           <property name="text">
+            <string>4</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="3">
+          <widget class="QCheckBox" name="LoG3">
+           <property name="text">
+            <string>3</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>Laplacian of Gauss:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="5">
+          <widget class="QCheckBox" name="HoG5">
+           <property name="text">
+            <string>5</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Intensity Value:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="4">
+          <widget class="QCheckBox" name="Gauss4">
+           <property name="text">
+            <string>4</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="label_13">
+           <property name="text">
+            <string> ( Neigh. Size / Bins)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="3">
+          <widget class="QCheckBox" name="HoG3">
+           <property name="text">
+            <string>3</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="2">
+          <widget class="QCheckBox" name="LoG2">
+           <property name="text">
+            <string>2</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0" colspan="5">
+          <widget class="QCheckBox" name="checkAddFeaturesToDataManager">
+           <property name="text">
+            <string>Add Feature Images to DataManager</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>Diff. of Gauss: </string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="4">
+          <widget class="QCheckBox" name="HoG4">
+           <property name="text">
+            <string>4</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QCheckBox" name="DoG1">
+           <property name="text">
+            <string>1</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QCheckBox" name="Gauss1">
+           <property name="text">
+            <string>1 </string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="5">
+          <widget class="QCheckBox" name="Gauss5">
+           <property name="text">
+            <string>5</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QCheckBox" name="Gauss3">
+           <property name="text">
+            <string>3</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QCheckBox" name="UseIntensity">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="5">
+          <widget class="QCheckBox" name="LoG5">
+           <property name="text">
+            <string>5</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QCheckBox" name="HoG1">
+           <property name="text">
+            <string>1</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Hessian of Gaussian:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="2">
+          <widget class="QCheckBox" name="HoG2">
+           <property name="text">
+            <string>2</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>Local Histogram</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QCheckBox" name="Gauss2">
+           <property name="text">
+            <string>2</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Gaussian smoothed:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QCheckBox" name="LoG1">
+           <property name="text">
+            <string>1</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="2">
+          <widget class="QCheckBox" name="DoG2">
+           <property name="text">
+            <string>2</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="4">
+          <widget class="QCheckBox" name="DoG4">
+           <property name="text">
+            <string>4</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="3">
+          <widget class="QCheckBox" name="DoG3">
+           <property name="text">
+            <string>3</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="5">
+          <widget class="QCheckBox" name="DoG5">
+           <property name="text">
+            <string>5</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1" colspan="2">
+          <widget class="QCheckBox" name="LH1">
+           <property name="text">
+            <string>3/5</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1" colspan="2">
+          <widget class="QCheckBox" name="LH2">
+           <property name="text">
+            <string>5/5</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="3" colspan="2">
+          <widget class="QCheckBox" name="LH3">
+           <property name="text">
+            <string>3/10</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="3" colspan="2">
+          <widget class="QCheckBox" name="LH4">
+           <property name="text">
+            <string>5/10</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="../../resources/ClassificationSegmentation.qrc"/>
+ </resources>
+ <connections/>
+</ui>

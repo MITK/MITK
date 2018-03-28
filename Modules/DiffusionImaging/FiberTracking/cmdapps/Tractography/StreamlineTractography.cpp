@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerOdf.h>
 #include <itkTensorImageToOdfImageFilter.h>
 #include <mitkTractographyForest.h>
+#include <mitkPreferenceListReaderOptionsFunctor.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -92,28 +93,35 @@ int main(int argc, char* argv[])
   parser.addArgument("loop_check", "", mitkCommandLineParser::Float, "Check for loops:", "threshold on angular stdev over the last 4 voxel lengths");
   parser.endGroup();
 
-  parser.beginGroup("5. Neighborhood sampling:");
+  parser.beginGroup("5. Tractography prior:");
+  parser.addArgument("prior_image", "", mitkCommandLineParser::String, "Peak prior:", "tractography prior in thr for of a peak image", us::Any());
+  parser.addArgument("prior_weight", "", mitkCommandLineParser::Float, "Prior weight", "weighting factor between prior and data.", 0.5);
+  parser.addArgument("restrict_to_prior", "", mitkCommandLineParser::Bool, "Restrict to prior:", "restrict tractography to regions where the prior is valid.");
+  parser.addArgument("new_directions_from_prior", "", mitkCommandLineParser::Bool, "New directios from prior:", "the prior can create directions where there are none in the data.");
+  parser.endGroup();
+
+  parser.beginGroup("6. Neighborhood sampling:");
   parser.addArgument("num_samples", "", mitkCommandLineParser::Int, "Num. neighborhood samples:", "number of neighborhood samples that are use to determine the next progression direction", 0);
   parser.addArgument("sampling_distance", "", mitkCommandLineParser::Float, "Sampling distance:", "distance of neighborhood sampling points (in voxels)", 0.25);
   parser.addArgument("use_stop_votes", "", mitkCommandLineParser::Bool, "Use stop votes:", "use stop votes");
   parser.addArgument("use_only_forward_samples", "", mitkCommandLineParser::Bool, "Use only forward samples:", "use only forward samples");
   parser.endGroup();
 
-  parser.beginGroup("6. Tensor tractography specific:");
+  parser.beginGroup("7. Tensor tractography specific:");
   parser.addArgument("tend_f", "", mitkCommandLineParser::Float, "Weight f", "weighting factor between first eigenvector (f=1 equals FACT tracking) and input vector dependent direction (f=0).", 1.0);
   parser.addArgument("tend_g", "", mitkCommandLineParser::Float, "Weight g", "weighting factor between input vector (g=0) and tensor deflection (g=1 equals TEND tracking)", 0.0);
   parser.endGroup();
 
-  parser.beginGroup("7. Random forest tractography specific:");
+  parser.beginGroup("8. Random forest tractography specific:");
   parser.addArgument("forest", "", mitkCommandLineParser::String, "Forest:", "input random forest (HDF5 file)", us::Any());
   parser.addArgument("use_sh_features", "", mitkCommandLineParser::Bool, "Use SH features:", "use SH features");
   parser.endGroup();
 
-  parser.beginGroup("8. Additional input:");
+  parser.beginGroup("9. Additional input:");
   parser.addArgument("additional_images", "", mitkCommandLineParser::StringList, "Additional images:", "specify a list of float images that hold additional information (FA, GFA, additional features for RF tractography)", us::Any());
   parser.endGroup();
 
-  parser.beginGroup("9. Misc:");
+  parser.beginGroup("10. Misc:");
   parser.addArgument("flip_x", "", mitkCommandLineParser::Bool, "Flip X:", "multiply x-coordinate of direction proposal by -1");
   parser.addArgument("flip_y", "", mitkCommandLineParser::Bool, "Flip Y:", "multiply y-coordinate of direction proposal by -1");
   parser.addArgument("flip_z", "", mitkCommandLineParser::Bool, "Flip Z:", "multiply z-coordinate of direction proposal by -1");
@@ -129,6 +137,22 @@ int main(int argc, char* argv[])
   mitkCommandLineParser::StringContainerType input_files = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["input"]);
   std::string outFile = us::any_cast<std::string>(parsedArgs["out"]);
   std::string algorithm = us::any_cast<std::string>(parsedArgs["algorithm"]);
+
+  std::string prior_image = "";
+  if (parsedArgs.count("prior_image"))
+    prior_image = us::any_cast<std::string>(parsedArgs["prior_image"]);
+
+  float prior_weight = 0.5;
+  if (parsedArgs.count("prior_weight"))
+    prior_weight = us::any_cast<float>(parsedArgs["prior_weight"]);
+
+  bool restrict_to_prior = false;
+  if (parsedArgs.count("restrict_to_prior"))
+    restrict_to_prior = us::any_cast<bool>(parsedArgs["restrict_to_prior"]);
+
+  bool new_directions_from_prior = false;
+  if (parsedArgs.count("new_directions_from_prior"))
+    new_directions_from_prior = us::any_cast<bool>(parsedArgs["new_directions_from_prior"]);
 
   bool sharpen_odfs = false;
   if (parsedArgs.count("sharpen_odfs"))
@@ -361,6 +385,36 @@ int main(int argc, char* argv[])
 
   typedef itk::StreamlineTrackingFilter TrackerType;
   TrackerType::Pointer tracker = TrackerType::New();
+
+  if (!prior_image.empty())
+  {
+    mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image"}, {});
+    mitk::PeakImage::Pointer priorImage = dynamic_cast<mitk::PeakImage*>(mitk::IOUtil::Load(prior_image, &functor)[0].GetPointer());
+
+    if (priorImage.IsNull())
+    {
+      MITK_INFO << "Only peak images are supported as prior at the moment!";
+      return EXIT_FAILURE;
+    }
+
+    mitk::TrackingDataHandler* priorhandler = new mitk::TrackingHandlerPeaks();
+
+    typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
+    CasterType::Pointer caster = CasterType::New();
+    caster->SetInput(priorImage);
+    caster->Update();
+    mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
+
+    dynamic_cast<mitk::TrackingHandlerPeaks*>(priorhandler)->SetPeakImage(itkImg);
+    dynamic_cast<mitk::TrackingHandlerPeaks*>(priorhandler)->SetPeakThreshold(0.0);
+    dynamic_cast<mitk::TrackingHandlerPeaks*>(priorhandler)->SetInterpolate(interpolate);
+    dynamic_cast<mitk::TrackingHandlerPeaks*>(priorhandler)->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
+
+    tracker->SetTrackingPriorHandler(priorhandler);
+    tracker->SetTrackingPriorWeight(prior_weight);
+    tracker->SetTrackingPriorAsMask(restrict_to_prior);
+    tracker->SetIntroduceDirectionsFromPrior(new_directions_from_prior);
+  }
 
   mitk::TrackingDataHandler* handler;
   if (algorithm == "DetRF" || algorithm == "ProbRF")

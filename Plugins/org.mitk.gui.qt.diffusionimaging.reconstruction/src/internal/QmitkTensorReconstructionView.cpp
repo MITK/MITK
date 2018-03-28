@@ -571,13 +571,9 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr()
       typedef itk::TensorReconstructionWithEigenvalueCorrectionFilter< DiffusionPixelType, TTensorPixelType > ReconstructionFilter;
 
       float b0Threshold = m_Controls->m_TensorReconstructionThreshold->value();
-
-      GradientDirectionContainerType::Pointer gradientContainerCopy = GradientDirectionContainerType::New();
-      for(GradientDirectionContainerType::ConstIterator it = static_cast<mitk::GradientDirectionsProperty*>( vols->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->Begin();
-          it != static_cast<mitk::GradientDirectionsProperty*>( vols->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->End(); it++)
-      {
+      mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientContainerCopy = mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::New();
+      for(auto it = mitk::DiffusionPropertyHelper::GetGradientContainer(vols)->Begin(); it != mitk::DiffusionPropertyHelper::GetGradientContainer(vols)->End(); it++)
         gradientContainerCopy->push_back(it.Value());
-      }
 
       ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
       mitk::CastToItkImage(vols, itkVectorImagePointer);

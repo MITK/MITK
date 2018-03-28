@@ -326,7 +326,7 @@ void QmitkIGTNavigationToolCalibration::OnComputePivot()
 
     mitk::NavigationData::Pointer ToolTipToTool = mitk::NavigationData::New();
     ToolTipToTool->SetPosition(myPivotCalibration->GetResultPivotPoint());
-    ToolTipToTool->SetOrientation(myPivotCalibration->GetResultPivotRotation());
+    ToolTipToTool->SetOrientation(mitk::Quaternion(0,0,0,1));
     mitk::NavigationData::Pointer TrackerToTool = mitk::NavigationData::New();
     TrackerToTool->SetOrientation(markerTransformationTrackingCoordinates->GetOrientation());
     TrackerToTool->SetPosition(markerTransformationTrackingCoordinates->GetPosition());
@@ -343,8 +343,7 @@ void QmitkIGTNavigationToolCalibration::OnComputePivot()
     //parse result string
     resultString = QString("Pivot computation succeeded!\n")
       + QString("RMS Error: ") + QString::number(myPivotCalibration->GetResultRMSError()) + QString("\n")
-      + QString("Pivot Point: ") + QString::number(myPivotCalibration->GetResultPivotPoint()[0]) + ";" + QString::number(myPivotCalibration->GetResultPivotPoint()[1]) + ";" + QString::number(myPivotCalibration->GetResultPivotPoint()[2]) + QString("\n")
-      + QString("Pivot Rotation: ") + QString::number(myPivotCalibration->GetResultPivotRotation()[0]) + ";" + QString::number(myPivotCalibration->GetResultPivotRotation()[1]) + ";" + QString::number(myPivotCalibration->GetResultPivotRotation()[2]) + ";" + QString::number(myPivotCalibration->GetResultPivotRotation()[3]) + QString("\n");
+      + QString("Pivot Point: ") + QString::number(myPivotCalibration->GetResultPivotPoint()[0]) + ";" + QString::number(myPivotCalibration->GetResultPivotPoint()[1]) + ";" + QString::number(myPivotCalibration->GetResultPivotPoint()[2]) + QString("\n");
 
     //finally: save results to member variable
     m_ComputedToolTipTransformation = ToolTipToTool;

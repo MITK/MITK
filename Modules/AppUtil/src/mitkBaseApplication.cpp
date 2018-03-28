@@ -660,21 +660,23 @@ namespace mitk
 
   QCoreApplication *BaseApplication::getQApplication() const
   {
-    vtkOpenGLRenderWindow::SetGlobalMaximumNumberOfMultiSamples(0);
-    QSurfaceFormat::setDefaultFormat(QVTKOpenGLWidget::defaultFormat());
-
     QCoreApplication *qCoreApp = qApp;
 
-// Needed to fix bug #18521, i.e. not responding GUI on Mac OS X with Qt5
+    if (nullptr == qCoreApp)
+    {
+      vtkOpenGLRenderWindow::SetGlobalMaximumNumberOfMultiSamples(0);
+
+      auto defaultFormat = QVTKOpenGLWidget::defaultFormat();
+      defaultFormat.setSamples(0);
+      QSurfaceFormat::setDefaultFormat(defaultFormat);
+
 #ifdef Q_OS_OSX
-    qCoreApp->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+      QCoreApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 
-    qCoreApp->setAttribute(Qt::AA_ShareOpenGLContexts);
+      QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
-    if (!qCoreApp)
-    {
-      if (getSingleMode())
+      if (this->getSingleMode())
       {
         qCoreApp = new QmitkSingleApplication(d->m_Argc, d->m_Argv, getSafeMode());
       }
@@ -686,6 +688,7 @@ namespace mitk
       }
       d->m_QApp.reset(qCoreApp);
     }
+
     return qCoreApp;
   }
 

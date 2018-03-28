@@ -1021,6 +1021,8 @@ foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
   set(MITK_MODULE_NAME_PREFIX ${MITK_DEFAULT_MODULE_NAME_PREFIX})
 endforeach()
 
+add_subdirectory(Wrapping)
+
 if(MITK_USE_BLUEBERRY)
 
   set(BLUEBERRY_XPDOC_OUTPUT_DIR ${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/)

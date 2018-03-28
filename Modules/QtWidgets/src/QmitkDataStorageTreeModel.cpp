@@ -432,47 +432,7 @@ QVariant QmitkDataStorageTreeModel::data(const QModelIndex &index, int role) con
   mitk::DataNode *dataNode = this->TreeItemFromIndex(index)->GetDataNode();
 
   // get name of treeItem (may also be edited)
-  QString nodeName;
-  if (DicomPropertiesExists(*dataNode))
-  {
-    mitk::BaseProperty *seriesDescription =
-      (dataNode->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x103e).c_str()));
-    mitk::BaseProperty *studyDescription =
-      (dataNode->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x1030).c_str()));
-    mitk::BaseProperty *patientsName =
-      (dataNode->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0010).c_str()));
-
-    mitk::BaseProperty *seriesDescription_deprecated = (dataNode->GetProperty("dicom.series.SeriesDescription"));
-    mitk::BaseProperty *studyDescription_deprecated = (dataNode->GetProperty("dicom.study.StudyDescription"));
-    mitk::BaseProperty *patientsName_deprecated = (dataNode->GetProperty("dicom.patient.PatientsName"));
-
-    if (patientsName)
-    {
-      nodeName += QString::fromStdString(patientsName->GetValueAsString()) + "\n";
-      nodeName += QString::fromStdString(studyDescription->GetValueAsString()) + "\n";
-      nodeName += QString::fromStdString(seriesDescription->GetValueAsString());
-    }
-    else
-    { /** Code coveres the deprecated property naming for backwards compatibility */
-      nodeName += QString::fromStdString(patientsName_deprecated->GetValueAsString()) + "\n";
-      nodeName += QString::fromStdString(studyDescription_deprecated->GetValueAsString()) + "\n";
-      nodeName += QString::fromStdString(seriesDescription_deprecated->GetValueAsString());
-    }
-
-    auto data = dataNode->GetData();
-
-    if (nullptr != data && std::string("LabelSetImage") == data->GetNameOfClass())
-    {
-      auto nameProperty = dataNode->GetProperty("name");
-
-      if (nullptr != nameProperty && !nameProperty->GetValueAsString().empty())
-        nodeName += ": " + QString::fromStdString(nameProperty->GetValueAsString());
-    }
-  }
-  else
-  {
-    nodeName = QString::fromStdString(dataNode->GetName());
-  }
+  QString nodeName = QString::fromStdString(dataNode->GetName());
   if (nodeName.isEmpty())
   {
     nodeName = "unnamed";

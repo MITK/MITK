@@ -968,22 +968,25 @@ void QmitkSlicesInterpolator::OnReinit3DInterpolation()
     mitk::NodePredicateProperty::New("3DContourContainer", mitk::BoolProperty::New(true));
   mitk::DataStorage::SetOfObjects::ConstPointer contourNodes =
     m_DataStorage->GetDerivations(m_ToolManager->GetWorkingData(0), pred);
+
   if (contourNodes->Size() != 0)
   {
+    m_BtnApply3D->setEnabled(true);
     m_3DContourNode = contourNodes->at(0);
+    mitk::Surface::Pointer contours = dynamic_cast<mitk::Surface *>(m_3DContourNode->GetData());
+    if (contours)
+      mitk::SurfaceInterpolationController::GetInstance()->ReinitializeInterpolation(contours);
+    m_BtnReinit3DInterpolation->setEnabled(false);
   }
   else
   {
+    m_BtnApply3D->setEnabled(false);
     QMessageBox errorInfo;
     errorInfo.setWindowTitle("Reinitialize surface interpolation");
     errorInfo.setIcon(QMessageBox::Information);
     errorInfo.setText("No contours available for the selected segmentation!");
     errorInfo.exec();
   }
-  mitk::Surface::Pointer contours = dynamic_cast<mitk::Surface *>(m_3DContourNode->GetData());
-  if (contours)
-    mitk::SurfaceInterpolationController::GetInstance()->ReinitializeInterpolation(contours);
-  m_BtnReinit3DInterpolation->setEnabled(false);
 }
 
 void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction *action)

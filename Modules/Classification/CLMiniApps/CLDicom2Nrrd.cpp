@@ -56,7 +56,6 @@ int main(int argc, char* argv[])
   std::string inputFolder = us::any_cast<std::string>(parsedArgs["input"]);
   std::string outFileName = us::any_cast<std::string>(parsedArgs["output"]);
 
-  //mitk::PreferenceListReaderOptionsFunctor::ListType preference = { "MITK DICOM Reader v2 (classic config)" };
   mitk::PreferenceListReaderOptionsFunctor::ListType preference = {};
   if (parsedArgs.count("reader"))
   {

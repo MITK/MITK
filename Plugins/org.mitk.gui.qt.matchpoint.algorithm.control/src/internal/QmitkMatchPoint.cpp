@@ -239,10 +239,10 @@ bool QmitkMatchPoint::CheckInputs()
 
   if (m_LoadedAlgorithm.IsNull())
   {
-    m_Controls.m_lbMovingName->setText(QString("<font color='red'>No algorithm seleted!</font>"));
+    m_Controls.m_lbMovingName->setText(QString("<font color='red'>No algorithm selected!</font>"));
     m_spSelectedMovingNode = nullptr;
     m_spSelectedMovingData = nullptr;
-    m_Controls.m_lbTargetName->setText(QString("<font color='red'>No algorithm seleted!</font>"));
+    m_Controls.m_lbTargetName->setText(QString("<font color='red'>No algorithm selected!</font>"));
     m_spSelectedTargetNode = nullptr;
     m_spSelectedTargetData = nullptr;
 

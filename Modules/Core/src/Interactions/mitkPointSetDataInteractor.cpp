@@ -57,7 +57,7 @@ void mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineActi
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
-    mitk::Point3D itkPoint = positionEvent->GetPlanePositionInWorld();
+    mitk::Point3D itkPoint = positionEvent->GetPositionInWorld();
 
     this->UnselectAll( timeStep, timeInMs);
 

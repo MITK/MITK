@@ -103,8 +103,8 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  mitk::Image::Pointer fix = mitk::IOUtil::LoadImage(parsedArgs["fix"].ToString());
-  mitk::Image::Pointer moving = mitk::IOUtil::LoadImage(parsedArgs["moving"].ToString());
+  mitk::Image::Pointer fix = mitk::IOUtil::Load<mitk::Image>(parsedArgs["fix"].ToString());
+  mitk::Image::Pointer moving = mitk::IOUtil::Load<mitk::Image>(parsedArgs["moving"].ToString());
   mitk::Image::Pointer erg = mitk::Image::New();
 
   AccessByItk_2(fix, ResampleImageToReferenceFunction, moving, parsedArgs["output"].ToString());

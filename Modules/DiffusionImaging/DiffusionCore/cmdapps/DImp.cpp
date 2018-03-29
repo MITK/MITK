@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 
   try
   {
-    mitk::Image::Pointer source = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(imageName)[0].GetPointer());
+    mitk::Image::Pointer source = mitk::IOUtil::Load<mitk::Image>(imageName);
     mitk::IOUtil::Save(source, outImage);
   }
   catch (itk::ExceptionObject e)

@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
     for (auto imgFile : imageFiles)
     {
-        mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(imgFile, &functor).GetPointer());
+        auto dwi = mitk::IOUtil::Load<mitk::Image>(imgFile, &functor));
         rawData.push_back(dwi);
     }
 
@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
     std::vector< ItkUcharImgType::Pointer > maskImageVector;
     for (auto maskFile : maskFiles)
     {
-        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskFile)[0].GetPointer());
+        mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(maskFile);
         ItkUcharImgType::Pointer mask = ItkUcharImgType::New();
         mitk::CastToItkImage(img, mask);
         maskImageVector.push_back(mask);
@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
     std::vector< ItkUcharImgType::Pointer > wmMaskImageVector;
     for (auto wmFile : wmMaskFiles)
     {
-        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(wmFile)[0].GetPointer());
+        mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(wmFile);
         ItkUcharImgType::Pointer wmmask = ItkUcharImgType::New();
         mitk::CastToItkImage(img, wmmask);
         wmMaskImageVector.push_back(wmmask);
@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
     std::vector< mitk::FiberBundle::Pointer > tractograms;
     for (auto tractFile : tractogramFiles)
     {
-        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(tractFile).at(0).GetPointer());
+        mitk::FiberBundle::Pointer fib = mitk::IOUtil::Load<mitk::FiberBundle>(tractFile);
         tractograms.push_back(fib);
     }
 
@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
     std::vector< ItkFloatImgType::Pointer > volumeModImages;
     for (auto file : volModFiles)
     {
-        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(file)[0].GetPointer());
+        mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(file);
         ItkFloatImgType::Pointer itkimg = ItkFloatImgType::New();
         mitk::CastToItkImage(img, itkimg);
         volumeModImages.push_back(itkimg);
@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
     int c = 0;
     for (auto file : addFeatFiles)
     {
-        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(file)[0].GetPointer());
+        mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(file);
         ItkFloatImgType::Pointer itkimg = ItkFloatImgType::New();
         mitk::CastToItkImage(img, itkimg);
         addFeatImages.at(c%addFeatImages.size()).push_back(itkimg);

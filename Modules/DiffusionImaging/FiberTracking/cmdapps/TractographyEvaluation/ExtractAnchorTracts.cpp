@@ -48,7 +48,7 @@ void CreateFolderStructure(const std::string& path)
 
 ItkFloatImgType::Pointer LoadItkImage(const std::string& filename)
 {
-  mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+  mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(filename);
   ItkFloatImgType::Pointer itkMask = ItkFloatImgType::New();
   mitk::CastToItkImage(img, itkMask);
   return itkMask;
@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
   {
     CreateFolderStructure(out_folder);
     std::vector< MaskType > known_tract_masks = get_file_list(reference_mask_folder, anchor_fraction, out_folder + "/skipped_masks/", random_seed);
-    mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(fibFile)[0].GetPointer());
+    mitk::FiberBundle::Pointer inputTractogram = mitk::IOUtil::Load<mitk::FiberBundle>(fibFile);
 
     if (gray_matter_mask.compare("")!=0)
     {

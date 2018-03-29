@@ -168,7 +168,7 @@ int main(int argc, char* argv[])
 
     for (std::size_t i = 0; i < forestVector.size(); ++i)
     {
-      forest = dynamic_cast<mitk::VigraRandomForestClassifier*>(mitk::IOUtil::Load(forestVector[i])[0].GetPointer());
+      forest = mitk::IOUtil::Load<mitk::VigraRandomForestClassifier>(forestVector[i]);
 
       time(&now);
       seconds = std::difftime(now, lastTimePoint);

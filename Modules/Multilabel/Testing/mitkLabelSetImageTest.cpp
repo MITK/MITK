@@ -176,7 +176,7 @@ public:
   void TestInitializeByLabeledImage()
   {
     mitk::Image::Pointer image =
-      dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"))[0].GetPointer());
+      mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
     m_LabelSetImage->InitializeByLabeledImage(image);
     CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels() == 6);
   }
@@ -388,7 +388,7 @@ public:
   void TestRemoveLabels()
   {
     mitk::Image::Pointer image =
-      dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"))[0].GetPointer());
+      mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
     m_LabelSetImage->InitializeByLabeledImage(image);
 
     CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels() == 6);
@@ -421,7 +421,7 @@ public:
 
   void TestMergeLabel()
   {
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"))[0].GetPointer());
+    mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
     m_LabelSetImage = nullptr;
     m_LabelSetImage = mitk::LabelSetImage::New();
     m_LabelSetImage->InitializeByLabeledImage(image);

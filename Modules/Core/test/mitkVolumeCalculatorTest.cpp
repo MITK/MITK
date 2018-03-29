@@ -31,7 +31,7 @@ int mitkVolumeCalculatorTest(int /*argc*/, char *argv[])
   // The correct values have been manually calculated using external software.
   //*********************************************************************
 
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(filename);
   MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(), "01 Check if test image could be loaded");
 
   volumeCalculator->SetImage(image);
@@ -47,7 +47,7 @@ int mitkVolumeCalculatorTest(int /*argc*/, char *argv[])
 
   MITK_TEST_CONDITION_REQUIRED(volume == 1272.50, "03 Test Volume Result. Expected 1272.50 actual value " << volume);
 
-  image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename3D)[0].GetPointer());
+  image = mitk::IOUtil::Load<mitk::Image>(filename3D);
 
   volumeCalculator->SetImage(image);
   volumeCalculator->SetThreshold(-1023);

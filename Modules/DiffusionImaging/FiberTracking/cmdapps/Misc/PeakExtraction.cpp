@@ -120,8 +120,8 @@ int StartPeakExtraction(int argc, char* argv[])
 
   try
   {
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(imageName)[0].GetPointer());
-    mitk::Image::Pointer mask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskImageName)[0].GetPointer());
+    mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(imageName);
+    mitk::Image::Pointer mask = mitk::IOUtil::Load<mitk::Image>(maskImageName);
 
     typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
     typedef itk::FiniteDiffOdfMaximaExtractionFilter< float, shOrder, 20242 > MaximaExtractionFilterType;

@@ -158,8 +158,8 @@ int main(int argc, char* argv[])
   std::string version = "Version: 1.0";
   MITK_INFO << version;
 
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(imagePath);
-  mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(maskPath);
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(imagePath);
+  mitk::Image::Pointer mask = mitk::IOUtil::Load<mitk::Image>(maskPath);
 
   // Create a QTApplication and a Datastorage
   // This is necessary in order to save screenshots of

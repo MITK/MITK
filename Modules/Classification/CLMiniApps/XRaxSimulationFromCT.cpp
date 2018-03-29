@@ -212,8 +212,8 @@ int main(int argc, char* argv[])
   }
 
 
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(inputImage);
-  mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(inputMask);
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(inputImage);
+  mitk::Image::Pointer mask = mitk::IOUtil::Load<mitk::Image>(inputMask);
 
   AccessByItk_3(image, CreateXRay, mask, parsedArgs["output"].ToString(),param);
 

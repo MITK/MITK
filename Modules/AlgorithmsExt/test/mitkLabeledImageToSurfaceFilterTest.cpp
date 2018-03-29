@@ -37,7 +37,7 @@ int mitkLabeledImageToSurfaceFilterTest(int argc, char *argv[])
 
   std::string fileIn = argv[1];
   std::cout << "Eingabe Datei: " << fileIn << std::endl;
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(fileIn)[0].GetPointer());
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(fileIn);
   if (image->GetPixelType() != mitk::PixelType(mitk::MakeScalarPixelType<char>()) ||
       image->GetPixelType() != mitk::PixelType(mitk::MakeScalarPixelType<unsigned char>()))
   {

@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
   try
   {
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"SH Image"}, {});
-    mitk::ShImage::Pointer source = dynamic_cast<mitk::ShImage*>(mitk::IOUtil::Load(imageName, &functor)[0].GetPointer());
+    mitk::ShImage::Pointer source = mitk::IOUtil::Load<mitk::ShImage>(imageName, &functor);
 
     mitk::OdfImage::Pointer out_image = nullptr;
     switch (source->ShOrder())

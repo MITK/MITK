@@ -44,10 +44,10 @@ public:
   {
 
     // Load Image Data
-    p1 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Classification/Algorithm/ResultProb_Class-0_0.nrrd"))[0].GetPointer());
-    p2 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Classification/Algorithm/ResultProb_Class-1_0.nrrd"))[0].GetPointer());
-    p3 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Classification/Algorithm/ResultProb_Class-2_0.nrrd"))[0].GetPointer());
-    pmask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("Classification/Algorithm/mask.nrrd"))[0].GetPointer());
+    p1 = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Classification/Algorithm/ResultProb_Class-0_0.nrrd"));
+    p2 = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Classification/Algorithm/ResultProb_Class-1_0.nrrd"));
+    p3 = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Classification/Algorithm/ResultProb_Class-2_0.nrrd"));
+    pmask = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Classification/Algorithm/mask.nrrd"));
 
     mitk::CastToItkImage(p1,i1);
     mitk::CastToItkImage(p2,i2);

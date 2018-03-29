@@ -39,7 +39,7 @@ public:
 
   void TestFillContourSetIntoImage()
   {
-    mitk::Image::Pointer refImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("ContourModel-Data/RefImage.nrrd"))[0].GetPointer());
+    mitk::Image::Pointer refImage = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("ContourModel-Data/RefImage.nrrd"));
     CPPUNIT_ASSERT_MESSAGE("Failed to load reference image", refImage.IsNotNull());
     std::vector<itk::SmartPointer<mitk::BaseData>> readerOutput;
     readerOutput = mitk::IOUtil::Load(GetTestDataFilePath("ContourModel-Data/Contours.cnt_set"));

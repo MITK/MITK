@@ -86,9 +86,9 @@ public:
     m_PlayerDevice->SetProperty("IntensityImageFileName",mitk::StringProperty::New(intensityFileName));
 
     //comparing against IOUtil seems fair enough
-    m_GroundTruthDepthImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(distanceFileName)[0].GetPointer());
-    m_GroundTruthAmplitudeImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(amplitudeFileName)[0].GetPointer());
-    m_GroundTruthIntensityImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(intensityFileName)[0].GetPointer());
+    m_GroundTruthDepthImage = mitk::IOUtil::Load<mitk::Image>(distanceFileName);
+    m_GroundTruthAmplitudeImage = mitk::IOUtil::Load<mitk::Image>(amplitudeFileName);
+    m_GroundTruthIntensityImage = mitk::IOUtil::Load<mitk::Image>(intensityFileName);
 
     m_PlayerDevice->ConnectCamera();
     m_PlayerDevice->StartCamera();
@@ -107,7 +107,7 @@ public:
     m_ToFImageRecorder->WaitForThreadBeingTerminated();
     m_ToFImageRecorder->StopRecording();
 
-    mitk::Image::Pointer recordedImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(m_DistanceImageName)[0].GetPointer());
+    mitk::Image::Pointer recordedImage = mitk::IOUtil::Load<mitk::Image>(m_DistanceImageName);
     MITK_ASSERT_EQUAL( m_GroundTruthDepthImage, recordedImage, "Recorded image should be equal to the test data.");
 
     //delete the tmp image
@@ -126,7 +126,7 @@ public:
     m_ToFImageRecorder->WaitForThreadBeingTerminated();
     m_ToFImageRecorder->StopRecording();
 
-    mitk::Image::Pointer recordedImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(m_AmplitudeImageName)[0].GetPointer());
+    mitk::Image::Pointer recordedImage = mitk::IOUtil::Load<mitk::Image>(m_AmplitudeImageName);
     MITK_ASSERT_EQUAL( m_GroundTruthAmplitudeImage, recordedImage, "Recorded image should be equal to the test data.");
 
     //delete the tmp image
@@ -145,7 +145,7 @@ public:
     m_ToFImageRecorder->WaitForThreadBeingTerminated();
     m_ToFImageRecorder->StopRecording();
 
-    mitk::Image::Pointer recordedImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(m_IntensityImageName)[0].GetPointer());
+    mitk::Image::Pointer recordedImage = mitk::IOUtil::Load<mitk::Image>(m_IntensityImageName);
     MITK_ASSERT_EQUAL( m_GroundTruthIntensityImage, recordedImage, "Recorded image should be equal to the test data.");
 
     //delete the tmp image

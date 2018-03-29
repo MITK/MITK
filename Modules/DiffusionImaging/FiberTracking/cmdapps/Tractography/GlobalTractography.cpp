@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 
     // load input image
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"SH Image"}, {});
-    mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(inFileName, &functor)[0].GetPointer());
+    mitk::Image::Pointer mitkImage = mitk::IOUtil::Load<mitk::Image>(inFileName, &functor);
 
     // try to cast to Odf image
     if( dynamic_cast<mitk::OdfImage*>(mitkImage.GetPointer()) )
@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("mask"))
     {
       typedef itk::Image<float,3> MaskImgType;
-      mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(us::any_cast<std::string>(parsedArgs["mask"]))[0].GetPointer());
+      mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::Load<mitk::Image>(us::any_cast<std::string>(parsedArgs["mask"]));
       MaskImgType::Pointer itk_mask = MaskImgType::New();
       mitk::CastToItkImage(mitkMaskImage, itk_mask);
       gibbsTracker->SetMaskImage(itk_mask);

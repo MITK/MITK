@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
 
   std::string dtiFileName = "_dti.dti";
 
-  mitk::Image::Pointer diffusionImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(inputFile)[0].GetPointer());
+  mitk::Image::Pointer diffusionImage = mitk::IOUtil::Load<mitk::Image>(inputFile);
 
   if (diffusionImage.IsNull() || !mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(diffusionImage)) // does nullptr pointer check make sense after static cast ?
   {

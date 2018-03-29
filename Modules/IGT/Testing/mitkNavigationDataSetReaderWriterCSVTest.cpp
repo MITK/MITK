@@ -70,7 +70,7 @@ public:
   {
     // Aim is to read an CSV into a pointset, write that CSV again, and compare the output
 
-    set = dynamic_cast<mitk::NavigationDataSet*>(mitk::IOUtil::Load(pathRead)[0].GetPointer() );
+    set = mitk::IOUtil::Load<mitk::NavigationDataSet>(pathRead);
     CPPUNIT_ASSERT_MESSAGE("Testing whether something was read at all", set != nullptr);
 
     mitk::IOUtil::Save(set, pathWrite);
@@ -87,7 +87,7 @@ public:
 
   bool CompareFiles(std::string file)
   {
-    set = dynamic_cast<mitk::NavigationDataSet*>(mitk::IOUtil::Load(file)[0].GetPointer());
+    set = mitk::IOUtil::Load<mitk::NavigationDataSet>(file);
 
     double sample[2][30] ={
       {5134019.44, 0, 0, 0,  0,  0,  0,  0,  0,  0,                                                                                       5134019.44, 0,   1,  101.2300034,  -62.63999939,  -203.2400055,  -0.3059000075,  0.5752000213,  0,  0.7585999966,                     5134019.44, 0, 0,  0,  0,  0,  0,  0,  0,  0},

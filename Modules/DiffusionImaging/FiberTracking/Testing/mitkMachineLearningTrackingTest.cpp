@@ -57,14 +57,14 @@ public:
         mitk::BaseData::Pointer baseData = fibInfile.at(0);
         ref = dynamic_cast<mitk::FiberBundle*>(baseData.GetPointer());
 
-        dwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/DiffusionImage.dwi"))[0].GetPointer());
+        dwi = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/DiffusionImage.dwi"));
 
 
-        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/seed.nrrd"))[0].GetPointer());
+        mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/seed.nrrd"));
         seed = ItkFloatImgType::New();
         mitk::CastToItkImage(img, seed);
 
-        mitk::TractographyForest::Pointer forest = dynamic_cast<mitk::TractographyForest*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/forest.rf"))[0].GetPointer());
+        mitk::TractographyForest::Pointer forest = mitk::IOUtil::Load<mitk::TractographyForest>(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/forest.rf"));
 
         tfh->SetForest(forest);
         tfh->AddDwi(dwi);

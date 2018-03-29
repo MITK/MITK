@@ -177,7 +177,7 @@ void ComparePixels( itk::Image<itk::RGBPixel<TPixel>,VImageDimension>* image )
 void ReadImageDataAndConvertForthAndBack(std::string imageFileName)
 {
   // first we load an mitk::Image from the data repository
-  mitk::Image::Pointer mitkTestImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(imageFileName)[0].GetPointer());
+  mitk::Image::Pointer mitkTestImage = mitk::IOUtil::Load<mitk::Image>(imageFileName);
 
   // some format checking
   mitk::Image::Pointer resultImg = nullptr;

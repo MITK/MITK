@@ -177,7 +177,7 @@ int mitkImageAccessorTest(int argc, char *argv[])
   mitk::Image::Pointer image = nullptr;
   try
   {
-    image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(std::string(argv[1]))[0].GetPointer());
+    image = mitk::IOUtil::Load<mitk::Image>(std::string(argv[1]));
 
     if (image.IsNull())
     {

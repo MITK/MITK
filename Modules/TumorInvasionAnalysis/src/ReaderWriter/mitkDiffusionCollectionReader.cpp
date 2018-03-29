@@ -135,7 +135,7 @@ mitk::DataCollection::Pointer mitk::DiffusionCollectionReader::FolderToCollectio
       std::string fileName = fileList.at(i).at(k);
       if (fileName.find(".fib") >= fileName.length())
       {
-        Image::Pointer image = dynamic_cast<mitk::Image*>(IOUtil::Load(fileList.at(i).at(k))[0].GetPointer());
+        auto image = IOUtil::Load<Image>(fileList.at(i).at(k));
         subCollection->AddData(image.GetPointer(),seriesNames.at(i), fileList.at(i).at(k));
       }
       else
@@ -211,7 +211,7 @@ void mitk::DiffusionCollectionReader::StartElement(const char* elementName, cons
     // Populate Sub-Collection
     if (itemLink.find(".fib") >= itemLink.length())
     {
-      Image::Pointer image = dynamic_cast<mitk::Image*>(IOUtil::Load(itemLink)[0].GetPointer());
+      auto image = IOUtil::Load<Image>(itemLink);
       if (image.IsNotNull())
         m_DataItemCollection->AddData(image.GetPointer(),itemName,relativeItemLink);
       else

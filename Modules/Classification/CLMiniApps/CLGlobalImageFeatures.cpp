@@ -458,15 +458,15 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer image;
   mitk::Image::Pointer mask;
 
-  mitk::Image::Pointer tmpImage = mitk::IOUtil::LoadImage(param.imagePath);
-  mitk::Image::Pointer tmpMask = mitk::IOUtil::LoadImage(param.maskPath);
+  mitk::Image::Pointer tmpImage = mitk::IOUtil::Load<mitk::Image>(param.imagePath);
+  mitk::Image::Pointer tmpMask = mitk::IOUtil::Load<mitk::Image>(param.maskPath);
   image = tmpImage;
   mask = tmpMask;
 
   mitk::Image::Pointer morphMask = mask;
   if (param.useMorphMask)
   {
-    morphMask = mitk::IOUtil::LoadImage(param.morphPath);
+    morphMask = mitk::IOUtil::Load<mitk::Image>(param.morphPath);
   }
 
   log << " Check for Dimensions -";

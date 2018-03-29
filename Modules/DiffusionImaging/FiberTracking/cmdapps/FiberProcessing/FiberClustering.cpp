@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
         metrics.push_back({new mitk::ClusteringMetricLength()});
       else if (m=="MAP" && scalar_map!="")
       {
-        mitk::Image::Pointer mitk_map = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(scalar_map)[0].GetPointer());
+        mitk::Image::Pointer mitk_map = mitk::IOUtil::Load<mitk::Image>(scalar_map);
         if (mitk_map->GetDimension()==3)
         {
           FloatImageType::Pointer itk_map = FloatImageType::New();
@@ -186,7 +186,7 @@ int main(int argc, char* argv[])
       }
       else if (m=="ANAT" && parcellation!="")
       {
-        mitk::Image::Pointer mitk_map = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parcellation)[0].GetPointer());
+        mitk::Image::Pointer mitk_map = mitk::IOUtil::Load<mitk::Image>(parcellation);
         if (mitk_map->GetDimension()==3)
         {
           ShortImageType::Pointer itk_map = ShortImageType::New();

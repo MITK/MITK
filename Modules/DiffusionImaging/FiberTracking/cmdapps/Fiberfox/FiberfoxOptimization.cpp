@@ -529,7 +529,7 @@ int main(int argc, char* argv[])
   parameters.LoadParameters(paramName);
   typedef itk::VectorImage< short, 3 >    ItkDwiType;
   mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images", "Fiberbundles"}, {});
-  mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(us::any_cast<std::string>(parsedArgs["dmri"]), &functor)[0].GetPointer());
+  auto dwi = mitk::IOUtil::Load<mitk::Image>(us::any_cast<std::string>(parsedArgs["dmri"]), &functor);
   ItkDwiType::Pointer reference = mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi);
   parameters.m_SignalGen.m_ImageRegion = reference->GetLargestPossibleRegion();
   parameters.m_SignalGen.m_ImageSpacing = reference->GetSpacing();
@@ -538,7 +538,7 @@ int main(int argc, char* argv[])
   parameters.SetBvalue(static_cast<mitk::FloatProperty*>(dwi->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue());
   parameters.SetGradienDirections(static_cast<mitk::GradientDirectionsProperty*>( dwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer());
 
-  mitk::FiberBundle::Pointer tracts = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(tract_file, &functor)[0].GetPointer());
+  auto tracts = mitk::IOUtil::Load<mitk::FiberBundle>(tract_file, &functor);
 
   int iterations=1000;
   if (parsedArgs.count("iterations"))

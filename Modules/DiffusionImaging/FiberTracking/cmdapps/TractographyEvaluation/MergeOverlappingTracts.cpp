@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
     std::vector< mitk::FiberBundle::Pointer > fibs;
     for (std::string f : fib_files)
     {
-      mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(f)[0].GetPointer());
+      mitk::FiberBundle::Pointer fib = mitk::IOUtil::Load<mitk::FiberBundle>(f);
       fibs.push_back(fib);
     }
 

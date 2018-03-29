@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
 
     itk::ImageFileWriter< PeakImgType >::Pointer peak_image_writer = itk::ImageFileWriter< PeakImgType >::New();
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image", "Fiberbundles"}, {});
-    mitk::Image::Pointer inputImage = dynamic_cast<mitk::PeakImage*>(mitk::IOUtil::Load(peak_file_name, &functor)[0].GetPointer());
+    mitk::Image::Pointer inputImage = mitk::IOUtil::Load<mitk::PeakImage>(peak_file_name, &functor);
 
     float minSpacing = 1;
     if(inputImage->GetGeometry()->GetSpacing()[0]<inputImage->GetGeometry()->GetSpacing()[1] && inputImage->GetGeometry()->GetSpacing()[0]<inputImage->GetGeometry()->GetSpacing()[2])
@@ -171,7 +171,7 @@ int main(int argc, char* argv[])
     itk::FitFibersToImageFilter::UcharImgType::Pointer mask = nullptr;
     if (mask_file.compare("")!=0)
     {
-      mitk::Image::Pointer mitk_mask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(mask_file)[0].GetPointer());
+      mitk::Image::Pointer mitk_mask = mitk::IOUtil::Load<mitk::Image>(mask_file);
       mitk::CastToItkImage(mitk_mask, mask);
     }
 
@@ -180,7 +180,7 @@ int main(int argc, char* argv[])
     for (auto filename : anchor_mask_files)
     {
       itk::FitFibersToImageFilter::UcharImgType::Pointer ref_mask = nullptr;
-      mitk::Image::Pointer ref_mitk_mask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+      mitk::Image::Pointer ref_mitk_mask = mitk::IOUtil::Load<mitk::Image>(filename);
       mitk::CastToItkImage(ref_mitk_mask, ref_mask);
       reference_masks.push_back(ref_mask);
     }
@@ -197,7 +197,7 @@ int main(int argc, char* argv[])
     std::vector< mitk::FiberBundle::Pointer > input_candidates;
     for (std::string f : candidate_tract_files)
     {
-      mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(f)[0].GetPointer());
+      mitk::FiberBundle::Pointer fib = mitk::IOUtil::Load<mitk::FiberBundle>(f);
       if (fib.IsNull())
         continue;
       if (fib->GetNumFibers()<=0)
@@ -213,7 +213,7 @@ int main(int argc, char* argv[])
     std::string name = "NOANCHOR";
     // Load reference tractogram consisting of all known tracts
     std::vector< mitk::FiberBundle::Pointer > input_reference;
-    mitk::FiberBundle::Pointer anchor_tractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(anchors_file)[0].GetPointer());
+    mitk::FiberBundle::Pointer anchor_tractogram = mitk::IOUtil::Load<mitk::FiberBundle>(anchors_file);
     if ( !(anchor_tractogram.IsNull() || anchor_tractogram->GetNumFibers()==0) )
     {
       std::streambuf *old = cout.rdbuf(); // <-- save

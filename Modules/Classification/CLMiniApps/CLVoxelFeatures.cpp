@@ -264,7 +264,7 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["image"].ToString())[0].GetPointer());
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(parsedArgs["image"].ToString());
   std::string filename=parsedArgs["output"].ToString();
 
   std::string extension = ".nii.gz";

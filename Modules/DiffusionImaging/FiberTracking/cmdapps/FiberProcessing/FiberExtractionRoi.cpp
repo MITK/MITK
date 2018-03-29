@@ -37,7 +37,7 @@ typedef itk::Image<float, 3>    ItkFloatImgType;
 
 ItkFloatImgType::Pointer LoadItkImage(const std::string& filename)
 {
-  mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+  mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(filename);
   ItkFloatImgType::Pointer itk_image = ItkFloatImgType::New();
   mitk::CastToItkImage(img, itk_image);
   return itk_image;
@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
   try
   {
     // load fiber bundle
-    mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(inFib)[0].GetPointer());
+    mitk::FiberBundle::Pointer inputTractogram = mitk::IOUtil::Load<mitk::FiberBundle>(inFib);
 
     std::vector< ItkFloatImgType::Pointer > roi_images;
     for (std::size_t i=0; i<roi_files.size(); ++i)

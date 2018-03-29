@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
   string ouputName = "E:\\Kollektive\\R02-Lebertumore-Diffusion\\01-Extrahierte-Daten\\" + in + "\\" + in + "-";
 
   MITK_INFO << "Load Image: ";
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(inputName);
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(inputName);
 
   //bool isDiffusionImage(mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image));
   //if (!isDiffusionImage)

@@ -59,11 +59,11 @@ int main(int argc, char* argv[])
   }
 
   MaskImageType::Pointer itkMsk = MaskImageType::New();
-  mitk::Image::Pointer img = mitk::IOUtil::LoadImage(parsedArgs["mask"].ToString());
+  mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(parsedArgs["mask"].ToString());
   mitk::CastToItkImage(img, itkMsk);
 
   ImageType::Pointer itkImage = ImageType::New();
-  mitk::Image::Pointer img2 = mitk::IOUtil::LoadImage(parsedArgs["input"].ToString());
+  mitk::Image::Pointer img2 = mitk::IOUtil::Load<mitk::Image>(parsedArgs["input"].ToString());
   mitk::CastToItkImage(img2, itkImage);
 
   FilterType::Pointer filter = FilterType::New();

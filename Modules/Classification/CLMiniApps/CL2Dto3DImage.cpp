@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
   std::string inputName = us::any_cast<std::string>(parsedArgs["input"]);
   std::string outputName = us::any_cast<std::string>(parsedArgs["output"]);
 
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(inputName);
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(inputName);
   mitk::Convert2Dto3DImageFilter::Pointer multiFilter2 = mitk::Convert2Dto3DImageFilter::New();
   multiFilter2->SetInput(image);
   multiFilter2->Update();

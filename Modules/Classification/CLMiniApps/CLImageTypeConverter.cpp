@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
   std::string outputName = us::any_cast<std::string>(parsedArgs["output"]);
   std::string type = us::any_cast<std::string>(parsedArgs["type"]);
 
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(inputName);
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(inputName);
   mitk::Image::Pointer outputImage = mitk::Image::New();
 
   if (type.compare("int") == 0)

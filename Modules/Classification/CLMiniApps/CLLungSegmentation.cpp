@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
 
   MITK_INFO << "Start Image Loading";
 
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(inputFile);
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(inputFile);
 
   MITK_INFO << "Loaded Image";
 

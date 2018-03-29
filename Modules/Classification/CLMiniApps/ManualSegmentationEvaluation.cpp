@@ -213,9 +213,9 @@ int main(int argc, char* argv[])
   raw_image = map.size() <= 7 ? dynamic_cast<mitk::Image *>(so[0].GetPointer()) : dynamic_cast<mitk::Image *>(so[1].GetPointer());
   class_mask = map.size() <= 7 ? dynamic_cast<mitk::Image *>(so[1].GetPointer()) : dynamic_cast<mitk::Image *>(so[0].GetPointer());
 
-  CSF_mps = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(inputdir + "/" + csf_mps_name)[0].GetPointer());
-  LES_mps = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(inputdir + "/" + les_mps_name)[0].GetPointer());
-  BRA_mps = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(inputdir + "/" + bra_mps_name)[0].GetPointer());
+  CSF_mps = mitk::IOUtil::Load<mitk::PointSet>(inputdir + "/" + csf_mps_name);
+  LES_mps = mitk::IOUtil::Load<mitk::PointSet>(inputdir + "/" + les_mps_name);
+  BRA_mps = mitk::IOUtil::Load<mitk::PointSet>(inputdir + "/" + bra_mps_name);
 
   unsigned int num_points = CSF_mps->GetSize() + LES_mps->GetSize() + BRA_mps->GetSize();
   MITK_INFO << "Found #" << num_points << " points over all classes.";

@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
   }
 
   // Load Mask Image and count number of non-zero voxels
-  mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(parsedArgs["mask-input"].ToString());
+  mitk::Image::Pointer mask = mitk::IOUtil::Load<mitk::Image>(parsedArgs["mask-input"].ToString());
   MaskImagePointerType itkMask = MaskImageType::New();
   mitk::CastToItkImage(mask, itkMask);
   ConstMaskIteratorType maskIter(itkMask, itkMask->GetLargestPossibleRegion());
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("output" + number) < 1)
       break;
 
-    mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["input"+number].ToString());
+    mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(parsedArgs["input"+number].ToString());
     mitkImagesVector.push_back(image);
 
     ImagePointerType itkImage = ImageType::New();

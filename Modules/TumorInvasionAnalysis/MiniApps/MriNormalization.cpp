@@ -59,10 +59,10 @@ int main(int argc, char *argv[])
   }
 
   std::string outFile = us::any_cast<string>(parsedArgs["output"]);
-  mitk::Image::Pointer inputFile = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(us::any_cast<string>(parsedArgs["input"]))[0].GetPointer());
-  mitk::Image::Pointer maxMask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(us::any_cast<string>(parsedArgs["maxMask"]))[0].GetPointer());
-  mitk::Image::Pointer minMask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(us::any_cast<string>(parsedArgs["minMask"]))[0].GetPointer());
-  mitk::Image::Pointer excludeMask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(us::any_cast<string>(parsedArgs["excludeMask"]))[0].GetPointer());
+  mitk::Image::Pointer inputFile = mitk::IOUtil::Load<mitk::Image>(us::any_cast<string>(parsedArgs["input"]));
+  mitk::Image::Pointer maxMask = mitk::IOUtil::Load<mitk::Image>(us::any_cast<string>(parsedArgs["maxMask"]));
+  mitk::Image::Pointer minMask = mitk::IOUtil::Load<mitk::Image>(us::any_cast<string>(parsedArgs["minMask"]));
+  mitk::Image::Pointer excludeMask = mitk::IOUtil::Load<mitk::Image>(us::any_cast<string>(parsedArgs["excludeMask"]));
 
   SeedImage::Pointer itkMaxImage = SeedImage::New();
   SeedImage::Pointer itkMinImage = SeedImage::New();

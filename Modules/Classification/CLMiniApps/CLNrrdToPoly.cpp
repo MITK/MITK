@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 
   MITK_INFO << "Version: "<< 1.0;
 
-  mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(parsedArgs["mask"].ToString());
+  mitk::Image::Pointer mask = mitk::IOUtil::Load<mitk::Image>(parsedArgs["mask"].ToString());
 
 
   vtkSmartPointer<vtkImageData> image = mask->GetVtkImageData();

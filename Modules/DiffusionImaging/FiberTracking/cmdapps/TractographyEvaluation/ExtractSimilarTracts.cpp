@@ -40,7 +40,7 @@ mitk::FiberBundle::Pointer LoadFib(std::string filename)
 
 ItkFloatImgType::Pointer LoadItkImage(const std::string& filename)
 {
-  mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+  mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(filename);
   ItkFloatImgType::Pointer itkMask = ItkFloatImgType::New();
   mitk::CastToItkImage(img, itkMask);
   return itkMask;

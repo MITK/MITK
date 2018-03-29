@@ -61,11 +61,11 @@ public:
   {
     mitk::CovarianceMatrixCalculator::Pointer matrixCalculator = mitk::CovarianceMatrixCalculator::New();
 
-    m_MovingSurface = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("AICPRegistration/head_green.stl"))[0].GetPointer());
-    m_FixedSurface = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("AICPRegistration/head_red.stl"))[0].GetPointer());
+    m_MovingSurface = mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("AICPRegistration/head_green.stl"));
+    m_FixedSurface = mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("AICPRegistration/head_red.stl"));
 
-    m_TargetsMovingSurface = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(GetTestDataFilePath("AICPRegistration/targets_head_green.mps"))[0].GetPointer());
-    m_TargetsFixedSurface = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(GetTestDataFilePath("AICPRegistration/targets_head_red.mps"))[0].GetPointer());
+    m_TargetsMovingSurface = mitk::IOUtil::Load<mitk::PointSet>(GetTestDataFilePath("AICPRegistration/targets_head_green.mps"));
+    m_TargetsFixedSurface = mitk::IOUtil::Load<mitk::PointSet>(GetTestDataFilePath("AICPRegistration/targets_head_red.mps"));
 
     // compute covariance matrices
     matrixCalculator->SetInputSurface(m_MovingSurface);

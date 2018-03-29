@@ -137,7 +137,7 @@ public:
       {
         std::stringstream series_filenames;
         series_filenames << filename << extension;
-        mitk::Image::Pointer compareImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(series_filenames.str())[0].GetPointer());
+        mitk::Image::Pointer compareImage = mitk::IOUtil::Load<mitk::Image>(series_filenames.str());
         if (compareImage.IsNotNull())
         {
           foundImagesCount++;
@@ -153,7 +153,7 @@ public:
         {
           std::stringstream series_filenames;
           series_filenames << filename << "." << i + 1 << extension;
-          mitk::Image::Pointer compareImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(series_filenames.str())[0].GetPointer());
+          mitk::Image::Pointer compareImage = mitk::IOUtil::Load<mitk::Image>(series_filenames.str());
           if (compareImage.IsNotNull())
           {
             foundImagesCount++;
@@ -179,7 +179,7 @@ public:
       {
         mitk::IOUtil::Save(singleSliceImage, fullFileName);
 
-        mitk::Image::Pointer compareImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(fullFileName.c_str())[0].GetPointer());
+        mitk::Image::Pointer compareImage = mitk::IOUtil::Load<mitk::Image>(fullFileName.c_str());
         MITK_TEST_CONDITION_REQUIRED(compareImage.IsNotNull(), "Image stored was succesfully loaded again");
 
         MITK_TEST_CONDITION_REQUIRED(
@@ -209,7 +209,7 @@ public:
     {
       mitk::IOUtil::Save(image, tmpFilePath);
 
-      mitk::Image::Pointer compareImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(tmpFilePath)[0].GetPointer());
+      mitk::Image::Pointer compareImage = mitk::IOUtil::Load<mitk::Image>(tmpFilePath);
       CPPUNIT_ASSERT_MESSAGE("Image stored in NRRD format was succesfully loaded again", compareImage.IsNotNull());
 
       /*It would make sence to check the images as well (see commented cppunit assert),
@@ -248,7 +248,7 @@ public:
     {
       mitk::IOUtil::Save(image, tmpFilePath);
 
-      mitk::Image::Pointer compareImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(tmpFilePath)[0].GetPointer());
+      mitk::Image::Pointer compareImage = mitk::IOUtil::Load<mitk::Image>(tmpFilePath);
       CPPUNIT_ASSERT_MESSAGE("Image stored in MHD format was succesfully loaded again! ", compareImage.IsNotNull());
 
       CPPUNIT_ASSERT_MESSAGE(".mhd file exists",
@@ -296,7 +296,7 @@ public:
 
     try
     {
-      image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(sourcefile)[0].GetPointer());
+      image = mitk::IOUtil::Load<mitk::Image>(sourcefile);
     }
     catch (...)
     {

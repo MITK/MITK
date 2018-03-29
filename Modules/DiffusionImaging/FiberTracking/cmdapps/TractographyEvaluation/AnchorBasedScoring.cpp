@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
 
     itk::ImageFileWriter< PeakImgType >::Pointer peak_image_writer = itk::ImageFileWriter< PeakImgType >::New();
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image", "Fiberbundles"}, {});
-    mitk::Image::Pointer inputImage = mitk::IOUtil::Load<mitk::PeakImage>(peak_file_name, &functor);
+    auto inputImage = mitk::IOUtil::Load<mitk::PeakImage>(peak_file_name, &functor);
 
     float minSpacing = 1;
     if(inputImage->GetGeometry()->GetSpacing()[0]<inputImage->GetGeometry()->GetSpacing()[1] && inputImage->GetGeometry()->GetSpacing()[0]<inputImage->GetGeometry()->GetSpacing()[2])

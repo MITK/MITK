@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
     for (auto imgFile : imageFiles)
     {
-        auto dwi = mitk::IOUtil::Load<mitk::Image>(imgFile, &functor));
+        auto dwi = mitk::IOUtil::Load<mitk::Image>(imgFile, &functor);
         rawData.push_back(dwi);
     }
 

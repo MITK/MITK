@@ -71,7 +71,7 @@ public:
     * @brief MoveCameraToPoint Move camera so that the point on the plane is in the view center.
     * @param planePoint
     */
-   void MoveCameraToPoint(const Point2D &planePoint);
+   void MoveCameraToPoint(const Point2D &planePoint, bool useConstraints = true);
 
    // Move by moveVector in display coordinates
    void MoveBy(const Vector2D &moveVector);
@@ -110,7 +110,7 @@ private:
      * zooming, eg. only rotate the camera.
      * @param PlanePoint point where the camera is moved to during the adjustment.
      */
-    void AdjustCameraToPlane(const Point2D& PlanePoint);
+    void AdjustCameraToPlane(const Point2D& PlanePoint, bool useConstraints = true);
 
     void AdjustConstrainedCameraPosition(Point2D& planePoint);
 

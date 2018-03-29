@@ -194,10 +194,10 @@ void mitk::CameraController::SetStandardView(mitk::CameraController::StandardVie
   rm->RequestUpdateAll();
 }
 
-void mitk::CameraController::MoveCameraToPoint(const mitk::Point2D& planePoint)
+void mitk::CameraController::MoveCameraToPoint(const mitk::Point2D& planePoint, bool useConstraints)
 {
   Point2D moveToPoint = planePoint;
-  AdjustCameraToPlane(moveToPoint);
+  AdjustCameraToPlane(moveToPoint, useConstraints);
 
   this->Modified();
 }
@@ -281,7 +281,7 @@ void mitk::CameraController::AdjustCameraToPlane()
   }
 }
 
-void mitk::CameraController::AdjustCameraToPlane(const Point2D& PlanePoint)
+void mitk::CameraController::AdjustCameraToPlane(const Point2D& PlanePoint, bool useConstraints)
 {
   if (this->GetRenderer()->GetMapperID() == BaseRenderer::Standard2D)
   {
@@ -294,7 +294,9 @@ void mitk::CameraController::AdjustCameraToPlane(const Point2D& PlanePoint)
       {
         this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(maxParallelScale);
       }
-      AdjustConstrainedCameraPosition(_planePoint);
+      if (useConstraints) {
+        AdjustConstrainedCameraPosition(_planePoint);
+      }
     }
     const PlaneGeometry *planeGeometry = this->GetRenderer()->GetCurrentWorldPlaneGeometry();
     if (planeGeometry != NULL)

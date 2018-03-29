@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommandLineParser.h"
 #include "mitkIOUtil.h"
 
+#include <itksys/SystemTools.hxx>
+
 #include "mitkPreferenceListReaderOptionsFunctor.h"
 
 

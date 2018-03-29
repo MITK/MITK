@@ -203,7 +203,7 @@ int main( int argc, char* argv[] )
   std::string maskPath = "";
 
   mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
-  mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage(inFileName, &functor);
+  mitk::Image::Pointer inputImage = mitk::IOUtil::Load<mitk::Image>(inFileName, &functor);
 
   bool omitBZero = false;
   double lower = -1000;

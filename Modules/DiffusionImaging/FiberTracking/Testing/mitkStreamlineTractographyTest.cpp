@@ -81,12 +81,12 @@ public:
     odf_threshold = 0.1;
     peak_threshold = 0.1;
 
-    mitk::Image::Pointer odf_image = mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/qball_image.qbi"));
-    mitk::Image::Pointer tensor_image = mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/tensor_image.dti"));
-    mitk::Image::Pointer peak_image = mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/qball_peak_image.nii.gz"));
-    mitk::Image::Pointer seed_image = mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/seed_image.nii.gz"));
-    mitk::Image::Pointer mask_image = mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/mask_image.nii.gz"));
-    mitk::Image::Pointer gfa_image = mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/gfa_image.nii.gz"));
+    mitk::Image::Pointer odf_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/qball_image.qbi"));
+    mitk::Image::Pointer tensor_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/tensor_image.dti"));
+    mitk::Image::Pointer peak_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/qball_peak_image.nii.gz"));
+    mitk::Image::Pointer seed_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/seed_image.nii.gz"));
+    mitk::Image::Pointer mask_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/mask_image.nii.gz"));
+    mitk::Image::Pointer gfa_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/gfa_image.nii.gz"));
 
     {
       typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
@@ -140,7 +140,7 @@ public:
 
     if (itksys::SystemTools::FileExists(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/ReferenceFibs/" + filename)))
     {
-      img = mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/ReferenceFibs/" + filename));
+      img = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/ReferenceFibs/" + filename));
     }
     return img;
   }

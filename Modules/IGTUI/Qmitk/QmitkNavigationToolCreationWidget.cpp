@@ -223,7 +223,7 @@ void QmitkNavigationToolCreationWidget::OnLoadSurface()
   mitk::Surface::Pointer surface;
   try
   {
-    surface = mitk::IOUtil::LoadSurface(filename.c_str());
+    surface = mitk::IOUtil::Load<mitk::Surface>(filename.c_str());
   }
   catch (mitk::Exception &e)
   {

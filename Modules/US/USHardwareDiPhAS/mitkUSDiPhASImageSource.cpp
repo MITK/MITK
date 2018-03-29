@@ -75,7 +75,7 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   {
     name = "c:\\HomogeneousScatteringAssumptions\\Scattering" + std::to_string(i) + ".nrrd";
 
-    m_FluenceCompOriginal.push_back(mitk::IOUtil::LoadImage(name));
+    m_FluenceCompOriginal.push_back(mitk::IOUtil::Load<mitk::Image>(name));
   }
 
   m_FluenceCompResized.insert(m_FluenceCompResized.begin(), 26, Image::New());

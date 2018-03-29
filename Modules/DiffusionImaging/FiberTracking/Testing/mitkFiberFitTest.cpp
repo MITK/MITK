@@ -118,7 +118,7 @@ public:
   {
     typedef mitk::ImageToItk< mitk::PeakImage::ItkPeakImageType > CasterType;
     CasterType::Pointer caster = CasterType::New();
-    caster->SetInput(mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/FiberFit/out/" + name)));
+    caster->SetInput(mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/FiberFit/out/" + name)));
     caster->Update();
     mitk::PeakImage::ItkPeakImageType::Pointer refImage = caster->GetOutput();
 

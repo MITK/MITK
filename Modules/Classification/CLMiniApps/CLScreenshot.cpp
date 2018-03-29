@@ -58,7 +58,7 @@ void SaveSliceOrImageAsPNG(std::vector<std::string> listOfOutputs, std::string p
   bool isSegmentation = false;
   for (auto name : listOfOutputs)
   {
-    mitk::Image::Pointer tmpImage = mitk::IOUtil::LoadImage(name);
+    mitk::Image::Pointer tmpImage = mitk::IOUtil::Load<mitk::Image>(name);
     auto nodeI = mitk::DataNode::New();
     nodeI->SetData(tmpImage);
     nodeI->GetPropertyValue("binary",isSegmentation);

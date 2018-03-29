@@ -338,7 +338,7 @@ int main(int argc, char* argv[])
       mitk::IOUtil::Save(forest, forestPath);
     } else
     {
-      forest = dynamic_cast<mitk::VigraRandomForestClassifier*>(mitk::IOUtil::Load(forestPath)[0].GetPointer());// TODO forest.Load(forestPath);
+      forest = mitk::IOUtil::Load<mitk::VigraRandomForestClassifier>(forestPath);// TODO forest.Load(forestPath);
     }
 
     time(&now);

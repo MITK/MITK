@@ -673,7 +673,7 @@ public:
 
     std::string filename = locator->FindFile("sphere_512.nrrd.mhd", "Modules/ImageExtraction/Testing/Data");
 
-    TestVolume = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+    TestVolume = mitk::IOUtil::Load<mitk::Image>(filename);
 
 #endif
 
@@ -948,7 +948,7 @@ int mitkExtractSliceFilterTest(int /*argc*/, char * /*argv*/ [])
 
   // set reslicer for renderwindow
 
-  mitk::Image::Pointer pic = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+  mitk::Image::Pointer pic = mitk::IOUtil::Load<mitk::Image>(filename);
   vtkSmartPointer<vtkImageReslice> slicer = vtkSmartPointer<vtkImageReslice>::New();
 
   slicer->SetInput(pic->GetVtkImageData());

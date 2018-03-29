@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
         {
             try
             {
-                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(referenceImages.at(i))[0].GetPointer());
+                mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(referenceImages.at(i));
                 typedef mitk::ImageToItk< ItkDirectionImage3DType > CasterType;
                 CasterType::Pointer caster = CasterType::New();
                 caster->SetInput(img);
@@ -194,7 +194,7 @@ int main(int argc, char* argv[])
         {
             for (unsigned int i=0; i<maskImages.size(); i++)
             {
-                mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskImages.at(i))[0].GetPointer());
+                mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::Load<mitk::Image>(maskImages.at(i));
                 mitk::CastToItkImage(mitkMaskImage, itkMaskImage);
 
                 // evaluate directions

@@ -50,7 +50,7 @@ int mitkKinectReconstructionTest(int  argc , char* argv[])
     distToSurf->SetCameraIntrinsics(intrinsics);
     distToSurf->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::Kinect);
     //load a data set
-    mitk::Image::Pointer kinectImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(kinectImagePath)[0].GetPointer());
+    mitk::Image::Pointer kinectImage = mitk::IOUtil::Load<mitk::Image>(kinectImagePath);
     MITK_TEST_CONDITION_REQUIRED(kinectImage.IsNotNull(), "Testing if a kinect image could be loaded.");
     distToSurf->SetInput(kinectImage);
     distToSurf->Update();

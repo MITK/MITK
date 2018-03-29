@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
   try
   {
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image"}, {});
-    mitk::PeakImage::Pointer image = dynamic_cast<mitk::PeakImage*>(mitk::IOUtil::Load(imageName, &functor)[0].GetPointer());
+    mitk::PeakImage::Pointer image = mitk::IOUtil::Load<mitk::PeakImage>(imageName, &functor);
 
     typedef mitk::ImageToItk< mitk::PeakImage::ItkPeakImageType > CasterType;
     CasterType::Pointer caster = CasterType::New();

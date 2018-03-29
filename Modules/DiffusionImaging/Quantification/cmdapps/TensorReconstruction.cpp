@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(inFileName)[0].GetPointer());
+        mitk::Image::Pointer dwi = mitk::IOUtil::Load<mitk::Image>(inFileName);
 
         mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
         mitk::CastToItkImage(dwi, itkVectorImagePointer);

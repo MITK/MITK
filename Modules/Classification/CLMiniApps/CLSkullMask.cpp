@@ -99,12 +99,12 @@ int main(int argc, char* argv[])
   std::vector<ImageType::Pointer> imageList;
   for (std::size_t i = 0; i < inputImageList.size(); ++i)
   {
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(inputImageList[i])[0].GetPointer());
+    mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(inputImageList[i]);
     ImageType::Pointer itkImage = ImageType::New();
     mitk::CastToItkImage(image, itkImage);
     imageList.push_back(itkImage);
   }
-  mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(inputImageList[0])[0].GetPointer());
+  mitk::Image::Pointer mitkMask = mitk::IOUtil::Load<mitk::Image>(inputImageList[0]);
   MaskType::Pointer mask = MaskType::New();
   mitk::CastToItkImage(mitkMask, mask);
 

@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
       {
         for ( auto fibFile : get_file_list(item) )
         {
-          mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(fibFile)[0].GetPointer());
+          mitk::FiberBundle::Pointer inputTractogram = mitk::IOUtil::Load<mitk::FiberBundle>(fibFile);
           if (inputTractogram.IsNull())
             continue;
           input_tracts.push_back(inputTractogram);
@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
       }
       else
       {
-        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(item)[0].GetPointer());
+        mitk::FiberBundle::Pointer inputTractogram = mitk::IOUtil::Load<mitk::FiberBundle>(item);
         if (inputTractogram.IsNull())
           continue;
         input_tracts.push_back(inputTractogram);

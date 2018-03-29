@@ -124,8 +124,8 @@ int main(int argc, char* argv[])
   }
 
 
-  mitk::Image::Pointer movingImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(movingFile)[0].GetPointer());
-  mitk::Image::Pointer fixedImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(fixedFile)[0].GetPointer());
+  mitk::Image::Pointer movingImage = mitk::IOUtil::Load<mitk::Image>(movingFile);
+  mitk::Image::Pointer fixedImage = mitk::IOUtil::Load<mitk::Image>(fixedFile);
 
   auto dllInfo = dllList[selectedAlgorithm];
 

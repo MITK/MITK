@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
     std::vector< ItkFloatImgType::Pointer > masks;
     for (auto f : reference)
     {
-      mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(f)[0].GetPointer());
+      mitk::FiberBundle::Pointer fib = mitk::IOUtil::Load<mitk::FiberBundle>(f);
       filter->SetFiberBundle(fib);
 
       std::streambuf *old = cout.rdbuf(); // <-- save
@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
       std::stringstream ss;
       std::cout.rdbuf (ss.rdbuf());       // <-- redirect
       bool is_overlapping = false;
-      mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(f)[0].GetPointer());
+      mitk::FiberBundle::Pointer fib = mitk::IOUtil::Load<mitk::FiberBundle>(f);
       fib->ResampleLinear(2);
       for (auto m : masks)
       {

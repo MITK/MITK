@@ -33,7 +33,7 @@ int mitkDWHeadMotionCorrectionTest( int argc, char* argv[] )
 
   MITK_TEST_CONDITION_REQUIRED( argc > 2, "Specify input and output.");
 
-  mitk::Image::Pointer inputImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load( argv[1] )[0].GetPointer());
+  mitk::Image::Pointer inputImage = mitk::IOUtil::Load<mitk::Image>( argv[1] );
   DiffusionImageType* dwimage = static_cast<DiffusionImageType*>( inputImage.GetPointer() );
 
   mitk::DWIHeadMotionCorrectionFilter::Pointer corrfilter = mitk::DWIHeadMotionCorrectionFilter::New();

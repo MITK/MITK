@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
 
   MITK_INFO << "Read images";
   mitk::Image::Pointer mask1;
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["image"].ToString())[0].GetPointer());
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(parsedArgs["image"].ToString());
 
   if (parsedArgs.count("float"))
   {
@@ -93,10 +93,10 @@ int main(int argc, char* argv[])
     mitk::CastToMitkImage(img, image);
   }
 
-  mitk::Image::Pointer mask0 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["mask0"].ToString())[0].GetPointer());
+  mitk::Image::Pointer mask0 = mitk::IOUtil::Load<mitk::Image>(parsedArgs["mask0"].ToString());
   if (mode > 3)
   {
-    mask1 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["mask1"].ToString())[0].GetPointer());
+    mask1 = mitk::IOUtil::Load<mitk::Image>(parsedArgs["mask1"].ToString());
   }
   mitk::MRNormLinearStatisticBasedFilter::Pointer oneRegion = mitk::MRNormLinearStatisticBasedFilter::New();
   mitk::MRNormTwoRegionsBasedFilter::Pointer twoRegion = mitk::MRNormTwoRegionsBasedFilter::New();

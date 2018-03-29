@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 
     mitk::Image::Pointer ref_img;
     if (!reference_image.empty())
-      ref_img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(reference_image)[0].GetPointer());
+      ref_img = mitk::IOUtil::Load<mitk::Image>(reference_image);
 
     if (endpoints)
     {

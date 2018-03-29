@@ -142,7 +142,7 @@ public:
 
   void TestLoadAndSaveImage()
   {
-    mitk::Image::Pointer img1 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(m_ImagePath)[0].GetPointer());
+    mitk::Image::Pointer img1 = mitk::IOUtil::Load<mitk::Image>(m_ImagePath);
     CPPUNIT_ASSERT(img1.IsNotNull());
 
     std::ofstream tmpStream;
@@ -190,7 +190,7 @@ public:
 
   void TestLoadAndSavePointSet()
   {
-    mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(m_PointSetPath)[0].GetPointer());
+    mitk::PointSet::Pointer pointset = mitk::IOUtil::Load<mitk::PointSet>(m_PointSetPath);
     CPPUNIT_ASSERT(pointset.IsNotNull());
 
     std::ofstream tmpStream;
@@ -215,7 +215,7 @@ public:
 
   void TestLoadAndSaveSurface()
   {
-    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(m_SurfacePath)[0].GetPointer());
+    mitk::Surface::Pointer surface = mitk::IOUtil::Load<mitk::Surface>(m_SurfacePath);
     CPPUNIT_ASSERT(surface.IsNotNull());
 
     std::ofstream tmpStream;

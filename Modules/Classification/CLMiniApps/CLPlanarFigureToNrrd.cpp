@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
     mitk::BaseData::Pointer data = mitk::IOUtil::Load(parsedArgs["planar"].ToString())[0];
     mitk::PlanarFigure::Pointer planar = dynamic_cast<mitk::PlanarFigure*>(data.GetPointer());
 
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["image"].ToString())[0].GetPointer());
+    mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(parsedArgs["image"].ToString());
 
     mitk::PlanarFigureMaskGenerator::Pointer pfMaskGen = mitk::PlanarFigureMaskGenerator::New();
     pfMaskGen->SetPlanarFigure(planar);

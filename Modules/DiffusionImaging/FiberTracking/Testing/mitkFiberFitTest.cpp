@@ -70,7 +70,7 @@ public:
     tracts.push_back(LoadFib("Cluster_4.fib"));
 
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image"}, {});
-    mitk::PeakImage::Pointer peaks = dynamic_cast<mitk::PeakImage*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/FiberFit/csd_peak_image.nii.gz"), &functor)[0].GetPointer());
+    mitk::PeakImage::Pointer peaks = mitk::IOUtil::Load<mitk::PeakImage>(GetTestDataFilePath("DiffusionImaging/FiberFit/csd_peak_image.nii.gz"), &functor);
 
 
     typedef mitk::ImageToItk< mitk::PeakImage::ItkPeakImageType > CasterType;

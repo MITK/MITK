@@ -37,7 +37,7 @@ typedef std::tuple< ItkFloatImgType::Pointer, std::string > MaskType;
 
 ItkFloatImgType::Pointer LoadItkImage(const std::string& filename)
 {
-  mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+  mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(filename);
   ItkFloatImgType::Pointer itkMask = ItkFloatImgType::New();
   mitk::CastToItkImage(img, itkMask);
   return itkMask;
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
     if (known_tract_masks.empty())
       return EXIT_FAILURE;
 
-    mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(fibFile)[0].GetPointer());
+    mitk::FiberBundle::Pointer inputTractogram = mitk::IOUtil::Load<mitk::FiberBundle>(fibFile);
 
     // resample fibers
     float minSpacing = 1;

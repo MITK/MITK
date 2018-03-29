@@ -75,7 +75,7 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageTestHelper::Crea
     myNavigationTool->SetCalibrationFile(toolFilePath);
     mitk::DataNode::Pointer myNode = mitk::DataNode::New();
     myNode->SetName("ClaronTool");
-    myNode->SetData(dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(toolSurfacePath1)[0].GetPointer())); //load an stl File
+    myNode->SetData(mitk::IOUtil::Load<mitk::Surface>(toolSurfacePath1)); //load an stl File
     myNavigationTool->SetDataNode(myNode);
     myNavigationTool->SetIdentifier("ClaronTool#1");
     myNavigationTool->SetSerialNumber("0815");
@@ -90,7 +90,7 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageTestHelper::Crea
     myNode2->SetName("AuroraTool");
 
     //load an stl File
-    testSurface2 = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(toolSurfacePath2)[0].GetPointer());
+    testSurface2 = mitk::IOUtil::Load<mitk::Surface>(toolSurfacePath2);
     myNode2->SetData(testSurface2);
 
     myNavigationTool2->SetDataNode(myNode2);

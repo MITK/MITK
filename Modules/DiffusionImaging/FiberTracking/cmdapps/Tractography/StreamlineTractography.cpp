@@ -295,7 +295,7 @@ int main(int argc, char* argv[])
   std::vector< mitk::Image::Pointer > input_images;
   for (unsigned int i=0; i<input_files.size(); i++)
   {
-    mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(input_files.at(i))[0].GetPointer());
+    mitk::Image::Pointer mitkImage = mitk::IOUtil::Load<mitk::Image>(input_files.at(i));
     input_images.push_back(mitkImage);
   }
 
@@ -303,7 +303,7 @@ int main(int argc, char* argv[])
   if (!maskFile.empty())
   {
     MITK_INFO << "loading mask image";
-    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskFile)[0].GetPointer());
+    mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(maskFile);
     mask = ItkFloatImgType::New();
     mitk::CastToItkImage(img, mask);
   }
@@ -312,7 +312,7 @@ int main(int argc, char* argv[])
   if (!seedFile.empty())
   {
     MITK_INFO << "loading seed ROI image";
-    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(seedFile)[0].GetPointer());
+    mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(seedFile);
     seed = ItkFloatImgType::New();
     mitk::CastToItkImage(img, seed);
   }
@@ -321,7 +321,7 @@ int main(int argc, char* argv[])
   if (!stopFile.empty())
   {
     MITK_INFO << "loading stop ROI image";
-    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(stopFile)[0].GetPointer());
+    mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(stopFile);
     stop = ItkFloatImgType::New();
     mitk::CastToItkImage(img, stop);
   }
@@ -330,7 +330,7 @@ int main(int argc, char* argv[])
   if (!targetFile.empty())
   {
     MITK_INFO << "loading target ROI image";
-    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(targetFile)[0].GetPointer());
+    mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(targetFile);
     target = ItkFloatImgType::New();
     mitk::CastToItkImage(img, target);
   }
@@ -339,7 +339,7 @@ int main(int argc, char* argv[])
   if (!exclusionFile.empty())
   {
     MITK_INFO << "loading exclusion ROI image";
-    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(exclusionFile)[0].GetPointer());
+    mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(exclusionFile);
     exclusion = ItkFloatImgType::New();
     mitk::CastToItkImage(img, exclusion);
   }
@@ -349,7 +349,7 @@ int main(int argc, char* argv[])
   addImages.push_back(std::vector< ItkFloatImgType::Pointer >());
   for (auto file : addFiles)
   {
-    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(file)[0].GetPointer());
+    mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(file);
     ItkFloatImgType::Pointer itkimg = ItkFloatImgType::New();
     mitk::CastToItkImage(img, itkimg);
     addImages.at(0).push_back(itkimg);
@@ -389,7 +389,7 @@ int main(int argc, char* argv[])
   if (!prior_image.empty())
   {
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image"}, {});
-    mitk::PeakImage::Pointer priorImage = dynamic_cast<mitk::PeakImage*>(mitk::IOUtil::Load(prior_image, &functor)[0].GetPointer());
+    mitk::PeakImage::Pointer priorImage = mitk::IOUtil::Load<mitk::PeakImage>(prior_image, &functor);
 
     if (priorImage.IsNull())
     {
@@ -419,7 +419,7 @@ int main(int argc, char* argv[])
   mitk::TrackingDataHandler* handler;
   if (algorithm == "DetRF" || algorithm == "ProbRF")
   {
-    mitk::TractographyForest::Pointer forest = dynamic_cast<mitk::TractographyForest*>(mitk::IOUtil::Load(forestFile)[0].GetPointer());
+    mitk::TractographyForest::Pointer forest = mitk::IOUtil::Load<mitk::TractographyForest>(forestFile);
     if (forest.IsNull())
       mitkThrow() << "Forest file " << forestFile << " could not be read.";
 

@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
     typedef itk::Image<unsigned char, 3>                                    ItkUcharImgType;
 
     // load fiber bundle
-    mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(fibFile)[0].GetPointer());
+    mitk::FiberBundle::Pointer inputTractogram = mitk::IOUtil::Load<mitk::FiberBundle>(fibFile);
 
     // load/create mask image
     ItkUcharImgType::Pointer itkMaskImage = nullptr;
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
     {
       std::cout << "Using mask image";
       itkMaskImage = ItkUcharImgType::New();
-      mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskImage)[0].GetPointer());
+      mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::Load<mitk::Image>(maskImage);
       mitk::CastToItkImage(mitkMaskImage, itkMaskImage);
     }
 

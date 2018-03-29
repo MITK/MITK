@@ -57,8 +57,8 @@ int main(int argc, char* argv[])
   {
     typedef itk::Image< float, 3 > ItkFloatImageType;
 
-    mitk::Image::Pointer fixed = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(f)[0].GetPointer());
-    mitk::Image::Pointer moving = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(m)[0].GetPointer());
+    mitk::Image::Pointer fixed = mitk::IOUtil::Load<mitk::Image>(f);
+    mitk::Image::Pointer moving = mitk::IOUtil::Load<mitk::Image>(m);
     mitk::Image::Pointer fixed_single = fixed;
     mitk::Image::Pointer moving_single = moving;
 

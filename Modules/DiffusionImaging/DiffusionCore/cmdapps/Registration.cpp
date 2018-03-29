@@ -207,7 +207,7 @@ static void CopyResources(FileListType fileList, std::string outputPath)
     std::string fileStem = itksys::SystemTools::GetFilenameWithoutExtension(derivedResourceFilename);
     std::string savePathAndFileName = outputPath +fileStem + "." + fileType;
     MITK_INFO << "Copy resource " << savePathAndFileName;
-    mitk::Image::Pointer resImage = ExtractFirstTS(dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(derivedResourceFilename)[0].GetPointer()), fileType);
+    mitk::Image::Pointer resImage = ExtractFirstTS(mitk::IOUtil::Load<mitk::Image>(derivedResourceFilename), fileType);
     mitk::IOUtil::Save(resImage, savePathAndFileName);
   }
 }
@@ -324,7 +324,7 @@ int main( int argc, char* argv[] )
 
   MITK_INFO << "Loading Reference (fixed) image: " << referenceFileName;
   std::string fileType = itksys::SystemTools::GetFilenameExtension(referenceFileName);
-  mitk::Image::Pointer refImage = ExtractFirstTS(dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(referenceFileName)[0].GetPointer()), fileType);
+  mitk::Image::Pointer refImage = ExtractFirstTS(mitk::IOUtil::Load<mitk::Image>(referenceFileName), fileType);
   mitk::Image::Pointer resampleReference = nullptr;
   if (doResampling)
   {
@@ -388,7 +388,7 @@ int main( int argc, char* argv[] )
     double offset[3];
     {
       std::string fileType = itksys::SystemTools::GetFilenameExtension(fileMorphName);
-      mitk::Image::Pointer movingImage = ExtractFirstTS(dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(fileMorphName)[0].GetPointer()), fileType);
+      mitk::Image::Pointer movingImage = ExtractFirstTS(mitk::IOUtil::Load<mitk::Image>(fileMorphName), fileType);
 
       if (movingImage.IsNull())
         MITK_ERROR << "Loaded moving image is nullptr";
@@ -431,7 +431,7 @@ int main( int argc, char* argv[] )
       derivedResourceFilename = fList.at(j);
       MITK_INFO << "----Processing derived resorce " << derivedResourceFilename << " ...";
       std::string fileType = itksys::SystemTools::GetFilenameExtension(derivedResourceFilename);
-      mitk::Image::Pointer derivedMovingResource = ExtractFirstTS(dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(derivedResourceFilename)[0].GetPointer()), fileType);
+      mitk::Image::Pointer derivedMovingResource = ExtractFirstTS(mitk::IOUtil::Load<mitk::Image>(derivedResourceFilename), fileType);
       // Apply transformation to derived resource, treat derived resource as binary
       mitk::RegistrationWrapper::ApplyTransformationToImage(derivedMovingResource, transf,offset, resampleReference,isBinary);
 

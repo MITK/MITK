@@ -1218,7 +1218,7 @@ void QmitkLabelSetWidget::OnImportLabeledImage()
     try
     {
       this->WaitCursorOn();
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load( fileNames.front().toStdString() )[0].GetPointer());
+      mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>( fileNames.front().toStdString() );
       if (image.IsNull())
       {
         this->WaitCursorOff();

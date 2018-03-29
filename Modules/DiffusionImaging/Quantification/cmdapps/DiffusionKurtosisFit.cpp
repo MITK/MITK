@@ -127,7 +127,7 @@ void KurtosisMapComputation( mitk::Image::Pointer input,
   if(maskPath != "")
   {
     mitk::Image::Pointer segmentation;
-    segmentation = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskPath)[0].GetPointer());
+    segmentation = mitk::IOUtil::Load<mitk::Image>(maskPath);
     typedef itk::Image< short , 3>            MaskImageType;
     MaskImageType::Pointer vectorSeg = MaskImageType::New() ;
     mitk::CastToItkImage( segmentation, vectorSeg );

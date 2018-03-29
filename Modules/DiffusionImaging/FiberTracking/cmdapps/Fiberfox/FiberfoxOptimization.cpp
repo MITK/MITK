@@ -436,7 +436,7 @@ int main(int argc, char* argv[])
   itk::Image< unsigned char,3 >::Pointer mask = nullptr;
   if (mask_file.compare("")!=0)
   {
-    mitk::Image::Pointer mitk_mask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(mask_file)[0].GetPointer());
+    mitk::Image::Pointer mitk_mask = mitk::IOUtil::Load<mitk::Image>(mask_file);
     mitk::CastToItkImage(mitk_mask, mask);
   }
 
@@ -444,7 +444,7 @@ int main(int argc, char* argv[])
   itk::Image< double,3 >::Pointer fa_image = nullptr;
   if (fa_file.compare("")!=0)
   {
-    mitk::Image::Pointer mitk_img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(fa_file)[0].GetPointer());
+    mitk::Image::Pointer mitk_img = mitk::IOUtil::Load<mitk::Image>(fa_file);
     mitk::CastToItkImage(mitk_img, fa_image);
 
     int binsPerDimension = 20;
@@ -485,7 +485,7 @@ int main(int argc, char* argv[])
   itk::Image< double,3 >::Pointer md_image = nullptr;
   if (md_file.compare("")!=0)
   {
-    mitk::Image::Pointer mitk_img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(md_file)[0].GetPointer());
+    mitk::Image::Pointer mitk_img = mitk::IOUtil::Load<mitk::Image>(md_file);
     mitk::CastToItkImage(mitk_img, md_image);
   }
 
@@ -495,7 +495,7 @@ int main(int argc, char* argv[])
   MITK_INFO << "Loading target image";
   typedef itk::VectorImage< short, 3 >    ItkDwiType;
   mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images", "Fiberbundles"}, {});
-  mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(us::any_cast<std::string>(parsedArgs["target"]), &functor)[0].GetPointer());
+  mitk::Image::Pointer dwi = mitk::IOUtil::Load<mitk::Image>(us::any_cast<std::string>(parsedArgs["target"]), &functor);
   ItkDwiType::Pointer reference = mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi);
   parameters.m_SignalGen.m_ImageRegion = reference->GetLargestPossibleRegion();
   parameters.m_SignalGen.m_ImageSpacing = reference->GetSpacing();

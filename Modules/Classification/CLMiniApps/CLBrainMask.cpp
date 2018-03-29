@@ -92,9 +92,9 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["image"].ToString())[0].GetPointer());
-  mitk::Image::Pointer im2= dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["image2"].ToString())[0].GetPointer());
-  mitk::Image::Pointer mask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["mask"].ToString())[0].GetPointer());
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(parsedArgs["image"].ToString());
+  mitk::Image::Pointer im2= mitk::IOUtil::Load<mitk::Image>(parsedArgs["image2"].ToString());
+  mitk::Image::Pointer mask = mitk::IOUtil::Load<mitk::Image>(parsedArgs["mask"].ToString());
 
   AccessByItk_3(image, Normalize, im2, mask, parsedArgs["output"].ToString());
 

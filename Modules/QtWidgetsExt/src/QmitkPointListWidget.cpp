@@ -262,7 +262,7 @@ void QmitkPointListWidget::OnBtnLoadPoints()
   // attempt to load file
   try
   {
-    mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(filename.toStdString())[0].GetPointer());
+    mitk::PointSet::Pointer pointSet = mitk::IOUtil::Load<mitk::PointSet>(filename.toStdString());
     if (pointSet.IsNull())
     {
       QMessageBox::warning(this, "Load point set", QString("File reader could not read %1").arg(filename));

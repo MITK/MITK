@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*
 #include <mitkGridRepresentationProperty.h>
 #include <mitkGridVolumeMapperProperty.h>
-#include <mitkOrganTypeProperty.h>
 */
 #include <mitkModalityProperty.h>
 //#include <mitkOdfNormalizationMethodProperty.h>
@@ -110,7 +109,6 @@ int mitkPropertySerializationTest(int /* argc */, char * /*argv*/ [])
   /*
   propList->SetProperty("gridrep", mitk::GridRepresentationProperty::New(2));
   propList->SetProperty("gridvol", mitk::GridVolumeMapperProperty::New(0));
-  propList->SetProperty("OrganTypeProperty", mitk::OrganTypeProperty::New("Larynx"));
   */
   propList->SetProperty("modality", mitk::ModalityProperty::New("Color Doppler"));
   // propList->SetProperty("OdfNormalizationMethodProperty", mitk::OdfNormalizationMethodProperty::New("Global

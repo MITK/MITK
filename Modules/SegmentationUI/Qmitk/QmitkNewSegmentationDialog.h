@@ -38,8 +38,6 @@ class QPushButton;
   \ingroup Widgets
 
   This dialog is used to ask a user about the type of a newly created segmentation and a name for it.
-
-  \warning Will not create a new organ type in the OrganTypeProperty. Client has to do that.
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkNewSegmentationDialog : public QDialog
 {

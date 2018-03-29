@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkColorProperty.h"
 #include "mitkDataStorage.h"
 #include "mitkLevelWindowProperty.h"
-#include "mitkOrganTypeProperty.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
 #include "mitkVtkResliceInterpolationProperty.h"

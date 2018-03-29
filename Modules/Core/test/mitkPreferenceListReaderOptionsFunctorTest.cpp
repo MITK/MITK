@@ -64,42 +64,6 @@ namespace mitk
 } // namespace mitk
 
 
-
-struct TestServiceActivator
-{
-  TestServiceActivator()
-  {
-    m_TestMimeType = new mitk::CustomMimeType("TestMimeType");
-    m_TestMimeType->AddExtension("nrrd");
-    m_TestMimeType->SetCategory(mitk::IOMimeTypes::CATEGORY_IMAGES());
-    m_TestMimeType->SetComment("Test mime type");
-
-    us::ModuleContext *context = us::GetModuleContext();
-    us::ServiceProperties props;
-    props[us::ServiceConstants::SERVICE_RANKING()] = 10;
-    context->RegisterService(m_TestMimeType, props);
-
-    m_NormalService = new mitk::TestFileReaderService("Normal Test Service");
-    m_PrefService = new mitk::TestFileReaderService("Prefered Test Service");
-    m_BlackService = new mitk::TestFileReaderService("Unwanted Test Service");
-  }
-
-  ~TestServiceActivator()
-  {
-    delete m_PrefService;
-    delete m_BlackService;
-    delete m_NormalService;
-    delete m_TestMimeType;
-  }
-
-  mitk::TestFileReaderService* m_NormalService;
-  mitk::TestFileReaderService* m_PrefService;
-  mitk::TestFileReaderService* m_BlackService;
-  mitk::CustomMimeType* m_TestMimeType;
-};
-
-TestServiceActivator activator;
-
 class mitkPreferenceListReaderOptionsFunctorTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkPreferenceListReaderOptionsFunctorTestSuite);
@@ -121,6 +85,11 @@ private:
   mitk::PreferenceListReaderOptionsFunctor::ListType black;
   mitk::PreferenceListReaderOptionsFunctor::ListType emptyList;
 
+  mitk::TestFileReaderService* m_NormalService;
+  mitk::TestFileReaderService* m_PrefService;
+  mitk::TestFileReaderService* m_BlackService;
+  mitk::CustomMimeType* m_TestMimeType;
+
 public:
   void setUp() override
   {
@@ -129,10 +98,28 @@ public:
     preference = { "Prefered Test Service" };
     black = { "Unwanted Test Service" };
     emptyList = {};
+
+    m_TestMimeType = new mitk::CustomMimeType("TestMimeType");
+    m_TestMimeType->AddExtension("nrrd");
+    m_TestMimeType->SetCategory(mitk::IOMimeTypes::CATEGORY_IMAGES());
+    m_TestMimeType->SetComment("Test mime type");
+
+    us::ModuleContext *context = us::GetModuleContext();
+    us::ServiceProperties props;
+    props[us::ServiceConstants::SERVICE_RANKING()] = 10;
+    context->RegisterService(m_TestMimeType, props);
+
+    m_NormalService = new mitk::TestFileReaderService("Normal Test Service");
+    m_PrefService = new mitk::TestFileReaderService("Prefered Test Service");
+    m_BlackService = new mitk::TestFileReaderService("Unwanted Test Service");
   }
 
   void tearDown() override
   {
+    delete m_PrefService;
+    delete m_BlackService;
+    delete m_NormalService;
+    delete m_TestMimeType;
   }
 
   void UsePreferenceList()

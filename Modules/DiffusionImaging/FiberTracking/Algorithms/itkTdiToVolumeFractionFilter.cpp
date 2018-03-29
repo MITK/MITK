@@ -120,7 +120,7 @@ void TdiToVolumeFractionFilter< TPixelType >::ThreadedGenerateData(const OutputI
       else if (comp_sum>1)
           intra_ax_val = 1.0 - (csf_val+gm_val);
       if (intra_ax_val<-0.01)
-        mitkThrow() << "Corrupted volume fraction. intra_ax_val=" << intra_ax_val;
+        MITK_INFO << "Corrupted volume fraction. intra_ax_val=" << intra_ax_val;
       if (intra_ax_val<0)
         intra_ax_val = 0;
     }

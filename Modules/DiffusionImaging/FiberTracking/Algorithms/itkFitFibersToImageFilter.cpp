@@ -466,7 +466,21 @@ void FitFibersToImageFilter::GenerateData()
   minimizer.set_lower_bound(l);
   minimizer.set_projected_gradient_tolerance(m_GradientTolerance);
 
-  MITK_INFO << "Regularization type: " << m_Regularization;
+  if (m_Regularization==VnlCostFunction::REGU::MSM)
+    MITK_INFO << "Regularization type: MSM";
+  else if (m_Regularization==VnlCostFunction::REGU::VARIANCE)
+    MITK_INFO << "Regularization type: VARIANCE";
+  else if (m_Regularization==VnlCostFunction::REGU::LASSO)
+    MITK_INFO << "Regularization type: LASSO";
+  else if (m_Regularization==VnlCostFunction::REGU::VOXEL_VARIANCE)
+    MITK_INFO << "Regularization type: VOXEL_VARIANCE";
+  else if (m_Regularization==VnlCostFunction::REGU::GROUP_LASSO)
+    MITK_INFO << "Regularization type: GROUP_LASSO";
+  else if (m_Regularization==VnlCostFunction::REGU::GROUP_VARIANCE)
+    MITK_INFO << "Regularization type: GROUP_VARIANCE";
+  else if (m_Regularization==VnlCostFunction::REGU::NONE)
+    MITK_INFO << "Regularization type: NONE";
+
   if (m_Regularization!=VnlCostFunction::REGU::NONE)  // REMOVE FOR NEW FIT AND SET cost.m_Lambda = m_Lambda
   {
     MITK_INFO << "Estimating regularization";
@@ -493,6 +507,8 @@ void FitFibersToImageFilter::GenerateData()
       }
     }
   }
+  else
+    cost.m_Lambda = 0;
   MITK_INFO << "Using regularization factor of " << cost.m_Lambda << " (λ: " << m_Lambda << ")";
 
   MITK_INFO << "Fitting fibers";

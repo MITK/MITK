@@ -42,6 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPartConstants.h>
 #include <berryQtPreferences.h>
 #include <berryQtStyleManager.h>
+#include <berryWorkbenchPlugin.h>
 
 #include <internal/berryQtShowViewAction.h>
 #include <internal/berryQtOpenPerspectiveAction.h>
@@ -819,6 +820,10 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   if (showViewToolbar)
   {
+    auto prefService = berry::WorkbenchPlugin::GetDefault()->GetPreferencesService();
+    berry::IPreferences::Pointer stylePrefs = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
+    bool showCategoryNames = stylePrefs->GetBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES, true);
+
     // Order view descriptors by category
 
     QMultiMap<QString, berry::IViewDescriptor::Pointer> categoryViewDescriptorMap;
@@ -845,7 +850,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
         toolbar->setObjectName(category + " View Toolbar");
         mainWindow->addToolBar(toolbar);
 
-        if (!category.isEmpty())
+        if (showCategoryNames && !category.isEmpty())
         {
           auto categoryButton = new QToolButton;
           categoryButton->setToolButtonStyle(Qt::ToolButtonTextOnly);

@@ -250,10 +250,10 @@ void QtStylePreferencePage::Update()
   oldStyle = styleManager->GetStyle();
   FillStyleCombo(oldStyle);
 
-  QString fontName = m_StylePref->Get(berry::QtPreferences::QT_FONT_NAME, "");
+  QString fontName = m_StylePref->Get(berry::QtPreferences::QT_FONT_NAME, "Open Sans");
   styleManager->SetFont(fontName);
 
-  int fontSize = m_StylePref->Get(berry::QtPreferences::QT_FONT_SIZE, "").toInt();
+  int fontSize = m_StylePref->Get(berry::QtPreferences::QT_FONT_SIZE, "9").toInt();
   styleManager->SetFontSize(fontSize);
   controls.m_FontSizeSpinBox->setValue(fontSize);
   styleManager->UpdateWorkbenchFont();

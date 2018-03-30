@@ -75,7 +75,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUndoController.h"
 #include "mitkVerboseLimitedLinearUndo.h"
 #include <QToolBar>
+#include <QToolButton>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QLabel>
 #include <QmitkAboutDialog.h>
 
@@ -844,7 +846,27 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
         mainWindow->addToolBar(toolbar);
 
         if (!category.isEmpty())
-          toolbar->addWidget(new QLabel(category + " "));
+        {
+          auto categoryButton = new QToolButton;
+          categoryButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+          categoryButton->setText(category);
+          categoryButton->setStyleSheet("background: transparent; margin: 0; padding: 0;");
+          toolbar->addWidget(categoryButton);
+
+          connect(categoryButton, &QToolButton::clicked, [toolbar]()
+          {
+            for (QWidget* widget : toolbar->findChildren<QWidget*>())
+            {
+              if (QStringLiteral("qt_toolbar_ext_button") == widget->objectName() && widget->isVisible())
+              {
+                QMouseEvent pressEvent(QEvent::MouseButtonPress, QPointF(0.0f, 0.0f), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                QMouseEvent releaseEvent(QEvent::MouseButtonRelease, QPointF(0.0f, 0.0f), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                QApplication::sendEvent(widget, &pressEvent);
+                QApplication::sendEvent(widget, &releaseEvent);
+              }
+            }
+          });
+        }
 
         for (auto viewDescriptor : viewDescriptorsInCurrentCategory)
         {

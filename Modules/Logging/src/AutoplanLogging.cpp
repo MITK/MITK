@@ -245,7 +245,7 @@ namespace Logger
         boost::log::keywords::min_free_space = 100 * 1024 * 1024    /*< minimum free space on the drive, in bytes >*/
       ));
       sink->set_formatter(
-        boost::log::expressions::format("{\"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\"}")
+        boost::log::expressions::format("{\"datetime\": \"%8%\", \"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\"}")
         % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::phoenix::bind(&MessageForLogstash, boost::log::expressions::attr<std::string>("Message"))]
         % boost::log::expressions::attr<std::string>("ComputerName")
         % boost::log::expressions::attr<std::string>("UserName")
@@ -253,6 +253,7 @@ namespace Logger
         % boost::log::expressions::attr<std::string>("Source")
         % boost::log::expressions::attr<std::string>("FullName")
         % boost::log::expressions::attr<std::string>("Organization")
+        % boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT)
       );
 
       /// Add the sink to the core
@@ -285,7 +286,7 @@ namespace Logger
         );
       } else {
         sink2->set_formatter(
-          boost::log::expressions::format("{\"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\"}")
+          boost::log::expressions::format("{\"datetime\": \"%8%\", \"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\"}")
           % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::phoenix::bind(&MessageForLogstash, boost::log::expressions::attr<std::string>("Message"))]
           % boost::log::expressions::attr<std::string>("ComputerName")
           % boost::log::expressions::attr<std::string>("UserName")
@@ -293,6 +294,7 @@ namespace Logger
           % boost::log::expressions::attr<std::string>("Source")
           % boost::log::expressions::attr<std::string>("FullName")
           % boost::log::expressions::attr<std::string>("Organization")
+          % boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT)
         );
       }
 

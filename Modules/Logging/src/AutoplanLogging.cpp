@@ -246,7 +246,7 @@ namespace Logger
       ));
       sink->set_formatter(
         boost::log::expressions::format("{\"datetime\": \"%8%\", \"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\"}")
-        % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::phoenix::bind(&MessageForLogstash, boost::log::expressions::attr<std::string>("Message"))]
+        % boost::phoenix::bind(&MessageForLogstash, boost::log::expressions::attr<std::string>("Message"))
         % boost::log::expressions::attr<std::string>("ComputerName")
         % boost::log::expressions::attr<std::string>("UserName")
         % boost::log::trivial::severity
@@ -280,14 +280,13 @@ namespace Logger
       if (Options::get().tcpdump) {
         sink2->set_formatter(
           boost::log::expressions::format("%1%")
-          % boost::log::expressions::xml_decor
-              [boost::log::expressions::stream << boost::phoenix::bind
-                                                  (&MessageToUTF8, boost::log::expressions::attr<std::string>("Message"))]
+          % boost::phoenix::bind
+              (&MessageToUTF8, boost::log::expressions::attr<std::string>("Message"))
         );
       } else {
         sink2->set_formatter(
           boost::log::expressions::format("{\"datetime\": \"%8%\", \"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\"}")
-          % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::phoenix::bind(&MessageForLogstash, boost::log::expressions::attr<std::string>("Message"))]
+          % boost::phoenix::bind(&MessageForLogstash, boost::log::expressions::attr<std::string>("Message"))
           % boost::log::expressions::attr<std::string>("ComputerName")
           % boost::log::expressions::attr<std::string>("UserName")
           % boost::log::trivial::severity

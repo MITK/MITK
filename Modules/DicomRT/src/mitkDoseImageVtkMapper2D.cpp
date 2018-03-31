@@ -361,7 +361,7 @@ void mitk::DoseImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
   this->ApplyRenderingMode(renderer);
 
   // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
-  localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
+  localStorage->m_Texture->SetColorModeToDirectScalars();
 
   int displayedComponent = 0;
 

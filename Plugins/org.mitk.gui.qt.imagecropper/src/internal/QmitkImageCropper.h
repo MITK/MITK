@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 #include <QProgressDialog>
-#include "QVTKWidget.h"
 #include "QmitkRegisterClasses.h"
 #include <QList>
 

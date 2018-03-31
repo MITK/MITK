@@ -153,8 +153,6 @@ void mitk::ContourSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *re
     m_Actor->GetProperty()->SetColor(rgba);
     m_Actor->SetMapper(m_VtkPolyDataMapper);
   }
-
-  SetVtkMapperImmediateModeRendering(m_VtkPolyDataMapper);
 }
 
 const mitk::ContourSet *mitk::ContourSetVtkMapper3D::GetInput()

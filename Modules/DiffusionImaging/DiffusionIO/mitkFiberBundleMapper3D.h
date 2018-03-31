@@ -50,7 +50,6 @@ public:
     const FiberBundle* GetInput();
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override; //looks like depricated.. should be replaced bz GetViewProp()
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false );
-    static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
     void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
     //=========================================================
 

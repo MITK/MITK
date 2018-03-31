@@ -190,9 +190,6 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer
     }
   }
 
-  SetVtkMapperImmediateModeRendering(m_ContourMapper);
-  SetVtkMapperImmediateModeRendering(m_SpheresMapper);
-
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 

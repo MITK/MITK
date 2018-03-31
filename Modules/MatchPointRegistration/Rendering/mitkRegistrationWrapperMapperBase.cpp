@@ -262,11 +262,6 @@ vtkProp* mitk::MITKRegistrationWrapperMapperBase::GetVtkProp(mitk::BaseRenderer 
     return m_LSH.GetLocalStorage(renderer)->m_RegAssembly;
 }
 
-void mitk::MITKRegistrationWrapperMapperBase::SetVtkMapperImmediateModeRendering(vtkMapper *)
-{
-
-}
-
 mitk::MITKRegistrationWrapperMapperBase::RegWrapperLocalStorage::RegWrapperLocalStorage()
 {
     m_DeformedGridActor = vtkSmartPointer<vtkActor>::New();

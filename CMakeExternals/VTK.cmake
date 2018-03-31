@@ -24,13 +24,6 @@ endif()
 if(NOT DEFINED VTK_DIR)
 
   set(additional_cmake_args )
-  if(MINGW)
-    set(additional_cmake_args
-        -DCMAKE_USE_WIN32_THREADS:BOOL=ON
-        -DCMAKE_USE_PTHREADS:BOOL=OFF
-        -DVTK_USE_VIDEO4WINDOWS:BOOL=OFF # no header files provided by MinGW
-        )
-  endif()
 
   # Optionally enable memory leak checks for any objects derived from vtkObject. This
   # will force unit tests to fail if they have any of these memory leaks.
@@ -67,9 +60,7 @@ if(NOT DEFINED VTK_DIR)
 
   if(MITK_USE_Qt5)
     list(APPEND additional_cmake_args
-        -DVTK_QT_VERSION:STRING=5
         -DVTK_Group_Qt:BOOL=ON
-        -DVTK_INSTALL_NO_QT_PLUGIN:BOOL=ON
      )
   endif()
 
@@ -81,8 +72,8 @@ if(NOT DEFINED VTK_DIR)
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
-    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-8.0.0.tar.gz
-    URL_MD5 8de89b8c7a729016ab7128da5e881cf4
+    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-8.1.0.tar.gz
+    URL_MD5 4fa5eadbc8723ba0b8d203f05376d932
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${ep_common_args}
@@ -92,9 +83,6 @@ if(NOT DEFINED VTK_DIR)
         -DVTK_USE_SYSTEM_FREETYPE:BOOL=${VTK_USE_SYSTEM_FREETYPE}
         -DVTK_LEGACY_REMOVE:BOOL=ON
         -DModule_vtkTestingRendering:BOOL=ON
-        -DVTK_MAKE_INSTANTIATORS:BOOL=ON
-        -DVTK_USE_CXX11_FEATURES:BOOL=ON
-        -DVTK_RENDERING_BACKEND:STRING=OpenGL2
         ${additional_cmake_args}
     CMAKE_CACHE_ARGS
       ${ep_common_cache_args}

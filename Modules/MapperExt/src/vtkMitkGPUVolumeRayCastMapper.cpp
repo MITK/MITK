@@ -47,7 +47,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkVolumeProperty.h"
 #include <cassert>
 
-vtkInstantiatorNewMacro(vtkMitkGPUVolumeRayCastMapper);
 vtkCxxSetObjectMacro(vtkMitkGPUVolumeRayCastMapper, MaskInput, vtkImageData);
 vtkCxxSetObjectMacro(vtkMitkGPUVolumeRayCastMapper, TransformedInput, vtkImageData);
 

@@ -109,12 +109,6 @@ bool mitk::VtkMapper::HasVtkProp(const vtkProp *prop, BaseRenderer *renderer)
   return (prop == myProp);
 }
 
-void mitk::VtkMapper::SetVtkMapperImmediateModeRendering(vtkMapper *mapper)
-{
-  if (mapper)
-    mapper->SetImmediateModeRendering(mitk::VtkPropRenderer::useImmediateModeRendering());
-}
-
 void mitk::VtkMapper::UpdateVtkTransform(mitk::BaseRenderer *renderer)
 {
   vtkLinearTransform *vtktransform = GetDataNode()->GetVtkTransform(this->GetTimestep());

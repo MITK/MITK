@@ -398,11 +398,6 @@ vtkProp* mitk::FiberBundleMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
   return m_LocalStorageHandler.GetLocalStorage(renderer)->m_FiberAssembly;
 }
 
-void mitk::FiberBundleMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper *)
-{
-
-}
-
 mitk::FiberBundleMapper3D::FBXLocalStorage3D::FBXLocalStorage3D()
 {
   m_FiberActor = vtkSmartPointer<vtkActor>::New();

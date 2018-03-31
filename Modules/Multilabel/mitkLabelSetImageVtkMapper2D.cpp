@@ -224,7 +224,7 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer 
       image->GetLabelSet(lidx)->GetLookupTable()->GetVtkLookupTable());
 
     // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
-    localStorage->m_LayerTextureVector[lidx]->MapColorScalarsThroughLookupTableOff();
+    localStorage->m_LayerTextureVector[lidx]->SetColorModeToDirectScalars();
 
     // connect the imageLayer with the levelwindow filter
     localStorage->m_LevelWindowFilterVector[lidx]->SetInputData(localStorage->m_ReslicedImageVector[lidx]);

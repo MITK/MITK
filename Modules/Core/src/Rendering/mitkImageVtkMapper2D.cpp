@@ -120,8 +120,6 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  SetVtkMapperImmediateModeRendering(localStorage->m_Mapper);
-
   auto *image = const_cast<mitk::Image *>(this->GetInput());
   mitk::DataNode *datanode = this->GetDataNode();
   if (nullptr == image || !image->IsInitialized())
@@ -378,7 +376,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
   this->ApplyRenderingMode(renderer);
 
   // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
-  localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
+  localStorage->m_Texture->SetColorModeToDirectScalars();
 
   int displayedComponent = 0;
 

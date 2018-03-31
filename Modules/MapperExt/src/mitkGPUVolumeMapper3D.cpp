@@ -50,8 +50,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRenderWindowInteractor.h>
 #include <vtkVolume.h>
 #include <vtkVolumeProperty.h>
-#include <vtkVolumeRayCastCompositeFunction.h>
-#include <vtkVolumeRayCastMIPFunction.h>
 
 #include <vtkCubeSource.h>
 #include <vtkPolyDataMapper.h>

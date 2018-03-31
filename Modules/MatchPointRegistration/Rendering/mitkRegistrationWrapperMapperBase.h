@@ -44,7 +44,6 @@ public:
     //========== essential implementation for mapper ==========
     vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false );
-    static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
     void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
     //=========================================================
 

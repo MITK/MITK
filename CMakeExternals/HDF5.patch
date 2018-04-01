@@ -1,0 +1,11 @@
+--- a/config/cmake_ext_mod/HDFMacros.cmake
++++ b/config/cmake_ext_mod/HDFMacros.cmake
+@@ -46,7 +46,7 @@
+     get_target_property (target_name ${libtarget} OUTPUT_NAME_RELWITHDEBINFO)
+     install (
+       FILES
+-          ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/${CMAKE_IMPORT_LIBRARY_PREFIX}${target_name}.pdb
++          ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/RelWithDebInfo/${CMAKE_IMPORT_LIBRARY_PREFIX}${target_name}.pdb
+       DESTINATION
+           ${targetdestination}
+       CONFIGURATIONS RelWithDebInfo

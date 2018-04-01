@@ -102,7 +102,7 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
     endif()
   endif()
 
-  set(_boost_variant "$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>")
+  set(_boost_variant "$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>$<$<CONFIG:RelWithDebInfo>:release>$<$<CONFIG:MinRelSize>:release>")
   set(_boost_link shared)
   if(NOT BUILD_SHARED_LIBS)
     set(_boost_link static)

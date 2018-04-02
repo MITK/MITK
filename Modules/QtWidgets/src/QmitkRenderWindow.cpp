@@ -349,7 +349,7 @@ void QmitkRenderWindow::FullScreenMode(bool state)
 {
   m_FullScreenMode = state;
   if (m_MenuWidget)
-    m_MenuWidget->SetFullScreenMode(state);//ChangeFullScreenMode(state);
+    m_MenuWidget->SetFullScreenMode(state);
 }
 
 void QmitkRenderWindow::dragEnterEvent(QDragEnterEvent *event)

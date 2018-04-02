@@ -95,6 +95,7 @@ public:
   }
 
   void FullScreenMode(bool state);
+  bool GetFullSreenMode();
 
 protected:
   // overloaded move handler

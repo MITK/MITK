@@ -347,8 +347,9 @@ void QmitkRenderWindow::OnWidgetPlaneModeChanged(int mode)
 
 void QmitkRenderWindow::FullScreenMode(bool state)
 {
+  m_FullScreenMode = state;
   if (m_MenuWidget)
-    m_MenuWidget->ChangeFullScreenMode(state);
+    m_MenuWidget->SetFullScreenMode(state);//ChangeFullScreenMode(state);
 }
 
 void QmitkRenderWindow::dragEnterEvent(QDragEnterEvent *event)
@@ -567,4 +568,9 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke) const
 int QmitkRenderWindow::GetDelta(QWheelEvent* we) const
 {
   return we->delta();
+}
+
+bool QmitkRenderWindow::GetFullSreenMode()
+{
+  return m_FullScreenMode;
 }

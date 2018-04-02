@@ -92,6 +92,7 @@ public:
 
 
   void ChangeFullScreenMode( bool state );
+  void SetFullScreenMode(bool state);
 
   void NotifyNewWidgetPlanesMode( int mode );
 

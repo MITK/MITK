@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
 
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
-  parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output folder", us::Any(), false);
+  parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output text file", us::Any(), false);
   parser.addArgument("reference_mask_folder", "m", mitkCommandLineParser::String, "Reference Mask Folder:", "reference masks of known bundles", false);
   parser.addArgument("overlap", "", mitkCommandLineParser::Float, "Overlap threshold:", "Overlap threshold used to identify true positives", 0.8);
   parser.addArgument("steps", "", mitkCommandLineParser::Int, "Threshold steps:", "number of weight thresholds used to calculate the ROC curve", 100);
@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
 
   std::string fibFile = us::any_cast<std::string>(parsedArgs["input"]);
   std::string reference_mask_folder = us::any_cast<std::string>(parsedArgs["reference_mask_folder"]);
-  std::string out_folder = us::any_cast<std::string>(parsedArgs["out"]);
+  std::string out_file = us::any_cast<std::string>(parsedArgs["out"]);
 
   float overlap = 0.8;
   if (parsedArgs.count("overlap"))
@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
     mitk::FiberBundle::Pointer pred_negatives = mitk::FiberBundle::New(nullptr);
 
     ofstream logfile;
-    logfile.open (out_folder + "LiFE_ROC.txt");
+    logfile.open(out_file);
 
     float fpr = 1.0;
     float tpr = 1.0;
@@ -180,7 +180,7 @@ int main(int argc, char* argv[])
       {
         ItkFloatImgType::Pointer mask_image = std::get<0>(mask);
 
-        mitk::FiberBundle::Pointer a;
+        mitk::FiberBundle::Pointer a=nullptr;
         {
           itk::FiberExtractionFilter<unsigned char>::Pointer extractor = itk::FiberExtractionFilter<unsigned char>::New();
           extractor->SetInputFiberBundle(pred_positives);
@@ -189,11 +189,13 @@ int main(int argc, char* argv[])
           extractor->SetDontResampleFibers(true);
           extractor->SetMode(itk::FiberExtractionFilter<unsigned char>::MODE::OVERLAP);
           extractor->Update();
-          a = extractor->GetPositives().at(0);
+          if (!extractor->GetPositives().empty())
+            a = extractor->GetPositives().at(0);
         }
-        tp_tracts = tp_tracts->AddBundle(a);
+        if (a.IsNotNull())
+          tp_tracts = tp_tracts->AddBundle(a);
 
-        mitk::FiberBundle::Pointer b;
+        mitk::FiberBundle::Pointer b=nullptr;
         {
           itk::FiberExtractionFilter<unsigned char>::Pointer extractor = itk::FiberExtractionFilter<unsigned char>::New();
           extractor->SetInputFiberBundle(pred_negatives);
@@ -202,9 +204,11 @@ int main(int argc, char* argv[])
           extractor->SetDontResampleFibers(true);
           extractor->SetMode(itk::FiberExtractionFilter<unsigned char>::MODE::OVERLAP);
           extractor->Update();
-          b = extractor->GetPositives().at(0);
+          if (!extractor->GetPositives().empty())
+            b = extractor->GetPositives().at(0);
         }
-        fn_tracts = fn_tracts->AddBundle(b);
+        if (b.IsNotNull())
+          fn_tracts = fn_tracts->AddBundle(b);
       }
       mitk::FiberBundle::Pointer fp_tracts = pred_positives->SubtractBundle(tp_tracts);
       mitk::FiberBundle::Pointer tn_tracts = pred_negatives->SubtractBundle(fn_tracts);

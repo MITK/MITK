@@ -102,6 +102,9 @@ int main(int argc, char* argv[])
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
   parser.addArgument("filter_outliers", "", mitkCommandLineParser::Bool, "Filter outliers:", "perform second optimization run with an upper weight bound based on the first weight estimation (99% quantile)", false);
   parser.addArgument("regu", "", mitkCommandLineParser::String, "Regularization:", "MSM, Variance, VoxelVariance, Lasso, GroupLasso, GroupVariance, NONE (default)");
+  parser.addArgument("use_num_streamlines", "", mitkCommandLineParser::Bool, "Use number of streamlines as score:", "Don't fit candidates, simply use number of streamlines per candidate as score", false);
+  parser.addArgument("use_weights", "", mitkCommandLineParser::Bool, "Use input weights as score:", "Don't fit candidates, simply use first input streamline weight per candidate as score", false);
+  parser.addArgument("filter_zero_weights", "", mitkCommandLineParser::Bool, "Filter zero-weights", "Remove streamlines with weight 0 from candidates", false);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -124,17 +127,29 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("filter_outliers"))
     filter_outliers = us::any_cast<bool>(parsedArgs["filter_outliers"]);
 
+  bool filter_zero_weights = false;
+  if (parsedArgs.count("filter_zero_weights"))
+    filter_zero_weights = us::any_cast<bool>(parsedArgs["filter_zero_weights"]);
+
   std::string mask_file = "";
   if (parsedArgs.count("mask"))
     mask_file = us::any_cast<std::string>(parsedArgs["mask"]);
 
-  mitkCommandLineParser::StringContainerType anchor_mask_files;
+  mitkCommandLineParser::StringContainerType anchor_mask_files_folders;
   if (parsedArgs.count("anchor_masks"))
-    anchor_mask_files = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["anchor_masks"]);
+    anchor_mask_files_folders = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["anchor_masks"]);
 
   std::string regu = "NONE";
   if (parsedArgs.count("regu"))
     regu = us::any_cast<std::string>(parsedArgs["regu"]);
+
+  bool use_weights = false;
+  if (parsedArgs.count("use_weights"))
+    use_weights = us::any_cast<bool>(parsedArgs["use_weights"]);
+
+  bool use_num_streamlines = false;
+  if (parsedArgs.count("use_num_streamlines"))
+    use_num_streamlines = us::any_cast<bool>(parsedArgs["use_num_streamlines"]);
 
   try
   {
@@ -157,7 +172,7 @@ int main(int argc, char* argv[])
 
     itk::ImageFileWriter< PeakImgType >::Pointer peak_image_writer = itk::ImageFileWriter< PeakImgType >::New();
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image", "Fiberbundles"}, {});
-    auto inputImage = mitk::IOUtil::Load<mitk::PeakImage>(peak_file_name, &functor);
+    mitk::Image::Pointer inputImage = dynamic_cast<mitk::PeakImage*>(mitk::IOUtil::Load(peak_file_name, &functor)[0].GetPointer());
 
     float minSpacing = 1;
     if(inputImage->GetGeometry()->GetSpacing()[0]<inputImage->GetGeometry()->GetSpacing()[1] && inputImage->GetGeometry()->GetSpacing()[0]<inputImage->GetGeometry()->GetSpacing()[2])
@@ -177,12 +192,29 @@ int main(int argc, char* argv[])
 
     // Load masks covering the true positives for evaluation purposes
     std::vector< itk::FitFibersToImageFilter::UcharImgType::Pointer > reference_masks;
-    for (auto filename : anchor_mask_files)
+    std::vector< std::string > anchor_mask_files;
+    for (auto filename : anchor_mask_files_folders)
     {
-      itk::FitFibersToImageFilter::UcharImgType::Pointer ref_mask = nullptr;
-      mitk::Image::Pointer ref_mitk_mask = mitk::IOUtil::Load<mitk::Image>(filename);
-      mitk::CastToItkImage(ref_mitk_mask, ref_mask);
-      reference_masks.push_back(ref_mask);
+      if (itksys::SystemTools::PathExists(filename))
+      {
+        auto list = get_file_list(filename, {".nrrd",".nii.gz",".nii"});
+        for (auto f : list)
+        {
+          itk::FitFibersToImageFilter::UcharImgType::Pointer ref_mask = nullptr;
+          mitk::Image::Pointer ref_mitk_mask = mitk::IOUtil::Load<mitk::Image>(f);
+          mitk::CastToItkImage(ref_mitk_mask, ref_mask);
+          reference_masks.push_back(ref_mask);
+          anchor_mask_files.push_back(f);
+        }
+      }
+      else if (itksys::SystemTools::FileExists(filename))
+      {
+        anchor_mask_files.push_back(filename);
+        itk::FitFibersToImageFilter::UcharImgType::Pointer ref_mask = nullptr;
+        mitk::Image::Pointer ref_mitk_mask = mitk::IOUtil::Load<mitk::Image>(filename);
+        mitk::CastToItkImage(ref_mitk_mask, ref_mask);
+        reference_masks.push_back(ref_mask);
+      }
     }
 
     // Load peak image
@@ -250,7 +282,71 @@ int main(int argc, char* argv[])
       peak_image_writer->Update();
     }
 
-    if (!greedy_add)
+    if (use_weights || use_num_streamlines)
+    {
+      MITK_INFO << "Using tract weights as scores";
+      int c = 0;
+      for (auto fib : input_candidates)
+      {
+        int mod = 1;
+        double score = 0;
+        if (use_weights)
+        {
+          score = fib->GetFiberWeight(0);
+          mod = 100000;
+        }
+        else if (use_num_streamlines)
+          score = fib->GetNumFibers();
+        fib->ColorFibersByOrientation();
+
+        std::string bundle_name = ist::GetFilenameWithoutExtension(candidate_tract_files.at(c));
+
+        std::streambuf *old = cout.rdbuf(); // <-- save
+        std::stringstream ss;
+        std::cout.rdbuf (ss.rdbuf());       // <-- redirect
+        mitk::IOUtil::Save(fib, out_folder + boost::lexical_cast<std::string>((int)(mod*score)) + "_" + bundle_name + ".fib");
+
+        float best_overlap = 0;
+        int best_overlap_index = -1;
+        int m_idx = 0;
+        for (auto ref_mask : reference_masks)
+        {
+          float overlap = fib->GetOverlap(ref_mask, false);
+          if (overlap>best_overlap)
+          {
+            best_overlap = overlap;
+            best_overlap_index = m_idx;
+          }
+          ++m_idx;
+        }
+
+        unsigned int num_voxels = 0;
+        {
+          itk::TractDensityImageFilter< ItkUcharImageType >::Pointer masks_filter = itk::TractDensityImageFilter< ItkUcharImageType >::New();
+          masks_filter->SetInputImage(mask);
+          masks_filter->SetBinaryOutput(true);
+          masks_filter->SetFiberBundle(fib);
+          masks_filter->SetUseImageGeometry(true);
+          masks_filter->Update();
+          num_voxels = masks_filter->GetNumCoveredVoxels();
+        }
+
+        double weight_sum = 0;
+        for (int i=0; i<fib->GetNumFibers(); i++)
+          weight_sum += fib->GetFiberWeight(i);
+
+        std::cout.rdbuf (old);              // <-- restore
+
+        logfile << "RMS_DIFF: " << setprecision(5) << score << " " << bundle_name << " " << num_voxels << " " << fib->GetNumFibers() << " " << weight_sum << "\n";
+        if (best_overlap_index>=0)
+          logfile << "Best_overlap: " << setprecision(5) << best_overlap << " " << ist::GetFilenameWithoutExtension(anchor_mask_files.at(best_overlap_index)) << "\n";
+        else
+          logfile << "No_overlap\n";
+        ++c;
+      }
+
+    }
+    else if (!greedy_add)
     {
       MITK_INFO << "Fit candidate tracts";
       itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
@@ -281,20 +377,22 @@ int main(int argc, char* argv[])
       fitter->Update();
       vnl_vector<double> rms_diff = fitter->GetRmsDiffPerBundle();
 
-      vnl_vector<double> log_rms_diff = rms_diff-rms_diff.min_value() + 1;
-      log_rms_diff = log_rms_diff.apply(std::log);
-      log_rms_diff /= log_rms_diff.max_value();
+//      vnl_vector<double> log_rms_diff = rms_diff-rms_diff.min_value() + 1;
+//      log_rms_diff = log_rms_diff.apply(std::log);
+//      log_rms_diff /= log_rms_diff.max_value();
       int c = 0;
       for (auto fib : input_candidates)
       {
-        fib->SetFiberWeights( log_rms_diff[c] );
-        fib->ColorFibersByOrientation();
+//        fib->SetFiberWeights( log_rms_diff[c] );
+//        fib->ColorFibersByOrientation();
 
         std::string bundle_name = ist::GetFilenameWithoutExtension(candidate_tract_files.at(c));
 
         std::streambuf *old = cout.rdbuf(); // <-- save
         std::stringstream ss;
         std::cout.rdbuf (ss.rdbuf());       // <-- redirect
+        if (filter_zero_weights)
+          fib = fib->FilterByWeights(0);
         mitk::IOUtil::Save(fib, out_folder + boost::lexical_cast<std::string>((int)(100000*rms_diff[c])) + "_" + bundle_name + ".fib");
 
         float best_overlap = 0;
@@ -418,6 +516,8 @@ int main(int argc, char* argv[])
         std::stringstream ss;
         std::cout.rdbuf (ss.rdbuf());       // <-- redirect
         // Save winning candidate
+        if (filter_zero_weights)
+          best_candidate = best_candidate->FilterByWeights(0);
         mitk::IOUtil::Save(best_candidate, out_folder + boost::lexical_cast<std::string>(iteration) + "_" + name + ".fib");
         peak_image_writer->SetInput(peak_image);
         peak_image_writer->SetFileName(out_folder + boost::lexical_cast<std::string>(iteration) + "_" + name + ".nrrd");

@@ -559,7 +559,7 @@ void FitFibersToImageFilter::GenerateData()
   MITK_INFO << "NumIterations: " << minimizer.get_num_iterations();
   MITK_INFO << "Residual cost: " << minimizer.get_end_error();
   m_RMSE = cost.S->get_rms_error(m_Weights);
-  MITK_INFO << "Final RMS: " << m_RMSE;
+  MITK_INFO << "Final RMSE: " << m_RMSE;
 
   clock.Stop();
   int h = clock.GetTotal()/3600;

@@ -1,7 +1,7 @@
 
 # This function is used to prepare all includes and files
 # that are necessary for a general swig project. 
-function(mitkSwigPrepareFiles swig_file library_names)
+function(mitkSwigPrepareFiles swig_module swig_file library_names)
     # Ensure that the input file is parsed as a c++ file. This is done via 
     # an additional source file property. 
     set_source_files_properties ( ${swig_file} PROPERTIES CPLUSPLUS ON )
@@ -21,6 +21,13 @@ function(mitkSwigPrepareFiles swig_file library_names)
         # the swig-option "-I":
         foreach(INCLUDE_PATH ${LIBRARY_INCLUDES})
             list(APPEND ADDITIONAL_TMP_SWIG_INCLUDES -I${INCLUDE_PATH} )
+
+            file(GLOB_RECURSE header_files "${INCLUDE_PATH}/*.h")
+            list(APPEND SWIG_MODULE_${swig_module}_EXTRA_DEPS ${header_files})
+            # export variable to parent scope
+            set(SWIG_MODULE_${swig_module}_EXTRA_DEPS
+              ${SWIG_MODULE_${swig_module}_EXTRA_DEPS} PARENT_SCOPE)
+
         endforeach()
     endforeach()
     
@@ -36,4 +43,14 @@ function(mitkSwigPrepareFiles swig_file library_names)
 
     # Set the additional parameters to the input project file:
     set_property(SOURCE ${swig_file} PROPERTY SWIG_FLAGS ${ADDITIONAL_TMP_SWIG_INCLUDES} )
+
+    # In addition include python dependencies:
+    include_directories( ${PYTHON_INCLUDE_DIR})
+    list(APPEND SWIG_MODULE_${swig_module}_EXTRA_DEPS ${PYTHON_INCLUDE_DIR})
+
+    # Add additional include paths, for example to the common files:
+    list(APPEND SWIG_MODULE_${swig_module}_EXTRA_DEPS ${SWIG_EXTRA_DEPS})
+
+    set(SWIG_MODULE_${swig_module}_EXTRA_DEPS
+      ${SWIG_MODULE_${swig_module}_EXTRA_DEPS} PARENT_SCOPE)
 endfunction()

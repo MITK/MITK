@@ -21,23 +21,10 @@ function(mitkSwigAddLibraryDependencies swig_module library_names)
                      TARGET ${library_name}
                      PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
         # Checking each given librarie to include all includes from this library.
-        foreach(INCLUDE_PATH ${LIBRARY_INCLUDES})
-            file(GLOB_RECURSE header_files "${INCLUDE_PATH}/*.h")
-            list(APPEND SWIG_MODULE_${swig_module}_EXTRA_DEPS ${header_files})
-            # export variable to parent scope
-            set(SWIG_MODULE_${swig_module}_EXTRA_DEPS
-              ${SWIG_MODULE_${swig_module}_EXTRA_DEPS} PARENT_SCOPE)
-        endforeach()
+
     endforeach()
 
     # In addition include python dependencies:
     include_directories( ${PYTHON_INCLUDE_DIR})
-    list(APPEND SWIG_MODULE_${swig_module}_EXTRA_DEPS ${PYTHON_INCLUDE_DIR})
-    #swig_link_libraries(${swig_module} ${PYTHON_LIBRARIES} )
 
-    # Add additional include paths, for example to the common files:
-    list(APPEND SWIG_MODULE_${swig_module}_EXTRA_DEPS ${SWIG_EXTRA_DEPS})
-
-    set(SWIG_MODULE_${swig_module}_EXTRA_DEPS
-      ${SWIG_MODULE_${swig_module}_EXTRA_DEPS} PARENT_SCOPE)
 endfunction()

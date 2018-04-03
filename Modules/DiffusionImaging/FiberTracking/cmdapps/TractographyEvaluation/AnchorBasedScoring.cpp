@@ -200,6 +200,7 @@ int main(int argc, char* argv[])
         auto list = get_file_list(filename, {".nrrd",".nii.gz",".nii"});
         for (auto f : list)
         {
+          MITK_INFO << f;
           itk::FitFibersToImageFilter::UcharImgType::Pointer ref_mask = nullptr;
           mitk::Image::Pointer ref_mitk_mask = mitk::IOUtil::Load<mitk::Image>(f);
           mitk::CastToItkImage(ref_mitk_mask, ref_mask);
@@ -239,6 +240,7 @@ int main(int argc, char* argv[])
     }
     std::cout.rdbuf (old);              // <-- restore
     MITK_INFO << "Loaded " << candidate_tract_files.size() << " candidate tracts.";
+    MITK_INFO << "Loaded " << reference_masks.size() << " reference masks.";
 
     double rmse = 0.0;
     int iteration = 0;

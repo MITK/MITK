@@ -1,8 +1,8 @@
-set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.5)
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.10)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 #-----------------------------------------------------------------------------
-# See http://www.cmake.org/cmake/help/v3.5/manual/cmake-policies.7.html for details
+# See https://cmake.org/cmake/help/v3.10/manual/cmake-policies.7.html for details
 #-----------------------------------------------------------------------------
 
 set(project_policies )

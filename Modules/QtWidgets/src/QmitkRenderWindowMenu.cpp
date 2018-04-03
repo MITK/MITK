@@ -983,3 +983,10 @@ void QmitkRenderWindowMenu::AutoRotateNextStep()
     m_Renderer->GetCameraRotationController()->GetSlice()->Next();
 }
 
+void QmitkRenderWindowMenu::SetFullScreenMode(bool state)
+{
+  m_FullScreenMode = state;
+
+  //change icon
+  this->ChangeFullScreenIcon();
+}

@@ -38,7 +38,7 @@ option ( MITK_PYTHON_WHEEL "Add building of python wheels to the dist target." O
 mark_as_advanced( MITK_PYTHON_WHEEL )
 
 # Prepare the SWIG-File, i.e. especially add necessary include folders
-mitkSwigPrepareFiles(MITK.i "MitkCore;MitkCLCore;MitkCLUtilities;ITKCommon")
+mitkSwigPrepareFiles(pyMITK MITK.i "MitkCore;MitkCLCore;MitkCLUtilities;ITKCommon")
 
 # Add additional SWIG Parameters
 # These parameters depend on the target language

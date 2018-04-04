@@ -42,14 +42,14 @@ namespace mitk {
         itkGetMacro(YDim, int)
         itkGetMacro(ZDim, int)
         itkGetMacro(VoxelSpacingInCentimeters, double)
-        itkGetMacro(VolumeSmoothingSigma, double)
-        itkGetMacro(DoVolumeSmoothing, bool)
+        itkGetMacro(DoPartialVolume, bool)
         itkGetMacro(UseRngSeed, bool)
         itkGetMacro(RngSeed, long)
         itkGetMacro(RandomizePhysicalProperties, bool)
         itkGetMacro(RandomizePhysicalPropertiesPercentage, double)
 
-        itkGetMacro(BackgroundAbsorption, double)
+        itkGetMacro(MinBackgroundAbsorption, double)
+        itkGetMacro(MaxBackgroundAbsorption, double)
         itkGetMacro(BackgroundScattering, double)
         itkGetMacro(BackgroundAnisotropy, double)
         itkGetMacro(AirAbsorption, double)
@@ -97,14 +97,14 @@ namespace mitk {
         itkSetMacro(YDim, int)
         itkSetMacro(ZDim, int)
         itkSetMacro(VoxelSpacingInCentimeters, double)
-        itkSetMacro(VolumeSmoothingSigma, double)
-        itkSetMacro(DoVolumeSmoothing, bool)
+        itkSetMacro(DoPartialVolume, bool)
         itkSetMacro(UseRngSeed, bool)
         itkSetMacro(RngSeed, long)
         itkSetMacro(RandomizePhysicalProperties, bool)
         itkSetMacro(RandomizePhysicalPropertiesPercentage, double)
 
-        itkSetMacro(BackgroundAbsorption, double)
+        itkSetMacro(MinBackgroundAbsorption, double)
+        itkSetMacro(MaxBackgroundAbsorption, double)
         itkSetMacro(BackgroundScattering, double)
         itkSetMacro(BackgroundAnisotropy, double)
         itkSetMacro(AirAbsorption, double)
@@ -158,14 +158,14 @@ namespace mitk {
       int m_YDim;
       int m_ZDim;
       double m_VoxelSpacingInCentimeters;
-      double m_VolumeSmoothingSigma;
-      bool m_DoVolumeSmoothing;
+      bool m_DoPartialVolume;
       bool m_UseRngSeed;
       long m_RngSeed;
       bool m_RandomizePhysicalProperties;
       double m_RandomizePhysicalPropertiesPercentage;
 
-      double m_BackgroundAbsorption;
+      double m_MinBackgroundAbsorption;
+      double m_MaxBackgroundAbsorption;
       double m_BackgroundScattering;
       double m_BackgroundAnisotropy;
       double m_AirAbsorption;

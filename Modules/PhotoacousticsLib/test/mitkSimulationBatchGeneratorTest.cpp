@@ -62,7 +62,7 @@ public:
     for (unsigned int i = 0; i < length; i++)
       data[i] = value;
 
-    return mitk::pa::Volume::New(data, xDim, yDim, zDim);
+    return mitk::pa::Volume::New(data, xDim, yDim, zDim, 1);
   }
 
   void testGenerateBatchFileString()

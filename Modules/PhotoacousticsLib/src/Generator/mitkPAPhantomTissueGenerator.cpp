@@ -14,11 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkPATissueGenerator.h"
+#include "mitkPAPhantomTissueGenerator.h"
 #include "mitkPAVector.h"
 #include "mitkPAVolumeManipulator.h"
 
-mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::GenerateInSilicoData(
+mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::PhantomTissueGenerator::GeneratePhantomData(
   TissueGeneratorParameters::Pointer parameters)
 {
   MITK_DEBUG << "Initializing Empty Volume";
@@ -33,6 +33,8 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
     parameters->SetVesselBifurcationFrequency(parameters->GetVesselBifurcationFrequency() * RESAMPLING_FACTOR);
     parameters->SetVoxelSpacingInCentimeters(parameters->GetVoxelSpacingInCentimeters() / RESAMPLING_FACTOR);
   }
+
+  parameters->SetVesselBifurcationFrequency(10000);
 
   std::mt19937 randomNumberGenerator;
   std::random_device randomDevice;
@@ -54,54 +56,42 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
 
   auto generatedVolume = mitk::pa::InSilicoTissueVolume::New(parameters, &randomNumberGenerator);
 
-  const double DIRECTION_VECTOR_INITIAL_VARIANCE = 0.2;
+  const unsigned int NUMER_OF_VESSELS = 5;
+  const double START_DEPTH_IN_CM = 2.10;
+  const double START_X_IN_CM = 0.76;
+  const double RADIUS_IN_MM = 0.6125;
+  const double INCREMENT_XZ_IN_CM = 0.50;
+  double ABSORPTION_PER_CM = parameters->GetMinVesselAbsorption();
 
-  std::uniform_int_distribution<int> randomNumVesselDistribution(
-              parameters->GetMinNumberOfVessels(), parameters->GetMaxNumberOfVessels());
-  std::uniform_real_distribution<double> randomBendingDistribution(
-              parameters->GetMinVesselBending(), parameters->GetMaxVesselBending());
-  std::uniform_real_distribution<double> randomAbsorptionDistribution(
-              parameters->GetMinVesselAbsorption(), parameters->GetMaxVesselAbsorption());
-  std::uniform_real_distribution<double> randomRadiusDistribution(
-              parameters->GetMinVesselRadiusInMillimeters(), parameters->GetMaxVesselRadiusInMillimeters());
-  std::uniform_real_distribution<double> randomScatteringDistribution(
-              parameters->GetMinVesselScattering(), parameters->GetMaxVesselScattering());
-  std::uniform_real_distribution<double> randomAnisotropyDistribution(
-              parameters->GetMinVesselAnisotropy(), parameters->GetMaxVesselAnisotropy());
-  std::uniform_int_distribution<int> borderTypeDistribution(0, 3);
-
-  int numberOfBloodVessels = randomNumVesselDistribution(randomNumberGenerator);
-
-  generatedVolume->AddIntProperty("numberOfVessels", numberOfBloodVessels);
+  generatedVolume->AddIntProperty("numberOfVessels", NUMER_OF_VESSELS);
   generatedVolume->AddIntProperty("bifurcationFrequency", parameters->GetVesselBifurcationFrequency());
 
-  MITK_INFO << "Simulating " << numberOfBloodVessels << " vessel structures";
-  for (int vesselNumber = 0; vesselNumber < numberOfBloodVessels; vesselNumber++)
+  for (unsigned int vesselNumber = 0; vesselNumber < NUMER_OF_VESSELS; vesselNumber++)
   {
     Vector::Pointer initialPosition = Vector::New();
     Vector::Pointer initialDirection = Vector::New();
 
-    double initialRadius = randomRadiusDistribution(randomNumberGenerator) / parameters->GetVoxelSpacingInCentimeters() / 10;
+    double initialRadius = RADIUS_IN_MM / parameters->GetVoxelSpacingInCentimeters() / 10;
     std::stringstream radiusString;
     radiusString << "vessel_" << vesselNumber + 1 << "_radius";
     generatedVolume->AddDoubleProperty(radiusString.str(), initialRadius);
 
-    double absorptionCoefficient = randomAbsorptionDistribution(randomNumberGenerator);
+    double absorptionCoefficient = ABSORPTION_PER_CM;
     std::stringstream absorptionString;
     absorptionString << "vessel_" << vesselNumber + 1 << "_absorption";
     generatedVolume->AddDoubleProperty(absorptionString.str(), absorptionCoefficient);
 
-    double bendingFactor = randomBendingDistribution(randomNumberGenerator);
+    double bendingFactor = 0;
     std::stringstream bendingString;
     bendingString << "vessel_" << vesselNumber + 1 << "_bendingFactor";
     generatedVolume->AddDoubleProperty(bendingString.str(), bendingFactor);
 
-    double vesselScattering = randomScatteringDistribution(randomNumberGenerator);
+    double vesselScattering = 15;
     std::stringstream scatteringString;
     scatteringString << "vessel_" << vesselNumber + 1 << "_scattering";
     generatedVolume->AddDoubleProperty(scatteringString.str(), vesselScattering);
 
-    double vesselAnisotropy = randomAnisotropyDistribution(randomNumberGenerator);
+    double vesselAnisotropy = 0.9;
     std::stringstream anisotropyString;
     anisotropyString << "vessel_" << vesselNumber + 1 << "_anisotropy";
     generatedVolume->AddDoubleProperty(anisotropyString.str(), vesselAnisotropy);
@@ -113,34 +103,14 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
     * plane they started from (within the limits of the
     * DIRECTION_VECTOR_INITIAL_VARIANCE)
     */
-    int borderType = borderTypeDistribution(randomNumberGenerator);
-    switch (borderType)
-    {
-    case 0:
-      initialPosition->Randomize(0, 0, initialRadius, parameters->GetYDim() - initialRadius, parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
-        parameters->GetMaxVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(), &randomNumberGenerator);
-      initialDirection->Randomize(1, 2, -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE,
-        -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, &randomNumberGenerator);
-      break;
-    case 1:
-      initialPosition->Randomize(parameters->GetXDim() - 1, parameters->GetXDim() - 1, initialRadius, parameters->GetYDim() - initialRadius, parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
-        parameters->GetMaxVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(), &randomNumberGenerator);
-      initialDirection->Randomize(-2, -1, -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE,
-        -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, &randomNumberGenerator);
-      break;
-    case 2:
-      initialPosition->Randomize(initialRadius, parameters->GetXDim() - initialRadius, 0, 0, parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
-        parameters->GetMaxVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(), &randomNumberGenerator);
-      initialDirection->Randomize(-DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, 1, 2,
-        -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, &randomNumberGenerator);
-      break;
-    case 3:
-      initialPosition->Randomize(initialRadius, parameters->GetXDim() - initialRadius, parameters->GetYDim() - 1, parameters->GetYDim() - 1, parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
-        parameters->GetMaxVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(), &randomNumberGenerator);
-      initialDirection->Randomize(-DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, -2, -1,
-        -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, &randomNumberGenerator);
-      break;
-    }
+
+    double zposition = (START_DEPTH_IN_CM + (vesselNumber*INCREMENT_XZ_IN_CM)) / parameters->GetVoxelSpacingInCentimeters();
+
+    double xposition = (START_X_IN_CM + (vesselNumber*INCREMENT_XZ_IN_CM)) / parameters->GetVoxelSpacingInCentimeters();
+
+
+    initialPosition->Randomize(xposition, xposition, 0, 0, zposition, zposition, &randomNumberGenerator);
+    initialDirection->Randomize(0, 0, 1, 1, 0, 0, &randomNumberGenerator);
 
     initialDirection->Normalize();
     MITK_INFO << initialPosition->GetElement(0) << " | " << initialPosition->GetElement(1) << " | " << initialPosition->GetElement(2);
@@ -179,10 +149,10 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
   return generatedVolume;
 }
 
-mitk::pa::InSilicoTissueGenerator::InSilicoTissueGenerator()
+mitk::pa::PhantomTissueGenerator::PhantomTissueGenerator()
 {
 }
 
-mitk::pa::InSilicoTissueGenerator::~InSilicoTissueGenerator()
+mitk::pa::PhantomTissueGenerator::~PhantomTissueGenerator()
 {
 }

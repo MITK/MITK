@@ -47,7 +47,8 @@ public:
     m_DefaultParameters->SetXDim(3);
     m_DefaultParameters->SetYDim(3);
     m_DefaultParameters->SetZDim(3);
-    m_InSilicoTissueVolume = mitk::pa::InSilicoTissueVolume::New(m_DefaultParameters);
+    auto rng = std::mt19937();
+    m_InSilicoTissueVolume = mitk::pa::InSilicoTissueVolume::New(m_DefaultParameters, &rng);
     m_ComposedVolume = mitk::pa::ComposedVolume::New(m_InSilicoTissueVolume);
     m_ComposedVolume->AddSlice(CreateValidationPair(-1, 1));
     m_ComposedVolume->AddSlice(CreateValidationPair(0, 3));
@@ -60,7 +61,7 @@ public:
     auto* data = new double[27];
     for (int i = 0; i < 27; ++i)
       data[i] = 0.5;
-    return mitk::pa::Volume::New(data, 3, 3, 3);
+    return mitk::pa::Volume::New(data, 3, 3, 3, 1);
   }
 
   void FillYSliceWith(mitk::pa::Volume::Pointer fluenceVolume, double ySlice, double value)
@@ -75,7 +76,7 @@ public:
   mitk::pa::FluenceYOffsetPair::Pointer CreateValidationPair(double yOffset, int start)
   {
     auto* data = new double[27];
-    mitk::pa::Volume::Pointer fluenceVolume = mitk::pa::Volume::New(data, 3, 3, 3);
+    mitk::pa::Volume::Pointer fluenceVolume = mitk::pa::Volume::New(data, 3, 3, 3, 1);
 
     FillYSliceWith(fluenceVolume, 0, start + 0);
     FillYSliceWith(fluenceVolume, 1, start + 1);
@@ -160,9 +161,9 @@ public:
     CPPUNIT_ASSERT(slicedFluence->GetXDim() == 3);
     CPPUNIT_ASSERT(slicedFluence->GetYDim() == 3);
     CPPUNIT_ASSERT(slicedFluence->GetZDim() == 3);
-    AssertYSliceValue(slicedFluence, 0, 1 * m_DefaultParameters->GetBackgroundAbsorption());
-    AssertYSliceValue(slicedFluence, 1, 4 * m_DefaultParameters->GetBackgroundAbsorption());
-    AssertYSliceValue(slicedFluence, 2, 8 * m_DefaultParameters->GetBackgroundAbsorption());
+    AssertYSliceValue(slicedFluence, 0, 1 * m_DefaultParameters->GetMinBackgroundAbsorption());
+    AssertYSliceValue(slicedFluence, 1, 4 * m_DefaultParameters->GetMinBackgroundAbsorption());
+    AssertYSliceValue(slicedFluence, 2, 8 * m_DefaultParameters->GetMinBackgroundAbsorption());
   }
 
   void testGetSlicedAbsorptionVolume()
@@ -173,9 +174,9 @@ public:
     CPPUNIT_ASSERT(slicedFluence->GetXDim() == 3);
     CPPUNIT_ASSERT(slicedFluence->GetYDim() == 3);
     CPPUNIT_ASSERT(slicedFluence->GetZDim() == 3);
-    AssertYSliceValue(slicedFluence, 0, m_DefaultParameters->GetBackgroundAbsorption());
-    AssertYSliceValue(slicedFluence, 1, m_DefaultParameters->GetBackgroundAbsorption());
-    AssertYSliceValue(slicedFluence, 2, m_DefaultParameters->GetBackgroundAbsorption());
+    AssertYSliceValue(slicedFluence, 0, m_DefaultParameters->GetMinBackgroundAbsorption());
+    AssertYSliceValue(slicedFluence, 1, m_DefaultParameters->GetMinBackgroundAbsorption());
+    AssertYSliceValue(slicedFluence, 2, m_DefaultParameters->GetMinBackgroundAbsorption());
   }
 
   void tearDown() override

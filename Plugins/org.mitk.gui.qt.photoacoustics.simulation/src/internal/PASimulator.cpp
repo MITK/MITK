@@ -45,7 +45,6 @@ void PASimulator::CreateQtPartControl(QWidget *parent)
 {
   m_Controls.setupUi(parent);
   connect(m_Controls.pushButtonShowRandomTissue, SIGNAL(clicked()), this, SLOT(DoImageProcessing()));
-  connect(m_Controls.checkBoxGauss, SIGNAL(stateChanged(int)), this, SLOT(ClickedGaussBox()));
   connect(m_Controls.pushButtonOpenPath, SIGNAL(clicked()), this, SLOT(OpenFolder()));
   connect(m_Controls.pushButtonOpenBinary, SIGNAL(clicked()), this, SLOT(OpenBinary()));
   connect(m_Controls.checkBoxGenerateBatch, SIGNAL(clicked()), this, SLOT(UpdateVisibilityOfBatchCreation()));
@@ -53,17 +52,19 @@ void PASimulator::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.checkBoxRngSeed, SIGNAL(clicked()), this, SLOT(ClickedCheckboxFixedSeed()));
   connect(m_Controls.checkBoxRandomizeParameters, SIGNAL(clicked()), this, SLOT(ClickedRandomizePhysicalParameters()));
 
-  m_Controls.spinboxSigma->setEnabled(false);
-  m_Controls.labelSigma->setEnabled(false);
-
-  std::string home_env = std::string(std::getenv("HOME"));
-  if (home_env.empty())
+  auto home = std::getenv("HOME");
+  std::string home_env = "";
+  if (home != nullptr)
   {
-    home_env = std::string(std::getenv("HOMEPATH"));
+    home_env = std::string(home);
   }
-  if (home_env.empty())
+  else
   {
-    home_env = "";
+    home = std::getenv("HOMEPATH");
+    if (home != nullptr)
+    {
+      home_env = std::string(home);
+    }
   }
   m_Controls.label_NrrdFilePath->setText(home_env.c_str());
 
@@ -72,7 +73,6 @@ void PASimulator::CreateQtPartControl(QWidget *parent)
   UpdateVisibilityOfBatchCreation();
   ClickedRandomizePhysicalParameters();
   ClickedCheckboxFixedSeed();
-  ClickedGaussBox();
 }
 
 void PASimulator::ClickedRandomizePhysicalParameters()
@@ -126,9 +126,7 @@ mitk::pa::TissueGeneratorParameters::Pointer PASimulator::GetParametersFromUIInp
   parameters->SetXDim(m_Controls.spinboxXDim->value());
   parameters->SetYDim(m_Controls.spinboxYDim->value());
   parameters->SetZDim(m_Controls.spinboxZDim->value());
-  parameters->SetDoVolumeSmoothing(m_Controls.checkBoxGauss->isChecked());
-  if (parameters->GetDoVolumeSmoothing())
-    parameters->SetVolumeSmoothingSigma(m_Controls.spinboxSigma->value());
+  parameters->SetDoPartialVolume(m_Controls.checkBoxPartialVolume->isChecked());
   parameters->SetRandomizePhysicalProperties(m_Controls.checkBoxRandomizeParameters->isChecked());
   parameters->SetRandomizePhysicalPropertiesPercentage(m_Controls.spinboxRandomizeParameters->value());
   parameters->SetVoxelSpacingInCentimeters(m_Controls.spinboxSpacing->value());
@@ -243,20 +241,6 @@ void PASimulator::DoImageProcessing()
       this->GetDataStorage()->Add(dataNode);
       mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
     }
-  }
-}
-
-void PASimulator::ClickedGaussBox()
-{
-  if (m_Controls.checkBoxGauss->isChecked())
-  {
-    m_Controls.spinboxSigma->setEnabled(true);
-    m_Controls.labelSigma->setEnabled(true);
-  }
-  else
-  {
-    m_Controls.spinboxSigma->setEnabled(false);
-    m_Controls.labelSigma->setEnabled(false);
   }
 }
 

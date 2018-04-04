@@ -111,7 +111,7 @@ namespace mitk
       *@brief convenience method to enable consistent access to the dat array
       *@return a 1d index from 3d pixel coordinates
       */
-      int GetIndex(unsigned int x, unsigned int y, unsigned int z);
+      long long GetIndex(unsigned int x, unsigned int y, unsigned int z);
 
       double GetSpacing();
 

@@ -138,7 +138,7 @@ double* mitk::pa::Volume::GetData() const
   return (double*)imgRead.GetData();
 }
 
-int mitk::pa::Volume::GetIndex(unsigned int x, unsigned int y, unsigned int z)
+long long mitk::pa::Volume::GetIndex(unsigned int x, unsigned int y, unsigned int z)
 {
 #ifdef _DEBUG
 
@@ -149,5 +149,5 @@ int mitk::pa::Volume::GetIndex(unsigned int x, unsigned int y, unsigned int z)
   }
 
 #endif
-  return z * m_XDim * m_YDim + x * m_YDim + y;
+  return ((long long)z) * m_XDim * m_YDim + ((long long)x) * m_YDim + ((long long)y);
 }

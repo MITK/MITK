@@ -55,9 +55,13 @@ TissueGeneratorParameters::Pointer CreatePhantom_08_03_18_Parameters()
   returnParameters->SetRandomizePhysicalProperties(false);
   returnParameters->SetSkinThicknessInMillimeters(0);
   returnParameters->SetUseRngSeed(false);
+  //returnParameters->SetVoxelSpacingInCentimeters(0.015);
+  //returnParameters->SetXDim(280);
+  //returnParameters->SetYDim(400);
+  //returnParameters->SetZDim(360);
   returnParameters->SetVoxelSpacingInCentimeters(0.0075);
   returnParameters->SetXDim(560);
-  returnParameters->SetYDim(800);
+  returnParameters->SetYDim(400);
   returnParameters->SetZDim(720);
   return returnParameters;
 }
@@ -159,58 +163,59 @@ InputParameters parseInput(int argc, char* argv[])
 int main(int argc, char * argv[])
 {
   auto input = parseInput(argc, argv);
-  double absorptions[10] = {1, 3, 5, 7, 9, 11, 13, 15, 17, 19};
+  double absorptions[4] = { 2, 4, 7, 10 };
   unsigned int iterationNumber = 0;
 
-  for(;iterationNumber<10; iterationNumber++)
+  for (; iterationNumber < 4; iterationNumber++)
   {
+    auto parameters = CreatePhantom_08_03_18_Parameters();
+    parameters->SetMinVesselAbsorption(absorptions[iterationNumber]);
+    parameters->SetMaxVesselAbsorption(absorptions[iterationNumber]);
+    MITK_INFO(input.verbose) << "Generating tissue..";
+    auto resultTissue = PhantomTissueGenerator::GeneratePhantomData(parameters);
+    MITK_INFO(input.verbose) << "Generating tissue..[Done]";
 
-      auto parameters = CreatePhantom_08_03_18_Parameters();
-      parameters->SetMinVesselAbsorption(absorptions[iterationNumber]);
-      parameters->SetMaxVesselAbsorption(absorptions[iterationNumber]);
-      MITK_INFO(input.verbose) << "Generating tissue..";
-      auto resultTissue = PhantomTissueGenerator::GeneratePhantomData(parameters);
-      MITK_INFO(input.verbose) << "Generating tissue..[Done]";
+    auto inputfolder = std::string(input.saveFolderPath + "input/");
+    auto outputfolder = std::string(input.saveFolderPath + "output/");
+    if (!itksys::SystemTools::FileIsDirectory(inputfolder))
+    {
+      itksys::SystemTools::MakeDirectory(inputfolder);
+    }
+    if (!itksys::SystemTools::FileIsDirectory(outputfolder))
+    {
+      itksys::SystemTools::MakeDirectory(outputfolder);
+    }
 
-      auto inputfolder = std::string(input.saveFolderPath + "input/");
-      auto outputfolder = std::string(input.saveFolderPath + "output/");
-      if (!itksys::SystemTools::FileIsDirectory(inputfolder))
-      {
-        itksys::SystemTools::MakeDirectory(inputfolder);
-      }
-      if (!itksys::SystemTools::FileIsDirectory(outputfolder))
-      {
-        itksys::SystemTools::MakeDirectory(outputfolder);
-      }
+    std::string savePath = input.saveFolderPath + "input/Phantom_" + input.identifyer +
+      "_" + std::to_string(iterationNumber) + ".nrrd";
+    mitk::IOUtil::Save(resultTissue->ConvertToMitkImage(), savePath);
+    std::string outputPath = input.saveFolderPath + "output/Phantom_" + input.identifyer +
+      "_" + std::to_string(iterationNumber) + "/";
 
-      std::string savePath = input.saveFolderPath + "input/Phantom_" + input.identifyer +
-              "_" + std::to_string(iterationNumber) + ".nrrd";
-      mitk::IOUtil::Save(resultTissue->ConvertToMitkImage(), savePath);
-      std::string outputPath = input.saveFolderPath + "output/Phantom_" + input.identifyer +
-              "_" + std::to_string(iterationNumber) + "/";
+    resultTissue = nullptr;
 
-      if (!itksys::SystemTools::FileIsDirectory(outputPath))
-      {
-        itksys::SystemTools::MakeDirectory(outputPath);
-      }
+    if (!itksys::SystemTools::FileIsDirectory(outputPath))
+    {
+      itksys::SystemTools::MakeDirectory(outputPath);
+    }
 
-      outputPath = outputPath + "Fluence_Phantom_" + input.identifyer + "_" + std::to_string(iterationNumber);
+    outputPath = outputPath + "Fluence_Phantom_" + input.identifyer + "_" + std::to_string(iterationNumber);
 
-      MITK_INFO(input.verbose) << "Simulating fluence..";
+    MITK_INFO(input.verbose) << "Simulating fluence..";
 
-      int result = -4;
-      if(!input.probePath.empty())
-          result = std::system(std::string(input.exePath + " -i " + savePath + " -o " +
-                                           (outputPath + ".nrrd") +
-                                           " -yo " + "0" + " -p " + input.probePath +
-                                           " -n 50000").c_str());
-      else
-          result = std::system(std::string(input.exePath + " -i " + savePath + " -o " +
-                                           (outputPath + ".nrrd") +
-                                           " -yo " + "0" + " -n 50000").c_str());
+    int result = -4;
 
-      MITK_INFO << result;
-      MITK_INFO(input.verbose) << "Simulating fluence..[Done]";
+    result = std::system(std::string(input.exePath + " -i " + savePath + " -o " +
+      (outputPath + "_low_res.nrrd") +
+      " -yo " + "0" + " -p " + input.probePath +
+      " -n 10000000").c_str());
+
+    result = std::system(std::string(input.exePath + " -i " + savePath + " -o " +
+      (outputPath + "_mid_res.nrrd") +
+      " -yo " + "0" + " -p " + input.probePath +
+      " -n 200000000").c_str());
+
+    MITK_INFO << result;
+    MITK_INFO(input.verbose) << "Simulating fluence..[Done]";
   }
-
 }

@@ -30,7 +30,7 @@ mitk::pa::InSilicoTissueVolume::InSilicoTissueVolume(TissueGeneratorParameters::
     unsigned int xDim = parameters->GetXDim();
     unsigned int yDim = parameters->GetYDim();
     unsigned int zDim = parameters->GetZDim();
-    m_TDim = 4;
+    m_TDim = 3;
     unsigned int size = xDim * yDim * zDim;
     auto* absorptionArray = new double[size];
     auto* scatteringArray = new double[size];
@@ -238,21 +238,20 @@ void mitk::pa::InSilicoTissueVolume::FinalizeVolume()
   unsigned int zDim = m_TissueParameters->GetZDim();
 
   std::uniform_real_distribution<double> randomBackgroundAbsorptionDistribution(
-              m_TissueParameters->GetMinBackgroundAbsorption(), m_TissueParameters->GetMaxBackgroundAbsorption());
-
+    m_TissueParameters->GetMinBackgroundAbsorption(), m_TissueParameters->GetMaxBackgroundAbsorption());
 
   for (unsigned int z = 0; z < zDim; z++)
   {
-      for (unsigned int y = 0; y < yDim; y++)
+    for (unsigned int y = 0; y < yDim; y++)
+    {
+      for (unsigned int x = 0; x < xDim; x++)
       {
-          for (unsigned int x = 0; x < xDim; x++)
-          {
-              if(fabs(m_AbsorptionVolume->GetData(x, y, z)-m_InitialBackgroundAbsorption) < mitk::eps)
-              {
-                  m_AbsorptionVolume->SetData(randomBackgroundAbsorptionDistribution(*m_Rng), x, y, z);
-              }
-          }
+        if (fabs(m_AbsorptionVolume->GetData(x, y, z) - m_InitialBackgroundAbsorption) < mitk::eps)
+        {
+          m_AbsorptionVolume->SetData(randomBackgroundAbsorptionDistribution(*m_Rng), x, y, z);
+        }
       }
+    }
   }
 }
 

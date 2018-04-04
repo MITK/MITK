@@ -59,7 +59,7 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::PhantomTissueGenerator::Genera
   const unsigned int NUMER_OF_VESSELS = 5;
   const double START_DEPTH_IN_CM = 2.10;
   const double START_X_IN_CM = 0.76;
-  const double RADIUS_IN_MM = 0.6125;
+  const double RADIUS_IN_MM = 0.5;
   const double INCREMENT_XZ_IN_CM = 0.50;
   double ABSORPTION_PER_CM = parameters->GetMinVesselAbsorption();
 
@@ -107,7 +107,6 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::PhantomTissueGenerator::Genera
     double zposition = (START_DEPTH_IN_CM + (vesselNumber*INCREMENT_XZ_IN_CM)) / parameters->GetVoxelSpacingInCentimeters();
 
     double xposition = (START_X_IN_CM + (vesselNumber*INCREMENT_XZ_IN_CM)) / parameters->GetVoxelSpacingInCentimeters();
-
 
     initialPosition->Randomize(xposition, xposition, 0, 0, zposition, zposition, &randomNumberGenerator);
     initialDirection->Randomize(0, 0, 1, 1, 0, 0, &randomNumberGenerator);

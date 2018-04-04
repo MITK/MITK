@@ -21,9 +21,49 @@
 
 #include "mitkInteractionEventObserver.h"
 
+namespace {
+  std::string getNameButton(const unsigned int& button)
+  {
+    std::string buttonName;
+    switch (button) {
+    case 1:
+      buttonName = "Left";
+      break;
+
+    case 2:
+      buttonName = "Right";
+      break;
+
+    case 4:
+      buttonName = "Middle";
+      break;
+
+    default:
+      buttonName = "";
+    }
+    return buttonName;
+  }
+
+  void updateMouseModes(mitk::MouseModeSwitcher::MouseModeMap& activeMouseModes, mitk::MouseModeSwitcher::MouseMode mode, const unsigned int& button)
+  {
+    activeMouseModes[mode].insert(button);
+    for (auto &activeMode : activeMouseModes) {
+      auto &buttonSet = activeMode.second;
+      if (activeMode.first != mode) {
+        buttonSet.erase(button);
+      }
+    }
+  }
+}
+
 mitk::MouseModeSwitcher::MouseModeSwitcher(const std::string& rendererName) :
     m_ActiveInteractionScheme(MITK), m_ActiveMouseMode(MousePointer)
 {
+  m_ActiveMouseModes.clear();
+  m_ActiveMouseModes[mitk::MouseModeSwitcher::CrossHair] = { 0x00000001 }; // Qt::LeftButton
+  m_ActiveMouseModes[mitk::MouseModeSwitcher::Zoom] = { 0x00000002 }; // Qt::RightButton
+  m_ActiveMouseModes[mitk::MouseModeSwitcher::Pan] = { 0x00000004 }; // Qt::MiddleButton
+
   this->AddRenderer(rendererName);
   this->SetInteractionScheme(m_ActiveInteractionScheme);
 }
@@ -106,7 +146,7 @@ void mitk::MouseModeSwitcher::SetSelectionMode(bool selection)
   }
 }
 
-void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode, const std::string& button)
+void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode, const unsigned int& button)
 {
   if (m_ActiveInteractionScheme != MITK)
     return;
@@ -152,7 +192,8 @@ void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode, const std::string&
   } // end switch (mode)
 
   if (eventConfig != "DisplayConfigMITK") {
-    eventConfig = eventConfig + button;
+
+    eventConfig = eventConfig + getNameButton(button);
   }
   eventConfig = eventConfig + ".xml";
 
@@ -163,6 +204,9 @@ void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode, const std::string&
   }
 
   m_ActiveMouseMode = mode;
+
+  updateMouseModes(m_ActiveMouseModes, mode, button);
+
   this->InvokeEvent(MouseModeChangedEvent());
 }
 
@@ -171,3 +215,7 @@ mitk::MouseModeSwitcher::MouseMode mitk::MouseModeSwitcher::GetCurrentMouseMode(
   return m_ActiveMouseMode;
 }
 
+mitk::MouseModeSwitcher::MouseModeMap mitk::MouseModeSwitcher::GetActiveMouseModes()
+{
+  return m_ActiveMouseModes;
+}

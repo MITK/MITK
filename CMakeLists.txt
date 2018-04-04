@@ -186,6 +186,7 @@ endmacro()
 # -----------------------------------------
 # General build options
 env_option(MITK_USE_TOF_KINECTV2 "Enable support for Kinect V2 camera" OFF)
+env_option(MITK_PDB "Enable debug information for windows" OFF)
 
 option(BUILD_SHARED_LIBS "Build MITK with shared libraries" ON)
 option(WITH_COVERAGE "Enable/Disable coverage" OFF)
@@ -328,6 +329,15 @@ mitkFunctionEnableBuildConfiguration()
 
 mitkFunctionCreateWhitelistPaths(MITK)
 mitkFunctionFindWhitelists(MITK)
+
+# ----------------------------------------
+# Debug information for Windows
+if(${MITK_PDB} AND WIN32)
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELWITHDEBUGINFO} /Zi")
+  set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBUGINFO} /DEBUG /OPT:REF")
+  set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBUGINFO} /DEBUG /OPT:REF")
+  set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBUGINFO} /DEBUG /OPT:REF")
+endif()
 
 # -----------------------------------------
 # Custom dependency logic

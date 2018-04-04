@@ -44,7 +44,7 @@ mitk::pa::Volume::Pointer mitk::pa::IOUtil::LoadNrrd(std::string filename, doubl
   if (filename.empty() || filename == "")
     return nullptr;
 
-  mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage(filename);
+  mitk::Image::Pointer inputImage = mitk::IOUtil::Load<mitk::Image>(filename);
 
   if (inputImage.IsNull())
     return nullptr;
@@ -222,7 +222,7 @@ mitk::pa::FluenceYOffsetPair::Pointer mitk::pa::IOUtil::LoadFluenceSimulation(st
 {
   MITK_INFO << "Adding slice...";
 
-  mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage(fluenceSimulation);
+  mitk::Image::Pointer inputImage = mitk::IOUtil::Load<mitk::Image>(fluenceSimulation);
 
   auto yOffsetProperty = inputImage->GetProperty("y-offset");
 

@@ -27,6 +27,7 @@ mitk::pa::TissueGeneratorParameters::TissueGeneratorParameters()
   m_RngSeed = 1337L;
   m_RandomizePhysicalProperties = false;
   m_RandomizePhysicalPropertiesPercentage = 0;
+  m_ForceVesselsMoveAlongYDirection = false;
 
   m_MinBackgroundAbsorption = 0.1;
   m_MaxBackgroundAbsorption = 0.1;

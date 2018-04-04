@@ -166,7 +166,7 @@ public:
     try
     {
       if (verbose) std::cout << "Loading input image..." << std::endl;
-      m_inputImage = mitk::IOUtil::LoadImage(inputFilename);
+      m_inputImage = mitk::IOUtil::Load<mitk::Image>(inputFilename);
       if (verbose) std::cout << "Loading input image... [Done]" << std::endl;
     }
     catch (...)

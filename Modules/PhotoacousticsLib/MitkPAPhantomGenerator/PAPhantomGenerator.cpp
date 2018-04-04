@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include <chrono>
 #include <mitkPATissueGeneratorParameters.h>
+#include <mitkPATissueGenerator.h>
 #include <mitkPAPhantomTissueGenerator.h>
 #include <mitkIOUtil.h>
 #include <mitkCommandLineParser.h>
@@ -27,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace mitk::pa;
 
-TissueGeneratorParameters::Pointer CreatePhantom_08_03_18_Parameters()
+TissueGeneratorParameters::Pointer CreatePhantom_04_04_18_Parameters()
 {
   auto returnParameters = TissueGeneratorParameters::New();
   returnParameters->SetAirThicknessInMillimeters(12);
@@ -37,32 +38,33 @@ TissueGeneratorParameters::Pointer CreatePhantom_08_03_18_Parameters()
   returnParameters->SetBackgroundScattering(15);
   returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateNewPositionInStraightLine);
   returnParameters->SetDoPartialVolume(false);
-  returnParameters->SetMinNumberOfVessels(5);
-  returnParameters->SetMaxNumberOfVessels(5);
-  returnParameters->SetMinVesselAbsorption(10);
+  returnParameters->SetMinNumberOfVessels(1);
+  returnParameters->SetMaxNumberOfVessels(8);
+  returnParameters->SetMinVesselAbsorption(1);
   returnParameters->SetMaxVesselAbsorption(10);
   returnParameters->SetMinVesselAnisotropy(0.9);
   returnParameters->SetMaxVesselAnisotropy(0.9);
   returnParameters->SetMinVesselBending(0.1);
   returnParameters->SetMaxVesselBending(0.3);
-  returnParameters->SetMinVesselRadiusInMillimeters(0.5);
+  returnParameters->SetMinVesselRadiusInMillimeters(0.25);
   returnParameters->SetMaxVesselRadiusInMillimeters(4);
   returnParameters->SetMinVesselScattering(15);
   returnParameters->SetMaxVesselScattering(15);
-  returnParameters->SetMinVesselZOrigin(2.2);
+  returnParameters->SetMinVesselZOrigin(1.6);
   returnParameters->SetMaxVesselZOrigin(4);
   returnParameters->SetVesselBifurcationFrequency(5000);
   returnParameters->SetRandomizePhysicalProperties(false);
   returnParameters->SetSkinThicknessInMillimeters(0);
   returnParameters->SetUseRngSeed(false);
-  //returnParameters->SetVoxelSpacingInCentimeters(0.015);
-  //returnParameters->SetXDim(280);
+  returnParameters->SetVoxelSpacingInCentimeters(0.015);
+  returnParameters->SetXDim(280);
+  returnParameters->SetYDim(200);
+  returnParameters->SetZDim(360);
+  returnParameters->SetForceVesselsMoveAlongYDirection(true);
+  //returnParameters->SetVoxelSpacingInCentimeters(0.0075);
+  //returnParameters->SetXDim(560);
   //returnParameters->SetYDim(400);
-  //returnParameters->SetZDim(360);
-  returnParameters->SetVoxelSpacingInCentimeters(0.0075);
-  returnParameters->SetXDim(560);
-  returnParameters->SetYDim(400);
-  returnParameters->SetZDim(720);
+  //returnParameters->SetZDim(720);
   return returnParameters;
 }
 
@@ -163,59 +165,46 @@ InputParameters parseInput(int argc, char* argv[])
 int main(int argc, char * argv[])
 {
   auto input = parseInput(argc, argv);
-  double absorptions[4] = { 2, 4, 7, 10 };
-  unsigned int iterationNumber = 0;
+  auto parameters = CreatePhantom_04_04_18_Parameters();
+  MITK_INFO(input.verbose) << "Generating tissue..";
+  auto resultTissue = InSilicoTissueGenerator::GenerateInSilicoData(parameters);
+  MITK_INFO(input.verbose) << "Generating tissue..[Done]";
 
-  for (; iterationNumber < 4; iterationNumber++)
-  {
-    auto parameters = CreatePhantom_08_03_18_Parameters();
-    parameters->SetMinVesselAbsorption(absorptions[iterationNumber]);
-    parameters->SetMaxVesselAbsorption(absorptions[iterationNumber]);
-    MITK_INFO(input.verbose) << "Generating tissue..";
-    auto resultTissue = PhantomTissueGenerator::GeneratePhantomData(parameters);
-    MITK_INFO(input.verbose) << "Generating tissue..[Done]";
-
-    auto inputfolder = std::string(input.saveFolderPath + "input/");
-    auto outputfolder = std::string(input.saveFolderPath + "output/");
-    if (!itksys::SystemTools::FileIsDirectory(inputfolder))
-    {
-      itksys::SystemTools::MakeDirectory(inputfolder);
-    }
-    if (!itksys::SystemTools::FileIsDirectory(outputfolder))
-    {
-      itksys::SystemTools::MakeDirectory(outputfolder);
-    }
-
-    std::string savePath = input.saveFolderPath + "input/Phantom_" + input.identifyer +
-      "_" + std::to_string(iterationNumber) + ".nrrd";
-    mitk::IOUtil::Save(resultTissue->ConvertToMitkImage(), savePath);
-    std::string outputPath = input.saveFolderPath + "output/Phantom_" + input.identifyer +
-      "_" + std::to_string(iterationNumber) + "/";
-
-    resultTissue = nullptr;
-
-    if (!itksys::SystemTools::FileIsDirectory(outputPath))
-    {
-      itksys::SystemTools::MakeDirectory(outputPath);
-    }
-
-    outputPath = outputPath + "Fluence_Phantom_" + input.identifyer + "_" + std::to_string(iterationNumber);
-
-    MITK_INFO(input.verbose) << "Simulating fluence..";
-
-    int result = -4;
-
-    result = std::system(std::string(input.exePath + " -i " + savePath + " -o " +
-      (outputPath + "_low_res.nrrd") +
-      " -yo " + "0" + " -p " + input.probePath +
-      " -n 10000000").c_str());
-
-    result = std::system(std::string(input.exePath + " -i " + savePath + " -o " +
-      (outputPath + "_mid_res.nrrd") +
-      " -yo " + "0" + " -p " + input.probePath +
-      " -n 200000000").c_str());
-
-    MITK_INFO << result;
-    MITK_INFO(input.verbose) << "Simulating fluence..[Done]";
+  auto inputfolder = std::string(input.saveFolderPath + "input/");
+  auto outputfolder = std::string(input.saveFolderPath + "output/");
+  if (!itksys::SystemTools::FileIsDirectory(inputfolder))
+   {
+    itksys::SystemTools::MakeDirectory(inputfolder);
   }
+  if (!itksys::SystemTools::FileIsDirectory(outputfolder))
+  {
+    itksys::SystemTools::MakeDirectory(outputfolder);
+  }
+
+  std::string savePath = input.saveFolderPath + "input/Phantom_" + input.identifyer +
+    ".nrrd";
+  mitk::IOUtil::Save(resultTissue->ConvertToMitkImage(), savePath);
+  std::string outputPath = input.saveFolderPath + "output/Phantom_" + input.identifyer +
+    "/";
+
+  resultTissue = nullptr;
+
+  if (!itksys::SystemTools::FileIsDirectory(outputPath))
+  {
+    itksys::SystemTools::MakeDirectory(outputPath);
+  }
+
+  outputPath = outputPath + "Fluence_Phantom_" + input.identifyer;
+
+  MITK_INFO(input.verbose) << "Simulating fluence..";
+
+  int result = -4;
+
+  result = std::system(std::string(input.exePath + " -i " + savePath + " -o " +
+    (outputPath + ".nrrd") +
+    " -yo " + "0" + " -p " + input.probePath +
+    " -n 10000000").c_str());
+
+  MITK_INFO << result;
+  MITK_INFO(input.verbose) << "Simulating fluence..[Done]";
 }

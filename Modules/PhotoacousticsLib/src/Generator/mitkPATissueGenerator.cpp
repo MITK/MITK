@@ -54,7 +54,10 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
 
   auto generatedVolume = mitk::pa::InSilicoTissueVolume::New(parameters, &randomNumberGenerator);
 
-  const double DIRECTION_VECTOR_INITIAL_VARIANCE = 0.2;
+  double DIRECTION_VECTOR_INITIAL_VARIANCE = 0.2;
+
+  if(parameters->GetForceVesselsMoveAlongYDirection())
+      DIRECTION_VECTOR_INITIAL_VARIANCE = 0;
 
   std::uniform_int_distribution<int> randomNumVesselDistribution(
               parameters->GetMinNumberOfVessels(), parameters->GetMaxNumberOfVessels());
@@ -114,28 +117,36 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
     * DIRECTION_VECTOR_INITIAL_VARIANCE)
     */
     int borderType = borderTypeDistribution(randomNumberGenerator);
+
+    if(parameters->GetForceVesselsMoveAlongYDirection())
+        borderType = 2;
+
     switch (borderType)
     {
     case 0:
-      initialPosition->Randomize(0, 0, initialRadius, parameters->GetYDim() - initialRadius, parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
+      initialPosition->Randomize(0, 0, initialRadius, parameters->GetYDim() - initialRadius,
+                                 parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
         parameters->GetMaxVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(), &randomNumberGenerator);
       initialDirection->Randomize(1, 2, -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE,
         -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, &randomNumberGenerator);
       break;
     case 1:
-      initialPosition->Randomize(parameters->GetXDim() - 1, parameters->GetXDim() - 1, initialRadius, parameters->GetYDim() - initialRadius, parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
+      initialPosition->Randomize(parameters->GetXDim() - 1, parameters->GetXDim() - 1, initialRadius, parameters->GetYDim() - initialRadius,
+                                 parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
         parameters->GetMaxVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(), &randomNumberGenerator);
       initialDirection->Randomize(-2, -1, -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE,
         -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, &randomNumberGenerator);
       break;
     case 2:
-      initialPosition->Randomize(initialRadius, parameters->GetXDim() - initialRadius, 0, 0, parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
+      initialPosition->Randomize(initialRadius, parameters->GetXDim() - initialRadius, 0, 0,
+                                 parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
         parameters->GetMaxVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(), &randomNumberGenerator);
       initialDirection->Randomize(-DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, 1, 2,
         -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, &randomNumberGenerator);
       break;
     case 3:
-      initialPosition->Randomize(initialRadius, parameters->GetXDim() - initialRadius, parameters->GetYDim() - 1, parameters->GetYDim() - 1, parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
+      initialPosition->Randomize(initialRadius, parameters->GetXDim() - initialRadius, parameters->GetYDim() - 1, parameters->GetYDim() - 1,
+                                 parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
         parameters->GetMaxVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(), &randomNumberGenerator);
       initialDirection->Randomize(-DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, -2, -1,
         -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, &randomNumberGenerator);

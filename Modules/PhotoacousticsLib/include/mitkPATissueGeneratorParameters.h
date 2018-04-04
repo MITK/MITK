@@ -47,6 +47,7 @@ namespace mitk {
         itkGetMacro(RngSeed, long)
         itkGetMacro(RandomizePhysicalProperties, bool)
         itkGetMacro(RandomizePhysicalPropertiesPercentage, double)
+        itkGetMacro(ForceVesselsMoveAlongYDirection, bool)
 
         itkGetMacro(MinBackgroundAbsorption, double)
         itkGetMacro(MaxBackgroundAbsorption, double)
@@ -102,6 +103,7 @@ namespace mitk {
         itkSetMacro(RngSeed, long)
         itkSetMacro(RandomizePhysicalProperties, bool)
         itkSetMacro(RandomizePhysicalPropertiesPercentage, double)
+        itkSetMacro(ForceVesselsMoveAlongYDirection, bool)
 
         itkSetMacro(MinBackgroundAbsorption, double)
         itkSetMacro(MaxBackgroundAbsorption, double)
@@ -150,7 +152,7 @@ namespace mitk {
 
     protected:
       TissueGeneratorParameters();
-      ~TissueGeneratorParameters() override;
+      ~TissueGeneratorParameters();
 
     private:
 
@@ -163,6 +165,7 @@ namespace mitk {
       long m_RngSeed;
       bool m_RandomizePhysicalProperties;
       double m_RandomizePhysicalPropertiesPercentage;
+      bool m_ForceVesselsMoveAlongYDirection;
 
       double m_MinBackgroundAbsorption;
       double m_MaxBackgroundAbsorption;

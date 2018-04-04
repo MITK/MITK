@@ -182,7 +182,7 @@ void QmitkFunctionalityCoordinator::ActivateStandaloneFunctionality( berry::IWor
     MITK_INFO << "setting active flag";
     // call activated on this functionality
     functionality->SetActivated(true);
-    functionality->Activated();
+    //functionality->Activated();
   }
   else if (dynamic_cast<mitk::IZombieViewPart*>(partRef->GetPart(false).GetPointer()) &&
            m_StandaloneFuntionality != partRef)

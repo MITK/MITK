@@ -167,7 +167,8 @@ mitk::pa::TissueGeneratorParameters::Pointer PASimulator::GetParametersFromUIInp
   parameters->SetMaxVesselZOrigin(m_Controls.spinboxMaxSpawnDepth->value());
 
   // Background tissue settings
-  parameters->SetBackgroundAbsorption(m_Controls.spinboxBackgroundAbsorption->value());
+  parameters->SetMinBackgroundAbsorption(m_Controls.spinboxBackgroundAbsorption->value());
+  parameters->SetMaxBackgroundAbsorption(m_Controls.spinboxBackgroundAbsorption->value());
   parameters->SetBackgroundScattering(m_Controls.spinboxBackgroundScattering->value());
   parameters->SetBackgroundAnisotropy(m_Controls.spinboxBackgroundAnisotropy->value());
 

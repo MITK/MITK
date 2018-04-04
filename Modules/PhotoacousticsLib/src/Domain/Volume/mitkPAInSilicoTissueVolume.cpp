@@ -30,12 +30,12 @@ mitk::pa::InSilicoTissueVolume::InSilicoTissueVolume(TissueGeneratorParameters::
     unsigned int xDim = parameters->GetXDim();
     unsigned int yDim = parameters->GetYDim();
     unsigned int zDim = parameters->GetZDim();
-    m_TDim = 4;
+    m_TDim = 3;
     unsigned int size = xDim * yDim * zDim;
     double* absorptionArray = new double[size];
     double* scatteringArray = new double[size];
     double* anisotropyArray = new double[size];
-    double* segmentationArray = new double[size];
+    //double* segmentationArray = new double[size];
 
     m_InitialBackgroundAbsorption = (parameters->GetMinBackgroundAbsorption() + parameters->GetMaxBackgroundAbsorption()) / 2;
     m_Rng = rng;
@@ -45,13 +45,13 @@ mitk::pa::InSilicoTissueVolume::InSilicoTissueVolume(TissueGeneratorParameters::
       absorptionArray[index] = m_InitialBackgroundAbsorption;
       scatteringArray[index] = parameters->GetBackgroundScattering();
       anisotropyArray[index] = parameters->GetBackgroundAnisotropy();
-      segmentationArray[index] = SegmentationType::BACKGROUND;
+      //segmentationArray[index] = SegmentationType::BACKGROUND;
     }
 
     m_AbsorptionVolume = Volume::New(absorptionArray, xDim, yDim, zDim, parameters->GetVoxelSpacingInCentimeters());
     m_ScatteringVolume = Volume::New(scatteringArray, xDim, yDim, zDim, parameters->GetVoxelSpacingInCentimeters());
     m_AnisotropyVolume = Volume::New(anisotropyArray, xDim, yDim, zDim, parameters->GetVoxelSpacingInCentimeters());
-    m_SegmentationVolume = Volume::New(segmentationArray, xDim, yDim, zDim, parameters->GetVoxelSpacingInCentimeters());
+    //m_SegmentationVolume = Volume::New(segmentationArray, xDim, yDim, zDim, parameters->GetVoxelSpacingInCentimeters());
   }
 
   m_TissueParameters = parameters;
@@ -96,7 +96,7 @@ mitk::pa::InSilicoTissueVolume::InSilicoTissueVolume(
   m_AbsorptionVolume = absorptionVolume;
   m_ScatteringVolume = scatteringVolume;
   m_AnisotropyVolume = anisotropyVolume;
-  m_SegmentationVolume = segmentationVolume;
+  //m_SegmentationVolume = segmentationVolume;
   m_TissueParameters = tissueParameters;
   m_PropertyList = propertyList;
   if (m_SegmentationVolume.IsNotNull())
@@ -115,7 +115,7 @@ void mitk::pa::InSilicoTissueVolume::SetSpacing(double spacing)
   m_AbsorptionVolume->SetSpacing(spacing);
   m_ScatteringVolume->SetSpacing(spacing);
   m_AnisotropyVolume->SetSpacing(spacing);
-  m_SegmentationVolume->SetSpacing(spacing);
+  //m_SegmentationVolume->SetSpacing(spacing);
 }
 
 void mitk::pa::InSilicoTissueVolume::AddDoubleProperty(std::string label, double value)
@@ -151,7 +151,7 @@ mitk::Image::Pointer mitk::pa::InSilicoTissueVolume::ConvertToMitkImage()
   resultImage->SetImportVolume(m_AbsorptionVolume->GetData(), 0, 0, mitk::Image::CopyMemory);
   resultImage->SetImportVolume(m_ScatteringVolume->GetData(), 1, 0, mitk::Image::CopyMemory);
   resultImage->SetImportVolume(m_AnisotropyVolume->GetData(), 2, 0, mitk::Image::CopyMemory);
-  resultImage->SetImportVolume(m_SegmentationVolume->GetData(), 3, 0, mitk::Image::CopyMemory);
+  //resultImage->SetImportVolume(m_SegmentationVolume->GetData(), 3, 0, mitk::Image::CopyMemory);
 
   resultImage->SetPropertyList(m_PropertyList);
 
@@ -200,7 +200,7 @@ void mitk::pa::InSilicoTissueVolume::SetVolumeValues(int x, int y, int z, double
     m_AbsorptionVolume->SetData(absorption, x, y, z);
     m_ScatteringVolume->SetData(scattering, x, y, z);
     m_AnisotropyVolume->SetData(anisotropy, x, y, z);
-    m_SegmentationVolume->SetData(segmentType, x, y, z);
+    //m_SegmentationVolume->SetData(segmentType, x, y, z);
   }
 }
 
@@ -238,21 +238,20 @@ void mitk::pa::InSilicoTissueVolume::FinalizeVolume()
   unsigned int zDim = m_TissueParameters->GetZDim();
 
   std::uniform_real_distribution<double> randomBackgroundAbsorptionDistribution(
-              m_TissueParameters->GetMinBackgroundAbsorption(), m_TissueParameters->GetMaxBackgroundAbsorption());
-
+    m_TissueParameters->GetMinBackgroundAbsorption(), m_TissueParameters->GetMaxBackgroundAbsorption());
 
   for (unsigned int z = 0; z < zDim; z++)
   {
-      for (unsigned int y = 0; y < yDim; y++)
+    for (unsigned int y = 0; y < yDim; y++)
+    {
+      for (unsigned int x = 0; x < xDim; x++)
       {
-          for (unsigned int x = 0; x < xDim; x++)
-          {
-              if(fabs(m_AbsorptionVolume->GetData(x, y, z)-m_InitialBackgroundAbsorption) < mitk::eps)
-              {
-                  m_AbsorptionVolume->SetData(randomBackgroundAbsorptionDistribution(*m_Rng), x, y, z);
-              }
-          }
+        if (fabs(m_AbsorptionVolume->GetData(x, y, z) - m_InitialBackgroundAbsorption) < mitk::eps)
+        {
+          m_AbsorptionVolume->SetData(randomBackgroundAbsorptionDistribution(*m_Rng), x, y, z);
+        }
       }
+    }
   }
 }
 
@@ -309,7 +308,7 @@ void mitk::pa::InSilicoTissueVolume::FillZLayer(int x, int y, double startIdx, d
         if (endIdx - z > 0.5)
         {
           //Only put the segmentation label if more than half of the partial volume is the wanted tissue type
-          m_SegmentationVolume->SetData(segmentationType, x, y, z);
+          //m_SegmentationVolume->SetData(segmentationType, x, y, z);
         }
       }
       else
@@ -317,7 +316,7 @@ void mitk::pa::InSilicoTissueVolume::FillZLayer(int x, int y, double startIdx, d
         m_AbsorptionVolume->SetData(absorption, x, y, z);
         m_ScatteringVolume->SetData(scattering, x, y, z);
         m_AnisotropyVolume->SetData(anisotropy, x, y, z);
-        m_SegmentationVolume->SetData(segmentationType, x, y, z);
+        //m_SegmentationVolume->SetData(segmentationType, x, y, z);
       }
     }
   }
@@ -384,5 +383,5 @@ void mitk::pa::InSilicoTissueVolume::SetAnisotropyVolume(Volume::Pointer volume)
 
 void mitk::pa::InSilicoTissueVolume::SetSegmentationVolume(Volume::Pointer volume)
 {
-  m_SegmentationVolume = volume;
+  //m_SegmentationVolume = volume;
 }

@@ -708,7 +708,7 @@ mitk::DataNode::Pointer QmitkUSNavigationStepPlacementPlanning::CalculatePlannin
   if (m_PlannedTargetNodes.size() > 1)
   {
     double meanAnglesDifference = m_PlacementQualityCalculator->GetMeanAngleDifference();
-    ui->angleDifferenceValue->setText(QString::number(meanAnglesDifference, 103, 2) + QString::fromLatin1(" °"));
+    ui->angleDifferenceValue->setText(QString::number(meanAnglesDifference, 103, 2) + QString::fromLatin1(" Â°"));
 
     planningQualityResult->SetFloatProperty("USNavigation::MeanAngleDifference", meanAnglesDifference);
     planningQualityResult->SetProperty(

@@ -439,7 +439,6 @@ void QmitkUSNavigationStepMarkerIntervention::OnTargetLeft()
   vtkSphere->SetCenter(0, 0, 0);
   vtkSphere->Update();
   zone->SetVtkPolyData(vtkSphere->GetOutput());
-  vtkSphere->Delete();
 
   // set vtk sphere and origin to data node
   node->SetData(zone);

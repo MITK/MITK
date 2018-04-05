@@ -733,7 +733,6 @@ itk::SmartPointer<mitk::Surface> QmitkUSNavigationStepPlacementPlanning::CreateS
   vtkSphere->SetCenter(0, 0, 0);
   vtkSphere->Update();
   surface->SetVtkPolyData(vtkSphere->GetOutput());
-  //vtkSphere->Delete();
 
   return surface;
 }

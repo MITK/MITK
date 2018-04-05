@@ -148,7 +148,6 @@ void QmitkUSNavigationMarkerPlacement::OnChangeAblationZone(int id, int newSize)
 
   mitk::Surface::Pointer zoneSurface = dynamic_cast<mitk::Surface *>(m_AblationZonesVector.at(id)->GetData());
   zoneSurface->SetVtkPolyData(vtkSphere->GetOutput());
-  //vtkSphere->Delete();
 }
 
 void QmitkUSNavigationMarkerPlacement::OnAddAblationZone(int size)
@@ -171,7 +170,6 @@ void QmitkUSNavigationMarkerPlacement::OnAddAblationZone(int size)
   vtkSphere->SetThetaResolution(20);
   vtkSphere->Update();
   zone->SetVtkPolyData(vtkSphere->GetOutput());
-  //vtkSphere->Delete();
 
   // set vtk sphere and origin to data node (origin must be set
   // again, because of the new sphere set as data)

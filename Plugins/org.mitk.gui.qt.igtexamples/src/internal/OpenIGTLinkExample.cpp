@@ -115,7 +115,6 @@ void OpenIGTLinkExample::CreatePipeline()
      vtkSphere->SetCenter(0.0, 0.0, 0.0);
      vtkSphere->Update();
      mySphere->SetVtkPolyData(vtkSphere->GetOutput());
-     vtkSphere->Delete();
      newNode->SetData(mySphere);
 
      m_VisFilter->SetRepresentationObject(i, mySphere);

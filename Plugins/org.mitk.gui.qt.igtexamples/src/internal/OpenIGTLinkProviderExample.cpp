@@ -140,12 +140,11 @@ void OpenIGTLinkProviderExample::CreatePipeline()
 
     //create small sphere and use it as surface
     mitk::Surface::Pointer mySphere = mitk::Surface::New();
-    vtkSphereSource *vtkData = vtkSphereSource::New();
+    vtkSmartPointer<vtkSphereSource> vtkData = vtkSmartPointer<vtkSphereSource>::New();
     vtkData->SetRadius(2.0f);
     vtkData->SetCenter(0.0, 0.0, 0.0);
     vtkData->Update();
     mySphere->SetVtkPolyData(vtkData->GetOutput());
-   // vtkData->Delete();
     newNode->SetData(mySphere);
 
     this->GetDataStorage()->Add(newNode);

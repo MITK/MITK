@@ -28,7 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 
 //VTK
-#include "vtkSmartPointer.h"
+#include <vtkSmartPointer.h>
+
 const std::string OpenIGTLinkPlugin::VIEW_ID = "org.mitk.views.openigtlinkplugin";
 
 void OpenIGTLinkPlugin::SetFocus()
@@ -153,7 +154,6 @@ void OpenIGTLinkPlugin::ReceivingButtonClicked()
       vtkSphere->Update();
       mySphere->SetProperty("color", mitk::ColorProperty::New(1, 0, 0));
       mySphere->SetVtkPolyData(vtkSphere->GetOutput());
-      //vtkSphere->Delete();
       newNode->SetData(mySphere);
 
       this->GetDataStorage()->Add(newNode);

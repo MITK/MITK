@@ -54,7 +54,6 @@ void mitk::USZonesInteractor::UpdateSurface(mitk::DataNode::Pointer dataNode)
   vtkSphere->SetThetaResolution(20);
   vtkSphere->Update();
   zone->SetVtkPolyData(vtkSphere->GetOutput());
-  //vtkSphere->Delete();
 
   // set vtk sphere and origin to data node (origin must be set
   // again, because of the new sphere set as data)

@@ -18,9 +18,9 @@ if(BUILD_TESTING)
 
   ExternalProject_Add(${proj}
     SOURCE_DIR ${proj}
-#    GIT_REPOSITORY https://phabricator.mitk.org/diffusion/MD/mitk-data.git
-#    GIT_TAG ${revision_tag}
-    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/mitk-data_${revision_tag}.tar.gz
+    GIT_REPOSITORY ssh://git@phabricator.mitk.org:2222/diffusion/MD/mitk-data.git
+    GIT_TAG ${revision_tag}
+#   URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/mitk-data_${revision_tag}.tar.gz
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
@@ -35,5 +35,3 @@ else()
   mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
 
 endif(BUILD_TESTING)
-
-

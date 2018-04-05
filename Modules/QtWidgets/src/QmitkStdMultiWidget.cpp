@@ -2500,7 +2500,7 @@ void QmitkStdMultiWidget::setAnnotationVisibility(std::vector<bool>& visibility)
   HandleCrosshairPositionEvent();
 }
 
-void QmitkStdMultiWidget::setMouseMode(mitk::MouseModeSwitcher::MouseMode mode, const std::string& button)
+void QmitkStdMultiWidget::setMouseMode(mitk::MouseModeSwitcher::MouseMode mode, const Qt::MouseButton& button)
 {
   m_MouseModeSwitcher->SelectMouseMode(mode, button);
 }

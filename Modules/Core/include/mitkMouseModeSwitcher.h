@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkCoreExports.h"
 #include <itkObject.h>
 #include "mitkDisplayInteractor.h"
+#include <map>
 
 
 namespace mitk {
@@ -97,6 +98,8 @@ namespace mitk {
       MouseRotation,
     };
 
+    typedef std::set<int> IntSetType; // set of Active buttons
+    typedef std::map<MouseMode, IntSetType> MouseModeMap;
     /**
     * \brief Setter for interaction scheme
     */
@@ -105,12 +108,15 @@ namespace mitk {
     /**
     * \brief Setter for mouse mode
     */
-    void SelectMouseMode( MouseMode mode, const std::string& button = "Left");
+    // Qt::LeftButton = 0x00000001
+    void SelectMouseMode( MouseMode mode, const unsigned int& button = 1 );
 
     /**
     * \brief Returns the current mouse mode
     */
     MouseMode GetCurrentMouseMode() const;
+
+    MouseModeMap GetActiveMouseModes();
 
     /**
     * \brief Enable 3D view selection events
@@ -137,6 +143,8 @@ namespace mitk {
      * it is needed to unregister the observer on unload.
      */
     std::vector<us::ServiceRegistration<InteractionEventObserver>> m_ServiceRegistrations;
+
+    MouseModeMap m_ActiveMouseModes;
   };
 } // namespace mitk
 

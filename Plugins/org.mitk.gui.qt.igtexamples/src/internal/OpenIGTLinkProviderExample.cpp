@@ -145,7 +145,7 @@ void OpenIGTLinkProviderExample::CreatePipeline()
     vtkData->SetCenter(0.0, 0.0, 0.0);
     vtkData->Update();
     mySphere->SetVtkPolyData(vtkData->GetOutput());
-    vtkData->Delete();
+   // vtkData->Delete();
     newNode->SetData(mySphere);
 
     this->GetDataStorage()->Add(newNode);

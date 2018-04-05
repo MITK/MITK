@@ -58,7 +58,7 @@ void mitk::USNavigationTargetOcclusionFilter::GenerateData()
   mitk::NavigationDataPassThroughFilter::GenerateData();
 
   // get vtk surface an the points
-  vtkPolyData* targetSurfaceVtk = this->GetVtkPolyDataOfTarget();
+  vtkSmartPointer<vtkPolyData> targetSurfaceVtk = this->GetVtkPolyDataOfTarget();
   if ( ! targetSurfaceVtk ) { return; } // cannot do anything without a target surface
 
   vtkIdType numberOfPoints = targetSurfaceVtk->GetNumberOfPoints();
@@ -119,7 +119,7 @@ void mitk::USNavigationTargetOcclusionFilter::GenerateData()
   transformFilter->SetInputData(0, targetSurfaceVtk);
   transformFilter->SetTransform(m_TargetStructure->GetData()->GetGeometry()->GetVtkTransform());
   transformFilter->Update();
-  vtkPolyData* targetSurfaceVtkTransformed = transformFilter->GetOutput();
+  vtkSmartPointer<vtkPolyData> targetSurfaceVtkTransformed = transformFilter->GetOutput();
 
   std::vector<bool> occlusion(numberOfPoints, false);
 
@@ -127,7 +127,7 @@ void mitk::USNavigationTargetOcclusionFilter::GenerateData()
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = m_ObstacleStructures->Begin();
     it != m_ObstacleStructures->End(); ++it)
   {
-    vtkPolyData* polyData = dynamic_cast<mitk::Surface*>(it->Value()->GetData())->GetVtkPolyData();
+    vtkSmartPointer<vtkPolyData> polyData = dynamic_cast<mitk::Surface*>(it->Value()->GetData())->GetVtkPolyData();
 
     // transform the obstacle strucutre according to the mitk geometry
     vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter =

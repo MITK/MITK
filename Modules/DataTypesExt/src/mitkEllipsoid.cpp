@@ -17,11 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkEllipsoid.h"
 #include "mitkNumericTypes.h"
 #include "vtkLinearTransform.h"
-#include "vtkSphereSource.h"
+#include <vtkSphereSource.h>
 
 mitk::Ellipsoid::Ellipsoid() : BoundingObject()
 {
-  vtkSphereSource *sphere = vtkSphereSource::New();
+  vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
   sphere->SetRadius(1.0);
   sphere->SetThetaResolution(20);
   sphere->SetPhiResolution(20);

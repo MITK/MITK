@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkSmartPointer.h"
 
 #include "vtkLineSource.h"
-#include "vtkSphereSource.h"
+#include <vtkSphereSource.h>
 
 #include "vtkCenterOfMass.h"
 #include "vtkLinearTransform.h"
@@ -708,7 +708,7 @@ mitk::DataNode::Pointer QmitkUSNavigationStepPlacementPlanning::CalculatePlannin
   if (m_PlannedTargetNodes.size() > 1)
   {
     double meanAnglesDifference = m_PlacementQualityCalculator->GetMeanAngleDifference();
-    ui->angleDifferenceValue->setText(QString::number(meanAnglesDifference, 103, 2) + QString::fromLatin1(" °"));
+    ui->angleDifferenceValue->setText(QString::number(meanAnglesDifference, 103, 2) + QString::fromLatin1(" Â°"));
 
     planningQualityResult->SetFloatProperty("USNavigation::MeanAngleDifference", meanAnglesDifference);
     planningQualityResult->SetProperty(
@@ -728,12 +728,11 @@ itk::SmartPointer<mitk::Surface> QmitkUSNavigationStepPlacementPlanning::CreateS
   mitk::Surface::Pointer surface = mitk::Surface::New();
 
   // create a vtk sphere with fixed radius
-  vtkSphereSource *vtkData = vtkSphereSource::New();
-  vtkData->SetRadius(5);
-  vtkData->SetCenter(0, 0, 0);
-  vtkData->Update();
-  surface->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
+  vtkSmartPointer<vtkSphereSource> vtkSphere = vtkSmartPointer<vtkSphereSource>::New();
+  vtkSphere->SetRadius(5);
+  vtkSphere->SetCenter(0, 0, 0);
+  vtkSphere->Update();
+  surface->SetVtkPolyData(vtkSphere->GetOutput());
 
   return surface;
 }

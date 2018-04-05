@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include <MitkUSExports.h>
 
+#include <itkWeakPointer.h>
+
 namespace itk {
   template<class T> class SmartPointer;
 }
@@ -55,7 +57,7 @@ protected:
   USAbstractControlInterface( itk::SmartPointer<USDevice> device );
   virtual ~USAbstractControlInterface( );
 
-  itk::SmartPointer<USDevice> m_Device;
+  itk::WeakPointer<USDevice> m_Device;
 };
 } // namespace mitk
 

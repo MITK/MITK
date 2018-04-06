@@ -171,10 +171,12 @@ set(CPP_FILES
   Interactions/mitkAction.cpp
   Interactions/mitkBindDispatcherInteractor.cpp
   Interactions/mitkCrosshairPositionEvent.cpp
+  Interactions/mitkCustomDisplayActionEventHandler.cpp
   Interactions/mitkDataInteractor.cpp
   Interactions/mitkDispatcher.cpp
   Interactions/mitkDisplayCoordinateOperation.cpp
   Interactions/mitkDisplayInteractor.cpp
+  Interactions/mitkDisplayActionEventBroadcast.cpp
   Interactions/mitkEventConfig.cpp
   Interactions/mitkEventFactory.cpp
   Interactions/mitkEventRecorder.cpp
@@ -199,6 +201,7 @@ set(CPP_FILES
   Interactions/mitkStateMachineContainer.cpp
   Interactions/mitkStateMachineState.cpp
   Interactions/mitkStateMachineTransition.cpp
+  Interactions/mitkStdDisplayActionEventHandler.cpp
   Interactions/mitkVtkEventAdapter.cpp
   Interactions/mitkVtkInteractorStyle.cxx
   Interactions/mitkXML2EventParser.cpp

@@ -105,6 +105,8 @@ namespace mitk
     */
     MouseMode GetCurrentMouseMode() const;
 
+    DisplayInteractor::Pointer GetCurrentObserver() { return m_CurrentObserver; }
+
   protected:
     MouseModeSwitcher();
     virtual ~MouseModeSwitcher();

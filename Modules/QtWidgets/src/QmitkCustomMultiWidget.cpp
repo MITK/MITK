@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTimer>
 #include <QVBoxLayout>
 
+// mitk core
+#include <mitkDisplayActionEvents.h>
 #include <mitkUIDGenerator.h>
 
 #include "mitkImagePixelReadAccessor.h"
@@ -60,6 +62,9 @@ QmitkCustomMultiWidget::QmitkCustomMultiWidget(QWidget* parent,
   , m_MultiWidgetName(multiWidgetName)
   , m_PendingCrosshairPositionEvent(false)
   , m_CrosshairNavigationEnabled(false)
+  , m_DisplayActionEventBroadcast(nullptr)
+  , m_CustomDisplayActionEventHandler(nullptr)
+  , m_StdDisplayActionEventHandler(nullptr)
 {
   // create widget manually
   // create and set layout
@@ -68,6 +73,7 @@ QmitkCustomMultiWidget::QmitkCustomMultiWidget(QWidget* parent,
   resize(QSize(364, 477).expandedTo(minimumSizeHint()));
 
   InitializeWidget();
+  InitializeDisplayActionEventHandling();
 }
 
 QmitkCustomMultiWidget::~QmitkCustomMultiWidget()
@@ -689,6 +695,19 @@ void QmitkCustomMultiWidget::InitializeWidget()
   */
 }
 
+void QmitkCustomMultiWidget::InitializeDisplayActionEventHandling()
+{
+  m_DisplayActionEventBroadcast = mitk::DisplayActionEventBroadcast::New();
+  m_DisplayActionEventBroadcast->LoadStateMachine("DisplayInteraction.xml");
+  m_DisplayActionEventBroadcast->SetEventConfig("DisplayConfigMITK.xml");
+
+  //m_CustomDisplayActionEventHandler = std::make_unique<mitk::CustomDisplayActionEventHandler>();
+  //m_CustomDisplayActionEventHandler->SetObservableBroadcast(m_DisplayActionEventBroadcast);
+  m_StdDisplayActionEventHandler = std::make_unique<mitk::StdDisplayActionEventHandler>();
+  m_StdDisplayActionEventHandler->SetObservableBroadcast(m_DisplayActionEventBroadcast);
+  m_StdDisplayActionEventHandler->InitStdActions();
+}
+
 void QmitkCustomMultiWidget::AddRenderWindowWidget(int column, int row, const std::string& cornerAnnotation/* = ""*/)
 {
   // #TODO: add QSplitter?
@@ -711,6 +730,20 @@ void QmitkCustomMultiWidget::AddRenderWindowWidget(int column, int row, const st
   // #TODO: define the grid cell to add the new render window widget
   // add the newly created render window widget to this multi widget
   m_CustomMultiWidgetLayout->addWidget(renderWindowWidget, row, column);
+
+  /*
+  auto callback = [](const itk::EventObject& displayInteractorEvent)
+  {
+    if (mitk::DisplayZoomEvent().CheckEvent(&displayInteractorEvent))
+    {
+      std::cout << "Success: CheckEvent" << std::endl;
+    }
+
+    std::cout << "lambda called" << std::endl;
+  };
+
+  m_CustomDisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayZoomEvent(nullptr, 0, mitk::Point2D()), std::move(callback));
+  */
 }
 
 mitk::DataNode::Pointer QmitkCustomMultiWidget::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes)

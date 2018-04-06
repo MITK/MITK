@@ -23,8 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk core
 #include <mitkBaseRenderer.h>
+#include <mitkCustomDisplayActionEventHandler.h>
 #include <mitkDataStorage.h>
+#include <mitkDisplayActionEventBroadcast.h>
 #include <mitkMouseModeSwitcher.h>
+#include <mitkStdDisplayActionEventHandler.h>
 
 // qt
 #include <qwidget.h>
@@ -188,6 +191,7 @@ private:
 
   void InitializeGUI();
   void InitializeWidget();
+  void InitializeDisplayActionEventHandling();
   void AddRenderWindowWidget(int column, int row, const std::string& cornerAnnotation = "");
   
   // #TODO: see T24173
@@ -205,7 +209,10 @@ private:
   QString m_MultiWidgetName;
 
   mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
-  mitk::SliceNavigationController *m_TimeNavigationController;
+  mitk::SliceNavigationController* m_TimeNavigationController;
+  mitk::DisplayActionEventBroadcast::Pointer m_DisplayActionEventBroadcast;
+  std::unique_ptr<mitk::CustomDisplayActionEventHandler> m_CustomDisplayActionEventHandler;
+  std::unique_ptr<mitk::StdDisplayActionEventHandler> m_StdDisplayActionEventHandler;
 
   mitk::DataStorage::Pointer m_DataStorage;
 

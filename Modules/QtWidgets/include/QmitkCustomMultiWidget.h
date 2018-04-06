@@ -188,7 +188,7 @@ private:
 
   void InitializeGUI();
   void InitializeWidget();
-  void AddRenderWindowWidget();
+  void AddRenderWindowWidget(int column, int row, const std::string& cornerAnnotation = "");
   
   // #TODO: see T24173
   mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes);

@@ -92,9 +92,12 @@ void QmitkCustomMultiWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 void QmitkCustomMultiWidget::InitRenderWindowWidgets()
 {
   // create three render window (widgets) initially
-  AddRenderWindowWidget();
-  AddRenderWindowWidget();
-  AddRenderWindowWidget();
+  AddRenderWindowWidget(0, 0, "2015-01-14 - CT");
+  AddRenderWindowWidget(0, 1, "2015-01-14 - MR");
+  AddRenderWindowWidget(1, 0, "2015-08-19 - CT");
+  AddRenderWindowWidget(1, 1, "2015-08-19 - MR");
+  AddRenderWindowWidget(2, 0, "2016-06-29 - CT");
+  AddRenderWindowWidget(2, 1, "2016-06-29 - MR");
 }
 
 QmitkCustomMultiWidget::RenderWindowWidgetMap QmitkCustomMultiWidget::GetRenderWindowWidgets() const
@@ -686,7 +689,7 @@ void QmitkCustomMultiWidget::InitializeWidget()
   */
 }
 
-void QmitkCustomMultiWidget::AddRenderWindowWidget()
+void QmitkCustomMultiWidget::AddRenderWindowWidget(int column, int row, const std::string& cornerAnnotation/* = ""*/)
 {
   // #TODO: add QSplitter?
   // #TODO: include technique, to set the image to level-slide on using the render window manager
@@ -696,6 +699,7 @@ void QmitkCustomMultiWidget::AddRenderWindowWidget()
   std::string renderWindowUID = generator.GetUID();
   QString UID = m_MultiWidgetName + "_" + QString::fromStdString(renderWindowUID);
   QmitkRenderWindowWidget* renderWindowWidget = new QmitkRenderWindowWidget(this, UID, m_DataStorage);
+  renderWindowWidget->SetCornerAnnotationText(cornerAnnotation);
 
   // create connections
   connect(renderWindowWidget, SIGNAL(ResetView()), this, SLOT(ResetCrosshair()));
@@ -706,7 +710,7 @@ void QmitkCustomMultiWidget::AddRenderWindowWidget()
 
   // #TODO: define the grid cell to add the new render window widget
   // add the newly created render window widget to this multi widget
-  m_CustomMultiWidgetLayout->addWidget(renderWindowWidget);
+  m_CustomMultiWidgetLayout->addWidget(renderWindowWidget, row, column);
 }
 
 mitk::DataNode::Pointer QmitkCustomMultiWidget::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes)

@@ -148,7 +148,7 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer
 
       for (j = 0, i = itkMesh->GetPoints()->Begin(); i != itkMesh->GetPoints()->End(); i++, j++)
       {
-        vtkSphereSource *sphere = vtkSphereSource::New();
+        vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
 
         sphere->SetRadius(pointSize);
         sphere->SetCenter(i.Value()[0], i.Value()[1], i.Value()[2]);

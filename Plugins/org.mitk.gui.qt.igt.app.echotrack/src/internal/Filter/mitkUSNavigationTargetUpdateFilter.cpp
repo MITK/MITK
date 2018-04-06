@@ -156,7 +156,7 @@ void mitk::USNavigationTargetUpdateFilter::UpdateTargetScores()
   transformFilter->SetInputData(0, targetSurfaceVtk);
   transformFilter->SetTransform(targetStructureGeometry->GetVtkTransform());
   transformFilter->Update();
-  vtkPolyData* targetSurfaceVtkTransformed = transformFilter->GetOutput();
+  vtkSmartPointer<vtkPolyData> targetSurfaceVtkTransformed = transformFilter->GetOutput();
 
   if ( numberOfPoints > 0 )
   {

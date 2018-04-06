@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "Poco/File.h"
 #include "mitkUnspecifiedTrackingTypeInformation.h"
 
-#include "vtkSphereSource.h"
+#include <vtkSphereSource.h>
 #include "vtkConeSource.h"
 #include "vtkLineSource.h"
 #include "vtkCylinderSource.h"

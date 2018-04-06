@@ -37,7 +37,7 @@ TissueGeneratorParameters::Pointer CreatePhantom_04_04_18_Parameters()
   returnParameters->SetBackgroundAnisotropy(0.9);
   returnParameters->SetBackgroundScattering(15);
   returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateNewPositionInStraightLine);
-  returnParameters->SetDoPartialVolume(false);
+  returnParameters->SetDoPartialVolume(true);
   returnParameters->SetMinNumberOfVessels(1);
   returnParameters->SetMaxNumberOfVessels(8);
   returnParameters->SetMinVesselAbsorption(1);
@@ -56,10 +56,14 @@ TissueGeneratorParameters::Pointer CreatePhantom_04_04_18_Parameters()
   returnParameters->SetRandomizePhysicalProperties(false);
   returnParameters->SetSkinThicknessInMillimeters(0);
   returnParameters->SetUseRngSeed(false);
-  returnParameters->SetVoxelSpacingInCentimeters(0.015);
-  returnParameters->SetXDim(280);
-  returnParameters->SetYDim(200);
-  returnParameters->SetZDim(360);
+  returnParameters->SetVoxelSpacingInCentimeters(0.03);
+  returnParameters->SetXDim(140);
+  returnParameters->SetYDim(100);
+  returnParameters->SetZDim(180);
+  //returnParameters->SetVoxelSpacingInCentimeters(0.015);
+  //returnParameters->SetXDim(280);
+  //returnParameters->SetYDim(200);
+  //returnParameters->SetZDim(360);
   returnParameters->SetForceVesselsMoveAlongYDirection(true);
   //returnParameters->SetVoxelSpacingInCentimeters(0.0075);
   //returnParameters->SetXDim(560);
@@ -173,7 +177,7 @@ int main(int argc, char * argv[])
   auto inputfolder = std::string(input.saveFolderPath + "input/");
   auto outputfolder = std::string(input.saveFolderPath + "output/");
   if (!itksys::SystemTools::FileIsDirectory(inputfolder))
-   {
+  {
     itksys::SystemTools::MakeDirectory(inputfolder);
   }
   if (!itksys::SystemTools::FileIsDirectory(outputfolder))
@@ -200,10 +204,14 @@ int main(int argc, char * argv[])
 
   int result = -4;
 
-  result = std::system(std::string(input.exePath + " -i " + savePath + " -o " +
+  std::string cmdString = std::string(input.exePath + " -i " + savePath + " -o " +
     (outputPath + ".nrrd") +
     " -yo " + "0" + " -p " + input.probePath +
-    " -n 10000000").c_str());
+    " -n 10000000");
+
+  MITK_INFO << "Executing: " << cmdString;
+
+  result = std::system(cmdString.c_str());
 
   MITK_INFO << result;
   MITK_INFO(input.verbose) << "Simulating fluence..[Done]";

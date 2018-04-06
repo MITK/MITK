@@ -312,14 +312,14 @@ void QmitkCustomMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     QHBoxLayout* layout = new QHBoxLayout(parent);
     layout->setContentsMargins(0, 0, 0, 0);
 
+    berry::IPreferences::Pointer prefs = GetPreferences();
+    mitk::BaseRenderer::RenderingMode::Type renderingMode = static_cast<mitk::BaseRenderer::RenderingMode::Type>(prefs->GetInt("Rendering Mode", 0));
+
     if (nullptr == m_MouseModeSwitcher)
     {
       m_MouseModeSwitcher = new QmitkMouseModeSwitcher(parent);
       layout->addWidget(m_MouseModeSwitcher);
     }
-
-    berry::IPreferences::Pointer prefs = GetPreferences();
-    mitk::BaseRenderer::RenderingMode::Type renderingMode = static_cast<mitk::BaseRenderer::RenderingMode::Type>(prefs->GetInt("Rendering Mode", 0));
 
     m_CustomMultiWidget = new QmitkCustomMultiWidget(parent, 0, 0, renderingMode);
     layout->addWidget(m_CustomMultiWidget);

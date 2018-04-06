@@ -26,11 +26,11 @@
   <event_variant class="MousePressEvent" name="StartMove">
     <attribute name="EventButton" value="MiddleMouseButton"/>
   </event_variant>
-  <event_variant class="MouseReleaseEvent" name="EndMoving">
-    <attribute name="EventButton" value="MiddleMouseButton"/>
-  </event_variant>
   <event_variant class="MouseMoveEvent" name="Moving">
     <attribute name="ButtonState" value="MiddleMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndMoving">
+    <attribute name="EventButton" value="MiddleMouseButton"/>
   </event_variant>
   <!-- Zooming -->
   <event_variant class="MousePressEvent" name="StartZoom">

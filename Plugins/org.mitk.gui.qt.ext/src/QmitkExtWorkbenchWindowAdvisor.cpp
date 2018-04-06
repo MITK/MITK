@@ -353,7 +353,7 @@ public:
       }
       if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.custommultiwidget"))
       {
-        windowAdvisor->openDicomEditorAction->setEnabled(false);
+        windowAdvisor->openCustomMultiWidgetEditorAction->setEnabled(false);
       }
 
       windowAdvisor->fileSaveProjectAction->setEnabled(false);

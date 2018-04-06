@@ -97,6 +97,11 @@ namespace mitk {
     std::vector<mitk::USProbe::Pointer> GetAllProbes();
 
     /**
+    * \brief Cleans the std::vector containing all configured probes.
+    */
+    void DeleteAllProbes();
+
+    /**
     * \brief Return current active probe for this USVideoDevice
     * Returns a pointer to the probe that is currently in use. If there were probes set while creating or modifying this USVideoDevice.
     * Returns null otherwise

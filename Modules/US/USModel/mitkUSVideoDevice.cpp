@@ -168,6 +168,11 @@ std::vector<mitk::USProbe::Pointer> mitk::USVideoDevice::GetAllProbes()
   return m_Probes;
 }
 
+void mitk::USVideoDevice::DeleteAllProbes()
+{
+  m_Probes.clear();
+}
+
 mitk::USProbe::Pointer mitk::USVideoDevice::GetCurrentProbe()
 {
   if (m_CurrentProbe.IsNotNull())

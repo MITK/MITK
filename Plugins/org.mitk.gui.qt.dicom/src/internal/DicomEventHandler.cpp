@@ -85,7 +85,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       if(modality.compare("RTDOSE",Qt::CaseInsensitive) == 0)
       {
           auto doseReader = mitk::RTDoseReaderService();
-          doseReader.SetInput(listOfFilesForSeries.front().toStdString());
+          doseReader.SetInput(getUTF8Char(listOfFilesForSeries.front()));
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = doseReader.Read();
           if (!readerOutput.empty()){
             mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(readerOutput.at(0).GetPointer());
@@ -132,7 +132,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       else if(modality.compare("RTSTRUCT",Qt::CaseInsensitive) == 0)
       {
           auto structReader = mitk::RTStructureSetReaderService();
-          structReader.SetInput(listOfFilesForSeries.front().toStdString());
+          structReader.SetInput(getUTF8Char(listOfFilesForSeries.front()));
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = structReader.Read();
 
           if (readerOutput.empty()){
@@ -171,7 +171,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       else if (modality.compare("RTPLAN", Qt::CaseInsensitive) == 0)
       {
           auto planReader = mitk::RTPlanReaderService();
-          planReader.SetInput(listOfFilesForSeries.front().toStdString());
+          planReader.SetInput(getUTF8Char(listOfFilesForSeries.front()));
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = planReader.Read();
           if (!readerOutput.empty()){
               //there is no image, only the properties are interesting
@@ -196,7 +196,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 
       while (it.hasNext())
       {
-        seriesToLoad.push_back(it.next().toStdString());
+		  seriesToLoad.push_back(getUTF8Char(it.next()));
       }
 
       //Get Reference for default data storage.
@@ -244,6 +244,14 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 
 void DicomEventHandler::OnSignalRemoveSeriesFromStorage(const ctkEvent& /*ctkEvent*/)
 {
+}
+
+const char* DicomEventHandler::getUTF8Char(const QString& string) {
+#ifdef Q_OS_WIN
+	return string.toLocal8Bit().constData();
+#elif Q_OS_MAC
+	return string.toUtf8().constData();
+#endif
 }
 
 void DicomEventHandler::SubscribeSlots()

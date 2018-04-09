@@ -37,7 +37,7 @@ QmitkPointListView::QmitkPointListView(QWidget *parent)
 {
   QListView::setAlternatingRowColors(true);
 
-  QListView::setSelectionBehavior(QAbstractItemView::SelectRows);
+  QListView::setSelectionBehavior(QAbstractItemView::SelectItems);
   QListView::setSelectionMode(QAbstractItemView::SingleSelection);
   QListView::setModel(m_PointListModel);
   QString tooltip = QString("Use the F2/F3 keys to move a point up/down, the Del key to remove a point\nand the mouse "
@@ -152,6 +152,9 @@ void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection &select
   // update selection of all points in pointset: select the one(s) that are selected in the view, deselect all others
   QModelIndexList selectedIndexes = selected.indexes();
 
+  // only call setSelectInfo on a point set with 'selected = true' if you deselcted the other entries
+  int indexToSelect = -1;
+
   for (mitk::PointSet::PointsContainer::Iterator it =
          pointSet->GetPointSet(m_PointListModel->GetTimeStep())->GetPoints()->Begin();
        it != pointSet->GetPointSet(m_PointListModel->GetTimeStep())->GetPoints()->End();
@@ -162,18 +165,23 @@ void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection &select
     {
       if (selectedIndexes.indexOf(index) != -1) // index is found in the selected indices list
       {
-        pointSet->SetSelectInfo(it->Index(), true, m_PointListModel->GetTimeStep());
-
-        mitk::Point3D p = pointSet->GetPoint(it->Index(), m_PointListModel->GetTimeStep());
-
-        for (auto snc : m_Sncs)
-          snc->SelectSliceByPoint(p);
+		indexToSelect = it->Index();
       }
       else
       {
         pointSet->SetSelectInfo(it->Index(), false, m_PointListModel->GetTimeStep());
       }
     }
+  }
+
+  // force selection of only one index after deselecting the others
+  if (indexToSelect > -1) {
+	  pointSet->SetSelectInfo(indexToSelect, true, m_PointListModel->GetTimeStep());
+
+	  mitk::Point3D p = pointSet->GetPoint(indexToSelect, m_PointListModel->GetTimeStep());
+
+	  for (auto snc : m_Sncs)
+		  snc->SelectSliceByPoint(p);
   }
 
   m_SelfCall = false;

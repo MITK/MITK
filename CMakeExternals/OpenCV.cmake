@@ -22,14 +22,7 @@ if(MITK_USE_OpenCV)
     )
 
     if(MITK_USE_Python)
-      if(NOT MITK_USE_SYSTEM_PYTHON)
-        list(APPEND proj_DEPENDENCIES Python Numpy)
-        # export python home
-        set(ENV{PYTHONHOME} "${Python_DIR}")
-        set(CV_PACKAGE_PATH -DPYTHON_PACKAGES_PATH:PATH=${MITK_PYTHON_SITE_DIR})
-      else()
-        set(CV_PACKAGE_PATH -DPYTHON_PACKAGES_PATH:PATH=${ep_prefix}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
-      endif()
+      set(CV_PACKAGE_PATH -DPYTHON_PACKAGES_PATH:PATH=${ep_prefix}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
 
       list(APPEND additional_cmake_args
          -DBUILD_opencv_python:BOOL=ON

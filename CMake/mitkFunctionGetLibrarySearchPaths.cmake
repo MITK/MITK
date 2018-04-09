@@ -103,7 +103,8 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
 
   if(MITK_USE_Python)
     list(APPEND _dir_candidates "${CTK_DIR}/CMakeExternals/Install/bin")
-    list(APPEND _dir_candidates "${MITK_EXTERNAL_PROJECT_PREFIX}/lib/python2.7/bin")
+    get_filename_component(_python_dir ${PYTHON_EXECUTABLE} DIRECTORY)
+    list(APPEND _dir_candidates "${_python_dir}")
   endif()
 
   if(MITK_USE_TOF_PMDO3 OR MITK_USE_TOF_PMDCAMCUBE OR MITK_USE_TOF_PMDCAMBOARD)

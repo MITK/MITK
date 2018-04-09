@@ -34,12 +34,7 @@ if(NOT DEFINED VTK_DIR)
       )
 
   if(MITK_USE_Python)
-    if(NOT MITK_USE_SYSTEM_PYTHON)
-     list(APPEND proj_DEPENDENCIES Python)
-     set(_vtk_install_python_dir -DVTK_INSTALL_PYTHON_MODULE_DIR:FILEPATH=${MITK_PYTHON_SITE_DIR})
-    else()
-      set(_vtk_install_python_dir -DVTK_INSTALL_PYTHON_MODULE_DIR:PATH=${ep_prefix}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
-    endif()
+    set(_vtk_install_python_dir -DVTK_INSTALL_PYTHON_MODULE_DIR:PATH=${ep_prefix}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
 
     list(APPEND additional_cmake_args
          -DVTK_WRAP_PYTHON:BOOL=ON
@@ -49,6 +44,7 @@ if(NOT DEFINED VTK_DIR)
          -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
          -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
          -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
+         -DVTK_PYTHON_VERSION:STRING=3
          ${_vtk_install_python_dir}
         )
   else()
@@ -61,6 +57,7 @@ if(NOT DEFINED VTK_DIR)
   if(MITK_USE_Qt5)
     list(APPEND additional_cmake_args
         -DVTK_Group_Qt:BOOL=ON
+        -DQt5_DIR:PATH=${Qt5_DIR}
      )
   endif()
 

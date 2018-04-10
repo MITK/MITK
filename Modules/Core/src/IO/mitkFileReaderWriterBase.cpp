@@ -161,14 +161,14 @@ namespace mitk
     // If the mime type name is set and the list of extensions is empty,
     // look up the mime type in the registry and print a warning if
     // there is none
-    /*if (!m_CustomMimeType->GetName().empty() && extensions.empty())
+    if (!m_CustomMimeType->GetName().empty() && extensions.empty())
     {
       if (!mimeTypeProvider->GetMimeTypeForName(m_CustomMimeType->GetName()).IsValid())
       {
         MITK_WARN << "Registering a MITK reader or writer with an unknown MIME type " << m_CustomMimeType->GetName();
       }
       return m_MimeTypeReg;
-    }*/
+    }
 
     // If the mime type name and extensions list is empty, print a warning
     if (m_CustomMimeType->GetName().empty() && extensions.empty())

@@ -85,6 +85,10 @@ namespace mitk
       extensions.push_back("he5");
       extensions.push_back("hd5");
     }
+    else if ("GE4ImageIO" == imageIOName || "GE5ImageIO" == imageIOName || "Bruker2dseqImageIO" == imageIOName)
+    {
+      extensions.push_back("");
+    }
 
     if (!extensions.empty())
     {
@@ -144,7 +148,8 @@ namespace mitk
       customReaderMimeType.AddExtension(extension);
     }
 
-    if (customReaderMimeType.GetExtensions().empty())
+    auto extensions = customReaderMimeType.GetExtensions();
+    if (extensions.empty() || (extensions.size() == 1 && extensions[0].empty()))
     {
       std::string imageIOName = m_ImageIO->GetNameOfClass();
       FixUpCustomMimeTypeName(imageIOName, customReaderMimeType);
@@ -176,7 +181,8 @@ namespace mitk
         customWriterMimeType.AddExtension(extension);
       }
 
-      if (customWriterMimeType.GetExtensions().empty())
+      auto extensions = customWriterMimeType.GetExtensions();
+      if (extensions.empty() || (extensions.size() == 1 && extensions[0].empty()))
       {
         std::string imageIOName = m_ImageIO->GetNameOfClass();
         FixUpCustomMimeTypeName(imageIOName, customWriterMimeType);

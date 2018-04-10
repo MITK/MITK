@@ -388,6 +388,13 @@ void QmitkCESTStatisticsView::PlotPointSet(itk::Image<TPixel, VImageDimension>* 
     return;
   }
 
+  if (!this->DataSanityCheck())
+  {
+    m_Controls.labelWarning->setText("Data can not be plotted, internally inconsistent.");
+    m_Controls.labelWarning->show();
+    return;
+  }
+
   auto maxIndex = internalPointset->GetMaxId().Index();
 
   for (std::size_t number = 0; number < maxIndex + 1; ++number)
@@ -779,12 +786,13 @@ bool QmitkCESTStatisticsView::DataSanityCheck()
   // if the CEST image data and the meta information do not match, the data can not be processed
   if (numberOfSpectra != m_ZImage->GetTimeSteps())
   {
+    MITK_INFO << "CEST meta information and number of volumes does not match.";
     return false;
   }
 
   // if we have neither a mask image, a point set nor a mask planar figure, we can not do statistics
   // statistics on the whole image would not make sense
-  if (m_MaskImage.IsNull() && m_MaskPlanarFigure.IsNull() && m_PointSet.IsNull() )
+  if (m_MaskImage.IsNull() && m_MaskPlanarFigure.IsNull() && m_PointSet.IsNull() && m_CrosshairPointSet->IsEmpty())
   {
     return false;
   }

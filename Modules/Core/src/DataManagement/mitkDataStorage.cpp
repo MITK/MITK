@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateBase.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkProperties.h"
+#include "mitkArbitraryTimeGeometry.h"
+
 
 mitk::DataStorage::DataStorage() : itk::Object(), m_BlockNodeModifiedEvents(false)
 {
@@ -255,7 +257,7 @@ void mitk::DataStorage::RemoveListeners(const mitk::DataNode *_Node)
   }
 }
 
-mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D(const SetOfObjects *input,
+mitk::TimeGeometry::ConstPointer mitk::DataStorage::ComputeBoundingGeometry3D(const SetOfObjects *input,
                                                                          const char *boolPropertyKey,
                                                                          const mitk::BaseRenderer *renderer,
                                                                          const char *boolPropertyKey2) const
@@ -271,12 +273,10 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D(const S
   Vector3D minSpacing;
   minSpacing.Fill(itk::NumericTraits<mitk::ScalarType>::max());
 
-  ScalarType stmin, stmax;
-  stmin = itk::NumericTraits<mitk::ScalarType>::NonpositiveMin();
-  stmax = itk::NumericTraits<mitk::ScalarType>::max();
+  ScalarType stmax = itk::NumericTraits<mitk::ScalarType>::max();
+  ScalarType stmin = itk::NumericTraits<mitk::ScalarType>::NonpositiveMin();
 
-  ScalarType minimalIntervallSize = stmax;
-  ScalarType minimalTime = stmax;
+  std::set<ScalarType> existingTimePoints;
   ScalarType maximalTime = 0;
 
   // Needed for check of zero bounding boxes
@@ -334,21 +334,14 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D(const S
               }
             }
 
-            const TimeBounds &curTimeBounds = node->GetData()->GetTimeGeometry()->GetTimeBounds(i);
-            // get the minimal time of all objects in the DataStorage
-            if ((curTimeBounds[0] < minimalTime) && (curTimeBounds[0] > stmin))
+            const auto curTimeBounds = timeGeometry->GetTimeBounds(i);
+            if ((curTimeBounds[0] > stmin) && (curTimeBounds[0] < stmax))
             {
-              minimalTime = curTimeBounds[0];
+              existingTimePoints.insert(curTimeBounds[0]);
             }
-            // get the maximal time of all objects in the DataStorage
             if ((curTimeBounds[1] > maximalTime) && (curTimeBounds[1] < stmax))
             {
-              maximalTime = curTimeBounds[1];
-            }
-            // get the minimal TimeBound of all time steps of the current DataNode
-            if (curTimeBounds[1] - curTimeBounds[0] < minimalIntervallSize)
-            {
-              minimalIntervallSize = curTimeBounds[1] - curTimeBounds[0];
+               maximalTime = curTimeBounds[1];
             }
           }
         }
@@ -365,16 +358,13 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D(const S
   result->ComputeBoundingBox();
 
   // compute the number of time steps
-  unsigned int numberOfTimeSteps = 1;
-  if (maximalTime == 0) // make sure that there is at least one time sliced geometry in the data storage
+  if (existingTimePoints.empty()) // make sure that there is at least one time sliced geometry in the data storage
   {
-    minimalTime = 0;
-    maximalTime = 1;
-    minimalIntervallSize = 1;
+    existingTimePoints.insert(0.0);
+    maximalTime = 1.0;
   }
-  numberOfTimeSteps = static_cast<unsigned int>((maximalTime - minimalTime) / minimalIntervallSize);
 
-  TimeGeometry::Pointer timeGeometry = nullptr;
+  ArbitraryTimeGeometry::Pointer timeGeometry = nullptr;
   if (result->GetPoints()->Size() > 0)
   {
     // Initialize a geometry of a single time step
@@ -393,23 +383,31 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D(const S
     geometry->GetIndexToWorldTransform()->SetOffset(offset);
     geometry->SetBounds(bounds);
     geometry->SetSpacing(minSpacing);
+
     // Initialize the time sliced geometry
-    timeGeometry = ProportionalTimeGeometry::New();
-    dynamic_cast<ProportionalTimeGeometry *>(timeGeometry.GetPointer())->Initialize(geometry, numberOfTimeSteps);
-    dynamic_cast<ProportionalTimeGeometry *>(timeGeometry.GetPointer())->SetFirstTimePoint(minimalTime);
-    dynamic_cast<ProportionalTimeGeometry *>(timeGeometry.GetPointer())->SetStepDuration(minimalIntervallSize);
+    auto tsIterator = existingTimePoints.cbegin();
+    auto tsPredecessor = tsIterator++;
+    auto tsEnd = existingTimePoints.cend();
+    timeGeometry = ArbitraryTimeGeometry::New();
+    for (; tsIterator != tsEnd; ++tsIterator, ++tsPredecessor)
+    {
+      timeGeometry->AppendNewTimeStep(geometry, *tsPredecessor, *tsIterator);
+    }
+    timeGeometry->AppendNewTimeStep(geometry, *tsPredecessor, maximalTime);
+
+    timeGeometry->Update();
   }
-  return timeGeometry;
+  return timeGeometry.GetPointer();
 }
 
-mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D(const char *boolPropertyKey,
+mitk::TimeGeometry::ConstPointer mitk::DataStorage::ComputeBoundingGeometry3D(const char *boolPropertyKey,
                                                                          const mitk::BaseRenderer *renderer,
                                                                          const char *boolPropertyKey2) const
 {
   return this->ComputeBoundingGeometry3D(this->GetAll(), boolPropertyKey, renderer, boolPropertyKey2);
 }
 
-mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeVisibleBoundingGeometry3D(const mitk::BaseRenderer *renderer,
+mitk::TimeGeometry::ConstPointer mitk::DataStorage::ComputeVisibleBoundingGeometry3D(const mitk::BaseRenderer *renderer,
                                                                                 const char *boolPropertyKey)
 {
   return ComputeBoundingGeometry3D("visible", renderer, boolPropertyKey);

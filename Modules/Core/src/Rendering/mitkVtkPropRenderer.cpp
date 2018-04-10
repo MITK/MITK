@@ -141,7 +141,7 @@ bool mitk::VtkPropRenderer::SetWorldGeometryToDataStorageBounds()
     return false;
 
   // initialize world geometry
-  mitk::TimeGeometry::Pointer geometry = m_DataStorage->ComputeVisibleBoundingGeometry3D(nullptr, "includeInBoundingBox");
+  auto geometry = m_DataStorage->ComputeVisibleBoundingGeometry3D(nullptr, "includeInBoundingBox");
 
   if (geometry.IsNull())
     return false;

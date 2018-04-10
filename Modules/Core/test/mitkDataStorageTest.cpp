@@ -826,7 +826,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
 
   // Checking ComputeBoundingGeometry3D method*/
   const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetAll();
-  mitk::TimeGeometry::Pointer geometry = ds->ComputeBoundingGeometry3D();
+  auto geometry = ds->ComputeBoundingGeometry3D();
   MITK_TEST_CONDITION(geometry->CountTimeSteps() == 4, "Test for number or time steps with ComputeBoundingGeometry()");
   mitk::TimeBounds timebounds = geometry->GetTimeBounds();
   MITK_TEST_CONDITION((timebounds[0] == 0) && (timebounds[1] == 4),

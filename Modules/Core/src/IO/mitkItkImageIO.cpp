@@ -85,10 +85,6 @@ namespace mitk
       extensions.push_back("he5");
       extensions.push_back("hd5");
     }
-    else if (imageIOName == "GE4ImageIO" || imageIOName == "GE5ImageIO")
-    {
-      extensions.push_back("");
-    }
 
     if (!extensions.empty())
     {
@@ -96,6 +92,22 @@ namespace mitk
     }
 
     return extensions;
+  }
+
+  void ItkImageIO::FixUpCustomMimeTypeName(const std::string &imageIOName, CustomMimeType &customMimeType)
+  {
+    if ("GE4ImageIO" == imageIOName)
+    {
+      customMimeType.SetName(this->AbstractFileReader::GetMimeTypePrefix() + "ge4");
+    }
+    else if ("GE5ImageIO" == imageIOName)
+    {
+      customMimeType.SetName(this->AbstractFileReader::GetMimeTypePrefix() + "ge5");
+    }
+    else if ("Bruker2dseqImageIO" == imageIOName)
+    {
+      customMimeType.SetName(this->AbstractFileReader::GetMimeTypePrefix() + "bruker2dseq");
+    }
   }
 
   ItkImageIO::ItkImageIO(itk::ImageIOBase::Pointer imageIO)
@@ -131,6 +143,13 @@ namespace mitk
       }
       customReaderMimeType.AddExtension(extension);
     }
+
+    if (customReaderMimeType.GetExtensions().empty())
+    {
+      std::string imageIOName = m_ImageIO->GetNameOfClass();
+      FixUpCustomMimeTypeName(imageIOName, customReaderMimeType);
+    }
+
     this->AbstractFileReader::SetMimeType(customReaderMimeType);
 
     std::vector<std::string> writeExtensions = imageIO->GetSupportedWriteExtensions();
@@ -156,6 +175,13 @@ namespace mitk
         }
         customWriterMimeType.AddExtension(extension);
       }
+
+      if (customWriterMimeType.GetExtensions().empty())
+      {
+        std::string imageIOName = m_ImageIO->GetNameOfClass();
+        FixUpCustomMimeTypeName(imageIOName, customWriterMimeType);
+      }
+
       this->AbstractFileWriter::SetMimeType(customWriterMimeType);
     }
 

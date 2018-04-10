@@ -17,7 +17,7 @@ set(MOC_H_FILES
   src/QmitkAbstractRenderEditor.h
   src/QmitkDnDFrameWidget.h
   src/QmitkSliceNavigationListener.h
-
+  src/ImporterUtil.h
   src/internal/QmitkCommonActivator.h
 )
 

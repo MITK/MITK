@@ -61,9 +61,5 @@ public:
         * \note Not yet implemented.
         */
         void OnSignalRemoveSeriesFromStorage(const ctkEvent& ctkEvent);
-
-private:
-	const char* getUTF8Char(const QString& string);
-
 };
 #endif // QmitkDicomEventHandlerBuilder_h

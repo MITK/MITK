@@ -229,7 +229,9 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(const mitk::PlanarFigure::PolyLin
     points[i * 2] = pointlist[i][0];
     points[i * 2 + 1] = pointlist[i][1];
   }
-    this->m_Context->DrawPoly(points,pointlist.size());
+
+  if (2 <= pointlist.size())
+    m_Context->DrawPoly(points,pointlist.size());
 
   anchorPoint = rightMostPoint;
 }

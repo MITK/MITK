@@ -14,12 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkCustomDisplayActionEventHandler.h"
+#include "mitkDisplayActionEventHandler.h"
 
-// c++
-#include <functional>
-
-void mitk::CustomDisplayActionEventHandler::SetObservableBroadcast(mitk::DisplayActionEventBroadcast* observableBroadcast)
+void mitk::DisplayActionEventHandler::SetObservableBroadcast(mitk::DisplayActionEventBroadcast* observableBroadcast)
 {
   if (m_ObservableBroadcast == observableBroadcast)
   {
@@ -41,7 +38,7 @@ void mitk::CustomDisplayActionEventHandler::SetObservableBroadcast(mitk::Display
   m_ObservableBroadcast = observableBroadcast;
 }
 
-unsigned long mitk::CustomDisplayActionEventHandler::ConnectDisplayActionEvent(const mitk::DisplayActionEvent& displayActionEvent,
+mitk::DisplayActionEventHandler::OberserverTagType mitk::DisplayActionEventHandler::ConnectDisplayActionEvent(const mitk::DisplayActionEvent& displayActionEvent,
   const mitk::StdFunctionCommand::ActionFunction& actionFunction,
   const mitk::StdFunctionCommand::FilterFunction& filterFunction)
 {
@@ -54,12 +51,12 @@ unsigned long mitk::CustomDisplayActionEventHandler::ConnectDisplayActionEvent(c
   auto command = mitk::StdFunctionCommand::New();
   command->SetCommandAction(actionFunction);
   command->SetCommandFilter(filterFunction);
-  unsigned long tag = m_ObservableBroadcast->AddObserver(displayActionEvent, command);
+  OberserverTagType tag = m_ObservableBroadcast->AddObserver(displayActionEvent, command);
   m_ObserverTags.push_back(tag);
   return tag;
 }
 
-void mitk::CustomDisplayActionEventHandler::DisconnectObserver(unsigned long observerTag)
+void mitk::DisplayActionEventHandler::DisconnectObserver(OberserverTagType observerTag)
 {
   // #TODO: change function call for new mitk::WeakPointer
   if (m_ObservableBroadcast.IsNull())
@@ -67,7 +64,7 @@ void mitk::CustomDisplayActionEventHandler::DisconnectObserver(unsigned long obs
     mitkThrow() << "No display action event broadcast class set to observe. Use 'SetObservableBroadcast' before disconnecting observer.";
   }
 
-  std::vector<unsigned long>::iterator observerTagPosition = std::find(m_ObserverTags.begin(), m_ObserverTags.end(), observerTag);
+  std::vector<OberserverTagType>::iterator observerTagPosition = std::find(m_ObserverTags.begin(), m_ObserverTags.end(), observerTag);
   if (observerTagPosition != m_ObserverTags.end())
   {
     m_ObservableBroadcast->RemoveObserver(observerTag);

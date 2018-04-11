@@ -23,10 +23,8 @@
 namespace mitk
 {
   /**
-  * @brief This class serves as a event state machine while simultaneously observing interaction events.
-  *   d
-  *
-  *
+  * @brief This class serves as an event state machine while simultaneously observing interaction events.
+  *   It connects the actions from the event state machine .xml-file with concrete functions of this class.
   */
   class MITKCORE_EXPORT DisplayActionEventBroadcast : public EventStateMachine, public InteractionEventObserver
   {

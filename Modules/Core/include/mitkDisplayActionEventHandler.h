@@ -14,24 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKCUSTOMDISPLAYACTIONEVENTHANDLER_H
-#define MITKCUSTOMDISPLAYACTIONEVENTHANDLER_H
+#ifndef MITKDISPLAYACTIONEVENTHANDLER_H
+#define MITKDISPLAYACTIONEVENTHANDLER_H
 
 #include <MitkCoreExports.h>
 
 // mitk core
 #include "mitkDisplayActionEventBroadcast.h"
-#include "mitkDisplayInteractor.h"
 #include "mitkDisplayActionEvents.h"
 #include "mitkStdFunctionCommand.h"
-#include "mitkWeakPointer.h"
-
-// c++
-#include <functional>
 
 namespace mitk
 {
-  class MITKCORE_EXPORT CustomDisplayActionEventHandler
+  class MITKCORE_EXPORT DisplayActionEventHandler
   {
   public:
 
@@ -71,7 +66,7 @@ namespace mitk
       const mitk::StdFunctionCommand::FilterFunction& filterFunction = [](const itk::EventObject& eventObject) { return true; });
 
     /**
-    * @brief Uses the given observer tag to remove the corresponding custom StdFunctionCommand as an observer of the observed
+    * @brief Uses the given observer tag to remove the corresponding custom command as an observer of the observed
     *     display action event broadcast class.
     *     If the given tag is not contained in the member vector of observer tags, nothing happens.
     *
@@ -84,7 +79,7 @@ namespace mitk
 
     const std::vector<OberserverTagType>& GetAllObserverTags() { return m_ObserverTags; };
 
-  private:
+  protected:
 
     mitk::WeakPointer<mitk::DisplayActionEventBroadcast> m_ObservableBroadcast;
     std::vector<OberserverTagType> m_ObserverTags;
@@ -93,4 +88,4 @@ namespace mitk
 
 } // end namespace mitk
 
-#endif // MITKCUSTOMDISPLAYACTIONEVENTHANDLER_H
+#endif // MITKDISPLAYACTIONEVENTHANDLER_H

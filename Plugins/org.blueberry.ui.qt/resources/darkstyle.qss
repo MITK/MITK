@@ -31,6 +31,10 @@ QWidget:disabled {
   color: #656565;
 }
 
+QStackedWidget {
+  background-color: transparent;
+}
+
 QAbstractButton:hover, QComboBox:hover, QLineEdit:hover, QAbstractSpinBox:hover {
   background-color: #3f3f46;
 }
@@ -68,9 +72,26 @@ QToolButton#qt_toolbar_ext_button {
   qproperty-icon: url(:/org.blueberry.ui.qt/dark/tight-right-arrow-textcolor.svg);
 }
 
+QToolBox::tab {
+  border: 1px solid #3f3f46;
+}
+
+QToolBox::tab:hover {
+  background-color: #434346;
+}
+
+QToolBox::tab:selected {
+  background-color: #1c97ea;
+  border: 1px solid #1c97ea;
+}
+
 QAbstractItemView {
   alternate-background-color: #1b1b1c;
   background-color: #252526;
+}
+
+QAbstractItemView::item {
+  color: #f1f1f1;
 }
 
 QHeaderView::section {
@@ -496,7 +517,6 @@ QTabBar::tab:selected {
 
 QTabBar::tab:!selected {
   background-color: #2d2d30;
-  margin-top: 4px;
 }
 
 QTabBar::tab:!selected:hover {

@@ -18,7 +18,6 @@ set(INTERNAL_CPP_FILES
   SegmentationUtilities/ContourModelToImage/QmitkContourModelToImageWidget.cpp
   SegmentationUtilities/MorphologicalOperations/QmitkMorphologicalOperationsWidget.cpp
   SegmentationUtilities/SurfaceToImage/QmitkSurfaceToImageWidget.cpp
-  SegmentationUtilities/CTKWidgets/QmitkCTKWidgetsWidget.cpp
 )
 
 set(UI_FILES
@@ -50,7 +49,6 @@ set(MOC_H_FILES
   src/internal/SegmentationUtilities/ContourModelToImage/QmitkContourModelToImageWidget.h
   src/internal/SegmentationUtilities/MorphologicalOperations/QmitkMorphologicalOperationsWidget.h
   src/internal/SegmentationUtilities/SurfaceToImage/QmitkSurfaceToImageWidget.h
-  src/internal/SegmentationUtilities/CTKWidgets/QmitkCTKWidgetsWidget.h
 )
 
 set(CACHED_RESOURCE_FILES

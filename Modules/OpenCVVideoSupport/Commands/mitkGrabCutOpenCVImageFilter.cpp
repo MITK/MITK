@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkFastMutexLock.h"
 #include "itkConditionVariable.h"
 
+#include <opencv2/imgproc.hpp>
+
 // This is a magic number defined in "grabcut.cpp" of OpenCV.
 // GrabCut function crashes if less than this number of model
 // points are given. There must be at least as much model points

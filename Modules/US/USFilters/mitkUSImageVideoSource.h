@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBasicCombinationOpenCVImageFilter.h"
 
 // OpenCV
-#include <highgui.h>
+#include <opencv2/videoio.hpp>
 
 namespace mitk {
   /**

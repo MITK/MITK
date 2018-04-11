@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkWeakPointer.h>
 #include <itkOpenCVImageBridge.h>
 #include <MitkOpenCVVideoSupportExports.h>
+#include <opencv2/core.hpp>
 
 #include "mitkImageSliceSelector.h"
 

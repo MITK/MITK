@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKTRANSFORM_H
 
 #include <itkObject.h>
-#include <cv.h>
+#include <opencv2/calib3d.hpp>
 #include <mitkCommon.h>
 #include <mitkNumericTypes.h>
 #include <mitkNavigationData.h>

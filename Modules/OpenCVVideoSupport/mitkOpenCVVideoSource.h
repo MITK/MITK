@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUndistortCameraImage.h"
 
 // HighGui camera interface: a convenient way for grabbing from a video capture (on windows VfW is used)
-#include "highgui.h"
+#include <opencv2/highgui.hpp>
 
 // For Providing ITK Image Interface
 #include "itkRGBPixel.h"

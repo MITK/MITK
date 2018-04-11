@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkConvertGrayscaleOpenCVImageFilter.h"
 
-#include "cv.h"
+#include <opencv2/imgproc.hpp>
 
 namespace mitk {
 

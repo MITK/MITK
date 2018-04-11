@@ -34,7 +34,6 @@ void mitk::CustomDisplayActionEventHandler::SetObservableBroadcast(mitk::Display
     {
       m_ObservableBroadcast->RemoveObserver(tag);
     }
-    // #TODO: decide if we want to move the observer to the new observable broadcast class
     m_ObserverTags.clear();
   }
 

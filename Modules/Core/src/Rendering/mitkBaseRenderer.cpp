@@ -96,7 +96,7 @@ vtkRenderWindow *mitk::BaseRenderer::GetRenderWindowByName(const std::string &na
 mitk::BaseRenderer::BaseRenderer(const char *name,
                                  vtkRenderWindow *renWin,
                                  mitk::RenderingManager *rm,
-                                 RenderingMode::Type renderingMode)
+                                 RenderingMode::Type)
   : m_RenderWindow(nullptr),
     m_VtkRenderer(nullptr),
     m_MapperID(defaultMapper),

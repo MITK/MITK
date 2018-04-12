@@ -477,17 +477,25 @@ void QmitkUSNewVideoDeviceWidget::OnDepthChanged(const QString &depth)
 
 void QmitkUSNewVideoDeviceWidget::OnSaveButtonClicked()
 {
-  QMessageBox msgBox;
-  msgBox.setText("This feature is not implemented yet.");
-  msgBox.exec();
-  return;
-  /*
-  QString fileName = QFileDialog::getSaveFileName(nullptr, "Save Configuration ...");
+  QString fileName = QFileDialog::getSaveFileName(nullptr, "Save Configuration ...", "", "XML files (*.xml)");
   if( fileName.isNull() )
   {
     return;
   }  // user pressed cancel
-  */
+
+  mitk::USDeviceWriterXML deviceWriter;
+  deviceWriter.SetFilename(fileName.toStdString());
+
+  mitk::USDeviceReaderXML::USVideoDeviceConfigData config;
+  this->CollectUltrasoundVideoDeviceConfigInformation(config);
+
+  if (!deviceWriter.WriteUltrasoundVideoDeviceConfiguration(config))
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Error when writing the configuration to the selected file. Could not write device information.");
+    msgBox.exec();
+    return;
+  }
 
 }
 
@@ -756,6 +764,33 @@ mitk::USProbe::Pointer QmitkUSNewVideoDeviceWidget::CheckIfProbeExistsAlready(st
       return (*it);
   }
   return nullptr; //no matching probe was found so nullptr is returned
+}
+
+void QmitkUSNewVideoDeviceWidget::CollectUltrasoundVideoDeviceConfigInformation(mitk::USDeviceReaderXML::USVideoDeviceConfigData &config)
+{
+  config.fileversion = 1.0;
+  config.deviceType = "video";
+
+  //Fill info in metadata groupbox:
+  config.deviceName = m_Controls->m_DeviceName->text().toStdString();
+  config.manufacturer = m_Controls->m_Manufacturer->text().toStdString();
+  config.model = m_Controls->m_Model->text().toStdString();
+  config.comment = m_Controls->m_Comment->text().toStdString();
+
+  //Fill info about video source:
+  config.sourceID = m_Controls->m_DeviceSelector->value();
+  config.filepathVideoSource = m_Controls->m_FilePathSelector->text().toStdString();
+
+  //Fill video options:
+  config.useGreyscale = m_Controls->m_CheckGreyscale->isChecked();
+
+  //Fill override options:
+  config.useResolutionOverride = m_Controls->m_CheckResolutionOverride->isChecked();
+  config.resolutionWidth = m_Controls->m_ResolutionWidth->value();
+  config.resolutionHeight = m_Controls->m_ResolutionHeight->value();
+
+  //Fill information about probes:
+  config.probes = m_ConfigProbes;
 }
 
 void QmitkUSNewVideoDeviceWidget::EnableDisableSpacingAndCropping(bool enable)

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkUSNewVideoDeviceWidgetControls.h"
 #include "mitkUSVideoDevice.h"
 #include "mitkUSIGTLDevice.h"
+#include "mitkUSDeviceReaderXML.h"
 
 //QT headers
 #include <QWidget>
@@ -135,6 +136,8 @@ protected:
   void AddProbesToDevice(mitk::USVideoDevice::Pointer device);
 
   mitk::USProbe::Pointer CheckIfProbeExistsAlready(std::string &probe);
+
+  void CollectUltrasoundVideoDeviceConfigInformation(mitk::USDeviceReaderXML::USVideoDeviceConfigData &config);
 
   /**
   * \brief Enables or disables the GUI elements of the spacing and cropping options.

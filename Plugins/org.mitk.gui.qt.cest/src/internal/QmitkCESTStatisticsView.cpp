@@ -57,6 +57,53 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iterator>
 #include <vector>
 
+namespace
+{
+  template <typename T, typename Compare>
+  void GetSortPermutation(std::vector<unsigned> &out,
+                          const std::vector<T> &determiningVector,
+                          Compare compare = std::less<T>())
+  {
+    out.resize(determiningVector.size());
+    std::iota(out.begin(), out.end(), 0);
+
+    std::sort(out.begin(), out.end(), [&](unsigned i, unsigned j) {
+      return compare(determiningVector[i], determiningVector[j]);
+    });
+  }
+
+  template <typename T>
+  void ApplyPermutation(const std::vector<unsigned> &order, std::vector<T> &vectorToSort)
+  {
+    assert(order.size() == vectorToSort.size());
+    std::vector<T> tempVector(vectorToSort.size());
+    for (unsigned i = 0; i < vectorToSort.size(); i++)
+    {
+      tempVector[i] = vectorToSort[order[i]];
+    }
+    vectorToSort = tempVector;
+  }
+
+  template <typename T, typename... S>
+  void ApplyPermutation(const std::vector<unsigned> &order,
+                        std::vector<T> &currentVector,
+                        std::vector<S> &... remainingVectors)
+  {
+    ApplyPermutation(order, currentVector);
+    ApplyPermutation(order, remainingVectors...);
+  }
+
+  template <typename T, typename Compare, typename... SS>
+  void SortVectors(const std::vector<T> &orderDeterminingVector,
+                   Compare comparison,
+                   std::vector<SS> &... vectorsToBeSorted)
+  {
+    std::vector<unsigned> order;
+    GetSortPermutation(order, orderDeterminingVector, comparison);
+    ApplyPermutation(order, vectorsToBeSorted...);
+  }
+}
+
 const std::string QmitkCESTStatisticsView::VIEW_ID = "org.mitk.views.ceststatistics";
 static const int STAT_TABLE_BASE_HEIGHT = 180;
 
@@ -314,6 +361,7 @@ void QmitkCESTStatisticsView::OnThreadedStatisticsCalculationEnds()
   QmitkPlotWidget::DataVector xValues = this->m_zSpectrum;
 
   RemoveMZeros(xValues, means, stdevs);
+  ::SortVectors(xValues, std::less<qreal>(), xValues, means, stdevs);
 
   unsigned int curveId = this->m_Controls.m_DataViewWidget->InsertCurve("Spectrum");
   this->m_Controls.m_DataViewWidget->SetCurveData(curveId, xValues, means, stdevs, stdevs);
@@ -441,6 +489,7 @@ void QmitkCESTStatisticsView::PlotPointSet(itk::Image<TPixel, VImageDimension>* 
     QmitkPlotWidget::DataVector xValues = this->m_zSpectrum;
 
     RemoveMZeros(xValues, values);
+    ::SortVectors(xValues, std::less<qreal>(), xValues, values);
 
     unsigned int curveId = this->m_Controls.m_DataViewWidget->InsertCurve(name.str().c_str());
     this->m_Controls.m_DataViewWidget->SetCurveData(curveId, xValues, values);

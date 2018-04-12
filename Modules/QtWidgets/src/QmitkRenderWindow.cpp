@@ -46,7 +46,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk:
 {
   m_InternalRenderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
   m_InternalRenderWindow->SetMultiSamples(0);
-  m_InternalRenderWindow->SetAlphaBitPlanes(mitk::BaseRenderer::RenderingMode::DepthPeeling == renderingMode ? 1 : 0);
+  m_InternalRenderWindow->SetAlphaBitPlanes(0);
 
   this->SetRenderWindow(m_InternalRenderWindow);
 

@@ -185,13 +185,6 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
 
   m_VtkRenderer = vtkRenderer::New();
 
-  if (renderingMode == RenderingMode::DepthPeeling)
-  {
-    m_VtkRenderer->SetUseDepthPeeling(1);
-    m_VtkRenderer->SetMaximumNumberOfPeels(8);
-    m_VtkRenderer->SetOcclusionRatio(0.0);
-  }
-
   if (mitk::VtkLayerController::GetInstance(m_RenderWindow) == nullptr)
   {
     mitk::VtkLayerController::AddInstance(m_RenderWindow, m_VtkRenderer);

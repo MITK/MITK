@@ -32,7 +32,7 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow *renWin,
   {
     m_vtkRenderWindow = vtkRenderWindow::New();
     m_vtkRenderWindow->SetMultiSamples(0);
-    m_vtkRenderWindow->SetAlphaBitPlanes(rmtype == BaseRenderer::RenderingMode::DepthPeeling ? 1 : 0);
+    m_vtkRenderWindow->SetAlphaBitPlanes(0);
   }
 
   if (m_vtkRenderWindow->GetSize()[0] <= 10)

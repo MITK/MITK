@@ -106,7 +106,7 @@ typedef pthread_t ThreadIDType;
   /** \brief Checks validity of given parameters from inheriting classes and stores those parameters in member variables. */
   ImageAccessorBase(ImageConstPointer iP,
       const ImageDataItem* iDI = nullptr,
-      int OptionFlags = IgnoreLock
+      int OptionFlags = DefaultBehavior
     );
 
   /** ImageAccessor has access to the image it belongs to. */

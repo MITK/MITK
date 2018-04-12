@@ -56,7 +56,7 @@ public:
   ImagePixelWriteAccessor(
       ImagePointer iP,
       const ImageDataItem* iDI = nullptr,
-      int OptionFlags = ImageAccessorBase::IgnoreLock
+      int OptionFlags = ImageAccessorBase::DefaultBehavior
       )
     : ImagePixelAccessor<TPixel, VDimension>(iP.GetPointer(),iDI)
     , m_WriteAccessor(iP , iDI, OptionFlags)

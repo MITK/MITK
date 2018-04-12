@@ -123,12 +123,6 @@ if(TARGET ${TESTDRIVER})
                             -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Stanford_bunnySTLDepthSorting640x480REF.png
     )
     endif()
-    if(NOT APPLE)
-      mitkAddCustomModuleTest(mitkSurfaceDepthPeelingTransparency_StanfordBunnySTL640x480 mitkSurfaceDepthPeelingTest
-                              ${MITK_DATA_DIR}/RenderingTestData/Stanford_bunny.stl
-                              -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Stanford_bunnySTLDepthPeeling640x480REF.png #corresponding reference screenshot
-    )
-    endif()
 
 # BUG 18695 - tests deactivated, because win 32 bit continuous renders images slightly different. TODO!
     #Test reslice interpolation

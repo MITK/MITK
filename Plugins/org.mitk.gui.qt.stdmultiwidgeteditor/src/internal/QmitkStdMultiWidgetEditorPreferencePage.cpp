@@ -256,12 +256,8 @@ void QmitkStdMultiWidgetEditorPreferencePage::OnWidgetComboBoxChanged(int i)
 
 void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)
 {
-  if( i == 0 )
-  {
+  //if( i == 0 )
+  //{
     m_CurrentRenderingMode = "Standard";
-  }
-  else if( i == 1 )
-  {
-    m_CurrentRenderingMode = "DepthPeeling";
-  }
+  //}
 }

@@ -184,7 +184,6 @@ set(MODULE_CUSTOM_TESTS
     mitkMultiComponentImageDataComparisonFilterTest.cpp
     mitkImageToItkTest.cpp
     mitkImageSliceSelectorTest.cpp
-    mitkSurfaceDepthPeelingTest.cpp
 )
 
 # Currently not working on windows because of a rendering timing issue

@@ -126,7 +126,6 @@ namespace mitk
     virtual void ApplyAllProperties(mitk::BaseRenderer *renderer, vtkActor *actor);
     virtual void CreateContour(vtkPoints *points, vtkCellArray *connections);
     virtual void CreateVTKRenderObjects();
-    virtual void VertexRendering();
 
     /// All point positions, already in world coordinates
     vtkSmartPointer<vtkPoints> m_WorldPositions;
@@ -160,7 +159,6 @@ namespace mitk
     // variables to check if an update of the vtk objects is needed
     ScalarType m_PointSize;
     ScalarType m_ContourRadius;
-    bool m_VertexRendering;
   };
 
 } // namespace mitk

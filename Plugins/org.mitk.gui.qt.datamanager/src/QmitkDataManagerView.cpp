@@ -1001,6 +1001,14 @@ void QmitkDataManagerView::SurfaceRepresentationActionToggled( bool /*checked*/ 
 
 void QmitkDataManagerView::ReinitSelectedNodes( bool )
 {
+  auto renderWindow = this->GetRenderWindowPart();
+
+  if (nullptr == renderWindow)
+    renderWindow = this->OpenRenderWindowPart(false);
+
+  if (nullptr == renderWindow)
+    return;
+
   auto dataStorage = this->GetDataStorage();
 
   auto selectedNodesIncludedInBoundingBox = mitk::NodePredicateAnd::New(
@@ -1012,7 +1020,7 @@ void QmitkDataManagerView::ReinitSelectedNodes( bool )
   if (nodes->empty())
     return;
 
-  if (1 == nodes->Size()) // Special case: If exacly one ...
+  if (1 == nodes->Size()) // Special case: If exactly one ...
   {
     auto image = dynamic_cast<mitk::Image*>(nodes->ElementAt(0)->GetData());
 

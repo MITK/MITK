@@ -78,23 +78,22 @@ struct InputParameters
   std::string identifyer;
   std::string exePath;
   std::string probePath;
+  bool empty;
   bool verbose;
 };
 
 InputParameters parseInput(int argc, char* argv[])
 {
-  MITK_INFO << "Paring arguments...";
+  MITK_INFO << "Parsing arguments...";
   mitkCommandLineParser parser;
-  // set general information
+
   parser.setCategory("MITK-Photoacoustics");
   parser.setTitle("Mitk Tissue Batch Generator");
   parser.setDescription("Creates in silico tissue in batch processing and automatically calculates fluence values for the central slice of the volume.");
   parser.setContributor("Computer Assisted Medical Interventions, DKFZ");
 
-  // how should arguments be prefixed
   parser.setArgumentPrefix("--", "-");
-  // add each argument, unless specified otherwise each argument is optional
-  // see mitkCommandLineParser::addArgument for more information
+
   parser.beginGroup("Required parameters");
   parser.addArgument(
     "savePath", "s", mitkCommandLineParser::InputDirectory,
@@ -105,6 +104,7 @@ InputParameters parseInput(int argc, char* argv[])
     "MitkMcxyz binary (file)", "path to the MitkMcxyz binary",
     us::Any(), false);
   parser.endGroup();
+
   parser.beginGroup("Optional parameters");
   parser.addArgument(
     "probe", "p", mitkCommandLineParser::OutputFile,
@@ -116,6 +116,10 @@ InputParameters parseInput(int argc, char* argv[])
   parser.addArgument(
     "identifyer", "i", mitkCommandLineParser::String,
     "Generator identifyer (string)", "A unique identifyer for the calculation instance");
+  parser.addArgument(
+    "empty-volume", "e", mitkCommandLineParser::Bool,
+    "omit vessel structures (boolean flag)", "Whether to create an empty volume with no structures inside.");
+  parser.endGroup();
 
   InputParameters input;
 
@@ -123,9 +127,17 @@ InputParameters parseInput(int argc, char* argv[])
   if (parsedArgs.size() == 0)
     exit(-1);
 
+  if (parsedArgs.count("empty-volume"))
+  {
+    input.empty = us::any_cast<bool>(parsedArgs["empty-volume"]);
+  }
+  else
+  {
+    input.empty = false;
+  }
+
   if (parsedArgs.count("verbose"))
   {
-    MITK_INFO << "verbose";
     input.verbose = us::any_cast<bool>(parsedArgs["verbose"]);
   }
   else
@@ -135,34 +147,29 @@ InputParameters parseInput(int argc, char* argv[])
 
   if (parsedArgs.count("savePath"))
   {
-    MITK_INFO << "savePath";
     input.saveFolderPath = us::any_cast<std::string>(parsedArgs["savePath"]);
   }
 
   if (parsedArgs.count("mitkMcxyz"))
   {
-    MITK_INFO << "mitkMcxyz";
     input.exePath = us::any_cast<std::string>(parsedArgs["mitkMcxyz"]);
   }
 
   if (parsedArgs.count("probe"))
   {
-    MITK_INFO << "probe";
     input.probePath = us::any_cast<std::string>(parsedArgs["probe"]);
   }
 
   if (parsedArgs.count("identifyer"))
   {
-    MITK_INFO << "identifyer";
     input.identifyer = us::any_cast<std::string>(parsedArgs["identifyer"]);
   }
   else
   {
-    MITK_INFO << "generating identifyer";
     auto uid = mitk::UIDGenerator("", 8);
     input.identifyer = uid.GetUID();
   }
-  MITK_INFO << "Paring arguments...[Done]";
+  MITK_INFO << "Parsing arguments...[Done]";
   return input;
 }
 
@@ -170,6 +177,11 @@ int main(int argc, char * argv[])
 {
   auto input = parseInput(argc, argv);
   auto parameters = CreatePhantom_04_04_18_Parameters();
+  if (input.empty)
+  {
+    parameters->SetMaxNumberOfVessels(0);
+    parameters->SetMinNumberOfVessels(0);
+  }
   MITK_INFO(input.verbose) << "Generating tissue..";
   auto resultTissue = InSilicoTissueGenerator::GenerateInSilicoData(parameters);
   MITK_INFO(input.verbose) << "Generating tissue..[Done]";

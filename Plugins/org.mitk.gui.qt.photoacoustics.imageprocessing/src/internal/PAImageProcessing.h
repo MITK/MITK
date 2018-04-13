@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef PAImageProcessing_h
 #define PAImageProcessing_h
 
-#include <mitkPhotoacousticImage.h>
+#include <mitkPhotoacousticFilterService.h>
 
 #include <berryISelectionListener.h>
 
@@ -136,7 +136,7 @@ class PAImageProcessing : public QmitkAbstractView
 
     /** \brief Class through which the filters are called.
     */
-    mitk::PhotoacousticImage::Pointer m_FilterBank;
+    mitk::PhotoacousticFilterService::Pointer m_FilterBank;
 };
 
 class BeamformingThread : public QThread
@@ -152,7 +152,7 @@ class BeamformingThread : public QThread
   public:
     void setConfig(mitk::BeamformingSettings BFconfig);
     void setInputImage(mitk::Image::Pointer image);
-    void setFilterBank(mitk::PhotoacousticImage::Pointer filterBank)
+    void setFilterBank(mitk::PhotoacousticFilterService::Pointer filterBank)
     {
       m_FilterBank = filterBank;
     }
@@ -163,7 +163,7 @@ class BeamformingThread : public QThread
     mitk::Image::Pointer m_InputImage;
     int m_Cutoff;
 
-    mitk::PhotoacousticImage::Pointer m_FilterBank;
+    mitk::PhotoacousticFilterService::Pointer m_FilterBank;
 };
 
 class BmodeThread : public QThread
@@ -177,9 +177,9 @@ class BmodeThread : public QThread
   public:
     enum BModeMethod { ShapeDetection, Abs };
 
-    void setConfig(bool useLogfilter, double resampleSpacing, mitk::PhotoacousticImage::BModeMethod method, bool useGPU);
+    void setConfig(bool useLogfilter, double resampleSpacing, mitk::PhotoacousticFilterService::BModeMethod method, bool useGPU);
     void setInputImage(mitk::Image::Pointer image);
-    void setFilterBank(mitk::PhotoacousticImage::Pointer filterBank)
+    void setFilterBank(mitk::PhotoacousticFilterService::Pointer filterBank)
     {
       m_FilterBank = filterBank;
     }
@@ -188,12 +188,12 @@ class BmodeThread : public QThread
   protected:
     mitk::Image::Pointer m_InputImage;
 
-    mitk::PhotoacousticImage::BModeMethod m_Method;
+    mitk::PhotoacousticFilterService::BModeMethod m_Method;
     bool m_UseLogfilter;
     double m_ResampleSpacing;
     bool m_UseGPU;
 
-    mitk::PhotoacousticImage::Pointer m_FilterBank;
+    mitk::PhotoacousticFilterService::Pointer m_FilterBank;
 };
 
 class CropThread : public QThread
@@ -207,7 +207,7 @@ signals:
 public:
   void setConfig(unsigned int CutAbove, unsigned int CutBelow, unsigned int CutSliceFirst, unsigned int CutSliceLast);
   void setInputImage(mitk::Image::Pointer image);
-  void setFilterBank(mitk::PhotoacousticImage::Pointer filterBank)
+  void setFilterBank(mitk::PhotoacousticFilterService::Pointer filterBank)
   {
     m_FilterBank = filterBank;
   }
@@ -220,7 +220,7 @@ protected:
   unsigned int m_CutSliceLast;
   unsigned int m_CutSliceFirst;
 
-  mitk::PhotoacousticImage::Pointer m_FilterBank;
+  mitk::PhotoacousticFilterService::Pointer m_FilterBank;
 };
 
 
@@ -235,7 +235,7 @@ signals:
 public:
   void setConfig(float BPHighPass, float BPLowPass, float TukeyAlpha, float recordTime);
   void setInputImage(mitk::Image::Pointer image);
-  void setFilterBank(mitk::PhotoacousticImage::Pointer filterBank)
+  void setFilterBank(mitk::PhotoacousticFilterService::Pointer filterBank)
   {
     m_FilterBank = filterBank;
   }
@@ -248,7 +248,7 @@ protected:
   float m_TukeyAlpha;
   float m_RecordTime;
 
-  mitk::PhotoacousticImage::Pointer m_FilterBank;
+  mitk::PhotoacousticFilterService::Pointer m_FilterBank;
 };
 
 #endif // PAImageProcessing_h

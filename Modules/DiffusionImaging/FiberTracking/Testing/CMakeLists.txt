@@ -15,5 +15,6 @@ mitkAddCustomModuleTest(mitkMachineLearningTrackingTest mitkMachineLearningTrack
 mitkAddCustomModuleTest(mitkStreamlineTractographyTest mitkStreamlineTractographyTest)
 mitkAddCustomModuleTest(mitkFiberProcessingTest mitkFiberProcessingTest)
 mitkAddCustomModuleTest(mitkFiberFitTest mitkFiberFitTest)
+mitkAddCustomModuleTest(mitkFiberMapper3DTest mitkFiberMapper3DTest)
 
 ENDIF()

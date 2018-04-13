@@ -26,11 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void mitk::VolumeMapperVtkSmart3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
-  if (this->GetDataNode()->GetMTime() < this->GetMTime())
-  {
-    return;
-  }
-
   bool value;
   this->GetDataNode()->GetBoolProperty("volumerendering", value, renderer);
   if (!value)

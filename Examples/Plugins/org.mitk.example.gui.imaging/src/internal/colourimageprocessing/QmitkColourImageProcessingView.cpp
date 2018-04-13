@@ -82,9 +82,12 @@ void QmitkColourImageProcessingView::OnSelectionChanged(berry::IWorkbenchPart::P
       if (node.IsNotNull())
       {
         mitk::Image *image = dynamic_cast<mitk::Image *>(node->GetData());
-        if (image->GetDimension() >= 3)
+        if(nullptr != image)
         {
-          selectedNodes.push_back(node);
+          if (image->GetDimension() >= 3)
+          {
+            selectedNodes.push_back(node);
+          }
         }
       }
     }

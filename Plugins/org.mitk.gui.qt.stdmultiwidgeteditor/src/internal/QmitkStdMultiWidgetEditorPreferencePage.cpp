@@ -254,7 +254,7 @@ void QmitkStdMultiWidgetEditorPreferencePage::OnWidgetComboBoxChanged(int i)
   m_Ui->m_RenderWindowDecorationText->setText(m_WidgetAnnotation[i]);
 }
 
-void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)
+void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int )
 {
   //if( i == 0 )
   //{

@@ -50,7 +50,7 @@ public:
 
     if (this->renderer)
     {
-      mitk::Vector3D plane_vec;
+      mitk::Vector3D plane_vec; plane_vec.Fill(0);
       node->GetPropertyValue("Fiber3DClippingPlane",plane_vec);
       float distance = plane_vec.GetNorm();
       plane_vec.Normalize();
@@ -71,7 +71,7 @@ public:
         distance *= -1;
       }
 
-      float* a = new float[4];
+      float a[4];
       for (int i = 0; i < 3; ++i)
         a[i] = plane_vec[i];
 

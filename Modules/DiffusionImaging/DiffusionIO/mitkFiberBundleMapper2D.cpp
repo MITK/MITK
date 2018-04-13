@@ -49,7 +49,7 @@ public:
 
   void Execute(vtkObject *, unsigned long, void*cbo) override
   {
-    vtkOpenGLHelper *cellBO = reinterpret_cast<vtkOpenGLHelper*>(cbo);
+    vtkShaderProgram *program = reinterpret_cast<vtkShaderProgram*>(cbo);
 
     float fiberOpacity;
     bool fiberFading = false;
@@ -59,9 +59,9 @@ public:
     node->GetFloatProperty("Fiber2DSliceThickness", fiberThickness);
     node->GetBoolProperty("Fiber2DfadeEFX", fiberFading);
 
-    cellBO->Program->SetUniformf("fiberOpacity", fiberOpacity);
-    cellBO->Program->SetUniformi("fiberFadingON", fiberFading);
-    cellBO->Program->SetUniformf("fiberThickness", fiberThickness);
+    program->SetUniformf("fiberOpacity", fiberOpacity);
+    program->SetUniformi("fiberFadingON", fiberFading);
+    program->SetUniformf("fiberThickness", fiberThickness);
 
     if (this->renderer)
     {
@@ -85,7 +85,7 @@ public:
         a[i] = planeNormal[i];
 
       a[3] = thickness;
-      cellBO->Program->SetUniform4f("slicingPlane", a);
+      program->SetUniform4f("slicingPlane", a);
 
     }
   }
@@ -185,8 +185,8 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   localStorage->m_FiberMapper->SetLookupTable(m_lut);  //apply the properties after the slice was set
   localStorage->m_PointActor->GetProperty()->SetOpacity(0.999);
   localStorage->m_FiberMapper->SelectColorArray("FIBER_COLORS");
-
   localStorage->m_FiberMapper->SetInputData(fiberPolyData);
+
   localStorage->m_FiberMapper->SetVertexShaderCode(
         "//VTK::System::Dec\n"
         "attribute vec4 vertexMC;\n"

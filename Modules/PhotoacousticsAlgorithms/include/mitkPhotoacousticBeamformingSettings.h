@@ -72,7 +72,7 @@ namespace mitk {
 
     /** \brief Decides whether GPU computing should be used
     */
-    bool UseGPU = true;
+    bool UseGPU = false;
 
     /** \brief Available delay calculation methods:
     * - Spherical delay for best results.

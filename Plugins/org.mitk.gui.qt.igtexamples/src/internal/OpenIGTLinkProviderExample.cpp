@@ -255,7 +255,7 @@ void OpenIGTLinkProviderExample::ResizeBoundingBox()
 {
   // get all nodes
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetAll();
-  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs)->Clone();
+  auto bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs)->Clone();
 
   if (bounds.IsNull())
   {

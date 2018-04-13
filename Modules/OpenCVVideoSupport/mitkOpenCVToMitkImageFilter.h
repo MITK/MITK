@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 
 // OpenCV includes
-#include <cv.h>
+#include <opencv2/core.hpp>
 
 namespace mitk
 {

@@ -28,8 +28,6 @@ if( arg2.type() == cv::DataType<float>::type ) \
   function<float, T>( arg1, arg2 ); \
 else if( arg2.type() == cv::DataType<double>::type ) \
   function<double, T>( arg1, arg2 ); \
-else if( arg2.type() == cv::DataType<unsigned int>::type ) \
-  function<unsigned int, T>( arg1, arg2 ); \
 else if( arg2.type() == cv::DataType<unsigned short>::type ) \
   function<unsigned short, T>( arg1, arg2 ); \
 else if( arg2.type() == cv::DataType<unsigned char>::type ) \

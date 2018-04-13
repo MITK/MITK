@@ -293,11 +293,11 @@ void QmitkUltrasoundSupport::OnClickedFreezeButton()
 
 void QmitkUltrasoundSupport::OnChangedActiveDevice()
 {
-	if (m_Controls->m_RunImageTimer->isChecked() == FALSE)
-	{
-		StopTimers();
-		return;
-	}
+  if (m_Controls->m_RunImageTimer->isChecked() == false)
+  {
+    StopTimers();
+    return;
+  }
 
   //clean up and stop timer
   StopTimers();

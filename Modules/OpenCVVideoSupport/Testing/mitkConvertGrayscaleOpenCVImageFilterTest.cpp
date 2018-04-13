@@ -17,13 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConvertGrayscaleOpenCVImageFilter.h"
 #include <mitkTestingMacros.h>
 
-#include <highgui.h>
-#include <cv.h>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
 
 static void ConvertTestLoadedImage(std::string mitkImagePath, std::string mitkGrayscaleImagePath)
 {
-  cv::Mat image = cvLoadImage(mitkImagePath.c_str());
-  cv::Mat compareImg = cvLoadImage(mitkGrayscaleImagePath.c_str());
+  cv::Mat image = cv::imread(mitkImagePath.c_str());
+  cv::Mat compareImg = cv::imread(mitkGrayscaleImagePath.c_str());
 
   // directly convert the image for comparison
   cv::Mat comparisonImg;

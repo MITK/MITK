@@ -86,18 +86,8 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
   endif()
 
   if(OpenCV_DIR)
-    set(_opencv_link_directories
-      "${OpenCV_LIB_DIR_DBG}"
-      "${OpenCV_LIB_DIR_OPT}"
-      "${OpenCV_3RDPARTY_LIB_DIR_DBG}"
-      "${OpenCV_3RDPARTY_LIB_DIR_OPT}")
-    list(REMOVE_DUPLICATES _opencv_link_directories)
     if(WIN32)
-      foreach(_opencv_link_directory ${_opencv_link_directories})
-        list(APPEND _dir_candidates "${_opencv_link_directory}/../bin")
-      endforeach()
-    else()
-      list(APPEND _dir_candidates ${_opencv_link_directories})
+      list(APPEND _dir_candidates "${OpenCV_LIB_PATH}/../bin")
     endif()
   endif()
 

@@ -10,6 +10,7 @@ SET(MODULE_CUSTOM_TESTS
   mitkMachineLearningTrackingTest.cpp
   mitkFiberProcessingTest.cpp
   mitkFiberFitTest.cpp
+  mitkFiberMapper3DTest.cpp
 )
 
 

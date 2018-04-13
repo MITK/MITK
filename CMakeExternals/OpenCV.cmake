@@ -77,6 +77,7 @@ if(MITK_USE_OpenCV)
         -DBUILD_DOXYGEN_DOCS:BOOL=OFF
         -DWITH_CUDA:BOOL=OFF
         -DWITH_VTK:BOOL=OFF
+        -DENABLE_CXX11:BOOL=ON
         ${additional_cmake_args}
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}

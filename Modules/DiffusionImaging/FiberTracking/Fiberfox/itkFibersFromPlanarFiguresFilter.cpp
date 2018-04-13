@@ -167,7 +167,8 @@ void FibersFromPlanarFiguresFilter::GenerateData()
 
                 eDir = p1-p0; eDir.Normalize();
                 mitk::Vector2D tDir2 = p3-p0; tDir2.Normalize();
-                mitk::Vector2D temp; temp.SetVnlVector(tRot.transpose() * tDir2.GetVnlVector());
+                mitk::Vector2D temp; temp.Fill(0);
+                temp.SetVnlVector(tRot.transpose() * tDir2.GetVnlVector());
 
                 // apply twist
                 tRot[0][0] = tDir[0]*tDir2[0] + tDir[1]*tDir2[1];

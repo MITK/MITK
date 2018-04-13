@@ -79,15 +79,15 @@ std::vector< std::string > get_file_list(const std::string& path, std::vector< s
 }
 
 /*!
-\brief Fits the tractogram to the input peak image by assigning a weight to each fiber (similar to https://doi.org/10.1016/j.neuroimage.2015.06.092).
+\brief Score input candidate tracts using ACP analysis
 */
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
 
-  parser.setTitle("Anchor Based Scoring");
+  parser.setTitle("Anchor Constrained Plausibility");
   parser.setCategory("Fiber Tracking Evaluation");
-  parser.setDescription("");
+  parser.setDescription("Score input candidate tracts using ACP analysis");
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");

@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
   parser.addArgument("ref_masks", "", mitkCommandLineParser::StringList, "Ref. Masks:", "reference bundle masks", us::Any());
   parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
   parser.addArgument("distance", "", mitkCommandLineParser::Int, "Distance:", "", 10);
-  parser.addArgument("metric", "", mitkCommandLineParser::String, "Metric:", "");
+  parser.addArgument("metric", "", mitkCommandLineParser::String, "Metric:", "EU_MEAN (default), EU_STD, EU_MAX");
   parser.addArgument("subsample", "", mitkCommandLineParser::Float, "Subsampling factor:", "Only use specified fraction of input fibers", 1.0);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

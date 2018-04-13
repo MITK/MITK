@@ -46,6 +46,9 @@ set(CPP_FILES
   QmitkDataStorageListInspector.cpp
   QmitkDataStorageTreeInspector.cpp
   QmitkModelViewSelectionConnector.cpp
+  QmitkIDataStorageInspectorProvider.cpp
+  mitkQtWidgetsActivator.cpp
+  QmitkDataStorageInspectorGenerator.cpp
 )
 
 set(MOC_H_FILES

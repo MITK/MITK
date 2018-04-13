@@ -17,14 +17,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkNodeSelectionDialog.h"
 
-#include <QmitkDataStorageListInspector.h>
+#include <QmitkDataStorageInspectorGenerator.h>
 #include <QmitkDataStorageTreeInspector.h>
 
 QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint) : QDialog(parent), m_NodePredicate(nullptr), m_SelectOnlyVisibleNodes(false)
 {
   m_Controls.setupUi(this);
-  AddPanel(new QmitkDataStorageListInspector(this),"List");
-  AddPanel(new QmitkDataStorageTreeInspector(this), "Rendering Tree");
+
+  auto providers = QmitkDataStorageInspectorGenerator::GetProviders();
+
+  for (auto provider : providers)
+  {
+    auto inspector = provider.second->CreateInspector();
+    QString name = QString::fromStdString(provider.second->GetInspectorDisplayName());
+    QString desc = QString::fromStdString(provider.second->GetInspectorDescription());
+    AddPanel(inspector, name, desc);
+  }
+
   m_Controls.tabWidget->setCurrentIndex(0);
   this->setWindowTitle(title);
   this->setToolTip(hint);
@@ -103,13 +112,14 @@ void QmitkNodeSelectionDialog::OnSelectionChanged(NodeList selectedNodes)
   emit CurrentSelectionChanged(selectedNodes);
 };
 
-void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageInspector* view, QString name)
+void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageInspector* view, QString name, QString desc)
 {
   view->setParent(this);
   view->SetSelectionMode(m_SelectionMode);
 
   auto tabPanel = new QWidget();
   tabPanel->setObjectName(QString("tab_")+name);
+  tabPanel->setToolTip(desc);
   m_Controls.tabWidget->insertTab(0, tabPanel, name);
 
   auto verticalLayout = new QVBoxLayout(tabPanel);

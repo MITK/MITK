@@ -110,7 +110,7 @@ protected Q_SLOTS:
   void OnCancel();
 
 protected:
-  void AddPanel(QmitkAbstractDataStorageInspector*, QString name);
+  void AddPanel(QmitkAbstractDataStorageInspector* view, QString name, QString desc);
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   mitk::NodePredicateBase::Pointer m_NodePredicate;

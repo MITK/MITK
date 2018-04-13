@@ -3,6 +3,7 @@ file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURREN
 set(CPP_FILES
   source/mitkPhotoacousticFilterService.cpp
   source/mitkPhotoacousticBeamformingFilter.cpp
+  source/mitkPhotoacousticBeamformingUtils.cpp
   source/OpenCLFilter/mitkPhotoacousticBModeFilter.cpp
 )
 

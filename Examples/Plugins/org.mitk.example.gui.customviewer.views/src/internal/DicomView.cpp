@@ -89,7 +89,7 @@ void DicomView::AddDataNodeFromDICOM(QHash<QString, QVariant> eventProperties)
       mitk::DataStorage::Pointer ds = this->GetDataStorage();
       // //! [DicomViewCreateAddDataNode]
       mitk::RenderingManager::GetInstance()->SetDataStorage(ds);
-      mitk::TimeGeometry::Pointer geometry = ds->ComputeBoundingGeometry3D(ds->GetAll());
+      auto geometry = ds->ComputeBoundingGeometry3D(ds->GetAll());
       mitk::RenderingManager::GetInstance()->InitializeViews(geometry);
 
       // //! [DicomViewCreateAddDataNodeActivatePersp]

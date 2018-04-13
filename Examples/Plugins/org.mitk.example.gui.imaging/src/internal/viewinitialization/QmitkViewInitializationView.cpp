@@ -109,7 +109,7 @@ void QmitkViewInitializationView::OnApply()
 void QmitkViewInitializationView::OnResetAll()
 {
   /* calculate bounding geometry of these nodes */
-  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D();
+  auto bounds = this->GetDataStorage()->ComputeBoundingGeometry3D();
   /* initialize the views to the bounding geometry */
   mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }

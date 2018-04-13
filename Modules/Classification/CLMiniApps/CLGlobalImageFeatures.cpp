@@ -317,7 +317,7 @@ void SaveSliceOrImageAsPNG(mitk::Image::Pointer image, mitk::Image::Pointer mask
   ds->Add(nodeI);
   ds->Add(nodeM);
 
-  mitk::TimeGeometry::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
+  auto geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
   mitk::SliceNavigationController::Pointer sliceNaviController = renderWindow.GetSliceNavigationController();

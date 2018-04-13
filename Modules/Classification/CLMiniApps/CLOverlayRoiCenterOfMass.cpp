@@ -83,7 +83,7 @@ void SaveSliceOrImageAsPNG(mitk::Image::Pointer image, mitk::Image::Pointer mask
   ds->Add(nodeI);
   ds->Add(nodeM);
 
-  mitk::TimeGeometry::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
+  auto geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews(
     mask->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
 

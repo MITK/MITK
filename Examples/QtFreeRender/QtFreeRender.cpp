@@ -311,7 +311,7 @@ int main(int argc, char *argv[])
   Fit();
 
   // Initialize the RenderWindows
-  mitk::TimeGeometry::Pointer geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
+  auto geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
   m_DataStorage->Print(std::cout);

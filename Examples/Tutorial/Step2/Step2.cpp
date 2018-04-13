@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
   renderWindow.GetRenderer()->SetDataStorage(storage);
 
   // Initialize the RenderWindow
-  mitk::TimeGeometry::Pointer geo = storage->ComputeBoundingGeometry3D(storage->GetAll());
+  auto geo = storage->ComputeBoundingGeometry3D(storage->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
   // Select a slice

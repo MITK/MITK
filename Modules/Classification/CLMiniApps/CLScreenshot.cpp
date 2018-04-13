@@ -74,7 +74,7 @@ void SaveSliceOrImageAsPNG(std::vector<std::string> listOfOutputs, std::string p
     ds->Add(nodeI);
   }
 
-  mitk::TimeGeometry::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
+  auto geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
   mitk::SliceNavigationController::Pointer sliceNaviController = renderWindow.GetSliceNavigationController();

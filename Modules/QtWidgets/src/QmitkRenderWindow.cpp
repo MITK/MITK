@@ -54,6 +54,8 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk:
 
   this->setFocusPolicy(Qt::StrongFocus);
   this->setMouseTracking(true);
+  QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  this->setSizePolicy(sizePolicy);
 }
 
 QmitkRenderWindow::~QmitkRenderWindow()

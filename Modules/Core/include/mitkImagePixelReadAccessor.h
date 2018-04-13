@@ -56,7 +56,7 @@ public:
   ImagePixelReadAccessor(
       ImageConstPointer iP,
       const ImageDataItem* iDI = nullptr,
-      int OptionFlags = ImageAccessorBase::IgnoreLock
+      int OptionFlags = ImageAccessorBase::DefaultBehavior
       )
     : ImagePixelAccessor<TPixel, VDimension>(iP,iDI)
     , m_ReadAccessor(iP, iDI, OptionFlags)
@@ -66,7 +66,7 @@ public:
   ImagePixelReadAccessor(
       ImagePointer iP,
       const ImageDataItem* iDI = nullptr,
-      int OptionFlags = ImageAccessorBase::IgnoreLock
+      int OptionFlags = ImageAccessorBase::DefaultBehavior
       )
     : ImagePixelAccessor<TPixel, VDimension>(iP.GetPointer(),iDI)
     , m_ReadAccessor(iP, iDI, OptionFlags)
@@ -76,7 +76,7 @@ public:
   ImagePixelReadAccessor(
       Image* iP,
       const ImageDataItem* iDI = nullptr,
-      int OptionFlags = ImageAccessorBase::IgnoreLock
+      int OptionFlags = ImageAccessorBase::DefaultBehavior
       )
     : ImagePixelAccessor<TPixel, VDimension>(iP,iDI)
     , m_ReadAccessor(mitk::Image::ConstPointer(iP), iDI, OptionFlags)
@@ -86,7 +86,7 @@ public:
   ImagePixelReadAccessor(
       const Image* iP,
       const ImageDataItem* iDI = nullptr,
-      int OptionFlags = ImageAccessorBase::IgnoreLock
+      int OptionFlags = ImageAccessorBase::DefaultBehavior
       )
     : ImagePixelAccessor<TPixel, VDimension>(iP,iDI)
     , m_ReadAccessor(iP, iDI, OptionFlags)

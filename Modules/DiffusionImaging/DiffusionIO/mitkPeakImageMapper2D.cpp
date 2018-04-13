@@ -49,7 +49,7 @@ public:
 
   void Execute(vtkObject *, unsigned long, void*cbo) override
   {
-    vtkOpenGLHelper *cellBO = reinterpret_cast<vtkOpenGLHelper*>(cbo);
+    vtkShaderProgram *program = reinterpret_cast<vtkShaderProgram*>(cbo);
 
 
     mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
@@ -66,8 +66,8 @@ public:
     float peakOpacity;
     node->GetOpacity(peakOpacity, nullptr);
 
-    cellBO->Program->SetUniformf("peakOpacity", peakOpacity);
-    cellBO->Program->SetUniformf("clippingPlaneThickness", minSpacing/2);
+    program->SetUniformf("peakOpacity", peakOpacity);
+    program->SetUniformf("clippingPlaneThickness", minSpacing/2);
 
     if (this->renderer)
     {
@@ -91,7 +91,7 @@ public:
         a[i] = planeNormal[i];
 
       a[3] = thickness;
-      cellBO->Program->SetUniform4f("slicingPlane", a);
+      program->SetUniform4f("slicingPlane", a);
     }
   }
 

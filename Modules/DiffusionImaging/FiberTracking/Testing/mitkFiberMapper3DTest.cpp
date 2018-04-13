@@ -47,6 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <omp.h>
 #include <mitkTestFixture.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
+#include <vtkTesting.h>
 
 class mitkFiberMapper3DTestSuite : public mitk::TestFixture
 {
@@ -90,18 +91,23 @@ public:
     auto node = mitk::DataNode::New();
     node->SetData(fib);
 
-    MITK_INFO << "TEST 1";
     mitk::RenderingTestHelper renderingHelper(640, 480);
     renderingHelper.AddNodeToStorage(node);
 
-    MITK_INFO << "TEST 2";
     renderingHelper.SetMapperID(mitk::BaseRenderer::Standard3D);
     renderingHelper.GetVtkRenderer()->SetBackground(0.0, 0.0, 0.0);
 
-    MITK_INFO << "TEST 3";
     mitk::RenderingManager::GetInstance()->InitializeViews(fib->GetGeometry(), mitk::RenderingManager::RequestType::REQUEST_UPDATE_ALL);
     renderingHelper.SaveReferenceScreenShot(mitk::IOUtil::GetTempPath()+"fib_renderingtest.png");
-    MITK_INFO << "TEST 4";
+
+//    MITK_INFO << "1";
+//    char* argv[4];
+//    argv[0] = (char*)"";
+//    argv[1] = (char*)"";
+//    argv[1] = (char*)"-V";
+//    argv[3] = (char*)GetTestDataFilePath("fib_renderingtest.png").c_str();
+//    MITK_INFO << "2";
+//    CPPUNIT_ASSERT_MESSAGE("CompareRenderWindowAgainstReference test result positive?", renderingHelper.CompareRenderWindowAgainstReference(4, argv));
   }
 
 };

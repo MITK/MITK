@@ -40,13 +40,13 @@ public:
   mitk::BaseRenderer *renderer;
   mitk::DataNode *node;
 
-  void Execute(vtkObject *, unsigned long, void*cbo) override
+  void Execute(vtkObject *, unsigned long, void* cbo) override
   {
-    vtkOpenGLHelper *cellBO = reinterpret_cast<vtkOpenGLHelper*>(cbo);
+    vtkShaderProgram *program = reinterpret_cast<vtkShaderProgram*>(cbo);
 
     float fiberOpacity;
     node->GetOpacity(fiberOpacity, nullptr);
-    cellBO->Program->SetUniformf("fiberOpacity", fiberOpacity);
+    program->SetUniformf("fiberOpacity", fiberOpacity);
 
     if (this->renderer)
     {
@@ -76,24 +76,24 @@ public:
         a[i] = plane_vec[i];
 
       a[3] = distance;
-      cellBO->Program->SetUniform4f("slicingPlane", a);
+      program->SetUniform4f("slicingPlane", a);
 
       float v = 1;
       node->GetFloatProperty("light.ambient", v);
-      cellBO->Program->SetUniformf("ambient", v);
+      program->SetUniformf("ambient", v);
 
       node->GetFloatProperty("light.diffuse", v);
-      cellBO->Program->SetUniformf("diffuse", v);
+      program->SetUniformf("diffuse", v);
 
       node->GetFloatProperty("light.specular", v);
-      cellBO->Program->SetUniformf("intensity", v);
+      program->SetUniformf("intensity", v);
 
       node->GetFloatProperty("light.intensity", v);
-      cellBO->Program->SetUniformf("intensity", v);
+      program->SetUniformf("intensity", v);
 
       bool enable_light = false;
       node->GetBoolProperty("light.enable_light", enable_light);
-      cellBO->Program->SetUniformi("enable_light", enable_light);
+      program->SetUniformi("enable_light", enable_light);
     }
   }
 
@@ -204,6 +204,20 @@ void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *rendere
 
   localStorage->m_FiberAssembly->AddPart(localStorage->m_FiberActor);
 
+//  localStorage->m_FiberMapper->AddShaderReplacement(
+//        vtkShader::Vertex,
+//        "//VTK::Normal::Dec\n",
+//        true,
+//        "//VTK::Normal::Dec\n"
+//        "uniform mat4 MCVCMatrix;\n"
+//        "attribute vec3 normalMC;\n"
+//        "uniform mat3 normalMatrix;\n"
+//        "varying vec4 positionWorld;\n"
+//        "varying vec4 colorVertex;\n"
+//        "varying vec3 N;\n"
+//        "varying vec4 v;\n",
+//        false
+//        );
 
   localStorage->m_FiberMapper->SetVertexShaderCode(
         "//VTK::System::Dec\n"

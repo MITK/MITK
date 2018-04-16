@@ -219,6 +219,13 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer( mitk::BaseRendere
     PlaneGeometryData* otherData = dynamic_cast<PlaneGeometryData*>(otherNode->GetData());
     if (!otherData) continue;
 
+    std::string multiWidgetName = "";
+    bool hasStringProperty = otherNode->GetStringProperty("multiWidget", multiWidgetName);
+    std::string rendererName(renderer->GetName());
+    if (hasStringProperty && rendererName.find(multiWidgetName) == std::string::npos) {
+      continue;
+    }
+
     PlaneGeometry* otherGeometry = dynamic_cast<PlaneGeometry*>(otherData->GetPlaneGeometry());
     if ( otherGeometry && !dynamic_cast<AbstractTransformGeometry*>(otherData->GetPlaneGeometry()) )
     {

@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk core
 #include <mitkBaseRenderer.h>
-#include <mitkCustomDisplayActionEventHandler.h>
 #include <mitkDataStorage.h>
 #include <mitkDisplayActionEventBroadcast.h>
 #include <mitkMouseModeSwitcher.h>
@@ -211,7 +210,6 @@ private:
   mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
   mitk::SliceNavigationController* m_TimeNavigationController;
   mitk::DisplayActionEventBroadcast::Pointer m_DisplayActionEventBroadcast;
-  std::unique_ptr<mitk::CustomDisplayActionEventHandler> m_CustomDisplayActionEventHandler;
   std::unique_ptr<mitk::StdDisplayActionEventHandler> m_StdDisplayActionEventHandler;
 
   mitk::DataStorage::Pointer m_DataStorage;

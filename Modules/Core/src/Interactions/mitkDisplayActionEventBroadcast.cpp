@@ -71,8 +71,8 @@ void mitk::DisplayActionEventBroadcast::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("move", Move);
   CONNECT_FUNCTION("zoom", Zoom);
   CONNECT_FUNCTION("scroll", Scroll);
-  CONNECT_FUNCTION("ScrollOneDown", ScrollOneDown);
   CONNECT_FUNCTION("ScrollOneUp", ScrollOneUp);
+  CONNECT_FUNCTION("ScrollOneDown", ScrollOneDown);
   CONNECT_FUNCTION("levelWindow", AdjustLevelWindow);
   CONNECT_FUNCTION("setCrosshair", SetCrosshair);
 
@@ -465,15 +465,14 @@ void mitk::DisplayActionEventBroadcast::Move(StateMachineAction* stateMachineAct
 {
   auto* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
 
-  float invertModifier = -1.0;
+  BaseRenderer* sender = interactionEvent->GetSender();
+  Vector2D moveVector = m_LastDisplayCoordinate - positionEvent->GetPointerPositionOnScreen();
+
   if (m_InvertMoveDirection)
   {
-    invertModifier = 1.0;
+    moveVector *= -1.0;
   }
 
-  // compute translation
-  BaseRenderer* sender = interactionEvent->GetSender();
-  Vector2D moveVector = (positionEvent->GetPointerPositionOnScreen() - m_LastDisplayCoordinate) * invertModifier;
   moveVector *= sender->GetScaleFactorMMPerDisplayUnit(); // #TODO: put here?
 
   // store new display coordinate
@@ -535,94 +534,64 @@ void mitk::DisplayActionEventBroadcast::Scroll(StateMachineAction* stateMachineA
 {
   auto* positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
 
-  mitk::SliceNavigationController::Pointer sliceNavigationController = interactionEvent->GetSender()->GetSliceNavigationController();
-  if (sliceNavigationController)
+  int sliceDelta = 0;
+
+  // scroll direction
+  if (m_ScrollDirection == "updown")
   {
-    int delta = 0;
-
-    // scroll direction
-    if (m_ScrollDirection == "updown")
-    {
-      delta = static_cast<int>(m_LastDisplayCoordinate[1] - positionEvent->GetPointerPositionOnScreen()[1]);
-    }
-    else
-    {
-      delta = static_cast<int>(m_LastDisplayCoordinate[0] - positionEvent->GetPointerPositionOnScreen()[0]);
-    }
-
-    if (m_InvertScrollDirection)
-    {
-      delta *= -1;
-    }
-
-    // set how many pixels the mouse has to be moved to scroll one slice
-    // if the mouse has been moved less than 'm_IndexToSliceModifier', pixels slice ONE slice only
-    if (delta > 0 && delta < m_IndexToSliceModifier)
-    {
-      delta = m_IndexToSliceModifier;
-    }
-    else if (delta < 0 && delta > -m_IndexToSliceModifier)
-    {
-      delta = -m_IndexToSliceModifier;
-    }
-    delta /= m_IndexToSliceModifier;
-
-    int newPosition = sliceNavigationController->GetSlice()->GetPos() + delta;
-
-    // if auto repeat is on, start at first slice if you reach the last slice and vice versa
-    int maxSlices = sliceNavigationController->GetSlice()->GetSteps();
-    if (m_AutoRepeat)
-    {
-      while (newPosition < 0)
-      {
-        newPosition += maxSlices;
-      }
-
-      while (newPosition >= maxSlices)
-      {
-        newPosition -= maxSlices;
-      }
-    }
-    else
-    {
-      // if the new slice is below 0 we still show slice 0
-      // due to the stepper using unsigned int we have to do this ourselves
-      if (newPosition < 1)
-      {
-        newPosition = 0;
-      }
-    }
-
-    // store new display coordinates
-    m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
-    m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
-
-    // propagate scroll event with computed geometry values
-    InvokeEvent(DisplayScrollEvent(interactionEvent, newPosition));
+    sliceDelta = static_cast<int>(m_LastDisplayCoordinate[1] - positionEvent->GetPointerPositionOnScreen()[1]);
   }
-}
-
-void mitk::DisplayActionEventBroadcast::ScrollOneDown(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
-{
-  // #TODO: needed here?
-  mitk::SliceNavigationController::Pointer sliceNavigationController = interactionEvent->GetSender()->GetSliceNavigationController();
-  if (sliceNavigationController)
+  else
   {
-    if (!sliceNavigationController->GetSliceLocked())
-    {
-      mitk::Stepper* stepper = sliceNavigationController->GetSlice();
-      if (stepper->GetSteps() <= 1)
-      {
-        stepper = sliceNavigationController->GetTime();
-      }
-      stepper->Next();
-    }
+    sliceDelta = static_cast<int>(m_LastDisplayCoordinate[0] - positionEvent->GetPointerPositionOnScreen()[0]);
   }
+
+  if (m_InvertScrollDirection)
+  {
+    sliceDelta *= -1;
+  }
+
+  // set how many pixels the mouse has to be moved to scroll one slice
+  // if the mouse has been moved less than 'm_IndexToSliceModifier', pixels slice ONE slice only
+  if (sliceDelta > 0 && sliceDelta < m_IndexToSliceModifier)
+  {
+    sliceDelta = m_IndexToSliceModifier;
+  }
+  else if (sliceDelta < 0 && sliceDelta > -m_IndexToSliceModifier)
+  {
+    sliceDelta = -m_IndexToSliceModifier;
+  }
+  sliceDelta /= m_IndexToSliceModifier;
+
+  // store new display coordinates
+  m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
+  m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
+
+  // propagate scroll event with computed geometry values
+  InvokeEvent(DisplayScrollEvent(interactionEvent, sliceDelta));
 }
 
 void mitk::DisplayActionEventBroadcast::ScrollOneUp(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
 {
-  // nothing here; no event sent
+  int sliceDelta = 1;
+  if (m_InvertScrollDirection)
+  {
+    sliceDelta = -1;
+  }
+
+  // propagate scroll event with a single slice delta (increase)
+  InvokeEvent(DisplayScrollEvent(interactionEvent, sliceDelta));
+}
+
+void mitk::DisplayActionEventBroadcast::ScrollOneDown(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+{
+  int sliceDelta = -1;
+  if (m_InvertScrollDirection)
+  {
+    sliceDelta = 1;
+  }
+  // propagate scroll event with a single slice delta (decrease)
+  InvokeEvent(DisplayScrollEvent(interactionEvent, sliceDelta));
 }
 
 void mitk::DisplayActionEventBroadcast::AdjustLevelWindow(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)

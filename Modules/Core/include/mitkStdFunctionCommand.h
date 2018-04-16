@@ -22,13 +22,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 // itk
 #include <itkCommand.h>
 
+// c++
+#include <functional>
+
 namespace mitk
 {
   // define custom command to accept std::functions as "filter" and as "action"
   class MITKCORE_EXPORT StdFunctionCommand : public itk::Command
   {
   public:
-    using Self =      StdFunctionCommand;
+    using Self    =   StdFunctionCommand;
     using Pointer =   itk::SmartPointer<Self>;
 
     using FilterFunction = std::function<bool(const itk::EventObject&)>;

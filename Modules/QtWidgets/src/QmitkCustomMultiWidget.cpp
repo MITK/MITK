@@ -63,7 +63,6 @@ QmitkCustomMultiWidget::QmitkCustomMultiWidget(QWidget* parent,
   , m_PendingCrosshairPositionEvent(false)
   , m_CrosshairNavigationEnabled(false)
   , m_DisplayActionEventBroadcast(nullptr)
-  , m_CustomDisplayActionEventHandler(nullptr)
   , m_StdDisplayActionEventHandler(nullptr)
 {
   // create widget manually
@@ -677,8 +676,8 @@ void QmitkCustomMultiWidget::InitializeWidget()
   // analyse those things and design a controlling mechanism
 
   // necessary here? mouse mode is valid for all render windows (and also used in editor)
-  m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();
-  m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::MITK);
+  //m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();
+  //m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::MITK);
 
   // setup the department logo rendering
   /*
@@ -699,10 +698,8 @@ void QmitkCustomMultiWidget::InitializeDisplayActionEventHandling()
 {
   m_DisplayActionEventBroadcast = mitk::DisplayActionEventBroadcast::New();
   m_DisplayActionEventBroadcast->LoadStateMachine("DisplayInteraction.xml");
-  m_DisplayActionEventBroadcast->SetEventConfig("DisplayConfigMITK.xml");
+  m_DisplayActionEventBroadcast->SetEventConfig("DisplayConfigPACS.xml");
 
-  //m_CustomDisplayActionEventHandler = std::make_unique<mitk::CustomDisplayActionEventHandler>();
-  //m_CustomDisplayActionEventHandler->SetObservableBroadcast(m_DisplayActionEventBroadcast);
   m_StdDisplayActionEventHandler = std::make_unique<mitk::StdDisplayActionEventHandler>();
   m_StdDisplayActionEventHandler->SetObservableBroadcast(m_DisplayActionEventBroadcast);
   m_StdDisplayActionEventHandler->InitStdActions();

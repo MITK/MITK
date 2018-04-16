@@ -176,7 +176,7 @@ set(CPP_FILES
   Interactions/mitkDisplayCoordinateOperation.cpp
   Interactions/mitkDisplayInteractor.cpp
   Interactions/mitkDisplayActionEventBroadcast.cpp
-  Interactions/mitkDisplayActionEventDefaultFunctions.cpp
+  Interactions/mitkDisplayActionEventFunctions.cpp
   Interactions/mitkDisplayActionEventHandler.cpp
   Interactions/mitkEventConfig.cpp
   Interactions/mitkEventFactory.cpp

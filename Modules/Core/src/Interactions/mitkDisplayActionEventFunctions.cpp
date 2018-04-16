@@ -14,14 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "DisplayActionEventDefaultFunctions.h"
+#include "mitkDisplayActionEventFunctions.h"
+
+// mitk core
+#include "mitkBaseRenderer.h"
+#include "mitkCameraController.h"
+#include "mitkDisplayActionEvents.h"
+#include "mitkInteractionEvent.h"
 
 // itk
 #include <itkEventObject.h>
 
-StdFunctionCommand::ActionFunction mitk::DisplayActionEventDefaultFunctions::DefaultMoveAction()
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::MoveSenderCameraAction()
 {
-  auto actionFunction = [](const itk::EventObject& displayInteractorEvent)
+  mitk::StdFunctionCommand::ActionFunction actionFunction = [](const itk::EventObject& displayInteractorEvent)
   {
     if (DisplayMoveEvent().CheckEvent(&displayInteractorEvent))
     {
@@ -37,7 +43,7 @@ StdFunctionCommand::ActionFunction mitk::DisplayActionEventDefaultFunctions::Def
   return actionFunction;
 }
 
-StdFunctionCommand::ActionFunction mitk::DisplayActionEventDefaultFunctions::DefaultSetCrosshairAction()
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetCrosshairAction()
 {
   auto actionFunction = [](const itk::EventObject& displayInteractorEvent)
   {
@@ -61,7 +67,7 @@ StdFunctionCommand::ActionFunction mitk::DisplayActionEventDefaultFunctions::Def
   return actionFunction;
 }
 
-void mitk::DisplayActionEventDefaultFunctions::DefaultZoomAction()
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ZoomSenderCameraAction()
 {
   auto actionFunction = [](const itk::EventObject& displayInteractorEvent)
   {
@@ -82,7 +88,7 @@ void mitk::DisplayActionEventDefaultFunctions::DefaultZoomAction()
   return actionFunction;
 }
 
-void mitk::DisplayActionEventDefaultFunctions::DefaultScrollAction()
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ScrollSliceStepperAction()
 {
   auto actionFunction = [](const itk::EventObject& displayInteractorEvent)
   {
@@ -92,9 +98,30 @@ void mitk::DisplayActionEventDefaultFunctions::DefaultScrollAction()
       const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetInteractionEvent()->GetSender();
 
       // concrete action
-      sendingRenderer->GetSliceNavigationController()->GetSlice()->SetPos(displayActionEvent->GetPosition());
+      mitk::SliceNavigationController* sliceNavigationController = sendingRenderer->GetSliceNavigationController();
+      if (nullptr == sliceNavigationController)
+      {
+        return;
+      }
+      if (sliceNavigationController->GetSliceLocked())
+      {
+        return;
+      }
+      mitk::Stepper* sliceStepper = sliceNavigationController->GetSlice();
+      if (nullptr == sliceStepper)
+      {
+        return;
+      }
+
+      // if only a single slice image was loaded, scrolling will affect the time steps
+      if (sliceStepper->GetSteps() <= 1)
+      {
+        sliceStepper = sliceNavigationController->GetTime();
+      }
+
+      sliceStepper->MoveSlice(displayActionEvent->GetSliceDelta());
     }
   };
 
-  return;
+  return actionFunction;
 }

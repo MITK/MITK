@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStdDisplayActionEventHandler.h"
 
 // mitk core
-#include "mitkDisplayActionEventDefaultFunctions.h"
+#include "mitkDisplayActionEventFunctions.h"
 
 // itk
 #include <itkEventObject.h>
@@ -30,15 +30,15 @@ void mitk::StdDisplayActionEventHandler::InitStdActions()
     mitkThrow() << "No display action event broadcast class set to observe. Use 'SetObservableBroadcast' before initializing actions.";
   }
 
-  StdFunctionCommand::ActionFunction actionFunction = DisplayActionEventDefaultFunctions::DefaultMoveAction();
+  StdFunctionCommand::ActionFunction actionFunction = DisplayActionEventFunctions::MoveSenderCameraAction();
   ConnectDisplayActionEvent(DisplayMoveEvent(nullptr, Vector2D()), actionFunction);
 
-  StdFunctionCommand::ActionFunction actionFunction = DisplayActionEventDefaultFunctions::DefaultSetCrosshairAction();
+  actionFunction = DisplayActionEventFunctions::SetCrosshairAction();
   ConnectDisplayActionEvent(DisplaySetCrosshairEvent(nullptr, Point3D()), actionFunction);
 
-  StdFunctionCommand::ActionFunction actionFunction = DisplayActionEventDefaultFunctions::DefaultZoomAction();
+  actionFunction = DisplayActionEventFunctions::ZoomSenderCameraAction();
   ConnectDisplayActionEvent(DisplayZoomEvent(nullptr, 0.0, Point2D()), actionFunction);
 
-  StdFunctionCommand::ActionFunction actionFunction = DisplayActionEventDefaultFunctions::DefaultScrollAction();
+  actionFunction = DisplayActionEventFunctions::ScrollSliceStepperAction();
   ConnectDisplayActionEvent(DisplayScrollEvent(nullptr, 0), actionFunction);
 }

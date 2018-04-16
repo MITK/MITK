@@ -93,9 +93,9 @@ namespace mitk
 
     virtual void Scroll(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
-    virtual void ScrollOneDown(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
-
     virtual void ScrollOneUp(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
+
+    virtual void ScrollOneDown(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
     virtual void AdjustLevelWindow(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 

@@ -531,8 +531,6 @@ void mitk::DisplayInteractor::Scroll(StateMachineAction *, InteractionEvent *int
 
     // set the new position
     sliceNaviController->GetSlice()->SetPos(newPos);
-    // #TODO: why not
-    // sliceNaviController->SelectSliceByPoint(pos);
     /*
     const BaseRenderer::Pointer sender = interactionEvent->GetSender();
     auto renWindows = sender->GetRenderingManager()->GetAllRegisteredRenderWindows();
@@ -542,8 +540,6 @@ void mitk::DisplayInteractor::Scroll(StateMachineAction *, InteractionEvent *int
         renWin != sender->GetRenderWindow())
       {
         BaseRenderer::GetInstance(renWin)->GetSliceNavigationController()->GetSlice()->SetPos(newPos);
-        // #TODO: why not
-        // BaseRenderer::GetInstance(renWin)->GetSliceNavigationController()->SelectSliceByPoint(pos);
       }
     }
     */

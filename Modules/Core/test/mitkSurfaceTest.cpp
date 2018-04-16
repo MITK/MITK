@@ -108,7 +108,6 @@ public:
 
   void StateOfVtkPolyDataEqualNullPointer_Success()
   {
-    vtkPolyData *polys = m_SphereSource->GetOutput();
     CPPUNIT_ASSERT_MESSAGE("Testing initial state of vtkPolyData", m_Surface->GetVtkPolyData() == nullptr);
   }
 

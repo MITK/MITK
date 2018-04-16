@@ -7,4 +7,5 @@ set(CPP_FILES
 
 set(RESOURCE_FILES
   1416.json
+  1485.json
 )

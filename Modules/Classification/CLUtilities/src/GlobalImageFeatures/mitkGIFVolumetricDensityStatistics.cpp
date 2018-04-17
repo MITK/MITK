@@ -80,7 +80,6 @@ CalculateVolumeDensityStatistic(itk::Image<TPixel, VImageDimension>* itkImage, m
   typename ImageType::PointType pointA;
   typename ImageType::PointType pointB;
 
-  std::cout << "GIFVolumetric Begin Image Mean Calcuation " << std::endl;
   while (!imgA.IsAtEnd())
   {
     if (maskA.Get() > 0)
@@ -95,8 +94,6 @@ CalculateVolumeDensityStatistic(itk::Image<TPixel, VImageDimension>* itkImage, m
   imgA.GoToBegin();
   maskA.GoToBegin();
 
-
-  std::cout << "GIFVolumetric Begin Image MoranB Calcuation " << std::endl;
   while (!imgA.IsAtEnd())
   {
     if (maskA.Get() > 0)
@@ -193,8 +190,6 @@ void calculateMOBB(vtkPointSet *pointset, double &volume, double &surface)
         curMaxY = std::max<double>(p2[1], curMaxY);
         curMinZ = std::min<double>(p2[2], curMinZ);
         curMaxZ = std::max<double>(p2[2], curMaxZ);
-
-        //std::cout << pointID << " (" << p[0] << "|" << p[1] << "|" << p[2] << ") (" << p2[0] << "|" << p2[1] << "|" << p2[2] << ")" << std::endl;
       }
 
       if ((curMaxX - curMinX)*(curMaxY - curMinY)*(curMaxZ - curMinZ) < volume)
@@ -209,7 +204,7 @@ void calculateMOBB(vtkPointSet *pointset, double &volume, double &surface)
   }
 }
 
-void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double tolerance=0.0000001)
+void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double tolerance=0.0001)
 {
   // Inspired by https://github.com/smdabdoub/ProkaryMetrics/blob/master/calc/fitting.py
 
@@ -229,7 +224,7 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
     Q(0, i) = p[0];
     Q(1, i) = p[1];
     Q(2, i) = p[2];
-    Q(3, i) = 1.0;// p[3];
+    Q(3, i) = 1.0;
   }
 
   int count = 1;
@@ -244,9 +239,6 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
   // Khachiyan Algorithm
   while (error > tolerance)
   {
-
-    std::cout << "GIFVolumetric Next K Loop: " << std::endl;
-    //std::cout << "Q: " << Q;
     auto Qt = Q.transpose();
     Eigen::MatrixXd X = Q*u*Qt;
     Eigen::FullPivHouseholderQR<Eigen::MatrixXd> qr(X);

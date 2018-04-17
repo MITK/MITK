@@ -13,7 +13,7 @@
 #define ITKCommon_EXPORT
 #define MITKMATCHPOINTREGISTRATION_EXPORT
 #define MAPDeployment_EXPORT
-#define MAPAlgorithm_EXPORT
+#define MAPAlgorithms_EXPORT
 
 #define ITKCommon_EXPORT
 #define ITK_FORWARD_EXPORT

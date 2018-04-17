@@ -110,13 +110,15 @@ if(MITK_USE_SimpleITK)
 
       if(WIN32)
         STRING(REPLACE "/" "\\\\" _install_dir ${_install_dir})
+        set(_additional_pythonpath $<SEMICOLON>${ep_prefix}/Lib/site-packages)
       else()
         # escape spaces in the install path for linux
         STRING(REPLACE " " "\ " _install_dir ${_install_dir})
+        set(_additional_pythonpath )
       endif()
 
       ExternalProject_Add_Step(${proj} sitk_python_install_step
-        COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${_pythonpath}$<SEMICOLON>${ep_prefix}/Lib/site-packages ${PYTHON_EXECUTABLE} Packaging/setup.py install --prefix=${_install_dir}
+        COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${_pythonpath}${_additional_pythonpath} ${PYTHON_EXECUTABLE} Packaging/setup.py install --prefix=${_install_dir}
         DEPENDEES install
         WORKING_DIRECTORY ${_sitk_build_dir}/SimpleITK-build/Wrapping/Python/
       )

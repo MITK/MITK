@@ -80,7 +80,6 @@ CalculateVolumeDensityStatistic(itk::Image<TPixel, VImageDimension>* itkImage, m
   typename ImageType::PointType pointA;
   typename ImageType::PointType pointB;
 
-  std::cout << "GIFVolumetric Begin Image Mean Calcuation " << std::endl;
   while (!imgA.IsAtEnd())
   {
     if (maskA.Get() > 0)
@@ -95,8 +94,6 @@ CalculateVolumeDensityStatistic(itk::Image<TPixel, VImageDimension>* itkImage, m
   imgA.GoToBegin();
   maskA.GoToBegin();
 
-
-  std::cout << "GIFVolumetric Begin Image MoranB Calcuation " << std::endl;
   while (!imgA.IsAtEnd())
   {
     if (maskA.Get() > 0)
@@ -193,8 +190,6 @@ void calculateMOBB(vtkPointSet *pointset, double &volume, double &surface)
         curMaxY = std::max<double>(p2[1], curMaxY);
         curMinZ = std::min<double>(p2[2], curMinZ);
         curMaxZ = std::max<double>(p2[2], curMaxZ);
-
-        //std::cout << pointID << " (" << p[0] << "|" << p[1] << "|" << p[2] << ") (" << p2[0] << "|" << p2[1] << "|" << p2[2] << ")" << std::endl;
       }
 
       if ((curMaxX - curMinX)*(curMaxY - curMinY)*(curMaxZ - curMinZ) < volume)
@@ -209,7 +204,7 @@ void calculateMOBB(vtkPointSet *pointset, double &volume, double &surface)
   }
 }
 
-void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double tolerance=0.0000001)
+void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double tolerance=0.0001)
 {
   // Inspired by https://github.com/smdabdoub/ProkaryMetrics/blob/master/calc/fitting.py
 
@@ -229,7 +224,7 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
     Q(0, i) = p[0];
     Q(1, i) = p[1];
     Q(2, i) = p[2];
-    Q(3, i) = p[3];
+    Q(3, i) = 1.0;
   }
 
   int count = 1;
@@ -242,24 +237,14 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
   Eigen::MatrixXd Ones = ones.asDiagonal();
 
   // Khachiyan Algorithm
-
-  std::cout << "Ones: " << Ones;
-  std::cout << "GIFVolumetric Start Khachyan Algorithm " << tolerance << std::endl;
   while (error > tolerance)
   {
-
-    std::cout << "GIFVolumetric Next K Loop: " << std::endl;
-    std::cout << "Q: " << Q;
     auto Qt = Q.transpose();
     Eigen::MatrixXd X = Q*u*Qt;
-    std::cout << "X: " << X;
     Eigen::FullPivHouseholderQR<Eigen::MatrixXd> qr(X);
     Eigen::MatrixXd Xi = qr.solve(Ones);
 
-    std::cout << "Xi: " << Xi;
     Eigen::MatrixXd M = Qt * Xi * Q;
-
-    std::cout << "M: " << M;
 
     double maximumValue = M(0, 0);
     int maximumPosition = 0;
@@ -272,7 +257,6 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
       }
     }
     double stepsize = (maximumValue - dimension - 1) / ((dimension + 1) * (maximumValue - 1));
-    std::cout << "GIFVolumetric Max Val+Stepsize " << maximumValue << " - " << stepsize<< std::endl;
     Eigen::DiagonalMatrix<double, Eigen::Dynamic> new_u = (1.0 - stepsize) * u;
     new_u.diagonal()[maximumPosition] = (new_u.diagonal())(maximumPosition) + stepsize;
     ++count;
@@ -282,7 +266,6 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
 
    // U = u
 
-  std::cout << "GIFVolumetric Decomposition U=u" << std::endl;
   Eigen::MatrixXd Ai = points * u * points.transpose() - points * u *(points * u).transpose();
   Eigen::FullPivHouseholderQR<Eigen::MatrixXd> qr(Ai);
   Eigen::VectorXd ones2(dimension);
@@ -295,8 +278,6 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
   double b = 1 / sqrt(svd.singularValues()[1]);
   double a = 1 / sqrt(svd.singularValues()[2]);
   double V = 4 * vnl_math::pi*a*b*c / 3;
-  std::cout << "GIFVolumetric c,b,a,V: " << c << " - " << b << " - " << a << " - " << V << std::endl;
-
 
   double ad_mvee= 0;
   double alpha = std::sqrt(1 - b*b / a / a);

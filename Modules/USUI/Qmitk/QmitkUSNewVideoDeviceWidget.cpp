@@ -549,7 +549,7 @@ void QmitkUSNewVideoDeviceWidget::OnLoadConfigurationButtonClicked()
       m_Controls->m_AddDepths->clear();
       m_Controls->m_Depths->clear();
 
-      for( int index = 0; index < m_ConfigProbes.size(); ++index)
+      for( size_t index = 0; index < m_ConfigProbes.size(); ++index)
       {
         m_Controls->m_Probes->addItem(QString::fromStdString(config.probes.at(index)->GetName()));
       }

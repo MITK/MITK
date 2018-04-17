@@ -2,33 +2,38 @@
 // This file contains macros for swig.
 //
 
+
+
 //
-// SWIG_ADD_MITK_CLASS is a helper macro in order to do
-// all important stuff before an mitk::Class is included.
-// Requires the name of the class as it is in c++ as classname
-// and the include file, in which the class is defined.
-// It is assumed that the class is somehow inherited from
-// mitk::BaseData, and supports smartpointers.
+// MITKSWIG_ADD_HEADERFILE includes a header-file into SWIG
 //
-%define SWIG_ADD_CLASS(classname, classinclude, nspace)
+%define MITKSWIG_ADD_HEADERFILE( classinclude )
   // Include the include file in the generated cpp file
   %{
    #include < ## classinclude ## >
-  typedef nspace ## :: ## classname classname ## ;
-  using nspace ## :: ## classname ;
   %}
 
   // Include the given header, where the class definition is found
   %include < ## classinclude ## >
+%enddef
+
+//
+// MITKSWIG_ADD_CLASS is a helper macro in order to do
+// all important stuff in order to wrap an existing
+// class
+//
+%define MITKSWIG_ADD_CLASS(classname, classinclude, nspace)
+  MITKSWIG_ADD_HEADERFILE( classinclude )
+  // Using class name in order to remove ambigiouties
+  %{
+    typedef nspace ## :: ## classname classname ## ;
+    using nspace ## :: ## classname ;
+  %}
   using nspace ##:: ## classname ;
 
   // Typedef is necessary to overcome ambigiouties resulting in the fact that SWIG
   // ignores namespaces. This can lead to some problems with templates.
   typedef nspace ## :: ## classname classname ## ;
-
-  // Initianziation of std. vectors containing pointers to these classes. This allows to use
-  // vectors of these types as target language arrays.
-  //%template(Vector ## classname) std::vector< nspace ## :: ## classname ## *>;
 %enddef
 
 //
@@ -40,26 +45,13 @@
 // mitk::BaseData, and supports smartpointers.
 //
 %define SWIG_ADD_MITK_CLASS(classname, classinclude, nspace)
-  // Include the include file in the generated cpp file
-  %{
-   #include < ## classinclude ## >
-  typedef nspace ## :: ## classname classname ## ;
-  using nspace ## :: ## classname ;
-  %}
 
-  // Include the given header, where the class definition is found
-  %include < ## classinclude ## >
-  using nspace ##:: ## classname ;
+  MITKSWIG_ADD_CLASS( classname, classinclude, nspace )
 
 
   // Declaring that this class is a smart-pointer class, in order to handle
   // online upcasting where necessary (for example python)
   %feature("smartptr", noblock=1) nspace ##:: ## classname { itk::SmartPointer<nspace ## :: ## classname ## ::Self> }
-
-
-  // Typedef is necessary to overcome ambigiouties resulting in the fact that SWIG
-  // ignores namespaces. This can lead to some problems with templates.
-  typedef nspace ## :: ## classname classname ## ;
 
   // Initianziation of std. vectors containing pointers to these classes. This allows to use
   // vectors of these types as target language arrays.

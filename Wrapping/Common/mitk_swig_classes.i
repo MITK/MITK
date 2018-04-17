@@ -93,14 +93,14 @@ SWIG_ADD_CLASS(MITKAlgorithmHelper, mitkAlgorithmHelper.h, mitk)
 SWIG_ADD_CLASS(RegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
 SWIG_ADD_CLASS(MITKRegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
 
-SWIG_ADD_MITK_CLASS(DLLDirectoryBrowser, mapDeploymentDLLDirectoryBrowser.h, map::deployment)
-SWIG_ADD_MITK_CLASS(DLLInfo, mapDeploymentDLLInfo.h, map::deployment)
-SWIG_ADD_MITK_CLASS(UID, mapUID.h, map::algorithm)
-%{
- #include <mapDeploymentDLLAccess.h>
-%}
-%include <mapDeploymentDLLAccess.h>
-SWIG_ADD_MITK_CLASS(DLLHandle, mapDeploymentDLLHandle.h, map::deployment)
+// SWIG_ADD_MITK_CLASS(DLLDirectoryBrowser, mapDeploymentDLLDirectoryBrowser.h, ::map::deployment)
+// SWIG_ADD_MITK_CLASS(DLLInfo, mapDeploymentDLLInfo.h, ::map::deployment)
+// SWIG_ADD_MITK_CLASS(UID, mapUID.h, ::map::algorithm)
+// %{
+//  #include <mapDeploymentDLLAccess.h>
+// %}
+// %include <mapDeploymentDLLAccess.h>
+// SWIG_ADD_MITK_CLASS(DLLHandle, mapDeploymentDLLHandle.h, ::map::deployment)
 
 // SWIG_ADD_MITK_CLASS(FastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm, mitkFastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm.h, mitk)
 // SWIG_ADD_MITK_CLASS(LevelSetMotionMultiResDefaultRegistrationAlgorithm, mitkLevelSetMotionMultiResDefaultRegistrationAlgorithm.h, mitk)
@@ -108,4 +108,4 @@ SWIG_ADD_MITK_CLASS(DLLHandle, mapDeploymentDLLHandle.h, map::deployment)
 // SWIG_ADD_MITK_CLASS(MultiModalRigidDefaultRegistrationAlgorithm, mitkMultiModalRigidDefaultRegistrationAlgorithm.h, mitk)
 // SWIG_ADD_MITK_CLASS(MultiModalTransDefaultRegistrationAlgorithm, mitkMultiModalTransDefaultRegistrationAlgorithm.h, mitk)
 // SWIG_ADD_MITK_CLASS(RigidClosedFormPointsDefaultRegistrationAlgorithm, mitkRigidClosedFormPointsDefaultRegistrationAlgorithm.h, mitk)
-// WIG_ADD_MITK_CLASS(RigidICPDefaultRegistrationAlgorithm, mitkRigidICPDefaultRegistrationAlgorithm.h, mitk)
+// SWIG_ADD_MITK_CLASS(RigidICPDefaultRegistrationAlgorithm, mitkRigidICPDefaultRegistrationAlgorithm.h, mitk)

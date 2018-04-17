@@ -75,7 +75,7 @@ InputParameters parseInput(int argc, char* argv[])
     "samples", "s", mitkCommandLineParser::Int,
     "samples per reconstruction line [pixels]", "The pixels along the y axis in the beamformed image [pixels] (default: 2048).");
   parser.addArgument(
-    "algorithm", "a", mitkCommandLineParser::String,
+    "algorithm", "alg", mitkCommandLineParser::String,
     "one of [\"DAS\", \"DMAS\", \"sDMAS\"]", "The beamforming algorithm to be used for reconstruction (default: DAS).");
   parser.endGroup();
 
@@ -93,16 +93,13 @@ InputParameters parseInput(int argc, char* argv[])
   {
     input.verbose = false;
   }
+  MITK_INFO(input.verbose) << "### VERBOSE OUTPUT ENABLED ###";
 
   if (parsedArgs.count("inputImage"))
   {
-    if (input.verbose)
-    {
-      MITK_INFO << "Reading input image...";
-    }
+    MITK_INFO(input.verbose) << "Reading input image...";
     input.inputImage = mitk::IOUtil::Load<mitk::Image>(us::any_cast<std::string>(parsedArgs["inputImage"]));
-    if (input.verbose)
-      MITK_INFO << "Reading input image...[Done]";
+    MITK_INFO(input.verbose) << "Reading input image...[Done]";
   }
   else
   {
@@ -157,16 +154,25 @@ InputParameters parseInput(int argc, char* argv[])
   if (parsedArgs.count("algorithm"))
   {
     std::string algorithm = us::any_cast<std::string>(parsedArgs["algorithm"]);
+    MITK_INFO(input.verbose) << "Parsing algorithm: " << algorithm;
     if (algorithm == "DAS")
       input.algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DAS;
     else if (algorithm == "DMAS")
       input.algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DMAS;
     else if (algorithm == "sDMAS")
       input.algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::sDMAS;
+    else
+    {
+      MITK_INFO(input.verbose) << "Not a valid beamforming algorithm: " << algorithm << " Reverting to DAS";
+      input.algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DAS;
+    }
+
+    MITK_INFO(input.verbose) << "Sucessfully set algorithm: " << algorithm;
   }
   else
   {
     input.algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DAS;
+    MITK_INFO(input.verbose) << "No matching algorithm found. Using DAS.";
   }
 
   return input;
@@ -176,7 +182,7 @@ mitk::BeamformingSettings ParseSettings(InputParameters &input)
 {
   mitk::BeamformingSettings outputSettings;
 
-  outputSettings.Algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DAS;
+  outputSettings.Algorithm = input.algorithm;
   outputSettings.Apod = mitk::BeamformingSettings::Apodization::Box;
   outputSettings.SpeedOfSound = input.speedOfSound;
   outputSettings.TimeSpacing = input.inputImage->GetGeometry()->GetSpacing()[1] / 1000000;
@@ -201,11 +207,7 @@ int main(int argc, char * argv[])
 {
   auto input = parseInput(argc, argv);
 
-  if (input.verbose)
-    MITK_INFO << "Read input parameters.";
-
-  if (input.verbose)
-    MITK_INFO << "Beamforming input image...";
+  MITK_INFO(input.verbose) << "Beamforming input image...";
 
   mitk::PhotoacousticImage::Pointer m_BeamformingFilter = mitk::PhotoacousticImage::New();
 
@@ -214,10 +216,13 @@ int main(int argc, char * argv[])
   std::string message = "Test";
 
   auto output = m_BeamformingFilter->ApplyBeamforming(input.inputImage, settings, message);
+  MITK_INFO(input.verbose) << "Applying BModeFilter to image...";
   output = m_BeamformingFilter->ApplyBmodeFilter(output, mitk::PhotoacousticImage::Abs, false, false, 0.3);
+  MITK_INFO(input.verbose) << "Applying BModeFilter to image...[Done]";
 
+  MITK_INFO(input.verbose) << "Saving image...";
   mitk::IOUtil::Save(output, input.outputFilename);
+  MITK_INFO(input.verbose) << "Saving image...[Done]";
 
-  if (input.verbose)
-    MITK_INFO << "Beamforming input image...[Done]";
+  MITK_INFO(input.verbose) << "Beamforming input image...[Done]";
 }

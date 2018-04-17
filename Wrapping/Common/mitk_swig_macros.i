@@ -36,34 +36,16 @@
   typedef nspace ## :: ## classname classname ## ;
 %enddef
 
+
 //
-// SWIG_ADD_MITK_CLASS is a helper macro in order to do
-// all important stuff before an mitk::Class is included.
-// Requires the name of the class as it is in c++ as classname
-// and the include file, in which the class is defined.
-// It is assumed that the class is somehow inherited from
-// mitk::BaseData, and supports smartpointers.
+// MITKSWIG_AUTOMATED_CASTING is a helper macro in order to
+// provide a convinience interface for up/downcasting of
+// classes
 //
-%define SWIG_ADD_MITK_CLASS(classname, classinclude, nspace)
-
-  MITKSWIG_ADD_CLASS( classname, classinclude, nspace )
-
-
-  // Declaring that this class is a smart-pointer class, in order to handle
-  // online upcasting where necessary (for example python)
-  %feature("smartptr", noblock=1) nspace ##:: ## classname { itk::SmartPointer<nspace ## :: ## classname ## ::Self> }
-
-  // Initianziation of std. vectors containing pointers to these classes. This allows to use
-  // vectors of these types as target language arrays.
-  %template(Vector ## classname ## Pointer) std::vector< nspace ## :: ## classname ## ::Pointer >;
-  %template(Vector ## classname) std::vector< nspace ## :: ## classname ## ::Self *>;
-
-  // Defining the Smartpointer, allows easy access in target language
-  %template(classname ## Pointer) itk::SmartPointer<nspace ## :: ## classname ## ::Self>;
+%define MITKSWIG_AUTOMATED_CASTING(classname, classinclude, nspace)
 
   // Define a conversion method to convert from and to types
   %template(ConvertTo ## classname) ConvertTo< nspace ##:: ## classname ## >;
-
 
   // This extend is necessary to have the automatic cast methods available
 %extend itk::SmartPointer< nspace ## :: ## classname ## ::Self> {
@@ -112,6 +94,37 @@
  convertion_list['classname'] = ConvertTo ## classname
 %}
 
+
+%enddef
+
+//
+// SWIG_ADD_MITK_CLASS is a helper macro in order to do
+// all important stuff before an mitk::Class is included.
+// Requires the name of the class as it is in c++ as classname
+// and the include file, in which the class is defined.
+// It is assumed that the class is somehow inherited from
+// mitk::BaseData, and supports smartpointers.
+//
+%define SWIG_ADD_MITK_CLASS(classname, classinclude, nspace)
+
+  MITKSWIG_ADD_CLASS( classname, classinclude, nspace )
+
+  class nspace ## :: ## classname ## ;
+  class nspace ## :: ## classname ## ::Pointer;
+
+  // Declaring that this class is a smart-pointer class, in order to handle
+  // online upcasting where necessary (for example python)
+  %feature("smartptr", noblock=1) nspace ##:: ## classname { itk::SmartPointer<nspace ## :: ## classname ## ::Self> }
+
+  // Defining the Smartpointer, allows easy access in target language
+  %template(classname ## Pointer) itk::SmartPointer<nspace ## :: ## classname ## ::Self>;
+
+  // Initianziation of std. vectors containing pointers to these classes. This allows to use
+  // vectors of these types as target language arrays.
+  %template(Vector ## classname ## Pointer) std::vector< nspace ## :: ## classname ## ::Pointer >;
+  %template(Vector ## classname) std::vector< nspace ## :: ## classname ## ::Self *>;
+
+  MITKSWIG_AUTOMATED_CASTING(classname, classinclude, nspace)
 %enddef
 
 

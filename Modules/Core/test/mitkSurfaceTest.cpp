@@ -65,7 +65,7 @@ class mitkSurfaceTestSuite : public mitk::TestFixture
 private:
   mitk::Surface::Pointer m_Surface;
   mitk::Surface::Pointer m_CloneSurface;
-  vtkSphereSource *m_SphereSource;
+  vtkSmartPointer<vtkSphereSource> m_SphereSource;
   const mitk::TimeGeometry *m_InputTimeGeometry;
 
   int m_Time;
@@ -76,7 +76,7 @@ public:
   {
     m_Surface = mitk::Surface::New();
     m_CloneSurface = m_Surface->Clone();
-    m_SphereSource = vtkSphereSource::New();
+    m_SphereSource = vtkSmartPointer<vtkSphereSource>::New();
     m_InputTimeGeometry = m_Surface->GetUpdatedTimeGeometry();
 
     m_SphereSource->SetCenter(0, 0, 0);
@@ -93,7 +93,6 @@ public:
   {
     m_Surface = nullptr;
     m_CloneSurface = nullptr;
-    m_SphereSource = nullptr;
   }
 
   void InitializationSurfacePointer_Success()
@@ -113,26 +112,23 @@ public:
 
   void SetVtkPolyDataNotNullPointer_Failure()
   {
-    vtkPolyData *polys = m_SphereSource->GetOutput();
+    vtkSmartPointer<vtkPolyData> polys = m_SphereSource->GetOutput();
     m_Surface->SetVtkPolyData(polys);
-    m_SphereSource->Delete();
     CPPUNIT_ASSERT_MESSAGE("Testing set vtkPolyData", m_Surface->GetVtkPolyData() != nullptr);
   }
 
   void SetClonedVtkPolyDataNotNullPointer_Failure()
   {
-    vtkPolyData *polys = m_SphereSource->GetOutput();
+    vtkSmartPointer<vtkPolyData> polys = m_SphereSource->GetOutput();
     m_Surface->SetVtkPolyData(polys);
-    m_SphereSource->Delete();
     m_CloneSurface = m_Surface->Clone();
     CPPUNIT_ASSERT_MESSAGE("Testing set vtkPolyData of cloned surface!", m_CloneSurface->GetVtkPolyData() != nullptr);
   }
 
   void GetBoundingBox_Success()
   {
-    vtkPolyData *polys = m_SphereSource->GetOutput();
+    vtkSmartPointer<vtkPolyData> polys = m_SphereSource->GetOutput();
     m_Surface->SetVtkPolyData(polys);
-    m_SphereSource->Delete();
 
     double bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     polys->ComputeBounds();
@@ -168,7 +164,7 @@ public:
 
     for (int i = 0; i < 5; i++)
     {
-      vtkSphereSource *sphereSource = vtkSphereSource::New();
+      vtkNew<vtkSphereSource> sphereSource;
       sphereSource->SetCenter(0, 0, 0);
       sphereSource->SetRadius(1.0 * (i + 1.0));
       sphereSource->SetThetaResolution(10);
@@ -177,7 +173,6 @@ public:
       sphereSource->GetOutput()->ComputeBounds();
       sphereSource->GetOutput()->GetBounds(boundsMat[i]);
       m_Surface->SetVtkPolyData(sphereSource->GetOutput(), i);
-      sphereSource->Delete();
     }
 
     m_Surface->UpdateOutputInformation();
@@ -209,14 +204,13 @@ public:
 
   void ChangingDataOfSpecificTimestepSurface_Success()
   {
-    vtkSphereSource *sphereSource = vtkSphereSource::New();
+    vtkNew<vtkSphereSource> sphereSource;
     sphereSource->SetCenter(0, 0, 0);
     sphereSource->SetRadius(100.0);
     sphereSource->SetThetaResolution(10);
     sphereSource->SetPhiResolution(10);
     sphereSource->Update();
     m_Surface->SetVtkPolyData(sphereSource->GetOutput(), 3);
-    sphereSource->Delete();
 
     m_Timestep = m_InputTimeGeometry->TimePointToTimeStep(m_Time);
     CPPUNIT_ASSERT_MESSAGE(
@@ -230,7 +224,7 @@ public:
 
     for (int i = 0; i < 5; i++)
     {
-      vtkSphereSource *sphereSource = vtkSphereSource::New();
+      vtkNew<vtkSphereSource> sphereSource;
       sphereSource->SetCenter(0, 0, 0);
       sphereSource->SetRadius(1.0 * (i + 1.0));
       sphereSource->SetThetaResolution(10);
@@ -239,7 +233,6 @@ public:
       sphereSource->GetOutput()->ComputeBounds();
       sphereSource->GetOutput()->GetBounds(boundsMat[i]);
       m_Surface->SetVtkPolyData(sphereSource->GetOutput(), i);
-      sphereSource->Delete();
     }
 
     m_Surface->UpdateOutputInformation();
@@ -256,7 +249,7 @@ public:
 
     for (int i = 0; i < 5; i++)
     {
-      vtkSphereSource *sphereSource = vtkSphereSource::New();
+      vtkNew<vtkSphereSource> sphereSource;
       sphereSource->SetCenter(0, 0, 0);
       sphereSource->SetRadius(1.0 * (i + 1.0));
       sphereSource->SetThetaResolution(10);
@@ -265,7 +258,6 @@ public:
       sphereSource->GetOutput()->ComputeBounds();
       sphereSource->GetOutput()->GetBounds(boundsMat[i]);
       m_Surface->SetVtkPolyData(sphereSource->GetOutput(), i);
-      sphereSource->Delete();
     }
 
     m_Surface->UpdateOutputInformation();

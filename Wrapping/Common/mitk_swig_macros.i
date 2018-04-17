@@ -10,6 +10,35 @@
 // It is assumed that the class is somehow inherited from
 // mitk::BaseData, and supports smartpointers.
 //
+%define SWIG_ADD_CLASS(classname, classinclude, nspace)
+  // Include the include file in the generated cpp file
+  %{
+   #include < ## classinclude ## >
+  typedef nspace ## :: ## classname classname ## ;
+  using nspace ## :: ## classname ;
+  %}
+
+  // Include the given header, where the class definition is found
+  %include < ## classinclude ## >
+  using nspace ##:: ## classname ;
+
+  // Typedef is necessary to overcome ambigiouties resulting in the fact that SWIG
+  // ignores namespaces. This can lead to some problems with templates.
+  typedef nspace ## :: ## classname classname ## ;
+
+  // Initianziation of std. vectors containing pointers to these classes. This allows to use
+  // vectors of these types as target language arrays.
+  %template(Vector ## classname) std::vector< nspace ## :: ## classname ## ::Self *>;
+%enddef
+
+//
+// SWIG_ADD_MITK_CLASS is a helper macro in order to do
+// all important stuff before an mitk::Class is included.
+// Requires the name of the class as it is in c++ as classname
+// and the include file, in which the class is defined.
+// It is assumed that the class is somehow inherited from
+// mitk::BaseData, and supports smartpointers.
+//
 %define SWIG_ADD_MITK_CLASS(classname, classinclude, nspace)
   // Include the include file in the generated cpp file
   %{

@@ -28,7 +28,7 @@
 
   // Initianziation of std. vectors containing pointers to these classes. This allows to use
   // vectors of these types as target language arrays.
-  %template(Vector ## classname) std::vector< nspace ## :: ## classname ## ::Self *>;
+  //%template(Vector ## classname) std::vector< nspace ## :: ## classname ## *>;
 %enddef
 
 //

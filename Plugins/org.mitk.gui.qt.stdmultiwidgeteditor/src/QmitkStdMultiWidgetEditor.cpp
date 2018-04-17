@@ -313,7 +313,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     // Add the displayed views to the tree to see their positions
     // in 2D and 3D
-    d->m_StdMultiWidget->AddDisplayPlaneSubTree();
+    d->m_StdMultiWidget->AddDisplayPlaneSubTree("stdmulti");
 
     //d->m_StdMultiWidget->EnableNavigationControllerEventListening();
 

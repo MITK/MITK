@@ -93,14 +93,29 @@ MITKSWIG_ADD_CLASS(MITKAlgorithmHelper, mitkAlgorithmHelper.h, mitk)
 MITKSWIG_ADD_CLASS(RegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
 MITKSWIG_ADD_CLASS(MITKRegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
 
-// SWIG_ADD_MITK_CLASS(DLLDirectoryBrowser, mapDeploymentDLLDirectoryBrowser.h, ::map::deployment)
-// SWIG_ADD_MITK_CLASS(DLLInfo, mapDeploymentDLLInfo.h, ::map::deployment)
-// SWIG_ADD_MITK_CLASS(UID, mapUID.h, ::map::algorithm)
-// %{
-//  #include <mapDeploymentDLLAccess.h>
-// %}
-// %include <mapDeploymentDLLAccess.h>
-// SWIG_ADD_MITK_CLASS(DLLHandle, mapDeploymentDLLHandle.h, ::map::deployment)
+
+%ignore map::deployment::DLLHandle::New(const LibraryHandleType& libraryHandle, const map::algorithm::UID* pUID, const core::String& libraryFile, const core::String& profileStr);
+%ignore map::deployment::DLLHandle::New(const map::algorithm::UID* pUID,const core::String& libraryFilePath,const core::String& profileStr);
+%ignore map::deployment::DLLInfo::New(const map::algorithm::UID* pUID,const core::String& libraryFilePath,const core::String& profileStr);
+%ignore map::deployment::DLLHandle::New;
+
+SWIG_ADD_MITK_CLASS_VECTORFREE(DLLDirectoryBrowser, mapDeploymentDLLDirectoryBrowser.h, ::map::deployment)
+SWIG_ADD_MITK_CLASS_VECTORFREE(DLLInfo, mapDeploymentDLLInfo.h, ::map::deployment)
+SWIG_ADD_MITK_CLASS_VECTORFREE(DLLHandle, mapDeploymentDLLHandle.h, ::map::deployment)
+SWIG_ADD_MITK_CLASS_VECTORFREE(UID, mapUID.h, ::map::algorithm)
+%{
+ namespace algorithm
+ {
+   typedef map::algorithm::UID UID;
+ }
+ namespace core
+ {
+   typedef map::core::String String;
+ }
+%}
+
+MITKSWIG_ADD_HEADERFILE(mapDeploymentDLLAccess.h)
+SWIG_ADD_MITK_CLASS_VECTORFREE(DLLHandle, mapDeploymentDLLHandle.h, ::map::deployment)
 
 // SWIG_ADD_MITK_CLASS(FastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm, mitkFastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm.h, mitk)
 // SWIG_ADD_MITK_CLASS(LevelSetMotionMultiResDefaultRegistrationAlgorithm, mitkLevelSetMotionMultiResDefaultRegistrationAlgorithm.h, mitk)

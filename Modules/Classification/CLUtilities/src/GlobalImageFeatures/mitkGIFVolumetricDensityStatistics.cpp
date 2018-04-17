@@ -242,16 +242,24 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
   Eigen::MatrixXd Ones = ones.asDiagonal();
 
   // Khachiyan Algorithm
+
+  std::cout << "Ones: " << Ones;
   std::cout << "GIFVolumetric Start Khachyan Algorithm " << tolerance << std::endl;
   while (error > tolerance)
   {
 
     std::cout << "GIFVolumetric Next K Loop: " << std::endl;
+    std::cout << "Q: " << Q;
     auto Qt = Q.transpose();
     Eigen::MatrixXd X = Q*u*Qt;
+    std::cout << "X: " << X;
     Eigen::FullPivHouseholderQR<Eigen::MatrixXd> qr(X);
     Eigen::MatrixXd Xi = qr.solve(Ones);
+
+    std::cout << "Xi: " << Xi;
     Eigen::MatrixXd M = Qt * Xi * Q;
+
+    std::cout << "M: " << M;
 
     double maximumValue = M(0, 0);
     int maximumPosition = 0;

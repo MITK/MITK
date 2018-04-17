@@ -86,20 +86,29 @@ public:
 
   void Test1()
   {
+    MITK_INFO << "1";
     omp_set_num_threads(1);
 
+    MITK_INFO << "2";
     auto node = mitk::DataNode::New();
     node->SetData(fib);
 
+    MITK_INFO << "3";
     mitk::RenderingTestHelper renderingHelper(640, 480);
     renderingHelper.AddNodeToStorage(node);
 
+    MITK_INFO << "4";
     renderingHelper.SetMapperID(mitk::BaseRenderer::Standard3D);
     renderingHelper.GetVtkRenderer()->SetBackground(0.0, 0.0, 0.0);
 
+    MITK_INFO << "5";
     mitk::RenderingManager::GetInstance()->InitializeViews(fib->GetGeometry(), mitk::RenderingManager::RequestType::REQUEST_UPDATE_ALL);
-    renderingHelper.SaveReferenceScreenShot(mitk::IOUtil::GetTempPath()+"fib_renderingtest.png");
 
+    MITK_INFO << "6";
+    renderingHelper.SaveReferenceScreenShot(mitk::IOUtil::GetTempPath()+"fib_renderingtest.png");
+    MITK_INFO << "7";
+
+    CPPUNIT_ASSERT_MESSAGE("No rendering crash", true);
 //    MITK_INFO << "1";
 //    char* argv[4];
 //    argv[0] = (char*)"";

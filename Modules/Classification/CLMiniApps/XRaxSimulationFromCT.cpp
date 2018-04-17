@@ -41,7 +41,7 @@ CreateXRay(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer m
   typename MaskType::Pointer itkMask = MaskType::New();
   mitk::CastToItkImage(mask1, itkMask);
 
-  NewImageType::SpacingType newSpacing;
+  typedef NewImageType::SpacingType newSpacing;
   ImageType::SpacingType spacing;
   spacing[0] = 0;
   spacing[1] = 0;

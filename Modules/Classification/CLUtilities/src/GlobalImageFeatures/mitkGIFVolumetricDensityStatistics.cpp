@@ -80,6 +80,7 @@ CalculateVolumeDensityStatistic(itk::Image<TPixel, VImageDimension>* itkImage, m
   typename ImageType::PointType pointA;
   typename ImageType::PointType pointB;
 
+  std::cout << "GIFVolumetric Begin Image Mean Calcuation " << std::endl;
   while (!imgA.IsAtEnd())
   {
     if (maskA.Get() > 0)
@@ -93,6 +94,9 @@ CalculateVolumeDensityStatistic(itk::Image<TPixel, VImageDimension>* itkImage, m
   mean /= Nv;
   imgA.GoToBegin();
   maskA.GoToBegin();
+
+
+  std::cout << "GIFVolumetric Begin Image MoranB Calcuation " << std::endl;
   while (!imgA.IsAtEnd())
   {
     if (maskA.Get() > 0)
@@ -214,6 +218,8 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
   Eigen::MatrixXd points(3, numberOfPoints);
   Eigen::MatrixXd Q(3+1, numberOfPoints);
   double p[3];
+
+  std::cout << "Initialize Q " << std::endl;
   for (int i = 0; i < numberOfPoints; ++i)
   {
     pointset->GetPoint(i, p);
@@ -236,8 +242,11 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
   Eigen::MatrixXd Ones = ones.asDiagonal();
 
   // Khachiyan Algorithm
+  std::cout << "GIFVolumetric Start Khachyan Algorithm " << tolerance << std::endl;
   while (error > tolerance)
   {
+
+    std::cout << "GIFVolumetric Next K Loop: " << std::endl;
     auto Qt = Q.transpose();
     Eigen::MatrixXd X = Q*u*Qt;
     Eigen::FullPivHouseholderQR<Eigen::MatrixXd> qr(X);
@@ -255,6 +264,7 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
       }
     }
     double stepsize = (maximumValue - dimension - 1) / ((dimension + 1) * (maximumValue - 1));
+    std::cout << "GIFVolumetric Max Val+Stepsize " << maximumValue << " - " << stepsize<< std::endl;
     Eigen::DiagonalMatrix<double, Eigen::Dynamic> new_u = (1.0 - stepsize) * u;
     new_u.diagonal()[maximumPosition] = (new_u.diagonal())(maximumPosition) + stepsize;
     ++count;
@@ -263,6 +273,8 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
   }
 
    // U = u
+
+  std::cout << "GIFVolumetric Decomposition U=u" << std::endl;
   Eigen::MatrixXd Ai = points * u * points.transpose() - points * u *(points * u).transpose();
   Eigen::FullPivHouseholderQR<Eigen::MatrixXd> qr(Ai);
   Eigen::VectorXd ones2(dimension);
@@ -275,6 +287,8 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
   double b = 1 / sqrt(svd.singularValues()[1]);
   double a = 1 / sqrt(svd.singularValues()[2]);
   double V = 4 * vnl_math::pi*a*b*c / 3;
+  std::cout << "GIFVolumetric c,b,a,V: " << c << " - " << b << " - " << a << " - " << V << std::endl;
+
 
   double ad_mvee= 0;
   double alpha = std::sqrt(1 - b*b / a / a);

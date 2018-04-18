@@ -44,99 +44,99 @@ class PAImageProcessing : public QmitkAbstractView
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-  public:
+public:
 
-    static const std::string VIEW_ID;
+  static const std::string VIEW_ID;
 
-    PAImageProcessing();
+  PAImageProcessing();
 
   protected slots:
 
-    void UpperSliceBoundChanged();
-    void LowerSliceBoundChanged();
-    void SliceBoundsEnabled();
-    
-    void UseResampling();
-    void UseLogfilter();
-    void SetResampling();
-    void UseImageSpacing();
-    void UpdateImageInfo();
+  void UpperSliceBoundChanged();
+  void LowerSliceBoundChanged();
+  void SliceBoundsEnabled();
 
-    /** \brief Method called when the beamforming thread finishes; 
-    *  it adds the image to a new data node and registers it to the worbench's data storage
-    */
-    void HandleBeamformingResults(mitk::Image::Pointer image);
-    /** \brief Beamforming is being performed in a separate thread to keep the workbench from freezing.
-    */
-    void StartBeamformingThread();
+  void UseResampling();
+  void UseLogfilter();
+  void SetResampling();
+  void UseImageSpacing();
+  void UpdateImageInfo();
 
-    /** \brief Method called when the B-mode filter thread finishes;
-    *  it adds the image to a new data node and registers it to the worbench's data storage
-    */
-    void HandleBmodeResults(mitk::Image::Pointer image);
-    /** \brief B-mode filtering is being performed in a separate thread to keep the workbench from freezing.
-    */
-    void StartBmodeThread();
+  /** \brief Method called when the beamforming thread finishes;
+  *  it adds the image to a new data node and registers it to the worbench's data storage
+  */
+  void HandleBeamformingResults(mitk::Image::Pointer image);
+  /** \brief Beamforming is being performed in a separate thread to keep the workbench from freezing.
+  */
+  void StartBeamformingThread();
 
-    /** \brief Method called when the Cropping thread finishes;
-    *  it adds the image to a new data node and registers it to the worbench's data storage
-    */
-    void HandleCropResults(mitk::Image::Pointer image);
-    /** \brief Cropping is being performed in a separate thread to keep the workbench from freezing.
-    */
-    void StartCropThread();
+  /** \brief Method called when the B-mode filter thread finishes;
+  *  it adds the image to a new data node and registers it to the worbench's data storage
+  */
+  void HandleBmodeResults(mitk::Image::Pointer image);
+  /** \brief B-mode filtering is being performed in a separate thread to keep the workbench from freezing.
+  */
+  void StartBmodeThread();
 
-    /** \brief Method called when the bandpass thread finishes;
-    *  it adds the image to a new data node and registers it to the worbench's data storage
-    */
-    void HandleBandpassResults(mitk::Image::Pointer image);
-    /** \brief Bandpassing is being performed in a separate thread to keep the workbench from freezing.
-    */
-    void StartBandpassThread();
+  /** \brief Method called when the Cropping thread finishes;
+  *  it adds the image to a new data node and registers it to the worbench's data storage
+  */
+  void HandleCropResults(mitk::Image::Pointer image);
+  /** \brief Cropping is being performed in a separate thread to keep the workbench from freezing.
+  */
+  void StartCropThread();
 
-    void UpdateProgress(int progress, std::string progressInfo);
-    void PAMessageBox(std::string message);
+  /** \brief Method called when the bandpass thread finishes;
+  *  it adds the image to a new data node and registers it to the worbench's data storage
+  */
+  void HandleBandpassResults(mitk::Image::Pointer image);
+  /** \brief Bandpassing is being performed in a separate thread to keep the workbench from freezing.
+  */
+  void StartBandpassThread();
 
-    void BatchProcessing();
-    void UpdateSaveBoxes();
+  void UpdateProgress(int progress, std::string progressInfo);
+  void PAMessageBox(std::string message);
 
-    void ChangedSOSBandpass();
-    void ChangedSOSBeamforming();
+  void BatchProcessing();
+  void UpdateSaveBoxes();
 
-  protected:
-    virtual void CreateQtPartControl(QWidget *parent) override;
+  void ChangedSOSBandpass();
+  void ChangedSOSBeamforming();
 
-    virtual void SetFocus() override;
+protected:
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-    /** \brief called by QmitkFunctionality when DataManager's selection has changed.
-    *  On a change some parameters are internally updated to calculate bounds for GUI elements as the slice selector for beamforming or
-    *  the bandpass filter settings.
-    */
-    virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-                                     const QList<mitk::DataNode::Pointer>& nodes ) override;
+  virtual void SetFocus() override;
 
-    /** \brief Instance of the GUI controls
-    */
-    Ui::PAImageProcessingControls m_Controls;
+  /** \brief called by QmitkFunctionality when DataManager's selection has changed.
+  *  On a change some parameters are internally updated to calculate bounds for GUI elements as the slice selector for beamforming or
+  *  the bandpass filter settings.
+  */
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
+    const QList<mitk::DataNode::Pointer>& nodes) override;
 
-    float m_ResampleSpacing;
-    bool m_UseLogfilter;
-    std::string m_OldNodeName;
+  /** \brief Instance of the GUI controls
+  */
+  Ui::PAImageProcessingControls m_Controls;
 
-    /** \brief The settings set which is used for beamforming, updated through this class.
-    */
-    mitk::BeamformingSettings BFconfig;
+  float m_ResampleSpacing;
+  bool m_UseLogfilter;
+  std::string m_OldNodeName;
 
-    /** \brief Method for updating the BFconfig by using a selected image and the GUI configuration.
-    */
-    void UpdateBFSettings(mitk::Image::Pointer image);
+  /** \brief The settings set which is used for beamforming, updated through this class.
+  */
+  mitk::BeamformingSettings::Pointer BFconfig;
 
-    void EnableControls();
-    void DisableControls();
+  /** \brief Method for updating the BFconfig by using a selected image and the GUI configuration.
+  */
+  void UpdateBFSettings(mitk::Image::Pointer image);
 
-    /** \brief Class through which the filters are called.
-    */
-    mitk::PhotoacousticFilterService::Pointer m_FilterBank;
+  void EnableControls();
+  void DisableControls();
+
+  /** \brief Class through which the filters are called.
+  */
+  mitk::PhotoacousticFilterService::Pointer m_FilterBank;
 };
 
 class BeamformingThread : public QThread
@@ -144,26 +144,25 @@ class BeamformingThread : public QThread
   Q_OBJECT
     void run() Q_DECL_OVERRIDE;
 
-  signals:
-    void result(mitk::Image::Pointer);
-    void updateProgress(int, std::string);
-    void message(std::string);
+signals:
+  void result(mitk::Image::Pointer);
+  void updateProgress(int, std::string);
+  void message(std::string);
 
-  public:
-    void setConfig(mitk::BeamformingSettings BFconfig);
-    void setInputImage(mitk::Image::Pointer image);
-    void setFilterBank(mitk::PhotoacousticFilterService::Pointer filterBank)
-    {
-      m_FilterBank = filterBank;
-    }
+public:
+  void setConfig(mitk::BeamformingSettings::Pointer BFconfig);
+  void setInputImage(mitk::Image::Pointer image);
+  void setFilterBank(mitk::PhotoacousticFilterService::Pointer filterBank)
+  {
+    m_FilterBank = filterBank;
+  }
 
+protected:
+  mitk::BeamformingSettings::Pointer m_BFconfig;
+  mitk::Image::Pointer m_InputImage;
+  int m_Cutoff;
 
-  protected:
-    mitk::BeamformingSettings m_BFconfig;
-    mitk::Image::Pointer m_InputImage;
-    int m_Cutoff;
-
-    mitk::PhotoacousticFilterService::Pointer m_FilterBank;
+  mitk::PhotoacousticFilterService::Pointer m_FilterBank;
 };
 
 class BmodeThread : public QThread
@@ -171,29 +170,28 @@ class BmodeThread : public QThread
   Q_OBJECT
     void run() Q_DECL_OVERRIDE;
 
-  signals:
-    void result(mitk::Image::Pointer);
+signals:
+  void result(mitk::Image::Pointer);
 
-  public:
-    enum BModeMethod { ShapeDetection, Abs };
+public:
+  enum BModeMethod { ShapeDetection, Abs };
 
-    void setConfig(bool useLogfilter, double resampleSpacing, mitk::PhotoacousticFilterService::BModeMethod method, bool useGPU);
-    void setInputImage(mitk::Image::Pointer image);
-    void setFilterBank(mitk::PhotoacousticFilterService::Pointer filterBank)
-    {
-      m_FilterBank = filterBank;
-    }
+  void setConfig(bool useLogfilter, double resampleSpacing, mitk::PhotoacousticFilterService::BModeMethod method, bool useGPU);
+  void setInputImage(mitk::Image::Pointer image);
+  void setFilterBank(mitk::PhotoacousticFilterService::Pointer filterBank)
+  {
+    m_FilterBank = filterBank;
+  }
 
+protected:
+  mitk::Image::Pointer m_InputImage;
 
-  protected:
-    mitk::Image::Pointer m_InputImage;
+  mitk::PhotoacousticFilterService::BModeMethod m_Method;
+  bool m_UseLogfilter;
+  double m_ResampleSpacing;
+  bool m_UseGPU;
 
-    mitk::PhotoacousticFilterService::BModeMethod m_Method;
-    bool m_UseLogfilter;
-    double m_ResampleSpacing;
-    bool m_UseGPU;
-
-    mitk::PhotoacousticFilterService::Pointer m_FilterBank;
+  mitk::PhotoacousticFilterService::Pointer m_FilterBank;
 };
 
 class CropThread : public QThread
@@ -222,7 +220,6 @@ protected:
 
   mitk::PhotoacousticFilterService::Pointer m_FilterBank;
 };
-
 
 class BandpassThread : public QThread
 {

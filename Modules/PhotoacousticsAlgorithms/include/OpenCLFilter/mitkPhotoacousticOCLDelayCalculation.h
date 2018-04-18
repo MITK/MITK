@@ -34,7 +34,6 @@ namespace mitk
 
   class OCLDelayCalculation : public OclDataSetToDataSetFilter, public itk::Object
   {
-
   public:
     mitkClassMacroItkParent(OCLDelayCalculation, itk::Object);
     itkNewMacro(Self);
@@ -45,7 +44,7 @@ namespace mitk
     *
     * @param conf The configuration set to use for the calculation of the delays.
     */
-    void SetConfig(BeamformingSettings conf)
+    void SetConfig(BeamformingSettings::Pointer conf)
     {
       m_Conf = conf;
     }
@@ -87,7 +86,7 @@ namespace mitk
     /** The OpenCL kernel for the filter */
     cl_kernel m_PixelCalculation;
 
-    BeamformingSettings m_Conf;
+    BeamformingSettings::Pointer m_Conf;
     cl_mem m_UsedLines;
     unsigned int m_BufferSize;
     float m_DelayMultiplicatorRaw;

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
@@ -53,6 +52,7 @@ void PAImageProcessing::SetFocus()
 
 void PAImageProcessing::CreateQtPartControl(QWidget *parent)
 {
+  BFconfig = mitk::BeamformingSettings::New();
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
   connect(m_Controls.buttonApplyBModeFilter, SIGNAL(clicked()), this, SLOT(StartBmodeThread()));
@@ -90,13 +90,13 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   m_Controls.UseBP->hide();
   m_Controls.UseGPUBmode->hide();
 
-  #ifndef PHOTOACOUSTICS_USE_GPU
-    m_Controls.UseGPUBf->setEnabled(false);
-    m_Controls.UseGPUBf->setChecked(false);
-    m_Controls.UseGPUBmode->setEnabled(false);
-    m_Controls.UseGPUBmode->setChecked(false);
-  #endif
-  
+#ifndef PHOTOACOUSTICS_USE_GPU
+  m_Controls.UseGPUBf->setEnabled(false);
+  m_Controls.UseGPUBf->setChecked(false);
+  m_Controls.UseGPUBmode->setEnabled(false);
+  m_Controls.UseGPUBmode->setChecked(false);
+#endif
+
   UseImageSpacing();
 }
 
@@ -180,7 +180,7 @@ void PAImageProcessing::BatchProcessing()
 
   DisableControls();
 
-  std::set<char> delims{'/'};
+  std::set<char> delims{ '/' };
 
   bool doSteps[] = { m_Controls.StepBeamforming->isChecked(), m_Controls.StepCropping->isChecked() , m_Controls.StepBandpass->isChecked(), m_Controls.StepBMode->isChecked() };
   bool saveSteps[] = { m_Controls.SaveBeamforming->isChecked(), m_Controls.SaveCropping->isChecked() , m_Controls.SaveBandpass->isChecked(), m_Controls.SaveBMode->isChecked() };
@@ -194,10 +194,10 @@ void PAImageProcessing::BatchProcessing()
 
     QString filename = fileNames.at(fileNumber);
     auto split = splitpath(filename.toStdString(), delims);
-    std::string imageName = split.at(split.size()-1);
+    std::string imageName = split.at(split.size() - 1);
 
     // remove ".nrrd"
-    imageName = imageName.substr(0, imageName.size()-5);
+    imageName = imageName.substr(0, imageName.size() - 5);
 
     mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(filename.toStdString().c_str());
 
@@ -268,7 +268,7 @@ void PAImageProcessing::BatchProcessing()
 
         BPHighPass = 0;
       }
-      if (BPHighPass > maxFrequency - BFconfig.BPLowPass)
+      if (BPHighPass > maxFrequency - BFconfig->GetBPLowPass())
       {
         QMessageBox Msgbox;
         Msgbox.setText("HighPass higher than LowPass, disabled both.");
@@ -286,17 +286,17 @@ void PAImageProcessing::BatchProcessing()
         mitk::IOUtil::Save(image, saveFileName);
       }
     }
-    // Bmode    
+    // Bmode
     if (doSteps[3])
     {
       m_Controls.ProgressInfo->setText("applying bmode filter");
       bool useGPU = m_Controls.UseGPUBmode->isChecked();
-      
+
       if (m_Controls.BModeMethod->currentText() == "Absolute Filter")
         image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticFilterService::BModeMethod::Abs, useGPU, m_UseLogfilter, m_ResampleSpacing);
       else if (m_Controls.BModeMethod->currentText() == "Envelope Detection")
         image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection, useGPU, m_UseLogfilter, m_ResampleSpacing);
-      
+
       if (saveSteps[3])
       {
         std::string saveFileName = saveDir.toStdString() + "/" + imageName + " bmode" + ".nrrd";
@@ -381,14 +381,14 @@ void PAImageProcessing::HandleBeamformingResults(mitk::Image::Pointer image)
 
   newNodeName << m_OldNodeName << " ";
 
-  if (BFconfig.Algorithm == mitk::BeamformingSettings::BeamformingAlgorithm::DAS)
+  if (BFconfig->GetAlgorithm() == mitk::BeamformingSettings::BeamformingAlgorithm::DAS)
     newNodeName << "DAS bf, ";
-  else if (BFconfig.Algorithm == mitk::BeamformingSettings::BeamformingAlgorithm::DMAS)
+  else if (BFconfig->GetAlgorithm() == mitk::BeamformingSettings::BeamformingAlgorithm::DMAS)
     newNodeName << "DMAS bf, ";
 
-  if (BFconfig.DelayCalculationMethod == mitk::BeamformingSettings::DelayCalc::QuadApprox)
+  if (BFconfig->GetDelayCalculationMethod() == mitk::BeamformingSettings::DelayCalc::QuadApprox)
     newNodeName << "q. delay";
-  if (BFconfig.DelayCalculationMethod == mitk::BeamformingSettings::DelayCalc::Spherical)
+  if (BFconfig->GetDelayCalculationMethod() == mitk::BeamformingSettings::DelayCalc::Spherical)
     newNodeName << "s. delay";
 
   newNode->SetName(newNodeName.str());
@@ -461,9 +461,9 @@ void PAImageProcessing::StartBmodeThread()
 
       bool useGPU = m_Controls.UseGPUBmode->isChecked();
 
-      if(m_Controls.BModeMethod->currentText() == "Absolute Filter")
+      if (m_Controls.BModeMethod->currentText() == "Absolute Filter")
         thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticFilterService::BModeMethod::Abs, useGPU);
-      else if(m_Controls.BModeMethod->currentText() == "Envelope Detection")
+      else if (m_Controls.BModeMethod->currentText() == "Envelope Detection")
         thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection, useGPU);
       thread->setInputImage(image);
       thread->setFilterBank(m_FilterBank);
@@ -671,7 +671,7 @@ void PAImageProcessing::StartBandpassThread()
 
         BPHighPass = 0;
       }
-      if (BPHighPass > maxFrequency - BFconfig.BPLowPass)
+      if (BPHighPass > maxFrequency - BFconfig->GetBPLowPass())
       {
         QMessageBox Msgbox;
         Msgbox.setText("HighPass higher than LowPass, disabled both.");
@@ -739,7 +739,7 @@ void PAImageProcessing::SliceBoundsEnabled()
 
 void PAImageProcessing::UpperSliceBoundChanged()
 {
-  if(m_Controls.boundLow->value() > m_Controls.boundHigh->value())
+  if (m_Controls.boundLow->value() > m_Controls.boundHigh->value())
   {
     m_Controls.boundLow->setValue(m_Controls.boundHigh->value());
   }
@@ -806,10 +806,10 @@ void PAImageProcessing::UpdateImageInfo()
 
       UpdateBFSettings(image);
 
-      m_Controls.CutoffBeforeBF->setValue(0.000001 / BFconfig.TimeSpacing); // 1us standard offset for our transducer
+      m_Controls.CutoffBeforeBF->setValue(0.000001 / BFconfig->GetTimeSpacing()); // 1us standard offset for our transducer
 
       std::stringstream frequency;
-      float maxFrequency = (1 / BFconfig.TimeSpacing) * image->GetDimension(1) / 2 / 2 / 1000;
+      float maxFrequency = (1 / BFconfig->GetTimeSpacing()) * image->GetDimension(1) / 2 / 2 / 1000;
       frequency << maxFrequency / 1000000; //[MHz]
       frequency << "MHz";
 
@@ -825,16 +825,16 @@ void PAImageProcessing::UpdateImageInfo()
   }
 }
 
-void PAImageProcessing::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
-                                             const QList<mitk::DataNode::Pointer>& nodes )
+void PAImageProcessing::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
+  const QList<mitk::DataNode::Pointer>& nodes)
 {
   // iterate all selected objects, adjust warning visibility
-  foreach( mitk::DataNode::Pointer node, nodes )
+  foreach(mitk::DataNode::Pointer node, nodes)
   {
-    if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
+    if (node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()))
     {
-      m_Controls.labelWarning->setVisible( false );
-      m_Controls.buttonApplyBModeFilter->setEnabled( true );
+      m_Controls.labelWarning->setVisible(false);
+      m_Controls.buttonApplyBModeFilter->setEnabled(true);
       m_Controls.labelWarning2->setVisible(false);
       m_Controls.buttonApplyCropFilter->setEnabled(true);
       m_Controls.labelWarning3->setVisible(false);
@@ -845,8 +845,8 @@ void PAImageProcessing::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sou
       return;
     }
   }
-  m_Controls.labelWarning->setVisible( true );
-  m_Controls.buttonApplyBModeFilter->setEnabled( false );
+  m_Controls.labelWarning->setVisible(true);
+  m_Controls.buttonApplyBModeFilter->setEnabled(false);
   m_Controls.labelWarning2->setVisible(true);
   m_Controls.buttonApplyCropFilter->setEnabled(false);
   m_Controls.labelWarning3->setVisible(true);
@@ -882,69 +882,69 @@ void PAImageProcessing::SetResampling()
 void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
 {
   if ("DAS" == m_Controls.BFAlgorithm->currentText())
-    BFconfig.Algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DAS;
+    BFconfig->SetAlgorithm(mitk::BeamformingSettings::BeamformingAlgorithm::DAS);
   else if ("DMAS" == m_Controls.BFAlgorithm->currentText())
-    BFconfig.Algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DMAS;
+    BFconfig->SetAlgorithm(mitk::BeamformingSettings::BeamformingAlgorithm::DMAS);
   else if ("sDMAS" == m_Controls.BFAlgorithm->currentText())
-    BFconfig.Algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::sDMAS;
+    BFconfig->SetAlgorithm(mitk::BeamformingSettings::BeamformingAlgorithm::sDMAS);
 
   if ("Quad. Approx." == m_Controls.DelayCalculation->currentText())
   {
-    BFconfig.DelayCalculationMethod = mitk::BeamformingSettings::DelayCalc::QuadApprox;
+    BFconfig->SetDelayCalculationMethod(mitk::BeamformingSettings::DelayCalc::QuadApprox);
   }
   else if ("Spherical Wave" == m_Controls.DelayCalculation->currentText())
   {
-    BFconfig.DelayCalculationMethod = mitk::BeamformingSettings::DelayCalc::Spherical;
+    BFconfig->SetDelayCalculationMethod(mitk::BeamformingSettings::DelayCalc::Spherical);
   }
 
   if ("Von Hann" == m_Controls.Apodization->currentText())
   {
-    BFconfig.Apod = mitk::BeamformingSettings::Apodization::Hann;
+    BFconfig->SetApod(mitk::BeamformingSettings::Apodization::Hann);
   }
   else if ("Hamming" == m_Controls.Apodization->currentText())
   {
-    BFconfig.Apod = mitk::BeamformingSettings::Apodization::Hamm;
+    BFconfig->SetApod(mitk::BeamformingSettings::Apodization::Hamm);
   }
   else if ("Box" == m_Controls.Apodization->currentText())
   {
-    BFconfig.Apod = mitk::BeamformingSettings::Apodization::Box;
+    BFconfig->SetApod(mitk::BeamformingSettings::Apodization::Box);
   }
 
-  BFconfig.Pitch = m_Controls.Pitch->value() / 1000; // [m]
-  BFconfig.SpeedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
-  BFconfig.SamplesPerLine = m_Controls.Samples->value();
-  BFconfig.ReconstructionLines = m_Controls.Lines->value();
-  BFconfig.TransducerElements = m_Controls.ElementCount->value();
-  BFconfig.apodizationArraySize = m_Controls.Lines->value();
-  BFconfig.Angle = m_Controls.Angle->value(); // [deg]
-  BFconfig.UseBP = m_Controls.UseBP->isChecked();
-  BFconfig.UseGPU = m_Controls.UseGPUBf->isChecked();
-  BFconfig.upperCutoff = m_Controls.CutoffBeforeBF->value();
+  BFconfig->SetPitch(m_Controls.Pitch->value() / 1000); // [m]
+  BFconfig->SetSpeedOfSound(m_Controls.SpeedOfSound->value()); // [m/s]
+  BFconfig->SetSamplesPerLine(m_Controls.Samples->value());
+  BFconfig->SetReconstructionLines(m_Controls.Lines->value());
+  BFconfig->SetTransducerElements(m_Controls.ElementCount->value());
+  BFconfig->SetApodizationArraySize(m_Controls.Lines->value());
+  BFconfig->SetAngle(m_Controls.Angle->value()); // [deg]
+  BFconfig->SetUseBP(m_Controls.UseBP->isChecked());
+  BFconfig->SetUseGPU(m_Controls.UseGPUBf->isChecked());
+  BFconfig->SetUpperCutoff(m_Controls.CutoffBeforeBF->value());
 
   if (m_Controls.UseImageSpacing->isChecked())
   {
-    BFconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000; // [s]
-    BFconfig.TimeSpacing = image->GetGeometry()->GetSpacing()[1] / 1000000;
-    MITK_INFO << "Calculated Scan Depth of " << BFconfig.RecordTime * BFconfig.SpeedOfSound * 100 / 2 << "cm";
+    BFconfig->SetRecordTime(image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000); // [s]
+    BFconfig->SetTimeSpacing(image->GetGeometry()->GetSpacing()[1] / 1000000);
+    MITK_INFO << "Calculated Scan Depth of " << BFconfig->GetRecordTime() * BFconfig->GetSpeedOfSound() * 100 / 2 << "cm";
   }
   else
   {
-    BFconfig.RecordTime = 2 * m_Controls.ScanDepth->value() / 1000 / BFconfig.SpeedOfSound; // [s]
-    BFconfig.TimeSpacing = BFconfig.RecordTime / image->GetDimension(1);
+    BFconfig->SetRecordTime(2 * m_Controls.ScanDepth->value() / 1000 / BFconfig->GetSpeedOfSound()); // [s]
+    BFconfig->SetTimeSpacing(BFconfig->GetRecordTime() / image->GetDimension(1));
   }
 
   if ("US Image" == m_Controls.ImageType->currentText())
   {
-    BFconfig.isPhotoacousticImage = false;
+    BFconfig->SetIsPhotoacousticImage(false);
   }
   else if ("PA Image" == m_Controls.ImageType->currentText())
   {
-    BFconfig.isPhotoacousticImage = true;
+    BFconfig->SetIsPhotoacousticImage(true);
   }
 
-  BFconfig.partial = m_Controls.Partial->isChecked();
-  BFconfig.CropBounds[0] = m_Controls.boundLow->value();
-  BFconfig.CropBounds[1] = m_Controls.boundHigh->value();
+  BFconfig->SetPartial(m_Controls.Partial->isChecked());
+  BFconfig->GetCropBounds()[0] = m_Controls.boundLow->value();
+  BFconfig->GetCropBounds()[1] = m_Controls.boundHigh->value();
 }
 
 void PAImageProcessing::EnableControls()
@@ -979,10 +979,10 @@ void PAImageProcessing::EnableControls()
   m_Controls.Apodization->setEnabled(true);
   m_Controls.UseBP->setEnabled(true);
 
-  #ifdef PHOTOACOUSTICS_USE_GPU
-    m_Controls.UseGPUBf->setEnabled(true);
-    m_Controls.UseGPUBmode->setEnabled(true);
-  #endif
+#ifdef PHOTOACOUSTICS_USE_GPU
+  m_Controls.UseGPUBf->setEnabled(true);
+  m_Controls.UseGPUBmode->setEnabled(true);
+#endif
 
   m_Controls.BPhigh->setEnabled(true);
   m_Controls.BPlow->setEnabled(true);
@@ -1032,10 +1032,10 @@ void PAImageProcessing::DisableControls()
   m_Controls.Apodization->setEnabled(false);
   m_Controls.UseBP->setEnabled(false);
 
-  #ifdef PHOTOACOUSTICS_USE_GPU
-    m_Controls.UseGPUBf->setEnabled(false);
-    m_Controls.UseGPUBmode->setEnabled(false);
-  #endif
+#ifdef PHOTOACOUSTICS_USE_GPU
+  m_Controls.UseGPUBf->setEnabled(false);
+  m_Controls.UseGPUBmode->setEnabled(false);
+#endif
 
   m_Controls.BPhigh->setEnabled(false);
   m_Controls.BPlow->setEnabled(false);
@@ -1071,8 +1071,8 @@ void BeamformingThread::run()
   mitk::Image::Pointer resultImageBuffer;
   std::string errorMessage = "";
   std::function<void(int, std::string)> progressHandle = [this](int progress, std::string progressInfo) {
-      emit updateProgress(progress, progressInfo);
-    };
+    emit updateProgress(progress, progressInfo);
+  };
 
   resultImageBuffer = m_FilterBank->ApplyBeamforming(m_InputImage, m_BFconfig, errorMessage, progressHandle);
   mitk::ImageReadAccessor copy(resultImageBuffer);
@@ -1085,7 +1085,7 @@ void BeamformingThread::run()
   emit message(errorMessage);
 }
 
-void BeamformingThread::setConfig(mitk::BeamformingSettings BFconfig)
+void BeamformingThread::setConfig(mitk::BeamformingSettings::Pointer BFconfig)
 {
   m_BFconfig = BFconfig;
 }

@@ -33,7 +33,6 @@ namespace mitk
 
   class OCLUsedLinesCalculation : public OclDataSetToDataSetFilter, public itk::Object
   {
-
   public:
     mitkClassMacroItkParent(OCLUsedLinesCalculation, itk::Object);
     itkNewMacro(Self);
@@ -44,7 +43,7 @@ namespace mitk
     *
     * @param conf The configuration set to use for the calculation of the used lines.
     */
-    void SetConfig(BeamformingSettings conf)
+    void SetConfig(BeamformingSettings::Pointer conf)
     {
       m_Conf = conf;
     }
@@ -76,12 +75,11 @@ namespace mitk
 
     int m_sizeThis;
 
-
   private:
     /** The OpenCL kernel for the filter */
     cl_kernel m_PixelCalculation;
 
-    BeamformingSettings m_Conf;
+    BeamformingSettings::Pointer m_Conf;
     float m_part;
     size_t m_ChunkSize[3];
   };

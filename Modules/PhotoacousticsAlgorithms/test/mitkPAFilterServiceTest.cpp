@@ -49,12 +49,18 @@ public:
     m_PhotoacousticFilterService = mitk::PhotoacousticFilterService::New();
   }
 
+  mitk::BeamformingSettings CreateBeamformingSettings()
+  {
+    mitk::BeamformingSettings config;
+    return config;
+  }
+
   void testRunning()
   {
     int xDim = 3;
     int yDim = 3;
     int length = yDim * xDim;
-    int* testArray = new int [length];
+    int* testArray = new int[length];
     for (int i = 0; i < length; ++i)
     {
       testArray[i] = 0;
@@ -68,7 +74,7 @@ public:
     testImage->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);
     testImage->SetImportSlice(testArray, 0, 0, 0, mitk::Image::ImportMemoryManagementType::ManageMemory);
     std::string message = "Es ist egal. Das taucht nicht auf!";
-    mitk::BeamformingSettings config;
+    mitk::BeamformingSettings config = CreateBeamformingSettings();
     auto output = m_PhotoacousticFilterService->ApplyBeamforming(testImage, config, message);
 
     mitk::ImageReadAccessor readAccess(output, output->GetVolumeData());
@@ -76,7 +82,7 @@ public:
 
     for (int i = 0; i < length; ++i)
     {
-      CPPUNIT_ASSERT(outputArray[i]==0);
+      CPPUNIT_ASSERT(outputArray[i] == 0);
     }
   }
 

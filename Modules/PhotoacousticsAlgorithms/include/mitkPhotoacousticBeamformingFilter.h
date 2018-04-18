@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <functional>
 #include "./OpenCLFilter/mitkPhotoacousticOCLBeamformingFilter.h"
 #include "mitkPhotoacousticBeamformingSettings.h"
+#include "mitkPhotoacousticBeamformingUtils.h"
 
 namespace mitk {
   /*!
@@ -37,20 +38,37 @@ namespace mitk {
     mitkClassMacro(BeamformingFilter, ImageToImageFilter);
 
     itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+      itkCloneMacro(Self)
+
+      /** \brief Sets a new configuration to use
+      *
+      * @param settings The configuration set to use for beamforming
+      */
+      void Configure(BeamformingSettings::Pointer settings)
+    {
+      MITK_INFO << "Configuring Beamforming Settings";
+      m_Conf = settings;
+
+      switch (m_Conf->GetApod())
+      {
+      case BeamformingSettings::Apodization::Hann:
+        m_Conf->SetApodizationFunction(mitk::PhotoacousticBeamformingUtils::VonHannFunction(m_Conf->GetApodizationArraySize()));
+        break;
+      case BeamformingSettings::Apodization::Hamm:
+        m_Conf->SetApodizationFunction(mitk::PhotoacousticBeamformingUtils::HammFunction(m_Conf->GetApodizationArraySize()));
+        break;
+      case BeamformingSettings::Apodization::Box:
+        m_Conf->SetApodizationFunction(mitk::PhotoacousticBeamformingUtils::BoxFunction(m_Conf->GetApodizationArraySize()));
+        break;
+      default:
+        m_Conf->SetApodizationFunction(mitk::PhotoacousticBeamformingUtils::BoxFunction(m_Conf->GetApodizationArraySize()));
+        break;
+      }
+      MITK_INFO << "set Apodization Function!";
+    }
 
     /** \brief Sets a new configuration to use
     *
-    * @param settings The configuration set to use for beamforming
-    */
-    void Configure(BeamformingSettings settings)
-    {
-      m_ConfOld = m_Conf;
-      m_Conf = settings;
-    }
-    
-    /** \brief Sets a new configuration to use
-    * 
     *  The Filter writes important messages that can be retrieved through this method; if nothing is to be reported, it returns "noMessage".
     *  @return The message
     */
@@ -85,38 +103,18 @@ namespace mitk {
     */
     std::function<void(int, std::string)> m_ProgressHandle;
 
-    /** \brief Pointer holding the Von-Hann apodization window for beamforming
-    * @param samples the resolution at which the window is created
-    */
-    float* VonHannFunction(int samples);
-    /** \brief Function to create a Hamming apodization window
-    * @param samples the resolution at which the window is created
-    */
-    float* HammFunction(int samples);
-    /** \brief Function to create a Box apodization window
-    * @param samples the resolution at which the window is created
-    */
-    float* BoxFunction(int samples);
     float* m_OutputData;
     float* m_InputData;
     float* m_InputDataPuffer;
 
-    /** \brief Pointer holding the Von-Hann apodization window for beamforming
-    */
-    float* m_VonHannFunction;
-    /** \brief Pointer holding the Hamming apodization window for beamforming
-    */
-    float* m_HammFunction;
-    /** \brief Pointer holding the Box apodization window for beamforming
-    */
-    float* m_BoxFunction;
-
     /** \brief Current configuration set
     */
-    BeamformingSettings m_Conf;
-    /** \brief Previous configuration set to selectively update used data for beamforming
+    BeamformingSettings::Pointer m_Conf;
+
+    /**
+    * The size of the apodization array when it last changed.
     */
-    BeamformingSettings m_ConfOld;
+    int m_LastApodizationArraySize;
 
     /** \brief Pointer to the GPU beamforming filter class; for performance reasons the filter is initialized within the constructor and kept for all later computations.
     */

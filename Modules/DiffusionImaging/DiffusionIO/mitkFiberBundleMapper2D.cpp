@@ -183,7 +183,6 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   localStorage->m_FiberMapper->ScalarVisibilityOn();
   localStorage->m_FiberMapper->SetScalarModeToUsePointFieldData();
   localStorage->m_FiberMapper->SetLookupTable(m_lut);  //apply the properties after the slice was set
-  localStorage->m_PointActor->GetProperty()->SetOpacity(0.999);
   localStorage->m_FiberMapper->SelectColorArray("FIBER_COLORS");
   localStorage->m_FiberMapper->SetInputData(fiberPolyData);
 
@@ -206,6 +205,7 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
         "  gl_Position = MCDCMatrix * vertexMC;\n"
         "}\n"
         );
+
   localStorage->m_FiberMapper->SetFragmentShaderCode(
         "//VTK::System::Dec\n"  // always start with this line
         "//VTK::Output::Dec\n"  // always have this line in your FS
@@ -243,7 +243,6 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   localStorage->m_FiberMapper->AddObserver(vtkCommand::UpdateShaderEvent,myCallback);
 
   localStorage->m_PointActor->SetMapper(localStorage->m_FiberMapper);
-  localStorage->m_PointActor->GetProperty()->ShadingOn();
   localStorage->m_PointActor->GetProperty()->SetLineWidth(m_LineWidth);
 
   // We have been modified => save this for next Update()

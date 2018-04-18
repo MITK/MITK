@@ -85,9 +85,17 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
     endif()
   endif()
 
-  if(OpenCV_DIR)
+  # If OpenCV is built within the MITK superbuild set the binary directory
+  # according to the lib path provided by OpenCV.
+  # In the case where an external OpenCV is provided use the binary directory
+  #  of this OpenCV directory
+  if(MITK_USE_OpenCV)
     if(WIN32)
-      list(APPEND _dir_candidates "${OpenCV_DIR}/bin")
+      if (EXISTS ${OpenCV_LIB_PATH})
+        list(APPEND _dir_candidates "${OpenCV_LIB_PATH}/../bin") # OpenCV is built in superbuild
+      else()
+        list(APPEND _dir_candidates "${OpenCV_DIR}/bin") # External OpenCV build is used
+      endif()
     endif()
   endif()
 

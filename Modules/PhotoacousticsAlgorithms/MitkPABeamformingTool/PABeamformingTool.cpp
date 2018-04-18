@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommandLineParser.h>
 #include <mitkException.h>
 
-#include <mitkPhotoacousticImage.h>
+#include <mitkPhotoacousticFilterService.h>
 #include <mitkPhotoacousticBeamformingSettings.h>
 
 #include <itksys/SystemTools.hxx>
@@ -209,15 +209,15 @@ int main(int argc, char * argv[])
 
   MITK_INFO(input.verbose) << "Beamforming input image...";
 
-  mitk::PhotoacousticImage::Pointer m_BeamformingFilter = mitk::PhotoacousticImage::New();
+  mitk::PhotoacousticFilterService::Pointer m_BeamformingService = mitk::PhotoacousticFilterService::New();
 
   mitk::BeamformingSettings settings = ParseSettings(input);
 
   std::string message = "Test";
 
-  auto output = m_BeamformingFilter->ApplyBeamforming(input.inputImage, settings, message);
+  auto output = m_BeamformingService->ApplyBeamforming(input.inputImage, settings, message);
   MITK_INFO(input.verbose) << "Applying BModeFilter to image...";
-  output = m_BeamformingFilter->ApplyBmodeFilter(output, mitk::PhotoacousticImage::Abs, false, false, 0.3);
+  output = m_BeamformingService->ApplyBmodeFilter(output, mitk::PhotoacousticFilterService::Abs, false, false, 0.3);
   MITK_INFO(input.verbose) << "Applying BModeFilter to image...[Done]";
 
   MITK_INFO(input.verbose) << "Saving image...";

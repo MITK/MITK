@@ -14,9 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkPhotoacousticImage.h"
-#include "ITKFilter/ITKUltrasound/itkBModeImageFilter.h"
-#include "ITKFilter/itkPhotoacousticBModeImageFilter.h"
+#include "mitkPhotoacousticFilterService.h"
+#include "../ITKFilter/ITKUltrasound/itkBModeImageFilter.h"
+#include "../ITKFilter/itkPhotoacousticBModeImageFilter.h"
 #include "mitkImageCast.h"
 #include "mitkITKImageImport.h"
 #include "mitkPhotoacousticBeamformingFilter.h"
@@ -43,20 +43,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkMultiplyImageFilter.h"
 #include "itkComplexToModulusImageFilter.h"
 #include <itkAddImageFilter.h>
-#include "ITKFilter/ITKUltrasound/itkFFT1DComplexConjugateToRealImageFilter.h"
-#include "ITKFilter/ITKUltrasound/itkFFT1DRealToComplexConjugateImageFilter.h"
+#include "../ITKFilter/ITKUltrasound/itkFFT1DComplexConjugateToRealImageFilter.h"
+#include "../ITKFilter/ITKUltrasound/itkFFT1DRealToComplexConjugateImageFilter.h"
 
-mitk::PhotoacousticImage::PhotoacousticImage()
+mitk::PhotoacousticFilterService::PhotoacousticFilterService() : m_BeamformingFilter(BeamformingFilter::New())
 {
-  MITK_INFO << "[PhotoacousticImage Debug] created that image";
+  MITK_INFO << "[PhotoacousticFilterService Debug] created that image";
 }
 
-mitk::PhotoacousticImage::~PhotoacousticImage()
+mitk::PhotoacousticFilterService::~PhotoacousticFilterService()
 {
-  MITK_INFO << "[PhotoacousticImage Debug] destroyed that image";
+  MITK_INFO << "[PhotoacousticFilterService Debug] destroyed that image";
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Pointer inputImage, BModeMethod method, bool UseGPU, bool UseLogFilter, float resampleSpacing)
+mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBmodeFilter(mitk::Image::Pointer inputImage, BModeMethod method, bool UseGPU, bool UseLogFilter, float resampleSpacing)
 {
   // the image needs to be of floating point type for the envelope filter to work; the casting is done automatically by the CastToItkImage
   typedef itk::Image< float, 3 > itkFloatImageType;
@@ -122,7 +122,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Poi
     resampleImageFilter->UpdateLargestPossibleRegion();
     return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
   }
-  else if (method == BModeMethod::ShapeDetection)
+  else if (method == BModeMethod::EnvelopeDetection)
   {
     typedef itk::BModeImageFilter < itkFloatImageType, itkFloatImageType > BModeFilterType;
     BModeFilterType::Pointer bModeFilter = BModeFilterType::New();  // LogFilter
@@ -179,7 +179,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Poi
   return nullptr;
 }
 
-/*mitk::Image::Pointer mitk::PhotoacousticImage::ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scattering)
+/*mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scattering)
 {
   typedef itk::Image< float, 3 > itkFloatImageType;
   typedef itk::MultiplyImageFilter <itkFloatImageType, itkFloatImageType > MultiplyImageFilterType;
@@ -194,7 +194,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Poi
   return mitk::GrabItkImageMemory(multiplyFilter->GetOutput());
 }*/
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyResampling(mitk::Image::Pointer inputImage, unsigned int outputSize[2])
+mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyResampling(mitk::Image::Pointer inputImage, unsigned int outputSize[2])
 {
   typedef itk::Image< float, 3 > itkFloatImageType;
 
@@ -229,7 +229,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyResampling(mitk::Image::Poin
   return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointer inputImage, int above, int below, int right, int left, int minSlice, int maxSlice)
+mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyCropping(mitk::Image::Pointer inputImage, int above, int below, int right, int left, int minSlice, int maxSlice)
 {
   
   unsigned int inputDim[3] = { inputImage->GetDimension(0), inputImage->GetDimension(1), inputImage->GetDimension(2) };
@@ -242,7 +242,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
   inputData = const_cast<void*>(acc.GetData());
   
   // convert the data to float by default
-  // as of now only those float, short, float are used at all... though it's easy to add other ones
+  // as of now only float, short, double are used at all.
   if (inputImage->GetPixelType().GetTypeAsString() == "scalar (float)" || inputImage->GetPixelType().GetTypeAsString() == " (float)")
   {
     // copy the data into the cropped image
@@ -259,7 +259,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
   }
   else if (inputImage->GetPixelType().GetTypeAsString() == "scalar (short)" || inputImage->GetPixelType().GetTypeAsString() == " (short)")
   {
-    // copy the data unsigned shorto the cropped image
+    // copy the data to the cropped image
     for (unsigned short sl = 0; sl < outputDim[2]; ++sl)
     {
       for (unsigned short l = 0; l < outputDim[0]; ++l)
@@ -273,7 +273,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
   }
   else if (inputImage->GetPixelType().GetTypeAsString() == "scalar (double)" || inputImage->GetPixelType().GetTypeAsString() == " (double)")
   {
-    // copy the data unsigned shorto the cropped image
+    // copy the data to the cropped image
     for (unsigned short sl = 0; sl < outputDim[2]; ++sl)
     {
       for (unsigned short l = 0; l < outputDim[0]; ++l)
@@ -298,34 +298,45 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
   return output;
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle)
+mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingSettings config, std::string& message, std::function<void(int, std::string)> progressHandle)
 {
-  config.RecordTime = config.RecordTime - (cutoff) / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
-  progressHandle(0, "cropping image");
+  Image::Pointer processedImage = inputImage;
+  if (inputImage->GetDimension() != 3)
+  {
+    processedImage->Initialize(mitk::MakeScalarPixelType<float>(), 3, inputImage->GetDimensions());
+    processedImage->SetSpacing(inputImage->GetGeometry()->GetSpacing());
+
+    mitk::ImageReadAccessor copy(inputImage);
+
+    processedImage->SetImportVolume(copy.GetData());
+  }
+
+  config.RecordTime = config.RecordTime - (float)(config.upperCutoff) / (float)inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
+  progressHandle(0, "converting image");
   if (!config.partial)
   {
     config.CropBounds[0] = 0;
     config.CropBounds[1] = inputImage->GetDimension(2) - 1;
   }
+  processedImage = ApplyCropping(inputImage, config.upperCutoff, 0, 0, 0, config.CropBounds[0], config.CropBounds[1]);
 
-  Image::Pointer processedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0, config.CropBounds[0], config.CropBounds[1]);
   config.inputDim[0] = processedImage->GetDimension(0);
   config.inputDim[1] = processedImage->GetDimension(1);
   config.inputDim[2] = processedImage->GetDimension(2);
 
   // perform the beamforming
-  BeamformingFilter::Pointer Beamformer = BeamformingFilter::New();
-  Beamformer->SetInput(processedImage);
-  Beamformer->Configure(config);
-  Beamformer->SetProgressHandle(progressHandle);
-  Beamformer->UpdateLargestPossibleRegion();
+  m_BeamformingFilter->SetInput(processedImage);
+  m_BeamformingFilter->Configure(config);
+  m_BeamformingFilter->SetProgressHandle(progressHandle);
+  m_BeamformingFilter->UpdateLargestPossibleRegion();
 
-  processedImage = Beamformer->GetOutput();
+  processedImage = m_BeamformingFilter->GetOutput();
+  message = m_BeamformingFilter->GetMessageString();
 
   return processedImage;
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::BandpassFilter(mitk::Image::Pointer data, float recordTime, float BPHighPass, float BPLowPass, float alpha)
+mitk::Image::Pointer mitk::PhotoacousticFilterService::BandpassFilter(mitk::Image::Pointer data, float recordTime, float BPHighPass, float BPLowPass, float alpha)
 {
   bool powerOfTwo = false;
   int finalPower = 0;
@@ -395,7 +406,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::BandpassFilter(mitk::Image::Point
   return GrabItkImageMemory(inverseFFTFilter->GetOutput());
 }
 
-itk::Image<float, 3U>::Pointer mitk::PhotoacousticImage::BPFunction(mitk::Image::Pointer reference, int cutoffFrequencyPixelHighPass, int cutoffFrequencyPixelLowPass, float alpha)
+itk::Image<float, 3U>::Pointer mitk::PhotoacousticFilterService::BPFunction(mitk::Image::Pointer reference, int cutoffFrequencyPixelHighPass, int cutoffFrequencyPixelLowPass, float alpha)
 {
   float* imageData = new float[reference->GetDimension(0)*reference->GetDimension(1)];
   
@@ -410,23 +421,31 @@ itk::Image<float, 3U>::Pointer mitk::PhotoacousticImage::BPFunction(mitk::Image:
   {
       imageData[reference->GetDimension(0)*n] = 0;
   }
-
-  for (int n = 0; n < width; ++n)
+  if (alpha < 0.00001)
   {
-    if (n <= (alpha*(width - 1)) / 2)
+    for (int n = 0; n < width; ++n)
     {
-      imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(itk::Math::pi*(2 * n / (alpha*(width - 1)) - 1))) / 2;
+      if (n <= (alpha*(width - 1)) / 2)
+      {
+        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(itk::Math::pi*(2 * n / (alpha*(width - 1)) - 1))) / 2;
+      }
+      else if (n >= (width - 1)*(1 - alpha / 2))
+      {
+        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(itk::Math::pi*(2 * n / (alpha*(width - 1)) + 1 - 2 / alpha))) / 2;
+      }
+      else
+      {
+        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = 1;
+      }
     }
-    else if (n >= (width - 1)*(1 - alpha / 2) && n <= (width - 1))
-    {
-      imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(itk::Math::pi*(2 * n / (alpha*(width - 1)) + 1 - 2 / alpha))) / 2;
-    }
-    else
+  }
+  else
+  {
+    for (int n = 0; n < width; ++n)
     {
       imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = 1;
     }
   }
-
   // Butterworth-Filter
   /*
   // first, write the HighPass
@@ -499,11 +518,11 @@ itk::Image<float, 3U>::Pointer mitk::PhotoacousticImage::BPFunction(mitk::Image:
 
   ImageType::IndexType pixelIndex;
 
-  for (ImageType::IndexValueType slice = 0; slice < reference->GetDimension(2); ++slice)
+  for (unsigned int slice = 0; slice < reference->GetDimension(2); ++slice)
   {
-    for (ImageType::IndexValueType line = 0; line < reference->GetDimension(0); ++line)
+    for (unsigned int line = 0; line < reference->GetDimension(0); ++line)
     {
-      for (ImageType::IndexValueType sample = 0; sample < reference->GetDimension(1); ++sample)
+      for (unsigned int sample = 0; sample < reference->GetDimension(1); ++sample)
       {
         pixelIndex[0] = line;
         pixelIndex[1] = sample;

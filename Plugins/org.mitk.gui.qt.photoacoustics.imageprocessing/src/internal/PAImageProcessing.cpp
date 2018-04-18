@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //mitk image
 #include <mitkImage.h>
-#include "mitkPhotoacousticImage.h"
+#include "mitkPhotoacousticFilterService.h"
 #include "mitkPhotoacousticBeamformingFilter.h"
 
 //other
@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string PAImageProcessing::VIEW_ID = "org.mitk.views.paimageprocessing";
 
-PAImageProcessing::PAImageProcessing() : m_ResampleSpacing(0), m_UseLogfilter(false), m_FilterBank(mitk::PhotoacousticImage::New())
+PAImageProcessing::PAImageProcessing() : m_ResampleSpacing(0), m_UseLogfilter(false), m_FilterBank(mitk::PhotoacousticFilterService::New())
 {
   qRegisterMetaType<mitk::Image::Pointer>();
   qRegisterMetaType<std::string>();
@@ -293,9 +293,9 @@ void PAImageProcessing::BatchProcessing()
       bool useGPU = m_Controls.UseGPUBmode->isChecked();
       
       if (m_Controls.BModeMethod->currentText() == "Absolute Filter")
-        image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::Abs, useGPU, m_UseLogfilter, m_ResampleSpacing);
+        image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticFilterService::BModeMethod::Abs, useGPU, m_UseLogfilter, m_ResampleSpacing);
       else if (m_Controls.BModeMethod->currentText() == "Envelope Detection")
-        image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticImage::BModeMethod::EnvelopeDetection, useGPU, m_UseLogfilter, m_ResampleSpacing);
+        image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection, useGPU, m_UseLogfilter, m_ResampleSpacing);
       
       if (saveSteps[3])
       {
@@ -462,9 +462,9 @@ void PAImageProcessing::StartBmodeThread()
       bool useGPU = m_Controls.UseGPUBmode->isChecked();
 
       if(m_Controls.BModeMethod->currentText() == "Absolute Filter")
-        thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticImage::BModeMethod::Abs, useGPU);
+        thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticFilterService::BModeMethod::Abs, useGPU);
       else if(m_Controls.BModeMethod->currentText() == "Envelope Detection")
-        thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticImage::BModeMethod::EnvelopeDetection, useGPU);
+        thread->setConfig(m_UseLogfilter, m_ResampleSpacing, mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection, useGPU);
       thread->setInputImage(image);
       thread->setFilterBank(m_FilterBank);
 
@@ -1104,7 +1104,7 @@ void BmodeThread::run()
   emit result(resultImage);
 }
 
-void BmodeThread::setConfig(bool useLogfilter, double resampleSpacing, mitk::PhotoacousticImage::BModeMethod method, bool useGPU)
+void BmodeThread::setConfig(bool useLogfilter, double resampleSpacing, mitk::PhotoacousticFilterService::BModeMethod method, bool useGPU)
 {
   m_UseLogfilter = useLogfilter;
   m_ResampleSpacing = resampleSpacing;

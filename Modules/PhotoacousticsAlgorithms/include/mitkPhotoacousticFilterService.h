@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkPhotoacousticImage_H_HEADER_INCLUDED
-#define mitkPhotoacousticImage_H_HEADER_INCLUDED
+#ifndef mitkPhotoacousticFilterService_H_HEADER_INCLUDED
+#define mitkPhotoacousticFilterService_H_HEADER_INCLUDED
 
 #include "itkObject.h"
 #include "mitkCommon.h"
@@ -37,10 +37,10 @@ namespace mitk {
   *  - A Bandpass Filter
   */
 
-    class MITKPHOTOACOUSTICSALGORITHMS_EXPORT PhotoacousticImage : public itk::Object
+    class MITKPHOTOACOUSTICSALGORITHMS_EXPORT PhotoacousticFilterService : public itk::Object
     {
     public:
-      mitkClassMacroItkParent(mitk::PhotoacousticImage, itk::Object);
+      mitkClassMacroItkParent(mitk::PhotoacousticFilterService, itk::Object);
       itkFactorylessNewMacro(Self);
       /** \brief Defines the methods for the B-Mode filter
       * Currently implemented are an Envelope Detection filter and a simple Absolute filter.
@@ -109,8 +109,8 @@ namespace mitk {
       mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data, float recordTime, float BPHighPass, float BPLowPass, float alpha);
 
     protected:
-      PhotoacousticImage();
-      ~PhotoacousticImage() override;
+      PhotoacousticFilterService();
+      ~PhotoacousticFilterService() override;
 
       /** \brief For performance reasons, an instance of the Beamforming filter is initialized as soon as possible and kept for all further uses.
       */
@@ -122,4 +122,4 @@ namespace mitk {
     };
 } // namespace mitk
 
-#endif /* mitkPhotoacousticImage_H_HEADER_INCLUDED */
+#endif /* mitkPhotoacousticFilterService_H_HEADER_INCLUDED */

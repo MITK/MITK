@@ -97,26 +97,6 @@ namespace mitk {
     * @param samples the resolution at which the window is created
     */
     float* BoxFunction(int samples);
-
-    /** \brief Function to perform beamforming on CPU for a single line, using DAS and quadratic delay
-    */
-    void DASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize);
-    /** \brief Function to perform beamforming on CPU for a single line, using DAS and spherical delay
-    */
-    void DASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize);
-    /** \brief Function to perform beamforming on CPU for a single line, using DMAS and quadratic delay
-    */
-    void DMASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize);
-    /** \brief Function to perform beamforming on CPU for a single line, using DMAS and spherical delay
-    */
-    void DMASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize);
-    /** \brief Function to perform beamforming on CPU for a single line, using signed DMAS and quadratic delay
-    */
-    void sDMASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize);
-    /** \brief Function to perform beamforming on CPU for a single line, using signed DMAS and spherical delay
-    */
-    void sDMASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize);
-
     float* m_OutputData;
     float* m_InputData;
     float* m_InputDataPuffer;

@@ -55,7 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "qcolordialog.h"
 #include <QRgb>
 #include <itkMultiThreader.h>
-
+#include <mitkClippingProperty.h>
 #include <ciso646>
 
 #define ROUND(a) ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
@@ -753,31 +753,18 @@ void QmitkControlVisualizationPropertiesView::OnSliceChanged()
 void QmitkControlVisualizationPropertiesView::Set3DClippingPlane(bool disable, mitk::DataNode* node, std::string plane)
 {
   mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-
   if (renderWindow && node && dynamic_cast<mitk::FiberBundle*>(node->GetData()))
   {
     mitk::Vector3D planeNormal; planeNormal.Fill(0.0);
+    mitk::Point3D planeOrigin; planeOrigin.Fill(0.0);
     if (!disable)
     {
       mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString(plane.c_str()))->GetSliceNavigationController();
       mitk::PlaneGeometry::ConstPointer planeGeo = slicer->GetCurrentPlaneGeometry();
-
-      //generate according cutting planes based on the view position
+      planeOrigin = this->GetRenderWindowPart()->GetSelectedPosition();
       planeNormal = planeGeo->GetNormal();
-
-      float tmp1 = planeGeo->GetOrigin()[0] * planeNormal[0];
-      float tmp2 = planeGeo->GetOrigin()[1] * planeNormal[1];
-      float tmp3 = planeGeo->GetOrigin()[2] * planeNormal[2];
-      float distance = tmp1 + tmp2 + tmp3; //attention, correct normalvector
-
-      planeNormal *= distance;
-      if (distance<0)
-        node->SetBoolProperty( "Fiber3DClippingPlaneSecondFlip", true );
-      else
-        node->SetBoolProperty( "Fiber3DClippingPlaneSecondFlip", false );
     }
-
-    node->SetProperty( "Fiber3DClippingPlane", mitk::Vector3DProperty::New( planeNormal ) );
+    node->SetProperty( "Fiber3DClipping", mitk::ClippingProperty::New( planeOrigin, planeNormal ) );
     dynamic_cast<mitk::FiberBundle*>(node->GetData())->RequestUpdate();
   }
 }
@@ -1247,15 +1234,10 @@ void QmitkControlVisualizationPropertiesView::TubeRadiusChanged()
   if(m_SelectedNode && dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData()))
   {
     float newRadius = m_Controls->m_TubeWidth->value();
-    if (newRadius>0)
-      m_SelectedNode->SetBoolProperty( "light.enable_light", true);
-    else
-      m_SelectedNode->SetBoolProperty( "light.enable_light", false);
     m_SelectedNode->SetFloatProperty("shape.tuberadius", newRadius);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
-
 
 void QmitkControlVisualizationPropertiesView::LineWidthChanged()
 {

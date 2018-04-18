@@ -20,33 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 
 #include <vtkSmartPointer.h>
-#include <vtkTexturedSphereSource.h>
-
-
-/*===================================================================
-
-The Medical Imaging Interaction Toolkit (MITK)
-
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
-All rights reserved.
-
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
-
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+#include <vtkRenderLargeImage.h>
 
 #include "mitkTestingMacros.h"
 #include <mitkFiberBundle.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkTestingConfig.h>
 #include <mitkIOUtil.h>
-#include <omp.h>
 #include <mitkTestFixture.h>
-#include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <vtkTesting.h>
 
 class mitkFiberMapper3DTestSuite : public mitk::TestFixture
@@ -63,12 +44,16 @@ private:
   /** Members used inside the different (sub-)tests. All members are initialized via setUp().*/
 
   mitk::FiberBundle::Pointer fib;
+  mitk::DataNode::Pointer node;
 
 public:
 
   void setUp() override
   {
     fib = mitk::IOUtil::Load<mitk::FiberBundle>(GetTestDataFilePath("DiffusionImaging/FiberFit/Cluster_0.fib"));
+
+    node = mitk::DataNode::New();
+    node->SetData(fib);
   }
 
   void tearDown() override
@@ -86,39 +71,17 @@ public:
 
   void Test1()
   {
-    MITK_INFO << "1";
-    omp_set_num_threads(1);
-
-    MITK_INFO << "2";
-    auto node = mitk::DataNode::New();
-    node->SetData(fib);
-
-    MITK_INFO << "3";
     mitk::RenderingTestHelper renderingHelper(640, 480);
     renderingHelper.AddNodeToStorage(node);
-
-    MITK_INFO << "4";
-    renderingHelper.SetMapperID(mitk::BaseRenderer::Standard3D);
+    renderingHelper.SetMapperIDToRender3D();
     renderingHelper.GetVtkRenderer()->SetBackground(0.0, 0.0, 0.0);
-
-    MITK_INFO << "5";
     mitk::RenderingManager::GetInstance()->InitializeViews(fib->GetGeometry(), mitk::RenderingManager::RequestType::REQUEST_UPDATE_ALL);
 
-    MITK_INFO << "6";
-    renderingHelper.SaveReferenceScreenShot(mitk::IOUtil::GetTempPath()+"fib_renderingtest.png");
-    MITK_INFO << "7";
-
-    CPPUNIT_ASSERT_MESSAGE("No rendering crash", true);
-//    MITK_INFO << "1";
-//    char* argv[4];
-//    argv[0] = (char*)"";
-//    argv[1] = (char*)"";
-//    argv[1] = (char*)"-V";
-//    argv[3] = (char*)GetTestDataFilePath("fib_renderingtest.png").c_str();
-//    MITK_INFO << "2";
-//    CPPUNIT_ASSERT_MESSAGE("CompareRenderWindowAgainstReference test result positive?", renderingHelper.CompareRenderWindowAgainstReference(4, argv));
+    renderingHelper.SaveReferenceScreenShot(mitk::IOUtil::GetTempPath()+"fib_3D.png");
+    mitk::Image::Pointer test_image = mitk::IOUtil::Load<mitk::Image>(mitk::IOUtil::GetTempPath()+"fib_3D.png");
+    mitk::Image::Pointer ref_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/fib_renderingtest.png"));
+    MITK_ASSERT_EQUAL(test_image, ref_image, "Check if images are equal.");
   }
-
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkFiberMapper3D)

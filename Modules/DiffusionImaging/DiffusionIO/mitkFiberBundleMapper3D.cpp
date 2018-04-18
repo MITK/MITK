@@ -105,7 +105,7 @@ mitk::FiberBundleMapper3D::FiberBundleMapper3D()
   , m_TubeSides(15)
   , m_LineWidth(1)
 {
-  m_lut = vtkLookupTable::New();
+  m_lut = vtkSmartPointer<vtkLookupTable>::New();
   m_lut->Build();
 }
 

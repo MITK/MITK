@@ -443,15 +443,6 @@ namespace mitk {
     std::string GetServicePropertyLabel();
 
     unsigned int m_NumberOfOutputs;
-
-  private:
-
-    std::string m_Manufacturer;
-    std::string m_Name;
-    std::string m_Comment;
-
-    bool m_SpawnAcquireThread;
-
     /**
     *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
     */
@@ -461,6 +452,14 @@ namespace mitk {
     * \brief Properties of the device's Microservice.
     */
     us::ServiceProperties m_ServiceProperties;
+
+  private:
+
+    std::string m_Manufacturer;
+    std::string m_Name;
+    std::string m_Comment;
+
+    bool m_SpawnAcquireThread;
 
     // Threading-Related
     itk::ConditionVariable::Pointer m_FreezeBarrier;

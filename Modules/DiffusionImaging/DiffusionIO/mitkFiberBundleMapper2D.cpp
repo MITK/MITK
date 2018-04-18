@@ -80,7 +80,7 @@ public:
       float tmp3 = planeGeo->GetOrigin()[2] * planeNormal[2];
       float thickness = tmp1 + tmp2 + tmp3; //attention, correct normalvector
 
-      float* a = new float[4];
+      float a[4];
       for (int i = 0; i < 3; ++i)
         a[i] = planeNormal[i];
 
@@ -98,7 +98,7 @@ public:
 mitk::FiberBundleMapper2D::FiberBundleMapper2D()
   : m_LineWidth(1)
 {
-  m_lut = vtkLookupTable::New();
+  m_lut = vtkSmartPointer<vtkLookupTable>::New();
   m_lut->Build();
 
 }

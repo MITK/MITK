@@ -145,7 +145,7 @@ mitk::OdfVtkMapper2D<T,N>::LocalStorage::LocalStorage()
   m_OdfsMappers.push_back(vtkPolyDataMapper::New());
   m_OdfsMappers.push_back(vtkPolyDataMapper::New());
 
-  vtkLookupTable *lut = vtkLookupTable::New();
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
 
   m_OdfsMappers[0]->SetLookupTable(lut);
   m_OdfsMappers[1]->SetLookupTable(lut);

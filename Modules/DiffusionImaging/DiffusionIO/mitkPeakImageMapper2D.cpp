@@ -102,7 +102,7 @@ public:
 
 mitk::PeakImageMapper2D::PeakImageMapper2D()
 {
-  m_lut = vtkLookupTable::New();
+  m_lut = vtkSmartPointer<vtkLookupTable>::New();
   m_lut->Build();
 }
 

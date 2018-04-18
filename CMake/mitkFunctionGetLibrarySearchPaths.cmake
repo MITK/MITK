@@ -87,7 +87,7 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
 
   if(OpenCV_DIR)
     if(WIN32)
-      list(APPEND _dir_candidates "${OpenCV_LIB_PATH}/../bin")
+      list(APPEND _dir_candidates "${OpenCV_DIR}/bin")
     endif()
   endif()
 

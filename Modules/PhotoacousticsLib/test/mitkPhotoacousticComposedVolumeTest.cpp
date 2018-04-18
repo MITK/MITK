@@ -45,7 +45,8 @@ public:
     m_DefaultParameters->SetXDim(5);
     m_DefaultParameters->SetYDim(5);
     m_DefaultParameters->SetZDim(5);
-    m_InSilicoTissueVolume = mitk::pa::InSilicoTissueVolume::New(m_DefaultParameters);
+    auto rng = std::mt19937();
+    m_InSilicoTissueVolume = mitk::pa::InSilicoTissueVolume::New(m_DefaultParameters, &rng);
     m_ComposedVolume = mitk::pa::ComposedVolume::New(m_InSilicoTissueVolume);
   }
 
@@ -54,7 +55,7 @@ public:
     auto* data = new double[125];
     for (int i = 0; i < 125; ++i)
       data[i] = value;
-    mitk::pa::Volume::Pointer volume = mitk::pa::Volume::New(data, 5, 5, 5);
+    mitk::pa::Volume::Pointer volume = mitk::pa::Volume::New(data, 5, 5, 5, 1);
     return mitk::pa::FluenceYOffsetPair::New(volume, yOffset);
   }
 

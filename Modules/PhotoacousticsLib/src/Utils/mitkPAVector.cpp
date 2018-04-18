@@ -136,6 +136,20 @@ mitk::pa::Vector::Pointer mitk::pa::Vector::Clone()
   return returnVector;
 }
 
+void mitk::pa::Vector::Subtract(Vector::Pointer other)
+{
+  m_Vector.SetElement(0, m_Vector.GetElement(0) - other->GetElement(0));
+  m_Vector.SetElement(1, m_Vector.GetElement(1) - other->GetElement(1));
+  m_Vector.SetElement(2, m_Vector.GetElement(2) - other->GetElement(2));
+}
+
+void mitk::pa::Vector::Add(Vector::Pointer other)
+{
+  m_Vector.SetElement(0, m_Vector.GetElement(0) + other->GetElement(0));
+  m_Vector.SetElement(1, m_Vector.GetElement(1) + other->GetElement(1));
+  m_Vector.SetElement(2, m_Vector.GetElement(2) + other->GetElement(2));
+}
+
 bool mitk::pa::Equal(const Vector::Pointer leftHandSide, const Vector::Pointer rightHandSide, double eps, bool verbose)
 {
   MITK_INFO(verbose) << "=== mitk::pa::Vector Equal ===";

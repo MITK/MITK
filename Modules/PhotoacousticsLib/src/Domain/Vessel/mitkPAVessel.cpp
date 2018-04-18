@@ -29,6 +29,7 @@ mitk::pa::Vessel::Vessel(VesselProperties::Pointer initialProperties) :
     NEW_RADIUS_MAXIMUM_RELATIVE_SIZE);
   m_VesselMeanderStrategy = VesselMeanderStrategy::New();
   m_WalkedDistance = 0;
+  m_VesselDrawer = VesselDrawer::New();
 }
 
 mitk::pa::Vessel::~Vessel()
@@ -40,9 +41,9 @@ mitk::pa::Vessel::~Vessel()
 void mitk::pa::Vessel::ExpandVessel(InSilicoTissueVolume::Pointer volume,
   CalculateNewVesselPositionCallback calculateNewPosition, double bendingFactor, std::mt19937* rng)
 {
-  Vector::Pointer oldPosition = m_VesselProperties->GetPositionVector()->Clone();
+  m_VesselDrawer->DrawVesselInVolume(m_VesselProperties, volume);
   (m_VesselMeanderStrategy->*calculateNewPosition)(m_VesselProperties->GetPositionVector(), m_VesselProperties->GetDirectionVector(), bendingFactor, rng);
-  DrawVesselInVolume(oldPosition, volume);
+  m_WalkedDistance += (m_VesselProperties->GetDirectionVector()->GetNorm() / volume->GetSpacing());
 }
 
 bool mitk::pa::Vessel::CanBifurcate()
@@ -75,59 +76,6 @@ mitk::pa::Vessel::Pointer mitk::pa::Vessel::Bifurcate(std::mt19937* rng)
   m_WalkedDistance = 0;
 
   return Vessel::New(vesselParams);
-}
-
-void mitk::pa::Vessel::DrawVesselInVolume(Vector::Pointer fromPosition,
-  InSilicoTissueVolume::Pointer volume)
-{
-  Vector::Pointer diffVector = Vector::New();
-  Vector::Pointer toPosition = m_VesselProperties->GetPositionVector();
-  diffVector->SetElement(0, fromPosition->GetElement(0) - toPosition->GetElement(0));
-  diffVector->SetElement(1, fromPosition->GetElement(1) - toPosition->GetElement(1));
-  diffVector->SetElement(2, fromPosition->GetElement(2) - toPosition->GetElement(2));
-
-  //1/SCALING_FACTOR steps along the direction vector are taken and drawn into the image.
-  Vector::Pointer stepSize = Vector::New();
-  stepSize->SetValue(m_VesselProperties->GetDirectionVector());
-  stepSize->Scale(SCALING_FACTOR);
-
-  while (diffVector->GetNorm() >= SCALING_FACTOR)
-  {
-    m_WalkedDistance += stepSize->GetNorm();
-
-    fromPosition->SetElement(0, fromPosition->GetElement(0) + stepSize->GetElement(0));
-    fromPosition->SetElement(1, fromPosition->GetElement(1) + stepSize->GetElement(1));
-    fromPosition->SetElement(2, fromPosition->GetElement(2) + stepSize->GetElement(2));
-
-    int xPos = fromPosition->GetElement(0);
-    int yPos = fromPosition->GetElement(1);
-    int zPos = fromPosition->GetElement(2);
-
-    if (!volume->IsInsideVolume(xPos, yPos, zPos))
-    {
-      m_VesselProperties->SetRadiusInVoxel(0);
-      break;
-    }
-
-    double radius = m_VesselProperties->GetRadiusInVoxel();
-
-    for (int x = xPos - radius; x <= xPos + radius; x++)
-      for (int y = yPos - radius; y <= yPos + radius; y++)
-        for (int z = zPos - radius; z <= zPos + radius; z++)
-        {
-          if (radius*radius >= (x - xPos)*(x - xPos) + (y - yPos)*(y - yPos) + (z - zPos)*(z - zPos))
-          {
-            volume->SetVolumeValues(x, y, z, m_VesselProperties->GetAbsorptionCoefficient(),
-              m_VesselProperties->GetScatteringCoefficient(),
-              m_VesselProperties->GetAnisotopyCoefficient(),
-              mitk::pa::InSilicoTissueVolume::SegmentationType::VESSEL);
-          }
-        }
-
-    diffVector->SetElement(0, fromPosition->GetElement(0) - toPosition->GetElement(0));
-    diffVector->SetElement(1, fromPosition->GetElement(1) - toPosition->GetElement(1));
-    diffVector->SetElement(2, fromPosition->GetElement(2) - toPosition->GetElement(2));
-  }
 }
 
 bool mitk::pa::Vessel::IsFinished()

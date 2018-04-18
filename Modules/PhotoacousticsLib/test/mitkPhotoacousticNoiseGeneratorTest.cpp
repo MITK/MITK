@@ -46,7 +46,7 @@ public:
     {
       volume[i] = 1;
     }
-    m_Volume = mitk::pa::Volume::New(volume, 1000, 100, 100);
+    m_Volume = mitk::pa::Volume::New(volume, 1000, 100, 100, 1);
     mitk::pa::NoiseGenerator::ApplyNoiseModel(m_Volume, 0.75, 0.1);
 
     int negativecounter = 0;

@@ -65,9 +65,6 @@ mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, Navigat
 
 mitk::USCombinedModality::~USCombinedModality()
 {
-  if (m_ServiceRegistration != nullptr)
-    m_ServiceRegistration.Unregister();
-  m_ServiceRegistration = 0;
 }
 
 std::string mitk::USCombinedModality::GetDeviceClass()
@@ -135,9 +132,7 @@ void mitk::USCombinedModality::UnregisterOnService()
   if (m_DeviceState == State_Activated) { this->Deactivate(); }
   if (m_DeviceState == State_Connected) { this->Disconnect(); }
 
-  if (m_ServiceRegistration != nullptr)
-    m_ServiceRegistration.Unregister();
-  m_ServiceRegistration = 0;
+  mitk::USDevice::UnregisterOnService();
 }
 
 mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration()

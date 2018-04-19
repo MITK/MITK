@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>222</width>
-    <height>161</height>
+    <width>242</width>
+    <height>391</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -31,12 +31,96 @@
     </widget>
    </item>
    <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Pyramid scale:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="linePyrScale">
+     <property name="text">
+      <string>0.5</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Levels:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="lineLevels">
+     <property name="text">
+      <string>3</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Averaging window size:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="lineWinSize">
+     <property name="text">
+      <string>15</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Iterations:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="lineIterations">
+     <property name="text">
+      <string>3</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Pixel neighborhood for poly-expan:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="linePolyN">
+     <property name="text">
+      <string>5</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Standard deviation:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="linePolySigma">
+     <property name="text">
+      <string>1.1</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="buttonPerformImageProcessing">
      <property name="toolTip">
       <string>Do image processing</string>
      </property>
      <property name="text">
-      <string>Do Something</string>
+      <string>Compute</string>
      </property>
     </widget>
    </item>

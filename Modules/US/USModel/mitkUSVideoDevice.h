@@ -124,6 +124,22 @@ namespace mitk {
     */
     bool GetIsSourceFile();
 
+    /**
+    * \brief Sets the first existing probe or the default probe of the video device
+    * as the current probe of it.
+    */
+    void SetDefaultProbeAsCurrentProbe();
+
+    /**
+    * \brief Sets the probe with the given name as current probe if the named probe exists.
+    */
+    void SetCurrentProbe( std::string probename );
+
+    /**
+    * \brief Sets the given spacing of the current depth of the current probe.
+    */
+    void SetSpacing( double xSpacing, double ySpacing ) override;
+
     itkGetMacro(ImageVector, std::vector<mitk::Image::Pointer>);
     itkGetMacro(DeviceID, int);
     itkGetMacro(FilePath, std::string);

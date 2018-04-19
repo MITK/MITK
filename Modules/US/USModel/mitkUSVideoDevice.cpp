@@ -137,9 +137,10 @@ void mitk::USVideoDevice::GenerateData()
 
   m_ImageMutex->Lock();
   auto& image = m_ImageVector[0];
-  if( image.IsNotNull() && image->IsInitialized() && m_OverrideSpacing )
+  if( image.IsNotNull() && image->IsInitialized() && m_CurrentProbe.IsNotNull() )
   {
-    image->GetGeometry()->SetSpacing(m_Spacing);
+    //MITK_INFO << "Spacing CurrentProbe: " << m_CurrentProbe->GetSpacingForGivenDepth(m_CurrentProbe->GetCurrentDepth());
+    image->GetGeometry()->SetSpacing(m_CurrentProbe->GetSpacingForGivenDepth(m_CurrentProbe->GetCurrentDepth()));
     this->GetOutput(0)->SetGeometry(image->GetGeometry());
   }
   m_ImageMutex->Unlock();
@@ -211,4 +212,42 @@ void mitk::USVideoDevice::AddNewProbe(mitk::USProbe::Pointer probe)
 bool mitk::USVideoDevice::GetIsSourceFile()
 {
   return m_SourceIsFile;
+}
+
+void mitk::USVideoDevice::SetDefaultProbeAsCurrentProbe()
+{
+  if( m_Probes.size() == 0 )
+  {
+    std::string name = "default";
+    mitk::USProbe::Pointer defaultProbe = mitk::USProbe::New( name );
+    m_Probes.push_back( defaultProbe );
+  }
+
+  m_CurrentProbe = m_Probes.at(0);
+  MITK_INFO << "SetDefaultProbeAsCurrentProbe()";
+  this->ProbeChanged( m_CurrentProbe->GetName() );
+}
+
+void mitk::USVideoDevice::SetCurrentProbe(std::string probename)
+{
+  m_CurrentProbe = this->GetProbeByName( probename );
+  MITK_INFO << "SetCurrentProbe() " << probename;
+}
+
+void mitk::USVideoDevice::SetSpacing(double xSpacing, double ySpacing)
+{
+  mitk::Vector3D spacing;
+  spacing[0] = xSpacing;
+  spacing[1] = ySpacing;
+  spacing[2] = 1;
+  MITK_INFO << "Spacing: " << spacing;
+
+  if( m_CurrentProbe.IsNotNull() )
+  {
+    m_CurrentProbe->SetSpacingForGivenDepth(m_CurrentProbe->GetCurrentDepth(), spacing);
+  }
+  else
+  {
+    MITK_WARN << "Cannot set spacing. Current ultrasound probe not set.";
+  }
 }

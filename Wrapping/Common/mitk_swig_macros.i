@@ -161,16 +161,20 @@
 //
 %define SWIG_ADD_MITK_CLASS(classname, classinclude, nspace)
 
+  %feature("smartptr", noblock=1) nspace ##:: ## classname { itk::SmartPointer<nspace ## :: ## classname ## ::Self> }
+
   MITKSWIG_ADD_CLASS( classname, classinclude, nspace )
 
+
   class nspace ## :: ## classname ## ;
-  class nspace ## :: ## classname ## ::Pointer;
+  //class nspace ## :: ## classname ## ::Pointer;
 
   // It is important to first define the Vectors and
   // then define the Smartpointer. Otherwise a SWIG-bug ...
   MITKSWIG_SMARTPOINTERVECTOR(classname, classinclude, nspace)
 
-  MITKSWIG_MITKSMARTPOINTER(classname, classinclude, nspace)
+  //MITKSWIG_MITKSMARTPOINTER(classname, classinclude, nspace)
+  %template(classname ## Pointer) itk::SmartPointer<nspace ## :: ## classname ## ::Self>;
 
   MITKSWIG_AUTOMATED_CASTING(classname, classinclude, nspace)
 %enddef

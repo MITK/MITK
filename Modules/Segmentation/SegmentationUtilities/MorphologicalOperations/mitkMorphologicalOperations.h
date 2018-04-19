@@ -92,31 +92,31 @@ namespace mitk
     /** \brief Perform morphological operation by using corresponding ITK filter.
      */
     template <typename TPixel, unsigned int VDimension>
-    void static itkClosing(itk::Image<TPixel, VDimension> *sourceImage,
+    static void itkClosing(itk::Image<TPixel, VDimension> *sourceImage,
                            mitk::Image::Pointer &resultImage,
                            int factor,
                            StructuralElementType structuralElement);
 
     template <typename TPixel, unsigned int VDimension>
-    void static itkErode(itk::Image<TPixel, VDimension> *sourceImage,
+    static void itkErode(itk::Image<TPixel, VDimension> *sourceImage,
                          mitk::Image::Pointer &resultImage,
                          int factor,
                          StructuralElementType structuralElement);
 
     template <typename TPixel, unsigned int VDimension>
-    void static itkDilate(itk::Image<TPixel, VDimension> *sourceImage,
+    static void itkDilate(itk::Image<TPixel, VDimension> *sourceImage,
                           mitk::Image::Pointer &resultImage,
                           int factor,
                           StructuralElementType structuralElement);
 
     template <typename TPixel, unsigned int VDimension>
-    void static itkOpening(itk::Image<TPixel, VDimension> *sourceImage,
+    static void itkOpening(itk::Image<TPixel, VDimension> *sourceImage,
                            mitk::Image::Pointer &resultImage,
                            int factor,
                            StructuralElementType structuralElement);
 
     template <typename TPixel, unsigned int VDimension>
-    void static itkFillHoles(itk::Image<TPixel, VDimension> *sourceImage, mitk::Image::Pointer &resultImage);
+    static void itkFillHoles(itk::Image<TPixel, VDimension> *sourceImage, mitk::Image::Pointer &resultImage);
     ///@}
   };
 }

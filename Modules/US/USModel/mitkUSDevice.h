@@ -80,6 +80,8 @@ namespace mitk {
     enum DeviceStates { State_NoState, State_Initialized, State_Connected, State_Activated };
 
     mitkClassMacro(USDevice, mitk::ImageSource);
+    itkSetMacro(SpawnAcquireThread, bool);
+    itkGetMacro(SpawnAcquireThread, bool);
 
     struct USImageCropArea
     {
@@ -289,6 +291,9 @@ namespace mitk {
     /* @return Returns the area that will be cropped from the US image. Is disabled / [0,0,0,0] by default. */
     mitk::USDevice::USImageCropArea GetCropArea();
 
+    /* @return Returns the size of the m_ImageVector of the ultrasound device.*/
+    unsigned int GetSizeOfImageVector();
+
     /** @return Returns the current image source of this device. */
     virtual USImageSource::Pointer GetUSImageSource() = 0;
 
@@ -312,7 +317,18 @@ namespace mitk {
 
       void GrabImage();
 
+    void SetSpacing(double xSpacing, double ySpacing);
+    void SetOverrideSpacing( bool overriding );
+
   protected:
+
+    // Threading-Related
+    itk::ConditionVariable::Pointer m_FreezeBarrier;
+    itk::SimpleMutexLock        m_FreezeMutex;
+    itk::MultiThreader::Pointer m_MultiThreader; ///< itk::MultiThreader used for thread handling
+    itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the image source
+    int m_ThreadID; ///< ID of the started thread
+
     virtual void SetImageVector(std::vector<mitk::Image::Pointer> vec)
     {
       if (this->m_ImageVector != vec)                   
@@ -321,14 +337,16 @@ namespace mitk {
       this->Modified();                             
       } 
     }
-    itkSetMacro(SpawnAcquireThread, bool);
-    itkGetMacro(SpawnAcquireThread, bool);
 
     static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
     static ITK_THREAD_RETURN_TYPE ConnectThread(void* pInfoStruct);
 
     std::vector<mitk::Image::Pointer> m_ImageVector;
     //mitk::Image::Pointer m_OutputImage;
+
+    // Variables to determine if spacing was calibrated and needs to be applied to the incoming images
+    mitk::Vector3D m_Spacing;
+    bool m_OverrideSpacing;
 
     /**
     * \brief Registers an OpenIGTLink device as a microservice so that we can send the images of
@@ -443,6 +461,15 @@ namespace mitk {
     std::string GetServicePropertyLabel();
 
     unsigned int m_NumberOfOutputs;
+
+  private:
+
+    std::string m_Manufacturer;
+    std::string m_Name;
+    std::string m_Comment;
+
+    bool m_SpawnAcquireThread;
+
     /**
     *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
     */
@@ -453,20 +480,6 @@ namespace mitk {
     */
     us::ServiceProperties m_ServiceProperties;
 
-  private:
-
-    std::string m_Manufacturer;
-    std::string m_Name;
-    std::string m_Comment;
-
-    bool m_SpawnAcquireThread;
-
-    // Threading-Related
-    itk::ConditionVariable::Pointer m_FreezeBarrier;
-    itk::SimpleMutexLock        m_FreezeMutex;
-    itk::MultiThreader::Pointer m_MultiThreader; ///< itk::MultiThreader used for thread handling
-    itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the image source
-    int m_ThreadID; ///< ID of the started thread
 
     bool m_UnregisteringStarted;
   };

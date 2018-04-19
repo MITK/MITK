@@ -126,6 +126,25 @@ bool mitk::USVideoDevice::OnDeactivation()
   return true;
 }
 
+void mitk::USVideoDevice::GenerateData()
+{
+  Superclass::GenerateData();
+
+  if( m_ImageVector.size() == 0 || this->GetNumberOfIndexedOutputs() == 0 )
+  {
+    return;
+  }
+
+  m_ImageMutex->Lock();
+  auto& image = m_ImageVector[0];
+  if( image.IsNotNull() && image->IsInitialized() && m_OverrideSpacing )
+  {
+    image->GetGeometry()->SetSpacing(m_Spacing);
+    this->GetOutput(0)->SetGeometry(image->GetGeometry());
+  }
+  m_ImageMutex->Unlock();
+}
+
 void mitk::USVideoDevice::UnregisterOnService()
 {
   if (m_DeviceState == State_Activated) { this->Deactivate(); }

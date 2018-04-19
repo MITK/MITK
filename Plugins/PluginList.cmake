@@ -76,6 +76,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.tubegraph:OFF
   org.mitk.gui.qt.ugvisualization:OFF
   org.mitk.gui.qt.photoacoustics.pausviewer:OFF
+  org.mitk.gui.qt.photoacoustics.pausmotioncompensation:OFF
   org.mitk.gui.qt.photoacoustics.imageprocessing:OFF
   org.mitk.gui.qt.photoacoustics.simulation:OFF
   org.mitk.gui.qt.ultrasound:OFF

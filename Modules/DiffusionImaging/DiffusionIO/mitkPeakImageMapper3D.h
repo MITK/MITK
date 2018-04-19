@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef PeakImageMapper2D_H_HEADER_INCLUDED
-#define PeakImageMapper2D_H_HEADER_INCLUDED
+#ifndef PeakImageMapper3D_H_HEADER_INCLUDED
+#define PeakImageMapper3D_H_HEADER_INCLUDED
 
 //MITK Rendering
 #include <mitkCommon.h>
@@ -24,11 +24,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPeakImage.h>
 #include <vtkSmartPointer.h>
 
-#define MITKPeakImageMapper2D_POLYDATAMAPPER vtkOpenGLPolyDataMapper
+#define MITKPeakImageMapper3D_POLYDATAMAPPER vtkOpenGLPolyDataMapper
 
 class vtkActor;
 class mitkBaseRenderer;
-class MITKPeakImageMapper2D_POLYDATAMAPPER;
+class MITKPeakImageMapper3D_POLYDATAMAPPER;
 class vtkCutter;
 class vtkPlane;
 class vtkPolyData;
@@ -39,11 +39,11 @@ namespace mitk {
 
 struct IShaderRepository;
 
-class PeakImageMapper2D : public VtkMapper
+class PeakImageMapper3D : public VtkMapper
 {
 
 public:
-    mitkClassMacro(PeakImageMapper2D, VtkMapper)
+    mitkClassMacro(PeakImageMapper3D, VtkMapper)
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -56,8 +56,9 @@ public:
     class  LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
-        vtkSmartPointer<vtkActor> m_PointActor;
-        vtkSmartPointer<MITKPeakImageMapper2D_POLYDATAMAPPER> m_Mapper;
+        vtkSmartPointer<vtkActor> m_Actor;
+        vtkSmartPointer<MITKPeakImageMapper3D_POLYDATAMAPPER> m_Mapper;
+        vtkSmartPointer<vtkPropAssembly> m_Assembly;
 
         itk::TimeStamp m_LastUpdateTime;
         LocalStorage();
@@ -67,12 +68,11 @@ public:
         }
     };
 
-    /** \brief This member holds all three LocalStorages for the three 2D render windows. */
     mitk::LocalStorageHandler<LocalStorage> m_LocalStorageHandler;
 
 protected:
-    PeakImageMapper2D();
-    ~PeakImageMapper2D() override;
+    PeakImageMapper3D();
+    ~PeakImageMapper3D() override;
     void GenerateDataForRenderer(mitk::BaseRenderer*) override;
 
 private:

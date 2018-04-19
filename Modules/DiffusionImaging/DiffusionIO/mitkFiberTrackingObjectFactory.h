@@ -19,14 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCoreObjectFactory.h"
 
-//modernized fiberbundle datastrucutre
-#include "mitkFiberBundle.h"
-#include "mitkFiberBundleMapper3D.h"
-#include "mitkFiberBundleMapper2D.h"
+#include <mitkFiberBundle.h>
+#include <mitkFiberBundleMapper3D.h>
+#include <mitkFiberBundleMapper2D.h>
 #include <mitkPeakImageMapper2D.h>
-
-//#include "mitkFiberBundleThreadMonitorMapper3D.h"
-//#include "mitkFiberBundleThreadMonitor.h"
+#include <mitkPeakImageMapper3D.h>
 
 namespace mitk {
 

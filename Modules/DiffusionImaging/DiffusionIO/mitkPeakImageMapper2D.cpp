@@ -74,18 +74,13 @@ void mitk::PeakImageMapper2D::Update(mitk::BaseRenderer * renderer)
   this->GenerateDataForRenderer( renderer );
 }
 
-void mitk::PeakImageMapper2D::UpdateShaderParameter(mitk::BaseRenderer *)
-{
-  // see new vtkPeakShaderCallback
-}
-
 // vtkActors and Mappers are feeded here
 void mitk::PeakImageMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
   mitk::PeakImage* peakImage = this->GetInput();
 
   //the handler of local storage gets feeded in this method with requested data for related renderwindow
-  FBXLocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
+  LocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
 
   vtkSmartPointer<vtkPolyData> polyData = peakImage->GetPolyData();
   if (polyData == nullptr)
@@ -169,7 +164,7 @@ vtkProp* mitk::PeakImageMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
 
 void mitk::PeakImageMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  Superclass::SetDefaultProperties(node, renderer, overwrite);
+//  Superclass::SetDefaultProperties(node, renderer, overwrite);
 
   //add other parameters to propertylist
   node->AddProperty( "color", mitk::ColorProperty::New(1.0,1.0,1.0), renderer, overwrite);
@@ -177,7 +172,7 @@ void mitk::PeakImageMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::B
 }
 
 
-mitk::PeakImageMapper2D::FBXLocalStorage::FBXLocalStorage()
+mitk::PeakImageMapper2D::LocalStorage::LocalStorage()
 {
   m_PointActor = vtkSmartPointer<vtkActor>::New();
   m_Mapper = vtkSmartPointer<MITKPeakImageMapper2D_POLYDATAMAPPER>::New();

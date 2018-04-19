@@ -27,8 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
   \brief PAUSMotionCompensation
 
-  \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
-
+  Photoacoustic and ultrasound image motion correction can be performed with this plugin. Internally OpenCV2 calc OpticalFlowFarneback is used.
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
 */

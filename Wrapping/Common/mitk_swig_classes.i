@@ -14,6 +14,7 @@
 #define MITKMATCHPOINTREGISTRATION_EXPORT
 #define MAPDeployment_EXPORT
 #define MAPAlgorithms_EXPORT
+#define MITKSEGMENTATION_EXPORT
 
 #define ITKCommon_EXPORT
 #define ITK_FORWARD_EXPORT
@@ -85,6 +86,14 @@ SWIG_ADD_MITK_CLASS(GIFLocalIntensity, mitkGIFLocalIntensity.h, mitk)
 SWIG_ADD_MITK_CLASS(GIFIntensityVolumeHistogramFeatures, mitkGIFIntensityVolumeHistogramFeatures.h, mitk)
 SWIG_ADD_MITK_CLASS(GIFNeighbourhoodGreyToneDifferenceFeatures, mitkGIFNeighbourhoodGreyToneDifferenceFeatures.h, mitk)
 SWIG_ADD_MITK_CLASS(GIFCurvatureStatistic, mitkGIFCurvatureStatistic.h, mitk)
+
+//
+// Conversion and Segmentation based Classes
+//
+SWIG_ADD_MITK_CLASS(ContourModelSetToImageFilter, mitkContourModelSetToImageFilter.h, mitk)
+SWIG_ADD_NONOBJECT_CLASS(BooleanOperation, mitkBooleanOperation.h, mitk)
+SWIG_ADD_NONOBJECT_CLASS(MorphologicalOperations, mitkMorphologicalOperations.h, mitk)
+
 
 //
 // MatchPoint Related Classes

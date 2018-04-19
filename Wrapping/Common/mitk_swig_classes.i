@@ -93,7 +93,11 @@ SWIG_ADD_MITK_CLASS(GIFCurvatureStatistic, mitkGIFCurvatureStatistic.h, mitk)
 SWIG_ADD_MITK_CLASS(ContourModelSetToImageFilter, mitkContourModelSetToImageFilter.h, mitk)
 SWIG_ADD_NONOBJECT_CLASS(BooleanOperation, mitkBooleanOperation.h, mitk)
 SWIG_ADD_NONOBJECT_CLASS(MorphologicalOperations, mitkMorphologicalOperations.h, mitk)
-
+%{
+  #include <itkProcessObject.h>
+  typedef itk::DataObject::DataObjectIdentifierType DataObjectIdentifierType;
+  typedef itk::ProcessObject::DataObjectPointerArraySizeType DataObjectPointerArraySizeType;
+%}
 
 //
 // MatchPoint Related Classes
@@ -101,11 +105,7 @@ SWIG_ADD_NONOBJECT_CLASS(MorphologicalOperations, mitkMorphologicalOperations.h,
 MITKSWIG_ADD_CLASS(MITKAlgorithmHelper, mitkAlgorithmHelper.h, mitk)
 MITKSWIG_ADD_CLASS(RegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
 MITKSWIG_ADD_CLASS(MITKRegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
-%{
-  #include <itkProcessObject.h>
-  typedef itk::DataObject::DataObjectIdentifierType DataObjectIdentifierType;
-  typedef itk::DataObjectPointerArray::size_type DataObjectPointerArraySizeType;
-%}
+
 
 %ignore map::deployment::DLLHandle::New(const LibraryHandleType& libraryHandle, const map::algorithm::UID* pUID, const core::String& libraryFile, const core::String& profileStr);
 %ignore map::deployment::DLLHandle::New(const map::algorithm::UID* pUID,const core::String& libraryFilePath,const core::String& profileStr);

@@ -166,6 +166,8 @@
   class nspace ## :: ## classname ## ;
   class nspace ## :: ## classname ## ::Pointer;
 
+  // It is important to first define the Vectors and
+  // then define the Smartpointer. Otherwise a SWIG-bug ...
   MITKSWIG_SMARTPOINTERVECTOR(classname, classinclude, nspace)
 
   MITKSWIG_MITKSMARTPOINTER(classname, classinclude, nspace)

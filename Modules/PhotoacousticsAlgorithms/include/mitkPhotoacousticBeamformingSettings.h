@@ -58,8 +58,6 @@ namespace mitk {
       itkSetMacro(Pitch, float)
       itkGetMacro(SpeedOfSound, float)
       itkSetMacro(SpeedOfSound, float)
-      itkGetMacro(RecordTime, float)
-      itkSetMacro(RecordTime, float)
       itkGetMacro(TimeSpacing, float)
       itkSetMacro(TimeSpacing, float)
       itkGetMacro(Angle, float)
@@ -134,7 +132,6 @@ namespace mitk {
         (lhs->GetIsPhotoacousticImage() == rhs->GetIsPhotoacousticImage()) &&
         (abs(lhs->GetPitch() - rhs->GetPitch()) < 0.000001f) && // 0.0001 mm error margin
         (lhs->GetReconstructionLines() == rhs->GetReconstructionLines()) &&
-        (abs(lhs->GetRecordTime() - rhs->GetRecordTime()) < 0.00000001f) && // 10 ns error margin
         (lhs->GetSamplesPerLine() == rhs->GetSamplesPerLine()) &&
         (abs(lhs->GetSpeedOfSound() - rhs->GetSpeedOfSound()) < 0.01f) &&
         (abs(lhs->GetTimeSpacing() - rhs->GetTimeSpacing()) < 0.00000000001f) && //0.01 ns error margin
@@ -159,10 +156,6 @@ namespace mitk {
     /** \brief Speed of sound in the used medium in [m/s].
     */
     float m_SpeedOfSound = 1540;
-
-    /** \brief This parameter is not neccessary to be set, as it's never used.
-    */
-    float m_RecordTime = 0.00006; // [s]
 
     /** \brief The time spacing of the input image
     */

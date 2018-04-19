@@ -807,8 +807,6 @@ void PAImageProcessing::UpdateImageInfo()
 
       UpdateBFSettings(image);
 
-      m_Controls.CutoffBeforeBF->setValue(0.000001 / BFconfig->GetTimeSpacing()); // 1us standard offset for our transducer
-
       std::stringstream frequency;
       float maxFrequency = (1 / BFconfig->GetTimeSpacing()) * image->GetDimension(1) / 2 / 2 / 1000;
       frequency << maxFrequency / 1000000; //[MHz]
@@ -920,18 +918,15 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   BFconfig->SetAngle(m_Controls.Angle->value()); // [deg]
   BFconfig->SetUseBP(m_Controls.UseBP->isChecked());
   BFconfig->SetUseGPU(m_Controls.UseGPUBf->isChecked());
-  BFconfig->SetUpperCutoff(m_Controls.CutoffBeforeBF->value());
 
   if (m_Controls.UseImageSpacing->isChecked())
   {
-    BFconfig->SetRecordTime(image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000); // [s]
     BFconfig->SetTimeSpacing(image->GetGeometry()->GetSpacing()[1] / 1000000);
-    MITK_INFO << "Calculated Scan Depth of " << BFconfig->GetRecordTime() * BFconfig->GetSpeedOfSound() * 100 / 2 << "cm";
+    MITK_INFO << "Calculated Scan Depth of " << (image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000) * BFconfig->GetSpeedOfSound() * 100 / 2 << "cm";
   }
   else
   {
-    BFconfig->SetRecordTime(2 * m_Controls.ScanDepth->value() / 1000 / BFconfig->GetSpeedOfSound()); // [s]
-    BFconfig->SetTimeSpacing(BFconfig->GetRecordTime() / image->GetDimension(1));
+    BFconfig->SetTimeSpacing((2 * m_Controls.ScanDepth->value() / 1000 / BFconfig->GetSpeedOfSound()) / image->GetDimension(1));
   }
 
   if ("US Image" == m_Controls.ImageType->currentText())
@@ -966,7 +961,6 @@ void PAImageProcessing::EnableControls()
 
   m_Controls.CutoffAbove->setEnabled(true);
   m_Controls.CutoffBelow->setEnabled(true);
-  m_Controls.CutoffBeforeBF->setEnabled(true);
   m_Controls.buttonApplyCropFilter->setEnabled(true);
   m_Controls.BPSpeedOfSound->setEnabled(true);
   m_Controls.buttonApplyBandpass->setEnabled(true);
@@ -1019,7 +1013,6 @@ void PAImageProcessing::DisableControls()
 
   m_Controls.CutoffAbove->setEnabled(false);
   m_Controls.CutoffBelow->setEnabled(false);
-  m_Controls.CutoffBeforeBF->setEnabled(false);
   m_Controls.buttonApplyCropFilter->setEnabled(false);
   m_Controls.BPSpeedOfSound->setEnabled(false);
   m_Controls.buttonApplyBandpass->setEnabled(false);

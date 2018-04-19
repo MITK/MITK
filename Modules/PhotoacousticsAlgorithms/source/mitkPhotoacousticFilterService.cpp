@@ -296,15 +296,15 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBeamforming(mitk::Im
     processedImage = dimensionImageFilter->GetOutput();
   }
 
-  config->SetRecordTime(config->GetRecordTime() - (float)(config->GetUpperCutoff()) /
-    (float)inputImage->GetDimension(1) * config->GetRecordTime()); // adjust the recorded time lost by cropping
-  progressHandle(0, "converting image");
-  if (!config->GetPartial())
-  {
-    config->GetCropBounds()[0] = 0;
-    config->GetCropBounds()[1] = inputImage->GetDimension(2) - 1;
-  }
-  processedImage = ApplyCropping(inputImage, config->GetUpperCutoff(), 0, 0, 0, config->GetCropBounds()[0], config->GetCropBounds()[1]);
+  //config->SetRecordTime(config->GetRecordTime() - (float)(config->GetUpperCutoff()) /
+  //  (float)inputImage->GetDimension(1) * config->GetRecordTime()); // adjust the recorded time lost by cropping
+  //progressHandle(0, "converting image");
+  //if (!config->GetPartial())
+  //{
+  //  config->GetCropBounds()[0] = 0;
+  //  config->GetCropBounds()[1] = inputImage->GetDimension(2) - 1;
+  //}
+  //processedImage = ApplyCropping(inputImage, config->GetUpperCutoff(), 0, 0, 0, config->GetCropBounds()[0], config->GetCropBounds()[1]);
 
   config->GetInputDim()[0] = processedImage->GetDimension(0);
   config->GetInputDim()[1] = processedImage->GetDimension(1);

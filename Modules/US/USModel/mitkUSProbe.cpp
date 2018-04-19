@@ -30,6 +30,19 @@ mitk::USProbe::~USProbe()
 {
 }
 
+void mitk::USProbe::SetProbeCropping(unsigned int top, unsigned int bottom, unsigned int left, unsigned int right)
+{
+  m_Cropping.top = top;
+  m_Cropping.bottom = bottom;
+  m_Cropping.left = left;
+  m_Cropping.right = right;
+}
+
+mitk::USProbe::USProbeCropping mitk::USProbe::GetProbeCropping()
+{
+  return m_Cropping;
+}
+
 bool mitk::USProbe::IsEqualToProbe(mitk::USProbe::Pointer probe)
 {
   if (m_Name.compare(probe->GetName()) == 0) return true;
@@ -85,4 +98,14 @@ mitk::Vector3D mitk::USProbe::GetSpacingForGivenDepth(int givenDepth)
     spacing[2] = 1;
   }
   return spacing;
+}
+
+bool mitk::USProbe::IsDepthAndSpacingEmpty()
+{
+  if( m_DepthsAndSpacings.size() == 0 )
+  {
+    return true;
+  }
+
+  return false;
 }

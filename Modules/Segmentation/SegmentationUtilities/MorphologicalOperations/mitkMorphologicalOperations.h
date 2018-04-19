@@ -55,38 +55,7 @@ namespace mitk
     MorphologicalOperations();
 
     template <class TStructuringElement>
-    static TStructuringElement CreateStructuringElement(StructuralElementType structuralElementFlag, int factor)
-    {
-      TStructuringElement strElem;
-      typename TStructuringElement::SizeType size;
-      size.Fill(0);
-      switch (structuralElementFlag)
-      {
-        case Ball_Axial:
-        case Cross_Axial:
-          size.SetElement(0, factor);
-          size.SetElement(1, factor);
-          break;
-        case Ball_Coronal:
-        case Cross_Coronal:
-          size.SetElement(0, factor);
-          size.SetElement(2, factor);
-          break;
-        case Ball_Sagital:
-        case Cross_Sagital:
-          size.SetElement(1, factor);
-          size.SetElement(2, factor);
-          break;
-        case Ball:
-        case Cross:
-          size.Fill(factor);
-          break;
-      }
-
-      strElem.SetRadius(size);
-      strElem.CreateStructuringElement();
-      return strElem;
-    }
+    static TStructuringElement CreateStructuringElement(StructuralElementType structuralElementFlag, int factor);
 
     ///@{
     /** \brief Perform morphological operation by using corresponding ITK filter.

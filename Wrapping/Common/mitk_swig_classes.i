@@ -15,6 +15,7 @@
 #define MAPDeployment_EXPORT
 #define MAPAlgorithms_EXPORT
 #define MITKSEGMENTATION_EXPORT
+#define MITKMULTILABEL_EXPORT
 
 #define ITKCommon_EXPORT
 #define ITK_FORWARD_EXPORT
@@ -66,6 +67,7 @@ SWIG_ADD_NONOBJECT_CLASS(Vector4D, mitkVector.h, mitk)
 SWIG_ADD_MITK_CLASS(BaseData, mitkBaseData.h, mitk)
 SWIG_ADD_MITK_CLASS(SlicedData, mitkSlicedData.h, mitk)
 SWIG_ADD_MITK_CLASS(Image, mitkImage.h, mitk)
+SWIG_ADD_MITK_CLASS(LabelSetImage, mtikLabelSetImage.h, mitk)
 SWIG_ADD_MITK_CLASS(PointSet, mitkPointSet.h, mitk)
 
 //

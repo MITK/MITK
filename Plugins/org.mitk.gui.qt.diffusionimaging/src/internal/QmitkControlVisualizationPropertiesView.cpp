@@ -330,14 +330,22 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect((QObject*) m_Controls->m_Crosshair, SIGNAL(clicked()), (QObject*) this, SLOT(SetInteractor()));
     connect((QObject*) m_Controls->m_LineWidth, SIGNAL(editingFinished()), (QObject*) this, SLOT(LineWidthChanged()));
     connect((QObject*) m_Controls->m_TubeWidth, SIGNAL(editingFinished()), (QObject*) this, SLOT(TubeRadiusChanged()));
+    connect((QObject*) m_Controls->m_RibbonWidth, SIGNAL(editingFinished()), (QObject*) this, SLOT(RibbonWidthChanged()));
     connect( (QObject*) m_Controls->m_OdfColorBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(OnColourisationModeChanged() ) );
     connect((QObject*) m_Controls->m_Clip0, SIGNAL(toggled(bool)), (QObject*) this, SLOT(Toggle3DClipping(bool)));
     connect((QObject*) m_Controls->m_Clip1, SIGNAL(toggled(bool)), (QObject*) this, SLOT(Toggle3DClipping(bool)));
     connect((QObject*) m_Controls->m_Clip2, SIGNAL(toggled(bool)), (QObject*) this, SLOT(Toggle3DClipping(bool)));
     connect((QObject*) m_Controls->m_Clip3, SIGNAL(toggled(bool)), (QObject*) this, SLOT(Toggle3DClipping(bool)));
     connect((QObject*) m_Controls->m_FlipClipBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(Toggle3DClipping()));
+    connect((QObject*) m_Controls->m_Enable3dPeaks, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(Toggle3DPeaks()));
 
     connect((QObject*) m_Controls->m_FlipPeaksButton, SIGNAL(clicked()), (QObject*) this, SLOT(FlipPeaks()));
+
+    m_Controls->m_BundleControlsFrame->setVisible(false);
+    m_Controls->m_ImageControlsFrame->setVisible(false);
+    m_Controls->m_PeakImageFrame->setVisible(false);
+    m_Controls->m_lblRotatedPlanesWarning->setVisible(false);
+    m_Controls->m_3DClippingBox->setVisible(false);
   }
 }
 
@@ -376,6 +384,9 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
   m_Controls->m_BundleControlsFrame->setVisible(false);
   m_Controls->m_ImageControlsFrame->setVisible(false);
   m_Controls->m_PeakImageFrame->setVisible(false);
+  m_Controls->m_3DClippingBox->setVisible(false);
+  m_Controls->m_FlipClipBox->setVisible(false);
+  m_Controls->m_Enable3dPeaks->setVisible(false);
 
   if (nodes.size()>1) // only do stuff if one node is selected
     return;
@@ -410,12 +421,35 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
       m_Color = dynamic_cast<mitk::ColorProperty*>(node->GetProperty("color", nullptr));
       if (m_Color.IsNotNull())
         m_ColorPropertyObserverTag = m_Color->AddObserver( itk::ModifiedEvent(), command );
+
+      int ClippingPlaneId = -1;
+      m_SelectedNode->GetPropertyValue("3DClippingPlaneId",ClippingPlaneId);
+      switch(ClippingPlaneId)
+      {
+      case 0:
+        m_Controls->m_Clip0->setChecked(1);
+        break;
+      case 1:
+        m_Controls->m_Clip1->setChecked(1);
+        break;
+      case 2:
+        m_Controls->m_Clip2->setChecked(1);
+        break;
+      case 3:
+        m_Controls->m_Clip3->setChecked(1);
+        break;
+      default :
+        m_Controls->m_Clip0->setChecked(1);
+      }
+
+      m_Controls->m_Enable3dPeaks->setVisible(true);
+      m_Controls->m_3DClippingBox->setVisible(true);
     }
     else if (dynamic_cast<mitk::FiberBundle*>(nodeData))
     {
-      int Fiber3DClippingPlaneId = -1;
-      m_SelectedNode->GetPropertyValue("Fiber3DClippingPlaneId",Fiber3DClippingPlaneId);
-      switch(Fiber3DClippingPlaneId)
+      int ClippingPlaneId = -1;
+      m_SelectedNode->GetPropertyValue("3DClippingPlaneId",ClippingPlaneId);
+      switch(ClippingPlaneId)
       {
       case 0:
         m_Controls->m_Clip0->setChecked(1);
@@ -442,7 +476,8 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
       if (m_Color.IsNotNull())
         m_ColorPropertyObserverTag = m_Color->AddObserver( itk::ModifiedEvent(), command );
 
-
+      m_Controls->m_FlipClipBox->setVisible(true);
+      m_Controls->m_3DClippingBox->setVisible(true);
       m_Controls->m_BundleControlsFrame->setVisible(true);
 
       if(m_CurrentPickingNode != 0 && node.GetPointer() != m_CurrentPickingNode)
@@ -701,31 +736,42 @@ void QmitkControlVisualizationPropertiesView::FlipPeaks()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkControlVisualizationPropertiesView::Toggle3DClipping(bool enabled)
+void QmitkControlVisualizationPropertiesView::Toggle3DPeaks()
 {
-  if (!enabled || m_SelectedNode.IsNull() || dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData())==nullptr)
+  if (m_SelectedNode.IsNull() || dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData())==nullptr)
     return;
 
-  m_SelectedNode->SetBoolProperty( "Fiber3DClippingPlaneFlip", m_Controls->m_FlipClipBox->isChecked() );
+  bool enabled = false;
+  m_SelectedNode->GetBoolProperty("Enable3DPeaks", enabled);
+  m_SelectedNode->SetBoolProperty( "Enable3DPeaks", !enabled );
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkControlVisualizationPropertiesView::Toggle3DClipping(bool enabled)
+{
+  if (!enabled || m_SelectedNode.IsNull() || (dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData())==nullptr && dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData())==nullptr))
+    return;
+
+  m_SelectedNode->SetBoolProperty( "3DClippingPlaneFlip", m_Controls->m_FlipClipBox->isChecked() );
 
   if (m_Controls->m_Clip0->isChecked())
   {
-    m_SelectedNode->SetIntProperty( "Fiber3DClippingPlaneId", 0 );
+    m_SelectedNode->SetIntProperty( "3DClippingPlaneId", 0 );
     Set3DClippingPlane(true, m_SelectedNode, "");
   }
   else if (m_Controls->m_Clip1->isChecked())
   {
-    m_SelectedNode->SetIntProperty( "Fiber3DClippingPlaneId", 1 );
+    m_SelectedNode->SetIntProperty( "3DClippingPlaneId", 1 );
     Set3DClippingPlane(false, m_SelectedNode, "axial");
   }
   else if (m_Controls->m_Clip2->isChecked())
   {
-    m_SelectedNode->SetIntProperty( "Fiber3DClippingPlaneId", 2 );
+    m_SelectedNode->SetIntProperty( "3DClippingPlaneId", 2 );
     Set3DClippingPlane(false, m_SelectedNode, "sagittal");
   }
   else if (m_Controls->m_Clip3->isChecked())
   {
-    m_SelectedNode->SetIntProperty( "Fiber3DClippingPlaneId", 3 );
+    m_SelectedNode->SetIntProperty( "3DClippingPlaneId", 3 );
     Set3DClippingPlane(false, m_SelectedNode, "coronal");
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -738,7 +784,7 @@ void QmitkControlVisualizationPropertiesView::OnSliceChanged()
   {
     mitk::DataNode::Pointer node = nodes->GetElement(i);
     int plane_id = -1;
-    node->GetIntProperty("Fiber3DClippingPlaneId", plane_id);
+    node->GetIntProperty("3DClippingPlaneId", plane_id);
 
     if (plane_id==1)
       Set3DClippingPlane(false, node, "axial");
@@ -753,7 +799,7 @@ void QmitkControlVisualizationPropertiesView::OnSliceChanged()
 void QmitkControlVisualizationPropertiesView::Set3DClippingPlane(bool disable, mitk::DataNode* node, std::string plane)
 {
   mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-  if (renderWindow && node && dynamic_cast<mitk::FiberBundle*>(node->GetData()))
+  if (renderWindow && node && (dynamic_cast<mitk::FiberBundle*>(node->GetData()) || dynamic_cast<mitk::PeakImage*>(node->GetData())))
   {
     mitk::Vector3D planeNormal; planeNormal.Fill(0.0);
     mitk::Point3D planeOrigin; planeOrigin.Fill(0.0);
@@ -764,8 +810,11 @@ void QmitkControlVisualizationPropertiesView::Set3DClippingPlane(bool disable, m
       planeOrigin = this->GetRenderWindowPart()->GetSelectedPosition();
       planeNormal = planeGeo->GetNormal();
     }
-    node->SetProperty( "Fiber3DClipping", mitk::ClippingProperty::New( planeOrigin, planeNormal ) );
-    dynamic_cast<mitk::FiberBundle*>(node->GetData())->RequestUpdate();
+    node->SetProperty( "3DClipping", mitk::ClippingProperty::New( planeOrigin, planeNormal ) );
+    if (dynamic_cast<mitk::FiberBundle*>(node->GetData()))
+      dynamic_cast<mitk::FiberBundle*>(node->GetData())->RequestUpdate();
+    else
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 
@@ -1239,17 +1288,26 @@ void QmitkControlVisualizationPropertiesView::TubeRadiusChanged()
   }
 }
 
-void QmitkControlVisualizationPropertiesView::LineWidthChanged()
+void QmitkControlVisualizationPropertiesView::RibbonWidthChanged()
 {
   if(m_SelectedNode && dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData()))
   {
-    int newWidth = m_Controls->m_LineWidth->value();
-    int currentWidth = 0;
-    m_SelectedNode->GetIntProperty("shape.linewidth", currentWidth);
+    float newWidth = m_Controls->m_RibbonWidth->value();
+    m_SelectedNode->SetFloatProperty("shape.ribbonwidth", newWidth);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+}
+
+void QmitkControlVisualizationPropertiesView::LineWidthChanged()
+{
+  if(m_SelectedNode && dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData()))
+  {
+    auto newWidth = m_Controls->m_LineWidth->value();
+    float currentWidth = 0;
+    m_SelectedNode->SetFloatProperty("shape.linewidth", currentWidth);
     if (currentWidth==newWidth)
       return;
-    m_SelectedNode->SetIntProperty("shape.linewidth", newWidth);
-    dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData())->RequestUpdate();
+    m_SelectedNode->SetFloatProperty("shape.linewidth", newWidth);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }

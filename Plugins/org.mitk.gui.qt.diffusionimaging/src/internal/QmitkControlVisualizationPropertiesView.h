@@ -77,12 +77,14 @@ protected slots:
   void FiberSlicingUpdateLabel(int);
   void LineWidthChanged();
   void TubeRadiusChanged();
+  void RibbonWidthChanged();
   void SetInteractor();
   void Toggle3DClipping(bool enabled=true);
   void FlipPeaks();
   void Welcome();
   void OnSliceChanged();
   void SetColor();
+  void Toggle3DPeaks();
 
   /// \brief Slot function for switching colourisation mode of glyphs.
   void OnColourisationModeChanged();

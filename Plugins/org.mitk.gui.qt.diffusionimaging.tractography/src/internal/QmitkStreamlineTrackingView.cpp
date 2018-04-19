@@ -53,6 +53,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkTensorImageToOdfImageFilter.h>
 #include <omp.h>
+#include <boost/lexical_cast.hpp>
 
 const std::string QmitkStreamlineTrackingView::VIEW_ID = "org.mitk.views.streamlinetracking";
 const std::string id_DataManager = "org.mitk.views.datamanager";
@@ -158,19 +159,19 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_FaImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_ForestBox, SIGNAL(currentIndexChanged(int)), this, SLOT(ForestSwitched()) );
     connect( m_Controls->m_ForestBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_SeedsPerVoxelBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_NumFibersBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_ScalarThresholdBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_OdfCutoffBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_StepSizeBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_SamplingDistanceBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_AngularThresholdBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_MinTractLengthBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_fBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_gBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_NumSamplesBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_SeedRadiusBox, SIGNAL(valueChanged(double)), this, SLOT(InteractiveSeedChanged()) );
-    connect( m_Controls->m_NumSeedsBox, SIGNAL(valueChanged(int)), this, SLOT(InteractiveSeedChanged()) );
+    connect( m_Controls->m_SeedsPerVoxelBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_NumFibersBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_ScalarThresholdBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_OdfCutoffBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_StepSizeBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_SamplingDistanceBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_AngularThresholdBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_MinTractLengthBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_fBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_gBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_NumSamplesBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_SeedRadiusBox, SIGNAL(editingFinished()), this, SLOT(InteractiveSeedChanged()) );
+    connect( m_Controls->m_NumSeedsBox, SIGNAL(editingFinished()), this, SLOT(InteractiveSeedChanged()) );
     connect( m_Controls->m_OutputProbMap, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_SharpenOdfsBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_InterpolationBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
@@ -180,9 +181,25 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_FlipZBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_FrontalSamplesBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_StopVotesBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_LoopCheckBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_TrialsPerSeedBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_LoopCheckBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_TrialsPerSeedBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_EpConstraintsBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
+
+    m_Controls->m_SeedsPerVoxelBox->editingFinished();
+    m_Controls->m_NumFibersBox->editingFinished();
+    m_Controls->m_ScalarThresholdBox->editingFinished();
+    m_Controls->m_OdfCutoffBox->editingFinished();
+    m_Controls->m_StepSizeBox->editingFinished();
+    m_Controls->m_SamplingDistanceBox->editingFinished();
+    m_Controls->m_AngularThresholdBox->editingFinished();
+    m_Controls->m_MinTractLengthBox->editingFinished();
+    m_Controls->m_fBox->editingFinished();
+    m_Controls->m_gBox->editingFinished();
+    m_Controls->m_NumSamplesBox->editingFinished();
+    m_Controls->m_SeedRadiusBox->editingFinished();
+    m_Controls->m_NumSeedsBox->editingFinished();
+    m_Controls->m_LoopCheckBox->editingFinished();
+    m_Controls->m_TrialsPerSeedBox->editingFinished();
 
     StartStopTrackingGui(false);
   }
@@ -331,7 +348,9 @@ void QmitkStreamlineTrackingView::InteractiveSeedChanged(bool posChanged)
 {
   if (m_ThreadIsRunning || !m_Visible)
     return;
-  if (!posChanged && (!m_Controls->m_InteractiveBox->isChecked() || !m_Controls->m_ParamUpdateBox->isChecked()))
+  if (!posChanged && (!m_Controls->m_InteractiveBox->isChecked() || !m_Controls->m_ParamUpdateBox->isChecked()) )
+    return;
+  if(!CheckAndStoreLastParams(sender()) && !posChanged)
     return;
 
   std::srand(std::time(0));
@@ -363,8 +382,37 @@ void QmitkStreamlineTrackingView::InteractiveSeedChanged(bool posChanged)
   DoFiberTracking();
 }
 
+bool QmitkStreamlineTrackingView::CheckAndStoreLastParams(QObject* obj)
+{
+  if (obj!=nullptr)
+  {
+    std::string new_val = "";
+    if(qobject_cast<QDoubleSpinBox*>(obj)!=nullptr)
+      new_val = boost::lexical_cast<std::string>(qobject_cast<QDoubleSpinBox*>(obj)->value());
+    else if (qobject_cast<QSpinBox*>(obj)!=nullptr)
+      new_val = boost::lexical_cast<std::string>(qobject_cast<QSpinBox*>(obj)->value());
+
+    if (m_LastTractoParams.find(obj->objectName())==m_LastTractoParams.end())
+    {
+      m_LastTractoParams[obj->objectName()] = new_val;
+      return false;
+    }
+    else if (m_LastTractoParams.at(obj->objectName()) != new_val)
+    {
+      m_LastTractoParams[obj->objectName()] = new_val;
+      return true;
+    }
+    else if (m_LastTractoParams.at(obj->objectName()) == new_val)
+      return false;
+  }
+  return true;
+}
+
 void QmitkStreamlineTrackingView::OnParameterChanged()
 {
+  if(!CheckAndStoreLastParams(sender()))
+    return;
+
   UpdateGui();
   if (m_Controls->m_InteractiveBox->isChecked() && m_Controls->m_ParamUpdateBox->isChecked())
     DoFiberTracking();

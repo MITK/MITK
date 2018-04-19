@@ -61,7 +61,7 @@ const mitk::FiberBundle* mitk::FiberBundleMapper3D::GetInput()
 void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *renderer)
 {
   m_FiberPolyData->GetPointData()->AddArray(m_FiberBundle->GetFiberColors());
-  FBXLocalStorage3D *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
+  LocalStorage3D *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
 
   if (m_TubeRadius>0.0)
   {
@@ -105,12 +105,12 @@ void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *rendere
   localStorage->m_FiberAssembly->AddPart(localStorage->m_FiberActor);
 
   const DataNode* node = this->GetDataNode();
-  mitk::ClippingProperty* prop = dynamic_cast<mitk::ClippingProperty*>(node->GetProperty("Fiber3DClipping"));
+  mitk::ClippingProperty* prop = dynamic_cast<mitk::ClippingProperty*>(node->GetProperty("3DClipping"));
 
   mitk::Vector3D plane_normal = prop->GetNormal();
   mitk::Point3D plane_origin = prop->GetOrigin();
   bool flip;
-  node->GetBoolProperty("Fiber3DClippingPlaneFlip",flip);
+  node->GetBoolProperty("3DClippingPlaneFlip",flip);
   if (flip)
     plane_normal *= -1;
 
@@ -125,8 +125,6 @@ void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *rendere
   if (plane_normal.GetNorm() > 0.0)
     localStorage->m_FiberMapper->AddClippingPlane(plane);
 
-
-
   localStorage->m_LastUpdateTime.Modified();
 }
 
@@ -140,7 +138,7 @@ void mitk::FiberBundleMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     return;
 
   const DataNode* node = this->GetDataNode();
-  FBXLocalStorage3D* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
+  LocalStorage3D* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
 
   m_FiberBundle = dynamic_cast<mitk::FiberBundle*>(node->GetData());
   m_FiberPolyData = m_FiberBundle->GetFiberPolyData();
@@ -218,14 +216,15 @@ void mitk::FiberBundleMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk:
 
   mitk::Vector3D plane_vec; plane_vec.Fill(0.0);
   mitk::Point3D plane_origin; plane_origin.Fill(0.0);
-  node->AddProperty( "Fiber3DClipping", mitk::ClippingProperty::New( plane_origin, plane_vec ), renderer, overwrite );
-  node->AddProperty( "Fiber3DClippingPlaneFlip", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "3DClipping", mitk::ClippingProperty::New( plane_origin, plane_vec ), renderer, overwrite );
+  node->AddProperty( "3DClippingPlaneId", mitk::IntProperty::New(-1), renderer, overwrite );
+  node->AddProperty( "3DClippingPlaneFlip", mitk::BoolProperty::New( false ), renderer, overwrite );
 
   node->AddProperty( "opacity", mitk::FloatProperty::New( 1.0 ), renderer, overwrite);
   node->AddProperty( "color", mitk::ColorProperty::New(1.0,1.0,1.0), renderer, overwrite);
   node->AddProperty( "pickable", mitk::BoolProperty::New( true ), renderer, overwrite);
 
-  node->AddProperty( "shape.linewidth", mitk::IntProperty::New( true ), renderer, overwrite );
+  node->AddProperty( "shape.linewidth", mitk::IntProperty::New( 1 ), renderer, overwrite );
   node->AddProperty( "shape.tuberadius",mitk::FloatProperty::New( 0.0 ), renderer, overwrite);
   node->AddProperty( "shape.tubesides",mitk::IntProperty::New( 15 ), renderer, overwrite);
   node->AddProperty( "shape.ribbonwidth", mitk::FloatProperty::New( 0.0 ), renderer, overwrite);
@@ -245,7 +244,7 @@ vtkProp* mitk::FiberBundleMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
   return m_LocalStorageHandler.GetLocalStorage(renderer)->m_FiberAssembly;
 }
 
-mitk::FiberBundleMapper3D::FBXLocalStorage3D::FBXLocalStorage3D()
+mitk::FiberBundleMapper3D::LocalStorage3D::LocalStorage3D()
 {
   m_FiberActor = vtkSmartPointer<vtkActor>::New();
   m_FiberMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();

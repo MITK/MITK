@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 class MITKQTWIDGETS_EXPORT QmitkPropertiesTableModel : public QAbstractTableModel
 {
+  Q_OBJECT
 
 //# PUBLIC CTORS,DTOR,TYPEDEFS,CONSTANTS
 public:

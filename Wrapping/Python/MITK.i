@@ -161,10 +161,6 @@ def GetImageFromArray( arr, isVector=False):
 
     return img
 
-#convertion_list = {'Image':ConvertToImage,
-#                   'SlicedData':ConvertToSlicedData,
-#                   'BaseData':ConvertToBaseData}
-
 %}
 
 

@@ -96,8 +96,8 @@ SWIG_ADD_MITK_CLASS(GIFCurvatureStatistic, mitkGIFCurvatureStatistic.h, mitk)
 // Conversion and Segmentation based Classes
 //
 SWIG_ADD_MITK_CLASS(ContourModelSetToImageFilter, mitkContourModelSetToImageFilter.h, mitk)
-SWIG_ADD_NONOBJECT_CLASS(BooleanOperation, mitkBooleanOperation.h, mitk)
-SWIG_ADD_NONOBJECT_CLASS(MorphologicalOperations, mitkMorphologicalOperations.h, mitk)
+SWIG_ADD_NONOBJECT_NOVECTOR_CLASS(BooleanOperation, mitkBooleanOperation.h, mitk)
+SWIG_ADD_NONOBJECT_NOVECTOR_CLASS(MorphologicalOperations, mitkMorphologicalOperations.h, mitk)
 %{
   #include <itkProcessObject.h>
   typedef itk::DataObject::DataObjectIdentifierType DataObjectIdentifierType;

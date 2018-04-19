@@ -51,7 +51,7 @@
 %extend itk::SmartPointer< nspace ## :: ## classname ## ::Self> {
   %pythoncode %{
       def _GetListOfValidItems(self):
-        return [str(k) for k in self.GetClassHierarchy() if k in convertion_list.keys() ]
+        return [str(k).replace("class itk::","") for k in self.GetClassHierarchy() if str(k).replace("class itk::","") in convertion_list.keys() ]
   %}
   %pythoncode %{
     def __getattr__(self, item):
@@ -72,7 +72,7 @@
 %extend  std::vector< nspace ## :: ## classname *>::value_type {
   %pythoncode %{
       def _GetListOfValidItems(self):
-        return [str(k) for k in self.GetClassHierarchy() if k in convertion_list.keys() ]
+        return [str(k).replace("class itk::","") for k in self.GetClassHierarchy() if str(k).replace("class itk::","") in convertion_list.keys() ]
   %}
   %pythoncode %{
     def __getattr__(self, item):
@@ -166,9 +166,9 @@
   class nspace ## :: ## classname ## ;
   class nspace ## :: ## classname ## ::Pointer;
 
-  MITKSWIG_MITKSMARTPOINTER(classname, classinclude, nspace)
-
   MITKSWIG_SMARTPOINTERVECTOR(classname, classinclude, nspace)
+
+  MITKSWIG_MITKSMARTPOINTER(classname, classinclude, nspace)
 
   MITKSWIG_AUTOMATED_CASTING(classname, classinclude, nspace)
 %enddef
@@ -183,7 +183,6 @@
 // mitk::BaseData, and supports smartpointers.
 //
 %define SWIG_ADD_NONOBJECT_CLASS(classname, classinclude, nspace)
-
   MITKSWIG_ADD_CLASS( classname, classinclude, nspace )
 
   // Typedef is necessary to overcome ambigiouties resulting in the fact that SWIG

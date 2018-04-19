@@ -19,8 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usServiceReference.h"
 #include "mitkImageReadAccessor.h"
 
-mitk::OCLUsedLinesCalculation::OCLUsedLinesCalculation()
-  : m_PixelCalculation(NULL)
+mitk::OCLUsedLinesCalculation::OCLUsedLinesCalculation(mitk::BeamformingSettings::Pointer settings)
+  : m_PixelCalculation(NULL),
+  m_Conf(settings)
 {
   this->AddSourceFile("UsedLinesCalculation.cl");
   this->m_FilterID = "UsedLinesCalculation";

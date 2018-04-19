@@ -37,35 +37,8 @@ namespace mitk {
   public:
     mitkClassMacro(BeamformingFilter, ImageToImageFilter);
 
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
-
-      /** \brief Sets a new configuration to use
-      *
-      * @param settings The configuration set to use for beamforming
-      */
-      void Configure(BeamformingSettings::Pointer settings)
-    {
-      MITK_INFO << "Configuring Beamforming Settings";
-      m_Conf = settings;
-
-      switch (m_Conf->GetApod())
-      {
-      case BeamformingSettings::Apodization::Hann:
-        m_Conf->SetApodizationFunction(mitk::PhotoacousticBeamformingUtils::VonHannFunction(m_Conf->GetApodizationArraySize()));
-        break;
-      case BeamformingSettings::Apodization::Hamm:
-        m_Conf->SetApodizationFunction(mitk::PhotoacousticBeamformingUtils::HammFunction(m_Conf->GetApodizationArraySize()));
-        break;
-      case BeamformingSettings::Apodization::Box:
-        m_Conf->SetApodizationFunction(mitk::PhotoacousticBeamformingUtils::BoxFunction(m_Conf->GetApodizationArraySize()));
-        break;
-      default:
-        m_Conf->SetApodizationFunction(mitk::PhotoacousticBeamformingUtils::BoxFunction(m_Conf->GetApodizationArraySize()));
-        break;
-      }
-      MITK_INFO << "set Apodization Function!";
-    }
+    mitkNewMacro1Param(Self, mitk::BeamformingSettings::Pointer);
+    itkCloneMacro(Self);
 
     /** \brief Sets a new configuration to use
     *
@@ -85,7 +58,7 @@ namespace mitk {
     void SetProgressHandle(std::function<void(int, std::string)> progressHandle);
 
   protected:
-    BeamformingFilter();
+    BeamformingFilter(mitk::BeamformingSettings::Pointer settings);
 
     ~BeamformingFilter() override;
 

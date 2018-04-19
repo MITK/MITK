@@ -178,27 +178,27 @@ InputParameters parseInput(int argc, char* argv[])
   return input;
 }
 
-mitk::BeamformingSettings ParseSettings(InputParameters &input)
+mitk::BeamformingSettings::Pointer ParseSettings(InputParameters &input)
 {
-  mitk::BeamformingSettings outputSettings;
+  mitk::BeamformingSettings::Pointer outputSettings = mitk::BeamformingSettings::New();
 
-  outputSettings.Algorithm = input.algorithm;
-  outputSettings.Apod = mitk::BeamformingSettings::Apodization::Box;
-  outputSettings.SpeedOfSound = input.speedOfSound;
-  outputSettings.TimeSpacing = input.inputImage->GetGeometry()->GetSpacing()[1] / 1000000;
-  outputSettings.RecordTime = input.inputImage->GetDimension(1)*input.inputImage->GetGeometry()->GetSpacing()[1] / 1000000; // [s]
-  outputSettings.UseGPU = false;
-  outputSettings.upperCutoff = input.cutoff;
-  outputSettings.DelayCalculationMethod = mitk::BeamformingSettings::DelayCalc::Spherical;
-  outputSettings.Angle = input.angle;
-  outputSettings.Pitch = input.inputImage->GetGeometry()->GetSpacing()[0] / 1000;
-  outputSettings.TransducerElements = input.inputImage->GetDimension(0);
-  outputSettings.ReconstructionLines = input.inputImage->GetDimension(0);
-  outputSettings.SamplesPerLine = input.samples;
-  outputSettings.isPhotoacousticImage = true;
-  outputSettings.partial = false;
-  outputSettings.apodizationArraySize = input.inputImage->GetDimension(0);
-  outputSettings.UseBP = false;
+  outputSettings->SetAlgorithm(input.algorithm);
+  outputSettings->SetApod(mitk::BeamformingSettings::Apodization::Box);
+  outputSettings->SetSpeedOfSound(input.speedOfSound);
+  outputSettings->SetTimeSpacing(input.inputImage->GetGeometry()->GetSpacing()[1] / 1000000);
+  outputSettings->SetRecordTime(input.inputImage->GetDimension(1)*input.inputImage->GetGeometry()->GetSpacing()[1] / 1000000); // [s]
+  outputSettings->SetUseGPU(false);
+  outputSettings->SetUpperCutoff(input.cutoff);
+  outputSettings->SetDelayCalculationMethod(mitk::BeamformingSettings::DelayCalc::Spherical);
+  outputSettings->SetAngle(input.angle);
+  outputSettings->SetPitch(input.inputImage->GetGeometry()->GetSpacing()[0] / 1000);
+  outputSettings->SetTransducerElements(input.inputImage->GetDimension(0));
+  outputSettings->SetReconstructionLines(input.inputImage->GetDimension(0));
+  outputSettings->SetSamplesPerLine(input.samples);
+  outputSettings->SetIsPhotoacousticImage(true);
+  outputSettings->SetPartial(false);
+  outputSettings->SetApodizationArraySize(input.inputImage->GetDimension(0));
+  outputSettings->SetUseBP(false);
 
   return outputSettings;
 }
@@ -211,13 +211,13 @@ int main(int argc, char * argv[])
 
   mitk::PhotoacousticFilterService::Pointer m_BeamformingService = mitk::PhotoacousticFilterService::New();
 
-  mitk::BeamformingSettings settings = ParseSettings(input);
+  mitk::BeamformingSettings::Pointer settings = ParseSettings(input);
 
   std::string message = "Test";
 
   auto output = m_BeamformingService->ApplyBeamforming(input.inputImage, settings, message);
   MITK_INFO(input.verbose) << "Applying BModeFilter to image...";
-  output = m_BeamformingService->ApplyBmodeFilter(output, mitk::PhotoacousticFilterService::Abs, false, false, 0.3);
+  //output = m_BeamformingService->ApplyBmodeFilter(output, mitk::PhotoacousticFilterService::Abs, false, false, 0.3);
   MITK_INFO(input.verbose) << "Applying BModeFilter to image...[Done]";
 
   MITK_INFO(input.verbose) << "Saving image...";

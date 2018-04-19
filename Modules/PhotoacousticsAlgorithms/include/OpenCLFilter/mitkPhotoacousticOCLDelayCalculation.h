@@ -36,18 +36,9 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(OCLDelayCalculation, itk::Object);
-    itkNewMacro(Self);
+    mitkNewMacro1Param(Self, mitk::BeamformingSettings::Pointer);
 
     void Update();
-
-    /** \brief Sets a new configuration to use.
-    *
-    * @param conf The configuration set to use for the calculation of the delays.
-    */
-    void SetConfig(BeamformingSettings::Pointer conf)
-    {
-      m_Conf = conf;
-    }
 
     /** \brief Sets the usedLines buffer object to use for the calculation of the delays.
     *
@@ -60,7 +51,7 @@ namespace mitk
 
   protected:
 
-    OCLDelayCalculation();
+    OCLDelayCalculation(mitk::BeamformingSettings::Pointer settings);
     virtual ~OCLDelayCalculation();
 
     /** Initialize the filter */

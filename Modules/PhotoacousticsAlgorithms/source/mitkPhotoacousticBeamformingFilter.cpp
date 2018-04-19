@@ -25,7 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPhotoacousticBeamformingFilter.h"
 #include "mitkPhotoacousticBeamformingUtils.h"
 
-mitk::BeamformingFilter::BeamformingFilter() : m_OutputData(nullptr), m_InputData(nullptr), m_Message("noMessage")
+mitk::BeamformingFilter::BeamformingFilter(mitk::BeamformingSettings::Pointer settings) :
+  m_OutputData(nullptr),
+  m_InputData(nullptr),
+  m_Message("noMessage"),
+  m_Conf(settings)
 {
   MITK_INFO << "Instantiating BeamformingFilter...";
   this->SetNumberOfIndexedInputs(1);
@@ -33,7 +37,24 @@ mitk::BeamformingFilter::BeamformingFilter() : m_OutputData(nullptr), m_InputDat
 
   m_ProgressHandle = [](int, std::string) {};
 
-  m_BeamformingOclFilter = mitk::PhotoacousticOCLBeamformingFilter::New();
+  m_BeamformingOclFilter = mitk::PhotoacousticOCLBeamformingFilter::New(m_Conf);
+
+  switch (m_Conf->GetApod())
+  {
+  case BeamformingSettings::Apodization::Hann:
+    m_Conf->SetApodizationFunction(mitk::PhotoacousticBeamformingUtils::VonHannFunction(m_Conf->GetApodizationArraySize()));
+    break;
+  case BeamformingSettings::Apodization::Hamm:
+    m_Conf->SetApodizationFunction(mitk::PhotoacousticBeamformingUtils::HammFunction(m_Conf->GetApodizationArraySize()));
+    break;
+  case BeamformingSettings::Apodization::Box:
+    m_Conf->SetApodizationFunction(mitk::PhotoacousticBeamformingUtils::BoxFunction(m_Conf->GetApodizationArraySize()));
+    break;
+  default:
+    m_Conf->SetApodizationFunction(mitk::PhotoacousticBeamformingUtils::BoxFunction(m_Conf->GetApodizationArraySize()));
+    break;
+  }
+
   MITK_INFO << "Instantiating BeamformingFilter...[Done]";
 }
 
@@ -275,7 +296,6 @@ void mitk::BeamformingFilter::GenerateData()
         inputBatch->SetImportVolume(&(((float*)copy.GetData())[input->GetDimension(0) * input->GetDimension(1) * batchSize * i]));
 
         m_BeamformingOclFilter->SetApodisation(m_Conf->GetApodizationFunction(), m_Conf->GetApodizationArraySize());
-        m_BeamformingOclFilter->SetConfig(m_Conf);
         m_BeamformingOclFilter->SetInput(inputBatch);
         m_BeamformingOclFilter->Update();
 

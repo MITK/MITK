@@ -21,8 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkITKImageImport.h"
 #include "mitkPhotoacousticBeamformingFilter.h"
 #include <chrono>
+#include <mitkIOUtil.h>
 #include <mitkAutoCropImageFilter.h>
 #include "./OpenCLFilter/mitkPhotoacousticBModeFilter.h"
+#include "mitkConvert2Dto3DImageFilter.h"
 
 // itk dependencies
 #include "itkImage.h"
@@ -45,14 +47,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "../ITKFilter/ITKUltrasound/itkFFT1DComplexConjugateToRealImageFilter.h"
 #include "../ITKFilter/ITKUltrasound/itkFFT1DRealToComplexConjugateImageFilter.h"
 
-mitk::PhotoacousticFilterService::PhotoacousticFilterService() : m_BeamformingFilter(BeamformingFilter::New())
+mitk::PhotoacousticFilterService::PhotoacousticFilterService()
 {
-  MITK_INFO << "[PhotoacousticFilterService Debug] created filter service";
+  MITK_INFO << "[PhotoacousticFilterService] created filter service";
 }
 
 mitk::PhotoacousticFilterService::~PhotoacousticFilterService()
 {
-  MITK_INFO << "[PhotoacousticFilterService Debug] destructed filter service";
+  MITK_INFO << "[PhotoacousticFilterService] destructed filter service";
 }
 
 mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBmodeFilter(mitk::Image::Pointer inputImage, BModeMethod method, bool UseGPU, bool UseLogFilter, float resampleSpacing)
@@ -178,21 +180,6 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBmodeFilter(mitk::Im
   return nullptr;
 }
 
-/*mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scattering)
-{
-  typedef itk::Image< float, 3 > itkFloatImageType;
-  typedef itk::MultiplyImageFilter <itkFloatImageType, itkFloatImageType > MultiplyImageFilterType;
-
-  itkFloatImageType::Pointer itkImage;
-  mitk::CastToItkImage(inputImage, itkImage);
-
-  MultiplyImageFilterType::Pointer multiplyFilter = MultiplyImageFilterType::New();
-  multiplyFilter->SetInput1(itkImage);
-  multiplyFilter->SetInput2(m_FluenceCompResizedItk.at(m_ScatteringCoefficient));
-
-  return mitk::GrabItkImageMemory(multiplyFilter->GetOutput());
-}*/
-
 mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyResampling(mitk::Image::Pointer inputImage, unsigned int outputSize[2])
 {
   typedef itk::Image< float, 3 > itkFloatImageType;
@@ -299,15 +286,14 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyCropping(mitk::Image
 mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBeamforming(mitk::Image::Pointer inputImage,
   BeamformingSettings::Pointer config, std::string& message, std::function<void(int, std::string)> progressHandle)
 {
-  Image::Pointer processedImage = inputImage;
+  Image::Pointer processedImage = mitk::Image::New();
+
   if (inputImage->GetDimension() != 3)
   {
-    processedImage->Initialize(mitk::MakeScalarPixelType<float>(), 3, inputImage->GetDimensions());
-    processedImage->SetSpacing(inputImage->GetGeometry()->GetSpacing());
-
-    mitk::ImageReadAccessor copy(inputImage);
-
-    processedImage->SetImportVolume(copy.GetData());
+    mitk::Convert2Dto3DImageFilter::Pointer dimensionImageFilter = mitk::Convert2Dto3DImageFilter::New();
+    dimensionImageFilter->SetInput(inputImage);
+    dimensionImageFilter->Update();
+    processedImage = dimensionImageFilter->GetOutput();
   }
 
   config->SetRecordTime(config->GetRecordTime() - (float)(config->GetUpperCutoff()) /
@@ -325,8 +311,8 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBeamforming(mitk::Im
   config->GetInputDim()[2] = processedImage->GetDimension(2);
 
   // perform the beamforming
+  m_BeamformingFilter = mitk::BeamformingFilter::New(config);
   m_BeamformingFilter->SetInput(processedImage);
-  m_BeamformingFilter->Configure(config);
   m_BeamformingFilter->SetProgressHandle(progressHandle);
   m_BeamformingFilter->UpdateLargestPossibleRegion();
 

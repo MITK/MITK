@@ -21,8 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usServiceReference.h"
 #include "mitkImageReadAccessor.h"
 
-mitk::OCLDelayCalculation::OCLDelayCalculation()
-  : m_PixelCalculation(NULL)
+mitk::OCLDelayCalculation::OCLDelayCalculation(mitk::BeamformingSettings::Pointer settings)
+  : m_PixelCalculation(NULL),
+  m_Conf(settings)
 {
   this->AddSourceFile("DelayCalculation.cl");
   this->m_FilterID = "DelayCalculation";

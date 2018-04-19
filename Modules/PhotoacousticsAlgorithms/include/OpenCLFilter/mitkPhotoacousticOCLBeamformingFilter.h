@@ -42,7 +42,7 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(PhotoacousticOCLBeamformingFilter, itk::Object);
-    itkNewMacro(Self);
+    mitkNewMacro1Param(Self, BeamformingSettings::Pointer);
 
     /**
     * @brief SetInput Set the input data through an image. Arbitrary images are supported
@@ -72,16 +72,9 @@ namespace mitk
       m_Apodisation = apodisation;
     }
 
-    /** \brief Set beamforming settings to use when beamforming */
-    void SetConfig(BeamformingSettings::Pointer settings)
-    {
-      m_ConfOld = m_Conf;
-      m_Conf = settings;
-    }
-
   protected:
 
-    PhotoacousticOCLBeamformingFilter();
+    PhotoacousticOCLBeamformingFilter(BeamformingSettings::Pointer settings);
     virtual ~PhotoacousticOCLBeamformingFilter();
 
     /** \brief Initialize the filter */
@@ -117,7 +110,6 @@ namespace mitk
     unsigned short m_PAImage;
 
     BeamformingSettings::Pointer m_Conf;
-    BeamformingSettings::Pointer m_ConfOld;
 
     mitk::Image::Pointer m_InputImage;
 

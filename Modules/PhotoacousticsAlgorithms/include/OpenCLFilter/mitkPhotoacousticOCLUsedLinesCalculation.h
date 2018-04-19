@@ -35,23 +35,14 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(OCLUsedLinesCalculation, itk::Object);
-    itkNewMacro(Self);
+    mitkNewMacro1Param(Self, mitk::BeamformingSettings::Pointer);
 
     void Update();
-
-    /** \brief Sets a new configuration to use.
-    *
-    * @param conf The configuration set to use for the calculation of the used lines.
-    */
-    void SetConfig(BeamformingSettings::Pointer conf)
-    {
-      m_Conf = conf;
-    }
 
   protected:
 
     /** Constructor */
-    OCLUsedLinesCalculation();
+    OCLUsedLinesCalculation(mitk::BeamformingSettings::Pointer settings);
 
     /** Destructor */
     virtual ~OCLUsedLinesCalculation();

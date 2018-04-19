@@ -19,8 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "./OpenCLFilter/mitkPhotoacousticOCLBeamformingFilter.h"
 #include "usServiceReference.h"
 
-mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter()
-  : m_PixelCalculation(NULL), m_InputImage(mitk::Image::New()), m_ApodizationBuffer(nullptr), m_MemoryLocationsBuffer(nullptr), m_DelaysBuffer(nullptr), m_UsedLinesBuffer(nullptr)
+mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter(BeamformingSettings::Pointer settings) :
+  m_PixelCalculation(NULL),
+  m_InputImage(mitk::Image::New()),
+  m_ApodizationBuffer(nullptr),
+  m_MemoryLocationsBuffer(nullptr),
+  m_DelaysBuffer(nullptr),
+  m_UsedLinesBuffer(nullptr),
+  m_Conf(settings)
 {
   this->AddSourceFile("DAS.cl");
   this->AddSourceFile("DMAS.cl");
@@ -43,8 +49,8 @@ mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter()
   m_ChunkSize[1] = 128;
   m_ChunkSize[2] = 8;
 
-  m_UsedLinesCalculation = mitk::OCLUsedLinesCalculation::New();
-  m_DelayCalculation = mitk::OCLDelayCalculation::New();
+  m_UsedLinesCalculation = mitk::OCLUsedLinesCalculation::New(m_Conf);
+  m_DelayCalculation = mitk::OCLDelayCalculation::New(m_Conf);
 }
 
 mitk::PhotoacousticOCLBeamformingFilter::~PhotoacousticOCLBeamformingFilter()
@@ -84,7 +90,7 @@ void mitk::PhotoacousticOCLBeamformingFilter::UpdateDataBuffers()
 
   try
   {
-    MITK_DEBUG << "Updating Workgroup size for new dimensions";
+    MITK_INFO << "Updating Workgroup size for new dimensions";
     size_t outputSize = (size_t)m_Conf->GetReconstructionLines() * (size_t)m_Conf->GetSamplesPerLine() *
       (size_t)m_Conf->GetInputDim()[2];
     m_OutputDim[0] = m_Conf->GetReconstructionLines();
@@ -98,45 +104,41 @@ void mitk::PhotoacousticOCLBeamformingFilter::UpdateDataBuffers()
     return;
   }
 
-  if (BeamformingSettings::SettingsChangedOpenCL(m_Conf, m_ConfOld))
+  //TODO FIXME
+  cl_int clErr = 0;
+  MITK_DEBUG << "Updating GPU Buffers for new configuration";
+
+  // create the apodisation buffer
+
+  if (m_Apodisation == nullptr)
   {
-    cl_int clErr = 0;
-    MITK_DEBUG << "Updating GPU Buffers for new configuration";
-
-    // create the apodisation buffer
-
-    if (m_Apodisation == nullptr)
-    {
-      MITK_INFO << "No apodisation function set; Beamforming will be done without any apodisation.";
-      m_Apodisation = new float[1];
-      m_Apodisation[0] = 1;
-      m_ApodArraySize = 1;
-    }
-
-    us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
-    OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
-    cl_context gpuContext = resources->GetContext();
-
-    if (m_ApodizationBuffer) clReleaseMemObject(m_ApodizationBuffer);
-
-    this->m_ApodizationBuffer = clCreateBuffer(gpuContext, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, sizeof(float) * m_ApodArraySize, m_Apodisation, &clErr);
-    CHECK_OCL_ERR(clErr);
-
-    // calculate used lines
-
-    m_UsedLinesCalculation->SetConfig(m_Conf);
-    m_UsedLinesCalculation->Update();
-    m_UsedLinesBuffer = m_UsedLinesCalculation->GetGPUOutput()->GetGPUBuffer();
-
-    // calculate the Delays
-    m_DelayCalculation->SetConfig(m_Conf);
-    m_DelayCalculation->SetInputs(m_UsedLinesBuffer);
-    m_DelayCalculation->Update();
-
-    m_DelaysBuffer = m_DelayCalculation->GetGPUOutput()->GetGPUBuffer();
-
-    m_ConfOld = m_Conf;
+    MITK_INFO << "No apodisation function set; Beamforming will be done without any apodisation.";
+    m_Apodisation = new float[1];
+    m_Apodisation[0] = 1;
+    m_ApodArraySize = 1;
   }
+
+  us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+  OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
+  cl_context gpuContext = resources->GetContext();
+
+  if (m_ApodizationBuffer) clReleaseMemObject(m_ApodizationBuffer);
+
+  this->m_ApodizationBuffer = clCreateBuffer(gpuContext, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, sizeof(float) * m_ApodArraySize, m_Apodisation, &clErr);
+  CHECK_OCL_ERR(clErr);
+
+  // calculate used lines
+
+  m_UsedLinesCalculation->Update();
+  m_UsedLinesBuffer = m_UsedLinesCalculation->GetGPUOutput()->GetGPUBuffer();
+
+  // calculate the Delays
+  m_DelayCalculation->SetInputs(m_UsedLinesBuffer);
+  m_DelayCalculation->Update();
+
+  m_DelaysBuffer = m_DelayCalculation->GetGPUOutput()->GetGPUBuffer();
+
+  //m_ConfOld = m_Conf;
 }
 
 void mitk::PhotoacousticOCLBeamformingFilter::Execute()
@@ -180,6 +182,7 @@ us::Module *mitk::PhotoacousticOCLBeamformingFilter::GetModule()
 
 bool mitk::PhotoacousticOCLBeamformingFilter::Initialize()
 {
+  MITK_INFO << "Initializing OCL Beamforming Filter...";
   bool buildErr = true;
   cl_int clErr = 0;
 
@@ -213,6 +216,8 @@ bool mitk::PhotoacousticOCLBeamformingFilter::Initialize()
   }
 
   CHECK_OCL_ERR(clErr);
+
+  MITK_INFO << "Initializing OCL Beamforming Filter...[Done]";
 
   return (OclFilter::IsInitialized() && buildErr);
 }

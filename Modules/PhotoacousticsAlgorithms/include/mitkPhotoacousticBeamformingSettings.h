@@ -144,6 +144,9 @@ namespace mitk {
   protected:
     BeamformingSettings()
     {
+      m_InputDim = new unsigned int[3]{ 1, 1, 1 };
+      m_CropBounds = new unsigned int[2]{ 0, 0 };
+      m_ApodizationFunction = new float[m_ApodizationArraySize];
     }
     ~BeamformingSettings()
     {
@@ -194,11 +197,11 @@ namespace mitk {
     bool m_Partial = false;
     /** \brief Sets the first and last slice to be beamformed.
     */
-    unsigned int* m_CropBounds = new unsigned int[2]{ 0, 0 };
+    unsigned int* m_CropBounds;
 
     /** \brief Sets the dimensions of the inputImage.
     */
-    unsigned int* m_InputDim = new unsigned int[3]{ 1, 1, 1 };
+    unsigned int* m_InputDim;
 
     /** \brief Decides whether GPU computing should be used
     */

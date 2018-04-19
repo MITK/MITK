@@ -86,7 +86,7 @@ void mitk::PhotoacousticBeamformingUtils::DASQuadraticLine(
   float l_i = 0;
   float s_i = 0;
 
-  float part = 0.07 * inputL;
+  float part = 0;
   float tan_phi = std::tan(config->GetAngle() / 360 * 2 * itk::Math::pi);
   float part_multiplicator = tan_phi * config->GetTimeSpacing() * config->GetSpeedOfSound() /
     config->GetPitch() * inputL / config->GetTransducerElements();

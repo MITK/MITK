@@ -112,7 +112,8 @@ namespace mitk {
     PhotoacousticFilterService();
     ~PhotoacousticFilterService() override;
 
-    /** \brief For performance reasons, an instance of the Beamforming filter is initialized as soon as possible and kept for all further uses.
+    /** \brief
+      For performance reasons, an instance of the Beamforming filter is initialized as soon as possible and kept for all further uses.
     */
     mitk::BeamformingFilter::Pointer m_BeamformingFilter;
 

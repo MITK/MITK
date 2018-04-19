@@ -373,6 +373,7 @@ void PAImageProcessing::StartBeamformingThread()
 
 void PAImageProcessing::HandleBeamformingResults(mitk::Image::Pointer image)
 {
+  MITK_INFO << "Handle Beamforming results";
   auto newNode = mitk::DataNode::New();
   newNode->SetData(image);
 

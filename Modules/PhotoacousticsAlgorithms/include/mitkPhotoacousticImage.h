@@ -106,7 +106,9 @@ namespace mitk {
       * @param alpha The tukey window parameter to control the shape of the bandpass filter: 0 will make it a Box function, 1 a Hann function. alpha can be set between those two bounds.
       * @return The processed image is returned after the filter has finished.
       */
-      mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data, float recordTime, float BPHighPass, float BPLowPass, float alpha);
+      mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data, float recordTime,
+                                          float BPHighPass, float BPLowPass,
+                                          float alphaHighPass, float alphaLowPass);
 
     protected:
       PhotoacousticImage();
@@ -118,7 +120,9 @@ namespace mitk {
 
       /** \brief Function that creates a Tukey function for the bandpass
       */
-      itk::Image<float, 3U>::Pointer BPFunction(mitk::Image::Pointer reference, int cutoffFrequencyPixelHighPass, int cutoffFrequencyPixelLowPass, float alpha);
+      itk::Image<float, 3U>::Pointer BPFunction(mitk::Image::Pointer reference,
+                                                int cutoffFrequencyPixelHighPass, int cutoffFrequencyPixelLowPass,
+                                                float alphaHighPass, float alphaLowPass);
     };
 } // namespace mitk
 

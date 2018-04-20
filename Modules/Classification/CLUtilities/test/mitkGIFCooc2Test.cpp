@@ -67,42 +67,42 @@ public:
     }
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 18 features.", std::size_t(93), featureList.size());
 
-    // These values are obtained with IBSI
+    // These values are obtained with IBSI (3D Comb)
     // Standard accuracy is 0.01
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.509, results["Co-occurenced Based Features::Overall Joint Maximum"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 2.149, results["Co-occurenced Based Features::Overall Joint Average"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 3.132, results["Co-occurenced Based Features::Overall Joint Variance"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 2.574, results["Co-occurenced Based Features::Overall Joint Entropy"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 1.379, results["Co-occurenced Based Features::Overall Diiference Average"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 3.215, results["Co-occurenced Based Features::Overall Difference Variance"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 1.641, results["Co-occurenced Based Features::Overall Difference Entropy"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 4.298, results["Co-occurenced Based Features::Overall Sum Average"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 7.412, results["Co-occurenced Based Features::Overall Sum Variance"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 2.110, results["Co-occurenced Based Features::Overall Sum Entropy"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.291, results["Co-occurenced Based Features::Overall Angular Second Moment"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 5.118, results["Co-occurenced Based Features::Overall Contrast"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 1.380, results["Co-occurenced Based Features::Overall Dissimilarity"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.688, results["Co-occurenced Based Features::Overall Inverse Difference"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.856, results["Co-occurenced Based Features::Overall Inverse Difference Normalized"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.631, results["Co-occurenced Based Features::Overall Inverse Difference Moment"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.902, results["Co-occurenced Based Features::Overall Inverse Difference Moment Normalized"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.057, results["Co-occurenced Based Features::Overall Inverse Variance"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.183, results["Co-occurenced Based Features::Overall Correlation"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 5.192, results["Co-occurenced Based Features::Overall Autocorrelation"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 7.412, results["Co-occurenced Based Features::Overall Cluster Tendendcy"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 17.419, results["Co-occurenced Based Features::Overall Cluster Shade"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 147.464, results["Co-occurenced Based Features::Overall Cluster Prominence"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", -0.0288, results["Co-occurenced Based Features::Overall First Measure of Information Correlation"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.269, results["Co-occurenced Based Features::Overall Second Measure of Information Correlation"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Joint Maximum with Large IBSI Phantom Image", 0.509, results["Co-occurenced Based Features::Overall Joint Maximum"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Joint Average with Large IBSI Phantom Image", 2.149, results["Co-occurenced Based Features::Overall Joint Average"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Joint Variance with Large IBSI Phantom Image", 3.132, results["Co-occurenced Based Features::Overall Joint Variance"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Joint Entropy with Large IBSI Phantom Image", 2.574, results["Co-occurenced Based Features::Overall Joint Entropy"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Difference Average with Large IBSI Phantom Image", 1.379, results["Co-occurenced Based Features::Overall Difference Average"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Difference Variance with Large IBSI Phantom Image", 3.215, results["Co-occurenced Based Features::Overall Difference Variance"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Difference Entropy with Large IBSI Phantom Image", 1.641, results["Co-occurenced Based Features::Overall Difference Entropy"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Sum Average with Large IBSI Phantom Image", 4.298, results["Co-occurenced Based Features::Overall Sum Average"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Sum Variance with Large IBSI Phantom Image", 7.412, results["Co-occurenced Based Features::Overall Sum Variance"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Sum Entropy with Large IBSI Phantom Image", 2.110, results["Co-occurenced Based Features::Overall Sum Entropy"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Angular Second Moment with Large IBSI Phantom Image", 0.291, results["Co-occurenced Based Features::Overall Angular Second Moment"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Contrast with Large IBSI Phantom Image", 5.118, results["Co-occurenced Based Features::Overall Contrast"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Dissimilarity with Large IBSI Phantom Image", 1.380, results["Co-occurenced Based Features::Overall Dissimilarity"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Inverse Difference with Large IBSI Phantom Image", 0.688, results["Co-occurenced Based Features::Overall Inverse Difference"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Inverse Difference Normalized with Large IBSI Phantom Image", 0.856, results["Co-occurenced Based Features::Overall Inverse Difference Normalized"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Inverse Difference Moment with Large IBSI Phantom Image", 0.631, results["Co-occurenced Based Features::Overall Inverse Difference Moment"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Inverse Difference Moment Normalized with Large IBSI Phantom Image", 0.902, results["Co-occurenced Based Features::Overall Inverse Difference Moment Normalized"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Inverse Variance with Large IBSI Phantom Image", 0.057, results["Co-occurenced Based Features::Overall Inverse Variance"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Correlation with Large IBSI Phantom Image", 0.183, results["Co-occurenced Based Features::Overall Correlation"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Autocorrelation with Large IBSI Phantom Image", 5.192, results["Co-occurenced Based Features::Overall Autocorrelation"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Cluster Tendency with Large IBSI Phantom Image", 7.412, results["Co-occurenced Based Features::Overall Cluster Tendency"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Cluster Shade with Large IBSI Phantom Image", 17.419, results["Co-occurenced Based Features::Overall Cluster Shade"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Cluster Prominence with Large IBSI Phantom Image", 147.464, results["Co-occurenced Based Features::Overall Cluster Prominence"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall First Measure of Information Correlation with Large IBSI Phantom Image", -0.0288, results["Co-occurenced Based Features::Overall First Measure of Information Correlation"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Second Measure of Information Correlation with Large IBSI Phantom Image", 0.269, results["Co-occurenced Based Features::Overall Second Measure of Information Correlation"], 0.001);
 
     // These values are obtained by manually running the tool
     // Values might be wrong.
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.679, results["Co-occurenced Based Features::Overall Row Maximum"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 2.149, results["Co-occurenced Based Features::Overall Row Average"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 3.132, results["Co-occurenced Based Features::Overall Row Variance"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 1.306, results["Co-occurenced Based Features::Overall Row Entropy"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 2.611, results["Co-occurenced Based Features::Overall First Row-Column Entropy"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 2.611, results["Co-occurenced Based Features::Overall Second Row-Column Entropy"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Row Maximum with Large IBSI Phantom Image", 0.679, results["Co-occurenced Based Features::Overall Row Maximum"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Row Average with Large IBSI Phantom Image", 2.149, results["Co-occurenced Based Features::Overall Row Average"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Row Variance with Large IBSI Phantom Image", 3.132, results["Co-occurenced Based Features::Overall Row Variance"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Row Entropy with Large IBSI Phantom Image", 1.306, results["Co-occurenced Based Features::Overall Row Entropy"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall First Row-Column Entropy with Large IBSI Phantom Image", 2.611, results["Co-occurenced Based Features::Overall First Row-Column Entropy"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Overall Second Row-Column Entropy with Large IBSI Phantom Image", 2.611, results["Co-occurenced Based Features::Overall Second Row-Column Entropy"], 0.001);
   }
 
   void ImageDescription_PhantomTest_2D()

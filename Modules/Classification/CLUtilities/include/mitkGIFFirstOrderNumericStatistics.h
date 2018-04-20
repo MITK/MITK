@@ -151,14 +151,6 @@ namespace mitk
     virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
     virtual void AddArguments(mitkCommandLineParser &parser);
 
-
-    struct ParameterStruct {
-      double MinimumIntensity;
-      double MaximumIntensity;
-      int Bins;
-      std::string prefix;
-    };
-
   };
 }
 #endif //mitkGIFFirstOrderStatistics_h

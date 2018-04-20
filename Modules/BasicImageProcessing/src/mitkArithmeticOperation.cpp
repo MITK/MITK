@@ -207,7 +207,7 @@ static void ExecuteOneImageFilter(itk::Image<TPixel, VImageDimension>* imageA, d
     break;
   case mitk::NonStaticArithmeticOperation::OperationsEnum::ATan:
     ExecuteOneImageFilterWithFunctorNonParameter<itk::Functor::Atan<TPixel, TPixel>,
-                                     itk::Functor::ATan<TPixel, double>,
+                                     itk::Functor::Atan<TPixel, double>,
                                      ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
     break;
   case mitk::NonStaticArithmeticOperation::OperationsEnum::Cos:
@@ -228,11 +228,6 @@ static void ExecuteOneImageFilter(itk::Image<TPixel, VImageDimension>* imageA, d
   case mitk::NonStaticArithmeticOperation::OperationsEnum::ASin:
     ExecuteOneImageFilterWithFunctorNonParameter<itk::Functor::Asin<TPixel, TPixel>,
                                      itk::Functor::Asin<TPixel, double>,
-                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
-    break;
-  case mitk::NonStaticArithmeticOperation::OperationsEnum::Round:
-    ExecuteOneImageFilterWithFunctorNonParameter<itk::Functor::Round<TPixel, TPixel>,
-                                     itk::Functor::Round<TPixel, double>,
                                      ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
     break;
   case mitk::NonStaticArithmeticOperation::OperationsEnum::Square:
@@ -438,12 +433,6 @@ mitk::Image::Pointer mitk::ArithmeticOperation::Acos(Image::Pointer & imageA, bo
 {
   mitk::Image::Pointer resultImage;
   AccessByItk_n(imageA, ExecuteOneImageFilter, (0.0, outputAsDouble, true, true, NonStaticArithmeticOperation::OperationsEnum::ACos, resultImage));
-  return resultImage;
-}
-mitk::Image::Pointer mitk::ArithmeticOperation::Round(Image::Pointer & imageA, bool outputAsDouble)
-{
-  mitk::Image::Pointer resultImage;
-  AccessByItk_n(imageA, ExecuteOneImageFilter, (0.0, outputAsDouble, true, true, NonStaticArithmeticOperation::OperationsEnum::Round, resultImage));
   return resultImage;
 }
 mitk::Image::Pointer mitk::ArithmeticOperation::Square(Image::Pointer & imageA, bool outputAsDouble)

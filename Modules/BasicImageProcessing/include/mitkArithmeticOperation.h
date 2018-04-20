@@ -50,7 +50,6 @@ namespace mitk
     static Image::Pointer Acos(Image::Pointer & imageA, bool outputAsDouble = true);
     static Image::Pointer Sin(Image::Pointer & imageA, bool outputAsDouble = true);
     static Image::Pointer Asin(Image::Pointer & imageA, bool outputAsDouble = true);
-    static Image::Pointer Round(Image::Pointer & imageA, bool outputAsDouble = true);
     static Image::Pointer Square(Image::Pointer & imageA, bool outputAsDouble = true);
     static Image::Pointer Sqrt(Image::Pointer & imageA, bool outputAsDouble = true);
     static Image::Pointer Abs(Image::Pointer & imageA, bool outputAsDouble = true);
@@ -78,7 +77,6 @@ namespace mitk
       ACos,
       Sin,
       ASin,
-      Round,
       Square,
       Sqrt,
       Abs,

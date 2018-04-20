@@ -18,13 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_CAST_TO_FLOAT_IMAGE_FILTER
 
 #include "mitkImageToImageFilter.h"
+#include "MitkPhotoacousticsAlgorithmsExports.h"
 
 namespace mitk {
   /*!
   * \brief Class implementing an mitk::ImageToImageFilter for casting any mitk image to a float image
   */
 
-  class CastToFloatImageFilter : public ImageToImageFilter
+  class MITKPHOTOACOUSTICSALGORITHMS_EXPORT CastToFloatImageFilter : public ImageToImageFilter
   {
   public:
     mitkClassMacro(CastToFloatImageFilter, ImageToImageFilter);

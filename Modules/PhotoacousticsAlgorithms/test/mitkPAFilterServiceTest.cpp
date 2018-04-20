@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPhotoacousticFilterService.h>
 #include <mitkImage.h>
 #include <mitkImageReadAccessor.h>
-#include <mitkPhotoacousticBeamformingSettings.h>
+#include <mitkBeamformingSettings.h>
 
 // us
 #include <usModule.h>

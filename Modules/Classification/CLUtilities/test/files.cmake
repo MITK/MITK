@@ -4,6 +4,7 @@ set(MODULE_TESTS
   mitkGIFGreyLevelDistanceZoneTest
   mitkGIFGreyLevelSizeZoneTest
   mitkGIFImageDescriptionFeaturesTest
+  mitkGIFIntensityVolumeHistogramTest
   mitkGIFLocalIntensityTest
   mitkGIFNeighbourhoodGreyToneDifferenceFeaturesTest
   mitkGIFNeighbouringGreyLevelDependenceFeatureTest

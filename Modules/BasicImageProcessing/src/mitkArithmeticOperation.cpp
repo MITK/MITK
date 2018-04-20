@@ -273,10 +273,8 @@ static void ExecuteOneImageFilterWithFunctor(ImageType* imageA, double value, bo
   {
     typename DoubleFilterType::Pointer filter = DoubleFilterType::New();
     filter->SetInput(imageA);
-    DoubleFunctorType functor = filter->GetFunctor();
-    functor.valueLeft = valueLeft;
-    functor.value = value;
-    filter->SetFunctor(functor);
+    filter->GetFunctor().valueLeft = valueLeft;
+    filter->GetFunctor().value = value;
     filter->Update();
     CastToMitkImage(filter->GetOutput(), outputImage);
   }
@@ -284,10 +282,8 @@ static void ExecuteOneImageFilterWithFunctor(ImageType* imageA, double value, bo
   {
     typename DefaultFilterType::Pointer filter = DefaultFilterType::New();
     filter->SetInput(imageA);
-    DefaultFunctorType functor = filter->GetFunctor();
-    functor.valueLeft = valueLeft;
-    functor.value = value;
-    filter->SetFunctor(functor);
+    filter->GetFunctor().valueLeft = valueLeft;
+    filter->GetFunctor().value = value;
     filter->Update();
     CastToMitkImage(filter->GetOutput(), outputImage);
   }

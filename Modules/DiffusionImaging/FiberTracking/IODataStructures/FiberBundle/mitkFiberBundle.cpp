@@ -517,6 +517,65 @@ vtkSmartPointer<vtkPolyData> mitk::FiberBundle::GetFiberPolyData() const
   return m_FiberPolyData;
 }
 
+void mitk::FiberBundle::ColorFibersByLength(bool opacity, bool normalize)
+{
+  if (m_MaxFiberLength<=0)
+    return;
+
+  int numOfPoints = this->GetNumberOfPoints();
+
+  //colors and alpha value for each single point, RGBA = 4 components
+  unsigned char rgba[4] = {0,0,0,0};
+  int componentSize = 4;
+  m_FiberColors = vtkSmartPointer<vtkUnsignedCharArray>::New();
+  m_FiberColors->Allocate(numOfPoints * componentSize);
+  m_FiberColors->SetNumberOfComponents(componentSize);
+  m_FiberColors->SetName("FIBER_COLORS");
+
+  int numOfFibers = m_FiberPolyData->GetNumberOfLines();
+  if (numOfFibers < 1)
+    return;
+
+  mitk::LookupTable::Pointer mitkLookup = mitk::LookupTable::New();
+  vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
+  lookupTable->SetTableRange(0.0, 0.8);
+  lookupTable->Build();
+  mitkLookup->SetVtkLookupTable(lookupTable);
+  mitkLookup->SetType(mitk::LookupTable::JET);
+
+  unsigned int count = 0;
+  for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
+  {
+    vtkCell* cell = m_FiberPolyData->GetCell(i);
+    int numPoints = cell->GetNumberOfPoints();
+
+    float l = m_FiberLengths.at(i)/m_MaxFiberLength;
+    if (!normalize)
+    {
+      l = m_FiberLengths.at(i)/255.0;
+      if (l > 1.0)
+        l = 1.0;
+    }
+    for (int j=0; j<numPoints; j++)
+    {
+      double color[3];
+      lookupTable->GetColor(1.0 - l, color);
+
+      rgba[0] = (unsigned char) (255.0 * color[0]);
+      rgba[1] = (unsigned char) (255.0 * color[1]);
+      rgba[2] = (unsigned char) (255.0 * color[2]);
+      if (opacity)
+        rgba[3] = (unsigned char) (255.0 * l);
+      else
+        rgba[3] = (unsigned char) (255.0);
+      m_FiberColors->InsertTypedTuple(cell->GetPointId(j), rgba);
+      count++;
+    }
+  }
+  m_UpdateTime3D.Modified();
+  m_UpdateTime2D.Modified();
+}
+
 void mitk::FiberBundle::ColorFibersByOrientation()
 {
   //===== FOR WRITING A TEST ========================

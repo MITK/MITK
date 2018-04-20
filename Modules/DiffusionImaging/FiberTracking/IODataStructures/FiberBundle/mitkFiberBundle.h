@@ -64,6 +64,7 @@ public:
     // colorcoding related methods
     void ColorFibersByFiberWeights(bool opacity, bool normalize);
     void ColorFibersByCurvature(bool opacity, bool normalize);
+    void ColorFibersByLength(bool opacity, bool normalize);
     void ColorFibersByScalarMap(mitk::Image::Pointer, bool opacity, bool normalize);
     template <typename TPixel>
     void ColorFibersByScalarMap(const mitk::PixelType pixelType, mitk::Image::Pointer, bool opacity, bool normalize);

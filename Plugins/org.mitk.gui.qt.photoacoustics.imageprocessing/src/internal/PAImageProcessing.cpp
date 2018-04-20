@@ -225,7 +225,7 @@ void PAImageProcessing::BatchProcessing()
     {
       m_Controls.ProgressInfo->setText("cropping image");
 
-      image = m_FilterBank->ApplyCropping(image, m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), 0, 0, 0, image->GetDimension(2) - 1);
+      image = m_FilterBank->ApplyCropping(image, m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), 0, 0, 0, 0);
 
       if (saveSteps[1])
       {
@@ -1119,7 +1119,7 @@ void CropThread::run()
 {
   mitk::Image::Pointer resultImage;
 
-  resultImage = m_FilterBank->ApplyCropping(m_InputImage, m_CutAbove, m_CutBelow, 0, 0, m_CutSliceFirst, m_CutSliceLast);
+  resultImage = m_FilterBank->ApplyCropping(m_InputImage, m_CutAbove, m_CutBelow, 0, 0, 0, 0);
 
   emit result(resultImage);
 }

@@ -88,5 +88,4 @@ void mitk::CastToFloatImageFilter::GenerateData()
   outputImage->Initialize(mitk::MakeScalarPixelType<float>(), inputImage->GetDimension(), inputImage->GetDimensions());
   outputImage->SetSpacing(inputImage->GetGeometry()->GetSpacing());
   outputImage->SetImportVolume(outputData, 0, 0, mitk::Image::ImportMemoryManagementType::ManageMemory);
-  //delete[] outputData;
 }

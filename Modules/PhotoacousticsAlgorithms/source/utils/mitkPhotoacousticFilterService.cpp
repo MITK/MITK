@@ -22,9 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBeamformingFilter.h"
 #include <chrono>
 #include <mitkIOUtil.h>
-#include <mitkAutoCropImageFilter.h>
+#include <mitkCropImageFilter.h>
 #include "./OpenCLFilter/mitkPhotoacousticBModeFilter.h"
 #include "mitkConvert2Dto3DImageFilter.h"
+#include <mitkCastToFloatImageFilter.h>
 
 // itk dependencies
 #include "itkImage.h"
@@ -70,7 +71,7 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBmodeFilter(mitk::Im
     if (inputImage->GetPixelType().GetTypeAsString() == "scalar (float)" || inputImage->GetPixelType().GetTypeAsString() == " (float)")
       input = inputImage;
     else
-      input = ApplyCropping(inputImage, 0, 0, 0, 0, 0, inputImage->GetDimension(2) - 1);
+      input = ApplyCropping(inputImage, 0, 0, 0, 0, 0, 0);
 
     if (!UseGPU)
     {
@@ -215,72 +216,21 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyResampling(mitk::Ima
   return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
 }
 
-mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyCropping(mitk::Image::Pointer inputImage, int above, int below, int right, int left, int minSlice, int maxSlice)
+mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyCropping(mitk::Image::Pointer inputImage,
+  int above, int below,
+  int right, int left,
+  int zStart, int zEnd)
 {
-  unsigned int inputDim[3] = { inputImage->GetDimension(0), inputImage->GetDimension(1), inputImage->GetDimension(2) };
-  unsigned int outputDim[3] = { inputImage->GetDimension(0) - left - right, inputImage->GetDimension(1) - (unsigned int)above - (unsigned int)below, (unsigned int)maxSlice - (unsigned int)minSlice + 1 };
-
-  void* inputData;
-  float* outputData = new float[outputDim[0] * outputDim[1] * outputDim[2]];
-
-  ImageReadAccessor acc(inputImage);
-  inputData = const_cast<void*>(acc.GetData());
-
-  // convert the data to float by default
-  // as of now only float, short, double are used at all.
-  if (inputImage->GetPixelType().GetTypeAsString() == "scalar (float)" || inputImage->GetPixelType().GetTypeAsString() == " (float)")
-  {
-    // copy the data into the cropped image
-    for (unsigned short sl = 0; sl < outputDim[2]; ++sl)
-    {
-      for (unsigned short l = 0; l < outputDim[0]; ++l)
-      {
-        for (unsigned short s = 0; s < outputDim[1]; ++s)
-        {
-          outputData[l + s*(unsigned short)outputDim[0] + sl*outputDim[0] * outputDim[1]] = (float)((float*)inputData)[(l + left) + (s + above)*(unsigned short)inputDim[0] + (sl + minSlice)*inputDim[0] * inputDim[1]];
-        }
-      }
-    }
-  }
-  else if (inputImage->GetPixelType().GetTypeAsString() == "scalar (short)" || inputImage->GetPixelType().GetTypeAsString() == " (short)")
-  {
-    // copy the data to the cropped image
-    for (unsigned short sl = 0; sl < outputDim[2]; ++sl)
-    {
-      for (unsigned short l = 0; l < outputDim[0]; ++l)
-      {
-        for (unsigned short s = 0; s < outputDim[1]; ++s)
-        {
-          outputData[l + s*(unsigned short)outputDim[0] + sl*outputDim[0] * outputDim[1]] = (float)((short*)inputData)[(l + left) + (s + above)*(unsigned short)inputDim[0] + (sl + minSlice)*inputDim[0] * inputDim[1]];
-        }
-      }
-    }
-  }
-  else if (inputImage->GetPixelType().GetTypeAsString() == "scalar (double)" || inputImage->GetPixelType().GetTypeAsString() == " (double)")
-  {
-    // copy the data to the cropped image
-    for (unsigned short sl = 0; sl < outputDim[2]; ++sl)
-    {
-      for (unsigned short l = 0; l < outputDim[0]; ++l)
-      {
-        for (unsigned short s = 0; s < outputDim[1]; ++s)
-        {
-          outputData[l + s*(unsigned short)outputDim[0] + sl*outputDim[0] * outputDim[1]] = (float)((double*)inputData)[(l + left) + (s + above)*(unsigned short)inputDim[0] + (sl + minSlice)*inputDim[0] * inputDim[1]];
-        }
-      }
-    }
-  }
-  else
-  {
-    MITK_INFO << "Could not determine pixel type";
-  }
-
-  mitk::Image::Pointer output = mitk::Image::New();
-  output->Initialize(mitk::MakeScalarPixelType<float>(), 3, outputDim);
-  output->SetSpacing(inputImage->GetGeometry()->GetSpacing());
-  output->SetImportVolume(outputData, 0, 0, mitk::Image::CopyMemory);
-  delete[] outputData;
-  return output;
+  mitk::CropImageFilter::Pointer cropImageFilter = mitk::CropImageFilter::New();
+  cropImageFilter->SetInput(inputImage);
+  cropImageFilter->SetXPixelsCropStart(left);
+  cropImageFilter->SetXPixelsCropEnd(right);
+  cropImageFilter->SetYPixelsCropStart(above);
+  cropImageFilter->SetYPixelsCropEnd(below);
+  cropImageFilter->SetZPixelsCropStart(zStart);
+  cropImageFilter->SetZPixelsCropEnd(zEnd);
+  cropImageFilter->Update();
+  return cropImageFilter->GetOutput();
 }
 
 mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBeamforming(mitk::Image::Pointer inputImage,
@@ -295,16 +245,6 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBeamforming(mitk::Im
     dimensionImageFilter->Update();
     processedImage = dimensionImageFilter->GetOutput();
   }
-
-  //config->SetRecordTime(config->GetRecordTime() - (float)(config->GetUpperCutoff()) /
-  //  (float)inputImage->GetDimension(1) * config->GetRecordTime()); // adjust the recorded time lost by cropping
-  //progressHandle(0, "converting image");
-  //if (!config->GetPartial())
-  //{
-  //  config->GetCropBounds()[0] = 0;
-  //  config->GetCropBounds()[1] = inputImage->GetDimension(2) - 1;
-  //}
-  //processedImage = ApplyCropping(inputImage, config->GetUpperCutoff(), 0, 0, 0, config->GetCropBounds()[0], config->GetCropBounds()[1]);
 
   config->GetInputDim()[0] = processedImage->GetDimension(0);
   config->GetInputDim()[1] = processedImage->GetDimension(1);

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_CROP_IMAGE_FILTER
 
 #include "mitkImageToImageFilter.h"
+#include "itkMacro.h"
 
 namespace mitk {
   /*!
@@ -32,12 +33,35 @@ namespace mitk {
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
+    itkGetMacro(XPixelsCropStart, unsigned int);
+    itkSetMacro(XPixelsCropStart, unsigned int);
+    itkGetMacro(YPixelsCropStart, unsigned int);
+    itkSetMacro(YPixelsCropStart, unsigned int);
+    itkGetMacro(ZPixelsCropStart, unsigned int);
+    itkSetMacro(ZPixelsCropStart, unsigned int);
+
+    itkGetMacro(XPixelsCropEnd, unsigned int);
+    itkSetMacro(XPixelsCropEnd, unsigned int);
+    itkGetMacro(YPixelsCropEnd, unsigned int);
+    itkSetMacro(YPixelsCropEnd, unsigned int);
+    itkGetMacro(ZPixelsCropEnd, unsigned int);
+    itkSetMacro(ZPixelsCropEnd, unsigned int);
+
   protected:
     CropImageFilter();
 
     ~CropImageFilter() override;
 
     void GenerateData() override;
+
+    void SanityCheckPreconditions();
+
+    unsigned int m_XPixelsCropStart;
+    unsigned int m_XPixelsCropEnd;
+    unsigned int m_YPixelsCropStart;
+    unsigned int m_YPixelsCropEnd;
+    unsigned int m_ZPixelsCropStart;
+    unsigned int m_ZPixelsCropEnd;
   };
 } // namespace mitk
 

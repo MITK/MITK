@@ -198,12 +198,12 @@ public:
 
     // These values are obtained by manually running the tool
     // Values might be wrong.
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Overall Row Maximum with Large IBSI Phantom Image", 0.0229329, results["SliceWise Mean Co-occurenced Based Features::Overall Row Maximum"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Overall Row Average with Large IBSI Phantom Image", 0.0929457, results["SliceWise Mean Co-occurenced Based Features::Overall Row Average"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Overall Row Variance with Large IBSI Phantom Image", 0.297216, results["SliceWise Mean Co-occurenced Based Features::Overall Row Variance"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Overall Row Entropy with Large IBSI Phantom Image", 0.0827357, results["SliceWise Mean Co-occurenced Based Features::Overall Row Entropy"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Overall First Row-Column Entropy with Large IBSI Phantom Image", 0.165471, results["SliceWise Mean Co-occurenced Based Features::Overall First Row-Column Entropy"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Overall Second Row-Column Entropy with Large IBSI Phantom Image", 0.165471, results["SliceWise Mean Co-occurenced Based Features::Overall Second Row-Column Entropy"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Overall Row Maximum with Large IBSI Phantom Image", 0.682689, results["SliceWise Mean Co-occurenced Based Features::Overall Row Maximum"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Overall Row Average with Large IBSI Phantom Image", 2.14343, results["SliceWise Mean Co-occurenced Based Features::Overall Row Average"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Overall Row Variance with Large IBSI Phantom Image", 2.71158, results["SliceWise Mean Co-occurenced Based Features::Overall Row Variance"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Overall Row Entropy with Large IBSI Phantom Image", 1.13773, results["SliceWise Mean Co-occurenced Based Features::Overall Row Entropy"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Overall First Row-Column Entropy with Large IBSI Phantom Image", 2.27545, results["SliceWise Mean Co-occurenced Based Features::Overall First Row-Column Entropy"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Overall Second Row-Column Entropy with Large IBSI Phantom Image", 2.27545, results["SliceWise Mean Co-occurenced Based Features::Overall Second Row-Column Entropy"], 0.001);
 
 
 

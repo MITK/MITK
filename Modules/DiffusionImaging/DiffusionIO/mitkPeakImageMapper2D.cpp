@@ -164,7 +164,7 @@ vtkProp* mitk::PeakImageMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
 
 void mitk::PeakImageMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-//  Superclass::SetDefaultProperties(node, renderer, overwrite);
+  Superclass::SetDefaultProperties(node, renderer, overwrite);
 
   //add other parameters to propertylist
   node->AddProperty( "color", mitk::ColorProperty::New(1.0,1.0,1.0), renderer, overwrite);

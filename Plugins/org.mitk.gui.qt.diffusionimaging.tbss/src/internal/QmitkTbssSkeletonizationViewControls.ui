@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>QmitkTbssSkeletonizationViewControls</class>
  <widget class="QWidget" name="QmitkTbssSkeletonizationViewControls">
@@ -18,6 +18,43 @@
   </property>
   <property name="windowTitle">
    <string>QmitkTemplate</string>
+  </property>
+  <property name="styleSheet">
+   <string>QCommandLinkButton {
+  font-weight: normal;
+}
+
+QCommandLinkButton:disabled {
+  border: none;
+  font-weight: lighter;
+}
+
+QToolBox::tab {
+  border: 1px solid #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:hover {
+  background-color: #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:selected {
+  background-color: #1c97ea;
+  border: 1px solid #1c97ea;
+  font-weight: bold;
+}
+
+QGroupBox {
+  border: 1px solid #434346;
+  background-color: #2d2d30;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: #2d2d30;
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_9">
    <item>
@@ -122,7 +159,7 @@
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11"/>
- <resources/>
- <connections/>
+ <layoutdefault spacing="6" margin="11"></layoutdefault>
+ <resources></resources>
+ <connections></connections>
 </ui>

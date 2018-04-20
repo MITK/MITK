@@ -13,6 +13,7 @@ if(BUILD_BasicImageProcessingMiniApps OR MITK_BUILD_ALL_APPS)
     # they are added after a "^^" and separated by "_"
     set( basicImageProcessingMiniApps
         FileConverter^^MitkCore
+        ImageTypeConverter^^MitkCore
     )
 
     foreach(basicImageProcessingMiniApp ${basicImageProcessingMiniApps})

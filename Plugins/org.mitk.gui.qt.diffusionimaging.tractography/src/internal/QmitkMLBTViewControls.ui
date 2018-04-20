@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>QmitkMLBTViewControls</class>
  <widget class="QWidget" name="QmitkMLBTViewControls">
@@ -12,6 +12,43 @@
   </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string>QCommandLinkButton {
+  font-weight: normal;
+}
+
+QCommandLinkButton:disabled {
+  border: none;
+  font-weight: lighter;
+}
+
+QToolBox::tab {
+  border: 1px solid #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:hover {
+  background-color: #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:selected {
+  background-color: #1c97ea;
+  border: 1px solid #1c97ea;
+  font-weight: bold;
+}
+
+QGroupBox {
+  border: 1px solid #434346;
+  background-color: #2d2d30;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: #2d2d30;
+}</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_8">
    <item row="0" column="0">
@@ -66,7 +103,8 @@
            </property>
            <property name="icon">
             <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
-             <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/list-remove.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/list-remove.svg</iconset>
+             <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/list-remove.svg</normaloff>
+:/org_mitk_icons/icons/tango/scalable/actions/list-remove.svg            </iconset>
            </property>
           </widget>
          </item>
@@ -80,7 +118,8 @@
            </property>
            <property name="icon">
             <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
-             <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/list-add.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/list-add.svg</iconset>
+             <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/list-add.svg</normaloff>
+:/org_mitk_icons/icons/tango/scalable/actions/list-add.svg            </iconset>
            </property>
           </widget>
          </item>
@@ -90,7 +129,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_9">
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#ff0000;&quot;&gt;It is recommended to use the command line application 'RfTraining' instead of this graphical user interface for the training process. Additional feature images are not supported here.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#ff0000;&quot;&gt;The GUI is intended for testing using small examples.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:600; color:#ff0000;"&gt;It is recommended to use the command line application 'RfTraining' instead of this graphical user interface for the training process. Additional feature images are not supported here.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" font-weight:600; color:#ff0000;"&gt;The GUI is intended for testing using small examples.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>
@@ -361,7 +400,7 @@
             <string>Number of previous fiber directions used as features.</string>
            </property>
            <property name="statusTip">
-            <string/>
+            <string></string>
            </property>
            <property name="minimum">
             <number>0</number>
@@ -427,7 +466,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc"/>
+  <include location="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc"></include>
  </resources>
- <connections/>
+ <connections></connections>
 </ui>

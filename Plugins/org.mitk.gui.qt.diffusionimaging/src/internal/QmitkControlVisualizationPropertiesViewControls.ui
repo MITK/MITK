@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>QmitkControlVisualizationPropertiesViewControls</class>
  <widget class="QWidget" name="QmitkControlVisualizationPropertiesViewControls">
@@ -24,6 +24,43 @@
   </property>
   <property name="windowTitle">
    <string>QmitkTemplate</string>
+  </property>
+  <property name="styleSheet">
+   <string>QCommandLinkButton {
+  font-weight: normal;
+}
+
+QCommandLinkButton:disabled {
+  border: none;
+  font-weight: lighter;
+}
+
+QToolBox::tab {
+  border: 1px solid #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:hover {
+  background-color: #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:selected {
+  background-color: #1c97ea;
+  border: 1px solid #1c97ea;
+  font-weight: bold;
+}
+
+QGroupBox {
+  border: 1px solid #434346;
+  background-color: #2d2d30;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: #2d2d30;
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <property name="leftMargin">
@@ -92,10 +129,10 @@
             <string>Multislice Projection</string>
            </property>
            <property name="statusTip">
-            <string/>
+            <string></string>
            </property>
            <property name="whatsThis">
-            <string/>
+            <string></string>
            </property>
            <property name="text">
             <string>MIP</string>
@@ -135,18 +172,19 @@
                <string>Toggle visibility of ODF glyphs (axial)</string>
               </property>
               <property name="statusTip">
-               <string/>
+               <string></string>
               </property>
               <property name="whatsThis">
-               <string/>
+               <string></string>
               </property>
               <property name="text">
-               <string/>
+               <string></string>
               </property>
               <property name="icon">
                <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
                 <normaloff>:/QmitkDiffusionImaging/glyphsoff_T.png</normaloff>
-                <normalon>:/QmitkDiffusionImaging/glyphson_T.png</normalon>:/QmitkDiffusionImaging/glyphsoff_T.png</iconset>
+                <normalon>:/QmitkDiffusionImaging/glyphson_T.png</normalon>
+:/QmitkDiffusionImaging/glyphsoff_T.png               </iconset>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -162,18 +200,19 @@
                <string>Toggle visibility of ODF glyphs (sagittal)</string>
               </property>
               <property name="statusTip">
-               <string/>
+               <string></string>
               </property>
               <property name="whatsThis">
-               <string/>
+               <string></string>
               </property>
               <property name="text">
-               <string/>
+               <string></string>
               </property>
               <property name="icon">
                <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
                 <normaloff>:/QmitkDiffusionImaging/glyphsoff_S.png</normaloff>
-                <normalon>:/QmitkDiffusionImaging/glyphson_S.png</normalon>:/QmitkDiffusionImaging/glyphsoff_S.png</iconset>
+                <normalon>:/QmitkDiffusionImaging/glyphson_S.png</normalon>
+:/QmitkDiffusionImaging/glyphsoff_S.png               </iconset>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -189,18 +228,19 @@
                <string>Toggle visibility of ODF glyphs (coronal)</string>
               </property>
               <property name="statusTip">
-               <string/>
+               <string></string>
               </property>
               <property name="whatsThis">
-               <string/>
+               <string></string>
               </property>
               <property name="text">
-               <string/>
+               <string></string>
               </property>
               <property name="icon">
                <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
                 <normaloff>:/QmitkDiffusionImaging/glyphsoff_C.png</normaloff>
-                <normalon>:/QmitkDiffusionImaging/glyphson_C.png</normalon>:/QmitkDiffusionImaging/glyphsoff_C.png</iconset>
+                <normalon>:/QmitkDiffusionImaging/glyphson_C.png</normalon>
+:/QmitkDiffusionImaging/glyphsoff_C.png               </iconset>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -502,11 +542,12 @@
             <string>Reset to Default Coloring</string>
            </property>
            <property name="text">
-            <string/>
+            <string></string>
            </property>
            <property name="icon">
             <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/color64.gif</normaloff>:/QmitkDiffusionImaging/color64.gif</iconset>
+             <normaloff>:/QmitkDiffusionImaging/color64.gif</normaloff>
+:/QmitkDiffusionImaging/color64.gif            </iconset>
            </property>
           </widget>
          </item>
@@ -516,11 +557,12 @@
             <string>Reset to Default Coloring</string>
            </property>
            <property name="text">
-            <string/>
+            <string></string>
            </property>
            <property name="icon">
             <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/reset.png</normaloff>:/QmitkDiffusionImaging/reset.png</iconset>
+             <normaloff>:/QmitkDiffusionImaging/reset.png</normaloff>
+:/QmitkDiffusionImaging/reset.png            </iconset>
            </property>
           </widget>
          </item>
@@ -530,14 +572,15 @@
             <string>Position Crosshair by 3D-Click</string>
            </property>
            <property name="statusTip">
-            <string/>
+            <string></string>
            </property>
            <property name="text">
-            <string/>
+            <string></string>
            </property>
            <property name="icon">
             <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/crosshair.png</normaloff>:/QmitkDiffusionImaging/crosshair.png</iconset>
+             <normaloff>:/QmitkDiffusionImaging/crosshair.png</normaloff>
+:/QmitkDiffusionImaging/crosshair.png            </iconset>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -553,7 +596,7 @@
             <string>2D Fiberfading on/off</string>
            </property>
            <property name="text">
-            <string/>
+            <string></string>
            </property>
           </widget>
          </item>
@@ -597,7 +640,7 @@
          <item>
           <widget class="QLabel" name="label_5">
            <property name="text">
-            <string>  2D Clipping</string>
+            <string>2D Clipping</string>
            </property>
           </widget>
          </item>
@@ -713,11 +756,11 @@
       </font>
      </property>
      <property name="text">
-      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+      <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1" /&gt;&lt;style type="text/css"&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;One or more slices are rotated.  ODF Visualisation is not possible in rotated planes. Use 'Reinit' on the image node to reset. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;"&gt;
+&lt;p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" color:#ff0000;"&gt;One or more slices are rotated.  ODF Visualisation is not possible in rotated planes. Use 'Reinit' on the image node to reset. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -833,11 +876,12 @@ p, li { white-space: pre-wrap; }
             <string>Reset to Default Coloring</string>
            </property>
            <property name="text">
-            <string/>
+            <string></string>
            </property>
            <property name="icon">
             <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/reset.png</normaloff>:/QmitkDiffusionImaging/reset.png</iconset>
+             <normaloff>:/QmitkDiffusionImaging/reset.png</normaloff>
+:/QmitkDiffusionImaging/reset.png            </iconset>
            </property>
           </widget>
          </item>
@@ -847,11 +891,12 @@ p, li { white-space: pre-wrap; }
             <string>Reset to Default Coloring</string>
            </property>
            <property name="text">
-            <string/>
+            <string></string>
            </property>
            <property name="icon">
             <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/color64.gif</normaloff>:/QmitkDiffusionImaging/color64.gif</iconset>
+             <normaloff>:/QmitkDiffusionImaging/color64.gif</normaloff>
+:/QmitkDiffusionImaging/color64.gif            </iconset>
            </property>
           </widget>
          </item>
@@ -904,16 +949,16 @@ p, li { white-space: pre-wrap; }
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
       <property name="leftMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="spacing">
        <number>0</number>
@@ -981,12 +1026,12 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11"/>
+ <layoutdefault spacing="6" margin="11"></layoutdefault>
  <includes>
   <include location="local">QmitkDataStorageComboBox.h</include>
  </includes>
  <resources>
-  <include location="../../resources/QmitkDiffusionImaging.qrc"/>
+  <include location="../../resources/QmitkDiffusionImaging.qrc"></include>
  </resources>
- <connections/>
+ <connections></connections>
 </ui>

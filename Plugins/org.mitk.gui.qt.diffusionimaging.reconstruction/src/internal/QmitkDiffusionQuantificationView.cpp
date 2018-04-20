@@ -49,10 +49,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateIsDWI.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
-
+#include <QmitkStyleManager.h>
 
 const std::string QmitkDiffusionQuantificationView::VIEW_ID = "org.mitk.views.diffusionquantification";
-
 
 
 QmitkDiffusionQuantificationView::QmitkDiffusionQuantificationView()
@@ -105,6 +104,8 @@ void QmitkDiffusionQuantificationView::CreateConnections()
     connect( (QObject*)(m_Controls->m_ClusteringAnisotropy), SIGNAL(clicked()), this, SLOT(ClusterAnisotropy()) );
     connect( (QObject*)(m_Controls->m_BallStickButton), SIGNAL(clicked()), this, SLOT(DoBallStickCalculation()) );
     connect( (QObject*)(m_Controls->m_MultiTensorButton), SIGNAL(clicked()), this, SLOT(DoMultiTensorCalculation()) );
+
+//    m_Controls->m_FAButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/go-next.svg")));
 
     m_Controls->m_ImageBox->SetDataStorage(this->GetDataStorage());
     mitk::TNodePredicateDataType<mitk::TensorImage>::Pointer isDti = mitk::TNodePredicateDataType<mitk::TensorImage>::New();

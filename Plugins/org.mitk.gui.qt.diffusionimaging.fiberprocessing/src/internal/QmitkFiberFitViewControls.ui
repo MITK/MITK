@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>QmitkFiberFitViewControls</class>
  <widget class="QWidget" name="QmitkFiberFitViewControls">
@@ -12,6 +12,43 @@
   </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string>QCommandLinkButton {
+  font-weight: normal;
+}
+
+QCommandLinkButton:disabled {
+  border: none;
+  font-weight: lighter;
+}
+
+QToolBox::tab {
+  border: 1px solid #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:hover {
+  background-color: #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:selected {
+  background-color: #1c97ea;
+  border: 1px solid #1c97ea;
+  font-weight: bold;
+}
+
+QGroupBox {
+  border: 1px solid #434346;
+  background-color: #2d2d30;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: #2d2d30;
+}</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_10">
    <item row="0" column="0">
@@ -41,7 +78,7 @@
       <item row="4" column="1">
        <widget class="QCheckBox" name="m_OutliersBox">
         <property name="text">
-         <string/>
+         <string></string>
         </property>
         <property name="checked">
          <bool>false</bool>
@@ -56,7 +93,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QmitkDataStorageComboBox" name="m_TractBox"/>
+       <widget class="QmitkDataStorageComboBox" name="m_TractBox"></widget>
       </item>
       <item row="3" column="1">
        <widget class="QDoubleSpinBox" name="m_ReguBox">
@@ -104,7 +141,7 @@
          </font>
         </property>
         <property name="toolTip">
-         <string/>
+         <string></string>
         </property>
         <property name="text">
          <string>Start</string>
@@ -114,7 +151,7 @@
       <item row="0" column="1">
        <widget class="QmitkDataStorageComboBox" name="m_ImageBox">
         <property name="toolTip">
-         <string/>
+         <string></string>
         </property>
        </widget>
       </item>
@@ -135,7 +172,7 @@
       <item row="5" column="1">
        <widget class="QCheckBox" name="m_ResidualsBox">
         <property name="text">
-         <string/>
+         <string></string>
         </property>
         <property name="checked">
          <bool>false</bool>
@@ -210,6 +247,6 @@
    <header location="global">QmitkDataStorageComboBox.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
- <connections/>
+ <resources></resources>
+ <connections></connections>
 </ui>

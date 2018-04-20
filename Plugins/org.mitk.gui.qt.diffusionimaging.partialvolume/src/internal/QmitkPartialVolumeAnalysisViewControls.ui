@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>QmitkPartialVolumeAnalysisViewControls</class>
  <widget class="QWidget" name="QmitkPartialVolumeAnalysisViewControls">
@@ -15,6 +15,43 @@
   </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string>QCommandLinkButton {
+  font-weight: normal;
+}
+
+QCommandLinkButton:disabled {
+  border: none;
+  font-weight: lighter;
+}
+
+QToolBox::tab {
+  border: 1px solid #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:hover {
+  background-color: #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:selected {
+  background-color: #1c97ea;
+  border: 1px solid #1c97ea;
+  font-weight: bold;
+}
+
+QGroupBox {
+  border: 1px solid #434346;
+  background-color: #2d2d30;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: #2d2d30;
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -67,14 +104,14 @@
       <item row="1" column="1">
        <widget class="QLabel" name="m_SelectedImageLabel">
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" color:#ff0000;"&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
        <widget class="QLabel" name="m_SelectedMaskLabel">
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" color:#ff0000;"&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -142,11 +179,12 @@
                <string>Draw circular ROI</string>
               </property>
               <property name="text">
-               <string/>
+               <string></string>
               </property>
               <property name="icon">
                <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-                <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>:/QmitkDiffusionImaging/circle.png</iconset>
+                <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>
+:/QmitkDiffusionImaging/circle.png               </iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -174,11 +212,12 @@
                <string>Draw quadratic ROI</string>
               </property>
               <property name="text">
-               <string/>
+               <string></string>
               </property>
               <property name="icon">
                <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-                <normaloff>:/QmitkDiffusionImaging/rectangle.png</normaloff>:/QmitkDiffusionImaging/rectangle.png</iconset>
+                <normaloff>:/QmitkDiffusionImaging/rectangle.png</normaloff>
+:/QmitkDiffusionImaging/rectangle.png               </iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -206,11 +245,12 @@
                <string>Draw polygonal ROI</string>
               </property>
               <property name="text">
-               <string/>
+               <string></string>
               </property>
               <property name="icon">
                <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-                <normaloff>:/QmitkDiffusionImaging/polygon.png</normaloff>:/QmitkDiffusionImaging/polygon.png</iconset>
+                <normaloff>:/QmitkDiffusionImaging/polygon.png</normaloff>
+:/QmitkDiffusionImaging/polygon.png               </iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -442,7 +482,7 @@
             </size>
            </property>
            <property name="text">
-            <string/>
+            <string></string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -505,7 +545,8 @@
            </property>
            <property name="icon">
             <iconset resource="../../../../../MITK-Superbuild-gcc/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging/org_mitk_gui_qt_diffusionimaging_cached.qrc">
-             <normaloff>:/org.mitk.gui.qt.diffusionimaging/resources/arrow.png</normaloff>:/org.mitk.gui.qt.diffusionimaging/resources/arrow.png</iconset>
+             <normaloff>:/org.mitk.gui.qt.diffusionimaging/resources/arrow.png</normaloff>
+:/org.mitk.gui.qt.diffusionimaging/resources/arrow.png            </iconset>
            </property>
           </widget>
          </item>
@@ -802,12 +843,12 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QSpinBox" name="m_PlanarFiguresThickness"/>
+       <widget class="QSpinBox" name="m_PlanarFiguresThickness"></widget>
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>&quot;Thick&quot; PFs</string>
+         <string>"Thick" PFs</string>
         </property>
        </widget>
       </item>
@@ -838,8 +879,8 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../../../MITK-Superbuild-gcc/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging/org_mitk_gui_qt_diffusionimaging_cached.qrc"/>
-  <include location="../../resources/QmitkDiffusionImaging.qrc"/>
+  <include location="../../../../../MITK-Superbuild-gcc/MITK-build/Plugins/org.mitk.gui.qt.diffusionimaging/org_mitk_gui_qt_diffusionimaging_cached.qrc"></include>
+  <include location="../../resources/QmitkDiffusionImaging.qrc"></include>
  </resources>
- <connections/>
+ <connections></connections>
 </ui>

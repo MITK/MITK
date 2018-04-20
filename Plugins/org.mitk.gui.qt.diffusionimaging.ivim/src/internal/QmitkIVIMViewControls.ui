@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>QmitkIVIMViewControls</class>
  <widget class="QWidget" name="QmitkIVIMViewControls">
@@ -18,6 +18,43 @@
   </property>
   <property name="windowTitle">
    <string>QmitkTemplate</string>
+  </property>
+  <property name="styleSheet">
+   <string>QCommandLinkButton {
+  font-weight: normal;
+}
+
+QCommandLinkButton:disabled {
+  border: none;
+  font-weight: lighter;
+}
+
+QToolBox::tab {
+  border: 1px solid #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:hover {
+  background-color: #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:selected {
+  background-color: #1c97ea;
+  border: 1px solid #1c97ea;
+  font-weight: bold;
+}
+
+QGroupBox {
+  border: 1px solid #434346;
+  background-color: #2d2d30;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: #2d2d30;
+}</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_11">
    <property name="leftMargin">
@@ -42,16 +79,16 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="leftMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="topMargin">
        <number>9</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
      </layout>
     </widget>
@@ -63,16 +100,16 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <item row="1" column="0">
        <widget class="QLabel" name="label_8">
@@ -95,10 +132,10 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QmitkDataStorageComboBox" name="m_DwiBox"/>
+       <widget class="QmitkDataStorageComboBox" name="m_DwiBox"></widget>
       </item>
       <item row="1" column="1">
-       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MaskBox"/>
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MaskBox"></widget>
       </item>
      </layout>
     </widget>
@@ -127,7 +164,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="m_Warning">
         <property name="styleSheet">
-         <string notr="true"/>
+         <string notr="true"></string>
         </property>
         <property name="text">
          <string>warning display</string>
@@ -388,7 +425,7 @@
                 <item row="0" column="1">
                  <widget class="QScrollBar" name="m_BThreshSlider">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="maximum">
                    <number>250</number>
@@ -994,7 +1031,7 @@
                 </layout>
                </item>
                <item row="9" column="2">
-                <widget class="ctkRangeWidget" name="m_KurtosisRangeWidget" native="true"/>
+                <widget class="ctkRangeWidget" name="m_KurtosisRangeWidget" native="true"></widget>
                </item>
                <item row="8" column="2">
                 <widget class="QDoubleSpinBox" name="m_SigmaSpinBox">
@@ -1142,7 +1179,7 @@
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11"/>
+ <layoutdefault spacing="6" margin="11"></layoutdefault>
  <customwidgets>
   <customwidget>
    <class>QmitkDataStorageComboBox</class>
@@ -1173,6 +1210,6 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
- <connections/>
+ <resources></resources>
+ <connections></connections>
 </ui>

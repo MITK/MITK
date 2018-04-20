@@ -474,18 +474,18 @@ void MatrixFeaturesTo(mitk::CoocurenceMatrixFeatures features,
   featureList.push_back(std::make_pair(prefix + "Inverse Difference Moment Normalized", features.InverseDifferenceMomentNormalised));
   featureList.push_back(std::make_pair(prefix + "Inverse Variance", features.InverseVariance));
   featureList.push_back(std::make_pair(prefix + "Correlation", features.Correlation));
-  featureList.push_back(std::make_pair(prefix + "Autocorrleation", features.Autocorrelation));
+  featureList.push_back(std::make_pair(prefix + "Autocorrelation", features.Autocorrelation));
+  featureList.push_back(std::make_pair(prefix + "Cluster Tendency", features.ClusterTendency));
+  featureList.push_back(std::make_pair(prefix + "Cluster Shade", features.ClusterShade));
+  featureList.push_back(std::make_pair(prefix + "Cluster Prominence", features.ClusterProminence));
+  featureList.push_back(std::make_pair(prefix + "First Measure of Information Correlation", features.FirstMeasureOfInformationCorrelation));
+  featureList.push_back(std::make_pair(prefix + "Second Measure of Information Correlation", features.SecondMeasureOfInformationCorrelation));
   featureList.push_back(std::make_pair(prefix + "Row Maximum", features.RowMaximum));
   featureList.push_back(std::make_pair(prefix + "Row Average", features.RowAverage));
   featureList.push_back(std::make_pair(prefix + "Row Variance", features.RowVariance));
   featureList.push_back(std::make_pair(prefix + "Row Entropy", features.RowEntropy));
   featureList.push_back(std::make_pair(prefix + "First Row-Column Entropy", features.FirstRowColumnEntropy));
   featureList.push_back(std::make_pair(prefix + "Second Row-Column Entropy", features.SecondRowColumnEntropy));
-  featureList.push_back(std::make_pair(prefix + "Cluster Tendency", features.ClusterTendency));
-  featureList.push_back(std::make_pair(prefix + "Cluster Shade", features.ClusterShade));
-  featureList.push_back(std::make_pair(prefix + "Cluster Prominence", features.ClusterProminence));
-  featureList.push_back(std::make_pair(prefix + "First Measure of Information Correlation", features.FirstMeasureOfInformationCorrelation));
-  featureList.push_back(std::make_pair(prefix + "Second Measure of Information Correlation", features.SecondMeasureOfInformationCorrelation));
 }
 
 static

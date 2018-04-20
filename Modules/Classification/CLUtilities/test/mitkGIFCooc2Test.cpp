@@ -65,11 +65,43 @@ public:
       MITK_INFO << valuePair.first << " : " << valuePair.second;
       results[valuePair.first] = valuePair.second;
     }
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 18 features.", std::size_t(18), featureList.size());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 18 features.", std::size_t(93), featureList.size());
 
     // These values are obtained with IBSI
     // Standard accuracy is 0.01
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Grey Level Size Zone::Small Zone Emphasis with Large IBSI Phantom Image", 0.255, results["Grey Level Size Zone::Small Zone Emphasis"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.509, results["Co-occurenced Based Features::Overall Joint Maximum"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 2.149, results["Co-occurenced Based Features::Overall Joint Average"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 3.132, results["Co-occurenced Based Features::Overall Joint Variance"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 2.574, results["Co-occurenced Based Features::Overall Joint Entropy"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features:: with Large IBSI Phantom Image", 0.255, results["Co-occurenced Based Features::"], 0.001);
     //CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Grey Level Size Zone:: with Large IBSI Phantom Image", 0.045, results["Grey Level Size Zone::"], 0.001);
 
     // These values are obtained by manually running the tool

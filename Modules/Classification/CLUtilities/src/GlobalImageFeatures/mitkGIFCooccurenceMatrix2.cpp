@@ -442,9 +442,9 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   ss << config.range;
   std::string strRange = ss.str();
 
-  MatrixFeaturesTo(overallFeature, config.prefix + " Overall", featureList);
-  MatrixFeaturesTo(featureMean, config.prefix + " Mean", featureList);
-  MatrixFeaturesTo(featureStd, config.prefix + " Std.Dev.", featureList);
+  MatrixFeaturesTo(overallFeature, config.prefix + "Overall ", featureList);
+  MatrixFeaturesTo(featureMean, config.prefix + "Mean ", featureList);
+  MatrixFeaturesTo(featureStd, config.prefix + "Std.Dev. ", featureList);
 
 
 }
@@ -459,12 +459,6 @@ void MatrixFeaturesTo(mitk::CoocurenceMatrixFeatures features,
   featureList.push_back(std::make_pair(prefix + "Joint Average", features.JointAverage));
   featureList.push_back(std::make_pair(prefix + "Joint Variance", features.JointVariance));
   featureList.push_back(std::make_pair(prefix + "Joint Entropy", features.JointEntropy));
-  featureList.push_back(std::make_pair(prefix + "Row Maximum", features.RowMaximum));
-  featureList.push_back(std::make_pair(prefix + "Row Average", features.RowAverage));
-  featureList.push_back(std::make_pair(prefix + "Row Variance", features.RowVariance));
-  featureList.push_back(std::make_pair(prefix + "Row Entropy", features.RowEntropy));
-  featureList.push_back(std::make_pair(prefix + "First Row-Column Entropy", features.FirstRowColumnEntropy));
-  featureList.push_back(std::make_pair(prefix + "Second Row-Column Entropy", features.SecondRowColumnEntropy));
   featureList.push_back(std::make_pair(prefix + "Difference Average", features.DifferenceAverage));
   featureList.push_back(std::make_pair(prefix + "Difference Variance", features.DifferenceVariance));
   featureList.push_back(std::make_pair(prefix + "Difference Entropy", features.DifferenceEntropy));
@@ -478,9 +472,15 @@ void MatrixFeaturesTo(mitk::CoocurenceMatrixFeatures features,
   featureList.push_back(std::make_pair(prefix + "Inverse Difference Normalized", features.InverseDifferenceNormalised));
   featureList.push_back(std::make_pair(prefix + "Inverse Difference Moment", features.InverseDifferenceMoment));
   featureList.push_back(std::make_pair(prefix + "Inverse Difference Moment Normalized", features.InverseDifferenceMomentNormalised));
-  featureList.push_back(std::make_pair(prefix + " Inverse Variance", features.InverseVariance));
+  featureList.push_back(std::make_pair(prefix + "Inverse Variance", features.InverseVariance));
   featureList.push_back(std::make_pair(prefix + "Correlation", features.Correlation));
   featureList.push_back(std::make_pair(prefix + "Autocorrleation", features.Autocorrelation));
+  featureList.push_back(std::make_pair(prefix + "Row Maximum", features.RowMaximum));
+  featureList.push_back(std::make_pair(prefix + "Row Average", features.RowAverage));
+  featureList.push_back(std::make_pair(prefix + "Row Variance", features.RowVariance));
+  featureList.push_back(std::make_pair(prefix + "Row Entropy", features.RowEntropy));
+  featureList.push_back(std::make_pair(prefix + "First Row-Column Entropy", features.FirstRowColumnEntropy));
+  featureList.push_back(std::make_pair(prefix + "Second Row-Column Entropy", features.SecondRowColumnEntropy));
   featureList.push_back(std::make_pair(prefix + "Cluster Tendency", features.ClusterTendency));
   featureList.push_back(std::make_pair(prefix + "Cluster Shade", features.ClusterShade));
   featureList.push_back(std::make_pair(prefix + "Cluster Prominence", features.ClusterProminence));

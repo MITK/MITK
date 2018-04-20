@@ -60,7 +60,7 @@ namespace mitk {
     mitk::USImageVideoSource::USImageCropping GetCropArea();
 
     /**
-      * \brief Sets new depth value
+      * \brief Sets a new depth value to the current probe.
       */
     void SetNewDepth(double depth);
 
@@ -78,6 +78,12 @@ namespace mitk {
     * \brief Get the scanning dephts of the given probe
     */
     std::vector<int> GetDepthsForProbe(std::string name);
+
+    /**
+    * \brief Sets the first existing probe or the default probe of a USVideoDevice
+    * as the current probe of the USVideoDevice.
+    */
+    void SetDefaultProbeAsCurrentProbe();
 
   protected:
     /**

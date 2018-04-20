@@ -372,7 +372,7 @@ void mitk::USDevice::Deactivate()
   if (!this->GetIsActive())
   {
     MITK_WARN("mitkUSDevice")
-      << "Cannot deactivate a device which is not active.";
+      << "Cannot deactivate a device which is not activae.";
     return;
   }
 
@@ -426,13 +426,14 @@ void mitk::USDevice::SetIsFreezed(bool freeze)
 
 bool mitk::USDevice::GetIsFreezed()
 {
+  /*
   if (!this->GetIsActive())
   {
     MITK_WARN("mitkUSDevice")("mitkUSTelemedDevice")
       << "Cannot get freeze state if the hardware interface is not ready. "
       "Returning false...";
     return false;
-  }
+  }*/
 
   return m_IsFreezed;
 }
@@ -572,6 +573,28 @@ std::string mitk::USDevice::GetDeviceModel() { return m_Name; }
 
 std::string mitk::USDevice::GetDeviceComment() { return m_Comment; }
 
+void mitk::USDevice::SetSpacing(double xSpacing, double ySpacing)
+{
+  m_Spacing[0] = xSpacing;
+  m_Spacing[1] = ySpacing;
+  m_Spacing[2] = 1;
+
+
+  if( m_ImageVector.size() > 0 )
+  {
+    for( size_t index = 0; index < m_ImageVector.size(); ++index )
+    {
+      auto& image = m_ImageVector[index];
+      if( image.IsNotNull() && image->IsInitialized() )
+      {
+        image->GetGeometry()->SetSpacing(m_Spacing);
+      }
+    }
+    this->Modified();
+  }
+  MITK_INFO << "Spacing: " << m_Spacing;
+}
+
 void mitk::USDevice::GenerateData()
 {
   m_ImageMutex->Lock();
@@ -600,10 +623,9 @@ void mitk::USDevice::GenerateData()
       // copy contents of the given image into the member variable
       mitk::ImageReadAccessor inputReadAccessor(image);
       output->SetImportVolume(inputReadAccessor.GetData());
-
       output->SetGeometry(image->GetGeometry());
     }
-  }
+  }  
   m_ImageMutex->Unlock();
 };
 

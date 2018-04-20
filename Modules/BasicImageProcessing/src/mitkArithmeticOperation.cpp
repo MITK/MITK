@@ -24,6 +24,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include "itkUnaryFunctorImageFilter.h"
 #include <itkBinaryFunctorImageFilter.h>
+
+#include <itkTanImageFilter.h>
+#include <itkAtanImageFilter.h>
+#include <itkCosImageFilter.h>
+#include <itkAcosImageFilter.h>
+#include <itkSinImageFilter.h>
+#include <itkAsinImageFilter.h>
+#include <itkRoundImageFilter.h>
+#include <itkSquareImageFilter.h>
+#include <itkSqrtImageFilter.h>
+#include <itkAbsImageFilter.h>
+#include <itkExpImageFilter.h>
+#include <itkExpNegativeImageFilter.h>
+#include <itkLog10ImageFilter.h>
+
+
 namespace mitk
 {
   namespace Functor
@@ -50,50 +66,255 @@ namespace mitk
       bool valueLeft = false;
       double value = 0.0;
     };
+    template< class TInput, class TOutput>
+    class SubValue
+    {
+    public:
+      SubValue() {};
+      ~SubValue() {};
+      bool operator!=(const SubValue &) const
+      {
+        return false;
+      }
+      bool operator==(const SubValue & other) const
+      {
+        return !(*this != other);
+      }
+      inline TOutput operator()(const TInput & A) const
+      {
+        if (valueLeft)
+          return value - A;
+        else
+          return A - value;
+      }
+
+      bool valueLeft = false;
+      double value = 0.0;
+    };
+    template< class TInput, class TOutput>
+    class MultValue
+    {
+    public:
+      MultValue() {};
+      ~MultValue() {};
+      bool operator!=(const MultValue &) const
+      {
+        return false;
+      }
+      bool operator==(const MultValue & other) const
+      {
+        return !(*this != other);
+      }
+      inline TOutput operator()(const TInput & A) const
+      {
+        return A * value;
+      }
+
+      bool valueLeft = false;
+      double value = 0.0;
+    };
+    template< class TInput, class TOutput>
+    class DivValue
+    {
+    public:
+      DivValue() {};
+      ~DivValue() {};
+      bool operator!=(const DivValue &) const
+      {
+        return false;
+      }
+      bool operator==(const DivValue & other) const
+      {
+        return !(*this != other);
+      }
+      inline TOutput operator()(const TInput & A) const
+      {
+        if (valueLeft)
+          return value / A;
+        else
+          return A / value;
+      }
+
+      bool valueLeft = false;
+      double value = 1.0;
+    };
+    template< class TInput, class TOutput>
+    class PowValue
+    {
+    public:
+      DivValue() {};
+      ~DivValue() {};
+      bool operator!=(const DivValue &) const
+      {
+        return false;
+      }
+      bool operator==(const DivValue & other) const
+      {
+        return !(*this != other);
+      }
+      inline TOutput operator()(const TInput & A) const
+      {
+        if (valueLeft)
+          return std::pow<TOutput>(value, A);
+        else
+          return std::pow<TOutput>(A, value);
+      }
+
+      bool valueLeft = false;
+      double value = 1.0;
+    };
   }
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-static void ExecuteOneImageFilter(itk::Image<TPixel, VImageDimension>* imageA, double value, bool returnDoubleImage, bool valueLeft, mitk::NonStaticArithmeticOperation::OperationsEnum algorithm, mitk::Image::Pointer & outputImage)
+static void ExecuteOneImageFilter(itk::Image<TPixel, VImageDimension>* imageA, double value, bool returnDoubleImage, bool valueLeft, bool parameterFree, mitk::NonStaticArithmeticOperation::OperationsEnum algorithm, mitk::Image::Pointer & outputImage)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<double, VImageDimension> DoubleOutputType;
 
 
   switch (algorithm) {
-  case OperationsEnum::AddValue:
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::AddValue:
     ExecuteOneImageFilterWithFunctor<mitk::Functor::AddValue<TPixel, TPixel>,
                                      mitk::Functor::AddValue<TPixel, double>,
-                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, mitk::Image::Pointer & outputImage);
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::SubValue:
+    ExecuteOneImageFilterWithFunctor<mitk::Functor::SubValue<TPixel, TPixel>,
+                                     mitk::Functor::SubValue<TPixel, double>,
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::MultValue:
+      ExecuteOneImageFilterWithFunctor<mitk::Functor::MultValue<TPixel, TPixel>,
+                                       mitk::Functor::MultValue<TPixel, double>,
+                                       ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::DivValue:
+    ExecuteOneImageFilterWithFunctor<mitk::Functor::DivValue<TPixel, TPixel>,
+                                     mitk::Functor::DivValue<TPixel, double>,
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::PowValue:
+    ExecuteOneImageFilterWithFunctor<mitk::Functor::PowValue<TPixel, TPixel>,
+                                     mitk::Functor::PowValue<TPixel, double>,
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::Tan:
+    ExecuteOneImageFilterWithFunctorNonParameter<itk::Functor::Tan<TPixel, TPixel>,
+                                     itk::Functor::Tan<TPixel, double>,
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::ATan:
+    ExecuteOneImageFilterWithFunctorNonParameter<itk::Functor::ATan<TPixel, TPixel>,
+                                     itk::Functor::ATan<TPixel, double>,
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::Cos:
+    ExecuteOneImageFilterWithFunctorNonParameter<itk::Functor::Cos<TPixel, TPixel>,
+                                     itk::Functor::Cos<TPixel, double>,
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::ACos:
+    ExecuteOneImageFilterWithFunctorNonParameter<itk::Functor::Acos<TPixel, TPixel>,
+                                     itk::Functor::Acos<TPixel, double>,
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::Sin:
+    ExecuteOneImageFilterWithFunctorNonParameter<itk::Functor::Sin<TPixel, TPixel>,
+                                     itk::Functor::Sin<TPixel, double>,
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::ASin:
+    ExecuteOneImageFilterWithFunctorNonParameter<itk::Functor::Asin<TPixel, TPixel>,
+                                     itk::Functor::Asin<TPixel, double>,
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::Round:
+    ExecuteOneImageFilterWithFunctorNonParameter<itk::Functor::Round<TPixel, TPixel>,
+                                     itk::Functor::Round<TPixel, double>,
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::Square:
+    ExecuteOneImageFilterWithFunctorNonParameter<itk::Functor::Square<TPixel, TPixel>,
+                                     itk::Functor::Square<TPixel, double>,
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::Sqrt:
+    ExecuteOneImageFilterWithFunctorNonParameter<itk::Functor::Sqrt<TPixel, TPixel>,
+                                     itk::Functor::Sqrt<TPixel, double>,
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::Abs:
+    ExecuteOneImageFilterWithFunctorNonParameter<itk::Functor::Abs<TPixel, TPixel>,
+                                     itk::Functor::Abs<TPixel, double>,
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::Exp:
+    ExecuteOneImageFilterWithFunctorNonParameter<itk::Functor::Exp<TPixel, TPixel>,
+                                     itk::Functor::Exp<TPixel, double>,
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::ExpNeg:
+    ExecuteOneImageFilterWithFunctorNonParameter<itk::Functor::ExpNegative<TPixel, TPixel>,
+                                     itk::Functor::ExpNegative<TPixel, double>,
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
+    break;
+  case mitk::NonStaticArithmeticOperation::OperationsEnum::Log10:
+    ExecuteOneImageFilterWithFunctorNonParameter<itk::Functor::Log10<TPixel, TPixel>,
+                                     itk::Functor::Log10<TPixel, double>,
+                                     ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
     break;
   }
 }
 
 template<typename DefaultFunctorType, typename DoubleFunctorType, typename ImageType, typename DoubleImageType >
-static void ExecuteOneImageFilterWithFunctor(ImageType* imageA, double value, bool returnDoubleImage, bool valueLeft, mitk::Image::Pointer & outputImage)
+static void ExecuteOneImageFilterWithFunctor(ImageType* imageA, double value, bool returnDoubleImage, bool valueLeft, bool parameterFree, mitk::Image::Pointer & outputImage)
 {
-  typedef itk::UnaryFunctorImageFilter< Image1Type, Image1Type, DefaultFunctorType > DefaultFilterType;
-  typedef itk::UnaryFunctorImageFilter< Image1Type, DoubleImageType, DoubleFunctorType > DoubleFilterType;
+  typedef itk::UnaryFunctorImageFilter< ImageType, ImageType, DefaultFunctorType > DefaultFilterType;
+  typedef itk::UnaryFunctorImageFilter< ImageType, DoubleImageType, DoubleFunctorType > DoubleFilterType;
 
   if (returnDoubleImage)
   {
-    DoubleFunctorType functor;
+    typename DoubleFilterType::Pointer filter = DoubleFilterType::New();
+    filter->SetInput(imageA);
+    DoubleFunctorType functor = filter->GetFunctor();
     functor.valueLeft = valueLeft;
     functor.value = value;
-    typename DoubleFilterType::Pointer filter = DoubleFilterType::New();
-    filter->SetInput1(imageA);
     filter->SetFunctor(functor);
     filter->Update();
     CastToMitkImage(filter->GetOutput(), outputImage);
   }
   else
   {
-    DefaultFunctorType functor;
+    typename DefaultFilterType::Pointer filter = DefaultFilterType::New();
+    filter->SetInput(imageA);
+    DefaultFunctorType functor = filter->GetFunctor();
     functor.valueLeft = valueLeft;
     functor.value = value;
-    typename DefaultFilterType::Pointer filter = DefaultFilterType::New();
-    filter->SetInput1(imageA);
     filter->SetFunctor(functor);
+    filter->Update();
+    CastToMitkImage(filter->GetOutput(), outputImage);
+  }
+}
+
+template<typename DefaultFunctorType, typename DoubleFunctorType, typename ImageType, typename DoubleImageType >
+static void ExecuteOneImageFilterWithFunctorNonParameter(ImageType* imageA, double value, bool returnDoubleImage, bool valueLeft, bool parameterFree, mitk::Image::Pointer & outputImage)
+{
+  typedef itk::UnaryFunctorImageFilter< ImageType, ImageType, DefaultFunctorType > DefaultFilterType;
+  typedef itk::UnaryFunctorImageFilter< ImageType, DoubleImageType, DoubleFunctorType > DoubleFilterType;
+
+  if (returnDoubleImage)
+  {
+    typename DoubleFilterType::Pointer filter = DoubleFilterType::New();
+    filter->SetInput(imageA);
+    filter->Update();
+    CastToMitkImage(filter->GetOutput(), outputImage);
+  }
+  else
+  {
+    typename DefaultFilterType::Pointer filter = DefaultFilterType::New();
+    filter->SetInput(imageA);
     filter->Update();
     CastToMitkImage(filter->GetOutput(), outputImage);
   }
@@ -135,7 +356,130 @@ mitk::Image::Pointer mitk::ArithmeticOperation::Divide(Image::Pointer & imageA, 
 mitk::Image::Pointer mitk::ArithmeticOperation::Add(Image::Pointer & imageA, double value, bool outputAsDouble)
 {
   mitk::Image::Pointer resultImage;
-  AccessByItk_n(imageA, ExecuteOneImageFilter, (value, outputAsDouble, false, NonStaticArithmeticOperation::OperationsEnum::AddValue, resultImage));
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (value, outputAsDouble, false, false, NonStaticArithmeticOperation::OperationsEnum::AddValue, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Subtract(Image::Pointer & imageA, double value, bool outputAsDouble)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (value, outputAsDouble, false, false, NonStaticArithmeticOperation::OperationsEnum::SubValue, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Multiply(Image::Pointer & imageA, double value, bool outputAsDouble)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (value, outputAsDouble, false, false, NonStaticArithmeticOperation::OperationsEnum::MultValue, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Divide(Image::Pointer & imageA, double value, bool outputAsDouble)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (value, outputAsDouble, false, false, NonStaticArithmeticOperation::OperationsEnum::DivValue, resultImage));
+  return resultImage;
+}
+
+mitk::Image::Pointer mitk::ArithmeticOperation::Add(double value, Image::Pointer & imageA, bool outputAsDouble)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (value, outputAsDouble, true, false, NonStaticArithmeticOperation::OperationsEnum::AddValue, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Subtract(double value, Image::Pointer & imageA, bool outputAsDouble)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (value, outputAsDouble, true, false, NonStaticArithmeticOperation::OperationsEnum::SubValue, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Multiply(double value, Image::Pointer & imageA, bool outputAsDouble)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (value, outputAsDouble, true, false, NonStaticArithmeticOperation::OperationsEnum::MultValue, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Divide(double value, Image::Pointer & imageA, bool outputAsDouble)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (value, outputAsDouble, true, false, NonStaticArithmeticOperation::OperationsEnum::DivValue, resultImage));
+  return resultImage;
+}
+
+
+mitk::Image::Pointer mitk::ArithmeticOperation::Tan(Image::Pointer & imageA, bool outputAsDouble = true)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (0.0, outputAsDouble, true, true, NonStaticArithmeticOperation::OperationsEnum::Tan, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Atan(Image::Pointer & imageA, bool outputAsDouble = true)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (0.0, outputAsDouble, true, true, NonStaticArithmeticOperation::OperationsEnum::ATan, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Sin(Image::Pointer & imageA, bool outputAsDouble = true)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (0.0, outputAsDouble, true, true, NonStaticArithmeticOperation::OperationsEnum::Sin, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Asin(Image::Pointer & imageA, bool outputAsDouble = true)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (0.0, outputAsDouble, true, true, NonStaticArithmeticOperation::OperationsEnum::ASin, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Cos(Image::Pointer & imageA, bool outputAsDouble = true)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (0.0, outputAsDouble, true, true, NonStaticArithmeticOperation::OperationsEnum::Cos, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Acos(Image::Pointer & imageA, bool outputAsDouble = true)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (0.0, outputAsDouble, true, true, NonStaticArithmeticOperation::OperationsEnum::ACos, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Round(Image::Pointer & imageA, bool outputAsDouble = true)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (0.0, outputAsDouble, true, true, NonStaticArithmeticOperation::OperationsEnum::Round, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Square(Image::Pointer & imageA, bool outputAsDouble = true)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (0.0, outputAsDouble, true, true, NonStaticArithmeticOperation::OperationsEnum::Square, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Sqrt(Image::Pointer & imageA, bool outputAsDouble = true)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (0.0, outputAsDouble, true, true, NonStaticArithmeticOperation::OperationsEnum::Sqrt, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Abs(Image::Pointer & imageA, bool outputAsDouble = true)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (0.0, outputAsDouble, true, true, NonStaticArithmeticOperation::OperationsEnum::Abs, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Exp(Image::Pointer & imageA, bool outputAsDouble = true)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (0.0, outputAsDouble, true, true, NonStaticArithmeticOperation::OperationsEnum::Exp, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::ExpNeg(Image::Pointer & imageA, bool outputAsDouble = true)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (0.0, outputAsDouble, true, true, NonStaticArithmeticOperation::OperationsEnum::ExpNeg, resultImage));
+  return resultImage;
+}
+mitk::Image::Pointer mitk::ArithmeticOperation::Log10(Image::Pointer & imageA, bool outputAsDouble = true)
+{
+  mitk::Image::Pointer resultImage;
+  AccessByItk_n(imageA, ExecuteOneImageFilter, (0.0, outputAsDouble, true, true, NonStaticArithmeticOperation::OperationsEnum::Log10, resultImage));
   return resultImage;
 }
 

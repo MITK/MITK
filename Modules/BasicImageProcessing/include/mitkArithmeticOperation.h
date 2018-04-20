@@ -33,20 +33,30 @@ namespace mitk
     static Image::Pointer Subtract(Image::Pointer & imageA, Image::Pointer & imageB, bool outputAsDouble = true);
     static Image::Pointer Multiply(Image::Pointer & imageA, Image::Pointer & imageB, bool outputAsDouble = true);
     static Image::Pointer Divide(Image::Pointer & imageA, Image::Pointer & imageB, bool outputAsDouble = true);
-    //static Image::Pointer Exp(Image::Pointer & imageA, Image::Pointer & imageB, bool outputAsDouble = true);
 
     static Image::Pointer Add(Image::Pointer & imageA, double value, bool outputAsDouble = true);
-    //static Image::Pointer Subtract(Image::Pointer & imageA, double value, bool outputAsDouble = true);
-    //static Image::Pointer Multiply(Image::Pointer & imageA, double value, bool outputAsDouble = true);
-    //static Image::Pointer Divide(Image::Pointer & imageA, double value, bool outputAsDouble = true);
+    static Image::Pointer Subtract(Image::Pointer & imageA, double value, bool outputAsDouble = true);
+    static Image::Pointer Multiply(Image::Pointer & imageA, double value, bool outputAsDouble = true);
+    static Image::Pointer Divide(Image::Pointer & imageA, double value, bool outputAsDouble = true);
 
-    //static Image::Pointer Add(double value, Image::Pointer & imageB, bool outputAsDouble = true);
-    //static Image::Pointer Subtract(double value, Image::Pointer & imageB, bool outputAsDouble = true);
-    //static Image::Pointer Multiply(double value, Image::Pointer & imageB, bool outputAsDouble = true);
-    //static Image::Pointer Divide(double value, Image::Pointer & imageB, bool outputAsDouble = true);
+    static Image::Pointer Add(double value, Image::Pointer & imageB, bool outputAsDouble = true);
+    static Image::Pointer Subtract(double value, Image::Pointer & imageB, bool outputAsDouble = true);
+    static Image::Pointer Multiply(double value, Image::Pointer & imageB, bool outputAsDouble = true);
+    static Image::Pointer Divide(double value, Image::Pointer & imageB, bool outputAsDouble = true);
 
-    //static Image::Pointer Log(Image::Pointer & imageA, bool outputAsDouble = true);
-    //static Image::Pointer Exp(Image::Pointer & imageA, bool outputAsDouble = true);
+    static Image::Pointer Tan(Image::Pointer & imageA, bool outputAsDouble = true);
+    static Image::Pointer Atan(Image::Pointer & imageA, bool outputAsDouble = true);
+    static Image::Pointer Cos(Image::Pointer & imageA, bool outputAsDouble = true);
+    static Image::Pointer Acos(Image::Pointer & imageA, bool outputAsDouble = true);
+    static Image::Pointer Sin(Image::Pointer & imageA, bool outputAsDouble = true);
+    static Image::Pointer Asin(Image::Pointer & imageA, bool outputAsDouble = true);
+    static Image::Pointer Round(Image::Pointer & imageA, bool outputAsDouble = true);
+    static Image::Pointer Square(Image::Pointer & imageA, bool outputAsDouble = true);
+    static Image::Pointer Sqrt(Image::Pointer & imageA, bool outputAsDouble = true);
+    static Image::Pointer Abs(Image::Pointer & imageA, bool outputAsDouble = true);
+    static Image::Pointer Exp(Image::Pointer & imageA, bool outputAsDouble = true);
+    static Image::Pointer ExpNeg(Image::Pointer & imageA, bool outputAsDouble = true);
+    static Image::Pointer Log10(Image::Pointer & imageA, bool outputAsDouble = true);
  };
 
   class MITKBASICIMAGEPROCESSING_EXPORT NonStaticArithmeticOperation {
@@ -57,7 +67,24 @@ namespace mitk
       Sub2,
       Mult,
       Div,
-      AddValue
+      AddValue,
+      SubValue,
+      MultValue,
+      DivValue,
+      PowValue,
+      Tan,
+      ATan,
+      Cos,
+      ACos,
+      Sin,
+      ASin,
+      Round,
+      Square,
+      Sqrt,
+      Abs,
+      Exp,
+      ExpNeg,
+      Log10
     };
 
 

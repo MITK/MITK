@@ -6,5 +6,3 @@ MITK_CREATE_MODULE(
 )
 
 add_subdirectory(MiniApps)
-#add_subdirectory(autoload/IO)
-#add_subdirectory(test)

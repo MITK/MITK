@@ -1,6 +1,6 @@
-option(BUILD_ClassificationMiniApps "Build commandline tools for classification" OFF)
+option(BUILD_BasicImageProcessingMiniApps "Build commandline tools for Basic Image Processing" OFF)
 
-if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
+if(BUILD_BasicImageProcessingMiniApps OR MITK_BUILD_ALL_APPS)
 
 
   include_directories(
@@ -11,13 +11,13 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     # list of miniapps
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
-    set( classificationminiapps
+    set( basicImageProcessingMiniApps
         FileConverter^^MitkCore
     )
 
-    foreach(classificationminiapps ${classificationminiapps})
+    foreach(basicImageProcessingMiniApp ${basicImageProcessingMiniApps})
       # extract mini app name and dependencies
-      string(REPLACE "^^" "\\;" miniapp_info ${classificationminiapps})
+      string(REPLACE "^^" "\\;" miniapp_info ${basicImageProcessingMiniApp})
       set(miniapp_info_list ${miniapp_info})
       list(GET miniapp_info_list 0 appname)
       list(GET miniapp_info_list 1 raw_dependencies)

@@ -121,7 +121,7 @@ void mitk::USDeviceWriterXML::CreateXmlInformationOfProbesTag(TiXmlElement * par
     TiXmlElement *probesTag = new TiXmlElement(TAG_PROBES);
     parentTag->LinkEndChild(probesTag);
 
-    for (int index = 0; index < config.probes.size(); ++index)
+    for (size_t index = 0; index < config.probes.size(); ++index)
     {
       TiXmlElement *probeTag = new TiXmlElement(TAG_PROBE);
       probesTag->LinkEndChild(probeTag);

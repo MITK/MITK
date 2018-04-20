@@ -1135,9 +1135,7 @@ void QmitkUltrasoundCalibration::OnUSDepthChanged(const std::string& key, const 
   //whenever depth of USImage is changed the spacing should no longer be overwritten
   if (key == mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH)
   {
-<<<<<<< HEAD
+
     m_OverrideSpacing = false;
-=======
->>>>>>> 67a979a... Realized the logic between the mapping of different calculable spacing vectors and various ultrasound probes and their corresponding depths. This belongs mainly to the USVideoDevice class. Additionally, the calculated spacing is set automatically to the actual ultrasound images if the used ultrasound device type belongs to the USVideoDevice.
   }
 }

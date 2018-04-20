@@ -582,7 +582,7 @@ void mitk::USDevice::SetSpacing(double xSpacing, double ySpacing)
 
   if( m_ImageVector.size() > 0 )
   {
-    for( int index = 0; index < m_ImageVector.size(); ++index )
+    for( size_t index = 0; index < m_ImageVector.size(); ++index )
     {
       auto& image = m_ImageVector[index];
       if( image.IsNotNull() && image->IsInitialized() )

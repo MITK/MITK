@@ -210,40 +210,40 @@ public:
 
     // These values are obtained with IBSI (2D Avg)
     // Standard accuracy is 0.01
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Joint Maximum with Large IBSI Phantom Image", 0.503, results["Co-occurenced Based Features::Mean Joint Maximum"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Joint Average with Large IBSI Phantom Image", 2.143, results["Co-occurenced Based Features::Mean Joint Average"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Joint Variance with Large IBSI Phantom Image", 3.099, results["Co-occurenced Based Features::Mean Joint Variance"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Joint Entropy with Large IBSI Phantom Image", 2.399, results["Co-occurenced Based Features::Mean Joint Entropy"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Difference Average with Large IBSI Phantom Image", 1.431, results["Co-occurenced Based Features::Mean Difference Average"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Difference Variance with Large IBSI Phantom Image", 3.056, results["Co-occurenced Based Features::Mean Difference Variance"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Difference Entropy with Large IBSI Phantom Image", 1.563, results["Co-occurenced Based Features::Mean Difference Entropy"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Sum Average with Large IBSI Phantom Image", 4.2859, results["Co-occurenced Based Features::Mean Sum Average"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Sum Variance with Large IBSI Phantom Image", 7.072, results["Co-occurenced Based Features::Mean Sum Variance"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Sum Entropy with Large IBSI Phantom Image", 1.9226, results["Co-occurenced Based Features::Mean Sum Entropy"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Angular Second Moment with Large IBSI Phantom Image", 0.303, results["Co-occurenced Based Features::Mean Angular Second Moment"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Contrast with Large IBSI Phantom Image", 5.3245, results["Co-occurenced Based Features::Mean Contrast"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Dissimilarity with Large IBSI Phantom Image", 1.431, results["Co-occurenced Based Features::Mean Dissimilarity"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Inverse Difference with Large IBSI Phantom Image", 0.6766, results["Co-occurenced Based Features::Mean Inverse Difference"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Inverse Difference Normalized with Large IBSI Phantom Image", 0.8506, results["Co-occurenced Based Features::Mean Inverse Difference Normalized"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Inverse Difference Moment with Large IBSI Phantom Image", 0.6177, results["Co-occurenced Based Features::Mean Inverse Difference Moment"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Inverse Difference Moment Normalized with Large IBSI Phantom Image", 0.8984, results["Co-occurenced Based Features::Mean Inverse Difference Moment Normalized"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Inverse Variance with Large IBSI Phantom Image", 0.0604, results["Co-occurenced Based Features::Mean Inverse Variance"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Correlation with Large IBSI Phantom Image", 0.157, results["Co-occurenced Based Features::Mean Correlation"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Autocorrelation with Large IBSI Phantom Image", 5.05544, results["Co-occurenced Based Features::Mean Autocorrelation"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Cluster Tendency with Large IBSI Phantom Image", 7.0728, results["Co-occurenced Based Features::Mean Cluster Tendency"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Cluster Shade with Large IBSI Phantom Image", 16.6441, results["Co-occurenced Based Features::Mean Cluster Shade"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Cluster Prominence with Large IBSI Phantom Image", 144.703, results["Co-occurenced Based Features::Mean Cluster Prominence"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean First Measure of Information Correlation with Large IBSI Phantom Image", -0.15684, results["Co-occurenced Based Features::Mean First Measure of Information Correlation"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Second Measure of Information Correlation with Large IBSI Phantom Image", 0.519588, results["Co-occurenced Based Features::Mean Second Measure of Information Correlation"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Joint Maximum with Large IBSI Phantom Image", 0.5188, results["SliceWise Mean Co-occurenced Based Features::Mean Joint Maximum"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Joint Average with Large IBSI Phantom Image", 2.14242, results["SliceWise Mean Co-occurenced Based Features::Mean Joint Average"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Joint Variance with Large IBSI Phantom Image", 2.6877, results["SliceWise Mean Co-occurenced Based Features::Mean Joint Variance"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Joint Entropy with Large IBSI Phantom Image", 2.04966, results["SliceWise Mean Co-occurenced Based Features::Mean Joint Entropy"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Difference Average with Large IBSI Phantom Image", 1.42247, results["SliceWise Mean Co-occurenced Based Features::Mean Difference Average"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Difference Variance with Large IBSI Phantom Image", 2.90159, results["SliceWise Mean Co-occurenced Based Features::Mean Difference Variance"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Difference Entropy with Large IBSI Phantom Image", 1.39615, results["SliceWise Mean Co-occurenced Based Features::Mean Difference Entropy"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Sum Average with Large IBSI Phantom Image", 4.28484, results["SliceWise Mean Co-occurenced Based Features::Mean Sum Average"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Sum Variance with Large IBSI Phantom Image", 5.47293, results["SliceWise Mean Co-occurenced Based Features::Mean Sum Variance"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Sum Entropy with Large IBSI Phantom Image", 1.60319, results["SliceWise Mean Co-occurenced Based Features::Mean Sum Entropy"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Angular Second Moment with Large IBSI Phantom Image", 0.367529, results["SliceWise Mean Co-occurenced Based Features::Mean Angular Second Moment"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Contrast with Large IBSI Phantom Image", 5.27785, results["SliceWise Mean Co-occurenced Based Features::Mean Contrast"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Dissimilarity with Large IBSI Phantom Image", 1.42247, results["SliceWise Mean Co-occurenced Based Features::Mean Dissimilarity"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Inverse Difference with Large IBSI Phantom Image", 0.677949, results["SliceWise Mean Co-occurenced Based Features::Mean Inverse Difference"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Inverse Difference Normalized with Large IBSI Phantom Image", 0.851399, results["SliceWise Mean Co-occurenced Based Features::Mean Inverse Difference Normalized"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Inverse Difference Moment with Large IBSI Phantom Image", 0.618737, results["SliceWise Mean Co-occurenced Based Features::Mean Inverse Difference Moment"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Inverse Difference Moment Normalized with Large IBSI Phantom Image", 0.899219, results["SliceWise Mean Co-occurenced Based Features::Mean Inverse Difference Moment Normalized"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Inverse Variance with Large IBSI Phantom Image", 0.0566983, results["SliceWise Mean Co-occurenced Based Features::Mean Inverse Variance"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Correlation with Large IBSI Phantom Image", -.012107, results["SliceWise Mean Co-occurenced Based Features::Mean Correlation"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Autocorrelation with Large IBSI Phantom Image", 5.09437, results["SliceWise Mean Co-occurenced Based Features::Mean Autocorrelation"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Cluster Tendency with Large IBSI Phantom Image", 5.47293, results["SliceWise Mean Co-occurenced Based Features::Mean Cluster Tendency"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Cluster Shade with Large IBSI Phantom Image", 6.99782, results["SliceWise Mean Co-occurenced Based Features::Mean Cluster Shade"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Cluster Prominence with Large IBSI Phantom Image", 79.1126, results["SliceWise Mean Co-occurenced Based Features::Mean Cluster Prominence"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean First Measure of Information Correlation with Large IBSI Phantom Image", -0.15512, results["SliceWise Mean Co-occurenced Based Features::Mean First Measure of Information Correlation"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Second Measure of Information Correlation with Large IBSI Phantom Image", 0.487457, results["SliceWise Mean Co-occurenced Based Features::Mean Second Measure of Information Correlation"], 0.001);
 
     // These values are obtained by manually running the tool
     // Values might be wrong.
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Row Maximum with Large IBSI Phantom Image", 0.6808, results["Co-occurenced Based Features::Mean Row Maximum"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Row Average with Large IBSI Phantom Image", 2.143, results["Co-occurenced Based Features::Mean Row Average"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Row Variance with Large IBSI Phantom Image", 3.0993, results["Co-occurenced Based Features::Mean Row Variance"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Row Entropy with Large IBSI Phantom Image", 1.29699, results["Co-occurenced Based Features::Mean Row Entropy"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean First Row-Column Entropy with Large IBSI Phantom Image", 2.5939, results["Co-occurenced Based Features::Mean First Row-Column Entropy"], 0.001);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Co-occurenced Based Features::Mean Second Row-Column Entropy with Large IBSI Phantom Image", 2.5939, results["Co-occurenced Based Features::Mean Second Row-Column Entropy"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Row Maximum with Large IBSI Phantom Image", 0.689717, results["SliceWise Mean Co-occurenced Based Features::Mean Row Maximum"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Row Average with Large IBSI Phantom Image", 2.14242, results["SliceWise Mean Co-occurenced Based Features::Mean Row Average"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Row Variance with Large IBSI Phantom Image", 2.6877, results["SliceWise Mean Co-occurenced Based Features::Mean Row Variance"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Row Entropy with Large IBSI Phantom Image", 1.1238, results["SliceWise Mean Co-occurenced Based Features::Mean Row Entropy"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean First Row-Column Entropy with Large IBSI Phantom Image", 2.24761, results["SliceWise Mean Co-occurenced Based Features::Mean First Row-Column Entropy"], 0.001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("SliceWise Mean Co-occurenced Based Features::Mean Second Row-Column Entropy with Large IBSI Phantom Image", 2.24761, results["SliceWise Mean Co-occurenced Based Features::Mean Second Row-Column Entropy"], 0.001);
   }
 
 };

@@ -1,4 +1,5 @@
 set(MODULE_TESTS
+  mitkGIFCooc2Test
   mitkGIFCurvatureStatisticTest
   mitkGIFFirstOrderHistogramStatisticsTest
   mitkGIFGreyLevelDistanceZoneTest

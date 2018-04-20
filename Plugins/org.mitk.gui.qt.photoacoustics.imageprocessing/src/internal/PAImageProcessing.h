@@ -230,7 +230,7 @@ signals:
   void result(mitk::Image::Pointer);
 
 public:
-  void setConfig(float BPHighPass, float BPLowPass, float TukeyAlpha, float recordTime);
+  void setConfig(float BPHighPass, float BPLowPass, float TukeyAlphaHighPass, float TukeyAlphaLowPass, float recordTime);
   void setInputImage(mitk::Image::Pointer image);
   void setFilterBank(mitk::PhotoacousticFilterService::Pointer filterBank)
   {
@@ -242,7 +242,8 @@ protected:
 
   float m_BPHighPass;
   float m_BPLowPass;
-  float m_TukeyAlpha;
+  float m_TukeyAlphaHighPass;
+  float m_TukeyAlphaLowPass;
   float m_RecordTime;
 
   mitk::PhotoacousticFilterService::Pointer m_FilterBank;

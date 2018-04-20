@@ -278,7 +278,9 @@ void PAImageProcessing::BatchProcessing()
         BPLowPass = 0;
       }
 
-      image = m_FilterBank->BandpassFilter(image, recordTime, BPHighPass, BPLowPass, m_Controls.BPFalloff->value());
+      image = m_FilterBank->BandpassFilter(image, recordTime, BPHighPass, BPLowPass,
+                                           m_Controls.BPFalloffHigh->value(),
+                                           m_Controls.BPFalloffLow->value());
 
       if (saveSteps[2])
       {
@@ -682,7 +684,7 @@ void PAImageProcessing::StartBandpassThread()
         BPLowPass = 0;
       }
 
-      thread->setConfig(BPHighPass, BPLowPass, m_Controls.BPFalloff->value(), recordTime);
+      thread->setConfig(BPHighPass, BPLowPass, m_Controls.BPFalloffLow->value(), m_Controls.BPFalloffHigh->value(), recordTime);
       thread->setInputImage(image);
       thread->setFilterBank(m_FilterBank);
 
@@ -981,7 +983,8 @@ void PAImageProcessing::EnableControls()
 
   m_Controls.BPhigh->setEnabled(true);
   m_Controls.BPlow->setEnabled(true);
-  m_Controls.BPFalloff->setEnabled(true);
+  m_Controls.BPFalloffLow->setEnabled(true);
+  m_Controls.BPFalloffHigh->setEnabled(true);
   m_Controls.UseImageSpacing->setEnabled(true);
   UseImageSpacing();
   m_Controls.Pitch->setEnabled(true);
@@ -1033,7 +1036,8 @@ void PAImageProcessing::DisableControls()
 
   m_Controls.BPhigh->setEnabled(false);
   m_Controls.BPlow->setEnabled(false);
-  m_Controls.BPFalloff->setEnabled(false);
+  m_Controls.BPFalloffLow->setEnabled(false);
+  m_Controls.BPFalloffHigh->setEnabled(false);
   m_Controls.UseImageSpacing->setEnabled(false);
   m_Controls.ScanDepth->setEnabled(false);
   m_Controls.Pitch->setEnabled(false);
@@ -1137,15 +1141,16 @@ void BandpassThread::run()
 {
   mitk::Image::Pointer resultImage;
 
-  resultImage = m_FilterBank->BandpassFilter(m_InputImage, m_RecordTime, m_BPHighPass, m_BPLowPass, m_TukeyAlpha);
+  resultImage = m_FilterBank->BandpassFilter(m_InputImage, m_RecordTime, m_BPHighPass, m_BPLowPass, m_TukeyAlphaHighPass, m_TukeyAlphaLowPass);
   emit result(resultImage);
 }
 
-void BandpassThread::setConfig(float BPHighPass, float BPLowPass, float TukeyAlpha, float recordTime)
+void BandpassThread::setConfig(float BPHighPass, float BPLowPass, float TukeyAlphaHighPass, float TukeyAlphaLowPass, float recordTime)
 {
   m_BPHighPass = BPHighPass;
   m_BPLowPass = BPLowPass;
-  m_TukeyAlpha = TukeyAlpha;
+  m_TukeyAlphaHighPass = TukeyAlphaHighPass;
+  m_TukeyAlphaLowPass = TukeyAlphaLowPass;
   m_RecordTime = recordTime;
 }
 

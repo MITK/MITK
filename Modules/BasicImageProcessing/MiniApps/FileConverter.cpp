@@ -62,12 +62,37 @@ int main(int argc, char* argv[])
   {
     preference.push_back(us::any_cast<std::string>(parsedArgs["reader"]));
   }
-  mitk::PreferenceListReaderOptionsFunctor::ListType emptyList = {};
-  mitk::IOUtil::LoadInfo info(inputFilename);
-  mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor(preference, emptyList);
-  functor(info);
 
-  std::string extension = itksys::SystemTools::GetFilenameExtension(inputFilename);
+  if (parsedArgs.count("list-readers"))
+  {
+    mitk::IOUtil::LoadInfo loadInfo(inputFilename);
+    auto readers = loadInfo.m_ReaderSelector.Get();
+
+    std::string errMsg;
+    if (readers.empty())
+    {
+      if (!itksys::SystemTools::FileExists(loadInfo.m_Path.c_str()))
+      {
+        errMsg += "File '" + loadInfo.m_Path + "' does not exist\n";
+      }
+      else
+      {
+        errMsg += "No reader available for '" + loadInfo.m_Path + "'\n";
+      }
+      MITK_ERROR << errMsg;
+      return 0;
+    }
+
+    for (auto reader : loadInfo.m_ReaderSelector.Get())
+    {
+      std::cout  << " : " << reader.GetDescription() << std::endl;
+    }
+  }
+
+  mitk::PreferenceListReaderOptionsFunctor::ListType emptyList = {};
+  mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor(preference, emptyList);
+
+  std::string extension = itksys::SystemTools::GetFilenameExtension(outputFilename);
   std::string filename = itksys::SystemTools::GetFilenameWithoutExtension(outputFilename);
   std::string path = itksys::SystemTools::GetFilenamePath(outputFilename);
 

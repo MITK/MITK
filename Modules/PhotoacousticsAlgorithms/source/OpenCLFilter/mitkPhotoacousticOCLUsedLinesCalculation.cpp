@@ -79,7 +79,7 @@ void mitk::OCLUsedLinesCalculation::Execute()
   // This calculation is the same for all kernels, so for performance reasons simply perform it here instead of within the kernels
   m_part = (tan(m_Conf->GetAngle() / 360 * 2 * itk::Math::pi) *
     ((m_Conf->GetSpeedOfSound() * m_Conf->GetTimeSpacing())) /
-    (m_Conf->GetPitch() * m_Conf->GetTransducerElements())) * m_Conf->GetInputDim()[0];
+    (m_Conf->GetPitchInMeters() * m_Conf->GetTransducerElements())) * m_Conf->GetInputDim()[0];
 
   unsigned int reconLines = this->m_Conf->GetReconstructionLines();
   unsigned int samplesPerLine = this->m_Conf->GetSamplesPerLine();

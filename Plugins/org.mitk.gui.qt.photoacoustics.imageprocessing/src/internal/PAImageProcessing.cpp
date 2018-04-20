@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk image
 #include <mitkImage.h>
 #include "mitkPhotoacousticFilterService.h"
-#include "mitkPhotoacousticBeamformingFilter.h"
+#include "mitkBeamformingFilter.h"
 
 //other
 #include <thread>
@@ -279,8 +279,8 @@ void PAImageProcessing::BatchProcessing()
       }
 
       image = m_FilterBank->BandpassFilter(image, recordTime, BPHighPass, BPLowPass,
-                                           m_Controls.BPFalloffHigh->value(),
-                                           m_Controls.BPFalloffLow->value());
+        m_Controls.BPFalloffHigh->value(),
+        m_Controls.BPFalloffLow->value());
 
       if (saveSteps[2])
       {
@@ -911,7 +911,7 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
     BFconfig->SetApod(mitk::BeamformingSettings::Apodization::Box);
   }
 
-  BFconfig->SetPitch(m_Controls.Pitch->value() / 1000); // [m]
+  BFconfig->SetPitchInMeters(m_Controls.Pitch->value() / 1000); // [m]
   BFconfig->SetSpeedOfSound(m_Controls.SpeedOfSound->value()); // [m/s]
   BFconfig->SetSamplesPerLine(m_Controls.Samples->value());
   BFconfig->SetReconstructionLines(m_Controls.Lines->value());

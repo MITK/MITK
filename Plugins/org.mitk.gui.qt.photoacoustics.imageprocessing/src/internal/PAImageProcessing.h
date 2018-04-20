@@ -26,8 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_PAImageProcessingControls.h"
 
-#include "mitkPhotoacousticBeamformingFilter.h"
-#include "mitkPhotoacousticBeamformingSettings.h"
+#include "mitkBeamformingFilter.h"
+#include "mitkBeamformingSettings.h"
 
 Q_DECLARE_METATYPE(mitk::Image::Pointer)
 Q_DECLARE_METATYPE(std::string)

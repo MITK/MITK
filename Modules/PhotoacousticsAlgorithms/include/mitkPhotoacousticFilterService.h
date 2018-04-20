@@ -22,8 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include <functional>
 
-#include "mitkPhotoacousticBeamformingSettings.h"
-#include "mitkPhotoacousticBeamformingFilter.h"
+#include "mitkBeamformingSettings.h"
+#include "mitkBeamformingFilter.h"
 #include "MitkPhotoacousticsAlgorithmsExports.h"
 
 namespace mitk {
@@ -103,10 +103,13 @@ namespace mitk {
     * @param recordTime The depth of the image in seconds.
     * @param BPHighPass The position at which Lower frequencies are completely cut off in Hz.
     * @param BPLowPass The position at which Higher frequencies are completely cut off in Hz.
-    * @param alpha The tukey window parameter to control the shape of the bandpass filter: 0 will make it a Box function, 1 a Hann function. alpha can be set between those two bounds.
+    * @param alphaHighPass The high pass tukey window parameter to control the shape of the bandpass filter: 0 will make it a Box function, 1 a Hann function. alpha can be set between those two bounds.
+    * @param alphaLowPass The low passtukey window parameter to control the shape of the bandpass filter: 0 will make it a Box function, 1 a Hann function. alpha can be set between those two bounds.
     * @return The processed image is returned after the filter has finished.
     */
-    mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data, float recordTime, float BPHighPass, float BPLowPass, float alpha);
+    mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data, float recordTime,
+      float BPHighPass, float BPLowPass,
+      float alphaHighPass, float alphaLowPass);
 
   protected:
     PhotoacousticFilterService();
@@ -119,7 +122,10 @@ namespace mitk {
 
     /** \brief Function that creates a Tukey function for the bandpass
     */
-    itk::Image<float, 3U>::Pointer BPFunction(mitk::Image::Pointer reference, int cutoffFrequencyPixelHighPass, int cutoffFrequencyPixelLowPass, float alpha);
+    itk::Image<float, 3U>::Pointer BPFunction(mitk::Image::Pointer reference,
+      int cutoffFrequencyPixelHighPass,
+      int cutoffFrequencyPixelLowPass,
+      float alphaHighPass, float alphaLowPass);
   };
 } // namespace mitk
 

@@ -14,11 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITK_PHOTOACOUSTICS_BEAMFORMING_SETTINGS
-#define MITK_PHOTOACOUSTICS_BEAMFORMING_SETTINGS
+#ifndef MITK_BEAMFORMING_SETTINGS
+#define MITK_BEAMFORMING_SETTINGS
 
 #include <itkObject.h>
 #include <itkMacro.h>
+//#include <mitkBeamformingUtils.h>
 
 namespace mitk {
   /*!
@@ -54,8 +55,8 @@ namespace mitk {
     */
     enum BeamformingAlgorithm { DMAS, DAS, sDMAS };
 
-    itkGetMacro(Pitch, float)
-      itkSetMacro(Pitch, float)
+    itkGetMacro(PitchInMeters, float)
+      itkSetMacro(PitchInMeters, float)
       itkGetMacro(SpeedOfSound, float)
       itkSetMacro(SpeedOfSound, float)
       itkGetMacro(TimeSpacing, float)
@@ -130,7 +131,7 @@ namespace mitk {
         (lhs->GetApod() == rhs->GetApod()) &&
         (lhs->GetDelayCalculationMethod() == rhs->GetDelayCalculationMethod()) &&
         (lhs->GetIsPhotoacousticImage() == rhs->GetIsPhotoacousticImage()) &&
-        (abs(lhs->GetPitch() - rhs->GetPitch()) < 0.000001f) && // 0.0001 mm error margin
+        (abs(lhs->GetPitchInMeters() - rhs->GetPitchInMeters()) < 0.000001f) && // 0.0001 mm error margin
         (lhs->GetReconstructionLines() == rhs->GetReconstructionLines()) &&
         (lhs->GetSamplesPerLine() == rhs->GetSamplesPerLine()) &&
         (abs(lhs->GetSpeedOfSound() - rhs->GetSpeedOfSound()) < 0.01f) &&
@@ -139,11 +140,28 @@ namespace mitk {
     }
 
   protected:
+
     BeamformingSettings()
     {
       m_InputDim = new unsigned int[3]{ 1, 1, 1 };
       m_CropBounds = new unsigned int[2]{ 0, 0 };
       m_ApodizationFunction = new float[m_ApodizationArraySize];
+
+      /*switch (GetApod())
+      {
+      case BeamformingSettings::Apodization::Hann:
+        SetApodizationFunction(mitk::BeamformingUtils::VonHannFunction(GetApodizationArraySize()));
+        break;
+      case BeamformingSettings::Apodization::Hamm:
+        SetApodizationFunction(mitk::BeamformingUtils::HammFunction(GetApodizationArraySize()));
+        break;
+      case BeamformingSettings::Apodization::Box:
+        SetApodizationFunction(mitk::BeamformingUtils::BoxFunction(GetApodizationArraySize()));
+        break;
+      default:
+        SetApodizationFunction(mitk::BeamformingUtils::BoxFunction(GetApodizationArraySize()));
+        break;
+      }*/
     }
     ~BeamformingSettings()
     {
@@ -151,7 +169,7 @@ namespace mitk {
 
     /** \brief Pitch of the used transducer in [m].
     */
-    float m_Pitch = 0.0003;
+    float m_PitchInMeters = 0.0003;
 
     /** \brief Speed of sound in the used medium in [m/s].
     */
@@ -188,6 +206,7 @@ namespace mitk {
     /** \brief Sets whether only the slices selected by mitk::BeamformingSettings::CropBounds should be beamformed.
     */
     bool m_Partial = false;
+
     /** \brief Sets the first and last slice to be beamformed.
     */
     unsigned int* m_CropBounds;
@@ -231,4 +250,4 @@ namespace mitk {
     float m_BPLowPass = 50;
   };
 }
-#endif
+#endif //MITK_BEAMFORMING_SETTINGS

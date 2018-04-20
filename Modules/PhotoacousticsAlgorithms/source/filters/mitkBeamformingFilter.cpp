@@ -22,8 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <thread>
 #include <itkImageIOBase.h>
 #include "mitkImageCast.h"
-#include "mitkPhotoacousticBeamformingFilter.h"
-#include "mitkPhotoacousticBeamformingUtils.h"
+#include "mitkBeamformingFilter.h"
+#include "mitkBeamformingUtils.h"
 
 mitk::BeamformingFilter::BeamformingFilter(mitk::BeamformingSettings::Pointer settings) :
   m_OutputData(nullptr),
@@ -38,22 +38,6 @@ mitk::BeamformingFilter::BeamformingFilter(mitk::BeamformingSettings::Pointer se
   m_ProgressHandle = [](int, std::string) {};
 
   m_BeamformingOclFilter = mitk::PhotoacousticOCLBeamformingFilter::New(m_Conf);
-
-  switch (m_Conf->GetApod())
-  {
-  case BeamformingSettings::Apodization::Hann:
-    m_Conf->SetApodizationFunction(mitk::PhotoacousticBeamformingUtils::VonHannFunction(m_Conf->GetApodizationArraySize()));
-    break;
-  case BeamformingSettings::Apodization::Hamm:
-    m_Conf->SetApodizationFunction(mitk::PhotoacousticBeamformingUtils::HammFunction(m_Conf->GetApodizationArraySize()));
-    break;
-  case BeamformingSettings::Apodization::Box:
-    m_Conf->SetApodizationFunction(mitk::PhotoacousticBeamformingUtils::BoxFunction(m_Conf->GetApodizationArraySize()));
-    break;
-  default:
-    m_Conf->SetApodizationFunction(mitk::PhotoacousticBeamformingUtils::BoxFunction(m_Conf->GetApodizationArraySize()));
-    break;
-  }
 
   MITK_INFO << "Instantiating BeamformingFilter...[Done]";
 }
@@ -80,7 +64,6 @@ void mitk::BeamformingFilter::GenerateInputRequestedRegion()
   }
 
   input->SetRequestedRegionToLargestPossibleRegion();
-  //GenerateTimeInInputRegion(output, input);
 }
 
 void mitk::BeamformingFilter::GenerateOutputInformation()
@@ -91,13 +74,11 @@ void mitk::BeamformingFilter::GenerateOutputInformation()
   if ((output->IsInitialized()) && (this->GetMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
     return;
 
-  itkDebugMacro(<< "GenerateOutputInformation()");
-
   unsigned int dim[] = { m_Conf->GetReconstructionLines(), m_Conf->GetSamplesPerLine(), input->GetDimension(2) };
   output->Initialize(mitk::MakeScalarPixelType<float>(), 3, dim);
 
   mitk::Vector3D spacing;
-  spacing[0] = m_Conf->GetPitch() * m_Conf->GetTransducerElements() * 1000 / m_Conf->GetReconstructionLines();
+  spacing[0] = m_Conf->GetPitchInMeters() * m_Conf->GetTransducerElements() * 1000 / m_Conf->GetReconstructionLines();
   spacing[1] = (m_Conf->GetTimeSpacing() * m_Conf->GetInputDim()[1]) / 2 * m_Conf->GetSpeedOfSound() * 1000 / m_Conf->GetSamplesPerLine();
   spacing[2] = 1;
 
@@ -110,8 +91,13 @@ void mitk::BeamformingFilter::GenerateOutputInformation()
 
 void mitk::BeamformingFilter::GenerateData()
 {
-  GenerateOutputInformation();
   mitk::Image::Pointer input = this->GetInput();
+  if (!(input->GetPixelType().GetTypeAsString() == "scalar (float)" || input->GetPixelType().GetTypeAsString() == " (float)"))
+  {
+    mitkThrow() << "Pixel type of input needs to be float for this filter to work.";
+  }
+
+  GenerateOutputInformation();
   mitk::Image::Pointer output = this->GetOutput();
 
   if (!output->IsInitialized())
@@ -130,17 +116,7 @@ void mitk::BeamformingFilter::GenerateData()
     for (unsigned int i = 0; i < output->GetDimension(2); ++i) // seperate Slices should get Beamforming seperately applied
     {
       mitk::ImageReadAccessor inputReadAccessor(input, input->GetSliceData(i));
-
-      // first, we check whether the dara is float, other formats are unsupported
-      if (input->GetPixelType().GetTypeAsString() == "scalar (float)" || input->GetPixelType().GetTypeAsString() == " (float)")
-      {
-        m_InputData = (float*)inputReadAccessor.GetData();
-      }
-      else
-      {
-        MITK_INFO << "Pixel type is not float, abort";
-        return;
-      }
+      m_InputData = (float*)inputReadAccessor.GetData();
 
       m_OutputData = new float[m_Conf->GetReconstructionLines()*m_Conf->GetSamplesPerLine()];
 
@@ -162,7 +138,7 @@ void mitk::BeamformingFilter::GenerateData()
         {
           for (short line = 0; line < outputDim[0]; ++line)
           {
-            threads[line] = std::thread(&PhotoacousticBeamformingUtils::DASQuadraticLine, m_InputData,
+            threads[line] = std::thread(&BeamformingUtils::DASQuadraticLine, m_InputData,
               m_OutputData, inputDim, outputDim, line, m_Conf->GetApodizationFunction(),
               m_Conf->GetApodizationArraySize(), m_Conf);
           }
@@ -171,7 +147,7 @@ void mitk::BeamformingFilter::GenerateData()
         {
           for (short line = 0; line < outputDim[0]; ++line)
           {
-            threads[line] = std::thread(&PhotoacousticBeamformingUtils::DASSphericalLine, m_InputData,
+            threads[line] = std::thread(&BeamformingUtils::DASSphericalLine, m_InputData,
               m_OutputData, inputDim, outputDim, line, m_Conf->GetApodizationFunction(),
               m_Conf->GetApodizationArraySize(), m_Conf);
           }
@@ -183,7 +159,7 @@ void mitk::BeamformingFilter::GenerateData()
         {
           for (short line = 0; line < outputDim[0]; ++line)
           {
-            threads[line] = std::thread(&PhotoacousticBeamformingUtils::DMASQuadraticLine, m_InputData,
+            threads[line] = std::thread(&BeamformingUtils::DMASQuadraticLine, m_InputData,
               m_OutputData, inputDim, outputDim, line, m_Conf->GetApodizationFunction(),
               m_Conf->GetApodizationArraySize(), m_Conf);
           }
@@ -192,7 +168,7 @@ void mitk::BeamformingFilter::GenerateData()
         {
           for (short line = 0; line < outputDim[0]; ++line)
           {
-            threads[line] = std::thread(&PhotoacousticBeamformingUtils::DMASSphericalLine, m_InputData,
+            threads[line] = std::thread(&BeamformingUtils::DMASSphericalLine, m_InputData,
               m_OutputData, inputDim, outputDim, line, m_Conf->GetApodizationFunction(),
               m_Conf->GetApodizationArraySize(), m_Conf);
           }
@@ -204,7 +180,7 @@ void mitk::BeamformingFilter::GenerateData()
         {
           for (short line = 0; line < outputDim[0]; ++line)
           {
-            threads[line] = std::thread(&PhotoacousticBeamformingUtils::sDMASQuadraticLine, m_InputData,
+            threads[line] = std::thread(&BeamformingUtils::sDMASQuadraticLine, m_InputData,
               m_OutputData, inputDim, outputDim, line, m_Conf->GetApodizationFunction(),
               m_Conf->GetApodizationArraySize(), m_Conf);
           }
@@ -213,7 +189,7 @@ void mitk::BeamformingFilter::GenerateData()
         {
           for (short line = 0; line < outputDim[0]; ++line)
           {
-            threads[line] = std::thread(&PhotoacousticBeamformingUtils::sDMASSphericalLine, m_InputData,
+            threads[line] = std::thread(&BeamformingUtils::sDMASSphericalLine, m_InputData,
               m_OutputData, inputDim, outputDim, line, m_Conf->GetApodizationFunction(),
               m_Conf->GetApodizationArraySize(), m_Conf);
           }

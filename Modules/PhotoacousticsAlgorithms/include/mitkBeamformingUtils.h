@@ -14,20 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITK_PHOTOACOUSTICS_BEAMFORMING_FILTER_UTILS
-#define MITK_PHOTOACOUSTICS_BEAMFORMING_FILTER_UTILS
+#ifndef MITK_BEAMFORMING_FILTER_UTILS
+#define MITK_BEAMFORMING_FILTER_UTILS
 
 #include "mitkImageToImageFilter.h"
 #include <functional>
 #include "./OpenCLFilter/mitkPhotoacousticOCLBeamformingFilter.h"
-#include "mitkPhotoacousticBeamformingSettings.h"
+#include "mitkBeamformingSettings.h"
 
 namespace mitk {
   /*!
   * \brief Class implementing util functionality for beamforming on CPU
   *
   */
-  class PhotoacousticBeamformingUtils final
+  class BeamformingUtils final
   {
   public:
 
@@ -71,10 +71,10 @@ namespace mitk {
     static float* BoxFunction(int samples);
 
   protected:
-    PhotoacousticBeamformingUtils();
+    BeamformingUtils();
 
-    ~PhotoacousticBeamformingUtils();
+    ~BeamformingUtils();
   };
 } // namespace mitk
 
-#endif //MITK_PHOTOACOUSTICS_BEAMFORMING_FILTER_UTILS
+#endif //MITK_BEAMFORMING_FILTER_UTILS

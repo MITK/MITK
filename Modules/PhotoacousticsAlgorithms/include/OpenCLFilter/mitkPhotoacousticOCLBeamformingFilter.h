@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPhotoacousticOCLDelayCalculation.h"
 #include "mitkPhotoacousticOCLUsedLinesCalculation.h"
-#include "mitkPhotoacousticBeamformingSettings.h"
+#include "mitkBeamformingSettings.h"
 
 #include <chrono>
 

@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageToImageFilter.h"
 #include <functional>
 #include "./OpenCLFilter/mitkPhotoacousticOCLBeamformingFilter.h"
-#include "mitkPhotoacousticBeamformingSettings.h"
-#include "mitkPhotoacousticBeamformingUtils.h"
+#include "mitkBeamformingSettings.h"
+#include "mitkBeamformingUtils.h"
 
 namespace mitk {
   /*!

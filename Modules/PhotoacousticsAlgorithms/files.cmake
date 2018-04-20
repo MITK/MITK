@@ -1,10 +1,13 @@
 file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
 
 set(CPP_FILES
-  source/mitkPhotoacousticFilterService.cpp
-  source/mitkPhotoacousticBeamformingFilter.cpp
-  source/mitkPhotoacousticBeamformingUtils.cpp
+  source/filters/mitkBeamformingFilter.cpp
+  source/filters/mitkImageSliceSelectionFilter.cpp
+  source/filters/mitkCastToFloatImageFilter.cpp
+  source/filters/mitkCropImageFilter.cpp
   source/OpenCLFilter/mitkPhotoacousticBModeFilter.cpp
+  source/utils/mitkPhotoacousticFilterService.cpp
+  source/utils/mitkBeamformingUtils.cpp
 )
 
 IF(MITK_USE_OpenCL)

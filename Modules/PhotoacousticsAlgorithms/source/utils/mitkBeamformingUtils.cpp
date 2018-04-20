@@ -22,17 +22,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <thread>
 #include <itkImageIOBase.h>
 #include "mitkImageCast.h"
-#include "mitkPhotoacousticBeamformingUtils.h"
+#include "mitkBeamformingUtils.h"
 
-mitk::PhotoacousticBeamformingUtils::PhotoacousticBeamformingUtils()
+mitk::BeamformingUtils::BeamformingUtils()
 {
 }
 
-mitk::PhotoacousticBeamformingUtils::~PhotoacousticBeamformingUtils()
+mitk::BeamformingUtils::~BeamformingUtils()
 {
 }
 
-float* mitk::PhotoacousticBeamformingUtils::VonHannFunction(int samples)
+float* mitk::BeamformingUtils::VonHannFunction(int samples)
 {
   float* ApodWindow = new float[samples];
 
@@ -44,7 +44,7 @@ float* mitk::PhotoacousticBeamformingUtils::VonHannFunction(int samples)
   return ApodWindow;
 }
 
-float* mitk::PhotoacousticBeamformingUtils::HammFunction(int samples)
+float* mitk::BeamformingUtils::HammFunction(int samples)
 {
   float* ApodWindow = new float[samples];
 
@@ -56,7 +56,7 @@ float* mitk::PhotoacousticBeamformingUtils::HammFunction(int samples)
   return ApodWindow;
 }
 
-float* mitk::PhotoacousticBeamformingUtils::BoxFunction(int samples)
+float* mitk::BeamformingUtils::BoxFunction(int samples)
 {
   float* ApodWindow = new float[samples];
 
@@ -68,7 +68,7 @@ float* mitk::PhotoacousticBeamformingUtils::BoxFunction(int samples)
   return ApodWindow;
 }
 
-void mitk::PhotoacousticBeamformingUtils::DASQuadraticLine(
+void mitk::BeamformingUtils::DASQuadraticLine(
   float* input, float* output, float inputDim[2], float outputDim[2],
   const short& line, float* apodisation, const short& apodArraySize,
   const mitk::BeamformingSettings::Pointer config)
@@ -89,7 +89,7 @@ void mitk::PhotoacousticBeamformingUtils::DASQuadraticLine(
   float part = 0;
   float tan_phi = std::tan(config->GetAngle() / 360 * 2 * itk::Math::pi);
   float part_multiplicator = tan_phi * config->GetTimeSpacing() * config->GetSpeedOfSound() /
-    config->GetPitch() * inputL / config->GetTransducerElements();
+    config->GetPitchInMeters() * inputL / config->GetTransducerElements();
   float apod_mult = 1;
 
   short usedLines = (maxLine - minLine);
@@ -113,7 +113,7 @@ void mitk::PhotoacousticBeamformingUtils::DASQuadraticLine(
     apod_mult = (float)apodArraySize / (float)usedLines;
 
     delayMultiplicator = pow((1 / (config->GetTimeSpacing()*config->GetSpeedOfSound()) *
-      (config->GetPitch()*config->GetTransducerElements()) / inputL), 2) / s_i / 2;
+      (config->GetPitchInMeters()*config->GetTransducerElements()) / inputL), 2) / s_i / 2;
 
     for (short l_s = minLine; l_s < maxLine; ++l_s)
     {
@@ -128,7 +128,7 @@ void mitk::PhotoacousticBeamformingUtils::DASQuadraticLine(
   }
 }
 
-void mitk::PhotoacousticBeamformingUtils::DASSphericalLine(
+void mitk::BeamformingUtils::DASSphericalLine(
   float* input, float* output, float inputDim[2], float outputDim[2],
   const short& line, float* apodisation, const short& apodArraySize,
   const mitk::BeamformingSettings::Pointer config)
@@ -148,7 +148,7 @@ void mitk::PhotoacousticBeamformingUtils::DASSphericalLine(
   float part = 0.07 * inputL;
   float tan_phi = std::tan(config->GetAngle() / 360 * 2 * itk::Math::pi);
   float part_multiplicator = tan_phi * config->GetTimeSpacing() *
-    config->GetSpeedOfSound() / config->GetPitch() * inputL / (float)config->GetTransducerElements();
+    config->GetSpeedOfSound() / config->GetPitchInMeters() * inputL / (float)config->GetTransducerElements();
   float apod_mult = 1;
 
   short usedLines = (maxLine - minLine);
@@ -178,7 +178,7 @@ void mitk::PhotoacousticBeamformingUtils::DASSphericalLine(
         pow(s_i, 2)
         +
         pow((1 / (config->GetTimeSpacing()*config->GetSpeedOfSound()) *
-        (((float)l_s - l_i)*config->GetPitch()*(float)config->GetTransducerElements()) / inputL), 2)
+        (((float)l_s - l_i)*config->GetPitchInMeters()*(float)config->GetTransducerElements()) / inputL), 2)
       ) + (1 - config->GetIsPhotoacousticImage())*s_i;
       if (AddSample < inputS && AddSample >= 0)
         output[sample*(short)outputL + line] += input[l_s + AddSample*(short)inputL] *
@@ -190,7 +190,7 @@ void mitk::PhotoacousticBeamformingUtils::DASSphericalLine(
   }
 }
 
-void mitk::PhotoacousticBeamformingUtils::DMASQuadraticLine(
+void mitk::BeamformingUtils::DMASQuadraticLine(
   float* input, float* output, float inputDim[2], float outputDim[2],
   const short& line, float* apodisation, const short& apodArraySize,
   const mitk::BeamformingSettings::Pointer config)
@@ -210,7 +210,7 @@ void mitk::PhotoacousticBeamformingUtils::DMASQuadraticLine(
   float part = 0.07 * inputL;
   float tan_phi = std::tan(config->GetAngle() / 360 * 2 * itk::Math::pi);
   float part_multiplicator = tan_phi * config->GetTimeSpacing() *
-    config->GetSpeedOfSound() / config->GetPitch() * inputL / (float)config->GetTransducerElements();
+    config->GetSpeedOfSound() / config->GetPitchInMeters() * inputL / (float)config->GetTransducerElements();
   float apod_mult = 1;
 
   float mult = 0;
@@ -235,7 +235,7 @@ void mitk::PhotoacousticBeamformingUtils::DMASQuadraticLine(
     apod_mult = (float)apodArraySize / (float)usedLines;
 
     delayMultiplicator = pow((1 / (config->GetTimeSpacing()*config->GetSpeedOfSound()) *
-      (config->GetPitch()*config->GetTransducerElements()) / inputL), 2) / s_i / 2;
+      (config->GetPitchInMeters()*config->GetTransducerElements()) / inputL), 2) / s_i / 2;
 
     //calculate the AddSamples beforehand to save some time
     short* AddSample = new short[maxLine - minLine];
@@ -274,7 +274,7 @@ void mitk::PhotoacousticBeamformingUtils::DMASQuadraticLine(
   }
 }
 
-void mitk::PhotoacousticBeamformingUtils::DMASSphericalLine(
+void mitk::BeamformingUtils::DMASSphericalLine(
   float* input, float* output, float inputDim[2], float outputDim[2],
   const short& line, float* apodisation, const short& apodArraySize,
   const mitk::BeamformingSettings::Pointer config)
@@ -293,7 +293,7 @@ void mitk::PhotoacousticBeamformingUtils::DMASSphericalLine(
   float part = 0.07 * inputL;
   float tan_phi = std::tan(config->GetAngle() / 360 * 2 * itk::Math::pi);
   float part_multiplicator = tan_phi * config->GetTimeSpacing() *
-    config->GetSpeedOfSound() / config->GetPitch() * inputL / (float)config->GetTransducerElements();
+    config->GetSpeedOfSound() / config->GetPitchInMeters() * inputL / (float)config->GetTransducerElements();
   float apod_mult = 1;
 
   float mult = 0;
@@ -327,7 +327,7 @@ void mitk::PhotoacousticBeamformingUtils::DMASSphericalLine(
         pow(s_i, 2)
         +
         pow((1 / (config->GetTimeSpacing()*config->GetSpeedOfSound()) *
-        (((float)minLine + (float)l_s - l_i)*config->GetPitch()*(float)config->GetTransducerElements()) / inputL), 2)
+        (((float)minLine + (float)l_s - l_i)*config->GetPitchInMeters()*(float)config->GetTransducerElements()) / inputL), 2)
       ) + (1 - config->GetIsPhotoacousticImage())*s_i;
     }
 
@@ -360,7 +360,7 @@ void mitk::PhotoacousticBeamformingUtils::DMASSphericalLine(
   }
 }
 
-void mitk::PhotoacousticBeamformingUtils::sDMASQuadraticLine(
+void mitk::BeamformingUtils::sDMASQuadraticLine(
   float* input, float* output, float inputDim[2], float outputDim[2],
   const short& line, float* apodisation, const short& apodArraySize,
   const mitk::BeamformingSettings::Pointer config)
@@ -380,7 +380,7 @@ void mitk::PhotoacousticBeamformingUtils::sDMASQuadraticLine(
   float part = 0.07 * inputL;
   float tan_phi = std::tan(config->GetAngle() / 360 * 2 * itk::Math::pi);
   float part_multiplicator = tan_phi * config->GetTimeSpacing() * config->GetSpeedOfSound() /
-    config->GetPitch() * inputL / (float)config->GetTransducerElements();
+    config->GetPitchInMeters() * inputL / (float)config->GetTransducerElements();
   float apod_mult = 1;
 
   float mult = 0;
@@ -405,7 +405,7 @@ void mitk::PhotoacousticBeamformingUtils::sDMASQuadraticLine(
     apod_mult = (float)apodArraySize / (float)usedLines;
 
     delayMultiplicator = pow((1 / (config->GetTimeSpacing()*config->GetSpeedOfSound()) *
-      (config->GetPitch()*config->GetTransducerElements()) / inputL), 2) / s_i / 2;
+      (config->GetPitchInMeters()*config->GetTransducerElements()) / inputL), 2) / s_i / 2;
 
     //calculate the AddSamples beforehand to save some time
     short* AddSample = new short[maxLine - minLine];
@@ -447,7 +447,7 @@ void mitk::PhotoacousticBeamformingUtils::sDMASQuadraticLine(
   }
 }
 
-void mitk::PhotoacousticBeamformingUtils::sDMASSphericalLine(
+void mitk::BeamformingUtils::sDMASSphericalLine(
   float* input, float* output, float inputDim[2], float outputDim[2],
   const short& line, float* apodisation, const short& apodArraySize,
   const mitk::BeamformingSettings::Pointer config)
@@ -466,7 +466,7 @@ void mitk::PhotoacousticBeamformingUtils::sDMASSphericalLine(
   float part = 0.07 * inputL;
   float tan_phi = std::tan(config->GetAngle() / 360 * 2 * itk::Math::pi);
   float part_multiplicator = tan_phi * config->GetTimeSpacing() * config->GetSpeedOfSound() /
-    config->GetPitch() * inputL / (float)config->GetTransducerElements();
+    config->GetPitchInMeters() * inputL / (float)config->GetTransducerElements();
   float apod_mult = 1;
 
   float mult = 0;
@@ -500,7 +500,7 @@ void mitk::PhotoacousticBeamformingUtils::sDMASSphericalLine(
         pow(s_i, 2)
         +
         pow((1 / (config->GetTimeSpacing()*config->GetSpeedOfSound()) *
-        (((float)minLine + (float)l_s - l_i)*config->GetPitch()*(float)config->GetTransducerElements()) / inputL), 2)
+        (((float)minLine + (float)l_s - l_i)*config->GetPitchInMeters()*(float)config->GetTransducerElements()) / inputL), 2)
       ) + (1 - config->GetIsPhotoacousticImage())*s_i;
     }
 

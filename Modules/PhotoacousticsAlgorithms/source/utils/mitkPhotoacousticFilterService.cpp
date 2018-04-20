@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "../ITKFilter/itkPhotoacousticBModeImageFilter.h"
 #include "mitkImageCast.h"
 #include "mitkITKImageImport.h"
-#include "mitkPhotoacousticBeamformingFilter.h"
+#include "mitkBeamformingFilter.h"
 #include <chrono>
 #include <mitkIOUtil.h>
 #include <mitkAutoCropImageFilter.h>
@@ -323,8 +323,8 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBeamforming(mitk::Im
 }
 
 mitk::Image::Pointer mitk::PhotoacousticFilterService::BandpassFilter(mitk::Image::Pointer data, float recordTime,
-                                                              float BPHighPass, float BPLowPass,
-                                                              float alphaHighPass, float alphaLowPass)
+  float BPHighPass, float BPLowPass,
+  float alphaHighPass, float alphaLowPass)
 {
   bool powerOfTwo = false;
   int finalPower = 0;
@@ -395,9 +395,9 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::BandpassFilter(mitk::Imag
 }
 
 itk::Image<float, 3U>::Pointer mitk::PhotoacousticFilterService::BPFunction(mitk::Image::Pointer reference,
-                                                                    int cutoffFrequencyPixelHighPass,
-                                                                    int cutoffFrequencyPixelLowPass,
-                                                                    float alphaHighPass, float alphaLowPass)
+  int cutoffFrequencyPixelHighPass,
+  int cutoffFrequencyPixelLowPass,
+  float alphaHighPass, float alphaLowPass)
 {
   float* imageData = new float[reference->GetDimension(0)*reference->GetDimension(1)];
 
@@ -416,7 +416,7 @@ itk::Image<float, 3U>::Pointer mitk::PhotoacousticFilterService::BPFunction(mitk
       if (alphaHighPass > 0.00001)
       {
         imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] =
-            (1 + cos(itk::Math::pi*(2 * n / (alphaHighPass*(width - 1)) - 1))) / 2;
+          (1 + cos(itk::Math::pi*(2 * n / (alphaHighPass*(width - 1)) - 1))) / 2;
       }
       else
       {
@@ -428,7 +428,7 @@ itk::Image<float, 3U>::Pointer mitk::PhotoacousticFilterService::BPFunction(mitk
       if (alphaLowPass > 0.00001)
       {
         imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] =
-            (1 + cos(itk::Math::pi*(2 * n / (alphaLowPass*(width - 1)) + 1 - 2 / alphaLowPass))) / 2;
+          (1 + cos(itk::Math::pi*(2 * n / (alphaLowPass*(width - 1)) + 1 - 2 / alphaLowPass))) / 2;
       }
       else
       {

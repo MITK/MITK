@@ -81,10 +81,10 @@ void mitk::OCLDelayCalculation::Execute()
   // This calculation is the same for all kernels, so for performance reasons simply perform it here instead of within the kernels
   if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::QuadApprox)
     m_DelayMultiplicatorRaw = pow(1 / (m_Conf->GetTimeSpacing()*m_Conf->GetSpeedOfSound()) *
-      m_Conf->GetPitch() * (float)m_Conf->GetTransducerElements() / (float)m_Conf->GetInputDim()[0], 2) / 2;
+      m_Conf->GetPitchInMeters() * (float)m_Conf->GetTransducerElements() / (float)m_Conf->GetInputDim()[0], 2) / 2;
   else if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::Spherical)
     m_DelayMultiplicatorRaw = 1 / (m_Conf->GetTimeSpacing()*m_Conf->GetSpeedOfSound()) *
-    (m_Conf->GetPitch()*(float)m_Conf->GetTransducerElements());
+    (m_Conf->GetPitchInMeters()*(float)m_Conf->GetTransducerElements());
 
   // as openCL does not support bool as a kernel argument, we need to buffer this value in a char...
   m_IsPAImage = m_Conf->GetIsPhotoacousticImage();

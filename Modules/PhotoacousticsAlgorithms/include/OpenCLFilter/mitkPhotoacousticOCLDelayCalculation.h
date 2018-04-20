@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOclDataSetToDataSetFilter.h"
 #include <itkObject.h>
-#include "mitkPhotoacousticBeamformingSettings.h"
+#include "mitkBeamformingSettings.h"
 
 namespace mitk
 {

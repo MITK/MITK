@@ -28,7 +28,52 @@ namespace mitk
   * The actual operation is executed when calling GetResult().
   */
   class MITKBASICIMAGEPROCESSING_EXPORT ArithmeticOperation {
-    static mitk::Image::Pointer Add(mitk::Image::Pointer & imageA, mitk::Image::Pointer & imageB, bool outputAsDouble = true);
-}
+  public:
+    static Image::Pointer Add(Image::Pointer & imageA, Image::Pointer & imageB, bool outputAsDouble = true);
+    static Image::Pointer Subtract(Image::Pointer & imageA, Image::Pointer & imageB, bool outputAsDouble = true);
+    static Image::Pointer Multiply(Image::Pointer & imageA, Image::Pointer & imageB, bool outputAsDouble = true);
+    static Image::Pointer Divide(Image::Pointer & imageA, Image::Pointer & imageB, bool outputAsDouble = true);
+    //static Image::Pointer Exp(Image::Pointer & imageA, Image::Pointer & imageB, bool outputAsDouble = true);
 
+    static Image::Pointer Add(Image::Pointer & imageA, double value, bool outputAsDouble = true);
+    //static Image::Pointer Subtract(Image::Pointer & imageA, double value, bool outputAsDouble = true);
+    //static Image::Pointer Multiply(Image::Pointer & imageA, double value, bool outputAsDouble = true);
+    //static Image::Pointer Divide(Image::Pointer & imageA, double value, bool outputAsDouble = true);
+
+    //static Image::Pointer Add(double value, Image::Pointer & imageB, bool outputAsDouble = true);
+    //static Image::Pointer Subtract(double value, Image::Pointer & imageB, bool outputAsDouble = true);
+    //static Image::Pointer Multiply(double value, Image::Pointer & imageB, bool outputAsDouble = true);
+    //static Image::Pointer Divide(double value, Image::Pointer & imageB, bool outputAsDouble = true);
+
+    //static Image::Pointer Log(Image::Pointer & imageA, bool outputAsDouble = true);
+    //static Image::Pointer Exp(Image::Pointer & imageA, bool outputAsDouble = true);
+ };
+
+  class MITKBASICIMAGEPROCESSING_EXPORT NonStaticArithmeticOperation {
+  public:
+    enum OperationsEnum
+    {
+      Add2,
+      Sub2,
+      Mult,
+      Div,
+      AddValue
+    };
+
+
+    void CallExecuteTwoImageFilter(mitk::Image::Pointer imageA, mitk::Image::Pointer imageB);
+
+    template <typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
+    void ExecuteTwoImageFilter(itk::Image<TPixel1, VImageDimension1>* imageA, itk::Image<TPixel2, VImageDimension2>* imageB);
+
+    template<typename DefaultFunctorType, typename DoubleFunctorType, typename Image1Type, typename Image2Type, typename DoubleImageType>
+    void ExecuteTwoImageFilterWithFunctor(Image1Type* imageA, Image2Type* imageB);
+
+    mitk::Image::Pointer m_ResultImage;
+    OperationsEnum m_Algorithm;
+    bool m_GenerateDoubleOutput = false;
+  };
+
+
+}
 #endif // mitkArithmeticOperation_h

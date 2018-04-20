@@ -7,6 +7,6 @@ class MITKBASICIMAGEPROCESSING_EXPORT mitkEmptyClass {
   public:
     int m_Meaningless;
     void foo();
-}
+};
 
 #endif

@@ -44,6 +44,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class MITKQTWIDGETS_EXPORT QmitkDataStorageListModel: public QAbstractListModel
 {
+  Q_OBJECT
+
 public:
 
   //! \param dataStorage the data storage to represent

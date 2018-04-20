@@ -49,11 +49,13 @@ bool QmitkSafeNotify(A* app, QObject* receiver, QEvent* event)
   MITK_ERROR << "An error occurred: " << msg.toStdString();
 
   QMessageBox msgBox;
-  msgBox.setText("An error occurred. You should save all data and quit the program to prevent possible data loss.");
+  msgBox.setText(QObject::tr("An error occurred. You should save all data and quit the program to prevent possible data loss."));
   msgBox.setDetailedText(msg);
   msgBox.setIcon(QMessageBox::Critical);
-  msgBox.addButton(app->trUtf8("Exit immediately"), QMessageBox::YesRole);
-  msgBox.addButton(app->trUtf8("Ignore"), QMessageBox::NoRole);
+  /*: Button in dialog due to exception */
+  msgBox.addButton(QObject::tr("Exit immediately"), QMessageBox::YesRole);
+  /*: Button to ignore exception and continue */
+  msgBox.addButton(QObject::tr("Ignore"), QMessageBox::NoRole);
 
   int ret = msgBox.exec();
 

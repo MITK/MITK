@@ -42,6 +42,7 @@ QmitkSynchronizeSelectedData.cpp
 
 set(MOC_H_FILES
   include/QmitkDataStorageComboBox.h
+  include/QmitkDataStorageListModel.h
   include/QmitkDataStorageTableModel.h
   include/QmitkFileReaderOptionsDialog.h
   include/QmitkFileReaderWriterOptionsWidget.h
@@ -56,6 +57,7 @@ set(MOC_H_FILES
   include/QmitkNodeDescriptorManager.h
   include/QmitkRenderWindowMenu.h
   include/QmitkProgressBar.h
+  include/QmitkPropertiesTableModel.h
   include/QmitkPropertiesTableEditor.h
   include/QmitkPropertyDelegate.h
   include/QmitkRenderingManager.h

@@ -24,30 +24,100 @@ See LICENSE.txt or http://www.mitk.org for details.
 // ITK
 #include <itkLabelStatisticsImageFilter.h>
 #include <itkMinimumMaximumImageCalculator.h>
+#include <itkImageRegionIterator.h>
 
 // STL
 #include <sstream>
 
+struct FirstOrderNumericParameterStruct {
+  mitk::IntensityQuantifier::Pointer quantifier;
+  double MinimumIntensity;
+  double MaximumIntensity;
+  int Bins;
+  std::string prefix;
+};
+
 template<typename TPixel, unsigned int VImageDimension>
 void
-CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFFirstOrderNumericStatistics::FeatureListType & featureList, mitk::GIFFirstOrderNumericStatistics::ParameterStruct params)
+CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFFirstOrderNumericStatistics::FeatureListType & featureList, FirstOrderNumericParameterStruct params)
 {
-  typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<unsigned short, VImageDimension> MaskType;
+  typedef itk::Image<TPixel, VImageDimension>             ImageType;
+  typedef itk::Image<unsigned short, VImageDimension>     MaskType;
+
+  typename MaskType::Pointer maskImage = MaskType::New();
+  mitk::CastToItkImage(mask, maskImage);
+
+  //
+  // Calculate the Volume of Voxel (Maximum to the 3th order)
+  //
+  double voxelVolume = 1;
+  for (unsigned int i = 0; i < std::min<unsigned int>(3, VImageDimension); ++i)
+    voxelVolume *= itkImage->GetSpacing()[i];
+
+  //
+  // Calculate the Hypervolume of Voxel
+  //
+  double voxelSpace = 1;
+  for (unsigned int i = 0; i < VImageDimension; ++i)
+    voxelSpace *= itkImage->GetSpacing()[i];
+
+  double minimum = std::numeric_limits<double>::max();
+  double maximum = std::numeric_limits<double>::lowest();
+
+  double sum = 0;
+  double sumTwo= 0;
+  double sumThree = 0;
+
+  unsigned int numberOfVoxels = 0;
+
+  itk::ImageRegionIterator<ImageType> imageIter(itkImage, itkImage->GetLargestPossibleRegion());
+  itk::ImageRegionIterator<MaskType>  maskIter(maskImage, maskImage->GetLargetPossibleRegion());
+
+  while (!imageIter.IsAtEnd())
+  {
+    if (maskIter.Get() > 0)
+    {
+      value = imageIter.Get();
+
+      minimum = std::min<double>(minimum, value);
+      maximum = std::max<double>(maximum, value);
+
+      sum += value;
+      sumTwo += value * value;
+      sumThree += value * value*value;
+
+      ++numberOfVoxels;
+    }
+    ++maskiter;
+    ++imageIter;
+  }
+
+  double mean = sum / numberOfVoxels;
+  double energy = sumTwo;
+  double rootMeanSquare = std::sqrt<double>(sumTwo / numberOfVoxels);
+
+
+
+  featureList.push_back(std::make_pair(params.prefix + "Mean", mean));
+  featureList.push_back(std::make_pair(params.prefix + "Energy", energy));
+  featureList.push_back(std::make_pair(params.prefix + "Root mean square", rootMeanSquare));
+
+  return;
+
+
+
+
+
+
+
+
   typedef itk::LabelStatisticsImageFilter<ImageType, MaskType> FilterType;
   typedef typename FilterType::HistogramType HistogramType;
   typedef typename HistogramType::IndexType HIndexType;
   typedef itk::MinimumMaximumImageCalculator<ImageType> MinMaxComputerType;
 
-  typename MaskType::Pointer maskImage = MaskType::New();
-  mitk::CastToItkImage(mask, maskImage);
 
-  double voxelVolume = 1;
-  for (unsigned int i = 0; i < std::min<unsigned int>(3, VImageDimension); ++i)
-    voxelVolume *= itkImage->GetSpacing()[i];
-  double voxelSpace = 1;
-  for (unsigned int i = 0; i < VImageDimension; ++i)
-    voxelSpace *= itkImage->GetSpacing()[i];
+
 
   typename MinMaxComputerType::Pointer minMaxComputer = MinMaxComputerType::New();
   minMaxComputer->SetImage(itkImage);
@@ -273,8 +343,9 @@ mitk::GIFFirstOrderNumericStatistics::FeatureListType mitk::GIFFirstOrderNumeric
   InitializeQuantifier(image, mask);
   FeatureListType featureList;
 
-  ParameterStruct params;
+  FirstOrderNumericParameterStruct params;
 
+  params.quantifier = GetQuantifier();
   params.MinimumIntensity = GetQuantifier()->GetMinimum();
   params.MaximumIntensity = GetQuantifier()->GetMaximum();
   params.Bins = GetQuantifier()->GetBins();
@@ -287,14 +358,6 @@ mitk::GIFFirstOrderNumericStatistics::FeatureListType mitk::GIFFirstOrderNumeric
 mitk::GIFFirstOrderNumericStatistics::FeatureNameListType mitk::GIFFirstOrderNumericStatistics::GetFeatureNames()
 {
   FeatureNameListType featureList;
-  featureList.push_back("First Order::Minimum");
-  featureList.push_back("First Order::Maximum");
-  featureList.push_back("First Order::Mean");
-  featureList.push_back("First Order::Variance");
-  featureList.push_back("First Order::Sum");
-  featureList.push_back("First Order::Median");
-  featureList.push_back("First Order::Standard deviation");
-  featureList.push_back("First Order::No. of Voxel");
   return featureList;
 }
 

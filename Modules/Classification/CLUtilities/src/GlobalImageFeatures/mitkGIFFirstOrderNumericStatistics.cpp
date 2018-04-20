@@ -61,23 +61,26 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   for (unsigned int i = 0; i < VImageDimension; ++i)
     voxelSpace *= itkImage->GetSpacing()[i];
 
+  unsigned int numberOfBins = params.quantifier->GetBins();
+  std::vector<unsigned int> histogram;
+  histogram.resize(numberOfBins, 0);
+
+
   double minimum = std::numeric_limits<double>::max();
   double maximum = std::numeric_limits<double>::lowest();
-
   double sum = 0;
   double sumTwo= 0;
   double sumThree = 0;
-
   unsigned int numberOfVoxels = 0;
 
   itk::ImageRegionIterator<ImageType> imageIter(itkImage, itkImage->GetLargestPossibleRegion());
-  itk::ImageRegionIterator<MaskType>  maskIter(maskImage, maskImage->GetLargetPossibleRegion());
+  itk::ImageRegionIterator<MaskType>  maskIter(maskImage, maskImage->GetLargestPossibleRegion());
 
   while (!imageIter.IsAtEnd())
   {
     if (maskIter.Get() > 0)
     {
-      value = imageIter.Get();
+      double value = imageIter.Get();
 
       minimum = std::min<double>(minimum, value);
       maximum = std::max<double>(maximum, value);
@@ -86,19 +89,61 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
       sumTwo += value * value;
       sumThree += value * value*value;
 
+      histogram[params.quantifier->IntensityToIndex(value)] += 1;
+
       ++numberOfVoxels;
     }
-    ++maskiter;
+    ++maskIter;
     ++imageIter;
   }
 
-  double mean = sum / numberOfVoxels;
-  double energy = sumTwo;
-  double rootMeanSquare = std::sqrt<double>(sumTwo / numberOfVoxels);
+  //
+  // Histogram based calculations
+  //
+  unsigned int passedValues = 0;
+  bool found10th = false;
+  bool found90th = false;
+  bool foundMedian = false;
+  double median = 0;
+  for (std::size_t idx = 0; idx < histogram.size(); ++idx)
+  {
 
+  }
+
+
+  double mean = sum / numberOfVoxels;
+  double variance = sumTwo / numberOfVoxels - (mean*mean);
+  double skewness = (sumThree / numberOfVoxels - 3 * mean * variance - mean * mean * mean) / (std::pow<double>(variance, 3/2 ));
+  double energy = sumTwo;
+  double rootMeanSquare = std::sqrt(sumTwo / numberOfVoxels);
+
+  double sumAbsoluteDistanceToMean = 0;
+
+  maskIter.GoToBegin();
+  imageIter.GoToBegin();
+  while (!imageIter.IsAtEnd())
+  {
+    if (maskIter.Get() > 0)
+    {
+      double value = imageIter.Get();
+
+      sumAbsoluteDistanceToMean += std::abs<double>(value - mean);
+
+    }
+    ++maskIter;
+    ++imageIter;
+  }
+  double meanAbsoluteDeviation = sumAbsoluteDistanceToMean / numberOfVoxels;
 
 
   featureList.push_back(std::make_pair(params.prefix + "Mean", mean));
+  featureList.push_back(std::make_pair(params.prefix + "Variance", variance));
+  featureList.push_back(std::make_pair(params.prefix + "Skewness", skewness));
+  featureList.push_back(std::make_pair(params.prefix + "Minimum", minimum));
+  featureList.push_back(std::make_pair(params.prefix + "Maximum", maximum));
+  featureList.push_back(std::make_pair(params.prefix + "Range", maximum-minimum));
+  featureList.push_back(std::make_pair(params.prefix + "Mean absolute deviation", meanAbsoluteDeviation));
+
   featureList.push_back(std::make_pair(params.prefix + "Energy", energy));
   featureList.push_back(std::make_pair(params.prefix + "Root mean square", rootMeanSquare));
 
@@ -109,7 +154,7 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
 
 
 
-
+  /*
 
   typedef itk::LabelStatisticsImageFilter<ImageType, MaskType> FilterType;
   typedef typename FilterType::HistogramType HistogramType;
@@ -328,7 +373,7 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   featureList.push_back(std::make_pair(params.prefix + "Interquartile Range", (p75th - p25th)));
   featureList.push_back(std::make_pair(params.prefix + "Image Dimension", VImageDimension));
   featureList.push_back(std::make_pair(params.prefix + "Voxel Space", voxelSpace));
-  featureList.push_back(std::make_pair(params.prefix + "Voxel Volume", voxelVolume));
+  featureList.push_back(std::make_pair(params.prefix + "Voxel Volume", voxelVolume)); */
 }
 
 mitk::GIFFirstOrderNumericStatistics::GIFFirstOrderNumericStatistics()

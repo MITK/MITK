@@ -29,7 +29,6 @@ struct Params {
   bool invert;
   float zeroValue;
 };
-
 template<typename TPixel, unsigned int VImageDimension>
 void
 CreateXRay(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask1, std::string output, Params param)
@@ -42,10 +41,10 @@ CreateXRay(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer m
   mitk::CastToItkImage(mask1, itkMask);
 
   NewImageType::SpacingType newSpacing;
-  auto spacing = itkImage->GetSpacing();
-  spacing[0] = itkImage->GetSpacing()[0];
-  spacing[1] = itkImage->GetSpacing()[1];
-  spacing[2] = itkImage->GetSpacing()[2];
+  typename ImageType::SpacingType spacing;
+  spacing[0] = 0;
+  spacing[1] = 0;
+  spacing[2] = 0;
   spacing = itkImage->GetSpacing();
 
   NewImageType::RegionType region1,region2,region3,region1m,region2m,region3m;

@@ -663,16 +663,6 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item row="0" column="1">
-          <widget class="QSpinBox" name="m_LineWidth">
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>10</number>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_8">
            <property name="text">
@@ -680,82 +670,30 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>Line Width</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="1">
           <widget class="QDoubleSpinBox" name="m_TubeWidth">
            <property name="decimals">
-            <number>4</number>
+            <number>3</number>
            </property>
            <property name="singleStep">
             <double>0.100000000000000</double>
            </property>
           </widget>
          </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QGroupBox" name="m_3DClippingBox">
-        <property name="title">
-         <string>3D Fiber Clipping</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_5">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <item row="3" column="0">
-          <widget class="QRadioButton" name="m_Clip2">
-           <property name="text">
-            <string>Sagittal</string>
-           </property>
-          </widget>
-         </item>
          <item row="2" column="0">
-          <widget class="QRadioButton" name="m_Clip0">
+          <widget class="QLabel" name="label_9">
            <property name="text">
-            <string>No clipping</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QRadioButton" name="m_Clip3">
-           <property name="text">
-            <string>Coronal</string>
+            <string>Ribbon Width</string>
            </property>
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QRadioButton" name="m_Clip1">
-           <property name="text">
-            <string>Axial</string>
+          <widget class="QDoubleSpinBox" name="m_RibbonWidth">
+           <property name="decimals">
+            <number>3</number>
            </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QCheckBox" name="m_FlipClipBox">
-           <property name="text">
-            <string>Flipp Clipping Direction</string>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
            </property>
           </widget>
          </item>
@@ -810,20 +748,7 @@ p, li { white-space: pre-wrap; }
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="0" column="3">
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="4">
+      <item row="0" column="2">
        <widget class="QFrame" name="frame">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -844,7 +769,28 @@ p, li { white-space: pre-wrap; }
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item row="0" column="0">
+         <item row="1" column="3">
+          <widget class="QCheckBox" name="m_FlipPeaksY">
+           <property name="text">
+            <string>y</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="4">
+          <widget class="QCheckBox" name="m_FlipPeaksZ">
+           <property name="text">
+            <string>z</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QCheckBox" name="m_FlipPeaksX">
+           <property name="text">
+            <string>x</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
           <widget class="QCommandLinkButton" name="m_FlipPeaksButton">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -857,55 +803,163 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QFrame" name="frame_3">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_7">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item row="0" column="1">
-          <widget class="QCheckBox" name="m_FlipPeaksX">
+          <widget class="QToolButton" name="m_ResetColoring2">
+           <property name="toolTip">
+            <string>Reset to Default Coloring</string>
+           </property>
            <property name="text">
-            <string>x</string>
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+             <normaloff>:/QmitkDiffusionImaging/reset.png</normaloff>:/QmitkDiffusionImaging/reset.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QToolButton" name="m_SetColor1">
+           <property name="toolTip">
+            <string>Reset to Default Coloring</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+             <normaloff>:/QmitkDiffusionImaging/color64.gif</normaloff>:/QmitkDiffusionImaging/color64.gif</iconset>
            </property>
           </widget>
          </item>
          <item row="0" column="2">
-          <widget class="QCheckBox" name="m_FlipPeaksY">
-           <property name="text">
-            <string>y</string>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
-          </widget>
-         </item>
-         <item row="0" column="3">
-          <widget class="QCheckBox" name="m_FlipPeaksZ">
-           <property name="text">
-            <string>z</string>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
            </property>
-          </widget>
+          </spacer>
          </item>
         </layout>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QToolButton" name="m_ResetColoring2">
-        <property name="toolTip">
-         <string>Reset to Default Coloring</string>
-        </property>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_7">
         <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-          <normaloff>:/QmitkDiffusionImaging/reset.png</normaloff>:/QmitkDiffusionImaging/reset.png</iconset>
+         <string>Line Width</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QToolButton" name="m_SetColor1">
-        <property name="toolTip">
-         <string>Reset to Default Coloring</string>
+      <item row="1" column="2">
+       <widget class="QDoubleSpinBox" name="m_LineWidth">
+        <property name="decimals">
+         <number>1</number>
         </property>
+        <property name="minimum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="m_3DClippingBox">
+     <property name="title">
+      <string>3D Clipping</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <item row="3" column="1">
+       <widget class="QRadioButton" name="m_Clip3">
         <property name="text">
-         <string/>
+         <string>Coronal</string>
         </property>
-        <property name="icon">
-         <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-          <normaloff>:/QmitkDiffusionImaging/color64.gif</normaloff>:/QmitkDiffusionImaging/color64.gif</iconset>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QRadioButton" name="m_Clip1">
+        <property name="text">
+         <string>Axial</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QRadioButton" name="m_Clip0">
+        <property name="text">
+         <string>No clipping</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QRadioButton" name="m_Clip2">
+        <property name="text">
+         <string>Sagittal</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="m_FlipClipBox">
+        <property name="text">
+         <string>Flipp Clipping Direction</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QCheckBox" name="m_Enable3dPeaks">
+        <property name="text">
+         <string>Enable 3D Rendering</string>
         </property>
        </widget>
       </item>

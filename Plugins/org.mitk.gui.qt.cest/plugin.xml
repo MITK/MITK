@@ -5,7 +5,8 @@
     <view id="org.mitk.views.ceststatistics"
           name="CEST Statistics"
           class="QmitkCESTStatisticsView"
-          icon="resources/icon.svg" />
+          icon="resources/icon.svg"
+		  category="CEST"/>
   </extension>
 
 </plugin>

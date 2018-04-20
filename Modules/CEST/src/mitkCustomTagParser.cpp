@@ -156,8 +156,8 @@ bool mitk::CustomTagParser::IsT1Sequence(std::string preparationType,
   // This unfortunate heuristic is due to somewhat arbitrary CEST sequence implementations.
   if (!isT1)
   {
-    std::string thisIsTrue = "0";
-    std::string thisIsFalse = "1";
+    std::string thisIsTrue = "1";
+    std::string thisIsFalse = "0";
     if ("0" == spoilingType)
     {
       thisIsFalse = "0";
@@ -170,7 +170,8 @@ bool mitk::CustomTagParser::IsT1Sequence(std::string preparationType,
     }
     else
     {
-      if (std::stoi(revisionString) - 1485 < 0)
+      int revisionNrWeAssumeToBeDifferenciating = 1485;
+      if (std::stoi(revisionString) - revisionNrWeAssumeToBeDifferenciating < 0)
       {
         thisIsFalse = "0";
         thisIsTrue = "1";

@@ -53,6 +53,11 @@ mitk::Mapper::Pointer mitk::FiberTrackingObjectFactory::CreateMapper(mitk::DataN
       newMapper = mitk::FiberBundleMapper3D::New();
       newMapper->SetDataNode(node);
     }
+    else if(node->GetData() && std::string("PeakImage").compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::PeakImageMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
   }
 
   return newMapper;
@@ -68,6 +73,7 @@ void mitk::FiberTrackingObjectFactory::SetDefaultProperties(mitk::DataNode* node
   }
   else if (node->GetData() && std::string("PeakImage").compare(node->GetData()->GetNameOfClass())==0)
   {
+    mitk::PeakImageMapper3D::SetDefaultProperties(node);
     mitk::PeakImageMapper2D::SetDefaultProperties(node);
   }
 }

@@ -11,6 +11,9 @@
 #define MITKCLCORE_EXPORT
 #define MITKCLUTILITIES_EXPORT
 #define ITKCommon_EXPORT
+#define MITKMATCHPOINTREGISTRATION_EXPORT
+#define MAPDeployment_EXPORT
+#define MAPAlgorithms_EXPORT
 
 #define ITKCommon_EXPORT
 #define ITK_FORWARD_EXPORT
@@ -64,6 +67,9 @@ SWIG_ADD_MITK_CLASS(SlicedData, mitkSlicedData.h, mitk)
 SWIG_ADD_MITK_CLASS(Image, mitkImage.h, mitk)
 SWIG_ADD_MITK_CLASS(PointSet, mitkPointSet.h, mitk)
 
+//
+// Phenotyping Related Classes
+//
 SWIG_ADD_MITK_CLASS(AbstractGlobalImageFeature, mitkAbstractGlobalImageFeature.h, mitk)
 SWIG_ADD_MITK_CLASS(GIFImageDescriptionFeatures, mitkGIFImageDescriptionFeatures.h, mitk)
 SWIG_ADD_MITK_CLASS(GIFFirstOrderStatistics, mitkGIFFirstOrderStatistics.h, mitk)
@@ -79,3 +85,42 @@ SWIG_ADD_MITK_CLASS(GIFLocalIntensity, mitkGIFLocalIntensity.h, mitk)
 SWIG_ADD_MITK_CLASS(GIFIntensityVolumeHistogramFeatures, mitkGIFIntensityVolumeHistogramFeatures.h, mitk)
 SWIG_ADD_MITK_CLASS(GIFNeighbourhoodGreyToneDifferenceFeatures, mitkGIFNeighbourhoodGreyToneDifferenceFeatures.h, mitk)
 SWIG_ADD_MITK_CLASS(GIFCurvatureStatistic, mitkGIFCurvatureStatistic.h, mitk)
+
+//
+// MatchPoint Related Classes
+//
+MITKSWIG_ADD_CLASS(MITKAlgorithmHelper, mitkAlgorithmHelper.h, mitk)
+MITKSWIG_ADD_CLASS(RegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
+MITKSWIG_ADD_CLASS(MITKRegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
+
+
+%ignore map::deployment::DLLHandle::New(const LibraryHandleType& libraryHandle, const map::algorithm::UID* pUID, const core::String& libraryFile, const core::String& profileStr);
+%ignore map::deployment::DLLHandle::New(const map::algorithm::UID* pUID,const core::String& libraryFilePath,const core::String& profileStr);
+%ignore map::deployment::DLLInfo::New(const map::algorithm::UID* pUID,const core::String& libraryFilePath,const core::String& profileStr);
+%ignore map::deployment::DLLHandle::New;
+
+SWIG_ADD_MITK_CLASS_VECTORFREE(DLLDirectoryBrowser, mapDeploymentDLLDirectoryBrowser.h, ::map::deployment)
+SWIG_ADD_MITK_CLASS_VECTORFREE(DLLInfo, mapDeploymentDLLInfo.h, ::map::deployment)
+SWIG_ADD_MITK_CLASS_VECTORFREE(DLLHandle, mapDeploymentDLLHandle.h, ::map::deployment)
+SWIG_ADD_MITK_CLASS_VECTORFREE(UID, mapUID.h, ::map::algorithm)
+%{
+ namespace algorithm
+ {
+   typedef map::algorithm::UID UID;
+ }
+ namespace core
+ {
+   typedef map::core::String String;
+ }
+%}
+
+MITKSWIG_ADD_HEADERFILE(mapDeploymentDLLAccess.h)
+SWIG_ADD_MITK_CLASS_VECTORFREE(DLLHandle, mapDeploymentDLLHandle.h, ::map::deployment)
+
+// SWIG_ADD_MITK_CLASS(FastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm, mitkFastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm.h, mitk)
+// SWIG_ADD_MITK_CLASS(LevelSetMotionMultiResDefaultRegistrationAlgorithm, mitkLevelSetMotionMultiResDefaultRegistrationAlgorithm.h, mitk)
+// SWIG_ADD_MITK_CLASS(MultiModalAffineDefaultRegistrationAlgorithm, mitkMultiModalAffineDefaultRegistrationAlgorithm.h, mitk)
+// SWIG_ADD_MITK_CLASS(MultiModalRigidDefaultRegistrationAlgorithm, mitkMultiModalRigidDefaultRegistrationAlgorithm.h, mitk)
+// SWIG_ADD_MITK_CLASS(MultiModalTransDefaultRegistrationAlgorithm, mitkMultiModalTransDefaultRegistrationAlgorithm.h, mitk)
+// SWIG_ADD_MITK_CLASS(RigidClosedFormPointsDefaultRegistrationAlgorithm, mitkRigidClosedFormPointsDefaultRegistrationAlgorithm.h, mitk)
+// SWIG_ADD_MITK_CLASS(RigidICPDefaultRegistrationAlgorithm, mitkRigidICPDefaultRegistrationAlgorithm.h, mitk)

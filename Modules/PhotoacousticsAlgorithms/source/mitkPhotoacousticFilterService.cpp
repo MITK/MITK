@@ -278,8 +278,8 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyCropping(mitk::Image
   mitk::Image::Pointer output = mitk::Image::New();
   output->Initialize(mitk::MakeScalarPixelType<float>(), 3, outputDim);
   output->SetSpacing(inputImage->GetGeometry()->GetSpacing());
-  output->SetImportVolume(outputData, 0, 0, mitk::Image::ReferenceMemory);
-
+  output->SetImportVolume(outputData, 0, 0, mitk::Image::CopyMemory);
+  delete[] outputData;
   return output;
 }
 

@@ -143,13 +143,16 @@ void mitk::FiberBundleMapper2D::Update(mitk::BaseRenderer * renderer)
   if (fiberBundle==nullptr)
     return;
 
-  int lineWidth = 0;
+  int lineWidth = 1.0;
   node->GetIntProperty("LineWidth", lineWidth);
   if (m_LineWidth!=lineWidth)
   {
     m_LineWidth = lineWidth;
     fiberBundle->RequestUpdate2D();
   }
+
+  vtkProperty *property = localStorage->m_Actor->GetProperty();
+  property->SetLighting(false);
 
   if ( localStorage->m_LastUpdateTime<renderer->GetCurrentWorldPlaneGeometryUpdateTime() || localStorage->m_LastUpdateTime<fiberBundle->GetUpdateTime2D() )
   {
@@ -180,13 +183,14 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
     return;
 
   fiberPolyData->GetPointData()->AddArray(fiberBundle->GetFiberColors());
-  localStorage->m_FiberMapper->ScalarVisibilityOn();
-  localStorage->m_FiberMapper->SetScalarModeToUsePointFieldData();
-  localStorage->m_FiberMapper->SetLookupTable(m_lut);  //apply the properties after the slice was set
-  localStorage->m_FiberMapper->SelectColorArray("FIBER_COLORS");
-  localStorage->m_FiberMapper->SetInputData(fiberPolyData);
+  localStorage->m_Mapper->ScalarVisibilityOn();
+  localStorage->m_Mapper->SetScalarModeToUsePointFieldData();
+  localStorage->m_Mapper->SetLookupTable(m_lut);  //apply the properties after the slice was set
+  localStorage->m_Actor->GetProperty()->SetOpacity(0.999);
+  localStorage->m_Mapper->SelectColorArray("FIBER_COLORS");
+  localStorage->m_Mapper->SetInputData(fiberPolyData);
 
-  localStorage->m_FiberMapper->SetVertexShaderCode(
+  localStorage->m_Mapper->SetVertexShaderCode(
         "//VTK::System::Dec\n"
         "attribute vec4 vertexMC;\n"
 
@@ -206,7 +210,7 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
         "}\n"
         );
 
-  localStorage->m_FiberMapper->SetFragmentShaderCode(
+  localStorage->m_Mapper->SetFragmentShaderCode(
         "//VTK::System::Dec\n"  // always start with this line
         "//VTK::Output::Dec\n"  // always have this line in your FS
         "uniform vec4 slicingPlane;\n"
@@ -232,7 +236,7 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
         "    out_Color = vec4(colorVertex.xyz*x, fiberOpacity);\n"
         "  }\n"
         "  else{\n"
-        "    out_Color = vec4(colorVertex.xyz,fiberOpacity);\n"
+        "    out_Color = vec4(colorVertex.xyz, fiberOpacity);\n"
         "  }\n"
         "}\n"
         );
@@ -240,10 +244,10 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   vtkSmartPointer<vtkShaderCallback> myCallback = vtkSmartPointer<vtkShaderCallback>::New();
   myCallback->renderer = renderer;
   myCallback->node = this->GetDataNode();
-  localStorage->m_FiberMapper->AddObserver(vtkCommand::UpdateShaderEvent,myCallback);
+  localStorage->m_Mapper->AddObserver(vtkCommand::UpdateShaderEvent,myCallback);
 
-  localStorage->m_PointActor->SetMapper(localStorage->m_FiberMapper);
-  localStorage->m_PointActor->GetProperty()->SetLineWidth(m_LineWidth);
+  localStorage->m_Actor->SetMapper(localStorage->m_Mapper);
+  localStorage->m_Actor->GetProperty()->SetLineWidth(m_LineWidth);
 
   // We have been modified => save this for next Update()
   localStorage->m_LastUpdateTime.Modified();
@@ -253,7 +257,7 @@ void mitk::FiberBundleMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
 vtkProp* mitk::FiberBundleMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
   this->Update(renderer);
-  return m_LocalStorageHandler.GetLocalStorage(renderer)->m_PointActor;
+  return m_LocalStorageHandler.GetLocalStorage(renderer)->m_Actor;
 }
 
 
@@ -271,6 +275,6 @@ void mitk::FiberBundleMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk:
 
 mitk::FiberBundleMapper2D::FBXLocalStorage::FBXLocalStorage()
 {
-  m_PointActor = vtkSmartPointer<vtkActor>::New();
-  m_FiberMapper = vtkSmartPointer<MITKFIBERBUNDLEMAPPER2D_POLYDATAMAPPER>::New();
+  m_Actor = vtkSmartPointer<vtkActor>::New();
+  m_Mapper = vtkSmartPointer<MITKFIBERBUNDLEMAPPER2D_POLYDATAMAPPER>::New();
 }

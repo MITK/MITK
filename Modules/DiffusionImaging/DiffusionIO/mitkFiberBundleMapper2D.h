@@ -52,8 +52,8 @@ public:
   class  FBXLocalStorage : public mitk::Mapper::BaseLocalStorage
   {
   public:
-    vtkSmartPointer<vtkActor> m_PointActor;
-    vtkSmartPointer<MITKFIBERBUNDLEMAPPER2D_POLYDATAMAPPER> m_FiberMapper;
+    vtkSmartPointer<vtkActor> m_Actor;
+    vtkSmartPointer<MITKFIBERBUNDLEMAPPER2D_POLYDATAMAPPER> m_Mapper;
     itk::TimeStamp m_LastUpdateTime;
     FBXLocalStorage();
 

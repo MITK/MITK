@@ -104,13 +104,19 @@ void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *rendere
   localStorage->m_FiberActor->GetProperty()->SetLineWidth(m_LineWidth);
   localStorage->m_FiberAssembly->AddPart(localStorage->m_FiberActor);
 
-  const DataNode* node = this->GetDataNode();
+  DataNode* node = this->GetDataNode();
   mitk::ClippingProperty* prop = dynamic_cast<mitk::ClippingProperty*>(node->GetProperty("3DClipping"));
+  if (prop==nullptr)
+  {
+    SetDefaultProperties(node, nullptr, false);
+    prop = dynamic_cast<mitk::ClippingProperty*>(node->GetProperty("3DClipping"));
+  }
 
   mitk::Vector3D plane_normal = prop->GetNormal();
   mitk::Point3D plane_origin = prop->GetOrigin();
   bool flip;
   node->GetBoolProperty("3DClippingPlaneFlip",flip);
+
   if (flip)
     plane_normal *= -1;
 

@@ -126,6 +126,7 @@ void mitk::PeakImageMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *render
   mitk::Vector3D plane_normal = prop->GetNormal();
   if (plane_normal.GetNorm()>0.0)
   {
+    plane_normal.Normalize();
     mitk::Point3D plane_origin = prop->GetOrigin();
 
     double vnormal[3];
@@ -175,7 +176,7 @@ vtkProp* mitk::PeakImageMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 
 void mitk::PeakImageMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-//  Superclass::SetDefaultProperties(node, renderer, overwrite);
+  Superclass::SetDefaultProperties(node, renderer, overwrite);
 
   mitk::Vector3D plane_vec; plane_vec.Fill(0.0);
   mitk::Point3D plane_origin; plane_origin.Fill(0.0);

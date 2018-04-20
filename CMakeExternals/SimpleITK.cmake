@@ -86,6 +86,7 @@ if(MITK_USE_SimpleITK)
          -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
          -DCMAKE_C_COMPILER_AR:FILEPATH=${CMAKE_C_COMPILER_AR}
          -DCMAKE_C_COMPILER_RANLIB:FILEPATH=${CMAKE_C_COMPILER_RANLIB}
+         -DCMAKE_INSTALL_PREFIX:PATH=${ep_prefix}
        CMAKE_CACHE_DEFAULT_ARGS
          ${ep_common_cache_default_args}
        DEPENDS ${proj_DEPENDENCIES}
@@ -109,16 +110,16 @@ if(MITK_USE_SimpleITK)
       set(_pythonpath ${ep_prefix}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages )
 
       if(WIN32)
-        STRING(REPLACE "/" "\\\\" _install_dir ${_install_dir})
-        set(_additional_pythonpath $<SEMICOLON>${ep_prefix}/Lib/site-packages)
+        STRING(REPLACE "/" "\\\\" _install_dir ${_pythonpath})
+        set(_python_install_arguments --install-lib=${_install_dir})
       else()
         # escape spaces in the install path for linux
         STRING(REPLACE " " "\ " _install_dir ${_install_dir})
-        set(_additional_pythonpath )
+        set(_python_install_arguments --prefix=${_install_dir})
       endif()
 
       ExternalProject_Add_Step(${proj} sitk_python_install_step
-        COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${_pythonpath}${_additional_pythonpath} ${PYTHON_EXECUTABLE} Packaging/setup.py install --prefix=${_install_dir}
+        COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${_pythonpath} ${PYTHON_EXECUTABLE} Packaging/setup.py install ${_python_install_arguments}
         DEPENDEES install
         WORKING_DIRECTORY ${_sitk_build_dir}/SimpleITK-build/Wrapping/Python/
       )

@@ -195,3 +195,10 @@ if(MITK_USE_BetData)
             DESTINATION "bin"
             FILES_MATCHING PATTERN "*")
 endif()
+
+#install SimpleITK libs that are currently not auto detected
+if(MITK_USE_SimpleITK)
+  install(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/bin/"
+            DESTINATION "bin"
+            FILES_MATCHING PATTERN "SimpleITK*")
+endif()

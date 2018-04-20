@@ -189,6 +189,11 @@ void QmitkFiberProcessingView::Modify()
     DoWeightColorCoding();
     break;
   }
+  case 8:
+  {
+    DoLengthColorCoding();
+    break;
+  }
   }
 }
 
@@ -977,6 +982,9 @@ void QmitkFiberProcessingView::UpdateGui()
   case 7:
     m_Controls->m_ColorFibersFrame->setVisible(true);
     break;
+  case 8:
+    m_Controls->m_ColorFibersFrame->setVisible(true);
+    break;
   }
 
   // are fiber bundles selected?
@@ -1536,6 +1544,20 @@ void QmitkFiberProcessingView::DoCurvatureColorCoding()
   {
     mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
     fib->ColorFibersByCurvature(m_Controls->m_FiberOpacityBox->isChecked(), m_Controls->m_NormalizeColorValues->isChecked());
+  }
+
+  if (auto renderWindowPart = this->GetRenderWindowPart())
+  {
+    renderWindowPart->RequestUpdate();
+  }
+}
+
+void QmitkFiberProcessingView::DoLengthColorCoding()
+{
+  for (auto node : m_SelectedFB)
+  {
+    mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+    fib->ColorFibersByLength(m_Controls->m_FiberOpacityBox->isChecked(), m_Controls->m_NormalizeColorValues->isChecked());
   }
 
   if (auto renderWindowPart = this->GetRenderWindowPart())

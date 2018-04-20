@@ -47,7 +47,7 @@ public:
 
   void ImageDescription_PhantomTest()
   {
-    mitk::mitkGIFFirstOrderNumericStatistics::Pointer featureCalculator = mitk::mitkGIFFirstOrderNumericStatistics::New();
+    mitk::GIFFirstOrderNumericStatistics::Pointer featureCalculator = mitk::GIFFirstOrderNumericStatistics::New();
 
     featureCalculator->SetUseBinsize(true);
     featureCalculator->SetBinsize(1.0);

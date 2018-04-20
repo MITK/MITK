@@ -5,5 +5,6 @@ MITK_CREATE_MODULE(
     PRIVATE ITK|ITKIOImageBase+ITKIOGDCM 
 )
 
+add_subdirectory(MiniApps)
 #add_subdirectory(autoload/IO)
 #add_subdirectory(test)

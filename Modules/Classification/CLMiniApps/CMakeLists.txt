@@ -17,7 +17,6 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         ManualSegmentationEvaluation^^MitkCLVigraRandomForest
         CLScreenshot^^MitkCore_MitkQtWidgetsExt_MitkCLUtilities
         CLDicom2Nrrd^^MitkCore
-        CLImageTypeConverter^^MitkCore
         CLResampleImageToReference^^MitkCore
         CLGlobalImageFeatures^^MitkCLUtilities_MitkQtWidgetsExt
         CLMRNormalization^^MitkCLUtilities_MitkCLMRUtilities
@@ -110,26 +109,6 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     PACKAGE_DEPENDS ITK Qt5|Core Vigra MatchPoint
     CPP_FILES CLMatchPointReg.cpp 
   )
-  #mitk_create_executable(CLGlobalImageFeatures
-  #  DEPENDS MitkCore MitkCLUtilities
-  #  CPP_FILES CLGlobalImageFeatures.cpp mitkCommandLineParser.cpp
-  #)
-  #mitk_create_executable(CLBrainMask
-  #  DEPENDS MitkCore MitkCLUtilities
-  #  CPP_FILES CLBrainMask.cpp mitkCommandLineParser.cpp
-  #)
-  #mitk_create_executable(CLImageConverter
-  #  DEPENDS MitkCore
-  #  CPP_FILES CLImageConverter.cpp mitkCommandLineParser.cpp
-  #)
-  #mitk_create_executable(CLSurWeighting
-  #  DEPENDS MitkCore MitkCLUtilities MitkDataCollection #MitkCLImportanceWeighting
-  #  CPP_FILES CLSurWeighting.cpp mitkCommandLineParser.cpp
-  #)
-  #mitk_create_executable(CLImageCropper
-  #  DEPENDS MitkCore MitkCLUtilities MitkAlgorithmsExt
-  #  CPP_FILES CLImageCropper.cpp mitkCommandLineParser.cpp
-  #)
 
         # On Linux, create a shell script to start a relocatable application
         if(UNIX AND NOT APPLE)

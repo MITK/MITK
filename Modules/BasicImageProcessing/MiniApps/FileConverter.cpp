@@ -100,6 +100,9 @@ int main(int argc, char* argv[])
 
   auto nodes = mitk::IOUtil::Load(inputFilename, &functor);
 
+  mitk::Image::Pointer image;
+
+
   unsigned count = 0;
   for (auto node : nodes)
   {

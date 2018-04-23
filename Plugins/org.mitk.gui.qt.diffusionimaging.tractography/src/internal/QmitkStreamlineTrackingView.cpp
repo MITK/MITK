@@ -329,9 +329,12 @@ void QmitkStreamlineTrackingView::AfterThread()
 
 void QmitkStreamlineTrackingView::InteractiveSeedChanged(bool posChanged)
 {
+  if(!CheckAndStoreLastParams(sender()) && !posChanged)
+    return;
   if (m_ThreadIsRunning || !m_Visible)
     return;
-  if (!posChanged && (!m_Controls->m_InteractiveBox->isChecked() || !m_Controls->m_ParamUpdateBox->isChecked()))
+
+  if (!posChanged && (!m_Controls->m_InteractiveBox->isChecked() || !m_Controls->m_ParamUpdateBox->isChecked()) )
     return;
 
   std::srand(std::time(0));
@@ -366,6 +369,10 @@ void QmitkStreamlineTrackingView::InteractiveSeedChanged(bool posChanged)
 void QmitkStreamlineTrackingView::OnParameterChanged()
 {
   UpdateGui();
+
+  if(!CheckAndStoreLastParams(sender()))
+    return;
+
   if (m_Controls->m_InteractiveBox->isChecked() && m_Controls->m_ParamUpdateBox->isChecked())
     DoFiberTracking();
 }
@@ -566,8 +573,8 @@ void QmitkStreamlineTrackingView::UpdateGui()
   m_Controls->commandLinkButton->setEnabled(false);
   m_Controls->m_TrialsPerSeedBox->setEnabled(false);
   m_Controls->m_TrialsPerSeedLabel->setEnabled(false);
-  m_Controls->m_TargetImageBox->setVisible(false);
-  m_Controls->m_TargetImageLabel->setVisible(false);
+  m_Controls->m_TargetImageBox->setEnabled(false);
+  m_Controls->m_TargetImageLabel->setEnabled(false);
 
   if (m_Controls->m_InteractiveBox->isChecked())
   {
@@ -586,8 +593,8 @@ void QmitkStreamlineTrackingView::UpdateGui()
 
   if (m_Controls->m_EpConstraintsBox->currentIndex()>0)
   {
-    m_Controls->m_TargetImageBox->setVisible(true);
-    m_Controls->m_TargetImageLabel->setVisible(true);
+    m_Controls->m_TargetImageBox->setEnabled(true);
+    m_Controls->m_TargetImageLabel->setEnabled(true);
   }
 
   // trials per seed are only important for probabilistic tractography
@@ -646,7 +653,12 @@ void QmitkStreamlineTrackingView::StartStopTrackingGui(bool start)
 
 void QmitkStreamlineTrackingView::DoFiberTracking()
 {
-  if (m_ThreadIsRunning || m_InputImages.empty() || !m_Visible)
+  if (m_InputImages.empty())
+  {
+    QMessageBox::information(nullptr, "Information", "Please select an input image in the datamaneger (tensor, ODF, peak or dMRI image)!");
+    return;
+  }
+  if (m_ThreadIsRunning || !m_Visible)
     return;
   if (m_Controls->m_InteractiveBox->isChecked() && m_SeedPoints.empty())
     return;

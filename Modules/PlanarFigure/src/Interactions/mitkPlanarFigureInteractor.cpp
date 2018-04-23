@@ -523,11 +523,9 @@ void mitk::PlanarFigureInteractor::SetPreviewPointPosition( StateMachineAction*,
     return;
 
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
-  const mitk::BaseRenderer *renderer = interactionEvent->GetSender();
+  mitk::BaseRenderer *renderer = interactionEvent->GetSender();
 
   planarFigure->DeselectControlPoint();
-
-  mitk::Point2D pointProjectedOntoLine = positionEvent->GetPointerPositionOnScreen();
 
   bool selected(false);
   bool isExtendable(false);
@@ -538,7 +536,8 @@ void mitk::PlanarFigureInteractor::SetPreviewPointPosition( StateMachineAction*,
 
   if ( selected &&  isExtendable && isEditable )
   {
-    renderer->DisplayToPlane( pointProjectedOntoLine, pointProjectedOntoLine );
+    mitk::Point2D pointProjectedOntoLine;
+    this->TransformPositionEventToPoint2D(positionEvent, dynamic_cast< PlaneGeometry * >(planarFigure->GetGeometry(0)), pointProjectedOntoLine);
     planarFigure->SetPreviewControlPoint( pointProjectedOntoLine );
   }
 

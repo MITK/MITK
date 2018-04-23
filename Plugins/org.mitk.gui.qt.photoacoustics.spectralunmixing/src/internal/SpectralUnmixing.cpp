@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk image
 #include <mitkImage.h>
 
-// Perform Spectral Unmixing
+// to perform Spectral Unmixing
 #include "mitkPASpectralUnmixingFilter.h"
 
 const std::string SpectralUnmixing::VIEW_ID = "org.mitk.views.spectralunmixing";
@@ -44,8 +44,7 @@ void SpectralUnmixing::CreateQtPartControl(QWidget *parent)
   m_Controls.setupUi(parent);
   connect(m_Controls.buttonPerformImageProcessing, &QPushButton::clicked, this, &SpectralUnmixing::DoImageProcessing);
   connect(m_Controls.ButtonAddWavelength, &QPushButton::clicked, this, &SpectralUnmixing::Wavelength);
-
-}
+  }
 
 void SpectralUnmixing::Wavelength()
 {
@@ -54,9 +53,6 @@ void SpectralUnmixing::Wavelength()
   m_SpectralUnmixingFilter->AddWavelength(wavelength);
   MITK_INFO << wavelength << " nm";
 }
-
-
-
 
 void SpectralUnmixing::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
                                                 const QList<mitk::DataNode::Pointer> &nodes)
@@ -103,7 +99,7 @@ void SpectralUnmixing::DoImageProcessing()
     {
       std::stringstream message;
       std::string name;
-      message << "Performing image processing for image ";
+      message << "PERFORMING SPECTRAL UNMIXING (SOON)";
       if (node->GetName(name))
       {
         // a property called "name" was found for this DataNode
@@ -115,6 +111,7 @@ void SpectralUnmixing::DoImageProcessing()
       // actually do something here...
 
       // Checking which chromophores wanted for SU if none throw exeption!
+      numberofChromophores = 0;
       DeOxbool = m_Controls.checkBoxDeOx->isChecked();
       Oxbool = m_Controls.checkBoxOx->isChecked();
       if (DeOxbool || Oxbool == true)
@@ -123,18 +120,29 @@ void SpectralUnmixing::DoImageProcessing()
       }
       if (Oxbool == true)
       {
+        numberofChromophores += 1;
         MITK_INFO << "- Oxyhemoglobin";
       }
       if (DeOxbool == true)
       {
+        numberofChromophores += 1;
         MITK_INFO << "- Deoxygenated hemoglobin";
       }
-      if (DeOxbool == false && Oxbool == false)
+      if (numberofChromophores == 0)
       {
         mitkThrow() << "PRESS 'IGNORE' AND CHOOSE A CHROMOPHORE!";       
       }
 
       // to do: number of wavelengths has to be larger then checked chromophores ;)
+
+      //TEST STUFF:
+      auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilter::New();
+      MITK_INFO << "size"<< m_SpectralUnmixingFilter->size;
+
+      //MITK_INFO << "size" << mitk::pa::SpectralUnmixingFilter::size;     
+      //MITK_INFO << "m_W" << mitk::pa::SpectralUnmixingFilter::m_Wavelengths;
+      //MITK_INFO << ".size" << mitk::pa::SpectralUnmixingFilter::m_Wavelengths.size;
+    
 
 
     }

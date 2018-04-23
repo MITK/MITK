@@ -47,6 +47,9 @@ class SpectralUnmixing : public QmitkAbstractView
 public:
   static const std::string VIEW_ID;
 
+  bool DeOxbool;
+  bool Oxbool;
+
 protected:
   virtual void CreateQtPartControl(QWidget *parent) override;
 
@@ -59,6 +62,8 @@ protected:
   /// \brief Called when the user clicks the GUI button
   void DoImageProcessing();
 
+  virtual void Wavelength();
+  unsigned int wavelength;
   Ui::SpectralUnmixingControls m_Controls;
 };
 

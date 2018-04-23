@@ -44,7 +44,7 @@
    <item>
     <widget class="QToolBox" name="toolBox">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="page">
       <property name="geometry">
@@ -52,7 +52,7 @@
         <x>0</x>
         <y>0</y>
         <width>600</width>
-        <height>433</height>
+        <height>456</height>
        </rect>
       </property>
       <attribute name="label">
@@ -109,7 +109,7 @@
           <widget class="QPushButton" name="m_LoadCalibrationFile">
            <property name="maximumSize">
             <size>
-             <width>40</width>
+             <width>60</width>
              <height>16777215</height>
             </size>
            </property>
@@ -141,7 +141,7 @@
         <x>0</x>
         <y>0</y>
         <width>600</width>
-        <height>433</height>
+        <height>456</height>
        </rect>
       </property>
       <attribute name="label">
@@ -214,7 +214,7 @@
            </property>
            <property name="maximumSize">
             <size>
-             <width>40</width>
+             <width>60</width>
              <height>16777215</height>
             </size>
            </property>
@@ -259,7 +259,7 @@
         <x>0</x>
         <y>0</y>
         <width>600</width>
-        <height>433</height>
+        <height>456</height>
        </rect>
       </property>
       <attribute name="label">
@@ -300,8 +300,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>600</width>
-        <height>433</height>
+        <width>276</width>
+        <height>161</height>
        </rect>
       </property>
       <attribute name="label">

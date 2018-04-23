@@ -21,7 +21,7 @@
   </property>
   <property name="styleSheet">
    <string>QCommandLinkButton {
-  font-weight: normal;
+  font-weight: lighter;
 }
 
 QCommandLinkButton:disabled {
@@ -30,30 +30,23 @@ QCommandLinkButton:disabled {
 }
 
 QToolBox::tab {
-  border: 1px solid #434346;
   font-weight: bold;
 }
 
 QToolBox::tab:hover {
-  background-color: #434346;
   font-weight: bold;
 }
 
 QToolBox::tab:selected {
-  background-color: #1c97ea;
-  border: 1px solid #1c97ea;
   font-weight: bold;
 }
 
 QGroupBox {
-  border: 1px solid #434346;
-  background-color: #2d2d30;
-  margin-top: 8px;
-  padding-top: 8px;
+  background-color: transparent;
 }
 
 QGroupBox, QGroupBox:disabled {
-  background-color: #2d2d30;
+  background-color: transparent;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">

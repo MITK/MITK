@@ -74,6 +74,7 @@ void mitk::CESTImageNormalizationFilter::NormalizeTimeSteps(const itk::Image<TPi
 
   std::string offsets = "";
   this->GetInput()->GetPropertyList()->GetStringProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str(), offsets);
+  boost::algorithm::trim(offsets);
 
   std::vector<std::string> parts;
   boost::split(parts, offsets, boost::is_any_of(" "));

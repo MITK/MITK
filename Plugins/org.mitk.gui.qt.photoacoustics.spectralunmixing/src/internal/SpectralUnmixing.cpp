@@ -29,7 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 
 // Perform Spectral Unmixing
-
 #include "mitkPASpectralUnmixingFilter.h"
 
 const std::string SpectralUnmixing::VIEW_ID = "org.mitk.views.spectralunmixing";
@@ -44,7 +43,20 @@ void SpectralUnmixing::CreateQtPartControl(QWidget *parent)
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
   connect(m_Controls.buttonPerformImageProcessing, &QPushButton::clicked, this, &SpectralUnmixing::DoImageProcessing);
+  connect(m_Controls.ButtonAddWavelength, &QPushButton::clicked, this, &SpectralUnmixing::Wavelength);
+
 }
+
+void SpectralUnmixing::Wavelength()
+{
+  auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilter::New();
+  wavelength = m_Controls.spinBoxAddWavelength->value();
+  m_SpectralUnmixingFilter->AddWavelength(wavelength);
+  MITK_INFO << wavelength << " nm";
+}
+
+
+
 
 void SpectralUnmixing::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
                                                 const QList<mitk::DataNode::Pointer> &nodes)
@@ -102,20 +114,27 @@ void SpectralUnmixing::DoImageProcessing()
 
       // actually do something here...
 
-      // Add Wavelength
+      // Checking which chromophores wanted for SU if none throw exeption!
+      DeOxbool = m_Controls.checkBoxDeOx->isChecked();
+      Oxbool = m_Controls.checkBoxOx->isChecked();
+      if (DeOxbool || Oxbool == true)
+      {
+        MITK_INFO << "CHOSEN CHROMOPHORES:";
+      }
+      if (Oxbool == true)
+      {
+        MITK_INFO << "- Oxyhemoglobin";
+      }
+      if (DeOxbool == true)
+      {
+        MITK_INFO << "- Deoxygenated hemoglobin";
+      }
+      if (DeOxbool == false && Oxbool == false)
+      {
+        mitkThrow() << "PRESS 'IGNORE' AND CHOOSE A CHROMOPHORE!";       
+      }
 
-      auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilter::New();
-      unsigned int wavelength1 = m_Controls.spinBoxWavelength1->value();
-      unsigned int wavelength2 = m_Controls.spinBoxWavelength2->value();
-      
-      unsigned int dimension = 3;
-      mitk::PixelType TPixel = mitk::MakeScalarPixelType<double>();
-
-      MITK_INFO << wavelength1;
-      m_SpectralUnmixingFilter->AddWavelength(wavelength1);
-      MITK_INFO << wavelength2;
-      m_SpectralUnmixingFilter->AddWavelength(wavelength2);
-      //MITK_INFO << m_SpectralUnmixingFilter;
+      // to do: number of wavelengths has to be larger then checked chromophores ;)
 
 
     }

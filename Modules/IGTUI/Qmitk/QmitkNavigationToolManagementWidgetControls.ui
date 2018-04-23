@@ -147,7 +147,7 @@ p, li { white-space: pre-wrap; }
             <widget class="QPushButton" name="m_AddTool">
              <property name="maximumSize">
               <size>
-               <width>50</width>
+               <width>60</width>
                <height>16777215</height>
               </size>
              </property>
@@ -160,7 +160,7 @@ p, li { white-space: pre-wrap; }
             <widget class="QPushButton" name="m_LoadTool">
              <property name="maximumSize">
               <size>
-               <width>50</width>
+               <width>60</width>
                <height>16777215</height>
               </size>
              </property>
@@ -184,7 +184,7 @@ p, li { white-space: pre-wrap; }
             <widget class="QPushButton" name="m_MoveToolUp">
              <property name="maximumSize">
               <size>
-               <width>50</width>
+               <width>60</width>
                <height>16777215</height>
               </size>
              </property>
@@ -197,7 +197,7 @@ p, li { white-space: pre-wrap; }
             <widget class="QPushButton" name="m_MoveToolDown">
              <property name="maximumSize">
               <size>
-               <width>50</width>
+               <width>60</width>
                <height>16777215</height>
               </size>
              </property>
@@ -210,7 +210,7 @@ p, li { white-space: pre-wrap; }
             <widget class="QPushButton" name="m_DeleteTool">
              <property name="maximumSize">
               <size>
-               <width>50</width>
+               <width>60</width>
                <height>16777215</height>
               </size>
              </property>
@@ -223,7 +223,7 @@ p, li { white-space: pre-wrap; }
             <widget class="QPushButton" name="m_EditTool">
              <property name="maximumSize">
               <size>
-               <width>50</width>
+               <width>60</width>
                <height>16777215</height>
               </size>
              </property>
@@ -236,7 +236,7 @@ p, li { white-space: pre-wrap; }
             <widget class="QPushButton" name="m_SaveTool">
              <property name="maximumSize">
               <size>
-               <width>50</width>
+               <width>60</width>
                <height>16777215</height>
               </size>
              </property>

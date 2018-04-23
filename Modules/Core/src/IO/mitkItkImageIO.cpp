@@ -653,8 +653,8 @@ namespace mitk
 
         itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(), key, value);
       }
-
       ImageReadAccessor imageAccess(image);
+      LocaleSwitch localeSwitch2("C");
       m_ImageIO->Write(imageAccess.GetData());
     }
     catch (const std::exception &e)

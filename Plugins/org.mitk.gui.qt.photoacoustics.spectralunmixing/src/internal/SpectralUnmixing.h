@@ -64,6 +64,7 @@ protected:
 
   virtual void Wavelength();
   unsigned int wavelength;
+  unsigned int numberofChromophores;
   Ui::SpectralUnmixingControls m_Controls;
 };
 

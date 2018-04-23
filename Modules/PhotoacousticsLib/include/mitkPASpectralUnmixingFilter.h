@@ -41,14 +41,15 @@ namespace mitk {
       };
 
       void AddWavelength(int wavelength);
+      void Test();
+      std::vector<int> m_Wavelengths;
+      int size;
 
-   
     protected:
       SpectralUnmixingFilter();
       virtual ~SpectralUnmixingFilter();
 
     private:
-      std::vector<int> m_Wavelengths;
 
     };
   }

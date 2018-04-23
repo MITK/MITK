@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::pa::SpectralUnmixingFilter::SpectralUnmixingFilter()
 {
-
 }
 
 mitk::pa::SpectralUnmixingFilter::~SpectralUnmixingFilter()
@@ -29,11 +28,39 @@ mitk::pa::SpectralUnmixingFilter::~SpectralUnmixingFilter()
 
 }
 
+void mitk::pa::SpectralUnmixingFilter::Test()
+{
+  MITK_INFO << "Test";
+}
+
 void mitk::pa::SpectralUnmixingFilter::AddWavelength(int wavelength)
 {
-  MITK_INFO << "ADD WAVELENGTH...";
+  
+  //MITK_INFO << "m_w" << m_Wavelengths[size];
+
+  /*if (m_Wavelengths.empty())
+  {
+    size = 0;
+  }*/
+  //MITK_INFO << "size after if empty:  " << size;
+
+
+  //MITK_INFO << "ADD WAVELENGTH...";
+
+
+  MITK_INFO << "begin size:  " << size;
   m_Wavelengths.push_back(wavelength);
+  MITK_INFO << "inhalt vector size:  " << m_Wavelengths[size];
+  MITK_INFO << "inhalt vector 0:  " << m_Wavelengths[0]; 
+  MITK_INFO << "inhalt vector 10:  " << m_Wavelengths[10];
+
+
+  int foo = size;
+  size = foo + 1;
+  MITK_INFO << "end size:  " << size;
+
 }
+
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // VERWORFENES ZEUG: 

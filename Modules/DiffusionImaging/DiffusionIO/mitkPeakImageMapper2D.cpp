@@ -37,72 +37,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSliceNavigationController.h>
 #include <mitkCoreServices.h>
 
-class vtkPeakShaderCallback : public vtkCommand
-{
-public:
-  static vtkPeakShaderCallback *New()
-  {
-    return new vtkPeakShaderCallback;
-  }
-  mitk::BaseRenderer *renderer;
-  mitk::DataNode *node;
-
-  void Execute(vtkObject *, unsigned long, void*cbo) override
-  {
-    vtkShaderProgram *program = reinterpret_cast<vtkShaderProgram*>(cbo);
-
-
-    mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
-    mitk::Vector3D spacing = image->GetGeometry()->GetSpacing();
-
-    float minSpacing = 1;
-    if(spacing[0]<spacing[1] && spacing[0]<spacing[2])
-      minSpacing = spacing[0];
-    else if (spacing[1] < spacing[2])
-      minSpacing = spacing[1];
-    else
-      minSpacing = spacing[2];
-
-    float peakOpacity;
-    node->GetOpacity(peakOpacity, nullptr);
-
-    program->SetUniformf("peakOpacity", peakOpacity);
-    program->SetUniformf("clippingPlaneThickness", minSpacing/2);
-
-    if (this->renderer)
-    {
-      //get information about current position of views
-      mitk::SliceNavigationController::Pointer sliceContr = renderer->GetSliceNavigationController();
-      mitk::PlaneGeometry::ConstPointer planeGeo = sliceContr->GetCurrentPlaneGeometry();
-
-      //generate according cutting planes based on the view position
-      float planeNormal[3];
-      planeNormal[0] = planeGeo->GetNormal()[0];
-      planeNormal[1] = planeGeo->GetNormal()[1];
-      planeNormal[2] = planeGeo->GetNormal()[2];
-
-      float tmp1 = planeGeo->GetOrigin()[0] * planeNormal[0];
-      float tmp2 = planeGeo->GetOrigin()[1] * planeNormal[1];
-      float tmp3 = planeGeo->GetOrigin()[2] * planeNormal[2];
-      float thickness = tmp1 + tmp2 + tmp3; //attention, correct normalvector
-
-      float* a = new float[4];
-      for (int i = 0; i < 3; ++i)
-        a[i] = planeNormal[i];
-
-      a[3] = thickness;
-      program->SetUniform4f("slicingPlane", a);
-    }
-  }
-
-  vtkPeakShaderCallback() { this->renderer = nullptr; }
-};
-
-
 
 mitk::PeakImageMapper2D::PeakImageMapper2D()
 {
-  m_lut = vtkLookupTable::New();
+  m_lut = vtkSmartPointer<vtkLookupTable>::New();
   m_lut->Build();
 }
 
@@ -136,18 +74,13 @@ void mitk::PeakImageMapper2D::Update(mitk::BaseRenderer * renderer)
   this->GenerateDataForRenderer( renderer );
 }
 
-void mitk::PeakImageMapper2D::UpdateShaderParameter(mitk::BaseRenderer *)
-{
-  // see new vtkPeakShaderCallback
-}
-
 // vtkActors and Mappers are feeded here
 void mitk::PeakImageMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
   mitk::PeakImage* peakImage = this->GetInput();
 
   //the handler of local storage gets feeded in this method with requested data for related renderwindow
-  FBXLocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
+  LocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
 
   vtkSmartPointer<vtkPolyData> polyData = peakImage->GetPolyData();
   if (polyData == nullptr)
@@ -156,56 +89,62 @@ void mitk::PeakImageMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *render
   localStorage->m_Mapper->ScalarVisibilityOn();
   localStorage->m_Mapper->SetScalarModeToUsePointFieldData();
   localStorage->m_Mapper->SetLookupTable(m_lut);  //apply the properties after the slice was set
-//  localStorage->m_PointActor->GetProperty()->SetOpacity(0.999);
   localStorage->m_Mapper->SelectColorArray("FIBER_COLORS");
-
   localStorage->m_Mapper->SetInputData(polyData);
-  localStorage->m_Mapper->SetVertexShaderCode(
-        "//VTK::System::Dec\n"
-        "attribute vec4 vertexMC;\n"
 
-        "//VTK::Normal::Dec\n"
-        "uniform mat4 MCDCMatrix;\n"
+  mitk::SliceNavigationController::Pointer sliceContr = renderer->GetSliceNavigationController();
+  mitk::PlaneGeometry::ConstPointer planeGeo = sliceContr->GetCurrentPlaneGeometry();
+  mitk::Point3D plane_origin = planeGeo->GetCenter();
 
-        "//VTK::Color::Dec\n"
+  mitk::DataNode* node = this->GetDataNode();
+  mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
+  mitk::Vector3D spacing = image->GetGeometry()->GetSpacing();
 
-        "varying vec4 positionWorld;\n"
-        "varying vec4 colorVertex;\n"
+  localStorage->m_Mapper->RemoveAllClippingPlanes();
+  float clipping_plane_thickness = 1;
+  if(spacing[0]<spacing[1] && spacing[0]<spacing[2])
+    clipping_plane_thickness = spacing[0];
+  else if (spacing[1] < spacing[2])
+    clipping_plane_thickness = spacing[1];
+  else
+    clipping_plane_thickness = spacing[2];
+  clipping_plane_thickness /= 2.0;
 
-        "void main(void)\n"
-        "{\n"
-        "  colorVertex = scalarColor;\n"
-        "  positionWorld = vertexMC;\n"
-        "  gl_Position = MCDCMatrix * vertexMC;\n"
-        "}\n"
-        );
-  localStorage->m_Mapper->SetFragmentShaderCode(
-        "//VTK::System::Dec\n"  // always start with this line
-        "//VTK::Output::Dec\n"  // always have this line in your FS
-        "uniform vec4 slicingPlane;\n"
-        "uniform float clippingPlaneThickness;\n"
-        "uniform float peakOpacity;\n"
-        "varying vec4 positionWorld;\n"
-        "varying vec4 colorVertex;\n"
-        "out vec4 out_Color;\n"
+  mitk::Vector3D plane_normal = planeGeo->GetNormal();
+  double vnormal[3];
+  double vp1[3];
+  double vp2[3];
 
-        "void main(void)\n"
-        "{\n"
-        "  float r1 = dot(positionWorld.xyz, slicingPlane.xyz) - slicingPlane.w;\n"
+  vp1[0] = plane_origin[0] + plane_normal[0] * clipping_plane_thickness;
+  vp1[1] = plane_origin[1] + plane_normal[1] * clipping_plane_thickness;
+  vp1[2] = plane_origin[2] + plane_normal[2] * clipping_plane_thickness;
 
-        "  if (abs(r1) >= clippingPlaneThickness)\n"
-        "    discard;\n"
-        "  out_Color = vec4(colorVertex.xyz,peakOpacity);\n"
-        "}\n"
-        );
+  vp2[0] = plane_origin[0] - plane_normal[0] * clipping_plane_thickness;
+  vp2[1] = plane_origin[1] - plane_normal[1] * clipping_plane_thickness;
+  vp2[2] = plane_origin[2] - plane_normal[2] * clipping_plane_thickness;
 
-  vtkSmartPointer<vtkPeakShaderCallback> myCallback = vtkSmartPointer<vtkPeakShaderCallback>::New();
-  myCallback->renderer = renderer;
-  myCallback->node = this->GetDataNode();
-  localStorage->m_Mapper->AddObserver(vtkCommand::UpdateShaderEvent,myCallback);
+  {
+    vnormal[0] = vp2[0] - vp1[0];
+    vnormal[1] = vp2[1] - vp1[1];
+    vnormal[2] = vp2[2] - vp1[2];
+
+    vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
+    plane->SetOrigin(vp1);
+    plane->SetNormal(vnormal);
+    localStorage->m_Mapper->AddClippingPlane(plane);
+  }
+  {
+    vnormal[0] = vp1[0] - vp2[0];
+    vnormal[1] = vp1[1] - vp2[1];
+    vnormal[2] = vp1[2] - vp2[2];
+
+    vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
+    plane->SetOrigin(vp2);
+    plane->SetNormal(vnormal);
+    localStorage->m_Mapper->AddClippingPlane(plane);
+  }
 
   localStorage->m_PointActor->SetMapper(localStorage->m_Mapper);
-  localStorage->m_PointActor->GetProperty()->ShadingOn();
 
   float linewidth = 1.0;
   this->GetDataNode()->GetFloatProperty("shape.linewidth",linewidth);
@@ -233,7 +172,7 @@ void mitk::PeakImageMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::B
 }
 
 
-mitk::PeakImageMapper2D::FBXLocalStorage::FBXLocalStorage()
+mitk::PeakImageMapper2D::LocalStorage::LocalStorage()
 {
   m_PointActor = vtkSmartPointer<vtkActor>::New();
   m_Mapper = vtkSmartPointer<MITKPeakImageMapper2D_POLYDATAMAPPER>::New();

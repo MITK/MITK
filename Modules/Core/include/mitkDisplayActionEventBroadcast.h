@@ -214,5 +214,6 @@ namespace mitk
     Vector3D m_PreviousRotationAxis;
     ScalarType m_PreviousRotationAngle;
   };
-}
+} // end namespace
+
 #endif // MITKDISPLAYACTIONEVENTBROADCAST_H

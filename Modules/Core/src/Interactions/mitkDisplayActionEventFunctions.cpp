@@ -20,10 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkCameraController.h"
 #include "mitkDisplayActionEvents.h"
-#include "mitkInteractionEvent.h"
-
-// itk
-#include <itkEventObject.h>
 
 mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::MoveSenderCameraAction()
 {
@@ -32,7 +28,11 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Move
     if (DisplayMoveEvent().CheckEvent(&displayInteractorEvent))
     {
       const DisplayMoveEvent* displayActionEvent = dynamic_cast<const DisplayMoveEvent*>(&displayInteractorEvent);
-      const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetInteractionEvent()->GetSender();
+      const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetSender();
+      if (nullptr == sendingRenderer)
+      {
+        return;
+      }
 
       // concrete action
       sendingRenderer->GetCameraController()->MoveBy(displayActionEvent->GetMoveVector());
@@ -50,7 +50,11 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetC
     if (DisplaySetCrosshairEvent().CheckEvent(&displayInteractorEvent))
     {
       const DisplaySetCrosshairEvent* displayActionEvent = dynamic_cast<const DisplaySetCrosshairEvent*>(&displayInteractorEvent);
-      const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetInteractionEvent()->GetSender();
+      const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetSender();
+      if (nullptr == sendingRenderer)
+      {
+        return;
+      }
 
       // concrete action
       auto allRenderWindows = sendingRenderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
@@ -74,7 +78,11 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Zoom
     if (DisplayZoomEvent().CheckEvent(&displayInteractorEvent))
     {
       const DisplayZoomEvent* displayActionEvent = dynamic_cast<const DisplayZoomEvent*>(&displayInteractorEvent);
-      const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetInteractionEvent()->GetSender();
+      const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetSender();
+      if (nullptr == sendingRenderer)
+      {
+        return;
+      }
 
       // concrete action
       if (1.0 != displayActionEvent->GetZoomFactor())
@@ -95,7 +103,11 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
     if (DisplayScrollEvent().CheckEvent(&displayInteractorEvent))
     {
       const DisplayScrollEvent* displayActionEvent = dynamic_cast<const DisplayScrollEvent*>(&displayInteractorEvent);
-      const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetInteractionEvent()->GetSender();
+      const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetSender();
+      if (nullptr == sendingRenderer)
+      {
+        return;
+      }
 
       // concrete action
       mitk::SliceNavigationController* sliceNavigationController = sendingRenderer->GetSliceNavigationController();

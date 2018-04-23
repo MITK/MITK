@@ -19,6 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCoreExports.h>
 
+// mitk core
+#include "mitkInteractionEvent.h"
+
+// itk
 #include <itkEventObject.h>
 
 #include <mitkVector.h>
@@ -40,6 +44,10 @@ namespace mitk
                                                      { return dynamic_cast<const Self*>(e) != nullptr; }
     virtual itk::EventObject* MakeObject() const override { return new Self(m_InteractionEvent); }
     InteractionEvent* GetInteractionEvent() const { return m_InteractionEvent; }
+    BaseRenderer* GetSender() const
+    {
+      return m_InteractionEvent != nullptr ? m_InteractionEvent->GetSender() : nullptr;
+    }
     DisplayActionEvent(const Self& s) : Superclass(s), m_InteractionEvent(s.m_InteractionEvent) {};
 
   private:

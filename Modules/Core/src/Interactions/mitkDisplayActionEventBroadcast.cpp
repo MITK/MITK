@@ -41,7 +41,7 @@ mitk::DisplayActionEventBroadcast::DisplayActionEventBroadcast()
   m_LastCoordinateInMM.Fill(0);
   m_CurrentDisplayCoordinate.Fill(0);
 
-  // register the broadcast class as interaction event observer via micro services
+  // register the broadcast class (itself) as an interaction event observer via micro services
   us::ServiceProperties props;
   props["name"] = std::string("DisplayActionEventBroadcast");
   m_ServiceRegistration = us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>(this, props);

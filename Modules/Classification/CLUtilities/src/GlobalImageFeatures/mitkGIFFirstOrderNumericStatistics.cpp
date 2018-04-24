@@ -242,7 +242,7 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   double interquantileRange = p75idx - p25idx;
   double coefficientOfVariation = std::sqrt(variance) / mean;
   double quantileCoefficientOfDispersion = (p75idx - p25idx) / (p75idx + p25idx + 2);
-  double coveredImageRange = (absoluteMaximum - absoluteMinimum) / (maximum - minimum);
+  double coveredImageRange = (maximum - minimum)/ (absoluteMaximum - absoluteMinimum) ;
 
   featureList.push_back(std::make_pair(params.prefix + "Mean", mean));
   featureList.push_back(std::make_pair(params.prefix + "Variance", variance));

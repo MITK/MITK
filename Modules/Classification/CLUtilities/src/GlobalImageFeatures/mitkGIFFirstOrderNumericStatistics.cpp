@@ -68,6 +68,8 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
 
   double minimum = std::numeric_limits<double>::max();
   double maximum = std::numeric_limits<double>::lowest();
+  double absoluteMinimum = std::numeric_limits<double>::max();
+  double absoluteMaximum = std::numeric_limits<double>::lowest();
   double sum = 0;
   double sumTwo= 0;
   double sumThree = 0;
@@ -78,10 +80,12 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
 
   while (!imageIter.IsAtEnd())
   {
+    double value = imageIter.Get();
+
+    absoluteMinimum = std::min<double>(minimum, value);
+    absoluteMaximum = std::max<double>(maximum, value);
     if (maskIter.Get() > 0)
     {
-      double value = imageIter.Get();
-
       minimum = std::min<double>(minimum, value);
       maximum = std::max<double>(maximum, value);
 
@@ -106,6 +110,9 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   double lastIntensityWithValues = params.quantifier->IndexToMeanIntensity(0);
   std::size_t modeIdx = 0;
   double modeValue = 0;
+
+  double entropy = 0;
+  double uniformity = 0;
 
   std::vector<double> percentiles;
   percentiles.resize(20, 0);
@@ -152,6 +159,10 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
     if (actualValues > 0)
     {
       lastIntensityWithValues = params.quantifier->IndexToMeanIntensity(idx);
+
+      double currentProbability = actualValues / (1.0 *numberOfVoxels);
+      uniformity += currentProbability * currentProbability;
+      entropy += currentProbability * std::log(currentProbability) / std::log(2);
     }
     passedValues += actualValues;
   }
@@ -231,6 +242,7 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   double interquantileRange = p75idx - p25idx;
   double coefficientOfVariation = std::sqrt(variance) / mean;
   double quantileCoefficientOfDispersion = (p75idx - p25idx) / (p75idx + p25idx + 2);
+  double coveredImageRange = (absoluteMaximum - absoluteMinimum) / (maximum - minimum);
 
   featureList.push_back(std::make_pair(params.prefix + "Mean", mean));
   featureList.push_back(std::make_pair(params.prefix + "Variance", variance));
@@ -238,8 +250,25 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   featureList.push_back(std::make_pair(params.prefix + "Excess kurtosis", kurtosis-3));
   featureList.push_back(std::make_pair(params.prefix + "Median", median));
   featureList.push_back(std::make_pair(params.prefix + "Minimum", minimum));
-  featureList.push_back(std::make_pair(params.prefix + "Percentile 10", p10));
-  featureList.push_back(std::make_pair(params.prefix + "Percentile 90", p90));
+  featureList.push_back(std::make_pair(params.prefix + "05th Percentile", percentiles[0]));
+  featureList.push_back(std::make_pair(params.prefix + "10th Percentile", percentiles[1]));
+  featureList.push_back(std::make_pair(params.prefix + "15th Percentile", percentiles[2]));
+  featureList.push_back(std::make_pair(params.prefix + "20th Percentile", percentiles[3]));
+  featureList.push_back(std::make_pair(params.prefix + "25th Percentile", percentiles[4]));
+  featureList.push_back(std::make_pair(params.prefix + "30th Percentile", percentiles[5]));
+  featureList.push_back(std::make_pair(params.prefix + "35th Percentile", percentiles[6]));
+  featureList.push_back(std::make_pair(params.prefix + "40th Percentile", percentiles[7]));
+  featureList.push_back(std::make_pair(params.prefix + "45th Percentile", percentiles[8]));
+  featureList.push_back(std::make_pair(params.prefix + "50th Percentile", percentiles[9]));
+  featureList.push_back(std::make_pair(params.prefix + "55th Percentile", percentiles[10]));
+  featureList.push_back(std::make_pair(params.prefix + "60th Percentile", percentiles[11]));
+  featureList.push_back(std::make_pair(params.prefix + "65th Percentile", percentiles[12]));
+  featureList.push_back(std::make_pair(params.prefix + "70th Percentile", percentiles[13]));
+  featureList.push_back(std::make_pair(params.prefix + "75th Percentile", percentiles[14]));
+  featureList.push_back(std::make_pair(params.prefix + "80th Percentile", percentiles[15]));
+  featureList.push_back(std::make_pair(params.prefix + "85th Percentile", percentiles[16]));
+  featureList.push_back(std::make_pair(params.prefix + "90th Percentile", percentiles[17]));
+  featureList.push_back(std::make_pair(params.prefix + "95th Percentile", percentiles[18]));
   featureList.push_back(std::make_pair(params.prefix + "Maximum", maximum));
   featureList.push_back(std::make_pair(params.prefix + "Interquantile range", interquantileRange));
   featureList.push_back(std::make_pair(params.prefix + "Range", maximum-minimum));
@@ -255,237 +284,19 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   featureList.push_back(std::make_pair(params.prefix + "Kurtosis", kurtosis));
   featureList.push_back(std::make_pair(params.prefix + "Robust mean", robustMean));
   featureList.push_back(std::make_pair(params.prefix + "Robust variance", robustVariance));
+  featureList.push_back(std::make_pair(params.prefix + "Covered image intensity range", coveredImageRange));
   featureList.push_back(std::make_pair(params.prefix + "Mode index", modeIdx));
   featureList.push_back(std::make_pair(params.prefix + "Mode value", params.quantifier->IndexToMeanIntensity(modeIdx)));
+  featureList.push_back(std::make_pair(params.prefix + "Mode probability", histogram[modeIdx] / (1.0*numberOfVoxels)));
+  featureList.push_back(std::make_pair(params.prefix + "Entropy", entropy));
+  featureList.push_back(std::make_pair(params.prefix + "Uniformtiy", uniformity));
   featureList.push_back(std::make_pair(params.prefix + "Number of voxels", numberOfVoxels));
+  featureList.push_back(std::make_pair(params.prefix + "Sum of voxels", sum));
+  featureList.push_back(std::make_pair(params.prefix + "Voxel space", voxelSpace));
+  featureList.push_back(std::make_pair(params.prefix + "Voxel volume", voxelVolume));
+  featureList.push_back(std::make_pair(params.prefix + "Image Dimension", VImageDimension));
 
   return;
-
-
-
-
-
-
-  /*
-
-  typedef itk::LabelStatisticsImageFilter<ImageType, MaskType> FilterType;
-  typedef typename FilterType::HistogramType HistogramType;
-  typedef typename HistogramType::IndexType HIndexType;
-  typedef itk::MinimumMaximumImageCalculator<ImageType> MinMaxComputerType;
-
-
-
-
-  typename MinMaxComputerType::Pointer minMaxComputer = MinMaxComputerType::New();
-  minMaxComputer->SetImage(itkImage);
-  minMaxComputer->Compute();
-  double imageRange = minMaxComputer->GetMaximum() -  minMaxComputer->GetMinimum();
-
-  typename FilterType::Pointer labelStatisticsImageFilter = FilterType::New();
-  labelStatisticsImageFilter->SetInput( itkImage );
-  labelStatisticsImageFilter->SetLabelInput(maskImage);
-  labelStatisticsImageFilter->SetUseHistograms(true);
-
-  double min = params.MinimumIntensity;
-  double max = params.MaximumIntensity;
-
-  labelStatisticsImageFilter->SetHistogramParameters(params.Bins, min,max);
-  labelStatisticsImageFilter->Update();
-
-  // --------------- Range --------------------
-  double range = labelStatisticsImageFilter->GetMaximum(1) - labelStatisticsImageFilter->GetMinimum(1);
-  // --------------- Uniformity, Entropy --------------------
-  double count = labelStatisticsImageFilter->GetCount(1);
-  //double std_dev = labelStatisticsImageFilter->GetSigma(1);
-  double mean = labelStatisticsImageFilter->GetMean(1);
-  double median = labelStatisticsImageFilter->GetMedian(1);
-  auto histogram = labelStatisticsImageFilter->GetHistogram(1);
-  bool histogramIsCalculated = histogram;
-
-  HIndexType index;
-  index.SetSize(1);
-
-  double uniformity = 0;
-  double entropy = 0;
-  double squared_sum = 0;
-  double kurtosis = 0;
-  double mean_absolut_deviation = 0;
-  double median_absolut_deviation = 0;
-  double skewness = 0;
-  double sum_prob = 0;
-  double binWidth = 0;
-  double p05th = 0, p10th = 0, p15th = 0, p20th = 0, p25th = 0, p30th = 0, p35th = 0, p40th = 0, p45th = 0, p50th = 0;
-  double p55th = 0, p60th = 0, p65th = 0, p70th = 0, p75th = 0, p80th = 0, p85th = 0, p90th = 0, p95th = 0;
-
-  double voxelValue = 0;
-
-  if (histogramIsCalculated)
-  {
-    binWidth = histogram->GetBinMax(0, 0) - histogram->GetBinMin(0, 0);
-    p05th = histogram->Quantile(0, 0.05);
-    p10th = histogram->Quantile(0, 0.10);
-    p15th = histogram->Quantile(0, 0.15);
-    p20th = histogram->Quantile(0, 0.20);
-    p25th = histogram->Quantile(0, 0.25);
-    p30th = histogram->Quantile(0, 0.30);
-    p35th = histogram->Quantile(0, 0.35);
-    p40th = histogram->Quantile(0, 0.40);
-    p45th = histogram->Quantile(0, 0.45);
-    p50th = histogram->Quantile(0, 0.50);
-    p55th = histogram->Quantile(0, 0.55);
-    p60th = histogram->Quantile(0, 0.60);
-    p65th = histogram->Quantile(0, 0.65);
-    p70th = histogram->Quantile(0, 0.70);
-    p75th = histogram->Quantile(0, 0.75);
-    p80th = histogram->Quantile(0, 0.80);
-    p85th = histogram->Quantile(0, 0.85);
-    p90th = histogram->Quantile(0, 0.90);
-    p95th = histogram->Quantile(0, 0.95);
-  }
-  double Log2=log(2);
-  double mode_bin;
-  double mode_value = 0;
-  double variance = 0;
-  if (histogramIsCalculated)
-  {
-    for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
-    {
-      index[0] = i;
-      double prob = histogram->GetFrequency(index);
-
-
-      if (prob < 0.00000001)
-        continue;
-
-      voxelValue = histogram->GetBinMin(0, i) + binWidth * 0.5;
-
-      if (prob > mode_value)
-      {
-        mode_value = prob;
-        mode_bin = voxelValue;
-      }
-
-      sum_prob += prob;
-      squared_sum += prob * voxelValue*voxelValue;
-
-      prob /= count;
-      mean_absolut_deviation += prob* std::abs(voxelValue - mean);
-      median_absolut_deviation += prob* std::abs(voxelValue - median);
-      variance += prob * (voxelValue - mean) * (voxelValue - mean);
-
-      kurtosis += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
-      skewness += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
-
-      uniformity += prob*prob;
-      if (prob > 0)
-      {
-        entropy += prob * std::log(prob) / Log2;
-      }
-    }
-  }
-  entropy = -entropy;
-
-  double uncorrected_std_dev = std::sqrt(variance);
-  double rms = std::sqrt(squared_sum / count);
-  kurtosis = kurtosis / (variance * variance);
-  skewness = skewness / (variance * uncorrected_std_dev);
-  double coveredGrayValueRange = range / imageRange;
-  double coefficient_of_variation = (mean == 0) ? 0 : std::sqrt(variance) / mean;
-  double quantile_coefficient_of_dispersion = (p75th - p25th) / (p75th + p25th);
-
-  //Calculate the robust mean absolute deviation
-  //First, set all frequencies to 0 that are <10th or >90th percentile
-  double meanRobust = 0.0;
-  double robustMeanAbsoluteDeviation = 0.0;
-  if (histogramIsCalculated)
-  {
-    for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
-    {
-      index[0] = i;
-      if (histogram->GetBinMax(0, i) < p10th)
-      {
-        histogram->SetFrequencyOfIndex(index, 0);
-      }
-      else if (histogram->GetBinMin(0, i) > p90th)
-      {
-        histogram->SetFrequencyOfIndex(index, 0);
-      }
-    }
-
-    //Calculate the mean
-    for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
-    {
-      index[0] = i;
-      meanRobust += histogram->GetFrequency(index) * 0.5 * (histogram->GetBinMin(0, i) + histogram->GetBinMax(0, i));
-    }
-    meanRobust = meanRobust / histogram->GetTotalFrequency();
-    for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
-    {
-      index[0] = i;
-      robustMeanAbsoluteDeviation += std::abs(histogram->GetFrequency(index) *
-        ((0.5 * (histogram->GetBinMin(0, i) + histogram->GetBinMax(0, i)))
-        - meanRobust
-        ));
-    }
-    robustMeanAbsoluteDeviation = robustMeanAbsoluteDeviation / histogram->GetTotalFrequency();
-  }
-
-  featureList.push_back(std::make_pair(params.prefix + "Mean", labelStatisticsImageFilter->GetMean(1)));
-  featureList.push_back(std::make_pair(params.prefix + "Unbiased Variance", labelStatisticsImageFilter->GetVariance(1))); //Siehe Definition von Unbiased Variance estimation. (Wird nicht durch n sondern durch n-1 normalisiert)
-  featureList.push_back(std::make_pair(params.prefix + "Biased Variance", variance));
-  featureList.push_back(std::make_pair(params.prefix + "Skewness", skewness));
-  featureList.push_back(std::make_pair(params.prefix + "Kurtosis", kurtosis));
-  featureList.push_back(std::make_pair(params.prefix + "Median", labelStatisticsImageFilter->GetMedian(1)));
-  featureList.push_back(std::make_pair(params.prefix + "Minimum", labelStatisticsImageFilter->GetMinimum(1)));
-  featureList.push_back(std::make_pair(params.prefix + "Maximum", labelStatisticsImageFilter->GetMaximum(1)));
-  featureList.push_back(std::make_pair(params.prefix + "Range", range));
-  featureList.push_back(std::make_pair(params.prefix + "Mean Absolute Deviation", mean_absolut_deviation));
-  featureList.push_back(std::make_pair(params.prefix + "Robust Mean Absolute Deviation", robustMeanAbsoluteDeviation));
-  featureList.push_back(std::make_pair(params.prefix + "Median Absolute Deviation", median_absolut_deviation));
-  featureList.push_back(std::make_pair(params.prefix + "Coefficient Of Variation", coefficient_of_variation));
-  featureList.push_back(std::make_pair(params.prefix + "Quantile Coefficient Of Dispersion", quantile_coefficient_of_dispersion));
-  featureList.push_back(std::make_pair(params.prefix + "Energy", squared_sum));
-  featureList.push_back(std::make_pair(params.prefix + "Root Mean Square", rms));
-
-  typename HistogramType::MeasurementVectorType mv(1);
-  mv[0] = 0;
-  typename HistogramType::IndexType resultingIndex;
-  histogram->GetIndex(mv, resultingIndex);
-  featureList.push_back(std::make_pair(params.prefix + "Robust Mean", meanRobust));
-  featureList.push_back(std::make_pair(params.prefix + "Uniformity", uniformity));
-  featureList.push_back(std::make_pair(params.prefix + "Entropy", entropy));
-  featureList.push_back(std::make_pair(params.prefix + "Excess Kurtosis", kurtosis - 3));
-  featureList.push_back(std::make_pair(params.prefix + "Covered Image Intensity Range", coveredGrayValueRange));
-  featureList.push_back(std::make_pair(params.prefix + "Sum", labelStatisticsImageFilter->GetSum(1)));
-  featureList.push_back(std::make_pair(params.prefix + "Mode", mode_bin));
-  featureList.push_back(std::make_pair(params.prefix + "Mode Probability", mode_value));
-  featureList.push_back(std::make_pair(params.prefix + "Unbiased Standard deviation", labelStatisticsImageFilter->GetSigma(1)));
-  featureList.push_back(std::make_pair(params.prefix + "Biased Standard deviation", sqrt(variance)));
-  featureList.push_back(std::make_pair(params.prefix + "Number Of Voxels", labelStatisticsImageFilter->GetCount(1)));
-
-  featureList.push_back(std::make_pair(params.prefix + "05th Percentile", p05th));
-  featureList.push_back(std::make_pair(params.prefix + "10th Percentile", p10th));
-  featureList.push_back(std::make_pair(params.prefix + "15th Percentile", p15th));
-  featureList.push_back(std::make_pair(params.prefix + "20th Percentile", p20th));
-  featureList.push_back(std::make_pair(params.prefix + "25th Percentile", p25th));
-  featureList.push_back(std::make_pair(params.prefix + "30th Percentile", p30th));
-  featureList.push_back(std::make_pair(params.prefix + "35th Percentile", p35th));
-  featureList.push_back(std::make_pair(params.prefix + "40th Percentile", p40th));
-  featureList.push_back(std::make_pair(params.prefix + "45th Percentile", p45th));
-  featureList.push_back(std::make_pair(params.prefix + "50th Percentile", p50th));
-  featureList.push_back(std::make_pair(params.prefix + "55th Percentile", p55th));
-  featureList.push_back(std::make_pair(params.prefix + "60th Percentile", p60th));
-  featureList.push_back(std::make_pair(params.prefix + "65th Percentile", p65th));
-  featureList.push_back(std::make_pair(params.prefix + "70th Percentile", p70th));
-  featureList.push_back(std::make_pair(params.prefix + "75th Percentile", p75th));
-  featureList.push_back(std::make_pair(params.prefix + "80th Percentile", p80th));
-  featureList.push_back(std::make_pair(params.prefix + "85th Percentile", p85th));
-  featureList.push_back(std::make_pair(params.prefix + "90th Percentile", p90th));
-  featureList.push_back(std::make_pair(params.prefix + "95th Percentile", p95th));
-  featureList.push_back(std::make_pair(params.prefix + "Interquartile Range", (p75th - p25th)));
-  featureList.push_back(std::make_pair(params.prefix + "Image Dimension", VImageDimension));
-  featureList.push_back(std::make_pair(params.prefix + "Voxel Space", voxelSpace));
-  featureList.push_back(std::make_pair(params.prefix + "Voxel Volume", voxelVolume)); */
 }
 
 mitk::GIFFirstOrderNumericStatistics::GIFFirstOrderNumericStatistics()

@@ -26,7 +26,21 @@
       <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
      </property>
      <property name="text">
-      <string>Please select an image!</string>
+      <string>Please select 2 images!</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Batch size</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="lineBatchSize">
+     <property name="text">
+      <string>5</string>
      </property>
     </widget>
    </item>
@@ -120,7 +134,7 @@
       <string>Do image processing</string>
      </property>
      <property name="text">
-      <string>Compute</string>
+      <string>Start processing</string>
      </property>
     </widget>
    </item>

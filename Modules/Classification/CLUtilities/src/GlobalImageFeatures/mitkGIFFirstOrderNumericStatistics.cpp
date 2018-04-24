@@ -109,7 +109,6 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   double median = 0;
   double lastIntensityWithValues = params.quantifier->IndexToMeanIntensity(0);
   std::size_t modeIdx = 0;
-  double modeValue = 0;
 
   double entropy = 0;
   double uniformity = 0;

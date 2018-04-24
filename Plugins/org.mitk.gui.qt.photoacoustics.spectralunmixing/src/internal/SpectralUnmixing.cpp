@@ -44,15 +44,38 @@ void SpectralUnmixing::CreateQtPartControl(QWidget *parent)
   m_Controls.setupUi(parent);
   connect(m_Controls.buttonPerformImageProcessing, &QPushButton::clicked, this, &SpectralUnmixing::DoImageProcessing);
   connect(m_Controls.ButtonAddWavelength, &QPushButton::clicked, this, &SpectralUnmixing::Wavelength);
+}
+
+// Add Wavelength is working, BUT in the Plugin! Not with same implementation at the filter
+// probably because the m_wavelengths vector is created new every time and not 'saved'.
+// Alternativ as comment here and at the filter.
+void SpectralUnmixing::Wavelength()
+{
+  if (m_Wavelengths.empty())
+  {
+      size = 0;
   }
 
-void SpectralUnmixing::Wavelength()
+  wavelength = m_Controls.spinBoxAddWavelength->value();
+  m_Wavelengths.push_back(wavelength);
+  MITK_INFO << "ADD WAVELENGTH: " << wavelength << "nm";
+  size += 1; // size implemented like this because '.size' is const
+  MITK_INFO << "ALL WAVELENGTHS: ";
+
+  for (int i = 0; i < size; ++i)
+  {
+    MITK_INFO << m_Wavelengths[i] << "nm";
+  }
+}
+
+// Not correct working alternativ for wavelengths
+/*void SpectralUnmixing::Wavelength()
 {
   auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilter::New();
   wavelength = m_Controls.spinBoxAddWavelength->value();
   m_SpectralUnmixingFilter->AddWavelength(wavelength);
   MITK_INFO << wavelength << " nm";
-}
+}*/
 
 void SpectralUnmixing::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
                                                 const QList<mitk::DataNode::Pointer> &nodes)
@@ -133,15 +156,12 @@ void SpectralUnmixing::DoImageProcessing()
         mitkThrow() << "PRESS 'IGNORE' AND CHOOSE A CHROMOPHORE!";       
       }
 
-      // to do: number of wavelengths has to be larger then checked chromophores ;)
-
-      //TEST STUFF:
-      auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilter::New();
-      MITK_INFO << "size"<< m_SpectralUnmixingFilter->size;
-
-      //MITK_INFO << "size" << mitk::pa::SpectralUnmixingFilter::size;     
-      //MITK_INFO << "m_W" << mitk::pa::SpectralUnmixingFilter::m_Wavelengths;
-      //MITK_INFO << ".size" << mitk::pa::SpectralUnmixingFilter::m_Wavelengths.size;
+      // Checking if number of wavelengths >= number of chromophores
+      if (numberofChromophores > size)
+      {
+        mitkThrow() << "PRESS 'IGNORE' AND ADD MORE WAVELENGTHS!";
+      }
+      
     
 
 

@@ -40,10 +40,12 @@ namespace mitk {
         OXYGENATED, DEOXYGENATED
       };
 
-      void AddWavelength(int wavelength);
       void Test();
+
+      /* for add wavelengths
+      void AddWavelength(int wavelength);
       std::vector<int> m_Wavelengths;
-      int size;
+      int size; */
 
     protected:
       SpectralUnmixingFilter();

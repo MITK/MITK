@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
@@ -39,23 +38,27 @@ void PAUSMotionCompensation::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
-  connect(m_Controls.buttonPerformImageProcessing, &QPushButton::clicked, this, &PAUSMotionCompensation::DoImageProcessing);
+  connect(
+    m_Controls.buttonPerformImageProcessing, &QPushButton::clicked, this, &PAUSMotionCompensation::DoImageProcessing);
 }
 
 void PAUSMotionCompensation::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
                                                 const QList<mitk::DataNode::Pointer> &nodes)
 {
-  // iterate all selected objects, adjust warning visibility
-  foreach (mitk::DataNode::Pointer node, nodes)
+  // Make sure that there are exactle 2 nodes selected
+  if (nodes.size() == 2)
   {
-    if (node.IsNotNull() && dynamic_cast<mitk::Image *>(node->GetData()))
+    // iterate all selected objects, adjust warning visibility
+    foreach (mitk::DataNode::Pointer node, nodes)
     {
-      m_Controls.labelWarning->setVisible(false);
-      m_Controls.buttonPerformImageProcessing->setEnabled(true);
-      return;
+      if (node.IsNotNull() && dynamic_cast<mitk::Image *>(node->GetData()))
+      {
+        m_Controls.labelWarning->setVisible(false);
+        m_Controls.buttonPerformImageProcessing->setEnabled(true);
+        return;
+      }
     }
   }
-
   m_Controls.labelWarning->setVisible(true);
   m_Controls.buttonPerformImageProcessing->setEnabled(false);
 }
@@ -63,9 +66,15 @@ void PAUSMotionCompensation::OnSelectionChanged(berry::IWorkbenchPart::Pointer /
 void PAUSMotionCompensation::DoImageProcessing()
 {
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-  if (nodes.empty())
-    return;
 
+  // Make sure that there are two images selected
+  if (nodes.empty() || nodes.size() != 2)
+  {
+    QMessageBox::information(nullptr, "Warning", "Please select two images before starting image processing.");
+    return;
+  }
+
+  //TODO: I need to process two nodes and get the BaseData.
   mitk::DataNode *node = nodes.front();
 
   if (!node)

@@ -168,7 +168,7 @@ namespace mitk
 
 
 template<typename DefaultFunctorType, typename DoubleFunctorType, typename ImageType, typename DoubleImageType >
-static void ExecuteOneImageFilterWithFunctor(ImageType* imageA, double value, bool returnDoubleImage, bool valueLeft, bool parameterFree, mitk::Image::Pointer & outputImage)
+static void ExecuteOneImageFilterWithFunctor(ImageType* imageA, double value, bool returnDoubleImage, bool valueLeft, bool , mitk::Image::Pointer & outputImage)
 {
   typedef itk::UnaryFunctorImageFilter< ImageType, ImageType, DefaultFunctorType > DefaultFilterType;
   typedef itk::UnaryFunctorImageFilter< ImageType, DoubleImageType, DoubleFunctorType > DoubleFilterType;
@@ -194,7 +194,7 @@ static void ExecuteOneImageFilterWithFunctor(ImageType* imageA, double value, bo
 }
 
 template<typename DefaultFunctorType, typename DoubleFunctorType, typename ImageType, typename DoubleImageType >
-static void ExecuteOneImageFilterWithFunctorNonParameter(ImageType* imageA, double value, bool returnDoubleImage, bool valueLeft, bool parameterFree, mitk::Image::Pointer & outputImage)
+static void ExecuteOneImageFilterWithFunctorNonParameter(ImageType* imageA, double , bool returnDoubleImage, bool valueLeft, bool , mitk::Image::Pointer & outputImage)
 {
   typedef itk::UnaryFunctorImageFilter< ImageType, ImageType, DefaultFunctorType > DefaultFilterType;
   typedef itk::UnaryFunctorImageFilter< ImageType, DoubleImageType, DoubleFunctorType > DoubleFilterType;

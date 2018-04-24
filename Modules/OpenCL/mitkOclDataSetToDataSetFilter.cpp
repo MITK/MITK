@@ -24,7 +24,6 @@ mitk::OclDataSetToDataSetFilter::OclDataSetToDataSetFilter()
   m_Output = mitk::OclDataSet::New();
 }
 
-
 mitk::OclDataSetToDataSetFilter::~OclDataSetToDataSetFilter()
 {
 }

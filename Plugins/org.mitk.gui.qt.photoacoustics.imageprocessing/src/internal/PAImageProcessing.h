@@ -123,13 +123,9 @@ protected:
   bool m_UseLogfilter;
   std::string m_OldNodeName;
 
-  /** \brief The settings set which is used for beamforming, updated through this class.
-  */
-  mitk::BeamformingSettings::Pointer BFconfig;
-
   /** \brief Method for updating the BFconfig by using a selected image and the GUI configuration.
   */
-  void UpdateBFSettings(mitk::Image::Pointer image);
+  mitk::BeamformingSettings::Pointer CreateBeamformingSettings(mitk::Image::Pointer image);
 
   void EnableControls();
   void DisableControls();

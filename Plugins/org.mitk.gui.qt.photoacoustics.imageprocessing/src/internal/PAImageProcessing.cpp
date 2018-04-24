@@ -53,7 +53,6 @@ void PAImageProcessing::SetFocus()
 
 void PAImageProcessing::CreateQtPartControl(QWidget *parent)
 {
-  BFconfig = mitk::BeamformingSettings::New();
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
   connect(m_Controls.buttonApplyBModeFilter, SIGNAL(clicked()), this, SLOT(StartBmodeThread()));
@@ -201,8 +200,8 @@ void PAImageProcessing::BatchProcessing()
     imageName = imageName.substr(0, imageName.size() - 5);
 
     mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(filename.toStdString().c_str());
+    auto BFconfig = CreateBeamformingSettings(image);
 
-    UpdateBFSettings(image);
     // Beamforming
     if (doSteps[0])
     {
@@ -268,7 +267,7 @@ void PAImageProcessing::BatchProcessing()
 
         BPHighPass = 0;
       }
-      if (BPHighPass > maxFrequency - BFconfig->GetBPLowPass())
+      if (BPHighPass > maxFrequency - BPLowPass)
       {
         QMessageBox Msgbox;
         Msgbox.setText("HighPass higher than LowPass, disabled both.");
@@ -334,7 +333,7 @@ void PAImageProcessing::StartBeamformingThread()
     mitk::Image* image = dynamic_cast<mitk::Image*>(data);
     if (image)
     {
-      UpdateBFSettings(image);
+      auto BFconfig = CreateBeamformingSettings(image);
       std::stringstream message;
       std::string name;
       message << "Performing beamforming for image ";
@@ -382,6 +381,8 @@ void PAImageProcessing::HandleBeamformingResults(mitk::Image::Pointer image)
   std::stringstream newNodeName;
 
   newNodeName << m_OldNodeName << " ";
+
+  auto BFconfig = CreateBeamformingSettings(image);
 
   if (BFconfig->GetAlgorithm() == mitk::BeamformingSettings::BeamformingAlgorithm::DAS)
     newNodeName << "DAS bf, ";
@@ -438,7 +439,6 @@ void PAImageProcessing::StartBmodeThread()
     mitk::Image* image = dynamic_cast<mitk::Image*>(data);
     if (image)
     {
-      UpdateBFSettings(image);
       std::stringstream message;
       std::string name;
       message << "Performing image processing for image ";
@@ -532,7 +532,6 @@ void PAImageProcessing::StartCropThread()
     mitk::Image* image = dynamic_cast<mitk::Image*>(data);
     if (image)
     {
-      UpdateBFSettings(image);
       std::stringstream message;
       std::string name;
       message << "Performing image cropping for image ";
@@ -619,7 +618,6 @@ void PAImageProcessing::StartBandpassThread()
     mitk::Image* image = dynamic_cast<mitk::Image*>(data);
     if (image)
     {
-      UpdateBFSettings(image);
       std::stringstream message;
       std::string name;
       message << "Performing Bandpass filter on image ";
@@ -673,7 +671,7 @@ void PAImageProcessing::StartBandpassThread()
 
         BPHighPass = 0;
       }
-      if (BPHighPass > maxFrequency - BFconfig->GetBPLowPass())
+      if (BPHighPass > maxFrequency - BPLowPass)
       {
         QMessageBox Msgbox;
         Msgbox.setText("HighPass higher than LowPass, disabled both.");
@@ -806,10 +804,20 @@ void PAImageProcessing::UpdateImageInfo()
       m_Controls.boundLow->setMaximum(image->GetDimension(2) - 1);
       m_Controls.boundHigh->setMaximum(image->GetDimension(2) - 1);
 
-      UpdateBFSettings(image);
-
+      float speedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
       std::stringstream frequency;
-      float maxFrequency = (1 / BFconfig->GetTimeSpacing()) * image->GetDimension(1) / 2 / 2 / 1000;
+      float timeSpacing;
+      if (m_Controls.UseImageSpacing->isChecked())
+      {
+        timeSpacing = image->GetGeometry()->GetSpacing()[1] / 1000000.0f;
+        MITK_INFO << "Calculated Scan Depth of " << (image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] /
+          1000000) * speedOfSound * 100 / 2 << "cm";
+      }
+      else
+      {
+        timeSpacing = (2 * m_Controls.ScanDepth->value() / 1000 / speedOfSound) / image->GetDimension(1);
+      }
+      float maxFrequency = (1 / timeSpacing) * image->GetDimension(1) / 2 / 2 / 1000;
       frequency << maxFrequency / 1000000; //[MHz]
       frequency << "MHz";
 
@@ -879,69 +887,81 @@ void PAImageProcessing::SetResampling()
   m_ResampleSpacing = m_Controls.ResamplingValue->value();
 }
 
-void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
+mitk::BeamformingSettings::Pointer PAImageProcessing::CreateBeamformingSettings(mitk::Image::Pointer image)
 {
+  mitk::BeamformingSettings::BeamformingAlgorithm algorithm;
   if ("DAS" == m_Controls.BFAlgorithm->currentText())
-    BFconfig->SetAlgorithm(mitk::BeamformingSettings::BeamformingAlgorithm::DAS);
+    algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DAS;
   else if ("DMAS" == m_Controls.BFAlgorithm->currentText())
-    BFconfig->SetAlgorithm(mitk::BeamformingSettings::BeamformingAlgorithm::DMAS);
+    algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DMAS;
   else if ("sDMAS" == m_Controls.BFAlgorithm->currentText())
-    BFconfig->SetAlgorithm(mitk::BeamformingSettings::BeamformingAlgorithm::sDMAS);
+    algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::sDMAS;
 
+  mitk::BeamformingSettings::DelayCalc delay;
   if ("Quad. Approx." == m_Controls.DelayCalculation->currentText())
   {
-    BFconfig->SetDelayCalculationMethod(mitk::BeamformingSettings::DelayCalc::QuadApprox);
+    delay = mitk::BeamformingSettings::DelayCalc::QuadApprox;
   }
   else if ("Spherical Wave" == m_Controls.DelayCalculation->currentText())
   {
-    BFconfig->SetDelayCalculationMethod(mitk::BeamformingSettings::DelayCalc::Spherical);
+    delay = mitk::BeamformingSettings::DelayCalc::Spherical;
   }
 
+  mitk::BeamformingSettings::Apodization apod;
   if ("Von Hann" == m_Controls.Apodization->currentText())
   {
-    BFconfig->SetApod(mitk::BeamformingSettings::Apodization::Hann);
+    apod = mitk::BeamformingSettings::Apodization::Hann;
   }
   else if ("Hamming" == m_Controls.Apodization->currentText())
   {
-    BFconfig->SetApod(mitk::BeamformingSettings::Apodization::Hamm);
+    apod = mitk::BeamformingSettings::Apodization::Hamm;
   }
   else if ("Box" == m_Controls.Apodization->currentText())
   {
-    BFconfig->SetApod(mitk::BeamformingSettings::Apodization::Box);
+    apod = mitk::BeamformingSettings::Apodization::Box;
   }
 
-  BFconfig->SetPitchInMeters(m_Controls.Pitch->value() / 1000); // [m]
-  BFconfig->SetSpeedOfSound(m_Controls.SpeedOfSound->value()); // [m/s]
-  BFconfig->SetSamplesPerLine(m_Controls.Samples->value());
-  BFconfig->SetReconstructionLines(m_Controls.Lines->value());
-  BFconfig->SetTransducerElements(m_Controls.ElementCount->value());
-  BFconfig->SetApodizationArraySize(m_Controls.Lines->value());
-  BFconfig->SetAngle(m_Controls.Angle->value()); // [deg]
-  BFconfig->SetUseBP(m_Controls.UseBP->isChecked());
-  BFconfig->SetUseGPU(m_Controls.UseGPUBf->isChecked());
+  float pitchInMeters = m_Controls.Pitch->value() / 1000; // [m]
+  float speedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
+  unsigned int samplesPerLine = m_Controls.Samples->value();
+  unsigned int reconstructionLines = m_Controls.Lines->value();
+  unsigned int apodizatonArraySize = m_Controls.Lines->value();
+  float angle = m_Controls.Angle->value(); // [deg]
+  bool useBandpass = m_Controls.UseBP->isChecked();
+  bool useGPU = m_Controls.UseGPUBf->isChecked();
 
+  float timeSpacing;
   if (m_Controls.UseImageSpacing->isChecked())
   {
-    BFconfig->SetTimeSpacing(image->GetGeometry()->GetSpacing()[1] / 1000000);
-    MITK_INFO << "Calculated Scan Depth of " << (image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000) * BFconfig->GetSpeedOfSound() * 100 / 2 << "cm";
+    timeSpacing = image->GetGeometry()->GetSpacing()[1] / 1000000.0f;
+    MITK_INFO << "Calculated Scan Depth of " << (image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] /
+      1000000) * speedOfSound * 100 / 2 << "cm";
   }
   else
   {
-    BFconfig->SetTimeSpacing((2 * m_Controls.ScanDepth->value() / 1000 / BFconfig->GetSpeedOfSound()) / image->GetDimension(1));
+    timeSpacing = (2 * m_Controls.ScanDepth->value() / 1000 / speedOfSound) / image->GetDimension(1);
   }
 
+  bool isPAImage;
   if ("US Image" == m_Controls.ImageType->currentText())
   {
-    BFconfig->SetIsPhotoacousticImage(false);
+    isPAImage = false;
   }
   else if ("PA Image" == m_Controls.ImageType->currentText())
   {
-    BFconfig->SetIsPhotoacousticImage(true);
+    isPAImage = true;
   }
 
-  BFconfig->SetPartial(m_Controls.Partial->isChecked());
-  BFconfig->GetCropBounds()[0] = m_Controls.boundLow->value();
-  BFconfig->GetCropBounds()[1] = m_Controls.boundHigh->value();
+  bool partial = m_Controls.Partial->isChecked();
+  unsigned int cropBoundLow = m_Controls.boundLow->value();
+  unsigned int cropBoundHigh = m_Controls.boundHigh->value();
+
+  unsigned int* cropBounds = new unsigned int[2]{ cropBoundLow, cropBoundHigh };
+
+  return mitk::BeamformingSettings::New(pitchInMeters,
+    speedOfSound, timeSpacing, angle, isPAImage, samplesPerLine, reconstructionLines, 0, partial,
+    cropBounds, image->GetDimensions(), useGPU, delay, apod,
+    apodizatonArraySize, algorithm, useBandpass, 50, 50);
 }
 
 void PAImageProcessing::EnableControls()

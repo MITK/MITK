@@ -29,7 +29,8 @@ mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,
   float timeSpacing,
   float angle,
   bool isPhotoacousticImage,
-  unsigned int transducerElements,
+  unsigned int samplesPerLine,
+  unsigned int reconstructionLines,
   unsigned int upperCutoff,
   bool partial,
   unsigned int* cropBounds,
@@ -48,7 +49,8 @@ mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,
   m_TimeSpacing(timeSpacing),
   m_Angle(angle),
   m_IsPhotoacousticImage(isPhotoacousticImage),
-  m_TransducerElements(transducerElements),
+  m_SamplesPerLine(samplesPerLine),
+  m_ReconstructionLines(reconstructionLines),
   m_UpperCutoff(upperCutoff),
   m_Partial(partial),
   m_CropBounds(cropBounds),
@@ -84,10 +86,9 @@ mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,
   if (m_CropBounds == nullptr)
     m_CropBounds = new unsigned int[2]{ 0, 0 };
 
-  m_InputDim = new unsigned int[2]{ inputDim[0], inputDim[1] };
+  m_InputDim = new unsigned int[3]{ inputDim[0], inputDim[1], inputDim[2] };
 
-  m_SamplesPerLine = m_InputDim[1];
-  m_ReconstructionLines = m_InputDim[0];
+  m_TransducerElements = m_InputDim[0];
 }
 
 mitk::BeamformingSettings::~BeamformingSettings()

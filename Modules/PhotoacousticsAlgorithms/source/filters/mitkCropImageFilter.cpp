@@ -44,6 +44,7 @@ void mitk::CropImageFilter::SanityCheckPreconditions()
   std::string type = inputImage->GetPixelType().GetTypeAsString();
   if (!(type == "scalar (float)" || type == " (float)"))
   {
+    MITK_ERROR << "This filter can currently only handle float type images.";
     mitkThrow() << "This filter can currently only handle float type images.";
   }
 

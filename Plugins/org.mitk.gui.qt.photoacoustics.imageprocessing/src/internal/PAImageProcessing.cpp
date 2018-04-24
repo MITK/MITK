@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk image
 #include <mitkImage.h>
 #include "mitkPhotoacousticFilterService.h"
+#include "mitkCastToFloatImageFilter.h"
 #include "mitkBeamformingFilter.h"
 
 //other
@@ -209,9 +210,8 @@ void PAImageProcessing::BatchProcessing()
         this->UpdateProgress(progress, progressInfo);
       };
       m_Controls.progressBar->setValue(100);
-      std::string errorMessage = "";
 
-      image = m_FilterBank->ApplyBeamforming(image, BFconfig, errorMessage, progressHandle);
+      image = m_FilterBank->ApplyBeamforming(image, BFconfig, progressHandle);
 
       if (saveSteps[0])
       {
@@ -360,7 +360,6 @@ void PAImageProcessing::StartBeamformingThread()
       BeamformingThread *thread = new BeamformingThread();
       connect(thread, &BeamformingThread::result, this, &PAImageProcessing::HandleBeamformingResults);
       connect(thread, &BeamformingThread::updateProgress, this, &PAImageProcessing::UpdateProgress);
-      connect(thread, &BeamformingThread::message, this, &PAImageProcessing::PAMessageBox);
       connect(thread, &BeamformingThread::finished, thread, &QObject::deleteLater);
 
       thread->setConfig(BFconfig);
@@ -1067,12 +1066,15 @@ void BeamformingThread::run()
 {
   mitk::Image::Pointer resultImage = mitk::Image::New();
   mitk::Image::Pointer resultImageBuffer;
-  std::string errorMessage = "";
   std::function<void(int, std::string)> progressHandle = [this](int progress, std::string progressInfo) {
     emit updateProgress(progress, progressInfo);
   };
-
-  resultImageBuffer = m_FilterBank->ApplyBeamforming(m_InputImage, m_BFconfig, errorMessage, progressHandle);
+  mitk::CastToFloatImageFilter::Pointer castToFloatImageFilter = mitk::CastToFloatImageFilter::New();
+  castToFloatImageFilter->SetInput(m_InputImage);
+  castToFloatImageFilter->Update();
+  m_InputImage = castToFloatImageFilter->GetOutput();
+  mitk::IOUtil::Save(m_InputImage, "G:/castedImage.nrrd");
+  resultImageBuffer = m_FilterBank->ApplyBeamforming(m_InputImage, m_BFconfig, progressHandle);
   mitk::ImageReadAccessor copy(resultImageBuffer);
 
   resultImage->Initialize(resultImageBuffer);
@@ -1080,7 +1082,6 @@ void BeamformingThread::run()
   resultImage->SetImportVolume(const_cast<void*>(copy.GetData()), 0, 0, mitk::Image::CopyMemory);
 
   emit result(resultImage);
-  emit message(errorMessage);
 }
 
 void BeamformingThread::setConfig(mitk::BeamformingSettings::Pointer BFconfig)

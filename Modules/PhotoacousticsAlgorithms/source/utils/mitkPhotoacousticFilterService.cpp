@@ -234,7 +234,7 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyCropping(mitk::Image
 }
 
 mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBeamforming(mitk::Image::Pointer inputImage,
-  BeamformingSettings::Pointer config, std::string& message, std::function<void(int, std::string)> progressHandle)
+  BeamformingSettings::Pointer config, std::function<void(int, std::string)> progressHandle)
 {
   Image::Pointer processedImage = mitk::Image::New();
 
@@ -245,10 +245,10 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBeamforming(mitk::Im
     dimensionImageFilter->Update();
     processedImage = dimensionImageFilter->GetOutput();
   }
-
-  config->GetInputDim()[0] = processedImage->GetDimension(0);
-  config->GetInputDim()[1] = processedImage->GetDimension(1);
-  config->GetInputDim()[2] = processedImage->GetDimension(2);
+  else
+  {
+    processedImage = inputImage;
+  }
 
   // perform the beamforming
   m_BeamformingFilter = mitk::BeamformingFilter::New(config);
@@ -257,7 +257,6 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBeamforming(mitk::Im
   m_BeamformingFilter->UpdateLargestPossibleRegion();
 
   processedImage = m_BeamformingFilter->GetOutput();
-  message = m_BeamformingFilter->GetMessageString();
 
   return processedImage;
 }

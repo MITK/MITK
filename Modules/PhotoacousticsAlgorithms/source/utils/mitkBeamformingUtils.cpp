@@ -70,9 +70,10 @@ float* mitk::BeamformingUtils::BoxFunction(int samples)
 
 void mitk::BeamformingUtils::DASQuadraticLine(
   float* input, float* output, float inputDim[2], float outputDim[2],
-  const short& line, float* apodisation, const short& apodArraySize,
-  const mitk::BeamformingSettings::Pointer config)
+  const short& line, const mitk::BeamformingSettings::Pointer config)
 {
+  const float* apodisation = config->GetApodizationFunction();
+  const short apodArraySize = config->GetApodizationArraySize();
   float& inputS = inputDim[1];
   float& inputL = inputDim[0];
 
@@ -130,9 +131,11 @@ void mitk::BeamformingUtils::DASQuadraticLine(
 
 void mitk::BeamformingUtils::DASSphericalLine(
   float* input, float* output, float inputDim[2], float outputDim[2],
-  const short& line, float* apodisation, const short& apodArraySize,
-  const mitk::BeamformingSettings::Pointer config)
+  const short& line, const mitk::BeamformingSettings::Pointer config)
 {
+  const float* apodisation = config->GetApodizationFunction();
+  const short apodArraySize = config->GetApodizationArraySize();
+
   float& inputS = inputDim[1];
   float& inputL = inputDim[0];
 
@@ -192,9 +195,11 @@ void mitk::BeamformingUtils::DASSphericalLine(
 
 void mitk::BeamformingUtils::DMASQuadraticLine(
   float* input, float* output, float inputDim[2], float outputDim[2],
-  const short& line, float* apodisation, const short& apodArraySize,
-  const mitk::BeamformingSettings::Pointer config)
+  const short& line, const mitk::BeamformingSettings::Pointer config)
 {
+  const float* apodisation = config->GetApodizationFunction();
+  const short apodArraySize = config->GetApodizationArraySize();
+
   float& inputS = inputDim[1];
   float& inputL = inputDim[0];
 
@@ -276,9 +281,11 @@ void mitk::BeamformingUtils::DMASQuadraticLine(
 
 void mitk::BeamformingUtils::DMASSphericalLine(
   float* input, float* output, float inputDim[2], float outputDim[2],
-  const short& line, float* apodisation, const short& apodArraySize,
-  const mitk::BeamformingSettings::Pointer config)
+  const short& line, const mitk::BeamformingSettings::Pointer config)
 {
+  const float* apodisation = config->GetApodizationFunction();
+  const short apodArraySize = config->GetApodizationArraySize();
+
   float& inputS = inputDim[1];
   float& inputL = inputDim[0];
 
@@ -362,9 +369,11 @@ void mitk::BeamformingUtils::DMASSphericalLine(
 
 void mitk::BeamformingUtils::sDMASQuadraticLine(
   float* input, float* output, float inputDim[2], float outputDim[2],
-  const short& line, float* apodisation, const short& apodArraySize,
-  const mitk::BeamformingSettings::Pointer config)
+  const short& line, const mitk::BeamformingSettings::Pointer config)
 {
+  const float* apodisation = config->GetApodizationFunction();
+  const short apodArraySize = config->GetApodizationArraySize();
+
   float& inputS = inputDim[1];
   float& inputL = inputDim[0];
 
@@ -449,9 +458,11 @@ void mitk::BeamformingUtils::sDMASQuadraticLine(
 
 void mitk::BeamformingUtils::sDMASSphericalLine(
   float* input, float* output, float inputDim[2], float outputDim[2],
-  const short& line, float* apodisation, const short& apodArraySize,
-  const mitk::BeamformingSettings::Pointer config)
+  const short& line, const mitk::BeamformingSettings::Pointer config)
 {
+  const float* apodisation = config->GetApodizationFunction();
+  const short apodArraySize = config->GetApodizationArraySize();
+
   float& inputS = inputDim[1];
   float& inputL = inputDim[0];
 

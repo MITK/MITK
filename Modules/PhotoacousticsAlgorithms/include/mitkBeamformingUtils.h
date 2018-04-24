@@ -33,27 +33,27 @@ namespace mitk {
 
     /** \brief Function to perform beamforming on CPU for a single line, using DAS and quadratic delay
    */
-    static void DASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize, const mitk::BeamformingSettings::Pointer config);
+    static void DASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, const mitk::BeamformingSettings::Pointer config);
 
     /** \brief Function to perform beamforming on CPU for a single line, using DAS and spherical delay
     */
-    static void DASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize, const mitk::BeamformingSettings::Pointer config);
+    static void DASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, const mitk::BeamformingSettings::Pointer config);
 
     /** \brief Function to perform beamforming on CPU for a single line, using DMAS and quadratic delay
     */
-    static void DMASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize, const mitk::BeamformingSettings::Pointer config);
+    static void DMASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, const mitk::BeamformingSettings::Pointer config);
 
     /** \brief Function to perform beamforming on CPU for a single line, using DMAS and spherical delay
     */
-    static void DMASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize, const mitk::BeamformingSettings::Pointer config);
+    static void DMASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, const mitk::BeamformingSettings::Pointer config);
 
     /** \brief Function to perform beamforming on CPU for a single line, using signed DMAS and quadratic delay
     */
-    static void sDMASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize, const mitk::BeamformingSettings::Pointer config);
+    static void sDMASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, const mitk::BeamformingSettings::Pointer config);
 
     /** \brief Function to perform beamforming on CPU for a single line, using signed DMAS and spherical delay
     */
-    static void sDMASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize, const mitk::BeamformingSettings::Pointer config);
+    static void sDMASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, const mitk::BeamformingSettings::Pointer config);
 
     /** \brief Pointer holding the Von-Hann apodization window for beamforming
     * @param samples the resolution at which the window is created

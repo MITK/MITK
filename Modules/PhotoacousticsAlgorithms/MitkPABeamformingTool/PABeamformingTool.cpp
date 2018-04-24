@@ -21,7 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkException.h>
 
 #include <mitkPhotoacousticFilterService.h>
-#include <mitkPhotoacousticBeamformingSettings.h>
+#include <mitkBeamformingSettings.h>
+#include <mitkCastToFloatImageFilter.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -30,10 +31,10 @@ struct InputParameters
   mitk::Image::Pointer inputImage;
   std::string outputFilename;
   bool verbose;
-  int speedOfSound;
-  int cutoff;
+  float speedOfSound;
+  unsigned int cutoff;
   float angle;
-  int samples;
+  unsigned int samples;
   mitk::BeamformingSettings::BeamformingAlgorithm algorithm;
 };
 
@@ -63,7 +64,7 @@ InputParameters parseInput(int argc, char* argv[])
     "verbose", "v", mitkCommandLineParser::Bool,
     "Verbose Output", "Whether to produce verbose, or rather debug output. (default: false)");
   parser.addArgument(
-    "speed-of-sound", "sos", mitkCommandLineParser::Int,
+    "speed-of-sound", "sos", mitkCommandLineParser::Float,
     "Speed of Sound [m/s]", "The average speed of sound as assumed for the reconstruction in [m/s]. (default: 1500)");
   parser.addArgument(
     "cutoff", "co", mitkCommandLineParser::Int,
@@ -180,25 +181,25 @@ InputParameters parseInput(int argc, char* argv[])
 
 mitk::BeamformingSettings::Pointer ParseSettings(InputParameters &input)
 {
-  mitk::BeamformingSettings::Pointer outputSettings = mitk::BeamformingSettings::New();
-
-  outputSettings->SetAlgorithm(input.algorithm);
-  outputSettings->SetApod(mitk::BeamformingSettings::Apodization::Box);
-  outputSettings->SetSpeedOfSound(input.speedOfSound);
-  outputSettings->SetTimeSpacing(input.inputImage->GetGeometry()->GetSpacing()[1] / 1000000);
-  outputSettings->SetRecordTime(input.inputImage->GetDimension(1)*input.inputImage->GetGeometry()->GetSpacing()[1] / 1000000); // [s]
-  outputSettings->SetUseGPU(false);
-  outputSettings->SetUpperCutoff(input.cutoff);
-  outputSettings->SetDelayCalculationMethod(mitk::BeamformingSettings::DelayCalc::Spherical);
-  outputSettings->SetAngle(input.angle);
-  outputSettings->SetPitch(input.inputImage->GetGeometry()->GetSpacing()[0] / 1000);
-  outputSettings->SetTransducerElements(input.inputImage->GetDimension(0));
-  outputSettings->SetReconstructionLines(input.inputImage->GetDimension(0));
-  outputSettings->SetSamplesPerLine(input.samples);
-  outputSettings->SetIsPhotoacousticImage(true);
-  outputSettings->SetPartial(false);
-  outputSettings->SetApodizationArraySize(input.inputImage->GetDimension(0));
-  outputSettings->SetUseBP(false);
+  mitk::BeamformingSettings::Pointer outputSettings = mitk::BeamformingSettings::New(
+    (float)(input.inputImage->GetGeometry()->GetSpacing()[0] / 1000),
+    (float)(input.speedOfSound),
+    (float)(input.inputImage->GetGeometry()->GetSpacing()[1] / 1000000),
+    input.angle,
+    true,
+    input.inputImage->GetDimension(0),
+    input.cutoff,
+    false,
+    (unsigned int*) nullptr,
+    input.inputImage->GetDimensions(),
+    false,
+    mitk::BeamformingSettings::DelayCalc::Spherical,
+    mitk::BeamformingSettings::Apodization::Box,
+    input.inputImage->GetDimension(0),
+    input.algorithm,
+    false,
+    0.0f,
+    0.0f);
 
   return outputSettings;
 }
@@ -213,9 +214,12 @@ int main(int argc, char * argv[])
 
   mitk::BeamformingSettings::Pointer settings = ParseSettings(input);
 
-  std::string message = "Test";
+  mitk::CastToFloatImageFilter::Pointer castFilter = mitk::CastToFloatImageFilter::New();
+  castFilter->SetInput(input.inputImage);
+  castFilter->Update();
+  auto floatImage = castFilter->GetOutput();
 
-  auto output = m_BeamformingService->ApplyBeamforming(input.inputImage, settings, message);
+  auto output = m_BeamformingService->ApplyBeamforming(floatImage, settings);
   MITK_INFO(input.verbose) << "Applying BModeFilter to image...";
   //output = m_BeamformingService->ApplyBmodeFilter(output, mitk::PhotoacousticFilterService::Abs, false, false, 0.3);
   MITK_INFO(input.verbose) << "Applying BModeFilter to image...[Done]";

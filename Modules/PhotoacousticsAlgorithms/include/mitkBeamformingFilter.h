@@ -40,16 +40,6 @@ namespace mitk {
     mitkNewMacro1Param(Self, mitk::BeamformingSettings::Pointer);
     itkCloneMacro(Self);
 
-    /** \brief Sets a new configuration to use
-    *
-    *  The Filter writes important messages that can be retrieved through this method; if nothing is to be reported, it returns "noMessage".
-    *  @return The message
-    */
-    std::string GetMessageString()
-    {
-      return m_Message;
-    }
-
     /** \brief Sets a callback for progress checking
     *
     *  An std::function<void(int, std::string)> can be set, through which progress of the currently updating filter is reported.
@@ -92,10 +82,6 @@ namespace mitk {
     /** \brief Pointer to the GPU beamforming filter class; for performance reasons the filter is initialized within the constructor and kept for all later computations.
     */
     mitk::PhotoacousticOCLBeamformingFilter::Pointer m_BeamformingOclFilter;
-
-    /** \brief The message returned by mitk::BeamformingFilter::GetMessageString()
-    */
-    std::string m_Message;
   };
 } // namespace mitk
 

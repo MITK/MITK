@@ -1,5 +1,5 @@
 /*===================================================================
-mitkPhotoacousticBeamformingFilter
+mitkBeamformingFilter
 The Medical Imaging Interaction Toolkit (MITK)
 
 Copyright (c) German Cancer Research Center,
@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::BeamformingFilter::BeamformingFilter(mitk::BeamformingSettings::Pointer settings) :
   m_OutputData(nullptr),
   m_InputData(nullptr),
-  m_Message("noMessage"),
   m_Conf(settings)
 {
   MITK_INFO << "Instantiating BeamformingFilter...";
@@ -94,6 +93,7 @@ void mitk::BeamformingFilter::GenerateData()
   mitk::Image::Pointer input = this->GetInput();
   if (!(input->GetPixelType().GetTypeAsString() == "scalar (float)" || input->GetPixelType().GetTypeAsString() == " (float)"))
   {
+    MITK_ERROR << "Pixel type of input needs to be float for this filter to work.";
     mitkThrow() << "Pixel type of input needs to be float for this filter to work.";
   }
 
@@ -139,8 +139,7 @@ void mitk::BeamformingFilter::GenerateData()
           for (short line = 0; line < outputDim[0]; ++line)
           {
             threads[line] = std::thread(&BeamformingUtils::DASQuadraticLine, m_InputData,
-              m_OutputData, inputDim, outputDim, line, m_Conf->GetApodizationFunction(),
-              m_Conf->GetApodizationArraySize(), m_Conf);
+              m_OutputData, inputDim, outputDim, line, m_Conf);
           }
         }
         else if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::Spherical)
@@ -148,8 +147,7 @@ void mitk::BeamformingFilter::GenerateData()
           for (short line = 0; line < outputDim[0]; ++line)
           {
             threads[line] = std::thread(&BeamformingUtils::DASSphericalLine, m_InputData,
-              m_OutputData, inputDim, outputDim, line, m_Conf->GetApodizationFunction(),
-              m_Conf->GetApodizationArraySize(), m_Conf);
+              m_OutputData, inputDim, outputDim, line, m_Conf);
           }
         }
       }
@@ -160,8 +158,7 @@ void mitk::BeamformingFilter::GenerateData()
           for (short line = 0; line < outputDim[0]; ++line)
           {
             threads[line] = std::thread(&BeamformingUtils::DMASQuadraticLine, m_InputData,
-              m_OutputData, inputDim, outputDim, line, m_Conf->GetApodizationFunction(),
-              m_Conf->GetApodizationArraySize(), m_Conf);
+              m_OutputData, inputDim, outputDim, line, m_Conf);
           }
         }
         else if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::Spherical)
@@ -169,8 +166,7 @@ void mitk::BeamformingFilter::GenerateData()
           for (short line = 0; line < outputDim[0]; ++line)
           {
             threads[line] = std::thread(&BeamformingUtils::DMASSphericalLine, m_InputData,
-              m_OutputData, inputDim, outputDim, line, m_Conf->GetApodizationFunction(),
-              m_Conf->GetApodizationArraySize(), m_Conf);
+              m_OutputData, inputDim, outputDim, line, m_Conf);
           }
         }
       }
@@ -181,8 +177,7 @@ void mitk::BeamformingFilter::GenerateData()
           for (short line = 0; line < outputDim[0]; ++line)
           {
             threads[line] = std::thread(&BeamformingUtils::sDMASQuadraticLine, m_InputData,
-              m_OutputData, inputDim, outputDim, line, m_Conf->GetApodizationFunction(),
-              m_Conf->GetApodizationArraySize(), m_Conf);
+              m_OutputData, inputDim, outputDim, line, m_Conf);
           }
         }
         else if (m_Conf->GetDelayCalculationMethod() == BeamformingSettings::DelayCalc::Spherical)
@@ -190,8 +185,7 @@ void mitk::BeamformingFilter::GenerateData()
           for (short line = 0; line < outputDim[0]; ++line)
           {
             threads[line] = std::thread(&BeamformingUtils::sDMASSphericalLine, m_InputData,
-              m_OutputData, inputDim, outputDim, line, m_Conf->GetApodizationFunction(),
-              m_Conf->GetApodizationArraySize(), m_Conf);
+              m_OutputData, inputDim, outputDim, line, m_Conf);
           }
         }
       }
@@ -256,15 +250,16 @@ void mitk::BeamformingFilter::GenerateData()
         m_ProgressHandle(input->GetDimension(2) / batches * i, "performing reconstruction");
 
         mitk::Image::Pointer inputBatch = mitk::Image::New();
+        unsigned int num_Slices = 1;
         if (i == batches - 1 && (input->GetDimension(2) % batchSize > 0))
         {
           inputBatch->Initialize(mitk::MakeScalarPixelType<float>(), 3, batchDimLast);
-          m_Conf->GetInputDim()[2] = batchDimLast[2];
+          num_Slices = batchDimLast[2];
         }
         else
         {
           inputBatch->Initialize(mitk::MakeScalarPixelType<float>(), 3, batchDim);
-          m_Conf->GetInputDim()[2] = batchDim[2];
+          num_Slices = batchDim[2];
         }
 
         inputBatch->SetSpacing(input->GetGeometry()->GetSpacing());
@@ -277,7 +272,7 @@ void mitk::BeamformingFilter::GenerateData()
 
         void* out = m_BeamformingOclFilter->GetOutput();
 
-        for (unsigned int slice = 0; slice < m_Conf->GetInputDim()[2]; ++slice)
+        for (unsigned int slice = 0; slice < num_Slices; ++slice)
         {
           output->SetImportSlice(
             &(((float*)out)[m_Conf->GetReconstructionLines() * m_Conf->GetSamplesPerLine() * slice]),
@@ -292,9 +287,7 @@ void mitk::BeamformingFilter::GenerateData()
       MITK_ERROR << errorMessage;
 
       float* dummyData = new float[m_Conf->GetReconstructionLines() * m_Conf->GetSamplesPerLine() * m_Conf->GetInputDim()[2]];
-      output->SetImportVolume(dummyData, 0, 0, mitk::Image::ImportMemoryManagementType::ManageMemory);
-
-      m_Message = "An openCL error occurred; all GPU operations in this and the next session may be corrupted.";
+      output->SetImportVolume(dummyData, 0, 0, mitk::Image::ImportMemoryManagementType::CopyMemory);
     }
   }
 #endif

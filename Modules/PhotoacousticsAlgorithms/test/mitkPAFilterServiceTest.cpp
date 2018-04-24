@@ -49,7 +49,13 @@ public:
     m_PhotoacousticFilterService = mitk::PhotoacousticFilterService::New();
   }
 
-  mitk::BeamformingSettings::Pointer CreateBeamformingSettings()
+  mitk::BeamformingSettings::Pointer CreateEmptyBeamformingSettings()
+  {
+    mitk::BeamformingSettings::Pointer config = mitk::BeamformingSettings::New();
+    return config;
+  }
+
+  mitk::BeamformingSettings::Pointer CreateFunctionalBeamformingSettings()
   {
     mitk::BeamformingSettings::Pointer config = mitk::BeamformingSettings::New();
     return config;
@@ -60,29 +66,39 @@ public:
     int xDim = 3;
     int yDim = 3;
     int length = yDim * xDim;
-    int* testArray = new int[length];
+    float* testArray = new float[length];
     for (int i = 0; i < length; ++i)
     {
       testArray[i] = 0;
     }
+
     unsigned int NUMBER_OF_SPATIAL_DIMENSIONS = 2;
-    auto* dimensions = new unsigned int[NUMBER_OF_SPATIAL_DIMENSIONS];
+    unsigned int* dimensions = new unsigned int[NUMBER_OF_SPATIAL_DIMENSIONS];
     dimensions[0] = yDim;
     dimensions[1] = xDim;
-    mitk::PixelType pixelType = mitk::MakeScalarPixelType<int>();
+    mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();
     mitk::Image::Pointer testImage = mitk::Image::New();
     testImage->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);
-    testImage->SetImportSlice(testArray, 0, 0, 0, mitk::Image::ImportMemoryManagementType::ManageMemory);
-    std::string message = "Es ist egal. Das taucht nicht auf!";
-    mitk::BeamformingSettings::Pointer config = CreateBeamformingSettings();
-    auto output = m_PhotoacousticFilterService->ApplyBeamforming(testImage, config, message);
+    testImage->SetImportSlice(testArray, 0, 0, 0, mitk::Image::ImportMemoryManagementType::RtlCopyMemory);
+    delete[] testArray;
 
-    mitk::ImageReadAccessor readAccess(output, output->GetVolumeData());
-    const int* outputArray = (const int*)readAccess.GetData();
+    mitk::ImageReadAccessor readAccessInput(testImage);
+    const float* inputArray = (const float*)readAccessInput.GetData();
 
     for (int i = 0; i < length; ++i)
     {
-      CPPUNIT_ASSERT(outputArray[i] == 0);
+      CPPUNIT_ASSERT_MESSAGE(std::string("Input array already not correct: " + std::to_string(inputArray[i])), abs(inputArray[i]) < 1e-5f);
+    }
+
+    mitk::BeamformingSettings::Pointer config = CreateEmptyBeamformingSettings();
+    auto output = m_PhotoacousticFilterService->ApplyBeamforming(testImage, config);
+
+    mitk::ImageReadAccessor readAccess(output);
+    const float* outputArray = (const float*)readAccess.GetData();
+
+    for (int i = 0; i < length; ++i)
+    {
+      CPPUNIT_ASSERT_MESSAGE(std::string("Ouput array not correct: " + std::to_string(abs(outputArray[i]))), abs(outputArray[i]) < 1e-5f);
     }
   }
 

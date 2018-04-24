@@ -2,6 +2,7 @@ file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURREN
 
 set(CPP_FILES
   source/filters/mitkBeamformingFilter.cpp
+  source/filters/mitkBeamformingSettings.cpp
   source/filters/mitkImageSliceSelectionFilter.cpp
   source/filters/mitkCastToFloatImageFilter.cpp
   source/filters/mitkCropImageFilter.cpp

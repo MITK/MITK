@@ -75,12 +75,11 @@ namespace mitk {
     * Resamples an image using the given parameters.
     * @param inputImage The image to be processed.
     * @param config The configuration set to be used for beamforming.
-    * @param message A string into which potentially critical messages will be written.
     * @param progressHandle An std::function<void(int, std::string)>, through which progress of the currently updating filter is reported.
     * The integer argument is a number between 0 an 100 to indicate how far completion has been achieved, the std::string argument indicates what the filter is currently doing.
     * @return The processed image is returned after the filter has finished.
     */
-    mitk::Image::Pointer ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingSettings::Pointer config, std::string& message, std::function<void(int, std::string)> progressHandle = [](int, std::string) {});
+    mitk::Image::Pointer ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingSettings::Pointer config, std::function<void(int, std::string)> progressHandle = [](int, std::string) {});
 
     /** \brief Crops the given image
     *

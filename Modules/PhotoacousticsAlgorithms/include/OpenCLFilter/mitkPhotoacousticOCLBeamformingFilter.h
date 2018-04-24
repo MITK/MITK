@@ -66,7 +66,7 @@ namespace mitk
     void Update();
 
     /** \brief Set the Apodisation function to apply when beamforming */
-    void SetApodisation(float* apodisation, unsigned short apodArraySize)
+    void SetApodisation(const float* apodisation, unsigned short apodArraySize)
     {
       m_ApodArraySize = apodArraySize;
       m_Apodisation = apodisation;
@@ -104,7 +104,7 @@ namespace mitk
 
     unsigned int m_OutputDim[3];
 
-    float* m_Apodisation;
+    const float* m_Apodisation;
     unsigned short m_ApodArraySize;
 
     unsigned short m_PAImage;

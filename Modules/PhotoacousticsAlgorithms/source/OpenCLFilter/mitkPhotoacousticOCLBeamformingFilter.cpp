@@ -28,6 +28,7 @@ mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter(Beamf
   m_UsedLinesBuffer(nullptr),
   m_Conf(settings)
 {
+  MITK_INFO << "Initializing OCL beamforming Filter...";
   this->AddSourceFile("DAS.cl");
   this->AddSourceFile("DMAS.cl");
   this->AddSourceFile("sDMAS.cl");
@@ -37,13 +38,7 @@ mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter(Beamf
 
   unsigned int dim[] = { 128, 2048, 2 };
 
-  mitk::Vector3D spacing;
-  spacing[0] = 1;
-  spacing[1] = 1;
-  spacing[2] = 1;
-
   m_InputImage->Initialize(mitk::MakeScalarPixelType<float>(), 3, dim);
-  m_InputImage->SetSpacing(spacing);
 
   m_ChunkSize[0] = 128;
   m_ChunkSize[1] = 128;
@@ -51,6 +46,7 @@ mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter(Beamf
 
   m_UsedLinesCalculation = mitk::OCLUsedLinesCalculation::New(m_Conf);
   m_DelayCalculation = mitk::OCLDelayCalculation::New(m_Conf);
+  MITK_INFO << "Initializing OCL beamforming Filter...[Done]";
 }
 
 mitk::PhotoacousticOCLBeamformingFilter::~PhotoacousticOCLBeamformingFilter()
@@ -113,8 +109,7 @@ void mitk::PhotoacousticOCLBeamformingFilter::UpdateDataBuffers()
   if (m_Apodisation == nullptr)
   {
     MITK_INFO << "No apodisation function set; Beamforming will be done without any apodisation.";
-    m_Apodisation = new float[1];
-    m_Apodisation[0] = 1;
+    m_Apodisation = new float[1]{ 1 };
     m_ApodArraySize = 1;
   }
 
@@ -124,7 +119,7 @@ void mitk::PhotoacousticOCLBeamformingFilter::UpdateDataBuffers()
 
   if (m_ApodizationBuffer) clReleaseMemObject(m_ApodizationBuffer);
 
-  this->m_ApodizationBuffer = clCreateBuffer(gpuContext, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, sizeof(float) * m_ApodArraySize, m_Apodisation, &clErr);
+  this->m_ApodizationBuffer = clCreateBuffer(gpuContext, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, sizeof(float) * m_ApodArraySize, const_cast<float*>(m_Apodisation), &clErr);
   CHECK_OCL_ERR(clErr);
 
   // calculate used lines
@@ -225,20 +220,12 @@ bool mitk::PhotoacousticOCLBeamformingFilter::Initialize()
 void mitk::PhotoacousticOCLBeamformingFilter::SetInput(mitk::Image::Pointer image)
 {
   OclDataSetToDataSetFilter::SetInput(image);
-
   m_InputImage = image;
-  m_Conf->GetInputDim()[0] = m_InputImage->GetDimension(0);
-  m_Conf->GetInputDim()[1] = m_InputImage->GetDimension(1);
-  m_Conf->GetInputDim()[2] = m_InputImage->GetDimension(2);
 }
 
 void mitk::PhotoacousticOCLBeamformingFilter::SetInput(void* data, unsigned int* dimensions, unsigned int BpE)
 {
   OclDataSetToDataSetFilter::SetInput(data, dimensions[0] * dimensions[1] * dimensions[2], BpE);
-
-  m_Conf->GetInputDim()[0] = dimensions[0];
-  m_Conf->GetInputDim()[1] = dimensions[1];
-  m_Conf->GetInputDim()[2] = dimensions[2];
 }
 
 mitk::Image::Pointer mitk::PhotoacousticOCLBeamformingFilter::GetOutputAsImage()

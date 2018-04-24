@@ -94,7 +94,7 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Numeric::Kurtosis with Large IBSI Phantom Image", 2.64538, results["First Order Numeric::Kurtosis"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Numeric::Robust mean with Large IBSI Phantom Image", 1.74627, results["First Order Numeric::Robust mean"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Numeric::Robust variance with Large IBSI Phantom Image", 1.65204, results["First Order Numeric::Robust variance"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Numeric::Covered image intensity range with Large IBSI Phantom Image", 1.2, results["First Order Numeric::Covered image intensity range"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Numeric::Covered image intensity range with Large IBSI Phantom Image", 0.83333, results["First Order Numeric::Covered image intensity range"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Numeric::Mode index with Large IBSI Phantom Image",0 , results["First Order Numeric::Mode index"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Numeric::Mode value with Large IBSI Phantom Image", 1, results["First Order Numeric::Mode value"], 0.01);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("First Order Numeric::Mode probability with Large IBSI Phantom Image", 0.675676, results["First Order Numeric::Mode probability"], 0.01);

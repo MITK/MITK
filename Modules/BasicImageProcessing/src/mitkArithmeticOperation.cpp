@@ -166,6 +166,55 @@ namespace mitk
   }
 }
 
+
+template<typename DefaultFunctorType, typename DoubleFunctorType, typename ImageType, typename DoubleImageType >
+static void ExecuteOneImageFilterWithFunctor(ImageType* imageA, double value, bool returnDoubleImage, bool valueLeft, bool parameterFree, mitk::Image::Pointer & outputImage)
+{
+  typedef itk::UnaryFunctorImageFilter< ImageType, ImageType, DefaultFunctorType > DefaultFilterType;
+  typedef itk::UnaryFunctorImageFilter< ImageType, DoubleImageType, DoubleFunctorType > DoubleFilterType;
+
+  if (returnDoubleImage)
+  {
+    typename DoubleFilterType::Pointer filter = DoubleFilterType::New();
+    filter->SetInput(imageA);
+    filter->GetFunctor().valueLeft = valueLeft;
+    filter->GetFunctor().value = value;
+    filter->Update();
+    CastToMitkImage(filter->GetOutput(), outputImage);
+  }
+  else
+  {
+    typename DefaultFilterType::Pointer filter = DefaultFilterType::New();
+    filter->SetInput(imageA);
+    filter->GetFunctor().valueLeft = valueLeft;
+    filter->GetFunctor().value = value;
+    filter->Update();
+    CastToMitkImage(filter->GetOutput(), outputImage);
+  }
+}
+
+template<typename DefaultFunctorType, typename DoubleFunctorType, typename ImageType, typename DoubleImageType >
+static void ExecuteOneImageFilterWithFunctorNonParameter(ImageType* imageA, double value, bool returnDoubleImage, bool valueLeft, bool parameterFree, mitk::Image::Pointer & outputImage)
+{
+  typedef itk::UnaryFunctorImageFilter< ImageType, ImageType, DefaultFunctorType > DefaultFilterType;
+  typedef itk::UnaryFunctorImageFilter< ImageType, DoubleImageType, DoubleFunctorType > DoubleFilterType;
+
+  if (returnDoubleImage)
+  {
+    typename DoubleFilterType::Pointer filter = DoubleFilterType::New();
+    filter->SetInput(imageA);
+    filter->Update();
+    CastToMitkImage(filter->GetOutput(), outputImage);
+  }
+  else
+  {
+    typename DefaultFilterType::Pointer filter = DefaultFilterType::New();
+    filter->SetInput(imageA);
+    filter->Update();
+    CastToMitkImage(filter->GetOutput(), outputImage);
+  }
+}
+
 template<typename TPixel, unsigned int VImageDimension>
 static void ExecuteOneImageFilter(itk::Image<TPixel, VImageDimension>* imageA, double value, bool returnDoubleImage, bool valueLeft, bool parameterFree, mitk::NonStaticArithmeticOperation::OperationsEnum algorithm, mitk::Image::Pointer & outputImage)
 {
@@ -262,55 +311,6 @@ static void ExecuteOneImageFilter(itk::Image<TPixel, VImageDimension>* imageA, d
     break;
   }
 }
-
-template<typename DefaultFunctorType, typename DoubleFunctorType, typename ImageType, typename DoubleImageType >
-static void ExecuteOneImageFilterWithFunctor(ImageType* imageA, double value, bool returnDoubleImage, bool valueLeft, bool parameterFree, mitk::Image::Pointer & outputImage)
-{
-  typedef itk::UnaryFunctorImageFilter< ImageType, ImageType, DefaultFunctorType > DefaultFilterType;
-  typedef itk::UnaryFunctorImageFilter< ImageType, DoubleImageType, DoubleFunctorType > DoubleFilterType;
-
-  if (returnDoubleImage)
-  {
-    typename DoubleFilterType::Pointer filter = DoubleFilterType::New();
-    filter->SetInput(imageA);
-    filter->GetFunctor().valueLeft = valueLeft;
-    filter->GetFunctor().value = value;
-    filter->Update();
-    CastToMitkImage(filter->GetOutput(), outputImage);
-  }
-  else
-  {
-    typename DefaultFilterType::Pointer filter = DefaultFilterType::New();
-    filter->SetInput(imageA);
-    filter->GetFunctor().valueLeft = valueLeft;
-    filter->GetFunctor().value = value;
-    filter->Update();
-    CastToMitkImage(filter->GetOutput(), outputImage);
-  }
-}
-
-template<typename DefaultFunctorType, typename DoubleFunctorType, typename ImageType, typename DoubleImageType >
-static void ExecuteOneImageFilterWithFunctorNonParameter(ImageType* imageA, double value, bool returnDoubleImage, bool valueLeft, bool parameterFree, mitk::Image::Pointer & outputImage)
-{
-  typedef itk::UnaryFunctorImageFilter< ImageType, ImageType, DefaultFunctorType > DefaultFilterType;
-  typedef itk::UnaryFunctorImageFilter< ImageType, DoubleImageType, DoubleFunctorType > DoubleFilterType;
-
-  if (returnDoubleImage)
-  {
-    typename DoubleFilterType::Pointer filter = DoubleFilterType::New();
-    filter->SetInput(imageA);
-    filter->Update();
-    CastToMitkImage(filter->GetOutput(), outputImage);
-  }
-  else
-  {
-    typename DefaultFilterType::Pointer filter = DefaultFilterType::New();
-    filter->SetInput(imageA);
-    filter->Update();
-    CastToMitkImage(filter->GetOutput(), outputImage);
-  }
-}
-
 
 mitk::Image::Pointer mitk::ArithmeticOperation::Add(Image::Pointer & imageA, Image::Pointer & imageB, bool outputAsDouble)
 {

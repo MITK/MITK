@@ -47,6 +47,10 @@ class SpectralUnmixing : public QmitkAbstractView
 public:
   static const std::string VIEW_ID;
 
+  // Add Wavelengths with button:
+  int size;
+  std::vector<int> m_Wavelengths;
+
   bool DeOxbool;
   bool Oxbool;
 

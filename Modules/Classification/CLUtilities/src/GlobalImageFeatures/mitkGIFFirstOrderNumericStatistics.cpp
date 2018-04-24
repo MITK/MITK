@@ -101,23 +101,64 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   // Histogram based calculations
   //
   unsigned int passedValues = 0;
-  bool found10th = false;
-  bool found90th = false;
-  bool foundMedian = false;
+  double doubleNoOfVoxes = numberOfVoxels;
   double median = 0;
+  double lastIntensityWithValues = params.quantifier->IndexToMeanIntensity(0);
+
+  std::vector<double> percentiles;
+  percentiles.resize(20, 0);
+
   for (std::size_t idx = 0; idx < histogram.size(); ++idx)
   {
+    unsigned int actualValues = histogram[idx];
 
+    for (std::size_t percentileIdx = 0; percentileIdx < percentiles.size(); ++percentileIdx)
+    {
+      double threshold = doubleNoOfVoxes * (percentileIdx + 1) *1.0 / (percentiles.size());
+      if ((passedValues < threshold) & ((passedValues + actualValues) >= threshold))
+      {
+        // Lower Bound
+        if (passedValues == std::floor(threshold))
+        {
+          percentiles[percentileIdx] = 0.5*(lastIntensityWithValues + params.quantifier->IndexToMeanIntensity(idx));
+        }
+        else
+        {
+          percentiles[percentileIdx] = params.quantifier->IndexToMeanIntensity(idx);
+        }
+      }
+    }
+
+    if ((passedValues < doubleNoOfVoxes * 0.5) & ((passedValues + actualValues) >= doubleNoOfVoxes * 0.5))
+    {
+      // Lower Bound
+      if (passedValues == std::floor(doubleNoOfVoxes * 0.5))
+      {
+        median = 0.5*(lastIntensityWithValues + params.quantifier->IndexToMeanIntensity(idx));
+      }
+      else
+      {
+        median = params.quantifier->IndexToMeanIntensity(idx);
+      }
+    }
+
+    if (actualValues > 0)
+    {
+      lastIntensityWithValues = params.quantifier->IndexToMeanIntensity(idx);
+    }
+    passedValues += actualValues;
   }
 
-
-  double mean = sum / numberOfVoxels;
-  double variance = sumTwo / numberOfVoxels - (mean*mean);
-  double skewness = (sumThree / numberOfVoxels - 3 * mean * variance - mean * mean * mean) / (std::pow<double>(variance, 3/2 ));
+  double mean = sum / (numberOfVoxels);
+  double variance = sumTwo / (numberOfVoxels) - (mean*mean);
   double energy = sumTwo;
   double rootMeanSquare = std::sqrt(sumTwo / numberOfVoxels);
 
   double sumAbsoluteDistanceToMean = 0;
+  double sumValueMinusMean = 0;
+  double sumValueMinusMeanTwo = 0;
+  double sumValueMinusMeanThree = 0;
+  double sumValueMinusMeanFour = 0;
 
   maskIter.GoToBegin();
   imageIter.GoToBegin();
@@ -126,26 +167,40 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
     if (maskIter.Get() > 0)
     {
       double value = imageIter.Get();
+      double valueMinusMean = value - mean;
 
-      sumAbsoluteDistanceToMean += std::abs<double>(value - mean);
-
+      sumAbsoluteDistanceToMean += std::abs<double>(valueMinusMean);
+      sumValueMinusMean += valueMinusMean;
+      sumValueMinusMeanTwo += valueMinusMean * valueMinusMean;
+      sumValueMinusMeanThree += valueMinusMean * valueMinusMean * valueMinusMean;
+      sumValueMinusMeanFour += valueMinusMean * valueMinusMean * valueMinusMean * valueMinusMean;
     }
     ++maskIter;
     ++imageIter;
   }
   double meanAbsoluteDeviation = sumAbsoluteDistanceToMean / numberOfVoxels;
-
+  double skewness = sumValueMinusMeanThree / numberOfVoxels / variance / std::sqrt(variance);
+  double kurtosis = sumValueMinusMeanFour / numberOfVoxels / variance / variance;
+  double interquantileRange = params.quantifier->IntensityToIndex(percentiles[14]) - params.quantifier->IntensityToIndex(percentiles[4]);
 
   featureList.push_back(std::make_pair(params.prefix + "Mean", mean));
   featureList.push_back(std::make_pair(params.prefix + "Variance", variance));
   featureList.push_back(std::make_pair(params.prefix + "Skewness", skewness));
+  featureList.push_back(std::make_pair(params.prefix + "Excess kurtosis", kurtosis-3));
+  featureList.push_back(std::make_pair(params.prefix + "Median", median));
   featureList.push_back(std::make_pair(params.prefix + "Minimum", minimum));
+  featureList.push_back(std::make_pair(params.prefix + "Percentile 10", percentiles[1]));
+  featureList.push_back(std::make_pair(params.prefix + "Percentile 90", percentiles[17]));
   featureList.push_back(std::make_pair(params.prefix + "Maximum", maximum));
+  featureList.push_back(std::make_pair(params.prefix + "Interquantile range", interquantileRange));
   featureList.push_back(std::make_pair(params.prefix + "Range", maximum-minimum));
   featureList.push_back(std::make_pair(params.prefix + "Mean absolute deviation", meanAbsoluteDeviation));
 
   featureList.push_back(std::make_pair(params.prefix + "Energy", energy));
   featureList.push_back(std::make_pair(params.prefix + "Root mean square", rootMeanSquare));
+
+  featureList.push_back(std::make_pair(params.prefix + "Standard Deviation", std::sqrt(variance)));
+  featureList.push_back(std::make_pair(params.prefix + "Kurtosis", kurtosis));
 
   return;
 

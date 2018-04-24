@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStdDisplayActionEventHandler.h>
 
 // qt
-#include <qwidget.h>
+#include <QWidget>
 
 class QHBoxLayout;
 class QVBoxLayout;
@@ -37,7 +37,6 @@ class QGridLayout;
 class QSpacerItem;
 class QmitkLevelWindowWidget;
 class QmitkRenderWindow;
-class vtkCornerAnnotation;
 
 namespace mitk
 {
@@ -64,13 +63,14 @@ public:
   virtual ~QmitkCustomMultiWidget();
   
   void SetDataStorage(mitk::DataStorage* dataStorage);
-  void InitRenderWindowWidgets();
+  void InitializeRenderWindowWidgets();
 
   using RenderWindowWidgetMap = std::map<QString, QmitkRenderWindowWidget*>;
   using RenderWindowHash = QHash<QString, QmitkRenderWindow*>;
   RenderWindowWidgetMap GetRenderWindowWidgets() const;
   QmitkRenderWindowWidget* GetRenderWindowWidget(const QString& widgetID) const;
 
+  void AddRenderWindowWidget(int row, int column, const std::string& cornerAnnotation = "");
   QmitkRenderWindow* GetRenderWindow(const QString& widgetID) const;
 
   QmitkRenderWindowWidget* GetActiveRenderWindowWidget() const;
@@ -92,57 +92,6 @@ public slots:
 
   void ShowLevelWindowWidget(const QString& widgetID, bool show);
   void ShowAllLevelWindowWidgets(bool show);
-  /**
-  * @brief Set a background color gradient for a specific render window.
-  *
-  *   If two different input colors are used, a gradient background is generated.
-  *
-  * @param upper          The color of the gradient background.
-  * @param lower          The color of the gradient background.
-  * @param widgetID   The widget identifier.
-  */
-  void SetBackgroundColorGradient(const mitk::Color& upper, const mitk::Color& lower, const QString& widgetID);
-  /**
-  * @brief Set a background color gradient for all available render windows.
-  *
-  *   If two different input colors are used, a gradient background is generated.
-  *
-  * @param upper          The color of the gradient background.
-  * @param lower          The color of the gradient background.
-  */
-  // #TODO: 'backgroundgradientcolor'
-  void SetAllBackgroundColorGradients(const mitk::Color& upper, const mitk::Color& lower);
-  void FillAllBackgroundColorGradientsWithBlack();
-  void ShowBackgroundColorGradient(const QString& widgetID, bool show);
-  void ShowAllBackgroundColorGradients(bool show);
-  /**
-  * @rief Return a render window (widget) specific background color gradient
-  *
-  * @param widgetID   The widget identifier.
-  *
-  * @return               A color gradient as a pair of colors.
-  *                       First entry: upper color value
-  *                       Second entry: lower color value
-  */
-  std::pair<mitk::Color, mitk::Color> GetBackgroundColorGradient(const QString& widgetID) const;
-  bool GetBackgroundColorGradientFlag(const QString& widgetID) const;
-
-  void SetDepartmentLogoPath(const char* path);
-  void ShowDepartmentLogo(const QString& widgetID, bool show);
-  void ShowAllDepartmentLogos(bool show);
-
-  void SetDecorationColor(const QString& widgetID, const mitk::Color& color);
-  mitk::Color GetDecorationColor(const QString& widgetID) const;
-
-  void ShowColoredRectangle(const QString& widgetID, bool show);
-  void ShowAllColoredRectangles(bool show);
-  bool IsColoredRectangleVisible(const QString& widgetID) const;
-
-  void ShowCornerAnnotation(const QString& widgetID, bool show);
-  void ShowAllCornerAnnotations(bool show);
-  bool IsCornerAnnotationVisible(const QString& widgetID) const;
-  void SetCornerAnnotationText(const QString& widgetID, const std::string& cornerAnnotation);
-  std::string GetCornerAnnotationText(const QString& widgetID) const;
 
   /**
   * @brief Listener to the CrosshairPositionEvent
@@ -155,10 +104,6 @@ public slots:
   *
   */
   void HandleCrosshairPositionEventDelayed();
-
-  void Fit();
-
-  void EnsureDisplayContainsPoint(mitk::BaseRenderer *renderer, const mitk::Point3D &p);
 
   void MoveCrossToPosition(const QString& widgetID, const mitk::Point3D& newPosition);
 
@@ -191,7 +136,6 @@ private:
   void InitializeGUI();
   void InitializeWidget();
   void InitializeDisplayActionEventHandling();
-  void AddRenderWindowWidget(int column, int row, const std::string& cornerAnnotation = "");
   
   // #TODO: see T24173
   mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
@@ -208,7 +152,7 @@ private:
   QString m_MultiWidgetName;
 
   mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
-  mitk::SliceNavigationController* m_TimeNavigationController;
+
   mitk::DisplayActionEventBroadcast::Pointer m_DisplayActionEventBroadcast;
   std::unique_ptr<mitk::StdDisplayActionEventHandler> m_StdDisplayActionEventHandler;
 

@@ -25,12 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk core
 #include <mitkDataStorage.h>
 #include <mitkRenderWindow.h>
-//#include <mitkSliceNavigationController.h>
 #include <vtkMitkRectangleProp.h>
 #include <vtkCornerAnnotation.h>
-
-// annotations module
-#include <mitkLogoAnnotation.h>
 
 // qt
 #include <QWidget>
@@ -47,11 +43,18 @@ class MITKQTWIDGETS_EXPORT QmitkRenderWindowWidget : public QWidget
 
 public:
 
-  QmitkRenderWindowWidget(QWidget* parent = nullptr, const QString& UID = "", mitk::DataStorage* dataStorage = nullptr);
+  QmitkRenderWindowWidget(
+    QWidget* parent = nullptr,
+    const QString& UID = "",
+    mitk::DataStorage* dataStorage = nullptr,
+    mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard
+  );
+
   ~QmitkRenderWindowWidget() override;
 
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
+  const QString& GetUID() const { return m_UID; };
   QmitkRenderWindow* GetRenderWindow() const { return m_RenderWindow; };
   QmitkLevelWindowWidget* GetlevelWindowWidget() const { return m_LevelWindowWidget; };
 
@@ -60,14 +63,12 @@ public:
   void RequestUpdate();
   void ForceImmediateUpdate();
 
-  // #TODO: 'backroundgradientcolor'
-  void SetBackgroundColorGradient(const mitk::Color& upper, const mitk::Color& lower);
-  void ShowBackgroundColorGradient(bool enable);
-  std::pair<mitk::Color, mitk::Color> GetRendererBackgroundColorGradient() const { return m_BackgroundColorGradient; };
-  bool GetBackgroundColorGradientFlag() const { return m_BackgroundColorGradientFlag; };
+  void SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower);
+  void ShowGradientBackground(bool enable);
+  std::pair<mitk::Color, mitk::Color> GetGradientBackgroundColors() const { return m_GradientBackgroundColors; };
+  bool IsGradientBackgroundOn() const;
 
   void ShowLevelWindowWidget(bool enable);
-  void ShowDepartmentLogo(bool show);
 
   void SetDecorationColor(const mitk::Color& color);
   mitk::Color GetDecorationColor() const { return m_DecorationColor; };
@@ -106,9 +107,7 @@ private:
   mitk::BaseRenderer::RenderingMode::Type m_RenderingMode;
   mitk::SliceNavigationController *m_TimeNavigationController;
 
-  std::pair<mitk::Color, mitk::Color> m_BackgroundColorGradient;
-  bool m_BackgroundColorGradientFlag;
-  mitk::LogoAnnotation::Pointer m_LogoAnnotation;
+  std::pair<mitk::Color, mitk::Color> m_GradientBackgroundColors;
   mitk::Color m_DecorationColor;
   vtkSmartPointer<vtkMitkRectangleProp> m_RectangleProp;
   vtkSmartPointer<vtkCornerAnnotation> m_CornerAnnotation;

@@ -22,10 +22,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt widgets module
 #include <QmitkCustomMultiWidget.h>
 
-QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/, const QString& UID/* = ""*/, mitk::DataStorage* dataStorage/* = nullptr*/)
+QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
+                                                 const QString& UID/* = ""*/,
+                                                 mitk::DataStorage* dataStorage/* = nullptr*/,
+                                                 mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::Standard*/)
   : QWidget(parent)
   , m_UID(UID)
   , m_DataStorage(dataStorage)
+  , m_RenderingMode(renderingMode)
   , m_RenderWindow(nullptr)
   , m_LevelWindowWidget(nullptr)
 {
@@ -72,7 +76,7 @@ void QmitkRenderWindowWidget::ForceImmediateUpdate()
   m_RenderingManager->ForceImmediateUpdate(m_RenderWindow->GetRenderWindow());
 }
 
-void QmitkRenderWindowWidget::SetBackgroundColorGradient(const mitk::Color& upper, const mitk::Color& lower)
+void QmitkRenderWindowWidget::SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower)
 {
   vtkRenderer* vtkRenderer = m_RenderWindow->GetRenderer()->GetVtkRenderer();
   if (nullptr == vtkRenderer)
@@ -80,26 +84,22 @@ void QmitkRenderWindowWidget::SetBackgroundColorGradient(const mitk::Color& uppe
     return;
   }
 
-  m_BackgroundColorGradient.first = upper;
-  m_BackgroundColorGradient.second = lower;
+  m_GradientBackgroundColors.first = upper;
+  m_GradientBackgroundColors.second = lower;
   vtkRenderer->SetBackground(lower[0], lower[1], lower[2]);
   vtkRenderer->SetBackground2(upper[0], upper[1], upper[2]);
 
-  ShowBackgroundColorGradient(true);
+  ShowGradientBackground(true);
 }
 
-void QmitkRenderWindowWidget::ShowBackgroundColorGradient(bool show)
+void QmitkRenderWindowWidget::ShowGradientBackground(bool show)
 {
-  if (show)
-  {
-    m_RenderWindow->GetRenderer()->GetVtkRenderer()->GradientBackgroundOn();
-  }
-  else
-  {
-    m_RenderWindow->GetRenderer()->GetVtkRenderer()->GradientBackgroundOff();
+  m_RenderWindow->GetRenderer()->GetVtkRenderer()->SetGradientBackground(show);
+}
 
-  }
-  m_BackgroundColorGradientFlag = show;
+bool QmitkRenderWindowWidget::IsGradientBackgroundOn() const
+{
+  return m_RenderWindow->GetRenderer()->GetVtkRenderer()->GetGradientBackground();
 }
 
 void QmitkRenderWindowWidget::ShowLevelWindowWidget(bool show)
@@ -115,11 +115,6 @@ void QmitkRenderWindowWidget::ShowLevelWindowWidget(bool show)
     m_LevelWindowWidget->disconnect(this);
     m_LevelWindowWidget->hide();
   }
-}
-
-void QmitkRenderWindowWidget::ShowDepartmentLogo(bool show)
-{
-  m_LogoAnnotation->SetVisibility(show);
 }
 
 void QmitkRenderWindowWidget::SetDecorationColor(const mitk::Color& color)
@@ -176,7 +171,6 @@ void QmitkRenderWindowWidget::InitializeGUI()
   //m_RenderingManager = mitk::RenderingManager::New();
   m_RenderingManager->SetDataStorage(m_DataStorage);
 
-  m_RenderingMode = mitk::BaseRenderer::RenderingMode::Standard; // TODO: do not always use the standard rendering mode
   m_RenderWindow = new QmitkRenderWindow(this, m_UID, nullptr, m_RenderingManager, m_RenderingMode);
   m_RenderWindow->SetLayoutIndex(QmitkCustomMultiWidget::SAGITTAL); // TODO: allow to change layout type later
   m_RenderWindow->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
@@ -198,7 +192,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
   m_Layout->addWidget(m_RenderWindow);
   m_Layout->addWidget(m_LevelWindowWidget);
 
-  // set colors, add logo etc.
+  // set colors and corner annotation
   InitializeDecorations();
 }
 
@@ -212,7 +206,7 @@ void QmitkRenderWindowWidget::InitializeDecorations()
 
   // initialize background color gradients
   float black[3] = { 0.0f, 0.0f, 0.0f };
-  SetBackgroundColorGradient(black, black);
+  SetGradientBackgroundColors(black, black);
 
   // initialize decoration color, rectangle and annotation text
   float white[3] = { 1.0f, 1.0f, 1.0f };

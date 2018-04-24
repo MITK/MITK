@@ -35,11 +35,12 @@ public:
   QmitkCustomMultiWidgetEditorPreferencePage();
   ~QmitkCustomMultiWidgetEditorPreferencePage();
 
+  void Init(berry::IWorkbench::Pointer) override;
   void CreateQtControl(QWidget* parent) override;
   QWidget* GetQtControl() const override;
-  void Init(berry::IWorkbench::Pointer) override;
-  void PerformCancel() override;
+
   bool PerformOk() override;
+  void PerformCancel() override;
   void Update() override;
 
 public slots:
@@ -54,17 +55,7 @@ public slots:
    */
   void ChangeRenderingMode(int i);
 
-  /**
-   * @brief OnWidgetComboBoxChanged slot called when the QComboBox to chose the widget was modified.
-   * @param i index of the combobox to select the widget (1-4).
-   */
-  void OnWidgetComboBoxChanged(int i);
-
-  /**
-   * @brief AnnotationTextChanged called when QLineEdit for the annotation was changed.
-   * @param text The new text.
-   */
-  void AnnotationTextChanged(QString text);
+  void ChangeColormap(int i);
 
 protected:
   /**
@@ -72,44 +63,12 @@ protected:
    */
   std::string m_CurrentRenderingMode;
 
-  /**
-   * @brief m_WidgetBackgroundColor1 the background colors.
-   *
-   * If two different colors are chosen, a gradient background appears.
-   */
-  QString m_WidgetBackgroundColor1[4];
-  QString m_WidgetBackgroundColor2[4];
-
-  /**
-   * @brief m_WidgetDecorationColor the decoration color.
-   *
-   * The rectangle prop, the crosshair, the 3D planes and the corner annotation use this.
-   */
-  QString m_WidgetDecorationColor[4];
-
-  /**
-   * @brief m_Widget1Annotation the text of the corner annotation.
-   */
-  QString m_WidgetAnnotation[4];
+  std::string m_CurrentColormap;
 
   /**
    * @brief m_Preferences the berry preferences.
    */
   berry::IPreferences::Pointer m_Preferences;
-
-  /**
-   * @brief SetStyleSheetToColorChooserButton colorize a button.
-   * @param backgroundcolor color for the button.
-   * @param button the button.
-   */
-  void SetStyleSheetToColorChooserButton(QColor backgroundcolor, QPushButton* button);
-
-protected slots:
-
-  /**
-   * @brief ColorChooserButtonClicked slot called when a button to choose color was clicked.
-   */
-  void ColorChooserButtonClicked();
 
 private:
 

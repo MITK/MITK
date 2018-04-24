@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     MITK_INFO << "Data Type for Conversion: " << typeid(TYPE).name();                                 \
     itk::Image<TYPE, DIM>::Pointer itkImage = itk::Image<TYPE, DIM>::New();                           \
     mitk::CastToItkImage(image, itkImage);                                                            \
-    mitk::CastToMitkImage(itkImage, outputImage)                                                      \
+    mitk::CastToMitkImage(itkImage, outputImage);                                                     \
   }
 
 #define CONVERT_IMAGE_TYPE(TYPE)                                                                      \
@@ -47,7 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
       default: MITK_INFO << "This tool doesn't support a dimension of "<<dimension<<".";              \
                outputImage = NULL;                                                                    \
                break;                                                                                 \
-    }                                                                                                 \
+    };                                                                                                 \
   }
 
 
@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
     CONVERT_IMAGE_TYPE(double);
   }
 
-  if (outputImage->IsNotNull())
+  if (outputImage.IsNotNull())
   {
     mitk::IOUtil::Save(outputImage, outputName);
   }

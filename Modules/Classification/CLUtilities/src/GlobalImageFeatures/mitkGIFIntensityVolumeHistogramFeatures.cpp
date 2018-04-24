@@ -107,11 +107,11 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
   unsigned int index010 = std::ceil(quantifier->GetBins() * 0.1);
   unsigned int index090 = std::floor(quantifier->GetBins() * 0.9);
 
-  featureList.push_back(std::make_pair(prefix + "Volume fration at 0.10 intensity", hist[index010]));
-  featureList.push_back(std::make_pair(prefix + "Volume fration at 0.90 intensity", hist[index090]));
+  featureList.push_back(std::make_pair(prefix + "Volume fraction at 0.10 intensity", hist[index010]));
+  featureList.push_back(std::make_pair(prefix + "Volume fraction at 0.90 intensity", hist[index090]));
   featureList.push_back(std::make_pair(prefix + "Intensity at 0.10 volume", intensity010));
   featureList.push_back(std::make_pair(prefix + "Intensity at 0.90 volume", intensity090));
-  featureList.push_back(std::make_pair(prefix + "Difference volume fration at 0.10 and 0.90 intensity", std::abs<double>(hist[index010] - hist[index090])));
+  featureList.push_back(std::make_pair(prefix + "Difference volume fraction at 0.10 and 0.90 intensity", std::abs<double>(hist[index010] - hist[index090])));
   featureList.push_back(std::make_pair(prefix + "Difference intensity at 0.10 and 0.90 volume", std::abs<double>(intensity090 - intensity010)));
   featureList.push_back(std::make_pair(prefix + "Area under IVH curve", auc));
   //featureList.push_back(std::make_pair("Local Intensity Global Intensity Peak", globalPeakValue));

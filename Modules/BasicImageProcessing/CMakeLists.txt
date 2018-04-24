@@ -1,0 +1,8 @@
+MITK_CREATE_MODULE(
+  DEPENDS MitkCore
+  PACKAGE_DEPENDS
+    PUBLIC 
+    PRIVATE ITK|ITKIOImageBase+ITKIOGDCM 
+)
+
+add_subdirectory(MiniApps)

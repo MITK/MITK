@@ -1,6 +1,6 @@
-option(BUILD_ClassificationMiniApps "Build commandline tools for classification" OFF)
+option(BUILD_BasicImageProcessingMiniApps "Build commandline tools for Basic Image Processing" OFF)
 
-if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
+if(BUILD_BasicImageProcessingMiniApps OR MITK_BUILD_ALL_APPS)
 
 
   include_directories(
@@ -11,40 +11,14 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     # list of miniapps
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
-    set( classificationminiapps
-        RandomForestTraining^^MitkCLVigraRandomForest
-        NativeHeadCTSegmentation^^MitkCLVigraRandomForest
-        ManualSegmentationEvaluation^^MitkCLVigraRandomForest
-        CLScreenshot^^MitkCore_MitkQtWidgetsExt_MitkCLUtilities
-        CLDicom2Nrrd^^MitkCore
-        CLResampleImageToReference^^MitkCore
-        CLGlobalImageFeatures^^MitkCLUtilities_MitkQtWidgetsExt
-        CLMRNormalization^^MitkCLUtilities_MitkCLMRUtilities
-        CLStaple^^MitkCLUtilities
-        CLVoxelFeatures^^MitkCLUtilities
-        CLPolyToNrrd^^
-        CLPlanarFigureToNrrd^^MitkCore_MitkSegmentation_MitkMultilabel
-        CLSimpleVoxelClassification^^MitkDataCollection_MitkCLVigraRandomForest
-        CLVoxelClassification^^MitkDataCollection_MitkCLImportanceWeighting_MitkCLVigraRandomForest
-        CLBrainMask^^MitkCLUtilities
-        XRaxSimulationFromCT^^MitkCLUtilities
-        CLRandomSampling^^MitkCore_MitkCLUtilities
-        CLRemoveEmptyVoxels^^MitkCore
-        CLN4^^MitkCore
-        CLSkullMask^^MitkCore
-        CLPointSetToSegmentation^^
-        CLMultiForestPrediction^^MitkDataCollection_MitkCLVigraRandomForest
-        CLNrrdToPoly^^MitkCore
-        CL2Dto3DImage^^MitkCore
-        CLWeighting^^MitkCore_MitkCLImportanceWeighting_MitkCLUtilities
-        CLOverlayRoiCenterOfMass^^MitkCore_MitkCLUtilities_MitkQtWidgetsExt
-        CLLungSegmentation^^MitkCore_MitkSegmentation_MitkMultilabel
-    #    RandomForestPrediction^^MitkCLVigraRandomForest
+    set( basicImageProcessingMiniApps
+        FileConverter^^MitkCore
+        ImageTypeConverter^^MitkCore
     )
 
-    foreach(classificationminiapps ${classificationminiapps})
+    foreach(basicImageProcessingMiniApp ${basicImageProcessingMiniApps})
       # extract mini app name and dependencies
-      string(REPLACE "^^" "\\;" miniapp_info ${classificationminiapps})
+      string(REPLACE "^^" "\\;" miniapp_info ${basicImageProcessingMiniApp})
       set(miniapp_info_list ${miniapp_info})
       list(GET miniapp_info_list 0 appname)
       list(GET miniapp_info_list 1 raw_dependencies)
@@ -52,8 +26,8 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
       set(dependencies_list ${dependencies})
 
       mitk_create_executable(${appname}
-      DEPENDS MitkCore MitkCLCore MitkCommandLine ${dependencies_list}
-      PACKAGE_DEPENDS ITK Qt5|Core Vigra
+      DEPENDS MitkCore MitkCommandLine ${dependencies_list}
+      PACKAGE_DEPENDS ITK
       CPP_FILES ${appname}.cpp
       )
       # CPP_FILES ${appname}.cpp mitkCommandLineParser.cpp
@@ -102,18 +76,10 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
       endif()
     endforeach()
 
-  # This mini app does not depend on mitkDiffusionImaging at all
-
-  mitk_create_executable(CLMatchPointReg
-    DEPENDS MitkCore MitkCLUtilities MitkMatchPointRegistration MitkCommandLine MitkMatchPointRegistrationUI
-    PACKAGE_DEPENDS ITK Qt5|Core Vigra MatchPoint
-    CPP_FILES CLMatchPointReg.cpp 
-  )
-
-        # On Linux, create a shell script to start a relocatable application
-        if(UNIX AND NOT APPLE)
-          install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME ${EXECUTABLE_TARGET}.sh)
-        endif()
+    # On Linux, create a shell script to start a relocatable application
+    if(UNIX AND NOT APPLE)
+      install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME ${EXECUTABLE_TARGET}.sh)
+    endif()
 
   if(EXECUTABLE_IS_ENABLED)
     MITK_INSTALL_TARGETS(EXECUTABLES ${EXECUTABLE_TARGET})

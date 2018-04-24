@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_PAUSMotionCompensationControls.h"
 
+#include "mitkPhotoacousticMotionCorrectionFilter.h"
+
 /**
   \brief PAUSMotionCompensation
 
@@ -53,6 +55,8 @@ protected:
   void DoImageProcessing();
 
   Ui::PAUSMotionCompensationControls m_Controls;
+  
+  mitk::PhotoacousticMotionCorrectionFilter::Pointer filter = mitk::PhotoacousticMotionCorrectionFilter::New();
 };
 
 #endif // PAUSMotionCompensation_h

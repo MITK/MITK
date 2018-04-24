@@ -312,7 +312,7 @@ static void ExecuteOneImageFilter(itk::Image<TPixel, VImageDimension>* imageA, d
   }
 }
 
-mitk::Image::Pointer mitk::ArithmeticOperation::Add(Image::Pointer & imageA, Image::Pointer & imageB, bool outputAsDouble)
+mitk::Image::Pointer mitk::ArithmeticOperation::Add(Image::Pointer & imageA, Image::Pointer & imageB, bool)
 {
   NonStaticArithmeticOperation helper;
   helper.m_Algorithm = NonStaticArithmeticOperation::OperationsEnum::Add2;
@@ -320,7 +320,7 @@ mitk::Image::Pointer mitk::ArithmeticOperation::Add(Image::Pointer & imageA, Ima
   return helper.m_ResultImage;
 }
 
-mitk::Image::Pointer mitk::ArithmeticOperation::Subtract(Image::Pointer & imageA, Image::Pointer & imageB, bool outputAsDouble)
+mitk::Image::Pointer mitk::ArithmeticOperation::Subtract(Image::Pointer & imageA, Image::Pointer & imageB, bool)
 {
   NonStaticArithmeticOperation helper;
   helper.m_Algorithm = NonStaticArithmeticOperation::OperationsEnum::Sub2;
@@ -328,7 +328,7 @@ mitk::Image::Pointer mitk::ArithmeticOperation::Subtract(Image::Pointer & imageA
   return helper.m_ResultImage;
 }
 
-mitk::Image::Pointer mitk::ArithmeticOperation::Multiply(Image::Pointer & imageA, Image::Pointer & imageB, bool outputAsDouble)
+mitk::Image::Pointer mitk::ArithmeticOperation::Multiply(Image::Pointer & imageA, Image::Pointer & imageB, bool)
 {
   NonStaticArithmeticOperation helper;
   helper.m_Algorithm = NonStaticArithmeticOperation::OperationsEnum::Mult;
@@ -336,7 +336,7 @@ mitk::Image::Pointer mitk::ArithmeticOperation::Multiply(Image::Pointer & imageA
   return helper.m_ResultImage;
 }
 
-mitk::Image::Pointer mitk::ArithmeticOperation::Divide(Image::Pointer & imageA, Image::Pointer & imageB, bool outputAsDouble)
+mitk::Image::Pointer mitk::ArithmeticOperation::Divide(Image::Pointer & imageA, Image::Pointer & imageB, bool)
 {
   NonStaticArithmeticOperation helper;
   helper.m_Algorithm = NonStaticArithmeticOperation::OperationsEnum::Div;

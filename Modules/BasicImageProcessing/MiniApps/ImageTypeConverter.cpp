@@ -20,14 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <typeinfo>
 
 #define CONVERT_IMAGE(TYPE, DIM)                                                                      \
-  MITK_INFO << "Data Type for Conversion: "<< typeid(TYPE).name();                                    \
+  MITK_INFO << "Data Type for Conversion: " << typeid(TYPE).name();                                   \
   itk::Image<TYPE, DIM>::Pointer itkImage = itk::Image<TYPE, DIM>::New();                             \
   mitk::CastToItkImage(image, itkImage);                                                              \
   mitk::CastToMitkImage(itkImage, outputImage)
 
 #define CONVERT_IMAGE_TYPE(TYPE)                                                                      \
   unsigned int dimension = image->GetDimension();                                                     \
-  MITK_INFO >> "Image Dimension is: " << dimension;                                                   \
+  MITK_INFO << "Image Dimension is: " << dimension;                                                   \
   switch (dimension) {                                                                                \
     case 1 : CONVERT_IMAGE( TYPE , 1);                                                                \
              break;                                                                                   \

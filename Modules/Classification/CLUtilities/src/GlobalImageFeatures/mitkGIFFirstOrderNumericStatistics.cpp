@@ -104,6 +104,8 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   double doubleNoOfVoxes = numberOfVoxels;
   double median = 0;
   double lastIntensityWithValues = params.quantifier->IndexToMeanIntensity(0);
+  std::size_t modeIdx = 0;
+  double modeValue = 0;
 
   std::vector<double> percentiles;
   percentiles.resize(20, 0);
@@ -142,12 +144,21 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
       }
     }
 
+    if (actualValues > histogram[modeIdx])
+    {
+      modeIdx = idx;
+    }
+
     if (actualValues > 0)
     {
       lastIntensityWithValues = params.quantifier->IndexToMeanIntensity(idx);
     }
     passedValues += actualValues;
   }
+  double p10 = percentiles[1];
+  double p25idx = params.quantifier->IntensityToIndex(percentiles[4]);
+  double p75idx = params.quantifier->IntensityToIndex(percentiles[14]);
+  double p90 = percentiles[17];
 
   double mean = sum / (numberOfVoxels);
   double variance = sumTwo / (numberOfVoxels) - (mean*mean);
@@ -155,10 +166,15 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   double rootMeanSquare = std::sqrt(sumTwo / numberOfVoxels);
 
   double sumAbsoluteDistanceToMean = 0;
+  double sumAbsoluteDistanceToMedian = 0;
+  double sumRobust = 0;
+  double sumRobustSquare = 0;
+  double sumRobustAbsolulteDistanceToMean = 0;
   double sumValueMinusMean = 0;
-  double sumValueMinusMeanTwo = 0;
   double sumValueMinusMeanThree = 0;
   double sumValueMinusMeanFour = 0;
+  unsigned int numberOfRobustVoxel = 0;
+
 
   maskIter.GoToBegin();
   imageIter.GoToBegin();
@@ -170,18 +186,51 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
       double valueMinusMean = value - mean;
 
       sumAbsoluteDistanceToMean += std::abs<double>(valueMinusMean);
+      sumAbsoluteDistanceToMedian += std::abs<double>(value - median);
       sumValueMinusMean += valueMinusMean;
-      sumValueMinusMeanTwo += valueMinusMean * valueMinusMean;
       sumValueMinusMeanThree += valueMinusMean * valueMinusMean * valueMinusMean;
       sumValueMinusMeanFour += valueMinusMean * valueMinusMean * valueMinusMean * valueMinusMean;
+
+      if ((p10 <= value) & (value <= p90))
+      {
+        sumRobust += value;
+        sumRobustSquare += value * value;
+        ++numberOfRobustVoxel;
+      }
     }
     ++maskIter;
     ++imageIter;
   }
+  double robustMean = sumRobust / numberOfRobustVoxel;
+  double robustVariance = sumRobustSquare / numberOfRobustVoxel - (robustMean * robustMean);
+
+  maskIter.GoToBegin();
+  imageIter.GoToBegin();
+  while (!imageIter.IsAtEnd())
+  {
+    if (maskIter.Get() > 0)
+    {
+      double value = imageIter.Get();
+
+      if ((p10 <= value) & (value <= p90))
+      {
+        sumRobustAbsolulteDistanceToMean += std::abs(value - robustMean);
+      }
+    }
+    ++maskIter;
+    ++imageIter;
+  }
+
+
+
   double meanAbsoluteDeviation = sumAbsoluteDistanceToMean / numberOfVoxels;
+  double medianAbsoluteDeviation = sumAbsoluteDistanceToMedian / numberOfVoxels;
+  double robustMeanAbsoluteDeviation = sumRobustAbsolulteDistanceToMean / numberOfRobustVoxel;
   double skewness = sumValueMinusMeanThree / numberOfVoxels / variance / std::sqrt(variance);
   double kurtosis = sumValueMinusMeanFour / numberOfVoxels / variance / variance;
-  double interquantileRange = params.quantifier->IntensityToIndex(percentiles[14]) - params.quantifier->IntensityToIndex(percentiles[4]);
+  double interquantileRange = p75idx - p25idx;
+  double coefficientOfVariation = std::sqrt(variance) / mean;
+  double quantileCoefficientOfDispersion = (p75idx - p25idx) / (p75idx + p25idx + 2);
 
   featureList.push_back(std::make_pair(params.prefix + "Mean", mean));
   featureList.push_back(std::make_pair(params.prefix + "Variance", variance));
@@ -189,18 +238,26 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   featureList.push_back(std::make_pair(params.prefix + "Excess kurtosis", kurtosis-3));
   featureList.push_back(std::make_pair(params.prefix + "Median", median));
   featureList.push_back(std::make_pair(params.prefix + "Minimum", minimum));
-  featureList.push_back(std::make_pair(params.prefix + "Percentile 10", percentiles[1]));
-  featureList.push_back(std::make_pair(params.prefix + "Percentile 90", percentiles[17]));
+  featureList.push_back(std::make_pair(params.prefix + "Percentile 10", p10));
+  featureList.push_back(std::make_pair(params.prefix + "Percentile 90", p90));
   featureList.push_back(std::make_pair(params.prefix + "Maximum", maximum));
   featureList.push_back(std::make_pair(params.prefix + "Interquantile range", interquantileRange));
   featureList.push_back(std::make_pair(params.prefix + "Range", maximum-minimum));
   featureList.push_back(std::make_pair(params.prefix + "Mean absolute deviation", meanAbsoluteDeviation));
-
+  featureList.push_back(std::make_pair(params.prefix + "Robust mean absolute deviation", robustMeanAbsoluteDeviation));
+  featureList.push_back(std::make_pair(params.prefix + "Median absolute deviation", medianAbsoluteDeviation));
+  featureList.push_back(std::make_pair(params.prefix + "Coefficient of variation", coefficientOfVariation));
+  featureList.push_back(std::make_pair(params.prefix + "Quantile coefficient of dispersion", quantileCoefficientOfDispersion));
   featureList.push_back(std::make_pair(params.prefix + "Energy", energy));
   featureList.push_back(std::make_pair(params.prefix + "Root mean square", rootMeanSquare));
 
   featureList.push_back(std::make_pair(params.prefix + "Standard Deviation", std::sqrt(variance)));
   featureList.push_back(std::make_pair(params.prefix + "Kurtosis", kurtosis));
+  featureList.push_back(std::make_pair(params.prefix + "Robust mean", robustMean));
+  featureList.push_back(std::make_pair(params.prefix + "Robust variance", robustVariance));
+  featureList.push_back(std::make_pair(params.prefix + "Mode index", modeIdx));
+  featureList.push_back(std::make_pair(params.prefix + "Mode value", params.quantifier->IndexToMeanIntensity(modeIdx)));
+  featureList.push_back(std::make_pair(params.prefix + "Number of voxels", numberOfVoxels));
 
   return;
 

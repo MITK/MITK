@@ -32,22 +32,14 @@ See LICENSE.txt or http://www.mitk.org for details.
     unsigned int dimension = image->GetDimension();                                                   \
     MITK_INFO << "Image Dimension is: " << dimension;                                                 \
     switch (dimension) {                                                                              \
-      case 1 : CONVERT_IMAGE( TYPE , 1);                                                              \
-               break;                                                                                 \
       case 2 : CONVERT_IMAGE( TYPE , 2);                                                              \
                break;                                                                                 \
       case 3 : CONVERT_IMAGE( TYPE , 3);                                                              \
                break;                                                                                 \
-      case 4 : CONVERT_IMAGE( TYPE , 4);                                                              \
-               break;                                                                                 \
-      case 5 : CONVERT_IMAGE( TYPE , 5);                                                              \
-               break;                                                                                 \
-      case 6 : CONVERT_IMAGE( TYPE , 6);                                                              \
-               break;                                                                                 \
       default: MITK_INFO << "This tool doesn't support a dimension of "<<dimension<<".";              \
                outputImage = NULL;                                                                    \
                break;                                                                                 \
-    };                                                                                                 \
+    };                                                                                                \
   }
 
 

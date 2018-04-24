@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProportionalTimeGeometry.h>
 #include <mitkTimeGeometry.h>
 
-// itksys
 #include "itkImage.h"
 
 // VTK includes

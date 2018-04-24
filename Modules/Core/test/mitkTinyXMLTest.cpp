@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // std includes
 #include <cmath>
 #include <iomanip>
-#include <string>
 #include <tinyxml.h>
 
 // MITK includes

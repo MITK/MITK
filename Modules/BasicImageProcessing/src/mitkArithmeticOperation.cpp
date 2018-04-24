@@ -309,6 +309,8 @@ static void ExecuteOneImageFilter(itk::Image<TPixel, VImageDimension>* imageA, d
                                      itk::Functor::Log10<TPixel, double>,
                                      ImageType, DoubleOutputType>(imageA, value, valueLeft, returnDoubleImage, parameterFree, outputImage);
     break;
+  default:
+    break;
   }
 }
 
@@ -528,6 +530,8 @@ void mitk::NonStaticArithmeticOperation::ExecuteTwoImageFilter(itk::Image<TPixel
     ExecuteTwoImageFilterWithFunctor<itk::Functor::Div<TPixel1, TPixel2, TPixel1>,
       itk::Functor::Add2<TPixel1, TPixel2, double>,
       Image1Type, Image2Type, DoubleOutputType>(imageA, imageB);
+    break;
+  default:
     break;
   }
 }

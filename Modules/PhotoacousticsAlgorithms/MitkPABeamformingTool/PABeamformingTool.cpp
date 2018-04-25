@@ -222,7 +222,7 @@ int main(int argc, char * argv[])
 
   auto output = m_BeamformingService->ApplyBeamforming(floatImage, settings);
   MITK_INFO(input.verbose) << "Applying BModeFilter to image...";
-  auto output2 = m_BeamformingService->ApplyBmodeFilter(output, mitk::PhotoacousticFilterService::Abs, false, false, 0.3);
+  auto output2 = m_BeamformingService->ApplyBmodeFilter(output, mitk::PhotoacousticFilterService::EnvelopeDetection, false, 0.3);
   MITK_INFO(input.verbose) << "Applying BModeFilter to image...[Done]";
 
   MITK_INFO(input.verbose) << "Saving image...";

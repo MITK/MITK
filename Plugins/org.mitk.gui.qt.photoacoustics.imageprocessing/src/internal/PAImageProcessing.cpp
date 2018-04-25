@@ -291,12 +291,11 @@ void PAImageProcessing::BatchProcessing()
     if (doSteps[3])
     {
       m_Controls.ProgressInfo->setText("applying bmode filter");
-      bool useGPU = m_Controls.UseGPUBmode->isChecked();
 
       if (m_Controls.BModeMethod->currentText() == "Absolute Filter")
-        image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticFilterService::BModeMethod::Abs, useGPU, m_UseLogfilter, m_ResampleSpacing);
+        image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticFilterService::BModeMethod::Abs, m_UseLogfilter, m_ResampleSpacing);
       else if (m_Controls.BModeMethod->currentText() == "Envelope Detection")
-        image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection, useGPU, m_UseLogfilter, m_ResampleSpacing);
+        image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection, m_UseLogfilter, m_ResampleSpacing);
 
       if (saveSteps[3])
       {
@@ -353,11 +352,10 @@ void PAImageProcessing::StartBeamformingThread()
       m_Controls.progressBar->setVisible(true);
       m_Controls.ProgressInfo->setVisible(true);
       m_Controls.ProgressInfo->setText("started");
-      m_Controls.buttonApplyBeamforming->setText("working...");
       DisableControls();
 
       BeamformingThread *thread = new BeamformingThread();
-      connect(thread, &BeamformingThread::result, this, &PAImageProcessing::HandleBeamformingResults);
+      connect(thread, &BeamformingThread::result, this, &PAImageProcessing::HandleResults);
       connect(thread, &BeamformingThread::updateProgress, this, &PAImageProcessing::UpdateProgress);
       connect(thread, &BeamformingThread::finished, thread, &QObject::deleteLater);
 
@@ -371,30 +369,13 @@ void PAImageProcessing::StartBeamformingThread()
   }
 }
 
-void PAImageProcessing::HandleBeamformingResults(mitk::Image::Pointer image)
+void PAImageProcessing::HandleResults(mitk::Image::Pointer image, std::string nameExtension)
 {
-  MITK_INFO << "Handle Beamforming results";
+  MITK_INFO << "Handling results...";
   auto newNode = mitk::DataNode::New();
   newNode->SetData(image);
 
-  // name the new Data node
-  std::stringstream newNodeName;
-
-  newNodeName << m_OldNodeName << " ";
-
-  auto BFconfig = CreateBeamformingSettings(image);
-
-  if (BFconfig->GetAlgorithm() == mitk::BeamformingSettings::BeamformingAlgorithm::DAS)
-    newNodeName << "DAS bf, ";
-  else if (BFconfig->GetAlgorithm() == mitk::BeamformingSettings::BeamformingAlgorithm::DMAS)
-    newNodeName << "DMAS bf, ";
-
-  if (BFconfig->GetDelayCalculationMethod() == mitk::BeamformingSettings::DelayCalc::QuadApprox)
-    newNodeName << "q. delay";
-  if (BFconfig->GetDelayCalculationMethod() == mitk::BeamformingSettings::DelayCalc::Spherical)
-    newNodeName << "s. delay";
-
-  newNode->SetName(newNodeName.str());
+  newNode->SetName(m_OldNodeName + nameExtension);
 
   // update level window for the current dynamic range
   mitk::LevelWindow levelWindow;
@@ -408,12 +389,12 @@ void PAImageProcessing::HandleBeamformingResults(mitk::Image::Pointer image)
   // disable progress bar
   m_Controls.progressBar->setVisible(false);
   m_Controls.ProgressInfo->setVisible(false);
-  m_Controls.buttonApplyBeamforming->setText("Apply Beamforming");
   EnableControls();
 
   // update rendering
   mitk::RenderingManager::GetInstance()->InitializeViews(image->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  MITK_INFO << "Handling results...[Done]";
 }
 
 void PAImageProcessing::StartBmodeThread()
@@ -454,11 +435,10 @@ void PAImageProcessing::StartBmodeThread()
       message << ".";
       MITK_INFO << message.str();
 
-      m_Controls.buttonApplyBModeFilter->setText("working...");
       DisableControls();
 
       BmodeThread *thread = new BmodeThread();
-      connect(thread, &BmodeThread::result, this, &PAImageProcessing::HandleBmodeResults);
+      connect(thread, &BmodeThread::result, this, &PAImageProcessing::HandleResults);
       connect(thread, &BmodeThread::finished, thread, &QObject::deleteLater);
 
       bool useGPU = m_Controls.UseGPUBmode->isChecked();
@@ -474,39 +454,6 @@ void PAImageProcessing::StartBmodeThread()
       thread->start();
     }
   }
-}
-
-void PAImageProcessing::HandleBmodeResults(mitk::Image::Pointer image)
-{
-  auto newNode = mitk::DataNode::New();
-  newNode->SetData(image);
-
-  // name the new Data node
-  std::stringstream newNodeName;
-  newNodeName << m_OldNodeName << " ";
-  newNodeName << "B-Mode";
-
-  newNode->SetName(newNodeName.str());
-
-  // update level window for the current dynamic range
-  mitk::LevelWindow levelWindow;
-  newNode->GetLevelWindow(levelWindow);
-  auto data = newNode->GetData();
-  levelWindow.SetAuto(dynamic_cast<mitk::Image*>(data), true, true);
-  newNode->SetLevelWindow(levelWindow);
-
-  // add new node to data storage
-  this->GetDataStorage()->Add(newNode);
-
-  // disable progress bar
-  m_Controls.progressBar->setVisible(false);
-  m_Controls.buttonApplyBModeFilter->setText("Apply B-mode Filter");
-  EnableControls();
-
-  // update rendering
-  mitk::RenderingManager::GetInstance()->InitializeViews(
-    dynamic_cast<mitk::Image*>(data)->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void PAImageProcessing::StartCropThread()
@@ -547,11 +494,10 @@ void PAImageProcessing::StartCropThread()
       message << ".";
       MITK_INFO << message.str();
 
-      m_Controls.buttonApplyCropFilter->setText("working...");
       DisableControls();
 
       CropThread *thread = new CropThread();
-      connect(thread, &CropThread::result, this, &PAImageProcessing::HandleCropResults);
+      connect(thread, &CropThread::result, this, &PAImageProcessing::HandleResults);
       connect(thread, &CropThread::finished, thread, &QObject::deleteLater);
 
       thread->setConfig(m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), 0, image->GetDimension(2) - 1);
@@ -562,37 +508,6 @@ void PAImageProcessing::StartCropThread()
       thread->start();
     }
   }
-}
-
-void PAImageProcessing::HandleCropResults(mitk::Image::Pointer image)
-{
-  auto newNode = mitk::DataNode::New();
-  newNode->SetData(image);
-
-  // name the new Data node
-  std::stringstream newNodeName;
-  newNodeName << m_OldNodeName << " ";
-  newNodeName << "Cropped";
-
-  newNode->SetName(newNodeName.str());
-
-  // update level window for the current dynamic range
-  mitk::LevelWindow levelWindow;
-  newNode->GetLevelWindow(levelWindow);
-  auto data = newNode->GetData();
-  levelWindow.SetAuto(dynamic_cast<mitk::Image*>(data), true, true);
-  newNode->SetLevelWindow(levelWindow);
-
-  // add new node to data storage
-  this->GetDataStorage()->Add(newNode);
-
-  m_Controls.buttonApplyCropFilter->setText("Apply Crop Filter");
-  EnableControls();
-
-  // update rendering
-  mitk::RenderingManager::GetInstance()->InitializeViews(
-    dynamic_cast<mitk::Image*>(data)->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void PAImageProcessing::StartBandpassThread()
@@ -633,11 +548,10 @@ void PAImageProcessing::StartBandpassThread()
       message << ".";
       MITK_INFO << message.str();
 
-      m_Controls.buttonApplyBandpass->setText("working...");
       DisableControls();
 
       BandpassThread *thread = new BandpassThread();
-      connect(thread, &BandpassThread::result, this, &PAImageProcessing::HandleBandpassResults);
+      connect(thread, &BandpassThread::result, this, &PAImageProcessing::HandleResults);
       connect(thread, &BandpassThread::finished, thread, &QObject::deleteLater);
 
       float recordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000 / m_Controls.BPSpeedOfSound->value();
@@ -689,37 +603,6 @@ void PAImageProcessing::StartBandpassThread()
       thread->start();
     }
   }
-}
-
-void PAImageProcessing::HandleBandpassResults(mitk::Image::Pointer image)
-{
-  auto newNode = mitk::DataNode::New();
-  newNode->SetData(image);
-
-  // name the new Data node
-  std::stringstream newNodeName;
-  newNodeName << m_OldNodeName << " ";
-  newNodeName << "Bandpassed";
-
-  newNode->SetName(newNodeName.str());
-
-  // update level window for the current dynamic range
-  mitk::LevelWindow levelWindow;
-  newNode->GetLevelWindow(levelWindow);
-  auto data = newNode->GetData();
-  levelWindow.SetAuto(dynamic_cast<mitk::Image*>(data), true, true);
-  newNode->SetLevelWindow(levelWindow);
-
-  // add new node to data storage
-  this->GetDataStorage()->Add(newNode);
-
-  m_Controls.buttonApplyBandpass->setText("Apply Bandpass");
-  EnableControls();
-
-  // update rendering
-  mitk::RenderingManager::GetInstance()->InitializeViews(
-    dynamic_cast<mitk::Image*>(data)->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void PAImageProcessing::SliceBoundsEnabled()
@@ -1095,13 +978,7 @@ void BeamformingThread::run()
   m_InputImage = castToFloatImageFilter->GetOutput();
   mitk::IOUtil::Save(m_InputImage, "G:/castedImage.nrrd");
   resultImageBuffer = m_FilterBank->ApplyBeamforming(m_InputImage, m_BFconfig, progressHandle);
-  mitk::ImageReadAccessor copy(resultImageBuffer);
-
-  resultImage->Initialize(resultImageBuffer);
-  resultImage->SetSpacing(resultImageBuffer->GetGeometry()->GetSpacing());
-  resultImage->SetImportVolume(const_cast<void*>(copy.GetData()), 0, 0, mitk::Image::CopyMemory);
-
-  emit result(resultImage);
+  emit result(resultImageBuffer, "_bf");
 }
 
 void BeamformingThread::setConfig(mitk::BeamformingSettings::Pointer BFconfig)
@@ -1116,11 +993,10 @@ void BeamformingThread::setInputImage(mitk::Image::Pointer image)
 
 void BmodeThread::run()
 {
-  mitk::Image::Pointer resultImage;
+  mitk::Image::Pointer resultImage = m_FilterBank->ApplyBmodeFilter(m_InputImage,
+    m_Method, m_UseLogfilter, m_ResampleSpacing);
 
-  resultImage = m_FilterBank->ApplyBmodeFilter(m_InputImage, m_Method, m_UseGPU, m_UseLogfilter, m_ResampleSpacing);
-
-  emit result(resultImage);
+  emit result(resultImage, "_bmode");
 }
 
 void BmodeThread::setConfig(bool useLogfilter, double resampleSpacing, mitk::PhotoacousticFilterService::BModeMethod method, bool useGPU)
@@ -1142,7 +1018,7 @@ void CropThread::run()
 
   resultImage = m_FilterBank->ApplyCropping(m_InputImage, m_CutAbove, m_CutBelow, 0, 0, 0, 0);
 
-  emit result(resultImage);
+  emit result(resultImage, "_cropped");
 }
 
 void CropThread::setConfig(unsigned int CutAbove, unsigned int CutBelow, unsigned int CutSliceFirst, unsigned int CutSliceLast)
@@ -1163,7 +1039,7 @@ void BandpassThread::run()
   mitk::Image::Pointer resultImage;
 
   resultImage = m_FilterBank->BandpassFilter(m_InputImage, m_RecordTime, m_BPHighPass, m_BPLowPass, m_TukeyAlphaHighPass, m_TukeyAlphaLowPass);
-  emit result(resultImage);
+  emit result(resultImage, "_bandpassed");
 }
 
 void BandpassThread::setConfig(float BPHighPass, float BPLowPass, float TukeyAlphaHighPass, float TukeyAlphaLowPass, float recordTime)

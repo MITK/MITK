@@ -42,6 +42,7 @@ namespace mitk {
   public:
     mitkClassMacroItkParent(mitk::PhotoacousticFilterService, itk::Object);
     itkFactorylessNewMacro(Self);
+
     /** \brief Defines the methods for the B-Mode filter
     * Currently implemented are an Envelope Detection filter and a simple Absolute filter.
     */
@@ -52,14 +53,14 @@ namespace mitk {
     * Applies a B-Mode filter using the given parameters.
     * @param inputImage The image to be processed.
     * @param method The kind of B-Mode Filter to be used.
-    * @param UseGPU Setting this to true will allow the Filter to use the GPU.
     * @param UseLogFilter Setting this to true will apply a simple logarithm to the image after the B-Mode Filter has been applied.
     * @param resampleSpacing If this is set to 0, nothing will be done; otherwise, the image is resampled to a spacing of resampleSpacing mm per pixel.
     * @return The processed image is returned after the filter has finished.
     */
-    mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage, BModeMethod method = BModeMethod::Abs, bool UseGPU = false, bool UseLogFilter = false, float resampleSpacing = 0.15);
-
-    // mitk::Image::Pointer ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scatteringCoefficient);
+    mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage,
+      BModeMethod method = BModeMethod::Abs,
+      bool UseLogFilter = false,
+      float resampleSpacing = 0.15);
 
     /** \brief Resamples the given image
     *

@@ -62,26 +62,14 @@ public:
   void UseImageSpacing();
   void UpdateImageInfo();
 
-  /** \brief Method called when the beamforming thread finishes;
-  *  it adds the image to a new data node and registers it to the worbench's data storage
-  */
-  void HandleBeamformingResults(mitk::Image::Pointer image);
   /** \brief Beamforming is being performed in a separate thread to keep the workbench from freezing.
   */
   void StartBeamformingThread();
 
-  /** \brief Method called when the B-mode filter thread finishes;
-  *  it adds the image to a new data node and registers it to the worbench's data storage
-  */
-  void HandleBmodeResults(mitk::Image::Pointer image);
   /** \brief B-mode filtering is being performed in a separate thread to keep the workbench from freezing.
   */
   void StartBmodeThread();
 
-  /** \brief Method called when the Cropping thread finishes;
-  *  it adds the image to a new data node and registers it to the worbench's data storage
-  */
-  void HandleCropResults(mitk::Image::Pointer image);
   /** \brief Cropping is being performed in a separate thread to keep the workbench from freezing.
   */
   void StartCropThread();
@@ -89,7 +77,8 @@ public:
   /** \brief Method called when the bandpass thread finishes;
   *  it adds the image to a new data node and registers it to the worbench's data storage
   */
-  void HandleBandpassResults(mitk::Image::Pointer image);
+  void HandleResults(mitk::Image::Pointer image, std::string nameExtension);
+
   /** \brief Bandpassing is being performed in a separate thread to keep the workbench from freezing.
   */
   void StartBandpassThread();
@@ -141,7 +130,7 @@ class BeamformingThread : public QThread
     void run() Q_DECL_OVERRIDE;
 
 signals:
-  void result(mitk::Image::Pointer);
+  void result(mitk::Image::Pointer, std::string nameExtension);
   void updateProgress(int, std::string);
   void message(std::string);
 
@@ -167,7 +156,7 @@ class BmodeThread : public QThread
     void run() Q_DECL_OVERRIDE;
 
 signals:
-  void result(mitk::Image::Pointer);
+  void result(mitk::Image::Pointer, std::string nameExtension);
 
 public:
   enum BModeMethod { ShapeDetection, Abs };
@@ -196,7 +185,7 @@ class CropThread : public QThread
     void run() Q_DECL_OVERRIDE;
 
 signals:
-  void result(mitk::Image::Pointer);
+  void result(mitk::Image::Pointer, std::string nameExtension);
 
 public:
   void setConfig(unsigned int CutAbove, unsigned int CutBelow, unsigned int CutSliceFirst, unsigned int CutSliceLast);
@@ -223,7 +212,7 @@ class BandpassThread : public QThread
     void run() Q_DECL_OVERRIDE;
 
 signals:
-  void result(mitk::Image::Pointer);
+  void result(mitk::Image::Pointer, std::string nameExtension);
 
 public:
   void setConfig(float BPHighPass, float BPLowPass, float TukeyAlphaHighPass, float TukeyAlphaLowPass, float recordTime);

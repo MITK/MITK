@@ -55,9 +55,15 @@ namespace mitk {
     void SetCropArea(USImageVideoSource::USImageCropping newArea);
 
     /**
-      * \return area currently set for image cropping
+      * \return area currently set for image cropping defined by the actual current probe.
       */
-    mitk::USImageVideoSource::USImageCropping GetCropArea();
+    mitk::USProbe::USProbeCropping GetCropArea();
+
+    /**
+     * \brief Updates the cropping of the current probe given by the crop area of the
+     * USImageVideoSource.
+     */
+    void UpdateProbeCropping( mitk::USImageVideoSource::USImageCropping cropping );
 
     /**
       * \brief Sets a new depth value to the current probe.

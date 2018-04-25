@@ -118,7 +118,18 @@ MITKSWIG_ADD_CLASS(MITKRegistrationType, mitkImageMappingHelper.h, mitk::ImageMa
 %ignore map::deployment::DLLHandle::New;
 
 SWIG_ADD_MITK_CLASS_VECTORFREE(DLLDirectoryBrowser, mapDeploymentDLLDirectoryBrowser.h, ::map::deployment)
-SWIG_ADD_MITK_CLASS(DLLInfo, mapDeploymentDLLInfo.h, ::map::deployment)
+%{
+namespace mitk {
+  namespace map {
+    namespace deployment {
+      typedef ::map::deployment::DLLInfo DLLInfo;
+    }
+  }
+}
+%}
+MITKSWIG_ADD_CLASS(DLLInfo, mapDeploymentDLLInfo.h, mitk::map::deployment)
+%template(VectorDLLInfo) std::vector<mitk::map::deployment::DLLInfo::Self *>;
+%template(VectorDLLInfoPointer) std::vector<mitk::map::deployment::DLLInfo::Pointer>;
 SWIG_ADD_MITK_CLASS_VECTORFREE(DLLHandle, mapDeploymentDLLHandle.h, ::map::deployment)
 SWIG_ADD_MITK_CLASS_VECTORFREE(UID, mapUID.h, ::map::algorithm)
 %{

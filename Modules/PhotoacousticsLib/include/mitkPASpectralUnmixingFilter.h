@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkPhotoacousticsLibExports.h>
 
+#include "mitkPAPropertyCalculator.h"
+#include <eigen3/Eigen/Dense>
+
 namespace mitk {
   namespace pa {
     class MITKPHOTOACOUSTICSLIB_EXPORT SpectralUnmixingFilter : public mitk::ImageToImageFilter
@@ -37,23 +40,36 @@ namespace mitk {
       //Contains all (so far) possible chromophores
       enum ChromophoreType
       {
-        OXYGENATED, DEOXYGENATED
+        OXYGENATED = 1,
+        DEOXYGENATED = 2
       };
 
-      void Test();
-
+      //Void to creat m_vector of all chosen chromophores with push back method
+      void SetChromophores(ChromophoreType);
+      std::vector<int> m_Chromophore;
+      
+      //Void to creat m_vector of all wavelengths with push back method
       void AddWavelength(int wavelength);
-      std::vector<int> m_Wavelength;
-      /* for add wavelengths
-
-      int size; */
-
+      std::vector<int> m_Wavelength; 
+      
+      //Void to creat Eigen::Matrix of all absorbtions
+      //@ specific wavelength (columns) of chromophores (rows)
+      virtual void AddEndmemberMatrix();
+ 
     protected:
       SpectralUnmixingFilter();
       virtual ~SpectralUnmixingFilter();
 
     private:
       virtual void GenerateData();
+      PropertyCalculator::Pointer m_PropertyCalculator;
+      unsigned int numberofchromophores;
+      unsigned int numberofwavelengths;
+      unsigned int numberOfInputs;
+      unsigned int numberOfOutputs;
+      long length;
+
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>  EndmemberMatrix;
     };
   }
 }

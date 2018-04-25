@@ -28,9 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOpenCVToMitkImageFilter.h"
 #include "mitkImageToOpenCVImageFilter.h"
 
-// OpenCV
-#include "cv.h"
-
 namespace mitk {
   /**
   * \brief This is an abstract superclass for delivering USImages.

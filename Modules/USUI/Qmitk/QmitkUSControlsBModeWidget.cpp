@@ -57,7 +57,7 @@ QmitkUSControlsBModeWidget::QmitkUSControlsBModeWidget(mitk::USControlInterfaceB
     // to the current depth value got from the interface
     if (curFrequencyValue == *it) ui->scanningFrequencyComboBox->setCurrentIndex(ui->scanningFrequencyComboBox->count()-1);
   }
-
+ 
   ui->scanningPowerSlider->setMinimum(m_ControlInterface->GetScanningPowerMin());
   ui->scanningPowerSlider->setMaximum(m_ControlInterface->GetScanningPowerMax());
   ui->scanningPowerSlider->setTickInterval(m_ControlInterface->GetScanningPowerTick());
@@ -106,19 +106,24 @@ void QmitkUSControlsBModeWidget::OnDepthControlActivated(int)
 void QmitkUSControlsBModeWidget::OnPowerControlValueChanged(int value)
 {
   m_ControlInterface->SetScanningPower(static_cast<double>(value));
+  ui->scanningPowerLabel_value->setText(QString::number(value) +"%");
+
 }
 
 void QmitkUSControlsBModeWidget::OnGainControlValueChanged(int value)
 {
   m_ControlInterface->SetScanningGain(static_cast<double>(value));
+  ui->scanningGainLabel_value->setText(QString::number(value) + "%");
 }
 
 void QmitkUSControlsBModeWidget::OnRejectionControlValueChanged(int value)
 {
   m_ControlInterface->SetScanningRejection(static_cast<double>(value));
+  ui->scanningRejectionLabel_value->setText(QString::number(value));
 }
 
 void QmitkUSControlsBModeWidget::OnDynamicRangeControlValueChanged(int value)
 {
   m_ControlInterface->SetScanningDynamicRange(static_cast<double>(value));
+  ui->scanningDynamicRangeLabel_value->setText(QString::number(value) + "dB");
 }

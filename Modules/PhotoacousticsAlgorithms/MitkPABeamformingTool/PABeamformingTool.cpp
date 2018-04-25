@@ -187,6 +187,7 @@ mitk::BeamformingSettings::Pointer ParseSettings(InputParameters &input)
     (float)(input.inputImage->GetGeometry()->GetSpacing()[1] / 1000000),
     input.angle,
     true,
+    input.inputImage->GetDimension(1),
     input.inputImage->GetDimension(0),
     input.cutoff,
     false,
@@ -221,11 +222,11 @@ int main(int argc, char * argv[])
 
   auto output = m_BeamformingService->ApplyBeamforming(floatImage, settings);
   MITK_INFO(input.verbose) << "Applying BModeFilter to image...";
-  //output = m_BeamformingService->ApplyBmodeFilter(output, mitk::PhotoacousticFilterService::Abs, false, false, 0.3);
+  auto output2 = m_BeamformingService->ApplyBmodeFilter(output, mitk::PhotoacousticFilterService::Abs, false, false, 0.3);
   MITK_INFO(input.verbose) << "Applying BModeFilter to image...[Done]";
 
   MITK_INFO(input.verbose) << "Saving image...";
-  mitk::IOUtil::Save(output, input.outputFilename);
+  mitk::IOUtil::Save(output2, input.outputFilename);
   MITK_INFO(input.verbose) << "Saving image...[Done]";
 
   MITK_INFO(input.verbose) << "Beamforming input image...[Done]";

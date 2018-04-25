@@ -132,7 +132,8 @@ mitk::Image::Pointer mitk::PhotoacousticOCLBModeFilter::GetOutput()
     outputImage->Initialize(this->GetOutputType(), dimension, dimensions);
     outputImage->SetSpacing(p_slg->GetSpacing());
     outputImage->SetGeometry(m_InputImage->GetGeometry());
-    outputImage->SetImportVolume(pData, 0, 0, mitk::Image::ReferenceMemory);
+    outputImage->SetImportVolume(pData, 0, 0, mitk::Image::CopyMemory);
+    delete[] pData;
   }
 
   MITK_DEBUG << "Image Initialized.";
@@ -179,7 +180,7 @@ void mitk::PhotoacousticBModeFilter::GenerateOutputInformation()
 
   itkDebugMacro(<< "GenerateOutputInformation()");
 
-  output->Initialize(input);
+  output->Initialize(input->GetPixelType(), input->GetDimension(), input->GetDimensions());
   output->GetGeometry()->SetSpacing(input->GetGeometry()->GetSpacing());
   output->GetGeometry()->Modified();
   output->SetPropertyList(input->GetPropertyList()->Clone());
@@ -200,7 +201,7 @@ void mitk::PhotoacousticBModeFilter::GenerateData()
 
   unsigned int size = output->GetDimension(0) * output->GetDimension(1) * output->GetDimension(2);
 
-  float* InputData = (float*)const_cast<void*>(reader.GetData());
+  const float* InputData = (const float*)(reader.GetData());
   float* OutputData = new float[size];
   if(!m_UseLogFilter)
     for (unsigned int i = 0; i < size; ++i)
@@ -215,7 +216,7 @@ void mitk::PhotoacousticBModeFilter::GenerateData()
     }
   }
 
-  output->SetImportVolume(OutputData, 0, 0, mitk::Image::ImportMemoryManagementType::ManageMemory);
-
+  output->SetImportVolume(OutputData, 0, 0, mitk::Image::ImportMemoryManagementType::CopyMemory);
+  delete[] OutputData;
   m_TimeOfHeaderInitialization.Modified();
 }

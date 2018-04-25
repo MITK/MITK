@@ -64,14 +64,16 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBmodeFilter(mitk::Im
   typedef itk::Image< float, 3 > itkFloatImageType;
   typedef itk::IdentityTransform<double, 3> TransformType;
 
+  if (inputImage.IsNull() || !(inputImage->GetPixelType().GetTypeAsString() == "scalar (float)" || inputImage->GetPixelType().GetTypeAsString() == " (float)"))
+  {
+    MITK_ERROR << "BMode Filter can only handle float image types.";
+    mitkThrow() << "BMode Filter can only handle float image types.";
+  }
+
   if (method == BModeMethod::Abs)
   {
-    mitk::Image::Pointer input;
+    mitk::Image::Pointer input = inputImage;
     mitk::Image::Pointer out;
-    if (inputImage->GetPixelType().GetTypeAsString() == "scalar (float)" || inputImage->GetPixelType().GetTypeAsString() == " (float)")
-      input = inputImage;
-    else
-      input = ApplyCropping(inputImage, 0, 0, 0, 0, 0, 0);
 
     if (!UseGPU)
     {
@@ -103,7 +105,7 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBmodeFilter(mitk::Im
     typedef itk::ResampleImageFilter < itkFloatImageType, itkFloatImageType > ResampleImageFilter;
     ResampleImageFilter::Pointer resampleImageFilter = ResampleImageFilter::New();
 
-    itkFloatImageType::Pointer itkImage;
+    itkFloatImageType::Pointer itkImage = itkFloatImageType::New();
     mitk::CastToItkImage(out, itkImage);
     itkFloatImageType::SpacingType outputSpacing;
     itkFloatImageType::SizeType inputSize = itkImage->GetLargestPossibleRegion().GetSize();

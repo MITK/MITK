@@ -21,6 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::pa::SpectralUnmixingFilter::SpectralUnmixingFilter()
 {
+  this->SetNumberOfIndexedOutputs(3);
+
+  for (unsigned int i = 0; i<GetNumberOfIndexedOutputs(); i++)
+  {
+    this->SetNthOutput(i, mitk::Image::New());
+  }
+
 }
 
 mitk::pa::SpectralUnmixingFilter::~SpectralUnmixingFilter()
@@ -34,10 +41,17 @@ void mitk::pa::SpectralUnmixingFilter::Test()
 }
 
 
+void mitk::pa::SpectralUnmixingFilter::AddWavelength(int wavelength)
+{
+  m_Wavelength.push_back(wavelength);
+}
 
 
+void mitk::pa::SpectralUnmixingFilter::GenerateData()
+{
+  MITK_INFO << "Hallo Welt!";
 
-
+}
 
 
 //// Not correct working alternativ for wavelengths

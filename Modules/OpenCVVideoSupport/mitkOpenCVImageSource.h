@@ -16,8 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKOPENCVIMAGESOURCE_H
 #define MITKOPENCVIMAGESOURCE_H
 
-#include <cv.h>
 #include <mitkCommon.h>
+
+#include "opencv2/core.hpp"
 
 namespace mitk
 {

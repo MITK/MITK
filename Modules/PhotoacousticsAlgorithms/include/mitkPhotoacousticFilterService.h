@@ -59,8 +59,7 @@ namespace mitk {
     */
     mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage,
       BModeMethod method = BModeMethod::Abs,
-      bool UseLogFilter = false,
-      float resampleSpacing = 0.15);
+      bool UseLogFilter = false);
 
     /** \brief Resamples the given image
     *
@@ -69,7 +68,7 @@ namespace mitk {
     * @param outputSize An array of dimensions the image should be resampled to.
     * @return The processed image is returned after the filter has finished.
     */
-    mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, unsigned int outputSize[2]);
+    mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, double outputSpacing[2]);
 
     /** \brief Beamforms the given image
     *
@@ -123,8 +122,8 @@ namespace mitk {
     /** \brief Function that creates a Tukey function for the bandpass
     */
     itk::Image<float, 3U>::Pointer BPFunction(mitk::Image::Pointer reference,
-      int cutoffFrequencyPixelHighPass,
-      int cutoffFrequencyPixelLowPass,
+      float cutoffFrequencyPixelHighPass,
+      float cutoffFrequencyPixelLowPass,
       float alphaHighPass, float alphaLowPass);
   };
 } // namespace mitk

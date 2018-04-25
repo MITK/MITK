@@ -79,7 +79,7 @@ public:
     mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();
     mitk::Image::Pointer testImage = mitk::Image::New();
     testImage->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);
-    testImage->SetImportSlice(testArray, 0, 0, 0, mitk::Image::ImportMemoryManagementType::RtlCopyMemory);
+    testImage->SetImportSlice(testArray, 0, 0, 0, mitk::Image::ImportMemoryManagementType::CopyMemory);
     delete[] testArray;
 
     mitk::ImageReadAccessor readAccessInput(testImage);

@@ -32,12 +32,11 @@ void mitk::PhotoacousticBModeFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  mitk::Image* output = this->GetOutput();
-  mitk::Image* input = const_cast<mitk::Image *> (this->GetInput());
+  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer input = this->GetInput();
+
   if (!output->IsInitialized())
-  {
     return;
-  }
 
   input->SetRequestedRegionToLargestPossibleRegion();
 }
@@ -49,8 +48,6 @@ void mitk::PhotoacousticBModeFilter::GenerateOutputInformation()
 
   if ((output->IsInitialized()) && (this->GetMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
     return;
-
-  itkDebugMacro(<< "GenerateOutputInformation()");
 
   output->Initialize(input->GetPixelType(), input->GetDimension(), input->GetDimensions());
   output->GetGeometry()->SetSpacing(input->GetGeometry()->GetSpacing());

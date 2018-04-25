@@ -53,7 +53,7 @@ void mitk::CastToFloatImageFilter::GenerateData()
   {
     outputImage->Initialize(mitk::MakeScalarPixelType<float>(), inputImage->GetDimension(), inputImage->GetDimensions());
     outputImage->SetSpacing(inputImage->GetGeometry()->GetSpacing());
-    outputImage->SetImportVolume(mitk::ImageWriteAccessor(inputImage).GetData(), 0, 0, mitk::Image::ImportMemoryManagementType::RtlCopyMemory);
+    outputImage->SetImportVolume(mitk::ImageWriteAccessor(inputImage).GetData(), 0, 0, mitk::Image::ImportMemoryManagementType::CopyMemory);
     MITK_INFO << "Input is already float type. Nothing to do here.";
     return;
   }
@@ -87,6 +87,6 @@ void mitk::CastToFloatImageFilter::GenerateData()
 
   outputImage->Initialize(mitk::MakeScalarPixelType<float>(), inputImage->GetDimension(), inputImage->GetDimensions());
   outputImage->SetSpacing(inputImage->GetGeometry()->GetSpacing());
-  outputImage->SetImportVolume(outputData, 0, 0, mitk::Image::ImportMemoryManagementType::RtlCopyMemory);
+  outputImage->SetImportVolume(outputData, 0, 0, mitk::Image::ImportMemoryManagementType::CopyMemory);
   delete[] outputData;
 }

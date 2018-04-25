@@ -245,7 +245,8 @@ mitk::Image::Pointer mitk::PhotoacousticOCLBeamformingFilter::GetOutputAsImage()
 
     outputImage->Initialize(this->GetOutputType(), dimension, dimensions);
     outputImage->SetSpacing(p_slg->GetSpacing());
-    outputImage->SetImportVolume(pData, 0, 0, mitk::Image::ImportMemoryManagementType::ManageMemory);
+    outputImage->SetImportVolume(pData, 0, 0, mitk::Image::ImportMemoryManagementType::CopyMemory);
+    delete[] pData;
   }
 
   MITK_DEBUG << "Image Initialized.";

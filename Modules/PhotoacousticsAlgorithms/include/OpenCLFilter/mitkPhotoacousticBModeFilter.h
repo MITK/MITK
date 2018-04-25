@@ -33,14 +33,14 @@ namespace mitk
   public:
     mitkClassMacro(PhotoacousticBModeFilter, ImageToImageFilter);
 
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      /** \brief Set parameters for the filter
-      *
-      * @param useLogFilter If true, the filter will apply a logfilter on the processed image
-      */
-      void SetParameters(bool useLogFilter)
+    /** \brief Set parameters for the filter
+    *
+    * @param useLogFilter If true, the filter will apply a logfilter on the processed image
+    */
+    void UseLogFilter(bool useLogFilter)
     {
       m_UseLogFilter = useLogFilter;
     }

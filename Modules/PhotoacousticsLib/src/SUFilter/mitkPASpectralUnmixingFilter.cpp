@@ -49,7 +49,50 @@ void mitk::pa::SpectralUnmixingFilter::AddWavelength(int wavelength)
 
 void mitk::pa::SpectralUnmixingFilter::GenerateData()
 {
-  MITK_INFO << "Hallo Welt!";
+
+  //Test region:++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  //code from "old" SUF.cpp
+
+  // now creats to identical output images lieke the input for hb and hb02
+
+  MITK_INFO << "GENERATING DATA..";
+  unsigned int numberOfInputs = GetNumberOfIndexedInputs();
+  unsigned int numberOfOutputs = GetNumberOfIndexedOutputs();
+
+
+  for (unsigned int outputIdx = 0; outputIdx < numberOfOutputs; outputIdx++)
+  {
+    GetOutput(outputIdx)->Initialize(GetInput(0));
+  }
+
+  long length = GetOutput(0)->GetDimension(0)*GetOutput(0)->GetDimension(1)*GetOutput(0)->GetDimension(2);
+
+  for (int i = 0; i < length; i++)
+  {
+    for (unsigned int j = 0; j < numberOfInputs; j++)
+    {
+      mitk::Image::Pointer input = GetInput(j);
+      mitk::ImageReadAccessor readAccess(input, input->GetVolumeData());
+    }
+
+
+
+    for (unsigned int outputIdx = 0; outputIdx < numberOfOutputs; outputIdx++)
+    {
+      mitk::Image::Pointer output = GetOutput(outputIdx);
+      mitk::ImageWriteAccessor writeOutput(output, output->GetVolumeData());
+      double* outputArray = (double *)writeOutput.GetData();
+    }
+  }
+
+  MITK_INFO << "GENERATING DATA...[DONE]";
+
+  //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
 
 }
 

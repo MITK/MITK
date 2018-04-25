@@ -216,37 +216,22 @@ void SpectralUnmixing::DoImageProcessing()
   
       MITK_INFO << "Updating Filter...";
       
-
       m_SpectralUnmixingFilter->Update();
-
-
-
-      //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ next usefull?
-
-      MITK_INFO << "ERROR TEST 1";
-
+      
       mitk::Image::Pointer HbO2 = m_SpectralUnmixingFilter->GetOutput(0);
+
       HbO2->GetGeometry()->SetIndexToWorldTransform(inputImage->GetGeometry()->GetIndexToWorldTransform());
-      MITK_INFO << "ERROR TEST 1";
-
-      // works ^ ; doesn't work v
-
-      /*
+           
       mitk::ImageWriteAccessor writeOutputHbO2(HbO2, HbO2->GetVolumeData());
-      MITK_INFO << "ERROR TEST 1";
-
       double* outputArrayHbO2 = (double *)writeOutputHbO2.GetData();
-
-      MITK_INFO << "ERROR TEST 1";
 
       mitk::DataNode::Pointer dataNodeHbO2 = mitk::DataNode::New();
       dataNodeHbO2->SetData(HbO2);
       dataNodeHbO2->SetName("HbO2");
       this->GetDataStorage()->Add(dataNodeHbO2);  
-      mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 
 
-      
+ 
       mitk::Image::Pointer Hb = m_SpectralUnmixingFilter->GetOutput(1);
             
       Hb->GetGeometry()->SetIndexToWorldTransform(inputImage->GetGeometry()->GetIndexToWorldTransform());
@@ -261,16 +246,11 @@ void SpectralUnmixing::DoImageProcessing()
       dataNodeHb->SetData(Hb);
       dataNodeHb->SetName("Hb");
       this->GetDataStorage()->Add(dataNodeHb);
-
+      
+      mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 
       MITK_INFO << "Adding images to DataStorage...[DONE]";
-*/
-
-
-
-
-
-
+      
     }
   }
 }

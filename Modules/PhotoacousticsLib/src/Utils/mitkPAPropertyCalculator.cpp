@@ -153,3 +153,9 @@ mitk::pa::PropertyCalculator::~PropertyCalculator()
   m_SpectralLibMap.clear();
   m_Valid = false;
 }
+
+double mitk::pa::PropertyCalculator::GetAbsorptionForWavelength(
+  MapType mapType, int wavelength)
+{
+  return m_SpectralLibMap[mapType][wavelength];
+}

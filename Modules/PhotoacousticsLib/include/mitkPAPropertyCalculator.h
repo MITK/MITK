@@ -32,7 +32,7 @@ namespace mitk {
       mitkClassMacroItkParent(PropertyCalculator, itk::LightObject)
         itkFactorylessNewMacro(Self)
 
-        struct Properties
+      struct Properties
       {
         double mua;
         double mus;
@@ -48,6 +48,18 @@ namespace mitk {
         STANDARD_TISSUE = 5
       };
 
+      enum MapType
+      {
+        OXYGENATED = 1,
+        DEOXYGENATED = 2,
+        WATER = 3,
+        FATTY = 4,
+        MELANIN = 5
+      };
+
+      double GetAbsorptionForWavelength(
+        MapType mapType, int wavelength);
+
       Properties CalculatePropertyForSpecificWavelength(
         TissueType tissueType, int wavelength, double oxygenSaturatonInFraction = 0);
 
@@ -58,15 +70,7 @@ namespace mitk {
       bool m_Valid = false;
 
       std::map<int, std::map<int, double>> m_SpectralLibMap;
-
-      enum MapType
-      {
-        OXYGENATED = 1,
-        DEOXYGENATED = 2,
-        WATER = 3,
-        FATTY = 4,
-        MELANIN = 5
-      };
+          
     };
   }
 }

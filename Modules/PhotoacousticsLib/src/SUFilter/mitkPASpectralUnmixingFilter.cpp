@@ -19,15 +19,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
 
+// Includes for AddEnmemberMatrix
+#include "mitkPAPropertyCalculator.h"
+#include <eigen3/Eigen/Dense>
+
 mitk::pa::SpectralUnmixingFilter::SpectralUnmixingFilter()
 {
-  this->SetNumberOfIndexedOutputs(3);
+  this->SetNumberOfIndexedOutputs(2);
 
   for (unsigned int i = 0; i<GetNumberOfIndexedOutputs(); i++)
   {
     this->SetNthOutput(i, mitk::Image::New());
   }
 
+  m_PropertyCalculator = mitk::pa::PropertyCalculator::New();
 }
 
 mitk::pa::SpectralUnmixingFilter::~SpectralUnmixingFilter()
@@ -35,39 +40,33 @@ mitk::pa::SpectralUnmixingFilter::~SpectralUnmixingFilter()
 
 }
 
-void mitk::pa::SpectralUnmixingFilter::Test()
-{
-  MITK_INFO << "Test";
-}
-
-
 void mitk::pa::SpectralUnmixingFilter::AddWavelength(int wavelength)
 {
   m_Wavelength.push_back(wavelength);
 }
 
+void mitk::pa::SpectralUnmixingFilter::SetChromophores(ChromophoreType chromophore)
+{
+  m_Chromophore.push_back(chromophore);
+}
 
 void mitk::pa::SpectralUnmixingFilter::GenerateData()
 {
+  //code recreaction from "old" SUF.cpp
 
-  //Test region:++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-  //code from "old" SUF.cpp
-
-  // now creats to identical output images lieke the input for hb and hb02
+  // now creats to identical output images like the input for hb and hb02
 
   MITK_INFO << "GENERATING DATA..";
-  unsigned int numberOfInputs = GetNumberOfIndexedInputs();
-  unsigned int numberOfOutputs = GetNumberOfIndexedOutputs();
-
-
+  numberOfInputs = GetNumberOfIndexedInputs();
+  numberOfOutputs = GetNumberOfIndexedOutputs();
+  
   for (unsigned int outputIdx = 0; outputIdx < numberOfOutputs; outputIdx++)
   {
     GetOutput(outputIdx)->Initialize(GetInput(0));
   }
 
-  long length = GetOutput(0)->GetDimension(0)*GetOutput(0)->GetDimension(1)*GetOutput(0)->GetDimension(2);
-
+  length = GetOutput(0)->GetDimension(0)*GetOutput(0)->GetDimension(1)*GetOutput(0)->GetDimension(2);
+    
   for (int i = 0; i < length; i++)
   {
     for (unsigned int j = 0; j < numberOfInputs; j++)
@@ -75,9 +74,6 @@ void mitk::pa::SpectralUnmixingFilter::GenerateData()
       mitk::Image::Pointer input = GetInput(j);
       mitk::ImageReadAccessor readAccess(input, input->GetVolumeData());
     }
-
-
-
     for (unsigned int outputIdx = 0; outputIdx < numberOfOutputs; outputIdx++)
     {
       mitk::Image::Pointer output = GetOutput(outputIdx);
@@ -85,60 +81,35 @@ void mitk::pa::SpectralUnmixingFilter::GenerateData()
       double* outputArray = (double *)writeOutput.GetData();
     }
   }
-
   MITK_INFO << "GENERATING DATA...[DONE]";
-
-  //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-
-
-
+  
+  AddEndmemberMatrix();
 }
 
 
-//// Not correct working alternativ for wavelengths
-/*void mitk::pa::SpectralUnmixingFilter::AddWavelength(int wavelength)
+//Void creats Matrix with #chromophores rows and #wavelengths columns
+//so Matrix Element (i,j) contains the Absorbtion of chromophore j @ wavelength i
+void mitk::pa::SpectralUnmixingFilter::AddEndmemberMatrix()
 {
-  // Das ganze klappt noch nicht so! m_wavelengths wird nicht gespeichert ... 
-  if (m_Wavelengths.empty())
+  numberofchromophores = m_Chromophore.size();
+  numberofwavelengths = m_Wavelength.size();
+
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix(numberofchromophores, numberofwavelengths);
+
+  //loop over j rows (Chromophores)
+  for(unsigned int j =0; j < numberofchromophores; ++j)
   {
-    size = 0;
+    //loop over i columns (Wavelength)
+    for (unsigned int i = 0; i < numberofwavelengths; ++i)
+    {
+      //writes @ Matrix element (i,j) the absorbtion wavelength of the propertycalculator.cpp
+        EndmemberMatrix(j,i)= m_PropertyCalculator->GetAbsorptionForWavelength(
+        static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[j]), m_Wavelength[i]);
+      /* Test to see what gets written in the Matrix:
+      MITK_INFO << "map type: " << static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[j]);
+      MITK_INFO << "wavelength: " << m_Wavelength[i];
+      MITK_INFO << "Matrixelement: (" << j << ", " << i << ") Absorbtion: " << EndmemberMatrix(j, i);*/
+    }
   }
-  m_Wavelengths.push_back(wavelength);
-  size += 1;
-}*/
-
-
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// VERWORFENES ZEUG: 
-/* 
-
-void mitk::pa::SpectralUnmixingFilter::GetInputPictures()
-{
-  MITK_INFO << "GET INPUT PICTURES...";
-  unsigned int numberOfInputs = GetNumberOfIndexedInputs();
-  unsigned int numberOfOutputs = GetNumberOfIndexedOutputs();
-
-  MITK_INFO << "Inputs: " << numberOfInputs << " Outputs: " << numberOfOutputs;
-
-  if (m_Wavelengths.empty() || m_Wavelengths.size() != numberOfInputs || numberOfInputs < m_Chromophores.size())
-  {
-    std::string invalidWavelengthError = "Not enough wavelengths given for calculation.";
-    MITK_ERROR << invalidWavelengthError;
-    mitkThrow() << invalidWavelengthError;
-  }
- MITK_INFO << "LOADING...[DONE]";
+  MITK_INFO << "GENERATING ENMEMBERMATRIX SUCCESSFUL!";
 }
-
-void mitk::pa::SpectralUnmixingFilter::AddChromophore(int chromophore)
-{
-  MITK_INFO << "ADD CHROMOPHORE...";
-  m_Chromophores.push_back(chromophore);
-}
-Probably easier to implement in the Plugin like: if (slot x then do algorithm x)
-void mitk::pa::SpectralUnmixingFilter::ChooseAlgorithm(int algorithm)
-{
-  MITK_INFO << "CHOOSE ALGORITHM...";
-  m_Chromophores.push_back(algorithm);
-}*/

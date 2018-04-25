@@ -24,17 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_SpectralUnmixingControls.h"
 
-//test
 #include "mitkPAPropertyCalculator.h"
-
-
-
-
-// Perform Spectral Unmixing
-//include "mitkPASpectralUnmixingFilter.h" 
-//--> include does not work
-//solution fprr cpp file 'Just right-click on the project -> Configuration Properties -> C/C++ -> General -> Additional Include Directories.'
-//https://stackoverflow.com/questions/12561048/visual-studio-cannot-include-header-file
 
 /**
   \brief SpectralUnmixing
@@ -76,8 +66,6 @@ protected:
   unsigned int wavelength;
   unsigned int numberofChromophores;
   Ui::SpectralUnmixingControls m_Controls;
-
-  // Test:
 
   mitk::pa::PropertyCalculator::Pointer m_PropertyCalculator;
 

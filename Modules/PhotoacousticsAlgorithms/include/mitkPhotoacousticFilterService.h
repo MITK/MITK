@@ -99,14 +99,13 @@ namespace mitk {
     *
     * Applies a bandpass filter to the given image using the given parameters.
     * @param data The image to be processed.
-    * @param recordTime The depth of the image in seconds.
     * @param BPHighPass The position at which Lower frequencies are completely cut off in Hz.
     * @param BPLowPass The position at which Higher frequencies are completely cut off in Hz.
     * @param alphaHighPass The high pass tukey window parameter to control the shape of the bandpass filter: 0 will make it a Box function, 1 a Hann function. alpha can be set between those two bounds.
     * @param alphaLowPass The low passtukey window parameter to control the shape of the bandpass filter: 0 will make it a Box function, 1 a Hann function. alpha can be set between those two bounds.
     * @return The processed image is returned after the filter has finished.
     */
-    mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data, float recordTime,
+    mitk::Image::Pointer ApplyBandpassFilter(mitk::Image::Pointer data,
       float BPHighPass, float BPLowPass,
       float alphaHighPass, float alphaLowPass);
 
@@ -119,12 +118,7 @@ namespace mitk {
     */
     mitk::BeamformingFilter::Pointer m_BeamformingFilter;
 
-    /** \brief Function that creates a Tukey function for the bandpass
-    */
-    itk::Image<float, 3U>::Pointer BPFunction(mitk::Image::Pointer reference,
-      float cutoffFrequencyPixelHighPass,
-      float cutoffFrequencyPixelLowPass,
-      float alphaHighPass, float alphaLowPass);
+    mitk::Image::Pointer ConvertToFloat(mitk::Image::Pointer);
   };
 } // namespace mitk
 

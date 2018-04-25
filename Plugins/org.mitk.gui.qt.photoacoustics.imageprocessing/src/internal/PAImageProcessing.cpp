@@ -277,7 +277,7 @@ void PAImageProcessing::BatchProcessing()
         BPLowPass = 0;
       }
 
-      image = m_FilterBank->BandpassFilter(image, recordTime, BPHighPass, BPLowPass,
+      image = m_FilterBank->ApplyBandpassFilter(image, BPHighPass, BPLowPass,
         m_Controls.BPFalloffHigh->value(),
         m_Controls.BPFalloffLow->value());
 
@@ -558,48 +558,10 @@ void PAImageProcessing::StartBandpassThread()
       connect(thread, &BandpassThread::result, this, &PAImageProcessing::HandleResults);
       connect(thread, &BandpassThread::finished, thread, &QObject::deleteLater);
 
-      float recordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000 / m_Controls.BPSpeedOfSound->value();
+      float BPHighPass = 1000000.0f * m_Controls.BPhigh->value(); // [Now in Hz]
+      float BPLowPass = 1000000.0f * m_Controls.BPlow->value(); // [Now in Hz]
 
-      // add a safeguard so the program does not chrash when applying a Bandpass that reaches out of the bounds of the image
-      float maxFrequency = 1 / (recordTime / image->GetDimension(1)) * image->GetDimension(1) / 2 / 2 / 1000;
-      float BPHighPass = 1000000 * m_Controls.BPhigh->value(); // [Hz]
-      float BPLowPass = maxFrequency - 1000000 * m_Controls.BPlow->value(); // [Hz]
-
-      if (BPLowPass > maxFrequency && m_Controls.UseBP->isChecked())
-      {
-        QMessageBox Msgbox;
-        Msgbox.setText("LowPass too low, disabled it.");
-        Msgbox.exec();
-
-        BPLowPass = 0;
-      }
-      if (BPLowPass < 0 && m_Controls.UseBP->isChecked())
-      {
-        QMessageBox Msgbox;
-        Msgbox.setText("LowPass too high, disabled it.");
-        Msgbox.exec();
-
-        BPLowPass = 0;
-      }
-      if (BPHighPass > maxFrequency &&  m_Controls.UseBP->isChecked())
-      {
-        QMessageBox Msgbox;
-        Msgbox.setText("HighPass too high, disabled it.");
-        Msgbox.exec();
-
-        BPHighPass = 0;
-      }
-      if (BPHighPass > maxFrequency - BPLowPass)
-      {
-        QMessageBox Msgbox;
-        Msgbox.setText("HighPass higher than LowPass, disabled both.");
-        Msgbox.exec();
-
-        BPHighPass = 0;
-        BPLowPass = 0;
-      }
-
-      thread->setConfig(BPHighPass, BPLowPass, m_Controls.BPFalloffLow->value(), m_Controls.BPFalloffHigh->value(), recordTime);
+      thread->setConfig(BPHighPass, BPLowPass, m_Controls.BPFalloffLow->value(), m_Controls.BPFalloffHigh->value(), 0);
       thread->setInputImage(image);
       thread->setFilterBank(m_FilterBank);
 
@@ -976,11 +938,6 @@ void BeamformingThread::run()
   std::function<void(int, std::string)> progressHandle = [this](int progress, std::string progressInfo) {
     emit updateProgress(progress, progressInfo);
   };
-  mitk::CastToFloatImageFilter::Pointer castToFloatImageFilter = mitk::CastToFloatImageFilter::New();
-  castToFloatImageFilter->SetInput(m_InputImage);
-  castToFloatImageFilter->Update();
-  m_InputImage = castToFloatImageFilter->GetOutput();
-  mitk::IOUtil::Save(m_InputImage, "G:/castedImage.nrrd");
   resultImageBuffer = m_FilterBank->ApplyBeamforming(m_InputImage, m_BFconfig, progressHandle);
   emit result(resultImageBuffer, "_bf");
 }
@@ -1044,9 +1001,7 @@ void CropThread::setInputImage(mitk::Image::Pointer image)
 
 void BandpassThread::run()
 {
-  mitk::Image::Pointer resultImage;
-
-  resultImage = m_FilterBank->BandpassFilter(m_InputImage, m_RecordTime, m_BPHighPass, m_BPLowPass, m_TukeyAlphaHighPass, m_TukeyAlphaLowPass);
+  mitk::Image::Pointer resultImage = m_FilterBank->ApplyBandpassFilter(m_InputImage, m_BPHighPass, m_BPLowPass, m_TukeyAlphaHighPass, m_TukeyAlphaLowPass);
   emit result(resultImage, "_bandpassed");
 }
 

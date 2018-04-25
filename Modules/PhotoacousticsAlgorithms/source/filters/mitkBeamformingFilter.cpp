@@ -214,7 +214,7 @@ void mitk::BeamformingFilter::GenerateData()
       if (!(input->GetPixelType().GetTypeAsString() == "scalar (float)" || input->GetPixelType().GetTypeAsString() == " (float)"))
       {
         MITK_ERROR << "Pixel type is not float, abort";
-        return;
+        mitkThrow() << "Pixel type is not float, abort";
       }
 
       unsigned long availableMemory = m_BeamformingOclFilter->GetDeviceMemory();

@@ -6,6 +6,7 @@ set(CPP_FILES
   source/filters/mitkImageSliceSelectionFilter.cpp
   source/filters/mitkCastToFloatImageFilter.cpp
   source/filters/mitkCropImageFilter.cpp
+  source/filters/mitkBandpassFilter.cpp
   source/OpenCLFilter/mitkPhotoacousticBModeFilter.cpp
   source/utils/mitkPhotoacousticFilterService.cpp
   source/utils/mitkBeamformingUtils.cpp

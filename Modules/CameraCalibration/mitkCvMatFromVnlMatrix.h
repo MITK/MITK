@@ -18,9 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkEndoMacros.h>
 #include <mitkEndoDebug.h>
-#include <cv.h>
 #include <vnl/vnl_matrix.h>
 #include <mitkAlgorithm.h>
+
+#include "opencv2/core.hpp"
 
 namespace mitk
 {

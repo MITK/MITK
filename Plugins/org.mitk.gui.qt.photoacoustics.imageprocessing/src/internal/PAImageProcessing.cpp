@@ -293,9 +293,13 @@ void PAImageProcessing::BatchProcessing()
       m_Controls.ProgressInfo->setText("applying bmode filter");
 
       if (m_Controls.BModeMethod->currentText() == "Absolute Filter")
-        image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticFilterService::BModeMethod::Abs, m_UseLogfilter, m_ResampleSpacing);
+        image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticFilterService::BModeMethod::Abs, m_UseLogfilter);
       else if (m_Controls.BModeMethod->currentText() == "Envelope Detection")
-        image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection, m_UseLogfilter, m_ResampleSpacing);
+        image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection, m_UseLogfilter);
+
+      double desiredSpacing[2]{ image->GetGeometry()->GetSpacing()[0], m_ResampleSpacing };
+
+      image = m_FilterBank->ApplyResampling(image, desiredSpacing);
 
       if (saveSteps[3])
       {
@@ -994,7 +998,11 @@ void BeamformingThread::setInputImage(mitk::Image::Pointer image)
 void BmodeThread::run()
 {
   mitk::Image::Pointer resultImage = m_FilterBank->ApplyBmodeFilter(m_InputImage,
-    m_Method, m_UseLogfilter, m_ResampleSpacing);
+    m_Method, m_UseLogfilter);
+
+  double desiredSpacing[2]{ m_InputImage->GetGeometry()->GetSpacing()[0], m_ResampleSpacing };
+
+  resultImage = m_FilterBank->ApplyResampling(resultImage, desiredSpacing);
 
   emit result(resultImage, "_bmode");
 }

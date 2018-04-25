@@ -42,9 +42,10 @@ namespace mitk {
 
       void Test();
 
-      /* for add wavelengths
       void AddWavelength(int wavelength);
-      std::vector<int> m_Wavelengths;
+      std::vector<int> m_Wavelength;
+      /* for add wavelengths
+
       int size; */
 
     protected:
@@ -52,7 +53,7 @@ namespace mitk {
       virtual ~SpectralUnmixingFilter();
 
     private:
-
+      virtual void GenerateData();
     };
   }
 }

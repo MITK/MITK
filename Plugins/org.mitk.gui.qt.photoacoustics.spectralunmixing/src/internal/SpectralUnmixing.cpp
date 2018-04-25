@@ -28,8 +28,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk image
 #include <mitkImage.h>
 
+//test mitk image
+#include <mitkIOUtil.h>
+#include <mitkImageWriteAccessor.h>
+#include <mitkImageReadAccessor.h>
+
 // to perform Spectral Unmixing
 #include "mitkPASpectralUnmixingFilter.h"
+
 
 const std::string SpectralUnmixing::VIEW_ID = "org.mitk.views.spectralunmixing";
 
@@ -137,16 +143,16 @@ void SpectralUnmixing::DoImageProcessing()
       numberofChromophores = 0;
       DeOxbool = m_Controls.checkBoxDeOx->isChecked();
       Oxbool = m_Controls.checkBoxOx->isChecked();
-      if (DeOxbool || Oxbool == true)
+      if (DeOxbool || Oxbool)
       {
         MITK_INFO << "CHOSEN CHROMOPHORES:";
       }
-      if (Oxbool == true)
+      if (Oxbool)
       {
         numberofChromophores += 1;
         MITK_INFO << "- Oxyhemoglobin";
       }
-      if (DeOxbool == true)
+      if (DeOxbool)
       {
         numberofChromophores += 1;
         MITK_INFO << "- Deoxygenated hemoglobin";
@@ -162,7 +168,107 @@ void SpectralUnmixing::DoImageProcessing()
         mitkThrow() << "PRESS 'IGNORE' AND ADD MORE WAVELENGTHS!";
       }
       
-    
+
+      //Test region:
+
+      //code from "old" SU.cpp
+
+  
+      MITK_INFO << "GENERATING DATA...";
+      unsigned int numberOfInputs = size;
+      unsigned int numberOfOutputs = numberofChromophores;
+
+      MITK_INFO << "Inputs: " << numberOfInputs << " Outputs: " << numberOfOutputs;
+
+
+      
+      mitk::DataStorage::Pointer storage = this->GetDataStorage();
+
+      mitk::DataNode::Pointer node = nodes.front();
+
+
+      auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilter::New();
+   
+      mitk::Image* inputImage = dynamic_cast<mitk::Image*>(data);
+
+      const unsigned int dimensions[]{
+      inputImage->GetDimension(0),
+      inputImage->GetDimension(1),
+      1 }; // just the first sequence for starters TODO GENERALIZE
+      unsigned int dimension = 3;
+      mitk::PixelType TPixel = mitk::MakeScalarPixelType<double>();
+
+      
+      //try to make another wavelength impementation using "above" one ;)
+      for (unsigned int imageIndex = 0; imageIndex < numberOfInputs; imageIndex++)
+      {
+        mitk::Image::Pointer fooImage = mitk::Image::New();
+        fooImage->Initialize(TPixel, dimension, dimensions);
+        wavelength = m_Wavelengths[imageIndex];
+        MITK_INFO << wavelength;
+        m_SpectralUnmixingFilter->AddWavelength(wavelength);
+        mitk::ImageReadAccessor inputAcc(inputImage, inputImage->GetSliceData(imageIndex));
+        fooImage->SetSlice(inputAcc.GetData(), 0);
+        m_SpectralUnmixingFilter->SetInput(imageIndex, fooImage);
+      }
+
+
+  
+      MITK_INFO << "Updating Filter...";
+      
+
+      m_SpectralUnmixingFilter->Update();
+
+
+
+      //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ next usefull?
+
+      MITK_INFO << "ERROR TEST 1";
+
+      mitk::Image::Pointer HbO2 = m_SpectralUnmixingFilter->GetOutput(0);
+      HbO2->GetGeometry()->SetIndexToWorldTransform(inputImage->GetGeometry()->GetIndexToWorldTransform());
+      MITK_INFO << "ERROR TEST 1";
+
+      // works ^ ; doesn't work v
+
+      /*
+      mitk::ImageWriteAccessor writeOutputHbO2(HbO2, HbO2->GetVolumeData());
+      MITK_INFO << "ERROR TEST 1";
+
+      double* outputArrayHbO2 = (double *)writeOutputHbO2.GetData();
+
+      MITK_INFO << "ERROR TEST 1";
+
+      mitk::DataNode::Pointer dataNodeHbO2 = mitk::DataNode::New();
+      dataNodeHbO2->SetData(HbO2);
+      dataNodeHbO2->SetName("HbO2");
+      this->GetDataStorage()->Add(dataNodeHbO2);  
+      mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+
+
+      
+      mitk::Image::Pointer Hb = m_SpectralUnmixingFilter->GetOutput(1);
+            
+      Hb->GetGeometry()->SetIndexToWorldTransform(inputImage->GetGeometry()->GetIndexToWorldTransform());
+
+      
+      mitk::ImageWriteAccessor writeOutputHb(Hb, Hb->GetVolumeData());
+      double* outputArrayHb = (double *)writeOutputHb.GetData();
+                
+     
+
+      mitk::DataNode::Pointer dataNodeHb = mitk::DataNode::New();
+      dataNodeHb->SetData(Hb);
+      dataNodeHb->SetName("Hb");
+      this->GetDataStorage()->Add(dataNodeHb);
+
+
+      MITK_INFO << "Adding images to DataStorage...[DONE]";
+*/
+
+
+
+
 
 
     }

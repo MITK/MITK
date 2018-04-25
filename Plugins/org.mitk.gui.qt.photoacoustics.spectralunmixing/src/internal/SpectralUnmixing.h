@@ -24,6 +24,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_SpectralUnmixingControls.h"
 
+//test
+#include "mitkPAPropertyCalculator.h"
+
+
+
+
 // Perform Spectral Unmixing
 //include "mitkPASpectralUnmixingFilter.h" 
 //--> include does not work
@@ -48,7 +54,7 @@ public:
   static const std::string VIEW_ID;
 
   // Add Wavelengths with button:
-  int size;
+  int size = 0;
   std::vector<int> m_Wavelengths;
 
   bool DeOxbool;
@@ -70,6 +76,11 @@ protected:
   unsigned int wavelength;
   unsigned int numberofChromophores;
   Ui::SpectralUnmixingControls m_Controls;
+
+  // Test:
+
+  mitk::pa::PropertyCalculator::Pointer m_PropertyCalculator;
+
 };
 
 #endif // SpectralUnmixing_h

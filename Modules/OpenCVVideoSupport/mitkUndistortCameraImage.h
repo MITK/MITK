@@ -22,7 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObject.h"
 
 #include "mitkPoint.h"
-#include "cv.h"
+
+#include "opencv2/core.hpp"
+#include "opencv2/imgproc.hpp"
 
 /*!
 \brief UndistortCameraImage

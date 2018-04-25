@@ -17,10 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkOpenCVVideoControls_h
 #define QmitkOpenCVVideoControls_h
 
-#include <cv.h>
 #include <ui_QmitkOpenCVVideoControls.h>
 #include <MitkOpenCVVideoSupportUIExports.h>
 #include <mitkPropertyListReplacedObserver.h>
+
+#include "opencv2/core.hpp"
 
 class QmitkRenderWindow;
 class QmitkVideoBackground;

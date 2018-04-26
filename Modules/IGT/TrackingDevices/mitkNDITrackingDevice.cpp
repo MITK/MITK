@@ -1117,9 +1117,6 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
   2. NDI enable all tools (PENA)
   **/
 
-  //remember the number of tools at start to identify the automatically detected tools later
-  int numberOfToolsAtStart = this->GetToolCount();
-
   for (unsigned int i = 0; i < portHandle.size(); i += 2)
   {
      std::string ph = portHandle.substr(i, 2);

@@ -14,110 +14,194 @@
 
  ===================================================================*/
 
-#include "itkLightObject.h"
+// Testing
+#include "mitkTestFixture.h"
+#include "mitkTestingMacros.h"
+// MITK includes
+#include <mitkCoreServices.h>
 #include "mitkBaseRenderer.h"
 #include "mitkDataInteractor.h"
 #include "mitkDataNode.h"
 #include "mitkDispatcher.h"
 #include "mitkStandaloneDataStorage.h"
-#include "mitkTestingMacros.h"
 #include "mitkVtkPropRenderer.h"
+// ITK includes
+#include "itkLightObject.h"
 
-int mitkDispatcherTest(int /*argc*/, char * /*argv*/ [])
+class mitkDispatcherTestSuite : public mitk::TestFixture
 {
-  MITK_TEST_BEGIN("Dispatcher")
+  CPPUNIT_TEST_SUITE(mitkDispatcherTestSuite);
+  MITK_TEST(DispatcherExists_Success);
+  MITK_TEST(AddInteractorConnectedToDataStorage_IncreaseNumberOfInteractors);
+  MITK_TEST(AddDataNodeToInteractor_NoIncreasedNumberOfInteractors);
+  MITK_TEST(AddInteractorNotConnectedToDataStorage_NoRegisteredInteractor);
+  MITK_TEST(ConnectInteractorToDataStorage_ReplaceInteractorEntry);
+  MITK_TEST(NewDataNodeAndInteractor_IncreasedNumberOfInteractors);
+  MITK_TEST(InteractorsPointToSameDataNode_DecreasedNumberOfInteractors);
+  MITK_TEST(SetDataNodeToNullptr_RemoveInteractor);
+  MITK_TEST(RemoveDataNode_RemoveInteractor);
+  MITK_TEST(GetReferenceCountDataNode_Success);
+  MITK_TEST(GetReferenceCountInteractors_Success);
+  CPPUNIT_TEST_SUITE_END();
 
-  /*
-   * Tests the process of creating Interactors and assigning DataNodes to them.
-   * Test checks if these Interactors are added to the Dispatcher under different conditions,
-   * and in different call order.
-   */
+private:
 
-  // Here BindDispatcherInteractor and Dispatcher should be created automatically
-  vtkRenderWindow *renWin = vtkRenderWindow::New();
-  mitk::VtkPropRenderer::Pointer renderer =
-    mitk::VtkPropRenderer::New("ContourRenderer", renWin, mitk::RenderingManager::GetInstance());
-
-  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+  vtkRenderWindow *renWin;
+  mitk::VtkPropRenderer::Pointer renderer;
+  
+  mitk::StandaloneDataStorage::Pointer ds;
   mitk::DataNode::Pointer dn;
 
-  dn = mitk::DataNode::New();
-  mitk::DataNode::Pointer dn2 = mitk::DataNode::New();
-  mitk::DataInteractor::Pointer ei = mitk::DataInteractor::New();
-  mitk::DataInteractor::Pointer ei2 = mitk::DataInteractor::New();
+  mitk::DataNode::Pointer dn2;
+  mitk::DataInteractor::Pointer ei;
+  mitk::DataInteractor::Pointer ei2;
+public:
 
-  MITK_TEST_CONDITION_REQUIRED(renderer->GetDispatcher()->GetNumberOfInteractors() == 0,
-                               "01 Check Existence of Dispatcher.");
+  /*
+  * Tests the process of creating Interactors and assigning DataNodes to them.
+  * Test checks if these Interactors are added to the Dispatcher under different conditions,
+  * and in different call order.
+  */
 
-  ei->SetDataNode(dn);
-  renderer->SetDataStorage(ds);
-  ds->Add(dn);
+  void setUp()
+  {
+    // Here BindDispatcherInteractor and Dispatcher should be created automatically
+    renWin = vtkRenderWindow::New();
+    renderer = mitk::VtkPropRenderer::New("ContourRenderer", renWin, mitk::RenderingManager::GetInstance());
+    ds = mitk::StandaloneDataStorage::New();
+    dn = mitk::DataNode::New();
+    dn2 = mitk::DataNode::New();
+    ei = mitk::DataInteractor::New();
+    ei2 = mitk::DataInteractor::New();
+    renderer->SetDataStorage(ds);
+  }
 
-  int num = renderer->GetDispatcher()->GetNumberOfInteractors();
-  MITK_TEST_CONDITION_REQUIRED(num == 1, "02 Number of registered Interactors " << num << " , expected 1");
+  void tearDown()
+  {
+    renWin->Delete();
+    renderer = nullptr;
+    ds = nullptr;
+    dn = nullptr;
+    dn2 = nullptr;
+    ei = nullptr;
+    ei2 = nullptr;
+  }
 
-  // This _must not_ result in additionally registered interactors.
-  ei->SetDataNode(dn);
-  ei->SetDataNode(dn);
+  void DispatcherExists_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("01 Check Existence of Dispatcher.",
+      renderer->GetDispatcher()->GetNumberOfInteractors() == 0);
+  }
 
-  num = renderer->GetDispatcher()->GetNumberOfInteractors();
-  MITK_TEST_CONDITION_REQUIRED(num == 1, "03 Number of registered Interactors " << num << " , expected 1");
+  void AddInteractorConnectedToDataStorage_IncreaseNumberOfInteractors()
+  {
+    ei->SetDataNode(dn);
+    ds->Add(dn);
 
-  // Switching the DataNode of an Interactor also must not result in extra registered Interactors in Dispatcher
-  // since dn2 is not connected to DataStorage
-  // ei will be dropped from dispatcher
-  ei->SetDataNode(dn2);
+    CPPUNIT_ASSERT_MESSAGE("02 Expected number of registered Interactors is 1",
+                      renderer->GetDispatcher()->GetNumberOfInteractors() == 1);
+  }
 
-  num = renderer->GetDispatcher()->GetNumberOfInteractors();
-  MITK_TEST_CONDITION_REQUIRED(num == 0, "04 Number of registered Interactors " << num << " , expected 0");
+  void AddDataNodeToInteractor_NoIncreasedNumberOfInteractors()
+  {
+    ei->SetDataNode(dn);
+    renderer->SetDataStorage(ds);
+    ds->Add(dn);
+    // This _must not_ result in additionally registered interactors.
+    ei->SetDataNode(dn);
+    CPPUNIT_ASSERT_MESSAGE("03 Expected number of registered Interactors is 1",
+                      renderer->GetDispatcher()->GetNumberOfInteractors() == 1);
+  }
 
-  // DataNode Added to DataStorage, now Interactor entry in Dispatcher should be replaced,
-  // hence we restore Interactor in the Dispatcher
-  ds->Add(dn2);
+  void AddInteractorNotConnectedToDataStorage_NoRegisteredInteractor()
+  {
+    // Switching the DataNode of an Interactor also must not result in extra registered Interactors in Dispatcher
+    // since dn2 is not connected to DataStorage
+    ei->SetDataNode(dn2);
+    
+    CPPUNIT_ASSERT_MESSAGE("04 Expected number of registered Interactors is 0",
+                      renderer->GetDispatcher()->GetNumberOfInteractors() == 0);
+  }
 
-  num = renderer->GetDispatcher()->GetNumberOfInteractors();
-  MITK_TEST_CONDITION_REQUIRED(num == 1, "05 Number of registered Interactors " << num << " , expected 1");
+  void ConnectInteractorToDataStorage_ReplaceInteractorEntry()
+  {
+    ei->SetDataNode(dn2);
+    // DataNode Added to DataStorage, now Interactor entry in Dispatcher should be replaced,
+    // hence we restore Interactor in the Dispatcher
+    ds->Add(dn2);
+    
+    CPPUNIT_ASSERT_MESSAGE("05 Expected number of registered Interactors is 1",
+                      renderer->GetDispatcher()->GetNumberOfInteractors() == 1);
+  }
 
-  // New DataNode and new interactor, this should result in additional Interactor in the Dispatcher.
+  void NewDataNodeAndInteractor_IncreasedNumberOfInteractors()
+  {
+    ei->SetDataNode(dn2);
+    ds->Add(dn2);
+    ds->Add(dn);
+    // New DataNode and new interactor, this should result in additional Interactor in the Dispatcher.
+    ei2->SetDataNode(dn);
 
-  ei2->SetDataNode(dn);
+    CPPUNIT_ASSERT_MESSAGE("06 Exprected number of registered Interactors is 2",
+                       renderer->GetDispatcher()->GetNumberOfInteractors() == 2);
+  }
 
-  num = renderer->GetDispatcher()->GetNumberOfInteractors();
-  MITK_TEST_CONDITION_REQUIRED(num == 2, "06 Number of registered Interactors " << num << " , expected 2");
+  void InteractorsPointToSameDataNode_DecreasedNumberOfInteractors()
+  {
+    ds->Add(dn2);
+    ds->Add(dn);
+    ei->SetDataNode(dn2);
+    ei2->SetDataNode(dn);
+    // Here ei and ei2 point to the same dn2; dn2 now only points to ei2, so ei is abandoned,
+    // therefore ei1 is expected to be removed
+    
+    ei2->SetDataNode(dn2);
+    CPPUNIT_ASSERT_MESSAGE("07 Expected number of registered Interactors is 1",
+                      renderer->GetDispatcher()->GetNumberOfInteractors() == 1);
+  }
 
-  // Here ei and ei2 point to the same dn2; dn2 now only points to ei2, so ei is abandoned,
-  // therefore ei1 is expected to be removed
+  void SetDataNodeToNullptr_RemoveInteractor()
+  {
+    ds->Add(dn2);
+    ei2->SetDataNode(dn2);
+    // Setting DataNode in Interactor to nullptr, should remove Interactor from Dispatcher
+    ei2->SetDataNode(nullptr);
+    CPPUNIT_ASSERT_MESSAGE("08 Expected number of registered Interactors is 0",
+                    renderer->GetDispatcher()->GetNumberOfInteractors() == 0);
+  }
 
-  ei2->SetDataNode(dn2);
-  num = renderer->GetDispatcher()->GetNumberOfInteractors();
-  MITK_TEST_CONDITION_REQUIRED(num == 1, "07 Number of registered Interactors " << num << " , expected 1");
+  void RemoveDataNode_RemoveInteractor()
+  {
+    // Add DN again check if it is registered
+    ds->Add(dn);
+    ei2->SetDataNode(dn);
+    
+    CPPUNIT_ASSERT_MESSAGE("09 Expected number of registered Interactors is 1",
+                      renderer->GetDispatcher()->GetNumberOfInteractors() == 1);
+    
+    // If DN is removed Interactors should be too
+    ds->Remove(dn);
+    CPPUNIT_ASSERT_MESSAGE("10 ExpectedNumber of registered Interactors is 0",
+                     renderer->GetDispatcher()->GetNumberOfInteractors() == 0);
+  }
 
-  // Setting DataNode in Interactor to nullptr, should remove Interactor from Dispatcher
-  ei2->SetDataNode(nullptr);
-  num = renderer->GetDispatcher()->GetNumberOfInteractors();
-  MITK_TEST_CONDITION_REQUIRED(num == 0, "08 Number of registered Interactors " << num << " , expected 0");
+  void GetReferenceCountDataNode_Success()
+  {
+    ds->Add(dn);
+    ei2->SetDataNode(dn);
+    ds->Remove(dn);
+    // after DN is removed from DS its reference count must be back to one
+    CPPUNIT_ASSERT_MESSAGE("11 Expected number of references of DataNode is 1",
+                                                  dn->GetReferenceCount() == 1);
+  }
 
-  // Add DN again check if it is registered
-
-  ei2->SetDataNode(dn);
-
-  num = renderer->GetDispatcher()->GetNumberOfInteractors();
-  MITK_TEST_CONDITION_REQUIRED(num == 1, "09 Number of registered Interactors " << num << " , expected 1");
-
-  // If DN is removed Interactors should be too
-  ds->Remove(dn);
-  num = renderer->GetDispatcher()->GetNumberOfInteractors();
-  MITK_TEST_CONDITION_REQUIRED(num == 0, "10 Number of registered Interactors " << num << " , expected 0");
-
-  // after DN is removed from DS its reference count must be back to one
-
-  MITK_TEST_CONDITION_REQUIRED(dn->GetReferenceCount() == 1,
-                               "10 Number of references of DataNode " << num << " , expected 1");
-
-  MITK_TEST_CONDITION_REQUIRED(ei->GetReferenceCount() == 1,
-                               "11 Number of references of Interactors " << num << " , expected 1");
-
-  renWin->Delete();
-  // always end with this!
-  MITK_TEST_END()
-}
+  void GetReferenceCountInteractors_Success()
+  {
+    ei->SetDataNode(dn2);
+    ds->Add(dn2);
+    ei2->SetDataNode(dn2);
+    CPPUNIT_ASSERT_MESSAGE("12 Expected number of references of Interactors is 1",
+                                                     ei->GetReferenceCount() == 1);
+  }
+};
+MITK_TEST_SUITE_REGISTRATION(mitkDispatcher)

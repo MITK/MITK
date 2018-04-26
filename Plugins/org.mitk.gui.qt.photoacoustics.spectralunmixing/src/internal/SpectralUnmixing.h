@@ -63,6 +63,7 @@ protected:
   void DoImageProcessing();
 
   virtual void Wavelength();
+  virtual void ClearWavelength();
   unsigned int wavelength;
   unsigned int numberofChromophores;
   Ui::SpectralUnmixingControls m_Controls;

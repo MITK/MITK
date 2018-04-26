@@ -103,12 +103,18 @@ void mitk::pa::SpectralUnmixingFilter::AddEndmemberMatrix()
     for (unsigned int i = 0; i < numberofwavelengths; ++i)
     {
       //writes @ Matrix element (i,j) the absorbtion wavelength of the propertycalculator.cpp
-        EndmemberMatrix(j,i)= m_PropertyCalculator->GetAbsorptionForWavelength(
-        static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[j]), m_Wavelength[i]);
+      EndmemberMatrix(j,i)= m_PropertyCalculator->GetAbsorptionForWavelength(
+      static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[j]), m_Wavelength[i]);
+      if (EndmemberMatrix(i, j) == 0)
+      {
+        m_Wavelength.clear();
+        MITK_INFO << "size: "<< m_Wavelength.size();
+        mitkThrow() << "WAVELENGTH NOT SUPPORTED!";
+      }
       /* Test to see what gets written in the Matrix:
       MITK_INFO << "map type: " << static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[j]);
       MITK_INFO << "wavelength: " << m_Wavelength[i];
-      MITK_INFO << "Matrixelement: (" << j << ", " << i << ") Absorbtion: " << EndmemberMatrix(j, i);*/
+      MITK_INFO << "Matrixelement: (" << j << ", " << i << ") Absorbtion: " << EndmemberMatrix(j, i);/**/
     }
   }
   MITK_INFO << "GENERATING ENMEMBERMATRIX SUCCESSFUL!";

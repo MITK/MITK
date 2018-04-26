@@ -104,6 +104,13 @@
          </item>
         </layout>
        </item>
+       <item row="5" column="0">
+        <widget class="QPushButton" name="ButtonClearWavelength">
+         <property name="text">
+          <string>Clear all Wavelengths</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
     </layout>

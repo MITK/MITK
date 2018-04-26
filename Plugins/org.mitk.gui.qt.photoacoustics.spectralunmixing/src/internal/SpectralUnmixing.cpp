@@ -49,6 +49,7 @@ void SpectralUnmixing::CreateQtPartControl(QWidget *parent)
   m_Controls.setupUi(parent);
   connect(m_Controls.buttonPerformImageProcessing, &QPushButton::clicked, this, &SpectralUnmixing::DoImageProcessing);
   connect(m_Controls.ButtonAddWavelength, &QPushButton::clicked, this, &SpectralUnmixing::Wavelength);
+  connect(m_Controls.ButtonClearWavelength, &QPushButton::clicked, this, &SpectralUnmixing::ClearWavelength);
 }
 
 // Add Wavelength is working, BUT in the Plugin! Not with same implementation at the filter
@@ -71,6 +72,11 @@ void SpectralUnmixing::Wavelength()
   {
     MITK_INFO << m_Wavelengths[i] << "nm";
   }
+}
+
+void SpectralUnmixing::ClearWavelength()
+{
+  m_Wavelengths.clear();
 }
 
 void SpectralUnmixing::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
@@ -199,6 +205,7 @@ void SpectralUnmixing::DoImageProcessing()
         fooImage->SetSlice(inputAcc.GetData(), 0);
         m_SpectralUnmixingFilter->SetInput(imageIndex, fooImage);
       }
+
         
       MITK_INFO << "Updating Filter...";
       
@@ -215,9 +222,7 @@ void SpectralUnmixing::DoImageProcessing()
       dataNodeHbO2->SetData(HbO2);
       dataNodeHbO2->SetName("HbO2");
       this->GetDataStorage()->Add(dataNodeHbO2);  
-
-
- 
+       
       mitk::Image::Pointer Hb = m_SpectralUnmixingFilter->GetOutput(1);
             
       Hb->GetGeometry()->SetIndexToWorldTransform(inputImage->GetGeometry()->GetIndexToWorldTransform());

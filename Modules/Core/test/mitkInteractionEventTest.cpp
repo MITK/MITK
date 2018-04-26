@@ -14,24 +14,6 @@
 
  ===================================================================*/
 
-
-//
-//int mitkInteractionEventTest(int /*argc*/, char * /*argv*/ [])
-//{
-//  /*
-//   * Create different Events, fill them with data.
-//   * And check if isEqual method is implemented properly.
-//   */
-//  MITK_TEST_BEGIN("InteractionEvent")
-//
-
-//
-//
-
-//
-//  // always end with this!
-//  MITK_TEST_END()
-//}
 // Testing
 #include "mitkTestFixture.h"
 #include "mitkTestingMacros.h"

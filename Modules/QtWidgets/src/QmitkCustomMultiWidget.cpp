@@ -91,7 +91,8 @@ void QmitkCustomMultiWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 void QmitkCustomMultiWidget::InitializeRenderWindowWidgets()
 {
   // create render window (widgets) initially
-  AddRenderWindowWidget(0, 0, "2015-01-14 - CT");
+  QString UID = CreateRenderWindowWidget("2015-01-14 - CT");
+  AddToMultiWidgetLayout(0, 0, UID);
   /*
   AddRenderWindowWidget(0, 1, "2015-08-19 - CT");
   AddRenderWindowWidget(0, 2, "2016-06-29 - CT");
@@ -101,12 +102,38 @@ void QmitkCustomMultiWidget::InitializeRenderWindowWidgets()
   */
 }
 
+void QmitkCustomMultiWidget::ResetLayout(int row, int column)
+{
+  int neededRenderWindowWidgets = (row + 1) * (column + 1);
+  int existingRenderWindowWidgets = m_RenderWindowWidgets.size();
+
+  int difference = neededRenderWindowWidgets - existingRenderWindowWidgets;
+  while(0 < difference)
+  {
+    // more render window widgets needed
+    CreateRenderWindowWidget();
+    --difference;
+  }
+  while(0 > difference)
+  {
+    // less render window widgets needed
+    RemoveRenderWindowWidget(m_RenderWindowWidgets.rbegin()->first);
+    ++difference;
+  }
+
+  InitializeGUI();
+  if (0 == difference)
+  {
+    FillLayout(row, column);
+  }
+}
+
 QmitkCustomMultiWidget::RenderWindowWidgetMap QmitkCustomMultiWidget::GetRenderWindowWidgets() const
 {
   return m_RenderWindowWidgets;
 }
 
-QmitkRenderWindowWidget* QmitkCustomMultiWidget::GetRenderWindowWidget(const QString& widgetID) const
+std::shared_ptr<QmitkRenderWindowWidget> QmitkCustomMultiWidget::GetRenderWindowWidget(const QString& widgetID) const
 {
   RenderWindowWidgetMap::const_iterator it = m_RenderWindowWidgets.find(widgetID);
   if (it == m_RenderWindowWidgets.end())
@@ -117,29 +144,55 @@ QmitkRenderWindowWidget* QmitkCustomMultiWidget::GetRenderWindowWidget(const QSt
   return it->second;
 }
 
-void QmitkCustomMultiWidget::AddRenderWindowWidget(int row, int column, const std::string& cornerAnnotation/* = ""*/)
+QString QmitkCustomMultiWidget::CreateRenderWindowWidget(const std::string& cornerAnnotation/* = ""*/)
 {
   // create the render window widget and connect signals / slots
   mitk::UIDGenerator generator;
   std::string renderWindowUID = generator.GetUID();
   QString UID = m_MultiWidgetName + "_" + QString::fromStdString(renderWindowUID);
-  QmitkRenderWindowWidget* renderWindowWidget = new QmitkRenderWindowWidget(this, UID, m_DataStorage);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, UID, m_DataStorage);
   renderWindowWidget->SetCornerAnnotationText(cornerAnnotation);
 
   // create connections
-  connect(renderWindowWidget, SIGNAL(ResetView()), this, SLOT(ResetCrosshair()));
-  connect(renderWindowWidget, SIGNAL(ChangeCrosshairRotationMode(int)), this, SLOT(SetWidgetPlaneMode(int)));
+  //connect(renderWindowWidget.get(), SIGNAL(ResetView()), this, SLOT(ResetCrosshair()));
+  //connect(renderWindowWidget.get(), SIGNAL(ChangeCrosshairRotationMode(int)), this, SLOT(SetWidgetPlaneMode(int)));
 
   // store the newly created render window widget with the UID
-  m_RenderWindowWidgets.insert(std::pair<QString, QmitkRenderWindowWidget*>(UID, renderWindowWidget));
+  m_RenderWindowWidgets.insert(std::make_pair(UID, renderWindowWidget));
 
-  // add the newly created render window widget to this multi widget
-  m_CustomMultiWidgetLayout->addWidget(renderWindowWidget, row, column);
+  return UID;
+}
+
+void QmitkCustomMultiWidget::AddToMultiWidgetLayout(int row, int column, const QString& widgetID)
+{
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = GetRenderWindowWidget(widgetID);
+  if (nullptr != renderWindowWidget)
+  {
+    m_CustomMultiWidgetLayout->addWidget(renderWindowWidget.get(), row, column);
+  }
+}
+
+void QmitkCustomMultiWidget::RemoveRenderWindowWidget(const QString& widgetID)
+{
+  auto iterator = m_RenderWindowWidgets.find(widgetID);
+  if (iterator == m_RenderWindowWidgets.end())
+  {
+    return;
+  }
+
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidgetToRemove = iterator->second;
+  disconnect(renderWindowWidgetToRemove.get(), 0, 0, 0);
+
+  // erase the render window from the map
+  m_RenderWindowWidgets.erase(iterator);
+
+  // remove from layout
+  // #TODO
 }
 
 QmitkRenderWindow* QmitkCustomMultiWidget::GetRenderWindow(const QString& widgetID) const
 {
-  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     return renderWindowWidget->GetRenderWindow();
@@ -148,13 +201,13 @@ QmitkRenderWindow* QmitkCustomMultiWidget::GetRenderWindow(const QString& widget
   return nullptr;
 }
 
-QmitkRenderWindowWidget* QmitkCustomMultiWidget::GetActiveRenderWindowWidget() const
+std::shared_ptr<QmitkRenderWindowWidget> QmitkCustomMultiWidget::GetActiveRenderWindowWidget() const
 {
   //return m_ActiveRenderWindowWidget;
   return m_RenderWindowWidgets.begin()->second;
 }
 
-QmitkRenderWindowWidget* QmitkCustomMultiWidget::GetFirstRenderWindowWidget() const
+std::shared_ptr<QmitkRenderWindowWidget> QmitkCustomMultiWidget::GetFirstRenderWindowWidget() const
 {
   if (!m_RenderWindowWidgets.empty())
   {
@@ -166,7 +219,7 @@ QmitkRenderWindowWidget* QmitkCustomMultiWidget::GetFirstRenderWindowWidget() co
   }
 }
 
-QmitkRenderWindowWidget* QmitkCustomMultiWidget::GetLastRenderWindowWidget() const
+std::shared_ptr<QmitkRenderWindowWidget> QmitkCustomMultiWidget::GetLastRenderWindowWidget() const
 {
   if (!m_RenderWindowWidgets.empty())
   {
@@ -185,7 +238,7 @@ unsigned int QmitkCustomMultiWidget::GetNumberOfRenderWindowWidgets() const
 
 void QmitkCustomMultiWidget::RequestUpdate(const QString& widgetID)
 {
-  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     return renderWindowWidget->RequestUpdate();
@@ -202,7 +255,7 @@ void QmitkCustomMultiWidget::RequestUpdateAll()
 
 void QmitkCustomMultiWidget::ForceImmediateUpdate(const QString& widgetID)
 {
-  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     renderWindowWidget->ForceImmediateUpdate();
@@ -251,7 +304,7 @@ const mitk::Point3D QmitkCustomMultiWidget::GetCrossPosition(const QString& widg
 //////////////////////////////////////////////////////////////////////////
 void QmitkCustomMultiWidget::ShowLevelWindowWidget(const QString& widgetID, bool show)
 {
-  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     renderWindowWidget->ShowLevelWindowWidget(show);
@@ -369,7 +422,7 @@ void QmitkCustomMultiWidget::HandleCrosshairPositionEventDelayed()
 
 void QmitkCustomMultiWidget::MoveCrossToPosition(const QString& widgetID, const mitk::Point3D& newPosition)
 {
-  QmitkRenderWindowWidget* renderWindowWidget = GetRenderWindowWidget(widgetID);
+  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     renderWindowWidget->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
@@ -421,6 +474,7 @@ void QmitkCustomMultiWidget::moveEvent(QMoveEvent* e)
 //////////////////////////////////////////////////////////////////////////
 void QmitkCustomMultiWidget::InitializeGUI()
 {
+  delete m_CustomMultiWidgetLayout;
   m_CustomMultiWidgetLayout = new QGridLayout(this);
   m_CustomMultiWidgetLayout->setContentsMargins(0, 0, 0, 0);
   setLayout(m_CustomMultiWidgetLayout);
@@ -445,6 +499,29 @@ void QmitkCustomMultiWidget::InitializeDisplayActionEventHandling()
   m_StdDisplayActionEventHandler = std::make_unique<mitk::StdDisplayActionEventHandler>();
   m_StdDisplayActionEventHandler->SetObservableBroadcast(m_DisplayActionEventBroadcast);
   m_StdDisplayActionEventHandler->InitStdActions();
+}
+
+void QmitkCustomMultiWidget::FillLayout(int row, int column)
+{
+  int r = 0;
+  int c = 0;
+  for (const auto& renderWindowWidget : m_RenderWindowWidgets)
+  {
+    AddToMultiWidgetLayout(r, c, renderWindowWidget.first);
+
+    c += 1;
+    if (c > column)
+    {
+      // first column
+      c = 0;
+      // next row
+      r += 1;
+      if (r > row)
+      {
+        return;
+      }
+    }
+  }
 }
 
 mitk::DataNode::Pointer QmitkCustomMultiWidget::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes)

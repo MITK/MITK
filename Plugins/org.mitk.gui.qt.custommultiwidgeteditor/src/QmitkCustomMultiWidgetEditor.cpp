@@ -32,6 +32,7 @@ const QString QmitkCustomMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.custom
 QmitkCustomMultiWidgetEditor::QmitkCustomMultiWidgetEditor()
   : m_CustomMultiWidget(nullptr)
   , m_MouseModeSwitcher(nullptr)
+  , m_ConfigurationToolBar(nullptr)
 {
   // nothing here
 }
@@ -147,6 +148,14 @@ QmitkCustomMultiWidget* QmitkCustomMultiWidgetEditor::GetCustomMultiWidget()
   return m_CustomMultiWidget;
 }
 
+void QmitkCustomMultiWidgetEditor::OnLayoutSet(int row, int column)
+{
+  m_CustomMultiWidget->ResetLayout(row, column);
+}
+
+//////////////////////////////////////////////////////////////////////////
+// PRIVATE
+//////////////////////////////////////////////////////////////////////////
 void QmitkCustomMultiWidgetEditor::SetFocus()
 {
   if (nullptr != m_CustomMultiWidget)
@@ -181,7 +190,14 @@ void QmitkCustomMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     m_CustomMultiWidget->SetDataStorage(GetDataStorage());
     m_CustomMultiWidget->InitializeRenderWindowWidgets();
 
+    // create right toolbar: configuration toolbar to change the render window widget layout
+    if (nullptr == m_ConfigurationToolBar)
+    {
+      m_ConfigurationToolBar = new QmitkMultiWidgetConfigurationToolBar(m_CustomMultiWidget);
+      layout->addWidget(m_ConfigurationToolBar);
+    }
 
+    connect(m_ConfigurationToolBar, SIGNAL(LayoutSet(int, int)), SLOT(OnLayoutSet(int, int)));
     m_MultiWidgetDecorationManager = std::make_unique<QmitkMultiWidgetDecorationManager>(m_CustomMultiWidget);
 
     OnPreferencesChanged(preferences);

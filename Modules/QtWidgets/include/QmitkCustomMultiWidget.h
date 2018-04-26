@@ -65,17 +65,22 @@ public:
   void SetDataStorage(mitk::DataStorage* dataStorage);
   void InitializeRenderWindowWidgets();
 
-  using RenderWindowWidgetMap = std::map<QString, QmitkRenderWindowWidget*>;
+  void ResetLayout(int row, int column);
+
+  using RenderWindowWidgetMap = std::map<QString, std::shared_ptr<QmitkRenderWindowWidget>>;
   using RenderWindowHash = QHash<QString, QmitkRenderWindow*>;
   RenderWindowWidgetMap GetRenderWindowWidgets() const;
-  QmitkRenderWindowWidget* GetRenderWindowWidget(const QString& widgetID) const;
+  std::shared_ptr<QmitkRenderWindowWidget> GetRenderWindowWidget(const QString& widgetID) const;
 
-  void AddRenderWindowWidget(int row, int column, const std::string& cornerAnnotation = "");
+  QString CreateRenderWindowWidget(const std::string& cornerAnnotation = "");
+  void AddToMultiWidgetLayout(int row, int column, const QString& widgetID);
+  void RemoveRenderWindowWidget(const QString& widgetID);
+
   QmitkRenderWindow* GetRenderWindow(const QString& widgetID) const;
 
-  QmitkRenderWindowWidget* GetActiveRenderWindowWidget() const;
-  QmitkRenderWindowWidget* GetFirstRenderWindowWidget() const;
-  QmitkRenderWindowWidget* GetLastRenderWindowWidget() const;
+  std::shared_ptr<QmitkRenderWindowWidget> GetActiveRenderWindowWidget() const;
+  std::shared_ptr<QmitkRenderWindowWidget> GetFirstRenderWindowWidget() const;
+  std::shared_ptr<QmitkRenderWindowWidget> GetLastRenderWindowWidget() const;
   
   unsigned int GetNumberOfRenderWindowWidgets() const;
 
@@ -136,6 +141,8 @@ private:
   void InitializeGUI();
   void InitializeWidget();
   void InitializeDisplayActionEventHandling();
+
+  void FillLayout(int row, int column);
   
   // #TODO: see T24173
   mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes);

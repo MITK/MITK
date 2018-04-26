@@ -17,6 +17,8 @@ set(CPP_FILES
   QmitkLineEditLevelWindowWidget.cpp
   QmitkMemoryUsageIndicatorView.cpp
   QmitkMimeTypes.cpp
+  QmitkMultiWidgetConfigurationToolBar.cpp
+  QmitkMultiWidgetLayoutSelectionWidget.cpp
   QmitkNodeDescriptor.cpp
   QmitkNodeDescriptorManager.cpp
   QmitkRenderWindowMenu.cpp
@@ -53,6 +55,8 @@ set(MOC_H_FILES
   include/QmitkLevelWindowWidget.h
   include/QmitkLineEditLevelWindowWidget.h
   include/QmitkMemoryUsageIndicatorView.h
+  include/QmitkMultiWidgetConfigurationToolBar.h
+  include/QmitkMultiWidgetLayoutSelectionWidget.h
   include/QmitkNodeDescriptor.h
   include/QmitkNodeDescriptorManager.h
   include/QmitkRenderWindowMenu.h
@@ -79,6 +83,7 @@ set(UI_FILES
   src/QmitkLevelWindowWidget.ui
   src/QmitkLevelWindowRangeChange.ui
   src/QmitkMemoryUsageIndicator.ui
+  src/QmitkMultiWidgetLayoutSelectionWidget.ui
   src/QmitkServiceListWidgetControls.ui
 )
 

@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt widgets module
 #include <QmitkCustomMultiWidget.h>
 #include <QmitkMouseModeSwitcher.h>
+#include <QmitkMultiWidgetConfigurationToolBar.h>
 
 #include <memory>
 
@@ -106,6 +107,10 @@ public:
 
   QmitkCustomMultiWidget* GetCustomMultiWidget();
 
+private slots:
+
+  void OnLayoutSet(int row, int column);
+
 private:
   /**
   * @brief Overridden from QmitkAbstractRenderEditor
@@ -128,6 +133,7 @@ private:
 
   QmitkCustomMultiWidget* m_CustomMultiWidget;
   QmitkMouseModeSwitcher* m_MouseModeSwitcher;
+  QmitkMultiWidgetConfigurationToolBar* m_ConfigurationToolBar;
   std::unique_ptr<QmitkMultiWidgetDecorationManager> m_MultiWidgetDecorationManager;
 
 };

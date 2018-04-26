@@ -101,10 +101,14 @@ bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTo
 
 mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::NavigationTool::Pointer Tool)
   {
-  mitk::DataNode::Pointer thisTool = mitk::DataNode::New();
+    mitk::DataNode::Pointer thisTool = Tool->GetDataNode();
   //Name
-    if (Tool->GetDataNode().IsNull()) thisTool->SetName("none");
-    else thisTool->SetName(Tool->GetDataNode()->GetName().c_str());
+    if (Tool->GetDataNode().IsNull())
+    {
+      thisTool = mitk::DataNode::New();
+      thisTool->SetName("none");
+    }
+    
   //Identifier
     thisTool->AddProperty("identifier",mitk::StringProperty::New(Tool->GetIdentifier().c_str()));
   //Serial Number
@@ -115,16 +119,6 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
     thisTool->AddProperty("tracking tool type",mitk::IntProperty::New(Tool->GetType()));
   //Calibration File Name
     thisTool->AddProperty("toolfileName",mitk::StringProperty::New(GetFileWithoutPath(Tool->GetCalibrationFile())));
-  //Surface
-    if (Tool->GetDataNode().IsNotNull()) if (Tool->GetDataNode()->GetData() != nullptr)
-    {
-      thisTool->SetData(Tool->GetDataNode()->GetData());
-  //Visibility
-      bool visible = true;
-      Tool->GetDataNode()->GetVisibility(visible, nullptr);
-      thisTool->SetVisibility(visible);
-    }
-
   //Tool Landmarks
     thisTool->AddProperty("ToolRegistrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolLandmarks())));
     thisTool->AddProperty("ToolCalibrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolControlPoints())));
@@ -136,11 +130,11 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
       thisTool->AddProperty("ToolAxisOrientation",mitk::StringProperty::New(ConvertQuaternionToString(Tool->GetToolAxisOrientation())));
     }
 
-    //Tool Axis
+  //Tool Axis
     thisTool->AddProperty("ToolAxis", mitk::StringProperty::New(ConvertPointToString(Tool->GetToolAxis())));
 
-  ////Material is not needed, to avoid errors in scene serialization we have to do this:
-    thisTool->ReplaceProperty("material",nullptr);
+  //Material is not needed, to avoid errors in scene serialization we have to do this:
+    thisTool->RemoveProperty("material");
 
 
   return thisTool;

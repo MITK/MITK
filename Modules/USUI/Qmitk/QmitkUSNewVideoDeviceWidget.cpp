@@ -755,7 +755,7 @@ void QmitkUSNewVideoDeviceWidget::AddProbesToDevice(mitk::USVideoDevice::Pointer
   }
 }
 
-mitk::USProbe::Pointer QmitkUSNewVideoDeviceWidget::CheckIfProbeExistsAlready(std::string &probeName)
+mitk::USProbe::Pointer QmitkUSNewVideoDeviceWidget::CheckIfProbeExistsAlready(const std::string &probeName)
 {
   for( std::vector<mitk::USProbe::Pointer>::iterator it = m_ConfigProbes.begin();
        it != m_ConfigProbes.end(); it++ )

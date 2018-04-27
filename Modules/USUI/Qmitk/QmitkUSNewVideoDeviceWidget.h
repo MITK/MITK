@@ -135,7 +135,7 @@ protected:
 
   void AddProbesToDevice(mitk::USVideoDevice::Pointer device);
 
-  mitk::USProbe::Pointer CheckIfProbeExistsAlready(std::string &probe);
+  mitk::USProbe::Pointer CheckIfProbeExistsAlready(const std::string &probe);
 
   void CollectUltrasoundVideoDeviceConfigInformation(mitk::USDeviceReaderXML::USVideoDeviceConfigData &config);
 

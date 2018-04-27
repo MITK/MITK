@@ -76,18 +76,18 @@ if(MITK_USE_Qt5)
     set(_prefix ".lib")
     if(APPLE)
       set(_ext ".dylib")
-      set(_configs "CONFIGURATIONS Release")
+      set(_configs CONFIGURATIONS Release)
       install(FILES "${_qmake_path}/../plugins/platforms/${_prefix}qcocoa${_ext}"
-             DESTINATION "bin/plugins/platforms"
-             ${_configs})
+              DESTINATION "bin/plugins/platforms"
+              ${_configs})
       get_filename_component(ABS_DIR_HELPERS "${_qmake_path}/../lib/QtWebEngineCore.framework/Helpers" REALPATH)
       MITK_INSTALL_HELPER_APP(EXECUTABLES "${ABS_DIR_HELPERS}/QtWebEngineProcess")
     else()
       set(_ext "so")
       set(_configs "")
       install(FILES "${_qmake_path}/../plugins/platforms/${_prefix}qxcb${_ext}"
-             DESTINATION "bin/plugins/platforms"
-             ${_configs})
+              DESTINATION "bin/plugins/platforms"
+              ${_configs})
       install(FILES "${_qmake_path}/../plugins/xcbglintegrations/${_prefix}qxcb-glx-integration${_ext}"
               DESTINATION "bin/plugins/xcbglintegrations"
               ${_configs})

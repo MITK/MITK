@@ -9,6 +9,7 @@ set(SRC_CPP_FILES
   QmitkNodeSelectionDialog.cpp
   QmitkAbstractNodeSelectionWidget.cpp
   QmitkMultiNodeSelectionWidget.cpp
+  QmitkNodeSelectionPreferenceHelper.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -16,12 +17,15 @@ set(INTERNAL_CPP_FILES
   QmitkDataNodeItemModel.cpp
   QmitkDataNodeSelection.cpp
   QmitkViewCoordinator.cpp
+  QmitkNodeSelectionConstants.cpp
+  QmitkNodeSelectionPreferencePage.cpp
 )
 
 set(UI_FILES
   src/QmitkSingleNodeSelectionWidget.ui
   src/QmitkMultiNodeSelectionWidget.ui
   src/QmitkNodeSelectionDialog.ui
+  src/internal/QmitkNodeSelectionPreferencePage.ui
 )
 
 set(MOC_H_FILES
@@ -34,9 +38,11 @@ set(MOC_H_FILES
   src/QmitkAbstractNodeSelectionWidget.h
   src/QmitkMultiNodeSelectionWidget.h
   src/internal/QmitkCommonActivator.h
+  src/internal/QmitkNodeSelectionPreferencePage.h
 )
 
 set(CACHED_RESOURCE_FILES
+  plugin.xml
 )
 
 set(QRC_FILES

@@ -63,11 +63,13 @@ public:
 
     for (unsigned int iteration = 0; iteration < NUM_ITERATIONS; ++iteration)
     {
+      // fill image with zeros
       for (unsigned int i = 0; i < DATA_DIM*DATA_DIM*DATA_DIM; ++i)
       {
         data[i] = 0;
       }
 
+      // write specific frequencies to the image
       if(HighPass != -1)
         addFrequency(randDistrHighPass(randGen), TIME_SPACING, data, dimension);
       if(LowPass != -1)
@@ -88,6 +90,7 @@ public:
       mitk::ImageReadAccessor readAccess(outputImage);
       const float* outputData = (const float*)readAccess.GetData();
 
+      // the resulting image should consist only of zeros, as we filtered the frequencies out
       for (unsigned int z = 0; z < DATA_DIM; ++z)
       {
         for (unsigned int y = 0; y < DATA_DIM; ++y)
@@ -105,6 +108,7 @@ public:
     delete[] data;
   }
 
+  // write a fixed-frequency signal to the image
   void addFrequency(float freq, float timeSpacing, float* data, unsigned int* dim)
   {
     for(unsigned int z = 0; z < dim[2]; ++z)

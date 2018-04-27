@@ -110,6 +110,7 @@ public:
 private slots:
 
   void OnLayoutSet(int row, int column);
+  void OnSynchronize(bool synchronized);
 
 private:
   /**

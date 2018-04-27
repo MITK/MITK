@@ -153,6 +153,11 @@ void QmitkCustomMultiWidgetEditor::OnLayoutSet(int row, int column)
   m_CustomMultiWidget->ResetLayout(row, column);
 }
 
+void QmitkCustomMultiWidgetEditor::OnSynchronize(bool synchronized)
+{
+  m_CustomMultiWidget->Synchronize(synchronized);
+}
+
 //////////////////////////////////////////////////////////////////////////
 // PRIVATE
 //////////////////////////////////////////////////////////////////////////
@@ -198,6 +203,7 @@ void QmitkCustomMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     }
 
     connect(m_ConfigurationToolBar, SIGNAL(LayoutSet(int, int)), SLOT(OnLayoutSet(int, int)));
+    connect(m_ConfigurationToolBar, SIGNAL(Synchronized(bool)), SLOT(OnSynchronize(bool)));
     m_MultiWidgetDecorationManager = std::make_unique<QmitkMultiWidgetDecorationManager>(m_CustomMultiWidget);
 
     OnPreferencesChanged(preferences);

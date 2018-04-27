@@ -54,7 +54,13 @@ void QmitkMultiWidgetConfigurationToolBar::AddButtons()
 
   QToolBar::addAction(setLayoutAction);
 
+  m_SynchronizeAction = new QAction(QIcon(":/Qmitk/cmwSynchronized.png"), tr("Desynchronize render windows"), this);
+  m_SynchronizeAction->setActionGroup(m_ActionGroup);
+  connect(m_SynchronizeAction, SIGNAL(triggered()), SLOT(OnSynchronize()));
 
+  m_Synchronized = true;
+
+  QToolBar::addAction(m_SynchronizeAction);
 }
 
 void QmitkMultiWidgetConfigurationToolBar::OnSetLayout()
@@ -67,7 +73,19 @@ void QmitkMultiWidgetConfigurationToolBar::OnSetLayout()
   }
 }
 
+void QmitkMultiWidgetConfigurationToolBar::OnSynchronize()
 {
+  m_Synchronized = !m_Synchronized;
+  if (m_Synchronized)
   {
+    m_SynchronizeAction->setIcon(QIcon(":/Qmitk/cmwSynchronized.png"));
+    m_SynchronizeAction->setText(tr("Desynchronize render windows"));
   }
+  else
+  {
+    m_SynchronizeAction->setIcon(QIcon(":/Qmitk/cmwDesynchronized.png"));
+    m_SynchronizeAction->setText(tr("Synchronize render windows"));
+  }
+
+  emit Synchronized(m_Synchronized);
 }

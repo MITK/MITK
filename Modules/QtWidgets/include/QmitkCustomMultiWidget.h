@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include <mitkDisplayActionEventBroadcast.h>
 #include <mitkMouseModeSwitcher.h>
-#include <mitkStdDisplayActionEventHandler.h>
+#include <mitkDisplayActionEventHandler.h>
 
 // qt
 #include <QWidget>
@@ -66,6 +66,7 @@ public:
   void InitializeRenderWindowWidgets();
 
   void ResetLayout(int row, int column);
+  void Synchronize(bool synchronized);
 
   using RenderWindowWidgetMap = std::map<QString, std::shared_ptr<QmitkRenderWindowWidget>>;
   using RenderWindowHash = QHash<QString, QmitkRenderWindow*>;
@@ -161,7 +162,8 @@ private:
   mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
 
   mitk::DisplayActionEventBroadcast::Pointer m_DisplayActionEventBroadcast;
-  std::unique_ptr<mitk::StdDisplayActionEventHandler> m_StdDisplayActionEventHandler;
+  std::unique_ptr<mitk::DisplayActionEventHandler> m_DisplayActionEventHandler;
+  bool m_Synchronized;
 
   mitk::DataStorage::Pointer m_DataStorage;
 

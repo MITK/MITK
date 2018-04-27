@@ -42,10 +42,12 @@ public:
 signals:
 
   void LayoutSet(int row, int column);
+  void Synchronized(bool synchronized);
 
 protected slots:
 
   void OnSetLayout();
+  void OnSynchronize();
 
 private:
 
@@ -54,6 +56,9 @@ private:
 
   QActionGroup* m_ActionGroup;
   QmitkCustomMultiWidget* m_CustomMultiWidget;
+
+  QAction* m_SynchronizeAction;
+  bool m_Synchronized;
 
   QmitkMultiWidgetLayoutSelectionWidget* m_LayoutSelectionPopup;
 

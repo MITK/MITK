@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKDISPLAYACTIONEVENTFUNCTIONS_H
 #define MITKDISPLAYACTIONEVENTFUNCTIONS_H
 
+#include <MitkCoreExports.h>
+
 #include "mitkStdFunctionCommand.h"
 
 namespace mitk
@@ -28,26 +30,50 @@ namespace mitk
     *   The command  performs a move of the camera controller of the sending renderer by a vector
     *   that was previously determined by the mouse interaction event.
     */
-    StdFunctionCommand::ActionFunction MoveSenderCameraAction();
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction MoveSenderCameraAction();
     /**
     * @brief Returns a command that reacts on the 'DisplaySetCrosshairEvent'.
     *   The command performs a slice selection of the slice navigation controller and will set
     *   the cross hair for all render windows.
     *   The new position was previously determined by the mouse interaction event.
     */
-    StdFunctionCommand::ActionFunction SetCrosshairAction();
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetCrosshairAction();
     /**
     * @brief Returns a command that reacts on the 'DisplayZoomEvent'.
     *   The command performs a zoom of the camera controller of the sending renderer by a zoom factor
     *   that was previously determined by the mouse interaction event.
     */
-    StdFunctionCommand::ActionFunction ZoomSenderCameraAction();
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ZoomSenderCameraAction();
     /**
     * @brief Returns a command that reacts on the 'DisplayScrollEvent'.
     *   The command performs a slice scrolling of the slice navigation controller of the sending renderer.
     *   The new position was previously determined by the mouse interaction event.
     */
-    StdFunctionCommand::ActionFunction ScrollSliceStepperAction();
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ScrollSliceStepperAction();
+    /**
+    * @brief
+    *
+    *
+    */
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction MoveCameraSynchronizedAction();
+    /**
+    * @brief
+    *
+    *
+    */
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetCrosshairSynchronizedAction();
+    /**
+    * @brief
+    *
+    *
+    */
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ZoomCameraSynchronizedAction();
+    /**
+    * @brief
+    *
+    *
+    */
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction ScrollSliceStepperSynchronizedAction();
 
   } // end namespace DisplayActionEventFunctions
 } // end namespace mitk

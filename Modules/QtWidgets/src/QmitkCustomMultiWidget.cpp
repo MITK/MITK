@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVBoxLayout>
 
 // mitk core
+#include <mitkDisplayActionEventFunctions.h>
+#include <mitkDisplayActionEvents.h>
+
 #include <mitkUIDGenerator.h>
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkPixelTypeMultiplex.h>
@@ -57,7 +60,7 @@ QmitkCustomMultiWidget::QmitkCustomMultiWidget(QWidget* parent,
   , m_PendingCrosshairPositionEvent(false)
   , m_CrosshairNavigationEnabled(false)
   , m_DisplayActionEventBroadcast(nullptr)
-  , m_StdDisplayActionEventHandler(nullptr)
+  , m_DisplayActionEventHandler(nullptr)
   , m_DataStorage(nullptr)
 {
   // create widget manually
@@ -125,6 +128,47 @@ void QmitkCustomMultiWidget::ResetLayout(int row, int column)
   if (0 == difference)
   {
     FillLayout(row, column);
+  }
+}
+
+void QmitkCustomMultiWidget::Synchronize(bool synchronized)
+{
+  m_Synchronized = synchronized;
+  auto allObserverTags = m_DisplayActionEventHandler->GetAllObserverTags();
+  for (auto observerTag : allObserverTags)
+  {
+    m_DisplayActionEventHandler->DisconnectObserver(observerTag);
+  }
+
+  if (m_Synchronized)
+  {
+    mitk::StdFunctionCommand::ActionFunction actionFunction = mitk::DisplayActionEventFunctions::MoveCameraSynchronizedAction();
+    m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayMoveEvent(nullptr, mitk::Vector2D()), actionFunction);
+
+    actionFunction = mitk::DisplayActionEventFunctions::SetCrosshairSynchronizedAction();
+    m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplaySetCrosshairEvent(nullptr, mitk::Point3D()), actionFunction);
+
+    actionFunction = mitk::DisplayActionEventFunctions::ZoomCameraSynchronizedAction();
+    m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayZoomEvent(nullptr, 0.0, mitk::Point2D()), actionFunction);
+
+    actionFunction = mitk::DisplayActionEventFunctions::ScrollSliceStepperSynchronizedAction();
+    m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayScrollEvent(nullptr, 0), actionFunction);
+
+    // #TODO: set equal view direction for all render windows
+  }
+  else
+  {
+    mitk::StdFunctionCommand::ActionFunction actionFunction = mitk::DisplayActionEventFunctions::MoveSenderCameraAction();
+    m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayMoveEvent(nullptr, mitk::Vector2D()), actionFunction);
+
+    actionFunction = mitk::DisplayActionEventFunctions::SetCrosshairAction();
+    m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplaySetCrosshairEvent(nullptr, mitk::Point3D()), actionFunction);
+
+    actionFunction = mitk::DisplayActionEventFunctions::ZoomSenderCameraAction();
+    m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayZoomEvent(nullptr, 0.0, mitk::Point2D()), actionFunction);
+
+    actionFunction = mitk::DisplayActionEventFunctions::ScrollSliceStepperAction();
+    m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayScrollEvent(nullptr, 0), actionFunction);
   }
 }
 
@@ -496,9 +540,10 @@ void QmitkCustomMultiWidget::InitializeDisplayActionEventHandling()
   m_DisplayActionEventBroadcast->LoadStateMachine("DisplayInteraction.xml");
   m_DisplayActionEventBroadcast->SetEventConfig("DisplayConfigPACS.xml");
 
-  m_StdDisplayActionEventHandler = std::make_unique<mitk::StdDisplayActionEventHandler>();
-  m_StdDisplayActionEventHandler->SetObservableBroadcast(m_DisplayActionEventBroadcast);
-  m_StdDisplayActionEventHandler->InitStdActions();
+  m_DisplayActionEventHandler = std::make_unique<mitk::DisplayActionEventHandler>();
+  m_DisplayActionEventHandler->SetObservableBroadcast(m_DisplayActionEventBroadcast);
+
+  Synchronize(true);
 }
 
 void QmitkCustomMultiWidget::FillLayout(int row, int column)

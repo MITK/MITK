@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCameraController.h"
 #include "mitkDisplayActionEvents.h"
 
+//////////////////////////////////////////////////////////////////////////
+// STANDARD FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
 mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::MoveSenderCameraAction()
 {
   mitk::StdFunctionCommand::ActionFunction actionFunction = [](const itk::EventObject& displayInteractorEvent)
@@ -58,11 +61,11 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetC
 
       // concrete action
       auto allRenderWindows = sendingRenderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
-      for (auto renWin : allRenderWindows)
+      for (auto renderWindow : allRenderWindows)
       {
-        if (BaseRenderer::GetInstance(renWin)->GetMapperID() == BaseRenderer::Standard2D && renWin != sendingRenderer->GetRenderWindow())
+        if (BaseRenderer::GetInstance(renderWindow)->GetMapperID() == BaseRenderer::Standard2D && renderWindow != sendingRenderer->GetRenderWindow())
         {
-          BaseRenderer::GetInstance(renWin)->GetSliceNavigationController()->SelectSliceByPoint(displayActionEvent->GetPosition());
+          BaseRenderer::GetInstance(renderWindow)->GetSliceNavigationController()->SelectSliceByPoint(displayActionEvent->GetPosition());
         }
       }
     }
@@ -132,6 +135,149 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
       }
 
       sliceStepper->MoveSlice(displayActionEvent->GetSliceDelta());
+    }
+  };
+
+  return actionFunction;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// SYNCHRONIZED FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::MoveCameraSynchronizedAction()
+{
+  mitk::StdFunctionCommand::ActionFunction actionFunction = [](const itk::EventObject& displayInteractorEvent)
+  {
+    if (DisplayMoveEvent().CheckEvent(&displayInteractorEvent))
+    {
+      const DisplayMoveEvent* displayActionEvent = dynamic_cast<const DisplayMoveEvent*>(&displayInteractorEvent);
+      const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetSender();
+      if (nullptr == sendingRenderer)
+      {
+        return;
+      }
+
+      // concrete action
+      auto allRenderWindows = sendingRenderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
+      for (auto renderWindow : allRenderWindows)
+      {
+        if (BaseRenderer::GetInstance(renderWindow)->GetMapperID() == BaseRenderer::Standard2D)
+        {
+          BaseRenderer* currentRenderer = BaseRenderer::GetInstance(renderWindow);
+          currentRenderer->GetCameraController()->MoveBy(displayActionEvent->GetMoveVector());
+          currentRenderer->GetRenderingManager()->RequestUpdate(currentRenderer->GetRenderWindow());
+        }
+      }
+    }
+  };
+
+  return actionFunction;
+}
+
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetCrosshairSynchronizedAction()
+{
+  auto actionFunction = [](const itk::EventObject& displayInteractorEvent)
+  {
+    if (DisplaySetCrosshairEvent().CheckEvent(&displayInteractorEvent))
+    {
+      const DisplaySetCrosshairEvent* displayActionEvent = dynamic_cast<const DisplaySetCrosshairEvent*>(&displayInteractorEvent);
+      const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetSender();
+      if (nullptr == sendingRenderer)
+      {
+        return;
+      }
+
+      // concrete action
+      auto allRenderWindows = sendingRenderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
+      for (auto renderWindow : allRenderWindows)
+      {
+        if (BaseRenderer::GetInstance(renderWindow)->GetMapperID() == BaseRenderer::Standard2D)
+        {
+          BaseRenderer::GetInstance(renderWindow)->GetSliceNavigationController()->SelectSliceByPoint(displayActionEvent->GetPosition());
+        }
+      }
+    }
+  };
+
+  return actionFunction;
+}
+
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ZoomCameraSynchronizedAction()
+{
+  auto actionFunction = [](const itk::EventObject& displayInteractorEvent)
+  {
+    if (DisplayZoomEvent().CheckEvent(&displayInteractorEvent))
+    {
+      const DisplayZoomEvent* displayActionEvent = dynamic_cast<const DisplayZoomEvent*>(&displayInteractorEvent);
+      const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetSender();
+      if (nullptr == sendingRenderer)
+      {
+        return;
+      }
+
+      // concrete action
+      if (1.0 != displayActionEvent->GetZoomFactor())
+      {
+        auto allRenderWindows = sendingRenderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
+        for (auto renderWindow : allRenderWindows)
+        {
+          if (BaseRenderer::GetInstance(renderWindow)->GetMapperID() == BaseRenderer::Standard2D)
+          {
+            BaseRenderer* currentRenderer = BaseRenderer::GetInstance(renderWindow);
+            currentRenderer->GetCameraController()->Zoom(displayActionEvent->GetZoomFactor(), displayActionEvent->GetStartCoordinate());
+            currentRenderer->GetRenderingManager()->RequestUpdate(currentRenderer->GetRenderWindow());
+          }
+        }
+      }
+    }
+  };
+
+  return actionFunction;
+}
+
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::ScrollSliceStepperSynchronizedAction()
+{
+  auto actionFunction = [](const itk::EventObject& displayInteractorEvent)
+  {
+    if (DisplayScrollEvent().CheckEvent(&displayInteractorEvent))
+    {
+      const DisplayScrollEvent* displayActionEvent = dynamic_cast<const DisplayScrollEvent*>(&displayInteractorEvent);
+      const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetSender();
+      if (nullptr == sendingRenderer)
+      {
+        return;
+      }
+
+      // concrete action
+      auto allRenderWindows = sendingRenderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
+      for (auto renderWindow : allRenderWindows)
+      {
+        if (BaseRenderer::GetInstance(renderWindow)->GetMapperID() == BaseRenderer::Standard2D)
+        {
+          mitk::SliceNavigationController* sliceNavigationController = BaseRenderer::GetInstance(renderWindow)->GetSliceNavigationController();
+          if (nullptr == sliceNavigationController)
+          {
+            return;
+          }
+          if (sliceNavigationController->GetSliceLocked())
+          {
+            return;
+          }
+          mitk::Stepper* sliceStepper = sliceNavigationController->GetSlice();
+          if (nullptr == sliceStepper)
+          {
+            return;
+          }
+
+          // if only a single slice image was loaded, scrolling will affect the time steps
+          if (sliceStepper->GetSteps() <= 1)
+          {
+            sliceStepper = sliceNavigationController->GetTime();
+          }
+
+          sliceStepper->MoveSlice(displayActionEvent->GetSliceDelta());
+        }
+      }
     }
   };
 

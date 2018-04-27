@@ -100,6 +100,7 @@ public:
     {
       CPPUNIT_ASSERT_MESSAGE(std::string("Ouput array not correct: " + std::to_string(abs(outputArray[i]))), abs(outputArray[i]) < 1e-5f);
     }
+    delete[] dimensions;
   }
 
   void tearDown() override

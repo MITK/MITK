@@ -46,15 +46,15 @@ class mitkDispatcherTestSuite : public mitk::TestFixture
 
 private:
 
-  vtkRenderWindow *renWin;
-  mitk::VtkPropRenderer::Pointer renderer;
+  vtkRenderWindow *m_RenWin;
+  mitk::VtkPropRenderer::Pointer m_Renderer;
   
-  mitk::StandaloneDataStorage::Pointer ds;
-  mitk::DataNode::Pointer dn;
+  mitk::StandaloneDataStorage::Pointer m_Ds;
+  mitk::DataNode::Pointer m_Dn;
 
-  mitk::DataNode::Pointer dn2;
-  mitk::DataInteractor::Pointer ei;
-  mitk::DataInteractor::Pointer ei2;
+  mitk::DataNode::Pointer m_Dn2;
+  mitk::DataInteractor::Pointer m_Ei;
+  mitk::DataInteractor::Pointer m_Ei2;
 public:
 
   /*
@@ -66,142 +66,142 @@ public:
   void setUp()
   {
     // Here BindDispatcherInteractor and Dispatcher should be created automatically
-    renWin = vtkRenderWindow::New();
-    renderer = mitk::VtkPropRenderer::New("ContourRenderer", renWin, mitk::RenderingManager::GetInstance());
-    ds = mitk::StandaloneDataStorage::New();
-    dn = mitk::DataNode::New();
-    dn2 = mitk::DataNode::New();
-    ei = mitk::DataInteractor::New();
-    ei2 = mitk::DataInteractor::New();
-    renderer->SetDataStorage(ds);
+    m_RenWin = vtkRenderWindow::New();
+    m_Renderer = mitk::VtkPropRenderer::New("ContourRenderer", m_RenWin, mitk::RenderingManager::GetInstance());
+    m_Ds = mitk::StandaloneDataStorage::New();
+    m_Dn = mitk::DataNode::New();
+    m_Dn2 = mitk::DataNode::New();
+    m_Ei = mitk::DataInteractor::New();
+    m_Ei2 = mitk::DataInteractor::New();
+    m_Renderer->SetDataStorage(m_Ds);
   }
 
   void tearDown()
   {
-    renWin->Delete();
-    renderer = nullptr;
-    ds = nullptr;
-    dn = nullptr;
-    dn2 = nullptr;
-    ei = nullptr;
-    ei2 = nullptr;
+    m_RenWin->Delete();
+    m_Renderer = nullptr;
+    m_Ds = nullptr;
+    m_Dn = nullptr;
+    m_Dn2 = nullptr;
+    m_Ei = nullptr;
+    m_Ei2 = nullptr;
   }
 
   void DispatcherExists_Success()
   {
     CPPUNIT_ASSERT_MESSAGE("01 Check Existence of Dispatcher.",
-      renderer->GetDispatcher()->GetNumberOfInteractors() == 0);
+      m_Renderer->GetDispatcher()->GetNumberOfInteractors() == 0);
   }
 
   void AddInteractorConnectedToDataStorage_IncreaseNumberOfInteractors()
   {
-    ei->SetDataNode(dn);
-    ds->Add(dn);
+    m_Ei->SetDataNode(m_Dn);
+    m_Ds->Add(m_Dn);
 
     CPPUNIT_ASSERT_MESSAGE("02 Expected number of registered Interactors is 1",
-                      renderer->GetDispatcher()->GetNumberOfInteractors() == 1);
+                      m_Renderer->GetDispatcher()->GetNumberOfInteractors() == 1);
   }
 
   void AddDataNodeToInteractor_NoIncreasedNumberOfInteractors()
   {
-    ei->SetDataNode(dn);
-    renderer->SetDataStorage(ds);
-    ds->Add(dn);
+    m_Ei->SetDataNode(m_Dn);
+    m_Renderer->SetDataStorage(m_Ds);
+    m_Ds->Add(m_Dn);
     // This _must not_ result in additionally registered interactors.
-    ei->SetDataNode(dn);
+    m_Ei->SetDataNode(m_Dn);
     CPPUNIT_ASSERT_MESSAGE("03 Expected number of registered Interactors is 1",
-                      renderer->GetDispatcher()->GetNumberOfInteractors() == 1);
+                      m_Renderer->GetDispatcher()->GetNumberOfInteractors() == 1);
   }
 
   void AddInteractorNotConnectedToDataStorage_NoRegisteredInteractor()
   {
     // Switching the DataNode of an Interactor also must not result in extra registered Interactors in Dispatcher
     // since dn2 is not connected to DataStorage
-    ei->SetDataNode(dn2);
+    m_Ei->SetDataNode(m_Dn2);
     
     CPPUNIT_ASSERT_MESSAGE("04 Expected number of registered Interactors is 0",
-                      renderer->GetDispatcher()->GetNumberOfInteractors() == 0);
+                      m_Renderer->GetDispatcher()->GetNumberOfInteractors() == 0);
   }
 
   void ConnectInteractorToDataStorage_ReplaceInteractorEntry()
   {
-    ei->SetDataNode(dn2);
+    m_Ei->SetDataNode(m_Dn2);
     // DataNode Added to DataStorage, now Interactor entry in Dispatcher should be replaced,
     // hence we restore Interactor in the Dispatcher
-    ds->Add(dn2);
+    m_Ds->Add(m_Dn2);
     
     CPPUNIT_ASSERT_MESSAGE("05 Expected number of registered Interactors is 1",
-                      renderer->GetDispatcher()->GetNumberOfInteractors() == 1);
+                      m_Renderer->GetDispatcher()->GetNumberOfInteractors() == 1);
   }
 
   void NewDataNodeAndInteractor_IncreasedNumberOfInteractors()
   {
-    ei->SetDataNode(dn2);
-    ds->Add(dn2);
-    ds->Add(dn);
+    m_Ei->SetDataNode(m_Dn2);
+    m_Ds->Add(m_Dn2);
+    m_Ds->Add(m_Dn);
     // New DataNode and new interactor, this should result in additional Interactor in the Dispatcher.
-    ei2->SetDataNode(dn);
+    m_Ei2->SetDataNode(m_Dn);
 
     CPPUNIT_ASSERT_MESSAGE("06 Exprected number of registered Interactors is 2",
-                       renderer->GetDispatcher()->GetNumberOfInteractors() == 2);
+                       m_Renderer->GetDispatcher()->GetNumberOfInteractors() == 2);
   }
 
   void InteractorsPointToSameDataNode_DecreasedNumberOfInteractors()
   {
-    ds->Add(dn2);
-    ds->Add(dn);
-    ei->SetDataNode(dn2);
-    ei2->SetDataNode(dn);
+    m_Ds->Add(m_Dn2);
+    m_Ds->Add(m_Dn);
+    m_Ei->SetDataNode(m_Dn2);
+    m_Ei2->SetDataNode(m_Dn);
     // Here ei and ei2 point to the same dn2; dn2 now only points to ei2, so ei is abandoned,
     // therefore ei1 is expected to be removed
     
-    ei2->SetDataNode(dn2);
+    m_Ei2->SetDataNode(m_Dn2);
     CPPUNIT_ASSERT_MESSAGE("07 Expected number of registered Interactors is 1",
-                      renderer->GetDispatcher()->GetNumberOfInteractors() == 1);
+                      m_Renderer->GetDispatcher()->GetNumberOfInteractors() == 1);
   }
 
   void SetDataNodeToNullptr_RemoveInteractor()
   {
-    ds->Add(dn2);
-    ei2->SetDataNode(dn2);
+    m_Ds->Add(m_Dn2);
+    m_Ei2->SetDataNode(m_Dn2);
     // Setting DataNode in Interactor to nullptr, should remove Interactor from Dispatcher
-    ei2->SetDataNode(nullptr);
+    m_Ei2->SetDataNode(nullptr);
     CPPUNIT_ASSERT_MESSAGE("08 Expected number of registered Interactors is 0",
-                    renderer->GetDispatcher()->GetNumberOfInteractors() == 0);
+                    m_Renderer->GetDispatcher()->GetNumberOfInteractors() == 0);
   }
 
   void RemoveDataNode_RemoveInteractor()
   {
     // Add DN again check if it is registered
-    ds->Add(dn);
-    ei2->SetDataNode(dn);
+    m_Ds->Add(m_Dn);
+    m_Ei2->SetDataNode(m_Dn);
     
     CPPUNIT_ASSERT_MESSAGE("09 Expected number of registered Interactors is 1",
-                      renderer->GetDispatcher()->GetNumberOfInteractors() == 1);
+                      m_Renderer->GetDispatcher()->GetNumberOfInteractors() == 1);
     
     // If DN is removed Interactors should be too
-    ds->Remove(dn);
+    m_Ds->Remove(m_Dn);
     CPPUNIT_ASSERT_MESSAGE("10 ExpectedNumber of registered Interactors is 0",
-                     renderer->GetDispatcher()->GetNumberOfInteractors() == 0);
+                     m_Renderer->GetDispatcher()->GetNumberOfInteractors() == 0);
   }
 
   void GetReferenceCountDataNode_Success()
   {
-    ds->Add(dn);
-    ei2->SetDataNode(dn);
-    ds->Remove(dn);
+    m_Ds->Add(m_Dn);
+    m_Ei2->SetDataNode(m_Dn);
+    m_Ds->Remove(m_Dn);
     // after DN is removed from DS its reference count must be back to one
     CPPUNIT_ASSERT_MESSAGE("11 Expected number of references of DataNode is 1",
-                                                  dn->GetReferenceCount() == 1);
+                                                  m_Dn->GetReferenceCount() == 1);
   }
 
   void GetReferenceCountInteractors_Success()
   {
-    ei->SetDataNode(dn2);
-    ds->Add(dn2);
-    ei2->SetDataNode(dn2);
+    m_Ei->SetDataNode(m_Dn2);
+    m_Ds->Add(m_Dn2);
+    m_Ei2->SetDataNode(m_Dn2);
     CPPUNIT_ASSERT_MESSAGE("12 Expected number of references of Interactors is 1",
-                                                     ei->GetReferenceCount() == 1);
+                                                     m_Ei->GetReferenceCount() == 1);
   }
 };
 MITK_TEST_SUITE_REGISTRATION(mitkDispatcher)

@@ -59,94 +59,58 @@ if(MACOSX_BUNDLE_NAMES)
   endforeach()
 endif()
 
-if(WIN32)
-  if(MITK_USE_Qt5)
-    get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
-                 PROPERTY IMPORT_LOCATION)
-    get_filename_component(_qmake_path "${_qmake_location}" DIRECTORY)
-    install(FILES "${_qmake_path}/../plugins/platforms/qwindows.dll"
+if(MITK_USE_Qt5)
+  get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
+               PROPERTY IMPORT_LOCATION)
+  get_filename_component(_qmake_path "${_qmake_location}" DIRECTORY)
+
+  if(WIN32)
+    set(_prefix "")
+    set(_ext ".dll")
+    set(_configs CONFIGURATIONS Release)
+    install(FILES "${_qmake_path}/../plugins/platforms/${_prefix}qwindows${_ext}"
             DESTINATION "bin/plugins/platforms"
-            CONFIGURATIONS Release)
-    install(FILES "${_qmake_path}/../plugins/sqldrivers/qsqlite.dll"
-            DESTINATION "bin/plugins/sqldrivers"
-            CONFIGURATIONS Release)
-    install(FILES "${_qmake_path}/../plugins/imageformats/qsvg.dll"
-            DESTINATION "bin/plugins/imageformats"
-            CONFIGURATIONS Release)
-    install(FILES "${_qmake_path}/../plugins/iconengines/qsvgicon.dll"
-            DESTINATION "bin/plugins/iconengines"
-            CONFIGURATIONS Release)
-
-    MITK_INSTALL( FILES "${_qmake_path}/QtWebEngineProcess.exe")
-
-    install(DIRECTORY "${_qmake_path}/../resources/"
-            DESTINATION "bin/resources/"
-            CONFIGURATIONS Release)
-    install(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales/"
-            DESTINATION "bin/translations/qtwebengine_locales/"
-            CONFIGURATIONS Release)
-    install(FILES "${_qmake_path}/../plugins/platforms/qwindowsd.dll"
-            DESTINATION "bin/plugins/platforms"
-            CONFIGURATIONS Debug)
-    install(FILES "${_qmake_path}/../plugins/sqldrivers/qsqlited.dll"
-            DESTINATION "bin/plugins/sqldrivers"
-            CONFIGURATIONS Debug)
-    install(FILES "${_qmake_path}/../plugins/imageformats/qsvgd.dll"
-            DESTINATION "bin/plugins/imageformats"
-            CONFIGURATIONS Debug)
-    install(FILES "${_qmake_path}/../plugins/iconengines/qsvgicond.dll"
-            DESTINATION "bin/plugins/iconengines"
-            CONFIGURATIONS Debug)
-    install(DIRECTORY "${_qmake_path}/../resources/"
-            DESTINATION "bin/resources/"
-            CONFIGURATIONS Debug)
-    install(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales/"
-            DESTINATION "bin/translations/qtwebengine_locales/"
-            CONFIGURATIONS Debug)
-  endif()
-
-else()
-
-  #DCMTK Dlls install target (shared libs on gcc only)
-  if(DCMTK_ofstd_LIBRARY)
-    set(_dcmtk_libs
-        ${DCMTK_dcmdata_LIBRARY}
-        ${DCMTK_dcmimgle_LIBRARY}
-        ${DCMTK_dcmnet_LIBRARY}
-        ${DCMTK_ofstd_LIBRARY}
-    )
-    foreach(_dcmtk_lib ${_dcmtk_libs})
-      #MITK_INSTALL(FILES ${_dcmtk_lib} DESTINATION lib)
-    endforeach()
-  endif()
-
-# We need to install Webengineprocess and related files on unix as well
-  if(UNIX)
-    if(MITK_USE_Qt5)
-      get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
-                 PROPERTY IMPORT_LOCATION)
-      get_filename_component(_qmake_path "${_qmake_location}" DIRECTORY)
-
-      install(FILES "${_qmake_path}/../plugins/platforms/libqxcb.so"
-              DESTINATION "bin/plugins/platforms")
-      install(FILES "${_qmake_path}/../plugins/sqldrivers/libqsqlite.so"
-              DESTINATION "bin/plugins/sqldrivers")
-      install(FILES "${_qmake_path}/../plugins/imageformats/libqsvg.so"
-              DESTINATION "bin/plugins/imageformats")
-      install(FILES "${_qmake_path}/../plugins/iconengines/libqsvgicon.so"
-              DESTINATION "bin/plugins/iconengines")
-      install(FILES "${_qmake_path}/../plugins/xcbglintegrations/libqxcb-glx-integration.so"
-              DESTINATION "bin/plugins/xcbglintegrations")
-
-      MITK_INSTALL_HELPER_APP( EXECUTABLES "${_qmake_path}/../libexec/QtWebEngineProcess")
-
-      install(DIRECTORY "${_qmake_path}/../resources/"
-              DESTINATION "bin/resources/")
-      install(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales/"
-              DESTINATION "bin/translations/qtwebengine_locales/")
+            ${_configs})
+    MITK_INSTALL(FILES "${_qmake_path}/QtWebEngineProcess.exe")
+  elseif(UNIX)
+    set(_prefix ".lib")
+    if(APPLE)
+      set(_ext ".dylib")
+      set(_configs "CONFIGURATIONS Release")
+      install(FILES "${_qmake_path}/../plugins/platforms/${_prefix}qcocoa${_ext}"
+             DESTINATION "bin/plugins/platforms"
+             ${_configs})
+      get_filename_component(ABS_DIR_HELPERS "${_qmake_path}/../lib/QtWebEngineCore.framework/Helpers" REALPATH)
+      MITK_INSTALL_HELPER_APP(EXECUTABLES "${ABS_DIR_HELPERS}/QtWebEngineProcess")
+    else()
+      set(_ext "so")
+      set(_configs "")
+      install(FILES "${_qmake_path}/../plugins/platforms/${_prefix}qxcb${_ext}"
+             DESTINATION "bin/plugins/platforms"
+             ${_configs})
+      install(FILES "${_qmake_path}/../plugins/xcbglintegrations/${_prefix}qxcb-glx-integration${_ext}"
+              DESTINATION "bin/plugins/xcbglintegrations"
+              ${_configs})
+      MITK_INSTALL_HELPER_APP(EXECUTABLES "${_qmake_path}/../libexec/QtWebEngineProcess")
     endif()
   endif()
 
+  install(FILES "${_qmake_path}/../plugins/sqldrivers/${_prefix}qsqlite${_ext}"
+          DESTINATION "bin/plugins/sqldrivers"
+          ${_configs})
+  install(FILES "${_qmake_path}/../plugins/imageformats/${_prefix}qsvg${_ext}"
+          DESTINATION "bin/plugins/imageformats"
+          ${_configs})
+  install(FILES "${_qmake_path}/../plugins/iconengines/${_prefix}qsvgicon${_ext}"
+          DESTINATION "bin/plugins/iconengines"
+          ${_configs})
+
+  install(DIRECTORY "${_qmake_path}/../resources/"
+          DESTINATION "bin/resources/"
+          ${_configs})
+  install(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales/"
+          DESTINATION "bin/translations/qtwebengine_locales/"
+          ${_configs})
 endif()
 
 #install Matchpoint libs that are currently not auto detected

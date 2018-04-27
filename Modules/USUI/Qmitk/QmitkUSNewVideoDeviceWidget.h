@@ -96,7 +96,7 @@ signals:
 
   void OnProbeChanged(const QString & probename);
 
-  void OnDepthChanged(int depth, mitk::USProbe* probe);
+  void OnDepthChanged(int depth, mitk::USProbe::Pointer probe);
 
   void OnDepthChanged(const QString &depth);
 

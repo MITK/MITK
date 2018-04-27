@@ -428,7 +428,7 @@ void QmitkUSNewVideoDeviceWidget::OnProbeChanged(const QString & probename)
   }
 }
 
-void QmitkUSNewVideoDeviceWidget::OnDepthChanged(int depth, mitk::USProbe* probe)
+void QmitkUSNewVideoDeviceWidget::OnDepthChanged(int depth, mitk::USProbe::Pointer probe)
 {
   if (m_Controls->m_Depths->count() == 0)
   {
@@ -439,7 +439,7 @@ void QmitkUSNewVideoDeviceWidget::OnDepthChanged(int depth, mitk::USProbe* probe
     return;
   }
 
-  if (probe != nullptr)
+  if (probe.IsNotNull())
   {
     mitk::Vector3D spacing = probe->GetSpacingForGivenDepth(depth);
     m_Controls->m_XSpacingSpinBox->setValue(spacing[0]);

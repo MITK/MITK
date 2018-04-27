@@ -19,22 +19,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkDataStorageInspectorGenerator.h>
 #include <QmitkDataStorageTreeInspector.h>
+#include <QmitkNodeSelectionPreferenceHelper.h>
 
 QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint) : QDialog(parent), m_NodePredicate(nullptr), m_SelectOnlyVisibleNodes(false)
 {
   m_Controls.setupUi(this);
 
   auto providers = QmitkDataStorageInspectorGenerator::GetProviders();
+  auto visibleProviders = mitk::GetVisibleDataStorageInspectors();
+  auto favoriteID = mitk::GetFavoriteDataStorageInspector();
 
-  for (auto provider : providers)
+  int favIndex = 0;
+  bool favoriteFound = false;
+  for (auto proIter : visibleProviders)
   {
-    auto inspector = provider.second->CreateInspector();
-    QString name = QString::fromStdString(provider.second->GetInspectorDisplayName());
-    QString desc = QString::fromStdString(provider.second->GetInspectorDescription());
-    AddPanel(inspector, name, desc);
+    auto finding = providers.find(proIter.second);
+    if (finding != providers.end())
+    {
+      auto inspector = finding->second->CreateInspector();
+      QString name = QString::fromStdString(finding->second->GetInspectorDisplayName());
+      QString desc = QString::fromStdString(finding->second->GetInspectorDescription());
+      AddPanel(inspector, name, desc);
+
+      favoriteFound = favoriteFound || proIter.second == favoriteID;
+      if (!favoriteFound)
+      {
+        ++favIndex;
+      }
+    }
+    else
+    {
+      MITK_DEBUG << "No provider registered for inspector that is defined as visible in the preferences. Illegal inspector ID: " << proIter.second;
+    }
   }
 
-  m_Controls.tabWidget->setCurrentIndex(0);
+  m_Controls.tabWidget->setCurrentIndex(favIndex);
   this->setWindowTitle(title);
   this->setToolTip(hint);
 
@@ -120,7 +139,7 @@ void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageInspector* view,
   auto tabPanel = new QWidget();
   tabPanel->setObjectName(QString("tab_")+name);
   tabPanel->setToolTip(desc);
-  m_Controls.tabWidget->insertTab(0, tabPanel, name);
+  m_Controls.tabWidget->insertTab(m_Controls.tabWidget->count(), tabPanel, name);
 
   auto verticalLayout = new QVBoxLayout(tabPanel);
   verticalLayout->setSpacing(0);

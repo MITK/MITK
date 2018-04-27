@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>482</width>
-    <height>230</height>
+    <height>211</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>QmitkToFVisualisationSettings</string>
   </property>
-  <layout class="QFormLayout" name="formLayout">
+  <layout class="QGridLayout" name="gridLayout_3">
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="font">
@@ -29,13 +29,6 @@
      </property>
      <property name="text">
       <string>ToF Visualization</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QCheckBox" name="m_AdvancedOptionsCheckbox">
-     <property name="text">
-      <string>Show advanced options</string>
      </property>
     </widget>
    </item>
@@ -205,6 +198,13 @@
      </item>
     </layout>
    </item>
+   <item row="0" column="1">
+    <widget class="QCheckBox" name="m_AdvancedOptionsCheckbox">
+     <property name="text">
+      <string>Show advanced options</string>
+     </property>
+    </widget>
+   </item>
    <item row="2" column="0" colspan="2">
     <widget class="QGroupBox" name="m_MappingGroupBox">
      <property name="title">
@@ -220,14 +220,20 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QGridLayout" name="gridLayout_2">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item row="0" column="0">
           <widget class="ctkRangeSlider" name="m_RangeSlider">
-           <property name="toolTip">
-            <string>modify actual seen window by dragging left and right slider. </string>
-           </property>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -236,16 +242,10 @@
          <item row="0" column="1">
           <widget class="QPushButton" name="m_RangeSliderReset">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>48</width>
-             <height>16777215</height>
-            </size>
            </property>
            <property name="toolTip">
             <string>Resets range to histogram minimum and maximum.</string>
@@ -261,16 +261,10 @@
       <item row="1" column="0" colspan="5">
        <widget class="QmitkColorTransferFunctionCanvas" name="m_ColorTransferFunctionCanvas" native="true">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
           <horstretch>1</horstretch>
           <verstretch>1</verstretch>
          </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>28</height>
-         </size>
         </property>
         <property name="font">
          <font/>
@@ -428,14 +422,14 @@ Double-click left mouse button to change color of a point.</string>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>ctkRangeSlider</class>
-   <extends>QWidget</extends>
-   <header location="global">ctkRangeSlider.h</header>
-  </customwidget>
-  <customwidget>
    <class>QmitkColorTransferFunctionCanvas</class>
    <extends>QWidget</extends>
    <header>QmitkColorTransferFunctionCanvas.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ctkRangeSlider</class>
+   <extends>QSlider</extends>
+   <header location="global">ctkRangeSlider.h</header>
   </customwidget>
  </customwidgets>
  <resources>

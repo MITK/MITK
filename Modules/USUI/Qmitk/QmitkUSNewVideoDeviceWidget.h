@@ -96,7 +96,7 @@ signals:
 
   void OnProbeChanged(const QString & probename);
 
-  void OnDepthChanged(int depth, mitk::USProbe* probe);
+  void OnDepthChanged(int depth, mitk::USProbe::Pointer probe);
 
   void OnDepthChanged(const QString &depth);
 
@@ -135,7 +135,7 @@ protected:
 
   void AddProbesToDevice(mitk::USVideoDevice::Pointer device);
 
-  mitk::USProbe::Pointer CheckIfProbeExistsAlready(std::string &probe);
+  mitk::USProbe::Pointer CheckIfProbeExistsAlready(const std::string &probe);
 
   void CollectUltrasoundVideoDeviceConfigInformation(mitk::USDeviceReaderXML::USVideoDeviceConfigData &config);
 

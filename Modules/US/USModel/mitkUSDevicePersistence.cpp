@@ -105,8 +105,6 @@ QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Po
   int resWidth = imageSource->GetResolutionOverrideWidth();
   int resHight = imageSource->GetResolutionOverrideHeight();
 
-  mitk::USImageVideoSource::USImageRoi roi = imageSource->GetRegionOfInterest();
-
   QString probes = ""; //ACV$100%1%1%0$120%2%2%0$140%2%2%5!BDW$90%1%1%2$100%1%1%8!CSV$50%1%2%3$60%2%2%5
 
   char probesSeperator = '!';

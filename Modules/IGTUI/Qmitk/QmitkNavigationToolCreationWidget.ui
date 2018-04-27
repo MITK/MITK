@@ -44,7 +44,7 @@
    <item>
     <widget class="QToolBox" name="toolBox">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page">
       <property name="geometry">
@@ -52,7 +52,7 @@
         <x>0</x>
         <y>0</y>
         <width>600</width>
-        <height>456</height>
+        <height>433</height>
        </rect>
       </property>
       <attribute name="label">
@@ -141,7 +141,7 @@
         <x>0</x>
         <y>0</y>
         <width>600</width>
-        <height>456</height>
+        <height>433</height>
        </rect>
       </property>
       <attribute name="label">
@@ -259,7 +259,7 @@
         <x>0</x>
         <y>0</y>
         <width>600</width>
-        <height>456</height>
+        <height>433</height>
        </rect>
       </property>
       <attribute name="label">
@@ -300,8 +300,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>276</width>
-        <height>161</height>
+        <width>600</width>
+        <height>433</height>
        </rect>
       </property>
       <attribute name="label">

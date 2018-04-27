@@ -28,7 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkOpenCVImageBridge.h"
 
 #include <MitkPhotoacousticsAlgorithmsExports.h>
+
 #include "mitkImageCast.h"
+#include <mitkOpenCVToMitkImageFilter.h>
 
 namespace mitk
 {
@@ -65,16 +67,17 @@ namespace mitk
 
   private:
     // InputData
-    mitk::Image::Pointer m_paImage, m_usImage;
+    mitk::Image::Pointer m_paImage, m_usImage, m_paCompensated, m_usCompensated;
     // Parameters
     double m_pyr_scale, m_poly_sigma;
-    int m_levels, m_winsize, m_iterations, m_poly_n, m_flags, m_batch;
+    unsigned int m_levels, m_winsize, m_iterations, m_poly_n, m_flags, m_batch;
     /* // Stuff that OpenCV needs */
-    cv::Mat m_startImage, m_stopImage, m_flow;
-    /* cv::UMat m_startImageG, m_StopImageG, m_uflow; */
+    cv::UMat m_UsRef, m_PaMat, m_UsMat, m_Flow;
+    cv::Mat m_PaRes, m_UsRes, m_PaMatC, m_UsMatC;
     // middle step conversion from MITK::image to cv::Mat
     // TODO: Note that there is always a float conversion inbetween
     itk::Image<float>::Pointer m_itkPaImage, m_itkUsImage;
+    mitk::OpenCVToMitkImageFilter::Pointer m_OpenCVToImageFilter = mitk::OpenCVToMitkImageFilter::New();
   };
 }
 #endif

@@ -80,7 +80,7 @@ void PAUSMotionCompensation::DoImageProcessing()
   if (!node)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information(nullptr, "Template", "Please load and select an image before starting image processing.");
+    QMessageBox::information(nullptr, "Template", "Please load and select 2 images before starting image processing.");
     return;
   }
 
@@ -106,6 +106,10 @@ void PAUSMotionCompensation::DoImageProcessing()
       MITK_INFO << message.str();
 
       // actually do something here...
+      m_Filter->SetInput(0, image);
+      m_Filter->SetInput(1, image);
+      m_Filter->Update();
+      node->SetData(m_Filter->GetOutput(0));
     }
   }
 }

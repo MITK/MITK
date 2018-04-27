@@ -56,7 +56,7 @@ protected:
 
   Ui::PAUSMotionCompensationControls m_Controls;
   
-  mitk::PhotoacousticMotionCorrectionFilter::Pointer filter = mitk::PhotoacousticMotionCorrectionFilter::New();
+  mitk::PhotoacousticMotionCorrectionFilter::Pointer m_Filter = mitk::PhotoacousticMotionCorrectionFilter::New();
 };
 
 #endif // PAUSMotionCompensation_h

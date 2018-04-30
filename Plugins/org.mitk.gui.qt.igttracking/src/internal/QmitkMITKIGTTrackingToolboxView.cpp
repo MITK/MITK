@@ -1397,9 +1397,9 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
       m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
       m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
     }
-    catch (mitk::IGTException)
+    catch (mitk::IGTException e)
     {
-      MITK_WARN("QmitkMITKIGTTrackingToolBoxView") << "Error during restoring tools. Problems with file (" << m_ToolStorageFilename.toStdString() << "), please check the file?";
+      MITK_WARN("QmitkMITKIGTTrackingToolBoxView") << "Error during restoring tools. Problems with file (" << m_ToolStorageFilename.toStdString() << "), please check the file? Error message: "<<e.GetDescription();
       this->OnResetTools(); //if there where errors reset the tool storage to avoid problems later on
     }
   }

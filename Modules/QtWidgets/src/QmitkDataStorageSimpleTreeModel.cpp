@@ -175,7 +175,7 @@ int QmitkDataStorageSimpleTreeModel::rowCount(const QModelIndex &parent) const
     return 0;
 }
 
-int QmitkDataStorageSimpleTreeModel::columnCount(const QModelIndex &parent) const
+int QmitkDataStorageSimpleTreeModel::columnCount(const QModelIndex &/*parent*/) const
 {
   return 1;
 }
@@ -252,7 +252,7 @@ bool QmitkDataStorageSimpleTreeModel::setData(const QModelIndex &index, const QV
   return true;
 }
 
-QVariant QmitkDataStorageSimpleTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant QmitkDataStorageSimpleTreeModel::headerData(int /*section*/, Qt::Orientation orientation, int role) const
 {
   if (orientation == Qt::Horizontal && role == Qt::DisplayRole && m_Root)
     return QString::fromStdString(m_Root->GetDataNode()->GetName());

@@ -16,13 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkNodeSelectionPreferenceHelper.h"
 
-#include <strstream>
-
 #include <internal/QmitkNodeSelectionConstants.h>
 
 #include <berryIPreferencesService.h>
 
 #include <berryIPreferences.h>
+#include <berryIPreferencesService.h>
+#include <berryPlatform.h>
+
 
 #include "mitkExceptionMacro.h"
 

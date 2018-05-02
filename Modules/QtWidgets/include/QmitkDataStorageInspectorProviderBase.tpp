@@ -49,6 +49,11 @@ See LICENSE.txt or http://www.mitk.org for details.
   };
 
   template<class TInspector>
+  QmitkDataStorageInspectorProviderBase<TInspector>::QmitkDataStorageInspectorProviderBase(const std::string& id) : QmitkDataStorageInspectorProviderBase(id, id)
+  {
+  }
+
+  template<class TInspector>
   QmitkDataStorageInspectorProviderBase<TInspector>::QmitkDataStorageInspectorProviderBase(const std::string& id, const std::string& displayName, const std::string& desc)
   {
     d.reset(new Impl(id, displayName, desc));

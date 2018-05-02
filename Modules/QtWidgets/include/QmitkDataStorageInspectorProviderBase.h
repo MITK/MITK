@@ -46,7 +46,8 @@ public:
 
   void UnregisterService();
 
-  QmitkDataStorageInspectorProviderBase(const std::string& id, const std::string& displayName = ID, const std::string& desc= "" );
+  QmitkDataStorageInspectorProviderBase(const std::string& id);
+  QmitkDataStorageInspectorProviderBase(const std::string& id, const std::string& displayName, const std::string& desc= "" );
   virtual ~QmitkDataStorageInspectorProviderBase();
 
 protected:

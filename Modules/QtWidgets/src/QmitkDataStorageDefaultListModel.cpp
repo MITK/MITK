@@ -35,18 +35,18 @@ void QmitkDataStorageDefaultListModel::NodePredicateChanged()
   UpdateModelData();
 }
 
-void QmitkDataStorageDefaultListModel::NodeAdded(const mitk::DataNode* node)
+void QmitkDataStorageDefaultListModel::NodeAdded(const mitk::DataNode* /*node*/)
 {
   UpdateModelData();
 }
 
-void QmitkDataStorageDefaultListModel::NodeChanged(const mitk::DataNode* node)
+void QmitkDataStorageDefaultListModel::NodeChanged(const mitk::DataNode* /*node*/)
 {
   // nothing here, since the "'NodeChanged'-event is currently sent far too often
   //UpdateModelData();
 }
 
-void QmitkDataStorageDefaultListModel::NodeRemoved(const mitk::DataNode* node)
+void QmitkDataStorageDefaultListModel::NodeRemoved(const mitk::DataNode* /*node*/)
 {
   UpdateModelData();
 }
@@ -62,7 +62,7 @@ QModelIndex QmitkDataStorageDefaultListModel::index(int row, int column, const Q
   return QModelIndex();
 }
 
-QModelIndex QmitkDataStorageDefaultListModel::parent(const QModelIndex &child) const
+QModelIndex QmitkDataStorageDefaultListModel::parent(const QModelIndex &/*child*/) const
 {
   return QModelIndex();
 }
@@ -94,7 +94,7 @@ QVariant QmitkDataStorageDefaultListModel::data(const QModelIndex &index, int ro
     return QVariant();
   }
 
-  if(index.row() < 0 || index.row() >= m_DataNodes.size())
+  if(index.row() < 0 || index.row() >= static_cast<int>(m_DataNodes.size()))
   {
     return QVariant();
   }
@@ -125,7 +125,7 @@ QVariant QmitkDataStorageDefaultListModel::data(const QModelIndex &index, int ro
   return QVariant();
 }
 
-QVariant QmitkDataStorageDefaultListModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant QmitkDataStorageDefaultListModel::headerData(int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const
 {
   return QVariant(tr("Nodes"));
 }

@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __QMITK_NODE_SELECTION_PREFERENCE_HELPER_H
 #define __QMITK_NODE_SELECTION_PREFERENCE_HELPER_H
 
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <string>
+#include <map>
 
 namespace mitk
 {
@@ -39,7 +39,6 @@ namespace mitk
 
     /** Gets the map of current visible inspectors.*/
     VisibleDataStorageInspectorMapType GetVisibleDataStorageInspectors();
-
 }
 
 #endif

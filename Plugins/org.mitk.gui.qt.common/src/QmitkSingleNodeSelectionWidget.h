@@ -29,13 +29,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkSingleNodeSelectionWidget.h"
 
 #include <QmitkAbstractNodeSelectionWidget.h>
+#include "QPushButton"
 
 class QmitkAbstractDataStorageModel;
-class QAbstractItemVew;
+
+class  QmitkSelectionButton : public QPushButton
+{
+  Q_OBJECT
+
+public:
+  QmitkSelectionButton(QWidget *parent = 0);
+
+  public Q_SLOTS :
+  virtual void SetSelectedNode(mitk::DataNode* node);
+  virtual void SetNodeInfo(QString info);
+
+protected:
+  void paintEvent(QPaintEvent *p) override;
+
+  mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
+  QString m_Info;
+};
 
 /**
 * \class QmitkSingleNodeSelectionWidget
-* \brief Widget that allows to show and edit the content of an mitk::IsoDoseLevel instance.
+* \brief Widget that that represents a node selection. It acts like a button. Clicking on it
+* allows to change the selection.
 */
 class MITK_QT_COMMON QmitkSingleNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget
 {
@@ -74,5 +93,7 @@ protected:
   mitk::DataNode::Pointer m_SelectedNode;
 
   Ui_QmitkSingleNodeSelectionWidget m_Controls;
+  QmitkSelectionButton *m_Btn;
 };
+
 #endif // QmitkSingleNodeSelectionWidget_H

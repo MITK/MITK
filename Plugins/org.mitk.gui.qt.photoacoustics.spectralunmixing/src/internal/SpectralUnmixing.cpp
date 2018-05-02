@@ -54,7 +54,6 @@ void SpectralUnmixing::CreateQtPartControl(QWidget *parent)
 
 // Add Wavelength is working, BUT in the Plugin! Not with same implementation at the filter
 // probably because the m_wavelengths vector is created new every time and not 'saved'.
-// Alternativ as comment here and at the filter.
 void SpectralUnmixing::Wavelength()
 {
   if (m_Wavelengths.empty())
@@ -133,9 +132,15 @@ void SpectralUnmixing::DoImageProcessing()
       message << ".";
       MITK_INFO << message.str();
 
-      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
 
       auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilter::New();
+
+      for (unsigned int i = 0; i < 3; i++)
+      {
+        m_SpectralUnmixingFilter->SetDimensions(image->GetDimension(i));
+      }
+
 
       // Checking which chromophores wanted for SU if none throw exeption!
       numberofChromophores = 0;
@@ -171,7 +176,7 @@ void SpectralUnmixing::DoImageProcessing()
       {
         mitkThrow() << "PRESS 'IGNORE' AND ADD MORE WAVELENGTHS!";
       }
-      
+
       //code recreaction from "old" SU.cpp
         
       MITK_INFO << "GENERATING DATA...";
@@ -193,7 +198,7 @@ void SpectralUnmixing::DoImageProcessing()
       unsigned int dimension = 3;
       mitk::PixelType TPixel = mitk::MakeScalarPixelType<double>();
             
-      // another wavelength impementation for fiter needs "above" one 
+      // additional wavelength implementation into fiter vector; needs "above" one 
       for (unsigned int imageIndex = 0; imageIndex < numberOfInputs; imageIndex++)
       {
         mitk::Image::Pointer fooImage = mitk::Image::New();
@@ -205,18 +210,18 @@ void SpectralUnmixing::DoImageProcessing()
         fooImage->SetSlice(inputAcc.GetData(), 0);
         m_SpectralUnmixingFilter->SetInput(imageIndex, fooImage);
       }
-
-        
+              
       MITK_INFO << "Updating Filter...";
       
       m_SpectralUnmixingFilter->Update();
-      
+     
       mitk::Image::Pointer HbO2 = m_SpectralUnmixingFilter->GetOutput(0);
-      
+
+      //*
       HbO2->GetGeometry()->SetIndexToWorldTransform(inputImage->GetGeometry()->GetIndexToWorldTransform());
            
       mitk::ImageWriteAccessor writeOutputHbO2(HbO2, HbO2->GetVolumeData());
-      double* outputArrayHbO2 = (double *)writeOutputHbO2.GetData();
+      double* outputArrayHbO2 = (double *)writeOutputHbO2.GetData();/**/
 
       mitk::DataNode::Pointer dataNodeHbO2 = mitk::DataNode::New();
       dataNodeHbO2->SetData(HbO2);
@@ -225,10 +230,11 @@ void SpectralUnmixing::DoImageProcessing()
        
       mitk::Image::Pointer Hb = m_SpectralUnmixingFilter->GetOutput(1);
             
+      //*
       Hb->GetGeometry()->SetIndexToWorldTransform(inputImage->GetGeometry()->GetIndexToWorldTransform());
             
       mitk::ImageWriteAccessor writeOutputHb(Hb, Hb->GetVolumeData());
-      double* outputArrayHb = (double *)writeOutputHb.GetData();
+      double* outputArrayHb = (double *)writeOutputHb.GetData();/**/
 
       mitk::DataNode::Pointer dataNodeHb = mitk::DataNode::New();
       dataNodeHb->SetData(Hb);

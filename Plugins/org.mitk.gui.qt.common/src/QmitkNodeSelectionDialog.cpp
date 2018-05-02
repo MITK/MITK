@@ -29,6 +29,16 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
   auto visibleProviders = mitk::GetVisibleDataStorageInspectors();
   auto favoriteID = mitk::GetFavoriteDataStorageInspector();
 
+  if (visibleProviders.empty())
+  {
+    MITK_DEBUG << "No presets for visible node selection inspectors available. Use fallback (show all available inspectors)";
+    unsigned int order = 0;
+    for (auto proIter : providers)
+    {
+      visibleProviders.insert(std::make_pair(order, proIter.first));
+    }
+  }
+
   int favIndex = 0;
   bool favoriteFound = false;
   for (auto proIter : visibleProviders)

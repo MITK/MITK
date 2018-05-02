@@ -86,7 +86,7 @@ namespace mitk {
 
       virtual void InitializeOutputs();
       //Eigen::VectorXd OutputVector = (Eigen::VectorXd, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>);
-
+      Eigen::VectorXd SpectralUnmixingAlgorithms(Eigen::VectorXd inputVector);
 
     };
   }

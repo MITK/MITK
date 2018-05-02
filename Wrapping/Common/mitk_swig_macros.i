@@ -51,7 +51,7 @@
 %extend itk::SmartPointer< nspace ## :: ## classname ## ::Self> {
   %pythoncode %{
       def _GetListOfValidItems(self):
-        return [str(k).replace("class itk::","") for k in self.GetClassHierarchy() if str(k).replace("class itk::","") in convertion_list.keys() ]
+        return [str(k) for k in self.GetClassHierarchy() if str(k) in convertion_list.keys() ]
   %}
   %pythoncode %{
     def __getattr__(self, item):
@@ -72,7 +72,7 @@
 %extend  std::vector< nspace ## :: ## classname *>::value_type {
   %pythoncode %{
       def _GetListOfValidItems(self):
-        return [str(k).replace("class itk::","") for k in self.GetClassHierarchy() if str(k).replace("class itk::","") in convertion_list.keys() ]
+        return [str(k) for k in self.GetClassHierarchy() if str(k) in convertion_list.keys() ]
   %}
   %pythoncode %{
     def __getattr__(self, item):
@@ -172,7 +172,7 @@
 
 
   class nspace ## :: ## classname ## ;
-  //class nspace ## :: ## classname ## ::Pointer;
+  class nspace ## :: ## classname ## ::Pointer;
 
   // It is important to first define the Vectors and
   // then define the Smartpointer. Otherwise a SWIG-bug ...

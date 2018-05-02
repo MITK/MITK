@@ -23,6 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPAPropertyCalculator.h"
 #include <eigen3/Eigen/Dense>
 
+// Test with ImagePixelAccessor
+#include <mitkImagePixelAccessor.h>
+#include <mitkImagePixelWriteAccessor.h>
+
 mitk::pa::SpectralUnmixingFilter::SpectralUnmixingFilter()
 {
   this->SetNumberOfIndexedOutputs(2);
@@ -52,44 +56,98 @@ void mitk::pa::SpectralUnmixingFilter::SetChromophores(ChromophoreType chromopho
 
 void mitk::pa::SpectralUnmixingFilter::GenerateData()
 {
-  //code recreaction from "old" SUF.cpp
-
-  // now creats to identical output images like the input for hb and hb02
-
   MITK_INFO << "GENERATING DATA..";
-  numberOfInputs = GetNumberOfIndexedInputs();
-  numberOfOutputs = GetNumberOfIndexedOutputs();
+
+  //checking Preconditions:
+  unsigned int NumberOfInputImages = m_Dimensions[2]; 
+  MITK_INFO << "NumberOfInputImages: " << NumberOfInputImages;
+  CheckPreConditions(NumberOfInputImages);
+
+  InitializeOutputs();
+
+  EndmemberMatrix = AddEndmemberMatrix();
+
+  MITK_INFO << "GENERATING DATA...[DONE]";
+
+  // code recreaction from "old" SUF.cpp see end of document
+ 
+
+
+  //*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++{
   
+
+ /*
+  MITK_INFO << "dim0: " << GetOutput(0)->GetDimension(0) //128
+    << " dim1: " << GetOutput(0)->GetDimension(1) //xxxx for header.nnrd: 3919
+    << " dim2: " << GetOutput(0)->GetDimension(2);//1
+  Dimensions of picture
+
+  int xdim = GetOutput(0)->GetDimension(0);
+  int ydim = GetOutput(0)->GetDimension(1);
+  int zdim = GetOutput(0)->GetDimension(2);
+
+  mitk::Image::Pointer data = GetInput();
+
+  for (unsigned int x = 0; x < xdim; x++)
+  {
+    for (unsigned int y = 0; y < ydim; y++)
+    {
+      Eigen::VectorXd b(numberOfInputs);
+
+      for (unsigned int z = 0; z < zdim; z++)
+      {
+        
+        b(z) = ;
+
+      }
+      
+      Eigen::Vector3d reultVector = EndmemberMatrix.householderQr().solve(b);
+
+      for (int outpuIdx = 0; outpuIdx < GetNumberOfIndexedOutputs(); ++outpuIdx)
+      {
+        auto output = GetOutput(outpuIdx);
+        mitk::ImageWriteAccessor writeOutput(output);
+        float* writeBuffer = (float *)writeOutput.GetData();
+
+        writeBuffer[y*xdim + x] = reultVector[outpuIdx];
+      }
+
+    }
+  }
+
+
+
+  /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}*/
+}
+
+// creats vector with x, y, z dimensions as entries
+void mitk::pa::SpectralUnmixingFilter::SetDimensions(int Dimension)
+{
+  m_Dimensions.push_back(Dimension);
+}
+
+// checks if number of Inputs == added wavelengths 
+void mitk::pa::SpectralUnmixingFilter::CheckPreConditions(unsigned int NumberOfInputImages)
+{
+  if (m_Wavelength.size() != NumberOfInputImages)
+    mitkThrow() << "CHECK INPUTS! WAVELENGTHERROR";
+  MITK_INFO << "CHECK PRECONDITIONS ...[DONE]";
+}
+
+// Initialize Outputs
+void mitk::pa::SpectralUnmixingFilter::InitializeOutputs()
+{
+  numberOfInputs = m_Dimensions[2];
+  numberOfOutputs = GetNumberOfIndexedOutputs();
   for (unsigned int outputIdx = 0; outputIdx < numberOfOutputs; outputIdx++)
   {
     GetOutput(outputIdx)->Initialize(GetInput(0));
   }
-
-  length = GetOutput(0)->GetDimension(0)*GetOutput(0)->GetDimension(1)*GetOutput(0)->GetDimension(2);
-    
-  for (int i = 0; i < length; i++)
-  {
-    for (unsigned int j = 0; j < numberOfInputs; j++)
-    {
-      mitk::Image::Pointer input = GetInput(j);
-      mitk::ImageReadAccessor readAccess(input, input->GetVolumeData());
-    }
-    for (unsigned int outputIdx = 0; outputIdx < numberOfOutputs; outputIdx++)
-    {
-      mitk::Image::Pointer output = GetOutput(outputIdx);
-      mitk::ImageWriteAccessor writeOutput(output, output->GetVolumeData());
-      double* outputArray = (double *)writeOutput.GetData();
-    }
-  }
-  MITK_INFO << "GENERATING DATA...[DONE]";
-  
-  AddEndmemberMatrix();
 }
 
-
-//Void creats Matrix with #chromophores rows and #wavelengths columns
-//so Matrix Element (i,j) contains the Absorbtion of chromophore j @ wavelength i
-void mitk::pa::SpectralUnmixingFilter::AddEndmemberMatrix()
+//Matrix with #chromophores rows and #wavelengths columns
+//so Matrix Element (j,i) contains the Absorbtion of chromophore j @ wavelength i
+Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingFilter::AddEndmemberMatrix()
 {
   numberofchromophores = m_Chromophore.size();
   numberofwavelengths = m_Wavelength.size();
@@ -105,17 +163,58 @@ void mitk::pa::SpectralUnmixingFilter::AddEndmemberMatrix()
       //writes @ Matrix element (i,j) the absorbtion wavelength of the propertycalculator.cpp
       EndmemberMatrix(j,i)= m_PropertyCalculator->GetAbsorptionForWavelength(
       static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[j]), m_Wavelength[i]);
-      if (EndmemberMatrix(i, j) == 0)
-      {
-        m_Wavelength.clear();
-        MITK_INFO << "size: "<< m_Wavelength.size();
-        mitkThrow() << "WAVELENGTH NOT SUPPORTED!";
-      }
       /* Test to see what gets written in the Matrix:
       MITK_INFO << "map type: " << static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[j]);
       MITK_INFO << "wavelength: " << m_Wavelength[i];
       MITK_INFO << "Matrixelement: (" << j << ", " << i << ") Absorbtion: " << EndmemberMatrix(j, i);/**/
+      
+      if (EndmemberMatrix(j, i) == 0)
+      {
+        m_Wavelength.clear();
+        mitkThrow() << "WAVELENGTH "<< m_Wavelength[i] << "nm NOT SUPPORTED!";
+      }
+   
     }
   }
-  MITK_INFO << "GENERATING ENMEMBERMATRIX SUCCESSFUL!";
+  //MITK_INFO << "GENERATING ENMEMBERMATRIX SUCCESSFUL!";
+  return EndmemberMatrix;
 }
+
+/* +++++++++++++++++++++++++++++++++++++++++ OLD CODE: +++++++++++++++++++++++++++++++++++++++++++++++++++
+was @ generate data
+
+length = GetOutput(0)->GetDimension(0)*GetOutput(0)->GetDimension(1)*GetOutput(0)->GetDimension(2);
+
+for (int i = 0; i < length; i++)
+{
+Eigen::VectorXd b(numberOfInputs);
+for (unsigned int j = 0; j < numberOfInputs; j++)
+{
+mitk::Image::Pointer input = GetInput(j);
+mitk::ImageReadAccessor readAccess(input, input->GetVolumeData());
+b(j) = ((const float*)readAccess.GetData())[i];
+}
+
+Eigen::Vector3d x = EndmemberMatrix.householderQr().solve(b);
+
+
+if (i == 0)
+{
+MITK_INFO << "for i=0 b(#Inputs)";
+MITK_INFO << b;
+MITK_INFO << "EndmemberMatrix";
+MITK_INFO << EndmemberMatrix;
+MITK_INFO << "x";
+MITK_INFO << x;
+}
+
+
+for (unsigned int outputIdx = 0; outputIdx < numberOfOutputs; outputIdx++)
+{
+mitk::Image::Pointer output = GetOutput(outputIdx);
+mitk::ImageWriteAccessor writeOutput(output, output->GetVolumeData());
+double* outputArray = (double *)writeOutput.GetData();
+outputArray[i] = x[outputIdx];
+}
+}
+/**/

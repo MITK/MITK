@@ -28,6 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPAPropertyCalculator.h"
 #include <eigen3/Eigen/Dense>
 
+// Test with ImagePixelAccessor
+#include <mitkImagePixelAccessor.h>
+#include <mitkImagePixelWriteAccessor.h>
+
 namespace mitk {
   namespace pa {
     class MITKPHOTOACOUSTICSLIB_EXPORT SpectralUnmixingFilter : public mitk::ImageToImageFilter
@@ -52,10 +56,15 @@ namespace mitk {
       void AddWavelength(int wavelength);
       std::vector<int> m_Wavelength; 
       
+      void SetDimensions(int dimension);
+      std::vector<int> m_Dimensions;
+
+
       //Void to creat Eigen::Matrix of all absorbtions
       //@ specific wavelength (columns) of chromophores (rows)
-      virtual void AddEndmemberMatrix();
- 
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> AddEndmemberMatrix();
+     
+
     protected:
       SpectralUnmixingFilter();
       virtual ~SpectralUnmixingFilter();
@@ -70,6 +79,15 @@ namespace mitk {
       long length;
 
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>  EndmemberMatrix;
+
+
+      //'New':
+      virtual void CheckPreConditions(unsigned int NumberOfInputImages);
+
+      virtual void InitializeOutputs();
+      //Eigen::VectorXd OutputVector = (Eigen::VectorXd, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>);
+
+
     };
   }
 }

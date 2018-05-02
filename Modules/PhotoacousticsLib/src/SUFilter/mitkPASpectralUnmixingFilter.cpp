@@ -58,66 +58,45 @@ void mitk::pa::SpectralUnmixingFilter::GenerateData()
 {
   MITK_INFO << "GENERATING DATA..";
 
-  //checking Preconditions:
-  unsigned int NumberOfInputImages = m_Dimensions[2]; 
-  MITK_INFO << "NumberOfInputImages: " << NumberOfInputImages;
-  CheckPreConditions(NumberOfInputImages);
+  unsigned int xDim = m_Dimensions[0];
+  unsigned int yDim = m_Dimensions[1];
+  unsigned int zDim = m_Dimensions[2];
+
+  MITK_INFO << "NumberOfInputImages: " << zDim;
+
+  CheckPreConditions(zDim);
 
   InitializeOutputs();
 
-  EndmemberMatrix = AddEndmemberMatrix();
-
-  MITK_INFO << "GENERATING DATA...[DONE]";
-
-  // code recreaction from "old" SUF.cpp see end of document
- 
-
-
-  //*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++{
-  
-
- /*
-  MITK_INFO << "dim0: " << GetOutput(0)->GetDimension(0) //128
-    << " dim1: " << GetOutput(0)->GetDimension(1) //xxxx for header.nnrd: 3919
-    << " dim2: " << GetOutput(0)->GetDimension(2);//1
-  Dimensions of picture
-
-  int xdim = GetOutput(0)->GetDimension(0);
-  int ydim = GetOutput(0)->GetDimension(1);
-  int zdim = GetOutput(0)->GetDimension(2);
-
   mitk::Image::Pointer data = GetInput();
 
-  for (unsigned int x = 0; x < xdim; x++)
+  for (unsigned int x = 0; x < xDim; x++)
   {
-    for (unsigned int y = 0; y < ydim; y++)
+    for (unsigned int y = 0; y < yDim; y++)
     {
-      Eigen::VectorXd b(numberOfInputs);
+      Eigen::VectorXd inputVector(numberOfInputs);
 
-      for (unsigned int z = 0; z < zdim; z++)
+      for (unsigned int z = 0; z < zDim; z++)
       {
+        //inputVector[z] = wertvonpixelmitderwellenlänge;
         
-        b(z) = ;
 
       }
       
-      Eigen::Vector3d reultVector = EndmemberMatrix.householderQr().solve(b);
+      Eigen::VectorXd resultVector = SpectralUnmixingAlgorithms(inputVector);
 
-      for (int outpuIdx = 0; outpuIdx < GetNumberOfIndexedOutputs(); ++outpuIdx)
+      for (int outputIdx = 0; outputIdx < GetNumberOfIndexedOutputs(); ++outputIdx)
       {
-        auto output = GetOutput(outpuIdx);
+        auto output = GetOutput(outputIdx);
         mitk::ImageWriteAccessor writeOutput(output);
         float* writeBuffer = (float *)writeOutput.GetData();
 
-        writeBuffer[y*xdim + x] = reultVector[outpuIdx];
+        writeBuffer[y*xDim + x] = resultVector[outputIdx];
       }
 
     }
   }
-
-
-
-  /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}*/
+  MITK_INFO << "GENERATING DATA...[DONE]";
 }
 
 // creats vector with x, y, z dimensions as entries
@@ -178,6 +157,14 @@ Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixing
   }
   //MITK_INFO << "GENERATING ENMEMBERMATRIX SUCCESSFUL!";
   return EndmemberMatrix;
+}
+
+// Perform SU algorithm
+Eigen::VectorXd mitk::pa::SpectralUnmixingFilter::SpectralUnmixingAlgorithms(Eigen::VectorXd inputVector)
+{
+  EndmemberMatrix = AddEndmemberMatrix();
+  Eigen::VectorXd resultVector = EndmemberMatrix.householderQr().solve(inputVector);
+  return resultVector;
 }
 
 /* +++++++++++++++++++++++++++++++++++++++++ OLD CODE: +++++++++++++++++++++++++++++++++++++++++++++++++++

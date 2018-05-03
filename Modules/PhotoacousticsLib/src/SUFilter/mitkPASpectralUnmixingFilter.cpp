@@ -24,8 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <eigen3/Eigen/Dense>
 
 // Test with ImagePixelAccessor
-#include <mitkImagePixelAccessor.h>
+#include <mitkImagePixelReadAccessor.h>
 #include <mitkImagePixelWriteAccessor.h>
+
+#include <random>
 
 mitk::pa::SpectralUnmixingFilter::SpectralUnmixingFilter()
 {
@@ -69,21 +71,36 @@ void mitk::pa::SpectralUnmixingFilter::GenerateData()
   InitializeOutputs();
 
   mitk::Image::Pointer data = GetInput();
+  //Error wird in Schleife bei readAccesor Zugriff ausgegeben:
+  //Ausgelöste Ausnahme: Lesezugriffsverletzung
+  //**mitk::ImagePixelReadAccessor<double, 3>::GetPixelByIndex**(...) hat 0x821F85870 zurückgegeben.
+  
+  itk::Index<3> idx;
+
+  mitk::ImagePixelReadAccessor<double, 3> readAccesor(data);
+
+  EndmemberMatrix = AddEndmemberMatrix();
 
   for (unsigned int x = 0; x < xDim; x++)
   {
+    idx[0] = x;
     for (unsigned int y = 0; y < yDim; y++)
     {
+      idx[1] = y;
       Eigen::VectorXd inputVector(numberOfInputs);
-
       for (unsigned int z = 0; z < zDim; z++)
       {
-        //inputVector[z] = wertvonpixelmitderwellenlänge;
+        idx[3] = z;
+        // auto pixel = readAccesor.GetPixelByIndex(idx); 
+        //Bsp.: mitkTbssImporter.cpp line 114
+
+        float pixel = rand(); // dummy value for pixel
         
+        inputVector[z] = pixel;
 
       }
       
-      Eigen::VectorXd resultVector = SpectralUnmixingAlgorithms(inputVector);
+      Eigen::VectorXd resultVector = SpectralUnmixingAlgorithms(EndmemberMatrix, inputVector);
 
       for (int outputIdx = 0; outputIdx < GetNumberOfIndexedOutputs(); ++outputIdx)
       {
@@ -160,9 +177,9 @@ Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixing
 }
 
 // Perform SU algorithm
-Eigen::VectorXd mitk::pa::SpectralUnmixingFilter::SpectralUnmixingAlgorithms(Eigen::VectorXd inputVector)
+Eigen::VectorXd mitk::pa::SpectralUnmixingFilter::SpectralUnmixingAlgorithms(
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXd inputVector)
 {
-  EndmemberMatrix = AddEndmemberMatrix();
   Eigen::VectorXd resultVector = EndmemberMatrix.householderQr().solve(inputVector);
   return resultVector;
 }

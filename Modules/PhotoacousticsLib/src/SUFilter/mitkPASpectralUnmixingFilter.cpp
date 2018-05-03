@@ -27,6 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkImagePixelWriteAccessor.h>
 
+#include <mitkImageReadAccessor.h>
+#include <mitkImageWriteAccessor.h>
+
 #include <random>
 
 mitk::pa::SpectralUnmixingFilter::SpectralUnmixingFilter()
@@ -69,15 +72,8 @@ void mitk::pa::SpectralUnmixingFilter::GenerateData()
   CheckPreConditions(zDim);
 
   InitializeOutputs();
-
-  mitk::Image::Pointer data = GetInput();
-  //Error wird in Schleife bei readAccesor Zugriff ausgegeben:
-  //Ausgelöste Ausnahme: Lesezugriffsverletzung
-  //**mitk::ImagePixelReadAccessor<double, 3>::GetPixelByIndex**(...) hat 0x821F85870 zurückgegeben.
   
   itk::Index<3> idx;
-
-  mitk::ImagePixelReadAccessor<double, 3> readAccesor(data);
 
   EndmemberMatrix = AddEndmemberMatrix();
 
@@ -91,13 +87,23 @@ void mitk::pa::SpectralUnmixingFilter::GenerateData()
       for (unsigned int z = 0; z < zDim; z++)
       {
         idx[3] = z;
-        // auto pixel = readAccesor.GetPixelByIndex(idx); 
-        //Bsp.: mitkTbssImporter.cpp line 114
 
-        float pixel = rand(); // dummy value for pixel
+        //* IMAGE READ ACCESOR see old SU.cpp
+        mitk::Image::Pointer input = GetInput(z);
+        mitk::ImageReadAccessor readAccess(input, input->GetVolumeData());
+        unsigned int pixelNumber = (xDim*yDim*z)+x*yDim+y;
+        auto pixel = ((const float*)readAccess.GetData())[pixelNumber];/**/
+        // --> works with 3x3x3 but not with 1000x1000x3 picture 
+        
+        /* IMAGE PIXEL READ ACCESOR:
+        // Bsp.: mitkTbssImporter.cpp line 114
+        mitk::Image::Pointer data = GetInput(????);
+        mitk::ImagePixelReadAccessor<double, 3> readAccesor(data, data->GetVolumeData());
+        auto pixel = readAccesor.GetPixelByIndex(idx); /**/
+
+        //float pixel = rand(); // dummy value for pixel
         
         inputVector[z] = pixel;
-
       }
       
       Eigen::VectorXd resultVector = SpectralUnmixingAlgorithms(EndmemberMatrix, inputVector);
@@ -107,10 +113,8 @@ void mitk::pa::SpectralUnmixingFilter::GenerateData()
         auto output = GetOutput(outputIdx);
         mitk::ImageWriteAccessor writeOutput(output);
         float* writeBuffer = (float *)writeOutput.GetData();
-
-        writeBuffer[y*xDim + x] = resultVector[outputIdx];
+        writeBuffer[x*yDim + y] = resultVector[outputIdx]; 
       }
-
     }
   }
   MITK_INFO << "GENERATING DATA...[DONE]";
@@ -135,9 +139,20 @@ void mitk::pa::SpectralUnmixingFilter::InitializeOutputs()
 {
   numberOfInputs = m_Dimensions[2];
   numberOfOutputs = GetNumberOfIndexedOutputs();
+
+  //* see MitkPAVolume.cpp
+  mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();
+  const int NUMBER_OF_SPATIAL_DIMENSIONS = 2;
+  auto* dimensions = new unsigned int[NUMBER_OF_SPATIAL_DIMENSIONS];
+  Image::Pointer m_InternalMitkImage;/**/
+
   for (unsigned int outputIdx = 0; outputIdx < numberOfOutputs; outputIdx++)
   {
     GetOutput(outputIdx)->Initialize(GetInput(0));
+    
+    /* see MitkPAVolume.cpp :: DOESN'T WORK (TM)
+    //m_InternalMitkImage = mitk::Image::New();
+    GetOutput(outputIdx)->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);/**/
   }
 }
 
@@ -169,10 +184,9 @@ Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixing
         m_Wavelength.clear();
         mitkThrow() << "WAVELENGTH "<< m_Wavelength[i] << "nm NOT SUPPORTED!";
       }
-   
     }
   }
-  //MITK_INFO << "GENERATING ENMEMBERMATRIX SUCCESSFUL!";
+  MITK_INFO << "GENERATING ENMEMBERMATRIX SUCCESSFUL!";
   return EndmemberMatrix;
 }
 
@@ -180,8 +194,22 @@ Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixing
 Eigen::VectorXd mitk::pa::SpectralUnmixingFilter::SpectralUnmixingAlgorithms(
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXd inputVector)
 {
-  Eigen::VectorXd resultVector = EndmemberMatrix.householderQr().solve(inputVector);
+  //test "solver" (input = output)
+  //Eigen::VectorXd resultVector = inputVector;
+  //return resultVector;
+    
+  //llt solver
+  Eigen::VectorXd resultVector = EndmemberMatrix.llt().solve(inputVector);
   return resultVector;
+
+  //householderqr solver
+  //Eigen::VectorXd resultVector =EndmemberMatrix.householderQr().solve(inputVector);
+  //return resultVector;
+
+  //test other solvers https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
+  // define treshold for relativ error and set value to eg. -1 ;)
+  /*double relative_error = (EndmemberMatrix*inputVector - resultVector).norm() / resultVector.norm(); // norm() is L2 norm
+  MITK_INFO << relative_error;/**/
 }
 
 /* +++++++++++++++++++++++++++++++++++++++++ OLD CODE: +++++++++++++++++++++++++++++++++++++++++++++++++++

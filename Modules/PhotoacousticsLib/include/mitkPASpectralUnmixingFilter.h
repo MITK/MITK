@@ -80,13 +80,13 @@ namespace mitk {
 
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>  EndmemberMatrix;
 
-
       //'New':
       virtual void CheckPreConditions(unsigned int NumberOfInputImages);
 
       virtual void InitializeOutputs();
       //Eigen::VectorXd OutputVector = (Eigen::VectorXd, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>);
-      Eigen::VectorXd SpectralUnmixingAlgorithms(Eigen::VectorXd inputVector);
+      Eigen::VectorXd SpectralUnmixingAlgorithms(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
+        Eigen::VectorXd inputVector);
 
     };
   }

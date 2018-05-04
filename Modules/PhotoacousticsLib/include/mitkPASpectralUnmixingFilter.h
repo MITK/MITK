@@ -56,9 +56,7 @@ namespace mitk {
       void AddWavelength(int wavelength);
       std::vector<int> m_Wavelength; 
       
-      void SetDimensions(int dimension);
-      std::vector<int> m_Dimensions;
-
+    
 
       //Void to creat Eigen::Matrix of all absorbtions
       //@ specific wavelength (columns) of chromophores (rows)
@@ -87,6 +85,7 @@ namespace mitk {
       //Eigen::VectorXd OutputVector = (Eigen::VectorXd, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>);
       Eigen::VectorXd SpectralUnmixingAlgorithms(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
         Eigen::VectorXd inputVector);
+
 
     };
   }

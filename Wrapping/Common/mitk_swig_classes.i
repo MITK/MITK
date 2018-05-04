@@ -116,16 +116,23 @@ namespace core
 {
   typedef std::string String;
 }
+#include <mapDeploymentDLLInfo.h>
 %}
 namespace core
 {
   typedef std::string String;
 }
-SWIG_ADD_MITK_CLASS_VECTORFREE(DLLDirectoryBrowser, mapDeploymentDLLDirectoryBrowser.h, ::map::deployment)
-MITKSWIG_ADD_HEADERFILE(mapString.h)
+
+class itk::SmartPointer<::map::deployment::DLLInfo>;
+class ::map::deployment::DLLInfo;
+%template(VectorDLLInfo2Pointer) std::vector< itk::SmartPointer<::map::deployment::DLLInfo> >;
+
 
 MITKSWIG_ADD_CLASS(DLLInfo, mapDeploymentDLLInfo.h, ::map::deployment)
-SWIG_ADD_MITK_CLASS_VECTORFREE(DLLHandle, mapDeploymentDLLHandle.h, map::deployment)
+SWIG_ADD_MITK_CLASS_VECTORFREE(DLLHandle, mapDeploymentDLLHandle.h, ::map::deployment)
+
+SWIG_ADD_MITK_CLASS_VECTORFREE(DLLDirectoryBrowser, mapDeploymentDLLDirectoryBrowser.h, ::map::deployment)
+MITKSWIG_ADD_HEADERFILE(mapString.h)
 
 MITKSWIG_ADD_CLASS(MITKAlgorithmHelper, mitkAlgorithmHelper.h, mitk)
 MITKSWIG_ADD_CLASS(RegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)

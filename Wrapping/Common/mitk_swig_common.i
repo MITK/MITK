@@ -9,7 +9,7 @@
 
 // Splitted the information about the addition files into sub-files:
 
-// %naturalvar;
+%naturalvar;
 
 // Includes of STD-Files goes in here
 %include <mitk_swig_std.i>

@@ -123,7 +123,7 @@ void SpectralUnmixing::DoImageProcessing()
     {
       std::stringstream message;
       std::string name;
-      message << "PERFORMING SPECTRAL UNMIXING (SOON)";
+      message << "PERFORMING SPECTRAL UNMIXING ";
       if (node->GetName(name))
       {
         // a property called "name" was found for this DataNode
@@ -136,27 +136,21 @@ void SpectralUnmixing::DoImageProcessing()
 
       auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilter::New();
 
-      for (unsigned int i = 0; i < 3; i++)
-      {
-        m_SpectralUnmixingFilter->SetDimensions(image->GetDimension(i));
-      }
+      m_SpectralUnmixingFilter->SetInput(image);
 
 
       // Checking which chromophores wanted for SU if none throw exeption!
       numberofChromophores = 0;
       DeOxbool = m_Controls.checkBoxDeOx->isChecked();
       Oxbool = m_Controls.checkBoxOx->isChecked();
-      if (DeOxbool || Oxbool)
-      {
-        MITK_INFO << "CHOSEN CHROMOPHORES:";
-      }
+
       if (Oxbool)
       {
         numberofChromophores += 1;
         MITK_INFO << "- Oxyhemoglobin";
         // Set chromophore Oxyhemoglobon:
         m_SpectralUnmixingFilter->SetChromophores(
-          mitk::pa::SpectralUnmixingFilter::ChromophoreType(1));
+          mitk::pa::SpectralUnmixingFilter::ChromophoreType::OXYGENATED);
       }
       if (DeOxbool)
       {
@@ -164,7 +158,7 @@ void SpectralUnmixing::DoImageProcessing()
         MITK_INFO << "- Deoxygenated hemoglobin";
         // Set chromophore Deoxygenated hemoglobin:
         m_SpectralUnmixingFilter->SetChromophores(
-          mitk::pa::SpectralUnmixingFilter::ChromophoreType(2));
+          mitk::pa::SpectralUnmixingFilter::ChromophoreType::DEOXYGENATED);
       }
       if (numberofChromophores == 0)
       {
@@ -183,32 +177,15 @@ void SpectralUnmixing::DoImageProcessing()
       unsigned int numberOfInputs = size;
       unsigned int numberOfOutputs = numberofChromophores;
 
-      MITK_INFO << "Inputs: " << numberOfInputs << " Outputs: " << numberOfOutputs;
-            
-      mitk::DataStorage::Pointer storage = this->GetDataStorage();
-
-      mitk::DataNode::Pointer node = nodes.front();
-    
-      mitk::Image* inputImage = dynamic_cast<mitk::Image*>(data);
-
-      const unsigned int dimensions[]{
-      inputImage->GetDimension(0),
-      inputImage->GetDimension(1),
-      1 }; // just the first sequence for starters TODO GENERALIZE
-      unsigned int dimension = 3;
-      mitk::PixelType TPixel = mitk::MakeScalarPixelType<double>();
+      MITK_INFO << "Inputs: " << numberOfInputs << " Outputs: " << numberOfOutputs;  
             
       // additional wavelength implementation into fiter vector; needs "above" one 
       for (unsigned int imageIndex = 0; imageIndex < numberOfInputs; imageIndex++)
       {
-        mitk::Image::Pointer fooImage = mitk::Image::New();
-        fooImage->Initialize(TPixel, dimension, dimensions);
         wavelength = m_Wavelengths[imageIndex];
         MITK_INFO << wavelength;
         m_SpectralUnmixingFilter->AddWavelength(wavelength);
-        mitk::ImageReadAccessor inputAcc(inputImage, inputImage->GetSliceData(imageIndex));
-        fooImage->SetSlice(inputAcc.GetData(), 0);
-        m_SpectralUnmixingFilter->SetInput(imageIndex, fooImage);
+      
       }
               
       MITK_INFO << "Updating Filter...";
@@ -216,26 +193,12 @@ void SpectralUnmixing::DoImageProcessing()
       m_SpectralUnmixingFilter->Update();
      
       mitk::Image::Pointer HbO2 = m_SpectralUnmixingFilter->GetOutput(0);
-
-      //*
-      HbO2->GetGeometry()->SetIndexToWorldTransform(inputImage->GetGeometry()->GetIndexToWorldTransform());
-           
-      mitk::ImageWriteAccessor writeOutputHbO2(HbO2, HbO2->GetVolumeData());
-      double* outputArrayHbO2 = (double *)writeOutputHbO2.GetData();/**/
-
       mitk::DataNode::Pointer dataNodeHbO2 = mitk::DataNode::New();
       dataNodeHbO2->SetData(HbO2);
       dataNodeHbO2->SetName("HbO2");
       this->GetDataStorage()->Add(dataNodeHbO2);  
        
       mitk::Image::Pointer Hb = m_SpectralUnmixingFilter->GetOutput(1);
-            
-      //*
-      Hb->GetGeometry()->SetIndexToWorldTransform(inputImage->GetGeometry()->GetIndexToWorldTransform());
-            
-      mitk::ImageWriteAccessor writeOutputHb(Hb, Hb->GetVolumeData());
-      double* outputArrayHb = (double *)writeOutputHb.GetData();/**/
-
       mitk::DataNode::Pointer dataNodeHb = mitk::DataNode::New();
       dataNodeHb->SetData(Hb);
       dataNodeHb->SetName("Hb");

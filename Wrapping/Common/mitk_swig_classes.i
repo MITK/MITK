@@ -30,6 +30,7 @@
 %include <mitkChannelDescriptor.h>
 %include <mitkIOUtil.h>
 
+
 #define DEPRECATED(func) func
 #undef ITK_DISALLOW_COPY_AND_ASSIGN
 #define ITK_DISALLOW_COPY_AND_ASSIGN(TypeName)
@@ -38,6 +39,8 @@
  convertion_list = {}
 %}
 
+SWIG_ADD_NONOBJECT_CLASS(Indent, itkIndent.h, itk)
+SWIG_ADD_MITK_CLASS(LightObject, itkLightObject.h, itk)
 SWIG_ADD_MITK_CLASS(Object, itkObject.h, itk)
 SWIG_ADD_MITK_CLASS(DataObject, itkDataObject.h, itk)
 
@@ -76,28 +79,28 @@ using mitk::Message;
 //
 // Phenotyping Related Classes
 //
-SWIG_ADD_MITK_CLASS(AbstractGlobalImageFeature, mitkAbstractGlobalImageFeature.h, mitk)
-SWIG_ADD_MITK_CLASS(GIFImageDescriptionFeatures, mitkGIFImageDescriptionFeatures.h, mitk)
-SWIG_ADD_MITK_CLASS(GIFFirstOrderStatistics, mitkGIFFirstOrderStatistics.h, mitk)
-SWIG_ADD_MITK_CLASS(GIFFirstOrderHistogramStatistics, mitkGIFFirstOrderHistogramStatistics.h, mitk)
-SWIG_ADD_MITK_CLASS(GIFVolumetricStatistics, mitkGIFVolumetricStatistics.h, mitk)
-SWIG_ADD_MITK_CLASS(GIFVolumetricDensityStatistics, mitkGIFVolumetricDensityStatistics.h, mitk)
-SWIG_ADD_MITK_CLASS(GIFCooccurenceMatrix2, mitkGIFCooccurenceMatrix2.h, mitk)
-SWIG_ADD_MITK_CLASS(GIFNeighbouringGreyLevelDependenceFeature, mitkGIFNeighbouringGreyLevelDependenceFeatures.h, mitk)
-SWIG_ADD_MITK_CLASS(GIFGreyLevelRunLength, mitkGIFGreyLevelRunLength.h, mitk)
-SWIG_ADD_MITK_CLASS(GIFGreyLevelSizeZone, mitkGIFGreyLevelSizeZone.h, mitk)
-SWIG_ADD_MITK_CLASS(GIFGreyLevelDistanceZone, mitkGIFGreyLevelDistanceZone.h, mitk)
-SWIG_ADD_MITK_CLASS(GIFLocalIntensity, mitkGIFLocalIntensity.h, mitk)
-SWIG_ADD_MITK_CLASS(GIFIntensityVolumeHistogramFeatures, mitkGIFIntensityVolumeHistogramFeatures.h, mitk)
-SWIG_ADD_MITK_CLASS(GIFNeighbourhoodGreyToneDifferenceFeatures, mitkGIFNeighbourhoodGreyToneDifferenceFeatures.h, mitk)
-SWIG_ADD_MITK_CLASS(GIFCurvatureStatistic, mitkGIFCurvatureStatistic.h, mitk)
+//SWIG_ADD_MITK_CLASS(AbstractGlobalImageFeature, mitkAbstractGlobalImageFeature.h, mitk)
+//SWIG_ADD_MITK_CLASS(GIFImageDescriptionFeatures, mitkGIFImageDescriptionFeatures.h, mitk)
+//SWIG_ADD_MITK_CLASS(GIFFirstOrderStatistics, mitkGIFFirstOrderStatistics.h, mitk)
+//SWIG_ADD_MITK_CLASS(GIFFirstOrderHistogramStatistics, mitkGIFFirstOrderHistogramStatistics.h, mitk)
+//SWIG_ADD_MITK_CLASS(GIFVolumetricStatistics, mitkGIFVolumetricStatistics.h, mitk)
+//SWIG_ADD_MITK_CLASS(GIFVolumetricDensityStatistics, mitkGIFVolumetricDensityStatistics.h, mitk)
+//SWIG_ADD_MITK_CLASS(GIFCooccurenceMatrix2, mitkGIFCooccurenceMatrix2.h, mitk)
+//SWIG_ADD_MITK_CLASS(GIFNeighbouringGreyLevelDependenceFeature, mitkGIFNeighbouringGreyLevelDependenceFeatures.h, mitk)
+//SWIG_ADD_MITK_CLASS(GIFGreyLevelRunLength, mitkGIFGreyLevelRunLength.h, mitk)
+//SWIG_ADD_MITK_CLASS(GIFGreyLevelSizeZone, mitkGIFGreyLevelSizeZone.h, mitk)
+//SWIG_ADD_MITK_CLASS(GIFGreyLevelDistanceZone, mitkGIFGreyLevelDistanceZone.h, mitk)
+//SWIG_ADD_MITK_CLASS(GIFLocalIntensity, mitkGIFLocalIntensity.h, mitk)
+//SWIG_ADD_MITK_CLASS(GIFIntensityVolumeHistogramFeatures, mitkGIFIntensityVolumeHistogramFeatures.h, mitk)
+//SWIG_ADD_MITK_CLASS(GIFNeighbourhoodGreyToneDifferenceFeatures, mitkGIFNeighbourhoodGreyToneDifferenceFeatures.h, mitk)
+//SWIG_ADD_MITK_CLASS(GIFCurvatureStatistic, mitkGIFCurvatureStatistic.h, mitk)
 
 //
 // Conversion and Segmentation based Classes
 //
-SWIG_ADD_MITK_CLASS(ContourModelSetToImageFilter, mitkContourModelSetToImageFilter.h, mitk)
-SWIG_ADD_NONOBJECT_NOVECTOR_CLASS(BooleanOperation, mitkBooleanOperation.h, mitk)
-SWIG_ADD_NONOBJECT_NOVECTOR_CLASS(MorphologicalOperations, mitkMorphologicalOperations.h, mitk)
+//SWIG_ADD_MITK_CLASS(ContourModelSetToImageFilter, mitkContourModelSetToImageFilter.h, mitk)
+//SWIG_ADD_NONOBJECT_NOVECTOR_CLASS(BooleanOperation, mitkBooleanOperation.h, mitk)
+//SWIG_ADD_NONOBJECT_NOVECTOR_CLASS(MorphologicalOperations, mitkMorphologicalOperations.h, mitk)
 %{
   #include <itkProcessObject.h>
   typedef itk::DataObject::DataObjectIdentifierType DataObjectIdentifierType;
@@ -109,46 +112,31 @@ SWIG_ADD_NONOBJECT_NOVECTOR_CLASS(MorphologicalOperations, mitkMorphologicalOper
 //
 %ignore map::deployment::DLLHandle::New(const LibraryHandleType& libraryHandle, const map::algorithm::UID* pUID, const core::String& libraryFile, const core::String& profileStr);
 %ignore map::deployment::DLLHandle::New(const map::algorithm::UID* pUID,const core::String& libraryFilePath,const core::String& profileStr);
-%ignore map::deployment::DLLInfo::New(const map::algorithm::UID* pUID,const core::String& libraryFilePath,const core::String& profileStr);
+//%ignore map::deployment::DLLInfo::New(const map::algorithm::UID* pUID,const core::String& libraryFilePath,const core::String& profileStr);
 %ignore map::deployment::DLLHandle::New;
+
+
 %{
 namespace core
 {
   typedef std::string String;
 }
-#include <mapDeploymentDLLInfo.h>
 %}
 namespace core
 {
   typedef std::string String;
 }
 
-class itk::SmartPointer<::map::deployment::DLLInfo>;
-class ::map::deployment::DLLInfo;
-%template(VectorDLLInfo2Pointer) std::vector< itk::SmartPointer<::map::deployment::DLLInfo> >;
-
-
-MITKSWIG_ADD_CLASS(DLLInfo, mapDeploymentDLLInfo.h, ::map::deployment)
-SWIG_ADD_MITK_CLASS_VECTORFREE(DLLHandle, mapDeploymentDLLHandle.h, ::map::deployment)
-
+SWIG_ADD_MITK_CLASS(UID, mapUID.h, map::algorithm)
+class itk::SmartPointer< map::algorithm::UID>::ObjectType;
+class map::algorithm::UID;
+SWIG_ADD_MITK_CLASS(DLLInfo, mapDeploymentDLLInfo.h, map::deployment)
 SWIG_ADD_MITK_CLASS_VECTORFREE(DLLDirectoryBrowser, mapDeploymentDLLDirectoryBrowser.h, ::map::deployment)
-MITKSWIG_ADD_HEADERFILE(mapString.h)
 
-MITKSWIG_ADD_CLASS(MITKAlgorithmHelper, mitkAlgorithmHelper.h, mitk)
-MITKSWIG_ADD_CLASS(RegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
-MITKSWIG_ADD_CLASS(MITKRegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
-
-
-SWIG_ADD_MITK_CLASS_VECTORFREE(UID, mapUID.h, map::algorithm)
-
-MITKSWIG_ADD_HEADERFILE(mapDeploymentDLLAccess.h)
-
-%{
-  namespace algorithm
-  {
-    typedef map::algorithm::UID UID;
-  }
-%}
+//MITKSWIG_ADD_CLASS(MITKAlgorithmHelper, mitkAlgorithmHelper.h, mitk)
+//MITKSWIG_ADD_CLASS(RegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
+//MITKSWIG_ADD_CLASS(MITKRegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
+//MITKSWIG_ADD_HEADERFILE(mapDeploymentDLLAccess.h)
 
 // SWIG_ADD_MITK_CLASS(FastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm, mitkFastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm.h, mitk)
 // SWIG_ADD_MITK_CLASS(LevelSetMotionMultiResDefaultRegistrationAlgorithm, mitkLevelSetMotionMultiResDefaultRegistrationAlgorithm.h, mitk)

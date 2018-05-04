@@ -53,10 +53,10 @@ namespace mitk
   NDIAuroraTypeInformation::NDIAuroraTypeInformation()
   {
     m_DeviceName = NDIAuroraTypeInformation::GetTrackingDeviceName();
-    m_TrackingDeviceData.push_back(GetDeviceDataAuroraCompact());
     m_TrackingDeviceData.push_back(GetDeviceDataAuroraPlanarCube());
     m_TrackingDeviceData.push_back(GetDeviceDataAuroraPlanarDome());
     m_TrackingDeviceData.push_back(GetDeviceDataAuroraTabletop());
+    m_TrackingDeviceData.push_back(GetDeviceDataAuroraCompact());
   }
 
   NDIAuroraTypeInformation::~NDIAuroraTypeInformation()

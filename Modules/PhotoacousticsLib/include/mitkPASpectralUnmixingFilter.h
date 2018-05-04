@@ -18,19 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKPHOTOACOUSTICSPECTRALUNMIXINGFILTER_H
 
 #include "mitkImageToImageFilter.h"
+#include <MitkPhotoacousticsLibExports.h>
 
 //Includes for smart pointer usage
 #include "mitkCommon.h"
 #include "itkLightObject.h"
 
-#include <MitkPhotoacousticsLibExports.h>
-
+// Includes for AddEnmemberMatrix
 #include "mitkPAPropertyCalculator.h"
 #include <eigen3/Eigen/Dense>
-
-// Test with ImagePixelAccessor
-#include <mitkImagePixelAccessor.h>
-#include <mitkImagePixelWriteAccessor.h>
 
 namespace mitk {
   namespace pa {
@@ -41,52 +37,41 @@ namespace mitk {
       mitkClassMacro(SpectralUnmixingFilter, mitk::ImageToImageFilter)
         itkFactorylessNewMacro(Self)
 
-      //Contains all (so far) possible chromophores
+      // Contains all (so far) possible chromophores
       enum ChromophoreType
       {
-        OXYGENATED = 1,
-        DEOXYGENATED = 2
+        OXYGENATED_HEMOGLOBIN = 1,
+        DEOXYGENATED_HEMOGLOBIN = 2
       };
 
-      //Void to creat m_vector of all chosen chromophores with push back method
-      void SetChromophores(ChromophoreType);
+      // Void to creat m_vector of all chosen chromophores with push back method
+      void AddChromophore(ChromophoreType);
       std::vector<int> m_Chromophore;
       
-      //Void to creat m_vector of all wavelengths with push back method
+      // Void to creat m_vector of all wavelengths with push back method
       void AddWavelength(int wavelength);
       std::vector<int> m_Wavelength; 
-      
-    
-
-      //Void to creat Eigen::Matrix of all absorbtions
-      //@ specific wavelength (columns) of chromophores (rows)
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> AddEndmemberMatrix();
      
-
     protected:
       SpectralUnmixingFilter();
       virtual ~SpectralUnmixingFilter();
 
     private:
-      virtual void GenerateData();
-      PropertyCalculator::Pointer m_PropertyCalculator;
-      unsigned int numberofchromophores;
-      unsigned int numberofwavelengths;
-      unsigned int numberOfInputs;
-      unsigned int numberOfOutputs;
-      long length;
-
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>  EndmemberMatrix;
-
-      //'New':
+      // Void checking precondtions possibly throwing exeptions
       virtual void CheckPreConditions(unsigned int NumberOfInputImages);
 
+      virtual void GenerateData();
       virtual void InitializeOutputs();
-      //Eigen::VectorXd OutputVector = (Eigen::VectorXd, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>);
-      Eigen::VectorXd SpectralUnmixingAlgorithms(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
-        Eigen::VectorXd inputVector);
 
+      // Void to creat Eigen::Matrix of all absorbtions
+      // @ specific wavelength (columns) of chromophores (rows)
+      Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> AddEndmemberMatrix();
+      Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>  EndmemberMatrix;
+      PropertyCalculator::Pointer m_PropertyCalculator;
 
+      // Test algorithm for SU --> later a new class should be set up
+      Eigen::VectorXf SpectralUnmixingTestAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
+        Eigen::VectorXf inputVector);
     };
   }
 }

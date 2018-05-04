@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
 
-// for testing reasons:
+// For testing reasons
 #include <random>
 
 mitk::pa::SpectralUnmixingFilter::SpectralUnmixingFilter()
@@ -49,7 +49,7 @@ void mitk::pa::SpectralUnmixingFilter::AddWavelength(int wavelength)
   m_Wavelength.push_back(wavelength);
 }
 
-void mitk::pa::SpectralUnmixingFilter::SetChromophores(ChromophoreType chromophore)
+void mitk::pa::SpectralUnmixingFilter::AddChromophore(ChromophoreType chromophore)
 {
   m_Chromophore.push_back(chromophore);
 }
@@ -57,48 +57,47 @@ void mitk::pa::SpectralUnmixingFilter::SetChromophores(ChromophoreType chromopho
 void mitk::pa::SpectralUnmixingFilter::GenerateData()
 {
   MITK_INFO << "GENERATING DATA..";
+
+  // Get input image
   mitk::Image::Pointer input = GetInput(0);
+
   unsigned int xDim = input->GetDimensions()[0];
   unsigned int yDim = input->GetDimensions()[1];
   unsigned int zDim = input->GetDimensions()[2];
 
-  MITK_INFO << "xdim: " << xDim;
-  MITK_INFO << "ydim: " << yDim;
-
-  MITK_INFO << "zdim: " << zDim;
+  MITK_INFO << "x dimension: " << xDim;
+  MITK_INFO << "y dimension: " << yDim;
+  MITK_INFO << "z dimension: " << zDim;
 
   CheckPreConditions(zDim);
-
   InitializeOutputs();
-  
-
   EndmemberMatrix = AddEndmemberMatrix();
-
-  //* IMAGE READ ACCESOR see old SU.cpp
   
+  // Copy input image into array
   mitk::ImageReadAccessor readAccess(input);
   const float* inputDataArray = ((const float*)readAccess.GetData());
 
+  //loop over every pixel @ x,y plane
   for (unsigned int x = 0; x < xDim; x++)
   {
     for (unsigned int y = 0; y < yDim; y++)
     {
-      Eigen::VectorXd inputVector(zDim);
+      Eigen::VectorXf inputVector(zDim);
       for (unsigned int z = 0; z < zDim; z++)
       {
-        
-        unsigned int pixelNumber = (xDim*yDim*z)+x*yDim+y;
-        //MITK_INFO << pixelNumber;
-        auto pixel = inputDataArray[pixelNumber];/**/
-        // --> works with 3x3x3 but not with 1000x1000x3 picture 
-        
-        //float pixel = rand(); // dummy value for pixel
-        
+        // Get pixel value of pixel x,y @ wavelength z
+        unsigned int pixelNumber = (xDim*yDim*z) + x * yDim + y;
+        auto pixel = inputDataArray[pixelNumber];
+
+        // dummy values for pixel for testing purposes
+        //float pixel = rand();
+
+        //write all wavelength absorbtion values for one(!) pixel to a vector
         inputVector[z] = pixel;
       }
-      
-      Eigen::VectorXd resultVector = SpectralUnmixingAlgorithms(EndmemberMatrix, inputVector);
+      Eigen::VectorXf resultVector = SpectralUnmixingTestAlgorithm(EndmemberMatrix, inputVector);
 
+      // write output
       for (int outputIdx = 0; outputIdx < GetNumberOfIndexedOutputs(); ++outputIdx)
       {
         auto output = GetOutput(outputIdx);
@@ -111,24 +110,26 @@ void mitk::pa::SpectralUnmixingFilter::GenerateData()
   MITK_INFO << "GENERATING DATA...[DONE]";
 }
 
-
-
-
-// checks if number of Inputs == added wavelengths 
 void mitk::pa::SpectralUnmixingFilter::CheckPreConditions(unsigned int NumberOfInputImages)
 {
+  // Checking if number of Inputs == added wavelengths
   if (m_Wavelength.size() != NumberOfInputImages)
     mitkThrow() << "CHECK INPUTS! WAVELENGTHERROR";
+
+  // Checking if number of wavelengths >= number of chromophores
+  if (m_Chromophore.size() > m_Wavelength.size())
+    mitkThrow() << "PRESS 'IGNORE' AND ADD MORE WAVELENGTHS!";
+
   MITK_INFO << "CHECK PRECONDITIONS ...[DONE]";
 }
 
-// Initialize Outputs
 void mitk::pa::SpectralUnmixingFilter::InitializeOutputs()
 {
-  numberOfInputs = GetNumberOfIndexedInputs();
-  numberOfOutputs = GetNumberOfIndexedOutputs();
+  unsigned int numberOfInputs = GetNumberOfIndexedInputs();
+  unsigned int numberOfOutputs = GetNumberOfIndexedOutputs();
+  MITK_INFO << "Inputs: " << numberOfInputs << " Outputs: " << numberOfOutputs;
 
-  //* see MitkPAVolume.cpp
+  //  Set dimensions (2) and pixel type (float) for output
   mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();
   const int NUMBER_OF_SPATIAL_DIMENSIONS = 2;
   auto* dimensions = new unsigned int[NUMBER_OF_SPATIAL_DIMENSIONS];
@@ -136,66 +137,61 @@ void mitk::pa::SpectralUnmixingFilter::InitializeOutputs()
   {
     dimensions[dimIdx] = GetInput()->GetDimensions()[dimIdx];
   }
-  Image::Pointer m_InternalMitkImage;/**/
 
+  // Initialize numberOfOutput pictures with pixel type and dimensions
   for (unsigned int outputIdx = 0; outputIdx < numberOfOutputs; outputIdx++)
   {
-    //GetOutput(outputIdx)->Initialize(GetInput(0));
-    
-    //* see MitkPAVolume.cpp :: DOESN'T WORK (TM)
-    //m_InternalMitkImage = mitk::Image::New();
-    GetOutput(outputIdx)->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);/**/
+    GetOutput(outputIdx)->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);
   }
 }
 
 //Matrix with #chromophores rows and #wavelengths columns
-//so Matrix Element (j,i) contains the Absorbtion of chromophore j @ wavelength i
-Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingFilter::AddEndmemberMatrix()
+//so Matrix Element (i,j) contains the Absorbtion of chromophore i @ wavelength j
+Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingFilter::AddEndmemberMatrix()
 {
-  numberofchromophores = m_Chromophore.size();
-  numberofwavelengths = m_Wavelength.size();
+  unsigned int numberOfChromophores = m_Chromophore.size(); //rows
+  unsigned int numberOfWavelengths = m_Wavelength.size(); //columns
 
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix(numberofchromophores, numberofwavelengths);
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix(numberOfChromophores, numberOfWavelengths);
 
-  //loop over j rows (Chromophores)
-  for(unsigned int j =0; j < numberofchromophores; ++j)
+  //loop over i rows (Chromophores)
+  for(unsigned int i = 0; i < numberOfChromophores; ++i)
   {
-    //loop over i columns (Wavelength)
-    for (unsigned int i = 0; i < numberofwavelengths; ++i)
+    //loop over j columns (Wavelengths)
+    for (unsigned int j = 0; j < numberOfWavelengths; ++j)
     {
       //writes @ Matrix element (i,j) the absorbtion wavelength of the propertycalculator.cpp
-      EndmemberMatrix(j,i)= m_PropertyCalculator->GetAbsorptionForWavelength(
-      static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[j]), m_Wavelength[i]);
+      EndmemberMatrix(i,j)= m_PropertyCalculator->GetAbsorptionForWavelength(
+      static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[i]), m_Wavelength[j]);
       /* Test to see what gets written in the Matrix:
-      MITK_INFO << "map type: " << static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[j]);
-      MITK_INFO << "wavelength: " << m_Wavelength[i];
-      MITK_INFO << "Matrixelement: (" << j << ", " << i << ") Absorbtion: " << EndmemberMatrix(j, i);/**/
+      MITK_INFO << "map type: " << static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[i]);
+      MITK_INFO << "wavelength: " << m_Wavelength[j];
+      MITK_INFO << "Matrixelement: (" << i << ", " << j << ") Absorbtion: " << EndmemberMatrix(i, j);/**/
       
-      if (EndmemberMatrix(j, i) == 0)
+      if (EndmemberMatrix(i, j) == 0)
       {
         m_Wavelength.clear();
-        mitkThrow() << "WAVELENGTH "<< m_Wavelength[i] << "nm NOT SUPPORTED!";
+        mitkThrow() << "WAVELENGTH "<< m_Wavelength[j] << "nm NOT SUPPORTED!";
       }
     }
   }
-  MITK_INFO << "GENERATING ENMEMBERMATRIX SUCCESSFUL!";
+  MITK_INFO << "GENERATING ENMEMBERMATRIX [DONE]!";
   return EndmemberMatrix;
 }
 
-// Perform SU algorithm
-Eigen::VectorXd mitk::pa::SpectralUnmixingFilter::SpectralUnmixingAlgorithms(
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXd inputVector)
+Eigen::VectorXf mitk::pa::SpectralUnmixingFilter::SpectralUnmixingTestAlgorithm(
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
 {
   //test "solver" (input = output)
-  Eigen::VectorXd resultVector = inputVector;
+  Eigen::VectorXf resultVector = inputVector;
   return resultVector;
     
   //llt solver
-  //Eigen::VectorXd resultVector = EndmemberMatrix.llt().solve(inputVector);
+  //Eigen::VectorXf resultVector = EndmemberMatrix.llt().solve(inputVector);
   //return resultVector;
 
   //householderqr solver
-  //Eigen::VectorXd resultVector =EndmemberMatrix.householderQr().solve(inputVector);
+  //Eigen::VectorXf resultVector =EndmemberMatrix.householderQr().solve(inputVector);
   //return resultVector;
 
   //test other solvers https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
@@ -203,42 +199,3 @@ Eigen::VectorXd mitk::pa::SpectralUnmixingFilter::SpectralUnmixingAlgorithms(
   /*double relative_error = (EndmemberMatrix*inputVector - resultVector).norm() / resultVector.norm(); // norm() is L2 norm
   MITK_INFO << relative_error;/**/
 }
-
-/* +++++++++++++++++++++++++++++++++++++++++ OLD CODE: +++++++++++++++++++++++++++++++++++++++++++++++++++
-was @ generate data
-
-length = GetOutput(0)->GetDimension(0)*GetOutput(0)->GetDimension(1)*GetOutput(0)->GetDimension(2);
-
-for (int i = 0; i < length; i++)
-{
-Eigen::VectorXd b(numberOfInputs);
-for (unsigned int j = 0; j < numberOfInputs; j++)
-{
-mitk::Image::Pointer input = GetInput(j);
-mitk::ImageReadAccessor readAccess(input, input->GetVolumeData());
-b(j) = ((const float*)readAccess.GetData())[i];
-}
-
-Eigen::Vector3d x = EndmemberMatrix.householderQr().solve(b);
-
-
-if (i == 0)
-{
-MITK_INFO << "for i=0 b(#Inputs)";
-MITK_INFO << b;
-MITK_INFO << "EndmemberMatrix";
-MITK_INFO << EndmemberMatrix;
-MITK_INFO << "x";
-MITK_INFO << x;
-}
-
-
-for (unsigned int outputIdx = 0; outputIdx < numberOfOutputs; outputIdx++)
-{
-mitk::Image::Pointer output = GetOutput(outputIdx);
-mitk::ImageWriteAccessor writeOutput(output, output->GetVolumeData());
-double* outputArray = (double *)writeOutput.GetData();
-outputArray[i] = x[outputIdx];
-}
-}
-/**/

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef SpectralUnmixing_h
 #define SpectralUnmixing_h
 
@@ -26,14 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPAPropertyCalculator.h"
 
-/**
-  \brief SpectralUnmixing
-
-  \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
-
-  \sa QmitkAbstractView
-  \ingroup ${plugin_target}_internal
-*/
 class SpectralUnmixing : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
@@ -42,17 +33,9 @@ class SpectralUnmixing : public QmitkAbstractView
 
 public:
   static const std::string VIEW_ID;
-
-  // Add Wavelengths with button:
-  int size = 0;
-  std::vector<int> m_Wavelengths;
-
-  bool DeOxbool;
-  bool Oxbool;
-
+  
 protected:
   virtual void CreateQtPartControl(QWidget *parent) override;
-
   virtual void SetFocus() override;
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
@@ -64,12 +47,18 @@ protected:
 
   virtual void Wavelength();
   virtual void ClearWavelength();
-  unsigned int wavelength;
-  unsigned int numberofChromophores;
-  Ui::SpectralUnmixingControls m_Controls;
+  virtual void numberOfChromophores();
 
+  Ui::SpectralUnmixingControls m_Controls;
   mitk::pa::PropertyCalculator::Pointer m_PropertyCalculator;
 
+  // Add Wavelengths with button:
+  int size = 0;
+  std::vector<int> m_Wavelengths;
+
+  // Selection of Chromophores
+  bool DeOxbool;
+  bool Oxbool;
 };
 
 #endif // SpectralUnmixing_h

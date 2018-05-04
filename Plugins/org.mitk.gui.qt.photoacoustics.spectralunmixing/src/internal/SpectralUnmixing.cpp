@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
@@ -28,10 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk image
 #include <mitkImage.h>
 
-//test mitk image
+/*//test mitk image
 #include <mitkIOUtil.h>
 #include <mitkImageWriteAccessor.h>
-#include <mitkImageReadAccessor.h>
+#include <mitkImageReadAccessor.h>*/
 
 // Include to perform Spectral Unmixing
 #include "mitkPASpectralUnmixingFilter.h"
@@ -52,8 +51,7 @@ void SpectralUnmixing::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.ButtonClearWavelength, &QPushButton::clicked, this, &SpectralUnmixing::ClearWavelength);
 }
 
-// Add Wavelength is working, BUT in the Plugin! Not with same implementation at the filter
-// probably because the m_wavelengths vector is created new every time and not 'saved'.
+// Adds Wavelength @ Plugin with button
 void SpectralUnmixing::Wavelength()
 {
   if (m_Wavelengths.empty())
@@ -61,15 +59,48 @@ void SpectralUnmixing::Wavelength()
       size = 0;
   }
 
-  wavelength = m_Controls.spinBoxAddWavelength->value();
+  unsigned int wavelength = m_Controls.spinBoxAddWavelength->value();
   m_Wavelengths.push_back(wavelength);
-  MITK_INFO << "ADD WAVELENGTH: " << wavelength << "nm";
   size += 1; // size implemented like this because '.size' is const
   MITK_INFO << "ALL WAVELENGTHS: ";
 
   for (int i = 0; i < size; ++i)
   {
     MITK_INFO << m_Wavelengths[i] << "nm";
+  }
+}
+
+// Checking which chromophores wanted for SU if none throw exeption!
+void SpectralUnmixing::numberOfChromophores()
+{
+  auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilter::New();
+
+  unsigned int numberofChromophores = 0;
+  DeOxbool = m_Controls.checkBoxDeOx->isChecked();
+  Oxbool = m_Controls.checkBoxOx->isChecked();
+  if (DeOxbool || Oxbool)
+  {
+    MITK_INFO << "CHOSEN CHROMOPHORES:";
+  }
+  if (Oxbool)
+  {
+    numberofChromophores += 1;
+    MITK_INFO << "- Oxyhemoglobin";
+    // Set chromophore Oxyhemoglobon:
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::SpectralUnmixingFilter::ChromophoreType::OXYGENATED_HEMOGLOBIN);
+  }
+  if (DeOxbool)
+  {
+    numberofChromophores += 1;
+    MITK_INFO << "- Deoxygenated hemoglobin";
+    // Set chromophore Deoxygenated hemoglobin:
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::SpectralUnmixingFilter::ChromophoreType::DEOXYGENATED_HEMOGLOBIN);
+  }
+  if (numberofChromophores == 0)
+  {
+    mitkThrow() << "PRESS 'IGNORE' AND CHOOSE A CHROMOPHORE!";
   }
 }
 
@@ -132,60 +163,17 @@ void SpectralUnmixing::DoImageProcessing()
       message << ".";
       MITK_INFO << message.str();
 
-      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+      MITK_INFO << "GENERATING DATA...";
 
       auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilter::New();
 
       m_SpectralUnmixingFilter->SetInput(image);
 
-
-      // Checking which chromophores wanted for SU if none throw exeption!
-      numberofChromophores = 0;
-      DeOxbool = m_Controls.checkBoxDeOx->isChecked();
-      Oxbool = m_Controls.checkBoxOx->isChecked();
-
-      if (Oxbool)
+      // Wavelength implementation into fiter
+      for (unsigned int imageIndex = 0; imageIndex < m_Wavelengths.size(); imageIndex++)
       {
-        numberofChromophores += 1;
-        MITK_INFO << "- Oxyhemoglobin";
-        // Set chromophore Oxyhemoglobon:
-        m_SpectralUnmixingFilter->SetChromophores(
-          mitk::pa::SpectralUnmixingFilter::ChromophoreType::OXYGENATED);
-      }
-      if (DeOxbool)
-      {
-        numberofChromophores += 1;
-        MITK_INFO << "- Deoxygenated hemoglobin";
-        // Set chromophore Deoxygenated hemoglobin:
-        m_SpectralUnmixingFilter->SetChromophores(
-          mitk::pa::SpectralUnmixingFilter::ChromophoreType::DEOXYGENATED);
-      }
-      if (numberofChromophores == 0)
-      {
-        mitkThrow() << "PRESS 'IGNORE' AND CHOOSE A CHROMOPHORE!";       
-      }
-
-      // Checking if number of wavelengths >= number of chromophores
-      if (numberofChromophores > size)
-      {
-        mitkThrow() << "PRESS 'IGNORE' AND ADD MORE WAVELENGTHS!";
-      }
-
-      //code recreaction from "old" SU.cpp
-        
-      MITK_INFO << "GENERATING DATA...";
-      unsigned int numberOfInputs = size;
-      unsigned int numberOfOutputs = numberofChromophores;
-
-      MITK_INFO << "Inputs: " << numberOfInputs << " Outputs: " << numberOfOutputs;  
-            
-      // additional wavelength implementation into fiter vector; needs "above" one 
-      for (unsigned int imageIndex = 0; imageIndex < numberOfInputs; imageIndex++)
-      {
-        wavelength = m_Wavelengths[imageIndex];
-        MITK_INFO << wavelength;
+        unsigned int wavelength = m_Wavelengths[imageIndex];
         m_SpectralUnmixingFilter->AddWavelength(wavelength);
-      
       }
               
       MITK_INFO << "Updating Filter...";

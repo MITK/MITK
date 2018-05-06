@@ -414,14 +414,15 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
       }
 
       // Paint outline
-      glColor4f( lineColor[0], lineColor[1], lineColor[2], lineOpacity );
+      glColor3f( .1, .1, .1 );
+      glLineWidth( 1.0f );
       glBegin( GL_LINE_LOOP );
       for ( int angle = 0; angle < 8; ++angle )
       {
         float angleRad = angle * (float) 3.14159 / 4.0;
         float x = displayPoint[0] + radius * (float)cos( angleRad );
         float y = displayPoint[1] + radius * (float)sin( angleRad );
-        glVertex3f(x, y, PLANAR_OFFSET);
+        glVertex3f(x, y, 1.f);
       }
       glEnd();
       break;

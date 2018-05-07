@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkPASpectralUnmixingFilter.h"
+#include "mitkPASpectralUnmixingFilterBase.h"
 
 // Includes for AddEnmemberMatrix
 #include "mitkPAPropertyCalculator.h"
@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // For testing reasons
 #include <random>
 
-mitk::pa::SpectralUnmixingFilter::SpectralUnmixingFilter()
+mitk::pa::SpectralUnmixingFilterBase::SpectralUnmixingFilterBase()
 {
   this->SetNumberOfIndexedOutputs(2);
 
@@ -39,23 +39,22 @@ mitk::pa::SpectralUnmixingFilter::SpectralUnmixingFilter()
   m_PropertyCalculator = mitk::pa::PropertyCalculator::New();
 }
 
-mitk::pa::SpectralUnmixingFilter::~SpectralUnmixingFilter()
+mitk::pa::SpectralUnmixingFilterBase::~SpectralUnmixingFilterBase()
 {
 
 }
 
-void mitk::pa::SpectralUnmixingFilter::AddWavelength(int wavelength)
+void mitk::pa::SpectralUnmixingFilterBase::AddWavelength(int wavelength)
 {
   m_Wavelength.push_back(wavelength);
 }
 
-void mitk::pa::SpectralUnmixingFilter::AddChromophore(ChromophoreType chromophore)
+void mitk::pa::SpectralUnmixingFilterBase::AddChromophore(ChromophoreType chromophore)
 {
   m_Chromophore.push_back(chromophore);
-
 }
 
-void mitk::pa::SpectralUnmixingFilter::GenerateData()
+void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
 {
   MITK_INFO << "GENERATING DATA..";
 
@@ -72,9 +71,8 @@ void mitk::pa::SpectralUnmixingFilter::GenerateData()
   MITK_INFO << "z dimension: " << zDim;
 
   InitializeOutputs();
-
-
-  EndmemberMatrix = AddEndmemberMatrix();
+  
+  auto EndmemberMatrix = AddEndmemberMatrix();
   
   // Copy input image into array
   mitk::ImageReadAccessor readAccess(input);
@@ -113,7 +111,7 @@ void mitk::pa::SpectralUnmixingFilter::GenerateData()
         //write all wavelength absorbtion values for one(!) pixel to a vector
         inputVector[z] = pixel;
       }
-      Eigen::VectorXf resultVector = SpectralUnmixingTestAlgorithm(EndmemberMatrix, inputVector);
+      Eigen::VectorXf resultVector = SpectralUnmixingAlgorithm(EndmemberMatrix, inputVector);
 
       // write output
       for (int outputIdx = 0; outputIdx < GetNumberOfIndexedOutputs(); ++outputIdx)
@@ -131,7 +129,7 @@ void mitk::pa::SpectralUnmixingFilter::GenerateData()
   myfile.close();
 }
 
-void mitk::pa::SpectralUnmixingFilter::CheckPreConditions(unsigned int size, unsigned int NumberOfInputImages, const float* inputDataArray)
+void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(unsigned int size, unsigned int NumberOfInputImages, const float* inputDataArray)
 {
   // Checking if number of Inputs == added wavelengths
   if (m_Wavelength.size() != NumberOfInputImages)
@@ -155,7 +153,7 @@ void mitk::pa::SpectralUnmixingFilter::CheckPreConditions(unsigned int size, uns
   MITK_INFO << "CHECK PRECONDITIONS ...[DONE]";
 }
 
-void mitk::pa::SpectralUnmixingFilter::InitializeOutputs()
+void mitk::pa::SpectralUnmixingFilterBase::InitializeOutputs()
 {
   unsigned int numberOfInputs = GetNumberOfIndexedInputs();
   unsigned int numberOfOutputs = GetNumberOfIndexedOutputs();
@@ -177,9 +175,10 @@ void mitk::pa::SpectralUnmixingFilter::InitializeOutputs()
   }
 }
 
+
 //Matrix with #chromophores rows and #wavelengths columns
 //so Matrix Element (i,j) contains the Absorbtion of chromophore i @ wavelength j
-Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingFilter::AddEndmemberMatrix()
+Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingFilterBase::AddEndmemberMatrix()
 {
   unsigned int numberOfChromophores = m_Chromophore.size(); //rows
   unsigned int numberOfWavelengths = m_Wavelength.size(); //columns
@@ -193,13 +192,15 @@ Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingF
     for (unsigned int j = 0; j < numberOfWavelengths; ++j)
     {
       //writes @ Matrix element (i,j) the absorbtion wavelength of the propertycalculator.cpp
+      //'i+1' because MapType is defined different then ChromophoreType
       EndmemberMatrix(i,j)= m_PropertyCalculator->GetAbsorptionForWavelength(
-      static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[i]), m_Wavelength[j]);
+      static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[i]+1), m_Wavelength[j]);
+            
+      //* Tests to see what gets written in the Matrix:
       auto testtype = m_PropertyCalculator->GetAbsorptionForWavelength(
-        static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[i]), m_Wavelength[j]);
-      /* Test to see what gets written in the Matrix:
+      static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[i]+1), m_Wavelength[j]);
       MITK_INFO << "TEST_TYPE Matrix: " << typeid(EndmemberMatrix(i,j)).name();
-      MITK_INFO << "map type: " << static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[i]);
+      MITK_INFO << "map type: " << static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[i]+1);
       MITK_INFO << "wavelength: " << m_Wavelength[j];
       MITK_INFO << "Matrixelement: (" << i << ", " << j << ") Absorbtion: " << EndmemberMatrix(i, j);/**/
       
@@ -212,34 +213,4 @@ Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingF
   }
   MITK_INFO << "GENERATING ENMEMBERMATRIX [DONE]!";
   return EndmemberMatrix;
-}
-
-Eigen::VectorXf mitk::pa::SpectralUnmixingFilter::SpectralUnmixingTestAlgorithm(
-  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
-{
-  int treshold = 0;
-  int defaultValue = -1;
-
-  //*llt solver
-  //Eigen::Vector2f resultVector = EndmemberMatrix.llt().solve(inputVector);
-  //double relative_error = (EndmemberMatrix*inputVector - lltVector).norm() / lltVector.norm(); // norm() is L2 norm
-  /**/
-
-  //*householderqr solver
-  Eigen::Vector2f resultVector = EndmemberMatrix.householderQr().solve(inputVector);/**/
-
-
-  /*Set threshold and replace with default value if under threshold
-  for (int i = 0; i < 2; ++i)
-  {
-    if (resultVector[i] < treshold)
-    {
-      resultVector[i] = defaultValue;
-      MITK_INFO << "UNMIXING RESULT N/A";
-    }
-  }/**/
-
-  //test other solvers https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
-
-  return resultVector;
 }

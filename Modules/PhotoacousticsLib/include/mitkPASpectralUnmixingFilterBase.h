@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKPHOTOACOUSTICSPECTRALUNMIXINGFILTER_H
-#define MITKPHOTOACOUSTICSPECTRALUNMIXINGFILTER_H
+#ifndef MITKPHOTOACOUSTICSPECTRALUNMIXINGFILTERBASE_H
+#define MITKPHOTOACOUSTICSPECTRALUNMIXINGFILTERBASE_H
 
 #include "mitkImageToImageFilter.h"
 #include <MitkPhotoacousticsLibExports.h>
@@ -30,49 +30,51 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
   namespace pa {
-    class MITKPHOTOACOUSTICSLIB_EXPORT SpectralUnmixingFilter : public mitk::ImageToImageFilter
+    class MITKPHOTOACOUSTICSLIB_EXPORT SpectralUnmixingFilterBase : public mitk::ImageToImageFilter
     {
     public:
 
-      mitkClassMacro(SpectralUnmixingFilter, mitk::ImageToImageFilter)
-        itkFactorylessNewMacro(Self)
+      mitkClassMacro(SpectralUnmixingFilterBase, mitk::ImageToImageFilter)
 
       // Contains all (so far) possible chromophores
       enum ChromophoreType
       {
-        OXYGENATED_HEMOGLOBIN = 1,
-        DEOXYGENATED_HEMOGLOBIN = 2
+        OXYGENATED_HEMOGLOBIN,
+        DEOXYGENATED_HEMOGLOBIN
       };
 
       // Void to creat m_vector of all chosen chromophores with push back method
       void AddChromophore(ChromophoreType);
-      std::vector<int> m_Chromophore;
       
       // Void to creat m_vector of all wavelengths with push back method
       void AddWavelength(int wavelength);
-      std::vector<int> m_Wavelength; 
+
+
 
     protected:
-      SpectralUnmixingFilter();
-      virtual ~SpectralUnmixingFilter();
+      SpectralUnmixingFilterBase();
+      virtual ~SpectralUnmixingFilterBase();
+
+      std::vector<ChromophoreType> m_Chromophore;
+      std::vector<int> m_Wavelength; 
+
+      virtual Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
+        Eigen::VectorXf inputVector) = 0;
 
     private:
       // Void checking precondtions possibly throwing exeptions
       virtual void CheckPreConditions(unsigned int size, unsigned int NumberOfInputImages, const float* inputDataArray);
 
-      virtual void GenerateData();
+      virtual void GenerateData() override;
       virtual void InitializeOutputs();
 
       // Void to creat Eigen::Matrix of all absorbtions
       // @ specific wavelength (columns) of chromophores (rows)
       Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> AddEndmemberMatrix();
-      Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>  EndmemberMatrix;
-      PropertyCalculator::Pointer m_PropertyCalculator;
 
-      // Test algorithm for SU --> later a new class should be set up
-      Eigen::VectorXf SpectralUnmixingTestAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
-        Eigen::VectorXf inputVector);
+      PropertyCalculator::Pointer m_PropertyCalculator;
+            
     };
   }
 }
-#endif // MITKPHOTOACOUSTICSPECTRALUNMIXINGFILTER_H
+#endif // MITKPHOTOACOUSTICSPECTRALUNMIXINGFILTERBASE_

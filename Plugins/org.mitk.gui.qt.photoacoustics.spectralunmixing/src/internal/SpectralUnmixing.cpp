@@ -28,7 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 
 // Include to perform Spectral Unmixing
-#include "mitkPASpectralUnmixingFilter.h"
+#include "mitkPASpectralUnmixingFilterBase.h"
+#include "mitkPALinearSpectralUnmixingFilter.h"
+
 
 const std::string SpectralUnmixing::VIEW_ID = "org.mitk.views.spectralunmixing";
 
@@ -124,7 +126,7 @@ void SpectralUnmixing::DoImageProcessing()
       message << ".";
       MITK_INFO << message.str();
 
-      auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilter::New();
+      auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
 
       m_SpectralUnmixingFilter->SetInput(image);
 
@@ -149,7 +151,7 @@ void SpectralUnmixing::DoImageProcessing()
         MITK_INFO << "- Oxyhemoglobin";
         // Set chromophore Oxyhemoglobon:
         m_SpectralUnmixingFilter->AddChromophore(
-        mitk::pa::SpectralUnmixingFilter::ChromophoreType::OXYGENATED_HEMOGLOBIN);
+        mitk::pa::SpectralUnmixingFilterBase::ChromophoreType::OXYGENATED_HEMOGLOBIN);
       }
       if (DeOxbool)
       {
@@ -157,7 +159,7 @@ void SpectralUnmixing::DoImageProcessing()
          MITK_INFO << "- Deoxygenated hemoglobin";
         // Set chromophore Deoxygenated hemoglobin:
         m_SpectralUnmixingFilter->AddChromophore(
-        mitk::pa::SpectralUnmixingFilter::ChromophoreType::DEOXYGENATED_HEMOGLOBIN);
+        mitk::pa::SpectralUnmixingFilterBase::ChromophoreType::DEOXYGENATED_HEMOGLOBIN);
       }
       if (numberofChromophores == 0)
       {

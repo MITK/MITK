@@ -51,14 +51,14 @@ namespace mitk {
       // Void to creat m_vector of all wavelengths with push back method
       void AddWavelength(int wavelength);
       std::vector<int> m_Wavelength; 
-     
+
     protected:
       SpectralUnmixingFilter();
       virtual ~SpectralUnmixingFilter();
 
     private:
       // Void checking precondtions possibly throwing exeptions
-      virtual void CheckPreConditions(unsigned int NumberOfInputImages);
+      virtual void CheckPreConditions(unsigned int size, unsigned int NumberOfInputImages, const float* inputDataArray);
 
       virtual void GenerateData();
       virtual void InitializeOutputs();

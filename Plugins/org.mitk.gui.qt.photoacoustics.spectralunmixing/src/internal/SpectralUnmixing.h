@@ -47,7 +47,6 @@ protected:
 
   virtual void Wavelength();
   virtual void ClearWavelength();
-  virtual void numberOfChromophores();
 
   Ui::SpectralUnmixingControls m_Controls;
   mitk::pa::PropertyCalculator::Pointer m_PropertyCalculator;

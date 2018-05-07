@@ -27,11 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk image
 #include <mitkImage.h>
 
-/*//test mitk image
-#include <mitkIOUtil.h>
-#include <mitkImageWriteAccessor.h>
-#include <mitkImageReadAccessor.h>*/
-
 // Include to perform Spectral Unmixing
 #include "mitkPASpectralUnmixingFilter.h"
 
@@ -67,40 +62,6 @@ void SpectralUnmixing::Wavelength()
   for (int i = 0; i < size; ++i)
   {
     MITK_INFO << m_Wavelengths[i] << "nm";
-  }
-}
-
-// Checking which chromophores wanted for SU if none throw exeption!
-void SpectralUnmixing::numberOfChromophores()
-{
-  auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilter::New();
-
-  unsigned int numberofChromophores = 0;
-  DeOxbool = m_Controls.checkBoxDeOx->isChecked();
-  Oxbool = m_Controls.checkBoxOx->isChecked();
-  if (DeOxbool || Oxbool)
-  {
-    MITK_INFO << "CHOSEN CHROMOPHORES:";
-  }
-  if (Oxbool)
-  {
-    numberofChromophores += 1;
-    MITK_INFO << "- Oxyhemoglobin";
-    // Set chromophore Oxyhemoglobon:
-    m_SpectralUnmixingFilter->AddChromophore(
-      mitk::pa::SpectralUnmixingFilter::ChromophoreType::OXYGENATED_HEMOGLOBIN);
-  }
-  if (DeOxbool)
-  {
-    numberofChromophores += 1;
-    MITK_INFO << "- Deoxygenated hemoglobin";
-    // Set chromophore Deoxygenated hemoglobin:
-    m_SpectralUnmixingFilter->AddChromophore(
-      mitk::pa::SpectralUnmixingFilter::ChromophoreType::DEOXYGENATED_HEMOGLOBIN);
-  }
-  if (numberofChromophores == 0)
-  {
-    mitkThrow() << "PRESS 'IGNORE' AND CHOOSE A CHROMOPHORE!";
   }
 }
 
@@ -163,8 +124,6 @@ void SpectralUnmixing::DoImageProcessing()
       message << ".";
       MITK_INFO << message.str();
 
-      MITK_INFO << "GENERATING DATA...";
-
       auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilter::New();
 
       m_SpectralUnmixingFilter->SetInput(image);
@@ -175,23 +134,52 @@ void SpectralUnmixing::DoImageProcessing()
         unsigned int wavelength = m_Wavelengths[imageIndex];
         m_SpectralUnmixingFilter->AddWavelength(wavelength);
       }
+
+      // Checking which chromophores wanted for SU if none throw exeption!
+      unsigned int numberofChromophores = 0;
+      DeOxbool = m_Controls.checkBoxDeOx->isChecked();
+      Oxbool = m_Controls.checkBoxOx->isChecked();
+      if (DeOxbool || Oxbool)
+      {
+        MITK_INFO << "CHOSEN CHROMOPHORES:";
+      }
+      if (Oxbool)
+      {
+        numberofChromophores += 1;
+        MITK_INFO << "- Oxyhemoglobin";
+        // Set chromophore Oxyhemoglobon:
+        m_SpectralUnmixingFilter->AddChromophore(
+        mitk::pa::SpectralUnmixingFilter::ChromophoreType::OXYGENATED_HEMOGLOBIN);
+      }
+      if (DeOxbool)
+      {
+        numberofChromophores += 1;
+         MITK_INFO << "- Deoxygenated hemoglobin";
+        // Set chromophore Deoxygenated hemoglobin:
+        m_SpectralUnmixingFilter->AddChromophore(
+        mitk::pa::SpectralUnmixingFilter::ChromophoreType::DEOXYGENATED_HEMOGLOBIN);
+      }
+      if (numberofChromophores == 0)
+      {
+        mitkThrow() << "PRESS 'IGNORE' AND CHOOSE A CHROMOPHORE!";
+      }
               
       MITK_INFO << "Updating Filter...";
       
       m_SpectralUnmixingFilter->Update();
-     
-      mitk::Image::Pointer HbO2 = m_SpectralUnmixingFilter->GetOutput(0);
-      mitk::DataNode::Pointer dataNodeHbO2 = mitk::DataNode::New();
-      dataNodeHbO2->SetData(HbO2);
-      dataNodeHbO2->SetName("HbO2");
-      this->GetDataStorage()->Add(dataNodeHbO2);  
-       
-      mitk::Image::Pointer Hb = m_SpectralUnmixingFilter->GetOutput(1);
+
+      mitk::Image::Pointer Hb = m_SpectralUnmixingFilter->GetOutput(0);
       mitk::DataNode::Pointer dataNodeHb = mitk::DataNode::New();
       dataNodeHb->SetData(Hb);
       dataNodeHb->SetName("Hb");
       this->GetDataStorage()->Add(dataNodeHb);
-      
+
+      mitk::Image::Pointer HbO2 = m_SpectralUnmixingFilter->GetOutput(1);
+      mitk::DataNode::Pointer dataNodeHbO2 = mitk::DataNode::New();
+      dataNodeHbO2->SetData(HbO2);
+      dataNodeHbO2->SetName("HbO2");
+      this->GetDataStorage()->Add(dataNodeHbO2);
+
       mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 
       MITK_INFO << "Adding images to DataStorage...[DONE]";

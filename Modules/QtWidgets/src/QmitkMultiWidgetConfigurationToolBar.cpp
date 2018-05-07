@@ -19,12 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkMultiWidgetConfigurationToolBar::QmitkMultiWidgetConfigurationToolBar(QmitkCustomMultiWidget* customMultiWidget)
   : QToolBar(customMultiWidget)
   , m_CustomMultiWidget(customMultiWidget)
-  , m_ActionGroup(nullptr)
 {
   QToolBar::setOrientation(Qt::Vertical);
   QToolBar::setIconSize(QSize(17, 17));
 
-  InitActionGroup();
+  InitializeToolBar();
 }
 
 QmitkMultiWidgetConfigurationToolBar::~QmitkMultiWidgetConfigurationToolBar()
@@ -32,11 +31,8 @@ QmitkMultiWidgetConfigurationToolBar::~QmitkMultiWidgetConfigurationToolBar()
   // nothing here
 }
 
-void QmitkMultiWidgetConfigurationToolBar::InitActionGroup()
+void QmitkMultiWidgetConfigurationToolBar::InitializeToolBar()
 {
-  m_ActionGroup = new QActionGroup(this);
-  m_ActionGroup->setExclusive(true);
-
   // create popup to show a widget to modify the multi widget layout
   m_LayoutSelectionPopup = new QmitkMultiWidgetLayoutSelectionWidget(this);
   m_LayoutSelectionPopup->hide();
@@ -49,18 +45,41 @@ void QmitkMultiWidgetConfigurationToolBar::InitActionGroup()
 void QmitkMultiWidgetConfigurationToolBar::AddButtons()
 {
   QAction* setLayoutAction = new QAction(QIcon(":/Qmitk/cmwLayout.png"), tr("Set multi widget layout"), this);
-  setLayoutAction->setActionGroup(m_ActionGroup);
   connect(setLayoutAction, SIGNAL(triggered()), SLOT(OnSetLayout()));
 
   QToolBar::addAction(setLayoutAction);
 
   m_SynchronizeAction = new QAction(QIcon(":/Qmitk/cmwSynchronized.png"), tr("Desynchronize render windows"), this);
-  m_SynchronizeAction->setActionGroup(m_ActionGroup);
+  m_SynchronizeAction->setCheckable(true);
+  m_SynchronizeAction->setChecked(true);
   connect(m_SynchronizeAction, SIGNAL(triggered()), SLOT(OnSynchronize()));
 
-  m_Synchronized = true;
-
   QToolBar::addAction(m_SynchronizeAction);
+
+  QAction* setAxialViewDirectionAction = new QAction(tr("Set axial view direction"), this);
+  setAxialViewDirectionAction->setData(ViewDirection::Axial);
+  connect(setAxialViewDirectionAction, SIGNAL(triggered()), SLOT(OnViewDirectionChanged()));
+
+  QAction* setSagittalViewDirectionAction = new QAction(tr("Set sagittal view direction"), this);
+  setSagittalViewDirectionAction->setData(ViewDirection::Sagittal);
+  connect(setSagittalViewDirectionAction, SIGNAL(triggered()), SLOT(OnViewDirectionChanged()));
+
+  QAction* setCoronalViewDirectionAction = new QAction(tr("Set coronal view direction"), this);
+  setCoronalViewDirectionAction->setData(ViewDirection::Frontal);
+  connect(setCoronalViewDirectionAction, SIGNAL(triggered()), SLOT(OnViewDirectionChanged()));
+
+  QToolButton* setViewDirectionToolButton = new QToolButton(this);
+  setViewDirectionToolButton->setIcon(QIcon(":/Qmitk/cmwViewDirection.png"));
+  setViewDirectionToolButton->setText(tr("Set synchronized render window view direction"));
+
+  QMenu* menu = new QMenu();
+  menu->addAction(setAxialViewDirectionAction);
+  menu->addAction(setSagittalViewDirectionAction);
+  menu->addAction(setCoronalViewDirectionAction);
+  setViewDirectionToolButton->setMenu(menu);
+  setViewDirectionToolButton->setPopupMode(QToolButton::InstantPopup);
+
+  this->addWidget(setViewDirectionToolButton);
 }
 
 void QmitkMultiWidgetConfigurationToolBar::OnSetLayout()
@@ -75,11 +94,12 @@ void QmitkMultiWidgetConfigurationToolBar::OnSetLayout()
 
 void QmitkMultiWidgetConfigurationToolBar::OnSynchronize()
 {
-  m_Synchronized = !m_Synchronized;
-  if (m_Synchronized)
+  bool synchronized = m_SynchronizeAction->isChecked();
+  if (synchronized)
   {
     m_SynchronizeAction->setIcon(QIcon(":/Qmitk/cmwSynchronized.png"));
     m_SynchronizeAction->setText(tr("Desynchronize render windows"));
+
   }
   else
   {
@@ -87,5 +107,16 @@ void QmitkMultiWidgetConfigurationToolBar::OnSynchronize()
     m_SynchronizeAction->setText(tr("Synchronize render windows"));
   }
 
-  emit Synchronized(m_Synchronized);
+  m_SynchronizeAction->setChecked(synchronized);
+  emit Synchronized(synchronized);
+}
+
+void QmitkMultiWidgetConfigurationToolBar::OnViewDirectionChanged()
+{
+  QAction* action = dynamic_cast<QAction*>(sender());
+  if (action)
+  {
+    ViewDirection viewDirection = static_cast<ViewDirection>(action->data().toInt());
+    emit ViewDirectionChanged(viewDirection);
+  }
 }

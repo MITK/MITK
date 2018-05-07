@@ -9,6 +9,7 @@ set(CPP_FILES
   QmitkFileReaderOptionsDialog.cpp
   QmitkFileReaderWriterOptionsWidget.cpp
   QmitkFileWriterOptionsDialog.cpp
+  QmitkInteractionSchemeToolBar.cpp
   QmitkIOUtil.cpp
   QmitkLevelWindowPresetDefinitionDialog.cpp
   QmitkLevelWindowRangeChangeDialog.cpp
@@ -49,12 +50,14 @@ set(MOC_H_FILES
   include/QmitkFileReaderOptionsDialog.h
   include/QmitkFileReaderWriterOptionsWidget.h
   include/QmitkFileWriterOptionsDialog.h
+  include/QmitkInteractionSchemeToolBar.h
   include/QmitkLevelWindowPresetDefinitionDialog.h
   include/QmitkLevelWindowRangeChangeDialog.h
   include/QmitkLevelWindowWidgetContextMenu.h
   include/QmitkLevelWindowWidget.h
   include/QmitkLineEditLevelWindowWidget.h
   include/QmitkMemoryUsageIndicatorView.h
+  include/QmitkMouseModeSwitcher.h
   include/QmitkMultiWidgetConfigurationToolBar.h
   include/QmitkMultiWidgetLayoutSelectionWidget.h
   include/QmitkNodeDescriptor.h
@@ -70,7 +73,6 @@ set(MOC_H_FILES
   include/QmitkSliderLevelWindowWidget.h
   include/QmitkStdMultiWidget.h
   include/QmitkCustomMultiWidget.h
-  include/QmitkMouseModeSwitcher.h
   include/QmitkDataStorageComboBoxWithSelectNone.h
   include/QmitkPropertyItemDelegate.h
   include/QmitkPropertyItemModel.h

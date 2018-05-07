@@ -31,7 +31,7 @@ const QString QmitkCustomMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.custom
 
 QmitkCustomMultiWidgetEditor::QmitkCustomMultiWidgetEditor()
   : m_CustomMultiWidget(nullptr)
-  , m_MouseModeSwitcher(nullptr)
+  , m_InteractionSchemeToolBar(nullptr)
   , m_ConfigurationToolBar(nullptr)
 {
   // nothing here
@@ -151,11 +151,17 @@ QmitkCustomMultiWidget* QmitkCustomMultiWidgetEditor::GetCustomMultiWidget()
 void QmitkCustomMultiWidgetEditor::OnLayoutSet(int row, int column)
 {
   m_CustomMultiWidget->ResetLayout(row, column);
+  SetControlledRenderer();
 }
 
 void QmitkCustomMultiWidgetEditor::OnSynchronize(bool synchronized)
 {
   m_CustomMultiWidget->Synchronize(synchronized);
+}
+
+void QmitkCustomMultiWidgetEditor::OnViewDirectionChanged(mitk::SliceNavigationController::ViewDirection viewDirection)
+{
+  m_RenderWindowViewDirectionController->SetViewDirectionOfRenderer(viewDirection);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -181,13 +187,13 @@ void QmitkCustomMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     m_CustomMultiWidget = new QmitkCustomMultiWidget(parent, 0, 0, renderingMode);
 
-    // create left toolbar: mouse mode toolbar to switch how the render window navigation behaves
-    if (nullptr == m_MouseModeSwitcher)
+    // create left toolbar: interaction scheme toolbar to switch how the render window navigation behaves
+    if (nullptr == m_InteractionSchemeToolBar)
     {
-      m_MouseModeSwitcher = new QmitkMouseModeSwitcher(parent);
-      layout->addWidget(m_MouseModeSwitcher);
+      m_InteractionSchemeToolBar = new QmitkInteractionSchemeToolBar(parent);
+      layout->addWidget(m_InteractionSchemeToolBar);
     }
-    m_MouseModeSwitcher->setMouseModeSwitcher(m_CustomMultiWidget->GetMouseModeSwitcher());
+    m_InteractionSchemeToolBar->SetInteractionEventHandler(m_CustomMultiWidget->GetInteractionEventHandler());
 
     // add center widget: the custom multi widget
     layout->addWidget(m_CustomMultiWidget);
@@ -204,7 +210,13 @@ void QmitkCustomMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     connect(m_ConfigurationToolBar, SIGNAL(LayoutSet(int, int)), SLOT(OnLayoutSet(int, int)));
     connect(m_ConfigurationToolBar, SIGNAL(Synchronized(bool)), SLOT(OnSynchronize(bool)));
+    connect(m_ConfigurationToolBar, SIGNAL(ViewDirectionChanged(mitk::SliceNavigationController::ViewDirection)), SLOT(OnViewDirectionChanged(mitk::SliceNavigationController::ViewDirection)));
+
     m_MultiWidgetDecorationManager = std::make_unique<QmitkMultiWidgetDecorationManager>(m_CustomMultiWidget);
+
+    m_RenderWindowViewDirectionController = std::make_unique<mitk::RenderWindowViewDirectionController>();
+    m_RenderWindowViewDirectionController->SetDataStorage(GetDataStorage());
+    SetControlledRenderer();
 
     OnPreferencesChanged(preferences);
   }
@@ -225,4 +237,27 @@ void QmitkCustomMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPrefe
 
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(GetDataStorage());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkCustomMultiWidgetEditor::SetControlledRenderer()
+{
+  if (nullptr == m_RenderWindowViewDirectionController || nullptr == m_CustomMultiWidget)
+  {
+    return;
+  }
+
+  RenderWindowLayerUtilities::RendererVector controlledRenderer;
+  auto renderWindowWidgets = m_CustomMultiWidget->GetRenderWindowWidgets();
+  for (const auto& renderWindowWidget : renderWindowWidgets)
+  {
+    auto renderWindow = renderWindowWidget.second->GetRenderWindow();
+    auto vtkRenderWindow = renderWindow->GetRenderWindow();
+    mitk::BaseRenderer* baseRenderer = mitk::BaseRenderer::GetInstance(vtkRenderWindow);
+    if (nullptr != baseRenderer)
+    {
+      controlledRenderer.push_back(baseRenderer);
+    }
+  }
+
+  m_RenderWindowViewDirectionController->SetControlledRenderer(controlledRenderer);
 }

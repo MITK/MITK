@@ -40,6 +40,8 @@ namespace mitk
   {
   public:
     
+    using ViewDirection = mitk::SliceNavigationController::ViewDirection;
+
     RenderWindowViewDirectionController();
     /**
     * @brief Set the data storage on which to work.
@@ -53,13 +55,21 @@ namespace mitk
     // wrapper functions to modify the view direction
     /**
     * @brief Set the view direction for the given renderer (nullptr = all renderer)
-    * @param viewDirection  The view direction that should be used for this renderer.
+    * @param viewDirection  The view direction that should be used for this renderer as a string.
     *                       Currently "axial", "coronal" and "sagittal" is supported.
     * @param renderer       Pointer to the renderer instance for which the view direction should be changed.
     *                       If it is a nullptr (default) nothing happens. The view direction can not be changed
     *                       for all controlled renderer at the moment.
     */
     void SetViewDirectionOfRenderer(const std::string &viewDirection, BaseRenderer* renderer = nullptr);
+    /**
+    * @brief Set the view direction for the given renderer (nullptr = all renderer)
+    * @param viewDirection  The view direction that should be used for this renderer.
+    * @param renderer       Pointer to the renderer instance for which the view direction should be changed.
+    *                       If it is a nullptr (default) nothing happens. The view direction can not be changed
+    *                       for all controlled renderer at the moment.
+    */
+    void SetViewDirectionOfRenderer(ViewDirection viewDirection, BaseRenderer* renderer = nullptr);
 
   private:
 

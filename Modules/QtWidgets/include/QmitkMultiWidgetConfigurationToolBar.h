@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkQtWidgetsExports.h"
 
-#include <QActionGroup>
 #include <QToolBar>
 
 // mitk qtwidgets
@@ -36,6 +35,9 @@ class MITKQTWIDGETS_EXPORT QmitkMultiWidgetConfigurationToolBar : public QToolBa
   Q_OBJECT
 
 public:
+
+  using ViewDirection = mitk::SliceNavigationController::ViewDirection;
+
   QmitkMultiWidgetConfigurationToolBar(QmitkCustomMultiWidget* customMultiWidget);
   ~QmitkMultiWidgetConfigurationToolBar() override;
 
@@ -43,22 +45,22 @@ signals:
 
   void LayoutSet(int row, int column);
   void Synchronized(bool synchronized);
+  void ViewDirectionChanged(mitk::SliceNavigationController::ViewDirection);
 
 protected slots:
 
   void OnSetLayout();
   void OnSynchronize();
+  void OnViewDirectionChanged();
 
 private:
 
-  void InitActionGroup();;
+  void InitializeToolBar();;
   void AddButtons();
 
-  QActionGroup* m_ActionGroup;
   QmitkCustomMultiWidget* m_CustomMultiWidget;
 
   QAction* m_SynchronizeAction;
-  bool m_Synchronized;
 
   QmitkMultiWidgetLayoutSelectionWidget* m_LayoutSelectionPopup;
 

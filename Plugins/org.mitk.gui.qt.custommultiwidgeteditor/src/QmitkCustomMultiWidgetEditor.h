@@ -25,10 +25,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <org_mitk_gui_qt_custommultiwidgeteditor_Export.h>
 #include "QmitkMultiWidgetDecorationManager.h"
 
-// qt widgets module
+// mitk qt widgets module
 #include <QmitkCustomMultiWidget.h>
-#include <QmitkMouseModeSwitcher.h>
+#include <QmitkInteractionSchemeToolBar.h>
 #include <QmitkMultiWidgetConfigurationToolBar.h>
+
+// mitk render window manager
+#include <mitkRenderWindowViewDirectionController.h>
 
 #include <memory>
 
@@ -111,6 +114,7 @@ private slots:
 
   void OnLayoutSet(int row, int column);
   void OnSynchronize(bool synchronized);
+  void OnViewDirectionChanged(mitk::SliceNavigationController::ViewDirection viewDirection);
 
 private:
   /**
@@ -125,6 +129,8 @@ private:
   * @brief Overridden from QmitkAbstractRenderEditor
   */
   virtual void OnPreferencesChanged(const berry::IBerryPreferences* preferences) override;
+
+  void SetControlledRenderer();
   /**
   * @brief
   *
@@ -133,9 +139,11 @@ private:
   void RequestActivateMenuWidget(bool on);
 
   QmitkCustomMultiWidget* m_CustomMultiWidget;
-  QmitkMouseModeSwitcher* m_MouseModeSwitcher;
+  QmitkInteractionSchemeToolBar* m_InteractionSchemeToolBar;
   QmitkMultiWidgetConfigurationToolBar* m_ConfigurationToolBar;
   std::unique_ptr<QmitkMultiWidgetDecorationManager> m_MultiWidgetDecorationManager;
+
+  std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
 
 };
 

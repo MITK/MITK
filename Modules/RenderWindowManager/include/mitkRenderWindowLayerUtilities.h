@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 namespace RenderWindowLayerUtilities
 {
-  typedef std::vector<mitk::BaseRenderer::ConstPointer> RendererVector;
+  typedef std::vector<mitk::BaseRenderer::Pointer> RendererVector;
   typedef std::map<int, mitk::DataNode::Pointer, std::greater<int>> LayerStack;
 
   /**

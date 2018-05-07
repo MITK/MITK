@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseRenderer.h>
 #include <mitkDataStorage.h>
 #include <mitkDisplayActionEventBroadcast.h>
-#include <mitkMouseModeSwitcher.h>
 #include <mitkDisplayActionEventHandler.h>
 
 // qt
@@ -65,6 +64,8 @@ public:
   void SetDataStorage(mitk::DataStorage* dataStorage);
   void InitializeRenderWindowWidgets();
 
+  mitk::InteractionEventHandler::Pointer GetInteractionEventHandler() { return m_DisplayActionEventBroadcast.GetPointer(); };
+
   void ResetLayout(int row, int column);
   void Synchronize(bool synchronized);
 
@@ -89,8 +90,6 @@ public:
   void RequestUpdateAll();
   void ForceImmediateUpdate(const QString& widgetID);
   void ForceImmediateUpdateAll();
-
-  mitk::MouseModeSwitcher* GetMouseModeSwitcher();
 
   const mitk::Point3D GetCrossPosition(const QString& widgetID) const;
 
@@ -159,11 +158,8 @@ private:
   mitk::BaseRenderer::RenderingMode::Type m_RenderingMode;
   QString m_MultiWidgetName;
 
-  mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
-
   mitk::DisplayActionEventBroadcast::Pointer m_DisplayActionEventBroadcast;
   std::unique_ptr<mitk::DisplayActionEventHandler> m_DisplayActionEventHandler;
-  bool m_Synchronized;
 
   mitk::DataStorage::Pointer m_DataStorage;
 

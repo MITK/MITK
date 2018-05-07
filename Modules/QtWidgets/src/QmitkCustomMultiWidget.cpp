@@ -133,14 +133,13 @@ void QmitkCustomMultiWidget::ResetLayout(int row, int column)
 
 void QmitkCustomMultiWidget::Synchronize(bool synchronized)
 {
-  m_Synchronized = synchronized;
   auto allObserverTags = m_DisplayActionEventHandler->GetAllObserverTags();
   for (auto observerTag : allObserverTags)
   {
     m_DisplayActionEventHandler->DisconnectObserver(observerTag);
   }
 
-  if (m_Synchronized)
+  if (synchronized)
   {
     mitk::StdFunctionCommand::ActionFunction actionFunction = mitk::DisplayActionEventFunctions::MoveCameraSynchronizedAction();
     m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayMoveEvent(nullptr, mitk::Vector2D()), actionFunction);
@@ -153,8 +152,6 @@ void QmitkCustomMultiWidget::Synchronize(bool synchronized)
 
     actionFunction = mitk::DisplayActionEventFunctions::ScrollSliceStepperSynchronizedAction();
     m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayScrollEvent(nullptr, 0), actionFunction);
-
-    // #TODO: set equal view direction for all render windows
   }
   else
   {
@@ -312,11 +309,6 @@ void QmitkCustomMultiWidget::ForceImmediateUpdateAll()
   {
     renderWindowWidget.second->ForceImmediateUpdate();
   }
-}
-
-mitk::MouseModeSwitcher* QmitkCustomMultiWidget::GetMouseModeSwitcher()
-{
-  return m_MouseModeSwitcher;
 }
 
 const mitk::Point3D QmitkCustomMultiWidget::GetCrossPosition(const QString& widgetID) const
@@ -528,10 +520,6 @@ void QmitkCustomMultiWidget::InitializeWidget()
 {
   // #TODO: some things have to be handled globally (hold for all render window (widgets)
   // analyse those things and design a controlling mechanism
-
-  // necessary here? mouse mode is valid for all render windows (and also used in editor)
-  //m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();
-  //m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::MITK);
 }
 
 void QmitkCustomMultiWidget::InitializeDisplayActionEventHandling()

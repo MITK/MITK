@@ -104,6 +104,7 @@ bool QmitkRenderWindowWidget::IsGradientBackgroundOn() const
 
 void QmitkRenderWindowWidget::ShowLevelWindowWidget(bool show)
 {
+  /* #TODO: level window will currently be managed by the PACS mode
   m_LevelWindowWidget->disconnect(this);
   if (show)
   {
@@ -115,6 +116,7 @@ void QmitkRenderWindowWidget::ShowLevelWindowWidget(bool show)
     m_LevelWindowWidget->disconnect(this);
     m_LevelWindowWidget->hide();
   }
+  */
 }
 
 void QmitkRenderWindowWidget::SetDecorationColor(const mitk::Color& color)
@@ -181,7 +183,6 @@ void QmitkRenderWindowWidget::InitializeGUI()
 
   // create level window widget for this render window widget
   m_LevelWindowWidget = new QmitkLevelWindowWidget(this);
-  //m_LevelWindowWidget->setObjectName(QString::fromUtf8("levelWindowWidget"));
   QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
   sizePolicy.setHorizontalStretch(0);
   sizePolicy.setVerticalStretch(0);
@@ -190,7 +191,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
   m_LevelWindowWidget->setMaximumWidth(50);
 
   m_Layout->addWidget(m_RenderWindow);
-  m_Layout->addWidget(m_LevelWindowWidget);
+  //m_Layout->addWidget(m_LevelWindowWidget);
 
   // set colors and corner annotation
   InitializeDecorations();

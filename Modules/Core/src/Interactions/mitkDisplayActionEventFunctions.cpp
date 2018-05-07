@@ -20,6 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkCameraController.h"
 #include "mitkDisplayActionEvents.h"
+#include "mitkInteractionPositionEvent.h"
+#include "mitkLevelWindow.h"
+#include "mitkLevelWindowProperty.h"
+#include "mitkNodePredicateDataType.h"
 
 //////////////////////////////////////////////////////////////////////////
 // STANDARD FUNCTIONS
@@ -135,6 +139,54 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
       }
 
       sliceStepper->MoveSlice(displayActionEvent->GetSliceDelta());
+    }
+  };
+
+  return actionFunction;
+}
+
+mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetLevelWindowAction()
+{
+  auto actionFunction = [](const itk::EventObject& displayInteractorEvent)
+  {
+    if (DisplaySetLevelWindowEvent().CheckEvent(&displayInteractorEvent))
+    {
+      const DisplaySetLevelWindowEvent* displayActionEvent = dynamic_cast<const DisplaySetLevelWindowEvent*>(&displayInteractorEvent);
+      const BaseRenderer::Pointer sendingRenderer = displayActionEvent->GetSender();
+      if (nullptr == sendingRenderer)
+      {
+        return;
+      }
+
+      // concrete action
+
+      // get the the topmost visible image of the sending renderer
+      DataStorage::Pointer storage = sendingRenderer->GetDataStorage();
+      DataStorage::SetOfObjects::ConstPointer allImageNodes = storage->GetSubset(NodePredicateDataType::New("Image"));
+      Point3D worldposition;
+      const auto* positionEvent = dynamic_cast<const InteractionPositionEvent*>(displayActionEvent->GetInteractionEvent());
+      sendingRenderer->DisplayToWorld(positionEvent->GetPointerPositionOnScreen(), worldposition);
+      DataNode::Pointer node = storage->GetTopLayerNode(allImageNodes, worldposition, sendingRenderer);
+      if (node.IsNull())
+      {
+        return;
+      }
+
+      LevelWindow levelWindow = LevelWindow();
+      node->GetLevelWindow(levelWindow);
+      ScalarType level = levelWindow.GetLevel();
+      ScalarType window = levelWindow.GetWindow();
+
+      level += displayActionEvent->GetLevel();
+      window += displayActionEvent->GetWindow();
+
+      levelWindow.SetLevelWindow(level, window);
+      auto* levelWindowProperty = dynamic_cast<LevelWindowProperty*>(node->GetProperty("levelwindow"));
+      if (nullptr != levelWindowProperty)
+      {
+        levelWindowProperty->SetLevelWindow(levelWindow);
+        sendingRenderer->GetRenderingManager()->RequestUpdateAll();
+      }
     }
   };
 

@@ -48,7 +48,7 @@ namespace mitk
     {
       return m_InteractionEvent != nullptr ? m_InteractionEvent->GetSender() : nullptr;
     }
-    DisplayActionEvent(const Self& s) : Superclass(s), m_InteractionEvent(s.m_InteractionEvent) {};
+    DisplayActionEvent(const Self& s) : Superclass(s), m_InteractionEvent(s.GetInteractionEvent()) {};
 
   private:
     InteractionEvent* m_InteractionEvent;
@@ -73,7 +73,7 @@ namespace mitk
                                                      { return dynamic_cast<const Self*>(e) != nullptr; }
     virtual itk::EventObject* MakeObject() const override { return new Self(GetInteractionEvent(), m_MoveVector); }
     const Vector2D& GetMoveVector() const { return m_MoveVector; }
-    DisplayMoveEvent(const Self& s) : Superclass(s), m_MoveVector(s.m_MoveVector) {};
+    DisplayMoveEvent(const Self& s) : Superclass(s), m_MoveVector(s.GetMoveVector()) {};
 
   private:
     Vector2D m_MoveVector;
@@ -97,7 +97,7 @@ namespace mitk
                                                      { return dynamic_cast<const Self*>(e) != nullptr; }
     virtual itk::EventObject* MakeObject() const override { return new Self(GetInteractionEvent(), m_Position); }
     const Point3D& GetPosition() const { return m_Position; }
-    DisplaySetCrosshairEvent(const Self& s) : Superclass(s), m_Position(s.m_Position) {};
+    DisplaySetCrosshairEvent(const Self& s) : Superclass(s), m_Position(s.GetPosition()) {};
 
   private:
     Point3D m_Position;
@@ -123,7 +123,7 @@ namespace mitk
     virtual itk::EventObject* MakeObject() const override { return new Self(GetInteractionEvent(), m_ZoomFactor, m_StartCoordinate); }
     float GetZoomFactor() const { return m_ZoomFactor; }
     const Point2D& GetStartCoordinate() const { return m_StartCoordinate; }
-    DisplayZoomEvent(const Self& s) : Superclass(s), m_ZoomFactor(s.m_ZoomFactor), m_StartCoordinate(s.m_StartCoordinate) {};
+    DisplayZoomEvent(const Self& s) : Superclass(s), m_ZoomFactor(s.GetZoomFactor()), m_StartCoordinate(s.GetStartCoordinate()) {};
 
   private:
     float m_ZoomFactor;
@@ -148,11 +148,41 @@ namespace mitk
                                                      { return dynamic_cast<const Self*>(e) != nullptr; }
     virtual itk::EventObject* MakeObject() const override { return new Self(GetInteractionEvent(), m_SliceDelta); }
     int GetSliceDelta() const { return m_SliceDelta; }
-    DisplayScrollEvent(const Self& s) : Superclass(s), m_SliceDelta(s.m_SliceDelta) {};
+    DisplayScrollEvent(const Self& s) : Superclass(s), m_SliceDelta(s.GetSliceDelta()) {};
 
   private:
     int m_SliceDelta;
   };
+
+  class MITKCORE_EXPORT DisplaySetLevelWindowEvent : public DisplayActionEvent
+  {
+  public:
+    typedef DisplaySetLevelWindowEvent Self;
+    typedef DisplayActionEvent Superclass;
+
+    DisplaySetLevelWindowEvent() : Superclass() {}
+    DisplaySetLevelWindowEvent(InteractionEvent* interactionEvent, mitk::ScalarType level, mitk::ScalarType window)
+      : Superclass(interactionEvent)
+      , m_Level(level)
+      , m_Window(window)
+    {
+    }
+    virtual ~DisplaySetLevelWindowEvent() {}
+    virtual const char* GetEventName() const override { return "DisplaySetLevelWindowEvent"; }
+    virtual bool CheckEvent(const itk::EventObject* e) const override
+    {
+      return dynamic_cast<const Self*>(e) != nullptr;
+    }
+    virtual itk::EventObject* MakeObject() const override { return new Self(GetInteractionEvent(), m_Level, m_Window); }
+    mitk::ScalarType GetLevel() const { return m_Level; }
+    mitk::ScalarType GetWindow() const { return m_Window; }
+    DisplaySetLevelWindowEvent(const Self& s) : Superclass(s), m_Level(s.GetLevel()), m_Window(s.GetWindow()) {};
+
+  private:
+    mitk::ScalarType m_Level;
+    mitk::ScalarType m_Window;
+  };
+
 } // end namespace
 
 #endif // MITKDISPLAYACTIONEVENTS_H

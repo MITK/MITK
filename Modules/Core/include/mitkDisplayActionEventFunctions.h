@@ -51,9 +51,11 @@ namespace mitk
     */
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction ScrollSliceStepperAction();
     /**
-    * @brief
-    *
-    *
+    * @brief Returns an 'std::function' that can be used  to react on the 'DisplaySetLevelWindowEvent'.
+    *   The function sets the 'levelwindow' property of the topmost visible image that is display by the sending renderer.
+    *   The level and window value for this property were previously determined by the mouse interaction event.
+    */
+    MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetLevelWindowAction();
     */
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction MoveCameraSynchronizedAction();
     /**

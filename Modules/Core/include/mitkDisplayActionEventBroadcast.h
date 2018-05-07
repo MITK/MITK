@@ -113,7 +113,6 @@ namespace mitk
 
     bool GetBoolProperty(mitk::PropertyList::Pointer propertyList, const char* propertyName, bool defaultValue);
 
-    mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes, mitk::Point3D worldposition, BaseRenderer* renderer);
 
     /**
     * @brief Reference to the service registration of the observer.

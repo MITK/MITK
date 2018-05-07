@@ -596,7 +596,37 @@ void mitk::DisplayActionEventBroadcast::ScrollOneDown(StateMachineAction* stateM
 
 void mitk::DisplayActionEventBroadcast::AdjustLevelWindow(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
 {
-  // nothing here; no event sent
+  auto* positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
+
+  mitk::ScalarType level;
+  mitk::ScalarType window;
+
+  if (m_LevelDirection == "leftright")
+  {
+    level = m_CurrentDisplayCoordinate[0] - m_LastDisplayCoordinate[0];
+    window = m_CurrentDisplayCoordinate[1] - m_LastDisplayCoordinate[1];
+  }
+  else
+  {
+    level = m_CurrentDisplayCoordinate[1] - m_LastDisplayCoordinate[1];
+    window = m_CurrentDisplayCoordinate[0] - m_LastDisplayCoordinate[0];
+  }
+
+  if (m_InvertLevelWindowDirection)
+  {
+    level *= -1;
+    window *= -1;
+  }
+
+  level *= static_cast<ScalarType>(2);
+  window *= static_cast<ScalarType>(2);
+
+  // store new display coordinates
+  m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
+  m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
+
+  // propagate set level window event with the level and window delta
+  InvokeEvent(DisplaySetLevelWindowEvent(interactionEvent, level, window));
 }
 
 void mitk::DisplayActionEventBroadcast::StartRotation(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
@@ -642,10 +672,4 @@ bool mitk::DisplayActionEventBroadcast::GetBoolProperty(mitk::PropertyList::Poin
       return false;
     }
   }
-}
-
-mitk::DataNode::Pointer mitk::DisplayActionEventBroadcast::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes, mitk::Point3D worldposition, BaseRenderer* renderer)
-{
-  // #TODO: see T24173
-  return nodes->front();
 }

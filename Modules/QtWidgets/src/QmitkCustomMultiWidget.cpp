@@ -167,6 +167,10 @@ void QmitkCustomMultiWidget::Synchronize(bool synchronized)
     actionFunction = mitk::DisplayActionEventFunctions::ScrollSliceStepperAction();
     m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplayScrollEvent(nullptr, 0), actionFunction);
   }
+
+  // use the standard 'set level window' action for both modes
+  mitk::StdFunctionCommand::ActionFunction actionFunction = mitk::DisplayActionEventFunctions::SetLevelWindowAction();
+  m_DisplayActionEventHandler->ConnectDisplayActionEvent(mitk::DisplaySetLevelWindowEvent(nullptr, mitk::ScalarType(), mitk::ScalarType()), actionFunction);
 }
 
 QmitkCustomMultiWidget::RenderWindowWidgetMap QmitkCustomMultiWidget::GetRenderWindowWidgets() const

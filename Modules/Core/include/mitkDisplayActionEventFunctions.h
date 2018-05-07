@@ -26,27 +26,27 @@ namespace mitk
   namespace DisplayActionEventFunctions
   {
     /**
-    * @brief Returns a command that reacts on the 'DisplayMoveEvent'.
-    *   The command  performs a move of the camera controller of the sending renderer by a vector
+    * @brief Returns an 'std::function' that can be used  to react on the 'DisplayMoveEvent'.
+    *   The function performs a move of the camera controller of the sending renderer by a vector
     *   that was previously determined by the mouse interaction event.
     */
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction MoveSenderCameraAction();
     /**
-    * @brief Returns a command that reacts on the 'DisplaySetCrosshairEvent'.
-    *   The command performs a slice selection of the slice navigation controller and will set
-    *   the cross hair for all render windows.
+    * @brief Returns an 'std::function' that can be used  to react on the 'DisplaySetCrosshairEvent'.
+    *   The function performs a slice selection of the slice navigation controller and will set
+    *   the cross hair for all 2D-render windows.
     *   The new position was previously determined by the mouse interaction event.
     */
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetCrosshairAction();
     /**
-    * @brief Returns a command that reacts on the 'DisplayZoomEvent'.
-    *   The command performs a zoom of the camera controller of the sending renderer by a zoom factor
+    * @brief Returns an 'std::function' that can be used  to react on the 'DisplayZoomEvent'.
+    *   The function performs a zoom of the camera controller of the sending renderer by a zoom factor
     *   that was previously determined by the mouse interaction event.
     */
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction ZoomSenderCameraAction();
     /**
-    * @brief Returns a command that reacts on the 'DisplayScrollEvent'.
-    *   The command performs a slice scrolling of the slice navigation controller of the sending renderer.
+    * @brief Returns an 'std::function' that can be used  to react on the 'DisplayScrollEvent'.
+    *   The function performs a slice scrolling of the slice navigation controller of the sending renderer.
     *   The new position was previously determined by the mouse interaction event.
     */
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction ScrollSliceStepperAction();
@@ -56,24 +56,31 @@ namespace mitk
     *   The level and window value for this property were previously determined by the mouse interaction event.
     */
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetLevelWindowAction();
+    /**
+    * @brief Returns an 'std::function' that can be used  to react on the 'DisplayMoveEvent'.
+    *   The function performs a move of the camera controller of all renderer (synchronized)
+    *   by a vector that was previously determined by the mouse interaction event.
+    *   The renderer need to be managed by the same rendering manager.
     */
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction MoveCameraSynchronizedAction();
     /**
-    * @brief
-    *
-    *
+    * @brief Returns an 'std::function' that can be used  to react on the 'DisplaySetCrosshairEvent'.
+    *   The function performs a slice selection of the slice navigation controller and will set
+    *   the cross hair for all 2D-render windows.
+    *   The new position was previously determined by the mouse interaction event.
+    *   #TODO: currently there is no need to distinguish between this and the non-synchronized version
     */
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetCrosshairSynchronizedAction();
     /**
-    * @brief
-    *
-    *
+    * @brief Returns an 'std::function' that can be used  to react on the 'DisplayZoomEvent'.
+    *   The function performs a zoom of the camera controller of all 2D-renderer (synchronized)
+    *   by a zoom factor that was previously determined by the mouse interaction event.
     */
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction ZoomCameraSynchronizedAction();
     /**
-    * @brief
-    *
-    *
+    * @brief Returns an 'std::function' that can be used  to react on the 'DisplayScrollEvent'.
+    *   The function performs a slice scrolling of the slice navigation controller of all 2D-renderer (synchronized).
+    *   The new position was previously determined by the mouse interaction event.
     */
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction ScrollSliceStepperSynchronizedAction();
 

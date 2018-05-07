@@ -91,45 +91,32 @@ void mitk::DisplayActionEventBroadcast::ConfigurationChanged()
 
   // allwaysReact
   std::string strAlwaysReact = "";
+  m_AlwaysReact = false;
   if (properties->GetStringProperty("alwaysReact", strAlwaysReact))
   {
     if (strAlwaysReact == "true")
     {
       m_AlwaysReact = true;
     }
-    else
-    {
-      m_AlwaysReact = false;
-    }
-  }
-  else
-  {
-    m_AlwaysReact = false;
   }
 
   // auto repeat
   std::string strAutoRepeat = "";
+  m_AutoRepeat = false;
   if (properties->GetStringProperty("autoRepeat", strAutoRepeat))
   {
     if (strAutoRepeat == "true")
     {
       m_AutoRepeat = true;
     }
-    else
-    {
-      m_AutoRepeat = false;
-    }
   }
 
   // pixel movement for scrolling one slice
   std::string strPixelPerSlice = "";
+  m_IndexToSliceModifier = 4;
   if (properties->GetStringProperty("pixelPerSlice", strPixelPerSlice))
   {
     m_IndexToSliceModifier = atoi(strPixelPerSlice.c_str());
-  }
-  else
-  {
-    m_IndexToSliceModifier = 4;
   }
 
   // scroll direction
@@ -147,7 +134,6 @@ void mitk::DisplayActionEventBroadcast::ConfigurationChanged()
   }
 
   m_InvertZoomDirection = GetBoolProperty(properties, "invertZoomDirection", false);
-
   m_InvertMoveDirection = GetBoolProperty(properties, "invertMoveDirection", false);
 
   if (!properties->GetStringProperty("levelWindowDirection", m_LevelDirection))
@@ -159,15 +145,12 @@ void mitk::DisplayActionEventBroadcast::ConfigurationChanged()
 
   // coupled rotation
   std::string strCoupled = "";
+  m_LinkPlanes = false;
   if (properties->GetStringProperty("coupled", strCoupled))
   {
     if (strCoupled == "true")
     {
       m_LinkPlanes = true;
-    }
-    else
-    {
-      m_LinkPlanes = false;
     }
   }
 
@@ -539,11 +522,11 @@ void mitk::DisplayActionEventBroadcast::Scroll(StateMachineAction* stateMachineA
   // scroll direction
   if (m_ScrollDirection == "updown")
   {
-    sliceDelta = static_cast<int>(m_LastDisplayCoordinate[1] - positionEvent->GetPointerPositionOnScreen()[1]);
+    sliceDelta = static_cast<int>(m_CurrentDisplayCoordinate[1] - m_LastDisplayCoordinate[1]);
   }
   else
   {
-    sliceDelta = static_cast<int>(m_LastDisplayCoordinate[0] - positionEvent->GetPointerPositionOnScreen()[0]);
+    sliceDelta = static_cast<int>(m_CurrentDisplayCoordinate[0] - m_LastDisplayCoordinate[0]);
   }
 
   if (m_InvertScrollDirection)
@@ -590,6 +573,7 @@ void mitk::DisplayActionEventBroadcast::ScrollOneDown(StateMachineAction* stateM
   {
     sliceDelta = 1;
   }
+
   // propagate scroll event with a single slice delta (decrease)
   InvokeEvent(DisplayScrollEvent(interactionEvent, sliceDelta));
 }

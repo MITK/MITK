@@ -77,42 +77,41 @@ namespace mitk
     *
     * @return True, if the given event can be dynamically cast to an 'InteractionPositionEvent'. False, if not.
     */
-    virtual bool CheckPositionEvent(const InteractionEvent* interactionEvent);
+    bool CheckPositionEvent(const InteractionEvent* interactionEvent);
 
-    virtual bool CheckRotationPossible(const InteractionEvent* interactionEvent);
+    bool CheckRotationPossible(const InteractionEvent* interactionEvent);
 
-    virtual bool CheckSwivelPossible(const InteractionEvent* interactionEvent);
+    bool CheckSwivelPossible(const InteractionEvent* interactionEvent);
 
-    virtual void Init(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
+    void Init(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
-    virtual void Move(StateMachineAction* stateMachineAction , InteractionEvent* interactionEvent);
+    void Move(StateMachineAction* stateMachineAction , InteractionEvent* interactionEvent);
 
-    virtual void SetCrosshair(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
+    void SetCrosshair(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
-    virtual void Zoom(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
+    void Zoom(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
-    virtual void Scroll(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
+    void Scroll(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
-    virtual void ScrollOneUp(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
+    void ScrollOneUp(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
-    virtual void ScrollOneDown(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
+    void ScrollOneDown(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
-    virtual void AdjustLevelWindow(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
+    void AdjustLevelWindow(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
-    virtual void StartRotation(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
+    void StartRotation(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
-    virtual void EndRotation(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
+    void EndRotation(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
-    virtual void Rotate(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
+    void Rotate(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
-    virtual void Swivel(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
+    void Swivel(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
   private:
 
-    virtual void UpdateStatusbar(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
+    void UpdateStatusbar(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent);
 
     bool GetBoolProperty(mitk::PropertyList::Pointer propertyList, const char* propertyName, bool defaultValue);
-
 
     /**
     * @brief Reference to the service registration of the observer.

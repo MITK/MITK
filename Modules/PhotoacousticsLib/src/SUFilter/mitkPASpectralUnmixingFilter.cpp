@@ -52,6 +52,7 @@ void mitk::pa::SpectralUnmixingFilter::AddWavelength(int wavelength)
 void mitk::pa::SpectralUnmixingFilter::AddChromophore(ChromophoreType chromophore)
 {
   m_Chromophore.push_back(chromophore);
+
 }
 
 void mitk::pa::SpectralUnmixingFilter::GenerateData()
@@ -64,18 +65,33 @@ void mitk::pa::SpectralUnmixingFilter::GenerateData()
   unsigned int xDim = input->GetDimensions()[0];
   unsigned int yDim = input->GetDimensions()[1];
   unsigned int zDim = input->GetDimensions()[2];
+  unsigned int size = xDim * yDim * zDim;
 
   MITK_INFO << "x dimension: " << xDim;
   MITK_INFO << "y dimension: " << yDim;
   MITK_INFO << "z dimension: " << zDim;
 
-  CheckPreConditions(zDim);
   InitializeOutputs();
+
+
   EndmemberMatrix = AddEndmemberMatrix();
   
   // Copy input image into array
   mitk::ImageReadAccessor readAccess(input);
+
   const float* inputDataArray = ((const float*)readAccess.GetData());
+
+  CheckPreConditions(size, zDim, inputDataArray);
+
+  /* READ OUT INPUTARRAY
+  MITK_INFO << "Info Array:";
+  int numberOfPixels= 6;
+  for (int i=0; i< numberOfPixels; ++i)
+    MITK_INFO << inputDataArray[i];/**/
+
+  // test to see pixel values @ txt file
+  ofstream myfile;
+  myfile.open("PASpectralUnmixingPixelValues.txt");
 
   //loop over every pixel @ x,y plane
   for (unsigned int x = 0; x < xDim; x++)
@@ -88,6 +104,8 @@ void mitk::pa::SpectralUnmixingFilter::GenerateData()
         // Get pixel value of pixel x,y @ wavelength z
         unsigned int pixelNumber = (xDim*yDim*z) + x * yDim + y;
         auto pixel = inputDataArray[pixelNumber];
+
+        //MITK_INFO << "Pixel_values: " << pixel;
 
         // dummy values for pixel for testing purposes
         //float pixel = rand();
@@ -105,12 +123,15 @@ void mitk::pa::SpectralUnmixingFilter::GenerateData()
         float* writeBuffer = (float *)writeOutput.GetData();
         writeBuffer[x*yDim + y] = resultVector[outputIdx]; 
       }
+      myfile << "Input Pixel(x,y): " << x << "," << y << "\n" << inputVector << "\n";
+      myfile << "Result: "  << "\n Hb: " << resultVector[0] << "\n HbO2: " << resultVector[1] <<"\n";
     }
   }
   MITK_INFO << "GENERATING DATA...[DONE]";
+  myfile.close();
 }
 
-void mitk::pa::SpectralUnmixingFilter::CheckPreConditions(unsigned int NumberOfInputImages)
+void mitk::pa::SpectralUnmixingFilter::CheckPreConditions(unsigned int size, unsigned int NumberOfInputImages, const float* inputDataArray)
 {
   // Checking if number of Inputs == added wavelengths
   if (m_Wavelength.size() != NumberOfInputImages)
@@ -120,6 +141,17 @@ void mitk::pa::SpectralUnmixingFilter::CheckPreConditions(unsigned int NumberOfI
   if (m_Chromophore.size() > m_Wavelength.size())
     mitkThrow() << "PRESS 'IGNORE' AND ADD MORE WAVELENGTHS!";
 
+  // Checking if pixel type is float
+  int maxPixel = size;
+  for (int i = 0; i < maxPixel; ++i)
+  {
+    if (typeid(inputDataArray[i]).name() != typeid(float).name())
+    {
+      mitkThrow() << "PIXELTYPE ERROR! FLOAT 32 REQUIRED";
+    }
+    else continue;
+  }
+
   MITK_INFO << "CHECK PRECONDITIONS ...[DONE]";
 }
 
@@ -127,7 +159,7 @@ void mitk::pa::SpectralUnmixingFilter::InitializeOutputs()
 {
   unsigned int numberOfInputs = GetNumberOfIndexedInputs();
   unsigned int numberOfOutputs = GetNumberOfIndexedOutputs();
-  MITK_INFO << "Inputs: " << numberOfInputs << " Outputs: " << numberOfOutputs;
+  //MITK_INFO << "Inputs: " << numberOfInputs << " Outputs: " << numberOfOutputs;
 
   //  Set dimensions (2) and pixel type (float) for output
   mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();
@@ -163,7 +195,10 @@ Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingF
       //writes @ Matrix element (i,j) the absorbtion wavelength of the propertycalculator.cpp
       EndmemberMatrix(i,j)= m_PropertyCalculator->GetAbsorptionForWavelength(
       static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[i]), m_Wavelength[j]);
+      auto testtype = m_PropertyCalculator->GetAbsorptionForWavelength(
+        static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[i]), m_Wavelength[j]);
       /* Test to see what gets written in the Matrix:
+      MITK_INFO << "TEST_TYPE Matrix: " << typeid(EndmemberMatrix(i,j)).name();
       MITK_INFO << "map type: " << static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[i]);
       MITK_INFO << "wavelength: " << m_Wavelength[j];
       MITK_INFO << "Matrixelement: (" << i << ", " << j << ") Absorbtion: " << EndmemberMatrix(i, j);/**/
@@ -182,20 +217,29 @@ Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingF
 Eigen::VectorXf mitk::pa::SpectralUnmixingFilter::SpectralUnmixingTestAlgorithm(
   Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
 {
-  //test "solver" (input = output)
-  Eigen::VectorXf resultVector = inputVector;
-  return resultVector;
-    
-  //llt solver
-  //Eigen::VectorXf resultVector = EndmemberMatrix.llt().solve(inputVector);
-  //return resultVector;
+  int treshold = 0;
+  int defaultValue = -1;
 
-  //householderqr solver
-  //Eigen::VectorXf resultVector =EndmemberMatrix.householderQr().solve(inputVector);
-  //return resultVector;
+  //*llt solver
+  //Eigen::Vector2f resultVector = EndmemberMatrix.llt().solve(inputVector);
+  //double relative_error = (EndmemberMatrix*inputVector - lltVector).norm() / lltVector.norm(); // norm() is L2 norm
+  /**/
+
+  //*householderqr solver
+  Eigen::Vector2f resultVector = EndmemberMatrix.householderQr().solve(inputVector);/**/
+
+
+  /*Set threshold and replace with default value if under threshold
+  for (int i = 0; i < 2; ++i)
+  {
+    if (resultVector[i] < treshold)
+    {
+      resultVector[i] = defaultValue;
+      MITK_INFO << "UNMIXING RESULT N/A";
+    }
+  }/**/
 
   //test other solvers https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
-  // define treshold for relativ error and set value to eg. -1 ;)
-  /*double relative_error = (EndmemberMatrix*inputVector - resultVector).norm() / resultVector.norm(); // norm() is L2 norm
-  MITK_INFO << relative_error;/**/
+
+  return resultVector;
 }

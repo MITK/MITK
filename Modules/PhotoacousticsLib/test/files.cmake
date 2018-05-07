@@ -29,6 +29,7 @@ set(MODULE_TESTS
   mitkMCThreadHandlerTest.cpp
   mitkSimulationBatchGeneratorTest.cpp
   mitkPropertyCalculatorTest.cpp
+  mitkSpectralUnmixingTest.cpp
 )
 
 set(RESOURCE_FILES

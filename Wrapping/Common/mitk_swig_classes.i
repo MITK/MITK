@@ -79,28 +79,28 @@ using mitk::Message;
 //
 // Phenotyping Related Classes
 //
-//SWIG_ADD_MITK_CLASS(AbstractGlobalImageFeature, mitkAbstractGlobalImageFeature.h, mitk)
-//SWIG_ADD_MITK_CLASS(GIFImageDescriptionFeatures, mitkGIFImageDescriptionFeatures.h, mitk)
-//SWIG_ADD_MITK_CLASS(GIFFirstOrderStatistics, mitkGIFFirstOrderStatistics.h, mitk)
-//SWIG_ADD_MITK_CLASS(GIFFirstOrderHistogramStatistics, mitkGIFFirstOrderHistogramStatistics.h, mitk)
-//SWIG_ADD_MITK_CLASS(GIFVolumetricStatistics, mitkGIFVolumetricStatistics.h, mitk)
-//SWIG_ADD_MITK_CLASS(GIFVolumetricDensityStatistics, mitkGIFVolumetricDensityStatistics.h, mitk)
-//SWIG_ADD_MITK_CLASS(GIFCooccurenceMatrix2, mitkGIFCooccurenceMatrix2.h, mitk)
-//SWIG_ADD_MITK_CLASS(GIFNeighbouringGreyLevelDependenceFeature, mitkGIFNeighbouringGreyLevelDependenceFeatures.h, mitk)
-//SWIG_ADD_MITK_CLASS(GIFGreyLevelRunLength, mitkGIFGreyLevelRunLength.h, mitk)
-//SWIG_ADD_MITK_CLASS(GIFGreyLevelSizeZone, mitkGIFGreyLevelSizeZone.h, mitk)
-//SWIG_ADD_MITK_CLASS(GIFGreyLevelDistanceZone, mitkGIFGreyLevelDistanceZone.h, mitk)
-//SWIG_ADD_MITK_CLASS(GIFLocalIntensity, mitkGIFLocalIntensity.h, mitk)
-//SWIG_ADD_MITK_CLASS(GIFIntensityVolumeHistogramFeatures, mitkGIFIntensityVolumeHistogramFeatures.h, mitk)
-//SWIG_ADD_MITK_CLASS(GIFNeighbourhoodGreyToneDifferenceFeatures, mitkGIFNeighbourhoodGreyToneDifferenceFeatures.h, mitk)
-//SWIG_ADD_MITK_CLASS(GIFCurvatureStatistic, mitkGIFCurvatureStatistic.h, mitk)
+SWIG_ADD_MITK_CLASS(AbstractGlobalImageFeature, mitkAbstractGlobalImageFeature.h, mitk)
+SWIG_ADD_MITK_CLASS(GIFImageDescriptionFeatures, mitkGIFImageDescriptionFeatures.h, mitk)
+SWIG_ADD_MITK_CLASS(GIFFirstOrderStatistics, mitkGIFFirstOrderStatistics.h, mitk)
+SWIG_ADD_MITK_CLASS(GIFFirstOrderHistogramStatistics, mitkGIFFirstOrderHistogramStatistics.h, mitk)
+SWIG_ADD_MITK_CLASS(GIFVolumetricStatistics, mitkGIFVolumetricStatistics.h, mitk)
+SWIG_ADD_MITK_CLASS(GIFVolumetricDensityStatistics, mitkGIFVolumetricDensityStatistics.h, mitk)
+SWIG_ADD_MITK_CLASS(GIFCooccurenceMatrix2, mitkGIFCooccurenceMatrix2.h, mitk)
+SWIG_ADD_MITK_CLASS(GIFNeighbouringGreyLevelDependenceFeature, mitkGIFNeighbouringGreyLevelDependenceFeatures.h, mitk)
+SWIG_ADD_MITK_CLASS(GIFGreyLevelRunLength, mitkGIFGreyLevelRunLength.h, mitk)
+SWIG_ADD_MITK_CLASS(GIFGreyLevelSizeZone, mitkGIFGreyLevelSizeZone.h, mitk)
+SWIG_ADD_MITK_CLASS(GIFGreyLevelDistanceZone, mitkGIFGreyLevelDistanceZone.h, mitk)
+SWIG_ADD_MITK_CLASS(GIFLocalIntensity, mitkGIFLocalIntensity.h, mitk)
+SWIG_ADD_MITK_CLASS(GIFIntensityVolumeHistogramFeatures, mitkGIFIntensityVolumeHistogramFeatures.h, mitk)
+SWIG_ADD_MITK_CLASS(GIFNeighbourhoodGreyToneDifferenceFeatures, mitkGIFNeighbourhoodGreyToneDifferenceFeatures.h, mitk)
+SWIG_ADD_MITK_CLASS(GIFCurvatureStatistic, mitkGIFCurvatureStatistic.h, mitk)
 
 //
 // Conversion and Segmentation based Classes
 //
-//SWIG_ADD_MITK_CLASS(ContourModelSetToImageFilter, mitkContourModelSetToImageFilter.h, mitk)
-//SWIG_ADD_NONOBJECT_NOVECTOR_CLASS(BooleanOperation, mitkBooleanOperation.h, mitk)
-//SWIG_ADD_NONOBJECT_NOVECTOR_CLASS(MorphologicalOperations, mitkMorphologicalOperations.h, mitk)
+SWIG_ADD_MITK_CLASS(ContourModelSetToImageFilter, mitkContourModelSetToImageFilter.h, mitk)
+SWIG_ADD_NONOBJECT_NOVECTOR_CLASS(BooleanOperation, mitkBooleanOperation.h, mitk)
+SWIG_ADD_NONOBJECT_NOVECTOR_CLASS(MorphologicalOperations, mitkMorphologicalOperations.h, mitk)
 %{
   #include <itkProcessObject.h>
   typedef itk::DataObject::DataObjectIdentifierType DataObjectIdentifierType;
@@ -127,9 +127,8 @@ namespace core
   typedef std::string String;
 }
 
-SWIG_ADD_MITK_CLASS(UID, mapUID.h, map::algorithm)
-class itk::SmartPointer< map::algorithm::UID>::ObjectType;
-class map::algorithm::UID;
+%include <mapUID.h>
+SWIG_ADD_MITK_CLASS(UID,mapUID.h, map::algorithm)
 SWIG_ADD_MITK_CLASS(DLLInfo, mapDeploymentDLLInfo.h, map::deployment)
 SWIG_ADD_MITK_CLASS_VECTORFREE(DLLDirectoryBrowser, mapDeploymentDLLDirectoryBrowser.h, ::map::deployment)
 

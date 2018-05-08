@@ -8,13 +8,14 @@
 // MITKSWIG_ADD_HEADERFILE includes a header-file into SWIG
 //
 %define MITKSWIG_ADD_HEADERFILE( classinclude )
+  // Include the given header, where the class definition is found
+  %include < ## classinclude ## >
+
   // Include the include file in the generated cpp file
   %{
    #include < ## classinclude ## >
   %}
 
-  // Include the given header, where the class definition is found
-  %include < ## classinclude ## >
 %enddef
 
 //
@@ -145,6 +146,7 @@
 // mitk::BaseData, and supports smartpointers.
 //
 %define SWIG_ADD_MITK_CLASS_VECTORFREE(classname, classinclude, nspace)
+  %include < ## classinclude ## >
   MITKSWIG_MITKSMARTPOINTER_INITIALIZATION(classname, classinclude, nspace)
 
   MITKSWIG_ADD_CLASS( classname, classinclude, nspace )
@@ -166,6 +168,7 @@
 // mitk::BaseData, and supports smartpointers.
 //
 %define SWIG_ADD_MITK_CLASS(classname, classinclude, nspace)
+  %include < ## classinclude ## >
   MITKSWIG_MITKSMARTPOINTER_INITIALIZATION(classname, classinclude, nspace)
 
   MITKSWIG_ADD_CLASS( classname, classinclude, nspace )
@@ -193,6 +196,7 @@
 // mitk::BaseData, and supports smartpointers.
 //
 %define SWIG_ADD_NONOBJECT_CLASS(classname, classinclude, nspace)
+  %include < ## classinclude ## >
   MITKSWIG_ADD_CLASS( classname, classinclude, nspace )
 
   // Typedef is necessary to overcome ambigiouties resulting in the fact that SWIG
@@ -214,7 +218,7 @@
 // mitk::BaseData, and supports smartpointers.
 //
 %define SWIG_ADD_NONOBJECT_NOVECTOR_CLASS(classname, classinclude, nspace)
-
+  %include < ## classinclude ## >
   MITKSWIG_ADD_CLASS( classname, classinclude, nspace )
 
   // Typedef is necessary to overcome ambigiouties resulting in the fact that SWIG

@@ -259,6 +259,7 @@ namespace mitk
 
     std::map<us::ServiceReferenceU, EventConfig> m_DisplayInteractorConfigs;
 
+    clock_t m_StartTime;
   };
 
 } // namespace

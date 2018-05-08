@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITK_CROP_IMAGE_FILTER
 #define MITK_CROP_IMAGE_FILTER
 
+#include <MitkPhotoacousticsAlgorithmsExports.h>
 #include "mitkImageToImageFilter.h"
 #include "itkMacro.h"
 
@@ -25,7 +26,7 @@ namespace mitk {
   * \brief Class implementing an mitk::ImageToImageFilter for casting any mitk image to a float image
   */
 
-  class CropImageFilter : public ImageToImageFilter
+  class MITKPHOTOACOUSTICSALGORITHMS_EXPORT CropImageFilter : public ImageToImageFilter
   {
   public:
     mitkClassMacro(CropImageFilter, ImageToImageFilter);

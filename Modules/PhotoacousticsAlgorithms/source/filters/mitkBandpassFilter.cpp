@@ -217,7 +217,6 @@ void mitk::BandpassFilter::GenerateData()
 
   mitk::Image::Pointer testImage;
   mitk::CastToMitkImage(fftMultiplicator, testImage);
-  mitk::IOUtil::Save(testImage, "G:/fftImage.nrrd");
 
   typedef itk::MultiplyImageFilter< ComplexImageType,
     RealImageType,
@@ -233,5 +232,4 @@ void mitk::BandpassFilter::GenerateData()
   inverseFFTFilter->SetDirection(1);
 
   GrabItkImageMemory(inverseFFTFilter->GetOutput(), output);
-  mitk::IOUtil::Save(output, "G:/bandpassedImage.nrrd");
 }

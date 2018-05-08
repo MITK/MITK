@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "./OpenCLFilter/mitkPhotoacousticOCLBeamformingFilter.h"
 #include "mitkBeamformingSettings.h"
 #include "mitkBeamformingUtils.h"
+#include "MitkPhotoacousticsAlgorithmsExports.h"
 
 namespace mitk {
   /*!
@@ -32,7 +33,7 @@ namespace mitk {
   *  For significant problems or important messages a string is written, which can be accessed via GetMessageString().
   */
 
-  class BeamformingFilter : public ImageToImageFilter
+  class MITKPHOTOACOUSTICSALGORITHMS_EXPORT BeamformingFilter : public ImageToImageFilter
   {
   public:
     mitkClassMacro(BeamformingFilter, ImageToImageFilter);

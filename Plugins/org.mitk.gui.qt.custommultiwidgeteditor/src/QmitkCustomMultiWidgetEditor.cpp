@@ -224,6 +224,10 @@ void QmitkCustomMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
 void QmitkCustomMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferences* preferences)
 {
+  if (m_CustomMultiWidget->GetRenderWindowWidgets().empty())
+  {
+    return;
+  }
   // update decoration preferences
   m_MultiWidgetDecorationManager->DecorationPreferencesChanged(preferences);
 

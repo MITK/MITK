@@ -19,11 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // qt widgets module
 #include "MitkQtWidgetsExports.h"
-#include <QmitkRenderWindow.h>
-#include <QmitkLevelWindowWidget.h>
+#include "QmitkRenderWindow.h"
+#include "QmitkLevelWindowWidget.h"
 
 // mitk core
 #include <mitkDataStorage.h>
+#include <mitkPointSet.h>
 #include <mitkRenderWindow.h>
 #include <vtkMitkRectangleProp.h>
 #include <vtkCornerAnnotation.h>
@@ -96,12 +97,17 @@ private:
   void InitializeGUI();
   void InitializeDecorations();
 
+  void SetCrosshair(mitk::Point3D selectedPoint);
+
   QString m_UID;
   QHBoxLayout* m_Layout;
 
   mitk::DataStorage* m_DataStorage;
   QmitkRenderWindow* m_RenderWindow;
   QmitkLevelWindowWidget* m_LevelWindowWidget;
+
+  mitk::DataNode::Pointer m_PointSetNode;
+  mitk::PointSet::Pointer m_PointSet;
 
   mitk::RenderingManager::Pointer m_RenderingManager;
   mitk::BaseRenderer::RenderingMode::Type m_RenderingMode;

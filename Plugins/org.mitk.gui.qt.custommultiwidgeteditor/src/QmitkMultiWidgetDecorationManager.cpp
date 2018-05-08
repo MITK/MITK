@@ -202,7 +202,7 @@ void QmitkMultiWidgetDecorationManager::ShowLogo(bool show)
     return;
   }
 
-  MITK_ERROR << "Department logo can not be shown for an unknown widget.";
+  MITK_ERROR << "Logo can not be shown for an unknown widget.";
 }
 
 bool QmitkMultiWidgetDecorationManager::IsLogoVisible() const

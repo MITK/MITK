@@ -64,14 +64,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetC
       }
 
       // concrete action
-      auto allRenderWindows = sendingRenderer->GetRenderingManager()->GetAllRegisteredRenderWindows();
-      for (auto renderWindow : allRenderWindows)
-      {
-        if (BaseRenderer::GetInstance(renderWindow)->GetMapperID() == BaseRenderer::Standard2D && renderWindow != sendingRenderer->GetRenderWindow())
-        {
-          BaseRenderer::GetInstance(renderWindow)->GetSliceNavigationController()->SelectSliceByPoint(displayActionEvent->GetPosition());
-        }
-      }
+      BaseRenderer::GetInstance(sendingRenderer->GetRenderWindow())->GetSliceNavigationController()->SelectSliceByPoint(displayActionEvent->GetPosition());
     }
   };
 

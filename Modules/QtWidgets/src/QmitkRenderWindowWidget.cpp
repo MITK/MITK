@@ -16,11 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkRenderWindowWidget.h"
 
+// mitk qt widgets
+#include <QmitkCustomMultiWidget.h>
+
 // vtk
 #include <vtkTextProperty.h>
-
-// qt widgets module
-#include <QmitkCustomMultiWidget.h>
 
 QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
                                                  const QString& UID/* = ""*/,
@@ -32,14 +32,16 @@ QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
   , m_RenderingMode(renderingMode)
   , m_RenderWindow(nullptr)
   , m_LevelWindowWidget(nullptr)
+  , m_PointSetNode(nullptr)
+  , m_PointSet(nullptr)
 {
   InitializeGUI();
-  // TODO: signals / slots
 }
 
 QmitkRenderWindowWidget::~QmitkRenderWindowWidget()
 {
-  // nothing here
+  m_RenderWindow->GetSliceNavigationController()->SetCrosshairEvent.RemoveListener(mitk::MessageDelegate1<QmitkRenderWindowWidget, mitk::Point3D>(this, &QmitkRenderWindowWidget::SetCrosshair));
+  m_DataStorage->Remove(m_PointSetNode);
 }
 
 void QmitkRenderWindowWidget::SetDataStorage(mitk::DataStorage* dataStorage)
@@ -177,6 +179,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
   m_RenderWindow->SetLayoutIndex(QmitkCustomMultiWidget::SAGITTAL); // TODO: allow to change layout type later
   m_RenderWindow->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
   m_RenderWindow->GetSliceNavigationController()->SetRenderingManager(m_RenderingManager);
+  m_RenderWindow->GetSliceNavigationController()->SetCrosshairEvent.AddListener(mitk::MessageDelegate1<QmitkRenderWindowWidget, mitk::Point3D>(this, &QmitkRenderWindowWidget::SetCrosshair));
 
   mitk::TimeGeometry::Pointer timeGeometry = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
   m_RenderingManager->InitializeViews(timeGeometry);
@@ -192,6 +195,20 @@ void QmitkRenderWindowWidget::InitializeGUI()
 
   m_Layout->addWidget(m_RenderWindow);
   //m_Layout->addWidget(m_LevelWindowWidget);
+
+  // add point set as a crosshair
+  m_PointSetNode = mitk::DataNode::New();
+  m_PointSetNode->SetProperty("name", mitk::StringProperty::New("Crosshair of render window " + m_UID.toStdString()));
+  m_PointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true)); // crosshair-node should typically be invisible
+
+  // set the crosshair only visible for this specific renderer
+  m_PointSetNode->SetBoolProperty("fixedLayer", true, m_RenderWindow->GetRenderer());
+  m_PointSetNode->SetVisibility(true, m_RenderWindow->GetRenderer());
+  m_PointSetNode->SetVisibility(false);
+
+  m_PointSet = mitk::PointSet::New();
+  m_PointSetNode->SetData(m_PointSet);
+  m_DataStorage->Add(m_PointSetNode);
 
   // set colors and corner annotation
   InitializeDecorations();
@@ -227,4 +244,10 @@ void QmitkRenderWindowWidget::InitializeDecorations()
   {
     vtkRenderer->AddViewProp(m_CornerAnnotation);
   }
+}
+
+void QmitkRenderWindowWidget::SetCrosshair(mitk::Point3D selectedPoint)
+{
+  m_PointSet->SetPoint(1, selectedPoint, 0);
+  mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetRenderWindow());
 }

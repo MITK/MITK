@@ -94,8 +94,8 @@ void QmitkCustomMultiWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 void QmitkCustomMultiWidget::InitializeRenderWindowWidgets()
 {
   // create render window (widgets) initially
-  QString UID = CreateRenderWindowWidget("2015-01-14 - CT");
-  AddToMultiWidgetLayout(0, 0, UID);
+  //QString UID = CreateRenderWindowWidget("2015-01-14 - CT");
+  //AddToMultiWidgetLayout(0, 0, UID);
   /*
   AddRenderWindowWidget(0, 1, "2015-08-19 - CT");
   AddRenderWindowWidget(0, 2, "2016-06-29 - CT");
@@ -197,10 +197,6 @@ QString QmitkCustomMultiWidget::CreateRenderWindowWidget(const std::string& corn
   QString UID = m_MultiWidgetName + "_" + QString::fromStdString(renderWindowUID);
   std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, UID, m_DataStorage);
   renderWindowWidget->SetCornerAnnotationText(cornerAnnotation);
-
-  // create connections
-  //connect(renderWindowWidget.get(), SIGNAL(ResetView()), this, SLOT(ResetCrosshair()));
-  //connect(renderWindowWidget.get(), SIGNAL(ChangeCrosshairRotationMode(int)), this, SLOT(SetWidgetPlaneMode(int)));
 
   // store the newly created render window widget with the UID
   m_RenderWindowWidgets.insert(std::make_pair(UID, renderWindowWidget));

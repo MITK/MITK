@@ -386,7 +386,7 @@ namespace mitk
       m_ReceiverToObserverTagsMap.erase(i);
     }
 
-    Message<> crosshairPositionEvent;
+    Message1<mitk::Point3D> SetCrosshairEvent;
 
     /**
      * \brief To connect multiple SliceNavigationController, we can

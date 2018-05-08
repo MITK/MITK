@@ -57,23 +57,24 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
 
   if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::colPivHouseholderQr == algorithmIndex)
   {
-    mitkThrow() << "not working";
-    resultVector = EndmemberMatrix.colPivHouseholderQr().solve(inputVector); //not working
+    resultVector = EndmemberMatrix.colPivHouseholderQr().solve(inputVector); //works :)
   }
 
   if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::llt == algorithmIndex)
   {
-    resultVector = EndmemberMatrix.llt().solve(inputVector);
+    resultVector = EndmemberMatrix.llt().solve(inputVector); //works with negativ values (no correct unmixing)
   }
 
   if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr == algorithmIndex)
   {
-    resultVector = EndmemberMatrix.householderQr().solve(inputVector);
+    resultVector = EndmemberMatrix.householderQr().solve(inputVector); //works :)
   }
 
   if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::ldlt == algorithmIndex)
   {
-    resultVector = EndmemberMatrix.ldlt().solve(inputVector); //until now 'best' algorithm
+    mitkThrow() << "not working";
+
+    resultVector = EndmemberMatrix.ldlt().solve(inputVector); //not working because matrix not quadratic(?)
   }
 
   //testing new algorithms:
@@ -101,5 +102,7 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
     }
   }
 
+  bool resultIsApprox = inputVector.isApprox(EndmemberMatrix*resultVector);
+  MITK_INFO << "IS APPROX RESULT: " << resultIsApprox;
   return resultVector;
 }

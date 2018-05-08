@@ -80,6 +80,9 @@
      <property name="text">
       <string>Change selection</string>
      </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
   </layout>

@@ -29,27 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkSingleNodeSelectionWidget.h"
 
 #include <QmitkAbstractNodeSelectionWidget.h>
-#include "QPushButton"
+#include <QmitkNodeSelectionButton.h>
 
 class QmitkAbstractDataStorageModel;
-
-class  QmitkSelectionButton : public QPushButton
-{
-  Q_OBJECT
-
-public:
-  QmitkSelectionButton(QWidget *parent = 0);
-
-  public Q_SLOTS :
-  virtual void SetSelectedNode(mitk::DataNode* node);
-  virtual void SetNodeInfo(QString info);
-
-protected:
-  void paintEvent(QPaintEvent *p) override;
-
-  mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
-  QString m_Info;
-};
 
 /**
 * \class QmitkSingleNodeSelectionWidget
@@ -62,6 +44,7 @@ class MITK_QT_COMMON QmitkSingleNodeSelectionWidget : public QmitkAbstractNodeSe
 
 public:
   explicit QmitkSingleNodeSelectionWidget(QWidget* parent = nullptr);
+  ~QmitkSingleNodeSelectionWidget();
 
   mitk::DataNode::Pointer GetSelectedNode() const;
 
@@ -79,6 +62,9 @@ public Q_SLOTS:
   virtual void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
   virtual void SetCurrentSelection(NodeList selectedNodes) override;
 
+protected Q_SLOTS:
+  virtual void OnClearSelection();
+
 protected:
   mitk::DataNode::Pointer ExtractCurrentValidSelection(const NodeList& nodes) const;
   NodeList CompileEmitSelection() const;
@@ -93,7 +79,6 @@ protected:
   mitk::DataNode::Pointer m_SelectedNode;
 
   Ui_QmitkSingleNodeSelectionWidget m_Controls;
-  QmitkSelectionButton *m_Btn;
 };
 
 #endif // QmitkSingleNodeSelectionWidget_H

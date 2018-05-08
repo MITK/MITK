@@ -23,59 +23,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QPainter"
 #include "QTextDocument"
 
-QmitkSelectionButton::QmitkSelectionButton(QWidget *parent)
-  : QPushButton(parent)
-{ }
-
-void QmitkSelectionButton::SetSelectedNode(mitk::DataNode* node)
-{
-  this->m_SelectedNode = mitk::WeakPointer<mitk::DataNode>(node);
-  this->update();
-};
-
-void QmitkSelectionButton::SetNodeInfo(QString info)
-{
-  this->m_Info = info;
-  this->update();
-};
-
-
-void QmitkSelectionButton::paintEvent(QPaintEvent *p)
-{
-  QPushButton::paintEvent(p);
-
-  QPainter painter(this);
-  QTextDocument td;
-  td.setHtml(m_Info);
-  painter.translate(QPoint(5,5));
-  td.drawContents(&painter);
-
-}
-
-
 QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent) : QmitkAbstractNodeSelectionWidget(parent)
 {
   m_Controls.setupUi(this);
 
-  QHBoxLayout *horizontalLayout = new QHBoxLayout(this);
-  horizontalLayout->setSpacing(0);
-  horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-  horizontalLayout->setContentsMargins(0, 0, 0, 0);
-  m_Btn = new QmitkSelectionButton(this);
-  m_Btn->setObjectName(QStringLiteral("btn"));
-  QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  sizePolicy.setHorizontalStretch(0);
-  sizePolicy.setVerticalStretch(0);
-  sizePolicy.setHeightForWidth(m_Btn->sizePolicy().hasHeightForWidth());
-  m_Btn->setSizePolicy(sizePolicy);
-  m_Btn->setMinimumSize(QSize(0, 20));
-
-  horizontalLayout->addWidget(m_Btn);
+  m_Controls.btnSelect->installEventFilter(this);
+  m_Controls.btnSelect->setVisible(true);
+  m_Controls.btnClear->setVisible(false);
 
   this->UpdateInfo();
 
-  m_Btn->installEventFilter(this);
-  m_Btn->setVisible(true);
+  connect(m_Controls.btnClear, SIGNAL(clicked(bool)), this, SLOT(OnClearSelection()));
+}
+
+QmitkSingleNodeSelectionWidget::~QmitkSingleNodeSelectionWidget()
+{
 }
 
 mitk::DataNode::Pointer QmitkSingleNodeSelectionWidget::ExtractCurrentValidSelection(const NodeList& nodes) const
@@ -121,6 +83,17 @@ void QmitkSingleNodeSelectionWidget::OnNodePredicateChanged(mitk::NodePredicateB
     m_SelectedNode = this->ExtractCurrentValidSelection(m_ExternalSelection);
 };
 
+void QmitkSingleNodeSelectionWidget::OnClearSelection()
+{
+  if (m_IsOptional)
+  {
+    NodeList emptyList;
+    this->SetCurrentSelection(emptyList);
+  }
+
+  this->UpdateInfo();
+}
+
 mitk::DataNode::Pointer QmitkSingleNodeSelectionWidget::GetSelectedNode() const
 {
   return m_SelectedNode;
@@ -128,7 +101,7 @@ mitk::DataNode::Pointer QmitkSingleNodeSelectionWidget::GetSelectedNode() const
 
 bool QmitkSingleNodeSelectionWidget::eventFilter(QObject *obj, QEvent *ev)
 {
-  if (obj == m_Btn)
+  if (obj == m_Controls.btnSelect)
   {
     if (ev->type() == QEvent::MouseButtonRelease)
     {
@@ -155,6 +128,8 @@ void QmitkSingleNodeSelectionWidget::EditSelection()
   dialog->SetSelectOnlyVisibleNodes(m_SelectOnlyVisibleNodes);
   dialog->SetSelectionMode(QAbstractItemView::SingleSelection);
 
+  m_Controls.btnSelect->setChecked(true);
+
   if (dialog->exec())
   {
     auto lastEmission = this->CompileEmitSelection();
@@ -178,6 +153,8 @@ void QmitkSingleNodeSelectionWidget::EditSelection()
     }
   }
 
+  m_Controls.btnSelect->setChecked(false);
+
   delete dialog;
 };
 
@@ -187,17 +164,20 @@ void QmitkSingleNodeSelectionWidget::UpdateInfo()
   {
     if (m_IsOptional)
     {
-      m_Btn->SetNodeInfo(m_EmptyInfo);
+      m_Controls.btnSelect->SetNodeInfo(m_EmptyInfo);
     }
     else
     {
-      m_Btn->SetNodeInfo(m_InvalidInfo);
+      m_Controls.btnSelect->SetNodeInfo(m_InvalidInfo);
     }
+    m_Controls.btnClear->setVisible(false);
   }
   else
   {
     auto name = m_SelectedNode->GetName();
-    m_Btn->SetNodeInfo(QString::fromStdString(name));
+    m_Controls.btnSelect->SetNodeInfo(QString::fromStdString(name));
+    
+    m_Controls.btnClear->setVisible(m_IsOptional);
   }
 
 };

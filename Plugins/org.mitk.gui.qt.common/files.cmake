@@ -10,6 +10,7 @@ set(SRC_CPP_FILES
   QmitkAbstractNodeSelectionWidget.cpp
   QmitkMultiNodeSelectionWidget.cpp
   QmitkNodeSelectionPreferenceHelper.cpp
+  QmitkNodeSelectionButton.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -37,6 +38,7 @@ set(MOC_H_FILES
   src/QmitkNodeSelectionDialog.h
   src/QmitkAbstractNodeSelectionWidget.h
   src/QmitkMultiNodeSelectionWidget.h
+  src/QmitkNodeSelectionButton.h
   src/internal/QmitkCommonActivator.h
   src/internal/QmitkNodeSelectionPreferencePage.h
 )

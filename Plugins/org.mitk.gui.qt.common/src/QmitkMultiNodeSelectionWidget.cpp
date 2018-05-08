@@ -79,6 +79,7 @@ void QmitkMultiNodeSelectionWidget::OnEditSelection()
   dialog->SetSelectOnlyVisibleNodes(m_SelectOnlyVisibleNodes);
   dialog->SetSelectionMode(QAbstractItemView::MultiSelection);
 
+  m_Controls.btnChange->setChecked(true);
   if (dialog->exec())
   {
     auto lastEmission = this->CompileEmitSelection();
@@ -94,6 +95,7 @@ void QmitkMultiNodeSelectionWidget::OnEditSelection()
       emit CurrentSelectionChanged(newEmission);
     }
   }
+  m_Controls.btnChange->setChecked(false);
 
   delete dialog;
 };

@@ -37,9 +37,9 @@ mitk::pa::LinearSpectralUnmixingFilter::~LinearSpectralUnmixingFilter()
 
 }
 
-void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(std::string chosenAlgorithm)
+void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(int SetAlgorithmIndex)
 {
-  MITK_INFO << chosenAlgorithm;
+  algorithmIndex = static_cast<mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType>(SetAlgorithmIndex);
 }
 
 Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorithm(
@@ -48,8 +48,6 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
 
   //test other solvers https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
 
-  int choseSolver = 3;
-
   bool relativErrorBool = false;
   bool tresholdBool = false;
   int treshold = 0;
@@ -57,24 +55,31 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
 
   Eigen::Vector2f resultVector;
 
-  if (choseSolver == 0)
+  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::colPivHouseholderQr == algorithmIndex)
   {
+    mitkThrow() << "not working";
     resultVector = EndmemberMatrix.colPivHouseholderQr().solve(inputVector); //not working
   }
 
-  if (choseSolver == 1)
+  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::llt == algorithmIndex)
   {
     resultVector = EndmemberMatrix.llt().solve(inputVector);
   }
 
-  if (choseSolver == 2)
+  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr == algorithmIndex)
   {
     resultVector = EndmemberMatrix.householderQr().solve(inputVector);
   }
 
-  if (choseSolver == 3)
+  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::ldlt == algorithmIndex)
   {
     resultVector = EndmemberMatrix.ldlt().solve(inputVector); //until now 'best' algorithm
+  }
+
+  //testing new algorithms:
+  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::test == algorithmIndex)
+  {
+    mitkThrow() << "nothing implemented";
   }
 
   if (relativErrorBool)

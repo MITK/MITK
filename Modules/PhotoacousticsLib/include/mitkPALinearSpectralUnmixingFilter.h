@@ -30,13 +30,20 @@ namespace mitk {
         itkFactorylessNewMacro(Self)
 
 
-      void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(std::string chosenAlgorithm);
+      void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(int SetAlgorithmIndex);
 
+      enum AlgortihmType
+      {
+        ldlt,
+        llt,
+        colPivHouseholderQr,
+        householderQr,
+        test
+      };
 
     protected:
       LinearSpectralUnmixingFilter();
       virtual ~LinearSpectralUnmixingFilter();
-
  
 
       // Test algorithm for SU --> later a new class should be set up
@@ -44,9 +51,8 @@ namespace mitk {
         Eigen::VectorXf inputVector) override;
 
     private:
+      mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType algorithmIndex;
 
-      
-      
     };
   }
 }

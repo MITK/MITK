@@ -131,9 +131,8 @@ void SpectralUnmixing::DoImageProcessing()
       m_SpectralUnmixingFilter->SetInput(image);
 
       // Set Algortihm to filter
-      QString fooChosenAlgorithm = m_Controls.QComboBoxAlgorithm->currentText();
-      std::string chosenAlgorithm = fooChosenAlgorithm.toLocal8Bit().constData();
-      m_SpectralUnmixingFilter->SetAlgorithm(chosenAlgorithm);
+      int SetAlgorithmIndex = m_Controls.QComboBoxAlgorithm->currentIndex();
+      m_SpectralUnmixingFilter->SetAlgorithm(SetAlgorithmIndex);
 
       // Wavelength implementation into filter
       for (unsigned int imageIndex = 0; imageIndex < m_Wavelengths.size(); imageIndex++)

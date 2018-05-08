@@ -51,14 +51,33 @@ public:
 
   mitk::BeamformingSettings::Pointer CreateEmptyBeamformingSettings()
   {
-    mitk::BeamformingSettings::Pointer config = mitk::BeamformingSettings::New();
-    return config;
+    return CreateFunctionalBeamformingSettings();
   }
 
   mitk::BeamformingSettings::Pointer CreateFunctionalBeamformingSettings()
   {
-    mitk::BeamformingSettings::Pointer config = mitk::BeamformingSettings::New();
-    return config;
+    mitk::BeamformingSettings::Pointer outputSettings = mitk::BeamformingSettings::New(
+      (float)(0.3 / 1000),
+      (float)(1500),
+      (float)(0.0125 / 1000000),
+      27,
+      true,
+      3000,
+      128,
+      20,
+      false,
+      (unsigned int*) nullptr,
+      (unsigned int*) nullptr,
+      false,
+      mitk::BeamformingSettings::DelayCalc::Spherical,
+      mitk::BeamformingSettings::Apodization::Box,
+      128,
+      mitk::BeamformingSettings::BeamformingAlgorithm::DAS,
+      false,
+      0.0f,
+      0.0f);
+
+    return outputSettings;
   }
 
   void testRunning()

@@ -34,10 +34,10 @@ private:
   mitk::BandpassFilter::Pointer m_BandpassFilter;
   const unsigned int NUM_ITERATIONS = 15;
   const unsigned int DATA_DIM = 500;
-  const unsigned float TIME_SPACING = 0.0001; // [us]
-  const unsigned float HIGHPASS_FREQENCY = 1.f / TIMESPACING * DATA_DIM * 0.7f; // [Hz]
-  const unsigned float LOWPASS_FREQENCY = 1.f / TIMESPACING * DATA_DIM * 0.3f; // [Hz]
-  const unsigned float ALPHA = 0; // 0 = box, 1 = von Hann; changing this may make the test invalid
+  const float TIME_SPACING = 0.0001; // [us]
+  const float HIGHPASS_FREQENCY = 1.f / TIME_SPACING * DATA_DIM * 0.7f; // [Hz]
+  const float LOWPASS_FREQENCY = 1.f / TIME_SPACING * DATA_DIM * 0.3f; // [Hz]
+  const float ALPHA = 0; // 0 = box, 1 = von Hann; changing this may make the test invalid
 
 public:
 
@@ -58,7 +58,10 @@ public:
     mitk::Image::Pointer inputImage = mitk::Image::New();
     unsigned int dimension[3]{ DATA_DIM, DATA_DIM, DATA_DIM };
     inputImage->Initialize(mitk::MakeScalarPixelType<float>(), 3, dimension);
-    mitk::Vector3D spacing { 1, TIME_SPACING, 1 };
+    mitk::Vector3D spacing;
+    spacing[0] = 1;
+    spacing[1] = TIME_SPACING;
+    spacing[2] = 1;
     inputImage->SetSpacing(spacing);
 
     for (unsigned int iteration = 0; iteration < NUM_ITERATIONS; ++iteration)
@@ -70,9 +73,9 @@ public:
       }
 
       // write specific frequencies to the image
-      if(HighPass != -1)
+      if (HighPass != -1)
         addFrequency(randDistrHighPass(randGen), TIME_SPACING, data, dimension);
-      if(LowPass != -1)
+      if (LowPass != -1)
         addFrequency(randDistrLowPass(randGen), TIME_SPACING, data, dimension);
 
       inputImage->SetImportVolume(data, 0, 0, mitk::Image::ImportMemoryManagementType::CopyMemory);
@@ -98,8 +101,8 @@ public:
           for (unsigned int x = 0; x < DATA_DIM; ++x)
           {
             unsigned int outPos = x + y * DATA_DIM + z * DATA_DIM * DATA_DIM;
-            CPPUNIT_ASSERT_MESSAGE(std::string("expected" + "" + "sth but no :(, got " + std::to_string(outputData[outPos])),
-            abs(1) < mitk::eps);
+            CPPUNIT_ASSERT_MESSAGE(std::string("expected not :(, got " + std::to_string(outputData[outPos])),
+              abs(1) < mitk::eps);
           }
         }
       }
@@ -111,13 +114,13 @@ public:
   // write a fixed-frequency signal to the image
   void addFrequency(float freq, float timeSpacing, float* data, unsigned int* dim)
   {
-    for(unsigned int z = 0; z < dim[2]; ++z)
+    for (unsigned int z = 0; z < dim[2]; ++z)
     {
-      for(unsigned int y = 0; y < dim[2]; ++y)
+      for (unsigned int y = 0; y < dim[2]; ++y)
       {
-        for(unsigned int x = 0; x < dim[2]; ++x)
+        for (unsigned int x = 0; x < dim[2]; ++x)
         {
-          data[x + y*dim[0] + z*dim[0]*dim[1]] += std::sin(freq * timeSpacing * y);
+          data[x + y*dim[0] + z*dim[0] * dim[1]] += std::sin(freq * timeSpacing * y);
         }
       }
     }
@@ -125,12 +128,12 @@ public:
 
   void testHighPass()
   {
-    test(HIGHPASS_FREQENCY, -1, ALPHA, 0);
+    test(7.5, HIGHPASS_FREQENCY, -1, ALPHA, 0);
   }
 
   void testLowPass()
   {
-    test(-1, LOWPASS_FREQENCY, 0, ALPHA);
+    test(7.5, -1, LOWPASS_FREQENCY, 0, ALPHA);
   }
 
   void tearDown() override
@@ -139,4 +142,4 @@ public:
   }
 };
 
-MITK_TEST_SUITE_REGISTRATION(mitkBandpassFilterTestSuite)
+MITK_TEST_SUITE_REGISTRATION(mitkBandpassFilter)

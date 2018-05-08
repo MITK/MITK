@@ -17,6 +17,8 @@ set(MODULE_TESTS
 
   mitkPAFilterServiceTest.cpp
   mitkCastToFloatImageFilterTest.cpp
-
+  mitkBandpassFilterTest.cpp
+  mitkBeamformingFilterTest.cpp
+  mitkCropImageFilterTest.cpp
 )
 set(RESOURCE_FILES)

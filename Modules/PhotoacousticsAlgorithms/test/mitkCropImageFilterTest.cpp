@@ -29,9 +29,9 @@ class mitkCropImageFilterTestSuite : public mitk::TestFixture
 
 private:
 
-  mitk::CastToFloatImageFilter::Pointer m_CropImageFilter;
-  const unsigned int NUM_ITERATIONS = 15;
-  const unsigned int DATA_DIM = 20;
+  mitk::CropImageFilter::Pointer m_CropImageFilter;
+  const unsigned int NUM_ITERATIONS = 5;
+  const unsigned int DATA_DIM = 25;
 
 public:
 
@@ -44,7 +44,7 @@ public:
   {
     std::random_device r;
     std::default_random_engine randGen(r());
-    std::uniform_int_distribution<int> randDistr(0, DATA_DIM / 2);
+    std::uniform_int_distribution<int> randDistr(0, (DATA_DIM / 2) - 1);
 
     float* data = new float[DATA_DIM*DATA_DIM*DATA_DIM];
 
@@ -67,9 +67,9 @@ public:
       unsigned int YPixelsCropEnd = randDistr(randGen);
       unsigned int ZPixelsCropEnd = randDistr(randGen);
 
-      unsigend int newXDim = DATA_DIM - XPixelsCropStart - XPixelsCropEnd;
-      unsigend int newYDim = DATA_DIM - YPixelsCropStart - YPixelsCropEnd;
-      unsigend int newZDim = DATA_DIM - ZPixelsCropStart - ZPixelsCropEnd;
+      unsigned int newXDim = DATA_DIM - XPixelsCropStart - XPixelsCropEnd;
+      unsigned int newYDim = DATA_DIM - YPixelsCropStart - YPixelsCropEnd;
+      unsigned int newZDim = DATA_DIM - ZPixelsCropStart - ZPixelsCropEnd;
 
       m_CropImageFilter->SetInput(inputImage);
 
@@ -86,9 +86,9 @@ public:
       mitk::ImageReadAccessor readAccess(outputImage);
       const float* outputData = (const float*)readAccess.GetData();
 
-      CPPUNIT_ASSERT_MESSAGE(std::string("expected x size to be" + std::to_string(newXDim) + " but was " + std::to_string(outputImage->GetDimension(0))), newXDim == outputImage->GetDimension(0));
-      CPPUNIT_ASSERT_MESSAGE(std::string("expected y size to be" + std::to_string(newYDim) + " but was " + std::to_string(outputImage->GetDimension(1))), newXDim == outputImage->GetDimension(1));
-      CPPUNIT_ASSERT_MESSAGE(std::string("expected z size to be" + std::to_string(newZDim) + " but was " + std::to_string(outputImage->GetDimension(2))), newXDim == outputImage->GetDimension(2));
+      CPPUNIT_ASSERT_MESSAGE(std::string("expected x size to be " + std::to_string(newXDim) + " but was " + std::to_string(outputImage->GetDimension(0))), newXDim == outputImage->GetDimension(0));
+      CPPUNIT_ASSERT_MESSAGE(std::string("expected y size to be " + std::to_string(newYDim) + " but was " + std::to_string(outputImage->GetDimension(1))), newYDim == outputImage->GetDimension(1));
+      CPPUNIT_ASSERT_MESSAGE(std::string("expected z size to be " + std::to_string(newZDim) + " but was " + std::to_string(outputImage->GetDimension(2))), newZDim == outputImage->GetDimension(2));
 
       for (unsigned int z = 0; z < newZDim; ++z)
       {
@@ -99,8 +99,8 @@ public:
             unsigned int origPos = (x + XPixelsCropStart) + (y + YPixelsCropStart) * DATA_DIM + (z + ZPixelsCropStart) * DATA_DIM * DATA_DIM;
             unsigned int outPos = x + y * newXDim + z * newXDim * newYDim;
             CPPUNIT_ASSERT_MESSAGE(std::string("expected " + std::to_string(data[origPos])
-            + " but was " + std::to_string(outputData[outPos])),
-            abs(outputData[outPos] - data[origPos]) < mitk::eps);
+              + " but was " + std::to_string(outputData[outPos])),
+              abs(outputData[outPos] - data[origPos]) < mitk::eps);
           }
         }
       }
@@ -111,7 +111,11 @@ public:
 
   void testCropImage()
   {
-    test();
+    for (int repetition = 0; repetition < 20; ++repetition)
+    {
+      MITK_INFO << "[" << (repetition + 1) << "/20]";
+      test();
+    }
   }
 
   void tearDown() override
@@ -120,4 +124,4 @@ public:
   }
 };
 
-MITK_TEST_SUITE_REGISTRATION(mitkCropImageFilterTestSuite)
+MITK_TEST_SUITE_REGISTRATION(mitkCropImageFilter)

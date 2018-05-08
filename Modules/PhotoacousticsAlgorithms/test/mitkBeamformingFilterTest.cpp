@@ -37,7 +37,7 @@ public:
 
   void setUp() override
   {
-    m_BeamformingFilter = mitk::BeamformingFilter::New();
+    m_BeamformingFilter = mitk::BeamformingFilter::New(nullptr);
   }
 
   void test(bool GPU)
@@ -51,7 +51,7 @@ public:
 
     mitk::Image::Pointer inputImage = mitk::Image::New();
     unsigned int dimension[3]{ DATA_DIM, DATA_DIM, DATA_DIM };
-    inputImage->Initialize(mitk::MakeScalarPixelType<TPixelType>(), 3, dimension);
+    inputImage->Initialize(mitk::MakeScalarPixelType<float>(), 3, dimension);
     inputImage->SetImportVolume(data);
 
     for (unsigned int iteration = 0; iteration < NUM_ITERATIONS; ++iteration)
@@ -79,4 +79,4 @@ public:
   }
 };
 
-MITK_TEST_SUITE_REGISTRATION(mitkBeamformingFilterTestSuite)
+MITK_TEST_SUITE_REGISTRATION(mitkBeamformingFilter)

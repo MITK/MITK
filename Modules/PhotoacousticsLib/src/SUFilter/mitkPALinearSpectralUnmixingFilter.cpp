@@ -48,11 +48,6 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
 
   //test other solvers https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
 
-  bool relativErrorBool = false;
-  bool tresholdBool = false;
-  int treshold = 0;
-  int defaultValue = -1;
-
   Eigen::Vector2f resultVector;
 
   if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::colPivHouseholderQr == algorithmIndex)
@@ -73,8 +68,28 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
   if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::ldlt == algorithmIndex)
   {
     mitkThrow() << "not working";
-
     resultVector = EndmemberMatrix.ldlt().solve(inputVector); //not working because matrix not quadratic(?)
+  }
+
+  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::jacobiSvd == algorithmIndex)
+  {
+    mitkThrow() << "not working";
+    resultVector = EndmemberMatrix.jacobiSvd().solve(inputVector); //not working
+  }
+
+  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivLu == algorithmIndex)
+  {
+    resultVector = EndmemberMatrix.fullPivLu().solve(inputVector); //works :)
+  }
+
+  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr == algorithmIndex)
+  {
+    resultVector = EndmemberMatrix.householderQr().solve(inputVector); //works :)
+  }
+
+  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivHouseholderQr == algorithmIndex)
+  {
+    resultVector = EndmemberMatrix.fullPivHouseholderQr().solve(inputVector);//works :)
   }
 
   //testing new algorithms:
@@ -83,26 +98,10 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
     mitkThrow() << "nothing implemented";
   }
 
-  if (relativErrorBool)
-  {
-    double relativeError = (EndmemberMatrix*inputVector - resultVector).norm() / resultVector.norm(); // norm() is L2 norm
-    MITK_INFO << "rel err: " << relativeError;
-  }
-
-  //Set threshold and replace with default value if under threshold
-  if (tresholdBool)
-  {
-    for (int i = 0; i < 2; ++i)
-    {
-      if (resultVector[i] < treshold)
-      {
-        resultVector[i] = defaultValue;
-        MITK_INFO << "UNMIXING RESULT N/A";
-      }
-    }
-  }
-
-  bool resultIsApprox = inputVector.isApprox(EndmemberMatrix*resultVector);
-  MITK_INFO << "IS APPROX RESULT: " << resultIsApprox;
+  double relativeError = (EndmemberMatrix*resultVector - inputVector).norm() / inputVector.norm(); // norm() is L2 norm
+  //MITK_INFO << "relativ error: " << relativeError;
+  float accuracyLevel = .1;
+  bool resultIsApprox = inputVector.isApprox(EndmemberMatrix*resultVector, accuracyLevel);
+  //MITK_INFO << "IS APPROX RESULT: " << resultIsApprox;
   return resultVector;
 }

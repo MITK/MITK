@@ -122,6 +122,11 @@
         <widget class="QComboBox" name="QComboBoxAlgorithm">
          <item>
           <property name="text">
+           <string>householderQr</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>ldlt</string>
           </property>
          </item>
@@ -137,7 +142,17 @@
          </item>
          <item>
           <property name="text">
-           <string>householderQr</string>
+           <string>jacobiSvd</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>fullPivLu</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>fullPivHouseholderQr</string>
           </property>
          </item>
          <item>

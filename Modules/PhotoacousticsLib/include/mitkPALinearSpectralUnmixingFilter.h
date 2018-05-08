@@ -34,10 +34,13 @@ namespace mitk {
 
       enum AlgortihmType
       {
+        householderQr,
         ldlt,
         llt,
         colPivHouseholderQr,
-        householderQr,
+        jacobiSvd,
+        fullPivLu,
+        fullPivHouseholderQr,
         test
       };
 

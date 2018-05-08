@@ -37,7 +37,6 @@ public:
   {
     // INSERT TEST HERE?
     MITK_INFO << "TEST TEST";
-
   }
 
 

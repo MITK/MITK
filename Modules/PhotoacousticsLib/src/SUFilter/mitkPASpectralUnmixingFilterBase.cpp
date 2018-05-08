@@ -196,7 +196,7 @@ Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingF
       EndmemberMatrix(i,j)= m_PropertyCalculator->GetAbsorptionForWavelength(
       static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[i]+1), m_Wavelength[j]);
             
-      //* Tests to see what gets written in the Matrix:
+      /* Tests to see what gets written in the Matrix:
       auto testtype = m_PropertyCalculator->GetAbsorptionForWavelength(
       static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[i]+1), m_Wavelength[j]);
       MITK_INFO << "TEST_TYPE Matrix: " << typeid(EndmemberMatrix(i,j)).name();

@@ -37,6 +37,10 @@ mitk::pa::LinearSpectralUnmixingFilter::~LinearSpectralUnmixingFilter()
 
 }
 
+void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(std::string chosenAlgorithm)
+{
+  MITK_INFO << chosenAlgorithm;
+}
 
 Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorithm(
   Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)

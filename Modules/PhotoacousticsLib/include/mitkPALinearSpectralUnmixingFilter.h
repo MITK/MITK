@@ -30,6 +30,7 @@ namespace mitk {
         itkFactorylessNewMacro(Self)
 
 
+      void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(std::string chosenAlgorithm);
 
 
     protected:
@@ -43,6 +44,7 @@ namespace mitk {
         Eigen::VectorXf inputVector) override;
 
     private:
+
       
       
     };

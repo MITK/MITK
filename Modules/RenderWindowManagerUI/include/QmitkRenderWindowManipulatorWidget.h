@@ -89,6 +89,7 @@ private Q_SLOTS:
 
   void ResetRenderer();
   void ClearRenderer();
+  void ReinitRenderer();
 
   void ChangeViewDirection(const QString &viewDirection);
 

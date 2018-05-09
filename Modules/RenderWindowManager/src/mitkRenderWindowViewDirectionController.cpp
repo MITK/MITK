@@ -45,7 +45,7 @@ void mitk::RenderWindowViewDirectionController::SetControlledRenderer(RenderWind
   }
 }
 
-void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(const std::string &viewDirection, BaseRenderer* renderer /*=nullptr*/)
+void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(const std::string &viewDirection, BaseRenderer* renderer/* =nullptr*/)
 {
   if (nullptr == renderer)
   {
@@ -79,7 +79,7 @@ void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(const
   }
 }
 
-void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(ViewDirection viewDirection , BaseRenderer* renderer /*=nullptr*/)
+void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(ViewDirection viewDirection , BaseRenderer* renderer/* =nullptr*/)
 {
   if (nullptr == renderer)
   {

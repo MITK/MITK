@@ -131,7 +131,7 @@ namespace mitk
     bool GetManageMemory() const { return m_ManageMemory; }
     virtual void ConstructVtkImageData(ImageConstPointer) const;
 
-    unsigned long GetSize() const { return m_Size; }
+    size_t GetSize() const { return m_Size; }
     virtual void Modified() const;
 
   protected:
@@ -148,7 +148,7 @@ namespace mitk
 
     bool m_IsComplete;
 
-    unsigned long m_Size;
+    size_t m_Size;
 
   private:
     void ComputeItemSize(const unsigned int *dimensions, unsigned int dimension);

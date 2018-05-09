@@ -97,11 +97,14 @@ namespace Logger
       Log(Log const&);
       void operator=(Log const&);
 
+      void setCustomField(const std::string& field, const std::string& value);
+
       boost::shared_ptr< std::stringstream > dataStream;
       boost::shared_ptr< boost::log::sinks::text_ostream_backend > dataBackend;
       boost::log::attributes::mutable_constant<std::string> sourceAttribute;
       boost::log::attributes::mutable_constant<std::string> fullNameAttribute;
       boost::log::attributes::mutable_constant<std::string> organizationAttribute;
+      boost::log::attributes::mutable_constant<std::string> customField;
 
       Utilities::TaskGroup m_TaskGroup;
 
@@ -117,6 +120,8 @@ namespace Logger
 
       void setSource(const std::string& src);
       void setUserData(const std::string& fullName, const std::string& organization);
+      void setRunningTime(double time);
+      void resetRunningTime();
 
       static std::string getLastDateTime(std::string str);
       void resetData() const;

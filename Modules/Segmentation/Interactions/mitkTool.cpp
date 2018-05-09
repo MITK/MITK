@@ -33,6 +33,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 // itk
 #include <itkObjectFactory.h>
 
+#include "time.h"
+
+#include <AutoplanLogging.h>
+
 mitk::Tool::Tool(const char* type)
 : m_PredicateImages(NodePredicateDataType::New("Image")) // for reference images
 , m_PredicateDim3(NodePredicateDimension::New(3, 1))
@@ -52,6 +56,7 @@ mitk::Tool::Tool(const char* type)
 , m_InteractorType( type )
 , m_DisplayInteractorConfigs()
 , m_EventConfig("DisplayConfigMITK.xml")
+, m_StartTime(clock_t())
 {
 
 }
@@ -133,6 +138,9 @@ void mitk::Tool::Activated()
       displayInteractor->SetEventConfig( m_EventConfig.c_str() );
     }
   }
+
+  m_StartTime = clock();
+  AUTOPLAN_INFO << this->GetName() << ": Activated";
 }
 
 void mitk::Tool::Deactivated()
@@ -154,6 +162,12 @@ void mitk::Tool::Deactivated()
     }
   }
   m_DisplayInteractorConfigs.clear();
+
+  double runningTime = double(clock() - m_StartTime) / CLOCKS_PER_SEC;
+
+  Logger::Log::get().setRunningTime(runningTime);
+  AUTOPLAN_INFO << this->GetName() << ": Deactivated";
+  Logger::Log::get().resetRunningTime();
 }
 
 const char* mitk::Tool::GetCaption() const

@@ -194,6 +194,7 @@ namespace Logger
     : sourceAttribute(std::string())
     , fullNameAttribute(std::string())
     , organizationAttribute(std::string())
+    , customField(std::string())
   {
     dataBackend =
       boost::make_shared< boost::log::sinks::text_ostream_backend >();
@@ -245,7 +246,7 @@ namespace Logger
         boost::log::keywords::min_free_space = 100 * 1024 * 1024    /*< minimum free space on the drive, in bytes >*/
       ));
       sink->set_formatter(
-        boost::log::expressions::format("{\"datetime\": \"%8%\", \"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\"}")
+        boost::log::expressions::format("{\"datetime\": \"%8%\", \"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\" %9%}")
         % boost::phoenix::bind(&MessageForLogstash, boost::log::expressions::attr<std::string>("Message"))
         % boost::log::expressions::attr<std::string>("ComputerName")
         % boost::log::expressions::attr<std::string>("UserName")
@@ -254,6 +255,7 @@ namespace Logger
         % boost::log::expressions::attr<std::string>("FullName")
         % boost::log::expressions::attr<std::string>("Organization")
         % boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT)
+        % boost::log::expressions::attr<std::string>("CustomField")
       );
 
       /// Add the sink to the core
@@ -285,7 +287,7 @@ namespace Logger
         );
       } else {
         sink2->set_formatter(
-          boost::log::expressions::format("{\"datetime\": \"%8%\", \"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\"}")
+          boost::log::expressions::format("{\"datetime\": \"%8%\", \"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\" %9%}")
           % boost::phoenix::bind(&MessageForLogstash, boost::log::expressions::attr<std::string>("Message"))
           % boost::log::expressions::attr<std::string>("ComputerName")
           % boost::log::expressions::attr<std::string>("UserName")
@@ -294,6 +296,7 @@ namespace Logger
           % boost::log::expressions::attr<std::string>("FullName")
           % boost::log::expressions::attr<std::string>("Organization")
           % boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT)
+          % boost::log::expressions::attr<std::string>("CustomField")
         );
       }
 
@@ -344,6 +347,8 @@ namespace Logger
     boost::log::core::get()->add_global_attribute("FullName", fullNameAttribute);
     boost::log::core::get()->add_global_attribute("Organization", organizationAttribute);
 
+    boost::log::core::get()->add_global_attribute("CustomField", customField);
+
     boost::log::add_common_attributes();
     boost::log::core::get()->flush();
   }
@@ -359,7 +364,26 @@ namespace Logger
     organizationAttribute.set(organization);
   }
 
-  // reutrns true in case of date time parse success
+  void Log::setCustomField(const std::string& field, const std::string& value)
+  {
+    std::string str("");
+    if (!field.empty()) {
+      str = ", \"" + field + "\" : \"" + value + "\"";
+    }
+    customField.set(str);
+  }
+
+  void Log::setRunningTime(double time)
+  {
+    setCustomField(std::string("runningtime"), std::to_string(time));
+  }
+
+  void Log::resetRunningTime()
+  {
+    setCustomField(std::string(""), std::string(""));
+  }
+
+  // returns true in case of date time parse success
   std::tuple<bool, boost::posix_time::ptime> dateFromString(const std::string& dateTime)
   {
     std::string formatDate("%Y-%b-%d %H:%M:%S%F"); // 2016-Jan-27 18:04:30.610194

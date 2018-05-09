@@ -73,13 +73,11 @@ mitk::SegTool2D::~SegTool2D()
 
 void mitk::SegTool2D::Activated()
 {
-  AUTOPLAN_INFO << this->GetName() << ": Activated";
   Superclass::Activated();
 }
 
 void mitk::SegTool2D::Deactivated()
 {
-  AUTOPLAN_INFO << this->GetName() << ": Deactivated";
   Superclass::Deactivated();
 }
 

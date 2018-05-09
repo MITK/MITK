@@ -7,12 +7,12 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="10%"
-   height="10%"
-   viewBox="0 0 1792 1792"
+   width="128"
+   height="128"
+   viewBox="0 0 2293760 2293760"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r13725"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
    sodipodi:docname="video-camera.svg">
   <metadata
      id="metadata10">
@@ -22,6 +22,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -36,19 +37,21 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="686"
-     inkscape:window-height="480"
+     inkscape:window-width="1667"
+     inkscape:window-height="983"
      id="namedview6"
      showgrid="false"
-     inkscape:zoom="0.13169643"
-     inkscape:cx="896"
-     inkscape:cy="896"
+     inkscape:zoom="2.97995"
+     inkscape:cx="94.503048"
+     inkscape:cy="63.781202"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
-     inkscape:current-layer="svg2" />
+     inkscape:current-layer="svg2"
+     units="px" />
   <path
-     d="M1792 352v1088q0 42-39 59-13 5-25 5-27 0-45-19l-403-403v166q0 119-84.5 203.5t-203.5 84.5h-704q-119 0-203.5-84.5t-84.5-203.5v-704q0-119 84.5-203.5t203.5-84.5h704q119 0 203.5 84.5t84.5 203.5v165l403-402q18-19 45-19 12 0 25 5 39 17 39 59z"
+     d="m 2222080,504611.1 v 1314742.2 q 0,50753 -46800,71295.8 -15599.9,6042 -30000,6042 -32399.9,0 -54000,-22959.6 L 1607680,1386745.1 V 1587340 q 0,143799.9 -101400,245910 -101400,102110 -244200,102110 H 417280.01 Q 274480,1935360 173080,1833250 71680,1731139.9 71680,1587340 V 736624.4 Q 71680,592824.5 173080,490714.46 274480,388604.43 417280.01,388604.43 H 1262080 q 142800,0 244200,102110.03 101400,102110.04 101400,245909.94 v 199386.5 l 483600,-485777.93 q 21600.1,-22959.65 54000,-22959.65 14400.1,0 30000,6042.01 46800,20542.85 46800,71295.77 z"
      id="path4"
-     style="fill:#00ff00;fill-opacity:1;stroke:none" />
+     style="fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:1.00000167"
+     inkscape:connector-curvature="0" />
 </svg>

@@ -17,7 +17,7 @@
    <item row="3" column="0">
     <widget class="QCommandLinkButton" name="buttonExecuteOnMultipleImages">
      <property name="text">
-      <string>Resample multiple images</string>
+      <string>Resample all selected images</string>
      </property>
     </widget>
    </item>

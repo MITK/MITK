@@ -513,7 +513,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>New...</string>
+           <string>New</string>
           </property>
          </widget>
         </item>

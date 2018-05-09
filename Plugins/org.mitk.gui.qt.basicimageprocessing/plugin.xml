@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin>
-  
+
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.basicimageprocessing"
-          name="BasicImageProcessing"
+          name="Image Processing"
           class="QmitkBasicImageProcessing"
           icon="resources/lena.xpm" >
       <description>Perform basic image operations like add, subtract etc..</description>

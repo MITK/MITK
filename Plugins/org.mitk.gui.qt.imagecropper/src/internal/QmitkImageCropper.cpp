@@ -202,9 +202,6 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
   if (!m_ImageNode.IsExpired())
   {
     auto imageNode = m_ImageNode.Lock();
-
-    bool ok = false;
-
     QString name = QString::fromStdString(imageNode->GetName() + " Bounding Shape");
 
     auto boundingShape = this->GetDataStorage()->GetNode(mitk::NodePredicateFunction::New([&name](const mitk::DataNode *node)

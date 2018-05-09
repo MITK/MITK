@@ -113,85 +113,6 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QPushButton" name="m_View1">
-        <property name="minimumSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Rotate 3D camera 45° around x-axis.</string>
-        </property>
-        <property name="text">
-         <string>x</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="m_View2">
-        <property name="minimumSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Rotate 3D camera 45° around y-axis.</string>
-        </property>
-        <property name="text">
-         <string>y</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="m_View3">
-        <property name="minimumSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Rotate 3D camera 45° around z-axis.</string>
-        </property>
-        <property name="text">
-         <string>z</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>36</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>Background Color:</string>
@@ -216,6 +137,19 @@
          <string/>
         </property>
        </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>

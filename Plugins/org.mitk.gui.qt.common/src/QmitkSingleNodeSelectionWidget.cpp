@@ -174,12 +174,10 @@ void QmitkSingleNodeSelectionWidget::UpdateInfo()
   }
   else
   {
-    auto name = m_SelectedNode->GetName();
-    m_Controls.btnSelect->SetNodeInfo(QString::fromStdString(name));
-    
     m_Controls.btnClear->setVisible(m_IsOptional);
   }
 
+  m_Controls.btnSelect->SetSelectedNode(m_SelectedNode);
 };
 
 void QmitkSingleNodeSelectionWidget::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes)

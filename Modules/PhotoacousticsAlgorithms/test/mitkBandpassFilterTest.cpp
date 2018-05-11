@@ -13,14 +13,21 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+#define _USE_MATH_DEFINES
+#include <cmath>
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 #include <mitkImage.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkBandpassFilter.h>
-#include <cmath>
 #include <random>
+#include <mitkIOUtil.h>
+
+#include "../ITKFilter/ITKUltrasound/itkFFT1DRealToComplexConjugateImageFilter.h"
+#include "mitkImageCast.h"
+#include "mitkITKImageImport.h"
+#include "itkComplexToModulusImageFilter.h."
 
 class mitkBandpassFilterTestSuite : public mitk::TestFixture
 {
@@ -33,10 +40,13 @@ private:
 
   mitk::BandpassFilter::Pointer m_BandpassFilter;
   const unsigned int NUM_ITERATIONS = 15;
-  const unsigned int DATA_DIM = 500;
-  const float TIME_SPACING = 0.0001; // [us]
-  const float HIGHPASS_FREQENCY = 1.f / TIME_SPACING * DATA_DIM * 0.7f; // [Hz]
-  const float LOWPASS_FREQENCY = 1.f / TIME_SPACING * DATA_DIM * 0.3f; // [Hz]
+  const unsigned int DATA_XY_DIM = 512;
+  const unsigned int DATA_Z_DIM = 8;
+  const float TIME_SPACING = 0.00625; // [us]
+  const float FREQUENCY_RESOLUTION = 2 * M_PI / (TIME_SPACING * DATA_XY_DIM); // [MHz]
+  const float MAX_FREQUENCY = FREQUENCY_RESOLUTION * DATA_XY_DIM / 2.f; // [MHz]
+  const float HIGHPASS_FREQENCY = MAX_FREQUENCY * 0.8f; // [MHz]
+  const float LOWPASS_FREQENCY = MAX_FREQUENCY * 0.1f; // [MHz]
   const float ALPHA = 0; // 0 = box, 1 = von Hann; changing this may make the test invalid
 
 public:
@@ -46,17 +56,16 @@ public:
     m_BandpassFilter = mitk::BandpassFilter::New();
   }
 
-  void test(float signalFreq, float HighPass, float LowPass, float HighPassAlpha, float LowPassAlpha)
+  void test(float HighPass, float LowPass, float HighPassAlpha, float LowPassAlpha, bool useLow, bool useHigh)
   {
     std::random_device r;
     std::default_random_engine randGen(r());
-    std::uniform_real_distribution<float> randDistrHighPass(0, HighPass * 0.9f);
-    std::uniform_real_distribution<float> randDistrLowPass(LowPass * 1.1f, LowPass * 10);
-
-    float* data = new float[DATA_DIM*DATA_DIM*DATA_DIM];
+    std::uniform_real_distribution<float> randDistrHighPass(HighPass * 0.01f, HighPass * 0.2f);
+    std::uniform_real_distribution<float> randDistrLowPass(LowPass * 1.5f, LowPass * 2.f);
+    float* data = new float[DATA_XY_DIM*DATA_XY_DIM*DATA_Z_DIM];
 
     mitk::Image::Pointer inputImage = mitk::Image::New();
-    unsigned int dimension[3]{ DATA_DIM, DATA_DIM, DATA_DIM };
+    unsigned int dimension[3]{ DATA_XY_DIM, DATA_XY_DIM, DATA_Z_DIM };
     inputImage->Initialize(mitk::MakeScalarPixelType<float>(), 3, dimension);
     mitk::Vector3D spacing;
     spacing[0] = 1;
@@ -67,42 +76,79 @@ public:
     for (unsigned int iteration = 0; iteration < NUM_ITERATIONS; ++iteration)
     {
       // fill image with zeros
-      for (unsigned int i = 0; i < DATA_DIM*DATA_DIM*DATA_DIM; ++i)
+      for (unsigned int i = 0; i < DATA_XY_DIM*DATA_XY_DIM*DATA_Z_DIM; ++i)
       {
         data[i] = 0;
       }
 
       // write specific frequencies to the image
-      if (HighPass != -1)
+      if (useHigh)
         addFrequency(randDistrHighPass(randGen), TIME_SPACING, data, dimension);
-      if (LowPass != -1)
+      if (useLow)
         addFrequency(randDistrLowPass(randGen), TIME_SPACING, data, dimension);
 
       inputImage->SetImportVolume(data, 0, 0, mitk::Image::ImportMemoryManagementType::CopyMemory);
 
       m_BandpassFilter->SetInput(inputImage);
 
+      if (!useHigh)
+        HighPass = 0;
       m_BandpassFilter->SetHighPass(HighPass);
+
+      if(!useLow)
+        LowPass = MAX_FREQUENCY;
       m_BandpassFilter->SetLowPass(LowPass);
+
       m_BandpassFilter->SetHighPassAlpha(HighPassAlpha);
       m_BandpassFilter->SetLowPassAlpha(LowPassAlpha);
 
       m_BandpassFilter->Update();
       mitk::Image::Pointer outputImage = m_BandpassFilter->GetOutput();
 
-      mitk::ImageReadAccessor readAccess(outputImage);
-      const float* outputData = (const float*)readAccess.GetData();
+      // do a fourier transform, and check whether the part of the image that has been filtered is zero
+      typedef itk::Image< float, 3 > RealImageType;
+      RealImageType::Pointer image;
+
+      mitk::CastToItkImage(outputImage, image);
+
+      typedef itk::FFT1DRealToComplexConjugateImageFilter<RealImageType> ForwardFFTFilterType;
+      typedef ForwardFFTFilterType::OutputImageType ComplexImageType;
+      ForwardFFTFilterType::Pointer forwardFFTFilter = ForwardFFTFilterType::New();
+      forwardFFTFilter->SetInput(image);
+      forwardFFTFilter->SetDirection(1);
+      forwardFFTFilter->UpdateOutputInformation();
+      forwardFFTFilter->Update();
+
+      auto fftResult = forwardFFTFilter->GetOutput();
 
       // the resulting image should consist only of zeros, as we filtered the frequencies out
-      for (unsigned int z = 0; z < DATA_DIM; ++z)
+      for (unsigned int z = 0; z < DATA_Z_DIM; ++z)
       {
-        for (unsigned int y = 0; y < DATA_DIM; ++y)
+        for (unsigned int y = 0; y < DATA_XY_DIM / 2; ++y)
         {
-          for (unsigned int x = 0; x < DATA_DIM; ++x)
+          if (y < (unsigned int)(HighPass / FREQUENCY_RESOLUTION) || y > (unsigned int)(LowPass / FREQUENCY_RESOLUTION))
           {
-            unsigned int outPos = x + y * DATA_DIM + z * DATA_DIM * DATA_DIM;
-            CPPUNIT_ASSERT_MESSAGE(std::string("expected not :(, got " + std::to_string(outputData[outPos])),
-              abs(1) < mitk::eps);
+            for (unsigned int x = 0; x < DATA_XY_DIM; ++x)
+            {
+              unsigned int outPos = x + y * DATA_XY_DIM + z * DATA_XY_DIM * DATA_XY_DIM;
+              std::complex<float> value = fftResult->GetPixel({ x,y,z });
+              CPPUNIT_ASSERT_MESSAGE(std::string("Expected 0, got (" + std::to_string(value.real()) + " + " + std::to_string(value.imag()) + "i) at " + std::to_string(x)+"-"+std::to_string(y)+"-"+std::to_string(z)),
+                (abs(value.real()) < 0.1) && (abs(value.imag() < 0.1)));
+            }
+          }
+        }
+
+        for (unsigned int y = DATA_XY_DIM / 2; y < DATA_XY_DIM; ++y)
+        {
+          if (y > DATA_XY_DIM - (unsigned int)(HighPass / FREQUENCY_RESOLUTION) || y < DATA_XY_DIM - (unsigned int)(LowPass / FREQUENCY_RESOLUTION))
+          {
+            for (unsigned int x = 0; x < DATA_XY_DIM; ++x)
+            {
+              unsigned int outPos = x + y * DATA_XY_DIM + z * DATA_XY_DIM * DATA_XY_DIM;
+              std::complex<float> value = fftResult->GetPixel({ x,y,z });
+              CPPUNIT_ASSERT_MESSAGE(std::string("Expected 0, got (" + std::to_string(value.real()) + " + " + std::to_string(value.imag()) + "i) at " + std::to_string(x) + "-" + std::to_string(y) + "-" + std::to_string(z)),
+                (abs(value.real()) < 0.1) && (abs(value.imag() < 0.1)));
+            }
           }
         }
       }
@@ -116,9 +162,9 @@ public:
   {
     for (unsigned int z = 0; z < dim[2]; ++z)
     {
-      for (unsigned int y = 0; y < dim[2]; ++y)
+      for (unsigned int y = 0; y < dim[1]; ++y)
       {
-        for (unsigned int x = 0; x < dim[2]; ++x)
+        for (unsigned int x = 0; x < dim[0]; ++x)
         {
           data[x + y*dim[0] + z*dim[0] * dim[1]] += std::sin(freq * timeSpacing * y);
         }
@@ -128,12 +174,15 @@ public:
 
   void testHighPass()
   {
-    test(7.5, HIGHPASS_FREQENCY, -1, ALPHA, 0);
+    MITK_INFO << "Performing HighPass test";
+    test(HIGHPASS_FREQENCY, 0, ALPHA, ALPHA, false, true);
   }
 
   void testLowPass()
   {
-    test(7.5, -1, LOWPASS_FREQENCY, 0, ALPHA);
+    return;
+    MITK_INFO << "Performing LowPass test";
+    test(0, LOWPASS_FREQENCY, ALPHA, ALPHA, true, false);
   }
 
   void tearDown() override

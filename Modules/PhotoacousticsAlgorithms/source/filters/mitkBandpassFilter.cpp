@@ -14,6 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "mitkBandpassFilter.h"
 
 #include "../ITKFilter/ITKUltrasound/itkFFT1DComplexConjugateToRealImageFilter.h"
@@ -22,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkMultiplyImageFilter.h"
 #include "mitkITKImageImport.h"
 #include "mitkIOUtil.h"
+#include "itkComplexToModulusImageFilter.h."
 
 mitk::BandpassFilter::BandpassFilter() :
   m_HighPass(0),
@@ -49,7 +53,7 @@ itk::Image<float, 3U>::Pointer BPFunction(mitk::Image::Pointer reference,
   float* imageData = new float[reference->GetDimension(0)*reference->GetDimension(1)];
 
   float width = cutoffFrequencyPixelLowPass - cutoffFrequencyPixelHighPass;
-  float center = cutoffFrequencyPixelHighPass / 2.0 + width / 2.0;
+  float center = cutoffFrequencyPixelHighPass + width / 2.f;
 
   for (unsigned int n = 0; n < reference->GetDimension(1); ++n)
   {
@@ -57,29 +61,29 @@ itk::Image<float, 3U>::Pointer BPFunction(mitk::Image::Pointer reference,
   }
   for (int n = 0; n < width; ++n)
   {
-    imageData[reference->GetDimension(0)*n] = 1;
-    if (n <= (alphaHighPass*(width - 1)) / 2.0)
+    imageData[reference->GetDimension(0)*(int)(n + center - (width / 2.f))] = 1;
+    if (n <= (alphaHighPass*(width - 1)) / 2.f)
     {
-      if (alphaHighPass > 0.00001)
+      if (alphaHighPass > 0.00001f)
       {
-        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] =
+        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2.f))] =
           (1 + cos(itk::Math::pi*(2 * n / (alphaHighPass*(width - 1)) - 1))) / 2;
       }
       else
       {
-        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = 1;
+        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2.f))] = 1;
       }
     }
-    else if (n >= (width - 1)*(1 - alphaLowPass / 2))
+    else if (n >= (width - 1)*(1 - alphaLowPass / 2.f))
     {
-      if (alphaLowPass > 0.00001)
+      if (alphaLowPass > 0.00001f)
       {
-        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] =
+        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2.f))] =
           (1 + cos(itk::Math::pi*(2 * n / (alphaLowPass*(width - 1)) + 1 - 2 / alphaLowPass))) / 2;
       }
       else
       {
-        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = 1;
+        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2.f))] = 1;
       }
     }
   }
@@ -155,7 +159,7 @@ void mitk::BandpassFilter::GenerateData()
   }
 
   auto output = GetOutput();
-  mitk::Image::Pointer resampledInput;
+  mitk::Image::Pointer resampledInput = input;
 
   bool powerOfTwo = false;
   int finalPower = 0;
@@ -199,12 +203,16 @@ void mitk::BandpassFilter::GenerateData()
     mitkThrow() << "bandpass error";
   }
 
+  if (m_HighPass > m_LowPass)
+    mitkThrow() << "High pass frequency higher than low pass frequency, abort";
+
+  float singleVoxel = 2*M_PI / ((float)resampledInput->GetGeometry()->GetSpacing()[1] * resampledInput->GetDimension(1)); // [MHz]
+  float cutoffPixelHighPass = std::min((m_HighPass / singleVoxel), (float)resampledInput->GetDimension(1) / 2.0f);
+  float cutoffPixelLowPass = std::min((m_LowPass / singleVoxel), (float)resampledInput->GetDimension(1) / 2.0f);
+
+  MITK_INFO << "SingleVoxel: " << singleVoxel;
   MITK_INFO << "HighPass: " << m_HighPass;
   MITK_INFO << "LowPass: " << m_LowPass;
-
-  float singleVoxel = 1.0f / ((float)resampledInput->GetGeometry()->GetSpacing()[1] / 1000);
-  float cutoffPixelHighPass = std::min((m_HighPass / singleVoxel) / 2, (float)resampledInput->GetDimension(1) / 2.0f);
-  float cutoffPixelLowPass = std::min((m_LowPass / singleVoxel) / 2, (float)resampledInput->GetDimension(1) / 2.0f - cutoffPixelHighPass);
 
   MITK_INFO << "cutoffPixelHighPass: " << cutoffPixelHighPass;
   MITK_INFO << "cutoffPixelLowPass: " << cutoffPixelLowPass;
@@ -215,8 +223,6 @@ void mitk::BandpassFilter::GenerateData()
     m_HighPassAlpha,
     m_LowPassAlpha);
 
-  mitk::Image::Pointer testImage;
-  mitk::CastToMitkImage(fftMultiplicator, testImage);
 
   typedef itk::MultiplyImageFilter< ComplexImageType,
     RealImageType,
@@ -225,6 +231,21 @@ void mitk::BandpassFilter::GenerateData()
   MultiplyFilterType::Pointer multiplyFilter = MultiplyFilterType::New();
   multiplyFilter->SetInput1(forwardFFTFilter->GetOutput());
   multiplyFilter->SetInput2(fftMultiplicator);
+
+  /*
+  GrabItkImageMemory(fftMultiplicator, output);
+  mitk::IOUtil::Save(output, "D:/fftImage.nrrd");
+
+  typedef itk::ComplexToModulusImageFilter< ComplexImageType, RealImageType > modulusType;
+  modulusType::Pointer modul = modulusType::New();
+
+  modul->SetInput(multiplyFilter->GetOutput());
+  GrabItkImageMemory(modul->GetOutput(), output);
+  mitk::IOUtil::Save(output, "D:/fftout.nrrd");
+
+  modul->SetInput(forwardFFTFilter->GetOutput());
+  GrabItkImageMemory(modul->GetOutput(), output);
+  mitk::IOUtil::Save(output, "D:/fftin.nrrd");*/
 
   typedef itk::FFT1DComplexConjugateToRealImageFilter< ComplexImageType, RealImageType > InverseFilterType;
   InverseFilterType::Pointer inverseFFTFilter = InverseFilterType::New();

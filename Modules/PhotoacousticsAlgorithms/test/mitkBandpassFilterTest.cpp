@@ -126,28 +126,28 @@ public:
       {
         for (unsigned int y = 0; y < DATA_XY_DIM / 2; ++y)
         {
-          if (y < (unsigned int)(HighPass / FREQUENCY_RESOLUTION) || y > (unsigned int)(LowPass / FREQUENCY_RESOLUTION))
+          if (y < (unsigned int)std::floor(HighPass / FREQUENCY_RESOLUTION) || y > (unsigned int)std::ceil(LowPass / FREQUENCY_RESOLUTION))
           {
             for (unsigned int x = 0; x < DATA_XY_DIM; ++x)
             {
               unsigned int outPos = x + y * DATA_XY_DIM + z * DATA_XY_DIM * DATA_XY_DIM;
               std::complex<float> value = fftResult->GetPixel({ x,y,z });
               CPPUNIT_ASSERT_MESSAGE(std::string("Expected 0, got (" + std::to_string(value.real()) + " + " + std::to_string(value.imag()) + "i) at " + std::to_string(x)+"-"+std::to_string(y)+"-"+std::to_string(z)),
-                (abs(value.real()) < 0.1) && (abs(value.imag() < 0.1)));
+                (abs(value.real()) < 0.00001) && (abs(value.imag() < 0.00001)));
             }
           }
         }
 
         for (unsigned int y = DATA_XY_DIM / 2; y < DATA_XY_DIM; ++y)
         {
-          if (y > DATA_XY_DIM - (unsigned int)(HighPass / FREQUENCY_RESOLUTION) || y < DATA_XY_DIM - (unsigned int)(LowPass / FREQUENCY_RESOLUTION))
+          if (y > DATA_XY_DIM - (unsigned int)std::floor(HighPass / FREQUENCY_RESOLUTION) || y < DATA_XY_DIM - (unsigned int)std::ceil(LowPass / FREQUENCY_RESOLUTION))
           {
             for (unsigned int x = 0; x < DATA_XY_DIM; ++x)
             {
               unsigned int outPos = x + y * DATA_XY_DIM + z * DATA_XY_DIM * DATA_XY_DIM;
               std::complex<float> value = fftResult->GetPixel({ x,y,z });
               CPPUNIT_ASSERT_MESSAGE(std::string("Expected 0, got (" + std::to_string(value.real()) + " + " + std::to_string(value.imag()) + "i) at " + std::to_string(x) + "-" + std::to_string(y) + "-" + std::to_string(z)),
-                (abs(value.real()) < 0.1) && (abs(value.imag() < 0.1)));
+                (abs(value.real()) < 0.00001) && (abs(value.imag() < 0.00001)));
             }
           }
         }
@@ -180,7 +180,6 @@ public:
 
   void testLowPass()
   {
-    return;
     MITK_INFO << "Performing LowPass test";
     test(0, LOWPASS_FREQENCY, ALPHA, ALPHA, true, false);
   }

@@ -43,8 +43,8 @@ class MITKQTWIDGETS_EXPORT QmitkRenderWindow : public QVTKOpenGLWidget, public m
 
 public:
   QmitkRenderWindow(
-    QWidget *parent = 0,
-    QString name = "unnamed renderwindow",
+    QWidget *parent = nullptr,
+    const QString &name = "unnamed renderwindow",
     mitk::VtkPropRenderer *renderer = nullptr,
     mitk::RenderingManager *renderingManager = nullptr,
     mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
@@ -80,7 +80,7 @@ public:
   void HideRenderWindowMenu();
 
   // Activate or Deactivate MenuWidget.
-  void ActivateMenuWidget(bool state, QmitkStdMultiWidget *stdMultiWidget = 0);
+  void ActivateMenuWidget(bool state, QmitkStdMultiWidget *stdMultiWidget = nullptr);
 
   bool GetActivateMenuWidgetFlag() { return m_MenuWidgetActivated; }
   // Get it from the QVTKWidget parent

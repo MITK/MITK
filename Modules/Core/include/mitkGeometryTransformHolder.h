@@ -139,7 +139,7 @@ namespace mitk
 
     void SetIdentity();
 
-    void Compose(const TransformType *other, bool pre = 0);
+    void Compose(const TransformType *other, bool pre = false);
 
     void SetVtkMatrixDeepCopy(vtkTransform *vtktransform);
 

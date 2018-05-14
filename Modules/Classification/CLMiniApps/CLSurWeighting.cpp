@@ -39,10 +39,10 @@ int main(int argc, char* argv[])
   mitk::DataCollection::Pointer col = mitk::DataCollection::New();
 
   MITK_INFO << "Arg 2 " << argv[2];
-  mitk::Image::Pointer sur=dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(argv[2])[0].GetPointer());
+  mitk::Image::Pointer sur=mitk::IOUtil::Load<mitk::Image>(argv[2]);
   col->AddData(sur.GetPointer(),"sur");
   MITK_INFO << "Arg 3 " << argv[3];
-  mitk::Image::Pointer mask=dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(argv[3])[0].GetPointer());
+  mitk::Image::Pointer mask=mitk::IOUtil::Load<mitk::Image>(argv[3]);
   col->AddData(mask.GetPointer(),"mask");
 
   std::vector<std::string> modalities;
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
     std::stringstream ss;
     ss << i;
     modalities.push_back(ss.str());
-    mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(argv[i])[0].GetPointer());
+    mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(argv[i]);
     col->AddData(img.GetPointer(),ss.str());
   }
 

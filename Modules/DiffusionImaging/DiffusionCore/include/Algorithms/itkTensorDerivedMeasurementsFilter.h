@@ -79,7 +79,7 @@ protected:
 
   Measure m_Measure;
 
-  void GenerateData();
+  void GenerateData() override;
 
 }; // end class
 

@@ -85,7 +85,7 @@ namespace mitk {
     *  - "CameraVisualization_FocalLength" : mitk::FloatProperty
     *  - "CameraVisualization_ViewAngle" : mitk::FloatProperty
     */
-    virtual void SetParameters(const mitk::PropertyList* p) override;
+    void SetParameters(const mitk::PropertyList* p) override;
 
     /**Documentation
     *\brief Get all filter parameters as a PropertyList
@@ -103,14 +103,14 @@ namespace mitk {
 
   protected:
     CameraVisualization();
-    virtual ~CameraVisualization();
+    ~CameraVisualization() override;
 
     /**Documentation
     * \brief filter execute method
     *
     * positions and orients camera according to the position and orientation hold in the NavigationData
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     mitk::BaseRenderer::Pointer m_Renderer; ///< renderer that visualizes the navigation data-
 

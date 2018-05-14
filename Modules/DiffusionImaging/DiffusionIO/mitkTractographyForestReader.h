@@ -33,12 +33,12 @@ namespace mitk
   public:
 
     TractographyForestReader();
-    virtual ~TractographyForestReader(){}
+    ~TractographyForestReader() override{}
     TractographyForestReader(const TractographyForestReader& other);
-    virtual TractographyForestReader * Clone() const override;
+    TractographyForestReader * Clone() const override;
 
     using mitk::AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+    std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   private:
 

@@ -227,7 +227,7 @@ void QmitkIGTTutorialView::OnTimer()
   //will be adapted.
   m_Visualizer->Update();
 
-  mitk::TimeGeometry::Pointer geo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
+  auto geo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews( geo );
   this->RequestRenderWindowUpdate();
 }

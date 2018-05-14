@@ -4,16 +4,16 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_openigtlink_Activator.cpp
-  OpenIGTLinkManager.cpp
+  QmitkOpenIGTLinkManager.cpp
 )
 
 set(UI_FILES
-  src/internal/OpenIGTLinkManagerControls.ui
+  src/internal/QmitkOpenIGTLinkManagerControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_openigtlink_Activator.h
-  src/internal/OpenIGTLinkManager.h
+  src/internal/QmitkOpenIGTLinkManager.h
 )
 
 # list of resource files which can be used by the plug-in

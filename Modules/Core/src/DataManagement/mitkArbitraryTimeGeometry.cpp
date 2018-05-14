@@ -28,7 +28,11 @@ void mitk::ArbitraryTimeGeometry::Initialize()
 {
   this->ClearAllGeometries();
   Geometry3D::Pointer geo = Geometry3D::New();
+  geo->Initialize();
+
   this->AppendNewTimeStep(geo, 0, 1);
+
+  Update();
 }
 
 mitk::TimeStepType mitk::ArbitraryTimeGeometry::CountTimeSteps() const

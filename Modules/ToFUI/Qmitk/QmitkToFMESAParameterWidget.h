@@ -43,8 +43,8 @@ class MITKTOFUI_EXPORT QmitkToFMESAParameterWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkToFMESAParameterWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
-    virtual ~QmitkToFMESAParameterWidget();
+    QmitkToFMESAParameterWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
+    ~QmitkToFMESAParameterWidget() override;
 
     /* @brief This method is part of the widget an needs not to be called seperately. */
     virtual void CreateQtPartControl(QWidget *parent);

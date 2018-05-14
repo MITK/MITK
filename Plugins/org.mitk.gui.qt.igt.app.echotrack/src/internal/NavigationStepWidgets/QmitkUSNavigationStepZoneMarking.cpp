@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNodeDisplacementFilter.h"
 
-#include "../USNavigationMarkerPlacement.h"
+#include "../QmitkUSNavigationMarkerPlacement.h"
 
 QmitkUSNavigationStepZoneMarking::QmitkUSNavigationStepZoneMarking(QWidget *parent) :
   QmitkUSAbstractNavigationStep(parent),
@@ -51,10 +51,10 @@ QmitkUSNavigationStepZoneMarking::~QmitkUSNavigationStepZoneMarking()
 
 bool QmitkUSNavigationStepZoneMarking::OnStartStep()
 {
-  this->GetNamedDerivedNodeAndCreate(USNavigationMarkerPlacement::DATANAME_ZONES,
+  this->GetNamedDerivedNodeAndCreate(QmitkUSNavigationMarkerPlacement::DATANAME_ZONES,
                                      QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
 
-  ui->zonesWidget->SetDataStorage(this->GetDataStorage(), USNavigationMarkerPlacement::DATANAME_ZONES);
+  ui->zonesWidget->SetDataStorage(this->GetDataStorage(), QmitkUSNavigationMarkerPlacement::DATANAME_ZONES);
 
   return true;
 }
@@ -72,7 +72,7 @@ bool QmitkUSNavigationStepZoneMarking::OnStopStep()
     mitk::DataNode::Pointer baseNode = dataStorage->GetNamedNode(QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
     if ( baseNode.IsNotNull() )
     {
-      dataStorage->Remove(dataStorage->GetNamedDerivedNode(USNavigationMarkerPlacement::DATANAME_ZONES, baseNode));
+      dataStorage->Remove(dataStorage->GetNamedDerivedNode(QmitkUSNavigationMarkerPlacement::DATANAME_ZONES, baseNode));
     }
   }
 

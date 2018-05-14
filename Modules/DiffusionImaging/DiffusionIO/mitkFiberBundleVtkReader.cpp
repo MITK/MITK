@@ -174,7 +174,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleVtkReader::Read
     {
       TiXmlHandle hDoc(&doc);
       TiXmlElement* pElem;
-      TiXmlHandle hRoot(0);
+      TiXmlHandle hRoot(nullptr);
       pElem = hDoc.FirstChildElement().Element();
       // save this for later
       hRoot = TiXmlHandle(pElem);

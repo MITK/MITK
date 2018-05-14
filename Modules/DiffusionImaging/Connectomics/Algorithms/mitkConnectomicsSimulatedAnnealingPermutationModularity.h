@@ -41,13 +41,13 @@ namespace mitk
     itkCloneMacro(Self)
 
     // Initialize the permutation
-    virtual void Initialize() override;
+    void Initialize() override;
 
     // Do a permutation for a specific temperature
-    virtual void Permutate( double temperature ) override;
+    void Permutate( double temperature ) override;
 
     // Do clean up necessary after a permutation
-    virtual void CleanUp() override;
+    void CleanUp() override;
 
     // set the network permutation is to be run upon
     void SetNetwork( mitk::ConnectomicsNetwork::Pointer theNetwork );
@@ -74,7 +74,7 @@ namespace mitk
 
     //////////////////// Functions ///////////////////////
     ConnectomicsSimulatedAnnealingPermutationModularity();
-    ~ConnectomicsSimulatedAnnealingPermutationModularity();
+    ~ConnectomicsSimulatedAnnealingPermutationModularity() override;
 
     // This function moves one single node from a module to another
         void permutateMappingSingleNodeShift(

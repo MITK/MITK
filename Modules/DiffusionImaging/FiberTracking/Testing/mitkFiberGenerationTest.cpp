@@ -33,11 +33,11 @@ int mitkFiberGenerationTest(int argc, char* argv[])
 
             try{
 
-        mitk::PlanarEllipse::Pointer pf1 = dynamic_cast<mitk::PlanarEllipse*>(mitk::IOUtil::Load(argv[1])[0].GetPointer());
-        mitk::PlanarEllipse::Pointer pf2 = dynamic_cast<mitk::PlanarEllipse*>(mitk::IOUtil::Load(argv[2])[0].GetPointer());
-        mitk::PlanarEllipse::Pointer pf3 = dynamic_cast<mitk::PlanarEllipse*>(mitk::IOUtil::Load(argv[3])[0].GetPointer());
-        mitk::FiberBundle::Pointer uniform = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(argv[4])[0].GetPointer());
-        mitk::FiberBundle::Pointer gaussian = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(argv[5])[0].GetPointer());
+        mitk::PlanarEllipse::Pointer pf1 = mitk::IOUtil::Load<mitk::PlanarEllipse>(argv[1]);
+        mitk::PlanarEllipse::Pointer pf2 = mitk::IOUtil::Load<mitk::PlanarEllipse>(argv[2]);
+        mitk::PlanarEllipse::Pointer pf3 = mitk::IOUtil::Load<mitk::PlanarEllipse>(argv[3]);
+        mitk::FiberBundle::Pointer uniform = mitk::IOUtil::Load<mitk::FiberBundle>(argv[4]);
+        mitk::FiberBundle::Pointer gaussian = mitk::IOUtil::Load<mitk::FiberBundle>(argv[5]);
 
         FiberGenerationParameters parameters;
         std::vector< mitk::PlanarEllipse::Pointer > fid; fid.push_back(pf1); fid.push_back(pf2); fid.push_back(pf3);

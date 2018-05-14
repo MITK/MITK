@@ -315,6 +315,7 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t, unsigned int com
 
   // used to avoid statistics calculation on Odf images. property will be replaced as soons as bug 17928 is merged and
   // the diffusion image refactoring is complete.
+  mitk::BoolProperty *isSh = dynamic_cast<mitk::BoolProperty *>(m_Image->GetProperty("IsShImage").GetPointer());
   mitk::BoolProperty *isOdf = dynamic_cast<mitk::BoolProperty *>(m_Image->GetProperty("IsOdfImage").GetPointer());
   const mitk::PixelType pType = m_Image->GetPixelType(0);
   if (pType.GetNumberOfComponents() == 1 && (pType.GetPixelType() != itk::ImageIOBase::UNKNOWNPIXELTYPE) &&
@@ -331,7 +332,7 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t, unsigned int com
     }
   }
   else if (pType.GetPixelType() == itk::ImageIOBase::VECTOR &&
-           (!isOdf || !isOdf->GetValue())) // we have a vector image
+           (!isOdf || !isOdf->GetValue()) && (!isSh || !isSh->GetValue())) // we have a vector image
   {
     // recompute
     mitk::ImageTimeSelector::Pointer timeSelector = this->GetTimeSelector();

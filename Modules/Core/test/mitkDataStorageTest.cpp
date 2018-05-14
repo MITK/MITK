@@ -166,7 +166,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
 
   // Take the ItkImageFile Reader for the .nrrd data format.
   // (was previously pic which is now deprecated format)
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(filename);
 
   // create some DataNodes to fill the ds
   mitk::DataNode::Pointer n1 = mitk::DataNode::New(); // node with image and name property
@@ -826,7 +826,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
 
   // Checking ComputeBoundingGeometry3D method*/
   const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetAll();
-  mitk::TimeGeometry::Pointer geometry = ds->ComputeBoundingGeometry3D();
+  auto geometry = ds->ComputeBoundingGeometry3D();
   MITK_TEST_CONDITION(geometry->CountTimeSteps() == 4, "Test for number or time steps with ComputeBoundingGeometry()");
   mitk::TimeBounds timebounds = geometry->GetTimeBounds();
   MITK_TEST_CONDITION((timebounds[0] == 0) && (timebounds[1] == 4),

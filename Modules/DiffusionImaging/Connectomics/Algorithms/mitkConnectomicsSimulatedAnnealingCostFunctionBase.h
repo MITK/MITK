@@ -46,7 +46,7 @@ namespace mitk
 
     //////////////////// Functions ///////////////////////
     ConnectomicsSimulatedAnnealingCostFunctionBase();
-    ~ConnectomicsSimulatedAnnealingCostFunctionBase();
+    ~ConnectomicsSimulatedAnnealingCostFunctionBase() override;
 
   };
 

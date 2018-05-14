@@ -45,7 +45,7 @@ bool ImageVtkDataReferenceCheck(const char *fname)
   const std::string filename = std::string(fname);
   try
   {
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+    mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(filename);
     MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(), "Non-nullptr image")
 
     vtkImageData *vtk = image->GetVtkImageData();
@@ -437,7 +437,7 @@ int mitkImageTest(int argc, char *argv[])
   mitk::Image::Pointer image;
   try
   {
-    image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+    image = mitk::IOUtil::Load<mitk::Image>(filename);
     MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(), "Non-nullptr image")
   }
   catch (...)

@@ -44,7 +44,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkEnumerationProperty.h>
 #include <mitkGridRepresentationProperty.h>
 #include <mitkGridVolumeMapperProperty.h>
-#include <mitkOrganTypeProperty.h>
 #include <mitkVtkInterpolationProperty.h>
 #include <mitkVtkRepresentationProperty.h>
 #include <mitkVtkResliceInterpolationProperty.h>

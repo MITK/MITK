@@ -44,7 +44,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPointListViewWidget : public QListWidget
 signals:
   void PointSelectionChanged(); ///< this signal is emmitted, if the selection of a point in the pointset is changed
 public:
-  QmitkPointListViewWidget(QWidget *parent = 0);
+  QmitkPointListViewWidget(QWidget *parent = nullptr);
   ~QmitkPointListViewWidget() override;
 
   /// assign a point set for observation

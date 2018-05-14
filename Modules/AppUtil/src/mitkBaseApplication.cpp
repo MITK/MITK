@@ -157,7 +157,7 @@ namespace mitk
 
     Impl(int argc, char **argv)
       : m_Argc(argc), m_Argv(argv), m_SingleMode(false), m_SafeMode(true),
-        m_Splashscreen(0), m_SplashscreenClosingCallback(nullptr)
+        m_Splashscreen(nullptr), m_SplashscreenClosingCallback(nullptr)
     {
 #ifdef Q_OS_MAC
       /*
@@ -366,11 +366,11 @@ namespace mitk
 
   BaseApplication::~BaseApplication()
   {
-    if (d->m_Splashscreen != 0)
+    if (d->m_Splashscreen != nullptr)
     {
       delete(d->m_Splashscreen);
     }
-    if (d->m_SplashscreenClosingCallback != 0)
+    if (d->m_SplashscreenClosingCallback != nullptr)
     {
       delete(d->m_SplashscreenClosingCallback);
     }
@@ -660,21 +660,23 @@ namespace mitk
 
   QCoreApplication *BaseApplication::getQApplication() const
   {
-    vtkOpenGLRenderWindow::SetGlobalMaximumNumberOfMultiSamples(0);
-    QSurfaceFormat::setDefaultFormat(QVTKOpenGLWidget::defaultFormat());
-
     QCoreApplication *qCoreApp = qApp;
 
-// Needed to fix bug #18521, i.e. not responding GUI on Mac OS X with Qt5
+    if (nullptr == qCoreApp)
+    {
+      vtkOpenGLRenderWindow::SetGlobalMaximumNumberOfMultiSamples(0);
+
+      auto defaultFormat = QVTKOpenGLWidget::defaultFormat();
+      defaultFormat.setSamples(0);
+      QSurfaceFormat::setDefaultFormat(defaultFormat);
+
 #ifdef Q_OS_OSX
-    qCoreApp->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+      QCoreApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 
-    qCoreApp->setAttribute(Qt::AA_ShareOpenGLContexts);
+      QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
-    if (!qCoreApp)
-    {
-      if (getSingleMode())
+      if (this->getSingleMode())
       {
         qCoreApp = new QmitkSingleApplication(d->m_Argc, d->m_Argv, getSafeMode());
       }
@@ -686,6 +688,7 @@ namespace mitk
       }
       d->m_QApp.reset(qCoreApp);
     }
+
     return qCoreApp;
   }
 
@@ -733,7 +736,7 @@ namespace mitk
       arguments.push_back(QString::fromStdString(arg));
     }
 
-    if (d->m_Splashscreen != 0)
+    if (d->m_Splashscreen != nullptr)
     {
       // a splash screen is displayed,
       // creating the closing callback

@@ -85,7 +85,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStatusBar.h"
 #include "mitkTeemDiffusionTensor3DReconstructionImageFilter.h"
 #include "mitkSurface.h"
-#include "mitkDataNodeFactory.h"
 
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
@@ -99,11 +98,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-#define DIFF_EST_PI   M_PI
 
 typedef float TTensorPixelType;
 typedef itk::DiffusionTensor3D< TTensorPixelType >    TensorPixelType;
@@ -1998,7 +1992,7 @@ void QmitkDiffusionTensorEstimation::OdfStandardAlgorithmsDeconvolutionButton()
   if(!m_Controls->m_OdfStandardAlgorithmsDeconvolutionAngResThresholdEdit->text().contains(QString("NaN")))
   {
     float angRes = m_Controls->m_OdfStandardAlgorithmsDeconvolutionAngResThresholdEdit->text().toFloat();
-    angRes /= 360/DIFF_EST_PI;
+    angRes /= 360/itk::Math::pi;
     devonvolutionFilter->SetAngularResolutionThreshold(angRes);
   }
   devonvolutionFilter->SetSamplingQuantileStart(m_Controls->m_OdfStandardAlgorithmsDeconvQuantStart->text().toFloat());

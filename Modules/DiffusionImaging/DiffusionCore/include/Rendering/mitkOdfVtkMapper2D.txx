@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOdfScaleByProperty.h"
 #include "mitkProperties.h"
 #include "mitkTensorImage.h"
+#include "mitkShImage.h"
 
 #include "vtkSphereSource.h"
 #include "vtkPropCollection.h"
@@ -64,7 +65,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkOpenGLRenderer.h"
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 #include <ciso646>
 
@@ -102,7 +103,19 @@ bool mitk::OdfVtkMapper2D<T, N>::m_ToggleGlyphPlacementMode = true;
 template<class T, int N>
 vtkSmartPointer<vtkDoubleArray> mitk::OdfVtkMapper2D<T, N>::m_ColourScalars = nullptr;
 
-#define ODF_MAPPER_PI M_PI
+
+template<class T, int N>
+vnl_matrix<float> mitk::OdfVtkMapper2D<T, N>::m_Sh2Basis =  mitk::sh::CalcShBasisForDirections(2, itk::PointShell<N, vnl_matrix_fixed<double, 3, N> >::DistributePointShell()->as_matrix());
+template<class T, int N>
+vnl_matrix<float> mitk::OdfVtkMapper2D<T, N>::m_Sh4Basis =  mitk::sh::CalcShBasisForDirections(4, itk::PointShell<N, vnl_matrix_fixed<double, 3, N> >::DistributePointShell()->as_matrix());
+template<class T, int N>
+vnl_matrix<float> mitk::OdfVtkMapper2D<T, N>::m_Sh6Basis =  mitk::sh::CalcShBasisForDirections(6, itk::PointShell<N, vnl_matrix_fixed<double, 3, N> >::DistributePointShell()->as_matrix());
+template<class T, int N>
+vnl_matrix<float> mitk::OdfVtkMapper2D<T, N>::m_Sh8Basis =  mitk::sh::CalcShBasisForDirections(8, itk::PointShell<N, vnl_matrix_fixed<double, 3, N> >::DistributePointShell()->as_matrix());
+template<class T, int N>
+vnl_matrix<float> mitk::OdfVtkMapper2D<T, N>::m_Sh10Basis =  mitk::sh::CalcShBasisForDirections(10, itk::PointShell<N, vnl_matrix_fixed<double, 3, N> >::DistributePointShell()->as_matrix());
+template<class T, int N>
+vnl_matrix<float> mitk::OdfVtkMapper2D<T, N>::m_Sh12Basis =  mitk::sh::CalcShBasisForDirections(12, itk::PointShell<N, vnl_matrix_fixed<double, 3, N> >::DistributePointShell()->as_matrix());
 
 
 template<class T, int N>
@@ -132,7 +145,7 @@ mitk::OdfVtkMapper2D<T,N>::LocalStorage::LocalStorage()
   m_OdfsMappers.push_back(vtkPolyDataMapper::New());
   m_OdfsMappers.push_back(vtkPolyDataMapper::New());
 
-  vtkLookupTable *lut = vtkLookupTable::New();
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
 
   m_OdfsMappers[0]->SetLookupTable(lut);
   m_OdfsMappers[1]->SetLookupTable(lut);
@@ -259,7 +272,7 @@ void  mitk::OdfVtkMapper2D<T,N>
   point[2] = p2[2];
 
   vtkPointData* data = pfilter->GetPointData();
-  vtkDataArray* odfvals = data->GetArray("vector");
+  vtkDataArray* image_vals = data->GetArray("vector");
   vtkIdType id = pfilter->GetPointId();
   m_OdfTransform->Identity();
   m_OdfTransform->Translate(point[0],point[1],point[2]);
@@ -267,36 +280,71 @@ void  mitk::OdfVtkMapper2D<T,N>
   typedef itk::OrientationDistributionFunction<float,N> OdfType;
   OdfType odf;
 
-  if( odfvals->GetNumberOfComponents()==6 and not m_ToggleTensorEllipsoidView )
+  if( image_vals->GetNumberOfComponents()==6 && !m_ToggleTensorEllipsoidView )
   {
     float tensorelems[6] = {
-      (float)odfvals->GetComponent(id,0),
-      (float)odfvals->GetComponent(id,1),
-      (float)odfvals->GetComponent(id,2),
-      (float)odfvals->GetComponent(id,3),
-      (float)odfvals->GetComponent(id,4),
-      (float)odfvals->GetComponent(id,5),
+      (float)image_vals->GetComponent(id,0),
+      (float)image_vals->GetComponent(id,1),
+      (float)image_vals->GetComponent(id,2),
+      (float)image_vals->GetComponent(id,3),
+      (float)image_vals->GetComponent(id,4),
+      (float)image_vals->GetComponent(id,5),
     };
     itk::DiffusionTensor3D<float> tensor(tensorelems);
     odf.InitFromTensor(tensor);
   }
-  else if( odfvals->GetNumberOfComponents()==6 and m_ToggleTensorEllipsoidView )
+  else if( image_vals->GetNumberOfComponents()==6 && m_ToggleTensorEllipsoidView )
   {
     float tensorelems[6] = {
-      (float)odfvals->GetComponent(id,0),
-      (float)odfvals->GetComponent(id,1),
-      (float)odfvals->GetComponent(id,2),
-      (float)odfvals->GetComponent(id,3),
-      (float)odfvals->GetComponent(id,4),
-      (float)odfvals->GetComponent(id,5),
+      (float)image_vals->GetComponent(id,0),
+      (float)image_vals->GetComponent(id,1),
+      (float)image_vals->GetComponent(id,2),
+      (float)image_vals->GetComponent(id,3),
+      (float)image_vals->GetComponent(id,4),
+      (float)image_vals->GetComponent(id,5),
     };
     itk::DiffusionTensor3D<float> tensor( tensorelems );
     odf.InitFromEllipsoid( tensor );
   }
-  else
+  else if (image_vals->GetNumberOfComponents() == ODF_SAMPLING_SIZE)
   {
     for(int i=0; i<N; i++)
-      odf[i] = (double)odfvals->GetComponent(id,i);
+      odf[i] = (double)image_vals->GetComponent(id,i);
+  }
+  else
+  {
+    int nrCoeffs = image_vals->GetNumberOfComponents();
+    Vector< float, N > odf_vals;
+    vnl_vector< float > coeffs(nrCoeffs);
+    for(int i=0; i<nrCoeffs; i++)
+      coeffs[i] = (float)image_vals->GetComponent(id,i);
+
+    switch (nrCoeffs)
+    {
+    case 6:
+      odf_vals = ( m_Sh2Basis * coeffs ).data_block();
+      break;
+    case 15:
+      odf_vals = ( m_Sh4Basis * coeffs ).data_block();
+      break;
+    case 28:
+      odf_vals = ( m_Sh6Basis * coeffs ).data_block();
+      break;
+    case 45:
+      odf_vals = ( m_Sh8Basis * coeffs ).data_block();
+      break;
+    case 66:
+      odf_vals = ( m_Sh10Basis * coeffs ).data_block();
+      break;
+    case 91:
+      odf_vals = ( m_Sh12Basis * coeffs ).data_block();
+      break;
+    default :
+      mitkThrow() << "SH order larger 12 not supported in current ODF mapper version";
+    }
+
+    for(int i=0; i<N; i++)
+      odf[i] = odf_vals[i];
   }
 
   if (m_ToggleColourisationMode)
@@ -496,7 +544,7 @@ void  mitk::OdfVtkMapper2D<T,N>
   }
 
 
-  m_Planes[index]->SetTransform( (vtkAbstractTransform*)NULL );
+  m_Planes[index]->SetTransform( (vtkAbstractTransform*)nullptr );
   m_Planes[index]->SetOrigin( dispGeo.vp );
   m_Planes[index]->SetNormal( dispGeo.vnormal );
 
@@ -578,7 +626,7 @@ void  mitk::OdfVtkMapper2D<T,N>
     inversetransform->TransformNormalAtPoint( dispGeo.vp, dispGeo.vnormal, dispGeo.vnormal );
 
     m_ThickPlanes1[index]->count = 0;
-    m_ThickPlanes1[index]->SetTransform((vtkAbstractTransform*)NULL );
+    m_ThickPlanes1[index]->SetTransform((vtkAbstractTransform*)nullptr );
     m_ThickPlanes1[index]->SetPose( dispGeo.vnormal, dispGeo.vp );
     m_ThickPlanes1[index]->SetThickness(dispGeo.d2);
     m_Clippers1[index]->SetClipFunction( m_ThickPlanes1[index] );
@@ -598,7 +646,7 @@ void  mitk::OdfVtkMapper2D<T,N>
     inversetransform->TransformNormalAtPoint( dispGeo.vp, dispGeo.vnormal, dispGeo.vnormal );
 
     m_ThickPlanes2[index]->count = 0;
-    m_ThickPlanes2[index]->SetTransform((vtkAbstractTransform*)NULL );
+    m_ThickPlanes2[index]->SetTransform((vtkAbstractTransform*)nullptr );
     m_ThickPlanes2[index]->SetPose( dispGeo.vnormal, dispGeo.vp );
     m_ThickPlanes2[index]->SetThickness(dispGeo.d1);
     m_Clippers2[index]->SetClipFunction( m_ThickPlanes2[index] );
@@ -668,7 +716,7 @@ bool mitk::OdfVtkMapper2D<T,N>
 {
   mitk::Image::Pointer input  = const_cast<mitk::Image*>(this->GetInput());
   const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
-  if(inputTimeGeometry==NULL || inputTimeGeometry->CountTimeSteps()==0 || !inputTimeGeometry->IsValidTimeStep(this->GetTimestep()))
+  if(inputTimeGeometry==nullptr || inputTimeGeometry->CountTimeSteps()==0 || !inputTimeGeometry->IsValidTimeStep(this->GetTimestep()))
     return false;
 
   if(this->IsPlaneRotated(renderer))
@@ -748,11 +796,15 @@ void mitk::OdfVtkMapper2D<T,N>
   if(qclassname.compare(input->GetNameOfClass())==0)
     m_VtkImage = dynamic_cast<mitk::OdfImage*>( this->GetInput() )->GetNonRgbVtkImageData();
 
+  std::string shclassname("ShImage");
+  if(shclassname.compare(input->GetNameOfClass())==0)
+    m_VtkImage = dynamic_cast<mitk::ShImage*>( this->GetInput() )->GetNonRgbVtkImageData();
+
   if( m_VtkImage )
   {
     // make sure, that we have point data with more than 1 component (as vectors)
     vtkPointData* pointData = m_VtkImage->GetPointData();
-    if ( pointData == NULL )
+    if ( pointData == nullptr )
     {
       itkWarningMacro( << "m_VtkImage->GetPointData() returns NULL!" );
       return ;
@@ -762,13 +814,7 @@ void mitk::OdfVtkMapper2D<T,N>
       itkWarningMacro( << "m_VtkImage->GetPointData()->GetNumberOfArrays() is 0!" );
       return ;
     }
-    else if ( pointData->GetArray(0)->GetNumberOfComponents() != N
-              && pointData->GetArray(0)->GetNumberOfComponents() != 6 /*for tensor visualization*/)
-    {
-      itkWarningMacro( << "number of components != number of directions in ODF!" );
-      return;
-    }
-    else if ( pointData->GetArrayName( 0 ) == NULL )
+    else if ( pointData->GetArrayName( 0 ) == nullptr )
     {
       m_VtkImage->GetPointData()->GetArray(0)->SetName("vector");
     }
@@ -878,7 +924,7 @@ bool mitk::OdfVtkMapper2D<T,N>
   vnl2vtk( normal.GetVnlVector(), vnormal );
 
   mitk::Image* currentImage = dynamic_cast<mitk::Image* >( this->GetDataNode()->GetData() );
-  if( currentImage == NULL )
+  if( currentImage == nullptr )
     return false;
   mitk::Vector3D imageNormal0 = currentImage->GetSlicedGeometry()->GetAxisVector(0);
   mitk::Vector3D imageNormal1 = currentImage->GetSlicedGeometry()->GetAxisVector(1);

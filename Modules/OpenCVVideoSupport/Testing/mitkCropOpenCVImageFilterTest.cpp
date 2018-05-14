@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCropOpenCVImageFilter.h"
 #include <mitkTestingMacros.h>
 
-#include <highgui.h>
-#include <cv.h>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
 
 static bool ImagesAreEqualInGray(const cv::Mat& img1, const cv::Mat& img2)
 {
@@ -33,8 +33,8 @@ static bool ImagesAreEqualInGray(const cv::Mat& img1, const cv::Mat& img2)
 
 static void CropTestLoadedImage(std::string mitkImagePath, std::string mitkCroppedImagePath)
 {
-  cv::Mat image = cvLoadImage(mitkImagePath.c_str());
-  cv::Mat croppedImage = cvLoadImage(mitkCroppedImagePath.c_str());
+  cv::Mat image = cv::imread(mitkImagePath.c_str());
+  cv::Mat croppedImage = cv::imread(mitkCroppedImagePath.c_str());
 
   MITK_INFO << mitkImagePath.c_str();
   MITK_INFO << mitkCroppedImagePath.c_str();

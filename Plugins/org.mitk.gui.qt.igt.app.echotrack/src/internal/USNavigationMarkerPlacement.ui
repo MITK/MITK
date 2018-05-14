@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>USNavigationMarkerPlacement</class>
+ <class>QmitkUSNavigationMarkerPlacement</class>
  <widget class="QWidget" name="USNavigationMarkerPlacement">
   <property name="geometry">
    <rect>

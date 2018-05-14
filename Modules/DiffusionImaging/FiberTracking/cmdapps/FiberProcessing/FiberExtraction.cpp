@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
   try
   {
     // load fiber bundle
-    mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(inFib)[0].GetPointer());
+    mitk::FiberBundle::Pointer inputTractogram = mitk::IOUtil::Load<mitk::FiberBundle>(inFib);
     mitk::FiberBundle::Pointer result;
 
     mitk::StandaloneDataStorage::Pointer storage = mitk::StandaloneDataStorage::New();

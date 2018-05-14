@@ -31,9 +31,9 @@ namespace mitk
   public:
 
     NPOptitrackTrackingTypeInformation();
-    virtual ~NPOptitrackTrackingTypeInformation();
+    ~NPOptitrackTrackingTypeInformation() override;
 
-    virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(TrackingDevice::Pointer trackingDevice,
+    TrackingDeviceSource::Pointer CreateTrackingDeviceSource(TrackingDevice::Pointer trackingDevice,
       NavigationToolStorage::Pointer navigationTools,
       std::string* errorMessage,
       std::vector<int>* toolCorrespondencesInToolStorage) override;

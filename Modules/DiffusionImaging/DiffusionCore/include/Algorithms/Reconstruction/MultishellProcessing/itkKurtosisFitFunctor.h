@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _itk_KurtosisFitFunctor_h_
 
 #include "itkDWIVoxelFunctor.h"
-#include <math.h>
+#include <cmath>
 
 // vnl include
 #include "vnl/vnl_least_squares_function.h"
@@ -32,7 +32,7 @@ class MITKDIFFUSIONCORE_EXPORT KurtosisFitFunctor : public DWIVoxelFunctor
 {
 public:
   KurtosisFitFunctor(){}
-  ~KurtosisFitFunctor(){}
+  ~KurtosisFitFunctor() override{}
 
   typedef KurtosisFitFunctor                       Self;
   typedef SmartPointer<Self>                      Pointer;

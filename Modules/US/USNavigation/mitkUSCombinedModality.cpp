@@ -162,7 +162,7 @@ mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration(std::s
   std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator calibrationIterator
     = m_Calibrations.find(calibrationKey);
 
-  if (calibrationIterator == m_Calibrations.end()) { return 0; }
+  if (calibrationIterator == m_Calibrations.end()) { return nullptr; }
 
   return calibrationIterator->second;
 }
@@ -369,7 +369,7 @@ void mitk::USCombinedModality::GenerateData()
   if (m_UltrasoundDevice->GetIsFreezed()) { return; } //if the image is freezed: do nothing
 
   //get next image from ultrasound image source
-  mitk::Image::Pointer image = m_UltrasoundDevice->GetUSImageSource()->GetNextImage();
+  mitk::Image::Pointer image = m_UltrasoundDevice->GetUSImageSource()->GetNextImage()[0];
 
   if (image.IsNull() || !image->IsInitialized()) //check the image
   {

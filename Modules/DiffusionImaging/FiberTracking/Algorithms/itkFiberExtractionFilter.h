@@ -54,7 +54,7 @@ public:
   itkCloneMacro(Self)
   itkTypeMacro( FiberExtractionFilter, ProcessObject )
 
-  virtual void Update() override{
+  void Update() override{
     this->GenerateData();
   }
 
@@ -85,7 +85,7 @@ protected:
   void GenerateData() override;
 
   FiberExtractionFilter();
-  virtual ~FiberExtractionFilter();
+  ~FiberExtractionFilter() override;
 
   mitk::FiberBundle::Pointer CreateFib(std::vector< long >& ids);
   void ExtractOverlap(mitk::FiberBundle::Pointer fib);

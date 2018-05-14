@@ -87,6 +87,9 @@ namespace mitk
     std::string GetRevisionAppropriateJSONString(std::string revisionString);
     void GetClosestLowerRevision(std::string revisionString);
     std::string GetClosestLowerRevision(std::string revisionString, std::vector<int> availableRevisionsVector);
+    
+    /// Decides whether or not the image is likely to be a T1Map, if not it is assumed to be a CEST sequence
+    bool IsT1Sequence(std::string preparationType, std::string recoveryMode, std::string spoilingType, std::string revisionString);
 
     /// Get a string filled with the properly formated offsets based on the sampling type and offset
     std::string GetOffsetString(std::string samplingType, std::string offset, std::string measurements);

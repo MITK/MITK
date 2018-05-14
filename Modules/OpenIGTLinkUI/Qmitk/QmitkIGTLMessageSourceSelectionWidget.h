@@ -49,8 +49,8 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLMessageSourceSelectionWidget :
   public:
     static const std::string VIEW_ID;
 
-    QmitkIGTLMessageSourceSelectionWidget(QWidget* parent = 0,
-                                          Qt::WindowFlags f = 0);
+    QmitkIGTLMessageSourceSelectionWidget(QWidget* parent = nullptr,
+                                          Qt::WindowFlags f = nullptr);
     ~QmitkIGTLMessageSourceSelectionWidget() override;
 
     /** @return Returns the currently selected OpenIGTLink message source.

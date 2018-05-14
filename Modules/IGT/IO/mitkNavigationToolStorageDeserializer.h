@@ -52,7 +52,7 @@ namespace mitk {
 
   protected:
     NavigationToolStorageDeserializer(mitk::DataStorage::Pointer dataStorage);
-    ~NavigationToolStorageDeserializer();
+    ~NavigationToolStorageDeserializer() override;
 
     std::string m_ErrorMessage;
 

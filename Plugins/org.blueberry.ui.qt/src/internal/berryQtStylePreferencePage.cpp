@@ -225,6 +225,10 @@ bool QtStylePreferencePage::PerformOk()
       controls.m_FontComboBox->currentText());
   m_StylePref->Put(berry::QtPreferences::QT_FONT_SIZE,
       QString::number(controls.m_FontSizeSpinBox->value()));
+
+  m_StylePref->PutBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES,
+    controls.m_ToolbarCategoryCheckBox->isChecked());
+
   return true;
 }
 
@@ -250,15 +254,18 @@ void QtStylePreferencePage::Update()
   oldStyle = styleManager->GetStyle();
   FillStyleCombo(oldStyle);
 
-  QString fontName = m_StylePref->Get(berry::QtPreferences::QT_FONT_NAME, "");
+  QString fontName = m_StylePref->Get(berry::QtPreferences::QT_FONT_NAME, "Open Sans");
   styleManager->SetFont(fontName);
 
-  int fontSize = m_StylePref->Get(berry::QtPreferences::QT_FONT_SIZE, "").toInt();
+  int fontSize = m_StylePref->Get(berry::QtPreferences::QT_FONT_SIZE, "9").toInt();
   styleManager->SetFontSize(fontSize);
   controls.m_FontSizeSpinBox->setValue(fontSize);
   styleManager->UpdateWorkbenchFont();
 
   FillFontCombo(styleManager->GetFont());
+
+  controls.m_ToolbarCategoryCheckBox->setChecked(
+    m_StylePref->GetBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES, true));
 }
 
 }

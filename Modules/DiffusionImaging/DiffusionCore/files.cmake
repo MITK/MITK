@@ -36,6 +36,8 @@ set(CPP_FILES
   # DataStructures -> Odf
   IODataStructures/OdfImages/mitkOdfImageSource.cpp
   IODataStructures/OdfImages/mitkOdfImage.cpp
+  IODataStructures/mitkShImage.cpp
+  IODataStructures/mitkShImageSource.cpp
 
   # DataStructures -> Tensor
   IODataStructures/TensorImages/mitkTensorImage.cpp
@@ -147,6 +149,7 @@ set(H_FILES
   include/Algorithms/itkRemoveDwiChannelFilter.h
   include/Algorithms/itkExtractDwiChannelFilter.h
   include/Algorithms/itkFlipPeaksFilter.h
+  include/Algorithms/itkShToOdfImageFilter.h
 
   include/Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.h
   include/Algorithms/itkNonLocalMeansDenoisingFilter.h

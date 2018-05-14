@@ -21,7 +21,7 @@
 #include "mitkPropertyList.h"
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkRotationOperation.h>
-#include <string.h>
+#include <cstring>
 // level window
 #include "mitkLevelWindow.h"
 #include "mitkLevelWindowProperty.h"

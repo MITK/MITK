@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkNewSegmentationDialog.h"
 
-#include "mitkOrganTypeProperty.h"
-
 #include <itkRGBPixel.h>
 
 #include <QAbstractItemModel>
@@ -38,8 +36,6 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent)
   QBoxLayout *verticalLayout = new QVBoxLayout(this);
   verticalLayout->setMargin(5);
   verticalLayout->setSpacing(5);
-
-  mitk::OrganTypeProperty::Pointer organTypes = mitk::OrganTypeProperty::New();
 
   // to enter a name for the segmentation
   lblPrompt = new QLabel(tr("Name and color of the segmentation"), this);

@@ -40,6 +40,7 @@ public:
     DiffusionSignalModel()
         : m_T2(100)
         , m_T1(0)
+        , m_BValue(1000)
     {}
     ~DiffusionSignalModel(){}
 
@@ -51,12 +52,8 @@ public:
     typedef mitk::DiffusionPropertyHelper           DPH;
 
     /** Realizes actual signal generation. Has to be implemented in subclass. **/
-    virtual PixelType SimulateMeasurement() = 0;
-    virtual ScalarType SimulateMeasurement(unsigned int dir) = 0;
-
-
-    virtual void SetFiberDirection(GradientType fiberDirection) = 0;
-    GradientType GetFiberDirection(){ return m_FiberDirection; }
+    virtual PixelType SimulateMeasurement(GradientType& fiberDirection) = 0;
+    virtual ScalarType SimulateMeasurement(unsigned int dir, GradientType& fiberDirection) = 0;
 
     void SetGradientList(DPH::GradientDirectionsContainerType* gradients)
     {
@@ -95,16 +92,19 @@ public:
         m_RandGen->SetSeed(s);
     }
 
+    void SetBvalue(double bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
+    double GetBvalue() { return m_BValue; }
+
     unsigned int                m_CompartmentId;        ///< GUI flag. Which compartment is this model assigned to?
 
 protected:
 
-    GradientType                m_FiberDirection;       ///< Needed to generate anisotropc signal to determin direction of anisotropy
     GradientListType            m_GradientList;         ///< Diffusion gradient direction container
     double                      m_T2;                   ///< Tissue specific transversal relaxation time
     double                      m_T1;                   ///< Tissue specific longitudinal relaxation time
     ItkDoubleImgType::Pointer   m_VolumeFractionImage;  ///< Tissue specific volume fraction for each voxel (only relevant for non fiber compartments)
     ItkRandGenType::Pointer     m_RandGen;              ///< Random number generator
+    double                      m_BValue;
 };
 
 }

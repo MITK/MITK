@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNDITrackingDevice.h"
 #include "mitkIGTTimeStamp.h"
 #include "mitkIGTHardwareException.h"
-#include <stdio.h>
+#include <cstdio>
 
 #include <itksys/SystemTools.hxx>
 #include <itkMutexLockHolder.h>
@@ -1063,69 +1063,108 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
   /* First, check for disconnected tools and remove them */
   this->FreePortHandles();
 
-  /* check for new tools, add and initialize them */
-  NDIErrorCode returnvalue;
+  //NDI handling (PHSR 02, PINIT, PHSR 02, PHSR 00) => all initialized and all handles available
+  //creation of MITK tools
+  //NDI enable all tools (PENA)
+  //NDI get all serial numbers (PHINF)
+
+  /** 
+  NDI handling (PHSR 02, PINIT, PHSR 02, PHSR 00) => all initialized and all handles available
+  **/
+
+  /* check for occupied port handles on channel 0 */
   std::string portHandle;
+  NDIErrorCode returnvalue = m_DeviceProtocol->PHSR(OCCUPIED, &portHandle);
+
+  if (returnvalue != NDIOKAY)
+  {
+	  mitkThrowException(mitk::IGTHardwareException) << "Could not obtain a list of port handles that are connected on channel 0.";
+  }
+
+  /* Initialize all port handles on channel 0 */
+  for (unsigned int i = 0; i < portHandle.size(); i += 2)
+  {
+     std::string ph = portHandle.substr(i, 2);
+     returnvalue = m_DeviceProtocol->PINIT(&ph);
+
+     if (returnvalue != NDIOKAY)
+     {
+        mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not initialize port '") + ph + std::string("."));
+     }
+  }
+
+  /* check for occupied port handles on channel 1 (initialize automatically, portHandle is empty although additional tools were detected) */
+  //For a split port on a dual 5DOF tool, the first PHSR sent will report only one port handle. After the port handle is
+  //initialized, it is assigned to channel 0. You must then use PHSR again to assign a port handle to channel 1. The
+  //port handle for channel 1 is initialized automatically.
   returnvalue = m_DeviceProtocol->PHSR(OCCUPIED, &portHandle);
 
   if (returnvalue != NDIOKAY)
   {
-    mitkThrowException(mitk::IGTHardwareException) << "Could not obtain a list of port handles that are connected";
+     mitkThrowException(mitk::IGTHardwareException) << "Could not obtain a list of port handles that are connected on channel 1.";
   }
 
-  /* if there are port handles that need to be initialized, initialize them. Furthermore instantiate tools for each handle that has no tool yet. */
-  std::string ph;
+  /* read all port handles */
+  returnvalue = m_DeviceProtocol->PHSR(ALL, &portHandle);
 
-  /* we need to remember the ports which are occupied to be able to readout the serial numbers of the connected tools later */
-  std::vector<int> occupiedPorts = std::vector<int>();
-  int numberOfToolsAtStart = this->GetToolCount(); //also remember the number of tools at start to identify the automatically detected tools later
+  if (returnvalue != NDIOKAY)
+  {
+     mitkThrowException(mitk::IGTHardwareException) << "Could not obtain a list of port handles that are connected on all channels.";
+  }
+
+  /**
+  1. Create MITK tracking tool representations of NDI tools
+  2. NDI enable all tools (PENA)
+  **/
 
   for (unsigned int i = 0; i < portHandle.size(); i += 2)
   {
-    ph = portHandle.substr(i, 2);
-    if (this->GetInternalTool(ph) != nullptr) // if we already have a tool with this handle
-      continue;                            // then skip the initialization
+     std::string ph = portHandle.substr(i, 2);
+     if (this->GetInternalTool(ph) != nullptr) // if we already have a tool with this handle
+        continue;                              // then skip the initialization
 
-    //instantiate an object for each tool that is connected
-    mitk::NDIPassiveTool::Pointer newTool = mitk::NDIPassiveTool::New();
-    newTool->SetPortHandle(ph.c_str());
-    newTool->SetTrackingPriority(mitk::NDIPassiveTool::Dynamic);
+     //define tracking priority
+     auto trackingPriority = mitk::NDIPassiveTool::Dynamic;
 
-    //set a name for identification
-    newTool->SetToolName((std::string("Port ") + ph).c_str());
+     //instantiate an object for each tool that is connected
+     mitk::NDIPassiveTool::Pointer newTool = mitk::NDIPassiveTool::New();
+     newTool->SetPortHandle(ph.c_str());
+     newTool->SetTrackingPriority(trackingPriority);
 
-    returnvalue = m_DeviceProtocol->PINIT(&ph);
-    if (returnvalue != NDIINITIALIZATIONFAILED) //if the initialization failed (AURORA) it can not be enabled. A srom file will have to be specified manually first. Still return true to be able to continue
-    {
-      if (returnvalue != NDIOKAY)
-      {
-        mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not initialize port '") + ph +
-          std::string("' for tool '") + newTool->GetToolName() + std::string("'")).c_str();
-      }
-      /* enable the port handle */
-      returnvalue = m_DeviceProtocol->PENA(&ph, newTool->GetTrackingPriority()); // Enable tool
-      if (returnvalue != NDIOKAY)
-      {
+     //set a name for identification
+     newTool->SetToolName((std::string("Port ") + ph).c_str());
+
+     /* enable the port handle */
+     returnvalue = m_DeviceProtocol->PENA(&ph, trackingPriority); // Enable tool
+
+     if (returnvalue != NDIOKAY)
+     {
         mitkThrowException(mitk::IGTHardwareException) << (std::string("Could not enable port '") + ph +
-          std::string("' for tool '") + newTool->GetToolName() + std::string("'")).c_str();
-      }
-    }
-    //we have to temporarily unlock m_ModeMutex here to avoid a deadlock with another lock inside InternalAddTool()
-    if (this->InternalAddTool(newTool) == false)
-    {
-      mitkThrowException(mitk::IGTException) << "Error while adding new tool";
-    }
-    else occupiedPorts.push_back(i);
+           std::string("' for tool '") + newTool->GetToolName() + std::string("'")).c_str();
+     }
+
+     //we have to temporarily unlock m_ModeMutex here to avoid a deadlock with another lock inside InternalAddTool()
+     if (this->InternalAddTool(newTool) == false)
+     {
+        mitkThrowException(mitk::IGTException) << "Error while adding new tool";
+     }
   }
 
+  /**
+  NDI get all serial numbers (PHINF)
+  **/
+
   // after initialization readout serial numbers of automatically detected tools
-  for (unsigned int i = 0; i < occupiedPorts.size(); i++)
+  for (unsigned int i = 0; i < portHandle.size(); i += 2)
   {
-    ph = portHandle.substr(occupiedPorts.at(i), 2);
-    std::string portInfo;
-    NDIErrorCode returnvaluePort = m_DeviceProtocol->PHINF(ph, &portInfo);
-    if ((returnvaluePort == NDIOKAY) && (portInfo.size()>31)) dynamic_cast<mitk::NDIPassiveTool*>(this->GetTool(i + numberOfToolsAtStart))->SetSerialNumber(portInfo.substr(23, 8));
-    itksys::SystemTools::Delay(10);
+     std::string ph = portHandle.substr(i, 2);
+
+     std::string portInfo;
+     NDIErrorCode returnvaluePort = m_DeviceProtocol->PHINF(ph, &portInfo);
+     if ((returnvaluePort == NDIOKAY) && (portInfo.size() > 31))
+        dynamic_cast<mitk::NDIPassiveTool*>(this->GetInternalTool(ph))->SetSerialNumber(portInfo.substr(23, 8));
+     MITK_INFO << "portInfo: " << portInfo;
+     itksys::SystemTools::Delay(10);
   }
 
   return true;

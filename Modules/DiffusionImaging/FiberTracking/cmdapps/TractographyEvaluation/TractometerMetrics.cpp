@@ -78,9 +78,9 @@ int main(int argc, char* argv[])
         typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
 
         // load fiber bundle
-        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(fibFile)[0].GetPointer());
+        mitk::FiberBundle::Pointer inputTractogram = mitk::IOUtil::Load<mitk::FiberBundle>(fibFile);
 
-        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(labelImageFile)[0].GetPointer());
+        mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(labelImageFile);
         typedef mitk::ImageToItk< ItkShortImgType > CasterType;
         CasterType::Pointer caster = CasterType::New();
         caster->SetInput(img);
@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
             detected.push_back(false);
 
             {
-                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(path+"/Bundle"+boost::lexical_cast<std::string>(labelsvector.size())+"_MASK.nrrd")[0].GetPointer());
+                mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(path+"/Bundle"+boost::lexical_cast<std::string>(labelsvector.size())+"_MASK.nrrd");
                 typedef mitk::ImageToItk< ItkUcharImgType > CasterType;
                 CasterType::Pointer caster = CasterType::New();
                 caster->SetInput(img);
@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
             }
 
             {
-            mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(path+"/Bundle"+boost::lexical_cast<std::string>(labelsvector.size())+"_MASK_COVERAGE.nrrd")[0].GetPointer());
+            mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(path+"/Bundle"+boost::lexical_cast<std::string>(labelsvector.size())+"_MASK_COVERAGE.nrrd");
                 typedef mitk::ImageToItk< ItkUcharImgType > CasterType;
                 CasterType::Pointer caster = CasterType::New();
                 caster->SetInput(img);

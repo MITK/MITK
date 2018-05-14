@@ -92,7 +92,7 @@ namespace mitk{
     if( img )
     {
       // do not copy data, then release just the header
-      mat = cv::Mat ( img, false );
+      mat = cv::cvarrToMat(img, false);
       cvReleaseImageHeader( &img );
     }
 

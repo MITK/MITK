@@ -20,12 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLogMacros.h>
 
 #include <itkGDCMImageIO.h>
-
 #include <itksys/SystemTools.hxx>
 
-// dcmqi
-#include <dcmqi/ImageSEGConverter.h>
-#include <dcmqi/JSONSegmentationMetaInformationHandler.h>
+#include <dcmtk/dcmdata/dcfilefo.h>
+#include <dcmtk/dcmdata/dcdeftag.h>
 
 namespace mitk
 {
@@ -75,6 +73,8 @@ namespace mitk
       return canRead;
     }
     // end fix for bug 18572
+
+
     DcmFileFormat dcmFileFormat;
     OFCondition status = dcmFileFormat.loadFile(path.c_str());
 
@@ -88,14 +88,20 @@ namespace mitk
       return canRead;
     }
 
-
-
     OFString modality;
-    if (dcmFileFormat.getDataset()->findAndGetOFString(DCM_Modality, modality).good())
+    OFString sopClassUID;
+    if (dcmFileFormat.getDataset()->findAndGetOFString(DCM_Modality, modality).good() && dcmFileFormat.getDataset()->findAndGetOFString(DCM_SOPClassUID, sopClassUID).good())
     {
       if (modality.compare("SEG") == 0)
-      {
-        canRead = true;
+      {//atm we could read SegmentationStorage files. Other storage classes with "SEG" modality, e.g. SurfaceSegmentationStorage (1.2.840.10008.5.1.4.1.1.66.5), are not supported yet.
+        if (sopClassUID.compare("1.2.840.10008.5.1.4.1.1.66.4") == 0)
+        {
+          canRead = true;
+        }
+        else
+        {
+          canRead = false;
+        }
       }
       else
       {

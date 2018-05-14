@@ -539,7 +539,7 @@ void QmitkLabelSetWidget::OnColorButtonClicked()
     int pixelValue = m_Controls.m_LabelSetTableWidget->item(row, 0)->data(Qt::UserRole).toInt();
     const mitk::Color &color = GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetColor();
     QColor initial(color.GetRed() * 255, color.GetGreen() * 255, color.GetBlue() * 255);
-    QColor qcolor = QColorDialog::getColor(initial, 0, QString("Change color"));
+    QColor qcolor = QColorDialog::getColor(initial, nullptr, QString("Change color"));
     if (!qcolor.isValid())
     {
       return;
@@ -1218,7 +1218,7 @@ void QmitkLabelSetWidget::OnImportLabeledImage()
     try
     {
       this->WaitCursorOn();
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load( fileNames.front().toStdString() )[0].GetPointer());
+      mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>( fileNames.front().toStdString() );
       if (image.IsNull())
       {
         this->WaitCursorOff();

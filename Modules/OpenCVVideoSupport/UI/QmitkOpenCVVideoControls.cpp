@@ -78,7 +78,7 @@ QmitkOpenCVVideoControls::QmitkOpenCVVideoControls(QmitkVideoBackground* _VideoB
 
 QmitkOpenCVVideoControls::~QmitkOpenCVVideoControls()
 {
-  if (m_VideoSource != 0 && m_VideoSource->IsCapturingEnabled())
+  if (m_VideoSource != nullptr && m_VideoSource->IsCapturingEnabled())
   {
     this->Stop(); // emulate stop
   }
@@ -249,7 +249,7 @@ void QmitkOpenCVVideoControls::Stop()
     this->disconnect(m_VideoBackground, SIGNAL(NewFrameAvailable(mitk::VideoSource*))
       , this, SLOT(NewFrameAvailable(mitk::VideoSource*)));
   }
-  if (m_VideoSource != 0)
+  if (m_VideoSource != nullptr)
     m_VideoSource->StopCapturing();
 }
 
@@ -304,13 +304,13 @@ void QmitkOpenCVVideoControls::SetRenderWindow(QmitkRenderWindow* _RenderWindow)
     return;
 
   // In Reset() m_MultiWidget is used, set it to 0 now for avoiding errors
-  if (_RenderWindow == 0)
-    m_RenderWindow = 0;
+  if (_RenderWindow == nullptr)
+    m_RenderWindow = nullptr;
   this->Reset();
 
   m_RenderWindow = _RenderWindow;
 
-  if (m_RenderWindow == 0)
+  if (m_RenderWindow == nullptr)
   {
     this->setEnabled(false);
   }
@@ -340,7 +340,7 @@ void QmitkOpenCVVideoControls::SetVideoBackground(QmitkVideoBackground* _VideoBa
 
   if (m_VideoBackground == nullptr)
   {
-    m_VideoSource = 0;
+    m_VideoSource = nullptr;
     MITK_WARN << "m_MultiWidget is 0";
     this->setEnabled(false);
   }

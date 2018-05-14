@@ -103,7 +103,7 @@ void mitk::RenderWindowViewDirectionController::InitializeViewByBoundingObjects(
   mitk::DataStorage::SetOfObjects::ConstPointer filteredDataNodes = m_DataStorage->GetSubset(combinedNodePredicate);
 
   // calculate bounding geometry of these nodes
-  mitk::TimeGeometry::Pointer bounds = m_DataStorage->ComputeBoundingGeometry3D(filteredDataNodes, "visible", renderer);
+  auto bounds = m_DataStorage->ComputeBoundingGeometry3D(filteredDataNodes, "visible", renderer);
 
   // initialize the views to the bounding geometry
   mitk::RenderingManager::GetInstance()->InitializeView(renderer->GetRenderWindow(), bounds);

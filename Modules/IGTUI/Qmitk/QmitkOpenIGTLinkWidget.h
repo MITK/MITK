@@ -33,7 +33,7 @@ class MITKIGTUI_EXPORT QmitkOpenIGTLinkWidget : public QmitkAbstractTrackingDevi
 public:
   static const std::string VIEW_ID;
 
-  QmitkOpenIGTLinkWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkOpenIGTLinkWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkOpenIGTLinkWidget() override;
 
   void Initialize() override;
@@ -49,6 +49,6 @@ protected:
 
   Ui::QmitkOpenIGTLinkWidget* m_Controls;
 public:
-  virtual mitk::TrackingDevice::Pointer GetTrackingDevice() override;
+  mitk::TrackingDevice::Pointer GetTrackingDevice() override;
 };
 #endif

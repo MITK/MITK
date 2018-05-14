@@ -4,6 +4,7 @@
     <view id="org.mitk.views.pointsetinteraction"
           name="PointSet Interaction"
           class="QmitkPointSetInteractionView"
-          icon="resources/pointset_interaction.svg" />
+          icon="resources/pointset_interaction.svg"
+          category="General" />
   </extension>
 </plugin>

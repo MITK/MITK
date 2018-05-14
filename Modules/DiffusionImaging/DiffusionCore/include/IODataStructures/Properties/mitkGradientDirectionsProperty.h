@@ -51,18 +51,18 @@ namespace mitk
   protected:
 
     GradientDirectionsProperty();
-    ~GradientDirectionsProperty();
+    ~GradientDirectionsProperty() override;
 
     GradientDirectionsProperty(const GradientDirectionsProperty& other);
     GradientDirectionsProperty(const GradientDirectionsContainerType::Pointer gradientDirectionsContainer);
     GradientDirectionsProperty(const AlternativeGradientDirectionsContainerType gradientDirectionsContainer);
 
-    virtual bool IsEqual(const BaseProperty& property) const override;
-    virtual bool Assign(const BaseProperty & property) override;
+    bool IsEqual(const BaseProperty& property) const override;
+    bool Assign(const BaseProperty & property) override;
 
     GradientDirectionsContainerType::Pointer m_GradientDirectionsContainer;
 
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
   };
 }
 #endif

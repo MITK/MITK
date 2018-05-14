@@ -36,6 +36,14 @@ set(CPP_FILES
   mitkDICOMTagPath.cpp
   mitkDICOMProperty.cpp
   mitkDICOMFilesHelper.cpp
+  legacy/mitkDicomSeriesReader.cpp
+  legacy/mitkDicomSR_GantryTiltInformation.cpp
+  legacy/mitkDicomSR_ImageBlockDescriptor.cpp
+  legacy/mitkDicomSR_LoadDICOMRGBPixel.cpp
+  legacy/mitkDicomSR_LoadDICOMRGBPixel4D.cpp
+  legacy/mitkDicomSR_LoadDICOMScalar.cpp
+  legacy/mitkDicomSR_LoadDICOMScalar4D.cpp
+  legacy/mitkDicomSR_SliceGroupingResult.cpp
 )
 
 set(RESOURCE_FILES
@@ -48,6 +56,7 @@ set(RESOURCE_FILES
   configurations/3D/simpleinstancenumber_soft.xml
 
   configurations/3DnT/classicreader.xml
+  configurations/3DnT/imageposition.xml
   configurations/3DnT/imageposition_byacquisition.xml
   configurations/3DnT/imageposition_bytriggertime.xml
 )

@@ -96,7 +96,7 @@ vtkRenderWindow *mitk::BaseRenderer::GetRenderWindowByName(const std::string &na
 mitk::BaseRenderer::BaseRenderer(const char *name,
                                  vtkRenderWindow *renWin,
                                  mitk::RenderingManager *rm,
-                                 RenderingMode::Type renderingMode)
+                                 RenderingMode::Type)
   : m_RenderWindow(nullptr),
     m_VtkRenderer(nullptr),
     m_MapperID(defaultMapper),
@@ -184,13 +184,6 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
   m_CameraController->SetRenderer(this);
 
   m_VtkRenderer = vtkRenderer::New();
-
-  if (renderingMode == RenderingMode::DepthPeeling)
-  {
-    m_VtkRenderer->SetUseDepthPeeling(1);
-    m_VtkRenderer->SetMaximumNumberOfPeels(8);
-    m_VtkRenderer->SetOcclusionRatio(0.0);
-  }
 
   if (mitk::VtkLayerController::GetInstance(m_RenderWindow) == nullptr)
   {
@@ -379,7 +372,7 @@ mitk::ScalarType mitk::BaseRenderer::GetTime() const
   }
 }
 
-void mitk::BaseRenderer::SetWorldTimeGeometry(mitk::TimeGeometry *geometry)
+void mitk::BaseRenderer::SetWorldTimeGeometry(const mitk::TimeGeometry *geometry)
 {
   assert(geometry != nullptr);
 
@@ -401,16 +394,16 @@ void mitk::BaseRenderer::SetWorldTimeGeometry(mitk::TimeGeometry *geometry)
   }
 }
 
-void mitk::BaseRenderer::SetWorldGeometry3D(mitk::BaseGeometry *geometry)
+void mitk::BaseRenderer::SetWorldGeometry3D(const mitk::BaseGeometry *geometry)
 {
   itkDebugMacro("setting WorldGeometry3D to " << geometry);
 
   if (geometry->GetBoundingBox()->GetDiagonalLength2() == 0)
     return;
-  SlicedGeometry3D *slicedWorldGeometry;
-  slicedWorldGeometry = dynamic_cast<SlicedGeometry3D *>(geometry);
+  const SlicedGeometry3D *slicedWorldGeometry;
+  slicedWorldGeometry = dynamic_cast<const SlicedGeometry3D *>(geometry);
 
-  PlaneGeometry::Pointer geometry2d;
+  PlaneGeometry::ConstPointer geometry2d;
   if (slicedWorldGeometry != nullptr)
   {
     if (m_Slice >= slicedWorldGeometry->GetSlices() && (m_Slice != 0))
@@ -426,7 +419,7 @@ void mitk::BaseRenderer::SetWorldGeometry3D(mitk::BaseGeometry *geometry)
   }
   else
   {
-    geometry2d = dynamic_cast<PlaneGeometry *>(geometry);
+    geometry2d = dynamic_cast<const PlaneGeometry *>(geometry);
     if (geometry2d.IsNull())
     {
       PlaneGeometry::Pointer plane = PlaneGeometry::New();
@@ -441,11 +434,11 @@ void mitk::BaseRenderer::SetWorldGeometry3D(mitk::BaseGeometry *geometry)
     itkWarningMacro("m_CurrentWorldPlaneGeometry is nullptr");
 }
 
-void mitk::BaseRenderer::SetCurrentWorldPlaneGeometry(mitk::PlaneGeometry *geometry2d)
+void mitk::BaseRenderer::SetCurrentWorldPlaneGeometry(const mitk::PlaneGeometry *geometry2d)
 {
   if (m_CurrentWorldPlaneGeometry != geometry2d)
   {
-    m_CurrentWorldPlaneGeometry = geometry2d;
+    m_CurrentWorldPlaneGeometry = geometry2d->Clone();
     m_CurrentWorldPlaneGeometryData->SetPlaneGeometry(m_CurrentWorldPlaneGeometry);
     m_CurrentWorldPlaneGeometryUpdateTime.Modified();
     Modified();
@@ -467,7 +460,7 @@ int *mitk::BaseRenderer::GetViewportSize() const
   return this->m_VtkRenderer->GetSize();
 }
 
-void mitk::BaseRenderer::SetCurrentWorldGeometry(mitk::BaseGeometry *geometry)
+void mitk::BaseRenderer::SetCurrentWorldGeometry(const mitk::BaseGeometry *geometry)
 {
   m_CurrentWorldGeometry = geometry;
   if (geometry == nullptr)
@@ -514,7 +507,7 @@ void mitk::BaseRenderer::UpdateGeometry(const itk::EventObject &geometryUpdateEv
 
   if (m_CurrentWorldGeometry.IsNotNull())
   {
-    auto *slicedWorldGeometry = dynamic_cast<SlicedGeometry3D *>(m_CurrentWorldGeometry.GetPointer());
+    auto *slicedWorldGeometry = dynamic_cast<const SlicedGeometry3D *>(m_CurrentWorldGeometry.GetPointer());
     if (slicedWorldGeometry)
     {
       PlaneGeometry *geometry2D = slicedWorldGeometry->GetPlaneGeometry(m_Slice);

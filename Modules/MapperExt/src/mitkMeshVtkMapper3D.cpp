@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPropAssembly.h>
 #include <vtkRenderer.h>
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 
@@ -148,7 +148,7 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer
 
       for (j = 0, i = itkMesh->GetPoints()->Begin(); i != itkMesh->GetPoints()->End(); i++, j++)
       {
-        vtkSphereSource *sphere = vtkSphereSource::New();
+        vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
 
         sphere->SetRadius(pointSize);
         sphere->SetCenter(i.Value()[0], i.Value()[1], i.Value()[2]);
@@ -189,9 +189,6 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer
       }
     }
   }
-
-  SetVtkMapperImmediateModeRendering(m_ContourMapper);
-  SetVtkMapperImmediateModeRendering(m_SpheresMapper);
 
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");

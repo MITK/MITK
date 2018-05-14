@@ -88,7 +88,7 @@ namespace mitk
 
     private:
       RemeshFilter();
-      ~RemeshFilter();
+      ~RemeshFilter() override;
 
       unsigned int m_TimeStep;
       int m_NumVertices;

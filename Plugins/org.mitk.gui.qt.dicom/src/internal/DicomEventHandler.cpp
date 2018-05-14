@@ -33,8 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDICOMEnums.h>
 #include <mitkDICOMTagsOfInterestHelper.h>
 #include <mitkDICOMProperty.h>
-#include <mitkStringProperty.h>
-#include <mitkDicomSeriesReader.h>
+#include <mitkPropertyNameHelper.h>
 
 #include <mitkRTDoseReaderService.h>
 #include <mitkRTPlanReaderService.h>
@@ -59,6 +58,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferencesService.h>
 #include <berryIPreferences.h>
 #include <berryPlatform.h>
+
+#include <ImporterUtil.h>
 
 DicomEventHandler::DicomEventHandler()
 {
@@ -86,7 +87,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       if(modality.compare("RTDOSE",Qt::CaseInsensitive) == 0)
       {
           auto doseReader = mitk::RTDoseReaderService();
-          doseReader.SetInput(listOfFilesForSeries.front().toStdString());
+          doseReader.SetInput(ImporterUtil::getUTF8String(listOfFilesForSeries.front()));
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = doseReader.Read();
           if (!readerOutput.empty()){
             mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(readerOutput.at(0).GetPointer());
@@ -97,14 +98,11 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 
             if (doseImage != nullptr)
             {
-                auto sopUIDProperty = doseImage->GetProperty("dicomseriesreader.SOPClassUID");
-                if (sopUIDProperty.IsNotNull()){
-                    auto sopUIDStringProperty = dynamic_cast<mitk::StringProperty*>(sopUIDProperty.GetPointer());
-                    if (sopUIDStringProperty != nullptr){
-                        std::string sopUID = sopUIDStringProperty->GetValue();
-                        doseImageNode->SetName(sopUID);
-                    }
-                }
+                std::string sopUID;
+                if (mitk::GetBackwardsCompatibleDICOMProperty(0x0008, 0x0016, "dicomseriesreader.SOPClassUID", doseImage->GetPropertyList(), sopUID))
+                {
+                  doseImageNode->SetName(sopUID);
+                };
 
                 berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
                 berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID.c_str());
@@ -136,7 +134,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       else if(modality.compare("RTSTRUCT",Qt::CaseInsensitive) == 0)
       {
           auto structReader = mitk::RTStructureSetReaderService();
-          structReader.SetInput(listOfFilesForSeries.front().toStdString());
+          structReader.SetInput(ImporterUtil::getUTF8String(listOfFilesForSeries.front()));
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = structReader.Read();
 
           if (readerOutput.empty()){
@@ -175,7 +173,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       else if (modality.compare("RTPLAN", Qt::CaseInsensitive) == 0)
       {
           auto planReader = mitk::RTPlanReaderService();
-          planReader.SetInput(listOfFilesForSeries.front().toStdString());
+          planReader.SetInput(ImporterUtil::getUTF8String(listOfFilesForSeries.front()));
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = planReader.Read();
           if (!readerOutput.empty()){
               //there is no image, only the properties are interesting
@@ -200,7 +198,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 
       while (it.hasNext())
       {
-        seriesToLoad.push_back(it.next().toStdString());
+		  seriesToLoad.push_back(ImporterUtil::getUTF8String(it.next()));
       }
 
       //Get Reference for default data storage.

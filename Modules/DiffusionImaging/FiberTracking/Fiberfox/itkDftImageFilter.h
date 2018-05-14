@@ -44,7 +44,6 @@ public:
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
     typedef ImageToImageFilter< Image< vcl_complex< TPixelType > >, Image< vcl_complex< TPixelType > > > Superclass;
-    typedef itk::Statistics::MersenneTwisterRandomVariateGenerator RandGenType;
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)
@@ -57,18 +56,18 @@ public:
     typedef typename Superclass::OutputImageType        OutputImageType;
     typedef typename Superclass::OutputImageRegionType  OutputImageRegionType;
 
-    void SetParameters( FiberfoxParameters<double> param ){ m_Parameters = param; }
+    void SetParameters( FiberfoxParameters& param ){ m_Parameters = param; }
 
 protected:
     DftImageFilter();
-    ~DftImageFilter() {}
+    ~DftImageFilter() override {}
 
-    void BeforeThreadedGenerateData();
-    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
+    void BeforeThreadedGenerateData() override;
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId) override;
 
 private:
 
-    FiberfoxParameters<double>          m_Parameters;
+    FiberfoxParameters  m_Parameters;
 };
 
 }

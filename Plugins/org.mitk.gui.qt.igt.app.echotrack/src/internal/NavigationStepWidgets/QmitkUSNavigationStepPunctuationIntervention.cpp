@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNeedleProjectionFilter.h"
 
 #include "../Widgets/QmitkZoneProgressBar.h"
-#include "../USNavigationMarkerPlacement.h"
+#include "../QmitkUSNavigationMarkerPlacement.h"
 
 #include "usModuleRegistry.h"
 
@@ -122,7 +122,7 @@ bool QmitkUSNavigationStepPunctuationIntervention::OnActivateStep()
 
 
   // add progress bars for risk zone nodes
-  m_ZoneNodes = dataStorage->GetDerivations(dataStorage->GetNamedNode(USNavigationMarkerPlacement::DATANAME_ZONES));
+  m_ZoneNodes = dataStorage->GetDerivations(dataStorage->GetNamedNode(QmitkUSNavigationMarkerPlacement::DATANAME_ZONES));
 
   // add zones to the widgets for risk structures
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = m_ZoneNodes->Begin();

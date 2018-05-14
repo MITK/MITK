@@ -42,6 +42,28 @@ namespace mitk
   * The result will be the matching properties in a map*/
   MITKDICOMREADER_EXPORT std::map< std::string, BaseProperty::Pointer> GetPropertyByDICOMTagPath(const BaseData* data, const DICOMTagPath& path);
 
+  /**Helper function that can be used to convert the content of a DICOM property
+     into the given return type. The function makes the following assumptions:
+     1. dcmValueString does only encode one number.
+     2. The value is encoded compliant to locale "C".
+     @pre dcmValueString must be convertibel into the return type.
+     If this is not the case an exception will be thrown.
+     */
+  template<typename TNumericReturnType>
+  TNumericReturnType ConvertDICOMStrToValue(const std::string& dcmValueString)
+  {
+    std::istringstream iss(dcmValueString);
+    iss.imbue(std::locale("C"));
+    TNumericReturnType d;
+    if (!(iss >> d) || !(iss.eof()))
+    {
+      mitkThrow() << "Cannot convert string to value type. Type: " << typeid(TNumericReturnType).name() << "; String: " << dcmValueString;
+    }
+
+    return d;
+  };
+
+
 }
 
 #endif

@@ -94,7 +94,7 @@ namespace mitk
 
     TbssRoiImage();
 
-    virtual ~TbssRoiImage(){}
+    ~TbssRoiImage() override{}
 
     ImageType::Pointer m_Image;
 

@@ -39,14 +39,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow::Pointer window)
-  : QAction(0)
+  : QAction(nullptr)
   , m_Window(nullptr)
 {
   this->Init(window.GetPointer());
 }
 
 QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow* window)
-  : QAction(0)
+  : QAction(nullptr)
   , m_Window(nullptr)
 {
   this->Init(window);
@@ -75,7 +75,7 @@ void QmitkExtFileSaveProjectAction::Run()
 
     {
       ctkPluginContext* context = QmitkCommonExtPlugin::getContext();
-      mitk::IDataStorageService* dss = 0;
+      mitk::IDataStorageService* dss = nullptr;
       ctkServiceReference dsServiceRef = context->getServiceReference<mitk::IDataStorageService>();
       if (dsServiceRef)
       {

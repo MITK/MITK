@@ -49,10 +49,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateIsDWI.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
-
+#include <QmitkStyleManager.h>
 
 const std::string QmitkDiffusionQuantificationView::VIEW_ID = "org.mitk.views.diffusionquantification";
-
 
 
 QmitkDiffusionQuantificationView::QmitkDiffusionQuantificationView()
@@ -105,6 +104,8 @@ void QmitkDiffusionQuantificationView::CreateConnections()
     connect( (QObject*)(m_Controls->m_ClusteringAnisotropy), SIGNAL(clicked()), this, SLOT(ClusterAnisotropy()) );
     connect( (QObject*)(m_Controls->m_BallStickButton), SIGNAL(clicked()), this, SLOT(DoBallStickCalculation()) );
     connect( (QObject*)(m_Controls->m_MultiTensorButton), SIGNAL(clicked()), this, SLOT(DoMultiTensorCalculation()) );
+
+//    m_Controls->m_FAButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/go-next.svg")));
 
     m_Controls->m_ImageBox->SetDataStorage(this->GetDataStorage());
     mitk::TNodePredicateDataType<mitk::TensorImage>::Pointer isDti = mitk::TNodePredicateDataType<mitk::TensorImage>::New();
@@ -286,13 +287,8 @@ void QmitkDiffusionQuantificationView::DoAdcCalculation(bool fit)
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput( itkVectorImagePointer );
 
-    filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>
-                                   ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
-                                   ->GetGradientDirectionsContainer() );
-
-    filter->SetB_value( static_cast<mitk::FloatProperty*>
-                        (image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
-                        ->GetValue() );
+    filter->SetGradientDirections( mitk::DiffusionPropertyHelper::GetGradientContainer(image) );
+    filter->SetB_value( mitk::DiffusionPropertyHelper::GetReferenceBValue(image) );
 
     filter->SetFitSignal(fit);
     filter->Update();
@@ -571,7 +567,6 @@ void QmitkDiffusionQuantificationView::TensorQuantification(int method)
     mitk::DataNode* node = m_Controls->m_ImageBox->GetSelectedNode();
 
     typedef mitk::TensorImage::ScalarPixelType    TTensorPixelType;
-    typedef mitk::TensorImage::PixelType          TensorPixelType;
     typedef mitk::TensorImage::ItkTensorImageType TensorImageType;
 
     mitk::Image* vol = static_cast<mitk::Image*>(node->GetData());

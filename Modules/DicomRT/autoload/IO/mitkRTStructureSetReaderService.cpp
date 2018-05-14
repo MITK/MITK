@@ -249,7 +249,7 @@ namespace mitk
 
       RoiEntry* refROI = this->FindRoiByNumber(refRoiNumber);
 
-      if (refROI == NULL)
+      if (refROI == nullptr)
       {
         MITK_ERROR << "Can not find references ROI" << std::endl;
         continue;

@@ -38,11 +38,11 @@ public:
 
     TractographyForestWriter();
     TractographyForestWriter(const TractographyForestWriter & other);
-    virtual TractographyForestWriter * Clone() const override;
-    virtual ~TractographyForestWriter();
+    TractographyForestWriter * Clone() const override;
+    ~TractographyForestWriter() override;
 
     using mitk::AbstractFileWriter::Write;
-    virtual void Write() override;
+    void Write() override;
 
 };
 

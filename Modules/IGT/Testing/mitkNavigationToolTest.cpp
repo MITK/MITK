@@ -29,6 +29,13 @@ class mitkNavigationToolTestClass
   {
   public:
 
+    static bool CompareQuaternions(mitk::Quaternion q1, mitk::Quaternion q2)
+    {
+      if ((q1.as_vector() - q2.as_vector()).one_norm() < 10e-3)
+        return true;
+      else
+        return false;
+    }
     static void TestInstantiation()
     {
     // let's create an object of our class
@@ -65,8 +72,8 @@ class mitkNavigationToolTestClass
     mitk::FillVector3D(testPt2,4,5,6);
     RegLandmarks->SetPoint(0,testPt2);
 
-    myNavigationTool->SetToolCalibrationLandmarks(CalLandmarks);
-    myNavigationTool->SetToolRegistrationLandmarks(RegLandmarks);
+    myNavigationTool->SetToolControlPoints(CalLandmarks);
+    myNavigationTool->SetToolLandmarks(RegLandmarks);
 
     //test getter
     MITK_TEST_CONDITION(myNavigationTool->GetType()==mitk::NavigationTool::Instrument,"Testing getter and setter of type.");
@@ -77,8 +84,29 @@ class mitkNavigationToolTestClass
     MITK_TEST_CONDITION(myNavigationTool->GetSerialNumber()=="0815","Testing getter and setter of serial number.");
     MITK_TEST_CONDITION(myNavigationTool->GetTrackingDeviceType() == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName(), "Testing getter and setter of tracking device type.");
     MITK_TEST_CONDITION(myNavigationTool->GetToolName()=="TestNodeName","Testing method GetToolName().");
-    MITK_TEST_CONDITION(myNavigationTool->GetToolCalibrationLandmarks()->GetPoint(0)[0] == 1.0,"Testing method GetToolCalibrationLandmarks()");
-    MITK_TEST_CONDITION(myNavigationTool->GetToolRegistrationLandmarks()->GetPoint(0)[0] == 4.0,"Testing method GetToolRegistrationLandmarks()");
+    MITK_TEST_CONDITION(myNavigationTool->GetToolControlPoints()->GetPoint(0)[0] == 1.0,"Testing method GetToolControlPoints()");
+    MITK_TEST_CONDITION(myNavigationTool->GetToolLandmarks()->GetPoint(0)[0] == 4.0,"Testing method GetToolLandmarks()");
+    }
+
+    static void TestToolTipAndAxis()
+    {
+      // let's create an object of our class
+      mitk::NavigationTool::Pointer myNavigationTool = mitk::NavigationTool::New();
+      MITK_TEST_CONDITION_REQUIRED(myNavigationTool.IsNotNull(), "Testing instantiation");
+      // define tool tip
+      mitk::Point3D toolTip;
+      mitk::FillVector3D(toolTip, 1.0, 3.4, 5.6);
+      // test Set / GetToolTipPosition
+      myNavigationTool->SetToolTipPosition(toolTip);
+      MITK_TEST_CONDITION(myNavigationTool->GetToolTipPosition() == toolTip, "Testing Set / GetToolTipPosition");
+      // define tool axis
+      mitk::Point3D toolAxis;
+      mitk::FillVector3D(toolAxis, 1.0, 0.0, 0.0);
+      // This tool axis will result in the following transformation
+      mitk::Quaternion resultingToolAxisOrientation(0, -sqrt(2)/2.0, 0, sqrt(2)/2.0);
+      // test calculation of ToolAxisOrientation
+      myNavigationTool->SetToolAxis(toolAxis);
+      MITK_TEST_CONDITION(CompareQuaternions(myNavigationTool->GetToolAxisOrientation(),resultingToolAxisOrientation), "Testing caluclation of ToolAxisOrientation");
     }
 
   };
@@ -89,7 +117,7 @@ int mitkNavigationToolTest(int /* argc */, char* /*argv*/[])
 
   mitkNavigationToolTestClass::TestInstantiation();
   mitkNavigationToolTestClass::TestGetterAndSetter();
-
+  mitkNavigationToolTestClass::TestToolTipAndAxis();
   MITK_TEST_END()
 }
 

@@ -194,7 +194,7 @@ namespace mitk
 
   protected:
     PropertyRelationRuleBase() = default;
-    virtual ~PropertyRelationRuleBase() = default;
+    ~PropertyRelationRuleBase() override = default;
 
     using InstanceIDType = std::string;
     using InstanceIDVectorType = std::vector<InstanceIDType>;
@@ -266,7 +266,7 @@ namespace mitk
     /** Returns the root path for the rule instance ("MITK.Relations.<RuleID>"). */
     PropertyKeyPath GetRuleRootKeyPath() const;
 
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
 
   private:
     /** Creats a relation UID*/

@@ -88,21 +88,21 @@ int mitkFiberExtractionTest(int argc, char* argv[])
     mitk::FiberBundle::Pointer notExtractedFibs = groundTruthFibs->SubtractBundle(extractedFibs);
 
     MITK_INFO << argv[11];
-    testFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(argv[11]).front().GetPointer());
+    testFibs = mitk::IOUtil::Load<mitk::FiberBundle>(argv[11]);
     MITK_TEST_CONDITION_REQUIRED(notExtractedFibs->Equals(testFibs),"check bundle subtraction");
 
     mitk::FiberBundle::Pointer joinded = extractedFibs->AddBundle(notExtractedFibs);
-    testFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(argv[12]).front().GetPointer());
+    testFibs = mitk::IOUtil::Load<mitk::FiberBundle>(argv[12]);
     MITK_TEST_CONDITION_REQUIRED(joinded->Equals(testFibs),"check bundle addition");
 
     // test binary image based extraction
-    mitk::Image::Pointer mitkRoiImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(argv[6]).front().GetPointer());
+    mitk::Image::Pointer mitkRoiImage = mitk::IOUtil::Load<mitk::Image>(argv[6]);
     typedef itk::Image< unsigned char, 3 >    itkUCharImageType;
     itkUCharImageType::Pointer itkRoiImage = itkUCharImageType::New();
     mitk::CastToItkImage(mitkRoiImage, itkRoiImage);
 
     {
-      testFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(argv[9]).front().GetPointer());
+      testFibs = mitk::IOUtil::Load<mitk::FiberBundle>(argv[9]);
       itk::FiberExtractionFilter<unsigned char>::Pointer extractor = itk::FiberExtractionFilter<unsigned char>::New();
       mitk::FiberBundle::Pointer test = groundTruthFibs->GetDeepCopy();
       test->ResampleLinear(0.2);
@@ -118,7 +118,7 @@ int mitkFiberExtractionTest(int argc, char* argv[])
     }
 
     {
-      testFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(argv[10]).front().GetPointer());
+      testFibs = mitk::IOUtil::Load<mitk::FiberBundle>(argv[10]);
       itk::FiberExtractionFilter<unsigned char>::Pointer extractor = itk::FiberExtractionFilter<unsigned char>::New();
       extractor->SetInputFiberBundle(groundTruthFibs);
       extractor->SetRoiImages({itkRoiImage});

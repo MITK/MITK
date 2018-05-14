@@ -126,12 +126,83 @@ mitk::CustomTagParser::CustomTagParser(std::string relevantFile) : m_ClosestInte
   m_RevisionMappingStrategy = "Fuzzy";
 }
 
+bool mitk::CustomTagParser::IsT1Sequence(std::string preparationType,
+  std::string recoveryMode,
+  std::string spoilingType,
+  std::string revisionString)
+{
+  bool isT1 = false;
+
+  // if a forced parse strategy is set, use that one
+  if ("T1" == m_ParseStrategy)
+  {
+    return true;
+  }
+  if ("CEST/WASABI" == m_ParseStrategy)
+  {
+    return false;
+  }
+
+  if (("T1Recovery" == preparationType) || ("T1Inversion" == preparationType))
+  {
+    isT1 = true;
+  }
+
+  // How to interpret the recoveryMode depends on the age of the sequence
+  // older sequences use 0 = false and 1 = true, newer ones 1 = false and 2 = true.
+  // A rough rule of thumb is to assume that if the SpoilingType is 0, then the first
+  // convention is chosen, if it is 1, then the second applies. Otherwise
+  // we assume revision 1485 and newer to follow the new convention.
+  // This unfortunate heuristic is due to somewhat arbitrary CEST sequence implementations.
+  if (!isT1)
+  {
+    std::string thisIsTrue = "1";
+    std::string thisIsFalse = "0";
+    if ("0" == spoilingType)
+    {
+      thisIsFalse = "0";
+      thisIsTrue = "1";
+    }
+    else if ("1" == spoilingType)
+    {
+      thisIsFalse = "1";
+      thisIsTrue = "2";
+    }
+    else
+    {
+      int revisionNrWeAssumeToBeDifferenciating = 1485;
+      if (std::stoi(revisionString) - revisionNrWeAssumeToBeDifferenciating < 0)
+      {
+        thisIsFalse = "0";
+        thisIsTrue = "1";
+      }
+      else
+      {
+        thisIsFalse = "1";
+        thisIsTrue = "2";
+      }
+    }
+
+    if (thisIsFalse == recoveryMode)
+    {
+      isT1 = false;
+    }
+    else if (thisIsTrue == recoveryMode)
+    {
+      isT1 = true;
+    }
+
+  }
+
+  return isT1;
+}
+
 mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std::string dicomPropertyString)
 {
   auto results = mitk::PropertyList::New();
   if ("" == dicomPropertyString)
   {
-    MITK_ERROR << "Could not parse empty custom dicom string";
+    //MITK_ERROR << "Could not parse empty custom dicom string";
     return results;
   }
 
@@ -254,10 +325,12 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
 
   std::string preparationType = "";
   std::string recoveryMode = "";
+  std::string spoilingType = "";
   results->GetStringProperty("CEST.PreparationType", preparationType);
   results->GetStringProperty("CEST.RecoveryMode", recoveryMode);
+  results->GetStringProperty("CEST.SpoilingType", spoilingType);
 
-  if ((("T1Recovery" == preparationType) || ("T1Inversion" == preparationType) || ("1" == recoveryMode) || ("T1" == m_ParseStrategy)) && !("CEST/WASABI" == m_ParseStrategy))
+  if (this->IsT1Sequence(preparationType, recoveryMode, spoilingType, revisionString))
   {
     MITK_INFO << "Parsed as T1 image";
 

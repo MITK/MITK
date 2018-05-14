@@ -16,7 +16,7 @@
 
 #include "mitkBindDispatcherInteractor.h"
 #include "mitkMessage.h"
-#include <string.h>
+#include <cstring>
 
 // us
 #include "usGetModuleContext.h"

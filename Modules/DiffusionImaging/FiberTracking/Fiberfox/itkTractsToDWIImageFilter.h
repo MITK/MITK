@@ -54,9 +54,8 @@ public:
     typedef mitk::FiberBundle::Pointer                                  FiberBundleType;
     typedef itk::VectorImage< double, 3 >                               DoubleDwiType;
     typedef itk::Matrix<double, 3, 3>                                   MatrixType;
-    typedef itk::Image< double, 2 >                                     SliceType;
-    typedef itk::VnlForwardFFTImageFilter<SliceType>::OutputImageType   ComplexSliceType;
-    typedef itk::VectorImage< vcl_complex< double >, 3 >                ComplexDwiType;
+    typedef itk::Image< float, 2 >                                      Float2DImageType;
+    typedef itk::Image< vcl_complex< float >, 2 >                       Complex2DImageType;
     typedef itk::Vector< double,3>                                      DoubleVectorType;
 
     itkFactorylessNewMacro(Self)
@@ -67,11 +66,11 @@ public:
     itkSetMacro( FiberBundle, FiberBundleType )             ///< Input fiber bundle
     itkSetMacro( InputImage, typename OutputImageType::Pointer )     ///< Input diffusion-weighted image. If no fiber bundle is set, then the acquisition is simulated for this image without a new diffusion simulation.
     itkSetMacro( UseConstantRandSeed, bool )                ///< Seed for random generator.
-    void SetParameters( FiberfoxParameters<double> param )  ///< Simulation parameters.
+    void SetParameters( FiberfoxParameters param )  ///< Simulation parameters.
     { m_Parameters = param; }
 
     /** Output */
-    FiberfoxParameters<double> GetParameters(){ return m_Parameters; }
+    FiberfoxParameters GetParameters(){ return m_Parameters; }
     std::vector< ItkDoubleImgType::Pointer > GetVolumeFractions() ///< one double image for each compartment containing the corresponding volume fraction per voxel
     { return m_VolumeFractions; }
     mitk::LevelWindow GetLevelWindow()  ///< Level window is determined from the output image
@@ -81,12 +80,22 @@ public:
     itkGetMacro( KspaceImage, DoubleDwiType::Pointer )
     itkGetMacro( CoilPointset, mitk::PointSet::Pointer )
 
-    void GenerateData();
+    void GenerateData() override;
+
+    std::vector<DoubleDwiType::Pointer> GetOutputImagesReal() const
+    {
+      return m_OutputImagesReal;
+    }
+
+    std::vector<DoubleDwiType::Pointer> GetOutputImagesImag() const
+    {
+      return m_OutputImagesImag;
+    }
 
 protected:
 
     TractsToDWIImageFilter();
-    virtual ~TractsToDWIImageFilter();
+    ~TractsToDWIImageFilter() override;
     itk::Point<float, 3> GetItkPoint(double point[3]);
     itk::Vector<double, 3> GetItkVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
@@ -100,7 +109,7 @@ protected:
     DoubleDwiType::Pointer SimulateKspaceAcquisition(std::vector< DoubleDwiType::Pointer >& images);
 
     /** Generate signal of non-fiber compartments. */
-    void SimulateExtraAxonalSignal(ItkUcharImgType::IndexType index, double intraAxonalVolume, int g=-1);
+    void SimulateExtraAxonalSignal(ItkUcharImgType::IndexType& index, itk::Point<double, 3>& volume_fraction_point, double intraAxonalVolume, int g);
 
     /** Move fibers to simulate headmotion */
     void SimulateMotion(int g=-1);
@@ -110,8 +119,10 @@ protected:
     void InitializeData();
     void InitializeFiberData();
 
+    itk::Point<double, 3> GetMovedPoint(itk::Index<3>& index, bool forward);
+
     // input
-    mitk::FiberfoxParameters<double>            m_Parameters;
+    mitk::FiberfoxParameters                    m_Parameters;
     FiberBundleType                             m_FiberBundle;
     typename OutputImageType::Pointer           m_InputImage;
 
@@ -119,6 +130,8 @@ protected:
     typename OutputImageType::Pointer           m_OutputImage;
     typename DoubleDwiType::Pointer             m_PhaseImage;
     typename DoubleDwiType::Pointer             m_KspaceImage;
+    std::vector < typename DoubleDwiType::Pointer > m_OutputImagesReal;
+    std::vector < typename DoubleDwiType::Pointer > m_OutputImagesImag;
     mitk::LevelWindow                           m_LevelWindow;
     std::vector< ItkDoubleImgType::Pointer >    m_VolumeFractions;
     std::string                                 m_StatusText;
@@ -154,6 +167,7 @@ protected:
 
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
     itk::LinearInterpolateImageFunction< ItkDoubleImgType, float >::Pointer   m_DoubleInterpolator;
+    itk::Vector<double,3>                       m_NullDir;
 };
 }
 

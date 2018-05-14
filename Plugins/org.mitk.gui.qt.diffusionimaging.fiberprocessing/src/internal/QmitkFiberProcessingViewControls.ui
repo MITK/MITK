@@ -13,6 +13,43 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string>QCommandLinkButton {
+  font-weight: normal;
+}
+
+QCommandLinkButton:disabled {
+  border: none;
+  font-weight: lighter;
+}
+
+QToolBox::tab {
+  border: 1px solid #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:hover {
+  background-color: #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:selected {
+  background-color: #1c97ea;
+  border: 1px solid #1c97ea;
+  font-weight: bold;
+}
+
+QGroupBox {
+  border: 1px solid #434346;
+  background-color: #2d2d30;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: #2d2d30;
+}</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout_3">
    <property name="leftMargin">
     <number>9</number>
@@ -40,7 +77,7 @@
         <x>0</x>
         <y>0</y>
         <width>353</width>
-        <height>443</height>
+        <height>441</height>
        </rect>
       </property>
       <attribute name="label">
@@ -120,7 +157,7 @@
           <item row="3" column="0">
            <widget class="QCheckBox" name="m_InteractiveBox">
             <property name="text">
-             <string>Interactive Extraction </string>
+             <string>Interactive Extraction</string>
             </property>
            </widget>
           </item>
@@ -455,6 +492,9 @@
           </item>
           <item row="2" column="2">
            <widget class="QDoubleSpinBox" name="m_FiberExtractionFractionBox">
+            <property name="toolTip">
+             <string>Minimum overlap of streamlines and ROI in terms of streamline length. Zero means that one streamline point inside the ROI is enough to be considered as &quot;overlapping&quot;.</string>
+            </property>
             <property name="decimals">
              <number>3</number>
             </property>
@@ -1155,7 +1195,7 @@
           <item row="2" column="0">
            <widget class="QCheckBox" name="m_NormalizeColorValues">
             <property name="toolTip">
-             <string>The values used to color the fibers are min-max normalized. If not checked, the values should be between 0 and 1. </string>
+             <string>The values used to color the fibers are min-max normalized. If not checked, the values should be between 0 and 1.</string>
             </property>
             <property name="text">
              <string>Normalize values</string>
@@ -1214,6 +1254,11 @@
          <item>
           <property name="text">
            <string>Color fibers by fiber weights</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Color fibers by length</string>
           </property>
          </item>
         </widget>
@@ -1372,7 +1417,7 @@
         <x>0</x>
         <y>0</y>
         <width>367</width>
-        <height>174</height>
+        <height>172</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1496,16 +1541,16 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_9">
       <property name="leftMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <item row="0" column="1">
        <widget class="QLabel" name="m_FibLabel">

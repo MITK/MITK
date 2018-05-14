@@ -34,7 +34,7 @@ class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkRegEvalSettingsWidget : public QW
   Q_OBJECT
 
 public:
-  QmitkRegEvalSettingsWidget(QWidget *parent = 0);
+  QmitkRegEvalSettingsWidget(QWidget *parent = nullptr);
 
   /**
    * Configures the passed settings according to the current state of the

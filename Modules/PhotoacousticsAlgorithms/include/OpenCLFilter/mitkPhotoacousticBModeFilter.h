@@ -122,13 +122,13 @@ namespace mitk
 
     PhotoacousticBModeFilter();
 
-    ~PhotoacousticBModeFilter();
+    ~PhotoacousticBModeFilter() override;
 
-    virtual void GenerateInputRequestedRegion() override;
+    void GenerateInputRequestedRegion() override;
 
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     //##Description
     //## @brief Time when Header was last initialized

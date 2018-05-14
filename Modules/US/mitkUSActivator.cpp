@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSActivator.h"
 #include "mitkUSDevicePersistence.h"
 
-mitk::USActivator::USActivator() : m_Context(0)
+mitk::USActivator::USActivator() : m_Context(nullptr)
 {
 }
 

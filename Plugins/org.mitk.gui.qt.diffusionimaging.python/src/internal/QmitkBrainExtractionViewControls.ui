@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>QmitkBrainExtractionViewControls</class>
  <widget class="QWidget" name="QmitkBrainExtractionViewControls">
@@ -13,6 +13,43 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string>QCommandLinkButton {
+  font-weight: normal;
+}
+
+QCommandLinkButton:disabled {
+  border: none;
+  font-weight: lighter;
+}
+
+QToolBox::tab {
+  border: 1px solid #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:hover {
+  background-color: #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:selected {
+  background-color: #1c97ea;
+  border: 1px solid #1c97ea;
+  font-weight: bold;
+}
+
+QGroupBox {
+  border: 1px solid #434346;
+  background-color: #2d2d30;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: #2d2d30;
+}</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="1" column="0">
     <widget class="QCommandLinkButton" name="m_StartButton">
@@ -20,7 +57,7 @@
       <bool>false</bool>
      </property>
      <property name="toolTip">
-      <string/>
+      <string></string>
      </property>
      <property name="text">
       <string>Start Brain Extraction</string>
@@ -62,7 +99,7 @@
        <number>0</number>
       </property>
       <item row="0" column="1">
-       <widget class="QmitkDataStorageComboBox" name="m_ImageBox"/>
+       <widget class="QmitkDataStorageComboBox" name="m_ImageBox"></widget>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
@@ -83,6 +120,6 @@
    <header>QmitkDataStorageComboBox.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
- <connections/>
+ <resources></resources>
+ <connections></connections>
 </ui>

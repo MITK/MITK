@@ -34,7 +34,7 @@ class MITKIGTUI_EXPORT QmitkNDIAbstractDeviceWidget : public QmitkAbstractTracki
 public:
   static const std::string VIEW_ID;
 
-  QmitkNDIAbstractDeviceWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkNDIAbstractDeviceWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkNDIAbstractDeviceWidget() override;
 
   void Initialize() override = 0;

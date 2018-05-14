@@ -94,7 +94,8 @@ protected:
   void ResampleSelectedBundlesSpline();   ///<
   void ResampleSelectedBundlesLinear();   ///<
   void DoImageColorCoding();        ///< color fibers by selected scalar image
-  void DoWeightColorCoding();        ///< color fibers by their respective weights
+  void DoWeightColorCoding();       ///< color fibers by their respective weights
+  void DoLengthColorCoding();       ///< color fibers by length
   void DoCurvatureColorCoding();    ///< color fibers by curvature
   void CompressSelectedBundles();   ///< remove points below certain error threshold
   void WeightFibers();

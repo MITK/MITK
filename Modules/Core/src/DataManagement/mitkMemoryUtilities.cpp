@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkMemoryUtilities.h"
 
-#include <stdio.h>
+#include <cstdio>
 #if _MSC_VER || __MINGW32__
 #include <windows.h>
 #include <psapi.h>

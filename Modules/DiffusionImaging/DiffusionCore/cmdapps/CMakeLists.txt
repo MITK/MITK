@@ -17,6 +17,7 @@ if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
     Registration^^
     DiffusionDICOMLoader^^
     ResampleGradients^^
+    ShToOdfImage^^
     DImp^^
     DReg^^
     )
@@ -38,8 +39,3 @@ if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
     endforeach()
 
 endif()
-
-mitkFunctionCreateCommandLineApp(
-  NAME Dicom2Nrrd
-  DEPENDS MitkCore ${dependencies_list}
-)

@@ -138,7 +138,7 @@ protected:
   TensorReconstructionWithEigenvalueCorrectionFilter();
   ~TensorReconstructionWithEigenvalueCorrectionFilter() {}
 
-  void GenerateData();
+  void GenerateData() override;
 
   typedef enum
   {

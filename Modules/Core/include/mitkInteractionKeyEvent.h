@@ -24,7 +24,7 @@
 #include "mitkInteractionEvent.h"
 #include "mitkInteractionEventConst.h"
 #include "mitkInteractionPositionEvent.h"
-#include <string.h>
+#include <cstring>
 
 #include <MitkCoreExports.h>
 

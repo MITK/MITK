@@ -52,7 +52,7 @@ public:
     {
       std::vector<mitk::PolhemusInterface::trackingData> lastFrame = myInterface->GetLastFrame();
       MITK_INFO << "Frame " << i;
-      for (int j = 0; j < lastFrame.size(); j++)
+      for (size_t j = 0; j < lastFrame.size(); j++)
       {
         MITK_INFO << "[" << j << "]" << " Pos:" << lastFrame.at(j).pos << " Rot:" << lastFrame.at(j).rot;
       }

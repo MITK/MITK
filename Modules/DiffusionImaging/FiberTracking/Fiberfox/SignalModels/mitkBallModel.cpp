@@ -22,7 +22,6 @@ using namespace mitk;
 template< class ScalarType >
 BallModel< ScalarType >::BallModel()
     : m_Diffusivity(0.001)
-    , m_BValue(1000)
 {
 
 }
@@ -34,7 +33,7 @@ BallModel< ScalarType >::~BallModel()
 }
 
 template< class ScalarType >
-ScalarType BallModel< ScalarType >::SimulateMeasurement(unsigned int dir)
+ScalarType BallModel< ScalarType >::SimulateMeasurement(unsigned int dir, GradientType& )
 {
     ScalarType signal = 0;
 
@@ -45,7 +44,7 @@ ScalarType BallModel< ScalarType >::SimulateMeasurement(unsigned int dir)
     ScalarType bVal = g.GetNorm(); bVal *= bVal;
 
     if (bVal>0.0001)
-        signal = std::exp( -m_BValue * bVal * m_Diffusivity );
+        signal = std::exp( -this->m_BValue * bVal * m_Diffusivity );
     else
         signal = 1;
 
@@ -53,7 +52,7 @@ ScalarType BallModel< ScalarType >::SimulateMeasurement(unsigned int dir)
 }
 
 template< class ScalarType >
-typename BallModel< ScalarType >::PixelType BallModel< ScalarType >::SimulateMeasurement()
+typename BallModel< ScalarType >::PixelType BallModel< ScalarType >::SimulateMeasurement(GradientType& )
 {
     PixelType signal;
     signal.SetSize(this->m_GradientList.size());
@@ -64,7 +63,7 @@ typename BallModel< ScalarType >::PixelType BallModel< ScalarType >::SimulateMea
         ScalarType bVal = g.GetNorm(); bVal *= bVal;
 
         if (bVal>0.0001)
-            signal[i] = std::exp( -m_BValue * bVal * m_Diffusivity );
+            signal[i] = std::exp( -this->m_BValue * bVal * m_Diffusivity );
         else
             signal[i] = 1;
     }

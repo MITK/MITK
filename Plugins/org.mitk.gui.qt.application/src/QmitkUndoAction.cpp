@@ -42,20 +42,20 @@ public:
 };
 
 QmitkUndoAction::QmitkUndoAction(berry::IWorkbenchWindow::Pointer window)
-  : QAction(0), d(new QmitkUndoActionPrivate)
+  : QAction(nullptr), d(new QmitkUndoActionPrivate)
 {
   d->init(window.GetPointer(), this);
 }
 
 QmitkUndoAction::QmitkUndoAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
-  : QAction(0), d(new QmitkUndoActionPrivate)
+  : QAction(nullptr), d(new QmitkUndoActionPrivate)
 {
   d->init(window.GetPointer(), this);
   this->setIcon(icon);
 }
 
 QmitkUndoAction::QmitkUndoAction(const QIcon& icon, berry::IWorkbenchWindow* window)
-  : QAction(0), d(new QmitkUndoActionPrivate)
+  : QAction(nullptr), d(new QmitkUndoActionPrivate)
 {
   d->init(window, this);
   this->setIcon(icon);

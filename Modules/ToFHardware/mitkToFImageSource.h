@@ -49,7 +49,7 @@ namespace mitk
 
     ToFImageSource();
 
-    ~ToFImageSource();
+    ~ToFImageSource() override;
 
     us::ServiceRegistration<Self> m_ServiceRegistration;
   private:

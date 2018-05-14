@@ -54,9 +54,9 @@ class MITKQTWIDGETS_EXPORT QmitkStdMultiWidget : public QWidget
 
 public:
   QmitkStdMultiWidget(
-    QWidget *parent = 0,
-    Qt::WindowFlags f = 0,
-    mitk::RenderingManager *renderingManager = 0,
+    QWidget *parent = nullptr,
+    Qt::WindowFlags f = nullptr,
+    mitk::RenderingManager *renderingManager = nullptr,
     mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard,
     const QString &name = "stdmulti");
   ~QmitkStdMultiWidget() override;

@@ -289,7 +289,7 @@ namespace mitk
 
     mitk::DataStorage::SetOfObjects::ConstPointer rs = ds->GetSubset(pred);
     // calculate bounding geometry of these nodes
-    mitk::TimeGeometry::Pointer bounds = ds->ComputeBoundingGeometry3D(rs, "visible");
+    auto bounds = ds->ComputeBoundingGeometry3D(rs, "visible");
 
     // initialize the views to the bounding geometry
     this->InitializeViews(bounds);

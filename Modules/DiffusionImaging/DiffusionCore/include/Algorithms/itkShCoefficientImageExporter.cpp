@@ -16,9 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __itkShCoefficientImageExporter_cpp
 #define __itkShCoefficientImageExporter_cpp
 
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstdio>
+#include <cstdlib>
 
 #include "itkShCoefficientImageExporter.h"
 #include <itkImageRegionIterator.h>
@@ -74,20 +74,35 @@ void ShCoefficientImageExporter< PixelType, ShOrder >
     InputIteratorType it(m_InputImage, m_InputImage->GetLargestPossibleRegion());
     int numCoeffs = imageRegion4.GetSize(3);
 
-    while(!it.IsAtEnd())
-    {
-        CoefficientImageType::IndexType index;
-        index[0] = it.GetIndex()[0];
-        index[1] = it.GetIndex()[1];
-        index[2] = it.GetIndex()[2];
+    int x = imageRegion3.GetSize(0);
+    int y = imageRegion3.GetSize(1);
+    int z = imageRegion3.GetSize(2);
 
+#ifdef WIN32
+#pragma omp parallel for
+#else
+#pragma omp parallel for collapse(3)
+#endif
+  for (int a=0; a<x; a++)
+    for (int b=0; b<y; b++)
+      for (int c=0; c<z; c++)
+      {
+        typename InputImageType::IndexType index3;
+        index3.SetElement(0,a);
+        index3.SetElement(1,b);
+        index3.SetElement(2,c);
+
+        CoefficientImageType::IndexType index4;
+        index4[0] = index3[0];
+        index4[1] = index3[1];
+        index4[2] = index3[2];
+
+        typename InputImageType::PixelType pix = m_InputImage->GetPixel(index3);
         for (int i=0; i<numCoeffs; i++)
         {
-            index[3] = i;
-            m_OutputImage->SetPixel(index, it.Get()[i]);
+            index4[3] = i;
+            m_OutputImage->SetPixel(index4, pix[i]);
         }
-
-        ++it;
     }
 }
 

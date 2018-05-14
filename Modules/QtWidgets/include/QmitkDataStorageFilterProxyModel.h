@@ -31,7 +31,7 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageFilterProxyModel : public QSortFilter
 {
   //# CTORS,DTOR
 public:
-  QmitkDataStorageFilterProxyModel(QObject *parent = 0);
+  QmitkDataStorageFilterProxyModel(QObject *parent = nullptr);
   ~QmitkDataStorageFilterProxyModel() override;
 
 public:

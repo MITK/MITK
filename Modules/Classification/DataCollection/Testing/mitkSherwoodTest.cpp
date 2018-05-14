@@ -205,7 +205,7 @@ public:
             ++i;
             if ( i >= argc || argv[i][0] == '-')
               break;
-            mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(argv[i])[0].GetPointer());
+            mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(argv[i]);
             m_TestData.AddImage(set,modality, image);
           }
           if ( i >= argc || argv[i][0] == '-')
@@ -224,13 +224,13 @@ public:
             ++i;
             if ( i >= argc || argv[i][0] == '-')
               break;
-            mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(argv[i])[0].GetPointer());
+            mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(argv[i]);
             m_TrainingData.AddImage(set,modality, image);
           }
           ++i;
           if ( i >= argc || argv[i][0] == '-')
             break;
-          mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(argv[i])[0].GetPointer());
+          mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(argv[i]);
           m_TrainingData.SetLabelImage(set, image);
         }
       }

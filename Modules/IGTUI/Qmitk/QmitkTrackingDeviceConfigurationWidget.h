@@ -48,7 +48,7 @@ class MITKIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
 public:
   static const std::string VIEW_ID;
 
-  QmitkTrackingDeviceConfigurationWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkTrackingDeviceConfigurationWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkTrackingDeviceConfigurationWidget() override;
 
   /* @return Returns the current configurated tracking device. If the user didn't finished the

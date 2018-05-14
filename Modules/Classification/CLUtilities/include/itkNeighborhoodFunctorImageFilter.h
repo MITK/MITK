@@ -5,7 +5,7 @@
 #include "itkZeroFluxNeumannBoundaryCondition.h"
 #include "itkConstNeighborhoodIterator.h"
 #include "itkImage.h"
-#include "stdio.h"
+#include <cstdio>
 
 #include <itkHistogramToTextureFeaturesFilter.h>
 #include "itkHistogram.h"

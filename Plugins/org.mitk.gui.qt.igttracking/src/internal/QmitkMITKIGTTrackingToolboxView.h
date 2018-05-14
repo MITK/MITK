@@ -156,6 +156,9 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkAbstractView
     */
     void OnToolStorageChanged(const ctkServiceEvent event);
 
+  /* This slot enables selction of tool for projection*/
+    void SelectToolProjection(int idx);
+
   protected slots:
 
    //help slots for enable/disable buttons
@@ -185,7 +188,6 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkAbstractView
     bool m_tracking;    ///> bool which is true if tracking is running, false if not
     bool m_connected;   ///> bool that is true when a tracking device is connected
     bool m_logging;     ///> bool which is true if logging is running, false if not
-    bool m_ShowHideToolProjection; ///> bool, which will be true, if the tool projection is visible during tracking
     bool m_ShowHideToolAxis; ///> bool, which will be true, if the tool axis is visible during tracking
     int m_loggedFrames; ///> stores the current number of logged frames if logging is on
 
@@ -244,6 +246,16 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkAbstractView
   */
    void AutoSaveToolStorage();
 
+   /**
+   * Shows the projection of the tool along the tool axis for the given tool index
+   */
+   void ShowToolProjection(int index);
+   /**
+   * Removes all the tool projections from the data storage
+   */
+   void RemoveAllToolProjections();
+
+
    //members for worker thread
    QThread* m_WorkerThread;
    QmitkMITKIGTTrackingToolboxViewWorker* m_Worker;
@@ -251,6 +263,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkAbstractView
   private:
    ctkServiceReference m_DeviceTypeServiceReference;
    mitk::TrackingDeviceTypeCollection* m_DeviceTypeCollection;
+   mitk::DataNode::Pointer m_ToolProjectionNode;
 };
 
 

@@ -300,7 +300,7 @@ namespace mitk
 
   protected:
     SerialCommunication();
-    virtual ~SerialCommunication();
+    ~SerialCommunication() override;
 
     /**
     * \brief configures the serial interface with all parameters

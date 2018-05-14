@@ -29,6 +29,7 @@ set(CPP_FILES
   mitkFiberBundleMapper2D.cpp
   mitkFiberBundleMapper3D.cpp
   mitkPeakImageMapper2D.cpp
+  mitkPeakImageMapper3D.cpp
 
   mitkTractographyForestReader.cpp
   mitkTractographyForestWriter.cpp

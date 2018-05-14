@@ -13,6 +13,7 @@ if(BUILD_DiffusionFiberfoxCmdApps OR MITK_BUILD_ALL_APPS)
     # they are added after a "^^" and separated by "_"
     set( diffusionFiberfoxcmdapps
     Fiberfox^^MitkFiberTracking
+    FiberfoxOptimization^^MitkFiberTracking
     )
 
     foreach(diffusionFiberfoxcmdapp ${diffusionFiberfoxcmdapps})

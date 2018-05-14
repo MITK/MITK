@@ -239,6 +239,9 @@ foreach(p ${external_projects})
 
   list(APPEND mitk_depends ${${p}_DEPENDS})
 endforeach()
+if (SWIG_EXECUTABLE)
+  list(APPEND mitk_superbuild_ep_args -DSWIG_EXECUTABLE=${SWIG_EXECUTABLE})
+endif()
 
 #-----------------------------------------------------------------------------
 # Set superbuild boolean args
@@ -254,7 +257,6 @@ set(mitk_cmake_boolean_args
   MITK_BUILD_EXAMPLES
 
   MITK_USE_Qt5
-  MITK_USE_Qt5_WebEngine
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_OpenCL
@@ -330,7 +332,6 @@ if(MITK_USE_Python)
        -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
        -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
        -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
-       -DMITK_USE_SYSTEM_PYTHON:BOOL=${MITK_USE_SYSTEM_PYTHON}
       )
 endif()
 
@@ -407,6 +408,7 @@ ExternalProject_Add(${proj}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}
     -DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARYDIR}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}
+    -DQt5_DIR:PATH=${Qt5_DIR}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
     ${MAC_OSX_ARCHITECTURE_ARGS}

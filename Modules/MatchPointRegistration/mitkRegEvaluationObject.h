@@ -48,22 +48,22 @@ namespace mitk
     /**
     * Pass through to the target image that defines the region
     */
-    virtual void SetRequestedRegionToLargestPossibleRegion();
+    void SetRequestedRegionToLargestPossibleRegion() override;
 
     /**
     * Pass through to the target image that defines the region
     */
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
     /**
     * Pass through to the target image that defines the region
     */
-    virtual bool VerifyRequestedRegion();
+    bool VerifyRequestedRegion() override;
 
     /**
     * Pass through to the target image that defines the region
     */
-    virtual void SetRequestedRegion(const itk::DataObject*);
+    void SetRequestedRegion(const itk::DataObject*) override;
 
     itkSetObjectMacro(Registration, mitk::MAPRegistrationWrapper);
 
@@ -94,10 +94,10 @@ namespace mitk
     template <typename TPixelType, unsigned int VImageDimension >
     void doConversion(const ::itk::Image<TPixelType,VImageDimension>* input, mitk::Image::Pointer& result) const;
 
-    virtual void PrintSelf (std::ostream &os, itk::Indent indent) const;
+    void PrintSelf (std::ostream &os, itk::Indent indent) const override;
 
     RegEvaluationObject();
-    virtual ~RegEvaluationObject();
+    ~RegEvaluationObject() override;
 
     mitk::MAPRegistrationWrapper::Pointer m_Registration;
     mitk::Image::Pointer m_TargetImage;

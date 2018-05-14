@@ -20,7 +20,8 @@ MITK-IGT consists of two layers for hardware control (Tracking Layer) and proces
 The IGT documentation contains the following pages:
 
 <ul>
-<li> \subpage IGTTutorialOverview  IGT Tutorial Overview - This tutorial will guide you step by step through all plugins, modules and documentation pages. It contains the following steps:
+<li> \ref IGTConcepts - A general overview of the concepts used within the IGT module for acquiring and processing tracking data
+<li> \ref IGTTutorialOverview   - This tutorial will guide you step by step through all plugins, modules and documentation pages. It contains the following steps:
 <ul>
 <li> \ref org_mitk_gui_qt_igttracking - Step 1: This tutorial step explains the usage of the most important IGT plugins
 

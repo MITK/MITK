@@ -167,7 +167,7 @@ public:
   /**
    * Creates an empty any type.
    */
-  Any(): _content(0)
+  Any(): _content(nullptr)
   { }
 
   /**
@@ -192,7 +192,7 @@ public:
    * \param other The Any to copy
    */
   Any(const Any& other)
-    : _content(other._content ? other._content->Clone() : 0)
+    : _content(other._content ? other._content->Clone() : nullptr)
   { }
 
   ~Any()
@@ -378,7 +378,7 @@ ValueType* any_cast(Any* operand)
 {
   return operand && operand->Type() == typeid(ValueType)
       ? &static_cast<Any::Holder<ValueType>*>(operand->_content)->_held
-      : 0;
+      : nullptr;
 }
 
 /**

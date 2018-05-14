@@ -125,9 +125,9 @@ protected:
     {
     this->SetNumberOfRequiredInputs(2);
     }
-  ~RegionFromReferenceImageFilter() {}
+  ~RegionFromReferenceImageFilter() override {}
 
-  virtual void GenerateOutputInformation() ITK_OVERRIDE;
+  void GenerateOutputInformation() ITK_OVERRIDE;
 
 private:
   RegionFromReferenceImageFilter(const Self&); //purposely not implemented

@@ -61,18 +61,18 @@ namespace mitk
     * \brief Used for pipeline update just to tell the pipeline
     * that we always have to update
     */
-    virtual void UpdateOutputInformation() override;
+    void UpdateOutputInformation() override;
 
   protected:
     NavigationDataSequentialPlayer();
-    virtual ~NavigationDataSequentialPlayer();
+    ~NavigationDataSequentialPlayer() override;
 
     /**
     * \brief Does nothing.
     * mitk::NavigationDataSequentialPlayer::GoToNextSnapshot() should be called
     * for generating next data.
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
   };
 } // namespace mitk
 

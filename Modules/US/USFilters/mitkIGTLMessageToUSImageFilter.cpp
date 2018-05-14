@@ -21,8 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 
 void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
-  mitk::Image::Pointer& img)
+  std::vector<mitk::Image::Pointer>& imgVector)
 {
+  if (imgVector.size() != 1)
+    imgVector.resize(1);
+
+  mitk::Image::Pointer& img = imgVector[0];
   m_upstream->Update();
 
   mitk::IGTLMessage* msg = m_upstream->GetOutput();

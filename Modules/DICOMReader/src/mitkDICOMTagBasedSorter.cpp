@@ -90,8 +90,8 @@ mitk::DICOMTagBasedSorter::CutDecimalPlaces
 mitk::DICOMTagBasedSorter
 ::DICOMTagBasedSorter()
 :DICOMDatasetSorter()
-,m_StrictSorting(false)
-,m_ExpectDistanceOne(false)
+,m_StrictSorting(m_DefaultStrictSorting)
+,m_ExpectDistanceOne(m_DefaultExpectDistanceOne)
 {
 }
 

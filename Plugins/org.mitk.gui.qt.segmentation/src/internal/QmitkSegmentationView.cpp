@@ -192,6 +192,9 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
       bool slimView = prefs->GetBool("slim view", false);
       m_Controls->m_ManualToolSelectionBox2D->SetShowNames(!slimView);
       m_Controls->m_ManualToolSelectionBox3D->SetShowNames(!slimView);
+      m_Controls->btnNewSegmentation->setToolButtonStyle(slimView
+        ? Qt::ToolButtonIconOnly
+        : Qt::ToolButtonTextOnly);
    }
 
    m_AutoSelectionEnabled = prefs->GetBool("auto selection", false);

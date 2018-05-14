@@ -35,28 +35,28 @@ class MITKFIBERTRACKING_EXPORT TrackingHandlerOdf : public TrackingDataHandler
 public:
 
   TrackingHandlerOdf();
-  ~TrackingHandlerOdf();
+  ~TrackingHandlerOdf() override;
 
   typedef TensorImage::PixelType    TensorType;
   typedef OdfImage::ItkOdfImageType ItkOdfImageType;
   typedef itk::Image< vnl_vector_fixed<float,3>, 3>  ItkPDImgType;
 
 
-  void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
-  vnl_vector_fixed<float,3> ProposeDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
-  bool WorldToIndex(itk::Point<float, 3>& pos, itk::Index<3>& index);
+  void InitForTracking() override;     ///< calls InputDataValidForTracking() and creates feature images
+  vnl_vector_fixed<float,3> ProposeDirection(const itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex) override;  ///< predicts next progression direction at the given position
+  bool WorldToIndex(itk::Point<float, 3>& pos, itk::Index<3>& index) override;
 
   void SetSharpenOdfs(bool doSharpen) { m_SharpenOdfs=doSharpen; }
   void SetOdfThreshold(float odfThreshold){ m_OdfThreshold = odfThreshold; }
   void SetGfaThreshold(float gfaThreshold){ m_GfaThreshold = gfaThreshold; }
   void SetOdfImage( ItkOdfImageType::Pointer img ){ m_OdfImage = img; DataModified(); }
   void SetGfaImage( ItkFloatImgType::Pointer img ){ m_GfaImage = img; DataModified(); }
-  void SetMode( MODE m ){ m_Mode = m; }
+  void SetMode( MODE m ) override{ m_Mode = m; }
 
-  ItkUcharImgType::SpacingType GetSpacing(){ return m_OdfImage->GetSpacing(); }
-  itk::Point<float,3> GetOrigin(){ return m_OdfImage->GetOrigin(); }
-  ItkUcharImgType::DirectionType GetDirection(){ return m_OdfImage->GetDirection(); }
-  ItkUcharImgType::RegionType GetLargestPossibleRegion(){ return m_OdfImage->GetLargestPossibleRegion(); }
+  ItkUcharImgType::SpacingType GetSpacing() override{ return m_OdfImage->GetSpacing(); }
+  itk::Point<float,3> GetOrigin() override{ return m_OdfImage->GetOrigin(); }
+  ItkUcharImgType::DirectionType GetDirection() override{ return m_OdfImage->GetDirection(); }
+  ItkUcharImgType::RegionType GetLargestPossibleRegion() override{ return m_OdfImage->GetLargestPossibleRegion(); }
 
   int OdfPower() const;
   void SetNumProbSamples(int NumProbSamples);

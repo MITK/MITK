@@ -218,7 +218,7 @@ int main(int argc, char* argv[])
     try
     {
         mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({ "Diffusion Weighted Images" }, {});
-        mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(inFileName, &functor).GetPointer());
+        mitk::Image::Pointer mitkImage = mitk::IOUtil::Load<mitk::Image>(inFileName, &functor);
         mitk::Image::Pointer newImage = DoReduceGradientDirections(mitkImage, bValue, nrOfGradients);
         //mitk::IOUtil::Save(newImage, outFileName); //save as dwi image
         mitk::IOUtil::Save(newImage, "application/vnd.mitk.nii.gz", outFileName);  //save as nifti image

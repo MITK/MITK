@@ -22,11 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkScalarImageToHistogramGenerator.h"
 #include "itkListSample.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-#define PVA_PI M_PI
-
 namespace mitk
 {
 
@@ -201,7 +196,7 @@ namespace mitk
       for(int i=0; i<arraysz; i++)
       {
         double d   = xVals(i)-params.means[j];
-        double amp = params.ps[j]/sqrt(2*PVA_PI*params.sigmas[j]);
+        double amp = params.ps[j]/sqrt(2*itk::Math::pi*params.sigmas[j]);
 
         result.vals[j](i) = amp*exp(-0.5 * (d*d)/params.sigmas[j]);
       }
@@ -219,7 +214,7 @@ namespace mitk
         double d = xVals(i)-(t*params.means[0]+(1-t)*params.means[1]);
         double v = t*params.sigmas[0]+(1-t)*params.sigmas[1];
         double p = 1.0 - params.ps[0] - params.ps[1];
-        double amp = (1.0/m_StepsNumIntegration) * p / sqrt(2.0*PVA_PI*v);
+        double amp = (1.0/m_StepsNumIntegration) * p / sqrt(2.0*itk::Math::pi*v);
 
         result.mixedVals[0](i) = result.mixedVals[0](i) + amp*exp(-0.5 * (d*d)/v);
 

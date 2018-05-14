@@ -33,11 +33,11 @@ class MITKFIBERTRACKING_EXPORT TractographyForest : public BaseData
 {
 public:
 
-  virtual void UpdateOutputInformation() override;
-  virtual void SetRequestedRegionToLargestPossibleRegion() override;
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
-  virtual bool VerifyRequestedRegion() override;
-  virtual void SetRequestedRegion(const itk::DataObject*) override;
+  void UpdateOutputInformation() override;
+  void SetRequestedRegionToLargestPossibleRegion() override;
+  bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+  bool VerifyRequestedRegion() override;
+  void SetRequestedRegion(const itk::DataObject*) override;
 
   mitkClassMacro( TractographyForest, BaseData )
   itkFactorylessNewMacro(Self)
@@ -57,9 +57,9 @@ public:
 protected:
 
   TractographyForest( std::shared_ptr< vigra::RandomForest<int> > forest = nullptr );
-  virtual ~TractographyForest();
+  ~TractographyForest() override;
 
-  virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+  void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
 private:
 

@@ -22,28 +22,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionIterator.h>
 #include <itkArray.h>
 #include <vnl/vnl_vector.h>
+#include <mitkDiffusionFunctionCollection.h>
 
-#include <boost/version.hpp>
-#include <stdio.h>
+#include <cstdio>
 #include <locale>
 #include <fstream>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-#include <boost/math/special_functions.hpp>
-
 #include "itkPointShell.h"
-
-using namespace boost::math;
 
 namespace itk {
 
-#define QBALL_ANAL_RECON_PI       M_PI
-
-template< class T, class TG, class TO, int L, int NODF>
-AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::AnalyticalDiffusionQballReconstructionImageFilter() :
+template< class T, class TG, class TO, int ShOrder, int NrOdfDirections>
+AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDirections>::AnalyticalDiffusionQballReconstructionImageFilter() :
   m_GradientDirectionContainer(nullptr),
   m_NumberOfGradientDirections(0),
   m_NumberOfBaselineImages(1),
@@ -65,16 +54,10 @@ template<
     class TReferenceImagePixelType,
     class TGradientImagePixelType,
     class TOdfPixelType,
-    int NOrderL,
+    int ShOrder,
     int NrOdfDirections>
-typename itk::AnalyticalDiffusionQballReconstructionImageFilter<
-TReferenceImagePixelType,TGradientImagePixelType,TOdfPixelType,
-NOrderL,NrOdfDirections>::OdfPixelType
-itk::AnalyticalDiffusionQballReconstructionImageFilter
-<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,
-NOrderL, NrOdfDirections>
-::Normalize( OdfPixelType odf,
-             typename NumericTraits<ReferencePixelType>::AccumulateType b0 )
+typename itk::AnalyticalDiffusionQballReconstructionImageFilter< TReferenceImagePixelType,TGradientImagePixelType,TOdfPixelType, ShOrder,NrOdfDirections>::OdfPixelType
+itk::AnalyticalDiffusionQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType, ShOrder, NrOdfDirections>::Normalize( OdfPixelType odf, typename NumericTraits<ReferencePixelType>::AccumulateType b0 )
 {
   switch( m_NormalizationMethod )
   {
@@ -129,7 +112,7 @@ NOrderL, NrOdfDirections>
   case QBAR_SOLID_ANGLE:
   {
     for(int i=0; i<NrOdfDirections; i++)
-      odf[i] *= QBALL_ANAL_RECON_PI*4/NrOdfDirections;
+      odf[i] *= itk::Math::pi*4/NrOdfDirections;
 
     break;
   }
@@ -147,14 +130,9 @@ template<
     class TReferenceImagePixelType,
     class TGradientImagePixelType,
     class TOdfPixelType,
-    int NOrderL,
+    int ShOrder,
     int NrOdfDirections>
-vnl_vector<TOdfPixelType>
-itk::AnalyticalDiffusionQballReconstructionImageFilter
-<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,
-NOrderL, NrOdfDirections>
-::PreNormalize( vnl_vector<TOdfPixelType> vec,
-                typename NumericTraits<ReferencePixelType>::AccumulateType b0 )
+vnl_vector<TOdfPixelType> itk::AnalyticalDiffusionQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType, ShOrder, NrOdfDirections>::PreNormalize( vnl_vector<TOdfPixelType> vec, typename NumericTraits<ReferencePixelType>::AccumulateType b0 )
 {
   switch( m_NormalizationMethod )
   {
@@ -238,9 +216,8 @@ NOrderL, NrOdfDirections>
   return vec;
 }
 
-template< class T, class TG, class TO, int L, int NODF>
-void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::BeforeThreadedGenerateData()
+template< class T, class TG, class TO, int ShOrder, int NrOdfDirections>
+void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDirections>::BeforeThreadedGenerateData()
 {
   // If we have more than 2 inputs, then each input, except the first is a
   // gradient image. The number of gradient images must match the number of
@@ -249,9 +226,9 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
   // There need to be at least 6 gradient directions to be able to compute the
   // tensor basis
-  if( m_NumberOfGradientDirections < (L*L + L + 2)/2 + L )
+  if( m_NumberOfGradientDirections < (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder )
   {
-    itkExceptionMacro( << "Not enough gradient directions supplied (" << m_NumberOfGradientDirections << "). At least " << (L*L + L + 2)/2 + L << " needed for SH-order " << L);
+    itkExceptionMacro( << "Not enough gradient directions supplied (" << m_NumberOfGradientDirections << "). At least " << (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder << " needed for SH-order " << ShOrder);
   }
 
   // Input must be an itk::VectorImage.
@@ -259,15 +236,12 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
         this->ProcessObject::GetInput(0)->GetNameOfClass());
   if ( strcmp(gradientImageClassName.c_str(),"VectorImage") != 0 )
   {
-    itkExceptionMacro( <<
-                       "There is only one Gradient image. I expect that to be a VectorImage. "
-                       << "But its of type: " << gradientImageClassName );
+    itkExceptionMacro( << "There is only one Gradient image. I expect that to be a VectorImage. " << "But its of type: " << gradientImageClassName );
   }
 
   this->ComputeReconstructionMatrix();
 
-  typename GradientImagesType::Pointer img = static_cast< GradientImagesType * >(
-                                               this->ProcessObject::GetInput(0) );
+  typename GradientImagesType::Pointer img = static_cast< GradientImagesType * >( this->ProcessObject::GetInput(0) );
 
   m_BZeroImage = BZeroImageType::New();
   m_BZeroImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
@@ -297,12 +271,11 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
     m_Lambda = 0.0;
 }
 
-template< class T, class TG, class TO, int L, int NODF>
-void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
+template< class T, class TG, class TO, int ShOrder, int NrOdfDirections>
+void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDirections>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType )
 {
-  typename OutputImageType::Pointer outputImage =
-      static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
+  typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
 
   ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
   oit.GoToBegin();
@@ -381,9 +354,9 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
       if(m_NormalizationMethod == QBAR_SOLID_ANGLE)
       {
         vnl_vector<TO> coeffs(m_NumberCoefficients);
-        coeffs = ( (*m_CoeffReconstructionMatrix) * B );
-        coeffs[0] += 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
-        odf = ( (*m_SphericalHarmonicBasisMatrix) * coeffs ).data_block();
+        coeffs = ( m_CoeffReconstructionMatrix * B );
+        coeffs[0] += 1.0/(2.0*sqrt(itk::Math::pi));
+        odf = ( m_SphericalHarmonicBasisMatrix * coeffs ).data_block();
         coeffPixel = coeffs.data_block();
       }
       else if(m_NormalizationMethod == QBAR_NONNEG_SOLID_ANGLE)
@@ -400,13 +373,12 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
       else
       {
         vnl_vector<TO> coeffs(m_NumberCoefficients);
-        coeffs = ( (*m_CoeffReconstructionMatrix) * B );
-        coeffs[0] += 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
+        coeffs = ( m_CoeffReconstructionMatrix * B );
+        coeffs[0] += 1.0/(2.0*sqrt(itk::Math::pi));
         coeffPixel = coeffs.data_block();
-        odf = ( (*m_ReconstructionMatrix) * B ).data_block();
+        odf = ( m_ReconstructionMatrix * B ).data_block();
       }
       odf = Normalize(odf, b0);
-
     }
 
     oit.Set( odf );
@@ -426,11 +398,11 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
   std::cout << "One Thread finished reconstruction" << std::endl;
 }
 
-template< class T, class TG, class TO, int L, int NODF>
-void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::tofile2(vnl_matrix<double> *pA, std::string fname)
+template< class T, class TG, class TO, int ShOrder, int NrOdfDirections>
+void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDirections>
+::tofile2(vnl_matrix<float> *pA, std::string fname)
 {
-  vnl_matrix<double> A = (*pA);
+  vnl_matrix<float> A = (*pA);
   std::ofstream myfile;
   std::locale C("C");
   std::locale originalLocale = myfile.getloc();
@@ -453,87 +425,16 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
   myfile.imbue( originalLocale );
 }
 
-template< class T, class TG, class TO, int L, int NODF>
-void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::Cart2Sph(double x, double y, double z, double *spherical)
+template< class T, class TG, class TO, int ShOrder, int NrOdfDirections>
+void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDirections>::ComputeReconstructionMatrix()
 {
-  double phi, theta, r;
-  r = sqrt(x*x+y*y+z*z);
-
-  if( r<mitk::eps )
+  m_NumberCoefficients = (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder;
+  if( m_NumberOfGradientDirections < m_NumberCoefficients )
   {
-    theta = M_PI/2;
-    phi = M_PI/2;
-  }
-  else
-  {
-    theta = acos(z/r);
-    phi = atan2(y, x);
-  }
-  spherical[0] = phi;
-  spherical[1] = theta;
-  spherical[2] = r;
-}
-
-template< class T, class TG, class TO, int L, int NODF>
-double AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::Yj(int m, int l, double theta, double phi, bool useMRtrixBasis)
-{
-  if (!useMRtrixBasis)
-  {
-    if (m<0)
-      return sqrt(2.0)*spherical_harmonic_r(l, -m, theta, phi);
-    else if (m==0)
-      return spherical_harmonic_r(l, m, theta, phi);
-    else
-      return pow(-1.0,m)*sqrt(2.0)*spherical_harmonic_i(l, m, theta, phi);
-  }
-  else
-  {
-    double plm = legendre_p<double>(l,abs(m),-cos(theta));
-    double mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
-    if (m>0)
-      return mag*cos(m*phi);
-    else if (m==0)
-      return mag;
-    else
-      return mag*sin(-m*phi);
+    itkExceptionMacro( << "Not enough gradient directions supplied (" << m_NumberOfGradientDirections << "). At least " << (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder << " needed for SH-order " << ShOrder);
   }
 
-  return 0;
-}
-
-template< class T, class TG, class TO, int L, int NODF>
-double AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::Legendre0(int l)
-{
-  if( l%2 != 0 )
-  {
-    return 0;
-  }
-  else
-  {
-    double prod1 = 1.0;
-    for(int i=1;i<l;i+=2) prod1 *= i;
-    double prod2 = 1.0;
-    for(int i=2;i<=l;i+=2) prod2 *= i;
-    return pow(-1.0,l/2.0)*(prod1/prod2);
-  }
-}
-
-template< class T, class TG, class TO, int L, int NODF>
-void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::ComputeReconstructionMatrix()
-{
-
-  //for(int i=-6;i<7;i++)
-  //  std::cout << boost::math::legendre_p<double>(6, i, 0.65657) << std::endl;
-
-  if( m_NumberOfGradientDirections < (L*L + L + 2)/2 + L )
-  {
-    itkExceptionMacro( << "Not enough gradient directions supplied (" << m_NumberOfGradientDirections << "). At least " << (L*L + L + 2)/2 + L << " needed for SH-order " << L);
-  }
-
+  // Gradient preprocessing
   {
     // check for duplicate diffusion gradients
     bool warning = false;
@@ -550,7 +451,8 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
           break;
         }
       }
-      if (warning) break;
+      if (warning)
+        break;
     }
 
     // handle acquisition schemes where only half of the spherical
@@ -578,12 +480,11 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
     }
   }
 
-  vnl_matrix<double> *Q = new vnl_matrix<double>(3, m_NumberOfGradientDirections);
-
+  // Create 3xM matrix Q that contains the gradient vectors in polar coordinates
+  vnl_matrix<float> Q(3, m_NumberOfGradientDirections);
   {
     int i = 0;
-    for(GradientDirectionContainerType::ConstIterator gdcit = this->m_GradientDirectionContainer->Begin();
-        gdcit != this->m_GradientDirectionContainer->End(); ++gdcit)
+    for(GradientDirectionContainerType::ConstIterator gdcit = this->m_GradientDirectionContainer->Begin(); gdcit != this->m_GradientDirectionContainer->End(); ++gdcit)
     {
       float bval = gdcit.Value().two_norm();
       bval = bval*bval*m_BValue;
@@ -593,16 +494,15 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
         double y = gdcit.Value().get(1);
         double z = gdcit.Value().get(2);
         double cart[3];
-        Cart2Sph(x,y,z,cart);
-        (*Q)(0,i) = cart[0];
-        (*Q)(1,i) = cart[1];
-        (*Q)(2,i++) = cart[2];
+        mitk::sh::Cart2Sph(x,y,z,cart);
+        Q(0,i) = cart[0];
+        Q(1,i) = cart[1];
+        Q(2,i++) = cart[2];
       }
     }
     if(m_DirectionsDuplicated)
     {
-      for(GradientDirectionContainerType::ConstIterator gdcit = this->m_GradientDirectionContainer->Begin();
-          gdcit != this->m_GradientDirectionContainer->End(); ++gdcit)
+      for(GradientDirectionContainerType::ConstIterator gdcit = this->m_GradientDirectionContainer->Begin(); gdcit != this->m_GradientDirectionContainer->End(); ++gdcit)
       {
         float bval = gdcit.Value().two_norm();
         bval = bval*bval*m_BValue;
@@ -612,84 +512,41 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
           double y = gdcit.Value().get(1);
           double z = gdcit.Value().get(2);
           double cart[3];
-          Cart2Sph(x,y,z,cart);
-          (*Q)(0,i) = cart[0];
-          (*Q)(1,i) = cart[1];
-          (*Q)(2,i++) = cart[2];
+          mitk::sh::Cart2Sph(x,y,z,cart);
+          Q(0,i) = cart[0];
+          Q(1,i) = cart[1];
+          Q(2,i++) = cart[2];
         }
       }
     }
   }
 
-  int l = L;
-  m_NumberCoefficients = (int)(l*l + l + 2.0)/2.0 + l;
-  vnl_matrix<double>* B = new vnl_matrix<double>(m_NumberOfGradientDirections,m_NumberCoefficients);
-  vnl_matrix<double>* _L = new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients);
-  _L->fill(0.0);
-  vnl_matrix<double>* LL = new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients);
-  LL->fill(0.0);
-  vnl_matrix<double>* P = new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients);
-  P->fill(0.0);
-  vnl_matrix<double>* Inv = new vnl_matrix<double>(m_NumberCoefficients,m_NumberCoefficients);
-  P->fill(0.0);
-  vnl_vector<int>* lj = new vnl_vector<int>(m_NumberCoefficients);
-  m_LP = new vnl_vector<double>(m_NumberCoefficients);
-
+  // Calcualte SH basis B
+  vnl_matrix<float> L(m_NumberCoefficients,m_NumberCoefficients, 0);
+  vnl_vector<int> lj(m_NumberCoefficients);
+  vnl_matrix<float> B(m_NumberOfGradientDirections,m_NumberCoefficients);
   for(unsigned int i=0; i<m_NumberOfGradientDirections; i++)
   {
-    for(int k=0; k<=l; k+=2)
+    for(int k=0; k<=ShOrder; k+=2)
     {
       for(int m=-k; m<=k; m++)
       {
         int j = (k*k + k + 2)/2 + m - 1;
-        (*_L)(j,j) = -k*(k+1);
-        (*m_LP)(j) = -k*(k+1);
-        (*lj)[j] = k;
-        double phi = (*Q)(0,i);
-        double th = (*Q)(1,i);
-        (*B)(i,j) = Yj(m,k,th,phi, m_UseMrtrixBasis);
+        L(j,j) = -k*(k+1);
+        lj[j] = k;
+        B(i,j) = mitk::sh::Yj(m, k, Q(1,i), Q(0,i));
       }
     }
   }
 
-  //vnl_matrix<double> temp((*_L)*(*_L));
-  LL->update(*_L);
-  *LL *= *_L;
-  //tofile2(LL,"LL");
+  vnl_matrix<float> P(m_NumberCoefficients,m_NumberCoefficients, 0);
+  for(unsigned int i=0; i<m_NumberCoefficients; i++)
+    P(i,i) = mitk::sh::legendre0(lj[i]);
 
-  for(int i=0; i<m_NumberCoefficients; i++)
-  {
-    // here we leave out the 2*pi multiplication from Descoteaux
-    // this is because we do not want the real integral value
-    // but an average value over the equator.
+  vnl_matrix<float> B_transpose(B.transpose());
+  vnl_matrix_inverse<float>* pseudoInverse = new vnl_matrix_inverse<float>( B_transpose * B + L*L*m_Lambda );
+  m_CoeffReconstructionMatrix = pseudoInverse->pinverse() * B_transpose;
 
-    if(m_NormalizationMethod == QBAR_SOLID_ANGLE || m_NormalizationMethod == QBAR_NONNEG_SOLID_ANGLE)
-    {
-      (*P)(i,i) = 2.0*QBALL_ANAL_RECON_PI*Legendre0((*lj)[i]);
-      (*m_LP)(i) *= (*P)(i,i);
-    }
-    else
-    {
-      (*P)(i,i) = Legendre0((*lj)[i]);
-    }
-  }
-  m_B_t = new vnl_matrix<double>(B->transpose());
-  //tofile2(&m_B_t,"m_B_t");
-  vnl_matrix<double> B_t_B = (*m_B_t) * (*B);
-  //tofile2(&B_t_B,"B_t_B");
-  vnl_matrix<double> lambdaLL(m_NumberCoefficients,m_NumberCoefficients);
-  lambdaLL.update((*LL));
-  lambdaLL *= m_Lambda;
-  //tofile2(&lambdaLL,"lLL");
-
-  vnl_matrix<double> tmp( B_t_B + lambdaLL);
-  vnl_matrix_inverse<double> *pseudoInverse
-      = new vnl_matrix_inverse<double>( tmp );
-
-  (*Inv) = pseudoInverse->pinverse();
-  //tofile2(Inv,"Inv");
-  vnl_matrix<double> temp((*Inv) * (*m_B_t));
-  double fac1 = (1.0/(16.0*QBALL_ANAL_RECON_PI*QBALL_ANAL_RECON_PI));
   switch(m_NormalizationMethod)
   {
   case QBAR_ADC_ONLY:
@@ -699,69 +556,28 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
   case QBAR_B_ZERO_B_VALUE:
   case QBAR_B_ZERO:
   case QBAR_NONE:
-    temp = (*P) * temp;
+  {
+    m_CoeffReconstructionMatrix = P * m_CoeffReconstructionMatrix;
     break;
+  }
   case QBAR_SOLID_ANGLE:
-    temp = fac1 * (*P) * (*_L) * temp;
+  {
+    m_CoeffReconstructionMatrix = (float)(1.0/(8.0*itk::Math::pi)) * P * L * m_CoeffReconstructionMatrix;
     break;
+  }
   case QBAR_NONNEG_SOLID_ANGLE:
     break;
   }
 
-  //tofile2(&temp,"A");
+  // needed to calculate the ODF values from the SH coefficients
+  vnl_matrix_fixed<double, 3, NrOdfDirections>* U = itk::PointShell<NrOdfDirections, vnl_matrix_fixed<double, 3, NrOdfDirections> >::DistributePointShell();
 
-  m_CoeffReconstructionMatrix = new vnl_matrix<TO>(m_NumberCoefficients,m_NumberOfGradientDirections);
-  for(int i=0; i<m_NumberCoefficients; i++)
-  {
-    for(unsigned int j=0; j<m_NumberOfGradientDirections; j++)
-    {
-      (*m_CoeffReconstructionMatrix)(i,j) = (float) temp(i,j);
-    }
-  }
-
-  // this code goes to the image adapter coeffs->odfs later
-
-  int NOdfDirections = NODF;
-  vnl_matrix_fixed<double, 3, NODF>* U =
-      itk::PointShell<NODF, vnl_matrix_fixed<double, 3, NODF> >::DistributePointShell();
-
-  m_SphericalHarmonicBasisMatrix  = new vnl_matrix<TO>(NOdfDirections,m_NumberCoefficients);
-  vnl_matrix<double>* sphericalHarmonicBasisMatrix2
-      = new vnl_matrix<double>(NOdfDirections,m_NumberCoefficients);
-  for(int i=0; i<NOdfDirections; i++)
-  {
-    double x = (*U)(0,i);
-    double y = (*U)(1,i);
-    double z = (*U)(2,i);
-    double cart[3];
-    Cart2Sph(x,y,z,cart);
-    (*U)(0,i) = cart[0];
-    (*U)(1,i) = cart[1];
-    (*U)(2,i) = cart[2];
-  }
-
-  for(int i=0; i<NOdfDirections; i++)
-  {
-    for(int k=0; k<=l; k+=2)
-    {
-      for(int m=-k; m<=k; m++)
-      {
-        int j = (k*k + k + 2)/2 + m - 1;
-        double phi = (*U)(0,i);
-        double th = (*U)(1,i);
-        (*m_SphericalHarmonicBasisMatrix)(i,j) = Yj(m,k,th,phi,m_UseMrtrixBasis);
-        (*sphericalHarmonicBasisMatrix2)(i,j) = (*m_SphericalHarmonicBasisMatrix)(i,j);
-      }
-    }
-  }
-
-  m_ReconstructionMatrix = new vnl_matrix<TO>(NOdfDirections,m_NumberOfGradientDirections);
-  *m_ReconstructionMatrix = (*m_SphericalHarmonicBasisMatrix) * (*m_CoeffReconstructionMatrix);
-
+  m_SphericalHarmonicBasisMatrix  = mitk::sh::CalcShBasisForDirections(ShOrder, U->as_matrix());
+  m_ReconstructionMatrix = m_SphericalHarmonicBasisMatrix * m_CoeffReconstructionMatrix;
 }
 
-template< class T, class TG, class TO, int L, int NODF>
-void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
+template< class T, class TG, class TO, int ShOrder, int NrOdfDirections>
+void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDirections>
 ::SetGradientImage(const GradientDirectionContainerType *gradientDirection,
                    const GradientImagesType *gradientImage )
 {
@@ -811,8 +627,8 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
   this->ProcessObject::SetNthInput( 0, const_cast< GradientImagesType* >(gradientImage) );
 }
 
-template< class T, class TG, class TO, int L, int NODF>
-void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
+template< class T, class TG, class TO, int ShOrder, int NrOdfDirections>
+void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDirections>
 ::PrintSelf(std::ostream& os, Indent indent) const
 {
   std::locale C("C");

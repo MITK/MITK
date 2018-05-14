@@ -61,14 +61,14 @@ public:
   itkGetMacro( MaxDensity, OutPixelType)
   itkGetMacro( NumCoveredVoxels, unsigned int)
 
-  void GenerateData();
+  void GenerateData() override;
 
 protected:
 
   itk::Point<float, 3> GetItkPoint(double point[3]);
 
   TractDensityImageFilter();
-  virtual ~TractDensityImageFilter();
+  ~TractDensityImageFilter() override;
 
   typename OutputImageType::Pointer m_InputImage;           ///< use input image geometry to initialize output image
   mitk::FiberBundle::Pointer        m_FiberBundle;          ///< input fiber bundle

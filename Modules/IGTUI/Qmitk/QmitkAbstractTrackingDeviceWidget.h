@@ -60,7 +60,7 @@ class MITKIGTUI_EXPORT QmitkAbstractTrackingDeviceWidget : public QWidget
 public:
   static const std::string VIEW_ID;
 
-  QmitkAbstractTrackingDeviceWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkAbstractTrackingDeviceWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
 
   ~QmitkAbstractTrackingDeviceWidget() override;
 
@@ -69,7 +69,7 @@ public:
    * Internally use of QmitkUSAbstractCustomWidget::Clone() with additionaly
    * setting an internal flag that the object was really cloned.
    */
-  QmitkAbstractTrackingDeviceWidget* CloneForQt(QWidget* parent = 0) const;
+  QmitkAbstractTrackingDeviceWidget* CloneForQt(QWidget* parent = nullptr) const;
 
   /**
   * \brief Subclass must implement this method to return a pointer to a copy of the object.
@@ -105,7 +105,7 @@ protected:
    * \brief Subclass must implement this method to return a pointer to a copy of the object.
    * Please don't forget to call Initialize() during this function and copy all of your settings.
    */
-  virtual QmitkAbstractTrackingDeviceWidget* Clone(QWidget* parent = 0) const = 0;
+  virtual QmitkAbstractTrackingDeviceWidget* Clone(QWidget* parent = nullptr) const = 0;
 
 public:
   /**

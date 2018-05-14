@@ -52,17 +52,17 @@ namespace mitk
     using RelationUIDVectorType = PropertyRelationRuleBase::RelationUIDVectorType;
 
     /** Returns an ID string that identifies the rule class */
-    virtual RuleIDType GetRuleID() const override;
+    RuleIDType GetRuleID() const override;
 
     /** Returns a human readable string that can be used to describe the rule. Does not need to be unique.*/
-    virtual std::string GetDisplayName() const override;
+    std::string GetDisplayName() const override;
 
     /** Returns a human readable string that can be used to describe the role of a source in context of the rule
      * instance.*/
-    virtual std::string GetSourceRoleName() const override;
+    std::string GetSourceRoleName() const override;
     /** Returns a human readable string that can be used to describe the role of a destination in context of the rule
      * instance.*/
-    virtual std::string GetDestinationRoleName() const override;
+    std::string GetDestinationRoleName() const override;
 
   protected:
     GenericIDRelationRule(const RuleIDType &ruleIDTag);
@@ -71,7 +71,7 @@ namespace mitk
                           const std::string &displayName,
                           const std::string &sourceRole,
                           const std::string &destinationRole);
-    virtual ~GenericIDRelationRule() = default;
+    ~GenericIDRelationRule() override = default;
 
     using InstanceIDType = PropertyRelationRuleBase::InstanceIDType;
     using InstanceIDVectorType = PropertyRelationRuleBase::InstanceIDVectorType;
@@ -86,7 +86,7 @@ namespace mitk
     will take care of this violation.
     @pre source must be a pointer to a valid IPropertyProvider instance.
     @pre destination must be a pointer to a valid IPropertyProvider instance.*/
-    virtual InstanceIDVectorType GetInstanceID_datalayer(const IPropertyProvider *source,
+    InstanceIDVectorType GetInstanceID_datalayer(const IPropertyProvider *source,
                                                          const IPropertyProvider *destination) const override;
 
     /** Is called by HasRelation() if no relation of type Connected_ID (GetInstanceID_IDLayer()) or
@@ -96,7 +96,7 @@ namespace mitk
       @pre source must be a pointer to a valid IPropertyProvider instance.
       @pre destination must be a pointer to a valid IPropertyProvider instance.
       */
-    virtual bool HasImplicitDataRelation(const IPropertyProvider *source,
+    bool HasImplicitDataRelation(const IPropertyProvider *source,
                                          const IPropertyProvider *destination) const override;
 
     /**Is called by Connect() to ensure that source has correctly set properties to resemble
@@ -108,7 +108,7 @@ namespace mitk
     is ensured.
     @pre source must be a valid instance.
     @pre destination must be a valid instance.*/
-    virtual void Connect_datalayer(IPropertyOwner *source,
+    void Connect_datalayer(IPropertyOwner *source,
                                    const IPropertyProvider *destination,
                                    const InstanceIDType &instanceID) const override;
 
@@ -118,9 +118,9 @@ namespace mitk
     If the relationUID is not part of the source. Nothing will be changed. Disconnect() ensures that source is a valid
     pointer if called.
     @remark Disconnect() ensures that sourece is valid and only invokes if instance exists.*/
-    virtual void Disconnect_datalayer(IPropertyOwner *source, const InstanceIDType &instanceID) const override;
+    void Disconnect_datalayer(IPropertyOwner *source, const InstanceIDType &instanceID) const override;
 
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
 
   private:
     RuleIDType m_RuleIDTag;

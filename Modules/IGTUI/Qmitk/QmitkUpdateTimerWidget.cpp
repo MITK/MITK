@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkUpdateTimerWidget.h"
 
 #include <QTimer>
-#include <math.h>
+#include <cmath>
 
 
 static unsigned int DEFAULTUPDATEVALUE = 50; // default update value (in msec) for the timer

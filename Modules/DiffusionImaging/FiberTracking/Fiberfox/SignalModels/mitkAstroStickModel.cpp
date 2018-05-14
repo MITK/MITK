@@ -21,8 +21,7 @@ using namespace mitk;
 
 template< class ScalarType >
 AstroStickModel< ScalarType >::AstroStickModel()
-    : m_BValue(1000)
-    , m_Diffusivity(0.001)
+    : m_Diffusivity(0.001)
     , m_NumSticks(42)
     , m_RandomizeSticks(false)
 {
@@ -46,14 +45,14 @@ AstroStickModel< ScalarType >::~AstroStickModel()
 }
 
 template< class ScalarType >
-ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(unsigned int dir)
+ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(unsigned int dir, GradientType& )
 {
     ScalarType signal = 0;
 
     if (dir>=this->m_GradientList.size())
         return signal;
 
-    ScalarType b = -m_BValue*m_Diffusivity;
+    ScalarType b = -this->m_BValue*m_Diffusivity;
 
     if (m_RandomizeSticks)  // random number of sticks
         m_NumSticks = 30 + this->m_RandGen->GetIntegerVariate()%31;
@@ -90,11 +89,11 @@ typename AstroStickModel< ScalarType >::GradientType AstroStickModel< ScalarType
 }
 
 template< class ScalarType >
-typename AstroStickModel< ScalarType >::PixelType AstroStickModel< ScalarType >::SimulateMeasurement()
+typename AstroStickModel< ScalarType >::PixelType AstroStickModel< ScalarType >::SimulateMeasurement(GradientType& )
 {
     PixelType signal;
     signal.SetSize(this->m_GradientList.size());
-    ScalarType b = -m_BValue*m_Diffusivity;
+    ScalarType b = -this->m_BValue*m_Diffusivity;
 
     if (m_RandomizeSticks)
         m_NumSticks = 30 + this->m_RandGen->GetIntegerVariate()%31;

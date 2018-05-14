@@ -5,15 +5,18 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_classificationsegmentation_Activator.cpp
   ClassificationSegmentation.cpp
+  ClassificationRegionGrow.cpp
 )
 
 set(UI_FILES
   src/internal/ClassificationSegmentationControls.ui
+  src/internal/ClassificationRegionGrowControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_classificationsegmentation_Activator.h
   src/internal/ClassificationSegmentation.h
+  src/internal/ClassificationRegionGrow.h
 )
 
 # list of resource files which can be used by the plug-in

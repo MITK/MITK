@@ -84,7 +84,7 @@ public:
     std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/TestAddPoints.xml");
 
     std::string pic3D = GetTestDataFilePath("Pic3D.nrrd");
-    mitk::Image::Pointer referenceImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(pic3D)[0].GetPointer());
+    mitk::Image::Pointer referenceImage = mitk::IOUtil::Load<mitk::Image>(pic3D);
     mitk::DataNode::Pointer refDN = mitk::DataNode::New();
     refDN->SetData(referenceImage);
 
@@ -99,7 +99,7 @@ public:
     interactionTestHelper.PlaybackInteraction();
 
     // Load the reference PointSet
-    mitk::PointSet::Pointer referencePointSet = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(referencePointSetPath)[0].GetPointer());
+    mitk::PointSet::Pointer referencePointSet = mitk::IOUtil::Load<mitk::PointSet>(referencePointSetPath);
 
     // Compare reference with the result of the interaction. Last parameter (false) is set to ignore the geometries.
     // They are not stored in a file and therefore not equal.
@@ -117,7 +117,7 @@ public:
       GetTestDataFilePath("InteractionTestData/Interactions/PointSetDataInteractor_PointsAdd2d3d.xml");
 
     std::string pic3D = GetTestDataFilePath("Pic3D.nrrd");
-    mitk::Image::Pointer referenceImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(pic3D)[0].GetPointer());
+    mitk::Image::Pointer referenceImage = mitk::IOUtil::Load<mitk::Image>(pic3D);
     mitk::DataNode::Pointer refDN = mitk::DataNode::New();
     refDN->SetData(referenceImage);
 
@@ -132,7 +132,7 @@ public:
     interactionTestHelper.PlaybackInteraction();
 
     // Load the reference PointSet
-    mitk::PointSet::Pointer referencePointSet = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(referencePointSetPath)[0].GetPointer());
+    mitk::PointSet::Pointer referencePointSet = mitk::IOUtil::Load<mitk::PointSet>(referencePointSetPath);
 
     // Compare reference with the result of the interaction. Last parameter (false) is set to ignore the geometries.
     // They are not stored in a file and therefore not equal.
@@ -148,7 +148,7 @@ public:
 
   void EvaluateState(std::string &refPsFile, mitk::PointSet::Pointer ps, int selected)
   {
-    mitk::PointSet::Pointer refPs = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(refPsFile)[0].GetPointer());
+    mitk::PointSet::Pointer refPs = mitk::IOUtil::Load<mitk::PointSet>(refPsFile);
     refPs->UpdateOutputInformation();
     ps->UpdateOutputInformation();
 
@@ -176,7 +176,7 @@ public:
     std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/TestMoveRemovePoints.xml");
 
     std::string pic3D = GetTestDataFilePath("Pic3D.nrrd");
-    mitk::Image::Pointer referenceImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(pic3D)[0].GetPointer());
+    mitk::Image::Pointer referenceImage = mitk::IOUtil::Load<mitk::Image>(pic3D);
     mitk::DataNode::Pointer refDN = mitk::DataNode::New();
     refDN->SetData(referenceImage);
 
@@ -191,7 +191,7 @@ public:
     interactionTestHelper.PlaybackInteraction();
 
     // Load the reference PointSet
-    mitk::PointSet::Pointer referencePointSet = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(referencePointSetPath)[0].GetPointer());
+    mitk::PointSet::Pointer referencePointSet = mitk::IOUtil::Load<mitk::PointSet>(referencePointSetPath);
 
     // Compare reference with the result of the interaction. Last parameter (false) is set to ignore the geometries.
     // They are not stored in a file and therefore not equal.

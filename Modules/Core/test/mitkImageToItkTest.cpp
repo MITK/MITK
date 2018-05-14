@@ -131,7 +131,7 @@ public:
     ItkImageType::Pointer itkImage = ItkImageType::New();
 
     std::string m_ImagePath = GetTestDataFilePath("Pic3D.nrrd");
-    mitk::Image::Pointer testDataImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(m_ImagePath)[0].GetPointer());
+    mitk::Image::Pointer testDataImage = mitk::IOUtil::Load<mitk::Image>(m_ImagePath);
 
     // modify ITK image
     itk::Matrix<double, 3, 3> dir = itkImage->GetDirection();
@@ -148,7 +148,7 @@ public:
   {
     itk::Image<short, 3>::Pointer itkImage;
     std::string m_ImagePath = GetTestDataFilePath("Pic3D.nrrd");
-    mitk::Image::Pointer testDataImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(m_ImagePath)[0].GetPointer());
+    mitk::Image::Pointer testDataImage = mitk::IOUtil::Load<mitk::Image>(m_ImagePath);
 
     mitk::CastToItkImage(testDataImage, itkImage);
     mitk::Image::Pointer mitkImageAfterCast = mitk::ImportItkImage(itkImage);

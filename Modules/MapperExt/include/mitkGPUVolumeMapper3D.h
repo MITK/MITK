@@ -135,7 +135,7 @@ namespace mitk
 
       LocalStorage()
       {
-        m_VtkRenderWindow = 0;
+        m_VtkRenderWindow = nullptr;
 
         m_cpuInitialized = false;
 

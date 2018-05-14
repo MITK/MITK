@@ -154,7 +154,7 @@ namespace mitk
     * \brief Every call of update causes one line for each added NavigationData in the output if the recording was started
     */
 
-    virtual void Update();
+    void Update() override;
 
     /**Documentation
     * \brief Sets the recording mode which causes different types of output streams
@@ -174,11 +174,11 @@ namespace mitk
     * \brief filter execute method here it is not used
     *
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     NavigationDataRecorderDeprecated();
 
-    virtual ~NavigationDataRecorderDeprecated();
+    ~NavigationDataRecorderDeprecated() override;
 
     std::string m_FileName; ///< stores the file name and path
 

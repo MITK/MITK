@@ -42,20 +42,20 @@ public:
 };
 
 QmitkRedoAction::QmitkRedoAction(berry::IWorkbenchWindow::Pointer window)
-  : QAction(0), d(new QmitkRedoActionPrivate)
+  : QAction(nullptr), d(new QmitkRedoActionPrivate)
 {
   d->init(window.GetPointer(), this);
 }
 
 QmitkRedoAction::QmitkRedoAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
-  : QAction(0), d(new QmitkRedoActionPrivate)
+  : QAction(nullptr), d(new QmitkRedoActionPrivate)
 {
   d->init(window.GetPointer(), this);
   this->setIcon(icon);
 }
 
 QmitkRedoAction::QmitkRedoAction(const QIcon& icon, berry::IWorkbenchWindow* window)
-  : QAction(0), d(new QmitkRedoActionPrivate)
+  : QAction(nullptr), d(new QmitkRedoActionPrivate)
 {
   d->init(window, this);
   this->setIcon(icon);

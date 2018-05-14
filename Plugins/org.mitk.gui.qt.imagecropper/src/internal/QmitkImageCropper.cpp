@@ -544,7 +544,7 @@ void QmitkImageCropper::ProcessImage(bool mask)
         tempDataStorage->InsertElement(0, node);
 
         // initialize the views to the bounding geometry
-        mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
+        auto bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
         mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
@@ -592,7 +592,7 @@ void QmitkImageCropper::ProcessImage(bool mask)
           tempDataStorage->InsertElement(0, node);
 
           // initialize the views to the bounding geometry
-          mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
+          auto bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
           mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
           mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         }

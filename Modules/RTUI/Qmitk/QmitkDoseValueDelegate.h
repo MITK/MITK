@@ -35,7 +35,7 @@ public:
   ///
   /// Creates a new PropertyDelegate.
   ///
-  explicit QmitkDoseValueDelegate(QObject *parent = 0);
+  explicit QmitkDoseValueDelegate(QObject *parent = nullptr);
 
   ///
   /// Renders a specific property  (overwritten from QItemDelegate)

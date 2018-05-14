@@ -203,7 +203,7 @@ void QmitkMapPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel 
 
 void QmitkMapPropertyDelegate::commitAndCloseEditor()
 {
-  QWidget *editor = 0;
+  QWidget *editor = nullptr;
   if (QPushButton *pushBtn = qobject_cast<QPushButton *>(sender()))
   {
     editor = pushBtn;
@@ -234,7 +234,7 @@ void QmitkMapPropertyDelegate::ComboBoxCurrentIndexChanged(int /*index*/)
 
 void QmitkMapPropertyDelegate::SpinBoxValueChanged(const QString & /*value*/)
 {
-  QAbstractSpinBox *spinBox = 0;
+  QAbstractSpinBox *spinBox = nullptr;
   if ((spinBox = qobject_cast<QSpinBox *>(sender())) || (spinBox = qobject_cast<QDoubleSpinBox *>(sender())))
   {
     emit commitData(spinBox);

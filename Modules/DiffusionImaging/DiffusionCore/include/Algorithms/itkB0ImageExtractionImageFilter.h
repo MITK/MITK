@@ -72,9 +72,9 @@ namespace itk{
   protected:
 
     B0ImageExtractionImageFilter();
-    virtual ~B0ImageExtractionImageFilter() {};
+    ~B0ImageExtractionImageFilter() override {};
 
-    void GenerateData();
+    void GenerateData() override;
 
     GradientDirectionContainerType::Pointer   m_Directions;
 

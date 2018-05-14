@@ -35,12 +35,12 @@ namespace mitk
   public:
 
     FiberBundleDicomReader();
-    virtual ~FiberBundleDicomReader(){}
+    ~FiberBundleDicomReader() override{}
     FiberBundleDicomReader(const FiberBundleDicomReader& other);
-    virtual FiberBundleDicomReader * Clone() const override;
+    FiberBundleDicomReader * Clone() const override;
 
     using mitk::AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+    std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   private:
 

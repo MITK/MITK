@@ -36,7 +36,7 @@ int mitkExtractSingleShellTest( int argc, char* argv[] )
   /*
     1. Get input data
     */
-  mitk::Image::Pointer dwimage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load( argv[1] )[0].GetPointer());
+  mitk::Image::Pointer dwimage = mitk::IOUtil::Load<mitk::Image>( argv[1] );
 
   mitk::GradientDirectionsProperty::Pointer gradientsProperty = static_cast<mitk::GradientDirectionsProperty *>( dwimage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() );
 

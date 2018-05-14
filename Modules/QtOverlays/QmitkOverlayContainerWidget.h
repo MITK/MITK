@@ -35,7 +35,7 @@ public:
   /**
   * @brief Default Constructor
   **/
-  QmitkOverlayContainerWidget(QWidget *parent = 0, Qt::WindowFlags f = 0);
+  QmitkOverlayContainerWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
 
   /**
   * @brief Default Destructor

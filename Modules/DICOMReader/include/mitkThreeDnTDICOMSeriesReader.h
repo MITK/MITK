@@ -61,9 +61,14 @@ class MITKDICOMREADER_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGD
 
     bool operator==(const DICOMFileReader& other) const override;
 
+    static bool GetDefaultGroup3DandT()
+    {
+      return m_DefaultGroup3DandT;
+    }
+
   protected:
 
-    ThreeDnTDICOMSeriesReader(unsigned int decimalPlacesForOrientation = 5);
+    ThreeDnTDICOMSeriesReader(unsigned int decimalPlacesForOrientation = Superclass::m_DefaultDecimalPlacesForOrientation);
     ~ThreeDnTDICOMSeriesReader() override;
 
     ThreeDnTDICOMSeriesReader(const ThreeDnTDICOMSeriesReader& other);
@@ -79,6 +84,8 @@ class MITKDICOMREADER_EXPORT ThreeDnTDICOMSeriesReader : public DICOMITKSeriesGD
     bool LoadMitkImageForImageBlockDescriptor(DICOMImageBlockDescriptor& block) const override;
 
     bool m_Group3DandT;
+
+    const static bool m_DefaultGroup3DandT = true;
 };
 
 }

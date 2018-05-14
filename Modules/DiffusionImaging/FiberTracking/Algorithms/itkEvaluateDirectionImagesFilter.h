@@ -79,9 +79,9 @@ public:
 
 protected:
     EvaluateDirectionImagesFilter();
-    ~EvaluateDirectionImagesFilter() {}
+    ~EvaluateDirectionImagesFilter() override {}
 
-    void GenerateData();
+    void GenerateData() override;
 
     UCharImageType::Pointer                  m_MaskImage;
     DirectionImageContainerType::Pointer     m_ImageSet;

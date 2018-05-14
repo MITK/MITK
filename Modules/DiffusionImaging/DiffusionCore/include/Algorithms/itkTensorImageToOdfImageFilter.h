@@ -74,17 +74,17 @@ namespace itk
 
   protected:
     TensorImageToOdfImageFilter(){};
-    ~TensorImageToOdfImageFilter(){};
+    ~TensorImageToOdfImageFilter() override{};
 
-    void PrintSelf (std::ostream& os, Indent indent) const
+    void PrintSelf (std::ostream& os, Indent indent) const override
     {
       Superclass::PrintSelf (os, indent);
     }
 
-    void BeforeThreadedGenerateData( void );
+    void BeforeThreadedGenerateData( void ) override;
 
     void ThreadedGenerateData( const
-      OutputImageRegionType &outputRegionForThread, ThreadIdType);
+      OutputImageRegionType &outputRegionForThread, ThreadIdType) override;
 
     //void GenerateData();
 

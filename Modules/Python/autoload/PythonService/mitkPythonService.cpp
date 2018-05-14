@@ -61,9 +61,9 @@ mitk::PythonService::PythonService()
       //TODO a better way to do this
 #ifndef WIN32
 #if defined (__APPLE__) || defined(MACOSX)
-      const char* library = "libpython2.7.dylib";
+      const char* library = "libpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.dylib";
 #else
-      const char* library = "libpython2.7.so";
+      const char* library = "libpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.so";
 #endif
       dlerror();
       if(dlopen(library, RTLD_NOW | RTLD_GLOBAL) == 0 )
@@ -85,8 +85,6 @@ mitk::PythonService::PythonService()
         pythonCommand.append( QString("sys.path.append('')\n") );
         pythonCommand.append( QString("sys.path.append('%1')\n").arg(programPath.c_str()) );
         pythonCommand.append( QString("sys.path.append('%1/Python')").arg(programPath.c_str()) );
-        //pythonCommand.append( QString("\nsite.addsitedir('%1/Python/python2.7/site-packages')").arg(programPath.c_str()) );
-        //pythonCommand.append( QString("\nsite.addsitedir('%1/Python/python2.7/dist-packages')").arg(programPath.c_str()) );
         // development
       } else {
         pythonCommand.append( QString("import site, sys\n") );
@@ -202,7 +200,7 @@ std::vector<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const
   PyObject* object = PyDict_GetItemString(dict, "__main__");
   PyObject* dirMain = PyObject_Dir(object);
   PyObject* tempObject = 0;
-  PyObject* strTempObject = 0;
+  //PyObject* strTempObject = 0;
 
   if(dirMain)
   {
@@ -215,15 +213,16 @@ std::vector<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const
       tempObject = PyObject_GetAttrString( object, name.c_str() );
       attrType = tempObject->ob_type->tp_name;
 
-      strTempObject = PyObject_Repr(tempObject);
-      if(strTempObject && ( PyUnicode_Check(strTempObject) || PyString_Check(strTempObject) ) )
-        attrValue = PyString_AsString(strTempObject);
-      else
-        attrValue = "";
+      //disabled due to strange errors, see T24085
+      //strTempObject = PyObject_Repr(tempObject);
+      //if(strTempObject && ( PyUnicode_Check(strTempObject) || PyString_Check(strTempObject) ) )
+      //  attrValue = PyString_AsString(strTempObject);
+      //else
+      //  attrValue = "";
 
       mitk::PythonVariable var;
       var.m_Name = name;
-      var.m_Value = attrValue;
+      //var.m_Value = attrValue;
       var.m_Type = attrType;
       list.push_back(var);
     }

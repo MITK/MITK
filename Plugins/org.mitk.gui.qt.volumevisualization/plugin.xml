@@ -6,7 +6,8 @@
       id="org.mitk.views.volumevisualization"
       name="Volume Visualization"
       class="QmitkVolumeVisualizationView"
-      icon="resources/volume_visualization.svg" >
+      icon="resources/volume_visualization.svg"
+      category="General" >
       <description>Configure the 3D-Visualization of images.</description>
       <keywordReference id="org.mitk.views.volumevisualization.ViewKeyword"/>
     </view>

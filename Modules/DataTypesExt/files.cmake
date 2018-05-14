@@ -25,7 +25,6 @@ set(CPP_FILES
   mitkLookupTableSource.cpp
   mitkMesh.cpp
   mitkMultiStepper.cpp
-  mitkOrganTypeProperty.cpp
   mitkPlane.cpp
   mitkSurfaceDeformationDataInteractor3D.cpp
   mitkUnstructuredGrid.cpp

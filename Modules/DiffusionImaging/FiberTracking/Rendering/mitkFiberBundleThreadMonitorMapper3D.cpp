@@ -194,13 +194,3 @@ void mitk::FiberBundleThreadMonitorMapper3D::UpdateVtkObjects()
 
 
 }
-
-void mitk::FiberBundleThreadMonitorMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper *)
-{
-
-
-
-}
-
-
-

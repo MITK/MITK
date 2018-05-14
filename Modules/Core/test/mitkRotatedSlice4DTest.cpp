@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionConst.h"
 #include "mitkRotationOperation.h"
 #include "mitkTestingMacros.h"
-#include "time.h"
+#include <ctime>
 
 /*
 * The mitkRotatedSlice4DTest loads a 4D image and extracts a specifically rotated slice in each time step's volume.
@@ -33,7 +33,7 @@ int mitkRotatedSlice4DTest(int, char *argv[])
   std::string filename = argv[1];
 
   // load 4D image
-  mitk::Image::Pointer image4D = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+  mitk::Image::Pointer image4D = mitk::IOUtil::Load<mitk::Image>(filename);
   // check inputs
   if (image4D.IsNull())
   {

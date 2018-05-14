@@ -61,7 +61,7 @@ public:
 
 protected:
     ShCoefficientImageExporter();
-    ~ShCoefficientImageExporter(){}
+    ~ShCoefficientImageExporter() override{}
 
     typename InputImageType::Pointer m_InputImage;
     CoefficientImageType::Pointer m_OutputImage;

@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkClusteringMetricEuclideanStd.h>
 #include <mitkClusteringMetricAnatomic.h>
 #include <mitkClusteringMetricScalarMap.h>
+#include <itksys/SystemTools.hxx>
 
 typedef itksys::SystemTools ist;
 typedef itk::Image<unsigned char, 3>    ItkFloatImgType;
@@ -39,7 +40,7 @@ mitk::FiberBundle::Pointer LoadFib(std::string filename)
 
 ItkFloatImgType::Pointer LoadItkImage(const std::string& filename)
 {
-  mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+  mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(filename);
   ItkFloatImgType::Pointer itkMask = ItkFloatImgType::New();
   mitk::CastToItkImage(img, itkMask);
   return itkMask;
@@ -62,7 +63,7 @@ int main(int argc, char* argv[])
   parser.addArgument("ref_masks", "", mitkCommandLineParser::StringList, "Ref. Masks:", "reference bundle masks", us::Any());
   parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
   parser.addArgument("distance", "", mitkCommandLineParser::Int, "Distance:", "", 10);
-  parser.addArgument("metric", "", mitkCommandLineParser::String, "Metric:", "");
+  parser.addArgument("metric", "", mitkCommandLineParser::String, "Metric:", "EU_MEAN (default), EU_STD, EU_MAX");
   parser.addArgument("subsample", "", mitkCommandLineParser::Float, "Subsampling factor:", "Only use specified fraction of input fibers", 1.0);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

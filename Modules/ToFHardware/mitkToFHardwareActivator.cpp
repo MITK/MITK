@@ -53,7 +53,7 @@ public:
     {
     }
 
-    ~ToFHardwareActivator()
+    ~ToFHardwareActivator() override
     {
         if(m_Factories.size() > 0)
         {

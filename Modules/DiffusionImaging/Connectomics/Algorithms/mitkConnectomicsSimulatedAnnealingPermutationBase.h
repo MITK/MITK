@@ -62,7 +62,7 @@ namespace mitk
 
     //////////////////// Functions ///////////////////////
     ConnectomicsSimulatedAnnealingPermutationBase();
-    ~ConnectomicsSimulatedAnnealingPermutationBase();
+    ~ConnectomicsSimulatedAnnealingPermutationBase() override;
 
     /////////////////////// Variables ////////////////////////
     // The cost function assigned to the permutation

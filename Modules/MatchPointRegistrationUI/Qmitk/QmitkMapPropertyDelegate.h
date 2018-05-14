@@ -39,7 +39,7 @@ public:
   ///
   /// Creates a new PropertyDelegate.
   ///
-  QmitkMapPropertyDelegate(QObject *parent = 0);
+  QmitkMapPropertyDelegate(QObject *parent = nullptr);
 
   ///
   /// Renders a specific property  (overwritten from QItemDelegate)

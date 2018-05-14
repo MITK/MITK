@@ -48,10 +48,17 @@ namespace mitk
   std::vector<itk::SmartPointer<BaseData> > PeakImageReader::Read()
   {
     std::vector<itk::SmartPointer<mitk::BaseData> > result;
+    std::string location = GetInputLocation();
+    std::string ext = itksys::SystemTools::GetFilenameExtension(location);
 
     typedef itk::ImageFileReader<PeakImage::ItkPeakImageType> FileReaderType;
     FileReaderType::Pointer reader = FileReaderType::New();
     reader->SetFileName(GetInputLocation());
+    if (ext==".peak")
+    {
+      itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+      reader->SetImageIO(io);
+    }
     reader->Update();
 
     Image::Pointer resultImage = dynamic_cast<Image*>(PeakImage::New().GetPointer());

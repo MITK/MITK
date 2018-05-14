@@ -51,7 +51,7 @@ namespace mitk
   PointSetWriterFactory::PointSetWriterFactory()
   {
     this->RegisterOverride(
-      "IOWriter", "PointSetWriter", "Point-Set Writer", 1, mitk::CreatePointSetWriter<mitk::PointSetWriter>::New());
+      "IOWriter", "PointSetWriter", "Point-Set Writer", true, mitk::CreatePointSetWriter<mitk::PointSetWriter>::New());
   }
 
   PointSetWriterFactory::~PointSetWriterFactory() {}

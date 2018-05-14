@@ -77,7 +77,7 @@ signals:
 
   protected:
 
-    void reject();
+    void reject() override;
 
     virtual void CreateConnections();
 

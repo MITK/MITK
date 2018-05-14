@@ -418,6 +418,36 @@ void mbilog::TextBackendBase::AppendTimeStamp(std::ostream &out)
 
 #ifdef USE_WIN32COLOREDCONSOLE
 
+// Get the horizontal and vertical screen sizes in pixel
+void GetDesktopResolution(int& horizontal, int& vertical)
+{
+    RECT desktop;
+    // Get a handle to the desktop window
+    const HWND hDesktop = GetDesktopWindow();
+    // Get the size of screen to the variable desktop
+    GetWindowRect(hDesktop, &desktop);
+    // The top left corner will have coordinates (0,0)
+      // and the bottom right corner will have coordinates
+      // (horizontal, vertical)
+    horizontal = desktop.right;
+    vertical = desktop.bottom;
+}
+
+BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData)
+ {
+  int *Count = (int*)dwData;
+  (*Count)++;
+  return TRUE;
+  }
+
+int GetMonitorCount()
+ {
+  int Count = 0;
+  if (EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (LPARAM)&Count))
+     return Count;
+  return -1;//signals an error
+}
+
 void mbilog::TextBackendBase::FormatSmartWindows(const mbilog::LogMessage &l, int /*threadID*/)
 {
   int colorNormal = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
@@ -582,6 +612,16 @@ void mbilog::TextBackendBase::FormatSmartWindows(const mbilog::LogMessage &l, in
   std::cout << l.message << std::endl;
 
   ChangeColor(colorNormal);
+
+  int monitorCount = GetMonitorCount();
+  if (monitorCount > 1) {
+    HWND consoleWindow = GetConsoleWindow();
+    int horizontal = 0, vertical = 0;
+    const int verticalSizeOfConsoleWindow = 300;
+    GetDesktopResolution(horizontal, vertical);
+    SetWindowPos(consoleWindow, 0, horizontal, vertical/2 - verticalSizeOfConsoleWindow, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+  }
+
 }
 
 #endif

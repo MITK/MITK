@@ -96,7 +96,7 @@ namespace mitk
 
     ToFCameraMITKPlayerController();
 
-    ~ToFCameraMITKPlayerController();
+    ~ToFCameraMITKPlayerController() override;
 
     int m_PixelNumber; ///< holds the number of pixels contained in the image
     int m_RGBPixelNumber; ///< same for RGB image

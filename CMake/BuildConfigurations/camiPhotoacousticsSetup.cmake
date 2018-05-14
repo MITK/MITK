@@ -9,8 +9,8 @@ set(MITK_US_DiPhAS_SDK_PATH "C:/Users/dkfz/Source/Repos/UltrasoundResearchPlatfo
 set(MITK_USE_OPHIR_PYRO_HARDWARE ON CACHE BOOL "Use the Ophir sensor build-in in OPOTEK Phocus Mobile" FORCE)
 set(MITK_OPHIR_API_PATH "C:/OphirCppWrapper" CACHE PATH "Ophir API Path")
 
-set(MITK_USE_OPOTEK_HARDWARE ON CACHE BOOL "Use hardware build-in in OPOTEK Phocus Mobile" FORCE)
-set(MITK_GALIL_API_PATH "C:/OphirCppWrapper" CACHE PATH "Galil API Path")
+set(MITK_USE_GALIL_HARDWARE ON CACHE BOOL "Use hardware build-in in OPOTEK Phocus Mobile" FORCE)
+set(MITK_GALIL_API_PATH "C:/Program Files (x86)/Galil/gclib" CACHE PATH "Galil API Path")
 
 # Enable default plugins and the navigation modules
 set(MITK_CONFIG_PLUGINS

@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_multilabelsegmentation The Multilabel Segmentation View
 
-\imageMacro{"multilabelsegmentation.png", "html", 12}
+\imageMacro{"multilabelsegmentation.svg", "Icon of the MultiLabelSegmentation Plugin", 12}
 
 Please reference \ref org_mitk_views_segmentation for the description of the general segmentation tools.
 

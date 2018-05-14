@@ -92,7 +92,7 @@ public:
                                      // can't be activated.
 
     // Load patient image
-    mitk::Image::Pointer patientImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath(patientImagePath))[0].GetPointer());
+    mitk::Image::Pointer patientImage = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath(patientImagePath));
     CPPUNIT_ASSERT(patientImage.IsNotNull());
     mitk::DataNode::Pointer patientImageNode = mitk::DataNode::New();
     patientImageNode->SetData(patientImage);
@@ -116,7 +116,7 @@ public:
     }
     else
     {
-      mitk::Image::Pointer preSegmentation = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath(preSegmentationImagePath))[0].GetPointer());
+      mitk::Image::Pointer preSegmentation = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath(preSegmentationImagePath));
       workingImageNode = tool->CreateSegmentationNode(preSegmentation, organName, color);
     }
 
@@ -144,7 +144,7 @@ public:
 
     // load reference segmentation image
     mitk::Image::Pointer segmentationReferenceImage =
-      dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath(referenceSegmentationImage))[0].GetPointer());
+      mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath(referenceSegmentationImage));
 
     mitk::Image::Pointer currentSegmentationImage = mitk::Image::New();
     currentSegmentationImage = dynamic_cast<mitk::Image *>(workingImageNode->GetData());

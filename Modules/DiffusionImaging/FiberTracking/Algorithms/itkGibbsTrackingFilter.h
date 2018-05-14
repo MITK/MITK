@@ -95,7 +95,7 @@ public:
     itkSetMacro(MaskImage, ItkFloatImageType::Pointer)
     itkSetMacro(TensorImage, ItkTensorImage::Pointer)
 
-    virtual void Update() override{
+    void Update() override{
         this->GenerateData();
     }
 
@@ -104,7 +104,7 @@ protected:
     void GenerateData() override;
 
     GibbsTrackingFilter();
-    virtual ~GibbsTrackingFilter();
+    ~GibbsTrackingFilter() override;
     void EstimateParticleWeight();
     void PrepareMaskImage();
     bool LoadParameters();

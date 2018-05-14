@@ -28,7 +28,7 @@
 #include "usServiceRegistry_p.h"
 #include "usServiceReferenceBasePrivate.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 US_BEGIN_NAMESPACE
 

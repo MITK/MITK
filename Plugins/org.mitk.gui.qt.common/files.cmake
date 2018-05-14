@@ -34,6 +34,7 @@ set(MOC_H_FILES
   src/QmitkDnDFrameWidget.h
   src/QmitkSelectionServiceConnector.h
   src/QmitkSliceNavigationListener.h
+  src/ImporterUtil.h
   src/QmitkSingleNodeSelectionWidget.h
   src/QmitkNodeSelectionDialog.h
   src/QmitkAbstractNodeSelectionWidget.h

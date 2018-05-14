@@ -5,7 +5,7 @@
     <view id="org.mitk.views.openigtlinkmanager"
           name="OpenIGTLink Manager"
           category="IGT"
-          class="OpenIGTLinkManager"
+          class="QmitkOpenIGTLinkManager"
           icon="resources/icon_openigtlink_manager.svg" />
   </extension>
 

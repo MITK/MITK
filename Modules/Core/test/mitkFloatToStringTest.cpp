@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/lexical_cast.hpp>
 
 #include "mitkEqual.h"
-#include <math.h>
+#include <cmath>
 
 #include "mitkLog.h"
 

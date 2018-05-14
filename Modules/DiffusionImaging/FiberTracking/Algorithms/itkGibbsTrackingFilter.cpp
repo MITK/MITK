@@ -34,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 // #include <QFile>
 #include <tinyxml.h>
-#include <math.h>
 #include <boost/progress.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -399,7 +398,7 @@ bool GibbsTrackingFilter< ItkOdfImageType >::LoadParameters()
 
     TiXmlHandle hDoc(&doc);
     TiXmlElement* pElem;
-    TiXmlHandle hRoot(0);
+    TiXmlHandle hRoot(nullptr);
 
     pElem = hDoc.FirstChildElement().Element();
     hRoot = TiXmlHandle(pElem);
@@ -430,7 +429,7 @@ bool GibbsTrackingFilter< ItkOdfImageType >::LoadParameters()
     m_MinFiberLength = boost::lexical_cast<float>(fiberLength);
 
     std::string curvThres(pElem->Attribute("curvature_threshold"));
-    m_CurvatureThreshold = cos(boost::lexical_cast<float>(curvThres)*M_PI/180);
+    m_CurvatureThreshold = cos(boost::lexical_cast<float>(curvThres)*itk::Math::pi/180);
     m_AbortTracking = false;
     MITK_INFO << "GibbsTrackingFilter: parameter file loaded successfully";
     return true;

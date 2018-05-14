@@ -124,6 +124,7 @@ protected slots:
 
 private:
 
+  bool CheckAndStoreLastParams(QObject* obj);
   void StartStopTrackingGui(bool start);
 
   std::vector< itk::Point<float> >        m_SeedPoints;
@@ -143,6 +144,9 @@ private:
   bool                                    m_DeleteTrackingHandler;
   QmitkSliceNavigationListener            m_SliceChangeListener;
   bool                                    m_Visible;
+  mitk::Identifiable::UIDType             m_LastPrior;
+  mitk::TrackingDataHandler*              m_TrackingPriorHandler;
+  std::map< QString, std::string >    m_LastTractoParams;
 };
 
 

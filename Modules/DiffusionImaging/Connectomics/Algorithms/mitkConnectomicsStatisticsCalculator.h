@@ -121,7 +121,7 @@ namespace mitk
 
     //////////////////// Functions ///////////////////////
     ConnectomicsStatisticsCalculator();
-    ~ConnectomicsStatisticsCalculator();
+    ~ConnectomicsStatisticsCalculator() override;
 
     void CalculateNumberOfVertices();
 

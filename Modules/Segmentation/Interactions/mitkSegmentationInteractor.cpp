@@ -21,7 +21,7 @@
 #include "mitkToolManagerProvider.h"
 #include <mitkImagePixelReadAccessor.h>
 
-#include <string.h>
+#include <cstring>
 
 void mitk::SegmentationInteractor::ConnectActionsAndFunctions()
 {

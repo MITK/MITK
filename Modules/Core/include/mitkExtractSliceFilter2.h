@@ -70,8 +70,9 @@ namespace mitk
     ~ExtractSliceFilter2() override;
 
     void AllocateOutputs() override;
-    void BeforeThreadedGenerateData() override;
-    void ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, itk::ThreadIdType threadId) override;
+    // void BeforeThreadedGenerateData() override;
+    // void ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, itk::ThreadIdType threadId) override;
+    void GenerateData() override;
     void VerifyInputInformation() override;
 
     struct Impl;

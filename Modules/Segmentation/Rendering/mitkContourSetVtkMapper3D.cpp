@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRenderer.h>
 #include <vtkTubeFilter.h>
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 
@@ -153,8 +153,6 @@ void mitk::ContourSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *re
     m_Actor->GetProperty()->SetColor(rgba);
     m_Actor->SetMapper(m_VtkPolyDataMapper);
   }
-
-  SetVtkMapperImmediateModeRendering(m_VtkPolyDataMapper);
 }
 
 const mitk::ContourSet *mitk::ContourSetVtkMapper3D::GetInput()

@@ -33,7 +33,7 @@ class MITKIGTUI_EXPORT QmitkNDIPolarisWidget : public QmitkNDIAbstractDeviceWidg
 public:
   static const std::string VIEW_ID;
 
-  QmitkNDIPolarisWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkNDIPolarisWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkNDIPolarisWidget() override;
 
   void Initialize() override;
@@ -63,7 +63,7 @@ protected:
 public:
   void ResetOutput() override;
   void AddOutput(std::string s) override;
-  virtual mitk::TrackingDevice::Pointer GetTrackingDevice() override;
+  mitk::TrackingDevice::Pointer GetTrackingDevice() override;
 
   void StoreUISettings() override;
   void LoadUISettings() override;

@@ -66,6 +66,9 @@ QmitkAdaptiveRegionGrowingToolGUI::QmitkAdaptiveRegionGrowingToolGUI(QWidget *pa
   // Not yet available
   // m_Controls.m_PreviewSlider->InvertedAppearance(true);
 
+  //3D preview doesn't work: T24430. Postponed until reimplementation of segmentation
+  m_Controls.m_cbVolumeRendering->setVisible(false);
+
   this->CreateConnections();
   this->SetDataNodeNames("labeledRGSegmentation", "RGResult", "RGFeedbackSurface", "maskedSegmentation");
 
@@ -128,7 +131,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::CreateConnections()
   connect((QObject *)(m_Controls.m_pbRunSegmentation), SIGNAL(clicked()), this, SLOT(RunSegmentation()));
   connect(m_Controls.m_PreviewSlider, SIGNAL(valueChanged(double)), this, SLOT(ChangeLevelWindow(double)));
   connect((QObject *)(m_Controls.m_pbConfirmSegementation), SIGNAL(clicked()), this, SLOT(ConfirmSegmentation()));
-  connect((QObject *)(m_Controls.m_cbVolumeRendering), SIGNAL(toggled(bool)), this, SLOT(UseVolumeRendering(bool)));
   connect(
     m_Controls.m_ThresholdSlider, SIGNAL(maximumValueChanged(double)), this, SLOT(SetUpperThresholdValue(double)));
   connect(

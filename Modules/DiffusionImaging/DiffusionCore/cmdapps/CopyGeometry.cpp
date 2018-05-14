@@ -56,8 +56,8 @@ int main(int argc, char* argv[])
 
   try
   {
-    mitk::Image::Pointer source = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(refImage)[0].GetPointer());
-    mitk::Image::Pointer target = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(imageName)[0].GetPointer());
+    mitk::Image::Pointer source = mitk::IOUtil::Load<mitk::Image>(refImage);
+    mitk::Image::Pointer target = mitk::IOUtil::Load<mitk::Image>(imageName);
     if (originOnly)
     {
       // Calculate correction to align centroids

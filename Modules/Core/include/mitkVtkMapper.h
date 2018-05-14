@@ -56,12 +56,6 @@ namespace mitk
 
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) = 0;
 
-    /** \brief Re-issues all drawing commands required to describe
-    * the entire scene each time a new frame is required,
-    * regardless of actual changes.
-    */
-    static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
-
     /**
     * \brief Returns whether this is an vtk-based mapper
     * \deprecatedSince{2013_03} All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead

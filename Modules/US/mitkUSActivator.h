@@ -39,7 +39,7 @@ class USActivator : public us::ModuleActivator {
 public:
 
   USActivator();
-  virtual ~USActivator();
+  ~USActivator() override;
 
   /**
     * \brief The mitk::USVideoDevice obejcts are loaded from hard disk and registered into micro service.

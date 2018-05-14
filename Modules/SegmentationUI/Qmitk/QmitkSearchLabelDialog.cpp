@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkSearchLabelDialog.h"
 
-#include "mitkOrganTypeProperty.h"
-
 #include <itkRGBPixel.h>
 
 #include <QAbstractItemModel>

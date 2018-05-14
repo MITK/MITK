@@ -27,22 +27,22 @@ namespace mitk {
   *
   */
 
-template< class ScalarType >
+template< class ScalarType = double >
 class RicianNoiseModel : public DiffusionNoiseModel< ScalarType >
 {
 public:
 
     RicianNoiseModel();
-    ~RicianNoiseModel();
+    ~RicianNoiseModel() override;
 
     typedef typename DiffusionNoiseModel< ScalarType >::PixelType      PixelType;
 
     /** Adds rician noise to the input pixel **/
-    void AddNoise(PixelType& pixel);
+    void AddNoise(PixelType& pixel) override;
 
-    void SetNoiseVariance(double var){ m_NoiseVariance = var; }
-    double GetNoiseVariance(){ return m_NoiseVariance; }
-    void SetSeed(int seed); ///< Set seed for random number generator
+    void SetNoiseVariance(double var) override{ m_NoiseVariance = var; }
+    double GetNoiseVariance() override{ return m_NoiseVariance; }
+    void SetSeed(int seed) override; ///< Set seed for random number generator
 
 protected:
 

@@ -120,7 +120,7 @@ namespace mitk
     void FromGMLCalibrationXML(TiXmlElement* elem);
     std::string ToOctaveString(const std::string& varName="CameraIntrinsics");
 
-    virtual ~CameraIntrinsics();
+    ~CameraIntrinsics() override;
 
   protected:
     CameraIntrinsics();
@@ -133,7 +133,7 @@ namespace mitk
 
   private:
 
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
   };
 
 } // namespace mitk

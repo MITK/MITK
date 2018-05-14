@@ -106,7 +106,7 @@ namespace
     const std::size_t yEnd = yBegin + outputRegion.GetSize(1);
 
     mitk::ImageWriteAccessor writeAccess(outputImage, nullptr, mitk::ImageAccessorBase::IgnoreLock);
-    auto data = static_cast<char*>(writeAccess.GetData());;
+    auto data = static_cast<char*>(writeAccess.GetData());
 
     const TPixel backgroundPixel = std::numeric_limits<TPixel>::lowest();
     TPixel pixel;
@@ -200,7 +200,7 @@ void mitk::ExtractSliceFilter2::AllocateOutputs()
   }
 }
 
-void mitk::ExtractSliceFilter2::BeforeThreadedGenerateData()
+/*void mitk::ExtractSliceFilter2::BeforeThreadedGenerateData()
 {
   if (nullptr != m_Impl->InterpolateImageFunction && this->GetInput()->GetMTime() < this->GetMTime())
     return;
@@ -213,6 +213,21 @@ void mitk::ExtractSliceFilter2::ThreadedGenerateData(const OutputImageRegionType
 {
   const auto* inputImage = this->GetInput();
   AccessFixedDimensionByItk_3(inputImage, ::GenerateData, 3, this->GetOutput(), outputRegionForThread, m_Impl->InterpolateImageFunction);
+}*/
+
+void mitk::ExtractSliceFilter2::GenerateData()
+{
+  if (nullptr != m_Impl->InterpolateImageFunction && this->GetInput()->GetMTime() < this->GetMTime())
+    return;
+
+  const auto* inputImage = this->GetInput();
+
+  AccessFixedDimensionByItk_2(inputImage, CreateInterpolateImageFunction, 3, this->GetInterpolator(), m_Impl->InterpolateImageFunction);
+
+  this->AllocateOutputs();
+  auto outputRegion = this->GetOutput()->GetLargestPossibleRegion();
+
+  AccessFixedDimensionByItk_3(inputImage, ::GenerateData, 3, this->GetOutput(), outputRegion, m_Impl->InterpolateImageFunction);
 }
 
 void mitk::ExtractSliceFilter2::SetInput(const InputImageType* image)

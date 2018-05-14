@@ -144,7 +144,6 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
   this->PolyDataMapper->SetScalarVisibility(this->GetScalarVisibility());
   this->PolyDataMapper->SetUseLookupTableScalarRange(this->GetUseLookupTableScalarRange());
   this->PolyDataMapper->SetScalarRange(this->GetScalarRange());
-  this->PolyDataMapper->SetImmediateModeRendering(this->GetImmediateModeRendering());
   this->PolyDataMapper->SetColorMode(this->GetColorMode());
   this->PolyDataMapper->SetInterpolateScalarsBeforeMapping(this->GetInterpolateScalarsBeforeMapping());
 

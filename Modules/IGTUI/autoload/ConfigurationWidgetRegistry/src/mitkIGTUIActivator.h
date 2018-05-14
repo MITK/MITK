@@ -33,7 +33,7 @@ namespace mitk
   {
     public:
       IGTUIActivator();
-      virtual ~IGTUIActivator();
+      ~IGTUIActivator() override;
       void Load(us::ModuleContext*) override;
       void Unload(us::ModuleContext*) override;
 

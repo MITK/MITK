@@ -76,13 +76,13 @@ public:
     * Constructs widget object. All gui control elements will be disabled until
     * QmitkUSAbstractCustomWidget::SetDevice() was called.
     */
-  explicit QmitkUSControlsCustomDiPhASDeviceWidget(QWidget *parent = 0);
+  QmitkUSControlsCustomDiPhASDeviceWidget();
   ~QmitkUSControlsCustomDiPhASDeviceWidget();
 
   /**
     * Getter for the device class of mitk:USDiPhASDevice.
     */
-  virtual std::string GetDeviceClass() const override;
+  std::string GetDeviceClass() const override;
 
   /**
     * Creates new QmitkUSAbstractCustomWidget with the same mitk::USDiPhASDevice
@@ -93,21 +93,22 @@ public:
     * QmitkUSAbstractCustomWidget::CloneForQt() instead, if you want a clone of
     * an object.
     */
-  virtual QmitkUSAbstractCustomWidget* Clone(QWidget* parent = 0) const override;
+  QmitkUSAbstractCustomWidget* Clone(QWidget* parent = nullptr) const override;
 
   /**
     * Gets control interface from the device which was currently set. Control
     * elements are according to current crop area of the device. If custom
     * control interface is null, the control elements stay disabled.
     */
-  virtual void OnDeviceSet() override;
+  void OnDeviceSet() override;
 
-  virtual void Initialize() override;
+  void Initialize() override;
 
 protected:
   void BlockSignalAndSetValue(QSpinBox* target, int value);
 
 private:
+  QmitkUSControlsCustomDiPhASDeviceWidget(QWidget *parent);
   Ui::QmitkUSControlsCustomDiPhASDeviceWidget*         ui;
   mitk::USDiPhASDeviceCustomControls::Pointer  m_ControlInterface;
   int m_OldReconstructionLines;

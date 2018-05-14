@@ -27,7 +27,7 @@ namespace mitk
     this->RegisterOverride("mitkIOAdapter",
                            "mitkPointSetReader",
                            "mitk PointSet IO",
-                           1,
+                           true,
                            itk::CreateObjectFunction<IOAdapter<PointSetReader>>::New());
   }
 

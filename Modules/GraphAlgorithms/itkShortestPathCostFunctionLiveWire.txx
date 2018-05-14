@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkShortestPathCostFunctionLiveWire.h"
 
-#include <math.h>
+#include <cmath>
 
 #include <itkCannyEdgeDetectionImageFilter.h>
 #include <itkCastImageFilter.h>

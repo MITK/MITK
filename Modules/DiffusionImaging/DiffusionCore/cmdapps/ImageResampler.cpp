@@ -384,9 +384,9 @@ int main( int argc, char* argv[] )
 
   mitk::Image::Pointer refImage;
   if (!useSpacing)
-    refImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(refImageFile)[0].GetPointer());
+    refImage = mitk::IOUtil::Load<mitk::Image>(refImageFile);
 
-  mitk::Image::Pointer inputDWI = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(inputFile)[0].GetPointer());
+  mitk::Image::Pointer inputDWI = mitk::IOUtil::Load<mitk::Image>(inputFile);
   if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(inputDWI.GetPointer()))
   {
     mitk::Image::Pointer outputImage;
@@ -403,7 +403,7 @@ int main( int argc, char* argv[] )
 
     return EXIT_SUCCESS;
   }
-  mitk::Image::Pointer inputImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(inputFile)[0].GetPointer());
+  mitk::Image::Pointer inputImage = mitk::IOUtil::Load<mitk::Image>(inputFile);
 
 
   mitk::Image::Pointer resultImage;

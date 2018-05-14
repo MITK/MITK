@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>QmitkOdfMaximaExtractionViewControls</class>
  <widget class="QWidget" name="QmitkOdfMaximaExtractionViewControls">
@@ -12,6 +12,43 @@
   </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string>QCommandLinkButton {
+  font-weight: normal;
+}
+
+QCommandLinkButton:disabled {
+  border: none;
+  font-weight: lighter;
+}
+
+QToolBox::tab {
+  border: 1px solid #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:hover {
+  background-color: #434346;
+  font-weight: bold;
+}
+
+QToolBox::tab:selected {
+  background-color: #1c97ea;
+  border: 1px solid #1c97ea;
+  font-weight: bold;
+}
+
+QGroupBox {
+  border: 1px solid #434346;
+  background-color: #2d2d30;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: #2d2d30;
+}</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <property name="verticalSpacing">
@@ -71,16 +108,16 @@
         </property>
         <layout class="QGridLayout" name="gridLayout_5">
          <property name="leftMargin">
-          <number>0</number>
+          <number>6</number>
          </property>
          <property name="topMargin">
-          <number>0</number>
+          <number>6</number>
          </property>
          <property name="rightMargin">
-          <number>0</number>
+          <number>6</number>
          </property>
          <property name="bottomMargin">
-          <number>0</number>
+          <number>6</number>
          </property>
          <item row="0" column="0">
           <widget class="QLabel" name="label_4">
@@ -100,10 +137,10 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_ImageBox"/>
+          <widget class="QmitkDataStorageComboBox" name="m_ImageBox"></widget>
          </item>
          <item row="1" column="1">
-          <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MaskBox"/>
+          <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MaskBox"></widget>
          </item>
         </layout>
        </widget>
@@ -121,16 +158,16 @@
        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
       </property>
       <property name="leftMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <item row="0" column="0">
        <widget class="QCheckBox" name="m_OutputNumDirectionsBox">
@@ -155,16 +192,16 @@
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <item row="0" column="0">
        <widget class="QFrame" name="frame_2">
@@ -348,7 +385,7 @@
          <item row="5" column="1">
           <widget class="QSpinBox" name="m_ClusteringAngleBox">
            <property name="toolTip">
-            <string>Cluster close directions. Define &quot;close&quot; here.</string>
+            <string>Cluster close directions. Define "close" here.</string>
            </property>
            <property name="maximum">
             <number>90</number>
@@ -394,47 +431,6 @@
      </layout>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QGroupBox" name="groupBox_3">
-     <property name="title">
-      <string>Spherical Harmonic Convention</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_6">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item row="0" column="0">
-       <widget class="QComboBox" name="m_ToolkitBox">
-        <property name="toolTip">
-         <string>Define SH coefficient convention (depends on toolkit)</string>
-        </property>
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <item>
-         <property name="text">
-          <string>MITK/FSL</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>MRtrix</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
    <item row="17" column="0">
     <spacer name="verticalSpacer">
      <property name="orientation">
@@ -448,15 +444,61 @@
      </property>
     </spacer>
    </item>
+   <item row="8" column="0">
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Spherical Harmonic Convention</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_6">
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QComboBox" name="m_ToolkitBox">
+        <property name="toolTip">
+         <string>Define SH coefficient convention (depends on toolkit)</string>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <item>
+         <property name="text">
+          <string>MITK/MRtrix</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>FSL</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">QmitkDataStorageComboBox.h</header>
+  </customwidget>
   <customwidget>
    <class>QmitkDataStorageComboBoxWithSelectNone</class>
    <extends>QComboBox</extends>
    <header>QmitkDataStorageComboBoxWithSelectNone.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
- <connections/>
+ <resources></resources>
+ <connections></connections>
 </ui>

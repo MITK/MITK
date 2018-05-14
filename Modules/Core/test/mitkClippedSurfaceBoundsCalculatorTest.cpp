@@ -15,15 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTestingMacros.h"
-#define _USE_MATH_DEFINES
 #include <iostream>
 
 #include "mitkClippedSurfaceBoundsCalculator.h"
 #include "mitkGeometry3D.h"
 #include "mitkNumericTypes.h"
 #include "mitkPlaneGeometry.h"
-
-#include <cmath>
 
 static void CheckPlanesInsideBoundingBoxOnlyOnOneSlice(mitk::BaseGeometry::Pointer geometry3D)
 {
@@ -633,7 +630,7 @@ static void CheckIntersectionWithRotatedGeometry90()
   }
 
   // now we make a rotation of the Image about 270 degrees around  Z Axis to get an aligment on the positiv x axis
-  double angleInDegrees = 270 * M_PI / 180;
+  double angleInDegrees = 270 * itk::Math::pi / 180;
 
   mitk::AffineTransform3D::MatrixType matrix2;
   matrix2[0][0] = cos(angleInDegrees);

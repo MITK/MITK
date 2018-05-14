@@ -50,7 +50,7 @@ namespace mitk
 
     if ( location == "")
     {
-      throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, the filename of the vessel tree to be read is empty!");
+      throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, the filename of the ODF image to be read is empty!");
     }
     else
     {

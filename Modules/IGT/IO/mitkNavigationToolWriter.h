@@ -58,7 +58,7 @@ namespace mitk
 
   protected:
     NavigationToolWriter();
-    ~NavigationToolWriter();
+    ~NavigationToolWriter() override;
     std::string m_ErrorMessage;
     mitk::DataNode::Pointer ConvertToDataNode(mitk::NavigationTool::Pointer Tool);
     std::string GetFileWithoutPath(std::string FileWithPath);

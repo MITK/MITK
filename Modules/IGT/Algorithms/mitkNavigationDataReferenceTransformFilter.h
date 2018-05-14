@@ -96,7 +96,7 @@ namespace mitk {
     /**
     * \brief Destructor
     **/
-    virtual ~NavigationDataReferenceTransformFilter();
+    ~NavigationDataReferenceTransformFilter() override;
 
     QuaternionTransformType::Pointer m_QuaternionTransform; ///< itk Quaternion transform
 

@@ -62,15 +62,15 @@ public:
   typedef itk::Image<DiffusionPixelType, 3> ITKDiffusionVolumeType;
 
   mitk::Image::Pointer GetCorrectedImage() const;
-  void UpdateOutputInformation();
+  void UpdateOutputInformation() override;
 
 protected:
   DWIHeadMotionCorrectionFilter();
-  virtual ~DWIHeadMotionCorrectionFilter() {}
+  ~DWIHeadMotionCorrectionFilter() override {}
 
   mitk::Image::Pointer m_CorrectedImage;
 
-  virtual void GenerateData() override;
+  void GenerateData() override;
 
 };
 

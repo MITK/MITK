@@ -27,7 +27,7 @@ namespace mitk
     this->RegisterOverride("mitkIOAdapter",
                            "mitkParRecFileReader",
                            "mitk ParRec Image IO",
-                           1,
+                           true,
                            itk::CreateObjectFunction<IOAdapter<ParRecFileReader>>::New());
   }
 

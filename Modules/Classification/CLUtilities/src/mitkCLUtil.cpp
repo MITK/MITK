@@ -13,6 +13,12 @@
 // itk includes
 #include <itkCheckerBoardImageFilter.h>
 #include <itkShapedNeighborhoodIterator.h>
+#include "itkHessianRecursiveGaussianImageFilter.h"
+#include "itkUnaryFunctorImageFilter.h"
+#include "vnl/algo/vnl_symmetric_eigensystem.h"
+#include <itkLaplacianRecursiveGaussianImageFilter.h>
+#include <itkMultiHistogramFilter.h>
+
 // Morphologic Operations
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryDilateImageFilter.h>
@@ -25,6 +31,7 @@
 
 // Image Filter
 #include <itkDiscreteGaussianImageFilter.h>
+#include <itkSubtractImageFilter.h>
 
 void mitk::CLUtil::ProbabilityMap(const mitk::Image::Pointer & image , double mean, double stddev, mitk::Image::Pointer & outimage)
 {
@@ -102,6 +109,27 @@ void mitk::CLUtil::GaussianFilter(mitk::Image::Pointer image, mitk::Image::Point
   AccessFixedDimensionByItk_2(image, mitk::CLUtil::itkGaussianFilter,3, smoothed, sigma);
 }
 
+void mitk::CLUtil::DifferenceOfGaussianFilter(mitk::Image::Pointer image, mitk::Image::Pointer & smoothed, double sigma1, double sigma2)
+{
+  AccessFixedDimensionByItk_3(image, mitk::CLUtil::itkDifferenceOfGaussianFilter, 3, smoothed, sigma1, sigma2);
+}
+
+void mitk::CLUtil::LaplacianOfGaussianFilter(mitk::Image::Pointer image, mitk::Image::Pointer & smoothed, double sigma1)
+{
+  AccessByItk_2(image, mitk::CLUtil::itkLaplacianOfGaussianFilter, sigma1, smoothed);
+}
+
+void mitk::CLUtil::HessianOfGaussianFilter(mitk::Image::Pointer image, std::vector<mitk::Image::Pointer> &out, double sigma)
+{
+  AccessByItk_2(image, mitk::CLUtil::itkHessianOfGaussianFilter, sigma, out);
+}
+
+void mitk::CLUtil::LocalHistogram(mitk::Image::Pointer image, std::vector<mitk::Image::Pointer> &out, int Bins, int NeighbourhoodSize)
+{
+  AccessByItk_3(image, mitk::CLUtil::itkLocalHistograms, out, NeighbourhoodSize, Bins);
+}
+
+
 
 void mitk::CLUtil::DilateBinary(mitk::Image::Pointer & sourceImage, mitk::Image::Pointer& resultImage, int factor , MorphologicalDimensions d)
 {
@@ -138,7 +166,7 @@ void mitk::CLUtil::itkProbabilityMap(const TImageType * sourceImage, double mean
   {
     double x = it.Value();
 
-    double prob = (1.0/(std_dev*std::sqrt(2.0*M_PI))) * std::exp(-(((x-mean)*(x-mean))/(2.0*std_dev*std_dev)));
+    double prob = (1.0/(std_dev*std::sqrt(2.0*itk::Math::pi))) * std::exp(-(((x-mean)*(x-mean))/(2.0*std_dev*std_dev)));
     outit.Set(prob);
     ++it;
     ++outit;
@@ -430,6 +458,126 @@ void mitk::CLUtil::itkGaussianFilter(TImageType * image, mitk::Image::Pointer & 
   filter->Update();
 
   mitk::CastToMitkImage(filter->GetOutput(),smoothed);
+}
+
+template<class TImageType>
+void mitk::CLUtil::itkDifferenceOfGaussianFilter(TImageType * image, mitk::Image::Pointer & smoothed, double sigma1, double sigma2)
+{
+  typedef itk::DiscreteGaussianImageFilter<TImageType, TImageType> FilterType;
+  typedef itk::SubtractImageFilter <TImageType, TImageType> SubtractFilterType;
+  typename FilterType::Pointer filter1 = FilterType::New();
+  typename FilterType::Pointer filter2 = FilterType::New();
+  typename SubtractFilterType::Pointer subFilter = SubtractFilterType::New();
+  filter1->SetInput(image);
+  filter1->SetVariance(sigma1);
+  filter1->Update();
+  filter2->SetInput(image);
+  filter2->SetVariance(sigma2);
+  filter2->Update();
+  subFilter->SetInput1(filter1->GetOutput());
+  subFilter->SetInput2(filter2->GetOutput());
+  subFilter->Update();
+
+  mitk::CastToMitkImage(subFilter->GetOutput(), smoothed);
+}
+
+
+template<typename TPixel, unsigned int VImageDimension>
+void mitk::CLUtil::itkLaplacianOfGaussianFilter(itk::Image<TPixel, VImageDimension>* itkImage, double variance, mitk::Image::Pointer &output)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::DiscreteGaussianImageFilter< ImageType, ImageType >  GaussFilterType;
+  typedef itk::LaplacianRecursiveGaussianImageFilter<ImageType, ImageType>    LaplacianFilter;
+
+  typename GaussFilterType::Pointer gaussianFilter = GaussFilterType::New();
+  gaussianFilter->SetInput(itkImage);
+  gaussianFilter->SetVariance(variance);
+  gaussianFilter->Update();
+  typename LaplacianFilter::Pointer laplaceFilter = LaplacianFilter::New();
+  laplaceFilter->SetInput(gaussianFilter->GetOutput());
+  laplaceFilter->Update();
+  mitk::CastToMitkImage(laplaceFilter->GetOutput(), output);
+}
+
+namespace Functor
+{
+  template <class TInput, class TOutput>
+  class MatrixFirstEigenvalue
+  {
+  public:
+    MatrixFirstEigenvalue() {}
+    virtual ~MatrixFirstEigenvalue() {}
+
+    int order;
+
+    inline TOutput operator ()(const TInput& input)
+    {
+      double a, b, c;
+      if (input[0] < 0.01 && input[1] < 0.01 &&input[2] < 0.01 &&input[3] < 0.01 &&input[4] < 0.01 &&input[5] < 0.01)
+        return 0;
+      vnl_symmetric_eigensystem_compute_eigenvals(input[0], input[1], input[2], input[3], input[4], input[5], a, b, c);
+      switch (order)
+      {
+      case 0: return a;
+      case 1: return b;
+      case 2: return c;
+      default: return a;
+      }
+    }
+    bool operator !=(const MatrixFirstEigenvalue) const
+    {
+      return false;
+    }
+    bool operator ==(const MatrixFirstEigenvalue& other) const
+    {
+      return !(*this != other);
+    }
+  };
+}
+
+template<typename TPixel, unsigned int VImageDimension>
+void mitk::CLUtil::itkHessianOfGaussianFilter(itk::Image<TPixel, VImageDimension>* itkImage, double variance, std::vector<mitk::Image::Pointer> &out)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::Image<double, VImageDimension> FloatImageType;
+  typedef itk::HessianRecursiveGaussianImageFilter <ImageType> HessianFilterType;
+  typedef typename HessianFilterType::OutputImageType VectorImageType;
+  typedef Functor::MatrixFirstEigenvalue<typename VectorImageType::PixelType, double> DeterminantFunctorType;
+  typedef itk::UnaryFunctorImageFilter<VectorImageType, FloatImageType, DeterminantFunctorType> DetFilterType;
+
+  typename HessianFilterType::Pointer hessianFilter = HessianFilterType::New();
+  hessianFilter->SetInput(itkImage);
+  hessianFilter->SetSigma(std::sqrt(variance));
+  for (unsigned int i = 0; i < VImageDimension; ++i)
+  {
+    mitk::Image::Pointer tmpImage = mitk::Image::New();
+    typename DetFilterType::Pointer detFilter = DetFilterType::New();
+    detFilter->SetInput(hessianFilter->GetOutput());
+    detFilter->GetFunctor().order = i;
+    detFilter->Update();
+    mitk::CastToMitkImage(detFilter->GetOutput(), tmpImage);
+    out.push_back(tmpImage);
+  }
+}
+
+template<typename TPixel, unsigned int VImageDimension>
+void mitk::CLUtil::itkLocalHistograms(itk::Image<TPixel, VImageDimension>* itkImage, std::vector<mitk::Image::Pointer> &out, int size, int bins)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::MultiHistogramFilter <ImageType, ImageType> MultiHistogramType;
+
+  typename MultiHistogramType::Pointer filter = MultiHistogramType::New();
+  filter->SetInput(itkImage);
+  filter->SetUseImageIntensityRange(true);
+  filter->SetSize(size);
+  filter->SetBins(bins);
+  filter->Update();
+  for (int i = 0; i < bins; ++i)
+  {
+    mitk::Image::Pointer img = mitk::Image::New();
+    mitk::CastToMitkImage(filter->GetOutput(i), img);
+    out.push_back(img);
+  }
 }
 
 template<class TImageType>

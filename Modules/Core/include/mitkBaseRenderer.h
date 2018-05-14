@@ -78,9 +78,7 @@ namespace mitk
     {
       enum Type
       {
-        Standard = 0,  // no multi-sampling, no depth-peeling
-        MultiSampling, // multi-sampling (antialiasing), no depth-peeling
-        DepthPeeling   // no multi-sampling, depth-peeling is on (order-independant transparency)
+        Standard = 0
       };
     };
 
@@ -178,8 +176,8 @@ namespace mitk
     //## \sa m_WorldGeometry
     //## \sa m_WorldTimeGeometry
     //## \sa m_CurrentWorldPlaneGeometry
-    virtual void SetWorldGeometry3D(BaseGeometry *geometry);
-    virtual void SetWorldTimeGeometry(mitk::TimeGeometry *geometry);
+    virtual void SetWorldGeometry3D(const BaseGeometry *geometry);
+    virtual void SetWorldTimeGeometry(const mitk::TimeGeometry *geometry);
 
     /**
     * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see
@@ -187,7 +185,7 @@ namespace mitk
     */
     DEPRECATED(void SetWorldGeometry3D(TimeSlicedGeometry *geometry));
 
-    itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry) itkGetObjectMacro(WorldTimeGeometry, TimeGeometry)
+    itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry)
 
       //##Documentation
       //## @brief Get the current 3D-worldgeometry (m_CurrentWorldGeometry) used for 3D-rendering
@@ -455,14 +453,14 @@ namespace mitk
 
     //##Documentation
     //## @brief Sets m_CurrentWorldPlaneGeometry
-    virtual void SetCurrentWorldPlaneGeometry(PlaneGeometry *geometry2d);
+    virtual void SetCurrentWorldPlaneGeometry(const PlaneGeometry *geometry2d);
     /**
     * \deprecatedSince{2014_10} Please use SetCurrentWorldPlaneGeometry
     */
     DEPRECATED(void SetCurrentWorldGeometry2D(PlaneGeometry *geometry2d)) { SetCurrentWorldPlaneGeometry(geometry2d); };
     //##Documentation
     //## @brief Sets m_CurrentWorldGeometry
-    virtual void SetCurrentWorldGeometry(BaseGeometry *geometry);
+    virtual void SetCurrentWorldGeometry(const BaseGeometry *geometry);
 
   private:
     //##Documentation
@@ -472,11 +470,11 @@ namespace mitk
     //## which 2D geometry stored in m_WorldTimeGeometry (if available)
     //## is used as m_CurrentWorldPlaneGeometry.
     //## \sa m_CurrentWorldPlaneGeometry
-    TimeGeometry::Pointer m_WorldTimeGeometry;
+    TimeGeometry::ConstPointer m_WorldTimeGeometry;
 
     //##Documentation
     //## Pointer to the current 3D-worldgeometry.
-    BaseGeometry::Pointer m_CurrentWorldGeometry;
+    BaseGeometry::ConstPointer m_CurrentWorldGeometry;
 
     //##Documentation
     //## Pointer to the current 2D-worldgeometry. The 2D-worldgeometry

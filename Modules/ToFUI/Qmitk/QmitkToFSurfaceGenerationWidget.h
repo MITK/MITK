@@ -53,8 +53,8 @@ class MITKTOFUI_EXPORT QmitkToFSurfaceGenerationWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkToFSurfaceGenerationWidget (QWidget* p = 0, Qt::WindowFlags f1 = 0);
-    virtual ~QmitkToFSurfaceGenerationWidget ();
+    QmitkToFSurfaceGenerationWidget (QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
+    ~QmitkToFSurfaceGenerationWidget () override;
 
     /* @brief Automatically called method. */
     virtual void CreateQtPartControl(QWidget *parent);

@@ -15,11 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkClaronTool.h"
-#include <stdio.h>
+#include <cstdio>
 #include <vector>
 #include <iostream>
 
-mitk::ClaronTool::ClaronTool() :InternalTrackingTool()
+mitk::ClaronTool::ClaronTool() : TrackingTool()
 {
 }
 

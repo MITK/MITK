@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 
   try
   {
-    mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(inFib)[0].GetPointer());
+    mitk::FiberBundle::Pointer inputTractogram = mitk::IOUtil::Load<mitk::FiberBundle>(inFib);
 
     itk::TractDensityImageFilter< ItkFloatImgType >::Pointer generator = itk::TractDensityImageFilter< ItkFloatImgType >::New();
     generator->SetFiberBundle(inputTractogram);

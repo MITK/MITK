@@ -51,7 +51,7 @@ namespace mitk
     mitk::PolhemusTrackingDevice::Pointer thisDevice = dynamic_cast<mitk::PolhemusTrackingDevice*>(trackingDevice.GetPointer());
     *toolCorrespondencesInToolStorage = std::vector<int>();
     //add the tools to the tracking device
-    for (int i = 0; i < navigationTools->GetToolCount(); i++)
+    for (unsigned int i = 0; i < navigationTools->GetToolCount(); i++)
     {
       mitk::NavigationTool::Pointer thisNavigationTool = navigationTools->GetTool(i);
       toolCorrespondencesInToolStorage->push_back(i);
@@ -62,7 +62,7 @@ namespace mitk
         errorMessage->append("Can't add tool, is the toolfile valid?");
         return NULL;
       }
-      thisDevice->GetTool(i)->SetToolTip(thisNavigationTool->GetToolTipPosition(), thisNavigationTool->GetToolTipOrientation());
+      thisDevice->GetTool(i)->SetToolTipPosition(thisNavigationTool->GetToolTipPosition(), thisNavigationTool->GetToolAxisOrientation());
     }
     returnValue->SetTrackingDevice(thisDevice);
     return returnValue;

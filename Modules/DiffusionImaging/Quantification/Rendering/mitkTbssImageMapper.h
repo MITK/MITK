@@ -42,7 +42,7 @@ namespace mitk {
   protected:
 
     TbssImageMapper();
-    virtual ~TbssImageMapper();
+    ~TbssImageMapper() override;
 
   };
 

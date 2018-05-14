@@ -108,7 +108,7 @@ namespace mitk {
     //itkCloneMacro(Self)
 
     IGTLMeasurements();
-    ~IGTLMeasurements();
+    ~IGTLMeasurements() override;
 
     // Disable copy constructor and assignment operator.
     IGTLMeasurements(const IGTLMeasurements&);

@@ -27,7 +27,7 @@ class MITKDIFFUSIONCORE_EXPORT ADCFitFunctor : public DWIVoxelFunctor
 {
 public:
   ADCFitFunctor(){}
-  ~ADCFitFunctor(){}
+  ~ADCFitFunctor() override{}
 
   typedef ADCFitFunctor                       Self;
   typedef SmartPointer<Self>                      Pointer;

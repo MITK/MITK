@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageStatisticsCalculator.h>
 #include <mitkUnstructuredGrid.h>
 
-mitk::ImageToPointCloudFilter::ImageToPointCloudFilter() : m_NumberOfExtractedPoints(0)
+mitk::ImageToPointCloudFilter::ImageToPointCloudFilter()
 {
   m_Method = DetectionMethod(0);
 

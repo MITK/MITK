@@ -2,7 +2,6 @@ set(MODULE_TESTS
   mitkColorSequenceRainbowTest.cpp
   mitkMeshTest.cpp
   mitkMultiStepperTest.cpp
-  mitkOrganTypePropertyTest.cpp
   mitkUnstructuredGridTest.cpp
 )
 

@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCommand.h>
 #include <mitkRenderingManager.h>
 
-#include <math.h>
+#include <cmath>
 
 /**
 * Constructor

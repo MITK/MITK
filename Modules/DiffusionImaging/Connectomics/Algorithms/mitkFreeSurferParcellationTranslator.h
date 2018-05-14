@@ -46,7 +46,7 @@ namespace mitk
       itkNewMacro(    FreeSurferParcellationTranslator )
     protected:
       FreeSurferParcellationTranslator();
-      ~FreeSurferParcellationTranslator();
+      ~FreeSurferParcellationTranslator() override;
 
 
       /*###########      Methods      ###########*/

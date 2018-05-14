@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QGridLayout>
 #include <itkDataObject.h>
 #include <mitkNavigationDataSource.h>
-#include <math.h>
+#include <cmath>
 
 
 

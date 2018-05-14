@@ -269,6 +269,12 @@ namespace mitk
     static std::vector<BaseData::Pointer> Load(const std::string &path,
                                                const ReaderOptionsFunctorBase *optionsCallback = nullptr);
 
+    template <typename T>
+    static typename T::Pointer Load(const std::string& path, const ReaderOptionsFunctorBase *optionsCallback = nullptr)
+    {
+      return dynamic_cast<T*>(Load(path, optionsCallback).at(0).GetPointer());
+    }
+
     /**
     * @brief Load a file and return the loaded data.
     *
@@ -284,6 +290,12 @@ namespace mitk
     * @sa Load(const std::vector<std::string>&, DataStorage&)
     */
     static std::vector<BaseData::Pointer> Load(const std::string &path, const IFileReader::Options &options);
+
+    template <typename T>
+    static typename T::Pointer Load(const std::string& path, const IFileReader::Options &options)
+    {
+      return dynamic_cast<T*>(Load(path, options).at(0).GetPointer());
+    }
 
     /**
      * @brief Loads a list of file paths into the given DataStorage.
@@ -306,42 +318,6 @@ namespace mitk
                                                const ReaderOptionsFunctorBase *optionsCallback = nullptr);
 
     /**
-     * @brief LoadImage Convenience method to load an arbitrary mitkImage.
-     * @param path The path to the image including file name and file extension.
-     * @param optionsCallback Pointer to a callback instance. The callback is used by
-     * the load operation if more the suitable reader was found or the reader has options
-     * that can be set.
-     * @throws mitk::Exception This exception is thrown when the Image is nullptr.
-     * @return Returns the mitkImage.
-     */
-    static mitk::Image::Pointer LoadImage(const std::string &path,
-      const ReaderOptionsFunctorBase *optionsCallback = nullptr);
-
-    /**
-     * @brief LoadSurface Convenience method to load an arbitrary mitkSurface.
-     * @param path The path to the surface including file name and file extension.
-     * @param optionsCallback Pointer to a callback instance. The callback is used by
-     * the load operation if more the suitable reader was found or the reader has options
-     * that can be set.
-     * @throws mitk::Exception This exception is thrown when the Surface is nullptr.
-     * @return Returns the mitkSurface.
-     */
-    static mitk::Surface::Pointer LoadSurface(const std::string &path,
-      const ReaderOptionsFunctorBase *optionsCallback = nullptr);
-
-    /**
-     * @brief LoadPointSet Convenience method to load an arbitrary mitkPointSet.
-     * @param path The path to the pointset including file name and file extension (currently, only .mps is supported).
-     * @param optionsCallback Pointer to a callback instance. The callback is used by
-     * the load operation if more the suitable reader was found or the reader has options
-     * that can be set.
-     * @throws mitk::Exception This exception is thrown when the PointSet is nullptr.
-     * @return Returns the mitkPointSet.
-     */
-    static mitk::PointSet::Pointer LoadPointSet(const std::string &path,
-      const ReaderOptionsFunctorBase *optionsCallback = nullptr);
-
-    /**
      * @brief Loads the contents of a us::ModuleResource and returns the corresponding mitk::BaseData
      * @param usResource a ModuleResource, representing a BaseData object
      * @param mode Optional parameter to set the openmode of the stream
@@ -352,6 +328,12 @@ namespace mitk
      */
     static std::vector<BaseData::Pointer> Load(const us::ModuleResource &usResource,
                                                std::ios_base::openmode mode = std::ios_base::in);
+
+    template <typename T>
+    static typename T::Pointer Load(const us::ModuleResource &usResource, std::ios_base::openmode mode = std::ios_base::in)
+    {
+      return dynamic_cast<T*>(Load(usResource, mode).at(0).GetPointer());
+    }
 
     /**
      * @brief Save a mitk::BaseData instance.

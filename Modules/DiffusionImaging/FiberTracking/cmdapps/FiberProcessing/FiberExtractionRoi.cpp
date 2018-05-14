@@ -37,7 +37,7 @@ typedef itk::Image<float, 3>    ItkFloatImgType;
 
 ItkFloatImgType::Pointer LoadItkImage(const std::string& filename)
 {
-  mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+  mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(filename);
   ItkFloatImgType::Pointer itk_image = ItkFloatImgType::New();
   mitk::CastToItkImage(img, itk_image);
   return itk_image;
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
   parser.addArgument("overlap_fraction", "", mitkCommandLineParser::Float, "Overlap fraction:", "Extract by overlap, not by endpoints. Extract fibers that overlap to at least the provided factor (0-1) with the ROI.", -1);
   parser.addArgument("invert", "", mitkCommandLineParser::Bool, "Invert:", "get streamlines not positive for any of the ROI images", false);
   parser.addArgument("interpolate", "", mitkCommandLineParser::Bool, "Interpolate:", "interpolate ROI images", false);
-  parser.addArgument("threshold", "", mitkCommandLineParser::Float, "Threshold:", "positive means ROI image value threshold", false, 0.5);
+  parser.addArgument("threshold", "", mitkCommandLineParser::Float, "Threshold:", "positive means ROI image value threshold", 0.5);
   parser.addArgument("labels", "", mitkCommandLineParser::StringList, "Labels:", "positive means roi image value in labels vector", false);
   parser.addArgument("split_labels", "", mitkCommandLineParser::Bool, "Split labels:", "output a separate tractogram for each label-->label tract", false);
   parser.addArgument("skip_self_connections", "", mitkCommandLineParser::Bool, "Skip self connections:", "ignore streamlines between two identical labels", false);
@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
   try
   {
     // load fiber bundle
-    mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(inFib)[0].GetPointer());
+    mitk::FiberBundle::Pointer inputTractogram = mitk::IOUtil::Load<mitk::FiberBundle>(inFib);
 
     std::vector< ItkFloatImgType::Pointer > roi_images;
     for (std::size_t i=0; i<roi_files.size(); ++i)

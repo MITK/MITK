@@ -51,6 +51,7 @@ namespace mitk
 
   protected:
     virtual std::vector<std::string> FixUpImageIOExtensions(const std::string &imageIOName);
+    virtual void FixUpCustomMimeTypeName(const std::string &imageIOName, CustomMimeType &customMimeType);
 
     // Fills the m_DefaultMetaDataKeys vector with default values
     virtual void InitializeDefaultMetaDataKeys();

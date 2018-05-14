@@ -61,7 +61,7 @@ namespace mitk
      *
      * \param img the image to fill with the data from the OIGTL message.
      */
-    virtual void GetNextRawImage(mitk::Image::Pointer& img);
+    void GetNextRawImage(std::vector<mitk::Image::Pointer>& imgVector) override;
 
   private:
     mitk::IGTLMessageSource* m_upstream;

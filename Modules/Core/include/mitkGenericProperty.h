@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE
 
 #include <sstream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
 
 #include "mitkBaseProperty.h"

@@ -73,8 +73,7 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
 
   if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::jacobiSvd == algorithmIndex)
   {
-    mitkThrow() << "not working";
-    resultVector = EndmemberMatrix.jacobiSvd().solve(inputVector); //not working
+    resultVector = EndmemberMatrix.jacobiSvd(Eigen::ComputeFullU | Eigen::ComputeFullV).solve(inputVector); //not working
   }
 
   if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivLu == algorithmIndex)
@@ -99,9 +98,9 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
   }
 
   double relativeError = (EndmemberMatrix*resultVector - inputVector).norm() / inputVector.norm(); // norm() is L2 norm
-  //MITK_INFO << "relativ error: " << relativeError;
+  MITK_INFO << "relativ error: " << relativeError;
   float accuracyLevel = .1;
   bool resultIsApprox = inputVector.isApprox(EndmemberMatrix*resultVector, accuracyLevel);
-  //MITK_INFO << "IS APPROX RESULT: " << resultIsApprox;
+  MITK_INFO << "IS APPROX RESULT: " << resultIsApprox;
   return resultVector;
 }

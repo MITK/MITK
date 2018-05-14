@@ -30,9 +30,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class QAbstractItemVew;
 
-/*
-* @brief This abstract class for convienient widgets that over a specific view onto a given DataStorage instance to
-* inspect its contents. One may also get the selection in this inspector of the data storage.
+/**
+* @brief This abstract class is a convinient base class for easy implementation of widgets that
+* offer a specific view onto a given DataStorage instance to inspect its contents.
+* One may also get the selection in this inspector of the data storage.
 */
 class MITKQTWIDGETS_EXPORT QmitkAbstractDataStorageInspector : public QWidget
 {
@@ -41,17 +42,17 @@ class MITKQTWIDGETS_EXPORT QmitkAbstractDataStorageInspector : public QWidget
 public:
   virtual ~QmitkAbstractDataStorageInspector();
 
-  /*
-  * @brief Sets the data storage that will be used /monitored by widget.
+  /**
+  * @brief Sets the data storage that will be used /monitored by the widget.
   *
-  * @par dataStorage      A pointer to the data storage to set.
+  * @param dataStorage      A pointer to the data storage to set.
   */
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
-  /*
+  /**
   * @brief Sets the node predicate and updates the widget, according to the node predicate.
   *
-  * @par nodePredicate    A pointer to node predicate.
+  * @param nodePredicate    A pointer to node predicate.
   */
   virtual void SetNodePredicate(mitk::NodePredicateBase* nodePredicate);
 
@@ -59,27 +60,31 @@ public:
 
   using NodeList = QList<mitk::DataNode::Pointer>;
 
+  /** Returns the list of currently selected nodes.*/
   NodeList GetSelectedNodes() const;
 
+  /** Returns an pointer to the view that is used in the inspector to show the content.*/
   virtual QAbstractItemView* GetView() = 0;
-  virtual QAbstractItemView* GetView() const = 0;
+  virtual const QAbstractItemView* GetView() const = 0;
 
+  /** Returns the setting of the internal connector. It can be changed by SetSelectOnlyVisibleNodes()*/
   bool GetSelectOnlyVisibleNodes() const;
 
   using SelectionMode = QAbstractItemView::SelectionMode;
+  /** Sets the selection mode of the inspector.*/
   virtual void SetSelectionMode(SelectionMode mode) = 0;
   virtual SelectionMode GetSelectionMode() const = 0;
 
 Q_SIGNALS:
-  /*
+  /**
   * @brief A signal that will be emitted if the selected node has changed.
   *
-  * @par	nodes		A list of data nodes that are newly selected.
+  * @param nodes		A list of data nodes that are newly selected.
   */
   void CurrentSelectionChanged(NodeList nodes);
 
   public Q_SLOTS:
-  /*
+  /**
   * @brief Change the selection modus of the item view's selection model.
   *
   *   If true, an incoming selection will be filtered (reduced) to only those nodes that are visible by the current view.
@@ -88,11 +93,11 @@ Q_SIGNALS:
   *   to include the original selection that could not be modified.
   *   The part of the original selection, that is non-visible are the nodes that are not
   *
-  * @par selectOnlyVisibleNodes   The bool value to define the selection modus.
+  * @param selectOnlyVisibleNodes   The bool value to define the selection modus.
   */
   void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes);
 
-  /*
+  /**
   * @brief Transform a list of data nodes into a model selection and set this as a new selection of the
   *        selection model of the private member item view.
   *
@@ -102,7 +107,7 @@ Q_SIGNALS:
   *   in the data storage viewer. By storing the non-visible nodes it is possible to send the new, modified selection
   *   but also include the selected nodes from the original selection that could not be modified (see 'SetSelectOnlyVisibleNodes').
   *
-  * @par	nodes		A list of data nodes that should be newly selected.
+  * @param nodes		A list of data nodes that should be newly selected.
   */
   void SetCurrentSelection(NodeList selectedNodes);
 
@@ -110,7 +115,7 @@ protected Q_SLOTS:
   void OnSelectionChanged(NodeList selectedNodes);
 
 protected:
-  /** Helper function is called if data storage or predicate is changed to (re) inizialze the widget correctly.
+  /** Helper function is called if data storage or predicate is changed to (re) initialize the widget correctly.
    Implement the function in derived classes.*/
   virtual void Initialize() = 0;
 

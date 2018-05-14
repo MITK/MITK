@@ -43,7 +43,7 @@ namespace mitk
     virtual ~IDataStorageInspectorProvider();
 
     /**
-     * \brief returns a inspector instance represented by the provider.
+     * \brief returns an inspector instance represented by the provider.
      */
     virtual QmitkAbstractDataStorageInspector* CreateInspector() const = 0;
 

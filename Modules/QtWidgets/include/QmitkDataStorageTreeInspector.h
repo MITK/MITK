@@ -37,7 +37,7 @@ public:
   QmitkDataStorageTreeInspector(QWidget* parent = nullptr);
 
   virtual QAbstractItemView* GetView() override;
-  virtual QAbstractItemView* GetView() const override;
+  virtual const QAbstractItemView* GetView() const override;
 
   virtual void SetSelectionMode(SelectionMode mode) override;
   virtual SelectionMode GetSelectionMode() const override;

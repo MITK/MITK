@@ -45,14 +45,14 @@ public:
   /*
   * @brief Sets the data storage that will be used /monitored by widget.
   *
-  * @par dataStorage      A pointer to the data storage to set.
+  * @param dataStorage      A pointer to the data storage to set.
   */
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
   /*
   * @brief Sets the node predicate and updates the widget, according to the node predicate.
   *
-  * @par nodePredicate    A pointer to node predicate.
+  * @param nodePredicate    A pointer to node predicate.
   */
   virtual void SetNodePredicate(mitk::NodePredicateBase* nodePredicate);
 
@@ -72,7 +72,7 @@ Q_SIGNALS:
   /*
   * @brief A signal that will be emitted if the selected node has changed.
   *
-  * @par	nodes		A list of data nodes that are newly selected.
+  * @param nodes		A list of data nodes that are newly selected.
   */
   void CurrentSelectionChanged(NodeList nodes);
 
@@ -86,7 +86,7 @@ Q_SIGNALS:
   *   to include the original selection that could not be modified.
   *   The part of the original selection, that is non-visible are the nodes that are not
   *
-  * @par selectOnlyVisibleNodes   The bool value to define the selection modus.
+  * @param selectOnlyVisibleNodes   The bool value to define the selection modus.
   */
   void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes);
 
@@ -100,7 +100,7 @@ Q_SIGNALS:
   *   in the data storage viewer. By storing the non-visible nodes it is possible to send the new, modified selection
   *   but also include the selected nodes from the original selection that could not be modified (see 'SetSelectOnlyVisibleNodes').
   *
-  * @par	nodes		A list of data nodes that should be newly selected.
+  * @param nodes		A list of data nodes that should be newly selected.
   */
   void SetCurrentSelection(NodeList selectedNodes);
 

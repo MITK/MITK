@@ -37,7 +37,7 @@ QAbstractItemView* QmitkDataStorageListInspector::GetView()
   return m_Controls.view;
 };
 
-QAbstractItemView* QmitkDataStorageListInspector::GetView() const
+const QAbstractItemView* QmitkDataStorageListInspector::GetView() const
 {
   return m_Controls.view;
 };

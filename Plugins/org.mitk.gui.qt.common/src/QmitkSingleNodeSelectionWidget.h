@@ -54,7 +54,7 @@ Q_SIGNALS:
   /*
   * @brief A signal that will be emitted if the selected node has changed.
   *
-  * @par	nodes		A list of data nodes that are newly selected.
+  * @param nodes		A list of data nodes that are newly selected.
   */
   void CurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 

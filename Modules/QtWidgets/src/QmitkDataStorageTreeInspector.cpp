@@ -39,7 +39,7 @@ QAbstractItemView* QmitkDataStorageTreeInspector::GetView()
   return m_Controls.view;
 };
 
-QAbstractItemView* QmitkDataStorageTreeInspector::GetView() const
+const QAbstractItemView* QmitkDataStorageTreeInspector::GetView() const
 {
   return m_Controls.view;
 };

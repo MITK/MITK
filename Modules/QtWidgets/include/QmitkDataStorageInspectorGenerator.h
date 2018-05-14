@@ -34,11 +34,8 @@ public:
 protected:
   QmitkDataStorageInspectorGenerator();
   virtual ~QmitkDataStorageInspectorGenerator();
-
-private:
-  // No copy constructor allowed
-  QmitkDataStorageInspectorGenerator(const QmitkDataStorageInspectorGenerator &source);
-  void operator=(const QmitkDataStorageInspectorGenerator &); // purposely not implemented
+  QmitkDataStorageInspectorGenerator(const QmitkDataStorageInspectorGenerator &source) = delete;
+  QmitkDataStorageInspectorGenerator& operator=(const QmitkDataStorageInspectorGenerator &) = delete;
 };
 
 #endif

@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __QMITK_DATA_STORAGE_INSPECTOR_PROVIDER_H
-#define __QMITK_DATA_STORAGE_INSPECTOR_PROVIDER_H
+#ifndef __QMITK_DATA_STORAGE_INSPECTOR_PROVIDER_BASE_H
+#define __QMITK_DATA_STORAGE_INSPECTOR_PROVIDER_BASE_H
 
 #include <memory>
 
@@ -52,6 +52,7 @@ public:
 
 protected:
   QmitkDataStorageInspectorProviderBase(const QmitkDataStorageInspectorProviderBase &other);
+  QmitkDataStorageInspectorProviderBase &operator=(const QmitkDataStorageInspectorProviderBase &other) = delete;
 
   virtual us::ServiceProperties GetServiceProperties() const;
 
@@ -67,8 +68,6 @@ protected:
   int GetRanking() const;
 
 private:
-  QmitkDataStorageInspectorProviderBase &operator=(const QmitkDataStorageInspectorProviderBase &other);
-
   class Impl;
   std::unique_ptr<Impl> d;
 };

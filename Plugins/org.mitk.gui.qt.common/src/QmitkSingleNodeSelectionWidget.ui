@@ -93,7 +93,17 @@
       <string>Press to remove the current selection.</string>
      </property>
      <property name="text">
-      <string>X</string>
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>:/org.mitk.gui.qt.common/resources/times.svg</normaloff>:/org.mitk.gui.qt.common/resources/times.svg</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>19</width>
+       <height>19</height>
+      </size>
      </property>
     </widget>
    </item>

@@ -37,7 +37,12 @@ public:
   {
     // INSERT TEST HERE?
     MITK_INFO << "TEST TEST";
+
+
+
   }
+
+
 
 
   void tearDown() override
@@ -47,3 +52,42 @@ public:
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkSpectralUnmixing)
+
+
+//++++++++++++++++++++++ erstmal (TM) verworfen:+++++++++++++++++++++++++++++++++++
+/* relativ aufwenig ggf Bild laden
+void creatInputImage()
+{
+unsigned int xDim = 1;
+unsigned int yDim = 1;
+unsigned int zDim = 3;
+
+mitk::Image *inputImage;
+
+mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();
+const int NUMBER_OF_SPATIAL_DIMENSIONS = 3;
+auto* dimensions = new unsigned int[NUMBER_OF_SPATIAL_DIMENSIONS];
+dimensions[0] = xDim;
+dimensions[1] = yDim;
+dimensions[2] = zDim;
+
+inputImage->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);
+
+float value;
+mitk::ImageWriteAccessor writeOutput(inputImage);
+
+
+for (int x = 0; x < xDim; ++x)
+{
+for (int y = 0; y < yDim; ++y)
+{
+for (int z = 0; z < zDim; ++z)
+{
+float* writeBuffer = (float *)writeOutput.GetData();
+writeBuffer[x*yDim + y] = value;
+}
+}
+}
+
+
+}/**/

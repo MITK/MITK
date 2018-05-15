@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.prefpage.nodeselection" name="Node Selection" class="QmitkNodeSelectionPreferencePage"></page>
+  </extension>
+</plugin>

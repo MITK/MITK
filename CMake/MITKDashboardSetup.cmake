@@ -9,11 +9,12 @@ set(MY_OPERATING_SYSTEM )
 
 if(UNIX)
   # Download a utility script
-  if(IS_PHABRICATOR_URL)
-    set(url "https://phabricator.mitk.org/source/mitk/browse/${GIT_BRANCH}/CMake/mitkDetectOS.sh?view=raw")
-  else()
+  # See T24757.
+  # if(IS_PHABRICATOR_URL)
+  #   set(url "https://phabricator.mitk.org/source/mitk/browse/${GIT_BRANCH}/CMake/mitkDetectOS.sh?view=raw")
+  # else()
     set(url "https://raw.githubusercontent.com/MITK/MITK/master/CMake/mitkDetectOS.sh")
-  endif()
+  # endif()
   set(dest "${CTEST_SCRIPT_DIRECTORY}/mitkDetectOS.sh")
   downloadFile("${url}" "${dest}")
   execute_process(COMMAND sh "${dest}"

@@ -109,7 +109,21 @@ void PAUSMotionCompensation::DoImageProcessing()
       m_Filter->SetInput(0, image);
       m_Filter->SetInput(1, image);
       m_Filter->Update();
-      node->SetData(m_Filter->GetOutput(0));
+      // node->SetData(m_Filter->GetOutput(0));
+      // mitk::Image *test = m_Filter->GetOutput(0);
+      m_Filter->GetOutput(0);
+      m_Filter->GetOutput(1);
+      // node->SetData(test);
+
+      MITK_INFO << "We are back in the plugin.";
+
+      auto newNode = mitk::DataNode::New();
+      // newNode->SetData(test);
+      newNode->SetName("Test");
+
+      this->GetDataStorage()->Add(newNode);
+
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }

@@ -31,8 +31,11 @@ mitk::PhotoacousticMotionCorrectionFilter::
   m_poly_sigma = 1.5;
   m_flags = 0;
 
-  SetNumberOfIndexedInputs(2);
-  SetNumberOfIndexedOutputs(2);
+  this->SetNumberOfIndexedInputs(2);
+  this->SetNumberOfIndexedOutputs(2);
+  mitk::Image::Pointer newOutput = mitk::Image::New();
+  this->SetNthOutput(0, newOutput);
+  this->SetNthOutput(1, newOutput);
 }
 
 mitk::PhotoacousticMotionCorrectionFilter::
@@ -49,7 +52,7 @@ mitk::PhotoacousticMotionCorrectionFilter::
 
 void mitk::PhotoacousticMotionCorrectionFilter::GenerateData() {
   MITK_INFO << "Start motion compensation.";
-  
+
   m_paImage = this->GetInput(0);
   m_usImage = this->GetInput(1);
 
@@ -118,34 +121,36 @@ void mitk::PhotoacousticMotionCorrectionFilter::GenerateData() {
     m_UsMatC = itk::OpenCVImageBridge::ITKImageToCVMat<itk::Image<float, 2>>(
         m_itkUsImage);
 
-    m_PaMat = m_PaMatC.getUMat( cv::ACCESS_READ );
-    m_UsMat = m_UsMatC.getUMat( cv::ACCESS_READ );
+    m_PaMat = m_PaMatC.getUMat( cv::ACCESS_READ ).clone();
+    m_UsMat = m_UsMatC.getUMat( cv::ACCESS_READ ).clone();
 
     MITK_INFO << "Matrix generated.";
     // At the beginning of a batch we set new references and the compensation
     // can be skipped.
     // TODO: handle m_batch == 0
-    // if (i % m_batch == 0) {
-    //   m_UsRef = m_UsMat;
-    //   m_UsRes = m_UsMatC;
-    //   m_PaRes = m_PaMatC;
-    //   continue;
-    // } else {
-    //   // Calculate the flow using the Farneback algorithm
-    //   // TODO: flags hard coded to 0, rethink.
-    //   cv::calcOpticalFlowFarneback(m_UsRef, m_UsMat, m_Flow, m_pyr_scale, m_levels,
-    //                                m_winsize, m_iterations, m_poly_n,
-    //                                m_poly_sigma, 0);
+    if (i % m_batch == 0) {
+      MITK_INFO << "Start of batch.";
+      m_UsRef = m_UsMat.clone();
+      m_UsRes = m_UsMatC.clone();
+      m_PaRes = m_PaMatC.clone();
+      continue;
+    } else {
+      // Calculate the flow using the Farneback algorithm
+      // TODO: flags hard coded to 0, rethink.
+      MITK_INFO << "Apply algorithm.";
+      cv::calcOpticalFlowFarneback(m_UsRef, m_UsMat, m_Flow, m_pyr_scale, m_levels,
+                                   m_winsize, m_iterations, m_poly_n,
+                                   m_poly_sigma, 0);
 
-    //   // Apply flow to the matrices
-    //   cv::remap(m_PaMatC, m_PaRes, m_Flow, cv::noArray(), cv::INTER_LINEAR);
-    //   cv::remap(m_UsMatC, m_UsRes, m_Flow, cv::noArray(), cv::INTER_LINEAR);
-    // }
+      // Apply flow to the matrices
+      cv::remap(m_PaMatC, m_PaRes, m_Flow, cv::noArray(), cv::INTER_LINEAR);
+      cv::remap(m_UsMatC, m_UsRes, m_Flow, cv::noArray(), cv::INTER_LINEAR);
+    }
 
     // TODO: Actually do something, not just retransform
-    m_PaRes = m_PaMatC;
-    m_UsRes = m_UsMatC;
-    
+    // m_PaRes = m_PaMatC;
+    // m_UsRes = m_UsMatC;
+
     m_OpenCVToImageFilter->SetOpenCVMat(m_PaRes);
     m_OpenCVToImageFilter->Update();
     pa_slice = m_OpenCVToImageFilter->GetOutput();

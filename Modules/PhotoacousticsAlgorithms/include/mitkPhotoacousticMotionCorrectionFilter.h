@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageCast.h"
 #include <mitkOpenCVToMitkImageFilter.h>
+#include <mitkImageToOpenCVImageFilter.h>
 
 namespace mitk
 {
@@ -60,14 +61,16 @@ namespace mitk
     ~PhotoacousticMotionCorrectionFilter() override;
 
     void GenerateData() override;
-
+    void CheckInput(mitk::Image::Pointer paImage, mitk::Image::Pointer usImage);
+    void InitializeOutput(mitk::Image::Pointer paInput, mitk::Image::Pointer usInput, mitk::Image::Pointer paOutput, mitk::Image::Pointer usOutput);
+    void SetOutputData(mitk::Image::Pointer input, mitk::Image::Pointer output);
     //##Description
     //## @brief Time when Header was last initialized
     /* itk::TimeStamp m_TimeOfHeaderInitialization; */
 
   private:
     // InputData
-    mitk::Image::Pointer m_paImage, m_usImage, m_paCompensated, m_usCompensated;
+    /* mitk::Image::Pointer m_paImage, m_usImage, m_paCompensated, m_usCompensated; */
     // Parameters
     double m_pyr_scale, m_poly_sigma;
     unsigned int m_levels, m_winsize, m_iterations, m_poly_n, m_flags, m_batch;

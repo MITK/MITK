@@ -33,9 +33,8 @@ mitk::PhotoacousticMotionCorrectionFilter::
 
   this->SetNumberOfIndexedInputs(2);
   this->SetNumberOfIndexedOutputs(2);
-  mitk::Image::Pointer newOutput = mitk::Image::New();
-  this->SetNthOutput(0, newOutput);
-  this->SetNthOutput(1, newOutput);
+  this->SetNthOutput(0, mitk::Image::New());
+  this->SetNthOutput(1, mitk::Image::New());
 }
 
 mitk::PhotoacousticMotionCorrectionFilter::
@@ -50,120 +49,74 @@ mitk::PhotoacousticMotionCorrectionFilter::
 //   m_usImage = usImage;
 // }
 
-void mitk::PhotoacousticMotionCorrectionFilter::GenerateData() {
-  MITK_INFO << "Start motion compensation.";
-
-  m_paImage = this->GetInput(0);
-  m_usImage = this->GetInput(1);
-
+// TODO: Find out how to throw the right errors
+void mitk::PhotoacousticMotionCorrectionFilter::CheckInput(mitk::Image::Pointer paImage, mitk::Image::Pointer usImage) {
   // Check that we actually got some images
-  if (!m_paImage || !m_usImage) {
+  if (!paImage || !usImage) {
     // TODO: Throw some error here
+    MITK_INFO << "We did not get two images!";
   }
+
   // Check that the image dimensions are the same
-  if (m_paImage->GetDimension() != m_usImage->GetDimension() &&
-      m_usImage->GetDimension() == 3) {
+  if (paImage->GetDimension() != usImage->GetDimension() &&
+      usImage->GetDimension() == 3) {
     MITK_INFO << "Mismatching image dimensions detected in the motion "
-                 "compensation filter.";
+      "compensation filter.";
     // TODO: Throw some error here
   }
-  for (unsigned int i = 0; i < m_paImage->GetDimension(); i++) {
-    if (m_paImage->GetDimensions()[i] != m_usImage->GetDimensions()[i]) {
+
+  // Check that each dimension has the same size
+  for (unsigned int i = 0; i < paImage->GetDimension(); i++) {
+    if (paImage->GetDimensions()[i] != usImage->GetDimensions()[i]) {
       MITK_INFO << "Mismatching image dimensions detected in the motion "
-                   "compensation filter.";
+        "compensation filter.";
       // TODO: Throw some error here
     }
   }
 
-  // Initialize output images
-  if (!m_paCompensated) {
-    m_paCompensated = mitk::Image::New();
-  }
-  if (!m_usCompensated) {
-    m_usCompensated = mitk::Image::New();
-  }
-  m_paCompensated->Initialize(m_paImage->GetPixelType(),
-                              m_paImage->GetDimension(),
-                              m_paImage->GetDimensions());
-  m_usCompensated->Initialize(m_usImage->GetPixelType(),
-                              m_usImage->GetDimension(),
-                              m_usImage->GetDimensions());
-
-  // TODO: remove debug messages
-
-  // Initialize the slices
-  mitk::Image::Pointer pa_slice = mitk::Image::New();
-  mitk::Image::Pointer us_slice = mitk::Image::New();
-  pa_slice->Initialize(m_paImage->GetPixelType(), 2,
-                       m_paImage->GetDimensions());
-  us_slice->Initialize(m_usImage->GetPixelType(), 2,
-                       m_usImage->GetDimensions());
-
-  MITK_INFO << "Start iteration.";
-  // Iterate over all the slices
-  for (unsigned int i = 0; i < m_paImage->GetDimensions()[2]; i++) {
-
-    // Get a read accessor for each slice
-    mitk::ImageReadAccessor pa_accessor(m_paImage, m_paImage->GetSliceData(i));
-    mitk::ImageReadAccessor us_accessor(m_paImage, m_usImage->GetSliceData(i));
-
-    // Write the correct image data into the slice
-    pa_slice->SetImportVolume(pa_accessor.GetData());
-    us_slice->SetImportVolume(us_accessor.GetData());
-
-    // Convert them first to an itk::Image and then to a cv::Mat
-    mitk::CastToItkImage(pa_slice, m_itkPaImage);
-    mitk::CastToItkImage(us_slice, m_itkUsImage);
-    MITK_INFO << "Generate Matrix.";
-
-    m_PaMatC = itk::OpenCVImageBridge::ITKImageToCVMat<itk::Image<float, 2>>(
-      m_itkPaImage);
-    m_UsMatC = itk::OpenCVImageBridge::ITKImageToCVMat<itk::Image<float, 2>>(
-        m_itkUsImage);
-
-    m_PaMat = m_PaMatC.getUMat( cv::ACCESS_READ ).clone();
-    m_UsMat = m_UsMatC.getUMat( cv::ACCESS_READ ).clone();
-
-    MITK_INFO << "Matrix generated.";
-    // At the beginning of a batch we set new references and the compensation
-    // can be skipped.
-    // TODO: handle m_batch == 0
-    if (i % m_batch == 0) {
-      MITK_INFO << "Start of batch.";
-      m_UsRef = m_UsMat.clone();
-      m_UsRes = m_UsMatC.clone();
-      m_PaRes = m_PaMatC.clone();
-      continue;
-    } else {
-      // Calculate the flow using the Farneback algorithm
-      // TODO: flags hard coded to 0, rethink.
-      MITK_INFO << "Apply algorithm.";
-      cv::calcOpticalFlowFarneback(m_UsRef, m_UsMat, m_Flow, m_pyr_scale, m_levels,
-                                   m_winsize, m_iterations, m_poly_n,
-                                   m_poly_sigma, 0);
-
-      // Apply flow to the matrices
-      cv::remap(m_PaMatC, m_PaRes, m_Flow, cv::noArray(), cv::INTER_LINEAR);
-      cv::remap(m_UsMatC, m_UsRes, m_Flow, cv::noArray(), cv::INTER_LINEAR);
-    }
-
-    // TODO: Actually do something, not just retransform
-    // m_PaRes = m_PaMatC;
-    // m_UsRes = m_UsMatC;
-
-    m_OpenCVToImageFilter->SetOpenCVMat(m_PaRes);
-    m_OpenCVToImageFilter->Update();
-    pa_slice = m_OpenCVToImageFilter->GetOutput();
-    mitk::ImageReadAccessor pa_slice_accessor(pa_slice);
-    m_paCompensated->SetSlice(pa_slice_accessor.GetData(), i);
-    m_OpenCVToImageFilter->SetOpenCVMat(m_UsRes);
-    m_OpenCVToImageFilter->Update();
-    us_slice = m_OpenCVToImageFilter->GetOutput();
-    mitk::ImageReadAccessor us_slice_accessor(us_slice);
-    m_paCompensated->SetSlice(us_slice_accessor.GetData(), i);
 }
 
-  this->SetNthOutput(1, m_usCompensated);
-  this->SetNthOutput(0, m_paCompensated);
+void mitk::PhotoacousticMotionCorrectionFilter::InitializeOutput(mitk::Image::Pointer paInput, mitk::Image::Pointer usInput, mitk::Image::Pointer paOutput, mitk::Image::Pointer usOutput) {
+  if (paOutput->GetDimension() != 3) {
+    MITK_INFO << "I jump in here.";
+    this->SetOutputData(paInput, paOutput);
+    this->SetOutputData(usInput, usOutput);
+  }
+
+  for (unsigned int i = 0; i < usOutput->GetDimension(); i++) {
+    if (usOutput->GetDimensions()[i] != usInput->GetDimensions()[i]) {
+      this->SetOutputData(paInput, paOutput);
+      this->SetOutputData(usInput, usOutput);
+      break;
+   }
+  }
+}
+
+void mitk::PhotoacousticMotionCorrectionFilter::SetOutputData(mitk::Image::Pointer input, mitk::Image::Pointer output) {
+  output->Initialize(input);
+  mitk::ImageReadAccessor accessor(input);
+  output->SetImportVolume(accessor.GetData());
+}
+
+void mitk::PhotoacousticMotionCorrectionFilter::GenerateData() {
+  MITK_INFO << "Start motion compensation.";
+
+  auto paInput = this->GetInput(0);
+  auto usInput = this->GetInput(1);
+  auto paOutput = this->GetOutput(0);
+  auto usOutput = this->GetOutput(1);
+
+  // Check that we have two images with agreeing dimensions
+  this->CheckInput(paInput, usInput);
+
+  // Check the output images and (re-)initialize, if necessary.
+  this->InitializeOutput(paInput, usInput, paOutput, usOutput);
+
+  // MITK_INFO << "Output: " << paOutput->GetPixelType(0);
+  // TODO: remove debug messages
+
+  // MITK_INFO << "Input: " << usInput;
+  // MITK_INFO << "Output: " << usOutput;
+  // MITK_INFO << "Output2: " << paOutput;
   MITK_INFO << "We succeeded in running through the whole thing!";
 }

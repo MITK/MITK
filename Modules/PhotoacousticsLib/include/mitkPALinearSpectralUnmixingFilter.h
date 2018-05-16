@@ -29,9 +29,6 @@ namespace mitk {
       mitkClassMacro(LinearSpectralUnmixingFilter, SpectralUnmixingFilterBase)
         itkFactorylessNewMacro(Self)
 
-
-      void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(int SetAlgorithmIndex);
-
       enum AlgortihmType
       {
         householderQr,
@@ -43,6 +40,8 @@ namespace mitk {
         fullPivHouseholderQr,
         test
       };
+
+      void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(AlgortihmType SetAlgorithmIndex);
 
     protected:
       LinearSpectralUnmixingFilter();

@@ -131,8 +131,34 @@ void SpectralUnmixing::DoImageProcessing()
       m_SpectralUnmixingFilter->SetInput(image);
 
       // Set Algortihm to filter
-      int SetAlgorithmIndex = m_Controls.QComboBoxAlgorithm->currentIndex();
-      m_SpectralUnmixingFilter->SetAlgorithm(SetAlgorithmIndex);
+      auto qs = m_Controls.QComboBoxAlgorithm->currentText();
+      std::string Algorithm = qs.toUtf8().constData();
+
+      if (Algorithm == "householderQr")
+        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr);
+
+      else if (Algorithm == "ldlt")
+        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::ldlt);
+
+      else if (Algorithm == "llt")
+        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::llt);
+
+      else if (Algorithm == "colPivHouseholderQr")
+        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::colPivHouseholderQr);
+
+      else if (Algorithm == "jacobiSvd")
+        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::jacobiSvd);
+
+      else if (Algorithm == "fullPivLu")
+        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivLu);
+
+      else if (Algorithm == "fullPivHouseholderQr")
+        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivHouseholderQr);
+
+      else if (Algorithm == "test")
+        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::test);
+      else
+        mitkThrow() << "ALGORITHM ERROR!";
 
       // Wavelength implementation into filter
       for (unsigned int imageIndex = 0; imageIndex < m_Wavelengths.size(); imageIndex++)

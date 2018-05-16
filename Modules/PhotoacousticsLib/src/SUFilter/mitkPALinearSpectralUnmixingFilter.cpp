@@ -37,9 +37,9 @@ mitk::pa::LinearSpectralUnmixingFilter::~LinearSpectralUnmixingFilter()
 
 }
 
-void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(int SetAlgorithmIndex)
+void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType SetAlgorithmIndex)
 {
-  algorithmIndex = static_cast<mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType>(SetAlgorithmIndex);
+  algorithmIndex = SetAlgorithmIndex;
 }
 
 Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorithm(

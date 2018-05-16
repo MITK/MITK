@@ -134,7 +134,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_HelperObjectFilterPredicate = mitk::NodePredicateOr::New(
    mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)),
    mitk::NodePredicateProperty::New("hidden object", mitk::BoolProperty::New(true)));
-  m_NodeWithNoDataFilterPredicate = mitk::NodePredicateData::New(0);
+  m_NodeWithNoDataFilterPredicate = mitk::NodePredicateData::New(nullptr);
 
   m_FilterModel = new QmitkDataStorageFilterProxyModel();
   m_FilterModel->setSourceModel(m_NodeTreeModel);
@@ -797,7 +797,7 @@ void QmitkDataManagerView::ColorChanged()
         if (!color_selected)
         {
           QColor initial(rgb[0] * 255, rgb[1] * 255, rgb[2] * 255);
-          newColor = QColorDialog::getColor(initial, 0, QString(tr("Change color")));
+          newColor = QColorDialog::getColor(initial, nullptr, QString(tr("Change color")));
 
           if ( newColor.isValid() )
           {
@@ -1001,23 +1001,39 @@ void QmitkDataManagerView::SurfaceRepresentationActionToggled( bool /*checked*/ 
 
 void QmitkDataManagerView::ReinitSelectedNodes( bool )
 {
-  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+  auto renderWindow = this->GetRenderWindowPart();
 
-  if (renderWindow == nullptr)
+  if (nullptr == renderWindow)
     renderWindow = this->OpenRenderWindowPart(false);
 
-  QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();
+  if (nullptr == renderWindow)
+    return;
 
-  foreach(mitk::DataNode::Pointer node, selectedNodes)
+  auto dataStorage = this->GetDataStorage();
+
+  auto selectedNodesIncludedInBoundingBox = mitk::NodePredicateAnd::New(
+    mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false))),
+    mitk::NodePredicateProperty::New("selected", mitk::BoolProperty::New(true)));
+
+  auto nodes = dataStorage->GetSubset(selectedNodesIncludedInBoundingBox);
+
+  if (nodes->empty())
+    return;
+
+  if (1 == nodes->Size()) // Special case: If exactly one ...
   {
-    mitk::BaseData::Pointer basedata = node->GetData();
-    if ( basedata.IsNotNull() &&
-      basedata->GetTimeGeometry()->IsValid() )
+    auto image = dynamic_cast<mitk::Image*>(nodes->ElementAt(0)->GetData());
+
+    if (nullptr != image) // ... image is selected, reinit is expected to rectify askew images.
     {
-      renderWindow->GetRenderingManager()->InitializeViews(
-          basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+      mitk::RenderingManager::GetInstance()->InitializeViews(image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+      return;
     }
   }
+
+  auto boundingGeometry = dataStorage->ComputeBoundingGeometry3D(nodes, "visible");
+
+  mitk::RenderingManager::GetInstance()->InitializeViews(boundingGeometry);
 }
 
 void QmitkDataManagerView::RemoveSelectedNodes( bool )
@@ -1034,7 +1050,7 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
   }
   std::vector<mitk::DataNode::Pointer> selectedNodes;
 
-  mitk::DataNode::Pointer node = 0;
+  mitk::DataNode::Pointer node = nullptr;
   QString question = tr("Do you really want to remove ");
 
   for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
@@ -1161,24 +1177,13 @@ void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent,
 
 void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*selected*/, const QItemSelection & /*deselected*/ )
 {
-  QList<mitk::DataNode::Pointer> nodes = m_NodeTreeModel->GetNodeSet();
+  auto selectedNodes = this->GetCurrentSelection();
 
-  foreach(mitk::DataNode::Pointer node, nodes)
+  for (auto node : m_NodeTreeModel->GetNodeSet())
   {
-    if ( node.IsNotNull() )
-      node->SetBoolProperty("selected", false);
+    if (node.IsNotNull())
+      node->SetSelected(selectedNodes.contains(node));
   }
-
-  nodes.clear();
-  nodes = this->GetCurrentSelection();
-
-  foreach(mitk::DataNode::Pointer node, nodes)
-  {
-    if ( node.IsNotNull() )
-      node->SetBoolProperty("selected", true);
-  }
-  //changing the selection does NOT require any rendering processes!
-  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::OnNodeVisibilityChanged()

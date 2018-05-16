@@ -30,10 +30,10 @@ class OdfImageSerializer : public BaseDataSerializer
     mitkClassMacro( OdfImageSerializer, BaseDataSerializer );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
-    virtual std::string Serialize() override;
+    std::string Serialize() override;
   protected:
     OdfImageSerializer();
-    virtual ~OdfImageSerializer();
+    ~OdfImageSerializer() override;
 };
 } // namespace
 #endif

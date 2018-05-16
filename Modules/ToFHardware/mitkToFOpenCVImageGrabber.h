@@ -38,7 +38,7 @@ namespace mitk
 
     ToFOpenCVImageGrabber();
 
-    ~ToFOpenCVImageGrabber();
+    ~ToFOpenCVImageGrabber() override;
 
     mitkClassMacro( ToFOpenCVImageGrabber , OpenCVImageSource );
 

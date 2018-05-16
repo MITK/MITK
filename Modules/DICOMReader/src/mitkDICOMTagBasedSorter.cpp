@@ -90,8 +90,8 @@ mitk::DICOMTagBasedSorter::CutDecimalPlaces
 mitk::DICOMTagBasedSorter
 ::DICOMTagBasedSorter()
 :DICOMDatasetSorter()
-,m_StrictSorting(false)
-,m_ExpectDistanceOne(false)
+,m_StrictSorting(m_DefaultStrictSorting)
+,m_ExpectDistanceOne(m_DefaultExpectDistanceOne)
 {
 }
 
@@ -246,8 +246,11 @@ mitk::DICOMTagBasedSorter
 {
   DICOMTagList allTags = m_DistinguishingTags;
 
-  const DICOMTagList sortingRelevantTags = m_SortCriterion->GetAllTagsOfInterest();
-  allTags.insert( allTags.end(), sortingRelevantTags.cbegin(), sortingRelevantTags.cend() ); // append
+  if (m_SortCriterion.IsNotNull())
+  {
+    const DICOMTagList sortingRelevantTags = m_SortCriterion->GetAllTagsOfInterest();
+    allTags.insert( allTags.end(), sortingRelevantTags.cbegin(), sortingRelevantTags.cend() ); // append
+  }
 
   return allTags;
 }

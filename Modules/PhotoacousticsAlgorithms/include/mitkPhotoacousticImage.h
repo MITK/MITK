@@ -110,7 +110,7 @@ namespace mitk {
 
     protected:
       PhotoacousticImage();
-      virtual ~PhotoacousticImage();
+      ~PhotoacousticImage() override;
 
       /** \brief For performance reasons, an instance of the Beamforming filter is initialized as soon as possible and kept for all further uses.
       */

@@ -40,10 +40,10 @@ namespace mitk
 
     NrrdOdfImageReader(const NrrdOdfImageReader& other);
     NrrdOdfImageReader();
-    virtual ~NrrdOdfImageReader();
+    ~NrrdOdfImageReader() override;
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+    std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   protected:
 

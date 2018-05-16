@@ -82,8 +82,8 @@ public:
 
     progression.PredictInvasion(evaluation, modalities);
 
-    mitk::Image::Pointer refImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(
-      GetTestDataFilePath("DiffusionImaging/ProgressionAnalysis/Classification/TESTING_RESULT.nrrd"))[0].GetPointer());
+    auto refImage = mitk::IOUtil::Load<mitk::Image>(
+      GetTestDataFilePath("DiffusionImaging/ProgressionAnalysis/Classification/TESTING_RESULT.nrrd"));
 
     mitk::DataCollection *patCol = dynamic_cast<mitk::DataCollection *>(evaluation->GetData(0).GetPointer());
     mitk::DataCollection *subCol = dynamic_cast<mitk::DataCollection *>(patCol->GetData(0).GetPointer());

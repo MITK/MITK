@@ -51,7 +51,7 @@ namespace itk {
 
       // allocate the data objects for the outputs which are
       // just decorators real types
-      for( unsigned int i = 0; i < 12; i++ )
+      for( unsigned int i = 0; i < 17; i++ )
       {
         this->ProcessObject::SetNthOutput( i, this->MakeOutput( i ) );
       }
@@ -109,6 +109,14 @@ namespace itk {
       MeasurementType longRunHighGreyLevelEmphasis = NumericTraits<MeasurementType>::ZeroValue();
       MeasurementType runPercentage = NumericTraits<MeasurementType>::ZeroValue();
       MeasurementType numberOfRuns = NumericTraits<MeasurementType>::ZeroValue();
+      //Added 15.07.2016
+      MeasurementType greyLevelVariance = NumericTraits<MeasurementType>::ZeroValue();
+      MeasurementType runLengthVariance = NumericTraits<MeasurementType>::ZeroValue();
+      MeasurementType runEntropy = NumericTraits<MeasurementType>::ZeroValue();
+
+      //Added 09.09.2016
+      MeasurementType greyLevelNonuniformityNormalized = NumericTraits<MeasurementType>::ZeroValue();
+      MeasurementType runLengthNonuniformityNormalized = NumericTraits<MeasurementType>::ZeroValue();
 
       vnl_vector<double> greyLevelNonuniformityVector(
         inputHistogram->GetSize()[0], 0.0 );
@@ -116,6 +124,39 @@ namespace itk {
         inputHistogram->GetSize()[1], 0.0 );
 
       typedef typename HistogramType::ConstIterator HistogramIterator;
+
+      double mu_i = 0.0;
+      double mu_j = 0.0;
+
+      //Calculate the means.
+      for ( HistogramIterator hit = inputHistogram->Begin();
+        hit != inputHistogram->End(); ++hit )
+      {
+        IndexType index = hit.GetIndex();
+        MeasurementType frequency = hit.GetFrequency();
+
+        if ( frequency == 0 )
+        {
+          continue;
+        }
+
+        // MITK_INFO << index[0] + 1 << "|" << index[1] + 1 << " " << frequency;
+
+        MeasurementVectorType measurement = hit.GetMeasurementVector();
+
+
+        double i = index[0] + 1;
+        double j = index[1] + 1;
+
+        double p_ij = frequency / (1.0*m_TotalNumberOfRuns);
+
+        mu_i += i * p_ij;
+        mu_j += j * p_ij;
+      }
+      // MITK_INFO << "Mu_i " << mu_i << " Mu_j " << mu_j;
+      //Calculate the other features.
+      const double log2 = std::log(2.0);
+
       for ( HistogramIterator hit = inputHistogram->Begin();
         hit != inputHistogram->End(); ++hit )
       {
@@ -128,8 +169,16 @@ namespace itk {
         IndexType index = hit.GetIndex();
         //      inputHistogram->GetIndex( hit.GetInstanceIdentifier() );
 
-        double i2 = static_cast<double>( ( index[0] + 1 ) * ( index[0] + 1 ) );
-        double j2 = static_cast<double>( ( index[1] + 1 ) * ( index[1] + 1 ) );
+        double i = index[0] + 1;
+        double j = index[1] + 1;
+        double i2 = i*i;
+        double j2 = j*j;
+
+        double p_ij = frequency / m_TotalNumberOfRuns;
+
+        greyLevelVariance += ((i - mu_i) * (i - mu_i) * p_ij);
+        runLengthVariance += ((j - mu_j) * (j - mu_j) * p_ij);
+        runEntropy -= ( p_ij > 0.0001 ) ? p_ij *std::log(p_ij) / log2 : 0;
 
         // Traditional measures
         shortRunEmphasis += ( frequency / j2 );
@@ -139,13 +188,13 @@ namespace itk {
         runLengthNonuniformityVector[index[1]] += frequency;
 
         // measures from Chu et al.
-        lowGreyLevelRunEmphasis += ( frequency / i2 );
+        lowGreyLevelRunEmphasis += (i2 > 0.0001) ? ( frequency / i2 ) : 0;
         highGreyLevelRunEmphasis += ( frequency * i2 );
 
         // measures from Dasarathy and Holder
-        shortRunLowGreyLevelEmphasis += ( frequency / ( i2 * j2 ) );
-        shortRunHighGreyLevelEmphasis += ( frequency * i2 / j2 );
-        longRunLowGreyLevelEmphasis += ( frequency * j2 / i2 );
+        shortRunLowGreyLevelEmphasis += ((i2 * j2) > 0.0001) ? ( frequency / ( i2 * j2 ) ) : 0;
+        shortRunHighGreyLevelEmphasis += (j2 > 0.0001) ? ( frequency * i2 / j2 ) : 0;
+        longRunLowGreyLevelEmphasis += (i2 > 0.0001) ? ( frequency * j2 / i2 ) : 0;
         longRunHighGreyLevelEmphasis += ( frequency * i2 * j2 );
       }
       greyLevelNonuniformity =
@@ -181,6 +230,10 @@ namespace itk {
           static_cast<double>( this->m_TotalNumberOfRuns );
         runPercentage = static_cast<double>( this->m_TotalNumberOfRuns ) / static_cast<double>( this->m_NumberOfVoxels );
         numberOfRuns = static_cast<double>( this->m_TotalNumberOfRuns ) ;
+
+        greyLevelNonuniformityNormalized = greyLevelNonuniformity / static_cast<double>(this->m_TotalNumberOfRuns);
+        runLengthNonuniformityNormalized = runLengthNonuniformity / static_cast<double>(this->m_TotalNumberOfRuns);
+
       } else {
         shortRunEmphasis        = 0;
         longRunEmphasis         = 0;
@@ -195,6 +248,10 @@ namespace itk {
         longRunLowGreyLevelEmphasis  = 0;
         longRunHighGreyLevelEmphasis = 0;
         runPercentage = 0;
+
+        greyLevelNonuniformityNormalized = 0;
+        runLengthNonuniformityNormalized = 0;
+
         numberOfRuns = static_cast<double>( this->m_TotalNumberOfRuns ) ;
       }
 
@@ -209,6 +266,14 @@ namespace itk {
       MeasurementObjectType* greyLevelNonuniformityOutputObject =
         static_cast<MeasurementObjectType*>( this->ProcessObject::GetOutput( 2 ) );
       greyLevelNonuniformityOutputObject->Set( greyLevelNonuniformity );
+
+      MeasurementObjectType* greyLevelNonuniformityNormalizedOutputObject =
+        static_cast<MeasurementObjectType*>( this->ProcessObject::GetOutput( 15 ) );
+      greyLevelNonuniformityNormalizedOutputObject->Set( greyLevelNonuniformityNormalized );
+
+      MeasurementObjectType* runLengthNonuniformityNormalizedOutputObject =
+        static_cast<MeasurementObjectType*>( this->ProcessObject::GetOutput( 16 ) );
+      runLengthNonuniformityNormalizedOutputObject->Set( runLengthNonuniformityNormalized );
 
       MeasurementObjectType* runLengthNonuniformityOutputObject =
         static_cast<MeasurementObjectType*>( this->ProcessObject::GetOutput( 3 ) );
@@ -246,6 +311,18 @@ namespace itk {
       MeasurementObjectType* numberOfRunsOutputObject =
         static_cast<MeasurementObjectType*>( this->ProcessObject::GetOutput( 11 ) );
       numberOfRunsOutputObject->Set( numberOfRuns );
+
+      MeasurementObjectType* greyLevelVarianceOutputObject =
+        static_cast<MeasurementObjectType*>( this->ProcessObject::GetOutput( 12 ) );
+      greyLevelVarianceOutputObject->Set( greyLevelVariance );
+
+      MeasurementObjectType* runLengthVarianceOutputObject =
+        static_cast<MeasurementObjectType*>( this->ProcessObject::GetOutput( 13 ) );
+      runLengthVarianceOutputObject->Set( runLengthVariance );
+
+      MeasurementObjectType* runEntropyOutputObject =
+        static_cast<MeasurementObjectType*>( this->ProcessObject::GetOutput( 14 ) );
+      runEntropyOutputObject->Set( runEntropy );
     }
 
     template<typename THistogram>
@@ -357,6 +434,51 @@ namespace itk {
     }
 
     template<typename THistogram>
+    const
+      typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementObjectType*
+      EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
+      ::GetGreyLevelVarianceOutput() const
+    {
+      return itkDynamicCastInDebugMode<const MeasurementObjectType*>( this->ProcessObject::GetOutput( 12 ) );
+    }
+
+    template<typename THistogram>
+    const
+      typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementObjectType*
+      EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
+      ::GetRunLengthVarianceOutput() const
+    {
+      return itkDynamicCastInDebugMode<const MeasurementObjectType*>( this->ProcessObject::GetOutput( 13 ) );
+    }
+
+    template<typename THistogram>
+    const
+      typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementObjectType*
+      EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
+      ::GetRunEntropyOutput() const
+    {
+      return itkDynamicCastInDebugMode<const MeasurementObjectType*>( this->ProcessObject::GetOutput( 14 ) );
+    }
+
+    template<typename THistogram>
+    const
+      typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementObjectType*
+      EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
+      ::GetGreyLevelNonuniformityNormalizedOutput() const
+    {
+      return itkDynamicCastInDebugMode<const MeasurementObjectType*>( this->ProcessObject::GetOutput( 15 ) );
+    }
+
+    template<typename THistogram>
+    const
+      typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementObjectType*
+      EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
+      ::GetRunLengthNonuniformityNormalizedOutput() const
+    {
+      return itkDynamicCastInDebugMode<const MeasurementObjectType*>( this->ProcessObject::GetOutput( 16 ) );
+    }
+
+    template<typename THistogram>
     typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementType
       EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
       ::GetShortRunEmphasis() const
@@ -444,6 +566,42 @@ namespace itk {
     {
       return this->GetNumberOfRunsOutput()->Get();
     }
+    template<typename THistogram>
+    typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementType
+      EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
+      ::GetGreyLevelVariance() const
+    {
+      return this->GetGreyLevelVarianceOutput()->Get();
+    }
+    template<typename THistogram>
+    typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementType
+      EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
+      ::GetRunLengthVariance() const
+    {
+      return this->GetRunLengthVarianceOutput()->Get();
+    }
+    template<typename THistogram>
+    typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementType
+      EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
+      ::GetRunEntropy() const
+    {
+      return this->GetRunEntropyOutput()->Get();
+    }
+
+    template<typename THistogram>
+    typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementType
+      EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
+      ::GetGreyLevelNonuniformityNormalized() const
+    {
+      return this->GetGreyLevelNonuniformityNormalizedOutput()->Get();
+    }
+    template<typename THistogram>
+    typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementType
+      EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
+      ::GetRunLengthNonuniformityNormalized() const
+    {
+      return this->GetRunLengthNonuniformityNormalizedOutput()->Get();
+    }
 
     template<typename THistogram>
     typename EnhancedHistogramToRunLengthFeaturesFilter< THistogram>::MeasurementType
@@ -458,8 +616,12 @@ namespace itk {
         return this->GetLongRunEmphasis();
       case GreyLevelNonuniformity:
         return this->GetGreyLevelNonuniformity();
+      case GreyLevelNonuniformityNormalized:
+        return this->GetGreyLevelNonuniformityNormalized();
       case RunLengthNonuniformity:
         return this->GetRunLengthNonuniformity();
+      case RunLengthNonuniformityNormalized:
+        return this->GetRunLengthNonuniformityNormalized();
       case LowGreyLevelRunEmphasis:
         return this->GetLowGreyLevelRunEmphasis();
       case HighGreyLevelRunEmphasis:
@@ -476,6 +638,12 @@ namespace itk {
         return this->GetRunPercentage();
       case NumberOfRuns:
         return this->GetNumberOfRuns();
+      case GreyLevelVariance:
+        return this->GetGreyLevelVariance();
+      case RunLengthVariance:
+        return this->GetRunLengthVariance();
+      case RunEntropy:
+        return this->GetRunEntropy();
       default:
         return 0;
       }

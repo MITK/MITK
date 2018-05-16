@@ -9,6 +9,7 @@
       id="org.blueberry.views.logview"
       name="Logging"
       class="berry::LogView"
-    icon="resources/logging.svg" />
+      icon="resources/logging.svg"
+      category="General" />
   </extension>
 </plugin>

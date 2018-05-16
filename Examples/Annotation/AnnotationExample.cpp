@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
   renderWindow.GetRenderer()->SetDataStorage(ds);
 
   // Initialize the RenderWindow
-  mitk::TimeGeometry::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
+  auto geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews(geo);
   // mitk::RenderingManager::GetInstance()->InitializeViews();
 

@@ -42,7 +42,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPointListView : public QListView
   Q_OBJECT
 
 public:
-  QmitkPointListView(QWidget *parent = 0);
+  QmitkPointListView(QWidget *parent = nullptr);
   ~QmitkPointListView() override;
 
   /// assign a point set for observation
@@ -60,8 +60,6 @@ public:
 
   QmitkStdMultiWidget *GetMultiWidget()
     const; ///< return the QmitkStdMultiWidget that is used for updating render window crosshair
-
-  void SetTimesStep(int i); ///< which time step to display/model
 
   /**
    * @brief Add a mitk::SliceNavigationController instance.
@@ -83,8 +81,8 @@ public:
 
 signals:
 
-  void
-    SignalPointSelectionChanged(); ///< this signal is emmitted, if the selection of a point in the pointset is changed
+  void SignalPointSelectionChanged(); ///< this signal is emmitted, if the selection of a point in the pointset is changed
+  void SignalTimeStepChanged(int);
 
 protected slots:
 
@@ -96,9 +94,6 @@ protected slots:
 
   /// called when the selection of the view widget changes
   void OnListViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
-
-  /// fade the shown timestep out
-  void fadeTimeStepOut();
 
   /// open ContextMenu
   void ctxMenu(const QPoint &pos);
@@ -115,7 +110,6 @@ protected slots:
 protected:
   void keyPressEvent(QKeyEvent *e) override;    ///< react to F2, F3 and DEL keys
   void wheelEvent(QWheelEvent *event) override; ///< change timestep of the current pointset by mouse wheel
-  void fadeTimeStepIn();                        ///< fade a label with the currently shown timestep in
 
   std::set<mitk::SliceNavigationController *> m_Sncs;
 
@@ -125,7 +119,6 @@ protected:
 
   /// used to position the planes on a selected point
   QmitkStdMultiWidget *m_MultiWidget;
-  QLabel *m_TimeStepFaderLabel;
 };
 
 #endif

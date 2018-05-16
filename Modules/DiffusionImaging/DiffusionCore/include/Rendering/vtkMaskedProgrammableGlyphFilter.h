@@ -96,9 +96,9 @@ public:
 
 protected:
   vtkMaskedProgrammableGlyphFilter();
-  ~vtkMaskedProgrammableGlyphFilter();
+  ~vtkMaskedProgrammableGlyphFilter() override;
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
 
   vtkMaskPoints *MaskPoints;
   int MaximumNumberOfPoints;

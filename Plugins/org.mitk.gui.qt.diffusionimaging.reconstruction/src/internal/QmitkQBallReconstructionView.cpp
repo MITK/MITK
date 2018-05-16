@@ -55,8 +55,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIStructuredSelection.h"
 #include "berryIWorkbenchWindow.h"
 #include "berryISelectionService.h"
-
+#include <mitkShImage.h>
 #include <boost/version.hpp>
+#include <itkShToOdfImageFilter.h>
+#include <mitkImageCast.h>
 
 const std::string QmitkQBallReconstructionView::VIEW_ID = "org.mitk.views.qballreconstruction";
 
@@ -223,12 +225,73 @@ void QmitkQBallReconstructionView::CreateConnections()
     connect( (QObject*)(m_Controls->m_ButtonStandard), SIGNAL(clicked()), this, SLOT(ReconstructStandard()) );
     connect( (QObject*)(m_Controls->m_QBallReconstructionMethodComboBox), SIGNAL(currentIndexChanged(int)), this, SLOT(MethodChoosen(int)) );
     connect( (QObject*)(m_Controls->m_QBallReconstructionThreasholdEdit), SIGNAL(valueChanged(int)), this, SLOT(PreviewThreshold(int)) );
+    connect( (QObject*)(m_Controls->m_ConvertButton), SIGNAL(clicked()), this, SLOT(ConvertShImage()) );
 
     m_Controls->m_ImageBox->SetDataStorage(this->GetDataStorage());
     mitk::NodePredicateIsDWI::Pointer isDwi = mitk::NodePredicateIsDWI::New();
     m_Controls->m_ImageBox->SetPredicate( isDwi );
 
+    m_Controls->m_ShImageBox->SetDataStorage(this->GetDataStorage());
+    mitk::TNodePredicateDataType<mitk::ShImage>::Pointer isSh = mitk::TNodePredicateDataType<mitk::ShImage>::New();
+    m_Controls->m_ShImageBox->SetPredicate( isSh );
+
     connect( (QObject*)(m_Controls->m_ImageBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
+    connect( (QObject*)(m_Controls->m_ShImageBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
+
+    UpdateGui();
+  }
+}
+
+template<int ShOrder>
+void QmitkQBallReconstructionView::TemplatedConvertShImage(mitk::ShImage::Pointer mitkImage)
+{
+  typedef itk::ShToOdfImageFilter< float, ShOrder > ShConverterType;
+
+  typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
+  mitk::CastToItkImage(mitkImage, itkvol);
+
+  typename ShConverterType::Pointer converter = ShConverterType::New();
+  converter->SetInput(itkvol);
+  converter->Update();
+
+  mitk::OdfImage::Pointer image = mitk::OdfImage::New();
+  image->InitializeByItk( converter->GetOutput() );
+  image->SetVolume( converter->GetOutput()->GetBufferPointer() );
+  mitk::DataNode::Pointer node=mitk::DataNode::New();
+  node->SetData( image );
+  node->SetName(m_Controls->m_ShImageBox->GetSelectedNode()->GetName());
+
+  GetDataStorage()->Add(node, m_Controls->m_ShImageBox->GetSelectedNode());
+}
+
+void QmitkQBallReconstructionView::ConvertShImage()
+{
+  if (m_Controls->m_ShImageBox->GetSelectedNode().IsNotNull())
+  {
+    mitk::ShImage::Pointer mitkImg = dynamic_cast<mitk::ShImage*>(m_Controls->m_ShImageBox->GetSelectedNode()->GetData());
+    switch (mitkImg->ShOrder())
+    {
+    case 2:
+      TemplatedConvertShImage<2>(mitkImg);
+      break;
+    case 4:
+      TemplatedConvertShImage<4>(mitkImg);
+      break;
+    case 6:
+      TemplatedConvertShImage<6>(mitkImg);
+      break;
+    case 8:
+      TemplatedConvertShImage<8>(mitkImg);
+      break;
+    case 10:
+      TemplatedConvertShImage<10>(mitkImg);
+      break;
+    case 12:
+      TemplatedConvertShImage<12>(mitkImg);
+      break;
+    default :
+      QMessageBox::warning(nullptr, "Error", "Only spherical harmonics orders 2-12 are supported.", QMessageBox::Ok);
+    }
   }
 }
 
@@ -240,6 +303,8 @@ void QmitkQBallReconstructionView::UpdateGui()
     m_Controls->m_ButtonStandard->setEnabled(true);
     GenerateShellSelectionUI(m_Controls->m_ImageBox->GetSelectedNode());
   }
+
+  m_Controls->m_ConvertButton->setEnabled(m_Controls->m_ShImageBox->GetSelectedNode().IsNotNull());
 }
 
 void QmitkQBallReconstructionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& /*nodes*/)
@@ -453,7 +518,7 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction(mitk::DataNode::
     image->SetVolume( filter->GetOutput()->GetBufferPointer() );
     mitk::DataNode::Pointer new_node = mitk::DataNode::New();
     new_node->SetData( image );
-    SetDefaultNodeProperties(new_node, nodename+nodePostfix);
+    new_node->SetName(nodename+nodePostfix);
     mitk::ProgressBar::GetInstance()->Progress();
 
     GetDataStorage()->Add(new_node, node);
@@ -600,19 +665,19 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::
   image->SetVolume( filter->GetOutput()->GetBufferPointer() );
   mitk::DataNode::Pointer node=mitk::DataNode::New();
   node->SetData( image );
-  SetDefaultNodeProperties(node, dataNodePointer->GetName()+nodePostfix);
+  node->SetName(dataNodePointer->GetName()+nodePostfix);
 
   GetDataStorage()->Add(node, dataNodePointer);
 
   if(m_Controls->m_OutputCoeffsImage->isChecked())
   {
-    mitk::Image::Pointer coeffsImage = mitk::Image::New();
+    mitk::Image::Pointer coeffsImage = dynamic_cast<mitk::Image*>(mitk::ShImage::New().GetPointer());
     coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
     coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
+
     mitk::DataNode::Pointer coeffsNode=mitk::DataNode::New();
     coeffsNode->SetData( coeffsImage );
     coeffsNode->SetProperty( "name", mitk::StringProperty::New(dataNodePointer->GetName()+"_SH-Coeffs") );
-    coeffsNode->SetVisibility(false);
     GetDataStorage()->Add(coeffsNode, node);
   }
 }
@@ -732,24 +797,9 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
   image->SetVolume( filter->GetOutput()->GetBufferPointer() );
   mitk::DataNode::Pointer node=mitk::DataNode::New();
   node->SetData( image );
-  SetDefaultNodeProperties(node, nodename+"_SH_MultiShell_Qball");
+  node->SetName(nodename+"_SH_MultiShell_Qball");
 
   GetDataStorage()->Add(node, dataNodePointer);
-}
-
-void QmitkQBallReconstructionView::SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name)
-{
-  node->SetProperty( "ShowMaxNumber", mitk::IntProperty::New( 500 ) );
-  node->SetProperty( "Scaling", mitk::FloatProperty::New( 1.0 ) );
-  node->SetProperty( "Normalization", mitk::OdfNormalizationMethodProperty::New());
-  node->SetProperty( "ScaleBy", mitk::OdfScaleByProperty::New());
-  node->SetProperty( "IndexParam1", mitk::FloatProperty::New(2));
-  node->SetProperty( "IndexParam2", mitk::FloatProperty::New(1));
-  node->SetProperty( "visible", mitk::BoolProperty::New( true ) );
-  node->SetProperty( "VisibleOdfs", mitk::BoolProperty::New( false ) );
-  node->SetProperty ("layer", mitk::IntProperty::New(100));
-  node->SetProperty( "DoRefresh", mitk::BoolProperty::New( true ) );
-  node->SetProperty( "name", mitk::StringProperty::New(name) );
 }
 
 void QmitkQBallReconstructionView::GenerateShellSelectionUI(mitk::DataNode::Pointer node)

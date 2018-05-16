@@ -71,7 +71,7 @@ public:
   itkCloneMacro(Self)
 
   /** \brief Performs the work */
-  virtual void GenerateData();
+  void GenerateData() override;
 
 
   /** \brief Output the gradient image as itkVectorImage
@@ -93,7 +93,7 @@ protected:
 
   SkeletonizationFilter();
 
-  virtual ~SkeletonizationFilter();
+  ~SkeletonizationFilter() override;
 
   VectorImageType::Pointer m_DirectionImage;
 

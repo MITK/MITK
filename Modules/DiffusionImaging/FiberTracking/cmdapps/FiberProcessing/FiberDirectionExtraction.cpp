@@ -27,9 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractsToVectorImageFilter.h>
 #include <mitkCoreObjectFactory.h>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 /*!
 \brief Extract principal fiber directions from a tractogram
 */
@@ -95,7 +92,7 @@ int main(int argc, char* argv[])
     typedef itk::Image<unsigned char, 3>                                    ItkUcharImgType;
 
     // load fiber bundle
-    mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(fibFile)[0].GetPointer());
+    mitk::FiberBundle::Pointer inputTractogram = mitk::IOUtil::Load<mitk::FiberBundle>(fibFile);
 
     // load/create mask image
     ItkUcharImgType::Pointer itkMaskImage = nullptr;
@@ -103,7 +100,7 @@ int main(int argc, char* argv[])
     {
       std::cout << "Using mask image";
       itkMaskImage = ItkUcharImgType::New();
-      mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskImage)[0].GetPointer());
+      mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::Load<mitk::Image>(maskImage);
       mitk::CastToItkImage(mitkMaskImage, itkMaskImage);
     }
 
@@ -111,7 +108,7 @@ int main(int argc, char* argv[])
     itk::TractsToVectorImageFilter<float>::Pointer fOdfFilter = itk::TractsToVectorImageFilter<float>::New();
     fOdfFilter->SetFiberBundle(inputTractogram);
     fOdfFilter->SetMaskImage(itkMaskImage);
-    fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
+    fOdfFilter->SetAngularThreshold(cos(angularThreshold*itk::Math::pi/180));
     switch (normalization)
     {
     case 1:

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>QmitkFiberProcessingViewControls</class>
  <widget class="QWidget" name="QmitkFiberProcessingViewControls">
@@ -12,6 +12,36 @@
   </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string>QCommandLinkButton {
+  font-weight: lighter;
+}
+
+QCommandLinkButton:disabled {
+  border: none;
+  font-weight: lighter;
+}
+
+QToolBox::tab {
+  font-weight: bold;
+}
+
+QToolBox::tab:hover {
+  font-weight: bold;
+}
+
+QToolBox::tab:selected {
+  font-weight: bold;
+}
+
+QGroupBox {
+  background-color: transparent;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: transparent;
+}</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
    <property name="leftMargin">
@@ -40,7 +70,7 @@
         <x>0</x>
         <y>0</y>
         <width>353</width>
-        <height>443</height>
+        <height>441</height>
        </rect>
       </property>
       <attribute name="label">
@@ -120,7 +150,7 @@
           <item row="3" column="0">
            <widget class="QCheckBox" name="m_InteractiveBox">
             <property name="text">
-             <string>Interactive Extraction </string>
+             <string>Interactive Extraction</string>
             </property>
            </widget>
           </item>
@@ -175,11 +205,12 @@
                 <string>Draw circular ROI. Select reference fiber bundle to execute.</string>
                </property>
                <property name="text">
-                <string/>
+                <string></string>
                </property>
                <property name="icon">
                 <iconset resource="../../../org.mitk.gui.qt.diffusionimaging.fiberfox/resources/QmitkDiffusionImaging.qrc">
-                 <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>:/QmitkDiffusionImaging/circle.png</iconset>
+                 <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>
+:/QmitkDiffusionImaging/circle.png                </iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -220,11 +251,12 @@
                 <string>Draw polygonal ROI. Select reference fiber bundle to execute.</string>
                </property>
                <property name="text">
-                <string/>
+                <string></string>
                </property>
                <property name="icon">
                 <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-                 <normaloff>:/QmitkDiffusionImaging/polygon.png</normaloff>:/QmitkDiffusionImaging/polygon.png</iconset>
+                 <normaloff>:/QmitkDiffusionImaging/polygon.png</normaloff>
+:/QmitkDiffusionImaging/polygon.png                </iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -455,6 +487,9 @@
           </item>
           <item row="2" column="2">
            <widget class="QDoubleSpinBox" name="m_FiberExtractionFractionBox">
+            <property name="toolTip">
+             <string>Minimum overlap of streamlines and ROI in terms of streamline length. Zero means that one streamline point inside the ROI is enough to be considered as "overlapping".</string>
+            </property>
             <property name="decimals">
              <number>3</number>
             </property>
@@ -718,10 +753,10 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="m_ExtractDirX"/>
+           <widget class="QDoubleSpinBox" name="m_ExtractDirX"></widget>
           </item>
           <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="m_ExtractDirY"/>
+           <widget class="QDoubleSpinBox" name="m_ExtractDirY"></widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_4">
@@ -731,7 +766,7 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="m_ExtractDirZ"/>
+           <widget class="QDoubleSpinBox" name="m_ExtractDirZ"></widget>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_5">
@@ -868,7 +903,7 @@
           </font>
          </property>
          <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
           <string>Remove</string>
@@ -1143,7 +1178,7 @@
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QmitkDataStorageComboBox" name="m_ColorMapBox"/>
+           <widget class="QmitkDataStorageComboBox" name="m_ColorMapBox"></widget>
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_12">
@@ -1155,7 +1190,7 @@
           <item row="2" column="0">
            <widget class="QCheckBox" name="m_NormalizeColorValues">
             <property name="toolTip">
-             <string>The values used to color the fibers are min-max normalized. If not checked, the values should be between 0 and 1. </string>
+             <string>The values used to color the fibers are min-max normalized. If not checked, the values should be between 0 and 1.</string>
             </property>
             <property name="text">
              <string>Normalize values</string>
@@ -1214,6 +1249,11 @@
          <item>
           <property name="text">
            <string>Color fibers by fiber weights</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Color fibers by length</string>
           </property>
          </item>
         </widget>
@@ -1307,7 +1347,7 @@
           </font>
          </property>
          <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
           <string>Execute</string>
@@ -1372,7 +1412,7 @@
         <x>0</x>
         <y>0</y>
         <width>367</width>
-        <height>174</height>
+        <height>172</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1496,21 +1536,21 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_9">
       <property name="leftMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <item row="0" column="1">
        <widget class="QLabel" name="m_FibLabel">
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" color:#ff0000;"&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -1520,7 +1560,7 @@
       <item row="1" column="1">
        <widget class="QLabel" name="m_PfLabel">
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;needed for extraction&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" color:#969696;"&gt;needed for extraction&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -1573,8 +1613,8 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../org.mitk.gui.qt.diffusionimaging.fiberfox/resources/QmitkDiffusionImaging.qrc"/>
-  <include location="../../resources/QmitkDiffusionImaging.qrc"/>
+  <include location="../../../org.mitk.gui.qt.diffusionimaging.fiberfox/resources/QmitkDiffusionImaging.qrc"></include>
+  <include location="../../resources/QmitkDiffusionImaging.qrc"></include>
  </resources>
- <connections/>
+ <connections></connections>
 </ui>

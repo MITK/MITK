@@ -42,7 +42,7 @@ public:
   void TestReduceContourWithNthPoint()
   {
     mitk::Surface::Pointer contour =
-      dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/SingleContour.vtk"))[0].GetPointer());
+      mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("SurfaceInterpolation/Reference/SingleContour.vtk"));
     m_ContourReducer->SetInput(contour);
     m_ContourReducer->SetReductionType(mitk::ReduceContourSetFilter::NTH_POINT);
     m_ContourReducer->SetStepSize(20);
@@ -50,7 +50,7 @@ public:
     mitk::Surface::Pointer reducedContour = m_ContourReducer->GetOutput();
 
     mitk::Surface::Pointer reference =
-      dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/ReducedContourNthPoint_20.vtk"))[0].GetPointer());
+      mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("SurfaceInterpolation/Reference/ReducedContourNthPoint_20.vtk"));
 
     CPPUNIT_ASSERT_MESSAGE(
       "Unequal contours",
@@ -61,14 +61,14 @@ public:
   void TestReduceContourWithDouglasPeuker()
   {
     mitk::Surface::Pointer contour =
-      dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/TwoContours.vtk"))[0].GetPointer());
+      mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("SurfaceInterpolation/Reference/TwoContours.vtk"));
     m_ContourReducer->SetInput(contour);
     m_ContourReducer->SetReductionType(mitk::ReduceContourSetFilter::DOUGLAS_PEUCKER);
     m_ContourReducer->Update();
     mitk::Surface::Pointer reducedContour = m_ContourReducer->GetOutput();
 
     mitk::Surface::Pointer reference =
-      dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath("SurfaceInterpolation/Reference/ReducedContourDouglasPeucker.vtk"))[0].GetPointer());
+      mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("SurfaceInterpolation/Reference/ReducedContourDouglasPeucker.vtk"));
 
     CPPUNIT_ASSERT_MESSAGE(
       "Unequal contours",

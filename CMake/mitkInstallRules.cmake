@@ -50,7 +50,7 @@ if(MACOSX_BUNDLE_NAMES)
             DESTINATION "${bundle_name}.app/Contents/MacOS/iconengines"
             CONFIGURATIONS Release)
     # related to MITK:T19679-InstallQtWebEnginProcess
-    if(MITK_USE_Qt5_WebEngine)
+    if(MITK_USE_Qt5)
         get_filename_component(ABS_DIR_HELPERS "${_qmake_path}/../lib/QtWebEngineCore.framework/Helpers" REALPATH)
         install(DIRECTORY ${ABS_DIR_HELPERS}
                 DESTINATION "${bundle_name}.app/Contents/Frameworks/QtWebEngineCore.framework/"
@@ -76,9 +76,9 @@ if(WIN32)
     install(FILES "${_qmake_path}/../plugins/iconengines/qsvgicon.dll"
             DESTINATION "bin/plugins/iconengines"
             CONFIGURATIONS Release)
-    if(MITK_USE_Qt5_WebEngine)
-      MITK_INSTALL( FILES "${_qmake_path}/QtWebEngineProcess.exe")
-    endif()
+
+    MITK_INSTALL( FILES "${_qmake_path}/QtWebEngineProcess.exe")
+
     install(DIRECTORY "${_qmake_path}/../resources/"
             DESTINATION "bin/resources/"
             CONFIGURATIONS Release)
@@ -169,9 +169,7 @@ else()
       install(FILES "${_qmake_path}/../plugins/xcbglintegrations/libqxcb-glx-integration.so"
               DESTINATION "bin/plugins/xcbglintegrations")
 
-      if(MITK_USE_Qt5_WebEngine)
-        MITK_INSTALL_HELPER_APP( EXECUTABLES "${_qmake_path}/../libexec/QtWebEngineProcess")
-      endif()
+      MITK_INSTALL_HELPER_APP( EXECUTABLES "${_qmake_path}/../libexec/QtWebEngineProcess")
 
       install(DIRECTORY "${_qmake_path}/../resources/"
               DESTINATION "bin/resources/")

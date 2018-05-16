@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>QmitkStreamlineTrackingViewControls</class>
  <widget class="QWidget" name="QmitkStreamlineTrackingViewControls">
@@ -18,6 +18,36 @@
   </property>
   <property name="windowTitle">
    <string>QmitkTemplate</string>
+  </property>
+  <property name="styleSheet">
+   <string>QCommandLinkButton {
+  font-weight: lighter;
+}
+
+QCommandLinkButton:disabled {
+  border: none;
+  font-weight: lighter;
+}
+
+QToolBox::tab {
+  font-weight: bold;
+}
+
+QToolBox::tab:hover {
+  font-weight: bold;
+}
+
+QToolBox::tab:selected {
+  font-weight: bold;
+}
+
+QGroupBox {
+  background-color: transparent;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: transparent;
+}</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_11">
    <property name="topMargin">
@@ -112,7 +142,7 @@
             <string>Input Image. ODF, tensor, peak, and, in case of ML tractography, raw diffusion-weighted images are currently supported.</string>
            </property>
            <property name="text">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;select image in data-manager&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" color:#ff0000;"&gt;select image in data-manager&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="wordWrap">
             <bool>true</bool>
@@ -122,7 +152,7 @@
          <item row="1" column="0">
           <widget class="QLabel" name="m_ForestLabel">
            <property name="toolTip">
-            <string/>
+            <string></string>
            </property>
            <property name="text">
             <string>Tractography Forest:</string>
@@ -196,7 +226,7 @@
         <x>0</x>
         <y>0</y>
         <width>421</width>
-        <height>267</height>
+        <height>262</height>
        </rect>
       </property>
       <attribute name="label">
@@ -267,7 +297,7 @@
              <item row="1" column="0">
               <widget class="QLabel" name="m_FaThresholdLabel_4">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Radius:</string>
@@ -296,7 +326,7 @@
              <item row="2" column="0">
               <widget class="QLabel" name="m_SeedsPerVoxelLabel_4">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Num. Seeds:</string>
@@ -368,7 +398,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="m_TrialsPerSeedLabel">
             <property name="toolTip">
-             <string/>
+             <string></string>
             </property>
             <property name="text">
              <string>Trials Per Seed:</string>
@@ -378,7 +408,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="m_FaThresholdLabel_2">
             <property name="toolTip">
-             <string/>
+             <string></string>
             </property>
             <property name="text">
              <string>Max. Num. Fibers:</string>
@@ -428,7 +458,7 @@
           <item row="1" column="1">
            <widget class="QSpinBox" name="m_SeedsPerVoxelBox">
             <property name="toolTip">
-             <string>Number of seed points placed in each voxel. </string>
+             <string>Number of seed points placed in each voxel.</string>
             </property>
             <property name="minimum">
              <number>1</number>
@@ -441,7 +471,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="m_SeedsPerVoxelLabel">
             <property name="toolTip">
-             <string/>
+             <string></string>
             </property>
             <property name="text">
              <string>Seeds per Voxel:</string>
@@ -466,7 +496,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_6">
             <property name="toolTip">
-             <string/>
+             <string></string>
             </property>
             <property name="text">
              <string>Seed Image:</string>
@@ -485,7 +515,7 @@
           <string>Dynamically pick a seed location by click into image.</string>
          </property>
          <property name="text">
-          <string>Enable Interactive Tractography </string>
+          <string>Enable Interactive Tractography</string>
          </property>
         </widget>
        </item>
@@ -510,7 +540,7 @@
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>255</height>
+        <height>224</height>
        </rect>
       </property>
       <attribute name="label">
@@ -520,24 +550,29 @@
        <string>Specify various ROI and mask images to constrain the tractography process.</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="4" column="0">
-        <widget class="QLabel" name="m_TargetImageLabel">
-         <property name="toolTip">
-          <string/>
-         </property>
-         <property name="text">
-          <string>Target ROI Image:</string>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label_7">
          <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
           <string>Mask Image:</string>
          </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_StopImageBox">
+         <property name="toolTip">
+          <string>Fibers that enter a region defined in this image will stop immediately.</string>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+         </property>
+         <item>
+          <property name="text">
+           <string>-</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item row="3" column="1">
@@ -585,6 +620,26 @@
          </item>
         </widget>
        </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="toolTip">
+          <string></string>
+         </property>
+         <property name="text">
+          <string>Endpoint Constraints:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="toolTip">
+          <string></string>
+         </property>
+         <property name="text">
+          <string>Stop ROI Image:</string>
+         </property>
+        </widget>
+       </item>
        <item row="4" column="1">
         <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TargetImageBox">
          <property name="toolTip">
@@ -600,23 +655,13 @@
          </item>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_9">
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_11">
          <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
-          <string>Stop ROI Image:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_10">
-         <property name="toolTip">
-          <string/>
-         </property>
-         <property name="text">
-          <string>Endpoint Constraints:</string>
+          <string>Exclusion ROI Image:</string>
          </property>
         </widget>
        </item>
@@ -635,41 +680,13 @@
          </item>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_StopImageBox">
+       <item row="4" column="0">
+        <widget class="QLabel" name="m_TargetImageLabel">
          <property name="toolTip">
-          <string>Fibers that enter a region defined in this image will stop immediately.</string>
-         </property>
-         <property name="sizeAdjustPolicy">
-          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-         </property>
-         <item>
-          <property name="text">
-           <string>-</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <spacer name="verticalSpacer_6">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_11">
-         <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
-          <string>Exclusion ROI Image:</string>
+          <string>Target ROI Image:</string>
          </property>
         </widget>
        </item>
@@ -688,6 +705,19 @@
          </item>
         </widget>
        </item>
+       <item row="6" column="0">
+        <spacer name="verticalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_trackingparam">
@@ -696,7 +726,7 @@
         <x>0</x>
         <y>0</y>
         <width>421</width>
-        <height>359</height>
+        <height>351</height>
        </rect>
       </property>
       <attribute name="label">
@@ -758,7 +788,7 @@
        <item row="2" column="0">
         <widget class="QLabel" name="m_FaThresholdLabel">
          <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
           <string>Cutoff:</string>
@@ -768,7 +798,7 @@
        <item row="3" column="0">
         <widget class="QLabel" name="mFaImageLabel">
          <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
           <string>FA/GFA Image:</string>
@@ -778,7 +808,7 @@
        <item row="0" column="0">
         <widget class="QLabel" name="m_FaThresholdLabel_3">
          <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
           <string>Mode:</string>
@@ -788,7 +818,7 @@
        <item row="7" column="0">
         <widget class="QLabel" name="m_AngularThresholdLabel">
          <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
           <string>Angular Threshold:</string>
@@ -820,10 +850,10 @@
        <item row="8" column="1">
         <widget class="QSpinBox" name="m_LoopCheckBox">
          <property name="toolTip">
-          <string>Maximum allowed angular SDTEV over 4 voxel lengths. Default: no loop check. </string>
+          <string>Maximum allowed angular SDTEV over 4 voxel lengths. Default: no loop check.</string>
          </property>
          <property name="statusTip">
-          <string/>
+          <string></string>
          </property>
          <property name="minimum">
           <number>-1</number>
@@ -854,7 +884,7 @@
        <item row="5" column="0">
         <widget class="QLabel" name="m_StepsizeLabel">
          <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
           <string>Step Size:</string>
@@ -905,7 +935,7 @@
           <string>If you are using dODF images as input, it is advisable to sharpen the ODFs (min-max normalize and raise to the power of 4). This is not necessary for CSD fODFs, since they are naturally much sharper.</string>
          </property>
          <property name="text">
-          <string/>
+          <string></string>
          </property>
         </widget>
        </item>
@@ -922,7 +952,7 @@
        <item row="6" column="0">
         <widget class="QLabel" name="m_MinTractLengthLabel">
          <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
           <string>Min. Tract Length:</string>
@@ -951,7 +981,7 @@
        <item row="4" column="0">
         <widget class="QLabel" name="m_OdfCutoffLabel">
          <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
           <string>ODF Cutoff:</string>
@@ -983,7 +1013,7 @@
        <item row="8" column="0">
         <widget class="QLabel" name="m_LoopCheckLabel">
          <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
           <string>Loop Check:</string>
@@ -1012,7 +1042,7 @@
        <item row="10" column="0">
         <widget class="QLabel" name="m_gLabel">
          <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
           <string>g:</string>
@@ -1022,10 +1052,115 @@
        <item row="1" column="0">
         <widget class="QLabel" name="m_FaThresholdLabel_5">
          <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
           <string>Sharpen ODFs:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_prior">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>435</width>
+        <height>224</height>
+       </rect>
+      </property>
+      <attribute name="label">
+       <string>Tractography Prior</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_9">
+       <item row="2" column="0">
+        <widget class="QLabel" name="m_PriorLabel_3">
+         <property name="text">
+          <string>Restrict to Prior:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="m_PriorLabel_2">
+         <property name="text">
+          <string>Weight:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="m_PriorLabel">
+         <property name="text">
+          <string>Peak Image:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QDoubleSpinBox" name="m_PriorWeightBox">
+         <property name="toolTip">
+          <string>Weighting factor between prior and data.</string>
+         </property>
+         <property name="maximum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.100000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.500000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="m_PriorAsMaskBox">
+         <property name="toolTip">
+          <string>Restrict tractography to regions where the prior is valid.</string>
+         </property>
+         <property name="text">
+          <string></string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_PriorImageBox">
+         <property name="toolTip">
+          <string></string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <spacer name="verticalSpacer_7">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="m_PriorLabel_4">
+         <property name="text">
+          <string>New Directions from Prior:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QCheckBox" name="m_NewDirectionsFromPriorBox">
+         <property name="toolTip">
+          <string>If unchecked, the prior cannot create directions where there are none in the data.</string>
+         </property>
+         <property name="text">
+          <string></string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -1037,7 +1172,7 @@
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>255</height>
+        <height>224</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1097,7 +1232,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="m_SeedsPerVoxelLabel_2">
             <property name="toolTip">
-             <string/>
+             <string></string>
             </property>
             <property name="text">
              <string>Num. Samples:</string>
@@ -1117,7 +1252,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="m_SamplingDistanceLabel">
             <property name="toolTip">
-             <string/>
+             <string></string>
             </property>
             <property name="text">
              <string>Sampling Distance:</string>
@@ -1167,7 +1302,7 @@
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>255</height>
+        <height>224</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1305,7 +1440,7 @@
           <item row="7" column="0">
            <widget class="QLabel" name="m_SeedsPerVoxelLabel_3">
             <property name="toolTip">
-             <string/>
+             <string></string>
             </property>
             <property name="text">
              <string>Flip directions:</string>
@@ -1336,7 +1471,7 @@
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>255</height>
+        <height>224</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1437,7 +1572,7 @@
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11"/>
+ <layoutdefault spacing="6" margin="11"></layoutdefault>
  <customwidgets>
   <customwidget>
    <class>QmitkDataStorageComboBox</class>
@@ -1450,6 +1585,6 @@
    <header>QmitkDataStorageComboBoxWithSelectNone.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
- <connections/>
+ <resources></resources>
+ <connections></connections>
 </ui>

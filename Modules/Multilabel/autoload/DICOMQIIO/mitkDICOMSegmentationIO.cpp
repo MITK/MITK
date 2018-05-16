@@ -436,6 +436,12 @@ namespace mitk
       MITK_ERROR << "An error occurred while reading the DICOM Seg file: " << e.what();
       return result;
     }
+    catch (...)
+    {
+      MITK_ERROR << "An error occurred in dcmqi while reading the DICOM Seg file";
+      return result;
+    }
+
 
     result.push_back(labelSetImage.GetPointer());
 

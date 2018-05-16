@@ -106,7 +106,7 @@ void mitk::FiberBundleDicomWriter::Write()
     IODImageReference* ref = new IODImageReference(patient_id.c_str(), study_instance_uid.c_str(), series_instance_uid.c_str(), sop_instance_uid.c_str(), UID_MRImageStorage);
     refs.add(ref);
 
-    std::time_t t = std::time(NULL);
+    std::time_t t = std::time(nullptr);
     char date_buffer[20];
     std::strftime(date_buffer, sizeof(date_buffer), "%Y%m%d", std::gmtime(&t));
     char time_buffer[20];
@@ -115,7 +115,7 @@ void mitk::FiberBundleDicomWriter::Write()
     OFString contentTime(time_buffer);
 
     OFString val = "-";
-    TrcTractographyResults *trc = NULL;
+    TrcTractographyResults *trc = nullptr;
     TrcTractographyResults::create(id, contentDate, contentTime, equipment, refs, trc);
     trc->getStudy().setStudyInstanceUID(study_instance_uid.c_str());
     trc->getSeries().setSeriesInstanceUID(series_instance_uid.c_str());
@@ -129,7 +129,7 @@ void mitk::FiberBundleDicomWriter::Write()
     // Every CodeSequenceMacro has: Code Value, Coding Scheme Designator, Code Meaning
     CodeSequenceMacro diffusionModel(model_code_value.c_str(), "DCM", model_code_meaning.c_str());
     CodeSequenceMacro algorithmId(algo_code_value.c_str(), "DCM", algo_code_meaning.c_str());
-    TrcTrackSet *set = NULL;
+    TrcTrackSet *set = nullptr;
     trc->addTrackSet("TRACTOGRAM", "Tractogram processed with MITK Diffusion", anatomy, diffusionModel, algorithmId, set);
 
     // Create trackset
@@ -156,7 +156,7 @@ void mitk::FiberBundleDicomWriter::Write()
         }
         tracts.push_back(pointData);
 
-        TrcTrack* track = NULL;
+        TrcTrack* track = nullptr;
         set->addTrack(pointData, numPoints, cieLabColor, 1 /* numColors */, track);
     }
 

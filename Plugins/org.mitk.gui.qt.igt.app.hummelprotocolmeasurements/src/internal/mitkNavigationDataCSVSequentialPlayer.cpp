@@ -13,13 +13,12 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#define _USE_MATH_DEFINES
+
 #include "mitkNavigationDataCSVSequentialPlayer.h"
 #include <QString>
 #include <QStringList>
 #include <iostream>
 #include <fstream>
-#include <math.h>
 
 mitk::NavigationDataCSVSequentialPlayer::NavigationDataCSVSequentialPlayer()
   : mitk::NavigationDataPlayerBase()
@@ -234,9 +233,9 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
 
         if (!m_EulersInRadiants) //the Euler Angles are in Degrees but MITK uses radiants so they need to be converted
         {
-            azimuthAngle = azimuthAngle / 180 * M_PI;
-            elevationAngle = elevationAngle / 180 * M_PI;
-            rollAngle = rollAngle / 180 * M_PI;
+            azimuthAngle = azimuthAngle / 180 * itk::Math::pi;
+            elevationAngle = elevationAngle / 180 * itk::Math::pi;
+            rollAngle = rollAngle / 180 * itk::Math::pi;
         }
         vnl_quaternion<double> eulerQuat(rollAngle, elevationAngle, azimuthAngle);
         orientation = eulerQuat;
@@ -246,7 +245,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     {
       //code block for conversion from left-handed to right-handed
       mitk::Quaternion linksZuRechtsdrehend;
-      double rotationAngle = -M_PI;
+      double rotationAngle = -itk::Math::pi;
       double rotationAxis[3];
       rotationAxis[0] = 0;
       rotationAxis[1] = 0;

@@ -89,10 +89,11 @@ class MITKDIFFUSIONCORE_EXPORT sh
 {
 public:
   static double factorial(int number);
-  static void Cart2Sph(double x, double y, double z, double* cart);
+  static void Cart2Sph(double x, double y, double z, double* spherical);
   static double legendre0(int l);
   static double spherical_harmonic(int m,int l,double theta,double phi, bool complexPart);
-  static double Yj(int m, int k, double theta, double phi);
+  static double Yj(int m, int k, float theta, float phi, bool mrtrix=true);
+  static vnl_matrix<float> CalcShBasisForDirections(int sh_order, vnl_matrix<double> U, bool mrtrix=true);
 };
 
 class MITKDIFFUSIONCORE_EXPORT gradients

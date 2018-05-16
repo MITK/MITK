@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>QmitkFiberfoxViewControls</class>
  <widget class="QWidget" name="QmitkFiberfoxViewControls">
@@ -13,6 +13,36 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string>QCommandLinkButton {
+  font-weight: lighter;
+}
+
+QCommandLinkButton:disabled {
+  border: none;
+  font-weight: lighter;
+}
+
+QToolBox::tab {
+  font-weight: bold;
+}
+
+QToolBox::tab:hover {
+  font-weight: bold;
+}
+
+QToolBox::tab:selected {
+  font-weight: bold;
+}
+
+QGroupBox {
+  background-color: transparent;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: transparent;
+}</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="3" column="0">
     <widget class="QCommandLinkButton" name="m_LoadParametersButton">
@@ -21,7 +51,8 @@
      </property>
      <property name="icon">
       <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-       <normaloff>:/QmitkDiffusionImaging/general_icons/upload.ico</normaloff>:/QmitkDiffusionImaging/general_icons/upload.ico</iconset>
+       <normaloff>:/QmitkDiffusionImaging/general_icons/upload.ico</normaloff>
+:/QmitkDiffusionImaging/general_icons/upload.ico      </iconset>
      </property>
     </widget>
    </item>
@@ -32,7 +63,8 @@
      </property>
      <property name="icon">
       <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-       <normaloff>:/QmitkDiffusionImaging/general_icons/download.ico</normaloff>:/QmitkDiffusionImaging/general_icons/download.ico</iconset>
+       <normaloff>:/QmitkDiffusionImaging/general_icons/download.ico</normaloff>
+:/QmitkDiffusionImaging/general_icons/download.ico      </iconset>
      </property>
     </widget>
    </item>
@@ -80,7 +112,8 @@
             </property>
             <property name="icon">
              <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-              <normaloff>:/QmitkDiffusionImaging/general_icons/right.ico</normaloff>:/QmitkDiffusionImaging/general_icons/right.ico</iconset>
+              <normaloff>:/QmitkDiffusionImaging/general_icons/right.ico</normaloff>
+:/QmitkDiffusionImaging/general_icons/right.ico             </iconset>
             </property>
            </widget>
           </item>
@@ -91,16 +124,16 @@
             </property>
             <layout class="QGridLayout" name="gridLayout_10">
              <property name="leftMargin">
-              <number>0</number>
+              <number>6</number>
              </property>
              <property name="topMargin">
-              <number>0</number>
+              <number>6</number>
              </property>
              <property name="rightMargin">
-              <number>0</number>
+              <number>6</number>
              </property>
              <property name="bottomMargin">
-              <number>0</number>
+              <number>6</number>
              </property>
              <item row="4" column="2">
               <widget class="QFrame" name="frame_6">
@@ -156,13 +189,13 @@
              <item row="0" column="0" rowspan="2" colspan="2">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_16">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Fiber Bundle:</string>
@@ -175,13 +208,13 @@
              <item row="4" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_10">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Save path:</string>
@@ -194,13 +227,13 @@
              <item row="2" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_3">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Tissue Mask:</string>
@@ -223,13 +256,13 @@
              <item row="3" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_11">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Template Image:</string>
@@ -265,7 +298,8 @@
             </property>
             <property name="icon">
              <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-              <normaloff>:/QmitkDiffusionImaging/general_icons/abort.ico</normaloff>:/QmitkDiffusionImaging/general_icons/abort.ico</iconset>
+              <normaloff>:/QmitkDiffusionImaging/general_icons/abort.ico</normaloff>
+:/QmitkDiffusionImaging/general_icons/abort.ico             </iconset>
             </property>
            </widget>
           </item>
@@ -292,16 +326,16 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_14">
           <property name="leftMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="topMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <item row="18" column="0">
            <widget class="QFrame" name="m_Comp4FractionFrame">
@@ -334,7 +368,7 @@
              <item row="0" column="1">
               <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_Comp4VolumeFraction">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
               </widget>
              </item>
@@ -369,16 +403,16 @@
            </widget>
           </item>
           <item row="8" column="0">
-           <widget class="QmitkAstrosticksModelParametersWidget" name="m_AstrosticksWidget1" native="true"/>
+           <widget class="QmitkAstrosticksModelParametersWidget" name="m_AstrosticksWidget1" native="true"></widget>
           </item>
           <item row="10" column="0">
-           <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget3" native="true"/>
+           <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget3" native="true"></widget>
           </item>
           <item row="16" column="0">
-           <widget class="QmitkDotModelParametersWidget" name="m_DotWidget2" native="true"/>
+           <widget class="QmitkDotModelParametersWidget" name="m_DotWidget2" native="true"></widget>
           </item>
           <item row="9" column="0">
-           <widget class="QmitkDotModelParametersWidget" name="m_DotWidget1" native="true"/>
+           <widget class="QmitkDotModelParametersWidget" name="m_DotWidget1" native="true"></widget>
           </item>
           <item row="12" column="0">
            <widget class="Line" name="line_2">
@@ -426,13 +460,13 @@
            </widget>
           </item>
           <item row="14" column="0">
-           <widget class="QmitkBallModelParametersWidget" name="m_BallWidget2" native="true"/>
+           <widget class="QmitkBallModelParametersWidget" name="m_BallWidget2" native="true"></widget>
           </item>
           <item row="7" column="0">
-           <widget class="QmitkBallModelParametersWidget" name="m_BallWidget1" native="true"/>
+           <widget class="QmitkBallModelParametersWidget" name="m_BallWidget1" native="true"></widget>
           </item>
           <item row="15" column="0">
-           <widget class="QmitkAstrosticksModelParametersWidget" name="m_AstrosticksWidget2" native="true"/>
+           <widget class="QmitkAstrosticksModelParametersWidget" name="m_AstrosticksWidget2" native="true"></widget>
           </item>
           <item row="13" column="0">
            <widget class="QComboBox" name="m_Compartment4Box">
@@ -467,7 +501,7 @@
            </widget>
           </item>
           <item row="17" column="0">
-           <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget4" native="true"/>
+           <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget4" native="true"></widget>
           </item>
          </layout>
         </widget>
@@ -479,25 +513,25 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_13">
           <property name="leftMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="topMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <item row="3" column="0">
-           <widget class="QmitkTensorModelParametersWidget" name="m_TensorWidget1" native="true"/>
+           <widget class="QmitkTensorModelParametersWidget" name="m_TensorWidget1" native="true"></widget>
           </item>
           <item row="1" column="0">
-           <widget class="QmitkStickModelParametersWidget" name="m_StickWidget1" native="true"/>
+           <widget class="QmitkStickModelParametersWidget" name="m_StickWidget1" native="true"></widget>
           </item>
           <item row="4" column="0">
-           <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget1" native="true"/>
+           <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget1" native="true"></widget>
           </item>
           <item row="0" column="0">
            <widget class="QComboBox" name="m_Compartment1Box">
@@ -527,7 +561,7 @@
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QmitkZeppelinModelParametersWidget" name="m_ZeppelinWidget1" native="true"/>
+           <widget class="QmitkZeppelinModelParametersWidget" name="m_ZeppelinWidget1" native="true"></widget>
           </item>
           <item row="5" column="0">
            <widget class="QFrame" name="m_Comp1FractionFrame">
@@ -577,16 +611,16 @@
          </property>
          <layout class="QGridLayout" name="gridLayout">
           <property name="leftMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="topMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <item row="6" column="0">
            <widget class="QCheckBox" name="m_AdvancedOptionsBox_2">
@@ -648,16 +682,16 @@
              <item row="1" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;b-Value&lt;span style=&quot; font-style:italic;&quot;&gt; [s/mm&lt;/span&gt;&lt;span style=&quot; font-style:italic; vertical-align:super;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;]&lt;/span&gt;:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;b-Value&lt;span style=" font-style:italic;"&gt; [s/mm&lt;/span&gt;&lt;span style=" font-style:italic; vertical-align:super;"&gt;2&lt;/span&gt;&lt;span style=" font-style:italic;"&gt;]&lt;/span&gt;:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
@@ -733,13 +767,13 @@
              <item row="2" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_13">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of Channels:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -833,13 +867,13 @@
              <item row="8" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_32">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Partial Fourier:</string>
@@ -865,13 +899,13 @@
              <item row="3" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_34">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Coil Sensitivity:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -938,16 +972,16 @@
              <item row="6" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_14">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Repetition Time &lt;span style=&quot; font-style:italic;&quot;&gt;TR&lt;/span&gt;: &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Repetition Time &lt;span style=" font-style:italic;"&gt;TR&lt;/span&gt;: &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
@@ -976,13 +1010,13 @@
              <item row="7" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_15">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Dwell Time:</string>
@@ -995,16 +1029,16 @@
              <item row="9" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_12">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-style:italic; vertical-align:sub;&quot;&gt;inhom&lt;/span&gt; Relaxation: &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-style:italic;"&gt;T&lt;/span&gt;&lt;span style=" font-style:italic; vertical-align:sub;"&gt;inhom&lt;/span&gt; Relaxation: &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
@@ -1014,7 +1048,7 @@
              <item row="13" column="0">
               <widget class="QCheckBox" name="m_RelaxationBox">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;TE&lt;/span&gt;, &lt;span style=&quot; font-style:italic;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-style:italic; vertical-align:sub;&quot;&gt;inhom&lt;/span&gt; and &lt;span style=&quot; font-style:italic;&quot;&gt;T2&lt;/span&gt; will have no effect if unchecked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-style:italic;"&gt;TE&lt;/span&gt;, &lt;span style=" font-style:italic;"&gt;T&lt;/span&gt;&lt;span style=" font-style:italic; vertical-align:sub;"&gt;inhom&lt;/span&gt; and &lt;span style=" font-style:italic;"&gt;T2&lt;/span&gt; will have no effect if unchecked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string>Simulate Signal Relaxation</string>
@@ -1027,16 +1061,16 @@
              <item row="4" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_33">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Echo Time &lt;span style=&quot; font-style:italic;&quot;&gt;TE&lt;/span&gt;:  &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Echo Time &lt;span style=" font-style:italic;"&gt;TE&lt;/span&gt;:  &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
@@ -1277,16 +1311,16 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_17">
           <property name="leftMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="topMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <item row="0" column="0">
            <widget class="QComboBox" name="m_Compartment2Box">
@@ -1316,16 +1350,16 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QmitkZeppelinModelParametersWidget" name="m_ZeppelinWidget2" native="true"/>
+           <widget class="QmitkZeppelinModelParametersWidget" name="m_ZeppelinWidget2" native="true"></widget>
           </item>
           <item row="2" column="0">
-           <widget class="QmitkStickModelParametersWidget" name="m_StickWidget2" native="true"/>
+           <widget class="QmitkStickModelParametersWidget" name="m_StickWidget2" native="true"></widget>
           </item>
           <item row="3" column="0">
-           <widget class="QmitkTensorModelParametersWidget" name="m_TensorWidget2" native="true"/>
+           <widget class="QmitkTensorModelParametersWidget" name="m_TensorWidget2" native="true"></widget>
           </item>
           <item row="4" column="0">
-           <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget2" native="true"/>
+           <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget2" native="true"></widget>
           </item>
           <item row="5" column="0">
            <widget class="QFrame" name="m_Comp2FractionFrame">
@@ -1375,16 +1409,16 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
           <property name="leftMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="topMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <item row="12" column="0">
            <widget class="QCheckBox" name="m_AddDistortions">
@@ -1439,13 +1473,13 @@
              <item row="0" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_26">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Gradient:</string>
@@ -1524,13 +1558,13 @@
              <item row="0" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_23">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>K-Space Line Offset:</string>
@@ -1680,27 +1714,27 @@
                </property>
                <layout class="QGridLayout" name="gridLayout_19">
                 <property name="leftMargin">
-                 <number>0</number>
+                 <number>6</number>
                 </property>
                 <property name="topMargin">
                  <number>9</number>
                 </property>
                 <property name="rightMargin">
-                 <number>0</number>
+                 <number>6</number>
                 </property>
                 <property name="bottomMargin">
-                 <number>0</number>
+                 <number>6</number>
                 </property>
                 <item row="1" column="0">
                  <widget class="QLabel" name="m_TensorsToDWIBValueLabel_36">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="statusTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="whatsThis">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="text">
                    <string>Degree:</string>
@@ -1713,13 +1747,13 @@
                 <item row="0" column="1">
                  <widget class="QLabel" name="m_TensorsToDWIBValueLabel_29">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="statusTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="whatsThis">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="text">
                    <string>x</string>
@@ -1732,13 +1766,13 @@
                 <item row="0" column="0">
                  <widget class="QLabel" name="m_TensorsToDWIBValueLabel_28">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="statusTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="whatsThis">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="text">
                    <string>Axis:</string>
@@ -1795,13 +1829,13 @@
                 <item row="0" column="2">
                  <widget class="QLabel" name="m_TensorsToDWIBValueLabel_30">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="statusTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="whatsThis">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="text">
                    <string>y</string>
@@ -1814,13 +1848,13 @@
                 <item row="0" column="3">
                  <widget class="QLabel" name="m_TensorsToDWIBValueLabel_31">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="statusTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="whatsThis">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="text">
                    <string>z</string>
@@ -1862,24 +1896,24 @@
                </property>
                <layout class="QGridLayout" name="gridLayout_28">
                 <property name="leftMargin">
-                 <number>0</number>
+                 <number>6</number>
                 </property>
                 <property name="rightMargin">
-                 <number>0</number>
+                 <number>6</number>
                 </property>
                 <property name="bottomMargin">
-                 <number>0</number>
+                 <number>6</number>
                 </property>
                 <item row="1" column="0">
                  <widget class="QLabel" name="m_TensorsToDWIBValueLabel_48">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="statusTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="whatsThis">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="text">
                    <string>Distance:</string>
@@ -1892,13 +1926,13 @@
                 <item row="0" column="1">
                  <widget class="QLabel" name="m_TensorsToDWIBValueLabel_51">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="statusTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="whatsThis">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="text">
                    <string>x</string>
@@ -1911,13 +1945,13 @@
                 <item row="0" column="2">
                  <widget class="QLabel" name="m_TensorsToDWIBValueLabel_52">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="statusTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="whatsThis">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="text">
                    <string>y</string>
@@ -1930,13 +1964,13 @@
                 <item row="0" column="0">
                  <widget class="QLabel" name="m_TensorsToDWIBValueLabel_47">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="statusTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="whatsThis">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="text">
                    <string>Axis:</string>
@@ -1949,13 +1983,13 @@
                 <item row="0" column="3">
                  <widget class="QLabel" name="m_TensorsToDWIBValueLabel_53">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="statusTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="whatsThis">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="text">
                    <string>z</string>
@@ -2065,7 +2099,7 @@
                 <item row="0" column="1">
                  <widget class="QLineEdit" name="m_MotionVolumesBox">
                   <property name="toolTip">
-                   <string>Type in the volume indices that should be affected by motion (e.g. &quot;0 3 7&quot; whithout quotation marks). Leave blank for motion in all volumes. Type in &quot;random&quot; to randomly select volumes for motion. A list of negative numbers (e.g. -1 -2 -3) excludes volumes (e.g. 1 2 3) selects all remaining volumes. </string>
+                   <string>Type in the volume indices that should be affected by motion (e.g. "0 3 7" whithout quotation marks). Leave blank for motion in all volumes. Type in "random" to randomly select volumes for motion. A list of negative numbers (e.g. -1 -2 -3) excludes volumes (e.g. 1 2 3) selects all remaining volumes.</string>
                   </property>
                   <property name="text">
                    <string>random</string>
@@ -2156,7 +2190,7 @@
           <item row="19" column="0">
            <widget class="QCheckBox" name="m_AddEddy">
             <property name="toolTip">
-             <string/>
+             <string></string>
             </property>
             <property name="text">
              <string>Add Eddy Current Effects</string>
@@ -2196,13 +2230,13 @@
              <item row="0" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_27">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Shrink FOV (%):</string>
@@ -2267,13 +2301,13 @@
              <item row="0" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_25">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Frequency Map:</string>
@@ -2402,7 +2436,7 @@
           <string notr="true">color: rgb(255, 0, 0);</string>
          </property>
          <property name="text">
-          <string>Please select an image or an existing fiber bundle to draw the fiber fiducials. If you can't provide a suitable image, generate one using the &quot;Signal Generation&quot; tab.</string>
+          <string>Please select an image or an existing fiber bundle to draw the fiber fiducials. If you can't provide a suitable image, generate one using the "Signal Generation" tab.</string>
          </property>
          <property name="textFormat">
           <enum>Qt::AutoText</enum>
@@ -2422,21 +2456,21 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_16">
           <property name="leftMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="topMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <item row="0" column="0">
            <widget class="QCheckBox" name="m_ConstantRadiusBox">
             <property name="toolTip">
-             <string>All fiducials are treated as circles with the same radius as the first fiducial. </string>
+             <string>All fiducials are treated as circles with the same radius as the first fiducial.</string>
             </property>
             <property name="text">
              <string>Use Constant Fiducial Radius</string>
@@ -2459,7 +2493,8 @@
             </property>
             <property name="icon">
              <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-              <normaloff>:/QmitkDiffusionImaging/general_icons/right.ico</normaloff>:/QmitkDiffusionImaging/general_icons/right.ico</iconset>
+              <normaloff>:/QmitkDiffusionImaging/general_icons/right.ico</normaloff>
+:/QmitkDiffusionImaging/general_icons/right.ico             </iconset>
             </property>
            </widget>
           </item>
@@ -2473,16 +2508,16 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_11">
           <property name="leftMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="topMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <item row="5" column="0">
            <widget class="QCommandLinkButton" name="m_JoinBundlesButton">
@@ -2494,7 +2529,8 @@
             </property>
             <property name="icon">
              <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-              <normaloff>:/QmitkDiffusionImaging/general_icons/plus.ico</normaloff>:/QmitkDiffusionImaging/general_icons/plus.ico</iconset>
+              <normaloff>:/QmitkDiffusionImaging/general_icons/plus.ico</normaloff>
+:/QmitkDiffusionImaging/general_icons/plus.ico             </iconset>
             </property>
            </widget>
           </item>
@@ -2522,13 +2558,13 @@
              <item row="1" column="2">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_18">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Y</string>
@@ -2560,13 +2596,13 @@
              <item row="1" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_22">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Axis:</string>
@@ -2598,13 +2634,13 @@
              <item row="3" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_21">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Translation:</string>
@@ -2655,13 +2691,13 @@
              <item row="1" column="1">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_17">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>X</string>
@@ -2674,13 +2710,13 @@
              <item row="2" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_20">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Rotation:</string>
@@ -2693,13 +2729,13 @@
              <item row="1" column="3">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_19">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Z</string>
@@ -2750,13 +2786,13 @@
              <item row="4" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_24">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Scaling:</string>
@@ -2836,7 +2872,8 @@
             </property>
             <property name="icon">
              <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-              <normaloff>:/QmitkDiffusionImaging/general_icons/copy2.ico</normaloff>:/QmitkDiffusionImaging/general_icons/copy2.ico</iconset>
+              <normaloff>:/QmitkDiffusionImaging/general_icons/copy2.ico</normaloff>
+:/QmitkDiffusionImaging/general_icons/copy2.ico             </iconset>
             </property>
            </widget>
           </item>
@@ -2850,7 +2887,8 @@
             </property>
             <property name="icon">
              <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-              <normaloff>:/QmitkDiffusionImaging/general_icons/refresh.ico</normaloff>:/QmitkDiffusionImaging/general_icons/refresh.ico</iconset>
+              <normaloff>:/QmitkDiffusionImaging/general_icons/refresh.ico</normaloff>
+:/QmitkDiffusionImaging/general_icons/refresh.ico             </iconset>
             </property>
            </widget>
           </item>
@@ -2877,16 +2915,16 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_15">
           <property name="leftMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="topMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <item row="2" column="0">
            <widget class="QFrame" name="frame_5">
@@ -2933,13 +2971,13 @@
                 <item row="1" column="0">
                  <widget class="QLabel" name="m_TensorsToDWIBValueLabel_5">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="statusTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="whatsThis">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="text">
                    <string>Tension:</string>
@@ -2952,13 +2990,13 @@
                 <item row="0" column="0">
                  <widget class="QLabel" name="m_TensorsToDWIBValueLabel_8">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="statusTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="whatsThis">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="text">
                    <string>Fiber Sampling:</string>
@@ -2971,7 +3009,7 @@
                 <item row="1" column="1">
                  <widget class="QDoubleSpinBox" name="m_TensionBox">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="decimals">
                    <number>3</number>
@@ -3012,13 +3050,13 @@
                 <item row="3" column="0">
                  <widget class="QLabel" name="m_TensorsToDWIBValueLabel_7">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="statusTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="whatsThis">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="text">
                    <string>Bias:</string>
@@ -3031,13 +3069,13 @@
                 <item row="2" column="0">
                  <widget class="QLabel" name="m_TensorsToDWIBValueLabel_6">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="statusTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="whatsThis">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="text">
                    <string>Continuity:</string>
@@ -3115,13 +3153,13 @@
                 <item row="0" column="0">
                  <widget class="QLabel" name="m_TensorsToDWIBValueLabel_4">
                   <property name="toolTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="statusTip">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="whatsThis">
-                   <string/>
+                   <string></string>
                   </property>
                   <property name="text">
                    <string>#Fibers:</string>
@@ -3166,7 +3204,8 @@
             </property>
             <property name="icon">
              <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-              <normaloff>:/QmitkDiffusionImaging/general_icons/right.ico</normaloff>:/QmitkDiffusionImaging/general_icons/right.ico</iconset>
+              <normaloff>:/QmitkDiffusionImaging/general_icons/right.ico</normaloff>
+:/QmitkDiffusionImaging/general_icons/right.ico             </iconset>
             </property>
            </widget>
           </item>
@@ -3211,13 +3250,13 @@
              <item row="0" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_9">
                <property name="toolTip">
-                <string/>
+                <string></string>
                </property>
                <property name="statusTip">
-                <string/>
+                <string></string>
                </property>
                <property name="whatsThis">
-                <string/>
+                <string></string>
                </property>
                <property name="text">
                 <string>Fiber Distribution:</string>
@@ -3276,7 +3315,7 @@
              <item row="0" column="0">
               <widget class="QCheckBox" name="m_RealTimeFibers">
                <property name="toolTip">
-                <string>Disable to only generate fibers if &quot;Generate Fibers&quot; button is pressed.</string>
+                <string>Disable to only generate fibers if "Generate Fibers" button is pressed.</string>
                </property>
                <property name="text">
                 <string>Real Time Fibers</string>
@@ -3289,7 +3328,7 @@
              <item row="0" column="1">
               <widget class="QCheckBox" name="m_AdvancedOptionsBox">
                <property name="toolTip">
-                <string>Disable to only generate fibers if &quot;Generate Fibers&quot; button is pressed.</string>
+                <string>Disable to only generate fibers if "Generate Fibers" button is pressed.</string>
                </property>
                <property name="text">
                 <string>Advanced Options</string>
@@ -3341,11 +3380,12 @@
              <string>Draw elliptical fiducial.</string>
             </property>
             <property name="text">
-             <string/>
+             <string></string>
             </property>
             <property name="icon">
              <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-              <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>:/QmitkDiffusionImaging/circle.png</iconset>
+              <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>
+:/QmitkDiffusionImaging/circle.png             </iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -3376,11 +3416,12 @@
              <string>Flip fiber waypoints of selcted fiducial around one axis.</string>
             </property>
             <property name="text">
-             <string/>
+             <string></string>
             </property>
             <property name="icon">
              <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-              <normaloff>:/QmitkDiffusionImaging/general_icons/refresh.ico</normaloff>:/QmitkDiffusionImaging/general_icons/refresh.ico</iconset>
+              <normaloff>:/QmitkDiffusionImaging/general_icons/refresh.ico</normaloff>
+:/QmitkDiffusionImaging/general_icons/refresh.ico             </iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -3561,7 +3602,7 @@
   <tabstop>toolBox</tabstop>
  </tabstops>
  <resources>
-  <include location="../../resources/QmitkDiffusionImaging.qrc"/>
+  <include location="../../resources/QmitkDiffusionImaging.qrc"></include>
  </resources>
- <connections/>
+ <connections></connections>
 </ui>

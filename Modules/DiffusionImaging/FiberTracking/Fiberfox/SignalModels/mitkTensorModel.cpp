@@ -21,7 +21,6 @@ using namespace mitk;
 
 template< class ScalarType >
 TensorModel< ScalarType >::TensorModel()
-  : m_BValue(1000)
 {
   m_KernelDirection[0]=1; m_KernelDirection[1]=0; m_KernelDirection[2]=0;
   m_KernelTensorMatrix.fill(0.0);
@@ -37,7 +36,7 @@ TensorModel< ScalarType >::~TensorModel()
 }
 
 template< class ScalarType >
-ScalarType TensorModel< ScalarType >::SimulateMeasurement(unsigned int dir)
+ScalarType TensorModel< ScalarType >::SimulateMeasurement(unsigned int dir, GradientType &fiberDirection)
 {
   ScalarType signal = 0;
 
@@ -45,9 +44,8 @@ ScalarType TensorModel< ScalarType >::SimulateMeasurement(unsigned int dir)
     return signal;
 
   ItkTensorType tensor; tensor.Fill(0.0);
-  this->m_FiberDirection.Normalize();
-  vnl_vector_fixed<double, 3> axis = itk::CrossProduct(m_KernelDirection, this->m_FiberDirection).GetVnlVector(); axis.normalize();
-  vnl_quaternion<double> rotation(axis, acos(m_KernelDirection*this->m_FiberDirection));
+  vnl_vector_fixed<double, 3> axis = itk::CrossProduct(m_KernelDirection, fiberDirection).GetVnlVector(); axis.normalize();
+  vnl_quaternion<double> rotation(axis, acos(m_KernelDirection*fiberDirection));
   rotation.normalize();
   vnl_matrix_fixed<double, 3, 3> matrix = rotation.rotation_matrix_transpose();
 
@@ -73,7 +71,7 @@ ScalarType TensorModel< ScalarType >::SimulateMeasurement(unsigned int dir)
 
     // check for corrupted tensor and generate signal
     if (D_scalar>=0)
-      signal = std::exp ( -m_BValue * D_scalar );  // skip * bVal becaus bVal is already encoded in g^T*g (norm of g encodes b-value relative to baseline b-value m_BValue)
+      signal = std::exp ( -this->m_BValue * D_scalar );  // skip * bVal becaus bVal is already encoded in g^T*g (norm of g encodes b-value relative to baseline b-value m_BValue)
   }
   else
     signal = 1;
@@ -82,14 +80,13 @@ ScalarType TensorModel< ScalarType >::SimulateMeasurement(unsigned int dir)
 }
 
 template< class ScalarType >
-typename TensorModel< ScalarType >::PixelType TensorModel< ScalarType >::SimulateMeasurement()
+typename TensorModel< ScalarType >::PixelType TensorModel< ScalarType >::SimulateMeasurement(GradientType& fiberDirection)
 {
   PixelType signal; signal.SetSize(this->m_GradientList.size()); signal.Fill(0.0);
 
   ItkTensorType tensor; tensor.Fill(0.0);
-  this->m_FiberDirection.Normalize();
-  vnl_vector_fixed<double, 3> axis = itk::CrossProduct(m_KernelDirection, this->m_FiberDirection).GetVnlVector(); axis.normalize();
-  vnl_quaternion<double> rotation(axis, acos(m_KernelDirection*this->m_FiberDirection));
+  vnl_vector_fixed<double, 3> axis = itk::CrossProduct(m_KernelDirection, fiberDirection).GetVnlVector(); axis.normalize();
+  vnl_quaternion<double> rotation(axis, acos(m_KernelDirection*fiberDirection));
   rotation.normalize();
   vnl_matrix_fixed<double, 3, 3> matrix = rotation.rotation_matrix_transpose();
 
@@ -117,7 +114,7 @@ typename TensorModel< ScalarType >::PixelType TensorModel< ScalarType >::Simulat
 
       // check for corrupted tensor and generate signal
       if (D_scalar>=0)
-        signal[i] = std::exp ( -m_BValue * D_scalar ); // skip * bVal becaus bVal is already encoded in g^T*g (norm of g encodes b-value relative to baseline b-value m_BValue)
+        signal[i] = std::exp ( -this->m_BValue * D_scalar ); // skip * bVal becaus bVal is already encoded in g^T*g (norm of g encodes b-value relative to baseline b-value m_BValue)
     }
     else
       signal[i] = 1;

@@ -15,13 +15,10 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag 0887c8b2) # From https://github.com/kislinsk/CTK.git
+    set(revision_tag 0d43ccf0)
 
     set(ctk_optional_cache_args )
     if(MITK_USE_Python)
-      if(NOT MITK_USE_SYSTEM_PYTHON)
-        list(APPEND proj_DEPENDENCIES Python)
-      endif()
       list(APPEND ctk_optional_cache_args
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
            -DCTK_ENABLE_Python_Wrapping:BOOL=ON
@@ -60,7 +57,7 @@ if(MITK_USE_CTK)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 e7997d53c556f45b6eadb7bdf1645280
+      URL_MD5 e40466b607529a6d80f0d08b19cc4f05
       # PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
@@ -73,6 +70,7 @@ if(MITK_USE_CTK)
         # libraries yet.
         -DCMAKE_DEBUG_POSTFIX:STRING=
         -DCTK_QT_VERSION:STRING=5
+        -DQt5_DIR=${Qt5_DIR}
         -DGit_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
         -DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
         -DCTK_LIB_CommandLineModules/Backend/LocalProcess:BOOL=ON

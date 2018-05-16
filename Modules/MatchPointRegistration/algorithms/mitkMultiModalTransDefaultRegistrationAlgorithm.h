@@ -51,11 +51,11 @@ namespace mitk
           {
           };
 
-          virtual ~MultiModalTranslationDefaultRegistrationAlgorithm()
+          ~MultiModalTranslationDefaultRegistrationAlgorithm() override
           {
           };
 
-          void configureAlgorithm()
+          void configureAlgorithm() override
           {
             Superclass::configureAlgorithm();
 
@@ -84,7 +84,7 @@ namespace mitk
           }
 
           void
-          doInterLevelSetup()
+          doInterLevelSetup() override
           {
             Superclass::doInterLevelSetup();
 

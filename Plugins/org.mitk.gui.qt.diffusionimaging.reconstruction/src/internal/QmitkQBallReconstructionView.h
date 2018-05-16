@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkDiffusionPropertyHelper.h>
 #include <itkVectorImage.h>
+#include <mitkShImage.h>
 
 typedef short DiffusionPixelType;
 
@@ -91,6 +92,7 @@ protected slots:
 
   void UpdateGui();
   void ReconstructStandard();
+  void ConvertShImage();
   void MethodChoosen(int method);
   void Reconstruct(int method, int normalization);
 
@@ -107,6 +109,9 @@ protected slots:
 
 protected:
 
+  template<int ShOrder>
+  void TemplatedConvertShImage(mitk::ShImage::Pointer mitkImage);
+
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
@@ -117,8 +122,6 @@ protected:
 
   template<int L>
   void TemplatedMultiQBallReconstruction(float lambda, mitk::DataNode*);
-
-  void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
 
 private:
 

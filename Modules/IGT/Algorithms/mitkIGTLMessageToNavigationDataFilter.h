@@ -115,9 +115,9 @@ namespace mitk
 
   protected:
     IGTLMessageToNavigationDataFilter();
-    virtual ~IGTLMessageToNavigationDataFilter();
+    ~IGTLMessageToNavigationDataFilter() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
     void GenerateTransformData();
     void GenerateTrackingDataData();
     void GenerateQuaternionTrackingDataData();
@@ -135,7 +135,7 @@ namespace mitk
     /**
     * \brief Defines how the input will be copied into the output
     */
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
   };
 } // namespace mitk
 #endif /* MITKOPENIGTLMESSAGETONAVIGATIONDATAFILTER_H_HEADER_INCLUDED_ */

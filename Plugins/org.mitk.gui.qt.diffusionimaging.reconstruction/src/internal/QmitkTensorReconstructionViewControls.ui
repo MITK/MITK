@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>QmitkTensorReconstructionViewControls</class>
  <widget class="QWidget" name="QmitkTensorReconstructionViewControls">
@@ -22,6 +22,36 @@
   <property name="windowTitle">
    <string>QmitkTensorReconstructionViewControls</string>
   </property>
+  <property name="styleSheet">
+   <string>QCommandLinkButton {
+  font-weight: lighter;
+}
+
+QCommandLinkButton:disabled {
+  border: none;
+  font-weight: lighter;
+}
+
+QToolBox::tab {
+  font-weight: bold;
+}
+
+QToolBox::tab:hover {
+  font-weight: bold;
+}
+
+QToolBox::tab:selected {
+  font-weight: bold;
+}
+
+QGroupBox {
+  background-color: transparent;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: transparent;
+}</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout_5">
    <property name="verticalSpacing">
     <number>25</number>
@@ -33,16 +63,16 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_8">
       <property name="leftMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <item row="1" column="0">
        <widget class="QCommandLinkButton" name="m_TensorsToOdfButton">
@@ -53,10 +83,10 @@
          <string comment="Calculate ODF value as tensor value in the according direction" extracomment="Calculate ODF value as tensor value in the according direction">Calculate ODF value as tensor value in the according direction</string>
         </property>
         <property name="statusTip">
-         <string/>
+         <string></string>
         </property>
         <property name="whatsThis">
-         <string notr="true"/>
+         <string notr="true"></string>
         </property>
         <property name="text">
          <string>Start</string>
@@ -85,7 +115,7 @@
           <number>0</number>
          </property>
          <item row="0" column="1">
-          <widget class="QmitkDataStorageComboBox" name="m_OdfBox"/>
+          <widget class="QmitkDataStorageComboBox" name="m_OdfBox"></widget>
          </item>
          <item row="0" column="0">
           <widget class="QLabel" name="label_4">
@@ -107,16 +137,16 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_6">
       <property name="leftMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <item row="2" column="0">
        <widget class="QCommandLinkButton" name="m_TensorsToDWIButton">
@@ -127,10 +157,10 @@
          <string>Estimates the original diffusion weighted image based on a reconstructed tensor image.</string>
         </property>
         <property name="statusTip">
-         <string/>
+         <string></string>
         </property>
         <property name="whatsThis">
-         <string notr="true"/>
+         <string notr="true"></string>
         </property>
         <property name="text">
          <string>Estimate DWI based on Tensor Image</string>
@@ -170,13 +200,13 @@
          <item row="0" column="0">
           <widget class="QLabel" name="m_TensorsToDWIBValueLabel">
            <property name="toolTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
+            <string comment='how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: "0"' extracomment='how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: "0"'>how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: "0"</string>
            </property>
            <property name="statusTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
+            <string comment='how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: "0"' extracomment='how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: "0"'>how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: "0"</string>
            </property>
            <property name="whatsThis">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
+            <string comment='how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: "0"' extracomment='how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: "0"'>how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: "0"</string>
            </property>
            <property name="text">
             <string>B-Value</string>
@@ -288,7 +318,7 @@
           <number>0</number>
          </property>
          <item row="0" column="1">
-          <widget class="QmitkDataStorageComboBox" name="m_DtiBox"/>
+          <widget class="QmitkDataStorageComboBox" name="m_DtiBox"></widget>
          </item>
          <item row="0" column="0">
           <widget class="QLabel" name="label_3">
@@ -316,16 +346,16 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <property name="leftMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="horizontalSpacing">
        <number>6</number>
@@ -429,7 +459,7 @@
                 <item>
                  <widget class="QLabel" name="m_UpperLabel">
                   <property name="text">
-                   <string/>
+                   <string></string>
                   </property>
                  </widget>
                 </item>
@@ -446,7 +476,7 @@
                 <item>
                  <widget class="QLabel" name="m_LowerLabel">
                   <property name="text">
-                   <string/>
+                   <string></string>
                   </property>
                  </widget>
                 </item>
@@ -476,10 +506,10 @@
          <string>Calculate the residual from a dti and a dwi image</string>
         </property>
         <property name="statusTip">
-         <string/>
+         <string></string>
         </property>
         <property name="whatsThis">
-         <string notr="true"/>
+         <string notr="true"></string>
         </property>
         <property name="text">
          <string>Start</string>
@@ -508,7 +538,7 @@
           <number>0</number>
          </property>
          <item row="0" column="1">
-          <widget class="QmitkDataStorageComboBox" name="m_ResBox1"/>
+          <widget class="QmitkDataStorageComboBox" name="m_ResBox1"></widget>
          </item>
          <item row="0" column="0">
           <widget class="QLabel" name="label_5">
@@ -525,7 +555,7 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QmitkDataStorageComboBox" name="m_ResBox2"/>
+          <widget class="QmitkDataStorageComboBox" name="m_ResBox2"></widget>
          </item>
         </layout>
        </widget>
@@ -553,16 +583,16 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_7">
       <property name="leftMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <item row="2" column="1">
        <widget class="QCheckBox" name="m_Advanced1">
@@ -583,10 +613,10 @@
          <string>Select raw DWI!</string>
         </property>
         <property name="statusTip">
-         <string/>
+         <string></string>
         </property>
         <property name="whatsThis">
-         <string notr="true"/>
+         <string notr="true"></string>
         </property>
         <property name="text">
          <string>Start Reconstruction</string>
@@ -707,7 +737,7 @@
           <number>0</number>
          </property>
          <item row="0" column="1">
-          <widget class="QmitkDataStorageComboBox" name="m_DwiBox"/>
+          <widget class="QmitkDataStorageComboBox" name="m_DwiBox"></widget>
          </item>
          <item row="0" column="0">
           <widget class="QLabel" name="label">
@@ -724,7 +754,7 @@
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11"/>
+ <layoutdefault spacing="6" margin="11"></layoutdefault>
  <customwidgets>
   <customwidget>
    <class>QmitkDataStorageComboBox</class>
@@ -743,6 +773,6 @@
    <header>QmitkResidualViewWidget.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
- <connections/>
+ <resources></resources>
+ <connections></connections>
 </ui>

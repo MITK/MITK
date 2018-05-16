@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(
-  DEPENDS MitkCore
+  DEPENDS MitkCore MitkCommandLine
   PACKAGE_DEPENDS
   PUBLIC Eigen
 )

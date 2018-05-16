@@ -35,7 +35,7 @@ class MITK_QT_APP QmitkPreferencesDialog : public QDialog
 
 public:
 
-    QmitkPreferencesDialog(QWidget * parent = nullptr, Qt::WindowFlags f = 0);
+    QmitkPreferencesDialog(QWidget * parent = nullptr, Qt::WindowFlags f = nullptr);
     ~QmitkPreferencesDialog() override;
 
     void SetSelectedPage(const QString& id);

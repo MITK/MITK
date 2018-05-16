@@ -130,7 +130,7 @@ int main(int, char**)
 
   //! [Initialize views]
   // Global reinit with the bounds of the virtual tracking device
-  mitk::TimeGeometry::Pointer timeGeometry = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
+  auto timeGeometry = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
   mitk::BaseGeometry::Pointer geometry = timeGeometry->GetGeometryForTimeStep(0);
   geometry->SetBounds(bounds);
 

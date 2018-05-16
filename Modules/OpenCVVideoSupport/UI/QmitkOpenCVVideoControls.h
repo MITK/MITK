@@ -17,10 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkOpenCVVideoControls_h
 #define QmitkOpenCVVideoControls_h
 
-#include <cv.h>
 #include <ui_QmitkOpenCVVideoControls.h>
 #include <MitkOpenCVVideoSupportUIExports.h>
 #include <mitkPropertyListReplacedObserver.h>
+
+#include "opencv2/core.hpp"
 
 class QmitkRenderWindow;
 class QmitkVideoBackground;
@@ -46,12 +47,12 @@ public:
   /// Construct the widget with the given render window and the given preset values
   ///
   QmitkOpenCVVideoControls(QmitkVideoBackground* _VideoBackground, QmitkRenderWindow* _RenderWindow
-    , QWidget* parent = 0, Qt::WindowFlags f = 0);
+    , QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
 
   ///
   /// call reset if video playback is enabled here
   ///
-  virtual ~QmitkOpenCVVideoControls();
+  ~QmitkOpenCVVideoControls() override;
 
   ///
   /// sets the render window for this video player
@@ -97,7 +98,7 @@ signals:
   void Stop();
   void Reset();
   void IsPlaying(bool paused);
-  void QObjectDestroyed(QObject * obj = 0);
+  void QObjectDestroyed(QObject * obj = nullptr);
 
   void NewFrameAvailable(mitk::VideoSource* videoSource);
   void EndOfVideoSourceReached(mitk::VideoSource* videoSource);

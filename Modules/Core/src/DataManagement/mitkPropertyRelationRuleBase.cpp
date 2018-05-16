@@ -467,9 +467,9 @@ namespace mitk
     mitkClassMacro(NodePredicateRuleFunction, NodePredicateBase)
       mitkNewMacro2Param(NodePredicateRuleFunction, const FunctionType &, PropertyRelationRuleBase::ConstPointer)
 
-    virtual ~NodePredicateRuleFunction() = default;
+    ~NodePredicateRuleFunction() override = default;
 
-    virtual bool CheckNode(const mitk::DataNode *node) const override 
+    bool CheckNode(const mitk::DataNode *node) const override 
     {
       if (!node)
       {

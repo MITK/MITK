@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "org_mitk_example_gui_customviewer_views_Activator.h"
 
-#include "mitkDicomSeriesReader.h"
+#include "mitkIOUtil.h"
 #include "mitkIDataStorageService.h"
 #include "mitkImage.h"
 
@@ -63,7 +63,7 @@ void DicomView::CreateQtPartControl(QWidget *parent)
 void DicomView::AddDataNodeFromDICOM(QHash<QString, QVariant> eventProperties)
 {
   QStringList listOfFilesForSeries;
-  mitk::DicomSeriesReader::StringContainer seriesToLoad;
+  std::vector<std::string> seriesToLoad;
 
   listOfFilesForSeries = eventProperties["FilesForSeries"].toStringList();
 
@@ -76,8 +76,9 @@ void DicomView::AddDataNodeFromDICOM(QHash<QString, QVariant> eventProperties)
       seriesToLoad.push_back(it.next().toStdString());
     }
 
-    mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries(seriesToLoad);
-    if (node.IsNull())
+    auto results = mitk::IOUtil::Load(seriesToLoad, *(this->GetDataStorage().GetPointer()));
+
+    if (results->empty())
     {
       MITK_ERROR << "Error loading Dicom series";
     }
@@ -86,10 +87,9 @@ void DicomView::AddDataNodeFromDICOM(QHash<QString, QVariant> eventProperties)
     {
       // //! [DicomViewCreateAddDataNode]
       mitk::DataStorage::Pointer ds = this->GetDataStorage();
-      ds->Add(node);
       // //! [DicomViewCreateAddDataNode]
       mitk::RenderingManager::GetInstance()->SetDataStorage(ds);
-      mitk::TimeGeometry::Pointer geometry = ds->ComputeBoundingGeometry3D(ds->GetAll());
+      auto geometry = ds->ComputeBoundingGeometry3D(ds->GetAll());
       mitk::RenderingManager::GetInstance()->InitializeViews(geometry);
 
       // //! [DicomViewCreateAddDataNodeActivatePersp]

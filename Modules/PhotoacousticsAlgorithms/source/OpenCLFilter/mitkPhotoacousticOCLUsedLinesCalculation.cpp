@@ -14,9 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #if defined(PHOTOACOUSTICS_USE_GPU) || DOXYGEN
-#define _USE_MATH_DEFINES
 
-#include <cmath>
 #include "./OpenCLFilter/mitkPhotoacousticOCLUsedLinesCalculation.h"
 #include "usServiceReference.h"
 #include "mitkImageReadAccessor.h"
@@ -78,7 +76,7 @@ void mitk::OCLUsedLinesCalculation::Execute()
   }
 
   // This calculation is the same for all kernels, so for performance reasons simply perform it here instead of within the kernels
-  m_part = (tan(m_Conf.Angle / 360 * 2 * M_PI) * ((m_Conf.SpeedOfSound * m_Conf.TimeSpacing)) / (m_Conf.Pitch * m_Conf.TransducerElements)) * m_Conf.inputDim[0];
+  m_part = (tan(m_Conf.Angle / 360 * 2 * itk::Math::pi) * ((m_Conf.SpeedOfSound * m_Conf.TimeSpacing)) / (m_Conf.Pitch * m_Conf.TransducerElements)) * m_Conf.inputDim[0];
   
   clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_float), &(this->m_part));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_uint), &(this->m_Conf.inputDim[0]));

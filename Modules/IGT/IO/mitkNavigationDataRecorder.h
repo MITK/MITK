@@ -109,11 +109,11 @@ namespace mitk
 
   protected:
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     NavigationDataRecorder();
 
-    virtual ~NavigationDataRecorder();
+    ~NavigationDataRecorder() override;
 
     unsigned int m_NumberOfInputs; ///< counts the numbers of added input NavigationDatas
 

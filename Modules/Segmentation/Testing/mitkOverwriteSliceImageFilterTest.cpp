@@ -306,7 +306,7 @@ int mitkOverwriteSliceImageFilterTest(int argc, char *argv[])
     MITK_INFO << "Testing with parameter '" << argv[1] << "'";
 
     std::string pathToImage(argv[1]);
-    image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(pathToImage)[0].GetPointer());
+    image = mitk::IOUtil::Load<mitk::Image>(pathToImage);
     if (image.IsNull())
     {
       MITK_INFO << "File not an image - test will not be applied";

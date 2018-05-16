@@ -70,7 +70,7 @@ void QmitkToFVisualisationSettingsWidget::CreateConnections()
     connect(m_Controls->m_RangeSliderMaxEdit, SIGNAL(returnPressed()), this, SLOT(OnRangeSliderMaxChanged()));
     connect(m_Controls->m_RangeSliderMinEdit, SIGNAL(returnPressed()), this, SLOT(OnRangeSliderMinChanged()));
     connect(m_Controls->m_RangeSliderReset, SIGNAL(pressed()), this, SLOT(OnResetSlider()));
-    connect(m_Controls->m_RangeSlider, SIGNAL(spanChanged(int, int)  ),this, SLOT( OnSpanChanged(int , int ) ));
+    connect(m_Controls->m_RangeSlider, SIGNAL(valuesChanged(int, int)  ),this, SLOT( OnSpanChanged(int , int ) ));
     connect(m_Controls->m_AdvancedOptionsCheckbox, SIGNAL(toggled(bool)  ),this, SLOT( OnShowAdvancedOptionsCheckboxChecked(bool) ));
 
     m_Controls->m_RangeSlider->setMaximum(2048);

@@ -100,7 +100,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   {
     for (unsigned int i=0; i<dimY; i++)
     {
-      itk::Index<2> index = {{ i, j }};
+      itk::Index<2> index = { { static_cast<itk::IndexValueType>(i), static_cast< itk::IndexValueType >( j) } };
       float distance = 0.0;
 
       try
@@ -141,7 +141,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
 
   MITK_TEST_CONDITION_REQUIRED((expectedResult->GetNumberOfPoints()==result->GetNumberOfPoints()),"Test if number of points in surface is equal");
   bool pointSetsEqual = true;
-  for (unsigned int i=0; i<expectedResult->GetNumberOfPoints(); i++)
+  for (int i=0; i<expectedResult->GetNumberOfPoints(); i++)
   {
     double* expected = expectedResult->GetPoint(i);
     double* res = result->GetPoint(i);
@@ -181,7 +181,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   {
     for (unsigned int i=0; i<dimY; i++)
     {
-        itk::Index<2> index = {{ i, j }};
+        itk::Index<2> index = {{ static_cast<itk::IndexValueType >(i), static_cast< itk::IndexValueType >( j )}};
         float distance = 0.0;
         try
         {
@@ -219,7 +219,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   result = resultSurface->GetVtkPolyData()->GetPoints();
   MITK_TEST_CONDITION_REQUIRED((expectedResult->GetNumberOfPoints()==result->GetNumberOfPoints()),"Test if number of points in surface is equal");
   pointSetsEqual = true;
-  for (unsigned int i=0; i<expectedResult->GetNumberOfPoints(); i++)
+  for (int i=0; i<expectedResult->GetNumberOfPoints(); i++)
   {
     double* expected = expectedResult->GetPoint(i);
     double* res = result->GetPoint(i);
@@ -246,7 +246,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
 
   //Backwardtransformation test without interpixeldistance
   bool backwardTransformationsPointsEqual = true;
-  for (unsigned int i=0; i<expectedResult->GetNumberOfPoints(); i++)
+  for (int i=0; i<expectedResult->GetNumberOfPoints(); i++)
   {
     double* expected = expectedResult->GetPoint(i);
     double* res = result->GetPoint(i);
@@ -278,7 +278,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
 
   //Backwardtransformation test with interpixeldistance
   backwardTransformationsPointsEqual = true;
-  for (unsigned int i=0; i<expectedResult->GetNumberOfPoints(); i++)
+  for ( int i=0; i<expectedResult->GetNumberOfPoints(); i++)
   {
     double* expected = expectedResult->GetPoint(i);
     double* res = result->GetPoint(i);
@@ -311,7 +311,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
 
   //Backwardtransformation test compare to original input without interpixeldistance
   bool compareToInput = true;
-  for (unsigned int i=0; i<result->GetNumberOfPoints(); i++)
+  for ( int i=0; i<result->GetNumberOfPoints(); i++)
   {
     double* res = result->GetPoint(i);
 
@@ -348,7 +348,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
 
   //Backwardtransformation test compare to original input with interpixeldistance
   compareToInput = true;
-  for (unsigned int i=0; i<result->GetNumberOfPoints(); i++)
+  for ( int i=0; i<result->GetNumberOfPoints(); i++)
   {
     double* res = result->GetPoint(i);
 
@@ -380,7 +380,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(compareToInput,"Testing backward transformation compared to original image with interpixeldistance");
 
   //clean up
-  delete point;
+  delete[] point;
   //  expectedResult->Delete();
 
   MITK_TEST_END();

@@ -38,13 +38,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 QmitkOpenDicomEditorAction::QmitkOpenDicomEditorAction(berry::IWorkbenchWindow::Pointer window)
-: QAction(0)
+: QAction(nullptr)
 {
   this->init(window);
 }
 
 QmitkOpenDicomEditorAction::QmitkOpenDicomEditorAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
-: QAction(0)
+: QAction(nullptr)
 {
   this->setIcon(icon);
 

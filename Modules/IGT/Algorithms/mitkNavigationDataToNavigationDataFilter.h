@@ -95,7 +95,7 @@ namespace mitk
 
   protected:
     NavigationDataToNavigationDataFilter();
-    virtual ~NavigationDataToNavigationDataFilter();
+    ~NavigationDataToNavigationDataFilter() override;
 
     /**
     * \brief Create an output for each input

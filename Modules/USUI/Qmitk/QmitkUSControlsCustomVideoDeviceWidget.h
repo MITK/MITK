@@ -57,17 +57,14 @@ class QmitkUSControlsCustomVideoDeviceWidget : public QmitkUSAbstractCustomWidge
   */
   void SetDepthsForProbe(std::string probename);
 public:
-  /**
-    * Constructs widget object. All gui control elements will be disabled until
-    * QmitkUSAbstractCustomWidget::SetDevice() was called.
-    */
-  explicit QmitkUSControlsCustomVideoDeviceWidget(QWidget *parent = 0);
+
+  QmitkUSControlsCustomVideoDeviceWidget();
   ~QmitkUSControlsCustomVideoDeviceWidget();
 
   /**
     * Getter for the device class of mitk:USVideoDevice.
     */
-  virtual std::string GetDeviceClass() const override;
+  std::string GetDeviceClass() const override;
 
   /**
     * Creates new QmitkUSAbstractCustomWidget with the same mitk::USVideoDevice
@@ -78,16 +75,16 @@ public:
     * QmitkUSAbstractCustomWidget::CloneForQt() instead, if you want a clone of
     * an object.
     */
-  virtual QmitkUSAbstractCustomWidget* Clone(QWidget* parent = 0) const override;
+  QmitkUSAbstractCustomWidget* Clone(QWidget* parent = nullptr) const override;
 
   /**
     * Gets control interface from the device which was currently set. Control
     * elements are according to current crop area of the device. If custom
     * control interface is null, the control elements stay disabled.
     */
-  virtual void OnDeviceSet() override;
+  void OnDeviceSet() override;
 
-  virtual void Initialize() override;
+  void Initialize() override;
 
 protected:
   void BlockSignalAndSetValue(QSpinBox* target, int value);
@@ -95,6 +92,11 @@ protected:
   mitk::USImageVideoSource::USImageCropping m_Cropping;
 
 private:
+  /**
+  * Constructs widget object. All gui control elements will be disabled until
+  * QmitkUSAbstractCustomWidget::SetDevice() was called.
+  */
+  QmitkUSControlsCustomVideoDeviceWidget(QWidget *parent);
   Ui::QmitkUSControlsCustomVideoDeviceWidget*         ui;
 
   mitk::USVideoDeviceCustomControls::Pointer  m_ControlInterface;

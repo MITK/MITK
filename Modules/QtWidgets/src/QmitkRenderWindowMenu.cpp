@@ -43,7 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include"iconVertiSplit.xpm"
 #include "iconLeaveFullScreen.xpm"
 
-#include <math.h>
+#include <cmath>
 
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
@@ -844,21 +844,21 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
         if (n)
         {
           bool v;
-          if (n->GetVisibility(v, 0))
+          if (n->GetVisibility(v, nullptr))
             currentState &= v;
         }
         n = this->m_MultiWidget->GetWidgetPlane2();
         if (n)
         {
           bool v;
-          if (n->GetVisibility(v, 0))
+          if (n->GetVisibility(v, nullptr))
             currentState &= v;
         }
         n = this->m_MultiWidget->GetWidgetPlane3();
         if (n)
         {
           bool v;
-          if (n->GetVisibility(v, 0))
+          if (n->GetVisibility(v, nullptr))
             currentState &= v;
         }
       }

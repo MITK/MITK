@@ -14,14 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#define _USE_MATH_DEFINES
-
 #include "mitkProperties.h"
 #include "mitkImageReadAccessor.h"
 #include <algorithm>
 #include <itkImageIOBase.h>
 #include <chrono>
-#include <cmath>
 #include <thread>
 #include <itkImageIOBase.h>
 #include "mitkImageCast.h"
@@ -338,7 +335,7 @@ float* mitk::BeamformingFilter::VonHannFunction(int samples)
 
   for (int n = 0; n < samples; ++n)
   {
-    ApodWindow[n] = (1 - cos(2 * M_PI * n / (samples - 1))) / 2;
+    ApodWindow[n] = (1 - cos(2 * itk::Math::pi * n / (samples - 1))) / 2;
   }
 
   return ApodWindow;
@@ -350,7 +347,7 @@ float* mitk::BeamformingFilter::HammFunction(int samples)
 
   for (int n = 0; n < samples; ++n)
   {
-    ApodWindow[n] = 0.54 - 0.46*cos(2 * M_PI*n / (samples - 1));
+    ApodWindow[n] = 0.54 - 0.46*cos(2 * itk::Math::pi*n / (samples - 1));
   }
 
   return ApodWindow;
@@ -384,7 +381,7 @@ void mitk::BeamformingFilter::DASQuadraticLine(float* input, float* output, floa
   float s_i = 0;
 
   float part = 0.07 * inputL;
-  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
+  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * itk::Math::pi);
   float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / m_Conf.TransducerElements;
   float apod_mult = 1;
 
@@ -437,7 +434,7 @@ void mitk::BeamformingFilter::DASSphericalLine(float* input, float* output, floa
   float s_i = 0;
 
   float part = 0.07 * inputL;
-  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
+  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * itk::Math::pi);
   float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / (float)m_Conf.TransducerElements;
   float apod_mult = 1;
 
@@ -494,7 +491,7 @@ void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, flo
   float s_i = 0;
 
   float part = 0.07 * inputL;
-  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
+  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * itk::Math::pi);
   float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / (float)m_Conf.TransducerElements;
   float apod_mult = 1;
 
@@ -571,7 +568,7 @@ void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, flo
   float s_i = 0;
 
   float part = 0.07 * inputL;
-  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
+  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * itk::Math::pi);
   float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / (float)m_Conf.TransducerElements;
   float apod_mult = 1;
 
@@ -653,7 +650,7 @@ void mitk::BeamformingFilter::sDMASQuadraticLine(float* input, float* output, fl
   float s_i = 0;
 
   float part = 0.07 * inputL;
-  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
+  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * itk::Math::pi);
   float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / (float)m_Conf.TransducerElements;
   float apod_mult = 1;
 
@@ -733,7 +730,7 @@ void mitk::BeamformingFilter::sDMASSphericalLine(float* input, float* output, fl
   float s_i = 0;
 
   float part = 0.07 * inputL;
-  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
+  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * itk::Math::pi);
   float part_multiplicator = tan_phi * m_Conf.TimeSpacing * m_Conf.SpeedOfSound / m_Conf.Pitch * inputL / (float)m_Conf.TransducerElements;
   float apod_mult = 1;
 

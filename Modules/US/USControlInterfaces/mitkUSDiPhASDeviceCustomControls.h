@@ -40,7 +40,7 @@ public:
     * Activate or deactivate the custom controls. This is just for handling
     * widget visibility in a GUI for example.
     */
-  virtual void SetIsActive( bool isActive ) override;
+  void SetIsActive( bool isActive ) override;
 
   enum DataType { Image_uChar, Beamformed_Short };
 
@@ -52,7 +52,7 @@ public:
   /**
     * \return if this custom controls are currently activated
     */
-  virtual bool GetIsActive( ) override;
+  bool GetIsActive( ) override;
 
   virtual void SetCompensateEnergy(bool compensate);
   virtual void SetUseBModeFilter(bool isSet);
@@ -98,7 +98,7 @@ protected:
     * Class needs an mitk::USDevice object for beeing constructed.
     */
   USDiPhASDeviceCustomControls( itk::SmartPointer<USDevice> device );
-  virtual ~USDiPhASDeviceCustomControls( );
+  ~USDiPhASDeviceCustomControls( ) override;
 
   bool                          m_IsActive;
   USImageVideoSource::Pointer   m_ImageSource;

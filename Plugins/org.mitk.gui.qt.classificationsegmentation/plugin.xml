@@ -5,7 +5,11 @@
     <view id="org.mitk.views.classificationsegmentation"
           name="Classification Segmentation"
           class="ClassificationSegmentation"
-          icon="resources/icon_32.png" />
+          icon="resources/icon_32.png" />   
+    <view id="org.mitk.views.classificationregiongrow"
+          name="Classification Region Grow"
+          class="ClassificationRegionGrow"
+          icon="resources/icon_32.png" />      
   </extension>
 
 </plugin>

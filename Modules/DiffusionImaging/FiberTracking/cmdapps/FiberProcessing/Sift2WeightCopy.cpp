@@ -52,9 +52,9 @@ int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
 
-    parser.setTitle("Sift2 Fiber Weight Import");
+    parser.setTitle("SIFT2 Fiber Weight Import");
     parser.setCategory("Fiber Tracking and Processing Methods");
-    parser.setDescription("Import sift2 fiber weights.");
+    parser.setDescription("Import SIFT2 fiber weights.");
     parser.setContributor("MIC");
 
     parser.setArgumentPrefix("--", "-");

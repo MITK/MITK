@@ -87,6 +87,9 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   requestedFeatures->push_back(TextureFilterType::InverseDifferenceMomentNormalized);
   requestedFeatures->push_back(TextureFilterType::InverseDifferenceNormalized);
   requestedFeatures->push_back(TextureFilterType::InverseDifference);
+  requestedFeatures->push_back(TextureFilterType::JointAverage);
+  requestedFeatures->push_back(TextureFilterType::FirstMeasureOfInformationCorrelation);
+  requestedFeatures->push_back(TextureFilterType::SecondMeasureOfInformationCorrelation);
 
   typename MinMaxComputerType::Pointer minMaxComputer = MinMaxComputerType::New();
   minMaxComputer->SetImage(itkImage);
@@ -95,7 +98,15 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   filter->SetInput(itkImage);
   filter->SetMaskImage(maskImage);
   filter->SetRequestedFeatures(requestedFeatures);
-  filter->SetPixelValueMinMax(minMaxComputer->GetMinimum()-0.5,minMaxComputer->GetMaximum()+0.5);
+
+  double min = minMaxComputer->GetMinimum() - 0.5;
+  double max = minMaxComputer->GetMaximum() + 0.5;
+  if (config.UseMinimumIntensity)
+    min = config.MinimumIntensity;
+  if (config.UseMaximumIntensity)
+    max = config.MaximumIntensity;
+
+  filter->SetPixelValueMinMax(min,max);
   //filter->SetPixelValueMinMax(-1024,3096);
   //filter->SetNumberOfBinsPerAxis(5);
   filter->Update();
@@ -210,6 +221,18 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
       featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifference Means",featureMeans->ElementAt(i)));
       featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifference Std.",featureStd->ElementAt(i)));
       break;
+    case TextureFilterType::JointAverage :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") JointAverage Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") JointAverage Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::FirstMeasureOfInformationCorrelation :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") FirstMeasureOfInformationCorrelation Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") FirstMeasureOfInformationCorrelation Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::SecondMeasureOfInformationCorrelation :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SecondMeasureOfInformationCorrelation Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SecondMeasureOfInformationCorrelation Std.",featureStd->ElementAt(i)));
+      break;
     default:
       break;
     }
@@ -217,8 +240,11 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
 }
 
 mitk::GIFCooccurenceMatrix::GIFCooccurenceMatrix():
-m_Range(1.0), m_Direction(0)
+m_Range(1.0)
 {
+  SetShortName("deprecated-cooc");
+  SetLongName("deprecated-cooccurence");
+  SetFeatureClassName("Deprecated Co-occurence Features");
 }
 
 mitk::GIFCooccurenceMatrix::FeatureListType mitk::GIFCooccurenceMatrix::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
@@ -226,8 +252,14 @@ mitk::GIFCooccurenceMatrix::FeatureListType mitk::GIFCooccurenceMatrix::Calculat
   FeatureListType featureList;
 
   GIFCooccurenceMatrixConfiguration config;
-  config.direction = m_Direction;
+  config.direction = GetDirection();
   config.range = m_Range;
+
+  config.MinimumIntensity = GetMinimumIntensity();
+  config.MaximumIntensity = GetMaximumIntensity();
+  config.UseMinimumIntensity = GetUseMinimumIntensity();
+  config.UseMaximumIntensity = GetUseMaximumIntensity();
+  config.Bins = GetBins();
 
   AccessByItk_3(image, CalculateCoocurenceFeatures, mask, featureList,config);
 
@@ -239,53 +271,46 @@ mitk::GIFCooccurenceMatrix::FeatureNameListType mitk::GIFCooccurenceMatrix::GetF
   FeatureNameListType featureList;
   featureList.push_back("co-occ. Energy Means");
   featureList.push_back("co-occ. Energy Std.");
-  featureList.push_back("co-occ. Entropy Means");
-  featureList.push_back("co-occ. Entropy Std.");
-  featureList.push_back("co-occ. Correlation Means");
-  featureList.push_back("co-occ. Correlation Std.");
-  featureList.push_back("co-occ. InverseDifferenceMoment Means");
-  featureList.push_back("co-occ. InverseDifferenceMoment Std.");
-  featureList.push_back("co-occ. Inertia Means");
-  featureList.push_back("co-occ. Inertia Std.");
-  featureList.push_back("co-occ. ClusterShade Means");
-  featureList.push_back("co-occ. ClusterShade Std.");
-  featureList.push_back("co-occ. ClusterProminence Means");
-  featureList.push_back("co-occ. ClusterProminence Std.");
-  featureList.push_back("co-occ. HaralickCorrelation Means");
-  featureList.push_back("co-occ. HaralickCorrelation Std.");
-  featureList.push_back("co-occ. Autocorrelation Means");
-  featureList.push_back("co-occ. Autocorrelation Std.");
-  featureList.push_back("co-occ. Contrast Means");
-  featureList.push_back("co-occ. Contrast Std.");
-  featureList.push_back("co-occ. Dissimilarity Means");
-  featureList.push_back("co-occ. Dissimilarity Std.");
-  featureList.push_back("co-occ. MaximumProbability Means");
-  featureList.push_back("co-occ. MaximumProbability Std.");
-  featureList.push_back("co-occ. InverseVariance Means");
-  featureList.push_back("co-occ. InverseVariance Std.");
-  featureList.push_back("co-occ. Homogeneity1 Means");
-  featureList.push_back("co-occ. Homogeneity1 Std.");
-  featureList.push_back("co-occ. ClusterTendency Means");
-  featureList.push_back("co-occ. ClusterTendency Std.");
-  featureList.push_back("co-occ. Variance Means");
-  featureList.push_back("co-occ. Variance Std.");
-  featureList.push_back("co-occ. SumAverage Means");
-  featureList.push_back("co-occ. SumAverage Std.");
-  featureList.push_back("co-occ. SumEntropy Means");
-  featureList.push_back("co-occ. SumEntropy Std.");
-  featureList.push_back("co-occ. SumVariance Means");
-  featureList.push_back("co-occ. SumVariance Std.");
-  featureList.push_back("co-occ. DifferenceAverage Means");
-  featureList.push_back("co-occ. DifferenceAverage Std.");
-  featureList.push_back("co-occ. DifferenceEntropy Means");
-  featureList.push_back("co-occ. DifferenceEntropy Std.");
-  featureList.push_back("co-occ. DifferenceVariance Means");
-  featureList.push_back("co-occ. DifferenceVariance Std.");
-  featureList.push_back("co-occ. InverseDifferenceMomentNormalized Means");
-  featureList.push_back("co-occ. InverseDifferenceMomentNormalized Std.");
-  featureList.push_back("co-occ. InverseDifferenceNormalized Means");
-  featureList.push_back("co-occ. InverseDifferenceNormalized Std.");
-  featureList.push_back("co-occ. InverseDifference Means");
-  featureList.push_back("co-occ. InverseDifference Std.");
   return featureList;
 }
+
+
+
+void mitk::GIFCooccurenceMatrix::AddArguments(mitkCommandLineParser &parser)
+{
+  std::string name = GetOptionPrefix();
+
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::Bool, "Use Co-occurence matrix", "calculates Co-occurence based features", us::Any());
+  parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
+}
+
+void
+mitk::GIFCooccurenceMatrix::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
+{
+  auto parsedArgs = GetParameter();
+  std::string name = GetOptionPrefix();
+
+  if (parsedArgs.count(GetLongName()))
+  {
+    std::vector<double> ranges;
+    if (parsedArgs.count(name + "::range"))
+    {
+      ranges = SplitDouble(parsedArgs[name + "::range"].ToString(), ';');
+    }
+    else
+    {
+      ranges.push_back(1);
+    }
+
+    for (std::size_t i = 0; i < ranges.size(); ++i)
+    {
+      MITK_INFO << "Start calculating coocurence with range " << ranges[i] << "....";
+      mitk::GIFCooccurenceMatrix::Pointer coocCalculator = mitk::GIFCooccurenceMatrix::New();
+      coocCalculator->SetRange(ranges[i]);
+      auto localResults = coocCalculator->CalculateFeatures(feature, maskNoNAN);
+      featureList.insert(featureList.end(), localResults.begin(), localResults.end());
+      MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";
+    }
+  }
+}
+

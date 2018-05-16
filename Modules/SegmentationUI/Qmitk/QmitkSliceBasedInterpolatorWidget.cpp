@@ -50,7 +50,7 @@ QmitkSliceBasedInterpolatorWidget::QmitkSliceBasedInterpolatorWidget(QWidget *pa
     m_ToolManager(nullptr),
     m_Activated(false),
     m_DataStorage(nullptr),
-    m_LastSNC(0),
+    m_LastSNC(nullptr),
     m_LastSliceIndex(0)
 {
   m_Controls.setupUi(this);
@@ -120,7 +120,7 @@ const QmitkSliceBasedInterpolatorWidget::ActionToSliceDimensionMapType
       name = "Sagittal (green window)";
     else if (name == "stdmulti.widget3")
       name = "Coronal (blue window)";
-    actionToSliceDimension[new QAction(QString::fromStdString(name), 0)] = slicer;
+    actionToSliceDimension[new QAction(QString::fromStdString(name), nullptr)] = slicer;
   }
 
   return actionToSliceDimension;

@@ -260,7 +260,7 @@ bool mitk::BaseGeometry::Is2DConvertable()
       isConvertableWithoutLoss = false;
       break;
     }
-  } while (0);
+  } while (false);
 
   return isConvertableWithoutLoss;
 }

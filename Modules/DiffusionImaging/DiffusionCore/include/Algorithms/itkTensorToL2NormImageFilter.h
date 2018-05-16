@@ -52,13 +52,13 @@ namespace itk
     TensorToL2NormImageFilter(){};
     ~TensorToL2NormImageFilter(){};
 
-    void PrintSelf (std::ostream& os, Indent indent) const
+    void PrintSelf (std::ostream& os, Indent indent) const override
     {
       Superclass::PrintSelf (os, indent);
     }
 
 
-    void ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
+    void ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId) override;
 
 
   private:

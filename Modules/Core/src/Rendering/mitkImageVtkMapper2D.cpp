@@ -120,8 +120,6 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  SetVtkMapperImmediateModeRendering(localStorage->m_Mapper);
-
   auto *image = const_cast<mitk::Image *>(this->GetInput());
   mitk::DataNode *datanode = this->GetDataNode();
   if (nullptr == image || !image->IsInitialized())
@@ -378,7 +376,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
   this->ApplyRenderingMode(renderer);
 
   // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
-  localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
+  localStorage->m_Texture->SetColorModeToDirectScalars();
 
   int displayedComponent = 0;
 
@@ -671,17 +669,13 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   // check if something important has changed and we need to rerender
-  if ((localStorage->m_LastUpdateTime < node->GetMTime()) // was the node modified?
-      ||
-      (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) // Was the data modified?
-      ||
-      (localStorage->m_LastUpdateTime <
-       renderer->GetCurrentWorldPlaneGeometryUpdateTime()) // was the geometry modified?
-      ||
+  if ((localStorage->m_LastUpdateTime < node->GetMTime()) ||
+      (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) ||
+      (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) ||
       (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldPlaneGeometry()->GetMTime()) ||
-      (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) // was a property modified?
-      ||
-      (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()))
+      (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) ||
+      (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) ||
+      (localStorage->m_LastUpdateTime < data->GetPropertyList()->GetMTime()))
   {
     this->GenerateDataForRenderer(renderer);
   }
@@ -772,7 +766,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::Ba
   }
 
   std::string className = image->GetNameOfClass();
-  if (className != "TensorImage" && className != "OdfImage")
+  if (className != "TensorImage" && className != "OdfImage" && className != "ShImage")
   {
     PixelType pixelType = image->GetPixelType();
     size_t numComponents = pixelType.GetNumberOfComponents();

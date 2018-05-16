@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <mitkFiberBundle.h>
 #include <mitkImageCast.h>
+#include <mitkImageToItk.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateAnd.h>
@@ -52,6 +53,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkTensorImageToOdfImageFilter.h>
 #include <omp.h>
+#include <boost/lexical_cast.hpp>
 
 const std::string QmitkStreamlineTrackingView::VIEW_ID = "org.mitk.views.streamlinetracking";
 const std::string id_DataManager = "org.mitk.views.datamanager";
@@ -77,6 +79,8 @@ QmitkStreamlineTrackingView::QmitkStreamlineTrackingView()
   , m_ThreadIsRunning(false)
   , m_DeleteTrackingHandler(false)
   , m_Visible(false)
+  , m_LastPrior("")
+  , m_TrackingPriorHandler(nullptr)
 {
   m_TrackingWorker.moveToThread(&m_TrackingThread);
   connect(&m_TrackingThread, SIGNAL(started()), this, SLOT(BeforeThread()));
@@ -106,10 +110,12 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_SeedImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_MaskImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_TargetImageBox->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_PriorImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_StopImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_ForestBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_ExclusionImageBox->SetDataStorage(this->GetDataStorage());
 
+    mitk::TNodePredicateDataType<mitk::PeakImage>::Pointer isPeakImagePredicate = mitk::TNodePredicateDataType<mitk::PeakImage>::New();
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isImagePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
     mitk::TNodePredicateDataType<mitk::TractographyForest>::Pointer isTractographyForest = mitk::TNodePredicateDataType<mitk::TractographyForest>::New();
 
@@ -129,6 +135,8 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_StopImageBox->SetZeroEntryText("--");
     m_Controls->m_TargetImageBox->SetPredicate( mitk::NodePredicateAnd::New(isImagePredicate, dimensionPredicate) );
     m_Controls->m_TargetImageBox->SetZeroEntryText("--");
+    m_Controls->m_PriorImageBox->SetPredicate( isPeakImagePredicate );
+    m_Controls->m_PriorImageBox->SetZeroEntryText("--");
     m_Controls->m_ExclusionImageBox->SetPredicate( mitk::NodePredicateAnd::New(isImagePredicate, dimensionPredicate) );
     m_Controls->m_ExclusionImageBox->SetZeroEntryText("--");
 
@@ -145,24 +153,25 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_ModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_StopImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_TargetImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_PriorImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_ExclusionImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_MaskImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_FaImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_ForestBox, SIGNAL(currentIndexChanged(int)), this, SLOT(ForestSwitched()) );
     connect( m_Controls->m_ForestBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_SeedsPerVoxelBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_NumFibersBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_ScalarThresholdBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_OdfCutoffBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_StepSizeBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_SamplingDistanceBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_AngularThresholdBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_MinTractLengthBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_fBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_gBox, SIGNAL(valueChanged(double)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_NumSamplesBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_SeedRadiusBox, SIGNAL(valueChanged(double)), this, SLOT(InteractiveSeedChanged()) );
-    connect( m_Controls->m_NumSeedsBox, SIGNAL(valueChanged(int)), this, SLOT(InteractiveSeedChanged()) );
+    connect( m_Controls->m_SeedsPerVoxelBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_NumFibersBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_ScalarThresholdBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_OdfCutoffBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_StepSizeBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_SamplingDistanceBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_AngularThresholdBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_MinTractLengthBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_fBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_gBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_NumSamplesBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_SeedRadiusBox, SIGNAL(editingFinished()), this, SLOT(InteractiveSeedChanged()) );
+    connect( m_Controls->m_NumSeedsBox, SIGNAL(editingFinished()), this, SLOT(InteractiveSeedChanged()) );
     connect( m_Controls->m_OutputProbMap, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_SharpenOdfsBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_InterpolationBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
@@ -172,9 +181,25 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_FlipZBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_FrontalSamplesBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_StopVotesBox, SIGNAL(stateChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_LoopCheckBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
-    connect( m_Controls->m_TrialsPerSeedBox, SIGNAL(valueChanged(int)), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_LoopCheckBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
+    connect( m_Controls->m_TrialsPerSeedBox, SIGNAL(editingFinished()), this, SLOT(OnParameterChanged()) );
     connect( m_Controls->m_EpConstraintsBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnParameterChanged()) );
+
+    m_Controls->m_SeedsPerVoxelBox->editingFinished();
+    m_Controls->m_NumFibersBox->editingFinished();
+    m_Controls->m_ScalarThresholdBox->editingFinished();
+    m_Controls->m_OdfCutoffBox->editingFinished();
+    m_Controls->m_StepSizeBox->editingFinished();
+    m_Controls->m_SamplingDistanceBox->editingFinished();
+    m_Controls->m_AngularThresholdBox->editingFinished();
+    m_Controls->m_MinTractLengthBox->editingFinished();
+    m_Controls->m_fBox->editingFinished();
+    m_Controls->m_gBox->editingFinished();
+    m_Controls->m_NumSamplesBox->editingFinished();
+    m_Controls->m_SeedRadiusBox->editingFinished();
+    m_Controls->m_NumSeedsBox->editingFinished();
+    m_Controls->m_LoopCheckBox->editingFinished();
+    m_Controls->m_TrialsPerSeedBox->editingFinished();
 
     StartStopTrackingGui(false);
   }
@@ -321,9 +346,12 @@ void QmitkStreamlineTrackingView::AfterThread()
 
 void QmitkStreamlineTrackingView::InteractiveSeedChanged(bool posChanged)
 {
+  if(!CheckAndStoreLastParams(sender()) && !posChanged)
+    return;
   if (m_ThreadIsRunning || !m_Visible)
     return;
-  if (!posChanged && (!m_Controls->m_InteractiveBox->isChecked() || !m_Controls->m_ParamUpdateBox->isChecked()))
+
+  if (!posChanged && (!m_Controls->m_InteractiveBox->isChecked() || !m_Controls->m_ParamUpdateBox->isChecked()) )
     return;
 
   std::srand(std::time(0));
@@ -355,9 +383,39 @@ void QmitkStreamlineTrackingView::InteractiveSeedChanged(bool posChanged)
   DoFiberTracking();
 }
 
+bool QmitkStreamlineTrackingView::CheckAndStoreLastParams(QObject* obj)
+{
+  if (obj!=nullptr)
+  {
+    std::string new_val = "";
+    if(qobject_cast<QDoubleSpinBox*>(obj)!=nullptr)
+      new_val = boost::lexical_cast<std::string>(qobject_cast<QDoubleSpinBox*>(obj)->value());
+    else if (qobject_cast<QSpinBox*>(obj)!=nullptr)
+      new_val = boost::lexical_cast<std::string>(qobject_cast<QSpinBox*>(obj)->value());
+
+    if (m_LastTractoParams.find(obj->objectName())==m_LastTractoParams.end())
+    {
+      m_LastTractoParams[obj->objectName()] = new_val;
+      return false;
+    }
+    else if (m_LastTractoParams.at(obj->objectName()) != new_val)
+    {
+      m_LastTractoParams[obj->objectName()] = new_val;
+      return true;
+    }
+    else if (m_LastTractoParams.at(obj->objectName()) == new_val)
+      return false;
+  }
+  return true;
+}
+
 void QmitkStreamlineTrackingView::OnParameterChanged()
 {
   UpdateGui();
+
+  if(!CheckAndStoreLastParams(sender()))
+    return;
+
   if (m_Controls->m_InteractiveBox->isChecked() && m_Controls->m_ParamUpdateBox->isChecked())
     DoFiberTracking();
 }
@@ -420,9 +478,6 @@ void QmitkStreamlineTrackingView::Deactivated()
 void QmitkStreamlineTrackingView::Visible()
 {
   m_Visible = true;
-  QList<mitk::DataNode::Pointer> selection = GetDataManagerSelection();
-  berry::IWorkbenchPart::Pointer nullPart;
-  OnSelectionChanged(nullPart, selection);
 }
 
 void QmitkStreamlineTrackingView::Hidden()
@@ -448,6 +503,9 @@ void QmitkStreamlineTrackingView::DeleteTrackingHandler()
     delete m_TrackingHandler;
     m_TrackingHandler = nullptr;
     m_DeleteTrackingHandler = false;
+    m_LastPrior = "";
+    if (m_TrackingPriorHandler != nullptr)
+      delete m_TrackingPriorHandler;
   }
   else if (m_ThreadIsRunning)
   {
@@ -469,9 +527,6 @@ void QmitkStreamlineTrackingView::OutputStyleSwitched()
 
 void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Pointer , const QList<mitk::DataNode::Pointer>& nodes )
 {
-  if (!m_Visible)
-    return;
-
   std::vector< mitk::DataNode::Pointer > last_nodes = m_InputImageNodes;
   m_InputImageNodes.clear();
   m_InputImages.clear();
@@ -561,8 +616,8 @@ void QmitkStreamlineTrackingView::UpdateGui()
   m_Controls->commandLinkButton->setEnabled(false);
   m_Controls->m_TrialsPerSeedBox->setEnabled(false);
   m_Controls->m_TrialsPerSeedLabel->setEnabled(false);
-  m_Controls->m_TargetImageBox->setVisible(false);
-  m_Controls->m_TargetImageLabel->setVisible(false);
+  m_Controls->m_TargetImageBox->setEnabled(false);
+  m_Controls->m_TargetImageLabel->setEnabled(false);
 
   if (m_Controls->m_InteractiveBox->isChecked())
   {
@@ -581,8 +636,8 @@ void QmitkStreamlineTrackingView::UpdateGui()
 
   if (m_Controls->m_EpConstraintsBox->currentIndex()>0)
   {
-    m_Controls->m_TargetImageBox->setVisible(true);
-    m_Controls->m_TargetImageLabel->setVisible(true);
+    m_Controls->m_TargetImageBox->setEnabled(true);
+    m_Controls->m_TargetImageLabel->setEnabled(true);
   }
 
   // trials per seed are only important for probabilistic tractography
@@ -641,9 +696,12 @@ void QmitkStreamlineTrackingView::StartStopTrackingGui(bool start)
 
 void QmitkStreamlineTrackingView::DoFiberTracking()
 {
-  if (m_ThreadIsRunning)
-    return;
   if (m_InputImages.empty())
+  {
+    QMessageBox::information(nullptr, "Information", "Please select an input image in the datamaneger (tensor, ODF, peak or dMRI image)!");
+    return;
+  }
+  if (m_ThreadIsRunning || !m_Visible)
     return;
   if (m_Controls->m_InteractiveBox->isChecked() && m_SeedPoints.empty())
     return;
@@ -653,8 +711,6 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
 
   if( dynamic_cast<mitk::TensorImage*>(m_InputImageNodes.at(0)->GetData()) )
   {
-    typedef mitk::ImageToItk<mitk::TensorImage::ItkTensorImageType> CasterType;
-
     if (m_Controls->m_ModeBox->currentIndex()==1)
     {
       if (m_InputImages.size()>1)
@@ -664,15 +720,8 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         return;
       }
 
-//      if (m_FirstTensorProbRun)
-//      {
-//        QMessageBox::information(nullptr, "Information", "Internally calculating ODF from tensor image and performing probabilistic ODF tractography. ODFs are sharpened (min-max normalized and raised to the power of 4). TEND parameters are ignored.");
-//        m_FirstTensorProbRun = false;
-//      }
-
       if (m_TrackingHandler==nullptr)
       {
-        typedef mitk::ImageToItk< mitk::TrackingHandlerOdf::ItkOdfImageType > CasterType;
         m_TrackingHandler = new mitk::TrackingHandlerOdf();
         mitk::TensorImage::ItkTensorImageType::Pointer itkImg = mitk::TensorImage::ItkTensorImageType::New();
         mitk::CastToItkImage(m_InputImages.at(0), itkImg);
@@ -731,7 +780,6 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
   {
     if (m_TrackingHandler==nullptr)
     {
-      typedef mitk::ImageToItk< mitk::TrackingHandlerOdf::ItkOdfImageType > CasterType;
       m_TrackingHandler = new mitk::TrackingHandlerOdf();
       mitk::TrackingHandlerOdf::ItkOdfImageType::Pointer itkImg = mitk::TrackingHandlerOdf::ItkOdfImageType::New();
       mitk::CastToItkImage(m_InputImages.at(0), itkImg);
@@ -817,6 +865,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
         CasterType::Pointer caster = CasterType::New();
         caster->SetInput(m_InputImages.at(0));
+        caster->SetCopyMemFlag(true);
         caster->Update();
         mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
         m_TrackingHandler = new mitk::TrackingHandlerPeaks();
@@ -880,6 +929,33 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_TargetImageBox->GetSelectedNode()->GetData()), mask);
     m_Tracker->SetTargetRegions(mask);
   }
+
+  if (m_Controls->m_PriorImageBox->GetSelectedNode().IsNotNull())
+  {
+    if (m_LastPrior!=m_Controls->m_PriorImageBox->GetSelectedNode()->GetUID() || m_TrackingPriorHandler==nullptr)
+    {
+      typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
+      CasterType::Pointer caster = CasterType::New();
+      caster->SetInput(dynamic_cast<mitk::PeakImage*>(m_Controls->m_PriorImageBox->GetSelectedNode()->GetData()));
+      caster->SetCopyMemFlag(true);
+      caster->Update();
+      mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
+      m_TrackingPriorHandler = new mitk::TrackingHandlerPeaks();
+      dynamic_cast<mitk::TrackingHandlerPeaks*>(m_TrackingPriorHandler)->SetPeakImage(itkImg);
+      dynamic_cast<mitk::TrackingHandlerPeaks*>(m_TrackingPriorHandler)->SetPeakThreshold(0.0);
+      m_LastPrior = m_Controls->m_PriorImageBox->GetSelectedNode()->GetUID();
+    }
+
+    m_TrackingPriorHandler->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
+    m_TrackingPriorHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
+
+    m_Tracker->SetTrackingPriorHandler(m_TrackingPriorHandler);
+    m_Tracker->SetTrackingPriorWeight(m_Controls->m_PriorWeightBox->value());
+    m_Tracker->SetTrackingPriorAsMask(m_Controls->m_PriorAsMaskBox->isChecked());
+    m_Tracker->SetIntroduceDirectionsFromPrior(m_Controls->m_NewDirectionsFromPriorBox->isChecked());
+  }
+  else if (m_Controls->m_PriorImageBox->GetSelectedNode().IsNull())
+    m_Tracker->SetTrackingPriorHandler(nullptr);
 
   if (m_Controls->m_ExclusionImageBox->GetSelectedNode().IsNotNull())
   {

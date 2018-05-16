@@ -75,7 +75,7 @@ void QmitkNodeDescriptorManager::RemoveDescriptor(QmitkNodeDescriptor *_Descript
   if (index != -1)
   {
     m_NodeDescriptors.removeAt(index);
-    _Descriptor->setParent(0);
+    _Descriptor->setParent(nullptr);
     delete _Descriptor;
   }
 }
@@ -95,7 +95,7 @@ QmitkNodeDescriptor *QmitkNodeDescriptorManager::GetDescriptor(const mitk::DataN
 
 QmitkNodeDescriptor *QmitkNodeDescriptorManager::GetDescriptor(const QString &_ClassName) const
 {
-  QmitkNodeDescriptor *_Descriptor = 0;
+  QmitkNodeDescriptor *_Descriptor = nullptr;
 
   if (_ClassName == "Unknown")
   {
@@ -163,7 +163,7 @@ QList<QAction *> QmitkNodeDescriptorManager::GetActions(const QList<mitk::DataNo
 }
 
 QmitkNodeDescriptorManager::QmitkNodeDescriptorManager()
-  : m_UnknownDataNodeDescriptor(new QmitkNodeDescriptor("Unknown", QString(":/Qmitk/DataTypeUnknown_48.png"), 0, this))
+  : m_UnknownDataNodeDescriptor(new QmitkNodeDescriptor("Unknown", QString(":/Qmitk/DataTypeUnknown_48.png"), nullptr, this))
 {
   this->Initialize();
 }

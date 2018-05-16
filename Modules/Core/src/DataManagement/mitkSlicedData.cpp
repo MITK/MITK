@@ -63,7 +63,7 @@ void mitk::SlicedData::UpdateOutputInformation()
     m_RequestedRegionInitialized = true;
   }
 
-  m_LastRequestedRegionWasOutsideOfTheBufferedRegion = 0;
+  m_LastRequestedRegionWasOutsideOfTheBufferedRegion = false;
 }
 
 void mitk::SlicedData::PrepareForNewData()

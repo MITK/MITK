@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkExceptionMacro.h>
 #include <mitkFileReaderRegistry.h>
 #include <mitkFileWriterRegistry.h>
-#include <mitkIDataNodeReader.h>
 #include <mitkIMimeTypeProvider.h>
 #include <mitkProgressBar.h>
 #include <mitkStandaloneDataStorage.h>
@@ -570,42 +569,6 @@ namespace mitk
       result.insert(result.end(), iter->m_Output.begin(), iter->m_Output.end());
     }
     return result;
-  }
-
-  Image::Pointer IOUtil::LoadImage(const std::string &path,
-    const ReaderOptionsFunctorBase *optionsCallback)
-  {
-    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path, optionsCallback);
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(baseData.GetPointer());
-    if (image.IsNull())
-    {
-      mitkThrow() << path << " is not a mitk::Image but a " << baseData->GetNameOfClass();
-    }
-    return image;
-  }
-
-  Surface::Pointer IOUtil::LoadSurface(const std::string &path,
-    const ReaderOptionsFunctorBase *optionsCallback)
-  {
-    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path, optionsCallback);
-    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface *>(baseData.GetPointer());
-    if (surface.IsNull())
-    {
-      mitkThrow() << path << " is not a mitk::Surface but a " << baseData->GetNameOfClass();
-    }
-    return surface;
-  }
-
-  PointSet::Pointer IOUtil::LoadPointSet(const std::string &path,
-    const ReaderOptionsFunctorBase *optionsCallback)
-  {
-    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path, optionsCallback);
-    mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet *>(baseData.GetPointer());
-    if (pointset.IsNull())
-    {
-      mitkThrow() << path << " is not a mitk::PointSet but a " << baseData->GetNameOfClass();
-    }
-    return pointset;
   }
 
   std::string IOUtil::Load(std::vector<LoadInfo> &loadInfos,

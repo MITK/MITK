@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKCLARONTOOL_H_HEADER_INCLUDED_
 
 #include <mitkClaronInterface.h>
-#include <mitkInternalTrackingTool.h>
+#include <mitkTrackingTool.h>
 #include <itkFastMutexLock.h>
 
 namespace mitk
@@ -30,11 +30,11 @@ namespace mitk
   *           continuously update the tool coordinates.
   *   \ingroup IGT
   */
-  class MITKIGT_EXPORT ClaronTool : public InternalTrackingTool
+  class MITKIGT_EXPORT ClaronTool : public TrackingTool
   {
   public:
     friend class ClaronTrackingDevice;
-    mitkClassMacro(ClaronTool, InternalTrackingTool);
+    mitkClassMacro(ClaronTool, TrackingTool);
 
 
     /**
@@ -74,7 +74,7 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
     ClaronTool();
-    virtual ~ClaronTool();
+    ~ClaronTool() override;
     /** \brief Tool handle variable from tracking device */
     claronToolHandle m_ToolHandle;
     /** \brief  Variable which holds the Tool's calibration name */

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>QmitkTractometryViewControls</class>
  <widget class="QWidget" name="QmitkTractometryViewControls">
@@ -12,6 +12,36 @@
   </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string>QCommandLinkButton {
+  font-weight: lighter;
+}
+
+QCommandLinkButton:disabled {
+  border: none;
+  font-weight: lighter;
+}
+
+QToolBox::tab {
+  font-weight: bold;
+}
+
+QToolBox::tab:hover {
+  font-weight: bold;
+}
+
+QToolBox::tab:selected {
+  font-weight: bold;
+}
+
+QGroupBox {
+  background-color: transparent;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: transparent;
+}</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_10">
    <item row="0" column="0">
@@ -41,7 +71,7 @@
       <item row="0" column="1">
        <widget class="QmitkDataStorageComboBox" name="m_ImageBox">
         <property name="toolTip">
-         <string/>
+         <string></string>
         </property>
        </widget>
       </item>
@@ -122,6 +152,6 @@
    <header location="global">QmitkChartWidget.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
- <connections/>
+ <resources></resources>
+ <connections></connections>
 </ui>

@@ -112,7 +112,7 @@ namespace mitk
   protected:
 
     DiffusionImageHeaderInformation();
-    virtual ~DiffusionImageHeaderInformation();
+    ~DiffusionImageHeaderInformation() override;
 
   };
 

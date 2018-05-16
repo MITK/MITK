@@ -76,7 +76,7 @@ public:
   inline bool operator==(const SharedDataPointer<T>& other) const { return d == other.d; }
   inline bool operator!=(const SharedDataPointer<T>& other) const { return d != other.d; }
 
-  inline SharedDataPointer() : d(0) { }
+  inline SharedDataPointer() : d(nullptr) { }
   inline ~SharedDataPointer() { if (d && !d->ref.Deref()) delete d; }
 
   explicit SharedDataPointer(T* data);
@@ -152,7 +152,7 @@ public:
     d = 0;
   }
 
-  inline operator bool () const { return d != 0; }
+  inline operator bool () const { return d != nullptr; }
 
   inline bool operator==(const ExplicitlySharedDataPointer<T>& other) const { return d == other.d; }
   inline bool operator!=(const ExplicitlySharedDataPointer<T>& other) const { return d != other.d; }

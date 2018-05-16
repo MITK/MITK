@@ -53,7 +53,7 @@ struct MITK_GUI_COMMON_PLUGIN WorkbenchUtil
    * @param openEditor
    *            Whether an Editor is to be opened on file loading (for cases there is none).
    *
-   * @see mitk::IDataNodeReader
+   * @see mitk::IOUtil
    */
   static void LoadFiles(const QStringList& fileNames, berry::IWorkbenchWindow::Pointer wnd, bool openEditor = true);
 

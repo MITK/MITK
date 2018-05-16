@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "QmitkPointListWidget.h"
+#include "QmitkPointListView.h"
+#include "QmitkPointListModel.h"
 
 #include <QDir>
 #include <QFileDialog>
@@ -21,7 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <mitkIOUtil.h>
 
+
 #include <QmitkEditPointDialog.h>
+#include <QmitkStyleManager.h>
 
 #include <mitkPointSetDataInteractor.h>
 
@@ -39,6 +43,7 @@ QmitkPointListWidget::QmitkPointListWidget(QWidget *parent, int orientation)
     m_LoadPointsBtn(nullptr),
     m_ToggleAddPoint(nullptr),
     m_AddPoint(nullptr),
+    m_TimeStepDisplay(nullptr),
     m_DataInteractor(nullptr),
     m_TimeStep(0),
     m_EditAllowed(true),
@@ -78,6 +83,12 @@ void QmitkPointListWidget::SetupConnections()
   connect(this->m_AddPoint, SIGNAL(clicked()), this, SLOT(OnBtnAddPointManually()));
   connect(this->m_PointListView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(OnListDoubleClick()));
   connect(this->m_PointListView, SIGNAL(SignalPointSelectionChanged()), this, SLOT(OnPointSelectionChanged()));
+  connect(this->m_PointListView, SIGNAL(SignalTimeStepChanged(int)), this, SLOT(OnTimeStepChanged(int)));
+}
+
+void QmitkPointListWidget::OnTimeStepChanged(int timeStep)
+{
+  m_TimeStepLabel->setText(QString("%1").arg(timeStep));
 }
 
 void QmitkPointListWidget::SetupUi()
@@ -88,49 +99,43 @@ void QmitkPointListWidget::SetupUi()
   m_ToggleAddPoint->setMaximumSize(25, 25);
   m_ToggleAddPoint->setCheckable(true);
   m_ToggleAddPoint->setToolTip("Toggle point editing (use SHIFT  + Left Mouse Button to add Points)");
-  QIcon iconAdd(":/QtWidgetsExt/btnSetPoints.xpm");
-  m_ToggleAddPoint->setIcon(iconAdd);
+  m_ToggleAddPoint->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/QtWidgetsExt/plus.svg")));
 
   m_AddPoint = new QPushButton();
   m_AddPoint->setMaximumSize(25, 25);
   m_AddPoint->setToolTip("Manually add point");
-  QIcon iconAddManually(":/QtWidgetsExt/btnSetPointsManually.xpm");
-  m_AddPoint->setIcon(iconAddManually);
+  m_AddPoint->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/QtWidgetsExt/plus-xyz.svg")));
 
   m_RemovePointBtn = new QPushButton();
   m_RemovePointBtn->setMaximumSize(25, 25);
-  const QIcon iconDel(":/QtWidgetsExt/btnClear.xpm");
-  m_RemovePointBtn->setIcon(iconDel);
+  m_RemovePointBtn->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/QtWidgetsExt/eraser.svg")));
   m_RemovePointBtn->setToolTip("Erase one point from list   (Hotkey: DEL)");
 
   m_MovePointUpBtn = new QPushButton();
   m_MovePointUpBtn->setMaximumSize(25, 25);
-  const QIcon iconUp(":/QtWidgetsExt/btnUp.xpm");
-  m_MovePointUpBtn->setIcon(iconUp);
+  m_MovePointUpBtn->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/QtWidgetsExt/arrow-up.svg")));
   m_MovePointUpBtn->setToolTip("Swap selected point upwards   (Hotkey: F2)");
 
   m_MovePointDownBtn = new QPushButton();
   m_MovePointDownBtn->setMaximumSize(25, 25);
-  const QIcon iconDown(":/QtWidgetsExt/btnDown.xpm");
-  m_MovePointDownBtn->setIcon(iconDown);
+  m_MovePointDownBtn->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/QtWidgetsExt/arrow-down.svg")));
   m_MovePointDownBtn->setToolTip("Swap selected point downwards   (Hotkey: F3)");
 
   m_SavePointsBtn = new QPushButton();
   m_SavePointsBtn->setMaximumSize(25, 25);
-  QIcon iconSave(":/QtWidgetsExt/btnSave.xpm");
-  m_SavePointsBtn->setIcon(iconSave);
+  m_SavePointsBtn->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/QtWidgetsExt/save.svg")));
   m_SavePointsBtn->setToolTip("Save points to file");
 
   m_LoadPointsBtn = new QPushButton();
   m_LoadPointsBtn->setMaximumSize(25, 25);
-  QIcon iconLoad(":/QtWidgetsExt/btnLoad.xpm");
-  m_LoadPointsBtn->setIcon(iconLoad);
+  m_LoadPointsBtn->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/QtWidgetsExt/folder-open.svg")));
   m_LoadPointsBtn->setToolTip("Load list of points from file (REPLACES current content)");
 
   int i;
 
   QBoxLayout *lay1;
   QBoxLayout *lay2;
+  QBoxLayout *lay3;
 
   switch (m_Orientation)
   {
@@ -162,8 +167,6 @@ void QmitkPointListWidget::SetupUi()
   // setup Layouts
 
   this->setLayout(lay1);
-  lay1->addLayout(lay2);
-
   lay2->stretch(true);
   lay2->addWidget(m_ToggleAddPoint);
   lay2->addWidget(m_AddPoint);
@@ -173,8 +176,29 @@ void QmitkPointListWidget::SetupUi()
   lay2->addWidget(m_SavePointsBtn);
   lay2->addWidget(m_LoadPointsBtn);
 
+  // setup Labels
+  m_TimeStepDisplay = new QLabel;
+  m_TimeStepLabel = new QLabel;
+  lay3 = new QHBoxLayout;
+
+  m_TimeStepDisplay->setMaximumSize(200, 15);
+
+  lay3->stretch(true);
+  lay3->setAlignment(Qt::AlignLeft);
+  lay3->addWidget(m_TimeStepDisplay);
+  lay3->addWidget(m_TimeStepLabel);
+
+  m_TimeStepDisplay->setText("Time Step: ");
+  m_TimeStepLabel->setMaximumSize(10, 15);
+
+  this->OnTimeStepChanged(0);
+
+  //Add Layouts
+
   lay1->insertWidget(i, m_PointListView);
   this->setLayout(lay1);
+  lay1->addLayout(lay2);
+  lay1->addLayout(lay3);
 }
 
 void QmitkPointListWidget::SetPointSet(mitk::PointSet *newPs)
@@ -238,7 +262,7 @@ void QmitkPointListWidget::OnBtnLoadPoints()
   // attempt to load file
   try
   {
-    mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(mitk::IOUtil::Load(filename.toStdString())[0].GetPointer());
+    mitk::PointSet::Pointer pointSet = mitk::IOUtil::Load<mitk::PointSet>(filename.toStdString());
     if (pointSet.IsNull())
     {
       QMessageBox::warning(this, "Load point set", QString("File reader could not read %1").arg(filename));
@@ -353,17 +377,18 @@ void QmitkPointListWidget::OnBtnAddPointManually()
 
   if (this->GetPointSet()->IsEmpty())
   {
-	  editPointDialog.SetPoint(pointSet, 0, m_TimeStep);
+      editPointDialog.SetPoint(pointSet, 0, m_TimeStep);
   }
 
   else
   {
-	  mitk::PointSet::PointsIterator maxIt = pointSet->GetMaxId();
-	  mitk::PointSet::PointIdentifier maxId = maxIt->Index();
-	  editPointDialog.SetPoint(pointSet, maxId + 1, m_TimeStep);
+      mitk::PointSet::PointsIterator maxIt = pointSet->GetMaxId();
+      mitk::PointSet::PointIdentifier maxId = maxIt->Index();
+      editPointDialog.SetPoint(pointSet, maxId + 1, m_TimeStep);
   }
 
   editPointDialog.exec();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkPointListWidget::OnListDoubleClick()

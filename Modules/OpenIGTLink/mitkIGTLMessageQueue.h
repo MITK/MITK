@@ -110,7 +110,7 @@ namespace mitk {
 
   protected:
     IGTLMessageQueue();
-    virtual ~IGTLMessageQueue();
+    ~IGTLMessageQueue() override;
 
   protected:
     /**

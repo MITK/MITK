@@ -30,9 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <mitkCoreObjectFactory.h>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 /*!
 \brief Calculate angular error of a tractogram with respect to the input reference directions.
 */
@@ -116,7 +113,7 @@ int main(int argc, char* argv[])
         {
             try
             {
-                mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(referenceImages.at(i))[0].GetPointer());
+                mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(referenceImages.at(i));
                 typedef mitk::ImageToItk< ItkDirectionImage3DType > CasterType;
                 CasterType::Pointer caster = CasterType::New();
                 caster->SetInput(img);
@@ -142,7 +139,7 @@ int main(int argc, char* argv[])
         itk::TractsToVectorImageFilter<float>::Pointer fOdfFilter = itk::TractsToVectorImageFilter<float>::New();
         fOdfFilter->SetFiberBundle(inputTractogram);
         fOdfFilter->SetMaskImage(itkMaskImage);
-        fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
+        fOdfFilter->SetAngularThreshold(cos(angularThreshold*itk::Math::pi/180));
         fOdfFilter->SetNormalizeVectors(true);
         fOdfFilter->SetUseWorkingCopy(false);
         fOdfFilter->SetSizeThreshold(sizeThreshold);
@@ -197,7 +194,7 @@ int main(int argc, char* argv[])
         {
             for (unsigned int i=0; i<maskImages.size(); i++)
             {
-                mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskImages.at(i))[0].GetPointer());
+                mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::Load<mitk::Image>(maskImages.at(i));
                 mitk::CastToItkImage(mitkMaskImage, itkMaskImage);
 
                 // evaluate directions

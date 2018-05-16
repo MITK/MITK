@@ -52,7 +52,7 @@ mitk::IGTLMeasurements* mitk::IGTLMeasurements::GetInstance()
   else
   {
     // No mitk::IGTLMeasurements instance was registered yet.
-    return 0;
+    return nullptr;
   }
 }
 

@@ -54,7 +54,7 @@ namespace mitk
 
     //////////////////// Functions ///////////////////////
     ConnectomicsSimulatedAnnealingCostFunctionModularity();
-    ~ConnectomicsSimulatedAnnealingCostFunctionModularity();
+    ~ConnectomicsSimulatedAnnealingCostFunctionModularity() override;
 
   };
 

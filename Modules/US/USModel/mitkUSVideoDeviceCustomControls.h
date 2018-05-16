@@ -41,12 +41,12 @@ namespace mitk {
       * mitk::USVideoDeviceCustomControls::SetCropArea() with an empty are
       * instead.
       */
-    virtual void SetIsActive(bool isActive) override;
+    void SetIsActive(bool isActive) override;
 
     /**
       * \return if this custom controls are currently activated
       */
-    virtual bool GetIsActive() override;
+    bool GetIsActive() override;
 
     /**
       * \brief Sets the area that will be cropped from the US image.
@@ -55,12 +55,18 @@ namespace mitk {
     void SetCropArea(USImageVideoSource::USImageCropping newArea);
 
     /**
-      * \return area currently set for image cropping
+      * \return area currently set for image cropping defined by the actual current probe.
       */
-    mitk::USImageVideoSource::USImageCropping GetCropArea();
+    mitk::USProbe::USProbeCropping GetCropArea();
 
     /**
-      * \brief Sets new depth value
+     * \brief Updates the cropping of the current probe given by the crop area of the
+     * USImageVideoSource.
+     */
+    void UpdateProbeCropping( mitk::USImageVideoSource::USImageCropping cropping );
+
+    /**
+      * \brief Sets a new depth value to the current probe.
       */
     void SetNewDepth(double depth);
 
@@ -79,13 +85,19 @@ namespace mitk {
     */
     std::vector<int> GetDepthsForProbe(std::string name);
 
+    /**
+    * \brief Sets the first existing probe or the default probe of a USVideoDevice
+    * as the current probe of the USVideoDevice.
+    */
+    void SetDefaultProbeAsCurrentProbe();
+
   protected:
     /**
       * Class needs an mitk::USImageVideoSource object for beeing constructed.
       * This object will be manipulated by the custom controls methods.
       */
     USVideoDeviceCustomControls(itk::SmartPointer<USVideoDevice> device);
-    virtual ~USVideoDeviceCustomControls();
+    ~USVideoDeviceCustomControls() override;
 
     bool                          m_IsActive;
     USImageVideoSource::Pointer   m_ImageSource;

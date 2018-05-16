@@ -56,7 +56,7 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLStreamingManagementWidget : public QWidg
      */
     void LoadSource(mitk::IGTLMessageProvider::Pointer provider);
 
-    QmitkIGTLStreamingManagementWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    QmitkIGTLStreamingManagementWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
     ~QmitkIGTLStreamingManagementWidget() override;
 
 

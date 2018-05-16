@@ -189,7 +189,7 @@ namespace mitk
 
     ToFCameraDevice();
 
-    ~ToFCameraDevice();
+    ~ToFCameraDevice() override;
 
     /*!
     \brief method for allocating memory for pixel arrays m_IntensityArray, m_DistanceArray and m_AmplitudeArray

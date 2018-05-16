@@ -35,7 +35,7 @@ public:
 
   void setUp() override
   {
-    m_image = mitk::IOUtil::LoadImage(GetTestDataFilePath("RT/Plan/rtplan.dcm"));
+    m_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("RT/Plan/rtplan.dcm"));
     CPPUNIT_ASSERT_EQUAL(m_image.IsNotNull(), true);
   }
 

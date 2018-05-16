@@ -38,7 +38,7 @@ MetropolisHastingsSampler::MetropolisHastingsSampler(ParticleGrid* grid, EnergyC
     m_DistanceThreshold = m_ParticleLength*m_ParticleLength;
     m_Sigma = m_ParticleLength/8.0;
     m_Gamma = 1/(m_Sigma*m_Sigma*2);
-    m_Z = pow(2*M_PI*m_Sigma,3.0/2.0)*(M_PI*m_Sigma/m_ParticleLength);
+    m_Z = pow(2*itk::Math::pi*m_Sigma,3.0/2.0)*(itk::Math::pi*m_Sigma/m_ParticleLength);
 
     m_CurvatureThreshold = curvThres;
     m_StopProb = exp(-1/m_TractProb);

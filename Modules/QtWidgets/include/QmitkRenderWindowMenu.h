@@ -57,10 +57,10 @@ class MITKQTWIDGETS_EXPORT QmitkRenderWindowMenu : public QWidget
   Q_OBJECT
 
 public:
-  QmitkRenderWindowMenu(QWidget *parent = 0,
-                        Qt::WindowFlags f = 0,
-                        mitk::BaseRenderer *b = 0,
-                        QmitkStdMultiWidget *mw = 0);
+  QmitkRenderWindowMenu(QWidget *parent = nullptr,
+                        Qt::WindowFlags f = nullptr,
+                        mitk::BaseRenderer *b = nullptr,
+                        QmitkStdMultiWidget *mw = nullptr);
   ~QmitkRenderWindowMenu() override;
 
   /*! Return visibility of settings menu. The menu is connected with m_SettingsButton and includes

@@ -151,7 +151,7 @@ mitk::PointSet::Pointer mitk::TargetPointsCalculator::CreateTargetPoints(mitk::I
   mitk::CastToItkImage(binaryImage, itkImage);
 
   itk::Index<3> begin = {{0, 0, 0}};
-  itk::Index<3> end = {{binaryImage->GetDimension(0), binaryImage->GetDimension(1), binaryImage->GetDimension(2)}};
+  itk::Index<3> end = {{static_cast<signed long>(binaryImage->GetDimension(0)), static_cast<signed long>(binaryImage->GetDimension(1)), static_cast<signed long>(binaryImage->GetDimension(2))}};
 
   mitk::Point3D beginWorld;
   mitk::Point3D endWorld;

@@ -22,10 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNumericTypes.h>
 #include <itkDataObject.h>
 #include <itkFastMutexLock.h>
-#include <cv.h>
 #include <vnl/vnl_matrix_fixed.h>
 #include "mitkXMLSerializable.h"
 #include <MitkCameraCalibrationExports.h>
+
+#include "opencv2/core.hpp"
 
 int mitkCameraIntrinsicsTest(int, char* []);
 
@@ -120,7 +121,7 @@ namespace mitk
     void FromGMLCalibrationXML(TiXmlElement* elem);
     std::string ToOctaveString(const std::string& varName="CameraIntrinsics");
 
-    virtual ~CameraIntrinsics();
+    ~CameraIntrinsics() override;
 
   protected:
     CameraIntrinsics();
@@ -133,7 +134,7 @@ namespace mitk
 
   private:
 
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
   };
 
 } // namespace mitk

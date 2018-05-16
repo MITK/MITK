@@ -82,18 +82,18 @@ public:
 
 protected:
   FFT1DRealToComplexConjugateImageFilter();
-  virtual ~FFT1DRealToComplexConjugateImageFilter() {}
+  ~FFT1DRealToComplexConjugateImageFilter() override {}
 
   void PrintSelf(std::ostream& os, Indent indent) const ITK_OVERRIDE;
 
-  virtual void GenerateInputRequestedRegion() ITK_OVERRIDE;
-  virtual void EnlargeOutputRequestedRegion(DataObject *output) ITK_OVERRIDE;
+  void GenerateInputRequestedRegion() ITK_OVERRIDE;
+  void EnlargeOutputRequestedRegion(DataObject *output) ITK_OVERRIDE;
 
-  virtual void BeforeThreadedGenerateData() ITK_OVERRIDE;
+  void BeforeThreadedGenerateData() ITK_OVERRIDE;
 
   /** Override to return a splitter that does not split along the direction we
    * are performing the transform. */
-  virtual const ImageRegionSplitterBase* GetImageRegionSplitter() const ITK_OVERRIDE;
+  const ImageRegionSplitterBase* GetImageRegionSplitter() const ITK_OVERRIDE;
 
 private:
   FFT1DRealToComplexConjugateImageFilter( const Self& );

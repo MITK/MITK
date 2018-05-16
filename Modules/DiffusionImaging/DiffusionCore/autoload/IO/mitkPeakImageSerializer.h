@@ -30,10 +30,10 @@ class PeakImageSerializer : public BaseDataSerializer
     mitkClassMacro( PeakImageSerializer, BaseDataSerializer );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
-    virtual std::string Serialize() override;
+    std::string Serialize() override;
   protected:
     PeakImageSerializer();
-    virtual ~PeakImageSerializer();
+    ~PeakImageSerializer() override;
 };
 } // namespace
 #endif

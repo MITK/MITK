@@ -1,0 +1,30 @@
+/**
+\page IGTConcepts IGT Concepts
+
+The MITK-IGT module allows for acquisition and processing of tracking data from various devices such as optical and electromagnetic tracking systems. It is organized in a layered structure in which the hardware related Tracking Layer is responsible for acquisition of tracking data and the Navigation Layer its processing.
+\imageMacro{IGTLayers.png,"Layered structure of MITK-IGT",3}
+\section TrackingLayer Tracking Layer
+The tracking layer offers an interface for tracking devices and holds classes which establish connection to such devices. The following tracking devices are currently supported:
+<ul>
+<li> NDI Polaris
+<li> NDI Aurora
+<li> Polhemus Liberty
+<li> MicronTracker (tested on Windows only)
+<li> Ascension/NDI Microbird (tested on Windows only)
+</ul>
+\section NavigationLayer Navigation Layer
+The navigation layer holds classes relating to program logic of IGT systems. Thus, the hardware is clearly separated from the program logic and e.g. integrating a new device into an existing software is easy. The program logic is designed to be flexible by a pipeline concept (cf. Fig. 2). Different existing or even new designed filters can be applied to navigation data which is produced by a tracking device. You can combine these filter in many different ways and easily add new functionality, e.g. by simply implementing a new filter and integrating it into your pipeline.
+\imageMacro{IGTPipeline.png,"Schematic illustration of an IGT Pipeline for processing navigation data",3}
+\section IGTWidgets IGT widgets
+Many of the UI components, such as configuration of tracking devices and visualization of status information of navigation tools, can be used in the creation of multiple applications. To enable reusing of UI elements, the module IGT-UI which offers an environment for IGT widgets was introduced. New widgets can be implemented by using the concept of QT widgets. Such widgets can be added to an UI easily by using the standard UI creator of MITK, the QT creator. Configuration widgets are available for all implemented tracking devices. Some other helpful widgets will be presented in the following but have a look to the MITK-IGT sourcecode for all currently available widgets:
+<ul>
+<li> <b>TrackingDeviceConfigurationWidget:</b> Allows the user to configure a tracking device. 
+<li> <b>IGTConnectionWidget:</b> Simple widget to create and connect a TrackingDeviceSourc
+<li> <b>ToolTrackingStatusWidget:</b> Shows informations of navigation tools. 
+<li> <b>LoggerWidget:</b> Allows easy logging of navigation data streams. Offers XML or CSV format. 
+<li> <b>PlayerWidget:</b> Offers functionality to load logged navigation data streams and replay them.
+</ul>
+\section IGTProcess IGT classes and their role in the process
+The realisation of a typical IGT workflow using the classes of MITK-IGT is depicted in the following sequence diagram:
+\imageMacro{IGTSequenceDiagram.png,"A typical IGT workflow and the role of the individual classes",3}
+*/

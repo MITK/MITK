@@ -199,7 +199,7 @@ void PAImageProcessing::BatchProcessing()
     // remove ".nrrd"
     imageName = imageName.substr(0, imageName.size()-5);
 
-    mitk::Image::Pointer image = mitk::IOUtil::LoadImage(filename.toStdString().c_str());
+    mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(filename.toStdString().c_str());
 
     UpdateBFSettings(image);
     // Beamforming

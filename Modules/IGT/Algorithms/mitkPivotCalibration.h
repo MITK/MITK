@@ -45,13 +45,12 @@ namespace mitk {
       bool ComputePivotResult();
 
       itkGetMacro(ResultPivotPoint,mitk::Point3D);
-      itkGetMacro(ResultPivotRotation,mitk::Quaternion);
       itkGetMacro(ResultRMSError,double);
 
 
     protected:
       PivotCalibration();
-      virtual ~PivotCalibration();
+      ~PivotCalibration() override;
 
       std::vector<mitk::NavigationData::Pointer> m_NavigationDatas;
 
@@ -59,7 +58,6 @@ namespace mitk {
       bool ComputePivotAxis();
 
       mitk::Point3D m_ResultPivotPoint;
-      mitk::Quaternion m_ResultPivotRotation;
       double m_ResultRMSError;
 
     };

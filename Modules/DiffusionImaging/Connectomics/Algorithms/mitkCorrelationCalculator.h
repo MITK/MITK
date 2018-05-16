@@ -137,10 +137,10 @@ namespace mitk {
   protected:
 
     // intentionally not accessible, use our non-const Modified function instead
-    virtual void Modified() const override;
+    void Modified() const override;
 
     CorrelationCalculator();
-    virtual ~CorrelationCalculator();
+    ~CorrelationCalculator() override;
 
     template< typename TPixel, unsigned int VImageDimension >
     void ExtractAllAverageTimeSeries( itk::Image< TPixel, VImageDimension>* itkTimeSeriesImage );

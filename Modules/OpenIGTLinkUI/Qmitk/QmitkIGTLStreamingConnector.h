@@ -43,7 +43,7 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLStreamingConnector : public QObject
   public:
     static const std::string VIEW_ID;
 
-    QmitkIGTLStreamingConnector(QObject* parent = 0);
+    QmitkIGTLStreamingConnector(QObject* parent = nullptr);
     ~QmitkIGTLStreamingConnector() override;
 
     /** @brief Sets the message source that is the end of the pipeline and the

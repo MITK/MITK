@@ -15,11 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkOpenIGTLinkTrackingTool.h"
-#include <stdio.h>
+#include <cstdio>
 #include <vector>
 #include <iostream>
 
-mitk::OpenIGTLinkTrackingTool::OpenIGTLinkTrackingTool() :InternalTrackingTool()
+mitk::OpenIGTLinkTrackingTool::OpenIGTLinkTrackingTool() : TrackingTool()
 {
 }
 

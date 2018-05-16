@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itk_zlib.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 
 mitk::CompressedImageContainer::CompressedImageContainer() : m_PixelType(nullptr), m_ImageGeometry(nullptr)
 {

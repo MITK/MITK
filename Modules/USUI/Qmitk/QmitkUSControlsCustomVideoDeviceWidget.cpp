@@ -20,6 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkException.h>
 
+
+QmitkUSControlsCustomVideoDeviceWidget::QmitkUSControlsCustomVideoDeviceWidget()
+  : ui(new Ui::QmitkUSControlsCustomVideoDeviceWidget)
+{
+}
+
+
 QmitkUSControlsCustomVideoDeviceWidget::QmitkUSControlsCustomVideoDeviceWidget(QWidget *parent)
   : QmitkUSAbstractCustomWidget(parent), ui(new Ui::QmitkUSControlsCustomVideoDeviceWidget)
 {
@@ -53,12 +60,6 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnDeviceSet()
 
   if (m_ControlInterface.IsNotNull())
   {
-    mitk::USImageVideoSource::USImageCropping cropping = m_ControlInterface->GetCropArea();
-    ui->crop_left->setValue(cropping.left);
-    ui->crop_right->setValue(cropping.right);
-    ui->crop_bot->setValue(cropping.bottom);
-    ui->crop_top->setValue(cropping.top);
-
     //get all probes and put their names into a combobox
     std::vector<mitk::USProbe::Pointer> probes = m_ControlInterface->GetProbes();
     for (std::vector<mitk::USProbe::Pointer>::iterator it = probes.begin(); it != probes.end(); it++)
@@ -66,8 +67,21 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnDeviceSet()
       std::string probeName = (*it)->GetName();
       ui->m_ProbeIdentifier->addItem(QString::fromUtf8(probeName.data(), probeName.size()));
     }
+
+    m_ControlInterface->SetDefaultProbeAsCurrentProbe();
+
+    SetDepthsForProbe( ui->m_ProbeIdentifier->currentText().toStdString() );
+    m_ControlInterface->SetNewDepth( ui->m_UsDepth->currentText().toDouble() );
+
     connect(ui->m_UsDepth, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnDepthChanged()));
     connect(ui->m_ProbeIdentifier, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnProbeChanged()));
+
+    // Call GetCropArea after the current ultrasound probe was set as default probe:
+    mitk::USProbe::USProbeCropping cropping = m_ControlInterface->GetCropArea();
+    ui->crop_left->setValue(cropping.left);
+    ui->crop_right->setValue(cropping.right);
+    ui->crop_bot->setValue(cropping.bottom);
+    ui->crop_top->setValue(cropping.top);
 
   }
   else
@@ -106,11 +120,13 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnCropAreaChanged()
   try
   {
     m_ControlInterface->SetCropArea(cropping);
+    m_ControlInterface->UpdateProbeCropping(cropping);
     m_Cropping = cropping;
   }
   catch (mitk::Exception e)
   {
     m_ControlInterface->SetCropArea(m_Cropping); // reset to last valid crop
+    m_ControlInterface->UpdateProbeCropping(m_Cropping);
 
     //reset values
     BlockSignalAndSetValue(ui->crop_left, m_Cropping.left);
@@ -130,6 +146,7 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnCropAreaChanged()
 void QmitkUSControlsCustomVideoDeviceWidget::OnDepthChanged()
 {
   double depth = ui->m_UsDepth->currentText().toDouble();
+  MITK_INFO << "OnDepthChanged() " << depth;
   m_ControlInterface->SetNewDepth(depth);
 }
 
@@ -138,6 +155,12 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnProbeChanged()
   std::string probename = ui->m_ProbeIdentifier->currentText().toStdString();
   m_ControlInterface->SetNewProbeIdentifier(probename);
   SetDepthsForProbe(probename);
+
+  mitk::USProbe::USProbeCropping cropping = m_ControlInterface->GetCropArea();
+  ui->crop_left->setValue(cropping.left);
+  ui->crop_right->setValue(cropping.right);
+  ui->crop_bot->setValue(cropping.bottom);
+  ui->crop_top->setValue(cropping.top);
 }
 
 void QmitkUSControlsCustomVideoDeviceWidget::BlockSignalAndSetValue(QSpinBox* target, int value)

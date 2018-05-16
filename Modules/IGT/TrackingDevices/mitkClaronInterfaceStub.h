@@ -112,7 +112,7 @@ namespace mitk
     /**
     * \brief standard destructor
     */
-    ~ClaronInterface();
+    ~ClaronInterface() override;
 
   };
 }//mitk

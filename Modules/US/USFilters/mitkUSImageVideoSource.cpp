@@ -18,12 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSImageVideoSource.h"
 #include "mitkImage.h"
 
-//OpenCV HEADER
-#include <cv.h>
-#include <highgui.h>
-
 //Other
-#include <stdio.h>
+#include <cstdio>
+#include <highgui.h>
 
 mitk::USImageVideoSource::USImageVideoSource()
   : m_VideoCapture(new cv::VideoCapture()),
@@ -181,7 +178,7 @@ void mitk::USImageVideoSource::RemoveRegionOfInterest()
   m_IsCropped = false;
 }
 
-void mitk::USImageVideoSource::GetNextRawImage( cv::Mat& image )
+void mitk::USImageVideoSource::GetNextRawImage(std::vector<cv::Mat>& image )
 {
   // loop video if necessary
   //Commented out because setting and getting of these properties is not supported. Therefore on Linux
@@ -191,27 +188,33 @@ void mitk::USImageVideoSource::GetNextRawImage( cv::Mat& image )
     m_VideoCapture->set(CV_CAP_PROP_POS_FRAMES, 0);
   }*/
 
+  if (image.size() != 1)
+    image.resize(1);
+
   // retrieve image
-  *m_VideoCapture >> image; // get a new frame from camera
+  *m_VideoCapture >> image[0]; // get a new frame from camera
 }
 
-void mitk::USImageVideoSource::GetNextRawImage( mitk::Image::Pointer& image )
+void mitk::USImageVideoSource::GetNextRawImage(std::vector<mitk::Image::Pointer>& image )
 {
-  cv::Mat cv_img;
+  if (image.size() != 1)
+    image.resize(1);
+
+  std::vector<cv::Mat> cv_img;
 
   this->GetNextRawImage(cv_img);
 
   // convert to MITK-Image
-  IplImage ipl_img = cv_img;
+  IplImage ipl_img = cv_img[0];
 
   this->m_OpenCVToMitkFilter->SetOpenCVImage(&ipl_img);
   this->m_OpenCVToMitkFilter->Update();
 
   // OpenCVToMitkImageFilter returns a standard mitk::image. We then transform it into an USImage
-  image = this->m_OpenCVToMitkFilter->GetOutput();
+  image[0] = this->m_OpenCVToMitkFilter->GetOutput();
 
   // clean up
-  cv_img.release();
+  cv_img[0].release();
 }
 
 void mitk::USImageVideoSource::OverrideResolution(int width, int height)

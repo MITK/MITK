@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fcntl.h>
 #include <unistd.h>
 #include <termios.h>
-#include <errno.h>
+#include <cerrno>
 
 #define INVALID_HANDLE_VALUE -1
 #endif

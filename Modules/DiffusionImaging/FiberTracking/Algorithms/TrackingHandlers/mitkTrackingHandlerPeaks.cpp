@@ -263,7 +263,9 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::ProposeDirection(const itk::Poin
   itk::Index<3> index;
   m_DummyImage->TransformPhysicalPointToIndex(pos, index);
 
-  vnl_vector_fixed<float,3> oldDir = olddirs.back();
+  vnl_vector_fixed<float,3> oldDir; oldDir.fill(0.0);
+  if (!olddirs.empty())
+    oldDir = olddirs.back();
   float old_mag = oldDir.magnitude();
 
   if (!m_Interpolate && oldIndex==index)

@@ -17,9 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataEvaluationFilter.h"
 #include <mitkPointSetStatisticsCalculator.h>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 mitk::NavigationDataEvaluationFilter::NavigationDataEvaluationFilter()
   : mitk::NavigationDataToNavigationDataFilter()
 {
@@ -271,15 +268,14 @@ std::vector<mitk::Vector3D> mitk::NavigationDataEvaluationFilter::QuaternionsToE
 
 std::vector<mitk::Vector3D> mitk::NavigationDataEvaluationFilter::QuaternionsToEulerAnglesGrad(std::vector<mitk::Quaternion> quaterions)
 {
-  double PI = M_PI;
   std::vector<mitk::Vector3D> returnValue = std::vector<mitk::Vector3D>();
   std::vector<mitk::Vector3D> eulerAnglesRadians = QuaternionsToEulerAngles(quaterions);
   for (unsigned int i = 0; i < eulerAnglesRadians.size(); i++)
   {
     mitk::Vector3D currentAngles;
-    currentAngles[0] = (eulerAnglesRadians.at(i)[0] / PI) * 180;
-    currentAngles[1] = (eulerAnglesRadians.at(i)[1] / PI) * 180;
-    currentAngles[2] = (eulerAnglesRadians.at(i)[2] / PI) * 180;
+    currentAngles[0] = (eulerAnglesRadians.at(i)[0] / itk::Math::pi) * 180;
+    currentAngles[1] = (eulerAnglesRadians.at(i)[1] / itk::Math::pi) * 180;
+    currentAngles[2] = (eulerAnglesRadians.at(i)[2] / itk::Math::pi) * 180;
     returnValue.push_back(currentAngles);
   }
   return returnValue;

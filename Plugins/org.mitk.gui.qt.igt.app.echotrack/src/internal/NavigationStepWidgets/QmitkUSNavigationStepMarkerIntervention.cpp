@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "../Filter/mitkUSNavigationTargetOcclusionFilter.h"
 #include "../Filter/mitkUSNavigationTargetUpdateFilter.h"
 
-#include "../USNavigationMarkerPlacement.h"
+#include "../QmitkUSNavigationMarkerPlacement.h"
 #include "../Widgets/QmitkZoneProgressBar.h"
 #include "../mitkUSTargetPlacementQualityCalculator.h"
 
@@ -57,9 +57,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkPolyData.h"
 #include "vtkSelectEnclosedPoints.h"
 #include "vtkSmartPointer.h"
-#include "vtkSphereSource.h"
+#include <vtkSphereSource.h>
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkWarpScalar.h"
+
 
 QmitkUSNavigationStepMarkerIntervention::QmitkUSNavigationStepMarkerIntervention(QWidget *parent)
   : QmitkUSAbstractNavigationStep(parent),
@@ -197,7 +198,7 @@ bool QmitkUSNavigationStepMarkerIntervention::OnStopStep()
 
   // remove base node for reached targets from the data storage
   mitk::DataNode::Pointer reachedTargetsNode = this->GetNamedDerivedNode(
-    QmitkUSAbstractNavigationStep::DATANAME_BASENODE, USNavigationMarkerPlacement::DATANAME_REACHED_TARGETS);
+    QmitkUSAbstractNavigationStep::DATANAME_BASENODE, QmitkUSNavigationMarkerPlacement::DATANAME_REACHED_TARGETS);
   if (reachedTargetsNode.IsNotNull())
   {
     dataStorage->Remove(reachedTargetsNode);
@@ -216,18 +217,18 @@ bool QmitkUSNavigationStepMarkerIntervention::OnActivateStep()
   this->ClearZones(); // clear risk zones before adding new ones
 
   // get target node from data storage and make sure that it contains data
-  m_TargetNode = this->GetNamedDerivedNode(USNavigationMarkerPlacement::DATANAME_TARGETSURFACE,
-                                           USNavigationMarkerPlacement::DATANAME_TUMOUR);
+  m_TargetNode = this->GetNamedDerivedNode(QmitkUSNavigationMarkerPlacement::DATANAME_TARGETSURFACE,
+	  QmitkUSNavigationMarkerPlacement::DATANAME_TUMOUR);
   if (m_TargetNode.IsNull() || m_TargetNode->GetData() == 0)
   {
-    mitkThrow() << "Target node (" << USNavigationMarkerPlacement::DATANAME_TARGETSURFACE << ") must not be null.";
+    mitkThrow() << "Target node (" << QmitkUSNavigationMarkerPlacement::DATANAME_TARGETSURFACE << ") must not be null.";
   }
 
   // get target data and make sure that it is a surface
   m_TargetSurface = dynamic_cast<mitk::Surface *>(m_TargetNode->GetData());
   if (m_TargetSurface.IsNull())
   {
-    mitkThrow() << "Target node (" << USNavigationMarkerPlacement::DATANAME_TARGETSURFACE
+    mitkThrow() << "Target node (" << QmitkUSNavigationMarkerPlacement::DATANAME_TARGETSURFACE
                 << ") data must be of type mitk::Surface";
   }
 
@@ -243,7 +244,7 @@ bool QmitkUSNavigationStepMarkerIntervention::OnActivateStep()
 
   this->UpdateTargetProgressDisplay();
 
-  mitk::DataNode::Pointer tumourNode = this->GetNamedDerivedNode(USNavigationMarkerPlacement::DATANAME_TUMOUR,
+  mitk::DataNode::Pointer tumourNode = this->GetNamedDerivedNode(QmitkUSNavigationMarkerPlacement::DATANAME_TUMOUR,
                                                                  QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
   if (tumourNode.IsNotNull())
   {
@@ -262,7 +263,7 @@ bool QmitkUSNavigationStepMarkerIntervention::OnActivateStep()
   m_TargetNode->SetProperty("LookupTable", m_TargetColorLookupTableProperty);
 
   //
-  mitk::DataNode::Pointer targetsBaseNode = this->GetNamedDerivedNode(USNavigationMarkerPlacement::DATANAME_TARGETS,
+  mitk::DataNode::Pointer targetsBaseNode = this->GetNamedDerivedNode(QmitkUSNavigationMarkerPlacement::DATANAME_TARGETS,
                                                                       QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
   mitk::DataStorage::SetOfObjects::ConstPointer plannedTargetNodes;
   if (targetsBaseNode.IsNotNull())
@@ -283,7 +284,7 @@ bool QmitkUSNavigationStepMarkerIntervention::OnActivateStep()
   }
 
   // add progress bars for risk zone nodes
-  mitk::DataNode::Pointer zonesBaseNode = this->GetNamedDerivedNode(USNavigationMarkerPlacement::DATANAME_ZONES,
+  mitk::DataNode::Pointer zonesBaseNode = this->GetNamedDerivedNode(QmitkUSNavigationMarkerPlacement::DATANAME_ZONES,
                                                                     QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
   // only add progress bars if the base node for zones was created
   if (zonesBaseNode.IsNotNull())
@@ -424,7 +425,7 @@ void QmitkUSNavigationStepMarkerIntervention::OnTargetLeft()
       (QString("Target ") + QString("%1").arg(m_CurrentTargetIndex, 2, 10, QLatin1Char('0'))).toStdString());
     this->GetDataStorage()->Add(
       node,
-      this->GetNamedDerivedNodeAndCreate(USNavigationMarkerPlacement::DATANAME_REACHED_TARGETS,
+      this->GetNamedDerivedNodeAndCreate(QmitkUSNavigationMarkerPlacement::DATANAME_REACHED_TARGETS,
                                          QmitkUSAbstractNavigationStep::DATANAME_BASENODE));
     m_ReachedTargetsNodes.push_back(node);
   }
@@ -433,12 +434,11 @@ void QmitkUSNavigationStepMarkerIntervention::OnTargetLeft()
   mitk::Surface::Pointer zone = mitk::Surface::New();
 
   // create a vtk sphere with given radius
-  vtkSphereSource *vtkData = vtkSphereSource::New();
-  vtkData->SetRadius(5);
-  vtkData->SetCenter(0, 0, 0);
-  vtkData->Update();
-  zone->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
+  vtkSmartPointer<vtkSphereSource> vtkSphere = vtkSmartPointer<vtkSphereSource>::New();
+  vtkSphere->SetRadius(5);
+  vtkSphere->SetCenter(0, 0, 0);
+  vtkSphere->Update();
+  zone->SetVtkPolyData(vtkSphere->GetOutput());
 
   // set vtk sphere and origin to data node
   node->SetData(zone);
@@ -504,7 +504,7 @@ void QmitkUSNavigationStepMarkerIntervention::OnFreeze(bool freezed)
         (QString("Target ") + QString("%1").arg(m_CurrentTargetIndex, 2, 10, QLatin1Char('0'))).toStdString());
       this->GetDataStorage()->Add(
         node,
-        this->GetNamedDerivedNodeAndCreate(USNavigationMarkerPlacement::DATANAME_REACHED_TARGETS,
+        this->GetNamedDerivedNodeAndCreate(QmitkUSNavigationMarkerPlacement::DATANAME_REACHED_TARGETS,
                                            QmitkUSAbstractNavigationStep::DATANAME_BASENODE));
       m_ReachedTargetsNodes.push_back(node);
     }

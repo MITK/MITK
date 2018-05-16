@@ -66,7 +66,7 @@ private:
 public:
   static const std::string VIEW_ID;
 
-  QmitkServiceListWidget(QWidget *p = 0, Qt::WindowFlags f1 = 0);
+  QmitkServiceListWidget(QWidget *p = nullptr, Qt::WindowFlags f1 = nullptr);
   ~QmitkServiceListWidget() override;
 
   /** \brief Set if the first entry of the list should be selected automatically if no entry was selected before. */

@@ -161,21 +161,25 @@ void QmitkImageStatisticsCalculationThread::run()
   catch (const mitk::Exception& e)
   {
     MITK_ERROR << "MITK Exception: " << e.what();
+    m_message = e.what();
     statisticCalculationSuccessful = false;
   }
   catch( const itk::ExceptionObject& e)
   {
     MITK_ERROR << "ITK Exception:" << e.what();
+    m_message = e.what();
     statisticCalculationSuccessful = false;
   }
   catch ( const std::runtime_error &e )
   {
     MITK_ERROR<< "Runtime Exception: " << e.what();
+    m_message = e.what();
     statisticCalculationSuccessful = false;
   }
   catch ( const std::exception &e )
   {
     MITK_ERROR<< "Standard Exception: " << e.what();
+    m_message = e.what();
     statisticCalculationSuccessful = false;
   }
 
@@ -203,19 +207,19 @@ void QmitkImageStatisticsCalculationThread::run()
     }
     catch ( mitk::Exception& e)
     {
-      //m_message = e.GetDescription();
+      m_message = e.GetDescription();
       MITK_ERROR<< "MITK Exception: " << e.what();
       statisticCalculationSuccessful = false;
     }
     catch ( const std::runtime_error &e )
     {
-      //m_message = "Failure: " + std::string(e.what());
+      m_message = "Failure: " + std::string(e.what());
       MITK_ERROR<< "Runtime Exception: " << e.what();
       statisticCalculationSuccessful = false;
     }
     catch ( const std::exception &e )
     {
-      //m_message = "Failure: " + std::string(e.what());
+      m_message = "Failure: " + std::string(e.what());
       MITK_ERROR<< "Standard Exception: " << e.what();
       statisticCalculationSuccessful = false;
     }

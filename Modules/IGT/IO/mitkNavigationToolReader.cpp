@@ -81,23 +81,21 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   mitk::NavigationTool::Pointer returnValue = mitk::NavigationTool::New();
 
   //DateTreeNode with Name and Surface
-  mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-  newNode->SetName(node->GetName());
-  newNode->SetData(node->GetData());
-  bool visible = true;
-  node->GetVisibility(visible, NULL);
-  newNode->SetVisibility(visible);
-  returnValue->SetDataNode(newNode);
+  returnValue->SetDataNode(node);
 
   //Identifier
   std::string identifier;
   node->GetStringProperty("identifier", identifier);
   returnValue->SetIdentifier(identifier);
 
+  node->RemoveProperty("identifier");
+
   //Serial Number
   std::string serial;
   node->GetStringProperty("serial number", serial);
   returnValue->SetSerialNumber(serial);
+
+  node->RemoveProperty("serial number");
 
   //Tracking Device
   mitk::TrackingDeviceType device_type;
@@ -140,12 +138,16 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
     }
   }
 
+  node->RemoveProperty("tracking device type");
+
   returnValue->SetTrackingDeviceType(static_cast<mitk::TrackingDeviceType>(device_type));
 
   //Tool Type
   int type;
   node->GetIntProperty("tracking tool type", type);
   returnValue->SetType(static_cast<mitk::NavigationTool::NavigationToolType>(type));
+
+  node->RemoveProperty("tracking tool type");
 
   //Calibration File Name
   std::string calibration_filename;
@@ -160,6 +162,8 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
     returnValue->SetCalibrationFile(calibration_filename_with_path);
   }
 
+  node->RemoveProperty("toolfileName");
+
   //Tool Landmarks
   mitk::PointSet::Pointer ToolRegLandmarks = mitk::PointSet::New();
   mitk::PointSet::Pointer ToolCalLandmarks = mitk::PointSet::New();
@@ -169,24 +173,30 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   node->GetStringProperty("ToolCalibrationLandmarks", CalLandmarksString);
   ToolRegLandmarks = ConvertStringToPointSet(RegLandmarksString);
   ToolCalLandmarks = ConvertStringToPointSet(CalLandmarksString);
-  returnValue->SetToolRegistrationLandmarks(ToolRegLandmarks);
-  returnValue->SetToolCalibrationLandmarks(ToolCalLandmarks);
+  returnValue->SetToolLandmarks(ToolRegLandmarks);
+  returnValue->SetToolControlPoints(ToolCalLandmarks);
+
+  node->RemoveProperty("ToolRegistrationLandmarks");
+  node->RemoveProperty("ToolCalibrationLandmarks");
 
   //Tool Tip
   std::string toolTipPositionString;
   std::string toolTipOrientationString;
   bool positionSet = node->GetStringProperty("ToolTipPosition", toolTipPositionString);
-  bool orientationSet = node->GetStringProperty("ToolTipOrientation", toolTipOrientationString);
+  bool orientationSet = node->GetStringProperty("ToolAxisOrientation", toolTipOrientationString);
 
   if (positionSet && orientationSet) //only define tooltip if it is set
   {
     returnValue->SetToolTipPosition(ConvertStringToPoint(toolTipPositionString));
-    returnValue->SetToolTipOrientation(ConvertStringToQuaternion(toolTipOrientationString));
+    returnValue->SetToolAxisOrientation(ConvertStringToQuaternion(toolTipOrientationString));
   }
   else if (positionSet != orientationSet)
   {
     MITK_WARN << "Tooltip definition incomplete: position and orientation have to be set! Skipping tooltip definition.";
   }
+
+  node->RemoveProperty("ToolTipPosition");
+  node->RemoveProperty("ToolAxisOrientation");
 
   //Tool Axis
   std::string ToolAxisString;

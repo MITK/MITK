@@ -151,15 +151,15 @@ public:
     }
 
 protected:
-    void AllocateOutputs();
+    void AllocateOutputs() override;
 
     void ThreadedGenerateData(const RegionType &
                                           outputRegionForThread,
-                                          ThreadIdType threadId);
+                                          ThreadIdType threadId) override;
 
-    void BeforeThreadedGenerateData();
+    void BeforeThreadedGenerateData() override;
 
-    void AfterThreadedGenerateData();
+    void AfterThreadedGenerateData() override;
 
 private:
     std::vector<ExtremaMapType> m_ThreadExtrema;

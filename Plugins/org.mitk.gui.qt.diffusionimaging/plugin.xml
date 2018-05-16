@@ -33,7 +33,7 @@
 
     <view id="org.mitk.views.diffusiondicomimport"
     name="DICOM Import"
-    category="Data handling"
+    category="Data"
     class="QmitkDiffusionDicomImport"
     icon="resources/dwiimport.png">
     <description>Diffusion DICOM data import</description>

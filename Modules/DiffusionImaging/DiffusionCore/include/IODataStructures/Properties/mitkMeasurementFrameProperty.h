@@ -44,17 +44,17 @@ namespace mitk
   protected:
 
     MeasurementFrameProperty();
-    ~MeasurementFrameProperty();
+    ~MeasurementFrameProperty() override;
 
     MeasurementFrameProperty(const MeasurementFrameProperty& other);
     MeasurementFrameProperty(const MeasurementFrameType& measurementFrame);
 
-    virtual bool IsEqual(const BaseProperty& property) const override;
-    virtual bool Assign(const BaseProperty & property) override;
+    bool IsEqual(const BaseProperty& property) const override;
+    bool Assign(const BaseProperty & property) override;
 
     MeasurementFrameType m_MeasurementFrame;
 
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
   };
 }
 #endif

@@ -38,11 +38,11 @@ public:
 
     FiberBundleVtkWriter();
     FiberBundleVtkWriter(const FiberBundleVtkWriter & other);
-    virtual FiberBundleVtkWriter * Clone() const override;
-    virtual ~FiberBundleVtkWriter();
+    FiberBundleVtkWriter * Clone() const override;
+    ~FiberBundleVtkWriter() override;
 
     using mitk::AbstractFileWriter::Write;
-    virtual void Write() override;
+    void Write() override;
 
     static const char* XML_GEOMETRY;
 

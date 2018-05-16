@@ -220,15 +220,6 @@ set(CPP_FILES
   IO/mitkAbstractFileReader.cpp
   IO/mitkAbstractFileWriter.cpp
   IO/mitkCustomMimeType.cpp
-  IO/mitkDicomSeriesReader.cpp
-  IO/mitkDicomSeriesReaderService.cpp
-  IO/mitkDicomSR_GantryTiltInformation.cpp
-  IO/mitkDicomSR_ImageBlockDescriptor.cpp
-  IO/mitkDicomSR_LoadDICOMRGBPixel4D.cpp
-  IO/mitkDicomSR_LoadDICOMRGBPixel.cpp
-  IO/mitkDicomSR_LoadDICOMScalar4D.cpp
-  IO/mitkDicomSR_LoadDICOMScalar.cpp
-  IO/mitkDicomSR_SliceGroupingResult.cpp
   IO/mitkFileReader.cpp
   IO/mitkFileReaderRegistry.cpp
   IO/mitkFileReaderSelector.cpp

@@ -19,11 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkUnaryFunctorImageFilter.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-#define P2C_PI M_PI
-
 namespace itk
 {
 

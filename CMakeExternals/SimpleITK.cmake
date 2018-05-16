@@ -40,9 +40,6 @@ if(MITK_USE_SimpleITK)
            -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
            -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
           )
-      if(NOT MITK_USE_SYSTEM_PYTHON)
-        list(APPEND proj_DEPENDENCIES Python)
-      endif()
     endif()
 
     if(CTEST_USE_LAUNCHERS)
@@ -56,14 +53,17 @@ if(MITK_USE_SimpleITK)
     if(APPLE)
       set(_build_shared OFF)
     endif()
-
     ExternalProject_Add(${proj}
        LIST_SEPARATOR ${sep}
-       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/SimpleITK-0.8.1.tar.gz
-       URL_MD5 9126ab2eda9e88f598a962c02a705c43
-       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/SimpleITK-0.8.1.patch
+       #GIT_REPOSITORY https://github.com/SimpleITK/SimpleITK.git
+       # URL https://github.com/SimpleITK/SimpleITK/releases/download/v1.0.1/SimpleITK-1.0.1.tar.xz
+       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/SimpleITK_9d510bef.tar.gz
+       URL_MD5 c34f4d5259594bf1adf1d83f13228cbe
+       # PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/SimpleITK-0.8.1.patch
+       INSTALL_COMMAND ""
+       SOURCE_SUBDIR SuperBuild
        CMAKE_ARGS
-         ${ep_common_args}
+         ${ep_common_cache_default_args}
          # -DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON
       CMAKE_CACHE_ARGS
          ${ep_common_cache_args}
@@ -71,38 +71,43 @@ if(MITK_USE_SimpleITK)
          -DBUILD_SHARED_LIBS:BOOL=${_build_shared}
          -DSimpleITK_BUILD_DISTRIBUTE:BOOL=ON
          -DSimpleITK_PYTHON_THREADS:BOOL=ON
-         -DUSE_SYSTEM_ITK:BOOL=ON
-         -DBUILD_EXAMPLES:BOOL=OFF
-         -DGDCM_DIR:PATH=${GDCM_DIR}
+         -DSimpleITK_USE_SYSTEM_ITK:BOOL=ON
          -DITK_DIR:PATH=${ITK_DIR}
+         -DSimpleITK_USE_SYSTEM_SWIG:BOOL=ON
          -DSWIG_DIR:PATH=${SWIG_DIR}
          -DSWIG_EXECUTABLE:FILEPATH=${SWIG_EXECUTABLE}
+         -DBUILD_EXAMPLES:BOOL=OFF
+         -DBUILD_TESTING:BOOL=OFF
+         -DGDCM_DIR:PATH=${GDCM_DIR}
          -DHDF5_DIR:PATH=${HDF5_DIR}
+         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
+         -DCMAKE_CXX_COMPILER_AR:FILEPATH=${CMAKE_CXX_COMPILER_AR}
+         -DCMAKE_CXX_COMPILER_RANLIB:FILEPATH=${CMAKE_CXX_COMPILER_RANLIB}
+         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
+         -DCMAKE_C_COMPILER_AR:FILEPATH=${CMAKE_C_COMPILER_AR}
+         -DCMAKE_C_COMPILER_RANLIB:FILEPATH=${CMAKE_C_COMPILER_RANLIB}
        CMAKE_CACHE_DEFAULT_ARGS
          ${ep_common_cache_default_args}
        DEPENDS ${proj_DEPENDENCIES}
       )
 
-    set(SimpleITK_DIR ${ep_prefix})
-
     if( MITK_USE_Python )
       set(_sitk_build_dir ${ep_prefix}/src/SimpleITK-build)
       # Build python distribution with easy install. If a own runtime is used
-      # embedd the egg into the site-package folder of the runtime
+      # embed the egg into the site-package folder of the runtime
 
-      # Note: Userbase install could also be relevant in some cases Probably windows want's to
-      # install to Lib/python2.7/
+      # Note: Userbase install could also be relevant in some cases Probably windows wants to
+      # install to Lib/python3.6/
       # Build egg into custom user base folder and deploy it later into installer
       # https://pythonhosted.org/setuptools/easy_install.html#use-the-user-option-and-customize-pythonuserbase
       # PYTHONUSERBASE=${_install_dir} ${PYTHON_EXECUTABLE} setup.py --user
 
       # PythonDir needs to be fixed for the python interpreter by
       # changing dir delimiter for Windows
-      if(MITK_USE_SYSTEM_PYTHON)
-        set(_install_dir ${ep_prefix})
-      else()
-        set(_install_dir ${Python_DIR})
-      endif()
+
+      set(_install_dir ${ep_prefix} )
+      set(_pythonpath ${ep_prefix}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages )
+
       if(WIN32)
         STRING(REPLACE "/" "\\\\" _install_dir ${_install_dir})
       else()
@@ -110,19 +115,12 @@ if(MITK_USE_SimpleITK)
         STRING(REPLACE " " "\ " _install_dir ${_install_dir})
       endif()
 
-      if( MITK_USE_SYSTEM_PYTHON )
-        ExternalProject_Add_Step(${proj} sitk_python_install_step
-          COMMAND PYTHONUSERBASE=${_install_dir} ${PYTHON_EXECUTABLE} setup.py install --prefix=${_install_dir}
-          DEPENDEES install
-          WORKING_DIRECTORY ${_sitk_build_dir}/Wrapping/PythonPackage
-        )
-      else()
-        ExternalProject_Add_Step(${proj} sitk_python_install_step
-          COMMAND ${PYTHON_EXECUTABLE} setup.py install --prefix=${_install_dir}
-          DEPENDEES install
-          WORKING_DIRECTORY ${_sitk_build_dir}/Wrapping/PythonPackage
-        )
-      endif()
+      ExternalProject_Add_Step(${proj} sitk_python_install_step
+        COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${_pythonpath}$<SEMICOLON>${ep_prefix}/Lib/site-packages ${PYTHON_EXECUTABLE} Packaging/setup.py install --prefix=${_install_dir}
+        DEPENDEES install
+        WORKING_DIRECTORY ${_sitk_build_dir}/SimpleITK-build/Wrapping/Python/
+      )
+
     endif()
 
     mitkFunctionInstallExternalCMakeProject(${proj})
@@ -132,6 +130,8 @@ if(MITK_USE_SimpleITK)
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
 
   endif()
+
+  set(SimpleITK_DIR ${ep_prefix}/src/SimpleITK-build/SimpleITK-build)
 
 endif()
 

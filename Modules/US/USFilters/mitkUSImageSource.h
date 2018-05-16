@@ -28,9 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOpenCVToMitkImageFilter.h"
 #include "mitkImageToOpenCVImageFilter.h"
 
-// OpenCV
-#include "cv.h"
-
 namespace mitk {
   /**
   * \brief This is an abstract superclass for delivering USImages.
@@ -61,11 +58,11 @@ namespace mitk {
     *
     * \return pointer to the next USImage (filtered if set)
     */
-    mitk::Image::Pointer GetNextImage();
+    std::vector<mitk::Image::Pointer> GetNextImage();
 
   protected:
     USImageSource();
-    virtual ~USImageSource();
+    ~USImageSource() override;
     /**
     * \brief Set the given OpenCV image matrix to the next image received
     * from the device or file.
@@ -74,13 +71,13 @@ namespace mitk {
     * mitk::Image and converts this image to OpenCV then. One should reimplement
     * this method for a better performance if an image filter is set.
     */
-    virtual void GetNextRawImage(cv::Mat&);
+    virtual void GetNextRawImage(std::vector<cv::Mat>&);
 
     /**
     * \brief Set mitk::Image to the next image received from the device or file.
     * This method must be implemented in every subclass.
     */
-    virtual void GetNextRawImage(mitk::Image::Pointer&) = 0;
+    virtual void GetNextRawImage(std::vector<mitk::Image::Pointer>&) = 0;
 
     /**
     * \brief Used to convert from OpenCV Images to MITK Images.

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUndistortCameraImage.h"
 
 // HighGui camera interface: a convenient way for grabbing from a video capture (on windows VfW is used)
-#include "highgui.h"
+#include <opencv2/highgui.hpp>
 
 // For Providing ITK Image Interface
 #include "itkRGBPixel.h"
@@ -89,23 +89,23 @@ namespace mitk
     ///
     /// \return a copy of the image as opencv 2 Mat
     ///
-    virtual cv::Mat GetImage() override;
+    cv::Mat GetImage() override;
     virtual const IplImage * GetCurrentFrame();
     ////##Documentation
     ////## @brief returns the current video data as an ITK image.
     virtual void GetCurrentFrameAsItkHSVPixelImage(HSVPixelImageType::Pointer &Image);
     ////##Documentation
     ////## @brief assigns the grabbing devices for acquiring the next frame.
-    virtual void FetchFrame() override;
+    void FetchFrame() override;
     ////##Documentation
     ////## @brief returns a pointer to the image data array for opengl rendering.
-    virtual unsigned char * GetVideoTexture() override;
+    unsigned char * GetVideoTexture() override;
     ////##Documentation
     ////## @brief starts the video capturing.
-    virtual void StartCapturing() override;
+    void StartCapturing() override;
     ////##Documentation
     ////## @brief stops the video capturing.
-    virtual void StopCapturing() override;
+    void StopCapturing() override;
     ////##Documentation
     ////## @brief rotate image according to the set angle.
     virtual IplImage* FlipImage(IplImage* input);
@@ -122,7 +122,7 @@ namespace mitk
     ///
     virtual bool OnlineImageUndistortionEnabled() const;
 
-    virtual void PauseCapturing() override;
+    void PauseCapturing() override;
     ///
     /// Returns the video file name (maybe empty if a grabbing device is used)
     ///
@@ -142,7 +142,7 @@ namespace mitk
 
   protected:
     OpenCVVideoSource();
-    virtual ~OpenCVVideoSource();
+    ~OpenCVVideoSource() override;
 
     ///
     /// Resets the whole class for capturing from a new device

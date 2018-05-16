@@ -3,6 +3,7 @@
 
 #include <vigra/multi_array.hxx>
 #include <vigra/random_forest.hxx>
+#include <mitkAdditionalRFData.h>
 
 namespace mitk
 {
@@ -15,7 +16,8 @@ namespace mitk
 
         template <class T>
         ImpurityLoss(TLabelContainer const &labels,
-                     vigra::ProblemSpec<T> const &ext);
+          vigra::ProblemSpec<T> const &ext,
+          AdditionalRFDataAbstract *data);
 
         void Reset();
 

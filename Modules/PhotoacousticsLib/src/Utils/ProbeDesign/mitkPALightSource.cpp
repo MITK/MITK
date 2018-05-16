@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPALightSource.h"
-#include "math.h"
+#include <cmath>
 
 mitk::pa::LightSource::LightSource() :
   m_IsValid(false)

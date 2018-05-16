@@ -308,7 +308,9 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::ProposeDirection(const itk::Poi
     if (fa<m_FaThreshold)
       return output_direction;
 
-    vnl_vector_fixed<float,3> oldDir = olddirs.back();
+    vnl_vector_fixed<float,3> oldDir; oldDir.fill(0.0);
+    if (!olddirs.empty())
+      oldDir = olddirs.back();
 
     if (m_FlipX)
       oldDir[0] *= -1;

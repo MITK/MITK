@@ -43,8 +43,8 @@ class MITKTOFUI_EXPORT QmitkToFPMDParameterWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkToFPMDParameterWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
-    virtual ~QmitkToFPMDParameterWidget();
+    QmitkToFPMDParameterWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
+    ~QmitkToFPMDParameterWidget() override;
 
     /* @brief This method is part of the widget an needs not to be called seperately. */
     virtual void CreateQtPartControl(QWidget *parent);

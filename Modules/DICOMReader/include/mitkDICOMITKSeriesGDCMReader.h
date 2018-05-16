@@ -277,6 +277,16 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
       return m_DefaultDecimalPlacesForOrientation; 
     }
 
+    static bool GetDefaultSimpleVolumeImport()
+    {
+      return m_DefaultSimpleVolumeImport;
+    }
+
+    static bool GetDefaultFixTiltByShearing()
+    {
+      return m_DefaultFixTiltByShearing;
+    }
+
   protected:
 
     void InternalPrintConfiguration(std::ostream& os) const override;
@@ -295,8 +305,10 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     void PopLocale() const;
 
     const static int m_DefaultDecimalPlacesForOrientation = 5;
+    const static bool m_DefaultSimpleVolumeImport = false;
+    const static bool m_DefaultFixTiltByShearing = true;
 
-    DICOMITKSeriesGDCMReader(unsigned int decimalPlacesForOrientation = m_DefaultDecimalPlacesForOrientation, bool simpleVolumeImport = false);
+    DICOMITKSeriesGDCMReader(unsigned int decimalPlacesForOrientation = m_DefaultDecimalPlacesForOrientation, bool simpleVolumeImport = m_DefaultSimpleVolumeImport);
     ~DICOMITKSeriesGDCMReader() override;
 
     DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other);

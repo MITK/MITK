@@ -7,6 +7,7 @@ set(CPP_FILES
   IODataStructures/FiberBundle/mitkTrackvis.cpp
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
   IODataStructures/mitkTractographyForest.cpp
+  IODataStructures/mitkFiberfoxParameters.cpp
 
   # Interactions
 
@@ -43,6 +44,7 @@ set(H_FILES
   Algorithms/itkFitFibersToImageFilter.h
   Algorithms/itkTractClusteringFilter.h
   Algorithms/itkFiberExtractionFilter.h
+  Algorithms/itkTdiToVolumeFractionFilter.h
 
   # Tractography
   Algorithms/TrackingHandlers/mitkTrackingDataHandler.h
@@ -72,6 +74,7 @@ set(H_FILES
   Algorithms/ClusteringMetrics/mitkClusteringMetricAnatomic.h
   Algorithms/ClusteringMetrics/mitkClusteringMetricScalarMap.h
   Algorithms/ClusteringMetrics/mitkClusteringMetricInnerAngles.h
+  Algorithms/ClusteringMetrics/mitkClusteringMetricLength.h
 
   # Fiberfox
   Fiberfox/itkFibersFromPlanarFiguresFilter.h

@@ -58,7 +58,7 @@ namespace itk
     itkCloneMacro(Self)
 
     /** Print internal ivars */
-    void PrintSelf(std::ostream& os, Indent indent) const
+    void PrintSelf(std::ostream& os, Indent indent) const override
     { this->Superclass::PrintSelf( os, indent ); }
 
 #ifdef ITK_USE_CONCEPT_CHECKING
@@ -70,9 +70,9 @@ namespace itk
 
 protected:
     TensorToRgbImageFilter() {};
-    virtual ~TensorToRgbImageFilter() {};
+    ~TensorToRgbImageFilter() override {};
 
-    void GenerateData()
+    void GenerateData() override
     {
 
       typename InputImageType::Pointer tensorImage = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );

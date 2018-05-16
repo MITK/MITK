@@ -62,18 +62,55 @@ void mitk::USVideoDeviceCustomControls::SetCropArea(mitk::USImageVideoSource::US
 
 void mitk::USVideoDeviceCustomControls::SetNewDepth(double depth)
 {
+  mitk::USVideoDevice::Pointer device = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
+  if (device.IsNotNull())
+  {
+    if( device->GetCurrentProbe().IsNotNull() )
+    {
+      device->GetCurrentProbe()->SetCurrentDepth(depth);
+      MITK_INFO << "SetCurrentDepth of currentProbe: " << depth;
+    }
+  }
   m_Device->DepthChanged(depth);
 }
 
 void mitk::USVideoDeviceCustomControls::SetNewProbeIdentifier(std::string probename)
 {
+  mitk::USVideoDevice::Pointer device = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
+  if( device.IsNotNull() )
+  {
+    device->SetCurrentProbe(probename);
+  }
   m_Device->ProbeChanged(probename);
 }
 
-mitk::USImageVideoSource::USImageCropping mitk::USVideoDeviceCustomControls::GetCropArea()
+mitk::USProbe::USProbeCropping mitk::USVideoDeviceCustomControls::GetCropArea()
 {
   // just return the crop area set at the image source
-  return m_ImageSource->GetCropping();
+  mitk::USVideoDevice::Pointer device = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
+  if (device.IsNotNull())
+  {
+    mitk::USProbe::Pointer probe = device->GetCurrentProbe();
+    if (probe.IsNotNull())
+    {
+      return probe->GetProbeCropping();
+    }
+  }
+  mitk::USProbe::USProbeCropping defaultCropping;
+  return defaultCropping;
+}
+
+void mitk::USVideoDeviceCustomControls::UpdateProbeCropping(mitk::USImageVideoSource::USImageCropping cropping)
+{
+  mitk::USVideoDevice::Pointer device = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
+  if (device.IsNotNull())
+  {
+    mitk::USProbe::Pointer probe = device->GetCurrentProbe();
+    if( probe.IsNotNull() )
+    {
+      probe->SetProbeCropping(cropping.top, cropping.bottom, cropping.left, cropping.right);
+    }
+  }
 }
 
 std::vector<mitk::USProbe::Pointer> mitk::USVideoDeviceCustomControls::GetProbes()
@@ -93,4 +130,10 @@ std::vector<int> mitk::USVideoDeviceCustomControls::GetDepthsForProbe(std::strin
     depths.push_back((it->first));
   }
   return depths;
+}
+
+void mitk::USVideoDeviceCustomControls::SetDefaultProbeAsCurrentProbe()
+{
+  mitk::USVideoDevice::Pointer device = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
+  device->SetDefaultProbeAsCurrentProbe();
 }

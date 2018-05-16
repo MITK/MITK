@@ -16,12 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPAVessel.h"
 #include <chrono>
-#define _USE_MATH_DEFINES
-#include <math.h>
 #include <thread>
 
 mitk::pa::Vessel::Vessel(VesselProperties::Pointer initialProperties) :
-  m_RangeDistribution(M_PI / 16, M_PI / 8),
+  m_RangeDistribution(itk::Math::pi / 16, itk::Math::pi / 8),
   m_SignDistribution(-1, 1)
 {
   m_Finished = false;

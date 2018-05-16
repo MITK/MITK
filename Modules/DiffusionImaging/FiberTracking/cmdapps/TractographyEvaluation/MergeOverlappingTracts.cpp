@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("in", "i", mitkCommandLineParser::InputFile, "Input Folder:", "input folder", us::Any(), false);
   parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output Folder:", "output folder", us::Any(), false);
-  parser.addArgument("overlap", "", mitkCommandLineParser::Float, "Overlap threshold:", "Tracts with overlap larger than this threshold are merged", false, 0.8);
+  parser.addArgument("overlap", "", mitkCommandLineParser::Float, "Overlap threshold:", "Tracts with overlap larger than this threshold are merged", 0.8, false);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -93,9 +93,8 @@ int main(int argc, char* argv[])
 
   try
   {
-    if (ist::PathExists(out_folder))
-      ist::RemoveADirectory(out_folder);
-    ist::MakeDirectory(out_folder);
+    if (!ist::PathExists(out_folder))
+      ist::MakeDirectory(out_folder);
 
     std::vector< std::string > fib_files = get_file_list(input_folder, {".fib", ".trk", ".tck"});
     if (fib_files.empty())
@@ -108,7 +107,7 @@ int main(int argc, char* argv[])
     std::vector< mitk::FiberBundle::Pointer > fibs;
     for (std::string f : fib_files)
     {
-      mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(f)[0].GetPointer());
+      mitk::FiberBundle::Pointer fib = mitk::IOUtil::Load<mitk::FiberBundle>(f);
       fibs.push_back(fib);
     }
 

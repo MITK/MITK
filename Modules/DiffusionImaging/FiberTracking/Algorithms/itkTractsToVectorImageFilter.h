@@ -78,7 +78,7 @@ protected:
 
 
   TractsToVectorImageFilter();
-  virtual ~TractsToVectorImageFilter();
+  ~TractsToVectorImageFilter() override;
 
   NormalizationMethods                m_NormalizationMethod;              ///< normalization method of peaks
   mitk::FiberBundle::Pointer          m_FiberBundle;                      ///< input fiber bundle

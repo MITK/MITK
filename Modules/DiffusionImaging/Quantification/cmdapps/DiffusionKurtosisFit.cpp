@@ -127,7 +127,7 @@ void KurtosisMapComputation( mitk::Image::Pointer input,
   if(maskPath != "")
   {
     mitk::Image::Pointer segmentation;
-    segmentation = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(maskPath)[0].GetPointer());
+    segmentation = mitk::IOUtil::Load<mitk::Image>(maskPath);
     typedef itk::Image< short , 3>            MaskImageType;
     MaskImageType::Pointer vectorSeg = MaskImageType::New() ;
     mitk::CastToItkImage( segmentation, vectorSeg );
@@ -203,7 +203,7 @@ int main( int argc, char* argv[] )
   std::string maskPath = "";
 
   mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
-  mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage(inFileName, &functor);
+  mitk::Image::Pointer inputImage = mitk::IOUtil::Load<mitk::Image>(inFileName, &functor);
 
   bool omitBZero = false;
   double lower = -1000;

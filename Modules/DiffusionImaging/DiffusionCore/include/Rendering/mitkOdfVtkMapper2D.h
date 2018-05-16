@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkSmartPointer.h"
 #include "vtkOdfSource.h"
 #include "vtkThickPlane.h"
+#include <mitkDiffusionFunctionCollection.h>
 
 namespace mitk {
 
@@ -70,12 +71,12 @@ public:
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
+    vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
     bool IsVisibleOdfs(mitk::BaseRenderer* renderer);
-    virtual void MitkRenderOverlay(mitk::BaseRenderer* renderer) override;
-    virtual void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer) override;
-    virtual void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer) override;
-    virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer*  /*renderer*/) override{}
+    void MitkRenderOverlay(mitk::BaseRenderer* renderer) override;
+    void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer) override;
+    void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer) override;
+    void MitkRenderVolumetricGeometry(mitk::BaseRenderer*  /*renderer*/) override{}
 
     OdfDisplayGeometry MeasureDisplayedGeometry(mitk::BaseRenderer* renderer);
     double GetMinImageSpacing( int index );
@@ -83,9 +84,9 @@ public:
     virtual void Slice(mitk::BaseRenderer* renderer, OdfDisplayGeometry dispGeo);
     virtual int GetIndex(mitk::BaseRenderer* renderer);
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false);
-    virtual void Update(mitk::BaseRenderer * renderer) override;
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
-    virtual bool IsLODEnabled( BaseRenderer * /*renderer*/ ) const override { return true; }
+    void Update(mitk::BaseRenderer * renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
+    bool IsLODEnabled( BaseRenderer * /*renderer*/ ) const override { return true; }
 
     class LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
@@ -102,7 +103,7 @@ public:
         /** \brief Default constructor of the local storage. */
         LocalStorage();
         /** \brief Default deconstructor of the local storage. */
-        ~LocalStorage()
+        ~LocalStorage() override
         {
         }
     };
@@ -110,13 +111,14 @@ public:
 protected:
 
     OdfVtkMapper2D();
-    virtual ~OdfVtkMapper2D();
+    ~OdfVtkMapper2D() override;
 
     static void GlyphMethod(void *arg);
     bool IsPlaneRotated(mitk::BaseRenderer* renderer);
     static bool m_ToggleTensorEllipsoidView;
     static bool m_ToggleColourisationMode;
     static bool m_ToggleGlyphPlacementMode;
+
 
     typedef vnl_matrix_fixed<double, 3, 3> DirectionsType;
 
@@ -143,6 +145,13 @@ private:
     vtkImageData*                                     m_VtkImage ;
     std::vector< OdfDisplayGeometry >                 m_LastDisplayGeometry;
     mitk::LocalStorageHandler<LocalStorage>           m_LSH;
+
+    static vnl_matrix<float>                          m_Sh2Basis;
+    static vnl_matrix<float>                          m_Sh4Basis;
+    static vnl_matrix<float>                          m_Sh6Basis;
+    static vnl_matrix<float>                          m_Sh8Basis;
+    static vnl_matrix<float>                          m_Sh10Basis;
+    static vnl_matrix<float>                          m_Sh12Basis;
 };
 
 } // namespace mitk

@@ -14,8 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#define _USE_MATH_DEFINES
-#include <cmath>
 #include "mitkPhotoacousticImage.h"
 #include "../ITKFilter/ITKUltrasound/itkBModeImageFilter.h"
 #include "../ITKFilter/itkPhotoacousticBModeImageFilter.h"
@@ -429,11 +427,11 @@ itk::Image<float, 3U>::Pointer mitk::PhotoacousticImage::BPFunction(mitk::Image:
     {
       if (n <= (alpha*(width - 1)) / 2)
       {
-        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) - 1))) / 2;
+        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(itk::Math::pi*(2 * n / (alpha*(width - 1)) - 1))) / 2;
       }
       else if (n >= (width - 1)*(1 - alpha / 2))
       {
-        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) + 1 - 2 / alpha))) / 2;
+        imageData[reference->GetDimension(0)*(int)(n + center - (width / 2))] = (1 + cos(itk::Math::pi*(2 * n / (alpha*(width - 1)) + 1 - 2 / alpha))) / 2;
       }
       else
       {
@@ -520,11 +518,11 @@ itk::Image<float, 3U>::Pointer mitk::PhotoacousticImage::BPFunction(mitk::Image:
 
   ImageType::IndexType pixelIndex;
 
-  for (ImageType::IndexValueType slice = 0; slice < reference->GetDimension(2); ++slice)
+  for (unsigned int slice = 0; slice < reference->GetDimension(2); ++slice)
   {
-    for (ImageType::IndexValueType line = 0; line < reference->GetDimension(0); ++line)
+    for (unsigned int line = 0; line < reference->GetDimension(0); ++line)
     {
-      for (ImageType::IndexValueType sample = 0; sample < reference->GetDimension(1); ++sample)
+      for (unsigned int sample = 0; sample < reference->GetDimension(1); ++sample)
       {
         pixelIndex[0] = line;
         pixelIndex[1] = sample;

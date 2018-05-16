@@ -82,7 +82,7 @@ namespace mitk
         errorMessage->append("Can't add tool, is the SROM-file valid?");
         return nullptr;
       }
-      thisDevice->GetTool(i)->SetToolTip(thisNavigationTool->GetToolTipPosition(), thisNavigationTool->GetToolTipOrientation());
+      thisDevice->GetTool(i)->SetToolTipPosition(thisNavigationTool->GetToolTipPosition(), thisNavigationTool->GetToolAxisOrientation());
     }
     returnValue->SetTrackingDevice(thisDevice);
     return returnValue;

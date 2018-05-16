@@ -37,34 +37,25 @@
 #include "QmitkMimeTypes.h"
 #include "QmitkRenderWindowMenu.h"
 
-QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
-                                     QString name,
-                                     mitk::VtkPropRenderer * /*renderer*/,
-                                     mitk::RenderingManager *renderingManager,
-                                     mitk::BaseRenderer::RenderingMode::Type renderingMode)
-  : QVTKOpenGLWidget(parent), m_ResendQtEvents(true), m_MenuWidget(nullptr), m_MenuWidgetActivated(false), m_LayoutIndex(0)
+QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk::VtkPropRenderer *, mitk::RenderingManager *renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode)
+  : QVTKOpenGLWidget(parent),
+    m_ResendQtEvents(true),
+    m_MenuWidget(nullptr),
+    m_MenuWidgetActivated(false),
+    m_LayoutIndex(0)
 {
   m_InternalRenderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+  m_InternalRenderWindow->SetMultiSamples(0);
+  m_InternalRenderWindow->SetAlphaBitPlanes(0);
+
   this->SetRenderWindow(m_InternalRenderWindow);
 
-  if (renderingMode == mitk::BaseRenderer::RenderingMode::DepthPeeling)
-  {
-    GetRenderWindow()->SetMultiSamples(0);
-    GetRenderWindow()->SetAlphaBitPlanes(1);
-  }
-  else if (renderingMode == mitk::BaseRenderer::RenderingMode::MultiSampling)
-  {
-    GetRenderWindow()->SetMultiSamples(8);
-  }
-  else if (renderingMode == mitk::BaseRenderer::RenderingMode::Standard)
-  {
-    GetRenderWindow()->SetMultiSamples(0);
-  }
+  this->Initialize(renderingManager, name.toStdString().c_str(), renderingMode);
 
-  Initialize(renderingManager, name.toStdString().c_str(), renderingMode); // Initialize mitkRenderWindowBase
-
-  setFocusPolicy(Qt::StrongFocus);
-  setMouseTracking(true);
+  this->setFocusPolicy(Qt::StrongFocus);
+  this->setMouseTracking(true);
+  QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  this->setSizePolicy(sizePolicy);
 }
 
 QmitkRenderWindow::~QmitkRenderWindow()
@@ -252,12 +243,12 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state, QmitkStdMultiWidget *stdM
     disconnect(m_MenuWidget, SIGNAL(ChangeCrosshairRotationMode(int)), this, SIGNAL(ChangeCrosshairRotationMode(int)));
 
     delete m_MenuWidget;
-    m_MenuWidget = 0;
+    m_MenuWidget = nullptr;
   }
   else if (m_MenuWidgetActivated && !m_MenuWidget)
   {
     // create render window MenuBar for split, close Window or set new setting.
-    m_MenuWidget = new QmitkRenderWindowMenu(this, 0, m_Renderer, stdMultiWidget);
+    m_MenuWidget = new QmitkRenderWindowMenu(this, nullptr, m_Renderer, stdMultiWidget);
     m_MenuWidget->SetLayoutIndex(m_LayoutIndex);
 
     // create Signal/Slot Connection

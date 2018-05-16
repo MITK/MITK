@@ -1,6 +1,6 @@
 
 #include <limits>
-#include <math.h>
+#include <cmath>
 
 #include <itkImageToHistogramFilter.h>
 #include <itkMaskedImageToHistogramFilter.h>

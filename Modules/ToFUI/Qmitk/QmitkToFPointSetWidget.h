@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <mitkPointSetDataInteractor.h>
 #include <mitkPropertyList.h>
+#include <mitkTextAnnotation2D.h>
 #include <mitkToFDistanceImageToPointSetFilter.h>
 
 //Qmitk headers
@@ -58,8 +59,8 @@ class MITKTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkToFPointSetWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
-    virtual ~QmitkToFPointSetWidget();
+    QmitkToFPointSetWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
+    ~QmitkToFPointSetWidget() override;
 
     /* @brief This method is part of the widget an needs not to be called seperately. */
     virtual void CreateQtPartControl(QWidget *parent);
@@ -118,14 +119,14 @@ class MITKTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
     mitk::Image::Pointer m_DistanceImage; ///< image holding the range data of the ToF camera
     mitk::CameraIntrinsics::Pointer m_CameraIntrinsics; ///< intrinsic parameters of the camera
 
-    vtkSmartPointer<vtkTextActor> m_VtkTextActor; ///< actor containing the text of the overlay
-    vtkSmartPointer<vtkRenderer> m_ForegroundRenderer1; ///< renderer responsible for text rendering in the foreground of widget 1
-    vtkSmartPointer<vtkRenderer> m_ForegroundRenderer2; ///< renderer responsible for text rendering in the foreground of widget 2
-    vtkSmartPointer<vtkRenderer> m_ForegroundRenderer3; ///< renderer responsible for text rendering in the foreground of widget 3
-    vtkSmartPointer<vtkRenderWindow> m_RenderWindow1; ///< vtk render window used for showing overlay in widget 1
-    vtkSmartPointer<vtkRenderWindow> m_RenderWindow2; ///< vtk render window used for showing overlay in widget 2
-    vtkSmartPointer<vtkRenderWindow> m_RenderWindow3; ///< vtk render window used for showing overlay in widget 3
-    vtkSmartPointer<vtkRenderWindow> m_RenderWindow4; ///< vtk render window used for showing overlay in widget 3
+    mitk::TextAnnotation2D::Pointer m_TextAnnotationAxial; ///< text annotation used to display measurements in axial window
+    mitk::TextAnnotation2D::Pointer m_TextAnnotationSagittal; ///< text annotation used to display measurement in axial window
+    mitk::TextAnnotation2D::Pointer m_TextAnnotationCoronal; ///< text annotation used to display measurement in axial window
+    mitk::TextAnnotation2D::Pointer m_TextAnnotation3D; ///< text annotation used to display measurement in 3d window
+    mitk::VtkPropRenderer::Pointer m_RendererAxial; ///< renderer of axial render window
+    mitk::VtkPropRenderer::Pointer m_RendererSagittal; ///< renderer of sagittal render window
+    mitk::VtkPropRenderer::Pointer m_RendererCoronal; ///< renderer of coronal render window
+    mitk::VtkPropRenderer::Pointer m_Renderer3D; ///< renderer of 3D render window
 
     mitk::PointSet::Pointer m_MeasurementPointSet2D; ///< PointSet holding the 2D ToF image point selection used for measuring
     mitk::DataNode::Pointer m_MeasurementPointSet3DNode; ///< DataNode holding the 3D ToF coordinates used for measuring

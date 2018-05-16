@@ -21,10 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSDevice.h"
 #include "mitkNavigationDataSource.h"
 
-// Microservices
-#include <mitkServiceInterface.h>
-#include <usServiceRegistration.h>
-
 namespace itk {
   template<class T> class SmartPointer;
 }
@@ -118,32 +114,32 @@ namespace mitk {
     /**
     * \brief Returns the Class of the Device.
     */
-    virtual std::string GetDeviceClass() override;
+    std::string GetDeviceClass() override;
 
     /**
     * \brief Wrapper for returning USImageSource of the UltrasoundDevice.
     */
-    virtual USImageSource::Pointer GetUSImageSource() override;
+    USImageSource::Pointer GetUSImageSource() override;
 
     /**
     * \brief Wrapper for returning custom control interface of the UltrasoundDevice.
     */
-    virtual itk::SmartPointer<USAbstractControlInterface> GetControlInterfaceCustom() override;
+    itk::SmartPointer<USAbstractControlInterface> GetControlInterfaceCustom() override;
 
     /**
     * \brief Wrapper for returning B mode control interface of the UltrasoundDevice.
     */
-    virtual itk::SmartPointer<USControlInterfaceBMode> GetControlInterfaceBMode() override;
+    itk::SmartPointer<USControlInterfaceBMode> GetControlInterfaceBMode() override;
 
     /**
     * \brief Wrapper for returning probes control interface of the UltrasoundDevice.
     */
-    virtual itk::SmartPointer<USControlInterfaceProbes> GetControlInterfaceProbes() override;
+    itk::SmartPointer<USControlInterfaceProbes> GetControlInterfaceProbes() override;
 
     /**
     * \brief Wrapper for returning doppler control interface of the UltrasoundDevice.
     */
-    virtual itk::SmartPointer<USControlInterfaceDoppler> GetControlInterfaceDoppler() override;
+    itk::SmartPointer<USControlInterfaceDoppler> GetControlInterfaceDoppler() override;
 
     virtual itk::SmartPointer<mitk::NavigationDataSource> GetNavigationDataSource();
 
@@ -198,37 +194,37 @@ namespace mitk {
     static const std::string US_PROPKEY_ID;
   protected:
     USCombinedModality(USDevice::Pointer usDevice, itk::SmartPointer<NavigationDataSource> trackingDevice, std::string manufacturer = "", std::string model = "");
-    virtual ~USCombinedModality();
+    ~USCombinedModality() override;
 
     /**
     * \brief Initializes UltrasoundDevice.
     */
-    virtual bool OnInitialization() override;
+    bool OnInitialization() override;
 
     /**
     * \brief Connects UltrasoundDevice.
     */
-    virtual bool OnConnection() override;
+    bool OnConnection() override;
 
     /**
     * \brief Disconnects UltrasoundDevice.
     */
-    virtual bool OnDisconnection() override;
+    bool OnDisconnection() override;
 
     /**
     * \brief Activates UltrasoundDevice.
     */
-    virtual bool OnActivation() override;
+    bool OnActivation() override;
 
     /**
     * \brief Deactivates UltrasoundDevice.
     */
-    virtual bool OnDeactivation() override;
+    bool OnDeactivation() override;
 
     /**
     * \brief Freezes or unfreezes UltrasoundDevice.
     */
-    virtual void OnFreeze(bool) override;
+    void OnFreeze(bool) override;
 
     /**
     * \brief Grabs the next frame from the input.
@@ -253,18 +249,8 @@ namespace mitk {
     unsigned int m_NumberOfSmoothingValues;
     unsigned int m_DelayCount;
 
-  private:
-    /**
-    *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
-    */
-    us::ServiceRegistration<Self>           m_ServiceRegistration;
-
-    /**
-    * \brief Properties of the device's Microservice.
-    */
-    us::ServiceProperties                   m_ServiceProperties;
   };
 } // namespace mitk
 
-MITK_DECLARE_SERVICE_INTERFACE(mitk::USCombinedModality, "org.mitk.services.USCombinedModality")
+//MITK_DECLARE_SERVICE_INTERFACE(mitk::USCombinedModality, "org.mitk.services.USCombinedModality")
 #endif // MITKUSCombinedModality_H_HEADER_INCLUDED_

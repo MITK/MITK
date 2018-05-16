@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>QmitkWelcomeScreenViewControls</class>
  <widget class="QWidget" name="QmitkWelcomeScreenViewControls">
@@ -19,16 +19,46 @@
   <property name="windowTitle">
    <string>QmitkTemplate</string>
   </property>
+  <property name="styleSheet">
+   <string>QCommandLinkButton {
+  font-weight: lighter;
+}
+
+QCommandLinkButton:disabled {
+  border: none;
+  font-weight: lighter;
+}
+
+QToolBox::tab {
+  font-weight: bold;
+}
+
+QToolBox::tab:hover {
+  font-weight: bold;
+}
+
+QToolBox::tab:selected {
+  font-weight: bold;
+}
+
+QGroupBox {
+  background-color: transparent;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: transparent;
+}</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="margin">
     <number>0</number>
    </property>
    <item row="0" column="0">
-    <layout class="QGridLayout" name="m_WebViewLayout"/>
+    <layout class="QGridLayout" name="m_WebViewLayout"></layout>
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11"/>
- <resources/>
- <connections/>
+ <layoutdefault spacing="6" margin="11"></layoutdefault>
+ <resources></resources>
+ <connections></connections>
 </ui>

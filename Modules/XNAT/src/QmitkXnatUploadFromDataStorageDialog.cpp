@@ -7,7 +7,7 @@
 #include <mitkNodePredicateProperty.h>
 
 QmitkXnatUploadFromDataStorageDialog::QmitkXnatUploadFromDataStorageDialog(QWidget *parent)
-  : QDialog(parent), ui(new Ui::QmitkXnatUploadFromDataStorageDialog), m_SelectedNode(0)
+  : QDialog(parent), ui(new Ui::QmitkXnatUploadFromDataStorageDialog), m_SelectedNode(nullptr)
 {
   ui->setupUi(this);
 

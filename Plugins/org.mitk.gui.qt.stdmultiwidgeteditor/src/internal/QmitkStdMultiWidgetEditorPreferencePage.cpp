@@ -254,18 +254,10 @@ void QmitkStdMultiWidgetEditorPreferencePage::OnWidgetComboBoxChanged(int i)
   m_Ui->m_RenderWindowDecorationText->setText(m_WidgetAnnotation[i]);
 }
 
-void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)
+void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int )
 {
-  if( i == 0 )
-  {
+  //if( i == 0 )
+  //{
     m_CurrentRenderingMode = "Standard";
-  }
-  else if( i == 1 )
-  {
-    m_CurrentRenderingMode = "Multisampling";
-  }
-  else if( i == 2 )
-  {
-    m_CurrentRenderingMode = "DepthPeeling";
-  }
+  //}
 }

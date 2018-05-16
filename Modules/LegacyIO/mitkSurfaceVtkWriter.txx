@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransformPolyDataFilter.h>
 
 #include <sstream>
-#include <stdio.h>
+#include <cstdio>
 #include <sys/stat.h>
 #include <sys/types.h>
 

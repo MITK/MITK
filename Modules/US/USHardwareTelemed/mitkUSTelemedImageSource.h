@@ -44,7 +44,7 @@ public:
     * Implementation of the superclass method. Returns the pointer
     * to the mitk::Image filled by Telemed API callback.
     */
-  virtual void GetNextRawImage( mitk::Image::Pointer& );
+  virtual void GetNextRawImage( std::vector<mitk::Image::Pointer>& );
 
   /**
     * Updates the geometry of the current image from the API.

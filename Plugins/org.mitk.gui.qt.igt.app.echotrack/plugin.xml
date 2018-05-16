@@ -8,12 +8,12 @@
     <view id="org.mitk.views.usmarkerplacement"
           name="IGT EchoTrack"
           category="IGT"
-          class="USNavigationMarkerPlacement"
-          icon="resources/icon2.xpm" />
+          class="QmitkUSNavigationMarkerPlacement"
+          icon="resources/icon_US_navigation.svg" />
     <view id="org.mitk.views.ultrasoundcalibration"
           name="IGT EchoTrack Calibration"
           category="IGT"
-          class="UltrasoundCalibration"
+          class="QmitkUltrasoundCalibration"
           icon="resources/icon_US_calibration.svg" />
   </extension>
 
@@ -21,6 +21,6 @@
     <perspective id="org.mitk.gui.qt.usnavigation.perspective"
                  name="Ultrasound Navigation"
                  class="QmitkUSNavigationPerspective"
-                 icon="resources/icon2.xpm" />
+                 icon="resources/icon_US_navigation.svg" />
   </extension>
 </plugin>

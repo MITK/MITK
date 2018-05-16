@@ -47,4 +47,4 @@ namespace mitk {
 
 }
 
-#endif // MITKDICOMSERIESREADERSERVICE_H
+#endif // MITKCESTDICOMREADERSERVICE_H

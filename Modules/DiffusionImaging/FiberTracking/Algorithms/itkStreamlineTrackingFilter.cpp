@@ -14,9 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstdio>
+#include <cstdlib>
 
 #include <omp.h>
 #include "itkStreamlineTrackingFilter.h"
@@ -33,9 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <TrackingHandlers/mitkTrackingHandlerTensor.h>
 #include <TrackingHandlers/mitkTrackingHandlerRandomForest.h>
 #include <mitkDiffusionFunctionCollection.h>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
 
 namespace itk {
 
@@ -85,6 +82,10 @@ StreamlineTrackingFilter
   , m_InterpolateMasks(true)
   , m_TrialsPerSeed(10)
   , m_EndpointConstraint(EndpointConstraints::NONE)
+  , m_IntroduceDirectionsFromPrior(true)
+  , m_TrackingPriorAsMask(true)
+  , m_TrackingPriorWeight(1.0)
+  , m_TrackingPriorHandler(nullptr)
 {
   this->SetNumberOfRequiredInputs(0);
 }
@@ -128,13 +129,20 @@ void StreamlineTrackingFilter::BeforeTracking()
   if (m_AngularThresholdDeg<0)
   {
     if  (m_StepSize/m_MinVoxelSize<=0.966)  // minimum 15° for automatic estimation
-      m_AngularThreshold = std::cos( 0.5 * M_PI * m_StepSize/m_MinVoxelSize );
+      m_AngularThreshold = std::cos( 0.5 * itk::Math::pi * m_StepSize/m_MinVoxelSize );
     else
-      m_AngularThreshold = std::cos( 0.5 * M_PI * 0.966 );
+      m_AngularThreshold = std::cos( 0.5 * itk::Math::pi * 0.966 );
   }
   else
-    m_AngularThreshold = std::cos( m_AngularThresholdDeg*M_PI/180.0 );
+    m_AngularThreshold = std::cos( m_AngularThresholdDeg*itk::Math::pi/180.0 );
   m_TrackingHandler->SetAngularThreshold(m_AngularThreshold);
+
+  if (m_TrackingPriorHandler!=nullptr)
+  {
+    m_TrackingPriorHandler->SetRandom(m_Random);
+    m_TrackingPriorHandler->InitForTracking();
+    m_TrackingPriorHandler->SetAngularThreshold(m_AngularThreshold);
+  }
 
   if (m_SamplingDistanceVox<mitk::eps)
     m_SamplingDistance = m_MinVoxelSize*0.25;
@@ -292,7 +300,7 @@ void StreamlineTrackingFilter::BeforeTracking()
   else if (m_EndpointConstraint==EndpointConstraints::NO_EP_IN_TARGET)
     std::cout << "StreamlineTracking - Endpoint constraint: NO_EP_IN_TARGET" << std::endl;
 
-  std::cout << "StreamlineTracking - Angular threshold: " << m_AngularThreshold << " (" << 180*std::acos( m_AngularThreshold )/M_PI << "°)" << std::endl;
+  std::cout << "StreamlineTracking - Angular threshold: " << m_AngularThreshold << " (" << 180*std::acos( m_AngularThreshold )/itk::Math::pi << "°)" << std::endl;
   std::cout << "StreamlineTracking - Stepsize: " << m_StepSize << "mm (" << m_StepSize/m_MinVoxelSize << "*vox)" << std::endl;
   std::cout << "StreamlineTracking - Seeds per voxel: " << m_SeedsPerVoxel << std::endl;
   std::cout << "StreamlineTracking - Max. tract length: " << m_MaxTractLength << "mm" << std::endl;
@@ -306,6 +314,9 @@ void StreamlineTrackingFilter::BeforeTracking()
 
   std::cout << "StreamlineTracking - Use stop votes: " << m_UseStopVotes << std::endl;
   std::cout << "StreamlineTracking - Only frontal samples: " << m_OnlyForwardSamples << std::endl;
+
+  if (m_TrackingPriorHandler!=nullptr)
+    std::cout << "StreamlineTracking - Using directional prior for tractography (w=" << m_TrackingPriorWeight << ")" << std::endl;
 
   if (m_DemoMode)
   {
@@ -334,14 +345,14 @@ std::vector< vnl_vector_fixed<float,3> > StreamlineTrackingFilter::CreateDirecti
 
   std::vector< float > phi; phi.resize(NPoints);
 
-  float C = sqrt(4*M_PI);
+  float C = sqrt(4*itk::Math::pi);
 
   phi[0] = 0.0;
   phi[NPoints-1] = 0.0;
 
   for(int i=0; i<NPoints; i++)
   {
-    theta[i] = acos(-1.0+2.0*i/(NPoints-1.0)) - M_PI / 2.0;
+    theta[i] = acos(-1.0+2.0*i/(NPoints-1.0)) - itk::Math::pi / 2.0;
     if( i>0 && i<NPoints-1)
     {
       phi[i] = (phi[i-1] + C / sqrt(NPoints*(1-(-1.0+2.0*i/(NPoints-1.0))*(-1.0+2.0*i/(NPoints-1.0)))));
@@ -363,7 +374,7 @@ std::vector< vnl_vector_fixed<float,3> > StreamlineTrackingFilter::CreateDirecti
 }
 
 
-vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<float, 3> &pos, std::deque<vnl_vector_fixed<float, 3> >& olddirs, itk::Index<3> &oldIndex)
+vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(const itk::Point<float, 3> &pos, std::deque<vnl_vector_fixed<float, 3> >& olddirs, itk::Index<3> &oldIndex)
 {
   if (m_DemoMode)
   {
@@ -378,102 +389,124 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
   else
     return direction;
 
-  vnl_vector_fixed<float,3> olddir = olddirs.back();
-  std::vector< vnl_vector_fixed<float,3> > probeVecs = CreateDirections(m_NumberOfSamples);
-  itk::Point<float, 3> sample_pos;
-  int alternatives = 1;
   int stop_votes = 0;
   int possible_stop_votes = 0;
-  for (unsigned int i=0; i<probeVecs.size(); i++)
+  if (!olddirs.empty())
   {
-    vnl_vector_fixed<float,3> d;
-    bool is_stop_voter = false;
-    if (m_Random && m_RandomSampling)
+    vnl_vector_fixed<float,3> olddir = olddirs.back();
+    std::vector< vnl_vector_fixed<float,3> > probeVecs = CreateDirections(m_NumberOfSamples);
+    itk::Point<float, 3> sample_pos;
+    int alternatives = 1;
+    for (unsigned int i=0; i<probeVecs.size(); i++)
     {
-      d[0] = m_TrackingHandler->GetRandDouble(-0.5, 0.5);
-      d[1] = m_TrackingHandler->GetRandDouble(-0.5, 0.5);
-      d[2] = m_TrackingHandler->GetRandDouble(-0.5, 0.5);
-      d.normalize();
-      d *= m_TrackingHandler->GetRandDouble(0,m_SamplingDistance);
-    }
-    else
-    {
-      d = probeVecs.at(i);
-      float dot = dot_product(d, olddir);
-      if (m_UseStopVotes && dot>0.7)
+      vnl_vector_fixed<float,3> d;
+      bool is_stop_voter = false;
+      if (m_Random && m_RandomSampling)
       {
-        is_stop_voter = true;
-        possible_stop_votes++;
+        d[0] = m_TrackingHandler->GetRandDouble(-0.5, 0.5);
+        d[1] = m_TrackingHandler->GetRandDouble(-0.5, 0.5);
+        d[2] = m_TrackingHandler->GetRandDouble(-0.5, 0.5);
+        d.normalize();
+        d *= m_TrackingHandler->GetRandDouble(0,m_SamplingDistance);
       }
-      else if (m_OnlyForwardSamples && dot<0)
-        continue;
-      d *= m_SamplingDistance;
-    }
-
-    sample_pos[0] = pos[0] + d[0];
-    sample_pos[1] = pos[1] + d[1];
-    sample_pos[2] = pos[2] + d[2];
-
-    vnl_vector_fixed<float,3> tempDir; tempDir.fill(0.0);
-    if (mitk::imv::IsInsideMask<float>(sample_pos, m_InterpolateMasks, m_MaskInterpolator))
-      tempDir = m_TrackingHandler->ProposeDirection(sample_pos, olddirs, oldIndex); // sample neighborhood
-    if (tempDir.magnitude()>mitk::eps)
-    {
-      direction += tempDir;
-
-      if(m_DemoMode)
-        m_SamplingPointset->InsertPoint(i, sample_pos);
-    }
-    else if (m_AvoidStop && olddir.magnitude()>0.5) // out of white matter
-    {
-      if (is_stop_voter)
-        stop_votes++;
-      if (m_DemoMode)
-        m_StopVotePointset->InsertPoint(i, sample_pos);
-
-      float dot = dot_product(d, olddir);
-      if (dot >= 0.0) // in front of plane defined by pos and olddir
-        d = -d + 2*dot*olddir; // reflect
       else
-        d = -d; // invert
+      {
+        d = probeVecs.at(i);
+        float dot = dot_product(d, olddir);
+        if (m_UseStopVotes && dot>0.7)
+        {
+          is_stop_voter = true;
+          possible_stop_votes++;
+        }
+        else if (m_OnlyForwardSamples && dot<0)
+          continue;
+        d *= m_SamplingDistance;
+      }
 
-      // look a bit further into the other direction
       sample_pos[0] = pos[0] + d[0];
       sample_pos[1] = pos[1] + d[1];
       sample_pos[2] = pos[2] + d[2];
-      alternatives++;
+
       vnl_vector_fixed<float,3> tempDir; tempDir.fill(0.0);
       if (mitk::imv::IsInsideMask<float>(sample_pos, m_InterpolateMasks, m_MaskInterpolator))
         tempDir = m_TrackingHandler->ProposeDirection(sample_pos, olddirs, oldIndex); // sample neighborhood
-
-      if (tempDir.magnitude()>mitk::eps)  // are we back in the white matter?
+      if (tempDir.magnitude()>mitk::eps)
       {
-        direction += d * m_DeflectionMod;         // go into the direction of the white matter
-        direction += tempDir;  // go into the direction of the white matter direction at this location
+        direction += tempDir;
 
         if(m_DemoMode)
-          m_AlternativePointset->InsertPoint(alternatives, sample_pos);
+          m_SamplingPointset->InsertPoint(i, sample_pos);
+      }
+      else if (m_AvoidStop && olddir.magnitude()>0.5) // out of white matter
+      {
+        if (is_stop_voter)
+          stop_votes++;
+        if (m_DemoMode)
+          m_StopVotePointset->InsertPoint(i, sample_pos);
+
+        float dot = dot_product(d, olddir);
+        if (dot >= 0.0) // in front of plane defined by pos and olddir
+          d = -d + 2*dot*olddir; // reflect
+        else
+          d = -d; // invert
+
+        // look a bit further into the other direction
+        sample_pos[0] = pos[0] + d[0];
+        sample_pos[1] = pos[1] + d[1];
+        sample_pos[2] = pos[2] + d[2];
+        alternatives++;
+        vnl_vector_fixed<float,3> tempDir; tempDir.fill(0.0);
+        if (mitk::imv::IsInsideMask<float>(sample_pos, m_InterpolateMasks, m_MaskInterpolator))
+          tempDir = m_TrackingHandler->ProposeDirection(sample_pos, olddirs, oldIndex); // sample neighborhood
+
+        if (tempDir.magnitude()>mitk::eps)  // are we back in the white matter?
+        {
+          direction += d * m_DeflectionMod;         // go into the direction of the white matter
+          direction += tempDir;  // go into the direction of the white matter direction at this location
+
+          if(m_DemoMode)
+            m_AlternativePointset->InsertPoint(alternatives, sample_pos);
+        }
+        else
+        {
+          if (m_DemoMode)
+            m_StopVotePointset->InsertPoint(i, sample_pos);
+        }
       }
       else
       {
         if (m_DemoMode)
           m_StopVotePointset->InsertPoint(i, sample_pos);
-      }
-    }
-    else
-    {
-      if (m_DemoMode)
-        m_StopVotePointset->InsertPoint(i, sample_pos);
 
-      if (is_stop_voter)
-        stop_votes++;
+        if (is_stop_voter)
+          stop_votes++;
+      }
     }
   }
 
+  bool valid = false;
   if (direction.magnitude()>0.001 && (possible_stop_votes==0 || (float)stop_votes/possible_stop_votes<0.5) )
+  {
     direction.normalize();
+    valid = true;
+  }
   else
     direction.fill(0);
+
+  if (m_TrackingPriorHandler!=nullptr && (m_IntroduceDirectionsFromPrior || valid))
+  {
+    vnl_vector_fixed<float,3> prior = m_TrackingPriorHandler->ProposeDirection(pos, olddirs, oldIndex);
+    if (prior.magnitude()>0.001)
+    {
+      prior.normalize();
+      if (dot_product(prior,direction)<0)
+        prior *= -1;
+      direction = (1.0f-m_TrackingPriorWeight) * direction + m_TrackingPriorWeight * prior;
+      direction.normalize();
+    }
+    else if (m_TrackingPriorAsMask)
+      direction.fill(0.0);
+  }
 
   return direction;
 }
@@ -569,6 +602,8 @@ float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool fro
     {
       dist += m_StepSize;
       vnl_vector_fixed< float, 3 > v = fib->at(c);
+      if (dot_product(v,meanV)<0)
+        v = -v;
       vectors.push_back(v);
       meanV += v;
       c++;
@@ -581,6 +616,8 @@ float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool fro
     {
       dist += m_StepSize;
       vnl_vector_fixed< float, 3 > v = fib->at(c);
+      if (dot_product(v,meanV)<0)
+        v = -v;
       vectors.push_back(v);
       meanV += v;
       c--;
@@ -593,12 +630,17 @@ float StreamlineTrackingFilter::CheckCurvature(DirectionContainer* fib, bool fro
     float angle = std::fabs(dot_product(meanV, vectors.at(c)));
     if (angle>1.0)
       angle = 1.0;
-    dev += acos(angle)*180/M_PI;
+    dev += acos(angle)*180/itk::Math::pi;
   }
   if (vectors.size()>0)
     dev /= vectors.size();
 
   return dev;
+}
+
+void StreamlineTrackingFilter::SetTrackingPriorHandler(mitk::TrackingDataHandler *TrackingPriorHandler)
+{
+  m_TrackingPriorHandler = TrackingPriorHandler;
 }
 
 void StreamlineTrackingFilter::GetSeedPointsFromSeedImage()
@@ -692,11 +734,7 @@ void StreamlineTrackingFilter::GenerateData()
       // get starting direction
       vnl_vector_fixed<float,3> dir; dir.fill(0.0);
       std::deque< vnl_vector_fixed<float,3> > olddirs;
-      while (olddirs.size()<m_NumPreviousDirections)
-        olddirs.push_back(dir); // start without old directions (only zero directions)
-
-      if (mitk::imv::IsInsideMask<float>(worldPos, m_InterpolateMasks, m_MaskInterpolator))
-        dir = m_TrackingHandler->ProposeDirection(worldPos, olddirs, zeroIndex);
+      dir = GetNewDirection(worldPos, olddirs, zeroIndex) * 0.5f;
 
       bool exclude = false;
       if (m_ExclusionRegions.IsNotNull() && mitk::imv::IsInsideMask<float>(worldPos, m_InterpolateMasks, m_ExclusionInterpolator))

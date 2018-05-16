@@ -96,26 +96,26 @@ public:
         if (dir[0] > 0.0)
           phi = 0.0;
         else
-          phi = M_PI;
+          phi = itk::Math::pi;
       }
       else if (dir[0] == 0.0)
       {
         // avoid div by zero
         if (dir[1] > 0) {
-          phi = M_PI / 2.0;
+          phi = itk::Math::pi / 2.0;
         }
         else {
-          phi = 1.5 * M_PI;
+          phi = 1.5 * itk::Math::pi;
         }
       }
       else if (dir[0] > 0.0 && dir[1] > 0.0) // first quadrant
         phi = atan(dir[1] / dir[0]);
       else if (dir[0] < 0.0 && dir[1] > 0.0) // second quadrant
-        phi = M_PI + atan(dir[1] / dir[0]);
+        phi = itk::Math::pi + atan(dir[1] / dir[0]);
       else if (dir[0] < 0.0 && dir[1] < 0.0) // third quadrant
-        phi =  M_PI + atan(dir[1] / dir[0]);
+        phi =  itk::Math::pi + atan(dir[1] / dir[0]);
       else // fourth quadrant
-        phi = 2.0 * M_PI + atan(dir[1] / dir[0]);
+        phi = 2.0 * itk::Math::pi + atan(dir[1] / dir[0]);
     }
   }
 

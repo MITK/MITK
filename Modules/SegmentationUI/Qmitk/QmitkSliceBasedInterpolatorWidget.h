@@ -64,7 +64,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSliceBasedInterpolatorWidget : public QWidg
   Q_OBJECT
 
 public:
-  QmitkSliceBasedInterpolatorWidget(QWidget *parent = 0, const char *name = 0);
+  QmitkSliceBasedInterpolatorWidget(QWidget *parent = nullptr, const char *name = nullptr);
   ~QmitkSliceBasedInterpolatorWidget() override;
 
   void SetDataStorage(mitk::DataStorage &storage);

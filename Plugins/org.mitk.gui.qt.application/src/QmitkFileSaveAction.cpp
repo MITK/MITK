@@ -81,7 +81,7 @@ public:
     {
       return prefService->GetSystemPreferences()->Node("/General");
     }
-    return berry::IPreferences::Pointer(0);
+    return berry::IPreferences::Pointer(nullptr);
   }
 
   QString getLastFileSavePath() const
@@ -133,20 +133,20 @@ public:
 };
 
 QmitkFileSaveAction::QmitkFileSaveAction(berry::IWorkbenchWindow::Pointer window)
-  : QAction(0), d(new QmitkFileSaveActionPrivate)
+  : QAction(nullptr), d(new QmitkFileSaveActionPrivate)
 {
   d->init(window.GetPointer(), this);
 }
 
 QmitkFileSaveAction::QmitkFileSaveAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
-  : QAction(0), d(new QmitkFileSaveActionPrivate)
+  : QAction(nullptr), d(new QmitkFileSaveActionPrivate)
 {
   d->init(window.GetPointer(), this);
   this->setIcon(icon);
 }
 
 QmitkFileSaveAction::QmitkFileSaveAction(const QIcon& icon, berry::IWorkbenchWindow* window)
-  : QAction(0), d(new QmitkFileSaveActionPrivate)
+  : QAction(nullptr), d(new QmitkFileSaveActionPrivate)
 {
   d->init(window, this);
   this->setIcon(icon);

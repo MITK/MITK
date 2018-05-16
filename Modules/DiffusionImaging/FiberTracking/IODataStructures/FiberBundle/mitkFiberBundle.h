@@ -50,11 +50,11 @@ public:
     // fiber colorcodings
     static const char* FIBER_ID_ARRAY;
 
-    virtual void UpdateOutputInformation() override;
-    virtual void SetRequestedRegionToLargestPossibleRegion() override;
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
-    virtual bool VerifyRequestedRegion() override;
-    virtual void SetRequestedRegion(const itk::DataObject*) override;
+    void UpdateOutputInformation() override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    bool VerifyRequestedRegion() override;
+    void SetRequestedRegion(const itk::DataObject*) override;
 
     mitkClassMacro( FiberBundle, BaseData )
     itkFactorylessNewMacro(Self)
@@ -64,6 +64,7 @@ public:
     // colorcoding related methods
     void ColorFibersByFiberWeights(bool opacity, bool normalize);
     void ColorFibersByCurvature(bool opacity, bool normalize);
+    void ColorFibersByLength(bool opacity, bool normalize);
     void ColorFibersByScalarMap(mitk::Image::Pointer, bool opacity, bool normalize);
     template <typename TPixel>
     void ColorFibersByScalarMap(const mitk::PixelType pixelType, mitk::Image::Pointer, bool opacity, bool normalize);
@@ -147,12 +148,12 @@ public:
 protected:
 
     FiberBundle( vtkPolyData* fiberPolyData = nullptr );
-    virtual ~FiberBundle();
+    ~FiberBundle() override;
 
     void                            GenerateFiberIds();
     itk::Point<float, 3>            GetItkPoint(double point[3]);
     void                            UpdateFiberGeometry();
-    virtual void                    PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void                    PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
 private:
 

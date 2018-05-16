@@ -1,8 +1,8 @@
-set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.5)
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.10)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 #-----------------------------------------------------------------------------
-# See http://www.cmake.org/cmake/help/v3.5/manual/cmake-policies.7.html for details
+# See https://cmake.org/cmake/help/v3.10/manual/cmake-policies.7.html for details
 #-----------------------------------------------------------------------------
 
 set(project_policies )
@@ -210,27 +210,14 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 # Qt version related variables
 
 env_option(MITK_USE_Qt5 "Use Qt 5 library" ON)
-env_option(MITK_USE_Qt5_WebEngine "Use Qt 5 WebEngine library" ON)
 
 if(MITK_USE_Qt5)
   set(MITK_QT5_MINIMUM_VERSION 5.6.0)
-  set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets Xml XmlPatterns UiTools Help LinguistTools)
-  if(MITK_USE_Qt5_WebEngine)
-    set(MITK_QT5_COMPONENTS ${MITK_QT5_COMPONENTS} WebEngineWidgets)
-  endif()
+  set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets Xml XmlPatterns WebEngineWidgets UiTools Help LinguistTools)
   if(APPLE)
     set(MITK_QT5_COMPONENTS ${MITK_QT5_COMPONENTS} DBus)
   endif()
   find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED)
-  if(Qt5_DIR)
-    get_filename_component(_Qt5_DIR "${Qt5_DIR}/../../../" ABSOLUTE)
-    list(FIND CMAKE_PREFIX_PATH "${_Qt5_DIR}" _result)
-    if(_result LESS 0)
-      set(CMAKE_PREFIX_PATH "${_Qt5_DIR};${CMAKE_PREFIX_PATH}" CACHE PATH "" FORCE)
-    endif()
-  endif()
-elseif(MITK_USE_Qt5_WebEngine)
-  set(MITK_USE_Qt5_WebEngine OFF)
 endif()
 
 set_property(GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS "")
@@ -297,11 +284,8 @@ elseif(MITK_USE_Python)
     set(MITK_USE_SimpleITK ON CACHE BOOL "Use SimpleITK" FORCE)
   endif()
 
-  option(MITK_USE_SYSTEM_PYTHON "Use the system python runtime" OFF)
-  if(MITK_USE_SYSTEM_PYTHON)
-    find_package(PythonLibs REQUIRED)
-    find_package(PythonInterp REQUIRED)
-  endif()
+  find_package(PythonLibs REQUIRED)
+  find_package(PythonInterp REQUIRED)
 elseif(MITK_USE_Python AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" AND WIN32)
   message(WARNING "Disabling Python support. Building MITK Python in debug mode on Windowsis not supported!")
   set(MITK_USE_Python OFF CACHE BOOL "Use python wrapping in MITK" FORCE)
@@ -588,7 +572,8 @@ mitkMacroConfigureItkPixelTypes()
 # Configure module naming conventions
 set(MITK_MODULE_NAME_REGEX_MATCH "^[A-Z].*$")
 set(MITK_MODULE_NAME_REGEX_NOT_MATCH "^[Mm][Ii][Tt][Kk].*$")
-set(MITK_MODULE_NAME_PREFIX "Mitk")
+set(MITK_DEFAULT_MODULE_NAME_PREFIX "Mitk")
+set(MITK_MODULE_NAME_PREFIX ${MITK_DEFAULT_MODULE_NAME_PREFIX})
 set(MITK_MODULE_NAME_DEFAULTS_TO_DIRECTORY_NAME 1)
 
 #-----------------------------------------------------------------------------
@@ -880,8 +865,8 @@ if(MITK_USE_Qt5)
         set(_force_blueberry_use_qt_help_to_off 1)
       endif()
 
-      if(NOT MITK_USE_Qt5_WebEngine)
-        message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because MITK_USE_Qt5_WebEngine is OFF.")
+      if(NOT MITK_USE_Qt5)
+        message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because MITK_USE_Qt5 is OFF.")
         set(_force_blueberry_use_qt_help_to_off 1)
       endif()
 
@@ -1023,7 +1008,10 @@ foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
       add_subdirectory(${MITK_MODULES_EXTENSION_DIR}/${mitk_module} Modules/${mitk_module})
     endforeach()
   endif()
+  set(MITK_MODULE_NAME_PREFIX ${MITK_DEFAULT_MODULE_NAME_PREFIX})
 endforeach()
+
+add_subdirectory(Wrapping)
 
 if(MITK_USE_BLUEBERRY)
 
@@ -1049,6 +1037,7 @@ if(MITK_USE_BLUEBERRY)
     list(APPEND mitk_plugins_fullpath Plugins/${mitk_plugin})
   endforeach()
 
+  set(MITK_PLUGIN_REGEX_LIST "")
   foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
     set(MITK_PLUGINS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/Plugins)
     get_filename_component(MITK_PLUGINS_EXTENSION_DIR ${MITK_PLUGINS_EXTENSION_DIR} ABSOLUTE)
@@ -1084,7 +1073,7 @@ if(MITK_USE_BLUEBERRY)
     set(re_ctkplugin_bb "^org_blueberry_[a-zA-Z0-9_]+$")
     set(_tmp_list)
     list(APPEND _tmp_list ${all_target_libraries})
-    ctkMacroListFilter(_tmp_list re_ctkplugin_mitk re_ctkplugin_bb OUTPUT_VARIABLE ${varname})
+    ctkMacroListFilter(_tmp_list re_ctkplugin_mitk re_ctkplugin_bb MITK_PLUGIN_REGEX_LIST OUTPUT_VARIABLE ${varname})
   endmacro()
 
   # Get infos about application directories and build options

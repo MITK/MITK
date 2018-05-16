@@ -495,11 +495,6 @@ void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode *node, Bas
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
-void mitk::ConnectomicsNetworkMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper *mapper)
-{
-  mapper->ImmediateModeRenderingOn();
-}
-
 void mitk::ConnectomicsNetworkMapper3D::UpdateVtkObjects()
 {
   // TODO: implement

@@ -37,8 +37,8 @@ public:
 
   void setUp() override
   {
-    m_referenceImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("RT/Dose/RT_Dose.nrrd"));
-    m_doseImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("RT/Dose/RD.dcm"));
+    m_referenceImage = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("RT/Dose/RT_Dose.nrrd"));
+    m_doseImage = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("RT/Dose/RD.dcm"));
   }
 
   void TestDoseImage()

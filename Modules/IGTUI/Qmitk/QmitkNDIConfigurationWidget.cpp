@@ -873,7 +873,7 @@ mitk::Surface::Pointer QmitkNDIConfigurationWidget::LoadSurfaceFromSTLFile(QStri
   if(surfaceFile.exists())
   {
     try{
-      toolSurface = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(surfaceFilename.toStdString().c_str())[0].GetPointer());
+      toolSurface = mitk::IOUtil::Load<mitk::Surface>(surfaceFilename.toStdString().c_str());
     }
     catch(std::exception& e )
     {

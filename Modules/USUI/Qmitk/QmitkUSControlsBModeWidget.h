@@ -76,7 +76,7 @@ public:
     * will be disabled.
     */
   explicit QmitkUSControlsBModeWidget(mitk::USControlInterfaceBMode::Pointer controlInterface, QWidget *parent = nullptr);
-  ~QmitkUSControlsBModeWidget();
+  ~QmitkUSControlsBModeWidget() override;
 
 private:
   Ui::QmitkUSControlsBModeWidget*         ui;

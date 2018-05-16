@@ -42,10 +42,10 @@ public:
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual void SetRequestedRegionToLargestPossibleRegion() override;
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
-    virtual bool VerifyRequestedRegion() override;
-    virtual void SetRequestedRegion(const itk::DataObject*) override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    bool VerifyRequestedRegion() override;
+    void SetRequestedRegion(const itk::DataObject*) override;
 
     // set if this compsition is AND, OR, NOT
     void setOperationType(OperationType);
@@ -53,7 +53,7 @@ public:
 
 protected:
     PlanarFigureComposite();
-    virtual ~PlanarFigureComposite();
+    ~PlanarFigureComposite() override;
 
     PlanarFigureComposite(const Self& other);
 

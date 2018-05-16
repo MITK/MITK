@@ -43,13 +43,13 @@ namespace mitk
 
     std::string GetDefaultPersistenceFile() override;
 
-    mitk::PropertyList::Pointer GetPropertyList(std::string &id, bool *existed = 0) override;
+    mitk::PropertyList::Pointer GetPropertyList(std::string &id, bool *existed = nullptr) override;
 
     bool RemovePropertyList(std::string &id) override;
 
     std::string GetPersistenceNodePropertyName() override;
 
-    DataStorage::SetOfObjects::Pointer GetDataNodes(DataStorage *ds = 0) override;
+    DataStorage::SetOfObjects::Pointer GetDataNodes(DataStorage *ds = nullptr) override;
 
     bool Save(const std::string &fileName = "", bool appendChanges = false) override;
 

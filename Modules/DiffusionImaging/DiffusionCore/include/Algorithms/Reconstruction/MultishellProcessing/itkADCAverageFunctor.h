@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _itk_ADCAverageFunctor_h_
 
 #include "itkDWIVoxelFunctor.h"
-#include <math.h>
+#include <cmath>
 
 
 namespace itk
@@ -28,7 +28,7 @@ class MITKDIFFUSIONCORE_EXPORT ADCAverageFunctor : public DWIVoxelFunctor
 {
 public:
   ADCAverageFunctor(){}
-  ~ADCAverageFunctor(){}
+  ~ADCAverageFunctor() override{}
 
   typedef ADCAverageFunctor                       Self;
   typedef SmartPointer<Self>                      Pointer;

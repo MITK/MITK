@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>QmitkConnectomicsNetworkOperationsViewControls</class>
  <widget class="QWidget" name="QmitkConnectomicsNetworkOperationsViewControls">
@@ -19,6 +19,36 @@
   <property name="windowTitle">
    <string>QmitkTemplate</string>
   </property>
+  <property name="styleSheet">
+   <string>QCommandLinkButton {
+  font-weight: lighter;
+}
+
+QCommandLinkButton:disabled {
+  border: none;
+  font-weight: lighter;
+}
+
+QToolBox::tab {
+  font-weight: bold;
+}
+
+QToolBox::tab:hover {
+  font-weight: bold;
+}
+
+QToolBox::tab:selected {
+  font-weight: bold;
+}
+
+QGroupBox {
+  background-color: transparent;
+}
+
+QGroupBox, QGroupBox:disabled {
+  background-color: transparent;
+}</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="verticalSpacing">
     <number>25</number>
@@ -30,16 +60,16 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <property name="leftMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <item>
        <widget class="QLabel" name="lblWarning">
@@ -103,16 +133,16 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <property name="leftMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <item row="0" column="0">
        <widget class="QPushButton" name="createConnectivityMatrixImagePushButton">
@@ -153,16 +183,16 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <property name="leftMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <item row="0" column="0">
        <widget class="QPushButton" name="prunePushButton">
@@ -204,7 +234,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="targetThresholdSpinBox"/>
+           <widget class="QSpinBox" name="targetThresholdSpinBox"></widget>
           </item>
          </layout>
         </item>
@@ -215,7 +245,7 @@
         <item>
          <widget class="QCheckBox" name="thresholdBasedThresholdingCheckBox">
           <property name="toolTip">
-           <string extracomment="Remove all edges below at and below weight"/>
+           <string extracomment="Remove all edges below at and below weight"></string>
           </property>
           <property name="text">
            <string>Threshold weight</string>
@@ -229,7 +259,7 @@
         <item>
          <widget class="QCheckBox" name="largestDensityLowerThanCheckBox">
           <property name="toolTip">
-           <string extracomment="Remove all edges of the weakest weight until below target density"/>
+           <string extracomment="Remove all edges of the weakest weight until below target density"></string>
           </property>
           <property name="text">
            <string>Threshold Below Density</string>
@@ -243,7 +273,7 @@
         <item>
          <widget class="QCheckBox" name="RandomRemovalThresholdingCheckBox">
           <property name="toolTip">
-           <string extracomment="Randomly remove one of the lowest weight edges until the target density is reached"/>
+           <string extracomment="Randomly remove one of the lowest weight edges until the target density is reached"></string>
           </property>
           <property name="text">
            <string>Random Removal Threshold</string>
@@ -270,7 +300,7 @@
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11"/>
- <resources/>
- <connections/>
+ <layoutdefault spacing="6" margin="11"></layoutdefault>
+ <resources></resources>
+ <connections></connections>
 </ui>

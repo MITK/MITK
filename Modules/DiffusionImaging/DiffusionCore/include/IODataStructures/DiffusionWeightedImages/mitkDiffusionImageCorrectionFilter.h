@@ -71,12 +71,12 @@ public:
    */
   void CorrectDirections( const TransformMatrixType& );
 
-  virtual void GenerateOutputInformation() override {}
+  void GenerateOutputInformation() override {}
 
 
 protected:
   DiffusionImageCorrectionFilter();
-  virtual ~DiffusionImageCorrectionFilter() {}
+  ~DiffusionImageCorrectionFilter() override {}
 
   /**
    * @brief Get the rotation component following the Finite Strain

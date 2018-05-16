@@ -27,8 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkIOUtil.h>
 
-#include <stdlib.h>     /* srand, rand */
-#include <time.h>       /* time */
+#include <cstdlib>     /* srand, rand */
+#include <ctime>       /* time */
 #include <sstream>
 namespace itk
 {

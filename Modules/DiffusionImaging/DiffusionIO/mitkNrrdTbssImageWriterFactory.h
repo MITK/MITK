@@ -30,15 +30,15 @@ public:
   mitkClassMacroItkParent( mitk::NrrdTbssImageWriterFactory, itk::ObjectFactoryBase )
 
   /** Class methods used to interface with the registered factories. */
-  virtual const char* GetITKSourceVersion(void) const override;
-  virtual const char* GetDescription(void) const override;
+  const char* GetITKSourceVersion(void) const override;
+  const char* GetDescription(void) const override;
 
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
 
 protected:
   NrrdTbssImageWriterFactory();
-  ~NrrdTbssImageWriterFactory();
+  ~NrrdTbssImageWriterFactory() override;
 
 private:
   NrrdTbssImageWriterFactory(const Self&); //purposely not implemented

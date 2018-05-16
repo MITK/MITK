@@ -26,8 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMultiThreader.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkTestingMacros.h>
-#include <stdlib.h>
-#include <time.h>
+#include <cstdlib>
+#include <ctime>
 
 struct ThreadData
 {
@@ -177,7 +177,7 @@ int mitkImageAccessorTest(int argc, char *argv[])
   mitk::Image::Pointer image = nullptr;
   try
   {
-    image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(std::string(argv[1]))[0].GetPointer());
+    image = mitk::IOUtil::Load<mitk::Image>(std::string(argv[1]));
 
     if (image.IsNull())
     {

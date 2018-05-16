@@ -55,7 +55,7 @@ namespace mitk
 
   protected:
     PeakImage();
-    virtual ~PeakImage();
+    ~PeakImage() override;
 
     mutable vtkSmartPointer< vtkPolyData > m_PolyData;
 

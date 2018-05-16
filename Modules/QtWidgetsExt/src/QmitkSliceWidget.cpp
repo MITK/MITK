@@ -28,7 +28,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget *parent, const char *name, Qt::Window
 {
   this->setupUi(this);
 
-  if (name != 0)
+  if (name != nullptr)
     this->setObjectName(name);
 
   popUp = new QMenu(this);
@@ -39,7 +39,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget *parent, const char *name, Qt::Window
   QObject::connect(popUp, SIGNAL(triggered(QAction *)), this, SLOT(ChangeView(QAction *)));
   setPopUpEnabled(false);
 
-  m_SlicedGeometry = 0;
+  m_SlicedGeometry = nullptr;
   m_View = mitk::SliceNavigationController::Axial;
 
   QHBoxLayout *hlayout = new QHBoxLayout(container);

@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
 
-#include <stdlib.h>
+#include <cstdlib>
 
 // constructor LocalStorage
 mitk::PointSetVtkMapper2D::LocalStorage::LocalStorage()

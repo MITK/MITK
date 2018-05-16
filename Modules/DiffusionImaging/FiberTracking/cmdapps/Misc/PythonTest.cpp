@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
     std::string params = us::any_cast<std::string>(parsedArgs["params"]);
     std::string out_file = us::any_cast<std::string>(parsedArgs["out_file"]);
 
-    mitk::Image::Pointer mitk_image = mitk::IOUtil::LoadImage(image_file);
+    mitk::Image::Pointer mitk_image = mitk::IOUtil::Load<mitk::Image>(image_file);
     us::ModuleContext* context = us::GetModuleContext();
 
     us::ServiceReference<mitk::IPythonService> m_PythonServiceRef = context->GetServiceReference<mitk::IPythonService>();

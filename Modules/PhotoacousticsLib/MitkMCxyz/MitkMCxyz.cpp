@@ -165,7 +165,7 @@ public:
     inputFilename = localInputFilename;
     try
     {
-      m_inputImage = mitk::IOUtil::LoadImage(inputFilename);
+      m_inputImage = mitk::IOUtil::Load<mitk::Image>(inputFilename);
     }
     catch (...)
     {
@@ -175,7 +175,7 @@ public:
     try
     {
       if (simulatePVFC && !normalizationFilename.empty())
-        m_normalizationImage = mitk::IOUtil::LoadImage(normalizationFilename);
+        m_normalizationImage = mitk::IOUtil::Load<mitk::Image>(normalizationFilename);
     }
     catch (...)
     {

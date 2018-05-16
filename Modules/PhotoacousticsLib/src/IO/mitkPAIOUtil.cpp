@@ -44,7 +44,7 @@ mitk::pa::Volume::Pointer mitk::pa::IOUtil::LoadNrrd(std::string filename, doubl
   if (filename.empty() || filename == "")
     return nullptr;
 
-  mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage(filename);
+  auto inputImage = mitk::IOUtil::Load<mitk::Image>(filename);
 
   if (inputImage.IsNull())
     return nullptr;
@@ -175,7 +175,7 @@ std::vector<std::string> mitk::pa::IOUtil::GetAllChildfoldersFromFolder(std::str
 mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::IOUtil::LoadInSilicoTissueVolumeFromNrrdFile(std::string nrrdFile)
 {
   MITK_INFO << "Initializing ComposedVolume by nrrd...";
-  mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage(nrrdFile);
+  auto inputImage = mitk::IOUtil::Load<mitk::Image>(nrrdFile);
 
   auto tissueParameters = TissueGeneratorParameters::New();
 
@@ -232,7 +232,7 @@ mitk::pa::FluenceYOffsetPair::Pointer mitk::pa::IOUtil::LoadFluenceSimulation(st
 {
   MITK_INFO << "Adding slice...";
 
-  mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage(fluenceSimulation);
+  auto inputImage = mitk::IOUtil::Load<mitk::Image>(fluenceSimulation);
   mitk::ImageReadAccessor readAccess0(inputImage, inputImage->GetVolumeData(0));
 
   unsigned int xDim = inputImage->GetDimensions()[1];

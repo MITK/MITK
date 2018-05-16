@@ -208,6 +208,9 @@ namespace itk
       itkGetConstMacro(FastCalculations, bool);
       itkSetMacro(FastCalculations, bool);
       itkBooleanMacro(FastCalculations);
+      itkGetConstMacro(CombinedFeatureCalculation, bool);
+      itkSetMacro(CombinedFeatureCalculation, bool);
+      itkBooleanMacro(CombinedFeatureCalculation);
 
     protected:
       EnhancedScalarImageToRunLengthFeaturesFilter();
@@ -234,6 +237,7 @@ namespace itk
       FeatureNameVectorConstPointer m_RequestedFeatures;
       OffsetVectorConstPointer      m_Offsets;
       bool                          m_FastCalculations;
+      bool                          m_CombinedFeatureCalculation;
     };
   } // end of namespace Statistics
 } // end of namespace itk

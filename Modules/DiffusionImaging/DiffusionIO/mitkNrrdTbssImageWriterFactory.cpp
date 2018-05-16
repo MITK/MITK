@@ -29,7 +29,7 @@ NrrdTbssImageWriterFactory::NrrdTbssImageWriterFactory()
   this->RegisterOverride("IOWriter",
                          "NrrdTbssImageWriter",
                          "NrrdTbssImage Writer",
-                         1,
+                         true,
                          itk::CreateObjectFunction< mitk::NrrdTbssImageWriter >::New());
 }
 

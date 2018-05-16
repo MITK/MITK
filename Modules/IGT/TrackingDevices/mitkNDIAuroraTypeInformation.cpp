@@ -53,10 +53,10 @@ namespace mitk
   NDIAuroraTypeInformation::NDIAuroraTypeInformation()
   {
     m_DeviceName = NDIAuroraTypeInformation::GetTrackingDeviceName();
-    m_TrackingDeviceData.push_back(GetDeviceDataAuroraCompact());
     m_TrackingDeviceData.push_back(GetDeviceDataAuroraPlanarCube());
     m_TrackingDeviceData.push_back(GetDeviceDataAuroraPlanarDome());
     m_TrackingDeviceData.push_back(GetDeviceDataAuroraTabletop());
+    m_TrackingDeviceData.push_back(GetDeviceDataAuroraCompact());
   }
 
   NDIAuroraTypeInformation::~NDIAuroraTypeInformation()
@@ -123,7 +123,7 @@ namespace mitk
             //adapt name of tool
             dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolName(navigationTools->GetTool(j)->GetToolName());
             //set tip of tool
-            dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolTip(navigationTools->GetTool(j)->GetToolTipPosition(), navigationTools->GetTool(j)->GetToolTipOrientation());
+            dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolTipPosition(navigationTools->GetTool(j)->GetToolTipPosition(), navigationTools->GetTool(j)->GetToolAxisOrientation());
             //rember that this tool was already found
             alreadyFoundTools.push_back(j);
 

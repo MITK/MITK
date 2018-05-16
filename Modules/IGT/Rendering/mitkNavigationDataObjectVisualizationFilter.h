@@ -124,7 +124,7 @@ namespace mitk {
     /*
     * \brief Transfer the information from the input to the associated BaseData
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
 
   protected:
@@ -139,7 +139,7 @@ namespace mitk {
     /**
     * \brief Destructor
     **/
-    ~NavigationDataObjectVisualizationFilter();
+    ~NavigationDataObjectVisualizationFilter() override;
 
     /**
     * \brief An array of the BaseData which represent the tools.

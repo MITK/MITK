@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkClusteringMetricAnatomic.h>
 #include <mitkClusteringMetricScalarMap.h>
 #include <mitkClusteringMetricInnerAngles.h>
+#include <mitkClusteringMetricLength.h>
 #include <QMessageBox>
 
 const std::string QmitkFiberClusteringView::VIEW_ID = "org.mitk.views.fiberclustering";
@@ -157,6 +158,13 @@ void QmitkFiberClusteringView::StartClustering()
     metric->SetScale(m_Controls->m_MetricWeight6->value());
     metrics.push_back(metric);
   }
+  if (m_Controls->m_MetricBox7->isChecked())
+  {
+    mitk::ClusteringMetricLength* metric = new mitk::ClusteringMetricLength();
+    metric->SetScale(m_Controls->m_MetricWeight7->value());
+    metrics.push_back(metric);
+  }
+
   if (m_Controls->m_ParcellationBox->GetSelectedNode().IsNotNull() && m_Controls->m_MetricBox4->isChecked())
   {
     mitk::Image::Pointer mitk_map = dynamic_cast<mitk::Image*>(m_Controls->m_ParcellationBox->GetSelectedNode()->GetData());

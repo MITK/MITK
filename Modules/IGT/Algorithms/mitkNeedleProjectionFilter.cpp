@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include "mitkNeedleProjectionFilter.h"
 #include <mitkPlaneGeometry.h>
-// Vermutung - wird nicht benötigt: #include "mitkUSCombinedModality.h"
 
 // VTK
 #include <vtkPlane.h>
@@ -26,14 +25,14 @@ mitk::NeedleProjectionFilter::NeedleProjectionFilter()
   : m_Projection(mitk::PointSet::New()),
   m_OriginalPoints(mitk::PointSet::New()),
   m_ShowToolAxis(false),
-  m_SelectedInput(-1)
+  m_SelectedInput(0)
 {
-  // Tool Coordinates:x axis is chosen as default axis when no axis is specified
+  // Tool Coordinates: z-axis is chosen as default axis when no axis is specified
 
   MITK_DEBUG << "Constructor called";
 
   mitk::Point3D toolAxis;
-  mitk::FillVector3D(toolAxis, 1, 0, 0);
+  mitk::FillVector3D(toolAxis, 0, 0, -1);
   m_ToolAxis = toolAxis;
   InitializeOriginalPoints(toolAxis, m_ShowToolAxis);
 

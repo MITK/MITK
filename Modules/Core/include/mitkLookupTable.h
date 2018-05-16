@@ -204,6 +204,10 @@ namespace mitk
       HOT_IRON,
       JET,
       JET_TRANSPARENT,
+      PLASMA,
+	    INFERNO,
+	    VIRIDIS,
+      MAGMA,
       LEGACY_BINARY,
       LEGACY_RAINBOW_COLOR,
       MULTILABEL,
@@ -242,6 +246,10 @@ namespace mitk
     virtual void BuildLegacyRainbowColorLookupTable();
     virtual void BuildInverseGrayScaleLookupTable();
     virtual void BuildHotIronLookupTable();
+	  virtual void BuildPlasmaLookupTable();
+	  virtual void BuildInfernoLookupTable();
+	  virtual void BuildViridisLookupTable();
+    virtual void BuildMagmaLookupTable();
     virtual void BuildJetLookupTable(bool transparent = false);
     virtual void BuildPETColorLookupTable();
     virtual void BuildPET20LookupTable();

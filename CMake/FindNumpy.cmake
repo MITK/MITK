@@ -15,7 +15,7 @@ if(UNIX)
 endif()
 
 execute_process (
-  COMMAND ${_python} -c "import os; os.environ['DISTUTILS_USE_SDK']='1'; import numpy.distutils; print numpy.distutils.misc_util.get_numpy_include_dirs()[0]"
+  COMMAND ${_python} -c "import os; os.environ['DISTUTILS_USE_SDK']='1'; import numpy.distutils; print( numpy.distutils.misc_util.get_numpy_include_dirs()[0])"
   OUTPUT_VARIABLE output
   OUTPUT_STRIP_TRAILING_WHITESPACE
   )

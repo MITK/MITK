@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkShortestPathImageFilter.h"
 
 #include "mitkMemoryUtilities.h"
-#include "time.h"
+#include <ctime>
 #include <algorithm>
 #include <iostream>
 #include <vector>

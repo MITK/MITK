@@ -19,9 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationData.h"
 #include "Poco/File.h"
 #include "mitkUnspecifiedTrackingTypeInformation.h"
-#include "mitkInternalTrackingTool.h"
 
-#include "vtkSphereSource.h"
+#include <vtkSphereSource.h>
 #include "vtkConeSource.h"
 #include "vtkLineSource.h"
 #include "vtkCylinderSource.h"
@@ -36,17 +35,13 @@ m_Type(mitk::NavigationTool::Unknown),
 m_CalibrationFile("none"),
 m_SerialNumber(""),
 m_TrackingDeviceType(mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName()),
-m_ToolRegistrationLandmarks(mitk::PointSet::New()),
-m_ToolCalibrationLandmarks(mitk::PointSet::New()),
-m_ToolTipOrientation(mitk::Quaternion(0, 0, 0, 1))
+m_ToolLandmarks(mitk::PointSet::New()),
+m_ToolControlPoints(mitk::PointSet::New()),
+m_ToolAxisOrientation(mitk::Quaternion(0, 0, 0, 1))
 {
   m_ToolTipPosition[0] = 0;
   m_ToolTipPosition[1] = 0;
   m_ToolTipPosition[2] = 0;
-
-  m_ToolAxis[0] = 1;
-  m_ToolAxis[1] = 0;
-  m_ToolAxis[2] = 0;
 
   SetDefaultSurface();
 }
@@ -78,24 +73,68 @@ mitk::NavigationTool::NavigationTool(const NavigationTool &other)
   this->m_CalibrationFile = other.m_CalibrationFile;
   this->m_SerialNumber = other.m_SerialNumber;
   this->m_TrackingDeviceType = other.m_TrackingDeviceType;
-  if (other.m_ToolRegistrationLandmarks.IsNotNull())
-    this->m_ToolRegistrationLandmarks = other.m_ToolRegistrationLandmarks->Clone();
-  if (other.m_ToolCalibrationLandmarks.IsNotNull())
-    this->m_ToolCalibrationLandmarks = other.m_ToolCalibrationLandmarks->Clone();
+  if (other.m_ToolLandmarks.IsNotNull())
+    this->m_ToolLandmarks = other.m_ToolLandmarks->Clone();
+  if (other.m_ToolControlPoints.IsNotNull())
+    this->m_ToolControlPoints = other.m_ToolControlPoints->Clone();
   this->m_ToolTipPosition = other.m_ToolTipPosition;
-  this->m_ToolTipOrientation = other.m_ToolTipOrientation;
-  this->m_ToolAxis = other.m_ToolAxis;
+  this->m_ToolAxisOrientation = other.m_ToolAxisOrientation;
 }
 
 mitk::NavigationTool::~NavigationTool()
 {
 }
 
+mitk::Point3D mitk::NavigationTool::GetToolAxis()
+{
+  // The tool axis in the sensor coordinate system is defined as the negative z-axis
+  mitk::Vector3D toolAxisSensorCoordinateSystem;
+  mitk::FillVector3D(toolAxisSensorCoordinateSystem, 0.0, 0.0, -1.0);
+  // Apply inverse tool axis transform to calculate tool axis
+  vnl_vector_fixed<mitk::ScalarType,3> toolAxisVector = m_ToolAxisOrientation.inverse().rotate(toolAxisSensorCoordinateSystem.GetVnlVector());
+  // Transfer to mitk::Point3D
+  mitk::Point3D toolAxis;
+  toolAxis[0] = toolAxisVector[0];
+  toolAxis[1] = toolAxisVector[1];
+  toolAxis[2] = toolAxisVector[2];
+  return toolAxis;
+}
+
+void mitk::NavigationTool::SetToolAxis(mitk::Point3D toolAxis)
+{
+  // The tool axis in the sensor coordinate system is defined as the negative z-axis
+  mitk::Vector3D toolAxisSensorCoordinateSystem;
+  mitk::FillVector3D(toolAxisSensorCoordinateSystem, 0.0, 0.0, -1.0);
+  // Normalize the tool axis as obtained by a tool axis calibration
+  mitk::Vector3D toolAxisFromCalibration;
+  mitk::FillVector3D(toolAxisFromCalibration, toolAxis[0], toolAxis[1], toolAxis[2]);
+  toolAxisFromCalibration.Normalize();
+  // if tool axis to be set is different to the default tool axis (0,0,-1) calculate the tool axis orientation, otherwise set it to identity
+  if (toolAxisSensorCoordinateSystem == toolAxisFromCalibration)
+  {
+    m_ToolAxisOrientation = mitk::Quaternion(0,0,0,1);
+  }
+  else
+  {
+    // Determine rotation angle
+    mitk::ScalarType rotationAngle = acos(toolAxisSensorCoordinateSystem*toolAxisFromCalibration);
+    // Determine rotation axis
+    mitk::Vector3D rotationAxis = itk::CrossProduct(toolAxisSensorCoordinateSystem, toolAxisFromCalibration);
+    // Calculate transform
+    itk::AffineTransform<mitk::ScalarType>::Pointer sensorToToolAxisOrientation = itk::AffineTransform<mitk::ScalarType>::New();
+    sensorToToolAxisOrientation->Rotate3D(rotationAxis, rotationAngle);
+    // transfer to quaternion notation. Note that the vnl_quaternion expects the matrix in row major format, hence the transpose
+    mitk::Quaternion toolAxisTransform(sensorToToolAxisOrientation->GetMatrix().GetVnlMatrix().transpose());
+    // Update the tool axis orientation
+    m_ToolAxisOrientation = toolAxisTransform;
+  }
+}
+
 mitk::AffineTransform3D::Pointer mitk::NavigationTool::GetToolTipTransform()
 {
   mitk::NavigationData::Pointer returnValue = mitk::NavigationData::New();
   returnValue->SetPosition(this->m_ToolTipPosition);
-  returnValue->SetOrientation(this->m_ToolTipOrientation);
+  returnValue->SetOrientation(this->m_ToolAxisOrientation);
   return returnValue->GetAffineTransform3D();
 }
 
@@ -129,11 +168,10 @@ void mitk::NavigationTool::Graft(const DataObject *data)
   m_CalibrationFile = nd->GetCalibrationFile();
   m_SerialNumber = nd->GetSerialNumber();
   m_TrackingDeviceType = nd->GetTrackingDeviceType();
-  m_ToolRegistrationLandmarks = nd->GetToolRegistrationLandmarks();
-  m_ToolCalibrationLandmarks = nd->GetToolCalibrationLandmarks();
+  m_ToolLandmarks = nd->GetToolLandmarks();
+  m_ToolControlPoints = nd->GetToolControlPoints();
   m_ToolTipPosition = nd->GetToolTipPosition();
-  m_ToolTipOrientation = nd->GetToolTipOrientation();
-  m_ToolAxis = nd->GetToolAxis();
+  m_ToolAxisOrientation = nd->GetToolAxisOrientation();
 }
 
 bool mitk::NavigationTool::IsToolTipSet()
@@ -141,10 +179,10 @@ bool mitk::NavigationTool::IsToolTipSet()
   if ((m_ToolTipPosition[0] == 0) &&
     (m_ToolTipPosition[1] == 0) &&
     (m_ToolTipPosition[2] == 0) &&
-    (m_ToolTipOrientation.x() == 0) &&
-    (m_ToolTipOrientation.y() == 0) &&
-    (m_ToolTipOrientation.z() == 0) &&
-    (m_ToolTipOrientation.r() == 1))
+    (m_ToolAxisOrientation.x() == 0) &&
+    (m_ToolAxisOrientation.y() == 0) &&
+    (m_ToolAxisOrientation.z() == 0) &&
+    (m_ToolAxisOrientation.r() == 1))
     return false;
   else return true;
 }
@@ -304,19 +342,6 @@ void mitk::NavigationTool::SetDefaultSurface()
 
   mySphere->SetVtkPolyData(TrafoFilter->GetOutput());
 
-  //vtkCone->Delete();
-  //vtkSphere->Delete();
-  //vtkLine->Delete();
-  //vtkLine2->Delete();
-  //vtkLine3->Delete();
-  //vtkCylinder->Delete();
-  //ZTransform->Delete();
-  //XTransform->Delete();
-  //ScaleTransform->Delete();
-  //TrafoFilter->Delete();
-  //appendPolyData->Delete();
-  //surface->Delete();
-
   this->GetDataNode()->SetData(mySphere);
 }
 
@@ -329,8 +354,9 @@ std::string mitk::NavigationTool::GetStringWithAllToolInformation() const
     << "  Serial number: " << m_SerialNumber << "\n"
     << "  TrackingDeviceType: " << m_TrackingDeviceType << "\n"
     << "  ToolTip Position: " << m_ToolTipPosition << "\n"
-    << "  ToolTip Orientation: " << m_ToolTipOrientation << "\n"
-    << "  ToolTip Axis: " << m_ToolAxis;
+    << "  Tool Axis Orientation: " << m_ToolAxisOrientation << "\n"
+    << "  Tool Axis: " <<   m_ToolAxisOrientation.inverse().rotate(vnl_vector_fixed<mitk::ScalarType,3>(0.0,0.0,-1.0))
+    ;
 
   return _info.str();
 }

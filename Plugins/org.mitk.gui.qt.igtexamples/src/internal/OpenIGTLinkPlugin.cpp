@@ -27,6 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk image
 #include <mitkImage.h>
 
+//VTK
+#include <vtkSmartPointer.h>
+
 const std::string OpenIGTLinkPlugin::VIEW_ID = "org.mitk.views.openigtlinkplugin";
 
 void OpenIGTLinkPlugin::SetFocus()
@@ -50,8 +53,8 @@ void OpenIGTLinkPlugin::CreateQtPartControl(QWidget *parent)
 void OpenIGTLinkPlugin::UpdatePipeline()
 {
   m_NavigationDataObjectVisualizationFilter->Update();
-  mitk::Image::Pointer image2d = m_ImageFilter2D->GetNextImage();
-  mitk::Image::Pointer image3d = m_ImageFilter3D->GetNextImage();
+  mitk::Image::Pointer image2d = m_ImageFilter2D->GetNextImage().at(0);
+  mitk::Image::Pointer image3d = m_ImageFilter3D->GetNextImage().at(0);
 
   m_Image2dNode->SetName("US Image Stream");
   m_Image2dNode->SetData(image2d);
@@ -145,13 +148,12 @@ void OpenIGTLinkPlugin::ReceivingButtonClicked()
 
       //create small sphere and use it as surface
       mitk::Surface::Pointer mySphere = mitk::Surface::New();
-      vtkSphereSource *vtkData = vtkSphereSource::New();
-      vtkData->SetRadius(2.0f);
-      vtkData->SetCenter(0.0, 0.0, 0.0);
-      vtkData->Update();
+      vtkSmartPointer<vtkSphereSource> vtkSphere = vtkSmartPointer<vtkSphereSource>::New();
+      vtkSphere->SetRadius(2.0f);
+      vtkSphere->SetCenter(0.0, 0.0, 0.0);
+      vtkSphere->Update();
       mySphere->SetProperty("color", mitk::ColorProperty::New(1, 0, 0));
-      mySphere->SetVtkPolyData(vtkData->GetOutput());
-      vtkData->Delete();
+      mySphere->SetVtkPolyData(vtkSphere->GetOutput());
       newNode->SetData(mySphere);
 
       this->GetDataStorage()->Add(newNode);

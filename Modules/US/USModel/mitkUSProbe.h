@@ -40,6 +40,29 @@ namespace mitk {
       mitkNewMacro1Param(Self, std::string);
 
     /**
+    * \brief Struct to define a probe specific ultrasound image cropping.
+    */
+    typedef struct USProbeCropping_
+    {
+      unsigned int top;
+      unsigned int bottom;
+      unsigned int left;
+      unsigned int right;
+
+      USProbeCropping_()
+        : top(0), bottom(0), left(0), right(0) { };
+
+      USProbeCropping_(unsigned int top, unsigned int bottom, unsigned int left, unsigned int right)
+        : top(top), bottom(bottom), left(left), right(right) { };
+    }USProbeCropping;
+
+    /**
+    * \brief Sets the probe cropping.
+    */
+    void SetProbeCropping(unsigned int top, unsigned int bottom, unsigned int left, unsigned int right);
+    USProbeCropping GetProbeCropping();
+
+    /**
     * \brief Compares this probe to another probe and returns true if they are equal in terms of name AND NAME ONLY
     *  be sure to sufficiently extend this method along with further capabilities probes.
     */
@@ -57,7 +80,7 @@ namespace mitk {
     std::map<int, Vector3D> GetDepthsAndSpacing();
 
     /**
-    * \brief Sets a scanning depth of the probe with the default spacing (1,1,0). Exact spacing needs to be calibrated.
+    * \brief Sets a scanning depth of the probe with the default spacing (1,1,1). Exact spacing needs to be calibrated.
     */
     void SetDepth(int depth);
 
@@ -73,24 +96,35 @@ namespace mitk {
 
     /**
     * \brief Returns the spacing that is associated to the given depth of the probe.
-    *If spacing was not calibrated or if depth does not exist for this probe the default spacing (1,1,0) is returned.
+    *If spacing was not calibrated or if depth does not exist for this probe the default spacing (1,1,1) is returned.
     */
     Vector3D GetSpacingForGivenDepth(int givenDepth);
+
+    /**
+    * \brief Checks, whether the std::map m_DepthAndSpacings contains at least one depth element or not.
+    * \return True, if the the std::map m_DepthAndSpacings does not contain at least one depth element, else false.
+    */
+    bool IsDepthAndSpacingEmpty();
 
     //## getter and setter ##
 
     itkGetMacro(Name, std::string);
     itkSetMacro(Name, std::string);
+    itkGetMacro(CurrentDepth, double);
+    itkSetMacro(CurrentDepth, double);
 
   protected:
     USProbe();
     USProbe(std::string identifier);
-    virtual ~USProbe();
+    ~USProbe() override;
 
     std::string m_Name;
+    double m_CurrentDepth;
 
     // Map containing the depths and the associated spacings as an std::vector with depth as key and spacing as value
     std::map<int, Vector3D> m_DepthsAndSpacings;
+
+    USProbeCropping m_Cropping;
   };
 } // namespace mitk
 #endif

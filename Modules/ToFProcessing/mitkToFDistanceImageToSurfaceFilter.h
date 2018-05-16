@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCameraIntrinsics.h>
 #include "mitkCameraIntrinsics.h"
 #include <mitkPointSet.h>
-#include <cv.h>
 
 #include <vtkSmartPointer.h>
 #include <vtkIdList.h>
@@ -158,13 +157,13 @@ namespace mitk
     /*!
     \brief Standard destructor
     */
-    ~ToFDistanceImageToSurfaceFilter();
-    virtual void GenerateOutputInformation() override;
+    ~ToFDistanceImageToSurfaceFilter() override;
+    void GenerateOutputInformation() override;
     /*!
     \brief Method generating the output of this filter. Called in the updated process of the pipeline.
     This method generates the output of the ToFSurfaceSource: The generated surface of the 3d points
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
     /**
     * \brief Create an output for each input
     *

@@ -50,6 +50,7 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   : QmitkAbstractView()
   , m_Controls(nullptr)
   , m_DeviceTypeCollection(nullptr)
+  , m_ToolProjectionNode(nullptr)
 {
   m_TrackingLoggingTimer = new QTimer(this);
   m_TrackingRenderTimer = new QTimer(this);
@@ -57,7 +58,6 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   m_tracking = false;
   m_connected = false;
   m_logging = false;
-  m_ShowHideToolProjection = false;
   m_ShowHideToolAxis = false;
   m_loggedFrames = 0;
   m_SimpleModeEnabled = false;
@@ -178,6 +178,11 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     connect(m_Controls->m_SimpleUI, SIGNAL(clicked()), this, SLOT(OnToggleAdvancedSimpleMode()));
     connect(m_Controls->showHideToolProjectionCheckBox, SIGNAL(clicked()), this, SLOT(OnShowHideToolProjectionClicked()));
     connect(m_Controls->showHideToolAxisCheckBox, SIGNAL(clicked()), this, SLOT(OnShowHideToolAxisClicked()));
+
+    connect(m_Controls->m_toolselector, SIGNAL(currentIndexChanged(int)), this, SLOT(SelectToolProjection(int)));
+
+
+
 
     //connections for the tracking device configuration widget
     connect(m_Controls->m_ConfigurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
@@ -328,7 +333,7 @@ void QmitkMITKIGTTrackingToolboxView::OnResetTools()
   m_Controls->m_ToolLabel->setText(toolLabel);
   m_ToolStorageFilename = "";
 
-
+  RemoveAllToolProjections();
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnStartStopTracking()
@@ -358,39 +363,83 @@ void QmitkMITKIGTTrackingToolboxView::OnFreezeUnfreezeTracking()
   }
 }
 
-void QmitkMITKIGTTrackingToolboxView::OnShowHideToolProjectionClicked()
+void QmitkMITKIGTTrackingToolboxView::ShowToolProjection(int index)
 {
-  if( !m_ShowHideToolProjection )
+  mitk::DataNode::Pointer toolnode = m_toolStorage->GetTool(index)->GetDataNode();
+  QString ToolProjectionName = "ToolProjection" + QString::number(index);
+  m_ToolProjectionNode = this->GetDataStorage()->GetNamedNode(ToolProjectionName.toStdString());
+  //If node does not exist, create the node for the Pointset
+  if (m_ToolProjectionNode.IsNull())
   {
-    //Activate and show the tool projection
-    mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode("Tool Projection");
-    //If node does not exist, create the node for the Pointset
-    if( node.IsNull() )
+    m_ToolProjectionNode = mitk::DataNode::New();
+    m_ToolProjectionNode->SetName(ToolProjectionName.toStdString());
+    if (index < static_cast<int>(m_NeedleProjectionFilter->GetNumberOfInputs()))
     {
-      node = mitk::DataNode::New();
-      node->SetName("Tool Projection");
-      node->SetData(m_NeedleProjectionFilter->GetProjection());
-      node->SetBoolProperty("show contour", true);
-      this->GetDataStorage()->Add(node);
+      m_NeedleProjectionFilter->SelectInput(index);
+      m_NeedleProjectionFilter->Update();
+      m_ToolProjectionNode->SetData(m_NeedleProjectionFilter->GetProjection());
+
+      m_ToolProjectionNode->SetBoolProperty("show contour", true);
+      this->GetDataStorage()->Add(m_ToolProjectionNode, toolnode);
     }
-    else
-    {
-      node->SetBoolProperty("show contour", true);
-    }
-    //Enable the checkbox for displaying the (standard) tool axis
-    m_Controls->showHideToolAxisCheckBox->setEnabled(true);
-    m_ShowHideToolProjection = true;
+    //  this->FireNodeSelected(node);
   }
   else
   {
+    m_ToolProjectionNode->SetBoolProperty("show contour", true);
+  }
+}
+
+void QmitkMITKIGTTrackingToolboxView::RemoveAllToolProjections()
+{
+  for (size_t i = 0; i < m_toolStorage->GetToolCount(); i++)
+  {
+    QString toolProjectionName = "ToolProjection" + QString::number(i);
+
+    mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode(toolProjectionName.toStdString());
+
     //Deactivate and hide the tool projection
-    mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode("Tool Projection");
-    if( !node.IsNull() )
+    if (!node.IsNull())
     {
       this->GetDataStorage()->Remove(node);
     }
+  }
+}
+
+void QmitkMITKIGTTrackingToolboxView::SelectToolProjection(int idx)
+{
+  if (m_Controls->showHideToolProjectionCheckBox->isChecked())
+  {
+    //Deactivate and hide the tool projection
+    if (!m_ToolProjectionNode.IsNull())
+    {
+      this->GetDataStorage()->Remove(m_ToolProjectionNode);
+    }
+
+    if (m_NeedleProjectionFilter.IsNotNull())
+    {
+      m_NeedleProjectionFilter->Update();
+    }
+    //Refresh the view and the status widget
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    // Show the tool projection for the currently selected tool
+    ShowToolProjection(idx);
+  }
+}
+
+void QmitkMITKIGTTrackingToolboxView::OnShowHideToolProjectionClicked()
+{
+  int index =  m_Controls->m_toolselector->currentIndex();
+  //Activate and show the tool projection
+  if (m_Controls->showHideToolProjectionCheckBox->isChecked())
+  {
+    ShowToolProjection(index);
+    m_Controls->showHideToolAxisCheckBox->setEnabled(true);
+  }
+  else
+  {
+    RemoveAllToolProjections();
     m_Controls->showHideToolAxisCheckBox->setEnabled(false);
-    m_ShowHideToolProjection = false;
   }
   if( m_NeedleProjectionFilter.IsNotNull() )
   {
@@ -398,7 +447,7 @@ void QmitkMITKIGTTrackingToolboxView::OnShowHideToolProjectionClicked()
   }
   //Refresh the view and the status widget
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  m_Controls->m_TrackingToolsStatusWidget->Refresh();
+//  m_Controls->m_TrackingToolsStatusWidget->Refresh();
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnShowHideToolAxisClicked()
@@ -423,7 +472,7 @@ void QmitkMITKIGTTrackingToolboxView::OnShowHideToolAxisClicked()
   }
   //Refresh the view and the status widget
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  m_Controls->m_TrackingToolsStatusWidget->Refresh();
+ // m_Controls->m_TrackingToolsStatusWidget->Refresh();
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnConnectDisconnect()
@@ -500,7 +549,10 @@ void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString er
   {
     //Connect the NeedleProjectionFilter to the ToolVisualizationFilter as third filter of the IGT pipeline
     m_NeedleProjectionFilter->ConnectTo(m_ToolVisualizationFilter);
-    m_NeedleProjectionFilter->SelectInput(0);
+    if (m_Controls->showHideToolProjectionCheckBox->isChecked())
+    {
+      ShowToolProjection(m_Controls->m_toolselector->currentIndex());
+    }
   }
 
   //! [Thread 6]
@@ -650,13 +702,27 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
 
 void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
 {
-  if (!m_tracking) return;
+	if (!m_tracking) return;
+  for (unsigned int i = 0; i < m_ToolVisualizationFilter->GetNumberOfIndexedOutputs(); i++)
+  {
+	mitk::NavigationData::Pointer currentTool = m_ToolVisualizationFilter->GetOutput(i);
+	if (currentTool->IsDataValid())
+	{
+  	 this->m_toolStorage->GetTool(i)->GetDataNode()->SetColor(mitk::IGTColor_INVALID);
+	}
+  }
+
+  //refresh view and status widget
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+
   m_TrackingRenderTimer->stop();
   m_TrackingLoggingTimer->stop();
 
   m_Worker->SetWorkerMethod(QmitkMITKIGTTrackingToolboxViewWorker::eStopTracking);
   m_WorkerThread->start();
   m_Controls->m_MainWidget->setEnabled(false);
+
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnStopTrackingFinished(bool success, QString errorMessage)
@@ -697,15 +763,15 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
   {
     Type = m_Controls->m_ConfigurationWidget->GetTrackingDevice()->GetType();
     //enable controls because device is valid
-    m_Controls->m_TrackingToolsGoupBox->setEnabled(true);
-    m_Controls->m_TrackingControlsGroupBox->setEnabled(true);
+    m_Controls->m_TrackingToolsFrame->setEnabled(true);
+    m_Controls->m_TrackingControlsFrame->setEnabled(true);
   }
   else
   {
     Type = mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName();
     MessageBox("Error: This tracking device is not included in this project. Please make sure that the device is installed and activated in your MITK build.");
-    m_Controls->m_TrackingToolsGoupBox->setEnabled(false);
-    m_Controls->m_TrackingControlsGroupBox->setEnabled(false);
+    m_Controls->m_TrackingToolsFrame->setEnabled(false);
+    m_Controls->m_TrackingControlsFrame->setEnabled(false);
     return;
   }
 
@@ -777,7 +843,7 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
     m_Worker->SetTrackingDevice(m_Controls->m_ConfigurationWidget->GetTrackingDevice().GetPointer());
     m_Worker->SetDataStorage(this->GetDataStorage());
     m_WorkerThread->start();
-    m_TimeoutTimer->start(7000);
+    m_TimeoutTimer->start(30000);
     //disable controls until worker thread is finished
     this->m_Controls->m_MainWidget->setEnabled(false);
   }
@@ -858,6 +924,7 @@ void QmitkMITKIGTTrackingToolboxView::UpdateRenderTrackingTimer()
     mitk::NavigationData::Pointer currentTool = m_ToolVisualizationFilter->GetOutput(i);
     if (currentTool->IsDataValid())
     {
+		
       this->m_toolStorage->GetTool(i)->GetDataNode()->SetColor(mitk::IGTColor_VALID);
     }
     else
@@ -871,7 +938,7 @@ void QmitkMITKIGTTrackingToolboxView::UpdateRenderTrackingTimer()
   {
     m_NeedleProjectionFilter->Update();
   }
-
+  
   //refresh view and status widget
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   m_Controls->m_TrackingToolsStatusWidget->Refresh();
@@ -1114,6 +1181,10 @@ void QmitkMITKIGTTrackingToolboxView::OnAddSingleToolFinished()
   m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
   m_Controls->m_ToolLabel->setText("<manually added>");
 
+  //displya in tool selector
+ // m_Controls->m_toolselector->addItem(QString::fromStdString(m_Controls->m_NavigationToolCreationWidget->GetCreatedTool()->GetToolName()));
+
+
   //auto save current storage for persistence
   MITK_INFO << "Auto saving manually added tools for persistence.";
   AutoSaveToolStorage();
@@ -1139,7 +1210,7 @@ void QmitkMITKIGTTrackingToolboxView::GlobalReinit()
 
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
   // calculate bounding geometry of these nodes
-  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
+  auto bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
 
   // initialize the views to the bounding geometry
   mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
@@ -1200,12 +1271,12 @@ void QmitkMITKIGTTrackingToolboxView::EnableOptionsButtons()
 
 void QmitkMITKIGTTrackingToolboxView::EnableTrackingControls()
 {
-  m_Controls->m_TrackingControlsGroupBox->setEnabled(true);
+  m_Controls->m_TrackingControlsFrame->setEnabled(true);
 }
 
 void QmitkMITKIGTTrackingToolboxView::DisableTrackingControls()
 {
-  m_Controls->m_TrackingControlsGroupBox->setEnabled(false);
+  m_Controls->m_TrackingControlsFrame->setEnabled(false);
 }
 
 void QmitkMITKIGTTrackingToolboxView::EnableTrackingConfigurationButtons()
@@ -1260,6 +1331,12 @@ void QmitkMITKIGTTrackingToolboxView::OnToolStorageChanged(const ctkServiceEvent
   if (!m_connected && (event.getType() == ctkServiceEvent::MODIFIED))
   {
     m_Controls->m_ConfigurationWidget->OnToolStorageChanged();
+
+    m_Controls->m_toolselector->clear();
+    for (size_t i = 0; i < m_toolStorage->GetToolCount(); i++)
+    {
+      m_Controls->m_toolselector->addItem(QString::fromStdString(m_toolStorage->GetTool(i)->GetToolName()));
+    }
   }
 }
 
@@ -1292,7 +1369,7 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
   settings.beginGroup(QString::fromStdString(VIEW_ID));
 
   // set some widgets and attributes by the values from the QSettings
-  m_Controls->m_ShowTrackingVolume->setChecked(settings.value("ShowTrackingVolume", true).toBool());
+  m_Controls->m_ShowTrackingVolume->setChecked(settings.value("ShowTrackingVolume", false).toBool());
   m_Controls->m_EnableOpenIGTLinkMicroService->setChecked(settings.value("EnableOpenIGTLinkMicroService", true).toBool());
   m_Controls->m_VolumeSelectionBox->setCurrentIndex(settings.value("VolumeSelectionBox", 0).toInt());
   m_Controls->m_OpenIGTLinkDataFormat->setCurrentIndex(settings.value("OpenIGTLinkDataFormat", 0).toInt());
@@ -1320,9 +1397,9 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
       m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
       m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
     }
-    catch (mitk::IGTException)
+    catch (mitk::IGTException e)
     {
-      MITK_WARN("QmitkMITKIGTTrackingToolBoxView") << "Error during restoring tools. Problems with file (" << m_ToolStorageFilename.toStdString() << "), please check the file?";
+      MITK_WARN("QmitkMITKIGTTrackingToolBoxView") << "Error during restoring tools. Problems with file (" << m_ToolStorageFilename.toStdString() << "), please check the file? Error message: "<<e.GetDescription();
       this->OnResetTools(); //if there where errors reset the tool storage to avoid problems later on
     }
   }

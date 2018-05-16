@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkMutexLock.h"
 
 // opencv headers
-#include "cv.h"
+#include <opencv2/core.hpp>
 
 namespace itk {
 template<unsigned int T> class Index;
@@ -69,7 +69,7 @@ public:
   itkCloneMacro(Self)
 
   GrabCutOpenCVImageFilter();
-  virtual ~GrabCutOpenCVImageFilter();
+  ~GrabCutOpenCVImageFilter() override;
 
   /**
    * \brief Implementation of the virtual image filtering method.

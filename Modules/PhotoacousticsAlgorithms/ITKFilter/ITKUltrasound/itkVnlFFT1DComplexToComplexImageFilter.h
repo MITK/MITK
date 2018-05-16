@@ -71,9 +71,9 @@ public:
 
 protected:
   VnlFFT1DComplexToComplexImageFilter() {}
-  virtual ~VnlFFT1DComplexToComplexImageFilter() {}
+  ~VnlFFT1DComplexToComplexImageFilter() override {}
 
-  virtual void ThreadedGenerateData( const OutputImageRegionType&, ThreadIdType threadID ) ITK_OVERRIDE;
+  void ThreadedGenerateData( const OutputImageRegionType&, ThreadIdType threadID ) ITK_OVERRIDE;
 
 private:
   VnlFFT1DComplexToComplexImageFilter(const Self&); //purposely not implemented

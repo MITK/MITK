@@ -48,9 +48,9 @@ public:
     m_Filter = mitk::ManualSegmentationToSurfaceFilter::New();
     if (parameter.size() == 2)
     {
-      m_Filter->SetInput(dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(GetTestDataFilePath(parameter.at(0)))[0].GetPointer()));
+      m_Filter->SetInput(mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath(parameter.at(0))));
       // For the tests which have reference data
-      m_ReferenceSurface = dynamic_cast<mitk::Surface*>(mitk::IOUtil::Load(GetTestDataFilePath(parameter.at(1)))[0].GetPointer());
+      m_ReferenceSurface = mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath(parameter.at(1)));
     }
     else
     {

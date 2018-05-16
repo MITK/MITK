@@ -80,6 +80,8 @@ namespace mitk {
     enum DeviceStates { State_NoState, State_Initialized, State_Connected, State_Activated };
 
     mitkClassMacro(USDevice, mitk::ImageSource);
+    itkSetMacro(SpawnAcquireThread, bool);
+    itkGetMacro(SpawnAcquireThread, bool);
 
     struct USImageCropArea
     {
@@ -141,10 +143,10 @@ namespace mitk {
      */
     mitkNewMessage2Macro(PropertyChanged, const std::string&, const std::string&)
 
-      /**
-       * \return keys for the microservice properties of ultrasound devices
-       */
-       static mitk::USDevice::PropertyKeys GetPropertyKeys();
+    /**
+     * \return keys for the microservice properties of ultrasound devices
+     */
+    static mitk::USDevice::PropertyKeys GetPropertyKeys();
 
     /**
     * \brief Default getter for the custom control interface.
@@ -289,6 +291,9 @@ namespace mitk {
     /* @return Returns the area that will be cropped from the US image. Is disabled / [0,0,0,0] by default. */
     mitk::USDevice::USImageCropArea GetCropArea();
 
+    /* @return Returns the size of the m_ImageVector of the ultrasound device.*/
+    unsigned int GetSizeOfImageVector();
+
     /** @return Returns the current image source of this device. */
     virtual USImageSource::Pointer GetUSImageSource() = 0;
 
@@ -308,20 +313,38 @@ namespace mitk {
     void SetComment(std::string comment);
 
     itkGetMacro(DeviceState, DeviceStates)
-      itkGetMacro(ServiceProperties, us::ServiceProperties)
+    itkGetMacro(ServiceProperties, us::ServiceProperties)
 
-      void GrabImage();
+    void GrabImage();
+
+    virtual void SetSpacing(double xSpacing, double ySpacing);
+
 
   protected:
-    itkSetMacro(Image, mitk::Image::Pointer);
-    itkSetMacro(SpawnAcquireThread, bool);
-    itkGetMacro(SpawnAcquireThread, bool);
+
+    // Threading-Related
+    itk::ConditionVariable::Pointer m_FreezeBarrier;
+    itk::SimpleMutexLock        m_FreezeMutex;
+    itk::MultiThreader::Pointer m_MultiThreader; ///< itk::MultiThreader used for thread handling
+    itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the image source
+    int m_ThreadID; ///< ID of the started thread
+
+    virtual void SetImageVector(std::vector<mitk::Image::Pointer> vec)
+    {
+      if (this->m_ImageVector != vec)                   
+      {                                             
+      this->m_ImageVector = vec;
+      this->Modified();                             
+      } 
+    }
 
     static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
     static ITK_THREAD_RETURN_TYPE ConnectThread(void* pInfoStruct);
 
-    mitk::Image::Pointer m_Image;
-    mitk::Image::Pointer m_OutputImage;
+    std::vector<mitk::Image::Pointer> m_ImageVector;
+
+    // Variables to determine if spacing was calibrated and needs to be applied to the incoming images
+    mitk::Vector3D m_Spacing;
 
     /**
     * \brief Registers an OpenIGTLink device as a microservice so that we can send the images of
@@ -425,15 +448,28 @@ namespace mitk {
     */
     USDevice(mitk::USImageMetadata::Pointer metadata);
 
-    virtual ~USDevice();
+    ~USDevice() override;
 
     /**
     * \brief Grabs the next frame from the Video input.
     * This method is called internally, whenever Update() is invoked by an Output.
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     std::string GetServicePropertyLabel();
+
+    unsigned int m_NumberOfOutputs;
+
+    /**
+    * \brief Properties of the device's Microservice.
+    */
+    us::ServiceProperties m_ServiceProperties;
+
+        /**
+    *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
+    */
+    us::ServiceRegistration<Self> m_ServiceRegistration;
+
 
   private:
 
@@ -442,23 +478,6 @@ namespace mitk {
     std::string m_Comment;
 
     bool m_SpawnAcquireThread;
-
-    /**
-    *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
-    */
-    us::ServiceRegistration<Self> m_ServiceRegistration;
-
-    /**
-    * \brief Properties of the device's Microservice.
-    */
-    us::ServiceProperties m_ServiceProperties;
-
-    // Threading-Related
-    itk::ConditionVariable::Pointer m_FreezeBarrier;
-    itk::SimpleMutexLock        m_FreezeMutex;
-    itk::MultiThreader::Pointer m_MultiThreader; ///< itk::MultiThreader used for thread handling
-    itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the image source
-    int m_ThreadID; ///< ID of the started thread
 
     bool m_UnregisteringStarted;
   };

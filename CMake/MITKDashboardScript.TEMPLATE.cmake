@@ -7,7 +7,7 @@
 # Note: The specific version and processor type of this machine should be reported in the
 # header above. Indeed, this file will be send to the dashboard as a NOTE file.
 
-cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 
 #
 # Dashboard properties
@@ -139,7 +139,8 @@ if(NOT DEFINED GIT_BRANCH OR GIT_BRANCH STREQUAL "")
   set(url "https://raw.githubusercontent.com/MITK/MITK/master/CMake/MITKDashboardSetup.cmake")
 else()
   set(IS_PHABRICATOR_URL TRUE)
-  set(url "https://phabricator.mitk.org/source/mitk/browse/${GIT_BRANCH}/CMake/MITKDashboardSetup.cmake?view=raw")
+  string(REPLACE "/" "%252F" GIT_BRANCH_URL ${GIT_BRANCH})
+  set(url "https://phabricator.mitk.org/source/mitk/browse/${GIT_BRANCH_URL}/CMake/MITKDashboardSetup.cmake?view=raw")
 endif()
 set(dest ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}.setup)
 downloadFile("${url}" "${dest}")

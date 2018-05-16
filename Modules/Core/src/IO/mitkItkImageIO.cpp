@@ -85,7 +85,7 @@ namespace mitk
       extensions.push_back("he5");
       extensions.push_back("hd5");
     }
-    else if (imageIOName == "GE4ImageIO" || imageIOName == "GE5ImageIO")
+    else if ("GE4ImageIO" == imageIOName || "GE5ImageIO" == imageIOName || "Bruker2dseqImageIO" == imageIOName)
     {
       extensions.push_back("");
     }
@@ -96,6 +96,22 @@ namespace mitk
     }
 
     return extensions;
+  }
+
+  void ItkImageIO::FixUpCustomMimeTypeName(const std::string &imageIOName, CustomMimeType &customMimeType)
+  {
+    if ("GE4ImageIO" == imageIOName)
+    {
+      customMimeType.SetName(this->AbstractFileReader::GetMimeTypePrefix() + "ge4");
+    }
+    else if ("GE5ImageIO" == imageIOName)
+    {
+      customMimeType.SetName(this->AbstractFileReader::GetMimeTypePrefix() + "ge5");
+    }
+    else if ("Bruker2dseqImageIO" == imageIOName)
+    {
+      customMimeType.SetName(this->AbstractFileReader::GetMimeTypePrefix() + "bruker2dseq");
+    }
   }
 
   ItkImageIO::ItkImageIO(itk::ImageIOBase::Pointer imageIO)
@@ -131,6 +147,14 @@ namespace mitk
       }
       customReaderMimeType.AddExtension(extension);
     }
+
+    auto extensions = customReaderMimeType.GetExtensions();
+    if (extensions.empty() || (extensions.size() == 1 && extensions[0].empty()))
+    {
+      std::string imageIOName = m_ImageIO->GetNameOfClass();
+      FixUpCustomMimeTypeName(imageIOName, customReaderMimeType);
+    }
+
     this->AbstractFileReader::SetMimeType(customReaderMimeType);
 
     std::vector<std::string> writeExtensions = imageIO->GetSupportedWriteExtensions();
@@ -156,6 +180,14 @@ namespace mitk
         }
         customWriterMimeType.AddExtension(extension);
       }
+
+      auto extensions = customWriterMimeType.GetExtensions();
+      if (extensions.empty() || (extensions.size() == 1 && extensions[0].empty()))
+      {
+        std::string imageIOName = m_ImageIO->GetNameOfClass();
+        FixUpCustomMimeTypeName(imageIOName, customWriterMimeType);
+      }
+
       this->AbstractFileWriter::SetMimeType(customWriterMimeType);
     }
 
@@ -621,8 +653,8 @@ namespace mitk
 
         itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(), key, value);
       }
-
       ImageReadAccessor imageAccess(image);
+      LocaleSwitch localeSwitch2("C");
       m_ImageIO->Write(imageAccess.GetData());
     }
     catch (const std::exception &e)

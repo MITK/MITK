@@ -229,36 +229,36 @@ void mitkImageStatisticsCalculatorTestSuite::setUp()
 
   MITK_TEST_OUTPUT(<< "Loading test image '" << filename << "'")
 
-  m_TestImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(filename)[0].GetPointer());
+  m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
   MITK_TEST_CONDITION_REQUIRED( m_TestImage.IsNotNull(), "Loaded an mitk::Image" );
 
   m_Geometry = m_TestImage->GetSlicedGeometry()->GetPlaneGeometry(0);
   MITK_TEST_CONDITION_REQUIRED( m_Geometry.IsNotNull(), "Getting image geometry" );
 
-  m_Pic3DImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(Pic3DFile)[0].GetPointer());
+  m_Pic3DImage = mitk::IOUtil::Load<mitk::Image>(Pic3DFile);
   MITK_TEST_CONDITION_REQUIRED( m_Pic3DImage.IsNotNull(), "Loaded Pic3D" );
-  m_Pic3DImageMask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(Pic3DImageMaskFile)[0].GetPointer());
+  m_Pic3DImageMask = mitk::IOUtil::Load<mitk::Image>(Pic3DImageMaskFile);
   MITK_TEST_CONDITION_REQUIRED( m_Pic3DImageMask.IsNotNull(), "Loaded Pic3D image mask" );
-  m_Pic3DImageMask2 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(Pic3DImageMaskFile2)[0].GetPointer());
+  m_Pic3DImageMask2 = mitk::IOUtil::Load<mitk::Image>(Pic3DImageMaskFile2);
   MITK_TEST_CONDITION_REQUIRED( m_Pic3DImageMask2.IsNotNull(), "Loaded Pic3D image secondary mask" );
-  m_Pic3DPlanarFigureAxial = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::Load(Pic3DAxialPlanarFigureFile)[0].GetPointer());
+  m_Pic3DPlanarFigureAxial = mitk::IOUtil::Load<mitk::PlanarFigure>(Pic3DAxialPlanarFigureFile);
   MITK_TEST_CONDITION_REQUIRED( m_Pic3DPlanarFigureAxial.IsNotNull(), "Loaded Pic3D axial planarFigure" );
-  m_Pic3DPlanarFigureSagittal = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::Load(Pic3DSagittalPlanarFigureFile)[0].GetPointer());
+  m_Pic3DPlanarFigureSagittal = mitk::IOUtil::Load<mitk::PlanarFigure>(Pic3DSagittalPlanarFigureFile);
   MITK_TEST_CONDITION_REQUIRED( m_Pic3DPlanarFigureSagittal.IsNotNull(), "Loaded Pic3D sagittal planarFigure" );
-  m_Pic3DPlanarFigureCoronal = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::Load(Pic3DCoronalPlanarFigureFile)[0].GetPointer());
+  m_Pic3DPlanarFigureCoronal = mitk::IOUtil::Load<mitk::PlanarFigure>(Pic3DCoronalPlanarFigureFile);
   MITK_TEST_CONDITION_REQUIRED( m_Pic3DPlanarFigureCoronal.IsNotNull(), "Loaded Pic3D coronal planarFigure" );
 
-  m_US4DImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(US4DFile)[0].GetPointer());
+  m_US4DImage = mitk::IOUtil::Load<mitk::Image>(US4DFile);
   MITK_TEST_CONDITION_REQUIRED( m_US4DImage.IsNotNull(), "Loaded US4D" );
-  m_US4DImageMask = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(US4DImageMaskFile)[0].GetPointer());
+  m_US4DImageMask = mitk::IOUtil::Load<mitk::Image>(US4DImageMaskFile);
   MITK_TEST_CONDITION_REQUIRED( m_US4DImageMask.IsNotNull(), "Loaded US4D image mask" );
-  m_US4DImageMask2 = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(US4DImageMaskFile2)[0].GetPointer());
+  m_US4DImageMask2 = mitk::IOUtil::Load<mitk::Image>(US4DImageMaskFile2);
   MITK_TEST_CONDITION_REQUIRED( m_US4DImageMask2.IsNotNull(), "Loaded US4D image mask2" );
-  m_US4DPlanarFigureAxial = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::Load(US4DAxialPlanarFigureFile)[0].GetPointer());
+  m_US4DPlanarFigureAxial = mitk::IOUtil::Load<mitk::PlanarFigure>(US4DAxialPlanarFigureFile);
   MITK_TEST_CONDITION_REQUIRED( m_US4DPlanarFigureAxial.IsNotNull(), "Loaded US4D axial planarFigure" );
-  m_US4DPlanarFigureSagittal = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::Load(US4DSagittalPlanarFigureFile)[0].GetPointer());
+  m_US4DPlanarFigureSagittal = mitk::IOUtil::Load<mitk::PlanarFigure>(US4DSagittalPlanarFigureFile);
   MITK_TEST_CONDITION_REQUIRED( m_US4DPlanarFigureSagittal.IsNotNull(), "Loaded US4D sagittal planarFigure" );
-  m_US4DPlanarFigureCoronal = dynamic_cast<mitk::PlanarFigure*>(mitk::IOUtil::Load(US4DCoronalPlanarFigureFile)[0].GetPointer());
+  m_US4DPlanarFigureCoronal = mitk::IOUtil::Load<mitk::PlanarFigure>(US4DCoronalPlanarFigureFile);
   MITK_TEST_CONDITION_REQUIRED( m_US4DPlanarFigureCoronal.IsNotNull(), "Loaded US4D coronal planarFigure" );
 
 }

@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
   }
 
   mitk::BaseData::Pointer data = mitk::IOUtil::Load(parsedArgs["polydata"].ToString())[0];
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(parsedArgs["image"].ToString())[0].GetPointer());
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(parsedArgs["image"].ToString());
 
   //MITK_INFO << data;
   mitk::Surface::Pointer surf = dynamic_cast<mitk::Surface*>(data.GetPointer());

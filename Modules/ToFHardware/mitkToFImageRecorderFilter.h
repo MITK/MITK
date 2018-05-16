@@ -72,13 +72,13 @@ namespace mitk
     \brief sets the input of this filter
     \param input is the distance image of e.g. a ToF camera
     */
-    virtual void SetInput( const InputImageType* input) override;
+    void SetInput( const InputImageType* input) override;
     /*!
     \brief sets the input of this filter at idx
     \param idx number of the current input
     \param input is the distance image of e.g. a ToF camera
     */
-    virtual void SetInput(unsigned int idx,  const InputImageType* input) override;
+    void SetInput(unsigned int idx,  const InputImageType* input) override;
     /*!
     \brief returns the input of this filter
     */
@@ -96,12 +96,12 @@ namespace mitk
     /*!
     \brief standard destructor
     */
-    ~ToFImageRecorderFilter();
+    ~ToFImageRecorderFilter() override;
     /*!
     \brief method generating the output of this filter. Called in the updated process of the pipeline.
     This method generates the output of the ToFSurfaceSource: The generated surface of the 3d points
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
     /**
     * \brief Create an output for each input
     *

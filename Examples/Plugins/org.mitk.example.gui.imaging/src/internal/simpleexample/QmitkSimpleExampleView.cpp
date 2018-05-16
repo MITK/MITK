@@ -126,7 +126,7 @@ void QmitkSimpleExampleView::InitNavigators()
     mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
   /* calculate bounding geometry of these nodes */
-  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
+  auto bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
   /* initialize the views to the bounding geometry */
   m_NavigatorsInitialized = mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }

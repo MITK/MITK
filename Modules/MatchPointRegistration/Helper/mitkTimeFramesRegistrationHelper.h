@@ -121,7 +121,7 @@ namespace mitk
       m_Registered4DImage = nullptr;
     };
 
-    ~TimeFramesRegistrationHelper() {};
+    ~TimeFramesRegistrationHelper() override {};
 
     RegistrationPointer DoFrameRegistration(const mitk::Image* movingFrame,
                                             const mitk::Image* targetFrame, const mitk::Image* targetMask) const;

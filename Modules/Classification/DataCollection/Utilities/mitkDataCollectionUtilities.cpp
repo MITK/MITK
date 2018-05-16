@@ -238,7 +238,7 @@ void mitk::DCUtilities::EnsureUCharImageInDC(mitk::DataCollection::Pointer dc, s
   for (std::size_t i = 0; i < dc->Size();++i)
   {
     mitk::DataCollection* newCol = dynamic_cast<mitk::DataCollection*>(dc->GetData(i).GetPointer());
-    if (newCol != 0)
+    if (newCol != nullptr)
     {
       EnsureUCharImageInDC(newCol, name, origin);
     }
@@ -275,7 +275,7 @@ void mitk::DCUtilities::EnsureDoubleImageInDC(mitk::DataCollection::Pointer dc, 
   for (std::size_t i = 0; i < dc->Size();++i)
   {
     mitk::DataCollection* newCol = dynamic_cast<mitk::DataCollection*>(dc->GetData(i).GetPointer());
-    if (newCol != 0)
+    if (newCol != nullptr)
     {
       EnsureDoubleImageInDC(newCol, name, origin);
     }

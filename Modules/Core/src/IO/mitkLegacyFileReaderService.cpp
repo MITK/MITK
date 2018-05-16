@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLegacyFileReaderService.h"
 
 #include <mitkCustomMimeType.h>
-#include <mitkDicomSeriesReader.h>
 #include <mitkIOAdapter.h>
 #include <mitkIOMimeTypes.h>
 #include <mitkProgressBar.h>

@@ -54,7 +54,7 @@ public:
   /*!
   \brief default constructor
   */
-  QmitkIGTPlayerWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkIGTPlayerWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
 
   /*!
   \brief default deconstructor

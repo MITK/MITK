@@ -160,8 +160,6 @@ set(MODULE_TESTSURFACE
 
 set(MODULE_CUSTOM_TESTS
     mitkDataStorageTest.cpp
-    mitkDicomSeriesReaderTest.cpp
-    mitkDICOMLocaleTest.cpp
     mitkDataNodeTest.cpp
     mitkEventConfigTest.cpp
     mitkPointSetLocaleTest.cpp
@@ -176,7 +174,6 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DOpacityTransferFunctionTest.cpp
     mitkImageVtkMapper2DLookupTableTest.cpp
     mitkSurfaceVtkMapper3DTest
-    mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
     mitkVolumeCalculatorTest.cpp
     mitkLevelWindowManagerTest.cpp
     mitkPointSetVtkMapper2DTest.cpp
@@ -187,7 +184,6 @@ set(MODULE_CUSTOM_TESTS
     mitkMultiComponentImageDataComparisonFilterTest.cpp
     mitkImageToItkTest.cpp
     mitkImageSliceSelectorTest.cpp
-    mitkSurfaceDepthPeelingTest.cpp
 )
 
 # Currently not working on windows because of a rendering timing issue

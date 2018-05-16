@@ -64,7 +64,7 @@ namespace mitk {
     /**
     * \brief filter execute method
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     using Superclass::SetInput;
 
@@ -124,7 +124,7 @@ namespace mitk {
   protected:
     NavigationDataToIGTLMessageFilter();
 
-    virtual ~NavigationDataToIGTLMessageFilter();
+    ~NavigationDataToIGTLMessageFilter() override;
 
     /**
     * \brief Generates the output

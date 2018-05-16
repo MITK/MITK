@@ -26,7 +26,6 @@ class QmitkContourModelToImageWidget;
 class QmitkImageMaskingWidget;
 class QmitkMorphologicalOperationsWidget;
 class QmitkSurfaceToImageWidget;
-class QmitkCTKWidgetsWidget;
 
 class QmitkSegmentationUtilitiesView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
@@ -51,7 +50,6 @@ private:
   QmitkImageMaskingWidget* m_ImageMaskingWidget;
   QmitkMorphologicalOperationsWidget* m_MorphologicalOperationsWidget;
   QmitkSurfaceToImageWidget* m_SurfaceToImageWidget;
-  QmitkCTKWidgetsWidget* m_CTKWidgetsWidget;
 };
 
 #endif

@@ -37,7 +37,7 @@ QmitkPointListView::QmitkPointListView(QWidget *parent)
 {
   QListView::setAlternatingRowColors(true);
 
-  QListView::setSelectionBehavior(QAbstractItemView::SelectRows);
+  QListView::setSelectionBehavior(QAbstractItemView::SelectItems);
   QListView::setSelectionMode(QAbstractItemView::SingleSelection);
   QListView::setModel(m_PointListModel);
   QString tooltip = QString("Use the F2/F3 keys to move a point up/down, the Del key to remove a point\nand the mouse "
@@ -45,10 +45,6 @@ QmitkPointListView::QmitkPointListView(QWidget *parent)
                       .arg(0);
   QListView::setToolTip(tooltip);
   this->setContextMenuPolicy(Qt::CustomContextMenu);
-
-  m_TimeStepFaderLabel = new QLabel(this);
-  QFont font("Arial", 17);
-  m_TimeStepFaderLabel->setFont(font);
 
   this->setMinimumHeight(40);
 
@@ -156,6 +152,9 @@ void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection &select
   // update selection of all points in pointset: select the one(s) that are selected in the view, deselect all others
   QModelIndexList selectedIndexes = selected.indexes();
 
+  // only call setSelectInfo on a point set with 'selected = true' if you deselcted the other entries
+  int indexToSelect = -1;
+
   for (mitk::PointSet::PointsContainer::Iterator it =
          pointSet->GetPointSet(m_PointListModel->GetTimeStep())->GetPoints()->Begin();
        it != pointSet->GetPointSet(m_PointListModel->GetTimeStep())->GetPoints()->End();
@@ -166,18 +165,23 @@ void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection &select
     {
       if (selectedIndexes.indexOf(index) != -1) // index is found in the selected indices list
       {
-        pointSet->SetSelectInfo(it->Index(), true, m_PointListModel->GetTimeStep());
-
-        mitk::Point3D p = pointSet->GetPoint(it->Index(), m_PointListModel->GetTimeStep());
-
-        for (auto snc : m_Sncs)
-          snc->SelectSliceByPoint(p);
+		indexToSelect = it->Index();
       }
       else
       {
         pointSet->SetSelectInfo(it->Index(), false, m_PointListModel->GetTimeStep());
       }
     }
+  }
+
+  // force selection of only one index after deselecting the others
+  if (indexToSelect > -1) {
+	  pointSet->SetSelectInfo(indexToSelect, true, m_PointListModel->GetTimeStep());
+
+	  mitk::Point3D p = pointSet->GetPoint(indexToSelect, m_PointListModel->GetTimeStep());
+
+	  for (auto snc : m_Sncs)
+		  snc->SelectSliceByPoint(p);
   }
 
   m_SelfCall = false;
@@ -242,48 +246,7 @@ void QmitkPointListView::wheelEvent(QWheelEvent *event)
                       .arg(currentTS);
   this->setToolTip(tooltip);
 
-  fadeTimeStepIn();
-}
-
-void QmitkPointListView::fadeTimeStepIn()
-{
-  // Setup Widget
-  QWidget *m_TimeStepFader = new QWidget(this);
-  QHBoxLayout *layout = new QHBoxLayout(m_TimeStepFader);
-
-  int x = (int)(this->geometry().x() + this->width() * 0.6);
-  int y = (int)(this->geometry().y() + this->height() * 0.8);
-  m_TimeStepFader->move(x, y);
-  m_TimeStepFader->resize(60, 55);
-  m_TimeStepFader->setLayout(layout);
-  m_TimeStepFader->setAttribute(Qt::WA_DeleteOnClose);
-
-  layout->addWidget(m_TimeStepFaderLabel);
-  m_TimeStepFaderLabel->setAlignment(Qt::AlignCenter);
-  m_TimeStepFaderLabel->setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
-  m_TimeStepFaderLabel->setLineWidth(2);
-  m_TimeStepFaderLabel->setText(QString("%1").arg(this->m_PointListModel->GetTimeStep()));
-
-  // give the widget opacity and some colour
-  QPalette pal = m_TimeStepFaderLabel->palette();
-  QColor semiTransparentColor(139, 192, 223, 50);
-  QColor labelTransparentColor(0, 0, 0, 200);
-  pal.setColor(m_TimeStepFaderLabel->backgroundRole(), semiTransparentColor);
-  pal.setColor(m_TimeStepFaderLabel->foregroundRole(), labelTransparentColor);
-  m_TimeStepFaderLabel->setAutoFillBackground(true);
-  m_TimeStepFaderLabel->setPalette(pal);
-
-  // show the widget
-  m_TimeStepFader->show();
-
-  // and start the timer
-  m_TimeStepFaderLabel->setVisible(true);
-  QTimer::singleShot(2000, this, SLOT(fadeTimeStepOut()));
-}
-
-void QmitkPointListView::fadeTimeStepOut()
-{
-  m_TimeStepFaderLabel->hide();
+  emit SignalTimeStepChanged(currentTS);
 }
 
 void QmitkPointListView::ctxMenu(const QPoint &pos)

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkUSNewVideoDeviceWidgetControls.h"
 #include "mitkUSVideoDevice.h"
 #include "mitkUSIGTLDevice.h"
+#include "mitkUSDeviceReaderXML.h"
 
 //QT headers
 #include <QWidget>
@@ -42,8 +43,8 @@ public:
 
   static const std::string VIEW_ID;
 
-  QmitkUSNewVideoDeviceWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
-  virtual ~QmitkUSNewVideoDeviceWidget();
+  QmitkUSNewVideoDeviceWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
+  ~QmitkUSNewVideoDeviceWidget() override;
 
   /* @brief This method is part of the widget an needs not to be called seperately. */
   virtual void CreateQtPartControl(QWidget *parent);
@@ -95,6 +96,28 @@ signals:
 
   void OnProbeChanged(const QString & probename);
 
+  void OnDepthChanged(int depth, mitk::USProbe::Pointer probe);
+
+  void OnDepthChanged(const QString &depth);
+
+  void OnSaveButtonClicked();
+
+  void OnLoadConfigurationButtonClicked();
+
+  void OnAddNewProbeClicked();
+
+  void OnXSpacingSpinBoxChanged(double value);
+
+  void OnYSpacingSpinBoxChanged(double value);
+
+  void OnCroppingTopSpinBoxChanged(int value);
+
+  void OnCroppingRightSpinBoxChanged(int value);
+
+  void OnCroppingBottomSpinBoxChanged(int value);
+
+  void OnCroppingLeftSpinBoxChanged(int value);
+
 protected:
 
   Ui::QmitkUSNewVideoDeviceWidgetControls* m_Controls; ///< member holding the UI elements of this widget
@@ -112,6 +135,16 @@ protected:
 
   void AddProbesToDevice(mitk::USVideoDevice::Pointer device);
 
+  mitk::USProbe::Pointer CheckIfProbeExistsAlready(const std::string &probe);
+
+  void CollectUltrasoundVideoDeviceConfigInformation(mitk::USDeviceReaderXML::USVideoDeviceConfigData &config);
+
+  /**
+  * \brief Enables or disables the GUI elements of the spacing and cropping options.
+  * \param enable If true: the GUI elements are enabled. If false: elements are disabled.
+  */
+  void EnableDisableSpacingAndCropping(bool enable);
+
   /*
   \brief Displays whether this widget is active or not. It gets activated by either sending a Signal to
   *  the "CreateNewDevice" Slot or to the "EditDevice" Slot. If the user finishes editing the device, a
@@ -125,6 +158,12 @@ protected:
   *  if the "CreateNewDevice slot was called.
   */
   mitk::USVideoDevice::Pointer m_TargetDevice;
+
+  /**
+  *   \brief The config probes are used to have a possibility to configure ultrasound probes without having an existing
+  *   created USVideoDevice yet.
+  */
+  std::vector<mitk::USProbe::Pointer> m_ConfigProbes;
 };
 
 #endif // _QmitkUSNewVideoDeviceWidget_H_INCLUDED

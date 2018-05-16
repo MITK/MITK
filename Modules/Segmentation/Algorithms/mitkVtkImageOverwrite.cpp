@@ -48,9 +48,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #undef VTK_USE_UINT64
 #define VTK_USE_UINT64 0
 
-#include <float.h>
-#include <limits.h>
-#include <math.h>
+#include <cfloat>
+#include <climits>
+#include <cmath>
 
 vtkStandardNewMacro(mitkVtkImageOverwrite);
 

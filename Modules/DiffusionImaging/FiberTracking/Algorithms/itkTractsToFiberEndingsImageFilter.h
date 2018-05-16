@@ -60,7 +60,7 @@ public:
 
   itkSetMacro( BinaryOutput, bool)
 
-  void GenerateData();
+  void GenerateData() override;
 
 protected:
 

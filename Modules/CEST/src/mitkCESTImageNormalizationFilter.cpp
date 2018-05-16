@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
+#include <mitkLocaleSwitch.h>
 
 #include <boost/algorithm/string.hpp>
 
@@ -67,11 +68,13 @@ void mitk::CESTImageNormalizationFilter::GenerateData()
 template <typename TPixel, unsigned int VImageDimension>
 void mitk::CESTImageNormalizationFilter::NormalizeTimeSteps(const itk::Image<TPixel, VImageDimension>* image)
 {
+  mitk::LocaleSwitch localeSwitch("C");
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<double, VImageDimension> OutputImageType;
 
   std::string offsets = "";
   this->GetInput()->GetPropertyList()->GetStringProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str(), offsets);
+  boost::algorithm::trim(offsets);
 
   std::vector<std::string> parts;
   boost::split(parts, offsets, boost::is_any_of(" "));

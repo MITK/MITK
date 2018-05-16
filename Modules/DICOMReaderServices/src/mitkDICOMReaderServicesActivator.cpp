@@ -28,7 +28,6 @@ namespace mitk {
   void DICOMReaderServicesActivator::Load(us::ModuleContext* context)
   {
     m_AutoSelectingDICOMReader.reset(new AutoSelectingDICOMReaderService());
-    m_ClassicDICOMSeriesReader.reset(new ClassicDICOMSeriesReaderService());
     m_SimpleVolumeDICOMSeriesReader.reset(new SimpleVolumeDICOMSeriesReaderService());
 
     m_DICOMTagsOfInterestService.reset(new DICOMTagsOfInterestService());

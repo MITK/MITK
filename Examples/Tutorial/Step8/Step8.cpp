@@ -58,7 +58,7 @@ void Step8::SetupWidgets()
 
   // Initialize views as axial, sagittal, coronar (from
   // top-left to bottom)
-  mitk::TimeGeometry::Pointer geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
+  auto geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
   // Initialize bottom-right view as 3D view

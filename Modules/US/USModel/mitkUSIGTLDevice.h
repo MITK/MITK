@@ -43,18 +43,18 @@ namespace mitk
     // To open a device (Manufacturer, Model, Hostname, Port, IsServer)
     mitkNewMacro5Param(Self, std::string, std::string, std::string, int, bool);
 
-    virtual std::string GetDeviceClass();
-    virtual USImageSource::Pointer GetUSImageSource();
+    std::string GetDeviceClass() override;
+    USImageSource::Pointer GetUSImageSource() override;
 
     USIGTLDevice(std::string manufacturer, std::string model, std::string host,
       int port, bool server);
 
   protected:
-    virtual bool OnInitialization();
-    virtual bool OnConnection();
-    virtual bool OnDisconnection();
-    virtual bool OnActivation();
-    virtual bool OnDeactivation();
+    bool OnInitialization() override;
+    bool OnConnection() override;
+    bool OnDisconnection() override;
+    bool OnActivation() override;
+    bool OnDeactivation() override;
 
   private:
     std::string m_Host;

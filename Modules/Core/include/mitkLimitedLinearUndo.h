@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkEventObject.h>
 #pragma GCC visibility pop
 
+#include <deque>
+
 namespace mitk
 {
   //##Documentation
@@ -38,8 +40,8 @@ namespace mitk
   class MITKCORE_EXPORT LimitedLinearUndo : public UndoModel
   {
   public:
-    typedef std::vector<UndoStackItem *> UndoContainer;
-    typedef std::vector<UndoStackItem *>::reverse_iterator UndoContainerRevIter;
+    typedef std::deque<UndoStackItem *> UndoContainer;
+    typedef std::deque<UndoStackItem *>::reverse_iterator UndoContainerRevIter;
 
     mitkClassMacro(LimitedLinearUndo, UndoModel);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
@@ -87,6 +89,21 @@ namespace mitk
     bool RedoListEmpty() override;
 
     //##Documentation
+    //## @brief Gets the limit on the size of the undo history.
+    //## The undo limit determines how many items can be stored
+    //## in the undo stack. If the value is 0 that means that
+    //## there is no limit.
+    std::size_t GetUndoLimit() const override;
+
+    //##Documentation
+    //## @brief Sets a limit on the size of the undo history.
+    //## If the limit is reached, the oldest undo items will
+    //## be dropped from the bottom of the undo stack.
+    //## The 0 value means that there is no limit.
+    //## @param limit the maximum number of items on the stack
+    void SetUndoLimit(std::size_t limit) override;
+
+    //##Documentation
     //## @brief Returns the ObjectEventId of the
     //## top element in the OperationHistory
     int GetLastObjectEventIdInList() override;
@@ -120,6 +137,9 @@ namespace mitk
 
   private:
     int FirstObjectEventIdOfCurrentGroup(UndoContainer &stack);
+
+    std::size_t m_UndoLimit;
+
   };
 
 #pragma GCC visibility push(default)

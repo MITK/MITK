@@ -90,11 +90,11 @@ namespace mitk {
     */
     itkGetMacro(StreamingTime, unsigned int);
 
-    virtual void Update() override;
+    void Update() override;
 
   protected:
     IGTLMessageProvider();
-    virtual ~IGTLMessageProvider();
+    ~IGTLMessageProvider() override;
 
     /**
     * \brief filter execute method
@@ -104,7 +104,7 @@ namespace mitk {
     * \warning Will raise a std::out_of_range exception, if tools were added to
     * the OpenIGTLink device after it was set as input for this filter
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     /**
     * \brief Create the necessary outputs for the m_IGTLDevice
@@ -118,18 +118,18 @@ namespace mitk {
     * \brief This method is called when the IGTL device hold by this class
     * receives a new message
     **/
-    virtual void OnIncomingMessage() override;
+    void OnIncomingMessage() override;
 
     /**
     * \brief This method is called when the IGTL device hold by this class
     * receives a new command
     **/
-    virtual void OnIncomingCommand() override;
+    void OnIncomingCommand() override;
 
     /**
     * \brief This method is called when the IGTL device lost the connection to the other side
     **/
-    virtual void OnLostConnection() override;
+    void OnLostConnection() override;
 
     /**
     *\brief Connects the input of this filter to the outputs of the given

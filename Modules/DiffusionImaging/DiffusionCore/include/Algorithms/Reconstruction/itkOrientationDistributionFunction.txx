@@ -17,16 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _itkOrientationDistributionFunction_txx
 #define _itkOrientationDistributionFunction_txx
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 #include <algorithm>
 #include <vector>
 #include <vnl/algo/vnl_matrix_inverse.h>
 #include "itkPointShell.h"
 
-#define _USE_MATH_DEFINES
-#include <cmath>
 #ifdef _MSC_VER
 #if _MSC_VER <= 1700
 #define fmin(a,b) ((a<=b)?(a):(b))
@@ -72,9 +70,6 @@ template<class T, unsigned int N>
 itk::SimpleFastMutexLock itk::OrientationDistributionFunction<T,N>::m_MutexNeighbors;
 template<class T, unsigned int N>
 itk::SimpleFastMutexLock itk::OrientationDistributionFunction<T,N>::m_MutexAngularRange;
-
-
-#define ODF_PI       M_PI
 
 /**
   * Assignment Operator
@@ -658,7 +653,7 @@ OrientationDistributionFunction<T, NOdfDirections>
         double *tmpPoint = points->GetPoint(pts[i]);
         double az = tmpPoint[0];
         double elev = tmpPoint[1];
-        if((std::abs(az)>ODF_PI-0.5) || (std::abs(elev)>ODF_PI/2-0.5))
+        if((std::abs(az)>itk::Math::pi-0.5) || (std::abs(elev)>itk::Math::pi/2-0.5))
           insert = false;
       }
       if(insert)
@@ -691,7 +686,7 @@ OrientationDistributionFunction<T, NOdfDirections>
         double *tmpPoint = points2->GetPoint(pts[i]);
         double az = tmpPoint[0];
         double elev = tmpPoint[1];
-        if((std::abs(az)>ODF_PI-0.5) || (std::abs(elev)>ODF_PI/2-0.5))
+        if((std::abs(az)>itk::Math::pi-0.5) || (std::abs(elev)>itk::Math::pi/2-0.5))
           insert = false;
       }
       if(insert)
@@ -1004,7 +999,7 @@ OrientationDistributionFunction<T, NOdfDirections>
                     + dir[2]*P[2];
       stv = (stv<-1.0) ? -1.0 : ( (stv>1.0) ? 1.0 : stv);
       double x = acos(stv);
-      contrib[i] = (1.0/(sigma*sqrt(2.0*ODF_PI)))
+      contrib[i] = (1.0/(sigma*sqrt(2.0*itk::Math::pi)))
                    *exp((-x*x)/(2*sigma*sigma));
       sum += contrib[i];
     }
@@ -1180,7 +1175,7 @@ T itk::OrientationDistributionFunction<T, N>
       for(unsigned int j=0; j<N; j++)
       {
         vnl_vector_fixed<double,3> cDir = GetDirection(j);
-        double angle = ( 180 / ODF_PI ) * acos( dot_product(pDir, cDir) );
+        double angle = ( 180 / itk::Math::pi ) * acos( dot_product(pDir, cDir) );
         if( (angle < alphaMaxDegree) && (angle > alphaMinDegree) )
         {
           idxs->push_back(j);

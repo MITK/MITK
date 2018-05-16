@@ -89,7 +89,6 @@ void QmitkDenoisingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*par
 
 void QmitkDenoisingView::StartDenoising()
 {
-  typedef itk::NonLocalMeansDenoisingFilter< DiffusionPixelType >                       NlmRicianFilterType;
   typedef itk::DiscreteGaussianImageFilter < DwiVolumeType, DwiVolumeType >             GaussianFilterType;
   typedef itk::PatchBasedDenoisingImageFilter < DwiVolumeType, DwiVolumeType >          NlmFilterType;
   typedef itk::VectorImageToImageFilter < DiffusionPixelType >                          ExtractFilterType;

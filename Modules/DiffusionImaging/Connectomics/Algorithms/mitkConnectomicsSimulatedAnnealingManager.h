@@ -55,7 +55,7 @@ namespace mitk
 
     //////////////////// Functions ///////////////////////
     ConnectomicsSimulatedAnnealingManager();
-    ~ConnectomicsSimulatedAnnealingManager();
+    ~ConnectomicsSimulatedAnnealingManager() override;
 
     /////////////////////// Variables ////////////////////////
     // The permutation assigned to the simulated annealing manager

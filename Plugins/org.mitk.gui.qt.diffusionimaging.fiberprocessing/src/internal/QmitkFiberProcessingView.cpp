@@ -56,10 +56,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractsToRgbaImageFilter.h>
 #include <itkFiberExtractionFilter.h>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-
 const std::string QmitkFiberProcessingView::VIEW_ID = "org.mitk.views.fiberprocessing";
 const std::string id_DataManager = "org.mitk.views.datamanager";
 using namespace mitk;
@@ -191,6 +187,11 @@ void QmitkFiberProcessingView::Modify()
   case 7:
   {
     DoWeightColorCoding();
+    break;
+  }
+  case 8:
+  {
+    DoLengthColorCoding();
     break;
   }
   }
@@ -354,7 +355,7 @@ void QmitkFiberProcessingView::RemoveDir()
     dir[0] = m_Controls->m_ExtractDirX->value();
     dir[1] = m_Controls->m_ExtractDirY->value();
     dir[2] = m_Controls->m_ExtractDirZ->value();
-    fib->RemoveDir(dir,cos((float)m_Controls->m_ExtractAngle->value()*M_PI/180));
+    fib->RemoveDir(dir,cos((float)m_Controls->m_ExtractAngle->value()*itk::Math::pi/180));
   }
   RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -626,7 +627,6 @@ template < typename TPixel, unsigned int VImageDimension >
 void QmitkFiberProcessingView::InternalCalculateMaskFromPlanarFigure( itk::Image< TPixel, VImageDimension > *image, unsigned int axis, std::string )
 {
   typedef itk::Image< TPixel, VImageDimension > ImageType;
-  typedef itk::CastImageFilter< ImageType, ItkUCharImageType > CastFilterType;
 
   // Generate mask image as new image with same header as input image and
   // initialize with "1".
@@ -980,6 +980,9 @@ void QmitkFiberProcessingView::UpdateGui()
     m_Controls->m_ColorFibersFrame->setVisible(true);
     break;
   case 7:
+    m_Controls->m_ColorFibersFrame->setVisible(true);
+    break;
+  case 8:
     m_Controls->m_ColorFibersFrame->setVisible(true);
     break;
   }
@@ -1541,6 +1544,20 @@ void QmitkFiberProcessingView::DoCurvatureColorCoding()
   {
     mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
     fib->ColorFibersByCurvature(m_Controls->m_FiberOpacityBox->isChecked(), m_Controls->m_NormalizeColorValues->isChecked());
+  }
+
+  if (auto renderWindowPart = this->GetRenderWindowPart())
+  {
+    renderWindowPart->RequestUpdate();
+  }
+}
+
+void QmitkFiberProcessingView::DoLengthColorCoding()
+{
+  for (auto node : m_SelectedFB)
+  {
+    mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+    fib->ColorFibersByLength(m_Controls->m_FiberOpacityBox->isChecked(), m_Controls->m_NormalizeColorValues->isChecked());
   }
 
   if (auto renderWindowPart = this->GetRenderWindowPart())

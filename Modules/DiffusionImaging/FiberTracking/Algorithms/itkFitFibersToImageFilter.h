@@ -21,8 +21,11 @@ public:
   enum REGU
   {
     MSM,
-    MSE,
-    Local_MSE,
+    VARIANCE,
+    LASSO,
+    VOXEL_VARIANCE,
+    GROUP_LASSO,
+    GROUP_VARIANCE,
     NONE
   };
 
@@ -35,6 +38,7 @@ public:
   vnl_vector<double> row_sums;  // number of active weights per row
   vnl_vector<double> local_weight_means;  // mean weight of each row
   REGU regularization;
+  std::vector<unsigned int> group_sizes;
 
   void SetProblem(vnl_sparse_matrix< double >& A, vnl_vector<double>& b, double lambda, REGU regu)
   {
@@ -56,26 +60,66 @@ public:
     regularization = regu;
   }
 
+  void SetGroupSizes(std::vector<unsigned int> sizes)
+  {
+    unsigned int sum = 0;
+    for (auto s : sizes)
+      sum += s;
+    if (sum!=m_A.cols())
+    {
+      MITK_INFO << "Group sizes do not match number of unknowns (" << sum << " vs. " << m_A.cols() << ")";
+      return;
+    }
+    group_sizes = sizes;
+  }
+
   VnlCostFunction(const int NumVars=0) : vnl_cost_function(NumVars)
   {
   }
 
+  // Regularization: mean squared magnitude of weight vectors (small weights)
+  void regu_MSM(vnl_vector<double> const &x, double& cost)
+  {
+    cost += 10000.0*m_Lambda*x.squared_magnitude()/dim;
+  }
+
   // Regularization: mean squared deaviation of weights from mean weight (enforce uniform weights)
-  void regu_MSE(vnl_vector<double> const &x, double& cost)
+  void regu_Variance(vnl_vector<double> const &x, double& cost)
   {
     double mean = x.mean();
     vnl_vector<double> tx = x-mean;
     cost += 10000.0*m_Lambda*tx.squared_magnitude()/dim;
   }
 
-  // Regularization: mean squared magnitude of weight vectors (small weights) L2
-  void regu_MSM(vnl_vector<double> const &x, double& cost)
+  // Regularization: mean absolute magnitude of weight vectors (small weights) L1
+  void regu_Lasso(vnl_vector<double> const &x, double& cost)
   {
-    cost += 10000.0*m_Lambda*x.squared_magnitude()/dim;
+    cost += m_Lambda*x.one_norm()/dim;
+  }
+
+  // Regularization: mean squared deaviation of weights from bundle mean weight (enforce uniform weights PER BUNDLE)
+  void regu_GroupVariance(vnl_vector<double> const &x, double& cost)
+  {
+    vnl_vector<double> tx(x);
+    unsigned int offset = 0;
+    for (auto g : group_sizes)
+    {
+      double group_mean = 0;
+      for (unsigned int i=0; i<g; ++i)
+        group_mean += x[offset+i];
+      group_mean /= g;
+
+      for (unsigned int i=0; i<g; ++i)
+        tx[offset+i] -= group_mean;
+
+      offset += g;
+    }
+
+    cost += 10000.0*m_Lambda*tx.squared_magnitude()/dim;
   }
 
   // Regularization: voxel-weise mean squared deaviation of weights from voxel-wise mean weight (enforce locally uniform weights)
-  void regu_localMSE(vnl_vector<double> const &x, double& cost)
+  void regu_VoxelVariance(vnl_vector<double> const &x, double& cost)
   {
     m_A_Ones.mult(x, local_weight_means);
     local_weight_means = element_quotient(local_weight_means, row_sums);
@@ -94,28 +138,62 @@ public:
     cost += m_Lambda*regu/dim;
   }
 
-  // gradients of regularization functions
-
-  void grad_regu_MSE(vnl_vector<double> const &x, vnl_vector<double> &dx)
+  // Regularization: group Lasso: sum_g(lambda_g * ||x_g||_2)
+  void regu_GroupLasso(vnl_vector<double> const &x, double& cost)
   {
-    double mean = x.mean();
-    vnl_vector<double> tx = x-mean; // difference to mean
-    dx += 10000.0*tx*(2.0-2.0/dim)/dim;
+    unsigned int offset = 0;
+    for (auto g : group_sizes)
+    {
+      double group_cost = 0;
+      for (unsigned int i=0; i<g; ++i)
+        group_cost += x[offset+i]*x[offset+i];
+      cost += m_Lambda*std::sqrt(g)*std::sqrt(group_cost)/dim;
+      offset += g;
+    }
   }
+
+  // gradients of regularization functions
 
   void grad_regu_MSM(vnl_vector<double> const &x, vnl_vector<double> &dx)
   {
     dx += 10000.0*m_Lambda*2.0*x/dim;
   }
 
-  void grad_regu_L1(vnl_vector<double> const &x, vnl_vector<double> &dx)
+  void grad_regu_Variance(vnl_vector<double> const &x, vnl_vector<double> &dx)
+  {
+    double mean = x.mean();
+    vnl_vector<double> tx = x-mean; // difference to mean
+    dx += 10000.0*tx*(2.0-2.0/dim)/dim;
+  }
+
+  void grad_regu_Lasso(vnl_vector<double> const &x, vnl_vector<double> &dx)
   {
     for (int i=0; i<dim; ++i)
       if (x[i]>0)
-        dx[i] += 10000.0*m_Lambda/dim;
+        dx[i] += m_Lambda/dim;
   }
 
-  void grad_regu_localMSE(vnl_vector<double> const &x, vnl_vector<double> &dx)
+  void grad_regu_GroupVariance(vnl_vector<double> const &x, vnl_vector<double> &dx)
+  {
+    vnl_vector<double> tx(x);
+    unsigned int offset = 0;
+    for (auto g : group_sizes)
+    {
+      double group_mean = 0;
+      for (unsigned int i=0; i<g; ++i)
+        group_mean += x[offset+i];
+      group_mean /= g;
+
+      for (unsigned int i=0; i<g; ++i)
+        tx[offset+i] -= group_mean;
+
+      offset += g;
+    }
+
+    dx += 10000.0*tx*(2.0-2.0/dim)/dim;
+  }
+
+  void grad_regu_VoxelVariance(vnl_vector<double> const &x, vnl_vector<double> &dx)
   {
     m_A_Ones.mult(x, local_weight_means);
     local_weight_means = element_quotient(local_weight_means, row_sums);
@@ -138,32 +216,67 @@ public:
     dx += tdx*2.0*m_Lambda/dim;
   }
 
+  void grad_regu_GroupLasso(vnl_vector<double> const &x, vnl_vector<double> &dx)
+  {
+    unsigned int offset = 0;
+    for (auto g : group_sizes)
+    {
+      double group_lambda = m_Lambda*std::sqrt(g)/dim;
+      double group_l2 = 0;
+      for (unsigned int i=0; i<g; ++i)
+        group_l2 += x[offset+i]*x[offset+i];
+      group_l2 = std::sqrt(group_l2);
+
+      if (group_l2>0.0)
+      {
+        for (unsigned int i=0; i<g; ++i)
+          dx[offset+i] += x[offset+i]*group_lambda/group_l2;
+      }
+
+      offset += g;
+    }
+  }
+
   void calc_regularization(vnl_vector<double> const &x, double& cost)
   {
-    if (regularization==Local_MSE)
-      regu_localMSE(x, cost);
-    else if (regularization==MSE)
-      regu_MSE(x, cost);
+    if (regularization==VOXEL_VARIANCE)
+      regu_VoxelVariance(x, cost);
+    else if (regularization==VARIANCE)
+      regu_Variance(x, cost);
     else if (regularization==MSM)
       regu_MSM(x, cost);
+    else if (regularization==LASSO)
+      regu_Lasso(x, cost);
+    else if (regularization==GROUP_LASSO)
+      regu_GroupLasso(x, cost);
+    else if (regularization==GROUP_VARIANCE)
+      regu_GroupVariance(x, cost);
   }
 
   void calc_regularization_gradient(vnl_vector<double> const &x, vnl_vector<double> &dx)
   {
-    if (regularization==Local_MSE)
-      grad_regu_localMSE(x,dx);
-    else if (regularization==MSE)
-      grad_regu_MSE(x,dx);
+    if (regularization==VOXEL_VARIANCE)
+      grad_regu_VoxelVariance(x,dx);
+    else if (regularization==VARIANCE)
+      grad_regu_Variance(x,dx);
     else if (regularization==MSM)
       grad_regu_MSM(x,dx);
+    else if (regularization==LASSO)
+      grad_regu_Lasso(x,dx);
+    else if (regularization==GROUP_LASSO)
+      grad_regu_GroupLasso(x, dx);
+    else if (regularization==GROUP_VARIANCE)
+      grad_regu_GroupVariance(x, dx);
   }
 
   // cost function
   double f(vnl_vector<double> const &x)
   {
     // RMS error
-    double cost = S->get_rms_error(x);
-    cost *= cost;
+    unsigned int N = m_b.size();
+    vnl_vector<double> d; d.set_size(N);
+    S->multiply(x,d);
+    double cost = (d - m_b).squared_magnitude()/N;
 
     // regularize
     calc_regularization(x, cost);
@@ -182,15 +295,12 @@ public:
     S->multiply(x,d);
     d -= m_b;
 
+    // (f(u(x)))' = f'(u(x)) * u'(x)
+    // d/dx_j = 1/N * Sum_i A_i,j * 2*(A_i,j * x_j - b_i)
     S->transpose_multiply(d, dx);
     dx *= 2.0/N;
 
-    if (regularization==Local_MSE)
-      grad_regu_localMSE(x,dx);
-    else if (regularization==MSE)
-      grad_regu_MSE(x,dx);
-    else if (regularization==MSM)
-      grad_regu_MSM(x,dx);
+    calc_regularization_gradient(x,dx);
   }
 };
 
@@ -215,11 +325,14 @@ public:
   typedef mitk::DiffusionPropertyHelper::ImageType  VectorImgType;
   typedef mitk::PeakImage::ItkPeakImageType         PeakImgType;
   typedef itk::Image<unsigned char, 3>              UcharImgType;
+  typedef itk::Image<double, 3>                     DoubleImgType;
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
   itkTypeMacro( FitFibersToImageFilter, ImageSource )
 
+  itkSetMacro( ScalarImage, DoubleImgType::Pointer)
+  itkGetMacro( ScalarImage, DoubleImgType::Pointer)
   itkSetMacro( PeakImage, PeakImgType::Pointer)
   itkGetMacro( PeakImage, PeakImgType::Pointer)
   itkSetMacro( DiffImage, VectorImgType::Pointer)
@@ -258,6 +371,11 @@ public:
   itkGetMacro( OverexplainedImageDiff, VectorImgType::Pointer)
   itkGetMacro( UnderexplainedImageDiff, VectorImgType::Pointer)
 
+  itkGetMacro( FittedImageScalar, DoubleImgType::Pointer)
+  itkGetMacro( ResidualImageScalar, DoubleImgType::Pointer)
+  itkGetMacro( OverexplainedImageScalar, DoubleImgType::Pointer)
+  itkGetMacro( UnderexplainedImageScalar, DoubleImgType::Pointer)
+
   itkGetMacro( Coverage, double)
   itkGetMacro( Overshoot, double)
   itkGetMacro( RMSE, double)
@@ -285,17 +403,20 @@ protected:
   FitFibersToImageFilter();
   virtual ~FitFibersToImageFilter();
 
-  vnl_vector_fixed<float,3> GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer m_PeakImage , vnl_vector_fixed<float,3> fiber_dir, int& id, double& w );
+  void GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer m_PeakImage , vnl_vector_fixed<float,3> fiber_dir, int& id, double& w, double& peak_mag );
 
   void CreatePeakSystem();
   void CreateDiffSystem();
+  void CreateScalarSystem();
 
   void GenerateOutputPeakImages();
   void GenerateOutputDiffImages();
+  void GenerateOutputScalarImages();
 
   std::vector< mitk::FiberBundle::Pointer >   m_Tractograms;
   PeakImgType::Pointer                        m_PeakImage;
   VectorImgType::Pointer                      m_DiffImage;
+  DoubleImgType::Pointer                      m_ScalarImage;
   UcharImgType::Pointer                       m_MaskImage;
   bool                                        m_FitIndividualFibers;
   double                                      m_GradientTolerance;
@@ -331,6 +452,11 @@ protected:
   VectorImgType::Pointer                      m_ResidualImageDiff;
   VectorImgType::Pointer                      m_FittedImageDiff;
 
+  DoubleImgType::Pointer                      m_UnderexplainedImageScalar;
+  DoubleImgType::Pointer                      m_OverexplainedImageScalar;
+  DoubleImgType::Pointer                      m_ResidualImageScalar;
+  DoubleImgType::Pointer                      m_FittedImageScalar;
+
   mitk::DiffusionSignalModel<>*               m_SignalModel;
 
   vnl_sparse_matrix<double>                   A;
@@ -345,6 +471,7 @@ protected:
   unsigned int                                fiber_count;
 
   VnlCostFunction::REGU                       m_Regularization;
+  std::vector<unsigned int>                   m_GroupSizes;
 };
 
 }

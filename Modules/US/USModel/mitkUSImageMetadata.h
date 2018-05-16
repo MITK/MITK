@@ -74,7 +74,7 @@ namespace mitk {
     * \brief Creates a new metadata object with all fields set to default values.
     */
     USImageMetadata();
-    virtual ~USImageMetadata();
+    ~USImageMetadata() override;
 
     std::string m_DeviceManufacturer;
     std::string m_DeviceModel;

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingManager.h>
 
 mitk::LimitedLinearUndo::LimitedLinearUndo()
+: m_UndoLimit(0)
 {
   // nothing to do
 }
@@ -52,6 +53,10 @@ bool mitk::LimitedLinearUndo::SetOperationEvent(UndoStackItem *stackItem)
     InvokeEvent(RedoEmptyEvent());
   }
 
+  if (m_UndoLimit > 0 && m_UndoList.size() == m_UndoLimit)
+  {
+    m_UndoList.pop_front();
+  }
   m_UndoList.push_back(operationEvent);
 
   InvokeEvent(UndoNotEmptyEvent());
@@ -168,6 +173,23 @@ void mitk::LimitedLinearUndo::ClearRedoList()
 bool mitk::LimitedLinearUndo::RedoListEmpty()
 {
   return m_RedoList.empty();
+}
+
+std::size_t mitk::LimitedLinearUndo::GetUndoLimit() const
+{
+  return m_UndoLimit;
+}
+
+void mitk::LimitedLinearUndo::SetUndoLimit(std::size_t undoLimit)
+{
+  if (undoLimit != m_UndoLimit)
+  {
+    if (m_UndoList.size() > undoLimit)
+    {
+      m_UndoList.erase(m_UndoList.begin(), m_UndoList.end() - undoLimit);
+    }
+    m_UndoLimit = undoLimit;
+  }
 }
 
 int mitk::LimitedLinearUndo::GetLastObjectEventIdInList()

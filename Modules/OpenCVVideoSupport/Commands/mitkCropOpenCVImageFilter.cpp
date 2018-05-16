@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCropOpenCVImageFilter.h"
 
-#include "cv.h"
 
 namespace mitk {
 CropOpenCVImageFilter::CropOpenCVImageFilter( )

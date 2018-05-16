@@ -43,10 +43,10 @@ namespace mitk
 
     DiffusionImageDicomReaderService(const DiffusionImageDicomReaderService & other);
     DiffusionImageDicomReaderService();
-    virtual ~DiffusionImageDicomReaderService();
+    ~DiffusionImageDicomReaderService() override;
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+    std::vector<itk::SmartPointer<BaseData> > Read() override;
 
     typedef short                                                           DiffusionPixelType;
 

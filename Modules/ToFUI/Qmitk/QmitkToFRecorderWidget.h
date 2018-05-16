@@ -54,8 +54,8 @@ class MITKTOFUI_EXPORT QmitkToFRecorderWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkToFRecorderWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
-    virtual ~QmitkToFRecorderWidget();
+    QmitkToFRecorderWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
+    ~QmitkToFRecorderWidget() override;
 
     /* @brief This method is part of the widget an needs not to be called seperately. */
     virtual void CreateQtPartControl(QWidget *parent);
@@ -146,12 +146,12 @@ class MITKTOFUI_EXPORT QmitkToFRecorderWidget :public QWidget
                                    bool& intensityImageSelected,
                                    bool& rgbImageSelected,
                                    bool& rawDataSelected,
-                                   QWidget *parent = 0,
+                                   QWidget *parent = nullptr,
                                    const QString &caption = QString(),
                                    const QString &dir = QString(),
                                    const QString &filter = QString(),
-                                   QString *selectedFilter = 0,
-                                   QFileDialog::Options options = 0
+                                   QString *selectedFilter = nullptr,
+                                   QFileDialog::Options options = nullptr
                                    );
     /*!
     \brief method creating a filename from the given information

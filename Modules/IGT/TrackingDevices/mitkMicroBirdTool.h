@@ -18,8 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKMICROBIRDTOOL_H_HEADER_INCLUDED_
 #define MITKMICROBIRDTOOL_H_HEADER_INCLUDED_
 
-#include <mitkInternalTrackingTool.h>
-//#include "mitkTrackingTypes.h"
+#include <mitkTrackingTool.h>
 
 namespace mitk {
     //##Documentation
@@ -28,10 +27,10 @@ namespace mitk {
     //##
     //## \ingroup IGT
 
-    class MITKIGT_EXPORT MicroBirdTool : public InternalTrackingTool
+    class MITKIGT_EXPORT MicroBirdTool : public TrackingTool
     {
     public:
-      mitkClassMacro(MicroBirdTool, InternalTrackingTool);
+      mitkClassMacro(MicroBirdTool, TrackingTool);
       itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
     protected:

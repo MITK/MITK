@@ -109,11 +109,11 @@ public:
 
   protected:
     AdcImageFilter();
-  ~AdcImageFilter() {}
-  void PrintSelf(std::ostream& os, Indent indent) const;
+  ~AdcImageFilter() override {}
+  void PrintSelf(std::ostream& os, Indent indent) const override;
 
-  void BeforeThreadedGenerateData();
-  void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType);
+  void BeforeThreadedGenerateData() override;
+  void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType) override;
 
   bool      m_FitSignal;
   double    m_B_value;

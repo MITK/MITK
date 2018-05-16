@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.preprocessing.resampling"
+          name="Image Resampling"
+          category="Preprocessing"
+          class="QmitkPreprocessingResampling"
+          icon="resources/lena.xpm" >
+      <description>Resampling an Image to an specific sizes</description>
+      <keywordReference id="org.mitk.views.preprocessing.resampling.ViewKeyword"/>
+    </view>
+  </extension>
+
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.gui.qt.preprocessing.resampling.ViewKeyword"  label="Resampling" />
+    <keyword id="org.mitk.gui.qt.preprocessing.resampling.ViewKeyword"  label="Preprocessing" />
+    <keyword id="org.mitk.gui.qt.preprocessing.resampling.ViewKeyword"  label="Data Preparation" />
+  </extension>
+</plugin>

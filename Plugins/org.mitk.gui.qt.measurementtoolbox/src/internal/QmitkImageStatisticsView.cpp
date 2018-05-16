@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkRenderWindow.h>
 #include <QmitkChartWidget.h>
 #include <mitkImageCast.h>
+#include <mitkImageStatisticsHolder.h>
 
 // itk includes
 #include "itksys/SystemTools.hxx"
@@ -224,9 +225,9 @@ void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject& e)
 
     if (histogram.IsNotNull())
     {
-      bool closedFigure = this->m_CalculationThread->GetStatisticsUpdateSuccessFlag();
+      bool statisticsUpdateSuccessful = this->m_CalculationThread->GetStatisticsUpdateSuccessFlag();
 
-      if (closedFigure)
+      if (statisticsUpdateSuccessful)
       {
 
         auto imageNameLabel = m_Controls->m_SelectedFeatureImageLabel->text().toStdString();
@@ -711,33 +712,23 @@ void QmitkImageStatisticsView::UpdateStatistics()
     }
 
     // check if the segmentation mask is empty
-    if (m_SelectedImageMask != NULL)
+    if (m_SelectedImageMask != nullptr)
     {
-      typedef itk::Image<unsigned char, 3> ItkImageType;
-      typedef itk::ImageRegionConstIteratorWithIndex< ItkImageType > IteratorType;
-
-      ItkImageType::Pointer itkImage;
-
-      mitk::CastToItkImage( m_SelectedImageMask, itkImage );
-
-      bool empty = true;
-      IteratorType it( itkImage, itkImage->GetLargestPossibleRegion() );
-      while ( !it.IsAtEnd() )
-      {
-        ItkImageType::ValueType val = it.Get();
-        if ( val != 0 )
-        {
-          empty = false;
-          break;
+      auto maskStatistics = m_SelectedImageMask->GetStatistics();
+      mitk::ScalarType maskMaxValue = maskStatistics->GetScalarValueMax(0);
+      if (m_SelectedImageMask->GetDimension() == 4) {
+        for (unsigned int curTimestep = 1; curTimestep < m_SelectedImageMask->GetTimeSteps(); curTimestep++) {
+          maskMaxValue = std::max(maskStatistics->GetScalarValueMax(curTimestep), maskMaxValue);
         }
-        ++it;
       }
 
-      if ( empty )
+      bool segmentationIsEmpty = maskMaxValue == 0;
+
+      if (segmentationIsEmpty)
       {
         m_Controls->m_ErrorMessageLabel->setText( "<font color='red'>Empty segmentation mask selected...</font>" );
         m_Controls->m_ErrorMessageLabel->show();
-
+        this->m_StatisticsUpdatePending = false;
         return;
       }
     }
@@ -865,20 +856,12 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     if (m_SelectedImage != nullptr) {
       //all statistics are now computed also on planar figures (lines, paths...)!
     // If a (non-closed) PlanarFigure is selected, display a line profile widget
-      if (m_SelectedPlanarFigure != nullptr) {
-        // Check if the (closed) planar figure is out of bounds and so no image mask could be calculated--> Intensity Profile can not be calculated
-        bool outOfBounds = false;
-        if (m_SelectedPlanarFigure->IsClosed() && m_SelectedImageMask == nullptr)
-        {
-          outOfBounds = true;
-          const QString message("<font color='red'>Planar figure is on a rotated image plane or outside the image bounds.</font>");
-          m_Controls->m_InfoLabel->setText(message);
-        }
+      if (m_SelectedPlanarFigure != nullptr && !m_SelectedPlanarFigure->IsClosed()) {
 
         // check whether PlanarFigure is initialized
         const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_SelectedPlanarFigure->GetPlaneGeometry();
 
-        if (!(planarFigurePlaneGeometry == nullptr || outOfBounds))
+        if (planarFigurePlaneGeometry != nullptr)
         {
           unsigned int timeStep = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
 
@@ -938,8 +921,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
           m_Controls->m_ErrorMessageLabel->hide();
           m_Controls->m_SelectedMaskLabel->setText("None");
           this->m_StatisticsUpdatePending = false;
-          if (!outOfBounds)
-            m_Controls->m_InfoLabel->setText("");
+          m_Controls->m_InfoLabel->setText("");
           return;
         }
       }

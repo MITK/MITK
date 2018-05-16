@@ -52,9 +52,9 @@ namespace mitk {
   protected:
 
     NavigationDataDelayFilter(unsigned int delay);
-    virtual ~NavigationDataDelayFilter();
+    ~NavigationDataDelayFilter() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     /**
     * \brief This field containes the buffered navigation datas. It is a queue of (pair of (time and vector of (several navigation datas from one point in time))

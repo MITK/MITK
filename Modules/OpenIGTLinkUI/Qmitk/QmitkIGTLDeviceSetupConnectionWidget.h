@@ -59,7 +59,7 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLDeviceSetupConnectionWidget : public QWi
      */
     void Initialize(mitk::IGTLDevice::Pointer device);
 
-    QmitkIGTLDeviceSetupConnectionWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    QmitkIGTLDeviceSetupConnectionWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
     ~QmitkIGTLDeviceSetupConnectionWidget() override;
 
 //    /**

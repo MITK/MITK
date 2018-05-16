@@ -95,7 +95,7 @@ cv::Mat mitk::OpenCVVideoSource::GetImage()
 {
   if(m_CurrentImage)
   {
-    cv::Mat copy( m_CurrentImage, false );
+    cv::Mat copy = cv::cvarrToMat( m_CurrentImage, false );
     return copy.clone();
   }
   return cv::Mat();

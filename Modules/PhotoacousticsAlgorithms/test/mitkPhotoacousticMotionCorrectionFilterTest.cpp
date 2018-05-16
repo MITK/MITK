@@ -22,7 +22,9 @@
 class mitkPhotoacousticMotionCorrectionFilterTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkPhotoacousticMotionCorrectionFilterTestSuite);
-  MITK_TEST(testSomething);
+  MITK_TEST(testSettingFirstInput);
+  MITK_TEST(testSettingSecondInput);
+  MITK_TEST(testNoThirdInput);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -39,7 +41,7 @@ public:
     mitk::PixelType pt = mitk::MakeScalarPixelType<float>();
     image->Initialize(pt, 3, dimensions);
     delete[] dimensions;
-    double * data = new double[8];
+    double * data = new double[8] {0, 0, 0, 0, 0, 0, 0, 0};
     image->SetVolume(data);
     delete[] data;
   }
@@ -47,13 +49,39 @@ public:
   void tearDown() override {
   }
 
-  void testSomething() {
-    CPPUNIT_ASSERT(true);
+  void testSettingFirstInput() {
+    filter->SetInput(0, image);
+    mitk::Image::Pointer out = filter->GetInput(0);
+    CPPUNIT_ASSERT_EQUAL(image, out);
   }
 
-  void testSettingFirstInput() {
+  void testSettingSecondInput() {
+    filter->SetInput(1, image);
+    mitk::Image::Pointer out = filter->GetInput(1);
+    CPPUNIT_ASSERT_EQUAL(image, out);
+  }
+
+  void testNoThirdInput() {
+    CPPUNIT_ASSERT_ASSERTION_FAIL(filter->SetInput(2, image));
+    // CPPUNIT_ASSERT(true);
+  }
+
+  void testGetFirstEmptyOutput() {
     
   }
+
+  void testGetSecondEmptyOutput() {
+
+  }
+
+  void testSameInOutDimensions() {
+    
+  }
+
+  void testSameInputDimensions() {
+    
+  }
+
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkPhotoacousticMotionCorrectionFilter)

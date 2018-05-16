@@ -132,7 +132,7 @@ namespace mitk
     typedef std::vector<Correspondence> CorrespondenceList;
 
     AnisotropicIterativeClosestPointRegistration();
-    ~AnisotropicIterativeClosestPointRegistration();
+    ~AnisotropicIterativeClosestPointRegistration() override;
 
     /** Max amount of iterations. Default is 1000.*/
     unsigned int m_MaxIterations;

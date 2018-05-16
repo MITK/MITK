@@ -39,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   className::OutputType *className::GetOutput(DataObjectPointerArraySizeType idx)                                      \
   {                                                                                                                    \
     OutputType *out = dynamic_cast<OutputType *>(this->ProcessObject::GetOutput(idx));                                 \
-    if (out == NULL && this->ProcessObject::GetOutput(idx) != NULL)                                                    \
+    if (out == nullptr && this->ProcessObject::GetOutput(idx) != nullptr)                                                    \
     {                                                                                                                  \
       itkWarningMacro(<< "Unable to convert output number " << idx << " to type " << typeid(OutputType).name());       \
     }                                                                                                                  \
@@ -48,7 +48,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   const className::OutputType *className::GetOutput(DataObjectPointerArraySizeType idx) const                          \
   {                                                                                                                    \
     const OutputType *out = dynamic_cast<const OutputType *>(this->ProcessObject::GetOutput(idx));                     \
-    if (out == NULL && this->ProcessObject::GetOutput(idx) != NULL)                                                    \
+    if (out == nullptr && this->ProcessObject::GetOutput(idx) != nullptr)                                                    \
     {                                                                                                                  \
       itkWarningMacro(<< "Unable to convert output number " << idx << " to type " << typeid(OutputType).name());       \
     }                                                                                                                  \
@@ -129,12 +129,12 @@ namespace mitk
     /**
      * @sa itk::ProcessObject::MakeOutput(DataObjectPointerArraySizeType)
      */
-    virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx) override = 0;
+    DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx) override = 0;
 
     /**
      * @sa itk::ProcessObject::MakeOutput(const DataObjectIdentifierType&)
      */
-    virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType &name) override = 0;
+    DataObjectPointer MakeOutput(const DataObjectIdentifierType &name) override = 0;
 
     /**
      * @brief Access itk::ProcessObject::m_Updating
@@ -147,7 +147,7 @@ namespace mitk
 
   protected:
     BaseDataSource();
-    virtual ~BaseDataSource();
+    ~BaseDataSource() override;
 
     // purposely not implemented
     static Pointer New();

@@ -43,14 +43,14 @@ mitk::MRNormTwoRegionsBasedFilter::~MRNormTwoRegionsBasedFilter()
 void mitk::MRNormTwoRegionsBasedFilter::SetMask1( const mitk::Image* mask )
 {
   // Process object is not const-correct so the const_cast is required here
-  Image* nonconstMask = const_cast< mitk::Image * >( mask );
+  auto* nonconstMask = const_cast< mitk::Image * >( mask );
   this->SetNthInput(1, nonconstMask );
 }
 
 void mitk::MRNormTwoRegionsBasedFilter::SetMask2( const mitk::Image* mask )
 {
   // Process object is not const-correct so the const_cast is required here
-  Image* nonconstMask = const_cast< mitk::Image * >( mask );
+  auto* nonconstMask = const_cast< mitk::Image * >( mask );
   this->SetNthInput(2, nonconstMask );
 }
 
@@ -68,7 +68,7 @@ void mitk::MRNormTwoRegionsBasedFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  mitk::Image* input = const_cast< mitk::Image * > ( this->GetInput() );
+  mitk::Image* input = this->GetInput();
 
   input->SetRequestedRegionToLargestPossibleRegion();
 }

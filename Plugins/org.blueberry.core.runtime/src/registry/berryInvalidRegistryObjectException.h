@@ -39,7 +39,7 @@ class org_blueberry_core_runtime_EXPORT InvalidRegistryObjectException : public 
 public:
 
   InvalidRegistryObjectException();
-  ~InvalidRegistryObjectException() throw();
+  ~InvalidRegistryObjectException() throw() override;
 
   const char* name() const throw() override;
   InvalidRegistryObjectException* clone() const override;

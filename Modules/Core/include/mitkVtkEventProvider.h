@@ -36,8 +36,8 @@ namespace mitk
     vtkTypeMacro(vtkEventProvider, vtkInteractorObserver);
 
     // Satisfy the superclass API. Enable/disable listening for events.
-    virtual void SetEnabled(int) override;
-    virtual void SetInteractor(vtkRenderWindowInteractor *iren) override;
+    void SetEnabled(int) override;
+    void SetInteractor(vtkRenderWindowInteractor *iren) override;
 
     // Interface to MITK
     virtual void SetMitkRenderWindow(mitk::RenderWindow *renWin);
@@ -45,7 +45,7 @@ namespace mitk
 
   protected:
     vtkEventProvider();
-    ~vtkEventProvider();
+    ~vtkEventProvider() override;
 
     // methods for processing events - callback for the observer/command pattern of vtkCommand
     static void ProcessEvents(vtkObject *object, unsigned long event, void *clientdata, void *calldata);

@@ -82,7 +82,7 @@ namespace mitk
 
     TargetPointCalculationMethod m_Method;
 
-    mitk::Image::Pointer CreateBinaryImage(mitk::Surface::Pointer input);
+    mitk::Image::Pointer CreateBinaryImage();
 
     mitk::PointSet::Pointer CreateTargetPoints(mitk::Image::Pointer binaryImage);
 

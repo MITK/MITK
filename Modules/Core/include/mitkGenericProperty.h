@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE
 
 #include <sstream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
 
 #include "mitkBaseProperty.h"
@@ -58,7 +58,7 @@ namespace mitk
     itkSetMacro(Value, T);
     itkGetConstMacro(Value, T);
 
-    virtual std::string GetValueAsString() const override
+    std::string GetValueAsString() const override
     {
       std::stringstream myStr;
       myStr << GetValue();
@@ -77,19 +77,19 @@ namespace mitk
     // purposely not implemented
     GenericProperty &operator=(const GenericProperty &);
 
-    virtual itk::LightObject::Pointer InternalClone() const override
+    itk::LightObject::Pointer InternalClone() const override
     {
       itk::LightObject::Pointer result(new Self(*this));
       result->UnRegister();
       return result;
     }
 
-    virtual bool IsEqual(const BaseProperty &other) const override
+    bool IsEqual(const BaseProperty &other) const override
     {
       return (this->m_Value == static_cast<const Self &>(other).m_Value);
     }
 
-    virtual bool Assign(const BaseProperty &other) override
+    bool Assign(const BaseProperty &other) override
     {
       this->m_Value = static_cast<const Self &>(other).m_Value;
       return true;

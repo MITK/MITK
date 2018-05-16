@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPointCloudScoringFilter.h"
 
-#include <math.h>
+#include <cmath>
 
 #include <vtkDoubleArray.h>
 #include <vtkKdTree.h>

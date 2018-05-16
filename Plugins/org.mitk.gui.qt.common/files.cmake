@@ -3,7 +3,14 @@ set(SRC_CPP_FILES
   QmitkAbstractView.cpp
   QmitkDataNodeSelectionProvider.cpp
   QmitkDnDFrameWidget.cpp
+  QmitkSelectionServiceConnector.cpp
   QmitkSliceNavigationListener.cpp
+  QmitkSingleNodeSelectionWidget.cpp
+  QmitkNodeSelectionDialog.cpp
+  QmitkAbstractNodeSelectionWidget.cpp
+  QmitkMultiNodeSelectionWidget.cpp
+  QmitkNodeSelectionPreferenceHelper.cpp
+  QmitkNodeSelectionButton.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -11,17 +18,35 @@ set(INTERNAL_CPP_FILES
   QmitkDataNodeItemModel.cpp
   QmitkDataNodeSelection.cpp
   QmitkViewCoordinator.cpp
+  QmitkNodeSelectionConstants.cpp
+  QmitkNodeSelectionPreferencePage.cpp
+)
+
+set(UI_FILES
+  src/QmitkSingleNodeSelectionWidget.ui
+  src/QmitkMultiNodeSelectionWidget.ui
+  src/QmitkNodeSelectionDialog.ui
+  src/internal/QmitkNodeSelectionPreferencePage.ui
 )
 
 set(MOC_H_FILES
   src/QmitkAbstractRenderEditor.h
   src/QmitkDnDFrameWidget.h
+  src/QmitkSelectionServiceConnector.h
   src/QmitkSliceNavigationListener.h
-
+  src/ImporterUtil.h
+  src/QmitkSingleNodeSelectionWidget.h
+  src/QmitkNodeSelectionDialog.h
+  src/QmitkAbstractNodeSelectionWidget.h
+  src/QmitkMultiNodeSelectionWidget.h
+  src/QmitkNodeSelectionButton.h
   src/internal/QmitkCommonActivator.h
+  src/internal/QmitkNodeSelectionPreferencePage.h
 )
 
 set(CACHED_RESOURCE_FILES
+  plugin.xml
+  resources/times.svg
 )
 
 set(QRC_FILES

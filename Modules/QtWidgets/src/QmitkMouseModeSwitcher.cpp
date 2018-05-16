@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkMouseModeSwitcher::QmitkMouseModeSwitcher(QWidget *parent)
   : QToolBar(parent),
     m_ActionGroup(new QActionGroup(this)),
-    m_MouseModeSwitcher(NULL),
+    m_MouseModeSwitcher(nullptr),
     m_ObserverTag(0),
     m_InObservationReaction(false)
 {

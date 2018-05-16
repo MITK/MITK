@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkIdList.h>
 
-#include <math.h>
+#include <cmath>
 #include <vtkMath.h>
 
 mitk::ToFDistanceImageToSurfaceFilter::ToFDistanceImageToSurfaceFilter() :
@@ -67,8 +67,8 @@ void mitk::ToFDistanceImageToSurfaceFilter::SetInput(  mitk::Image* distanceImag
 
 void mitk::ToFDistanceImageToSurfaceFilter::SetInput( unsigned int idx,  mitk::Image* distanceImage )
 {
-  if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
-    this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
+  if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to nullptr, reduce the number of inputs by one
+    this->SetNumberOfIndexedInputs(this->GetNumberOfInputs() - 1);
   else
     this->ProcessObject::SetNthInput(idx, distanceImage);   // Process object is not const-correct so the const_cast is required here
 
@@ -143,11 +143,20 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   {
     focalLengthInPixelUnits[0] = m_CameraIntrinsics->GetFocalLengthX();
     focalLengthInPixelUnits[1] = m_CameraIntrinsics->GetFocalLengthY();
+    focalLengthInMm = 0.0;
   }
   else if( m_ReconstructionMode == WithInterPixelDistance)
   {
     //convert focallength from pixel to mm
+    focalLengthInPixelUnits[0] = 0.0;
+    focalLengthInPixelUnits[1] = 0.0;
     focalLengthInMm = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
+  }
+  else
+  {
+    focalLengthInPixelUnits[0] = 0.0;
+    focalLengthInPixelUnits[1] = 0.0;
+    focalLengthInMm = 0.0;
   }
 
   mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
@@ -304,7 +313,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
 
 void mitk::ToFDistanceImageToSurfaceFilter::CreateOutputsForAllInputs()
 {
-  this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
+  this->SetNumberOfIndexedOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
   for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
     if (this->GetOutput(idx) == nullptr)
     {

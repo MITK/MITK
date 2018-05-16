@@ -58,7 +58,7 @@ namespace mitk
   protected:
     FeedbackContourTool();             // purposely hidden
     FeedbackContourTool(const char *); // purposely hidden
-    virtual ~FeedbackContourTool();
+    ~FeedbackContourTool() override;
 
     ContourModel *GetFeedbackContour();
     void SetFeedbackContour(ContourModel::Pointer);

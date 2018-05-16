@@ -31,9 +31,9 @@ QmitkToFPMDParameterWidget::QmitkToFPMDParameterWidget(QWidget* parent, Qt::Wind
 {
   this->m_IntegrationTime = 0;
   this->m_ModulationFrequency = 0;
-  this->m_ToFImageGrabber = NULL;
+  this->m_ToFImageGrabber = nullptr;
 
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
 }
 
@@ -97,9 +97,9 @@ void QmitkToFPMDParameterWidget::ActivateAllParameters()
     m_Controls->m_ModulationFrequencySpinBox->setValue(this->m_ToFImageGrabber->GetModulationFrequency());
 }
 
-void QmitkToFPMDParameterWidget::OnChangeIntegrationTimeSpinBox(int value)
+void QmitkToFPMDParameterWidget::OnChangeIntegrationTimeSpinBox(int)
 {
-  if (this->m_ToFImageGrabber != NULL)
+  if (this->m_ToFImageGrabber != nullptr)
   {
     // stop camera if active
     bool active = m_ToFImageGrabber->IsCameraActive();
@@ -121,9 +121,9 @@ void QmitkToFPMDParameterWidget::OnChangeIntegrationTimeSpinBox(int value)
   }
 }
 
-void QmitkToFPMDParameterWidget::OnChangeModulationFrequencySpinBox(int value)
+void QmitkToFPMDParameterWidget::OnChangeModulationFrequencySpinBox(int)
 {
-  if (this->m_ToFImageGrabber != NULL)
+  if (this->m_ToFImageGrabber != nullptr)
   {
     // stop camera if active
     bool active = m_ToFImageGrabber->IsCameraActive();

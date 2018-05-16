@@ -112,7 +112,7 @@ public:
       resultDepthImage->Initialize(mitk::PixelType(mitk::MakeScalarPixelType<float>()), 2, dimension,1);
       resultDepthImage->SetSlice(m_DistanceArray);
 
-      mitk::Image::Pointer expectedDepthImage = mitk::IOUtil::LoadImage(m_PathToDepthData);
+      mitk::Image::Pointer expectedDepthImage = mitk::IOUtil::Load<mitk::Image>(m_PathToDepthData);
 
       MITK_ASSERT_EQUAL( expectedDepthImage, resultDepthImage,
         "Image from the player should be the same as loaded from the harddisk, because we just load one slice.");

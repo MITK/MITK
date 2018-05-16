@@ -24,7 +24,7 @@ namespace mitk
   mitk::TransferFunctionPropertySerializer::~TransferFunctionPropertySerializer() {}
   TiXmlElement *mitk::TransferFunctionPropertySerializer::Serialize()
   {
-    if (const TransferFunctionProperty *prop =
+    if (const auto *prop =
           dynamic_cast<const TransferFunctionProperty *>(mitk::BasePropertySerializer::m_Property.GetPointer()))
     {
       LocaleSwitch localeSwitch("C");

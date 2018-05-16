@@ -42,7 +42,7 @@ namespace mitk
 
   protected:
     StateMachineAction(const std::string &);
-    ~StateMachineAction();
+    ~StateMachineAction() override;
 
   private:
     /**

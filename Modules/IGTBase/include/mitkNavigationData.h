@@ -59,7 +59,7 @@ namespace mitk {
       */
       typedef itk::Matrix<mitk::ScalarType,6,6> CovarianceMatrixType;
       /**
-      * \brief type that holds the time at which the data was recorded
+      * \brief type that holds the time at which the data was recorded in milliseconds
       */
       typedef double TimeStampType;
 
@@ -88,11 +88,12 @@ namespace mitk {
       */
       itkSetMacro(DataValid, bool);
       /**
-      * \brief sets the IGT timestamp of the NavigationData object
+      * \brief sets the IGT timestamp of the NavigationData object in milliseconds
       */
       itkSetMacro(IGTTimeStamp, TimeStampType);
       /**
-      * \brief gets the IGT timestamp of the NavigationData object
+      * \brief gets the IGT timestamp of the NavigationData object in milliseconds
+      * Please note, that there is also the GetTimeStamp method provided by the ITK object. Within IGT you should always use GetIGTTimeStamp !
       */
       itkGetConstMacro(IGTTimeStamp, TimeStampType);
       /**
@@ -138,14 +139,14 @@ namespace mitk {
       * SmartPointers to the same NavigationData object since separate DataObjects are
       * still maintained.
       */
-      virtual void Graft(const DataObject *data) override;
+      void Graft(const DataObject *data) override;
 
       /**
       * \brief copy meta data of a NavigationData object
       *
       * copies all meta data from NavigationData data to this object
       */
-      virtual void CopyInformation(const DataObject* data) override;
+      void CopyInformation(const DataObject* data) override;
 
       /**
       * \brief Prints the object information to the given stream os.
@@ -226,7 +227,7 @@ namespace mitk {
        */
       NavigationData(mitk::AffineTransform3D::Pointer affineTransform3D, const bool checkForRotationMatrix = true);
 
-      virtual ~NavigationData();
+      ~NavigationData() override;
 
       /**
       * \brief holds the position part of the tracking data

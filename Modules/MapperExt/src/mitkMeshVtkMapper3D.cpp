@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPropAssembly.h>
 #include <vtkRenderer.h>
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 
@@ -52,7 +52,7 @@ void mitk::MeshVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/
   m_ContourActor->SetUserTransform(vtktransform);
 }
 
-mitk::MeshVtkMapper3D::MeshVtkMapper3D() : m_PropAssembly(NULL)
+mitk::MeshVtkMapper3D::MeshVtkMapper3D() : m_PropAssembly(nullptr)
 {
   m_Spheres = vtkAppendPolyData::New();
   m_Contour = vtkPolyData::New();
@@ -107,7 +107,7 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer
 
     mitk::Mesh::DataType::Pointer itkMesh = input->GetMesh(this->GetTimestep());
 
-    if (itkMesh.GetPointer() == NULL)
+    if (itkMesh.GetPointer() == nullptr)
     {
       m_PropAssembly->VisibilityOff();
       return;
@@ -122,9 +122,9 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer
     mitk::Color tmpColor;
 
     // check for color prop and use it for rendering if it exists
-    m_DataNode->GetColor(floatRgba, NULL);
+    m_DataNode->GetColor(floatRgba, nullptr);
 
-    if (dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetProperty("unselectedcolor")) != NULL)
+    if (dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetProperty("unselectedcolor")) != nullptr)
     {
       tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetProperty("unselectedcolor"))->GetValue();
       floatRgba[0] = tmpColor[0];
@@ -148,7 +148,7 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer
 
       for (j = 0, i = itkMesh->GetPoints()->Begin(); i != itkMesh->GetPoints()->End(); i++, j++)
       {
-        vtkSphereSource *sphere = vtkSphereSource::New();
+        vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
 
         sphere->SetRadius(pointSize);
         sphere->SetCenter(i.Value()[0], i.Value()[1], i.Value()[2]);
@@ -171,7 +171,7 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer
                            "currently not supported.");
 #else
       m_Contour =
-        MeshUtil<mitk::Mesh::MeshType>::MeshToPolyData(itkMesh.GetPointer(), false, false, 0, NULL, m_Contour);
+        MeshUtil<mitk::Mesh::MeshType>::MeshToPolyData(itkMesh.GetPointer(), false, false, 0, nullptr, m_Contour);
 #endif
 
       if (m_Contour->GetNumberOfCells() > 0)
@@ -179,7 +179,7 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer
         // setup mapper, actor and add to assembly
         m_ContourMapper->SetInputData(m_Contour);
         bool wireframe = true;
-        GetDataNode()->GetVisibility(wireframe, NULL, "wireframe");
+        GetDataNode()->GetVisibility(wireframe, nullptr, "wireframe");
         if (wireframe)
           m_ContourActor->GetProperty()->SetRepresentationToWireframe();
         else
@@ -189,9 +189,6 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer
       }
     }
   }
-
-  SetVtkMapperImmediateModeRendering(m_ContourMapper);
-  SetVtkMapperImmediateModeRendering(m_SpheresMapper);
 
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");

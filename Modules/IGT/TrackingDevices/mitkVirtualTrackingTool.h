@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKVirtualTrackingTool_H_HEADER_INCLUDED_
 #define MITKVirtualTrackingTool_H_HEADER_INCLUDED_
 
-#include <mitkInternalTrackingTool.h>
+#include <mitkTrackingTool.h>
 #include <MitkIGTExports.h>
 #include <mitkNumericTypes.h>
 #include <itkFastMutexLock.h>
@@ -37,10 +37,10 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MITKIGT_EXPORT VirtualTrackingTool : public InternalTrackingTool
+  class MITKIGT_EXPORT VirtualTrackingTool : public TrackingTool
   {
   public:
-    mitkClassMacro(VirtualTrackingTool, InternalTrackingTool);
+    mitkClassMacro(VirtualTrackingTool, TrackingTool);
     friend class VirtualTrackingDevice;
     itkFactorylessNewMacro(Self)
     typedef itk::NonUniformBSpline<3> SplineType; ///< spline type used for tool path interpolation
@@ -57,7 +57,7 @@ namespace mitk {
   protected:
     itkCloneMacro(Self)
     VirtualTrackingTool();
-    virtual ~VirtualTrackingTool();
+    ~VirtualTrackingTool() override;
 
     SplineType::Pointer m_Spline;
     mitk::ScalarType m_SplineLength;

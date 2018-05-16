@@ -41,8 +41,8 @@ public:
 
   void tearDown() override
   {
-    regularImage = 0;
-    multilabelImage = 0;
+    regularImage = nullptr;
+    multilabelImage = nullptr;
   }
 
   void TestReadWrite3DLabelSetImage()
@@ -79,7 +79,7 @@ public:
     mitk::IOUtil::Save(multilabelImage, pathToImage);
 
     mitk::LabelSetImage::Pointer loadedImage =
-      dynamic_cast<mitk::LabelSetImage *>(mitk::IOUtil::LoadBaseData(pathToImage).GetPointer());
+      mitk::IOUtil::Load<mitk::LabelSetImage >(pathToImage);
 
     // This information is currently not serialized but also checked within the Equals function
     loadedImage->SetActiveLayer(multilabelImage->GetActiveLayer());
@@ -124,7 +124,7 @@ public:
     mitk::IOUtil::Save(multilabelImage, pathToImage);
 
     mitk::LabelSetImage::Pointer loadedImage =
-      dynamic_cast<mitk::LabelSetImage *>(mitk::IOUtil::LoadBaseData(pathToImage).GetPointer());
+      mitk::IOUtil::Load<mitk::LabelSetImage >(pathToImage);
 
     // This information is currently not serialized but also checked within the Equals function
     loadedImage->SetActiveLayer(multilabelImage->GetActiveLayer());

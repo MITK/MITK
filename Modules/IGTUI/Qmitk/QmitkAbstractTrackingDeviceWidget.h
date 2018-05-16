@@ -32,7 +32,11 @@ See LICENSE.txt or http://www.mitk.org for details.
  *         Inherited widgets should be registered in the Microservice (TrackingDeviceCollectionWidget),
  *         If done so, they will be included in the QmitkTrackingDeviceConfigurationWidget of the Tracking Toolbox.
  *
- *         - Each implementation of this class must have a method to construct a tracking Device (ConstructTrackingDevice).
+ *         - Each implementation of this class must have a method to get a TrackingDevice
+ *         - Each implementation handles itself, if a new TrackingDevice needs to be constructed.
+ *                Attention: In former MITK versions, there was no pure virtual GetTrackingDevice function but a pure virtual ConstructTrackingDevice function.
+ *                You can simply rename these, but you should give it a thought, if each time "Construct" was called, a new device needs to be constructed,
+ *                or if you can store your TrackingDevice in a member variable and return this. Up to you.
  *         - Please create the UI elements in a function like CreateQtPartControl (e.g. see QmitkVitrualTrackerWidget).
  *         - You might want to use own buttons etc., please connect them in a private CreateConnections (e.g. see QmitkVitrualTrackerWidget).
  *         - Due to initialization of qt during autoloading of the IGT module, you constructor should be as slim as possible and only contain a call
@@ -56,16 +60,16 @@ class MITKIGTUI_EXPORT QmitkAbstractTrackingDeviceWidget : public QWidget
 public:
   static const std::string VIEW_ID;
 
-  QmitkAbstractTrackingDeviceWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkAbstractTrackingDeviceWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
 
-  virtual ~QmitkAbstractTrackingDeviceWidget();
+  ~QmitkAbstractTrackingDeviceWidget() override;
 
   /**
    * \brief Return pointer to copy of the object.
    * Internally use of QmitkUSAbstractCustomWidget::Clone() with additionaly
    * setting an internal flag that the object was really cloned.
    */
-  QmitkAbstractTrackingDeviceWidget* CloneForQt(QWidget* parent = 0) const;
+  QmitkAbstractTrackingDeviceWidget* CloneForQt(QWidget* parent = nullptr) const;
 
   /**
   * \brief Subclass must implement this method to return a pointer to a copy of the object.
@@ -101,7 +105,7 @@ protected:
    * \brief Subclass must implement this method to return a pointer to a copy of the object.
    * Please don't forget to call Initialize() during this function and copy all of your settings.
    */
-  virtual QmitkAbstractTrackingDeviceWidget* Clone(QWidget* parent = 0) const = 0;
+  virtual QmitkAbstractTrackingDeviceWidget* Clone(QWidget* parent = nullptr) const = 0;
 
 public:
   /**
@@ -112,7 +116,7 @@ public:
   * \brief Optional method to add output to a small screen in the trackingToolbox (see QmitkNDIPolarisWidget)
   */
   virtual void AddOutput(std::string) {}
-  virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice() = 0;
+  virtual mitk::TrackingDevice::Pointer GetTrackingDevice() = 0;
 
   /**
   * \brief Optional method to store and load settings of your widget (see QmitkNDIPolarisWidget)
@@ -130,6 +134,34 @@ public:
   * Others however migth crash, and for these you might implement this function (see QmitkMicronTrackerWidget)
   */
   virtual bool IsDeviceInstalled() { return true; }
+
+  /**
+  * \brief This function is called, when in the TrackingToolboxView "Connect" was clicked and the device is successful connected.
+  * Can e.g. be used to activate options of a tracking device only when it is connected.
+  */
+  virtual void OnConnected(bool) {}
+  /**
+  * \brief This function is called, when in the TrackingToolboxView "Disconnect" was clicked and the device is successful disconnected.
+  * Can e.g. be used to activate/disactivate options of a tracking device.
+  */
+  virtual void OnDisconnected(bool) {}
+
+  /**
+  * \brief This function is called, when in the TrackingToolboxView "Start Tracking" was clicked and the device successfully started tracking.
+  * Can e.g. be used to activate options of a tracking device only when tracking is started.
+  */
+  virtual void OnStartTracking(bool) {}
+  /**
+  * \brief This function is called, when in the TrackingToolboxView "Stop Tracking" was clicked and the device successful stopped tracking.
+  * Can e.g. be used to activate/disactivate options when device is not tracking.
+  */
+  virtual void OnStopTracking(bool) {}
+  /**
+  * \brief This function is called, when anything in the ToolStorage changed, e.g. AddTool or EditTool.
+  * ServiceListener is connected in the QmitkMITKIGTTrackingToolboxView.
+  */
+  virtual void OnToolStorageChanged() {}
+
 
   std::string m_ErrorMessage; ///< current problem description
 

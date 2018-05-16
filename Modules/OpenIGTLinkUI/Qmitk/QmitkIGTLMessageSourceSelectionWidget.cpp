@@ -25,8 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkIGTLMessageSourceSelectionWidget::QmitkIGTLMessageSourceSelectionWidget(
     QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
-  m_Controls = NULL;
-  m_CurrentIGTLMessageSource = NULL;
+  m_Controls = nullptr;
+  m_CurrentIGTLMessageSource = nullptr;
   CreateQtPartControl(this);
 }
 
@@ -69,7 +69,7 @@ void QmitkIGTLMessageSourceSelectionWidget::IGTLMessageSourceSelected(us::Servic
     if (!s) //nothing selected
       {
         //reset everything
-        this->m_CurrentIGTLMessageSource = NULL;
+        this->m_CurrentIGTLMessageSource = nullptr;
         emit IGTLMessageSourceSelected(this->m_CurrentIGTLMessageSource);
         return;
       }
@@ -83,5 +83,24 @@ void QmitkIGTLMessageSourceSelectionWidget::IGTLMessageSourceSelected(us::Servic
 
 mitk::IGTLMessageSource::Pointer QmitkIGTLMessageSourceSelectionWidget::GetSelectedIGTLMessageSource()
 {
+  return this->m_CurrentIGTLMessageSource;
+}
+
+mitk::IGTLMessageSource::Pointer QmitkIGTLMessageSourceSelectionWidget::AutoSelectFirstIGTLMessageSource()
+{
+  if( m_Controls->m_ServiceListWidget->GetAllServiceReferences().size() != 0 )
+  {
+    us::ModuleContext* context = us::GetModuleContext();
+    this->m_CurrentIGTLMessageSource =
+      context->GetService<mitk::IGTLMessageSource>(
+        m_Controls->m_ServiceListWidget->GetAllServiceReferences().at(0) );
+  }
+  else
+  {
+    this->m_CurrentIGTLMessageSource = nullptr;
+    MITK_WARN("CurrentIGTLMessageSource") << "There was no OpenIGTLink message source to select."
+    << "The OpenIGTLink message source must be selected manually.";
+  }
+
   return this->m_CurrentIGTLMessageSource;
 }

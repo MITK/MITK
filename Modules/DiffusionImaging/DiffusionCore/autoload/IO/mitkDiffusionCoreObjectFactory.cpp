@@ -51,11 +51,11 @@ mitk::DiffusionCoreObjectFactory::~DiffusionCoreObjectFactory()
 
 mitk::Mapper::Pointer mitk::DiffusionCoreObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)
 {
-  mitk::Mapper::Pointer newMapper=NULL;
+  mitk::Mapper::Pointer newMapper=nullptr;
 
   if ( id == mitk::BaseRenderer::Standard2D )
   {
-    std::string classname("QBallImage");
+    std::string classname("OdfImage");
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::CompositeMapper::New();
@@ -63,6 +63,13 @@ mitk::Mapper::Pointer mitk::DiffusionCoreObjectFactory::CreateMapper(mitk::DataN
       node->SetMapper(3, ((CompositeMapper*)newMapper.GetPointer())->GetImageMapper());
     }
     classname = "TensorImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::CompositeMapper::New();
+      newMapper->SetDataNode(node);
+      node->SetMapper(3, ((CompositeMapper*)newMapper.GetPointer())->GetImageMapper());
+    }
+    classname = "ShImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::CompositeMapper::New();
@@ -73,13 +80,19 @@ mitk::Mapper::Pointer mitk::DiffusionCoreObjectFactory::CreateMapper(mitk::DataN
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
-    std::string classname("QBallImage");
+    std::string classname("OdfImage");
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::GPUVolumeMapper3D::New();
       newMapper->SetDataNode(node);
     }
     classname = "TensorImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::GPUVolumeMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
+    classname = "ShImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::GPUVolumeMapper3D::New();
@@ -92,7 +105,7 @@ mitk::Mapper::Pointer mitk::DiffusionCoreObjectFactory::CreateMapper(mitk::DataN
 
 void mitk::DiffusionCoreObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
-  std::string classname = "QBallImage";
+  std::string classname = "OdfImage";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
     mitk::CompositeMapper::SetDefaultProperties(node);
@@ -106,6 +119,12 @@ void mitk::DiffusionCoreObjectFactory::SetDefaultProperties(mitk::DataNode* node
     mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
 
+  classname = "ShImage";
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::CompositeMapper::SetDefaultProperties(node);
+    mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
+  }
 }
 
 const char* mitk::DiffusionCoreObjectFactory::GetFileExtensions()

@@ -1,5 +1,6 @@
 set(CPP_FILES
   mitkDiffusionCoreIOActivator.cpp
+  mitkPeakImageReader.cpp
   mitkNrrdTensorImageReader.cpp
   mitkNrrdTensorImageWriter.cpp
   mitkTensorImageSerializer.cpp
@@ -8,14 +9,19 @@ set(CPP_FILES
 
   mitkDiffusionCoreIOMimeTypes.cpp
 
+  mitkDiffusionImageDicomReaderService.cpp
   mitkDiffusionImageNrrdReaderService.cpp
   mitkDiffusionImageNrrdWriterService.cpp
   mitkDiffusionImageNiftiReaderService.cpp
   mitkDiffusionImageNiftiWriterService.cpp
 
-  mitkNrrdQBallImageReader.cpp
-  mitkNrrdQBallImageWriter.cpp
-  mitkQBallImageSerializer.cpp
+  mitkNrrdOdfImageReader.cpp
+  mitkNrrdOdfImageWriter.cpp
+  mitkOdfImageSerializer.cpp
+  mitkPeakImageSerializer.cpp
+  mitkShImageReader.cpp
+  mitkShImageWriter.cpp
+  mitkShImageSerializer.cpp
 
   mitkCompositeMapper.cpp
 )

@@ -54,8 +54,8 @@ namespace mitk
     itkGetMacro(FlipNormals, bool);
     itkSetMacro(FlipNormals, bool);
 
-    virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx) override;
-    virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType &name) override;
+    DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx) override;
+    DataObjectPointer MakeOutput(const DataObjectIdentifierType &name) override;
 
     using Superclass::SetInput;
     void SetInput(mitk::PlanarFigure *planarFigure);
@@ -65,10 +65,10 @@ namespace mitk
 
   protected:
     ExtrudePlanarFigureFilter();
-    virtual ~ExtrudePlanarFigureFilter();
+    ~ExtrudePlanarFigureFilter() override;
 
-    virtual void GenerateData() override;
-    virtual void GenerateOutputInformation() override;
+    void GenerateData() override;
+    void GenerateOutputInformation() override;
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
   private:

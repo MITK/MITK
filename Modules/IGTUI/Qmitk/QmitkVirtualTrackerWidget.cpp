@@ -56,7 +56,7 @@ void QmitkVirtualTrackerWidget::CreateConnections()
   }
 }
 
-mitk::TrackingDevice::Pointer QmitkVirtualTrackerWidget::ConstructTrackingDevice()
+mitk::TrackingDevice::Pointer QmitkVirtualTrackerWidget::GetTrackingDevice()
 {
   // Create the Virtual Tracking Device
   mitk::VirtualTrackingDevice::Pointer returnValue = mitk::VirtualTrackingDevice::New();

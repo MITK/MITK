@@ -62,7 +62,7 @@ namespace mitk
      * BaseRenderer is itself deallocating it in its destructor, it has to set
      * unregisterFromBaseRenderer=false)
      */
-    virtual void ClearLocalStorage(mitk::BaseRenderer *renderer, bool unregisterFromBaseRenderer = true) override
+    void ClearLocalStorage(mitk::BaseRenderer *renderer, bool unregisterFromBaseRenderer = true) override
     {
       // MITK_INFO << "deleting a localstorage on a mapper request";
       if (unregisterFromBaseRenderer)
@@ -70,6 +70,17 @@ namespace mitk
       L *l = m_BaseRenderer2LS[renderer];
       m_BaseRenderer2LS.erase(renderer);
       delete l;
+    }
+
+    std::vector<mitk::BaseRenderer *> GetRegisteredBaseRenderer()
+    {
+      std::vector<mitk::BaseRenderer *> baserenderers;
+      typename std::map<mitk::BaseRenderer *, L *>::iterator it;
+      for (it = m_BaseRenderer2LS.begin(); it != m_BaseRenderer2LS.end(); ++it)
+      {
+        baserenderers.push_back(it->first);
+      }
+      return baserenderers;
     }
 
     /** \brief Retrieves a LocalStorage for a specific BaseRenderer.
@@ -89,7 +100,7 @@ namespace mitk
       return l;
     }
 
-    ~LocalStorageHandler()
+    ~LocalStorageHandler() override
     {
       typename std::map<mitk::BaseRenderer *, L *>::iterator it;
 

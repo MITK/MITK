@@ -34,7 +34,7 @@ struct BERRY_UI_QT IStickyViewManager : public Object
 
   berryObjectMacro(berry::IStickyViewManager)
 
-  ~IStickyViewManager();
+  ~IStickyViewManager() override;
 
   virtual void Remove(const QString& perspectiveId) = 0;
 

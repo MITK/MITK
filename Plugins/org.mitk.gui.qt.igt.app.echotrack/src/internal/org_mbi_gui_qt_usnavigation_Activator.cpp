@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QtPlugin>
 
 //#include "USNavigation.h"
-#include "UltrasoundCalibration.h"
-#include "USNavigationMarkerPlacement.h"
+#include "QmitkUltrasoundCalibration.h"
+#include "QmitkUSNavigationMarkerPlacement.h"
 #include "QmitkUSNavigationPerspective.h"
 
 #include "mitkVirtualTrackingDevice.h"
@@ -34,11 +34,11 @@ namespace mitk {
     m_Context = context;
 
     //BERRY_REGISTER_EXTENSION_CLASS(USNavigation, context)
-    BERRY_REGISTER_EXTENSION_CLASS(UltrasoundCalibration, context)
-      BERRY_REGISTER_EXTENSION_CLASS(USNavigationMarkerPlacement, context)
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkUltrasoundCalibration, context)
+      BERRY_REGISTER_EXTENSION_CLASS(QmitkUSNavigationMarkerPlacement, context)
       BERRY_REGISTER_EXTENSION_CLASS(QmitkUSNavigationPerspective, context)
 
-      // create a combined modality persitence object for loading and storing
+      // create a combined modality persistence object for loading and storing
       // combined modality objects persistently
       m_USCombinedModalityPersistence = mitk::USNavigationCombinedModalityPersistence::New();
   }
@@ -59,7 +59,7 @@ namespace mitk {
 }
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-Q_EXPORT_PLUGIN2(org_mbi_gui_qt_usnavigation, mitk::org_mbi_gui_qt_usnavigation_Activator)
+Q_EXPORT_PLUGIN2(org_mitk_gui_qt_igt_app_echotrack, mitk::org_mbi_gui_qt_usnavigation_Activator)
 #endif
 
 // necessary for us::GetModuleContext() in USNavigationCombinedModalityPersistence

@@ -53,7 +53,7 @@ protected slots:
 
 protected:
   QmitkCalculateGrayValueStatisticsToolGUI();
-  virtual ~QmitkCalculateGrayValueStatisticsToolGUI();
+  ~QmitkCalculateGrayValueStatisticsToolGUI() override;
 
   mitk::CalculateGrayValueStatisticsTool::Pointer m_CalculateGrayValueStatisticsTool;
 };

@@ -42,15 +42,15 @@ namespace mitk
   {
   public:
     PointSetWriterService();
-    virtual ~PointSetWriterService();
+    ~PointSetWriterService() override;
 
     using AbstractFileWriter::Write;
-    virtual void Write() override;
+    void Write() override;
 
   private:
     PointSetWriterService(const PointSetWriterService &other);
 
-    virtual mitk::PointSetWriterService *Clone() const override;
+    mitk::PointSetWriterService *Clone() const override;
 
     template <typename T>
     std::string ConvertToString(T value);

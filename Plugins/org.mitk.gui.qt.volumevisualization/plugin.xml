@@ -2,14 +2,12 @@
 <?BlueBerry version="0.1"?>
 <plugin>
   <extension point="org.blueberry.ui.views">
-    <category
-      id="org.mitk.views.general"
-      name="MITK General"/>
     <view
       id="org.mitk.views.volumevisualization"
       name="Volume Visualization"
       class="QmitkVolumeVisualizationView"
-      icon="resources/icon.xpm" >
+      icon="resources/volume_visualization.svg"
+      category="General" >
       <description>Configure the 3D-Visualization of images.</description>
       <keywordReference id="org.mitk.views.volumevisualization.ViewKeyword"/>
     </view>

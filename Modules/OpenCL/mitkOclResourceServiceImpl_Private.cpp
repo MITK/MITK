@@ -21,7 +21,7 @@ OclResourceService::~OclResourceService()
 }
 
 OclResourceServiceImpl::OclResourceServiceImpl()
-  : m_ContextCollection(NULL), m_ProgramStorage()
+  : m_ContextCollection(nullptr), m_ProgramStorage()
 {
   m_ProgramStorageMutex = itk::FastMutexLock::New();
 }
@@ -45,13 +45,13 @@ OclResourceServiceImpl::~OclResourceServiceImpl()
 
 cl_context OclResourceServiceImpl::GetContext() const
 {
-  if( m_ContextCollection == NULL )
+  if( m_ContextCollection == nullptr )
   {
     m_ContextCollection = new OclContextCollection();
   }
   else if( !m_ContextCollection->CanProvideContext() )
   {
-    return NULL;
+    return nullptr;
   }
 
   return m_ContextCollection->m_Context;
@@ -69,11 +69,11 @@ cl_command_queue OclResourceServiceImpl::GetCommandQueue() const
     m_ContextCollection = new OclContextCollection();
   }
 
-  cl_int clErr = clGetCommandQueueInfo( m_ContextCollection->m_CommandQueue, CL_QUEUE_CONTEXT, sizeof(clQueueContext), &clQueueContext, NULL );
+  cl_int clErr = clGetCommandQueueInfo( m_ContextCollection->m_CommandQueue, CL_QUEUE_CONTEXT, sizeof(clQueueContext), &clQueueContext, nullptr );
   if( clErr != CL_SUCCESS || clQueueContext != m_ContextCollection->m_Context )
   {
     MITK_WARN << "Have no valid command queue. Query returned : " << GetOclErrorAsString( clErr );
-    return NULL;
+    return nullptr;
   }
 
   return m_ContextCollection->m_CommandQueue;
@@ -169,7 +169,7 @@ void OclResourceServiceImpl::InvalidateStorage()
   {
     // query the program build status
     cl_build_status status;
-    unsigned int query = clGetProgramBuildInfo( it->second.program, m_ContextCollection->m_Devices[0], CL_PROGRAM_BUILD_STATUS, sizeof(cl_int), &status, NULL );
+    unsigned int query = clGetProgramBuildInfo( it->second.program, m_ContextCollection->m_Devices[0], CL_PROGRAM_BUILD_STATUS, sizeof(cl_int), &status, nullptr );
     CHECK_OCL_ERR( query )
 
     MITK_DEBUG << "Quering status for " << it->first << std::endl;
@@ -192,7 +192,7 @@ void OclResourceServiceImpl::RemoveProgram(const std::string& name)
 {
   ProgramMapType::iterator it = m_ProgramStorage.find(name);
   cl_int status = 0;
-  cl_program program = NULL;
+  cl_program program = nullptr;
 
   if( it != m_ProgramStorage.end() )
   {
@@ -235,20 +235,20 @@ unsigned int OclResourceServiceImpl::GetMaximumImageSize(unsigned int dimension,
   {
   case 0:
     if ( _imagetype == CL_MEM_OBJECT_IMAGE2D)
-      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE2D_MAX_WIDTH, sizeof( size_t ), &retValue, NULL );
+      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE2D_MAX_WIDTH, sizeof( size_t ), &retValue, nullptr );
     else
-      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE3D_MAX_WIDTH, sizeof( size_t ), &retValue, NULL );
+      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE3D_MAX_WIDTH, sizeof( size_t ), &retValue, nullptr );
 
     break;
   case 1:
     if ( _imagetype == CL_MEM_OBJECT_IMAGE2D)
-      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE2D_MAX_HEIGHT, sizeof( size_t ), &retValue, NULL );
+      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE2D_MAX_HEIGHT, sizeof( size_t ), &retValue, nullptr );
     else
-      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE3D_MAX_HEIGHT, sizeof( size_t ), &retValue, NULL );
+      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE3D_MAX_HEIGHT, sizeof( size_t ), &retValue, nullptr );
     break;
   case 2:
     if ( _imagetype == CL_MEM_OBJECT_IMAGE3D)
-      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE3D_MAX_DEPTH, sizeof( size_t ), &retValue, NULL);
+      clGetDeviceInfo( m_ContextCollection->m_Devices[0], CL_DEVICE_IMAGE3D_MAX_DEPTH, sizeof( size_t ), &retValue, nullptr);
     break;
   default:
     MITK_WARN << "Could not recieve info. Desired dimension or object type does not exist. ";

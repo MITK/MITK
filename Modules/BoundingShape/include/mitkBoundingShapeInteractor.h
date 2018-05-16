@@ -45,23 +45,23 @@ namespace mitk
     mitkClassMacro(BoundingShapeInteractor, DataInteractor);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual void SetDataNode(DataNode *dataNode) override;
+      void SetDataNode(DataNode *dataNode) override;
     void SetRotationEnabled(bool rotationEnabled);
 
   protected:
     BoundingShapeInteractor();
-    virtual ~BoundingShapeInteractor();
+    ~BoundingShapeInteractor() override;
 
     /**
       * Here actions strings from the loaded state machine pattern are mapped to functions of
       * the DataInteractor. These functions are called when an action from the state machine pattern is executed.
       */
-    virtual void ConnectActionsAndFunctions() override;
+    void ConnectActionsAndFunctions() override;
 
     /**
       * @brief Called when a DataNode has been set/changed.
       */
-    virtual void DataNodeChanged() override;
+    void DataNodeChanged() override;
 
     void HandlePositionChanged(const InteractionEvent *interactionEvent, Point3D &center);
 

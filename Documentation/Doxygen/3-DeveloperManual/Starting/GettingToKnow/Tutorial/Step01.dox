@@ -11,7 +11,7 @@ Open your IDE. All steps can be found among the listed projects.
 The first program shows how to display an image in a 2D view. The picture above is a screenshot of the program.
 The program has to be executed using the image file Pic3D.nrrd.
 
-If you are using Visual Studio use the StartVS_release.bat in your bin\\ subdirectory to start it with all required paths set.
+If you are using Visual Studio start MITK.sln in your bin\\ subdirectory to start it with all required paths set.
 To set the image file path in Visual Studio, right click on "MitkStep1"-project and go to 'Properties -> Configuration Properties -> Debugging'.
 Now insert the image file path to Pic3D.nrrd in the "Command Arguments" text field.
 Then right click on the "MitkStep1"-project again and select "Set as StartUp Project". Start to run the code. Use this also in the following steps.

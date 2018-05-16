@@ -37,24 +37,27 @@ class MITKIMAGESTATISTICS_EXPORT PlanarFigureMaskGenerator: public MaskGenerator
      * @brief GetMask Computes and returns the mask
      * @return mitk::Image::Pointer of the generated mask
      */
-    mitk::Image::Pointer GetMask();
+    mitk::Image::Pointer GetMask() override;
 
     void SetPlanarFigure(mitk::PlanarFigure::Pointer planarFigure);
 
-    mitk::Image::Pointer GetReferenceImage();
+    mitk::Image::Pointer GetReferenceImage() override;
 
     /**
      * @brief SetTimeStep is used to set the time step for which the mask is to be generated
      * @param timeStep
      */
-    void SetTimeStep(unsigned int timeStep);
+    void SetTimeStep(unsigned int timeStep) override;
 
+    itkGetConstMacro(PlanarFigureAxis, unsigned int);
+    itkGetConstMacro(PlanarFigureSlice, unsigned int);
 
     protected:
     PlanarFigureMaskGenerator():Superclass(){
         m_InternalMaskUpdateTime = 0;
         m_InternalMask = mitk::Image::New();
         m_ReferenceImage = nullptr;
+        m_PlanarFigureAxis = 0;
     }
 
 
@@ -63,6 +66,10 @@ class MITKIMAGESTATISTICS_EXPORT PlanarFigureMaskGenerator: public MaskGenerator
 
     template < typename TPixel, unsigned int VImageDimension >
     void InternalCalculateMaskFromPlanarFigure(
+      const itk::Image< TPixel, VImageDimension > *image, unsigned int axis );
+
+    template < typename TPixel, unsigned int VImageDimension >
+    void InternalCalculateMaskFromOpenPlanarFigure(
       const itk::Image< TPixel, VImageDimension > *image, unsigned int axis );
 
     mitk::Image::Pointer  extract2DImageSlice(unsigned int axis, unsigned int slice);
@@ -120,6 +127,7 @@ class MITKIMAGESTATISTICS_EXPORT PlanarFigureMaskGenerator: public MaskGenerator
     mitk::Image::Pointer m_ReferenceImage;
     unsigned int m_PlanarFigureAxis;
     unsigned long m_InternalMaskUpdateTime;
+    unsigned int m_PlanarFigureSlice;
     };
 }
 

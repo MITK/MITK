@@ -66,15 +66,15 @@ public:
   void SetRandomMode(int mode);
   int GetRandomMode();
 
-  virtual void SetInputConnection(vtkAlgorithmOutput *input) override;
+  void SetInputConnection(vtkAlgorithmOutput *input) override;
 
   using vtkGlyph3D::SetInputConnection;
 
 protected:
   vtkMaskedGlyph3D();
-  ~vtkMaskedGlyph3D();
+  ~vtkMaskedGlyph3D() override;
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
 
   vtkMaskPoints *MaskPoints;
   int MaximumNumberOfPoints;

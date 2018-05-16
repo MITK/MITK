@@ -20,13 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usServiceReference.h>
 
-mitk::ToolManagerProvider::ToolManagerProvider() : m_ToolManager(mitk::ToolManager::New(NULL))
+mitk::ToolManagerProvider::ToolManagerProvider() : m_ToolManager(mitk::ToolManager::New(nullptr))
 {
 }
 
 mitk::ToolManagerProvider::~ToolManagerProvider()
 {
-  this->m_ToolManager = NULL;
+  this->m_ToolManager = nullptr;
 }
 
 mitk::ToolManager *mitk::ToolManagerProvider::GetToolManager()
@@ -56,6 +56,6 @@ mitk::ToolManagerProvider *mitk::ToolManagerProvider::GetInstance()
   else
   {
     // No SingletonOneService instance was registered yet.
-    return 0;
+    return nullptr;
   }
 }

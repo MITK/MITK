@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAutoSelectingDICOMReaderService.h"
 #include "mitkClassicDICOMSeriesReaderService.h"
 #include "mitkDICOMTagsOfInterestService.h"
+#include "mitkSimpleVolumeDICOMSeriesReaderService.h"
 
 #include <usModuleContext.h>
 
@@ -27,7 +28,7 @@ namespace mitk {
   void DICOMReaderServicesActivator::Load(us::ModuleContext* context)
   {
     m_AutoSelectingDICOMReader.reset(new AutoSelectingDICOMReaderService());
-    m_ClassicDICOMSeriesReader.reset(new ClassicDICOMSeriesReaderService());
+    m_SimpleVolumeDICOMSeriesReader.reset(new SimpleVolumeDICOMSeriesReaderService());
 
     m_DICOMTagsOfInterestService.reset(new DICOMTagsOfInterestService());
     context->RegisterService<mitk::IDICOMTagsOfInterest>(m_DICOMTagsOfInterestService.get());

@@ -79,7 +79,7 @@ void mitk::GeometryClipImageFilter::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
 
   mitk::Image *output = this->GetOutput();
-  mitk::Image *input = const_cast<mitk::Image *>(this->GetInput());
+  mitk::Image *input = this->GetInput();
   if ((output->IsInitialized() == false) || (m_ClippingGeometry.IsNull()))
     return;
 
@@ -165,9 +165,9 @@ void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension> *inp
       MITK_INFO << leftMostPoint << " is above geometry" << std::endl;
   }
 
-  typename ItkOutputImageType::PixelType aboveLabel =
+  auto aboveLabel =
     (typename ItkOutputImageType::PixelType)geometryClipper->GetAboveGeometryLabel();
-  typename ItkOutputImageType::PixelType belowLabel =
+  auto belowLabel =
     (typename ItkOutputImageType::PixelType)geometryClipper->GetBelowGeometryLabel();
 
   for (inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)

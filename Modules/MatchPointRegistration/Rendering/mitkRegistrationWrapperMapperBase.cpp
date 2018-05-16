@@ -47,13 +47,20 @@ mitk::MITKRegistrationWrapperMapperBase::~MITKRegistrationWrapperMapperBase()
 
 void mitk::MITKRegistrationWrapperMapperBase::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
-    if ( !this->IsVisible( renderer ) )
+    mitk::DataNode::Pointer node = this->GetDataNode();
+
+    if (node.IsNull())
+      return;
+
+    bool isVisible = true;
+    node->GetVisibility(isVisible, renderer);
+
+    if (!isVisible)
         return;
 
     RegWrapperLocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
     //check if updates occured in the node or on the display
-    const DataNode *node = this->GetDataNode();
     bool outdatedRendererGeometry = RendererGeometryIsOutdated(renderer,localStorage->m_LastUpdateTime);
 
     if ( (localStorage->m_LastUpdateTime < node->GetMTime())
@@ -80,16 +87,13 @@ void mitk::MITKRegistrationWrapperMapperBase::GenerateDataForRenderer( mitk::Bas
         bool isPointsActiveOutdated = mitk::PropertyIsOutdated(node,mitk::nodeProp_RegVisPoints,localStorage->m_LastUpdateTime);
         bool showStartGridOutdated = mitk::PropertyIsOutdated(node,mitk::nodeProp_RegVisGridShowStart,localStorage->m_LastUpdateTime);
 
-        const mitk::BaseData* baseData = this->GetData();
-        if (baseData == NULL)
+        mitk::BaseData::Pointer baseData = node->GetData();
+
+        if (baseData.IsNull())
             return;
 
-        const DataNode *node = this->GetDataNode();
-        if (node == NULL)
-            return;
-
-        const mitk::MAPRegistrationWrapper* regWrapper = dynamic_cast<const mitk::MAPRegistrationWrapper*>(baseData);
-        if (regWrapper == NULL)
+        const mitk::MAPRegistrationWrapper* regWrapper = dynamic_cast<const mitk::MAPRegistrationWrapper*>(baseData.GetPointer());
+        if (regWrapper == nullptr)
             return;
 
         //////////////////////////////////////////////////////////////////////////
@@ -122,7 +126,7 @@ void mitk::MITKRegistrationWrapperMapperBase::GenerateDataForRenderer( mitk::Bas
             else if (isGlyphActive)
             {
               localStorage->m_DeformedGridData = mitk::Generate3DDeformationGlyph(gridDesc, regKernel);
-              localStorage->m_StartGridData = NULL;
+              localStorage->m_StartGridData = nullptr;
               localStorage->m_DeformedGridMapper->SetInputData(localStorage->m_DeformedGridData);
             }
             else
@@ -152,17 +156,17 @@ void mitk::MITKRegistrationWrapperMapperBase::GenerateDataForRenderer( mitk::Bas
             localStorage->m_DeformedGridMapper->SetScalarModeToUsePointData();
             localStorage->m_DeformedGridMapper->SelectColorArray( "VectorMagnitude" );
 
-            mitk::RegVisColorStyleProperty* colorStyleProp = NULL;
+            mitk::RegVisColorStyleProperty* colorStyleProp = nullptr;
             node->GetProperty(colorStyleProp, mitk::nodeProp_RegVisColorStyle);
 
             float color1[3] = {0.0,0.0,0.0};
-            node->GetColor( color1, NULL, mitk::nodeProp_RegVisColor1Value );
+            node->GetColor( color1, nullptr, mitk::nodeProp_RegVisColor1Value );
             float color2[3] = {0.25,0.25,0.25};
-            node->GetColor( color2, NULL, mitk::nodeProp_RegVisColor2Value );
+            node->GetColor( color2, nullptr, mitk::nodeProp_RegVisColor2Value );
             float color3[3] = {0.5,0.5,0.5};
-            node->GetColor( color3, NULL, mitk::nodeProp_RegVisColor3Value );
+            node->GetColor( color3, nullptr, mitk::nodeProp_RegVisColor3Value );
             float color4[3] = {1.0,1.0,1.0};
-            node->GetColor( color4, NULL, mitk::nodeProp_RegVisColor4Value );
+            node->GetColor( color4, nullptr, mitk::nodeProp_RegVisColor4Value );
 
             double mag2 = 0;
             node->GetPropertyValue(mitk::nodeProp_RegVisColor2Magnitude, mag2);
@@ -183,7 +187,7 @@ void mitk::MITKRegistrationWrapperMapperBase::GenerateDataForRenderer( mitk::Bas
             if (!colorStyleProp || colorStyleProp->GetValueAsId()==0)
             { //uni color mode
                 float temprgb[3] = {1.0,1.0,1.0};
-                node->GetColor( temprgb, NULL, mitk::nodeProp_RegVisColorUni );
+                node->GetColor( temprgb, nullptr, mitk::nodeProp_RegVisColorUni );
                 localStorage->m_LUT->AddRGBSegment(0.0,temprgb[0],temprgb[1],temprgb[2],1.0,temprgb[0],temprgb[1],temprgb[2]);
                 localStorage->m_LUT->Build();
                 localStorage->m_DeformedGridMapper->SetLookupTable(localStorage->m_LUT);
@@ -215,7 +219,7 @@ void mitk::MITKRegistrationWrapperMapperBase::GenerateDataForRenderer( mitk::Bas
             localStorage->m_StartGridMapper->SetScalarModeToUsePointFieldData();
 
             float temprgb[3];
-            if (node->GetColor( temprgb, NULL, mitk::nodeProp_RegVisGridStartColor ))
+            if (node->GetColor( temprgb, nullptr, mitk::nodeProp_RegVisGridStartColor ))
               {
                       double trgb[3] = { (double) temprgb[0], (double) temprgb[1], (double) temprgb[2] };
                       localStorage->m_StartGridActor->GetProperty()->SetColor(trgb);
@@ -258,11 +262,6 @@ vtkProp* mitk::MITKRegistrationWrapperMapperBase::GetVtkProp(mitk::BaseRenderer 
     return m_LSH.GetLocalStorage(renderer)->m_RegAssembly;
 }
 
-void mitk::MITKRegistrationWrapperMapperBase::SetVtkMapperImmediateModeRendering(vtkMapper *)
-{
-
-}
-
 mitk::MITKRegistrationWrapperMapperBase::RegWrapperLocalStorage::RegWrapperLocalStorage()
 {
     m_DeformedGridActor = vtkSmartPointer<vtkActor>::New();
@@ -277,7 +276,7 @@ mitk::MITKRegistrationWrapperMapperBase::RegWrapperLocalStorage::RegWrapperLocal
 
     m_LUT = vtkSmartPointer<vtkColorTransferFunction>::New();
 
-    m_DeformedGridData = NULL;
-    m_StartGridData = NULL;
+    m_DeformedGridData = nullptr;
+    m_StartGridData = nullptr;
 }
 

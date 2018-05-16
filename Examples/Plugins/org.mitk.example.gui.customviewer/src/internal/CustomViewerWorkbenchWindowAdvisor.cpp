@@ -25,8 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QToolButton>
 #include <QVBoxLayout>
 
-#include <mitkCoreObjectFactory.h>
 #include <mitkWorkbenchUtil.h>
+#include <QmitkIOUtil.h>
 
 #include <berryIQtStyleManager.h>
 #include <berryIWorkbench.h>
@@ -145,13 +145,14 @@ void CustomViewerWorkbenchWindowAdvisor::UpdateStyle()
 }
 // //! [WorkbenchWindowAdvisorUpdateStyle]
 // //! [WorkbenchWindowAdvisorOpenFile]
+
 void CustomViewerWorkbenchWindowAdvisor::OpenFile()
 {
-  // Ask the user for a list of files to open
-  QStringList fileNames = QFileDialog::getOpenFileNames(NULL,
-                                                        "Open",
-                                                        /*d->getLastFileOpenPath()*/ QString(),
-                                                        mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
+  QStringList fileNames = QFileDialog::getOpenFileNames(
+    nullptr,
+    QStringLiteral("Open"),
+    QString(),
+    QmitkIOUtil::GetFileOpenFilterString());
 
   if (fileNames.empty())
     return;

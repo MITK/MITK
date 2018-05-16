@@ -313,15 +313,22 @@ namespace mitk {
       void GrabImage();
 
   protected:
-    itkSetMacro(Image, mitk::Image::Pointer);
+    virtual void SetImageVector(std::vector<mitk::Image::Pointer> vec)
+    {
+      if (this->m_ImageVector != vec)                   
+      {                                             
+      this->m_ImageVector = vec;
+      this->Modified();                             
+      } 
+    }
     itkSetMacro(SpawnAcquireThread, bool);
     itkGetMacro(SpawnAcquireThread, bool);
 
     static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
     static ITK_THREAD_RETURN_TYPE ConnectThread(void* pInfoStruct);
 
-    mitk::Image::Pointer m_Image;
-    mitk::Image::Pointer m_OutputImage;
+    std::vector<mitk::Image::Pointer> m_ImageVector;
+    //mitk::Image::Pointer m_OutputImage;
 
     /**
     * \brief Registers an OpenIGTLink device as a microservice so that we can send the images of
@@ -425,15 +432,17 @@ namespace mitk {
     */
     USDevice(mitk::USImageMetadata::Pointer metadata);
 
-    virtual ~USDevice();
+    ~USDevice() override;
 
     /**
     * \brief Grabs the next frame from the Video input.
     * This method is called internally, whenever Update() is invoked by an Output.
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     std::string GetServicePropertyLabel();
+
+    unsigned int m_NumberOfOutputs;
 
   private:
 

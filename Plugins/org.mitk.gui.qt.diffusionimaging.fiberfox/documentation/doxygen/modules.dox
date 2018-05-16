@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_gui_qt_diffusionimaging_fiberfox org.mitk.gui.qt.diffusionimaging.fiberfox
+  \ingroup MITKPlugins
+
+  \brief This is the diffusionimaging.fiberfox plugin. 
+  
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_diffusionimaging_fiberfox_internal Internal
+  \ingroup org_mitk_gui_qt_diffusionimaging_fiberfox
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.diffusionimaging.fiberfox plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

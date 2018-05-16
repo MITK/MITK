@@ -33,11 +33,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define _itk_ElectrostaticRepulsionDiffusionGradientReductionFilter_txx_
 #endif
 
-#define _USE_MATH_DEFINES
-
 #include "itkElectrostaticRepulsionDiffusionGradientReductionFilter.h"
-#include <math.h>
-#include <time.h>
+#include <ctime>
 #include <itkImageRegionIterator.h>
 #include <itkImageRegion.h>
 
@@ -56,7 +53,7 @@ double
 ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutputScalarType>
 ::Costs()
 {
-    double costs = 2*M_PI;
+    double costs = 2*itk::Math::pi;
     for (IndicesVector::iterator it = m_UsedGradientIndices.begin(); it!=m_UsedGradientIndices.end(); ++it)
     {
         for (IndicesVector::iterator it2 = m_UsedGradientIndices.begin(); it2!=m_UsedGradientIndices.end(); ++it2)
@@ -97,10 +94,10 @@ void
 ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutputScalarType>
 ::GenerateData()
 {
-    unsigned int randSeed = time(NULL);
+    unsigned int randSeed = time(nullptr);
 
     if(m_InputBValueMap.empty() || m_NumGradientDirections.size()!=m_InputBValueMap.size())
-        return;
+        mitkThrow() << "Vector of the number of desired gradient directions contains more elements than the specified target b-value map.";
 
     BValueMap manipulatedMap = m_InputBValueMap;
 
@@ -136,7 +133,7 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
         double minAngle = Costs();
         double newMinAngle = 0;
 
-        MITK_INFO << "minimum angle: " << 180*minAngle/M_PI;
+        MITK_INFO << "minimum angle: " << 180*minAngle/itk::Math::pi;
         int stagnationCount = 0;
         int rejectionCount = 0;
         int maxRejections = m_NumGradientDirections[shellCounter] * 1000;
@@ -157,7 +154,7 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
                 newMinAngle = Costs();          // calculate costs of proposed configuration
                 if (newMinAngle > minAngle)     // accept or reject proposal
                 {
-                    MITK_INFO << "minimum angle: " << 180*newMinAngle/M_PI;
+                    MITK_INFO << "minimum angle: " << 180*newMinAngle/itk::Math::pi;
 
                     if ( (newMinAngle-minAngle)<0.01 )
                         stagnationCount++;

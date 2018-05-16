@@ -96,10 +96,10 @@ namespace mitk
   class BaseDataCompareT : public BaseDataCompare
   {
   private:
-    virtual bool InternalAreEqual(const BaseData &left,
+    bool InternalAreEqual(const BaseData &left,
                                   const BaseData &right,
                                   ScalarType eps = mitk::eps,
-                                  bool verbose = false)
+                                  bool verbose = false) override
     {
       try
       {
@@ -131,10 +131,10 @@ namespace mitk
   class BaseDataCompareTNonConst : public BaseDataCompare
   {
   private:
-    virtual bool InternalAreEqual(const BaseData &left,
+    bool InternalAreEqual(const BaseData &left,
                                   const BaseData &right,
                                   ScalarType eps = mitk::eps,
-                                  bool verbose = false)
+                                  bool verbose = false) override
     {
       try
       {

@@ -63,7 +63,7 @@ void QmitkTimeSliceAnimationItem::Animate(double s)
 {
   mitk::Stepper* stepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime();
 
-  if (stepper == NULL)
+  if (stepper == nullptr)
     return;
 
   int newPos = this->GetReverse()

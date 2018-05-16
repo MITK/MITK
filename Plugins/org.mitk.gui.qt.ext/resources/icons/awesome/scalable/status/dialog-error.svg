@@ -25,7 +25,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.75"
-     inkscape:cx="22.718827"
+     inkscape:cx="-16.181818"
      inkscape:cy="79.050308"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -33,8 +33,8 @@
      inkscape:grid-bbox="true"
      inkscape:window-width="757"
      inkscape:window-height="701"
-     inkscape:window-x="1669"
-     inkscape:window-y="69"
+     inkscape:window-x="332"
+     inkscape:window-y="115"
      inkscape:window-maximized="0" />
   <metadata
      id="metadata2990">
@@ -53,11 +53,11 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
     <g
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:71.70020294px;line-height:125%;font-family:FontAwesome;-inkscape-font-specification:FontAwesome;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:71.70020294px;line-height:125%;font-family:FontAwesome;-inkscape-font-specification:FontAwesome;letter-spacing:0px;word-spacing:0px;fill:#ff00ff;fill-opacity:1;stroke:none"
        id="text2993">
       <path
          d="m 49.948795,35.243305 c 0,1.400395 -1.160327,2.560721 -2.560722,2.560721 l -30.728658,0 c -1.400395,0 -2.560722,-1.160326 -2.560722,-2.560721 l 0,-5.121443 c 0,-1.400395 1.160327,-2.560722 2.560722,-2.560722 l 30.728658,0 c 1.400395,0 2.560722,1.160327 2.560722,2.560722 l 0,5.121443 z m 12.803608,-2.560722 c 0,-16.96478 -13.763879,-30.728658 -30.728659,-30.728658 -16.96478,0 -30.7286582,13.763878 -30.7286582,30.728658 0,16.964781 13.7638782,30.728659 30.7286582,30.728659 16.96478,0 30.728659,-13.763878 30.728659,-30.728659 z"
-         style=""
+         style="fill:#ff00ff;fill-opacity:1"
          id="path13577" />
     </g>
   </g>

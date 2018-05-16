@@ -48,12 +48,12 @@ namespace mitk
     /*!
     \brief standard destructor
     */
-    ~Convert2Dto3DImageFilter();
+    ~Convert2Dto3DImageFilter() override;
     /*!
     \brief Method generating the output of this filter. Called in the updated process of the pipeline.
     This method generates the smoothed output image.
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     /*!
     \brief Make a 2D image to a 3D image

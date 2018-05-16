@@ -145,7 +145,7 @@ mitk::PlaneProposer::PlaneInfo mitk::PlaneProposer::CreatePlaneByCentroids(
       tmpGrid = m_Grids.at(sizeIDs.at(j).second)->GetVtkUnstructuredGrid(); // biggest cluster
 
     double tmpCenter[3];
-    vtkCenterOfMass::ComputeCenterOfMass(tmpGrid->GetPoints(), NULL, tmpCenter);
+    vtkCenterOfMass::ComputeCenterOfMass(tmpGrid->GetPoints(), nullptr, tmpCenter);
     std::array<double, 3> center;
     center[0] = tmpCenter[0];
     center[1] = tmpCenter[1];

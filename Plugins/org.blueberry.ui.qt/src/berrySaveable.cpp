@@ -30,8 +30,6 @@ bool Saveable::Show(IWorkbenchPage::Pointer  /*page*/)
 /*IJobRunnable*/void Saveable::DoSave(/*IProgressMonitor monitor,
  IShellProvider shellProvider*/)
 {
-  this->DoSave(/*monitor*/);
-  //return 0;
 }
 
 void Saveable::DisableUI(const QList<IWorkbenchPart::Pointer>& /*parts*/,

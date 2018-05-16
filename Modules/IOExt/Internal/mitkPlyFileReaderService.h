@@ -35,10 +35,10 @@ namespace mitk
   {
   public:
     PlyFileReaderService();
-    virtual ~PlyFileReaderService();
+    ~PlyFileReaderService() override;
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
+    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
     static mitk::CustomMimeType mimeType;
 

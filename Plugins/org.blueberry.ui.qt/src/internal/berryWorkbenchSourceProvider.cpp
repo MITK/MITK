@@ -122,7 +122,7 @@ void WorkbenchSourceProvider::SelectionChanged(const SmartPointer<IWorkbenchPart
 
   selection = newSelection;
 
-  LogDebuggingInfo(QString("Selection changed to ") + (selection ? selection->ToString() : QString("NULL")));
+  LogDebuggingInfo(QString("Selection changed to ") + (selection ? selection->ToString() : QString("nullptr")));
 
   FireSourceChanged(ISources::ACTIVE_CURRENT_SELECTION(),
                     ISources::ACTIVE_CURRENT_SELECTION_NAME(), selection);
@@ -347,23 +347,23 @@ void WorkbenchSourceProvider::CheckActivePart(bool updateShowInSelection)
     {
       if ((sources & ISources::ACTIVE_PART()) != 0)
       {
-        LogDebuggingInfo("Active part changed to " + (lastActivePart ? lastActivePart->ToString() : QString("NULL")));
+        LogDebuggingInfo("Active part changed to " + (lastActivePart ? lastActivePart->ToString() : QString("nullptr")));
       }
       if ((sources & ISources::ACTIVE_PART_ID()) != 0)
       {
-        LogDebuggingInfo("Active part id changed to " + (lastActivePartId ? lastActivePartId->ToString() : QString("NULL")));
+        LogDebuggingInfo("Active part id changed to " + (lastActivePartId ? lastActivePartId->ToString() : QString("nullptr")));
       }
       if ((sources & ISources::ACTIVE_SITE()) != 0)
       {
-        LogDebuggingInfo("Active site changed to " + (lastActivePartSite ? lastActivePartSite->ToString() : QString("NULL")));
+        LogDebuggingInfo("Active site changed to " + (lastActivePartSite ? lastActivePartSite->ToString() : QString("nullptr")));
       }
       if ((sources & ISources::ACTIVE_EDITOR()) != 0)
       {
-        LogDebuggingInfo("Active editor changed to " + (lastActiveEditor ? lastActiveEditor->ToString() : QString("NULL")));
+        LogDebuggingInfo("Active editor changed to " + (lastActiveEditor ? lastActiveEditor->ToString() : QString("nullptr")));
       }
       if ((sources & ISources::ACTIVE_EDITOR_ID()) != 0)
       {
-        LogDebuggingInfo("Active editor id changed to " + (lastActiveEditorId ? lastActiveEditorId->ToString() : QString("NULL")));
+        LogDebuggingInfo("Active editor id changed to " + (lastActiveEditorId ? lastActiveEditorId->ToString() : QString("nullptr")));
       }
     }
     sources |= UpdateSelection(currentState);
@@ -402,7 +402,7 @@ SmartPointer<ShowInContext> WorkbenchSourceProvider::GetContext(const SmartPoint
 IWorkbenchWindow* WorkbenchSourceProvider::GetActiveWindow() const
 {
 //  IContextService* const contextService = workbench->GetService<IContextService>();
-//  if (contextService != NULL)
+//  if (contextService != nullptr)
 //  {
 //    const int shellType = contextService->GetShellType(qApp->activeWindow());
 //    if (shellType != IContextService::TYPE_DIALOG)
@@ -591,9 +591,9 @@ void WorkbenchSourceProvider::HandleShellEvent()
 //  }
 
   LogDebuggingInfo("\tWSP:lastActiveShell: " +
-                   (!lastActiveShell.Expired() ? lastActiveShell.Lock()->GetControl()->objectName() : QString("NULL")));
+                   (!lastActiveShell.Expired() ? lastActiveShell.Lock()->GetControl()->objectName() : QString("nullptr")));
   LogDebuggingInfo("\tWSP:lastActiveWorkbenchWindowShell: " +
-                   (!lastActiveWorkbenchWindowShell.Expired() ? lastActiveWorkbenchWindowShell.Lock()->GetControl()->objectName() : QString("NULL")));
+                   (!lastActiveWorkbenchWindowShell.Expired() ? lastActiveWorkbenchWindowShell.Lock()->GetControl()->objectName() : QString("nullptr")));
 
   const ISourceProvider::StateMapType currentState = GetCurrentState();
   const Shell::ConstPointer newActiveShell = currentState.value(ISources::ACTIVE_SHELL_NAME()).Cast<const Shell>();
@@ -673,12 +673,12 @@ void WorkbenchSourceProvider::HandleShellEvent()
 
     if (DEBUG)
     {
-      LogDebuggingInfo("Active shell changed to " + (newActiveShell ? newActiveShell->ToString() : QString("NULL")));
-      LogDebuggingInfo("Active workbench window changed to " + (newActiveWorkbenchWindow ?  newActiveWorkbenchWindow->ToString() : QString("NULL")));
-      LogDebuggingInfo("Active workbench window shell changed to " + (newActiveWorkbenchWindowShell ? newActiveWorkbenchWindowShell->ToString() : QString("NULL")));
-      LogDebuggingInfo("Active workbench window coolbar visibility " + (newToolbarVisibility ? newToolbarVisibility->ToString() : QString("NULL")));
-      LogDebuggingInfo("Active workbench window perspective bar visibility " + (newPerspectiveBarVisibility ? newPerspectiveBarVisibility->ToString() : QString("NULL")));
-      LogDebuggingInfo("Active workbench window status line visibility " + (newStatusLineVis ? newStatusLineVis->ToString() : QString("NULL")));
+      LogDebuggingInfo("Active shell changed to " + (newActiveShell ? newActiveShell->ToString() : QString("nullptr")));
+      LogDebuggingInfo("Active workbench window changed to " + (newActiveWorkbenchWindow ?  newActiveWorkbenchWindow->ToString() : QString("nullptr")));
+      LogDebuggingInfo("Active workbench window shell changed to " + (newActiveWorkbenchWindowShell ? newActiveWorkbenchWindowShell->ToString() : QString("nullptr")));
+      LogDebuggingInfo("Active workbench window coolbar visibility " + (newToolbarVisibility ? newToolbarVisibility->ToString() : QString("nullptr")));
+      LogDebuggingInfo("Active workbench window perspective bar visibility " + (newPerspectiveBarVisibility ? newPerspectiveBarVisibility->ToString() : QString("nullptr")));
+      LogDebuggingInfo("Active workbench window status line visibility " + (newStatusLineVis ? newStatusLineVis->ToString() : QString("nullptr")));
     }
 
     FireSourceChanged(sourceFlags, sourceValuesByName);
@@ -688,7 +688,7 @@ void WorkbenchSourceProvider::HandleShellEvent()
   }
   else if (shellChanged)
   {
-    LogDebuggingInfo("Active shell changed to " + (newActiveShell ? newActiveShell->ToString() : QString("NULL")));
+    LogDebuggingInfo("Active shell changed to " + (newActiveShell ? newActiveShell->ToString() : QString("nullptr")));
     FireSourceChanged(ISources::ACTIVE_SHELL(), ISources::ACTIVE_SHELL_NAME(), newActiveShell);
   }
   else if (windowChanged)
@@ -728,11 +728,11 @@ void WorkbenchSourceProvider::HandleShellEvent()
 
     if (DEBUG)
     {
-      LogDebuggingInfo("Active workbench window changed to "  + (newActiveWorkbenchWindow ? newActiveWorkbenchWindow->ToString() : QString("NULL")));
-      LogDebuggingInfo("Active workbench window shell changed to " + (newActiveWorkbenchWindowShell ? newActiveWorkbenchWindowShell->ToString() : QString("NULL")));
-      LogDebuggingInfo("Active workbench window coolbar visibility " + (newToolbarVisibility ? newToolbarVisibility->ToString() : QString("NULL")));
-      LogDebuggingInfo("Active workbench window perspective bar visibility " + (newPerspectiveBarVisibility ? newPerspectiveBarVisibility->ToString() : QString("NULL")));
-      LogDebuggingInfo("Active workbench window status line visibility " + (newStatusLineVis ? newStatusLineVis->ToString() : QString("NULL")));
+      LogDebuggingInfo("Active workbench window changed to "  + (newActiveWorkbenchWindow ? newActiveWorkbenchWindow->ToString() : QString("nullptr")));
+      LogDebuggingInfo("Active workbench window shell changed to " + (newActiveWorkbenchWindowShell ? newActiveWorkbenchWindowShell->ToString() : QString("nullptr")));
+      LogDebuggingInfo("Active workbench window coolbar visibility " + (newToolbarVisibility ? newToolbarVisibility->ToString() : QString("nullptr")));
+      LogDebuggingInfo("Active workbench window perspective bar visibility " + (newPerspectiveBarVisibility ? newPerspectiveBarVisibility->ToString() : QString("nullptr")));
+      LogDebuggingInfo("Active workbench window status line visibility " + (newStatusLineVis ? newStatusLineVis->ToString() : QString("nullptr")));
     }
 
     FireSourceChanged(sourceFlags, sourceValuesByName);

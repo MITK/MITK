@@ -63,7 +63,7 @@ namespace mitk
     /**
     * @brief Default Destructor
     **/
-    ~Action();
+    ~Action() override;
 
   private:
     /**

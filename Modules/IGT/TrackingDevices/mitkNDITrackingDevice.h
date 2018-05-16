@@ -79,14 +79,14 @@ namespace mitk
     * @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device.
     * @throw mitk::IGTException Throws a normal IGT exception if an error occures which is not related to the hardware.
     */
-    virtual bool OpenConnection() override;
+    bool OpenConnection() override;
 
     /**
     * \brief Closes the connection
     *
     * CloseConnection() resets the tracking device, invalidates all tools and then closes the serial port.
     */
-    virtual bool CloseConnection() override;
+    bool CloseConnection() override;
 
     /** @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device. */
     bool InitializeWiredTools();
@@ -94,7 +94,7 @@ namespace mitk
     /** Sets the rotation mode of this class. See documentation of enum RotationMode for details
      *  on the different modes.
      */
-    virtual void SetRotationMode(RotationMode r) override;
+    void SetRotationMode(RotationMode r) override;
 
     /**
     * \brief TestConnection() tries to connect to a NDI tracking device on the current port/device and returns which device it has found
@@ -124,18 +124,18 @@ namespace mitk
     * 3D marker positions (MarkerTracking3D) or both 6D tools and 3D markers (HybridTracking) are updated.
     * Call StopTracking() to stop the tracking thread.
     */
-    virtual bool StartTracking() override;
+    bool StartTracking() override;
 
     /**
     * \brief return the tool with index toolNumber
     */
-    virtual TrackingTool* GetTool(unsigned int toolNumber) const override;
+    TrackingTool* GetTool(unsigned int toolNumber) const override;
 
-    virtual mitk::TrackingTool* GetToolByName(std::string name) const override;
+    mitk::TrackingTool* GetToolByName(std::string name) const override;
     /**
     * \brief return current number of tools
     */
-    virtual unsigned int GetToolCount() const override;
+    unsigned int GetToolCount() const override;
 
     /**
     * \brief Create a passive 6D tool with toolName and fileName and add it to the list of tools
@@ -205,7 +205,17 @@ namespace mitk
     **/
     virtual const char* GetFirmwareRevisionNumber();
 
+    /** @return Returns true if this device can autodetects its tools. */
+    bool AutoDetectToolsAvailable() override;
 
+    /** @return Returns true if it is possible to add a single tool. True for Polaris, false for Aurora.*/
+    bool AddSingleToolIsAvailable() override;
+
+    /** Autodetects tools from this device and returns them as a navigation tool storage.
+    *  @return Returns the detected tools. Returns an empty storage if no tools are present
+    *          or if detection is not possible
+    */
+    mitk::NavigationToolStorage::Pointer AutoDetectTools() override;
 
 
 
@@ -236,7 +246,7 @@ namespace mitk
 
     /* Methods for NDIProtocol friend class */
     virtual void InvalidateAll();             ///< invalidate all tools
-    NDIPassiveTool* GetInternalTool(std::string portHandle); ///< returns the tool object that has been assigned the port handle or NULL if no tool can be found
+    NDIPassiveTool* GetInternalTool(std::string portHandle); ///< returns the tool object that has been assigned the port handle or nullptr if no tool can be found
 
     /**
     * \brief free all port handles that need to be freed
@@ -295,7 +305,7 @@ public:
 
   protected:
     NDITrackingDevice();          ///< Constructor
-    virtual ~NDITrackingDevice(); ///< Destructor
+    ~NDITrackingDevice() override; ///< Destructor
 
     std::string m_DeviceName;///< Device Name
     PortNumber m_PortNumber; ///< COM Port Number

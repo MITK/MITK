@@ -21,8 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkGIFFirstOrderStatistics.h>
 #include <mitkGIFCooccurenceMatrix.h>
-#include <mitkGIFGrayLevelRunLength.h>
-#include <math.h>
+#include <mitkGIFGreyLevelRunLength.h>
+#include <cmath>
 
 #include <mitkImageGenerator.h>
 
@@ -112,6 +112,7 @@ static mitk::Image::Pointer GenerateGradientWithDimXImage(unsigned int dimX,
   return mitkImage;
 }
 
+
 class mitkGlobalFeaturesTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkGlobalFeaturesTestSuite  );
@@ -138,14 +139,14 @@ private:
 
 public:
 
-  void setUp(void)
+  void setUp(void) override
   {
     // Load Image Data
-    m_Image = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
+    m_Image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Pic3D.nrrd"));
     mitk::CastToItkImage(m_Image,m_ItkImage);
 
     // Create a single mask with only one pixel within the regions
-    mitk::Image::Pointer mask1 = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
+    mitk::Image::Pointer mask1 = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Pic3D.nrrd"));
     mitk::CastToItkImage(mask1,m_ItkMask);
     m_ItkMask->FillBuffer(0);
     MaskType::IndexType index;
@@ -155,7 +156,7 @@ public:
     mitk::CastToMitkImage(m_ItkMask, m_Mask);
 
     // Create a mask with a covered region
-    mitk::Image::Pointer lmask1 = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
+    mitk::Image::Pointer lmask1 = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Pic3D.nrrd"));
     mitk::CastToItkImage(lmask1,m_ItkMask1);
     m_ItkMask1->FillBuffer(0);
     int range=2;
@@ -182,8 +183,8 @@ public:
   void FirstOrder_SinglePoint()
   {
     mitk::GIFFirstOrderStatistics::Pointer calculator = mitk::GIFFirstOrderStatistics::New();
-    calculator->SetHistogramSize(4096);
-    calculator->SetUseCtRange(true);
+    //calculator->SetHistogramSize(4096);
+    //calculator->SetUseCtRange(true);
     auto features = calculator->CalculateFeatures(m_Image, m_Mask);
 
     std::map<std::string, double> results;
@@ -216,8 +217,8 @@ public:
   void FirstOrder_QubicArea()
   {
     mitk::GIFFirstOrderStatistics::Pointer calculator = mitk::GIFFirstOrderStatistics::New();
-    calculator->SetHistogramSize(4096);
-    calculator->SetUseCtRange(true);
+    //calculator->SetHistogramSize(4096);
+    //calculator->SetUseCtRange(true);
     auto features = calculator->CalculateFeatures(m_Image, m_Mask1);
 
     std::map<std::string, double> results;
@@ -248,10 +249,8 @@ public:
 
   void RunLenght_QubicArea()
   {
-    mitk::GIFGrayLevelRunLength::Pointer calculator = mitk::GIFGrayLevelRunLength::New();
+    mitk::GIFGreyLevelRunLength::Pointer calculator = mitk::GIFGreyLevelRunLength::New();
     //calculator->SetHistogramSize(4096);
-    calculator->SetUseCtRange(true);
-    calculator->SetRange(981);
     auto features = calculator->CalculateFeatures(m_Image, m_Mask1);
 
     std::map<std::string, double> results;

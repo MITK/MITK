@@ -49,7 +49,7 @@ ServiceListenerHook::ListenerInfo::ListenerInfo(ListenerInfoData* data)
 }
 
 ServiceListenerHook::ListenerInfo::ListenerInfo()
-  : d(NULL)
+  : d(nullptr)
 {
 }
 

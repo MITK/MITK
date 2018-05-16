@@ -78,14 +78,14 @@ mitk::Image::Image(const Image &other)
 
     for (unsigned int i = 0u; i < time_steps; ++i)
     {
-      ImageDataItemPointer volume = const_cast<Image &>(other).GetVolumeData(i);
+      ImageDataItemPointer volume = other.GetVolumeData(i);
 
       this->SetVolume(volume->GetData(), i);
     }
   }
   else
   {
-    ImageDataItemPointer volume = const_cast<Image &>(other).GetVolumeData(0);
+    ImageDataItemPointer volume = other.GetVolumeData(0);
 
     this->SetVolume(volume->GetData(), 0);
   }
@@ -131,7 +131,7 @@ void *mitk::Image::GetData()
   m_CompleteData = GetChannelData();
 
   // update channel's data
-  // if data was not available at creation point, the m_Data of channel descriptor is NULL
+  // if data was not available at creation point, the m_Data of channel descriptor is nullptr
   // if data present, it won't be overwritten
   m_ImageDescriptor->GetChannelDescriptor(0).SetData(m_CompleteData->GetData());
 
@@ -422,7 +422,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData_unlocked(
           m_Slices[posSl] = sl;
         }
       }
-      // if(vol->GetPicDescriptor()->info->tags_head==NULL)
+      // if(vol->GetPicDescriptor()->info->tags_head==nullptr)
       //  mitkIpFuncCopyTags(vol->GetPicDescriptor(), m_Slices[GetSliceIndex(0,t,n)]->GetPicDescriptor());
     }
     return m_Volumes[pos] = vol;
@@ -536,7 +536,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData_unlocked(
         }
       }
       // REVIEW FIX
-      //   if(ch->GetPicDescriptor()->info->tags_head==NULL)
+      //   if(ch->GetPicDescriptor()->info->tags_head==nullptr)
       //     mitkIpFuncCopyTags(ch->GetPicDescriptor(), m_Volumes[GetVolumeIndex(0,n)]->GetPicDescriptor());
     }
     return m_Channels[n] = ch;
@@ -755,6 +755,11 @@ bool mitk::Image::SetImportVolume(void *data, int t, int n, ImportMemoryManageme
     // Therefore, we do not call Modified()!
   }
   return true;
+}
+
+bool mitk::Image::SetImportVolume(const void *const_data, int t, int n)
+{
+  return this->SetImportVolume(const_cast<void*>(const_data), t, n, CopyMemory);
 }
 
 bool mitk::Image::SetImportChannel(void *data, int n, ImportMemoryManagementType importMemoryManagement)
@@ -1081,7 +1086,7 @@ void mitk::Image::Initialize(vtkImageData *vtkimagedata, int channels, int tDim,
   SlicedGeometry3D *slicedGeometry = GetSlicedGeometry(0);
 
   // re-initialize PlaneGeometry with origin and direction
-  PlaneGeometry *planeGeometry = static_cast<PlaneGeometry *>(slicedGeometry->GetPlaneGeometry(0));
+  auto *planeGeometry = static_cast<PlaneGeometry *>(slicedGeometry->GetPlaneGeometry(0));
   planeGeometry->SetOrigin(origin);
 
   // re-initialize SlicedGeometry3D
@@ -1458,7 +1463,7 @@ bool mitk::Equal(const mitk::Image *leftHandSide, const mitk::Image *rightHandSi
   if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal(const mitk::Image* leftHandSide, const mitk::Image* rightHandSide, ScalarType eps, bool "
-                  "verbose) does not work with NULL pointer input.";
+                  "verbose) does not work with nullptr pointer input.";
     return false;
   }
   return mitk::Equal(*leftHandSide, *rightHandSide, eps, verbose);

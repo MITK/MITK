@@ -48,7 +48,7 @@ struct BERRY_UI_QT IViewDescriptor : public IWorkbenchPartDescriptor, public IAd
 
   berryObjectMacro(berry::IViewDescriptor)
 
-  ~IViewDescriptor();
+  ~IViewDescriptor() override;
 
   /**
    * Creates an instance of the view defined in the descriptor.
@@ -88,7 +88,7 @@ struct BERRY_UI_QT IViewDescriptor : public IWorkbenchPartDescriptor, public IAd
   /**
    * Returns the descriptor for the icon to show for this view.
    */
-  virtual QIcon GetImageDescriptor() const = 0;
+  QIcon GetImageDescriptor() const override = 0;
 
 
   /**
@@ -105,7 +105,7 @@ struct BERRY_UI_QT IViewDescriptor : public IWorkbenchPartDescriptor, public IAd
    */
   virtual bool IsRestorable() const = 0;
 
-  virtual bool operator==(const Object*) const = 0;
+  bool operator==(const Object*) const override = 0;
 };
 
 }

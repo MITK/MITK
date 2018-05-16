@@ -163,6 +163,18 @@ static void TestMitkImagesAreLoaded( DICOMFileReader* reader,
   }
 }
 
+static void TestSingleBlockIsRead( DICOMFileReader* reader )
+{
+  StringList inputFiles = GetInputFilenames();
+  reader->SetInputFiles( inputFiles );
+  reader->AnalyzeInputFiles();
+  reader->LoadImages();
+
+  unsigned int numberOfOutputs = reader->GetNumberOfOutputs();
+
+  MITK_TEST_CONDITION_REQUIRED( numberOfOutputs == 1, "Single block is read from input files.");
+}
+
 static mitk::BaseProperty::Pointer DummyTagToPropertyFunctor( const mitk::StringLookupTable& )
 {
   return mitk::BaseProperty::Pointer();

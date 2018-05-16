@@ -67,7 +67,7 @@ std::map<std::string, mitk::BaseProperty::Pointer> mitk::PropertyFilters::ApplyF
 
 mitk::PropertyFilter mitk::PropertyFilters::GetFilter(const std::string &className) const
 {
-  std::map<std::string, PropertyFilter>::const_iterator iter = m_Filters.find(className);
+  auto iter = m_Filters.find(className);
 
   if (iter != m_Filters.end())
     return iter->second;

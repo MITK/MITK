@@ -50,10 +50,10 @@ namespace mitk
     /** \brief Gives full data access. */
     inline void *GetData() { return m_AddressBegin; }
     /** \brief informs Image to unlock the represented image part */
-    virtual ~ImageWriteAccessor();
+    ~ImageWriteAccessor() override;
 
   protected:
-    virtual const Image *GetImage() const override;
+    const Image *GetImage() const override;
 
   private:
     /** \brief manages a consistent write access and locks the ordered image part */

@@ -49,7 +49,7 @@ void MITKMATCHPOINTREGISTRATION_EXPORT GetGridGeometryFromNode(const mitk::DataN
  * Generates a 3D defomration gird according to a passed Geometry3D info. It is the basis
  * for most of the visualizations of a MatchPoint registration.
  */
-vtkSmartPointer<vtkPolyData> MITKMATCHPOINTREGISTRATION_EXPORT Generate3DDeformationGrid(const mitk::BaseGeometry* gridDesc, unsigned int gridFrequence, const map::core::RegistrationKernelBase<3,3>* regKernel = NULL);
+vtkSmartPointer<vtkPolyData> MITKMATCHPOINTREGISTRATION_EXPORT Generate3DDeformationGrid(const mitk::BaseGeometry* gridDesc, unsigned int gridFrequence, const map::core::RegistrationKernelBase<3,3>* regKernel = nullptr);
 
 /**
  * Generates a 3D glyph representation of the given regKernel in the FOV defined by gridDesc.
@@ -70,7 +70,7 @@ bool MITKMATCHPOINTREGISTRATION_EXPORT PropertyIsOutdated(const mitk::DataNode* 
 /**
  * Gets the relevant kernel for visualization of a registration node. The kernel is determined
  * by the direction property of the node.
- * @return Pointer to the relevant kernel. Method may return NULL if data node is not valid, node
+ * @return Pointer to the relevant kernel. Method may return nullptr if data node is not valid, node
  * contains no registration or has no direction property.*/
 MITKMATCHPOINTREGISTRATION_EXPORT const map::core::RegistrationKernelBase<3,3>* GetRelevantRegKernelOfNode(const mitk::DataNode* regNode);
 

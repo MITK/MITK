@@ -55,7 +55,7 @@ public:
 
   berryObjectMacro(berry::ContributionManager)
 
-  ~ContributionManager();
+  ~ContributionManager() override;
 
   /*
    * Method declared on IContributionManager.

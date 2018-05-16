@@ -112,7 +112,7 @@ namespace mitk
   *   - \b "contourcolor" : (ColorProperty (1.0f, 0.0f, 0.0f))  // default color for the contour is red
   *   - \b "color": (ColorProperty (1.0f, 1.0f, 0.0f))          // default color of the (unselected) pointset is yellow
   *   - \b "opacity": (FloatProperty 1.0)                       // opacity of point set, contours
-  *   - \b "label": (StringProperty NULL)     // a label can be defined for each point, which is rendered in proximity
+  *   - \b "label": (StringProperty nullptr)     // a label can be defined for each point, which is rendered in proximity
   * to
   * the point
   *
@@ -128,10 +128,10 @@ namespace mitk
       virtual const mitk::PointSet *GetInput() const;
 
     /** \brief returns the a prop assembly */
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
     /** \brief set the default properties for this mapper */
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
     class LocalStorage : public mitk::Mapper::BaseLocalStorage
@@ -141,7 +141,7 @@ namespace mitk
       LocalStorage();
 
       /* destructor */
-      ~LocalStorage();
+      ~LocalStorage() override;
 
       // points
       vtkSmartPointer<vtkPoints> m_UnselectedPoints;
@@ -198,14 +198,14 @@ namespace mitk
     PointSetVtkMapper2D();
 
     /* destructor */
-    virtual ~PointSetVtkMapper2D();
+    ~PointSetVtkMapper2D() override;
 
     /* \brief Applies the color and opacity properties and calls CreateVTKRenderObjects */
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
     /* \brief Called in mitk::Mapper::Update
     * If TimeSlicedGeometry or time step is not valid of point set: reset mapper so that nothing is
     * displayed e.g. toggle visiblity of the propassembly */
-    virtual void ResetMapper(BaseRenderer *renderer) override;
+    void ResetMapper(BaseRenderer *renderer) override;
 
     /* \brief Fills the vtk objects, thus it is only called when the point set has been changed.
    * This function iterates over the input point set and determines the glyphs which lie in a specific

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <stdlib.h>
 
-int QtTesting()
+int QtTesting(void)
 {
   // QtTestingClass *qttestingclass = new QtTestingClass;
   std::cout << "Testing ... " << std::endl;

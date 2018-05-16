@@ -55,7 +55,7 @@ public:
   ///
   /// Standard dtor. Delete predicate, disconnect from DataStorage.
   ///
-  virtual ~QmitkDataStorageTableModel();
+  ~QmitkDataStorageTableModel() override;
 
   //# Public GETTER
 public:
@@ -77,24 +77,24 @@ public:
   /// Overridden from QAbstractTableModel. Returns the header data at section
   /// for given orientation and role.
   ///
-  virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
   ///
   /// Overridden from QAbstractTableModel. Returns what can be done
   /// with an item.
   ///
-  virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
+  Qt::ItemFlags flags(const QModelIndex &index) const override;
   ///
   /// Overridden from QAbstractTableModel. Returns the node count.
   ///
-  virtual int rowCount(const QModelIndex &parent) const override;
+  int rowCount(const QModelIndex &parent) const override;
   ///
   /// Overridden from QAbstractTableModel. Returns the number of features (columns) to display.
   ///
-  virtual int columnCount(const QModelIndex &parent) const override;
+  int columnCount(const QModelIndex &parent) const override;
   ///
   /// Overridden from QAbstractTableModel. Returns the data at index for given role.
   ///
-  virtual QVariant data(const QModelIndex &index, int role) const override;
+  QVariant data(const QModelIndex &index, int role) const override;
 
   //# Public SETTERS
 public:
@@ -199,7 +199,7 @@ protected:
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   ///
   /// Holds the predicate that defines this SubSet of Nodes. If m_Predicate
-  /// is NULL all Nodes will be selected.
+  /// is nullptr all Nodes will be selected.
   ///
   mitk::NodePredicateBase::Pointer m_Predicate;
   ///

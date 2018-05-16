@@ -16,23 +16,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkUSAbstractCustomWidget.h"
 
-#include <usPrototypeServiceFactory.h>
-#include <usModuleContext.h>
-
 std::string QmitkUSAbstractCustomWidget::US_DEVICE_PROPKEY_CLASS()
 {
-  static std::string s = "ork.mitk.services.UltrasoundCustomWidget.deviceClass";
+  static std::string s = "org.mitk.services.UltrasoundCustomWidget.deviceClass";
   return s;
 }
 
 QmitkUSAbstractCustomWidget::QmitkUSAbstractCustomWidget(QWidget* parent)
-  : QWidget(parent), m_PrototypeServiceFactory(0), m_IsClonedForQt(false)
+  : QWidget(parent), m_IsClonedForQt(false)
 {
 }
 
 QmitkUSAbstractCustomWidget::~QmitkUSAbstractCustomWidget()
 {
-  delete m_PrototypeServiceFactory;
 }
 
 void QmitkUSAbstractCustomWidget::SetDevice(mitk::USDevice::Pointer device)

@@ -93,12 +93,12 @@ namespace mitk
 
   protected:
     ExtractImageFilter(); // purposely hidden
-    virtual ~ExtractImageFilter();
+    ~ExtractImageFilter() override;
 
-    virtual void GenerateOutputInformation() override;
-    virtual void GenerateInputRequestedRegion() override;
+    void GenerateOutputInformation() override;
+    void GenerateInputRequestedRegion() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     template <typename TPixel, unsigned int VImageDimension>
     void ItkImageProcessing(const itk::Image<TPixel, VImageDimension> *image);

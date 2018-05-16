@@ -27,6 +27,7 @@ namespace mitk
 
   /**
    * /brief This structure defines key variables of a device model and type.
+   * Line is (usually) identical with the TrackingDeviceName and can be used to compare TrackingDevices (string).
    * It is specifically used to find out which models belong to which vendor, and what volume
    * to use for a specific Model. Leaving VolumeModelLocation set to null will instruct the Generator
    * to generate a field to the best of his ability. HardwareCode stands for a hexadecimal string,
@@ -89,5 +90,6 @@ namespace mitk
   /** definition of colors for IGT */
   static mitk::Color IGTColor_WARNING = mitk::ColorProperty::New(1.0f, 0.0f, 0.0f)->GetColor();
   static mitk::Color IGTColor_VALID = mitk::ColorProperty::New(0.0f, 1.0f, 0.0f)->GetColor();
+  static mitk::Color IGTColor_INVALID = mitk::ColorProperty::New(1.0f, 1.0f, 1.0f)->GetColor();
 } // namespace mitk
 #endif /* MITKTRACKINGTYPES_H_HEADER_INCLUDED_ */

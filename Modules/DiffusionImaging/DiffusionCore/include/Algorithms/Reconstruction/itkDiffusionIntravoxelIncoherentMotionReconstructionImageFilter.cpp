@@ -221,7 +221,7 @@ void DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<TIn, TOut>
 
     typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
     typedef typename InputImageType::PixelType         InputVectorType;
-    typename InputImageType::Pointer inputImagePointer = NULL;
+    typename InputImageType::Pointer inputImagePointer = nullptr;
 
     // Would have liked a dynamic_cast here, but seems SGI doesn't like it
     // The enum will DiffusionIntravoxelIncoherentMotionReconstructionImageFilterensure that an inappropriate cast is not done

@@ -29,7 +29,7 @@ class MyApplicationPlugin : public QObject, public ctkPluginActivator
 
 public:
   MyApplicationPlugin();
-  ~MyApplicationPlugin();
+  ~MyApplicationPlugin() override;
 
   //! [0]
   void start(ctkPluginContext *context) override

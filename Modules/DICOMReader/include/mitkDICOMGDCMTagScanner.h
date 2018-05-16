@@ -60,26 +60,26 @@ namespace mitk
       /**
         \brief Add this tag to the scanning process.
       */
-      virtual void AddTag(const DICOMTag& tag) override;
+      void AddTag(const DICOMTag& tag) override;
       /**
         \brief Add a list of tags to the scanning process.
       */
-      virtual void AddTags(const DICOMTagList& tags) override;
+      void AddTags(const DICOMTagList& tags) override;
       /**
       \brief Add this tag path to the scanning process.
       */
-      virtual void AddTagPath(const DICOMTagPath& tag) override;
+      void AddTagPath(const DICOMTagPath& tag) override;
       /**
       \brief Add a list of tag pathes to the scanning process.
       */
-      virtual void AddTagPaths(const DICOMTagPathList& tags) override;
+      void AddTagPaths(const DICOMTagPathList& tags) override;
 
       /**
         \brief Define the list of files to scan.
         This does not ADD to an internal list, but it replaces the
         whole list of files.
       */
-      virtual void SetInputFiles(const StringList& filenames) override;
+      void SetInputFiles(const StringList& filenames) override;
 
       /**
         \brief Start the scanning process.
@@ -87,17 +87,17 @@ namespace mitk
         all about files and tags from files that have been scanned
         previously.
       */
-      virtual void Scan();
+      void Scan() override;
 
       /**
         \brief Retrieve a result list for file-by-file tag access.
       */
-      virtual DICOMDatasetAccessingImageFrameList GetFrameInfoList() const override;
+      DICOMDatasetAccessingImageFrameList GetFrameInfoList() const override;
 
       /**
       \brief Retrieve Pointer to the complete cache of the scan.
       */
-      virtual DICOMTagCache::Pointer GetScanCache() const override;
+      DICOMTagCache::Pointer GetScanCache() const override;
 
       /**
         \brief Directly retrieve the tag value for a given frame and tag.
@@ -108,7 +108,7 @@ namespace mitk
     protected:
 
       DICOMGDCMTagScanner();
-      virtual ~DICOMGDCMTagScanner();
+      ~DICOMGDCMTagScanner() override;
 
       std::set<DICOMTag> m_ScannedTags;
       StringList m_InputFilenames;

@@ -119,7 +119,7 @@ void QmitkToolRoiDataSelectionBox::OnRoiDataSelectionChanged(const QString &name
 
   m_lastSelectedName = name;
   m_boundingObjectWidget->setEnabled(false);
-  mitk::DataNode::Pointer selection = NULL;
+  mitk::DataNode::Pointer selection = nullptr;
 
   if (name.compare(tr("none")) == 0)
     m_segmentationComboBox->setCurrentIndex(0);

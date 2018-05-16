@@ -64,8 +64,8 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSliceBasedInterpolatorWidget : public QWidg
   Q_OBJECT
 
 public:
-  QmitkSliceBasedInterpolatorWidget(QWidget *parent = 0, const char *name = 0);
-  virtual ~QmitkSliceBasedInterpolatorWidget();
+  QmitkSliceBasedInterpolatorWidget(QWidget *parent = nullptr, const char *name = nullptr);
+  ~QmitkSliceBasedInterpolatorWidget() override;
 
   void SetDataStorage(mitk::DataStorage &storage);
 
@@ -190,13 +190,13 @@ private:
 
   mitk::LabelSetImage::Pointer m_WorkingImage;
 
-  mitk::SliceNavigationController *m_LastSNC;
-
-  unsigned int m_LastSliceIndex;
-
   QHash<mitk::SliceNavigationController *, unsigned int> m_TimeStep;
 
   mitk::DataStorage::Pointer m_DataStorage;
+
+  mitk::SliceNavigationController *m_LastSNC;
+
+  unsigned int m_LastSliceIndex;
 };
 
 #endif

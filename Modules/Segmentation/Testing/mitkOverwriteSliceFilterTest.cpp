@@ -158,7 +158,9 @@ stop:
   /* ============= check ============*/
   areSame = true;
 
-  int xx, yy, zz;
+  int xx = 0;
+  int yy = 0;
+  int zz = 0;
 
   for (xx = 0; xx < VolumeSize; ++xx)
   {

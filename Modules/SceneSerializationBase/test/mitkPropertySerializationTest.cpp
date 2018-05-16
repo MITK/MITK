@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*
 #include <mitkGridRepresentationProperty.h>
 #include <mitkGridVolumeMapperProperty.h>
-#include <mitkOrganTypeProperty.h>
 */
 #include <mitkModalityProperty.h>
 //#include <mitkOdfNormalizationMethodProperty.h>
@@ -36,7 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLevelWindowProperty.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkPlaneOrientationProperty.h>
-#include <mitkShaderProperty.h>
 #include <mitkStringProperty.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkVtkInterpolationProperty.h>
@@ -111,7 +109,6 @@ int mitkPropertySerializationTest(int /* argc */, char * /*argv*/ [])
   /*
   propList->SetProperty("gridrep", mitk::GridRepresentationProperty::New(2));
   propList->SetProperty("gridvol", mitk::GridVolumeMapperProperty::New(0));
-  propList->SetProperty("OrganTypeProperty", mitk::OrganTypeProperty::New("Larynx"));
   */
   propList->SetProperty("modality", mitk::ModalityProperty::New("Color Doppler"));
   // propList->SetProperty("OdfNormalizationMethodProperty", mitk::OdfNormalizationMethodProperty::New("Global
@@ -119,7 +116,6 @@ int mitkPropertySerializationTest(int /* argc */, char * /*argv*/ [])
   // propList->SetProperty("OdfScaleByProperty", mitk::OdfScaleByProperty::New("Principal Curvature"));
   propList->SetProperty("PlaneOrientationProperty",
                         mitk::PlaneOrientationProperty::New("Arrows in positive direction"));
-  propList->SetProperty("ShaderProperty", mitk::ShaderProperty::New("fixed"));
   propList->SetProperty("VtkInterpolationProperty", mitk::VtkInterpolationProperty::New("Gouraud"));
   propList->SetProperty("VtkRepresentationProperty", mitk::VtkRepresentationProperty::New("Surface"));
   propList->SetProperty("VtkResliceInterpolationProperty", mitk::VtkResliceInterpolationProperty::New("Cubic"));
@@ -206,9 +202,8 @@ int mitkPropertySerializationTest(int /* argc */, char * /*argv*/ [])
     mitk::PlaneGeometryData
     GradientBackground
     ItkBaseDataAdapter
-    ManufacturerLogo
     SlicedData
-    QBallImage
+    OdfImage
     SeedsImage
     TensorImage
     BoundingObject
@@ -223,7 +218,7 @@ void TestAllProperties(const mitk::PropertyList *propList)
   assert(propList);
 
   /* try to serialize each property in the list, then deserialize again and check for equality */
-  for (mitk::PropertyList::PropertyMap::const_iterator it = propList->GetMap()->begin();
+  for (auto it = propList->GetMap()->begin();
        it != propList->GetMap()->end();
        ++it)
   {
@@ -243,13 +238,13 @@ void TestAllProperties(const mitk::PropertyList *propList)
       MITK_TEST_OUTPUT(<< "Warning: " << allSerializers.size() << " serializers found for " << prop->GetNameOfClass()
                        << "testing only the first one.");
     }
-    mitk::BasePropertySerializer *serializer =
+    auto *serializer =
       dynamic_cast<mitk::BasePropertySerializer *>(allSerializers.begin()->GetPointer());
-    MITK_TEST_CONDITION(serializer != NULL, serializername + std::string(" is valid"));
-    if (serializer != NULL)
+    MITK_TEST_CONDITION(serializer != nullptr, serializername + std::string(" is valid"));
+    if (serializer != nullptr)
     {
       serializer->SetProperty(prop);
-      TiXmlElement *valueelement = NULL;
+      TiXmlElement *valueelement = nullptr;
       try
       {
         valueelement = serializer->Serialize();
@@ -257,9 +252,9 @@ void TestAllProperties(const mitk::PropertyList *propList)
       catch (...)
       {
       }
-      MITK_TEST_CONDITION(valueelement != NULL, std::string("Serialize property with ") + serializername);
+      MITK_TEST_CONDITION(valueelement != nullptr, std::string("Serialize property with ") + serializername);
 
-      if (valueelement == NULL)
+      if (valueelement == nullptr)
       {
         MITK_TEST_OUTPUT(<< "serialization failed, skipping deserialization");
         continue;

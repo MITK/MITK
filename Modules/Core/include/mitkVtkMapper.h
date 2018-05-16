@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseRenderer.h"
 #include "mitkDataNode.h"
-#include "mitkIShaderRepository.h"
 #include "mitkLocalStorageHandler.h"
 #include "mitkMapper.h"
 #include "mitkVtkPropRenderer.h"
@@ -56,12 +55,6 @@ namespace mitk
     mitkClassMacro(VtkMapper, Mapper);
 
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) = 0;
-
-    /** \brief Re-issues all drawing commands required to describe
-    * the entire scene each time a new frame is required,
-    * regardless of actual changes.
-    */
-    static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
 
     /**
     * \brief Returns whether this is an vtk-based mapper
@@ -121,15 +114,15 @@ namespace mitk
     }
 
     /**
-    * \brief SHADERTODO
+    * \deprecatedSince{2017_08}
     */
-    void ApplyShaderProperties(mitk::BaseRenderer *renderer);
+    DEPRECATED(void ApplyShaderProperties(mitk::BaseRenderer *)){}
 
     /**
     * \brief Apply color and opacity properties read from the PropertyList.
     * Called by mapper subclasses.
     */
-    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor) override;
+    void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor) override;
 
     /**
     * \brief  Release vtk-based graphics resources that are being consumed by this mapper.
@@ -139,32 +132,17 @@ namespace mitk
     * by the parameter renderer. Should be overwritten in subclasses.
     */
     virtual void ReleaseGraphicsResources(mitk::BaseRenderer * /*renderer*/) {}
-    class VtkMapperLocalStorage : public mitk::Mapper::BaseLocalStorage
+
+    class LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
-    public:
-      mitk::IShaderRepository::ShaderProgram::Pointer m_ShaderProgram;
-      itk::TimeStamp m_ModifiedTimeStamp;
-
-      VtkMapperLocalStorage()
-      {
-        IShaderRepository *shaderRepo = CoreServices::GetShaderRepository();
-        if (shaderRepo)
-        {
-          m_ShaderProgram = shaderRepo->CreateShaderProgram();
-        }
-      }
-
-      ~VtkMapperLocalStorage() {}
     };
-
-    mitk::LocalStorageHandler<VtkMapperLocalStorage> m_VtkMapperLSH;
 
   protected:
     /** constructor */
     VtkMapper();
 
     /** virtual destructor in order to derive from this class */
-    virtual ~VtkMapper();
+    ~VtkMapper() override;
 
   private:
     /** copy constructor */

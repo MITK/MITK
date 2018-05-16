@@ -86,7 +86,7 @@ std::string mitk::PropertyDescriptions::GetDescription(const std::string &proper
 
     if (descriptionsIter != m_Descriptions.cend())
     {
-      DescriptionMapConstIterator iter = descriptionsIter->second.find(propertyName);
+      auto iter = descriptionsIter->second.find(propertyName);
 
       if (iter != descriptionsIter->second.end())
         return iter->second;
@@ -124,7 +124,7 @@ bool mitk::PropertyDescriptions::HasDescription(const std::string &propertyName,
 
     if (descriptionsIter != m_Descriptions.cend())
     {
-      DescriptionMapConstIterator iter = descriptionsIter->second.find(propertyName);
+      auto iter = descriptionsIter->second.find(propertyName);
 
       if (iter != descriptionsIter->second.end())
         return true;

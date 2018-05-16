@@ -23,7 +23,7 @@ int mitkPropertyDescriptionsTest(int, char *[])
   MITK_TEST_BEGIN("mitkPropertyDescriptionsTest");
 
   mitk::IPropertyDescriptions *propertyDescriptions = mitk::CoreServices::GetPropertyDescriptions();
-  MITK_TEST_CONDITION_REQUIRED(propertyDescriptions != NULL, "Get property descriptions service");
+  MITK_TEST_CONDITION_REQUIRED(propertyDescriptions != nullptr, "Get property descriptions service");
 
   propertyDescriptions->AddDescription("propertyName1", "description1a");
   propertyDescriptions->AddDescription("propertyName1", "description1b");

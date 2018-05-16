@@ -100,7 +100,7 @@ void ModuleResourcePrivate::InitFilePath(const std::string& file)
 }
 
 ModuleResource::ModuleResource()
-  : d(new ModuleResourcePrivate(NULL))
+  : d(new ModuleResourcePrivate(nullptr))
 {
 }
 
@@ -168,7 +168,7 @@ bool ModuleResource::IsValid() const
 
 ModuleResource::operator bool_type() const
 {
-  return IsValid() ? &ModuleResource::d : NULL;
+  return IsValid() ? &ModuleResource::d : nullptr;
 }
 
 std::string ModuleResource::GetName() const
@@ -268,10 +268,10 @@ std::size_t ModuleResource::Hash() const
 
 void* ModuleResource::GetData() const
 {
-  if (!IsValid()) return NULL;
+  if (!IsValid()) return nullptr;
 
   void* data = d->resourceContainer->GetData(d->stat.index);
-  if (data == NULL)
+  if (data == nullptr)
   {
     US_WARN << "Error uncompressing resource data for " << this->GetResourcePath() << " from "
             << d->resourceContainer->GetModuleInfo()->location;

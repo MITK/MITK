@@ -53,15 +53,15 @@ namespace mitk
 
     /**
      * @brief Get XPM
-     * @return NULL
+     * @return nullptr
      */
-    virtual const char **GetXPM() const override;
+    const char **GetXPM() const override;
 
     /**
      * @brief Get name
      * @return name of the Tool
      */
-    virtual const char *GetName() const override;
+    const char *GetName() const override;
 
     /**
      * @brief Get icon resource
@@ -74,14 +74,14 @@ namespace mitk
      *
      *
      */
-    virtual void Activated() override;
+    void Activated() override;
 
     /**
      * @brief Removes all set points and interactors.
      *
      *
      */
-    virtual void Deactivated() override;
+    void Deactivated() override;
 
     /**
      * @brief get pointset node
@@ -118,7 +118,7 @@ namespace mitk
     /**
      * @brief destructor
      */
-    virtual ~AdaptiveRegionGrowingTool();
+    ~AdaptiveRegionGrowingTool() override;
 
   private:
     PointSet::Pointer m_PointSet;

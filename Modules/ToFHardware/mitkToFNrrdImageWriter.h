@@ -50,7 +50,7 @@ namespace mitk
     /*!
     \brief Add new data to file.
     */
-    void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData=0) override;
+    void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData=nullptr) override;
 
   protected:
 
@@ -62,7 +62,7 @@ namespace mitk
   private:
 
     ToFNrrdImageWriter();
-    ~ToFNrrdImageWriter();
+    ~ToFNrrdImageWriter() override;
 
     /*!
     \brief Open file by filename to gain write access to it.

@@ -35,7 +35,7 @@ class MITKQTWIDGETS_EXPORT QmitkLevelWindowPresetDefinitionDialog : public QDial
 
 public:
   QmitkLevelWindowPresetDefinitionDialog(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
-  ~QmitkLevelWindowPresetDefinitionDialog();
+  ~QmitkLevelWindowPresetDefinitionDialog() override;
 
   void setPresets(std::map<std::string, double> &level,
                   std::map<std::string, double> &window,

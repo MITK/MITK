@@ -189,7 +189,7 @@ public:
    */
   void Dispose();
 
-  ~ExpressionAuthority();
+  ~ExpressionAuthority() override;
 
   /**
    * Creates a new evaluation context based on the current evaluation context

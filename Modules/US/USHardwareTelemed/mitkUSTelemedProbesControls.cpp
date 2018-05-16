@@ -137,7 +137,7 @@ void mitk::USTelemedProbesControls::ProbeAdded(unsigned int index)
 
 bool mitk::USTelemedProbesControls::CreateProbesCollection()
 {
-  IUnknown* tmp_obj = NULL;
+  IUnknown* tmp_obj = nullptr;
   HRESULT hr;
 
   // get the main API interface from the Telemed device
@@ -205,10 +205,10 @@ void mitk::USTelemedProbesControls::CreateProbesSet()
   // initialize probes set with new vector
   m_ProbesSet = std::vector<mitk::USTelemedProbe::Pointer>(probes_count, 0);
 
-  for (unsigned int n = 0; n < probes_count; ++n)
+  for (LONG n = 0; n < probes_count; ++n)
   {
     // get the probe item from the API collection
-    IUnknown* tmp_obj = NULL;
+    IUnknown* tmp_obj = nullptr;
     hr = m_ProbesCollection->Item(n,&tmp_obj);
     if (FAILED(hr))
     {

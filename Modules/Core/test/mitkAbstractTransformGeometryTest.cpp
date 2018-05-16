@@ -31,7 +31,7 @@ int mitkAbstractTransformGeometryTest(int /*argc*/, char * /*argv*/ [])
   mitk::ScalarType widthInMM, heightInMM;
 
   std::cout << "Initializing an x-/y-plane (xyPlane) as parameter plane by InitializeStandardPlane(rightVector, "
-               "downVector, spacing = NULL): "
+               "downVector, spacing = nullptr): "
             << std::endl;
   mitk::PlaneGeometry::Pointer xyPlane = mitk::PlaneGeometry::New();
   width = 100;
@@ -97,7 +97,7 @@ int mitkAbstractTransformGeometryTest(int /*argc*/, char * /*argv*/ [])
   std::cout << "[PASSED]" << std::endl;
 
   std::cout << "Initializing an phi-/theta-plane (sphereParameterPlane) as parameter plane by "
-               "InitializeStandardPlane(rightVector, downVector, spacing = NULL): "
+               "InitializeStandardPlane(rightVector, downVector, spacing = nullptr): "
             << std::endl;
   mitk::PlaneGeometry::Pointer sphereParameterPlane = mitk::PlaneGeometry::New();
   width = 100;
@@ -220,7 +220,7 @@ int mitkAbstractTransformGeometryTest(int /*argc*/, char * /*argv*/ [])
   // std::cout << "Testing availability and type (PlaneGeometry) of first geometry in the SlicedGeometry3D: ";
   // mitk::PlaneGeometry* accessedplanegeometry3 =
   // dynamic_cast<mitk::PlaneGeometry*>(slicedWorldGeometry->GetGeometry2D(0));
-  // if(accessedplanegeometry3==NULL)
+  // if(accessedplanegeometry3==nullptr)
   //{
   //  std::cout<<"[FAILED]"<<std::endl;
   //  return EXIT_FAILURE;

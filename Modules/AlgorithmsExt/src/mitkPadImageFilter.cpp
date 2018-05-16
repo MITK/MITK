@@ -52,8 +52,8 @@ void mitk::PadImageFilter::GenerateData()
   mitk::Point3D referenceOrigin = referenceImageGeometry->GetOrigin();
 
   double outputOrigin[3];
-  unsigned long padLowerBound[3];
-  unsigned long padUpperBound[3];
+  itk::SizeValueType padLowerBound[3];
+  itk::SizeValueType padUpperBound[3];
 
   int i;
   for (i = 0; i < 3; ++i)

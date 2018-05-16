@@ -31,25 +31,25 @@ namespace mitk
       unsigned int GetNumberOfSegments() const;
     void SetNumberOfSegments(unsigned int numSegments);
 
-    virtual unsigned int GetMaximumNumberOfControlPoints() const override;
-    virtual unsigned int GetMinimumNumberOfControlPoints() const override;
-    virtual bool SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist = true) override;
+    unsigned int GetMaximumNumberOfControlPoints() const override;
+    unsigned int GetMinimumNumberOfControlPoints() const override;
+    bool SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist = true) override;
 
     const unsigned int FEATURE_ID_MAJOR_AXIS;
     const unsigned int FEATURE_ID_MINOR_AXIS;
     const unsigned int FEATURE_ID_THICKNESS;
 
-    virtual bool Equals(const mitk::PlanarFigure &other) const override;
+    bool Equals(const mitk::PlanarFigure &other) const override;
 
   protected:
     PlanarDoubleEllipse();
 
     mitkCloneMacro(Self)
 
-      virtual mitk::Point2D ApplyControlPointConstraints(unsigned int index, const Point2D &point) override;
-    virtual void EvaluateFeaturesInternal() override;
-    virtual void GenerateHelperPolyLine(double, unsigned int) override;
-    virtual void GeneratePolyLine() override;
+      mitk::Point2D ApplyControlPointConstraints(unsigned int index, const Point2D &point) override;
+    void EvaluateFeaturesInternal() override;
+    void GenerateHelperPolyLine(double, unsigned int) override;
+    void GeneratePolyLine() override;
 
   private:
     unsigned int m_NumberOfSegments;

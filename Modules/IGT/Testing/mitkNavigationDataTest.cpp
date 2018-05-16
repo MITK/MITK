@@ -329,7 +329,7 @@ static mitk::AffineTransform3D::Pointer CreateAffineTransform(mitk::Matrix3D rot
 /**
  * Test if NavigationData::GetInverse returns the correct inverse
  */
-static void TestInverse()
+/*static void TestInverse()
 {
   SetupNaviDataTests();
   mitk::NavigationData::Pointer nd = CreateNavidata(quaternion, offsetPoint);
@@ -384,7 +384,7 @@ static void TestInverse()
   mitk::NavigationData::Pointer ndInverse2 = nd2->GetInverse();
   MITK_TEST_CONDITION(mitk::Equal(nd2->GetOrientation(),referenceQuaternion),"Testing if the method GetInverse() modifies the data which should never happen!");
   MITK_TEST_CONDITION(mitk::Equal(ndInverse2->GetOrientation(),referenceQuaternion.inverse()),"Testing if the Qrientation was inverted correctly with the realistic quaternion");
-}
+}*/
 
 /**
  * Test if the original orientation and position are retained after inverting two times.

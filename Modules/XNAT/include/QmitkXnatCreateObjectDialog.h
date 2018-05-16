@@ -37,8 +37,8 @@ public:
     EXPERIMENT
   };
 
-  QmitkXnatCreateObjectDialog(SpecificType type, QWidget *parent = 0);
-  virtual ~QmitkXnatCreateObjectDialog();
+  QmitkXnatCreateObjectDialog(SpecificType type, QWidget *parent = nullptr);
+  ~QmitkXnatCreateObjectDialog() override;
 
   // Returns a specific xnat object like SpecificType
   ctkXnatObject *GetXnatObject();

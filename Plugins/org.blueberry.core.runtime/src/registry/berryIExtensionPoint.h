@@ -62,7 +62,7 @@ struct IExtensionPoint : public virtual Object
 
   berryObjectMacro(berry::IExtensionPoint)
 
-  virtual ~IExtensionPoint();
+  ~IExtensionPoint() override;
 
   /**
    * Returns all configuration elements from all extensions configured

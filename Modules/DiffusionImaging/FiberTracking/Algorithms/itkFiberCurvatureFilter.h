@@ -31,12 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 #include <vtkPolyLine.h>
 
-using namespace std;
-
 namespace itk{
 
 /**
-* \brief Generates artificial fibers distributed in and interpolated between the input planar figures.   */
+* \brief    */
 
 class FiberCurvatureFilter : public ProcessObject
 {
@@ -51,13 +49,14 @@ public:
     itkCloneMacro(Self)
     itkTypeMacro( FiberCurvatureFilter, ProcessObject )
 
-    virtual void Update() override{
+    void Update() override{
         this->GenerateData();
     }
 
     itkSetMacro( Distance, double )
     itkSetMacro( AngularDeviation, double )
     itkSetMacro( RemoveFibers, bool )
+    itkSetMacro( UseMedian, bool )
     itkSetMacro( InputFiberBundle, FiberBundle::Pointer )
     itkGetMacro( OutputFiberBundle, FiberBundle::Pointer )
 
@@ -66,13 +65,14 @@ protected:
     void GenerateData() override;
 
     FiberCurvatureFilter();
-    virtual ~FiberCurvatureFilter();
+    ~FiberCurvatureFilter() override;
 
     FiberBundle::Pointer m_InputFiberBundle;
     FiberBundle::Pointer m_OutputFiberBundle;
     double  m_AngularDeviation;
     double  m_Distance;
     bool    m_RemoveFibers;
+    bool    m_UseMedian;
 };
 }
 

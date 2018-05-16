@@ -30,7 +30,7 @@ namespace mitk
 
   NonBlockingAlgorithm::~NonBlockingAlgorithm() {}
   void mitk::NonBlockingAlgorithm::SetDataStorage(DataStorage &storage) { m_DataStorage = &storage; }
-  DataStorage *mitk::NonBlockingAlgorithm::GetDataStorage() { return m_DataStorage; }
+  DataStorage *mitk::NonBlockingAlgorithm::GetDataStorage() { return m_DataStorage.Lock(); }
   void NonBlockingAlgorithm::Initialize(const NonBlockingAlgorithm *itkNotUsed(other))
   {
     // define one input, one output basedata object
@@ -120,10 +120,10 @@ namespace mitk
   ITK_THREAD_RETURN_TYPE NonBlockingAlgorithm::StaticNonBlockingAlgorithmThread(void *param)
   {
     // itk::MultiThreader provides an itk::MultiThreader::ThreadInfoStruct as parameter
-    itk::MultiThreader::ThreadInfoStruct *itkmttis = static_cast<itk::MultiThreader::ThreadInfoStruct *>(param);
+    auto *itkmttis = static_cast<itk::MultiThreader::ThreadInfoStruct *>(param);
 
     // we need the UserData part of that structure
-    ThreadParameters *flsp = static_cast<ThreadParameters *>(itkmttis->UserData);
+    auto *flsp = static_cast<ThreadParameters *>(itkmttis->UserData);
 
     NonBlockingAlgorithm::Pointer algorithm = flsp->m_Algorithm;
     // this UserData tells us, which BubbleTool's method to call

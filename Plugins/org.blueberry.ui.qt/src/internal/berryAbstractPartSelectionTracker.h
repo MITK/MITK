@@ -97,7 +97,7 @@ public:
   /**
    * Disposes this selection tracker. This removes all listeners currently registered.
    */
-  ~AbstractPartSelectionTracker();
+  ~AbstractPartSelectionTracker() override;
 
 protected:
 

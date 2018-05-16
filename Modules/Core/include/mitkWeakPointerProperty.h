@@ -39,7 +39,7 @@ namespace mitk
 
     itkFactorylessNewMacro(Self) itkCloneMacro(Self) mitkNewMacro1Param(WeakPointerProperty, itk::Object *);
 
-    virtual ~WeakPointerProperty();
+    ~WeakPointerProperty() override;
 
     typedef itk::WeakPointer<itk::Object> ValueType;
 
@@ -49,7 +49,7 @@ namespace mitk
     void SetWeakPointer(itk::Object *pointer);
     void SetValue(const ValueType &value);
 
-    virtual std::string GetValueAsString() const override;
+    std::string GetValueAsString() const override;
 
     using BaseProperty::operator=;
 
@@ -66,8 +66,8 @@ namespace mitk
 
     itk::LightObject::Pointer InternalClone() const override;
 
-    virtual bool IsEqual(const BaseProperty &property) const override;
-    virtual bool Assign(const BaseProperty &property) override;
+    bool IsEqual(const BaseProperty &property) const override;
+    bool Assign(const BaseProperty &property) override;
   };
 
 #ifdef _MSC_VER

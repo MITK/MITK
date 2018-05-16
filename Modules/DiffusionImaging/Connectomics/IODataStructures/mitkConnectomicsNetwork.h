@@ -68,7 +68,7 @@ namespace mitk {
     {
       int sourceId;
       int targetId;
-      int weight; // For now the number of times it was present
+      double fiber_count; // For now the number of times it was present
       double edge_weight; // For boost, currently set to 1 by default for unweighted calculations
     };
 
@@ -79,11 +79,11 @@ namespace mitk {
     typedef boost::graph_traits<NetworkType>::edge_descriptor EdgeDescriptorType;
 
     // virtual methods that need to be implemented
-    virtual void UpdateOutputInformation() override;
-    virtual void SetRequestedRegionToLargestPossibleRegion() override;
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
-    virtual bool VerifyRequestedRegion() override;
-    virtual void SetRequestedRegion(const itk::DataObject * ) override;
+    void UpdateOutputInformation() override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    bool VerifyRequestedRegion() override;
+    void SetRequestedRegion(const itk::DataObject * ) override;
 
 
     // Macros
@@ -96,13 +96,13 @@ namespace mitk {
     bool EdgeExists( VertexDescriptorType vertexA, VertexDescriptorType vertexB ) const;
 
     /** increase the weight of an edge between the two given vertices */
-    void IncreaseEdgeWeight( VertexDescriptorType vertexA, VertexDescriptorType vertexB );
+    void IncreaseEdgeWeight( VertexDescriptorType vertexA, VertexDescriptorType vertexB, double fiber_count );
 
     /** add an edge between two given vertices */
-    void AddEdge( VertexDescriptorType vertexA, VertexDescriptorType vertexB);
+    void AddEdge( VertexDescriptorType vertexA, VertexDescriptorType vertexB, double fiber_count);
 
     /** add an edge between two given vertices ( with a specific weight ) */
-    void AddEdge( VertexDescriptorType vertexA, VertexDescriptorType vertexB, int sourceID, int targetID, int weight = 1, double edge_weight = 1.0 );
+    void AddEdge(VertexDescriptorType vertexA, VertexDescriptorType vertexB, int sourceID, int targetID, double fiber_count, double edge_weight = 1.0 );
 
     /** add a vertex with a specified id */
     VertexDescriptorType AddVertex( int id);
@@ -150,7 +150,7 @@ namespace mitk {
     double GetConnectionDensity();
 
     /** Get the maximum weight of all edges */
-    int GetMaximumWeight() const;
+    double GetMaximumWeight() const;
 
     /** Get a vector in the format vector[ vertexID ] = degree */
     std::vector< int > GetDegreeOfNodes( ) const;
@@ -208,7 +208,7 @@ namespace mitk {
 
   protected:
     ConnectomicsNetwork();
-    virtual ~ConnectomicsNetwork();
+    ~ConnectomicsNetwork() override;
 
     NetworkType m_Network;
 

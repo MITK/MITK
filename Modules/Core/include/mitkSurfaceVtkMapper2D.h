@@ -67,10 +67,10 @@ namespace mitk
       virtual const mitk::Surface *GetInput() const;
 
     /** \brief returns the prop assembly */
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
     /** \brief set the default properties for this mapper */
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
     class LocalStorage : public mitk::Mapper::BaseLocalStorage
@@ -145,7 +145,7 @@ namespace mitk
       /** \brief Default constructor of the local storage. */
       LocalStorage();
       /** \brief Default deconstructor of the local storage. */
-      ~LocalStorage();
+      ~LocalStorage() override;
     };
 
     /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
@@ -171,13 +171,13 @@ namespace mitk
     /**
        * @brief ~SurfaceVtkMapper2D default destructor.
        */
-    virtual ~SurfaceVtkMapper2D();
+    ~SurfaceVtkMapper2D() override;
 
     /**
        * @brief GenerateDataForRenderer produces all the data.
        * @param renderer The respective renderer of the mitkRenderWindow.
        */
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
     /**
        * @brief ResetMapper Called in mitk::Mapper::Update to hide objects.
@@ -186,12 +186,25 @@ namespace mitk
        *
        * @param renderer The respective renderer of the mitkRenderWindow.
        */
-    virtual void ResetMapper(BaseRenderer *renderer) override;
+    void ResetMapper(BaseRenderer *renderer) override;
 
     /**
-       * @brief ApplyAllProperties Pass all the properties to VTK.
-       * @param renderer The respective renderer of the mitkRenderWindow.
-       */
+     * @brief Updates legacy properties to current behavior/interpretation.
+     * @param properties The property list which should be adapted to new behaviour.
+     *
+     * Whenever a mapper decides to change its property types or its
+     * interpretation of certain values, it should add something to this
+     * method and call it before methods like ApplyProperties();
+     *
+     * This is particularly helpful when dealing with data from
+     * archive/scene files that were created before changes.
+     */
+    virtual void FixupLegacyProperties(PropertyList *properties);
+
+    /**
+     * @brief ApplyAllProperties Pass all the properties to VTK.
+     * @param renderer The respective renderer of the mitkRenderWindow.
+     */
     void ApplyAllProperties(BaseRenderer *renderer);
 
     /**

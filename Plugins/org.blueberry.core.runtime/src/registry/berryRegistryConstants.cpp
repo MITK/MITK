@@ -25,7 +25,7 @@ const QString RegistryConstants::PROP_NO_LAZY_REGISTRY_CACHE_LOADING = "BlueBerr
 const QString RegistryConstants::PROP_CHECK_CONFIG = "osgi.checkConfiguration";
 const QString RegistryConstants::PROP_NO_REGISTRY_CACHE = "BlueBerry.noRegistryCache";
 const QString RegistryConstants::PROP_DEFAULT_REGISTRY = "BlueBerry.createRegistry";
-const QString RegistryConstants::PROP_REGISTRY_NULL_USER_TOKEN = "BlueBerry.registry.nulltoken";
+const QString RegistryConstants::PROP_REGISTRY_nullptr_USER_TOKEN = "BlueBerry.registry.nulltoken";
 const QString RegistryConstants::PROP_REGISTRY_MULTI_LANGUAGE = "BlueBerry.registry.MultiLanguage";
 
 const int RegistryConstants::PLUGIN_ERROR = 1;

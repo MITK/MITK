@@ -36,7 +36,7 @@ bool mitk::StateMachineTransition::operator==(const StateMachineTransition &tran
   // then try to cast it to the type of event that this transition holds,
   // if this is possible, the variant is checked
 
-  // check for NULL since a corrupted state machine might cause an empty event
+  // check for nullptr since a corrupted state machine might cause an empty event
   if (m_TransitionEvent.IsNull())
   {
     return false;
@@ -71,7 +71,7 @@ bool mitk::StateMachineTransition::operator==(const StateMachineTransition &tran
 mitk::StateMachineTransition::~StateMachineTransition()
 {
   // needed for correct reference counting of mitkState//, for real???
-  m_NextState = NULL;
+  m_NextState = nullptr;
 
   m_Actions.clear();
   m_Conditions.clear();

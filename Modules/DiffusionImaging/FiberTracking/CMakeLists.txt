@@ -1,5 +1,5 @@
 
-set(_module_deps MitkDiffusionCore MitkGraphAlgorithms)
+set(_module_deps MitkDiffusionCore MitkGraphAlgorithms MitkCLVigraRandomForest)
 
 mitk_check_module_dependencies(
   MODULES ${_module_deps}
@@ -10,7 +10,6 @@ if(NOT _missing_deps)
 
   set(lut_url http://mitk.org/download/data/FibertrackingLUT.tar.gz)
   set(lut_tarball ${CMAKE_CURRENT_BINARY_DIR}/FibertrackingLUT.tar.gz)
-  message("Downloading FiberTracking LUT ${lut_url}...")
   file(DOWNLOAD ${lut_url} ${lut_tarball}
        EXPECTED_MD5 38ecb6d4a826c9ebb0f4965eb9aeee44
        TIMEOUT 60
@@ -23,32 +22,31 @@ if(NOT _missing_deps)
 
   if(NOT status_code EQUAL 0)
     message(SEND_ERROR "${status_msg} (error code ${status_code})")
-  else()
-    message("done.")
   endif()
 
   file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Resources)
-  message("Unpacking FiberTracking LUT tarball...")
   execute_process(COMMAND ${CMAKE_COMMAND} -E  tar xzf ../FibertrackingLUT.tar.gz
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Resources
                   RESULT_VARIABLE result
                   ERROR_VARIABLE err_msg)
   if(result)
     message(SEND_ERROR "Unpacking FibertrackingLUT.tar.gz failed: ${err_msg}")
-  else()
-    message("done.")
   endif()
 
 endif()
 
 MITK_CREATE_MODULE(
   SUBPROJECTS MITK-DTI
-  INCLUDE_DIRS Fiberfox Fiberfox/SignalModels Fiberfox/Sequences Algorithms Algorithms/MLTracking Algorithms/GibbsTracking Algorithms/StochasticTracking IODataStructures IODataStructures/FiberBundle IODataStructures/PlanarFigureComposite Rendering ${CMAKE_CURRENT_BINARY_DIR}
+  INCLUDE_DIRS Fiberfox Fiberfox/SignalModels Fiberfox/Sequences Algorithms Algorithms/TrackingHandlers Algorithms/ClusteringMetrics Algorithms/GibbsTracking Algorithms/StochasticTracking IODataStructures IODataStructures/FiberBundle IODataStructures/PlanarFigureComposite Rendering ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS ${_module_deps}
   PACKAGE_DEPENDS PUBLIC ITK|ITKFFT ITK|ITKDiffusionTensorImage Vigra HDF5
-  #WARNINGS_AS_ERRORS
 )
 
 if(MODULE_IS_ENABLED)
+  add_subdirectory(cmdapps/Fiberfox)
+  add_subdirectory(cmdapps/FiberProcessing)
+  add_subdirectory(cmdapps/Tractography)
+  add_subdirectory(cmdapps/TractographyEvaluation)
+  add_subdirectory(cmdapps/Misc)
   add_subdirectory(Testing)
 endif()

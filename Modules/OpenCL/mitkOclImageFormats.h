@@ -103,6 +103,7 @@ private:
                 Todo: What means support field? What is this offset used for? In what unit is it returned?*/
     unsigned int GetOffset( cl_image_format format );
 
+    using itk::LightObject::PrintSelf;
     /** @brief Print all supported formats (in a table) for both 2D and 3D IMAGE */
     void PrintSelf();
 

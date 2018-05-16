@@ -46,7 +46,7 @@ public:
     protected :
 
     QmitkErasePaintbrushToolGUI();
-  virtual ~QmitkErasePaintbrushToolGUI();
+  ~QmitkErasePaintbrushToolGUI() override;
 };
 
 #endif

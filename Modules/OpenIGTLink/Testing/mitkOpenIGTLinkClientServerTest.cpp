@@ -183,7 +183,7 @@ public:
 
     igtl::MessageBase::Pointer sentMessage = m_MessageFactory->CreateInstance("STATUS");
     dynamic_cast<igtl::StatusMessage*>(sentMessage.GetPointer())->SetStatusString(m_Message.c_str());
-    m_Server->SendMessage(sentMessage);
+    m_Server->SendMessage(mitk::IGTLMessage::New(sentMessage));
     igtl::MessageBase::Pointer receivedMessage;
     int steps = 0;
     while ((receivedMessage = m_Client_One->GetMessageQueue()->PullMiscMessage()) == nullptr)
@@ -216,7 +216,7 @@ public:
 
     igtl::MessageBase::Pointer sentMessage = m_MessageFactory->CreateInstance("STATUS");
     dynamic_cast<igtl::StatusMessage*>(sentMessage.GetPointer())->SetStatusString(m_Message.c_str());
-    m_Server->SendMessage(sentMessage);
+    m_Server->SendMessage(mitk::IGTLMessage::New(sentMessage));
     MITK_INFO << "SENT MESSAGE";
 
     igtl::MessageBase::Pointer receivedMessage1;

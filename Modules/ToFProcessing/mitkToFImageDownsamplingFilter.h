@@ -60,13 +60,13 @@ namespace mitk
     /*!
     \brief Standard destructor
     */
-    ~ToFImageDownsamplingFilter();
+    ~ToFImageDownsamplingFilter() override;
 
      /*!
     \brief Method generating the output of this filter. Called in the updated process of the pipeline.
     This method calls the AccessFixedDimensionByItk class with the ItkImageResampling function below
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
      /*!
     \brief Templated method for ITK image type which performs the resampling with an itk filter.

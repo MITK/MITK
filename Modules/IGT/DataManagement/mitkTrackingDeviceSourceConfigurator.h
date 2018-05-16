@@ -49,12 +49,12 @@ namespace mitk {
      */
     bool IsCreateTrackingDeviceSourcePossible();
 
-    /** @return Returns a new TrackingDeviceSource. Returns NULL if there was an error on creating the
+    /** @return Returns a new TrackingDeviceSource. Returns nullptr if there was an error on creating the
      *          TrackingDeviceSource. If there was an error it's availiable as error message.
      */
     mitk::TrackingDeviceSource::Pointer CreateTrackingDeviceSource();
 
-    /** @return Returns a new TrackingDeviceSource. Returns NULL if there was an error on creating the
+    /** @return Returns a new TrackingDeviceSource. Returns nullptr if there was an error on creating the
      *          TrackingDeviceSource. If there was an error it's availiable as error message.
      *  @param visualizationFilter (return value) returns a visualization filter which is already connected to the tracking device source.
      *                             This filter visualises the surfaces which are availiable by the navigation tool storage.
@@ -88,7 +88,7 @@ namespace mitk {
 
   protected:
     TrackingDeviceSourceConfigurator(mitk::NavigationToolStorage::Pointer NavigationTools, mitk::TrackingDevice::Pointer TrackingDevice);
-    virtual ~TrackingDeviceSourceConfigurator();
+    ~TrackingDeviceSourceConfigurator() override;
 
     mitk::NavigationToolStorage::Pointer m_NavigationTools;
     mitk::TrackingDevice::Pointer m_TrackingDevice;

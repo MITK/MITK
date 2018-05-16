@@ -74,7 +74,7 @@ void mitk::ImageTimeSelector::GenerateData()
   {
     mitk::ImageDataItem::Pointer im = this->GetVolumeData(m_TimeNr, m_ChannelNr)->Clone();
     im->SetTimestep(0);
-    im->SetManageMemory(0);
+    im->SetManageMemory(false);
     this->SetVolumeItem(im, 0);
   }
   else
@@ -87,8 +87,7 @@ void mitk::ImageTimeSelector::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  ImageToImageFilter::InputImagePointer input =
-    const_cast<mitk::ImageToImageFilter::InputImageType *>(this->GetInput());
+  ImageToImageFilter::InputImagePointer input = this->GetInput();
   Image::Pointer output = this->GetOutput();
 
   Image::RegionType requestedRegion;

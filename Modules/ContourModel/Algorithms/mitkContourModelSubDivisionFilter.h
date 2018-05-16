@@ -64,7 +64,7 @@ namespace mitk
   protected:
     ContourModelSubDivisionFilter();
 
-    virtual ~ContourModelSubDivisionFilter();
+    ~ContourModelSubDivisionFilter() override;
 
     void GenerateOutputInformation() override{};
 

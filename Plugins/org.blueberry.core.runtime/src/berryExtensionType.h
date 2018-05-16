@@ -169,7 +169,7 @@ struct ExtensionTypeIdHelper<T, false>
 template <typename T>
 int registerExtensionType(const char* typeName
 #ifndef DOXYGEN_SKIP
-                          , T* dummy = 0
+                          , T* dummy = nullptr
 #endif
 )
 {

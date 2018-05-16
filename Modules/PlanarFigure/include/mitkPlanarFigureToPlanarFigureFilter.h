@@ -56,7 +56,7 @@ namespace mitk
 
   protected:
     PlanarFigureToPlanarFigureFilter();
-    virtual ~PlanarFigureToPlanarFigureFilter();
+    ~PlanarFigureToPlanarFigureFilter() override;
   };
 } // namespace mitk
 #endif

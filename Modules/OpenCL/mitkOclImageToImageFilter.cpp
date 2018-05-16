@@ -146,3 +146,48 @@ bool mitk::OclImageToImageFilter::InitExec(cl_kernel ckKernel)
 
   return( clErr == CL_SUCCESS );
 }
+
+ bool mitk::OclImageToImageFilter::InitExec(cl_kernel ckKernel, unsigned int* dimensions)
+ {
+  cl_int clErr = 0;
+
+  if( m_Input.IsNull() )
+    mitkThrow() << "Input image is null.";
+
+  // get image size once
+  const unsigned int uiImageWidth  = dimensions[0];
+  const unsigned int uiImageHeight = dimensions[1];
+  const unsigned int uiImageDepth  = dimensions[2]+1;
+
+  // compute work sizes
+  this->SetWorkingSize( 8, uiImageWidth, 8, uiImageHeight , 8, uiImageDepth );
+
+  cl_mem clBuffIn = m_Input->GetGPUImage(this->m_CommandQue);
+  cl_mem clBuffOut = m_Output->GetGPUBuffer();
+
+  if (!clBuffIn)
+  {
+    if ( m_Input->TransferDataToGPU(m_CommandQue) != CL_SUCCESS )
+    {
+      mitkThrow()<< "Could not create / initialize gpu image.";
+    }
+
+    clBuffIn = m_Input->GetGPUImage(m_CommandQue);
+  }
+
+  // output image not initialized
+  //TODO bpp, or SetImageWidth/Height/...
+  MITK_INFO << "Create GPU Image call " << uiImageWidth<< "x"<<uiImageHeight<< "x"<<uiImageDepth;
+  clBuffOut = m_Output->CreateGPUImage(uiImageWidth, uiImageHeight, uiImageDepth, this->m_CurrentType + 1);
+  
+
+  clErr = 0;
+  clErr  = clSetKernelArg(ckKernel, 0, sizeof(cl_mem), &clBuffIn);
+  clErr |= clSetKernelArg(ckKernel, 1, sizeof(cl_mem), &clBuffOut);
+  CHECK_OCL_ERR( clErr );
+
+  if( clErr != CL_SUCCESS )
+    mitkThrow() << "OpenCL Part initialization failed with " << GetOclErrorAsString(clErr);
+
+  return( clErr == CL_SUCCESS );
+}

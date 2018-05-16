@@ -23,10 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ImageMasking/QmitkImageMaskingWidget.h"
 
 QmitkMultiLabelSegmentationUtilitiesView::QmitkMultiLabelSegmentationUtilitiesView() :
-m_BooleanOperationsWidget(NULL),
-m_MorphologicalOperationsWidget(NULL),
-m_SurfaceToImageWidget(NULL),
-m_ImageMaskingWidget(NULL)
+m_BooleanOperationsWidget(nullptr),
+m_MorphologicalOperationsWidget(nullptr),
+m_SurfaceToImageWidget(nullptr),
+m_ImageMaskingWidget(nullptr)
 {
 }
 
@@ -40,9 +40,9 @@ void QmitkMultiLabelSegmentationUtilitiesView::CreateQtPartControl(QWidget* pare
 
   mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
 
-  mitk::SliceNavigationController* timeNavigationController = renderWindowPart != NULL
+  mitk::SliceNavigationController* timeNavigationController = renderWindowPart != nullptr
     ? renderWindowPart->GetTimeNavigationController()
-    : NULL;
+    : nullptr;
 
   m_BooleanOperationsWidget = new QmitkBooleanOperationsWidget(timeNavigationController, parent);
 
@@ -83,8 +83,8 @@ void QmitkMultiLabelSegmentationUtilitiesView::RenderWindowPartActivated(mitk::I
 
 void QmitkMultiLabelSegmentationUtilitiesView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
 {
-  m_BooleanOperationsWidget->SetTimeNavigationController(NULL);
-  m_MorphologicalOperationsWidget->SetTimeNavigationController(NULL);
-  m_SurfaceToImageWidget->SetTimeNavigationController(NULL);
-  m_ImageMaskingWidget->SetTimeNavigationController(NULL);
+  m_BooleanOperationsWidget->SetTimeNavigationController(nullptr);
+  m_MorphologicalOperationsWidget->SetTimeNavigationController(nullptr);
+  m_SurfaceToImageWidget->SetTimeNavigationController(nullptr);
+  m_ImageMaskingWidget->SetTimeNavigationController(nullptr);
 }

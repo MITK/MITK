@@ -38,7 +38,7 @@ bool mitk::ExampleInteractor::CheckPoint(const InteractionEvent *interactionEven
   // check if a point close to the clicked position already exists
   float epsilon = 0.3; // do not accept new points within 3mm range of existing points
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent != NULL)
+  if (positionEvent != nullptr)
   {
     // query the position of the mouse in the world geometry
     mitk::Point3D point = positionEvent->GetPositionInWorld();
@@ -46,7 +46,7 @@ bool mitk::ExampleInteractor::CheckPoint(const InteractionEvent *interactionEven
     if (retVal == -1) // SearchPoint returns -1 if no point was found within given range
       return true;
   }
-  return false; // if the positionEvent is NULL or a point was found return false. AddPoint will not be executed
+  return false; // if the positionEvent is nullptr or a point was found return false. AddPoint will not be executed
   // end
 }
 
@@ -56,7 +56,7 @@ bool mitk::ExampleInteractor::AddPoint(StateMachineAction *, InteractionEvent *i
   // we stay here as general as possible so that a different state machine pattern
   // can reuse this code with MouseRelease or MouseMoveEvents.
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent != NULL)
+  if (positionEvent != nullptr)
   {
     // query the position of the mouse in the world geometry
     mitk::Point3D point = positionEvent->GetPositionInWorld();
@@ -68,7 +68,7 @@ bool mitk::ExampleInteractor::AddPoint(StateMachineAction *, InteractionEvent *i
     if (m_NumberOfPoints != 0 && m_NumberOfPoints >= m_MaximalNumberOfPoints)
     {
       // create internal event that signal that the maximal number of points is reached
-      InternalEvent::Pointer event = InternalEvent::New(NULL, this, "enoughPointsAdded");
+      InternalEvent::Pointer event = InternalEvent::New(nullptr, this, "enoughPointsAdded");
       // add the internal event to the event queue of the Dispatcher
       positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
     }

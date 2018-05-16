@@ -105,7 +105,7 @@ void mitk::PlaneGeometryDataToSurfaceFilter::GenerateOutputInformation()
   vtkPolyData *planeSurface = nullptr;
 
   // Does the PlaneGeometryData contain an AbstractTransformGeometry?
-  if (mitk::AbstractTransformGeometry *abstractGeometry =
+  if (auto *abstractGeometry =
         dynamic_cast<AbstractTransformGeometry *>(input->GetPlaneGeometry()))
   {
     // In the case of an AbstractTransformGeometry (which holds a possibly
@@ -192,7 +192,7 @@ void mitk::PlaneGeometryDataToSurfaceFilter::GenerateOutputInformation()
   // Does the PlaneGeometryData contain a PlaneGeometry?
   else if (dynamic_cast<PlaneGeometry *>(input->GetPlaneGeometry()) != nullptr)
   {
-    mitk::PlaneGeometry *planeGeometry = dynamic_cast<PlaneGeometry *>(input->GetPlaneGeometry());
+    auto *planeGeometry = dynamic_cast<PlaneGeometry *>(input->GetPlaneGeometry());
 
     if (m_PlaceByGeometry)
     {

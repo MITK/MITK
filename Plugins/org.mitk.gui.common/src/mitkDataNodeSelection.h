@@ -39,13 +39,13 @@ public:
   DataNodeSelection(DataNode::Pointer node);
   DataNodeSelection(const std::vector<DataNode::Pointer>& nodes);
 
-  virtual Object::Pointer GetFirstElement() const override;
-  virtual iterator Begin() const override;
-  virtual iterator End() const override;
+  Object::Pointer GetFirstElement() const override;
+  iterator Begin() const override;
+  iterator End() const override;
 
-  virtual int Size() const override;
+  int Size() const override;
 
-  virtual ContainerType::Pointer ToVector() const override;
+  ContainerType::Pointer ToVector() const override;
 
   std::list<mitk::DataNode::Pointer> GetSelectedDataNodes() const;
 

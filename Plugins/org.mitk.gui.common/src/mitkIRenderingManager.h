@@ -116,7 +116,7 @@ struct IRenderingManager {
 
   virtual int GetNextLOD( BaseRenderer* renderer ) const = 0;
 
-  /** Set current LOD (NULL means all renderers)*/
+  /** Set current LOD (nullptr means all renderers)*/
   virtual void SetMaximumLOD( unsigned int max ) = 0;
 
   virtual void SetShading( bool state, unsigned int lod ) = 0;

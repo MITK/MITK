@@ -8,30 +8,41 @@
 #include "vtkObjectFactory.h"
 #include "vtkDoubleArray.h"
 #include "vtkCellData.h"
-
+#include <vtkLookupTable.h>
 #include <limits>
+#include <vtkPointData.h>
 
 vtkStandardNewMacro(vtkOdfSource);
 
 vtkOdfSource::vtkOdfSource()
+  : r(0)
+  , g(0)
+  , b(0)
+  , UseCustomColor(false)
 {
   Scale = 1;
+  lut = vtkSmartPointer<vtkLookupTable>::New();
+  lut->SetRange(0,1);
+  lut->Build();
   this->SetNumberOfInputPorts(0);
+}
+
+vtkOdfSource::~vtkOdfSource()
+{
+
 }
 
 //----------------------------------------------------------------------------
 int vtkOdfSource::RequestData(
-  vtkInformation *vtkNotUsed(request),
-  vtkInformationVector **vtkNotUsed(inputVector),
-  vtkInformationVector *outputVector)
+    vtkInformation *vtkNotUsed(request),
+    vtkInformationVector **vtkNotUsed(inputVector),
+    vtkInformationVector *outputVector)
 {
   vtkPolyData* TemplateOdf = OdfType::GetBaseMesh();
   // get the info object
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
-
   // get the ouptut
-  vtkPolyData *output = vtkPolyData::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   OdfType colorOdf;
   switch(Normalization)
@@ -48,37 +59,26 @@ int vtkOdfSource::RequestData(
     colorOdf = Odf.MaxNormalize();
     break;
   default:
-    Odf = Odf.MinMaxNormalize();
+    Odf = Odf.MaxNormalize();
     colorOdf = Odf;
   }
 
-
-  vtkIdType cellId = 0;
-  vtkIdType npts; vtkIdType *pts;
-  vtkPoints *newPoints;
   vtkCellArray* polys = TemplateOdf->GetPolys();
   output->SetPolys(polys);
-  vtkDoubleArray* colors = vtkDoubleArray::New();
-  int numCells = polys->GetNumberOfCells();
-  colors->Allocate(numCells);
   polys->InitTraversal();
-  newPoints = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
   int numPoints = TemplateOdf->GetPoints()->GetNumberOfPoints();
   newPoints->Allocate(numPoints);
 
-  while(polys->GetNextCell(npts,pts))
-  {
-    double val = 0;
-    for(int i=0; i<npts; i++)
-    {
-      vtkIdType pointId = pts[i];
-      val += colorOdf.GetElement(pointId);
-    }
-    val /= npts;
-    colors->SetComponent(0,cellId++, 1-val);
-  }
+  vtkSmartPointer<vtkUnsignedCharArray> point_colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
+  point_colors->Allocate(output->GetNumberOfPoints() * 4);
+  point_colors->SetNumberOfComponents(4);
+  point_colors->SetName("ODF_COLORS");
+  unsigned char rgba[4];
+  double rgb[3];
 
-  for(int j=0; j<numPoints; j++){
+  for(int j=0; j<numPoints; j++)
+  {
     double p[3];
     TemplateOdf->GetPoints()->GetPoint(j,p);
     double val = Odf.GetElement(j);
@@ -86,11 +86,26 @@ int vtkOdfSource::RequestData(
     p[1] *= val*Scale*AdditionalScale*0.5;
     p[2] *= val*Scale*AdditionalScale*0.5;
     newPoints->InsertNextPoint(p);
+
+    if (UseCustomColor)
+    {
+      rgba[0] = (unsigned char)r;
+      rgba[1] = (unsigned char)g;
+      rgba[2] = (unsigned char)b;
+    }
+    else
+    {
+      double color_val = colorOdf.GetElement(j);
+      lut->GetColor(1-color_val, rgb);
+      rgba[0] = (unsigned char)(255.0*rgb[0]);
+      rgba[1] = (unsigned char)(255.0*rgb[1]);
+      rgba[2] = (unsigned char)(255.0*rgb[2]);
+    }
+    rgba[3] = 255;
+    point_colors->InsertTypedTuple(j, rgba);
   }
   output->SetPoints(newPoints);
-  output->GetCellData()->SetScalars(colors);
-  colors->Delete();
-  newPoints->Delete();
+  output->GetPointData()->AddArray(point_colors);
   return 1;
 }
 
@@ -102,9 +117,9 @@ void vtkOdfSource::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 int vtkOdfSource::RequestInformation(
-  vtkInformation *vtkNotUsed(request),
-  vtkInformationVector **vtkNotUsed(inputVector),
-  vtkInformationVector *outputVector)
+    vtkInformation *vtkNotUsed(request),
+    vtkInformationVector **vtkNotUsed(inputVector),
+    vtkInformationVector *outputVector)
 {
   // get the info object
   vtkInformation *outInfo = outputVector->GetInformationObject(0);

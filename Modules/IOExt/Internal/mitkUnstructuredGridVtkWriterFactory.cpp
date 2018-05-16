@@ -46,7 +46,7 @@ namespace mitk
 
   protected:
     CreateUnstructuredGridWriter() {}
-    ~CreateUnstructuredGridWriter() {}
+    ~CreateUnstructuredGridWriter() override {}
   private:
     CreateUnstructuredGridWriter(const Self &); // purposely not implemented
     void operator=(const Self &);               // purposely not implemented
@@ -58,21 +58,21 @@ namespace mitk
       "IOWriter",
       "UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>",
       "VTK Legacy Unstructured Grid Writer",
-      1,
+      true,
       mitk::CreateUnstructuredGridWriter<mitk::UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>>::New());
 
     this->RegisterOverride(
       "IOWriter",
       "UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>",
       "VTK XML UnstructuredGrid Writer",
-      1,
+      true,
       mitk::CreateUnstructuredGridWriter<mitk::UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>>::New());
 
     this->RegisterOverride(
       "IOWriter",
       "UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>",
       "VTK Parallel XML UnstructuredGrid Writer",
-      1,
+      true,
       mitk::CreateUnstructuredGridWriter<mitk::UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>>::New());
   }
 

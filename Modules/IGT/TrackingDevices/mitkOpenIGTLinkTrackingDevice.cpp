@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMutexLockHolder.h>
 #include <itkCommand.h>
 #include <mitkOpenIGTLinkTypeInformation.h>
+#include <vtkConeSource.h>
 
 //sleep headers
 #include <chrono>
@@ -39,8 +40,9 @@ mitk::OpenIGTLinkTrackingDevice::OpenIGTLinkTrackingDevice() : mitk::TrackingDev
 
   m_OpenIGTLinkClient = mitk::IGTLClient::New(true);
   m_OpenIGTLinkClient->SetName("OpenIGTLink Tracking Device");
+  m_OpenIGTLinkClient->EnableNoBufferingMode(false);
 
-  m_IGTLDeviceSource = mitk::IGTLTransformDeviceSource::New();
+  m_IGTLDeviceSource = mitk::IGTLTrackingDataDeviceSource::New();
   m_IGTLDeviceSource->SetIGTLDevice(m_OpenIGTLinkClient);
 }
 
@@ -51,6 +53,145 @@ mitk::OpenIGTLinkTrackingDevice::~OpenIGTLinkTrackingDevice()
 int mitk::OpenIGTLinkTrackingDevice::GetPortNumber()
 {
   return m_OpenIGTLinkClient->GetPortNumber();
+}
+
+bool mitk::OpenIGTLinkTrackingDevice::AutoDetectToolsAvailable()
+{
+  return true;
+}
+
+mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::AutoDetectTools()
+{
+  mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
+
+  if (m_OpenIGTLinkClient->GetPortNumber() == -1)
+  {
+    MITK_WARN << "Connection not initialized, aborting (invalid port number).";
+    return mitk::NavigationToolStorage::New();
+  }
+
+  //open connection
+  try
+  {
+    m_IGTLDeviceSource->Connect();
+    m_IGTLDeviceSource->StartCommunication();
+  }
+  catch (std::runtime_error &e)
+  {
+    MITK_WARN << "AutoDetection: Open IGT Link device retruned an error while trying to connect: " << e.what();
+    return mitk::NavigationToolStorage::New();
+  }
+
+  //get a message to find out type
+  m_IGTLDeviceSource->SettrackingDataType(mitk::IGTLTrackingDataDeviceSource::UNKNOWN);
+  mitk::IGTLMessage::Pointer receivedMessage = ReceiveMessage(100);
+
+  const char* msgType = receivedMessage->GetIGTLMessageType();
+
+  if (std::string(msgType).empty())
+  {
+    MITK_INFO << "Did not receive a message. Do you have to start the stream manually at the server?";
+    MITK_INFO << "Waiting for 10 seconds ...";
+    receivedMessage = ReceiveMessage(10000);
+    msgType = receivedMessage->GetIGTLMessageType();
+  }
+  MITK_INFO << "################# got message type: " << msgType;
+  mitk::OpenIGTLinkTrackingDevice::TrackingMessageType type = GetMessageTypeFromString(msgType);
+  switch (type)
+  {
+  case UNKNOWN:
+    m_IGTLDeviceSource->SettrackingDataType(mitk::IGTLTrackingDataDeviceSource::UNKNOWN);
+    break;
+  case TDATA:
+    m_IGTLDeviceSource->SettrackingDataType(mitk::IGTLTrackingDataDeviceSource::TDATA);
+    break;
+  case QTDATA:
+    m_IGTLDeviceSource->SettrackingDataType(mitk::IGTLTrackingDataDeviceSource::QTDATA);
+    break;
+  case TRANSFORM:
+    m_IGTLDeviceSource->SettrackingDataType(mitk::IGTLTrackingDataDeviceSource::TRANSFORM);
+    break;
+  }
+  returnValue = DiscoverToolsAndConvertToNavigationTools(type);
+
+  //close connection
+  try
+  {
+    m_IGTLDeviceSource->StopCommunication();
+    m_IGTLDeviceSource->Disconnect();
+  }
+  catch (std::runtime_error &e)
+  {
+    MITK_WARN << "AutoDetection: Open IGT Link device retruned an error while trying to disconnect: " << e.what();
+    return mitk::NavigationToolStorage::New();
+  }
+
+
+  return returnValue;
+}
+
+mitk::NavigationToolStorage::Pointer mitk::OpenIGTLinkTrackingDevice::DiscoverToolsAndConvertToNavigationTools(mitk::OpenIGTLinkTrackingDevice::TrackingMessageType type, int NumberOfMessagesToWait)
+{
+  MITK_INFO << "Start discovering tools by " << type << " messages";
+  mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
+  std::map<std::string, int> toolNameMap;
+
+  for (int j = 0; j<NumberOfMessagesToWait; j++)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    m_IGTLDeviceSource->Update();
+    switch (type)
+    {
+    case TRANSFORM:
+      {
+      igtl::TransformMessage::Pointer msg = dynamic_cast<igtl::TransformMessage*>(m_IGTLDeviceSource->GetOutput()->GetMessage().GetPointer());
+      if (msg == nullptr || msg.IsNull()) { MITK_INFO << "Received message is invalid / null. Skipping.."; continue; }
+      int count = toolNameMap[msg->GetDeviceName()];
+      if (count == 0) { toolNameMap[msg->GetDeviceName()] = 1; }
+      else { toolNameMap[msg->GetDeviceName()]++; }
+      }
+      break;
+    case TDATA:
+      {
+      igtl::TrackingDataMessage::Pointer msg = dynamic_cast<igtl::TrackingDataMessage*>(m_IGTLDeviceSource->GetOutput()->GetMessage().GetPointer());
+      if (msg == nullptr || msg.IsNull()) { MITK_INFO << "Received message is invalid / null. Skipping.."; continue; }
+      for (int k = 0; k < msg->GetNumberOfTrackingDataElements(); k++)
+        {
+        igtl::TrackingDataElement::Pointer tde;
+        msg->GetTrackingDataElement(k, tde);
+        if (tde.IsNotNull())
+          {
+          int count = toolNameMap[tde->GetName()];
+          if (count == 0) { toolNameMap[tde->GetName()] = 1; }
+          else { toolNameMap[tde->GetName()]++; }
+          }
+        }
+      }
+      break;
+    default:
+      MITK_WARN << "Only TRANSFORM and TDATA is currently supported, skipping!";
+      break;
+    }
+  }
+
+  int i = 0;
+  for (std::map<std::string, int>::iterator it = toolNameMap.begin(); it != toolNameMap.end(); ++it)
+  {
+    MITK_INFO << "Found tool: " << it->first;
+
+    std::stringstream name;
+    name << it->first;
+
+    std::stringstream identifier;
+    identifier << "AutoDetectedTool-" << i;
+    i++;
+
+    mitk::NavigationTool::Pointer newTool = ConstructDefaultOpenIGTLinkTool(name.str(), identifier.str());
+
+    returnValue->AddTool(newTool);
+  }
+
+  return returnValue;
 }
 
 std::string mitk::OpenIGTLinkTrackingDevice::GetHostname()
@@ -73,12 +214,12 @@ bool mitk::OpenIGTLinkTrackingDevice::IsDeviceInstalled()
   return true;
 }
 
-mitk::TrackingTool* mitk::OpenIGTLinkTrackingDevice::AddTool(const char* toolName, const char* fileName)
+mitk::TrackingTool* mitk::OpenIGTLinkTrackingDevice::AddTool(const char*, const char*)
 {
   mitk::OpenIGTLinkTrackingTool::Pointer t;// = mitk::OpenIGTLinkTrackingTool::New();
   //TODO: Implement
   if (this->InternalAddTool(t) == false)
-    return NULL;
+    return nullptr;
   return t.GetPointer();
 }
 
@@ -107,29 +248,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int waitingTime)
     return false;
   }
 
-  //send a message to the server: start tracking stream
-  mitk::IGTLMessageFactory::Pointer msgFactory = m_OpenIGTLinkClient->GetMessageFactory();
-  std::string message = "STT_TDATA";
-  igtl::MessageBase::Pointer sttMsg = msgFactory->CreateInstance(message);
-  //TODO: Fix this to dynamically get this from GUI
-  ((igtl::StartTrackingDataMessage*)sttMsg.GetPointer())->SetResolution(m_UpdateRate);
-  m_OpenIGTLinkClient->SendMessage(sttMsg);
-
-  mitk::IGTLMessage::Pointer receivedMessage;
-
-  std::chrono::high_resolution_clock::time_point time = std::chrono::high_resolution_clock::now();
-  std::chrono::milliseconds d = std::chrono::milliseconds(waitingTime);
-
-  while (!(receivedMessage.IsNotNull() && receivedMessage->IsDataValid()))
-  {
-    m_IGTLDeviceSource->Update();
-    receivedMessage = m_IGTLDeviceSource->GetOutput();
-
-    if ((time + d) < std::chrono::high_resolution_clock::now())
-      break;
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  }
+  mitk::IGTLMessage::Pointer receivedMessage = ReceiveMessage(waitingTime);
 
   //check the tracking stream for the number and type of tools
   //igtl::MessageBase::Pointer receivedMessage = m_OpenIGTLinkClient->GetNextMessage();
@@ -148,64 +267,42 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int waitingTime)
 
   mitk::OpenIGTLinkTrackingDevice::TrackingMessageType type = GetMessageTypeFromString(msgType);
 
-  switch (type)
-  {
-  case TDATA:
-    return DiscoverToolsFromTData(dynamic_cast<igtl::TrackingDataMessage*>(receivedMessage->GetMessage().GetPointer()));
-  case QTDATA:
-    return DiscoverToolsFromQTData(dynamic_cast<igtl::QuaternionTrackingDataMessage*>(receivedMessage->GetMessage().GetPointer()));
-  case TRANSFORM:
-    return DiscoverToolsFromTransform();
-  default:
-    MITK_INFO << "Server does not send tracking data. Received data is not of a compatible type. Received type: " << msgType;
-    return false;
-  }
-}
-
-bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTData(igtl::TrackingDataMessage::Pointer tdMsg)
-{
-  MITK_INFO << "Start discovering tools by TDATA messages";
-  if (tdMsg == nullptr)
-  {
-    MITK_WARN << "Message was not a TrackingDataMessage, aborting!";
-    return false;
-  }
-
-  int numberOfTools = tdMsg->GetNumberOfTrackingDataElements();
-  MITK_INFO << "Found " << numberOfTools << " tools";
-  for (int i = 0; i < numberOfTools; i++)
-  {
-    igtl::TrackingDataElement::Pointer currentTrackingData;
-    tdMsg->GetTrackingDataElement(i, currentTrackingData);
-    std::string name = currentTrackingData->GetName();
-    AddNewToolForName(name, i);
-  }
-
-  m_IGTLDeviceSource->StopCommunication();
-  SetState(Ready);
+  mitk::NavigationToolStorage::Pointer foundTools = this->DiscoverToolsAndConvertToNavigationTools(type);
+  if (foundTools.IsNull() || (foundTools->GetToolCount() == 0)) { return false; }
+  for (unsigned int i = 0; i < foundTools->GetToolCount(); i++) { AddNewToolForName(foundTools->GetTool(i)->GetToolName(), i); }
+  MITK_INFO << "Found tools: " << foundTools->GetToolCount();
   return true;
 }
 
-bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg)
+mitk::IGTLMessage::Pointer mitk::OpenIGTLinkTrackingDevice::ReceiveMessage(int waitingTime)
 {
-  MITK_INFO << "Start discovering tools by QTDATA messages";
-  if (msg == nullptr)
+  mitk::IGTLMessage::Pointer receivedMessage;
+  //send a message to the server: start tracking stream
+  mitk::IGTLMessageFactory::Pointer msgFactory = m_OpenIGTLinkClient->GetMessageFactory();
+  std::string message[2] = {"STT_QTDATA","STT_TDATA"};
+
+  for (int i = 0; i < 2; i++)
   {
-    MITK_WARN << "Message was not a QuaternionTrackingDataMessage, aborting!";
-    return false;
+    igtl::MessageBase::Pointer sttMsg = msgFactory->CreateInstance(message[i]);
+    //TODO: Fix this to dynamically get this from GUI
+    ((igtl::StartTrackingDataMessage*)sttMsg.GetPointer())->SetResolution(m_UpdateRate);
+    m_OpenIGTLinkClient->SendMessage(mitk::IGTLMessage::New(sttMsg));
   }
-  int numberOfTools = msg->GetNumberOfQuaternionTrackingDataElements();
-  MITK_INFO << "Found " << numberOfTools << " tools";
-  for (int i = 0; i < numberOfTools; i++)
+
+  std::chrono::high_resolution_clock::time_point time = std::chrono::high_resolution_clock::now();
+  std::chrono::milliseconds d = std::chrono::milliseconds(waitingTime);
+
+  while (!(receivedMessage.IsNotNull() && receivedMessage->IsDataValid()))
   {
-    igtl::QuaternionTrackingDataElement::Pointer currentTrackingData;
-    msg->GetQuaternionTrackingDataElement(i, currentTrackingData);
-    std::string name = currentTrackingData->GetName();
-    AddNewToolForName(name, i);
+    m_IGTLDeviceSource->Update();
+    receivedMessage = m_IGTLDeviceSource->GetOutput();
+
+    if ((time + d) < std::chrono::high_resolution_clock::now())
+      break;
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
-  m_IGTLDeviceSource->StopCommunication();
-  SetState(Ready);
-  return true;
+  return receivedMessage;
 }
 
 void mitk::OpenIGTLinkTrackingDevice::AddNewToolForName(std::string name, int i)
@@ -222,54 +319,16 @@ void mitk::OpenIGTLinkTrackingDevice::AddNewToolForName(std::string name, int i)
   InternalAddTool(newTool);
 }
 
-bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTransform()
+mitk::NavigationTool::Pointer mitk::OpenIGTLinkTrackingDevice::ConstructDefaultOpenIGTLinkTool(std::string name, std::string identifier)
 {
-  MITK_INFO << "Start discovering tools by TRANSFORM messages";
-  std::map<std::string, int> toolNameMap;
-  bool condition = false;
-  while (!condition)
-  {
-    //TODO: Fix this.. :/
-    std::this_thread::sleep_for(std::chrono::milliseconds(20));
-    m_IGTLDeviceSource->Update();
-    igtl::TransformMessage::Pointer msg = dynamic_cast<igtl::TransformMessage*>(m_IGTLDeviceSource->GetOutput()->GetMessage().GetPointer());
-    if (msg == nullptr || msg.IsNull())
-    {
-      MITK_INFO << "Received message could not be casted to TransformMessage. Skipping..";
-      continue;
-    }
+  mitk::NavigationTool::Pointer newTool = mitk::NavigationTool::New();
+  newTool->GetDataNode()->SetName(name);
+  newTool->SetIdentifier(identifier);
 
-    condition = true;
-    int count = toolNameMap[msg->GetDeviceName()];
-    if (count == 0)
-    {
-      MITK_WARN << "ADDED NEW TOOL TO TOOLCHAIN: " << msg->GetDeviceName() << " - 1";
-      toolNameMap[msg->GetDeviceName()] = 1;
-    }
-    else
-    {
-      toolNameMap[msg->GetDeviceName()]++;
-      MITK_WARN << "INCREMENTED TOOL COUNT IN TOOLCHAIN: " << msg->GetDeviceName() << " - " << toolNameMap[msg->GetDeviceName()];
-    }
+  newTool->SetTrackingDeviceType(mitk::OpenIGTLinkTypeInformation::GetDeviceDataOpenIGTLinkTrackingDeviceConnection().Line);
 
-    for (std::map<std::string, int>::iterator it = toolNameMap.begin(); it != toolNameMap.end(); ++it)
-    {
-      if (it->second < 5)
-      {
-        condition = false;
-        break;
-      }
-    }
-  }
+  return newTool;
 
-  int i = 0;
-  for (std::map<std::string, int>::iterator it = toolNameMap.begin(); it != toolNameMap.end(); ++it)
-  {
-    AddNewToolForName(it->first, i++);
-  }
-  //TODO InternalAddTool for all tools
-
-  return true;
 }
 
 void mitk::OpenIGTLinkTrackingDevice::UpdateTools()
@@ -282,18 +341,19 @@ void mitk::OpenIGTLinkTrackingDevice::UpdateTools()
 
   m_IGTLMsgToNavDataFilter->Update();
 
-  mitk::NavigationData::Pointer currentNavData = m_IGTLMsgToNavDataFilter->GetOutput();
-  const char* name = currentNavData->GetName();
-  MITK_WARN << name;
-
-  for (int i = 0; i < m_AllTools.size(); i++)
+  for (std::size_t j = 0; j < m_IGTLMsgToNavDataFilter->GetNumberOfIndexedOutputs(); ++j)
   {
-    if (strcmp(m_AllTools.at(i)->GetToolName(), name) == 0)
+    mitk::NavigationData::Pointer currentNavData = m_IGTLMsgToNavDataFilter->GetOutput(j);
+    const char* name = currentNavData->GetName();
+    for (std::size_t i = 0; i < m_AllTools.size(); i++)
     {
-      m_AllTools.at(i)->SetDataValid(currentNavData->IsDataValid());
-      m_AllTools.at(i)->SetPosition(currentNavData->GetPosition());
-      m_AllTools.at(i)->SetOrientation(currentNavData->GetOrientation());
-      m_AllTools.at(i)->SetIGTTimeStamp(currentNavData->GetIGTTimeStamp());
+      if (strcmp(m_AllTools.at(i)->GetToolName(), name) == 0)
+      {
+        m_AllTools.at(i)->SetDataValid(currentNavData->IsDataValid());
+        m_AllTools.at(i)->SetPosition(currentNavData->GetPosition());
+        m_AllTools.at(i)->SetOrientation(currentNavData->GetOrientation());
+        m_AllTools.at(i)->SetIGTTimeStamp(currentNavData->GetIGTTimeStamp());
+      }
     }
   }
 }
@@ -333,6 +393,7 @@ bool mitk::OpenIGTLinkTrackingDevice::StartTracking()
   messageReceivedCommand->SetCallbackFunction(this, &mitk::OpenIGTLinkTrackingDevice::UpdateTools);
   m_MessageReceivedObserverTag = m_OpenIGTLinkClient->AddObserver(mitk::MessageReceivedEvent(), messageReceivedCommand);
 
+  m_OpenIGTLinkClient->EnableNoBufferingMode(true);
   this->SetState(Tracking);
   return true;
 }
@@ -357,6 +418,7 @@ bool mitk::OpenIGTLinkTrackingDevice::StopTracking()
     MITK_WARN << "Open IGT Link device retruned an error while stopping communication: " << e.what();
     return false;
   }
+  m_OpenIGTLinkClient->EnableNoBufferingMode(false);
   this->SetState(Ready);
   return true;
 }
@@ -369,7 +431,7 @@ unsigned int mitk::OpenIGTLinkTrackingDevice::GetToolCount() const
 mitk::TrackingTool* mitk::OpenIGTLinkTrackingDevice::GetTool(unsigned int toolNumber) const
 {
   if (toolNumber >= this->GetToolCount())
-    return NULL;
+    return nullptr;
   else
     return this->m_AllTools[toolNumber];
 }

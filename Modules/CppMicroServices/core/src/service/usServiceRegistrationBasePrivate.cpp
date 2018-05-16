@@ -66,7 +66,7 @@ void* ServiceRegistrationBasePrivate::GetService(const std::string& interfaceId)
   {
     return iter->second;
   }
-  return NULL;
+  return nullptr;
 }
 
 US_END_NAMESPACE

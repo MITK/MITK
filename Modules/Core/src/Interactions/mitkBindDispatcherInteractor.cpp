@@ -16,17 +16,17 @@
 
 #include "mitkBindDispatcherInteractor.h"
 #include "mitkMessage.h"
-#include <string.h>
+#include <cstring>
 
 // us
 #include "usGetModuleContext.h"
 #include "usModule.h"
 #include "usModuleRegistry.h"
 
-mitk::BindDispatcherInteractor::BindDispatcherInteractor(const std::string &rendererName) : m_DataStorage(NULL)
+mitk::BindDispatcherInteractor::BindDispatcherInteractor(const std::string &rendererName) : m_DataStorage(nullptr)
 {
   us::ModuleContext *context = us::ModuleRegistry::GetModule(1)->GetModuleContext();
-  if (context == NULL)
+  if (context == nullptr)
   {
     MITK_ERROR << "BindDispatcherInteractor() - Context could not be obtained.";
     return;

@@ -71,7 +71,7 @@ public:
     {
       manager->SetLevelWindowProperty(levelWindowProperty);
     }
-    catch (mitk::Exception &e)
+    catch (const mitk::Exception &)
     {
       success = true;
     }
@@ -116,10 +116,10 @@ public:
     manager->SetDataStorage(ds);
 
     // add multiple objects to the data storage => multiple observers should be created
-    mitk::Image::Pointer image1 = mitk::IOUtil::LoadImage(testImageFile);
+    mitk::Image::Pointer image1 = mitk::IOUtil::Load<mitk::Image>(testImageFile);
     mitk::DataNode::Pointer node1 = mitk::DataNode::New();
     node1->SetData(image1);
-    mitk::Image::Pointer image2 = mitk::IOUtil::LoadImage(testImageFile);
+    mitk::Image::Pointer image2 = mitk::IOUtil::Load<mitk::Image>(testImageFile);
     mitk::DataNode::Pointer node2 = mitk::DataNode::New();
     node2->SetData(image2);
     ds->Add(node1);
@@ -130,7 +130,7 @@ public:
       static_cast<int>(manager->GetRelevantNodes()->size()) == manager->GetNumberOfObservers(),
       "Test if number of nodes is similar to number of observers");
 
-    mitk::Image::Pointer image3 = mitk::IOUtil::LoadImage(testImageFile);
+    mitk::Image::Pointer image3 = mitk::IOUtil::Load<mitk::Image>(testImageFile);
     mitk::DataNode::Pointer node3 = mitk::DataNode::New();
     node3->SetData(image3);
     ds->Add(node3);
@@ -176,12 +176,11 @@ public:
     manager->SetDataStorage(ds);
 
     // add multiple objects to the data storage => multiple observers should be created
-    mitk::Image::Pointer image1 = mitk::IOUtil::LoadImage(testImageFile);
+    mitk::Image::Pointer image1 = mitk::IOUtil::Load<mitk::Image>(testImageFile);
     mitk::DataNode::Pointer node1 = mitk::DataNode::New();
     node1->SetData(image1);
     ds->Add(node1);
 
-    // mitk::DataNode::Pointer node1 = mitk::IOUtil::LoadDataNode( testImageFile );
     mitk::DataNode::Pointer node2 = mitk::IOUtil::Load(testImageFile, *ds)->GetElement(0);
     mitk::DataNode::Pointer node3 = mitk::IOUtil::Load(testImageFile, *ds)->GetElement(0);
     std::vector<mitk::DataNode::Pointer> nodeVec;
@@ -336,7 +335,6 @@ public:
   static void TestImageForLevelWindowOnRandomPropertyChange(std::string testImageFile)
   {
     typedef std::vector<bool> BoolVecType;
-    typedef BoolVecType::iterator IteratorType;
     typedef itk::Statistics::MersenneTwisterRandomVariateGenerator RandomGeneratorType;
 
     // initialize the data storage
@@ -441,11 +439,11 @@ public:
         falseran = ranGen->GetIntegerVariate(7);
       }
       BoolVecType falseNodes;
-      falseNodes.push_back(falseran & 1 == 1 ? !lvlWin1 : lvlWin1);
+      falseNodes.push_back((falseran & 1) == 1 ? !lvlWin1 : lvlWin1);
       falseran >>= 1;
-      falseNodes.push_back(falseran & 1 == 1 ? !lvlWin2 : lvlWin2);
+      falseNodes.push_back((falseran & 1) == 1 ? !lvlWin2 : lvlWin2);
       falseran >>= 1;
-      falseNodes.push_back(falseran & 1 == 1 ? !lvlWin3 : lvlWin3);
+      falseNodes.push_back((falseran & 1) == 1 ? !lvlWin3 : lvlWin3);
       int falseLevelWindow = 0;
       for (int i = 0; i < 3; ++i)
       {
@@ -468,7 +466,6 @@ public:
   static void TestImageForLevelWindowOnRandomVisibilityChange(std::string testImageFile)
   {
     typedef std::vector<bool> BoolVecType;
-    typedef BoolVecType::iterator IteratorType;
     typedef itk::Statistics::MersenneTwisterRandomVariateGenerator RandomGeneratorType;
 
     // initialize the data storage
@@ -572,11 +569,6 @@ public:
         }
       }
 
-      if (hasLevelWindow != mustHaveLvlWindow)
-      {
-        int n = 5;
-      }
-
       validCount += hasLevelWindow == mustHaveLvlWindow ? 1 : 0;
 
       // test sensitivity
@@ -586,11 +578,11 @@ public:
         falseran = ranGen->GetIntegerVariate(7);
       }
       BoolVecType falseNodes;
-      falseNodes.push_back(falseran & 1 == 1 ? !lvlWin1 : lvlWin1);
+      falseNodes.push_back((falseran & 1) == 1 ? !lvlWin1 : lvlWin1);
       falseran >>= 1;
-      falseNodes.push_back(falseran & 1 == 1 ? !lvlWin2 : lvlWin2);
+      falseNodes.push_back((falseran & 1) == 1 ? !lvlWin2 : lvlWin2);
       falseran >>= 1;
-      falseNodes.push_back(falseran & 1 == 1 ? !lvlWin3 : lvlWin3);
+      falseNodes.push_back((falseran & 1) == 1 ? !lvlWin3 : lvlWin3);
       int falseLevelWindow = 0;
       for (int i = 0; i < 3; ++i)
       {

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+
+    <view id="org.mitk.views.gibbstracking"
+    name="Global Gibbs Tractography"
+    category="Fiber Tractography"
+    class="QmitkGibbsTrackingView"
+    icon="resources/tractogram.png">
+    <keywordReference id="org.mitk.views.gibbstracking.Keyword"/>
+    </view>
+
+    <view id="org.mitk.views.streamlinetracking"
+    name="Streamline Tractography"
+    category="Fiber Tractography"
+    class="QmitkStreamlineTrackingView"
+    icon="resources/tract.png">
+    <keywordReference id="org.mitk.views.streamlinetracking.Keyword"/>
+    </view>
+
+    <view id="org.mitk.views.mlbtview"
+    name="ML-Based Tractography Training"
+    category="Fiber Tractography"
+    class="QmitkMLBTView"
+    icon="resources/ml_tractography.png">
+    <keywordReference id="org.mitk.views.mlbtview.Keyword"/>
+    </view>
+
+  </extension>
+
+  <extension point="org.blueberry.ui.keywords">
+
+  <keyword label="tractography" id="org.mitk.views.gibbstracking.Keyword"/>
+  <keyword label="tracking" id="org.mitk.views.gibbstracking.Keyword"/>
+  <keyword label="fiber" id="org.mitk.views.gibbstracking.Keyword"/>
+  <keyword label="global" id="org.mitk.views.gibbstracking.Keyword"/>
+  <keyword label="gibbs" id="org.mitk.views.gibbstracking.Keyword"/>
+  <keyword label="diffusion" id="org.mitk.views.gibbstracking.Keyword"/>
+
+  <keyword label="tractography" id="org.mitk.views.streamlinetracking.Keyword"/>
+  <keyword label="tracking" id="org.mitk.views.streamlinetracking.Keyword"/>
+  <keyword label="fiber" id="org.mitk.views.streamlinetracking.Keyword"/>
+  <keyword label="deterministic" id="org.mitk.views.streamlinetracking.Keyword"/>
+  <keyword label="probabilistic" id="org.mitk.views.streamlinetracking.Keyword"/>
+  <keyword label="odf" id="org.mitk.views.streamlinetracking.Keyword"/>
+  <keyword label="peak" id="org.mitk.views.streamlinetracking.Keyword"/>
+  <keyword label="streamline" id="org.mitk.views.streamlinetracking.Keyword"/>
+  <keyword label="tend" id="org.mitk.views.streamlinetracking.Keyword"/>
+  <keyword label="tensorline" id="org.mitk.views.streamlinetracking.Keyword"/>
+  <keyword label="tensorlines" id="org.mitk.views.streamlinetracking.Keyword"/>
+  <keyword label="multi" id="org.mitk.views.streamlinetracking.Keyword"/>
+  <keyword label="tensor" id="org.mitk.views.streamlinetracking.Keyword"/>
+  <keyword label="dti" id="org.mitk.views.streamlinetracking.Keyword"/>
+  <keyword label="diffusion" id="org.mitk.views.streamlinetracking.Keyword"/>
+
+  <keyword label="tractography" id="org.mitk.views.mlbtview.Keyword"/>
+  <keyword label="tracking" id="org.mitk.views.mlbtview.Keyword"/>
+  <keyword label="fiber" id="org.mitk.views.mlbtview.Keyword"/>
+  <keyword label="machine" id="org.mitk.views.mlbtview.Keyword"/>
+  <keyword label="learning" id="org.mitk.views.mlbtview.Keyword"/>
+  <keyword label="streamline" id="org.mitk.views.mlbtview.Keyword"/>
+  <keyword label="tensor" id="org.mitk.views.mlbtview.Keyword"/>
+  <keyword label="dwi" id="org.mitk.views.mlbtview.Keyword"/>
+  <keyword label="diffusion" id="org.mitk.views.mlbtview.Keyword"/>
+
+  </extension>
+
+
+  <extension point="org.blueberry.ui.perspectives">
+
+    <perspective id="org.mitk.perspectives.tractography1"
+    name="Global Gibbs Tractography"
+    category="Fiber Tractography"
+    class="QmitkGibbsTractographyPerspective"
+    icon="resources/tractogram.png">
+    <keywordReference id="org.mitk.views.gibbstracking.Keyword"/>
+    </perspective>
+
+    <perspective id="org.mitk.perspectives.tractography2"
+    name="Streamline Tractography"
+    category="Fiber Tractography"
+    class="QmitkStreamlineTractographyPerspective"
+    icon="resources/tract.png">
+    <keywordReference id="org.mitk.views.streamlinetracking.Keyword"/>
+    </perspective>
+
+  </extension>
+
+</plugin>

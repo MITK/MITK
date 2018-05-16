@@ -37,13 +37,13 @@ namespace mitk
     mitkClassMacro(SegmentationInteractor, DisplayInteractor) itkNewMacro(Self)
 
       protected : SegmentationInteractor(){};
-    virtual ~SegmentationInteractor(){};
+    ~SegmentationInteractor() override{};
     /**
      * Derived function.
      * Connects the action names used in the state machine pattern with functions implemented within
      * this InteractionEventObserver. This is only necessary here because the events are processed by the state machine.
      */
-    virtual void ConnectActionsAndFunctions();
+    void ConnectActionsAndFunctions() override;
 
     /**
     * Changes the active label.

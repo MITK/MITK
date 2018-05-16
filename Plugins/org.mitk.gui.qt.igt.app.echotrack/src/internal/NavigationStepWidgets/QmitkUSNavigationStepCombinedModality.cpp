@@ -24,11 +24,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTextStream>
 #include <QSettings>
 
+#include "mitkBaseRenderer.h"
+
 QmitkUSNavigationStepCombinedModality::QmitkUSNavigationStepCombinedModality(QWidget *parent) :
-QmitkUSAbstractNavigationStep(parent), m_CalibrationLoadedNecessary(true),
-m_ListenerDeviceChanged(this, &QmitkUSNavigationStepCombinedModality::OnDevicePropertyChanged),
-ui(new Ui::QmitkUSNavigationStepCombinedModality),
-m_LastCalibrationFilename("")
+  QmitkUSAbstractNavigationStep(parent),
+  m_LastCalibrationFilename(""),
+  m_CalibrationLoadedNecessary(true),
+  m_ListenerDeviceChanged(this, &QmitkUSNavigationStepCombinedModality::OnDevicePropertyChanged),
+  ui(new Ui::QmitkUSNavigationStepCombinedModality)
 {
   ui->setupUi(this);
 
@@ -189,6 +192,17 @@ void QmitkUSNavigationStepCombinedModality::OnCombinedModalityCreateNewButtonCli
 void QmitkUSNavigationStepCombinedModality::OnCombinedModalityCreationExit()
 {
   this->SetCombinedModalityCreateWidgetEnabled(false);
+  mitk::DataNode::Pointer usNode = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()//GetDataStorage
+    ->GetNamedNode("US Viewing Stream - Image 0");
+  if (usNode.IsNotNull())
+  {
+    mitk::RenderingManager::GetInstance()->InitializeViews(//Reinit
+      usNode->GetData()->GetTimeGeometry());//GetNode
+  }
+  else
+  {
+    mitkThrow()<< "No reinit possible";
+  }
 }
 
 void QmitkUSNavigationStepCombinedModality::OnCombinedModalityEditExit()
@@ -321,11 +335,11 @@ void QmitkUSNavigationStepCombinedModality::CreateCombinedModalityResultAndSigna
   mitk::DataNode::Pointer combinedModalityResult = mitk::DataNode::New();
   combinedModalityResult->SetName("CombinedModalityResult");
   combinedModalityResult->SetStringProperty("USNavigation::CombinedModality",
-    std::string(combinedModality->GetDeviceManufacturer() + ": " + combinedModality->GetDeviceModel()
-    + " (" + combinedModality->GetDeviceComment() + ")").c_str());
+    std::string(combinedModality->GetManufacturer() + ": " + combinedModality->GetName()
+    + " (" + combinedModality->GetComment() + ")").c_str());
   combinedModalityResult->SetStringProperty("USNavigation::UltrasoundDevice",
-    std::string(usDevice->GetDeviceManufacturer() + ": " + usDevice->GetDeviceModel()
-    + " (" + usDevice->GetDeviceComment() + ")").c_str());
+    std::string(usDevice->GetManufacturer() + ": " + usDevice->GetName()
+    + " (" + usDevice->GetComment() + ")").c_str());
   combinedModalityResult->SetStringProperty("USNavigation::TrackingDevice",
     combinedModality->GetNavigationDataSource()->GetName().c_str());
   combinedModalityResult->SetStringProperty("USNavigation::Calibration",

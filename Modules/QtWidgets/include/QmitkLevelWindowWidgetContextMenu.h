@@ -38,7 +38,7 @@ class MITKQTWIDGETS_EXPORT QmitkLevelWindowWidgetContextMenu : public QWidget
 public:
   /// constructor
   QmitkLevelWindowWidgetContextMenu(QWidget *parent, Qt::WindowFlags f = nullptr);
-  virtual ~QmitkLevelWindowWidgetContextMenu();
+  ~QmitkLevelWindowWidgetContextMenu() override;
 
   /*!
   *  data structure which reads and writes presets defined in a XML-file

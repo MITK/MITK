@@ -42,7 +42,7 @@ struct BERRY_UI_QT IPresentablePart : public Object, public ISizeProvider {
 
   berryObjectMacro(berry::IPresentablePart)
 
-  ~IPresentablePart();
+  ~IPresentablePart() override;
 
     /**
      * The property id for <code>isDirty</code>.

@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDataNode.h"
 #include "mitkFeedbackContourTool.h"
-#include "mitkLegacyAdaptors.h"
 #include "mitkPointSet.h"
 #include "mitkToolCommand.h"
 #include <MitkSegmentationExports.h>
@@ -78,10 +77,10 @@ namespace mitk
     typedef FastMarchingFilterType::NodeType NodeType;
 
     /* icon stuff */
-    virtual const char **GetXPM() const override;
-    virtual const char *GetName() const override;
+    const char **GetXPM() const override;
+    const char *GetName() const override;
 
-    virtual us::ModuleResource GetCursorIconResource() const override;
+    us::ModuleResource GetCursorIconResource() const override;
     us::ModuleResource GetIconResource() const override;
 
     /// \brief Set parameter used in Threshold filter.
@@ -116,14 +115,14 @@ namespace mitk
 
   protected:
     FastMarchingTool();
-    virtual ~FastMarchingTool();
+    ~FastMarchingTool() override;
 
     void ConnectActionsAndFunctions() override;
 
     // virtual float CanHandleEvent( StateEvent const *stateEvent) const;
 
-    virtual void Activated() override;
-    virtual void Deactivated() override;
+    void Activated() override;
+    void Deactivated() override;
     virtual void Initialize();
 
     virtual void BuildITKPipeline();

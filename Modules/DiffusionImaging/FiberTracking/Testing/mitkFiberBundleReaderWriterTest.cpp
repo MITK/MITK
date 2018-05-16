@@ -40,8 +40,8 @@ public:
 
   void setUp() override
   {
-    fib1 = NULL;
-    fib2 = NULL;
+    fib1 = nullptr;
+    fib2 = nullptr;
 
     std::string filename = GetTestDataFilePath("DiffusionImaging/fiberBundleX.fib");
 
@@ -53,8 +53,8 @@ public:
 
   void tearDown() override
   {
-    fib1 = NULL;
-    fib2 = NULL;
+    fib1 = nullptr;
+    fib2 = nullptr;
   }
 
   void Equal_SaveLoad_ReturnsTrue()

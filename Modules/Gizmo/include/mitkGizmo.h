@@ -158,7 +158,7 @@ namespace mitk
 
   protected:
     Gizmo();
-    virtual ~Gizmo();
+    ~Gizmo() override;
 
     Gizmo(const Gizmo &);            // = delete;
     Gizmo &operator=(const Gizmo &); // = delete;

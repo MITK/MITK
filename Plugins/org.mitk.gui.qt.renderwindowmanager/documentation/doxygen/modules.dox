@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_gui_qt_renderwindowmanager org.mitk.gui.qt.renderwindowmanager
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_renderwindowmanager_internal Internal
+  \ingroup org_mitk_gui_qt_renderwindowmanager
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.renderwindowmanager plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

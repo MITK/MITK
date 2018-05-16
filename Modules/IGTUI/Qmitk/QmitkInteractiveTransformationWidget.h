@@ -18,12 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkInteractiveTransformationWidget_H
 
 //QT headers
-#include <QWidget>
+#include <QDialog>
 
 //Mitk headers
 #include "MitkIGTUIExports.h"
 #include "mitkVector.h"
 #include "mitkGeometry3D.h"
+#include "mitkNavigationTool.h"
 
 //ui header
 #include "ui_QmitkInteractiveTransformationWidgetControls.h"
@@ -34,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   *
   *   \ingroup IGTUI
   */
-class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QWidget
+class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QDialog
 {
   Q_OBJECT
 
@@ -42,42 +43,45 @@ class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QWidget
     static const std::string VIEW_ID;
 
     QmitkInteractiveTransformationWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
-    ~QmitkInteractiveTransformationWidget();
+    ~QmitkInteractiveTransformationWidget() override;
 
-    /** Sets the geometry which will be modified by this widget. Default values may be
-     *  provided by the second variable. These values will be applied to the geometry
-     *  in the beginning and the UI will also hold these values.
+    /** This tool will be copied to m_ToolToEdit. It will not be changed.
+        To apply any changes made by this widget, you will need to connect to the signal
+        EditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip) and set this transfrom
+        as calibrated tool tip.
+        We do not directly modify the tool to allow to cancel/exit this widget without doing
+        any harm.
      */
-    void SetGeometry(mitk::BaseGeometry::Pointer geometry, mitk::BaseGeometry::Pointer defaultValues = nullptr);
+    void SetToolToEdit(const mitk::NavigationTool::Pointer _tool);
 
-    mitk::BaseGeometry::Pointer GetGeometry();
+    /** The sliders and spinboxes will be set to these values.
+        When clicking "Revert Changes", sliders will be reseted to these values.
+    */
+    void SetDefaultOffset(const mitk::Point3D _defaultValues);
+    void SetDefaultRotation(const mitk::Quaternion _defaultValues);
 
   protected slots:
-    void OnZTranslationValueChanged( int v );
-    void OnYTranslationValueChanged( int v );
-    void OnXTranslationValueChanged( int v );
-    void OnZRotationValueChanged( int v );
-    void OnYRotationValueChanged( int v );
-    void OnXRotationValueChanged( int v );
-    void OnResetGeometry();
+    void OnZTranslationValueChanged( double v );
+    void OnYTranslationValueChanged(double v);
+    void OnXTranslationValueChanged(double v);
+    void OnZRotationValueChanged(double v);
+    void OnYRotationValueChanged(double v);
+    void OnXRotationValueChanged(double v);
+    void OnResetGeometryToIdentity();
+    void OnRevertChanges();
     void OnApplyManipulatedToolTip();
+    void OnCancel();
 
 signals:
-    void ApplyManipulatedToolTip();
+    void EditToolTipFinished(mitk::AffineTransform3D::Pointer toolTip);
 
   protected:
+
+    void reject() override;
 
     virtual void CreateConnections();
 
     virtual void CreateQtPartControl(QWidget *parent);
-
-    void SetSliderX(int v);
-    void SetSliderY(int v);
-    void SetSliderZ(int v);
-
-    /*! \brief Method performs the translation.
-        \params translateVector New translation to be combine with geometry. */
-    void Translate( mitk::Vector3D translateVector);
 
     /*! \brief Method performs the rotation.
     \params rotateVector New rotation to be combined with geometry. */
@@ -86,9 +90,13 @@ signals:
     // Member variables
     Ui::QmitkInteractiveTransformationWidgetControls* m_Controls;
 
-    mitk::BaseGeometry::Pointer m_Geometry;         ///< \brief Initial geometry that is manipulated
-    mitk::BaseGeometry::Pointer m_ResetGeometry;    ///< \brief Lifeline to reset to the initial geometry
-    mitk::Vector3D m_TranslationVector;           ///< \brief Accumulated translation vector
-    mitk::Vector3D m_RotateSliderPos;             ///< \brief Accumulated rotation vector (holds degree around x,y,z direction)
+    mitk::NavigationTool::Pointer m_ToolToEdit;     ///< \brief this mamber holds a copy of the tool that should be edited for visualization
+    mitk::BaseGeometry::Pointer m_Geometry;         ///< \brief The geometry that is manipulated
+    mitk::BaseGeometry::Pointer m_ResetGeometry;    ///< \brief Lifeline to reset to the original geometry
+
+private:
+  void SetValuesToGUI(const mitk::AffineTransform3D::Pointer _defaultValues);
+  void SetSynchronizedVauesToSliderAndSpinbox(QDoubleSpinBox* _spinbox, QSlider* _slider, double _value);
+
 };
 #endif // QmitkInteractiveTransformationWidget_H

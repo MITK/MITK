@@ -28,8 +28,8 @@ m_pl(50), // 50 Hz for Europe
 m_metric(true),
 m_agcModeBoth(true),
 m_measurementRate(68.3), // 68.3 for mid-range transmitter, 40.5 for flat transmitter
-m_TransmitterConfig(NULL),
-m_SensorConfig(NULL)
+m_TransmitterConfig(nullptr),
+m_SensorConfig(nullptr)
 {
   // Flat transmitter needs measurement rate: 40.5
   // Mid-range transmitter needs measurement rate: 68.3;
@@ -55,17 +55,17 @@ mitk::MicroBirdTrackingDevice::~MicroBirdTrackingDevice()
 {
   if (m_MultiThreader)
     m_MultiThreader->TerminateThread(m_ThreadID);
-  m_MultiThreader = NULL;
+  m_MultiThreader = nullptr;
   if (m_ToolsMutex)
     m_ToolsMutex->Unlock();
-  m_ToolsMutex = NULL;
+  m_ToolsMutex = nullptr;
 
   this->StopTracking();
   this->CloseConnection();
 
-  if (m_TransmitterConfig != NULL)
+  if (m_TransmitterConfig != nullptr)
     delete [] m_TransmitterConfig;
-  if (m_SensorConfig != NULL)
+  if (m_SensorConfig != nullptr)
     delete [] m_SensorConfig;
 
   //\TODO: Do we need to clean up the pointers to PCIBird data like DOUBLE_POSITION_QUATERNION_TIME_Q_RECORD?
@@ -264,15 +264,15 @@ bool mitk::MicroBirdTrackingDevice::CloseConnection()
     HandleError(errorCode);
 
   // Delete configuration
-  if (m_TransmitterConfig != NULL)
+  if (m_TransmitterConfig != nullptr)
   {
     delete [] m_TransmitterConfig;
-    m_TransmitterConfig = NULL;
+    m_TransmitterConfig = nullptr;
   }
-  if (m_SensorConfig != NULL)
+  if (m_SensorConfig != nullptr)
   {
     delete [] m_SensorConfig;
-    m_SensorConfig = NULL;
+    m_SensorConfig = nullptr;
   }
   // Change mode and release mutex
   this->SetState(Setup);
@@ -288,11 +288,11 @@ ITK_THREAD_RETURN_TYPE mitk::MicroBirdTrackingDevice::ThreadStartTracking(void* 
 {
   /* extract this pointer from Thread Info structure */
   struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if ((pInfo == NULL) || (pInfo->UserData == NULL))
+  if ((pInfo == nullptr) || (pInfo->UserData == nullptr))
     return ITK_THREAD_RETURN_VALUE;
 
   MicroBirdTrackingDevice *trackingDevice = (MicroBirdTrackingDevice*)pInfo->UserData;
-  if (trackingDevice != NULL)
+  if (trackingDevice != nullptr)
     trackingDevice->TrackTools();             // call TrackTools() from the original object
 
   return ITK_THREAD_RETURN_VALUE;
@@ -374,7 +374,7 @@ void mitk::MicroBirdTrackingDevice::TrackTools()
         nOfAttachedSensors++;
         timeStamp += record.time; // Get timestamp from record
         ToolType* tool = GetMicroBirdTool(toolNumber); /// Get tool (current sensor)
-        if (tool != NULL)
+        if (tool != nullptr)
         {
           tool->SetTrackingError(record.quality); // Set tracking error (quality) from record
           mitk::Point3D position;
@@ -422,15 +422,15 @@ void mitk::MicroBirdTrackingDevice::TrackTools()
 }
 
 
-mitk::TrackingTool* mitk::MicroBirdTrackingDevice::GetTool(unsigned int toolNumber)
+mitk::ToolType* mitk::MicroBirdTrackingDevice::GetTool(unsigned int toolNumber)
 {
-  return static_cast<TrackingTool*>(GetMicroBirdTool(toolNumber));
+  return static_cast<ToolType*>(GetMicroBirdTool(toolNumber));
 }
 
 
 mitk::MicroBirdTrackingDevice::ToolType* mitk::MicroBirdTrackingDevice::GetMicroBirdTool(unsigned int toolNumber)
 {
-  ToolType* t = NULL;
+  ToolType* t = nullptr;
 
   MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
   if (toolNumber < m_Tools.size())

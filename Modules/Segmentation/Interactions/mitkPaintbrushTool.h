@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "mitkFeedbackContourTool.h"
-#include "mitkLegacyAdaptors.h"
 #include "mitkPointOperation.h"
 #include "mitkPointSet.h"
 #include <MitkSegmentationExports.h>
@@ -58,12 +57,12 @@ namespace mitk
 
   protected:
     PaintbrushTool(int paintingPixelValue = 1); // purposely hidden
-    virtual ~PaintbrushTool();
+    ~PaintbrushTool() override;
 
     void ConnectActionsAndFunctions() override;
 
-    virtual void Activated() override;
-    virtual void Deactivated() override;
+    void Activated() override;
+    void Deactivated() override;
 
     virtual void OnMousePressed(StateMachineAction *, InteractionEvent *);
     virtual void OnMouseMoved(StateMachineAction *, InteractionEvent *);
@@ -98,7 +97,7 @@ namespace mitk
     int m_LastContourSize;
 
     Image::Pointer m_WorkingSlice;
-    PlaneGeometry::Pointer m_CurrentPlane;
+    PlaneGeometry::ConstPointer m_CurrentPlane;
     DataNode::Pointer m_WorkingNode;
     mitk::Point3D m_LastPosition;
   };

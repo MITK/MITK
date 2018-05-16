@@ -59,22 +59,22 @@ void mitk::GeometryDataWriterService::Write()
 
   TiXmlDocument doc;
 
-  TiXmlDeclaration *decl = new TiXmlDeclaration(
+  auto *decl = new TiXmlDeclaration(
     "1.0", "UTF-8", ""); // TODO what to write here? encoding? standalone would mean that we provide a DTD somewhere...
   doc.LinkEndChild(decl);
 
-  TiXmlElement *rootNode = new TiXmlElement("GeometryData");
+  auto *rootNode = new TiXmlElement("GeometryData");
   doc.LinkEndChild(rootNode);
 
   // note version info
-  TiXmlElement *version = new TiXmlElement("Version");
+  auto *version = new TiXmlElement("Version");
   version->SetAttribute("Writer", __FILE__);
   version->SetAttribute("FileVersion", 1);
   rootNode->LinkEndChild(version);
 
-  const GeometryData *data = static_cast<const GeometryData *>(this->GetInput());
+  const auto *data = static_cast<const GeometryData *>(this->GetInput());
 
-  const ProportionalTimeGeometry *timeGeometry(NULL);
+  const ProportionalTimeGeometry *timeGeometry(nullptr);
   if ((timeGeometry = dynamic_cast<const ProportionalTimeGeometry *>(data->GetTimeGeometry())))
   {
     TiXmlElement *timeGeometryElement = ProportionalTimeGeometryToXML::ToXML(timeGeometry);

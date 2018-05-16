@@ -29,7 +29,7 @@ bool QmitkPropertyItemSortFilterProxyModel::FilterAcceptsAnyChildRow(const QMode
 {
   QString propertyName = this->sourceModel()->data(sourceParent).toString();
 
-  if (propertyName.contains(filterRegExp()))
+  if (propertyName.contains(this->filterRegExp()))
     return true;
 
   if (this->sourceModel()->hasChildren(sourceParent))

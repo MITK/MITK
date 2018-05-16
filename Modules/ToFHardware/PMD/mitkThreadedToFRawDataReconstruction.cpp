@@ -39,10 +39,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #endif
 #include <new>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-#define PI M_PI;
 #define cAir 299704944;
 #define fMod 20000000;
 
@@ -65,25 +61,25 @@ namespace mitk
 
   ThreadedToFRawDataReconstruction::~ThreadedToFRawDataReconstruction()
   {
-    if(m_ThreadData != NULL)
+    if(m_ThreadData != nullptr)
       delete m_ThreadData;
 
-    if(m_CISDist != NULL)
+    if(m_CISDist != nullptr)
       delete[] m_CISDist;
 
-    if(m_CISAmpl != NULL)
+    if(m_CISAmpl != nullptr)
       delete[] m_CISAmpl;
 
-    if(m_CISInten != NULL)
+    if(m_CISInten != nullptr)
       delete[] m_CISInten;
 
-    if(m_ThreadedCISInten != NULL)
+    if(m_ThreadedCISInten != nullptr)
       delete[] m_ThreadedCISInten;
 
-    if(m_ThreadedCISAmpl != NULL)
+    if(m_ThreadedCISAmpl != nullptr)
       delete[] m_ThreadedCISAmpl;
 
-    if(m_ThreadedCISDist != NULL)
+    if(m_ThreadedCISDist != nullptr)
       delete[] m_ThreadedCISDist;
 
   }
@@ -236,11 +232,11 @@ void ThreadedToFRawDataReconstruction::GetAllData(float* dist, float* ampl, floa
   {
     /* extract this pointer from Thread Info structure */
     struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)data;
-    if (pInfo == NULL)
+    if (pInfo == nullptr)
     {
       return ITK_THREAD_RETURN_VALUE;
     }
-    if (pInfo->UserData == NULL)
+    if (pInfo->UserData == nullptr)
     {
       return ITK_THREAD_RETURN_VALUE;
     }
@@ -264,8 +260,7 @@ void ThreadedToFRawDataReconstruction::GetAllData(float* dist, float* ampl, floa
     double A7m5 = 0;
     double A8m6 = 0;
     double cair = cAir;
-    double pi = PI;
-    double twoPi = pi + pi;
+    double twoPi = itk::Math::pi + itk::Math::pi;
     long modFreq = fMod;
 
     threadData->m_ThreadDataMutex->Lock();
@@ -280,7 +275,7 @@ void ThreadedToFRawDataReconstruction::GetAllData(float* dist, float* ampl, floa
     int frameheight = threadData->m_FrameHeight;
     threadData->m_ThreadDataMutex->Unlock();
 
-    double intermed1 = cair/(pi*(modFreq << 2));
+    double intermed1 = cair/(itk::Math::pi*(modFreq << 2));
     double intermed2 = intermed1*500;
     int doubleLwidth = linewidth << 1;
     int datasize = doubleLwidth*frameheight << 2;
@@ -302,7 +297,7 @@ void ThreadedToFRawDataReconstruction::GetAllData(float* dist, float* ampl, floa
         A7 = htons(quad3.at(index+1));
         A8 = htons(quad4.at(index+1));
 
-        phi  = atan2((A3 - A1),(A2 - A4)) + pi;
+        phi  = atan2((A3 - A1),(A2 - A4)) + itk::Math::pi;
         phi2 = atan2((A7 - A5),(A6 - A8));
         if(phi2<0) phi2 +=twoPi;
 

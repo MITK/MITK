@@ -14,6 +14,7 @@ namespace itk
       typedef SmartPointer< Self >                                    Pointer;
       typedef typename TInputImageType::ConstPointer                       InputImagePointer;
       typedef typename TOuputImageType::Pointer                       OutputImagePointer;
+      typedef typename TOuputImageType::RegionType                    OutputImageRegionType;
 
       itkNewMacro (Self);
       itkTypeMacro(MultiHistogramFilter, ImageToImageFilter);
@@ -24,13 +25,25 @@ namespace itk
       itkSetMacro(Offset, double);
       itkGetConstMacro(Offset, double);
 
+      itkSetMacro(Bins, int);
+      itkGetConstMacro(Bins, int);
+
+      itkSetMacro(Size, int);
+      itkGetConstMacro(Size, int);
+
+      itkSetMacro(UseImageIntensityRange, bool);
+      itkGetConstMacro(UseImageIntensityRange, bool);
+
     protected:
       MultiHistogramFilter();
       ~MultiHistogramFilter(){};
 
-      virtual void GenerateData();
+      virtual void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, ThreadIdType threadId);
+      virtual void BeforeThreadedGenerateData(void);
 
-      DataObject::Pointer MakeOutput(unsigned int /*idx*/);
+
+      using itk::ProcessObject::MakeOutput;
+      itk::ProcessObject::DataObjectPointer MakeOutput(itk::ProcessObject::DataObjectPointerArraySizeType /*idx*/) override;
 
       void CreateOutputImage(InputImagePointer input, OutputImagePointer output);
 
@@ -40,6 +53,9 @@ namespace itk
 
       double m_Delta;
       double m_Offset;
+      int m_Bins;
+      int m_Size;
+      bool m_UseImageIntensityRange;
   };
 }
 

@@ -42,7 +42,7 @@ protected slots:
   void LineEditTextChanged(const QString &);
 
 protected:
-  virtual void keyPressEvent(QKeyEvent *event) override;
+  void keyPressEvent(QKeyEvent *event) override;
   void Init();
 
 protected:

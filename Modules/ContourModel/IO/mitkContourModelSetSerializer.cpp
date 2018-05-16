@@ -31,7 +31,7 @@ mitk::ContourModelSetSerializer::~ContourModelSetSerializer()
 
 std::string mitk::ContourModelSetSerializer::Serialize()
 {
-  const ContourModelSet *contourSet = dynamic_cast<const ContourModelSet *>(m_Data.GetPointer());
+  const auto *contourSet = dynamic_cast<const ContourModelSet *>(m_Data.GetPointer());
   if (!contourSet)
   {
     MITK_ERROR << " Object at " << (const void *)this->m_Data
@@ -52,7 +52,7 @@ std::string mitk::ContourModelSetSerializer::Serialize()
   {
     ContourModelSetWriter writer;
     writer.SetOutputLocation(fullname);
-    writer.SetInput(const_cast<ContourModelSet *>(contourSet));
+    writer.SetInput(contourSet);
     writer.Write();
   }
   catch (std::exception &e)

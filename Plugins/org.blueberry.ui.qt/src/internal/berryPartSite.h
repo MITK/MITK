@@ -141,7 +141,7 @@ private: void InitializeDefaultServices();
   /**
    * Dispose the contributions.
    */
-public: ~PartSite();
+public: ~PartSite() override;
 
   /**
    * Returns the action bars for the part. If this part is a view then it has
@@ -156,14 +156,14 @@ public: ~PartSite();
    *
    * @return the registry extension ID
    */
-public: virtual QString GetId() const override;
+public: QString GetId() const override;
 
   /**
    * Returns the page containing this workbench site's part.
    *
    * @return the page containing this part
    */
-public: virtual SmartPointer<IWorkbenchPage> GetPage() override;
+public: SmartPointer<IWorkbenchPage> GetPage() override;
 
   /**
    * Gets the part pane.
@@ -173,7 +173,7 @@ public: SmartPointer<PartPane> GetPane();
   /**
    * Returns the part.
    */
-public: virtual SmartPointer<IWorkbenchPart> GetPart() override;
+public: SmartPointer<IWorkbenchPart> GetPart() override;
 
   /**
    * Returns the part reference.
@@ -185,17 +185,17 @@ public: virtual IWorkbenchPartReference::Pointer GetPartReference();
    *
    * @return the registry plugin ID
    */
-public: virtual QString GetPluginId() const override;
+public: QString GetPluginId() const override;
 
   /**
    * Returns the registered name for this part.
    */
-public: virtual QString GetRegisteredName() const override;
+public: QString GetRegisteredName() const override;
 
   /**
    * Returns the selection provider for a part.
    */
-public: virtual ISelectionProvider::Pointer GetSelectionProvider() override;
+public: ISelectionProvider::Pointer GetSelectionProvider() override;
 
   /**
    * Returns the shell containing this part.
@@ -209,7 +209,7 @@ public: SmartPointer<Shell> GetShell() override;
    *
    * @return the workbench window containing this part
    */
-public: virtual SmartPointer<IWorkbenchWindow> GetWorkbenchWindow() override;
+public: SmartPointer<IWorkbenchWindow> GetWorkbenchWindow() override;
 
   /**
    * Register a popup menu for extension.
@@ -266,7 +266,7 @@ protected: virtual void SetRegisteredName(const QString& name);
   /**
    * Set the selection provider for a part.
    */
-public: virtual void SetSelectionProvider(ISelectionProvider::Pointer provider) override;
+public: void SetSelectionProvider(ISelectionProvider::Pointer provider) override;
 
   /*
    * @see IWorkbenchPartSite#getKeyBindingService()
@@ -306,7 +306,7 @@ public: bool HasService(const QString& api) const override;
    *
    * @since 3.2
    */
-public: virtual QString ToString() const override;
+public: QString ToString() const override;
 };
 
 }  // namespace berry

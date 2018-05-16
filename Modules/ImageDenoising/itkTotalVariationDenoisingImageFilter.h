@@ -81,10 +81,10 @@ namespace itk
 
   protected:
     TotalVariationDenoisingImageFilter();
-    virtual ~TotalVariationDenoisingImageFilter() {}
-    void PrintSelf(std::ostream &os, Indent indent) const;
+    ~TotalVariationDenoisingImageFilter() override {}
+    void PrintSelf(std::ostream &os, Indent indent) const override;
 
-    void GenerateData();
+    void GenerateData() override;
 
     double m_Lambda;
 

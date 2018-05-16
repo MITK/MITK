@@ -23,7 +23,7 @@ QDiffusionImagingSplashScreen::QDiffusionImagingSplashScreen(const QImage &image
 {
   setAttribute(Qt::WA_TranslucentBackground);
   resize(image.size());
-  resizeEvent(NULL);
+  resizeEvent(nullptr);
 }
 
 QDiffusionImagingSplashScreen::~QDiffusionImagingSplashScreen()

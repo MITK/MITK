@@ -145,7 +145,6 @@ QString IntroPart::GetPartName() const
 }
 
 void IntroPart::Init(IIntroSite::Pointer site, IMemento::Pointer /*memento*/)
-    throw (PartInitException)
 {
   SetSite(site);
 }

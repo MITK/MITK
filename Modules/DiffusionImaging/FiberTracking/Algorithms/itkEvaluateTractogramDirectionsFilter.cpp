@@ -23,15 +23,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageDuplicator.h>
 #include <boost/progress.hpp>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 namespace itk {
 
 template< class PixelType >
 EvaluateTractogramDirectionsFilter< PixelType >
 ::EvaluateTractogramDirectionsFilter():
-    m_ReferenceImageSet(NULL),
+    m_ReferenceImageSet(nullptr),
     m_IgnoreMissingDirections(false),
     m_Eps(0.0001),
     m_UseInterpolation(false)
@@ -201,7 +198,7 @@ void EvaluateTractogramDirectionsFilter< PixelType >::GenerateData()
                         continue;
 
                     // calculate angle between directions
-                    double tempAngle = acos(fabs(dot_product(refDir, fiberDir)))*180.0/M_PI;
+                    double tempAngle = acos(fabs(dot_product(refDir, fiberDir)))*180.0/itk::Math::pi;
                     directionFound.at(k)->SetPixel(idx, tempAngle);
 
                     if (tempAngle < angle)
@@ -272,7 +269,7 @@ void EvaluateTractogramDirectionsFilter< PixelType >::GenerateData()
                                 continue;
 
                             // calculate angle between directions
-                            double tempAngle = acos(fabs(dot_product(refDir, fiberDir)))*180.0/M_PI;
+                            double tempAngle = acos(fabs(dot_product(refDir, fiberDir)))*180.0/itk::Math::pi;
                             directionFound.at(k)->SetPixel(newIdx, tempAngle);
 
                             if (tempAngle < angle)

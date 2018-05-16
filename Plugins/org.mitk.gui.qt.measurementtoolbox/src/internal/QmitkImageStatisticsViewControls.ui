@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>548</width>
-    <height>800</height>
+    <height>812</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -109,7 +109,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_3">
+    <widget class="QGroupBox" name="groupBox_statistics">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -357,7 +357,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="groupBox_histogram">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -375,7 +375,111 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QGroupBox" name="groupBox_2">
+       <widget class="QLabel" name="label_HistogramIsInvisibleWarning">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="palette">
+         <palette>
+          <active>
+           <colorrole role="WindowText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>255</red>
+              <green>0</green>
+              <blue>0</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Text">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>255</red>
+              <green>0</green>
+              <blue>0</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="ButtonText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>255</red>
+              <green>0</green>
+              <blue>0</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </active>
+          <inactive>
+           <colorrole role="WindowText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>255</red>
+              <green>0</green>
+              <blue>0</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Text">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>255</red>
+              <green>0</green>
+              <blue>0</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="ButtonText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>255</red>
+              <green>0</green>
+              <blue>0</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </inactive>
+          <disabled>
+           <colorrole role="WindowText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>120</red>
+              <green>120</green>
+              <blue>120</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="Text">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>120</red>
+              <green>120</green>
+              <blue>120</blue>
+             </color>
+            </brush>
+           </colorrole>
+           <colorrole role="ButtonText">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>120</red>
+              <green>120</green>
+              <blue>120</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </disabled>
+         </palette>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox_plot">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -454,9 +558,9 @@
           </layout>
          </item>
          <item>
-          <widget class="QCheckBox" name="m_UseDefaultBinSizeBox">
+          <widget class="QCheckBox" name="m_ShowSubchartCheckBox">
            <property name="text">
-            <string>Use default bin size</string>
+            <string>Show Subchart</string>
            </property>
            <property name="checked">
             <bool>true</bool>
@@ -464,9 +568,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="m_ShowSubchartCheckBox">
+          <widget class="QCheckBox" name="m_UseDefaultNBinsCheckBox">
            <property name="text">
-            <string>Show Subchart</string>
+            <string>Use default #bins</string>
            </property>
            <property name="checked">
             <bool>true</bool>
@@ -498,7 +602,7 @@
              <number>0</number>
             </property>
             <item row="1" column="0">
-             <widget class="QLabel" name="m_HistogramBinSizeCaptionLabel">
+             <widget class="QLabel" name="m_HistogramNBinsCaptionLabel">
               <property name="minimumSize">
                <size>
                 <width>60</width>
@@ -512,29 +616,26 @@
                </size>
               </property>
               <property name="text">
-               <string>Bin size:</string>
+               <string># bins:</string>
               </property>
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QDoubleSpinBox" name="m_HistogramBinSizeSpinbox">
+             <widget class="QSpinBox" name="m_HistogramNBinsSpinbox">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="toolTip">
                <string>Press enter to recalculate statistics with new bin size.</string>
               </property>
-              <property name="frame">
-               <bool>true</bool>
-              </property>
-              <property name="decimals">
-               <number>5</number>
-              </property>
               <property name="minimum">
-               <double>0.000010000000000</double>
+               <number>1</number>
               </property>
               <property name="maximum">
-               <double>1000000.000000000000000</double>
+               <number>10000</number>
               </property>
               <property name="value">
-               <double>100.000000000000000</double>
+               <number>100</number>
               </property>
              </widget>
             </item>
@@ -555,7 +656,7 @@
         <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QmitkC3jsWidget" name="m_JSHistogram">
+        <widget class="QmitkChartWidget" name="m_JSHistogram">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -592,6 +693,12 @@
          </property>
          <item>
           <widget class="QPushButton" name="m_ButtonCopyHistogramToClipboard">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string>Copy to Clipboard</string>
            </property>
@@ -604,8 +711,8 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>413</width>
-             <height>17</height>
+             <width>40</width>
+             <height>20</height>
             </size>
            </property>
           </spacer>
@@ -633,9 +740,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QmitkC3jsWidget</class>
+   <class>QmitkChartWidget</class>
    <extends>QWidget</extends>
-   <header location="global">QmitkC3jsWidget.h</header>
+   <header location="global">QmitkChartWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

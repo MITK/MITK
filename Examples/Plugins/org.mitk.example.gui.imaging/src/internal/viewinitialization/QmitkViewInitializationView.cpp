@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkViewInitializationView::VIEW_ID = "org.mitk.views.viewinitialization";
 
-QmitkViewInitializationView::QmitkViewInitializationView() : m_Controls(NULL)
+QmitkViewInitializationView::QmitkViewInitializationView() : m_Controls(nullptr)
 {
   m_CommandTag = 0;
 }
@@ -94,7 +94,7 @@ void QmitkViewInitializationView::OnApply()
     viewDirection = mitk::SliceNavigationController::Sagittal;
 
   vtkRenderWindow *renderwindow = this->GetSelectedRenderWindow();
-  if (renderwindow != NULL)
+  if (renderwindow != nullptr)
   {
     mitk::BaseRenderer::GetInstance(renderwindow)
       ->GetSliceNavigationController()
@@ -109,7 +109,7 @@ void QmitkViewInitializationView::OnApply()
 void QmitkViewInitializationView::OnResetAll()
 {
   /* calculate bounding geometry of these nodes */
-  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D();
+  auto bounds = this->GetDataStorage()->ComputeBoundingGeometry3D();
   /* initialize the views to the bounding geometry */
   mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }
@@ -130,7 +130,7 @@ vtkRenderWindow *QmitkViewInitializationView::GetSelectedRenderWindow()
   {
     return (*mapit).first;
   }
-  return NULL;
+  return nullptr;
 }
 
 void QmitkViewInitializationView::InitRenderWindowSelector()

@@ -51,11 +51,8 @@ namespace mitk
 
       typedef itk::Image<double, 3> FloatImageType;
 
-    /** Returns the selected DetectionMethod */
-    itkGetMacro(Method, DetectionMethod)
-
-      /** Returns the number of extracted points after edge detection */
-      itkGetMacro(NumberOfExtractedPoints, int)
+      /** Returns the selected DetectionMethod */
+      itkGetMacro(Method, DetectionMethod)
 
       /** Sets the DetectionMethod for edge detection and extraction */
       itkSetMacro(Method, DetectionMethod)
@@ -63,16 +60,16 @@ namespace mitk
         protected :
 
       /** This method is called by Update(). */
-      virtual void GenerateData();
+      void GenerateData() override;
 
     /** Initializes the output information */
-    virtual void GenerateOutputInformation();
+    void GenerateOutputInformation() override;
 
     /** Constructor */
     ImageToPointCloudFilter();
 
     /** Destructor */
-    virtual ~ImageToPointCloudFilter();
+    ~ImageToPointCloudFilter() override;
 
   private:
     /** Uses the laplace filter to create an image and extracts a pixel as point
@@ -83,9 +80,6 @@ namespace mitk
     /** The geometry of the input image for transforming the pixel coordinates to
      *  world coordinates */
     mitk::BaseGeometry *m_Geometry;
-
-    /** The number of extracted points */
-    int m_NumberOfExtractedPoints;
 
     /** The selected detection method */
     DetectionMethod m_Method;

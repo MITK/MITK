@@ -64,11 +64,14 @@ namespace mitk
     itkGetConstMacro(BackgroundValue, float);
     itkSetMacro(BackgroundValue, float);
 
-    virtual void GenerateInputRequestedRegion() override;
+    itkGetConstMacro(Tolerance, double);
+    itkSetMacro(Tolerance, double);
 
-    virtual void GenerateOutputInformation() override;
+    void GenerateInputRequestedRegion() override;
 
-    virtual void GenerateData() override;
+    void GenerateOutputInformation() override;
+
+    void GenerateData() override;
 
     const mitk::Surface *GetInput(void);
 
@@ -82,7 +85,7 @@ namespace mitk
   protected:
     SurfaceToImageFilter();
 
-    virtual ~SurfaceToImageFilter();
+    ~SurfaceToImageFilter() override;
 
     void Stencil3DImage(int time = 0);
 
@@ -90,6 +93,7 @@ namespace mitk
     bool m_UShortBinaryPixelType;
 
     float m_BackgroundValue;
+    double m_Tolerance;
   };
 
 } // namespace mitk

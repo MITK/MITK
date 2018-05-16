@@ -57,7 +57,7 @@ private:
 static void ValidateSurface(mitk::Surface::ConstPointer surface, unsigned int t)
 {
   if (surface.IsNull())
-    mitkThrow() << "Input surface is NULL!";
+    mitkThrow() << "Input surface is nullptr!";
 
   if (t >= surface->GetSizeOfPolyDataSeries())
     mitkThrow() << "Input surface doesn't have data at time step " << t << "!";
@@ -65,7 +65,7 @@ static void ValidateSurface(mitk::Surface::ConstPointer surface, unsigned int t)
   vtkPolyData *polyData = const_cast<mitk::Surface *>(surface.GetPointer())->GetVtkPolyData(t);
 
   if (polyData == nullptr)
-    mitkThrow() << "PolyData of input surface at time step " << t << " is NULL!";
+    mitkThrow() << "PolyData of input surface at time step " << t << " is nullptr!";
 
   if (polyData->GetNumberOfPolys() == 0)
     mitkThrow() << "Input surface has no polygons at time step " << t << "!";

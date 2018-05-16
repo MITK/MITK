@@ -23,9 +23,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarFigureMaskGenerator.h>
 #include <mitkIgnorePixelMaskGenerator.h>
 
-QmitkImageStatisticsCalculationThread::QmitkImageStatisticsCalculationThread():QThread(),
-  m_StatisticsImage(nullptr), m_BinaryMask(nullptr), m_PlanarFigureMask(nullptr), m_TimeStep(0),
-  m_IgnoreZeros(false), m_CalculationSuccessful(false), m_StatisticChanged(false), m_HistogramBinSize(10.0), m_UseDefaultNBins(true), m_nBinsForHistogramStatistics(100), m_prioritizeNBinsOverBinSize(true)
+QmitkImageStatisticsCalculationThread::QmitkImageStatisticsCalculationThread()
+  : QThread()
+  , m_StatisticsImage(nullptr)
+  , m_BinaryMask(nullptr)
+  , m_PlanarFigureMask(nullptr)
+  , m_TimeStep(0)
+  , m_IgnoreZeros(false)
+  , m_HistogramNBins(100)
+  , m_StatisticChanged(false)
+  , m_CalculationSuccessful(false)
 {
 }
 
@@ -52,11 +59,6 @@ void QmitkImageStatisticsCalculationThread::Initialize( mitk::Image::Pointer ima
     this->m_BinaryMask = binaryImage->Clone();
   if(planarFig.IsNotNull())
     this->m_PlanarFigureMask = planarFig->Clone();
-}
-
-void QmitkImageStatisticsCalculationThread::SetUseDefaultNBins(bool useDefault)
-{
-    m_UseDefaultNBins = useDefault;
 }
 
 void QmitkImageStatisticsCalculationThread::SetTimeStep( int times )
@@ -89,26 +91,14 @@ bool QmitkImageStatisticsCalculationThread::GetIgnoreZeroValueVoxel()
   return this->m_IgnoreZeros;
 }
 
-void QmitkImageStatisticsCalculationThread::SetHistogramBinSize(double size)
+void QmitkImageStatisticsCalculationThread::SetHistogramNBins(unsigned int nbins)
 {
-  this->m_HistogramBinSize = size;
-  this->m_prioritizeNBinsOverBinSize = false;
+  this->m_HistogramNBins = nbins;
 }
 
-double QmitkImageStatisticsCalculationThread::GetHistogramBinSize() const
+unsigned int QmitkImageStatisticsCalculationThread::GetHistogramNBins() const
 {
-  return this->m_HistogramBinSize;
-}
-
-void QmitkImageStatisticsCalculationThread::SetHistogramNBins(double size)
-{
-  this->m_nBinsForHistogramStatistics = size;
-  this->m_prioritizeNBinsOverBinSize = true;
-}
-
-double QmitkImageStatisticsCalculationThread::GetHistogramNBins() const
-{
-  return this->m_nBinsForHistogramStatistics;
+  return this->m_HistogramNBins;
 }
 
 std::string QmitkImageStatisticsCalculationThread::GetLastErrorMessage()
@@ -168,25 +158,28 @@ void QmitkImageStatisticsCalculationThread::run()
       calculator->SetMask(pfMaskGen.GetPointer());
     }
   }
+  catch (const mitk::Exception& e)
+  {
+    MITK_ERROR << "MITK Exception: " << e.what();
+    m_message = e.what();
+    statisticCalculationSuccessful = false;
+  }
   catch( const itk::ExceptionObject& e)
   {
     MITK_ERROR << "ITK Exception:" << e.what();
-    statisticCalculationSuccessful = false;
-  }
-  catch( const mitk::Exception& e )
-  {
-    MITK_ERROR<< "MITK Exception: " << e.what();
+    m_message = e.what();
     statisticCalculationSuccessful = false;
   }
   catch ( const std::runtime_error &e )
   {
     MITK_ERROR<< "Runtime Exception: " << e.what();
+    m_message = e.what();
     statisticCalculationSuccessful = false;
   }
   catch ( const std::exception &e )
   {
-    //m_message = "Failure: " + std::string(e.what());
     MITK_ERROR<< "Standard Exception: " << e.what();
+    m_message = e.what();
     statisticCalculationSuccessful = false;
   }
 
@@ -204,24 +197,7 @@ void QmitkImageStatisticsCalculationThread::run()
       calculator->SetSecondaryMask(nullptr);
   }
 
-  if (m_UseDefaultNBins)
-  {
-      calculator->SetNBinsForHistogramStatistics(100);
-  }
-  else
-  {
-      if (!m_prioritizeNBinsOverBinSize)
-      {
-          calculator->SetBinSizeForHistogramStatistics(m_HistogramBinSize);
-      }
-      else
-      {
-          calculator->SetNBinsForHistogramStatistics(100);
-      }
-  }
-
-  //calculator->SetHistogramBinSize( m_HistogramBinSize );
-  //calculator->SetUseDefaultBinSize( m_UseDefaultBinSize );
+  calculator->SetNBinsForHistogramStatistics(m_HistogramNBins);
 
   for (unsigned int i = 0; i < m_StatisticsImage->GetTimeSteps(); i++)
   {
@@ -231,19 +207,19 @@ void QmitkImageStatisticsCalculationThread::run()
     }
     catch ( mitk::Exception& e)
     {
-      //m_message = e.GetDescription();
+      m_message = e.GetDescription();
       MITK_ERROR<< "MITK Exception: " << e.what();
       statisticCalculationSuccessful = false;
     }
     catch ( const std::runtime_error &e )
     {
-      //m_message = "Failure: " + std::string(e.what());
+      m_message = "Failure: " + std::string(e.what());
       MITK_ERROR<< "Runtime Exception: " << e.what();
       statisticCalculationSuccessful = false;
     }
     catch ( const std::exception &e )
     {
-      //m_message = "Failure: " + std::string(e.what());
+      m_message = "Failure: " + std::string(e.what());
       MITK_ERROR<< "Standard Exception: " << e.what();
       statisticCalculationSuccessful = false;
     }

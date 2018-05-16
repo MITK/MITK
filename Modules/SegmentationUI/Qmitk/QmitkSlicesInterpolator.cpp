@@ -64,7 +64,7 @@ const std::map<QAction *, mitk::SliceNavigationController *> QmitkSlicesInterpol
   std::map<QAction *, mitk::SliceNavigationController *> actionToSliceDimension;
   foreach (mitk::SliceNavigationController *slicer, m_ControllerToDeleteObserverTag.keys())
   {
-    actionToSliceDimension[new QAction(QString::fromStdString(slicer->GetViewDirectionAsString()), 0)] = slicer;
+    actionToSliceDimension[new QAction(QString::fromStdString(slicer->GetViewDirectionAsString()), nullptr)] = slicer;
   }
 
   return actionToSliceDimension;
@@ -75,9 +75,9 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
     //    ACTION_TO_SLICEDIMENSION( createActionToSliceDimension() ),
     m_Interpolator(mitk::SegmentationInterpolationController::New()),
     m_SurfaceInterpolator(mitk::SurfaceInterpolationController::GetInstance()),
-    m_ToolManager(NULL),
+    m_ToolManager(nullptr),
     m_Initialized(false),
-    m_LastSNC(0),
+    m_LastSNC(nullptr),
     m_LastSliceIndex(0),
     m_2DInterpolationEnabled(false),
     m_3DInterpolationEnabled(false),
@@ -182,7 +182,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
     false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
 
   QWidget::setContentsMargins(0, 0, 0, 0);
-  if (QWidget::layout() != NULL)
+  if (QWidget::layout() != nullptr)
   {
     QWidget::layout()->setContentsMargins(0, 0, 0, 0);
   }
@@ -210,7 +210,7 @@ void QmitkSlicesInterpolator::SetDataStorage(mitk::DataStorage::Pointer storage)
       mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::NodeRemoved)
     );
   }
-   
+
   m_DataStorage = storage;
   m_SurfaceInterpolator->SetDataStorage(storage);
 
@@ -230,7 +230,7 @@ mitk::DataStorage *QmitkSlicesInterpolator::GetDataStorage()
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -251,7 +251,7 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager *toolManager,
   {
     // set enabled only if a segmentation is selected
     mitk::DataNode *node = m_ToolManager->GetWorkingData(0);
-    QWidget::setEnabled(node != NULL);
+    QWidget::setEnabled(node != nullptr);
 
     // react whenever the set of selected segmentation changes
     m_ToolManager->WorkingDataChanged +=
@@ -275,13 +275,13 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager *toolManager,
         itk::MemberCommand<QmitkSlicesInterpolator>::New();
       timeChangedCommand->SetCallbackFunction(this, &QmitkSlicesInterpolator::OnTimeChanged);
       m_ControllerToTimeObserverTag.insert(
-        slicer, slicer->AddObserver(mitk::SliceNavigationController::TimeGeometryEvent(NULL, 0), timeChangedCommand));
+        slicer, slicer->AddObserver(mitk::SliceNavigationController::TimeGeometryEvent(nullptr, 0), timeChangedCommand));
 
       itk::MemberCommand<QmitkSlicesInterpolator>::Pointer sliceChangedCommand =
         itk::MemberCommand<QmitkSlicesInterpolator>::New();
       sliceChangedCommand->SetCallbackFunction(this, &QmitkSlicesInterpolator::OnSliceChanged);
       m_ControllerToSliceObserverTag.insert(
-        slicer, slicer->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), sliceChangedCommand));
+        slicer, slicer->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), sliceChangedCommand));
     }
     ACTION_TO_SLICEDIMENSION = createActionToSliceDimension();
   }
@@ -308,7 +308,7 @@ void QmitkSlicesInterpolator::Uninitialize()
 
   ACTION_TO_SLICEDIMENSION.clear();
 
-  m_ToolManager = NULL;
+  m_ToolManager = nullptr;
 
   m_Initialized = false;
 }
@@ -323,7 +323,7 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
 
   WaitForFutures();
 
-  if (m_DataStorage.IsNotNull()) 
+  if (m_DataStorage.IsNotNull())
   {
     m_DataStorage->RemoveNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::NodeRemoved)
@@ -463,7 +463,7 @@ void QmitkSlicesInterpolator::OnShowMarkers(bool state)
 
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
-  if (m_ToolManager->GetWorkingData(0) != 0)
+  if (m_ToolManager->GetWorkingData(0) != nullptr)
   {
     m_Segmentation = dynamic_cast<mitk::Image *>(m_ToolManager->GetWorkingData(0)->GetData());
     m_BtnReinit3DInterpolation->setEnabled(true);
@@ -472,11 +472,11 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
   {
     // If no workingdata is set, remove the interpolation feedback
     this->GetDataStorage()->Remove(m_FeedbackNode);
-    m_FeedbackNode->SetData(NULL);
+    m_FeedbackNode->SetData(nullptr);
     this->GetDataStorage()->Remove(m_3DContourNode);
-    m_3DContourNode->SetData(NULL);
+    m_3DContourNode->SetData(nullptr);
     this->GetDataStorage()->Remove(m_InterpolatedSurfaceNode);
-    m_InterpolatedSurfaceNode->SetData(NULL);
+    m_InterpolatedSurfaceNode->SetData(nullptr);
     m_BtnReinit3DInterpolation->setEnabled(false);
     return;
   }
@@ -665,7 +665,7 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     m_Segmentation->Modified();
     m_Segmentation->GetVtkImageData()->Modified();
 
-    m_FeedbackNode->SetData(NULL);
+    m_FeedbackNode->SetData(nullptr);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -790,7 +790,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       }
     }
 
-    m_FeedbackNode->SetData(NULL);
+    m_FeedbackNode->SetData(nullptr);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -799,7 +799,7 @@ void QmitkSlicesInterpolator::FinishInterpolation(mitk::SliceNavigationControlle
 {
   // this redirect is for calling from outside
 
-  if (slicer == NULL)
+  if (slicer == nullptr)
     OnAcceptAllInterpolationsClicked();
   else
     AcceptAllInterpolations(slicer);
@@ -831,7 +831,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     s2iFilter->SetInput(dynamic_cast<mitk::Surface *>(m_InterpolatedSurfaceNode->GetData()));
 
     // check if ToolManager holds valid ReferenceData
-    if (m_ToolManager->GetReferenceData(0) == NULL || m_ToolManager->GetWorkingData(0) == NULL)
+    if (m_ToolManager->GetReferenceData(0) == nullptr || m_ToolManager->GetWorkingData(0) == nullptr)
     {
       return;
     }
@@ -968,22 +968,25 @@ void QmitkSlicesInterpolator::OnReinit3DInterpolation()
     mitk::NodePredicateProperty::New("3DContourContainer", mitk::BoolProperty::New(true));
   mitk::DataStorage::SetOfObjects::ConstPointer contourNodes =
     m_DataStorage->GetDerivations(m_ToolManager->GetWorkingData(0), pred);
+
   if (contourNodes->Size() != 0)
   {
+    m_BtnApply3D->setEnabled(true);
     m_3DContourNode = contourNodes->at(0);
+    mitk::Surface::Pointer contours = dynamic_cast<mitk::Surface *>(m_3DContourNode->GetData());
+    if (contours)
+      mitk::SurfaceInterpolationController::GetInstance()->ReinitializeInterpolation(contours);
+    m_BtnReinit3DInterpolation->setEnabled(false);
   }
   else
   {
+    m_BtnApply3D->setEnabled(false);
     QMessageBox errorInfo;
     errorInfo.setWindowTitle("Reinitialize surface interpolation");
     errorInfo.setIcon(QMessageBox::Information);
     errorInfo.setText("No contours available for the selected segmentation!");
     errorInfo.exec();
   }
-  mitk::Surface::Pointer contours = dynamic_cast<mitk::Surface *>(m_3DContourNode->GetData());
-  if (contours)
-    mitk::SurfaceInterpolationController::GetInstance()->ReinitializeInterpolation(contours);
-  m_BtnReinit3DInterpolation->setEnabled(false);
 }
 
 void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction *action)
@@ -1034,7 +1037,7 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
   {
     mitk::DataNode *workingNode = m_ToolManager->GetWorkingData(0);
     mitk::DataNode *referenceNode = m_ToolManager->GetReferenceData(0);
-    QWidget::setEnabled(workingNode != NULL);
+    QWidget::setEnabled(workingNode != nullptr);
 
     m_BtnApply2D->setEnabled(on);
     m_FeedbackNode->SetVisibility(on);
@@ -1055,7 +1058,7 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
         if (referenceNode)
         {
           mitk::Image *referenceImage = dynamic_cast<mitk::Image *>(referenceNode->GetData());
-          m_Interpolator->SetReferenceVolume(referenceImage); // may be NULL
+          m_Interpolator->SetReferenceVolume(referenceImage); // may be nullptr
         }
       }
     }
@@ -1239,7 +1242,7 @@ void QmitkSlicesInterpolator::SetCurrentContourListID()
 
         // In case the time is not valid use 0 to access the time geometry of the working node
         unsigned int time_position = 0;
-        if (m_LastSNC->GetTime() != NULL)
+        if (m_LastSNC->GetTime() != nullptr)
           time_position = m_LastSNC->GetTime()->GetPos();
 
         mitk::Vector3D spacing = workingNode->GetData()->GetGeometry(time_position)->GetSpacing();

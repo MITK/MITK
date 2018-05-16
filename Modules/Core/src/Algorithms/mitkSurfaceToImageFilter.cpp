@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransformPolyDataFilter.h>
 
 mitk::SurfaceToImageFilter::SurfaceToImageFilter()
-  : m_MakeOutputBinary(false), m_UShortBinaryPixelType(false), m_BackgroundValue(-10000)
+  : m_MakeOutputBinary(false), m_UShortBinaryPixelType(false), m_BackgroundValue(-10000), m_Tolerance(0.0)
 {
 }
 
@@ -175,7 +175,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
     normalsFilter->SetInputConnection(move->GetOutputPort());
 
     vtkSmartPointer<vtkPolyDataToImageStencil> surfaceConverter = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
-    surfaceConverter->SetTolerance(0.0);
+    surfaceConverter->SetTolerance(m_Tolerance);
     surfaceConverter->ReleaseDataFlagOn();
 
     surfaceConverter->SetInputConnection(normalsFilter->GetOutputPort());

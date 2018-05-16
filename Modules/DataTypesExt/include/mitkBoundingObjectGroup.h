@@ -41,8 +41,8 @@ namespace mitk
                    mitk::BoundingObject); // itk::VectorContainer<unsigned int ,mitk::BoundingObject::Pointer>);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual void UpdateOutputInformation() override;
-    virtual bool IsInside(const mitk::Point3D &p) const override;
+      void UpdateOutputInformation() override;
+    bool IsInside(const mitk::Point3D &p) const override;
 
     void SetBoundingObjects(const std::deque<mitk::BoundingObject::Pointer> boundingObjects);
     std::deque<mitk::BoundingObject::Pointer> GetBoundingObjects();
@@ -55,11 +55,11 @@ namespace mitk
     unsigned int GetCount() const;
     mitk::BaseGeometry *GetGeometry(int t = 0) const;
 
-    virtual bool VerifyRequestedRegion() override;
+    bool VerifyRequestedRegion() override;
 
   protected:
     BoundingObjectGroup();
-    virtual ~BoundingObjectGroup();
+    ~BoundingObjectGroup() override;
 
     std::deque<mitk::BoundingObject::Pointer> m_BoundingObjects;
     unsigned int m_Counter;

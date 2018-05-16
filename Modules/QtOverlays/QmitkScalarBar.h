@@ -41,7 +41,7 @@ public:
   /**
   * @brief Default Destructor
   **/
-  virtual ~QmitkScalarBar();
+  ~QmitkScalarBar() override;
 
   virtual void SetScaleFactor(double scale);
 

@@ -33,7 +33,7 @@ namespace mitk
    *\brief Class to create events from within the application to signal about internal events.
    *
    * These events can target a specific DataInteractor, if this DataInteractor is specified in the constructor;
-   * else this parameter is set to NULL and the event is treated as a regular event.
+   * else this parameter is set to nullptr and the event is treated as a regular event.
    */
   class MITKCORE_EXPORT InternalEvent : public InteractionEvent
   {
@@ -44,13 +44,13 @@ namespace mitk
     std::string GetSignalName() const;
     DataInteractor *GetTargetInteractor() const;
 
-    virtual bool IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const override;
+    bool IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const override;
 
   protected:
     InternalEvent(BaseRenderer *, DataInteractor *destInteractor, const std::string &signalName);
-    virtual ~InternalEvent();
+    ~InternalEvent() override;
 
-    virtual bool IsEqual(const InteractionEvent &) const override;
+    bool IsEqual(const InteractionEvent &) const override;
 
   private:
     DataInteractor::Pointer m_DataInteractor;

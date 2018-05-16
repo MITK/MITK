@@ -106,12 +106,12 @@ int mitk::PlanarBezierCurve::GetControlPointForPolylinePoint(int indexOfPolyline
     return -1;
 
   mitk::PlanarFigure::ControlPointListType::const_iterator elem;
-  mitk::PlanarFigure::ControlPointListType::const_iterator first = m_ControlPoints.cbegin();
-  mitk::PlanarFigure::ControlPointListType::const_iterator end = m_ControlPoints.cend();
+  auto first = m_ControlPoints.cbegin();
+  auto end = m_ControlPoints.cend();
 
   mitk::PlanarFigure::PolyLineType::const_iterator polyLineIter;
-  mitk::PlanarFigure::PolyLineType::const_iterator polyLineEnd = polyLine.cend();
-  mitk::PlanarFigure::PolyLineType::const_iterator polyLineStart = polyLine.cbegin();
+  auto polyLineEnd = polyLine.cend();
+  auto polyLineStart = polyLine.cbegin();
   polyLineStart += indexOfPolylinePoint;
 
   for (polyLineIter = polyLineStart; polyLineIter != polyLineEnd; ++polyLineIter)
@@ -142,7 +142,7 @@ bool mitk::PlanarBezierCurve::IsHelperToBePainted(unsigned int index) const
 
 bool mitk::PlanarBezierCurve::Equals(const PlanarFigure &other) const
 {
-  const mitk::PlanarBezierCurve *otherBezierCurve = dynamic_cast<const mitk::PlanarBezierCurve *>(&other);
+  const auto *otherBezierCurve = dynamic_cast<const mitk::PlanarBezierCurve *>(&other);
   if (otherBezierCurve)
   {
     if (this->m_NumberOfSegments != otherBezierCurve->m_NumberOfSegments)

@@ -200,7 +200,7 @@ void Step6::SetupWidgets()
 
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the tree!
-  m_DataStorage->Add(view2->GetRenderer()->GetCurrentWorldGeometry2DNode());
+  m_DataStorage->Add(view2->GetRenderer()->GetCurrentWorldPlaneGeometryNode());
 
   //*************************************************************************
   // Part Ic: 2D view for slicing sagitally
@@ -218,7 +218,7 @@ void Step6::SetupWidgets()
 
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the tree!
-  m_DataStorage->Add(view3->GetRenderer()->GetCurrentWorldGeometry2DNode());
+  m_DataStorage->Add(view3->GetRenderer()->GetCurrentWorldPlaneGeometryNode());
 
   //*************************************************************************
   // Part II: handle updates: To avoid unnecessary updates, we have to

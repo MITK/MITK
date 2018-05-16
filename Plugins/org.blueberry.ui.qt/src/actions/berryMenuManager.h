@@ -127,7 +127,7 @@ public:
    */
   MenuManager(const QString& text = QString(), const QString& id = QString());
 
-  ~MenuManager();
+  ~MenuManager() override;
 
   /**
    * Creates a menu manager with the given text, image, and id.

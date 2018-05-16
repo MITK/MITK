@@ -54,21 +54,21 @@ namespace mitk
   class MITKCORE_EXPORT AbstractFileWriter : public mitk::IFileWriter
   {
   public:
-    virtual void SetInput(const BaseData *data) override;
-    virtual const BaseData *GetInput() const override;
+    void SetInput(const BaseData *data) override;
+    const BaseData *GetInput() const override;
 
-    virtual void SetOutputLocation(const std::string &location) override;
-    virtual std::string GetOutputLocation() const override;
+    void SetOutputLocation(const std::string &location) override;
+    std::string GetOutputLocation() const override;
 
-    virtual void SetOutputStream(const std::string &location, std::ostream *os) override;
-    virtual std::ostream *GetOutputStream() const override;
+    void SetOutputStream(const std::string &location, std::ostream *os) override;
+    std::ostream *GetOutputStream() const override;
 
     /**
      * \brief Write the base data to the specified location or output stream.
      *
      * This method must be implemented for each specific writer. Call
      * GetOutputStream() first and check for a non-null stream to write to.
-     * If the output stream is \c NULL, use GetOutputLocation() to write
+     * If the output stream is \c nullptr, use GetOutputLocation() to write
      * to a local file-system path.
      *
      * If the reader cannot use streams directly, use GetLocalFile() to retrieve
@@ -79,21 +79,21 @@ namespace mitk
      * \see GetLocalFile()
      * \see IFileWriter::Write()
      */
-    virtual void Write() override = 0;
+    void Write() override = 0;
 
-    virtual ConfidenceLevel GetConfidenceLevel() const override;
+    ConfidenceLevel GetConfidenceLevel() const override;
 
     MimeType GetRegisteredMimeType() const;
 
-    virtual Options GetOptions() const override;
-    virtual us::Any GetOption(const std::string &name) const override;
+    Options GetOptions() const override;
+    us::Any GetOption(const std::string &name) const override;
 
-    virtual void SetOptions(const Options &options) override;
-    virtual void SetOption(const std::string &name, const us::Any &value) override;
+    void SetOptions(const Options &options) override;
+    void SetOption(const std::string &name, const us::Any &value) override;
 
-    virtual void AddProgressCallback(const ProgressCallback &callback) override;
+    void AddProgressCallback(const ProgressCallback &callback) override;
 
-    virtual void RemoveProgressCallback(const ProgressCallback &callback) override;
+    void RemoveProgressCallback(const ProgressCallback &callback) override;
 
     us::ServiceRegistration<IFileWriter> RegisterService(us::ModuleContext *context = us::GetModuleContext());
     void UnregisterService();
@@ -140,13 +140,13 @@ namespace mitk
     {
     public:
       OutputStream(IFileWriter *writer, std::ios_base::openmode mode = std::ios_base::trunc | std::ios_base::out);
-      ~OutputStream();
+      ~OutputStream() override;
 
     private:
       std::ostream *m_Stream;
     };
 
-    ~AbstractFileWriter();
+    ~AbstractFileWriter() override;
 
     AbstractFileWriter(const AbstractFileWriter &other);
 
@@ -167,7 +167,7 @@ namespace mitk
      *
      * @param context
      * @return
-     * @throws std::invalid_argument if \c context is NULL.
+     * @throws std::invalid_argument if \c context is nullptr.
      */
     virtual us::ServiceRegistration<CustomMimeType> RegisterMimeType(us::ModuleContext *context);
 

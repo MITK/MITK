@@ -307,7 +307,7 @@ protected:
    */
   Window(IShellProvider::Pointer shellProvider);
 
-  ~Window();
+  ~Window() override;
 
   /**
    * Given the desired position of the window, this method returns an adjusted

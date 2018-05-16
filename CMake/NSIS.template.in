@@ -40,6 +40,8 @@
   ;Set compression
   SetCompressor @CPACK_NSIS_COMPRESSOR@
 
+  RequestExecutionLevel user
+
 @CPACK_NSIS_DEFINES@
 
   !include Sections.nsh
@@ -233,7 +235,11 @@ Function AddToPath
   StrLen $2 $1
   IntCmp $2 0 CheckPathLength_ShowPathWarning CheckPathLength_Done CheckPathLength_Done
     CheckPathLength_ShowPathWarning:
-    Messagebox MB_OK|MB_ICONEXCLAMATION "Warning! PATH too long installer unable to modify PATH!"
+    DetailPrint "Warning: Could not modify PATH variable - current PATH is too long.\n\
+This does not impact the functionality of MITK itself, but you will not be able to start\
+it from anywhere via command line."
+    ; The message box is probably too much of an escalation, most users won't care or notice
+    ;Messagebox MB_OK|MB_ICONEXCLAMATION "Warning! PATH too long installer unable to modify PATH!"
     Goto AddToPath_done
   CheckPathLength_Done:
   Push "$1;"
@@ -837,17 +843,17 @@ Function RedistributablePage
 
   ; We need compile time information on whether the redistributable installer exists.
   ; If it does not exist using the "File" command will lead to errors.
-  ${!defineifexist} REDIST_INSTALLER_PRESENT @CPACK_PACKAGE_FILE_NAME@\thirdpartyinstallers\vcredist_@CPACK_LIBRARY_ARCHITECTURE@.exe
+  ${!defineifexist} REDIST_INSTALLER_PRESENT @CPACK_PACKAGE_FILE_NAME@\thirdpartyinstallers\@CPACK_REDISTRIBUTABLE_FILE_NAME@
 
   !ifdef REDIST_INSTALLER_PRESENT
     ; Check at runtime whether the redistributable installer is available
-    IfFileExists $INSTDIR\thirdpartyinstallers\vcredist_@CPACK_LIBRARY_ARCHITECTURE@.exe InstallRedist NoRedistInstaller
+    IfFileExists $INSTDIR\thirdpartyinstallers\@CPACK_REDISTRIBUTABLE_FILE_NAME@ InstallRedist NoRedistInstaller
 
     InstallRedist:
 
     ClearErrors
-    File "@CPACK_PACKAGE_FILE_NAME@\thirdpartyinstallers\vcredist_@CPACK_LIBRARY_ARCHITECTURE@.exe"
-    ExecWait '"$INSTDIR\thirdpartyinstallers\vcredist_@CPACK_LIBRARY_ARCHITECTURE@.exe" /passive /norestart'
+    File "@CPACK_PACKAGE_FILE_NAME@\thirdpartyinstallers\@CPACK_REDISTRIBUTABLE_FILE_NAME@"
+    ExecWait '"$INSTDIR\thirdpartyinstallers\@CPACK_REDISTRIBUTABLE_FILE_NAME@" /passive /norestart'
     IfErrors endInstallationMissingRedist
 
     Goto RedistInstalled

@@ -79,7 +79,7 @@ const std::string&Module::PROP_AUTOLOADED_MODULES()
 }
 
 Module::Module()
-: d(0)
+: d(nullptr)
 {
 
 }
@@ -99,21 +99,21 @@ void Module::Init(CoreModuleContext* coreCtx,
 
 void Module::Uninit()
 {
-  if (d->moduleContext != NULL)
+  if (d->moduleContext != nullptr)
   {
     //d->coreCtx->listeners.HooksModuleStopped(d->moduleContext);
     d->RemoveModuleResources();
     delete d->moduleContext;
-    d->moduleContext = 0;
+    d->moduleContext = nullptr;
     d->coreCtx->listeners.ModuleChanged(ModuleEvent(ModuleEvent::UNLOADED, this));
 
-    d->moduleActivator = 0;
+    d->moduleActivator = nullptr;
   }
 }
 
 bool Module::IsLoaded() const
 {
-  return d->moduleContext != 0;
+  return d->moduleContext != nullptr;
 }
 
 void Module::Start()
@@ -128,7 +128,7 @@ void Module::Start()
   d->moduleContext = new ModuleContext(this->d);
 
   typedef ModuleActivator*(*ModuleActivatorHook)(void);
-  ModuleActivatorHook activatorHook = NULL;
+  ModuleActivatorHook activatorHook = nullptr;
 
   std::string activator_func = "_us_module_activator_instance_" + d->info.name;
   void* activatorHookSym = ModuleUtils::GetSymbol(d->info, activator_func.c_str());
@@ -172,7 +172,7 @@ void Module::Start()
 
 void Module::Stop()
 {
-  if (d->moduleContext == 0)
+  if (d->moduleContext == nullptr)
   {
     US_WARN << "Module " << d->info.name << " already stopped.";
     return;

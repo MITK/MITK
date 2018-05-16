@@ -31,8 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <fstream>
 
-using namespace std;
-
 namespace mitk {
 
   TractAnalyzer::TractAnalyzer() { }

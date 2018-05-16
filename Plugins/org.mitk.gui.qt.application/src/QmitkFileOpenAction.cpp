@@ -46,7 +46,7 @@ public:
     {
       return prefService->GetSystemPreferences()->Node("/General");
     }
-    return berry::IPreferences::Pointer(0);
+    return berry::IPreferences::Pointer(nullptr);
   }
 
   QString getLastFileOpenPath() const
@@ -83,20 +83,20 @@ public:
 };
 
 QmitkFileOpenAction::QmitkFileOpenAction(berry::IWorkbenchWindow::Pointer window)
-  : QAction(0), d(new QmitkFileOpenActionPrivate)
+  : QAction(nullptr), d(new QmitkFileOpenActionPrivate)
 {
   d->init(window.GetPointer(), this);
 }
 
 QmitkFileOpenAction::QmitkFileOpenAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
-  : QAction(0), d(new QmitkFileOpenActionPrivate)
+  : QAction(nullptr), d(new QmitkFileOpenActionPrivate)
 {
   d->init(window.GetPointer(), this);
   this->setIcon(icon);
 }
 
 QmitkFileOpenAction::QmitkFileOpenAction(const QIcon& icon, berry::IWorkbenchWindow* window)
-  : QAction(0), d(new QmitkFileOpenActionPrivate)
+  : QAction(nullptr), d(new QmitkFileOpenActionPrivate)
 {
   d->init(window, this);
   this->setIcon(icon);
@@ -110,7 +110,7 @@ void QmitkFileOpenAction::Run()
 {
 
   // Ask the user for a list of files to open
-  QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Open",
+  QStringList fileNames = QFileDialog::getOpenFileNames(nullptr, "Open",
                                                         d->getLastFileOpenPath(),
                                                         QmitkIOUtil::GetFileOpenFilterString());
 

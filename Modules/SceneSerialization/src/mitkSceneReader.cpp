@@ -47,7 +47,7 @@ bool mitk::SceneReader::LoadScene(TiXmlDocument &document, const std::string &wo
 
   for (auto iter = sceneReaders.begin(); iter != sceneReaders.end(); ++iter)
   {
-    if (SceneReader *reader = dynamic_cast<SceneReader *>(iter->GetPointer()))
+    if (auto *reader = dynamic_cast<SceneReader *>(iter->GetPointer()))
     {
       if (!reader->LoadScene(document, workingDirectory, storage))
       {

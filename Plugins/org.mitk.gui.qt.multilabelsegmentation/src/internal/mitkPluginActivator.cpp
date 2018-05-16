@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <usModuleInitialization.h>
 
-ctkPluginContext* mitk::PluginActivator::m_Context = NULL;
+ctkPluginContext* mitk::PluginActivator::m_Context = nullptr;
 
 //MLI TODO
 US_INITIALIZE_MODULE //("MultiLabelSegmentation", "liborg_mitk_gui_qt_multilabelsegmentation")
@@ -56,7 +56,7 @@ void mitk::PluginActivator::start(ctkPluginContext *context)
 void mitk::PluginActivator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
-  m_Context = NULL;
+  m_Context = nullptr;
 }
 
 ctkPluginContext* mitk::PluginActivator::getContext()

@@ -42,11 +42,12 @@ namespace mitk
   public:
 
     DiffusionImageNiftiReaderService(const DiffusionImageNiftiReaderService & other);
-    DiffusionImageNiftiReaderService();
-    virtual ~DiffusionImageNiftiReaderService();
+    //DiffusionImageNiftiReaderService();
+    DiffusionImageNiftiReaderService(CustomMimeType mime_type, std::string mime_type_description );
+    ~DiffusionImageNiftiReaderService() override;
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+    std::vector<itk::SmartPointer<BaseData> > Read() override;
 
     typedef short                                                           DiffusionPixelType;
 

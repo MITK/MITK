@@ -5,7 +5,7 @@
     <editor
       id="org.mitk.editors.stdmultiwidget"
       name="Display"
-      icon="resources/StdMultiWidgetEditor.png"
+      icon="resources/StdMultiWidgetEditor.svg"
       extensions="mitk"
       class="QmitkStdMultiWidgetEditor">
     </editor>
@@ -22,7 +22,7 @@
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="zooming panning contraint"/>
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="show level window widget"/>
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="pacs like mouse interaction select left mouse button action"/>
-    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="rendering mode standard multisampling enable antialiasing depth peeling"/>
+    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="rendering mode standard"/>
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="crosshair gap size background decoration color corner annotation"/>
   </extension>
 </plugin>

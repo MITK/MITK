@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 
 // OpenCV includes
-#include <cv.h>
+#include <opencv2/core.hpp>
 
 namespace mitk
 {
@@ -82,9 +82,9 @@ namespace mitk
   protected:
 
     OpenCVToMitkImageFilter(); // purposely hidden
-    virtual ~OpenCVToMitkImageFilter();
+    ~OpenCVToMitkImageFilter() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
   protected:
     Image::Pointer m_Image;

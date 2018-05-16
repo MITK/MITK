@@ -54,7 +54,7 @@ void org_mitk_matchpoint_core_helper_Activator::stop(ctkPluginContext* context)
 {
     Q_UNUSED(context)
 
-        this->m_Context = NULL;
+        this->m_Context = nullptr;
 }
 
 ctkPluginContext* org_mitk_matchpoint_core_helper_Activator::getContext()

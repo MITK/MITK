@@ -234,7 +234,7 @@ struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
       BERRY_WARN << "Error getting adapter for '" << Reflection::GetClassName(adaptable) << "': "
                  << "Cannot get the interface id for type '" << Reflection::GetClassName<A>()
                  << "'. It is probably missing a Q_DECLARE_INTERFACE macro in its header.";
-      return NULL;
+      return nullptr;
     }
     return dynamic_cast<A*>(this->GetAdapter(adaptable, typeName, true));
   }

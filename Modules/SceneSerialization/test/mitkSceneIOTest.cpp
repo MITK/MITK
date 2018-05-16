@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurface.h"
 
 #ifndef WIN32
-#include <errno.h>
+#include <cerrno>
 #include <ulimit.h>
 #endif
 
@@ -41,7 +41,7 @@ class SceneIOTestClass
 public:
   static mitk::Image::Pointer LoadImage(const std::string &filename)
   {
-    mitk::Image::Pointer image = mitk::IOUtil::LoadImage(filename);
+    mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(filename);
     if (image.IsNull())
     {
       MITK_TEST_FAILED_MSG(<< "Test image '" << filename << "' was not loaded as an mitk::Image");
@@ -51,7 +51,7 @@ public:
 
   static mitk::Surface::Pointer LoadSurface(const std::string &filename)
   {
-    mitk::Surface::Pointer surface = mitk::IOUtil::LoadSurface(filename);
+    mitk::Surface::Pointer surface = mitk::IOUtil::Load<mitk::Surface>(filename);
     if (surface.IsNull())
     {
       MITK_TEST_FAILED_MSG(<< "Test surface '" << filename << "' was not loaded as an mitk::Surface");
@@ -285,7 +285,7 @@ int mitkSceneIOTest(int, char *argv[])
     if (failedNodes.IsNotNull() && !failedNodes->empty())
     {
       MITK_TEST_OUTPUT(<< "The following nodes could not be serialized:");
-      for (mitk::SceneIO::FailedBaseDataListType::const_iterator iter = failedNodes->begin();
+      for (auto iter = failedNodes->begin();
            iter != failedNodes->end();
            ++iter)
       {
@@ -296,7 +296,7 @@ int mitkSceneIOTest(int, char *argv[])
         }
         else
         {
-          MITK_TEST_OUTPUT_NO_ENDL(<< "(NULL)");
+          MITK_TEST_OUTPUT_NO_ENDL(<< "(nullptr)");
         }
 
         MITK_TEST_OUTPUT(<< " contained in node '" << (*iter)->GetName() << "'");
@@ -309,7 +309,7 @@ int mitkSceneIOTest(int, char *argv[])
     {
       MITK_TEST_OUTPUT(<< "The following properties could not be serialized:");
       const mitk::PropertyList::PropertyMap *propmap = failedProperties->GetMap();
-      for (mitk::PropertyList::PropertyMap::const_iterator iter = propmap->begin(); iter != propmap->end(); ++iter)
+      for (auto iter = propmap->begin(); iter != propmap->end(); ++iter)
       {
         MITK_TEST_OUTPUT(<< " - " << iter->second->GetNameOfClass() << " associated to key '" << iter->first << "'");
         // \TODO: should we fail the test case if failed properties exist?
@@ -332,7 +332,7 @@ int mitkSceneIOTest(int, char *argv[])
     if (failedNodes.IsNotNull() && !failedNodes->empty())
     {
       MITK_TEST_OUTPUT(<< "The following nodes could not be serialized:");
-      for (mitk::SceneIO::FailedBaseDataListType::const_iterator iter = failedNodes->begin();
+      for (auto iter = failedNodes->begin();
            iter != failedNodes->end();
            ++iter)
       {
@@ -343,7 +343,7 @@ int mitkSceneIOTest(int, char *argv[])
         }
         else
         {
-          MITK_TEST_OUTPUT_NO_ENDL(<< "(NULL)");
+          MITK_TEST_OUTPUT_NO_ENDL(<< "(nullptr)");
         }
 
         MITK_TEST_OUTPUT(<< " contained in node '" << (*iter)->GetName() << "'");
@@ -356,7 +356,7 @@ int mitkSceneIOTest(int, char *argv[])
     {
       MITK_TEST_OUTPUT(<< "The following properties could not be serialized:");
       const mitk::PropertyList::PropertyMap *propmap = failedProperties->GetMap();
-      for (mitk::PropertyList::PropertyMap::const_iterator iter = propmap->begin(); iter != propmap->end(); ++iter)
+      for (auto iter = propmap->begin(); iter != propmap->end(); ++iter)
       {
         MITK_TEST_OUTPUT(<< " - " << iter->second->GetNameOfClass() << " associated to key '" << iter->first << "'");
         // \TODO: should we fail the test case if failed properties exist?

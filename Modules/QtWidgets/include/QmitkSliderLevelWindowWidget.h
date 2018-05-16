@@ -87,7 +87,7 @@ public:
   QmitkSliderLevelWindowWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
 
   /// destructor
-  ~QmitkSliderLevelWindowWidget();
+  ~QmitkSliderLevelWindowWidget() override;
 
   /*!
   *  data structure which stores the values manipulated
@@ -180,7 +180,7 @@ protected:
   /*!
   * causes an update of the sliderbar when resizing the window
   */
-  void virtual resizeEvent(QResizeEvent *event) override;
+  void resizeEvent(QResizeEvent *event) override;
 
 protected slots:
 

@@ -113,7 +113,7 @@ const mitk::Image *mitk::ContourModelSetToImageFilter::GetImage(void)
 
 void mitk::ContourModelSetToImageFilter::GenerateData()
 {
-  mitk::ContourModelSet *contourSet = const_cast<mitk::ContourModelSet *>(this->GetInput());
+  auto *contourSet = const_cast<mitk::ContourModelSet *>(this->GetInput());
 
   // Initializing progressbar
   unsigned int num_contours = contourSet->GetContourModelList()->size();

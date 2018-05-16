@@ -34,13 +34,13 @@ class MITKRTUI_EXPORT QmitkDoseVisualStyleDelegate : public QStyledItemDelegate
 
 public:
 
-  QmitkDoseVisualStyleDelegate(QObject *parent = 0);
+  explicit QmitkDoseVisualStyleDelegate(QObject *parent = nullptr);
 
   void paint(QPainter *painter, const QStyleOptionViewItem &option
-    , const QModelIndex &index) const;
+    , const QModelIndex &index) const override;
 
   bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
-    const QModelIndex &index);
+    const QModelIndex &index) override;
 
 };
 

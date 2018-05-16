@@ -61,7 +61,7 @@ namespace mitk
 
   protected:
     TransferFunctionInitializer(TransferFunction::Pointer transferFunction = nullptr);
-    virtual ~TransferFunctionInitializer();
+    ~TransferFunctionInitializer() override;
 
   private:
     int m_Mode;

@@ -33,7 +33,7 @@ void mitk::MorphologicalOperations::Closing(mitk::Image::Pointer &image,
 {
   MITK_INFO << "Start Closing...";
 
-  int timeSteps = static_cast<int>(image->GetTimeSteps());
+  auto timeSteps = static_cast<int>(image->GetTimeSteps());
 
   if (timeSteps > 1)
   {
@@ -70,7 +70,7 @@ void mitk::MorphologicalOperations::Erode(mitk::Image::Pointer &image,
 {
   MITK_INFO << "Start Erode...";
 
-  int timeSteps = static_cast<int>(image->GetTimeSteps());
+  auto timeSteps = static_cast<int>(image->GetTimeSteps());
 
   if (timeSteps > 1)
   {
@@ -107,7 +107,7 @@ void mitk::MorphologicalOperations::Dilate(mitk::Image::Pointer &image,
 {
   MITK_INFO << "Start Dilate...";
 
-  int timeSteps = static_cast<int>(image->GetTimeSteps());
+  auto timeSteps = static_cast<int>(image->GetTimeSteps());
 
   if (timeSteps > 1)
   {
@@ -144,7 +144,7 @@ void mitk::MorphologicalOperations::Opening(mitk::Image::Pointer &image,
 {
   MITK_INFO << "Start Opening...";
 
-  int timeSteps = static_cast<int>(image->GetTimeSteps());
+  auto timeSteps = static_cast<int>(image->GetTimeSteps());
 
   if (timeSteps > 1)
   {
@@ -179,7 +179,7 @@ void mitk::MorphologicalOperations::FillHoles(mitk::Image::Pointer &image)
 {
   MITK_INFO << "Start FillHole...";
 
-  int timeSteps = static_cast<int>(image->GetTimeSteps());
+  auto timeSteps = static_cast<int>(image->GetTimeSteps());
 
   if (timeSteps > 1)
   {
@@ -381,4 +381,38 @@ void mitk::MorphologicalOperations::itkFillHoles(itk::Image<TPixel, VDimension> 
   fillHoleFilter->UpdateLargestPossibleRegion();
 
   mitk::CastToMitkImage(fillHoleFilter->GetOutput(), resultImage);
+}
+
+template <class TStructuringElement>
+TStructuringElement  mitk::MorphologicalOperations::CreateStructuringElement(StructuralElementType structuralElementFlag, int factor)
+{
+  TStructuringElement strElem;
+  typename TStructuringElement::SizeType size;
+  size.Fill(0);
+  switch (structuralElementFlag)
+  {
+  case Ball_Axial:
+  case Cross_Axial:
+    size.SetElement(0, factor);
+    size.SetElement(1, factor);
+    break;
+  case Ball_Coronal:
+  case Cross_Coronal:
+    size.SetElement(0, factor);
+    size.SetElement(2, factor);
+    break;
+  case Ball_Sagital:
+  case Cross_Sagital:
+    size.SetElement(1, factor);
+    size.SetElement(2, factor);
+    break;
+  case Ball:
+  case Cross:
+    size.Fill(factor);
+    break;
+  }
+
+  strElem.SetRadius(size);
+  strElem.CreateStructuringElement();
+  return strElem;
 }

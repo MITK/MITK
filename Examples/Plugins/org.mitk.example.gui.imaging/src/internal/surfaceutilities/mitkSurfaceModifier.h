@@ -98,12 +98,8 @@ namespace mitk
     SurfaceModifier();
     ~SurfaceModifier();
 
-    /**
-     * @param maxNoiseVectorLenght Limits the length of the noise vector. Value -1 disables the limit. Default value is
-     * also -1.
-     */
     mitk::Point3D PerturbePoint(
-      mitk::Point3D point, double varianceX, double varianceY, double varianceZ, double maxNoiseVectorLenght = -1);
+      mitk::Point3D point, double varianceX, double varianceY, double varianceZ);
 
     /** @brief perturbes a point along the given axis */
     mitk::Point3D PerturbePointAlongAxis(mitk::Point3D point, mitk::Vector3D axis, double variance);

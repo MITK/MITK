@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class OclResourceService
 {
 public:
-  /** @brief Returns a valid OpenCL Context (if applicable) or NULL if none present */
+  /** @brief Returns a valid OpenCL Context (if applicable) or nullptr if none present */
   virtual cl_context GetContext() const = 0;
 
   /** @brief Returns a valid cl_command_queue related to the (one) OpenCL context */

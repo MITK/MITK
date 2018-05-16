@@ -57,7 +57,7 @@ m_MessageFactory = mitk::IGTLMessageFactory::New();
 
 void tearDown() override
 {
-m_MessageFactory = NULL;
+m_MessageFactory = nullptr;
 }
 
 void Test_CreateImageMessage_NotNull()

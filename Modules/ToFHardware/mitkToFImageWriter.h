@@ -41,7 +41,7 @@ namespace mitk
 
     ToFImageWriter();
 
-    ~ToFImageWriter();
+    ~ToFImageWriter() override;
 
     mitkClassMacroItkParent( ToFImageWriter , itk::Object );
 
@@ -98,7 +98,7 @@ namespace mitk
     /*!
     \brief Add new data to file.
     */
-    virtual void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData=0){};
+    virtual void Add(float* /*distanceFloatData*/, float* /*amplitudeFloatData*/, float* /*intensityFloatData*/, unsigned char* /*rgbData*/=nullptr){};
 
   protected:
 
@@ -108,30 +108,26 @@ namespace mitk
     void CheckForFileExtension(std::string& fileName);
 
     // member variables
+    std::string m_Extension; ///< file extension used for saving images
     std::string m_DistanceImageFileName; ///< file name for saving the distance image
     std::string m_AmplitudeImageFileName; ///< file name for saving the amplitude image
     std::string m_IntensityImageFileName; ///< file name for saving the intensity image
     std::string m_RGBImageFileName; ///< file name for saving the RGB image
-    std::string m_Extension; ///< file extension used for saving images
 
-    int m_ToFCaptureWidth; ///< width (x-dimension) of the images to record.
-    int m_ToFCaptureHeight; ///< height (y-dimension) of the images to record.
-    int m_ToFPixelNumber; ///< number of pixels (widht*height) of the images to record
-    int m_ToFImageSizeInBytes; ///< size of the image to save in bytes
-    int m_RGBCaptureWidth; ///< width (x-dimension) of the images to record.
-    int m_RGBCaptureHeight; ///< height (y-dimension) of the images to record.
-    int m_RGBPixelNumber; ///< number of pixels (widht*height) of the images to record
-    int m_RGBImageSizeInBytes; ///< size of the image to save in bytes
     int m_NumOfFrames; ///< number of frames written to the image. Used for pic header.
-    ToFImageWriter::ToFImageType m_ToFImageType; ///< type of image to be recorded: ToFImageType3D (0) or ToFImageType2DPlusT (1)
-
     bool m_DistanceImageSelected; ///< flag indicating if distance image should be recorded
     bool m_AmplitudeImageSelected; ///< flag indicating if amplitude image should be recorded
     bool m_IntensityImageSelected; ///< flag indicating if intensity image should be recorded
     bool m_RGBImageSelected; ///< flag indicating if RGB image should be recorded
-
-  private:
-
+    int m_ToFCaptureWidth; ///< width (x-dimension) of the images to record.
+    int m_ToFCaptureHeight; ///< height (y-dimension) of the images to record.
+    int m_RGBCaptureWidth; ///< width (x-dimension) of the images to record.
+    int m_RGBCaptureHeight; ///< height (y-dimension) of the images to record.
+    int m_ToFPixelNumber; ///< number of pixels (widht*height) of the images to record
+    int m_ToFImageSizeInBytes; ///< size of the image to save in bytes
+    int m_RGBPixelNumber; ///< number of pixels (widht*height) of the images to record
+    int m_RGBImageSizeInBytes; ///< size of the image to save in bytes
+    ToFImageWriter::ToFImageType m_ToFImageType; ///< type of image to be recorded: ToFImageType3D (0) or ToFImageType2DPlusT (1)
   };
 } //END mitk namespace
 #endif // __mitkToFImageWriter_h

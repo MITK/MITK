@@ -28,19 +28,19 @@ bool mitk::LabelSetIOHelper::SaveLabelSetImagePreset(std::string &presetFilename
     presetFilename.append(".lsetp");
   }
 
-  TiXmlDocument *presetXmlDoc = new TiXmlDocument();
+  auto *presetXmlDoc = new TiXmlDocument();
 
-  TiXmlDeclaration *decl = new TiXmlDeclaration("1.0", "", "");
+  auto *decl = new TiXmlDeclaration("1.0", "", "");
   presetXmlDoc->LinkEndChild(decl);
 
-  TiXmlElement *presetElement = new TiXmlElement("LabelSetImagePreset");
+  auto *presetElement = new TiXmlElement("LabelSetImagePreset");
   presetElement->SetAttribute("layers", inputImage->GetNumberOfLayers());
 
   presetXmlDoc->LinkEndChild(presetElement);
 
   for (unsigned int layerIdx = 0; layerIdx < inputImage->GetNumberOfLayers(); layerIdx++)
   {
-    TiXmlElement *layerElement = new TiXmlElement("Layer");
+    auto *layerElement = new TiXmlElement("Layer");
     layerElement->SetAttribute("index", layerIdx);
     layerElement->SetAttribute("labels", inputImage->GetNumberOfLabels(layerIdx));
 
@@ -89,11 +89,11 @@ void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(std::string &presetFilename
     int numberOfLabels;
     layerElem->QueryIntAttribute("labels", &numberOfLabels);
 
-    if (inputImage->GetLabelSet(i) == NULL)
+    if (inputImage->GetLabelSet(i) == nullptr)
       inputImage->AddLayer();
 
     TiXmlElement *labelElement = layerElem->FirstChildElement("Label");
-    if (labelElement == NULL)
+    if (labelElement == nullptr)
       break;
     for (int j = 0; j < numberOfLabels; j++)
     {
@@ -105,7 +105,7 @@ void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(std::string &presetFilename
         inputImage->GetLabelSet()->AddLabel(label);
 
       labelElement = labelElement->NextSiblingElement("Label");
-      if (labelElement == NULL)
+      if (labelElement == nullptr)
         break;
     }
   }
@@ -113,11 +113,11 @@ void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(std::string &presetFilename
 
 TiXmlElement *mitk::LabelSetIOHelper::GetLabelAsTiXmlElement(Label *label)
 {
-  TiXmlElement *labelElem = new TiXmlElement("Label");
+  auto *labelElem = new TiXmlElement("Label");
 
   // add XML contents
   const PropertyList::PropertyMap *propmap = label->GetMap();
-  for (PropertyList::PropertyMap::const_iterator iter = propmap->begin(); iter != propmap->end(); ++iter)
+  for (auto iter = propmap->begin(); iter != propmap->end(); ++iter)
   {
     std::string key = iter->first;
     const BaseProperty *property = iter->second;
@@ -149,7 +149,7 @@ mitk::Label::Pointer mitk::LabelSetIOHelper::LoadLabelFromTiXmlDocument(TiXmlEle
 
 TiXmlElement *mitk::LabelSetIOHelper::PropertyToXmlElem(const std::string &key, const BaseProperty *property)
 {
-  TiXmlElement *keyelement = new TiXmlElement("property");
+  auto *keyelement = new TiXmlElement("property");
   keyelement->SetAttribute("key", key);
   keyelement->SetAttribute("type", property->GetNameOfClass());
 
@@ -165,10 +165,10 @@ TiXmlElement *mitk::LabelSetIOHelper::PropertyToXmlElem(const std::string &key, 
   if (allSerializers.size() > 1)
     MITK_WARN << "Multiple serializers found for " << property->GetNameOfClass() << "Using arbitrarily the first one.";
 
-  for (std::list<itk::LightObject::Pointer>::iterator iter = allSerializers.begin(); iter != allSerializers.end();
+  for (auto iter = allSerializers.begin(); iter != allSerializers.end();
        ++iter)
   {
-    if (BasePropertySerializer *serializer = dynamic_cast<BasePropertySerializer *>(iter->GetPointer()))
+    if (auto *serializer = dynamic_cast<BasePropertySerializer *>(iter->GetPointer()))
     {
       serializer->SetProperty(property);
       try
@@ -207,10 +207,10 @@ bool mitk::LabelSetIOHelper::PropertyFromXmlElem(std::string &key,
   if (allSerializers.size() > 1)
     MITK_WARN << "Multiple deserializers found for " << type << "Using arbitrarily the first one.";
 
-  for (std::list<itk::LightObject::Pointer>::iterator iter = allSerializers.begin(); iter != allSerializers.end();
+  for (auto iter = allSerializers.begin(); iter != allSerializers.end();
        ++iter)
   {
-    if (BasePropertySerializer *serializer = dynamic_cast<BasePropertySerializer *>(iter->GetPointer()))
+    if (auto *serializer = dynamic_cast<BasePropertySerializer *>(iter->GetPointer()))
     {
       try
       {

@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodeDisplacementFilter.h"
 #include "QmitkUSNavigationStepCombinedModality.h"
 
-#include "../USNavigationMarkerPlacement.h"
+#include "../QmitkUSNavigationMarkerPlacement.h"
 
 #include "mitkIOUtil.h"
 
@@ -36,15 +36,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkWarpScalar.h"
 
 QmitkUSNavigationStepTumourSelection::QmitkUSNavigationStepTumourSelection(QWidget* parent) :
-QmitkUSAbstractNavigationStep(parent),
-m_SecurityDistance(0),
-m_Interactor(mitk::USZonesInteractor::New()),
-m_NodeDisplacementFilter(mitk::NodeDisplacementFilter::New()),
-m_StateMachineFilename("USZoneInteractions.xml"),
-m_ReferenceSensorIndex(1),
-m_ListenerChangeNode(this, &QmitkUSNavigationStepTumourSelection::TumourNodeChanged),
-m_targetSelectionOptional(false),
-ui(new Ui::QmitkUSNavigationStepTumourSelection)
+  QmitkUSAbstractNavigationStep(parent),
+  m_targetSelectionOptional(false),
+  m_SecurityDistance(0),
+  m_Interactor(mitk::USZonesInteractor::New()),
+  m_NodeDisplacementFilter(mitk::NodeDisplacementFilter::New()),
+  m_StateMachineFilename("USZoneInteractions.xml"),
+  m_ReferenceSensorIndex(1),
+  m_ListenerChangeNode(this, &QmitkUSNavigationStepTumourSelection::TumourNodeChanged),
+  ui(new Ui::QmitkUSNavigationStepTumourSelection)
 {
   ui->setupUi(this);
 
@@ -76,7 +76,7 @@ QmitkUSNavigationStepTumourSelection::~QmitkUSNavigationStepTumourSelection()
 bool QmitkUSNavigationStepTumourSelection::OnStartStep()
 {
   m_TumourNode = this->GetNamedDerivedNodeAndCreate(
-    USNavigationMarkerPlacement::DATANAME_TUMOUR,
+    QmitkUSNavigationMarkerPlacement::DATANAME_TUMOUR,
     QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
   m_TumourNode->SetColor(m_SphereColor[0], m_SphereColor[1], m_SphereColor[2]);
 
@@ -87,8 +87,8 @@ bool QmitkUSNavigationStepTumourSelection::OnStartStep()
   this->GetDataStorage()->ChangedNodeEvent.AddListener(m_ListenerChangeNode);
 
   m_TargetSurfaceNode = this->GetNamedDerivedNodeAndCreate(
-    USNavigationMarkerPlacement::DATANAME_TARGETSURFACE,
-    USNavigationMarkerPlacement::DATANAME_TUMOUR);
+    QmitkUSNavigationMarkerPlacement::DATANAME_TARGETSURFACE,
+    QmitkUSNavigationMarkerPlacement::DATANAME_TUMOUR);
 
   // do not show the surface until this is requested
   m_TargetSurfaceNode->SetBoolProperty("visible", false);

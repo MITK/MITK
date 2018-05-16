@@ -58,12 +58,12 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_TestTracker = mitk::VirtualTrackingDevice::New();
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_TestTracker->CloseConnection();
   }

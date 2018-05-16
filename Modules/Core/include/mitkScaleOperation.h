@@ -44,7 +44,7 @@ namespace mitk
     /**
      * @brief ~ScaleOperation destructor.
      */
-    virtual ~ScaleOperation();
+    ~ScaleOperation() override;
 
     /**
      * @brief GetScaleFactor getter for the scale factor.

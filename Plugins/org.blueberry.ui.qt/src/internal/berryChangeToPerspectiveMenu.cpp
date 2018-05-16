@@ -176,12 +176,16 @@ SmartPointer<CommandContributionItemParameter> ChangeToPerspectiveMenu::GetItem(
 
   public:
 
-    berryObjectMacro(PluginCCIP, CommandContributionItemParameter, IPluginContribution)
+    typedef PluginCCIP Self;
+    static const char* GetStaticClassName() { return "PluginCCIP"; }
+    berryObjectTypeInfo(CommandContributionItemParameter, IPluginContribution)
 
     PluginCCIP(const IPerspectiveDescriptor::Pointer& v, IServiceLocator* serviceLocator,
                const QString& id, const QString& commandId, CommandContributionItem::Style style)
       : CommandContributionItemParameter(serviceLocator, id, commandId, style)
     {
+
+
       PerspectiveDescriptor::Pointer vd = v.Cast<PerspectiveDescriptor>();
       localId = vd->GetLocalId();
       pluginId = vd->GetPluginId();

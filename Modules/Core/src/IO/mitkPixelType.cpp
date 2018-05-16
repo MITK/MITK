@@ -105,21 +105,19 @@ mitk::PixelType::PixelType(const int componentType,
 
 bool mitk::PixelType::operator==(const mitk::PixelType &rhs) const
 {
-  MITK_DEBUG << "operator==" << std::endl;
+  bool returnValue = ( this->m_PixelType == rhs.m_PixelType
+                    && this->m_ComponentType == rhs.m_ComponentType
+                    && this->m_NumberOfComponents == rhs.m_NumberOfComponents
+                    && this->m_BytesPerComponent == rhs.m_BytesPerComponent );
 
-  MITK_DEBUG << "m_NumberOfComponents = " << m_NumberOfComponents << " " << rhs.m_NumberOfComponents << std::endl;
-  MITK_DEBUG << "m_BytesPerComponent = " << m_BytesPerComponent << " " << rhs.m_BytesPerComponent << std::endl;
-  MITK_DEBUG << "m_PixelTypeName = " << m_PixelTypeName << " " << rhs.m_PixelTypeName << std::endl;
-  MITK_DEBUG << "m_PixelType = " << m_PixelType << " " << rhs.m_PixelType << std::endl;
-
-  bool returnValue =
-    (this->m_PixelType == rhs.m_PixelType && this->m_ComponentType == rhs.m_ComponentType &&
-     this->m_NumberOfComponents == rhs.m_NumberOfComponents && this->m_BytesPerComponent == rhs.m_BytesPerComponent);
-
-  if (returnValue)
-    MITK_DEBUG << " [TRUE] ";
-  else
-    MITK_DEBUG << " [FALSE] ";
+ MITK_DEBUG << "|> mitk::PixelType::operator== rhs, lhs: \n"
+            << "| m_BytesPerComponent = " << m_BytesPerComponent << ", " << rhs.m_BytesPerComponent << '\n'
+            << "| m_NumberOfComponents = " << m_NumberOfComponents << ", " << rhs.m_NumberOfComponents << '\n'
+            << "| m_PixelTypeName = " << m_PixelTypeName << ", " << rhs.m_PixelTypeName << '\n'
+            << "| m_ComponentTypeName = " << m_ComponentTypeName << ", " << rhs.m_ComponentTypeName << '\n'
+            << "| m_PixelType = " << m_PixelType << ", " << rhs.m_PixelType << '\n'
+            << "| m_ComponentType = " << m_ComponentType << ", " << rhs.m_ComponentType
+            << ", returnValue = " << returnValue << (returnValue ? "[True]" : "[False]") << ". <|";
 
   return returnValue;
 }

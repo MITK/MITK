@@ -106,10 +106,8 @@ paths accordingly.
       Your Visual Studio should appear and by pressing F7 you start the compilation.
       This will clone the MITK source code, build it, and then start building your own
       project.
- <li> After the superbuild compilation has finished, close the solution file and start
-      the batch file "D:\AwesomeProject-superbuild\AwesomeProject-build\StartVS_debug.bat"
-      (or _release.bat if you built in Release mode) which opens the
-      "D:\AwesomeProject-superbuild\AweseomeProject-build\AwesomeProject.sln" solution.
+ <li> After the superbuild compilation has finished, close the superbuild solution file and start
+      the build solution file "D:\AwesomeProject-superbuild\AwesomeProject-build\AwesomeProject.sln"
  <li> Set the "AwesomeApp" project as start-up project (right click > "Set as StartUp
       Project") and press "F5" to start your MITK AwesomeApp.
 </ol>

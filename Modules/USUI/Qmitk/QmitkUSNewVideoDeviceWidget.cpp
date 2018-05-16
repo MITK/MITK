@@ -31,7 +31,7 @@ QmitkUSNewVideoDeviceWidget::QmitkUSNewVideoDeviceWidget(QWidget* parent,
   Qt::WindowFlags f)
   : QWidget(parent, f)
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
 }
 
@@ -206,7 +206,7 @@ void QmitkUSNewVideoDeviceWidget::OnClickedFinishedEditing()
 
 void QmitkUSNewVideoDeviceWidget::OnClickedCancel()
 {
-  m_TargetDevice = 0;
+  m_TargetDevice = nullptr;
   m_Active = false;
   CleanUpAfterCreatingNewDevice();
   CleanUpAfterEditingOfDevice();
@@ -231,7 +231,7 @@ void QmitkUSNewVideoDeviceWidget::OnDeviceTypeSelection()
 
 void QmitkUSNewVideoDeviceWidget::OnOpenFileButtonClicked()
 {
-  QString fileName = QFileDialog::getOpenFileName(NULL, "Open Video File");
+  QString fileName = QFileDialog::getOpenFileName(nullptr, "Open Video File");
   if (fileName.isNull())
   {
     return;
@@ -248,7 +248,11 @@ void QmitkUSNewVideoDeviceWidget::OnOpenFileButtonClicked()
 void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
 {
   // If no VideoDevice is given, throw an exception
-  if (device->GetDeviceClass().compare("org.mitk.modules.us.USVideoDevice") !=
+  if (device.IsNull())
+  {
+    mitkThrow() << "No device selected";
+  }
+  else if (device->GetDeviceClass().compare("org.mitk.modules.us.USVideoDevice") !=
     0)
   {
     // TODO Alert if bad path
@@ -275,7 +279,7 @@ void QmitkUSNewVideoDeviceWidget::CreateNewDevice()
   m_Controls->m_Model->setText("Unknown Model");
   m_Controls->m_Comment->setText("None");
 
-  m_TargetDevice = 0;
+  m_TargetDevice = nullptr;
   m_Active = true;
 }
 
@@ -286,16 +290,13 @@ QListWidgetItem* QmitkUSNewVideoDeviceWidget::ConstructItemFromDevice(
 {
   QListWidgetItem* result = new QListWidgetItem;
   std::string text =
-    device->GetDeviceManufacturer() + "|" + device->GetDeviceModel();
+    device->GetManufacturer() + "|" + device->GetName();
   result->setText(text.c_str());
   return result;
 }
 
 void QmitkUSNewVideoDeviceWidget::ChangeUIEditingUSVideoDevice()
 {
-  //deactivate the group box containing Videosource options because they should not be changed
-  m_Controls->m_GroupBoxVideoSource->setEnabled(false);
-
   //activate the groupbox contaning the options to edit the probes of the device and fill it with information
   m_Controls->m_GroupBoxEditProbes->setEnabled(true);
   std::vector<mitk::USProbe::Pointer> probes = m_TargetDevice->GetAllProbes();

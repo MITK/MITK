@@ -83,14 +83,8 @@ namespace itk{
  *
  */
 
-template< class TReferenceImagePixelType,
-          class TGradientImagePixelType,
-          class TOdfPixelType,
-          int NOrderL,
-          int NrOdfDirections>
-class AnalyticalDiffusionQballReconstructionImageFilter :
-        public ImageToImageFilter< Image< TReferenceImagePixelType, 3 >,
-        Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > >
+template< class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int ShOrder, int NrOdfDirections>
+class AnalyticalDiffusionQballReconstructionImageFilter : public ImageToImageFilter< Image< TReferenceImagePixelType, 3 >, Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > >
 {
 
 public:
@@ -135,7 +129,7 @@ public:
 
     typedef OdfImageType                              OutputImageType;
 
-    typedef Image< Vector< TOdfPixelType, (NOrderL*NOrderL + NOrderL + 2)/2 + NOrderL >, 3 > CoefficientImageType;
+    typedef Image< Vector< TOdfPixelType, (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder >, 3 > CoefficientImageType;
 
     typedef Image< BZeroPixelType, 3 >                BZeroImageType;
 
@@ -150,12 +144,6 @@ public:
    * Reference image and a vector length parameter of \c n (number of
    * gradient directions)*/
     typedef VectorImage< GradientPixelType, 3 >      GradientImagesType;
-
-    /** Holds the ODF reconstruction matrix */
-    typedef vnl_matrix< TOdfPixelType >*
-    OdfReconstructionMatrixType;
-
-    typedef vnl_matrix< double >                     CoefficientMatrixType;
 
     /** Holds each magnetic field gradient used to acquire one DWImage */
     typedef vnl_vector_fixed< double, 3 >            GradientDirectionType;
@@ -185,10 +173,7 @@ public:
         return m_GradientDirectionContainer->ElementAt( idx+1 );
     }
 
-    static void tofile2(vnl_matrix<double> *A, std::string fname);
-    static void Cart2Sph(double x, double y, double z, double* cart);
-    static double Yj(int m, int k, double theta, double phi, bool useMRtrixBasis = false);
-    double Legendre0(int l);
+    static void tofile2(vnl_matrix<float> *A, std::string fname);
 
     OdfPixelType Normalize(OdfPixelType odf, typename NumericTraits<ReferencePixelType>::AccumulateType b0 );
     vnl_vector<TOdfPixelType> PreNormalize( vnl_vector<TOdfPixelType> vec, typename NumericTraits<ReferencePixelType>::AccumulateType b0  );
@@ -239,19 +224,19 @@ public:
 
 protected:
     AnalyticalDiffusionQballReconstructionImageFilter();
-    ~AnalyticalDiffusionQballReconstructionImageFilter() {};
-    void PrintSelf(std::ostream& os, Indent indent) const;
+    ~AnalyticalDiffusionQballReconstructionImageFilter() override {};
+    void PrintSelf(std::ostream& os, Indent indent) const override;
 
     void ComputeReconstructionMatrix();
-    void BeforeThreadedGenerateData();
+    void BeforeThreadedGenerateData() override;
     void ThreadedGenerateData( const
-                               OutputImageRegionType &outputRegionForThread, ThreadIdType);
+                               OutputImageRegionType &outputRegionForThread, ThreadIdType) override;
 
 private:
 
-    OdfReconstructionMatrixType                       m_ReconstructionMatrix;
-    OdfReconstructionMatrixType                       m_CoeffReconstructionMatrix;
-    OdfReconstructionMatrixType                       m_SphericalHarmonicBasisMatrix;
+    vnl_matrix< float >                       m_ReconstructionMatrix;
+    vnl_matrix< float >                       m_CoeffReconstructionMatrix;
+    vnl_matrix< float >                       m_SphericalHarmonicBasisMatrix;
     /** container to hold gradient directions */
     GradientDirectionContainerType::Pointer           m_GradientDirectionContainer;
     /** Number of gradient measurements */
@@ -266,9 +251,7 @@ private:
     double                                            m_Lambda;
     bool                                              m_DirectionsDuplicated;
     Normalization                                     m_NormalizationMethod;
-    int                                               m_NumberCoefficients;
-    vnl_matrix<double>*                               m_B_t;
-    vnl_vector<double>*                               m_LP;
+    unsigned int                                      m_NumberCoefficients;
     FloatImageType::Pointer                           m_ODFSumImage;
     typename CoefficientImageType::Pointer            m_CoefficientImage;
     TOdfPixelType                                     m_Delta1;

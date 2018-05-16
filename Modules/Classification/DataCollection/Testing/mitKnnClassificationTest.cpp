@@ -1,4 +1,3 @@
-#include <mitkDataNodeFactory.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkIOUtil.h>
 #include <mitkClassification.h>

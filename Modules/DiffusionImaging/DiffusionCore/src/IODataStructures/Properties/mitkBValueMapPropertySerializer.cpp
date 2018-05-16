@@ -52,7 +52,7 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  virtual TiXmlElement* Serialize() override
+  TiXmlElement* Serialize() override
   {
     if (const BValueMapProperty* prop = dynamic_cast<const BValueMapProperty*>(m_Property.GetPointer()))
     {
@@ -95,7 +95,7 @@ public:
   }
 
 
-  virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
+  BaseProperty::Pointer Deserialize(TiXmlElement* element) override
   {
     if (!element) return nullptr;
 
@@ -120,7 +120,7 @@ public:
 protected:
 
   BValueMapPropertySerializer(){}
-  virtual ~BValueMapPropertySerializer() {}
+  ~BValueMapPropertySerializer() override {}
 };
 
 } // namespace

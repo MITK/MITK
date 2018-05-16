@@ -92,8 +92,8 @@ int mitkDispatcherTest(int /*argc*/, char * /*argv*/ [])
   num = renderer->GetDispatcher()->GetNumberOfInteractors();
   MITK_TEST_CONDITION_REQUIRED(num == 1, "07 Number of registered Interactors " << num << " , expected 1");
 
-  // Setting DataNode in Interactor to NULL, should remove Interactor from Dispatcher
-  ei2->SetDataNode(NULL);
+  // Setting DataNode in Interactor to nullptr, should remove Interactor from Dispatcher
+  ei2->SetDataNode(nullptr);
   num = renderer->GetDispatcher()->GetNumberOfInteractors();
   MITK_TEST_CONDITION_REQUIRED(num == 0, "08 Number of registered Interactors " << num << " , expected 0");
 

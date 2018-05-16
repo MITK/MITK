@@ -26,7 +26,7 @@ namespace mitk
   {
   public:
     PropertyAliases();
-    ~PropertyAliases();
+    ~PropertyAliases() override;
 
     bool AddAlias(const std::string &propertyName, const std::string &alias, const std::string &className) override;
     std::vector<std::string> GetAliases(const std::string &propertyName, const std::string &className) override;

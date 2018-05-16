@@ -42,7 +42,7 @@ namespace mitk {
     itkNewMacro(USImageLoggingFilter);
 
     /** This method is internally called by the Update() mechanism of the pipeline. Don't call it directly. */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     /** Adds a message to the current (last logged) image. This message is internally stored and written to the
      *  harddisc when SaveImages(...) is called.
@@ -79,7 +79,7 @@ namespace mitk {
 
   protected:
     USImageLoggingFilter();
-    virtual ~USImageLoggingFilter();
+    ~USImageLoggingFilter() override;
     typedef std::vector<mitk::Image::Pointer> ImageCollection;
     mitk::RealTimeClock::Pointer m_SystemTimeClock;  ///< system time clock for system time tag
 

@@ -1,0 +1,38 @@
+/**
+\page org_mitk_views_fiberclustering Fiber Clustering
+
+Cluster fibers using an extended version of the QuickBundles method (see [1,2]). Corrseponding command line tool is MitkFiberClustering.
+
+\section SecInput Input Data
+
+- Tractogram: Input streamlines to be clustered.
+- Input Centroids: Optionally input a set of streamlines around which the streamlines of the input tractograms are clustered. No new clusters are created in this case. Each input streamline is assigned to the neares centroid.
+
+\section SecParams Parameters
+
+- Cluster Size: Metric distance threshold for a streamline to be assigned to a cluster (cluster size).
+- Fiber Points: Resample the input streamlines to the given number of points. For scalar map and anatomical metrics this value should be much larger than for streamline shape-based metrics.
+- Min. Fibers per Cluster: Clusters with a smaller number of streamlines are discarded.
+- Max. Clusters: Only the N largest clusters are retained.
+- Merge Duplicate Clusters: Merge clusters based on the distance of their respective centroids using the given metric threshold. No merging is performed for a metric threshold of 0.
+- Output Centroids: Output the final cluster centroids.
+
+\section SecMetrics Metrics
+
+All metrics can be combined using the average weighted metric value.
+
+- Euclidean: Equivalent to the the MDF of [1]. Command line tool metric string EU_MEAN.
+- Euclidean STDEV: Standard deviation of the point-wise euclidean distance. Fibers that run parallel have a low distance with this metric, regardless of their absolute distance. Command line tool metric string EU_STD.
+- Euclidean Maximum: Use maximum value of the point-weise euclidean distance. Command line tool metric string EU_MAX.
+- Streamline Length: Absolute streamline length difference. Command line tool metric string LENGTH.
+- Anatomical: Metric based on white matter parcellation histograms along the tracts (see [3]). Command line tool metric string MAP.
+- Scalar Map: Use the average point-wise scalar map value differences (e.g. FA) of two streamlines as distance metric. Command line tool metric string ANAT.
+
+[1] Garyfallidis, Eleftherios, Matthew Brett, Marta Morgado Correia, Guy B. Williams, and Ian Nimmo-Smith. “QuickBundles, a Method for Tractography Simplification.” Frontiers in Neuroscience 6 (2012).
+
+[2] Garyfallidis, Eleftherios, Marc-Alexandre Côté, François Rheault, and Maxime Descoteaux. “QuickBundlesX: Sequential Clustering of Millions of Streamlines in Multiple Levels of Detail at Record Execution Time.” ISMRM2016 (Singapore), 2016.
+
+[3] Siless, Viviana, Ken Chang, Bruce Fischl, and Anastasia Yendiki. “AnatomiCuts: Hierarchical Clustering of Tractography Streamlines Based on Anatomical Similarity.” NeuroImage 166 (February 1, 2018): 32–45. https://doi.org/10.1016/j.neuroimage.2017.10.058.
+
+
+*/

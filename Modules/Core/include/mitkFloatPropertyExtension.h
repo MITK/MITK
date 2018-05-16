@@ -51,7 +51,7 @@ namespace mitk
     FloatPropertyExtension();
     FloatPropertyExtension(float minimum, float maximum, float singleStep = 0.1f, int decimals = 2);
 
-    ~FloatPropertyExtension();
+    ~FloatPropertyExtension() override;
 
     struct Impl;
     Impl *m_Impl;

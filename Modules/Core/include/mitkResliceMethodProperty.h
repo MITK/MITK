@@ -49,7 +49,7 @@ namespace mitk
     // purposely not implemented
     ResliceMethodProperty &operator=(const ResliceMethodProperty &);
 
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
   };
 
 #ifdef _MSC_VER

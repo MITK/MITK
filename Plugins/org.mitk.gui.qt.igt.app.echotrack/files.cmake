@@ -5,8 +5,8 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   org_mbi_gui_qt_usnavigation_Activator.cpp
   #USNavigation.cpp //not functional anymore. Delete code?
-  UltrasoundCalibration.cpp
-  USNavigationMarkerPlacement.cpp
+  QmitkUltrasoundCalibration.cpp
+  QmitkUSNavigationMarkerPlacement.cpp
 
   QmitkUSNavigationPerspective.cpp
 
@@ -51,8 +51,8 @@ set(INTERNAL_CPP_FILES
 
 set(UI_FILES
   #src/internal/USNavigationControls.ui //not functional anymore. Delete code?
-  src/internal/UltrasoundCalibrationControls.ui
-  src/internal/USNavigationMarkerPlacement.ui
+  src/internal/QmitkUltrasoundCalibrationControls.ui
+  src/internal/QmitkUSNavigationMarkerPlacement.ui
 
   src/internal/Widgets/QmitkUSCombinedModalityCreationWidget.ui
   src/internal/Widgets/QmitkUSCombinedModalityEditWidget.ui
@@ -73,8 +73,8 @@ set(UI_FILES
 set(MOC_H_FILES
   src/internal/org_mbi_gui_qt_usnavigation_Activator.h
   #src/internal/USNavigation.h //not functional anymore. Delete code?
-  src/internal/UltrasoundCalibration.h
-  src/internal/USNavigationMarkerPlacement.h
+  src/internal/QmitkUltrasoundCalibration.h
+  src/internal/QmitkUSNavigationMarkerPlacement.h
   src/internal/QmitkUSZonesDataModel.h
   src/internal/QmitkUSNavigationCalibrationsDataModel.h
   src/internal/QmitkUSZoneManagementColorDialogDelegate.h
@@ -108,8 +108,7 @@ set(MOC_H_FILES
 # for example the icon used in the menu and tabs for the
 # plug-in views in the workbench
 set(CACHED_RESOURCE_FILES
-  # resources/icon.xpm //not functional anymore. Delete code?
-  resources/icon2.xpm
+  resources/icon_US_navigation.svg
   resources/icon_US_calibration.svg
   plugin.xml
 )

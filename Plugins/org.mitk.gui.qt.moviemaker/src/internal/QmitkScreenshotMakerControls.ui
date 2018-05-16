@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>430</width>
+    <width>315</width>
     <height>368</height>
    </rect>
   </property>
@@ -14,125 +14,42 @@
    <string>ScreenshotMaker</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="leftMargin">
-    <number>5</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>5</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
-   </property>
-   <item>
-    <widget class="QFrame" name="frame_2">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <property name="margin">
-       <number>0</number>
-      </property>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QFrame" name="frame">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="margin">
-       <number>0</number>
-      </property>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QFrame" name="frame_4">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <property name="margin">
-       <number>0</number>
-      </property>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QFrame" name="frame_5">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_5">
-      <property name="margin">
-       <number>0</number>
-      </property>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QFrame" name="frame_3">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <property name="margin">
-       <number>0</number>
-      </property>
-     </layout>
-    </widget>
-   </item>
    <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
       <string>2D Screenshots</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
+      <item row="1" column="0" colspan="2">
+       <widget class="QComboBox" name="m_DirectionBox">
+        <item>
+         <property name="text">
+          <string>axial</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>coronal</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>sagittal</string>
+         </property>
+        </item>
+       </widget>
+      </item>
       <item row="0" column="0">
-       <widget class="QToolButton" name="btnScreenshot">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font/>
-        </property>
-        <property name="toolTip">
-         <string>Writes a screenshot of the selected (last clicked) render window.</string>
-        </property>
+       <widget class="QPushButton" name="btnScreenshot">
         <property name="text">
-         <string>Single Screenshot</string>
+         <string>Single</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
        <widget class="QPushButton" name="m_Shot">
-        <property name="toolTip">
-         <string>Writes screenshots of the axial, sagittal and coronal render window.</string>
-        </property>
         <property name="text">
-         <string>Multiplanar Screenshot</string>
+         <string>Multiplanar</string>
         </property>
        </widget>
       </item>
@@ -142,57 +59,49 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>3D Screenshots</string>
+      <string>3D Screenshots (High-res)</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
-       <widget class="QToolButton" name="m_HRScreenshot">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font/>
-        </property>
-        <property name="toolTip">
-         <string>Writes a high resolution screenshot of the 3D render window.</string>
-        </property>
+       <widget class="QPushButton" name="m_HRScreenshot">
         <property name="text">
-         <string>High-res Single Screenshot</string>
+         <string>Single</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
        <widget class="QPushButton" name="m_AllViews">
-        <property name="toolTip">
-         <string>Writes screenshots of the 3D render window from 3 different angles.</string>
-        </property>
         <property name="text">
-         <string>High-res Multiplanar Screenshot</string>
+         <string>Multiplanar</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Upsampling:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QSpinBox" name="m_MagFactor">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="value">
-         <number>5</number>
-        </property>
-       </widget>
+      <item row="1" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Upsampling:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="m_MagFactor">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="value">
+           <number>4</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -202,19 +111,19 @@
      <property name="title">
       <string>Options</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
        <widget class="QPushButton" name="m_View1">
         <property name="minimumSize">
          <size>
           <width>30</width>
-          <height>0</height>
+          <height>30</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>10</width>
-          <height>16777215</height>
+          <width>30</width>
+          <height>30</height>
          </size>
         </property>
         <property name="toolTip">
@@ -225,12 +134,18 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
+      <item>
        <widget class="QPushButton" name="m_View2">
+        <property name="minimumSize">
+         <size>
+          <width>30</width>
+          <height>30</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
           <width>30</width>
-          <height>16777215</height>
+          <height>30</height>
          </size>
         </property>
         <property name="toolTip">
@@ -241,12 +156,18 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
+      <item>
        <widget class="QPushButton" name="m_View3">
+        <property name="minimumSize">
+         <size>
+          <width>30</width>
+          <height>30</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
           <width>30</width>
-          <height>16777215</height>
+          <height>30</height>
          </size>
         </property>
         <property name="toolTip">
@@ -257,28 +178,40 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>308</width>
-          <height>23</height>
+          <width>36</width>
+          <height>20</height>
          </size>
         </property>
        </spacer>
       </item>
-      <item row="0" column="4">
+      <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>Background Color:</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="5">
+      <item>
        <widget class="QPushButton" name="m_BackgroundColor">
+        <property name="minimumSize">
+         <size>
+          <width>30</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>30</width>
+          <height>30</height>
+         </size>
+        </property>
         <property name="text">
          <string/>
         </property>

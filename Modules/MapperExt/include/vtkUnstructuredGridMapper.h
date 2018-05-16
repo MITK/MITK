@@ -56,7 +56,7 @@ public:
 
   // Description:
   // Get the mtime also considering the lookup table.
-  unsigned long GetMTime() override;
+  vtkMTimeType GetMTime() override;
 
   // Description:
   // Set the Input of this mapper.
@@ -67,17 +67,17 @@ public:
 
 protected:
   vtkUnstructuredGridMapper();
-  ~vtkUnstructuredGridMapper();
+  ~vtkUnstructuredGridMapper() override;
 
   vtkGeometryFilter *GeometryExtractor;
   vtkPolyDataMapper *PolyDataMapper;
 
   mitk::BoundingObject::Pointer m_BoundingObject;
 
-  virtual void ReportReferences(vtkGarbageCollector *) override;
+  void ReportReferences(vtkGarbageCollector *) override;
 
   // see algorithm for more info
-  virtual int FillInputPortInformation(int port, vtkInformation *info) override;
+  int FillInputPortInformation(int port, vtkInformation *info) override;
 
 private:
   vtkUnstructuredGridMapper(const vtkUnstructuredGridMapper &); // Not implemented.

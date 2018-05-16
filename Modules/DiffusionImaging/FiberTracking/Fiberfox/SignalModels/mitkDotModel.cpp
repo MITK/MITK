@@ -32,13 +32,13 @@ DotModel< ScalarType >::~DotModel()
 }
 
 template< class ScalarType >
-ScalarType DotModel< ScalarType >::SimulateMeasurement(unsigned int /*dir*/)
+ScalarType DotModel< ScalarType >::SimulateMeasurement(unsigned int /*dir*/, GradientType& )
 {
     return 1;
 }
 
 template< class ScalarType >
-typename DotModel< ScalarType >::PixelType DotModel< ScalarType >::SimulateMeasurement()
+typename DotModel< ScalarType >::PixelType DotModel< ScalarType >::SimulateMeasurement(GradientType& )
 {
     PixelType signal;
     signal.SetSize(this->m_GradientList.size());

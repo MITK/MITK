@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkSphereInterpolator.h>
+#include <mitkFiberBundle.h>
 
 // ITK
 #include <itkProcessObject.h>
@@ -35,9 +36,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk{
 
 /**
-* \brief Performes global fiber tractography on the input Q-Ball or tensor image (Gibbs tracking, Reisert 2010).   */
+* \brief Performes global fiber tractography on the input ODF or tensor image (Gibbs tracking, Reisert 2010).   */
 
-template< class ItkQBallImageType >
+template< class ItkOdfImageType >
 class GibbsTrackingFilter : public ProcessObject
 {
 public:
@@ -51,7 +52,7 @@ public:
     itkTypeMacro( GibbsTrackingFilter, ProcessObject )
 
     typedef Image< DiffusionTensor3D<float>, 3 >    ItkTensorImage;
-    typedef typename ItkQBallImageType::Pointer     ItkQBallImageTypePointer;
+    typedef typename ItkOdfImageType::Pointer       ItkOdfImageTypePointer;
     typedef Image< float, 3 >                       ItkFloatImageType;
     typedef vtkSmartPointer< vtkPolyData >          FiberPolyDataType;
 
@@ -87,12 +88,14 @@ public:
     itkGetMacro( IsInValidState, bool)
     FiberPolyDataType GetFiberBundle();             ///< Output fibers
 
+    void SetDicomProperties(mitk::FiberBundle::Pointer fib);
+
     /** Input images. */
-    itkSetMacro(QBallImage, typename ItkQBallImageType::Pointer)
+    itkSetMacro(OdfImage, typename ItkOdfImageType::Pointer)
     itkSetMacro(MaskImage, ItkFloatImageType::Pointer)
     itkSetMacro(TensorImage, ItkTensorImage::Pointer)
 
-    virtual void Update() override{
+    void Update() override{
         this->GenerateData();
     }
 
@@ -101,14 +104,14 @@ protected:
     void GenerateData() override;
 
     GibbsTrackingFilter();
-    virtual ~GibbsTrackingFilter();
+    ~GibbsTrackingFilter() override;
     void EstimateParticleWeight();
     void PrepareMaskImage();
     bool LoadParameters();
     bool SaveParameters();
 
     // Input Images
-    typename ItkQBallImageType::Pointer m_QBallImage;
+    typename ItkOdfImageType::Pointer m_OdfImage;
     typename ItkFloatImageType::Pointer m_MaskImage;
     typename ItkTensorImage::Pointer    m_TensorImage;
 
@@ -130,7 +133,7 @@ protected:
     volatile bool   m_BuildFibers;          ///< set flag to generate fibers from particle grid
     float           m_ProposalAcceptance;   ///< proposal acceptance rate (0-1)
     float           m_CurvatureThreshold;   ///< curvature threshold in radians (1 -> no curvature is accepted, -1 all curvature angles are accepted)
-    bool            m_DuplicateImage;       ///< generates a working copy of the qball image so that the original image won't be changed by the mean subtraction
+    bool            m_DuplicateImage;       ///< generates a working copy of the Odf image so that the original image won't be changed by the mean subtraction
     int             m_NumParticles;         ///< current number of particles in grid
     int             m_NumConnections;       ///< current number of connections between particles in grid
     int             m_RandomSeed;           ///< seed value for random generator (-1 for standard seeding)

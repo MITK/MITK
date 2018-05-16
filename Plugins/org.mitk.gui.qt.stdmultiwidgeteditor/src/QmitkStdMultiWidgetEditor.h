@@ -42,7 +42,7 @@ public:
   static const QString EDITOR_ID;
 
   QmitkStdMultiWidgetEditor();
-  ~QmitkStdMultiWidgetEditor();
+  ~QmitkStdMultiWidgetEditor() override;
 
   QmitkStdMultiWidget* GetStdMultiWidget();
 

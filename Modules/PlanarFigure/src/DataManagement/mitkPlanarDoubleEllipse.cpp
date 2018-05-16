@@ -250,7 +250,7 @@ bool mitk::PlanarDoubleEllipse::SetControlPoint(unsigned int index, const Point2
 
 bool mitk::PlanarDoubleEllipse::Equals(const mitk::PlanarFigure &other) const
 {
-  const mitk::PlanarDoubleEllipse *otherDoubleEllipse = dynamic_cast<const mitk::PlanarDoubleEllipse *>(&other);
+  const auto *otherDoubleEllipse = dynamic_cast<const mitk::PlanarDoubleEllipse *>(&other);
   if (otherDoubleEllipse)
   {
     if (this->m_ConstrainCircle != otherDoubleEllipse->m_ConstrainCircle)

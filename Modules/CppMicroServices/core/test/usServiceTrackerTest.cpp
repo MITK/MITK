@@ -76,19 +76,19 @@ public:
     : m_context(context)
   {}
 
-  virtual MyInterfaceOne* AddingService(const ServiceReferenceType& reference) override
+  MyInterfaceOne* AddingService(const ServiceReferenceType& reference) override
   {
     US_TEST_CONDITION_REQUIRED(reference, "AddingService() valid reference")
     return m_context->GetService(reference);
   }
 
-  virtual void ModifiedService(const ServiceReferenceType& reference, MyInterfaceOne* service) override
+  void ModifiedService(const ServiceReferenceType& reference, MyInterfaceOne* service) override
   {
     US_TEST_CONDITION(reference, "ModifiedService() valid reference")
     US_TEST_CONDITION(service, "ModifiedService() valid service")
   }
 
-  virtual void RemovedService(const ServiceReferenceType& reference, MyInterfaceOne* service) override
+  void RemovedService(const ServiceReferenceType& reference, MyInterfaceOne* service) override
   {
     US_TEST_CONDITION(reference, "RemovedService() valid reference")
     US_TEST_CONDITION(service, "RemovedService() valid service")
@@ -152,13 +152,13 @@ void TestServiceTracker()
   std::string s1("us::TestModuleSService");
   ServiceReferenceU servref = mc->GetServiceReference(s1 + "0");
 
-  US_TEST_CONDITION_REQUIRED(servref != 0, "Test if registered service of id us::TestModuleSService0");
+  US_TEST_CONDITION_REQUIRED(servref != nullptr, "Test if registered service of id us::TestModuleSService0");
 
   ServiceReference<ServiceControlInterface> servCtrlRef = mc->GetServiceReference<ServiceControlInterface>();
-  US_TEST_CONDITION_REQUIRED(servCtrlRef != 0, "Test if constrol service was registered");
+  US_TEST_CONDITION_REQUIRED(servCtrlRef != nullptr, "Test if constrol service was registered");
 
   ServiceControlInterface* serviceController = mc->GetService(servCtrlRef);
-  US_TEST_CONDITION_REQUIRED(serviceController != 0, "Test valid service controller");
+  US_TEST_CONDITION_REQUIRED(serviceController != nullptr, "Test valid service controller");
 
   std::unique_ptr<ServiceTracker<void>> st1(new ServiceTracker<void>(mc, servref));
 

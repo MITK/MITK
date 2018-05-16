@@ -64,15 +64,15 @@ void mitk::PointSetWriterService::Write()
 
   TiXmlDocument doc;
 
-  TiXmlDeclaration *decl = new TiXmlDeclaration(
+  auto *decl = new TiXmlDeclaration(
     "1.0", "UTF-8", ""); // TODO what to write here? encoding? standalone would mean that we provide a DTD somewhere...
   doc.LinkEndChild(decl);
 
-  TiXmlElement *rootNode = new TiXmlElement(XML_POINT_SET_FILE);
+  auto *rootNode = new TiXmlElement(XML_POINT_SET_FILE);
   doc.LinkEndChild(rootNode);
 
-  TiXmlElement *versionNode = new TiXmlElement(XML_FILE_VERSION);
-  TiXmlText *versionText = new TiXmlText(VERSION_STRING);
+  auto *versionNode = new TiXmlElement(XML_FILE_VERSION);
+  auto *versionText = new TiXmlText(VERSION_STRING);
   versionNode->LinkEndChild(versionText);
   rootNode->LinkEndChild(versionNode);
 
@@ -103,15 +103,15 @@ TiXmlElement *mitk::PointSetWriterService::ToXML(const mitk::PointSet *pointSet)
   // the following is rather bloated and could be expressed in more compact XML
   // (e.g. using attributes instead of tags for x/y/z). The current format is
   // kept to be compatible with the previous writer.
-  TiXmlElement *pointSetElement = new TiXmlElement(XML_POINT_SET);
+  auto *pointSetElement = new TiXmlElement(XML_POINT_SET);
   unsigned int timecount = pointSet->GetTimeSteps();
 
   for (unsigned int i = 0; i < timecount; i++)
   {
-    TiXmlElement *timeSeriesElement = new TiXmlElement(XML_TIME_SERIES);
+    auto *timeSeriesElement = new TiXmlElement(XML_TIME_SERIES);
     pointSetElement->LinkEndChild(timeSeriesElement);
 
-    TiXmlElement *timeSeriesIDElement = new TiXmlElement(XML_TIME_SERIES_ID);
+    auto *timeSeriesIDElement = new TiXmlElement(XML_TIME_SERIES_ID);
     timeSeriesElement->LinkEndChild(timeSeriesIDElement);
     TiXmlText *timeSeriesIDText = new TiXmlText(ConvertToString(i));
     timeSeriesIDElement->LinkEndChild(timeSeriesIDText);
@@ -119,7 +119,7 @@ TiXmlElement *mitk::PointSetWriterService::ToXML(const mitk::PointSet *pointSet)
     PointSet::PointsContainer *pointsContainer = pointSet->GetPointSet(i)->GetPoints();
     PointSet::PointsContainer::Iterator it;
 
-    Geometry3D *geometry = dynamic_cast<Geometry3D *>(pointSet->GetGeometry(i));
+    auto *geometry = dynamic_cast<Geometry3D *>(pointSet->GetGeometry(i));
     if (geometry == nullptr)
     {
       MITK_WARN << "Writing a PointSet with something other that a Geometry3D. This is not foreseen and not handled.";
@@ -133,32 +133,32 @@ TiXmlElement *mitk::PointSetWriterService::ToXML(const mitk::PointSet *pointSet)
 
     for (it = pointsContainer->Begin(); it != pointsContainer->End(); ++it)
     {
-      TiXmlElement *pointElement = new TiXmlElement(XML_POINT);
+      auto *pointElement = new TiXmlElement(XML_POINT);
       timeSeriesElement->LinkEndChild(pointElement);
 
-      TiXmlElement *pointIDElement = new TiXmlElement(XML_ID);
+      auto *pointIDElement = new TiXmlElement(XML_ID);
       TiXmlText *pointIDText = new TiXmlText(ConvertToString(it->Index()));
       pointIDElement->LinkEndChild(pointIDText);
       pointElement->LinkEndChild(pointIDElement);
 
       mitk::PointSet::PointType point = it->Value();
 
-      TiXmlElement *pointSpecElement = new TiXmlElement(XML_SPEC);
+      auto *pointSpecElement = new TiXmlElement(XML_SPEC);
       TiXmlText *pointSpecText = new TiXmlText(ConvertToString(pointSet->GetSpecificationTypeInfo(it->Index(), i)));
       pointSpecElement->LinkEndChild(pointSpecText);
       pointElement->LinkEndChild(pointSpecElement);
 
-      TiXmlElement *pointXElement = new TiXmlElement(XML_X);
+      auto *pointXElement = new TiXmlElement(XML_X);
       TiXmlText *pointXText = new TiXmlText(ConvertToString(point[0]));
       pointXElement->LinkEndChild(pointXText);
       pointElement->LinkEndChild(pointXElement);
 
-      TiXmlElement *pointYElement = new TiXmlElement(XML_Y);
+      auto *pointYElement = new TiXmlElement(XML_Y);
       TiXmlText *pointYText = new TiXmlText(ConvertToString(point[1]));
       pointYElement->LinkEndChild(pointYText);
       pointElement->LinkEndChild(pointYElement);
 
-      TiXmlElement *pointZElement = new TiXmlElement(XML_Z);
+      auto *pointZElement = new TiXmlElement(XML_Z);
       TiXmlText *pointZText = new TiXmlText(ConvertToString(point[2]));
       pointZElement->LinkEndChild(pointZText);
       pointElement->LinkEndChild(pointZElement);

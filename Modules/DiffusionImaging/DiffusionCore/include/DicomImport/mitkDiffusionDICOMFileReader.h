@@ -27,7 +27,7 @@ namespace mitk
 {
 
 class MITKDIFFUSIONCORE_EXPORT DiffusionDICOMFileReader
-        : public ClassicDICOMSeriesReader
+    : public ClassicDICOMSeriesReader
 {
 public:
 
@@ -36,30 +36,49 @@ public:
 
   itkNewMacro( DiffusionDICOMFileReader )
 
-  virtual void AnalyzeInputFiles() override;
+  void AnalyzeInputFiles() override;
 
-  virtual bool LoadImages() override;
+  bool LoadImages() override;
 
-  virtual bool CanHandleFile(const std::string &filename) override;
+  bool CanHandleFile(const std::string &filename) override;
 
   void SetResolveMosaic( bool flag )
   {
     m_ResolveMosaic = flag;
   }
 
+  std::string GetStudyName(int i){ return m_Study_names.at(i); }
+  std::string GetSeriesName(int i){ return m_Series_names.at(i); }
+
+  std::vector<std::string> sop_instance_uids() const;
+  std::vector<std::string> frame_of_reference_uids() const;
+  std::vector<std::string> series_instance_uids() const;
+  std::vector<std::string> study_instance_uids() const;
+  std::vector<std::string> patient_names() const;
+  std::vector<std::string> patient_ids() const;
+
 protected:
-    DiffusionDICOMFileReader();
-    virtual ~DiffusionDICOMFileReader();
+  DiffusionDICOMFileReader();
+  ~DiffusionDICOMFileReader() override;
 
-    bool LoadSingleOutputImage( DiffusionHeaderDICOMFileReader::DICOMHeaderListType, DICOMImageBlockDescriptor&, bool);
+  bool LoadSingleOutputImage( DiffusionHeaderDICOMFileReader::DICOMHeaderListType, DICOMImageBlockDescriptor&, bool);
 
-    //mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType m_RetrievedHeader;
+  //mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType m_RetrievedHeader;
 
-    std::vector< mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType > m_OutputHeaderContainer;
-    std::vector< mitk::DiffusionHeaderDICOMFileReader::Pointer> m_OutputReaderContainer;
-    std::vector< bool > m_IsMosaicData;
+  std::vector< mitk::DiffusionHeaderDICOMFileReader::DICOMHeaderListType > m_OutputHeaderContainer;
+  std::vector< mitk::DiffusionHeaderDICOMFileReader::Pointer> m_OutputReaderContainer;
+  std::vector< bool > m_IsMosaicData;
+  std::vector< std::string > m_Study_names;
+  std::vector< std::string > m_Series_names;
 
-    bool m_ResolveMosaic;
+  bool m_ResolveMosaic;
+
+  std::vector< std::string > m_sop_instance_uids;
+  std::vector< std::string > m_frame_of_reference_uids;
+  std::vector< std::string > m_series_instance_uids;
+  std::vector< std::string > m_study_instance_uids;
+  std::vector< std::string > m_patient_names;
+  std::vector< std::string > m_patient_ids;
 };
 
 }

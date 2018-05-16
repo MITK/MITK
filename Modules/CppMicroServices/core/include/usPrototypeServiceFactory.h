@@ -66,8 +66,8 @@ struct PrototypeServiceFactory : public ServiceFactory
    * ServiceObjects::GetService(). The factory can then return a specific service object for the caller.
    * The framework checks that the returned service object is valid. If the returned service
    * object is empty or does not contain entries for all the interfaces named when the service
-   * was registered, a warning is issued and NULL is returned to the caller. If this
-   * method throws an exception, a warning is issued and NULL is returned to the caller.
+   * was registered, a warning is issued and nullptr is returned to the caller. If this
+   * method throws an exception, a warning is issued and nullptr is returned to the caller.
    *
    * @param module The module requesting the service.
    * @param registration The ServiceRegistrationBase object for the requested service.
@@ -77,7 +77,7 @@ struct PrototypeServiceFactory : public ServiceFactory
    * @see ServiceObjects#GetService()
    * @see InterfaceMap
    */
-  virtual InterfaceMap GetService(Module* module, const ServiceRegistrationBase& registration) = 0;
+  InterfaceMap GetService(Module* module, const ServiceRegistrationBase& registration) override = 0;
 
   /**
    * Releases a service object created for a caller.
@@ -92,8 +92,8 @@ struct PrototypeServiceFactory : public ServiceFactory
    *
    * @see ServiceObjects::UngetService()
    */
-  virtual void UngetService(Module* module, const ServiceRegistrationBase& registration,
-                            const InterfaceMap& service) = 0;
+  void UngetService(Module* module, const ServiceRegistrationBase& registration,
+                            const InterfaceMap& service) override = 0;
 
 };
 

@@ -96,7 +96,7 @@ Read()
   else
   {
     const std::string& locale = "C";
-    const std::string& currLocale = setlocale( LC_ALL, NULL );
+    const std::string& currLocale = setlocale( LC_ALL, nullptr );
 
     if ( locale.compare(currLocale)!=0 )
     {
@@ -162,7 +162,7 @@ void mitk::RandomForestFileIO::Write()
   mitk::BaseData::ConstPointer input = this->GetInput();
   if (input.IsNull())
   {
-    MITK_ERROR <<"Sorry, input to NrrdDiffusionImageWriter is NULL!";
+    MITK_ERROR <<"Sorry, input to NrrdDiffusionImageWriter is nullptr!";
     return;
   }
   if ( this->GetOutputLocation().empty() )
@@ -171,7 +171,7 @@ void mitk::RandomForestFileIO::Write()
     return ;
   }else{
     const std::string& locale = "C";
-    const std::string& currLocale = setlocale( LC_ALL, NULL );
+    const std::string& currLocale = setlocale( LC_ALL, nullptr );
 
     if ( locale.compare(currLocale)!=0 )
     {

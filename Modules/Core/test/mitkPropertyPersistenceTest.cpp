@@ -14,17 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <algorithm>
-#include <cmath>
-#include <limits>
-
 #include "mitkIOMimeTypes.h"
 #include "mitkPropertyPersistence.h"
 #include "mitkStringProperty.h"
+
 #include "mitkTestFixture.h"
 #include "mitkTestingMacros.h"
+
 #include <mitkEqual.h>
 #include <mitkNumericConstants.h>
+
+#include <algorithm>
 
 class mitkPropertyPersistenceTestSuite : public mitk::TestFixture
 {

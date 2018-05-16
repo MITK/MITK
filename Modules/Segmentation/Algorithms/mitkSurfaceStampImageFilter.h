@@ -69,11 +69,11 @@ namespace mitk
     itkGetConstMacro(ForegroundValue, float);
     itkSetMacro(ForegroundValue, float);
 
-    virtual void GenerateInputRequestedRegion();
+    void GenerateInputRequestedRegion() override;
 
-    virtual void GenerateOutputInformation();
+    void GenerateOutputInformation() override;
 
-    virtual void GenerateData();
+    void GenerateData() override;
 
     void SetSurface(mitk::Surface *surface);
 
@@ -82,7 +82,7 @@ namespace mitk
   protected:
     SurfaceStampImageFilter();
 
-    virtual ~SurfaceStampImageFilter();
+    ~SurfaceStampImageFilter() override;
 
     void SurfaceStamp(int time = 0);
 

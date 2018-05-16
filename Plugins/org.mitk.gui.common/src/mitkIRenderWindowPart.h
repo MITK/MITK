@@ -74,7 +74,7 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
    * Get the currently active (focused) render window.
    * Focus handling is implementation specific.
    *
-   * \return The active QmitkRenderWindow instance; <code>NULL</code>
+   * \return The active QmitkRenderWindow instance; <code>nullptr</code>
    *         if no render window is active.
    */
   virtual QmitkRenderWindow* GetActiveQmitkRenderWindow() const = 0;
@@ -97,7 +97,7 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
   /**
    * Get the rendering manager used by this render window part.
    *
-   * \return The current IRenderingManager instance or <code>NULL</code>
+   * \return The current IRenderingManager instance or <code>nullptr</code>
    *         if no rendering manager is used.
    */
   virtual mitk::IRenderingManager* GetRenderingManager() const = 0;
@@ -122,13 +122,13 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
    * Get the SliceNavigationController for controlling time positions.
    *
    * \return A SliceNavigationController if the render window supports this
-   *         operation; otherwise returns <code>NULL</code>.
+   *         operation; otherwise returns <code>nullptr</code>.
    */
   virtual mitk::SliceNavigationController* GetTimeNavigationController() const = 0;
 
   /**
    * Get the selected position in the render window with id <code>id</code>
-   * or in the active render window if <code>id</code> is NULL.
+   * or in the active render window if <code>id</code> is nullptr.
    *
    * \param id The render window id.
    * \return The currently selected position in world coordinates.
@@ -137,7 +137,7 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
 
   /**
    * Set the selected position in the render window with id <code>id</code>
-   * or in the active render window if <code>id</code> is NULL.
+   * or in the active render window if <code>id</code> is nullptr.
    *
    * \param pos The position in world coordinates which should be selected.
    * \param id The render window id in which the selection should take place.

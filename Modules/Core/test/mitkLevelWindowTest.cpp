@@ -834,7 +834,7 @@ int mitkLevelWindowTest(int, char *[])
 
   image->Initialize(mitk::MakePixelType<int, int, 1>(), 3, dim);
   mitk::ImageWriteAccessor imAccess(image);
-  int *p = (int *)imAccess.GetData();
+  auto *p = (int *)imAccess.GetData();
 
   int size = dim[0] * dim[1] * dim[2];
   int i;

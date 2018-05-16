@@ -44,7 +44,7 @@ namespace mitk
        * @param idx the index of the output for which an object should be created
        * @returns the new object
        */
-      virtual itk::DataObject::Pointer
+      itk::DataObject::Pointer
       MakeOutput(DataObjectPointerArraySizeType idx) override;
 
     /**
@@ -53,12 +53,12 @@ namespace mitk
      * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
      * virtual.
      */
-    virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
+    itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
 
   protected:
     ContourModelSource();
 
-    virtual ~ContourModelSource();
+    ~ContourModelSource() override;
   };
 }
 #endif // #_MITK_CONTOURMODEL_SOURCE_H

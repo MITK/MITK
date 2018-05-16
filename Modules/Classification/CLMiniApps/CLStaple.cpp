@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
   {
     MITK_INFO << argv[i];
     MaskImageType::Pointer itkImg = MaskImageType::New();
-    mitk::Image::Pointer img = mitk::IOUtil::LoadImage(argv[i]);
+    mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(argv[i]);
     mitk::CastToItkImage(img,itkImg);
     filter->SetInput(i-2, itkImg);
   }
@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
   auto out = filter->GetOutput();
   mitk::Image::Pointer outImg = mitk::Image::New();
   mitk::CastToMitkImage(out, outImg);
-  mitk::IOUtil::SaveImage(outImg, argv[1]);
+  mitk::IOUtil::Save(outImg, argv[1]);
 
   return EXIT_SUCCESS;
 }

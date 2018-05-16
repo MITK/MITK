@@ -30,11 +30,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  MimeTypeProvider::MimeTypeProvider() : m_Tracker(NULL) {}
+  MimeTypeProvider::MimeTypeProvider() : m_Tracker(nullptr) {}
   MimeTypeProvider::~MimeTypeProvider() { delete m_Tracker; }
   void MimeTypeProvider::Start()
   {
-    if (m_Tracker == NULL)
+    if (m_Tracker == nullptr)
     {
       m_Tracker = new us::ServiceTracker<CustomMimeType, MimeTypeTrackerTypeTraits>(us::GetModuleContext(), this);
     }
@@ -82,7 +82,7 @@ namespace mitk
 
   MimeType MimeTypeProvider::GetMimeTypeForName(const std::string &name) const
   {
-    std::map<std::string, MimeType>::const_iterator iter = m_NameToMimeType.find(name);
+    auto iter = m_NameToMimeType.find(name);
     if (iter != m_NameToMimeType.end())
       return iter->second;
     return MimeType();
@@ -147,7 +147,7 @@ namespace mitk
       return result;
 
     CustomMimeType *mimeType = us::GetModuleContext()->GetService(reference);
-    if (mimeType != NULL)
+    if (mimeType != nullptr)
     {
       try
       {
@@ -157,7 +157,7 @@ namespace mitk
         {
           rank = us::any_cast<int>(rankProp);
         }
-        long id = us::any_cast<long>(reference.GetProperty(us::ServiceConstants::SERVICE_ID()));
+        auto id = us::any_cast<long>(reference.GetProperty(us::ServiceConstants::SERVICE_ID()));
         result = MimeType(*mimeType, rank, id);
       }
       catch (const us::BadAnyCastException &e)

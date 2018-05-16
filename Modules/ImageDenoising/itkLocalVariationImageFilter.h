@@ -80,12 +80,12 @@ namespace itk
      * in order to inform the pipeline execution model.
      *
      * \sa ImageToImageFilter::GenerateInputRequestedRegion() */
-    virtual void GenerateInputRequestedRegion() throw(InvalidRequestedRegionError);
+    void GenerateInputRequestedRegion() override;
 
   protected:
     LocalVariationImageFilter();
-    virtual ~LocalVariationImageFilter() {}
-    void PrintSelf(std::ostream &os, Indent indent) const;
+    ~LocalVariationImageFilter() override {}
+    void PrintSelf(std::ostream &os, Indent indent) const override;
 
     /** MedianImageFilter can be implemented as a multithreaded filter.
      * Therefore, this implementation provides a ThreadedGenerateData()
@@ -97,7 +97,7 @@ namespace itk
      *
      * \sa ImageToImageFilter::ThreadedGenerateData(),
      *     ImageToImageFilter::GenerateData() */
-    void ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
+    void ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId) override;
 
   private:
     LocalVariationImageFilter(const Self &); // purposely not implemented

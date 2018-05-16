@@ -68,7 +68,7 @@ namespace mitk
 
         TiXmlHandle hDoc(&doc);
         TiXmlElement* pElem;
-        TiXmlHandle hRoot(0);
+        TiXmlHandle hRoot(nullptr);
 
         pElem = hDoc.FirstChildElement().Element();
 
@@ -185,7 +185,7 @@ namespace mitk
             edgeElement->Attribute(mitk::ConnectomicsNetworkDefinitions::XML_EDGE_ID, &edgeID);
             edgeElement->Attribute(mitk::ConnectomicsNetworkDefinitions::XML_EDGE_SOURCE_ID, &edgeSourceID);
             edgeElement->Attribute(mitk::ConnectomicsNetworkDefinitions::XML_EDGE_TARGET_ID, &edgeTargetID);
-            edgeElement->Attribute(mitk::ConnectomicsNetworkDefinitions::XML_EDGE_WEIGHT_ID, &edgeWeight);
+            edgeElement->Attribute(mitk::ConnectomicsNetworkDefinitions::XML_EDGE_FIBERCOUNT_ID, &edgeWeight);
             if(version == "0.1")
             {
               // in version 0.1 only the int weight was saved, assume double weight to be one by default

@@ -151,7 +151,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
     /**
      * Dispose the perspective and all views contained within.
      */
-    public: ~Perspective();
+    public: ~Perspective() override;
 
     private: void DisposeViewRefs();
 

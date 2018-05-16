@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 #include <sstream>
 #include <itksys/SystemTools.hxx>
-#include <stdio.h>
+#include <cstdio>
 
 mitk::NDIProtocol::NDIProtocol()
 : itk::Object(), m_TrackingDevice(nullptr), m_UseCRC(true)
@@ -1249,7 +1249,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPosi
   }
   if (markerPositions == nullptr)
   {
-    std::cout << "ERROR: markerPositions==NULL" << std::endl;
+    std::cout << "ERROR: markerPositions==nullptr" << std::endl;
     return NDIUNKNOWNERROR;
   }
 

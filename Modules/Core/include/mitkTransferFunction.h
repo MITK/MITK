@@ -156,11 +156,11 @@ namespace mitk
 
   protected:
     TransferFunction();
-    virtual ~TransferFunction();
+    ~TransferFunction() override;
 
     TransferFunction(const TransferFunction &other);
 
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 

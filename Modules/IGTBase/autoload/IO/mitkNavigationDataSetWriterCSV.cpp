@@ -73,7 +73,7 @@ void mitk::NavigationDataSetWriterCSV::Write()
     for (unsigned int toolIndex = 0; toolIndex < numberOfTools; toolIndex++)
     {
       mitk::NavigationData::Pointer nd = NavigationDatasOfCurrentStep.at(toolIndex);
-      *out             << nd->GetTimeStamp() << ";"
+      *out << nd->GetIGTTimeStamp() << ";"
                        << nd->IsDataValid() << ";"
                        << nd->GetPosition()[0] << ";"
                        << nd->GetPosition()[1] << ";"

@@ -64,7 +64,7 @@ namespace mitk {
     /**
     * \brief filter execute method
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     using Superclass::SetInput;
 
@@ -124,7 +124,7 @@ namespace mitk {
   protected:
     NavigationDataToIGTLMessageFilter();
 
-    virtual ~NavigationDataToIGTLMessageFilter();
+    ~NavigationDataToIGTLMessageFilter() override;
 
     /**
     * \brief Generates the output
@@ -163,6 +163,9 @@ namespace mitk {
     //    unsigned int m_RingBufferSize;  ///< Stores the ringbuffer size
     unsigned int m_CurrentTimeStep; ///< Indicates the current timestamp
     //    unsigned int m_NumberForMean;   ///< Number of Navigation Data, which should be averaged
+
+    /** Converts a mitk::IGTTimestamp (double, milliseconds) to an OpenIGTLink timestamp */
+    igtl::TimeStamp::Pointer ConvertToIGTLTimeStamp(double IGTTimeStamp);
 
     /** Measurement class to calculate latency and frame count */
   };

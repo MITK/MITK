@@ -31,9 +31,9 @@ class QtShell : public Shell
 
 public:
 
-  QtShell(QWidget* parent = nullptr, Qt::WindowFlags flags = 0);
+  QtShell(QWidget* parent = nullptr, Qt::WindowFlags flags = nullptr);
 
-  ~QtShell();
+  ~QtShell() override;
 
   // berry::Shell
   void SetBounds(const QRect& bounds) override;

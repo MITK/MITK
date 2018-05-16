@@ -56,7 +56,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetServiceFromFactory(Module* module,
                                                                 ServiceFactory* factory,
                                                                 bool isModuleScope)
 {
-  assert(factory && "Factory service pointer is NULL");
+  assert(factory && "Factory service pointer is nullptr");
   InterfaceMap s;
   try
   {
@@ -116,7 +116,7 @@ InterfaceMap ServiceReferenceBasePrivate::GetPrototypeService(Module* module)
 
 void* ServiceReferenceBasePrivate::GetService(Module* module)
 {
-  void* s = NULL;
+  void* s = nullptr;
   {
     MutexLock lock(registration->propsLock);
     if (registration->available)

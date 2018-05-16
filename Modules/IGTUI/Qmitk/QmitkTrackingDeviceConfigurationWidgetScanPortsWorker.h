@@ -31,7 +31,7 @@ class MITKIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidgetScanPortsWorker : p
 
 public:
   QmitkTrackingDeviceConfigurationWidgetScanPortsWorker(){};
-  ~QmitkTrackingDeviceConfigurationWidgetScanPortsWorker(){};
+  ~QmitkTrackingDeviceConfigurationWidgetScanPortsWorker() override{};
 
   public slots:
   void ScanPortsThreadFunc();

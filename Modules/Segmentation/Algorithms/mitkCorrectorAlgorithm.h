@@ -74,10 +74,10 @@ namespace mitk
 
   protected:
     CorrectorAlgorithm();
-    virtual ~CorrectorAlgorithm();
+    ~CorrectorAlgorithm() override;
 
     // does the actual processing
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     bool ImprovedHeimannCorrectionAlgorithm(itk::Image<DefaultSegmentationDataType, 2>::Pointer pic);
     bool ModifySegment(const TSegData &segment, itk::Image<DefaultSegmentationDataType, 2>::Pointer pic);

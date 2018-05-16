@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageFileWriter.h"
 #include "itkImage.h"
 #include "itkImageRegionIterator.h"
+#include <itkImageDuplicator.h>
 
 namespace itk
 {
@@ -37,8 +38,11 @@ void
 TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
 ::GenerateData ()
 {
-
-  m_GradientImagePointer = static_cast< GradientImagesType * >( this->ProcessObject::GetInput(0) );
+  typename GradientImagesType::Pointer input_image = static_cast< GradientImagesType * >( this->ProcessObject::GetInput(0) );
+  typename itk::ImageDuplicator<GradientImagesType>::Pointer duplicator = itk::ImageDuplicator<GradientImagesType>::New();
+  duplicator->SetInputImage(input_image);
+  duplicator->Update();
+  m_GradientImagePointer = duplicator->GetOutput();
 
   typename GradientImagesType::SizeType size = m_GradientImagePointer->GetLargestPossibleRegion().GetSize();
 
@@ -50,11 +54,12 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
   for(int i=0; i<nof; i++)
   {
     vnl_vector_fixed <double, 3 > vec = m_GradientDirectionContainer->ElementAt(i);
-    // due to roundings, the values are not always exactly zero
-    if(vec[0]<0.0001 && vec[1]<0.0001 && vec[2]<0.0001 && vec[0]>-0.0001&& vec[1]>-0.0001 && vec[2]>-0.0001)
-    {
+
+    float bval = vec.magnitude();
+    bval = bval*bval*m_BValue;
+
+    if(bval<100)
       numberb0++;
-    }
   }
 
 
@@ -69,7 +74,10 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
   {
     vnl_vector_fixed <double, 3 > vec = m_GradientDirectionContainer->ElementAt(i);
 
-    if(vec[0]<0.0001 && vec[1]<0.0001 && vec[2]<0.0001 && vec[0]>-0.0001&& vec[1]>-0.0001 && vec[2]>-0.0001)
+    float bval = vec.magnitude();
+    bval = bval*bval*m_BValue;
+
+    if(bval<100)
     {
       // the diffusion encoding gradient is approximately zero, wo we are dealing with a non-diffusion weighted volume
       m_B0Mask[i]=1;
@@ -99,9 +107,8 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
 
 
   for (int i=0;i<nof-numberb0;i++)
-  {
     diagonal[i]=dirsTimesDirsTrans[i][i];
-  }
+
   // normalization: free-water method assumes that directions matrix norm 1 is equal to b=1000
   directions=directions*sqrt(m_BValue/1000.0);
 
@@ -110,13 +117,9 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
   dirsTimesDirsTrans = directions*directions.transpose();
 
   for (int i=0;i<nof-numberb0;i++)
-  {
     b_vec[i]= dirsTimesDirsTrans[i][i];
-  }
-
 
   // Calculation of so called design matrix that is used to obtain expected signal.
-
   vnl_matrix<double> H(nof-numberb0, 6);
   vnl_matrix<double> H_org(nof-numberb0, 6);
   vnl_vector<double> pre_tensor(9);
@@ -174,14 +177,17 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
   // 1 in mask voxel means that B0 > assumed treshold.
 
   int mask_cnt=0;
-  for(unsigned int x=0;x<size[0];x++)
-  {
-    for(unsigned int y=0;y<size[1];y++)
-    {
-      for(unsigned int z=0;z<size[2];z++)
+#ifdef WIN32
+#pragma omp parallel for
+#else
+#pragma omp parallel for collapse(3)
+#endif
+  for(int x=0;x<(int)size[0];x++)
+    for(int y=0;y<(int)size[1];y++)
+      for(int z=0;z<(int)size[2];z++)
       {
         double mean_b=0.0;
-        itk::Index<3> ix = {{x,y,z}};
+        itk::Index<3> ix = {{(itk::IndexValueType)x,(itk::IndexValueType)y,(itk::IndexValueType)z}};
 
         GradientVectorType pixel = m_GradientImagePointer->GetPixel(ix);
         for (int i=0;i<nof;i++)
@@ -194,57 +200,51 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
         mean_b=mean_b/numberb0;
         if(mean_b > m_B0Threshold)
         {
-          mask->SetPixel(ix, 1);
-          mask_cnt++;
+#pragma omp critical
+          {
+            mask->SetPixel(ix, 1);
+            mask_cnt++;
+          }
         }
         else
+        {
+#pragma omp critical
           mask->SetPixel(ix, 0);
+        }
       }
-    }
-  }
 
-  double mask_val=0.0;
-  vnl_vector<double> org_vec(nof);
-
-  int counter_corrected =0;
-
-  for (unsigned int x=0;x<size[0];x++)
-  {
-    for (unsigned int y=0;y<size[1];y++)
-    {
-      for (unsigned int z=0;z<size[2];z++)
+#ifdef WIN32
+#pragma omp parallel for
+#else
+#pragma omp parallel for collapse(3)
+#endif
+  for (int x=0;x<(int)size[0];x++)
+    for (int y=0;y<(int)size[1];y++)
+      for (int z=0;z<(int)size[2];z++)
       {
-        itk::Index<3> ix = {{x,y,z}};
+        vnl_vector<double> org_vec(nof);
+        itk::Index<3> ix = {{(itk::IndexValueType)x,(itk::IndexValueType)y,(itk::IndexValueType)z}};
 
-        mask_val = mask->GetPixel(ix);
+        double mask_val = mask->GetPixel(ix);
 
         GradientVectorType pixel2 = m_GradientImagePointer->GetPixel(ix);
 
         for (int i=0;i<nof;i++)
-        {
           org_vec[i]=pixel2[i];
-        }
 
         if(mask_val >0)
         {
           for( int f=0;f<nof;f++)
-          {
             if(org_vec[f] <= 0)
-            {
               org_vec[f] = CheckNeighbours(x,y,z,f,size,mask,m_GradientImagePointer);
-              counter_corrected++;
-            }
-          }
 
           for (int i=0;i<nof;i++)
             pixel2[i]=org_vec[i];
 
+#pragma omp critical
           m_GradientImagePointer->SetPixel(ix, pixel2);
-
         }
       }
-    }
-  }
 
   typename TensorImageType::Pointer tensorImg;
   tensorImg = TensorImageType::New();
@@ -277,9 +277,6 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
   // in preprocessing we are dealing with 3 types of voxels: voxels excluded = 0 in mask, voxels correct =1 and voxels under correction
   //= 2. During pre processing most of voxels should be switched from 2 to 1.
 
-
-
-
   // what mask is a variable declared to simplify tensor calculaton. Tensors are obtained only for voxels that have a mask value bigger
   // than what_mask. Sometimes it is 1 sometimes 2.
 
@@ -288,35 +285,30 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
   double set_mask=2.0;
   double previous_mask=0;
 
-  double old_number_negative_eigs=0;
-  double new_number_negative_eigs=0;
+  int old_number_negative_eigs=0;
+  int new_number_negative_eigs=0;
 
   bool  stil_correcting = true;
 
   TurnMask(size,mask,previous_mask,set_mask);
   // simply defining all possible tensors as with negative eigenvalues
 
-
   //Preprocessing is performed in multiple iterations as long as the next iteration does not increase the number of bad voxels.
   //The final DWI should be the one that has a smaller or equal number of bad voxels as in the
   //previous iteration. To obtain this temporary DWI image must be stored in memory.
 
-
   // ! Initial Calculation of Tensors
-  std::cout << "Initial Tensor" << std::endl;
+  std::cout << "Initial tensor calculation" << std::endl;
   GenerateTensorImage(nof,numberb0,size,m_GradientImagePointer,mask,what_mask,tensorImg);
 
-
+  std::cout << "Check negatives" << std::endl;
   // checking how many tensors have problems, this is working only for mask =2
   old_number_negative_eigs = CheckNegatives (size,mask,tensorImg);
-
 
   //info for the user printed in the consol-debug information to be removed in the future
   std::cout << "Number of negative eigenvalues: " << old_number_negative_eigs << std::endl;
 
   CorrectDiffusionImage(nof,numberb0,size,m_GradientImagePointer,mask,pixel_max,pixel_min);
-
-
   while (stil_correcting == true)
   {
     //info for the user printed in the consol-debug information to be removed in the future
@@ -363,14 +355,14 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
   itk::ImageRegionIterator<OutputType> outputIterator(tensorImg, tensorImg->GetLargestPossibleRegion());
   outputIterator.GoToBegin();
   while(!outputIterator.IsAtEnd())
-    {
+  {
     TensorPixelType tens = outputIterator.Get();
 
     tens/= 1000.0;
 
     outputIterator.Set(tens);
     ++outputIterator;
-    }
+  }
 
   this->SetNthOutput(0, tensorImg);
 }
@@ -464,18 +456,16 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
   //getting back to the original position of the voxel
 
   itk::Index<3> ix = {{x,y,z}};
-
   if (temp_number <= 0.0)
   {
     tempsum=0;
+#pragma omp critical
     mask->SetPixel(ix,0);
   }
   else
   {
     tempsum=tempsum/temp_number;
-
   }
-
 
   return tempsum;// smoothed value of voxel
 }
@@ -489,25 +479,18 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
   double mean_b=0.0;
 
   for (int i=0;i<nof;i++)
-  {
     if(m_B0Mask[i]>0)
-    {
-   //   double o_d=org_data[i];
       mean_b=mean_b+org_data[i];
-    }
 
-  }
   mean_b=mean_b/numberb0;
   int cnt=0;
   for (int i=0;i<nof;i++)
-  {
     if(m_B0Mask[i]==0)
     {
       //if(org_data[i]<0.001){org_data[i]=0.01;}
       atten[cnt]=org_data[i]/mean_b;
       cnt++;
     }
-  }
 }
 
 template <class TDiffusionPixelType, class TTensorPixelType>
@@ -515,153 +498,107 @@ double
 TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
 ::CheckNegatives ( itk::Size<3> size, itk::Image<short, 3>::Pointer mask, typename itk::Image< itk::DiffusionTensor3D<TTensorPixelType>, 3 >::Pointer tensorImg )
 {
-
   // The method was created to simplif the flow of negative eigenvalue correction process. The method itself just return the number
   // of voxels (tensors) with negative eigenvalues. Then if the voxel was previously bad ( mask=2 ) but it is not bad anymore mask is
   //changed to 1.
 
   // declaration of important structures and variables
   double badvoxels=0;
-  double pixel=0;
-  itk::DiffusionTensor3D<double> ten;
-  vnl_matrix<double> temp_tensor(3,3);
-  vnl_vector<double> eigen_vals(3);
-  vnl_vector<double> tensor (6);
 
-  // for every pixel from the image
-  for (unsigned int x=0;x<size[0];x++)
-  {
-
-    for (unsigned int y=0;y<size[1];y++)
-    {
-
-      for (unsigned int z=0;z<size[2];z++)
+#ifdef WIN32
+#pragma omp parallel for
+#else
+#pragma omp parallel for collapse(3)
+#endif
+  for (int x=0;x<(int)size[0];x++)
+    for (int y=0;y<(int)size[1];y++)
+      for (int z=0;z<(int)size[2];z++)
       {
+        double pixel=0;
 
-
-        itk::Index<3> ix = {{x,y,z}};
+        itk::Index<3> ix = {{(itk::IndexValueType)x,(itk::IndexValueType)y,(itk::IndexValueType)z}};
         pixel = mask->GetPixel(ix);
 
         // but only if previously marked as bad one-negative eigen value
-
         if(pixel > 1)
         {
-
-          ten = tensorImg->GetPixel(ix);
-
-          // changing order from tensor structure in MITK into vnl structure 3x3 symmetric tensor matrix
-
-          tensor[0] = ten(0,0);
-          tensor[3] = ten(0,1);
-          tensor[5] = ten(0,2);
-          tensor[1] = ten(1,1);
-          tensor[4] = ten(1,2);
-          tensor[2] = ten(2,2);
-
-          temp_tensor[0][0]= tensor[0]; temp_tensor[1][0]= tensor[3]; temp_tensor[2][0]= tensor[5];
-          temp_tensor[0][1]= tensor[3]; temp_tensor[1][1]= tensor[1]; temp_tensor[2][1]= tensor[4];
-          temp_tensor[0][2]= tensor[5]; temp_tensor[1][2]= tensor[4]; temp_tensor[2][2]= tensor[2];
-
-          //checking negativity of tensor eigenvalues
-
-          vnl_symmetric_eigensystem<double> eigen_tensor(temp_tensor);
-
-
-          eigen_vals[0]=eigen_tensor.get_eigenvalue(0);
-          eigen_vals[1]=eigen_tensor.get_eigenvalue(1);
-          eigen_vals[2]=eigen_tensor.get_eigenvalue(2);
-
-          //comparison to 0.01 instead of 0 was proposed by O.Pasternak
-
-          if( eigen_vals[0]>0.01 && eigen_vals[1]>0.01 && eigen_vals[2]>0.01)
+#pragma omp critical
           {
-            mask->SetPixel(ix,1);
+            itk::DiffusionTensor3D<double>::EigenValuesArrayType eigenvalues;
+            itk::DiffusionTensor3D<double>::EigenVectorsMatrixType eigenvectors;
+            itk::DiffusionTensor3D<double> ten = tensorImg->GetPixel(ix);
+            ten.ComputeEigenAnalysis(eigenvalues, eigenvectors);
 
+            //comparison to 0.01 instead of 0 was proposed by O.Pasternak
+            if( eigenvalues[0]>0.01 && eigenvalues[1]>0.01 && eigenvalues[2]>0.01)
+              mask->SetPixel(ix,1);
+            else
+              badvoxels++;
           }
-          else
-          {
-            badvoxels++;
-          }
-
         }
-
       }
-    }
-  }
 
-  double ret = badvoxels;
-
-  return ret;
-
+  return badvoxels;
 }
 
 
 template <class TDiffusionPixelType, class TTensorPixelType>
 void
 TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
-::CorrectDiffusionImage(int nof,int numberb0,itk::Size<3> size, typename GradientImagesType::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,vnl_vector< double> pixel_max,vnl_vector< double> pixel_min)
+::CorrectDiffusionImage(int nof, int numberb0, itk::Size<3> size, typename GradientImagesType::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,vnl_vector< double> pixel_max,vnl_vector< double> pixel_min)
 {
   // in this method the voxels that has tensor negative eigenvalues are smoothed. Smoothing is done on DWI image.For the voxel
   //detected as bad one, B0 image is smoothed obligatory. All other gradient images are smoothed only when value of attenuation
   //is out of declared bounds for too high or too low attenuation.
 
   // declaration of important variables
-  vnl_vector<double> org_data(nof);
-  vnl_vector<double> atten(nof-numberb0);
-  double cnt_atten=0;
 
-  for (unsigned int z=0;z<size[2];z++)
-  {
-
-    for (unsigned int x=0;x<size[0];x++)
-    {
-
-      for (unsigned int y=0;y<size[1];y++)
+#ifdef WIN32
+#pragma omp parallel for
+#else
+#pragma omp parallel for collapse(3)
+#endif
+  for (int z=0;z<(int)size[2];z++)
+    for (int x=0;x<(int)size[0];x++)
+      for (int y=0;y<(int)size[1];y++)
       {
-        itk::Index<3> ix = {{x, y, z}};
+        vnl_vector<double> org_data(nof);
+        vnl_vector<double> atten(nof-numberb0);
+        double cnt_atten=0;
 
+        itk::Index<3> ix = {{(itk::IndexValueType)x, (itk::IndexValueType)y, (itk::IndexValueType)z}};
 
         if(mask->GetPixel(ix) > 1.0)
         {
           GradientVectorType  pt = corrected_diffusion->GetPixel(ix);
 
           for (int i=0;i<nof;i++)
-          {
             org_data[i]=pt[i];
-          }
-
 
           double mean_b=0.0;
 
           for (int i=0;i<nof;i++)
-          {
             if(m_B0Mask[i]>0)
             {
               mean_b=mean_b+org_data[i];
             }
 
-          }
           mean_b=mean_b/numberb0;
           int cnt=0;
           for (int i=0;i<nof;i++)
-          {
             if(m_B0Mask[i]==0)
             {
-
               atten[cnt]=org_data[i]/mean_b;
               cnt++;
             }
-          }
 
           cnt_atten=0;
 
           //smoothing certain gradient images that are out of declared constraints
-
           for (int f=0;f<nof;f++)
           {
             if(m_B0Mask[f]==0)
             {
-
               if(atten[cnt_atten]<pixel_min[cnt_atten] || atten[cnt_atten]> pixel_max[cnt_atten])
               {
 
@@ -680,60 +617,41 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
                 double tempsum=0;
                 double temp_number=0;
 
-                for(unsigned int i=back_x; i<=forth_x; i++)
-                {
-                  for (unsigned int j=back_y; j<=forth_y; j++)
-                  {
-                    for (unsigned int k=back_z; k<=forth_z; k++)
+                for(int i=back_x; i<=forth_x; i++)
+                  for (int j=back_y; j<=forth_y; j++)
+                    for (int k=back_z; k<=forth_z; k++)
                     {
                       itk::Index<3> ix = {{i,j,k}};
 
                       GradientVectorType p = corrected_diffusion->GetPixel(ix);
 
-                      //double test= p[f];
-
-                      if (p[f] > 0.0 )// taking only positive values and counting them
+                      if(p[f] > 0.0 && !(i==x && j==y && k== z))
                       {
-                        if(!(i==x && j==y && k== z))
-                        {
-                          tempsum=tempsum+p[f];
-                          temp_number++;
-                        }
-
+                        tempsum=tempsum+p[f];
+                        temp_number++;
                       }
-
-
                     }
-                  }
-                }
 
                 //getting back to the original position of the voxel
-
-                itk::Index<3> ix = {{x,y,z}};
-
+                itk::Index<3> ix = {{(itk::IndexValueType)x,(itk::IndexValueType)y,(itk::IndexValueType)z}};
                 if (temp_number <= 0.0)
                 {
                   tempsum=0;
+#pragma omp critical
                   mask->SetPixel(ix,0);
                 }
                 else
-                {
                   tempsum=tempsum/temp_number;
 
-                }
-
                 org_data[f] = tempsum;
-
               }
 
-
               cnt_atten++;
-
             }
+
             //smoothing B0
             if(m_B0Mask[f]==1)
             {
-
               int x_max=size[0] - 1;
               int y_max=size[1] - 1;
               int z_max=size[2] - 1;
@@ -746,15 +664,12 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
               double forth_y=std::min(((int)y+1),y_max);
               double forth_z=std::min(((int)z+1),z_max);
 
-
               double tempsum=0;
               double temp_number=0;
 
-              for(unsigned int i=back_x; i<=forth_x; i++)
-              {
-                for (unsigned int j=back_y; j<=forth_y; j++)
-                {
-                  for (unsigned int k=back_z; k<=forth_z; k++)
+              for(int i=back_x; i<=forth_x; i++)
+                for (int j=back_y; j<=forth_y; j++)
+                  for (int k=back_z; k<=forth_z; k++)
                   {
                     itk::Index<3> ix = {{i,j,k}};
 
@@ -769,34 +684,24 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
                         tempsum=tempsum+p[f];
                         temp_number++;
                       }
-
                     }
-
-
                   }
-                }
-              }
 
               //getting back to the original position of the voxel
-
-              itk::Index<3> ix = {{x,y,z}};
-
+              itk::Index<3> ix = {{(itk::IndexValueType)x,(itk::IndexValueType)y,(itk::IndexValueType)z}};
               if (temp_number <= 0.0)
               {
                 tempsum=0;
+#pragma omp critical
                 mask->SetPixel(ix,0);
               }
               else
               {
                 tempsum=tempsum/temp_number;
-
               }
 
               org_data[f] = tempsum;
-
             }
-
-
           }
 
           for (int i=0;i<nof;i++)
@@ -804,59 +709,47 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
             pt[i]=org_data[i];
           }
 
+#pragma omp critical
           corrected_diffusion->SetPixel(ix, pt);
-
         }
         else
         {
           GradientVectorType  pt = corrected_diffusion->GetPixel(ix);
+#pragma omp critical
           corrected_diffusion->SetPixel(ix, pt);
-
         }
       }
-    }
-  }
-
-
-
 }
 
 template <class TDiffusionPixelType, class TTensorPixelType>
 void
 TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
-::GenerateTensorImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,double what_mask, typename itk::Image< itk::DiffusionTensor3D<TTensorPixelType>, 3 >::Pointer tensorImg)
+::GenerateTensorImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,double , typename itk::Image< itk::DiffusionTensor3D<TTensorPixelType>, 3 >::Pointer tensorImg)
 {
   // in this method the whole tensor image is updated with a tensors for defined voxels ( defined by a value of mask);
 
-
-  itk::Index<3> ix;
-
-  itk::Index<3> idx;
-  idx.Fill(5);
-
-  vnl_vector<double> org_data(nof);
-  vnl_vector<double> atten(nof-numberb0);
-  vnl_vector<double> tensor(6);
-  itk::DiffusionTensor3D<double> ten;
-  double mask_val=0;
-
-
-  for (unsigned int x=0;x<size[0];x++)
-  {
-
-    for (unsigned int y=0;y<size[1];y++)
-    {
-
-      for (unsigned int z=0;z<size[2];z++)
+#ifdef WIN32
+#pragma omp parallel for
+#else
+#pragma omp parallel for collapse(3)
+#endif
+  for (int x=0;x<(int)size[0];x++)
+    for (int y=0;y<(int)size[1];y++)
+      for (int z=0;z<(int)size[2];z++)
       {
+        itk::Index<3> ix;
 
+        vnl_vector<double> org_data(nof);
+        vnl_vector<double> atten(nof-numberb0);
+        vnl_vector<double> tensor(6);
+        itk::DiffusionTensor3D<double> ten;
+        double mask_val=0;
 
         ix[0] = x; ix[1] = y; ix[2] = z;
 
         mask_val= mask->GetPixel(ix);
 
         //Tensors are calculated only for voxels above theshold for B0 image.
-
         if( mask_val > 0.0 )
         {
 
@@ -894,9 +787,6 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
             }
           }
 
-
-
-
           for (int i=0;i<nof-numberb0;i++)
           {
 
@@ -913,38 +803,23 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
           ten(1,2) = tensor[4];
           ten(2,2) = tensor[2];
 
+#pragma omp critical
           tensorImg->SetPixel(ix, ten);
-
-
-
         }
         // for voxels with mask value 0 - tensor is simply 0 ( outside brain value)
         else if (mask_val < 1.0)
         {
-
           ten(0,0) = 0;
           ten(0,1) = 0;
           ten(0,2) = 0;
           ten(1,1) = 0;
           ten(1,2) = 0;
           ten(2,2) = 0;
+
+#pragma omp critical
           tensorImg->SetPixel(ix, ten);
         }
-
-        if (ix == idx)
-        {
-          for (int ll = 0; ll < 6 ; ll++)
-          std::cout << tensor[ll] << "," << std::endl;
-        }
-
-
-
-
       }
-    }
-  }
-
-
 
 }// end of Generate Tensor
 
@@ -959,22 +834,24 @@ TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorP
   itk::Index<3> ix;
   double temp_mask_value=0;
 
-  for(unsigned int x=0;x<size[0];x++)
-  {
-    for(unsigned int y=0;y<size[1];y++)
-    {
-      for(unsigned int z=0;z<size[2];z++)
+#ifdef WIN32
+#pragma omp parallel for
+#else
+#pragma omp parallel for collapse(3)
+#endif
+  for(int x=0;x<(int)size[0];x++)
+    for(int y=0;y<(int)size[1];y++)
+      for(int z=0;z<(int)size[2];z++)
       {
         ix[0] = x; ix[1] = y; ix[2] = z;
         temp_mask_value=mask->GetPixel(ix);
 
         if(temp_mask_value>previous_mask)
         {
+#pragma omp critical
           mask->SetPixel(ix,set_mask);
         }
       }
-    }
-  }
 }
 
 } // end of namespace

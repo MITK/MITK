@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //is used for visual output.
 
 //! [What we will do]
-int main(int argc, char* argv[])
+int main(int, char**)
 {
   //*************************************************************************
   // Set up Render Window and Tracking Device
@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 
   //! [Initialize views]
   // Global reinit with the bounds of the virtual tracking device
-  mitk::TimeGeometry::Pointer timeGeometry = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
+  auto timeGeometry = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
   mitk::BaseGeometry::Pointer geometry = timeGeometry->GetGeometryForTimeStep(0);
   geometry->SetBounds(bounds);
 

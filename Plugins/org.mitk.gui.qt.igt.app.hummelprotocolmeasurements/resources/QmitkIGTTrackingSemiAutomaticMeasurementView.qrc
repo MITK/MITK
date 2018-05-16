@@ -1,0 +1,8 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource prefix="/QmitkIGTTrackingSemiAutomaticMeasurementView">
+     <file>iconMeasurementTracking.svg</file>
+ </qresource>
+ <qresource prefix="/QmitkIGTTrackingDataEvaluationView">
+     <file>iconMeasurementEvaluation.svg</file>
+ </qresource>
+ </RCC>

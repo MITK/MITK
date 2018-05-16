@@ -77,7 +77,7 @@ void TestServiceFactoryModuleScope()
 #endif
 
   Module* moduleH = ModuleRegistry::GetModule("TestModuleH");
-  US_TEST_CONDITION_REQUIRED(moduleH != 0, "Test for existing module TestModuleH")
+  US_TEST_CONDITION_REQUIRED(moduleH != nullptr, "Test for existing module TestModuleH")
 
   std::vector<ServiceReferenceU> registeredRefs = moduleH->GetRegisteredServices();
   US_TEST_CONDITION_REQUIRED(registeredRefs.size() == 2, "# of registered services")
@@ -94,7 +94,7 @@ void TestServiceFactoryModuleScope()
   US_TEST_CONDITION_REQUIRED(service.size() >= 1, "GetService()")
   InterfaceMap::const_iterator serviceIter = service.find("us::TestModuleH");
   US_TEST_CONDITION_REQUIRED(serviceIter != service.end(), "GetService()")
-  US_TEST_CONDITION_REQUIRED(serviceIter->second != NULL, "GetService()")
+  US_TEST_CONDITION_REQUIRED(serviceIter->second != nullptr, "GetService()")
 
   InterfaceMap service2 = mc->GetService(sr1);
   US_TEST_CONDITION(service == service2, "Same service pointer")
@@ -132,7 +132,7 @@ void TestServiceFactoryPrototypeScope()
   }
 
   Module* moduleH = ModuleRegistry::GetModule("TestModuleH");
-  US_TEST_CONDITION_REQUIRED(moduleH != 0, "Test for existing module TestModuleH")
+  US_TEST_CONDITION_REQUIRED(moduleH != nullptr, "Test for existing module TestModuleH")
 #endif
 
   ModuleContext* mc = GetModuleContext();

@@ -87,7 +87,7 @@ public:
       m_ToFImageGrabber->StopCamera();
       m_ToFImageGrabber->DisconnectCamera();
     }
-    m_ToFImageGrabber = NULL;
+    m_ToFImageGrabber = nullptr;
   }
 
   /**
@@ -130,7 +130,7 @@ public:
 
       m_ToFImageGrabber->ConnectCamera();
       m_ToFImageGrabber->StartCamera();
-      mitk::Image::Pointer expectedResultImage = mitk::IOUtil::LoadImage(m_KinectDepthImagePath);
+      mitk::Image::Pointer expectedResultImage = mitk::IOUtil::Load<mitk::Image>(m_KinectDepthImagePath);
 
       m_ToFImageGrabber->Update();
 
@@ -182,8 +182,8 @@ public:
 
     CPPUNIT_ASSERT( m_ToFImageGrabber->GetBoolProperty("HasAmplitudeImage") == true);
     CPPUNIT_ASSERT( m_ToFImageGrabber->GetBoolProperty("HasIntensityImage") == true);
-    CPPUNIT_ASSERT( m_ToFImageGrabber->GetOutput(1) != NULL );
-    CPPUNIT_ASSERT( m_ToFImageGrabber->GetOutput(2) != NULL );
+    CPPUNIT_ASSERT( m_ToFImageGrabber->GetOutput(1) != nullptr );
+    CPPUNIT_ASSERT( m_ToFImageGrabber->GetOutput(2) != nullptr );
   }
 };
 

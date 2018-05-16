@@ -37,16 +37,16 @@ namespace mitk
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
       protected : AffineImageCropperInteractor();
-    virtual ~AffineImageCropperInteractor();
+    ~AffineImageCropperInteractor() override;
     /**
       * Here actions strings from the loaded state machine pattern are mapped to functions of
       * the DataInteractor. These functions are called when an action from the state machine pattern is executed.
       */
-    virtual void ConnectActionsAndFunctions() override;
+    void ConnectActionsAndFunctions() override;
     /**
       * This function is called when a DataNode has been set/changed.
       */
-    virtual void DataNodeChanged() override;
+    void DataNodeChanged() override;
 
     /**
       * Initializes the movement, stores starting position.

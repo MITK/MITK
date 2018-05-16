@@ -95,7 +95,7 @@ cv::Mat mitk::OpenCVVideoSource::GetImage()
 {
   if(m_CurrentImage)
   {
-    cv::Mat copy( m_CurrentImage, false );
+    cv::Mat copy = cv::cvarrToMat( m_CurrentImage, false );
     return copy.clone();
   }
   return cv::Mat();
@@ -220,6 +220,7 @@ void mitk::OpenCVVideoSource::StartCapturing()
 
 void mitk::OpenCVVideoSource::StopCapturing()
 {
+  m_CapturePaused = false;
   m_CapturingInProcess = false;
 }
 
@@ -275,7 +276,7 @@ void mitk::OpenCVVideoSource::GetCurrentFrameAsItkHSVPixelImage(HSVPixelImageTyp
 
   // Prepare iteration
   HSVConstIteratorType itImage( Image, Image->GetLargestPossibleRegion());
-  itImage.Begin();
+  itImage.GoToBegin();
   HSVPixelType pixel;
   int rowsize = 3 * m_CaptureWidth;
 
@@ -391,6 +392,7 @@ void mitk::OpenCVVideoSource::Reset()
 {
   // set capturing to false
   this->StopCapturing();
+  this->m_FrameCount = 0;
   if(m_VideoCapture)
     cvReleaseCapture(&m_VideoCapture);
   m_VideoCapture = nullptr;

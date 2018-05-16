@@ -67,7 +67,7 @@ class HelpContentView : public QtViewPart
 public:
 
   HelpContentView();
-  ~HelpContentView();
+  ~HelpContentView() override;
 
   void SetFocus() override;
 

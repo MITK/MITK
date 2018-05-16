@@ -41,8 +41,8 @@ class MITKSEGMENTATIONUI_EXPORT QmitkMaskStampWidget : public QWidget
   Q_OBJECT
 
 public:
-  QmitkMaskStampWidget(QWidget *parent = 0, const char *name = 0);
-  virtual ~QmitkMaskStampWidget();
+  QmitkMaskStampWidget(QWidget *parent = nullptr, const char *name = nullptr);
+  ~QmitkMaskStampWidget() override;
 
   void SetDataStorage(mitk::DataStorage *storage);
 

@@ -41,8 +41,8 @@ mitk::MITKRegistrationWrapperMapper2D::~MITKRegistrationWrapperMapper2D()
 
 bool mitk::MITKRegistrationWrapperMapper2D::RendererGeometryIsOutdated(mitk::BaseRenderer *renderer, const itk::TimeStamp& time) const
 {
-  return (time < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
-    || (time < renderer->GetCurrentWorldGeometry2D()->GetMTime());
+  return (time < renderer->GetCurrentWorldPlaneGeometryUpdateTime()) //was the geometry modified?
+    || (time < renderer->GetCurrentWorldPlaneGeometry()->GetMTime());
 }
 
 bool mitk::MITKRegistrationWrapperMapper2D::GetGeometryDescription( mitk::BaseRenderer *renderer, mitk::BaseGeometry::ConstPointer& gridDesc, unsigned int& gridFrequ ) const

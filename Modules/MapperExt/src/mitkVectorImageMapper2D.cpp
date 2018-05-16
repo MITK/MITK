@@ -97,11 +97,11 @@ void mitk::VectorImageMapper2D::Paint(mitk::BaseRenderer *renderer)
     point = worldPlaneGeometry->GetOrigin();
     normal = worldPlaneGeometry->GetNormal();
     normal.Normalize();
-    m_Plane->SetTransform((vtkAbstractTransform *)NULL);
+    m_Plane->SetTransform((vtkAbstractTransform *)nullptr);
   }
   else
   {
-    itkWarningMacro(<< "worldPlaneGeometry is NULL!");
+    itkWarningMacro(<< "worldPlaneGeometry is nullptr!");
     return;
   }
 
@@ -211,7 +211,7 @@ void mitk::VectorImageMapper2D::Paint(mitk::BaseRenderer *renderer)
     // make sure, that we have point data with more than 1 component (as vectors)
     //
     vtkPointData *pointData = cuttedPlane->GetPointData();
-    if (pointData == NULL)
+    if (pointData == nullptr)
     {
       itkWarningMacro(<< "no point data associated with cutters result!");
       return;
@@ -226,7 +226,7 @@ void mitk::VectorImageMapper2D::Paint(mitk::BaseRenderer *renderer)
       itkWarningMacro(<< "number of components <= 1!");
       return;
     }
-    else if (pointData->GetArrayName(0) == NULL)
+    else if (pointData->GetArrayName(0) == nullptr)
     {
       pointData->GetArray(0)->SetName("vector");
       // std::cout << "array name = vectors now" << std::endl;
@@ -240,7 +240,7 @@ void mitk::VectorImageMapper2D::Paint(mitk::BaseRenderer *renderer)
     vtkIdType numPoints, pointId;
     numPoints = cuttedPlane->GetNumberOfPoints();
     vtkDataArray *inVectors = cuttedPlane->GetPointData()->GetVectors("vector");
-    assert(inVectors != NULL);
+    assert(inVectors != nullptr);
     vtkFloatArray *vectorMagnitudes = vtkFloatArray::New();
     vectorMagnitudes->SetName("vectorMagnitudes");
     vectorMagnitudes->SetNumberOfComponents(1);
@@ -322,7 +322,7 @@ void mitk::VectorImageMapper2D::Paint(mitk::BaseRenderer *renderer)
     glyphGenerator->Update();
 
     /*
-    vtkLookupTable* vtkLut = NULL;
+    vtkLookupTable* vtkLut = nullptr;
     mitk::LookupTableProperty::Pointer mitkLutProp =
     dynamic_cast<mitk::LookupTableProperty*>(GetDataNode()->GetProperty("LookupTable"));
     if (mitkLutProp.IsNotNull())
@@ -365,7 +365,7 @@ void mitk::VectorImageMapper2D::Paint(mitk::BaseRenderer *renderer)
                      renderer->GetCurrentWorldPlaneGeometry(),
                      trafo,
                      renderer,
-                     NULL /*vtkLut*/,
+                     nullptr /*vtkLut*/,
                      color,
                      lwidth,
                      spacing);
@@ -395,7 +395,7 @@ void mitk::VectorImageMapper2D::PaintCells(vtkPolyData *glyphs,
   vtkPointData *vpointdata = glyphs->GetPointData();
   vtkDataArray *vpointscalars = vpointdata->GetArray("vectorMagnitudes");
   // vtkDataArray* vpointpositions = vpointdata->GetArray("pointPositions");
-  assert(vpointscalars != NULL);
+  assert(vpointscalars != nullptr);
   // std::cout << "  Scalars range 2d:" << vpointscalars->GetRange()[0] << " " << vpointscalars->GetRange()[0] <<
   // std::endl;
 
@@ -454,12 +454,12 @@ void mitk::VectorImageMapper2D::PaintCells(vtkPolyData *glyphs,
         // convert 3D point (in mm) to display coordinates (units )
         renderer->WorldToDisplay(p, p2d);
 
-        if (lut != NULL)
+        if (lut != nullptr)
         {
           // color each point according to point data
           double *color;
 
-          if (vpointscalars != NULL)
+          if (vpointscalars != nullptr)
           {
             vpointscalars->GetComponent(pointNr, 0);
             color = lut->GetColor(vpointscalars->GetComponent(idList->GetId(pointNr), 0));
@@ -482,7 +482,7 @@ void mitk::VectorImageMapper2D::PaintCells(vtkPolyData *glyphs,
 
 mitk::VectorImageMapper2D::VectorImageMapper2D()
 {
-  m_LUT = NULL;
+  m_LUT = nullptr;
   m_Plane = vtkPlane::New();
   m_Cutter = vtkCutter::New();
 
@@ -492,11 +492,11 @@ mitk::VectorImageMapper2D::VectorImageMapper2D()
 
 mitk::VectorImageMapper2D::~VectorImageMapper2D()
 {
-  if (m_LUT != NULL)
+  if (m_LUT != nullptr)
     m_LUT->Delete();
-  if (m_Plane != NULL)
+  if (m_Plane != nullptr)
     m_Plane->Delete();
-  if (m_Cutter != NULL)
+  if (m_Cutter != nullptr)
     m_Cutter->Delete();
 }
 
@@ -506,7 +506,7 @@ int mitk::VectorImageMapper2D::GetCurrentTimeStep(mitk::BaseData *data, mitk::Ba
   // get the TimeGeometry of the input object
   //
   const TimeGeometry *dataTimeGeometry = data->GetUpdatedTimeGeometry();
-  if ((dataTimeGeometry == NULL) || (dataTimeGeometry->CountTimeSteps() == 0))
+  if ((dataTimeGeometry == nullptr) || (dataTimeGeometry->CountTimeSteps() == 0))
   {
     itkWarningMacro(<< "The given object is missing a mitk::TimeGeometry, or the number of time steps is 0!");
     return 0;

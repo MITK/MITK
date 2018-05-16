@@ -55,12 +55,12 @@ mitk::FastMarchingTool3D::~FastMarchingTool3D()
 
 bool mitk::FastMarchingTool3D::CanHandle(BaseData *referenceData) const
 {
-  if (referenceData == NULL)
+  if (referenceData == nullptr)
     return false;
 
-  Image *image = dynamic_cast<Image *>(referenceData);
+  auto *image = dynamic_cast<Image *>(referenceData);
 
-  if (image == NULL)
+  if (image == nullptr)
     return false;
 
   if (image->GetDimension() < 3)
@@ -71,7 +71,7 @@ bool mitk::FastMarchingTool3D::CanHandle(BaseData *referenceData) const
 
 const char **mitk::FastMarchingTool3D::GetXPM() const
 {
-  return NULL; // mitkFastMarchingTool3D_xpm;
+  return nullptr; // mitkFastMarchingTool3D_xpm;
 }
 
 us::ModuleResource mitk::FastMarchingTool3D::GetIconResource() const
@@ -237,20 +237,20 @@ void mitk::FastMarchingTool3D::Deactivated()
   this->m_SigmoidFilter->RemoveAllObservers();
   this->m_GradientMagnitudeFilter->RemoveAllObservers();
   this->m_FastMarchingFilter->RemoveAllObservers();
-  m_ResultImageNode = NULL;
+  m_ResultImageNode = nullptr;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   unsigned int numberOfPoints = m_SeedsAsPointSet->GetSize();
   for (unsigned int i = 0; i < numberOfPoints; ++i)
   {
     mitk::Point3D point = m_SeedsAsPointSet->GetPoint(i);
-    mitk::PointOperation *doOp = new mitk::PointOperation(mitk::OpREMOVE, point, 0);
+    auto *doOp = new mitk::PointOperation(mitk::OpREMOVE, point, 0);
     m_SeedsAsPointSet->ExecuteOperation(doOp);
   }
   // Deactivate Interaction
-  m_SeedPointInteractor->SetDataNode(NULL);
+  m_SeedPointInteractor->SetDataNode(nullptr);
   m_ToolManager->GetDataStorage()->Remove(m_SeedsAsPointSetNode);
-  m_SeedsAsPointSetNode = NULL;
+  m_SeedsAsPointSetNode = nullptr;
   m_SeedsAsPointSet->RemoveObserver(m_PointSetAddObserverTag);
   m_SeedsAsPointSet->RemoveObserver(m_PointSetRemoveObserverTag);
 
@@ -368,7 +368,7 @@ void mitk::FastMarchingTool3D::Update()
     m_ProgressCommand->AddStepsToDo(progress_steps);
 
     // remove interaction with poinset while updating
-    m_SeedPointInteractor->SetDataNode(NULL);
+    m_SeedPointInteractor->SetDataNode(nullptr);
     CurrentlyBusy.Send(true);
     try
     {

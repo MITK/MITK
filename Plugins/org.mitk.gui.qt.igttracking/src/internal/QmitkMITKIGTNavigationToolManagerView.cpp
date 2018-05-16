@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkMITKIGTNavigationToolManagerView.h"
-#include "QmitkStdMultiWidget.h"
 
 // MITK
 #include <usGetModuleContext.h>
@@ -38,8 +37,8 @@ QmitkMITKIGTNavigationToolManagerView::QmitkMITKIGTNavigationToolManagerView()
 
 QmitkMITKIGTNavigationToolManagerView::~QmitkMITKIGTNavigationToolManagerView()
 {
-  for (int i = 0; i < m_AllStoragesHandledByThisWidget.size(); i++)
-    m_AllStoragesHandledByThisWidget.at(i)->UnRegisterMicroservice();
+  for (auto storage : m_AllStoragesHandledByThisWidget)
+    storage->UnRegisterMicroservice();
 }
 
 void QmitkMITKIGTNavigationToolManagerView::CreateQtPartControl(QWidget *parent)
@@ -50,7 +49,7 @@ void QmitkMITKIGTNavigationToolManagerView::CreateQtPartControl(QWidget *parent)
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls = new Ui::QmitkMITKIGTNavigationToolManagerViewControls;
     m_Controls->setupUi(parent);
-    connect((QObject*)(m_Controls->m_toolManagerWidget), SIGNAL(NewStorageAdded(mitk::NavigationToolStorage::Pointer, std::string)), this, SLOT(NewStorageByWidget(mitk::NavigationToolStorage::Pointer, std::string)));
+    connect((QObject*)(m_Controls->m_toolManagerWidget), SIGNAL(NewStorageAdded(mitk::NavigationToolStorage::Pointer, std::string)), this, SLOT(NewStorageByWidget(mitk::NavigationToolStorage::Pointer)));
     connect((QObject*)(m_Controls->m_ToolStorageListWidget), SIGNAL(NavigationToolStorageSelected(mitk::NavigationToolStorage::Pointer)), this, SLOT(ToolStorageSelected(mitk::NavigationToolStorage::Pointer)));
   }
   m_Controls->m_toolManagerWidget->Initialize(this->GetDataStorage());
@@ -61,9 +60,9 @@ void QmitkMITKIGTNavigationToolManagerView::SetFocus()
   m_Controls->m_ToolStorageListWidget->setFocus();
 }
 
-void QmitkMITKIGTNavigationToolManagerView::NewStorageByWidget(mitk::NavigationToolStorage::Pointer storage, std::string storageName)
+void QmitkMITKIGTNavigationToolManagerView::NewStorageByWidget(mitk::NavigationToolStorage::Pointer storage)
 {
-  storage->RegisterAsMicroservice(storageName);
+  storage->RegisterAsMicroservice();
   m_AllStoragesHandledByThisWidget.push_back(storage);
 }
 

@@ -148,7 +148,7 @@ mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetUnion() const
 void mitk::BooleanOperation::ValidateSegmentation(mitk::Image::Pointer segmentation) const
 {
   if (segmentation.IsNull())
-    mitkThrow() << "Segmentation is NULL!";
+    mitkThrow() << "Segmentation is nullptr!";
 
   if (segmentation->GetImageDescriptor()->GetNumberOfChannels() != 1)
     mitkThrow() << "Segmentation has more than one channel!";

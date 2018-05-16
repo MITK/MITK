@@ -51,9 +51,9 @@ namespace mitk
 
   protected:
     ContourModelToSurfaceFilter();
-    ~ContourModelToSurfaceFilter();
+    ~ContourModelToSurfaceFilter() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
   };
 }
 #endif

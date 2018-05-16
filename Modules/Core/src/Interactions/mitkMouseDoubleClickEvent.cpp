@@ -65,12 +65,12 @@ mitk::MouseDoubleClickEvent::~MouseDoubleClickEvent()
 
 bool mitk::MouseDoubleClickEvent::IsEqual(const mitk::InteractionEvent &interactionEvent) const
 {
-  const mitk::MouseDoubleClickEvent &mpe = static_cast<const mitk::MouseDoubleClickEvent &>(interactionEvent);
+  const auto &mpe = static_cast<const mitk::MouseDoubleClickEvent &>(interactionEvent);
   return (this->GetEventButton() == mpe.GetEventButton() && this->GetModifiers() == mpe.GetModifiers() &&
           this->GetButtonStates() == mpe.GetButtonStates() && Superclass::IsEqual(interactionEvent));
 }
 
 bool mitk::MouseDoubleClickEvent::IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const
 {
-  return (dynamic_cast<MouseDoubleClickEvent *>(baseClass.GetPointer()) != NULL);
+  return (dynamic_cast<MouseDoubleClickEvent *>(baseClass.GetPointer()) != nullptr);
 }

@@ -99,17 +99,17 @@ struct TrackedTypeTraits<S,T*> : public TrackedTypeTraitsBase<T*,TrackedTypeTrai
 
   static bool IsValid(const TrackedType& t)
   {
-    return t != NULL;
+    return t != nullptr;
   }
 
   static TrackedType DefaultValue()
   {
-    return NULL;
+    return nullptr;
   }
 
   static void Dispose(TrackedType& t)
   {
-    t = 0;
+    t = nullptr;
   }
 };
 
@@ -121,17 +121,17 @@ struct TrackedTypeTraits<S,S*>
 
   static bool IsValid(const TrackedType& t)
   {
-    return t != NULL;
+    return t != nullptr;
   }
 
   static TrackedType DefaultValue()
   {
-    return NULL;
+    return nullptr;
   }
 
   static void Dispose(TrackedType& t)
   {
-    t = 0;
+    t = nullptr;
   }
 
   static TrackedType ConvertToTrackedType(S* s)
@@ -241,7 +241,7 @@ public:
 
   typedef std::map<ServiceReference<S>,T> TrackingMap;
 
-  ~ServiceTracker();
+  ~ServiceTracker() override;
 
   /**
    * Create a <code>ServiceTracker</code> on the specified
@@ -265,7 +265,7 @@ public:
    */
   ServiceTracker(ModuleContext* context,
                  const ServiceReferenceType& reference,
-                 ServiceTrackerCustomizer<S,T>* customizer = 0);
+                 ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
    * Create a <code>ServiceTracker</code> on the specified class name.
@@ -308,7 +308,7 @@ public:
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
   ServiceTracker(ModuleContext* context, const LDAPFilter& filter,
-                 ServiceTrackerCustomizer<S,T>* customizer = 0);
+                 ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
    * Create a <code>ServiceTracker</code> on the class template
@@ -327,7 +327,7 @@ public:
    *        <code>ServiceTracker</code> will call the
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
-  ServiceTracker(ModuleContext* context, ServiceTrackerCustomizer<S,T>* customizer = 0);
+  ServiceTracker(ModuleContext* context, ServiceTrackerCustomizer<S,T>* customizer = nullptr);
 
   /**
    * Open this <code>ServiceTracker</code> and begin tracking services.
@@ -535,7 +535,7 @@ protected:
    *         <code>ServiceTracker</code>.
    * @see ServiceTrackerCustomizer::AddingService(const ServiceReference&)
    */
-  T AddingService(const ServiceReferenceType& reference);
+  T AddingService(const ServiceReferenceType& reference) override;
 
   /**
    * Default implementation of the
@@ -552,7 +552,7 @@ protected:
    * @param service The service object for the modified service.
    * @see ServiceTrackerCustomizer::ModifiedService(const ServiceReference&, T)
    */
-  void ModifiedService(const ServiceReferenceType& reference, T service);
+  void ModifiedService(const ServiceReferenceType& reference, T service) override;
 
   /**
    * Default implementation of the
@@ -575,7 +575,7 @@ protected:
    * @param service The service object for the removed service.
    * @see ServiceTrackerCustomizer::RemovedService(const ServiceReferenceType&, T)
    */
-  void RemovedService(const ServiceReferenceType& reference, T service);
+  void RemovedService(const ServiceReferenceType& reference, T service) override;
 
 private:
 

@@ -199,21 +199,22 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     mitkCloneMacro( DICOMITKSeriesGDCMReader );
     itkFactorylessNewMacro( DICOMITKSeriesGDCMReader );
     mitkNewMacro1Param( DICOMITKSeriesGDCMReader, unsigned int );
+    mitkNewMacro2Param( DICOMITKSeriesGDCMReader, unsigned int, bool );
 
     /**
       \brief Runs the sorting / splitting process described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy.
       Method required by DICOMFileReader.
     */
-    virtual void AnalyzeInputFiles() override;
+    void AnalyzeInputFiles() override;
 
     // void AllocateOutputImages();
     /**
       \brief Loads images using itk::ImageSeriesReader, potentially applies shearing to correct gantry tilt.
     */
-    virtual bool LoadImages() override;
+    bool LoadImages() override;
 
     // re-implemented from super-class
-    virtual bool CanHandleFile(const std::string& filename) override;
+    bool CanHandleFile(const std::string& filename) override;
 
     /**
       \brief Add an element to the sorting procedure described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy.
@@ -246,18 +247,49 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     */
     void SetToleratedOriginOffset(double millimeters = 0.005) const;
 
+    /**
+    \brief Ignore all dicom tags that are non-essential for simple 3D volume import.
+    */
+    void SetSimpleVolumeReading(bool read)
+    {
+      m_SimpleVolumeReading = read;
+    };
+
+    /**
+    \brief Ignore all dicom tags that are non-essential for simple 3D volume import.
+    */
+    bool GetSimpleVolumeReading()
+    {
+      return m_SimpleVolumeReading;
+    };
+
     double GetToleratedOriginError() const;
     bool IsToleratedOriginOffsetAbsolute() const;
 
     double GetDecimalPlacesForOrientation() const;
 
-    virtual bool operator==(const DICOMFileReader& other) const override;
+    bool operator==(const DICOMFileReader& other) const override;
 
-    virtual DICOMTagPathList GetTagsOfInterest() const override;
+    DICOMTagPathList GetTagsOfInterest() const override;
+
+    static int GetDefaultDecimalPlacesForOrientation()
+    {
+      return m_DefaultDecimalPlacesForOrientation; 
+    }
+
+    static bool GetDefaultSimpleVolumeImport()
+    {
+      return m_DefaultSimpleVolumeImport;
+    }
+
+    static bool GetDefaultFixTiltByShearing()
+    {
+      return m_DefaultFixTiltByShearing;
+    }
 
   protected:
 
-    virtual void InternalPrintConfiguration(std::ostream& os) const override;
+    void InternalPrintConfiguration(std::ostream& os) const override;
 
     /// \brief Return active C locale
   static std::string GetActiveLocale();
@@ -272,8 +304,12 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     */
     void PopLocale() const;
 
-    DICOMITKSeriesGDCMReader(unsigned int decimalPlacesForOrientation = 5);
-    virtual ~DICOMITKSeriesGDCMReader();
+    const static int m_DefaultDecimalPlacesForOrientation = 5;
+    const static bool m_DefaultSimpleVolumeImport = false;
+    const static bool m_DefaultFixTiltByShearing = true;
+
+    DICOMITKSeriesGDCMReader(unsigned int decimalPlacesForOrientation = m_DefaultDecimalPlacesForOrientation, bool simpleVolumeImport = m_DefaultSimpleVolumeImport);
+    ~DICOMITKSeriesGDCMReader() override;
 
     DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other);
     DICOMITKSeriesGDCMReader& operator=(const DICOMITKSeriesGDCMReader& other);
@@ -304,12 +340,14 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
   private:
 
     /// \brief Creates the required sorting steps described in \ref DICOMITKSeriesGDCMReader_ForcedConfiguration
-    void EnsureMandatorySortersArePresent(unsigned int decimalPlacesForOrientation);
+    void EnsureMandatorySortersArePresent(unsigned int decimalPlacesForOrientation, bool simpleVolumeImport = false);
 
   protected:
 
     // NOT nice, made available to ThreeDnTDICOMSeriesReader due to lack of time
     bool m_FixTiltByShearing; // could be removed by ITKDICOMSeriesReader NOT flagging tilt unless requested to fix it!
+
+    bool m_SimpleVolumeReading;
 
   private:
 

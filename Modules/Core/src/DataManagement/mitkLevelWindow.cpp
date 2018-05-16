@@ -428,7 +428,7 @@ void mitk::LevelWindow::SetToImageRange(const mitk::Image *image)
   if (IsFixed())
     return;
 
-  if (image == NULL || !image->IsInitialized())
+  if (image == nullptr || !image->IsInitialized())
     return;
 
   ScalarType minValue = image->GetStatistics()->GetScalarValueMin(0);

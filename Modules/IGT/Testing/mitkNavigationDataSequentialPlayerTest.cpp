@@ -47,7 +47,7 @@ public:
     player = mitk::NavigationDataSequentialPlayer::New();
     std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData_2ToolsDouble.xml");
 
-    NavigationDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(file).GetPointer());
+    NavigationDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(file)[0].GetPointer());
   }
 
   void tearDown() override
@@ -124,7 +124,7 @@ public:
 
     // setting new NavigationDataSet with different tool count should result in an exception
     std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData.xml");
-    mitk::NavigationDataSet::Pointer dataset = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(file).GetPointer());
+    mitk::NavigationDataSet::Pointer dataset = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(file)[0].GetPointer());
     MITK_TEST_FOR_EXCEPTION(mitk::IGTException, player->SetNavigationDataSet(dataset));
   }
 
@@ -133,7 +133,7 @@ public:
     //testing GoToSnapShot for exception
     mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer2 = mitk::NavigationDataSequentialPlayer::New();
     std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData_2Tools.xml");
-    mitk::NavigationDataSet::Pointer dataset = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(file).GetPointer());
+    mitk::NavigationDataSet::Pointer dataset = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(file)[0].GetPointer());
     myTestPlayer2->SetNavigationDataSet(dataset);
 
     bool exceptionThrown2=false;

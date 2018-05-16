@@ -37,9 +37,9 @@ ModuleHooks::ModuleHooks(CoreModuleContext* ctx)
 
 Module* ModuleHooks::FilterModule(const ModuleContext* mc, Module* module) const
 {
-  if(module == NULL)
+  if(module == nullptr)
   {
-    return NULL;
+    return nullptr;
   }
 
   std::vector<ServiceRegistrationBase> srl;
@@ -53,7 +53,7 @@ Module* ModuleHooks::FilterModule(const ModuleContext* mc, Module* module) const
     std::vector<Module*> ml;
     ml.push_back(module);
     this->FilterModules(mc, ml);
-    return ml.empty() ? NULL : module;
+    return ml.empty() ? nullptr : module;
   }
 }
 
@@ -69,7 +69,7 @@ void ModuleHooks::FilterModules(const ModuleContext* mc, std::vector<Module*>& m
   {
     ServiceReference<ModuleFindHook> sr = srBaseIter->GetReference();
     ModuleFindHook* const fh = reinterpret_cast<ModuleFindHook*>(sr.d->GetService(GetModuleContext()->GetModule()));
-    if (fh != NULL)
+    if (fh != nullptr)
     {
       try
       {
@@ -130,7 +130,7 @@ void ModuleHooks::FilterModuleEventReceivers(const ModuleEvent& evt,
       }
 
       ModuleEventHook* eh = reinterpret_cast<ModuleEventHook*>(sr.d->GetService(GetModuleContext()->GetModule()));
-      if (eh != NULL)
+      if (eh != nullptr)
       {
         try
         {

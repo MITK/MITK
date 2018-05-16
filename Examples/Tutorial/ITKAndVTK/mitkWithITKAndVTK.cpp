@@ -38,7 +38,7 @@ int main(int /*argc*/, char **argv)
   mitk::Image::Pointer mitkImage;
   try
   {
-    mitkImage = mitk::IOUtil::LoadImage(filename);
+    mitkImage = mitk::IOUtil::Load<mitk::Image>(filename);
   }
   catch (const std::exception &e)
   {

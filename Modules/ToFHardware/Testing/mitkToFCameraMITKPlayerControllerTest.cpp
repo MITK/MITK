@@ -154,7 +154,7 @@ int mitkToFCameraMITKPlayerControllerTest(int /* argc */, char* /*argv*/[])
   mitk::ToFImageGrabber::Pointer imageGrabber = mitk::ToFImageGrabber::New();
   imageGrabber->SetCameraDevice(deviceImpl);
 
-  MITK_TEST_CONDITION_REQUIRED(!(testObject.GetPointer() == NULL) ,"Testing initialization class");
+  MITK_TEST_CONDITION_REQUIRED(!(testObject.GetPointer() == nullptr) ,"Testing initialization class");
   MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureHeight()== 0 ,"Testing initialization of CaptureHeight");
   MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureWidth()== 0 ,"Testing initialization of CaptureWidth");
 

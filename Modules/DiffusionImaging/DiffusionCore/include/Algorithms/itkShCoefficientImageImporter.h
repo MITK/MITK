@@ -21,7 +21,7 @@
 
 namespace itk{
 /** \class ShCoefficientImageImporter
-  Converts FSL reconstructions of diffusionweighted images (4D images containing the sh coefficients) to qball images or 3D sh-coefficient images.
+  Converts converts 4D SH coefficient images (MRtrix) to 3D vector images containing the SH coefficients
 */
 
 template< class PixelType, int ShOrder >
@@ -30,24 +30,13 @@ class ShCoefficientImageImporter : public ProcessObject
 
 public:
 
-    enum NormalizationMethods {
-        NO_NORM,
-        SINGLE_VEC_NORM,
-        SPACING_COMPENSATION
-    };
-
-    enum Toolkit {  ///< SH coefficient convention (depends on toolkit)
-        FSL,
-        MRTRIX
-    };
-
     typedef ShCoefficientImageImporter Self;
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
     typedef ProcessObject                           Superclass;
     typedef itk::Image< float, 4 >                  InputImageType;
     typedef Image< Vector< PixelType, (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder >, 3 > CoefficientImageType;
-    typedef Image< Vector< PixelType, QBALL_ODFSIZE >, 3 > QballImageType;
+    typedef Image< Vector< PixelType, ODF_SAMPLING_SIZE >, 3 > OdfImageType;
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)
@@ -61,25 +50,15 @@ public:
 
     // output
     itkGetMacro( CoefficientImage, typename CoefficientImageType::Pointer)    ///< mitk style image containing the SH coefficients
-    itkGetMacro( QballImage, typename QballImageType::Pointer)                ///< mitk Q-Ball image generated from the coefficients
-
-    itkSetMacro( Toolkit, Toolkit)  ///< define SH coefficient convention (depends on toolkit)
-    itkGetMacro( Toolkit, Toolkit)  ///< SH coefficient convention (depends on toolkit)
 
     void GenerateData() override;
 
 protected:
     ShCoefficientImageImporter();
-    ~ShCoefficientImageImporter(){}
-
-    void CalcShBasis();
-    vnl_matrix_fixed<double, 2, QBALL_ODFSIZE> GetSphericalOdfDirections();
+    ~ShCoefficientImageImporter() override{}
 
     InputImageType::Pointer                   m_InputImage;
     typename CoefficientImageType::Pointer    m_CoefficientImage; ///< mitk style image containing the SH coefficients
-    typename QballImageType::Pointer          m_QballImage;       ///< mitk Q-Ball image generated from the coefficients
-    vnl_matrix<double>                        m_ShBasis;
-    Toolkit                                   m_Toolkit;
 
 private:
 

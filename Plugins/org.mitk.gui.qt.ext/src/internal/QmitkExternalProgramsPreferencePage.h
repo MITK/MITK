@@ -34,7 +34,7 @@ class QmitkExternalProgramsPreferencePage : public QObject, public berry::IQtPre
 
 public:
   QmitkExternalProgramsPreferencePage();
-  ~QmitkExternalProgramsPreferencePage();
+  ~QmitkExternalProgramsPreferencePage() override;
 
   void CreateQtControl(QWidget* parent) override;
   QWidget* GetQtControl() const override;

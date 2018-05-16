@@ -38,7 +38,7 @@ struct BERRY_UI_QT IWorkbenchLocationService : public virtual Object
 
   berryObjectMacro(berry::IWorkbenchLocationService)
 
-  ~IWorkbenchLocationService();
+  ~IWorkbenchLocationService() override;
 
   /**
    * Get the service scope.

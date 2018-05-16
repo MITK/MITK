@@ -75,7 +75,7 @@ namespace mitk
     /**
     * The destructor
     */
-    virtual ~PointSetToPointSetFilter();
+    ~PointSetToPointSetFilter() override;
 
   private:
     void operator=(const Self &); // purposely not implemented

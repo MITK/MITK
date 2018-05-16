@@ -40,17 +40,17 @@ namespace mitk
   {
   public:
     DICOMTagsOfInterestService();
-    virtual ~DICOMTagsOfInterestService();
+    ~DICOMTagsOfInterestService() override;
 
-    virtual void AddTagOfInterest(const DICOMTagPath& tag, bool makePersistant = true) override;
+    void AddTagOfInterest(const DICOMTagPath& tag, bool makePersistant = true) override;
 
-    virtual DICOMTagPathMapType GetTagsOfInterest() const override;
+    DICOMTagPathMapType GetTagsOfInterest() const override;
 
-    virtual bool HasTag(const DICOMTagPath& tag) const override;
+    bool HasTag(const DICOMTagPath& tag) const override;
 
-    virtual void RemoveTag(const DICOMTagPath& tag) override;
+    void RemoveTag(const DICOMTagPath& tag) override;
 
-    virtual void RemoveAllTags() override;
+    void RemoveAllTags() override;
 
   private:
 

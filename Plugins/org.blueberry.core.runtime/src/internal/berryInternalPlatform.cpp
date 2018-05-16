@@ -311,6 +311,26 @@ void InternalPlatform::CloseServiceTrackers()
     m_DebugTracker->close();
     m_DebugTracker.reset();
   }
+
+  if (!configurationLocation.isNull()) {
+    configurationLocation->close();
+    configurationLocation.reset();
+  }
+
+  if (!installLocation.isNull()) {
+    installLocation->close();
+    installLocation.reset();
+  }
+
+  if (!instanceLocation.isNull()) {
+    instanceLocation->close();
+    instanceLocation.reset();
+  }
+
+  if (!userLocation.isNull()) {
+    userLocation->close();
+    userLocation.reset();
+  }
 }
 
 void InternalPlatform::InitializeDebugFlags()
@@ -341,13 +361,13 @@ ctkLocation* InternalPlatform::GetConfigurationLocation()
 ctkLocation* InternalPlatform::GetInstallLocation()
 {
   this->AssertInitialized();
-  return configurationLocation->getService();
+  return installLocation->getService();
 }
 
 ctkLocation* InternalPlatform::GetInstanceLocation()
 {
   this->AssertInitialized();
-  return installLocation->getService();
+  return instanceLocation->getService();
 }
 
 QDir InternalPlatform::GetStateLocation(const QSharedPointer<ctkPlugin>& plugin)

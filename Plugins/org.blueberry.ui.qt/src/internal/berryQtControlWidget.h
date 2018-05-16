@@ -31,9 +31,9 @@ class BERRY_UI_QT QtControlWidget : public QFrame
 
 public:
 
-  QtControlWidget(QWidget* parent, Shell* shell, Qt::WindowFlags f = 0);
+  QtControlWidget(QWidget* parent, Shell* shell, Qt::WindowFlags f = nullptr);
 
-  ~QtControlWidget();
+  ~QtControlWidget() override;
 
   void FireActivateEvent();
 

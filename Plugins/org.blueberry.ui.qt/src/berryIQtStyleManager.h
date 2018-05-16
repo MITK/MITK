@@ -52,29 +52,7 @@ struct BERRY_UI_QT IQtStyleManager
     { return name == s.name; }
   };
 
-  struct IconTheme {
-    QString name;
-
-    IconTheme() {}
-
-    IconTheme(const QString& name)
-    : name(name) {}
-
-    IconTheme& operator=(const IconTheme& s)
-    {
-      this->name = s.name;
-      return *this;
-    }
-
-    bool operator<(const IconTheme& s) const
-    { return name < s.name; }
-
-    bool operator==(const IconTheme& s) const
-    { return name == s.name; }
-  };
-
   typedef QList<Style> StyleList;
-  typedef QList<IconTheme> IconThemeList;
 
   virtual ~IQtStyleManager();
 
@@ -82,6 +60,7 @@ struct BERRY_UI_QT IQtStyleManager
   virtual QString GetStylesheet() const = 0;
   virtual QString GetActiveTabStylesheet() const = 0;
   virtual QString GetTabStylesheet() const = 0;
+  virtual QString GetFont() const = 0;
 
   virtual void AddStyle(const QString& styleFileName, const QString& styleName = QString()) = 0;
   virtual void AddStyles(const QString& path) = 0;
@@ -91,12 +70,13 @@ struct BERRY_UI_QT IQtStyleManager
   virtual void GetStyles(StyleList& styles) const = 0;
   virtual void SetStyle(const QString& fileName) = 0;
 
+  virtual void GetFonts(QStringList& fontNames) const = 0;
+  virtual void SetFont(const QString& fontName) = 0;
+  virtual void SetFontSize(const int fontSize) = 0;
+  virtual void UpdateWorkbenchFont() = 0;
+
   virtual Style GetDefaultStyle() const = 0;
   virtual void SetDefaultStyle() = 0;
-
-  virtual void GetIconThemes(IconThemeList& iconThemes) const = 0;
-
-  virtual void SetIconTheme(const QString& themeName) = 0;
 
   virtual bool Contains(const QString& fileName) const = 0;
 

@@ -34,7 +34,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkModuleTableModel : public QAbstractTableModel
 {
 public:
   QmitkModuleTableModel(QObject *parent = nullptr, us::ModuleContext *mc = nullptr);
-  ~QmitkModuleTableModel();
+  ~QmitkModuleTableModel() override;
 
 protected:
   int rowCount(const QModelIndex &parent = QModelIndex()) const override;

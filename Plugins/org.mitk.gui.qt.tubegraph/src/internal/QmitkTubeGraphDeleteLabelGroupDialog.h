@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _QMITKTUBEGRAPHDELETELABELGROUPDIALOG_H_INCLUDED
 
 
-#include <qdialog.h>
+#include <QDialog>
 
 class QPushButton;
 class QListWidget;
@@ -33,8 +33,8 @@ public:
   QmitkTubeGraphDeleteLabelGroupDialog(QWidget* parent = nullptr);
   virtual ~QmitkTubeGraphDeleteLabelGroupDialog();
 
-  const QStringList GetSelectedLabelGroups();
-  void SetLabelGroups(QStringList labelGroups);
+  QStringList GetSelectedLabelGroups();
+  void SetLabelGroups(const QStringList &labelGroups);
 
 
  protected slots:

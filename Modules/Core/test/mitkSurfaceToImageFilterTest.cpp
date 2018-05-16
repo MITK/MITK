@@ -41,7 +41,7 @@ public:
    * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used
    * members for a new test case. (If the members are not used in a test, the method does not need to be called).
    */
-  void setUp() override { m_Surface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("ball.stl")); }
+  void setUp() override { m_Surface = mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("ball.stl")); }
   void tearDown() override {}
   void test3DSurfaceValidOutput()
   {
@@ -75,7 +75,7 @@ public:
     // todo I don't know if this image is always needed. There is no documentation of the filter. Use git blame and ask
     // the author.
     mitk::Image::Pointer additionalInputImage = mitk::Image::New();
-    unsigned int *dims = new unsigned int[3];
+    auto *dims = new unsigned int[3];
     dims[0] = 32;
     dims[1] = 32;
     dims[2] = 32;
@@ -136,7 +136,7 @@ public:
     mitk::SurfaceToImageFilter::Pointer surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
 
     mitk::Image::Pointer additionalInputImage = mitk::Image::New();
-    unsigned int *dims = new unsigned int[4];
+    auto *dims = new unsigned int[4];
     dims[0] = 32;
     dims[1] = 32;
     dims[2] = 32;
@@ -145,18 +145,29 @@ public:
     additionalInputImage->SetOrigin(m_Surface->GetGeometry()->GetOrigin());
     additionalInputImage->GetGeometry()->SetIndexToWorldTransform(m_Surface->GetGeometry()->GetIndexToWorldTransform());
     mitk::Image::Pointer secondStep = additionalInputImage->Clone();
+
     unsigned int size = sizeof(unsigned char);
     for (unsigned int i = 0; i < secondStep->GetDimension(); ++i)
+    {
       size *= secondStep->GetDimension(i);
-    mitk::ImageWriteAccessor accessor(secondStep);
-    memset(accessor.GetData(), 1, size);
+    }
+
+    {
+      mitk::ImageWriteAccessor accessor(secondStep);
+      memset(accessor.GetData(), 1, size);
+    }
+
     additionalInputImage->GetTimeGeometry()->Expand(2);
     additionalInputImage->GetGeometry(1)->SetSpacing(secondStep->GetGeometry()->GetSpacing());
     additionalInputImage->GetGeometry(1)->SetOrigin(secondStep->GetGeometry()->GetOrigin());
     additionalInputImage->GetGeometry(1)->SetIndexToWorldTransform(
       secondStep->GetGeometry()->GetIndexToWorldTransform());
-    additionalInputImage->SetImportVolume(secondStep->GetData(), 0);
-    additionalInputImage->SetImportVolume(secondStep->GetData(), 1);
+
+    {
+      mitk::ImageReadAccessor readAccess(secondStep);
+      additionalInputImage->SetImportVolume(readAccess.GetData(), 0);
+      additionalInputImage->SetImportVolume(readAccess.GetData(), 1);
+    }
 
     // Arrange the filter
     surfaceToImageFilter->MakeOutputBinaryOn();

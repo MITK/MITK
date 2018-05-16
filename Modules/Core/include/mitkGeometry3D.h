@@ -63,9 +63,9 @@ namespace mitk
     //##  newGeometry->UnRegister();
     //##  return newGeometry.GetPointer();
     //## \endcode
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
 
-    virtual ~Geometry3D();
+    ~Geometry3D() override;
 
     //##Documentation
     //## @brief PreSetSpacing
@@ -73,7 +73,7 @@ namespace mitk
     //## These virtual function allows a different beahiour in subclasses.
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
-    virtual void PreSetSpacing(const mitk::Vector3D &aSpacing) override { Superclass::PreSetSpacing(aSpacing); };
+    void PreSetSpacing(const mitk::Vector3D &aSpacing) override { Superclass::PreSetSpacing(aSpacing); };
   };
 } // namespace mitk
 

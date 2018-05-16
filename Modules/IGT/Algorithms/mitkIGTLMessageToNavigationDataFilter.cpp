@@ -40,7 +40,7 @@ void mitk::IGTLMessageToNavigationDataFilter::SetInput(const IGTLMessage* msg)
 
 void mitk::IGTLMessageToNavigationDataFilter::SetInput(unsigned int idx, const IGTLMessage* msg)
 {
-  if (msg == NULL) // if an input is set to NULL, remove it
+  if (msg == nullptr) // if an input is set to nullptr, remove it
   {
     this->RemoveInput(idx);
   }
@@ -56,7 +56,7 @@ const mitk::IGTLMessage*
 mitk::IGTLMessageToNavigationDataFilter::GetInput(void) const
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
 
   return static_cast<const IGTLMessage*>(this->ProcessObject::GetInput(0));
 }
@@ -65,7 +65,7 @@ const mitk::IGTLMessage*
 mitk::IGTLMessageToNavigationDataFilter::GetInput(unsigned int idx) const
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
 
   return static_cast<const IGTLMessage*>(this->ProcessObject::GetInput(idx));
 }
@@ -83,7 +83,7 @@ mitk::IGTLMessageToNavigationDataFilter::GetInput(std::string messageName) const
       return static_cast<IGTLMessage*>(it->GetPointer());
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 itk::ProcessObject::DataObjectPointerArraySizeType
@@ -125,7 +125,7 @@ void mitk::IGTLMessageToNavigationDataFilter::CreateOutputsForAllInputs()
   bool isModified = false;
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
   {
-    if (this->GetOutput(idx) == NULL)
+    if (this->GetOutput(idx) == nullptr)
     {
       mitk::NavigationData::Pointer newOutput = mitk::NavigationData::New();
       this->SetNthOutput(idx, newOutput);
@@ -237,10 +237,7 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateTrackingDataData()
     //check if the current index, all outputs that have no corresponding input
     //tracking element stay invalidated, the others are validated according to
     //the tracking element
-    if (input->IsDataValid() == false || i >= numTrackingDataElements)
-    {
-      continue;
-    }
+    if (input->IsDataValid() == false) { continue; }
     output->SetDataValid(true);
 
     //get the tracking data element which holds all the data

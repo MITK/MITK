@@ -72,7 +72,7 @@ void QmitkXnatConnectionPreferencePage::CreateQtControl(QWidget* parent)
 
   if (session != nullptr && session->isOpen())
   {
-    m_Controls.xnatTestConnectionLabel->setStyleSheet("QLabel { color: green; }");
+    m_Controls.xnatTestConnectionLabel->setStyleSheet("color: green");
     m_Controls.xnatTestConnectionLabel->setText("Already connected.");
     m_Controls.xnatTestConnectionButton->setEnabled(false);
   }
@@ -158,7 +158,7 @@ bool QmitkXnatConnectionPreferencePage::UserInformationEmpty()
   // if something is empty
   if (!errString.isEmpty())
   {
-    m_Controls.xnatTestConnectionLabel->setStyleSheet("QLabel { color: red; }");
+    m_Controls.xnatTestConnectionLabel->setStyleSheet("color: red");
     m_Controls.xnatTestConnectionLabel->setText("Connecting failed.\n" + errString);
     return true;
   }
@@ -204,7 +204,7 @@ void QmitkXnatConnectionPreferencePage::Update()
 
 void QmitkXnatConnectionPreferencePage::UrlChanged()
 {
-  m_Controls.inXnatHostAddress->setStyleSheet("QLineEdit { background-color: white; }");
+  m_Controls.inXnatHostAddress->setStyleSheet("");
   QString str = m_Controls.inXnatHostAddress->text();
 
   while (str.endsWith("/"))
@@ -217,13 +217,13 @@ void QmitkXnatConnectionPreferencePage::UrlChanged()
   QUrl url(m_Controls.inXnatHostAddress->text());
   if (!url.isValid())
   {
-    m_Controls.inXnatHostAddress->setStyleSheet("QLineEdit { background-color: red; }");
+    m_Controls.inXnatHostAddress->setStyleSheet("background-color: red");
   }
 }
 
 void QmitkXnatConnectionPreferencePage::DownloadPathChanged()
 {
-  m_Controls.inXnatDownloadPath->setStyleSheet("QLineEdit { background-color: white; }");
+  m_Controls.inXnatDownloadPath->setStyleSheet("");
   QString downloadPath = m_Controls.inXnatDownloadPath->text();
   if (!downloadPath.isEmpty())
   {
@@ -235,7 +235,7 @@ void QmitkXnatConnectionPreferencePage::DownloadPathChanged()
     QFileInfo path(m_Controls.inXnatDownloadPath->text());
     if (!path.isDir())
     {
-      m_Controls.inXnatDownloadPath->setStyleSheet("QLineEdit { background-color: red; }");
+      m_Controls.inXnatDownloadPath->setStyleSheet("background-color: red");
     }
   }
 }
@@ -259,22 +259,21 @@ void QmitkXnatConnectionPreferencePage::TestConnection()
   {
     return;
   }
-  ctkXnatSession* session = 0;
 
   try
   {
-    session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
-          mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
+    mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
+      mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
   }
-  catch (std::invalid_argument)
+  catch (const std::invalid_argument &)
   {
     if (!UserInformationEmpty())
     {
       PerformOk();
 
       mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CreateXnatSession();
-      session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
-            mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
+      mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
+        mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
     }
   }
 
@@ -282,21 +281,21 @@ void QmitkXnatConnectionPreferencePage::TestConnection()
   {
     mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->OpenXnatSession();
 
-    m_Controls.xnatTestConnectionLabel->setStyleSheet("QLabel { color: green; }");
+    m_Controls.xnatTestConnectionLabel->setStyleSheet("color: green");
     m_Controls.xnatTestConnectionLabel->setText("Connecting successful.");
 
     mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CloseXnatSession();
   }
   catch (const ctkXnatAuthenticationException& auth)
   {
-    m_Controls.xnatTestConnectionLabel->setStyleSheet("QLabel { color: red; }");
+    m_Controls.xnatTestConnectionLabel->setStyleSheet("color: red");
     m_Controls.xnatTestConnectionLabel->setText("Connecting failed:\nAuthentication error.");
     MITK_INFO << auth.message().toStdString();
     mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CloseXnatSession();
   }
   catch (const ctkException& e)
   {
-    m_Controls.xnatTestConnectionLabel->setStyleSheet("QLabel { color: red; }");
+    m_Controls.xnatTestConnectionLabel->setStyleSheet("color: red");
     m_Controls.xnatTestConnectionLabel->setText("Connecting failed:\nInvalid Server Adress\nPossibly due to missing OpenSSL for HTTPS connections");
     MITK_INFO << e.message().toStdString();
     mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CloseXnatSession();

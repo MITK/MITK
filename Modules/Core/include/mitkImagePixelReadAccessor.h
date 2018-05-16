@@ -83,7 +83,7 @@ namespace mitk
     }
 
     /** Destructor informs Image to unlock memory. */
-    virtual ~ImagePixelReadAccessor() {}
+    ~ImagePixelReadAccessor() override {}
     /** Returns a const reference to the pixel at given index. */
     const TPixel &GetPixelByIndex(const itk::Index<VDimension> &idx) const
     {

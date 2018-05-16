@@ -52,7 +52,7 @@ namespace mitk
     unsigned int GetMaximumNumberOfControlPoints() const override { return 2; }
     void SetArrowTipScaleFactor(float scale);
 
-    virtual bool Equals(const mitk::PlanarFigure &other) const override;
+    bool Equals(const mitk::PlanarFigure &other) const override;
 
   protected:
     PlanarArrow();
@@ -60,15 +60,15 @@ namespace mitk
     mitkCloneMacro(Self);
 
     /** \brief Generates the poly-line representation of the planar figure. */
-    virtual void GeneratePolyLine() override;
+    void GeneratePolyLine() override;
 
     /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
-    virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
+    void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
 
     /** \brief Calculates feature quantities of the planar figure. */
-    virtual void EvaluateFeaturesInternal() override;
+    void EvaluateFeaturesInternal() override;
 
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     // Feature identifiers
     const unsigned int FEATURE_ID_LENGTH;

@@ -31,7 +31,7 @@ class QtSash : public QWidget
 
 public:
     QtSash(Qt::Orientation o, QWidget* parent = nullptr, bool smooth = true);
-    ~QtSash();
+    ~QtSash() override;
 
     //void setOrientation(Qt::Orientation o);
     Qt::Orientation GetOrientation() const;

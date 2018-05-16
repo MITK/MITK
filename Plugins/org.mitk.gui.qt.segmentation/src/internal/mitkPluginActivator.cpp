@@ -53,7 +53,7 @@ void PluginActivator::start(ctkPluginContext *context)
 
 void PluginActivator::stop(ctkPluginContext *)
 {
-  this->m_context = NULL;
+  this->m_context = nullptr;
 }
 
 PluginActivator* PluginActivator::getDefault()

@@ -63,8 +63,8 @@ namespace mitk
     * deleting any extra outputs that might have been initialized.
     * Subclasses that have a different number of outputs than inputs
     * must overwrite the SetInput methods.
-    * If the last input is set to NULL, the number of inputs will be decreased by
-    * one (-> removing the last input). If other inputs are set to NULL, the
+    * If the last input is set to nullptr, the number of inputs will be decreased by
+    * one (-> removing the last input). If other inputs are set to nullptr, the
     * number of inputs will not change.
     */
     virtual void SetInput( unsigned int idx, const IGTLMessage* msg);
@@ -115,9 +115,9 @@ namespace mitk
 
   protected:
     IGTLMessageToNavigationDataFilter();
-    virtual ~IGTLMessageToNavigationDataFilter();
+    ~IGTLMessageToNavigationDataFilter() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
     void GenerateTransformData();
     void GenerateTrackingDataData();
     void GenerateQuaternionTrackingDataData();
@@ -135,7 +135,7 @@ namespace mitk
     /**
     * \brief Defines how the input will be copied into the output
     */
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
   };
 } // namespace mitk
 #endif /* MITKOPENIGTLMESSAGETONAVIGATIONDATAFILTER_H_HEADER_INCLUDED_ */

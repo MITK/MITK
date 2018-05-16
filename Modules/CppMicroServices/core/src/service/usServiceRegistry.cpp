@@ -81,7 +81,7 @@ void ServiceRegistry::Clear()
   services.clear();
   serviceRegistrations.clear();
   classServices.clear();
-  core = 0;
+  core = nullptr;
 }
 
 ServiceRegistrationBase ServiceRegistry::RegisterService(ModulePrivate* module,
@@ -95,14 +95,14 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(ModulePrivate* module,
 
   // Check if we got a service factory
   bool isFactory = service.count("org.cppmicroservices.factory") > 0;
-  bool isPrototypeFactory = (isFactory ? dynamic_cast<PrototypeServiceFactory*>(reinterpret_cast<ServiceFactory*>(service.find("org.cppmicroservices.factory")->second)) != NULL : false);
+  bool isPrototypeFactory = (isFactory ? dynamic_cast<PrototypeServiceFactory*>(reinterpret_cast<ServiceFactory*>(service.find("org.cppmicroservices.factory")->second)) != nullptr : false);
 
   std::vector<std::string> classes;
   // Check if service implements claimed classes and that they exist.
   for (InterfaceMap::const_iterator i = service.begin();
        i != service.end(); ++i)
   {
-    if (i->first.empty() || (!isFactory && i->second == NULL))
+    if (i->first.empty() || (!isFactory && i->second == nullptr))
     {
       throw std::invalid_argument("Can't register as null class");
     }
@@ -269,13 +269,13 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz, const std::string& 
 
   if (!res.empty())
   {
-    if (module != NULL)
+    if (module != nullptr)
     {
       core->serviceHooks.FilterServiceReferences(module->moduleContext, clazz, filter, res);
     }
     else
     {
-      core->serviceHooks.FilterServiceReferences(NULL, clazz, filter, res);
+      core->serviceHooks.FilterServiceReferences(nullptr, clazz, filter, res);
     }
   }
 }

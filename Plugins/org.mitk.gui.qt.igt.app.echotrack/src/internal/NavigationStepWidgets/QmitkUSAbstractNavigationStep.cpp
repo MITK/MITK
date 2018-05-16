@@ -177,7 +177,7 @@ itk::SmartPointer<mitk::DataNode> QmitkUSAbstractNavigationStep::GetNamedDerived
   if ( sourceNode.IsNull() )
   {
     MITK_WARN << "Source node cannot be found in data storage. Returning null.";
-    return NULL;
+    return nullptr;
   }
 
   return m_DataStorage->GetNamedDerivedNode(name, m_DataStorage->GetNamedNode(sourceName));

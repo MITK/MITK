@@ -89,13 +89,13 @@ namespace mitk
     UnstructuredGridClusteringFilter();
 
     /** Destructor */
-    virtual ~UnstructuredGridClusteringFilter();
+    ~UnstructuredGridClusteringFilter() override;
 
     /** Defines the output of the filter */
-    virtual void GenerateOutputInformation();
+    void GenerateOutputInformation() override;
 
     /** Is called by the Update() method */
-    virtual void GenerateData();
+    void GenerateData() override;
 
   private:
     /** Used for the DBSCAN algorithm to expand a cluster and add more points to it */

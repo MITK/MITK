@@ -37,13 +37,13 @@ public:
     /**
      * @brief Computes and returns the mask
      */
-    mitk::Image::Pointer GetMask();
+    mitk::Image::Pointer GetMask() override;
 
     /**
      * @brief SetTimeStep is used to set the time step for which the mask is to be generated
      * @param timeStep
      */
-    void SetTimeStep(unsigned int timeStep);
+    void SetTimeStep(unsigned int timeStep) override;
 
 protected:
     IgnorePixelMaskGenerator():
@@ -54,7 +54,7 @@ protected:
         m_InternalMask = mitk::Image::New();
     }
 
-    ~IgnorePixelMaskGenerator(){}
+    ~IgnorePixelMaskGenerator() override{}
 
     template <typename TPixel, unsigned int VImageDimension>
     void InternalCalculateMask(typename itk::Image<TPixel, VImageDimension>* image);

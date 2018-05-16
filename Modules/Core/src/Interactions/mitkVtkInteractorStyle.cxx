@@ -33,7 +33,7 @@ void mitkVtkInteractorStyle::OnMouseWheelForward()
 {
   if (this->HasObserver(vtkCommand::MouseWheelForwardEvent))
   {
-    this->InvokeEvent(vtkCommand::MouseWheelForwardEvent, NULL);
+    this->InvokeEvent(vtkCommand::MouseWheelForwardEvent, nullptr);
   }
 }
 
@@ -41,6 +41,6 @@ void mitkVtkInteractorStyle::OnMouseWheelBackward()
 {
   if (this->HasObserver(vtkCommand::MouseWheelBackwardEvent))
   {
-    this->InvokeEvent(vtkCommand::MouseWheelBackwardEvent, NULL);
+    this->InvokeEvent(vtkCommand::MouseWheelBackwardEvent, nullptr);
   }
 }

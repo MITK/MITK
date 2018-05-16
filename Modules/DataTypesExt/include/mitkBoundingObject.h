@@ -50,7 +50,7 @@ namespace mitk
 
   protected:
     BoundingObject();
-    virtual ~BoundingObject();
+    ~BoundingObject() override;
 
     bool WriteXMLData(XMLWriter &xmlWriter);
 

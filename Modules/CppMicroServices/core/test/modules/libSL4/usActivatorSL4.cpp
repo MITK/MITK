@@ -34,7 +34,7 @@ class ActivatorSL4 :
 
 public:
 
-  ~ActivatorSL4()
+  ~ActivatorSL4() override
   {
 
   }

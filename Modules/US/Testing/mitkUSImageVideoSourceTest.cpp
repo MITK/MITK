@@ -35,15 +35,15 @@ public:
     usSource->SetVideoFileInput(videoFilePath);
     MITK_TEST_CONDITION_REQUIRED(usSource->GetIsVideoReady(), "USImageVideoSource should have isVideoReady flag set after opening a Video File");
     mitk::Image::Pointer frame;
-    frame = usSource->GetNextImage();
+    frame = usSource->GetNextImage()[0];
     MITK_TEST_CONDITION_REQUIRED(frame.IsNotNull(), "First frame should not be null.");
-    frame = usSource->GetNextImage();
+    frame = usSource->GetNextImage()[0];
     MITK_TEST_CONDITION_REQUIRED(frame.IsNotNull(), "Second frame should not be null.");
-    frame = usSource->GetNextImage();
+    frame = usSource->GetNextImage()[0];
     MITK_TEST_CONDITION_REQUIRED(frame.IsNotNull(), "Third frame should not be null.");
-    frame = usSource->GetNextImage();
+    frame = usSource->GetNextImage()[0];
     MITK_TEST_CONDITION_REQUIRED(frame.IsNotNull(), "Fourth frame should not be null.");
-    frame = usSource->GetNextImage();
+    frame = usSource->GetNextImage()[0];
     MITK_TEST_CONDITION_REQUIRED(frame.IsNotNull(), "Fifth frame should not be null.");
   }
   /** This Test will fail if no device is attached. Since it basically covers the same non-OpenCV Functionality as TestOpenVideoFile, it is ommited
@@ -56,18 +56,17 @@ public:
   */
 };
 
+#ifdef WIN32 // Video file compression is currently only supported under windows.
 /**
 * This function is testing methods of the class USImageVideoSource.
 */
-int mitkUSImageVideoSourceTest(int argc, char* argv[])
+int mitkUSImageVideoSourceTest(int, char* argv[])
 {
   MITK_TEST_BEGIN("mitkUSImageVideoSourceTest");
 
   mitkUSImageVideoSourceTestClass::TestInstantiation();
 
-#ifdef WIN32 // Video file compression is currently only supported under windows.
   mitkUSImageVideoSourceTestClass::TestOpenVideoFile(argv[1]);
-#endif
 
   // This test is commented out since no videodevcie ist steadily connected to the dart clients.
   // Functionality should sufficiently be tested through TestOpenVideoFile anyway
@@ -75,3 +74,10 @@ int mitkUSImageVideoSourceTest(int argc, char* argv[])
 
   MITK_TEST_END();
 }
+#else
+int mitkUSImageVideoSourceTest(int, char* [] )
+{
+  MITK_TEST_BEGIN("mitkUSImageVideoSourceTest");
+  MITK_TEST_END();
+}
+#endif

@@ -1,0 +1,9 @@
+/**
+\page org_mitk_views_fiberprocessing Fiber Processing
+
+This view provides tools to extract subbundles from a given fiber bundle, to remove unwanted fibers (e.g. via length, curvature, directional and fiber weight constraints) and to modify the properties of a fiber bundles such as coloring or fiber sampling.
+
+<b>Fiber Extraction:</b>
+Place ROIs in the 2D render widgets (cricles or polygons) and extract fibers from the bundle that pass through these ROIs by selecting the according ROI and fiber bundle in the datamanger and starting the extraction. The ROIs can be combined via logical operations. All fibers that pass through the thus generated composite ROI are extracted. The extraction can also be performed using 3D ROIs represented as binary mask images. In this extraction method, the logical operations are not implemented at the moment.
+
+*/

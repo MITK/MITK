@@ -18,9 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingModeProperty.h>
 #include <mitkTransferFunctionProperty.h>
 #include "mitkFreeSurferParcellationTranslator.h"
-using namespace mitk;
-using namespace std;
 
+using namespace mitk;
 
 /*###########   Static Members   ###########*/
 LookupTable::Pointer                              FreeSurferParcellationTranslator::m_LookupTable      = FreeSurferParcellationTranslator::CreateLookupTable();
@@ -51,7 +50,7 @@ void FreeSurferParcellationTranslator::AssignTransferFunction(DataNode::Pointer 
   node->SetProperty( "Image Rendering.Transfer Function", transferFunctionProp );
 }
 // Get the label assigned to the given name
-const string FreeSurferParcellationTranslator::GetLabel(const string& name) const
+const std::string FreeSurferParcellationTranslator::GetLabel(const std::string& name) const
 {
   NameTable::const_iterator iter;
   for( iter = m_NameTable.begin(); iter != m_NameTable.end(); ++iter )
@@ -62,7 +61,7 @@ const string FreeSurferParcellationTranslator::GetLabel(const string& name) cons
   return "0";
 }
 // Get the label assigned to the given name as integer
-int FreeSurferParcellationTranslator::GetLabelAsNumber(const string &name) const
+int FreeSurferParcellationTranslator::GetLabelAsNumber(const std::string &name) const
 {
   return std::atoi(this->GetLabel( name ).c_str()) ;
 }
@@ -72,7 +71,7 @@ LookupTable::Pointer FreeSurferParcellationTranslator::GetLookupTable() const
   return m_LookupTable;
 }
 // Get the name assigned to the given label
-const string FreeSurferParcellationTranslator::GetName(const string & label) const
+const std::string FreeSurferParcellationTranslator::GetName(const std::string & label) const
 {
   auto endIter = this->m_NameTable.end();
   auto iter = this->m_NameTable.find( label );
@@ -86,9 +85,9 @@ const string FreeSurferParcellationTranslator::GetName(const string & label) con
   }
 }
 // Get the name assigned to the given label
-const string FreeSurferParcellationTranslator::GetName(int label) const
+const std::string FreeSurferParcellationTranslator::GetName(int label) const
 {
-  stringstream ss;//create a stringstream
+  std::stringstream ss;//create a stringstream
   ss << label;//add number to the stream
   return  this->GetName( ss.str() );
 }

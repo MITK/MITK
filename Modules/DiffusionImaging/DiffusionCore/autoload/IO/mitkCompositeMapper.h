@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkGLMapper.h"
 #include "mitkVtkMapper.h"
-#include "mitkQBallImage.h"
+#include "mitkOdfImage.h"
 #include "mitkImageVtkMapper2D.h"
 #include "mitkOdfVtkMapper2D.h"
 #include "mitkLevelWindowProperty.h"
@@ -48,13 +48,13 @@ namespace mitk {
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual void MitkRenderOverlay(BaseRenderer* renderer) override
+    void MitkRenderOverlay(BaseRenderer* renderer) override
     {
       m_ImgMapper->MitkRenderOverlay(renderer);
       m_OdfMapper->MitkRenderOverlay(renderer);
     }
 
-    virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer) override
+    void MitkRenderOpaqueGeometry(BaseRenderer* renderer) override
     {
       m_ImgMapper->MitkRenderOpaqueGeometry(renderer);
       m_OdfMapper->MitkRenderOpaqueGeometry(renderer);
@@ -64,13 +64,13 @@ namespace mitk {
       }
     }
 
-    virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer) override
+    void MitkRenderTranslucentGeometry(BaseRenderer* renderer) override
     {
       m_ImgMapper->MitkRenderTranslucentGeometry(renderer);
       m_OdfMapper->MitkRenderTranslucentGeometry(renderer);
     }
 
-    virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer) override
+    void MitkRenderVolumetricGeometry(BaseRenderer* renderer) override
     {
       m_ImgMapper->MitkRenderVolumetricGeometry(renderer);
       m_OdfMapper->MitkRenderVolumetricGeometry(renderer);
@@ -100,9 +100,9 @@ namespace mitk {
       m_OdfMapper->ReleaseGraphicsResources(renderer);
     }
 
-    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false )
+    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false )
     {
-      mitk::OdfVtkMapper2D<float,QBALL_ODFSIZE>::SetDefaultProperties(node, renderer, overwrite);
+      mitk::OdfVtkMapper2D<float,ODF_SAMPLING_SIZE>::SetDefaultProperties(node, renderer, overwrite);
       mitk::CopyImageMapper2D::SetDefaultProperties(node, renderer, overwrite);
 
       mitk::LevelWindow opaclevwin;
@@ -127,13 +127,13 @@ namespace mitk {
 
   protected:
 
-    virtual void Update(mitk::BaseRenderer* renderer) override
+    void Update(mitk::BaseRenderer* renderer) override
     {
       m_OdfMapper->Update(renderer);
       GenerateDataForRenderer(renderer);
     }
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override
+    void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override
     {
       m_ImgMapper->GenerateDataForRenderer(renderer);
 //      if( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) > 0 )
@@ -144,11 +144,11 @@ namespace mitk {
 
     CompositeMapper();
 
-    virtual ~CompositeMapper();
+    ~CompositeMapper() override;
 
   private:
 
-    mitk::OdfVtkMapper2D<float,QBALL_ODFSIZE>::Pointer m_OdfMapper;
+    mitk::OdfVtkMapper2D<float,ODF_SAMPLING_SIZE>::Pointer m_OdfMapper;
     mitk::CopyImageMapper2D::Pointer m_ImgMapper;
 
   };

@@ -76,7 +76,7 @@ namespace QtLP_Private
 
     QtLockedFile();
     QtLockedFile(const QString &name);
-    ~QtLockedFile();
+    ~QtLockedFile() override;
 
     bool open(OpenMode mode) override;
 

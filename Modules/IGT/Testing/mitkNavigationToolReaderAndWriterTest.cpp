@@ -61,7 +61,7 @@ static void TestWrite()
 
   std::string surfaceFileName(MITK_IGT_DATA_DIR);
   surfaceFileName.append("/ClaronTool.stl");
-  m_testSurface = mitk::IOUtil::LoadSurface( surfaceFileName );
+  m_testSurface = mitk::IOUtil::Load<mitk::Surface>( surfaceFileName );
   myNode->SetData(m_testSurface);
 
   myNavigationTool->SetDataNode(myNode);
@@ -111,7 +111,7 @@ static void TestWrite2()
 
   std::string surfaceFileName(MITK_IGT_DATA_DIR);
   surfaceFileName.append("/EMTool.stl");
-  m_testSurface = mitk::IOUtil::LoadSurface( surfaceFileName );
+  m_testSurface = mitk::IOUtil::Load<mitk::Surface>( surfaceFileName );
   myNode->SetData(m_testSurface);
 
   myNavigationTool->SetDataNode(myNode);
@@ -175,7 +175,7 @@ static void TestWriteInvalidFilename()
   myNode->SetName("AuroraTool");
   std::string surfaceFileName(MITK_IGT_DATA_DIR);
   surfaceFileName.append("/EMTool.stl");
-  m_testSurface = mitk::IOUtil::LoadSurface( surfaceFileName );
+  m_testSurface = mitk::IOUtil::Load<mitk::Surface>( surfaceFileName );
   myNode->SetData(m_testSurface);
   myNavigationTool->SetDataNode(myNode);
   myNavigationTool->SetIdentifier("AuroraTool#1");

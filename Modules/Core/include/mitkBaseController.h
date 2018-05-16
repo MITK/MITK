@@ -65,9 +65,9 @@ namespace mitk
     /**
     * @brief Default Destructor
     **/
-    virtual ~BaseController();
+    ~BaseController() override;
 
-    virtual void ExecuteOperation(Operation *) override;
+    void ExecuteOperation(Operation *) override;
 
     //## @brief Stepper through the time
     Stepper::Pointer m_Time;

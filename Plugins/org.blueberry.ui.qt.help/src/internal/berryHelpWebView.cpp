@@ -79,7 +79,7 @@ class HelpDeviceReply final : public QIODevice
 {
 public:
   HelpDeviceReply(const QUrl& request, const QByteArray& fileData);
-  ~HelpDeviceReply();
+  ~HelpDeviceReply() override;
 
   qint64 bytesAvailable() const override;
   void close() override;
@@ -140,7 +140,7 @@ class HelpUrlSchemeHandler final : public QWebEngineUrlSchemeHandler
 {
 public:
   explicit HelpUrlSchemeHandler(QObject* parent = nullptr);
-  ~HelpUrlSchemeHandler();
+  ~HelpUrlSchemeHandler() override;
 
   void requestStarted(QWebEngineUrlRequestJob* job) override;
 };
@@ -208,15 +208,19 @@ void HelpUrlSchemeHandler::requestStarted(QWebEngineUrlRequestJob* job)
 }
 
 const QString HelpWebView::m_PageNotFoundMessage =
-    QCoreApplication::translate("org.blueberry.ui.qt.help", "<title>Error 404...</title><div "
-                                "align=\"center\"><br><br><h1>The page could not be found</h1><br><h3>'%1'"
+    QCoreApplication::translate("org.blueberry.ui.qt.help", "<title>Context Help</title><div "
+                                "align=\"center\"><br><br><h1>No help page found for identifier</h1><br><h3>'%1'"
                                 "</h3></div>");
+
+const QString HelpWebView::m_MissingContextMessage =
+    QCoreApplication::translate("org.blueberry.ui.qt.help", "<title>Context Help</title><div "
+                                "align=\"center\"><br><br><h1>Unknown context..</h1><h1>&nbsp;</h1><h1>Please click inside a view and hit F1 again!</h1></div>");
 
 class HelpPage final : public QWebEnginePage
 {
 public:
   explicit HelpPage(QObject* parent = nullptr);
-  ~HelpPage();
+  ~HelpPage() override;
 
 private:
   bool acceptNavigationRequest(const QUrl& url, NavigationType type, bool isMainFrame) override;
@@ -242,7 +246,7 @@ bool HelpPage::acceptNavigationRequest(const QUrl& url, NavigationType, bool)
   return true;
 }
 
-HelpWebView::HelpWebView(IEditorSite::Pointer editorSite, QWidget *parent, qreal zoom)
+HelpWebView::HelpWebView(IEditorSite::Pointer, QWidget *parent, qreal zoom)
   : QWebEngineView(parent),
     m_LoadFinished(false),
     m_HelpEngine(HelpPluginActivator::getInstance()->getQHelpEngine()),
@@ -328,10 +332,17 @@ bool HelpWebView::handleForwardBackwardMouseButtons(QMouseEvent *e)
 
 void HelpWebView::setSource(const QUrl &url)
 {
-  if (m_HelpEngine.findFile(url).isValid())
+  if (url.toString().trimmed().isEmpty()) {
+    setHtml(m_MissingContextMessage);
+  }
+  else if (m_HelpEngine.findFile(url).isValid())
+  {
     load(url);
+  }
   else
+  {
     setHtml(m_PageNotFoundMessage.arg(url.toString()));
+  }
 }
 
 void HelpWebView::wheelEvent(QWheelEvent *e)

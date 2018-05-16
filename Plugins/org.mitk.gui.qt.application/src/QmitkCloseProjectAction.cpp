@@ -30,14 +30,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 QmitkCloseProjectAction::QmitkCloseProjectAction(berry::IWorkbenchWindow::Pointer window)
-  : QAction(0)
+  : QAction(nullptr)
   , m_Window(nullptr)
 {
   this->init(window.GetPointer());
 }
 
 QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
-  : QAction(0)
+  : QAction(nullptr)
   , m_Window(nullptr)
 {
   this->setIcon(icon);
@@ -45,14 +45,14 @@ QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon & icon, berry::IWor
 }
 
 QmitkCloseProjectAction::QmitkCloseProjectAction(berry::IWorkbenchWindow* window)
-  : QAction(0)
+  : QAction(nullptr)
   , m_Window(nullptr)
 {
   this->init(window);
 }
 
 QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon& icon, berry::IWorkbenchWindow* window)
-  : QAction(0)
+  : QAction(nullptr)
   , m_Window(nullptr)
 {
   this->setIcon(icon);
@@ -72,7 +72,7 @@ void QmitkCloseProjectAction::Run()
   try
   {
     ctkPluginContext* context = mitk::PluginActivator::GetContext();
-    mitk::IDataStorageService* dss = 0;
+    mitk::IDataStorageService* dss = nullptr;
     ctkServiceReference dsRef = context->getServiceReference<mitk::IDataStorageService>();
     if (dsRef)
     {
@@ -109,7 +109,7 @@ void QmitkCloseProjectAction::Run()
 
     /* Ask, if the user is sure about that */
     QString msg = "Are you sure that you want to close the current project (%1)?\nThis will remove all data objects.";
-    if (QMessageBox::question(NULL, "Remove all data?", msg.arg(dataStorageRef->GetLabel()),
+    if (QMessageBox::question(nullptr, "Remove all data?", msg.arg(dataStorageRef->GetLabel()),
                               QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
     {
       return;
@@ -136,6 +136,6 @@ void QmitkCloseProjectAction::Run()
   catch (std::exception& e)
   {
     MITK_ERROR << "Exception caught during closing project: " << e.what();
-    QMessageBox::warning(NULL, "Error", QString("An error occurred during Close Project: %1").arg(e.what()));
+    QMessageBox::warning(nullptr, "Error", QString("An error occurred during Close Project: %1").arg(e.what()));
   }
 }

@@ -51,8 +51,8 @@ int main(int argc, char* argv[])
   std::string inputName = us::any_cast<std::string>(parsedArgs["input"]);
   std::string outputName = us::any_cast<std::string>(parsedArgs["output"]);
 
-  mitk::Image::Pointer imageToCrop = mitk::IOUtil::LoadImage(inputName);
-  mitk::Image::Pointer referenceImage = mitk::IOUtil::LoadImage(referenceName);
+  mitk::Image::Pointer imageToCrop = mitk::IOUtil::Load<mitk::Image>(inputName);
+  mitk::Image::Pointer referenceImage = mitk::IOUtil::Load<mitk::Image>(referenceName);
   mitk::BoundingObjectCutter::Pointer cutter = mitk::BoundingObjectCutter::New();
   mitk::BoundingObject::Pointer boundingObject = (mitk::Cuboid::New()).GetPointer();
   boundingObject->FitGeometry(referenceImage->GetGeometry());
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
   cutter->SetBoundingObject(boundingObject);
   cutter->SetInput(imageToCrop);
   cutter->Update();
-  mitk::IOUtil::SaveImage(cutter->GetOutput(), outputName);
+  mitk::IOUtil::Save(cutter->GetOutput(), outputName);
 
   return EXIT_SUCCESS;
 }

@@ -210,7 +210,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataReaderXML::ReadVersion1()
 
 mitk::NavigationData::Pointer mitk::NavigationDataReaderXML::ReadNavigationData(TiXmlElement* elem)
 {
-  if (elem == nullptr) {mitkThrow() << "Error: Element is NULL!";}
+  if (elem == nullptr) {mitkThrow() << "Error: Element is nullptr!";}
 
   mitk::NavigationData::Pointer nd = mitk::NavigationData::New();
 
@@ -229,7 +229,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataReaderXML::ReadNavigationData(
   elem->QueryDoubleAttribute("Time",&timestamp);
   if (timestamp == -1)
   {
-    return nullptr;  //the calling method should check the return value if it is valid/not NULL
+    return nullptr;  //the calling method should check the return value if it is valid/not nullptr
   }
 
   elem->QueryDoubleAttribute("X", &position[0]);

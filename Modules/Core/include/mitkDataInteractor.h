@@ -68,7 +68,7 @@ namespace mitk
 
   protected:
     DataInteractor();
-    virtual ~DataInteractor();
+    ~DataInteractor() override;
 
     /**
      * @brief Overwrite this function to connect actions from StateMachine description with functions.
@@ -83,14 +83,14 @@ namespace mitk
      }
      * @endcode
      */
-    virtual void ConnectActionsAndFunctions() override;
+    void ConnectActionsAndFunctions() override;
 
     /** \brief Is called when a DataNode is initially set or changed
      *  To be implemented by sub-classes for initialization code which require a DataNode.
      *  \note New DataInteractors usually are expected to have the focus, but this only works if they have the highest
      * Layer,
      *  since empty DataNodes have a layer of -1, the DataNode must be filled here in order to get a layer assigned.
-     *  \note Is also called when the DataNode is set to NULL.
+     *  \note Is also called when the DataNode is set to nullptr.
      */
     virtual void DataNodeChanged();
 

@@ -34,7 +34,7 @@ class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkMapperSettingsWidget : public QWi
   Q_OBJECT
 
 public:
-  QmitkMapperSettingsWidget(QWidget *parent = 0);
+  QmitkMapperSettingsWidget(QWidget *parent = nullptr);
 
   /**
    * Configures the passed settings according to the current state of the

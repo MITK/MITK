@@ -39,11 +39,11 @@ namespace mitk
       itkFactorylessNewMacro( DICOMGDCMTagCache );
       itkCloneMacro(Self);
 
-      virtual DICOMDatasetFinding GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const override;
+      DICOMDatasetFinding GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const override;
 
-      virtual FindingsListType GetTagValue(DICOMImageFrameInfo* frame, const DICOMTagPath& path) const override;
+      FindingsListType GetTagValue(DICOMImageFrameInfo* frame, const DICOMTagPath& path) const override;
 
-      virtual DICOMDatasetAccessingImageFrameList GetFrameInfoList() const override;
+      DICOMDatasetAccessingImageFrameList GetFrameInfoList() const override;
 
       void InitCache(const std::set<DICOMTag>& scannedTags, const std::shared_ptr<gdcm::Scanner>& scanner, const StringList& inputFiles);
 
@@ -52,7 +52,7 @@ namespace mitk
   protected:
 
       DICOMGDCMTagCache();
-      virtual ~DICOMGDCMTagCache();
+      ~DICOMGDCMTagCache() override;
 
       std::set<DICOMTag> m_ScannedTags;
 

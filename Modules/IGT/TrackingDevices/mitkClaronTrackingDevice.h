@@ -50,40 +50,40 @@ namespace mitk
     /**
     * @returns Returns true if the MicronTracker is installed on this build (means activated in CMAKE). False if not.
     */
-    virtual bool IsDeviceInstalled() override;
+    bool IsDeviceInstalled() override;
 
     /**
     * \brief Starts the tracking.
     * \return Returns true if the tracking is started. Throws an exception if an error occures.
     * @throw mitk::IGTHardwareException Throws an exception if there is an error during start tracking.
     */
-    virtual bool StartTracking() override;
+    bool StartTracking() override;
 
     /**
     * \brief Stops the tracking.
     * \return Returns true if the tracking is stopped.
     */
-    virtual bool StopTracking() override;
+    bool StopTracking() override;
 
     /**
     * \brief Opens the connection to the device. This have to be done before the tracking is started.
     * @throw mitk::IGTHardwareException Throws an exception if there is an error during open connection.
     */
-    virtual bool OpenConnection() override;
+    bool OpenConnection() override;
 
     /**
     * \brief Closes the connection and clears all resources.
     */
-    virtual bool CloseConnection() override;
+    bool CloseConnection() override;
 
     /**
     * \return Returns the number of tools which have been added to the device.
     */
-    virtual unsigned int GetToolCount() const override;
+    unsigned int GetToolCount() const override;
 
     /**
     * \param toolNumber The number of the tool which should be given back.
-    * \return Returns the tool which the number "toolNumber". Returns NULL, if there is
+    * \return Returns the tool which the number "toolNumber". Returns nullptr, if there is
     * no tool with this number.
     */
     TrackingTool* GetTool(unsigned int toolNumber)  const override;
@@ -118,7 +118,7 @@ namespace mitk
 
   protected:
     ClaronTrackingDevice();
-    ~ClaronTrackingDevice();
+    ~ClaronTrackingDevice() override;
 
     /**
     * \brief Adds a tool to the tracking device.

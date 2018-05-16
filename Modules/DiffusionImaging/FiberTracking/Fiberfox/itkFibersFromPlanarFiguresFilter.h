@@ -31,8 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 #include <vtkPolyLine.h>
 
-using namespace std;
-
 namespace itk{
 
 /**
@@ -46,14 +44,14 @@ public:
     typedef ProcessObject                                       Superclass;
     typedef SmartPointer< Self >                                Pointer;
     typedef SmartPointer< const Self >                          ConstPointer;
-    typedef mitk::FiberBundle::Pointer                         FiberType;
-    typedef vector< mitk::FiberBundle::Pointer >               FiberContainerType;
+    typedef mitk::FiberBundle::Pointer                          FiberType;
+    typedef std::vector< mitk::FiberBundle::Pointer >           FiberContainerType;
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
     itkTypeMacro( FibersFromPlanarFiguresFilter, ProcessObject )
 
-    virtual void Update() override{
+    void Update() override{
         this->GenerateData();
     }
 
@@ -71,11 +69,11 @@ protected:
     void GenerateData() override;
 
     FibersFromPlanarFiguresFilter();
-    virtual ~FibersFromPlanarFiguresFilter();
+    ~FibersFromPlanarFiguresFilter() override;
     void GeneratePoints();
 
     FiberContainerType              m_FiberBundles;    ///< container for the output fiber bundles
-    vector< mitk::Vector2D >        m_2DPoints;        ///< container for the 2D fiber waypoints
+    std::vector< mitk::Vector2D >   m_2DPoints;        ///< container for the 2D fiber waypoints
     FiberGenerationParameters       m_Parameters;
 };
 }

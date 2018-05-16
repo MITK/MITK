@@ -28,8 +28,8 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPointListModel : public QAbstractListModel
   Q_OBJECT
 
 public:
-  QmitkPointListModel(mitk::DataNode * = NULL, int t = 0, QObject *parent = 0);
-  ~QmitkPointListModel();
+  QmitkPointListModel(mitk::DataNode * = nullptr, int t = 0, QObject *parent = nullptr);
+  ~QmitkPointListModel() override;
 
   Qt::ItemFlags flags(const QModelIndex &) const override;
 
@@ -116,7 +116,7 @@ protected:
   void ObserveNewPointSet(mitk::DataNode *pointSetNode);
 
   // initially checks if there is a PointSet as data in the DataNode.
-  // returns PointSet if so and NULL if other data is set to node
+  // returns PointSet if so and nullptr if other data is set to node
   mitk::PointSet *CheckForPointSetInNode(mitk::DataNode *node) const;
 
 protected:

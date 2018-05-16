@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::OdfNormalizationMethodProperty::OdfNormalizationMethodProperty( )
 {
   this->AddInterpolationTypes();
-  this->SetValue( static_cast<IdType>( ODFN_MINMAX ) );
+  this->SetValue( static_cast<IdType>( ODFN_MAX ) );
 }
 
 

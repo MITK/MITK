@@ -36,7 +36,7 @@ private:
 public:
 
   IntroHandler();
-  ~IntroHandler();
+  ~IntroHandler() override;
 
   SmartPointer<Object> Execute(const SmartPointer<const ExecutionEvent>& event) override;
 

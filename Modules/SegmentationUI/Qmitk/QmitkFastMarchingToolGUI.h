@@ -58,7 +58,7 @@ protected slots:
 
 protected:
   QmitkFastMarchingToolGUI();
-  virtual ~QmitkFastMarchingToolGUI();
+  ~QmitkFastMarchingToolGUI() override;
 
   void Update();
 
@@ -79,6 +79,9 @@ protected:
   mitk::Stepper::Pointer m_TimeStepper;
 
   void OnFastMarchingToolReady();
+
+private:
+  void EnableWidgets(bool);
 };
 
 #endif

@@ -194,7 +194,7 @@ namespace mitk
       bool keepDistanceToImageBorders( neccessaryDistanceToImageBorderInMM > 0 );
       if (keepDistanceToImageBorders)
       {
-        long distanceInPixels[VImageDimension];
+        itk::IndexValueType distanceInPixels[VImageDimension];
         for(unsigned short dimension = 0; dimension < VImageDimension; ++dimension)
         {
           // To confirm that the whole hotspot is inside the image we have to keep a specific distance to the image-borders, which is as long as
@@ -370,7 +370,6 @@ namespace mitk
       int numberOfSubVoxels = ::pow( static_cast<float>(numberOfSubVoxelsPerDimension), static_cast<float>(VImageDimension) );
       double subVoxelSizeInPixels = 1.0 / (double)numberOfSubVoxelsPerDimension;
       double valueOfOneSubVoxel = 1.0 / (double)numberOfSubVoxels;
-      double maskValue = 0.0;
       mitk::Point3D subVoxelIndexPosition;
       double distanceSquared = 0.0;
 
@@ -384,7 +383,7 @@ namespace mitk
           voxelPosition[dimension] = indexPoint[dimension];
         }
 
-        maskValue = 0.0;
+        double maskValue = 0.0;
         mitk::Vector3D subVoxelOffset; subVoxelOffset.Fill(0.0);
         // iterate sub-voxels by iterating all possible offsets
         for (subVoxelOffset[0] = -0.5 + subVoxelSizeInPixels / 2.0;
@@ -493,7 +492,6 @@ namespace mitk
     {
         typedef itk::Image< TPixel, VImageDimension > InputImageType;
         typedef itk::Image< TPixel, VImageDimension > ConvolutionImageType;
-        typedef itk::Image< float, VImageDimension > KernelImageType;
         typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
 
         typename ConvolutionImageType::Pointer convolutionImage = this->GenerateConvolutionImage(inputImage);

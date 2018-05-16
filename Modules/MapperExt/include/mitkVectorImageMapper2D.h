@@ -49,7 +49,7 @@ namespace mitk
      */
     const mitk::Image *GetInput(void);
 
-    virtual void Paint(mitk::BaseRenderer *renderer) override;
+    void Paint(mitk::BaseRenderer *renderer) override;
 
     /**
      * Explicitly set an vector image. This image will be used for
@@ -59,7 +59,7 @@ namespace mitk
 
     /**
      * Get the explicitly set image
-     * @returns NULL if no Image has been set instead of GetData();
+     * @returns nullptr if no Image has been set instead of GetData();
      */
     itkGetConstObjectMacro(Image, mitk::Image);
 
@@ -77,7 +77,7 @@ namespace mitk
 
     VectorImageMapper2D();
 
-    virtual ~VectorImageMapper2D();
+    ~VectorImageMapper2D() override;
 
     mitk::Image::ConstPointer m_Image;
 

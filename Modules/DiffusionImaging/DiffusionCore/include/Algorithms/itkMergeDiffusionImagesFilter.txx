@@ -113,7 +113,10 @@ MergeDiffusionImagesFilter<TScalarType>
             throw itk::ExceptionObject (__FILE__,__LINE__,"Error: images are not of same size.");
     }
 
-    m_BValue = m_BValues.at(0);
+    m_BValue = 0;
+    for (auto bval : m_BValues)
+      if (bval>m_BValue)
+        m_BValue = bval;
     m_OutputGradients = GradientListType::New();
 
     typename DwiImageType::Pointer outImage = DwiImageType::New();

@@ -26,13 +26,13 @@ namespace mitk
   {
   public:
     VtkUnstructuredGridReader();
-    virtual ~VtkUnstructuredGridReader();
+    ~VtkUnstructuredGridReader() override;
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
+    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
   protected:
-    virtual VtkUnstructuredGridReader *Clone() const override;
+    VtkUnstructuredGridReader *Clone() const override;
   };
 
 } // namespace mitk

@@ -100,20 +100,20 @@ int main(int argc, char *argv[])
 
   // Read-in image data
   mitk::Image::Pointer tmpImage;
-  mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage(inputFile);
-  mitk::Image::Pointer maskImage = mitk::IOUtil::LoadImage(maskFile);
-  mitk::Image::Pointer seedImage = mitk::IOUtil::LoadImage(seedFile);
+  mitk::Image::Pointer inputImage = mitk::IOUtil::Load<mitk::Image>(inputFile);
+  mitk::Image::Pointer maskImage = mitk::IOUtil::Load<mitk::Image>(maskFile);
+  mitk::Image::Pointer seedImage = mitk::IOUtil::Load<mitk::Image>(seedFile);
 
   mitk::Image::Pointer valueImage;
   if (useValueImage)
-    valueImage = mitk::IOUtil::LoadImage(valueImageFile);
+    valueImage = mitk::IOUtil::Load<mitk::Image>(valueImageFile);
 
   mitk::Image::Pointer confImage;
   if (mode == "Vector" || mode == "FeatureVector")
   {
     MITK_INFO << "Load Tensor/Confidence";
-    tmpImage = mitk::IOUtil::LoadImage(tensImageFile);
-    confImage = mitk::IOUtil::LoadImage(confFile);
+    tmpImage = mitk::IOUtil::Load<mitk::Image>(tensImageFile);
+    confImage = mitk::IOUtil::Load<mitk::Image>(confFile);
   }
 
   mitk::TensorImage *diffusionImage = static_cast<mitk::TensorImage *>(tmpImage.GetPointer());

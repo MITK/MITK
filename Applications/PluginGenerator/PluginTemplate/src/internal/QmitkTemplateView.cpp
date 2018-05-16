@@ -24,7 +24,7 @@ void $(view-class-name)::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
-  connect(m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()));
+  connect(m_Controls.buttonPerformImageProcessing, &QPushButton::clicked, this, &$(view-class-name)::DoImageProcessing);
 }
 
 void $(view-class-name)::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
@@ -56,7 +56,7 @@ void $(view-class-name)::DoImageProcessing()
   if (!node)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information(NULL, "Template", "Please load and select an image before starting image processing.");
+    QMessageBox::information(nullptr, "Template", "Please load and select an image before starting image processing.");
     return;
   }
 

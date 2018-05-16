@@ -61,7 +61,7 @@ namespace mitk
 
   protected:
     CompressedImageContainer(); // purposely hidden
-    virtual ~CompressedImageContainer();
+    ~CompressedImageContainer() override;
 
     PixelType *m_PixelType;
 

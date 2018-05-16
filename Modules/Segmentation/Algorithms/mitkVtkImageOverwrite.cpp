@@ -48,9 +48,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #undef VTK_USE_UINT64
 #define VTK_USE_UINT64 0
 
-#include <float.h>
-#include <limits.h>
-#include <math.h>
+#include <cfloat>
+#include <climits>
+#include <cmath>
 
 vtkStandardNewMacro(mitkVtkImageOverwrite);
 
@@ -125,7 +125,7 @@ mitkVtkImageOverwrite::~mitkVtkImageOverwrite()
 #define VTK_RESLICE_WRAP 1       // wrap to opposite side of image
 #define VTK_RESLICE_MIRROR 2     // mirror off of the boundary
 #define VTK_RESLICE_BORDER 3     // use a half-voxel border
-#define VTK_RESLICE_NULL 4       // do nothing to *outPtr if out-of-bounds
+#define VTK_RESLICE_nullptr 4       // do nothing to *outPtr if out-of-bounds
 
 //----------------------------------------------------------------------------
 // rounding functions for each type, where 'F' is a floating-point type
@@ -525,6 +525,7 @@ static void vtkGetSetPixelsFunc(mitkVtkImageOverwrite *self,
   int dataType = self->GetOutput()->GetScalarType();
   int numscalars = self->GetOutput()->GetNumberOfScalarComponents();
 
+  // TODO: this switch should be examined
   switch (numscalars)
   {
     case 1:
@@ -534,6 +535,8 @@ static void vtkGetSetPixelsFunc(mitkVtkImageOverwrite *self,
         default:
           setpixels = nullptr;
       }
+      // just to make the compiler happy, TODO: check!
+      // FALLTHRU
     default:
       switch (dataType)
       {

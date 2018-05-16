@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkRemeshingView_h
 
 #include <QmitkAbstractView.h>
-#include <QThread>
 #include <ui_QmitkRemeshingViewControls.h>
 
 class QmitkRemeshingView : public QmitkAbstractView
@@ -33,22 +32,15 @@ public:
   void SetFocus() override;
 
 private slots:
-  void OnAdvancedSettingsButtonToggled(bool toggled);
-  void OnEdgeSplittingChanged(double edgeSplitting);
-  void OnGradationChanged(double gradation);
-  void OnMaxNumVerticesLineEditEditingFinished();
-  void OnNumberOfVerticesChanged(int numVertices);
-  void OnOptimizationLevelChanged(int optimizationLevel);
-  void OnRemeshButtonClicked();
   void OnSelectedSurfaceChanged(const mitk::DataNode *node);
-  void OnSubsamplingChanged(int subsampling);
+  void OnDensityChanged(int numVertices);
+  void OnRemeshButtonClicked();
 
 private:
   void EnableWidgets(bool enable);
-  void SetNumberOfVertices(int minimum, int maximum, int step, int value);
 
   Ui::QmitkRemeshingViewControls m_Controls;
-  QThread m_Thread;
+  int m_MaxNumberOfVertices;
 };
 
 #endif

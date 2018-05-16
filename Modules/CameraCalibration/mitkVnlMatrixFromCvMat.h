@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkVnlMatrixFromCvMat_h
 
 #include <vnl/vnl_matrix.h>
-#include <cv.h>
+#include <opencv2/core.hpp>
 #include <mitkObservable.h>
 #include <mitkAlgorithm.h>
 #include <mitkEndoMacros.h>

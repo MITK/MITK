@@ -107,7 +107,7 @@ void mitk::PlanarArrow::SetArrowTipScaleFactor(float scale)
 
 bool mitk::PlanarArrow::Equals(const mitk::PlanarFigure &other) const
 {
-  const mitk::PlanarArrow *otherArrow = dynamic_cast<const mitk::PlanarArrow *>(&other);
+  const auto *otherArrow = dynamic_cast<const mitk::PlanarArrow *>(&other);
   if (otherArrow)
   {
     if (std::abs(this->m_ArrowTipScaleFactor - otherArrow->m_ArrowTipScaleFactor) > mitk::eps)

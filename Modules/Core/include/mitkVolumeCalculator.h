@@ -67,7 +67,7 @@ namespace mitk
 
   protected:
     VolumeCalculator();
-    virtual ~VolumeCalculator();
+    ~VolumeCalculator() override;
 
     template <typename TPixel, unsigned int VImageDimension>
     void InternalCompute(const itk::Image<TPixel, VImageDimension> *itkImage);

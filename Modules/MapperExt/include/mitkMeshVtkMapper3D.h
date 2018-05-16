@@ -57,19 +57,19 @@ namespace mitk
 
       virtual const mitk::Mesh *GetInput();
 
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
-    virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 
   protected:
     MeshVtkMapper3D();
 
-    virtual ~MeshVtkMapper3D();
+    ~MeshVtkMapper3D() override;
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    virtual void ResetMapper(BaseRenderer *renderer) override;
+    void ResetMapper(BaseRenderer *renderer) override;
 
     vtkPropAssembly *m_PropAssembly;
 

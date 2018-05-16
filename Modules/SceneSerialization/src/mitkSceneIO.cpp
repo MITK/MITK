@@ -152,6 +152,9 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene(const std::string &filename,
                << "'. Will attempt to read whatever could be unzipped.";
   }
 
+  // transcode locale-dependent string
+  m_WorkingDirectory = Poco::Path::transcode (m_WorkingDirectory);
+
   // test if index.xml exists
   // parse index.xml with TinyXML
   TiXmlDocument document(m_WorkingDirectory + mitk::IOUtil::GetDirectorySeparator() + "index.xml");
@@ -214,13 +217,13 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
 
     // start XML DOM
     TiXmlDocument document;
-    TiXmlDeclaration *decl = new TiXmlDeclaration(
+    auto *decl = new TiXmlDeclaration(
       "1.0",
       "UTF-8",
       ""); // TODO what to write here? encoding? standalone would mean that we provide a DTD somewhere...
     document.LinkEndChild(decl);
 
-    TiXmlElement *version = new TiXmlElement("Version");
+    auto *version = new TiXmlElement("Version");
     version->SetAttribute("Writer", __FILE__);
     version->SetAttribute("Revision", "$Revision: 17055 $");
     version->SetAttribute("FileVersion", 1);
@@ -259,15 +262,15 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
 
       UIDGenerator nodeUIDGen("OBJECT_");
 
-      for (DataStorage::SetOfObjects::const_iterator iter = sceneNodes->begin(); iter != sceneNodes->end(); ++iter)
+      for (auto iter = sceneNodes->begin(); iter != sceneNodes->end(); ++iter)
       {
         DataNode *node = iter->GetPointer();
         if (!node)
-          continue; // unlikely event that we get a NULL pointer as an object for saving. just ignore
+          continue; // unlikely event that we get a nullptr pointer as an object for saving. just ignore
 
         // generate UIDs for all source objects
         DataStorage::SetOfObjects::ConstPointer sourceObjects = storage->GetSources(node);
-        for (mitk::DataStorage::SetOfObjects::const_iterator sourceIter = sourceObjects->begin();
+        for (auto sourceIter = sourceObjects->begin();
              sourceIter != sourceObjects->end();
              ++sourceIter)
         {
@@ -291,34 +294,34 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
       }
 
       // write out objects, dependencies and properties
-      for (DataStorage::SetOfObjects::const_iterator iter = sceneNodes->begin(); iter != sceneNodes->end(); ++iter)
+      for (auto iter = sceneNodes->begin(); iter != sceneNodes->end(); ++iter)
       {
         DataNode *node = iter->GetPointer();
 
         if (node)
         {
-          TiXmlElement *nodeElement = new TiXmlElement("node");
+          auto *nodeElement = new TiXmlElement("node");
           std::string filenameHint(node->GetName());
           filenameHint = itksys::SystemTools::MakeCindentifier(
             filenameHint.c_str()); // escape filename <-- only allow [A-Za-z0-9_], replace everything else with _
 
           // store dependencies
-          UIDMapType::iterator searchUIDIter = nodeUIDs.find(node);
+          auto searchUIDIter = nodeUIDs.find(node);
           if (searchUIDIter != nodeUIDs.end())
           {
             // store this node's ID
             nodeElement->SetAttribute("UID", searchUIDIter->second.c_str());
           }
 
-          SourcesMapType::iterator searchSourcesIter = sourceUIDs.find(node);
+          auto searchSourcesIter = sourceUIDs.find(node);
           if (searchSourcesIter != sourceUIDs.end())
           {
             // store all source IDs
-            for (std::list<std::string>::iterator sourceUIDIter = searchSourcesIter->second.begin();
+            for (auto sourceUIDIter = searchSourcesIter->second.begin();
                  sourceUIDIter != searchSourcesIter->second.end();
                  ++sourceUIDIter)
             {
-              TiXmlElement *uidElement = new TiXmlElement("source");
+              auto *uidElement = new TiXmlElement("source");
               uidElement->SetAttribute("UID", sourceUIDIter->c_str());
               nodeElement->LinkEndChild(uidElement);
             }
@@ -373,16 +376,18 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
         }
         else
         {
-          MITK_WARN << "Ignoring NULL node during scene serialization.";
+          MITK_WARN << "Ignoring nullptr node during scene serialization.";
         }
 
         ProgressBar::GetInstance()->Progress();
       } // end for all nodes
     }   // end if sceneNodes
 
-    if (!document.SaveFile(m_WorkingDirectory + Poco::Path::separator() + "index.xml"))
+    std::string defaultLocale_WorkingDirectory = Poco::Path::transcode( m_WorkingDirectory );
+
+    if (!document.SaveFile(defaultLocale_WorkingDirectory + Poco::Path::separator() + "index.xml"))
     {
-      MITK_ERROR << "Could not write scene to " << m_WorkingDirectory << Poco::Path::separator() << "index.xml"
+      MITK_ERROR << "Could not write scene to " << defaultLocale_WorkingDirectory << Poco::Path::separator() << "index.xml"
                  << "\nTinyXML reports '" << document.ErrorDesc() << "'";
       return false;
     }
@@ -446,7 +451,7 @@ TiXmlElement *mitk::SceneIO::SaveBaseData(BaseData *data, const std::string &fil
   //  - create a file containing all information to recreate the BaseData object --> needs to know where to put this
   //  file (and a filename?)
   //  - TODO what to do about writers that creates one file per timestep?
-  TiXmlElement *element = new TiXmlElement("data");
+  auto *element = new TiXmlElement("data");
   element->SetAttribute("type", data->GetNameOfClass());
 
   // construct name of serializer class
@@ -460,15 +465,16 @@ TiXmlElement *mitk::SceneIO::SaveBaseData(BaseData *data, const std::string &fil
     MITK_ERROR << "No serializer found for " << data->GetNameOfClass() << ". Skipping object";
   }
 
-  for (std::list<itk::LightObject::Pointer>::iterator iter = thingsThatCanSerializeThis.begin();
+  for (auto iter = thingsThatCanSerializeThis.begin();
        iter != thingsThatCanSerializeThis.end();
        ++iter)
   {
-    if (BaseDataSerializer *serializer = dynamic_cast<BaseDataSerializer *>(iter->GetPointer()))
+    if (auto *serializer = dynamic_cast<BaseDataSerializer *>(iter->GetPointer()))
     {
       serializer->SetData(data);
       serializer->SetFilenameHint(filenamehint);
-      serializer->SetWorkingDirectory(m_WorkingDirectory);
+      std::string defaultLocale_WorkingDirectory = Poco::Path::transcode( m_WorkingDirectory );
+      serializer->SetWorkingDirectory(defaultLocale_WorkingDirectory);
       try
       {
         std::string writtenfilename = serializer->Serialize();
@@ -491,14 +497,15 @@ TiXmlElement *mitk::SceneIO::SavePropertyList(PropertyList *propertyList, const 
   assert(propertyList);
 
   //  - TODO what to do about shared properties (same object in two lists or behind several keys)?
-  TiXmlElement *element = new TiXmlElement("properties");
+  auto *element = new TiXmlElement("properties");
 
   // construct name of serializer class
   PropertyListSerializer::Pointer serializer = PropertyListSerializer::New();
 
   serializer->SetPropertyList(propertyList);
   serializer->SetFilenameHint(filenamehint);
-  serializer->SetWorkingDirectory(m_WorkingDirectory);
+  std::string defaultLocale_WorkingDirectory = Poco::Path::transcode( m_WorkingDirectory );
+  serializer->SetWorkingDirectory(defaultLocale_WorkingDirectory);
   try
   {
     std::string writtenfilename = serializer->Serialize();

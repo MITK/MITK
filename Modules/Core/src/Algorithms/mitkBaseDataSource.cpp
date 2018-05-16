@@ -34,7 +34,7 @@ void mitk::BaseDataSource::GraftOutput(const DataObjectIdentifierType &key, Outp
 {
   if (!graft)
   {
-    itkExceptionMacro(<< "Requested to graft output that is a NULL pointer");
+    itkExceptionMacro(<< "Requested to graft output that is a nullptr pointer");
   }
 
   // we use the process object method since all our output may not be

@@ -36,7 +36,7 @@ class PerspectivesPreferencePage : public QObject, public IQtPreferencePage
 public:
 
   PerspectivesPreferencePage();
-  ~PerspectivesPreferencePage();
+  ~PerspectivesPreferencePage() override;
 
   void Init(IWorkbench::Pointer workbench) override;
 

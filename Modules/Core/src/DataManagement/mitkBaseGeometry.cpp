@@ -260,7 +260,7 @@ bool mitk::BaseGeometry::Is2DConvertable()
       isConvertableWithoutLoss = false;
       break;
     }
-  } while (0);
+  } while (false);
 
   return isConvertableWithoutLoss;
 }
@@ -474,7 +474,7 @@ void mitk::BaseGeometry::WorldToIndex(const mitk::Point3D & /*atPt3d_mm*/,
 
 mitk::VnlVector mitk::BaseGeometry::GetOriginVnl() const
 {
-  return const_cast<Self *>(this)->GetOrigin().GetVnlVector();
+  return GetOrigin().GetVnlVector();
 }
 
 vtkLinearTransform *mitk::BaseGeometry::GetVtkTransform() const
@@ -534,7 +534,7 @@ void mitk::BaseGeometry::ExecuteOperation(Operation *operation)
       break;
     case OpMOVE:
     {
-      mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
+      auto *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
       if (pointOp == nullptr)
       {
         MITK_ERROR << "Point move operation is null!";
@@ -550,7 +550,7 @@ void mitk::BaseGeometry::ExecuteOperation(Operation *operation)
     }
     case OpSCALE:
     {
-      mitk::ScaleOperation *scaleOp = dynamic_cast<mitk::ScaleOperation *>(operation);
+      auto *scaleOp = dynamic_cast<mitk::ScaleOperation *>(operation);
       if (scaleOp == nullptr)
       {
         MITK_ERROR << "Scale operation is null!";
@@ -573,7 +573,7 @@ void mitk::BaseGeometry::ExecuteOperation(Operation *operation)
     }
     case OpROTATE:
     {
-      mitk::RotationOperation *rotateOp = dynamic_cast<mitk::RotationOperation *>(operation);
+      auto *rotateOp = dynamic_cast<mitk::RotationOperation *>(operation);
       if (rotateOp == nullptr)
       {
         MITK_ERROR << "Rotation operation is null!";
@@ -601,7 +601,7 @@ void mitk::BaseGeometry::ExecuteOperation(Operation *operation)
     }
     case OpAPPLYTRANSFORMMATRIX:
     {
-      ApplyTransformMatrixOperation *applyMatrixOp = dynamic_cast<ApplyTransformMatrixOperation *>(operation);
+      auto *applyMatrixOp = dynamic_cast<ApplyTransformMatrixOperation *>(operation);
       vtktransform->SetMatrix(applyMatrixOp->GetMatrix());
       break;
     }
@@ -740,7 +740,7 @@ void mitk::BaseGeometry::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
   os << indent << " IndexToWorldTransform: ";
   if (this->IsIndexToWorldTransformNull())
-    os << "NULL" << std::endl;
+    os << "nullptr" << std::endl;
   else
   {
     // from itk::MatrixOffsetTransformBase
@@ -783,7 +783,7 @@ void mitk::BaseGeometry::PrintSelf(std::ostream &os, itk::Indent indent) const
 
   os << indent << " BoundingBox: ";
   if (this->IsBoundingBoxNull())
-    os << "NULL" << std::endl;
+    os << "nullptr" << std::endl;
   else
   {
     os << indent << "( ";
@@ -830,7 +830,7 @@ bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType *leftHandSide,
   if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal( const mitk::Geometry3D::BoundingBoxType *leftHandSide, const "
-                  "mitk::Geometry3D::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose ) does not with NULL "
+                  "mitk::Geometry3D::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose ) does not with nullptr "
                   "pointer input.";
     return false;
   }
@@ -872,7 +872,7 @@ bool mitk::Equal(const mitk::BaseGeometry *leftHandSide,
   if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal(const mitk::Geometry3D *leftHandSide, const mitk::Geometry3D *rightHandSide, ScalarType "
-                  "eps, bool verbose) does not with NULL pointer input.";
+                  "eps, bool verbose) does not with nullptr pointer input.";
     return false;
   }
   return Equal(*leftHandSide, *rightHandSide, eps, verbose);
@@ -981,7 +981,7 @@ bool mitk::Equal(const mitk::BaseGeometry::TransformType *leftHandSide,
   if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal(const Geometry3D::TransformType *leftHandSide, const Geometry3D::TransformType "
-                  "*rightHandSide, ScalarType eps, bool verbose ) does not with NULL pointer input.";
+                  "*rightHandSide, ScalarType eps, bool verbose ) does not with nullptr pointer input.";
     return false;
   }
   return Equal(*leftHandSide, *rightHandSide, eps, verbose);

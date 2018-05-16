@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __itkExtractDwiChannelFilter_txx
 #define __itkExtractDwiChannelFilter_txx
 
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstdio>
+#include <cstdlib>
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
 #include "itkImageRegionConstIterator.h"
 #include "itkImageRegionConstIteratorWithIndex.h"
@@ -64,8 +64,6 @@ void ExtractDwiChannelFilter< TInPixelType>::ThreadedGenerateData(const OutputIm
         ++oit;
         ++git;
     }
-
-    std::cout << "One Thread finished calculation" << std::endl;
 }
 
 }

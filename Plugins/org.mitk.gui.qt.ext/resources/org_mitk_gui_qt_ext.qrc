@@ -1,9 +1,9 @@
 <RCC>
     <qresource prefix="/org.mitk.gui.qt.ext">
-        <file>dcm-icon.png</file>
-        <file>Slider.png</file>
+        <file>dicom.svg</file>
+        <file>image_navigator.svg</file>
         <file>index.html</file>
         <file>xnat-icon.png</file>
-        <file>view-manager_48.png</file>
+        <file>view-manager.svg</file>
     </qresource>
 </RCC>

@@ -59,7 +59,7 @@ namespace mitk
 
   By default the properties are set to:
   - interpolation mode Nearestneighbor.
-  - a transform NULL (No transform is set).
+  - a transform nullptr (No transform is set).
   - time step 0.
   - component 0.
   - resample by geometry false (Corresponds to input image).
@@ -164,11 +164,11 @@ namespace mitk
 
   protected:
     ExtractSliceFilter(vtkImageReslice *reslicer = nullptr);
-    virtual ~ExtractSliceFilter();
+    ~ExtractSliceFilter() override;
 
-    virtual void GenerateData() override;
-    virtual void GenerateOutputInformation() override;
-    virtual void GenerateInputRequestedRegion() override;
+    void GenerateData() override;
+    void GenerateOutputInformation() override;
+    void GenerateInputRequestedRegion() override;
 
     const PlaneGeometry *m_WorldGeometry;
     vtkSmartPointer<vtkImageReslice> m_Reslicer;

@@ -32,8 +32,8 @@ mitk::VideoInputSource::VideoInputSource()
   m_DeviceNumber = -1;
   m_CaptureSize = 0;
 
-  m_CurrentVideoTexture   = NULL;
-  m_CurrentImage          = NULL;
+  m_CurrentVideoTexture   = nullptr;
+  m_CurrentImage          = nullptr;
   m_VideoInput = new videoInput;
 
 
@@ -50,12 +50,12 @@ mitk::VideoInputSource::~VideoInputSource()
 void mitk::VideoInputSource::FetchFrame()
 { // main procedure for updating video data
 
-//  if(m_CurrentVideoTexture == NULL)
+//  if(m_CurrentVideoTexture == nullptr)
 //    m_CurrentVideoTexture = new unsigned char[m_CaptureSize];
 
   if(m_CapturingInProcess && !m_CapturePaused)
   {
-    if(m_CurrentImage == NULL)
+    if(m_CurrentImage == nullptr)
       m_CurrentImage = cvCreateImage(cvSize(m_CaptureWidth,m_CaptureHeight),IPL_DEPTH_8U,3);
 
     if(m_VideoInput->isFrameNew(m_DeviceNumber))

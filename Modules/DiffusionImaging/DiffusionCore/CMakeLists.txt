@@ -5,12 +5,11 @@ endif()
 
 MITK_CREATE_MODULE(
   SUBPROJECTS MITK-DTI
-  INCLUDE_DIRS include/ include/Algorithms include/Algorithms/Reconstruction include/Algorithms/Registration include/Algorithms/Reconstruction/MultishellProcessing include/DicomImport include/IODataStructures/DiffusionWeightedImages include/IODataStructures/Properties include/IODataStructures/QBallImages include/IODataStructures/TensorImages include/IODataStructures include/Rendering ${CMAKE_CURRENT_BINARY_DIR}
-  DEPENDS MitkMapperExt MitkPlanarFigure MitkImageExtraction MitkSceneSerializationBase MitkDICOMReader
+  INCLUDE_DIRS include/ include/Algorithms include/Algorithms/Reconstruction include/Algorithms/Registration include/Algorithms/Reconstruction/MultishellProcessing include/Algorithms/Reconstruction/FittingFunctions include/DicomImport include/IODataStructures/DiffusionWeightedImages include/IODataStructures/Properties include/IODataStructures/OdfImages include/IODataStructures/TensorImages include/IODataStructures include/Rendering ${CMAKE_CURRENT_BINARY_DIR}
+  DEPENDS MitkMapperExt MitkPlanarFigure MitkImageExtraction MitkSceneSerializationBase MitkDICOMReader MitkMatchPointRegistration
   PACKAGE_DEPENDS
     PUBLIC ITK|ITKTestKernel+ITKRegistrationCommon+ITKMetricsv4+ITKRegistrationMethodsv4+ITKDistanceMap+ITKLabelVoting+ITKVTK
     PUBLIC VTK|vtkFiltersProgrammable
-  WARNINGS_AS_ERRORS
 )
 
 if(MSVC)

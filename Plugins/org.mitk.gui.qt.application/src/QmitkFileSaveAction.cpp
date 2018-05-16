@@ -81,7 +81,7 @@ public:
     {
       return prefService->GetSystemPreferences()->Node("/General");
     }
-    return berry::IPreferences::Pointer(0);
+    return berry::IPreferences::Pointer(nullptr);
   }
 
   QString getLastFileSavePath() const
@@ -114,7 +114,7 @@ public:
       for (std::list<mitk::DataNode::Pointer>::const_iterator nodeIter = dataNodes.begin(),
            nodeIterEnd = dataNodes.end(); nodeIter != nodeIterEnd; ++nodeIter)
       {
-        if ((*nodeIter)->GetData() != NULL)
+        if ((*nodeIter)->GetData() != nullptr)
         {
           enable = true;
           break;
@@ -133,20 +133,20 @@ public:
 };
 
 QmitkFileSaveAction::QmitkFileSaveAction(berry::IWorkbenchWindow::Pointer window)
-  : QAction(0), d(new QmitkFileSaveActionPrivate)
+  : QAction(nullptr), d(new QmitkFileSaveActionPrivate)
 {
   d->init(window.GetPointer(), this);
 }
 
 QmitkFileSaveAction::QmitkFileSaveAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
-  : QAction(0), d(new QmitkFileSaveActionPrivate)
+  : QAction(nullptr), d(new QmitkFileSaveActionPrivate)
 {
   d->init(window.GetPointer(), this);
   this->setIcon(icon);
 }
 
 QmitkFileSaveAction::QmitkFileSaveAction(const QIcon& icon, berry::IWorkbenchWindow* window)
-  : QAction(0), d(new QmitkFileSaveActionPrivate)
+  : QAction(nullptr), d(new QmitkFileSaveActionPrivate)
 {
   d->init(window, this);
   this->setIcon(icon);
@@ -162,7 +162,7 @@ void QmitkFileSaveAction::Run()
   mitk::DataNodeSelection::ConstPointer selection = d->m_Window.Lock()->GetSelectionService()->GetSelection().Cast<const mitk::DataNodeSelection>();
   if (selection.IsNull() || selection->IsEmpty())
   {
-    MITK_ERROR << "Assertion failed: data node selection is NULL or empty";
+    MITK_ERROR << "Assertion failed: data node selection is nullptr or empty";
     return;
   }
 

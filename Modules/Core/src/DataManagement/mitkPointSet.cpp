@@ -335,7 +335,7 @@ void mitk::PointSet::InsertPoint(PointIdentifier id, PointType point, PointSpeci
     mitk::BaseGeometry *tempGeometry = this->GetGeometry(t);
     if (tempGeometry == nullptr)
     {
-      MITK_INFO << __FILE__ << ", l." << __LINE__ << ": GetGeometry of " << t << " returned NULL!" << std::endl;
+      MITK_INFO << __FILE__ << ", l." << __LINE__ << ": GetGeometry of " << t << " returned nullptr!" << std::endl;
       return;
     }
     tempGeometry->WorldToIndex(point, indexPoint);
@@ -597,7 +597,7 @@ void mitk::PointSet::ExecuteOperation(Operation *operation)
       mitk::BaseGeometry *geometry = this->GetGeometry(timeStep);
       if (geometry == nullptr)
       {
-        MITK_INFO << "GetGeometry returned NULL!\n";
+        MITK_INFO << "GetGeometry returned nullptr!\n";
         return;
       }
       geometry->WorldToIndex(pt, pt);
@@ -892,7 +892,7 @@ bool mitk::Equal(const mitk::PointSet *leftHandSide,
   if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, "
-                  "mitk::ScalarType eps, bool verbose ) does not work with NULL pointer input.";
+                  "mitk::ScalarType eps, bool verbose ) does not work with nullptr pointer input.";
     return false;
   }
   return Equal(*leftHandSide, *rightHandSide, eps, verbose, checkGeometry);

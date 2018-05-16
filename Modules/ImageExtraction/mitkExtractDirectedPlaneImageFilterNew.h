@@ -84,9 +84,9 @@ namespace mitk
 
   protected:
     ExtractDirectedPlaneImageFilterNew();
-    virtual ~ExtractDirectedPlaneImageFilterNew();
-    virtual void GenerateData() override;
-    virtual void GenerateOutputInformation() override;
+    ~ExtractDirectedPlaneImageFilterNew() override;
+    void GenerateData() override;
+    void GenerateOutputInformation() override;
 
   private:
     const BaseGeometry *m_CurrentWorldPlaneGeometry;

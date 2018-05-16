@@ -67,7 +67,7 @@ public:
 
   void Initialize(IServiceLocator* locator) override;
 
-  ~WorkbenchSourceProvider();
+  ~WorkbenchSourceProvider() override;
 
   QList<QString> GetProvidedSourceNames() const override;
 
@@ -114,7 +114,7 @@ private:
    */
   const IWorkbenchPartSite* lastActivePartSite;
 
-  const Object* lastShowInInput;
+  SmartPointer<const Object> lastShowInInput;
 
   void PartActivated(const SmartPointer<IWorkbenchPartReference>& part) override;
   void PartBroughtToTop(const SmartPointer<IWorkbenchPartReference>& part) override;

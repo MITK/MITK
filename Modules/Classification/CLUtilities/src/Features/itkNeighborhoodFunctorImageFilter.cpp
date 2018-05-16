@@ -39,7 +39,6 @@ template< typename TInputImage, typename TFeatureImageType , class  FunctorType>
 void
 NeighborhoodFunctorImageFilter< TInputImage, TFeatureImageType, FunctorType >
 ::GenerateInputRequestedRegion()
-throw ( InvalidRequestedRegionError )
 {
 
   // call the superclass' implementation of this method. this should
@@ -47,7 +46,7 @@ throw ( InvalidRequestedRegionError )
   Superclass::GenerateInputRequestedRegion();
 
   // get pointers to the input and output
-  TInputImage * inputPtr = const_cast< TInputImage * >( this->GetInput() );
+  auto inputPtr = const_cast<InputImageType *>(this->GetInput());
 
   if ( !inputPtr )
   {

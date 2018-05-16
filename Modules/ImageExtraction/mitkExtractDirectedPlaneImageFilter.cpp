@@ -60,7 +60,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     return;
   }
 
-  Image *input = const_cast<ImageToImageFilter::InputImageType *>(this->GetInput());
+  auto *input = dynamic_cast<ImageToImageFilter::InputImageType *>(this->GetInput());
   input->Update();
 
   if (input == nullptr)
@@ -147,7 +147,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   if (dynamic_cast<const PlaneGeometry *>(m_WorldGeometry) != nullptr &&
       dynamic_cast<const AbstractTransformGeometry *>(m_WorldGeometry) == nullptr)
   {
-    const PlaneGeometry *planeGeometry = static_cast<const PlaneGeometry *>(m_WorldGeometry);
+    const auto *planeGeometry = static_cast<const PlaneGeometry *>(m_WorldGeometry);
     origin = planeGeometry->GetOrigin();
     right = planeGeometry->GetAxisVector(0);
     bottom = planeGeometry->GetAxisVector(1);
@@ -215,7 +215,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   // Do we have an AbstractTransformGeometry?
   else if (dynamic_cast<const AbstractTransformGeometry *>(m_WorldGeometry))
   {
-    const mitk::AbstractTransformGeometry *abstractGeometry =
+    const auto *abstractGeometry =
       dynamic_cast<const AbstractTransformGeometry *>(m_WorldGeometry);
 
     extent[0] = abstractGeometry->GetParametricExtent(0);

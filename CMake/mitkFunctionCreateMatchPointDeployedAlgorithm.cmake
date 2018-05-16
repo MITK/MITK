@@ -9,6 +9,7 @@
 #! \param CPP_FILES (optional) list of cpp files, if it is not given NAME.cpp is assumed
 #! \param INCLUDE_DIRS (optional): All directories that should be added as include dirs to the project
 #! \param PROFILE (optional): The profile file that should be used for the algorithm. If not set it is "./<algname>.profile".
+#! \param NO_PROFILE_GEN (optional): Flag. If set no profile resource will be generated.
 #! \param ADDITIONAL_LIBS (optional) List of additional private libraries linked to this module.
 #!        The folder containing the library will be added to the global list of library search paths.
 #! \param H_FILES (optional) List of public header files for this module.
@@ -26,6 +27,7 @@ function(mitkFunctionCreateMatchPointDeployedAlgorithm)
 
   set(_function_params
       NAME                # Name of the algorithm/target
+      PROFILE             # Profile of the algorithm that should be used
      )
 
   set(_function_multiparams
@@ -38,7 +40,7 @@ function(mitkFunctionCreateMatchPointDeployedAlgorithm)
      )
 
   set(_function_options
-
+       NO_PROFILE_GEN #Flag that indicates that no profile resource should be generated.
      )
 
   cmake_parse_arguments(ALG "${_function_options}" "${_function_params}" "${_function_multiparams}" ${ARGN})
@@ -61,13 +63,16 @@ function(mitkFunctionCreateMatchPointDeployedAlgorithm)
     set(ALG_PROFILE "${ALG_NAME}.profile")
   ENDIF(NOT ALG_PROFILE)
 
-  MESSAGE(STATUS "... generate MDRA profile (from ${ALG_PROFILE})...")
+  IF(NOT ALG_NO_PROFILE_GEN)
+      MESSAGE(STATUS "... generate MDRA profile for ${ALG_NAME} (from ${ALG_PROFILE})...")
 
-  include(${MatchPoint_SOURCE_DIR}/CMake/mapFunctionCreateAlgorithmProfile.cmake)
-  CREATE_ALGORITHM_PROFILE(${ALG_NAME} ${ALG_PROFILE})
+      include(${MatchPoint_SOURCE_DIR}/CMake/mapFunctionCreateAlgorithmProfile.cmake)
+      CREATE_ALGORITHM_PROFILE(${ALG_NAME} ${ALG_PROFILE})
 
-  MESSAGE(STATUS "... algorithm UID: ${ALGORITHM_PROFILE_UID}")
+      MESSAGE(STATUS "... algorithm UID: ${ALGORITHM_PROFILE_UID}")
+  ENDIF(NOT ALG_NO_PROFILE_GEN)
 
+  MESSAGE(STATUS "... deploy MDRA algorithm ${ALG_NAME}...")
   ADD_LIBRARY(${ALG_TARGET} SHARED ${ALG_CPP_FILES} ${ALGORITHM_PROFILE_FILE})
 
   SET_TARGET_PROPERTIES(${ALG_TARGET} PROPERTIES

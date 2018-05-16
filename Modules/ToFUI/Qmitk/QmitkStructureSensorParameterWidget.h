@@ -42,8 +42,8 @@ class MITKTOFUI_EXPORT QmitkStructureSensorParameterWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkStructureSensorParameterWidget(QWidget* p = 0, Qt::WindowFlags f = 0);
-    virtual ~QmitkStructureSensorParameterWidget();
+    QmitkStructureSensorParameterWidget(QWidget* p = nullptr, Qt::WindowFlags f = nullptr);
+    ~QmitkStructureSensorParameterWidget() override;
 
     /* @brief This method is part of the widget an needs not to be called seperately. */
     virtual void CreateQtPartControl(QWidget *parent);

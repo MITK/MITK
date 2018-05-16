@@ -23,6 +23,7 @@ namespace mitk {
 AutoSelectingDICOMReaderService::AutoSelectingDICOMReaderService()
   : BaseDICOMReaderService("MITK DICOM Reader v2 (autoselect)")
 {
+  this->SetRanking(5);
   this->RegisterService();
 }
 

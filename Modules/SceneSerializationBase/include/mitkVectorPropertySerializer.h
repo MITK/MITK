@@ -57,7 +57,7 @@ namespace mitk
     typedef BasePropertySerializer SuperClass;
     typedef itk::SmartPointer<Self> Pointer;
     typedef itk::SmartPointer<const Self> ConstPointer;
-    virtual std::vector<std::string> GetClassHierarchy() const override { return mitk::GetClassHierarchy<Self>(); }
+    std::vector<std::string> GetClassHierarchy() const override { return mitk::GetClassHierarchy<Self>(); }
     // This function must return different
     // strings in function of the template parameter!
     // Serialization depends on this feature.
@@ -69,12 +69,12 @@ namespace mitk
       return nameOfClass.c_str();
     }
 
-    virtual const char *GetNameOfClass() const override { return this->GetStaticNameOfClass(); }
+    const char *GetNameOfClass() const override { return this->GetStaticNameOfClass(); }
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self)
 
       //! Build an XML version of this property
-      virtual TiXmlElement *Serialize() override
+      TiXmlElement *Serialize() override
     {
       auto listElement = new TiXmlElement("Values");
 
@@ -102,7 +102,7 @@ namespace mitk
     }
 
     //! Construct a property from an XML serialization
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement *listElement) override
+    BaseProperty::Pointer Deserialize(TiXmlElement *listElement) override
     {
       typename PropertyType::VectorType datalist;
 

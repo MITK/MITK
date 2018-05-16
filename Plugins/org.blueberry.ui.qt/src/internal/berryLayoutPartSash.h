@@ -42,7 +42,7 @@ public:
   berryObjectMacro(LayoutPartSash);
 
   LayoutPartSash(PartSashContainer* rootContainer, int style);
-  ~LayoutPartSash();
+  ~LayoutPartSash() override;
 
 private:
 

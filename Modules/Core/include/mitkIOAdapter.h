@@ -47,7 +47,7 @@ namespace mitk
 
   protected:
     IOAdapterBase() {}
-    ~IOAdapterBase() {}
+    ~IOAdapterBase() override {}
   private:
     IOAdapterBase(const Self &);  // purposely not implemented
     void operator=(const Self &); // purposely not implemented
@@ -82,7 +82,7 @@ namespace mitk
       return ioProcessObject.GetPointer();
     }
 
-    virtual bool CanReadFile(const std::string filename,
+    bool CanReadFile(const std::string filename,
                              const std::string filePrefix,
                              const std::string filePattern) override
     {
@@ -91,7 +91,7 @@ namespace mitk
 
   protected:
     IOAdapter() {}
-    ~IOAdapter() {}
+    ~IOAdapter() override {}
   private:
     IOAdapter(const Self &);      // purposely not implemented
     void operator=(const Self &); // purposely not implemented

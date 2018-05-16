@@ -41,7 +41,7 @@ namespace mitk
 
   protected:
     CreatePlanarFigureWriter() {}
-    ~CreatePlanarFigureWriter() {}
+    ~CreatePlanarFigureWriter() override {}
   private:
     CreatePlanarFigureWriter(const Self &); // purposely not implemented
     void operator=(const Self &);           // purposely not implemented
@@ -52,7 +52,7 @@ namespace mitk
     this->RegisterOverride("IOWriter",
                            "PlanarFigureWriter",
                            "PlanarFigure xml Writer",
-                           1,
+                           true,
                            mitk::CreatePlanarFigureWriter<mitk::PlanarFigureWriter>::New());
   }
 

@@ -52,7 +52,7 @@ namespace mitk
     if (thisDevice->GetToolCount() != navigationTools->GetToolCount())
     {
       errorMessage->append("The number of tools in the connected device differs from the tool storage, cannot add tools.");
-      return NULL;
+      return nullptr;
     }
     returnValue->SetTrackingDevice(thisDevice);
     return returnValue;

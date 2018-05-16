@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkMemoryUtilities.h"
 
-#include <stdio.h>
+#include <cstdio>
 #if _MSC_VER || __MINGW32__
 #include <windows.h>
 #include <psapi.h>
@@ -44,7 +44,7 @@ size_t mitk::MemoryUtilities::GetProcessMemoryUsage()
   DWORD pid = GetCurrentProcessId();
   PROCESS_MEMORY_COUNTERS pmc;
   HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
-  if (hProcess == NULL)
+  if (hProcess == nullptr)
     return 0;
   if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc)))
   {
@@ -84,7 +84,7 @@ size_t mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam()
   mib[0] = CTL_HW;
   mib[1] = HW_MEMSIZE;
   size_t length = sizeof(int64_t);
-  sysctl(mib, 2, &physical_memory, &length, NULL, 0);
+  sysctl(mib, 2, &physical_memory, &length, nullptr, 0);
   return physical_memory;
 #else
   struct sysinfo info;

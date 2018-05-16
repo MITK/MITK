@@ -252,7 +252,7 @@ public:
     mitk::Image::Pointer image =
       mitk::ImageGenerator::GenerateRandomImage<mitk::ScalarType>(DimX, DimY, DimZ, DimT, 0.5, 0.33, 0.78, 100);
     mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
-    bool isValid = geometry->IsValidTimePoint(-DimT);
+    bool isValid = geometry->IsValidTimePoint(-static_cast<int>(DimT));
     MITK_TEST_CONDITION(mitk::Equal(isValid, false), "Is invalid time Point correct minimum time point ");
   }
 
@@ -280,7 +280,7 @@ public:
     mitk::BaseData *baseData, unsigned int /*DimX*/, unsigned int /*DimY*/, unsigned int /*DimZ*/, unsigned int DimT)
   {
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
-    bool isValid = geometry->IsValidTimeStep(-DimT);
+    bool isValid = geometry->IsValidTimeStep(-static_cast<int>(DimT));
     MITK_TEST_CONDITION(mitk::Equal(isValid, false), "Is invalid time Point correct minimum time point ");
   }
 

@@ -18,7 +18,7 @@
 #include "mitkInteractionEventConst.h"
 #include "vtkCommand.h"
 #include <mitkInteractionConst.h> // INTERACTION LEGACY
-#include <string.h>
+#include <cstring>
 
 namespace mitk
 {
@@ -201,7 +201,7 @@ mitk::InteractionKeyEvent::Pointer mitk::VtkEventAdapter::AdaptInteractionKeyEve
   if (vtkCommandEventId != vtkCommand::KeyPressEvent)
   {
     MITK_WARN << "mitk::VtkEventAdapter::AdaptInteractionKeyEvent() called with wrong argument";
-    return NULL;
+    return nullptr;
   }
   int modifiers = 0;
   if (rwi->GetShiftKey())

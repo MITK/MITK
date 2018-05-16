@@ -35,133 +35,81 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 #include <vtkPolyLine.h>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 namespace itk {
 
-//#define QBALL_RECON_PI       M_PI
-
-template< class TTensorPixelType, class TPDPixelType>
-DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType,
-TPDPixelType>
-::DiffusionTensorPrincipalDirectionImageFilter()
+template< class TTensorPixelType>
+DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType>::DiffusionTensorPrincipalDirectionImageFilter()
     : m_NormalizeVectors(true)
-    , m_MaxEigenvalue(0.0)
+    , m_UsePolarCoordinates(false)
+    , m_FaThreshold(0.2)
 {
     this->SetNumberOfRequiredInputs( 1 );
 }
 
-template< class TTensorPixelType,
-          class TPDPixelType>
-void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType,
-TPDPixelType>
-::BeforeThreadedGenerateData()
+template< class TTensorPixelType>
+void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType>::BeforeThreadedGenerateData()
 {
     typename InputImageType::Pointer inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
-    Vector<double,3> spacing = inputImagePointer->GetSpacing();
-    mitk::Point3D origin = inputImagePointer->GetOrigin();
-    itk::Matrix<double, 3, 3> direction = inputImagePointer->GetDirection();
-    ImageRegion<3> imageRegion = inputImagePointer->GetLargestPossibleRegion();
+    Vector<double,3> spacing3 = inputImagePointer->GetSpacing();
+    mitk::Point3D origin3 = inputImagePointer->GetOrigin();
+    itk::Matrix<double, 3, 3> direction3 = inputImagePointer->GetDirection();
+    ImageRegion<3> imageRegion3 = inputImagePointer->GetLargestPossibleRegion();
 
     if (m_MaskImage.IsNull())
     {
         m_MaskImage = ItkUcharImgType::New();
-        m_MaskImage->SetSpacing( spacing );
-        m_MaskImage->SetOrigin( origin );
-        m_MaskImage->SetDirection( direction );
-        m_MaskImage->SetRegions( imageRegion );
+        m_MaskImage->SetSpacing( spacing3 );
+        m_MaskImage->SetOrigin( origin3 );
+        m_MaskImage->SetDirection( direction3 );
+        m_MaskImage->SetRegions( imageRegion3 );
         m_MaskImage->Allocate();
         m_MaskImage->FillBuffer(1);
     }
-    m_NumDirectionsImage = ItkUcharImgType::New();
-    m_NumDirectionsImage->SetSpacing( spacing );
-    m_NumDirectionsImage->SetOrigin( origin );
-    m_NumDirectionsImage->SetDirection( direction );
-    m_NumDirectionsImage->SetRegions( imageRegion );
-    m_NumDirectionsImage->Allocate();
-    m_NumDirectionsImage->FillBuffer(0);
 
-    itk::Vector< TPDPixelType, 3 > nullVec; nullVec.Fill(0.0);
     typename OutputImageType::Pointer outputImage = OutputImageType::New();
-    outputImage->SetSpacing( spacing );
-    outputImage->SetOrigin( origin );
-    outputImage->SetDirection( direction );
-    outputImage->SetRegions( imageRegion );
+    outputImage->SetSpacing( spacing3 );
+    outputImage->SetOrigin( origin3 );
+    outputImage->SetDirection( direction3 );
+    outputImage->SetRegions( imageRegion3 );
     outputImage->Allocate();
-    outputImage->FillBuffer(nullVec);
+    outputImage->FillBuffer(0);
     this->SetNthOutput(0, outputImage);
+
+
+    itk::Vector<double, 4> spacing4;
+    itk::Point<float, 4> origin4;
+    itk::Matrix<double, 4, 4> direction4;
+    itk::ImageRegion<4> imageRegion4;
+
+    spacing4[0] = spacing3[0]; spacing4[1] = spacing3[1]; spacing4[2] = spacing3[2]; spacing4[3] = 1;
+    origin4[0] = origin3[0]; origin4[1] = origin3[1]; origin4[2] = origin3[2]; origin3[3] = 0;
+    for (int r=0; r<3; r++)
+      for (int c=0; c<3; c++)
+        direction4[r][c] = direction3[r][c];
+    direction4[3][3] = 1;
+    imageRegion4.SetSize(0, imageRegion3.GetSize()[0]);
+    imageRegion4.SetSize(1, imageRegion3.GetSize()[1]);
+    imageRegion4.SetSize(2, imageRegion3.GetSize()[2]);
+    imageRegion4.SetSize(3, 3);
+
+    m_PeakImage = PeakImageType::New();
+    m_PeakImage->SetSpacing( spacing4 );
+    m_PeakImage->SetOrigin( origin4 );
+    m_PeakImage->SetDirection( direction4 );
+    m_PeakImage->SetRegions( imageRegion4 );
+    m_PeakImage->Allocate();
+    m_PeakImage->FillBuffer(0.0);
 }
 
-template< class TTensorPixelType,
-          class TPDPixelType>
-void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType,
-TPDPixelType>
+template< class TTensorPixelType>
+void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType>
 ::AfterThreadedGenerateData()
 {
-    vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
-    vtkSmartPointer<vtkPoints>    m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
 
-    typename OutputImageType::Pointer directionImage = static_cast< OutputImageType* >( this->ProcessObject::GetPrimaryOutput() );
-    ImageRegionConstIterator< OutputImageType > it(directionImage, directionImage->GetLargestPossibleRegion() );
-
-    mitk::Vector3D spacing = directionImage->GetSpacing();
-    double minSpacing = spacing[0];
-    if (spacing[1]<minSpacing)
-        minSpacing = spacing[1];
-    if (spacing[2]<minSpacing)
-        minSpacing = spacing[2];
-
-    while( !it.IsAtEnd() )
-    {
-        typename OutputImageType::IndexType index = it.GetIndex();
-        if (m_MaskImage->GetPixel(index)==0)
-        {
-            ++it;
-            continue;
-        }
-
-        itk::Vector< float, 3 > pixel = directionImage->GetPixel(index);
-        DirectionType dir; dir[0] = pixel[0]; dir[1] = pixel[1]; dir[2] = pixel[2];
-
-        if (!m_NormalizeVectors && m_MaxEigenvalue>0)
-            dir /= m_MaxEigenvalue;
-
-        vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-        itk::ContinuousIndex<double, 3> center;
-        center[0] = index[0];
-        center[1] = index[1];
-        center[2] = index[2];
-        itk::Point<double> worldCenter;
-        directionImage->TransformContinuousIndexToPhysicalPoint( center, worldCenter );
-
-        itk::Point<double> worldStart;
-        worldStart[0] = worldCenter[0]-dir[0]/2 * minSpacing;
-        worldStart[1] = worldCenter[1]-dir[1]/2 * minSpacing;
-        worldStart[2] = worldCenter[2]-dir[2]/2 * minSpacing;
-        vtkIdType id = m_VtkPoints->InsertNextPoint(worldStart.GetDataPointer());
-        container->GetPointIds()->InsertNextId(id);
-        itk::Point<double> worldEnd;
-        worldEnd[0] = worldCenter[0]+dir[0]/2 * minSpacing;
-        worldEnd[1] = worldCenter[1]+dir[1]/2 * minSpacing;
-        worldEnd[2] = worldCenter[2]+dir[2]/2 * minSpacing;
-        id = m_VtkPoints->InsertNextPoint(worldEnd.GetDataPointer());
-        container->GetPointIds()->InsertNextId(id);
-        m_VtkCellArray->InsertNextCell(container);
-
-        ++it;
-    }
-
-    vtkSmartPointer<vtkPolyData> directionsPolyData = vtkSmartPointer<vtkPolyData>::New();
-    directionsPolyData->SetPoints(m_VtkPoints);
-    directionsPolyData->SetLines(m_VtkCellArray);
-    m_OutputFiberBundle = mitk::FiberBundle::New(directionsPolyData);
 }
 
-template< class TTensorPixelType,
-          class TPDPixelType>
-void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType,
-TPDPixelType>
+template< class TTensorPixelType>
+void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType )
 {
 
@@ -171,65 +119,97 @@ TPDPixelType>
 
     typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
 
-    ImageRegionIterator< OutputImageType > outIt(outputImage, outputRegionForThread);
-    InputIteratorType inIt(inputImagePointer, outputRegionForThread );
-    ImageRegionIterator< ItkUcharImgType > nIt(m_NumDirectionsImage, outputRegionForThread );
+    ImageRegionIterator< OutputImageType > numDirectionsIterator(outputImage, outputRegionForThread);
+    InputIteratorType tensorIterator(inputImagePointer, outputRegionForThread );
 
-    while( !inIt.IsAtEnd() )
+    while( !tensorIterator.IsAtEnd() )
     {
-        typename InputImageType::IndexType index = inIt.GetIndex();
+        typename InputImageType::IndexType index = tensorIterator.GetIndex();
         if (m_MaskImage->GetPixel(index)==0)
         {
-            ++inIt;
-            ++nIt;
-            ++outIt;
+            ++tensorIterator;
+            ++numDirectionsIterator;
             continue;
         }
 
-        typename InputImageType::PixelType b = inIt.Get();
+        typename InputImageType::PixelType b = tensorIterator.Get();
         TensorType tensor = b.GetDataPointer();
 
-        typename OutputImageType::PixelType dir;
+        typename PeakImageType::IndexType peakIndex;
+        peakIndex[0] = tensorIterator.GetIndex()[0];
+        peakIndex[1] = tensorIterator.GetIndex()[1];
+        peakIndex[2] = tensorIterator.GetIndex()[2];
+
         typename TensorType::EigenValuesArrayType eigenvalues;
         typename TensorType::EigenVectorsMatrixType eigenvectors;
         if(tensor.GetTrace()!=0)
         {
             tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
 
-            vnl_vector_fixed<double,3> vec;
+            vnl_vector_fixed<float,3> vec;
             vec[0] = eigenvectors(2,0);
             vec[1] = eigenvectors(2,1);
             vec[2] = eigenvectors(2,2);
+            vec.normalize();
 
-            if (!m_NormalizeVectors)
-                vec *= eigenvalues[2];
+            vnl_vector_fixed<float,3> out; out.fill(0);
 
-            if (eigenvalues[2]>m_MaxEigenvalue)
-                m_MaxEigenvalue = eigenvalues[2];
+            float fa = tensor.GetFractionalAnisotropy();
+            if (fa<m_FaThreshold)
+              vec.fill(0.0);
+            else
+            {
+              if (!m_NormalizeVectors)
+                vec *= fa;
 
-            dir[0] = (TPDPixelType)vec[0];
-            dir[1] = (TPDPixelType)vec[1];
-            dir[2] = (TPDPixelType)vec[2];
+              if (m_UsePolarCoordinates)
+              {
+                if(vec[0] || vec[1] || vec[2])
+                {
+                  out[0] = sqrt( vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2] );
+                  out[1] = atan2( vec[1], vec[0] );
+                  out[2] = 0.5*itk::Math::pi - atan( vec[2] / sqrt( vec[0] * vec[0] + vec[1] * vec[1] ) );
 
-            outIt.Set( dir );
-            m_NumDirectionsImage->SetPixel(index, 1);
+                  if(out[1]>itk::Math::pi)
+                  {
+                    out[1] = out[1] - itk::Math::pi;
+                  }
+                }
+                else
+                {
+                  out[0] = 0;
+                  out[1] = 0;
+                  out[2] = 0;
+                }
+              }
+              else
+              {
+                out = vec;
+              }
+            }
+
+            peakIndex[3] = 0;
+            m_PeakImage->SetPixel(peakIndex, out[0]);
+            peakIndex[3] = 1;
+            m_PeakImage->SetPixel(peakIndex, out[1]);
+            peakIndex[3] = 2;
+            m_PeakImage->SetPixel(peakIndex, out[2]);
+
+            numDirectionsIterator.Set( 1 );
         }
 
-        ++outIt;
-        ++inIt;
-        ++nIt;
+        ++numDirectionsIterator;
+        ++tensorIterator;
     }
 
     std::cout << "One Thread finished extraction" << std::endl;
 }
 
-template< class TTensorPixelType,
-          class TPDPixelType>
-void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType,
-TPDPixelType>
-::PrintSelf(std::ostream& os, Indent indent) const
+template< class TTensorPixelType>
+void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType>
+::PrintSelf(std::ostream& , Indent ) const
 {
 }
 
 }
-#endif // __itkDiffusionQballPrincipleDirectionsImageFilter_txx
+#endif

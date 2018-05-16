@@ -24,7 +24,7 @@ namespace mitk
 {
   /** \brief Converts composite pixel values to a displayable string
   *
-  * \throws mitk::Exception If the image is NULL.
+  * \throws mitk::Exception If the image is nullptr.
   * \throws mitk::AccessByItkException for pixel types which are not part of MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES_SEQ
   */
   std::string MITKCORE_EXPORT ConvertCompositePixelValueToString(Image::Pointer image, itk::Index<3> index);

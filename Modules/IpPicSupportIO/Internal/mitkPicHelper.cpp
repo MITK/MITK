@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 bool mitk::PicHelper::GetSpacing(const mitkIpPicDescriptor *aPic, Vector3D &spacing)
 {
-  mitkIpPicDescriptor *pic = const_cast<mitkIpPicDescriptor *>(aPic);
+  auto *pic = const_cast<mitkIpPicDescriptor *>(aPic);
 
   mitkIpPicTSV_t *tsv;
   bool pixelSize = false;
@@ -132,7 +132,7 @@ bool mitk::PicHelper::GetSpacing(const mitkIpPicDescriptor *aPic, Vector3D &spac
 
 bool mitk::PicHelper::GetTimeSpacing(const mitkIpPicDescriptor *aPic, float &timeSpacing)
 {
-  mitkIpPicDescriptor *pic = const_cast<mitkIpPicDescriptor *>(aPic);
+  auto *pic = const_cast<mitkIpPicDescriptor *>(aPic);
 
   mitkIpPicTSV_t *tsv;
 
@@ -150,7 +150,7 @@ bool mitk::PicHelper::GetTimeSpacing(const mitkIpPicDescriptor *aPic, float &tim
 
 bool mitk::PicHelper::SetSpacing(const mitkIpPicDescriptor *aPic, SlicedGeometry3D *slicedgeometry)
 {
-  mitkIpPicDescriptor *pic = const_cast<mitkIpPicDescriptor *>(aPic);
+  auto *pic = const_cast<mitkIpPicDescriptor *>(aPic);
 
   Vector3D spacing(slicedgeometry->GetSpacing());
 
@@ -158,7 +158,7 @@ bool mitk::PicHelper::SetSpacing(const mitkIpPicDescriptor *aPic, SlicedGeometry
   if ((tsv = mitkIpPicQueryTag(pic, "REAL PIXEL SIZES")) != nullptr)
   {
     int count = tsv->n[1];
-    float *value = (float *)tsv->value;
+    auto *value = (float *)tsv->value;
     mitk::Vector3D pixelSize;
     spacing.Fill(0);
 
@@ -221,7 +221,7 @@ void mitk::PicHelper::InitializeEvenlySpaced(const mitkIpPicDescriptor *pic,
 
 bool mitk::PicHelper::SetPlaneGeometry(const mitkIpPicDescriptor *aPic, int s, SlicedGeometry3D *slicedgeometry)
 {
-  mitkIpPicDescriptor *pic = const_cast<mitkIpPicDescriptor *>(aPic);
+  auto *pic = const_cast<mitkIpPicDescriptor *>(aPic);
   if ((pic != nullptr) && (slicedgeometry->IsValidSlice(s)))
   {
     // construct standard view
@@ -230,8 +230,8 @@ bool mitk::PicHelper::SetPlaneGeometry(const mitkIpPicDescriptor *aPic, int s, S
     mitkIpPicTSV_t *tsv;
     if ((tsv = mitkIpPicQueryTag(pic, "REAL PIXEL SIZES")) != nullptr)
     {
-      unsigned int count = (unsigned int)tsv->n[1];
-      float *value = (float *)tsv->value;
+      auto count = (unsigned int)tsv->n[1];
+      auto *value = (float *)tsv->value;
       mitk::Vector3D pixelSize;
       ScalarType zPosition = 0.0f;
 

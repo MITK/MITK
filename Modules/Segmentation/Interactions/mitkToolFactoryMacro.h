@@ -27,8 +27,8 @@ class EXPORT_SPEC CLASS_NAME##Factory : public ::itk::ObjectFactoryBase         
     typedef itk::SmartPointer<const Self> ConstPointer;                                                                \
                                                                                                                        \
     /* Methods from ObjectFactoryBase */                                                                               \
-    virtual const char *GetITKSourceVersion() const { return ITK_SOURCE_VERSION; }                                     \
-    virtual const char *GetDescription() const { return DESCRIPTION; }                                                 \
+    virtual const char *GetITKSourceVersion() const override { return ITK_SOURCE_VERSION; }                                     \
+    virtual const char *GetDescription() const override { return DESCRIPTION; }                                                 \
     /* Method for class instantiation. */                                                                              \
     itkFactorylessNewMacro(Self);                                                                                      \
                                                                                                                        \
@@ -128,8 +128,8 @@ class EXPORT_SPEC CLASS_NAME##Factory : public ::itk::ObjectFactoryBase         
     typedef itk::SmartPointer<const Self> ConstPointer;                                                                \
                                                                                                                        \
     /* Methods from ObjectFactoryBase */                                                                               \
-    virtual const char *GetITKSourceVersion() const { return ITK_SOURCE_VERSION; }                                     \
-    virtual const char *GetDescription() const { return DESCRIPTION; }                                                 \
+    virtual const char *GetITKSourceVersion() const override { return ITK_SOURCE_VERSION; }                                     \
+    virtual const char *GetDescription() const override { return DESCRIPTION; }                                                 \
     /* Method for class instantiation. */                                                                              \
     itkFactorylessNewMacro(Self);                                                                                      \
                                                                                                                        \

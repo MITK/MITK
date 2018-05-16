@@ -28,11 +28,11 @@ namespace mitk
     mitkClassMacro(ContourModelSerializer, BaseDataSerializer);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual std::string Serialize() override;
+      std::string Serialize() override;
 
   protected:
     ContourModelSerializer();
-    virtual ~ContourModelSerializer();
+    ~ContourModelSerializer() override;
   };
 }
 

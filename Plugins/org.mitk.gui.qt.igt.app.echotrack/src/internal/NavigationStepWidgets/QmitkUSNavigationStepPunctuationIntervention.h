@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkUSAbstractNavigationStep.h"
 #include <mitkPointSet.h>
+#include <mitkNavigationTool.h>
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
 #include <vtkLine.h>
@@ -56,6 +57,9 @@ class QmitkUSNavigationStepPunctuationIntervention : public QmitkUSAbstractNavig
   Q_OBJECT
 
 public:
+
+  /** Sets the navigation tool of the needle for the meta data (tool axis etc.)*/
+  void SetNeedleMetaData(mitk::NavigationTool::Pointer needleNavigationTool);
   explicit QmitkUSNavigationStepPunctuationIntervention(QWidget *parent = 0);
   ~QmitkUSNavigationStepPunctuationIntervention();
 
@@ -84,6 +88,7 @@ protected slots:
   void OnAddAblationZoneClicked();
   void OnEnableAblationZoneMarkingClicked();
   void OnAblationZoneSizeSliderChanged(int size);
+  void OnShowToolAxisEnabled(int enabled);
 
 protected:
   virtual void OnSetCombinedModality();
@@ -96,12 +101,16 @@ protected:
   /** Checks if the given line intersects the given sphere. */
   bool CheckSphereLineIntersection(mitk::Point3D& sphereOrigin, float& sphereRadius, mitk::Point3D& lineStart, mitk::Point3D& lineEnd);
 
+private:
+  Ui::QmitkUSNavigationStepPunctuationIntervention *m_Ui;
+
   mitk::DataStorage::SetOfObjects::ConstPointer m_ZoneNodes;
 
-    /**
-   * \brief Creates a Pointset that projects the needle's path
-   */
+  /** \brief Creates a Pointset that projects the needle's path */
   itk::SmartPointer<mitk::NeedleProjectionFilter> m_NeedleProjectionFilter;
+
+  /** holds the navigation tool of the needle for the meta data (tool axis etc.)*/
+  mitk::NavigationTool::Pointer m_NeedleNavigationTool;
 
   std::map<mitk::DataNode::Pointer,mitk::Color> m_OldColors; //stores the original color of the critical structrue nodes
 
@@ -109,9 +118,6 @@ protected:
   vtkSmartPointer<vtkSphereSource> m_SphereSource;
   vtkSmartPointer<vtkOBBTree> m_OBBTree;
   vtkSmartPointer<vtkPoints> m_IntersectPoints;
-
-private:
-  Ui::QmitkUSNavigationStepPunctuationIntervention *ui;
 };
 
 #endif // QMITKUSNAVIGATIONSTEPPUNCTUATIONINTERVENTION_H

@@ -454,7 +454,7 @@ bool ExtensionRegistry::RemoveObject(const SmartPointer<RegistryObject>& registr
 
 void ExtensionRegistry::SetFileManager(const QString& /*cacheBase*/, bool /*isCacheReadOnly*/)
 {
-//  if (cacheStorageManager != NULL)
+//  if (cacheStorageManager != nullptr)
 //    cacheStorageManager->Close(); // close existing file manager first
 
 //  if (cacheBase != null) {
@@ -920,7 +920,7 @@ void ExtensionRegistry::Stop(QObject* /*key*/)
 
   StopChangeEventScheduler();
 
-//  if (cacheStorageManager == NULL)
+//  if (cacheStorageManager == nullptr)
 //    return;
 
 //  if (!registryObjects.isDirty() || cacheStorageManager.isReadOnly()) {

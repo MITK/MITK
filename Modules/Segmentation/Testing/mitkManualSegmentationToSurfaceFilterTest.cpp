@@ -48,9 +48,9 @@ public:
     m_Filter = mitk::ManualSegmentationToSurfaceFilter::New();
     if (parameter.size() == 2)
     {
-      m_Filter->SetInput(mitk::IOUtil::LoadImage(GetTestDataFilePath(parameter.at(0))));
+      m_Filter->SetInput(mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath(parameter.at(0))));
       // For the tests which have reference data
-      m_ReferenceSurface = mitk::IOUtil::LoadSurface(GetTestDataFilePath(parameter.at(1)));
+      m_ReferenceSurface = mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath(parameter.at(1)));
     }
     else
     {
@@ -60,8 +60,8 @@ public:
 
   void tearDown() override
   {
-    m_Filter = NULL;
-    m_ReferenceSurface = NULL;
+    m_Filter = nullptr;
+    m_ReferenceSurface = nullptr;
   }
 
   void Update_BallBinary_OutputEqualsReference()

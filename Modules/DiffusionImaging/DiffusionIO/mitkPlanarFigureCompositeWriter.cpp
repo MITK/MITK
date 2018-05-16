@@ -64,7 +64,7 @@ void mitk::PlanarFigureCompositeWriter::Write()
     try
     {
         const std::string& locale = "C";
-        const std::string& currLocale = setlocale( LC_ALL, NULL );
+        const std::string& currLocale = setlocale( LC_ALL, nullptr );
         setlocale(LC_ALL, locale.c_str());
 
         std::locale previousLocale(out->getloc());

@@ -31,7 +31,7 @@ int mitkVolumeCalculatorTest(int /*argc*/, char *argv[])
   // The correct values have been manually calculated using external software.
   //*********************************************************************
 
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(filename);
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(filename);
   MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(), "01 Check if test image could be loaded");
 
   volumeCalculator->SetImage(image);
@@ -47,14 +47,14 @@ int mitkVolumeCalculatorTest(int /*argc*/, char *argv[])
 
   MITK_TEST_CONDITION_REQUIRED(volume == 1272.50, "03 Test Volume Result. Expected 1272.50 actual value " << volume);
 
-  image = mitk::IOUtil::LoadImage(filename3D);
+  image = mitk::IOUtil::Load<mitk::Image>(filename3D);
 
   volumeCalculator->SetImage(image);
   volumeCalculator->SetThreshold(-1023);
   volumeCalculator->ComputeVolume();
   std::vector<float> volumes = volumeCalculator->GetVolumes();
 
-  for (std::vector<float>::iterator it = volumes.begin(); it != volumes.end(); ++it)
+  for (auto it = volumes.begin(); it != volumes.end(); ++it)
   {
     MITK_TEST_CONDITION_REQUIRED((*it) == 24.576f, "04 Test Volume Result.");
   }

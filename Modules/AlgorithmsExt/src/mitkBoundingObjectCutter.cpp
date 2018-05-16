@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkTimeHelper.h"
 
-#include <math.h>
+#include <cmath>
 
 namespace mitk
 {
@@ -61,7 +61,7 @@ namespace mitk
     // input-requested-region in m_InputRequestedRegion in
     // GenerateOutputInformation (which is called before
     // GenerateInputRequestedRegion).
-    GenerateTimeInInputRegion(output, const_cast<mitk::Image *>(this->GetInput()));
+    GenerateTimeInInputRegion(output, this->GetInput());
     GenerateTimeInInputRegion(output, m_BoundingObject.GetPointer());
   }
 
@@ -71,7 +71,7 @@ namespace mitk
     if ((output->IsInitialized()) && (output->GetPipelineMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
       return;
 
-    mitk::Image::Pointer input = const_cast<mitk::Image *>(this->GetInput());
+    mitk::Image::Pointer input = this->GetInput();
 
     if (input.IsNull())
     {

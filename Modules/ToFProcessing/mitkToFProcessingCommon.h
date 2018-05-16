@@ -71,7 +71,7 @@ namespace mitk
     \param principalPoint coordinates of principal point on image plane in pixel
     \return cartesian coordinates for current index will be written here
     */
-    inline static ToFPoint3D IndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance,
+    static ToFPoint3D IndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance,
       ToFPoint2D focalLength, ToFPoint2D principalPoint)
     {
       return IndexToCartesianCoordinates(i,j,distance,focalLength[0],focalLength[1],principalPoint[0],principalPoint[1]);
@@ -85,7 +85,7 @@ namespace mitk
     \param principalPoint coordinates of principal point on image plane in pixel
     \return cartesian coordinates for current index will be written here
     */
-    inline static ToFPoint3D IndexToCartesianCoordinates(itk::Index<3> index, ToFScalarType distance,
+    static ToFPoint3D IndexToCartesianCoordinates(itk::Index<3> index, ToFScalarType distance,
       ToFPoint2D focalLength, ToFPoint2D principalPoint)
     {
       return IndexToCartesianCoordinates(index[0],index[1],distance,focalLength[0],focalLength[1],principalPoint[0], principalPoint[1]);
@@ -99,7 +99,7 @@ namespace mitk
     \param principalPoint coordinates of principal point on image plane in pixel
     \return cartesian coordinates for current index will be written here
     */
-    inline static ToFPoint3D IndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance,
+    static ToFPoint3D IndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance,
       ToFScalarType focalLength[2], ToFScalarType principalPoint[2])
     {
       return IndexToCartesianCoordinates(i,j,distance,focalLength[0],focalLength[1],principalPoint[0],principalPoint[1]);
@@ -131,7 +131,7 @@ namespace mitk
     \param principalPoint coordinates of principal point on image plane in pixel
     \return cartesian coordinates for current index will be written here
     */
-    inline static ToFPoint3D IndexToCartesianCoordinatesWithInterpixdist(unsigned int i, unsigned int j, ToFScalarType distance, ToFScalarType focalLength,
+    static ToFPoint3D IndexToCartesianCoordinatesWithInterpixdist(unsigned int i, unsigned int j, ToFScalarType distance, ToFScalarType focalLength,
       ToFPoint2D interPixelDistance, ToFPoint2D principalPoint)
     {
       return IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLength,interPixelDistance[0],interPixelDistance[1],principalPoint[0],principalPoint[1]);
@@ -145,7 +145,7 @@ namespace mitk
     \param principalPoint coordinates of principal point on image plane in pixel
     \return cartesian coordinates for current index will be written here
     */
-    inline static ToFPoint3D IndexToCartesianCoordinatesWithInterpixdist(itk::Index<3> index, ToFScalarType distance, ToFScalarType focalLength,
+    static ToFPoint3D IndexToCartesianCoordinatesWithInterpixdist(itk::Index<3> index, ToFScalarType distance, ToFScalarType focalLength,
       ToFPoint2D interPixelDistance, ToFPoint2D principalPoint)
     {
       return IndexToCartesianCoordinatesWithInterpixdist(index[0],index[1],distance,focalLength,interPixelDistance[0], interPixelDistance[1],principalPoint[0], principalPoint[1]);
@@ -160,7 +160,7 @@ namespace mitk
     \param principalPoint coordinates of principal point on image plane in pixel
     \return cartesian coordinates for current index will be written here
     */
-    inline static ToFPoint3D IndexToCartesianCoordinatesWithInterpixdist(unsigned int i, unsigned int j, ToFScalarType distance, ToFScalarType focalLength,
+    static ToFPoint3D IndexToCartesianCoordinatesWithInterpixdist(unsigned int i, unsigned int j, ToFScalarType distance, ToFScalarType focalLength,
       ToFScalarType interPixelDistance[2], ToFScalarType principalPoint[2])
     {
       return IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLength,interPixelDistance[0],interPixelDistance[1],principalPoint[0],principalPoint[1]);
@@ -191,7 +191,7 @@ namespace mitk
     \param calculateDistance if this flag is set, the distance value is stored in the z position of the output otherwise z=0
     \return a ToFPoint3D. (int)ToFPoint3D[0]+0.5 and (int)ToFPoint3D[0]+0.5 will return the x and y index coordinates. ToFPoint3D[2] contains the distance value
     */
-    inline static ToFPoint3D CartesianToIndexCoordinates(ToFScalarType cartesianPoint[3], ToFScalarType focalLength[2],
+    static ToFPoint3D CartesianToIndexCoordinates(ToFScalarType cartesianPoint[3], ToFScalarType focalLength[2],
                                                          ToFScalarType principalPoint[2], bool calculateDistance=true)
     {
       return CartesianToIndexCoordinates(cartesianPoint[0],cartesianPoint[1],cartesianPoint[2],focalLength[0], focalLength[1],
@@ -205,7 +205,7 @@ namespace mitk
     \param calculateDistance if this flag is set, the distance value is stored in the z position of the output otherwise z=0
     \return a ToFPoint3D. (int)ToFPoint3D[0]+0.5 and (int)ToFPoint3D[0]+0.5 will return the x and y index coordinates. ToFPoint3D[2] contains the distance value
     */
-    inline static ToFPoint3D CartesianToIndexCoordinates(ToFPoint3D cartesianPoint, ToFPoint2D focalLength,
+    static ToFPoint3D CartesianToIndexCoordinates(ToFPoint3D cartesianPoint, ToFPoint2D focalLength,
       ToFPoint2D principalPoint, bool calculateDistance=true)
     {
       return CartesianToIndexCoordinates(cartesianPoint[0],cartesianPoint[1],cartesianPoint[2],focalLength[0], focalLength[1],
@@ -239,7 +239,7 @@ namespace mitk
     \param calculateDistance if this flag is set, the distance value is stored in the z position of the output otherwise z=0
     \return a ToFPoint3D. (int)ToFPoint3D[0]+0.5 and (int)ToFPoint3D[0]+0.5 will return the x and y index coordinates. ToFPoint3D[2] contains the distance value
     */
-    inline static ToFPoint3D CartesianToIndexCoordinatesWithInterpixdist(ToFScalarType cartesianPoint[3], ToFScalarType focalLength,
+    static ToFPoint3D CartesianToIndexCoordinatesWithInterpixdist(ToFScalarType cartesianPoint[3], ToFScalarType focalLength,
                                                          ToFScalarType interPixelDistance[2], ToFScalarType principalPoint[2],
                                                          bool calculateDistance=true)
     {
@@ -255,7 +255,7 @@ namespace mitk
     \param calculateDistance if this flag is set, the distance value is stored in the z position of the output otherwise z=0
     \return a ToFPoint3D. (int)ToFPoint3D[0]+0.5 and (int)ToFPoint3D[0]+0.5 will return the x and y index coordinates. ToFPoint3D[2] contains the distance value
     */
-    inline static ToFPoint3D CartesianToIndexCoordinatesWithInterpixdist(ToFPoint3D cartesianPoint, ToFScalarType focalLength,
+    static ToFPoint3D CartesianToIndexCoordinatesWithInterpixdist(ToFPoint3D cartesianPoint, ToFScalarType focalLength,
       ToFPoint2D interPixelDistance, ToFPoint2D principalPoint, bool calculateDistance=true)
     {
       return CartesianToIndexCoordinatesWithInterpixdist(cartesianPoint[0],cartesianPoint[1],cartesianPoint[2],focalLength,
@@ -277,19 +277,19 @@ namespace mitk
      */
     static ToFProcessingCommon::ToFPoint3D KinectIndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance, ToFScalarType focalLengthX, ToFScalarType focalLengthY, ToFScalarType principalPointX, ToFScalarType principalPointY);
 
-    inline static ToFPoint3D KinectIndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance,
+    static ToFPoint3D KinectIndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance,
       ToFScalarType focalLength[2], ToFScalarType principalPoint[2])
     {
       return KinectIndexToCartesianCoordinates(i,j,distance,focalLength[0],focalLength[1],principalPoint[0],principalPoint[1]);
     }
 
-    inline static ToFPoint3D KinectIndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance,
+    static ToFPoint3D KinectIndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance,
       ToFPoint2D focalLength, ToFPoint2D principalPoint)
     {
       return KinectIndexToCartesianCoordinates(i,j,distance,focalLength[0],focalLength[1],principalPoint[0],principalPoint[1]);
     }
 
-    inline static ToFPoint3D KinectIndexToCartesianCoordinates(itk::Index<3> index, ToFScalarType distance, ToFPoint2D focalLength, ToFPoint2D principalPoint)
+    static ToFPoint3D KinectIndexToCartesianCoordinates(itk::Index<3> index, ToFScalarType distance, ToFPoint2D focalLength, ToFPoint2D principalPoint)
     {
         return KinectIndexToCartesianCoordinates(index[0],index[1],distance,focalLength[0],focalLength[1],principalPoint[0], principalPoint[1]);
     }
@@ -312,7 +312,7 @@ namespace mitk
                                                                    ToFScalarType focalLengthY, ToFScalarType principalPointX,
                                                                    ToFScalarType principalPointY, bool calculateDistance=true);
 
-    inline static ToFProcessingCommon::ToFPoint3D CartesianToKinectIndexCoordinates(ToFPoint3D cartesianPoint, ToFPoint2D focalLength, ToFPoint2D  principalPoint, bool calculateDistance=true)
+    static ToFProcessingCommon::ToFPoint3D CartesianToKinectIndexCoordinates(ToFPoint3D cartesianPoint, ToFPoint2D focalLength, ToFPoint2D  principalPoint, bool calculateDistance=true)
     {
       return CartesianToKinectIndexCoordinates( cartesianPoint[0], cartesianPoint[1], cartesianPoint[2], focalLength[0], focalLength[1], principalPoint[0], principalPoint[1], calculateDistance);
     }

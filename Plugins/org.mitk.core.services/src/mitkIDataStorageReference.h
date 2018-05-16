@@ -41,7 +41,7 @@ struct MITK_CORE_SERVICES_PLUGIN IDataStorageReference : public berry::Object
   virtual QString GetLabel() const = 0;
   virtual void SetLabel(const QString& label) = 0;
 
-  virtual bool operator==(const berry::Object* o) const = 0;
+  bool operator==(const berry::Object* o) const override = 0;
 };
 
 }

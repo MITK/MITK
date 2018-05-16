@@ -54,12 +54,12 @@ public:
   /*!
   \brief default constructor
   */
-  QmitkIGTPlayerWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkIGTPlayerWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
 
   /*!
   \brief default deconstructor
   */
-  ~QmitkIGTPlayerWidget();
+  ~QmitkIGTPlayerWidget() override;
 
   /*!
   \brief Sets the real time player for this player widget
@@ -238,15 +238,13 @@ protected:
   */
   void ResetLCDNumbers();
 
-  Ui::QmitkIGTPlayerWidgetControls* m_Controls;
-
   mitk::NavigationDataPlayer::Pointer m_RealTimePlayer; ///< plays NDs from a XML file
   mitk::NavigationDataSequentialPlayer::Pointer m_SequentialPlayer;
+  mitk::NavigationData::TimeStampType m_StartTime; ///< start time of playback needed for time display
+  unsigned int m_CurrentSequentialPointNumber; ///< current point number
+  Ui::QmitkIGTPlayerWidgetControls* m_Controls;
 
   QString m_CmpFilename; ///< filename of the input file
   QTimer* m_PlayingTimer; ///< update timer
-
-  mitk::NavigationData::TimeStampType m_StartTime; ///< start time of playback needed for time display
-  unsigned int m_CurrentSequentialPointNumber; ///< current point number
 };
 #endif

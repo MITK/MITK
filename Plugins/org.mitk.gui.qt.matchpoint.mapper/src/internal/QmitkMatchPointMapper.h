@@ -113,7 +113,7 @@ private:
 
     /** Function returns the first data node containing a registration wrapper
      * in the current selection of the data manager. If nothing is selected or
-     * no registration wrapper is selected it return NULL.*/
+     * no registration wrapper is selected it return nullptr.*/
     mitk::DataNode::Pointer GetSelectedRegNode();
 
     /** Methods returns a list of all nodes selected in the data manager that do
@@ -126,7 +126,7 @@ private:
      * registration object or, if the first cannot be determined, the currently selected input
      * node.
      * @return Pointer to the reference node (target data of the registration algorithm run).
-     * Function may return NULL if the referenced node cannot be found or is not defined
+     * Function may return nullptr if the referenced node cannot be found or is not defined
      * by the registration.*/
     mitk::DataNode::Pointer GetAutoRefNodeByReg();
 

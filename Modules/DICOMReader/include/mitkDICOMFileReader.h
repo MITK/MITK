@@ -138,7 +138,7 @@ public:
 
 protected:
   DICOMFileReader();
-  virtual ~DICOMFileReader();
+  ~DICOMFileReader() override;
 
   DICOMFileReader( const DICOMFileReader& other );
   DICOMFileReader& operator=( const DICOMFileReader& other );

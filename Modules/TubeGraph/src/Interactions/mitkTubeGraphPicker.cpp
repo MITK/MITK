@@ -27,7 +27,7 @@ mitk::TubeGraphPicker::~TubeGraphPicker()
 
 void mitk::TubeGraphPicker::SetTubeGraph(const mitk::TubeGraph *tubeGraph)
 {
-  m_TubeGraph = const_cast<mitk::TubeGraph *>(tubeGraph);
+  m_TubeGraph = tubeGraph;
   m_TubeGraphProperty =
     dynamic_cast<TubeGraphProperty *>(m_TubeGraph->GetProperty("Tube Graph.Visualization Information").GetPointer());
 }
@@ -87,6 +87,6 @@ std::pair<mitk::TubeGraph::TubeDescriptorType, mitk::TubeElement *> mitk::TubeGr
       }
     }
   }
-  std::pair<mitk::TubeGraph::TubeDescriptorType, mitk::TubeElement *> pickedTubeWithElement(tubeId, tubeElement);
-  return pickedTubeWithElement;
+
+  return std::make_pair(tubeId, tubeElement);
 }

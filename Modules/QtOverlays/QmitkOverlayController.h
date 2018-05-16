@@ -62,8 +62,8 @@ public:
   /**
   * \brief constructor with mandatory QmitkRenderWindow and optional mitk::PropertyList
   */
-  QmitkOverlayController(QmitkRenderWindow *rw, mitk::PropertyList *pl = NULL);
-  virtual ~QmitkOverlayController();
+  QmitkOverlayController(QmitkRenderWindow *rw, mitk::PropertyList *pl = nullptr);
+  ~QmitkOverlayController() override;
 
   /**
   * \brief adds an instance of QmitkOverlay to the RenderWindow

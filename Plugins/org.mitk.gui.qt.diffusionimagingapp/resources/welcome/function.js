@@ -3,91 +3,87 @@
 // The buttons will be generated in order to the array's index. e.g. data at array's index '0' will generate the first button.
 
 // enter the name of your module here
-var moduleNames = new Array("Dicom Import",
-                            "IVIM",
+var moduleNames = new Array(
                             "Preprocessing",
-                            "Quantification",
+                            "ODF Reconstruction/Signal Modelling",
+                            "Diffusion Indices",
                             "Tractography",
+                            "Fiber Processing",
                             "Connectomics",
-                            "Synthetic Data",
-                            "Registration",
-                            "Image Processing",
-                            "Visualization",
-                            "Utilities",
+                            "Fiberfox",
+                            "IVIM",
+                            "Segmentation",
                             "MITK Downloads & News");
 
 // add the MITK-link to your module
-var moduleLinks = new Array("mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
-                            "mitk://mitk.perspectives/org.mitk.perspectives.diffusiondefault?clear=false",
+var moduleLinks = new Array(
+                            "mitk://mitk.perspectives/org.mitk.perspectives.dwipreprocessing?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.reconstruction1?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.quantification?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.tractography2?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.fiberprocessings?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.connectomics?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.syntheticdata?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.ivim?clear=false",
+                            "mitk://mitk.perspectives/org.mitk.perspectives.segmentation?clear=false",
                             "http://www.mitk.org");
 
 // add the filename of your icon for the module. Place the picture in subdirectory "pics".
 // The picture's width should be 136 pixel; the height 123 pixel.
-var picFilenames = new Array("01dicomimport.png",
-                             "07ivim.png",
+var picFilenames = new Array(
+                             "12registration.png",
                              "02preprocessingreconstruction.png",
                              "03quantification.png",
                              "04tractography.png",
+                             "05fiberprocessing.png",
                              "06connectomics.png",
                              "10softwarephantoms.png",
-                             "12registration.png",
+                             "07ivim.png",
                              "11segmentation.png",
-                             "08volumevisualization.png",
-                             "13utilities.png",
                              "button_mitk.png");
 
 // if you want to create an animated icon, add the name of your animated gif (placed in subdirectory "pics"). Otherwise enter an empty string "".
 // The animation's width should be 136 pixel; the height 123 pixel.
-var aniFilenames = new Array("01adicomimport.png",
-                             "07aivim.png",
+var aniFilenames = new Array(
+                             "12aregistration.png",
                              "02apreprocessingreconstruction.png",
                              "03aquantification.png",
                              "04atractography.png",
+                             "05afiberprocessing.png",
                              "06aconnectomics.png",
                              "10asoftwarephantoms.png",
-                             "12aregistration.png",
+                             "07aivim.png",
                              "11asegmentation.png",
-                             "08avolumevisualization.png",
-                             "13autilities.png",
                              "button_mitka.png");
 
 // if your module is not stable, you can mark it as experimental.
 // just set true for experimental or false for stable.
-var experimental = new Array(false,
+var experimental = new Array(
                              false,
                              false,
                              false,
                              false,
                              false,
                              false,
-                             true,
                              false,
                              false,
                              false,
                              false);
 
+//"MITK Diffusion allows partial volume analysis and the evaluation and exploration of Tract Based Spatial Statistic datasets (it does NOT reimplement the TBSS methods available in FSL). The Partial Volume Analysis view provides a very robust method for semi-automatic ROI analysis. It uses EM clustering to probabilistically segment fiber vs. non-fiber vs. partial volume.",
+
 // add the description for your module. The description is displayed in a PopUp-window.
-var moduleDescriptions = new Array("MITK Diffusion supports direct import of Siemens diffusion weighted DICOM files.",
-                                   "You can use Intravoxel Incoherent Motion to estimate tissue perfusion on basis of diffusion measurements. Several models and interactive exploration of the data are supported.",
-                            "You can use MITK Diffusion to preprocess diffusion weighted MR Images using techniques like gradient averaging or reduction and baseline image extraction. Then you can estimate diffusion tensors or q-balls using different reconstruction methods and calculates scalar indices (FA, GFA, ...).",
-                            "MITK Diffusion allows partial volume analysis and the evaluation and exploration of Tract Based Spatial Statistic datasets (it does NOT reimplement the TBSS methods available in FSL). The Partial Volume Analysis view provides a very robust method for semi-automatic ROI analysis. It uses EM clustering to probabilistically segment fiber vs. non-fiber vs. partial volume.",
-                            "The tractography components of MITK Diffusion implement several fiber tractography algorithms (global, probabilistic and streamline). The fiber bundle operations view allows for extraction, join, and substraction of bundles. It also generates a variety of images from given fiber tracts and gives detailed information about the fiberbundle itself.",
-                            "Connectomics aims at building graphs (nodes and edges) from a global tractogram and applying graph theory for data analysis.",
-                            "The Fiberfox software phantom tool allows you to create synthetic phantoms easily and with a wide variety of properties and options.",
-                            "Registration views allow for rigid and point based image registration (only non-diffusion!).",
-                            "MITK Diffusion provides tools for image segmentation and diffusion unrelated image processing.",
-                            "In order to visually present your research MITK Diffusion contains fast volume rendering of images, means to capture high resolution screenshots as well as movies of the 3D sceen.",
-                            "Further utilites include the property list view to modify the properties of the selected data node as well as a logging view for debugging purposes.",
-                            "Open the MITK website in an external browser.");
+var moduleDescriptions = new Array(
+            "You can use MITK Diffusion to preprocess diffusion-weighted images using image registration, head-motion correction, denoising and much more.",
+            "MITK provides methods to estimate diffusion tensors or Q-balls using different reconstruction methods.",
+            "MITK allows the calculation of different scalar measures for raw diffusion-weighted images (MD, ADC), tensors (Fractional Anisotropy, Relative Anisotropy, Axial Diffusivity, Radial Diffusivity) or ODFs (Generalized Fractional Anisotropy).",
+            "The tractography components of MITK Diffusion implement several fiber tractography algorithms (global and streamline; tensor, dODF/fODF/FOD, peak based as well as machine learning based using the raw signal). The fiber bundle operations view enables fiber postprocessing in various ways. The fiber quantification view generates a variety of images from given fiber tracts, extracts the principal fiber directions and gives detailed information about the fiberbundle itself.",
+            "The results obtained with any fiber tractography method can be postprocessed using tract dissection, filtering, clustering, coloring or SIFT2-like fitting methods.",
+            "Connectomics aims at building graphs (nodes and edges) from a tractogram and applying graph theory for data analysis.",
+            "The Fiberfox software phantom tool allows you to create synthetic diffusion-weighted MR images easily and with a wide variety of properties and options.",
+            "You can use Intravoxel Incoherent Motion to estimate tissue perfusion on basis of diffusion measurements. Several models and interactive exploration of the data are supported.",
+            "MITK Diffusion provides tools for image segmentation and diffusion unrelated image processing.",
+            "Open the MITK website in an external browser.");
 
 var bttns = new Array();
 
@@ -156,12 +152,14 @@ function Button(moduleName, moduleLink, picFilename, aniFilename, moduleDescr){
     // append button to link-element
     bttnPicLink.appendChild(bttn);
 
-    // create text-link and add it to DIV-wrapper
-    bttnTxtLink = document.createElement("a");
-    bttnTxtLink.href = this.modLink;
-    bttnTxtLink.className = "txtLink";
-    bttnTxtLink.appendChild(document.createTextNode(this.modName));
-    bttnWrapper.appendChild(bttnTxtLink);
+//    // create text-link and add it to DIV-wrapper
+//    bttnTxtLink = document.createElement("a");
+////    bttnTxtLink.href = this.modLink;
+//    bttnTxtLink.className = "txtLink";
+//    bttnTxtLink.appendChild(document.createTextNode(this.modName));
+//    bttnTxtLink.onclick = function(){showPopUpWindow();};
+//    bttnTxtLink.id = "popup" + this.modName;
+//    bttnWrapper.appendChild(bttnTxtLink);
 
     // create pop-up link for module description
     bttnPopUpLink = document.createElement("a");
@@ -170,8 +168,7 @@ function Button(moduleName, moduleLink, picFilename, aniFilename, moduleDescr){
     bttnPopUpLink.onclick = function(){showPopUpWindow();};
     bttnPopUpLink.className = "popUpLink";
     bttnPopUpLink.id = "popup" + this.modName;
-    bttnPopUpLink.appendChild(document.createTextNode("more info >>"));
-    bttnWrapper.appendChild(document.createElement("br"));
+    bttnPopUpLink.appendChild(document.createTextNode(this.modName));
     bttnWrapper.appendChild(bttnPopUpLink);
 
     return bttn;
@@ -250,7 +247,7 @@ function showPopUpWindow(){
   // append text-elements to their container
   contHeadline.appendChild(headline);
   contDescription.appendChild(description);
-  //contModLink.appendChild(moduleLink);
+//  contModLink.appendChild(moduleLink);
 }
 
 function getPos(id,prefix){

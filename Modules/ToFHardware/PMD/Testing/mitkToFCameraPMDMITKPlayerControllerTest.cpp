@@ -26,7 +26,7 @@ int mitkToFCameraPMDMITKPlayerControllerTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("ToFCameraPMDMITKPlayerController");
 
   mitk::ToFCameraPMDMITKPlayerController::Pointer testObject = mitk::ToFCameraPMDMITKPlayerController::New();
-  MITK_TEST_CONDITION_REQUIRED(!(testObject.GetPointer() == NULL) ,"Testing initialization class");
+  MITK_TEST_CONDITION_REQUIRED(!(testObject.GetPointer() == nullptr) ,"Testing initialization class");
   MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureHeight()== 200 ,"Testing initialization of CaptureHeight");
   MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureWidth()== 200 ,"Testing initialization of CaptureWidth");
   // test empty file behavior
@@ -50,13 +50,13 @@ int mitkToFCameraPMDMITKPlayerControllerTest(int /* argc */, char* /*argv*/[])
   ////test source data passing and updating!
   //int size = testObject->GetSourceDataStructSize();
   //MITK_TEST_CONDITION_REQUIRED( size != 0 , "Testing correct setting of source data size!" )
-  //char* sourceData = NULL;
+  //char* sourceData = nullptr;
   //testObject->GetSourceData( sourceData );
-  //MITK_TEST_CONDITION_REQUIRED( sourceData == NULL, "Testing setting of source data without update camera!");
+  //MITK_TEST_CONDITION_REQUIRED( sourceData == nullptr, "Testing setting of source data without update camera!");
   //testObject->UpdateCamera();
   //sourceData = new char[size];
   //testObject->GetSourceData(sourceData);
-  //MITK_TEST_CONDITION_REQUIRED( sourceData != NULL, "Testing setting of source data with update camera!");
+  //MITK_TEST_CONDITION_REQUIRED( sourceData != nullptr, "Testing setting of source data with update camera!");
   //delete[] sourceData;
   MITK_TEST_CONDITION( testObject->CloseCameraConnection(),"Closing Connection!");
 

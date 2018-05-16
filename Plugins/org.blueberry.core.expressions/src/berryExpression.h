@@ -153,9 +153,9 @@ public:
   static const Expression::Pointer FALSE_EVAL;
 
   Expression();
-  virtual ~Expression();
+  ~Expression() override;
 
-  virtual uint HashCode() const override;
+  uint HashCode() const override;
 
   /**
    * Evaluates this expression.
@@ -191,9 +191,9 @@ public:
    */
   virtual void CollectExpressionInfo(ExpressionInfo* info) const;
 
-  virtual QString ToString() const override;
+  QString ToString() const override;
 
-  virtual bool operator==(const Object* object) const override;
+  bool operator==(const Object* object) const override;
 
 };
 

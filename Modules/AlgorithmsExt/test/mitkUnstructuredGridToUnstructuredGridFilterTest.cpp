@@ -106,7 +106,7 @@ public:
       mitk::UnstructuredGridToUnstructuredGridFilter::New();
     testFilter->SetInput(m_UnstructuredGrid);
     testFilter->Update();
-    CPPUNIT_ASSERT_MESSAGE("Testing unstructured grid generation!", testFilter->GetOutput() != NULL);
+    CPPUNIT_ASSERT_MESSAGE("Testing unstructured grid generation!", testFilter->GetOutput() != nullptr);
   }
 };
 

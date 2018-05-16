@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPropertyExtensions.h>
 #include <mitkIPropertyFilters.h>
 #include <mitkIPropertyPersistence.h>
-#include <mitkIShaderRepository.h>
+#include <mitkIPropertyRelations.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -49,30 +49,23 @@ namespace mitk
   template <class S>
   static S *GetCoreService(us::ModuleContext *context)
   {
-    if (context == NULL)
+    if (context == nullptr)
       context = us::GetModuleContext();
 
-    S *coreService = NULL;
+    S *coreService = nullptr;
     us::ServiceReference<S> serviceRef = context->GetServiceReference<S>();
     if (serviceRef)
     {
       coreService = context->GetService(serviceRef);
     }
 
-    assert(coreService && "Asserting non-NULL MITK core service");
+    assert(coreService && "Asserting non-nullptr MITK core service");
     {
       itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex());
       s_ContextToServicesMap()[context].insert(std::make_pair(coreService, serviceRef));
     }
 
     return coreService;
-  }
-
-  IShaderRepository *CoreServices::GetShaderRepository()
-  {
-    static us::ServiceTracker<IShaderRepository> tracker(us::GetModuleContext());
-    tracker.Open();
-    return tracker.GetService();
   }
 
   IPropertyAliases *CoreServices::GetPropertyAliases(us::ModuleContext *context)
@@ -100,6 +93,11 @@ namespace mitk
     return GetCoreService<IPropertyPersistence>(context);
   }
 
+  IPropertyRelations *CoreServices::GetPropertyRelations(us::ModuleContext *context)
+  {
+    return GetCoreService<IPropertyRelations>(context);
+  }
+
   IMimeTypeProvider *CoreServices::GetMimeTypeProvider(us::ModuleContext *context)
   {
     return GetCoreService<IMimeTypeProvider>(context);
@@ -110,11 +108,11 @@ namespace mitk
     bool success = false;
 
     itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex());
-    std::map<us::ModuleContext *, std::map<void *, us::ServiceReferenceU>>::iterator iter =
+    auto iter =
       s_ContextToServicesMap().find(context);
     if (iter != s_ContextToServicesMap().end())
     {
-      std::map<void *, us::ServiceReferenceU>::iterator iter2 = iter->second.find(service);
+      auto iter2 = iter->second.find(service);
       if (iter2 != iter->second.end())
       {
         us::ServiceReferenceU serviceRef = iter2->second;

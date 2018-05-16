@@ -45,21 +45,21 @@ class MITKQTWIDGETS_EXPORT QmitkRenderingManager : public QObject, public mitk::
 
 public:
   mitkClassMacro(QmitkRenderingManager, mitk::RenderingManager);
-  virtual ~QmitkRenderingManager();
+  ~QmitkRenderingManager() override;
 
-  virtual void DoMonitorRendering() override;
-  virtual void DoFinishAbortRendering() override;
+  void DoMonitorRendering() override;
+  void DoFinishAbortRendering() override;
 
-  virtual bool event(QEvent *event) override;
+  bool event(QEvent *event) override;
 
 protected:
   itkFactorylessNewMacro(Self);
 
   QmitkRenderingManager();
 
-  virtual void GenerateRenderingRequestEvent() override;
+  void GenerateRenderingRequestEvent() override;
 
-  virtual void StartOrResetTimer() override;
+  void StartOrResetTimer() override;
 
   int pendingTimerCallbacks;
 

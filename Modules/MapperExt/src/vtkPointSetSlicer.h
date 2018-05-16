@@ -49,7 +49,7 @@ public:
   // Description:
   // Override GetMTime because we delegate to vtkContourValues and refer to
   // vtkImplicitFunction.
-  unsigned long GetMTime() override;
+  vtkMTimeType GetMTime() override;
 
   // Description
   // Specify the implicit function to perform the cutting.
@@ -76,12 +76,12 @@ public:
   void CreateDefaultLocator();
 
 protected:
-  vtkPointSetSlicer(vtkPlane *cf = 0);
-  ~vtkPointSetSlicer();
+  vtkPointSetSlicer(vtkPlane *cf = nullptr);
+  ~vtkPointSetSlicer() override;
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
-  virtual int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
-  virtual int FillInputPortInformation(int port, vtkInformation *info) override;
+  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int FillInputPortInformation(int port, vtkInformation *info) override;
 
   void UnstructuredGridCutter(vtkDataSet *input, vtkPolyData *output);
 

@@ -27,6 +27,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int mitkPointSetVtkMapper2DTransformedPointsTest(int argc, char *argv[])
 {
+  try
+  {
+    mitk::RenderingTestHelper openGlTest(640, 480);
+  }
+  catch (const mitk::TestNotRunException &e)
+  {
+    MITK_WARN << "Test not run: " << e.GetDescription();
+    return 77;
+  }
+
   // load all arguments into a datastorage, take last argument as reference rendering
   // setup a renderwindow of fixed size X*Y
   // render the datastorage

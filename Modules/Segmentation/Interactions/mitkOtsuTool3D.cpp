@@ -87,18 +87,18 @@ void mitk::OtsuTool3D::Activated()
 void mitk::OtsuTool3D::Deactivated()
 {
   m_ToolManager->GetDataStorage()->Remove(this->m_MultiLabelResultNode);
-  m_MultiLabelResultNode = NULL;
+  m_MultiLabelResultNode = nullptr;
   m_ToolManager->GetDataStorage()->Remove(this->m_BinaryPreviewNode);
-  m_BinaryPreviewNode = NULL;
+  m_BinaryPreviewNode = nullptr;
   m_ToolManager->GetDataStorage()->Remove(this->m_MaskedImagePreviewNode);
-  m_MaskedImagePreviewNode = NULL;
+  m_MaskedImagePreviewNode = nullptr;
 
   Superclass::Deactivated();
 }
 
 const char **mitk::OtsuTool3D::GetXPM() const
 {
-  return NULL;
+  return nullptr;
 }
 
 us::ModuleResource mitk::OtsuTool3D::GetIconResource() const
@@ -134,7 +134,7 @@ void mitk::OtsuTool3D::RunSegmentation(int regions, bool useValley, int numberOf
   }
 
   m_ToolManager->GetDataStorage()->Remove(this->m_MultiLabelResultNode);
-  m_MultiLabelResultNode = NULL;
+  m_MultiLabelResultNode = nullptr;
   m_MultiLabelResultNode = mitk::DataNode::New();
   m_MultiLabelResultNode->SetName("Otsu_Preview");
   m_MultiLabelResultNode->SetVisibility(true);
@@ -217,7 +217,7 @@ void mitk::OtsuTool3D::CalculatePreview(itk::Image<TPixel, VImageDimension> *itk
     itk::OrImageFilter<OutputImageType, OutputImageType>::New();
 
   // if more than one region id is used compute the union of all given binary regions
-  for (std::vector<int>::iterator it = regionIDs.begin(); it != regionIDs.end(); ++it)
+  for (auto it = regionIDs.begin(); it != regionIDs.end(); ++it)
   {
     filter->SetLowerThreshold(*it);
     filter->SetUpperThreshold(*it);

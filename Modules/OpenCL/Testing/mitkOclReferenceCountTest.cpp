@@ -76,8 +76,8 @@ int mitkOclReferenceCountTest( int /*argc*/, char* /*argv*/[] )
   outputImage2 = oclFilter2->GetOutput();
 
   // delete filters
-  oclFilter1 = NULL;
-  oclFilter2 = NULL;
+  oclFilter1 = nullptr;
+  oclFilter2 = nullptr;
 
   // this is only visible if the delete did not cause a segmentation fault
   // it is always true and successfull if the program reaches this state

@@ -38,7 +38,7 @@ class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkAlgorithmSettingsConfig : public 
   Q_OBJECT
 
 public:
-  QmitkAlgorithmSettingsConfig(QWidget *parent = 0);
+  QmitkAlgorithmSettingsConfig(QWidget *parent = nullptr);
 
   /**
    * \brief Changes the current algorithm and updates widget accordingly.

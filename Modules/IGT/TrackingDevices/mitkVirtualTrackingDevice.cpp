@@ -18,9 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTTimeStamp.h"
 #include "mitkIGTException.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
+#include <cstdlib>
+#include <cstdio>
+#include <ctime>
 #include <itksys/SystemTools.hxx>
 #include <itkMutexLockHolder.h>
 #include <random>
@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 mitk::VirtualTrackingDevice::VirtualTrackingDevice() : mitk::TrackingDevice(),
-m_AllTools(), m_ToolsMutex(NULL), m_MultiThreader(NULL), m_ThreadID(-1), m_RefreshRate(100), m_NumberOfControlPoints(20), m_GaussianNoiseEnabled(false),
+m_AllTools(), m_ToolsMutex(nullptr), m_MultiThreader(nullptr), m_ThreadID(-1), m_RefreshRate(100), m_NumberOfControlPoints(20), m_GaussianNoiseEnabled(false),
 m_MeanDistributionParam(0.0), m_DeviationDistributionParam(1.0)
 {
   m_Data = mitk::VirtualTrackerTypeInformation::GetDeviceDataVirtualTracker();
@@ -53,7 +53,7 @@ mitk::VirtualTrackingDevice::~VirtualTrackingDevice()
   if (m_MultiThreader.IsNotNull() && (m_ThreadID != -1))
   {
     m_MultiThreader->TerminateThread(m_ThreadID);
-    m_MultiThreader = NULL;
+    m_MultiThreader = nullptr;
   }
   m_AllTools.clear();
 }
@@ -62,7 +62,7 @@ mitk::TrackingTool* mitk::VirtualTrackingDevice::AddTool(const char* toolName)
 {
   //if (this->GetState() == Tracking)
   //{
-  //  return NULL;
+  //  return nullptr;
   //}
   mitk::VirtualTrackingTool::Pointer t = mitk::VirtualTrackingTool::New();
   t->SetToolName(toolName);
@@ -122,7 +122,7 @@ mitk::TrackingTool* mitk::VirtualTrackingDevice::GetTool(unsigned int toolNumber
   MutexLockHolder lock(*m_ToolsMutex); // lock and unlock the mutex
   if (toolNumber < m_AllTools.size())
     return this->m_AllTools.at(toolNumber);
-  return NULL;
+  return nullptr;
 }
 
 bool mitk::VirtualTrackingDevice::OpenConnection()
@@ -131,7 +131,7 @@ bool mitk::VirtualTrackingDevice::OpenConnection()
   {
     mitkThrowException(mitk::IGTException) << "to few control points for spline interpolation";
   }
-  srand(time(NULL)); //Init random number generator
+  srand(time(nullptr)); //Init random number generator
 
   this->SetState(Ready);
   return true;
@@ -139,7 +139,7 @@ bool mitk::VirtualTrackingDevice::OpenConnection()
 
 void mitk::VirtualTrackingDevice::InitializeSpline(mitk::VirtualTrackingTool* t)
 {
-  if (t == NULL)
+  if (t == nullptr)
     return;
 
   typedef mitk::VirtualTrackingTool::SplineType SplineType;
@@ -184,7 +184,7 @@ bool mitk::VirtualTrackingDevice::CloseConnection()
 mitk::ScalarType mitk::VirtualTrackingDevice::GetSplineChordLength(unsigned int idx)
 {
   mitk::VirtualTrackingTool* t = this->GetInternalTool(idx);
-  if (t != NULL)
+  if (t != nullptr)
     return t->GetSplineLength();
   else
     throw std::invalid_argument("invalid index");
@@ -196,7 +196,7 @@ void mitk::VirtualTrackingDevice::SetToolSpeed(unsigned int idx, mitk::ScalarTyp
     throw std::invalid_argument("Minimum tool speed is 0.0001 rounds per second");
 
   mitk::VirtualTrackingTool* t = this->GetInternalTool(idx);
-  if (t != NULL)
+  if (t != nullptr)
     t->SetVelocity(roundsPerSecond);
   else
     throw std::invalid_argument("invalid index");
@@ -208,7 +208,7 @@ mitk::VirtualTrackingTool* mitk::VirtualTrackingDevice::GetInternalTool(unsigned
   if (idx < m_AllTools.size())
     return m_AllTools.at(idx);
   else
-    return NULL;
+    return nullptr;
 }
 
 void mitk::VirtualTrackingDevice::TrackTools()
@@ -280,17 +280,17 @@ ITK_THREAD_RETURN_TYPE mitk::VirtualTrackingDevice::ThreadStartTracking(void* pI
 {
   /* extract this pointer from Thread Info structure */
   struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == NULL)
+  if (pInfo == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
-  if (pInfo->UserData == NULL)
+  if (pInfo->UserData == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
   VirtualTrackingDevice *trackingDevice = static_cast<VirtualTrackingDevice*>(pInfo->UserData);
 
-  if (trackingDevice != NULL)
+  if (trackingDevice != nullptr)
     trackingDevice->TrackTools();
 
   trackingDevice->m_ThreadID = -1; // reset thread ID because we end the thread here

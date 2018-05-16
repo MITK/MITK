@@ -116,11 +116,11 @@ namespace mitk
     virtual DataType::BoundingBoxPointer GetBoundingBoxFromCell(unsigned long cellId, int t = 0);
 
     /** \brief executes the given Operation */
-    virtual void ExecuteOperation(Operation *operation) override;
+    void ExecuteOperation(Operation *operation) override;
 
   protected:
     Mesh();
-    virtual ~Mesh();
+    ~Mesh() override;
   };
 
 } // namespace mitk

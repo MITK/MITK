@@ -27,8 +27,8 @@ MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkBinaryThresholdToolGUI, "")
 
 QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
   : QmitkToolGUI(),
-    m_Slider(NULL),
-    m_Spinner(NULL),
+    m_Slider(nullptr),
+    m_Spinner(nullptr),
     m_isFloat(false),
     m_RangeMin(0),
     m_RangeMax(0),

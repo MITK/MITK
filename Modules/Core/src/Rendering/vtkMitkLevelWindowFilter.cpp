@@ -48,10 +48,10 @@ vtkMitkLevelWindowFilter::~vtkMitkLevelWindowFilter()
 {
 }
 
-unsigned long int vtkMitkLevelWindowFilter::GetMTime()
+vtkMTimeType vtkMitkLevelWindowFilter::GetMTime()
 {
-  unsigned long mTime = this->vtkObject::GetMTime();
-  unsigned long time;
+  vtkMTimeType mTime = this->vtkObject::GetMTime();
+  vtkMTimeType time;
 
   if (this->m_LookupTable != nullptr)
   {
@@ -290,7 +290,7 @@ void vtkApplyLookupTableOnScalarsFast(
   double tableRange[2];
 
   // access vtkLookupTable
-  vtkLookupTable *lookupTable = dynamic_cast<vtkLookupTable *>(self->GetLookupTable());
+  auto *lookupTable = dynamic_cast<vtkLookupTable *>(self->GetLookupTable());
   lookupTable->GetTableRange(tableRange);
 
   // access elements of the vtkLookupTable
@@ -314,7 +314,7 @@ void vtkApplyLookupTableOnScalarsFast(
     while (outputSI != outputSIEnd)
     {
       // map to an index
-      int idx = static_cast<int>(*inputSI * scale + bias);
+      auto idx = static_cast<int>(*inputSI * scale + bias);
 
       if (idx < 0)
         idx = 0;
@@ -368,7 +368,7 @@ void vtkApplyLookupTableOnScalars(vtkMitkLevelWindowFilter *self,
         if (x >= clippingBounds[0] && x < clippingBounds[1])
         {
           // fetching original value
-          double grayValue = static_cast<double>(*inputSI);
+          auto grayValue = static_cast<double>(*inputSI);
           // applying lookuptable - copy the 4 (RGBA) chars as a single int
           *reinterpret_cast<int *>(outputSI) = *reinterpret_cast<int *>(lookupTable->MapValue(grayValue));
         }
@@ -412,7 +412,7 @@ void vtkApplyLookupTableOnScalarsCTF(vtkMitkLevelWindowFilter *self,
 {
   vtkImageIterator<T> inputIt(inData, outExt);
   vtkImageIterator<unsigned char> outputIt(outData, outExt);
-  vtkColorTransferFunction *lookupTable = dynamic_cast<vtkColorTransferFunction *>(self->GetLookupTable());
+  auto *lookupTable = dynamic_cast<vtkColorTransferFunction *>(self->GetLookupTable());
   vtkPiecewiseFunction *opacityFunction = self->GetOpacityPiecewiseFunction();
 
   int y = outExt[2];
@@ -436,7 +436,7 @@ void vtkApplyLookupTableOnScalarsCTF(vtkMitkLevelWindowFilter *self,
         if (x >= clippingBounds[0] && x < clippingBounds[1])
         {
           // fetching original value
-          double grayValue = static_cast<double>(*inputSI);
+          auto grayValue = static_cast<double>(*inputSI);
 
           // applying directly colortransferfunction
           // because vtkColorTransferFunction::MapValue is not threadsafe
@@ -514,8 +514,8 @@ void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData, vtkImageDat
     if (this->GetLookupTable())
       this->GetLookupTable()->Build();
 
-    vtkLookupTable *vlt = dynamic_cast<vtkLookupTable *>(this->GetLookupTable());
-    vtkColorTransferFunction *ctf = dynamic_cast<vtkColorTransferFunction *>(this->GetLookupTable());
+    auto *vlt = dynamic_cast<vtkLookupTable *>(this->GetLookupTable());
+    auto *ctf = dynamic_cast<vtkColorTransferFunction *>(this->GetLookupTable());
 
     bool linearLookupTable = vlt && vlt->GetScale() == VTK_SCALE_LINEAR;
 

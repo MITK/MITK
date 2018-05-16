@@ -28,11 +28,11 @@ namespace mitk
   {
   public:
     mitkClassMacro(PlanarFigureSerializer, BaseDataSerializer) itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self) virtual std::string Serialize() override;
+      itkCloneMacro(Self) std::string Serialize() override;
 
   protected:
     PlanarFigureSerializer();
-    virtual ~PlanarFigureSerializer();
+    ~PlanarFigureSerializer() override;
   };
 } // namespace
 #endif

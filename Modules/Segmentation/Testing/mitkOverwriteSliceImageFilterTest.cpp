@@ -26,7 +26,7 @@ unsigned int CompareImageSliceTestHelper::m_Dimension1 = 0;
 unsigned int CompareImageSliceTestHelper::m_SliceDimension = 0;
 unsigned int CompareImageSliceTestHelper::m_SliceIndex = 0;
 bool CompareImageSliceTestHelper::m_ComparisonResult = false;
-mitk::Image *CompareImageSliceTestHelper::m_SliceImage = NULL;
+mitk::Image *CompareImageSliceTestHelper::m_SliceImage = nullptr;
 
 class mitkOverwriteSliceImageFilterTestClass
 {
@@ -99,7 +99,7 @@ public:
       if (output.IsNull())
       {
         ++numberFailed;
-        std::cerr << "  (EE) Overwrite filter has output NULL and gave no exception for an " << image->GetDimension()
+        std::cerr << "  (EE) Overwrite filter has output nullptr and gave no exception for an " << image->GetDimension()
                   << "-dimensional image, sliceDimension " << sliceDimension << " sliceIndex 1-2."
                   << "(l. " << __LINE__ << ")" << std::endl;
         continue;
@@ -147,7 +147,7 @@ public:
         slice->Initialize(mitk::MakeScalarPixelType<signed int>(), 2, dim);
         unsigned int i;
         mitk::ImageWriteAccessor accessor(slice);
-        signed int *p = (signed int *)accessor.GetData();
+        auto *p = (signed int *)accessor.GetData();
         unsigned int size = dim[0] * dim[1];
         for (i = 0; i < size; ++i, ++p)
           *p = (signed int)i;
@@ -184,7 +184,7 @@ public:
         slice->Initialize(mitk::MakeScalarPixelType<signed int>(), 2, dim);
         unsigned int i;
         mitk::ImageWriteAccessor accessor(slice);
-        signed int *p = (signed int *)accessor.GetData();
+        auto *p = (signed int *)accessor.GetData();
         unsigned int size = dim[0] * dim[1];
         for (i = 0; i < size; ++i, ++p)
           *p = (signed int)i;
@@ -300,13 +300,13 @@ int mitkOverwriteSliceImageFilterTest(int argc, char *argv[])
 
   // load the image
 
-  mitk::Image::Pointer image = NULL;
+  mitk::Image::Pointer image = nullptr;
   try
   {
     MITK_INFO << "Testing with parameter '" << argv[1] << "'";
 
     std::string pathToImage(argv[1]);
-    image = mitk::IOUtil::LoadImage(pathToImage);
+    image = mitk::IOUtil::Load<mitk::Image>(pathToImage);
     if (image.IsNull())
     {
       MITK_INFO << "File not an image - test will not be applied";
@@ -353,7 +353,7 @@ int mitkOverwriteSliceImageFilterTest(int argc, char *argv[])
   std::cout << "Testing filter destruction" << std::endl;
 
   // freeing
-  filter = NULL;
+  filter = nullptr;
 
   std::cout << "  (II) Freeing works." << std::endl;
 

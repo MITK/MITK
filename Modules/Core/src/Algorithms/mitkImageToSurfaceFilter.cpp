@@ -169,7 +169,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time,
 void mitk::ImageToSurfaceFilter::GenerateData()
 {
   mitk::Surface *surface = this->GetOutput();
-  mitk::Image *image = (mitk::Image *)GetInput();
+  auto *image = (mitk::Image *)GetInput();
   if (image == nullptr || !image->IsInitialized())
     mitkThrow() << "No input image set, please set an valid input image!";
 

@@ -26,7 +26,7 @@ namespace mitk
   {
   public:
     PropertyFilters();
-    ~PropertyFilters();
+    ~PropertyFilters() override;
 
     bool AddFilter(const PropertyFilter &filter, const std::string &className, bool overwrite) override;
     std::map<std::string, BaseProperty::Pointer> ApplyFilter(

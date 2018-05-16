@@ -43,7 +43,7 @@ namespace mitk
       //## by the object
       //##
       //## @warning Accepts only instances of PlaneGeometry or sub-classes.
-      virtual void SetGeometry(mitk::BaseGeometry *geometry) override;
+      void SetGeometry(mitk::BaseGeometry *geometry) override;
 
     //##Documentation
     //## @brief Set the reference to the PlaneGeometry that is stored
@@ -61,22 +61,22 @@ namespace mitk
     * \deprecatedSince{2014_10} Please use GetPlaneGeometry
     */
     DEPRECATED(const PlaneGeometry *GetGeometry2D()) { return GetPlaneGeometry(); };
-    virtual void UpdateOutputInformation() override;
+    void UpdateOutputInformation() override;
 
-    virtual void SetRequestedRegionToLargestPossibleRegion() override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
 
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
-    virtual bool VerifyRequestedRegion() override;
+    bool VerifyRequestedRegion() override;
 
-    virtual void SetRequestedRegion(const itk::DataObject *data) override;
+    void SetRequestedRegion(const itk::DataObject *data) override;
 
-    virtual void CopyInformation(const itk::DataObject *data) override;
+    void CopyInformation(const itk::DataObject *data) override;
 
   protected:
     PlaneGeometryData();
 
-    virtual ~PlaneGeometryData();
+    ~PlaneGeometryData() override;
   };
 } // namespace mitk
 #endif /* MITKGEOMETRY2DDATA_H_HEADER_INCLUDED_C19C01E2 */

@@ -49,9 +49,6 @@ void mitk::IGTL2DImageDeviceSource::GenerateData()
   if (msgIn.IsNotNull())
   {
     assert(msgIn);
-
-    MITK_INFO << "Received valid image";
-
     msgOut->SetMessage(msgIn);
     msgOut->SetName(msgIn->GetDeviceName());
   }

@@ -29,14 +29,14 @@ namespace mitk
     mitkClassMacro(StringLookupTablePropertySerializer, BasePropertySerializer);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual TiXmlElement *Serialize() override
+      TiXmlElement *Serialize() override
     {
       const StringLookupTableProperty *prop = dynamic_cast<const StringLookupTableProperty *>(m_Property.GetPointer());
       if (prop == nullptr)
         return nullptr;
       StringLookupTable lut = prop->GetValue();
       // if (lut.IsNull())
-      //  return NULL; // really?
+      //  return nullptr; // really?
       const StringLookupTable::LookupTableType &map = lut.GetLookupTable();
 
       auto element = new TiXmlElement("StringLookupTable");
@@ -50,7 +50,7 @@ namespace mitk
       return element;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
       if (!element)
         return nullptr;
@@ -74,7 +74,7 @@ namespace mitk
 
   protected:
     StringLookupTablePropertySerializer() {}
-    virtual ~StringLookupTablePropertySerializer() {}
+    ~StringLookupTablePropertySerializer() override {}
   };
 } // namespace
 // important to put this into the GLOBAL namespace (because it starts with 'namespace mitk')

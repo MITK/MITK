@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 QmitkIsoSurface::QmitkIsoSurface(QObject * /*parent*/, const char * /*name*/)
-  : m_Controls(NULL), m_MitkImage(NULL), m_SurfaceCounter(0)
+  : m_Controls(nullptr), m_MitkImage(nullptr), m_SurfaceCounter(0)
 {
 }
 
@@ -71,7 +71,7 @@ void QmitkIsoSurface::CreateConnections()
 
 void QmitkIsoSurface::ImageSelected(const mitk::DataNode *item)
 {
-  // nothing selected (NULL selection)
+  // nothing selected (nullptr selection)
   if (item == 0 || item->GetData() == 0)
     return;
 
@@ -81,7 +81,7 @@ void QmitkIsoSurface::ImageSelected(const mitk::DataNode *item)
 void QmitkIsoSurface::CreateSurface()
 {
   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-  if (m_MitkImage != NULL)
+  if (m_MitkImage != nullptr)
   {
     // Value Gauss
     // float gsDev = 1.5;
@@ -95,7 +95,7 @@ void QmitkIsoSurface::CreateSurface()
     mitk::ManualSegmentationToSurfaceFilter::Pointer filter = mitk::ManualSegmentationToSurfaceFilter::New();
     if (filter.IsNull())
     {
-      std::cout << "NULL Pointer for ManualSegmentationToSurfaceFilter" << std::endl;
+      std::cout << "nullptr Pointer for ManualSegmentationToSurfaceFilter" << std::endl;
       return;
     }
 
@@ -110,7 +110,7 @@ void QmitkIsoSurface::CreateSurface()
     if (numOfPolys > 2000000)
     {
       QApplication::restoreOverrideCursor();
-      if (QMessageBox::question(NULL,
+      if (QMessageBox::question(nullptr,
                                 "CAUTION!!!",
                                 "The number of polygons is greater than 2 000 000. If you continue, the program might "
                                 "crash. How do you want to go on?",

@@ -76,12 +76,12 @@ Eigen::MatrixXi mitk::LibSVMClassifier::Predict(const Eigen::MatrixXd &X)
   {
     mitkThrow() << "No Model is trained. Train or load a model before predicting new values.";
   }
-  int noOfPoints = static_cast<int>(X.rows());
-  int noOfFeatures = static_cast<int>(X.cols());
+  auto noOfPoints = static_cast<int>(X.rows());
+  auto noOfFeatures = static_cast<int>(X.cols());
 
   Eigen::MatrixXi result(noOfPoints,1);
 
-  LibSVM::svm_node * xVector = static_cast<LibSVM::svm_node *>(malloc(sizeof(LibSVM::svm_node) * (noOfFeatures+1)));
+  auto * xVector = static_cast<LibSVM::svm_node *>(malloc(sizeof(LibSVM::svm_node) * (noOfFeatures+1)));
   for (int point = 0; point < noOfPoints; ++point)
   {
     for (int feature = 0; feature < noOfFeatures; ++feature)
@@ -291,8 +291,8 @@ void mitk::LibSVMClassifier::PrintParameter(std::ostream & str)
 // Trying to assign from matrix to noOfPoints
 void mitk::LibSVMClassifier::ReadXValues(LibSVM::svm_problem * problem, LibSVM::svm_node** xSpace, const Eigen::MatrixXd &X)
 {
-  int noOfPoints = static_cast<int>(X.rows());
-  int features = static_cast<int>(X.cols());
+  auto noOfPoints = static_cast<int>(X.rows());
+  auto features = static_cast<int>(X.cols());
 
   problem->x = static_cast<LibSVM::svm_node **>(malloc(sizeof(LibSVM::svm_node *)  * noOfPoints));
   (*xSpace) = static_cast<LibSVM::svm_node *> (malloc(sizeof(LibSVM::svm_node) * noOfPoints * (features+1)));

@@ -23,6 +23,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int mitkSceneIOCompatibilityTest(int argc, char *argv[])
 {
+  try
+  {
+    mitk::RenderingTestHelper openGlTest(640, 480);
+  }
+  catch (const mitk::TestNotRunException &e)
+  {
+    MITK_WARN << "Test not run: " << e.GetDescription();
+    return 77;
+  }
   // Load all arguments but last into a DataStorage,
   // Take last argument as reference rendering.
   //

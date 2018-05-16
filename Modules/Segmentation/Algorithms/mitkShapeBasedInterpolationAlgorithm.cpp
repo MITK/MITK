@@ -77,11 +77,11 @@ void mitk::ShapeBasedInterpolationAlgorithm::ComputeDistanceMap(const itk::Image
   // do the processing on the image and the inverted image to get inside and outside distance
   isoContourFilter->SetInput(binaryImage);
   isoContourFilter->SetFarValue(maximumDistance + 1);
-  isoContourFilter->SetLevelSetValue(0.5);
+  isoContourFilter->SetLevelSetValue(0);
 
   isoContourFilterInverted->SetInput(invertFilter->GetOutput());
   isoContourFilterInverted->SetFarValue(maximumDistance + 1);
-  isoContourFilterInverted->SetLevelSetValue(0.5);
+  isoContourFilterInverted->SetLevelSetValue(0);
 
   distanceFilter->SetInput(isoContourFilter->GetOutput());
   distanceFilter->SetMaximumDistance(maximumDistance);
@@ -103,8 +103,6 @@ void mitk::ShapeBasedInterpolationAlgorithm::InterpolateIntermediateSlice(itk::I
                                                                           const mitk::Image::Pointer &upper,
                                                                           float ratio)
 {
-  typedef itk::Image<TPixel, VImageDimension> ResultImageType;
-
   typename DistanceFilterImageType::Pointer lowerITK = DistanceFilterImageType::New();
   typename DistanceFilterImageType::Pointer upperITK = DistanceFilterImageType::New();
 

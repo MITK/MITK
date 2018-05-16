@@ -51,7 +51,7 @@ namespace mitk
    void mitk::InteractionEventObserver::Notify(InteractionEvent::Pointer interactionEvent, bool isHandled)
     {
       if (!isHandled) {
-        this->HandleEvent(interactionEvent, NULL);
+        this->HandleEvent(interactionEvent, nullptr);
       }
     }
     \endcode

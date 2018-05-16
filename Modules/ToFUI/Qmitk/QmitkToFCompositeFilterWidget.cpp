@@ -25,9 +25,9 @@ const std::string QmitkToFCompositeFilterWidget::VIEW_ID = "org.mitk.views.qmitk
 
 QmitkToFCompositeFilterWidget::QmitkToFCompositeFilterWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
 {
-  this->m_ToFCompositeFilter = NULL;
+  this->m_ToFCompositeFilter = nullptr;
 
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
 }
 
@@ -218,17 +218,17 @@ void QmitkToFCompositeFilterWidget::OnTemporalMedianFilterNumOfFramesSpinBoxValu
   this->m_ToFCompositeFilter->SetTemporalMedianFilterParameter(value);
 }
 
-void QmitkToFCompositeFilterWidget::OnBilateralFilterDomainSigmaSpinBoxValueChanged(double value)
+void QmitkToFCompositeFilterWidget::OnBilateralFilterDomainSigmaSpinBoxValueChanged(double)
 {
   SetBilateralFilterParameter();
 }
 
-void QmitkToFCompositeFilterWidget::OnBilateralFilterRangeSigmaSpinBoxValueChanged(double value)
+void QmitkToFCompositeFilterWidget::OnBilateralFilterRangeSigmaSpinBoxValueChanged(double)
 {
   SetBilateralFilterParameter();
 }
 
-void QmitkToFCompositeFilterWidget::OnBilateralFilterKernelRadiusSpinBoxValueChanged(int value)
+void QmitkToFCompositeFilterWidget::OnBilateralFilterKernelRadiusSpinBoxValueChanged(int)
 {
   SetBilateralFilterParameter();
 }
@@ -261,7 +261,7 @@ void QmitkToFCompositeFilterWidget::SetBilateralFilterParameter()
   this->m_ToFCompositeFilter->SetBilateralFilterParameter(domainSigma, rangeSigma, kernelRadius);
 }
 
-void QmitkToFCompositeFilterWidget::OnSpanChanged(int lower, int upper)
+void QmitkToFCompositeFilterWidget::OnSpanChanged(int, int)
 {
   int lowerVal =  m_Controls->m_ThresholdFilterRangeSlider->minimumValue();
   int upperVal =  m_Controls->m_ThresholdFilterRangeSlider->maximumValue();

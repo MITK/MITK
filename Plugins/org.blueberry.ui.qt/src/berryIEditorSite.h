@@ -35,7 +35,7 @@ struct BERRY_UI_QT IEditorSite : public virtual IWorkbenchPartSite {
 
   berryObjectMacro(berry::IEditorSite)
 
-  virtual ~IEditorSite();
+  ~IEditorSite() override;
 
     /**
      * Returns the action bar contributor for this editor.

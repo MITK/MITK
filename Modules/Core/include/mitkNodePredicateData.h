@@ -26,7 +26,7 @@ namespace mitk
   //##Documentation
   //## @brief Predicate that evaluates if the given DataNodes data object pointer equals a given pointer
   //##
-  //## NodePredicateData(NULL) returns true if a DataNode does not have a data object (e.g. ->GetData() returns NULL).
+  //## NodePredicateData(nullptr) returns true if a DataNode does not have a data object (e.g. ->GetData() returns nullptr).
   //## This could return an unexpected number of nodes (e.g. the root node of the tree)
   //## @warning NodePredicateData holds a weak pointer to a BaseData! NodePredicateData p(mitk::BaseData::New()); will
   //not
@@ -43,11 +43,11 @@ namespace mitk
 
     //##Documentation
     //## @brief Standard Destructor
-    virtual ~NodePredicateData();
+    ~NodePredicateData() override;
 
     //##Documentation
     //## @brief Checks, if the nodes data object is of a specific data type
-    virtual bool CheckNode(const mitk::DataNode *node) const override;
+    bool CheckNode(const mitk::DataNode *node) const override;
 
   protected:
     //##Documentation

@@ -47,7 +47,7 @@ struct BERRY_UI_QT IStackPresentationSite : public Object
 
   static int STATE_RESTORED; // = 2;
 
-  ~IStackPresentationSite();
+  ~IStackPresentationSite() override;
 
   /**
    * Sets the state of the container. Called by the presentation when the

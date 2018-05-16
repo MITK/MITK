@@ -639,6 +639,7 @@ map<string, us::Any> mitkCommandLineParser::parseArguments(const StringContainer
 // -------------------------------------------------------------------------
 map<string, us::Any> mitkCommandLineParser::parseArguments(int argc, char **argv, bool *ok)
 {
+  std::cout << "Running Command Line Utility *" << Title << "*" << std::endl;
   StringContainerType arguments;
 
   // Create a StringContainerType of arguments

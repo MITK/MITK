@@ -102,7 +102,7 @@ namespace itk
     AdaptiveThresholdIterator(ImageType *imagePtr, FunctionType *fnPtr);
 
     /** Default Destructor. */
-    virtual ~AdaptiveThresholdIterator(){};
+    ~AdaptiveThresholdIterator() override{};
 
     /** Initializes the iterator, called from constructor */
     void InitializeIterator();
@@ -133,12 +133,12 @@ namespace itk
     * This causes the index to be calculated from pointer arithmetic and is
     * therefore an expensive operation.
     * \sa SetIndex */
-    const IndexType GetIndex()
+    const IndexType GetIndex() override
     {
       return (*m_QueueMap.find(m_RegionGrowingState)).second.front();
     } // [!] is never called?!
 
-    const PixelType Get(void) const
+    const PixelType Get(void) const override
     {
       return const_cast<ImageType *>(this->m_Image.GetPointer())
         ->GetPixel((*m_QueueMap.find(m_RegionGrowingState)).second.front());
@@ -154,9 +154,9 @@ namespace itk
     void GoToBegin();
 
     /** Is the iterator at the end of the region? */
-    bool IsAtEnd() { return this->m_IsAtEnd; };
+    bool IsAtEnd() override { return this->m_IsAtEnd; };
     /** Walk forward one index */
-    void operator++() { this->DoExtendedFloodStep(); }
+    void operator++() override { this->DoExtendedFloodStep(); }
     virtual SmartPointer<FunctionType> GetFunction() const { return m_Function; }
     /** operator= is provided to make sure the handle to the image is properly
     * reference counted. */
@@ -168,7 +168,7 @@ namespace itk
     }
 
     /** Compute whether the index of interest should be included in the flood */
-    bool IsPixelIncluded(const IndexType &index) const;
+    bool IsPixelIncluded(const IndexType &index) const override;
 
     // Calculate the value the outputImage is initialized to
     static int CalculateInitializeValue(int lower, int upper) { return ((upper - lower) + 1) * (-1); };

@@ -81,7 +81,7 @@ namespace mitk {
     * \brief Get the representation object associated with the index idx
     *
     * \param idx the corresponding input number with which the BaseData is associated
-    * \return Returns the desired BaseData if it exists for the given input; Returns NULL
+    * \return Returns the desired BaseData if it exists for the given input; Returns nullptr
     *         if no BaseData was found.
     */
     const BaseData* GetRepresentationObject(unsigned int idx);
@@ -97,8 +97,8 @@ namespace mitk {
     virtual void TransformOrientationOff(unsigned int index); ///< sets the TransformOrientation flag to false for the given index
 
     /** @brief Defines an offset for a representation object. This offset is applied before the object is visualized.
-     *         If no offset is given, no offset will be used. To deactivate the offset just set it to NULL. The offset is deactivated by default.
-     * @param offset The new offset which will be set. Set to NULL to deactivate the offset.
+     *         If no offset is given, no offset will be used. To deactivate the offset just set it to nullptr. The offset is deactivated by default.
+     * @param offset The new offset which will be set. Set to nullptr to deactivate the offset.
      */
     void SetOffset(int index, mitk::AffineTransform3D::Pointer offset);
 
@@ -109,7 +109,7 @@ namespace mitk {
      */
     virtual void SetRotationMode(RotationMode r);
 
-    /** @return Returns the offset of a represenation object. Returns NULL if there is no offset. */
+    /** @return Returns the offset of a represenation object. Returns nullptr if there is no offset. */
     mitk::AffineTransform3D::Pointer GetOffset(int index);
 
     /**
@@ -124,7 +124,7 @@ namespace mitk {
     /*
     * \brief Transfer the information from the input to the associated BaseData
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
 
   protected:
@@ -139,7 +139,7 @@ namespace mitk {
     /**
     * \brief Destructor
     **/
-    ~NavigationDataObjectVisualizationFilter();
+    ~NavigationDataObjectVisualizationFilter() override;
 
     /**
     * \brief An array of the BaseData which represent the tools.

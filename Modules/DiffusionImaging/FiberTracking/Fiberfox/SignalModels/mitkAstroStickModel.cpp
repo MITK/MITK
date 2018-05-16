@@ -21,8 +21,7 @@ using namespace mitk;
 
 template< class ScalarType >
 AstroStickModel< ScalarType >::AstroStickModel()
-    : m_BValue(1000)
-    , m_Diffusivity(0.001)
+    : m_Diffusivity(0.001)
     , m_NumSticks(42)
     , m_RandomizeSticks(false)
 {
@@ -46,22 +45,20 @@ AstroStickModel< ScalarType >::~AstroStickModel()
 }
 
 template< class ScalarType >
-ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(unsigned int dir)
+ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(unsigned int dir, GradientType& )
 {
     ScalarType signal = 0;
 
     if (dir>=this->m_GradientList.size())
         return signal;
 
-    ScalarType b = -m_BValue*m_Diffusivity;
+    ScalarType b = -this->m_BValue*m_Diffusivity;
 
     if (m_RandomizeSticks)  // random number of sticks
         m_NumSticks = 30 + this->m_RandGen->GetIntegerVariate()%31;
 
     GradientType g = this->m_GradientList[dir];
-    ScalarType bVal = g.GetNorm(); bVal *= bVal;
-
-    if (bVal>0.0001)    // is weighted direction
+    if (g.GetNorm()>0.0001)    // is weighted direction
     {
         for (unsigned int j=0; j<m_NumSticks; j++)
         {
@@ -70,7 +67,7 @@ ScalarType AstroStickModel< ScalarType >::SimulateMeasurement(unsigned int dir)
                 dot = GetRandomDirection()*g;
             else
                 dot = m_Sticks[j]*g;
-            signal += std::exp( (double)(b*bVal*dot*dot) );
+            signal += std::exp( (double)(b*dot*dot) ); // skip * bVal becaus bVal is already encoded in the dot product (norm of g encodes b-value relative to baseline b-value m_BValue)
         }
         signal /= m_NumSticks;
     }
@@ -92,11 +89,11 @@ typename AstroStickModel< ScalarType >::GradientType AstroStickModel< ScalarType
 }
 
 template< class ScalarType >
-typename AstroStickModel< ScalarType >::PixelType AstroStickModel< ScalarType >::SimulateMeasurement()
+typename AstroStickModel< ScalarType >::PixelType AstroStickModel< ScalarType >::SimulateMeasurement(GradientType& )
 {
     PixelType signal;
     signal.SetSize(this->m_GradientList.size());
-    ScalarType b = -m_BValue*m_Diffusivity;
+    ScalarType b = -this->m_BValue*m_Diffusivity;
 
     if (m_RandomizeSticks)
         m_NumSticks = 30 + this->m_RandGen->GetIntegerVariate()%31;
@@ -104,9 +101,7 @@ typename AstroStickModel< ScalarType >::PixelType AstroStickModel< ScalarType >:
     for( unsigned int i=0; i<this->m_GradientList.size(); i++)
     {
         GradientType g = this->m_GradientList[i];
-        ScalarType bVal = g.GetNorm(); bVal *= bVal;
-
-        if (bVal>0.0001)
+        if (g.GetNorm()>0.0001)
         {
             for (unsigned int j=0; j<m_NumSticks; j++)
             {
@@ -115,7 +110,7 @@ typename AstroStickModel< ScalarType >::PixelType AstroStickModel< ScalarType >:
                     dot = GetRandomDirection()*g;
                 else
                     dot = m_Sticks[j]*g;
-                signal[i] += std::exp( (double)(b*bVal*dot*dot) );
+                signal[i] += std::exp( (double)(b*dot*dot) ); // skip * bVal becaus bVal is already encoded in the dot product (norm of g encodes b-value relative to baseline b-value m_BValue)
             }
             signal[i] /= m_NumSticks;
         }

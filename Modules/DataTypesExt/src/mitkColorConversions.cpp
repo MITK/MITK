@@ -41,10 +41,10 @@ namespace mitk
       if (h >= 360)
         Hi = 6;
 
-      float f = (float)(h / 60.0 - (float)Hi);
-      float p = (float)(v * (1.0 - s));
-      float q = (float)(v * (1.0 - s * f));
-      float t = (float)(v * (1.0 - s * (1.0 - f)));
+      auto f = (float)(h / 60.0 - (float)Hi);
+      auto p = (float)(v * (1.0 - s));
+      auto q = (float)(v * (1.0 - s * f));
+      auto t = (float)(v * (1.0 - s * (1.0 - f)));
 
       switch (Hi)
       {

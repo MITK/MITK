@@ -58,9 +58,9 @@ private:
   class PreferenceChangeListener;
   QScopedPointer<PreferenceChangeListener> preferenceListener;
 
-  virtual void AddExtension(IExtensionTracker* tracker, const SmartPointer<IExtension>& extension) override;
+  void AddExtension(IExtensionTracker* tracker, const SmartPointer<IExtension>& extension) override;
 
-  virtual void RemoveExtension(const SmartPointer<IExtension>& extension,
+  void RemoveExtension(const SmartPointer<IExtension>& extension,
                                const QList<SmartPointer<Object> >& objects) override;
 
 public:
@@ -154,23 +154,23 @@ public:
   /**
    * Dispose the receiver.
    */
-  ~PerspectiveRegistry();
+  ~PerspectiveRegistry() override;
 
   // ---------- IPerspectiveRegistry methods ------------
 
-  virtual IPerspectiveDescriptor::Pointer FindPerspectiveWithId(const QString& id) override;
-  virtual IPerspectiveDescriptor::Pointer FindPerspectiveWithLabel(const QString& label) override;
+  IPerspectiveDescriptor::Pointer FindPerspectiveWithId(const QString& id) override;
+  IPerspectiveDescriptor::Pointer FindPerspectiveWithLabel(const QString& label) override;
 
-  virtual QString GetDefaultPerspective() override;
+  QString GetDefaultPerspective() override;
 
-  virtual QList<IPerspectiveDescriptor::Pointer> GetPerspectives() override;
+  QList<IPerspectiveDescriptor::Pointer> GetPerspectives() override;
 
-  virtual void SetDefaultPerspective(const QString& id) override;
+  void SetDefaultPerspective(const QString& id) override;
 
-  virtual IPerspectiveDescriptor::Pointer ClonePerspective(const QString& id, const QString& label,
+  IPerspectiveDescriptor::Pointer ClonePerspective(const QString& id, const QString& label,
       IPerspectiveDescriptor::Pointer originalDescriptor) override;
 
-  virtual void RevertPerspective(IPerspectiveDescriptor::Pointer perspToRevert) override;
+  void RevertPerspective(IPerspectiveDescriptor::Pointer perspToRevert) override;
 
 protected:
 

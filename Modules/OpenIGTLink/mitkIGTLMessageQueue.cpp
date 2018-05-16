@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include "igtlMessageBase.h"
 
-void mitk::IGTLMessageQueue::PushSendMessage(igtl::MessageBase::Pointer message)
+void mitk::IGTLMessageQueue::PushSendMessage(mitk::IGTLMessage::Pointer message)
 {
   this->m_Mutex->Lock();
-  if (this->m_BufferingType == IGTLMessageQueue::Infinit)
+  if (this->m_BufferingType == IGTLMessageQueue::NoBuffering)
     m_SendQueue.clear();
 
   m_SendQueue.push_back(message);
@@ -31,7 +31,7 @@ void mitk::IGTLMessageQueue::PushSendMessage(igtl::MessageBase::Pointer message)
 void mitk::IGTLMessageQueue::PushCommandMessage(igtl::MessageBase::Pointer message)
 {
   this->m_Mutex->Lock();
-  if (this->m_BufferingType == IGTLMessageQueue::Infinit)
+  if (this->m_BufferingType == IGTLMessageQueue::NoBuffering)
     m_CommandQueue.clear();
 
   m_CommandQueue.push_back(message);
@@ -48,7 +48,7 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
 
   if (dynamic_cast<igtl::TrackingDataMessage*>(msg.GetPointer()) != nullptr)
   {
-    if (this->m_BufferingType == IGTLMessageQueue::Infinit)
+    if (this->m_BufferingType == IGTLMessageQueue::NoBuffering)
       m_TrackingDataQueue.clear();
 
     this->m_TrackingDataQueue.push_back(dynamic_cast<igtl::TrackingDataMessage*>(msg.GetPointer()));
@@ -57,7 +57,7 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
   }
   else if (dynamic_cast<igtl::TransformMessage*>(msg.GetPointer()) != nullptr)
   {
-    if (this->m_BufferingType == IGTLMessageQueue::Infinit)
+    if (this->m_BufferingType == IGTLMessageQueue::NoBuffering)
       m_TransformQueue.clear();
 
     this->m_TransformQueue.push_back(dynamic_cast<igtl::TransformMessage*>(msg.GetPointer()));
@@ -66,7 +66,7 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
   }
   else if (dynamic_cast<igtl::StringMessage*>(msg.GetPointer()) != nullptr)
   {
-    if (this->m_BufferingType == IGTLMessageQueue::Infinit)
+    if (this->m_BufferingType == IGTLMessageQueue::NoBuffering)
       m_StringQueue.clear();
 
     this->m_StringQueue.push_back(dynamic_cast<igtl::StringMessage*>(msg.GetPointer()));
@@ -80,7 +80,7 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
     imageMsg->GetDimensions(dim);
     if (dim[2] > 1)
     {
-      if (this->m_BufferingType == IGTLMessageQueue::Infinit)
+      if (this->m_BufferingType == IGTLMessageQueue::NoBuffering)
         m_Image3dQueue.clear();
 
       this->m_Image3dQueue.push_back(dynamic_cast<igtl::ImageMessage*>(msg.GetPointer()));
@@ -89,7 +89,7 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
     }
     else
     {
-      if (this->m_BufferingType == IGTLMessageQueue::Infinit)
+      if (this->m_BufferingType == IGTLMessageQueue::NoBuffering)
         m_Image2dQueue.clear();
 
       this->m_Image2dQueue.push_back(dynamic_cast<igtl::ImageMessage*>(msg.GetPointer()));
@@ -99,7 +99,7 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
   }
   else
   {
-    if (this->m_BufferingType == IGTLMessageQueue::Infinit)
+    if (this->m_BufferingType == IGTLMessageQueue::NoBuffering)
       m_MiscQueue.clear();
 
     this->m_MiscQueue.push_back(msg);
@@ -109,14 +109,14 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
 
   m_Latest_Message = msg;
 
-  MITK_INFO << infolog.str();
+  //MITK_INFO << infolog.str();
 
   this->m_Mutex->Unlock();
 }
 
-igtl::MessageBase::Pointer mitk::IGTLMessageQueue::PullSendMessage()
+mitk::IGTLMessage::Pointer mitk::IGTLMessageQueue::PullSendMessage()
 {
-  igtl::MessageBase::Pointer ret = nullptr;
+  mitk::IGTLMessage::Pointer ret = nullptr;
   this->m_Mutex->Lock();
   if (this->m_SendQueue.size() > 0)
   {
@@ -290,20 +290,20 @@ int mitk::IGTLMessageQueue::GetSize()
     + this->m_StringQueue.size() + this->m_TrackingDataQueue.size() + this->m_TransformQueue.size());
 }
 
-void mitk::IGTLMessageQueue::EnableInfiniteBuffering(bool enable)
+void mitk::IGTLMessageQueue::EnableNoBufferingMode(bool enable)
 {
   this->m_Mutex->Lock();
   if (enable)
-    this->m_BufferingType = IGTLMessageQueue::BufferingType::Infinit;
-  else
     this->m_BufferingType = IGTLMessageQueue::BufferingType::NoBuffering;
+  else
+    this->m_BufferingType = IGTLMessageQueue::BufferingType::Infinit;
   this->m_Mutex->Unlock();
 }
 
 mitk::IGTLMessageQueue::IGTLMessageQueue()
 {
   this->m_Mutex = itk::FastMutexLock::New();
-  this->m_BufferingType = IGTLMessageQueue::Infinit;
+  this->m_BufferingType = IGTLMessageQueue::NoBuffering;
 }
 
 mitk::IGTLMessageQueue::~IGTLMessageQueue()

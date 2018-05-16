@@ -30,8 +30,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::FiberBundleTrackVisWriter::FiberBundleTrackVisWriter()
     : mitk::AbstractFileWriter(mitk::FiberBundle::GetStaticNameOfClass(), mitk::DiffusionIOMimeTypes::FIBERBUNDLE_TRK_MIMETYPE_NAME(), "TrackVis Fiber Bundle Reader")
 {
-    //    Options defaultOptions;
-    //    this->SetDefaultOptions(defaultOptions);
+    Options defaultOptions;
+    defaultOptions["Save in LPS space (if unchecked, use RAS)"] = true;
+    this->SetDefaultOptions(defaultOptions);
+
     RegisterService();
 }
 
@@ -69,10 +71,9 @@ void mitk::FiberBundleTrackVisWriter::Write()
     try
     {
         const std::string& locale = "C";
-        const std::string& currLocale = setlocale( LC_ALL, NULL );
+        const std::string& currLocale = setlocale( LC_ALL, nullptr );
         setlocale(LC_ALL, locale.c_str());
 
-        std::locale previousLocale(out->getloc());
         std::locale I("C");
         out->imbue(I);
 
@@ -88,14 +89,17 @@ void mitk::FiberBundleTrackVisWriter::Write()
             this->SetOutputLocation(this->GetOutputLocation() + ext);
         }
 
+        Options options = this->GetOptions();
+        bool lps = us::any_cast<bool>(options["Save in LPS space (if unchecked, use RAS)"]);
+
         MITK_INFO << "Writing fiber bundle as TRK";
         TrackVisFiberReader trk;
-        trk.create(filename, input.GetPointer());
+        trk.create(filename, input.GetPointer(), lps);
         trk.writeHdr();
         trk.append(input.GetPointer());
 
         setlocale(LC_ALL, currLocale.c_str());
-        MITK_INFO << "Fiber bundle written";
+        MITK_INFO << "TrackVis Fiber bundle written to " << filename;
     }
     catch(...)
     {

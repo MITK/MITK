@@ -65,7 +65,7 @@ namespace mitk
 
       // hide everything
       ToolManagerProvider();
-    virtual ~ToolManagerProvider();
+    ~ToolManagerProvider() override;
     ToolManagerProvider(const ToolManagerProvider &);
     ToolManagerProvider &operator=(const ToolManagerProvider &);
 

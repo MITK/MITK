@@ -98,16 +98,16 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
   mitk::PointSet::PointDataIterator pdIt;
 
   /* search removed points and delete the corresponding source/actor/mapper objects */
-  for (ActorMap::iterator it = m_PointActors.begin(); it != m_PointActors.end();)
+  for (auto it = m_PointActors.begin(); it != m_PointActors.end();)
   {
     PointIdentifier id = it->first;
     if (!points->IndexExists(id))
     {
       this->RemoveEntryFromSourceMaps(id);
       m_PropAssembly->GetParts()->RemoveItem(it->second.first); // remove from prop assembly
-      if (it->second.first != NULL)
+      if (it->second.first != nullptr)
         it->second.first->Delete(); // Delete actor, which deletes mapper too (reference count)
-      ActorMap::iterator er = it;   // save iterator for deleting
+      auto er = it;   // save iterator for deleting
       ++it;                         // advance iterator to next object
       m_PointActors.erase(
         er); // erase element from map. This invalidates er, therefore we had to advance it before deletion.
@@ -124,10 +124,10 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
 
     mitk::PointSet::PointDataType data = pdIt->Value();
 
-    ActorMap::iterator aIt = m_PointActors.find(pointID); // Does an actor exist for the point?
+    auto aIt = m_PointActors.find(pointID); // Does an actor exist for the point?
 
     /* Create/Update sources for the point */
-    vtkActor *a = NULL;
+    vtkActor *a = nullptr;
     bool newPoint = (aIt == m_PointActors.end());                           // current point is new
     bool specChanged = (!newPoint && data.pointSpec != aIt->second.second); // point spec of current point has changed
 
@@ -136,7 +136,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
       a = vtkActor::New();
       vtkPolyDataMapper *m = vtkPolyDataMapper::New();
       a->SetMapper(m);
-      m->UnRegister(NULL);
+      m->UnRegister(nullptr);
       aIt = m_PointActors.insert(std::make_pair(pointID, std::make_pair(a, data.pointSpec)))
               .first; // insert element and update actormap iterator to point to new element
       m_PropAssembly->AddPart(a);
@@ -151,7 +151,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
     }
     if (newPoint || specChanged) // new point OR existing point but point spec changed
     {
-      vtkPolyDataAlgorithm *source = NULL; // works only in VTK 5+
+      vtkPolyDataAlgorithm *source = nullptr; // works only in VTK 5+
       switch (data.pointSpec)              // add to new map
       {                                    // TODO: look up representation in a representationlookuptable
         case PTSTART:                      // cube
@@ -173,8 +173,8 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
           source = m_SphereSources[pointID];
           break;
       }
-      vtkPolyDataMapper *m = dynamic_cast<vtkPolyDataMapper *>(a->GetMapper());
-      assert(m != NULL);
+      auto *m = dynamic_cast<vtkPolyDataMapper *>(a->GetMapper());
+      assert(m != nullptr);
       m->SetInputConnection(source->GetOutputPort());
       aIt->second.second = data.pointSpec; // update point spec in actormap
     }
@@ -197,7 +197,7 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyColorAndOpacityProperties(mitk::Bas
   mitk::PointSet::PointsIterator pIt;
   mitk::PointSet::PointDataIterator pdIt;
   mitk::DataNode *n = this->GetDataNode();
-  assert(n != NULL);
+  assert(n != nullptr);
 
   for (pIt = points->Begin(), pdIt = pointData->Begin(); pIt != itkPointSet->GetPoints()->End();
        ++pIt, ++pdIt) // for each point in the pointset
@@ -207,24 +207,22 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyColorAndOpacityProperties(mitk::Bas
 
     mitk::PointSet::PointDataType data = pdIt->Value();
 
-    ActorMap::iterator aIt = m_PointActors.find(pointID); // Does an actor exist for the point?
+    auto aIt = m_PointActors.find(pointID); // Does an actor exist for the point?
     assert(aIt != m_PointActors.end());                   // UpdateVtkObjects() must ensure that actor exists
 
     vtkActor *a = aIt->second.first;
-    assert(a != NULL);
-
-    SetVtkMapperImmediateModeRendering(a->GetMapper());
+    assert(a != nullptr);
 
     /* update properties */
     // visibility
     bool pointVisibility = true;
     bool visValueFound = false;
     mitk::BaseProperty *visProp = n->GetProperty("visibility", renderer);
-    mitk::BoolLookupTableProperty *visLTProp = dynamic_cast<mitk::BoolLookupTableProperty *>(visProp);
-    if (visLTProp != NULL)
+    auto *visLTProp = dynamic_cast<mitk::BoolLookupTableProperty *>(visProp);
+    if (visLTProp != nullptr)
     {
       mitk::BoolLookupTable visLookupTable = visLTProp->GetValue();
-      // if (visLookupTable != NULL)
+      // if (visLookupTable != nullptr)
       //{
       try
       {
@@ -246,11 +244,11 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyColorAndOpacityProperties(mitk::Bas
     float opacity = 1.0;
     bool opValueFound = false;
     mitk::BaseProperty *opProp = n->GetProperty("opacity", renderer);
-    mitk::FloatLookupTableProperty *opLTProp = dynamic_cast<mitk::FloatLookupTableProperty *>(opProp);
-    if (opLTProp != NULL)
+    auto *opLTProp = dynamic_cast<mitk::FloatLookupTableProperty *>(opProp);
+    if (opLTProp != nullptr)
     {
       mitk::FloatLookupTable opLookupTable = opLTProp->GetValue();
-      // if (opLookupTable != NULL)
+      // if (opLookupTable != nullptr)
       //{
       try
       {
@@ -317,8 +315,8 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyColorAndOpacityProperties(mitk::Bas
     else
     {
       mitk::BaseProperty *a = n->GetProperty("colorLookupTable", renderer);
-      mitk::LookupTableProperty *b = dynamic_cast<mitk::LookupTableProperty *>(a);
-      if (b != NULL)
+      auto *b = dynamic_cast<mitk::LookupTableProperty *>(a);
+      if (b != nullptr)
       {
         mitk::LookupTable::Pointer c = b->GetLookupTable();
         vtkLookupTable *d = c->GetVtkLookupTable();
@@ -360,7 +358,7 @@ void mitk::EnhancedPointSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRender
     this->UpdateVtkObjects();
   }
 
-  ApplyColorAndOpacityProperties(renderer, NULL);
+  ApplyColorAndOpacityProperties(renderer, nullptr);
 }
 
 void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/)
@@ -398,13 +396,13 @@ void mitk::EnhancedPointSetVtkMapper3D::SetDefaultProperties(mitk::DataNode *nod
 
 void mitk::EnhancedPointSetVtkMapper3D::DeleteVtkObject(vtkObject *o)
 {
-  if (o != NULL)
+  if (o != nullptr)
     o->Delete();
 }
 
 void mitk::EnhancedPointSetVtkMapper3D::RemoveEntryFromSourceMaps(mitk::PointSet::PointIdentifier pointID)
 {
-  ActorMap::iterator aIt = m_PointActors.find(pointID);
+  auto aIt = m_PointActors.find(pointID);
   if (aIt == m_PointActors.end())
     return;
 

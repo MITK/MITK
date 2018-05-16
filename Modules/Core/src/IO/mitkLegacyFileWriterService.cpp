@@ -29,7 +29,7 @@ mitk::LegacyFileWriterService::LegacyFileWriterService(mitk::FileWriter::Pointer
 
   CustomMimeType customMimeType;
   std::vector<std::string> extensions = legacyWriter->GetPossibleFileExtensions();
-  for (std::vector<std::string>::iterator ext = extensions.begin(); ext != extensions.end(); ++ext)
+  for (auto ext = extensions.begin(); ext != extensions.end(); ++ext)
   {
     if (ext->empty())
       continue;

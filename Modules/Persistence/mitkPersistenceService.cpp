@@ -73,7 +73,7 @@ mitk::PropertyList::Pointer mitk::PersistenceService::GetPropertyList(std::strin
     id = uidGen.GetUID();
   }
 
-  std::map<std::string, mitk::PropertyList::Pointer>::iterator it = m_PropertyLists.find(id);
+  auto it = m_PropertyLists.find(id);
   if (it == m_PropertyLists.end())
   {
     propList = PropertyList::New();
@@ -96,7 +96,7 @@ void mitk::PersistenceService::ClonePropertyList(mitk::PropertyList *from, mitk:
   to->Clear();
 
   const std::map<std::string, BaseProperty::Pointer> *propMap = from->GetMap();
-  std::map<std::string, BaseProperty::Pointer>::const_iterator propMapIt = propMap->begin();
+  auto propMapIt = propMap->begin();
   while (propMapIt != propMap->end())
   {
     mitk::BaseProperty::Pointer clonedProp = (*propMapIt).second->Clone();
@@ -143,8 +143,8 @@ bool mitk::PersistenceService::Save(const std::string &fileName, bool appendChan
       {
         bool load = false;
         DataStorage::Pointer ds = m_SceneIO->LoadScene(theFile);
-        load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) &&
-               (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
+        load = (m_SceneIO->GetFailedNodes() == nullptr || m_SceneIO->GetFailedNodes()->size() == 0) &&
+               (m_SceneIO->GetFailedNodes() == nullptr || m_SceneIO->GetFailedProperties()->IsEmpty());
         if (!load)
           return false;
 
@@ -212,7 +212,7 @@ bool mitk::PersistenceService::Load(const std::string &fileName, bool enforceRel
   if (enforceReload == false)
   {
     bool loadTheFile = true;
-    std::map<std::string, long int>::iterator it = m_FileNamesToModifiedTimes.find(theFile);
+    auto it = m_FileNamesToModifiedTimes.find(theFile);
 
     long int currentModifiedTime = itksys::SystemTools::ModifiedTime(theFile.c_str());
     if (it != m_FileNamesToModifiedTimes.end())
@@ -240,8 +240,8 @@ bool mitk::PersistenceService::Load(const std::string &fileName, bool enforceRel
       m_SceneIO = mitk::SceneIO::New();
     }
     DataStorage::Pointer ds = m_SceneIO->LoadScene(theFile);
-    load = (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedNodes()->size() == 0) &&
-           (m_SceneIO->GetFailedNodes() == 0 || m_SceneIO->GetFailedProperties()->IsEmpty());
+    load = (m_SceneIO->GetFailedNodes() == nullptr || m_SceneIO->GetFailedNodes()->size() == 0) &&
+           (m_SceneIO->GetFailedNodes() == nullptr || m_SceneIO->GetFailedProperties()->IsEmpty());
     if (load)
     {
       this->RestorePropertyListsFromPersistentDataNodes(ds);
@@ -326,7 +326,7 @@ bool mitk::PersistenceService::RestorePropertyListsFromPersistentDataNodes(const
   this->Initialize();
   bool oneFound = false;
   DataStorage::SetOfObjects::ConstPointer allNodes = storage->GetAll();
-  for (mitk::DataStorage::SetOfObjects::const_iterator sourceIter = allNodes->begin(); sourceIter != allNodes->end();
+  for (auto sourceIter = allNodes->begin(); sourceIter != allNodes->end();
        ++sourceIter)
   {
     mitk::DataNode *node = *sourceIter;
@@ -346,7 +346,7 @@ bool mitk::PersistenceService::RestorePropertyListsFromPersistentDataNodes(const
       if (existed)
       {
         MITK_DEBUG("mitk::PersistenceService") << "calling replace observer before replacing values";
-        std::set<PropertyListReplacedObserver *>::iterator it = m_PropertyListReplacedObserver.begin();
+        auto it = m_PropertyListReplacedObserver.begin();
         while (it != m_PropertyListReplacedObserver.end())
         {
           (*it)->BeforePropertyListReplaced(name, propList);
@@ -361,7 +361,7 @@ bool mitk::PersistenceService::RestorePropertyListsFromPersistentDataNodes(const
       if (existed)
       {
         MITK_DEBUG("mitk::PersistenceService") << "calling replace observer before replacing values";
-        std::set<PropertyListReplacedObserver *>::iterator it = m_PropertyListReplacedObserver.begin();
+        auto it = m_PropertyListReplacedObserver.begin();
         while (it != m_PropertyListReplacedObserver.end())
         {
           (*it)->AfterPropertyListReplaced(name, propList);
@@ -383,7 +383,7 @@ bool mitk::PersistenceService::GetAutoLoadAndSave()
 bool mitk::PersistenceService::RemovePropertyList(std::string &id)
 {
   this->Initialize();
-  std::map<std::string, mitk::PropertyList::Pointer>::iterator it = m_PropertyLists.find(id);
+  auto it = m_PropertyLists.find(id);
   if (it != m_PropertyLists.end())
   {
     m_PropertyLists.erase(it);

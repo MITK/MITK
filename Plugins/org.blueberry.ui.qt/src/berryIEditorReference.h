@@ -39,7 +39,7 @@ struct BERRY_UI_QT IEditorReference : public virtual IWorkbenchPartReference
 
   berryObjectMacro(berry::IEditorReference)
 
-  ~IEditorReference();
+  ~IEditorReference() override;
 
     /**
      * Returns the factory id of the factory used to

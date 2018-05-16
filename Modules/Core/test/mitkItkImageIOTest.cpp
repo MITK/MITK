@@ -115,7 +115,7 @@ public:
   {
     const std::string fullFileName = AppendExtension(filename, extension.c_str());
 
-    mitk::Image::Pointer singleSliceImage = NULL;
+    mitk::Image::Pointer singleSliceImage = nullptr;
     if (image->GetDimension() == 3)
     {
       mitk::ExtractSliceFilter::Pointer extractFilter = mitk::ExtractSliceFilter::New();
@@ -137,7 +137,7 @@ public:
       {
         std::stringstream series_filenames;
         series_filenames << filename << extension;
-        mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage(series_filenames.str());
+        mitk::Image::Pointer compareImage = mitk::IOUtil::Load<mitk::Image>(series_filenames.str());
         if (compareImage.IsNotNull())
         {
           foundImagesCount++;
@@ -153,7 +153,7 @@ public:
         {
           std::stringstream series_filenames;
           series_filenames << filename << "." << i + 1 << extension;
-          mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage(series_filenames.str());
+          mitk::Image::Pointer compareImage = mitk::IOUtil::Load<mitk::Image>(series_filenames.str());
           if (compareImage.IsNotNull())
           {
             foundImagesCount++;
@@ -179,7 +179,7 @@ public:
       {
         mitk::IOUtil::Save(singleSliceImage, fullFileName);
 
-        mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage(fullFileName.c_str());
+        mitk::Image::Pointer compareImage = mitk::IOUtil::Load<mitk::Image>(fullFileName.c_str());
         MITK_TEST_CONDITION_REQUIRED(compareImage.IsNotNull(), "Image stored was succesfully loaded again");
 
         MITK_TEST_CONDITION_REQUIRED(
@@ -209,7 +209,7 @@ public:
     {
       mitk::IOUtil::Save(image, tmpFilePath);
 
-      mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage(tmpFilePath);
+      mitk::Image::Pointer compareImage = mitk::IOUtil::Load<mitk::Image>(tmpFilePath);
       CPPUNIT_ASSERT_MESSAGE("Image stored in NRRD format was succesfully loaded again", compareImage.IsNotNull());
 
       /*It would make sence to check the images as well (see commented cppunit assert),
@@ -248,7 +248,7 @@ public:
     {
       mitk::IOUtil::Save(image, tmpFilePath);
 
-      mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage(tmpFilePath);
+      mitk::Image::Pointer compareImage = mitk::IOUtil::Load<mitk::Image>(tmpFilePath);
       CPPUNIT_ASSERT_MESSAGE("Image stored in MHD format was succesfully loaded again! ", compareImage.IsNotNull());
 
       CPPUNIT_ASSERT_MESSAGE(".mhd file exists",
@@ -292,18 +292,18 @@ public:
     // load image
     CPPUNIT_ASSERT_MESSAGE("Checking whether source image exists", itksys::SystemTools::FileExists(sourcefile.c_str()));
 
-    mitk::Image::Pointer image = NULL;
+    mitk::Image::Pointer image = nullptr;
 
     try
     {
-      image = mitk::IOUtil::LoadImage(sourcefile);
+      image = mitk::IOUtil::Load<mitk::Image>(sourcefile);
     }
     catch (...)
     {
       CPPUNIT_FAIL("Exception during file loading:");
     }
 
-    CPPUNIT_ASSERT_MESSAGE("loaded image not NULL", image.IsNotNull());
+    CPPUNIT_ASSERT_MESSAGE("loaded image not nullptr", image.IsNotNull());
 
     // write ITK .mhd image (2D and 3D only)
     if (image->GetDimension() <= 3)
@@ -370,8 +370,8 @@ public:
 
     mitk::Image::Pointer image = mitk::ImportItkImage(itkImage);
 
-    mitk::IOUtil::SaveImage(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.nrrd"));
-    mitk::IOUtil::SaveImage(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.png"));
+    mitk::IOUtil::Save(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.nrrd"));
+    mitk::IOUtil::Save(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.png"));
   }
 
   /**
@@ -417,9 +417,9 @@ public:
     }
     mitk::Image::Pointer image = mitk::ImportItkImage(itkImage);
 
-    mitk::IOUtil::SaveImage(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.nrrd"));
+    mitk::IOUtil::Save(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.nrrd"));
 
-    CPPUNIT_ASSERT_THROW(mitk::IOUtil::SaveImage(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.png")),
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::Save(image, mitk::IOUtil::CreateTemporaryFile("3Dto2DTestImageXXXXXX.png")),
                          mitk::Exception);
   }
 };

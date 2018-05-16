@@ -24,7 +24,7 @@
 #include "mitkInteractionEvent.h"
 #include "mitkInteractionEventConst.h"
 #include "mitkInteractionPositionEvent.h"
-#include <string.h>
+#include <cstring>
 
 #include <MitkCoreExports.h>
 
@@ -53,9 +53,9 @@ namespace mitk
 
   protected:
     InteractionKeyEvent(BaseRenderer *, const std::string &key, ModifierKeys modifiers);
-    virtual ~InteractionKeyEvent();
+    ~InteractionKeyEvent() override;
 
-    virtual bool IsEqual(const InteractionEvent &) const override;
+    bool IsEqual(const InteractionEvent &) const override;
 
   private:
     std::string m_Key;

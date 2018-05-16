@@ -44,11 +44,11 @@ namespace mitk
        * Here actions strings from the loaded state machine pattern are mapped to functions of
        * the DataInteractor. These functions are called when an action from the state machine pattern is executed.
        */
-      virtual void ConnectActionsAndFunctions() override;
+      void ConnectActionsAndFunctions() override;
 
   protected:
     ContourModelInteractor();
-    virtual ~ContourModelInteractor();
+    ~ContourModelInteractor() override;
 
     virtual bool OnCheckPointClick(const InteractionEvent *interactionEvent);
     virtual bool IsHovering(const InteractionEvent *interactionEvent);

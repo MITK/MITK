@@ -23,16 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageDuplicator.h>
 #include <boost/progress.hpp>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 namespace itk {
 
 template< class PixelType >
 EvaluateDirectionImagesFilter< PixelType >
 ::EvaluateDirectionImagesFilter():
-    m_ImageSet(NULL),
-    m_ReferenceImageSet(NULL),
+    m_ImageSet(nullptr),
+    m_ReferenceImageSet(nullptr),
     m_IgnoreMissingDirections(false),
     m_IgnoreEmptyVoxels(false),
     m_Eps(0.0001)
@@ -297,7 +294,7 @@ void EvaluateDirectionImagesFilter< PixelType >::GenerateData()
             }
 
             m_LengthErrorVector.push_back( fabs(refLength-testLength) );
-            m_AngularErrorVector.push_back( acos(error)*180.0/M_PI );
+            m_AngularErrorVector.push_back( acos(error)*180.0/itk::Math::pi );
 
             m_MeanAngularError += m_AngularErrorVector.back();
             m_MeanLengthError += m_LengthErrorVector.back();

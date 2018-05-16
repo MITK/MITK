@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <map>
 #include <sstream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
 
 #include <itkDataObject.h>

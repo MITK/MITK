@@ -81,14 +81,14 @@ namespace mitk
     double m_TimeStampEpsilon;
 
     NavigationDataToMessageFilter();
-    virtual ~NavigationDataToMessageFilter();
+    ~NavigationDataToMessageFilter() override;
 
     /**Documentation
     * \brief filter execute method
     *
     * emits the Messages
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
   };
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATATOMESSAGEFILTER_H_HEADER_INCLUDED_ */

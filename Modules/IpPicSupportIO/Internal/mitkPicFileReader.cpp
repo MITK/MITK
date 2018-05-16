@@ -15,13 +15,112 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPicFileReader.h"
-#include "mitkLegacyAdaptors.h"
 #include "mitkPicHelper.h"
 
 #include "mitkCustomMimeType.h"
 #include "mitkImageWriteAccessor.h"
 
 #include <mitkIpPic.h>
+
+
+static mitk::PixelType CastToPixelType(mitkIpPicType_t pictype, size_t bpe)
+{
+  const bool isSignedIntegralType = (pictype == mitkIpPicInt);
+  const bool isUnsignedIntegralType = (pictype == mitkIpPicUInt);
+
+  if (isSignedIntegralType)
+  {
+    switch (bpe)
+    {
+    case sizeof(char) :
+      return mitk::MakeScalarPixelType<char>();
+    case sizeof(short) :
+      return mitk::MakeScalarPixelType<short>();
+    default:
+      return mitk::MakeScalarPixelType<int>();
+    }
+  }
+  else if (isUnsignedIntegralType)
+  {
+    switch (bpe)
+    {
+    case sizeof(unsigned char) :
+      return mitk::MakeScalarPixelType<unsigned char>();
+    case sizeof(unsigned short) :
+      return mitk::MakeScalarPixelType<unsigned short>();
+    default:
+      return mitk::MakeScalarPixelType<unsigned int>();
+    }
+  }
+  else // is floating point type
+  {
+    switch (bpe)
+    {
+    case sizeof(float) :
+      return mitk::MakeScalarPixelType<float>();
+    default:
+      return mitk::MakeScalarPixelType<double>();
+    }
+  }
+}
+
+static mitk::ImageDescriptor::Pointer CastToImageDescriptor(mitkIpPicDescriptor *desc)
+{
+  mitk::ImageDescriptor::Pointer imDescriptor = mitk::ImageDescriptor::New();
+
+  imDescriptor->Initialize(desc->n, desc->dim);
+
+  mitk::PixelType ptype = ::CastToPixelType(desc->type, (desc->bpe / 8));
+  imDescriptor->AddNewChannel(ptype, "imported by pic");
+
+  return imDescriptor;
+}
+
+static mitkIpPicType_t CastToIpPicType(int intype)
+{
+  const bool isSignedIntegralType = (intype == itk::ImageIOBase::INT || intype == itk::ImageIOBase::SHORT ||
+    intype == itk::ImageIOBase::CHAR || intype == itk::ImageIOBase::LONG);
+
+  const bool isUnsignedIntegralType = (intype == itk::ImageIOBase::UINT || intype == itk::ImageIOBase::USHORT ||
+    intype == itk::ImageIOBase::UCHAR || intype == itk::ImageIOBase::ULONG);
+
+  const bool isFloatingPointType = (intype == itk::ImageIOBase::FLOAT || intype == itk::ImageIOBase::DOUBLE);
+
+  if (isSignedIntegralType)
+    return mitkIpPicInt;
+  if (isUnsignedIntegralType)
+    return mitkIpPicUInt;
+  if (isFloatingPointType)
+    return mitkIpPicFloat;
+  return mitkIpPicUnknown;
+}
+
+static mitkIpPicDescriptor * CastToIpPicDescriptor(mitk::Image::Pointer refImg,
+  mitk::ImageWriteAccessor *imageAccess,
+  mitkIpPicDescriptor *picDesc)
+{
+  const mitk::ImageDescriptor::Pointer imDesc = refImg->GetImageDescriptor();
+
+  // initialize dimension information
+  for (unsigned int i = 0; i < 8; i++)
+  {
+    picDesc->n[i] = 1;
+  }
+
+  // set dimension information
+  picDesc->dim = refImg->GetDimension();
+  memcpy(picDesc->n, imDesc->GetDimensions(), picDesc->dim * sizeof(unsigned int));
+
+  picDesc->type = ::CastToIpPicType(refImg->GetPixelType().GetComponentType());
+  picDesc->bpe = refImg->GetPixelType().GetBpe();
+  if (imageAccess != nullptr)
+  {
+    picDesc->data = imageAccess->GetData();
+  }
+
+  return picDesc;
+}
+
 
 mitk::PicFileReader::PicFileReader() : AbstractFileReader()
 {
@@ -54,19 +153,19 @@ mitk::Image::Pointer mitk::PicFileReader::CreateImage()
 
   std::string fileName = this->GetLocalFileName();
 
-  mitkIpPicDescriptor *header = mitkIpPicGetHeader(const_cast<char *>(fileName.c_str()), NULL);
+  mitkIpPicDescriptor *header = mitkIpPicGetHeader(fileName.c_str(), nullptr);
 
   if (!header)
   {
     mitkThrow() << "File could not be read.";
   }
 
-  header = mitkIpPicGetTags(const_cast<char *>(fileName.c_str()), header);
+  header = mitkIpPicGetTags(fileName.c_str(), header);
 
   int channels = 1;
 
   mitkIpPicTSV_t *tsv;
-  if ((tsv = mitkIpPicQueryTag(header, "SOURCE HEADER")) != NULL)
+  if ((tsv = mitkIpPicQueryTag(header, "SOURCE HEADER")) != nullptr)
   {
     if (tsv->n[0] > 1e+06)
     {
@@ -75,19 +174,19 @@ mitk::Image::Pointer mitk::PicFileReader::CreateImage()
       mitkIpPicFreeTag(tsvSH);
     }
   }
-  if ((tsv = mitkIpPicQueryTag(header, "ICON80x80")) != NULL)
+  if ((tsv = mitkIpPicQueryTag(header, "ICON80x80")) != nullptr)
   {
     mitkIpPicTSV_t *tsvSH;
     tsvSH = mitkIpPicDelTag(header, "ICON80x80");
     mitkIpPicFreeTag(tsvSH);
   }
-  if ((tsv = mitkIpPicQueryTag(header, "VELOCITY")) != NULL)
+  if ((tsv = mitkIpPicQueryTag(header, "VELOCITY")) != nullptr)
   {
     ++channels;
     mitkIpPicDelTag(header, "VELOCITY");
   }
 
-  if (header == NULL || header->bpe == 0)
+  if (header == nullptr || header->bpe == 0)
   {
     mitkThrow() << " Could not read file " << fileName;
   }
@@ -128,7 +227,7 @@ void mitk::PicFileReader::ConvertHandedness(mitkIpPicDescriptor *pic)
   // left to right handed conversion
   if (pic->dim >= 3)
   {
-    mitkIpPicDescriptor *slice = mitkIpPicCopyHeader(pic, NULL);
+    mitkIpPicDescriptor *slice = mitkIpPicCopyHeader(pic, nullptr);
     slice->dim = 2;
     size_t size = _mitkIpPicSize(slice);
     slice->data = malloc(size);
@@ -138,8 +237,8 @@ void mitk::PicFileReader::ConvertHandedness(mitkIpPicDescriptor *pic)
 
     for (v = 0; v < volumes; ++v)
     {
-      unsigned char *p_first = (unsigned char *)pic->data;
-      unsigned char *p_last = (unsigned char *)pic->data;
+      auto *p_first = (unsigned char *)pic->data;
+      auto *p_last = (unsigned char *)pic->data;
       p_first += v * volume_size;
       p_last += size * (pic->n[2] - 1) + v * volume_size;
 
@@ -164,12 +263,12 @@ void mitk::PicFileReader::FillImage(Image::Pointer output)
 {
   mitkIpPicDescriptor *outputPic = mitkIpPicNew();
   outputPic = CastToIpPicDescriptor(output, nullptr, outputPic);
-  mitkIpPicDescriptor *pic = mitkIpPicGet(const_cast<char *>(this->GetLocalFileName().c_str()), outputPic);
+  mitkIpPicDescriptor *pic = mitkIpPicGet(this->GetLocalFileName().c_str(), outputPic);
   // comes upside-down (in MITK coordinates) from PIC file
   ConvertHandedness(pic);
 
   mitkIpPicTSV_t *tsv;
-  if ((tsv = mitkIpPicQueryTag(pic, "SOURCE HEADER")) != NULL)
+  if ((tsv = mitkIpPicQueryTag(pic, "SOURCE HEADER")) != nullptr)
   {
     if (tsv->n[0] > 1e+06)
     {
@@ -178,19 +277,19 @@ void mitk::PicFileReader::FillImage(Image::Pointer output)
       mitkIpPicFreeTag(tsvSH);
     }
   }
-  if ((tsv = mitkIpPicQueryTag(pic, "ICON80x80")) != NULL)
+  if ((tsv = mitkIpPicQueryTag(pic, "ICON80x80")) != nullptr)
   {
     mitkIpPicTSV_t *tsvSH;
     tsvSH = mitkIpPicDelTag(pic, "ICON80x80");
     mitkIpPicFreeTag(tsvSH);
   }
-  if ((tsv = mitkIpPicQueryTag(pic, "VELOCITY")) != NULL)
+  if ((tsv = mitkIpPicQueryTag(pic, "VELOCITY")) != nullptr)
   {
-    mitkIpPicDescriptor *header = mitkIpPicCopyHeader(pic, NULL);
+    mitkIpPicDescriptor *header = mitkIpPicCopyHeader(pic, nullptr);
     header->data = tsv->value;
     ConvertHandedness(header);
     output->SetChannel(header->data, 1);
-    header->data = NULL;
+    header->data = nullptr;
     mitkIpPicFree(header);
     mitkIpPicDelTag(pic, "VELOCITY");
   }

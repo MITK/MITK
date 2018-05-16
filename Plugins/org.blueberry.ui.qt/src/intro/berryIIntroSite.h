@@ -36,7 +36,7 @@ struct BERRY_UI_QT IIntroSite : public IWorkbenchSite
 
   berryObjectMacro(berry::IIntroSite)
 
-  ~IIntroSite();
+  ~IIntroSite() override;
 
   /**
    * Returns the part registry extension id for this intro site's part.

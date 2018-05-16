@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryQCTabBar.h"
 
 #include <internal/berryQtControlWidget.h>
-#include <internal/berryWorkbenchPlugin.h>
+#include <berryWorkbenchPlugin.h>
 
 #include <berryIQtStyleManager.h>
 #include <berryShell.h>
@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QFrame>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QKeyEvent>
 
 namespace berry
@@ -65,42 +64,26 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
   viewForm = new QtControlWidget(parent, nullptr);
   viewForm->setObjectName("ViewForm");
   viewForm->installEventFilter(this);
-  auto   layout = new QVBoxLayout(viewForm);
+  auto   layout = new QVBoxLayout;
   layout->setContentsMargins(0,0,0,0);
   layout->setSpacing(0);
   viewForm->setLayout(layout);
 
   connect(viewForm, SIGNAL(destroyed(QObject*)), this, SLOT(ViewFormDestroyed(QObject*)));
 
-  auto   topControls = new QWidget(viewForm);
-  topControls->setMinimumSize(0, 24);
-  topControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  layout->addWidget(topControls);
-  auto   topLayout = new QHBoxLayout(topControls);
-  topLayout->setContentsMargins(0, 0, 0, 0);
-  topLayout->setSpacing(0);
-
-  tabControl = new QCTabBar(topControls);
+  tabControl = new QCTabBar;
   tabControl->installEventFilter(this);
-  tabControl->setMinimumSize(0, 25);
-  tabControl->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  topLayout->addWidget(tabControl);
-
-  auto   topRightControls = new QFrame(topControls);
-  topRightControls->setObjectName("TabTopRightControls");
-  topRightControls->setMinimumSize(6, 25);
-  topRightControls->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  topLayout->addWidget(topRightControls);
+  tabControl->setMinimumSize(0, 27);
+  tabControl->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+  layout->addWidget(tabControl);
 
   contentFrame = new QFrame(viewForm);
   contentFrame->setObjectName("ViewFormContentFrame");
   contentFrame->installEventFilter(this);
   contentFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  auto   contentFrameLayout = new QVBoxLayout(contentFrame);
-  contentFrameLayout->setContentsMargins(0,0,0,0);
+  auto contentFrameLayout = new QVBoxLayout(contentFrame);
+  contentFrameLayout->setContentsMargins(0, 0, 0, 0);
   contentFrameLayout->setSpacing(0);
-  //contentFrame->setLayout(layout);
-
   layout->addWidget(contentFrame);
 
   this->connect(tabControl, SIGNAL(currentChanged(int)), this,
@@ -108,33 +91,6 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
 
   this->connect(tabControl, SIGNAL(dragStarted(const QPoint&)), this,
       SLOT(DragStarted(const QPoint&)));
-
-
-  //std::cout << "Created: viewForm <-- " << qPrintable(parent->objectName());
-  //for (parent = parent->parentWidget(); parent != 0; parent = parent->parentWidget())
-  //  std::cout << " <-- " << qPrintable(parent->objectName());
-  //std::cout << std::endl;
-
-  //parent = viewForm;
-  //std::cout << "Created control: QCTabBar <-- " << qPrintable(parent->objectName());
-  //for (parent = parent->parentWidget(); parent != 0; parent = parent->parentWidget())
-  //  std::cout << " <-- " << qPrintable(parent->objectName());
-  //std::cout << std::endl;
-
-  //attachListeners(control, false);
-
-  //        viewForm = new ViewForm(control, SWT.FLAT);
-  //        attachListeners(viewForm, false);
-  //        systemToolbar = new StandardSystemToolbar(viewForm, true, false, true, true, true);
-  //        systemToolbar.addListener(systemToolbarListener);
-  //        viewForm.setTopRight(systemToolbar.getControl());
-  //
-  //        topCenter = new ProxyControl(viewForm);
-  //        topCenterCache = new SizeCache();
-  //
-  //        title = new CLabel(viewForm, SWT.LEFT);
-  //        attachListeners(title, false);
-  //        viewForm.setTopLeft(title);
 
   ctkServiceReference serviceRef = WorkbenchPlugin::GetDefault()->GetPluginContext()->getServiceReference<IQtStyleManager>();
   if (serviceRef)
@@ -168,19 +124,17 @@ bool NativeTabFolder::eventFilter(QObject* watched, QEvent* event)
   return QObject::eventFilter(watched, event);
 }
 
-void NativeTabFolder::UpdateColors()
-{
-  QString tabStyle = this->GetActive() == 1 ? skinManager->GetActiveTabStylesheet() : skinManager->GetTabStylesheet();
-
-  //tabControl->setStyleSheet(tabSkin);
-  //contentFrame->setStyleSheet(tabSkin);
-  viewForm->setStyleSheet(tabStyle);
-}
-
 void NativeTabFolder::SetActive(int activeState)
 {
   AbstractTabFolder::SetActive(activeState);
   this->UpdateColors();
+}
+
+void NativeTabFolder::UpdateColors()
+{
+  viewForm->setStyleSheet(1 == this->GetActive()
+    ? skinManager->GetActiveTabStylesheet()
+    : skinManager->GetTabStylesheet());
 }
 
 void NativeTabFolder::CloseButtonClicked(AbstractTabItem* item)
@@ -209,34 +163,16 @@ void NativeTabFolder::Move(int from, int to)
 void NativeTabFolder::Layout(bool flushCache)
 {
   AbstractTabFolder::Layout(flushCache);
-
-//  QRect rect1 = tabControl->geometry();
-//  QRect rect2 = viewForm->geometry();
-//  std::cout << "QCTabBar geometry is: x=" << rect1.x() << ", y=" << rect1.y() << ", width=" << rect1.width() << ", height=" << rect1.height() << std::endl;
-//  std::cout << "ViewForm geometry is: " << rect2.x() << ", y=" << rect2.y() << ", width=" << rect2.width() << ", height=" << rect2.height() << std::endl;
-
-//  Rectangle oldBounds = viewForm.getBounds();
-//  Rectangle newBounds = control.getClientArea();
-//
-//  viewForm.setBounds(newBounds);
-//
-//  if (Util.equals(oldBounds, newBounds))
-//  {
-//    viewForm.layout(flushCache);
-//  }
 }
 
 QPoint NativeTabFolder::GetPaneMenuLocation()
 {
   return AbstractTabFolder::GetPaneMenuLocation();
-  //return systemToolbar.getPaneMenuLocation();
 }
 
 void NativeTabFolder::SetState(int state)
 {
   AbstractTabFolder::SetState(state);
-
-  //systemToolbar.setState(state);
 }
 
 QRect NativeTabFolder::GetClientArea()
@@ -264,32 +200,13 @@ void NativeTabFolder::SetSelection(AbstractTabItem* toSelect)
   tabControl->setCurrentTab(toSelect);
 }
 
-void NativeTabFolder::SetSelectedInfo(const PartInfo&  /*info*/)
+void NativeTabFolder::SetSelectedInfo(const PartInfo&)
 {
-//  if (!Util.equals(title.getText(), info.title))
-//  {
-//    title.setText(info.title);
-//  }
-//  if (title.getImage() != info.image)
-//  {
-//    title.setImage(info.image);
-//  }
 }
 
 QRect NativeTabFolder::GetTabArea()
 {
-
   return tabControl->geometry();
-
-//  Rectangle bounds = control.getBounds();
-//
-//  Rectangle clientArea = control.getClientArea();
-//
-//  bounds.x = 0;
-//  bounds.y = 0;
-//  Geometry.expand(bounds, 0, 0, -(clientArea.height + clientArea.y), 0);
-//
-//  return Geometry.toDisplay(control.getParent(), bounds);
 }
 
 QWidget* NativeTabFolder::GetControl()
@@ -297,13 +214,8 @@ QWidget* NativeTabFolder::GetControl()
   return viewForm;
 }
 
-bool NativeTabFolder::IsOnBorder(const QPoint&  /*globalPos*/)
+bool NativeTabFolder::IsOnBorder(const QPoint& )
 {
-//  Point localPos = getControl().toControl(globalPos);
-//
-//  Rectangle clientArea = getClientArea();
-//  return localPos.y > clientArea.y && localPos.y < clientArea.y
-//      + clientArea.height;
   return false;
 }
 
@@ -319,7 +231,6 @@ QWidget* NativeTabFolder::GetContentParent()
 
 void NativeTabFolder::SetContent(QWidget* newContent)
 {
-  //viewForm.setContent(newContent);
   if (content != nullptr)
   {
     contentFrame->layout()->removeWidget(content);
@@ -327,7 +238,6 @@ void NativeTabFolder::SetContent(QWidget* newContent)
   }
   content = newContent;
   content->installEventFilter(this);
-  //((QBoxLayout*)contentFrame->layout())->addWidget(content, 1);
   contentFrame->layout()->addWidget(content);
 }
 
@@ -336,14 +246,12 @@ QCTabBar* NativeTabFolder::GetTabFolder()
   return tabControl;
 }
 
-void NativeTabFolder::SetSelectedTitle(const QString&  /*newTitle*/)
+void NativeTabFolder::SetSelectedTitle(const QString&)
 {
-  //title.setText(newTitle);
 }
 
-void NativeTabFolder::SetSelectedImage(const QPixmap*  /*image*/)
+void NativeTabFolder::SetSelectedImage(const QPixmap*)
 {
-  //title.setImage(image);
 }
 
 AbstractTabItem* NativeTabFolder::GetItem(const QPoint& toFind)
@@ -355,9 +263,8 @@ AbstractTabItem* NativeTabFolder::GetItem(const QPoint& toFind)
   return tabControl->getTab(index);
 }
 
-void NativeTabFolder::EnablePaneMenu(bool  /*enabled*/)
+void NativeTabFolder::EnablePaneMenu(bool)
 {
-  //systemToolbar.enablePaneMenu(enabled);
 }
 
 }

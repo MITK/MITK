@@ -66,7 +66,7 @@ namespace mitk
     typedef BaseProperty SuperClass;
     typedef itk::SmartPointer<Self> Pointer;
     typedef itk::SmartPointer<const Self> ConstPointer;
-    virtual std::vector<std::string> GetClassHierarchy() const override { return mitk::GetClassHierarchy<Self>(); }
+    std::vector<std::string> GetClassHierarchy() const override { return mitk::GetClassHierarchy<Self>(); }
     /// This function must return different
     /// strings in function of the template parameter!
     /// Serialization depends on this feature.
@@ -77,7 +77,7 @@ namespace mitk
       return nameOfClass.c_str();
     }
 
-    virtual const char *GetNameOfClass() const override { return this->GetStaticNameOfClass(); }
+    const char *GetNameOfClass() const override { return this->GetStaticNameOfClass(); }
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self)
 
@@ -89,7 +89,7 @@ namespace mitk
       /// elements really appear in the string.
       /// Missing central elements are indicated by
       /// an ellipsis ("...")
-      virtual std::string GetValueAsString() const override;
+      std::string GetValueAsString() const override;
 
     /// returns a const reference to the contained vector
     virtual const VectorType &GetValue() const;
@@ -102,13 +102,13 @@ namespace mitk
     VectorProperty &operator=(const Self &);
 
     /// creates a copy of it self
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
 
     /// compares two properties.
-    virtual bool IsEqual(const BaseProperty &an_other_property) const override;
+    bool IsEqual(const BaseProperty &an_other_property) const override;
 
     /// assigns the content of an_other_property to this
-    virtual bool Assign(const BaseProperty &an_other_property) override;
+    bool Assign(const BaseProperty &an_other_property) override;
 
     /// property content
     VectorType m_PropertyContent;

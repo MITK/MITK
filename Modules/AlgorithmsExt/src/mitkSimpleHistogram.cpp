@@ -29,7 +29,7 @@ namespace mitk
     // check if input is valid
     if (src == nullptr)
       return;
-    Image *source = dynamic_cast<Image *>(src);
+    auto *source = dynamic_cast<Image *>(src);
     if (source == nullptr)
       return;
     else if (source->IsEmpty())
@@ -104,70 +104,70 @@ namespace mitk
         {
           case 0:
           {
-            unsigned char *t = (unsigned char *)src;
+            auto *t = (unsigned char *)src;
             value = *t++;
             src = (void *)t;
           }
           break;
           case 1:
           {
-            signed char *t = (signed char *)src;
+            auto *t = (signed char *)src;
             value = *t++;
             src = (void *)t;
           }
           break;
           case 2:
           {
-            unsigned short *t = (unsigned short *)src;
+            auto *t = (unsigned short *)src;
             value = *t++;
             src = (void *)t;
           }
           break;
           case 3:
           {
-            signed short *t = (signed short *)src;
+            auto *t = (signed short *)src;
             value = *t++;
             src = (void *)t;
           }
           break;
           case 4:
           {
-            signed int *t = (signed int *)src;
+            auto *t = (signed int *)src;
             value = *t++;
             src = (void *)t;
           }
           break;
           case 5:
           {
-            unsigned int *t = (unsigned int *)src;
+            auto *t = (unsigned int *)src;
             value = *t++;
             src = (void *)t;
           }
           break;
           case 6:
           {
-            signed long *t = (signed long *)src;
+            auto *t = (signed long *)src;
             value = *t++;
             src = (void *)t;
           }
           break;
           case 7:
           {
-            unsigned long *t = (unsigned long *)src;
+            auto *t = (unsigned long *)src;
             value = *t++;
             src = (void *)t;
           }
           break;
           case 8:
           {
-            float *t = (float *)src;
+            auto *t = (float *)src;
             value = *t++;
             src = (void *)t;
           }
           break;
           case 9:
           {
-            double *t = (double *)src;
+            auto *t = (double *)src;
             value = *t++;
             src = (void *)t;
           }
@@ -262,7 +262,7 @@ namespace mitk
     for (auto iter = cache.begin(); iter != cache.end(); iter++)
     {
       Element *e = *iter;
-      BaseData *p_tmp = e->baseData.GetPointer();
+      BaseData *p_tmp = e->baseData.Lock();
 
       if (p_tmp == p_BaseData)
       {

@@ -68,9 +68,9 @@ namespace itk
 
   protected:
     ImageToPathFilter();
-    ~ImageToPathFilter();
+    ~ImageToPathFilter() override;
 
-    virtual void PrintSelf(std::ostream &os, Indent indent) const;
+    void PrintSelf(std::ostream &os, Indent indent) const override;
 
   private:
     ImageToPathFilter(const Self &); // purposely not implemented

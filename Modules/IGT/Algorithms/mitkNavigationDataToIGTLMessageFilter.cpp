@@ -29,7 +29,6 @@ mitk::NavigationDataToIGTLMessageFilter::NavigationDataToIGTLMessageFilter()
   mitk::IGTLMessage::Pointer output = mitk::IGTLMessage::New();
   this->SetNumberOfRequiredOutputs(1);
   this->SetNthOutput(0, output.GetPointer());
-
   this->SetNumberOfRequiredInputs(1);
 
   //  m_OperationMode = Mode3D;
@@ -61,13 +60,6 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateData()
   default:
     break;
   }
-  igtl::MessageBase::Pointer curMessage = this->GetOutput()->GetMessage();
-  if (dynamic_cast<igtl::TrackingDataMessage*>(curMessage.GetPointer()) != nullptr)
-  {
-    igtl::TrackingDataMessage* tdMsg =
-      (igtl::TrackingDataMessage*)(curMessage.GetPointer());
-  }
-
 }
 
 void mitk::NavigationDataToIGTLMessageFilter::SetInput(const NavigationData* nd)
@@ -87,14 +79,14 @@ void mitk::NavigationDataToIGTLMessageFilter::SetInput(unsigned int idx, const N
 const mitk::NavigationData* mitk::NavigationDataToIGTLMessageFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const NavigationData*>(this->ProcessObject::GetInput(0));
 }
 
 const mitk::NavigationData* mitk::NavigationDataToIGTLMessageFilter::GetInput(unsigned int idx)
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const NavigationData*>(this->ProcessObject::GetInput(idx));
 }
 
@@ -104,24 +96,24 @@ void mitk::NavigationDataToIGTLMessageFilter::CreateOutputsForAllInputs()
   {
   case ModeSendQTDataMsg:
     // create one message output for all navigation data inputs
-    this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());
+    this->SetNumberOfIndexedOutputs(1);
     // set the type for this filter
     this->SetType("QTDATA");
     break;
   case ModeSendTDataMsg:
     // create one message output for all navigation data inputs
-    this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());
+    this->SetNumberOfIndexedOutputs(1);
     // set the type for this filter
     this->SetType("TDATA");
     break;
   case ModeSendQTransMsg:
     // create one message output for all navigation data input together
-    this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());
+    this->SetNumberOfIndexedOutputs(1);
     // set the type for this filter
     this->SetType("POSITION");
     break;
   case ModeSendTransMsg:
-    // create one message output for all navigation data input together
+    // create one message output for each navigation data input
     this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());
     // set the type for this filter
     this->SetType("TRANS");
@@ -132,7 +124,7 @@ void mitk::NavigationDataToIGTLMessageFilter::CreateOutputsForAllInputs()
 
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
   {
-    if (this->GetOutput(idx) == NULL)
+    if (this->GetOutput(idx) == nullptr)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);
       this->SetNthOutput(idx, newOutput);
@@ -165,7 +157,7 @@ void ConvertAffineTransformationIntoIGTLMatrix(mitk::AffineTransform3D* trans,
 void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTransMsg()
 {
   // for each output message
-  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs(); ++i)
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedInputs(); ++i)
   {
     mitk::IGTLMessage* output = this->GetOutput(i);
     assert(output);
@@ -183,8 +175,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTransMsg()
     igtl::PositionMessage::Pointer posMsg = igtl::PositionMessage::New();
     posMsg->SetPosition(pos[0], pos[1], pos[2]);
     posMsg->SetQuaternion(ori[0], ori[1], ori[2], ori[3]);
-    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
-    timestamp->SetTime(input->GetTimeStamp().GetMTime() / 1000, input->GetTimeStamp().GetMTime() % 1000);
+    igtl::TimeStamp::Pointer timestamp = ConvertToIGTLTimeStamp(input->GetIGTTimeStamp());
     posMsg->SetTimeStamp(timestamp);
     posMsg->SetDeviceName(input->GetName());
     posMsg->Pack();
@@ -197,7 +188,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTransMsg()
 void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTransMsg()
 {
   // for each output message
-  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs(); ++i)
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedInputs(); ++i)
   {
     mitk::IGTLMessage* output = this->GetOutput(i);
     assert(output);
@@ -219,8 +210,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTransMsg()
     igtl::TransformMessage::Pointer transMsg = igtl::TransformMessage::New();
     transMsg->SetMatrix(igtlTransform);
     transMsg->SetPosition(position[0], position[1], position[2]);
-    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
-    timestamp->SetTime(input->GetTimeStamp().GetMTime() / 1000, input->GetTimeStamp().GetMTime() % 1000);
+    igtl::TimeStamp::Pointer timestamp = ConvertToIGTLTimeStamp(input->GetIGTTimeStamp());
     transMsg->SetTimeStamp(timestamp);
     transMsg->SetDeviceName(input->GetName());
     transMsg->Pack();
@@ -228,6 +218,12 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTransMsg()
     //add the igtl message to the mitk::IGTLMessage
     output->SetMessage(transMsg.GetPointer());
   }
+}
+igtl::TimeStamp::Pointer mitk::NavigationDataToIGTLMessageFilter::ConvertToIGTLTimeStamp(double IGTTimeStamp)
+{
+  igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+  timestamp->SetTime(IGTTimeStamp / 1000, (int)(IGTTimeStamp) % 1000);
+  return timestamp;
 }
 
 void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTDataMsg()
@@ -261,11 +257,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTDataMsg()
     //insert this element into the tracking data message
     qtdMsg->AddQuaternionTrackingDataElement(tde);
 
-    //copy the time stamp
-    //todo find a better way to do that
-    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
-    timestamp->SetTime(nd->GetTimeStamp().GetMTime() / 1000, nd->GetTimeStamp().GetMTime() % 1000);
-    MITK_INFO << timestamp;
+    MITK_INFO << ConvertToIGTLTimeStamp(nd->GetIGTTimeStamp());
   }
   qtdMsg->Pack();
 
@@ -275,78 +267,49 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTDataMsg()
 
 void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTDataMsg()
 {
-  bool isValidData = true;
-  mitk::IGTLMessage* output = this->GetOutput();
+  igtl::TrackingDataMessage::Pointer tdMsg = igtl::TrackingDataMessage::New();
+  mitk::IGTLMessage* output = this->GetOutput(0);
   assert(output);
 
-  //create a output igtl message
-  igtl::TrackingDataMessage::Pointer tdMsg = igtl::TrackingDataMessage::New();
-
-  mitk::AffineTransform3D::Pointer transform;
-  Vector3D position;
-  igtl::Matrix4x4 igtlTransform;
-  vnl_matrix_fixed<ScalarType, 3, 3> rotationMatrix;
-  vnl_matrix_fixed<ScalarType, 3, 3> rotationMatrixTransposed;
-
-  for (unsigned int index = 0; index < this->GetNumberOfIndexedInputs(); index++)
+  // for each output message
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedInputs(); ++i)
   {
-    const mitk::NavigationData* nd = GetInput(index);
-    assert(nd);
-
-    //create a new tracking element
-    igtl::TrackingDataElement::Pointer tde = igtl::TrackingDataElement::New();
+    const mitk::NavigationData* input = this->GetInput(i);
+    assert(input);
+    // do not add navigation data to message if input is invalid
+    if (input->IsDataValid() == false)
+      continue;
 
     //get the navigation data components
-    transform = nd->GetAffineTransform3D();
-    position = transform->GetOffset();
-
-    //check the rotation matrix
-    rotationMatrix = transform->GetMatrix().GetVnlMatrix();
-    rotationMatrixTransposed = rotationMatrix.transpose();
-    // a quadratic matrix is a rotation matrix exactly when determinant is 1
-    // and transposed is inverse
-    if (!Equal(1.0, vnl_det(rotationMatrix), 0.1)
-      || !((rotationMatrix*rotationMatrixTransposed).is_identity(0.1)))
-    {
-      //the rotation matrix is not valid! => invalidate the current element
-      isValidData = false;
-    }
+    mitk::AffineTransform3D::Pointer transform = input->GetAffineTransform3D();
+    mitk::NavigationData::PositionType position = transform->GetOffset();
 
     //convert the transform into a igtl type
+    igtl::Matrix4x4 igtlTransform;
     ConvertAffineTransformationIntoIGTLMatrix(transform, igtlTransform);
 
-    //fill the tracking element with life
+    //insert this information into the message
+    igtl::TrackingDataElement::Pointer tde = igtl::TrackingDataElement::New();
     tde->SetMatrix(igtlTransform);
     tde->SetPosition(position[0], position[1], position[2]);
-    std::stringstream name;
-    name << nd->GetName();
-    if (name.rdbuf()->in_avail() == 0)
-    {
-      name << "TrackingTool" << index;
-    }
-    tde->SetName(name.str().c_str());
-
-    //insert this element into the tracking data message
+    tde->SetName(input->GetName());
+    tde->SetType(igtl::TrackingDataElement::TYPE_6D);
     tdMsg->AddTrackingDataElement(tde);
-
-    //copy the time stamp
-    //todo find a better way to do that
-    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
-    timestamp->SetTime(nd->GetTimeStamp().GetMTime() / 1000, nd->GetTimeStamp().GetMTime() % 1000);
-    tdMsg->SetTimeStamp(timestamp);
-
   }
+
+  //use time stamp from first input
+  igtl::TimeStamp::Pointer timestamp = ConvertToIGTLTimeStamp(this->GetInput(0)->GetIGTTimeStamp());
+  tdMsg->SetTimeStamp(timestamp);
+  //tdMsg->SetDeviceName("MITK OpenIGTLink Connection");
   tdMsg->Pack();
-  //add the igtl message to the mitk::IGTLMessage
+  tdMsg->SetDeviceName("MITK OpenIGTLink Source");
   output->SetMessage(tdMsg.GetPointer());
-  output->SetDataValid(isValidData);
 }
 
 void mitk::NavigationDataToIGTLMessageFilter::SetOperationMode(OperationMode mode)
 {
   m_OperationMode = mode;
   this->Modified();
-  this->CreateOutputsForAllInputs();
 }
 
 void mitk::NavigationDataToIGTLMessageFilter::ConnectTo(

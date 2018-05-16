@@ -45,15 +45,15 @@ namespace mitk
     itkSetMacro(ChannelNr, int);
 
   protected:
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
-    virtual void GenerateInputRequestedRegion() override;
+    void GenerateInputRequestedRegion() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     ImageSliceSelector();
 
-    virtual ~ImageSliceSelector();
+    ~ImageSliceSelector() override;
 
     int m_SliceNr;
 

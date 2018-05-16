@@ -53,16 +53,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QClipboard>
 #include <QDateTime>
 #include <QDialog>
-#include <QDialogButtonBox>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileDialog>
 #include <QInputDialog>
-#include <QLayoutItem>
 #include <QMenu>
 #include <QMessageBox>
 #include <QTimer>
-#include <QFileInfo>
 #include <QFileInfoList>
 
 #include <QmitkPreferencesDialog.h>
@@ -219,25 +216,13 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
 
   m_ContextMenu = new QMenu(m_Controls.treeView);
 
-  connect(m_Controls.treeView, SIGNAL(clicked(const QModelIndex&)), SLOT(itemSelected(const QModelIndex&)));
+  connect(m_Controls.treeView, SIGNAL(clicked(const QModelIndex&)), SLOT(ItemSelected(const QModelIndex&)));
   connect(m_Controls.treeView, SIGNAL(customContextMenuRequested(const QPoint&)),
           this, SLOT(OnContextMenuRequested(const QPoint&)));
   connect(m_Tracker, SIGNAL(AboutToBeClosed(ctkXnatSession*)), this, SLOT(CleanTreeModel(ctkXnatSession*)));
   connect(m_Tracker, SIGNAL(Opened(ctkXnatSession*)), this, SLOT(UpdateSession(ctkXnatSession*)));
 
   m_Tracker->Open();
-
-  ctkXnatSession* session;
-
-  try
-  {
-    session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
-          mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
-  }
-  catch (std::invalid_argument)
-  {
-    session = 0;
-  }
 
   connect(m_Controls.treeView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(OnActivatedNode(const QModelIndex&)));
   connect(m_Controls.treeView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(OnXnatNodeSelected(const QModelIndex&)));
@@ -247,7 +232,7 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.btnXnatUpload, SIGNAL(clicked()), this, SLOT(OnUploadFromDataStorage()));
   connect(m_Controls.btnXnatDownload, SIGNAL(clicked()), this, SLOT(OnDownloadSelectedXnatFile()));
   connect(m_Controls.btnCreateXnatFolder, SIGNAL(clicked()), this, SLOT(OnCreateResourceFolder()));
-  connect(m_Controls.searchField, SIGNAL(textChanged(const QString&)), this, SLOT(search(const QString&)));
+  connect(m_Controls.searchField, SIGNAL(textChanged(const QString&)), this, SLOT(Search(const QString&)));
 }
 
 void QmitkXnatTreeBrowserView::OnCreateResourceFolder()
@@ -264,7 +249,7 @@ void QmitkXnatTreeBrowserView::OnCreateResourceFolder()
 }
 
 
-void QmitkXnatTreeBrowserView::search(const QString &toSearch)
+void QmitkXnatTreeBrowserView::Search(const QString &toSearch)
 {
   if(m_AlreadyInSearch)
     return;
@@ -432,8 +417,8 @@ void QmitkXnatTreeBrowserView::UpdateSession(ctkXnatSession* session)
     m_Controls.treeView->reset();
 
     connect(session, SIGNAL(progress(QUuid,double)), this, SLOT(OnProgress(QUuid,double)));
-    connect(session, SIGNAL(timedOut()), this, SLOT(sessionTimedOutMsg()));
-    connect(session, SIGNAL(aboutToTimeOut()), this, SLOT(sessionTimesOutSoonMsg()));
+    connect(session, SIGNAL(timedOut()), this, SLOT(SessionTimedOutMsg()));
+    connect(session, SIGNAL(aboutToTimeOut()), this, SLOT(SessionTimesOutSoonMsg()));
   }
 }
 
@@ -527,7 +512,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
             {
               this->InternalDICOMDownload(obj, downloadPath);
             }
-            catch(ctkRuntimeException exc)
+            catch(const ctkRuntimeException& exc)
             {
               QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
               return;
@@ -586,7 +571,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
             {
               this->InternalDICOMDownload(parent, downloadPath);
             }
-            catch(ctkRuntimeException exc)
+            catch(const ctkRuntimeException& exc)
             {
               QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
               return;
@@ -663,7 +648,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
       {
         this->InternalOpenFiles(fileList, xnatURL);
       }
-      catch(ctkRuntimeException exc)
+      catch(const ctkRuntimeException& exc)
       {
         QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
         return;
@@ -797,7 +782,7 @@ ctkXnatResource* QmitkXnatTreeBrowserView::InternalAddResourceFolder(ctkXnatObje
     {
       return parent->addResourceFolder(folderName);
     }
-    catch(ctkRuntimeException exc)
+    catch(const ctkRuntimeException& exc)
     {
       QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
       return nullptr;
@@ -853,7 +838,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuUploadFile()
     {
       this->InternalFileUpload(file);
     }
-    catch(ctkRuntimeException exc)
+    catch(const ctkRuntimeException& exc)
     {
       QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
       return;
@@ -907,15 +892,15 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
 
   //2. Save files locally
   //3. Upload file
-  mitk::DataNode* node = NULL;
+  mitk::DataNode* node = nullptr;
   foreach (node, droppedNodes)
   {
     mitk::BaseData* data = node->GetData();
     if (!data)
       return;
 
-
-    QString fileName (QString::fromStdString(node->GetName()));
+    //We have to replace special characters due to XNAT inability to get along with them (" " is replaced by "%20", what leads to nasty behaviour!)
+    QString fileName(QString::fromStdString(ReplaceSpecialChars(node->GetName())));
 
     ctkXnatFile* xnatFile = new ctkXnatFile(resource);
 
@@ -963,7 +948,7 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     {
       this->InternalFileUpload(xnatFile);
     }
-    catch(ctkRuntimeException exc)
+    catch(const ctkRuntimeException& exc)
     {
       QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
       return;
@@ -994,7 +979,7 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
 
     //        fileInfo.setFile(origFile);
     //        if (!fileInfo.exists())
-    //          mitk::IOUtil::SaveSurface(surface, dir.path().toStdString());
+    //          mitk::IOUtil::Save(surface, dir.path().toStdString());
     //      }
     //    this->uploadFileToXnat(xnatFile, dir.path());
   }
@@ -1028,25 +1013,25 @@ void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
   ctkXnatObject* xnatObject = m_TreeModel->xnatObject(index);
 
   bool downloadable = false;
-  downloadable |= dynamic_cast<ctkXnatFile*>(xnatObject)!=NULL;
-  downloadable |= dynamic_cast<ctkXnatScan*>(xnatObject)!=NULL;
-  downloadable |= dynamic_cast<ctkXnatScanFolder*>(xnatObject)!=NULL;
-  downloadable |= dynamic_cast<ctkXnatAssessor*>(xnatObject)!=NULL;
-  downloadable |= dynamic_cast<ctkXnatAssessorFolder*>(xnatObject)!=NULL;
-  downloadable |= dynamic_cast<ctkXnatResource*>(xnatObject)!=NULL;
-  downloadable |= dynamic_cast<ctkXnatReconstruction*>(xnatObject)!=NULL;
-  downloadable |= dynamic_cast<ctkXnatReconstructionFolder*>(xnatObject)!=NULL;
+  downloadable |= dynamic_cast<ctkXnatFile*>(xnatObject)!=nullptr;
+  downloadable |= dynamic_cast<ctkXnatScan*>(xnatObject)!=nullptr;
+  downloadable |= dynamic_cast<ctkXnatScanFolder*>(xnatObject)!=nullptr;
+  downloadable |= dynamic_cast<ctkXnatAssessor*>(xnatObject)!=nullptr;
+  downloadable |= dynamic_cast<ctkXnatAssessorFolder*>(xnatObject)!=nullptr;
+  downloadable |= dynamic_cast<ctkXnatResource*>(xnatObject)!=nullptr;
+  downloadable |= dynamic_cast<ctkXnatReconstruction*>(xnatObject)!=nullptr;
+  downloadable |= dynamic_cast<ctkXnatReconstructionFolder*>(xnatObject)!=nullptr;
 
   bool canHaveResourceFolder = false;
-  canHaveResourceFolder |= dynamic_cast<ctkXnatProject*>(xnatObject) != NULL;
-  canHaveResourceFolder |=  dynamic_cast<ctkXnatSubject*>(xnatObject) != NULL;
-  canHaveResourceFolder |=  dynamic_cast<ctkXnatExperiment*>(xnatObject) != NULL;
-  canHaveResourceFolder |= dynamic_cast<ctkXnatResourceFolder*>(xnatObject) != NULL;
+  canHaveResourceFolder |= dynamic_cast<ctkXnatProject*>(xnatObject) != nullptr;
+  canHaveResourceFolder |=  dynamic_cast<ctkXnatSubject*>(xnatObject) != nullptr;
+  canHaveResourceFolder |=  dynamic_cast<ctkXnatExperiment*>(xnatObject) != nullptr;
+  canHaveResourceFolder |= dynamic_cast<ctkXnatResourceFolder*>(xnatObject) != nullptr;
 
   bool uploadFilePossible = false;
-  uploadFilePossible |= dynamic_cast<ctkXnatResource*>(xnatObject) != NULL;
-  uploadFilePossible |=  dynamic_cast<ctkXnatScan*>(xnatObject) != NULL;
-  uploadFilePossible |=  dynamic_cast<ctkXnatAssessor*>(xnatObject) != NULL;
+  uploadFilePossible |= dynamic_cast<ctkXnatResource*>(xnatObject) != nullptr;
+  uploadFilePossible |=  dynamic_cast<ctkXnatScan*>(xnatObject) != nullptr;
+  uploadFilePossible |=  dynamic_cast<ctkXnatAssessor*>(xnatObject) != nullptr;
 
   if (downloadable)
   {
@@ -1109,7 +1094,13 @@ void QmitkXnatTreeBrowserView::CleanUp()
   m_Controls.searchModeBox->setEnabled(false);
 }
 
-void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
+std::string QmitkXnatTreeBrowserView::ReplaceSpecialChars(const std::string& input) const
+{
+  QString convertedString = QString(QUrl::toPercentEncoding(QString::fromStdString(input)));
+  return  convertedString.toStdString();
+}
+
+void QmitkXnatTreeBrowserView::ItemSelected(const QModelIndex& index)
 {
   //TODO: CTK seems to ignore spaces while creating the http request. This will lead to corrupted http request that will fail.
   QVariant variant = m_TreeModel->data(index, Qt::UserRole);
@@ -1243,10 +1234,10 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewSubject()
       {
         subject->save();
       }
-      catch(ctkRuntimeException exc)
+      catch(const ctkRuntimeException& exc)
       {
         //TODO: Implement isValid-flag to check if ctkRuntimeExceptio is valid http-exception.
-        !QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
+        QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
         project->remove(subject);
         delete subject;
         return;
@@ -1282,7 +1273,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewExperiment()
       {
         experiment->save();
       }
-      catch(ctkRuntimeException exc)
+      catch(const ctkRuntimeException& exc)
       {
         QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
         subject->remove(experiment);
@@ -1308,7 +1299,7 @@ void QmitkXnatTreeBrowserView::SetStatusInformation(const QString& text)
   m_Controls.groupBox->show();
 }
 
-void QmitkXnatTreeBrowserView::sessionTimedOutMsg()
+void QmitkXnatTreeBrowserView::SessionTimedOutMsg()
 {
   ctkXnatSession* session = qobject_cast<ctkXnatSession*>(QObject::sender());
 
@@ -1327,7 +1318,7 @@ void QmitkXnatTreeBrowserView::sessionTimedOutMsg()
   CleanUp();
 }
 
-void QmitkXnatTreeBrowserView::sessionTimesOutSoonMsg()
+void QmitkXnatTreeBrowserView::SessionTimesOutSoonMsg()
 {
   ctkXnatSession* session = qobject_cast<ctkXnatSession*>(QObject::sender());
 

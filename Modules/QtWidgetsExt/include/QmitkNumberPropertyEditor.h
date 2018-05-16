@@ -35,7 +35,7 @@ public:
   QmitkNumberPropertyEditor(mitk::FloatProperty *, QWidget *parent);
   QmitkNumberPropertyEditor(mitk::DoubleProperty *, QWidget *parent);
 
-  virtual ~QmitkNumberPropertyEditor();
+  ~QmitkNumberPropertyEditor() override;
 
   short getDecimalPlaces() const;
   void setDecimalPlaces(short);
@@ -53,11 +53,11 @@ public:
 protected:
   void initialize();
 
-  virtual QString textFromValue(int) const override;
-  virtual int valueFromText(const QString &) const override;
+  QString textFromValue(int) const override;
+  int valueFromText(const QString &) const override;
 
-  virtual void PropertyChanged() override;
-  virtual void PropertyRemoved() override;
+  void PropertyChanged() override;
+  void PropertyRemoved() override;
 
   void DisplayNumber();
 

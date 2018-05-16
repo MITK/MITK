@@ -36,13 +36,13 @@ private:
    */
   struct DummyFactory : public mitk::AbstractToFDeviceFactory {
 
-    virtual std::string GetFactoryName() override{return "dummy factory";}
+    std::string GetFactoryName() override{return "dummy factory";}
 
-    virtual std::string GetDeviceNamePrefix() override{return "dummy device";}
+    std::string GetDeviceNamePrefix() override{return "dummy device";}
 
-    virtual std::string GetCurrentDeviceName() override{return "dummy device";}
+    std::string GetCurrentDeviceName() override{return "dummy device";}
 
-    virtual mitk::ToFCameraDevice::Pointer CreateToFCameraDevice() override {return NULL;}
+    mitk::ToFCameraDevice::Pointer CreateToFCameraDevice() override {return nullptr;}
 
     /**
      * @brief GetIntrinsics Public wrapper to test intrinsics

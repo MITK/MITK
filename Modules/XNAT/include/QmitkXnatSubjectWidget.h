@@ -39,7 +39,7 @@ public:
 
   QmitkXnatSubjectWidget(QWidget *parent = nullptr);
   QmitkXnatSubjectWidget(Mode mode, QWidget *parent = nullptr);
-  ~QmitkXnatSubjectWidget();
+  ~QmitkXnatSubjectWidget() override;
 
   void SetSubject(ctkXnatSubject *subject);
   ctkXnatSubject *GetSubject() const;

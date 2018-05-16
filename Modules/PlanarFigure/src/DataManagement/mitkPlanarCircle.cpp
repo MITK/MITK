@@ -179,7 +179,7 @@ bool mitk::PlanarCircle::SetCurrentControlPoint(const Point2D &point)
 
 bool mitk::PlanarCircle::Equals(const PlanarFigure &other) const
 {
-  const mitk::PlanarCircle *otherCircle = dynamic_cast<const mitk::PlanarCircle *>(&other);
+  const auto *otherCircle = dynamic_cast<const mitk::PlanarCircle *>(&other);
   if (otherCircle)
   {
     return Superclass::Equals(other);

@@ -60,7 +60,7 @@ void mitk::USNavigationLoggingBackend::WriteCSVFileWithNavigationMessages(std::s
   std::ofstream csvStream;
   csvStream.open(filename.c_str());
   if ( ! csvStream.is_open() ) {MITK_ERROR("USNavigationLoggingBackend") << "File '" << filename << "' cannot be opened for logging."; return;}
-  for (int i = 0; i < m_allNavigationMessages.size(); i++)
+  for (std::size_t i = 0; i < m_allNavigationMessages.size(); i++)
     {
     csvStream << m_allNavigationMessages.at(i) << "\n";
     }

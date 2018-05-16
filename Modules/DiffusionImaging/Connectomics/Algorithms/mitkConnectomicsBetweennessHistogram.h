@@ -21,7 +21,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include<mitkConnectomicsHistogramBase.h>
 
+
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4172)
+#endif
+
 #include <boost/graph/betweenness_centrality.hpp>
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 namespace mitk {
 
@@ -41,7 +51,7 @@ namespace mitk {
     };
 
     ConnectomicsBetweennessHistogram();
-    virtual ~ConnectomicsBetweennessHistogram();
+    ~ConnectomicsBetweennessHistogram() override;
 
     /** Set the calucaltion mode */
     void SetBetweennessCalculationMode( const BetweennessCalculationMode & );
@@ -57,7 +67,7 @@ namespace mitk {
     typedef std::vector< double > BCMapType;
 
     /** @brief Creates a new histogram from the network source. */
-    virtual void ComputeFromConnectomicsNetwork( ConnectomicsNetwork* source ) override;
+    void ComputeFromConnectomicsNetwork( ConnectomicsNetwork* source ) override;
 
     /** Calculate betweenness centrality ignoring the weight of the edges */
     void CalculateUnweightedUndirectedBetweennessCentrality( NetworkType*, IteratorType, IteratorType );

@@ -53,10 +53,10 @@ namespace mitk
     typedef OperationEndEvent Self;
     typedef itk::EndEvent Superclass;
     OperationEndEvent(Operation *operation = nullptr) : m_Operation(operation) {}
-    virtual ~OperationEndEvent() {}
-    virtual const char *GetEventName() const override { return "OperationEndEvent"; }
-    virtual bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
-    virtual ::itk::EventObject *MakeObject() const override { return new Self(m_Operation); }
+    ~OperationEndEvent() override {}
+    const char *GetEventName() const override { return "OperationEndEvent"; }
+    bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
+    ::itk::EventObject *MakeObject() const override { return new Self(m_Operation); }
     Operation *GetOperation() const { return m_Operation; }
   private:
     Operation *m_Operation;

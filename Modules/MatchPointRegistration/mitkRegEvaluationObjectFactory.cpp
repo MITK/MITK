@@ -30,8 +30,6 @@ mitk::RegEvaluationObjectFactory::RegEvaluationObjectFactory()
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    MITK_INFO << "RegEvaluationObjectFactory c'tor" << std::endl;
-
     alreadyDone = true;
   }
 
@@ -45,7 +43,7 @@ mitk::Mapper::Pointer
 mitk::RegEvaluationObjectFactory::
 CreateMapper(mitk::DataNode* node, MapperSlotId slotId)
 {
-    mitk::Mapper::Pointer newMapper = NULL;
+    mitk::Mapper::Pointer newMapper = nullptr;
 
     if ( slotId == mitk::BaseRenderer::Standard2D )
     {
@@ -60,7 +58,7 @@ CreateMapper(mitk::DataNode* node, MapperSlotId slotId)
     return newMapper;
 };
 
-void mitk::RegEvaluationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
+void mitk::RegEvaluationObjectFactory::SetDefaultProperties(mitk::DataNode*)
 {
 
 }

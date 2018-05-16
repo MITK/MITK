@@ -99,7 +99,7 @@ namespace mitk {
     /** Manually sets the initial marker pose which is used for computing the offset. By default this
      *  option is disabled and the current pose of the selected input is used to compute the offset.
      *  However, sometimes it is needed to give a defined marker pose, then this method can be used.
-     *  To disable the option you can set MarkerPosition to NULL.
+     *  To disable the option you can set MarkerPosition to nullptr.
      */
     itkSetMacro(InitialReferencePose,mitk::NavigationData::Pointer);
 
@@ -110,9 +110,9 @@ namespace mitk {
 
   protected:
     NodeDisplacementFilter();
-    virtual ~NodeDisplacementFilter();
+    ~NodeDisplacementFilter() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     /**
      * \brief Creates an Geometry 3D Object from an AffineTransformation.
@@ -136,7 +136,7 @@ namespace mitk {
     int m_SelectedInput;
 
     /**
-     * Reference pose of the selected input to compute the offset. If this is NULL the current pose of the selected input is used instead.
+     * Reference pose of the selected input to compute the offset. If this is nullptr the current pose of the selected input is used instead.
      */
     mitk::NavigationData::Pointer m_InitialReferencePose;
   };

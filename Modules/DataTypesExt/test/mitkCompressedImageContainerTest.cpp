@@ -90,8 +90,8 @@ public:
       mitk::ImageReadAccessor origImgAcc(image, image->GetVolumeData(timeStep));
       mitk::ImageReadAccessor unCompImgAcc(uncompressedImage, uncompressedImage->GetVolumeData(timeStep));
 
-      unsigned char *originalData((unsigned char *)origImgAcc.GetData());
-      unsigned char *uncompressedData((unsigned char *)unCompImgAcc.GetData());
+      auto *originalData((unsigned char *)origImgAcc.GetData());
+      auto *uncompressedData((unsigned char *)unCompImgAcc.GetData());
 
       unsigned long difference(0);
       for (unsigned long byte = 0; byte < oneTimeStepSizeInBytes; ++byte)
@@ -128,11 +128,11 @@ int mitkCompressedImageContainerTest(int argc, char *argv[])
 
   // load the image
 
-  mitk::Image::Pointer image = NULL;
+  mitk::Image::Pointer image = nullptr;
   try
   {
     std::cout << "Testing with parameter '" << argv[1] << "'" << std::endl;
-    image = mitk::IOUtil::LoadImage(argv[1]);
+    image = mitk::IOUtil::Load<mitk::Image>(argv[1]);
   }
   catch (const mitk::Exception &)
   {
@@ -169,7 +169,7 @@ int mitkCompressedImageContainerTest(int argc, char *argv[])
   std::cout << "Testing destruction" << std::endl;
 
   // freeing
-  container = NULL;
+  container = nullptr;
 
   std::cout << "  (II) Freeing works." << std::endl;
 

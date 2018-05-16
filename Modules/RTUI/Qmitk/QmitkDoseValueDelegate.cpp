@@ -30,7 +30,7 @@ void QmitkDoseValueDelegate::paint(QPainter *painter, const QStyleOptionViewItem
 {
   QVariant data = index.data(Qt::DisplayRole);
 
-  QStyleOptionViewItemV4 opt = option;
+  QStyleOptionViewItem opt = option;
   initStyleOption(&opt, index);
 
   QStyle *style = QApplication::style();

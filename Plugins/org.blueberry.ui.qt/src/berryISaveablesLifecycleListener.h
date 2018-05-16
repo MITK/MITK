@@ -63,7 +63,7 @@ struct ISaveablesLifecycleListener : public virtual Object
     typedef MessageDelegate1<ISaveablesLifecycleListener, const SaveablesLifecycleEvent::Pointer&> Delegate;
   };
 
-  virtual ~ISaveablesLifecycleListener();
+  ~ISaveablesLifecycleListener() override;
 
   /**
    * Handle the given event. This method must be called on the UI thread.

@@ -42,9 +42,9 @@ mitk::USTelemedImageSource::~USTelemedImageSource( )
   SAFE_RELEASE(m_DepthProperties);
 }
 
-void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
+void mitk::USTelemedImageSource::GetNextRawImage(std::vector<mitk::Image::Pointer>& imageVector)
 {
-  if ( image.IsNull() ) { image = mitk::Image::New(); }
+  if (imageVector.empty() ) { imageVector.push_back( mitk::Image::New()); }
 
   //get the actual resolution to check if it changed. We have to do this every time because the geometry takes a few frames to adapt
   Usgfw2Lib::tagImageResolution resolutionInMetersActual;
@@ -52,7 +52,7 @@ void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
   if (m_OldnXPelsPerUnit != resolutionInMetersActual.nXPelsPerUnit || m_OldnYPelsPerUnit != resolutionInMetersActual.nYPelsPerUnit)
     {
       //we can only update if the image exists and has a geometry
-      if (m_Image.IsNotNull() && m_Image->GetGeometry() != NULL)
+      if (m_Image.IsNotNull() && m_Image->GetGeometry() != nullptr)
      {
         m_OldnXPelsPerUnit = resolutionInMetersActual.nXPelsPerUnit;
         m_OldnYPelsPerUnit = resolutionInMetersActual.nYPelsPerUnit;
@@ -66,10 +66,10 @@ void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
     m_ImageMutex->Lock();
 
     // copy contents of the given image into the member variable
-    image->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
+    imageVector.at(0)->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
     mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(0,0,0));
-    image->SetSlice(inputReadAccessor.GetData());
-    image->SetGeometry(m_Image->GetGeometry());
+    imageVector.at(0)->SetSlice(inputReadAccessor.GetData());
+    imageVector.at(0)->SetGeometry(m_Image->GetGeometry());
 
     m_ImageMutex->Unlock();
   }
@@ -88,13 +88,13 @@ void mitk::USTelemedImageSource::UpdateImageGeometry()
   spacing[2] = 1;
 
   m_ImageMutex->Lock();
-  if(m_Image.IsNotNull() && (m_Image->GetGeometry()!=NULL))
+  if(m_Image.IsNotNull() && (m_Image->GetGeometry()!=nullptr))
     {
     m_Image->GetGeometry()->SetSpacing(spacing);
     m_Image->GetGeometry()->Modified();
     }
   else
-    {MITK_WARN << "image or geometry was NULL, can't adapt geometry";}
+    {MITK_WARN << "image or geometry was nullptr, can't adapt geometry";}
   m_ImageMutex->Unlock();
 
   MITK_DEBUG << "UpdateImageGeometry called!";
@@ -104,7 +104,7 @@ void mitk::USTelemedImageSource::UpdateImageGeometry()
 
 bool mitk::USTelemedImageSource::CreateAndConnectConverterPlugin(Usgfw2Lib::IUsgDataView* usgDataView, Usgfw2Lib::tagScanMode scanMode)
 {
-  IUnknown* tmp_obj = NULL;
+  IUnknown* tmp_obj = nullptr;
 
   // create control object from Telemed API
   mitk::telemed::CreateUsgControl( usgDataView, Usgfw2Lib::IID_IUsgScanConverterPlugin, scanMode, 0, (void**)&tmp_obj );

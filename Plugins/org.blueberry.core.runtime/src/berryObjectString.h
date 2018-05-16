@@ -36,7 +36,7 @@ public:
   ObjectString();
   ObjectString(const QString& s);
 
-  ~ObjectString();
+  ~ObjectString() override;
 
   bool operator==(const Object* other) const override;
 

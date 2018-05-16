@@ -83,7 +83,7 @@ namespace mitk
 
     /** \brief Clear the storage container.
     */
-    virtual void Clear() override;
+    void Clear() override;
 
     //////////////// inherit  from mitk::BaseData ////////////////////
 
@@ -98,7 +98,7 @@ namespace mitk
 
     The BoundingBox of the contour will be updated, if necessary.
     */
-    virtual void UpdateOutputInformation() override;
+    void UpdateOutputInformation() override;
 
     //////////////// END inherit  from mitk::BaseData ////////////////////
 
@@ -107,10 +107,10 @@ namespace mitk
 
     ContourModelSet();
     ContourModelSet(const mitk::ContourModelSet &other);
-    virtual ~ContourModelSet();
+    ~ContourModelSet() override;
 
     // inherit from BaseData. Initial state with no contours and a single timestep.
-    virtual void InitializeEmpty() override;
+    void InitializeEmpty() override;
 
     ContourModelListType m_Contours;
 

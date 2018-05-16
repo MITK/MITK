@@ -33,8 +33,8 @@ namespace mitk
     mitkClassMacroItkParent(mitk::ImageWriterFactory, itk::ObjectFactoryBase)
 
       /** Class methods used to interface with the registered factories. */
-      virtual const char *GetITKSourceVersion(void) const override;
-    virtual const char *GetDescription(void) const override;
+      const char *GetITKSourceVersion(void) const override;
+    const char *GetDescription(void) const override;
 
     /** Method for class instantiation. */
     itkFactorylessNewMacro(Self);
@@ -56,7 +56,7 @@ namespace mitk
 
   protected:
     ImageWriterFactory();
-    ~ImageWriterFactory();
+    ~ImageWriterFactory() override;
 
   private:
     ImageWriterFactory(const Self &); // purposely not implemented

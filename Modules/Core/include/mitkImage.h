@@ -154,11 +154,11 @@ namespace mitk
     /** @brief Get the pixel value at one specific world position.
 
     The pixel type is always being converted to double.
-     \deprecatedSince{2012_09} Please use image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method
-    can be replaced by a method from ImagePixelWriteAccessor or ImagePixelReadAccessor */
-    DEPRECATED(double GetPixelValueByWorldCoordinate(const mitk::Point3D &position,
+    Please consider using image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method
+    can be replaced by a templated method from ImagePixelWriteAccessor or ImagePixelReadAccessor */
+    double GetPixelValueByWorldCoordinate(const mitk::Point3D &position,
                                                      unsigned int timestep = 0,
-                                                     unsigned int component = 0));
+                                                     unsigned int component = 0);
 
     //##Documentation
     //## @brief Get a volume at a specific time @a t of channel @a n as a vtkImageData.
@@ -174,15 +174,15 @@ namespace mitk
 
     //##Documentation
     //## @brief Check whether slice @a s at time @a t in channel @a n is set
-    virtual bool IsSliceSet(int s = 0, int t = 0, int n = 0) const override;
+    bool IsSliceSet(int s = 0, int t = 0, int n = 0) const override;
 
     //##Documentation
     //## @brief Check whether volume at time @a t in channel @a n is set
-    virtual bool IsVolumeSet(int t = 0, int n = 0) const override;
+    bool IsVolumeSet(int t = 0, int n = 0) const override;
 
     //##Documentation
     //## @brief Check whether the channel @a n is set
-    virtual bool IsChannelSet(int n = 0) const override;
+    bool IsChannelSet(int n = 0) const override;
 
     //##Documentation
     //## @brief Set @a data as slice @a s at time @a t in channel @a n. It is in
@@ -246,6 +246,8 @@ namespace mitk
                                  int t = 0,
                                  int n = 0,
                                  ImportMemoryManagementType importMemoryManagement = CopyMemory);
+
+    virtual bool SetImportVolume(const void *const_data, int t = 0, int n = 0);
 
     //##Documentation
     //## @brief Set @a data in channel @a n. It is in
@@ -529,7 +531,7 @@ namespace mitk
     ChannelDescriptor GetChannelDescriptor(int id = 0) const { return m_ImageDescriptor->GetChannelDescriptor(id); }
     /** \brief Sets a geometry to an image.
       */
-    virtual void SetGeometry(BaseGeometry *aGeometry3D) override;
+    void SetGeometry(BaseGeometry *aGeometry3D) override;
 
     /**
     * @warning for internal use only
@@ -657,7 +659,7 @@ namespace mitk
 
     virtual bool IsValidTimeStep(int t) const;
 
-    virtual void Expand(unsigned int timeSteps) override;
+    void Expand(unsigned int timeSteps) override;
 
     virtual ImageDataItemPointer AllocateSliceData(
       int s = 0,
@@ -676,14 +678,14 @@ namespace mitk
 
     Image(const Image &other);
 
-    virtual ~Image();
+    ~Image() override;
 
-    virtual void Clear() override;
+    void Clear() override;
 
     //## @warning Has to be called by every Initialize method!
-    virtual void Initialize() override;
+    void Initialize() override;
 
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     mutable ImageDataItemPointerArray m_Channels;
     mutable ImageDataItemPointerArray m_Volumes;

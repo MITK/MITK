@@ -44,7 +44,7 @@ namespace mitk
 
   protected:
     PropertyListDeserializer();
-    virtual ~PropertyListDeserializer();
+    ~PropertyListDeserializer() override;
 
     std::string m_Filename;
     PropertyList::Pointer m_PropertyList;

@@ -24,12 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vnl/vnl_vector.h"
 #include "itkPointShell.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 namespace itk {
-
-#define QBALL_RECON_PI       M_PI
 
   template< class TReferenceImagePixelType,
   class TGradientImagePixelType,
@@ -40,7 +35,7 @@ namespace itk {
     TGradientImagePixelType, TOdfPixelType, NrOdfDirections,
     NrBasisFunctionCenters>
     ::DiffusionQballReconstructionImageFilter() :
-    m_GradientDirectionContainer(NULL),
+    m_GradientDirectionContainer(nullptr),
     m_NumberOfGradientDirections(0),
     m_NumberOfEquatorSamplingPoints(0),
     m_NumberOfBaselineImages(1),
@@ -257,7 +252,7 @@ namespace itk {
           index = i % (m_NumberOfGradientDirections/2);
 
         // init and pushback current input image iterator
-        typename GradientImageType::Pointer gradientImagePointer = NULL;
+        typename GradientImageType::Pointer gradientImagePointer = nullptr;
         // dynamic_cast would be nice, static because of SGI
         gradientImagePointer = static_cast< GradientImageType * >(
           this->ProcessObject::GetInput(index) );
@@ -333,7 +328,7 @@ namespace itk {
       // init input iterator
       typedef ImageRegionConstIterator< GradientImagesType > GradientIteratorType;
       typedef typename GradientImagesType::PixelType         GradientVectorType;
-      typename GradientImagesType::Pointer gradientImagePointer = NULL;
+      typename GradientImagesType::Pointer gradientImagePointer = nullptr;
       // dynamic_cast would be nice, static because of SGI
       gradientImagePointer = static_cast< GradientImagesType * >(
         this->ProcessObject::GetInput(0) );
@@ -478,7 +473,7 @@ namespace itk {
     // set default number of equator sampling points if needed
     if(!this->m_NumberOfEquatorSamplingPoints)
       this->m_NumberOfEquatorSamplingPoints
-        = (int) ceil((double)sqrt(8*QBALL_RECON_PI*this->m_NumberOfGradientDirections));
+        = (int) ceil((double)sqrt(8*itk::Math::pi*this->m_NumberOfGradientDirections));
 
     vnl_matrix<double>* Q =
       new vnl_matrix<double>(3, m_NumberOfGradientDirections);
@@ -523,7 +518,7 @@ namespace itk {
       = new vnl_matrix<double>(3, m_NumberOfEquatorSamplingPoints);
     for(unsigned int i=0; i<m_NumberOfEquatorSamplingPoints; i++)
     {
-      double theta = i * (2*QBALL_RECON_PI / m_NumberOfEquatorSamplingPoints);
+      double theta = i * (2*itk::Math::pi / m_NumberOfEquatorSamplingPoints);
       (*C)(0,i) = cos(theta);
       (*C)(1,i) = sin(theta);
       (*C)(2,i) = NumericTraits<double>::Zero;
@@ -567,7 +562,7 @@ namespace itk {
     vnl_matrix<double> *H_plus
       = new vnl_matrix<double>(NBasisFunctionCenters,m_NumberOfGradientDirections);
 
-    double maxSigma = QBALL_RECON_PI/6;
+    double maxSigma = itk::Math::pi/6;
     double bestSigma = maxSigma;
 
     {
@@ -595,7 +590,7 @@ namespace itk {
                 + (*Q)(2,r)*(*V)(2,c);
               qtv = (qtv<-1.0) ? -1.0 : ( (qtv>1.0) ? 1.0 : qtv);
               double x = acos(qtv);
-              (*tmpH)(r,c) = (1.0/(sigma*sqrt(2.0*QBALL_RECON_PI)))
+              (*tmpH)(r,c) = (1.0/(sigma*sqrt(2.0*itk::Math::pi)))
                 *exp((-x*x)/(2*sigma*sigma));
             }
           }
@@ -651,7 +646,7 @@ namespace itk {
             + (*S)(2,r)*(*V)(2,c);
           stv = (stv<-1.0) ? -1.0 : ( (stv>1.0) ? 1.0 : stv);
           double x = acos(stv);
-          (*G)(r,c) = (1.0/(bestSigma*sqrt(2.0*QBALL_RECON_PI)))
+          (*G)(r,c) = (1.0/(bestSigma*sqrt(2.0*itk::Math::pi)))
             *exp((-x*x)/(2*bestSigma*bestSigma));
         }
       }
@@ -662,6 +657,7 @@ namespace itk {
 
     // simple matrix multiplication, manual cause of stack overflow using operator
     for (unsigned i = 0; i < m_NumberOfEquatorSamplingPoints*NOdfDirections; ++i)
+    {
       for (unsigned j = 0; j < m_NumberOfGradientDirections; ++j)
       {
         double accum = (*G)(i,0) * (*H_plus)(0,j);
@@ -669,44 +665,44 @@ namespace itk {
           accum += (*G)(i,k) * (*H_plus)(k,j);
         (*GH_plus)(i,j) = accum;
       }
+    }
 
-      typename vnl_matrix<double>::iterator it3;
-      for( it3 = (*GH_plus).begin(); it3 != (*GH_plus).end(); it3++)
-      {
-        if(*it3<0.0)
-          *it3 = 0;
-      }
+    typename vnl_matrix<double>::iterator it3;
+    for( it3 = (*GH_plus).begin(); it3 != (*GH_plus).end(); it3++)
+    {
+      if(*it3<0.0)
+        *it3 = 0;
+    }
 
-      // this is an addition to the original tuch algorithm
-      for(unsigned int i=0; i<NOdfDirections*m_NumberOfEquatorSamplingPoints; i++)
-      {
-        vnl_vector< double > r = GH_plus->get_row(i);
-        r /= r.sum();
-        GH_plus->set_row(i,r);
-      }
+    // this is an addition to the original tuch algorithm
+    for(unsigned int i=0; i<NOdfDirections*m_NumberOfEquatorSamplingPoints; i++)
+    {
+      vnl_vector< double > r = GH_plus->get_row(i);
+      r /= r.sum();
+      GH_plus->set_row(i,r);
+    }
 
-      m_ReconstructionMatrix
-        = new vnl_matrix<TOdfPixelType>(NOdfDirections,m_NumberOfGradientDirections,0.0);
-      for(int i=0; i<NOdfDirections; i++)
+    m_ReconstructionMatrix
+      = new vnl_matrix<TOdfPixelType>(NOdfDirections,m_NumberOfGradientDirections,0.0);
+    for(int i=0; i<NOdfDirections; i++)
+    {
+      for(unsigned int j=0; j<m_NumberOfGradientDirections; j++)
       {
-        for(unsigned int j=0; j<m_NumberOfGradientDirections; j++)
+        for(unsigned int k=0; k<m_NumberOfEquatorSamplingPoints; k++)
         {
-          for(unsigned int k=0; k<m_NumberOfEquatorSamplingPoints; k++)
-          {
-            (*m_ReconstructionMatrix)(i,j) += (TOdfPixelType)(*GH_plus)(m_NumberOfEquatorSamplingPoints*i+k,j);
-          }
+          (*m_ReconstructionMatrix)(i,j) += (TOdfPixelType)(*GH_plus)(m_NumberOfEquatorSamplingPoints*i+k,j);
         }
       }
+    }
 
-      // this is also an addition to the original tuch algorithm
-      for(int i=0; i<NOdfDirections; i++)
-      {
-        vnl_vector< TOdfPixelType > r = m_ReconstructionMatrix->get_row(i);
-        r /= r.sum();
-        m_ReconstructionMatrix->set_row(i,r);
-      }
-      std::cout << "Reconstruction Matrix computed." << std::endl;
-
+    // this is also an addition to the original tuch algorithm
+    for(int i=0; i<NOdfDirections; i++)
+    {
+      vnl_vector< TOdfPixelType > r = m_ReconstructionMatrix->get_row(i);
+      r /= r.sum();
+      m_ReconstructionMatrix->set_row(i,r);
+    }
+    std::cout << "Reconstruction Matrix computed." << std::endl;
   }
 
   template< class TReferenceImagePixelType,

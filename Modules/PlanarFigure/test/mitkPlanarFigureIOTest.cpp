@@ -365,8 +365,8 @@ public:
     }
 
     // Test if Geometry is equal
-    const mitk::PlaneGeometry *planeGeometry1 = dynamic_cast<const mitk::PlaneGeometry *>(figure1->GetPlaneGeometry());
-    const mitk::PlaneGeometry *planeGeometry2 = dynamic_cast<const mitk::PlaneGeometry *>(figure2->GetPlaneGeometry());
+    const auto *planeGeometry1 = dynamic_cast<const mitk::PlaneGeometry *>(figure1->GetPlaneGeometry());
+    const auto *planeGeometry2 = dynamic_cast<const mitk::PlaneGeometry *>(figure2->GetPlaneGeometry());
 
     // Test Geometry transform parameters
     typedef mitk::Geometry3D::TransformType TransformType;

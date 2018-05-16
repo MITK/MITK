@@ -73,18 +73,18 @@ namespace mitk
 
       virtual const mitk::PointSet *GetInput();
 
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
-    virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
+    void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 
   protected:
     EnhancedPointSetVtkMapper3D();
 
-    virtual ~EnhancedPointSetVtkMapper3D();
+    ~EnhancedPointSetVtkMapper3D() override;
 
     void RemoveEntryFromSourceMaps(mitk::PointSet::PointIdentifier pointID);
     void DeleteVtkObject(vtkObject *o); // functor for stl_each in destructor
@@ -92,8 +92,8 @@ namespace mitk
     // update all vtk sources, mappers, actors with current data and properties
     void UpdateVtkObjects();
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
-    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor) override;
 
     typedef mitk::PointSet::PointIdentifier PointIdentifier;
     typedef std::map<PointIdentifier, vtkSphereSource *> SphereSourceMap;

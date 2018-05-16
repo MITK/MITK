@@ -63,18 +63,20 @@ namespace mitk
     itkSetMacro(ApplyBilateralFilter,bool);
     itkGetConstMacro(ApplyBilateralFilter,bool);
 
+    using itk::ProcessObject::SetInput;
+
      /*!
     \brief sets the input of this filter
     \param distanceImage input is the distance image of e.g. a ToF camera
     */
-    virtual void SetInput( Image* distanceImage);
+    void SetInput( const InputImageType* distanceImage) override;
 
     /*!
     \brief sets the input of this filter at idx
     \param idx number of the current input
     \param distanceImage input is the distance image of e.g. a ToF camera
     */
-    virtual void SetInput(unsigned int idx,  Image* distanceImage);
+    void SetInput(unsigned int idx,  const InputImageType* distanceImage) override;
 
     /*!
     \brief returns the input of this filter
@@ -112,13 +114,13 @@ namespace mitk
     /*!
     \brief standard destructor
     */
-    ~ToFCompositeFilter();
-    virtual void GenerateOutputInformation() override;
+    ~ToFCompositeFilter() override;
+    void GenerateOutputInformation() override;
     /*!
     \brief method generating the output of this filter. Called in the updated process of the pipeline.
     This method generates the output of the ToFSurfaceSource: The generated surface of the 3d points
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
     /**
     * \brief Create an output for each input
     *

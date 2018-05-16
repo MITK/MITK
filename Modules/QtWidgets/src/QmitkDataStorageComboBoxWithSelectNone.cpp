@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDataStorageComboBoxWithSelectNone.h"
 #include <QDebug>
 
-const QString QmitkDataStorageComboBoxWithSelectNone::ZERO_ENTRY_STRING = "please select";
+const QString QmitkDataStorageComboBoxWithSelectNone::ZERO_ENTRY_STRING = "--";
 
 //-----------------------------------------------------------------------------
 QmitkDataStorageComboBoxWithSelectNone::QmitkDataStorageComboBoxWithSelectNone(
@@ -188,6 +188,7 @@ void QmitkDataStorageComboBoxWithSelectNone::Reset()
 void QmitkDataStorageComboBoxWithSelectNone::SetZeroEntryText(const QString& zeroEntryString)
 {
   this->setItemText(0, zeroEntryString);
+  this->setCurrentIndex(0);
 }
 
 

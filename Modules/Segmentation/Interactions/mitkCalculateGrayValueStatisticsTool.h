@@ -47,8 +47,8 @@ namespace mitk
     mitkClassMacro(CalculateGrayValueStatisticsTool, SegmentationsProcessingTool);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual const char **GetXPM() const override;
-    virtual const char *GetName() const override;
+      const char **GetXPM() const override;
+    const char *GetName() const override;
 
     virtual std::string GetReport() const;
     //
@@ -65,13 +65,13 @@ namespace mitk
 
   protected:
     CalculateGrayValueStatisticsTool(); // purposely hidden
-    virtual ~CalculateGrayValueStatisticsTool();
+    ~CalculateGrayValueStatisticsTool() override;
 
-    virtual void StartProcessingAllData() override;
-    virtual bool ProcessOneWorkingData(DataNode *node) override;
-    virtual void FinishProcessingAllData() override;
+    void StartProcessingAllData() override;
+    bool ProcessOneWorkingData(DataNode *node) override;
+    void FinishProcessingAllData() override;
 
-    virtual std::string GetErrorMessage() override;
+    std::string GetErrorMessage() override;
 
     /**
      Calculates the minimum and maximum of the pixelvalues. They have to be known to initialize the histogram.

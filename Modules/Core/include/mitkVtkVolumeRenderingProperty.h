@@ -33,7 +33,7 @@ namespace mitk
    * (VTK constant/Id/string representation):
    * VTK_VOLUME_RAY_CAST_MIP_FUNCTION
    * VTK_RAY_CAST_COMPOSITE_FUNCTION
-   * Default is NULL
+   * Default is nullptr
    */
   class MITKCORE_EXPORT VtkVolumeRenderingProperty : public EnumerationProperty
   {
@@ -82,7 +82,7 @@ namespace mitk
      * this function is overridden as protected, so that the user may not add
      * additional invalid rendering types.
      */
-    virtual bool AddEnum(const std::string &name, const IdType &id) override;
+    bool AddEnum(const std::string &name, const IdType &id) override;
 
     /**
      * Adds the enumeration types as defined by vtk to the list of known

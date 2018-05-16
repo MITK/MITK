@@ -4,6 +4,11 @@
             <condition name="PickedHandle"/>
             <action name="DecideInteraction"/>
         </transition>
+        <transition event_class="MouseMoveEvent" event_variant="UpdateHighlightEvent" target="start">
+            <condition name="PickedHandle"/>
+            <!-- hopefully statemachine will never try to optimize away conditions
+                 when there are no actions to take action name="DecideInteraction"/-->
+        </transition>
     </state>
     <state name="decide_interaction">
         <transition event_class="InternalEvent" event_variant="StartTranslationAlongAxis" target="translation_along_axis"/>

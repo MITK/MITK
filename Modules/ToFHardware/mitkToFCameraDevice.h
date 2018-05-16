@@ -109,7 +109,7 @@ namespace mitk
     \param capturedImageSequence the actually captured image sequence number
     */
     virtual void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
-                              int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL) = 0;
+                              int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=nullptr) = 0;
     /*!
     \brief get the currently set capture width
     \return capture width
@@ -189,7 +189,7 @@ namespace mitk
 
     ToFCameraDevice();
 
-    ~ToFCameraDevice();
+    ~ToFCameraDevice() override;
 
     /*!
     \brief method for allocating memory for pixel arrays m_IntensityArray, m_DistanceArray and m_AmplitudeArray

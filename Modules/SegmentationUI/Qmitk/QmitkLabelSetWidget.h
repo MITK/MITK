@@ -42,8 +42,8 @@ class MITKSEGMENTATIONUI_EXPORT QmitkLabelSetWidget : public QWidget
   Q_OBJECT
 
 public:
-  explicit QmitkLabelSetWidget(QWidget *parent = NULL);
-  ~QmitkLabelSetWidget();
+  explicit QmitkLabelSetWidget(QWidget *parent = nullptr);
+  ~QmitkLabelSetWidget() override;
 
   void SetDataStorage(mitk::DataStorage *storage);
 
@@ -63,13 +63,27 @@ signals:
 
 public slots:
 
-  void ResetAllTableWidgetItems();
+  /**
+  * @brief Updates the current labels in the label set widget table. For each label (widget item) the 'UpdateTableWidgetItem' is called.
+  *
+  *   Updating means setting the color box of the table, setting the column with and fill it with the label name.
+  *   Furthermore the two push buttons for locking and showing/hiding the layer are checked/unchecked.
+  *   This functions only changes the appearance of the table widget and no render window update is necessary.
+  */
   void UpdateAllTableWidgetItems();
+  /**
+  * @brief Resets the current labels in the label set widget table. For each label a widget item is inserted into the table.
+  *
+  *   Resetting means removing all rows of the widget table and inserting new rows (labels) from the active label set (= layer) of the current working node.
+  *   The currently active label is selected and 'Number of labels' is set.
+  *   As this function is typically used after one label has been removed or the reference node has been changed (e.g.) the render windows have to be updated.
+  */
+  void ResetAllTableWidgetItems();
   void SelectLabelByPixelValue(mitk::Label::PixelType pixelValue);
 
 private slots:
 
-  // Label Set Dependend
+  // LabelSet dependent
   void OnOpacityChanged(int);
   void OnUnlockAllLabels(bool);
   void OnLockAllLabels(bool);
@@ -147,9 +161,9 @@ private:
 
   mitk::ColorSequenceRainbow m_ColorSequenceRainbow;
 
-  QCompleter *m_Completer;
-
   mitk::DataStorage *m_DataStorage;
+
+  QCompleter *m_Completer;
 
   mitk::ToolManager *m_ToolManager;
 

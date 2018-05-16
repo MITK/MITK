@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "internal/berryWorkbench.h"
 #include "internal/berryWorkbenchPage.h"
-#include "internal/berryWorkbenchPlugin.h"
+#include "berryWorkbenchPlugin.h"
 #include "internal/berryPerspective.h"
 #include "internal/berryNullEditorInput.h"
 

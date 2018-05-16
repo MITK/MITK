@@ -35,9 +35,9 @@ protected:
 
     IsoDoseLevelSetProperty();
 
-    IsoDoseLevelSetProperty(const IsoDoseLevelSetProperty& other);
+    explicit IsoDoseLevelSetProperty(const IsoDoseLevelSetProperty& other);
 
-    IsoDoseLevelSetProperty(IsoDoseLevelSet* levelSet);
+    explicit IsoDoseLevelSetProperty(IsoDoseLevelSet* levelSet);
 
 public:
     mitkClassMacro(IsoDoseLevelSetProperty, BaseProperty);
@@ -47,7 +47,7 @@ public:
 
     typedef IsoDoseLevelSet ValueType;
 
-    virtual ~IsoDoseLevelSetProperty();
+    ~IsoDoseLevelSetProperty() override;
 
     const IsoDoseLevelSet * GetIsoDoseLevelSet() const;
     const IsoDoseLevelSet * GetValue() const;
@@ -58,19 +58,16 @@ public:
     void SetIsoDoseLevelSet(IsoDoseLevelSet* levelSet);
     void SetValue(IsoDoseLevelSet* levelSet);
 
-    virtual std::string GetValueAsString() const override;
+    std::string GetValueAsString() const override;
 
     using BaseProperty::operator=;
 
 private:
 
-    // purposely not implemented
-    IsoDoseLevelSetProperty& operator=(const IsoDoseLevelSetProperty&);
-
     itk::LightObject::Pointer InternalClone() const override;
 
-    virtual bool IsEqual(const BaseProperty& property) const override;
-    virtual bool Assign(const BaseProperty& property) override;
+    bool IsEqual(const BaseProperty& property) const override;
+    bool Assign(const BaseProperty& property) override;
 
 };
 

@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fcntl.h>
 #include <unistd.h>
 #include <termios.h>
-#include <errno.h>
+#include <cerrno>
 
 #define INVALID_HANDLE_VALUE -1
 #endif
@@ -53,6 +53,11 @@ mitk::SerialCommunication::~SerialCommunication()
   CloseConnection();
 }
 
+bool mitk::SerialCommunication::IsConnected()
+{
+  return m_Connected;
+}
+
 int mitk::SerialCommunication::OpenConnection()
 {
   if (m_Connected)
@@ -66,11 +71,11 @@ int mitk::SerialCommunication::OpenConnection()
     ss << "\\\\.\\" << m_DeviceName; // use m_DeviceName
 
   m_ComPortHandle = CreateFile(ss.str().c_str(), GENERIC_READ | GENERIC_WRITE,
-    NULL,    /* no sharing */
-    NULL, /* no security flags */
-    OPEN_EXISTING, /* open com port, don't create it */
-    NULL, /* no flags */
-    NULL); /* no template */
+    0,             // no sharing
+    0,             // no security flags
+    OPEN_EXISTING, // open com port, don't create it
+    0,             // no flags
+    0);            // no template
   if (m_ComPortHandle == INVALID_HANDLE_VALUE)
     return ERROR_VALUE;
 
@@ -153,7 +158,7 @@ int mitk::SerialCommunication::Receive(std::string& answer, unsigned int numberO
 
   DWORD numberOfBytesRead = 0;
   char* buffer = new char[numberOfBytes];
-  if (ReadFile(m_ComPortHandle, buffer, numberOfBytes, &numberOfBytesRead, NULL) != 0)
+  if (ReadFile(m_ComPortHandle, buffer, numberOfBytes, &numberOfBytesRead, nullptr) != 0)
   {
     if (numberOfBytesRead > 0) // data read
     {
@@ -207,7 +212,9 @@ int mitk::SerialCommunication::Receive(std::string& answer, unsigned int numberO
   }
   if (bytesRead > 0)
     answer.assign(buffer, bytesRead); // copy buffer to answer
-  delete buffer;
+
+  delete[] buffer;
+
   if ( bytesRead == numberOfBytes ||                            // everything was received
        (eol && answer.size() > 0 && *eol == answer.at(answer.size()-1)) )  // end of line char reached
     return OK;
@@ -229,7 +236,7 @@ int mitk::SerialCommunication::Send(const std::string& input, bool block)
     return ERROR_VALUE;
 
   DWORD bytesWritten = 0;
-  if (WriteFile(m_ComPortHandle, input.data(), static_cast<DWORD>(input.size()), &bytesWritten, NULL) == TRUE)
+  if (WriteFile(m_ComPortHandle, input.data(), static_cast<DWORD>(input.size()), &bytesWritten, nullptr) == TRUE)
     return OK;
   else
     return GetLastError();
@@ -371,7 +378,10 @@ int mitk::SerialCommunication::ApplyConfigurationUnix()
   case Even:
     termIOStructure.c_cflag |= PARENB;
     termIOStructure.c_cflag &= ~PARODD;
+    // TODO: check if this is intended
+    // FALLTHRU
   case None:
+    // FALLTHRU
   default:
     termIOStructure.c_cflag &= ~PARENB;
     break;

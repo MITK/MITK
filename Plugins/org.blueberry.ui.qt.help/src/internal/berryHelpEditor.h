@@ -40,7 +40,7 @@ public:
   static const QString EDITOR_ID;
 
   HelpEditor();
-  ~HelpEditor();
+  ~HelpEditor() override;
 
   void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input) override;
 

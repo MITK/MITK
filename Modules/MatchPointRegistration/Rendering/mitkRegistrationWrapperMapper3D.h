@@ -36,13 +36,13 @@ public:
     mitkClassMacro(MITKRegistrationWrapperMapper3D, MITKRegistrationWrapperMapperBase);
     itkNewMacro(Self);
 
-    virtual bool GetGeometryDescription(mitk::BaseRenderer *renderer, mitk::BaseGeometry::ConstPointer& gridDesc, unsigned int& gridFrequ) const;
-    virtual bool RendererGeometryIsOutdated(mitk::BaseRenderer *renderer, const itk::TimeStamp& time) const;
+    bool GetGeometryDescription(mitk::BaseRenderer *renderer, mitk::BaseGeometry::ConstPointer& gridDesc, unsigned int& gridFrequ) const override;
+    bool RendererGeometryIsOutdated(mitk::BaseRenderer *renderer, const itk::TimeStamp& time) const override;
 
 protected:
 
     MITKRegistrationWrapperMapper3D();
-    virtual ~MITKRegistrationWrapperMapper3D();
+    ~MITKRegistrationWrapperMapper3D() override;
 
 
 private:

@@ -59,7 +59,7 @@ void mitk::RGBToRGBACastImageFilter::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
 
   mitk::Image *output = this->GetOutput();
-  mitk::Image *input = const_cast<mitk::Image *>(this->GetInput());
+  mitk::Image *input = this->GetInput();
   if (!output->IsInitialized())
   {
     return;

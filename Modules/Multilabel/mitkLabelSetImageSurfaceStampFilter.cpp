@@ -43,7 +43,7 @@ void mitk::LabelSetImageSurfaceStampFilter::GenerateData()
 
   if (m_Surface.IsNull())
   {
-    MITK_ERROR << "Input surface is NULL.";
+    MITK_ERROR << "Input surface is nullptr.";
     return;
   }
 
@@ -82,8 +82,8 @@ void mitk::LabelSetImageSurfaceStampFilter::ItkImageProcessing(itk::Image<TPixel
 
     while (!sourceIter.IsAtEnd())
     {
-      int sourceValue = static_cast<int>(sourceIter.Get());
-      int targetValue = static_cast<int>(targetIter.Get());
+      auto sourceValue = static_cast<int>(sourceIter.Get());
+      auto targetValue = static_cast<int>(targetIter.Get());
 
       if ((sourceValue != 0) &&
           (m_ForceOverwrite ||

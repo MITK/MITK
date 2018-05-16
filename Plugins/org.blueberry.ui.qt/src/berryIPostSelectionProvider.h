@@ -38,7 +38,7 @@ struct BERRY_UI_QT IPostSelectionProvider : public ISelectionProvider
 
   berryObjectMacro(berry::IPostSelectionProvider)
 
-  ~IPostSelectionProvider();
+  ~IPostSelectionProvider() override;
 
     /**
      * Adds a listener for post selection changes in this selection provider.

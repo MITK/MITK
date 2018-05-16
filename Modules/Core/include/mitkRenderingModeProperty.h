@@ -143,7 +143,7 @@ namespace mitk
      * this function is overridden as protected, so that the user may not add
      * additional invalid rendering types.
      */
-    virtual bool AddEnum(const std::string &name, const IdType &id) override;
+    bool AddEnum(const std::string &name, const IdType &id) override;
 
     /**
      * Adds the default enumeration types.
@@ -154,7 +154,7 @@ namespace mitk
     // purposely not implemented
     RenderingModeProperty &operator=(const RenderingModeProperty &);
 
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
   };
 
 #ifdef _MSC_VER

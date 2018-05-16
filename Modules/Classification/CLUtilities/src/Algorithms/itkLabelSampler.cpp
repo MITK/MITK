@@ -24,8 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageIterator.h"
 #include "itkImageConstIterator.h"
 
-#include <stdlib.h>     /* srand, rand */
-#include <time.h>       /* time */
+#include <cstdlib>     /* srand, rand */
+#include <ctime>       /* time */
 
 namespace itk
 {
@@ -36,7 +36,7 @@ void LabelSampler< TImage>
 {
 
 
-  srand (time(NULL));
+  srand (time(nullptr));
   this->AllocateOutputs();
 
   typename TImage::ConstPointer input = this->GetInput();

@@ -4,6 +4,7 @@
     <view id="org.mitk.views.remeshing"
           name="Remeshing"
           class="QmitkRemeshingView"
-          icon="resources/RemeshingIcon.png" />
+          icon="resources/RemeshingIcon.svg"
+          category="General" />
   </extension>
 </plugin>

@@ -437,7 +437,6 @@ std::cout<<"[PASSED]"<<std::endl;
   void TestInsertPointAtEnd()
   {
     typedef mitk::PointSet::PointType PointType;
-    typedef mitk::PointSet::PointIdentifier IndexType;
 
     PointType new1, new2, new3, new4, refMaxPt;
     new1.Fill(4);

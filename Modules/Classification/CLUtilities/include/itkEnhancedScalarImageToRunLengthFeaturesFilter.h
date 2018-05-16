@@ -208,23 +208,26 @@ namespace itk
       itkGetConstMacro(FastCalculations, bool);
       itkSetMacro(FastCalculations, bool);
       itkBooleanMacro(FastCalculations);
+      itkGetConstMacro(CombinedFeatureCalculation, bool);
+      itkSetMacro(CombinedFeatureCalculation, bool);
+      itkBooleanMacro(CombinedFeatureCalculation);
 
     protected:
       EnhancedScalarImageToRunLengthFeaturesFilter();
-      virtual ~EnhancedScalarImageToRunLengthFeaturesFilter() {}
-      virtual void PrintSelf( std::ostream & os, Indent indent ) const ITK_OVERRIDE;
+      ~EnhancedScalarImageToRunLengthFeaturesFilter() override {}
+      void PrintSelf( std::ostream & os, Indent indent ) const ITK_OVERRIDE;
 
       void FastCompute();
 
       void FullCompute();
 
       /** This method causes the filter to generate its output. */
-      virtual void GenerateData() ITK_OVERRIDE;
+      void GenerateData() ITK_OVERRIDE;
 
       /** Make a DataObject to be used for output output. */
       typedef ProcessObject::DataObjectPointerArraySizeType DataObjectPointerArraySizeType;
       using Superclass::MakeOutput;
-      virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType) ITK_OVERRIDE;
+      DataObjectPointer MakeOutput(DataObjectPointerArraySizeType) ITK_OVERRIDE;
 
     private:
       typename RunLengthMatrixFilterType::Pointer m_RunLengthMatrixGenerator;
@@ -234,6 +237,7 @@ namespace itk
       FeatureNameVectorConstPointer m_RequestedFeatures;
       OffsetVectorConstPointer      m_Offsets;
       bool                          m_FastCalculations;
+      bool                          m_CombinedFeatureCalculation;
     };
   } // end of namespace Statistics
 } // end of namespace itk

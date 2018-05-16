@@ -30,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourModelSetMapper3D.h"
 #include "mitkContourModelSetWriter.h"
 #include "mitkContourModelWriter.h"
-#include "mitkVtkGLMapperWrapper.h"
 
 mitk::ContourObjectFactory::ContourObjectFactory() : CoreObjectFactoryBase()
 {
@@ -49,30 +48,30 @@ mitk::ContourObjectFactory::~ContourObjectFactory()
 
 mitk::Mapper::Pointer mitk::ContourObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId id)
 {
-  mitk::Mapper::Pointer newMapper = NULL;
+  mitk::Mapper::Pointer newMapper = nullptr;
 
   if (id == mitk::BaseRenderer::Standard2D)
   {
     std::string classname("ContourModel");
-    if (dynamic_cast<mitk::ContourModel *>(node->GetData()) != NULL)
+    if (dynamic_cast<mitk::ContourModel *>(node->GetData()) != nullptr)
     {
-      newMapper = mitk::VtkGLMapperWrapper::New(mitk::ContourModelGLMapper2D::New().GetPointer());
+      newMapper = mitk::ContourModelGLMapper2D::New();
       newMapper->SetDataNode(node);
     }
-    else if (dynamic_cast<mitk::ContourModelSet *>(node->GetData()) != NULL)
+    else if (dynamic_cast<mitk::ContourModelSet *>(node->GetData()) != nullptr)
     {
-      newMapper = mitk::VtkGLMapperWrapper::New(mitk::ContourModelSetGLMapper2D::New().GetPointer());
+      newMapper = mitk::ContourModelSetGLMapper2D::New();
       newMapper->SetDataNode(node);
     }
   }
   else if (id == mitk::BaseRenderer::Standard3D)
   {
-    if (dynamic_cast<mitk::ContourModel *>(node->GetData()) != NULL)
+    if (dynamic_cast<mitk::ContourModel *>(node->GetData()) != nullptr)
     {
       newMapper = mitk::ContourModelMapper3D::New();
       newMapper->SetDataNode(node);
     }
-    else if (dynamic_cast<mitk::ContourModelSet *>(node->GetData()) != NULL)
+    else if (dynamic_cast<mitk::ContourModelSet *>(node->GetData()) != nullptr)
     {
       newMapper = mitk::ContourModelSetMapper3D::New();
       newMapper->SetDataNode(node);
@@ -83,20 +82,20 @@ mitk::Mapper::Pointer mitk::ContourObjectFactory::CreateMapper(mitk::DataNode *n
 
 void mitk::ContourObjectFactory::SetDefaultProperties(mitk::DataNode *node)
 {
-  if (node == NULL)
+  if (node == nullptr)
     return;
 
   mitk::DataNode::Pointer nodePointer = node;
 
-  if (node->GetData() == NULL)
+  if (node->GetData() == nullptr)
     return;
 
-  if (dynamic_cast<mitk::ContourModel *>(node->GetData()) != NULL)
+  if (dynamic_cast<mitk::ContourModel *>(node->GetData()) != nullptr)
   {
     mitk::ContourModelGLMapper2D::SetDefaultProperties(node);
     mitk::ContourModelMapper3D::SetDefaultProperties(node);
   }
-  else if (dynamic_cast<mitk::ContourModelSet *>(node->GetData()) != NULL)
+  else if (dynamic_cast<mitk::ContourModelSet *>(node->GetData()) != nullptr)
   {
     mitk::ContourModelSetGLMapper2D::SetDefaultProperties(node);
     mitk::ContourModelSetMapper3D::SetDefaultProperties(node);

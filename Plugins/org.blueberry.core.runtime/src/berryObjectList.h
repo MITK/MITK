@@ -34,7 +34,7 @@ public:
   ObjectList() : QList<T>() {}
   ObjectList(const QList<T>& l) : QList<T>(l) {}
 
-  bool operator==(const Object* o) const
+  bool operator==(const Object* o) const override
   {
     if (const QList<T>* l = dynamic_cast<const QList<T>*>(o))
     {

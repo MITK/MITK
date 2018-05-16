@@ -35,8 +35,8 @@ class MITKQTWIDGETSEXT_EXPORT QmitkSelectableGLWidget : public QWidget
   Q_OBJECT
 
 public:
-  QmitkSelectableGLWidget(QWidget *parent = 0);
-  ~QmitkSelectableGLWidget();
+  QmitkSelectableGLWidget(QWidget *parent = nullptr);
+  ~QmitkSelectableGLWidget() override;
   mitk::VtkPropRenderer *GetRenderer();
   QmitkRenderWindow *GetRenderWindow() const;
   mitk::SliceNavigationController *GetSliceNavigationController() const;

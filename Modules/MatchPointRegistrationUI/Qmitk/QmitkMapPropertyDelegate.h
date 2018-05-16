@@ -39,35 +39,35 @@ public:
   ///
   /// Creates a new PropertyDelegate.
   ///
-  QmitkMapPropertyDelegate(QObject *parent = 0);
+  QmitkMapPropertyDelegate(QObject *parent = nullptr);
 
   ///
   /// Renders a specific property  (overwritten from QItemDelegate)
   ///
-  void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+  void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
   ///
   /// Create an editor for a specific property  (overwritten from QItemDelegate)
   ///
-  QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+  QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
   ///
   /// Create an editor for a specific property  (overwritten from QItemDelegate)
   ///
-  void setEditorData(QWidget *editor, const QModelIndex &index) const;
+  void setEditorData(QWidget *editor, const QModelIndex &index) const override;
 
   ///
   /// When the user accepts input this func commits the data to the model  (overwritten from QItemDelegate)
   ///
-  void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+  void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
 
   ///
   /// \brief Fit an editor to some geometry (overwritten from QItemDelegate)
   ///
-  void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+  void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
 protected:
-  bool eventFilter(QObject *o, QEvent *e);
+  bool eventFilter(QObject *o, QEvent *e) override;
 
 private slots:
   ///

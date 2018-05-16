@@ -37,7 +37,7 @@ namespace itk
 {
 
 /** \class OrientationDistributionFunction
- * \brief Represents an ODF for Q-Ball imaging.
+ * \brief Represents an ODF
  *
  * Reference: David S. Tuch, Q-ball imaging,
  * Magnetic Resonance in Medicine Volume 52 Issue 6, Pages 1358 - 1372
@@ -80,15 +80,15 @@ public:
   typedef vnl_matrix_fixed<double, 3, NOdfDirections> DirectionsType;
 
   /** Default constructor has nothing to do. */
-  OrientationDistributionFunction() {this->Fill(0);}
+  OrientationDistributionFunction() {this->Fill(0); m_EigenAnalysisCalculated = false; }
 
-  OrientationDistributionFunction (const ComponentType& r) { this->Fill(r); }
+  OrientationDistributionFunction (const ComponentType& r) { this->Fill(r); m_EigenAnalysisCalculated = false; }
 
   typedef ComponentType ComponentArrayType[ itkGetStaticConstMacro(InternalDimension) ];
 
   /** Pass-through constructor for the Array base class. */
-  OrientationDistributionFunction(const Self& r): BaseArray(r) {}
-  OrientationDistributionFunction(const ComponentArrayType r): BaseArray(r) {}
+  OrientationDistributionFunction(const Self& r): BaseArray(r) { m_EigenAnalysisCalculated = false; }
+  OrientationDistributionFunction(const ComponentArrayType r): BaseArray(r) { m_EigenAnalysisCalculated = false; }
 
   /** Pass-through assignment operator for the Array base class. */
   Self& operator= (const Self& r);
@@ -156,7 +156,9 @@ public:
 
   void L2Normalize();
 
-  int GetPrincipleDiffusionDirection() const;
+  int GetPrincipalDiffusionDirectionIndex() const;
+
+  vnl_vector_fixed<double,3> GetPrincipalDiffusionDirection() const;
 
   int GetNthDiffusionDirection(int n, vnl_vector_fixed<double,3> rndVec) const;
 
@@ -206,6 +208,9 @@ private:
   static itk::SimpleFastMutexLock m_MutexHalfSphereIdxs;
   static itk::SimpleFastMutexLock m_MutexNeighbors;
   static itk::SimpleFastMutexLock m_MutexAngularRange;
+  typename itk::DiffusionTensor3D<TComponent>::EigenValuesArrayType   m_EigenValues;
+  typename itk::DiffusionTensor3D<TComponent>::EigenVectorsMatrixType m_EigenVectors;
+  bool  m_EigenAnalysisCalculated;
 
 };
 

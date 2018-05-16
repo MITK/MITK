@@ -90,9 +90,9 @@ namespace mitk
     us::SharedDataPointer<const Impl> m_Data;
   };
 
-  void swap(MimeType &m1, MimeType &m2);
+  MITKCORE_EXPORT void swap(MimeType &m1, MimeType &m2);
 
-  std::ostream &operator<<(std::ostream &os, const MimeType &mimeType);
+  MITKCORE_EXPORT std::ostream &operator<<(std::ostream &os, const MimeType &mimeType);
 }
 
 #ifdef _MSC_VER

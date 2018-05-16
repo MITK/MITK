@@ -167,7 +167,7 @@ public:
   /**
    * Creates an empty any type.
    */
-  Any(): _content(0)
+  Any(): _content(nullptr)
   { }
 
   /**
@@ -192,7 +192,7 @@ public:
    * \param other The Any to copy
    */
   Any(const Any& other)
-    : _content(other._content ? other._content->Clone() : 0)
+    : _content(other._content ? other._content->Clone() : nullptr)
   { }
 
   ~Any()
@@ -303,22 +303,22 @@ private:
       : _held(value)
     { }
 
-    virtual std::string ToString() const override
+    std::string ToString() const override
     {
       return any_value_to_string(_held);
     }
 
-    virtual std::string ToJSON() const override
+    std::string ToJSON() const override
     {
       return any_value_to_json(_held);
     }
 
-    virtual const std::type_info& Type() const override
+    const std::type_info& Type() const override
     {
       return typeid(ValueType);
     }
 
-    virtual Placeholder* Clone() const override
+    Placeholder* Clone() const override
     {
       return new Holder(_held);
     }
@@ -347,9 +347,9 @@ public:
     : std::bad_cast(), _msg(msg)
   {}
 
-  ~BadAnyCastException() throw() {}
+  ~BadAnyCastException() throw() override {}
 
-  virtual const char * what() const throw() override
+  const char * what() const throw() override
   {
     if (_msg.empty())
       return "US_PREPEND_NAMESPACE(BadAnyCastException): "
@@ -371,14 +371,14 @@ private:
  * \code
  * MyType* pTmp = any_cast<MyType*>(pAny)
  * \endcode
- * Will return NULL if the cast fails, i.e. types don't match.
+ * Will return nullptr if the cast fails, i.e. types don't match.
  */
 template <typename ValueType>
 ValueType* any_cast(Any* operand)
 {
   return operand && operand->Type() == typeid(ValueType)
       ? &static_cast<Any::Holder<ValueType>*>(operand->_content)->_held
-      : 0;
+      : nullptr;
 }
 
 /**
@@ -389,7 +389,7 @@ ValueType* any_cast(Any* operand)
  * \code
  * const MyType* pTmp = any_cast<MyType*>(pAny)
  * \endcode
- * Will return NULL if the cast fails, i.e. types don't match.
+ * Will return nullptr if the cast fails, i.e. types don't match.
  */
 template <typename ValueType>
 const ValueType* any_cast(const Any* operand)

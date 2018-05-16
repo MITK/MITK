@@ -36,9 +36,9 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
   // it makes no sense to continue without an object.
   MITK_TEST_CONDITION_REQUIRED(mySource.IsNotNull(), "Testing instantiation");
 
-  mySource->SetTrackingDevice(NULL);
-  MITK_TEST_CONDITION(mySource->GetTrackingDevice() == NULL, "Testing Set/GetTrackingDevice(NULL)");
-  MITK_TEST_CONDITION(mySource->GetNumberOfOutputs() == 0, "Testing GetNumberOfOutputs with NULL td");
+  mySource->SetTrackingDevice(nullptr);
+  MITK_TEST_CONDITION(mySource->GetTrackingDevice() == nullptr, "Testing Set/GetTrackingDevice(nullptr)");
+  MITK_TEST_CONDITION(mySource->GetNumberOfOutputs() == 0, "Testing GetNumberOfOutputs with nullptr td");
   MITK_TEST_FOR_EXCEPTION(std::invalid_argument, mySource->Connect());
   MITK_TEST_FOR_EXCEPTION(std::invalid_argument, mySource->StartTracking());
 
@@ -77,9 +77,9 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
 
   //test getOutput()
   mitk::NavigationData* nd0 = mySource->GetOutput();
-  MITK_TEST_CONDITION_REQUIRED(nd0!=NULL,"Testing GetOutput() [1]");
+  MITK_TEST_CONDITION_REQUIRED(nd0!=nullptr,"Testing GetOutput() [1]");
   nd0 = mySource->GetOutput(nd0->GetName());
-  MITK_TEST_CONDITION_REQUIRED(nd0!=NULL,"Testing GetOutput() [2]");
+  MITK_TEST_CONDITION_REQUIRED(nd0!=nullptr,"Testing GetOutput() [2]");
 
   //test getOutputIndex()
   MITK_TEST_CONDITION(mySource->GetOutputIndex(nd0->GetName())==0,"Testing GetOutputIndex()");
@@ -115,7 +115,7 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
   tracker = mitk::VirtualTrackingDevice::New();
   mySource->SetTrackingDevice(tracker);
   MITK_TEST_CONDITION(watch->GetReferenceCount() == 0, "Testing if reference to previous tracker object is released");
-  watch = NULL;
+  watch = nullptr;
 
   MITK_TEST_FOR_EXCEPTION(std::runtime_error, mySource->StartTracking()); // new tracker, needs Connect() before StartTracking()
 
@@ -124,8 +124,8 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
  // itksys::SystemTools::Delay(800); // wait for tracking thread to start properly //DEBUG ONLY  --> race condition. will the thread start before the object is destroyed? --> maybe hold a smartpointer?
   try
   {
-    mySource = NULL;  // delete source
-    tracker = NULL;   // delete tracker --> both should not result in any exceptions or deadlocks
+    mySource = nullptr;  // delete source
+    tracker = nullptr;   // delete tracker --> both should not result in any exceptions or deadlocks
   }
   catch (...)
   {

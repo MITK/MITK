@@ -46,7 +46,7 @@ public:
     void AddSourceFile(const char* filename);
 
   /**
-    * @brief Set specific compilerflags to compile the CL source. Default is set to NULL;
+    * @brief Set specific compilerflags to compile the CL source. Default is set to nullptr;
     *        example: "-cl-fast-relaxed-math -cl-mad-enable -cl-strict-aliasing"
     *
     *  @param flags to the modulefolder that contains the gpuSource
@@ -57,6 +57,11 @@ public:
     * @brief Returns true if the initialization was successfull
     */
   virtual bool IsInitialized();
+
+  /**
+    * @brief Returns the amount of global memory of the used device in bytes
+    */
+  virtual unsigned long GetDeviceMemory();
 
   /** @brief Destructor */
   virtual ~OclFilter();
@@ -108,6 +113,14 @@ protected:
       */
   bool ExecuteKernel( cl_kernel kernel, unsigned int workSizeDim );
 
+  /** @brief Execute the given kernel on the OpenCL Index-Space defined by the local and global work sizes, but divide it into chunks of dimension chunksDim
+      */
+  bool ExecuteKernelChunks( cl_kernel kernel, unsigned int workSizeDim, size_t* chunksDim );
+
+  /** @brief Execute the given kernel on the OpenCL Index-Space defined by the local and global work sizes, but divide it into chunks of dimension chunksDim and wait between 
+    * batches of batchSize chunks a time of waitTimems milliseconds
+  */
+  bool ExecuteKernelChunksInBatches(cl_kernel kernel, unsigned int workSizeDim, size_t* chunksDim, size_t batchSize, int waitTimems);
   /**
       * \brief Initialize all necessary parts of the filter
       *

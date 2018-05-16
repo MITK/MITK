@@ -54,9 +54,9 @@ namespace mitk
 
   protected:
     AutoSegmentationTool(); // purposely hidden
-    virtual ~AutoSegmentationTool();
+    ~AutoSegmentationTool() override;
 
-    virtual const char *GetGroup() const override;
+    const char *GetGroup() const override;
 
     virtual itk::SmartPointer<Image> Get3DImage(itk::SmartPointer<Image> image, unsigned int timestep);
 

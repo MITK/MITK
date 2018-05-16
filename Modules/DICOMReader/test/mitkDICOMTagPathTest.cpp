@@ -203,7 +203,7 @@ public:
     CPPUNIT_ASSERT(std::regex_match(result, regEx));
     regEx = std::regex(mitk::DICOMTagPathToPropertyRegEx(deepPath_withAnyElement));
     result = mitk::DICOMTagPathToPropertyName(deepPath_withAnyElement);
-    int position = result.find("*");
+    auto position = result.find("*");
     if (std::string::npos != position)
     {
       result.replace(position, 1, "1234.ABCD");

@@ -110,7 +110,7 @@ mitk::Point3D SimpleRenderWindowView::GetSelectedPosition(const QString & /*id*/
   }
 }
 
-void SimpleRenderWindowView::SetSelectedPosition(const mitk::Point3D &pos, const QString & /*id*/)
+void SimpleRenderWindowView::SetSelectedPosition(const mitk::Point3D &, const QString &)
 {
 }
 

@@ -19,9 +19,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <numeric>
 
-#include <boost/graph/connected_components.hpp>
 #include <boost/graph/clustering_coefficient.hpp>
+
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4172)
+#endif
+#include <boost/graph/connected_components.hpp>
 #include <boost/graph/betweenness_centrality.hpp>
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
+
 #include <boost/graph/visitors.hpp>
 
 #include "vnl/algo/vnl_symmetric_eigensystem.h"

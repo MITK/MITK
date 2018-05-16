@@ -49,7 +49,7 @@ struct BERRY_EXPRESSIONS IEvaluationContext : public Object
    */
   static Object::ConstPointer UNDEFINED_VARIABLE;
 
-  virtual ~IEvaluationContext();
+  ~IEvaluationContext() override;
 
   /**
    * Returns the parent context or <code>null</code> if

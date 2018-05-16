@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGeometry3D.h>
 #include <mitkPlaneGeometry.h>
 #include <vtkPoints.h>
+#include <vtkSmartPointer.h>
 #include <vtkTransform.h>
 
 namespace mitk

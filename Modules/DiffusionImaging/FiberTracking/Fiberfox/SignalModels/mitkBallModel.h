@@ -31,42 +31,36 @@ class BallModel : public DiffusionSignalModel< ScalarType >
 {
 public:
 
-    BallModel();
-    template< class OtherType >BallModel(BallModel<OtherType>* model)
-    {
-        this->m_CompartmentId = model->m_CompartmentId;
-        this->m_T2 = model->GetT2();
-        this->m_FiberDirection = model->GetFiberDirection();
-        this->m_GradientList = model->GetGradientList();
-        this->m_VolumeFractionImage = model->GetVolumeFractionImage();
-        this->m_RandGen = model->GetRandomGenerator();
+  BallModel();
+  template< class OtherType >BallModel(BallModel<OtherType>* model)
+  {
+    this->m_CompartmentId = model->m_CompartmentId;
+    this->m_T1 = model->GetT1();
+    this->m_T2 = model->GetT2();
+    this->m_GradientList = model->GetGradientList();
+    this->m_VolumeFractionImage = model->GetVolumeFractionImage();
+    this->m_RandGen = model->GetRandomGenerator();
 
-        this->m_BValue = model->GetBvalue();
-        this->m_Diffusivity = model->GetDiffusivity();
-    }
-    ~BallModel();
+    this->m_BValue = model->GetBvalue();
+    this->m_Diffusivity = model->GetDiffusivity();
+  }
+  ~BallModel();
 
-    typedef typename DiffusionSignalModel< ScalarType >::PixelType      PixelType;
-    typedef typename DiffusionSignalModel< ScalarType >::GradientType   GradientType;
-    typedef typename DiffusionSignalModel< ScalarType >::GradientListType   GradientListType;
+  typedef typename DiffusionSignalModel< ScalarType >::PixelType      PixelType;
+  typedef typename DiffusionSignalModel< ScalarType >::GradientType   GradientType;
+  typedef typename DiffusionSignalModel< ScalarType >::GradientListType   GradientListType;
 
 
-    /** Actual signal generation **/
-    PixelType SimulateMeasurement();
-    ScalarType SimulateMeasurement(unsigned int dir);
+  /** Actual signal generation **/
+  PixelType SimulateMeasurement(GradientType& fiberDirection) override;
+  ScalarType SimulateMeasurement(unsigned int dir, GradientType& fiberDirection) override;
 
-    void SetDiffusivity(double D) { m_Diffusivity = D; }
-    double GetDiffusivity() { return m_Diffusivity; }
-    void SetBvalue(double bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
-    double GetBvalue() { return m_BValue; }
-
-    void SetFiberDirection(GradientType fiberDirection){ this->m_FiberDirection = fiberDirection; }
-    void SetGradientList(GradientListType gradientList) { this->m_GradientList = gradientList; }
+  void SetDiffusivity(double D) { m_Diffusivity = D; }
+  double GetDiffusivity() { return m_Diffusivity; }
 
 protected:
 
-    double  m_Diffusivity;  ///< Scalar diffusion constant
-    double  m_BValue;       ///< b-value used to generate the artificial signal
+  double  m_Diffusivity;  ///< Scalar diffusion constant
 };
 
 }

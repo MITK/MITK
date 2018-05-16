@@ -17,7 +17,7 @@ set(MOC_H_FILES
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/Slider.png
+  resources/image_navigator.svg
   plugin.xml
 )
 

@@ -39,16 +39,16 @@ struct PersistenceTestClass
 struct TestPropertyListReplacedObserver : public mitk::PropertyListReplacedObserver
 {
   TestPropertyListReplacedObserver() : counter(0) {}
-  virtual void BeforePropertyListReplaced(const std::string &id, mitk::PropertyList *propertyList) override
+  void BeforePropertyListReplaced(const std::string &id, mitk::PropertyList *) override
   {
     if (id == m_Id)
-      counter++;
+      ++counter;
   }
 
-  virtual void AfterPropertyListReplaced(const std::string &id, mitk::PropertyList *propertyList) override
+  void AfterPropertyListReplaced(const std::string &id, mitk::PropertyList *) override
   {
     if (id == m_Id)
-      counter++;
+      ++counter;
   }
 
   int counter;
@@ -83,7 +83,7 @@ public:
     mitk::PersistenceService::LoadModule();
 
     PERSISTENCE_GET_SERVICE_MACRO
-    CPPUNIT_ASSERT_MESSAGE("Testing availability of the PersistenceService.", persistenceService != NULL);
+    CPPUNIT_ASSERT_MESSAGE("Testing availability of the PersistenceService.", persistenceService != nullptr);
 
     // Initialize testable parameter values
     std::string defaultPersistenceFile = persistenceService->GetDefaultPersistenceFile();
@@ -164,7 +164,7 @@ public:
     persistenceService->AddPropertyListReplacedObserver(&testObserver);
     persistenceService->Load(testTempFile);
     CPPUNIT_ASSERT_MESSAGE(
-      "Testing observer functionality: testObserver.counter == 2, testObserver.counter is " + testObserver.counter,
+      "Testing observer functionality: testObserver.counter == 2, testObserver.counter is " + std::to_string(testObserver.counter),
       testObserver.counter == 2);
 
     autoLoadTestClass.param1 = param1;
@@ -176,7 +176,7 @@ public:
   /**
  * Helper Method that compares the returned class to its base values
  */
-  void testParams(const PersistenceTestClass &testClass, const std::string &testClassName)
+  void testParams(const PersistenceTestClass &testClass, const std::string &)
   {
     CPPUNIT_ASSERT_MESSAGE("Parameter of TestClass not equal to reference value: testClass.id",
                            testClass.id == testClassId);

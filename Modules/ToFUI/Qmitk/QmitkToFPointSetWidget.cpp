@@ -24,27 +24,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkToFPointSetWidget::VIEW_ID = "org.mitk.views.qmitktofpointsetwidget";
 
 QmitkToFPointSetWidget::QmitkToFPointSetWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
-, m_DataStorage(NULL)
-, m_DistanceImage(NULL)
-, m_CameraIntrinsics(NULL)
-, m_VtkTextActor(NULL)
-, m_ForegroundRenderer1(NULL)
-, m_ForegroundRenderer2(NULL)
-, m_ForegroundRenderer3(NULL)
-, m_RenderWindow1(NULL)
-, m_RenderWindow2(NULL)
-, m_RenderWindow3(NULL)
-, m_MeasurementPointSet2D(NULL)
-, m_MeasurementPointSet3DNode(NULL)
-, m_PointSet2D(NULL)
-, m_PointSet3DNode(NULL)
-, m_PointSetInteractor(NULL)
-, m_MeasurementPointSetInteractor(NULL)
+, m_DataStorage(nullptr)
+, m_DistanceImage(nullptr)
+, m_CameraIntrinsics(nullptr)
+, m_VtkTextActor(nullptr)
+, m_ForegroundRenderer1(nullptr)
+, m_ForegroundRenderer2(nullptr)
+, m_ForegroundRenderer3(nullptr)
+, m_RenderWindow1(nullptr)
+, m_RenderWindow2(nullptr)
+, m_RenderWindow3(nullptr)
+, m_MeasurementPointSet2D(nullptr)
+, m_MeasurementPointSet3DNode(nullptr)
+, m_PointSet2D(nullptr)
+, m_PointSet3DNode(nullptr)
+, m_PointSetInteractor(nullptr)
+, m_MeasurementPointSetInteractor(nullptr)
 , m_MeasurementPointSetChangedObserverTag(0)
 , m_PointSetChangedObserverTag(0)
 , m_WindowHeight(0)
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
 }
 
@@ -84,7 +84,7 @@ void QmitkToFPointSetWidget::InitializeWidget(QHash<QString, QmitkRenderWindow*>
   m_RenderWindow2 = renderWindowHashMap.value("sagittal")->GetRenderWindow();
   m_RenderWindow3 = renderWindowHashMap.value("coronal")->GetRenderWindow();
   m_RenderWindow4 = renderWindowHashMap.value("3d")->GetRenderWindow();
-  if ((m_RenderWindow1 != NULL) && (m_RenderWindow2 != NULL) && (m_RenderWindow3 != NULL) && (m_RenderWindow4 != NULL) && (dataStorage.IsNotNull()))
+  if ((m_RenderWindow1 != nullptr) && (m_RenderWindow2 != nullptr) && (m_RenderWindow3 != nullptr) && (m_RenderWindow4 != nullptr) && (dataStorage.IsNotNull()))
   {
     // enable buttons
     m_Controls->pointSetButton->setEnabled(true);
@@ -98,19 +98,19 @@ void QmitkToFPointSetWidget::InitializeWidget(QHash<QString, QmitkRenderWindow*>
     //    this->m_VtkTextActor->GetTextProperty()->SetColor(1,0,0);
     this->m_VtkTextActor->GetTextProperty()->BoldOn();
     this->m_VtkTextActor->SetVisibility(0);
-    if (m_ForegroundRenderer1==NULL)
+    if (m_ForegroundRenderer1==nullptr)
     {
       this->m_ForegroundRenderer1 = vtkSmartPointer<vtkRenderer>::New();
       this->m_ForegroundRenderer1->AddActor(m_VtkTextActor);
       mitk::VtkLayerController::GetInstance(m_RenderWindow1)->InsertForegroundRenderer(m_ForegroundRenderer1,true);
     }
-    if (m_ForegroundRenderer2==NULL)
+    if (m_ForegroundRenderer2==nullptr)
     {
       this->m_ForegroundRenderer2 = vtkSmartPointer<vtkRenderer>::New();
       this->m_ForegroundRenderer2->AddActor(m_VtkTextActor);
       mitk::VtkLayerController::GetInstance(m_RenderWindow2)->InsertForegroundRenderer(m_ForegroundRenderer2,true);
     }
-    if (m_ForegroundRenderer3==NULL)
+    if (m_ForegroundRenderer3==nullptr)
     {
       this->m_ForegroundRenderer3 =vtkSmartPointer<vtkRenderer>::New();
       this->m_ForegroundRenderer3->AddActor(m_VtkTextActor);
@@ -226,7 +226,7 @@ void QmitkToFPointSetWidget::CleanUpWidget()
     {
       mitk::VtkLayerController::GetInstance(m_RenderWindow1)->RemoveRenderer(m_ForegroundRenderer1);
     }
-    m_ForegroundRenderer1 = NULL;
+    m_ForegroundRenderer1 = nullptr;
   }
   if (m_ForegroundRenderer2&&m_RenderWindow2)
   {
@@ -234,7 +234,7 @@ void QmitkToFPointSetWidget::CleanUpWidget()
     {
       mitk::VtkLayerController::GetInstance(m_RenderWindow2)->RemoveRenderer(m_ForegroundRenderer2);
     }
-    m_ForegroundRenderer2 = NULL;
+    m_ForegroundRenderer2 = nullptr;
   }
   if (m_ForegroundRenderer3&&m_RenderWindow3)
   {
@@ -242,7 +242,7 @@ void QmitkToFPointSetWidget::CleanUpWidget()
     {
       mitk::VtkLayerController::GetInstance(m_RenderWindow3)->RemoveRenderer(m_ForegroundRenderer3);
     }
-    m_ForegroundRenderer3 = NULL;
+    m_ForegroundRenderer3 = nullptr;
   }
   if (mitk::RenderingManager::GetInstance())
   {

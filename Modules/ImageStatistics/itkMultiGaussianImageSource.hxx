@@ -29,13 +29,13 @@
 #define __itkMultiGaussianImageSource_hxx
 #include <iostream>
 #include <fstream>
-#include <time.h>
+#include <ctime>
 #include "itkMultiGaussianImageSource.h"
 #include "itkImageRegionIterator.h"
 #include "itkObjectFactory.h"
 #include "itkProgressReporter.h"
 #include "itkDOMNodeXMLWriter.h"
-#include "stdlib.h"
+#include <cstdlib>
 
 namespace itk
 {
@@ -786,7 +786,6 @@ namespace itk
     itkDebugMacro(<< "Generating a  image of scalars ");
     double valueReal;
     IndexType index;
-    typedef typename TOutputImage::PixelType scalarType;
     typename TOutputImage::Pointer image = this->GetOutput(0);
     image = this->GetOutput(0);
     image->SetBufferedRegion( image->GetRequestedRegion() );

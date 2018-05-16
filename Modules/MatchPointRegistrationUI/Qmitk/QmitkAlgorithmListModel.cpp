@@ -56,7 +56,7 @@ QVariant QmitkAlgorithmListModel::data(const QModelIndex &index, int role) const
 
   QVariant result;
 
-  if (index.row() < m_AlgList.size())
+  if (index.row() < static_cast<int>(m_AlgList.size()))
   {
     const ::map::deployment::DLLInfo *info = m_AlgList[index.row()].GetPointer();
 

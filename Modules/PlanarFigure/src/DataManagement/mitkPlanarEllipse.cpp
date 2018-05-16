@@ -20,9 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <algorithm>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 mitk::PlanarEllipse::PlanarEllipse()
   : FEATURE_ID_MAJOR_AXIS(Superclass::AddFeature("Major Axis", "mm")),
     FEATURE_ID_MINOR_AXIS(Superclass::AddFeature("Minor Axis", "mm")),
@@ -286,7 +283,7 @@ void mitk::PlanarEllipse::EvaluateFeaturesInternal()
 
   this->SetQuantity(FEATURE_ID_MAJOR_AXIS, 2 * longAxisLength);
   this->SetQuantity(FEATURE_ID_MINOR_AXIS, 2 * shortAxisLength);
-  this->SetQuantity(FEATURE_ID_AREA, longAxisLength * shortAxisLength * M_PI);
+  this->SetQuantity(FEATURE_ID_AREA, longAxisLength * shortAxisLength * itk::Math::pi);
 }
 
 void mitk::PlanarEllipse::PrintSelf(std::ostream &os, itk::Indent indent) const
@@ -296,7 +293,7 @@ void mitk::PlanarEllipse::PrintSelf(std::ostream &os, itk::Indent indent) const
 
 bool mitk::PlanarEllipse::Equals(const mitk::PlanarFigure &other) const
 {
-  const mitk::PlanarEllipse *otherEllipse = dynamic_cast<const mitk::PlanarEllipse *>(&other);
+  const auto *otherEllipse = dynamic_cast<const mitk::PlanarEllipse *>(&other);
   if (otherEllipse)
   {
     if (this->m_TreatAsCircle != otherEllipse->m_TreatAsCircle)

@@ -30,9 +30,9 @@ namespace mitk
   {
   public:
     OpenIGTLinkTypeInformation();
-    virtual ~OpenIGTLinkTypeInformation();
+    ~OpenIGTLinkTypeInformation() override;
 
-    virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice,
+    TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice,
       mitk::NavigationToolStorage::Pointer navigationTools,
       std::string* errorMessage, std::vector<int>*) override;
 

@@ -44,7 +44,7 @@ public:
   static const bool DEBUG;
 
   org_blueberry_core_runtime_Activator();
-  ~org_blueberry_core_runtime_Activator();
+  ~org_blueberry_core_runtime_Activator() override;
 
   void start(ctkPluginContext* context) override;
   void stop(ctkPluginContext* context) override;

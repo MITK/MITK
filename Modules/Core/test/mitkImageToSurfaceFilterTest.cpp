@@ -59,7 +59,7 @@ public:
    * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used
    * members for a new test case. (If the members are not used in a test, the method does not need to be called).
    */
-  void setUp() override { m_BallImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("BallBinary30x30x30.nrrd")); }
+  void setUp() override { m_BallImage = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("BallBinary30x30x30.nrrd")); }
   void tearDown() override {}
   void testImageToSurfaceFilterInitialization()
   {
@@ -87,9 +87,9 @@ public:
     mitk::ImageToSurfaceFilter::Pointer testObject = mitk::ImageToSurfaceFilter::New();
     testObject->SetInput(m_BallImage);
     testObject->Update();
-    mitk::Surface::Pointer resultSurface = NULL;
+    mitk::Surface::Pointer resultSurface = nullptr;
     resultSurface = testObject->GetOutput();
-    CPPUNIT_ASSERT_MESSAGE("Testing surface generation!", testObject->GetOutput() != NULL);
+    CPPUNIT_ASSERT_MESSAGE("Testing surface generation!", testObject->GetOutput() != nullptr);
   }
 
   void testDecimatePromeshDecimation()
@@ -97,7 +97,7 @@ public:
     mitk::ImageToSurfaceFilter::Pointer testObject = mitk::ImageToSurfaceFilter::New();
     testObject->SetInput(m_BallImage);
     testObject->Update();
-    mitk::Surface::Pointer resultSurface = NULL;
+    mitk::Surface::Pointer resultSurface = nullptr;
     resultSurface = testObject->GetOutput();
 
     mitk::Surface::Pointer testSurface1 = testObject->GetOutput()->Clone();
@@ -117,7 +117,7 @@ public:
     mitk::ImageToSurfaceFilter::Pointer testObject = mitk::ImageToSurfaceFilter::New();
     testObject->SetInput(m_BallImage);
     testObject->Update();
-    mitk::Surface::Pointer resultSurface = NULL;
+    mitk::Surface::Pointer resultSurface = nullptr;
     resultSurface = testObject->GetOutput();
 
     mitk::Surface::Pointer testSurface1 = testObject->GetOutput()->Clone();
@@ -137,7 +137,7 @@ public:
     mitk::ImageToSurfaceFilter::Pointer testObject = mitk::ImageToSurfaceFilter::New();
     testObject->SetInput(m_BallImage);
     testObject->Update();
-    mitk::Surface::Pointer resultSurface = NULL;
+    mitk::Surface::Pointer resultSurface = nullptr;
     resultSurface = testObject->GetOutput();
 
     mitk::Surface::Pointer testSurface1 = testObject->GetOutput()->Clone();

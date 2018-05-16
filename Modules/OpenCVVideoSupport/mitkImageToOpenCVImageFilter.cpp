@@ -39,6 +39,11 @@ namespace mitk{
     m_Image = _Image;
   }
 
+  Image* ImageToOpenCVImageFilter::GetImage()
+  {
+    return m_Image.Lock();
+  }
+
 
   bool ImageToOpenCVImageFilter::CheckImage( Image* image )
   {
@@ -57,15 +62,16 @@ namespace mitk{
 
   IplImage* ImageToOpenCVImageFilter::GetOpenCVImage()
   {
+    auto image = m_Image.Lock();
 
-    if(!this->CheckImage( m_Image ))
+    if(!this->CheckImage(image))
       return nullptr;
 
     m_OpenCVImage = (nullptr);
 
     try
     {
-      AccessFixedTypeByItk(m_Image.GetPointer(), ItkImageProcessing,
+      AccessFixedTypeByItk(image.GetPointer(), ItkImageProcessing,
         MITK_ACCESSBYITK_PIXEL_TYPES_SEQ  // gray image
         (UCRGBPixelType)(USRGBPixelType)(FloatRGBPixelType)(DoubleRGBPixelType), // rgb image
         (2) // dimensions
@@ -86,7 +92,7 @@ namespace mitk{
     if( img )
     {
       // do not copy data, then release just the header
-      mat = cv::Mat ( img, false );
+      mat = cv::cvarrToMat(img, false);
       cvReleaseImageHeader( &img );
     }
 

@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
-#include <mitkDataNodeFactory.h>
 
 #include "ui_RTDoseVisualizerControls.h"
 
@@ -29,12 +28,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImage.h>
 
+#include <mitkNodePredicateBase.h>
+
 #include "mitkDoseVisPreferenceHelper.h"
 
 // Shader
 #include <mitkCoreServices.h>
-#include <mitkIShaderRepository.h>
-#include <mitkShaderProperty.h>
 
 #include <vtkSmartPointer.h>
 #include <mitkRenderingModeProperty.h>
@@ -70,6 +69,7 @@ public:
   RTDoseVisualizer();
   virtual ~RTDoseVisualizer();
   static const std::string VIEW_ID;
+  static const std::string ISO_LINE_NODE_NAME;
 
   void OnSliceChanged(itk::Object *sender, const itk::EventObject &e);
 
@@ -103,8 +103,6 @@ public:
 
     void ActualizeFreeIsoLine();
 
-    void OnDoseClicked();
-
 protected:
 
   virtual void CreateQtPartControl(QWidget *parent);
@@ -114,6 +112,8 @@ protected:
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
     const QList<mitk::DataNode::Pointer>& nodes );
+
+  void PrepareDoseNode(mitk::DataNode* doseNode) const;
 
   /** Update the transfer funtion property for the color wash*/
   void UpdateColorWashTransferFunction();
@@ -163,9 +163,15 @@ protected:
 
   bool m_internalUpdate;
 
+  /**Predicate for dose nodes (excluding iso line nodes)*/
+  mitk::NodePredicateBase::Pointer m_isDosePredicate;
+  /**Predicate for dose nodes and all iso line nodes*/
+  mitk::NodePredicateBase::Pointer m_isDoseOrIsoPredicate;
+  /**Predicate for iso line nodes*/
+  mitk::NodePredicateBase::Pointer m_isIsoPredicate;
+
 private:
-  mitk::DataNode::Pointer GetIsoDoseNode(mitk::DataNode::Pointer doseNode);
-  bool ModalityIsRTDose(const mitk::DataNode* dataNode) const;
+  mitk::DataNode::Pointer GetIsoDoseNode(mitk::DataNode::Pointer doseNode) const;
 };
 
 #endif // RTDoseVisualizer_h

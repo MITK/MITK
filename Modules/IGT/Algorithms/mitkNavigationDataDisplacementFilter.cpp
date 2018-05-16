@@ -57,7 +57,7 @@ void mitk::NavigationDataDisplacementFilter::GenerateData()
 
 void mitk::NavigationDataDisplacementFilter::SetParameters( const mitk::PropertyList* p )
 {
-  if (p == NULL)
+  if (p == nullptr)
     return;
   mitk::Vector3D v;
   if (p->GetPropertyValue<mitk::Vector3D>("NavigationDataDisplacementFilter_Offset", v) == true)  // search for Offset parameter

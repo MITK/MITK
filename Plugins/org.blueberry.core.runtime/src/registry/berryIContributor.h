@@ -44,7 +44,7 @@ struct org_blueberry_core_runtime_EXPORT IContributor : public Object
 {
   berryObjectMacro(berry::IContributor)
 
-  virtual ~IContributor();
+  ~IContributor() override;
 
   /**
    * Provides name of the contributor (e.g., "org.eclipse.core.runtime").

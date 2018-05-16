@@ -50,7 +50,7 @@ namespace mitk
     * If existed was passed, it is true if the PropertyList with that id existed, false otherwise
     * \return a valid PropertyList with a StringProperty "Id" containing the passed id
     */
-    virtual mitk::PropertyList::Pointer GetPropertyList(std::string &id, bool *existed = 0) = 0;
+    virtual mitk::PropertyList::Pointer GetPropertyList(std::string &id, bool *existed = nullptr) = 0;
     /**
     * removes the PropertyList with the given id
     * \return true if PropertyList existed and could be removed, false otherwise
@@ -71,7 +71,7 @@ namespace mitk
     * GetPersistenceNodePropertyName() set to true. If ds is set the returned DataNodes will also be added to that DS.
     * \return vector of DataNodes with the described attributes
     */
-    virtual DataStorage::SetOfObjects::Pointer GetDataNodes(DataStorage *ds = 0) = 0;
+    virtual DataStorage::SetOfObjects::Pointer GetDataNodes(DataStorage *ds = nullptr) = 0;
     /**
     * Searches storage for persistent DataNodes, extracts and inserts the appended property lists to this service
     * \return true if at least one node was found from which a PropertyList could be restored
@@ -198,7 +198,7 @@ private:                                                                        
       if (m_PersistenceService)                                                                                        \
         m_PersistenceService->RemovePropertyListReplacedObserver(this);                                                \
     }                                                                                                                  \
-    void AfterPropertyListReplaced(const std::string &id, mitk::PropertyList *propertyList)                            \
+    void AfterPropertyListReplaced(const std::string &id, mitk::PropertyList *)                            \
     {                                                                                                                  \
       if (m_##THE_CLASS_NAME && m_##THE_CLASS_NAME->GetId() == id)                                                     \
         m_##THE_CLASS_NAME->FromPropertyList();                                                                        \

@@ -102,10 +102,10 @@ namespace mitk
 
     // overwritten from VtkMapper3D to be able to return a
     // m_PointsAssembly which is much faster than a vtkAssembly
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
-    virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /*
     * \deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
@@ -119,14 +119,13 @@ namespace mitk
   protected:
     PointSetVtkMapper3D();
 
-    virtual ~PointSetVtkMapper3D();
+    ~PointSetVtkMapper3D() override;
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
-    virtual void ResetMapper(BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void ResetMapper(BaseRenderer *renderer) override;
     virtual void ApplyAllProperties(mitk::BaseRenderer *renderer, vtkActor *actor);
     virtual void CreateContour(vtkPoints *points, vtkCellArray *connections);
     virtual void CreateVTKRenderObjects();
-    virtual void VertexRendering();
 
     /// All point positions, already in world coordinates
     vtkSmartPointer<vtkPoints> m_WorldPositions;
@@ -160,7 +159,6 @@ namespace mitk
     // variables to check if an update of the vtk objects is needed
     ScalarType m_PointSize;
     ScalarType m_ContourRadius;
-    bool m_VertexRendering;
   };
 
 } // namespace mitk

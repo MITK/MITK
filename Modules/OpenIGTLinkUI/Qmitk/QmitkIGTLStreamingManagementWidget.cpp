@@ -44,8 +44,8 @@ QmitkIGTLStreamingManagementWidget::QmitkIGTLStreamingManagementWidget(
   QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f), m_IsClient(false)
 {
-  m_Controls = NULL;
-  this->m_IGTLDevice = NULL;
+  m_Controls = nullptr;
+  this->m_IGTLDevice = nullptr;
   CreateQtPartControl(this);
 }
 
@@ -212,7 +212,7 @@ void QmitkIGTLStreamingManagementWidget::LoadSource(
 
   //check if the device is a server or a client
   if (dynamic_cast<mitk::IGTLClient*>(
-    this->m_IGTLDevice.GetPointer()) == NULL)
+    this->m_IGTLDevice.GetPointer()) == nullptr)
   {
     m_IsClient = false;
   }
@@ -368,8 +368,16 @@ void QmitkIGTLStreamingManagementWidget::OnStreamingTimerTimeout()
 
 void QmitkIGTLStreamingManagementWidget::SelectSourceAndAdaptGUI()
 {
-  //get the current selection and call SourceSelected which will call AdaptGUI
+  //get the current selection (the auto-selected message source) and call
+  //SourceSelected which will call AdaptGUI
   mitk::IGTLMessageSource::Pointer curSelSrc =
-    m_Controls->messageSourceSelectionWidget->GetSelectedIGTLMessageSource();
+    m_Controls->messageSourceSelectionWidget->AutoSelectFirstIGTLMessageSource();
   SourceSelected(curSelSrc);
+
+  if( curSelSrc.IsNotNull() )
+  {
+    //automatically start streaming for better support and handling when using
+    //e.g. the US-module.
+    this->OnStartStreaming();
+  }
 }

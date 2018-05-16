@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 
 #include "ui_QmitkToFTutorialViewControls.h"
 
@@ -29,11 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
   \brief QmitkToFTutorialView is a tutorial showing the basic implementation techniques of MITK-ToF
   Step 1 shows how to acquire images from a tof camera
   Step 2 shows how to apply a processing filter to generate a surface from a range image
-
-  \sa QmitkFunctionality
-  \ingroup Functionalities
 */
-class QmitkToFTutorialView : public QmitkFunctionality
+class QmitkToFTutorialView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -48,8 +45,10 @@ class QmitkToFTutorialView : public QmitkFunctionality
 
     virtual void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-    virtual void StdMultiWidgetNotAvailable() override;
+    ///
+    /// Sets the focus to an internal widget.
+    ///
+    virtual void SetFocus() override;
 
   protected slots:
 
@@ -63,8 +62,6 @@ class QmitkToFTutorialView : public QmitkFunctionality
     void RemoveAllNodesFromDataStorage();
 
     Ui::QmitkToFTutorialViewControls* m_Controls;
-
-    QmitkStdMultiWidget* m_MultiWidget;
 
 };
 

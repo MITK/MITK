@@ -64,7 +64,7 @@ public:
   static int STATE_DISPOSED; // = 3
 
   WorkbenchPartReference();
-  ~WorkbenchPartReference();
+  ~WorkbenchPartReference() override;
 
   virtual bool IsDisposed() const;
 
@@ -74,34 +74,34 @@ public:
   /**
    * @see IWorkbenchPart
    */
-  virtual void AddPropertyListener(IPropertyChangeListener* listener) override;
+  void AddPropertyListener(IPropertyChangeListener* listener) override;
 
   /**
    * @see IWorkbenchPart
    */
-  virtual void RemovePropertyListener(IPropertyChangeListener* listener) override;
+  void RemovePropertyListener(IPropertyChangeListener* listener) override;
 
   QString GetId() const override;
 
-  virtual QString GetTitleToolTip() const override;
+  QString GetTitleToolTip() const override;
 
   /**
    * Returns the pane name for the part
    *
    * @return the pane name for the part
    */
-  virtual QString GetPartName() const override;
+  QString GetPartName() const override;
 
   /**
    * Returns the content description for this part.
    *
    * @return the pane name for the part
    */
-  virtual QString GetContentDescription() const override;
+  QString GetContentDescription() const override;
 
-  virtual bool IsDirty() const override;
+  bool IsDirty() const override;
 
-  virtual QIcon GetTitleImage() const override;
+  QIcon GetTitleImage() const override;
 
   virtual void FireVisibilityChange();
 
@@ -122,12 +122,12 @@ public:
 
   virtual void SetPinned(bool newPinned);
 
-  virtual bool IsPinned() const override;
+  bool IsPinned() const override;
 
   /*
    * @see org.blueberry.ui.IWorkbenchPartReference#getPartProperty(java.lang.String)
    */
-  virtual QString GetPartProperty(const QString& key) const override;
+  QString GetPartProperty(const QString& key) const override;
 
   int ComputePreferredSize(bool width, int availableParallel,
                            int availablePerpendicular, int preferredResult) override;

@@ -46,7 +46,7 @@ void mitk::ConnectomicsNetworkMatrixWriter::Write()
   InputType::ConstPointer input = dynamic_cast<const InputType*>(this->GetInput());
   if (input.IsNull() )
   {
-    MITK_ERROR <<"Sorry, input to ConnectomicsNetworkMatrixWriter is NULL!";
+    MITK_ERROR <<"Sorry, input to ConnectomicsNetworkMatrixWriter is nullptr!";
     return;
   }
 
@@ -73,7 +73,7 @@ void mitk::ConnectomicsNetworkMatrixWriter::Write()
   try
   {
     const std::string& locale = "C";
-    const std::string& currLocale = setlocale( LC_ALL, NULL );
+    const std::string& currLocale = setlocale( LC_ALL, nullptr );
     setlocale(LC_ALL, locale.c_str());
 
     std::locale previousLocale(out->getloc());
@@ -114,7 +114,7 @@ void mitk::ConnectomicsNetworkMatrixWriter::Write()
       {
         if( input->EdgeExists(nodes[i], nodes[j]))
         {
-        body << (input->GetEdge(nodes[i], nodes[j])).edge_weight;
+        body << (input->GetEdge(nodes[i], nodes[j])).fiber_count;
         }
         else
         {

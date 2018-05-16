@@ -46,19 +46,19 @@ namespace itk
       itkTypeMacro(Self, Superclass);
 
     // \brief calculates the costs for going from p1 to p2
-    virtual double GetCost(IndexType p1, IndexType p2);
+    double GetCost(IndexType p1, IndexType p2) override;
 
     // \brief Initialize the metric
-    virtual void Initialize();
+    void Initialize() override;
 
     // \brief returns the minimal costs possible (needed for A*)
-    virtual double GetMinCost();
+    double GetMinCost() override;
 
     void SetThreshold(double t) { m_Threshold = t; }
   protected:
     ShortestPathCostFunctionTbss();
 
-    virtual ~ShortestPathCostFunctionTbss(){};
+    ~ShortestPathCostFunctionTbss() override{};
 
     double m_Threshold;
 

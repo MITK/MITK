@@ -47,7 +47,7 @@ void mitk::ContourModelMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *ren
 
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  mitk::ContourModel *inputContour = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
+  auto *inputContour = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
 
   localStorage->m_OutlinePolyData = this->CreateVtkPolyDataFromContour(inputContour);
 
@@ -76,8 +76,8 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer *renderer)
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  mitk::ContourModel *data = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
-  if (data == NULL)
+  auto *data = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
+  if (data == nullptr)
   {
     return;
   }
@@ -88,7 +88,7 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer *renderer)
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
   // Check if time step is valid
   const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
-  if ((dataTimeGeometry == NULL) || (dataTimeGeometry->CountTimeSteps() == 0) ||
+  if ((dataTimeGeometry == nullptr) || (dataTimeGeometry->CountTimeSteps() == 0) ||
       (!dataTimeGeometry->IsValidTimeStep(renderer->GetTimeStep())) || (this->GetTimestep() == -1))
   {
     // clear the rendered polydata
@@ -132,13 +132,13 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper3D::CreateVtkPolyDataFromCo
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
 
   // iterate over the control points
-  mitk::ContourModel::VertexIterator current = inputContour->IteratorBegin(timestep);
-  mitk::ContourModel::VertexIterator next = inputContour->IteratorBegin(timestep);
+  auto current = inputContour->IteratorBegin(timestep);
+  auto next = inputContour->IteratorBegin(timestep);
   if (next != inputContour->IteratorEnd(timestep))
   {
     next++;
 
-    mitk::ContourModel::VertexIterator end = inputContour->IteratorEnd(timestep);
+    auto end = inputContour->IteratorEnd(timestep);
 
     while (next != end)
     {

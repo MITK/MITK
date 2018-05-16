@@ -110,12 +110,11 @@ void OpenIGTLinkExample::CreatePipeline()
 
      //create small sphere and use it as surface
      mitk::Surface::Pointer mySphere = mitk::Surface::New();
-     vtkSphereSource *vtkData = vtkSphereSource::New();
-     vtkData->SetRadius(2.0f);
-     vtkData->SetCenter(0.0, 0.0, 0.0);
-     vtkData->Update();
-     mySphere->SetVtkPolyData(vtkData->GetOutput());
-     vtkData->Delete();
+     vtkSmartPointer<vtkSphereSource> vtkSphere = vtkSmartPointer<vtkSphereSource>::New();
+     vtkSphere->SetRadius(2.0f);
+     vtkSphere->SetCenter(0.0, 0.0, 0.0);
+     vtkSphere->Update();
+     mySphere->SetVtkPolyData(vtkSphere->GetOutput());
      newNode->SetData(mySphere);
 
      m_VisFilter->SetRepresentationObject(i, mySphere);
@@ -158,7 +157,7 @@ void OpenIGTLinkExample::Start()
     m_Timer.stop();
     igtl::StopTrackingDataMessage::Pointer stopStreaming =
       igtl::StopTrackingDataMessage::New();
-    this->m_IGTLClient->SendMessage(stopStreaming.GetPointer());
+    this->m_IGTLClient->SendMessage(mitk::IGTLMessage::New((igtl::MessageBase::Pointer) stopStreaming));
     this->m_Controls.butStart->setText("Start Pipeline");
     //this->m_Controls.visualizationUpdateRateSpinBox->setEnabled(false);
   }
@@ -215,7 +214,7 @@ void OpenIGTLinkExample::ResizeBoundingBox()
 {
   // get all nodes
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetAll();
-  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
+  auto bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
 
   if (bounds.IsNull())
   {

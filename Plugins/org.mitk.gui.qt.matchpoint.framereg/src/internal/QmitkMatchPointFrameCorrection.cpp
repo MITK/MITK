@@ -61,11 +61,11 @@ const std::string QmitkMatchPointFrameCorrection::VIEW_ID =
   "org.mitk.views.matchpoint.algorithm.framereg";
 
 QmitkMatchPointFrameCorrection::QmitkMatchPointFrameCorrection()
-  : m_Parent(NULL), m_LoadedDLLHandle(NULL), m_LoadedAlgorithm(NULL), m_CanLoadAlgorithm(false),
+  : m_Parent(nullptr), m_LoadedDLLHandle(nullptr), m_LoadedAlgorithm(nullptr), m_CanLoadAlgorithm(false),
     m_ValidInputs(false), m_Working(false)
 {
-  m_spSelectedTargetData = NULL;
-  m_spSelectedTargetMaskData = NULL;
+  m_spSelectedTargetData = nullptr;
+  m_spSelectedTargetMaskData = nullptr;
 }
 
 QmitkMatchPointFrameCorrection::~QmitkMatchPointFrameCorrection()
@@ -115,7 +115,7 @@ const map::deployment::DLLInfo* QmitkMatchPointFrameCorrection::GetSelectedAlgor
   return m_SelectedAlgorithmInfo;
 }
 
-void QmitkMatchPointFrameCorrection::OnMaskCheckBoxToggeled(bool checked)
+void QmitkMatchPointFrameCorrection::OnMaskCheckBoxToggeled(bool)
 {
   if (!m_Working)
   {
@@ -243,20 +243,18 @@ bool QmitkMatchPointFrameCorrection::CheckInputs()
   {
     m_Controls.m_lbLoadedAlgorithmName->setText(
       QString("<font color='red'>No algorithm seleted!</font>"));
-    m_spSelectedTargetNode = NULL;
-    m_spSelectedTargetData = NULL;
+    m_spSelectedTargetNode = nullptr;
+    m_spSelectedTargetData = nullptr;
 
-    m_spSelectedTargetMaskNode = NULL;
-    m_spSelectedTargetMaskData = NULL;
+    m_spSelectedTargetMaskNode = nullptr;
+    m_spSelectedTargetMaskData = nullptr;
   }
   else
   {
     QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
 
-    mitk::Image* targetImage = NULL;
-    mitk::PointSet* targetPointSet = NULL;
-
-    mitk::Image* targetMaskImage = NULL;
+    mitk::Image* targetImage = nullptr;
+    mitk::Image* targetMaskImage = nullptr;
 
     typedef ::map::algorithm::facet::MaskedRegistrationAlgorithmInterface<3, 3> MaskRegInterface;
 
@@ -265,8 +263,8 @@ bool QmitkMatchPointFrameCorrection::CheckInputs()
     if (nodes.count() < 1)
     {
       m_Controls.m_lbTargetName->setText(QString("<font color='red'>no data selected!</font>"));
-      m_spSelectedTargetNode = NULL;
-      m_spSelectedTargetData = NULL;
+      m_spSelectedTargetNode = nullptr;
+      m_spSelectedTargetData = nullptr;
     }
     else
     {
@@ -303,13 +301,13 @@ bool QmitkMatchPointFrameCorrection::CheckInputs()
       if (nodes.count() < 1)
       {
         m_Controls.m_lbTargetMaskName->setText(QString("<font color='red'>no data selected!</font>"));
-        m_spSelectedTargetMaskNode = NULL;
-        m_spSelectedTargetMaskData = NULL;
+        m_spSelectedTargetMaskNode = nullptr;
+        m_spSelectedTargetMaskData = nullptr;
       }
       else
       {
         m_spSelectedTargetMaskNode = nodes.front();
-        m_spSelectedTargetMaskData = NULL;
+        m_spSelectedTargetMaskData = nullptr;
         targetMaskImage = dynamic_cast<mitk::Image*>(m_spSelectedTargetMaskNode->GetData());
 
         bool isMask = maskPredicate->CheckNode(m_spSelectedTargetMaskNode);
@@ -335,8 +333,8 @@ bool QmitkMatchPointFrameCorrection::CheckInputs()
     {
       m_Controls.m_lbTargetMaskName->setText(QString("mask deactivated"));
       validTargetMask = true;
-      m_spSelectedTargetMaskNode = NULL;
-      m_spSelectedTargetMaskData = NULL;
+      m_spSelectedTargetMaskNode = nullptr;
+      m_spSelectedTargetMaskData = nullptr;
     }
 
   }
@@ -369,7 +367,7 @@ bool QmitkMatchPointFrameCorrection::CheckInputs()
 std::string QmitkMatchPointFrameCorrection::GetInputNodeDisplayName(const mitk::DataNode* node)
 const
 {
-  std::string result = "UNDEFINED/NULL";
+  std::string result = "UNDEFINED/nullptr";
 
   if (node)
   {
@@ -431,7 +429,7 @@ std::string QmitkMatchPointFrameCorrection::GetDefaultJobName() const
   {
     ++newIndex;
     result = baseName + ::map::core::convert::toStr(newIndex);
-    isUnique =  this->GetDataStorage()->GetNamedNode(result) == NULL;
+    isUnique =  this->GetDataStorage()->GetNamedNode(result) == nullptr;
   }
 
   return result;
@@ -459,7 +457,7 @@ void QmitkMatchPointFrameCorrection::ConfigureRegistrationControls()
     const MaskRegInterface* pMaskReg = dynamic_cast<const MaskRegInterface*>
                                        (m_LoadedAlgorithm.GetPointer());
 
-    m_Controls.groupMasks->setVisible(pMaskReg != NULL);
+    m_Controls.groupMasks->setVisible(pMaskReg != nullptr);
 
     this->m_Controls.m_lbLoadedAlgorithmName->setText(
       QString::fromStdString(m_LoadedAlgorithm->getUID()->toStr()));
@@ -545,7 +543,7 @@ void QmitkMatchPointFrameCorrection::ConfigureFrameList()
 
 void QmitkMatchPointFrameCorrection::OnFramesSelectAllPushed()
 {
-  for (unsigned int row = 0; row < m_Controls.m_listFrames->count(); row++)
+  for (int row = 0; row < m_Controls.m_listFrames->count(); row++)
   {
     QListWidgetItem* item = m_Controls.m_listFrames->item(row);
     item->setCheckState(Qt::Checked);
@@ -554,7 +552,7 @@ void QmitkMatchPointFrameCorrection::OnFramesSelectAllPushed()
 
 void QmitkMatchPointFrameCorrection::OnFramesDeSelectAllPushed()
 {
-  for (unsigned int row = 0; row < m_Controls.m_listFrames->count(); row++)
+  for (int row = 0; row < m_Controls.m_listFrames->count(); row++)
   {
     QListWidgetItem* item = m_Controls.m_listFrames->item(row);
     item->setCheckState(Qt::Unchecked);
@@ -563,7 +561,7 @@ void QmitkMatchPointFrameCorrection::OnFramesDeSelectAllPushed()
 
 void QmitkMatchPointFrameCorrection::OnFramesInvertPushed()
 {
-  for (unsigned int row = 0; row < m_Controls.m_listFrames->count(); row++)
+  for (int row = 0; row < m_Controls.m_listFrames->count(); row++)
   {
     QListWidgetItem* item = m_Controls.m_listFrames->item(row);
 
@@ -583,7 +581,7 @@ QmitkMatchPointFrameCorrection::GenerateIgnoreList() const
 {
   mitk::TimeFramesRegistrationHelper::IgnoreListType result;
 
-  for (unsigned int row = 0; row < m_Controls.m_listFrames->count(); row++)
+  for (int row = 0; row < m_Controls.m_listFrames->count(); row++)
   {
     QListWidgetItem* item = m_Controls.m_listFrames->item(row);
 
@@ -596,8 +594,8 @@ QmitkMatchPointFrameCorrection::GenerateIgnoreList() const
   return result;
 }
 
-void QmitkMatchPointFrameCorrection::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
-    const QList<mitk::DataNode::Pointer>& nodes)
+void QmitkMatchPointFrameCorrection::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
+    const QList<mitk::DataNode::Pointer>&)
 {
   if (!m_Working)
   {
@@ -670,12 +668,12 @@ void QmitkMatchPointFrameCorrection::OnSaveLogBtnPushed()
   QDateTime currentTime = QDateTime::currentDateTime();
   QString fileName = tr("registration_log_") + currentTime.toString(tr("yyyy-MM-dd_hh-mm-ss")) +
                      tr(".txt");
-  fileName = QFileDialog::getSaveFileName(NULL, tr("Save registration log"), fileName,
+  fileName = QFileDialog::getSaveFileName(nullptr, tr("Save registration log"), fileName,
                                           tr("Text files (*.txt)"));
 
   if (fileName.isEmpty())
   {
-    QMessageBox::critical(NULL, tr("No file selected!"),
+    QMessageBox::critical(nullptr, tr("No file selected!"),
                           tr("Cannot save registration log file. Please selected a file."));
   }
   else

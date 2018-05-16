@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkSkeletonizationFilter.h"
 #include "mitkProgressBar.h"
 #include <limits>
-#include <time.h>
+#include <ctime>
 
 namespace itk
 {
@@ -194,7 +194,7 @@ namespace itk
         }
       }
 
-      delete localsum;
+      delete[] localsum;
 
     }
 

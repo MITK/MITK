@@ -40,7 +40,7 @@ namespace mitk
                                   vtkSmartPointer<vtkMatrix4x4> matrix,
                                   mitk::Point3D refPoint);
 
-    virtual ~ApplyTransformMatrixOperation();
+    ~ApplyTransformMatrixOperation() override;
 
     vtkSmartPointer<vtkMatrix4x4> GetMatrix();
 

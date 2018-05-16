@@ -1,0 +1,21 @@
+/**
+\page org_mitk_views_qballreconstruction Q-Ball Reconstruction
+
+The q-ball reonstruction view implements a variety of reconstruction methods. The different reconstruction methods are described in the following:
+\li <b>Numerical:</b> The original, numerical q-ball reconstruction presented by Tuch et al. [5]
+\li <b>Standard (SH):</b> Descoteaux's reconstruction based on spherical harmonic basis functions [6]
+\li <b>Solid Angle (SH):</b> Aganj's reconstruction with solid angle consideration [7]
+\li <b>ADC-profile only:</b> The ADC-profile reconstructed with spherical harmonic basis functions
+\li <b>Raw signal only:</b> The raw signal reconstructed with spherical harmonic basis functions
+
+\imageMacro{qballs1.png,"The q-ball resonstruction view",9.99}
+
+B0 threshold works the same as in tensor reconstruction. The maximum l-level configures the size of the spherical harmonics basis. Larger l-values (e.g. l=8) allow higher levels of detail, lower levels are more stable against noise (e.g. l=4). Lambda is a regularisation parameter. Set it to 0 for no regularisation. lambda = 0.006 has proven to be a stable choice under various settings.
+
+\imageMacro{qballs2.png,"Advanced q-ball reconstruction settings",8.00}
+
+This is how a q-ball image should initially look after reconstruction. Standard q-balls feature a relatively low GFA and thus appear rather dark. Adjust the level-window to solve this.
+
+\imageMacro{qballs3.png,"q-ball image after reconstruction",16.00}
+
+*/

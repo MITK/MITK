@@ -64,7 +64,7 @@ namespace mitk
 
   protected:
     ContourUtils();
-    virtual ~ContourUtils();
+    ~ContourUtils() override;
   };
 }
 

@@ -20,14 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::ThreeDnTDICOMSeriesReader
 ::ThreeDnTDICOMSeriesReader(unsigned int decimalPlacesForOrientation)
 :DICOMITKSeriesGDCMReader(decimalPlacesForOrientation)
-,m_Group3DandT(true)
+,m_Group3DandT(m_DefaultGroup3DandT)
 {
 }
 
 mitk::ThreeDnTDICOMSeriesReader
 ::ThreeDnTDICOMSeriesReader(const ThreeDnTDICOMSeriesReader& other )
 :DICOMITKSeriesGDCMReader(other)
-,m_Group3DandT(true)
+,m_Group3DandT(m_DefaultGroup3DandT)
 {
 }
 
@@ -52,7 +52,7 @@ bool
 mitk::ThreeDnTDICOMSeriesReader
 ::operator==(const DICOMFileReader& other) const
 {
-  if (const Self* otherSelf = dynamic_cast<const Self*>(&other))
+  if (const auto* otherSelf = dynamic_cast<const Self*>(&other))
   {
     return
        DICOMITKSeriesGDCMReader::operator==(other)

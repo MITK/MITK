@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkImage.h"
 #include "mitkVtkMapper.h"
-#include "vtkMitkVolumeTextureMapper3D.h"
 
 // VTK
 #include <vtkFixedPointVolumeRayCastMapper.h>
@@ -33,12 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkVersionMacros.h>
 #include <vtkVolumeProperty.h>
 
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 6)))
-
 #include "vtkMitkGPUVolumeRayCastMapper.h"
-
-#endif
 
 namespace mitk
 {
@@ -63,24 +57,24 @@ namespace mitk
 
       virtual const mitk::Image *GetInput();
 
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
-    virtual void ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer) override;
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
+    void ApplyProperties(vtkActor *actor, mitk::BaseRenderer *renderer) override;
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /** Returns true if this Mapper currently allows for Level-of-Detail rendering.
      * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
      * ProgressEvent on BaseRenderer. */
-    virtual bool IsLODEnabled(BaseRenderer *renderer = NULL) const override;
-    bool IsMIPEnabled(BaseRenderer *renderer = NULL);
-    bool IsGPUEnabled(BaseRenderer *renderer = NULL);
-    bool IsRAYEnabled(BaseRenderer *renderer = NULL);
+    bool IsLODEnabled(BaseRenderer *renderer = nullptr) const override;
+    bool IsMIPEnabled(BaseRenderer *renderer = nullptr);
+    bool IsGPUEnabled(BaseRenderer *renderer = nullptr);
+    bool IsRAYEnabled(BaseRenderer *renderer = nullptr);
 
-    virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer *renderer) override;
+    void MitkRenderVolumetricGeometry(mitk::BaseRenderer *renderer) override;
 
   protected:
     GPUVolumeMapper3D();
-    virtual ~GPUVolumeMapper3D();
+    ~GPUVolumeMapper3D() override;
 
     bool IsRenderable(mitk::BaseRenderer *renderer);
 
@@ -92,26 +86,21 @@ namespace mitk
     void GenerateDataCPU(mitk::BaseRenderer *renderer);
 
     bool InitGPU(mitk::BaseRenderer *renderer);
-    void DeinitGPU(mitk::BaseRenderer *renderer);
-    void GenerateDataGPU(mitk::BaseRenderer *renderer);
-
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 6)))
+    void DeinitGPU(mitk::BaseRenderer *);
+    void GenerateDataGPU(mitk::BaseRenderer *);
 
     bool InitRAY(mitk::BaseRenderer *renderer);
     void DeinitRAY(mitk::BaseRenderer *renderer);
     void GenerateDataRAY(mitk::BaseRenderer *renderer);
 
-#endif
-
     void InitVtkMapper(mitk::BaseRenderer *renderer);
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
     void CreateDefaultTransferFunctions();
     void UpdateTransferFunctions(mitk::BaseRenderer *renderer);
 
-    vtkSmartPointer<vtkVolume> m_VolumeNULL;
+    vtkSmartPointer<vtkVolume> m_Volumenullptr;
 
     bool m_commonInitialized;
     vtkSmartPointer<vtkImageChangeInformation> m_UnitSpacingImageFilter;
@@ -136,11 +125,7 @@ namespace mitk
       bool m_gpuSupported;
       bool m_gpuInitialized;
       vtkSmartPointer<vtkVolume> m_VolumeGPU;
-      vtkSmartPointer<vtkMitkVolumeTextureMapper3D> m_MapperGPU;
       vtkSmartPointer<vtkVolumeProperty> m_VolumePropertyGPU;
-
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 6)))
 
       bool m_raySupported;
       bool m_rayInitialized;
@@ -148,37 +133,26 @@ namespace mitk
       vtkSmartPointer<vtkGPUVolumeRayCastMapper> m_MapperRAY;
       vtkSmartPointer<vtkVolumeProperty> m_VolumePropertyRAY;
 
-#endif
-
       LocalStorage()
       {
-        m_VtkRenderWindow = 0;
+        m_VtkRenderWindow = nullptr;
 
         m_cpuInitialized = false;
 
         m_gpuInitialized = false;
         m_gpuSupported = true; // assume initially gpu slicing is supported
 
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 6)))
         m_rayInitialized = false;
         m_raySupported = true; // assume initially gpu raycasting is supported
-#endif
       }
 
-      ~LocalStorage()
+      ~LocalStorage() override
       {
         if (m_cpuInitialized && m_MapperCPU && m_VtkRenderWindow)
           m_MapperCPU->ReleaseGraphicsResources(m_VtkRenderWindow);
 
-        if (m_gpuInitialized && m_MapperGPU && m_VtkRenderWindow)
-          m_MapperGPU->ReleaseGraphicsResources(m_VtkRenderWindow);
-
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 6)))
         if (m_rayInitialized && m_MapperRAY && m_VtkRenderWindow)
           m_MapperRAY->ReleaseGraphicsResources(m_VtkRenderWindow);
-#endif
       }
     };
 

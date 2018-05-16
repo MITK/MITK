@@ -162,7 +162,6 @@ void mitk::CreateDistanceImageFromSurfaceFilter::PreprocessContourPoints()
   // First of all we have to extract the nomals and the surface points.
   // Duplicated points can be eliminated
 
-  Surface *currentSurface;
   vtkSmartPointer<vtkPolyData> polyData;
   vtkSmartPointer<vtkDoubleArray> currentCellNormals;
   vtkSmartPointer<vtkCellArray> existingPolys;
@@ -174,7 +173,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::PreprocessContourPoints()
 
   for (unsigned int i = 0; i < numberOfInputs; i++)
   {
-    currentSurface = const_cast<Surface *>(this->GetInput(i));
+    auto currentSurface = this->GetInput(i);
     polyData = currentSurface->GetVtkPolyData();
 
     if (polyData->GetNumberOfPolys() == 0)
@@ -473,7 +472,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::PrintEquationSystem()
 
 void mitk::CreateDistanceImageFromSurfaceFilter::SetInput(const mitk::Surface *surface)
 {
-  this->SetInput(0, const_cast<mitk::Surface *>(surface));
+  this->SetInput(0, surface);
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::SetInput(unsigned int idx, const mitk::Surface *surface)

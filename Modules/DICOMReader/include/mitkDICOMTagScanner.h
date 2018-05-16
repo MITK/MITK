@@ -106,7 +106,7 @@ namespace mitk
       void PopLocale() const;
 
       DICOMTagScanner();
-      virtual ~DICOMTagScanner();
+      ~DICOMTagScanner() override;
 
     private:
 

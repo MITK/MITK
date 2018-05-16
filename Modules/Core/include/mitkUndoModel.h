@@ -61,6 +61,21 @@ namespace mitk
     virtual bool RedoListEmpty() = 0;
 
     //##Documentation
+    //## @brief Gets the limit on the size of the undo history.
+    //## The undo limit determines how many items can be stored
+    //## in the undo stack. If the value is 0 that means that
+    //## there is no limit.
+    virtual std::size_t GetUndoLimit() const = 0;
+
+    //##Documentation
+    //## @brief Sets a limit on the size of the undo history.
+    //## If the limit is reached, the oldest undo items will
+    //## be dropped from the bottom of the undo stack.
+    //## The 0 value means that there is no limit.
+    //## @param limit the maximum number of items on the stack
+    virtual void SetUndoLimit(std::size_t limit) = 0;
+
+    //##Documentation
     //## @brief returns the ObjectEventId of the
     //## top Element in the OperationHistory of the selected
     //## UndoModel
@@ -74,14 +89,14 @@ namespace mitk
 
     //##Documentation
     //## @brief returns the last specified OperationEvent in Undo-list
-    //## corresponding to the given values; if nothing found, then returns NULL
+    //## corresponding to the given values; if nothing found, then returns nullptr
     //##
     //## needed to get the old Position of an Element for declaring an UndoOperation
     virtual OperationEvent *GetLastOfType(OperationActor *destination, OperationType opType) = 0;
 
   protected:
     UndoModel(){};
-    virtual ~UndoModel(){};
+    ~UndoModel() override{};
   };
 
 } // namespace mitk

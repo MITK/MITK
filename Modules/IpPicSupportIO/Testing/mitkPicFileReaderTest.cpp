@@ -40,13 +40,13 @@ int mitkPicFileReaderTest(int argc, char *argv[])
     else
     {
       // independently read header of pic file
-      mitkIpPicDescriptor *picheader = NULL;
+      mitkIpPicDescriptor *picheader = nullptr;
       if (itksys::SystemTools::LowerCase(itksys::SystemTools::GetFilenameExtension(argv[1])).find(".pic") !=
           std::string::npos)
       {
-        picheader = mitkIpPicGetHeader(argv[1], NULL);
+        picheader = mitkIpPicGetHeader(argv[1], nullptr);
       }
-      if (picheader == NULL)
+      if (picheader == nullptr)
       {
         std::cout << "file not found/not a pic-file - test not applied [PASSED]" << std::endl;
         std::cout << "[TEST DONE]" << std::endl;
@@ -76,7 +76,7 @@ int mitkPicFileReaderTest(int argc, char *argv[])
       std::cout << "[PASSED]" << std::endl;
 
       std::cout << "Testing availability of geometry: ";
-      if (reader->GetOutput()->GetGeometry() == NULL)
+      if (reader->GetOutput()->GetGeometry() == nullptr)
       {
         std::cout << "[FAILED]" << std::endl;
         return EXIT_FAILURE;
@@ -86,7 +86,7 @@ int mitkPicFileReaderTest(int argc, char *argv[])
       std::cout << "Testing type of geometry (TimeGeometry expected): ";
       mitk::TimeGeometry *timeGeometry;
       timeGeometry = reader->GetOutput()->GetTimeGeometry();
-      if (timeGeometry == NULL)
+      if (timeGeometry == nullptr)
       {
         std::cout << "[FAILED]" << std::endl;
         return EXIT_FAILURE;
@@ -104,7 +104,7 @@ int mitkPicFileReaderTest(int argc, char *argv[])
       std::cout << "Testing type of first geometry contained in the TimeGeometry (SlicedGeometry3D expected): ";
       mitk::SlicedGeometry3D *slicedgeometry;
       slicedgeometry = dynamic_cast<mitk::SlicedGeometry3D *>(timeGeometry->GetGeometryForTimeStep(0).GetPointer());
-      if (slicedgeometry == NULL)
+      if (slicedgeometry == nullptr)
       {
         std::cout << "[FAILED]" << std::endl;
         return EXIT_FAILURE;
@@ -113,7 +113,7 @@ int mitkPicFileReaderTest(int argc, char *argv[])
 
       std::cout << "Testing availability of first geometry contained in the SlicedGeometry3D: ";
       mitk::Geometry2D *geometry2d = slicedgeometry->GetGeometry2D(0);
-      if (geometry2d == NULL)
+      if (geometry2d == nullptr)
       {
         std::cout << "[FAILED]" << std::endl;
         return EXIT_FAILURE;

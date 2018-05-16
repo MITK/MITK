@@ -35,6 +35,11 @@ double vtkThickPlane::EvaluateFunction(double x[3])
   return this->EvaluateFunction(x[0],x[1],x[2]);
 }
 
+void vtkThickPlane::EvaluateFunction(vtkDataArray* input, vtkDataArray* output)
+{
+  vtkImplicitFunction::EvaluateFunction(input, output);
+}
+
 // Evaluate plane equation for point x,y,z.
 double vtkThickPlane::EvaluateFunction(double x,double y,double z)
 {

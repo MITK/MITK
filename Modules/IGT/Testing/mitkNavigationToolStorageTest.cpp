@@ -165,13 +165,13 @@ class mitkNavigationToolStorageTestClass
     MITK_TEST_CONDITION_REQUIRED(myStorage->AddTool(myTool1),"Testing: Add one tool.");
     MITK_TEST_CONDITION_REQUIRED(myDataStorage->GetNamedNode("Tool1")==node1,"Testing: Is data node in data storage?");
     MITK_TEST_CONDITION_REQUIRED(myStorage->DeleteAllTools(),"Deleting all tools.");
-    MITK_TEST_CONDITION_REQUIRED(myDataStorage->GetNamedNode("Tool1")==NULL,"Testing: Was data node removed from storage?");
+    MITK_TEST_CONDITION_REQUIRED(myDataStorage->GetNamedNode("Tool1")==nullptr,"Testing: Was data node removed from storage?");
     MITK_TEST_CONDITION_REQUIRED(myStorage->AddTool(myTool1),"Testing: Add two tools (1).");
     MITK_TEST_CONDITION_REQUIRED(myStorage->AddTool(myTool2),"Testing: Add two tools (2).");
     MITK_TEST_CONDITION_REQUIRED(myDataStorage->GetNamedNode("Tool1")==node1,"Testing: Is data node in data storage (1)?");
     MITK_TEST_CONDITION_REQUIRED(myDataStorage->GetNamedNode("Tool2")==node2,"Testing: Is data node in data storage (2)?");
     MITK_TEST_CONDITION_REQUIRED(myStorage->DeleteTool(0),"Deleting tool 1.");
-    MITK_TEST_CONDITION_REQUIRED(myDataStorage->GetNamedNode("Tool1")==NULL,"Testing: Was data node 1 deleted?");
+    MITK_TEST_CONDITION_REQUIRED(myDataStorage->GetNamedNode("Tool1")==nullptr,"Testing: Was data node 1 deleted?");
     MITK_TEST_CONDITION_REQUIRED(myDataStorage->GetNamedNode("Tool2")==node2,"Testing: Is data node 2 still in data storage?");
 
     }

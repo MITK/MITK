@@ -39,7 +39,7 @@ struct BERRY_UI_QT IFolderLayout : public IPlaceholderFolderLayout
 
   berryObjectMacro(berry::IFolderLayout)
 
-  ~IFolderLayout();
+  ~IFolderLayout() override;
 
     /**
      * Adds a view with the given compound id to this folder.

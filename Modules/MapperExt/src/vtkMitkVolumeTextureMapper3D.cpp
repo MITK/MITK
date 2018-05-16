@@ -63,9 +63,9 @@ vtkMitkVolumeTextureMapper3D::vtkMitkVolumeTextureMapper3D()
   this->SavedScalarOpacityDistance = 0;
 
   /*
-    this->Volume1                       = NULL;
-    this->Volume2                       = NULL;
-    this->Volume3                       = NULL;
+    this->Volume1                       = nullptr;
+    this->Volume2                       = nullptr;
+    this->Volume3                       = nullptr;
     */
   /*
   this->VolumeSize                    = 0;

@@ -34,7 +34,7 @@ struct BERRY_UI_QT IViewReference : virtual public IWorkbenchPartReference {
 
   berryObjectMacro(berry::IViewReference)
 
-  ~IViewReference();
+  ~IViewReference() override;
 
     /**
      * Returns the secondary ID for the view.

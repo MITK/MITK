@@ -37,7 +37,7 @@ public:
   mitkClassMacro(QmitkDrawPaintbrushToolGUI, QmitkPaintbrushToolGUI);
   itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    virtual ~QmitkDrawPaintbrushToolGUI();
+    ~QmitkDrawPaintbrushToolGUI() override;
 
 signals:
 

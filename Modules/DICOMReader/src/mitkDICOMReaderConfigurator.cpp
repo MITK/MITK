@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMSortByTag.h"
 #include "mitkSortByImagePositionPatient.h"
 
+
 mitk::DICOMReaderConfigurator
 ::DICOMReaderConfigurator()
 {
@@ -80,10 +81,17 @@ mitk::DICOMReaderConfigurator
     int version(1);
     if ( rootElement->QueryIntAttribute("version", &version) == TIXML_SUCCESS)
     {
-      if (version != 1)
+      if (version == 1)
       {
-        MITK_WARN << "This reader is only capable of creating DICOMFileReaders of version 1. "
-                  << "Will not continue, because given configuration is meant for version " << version << ".";
+        MITK_WARN << "Warning the given configuration is for DICOMFileReaders of version 1. "
+                  << "This old version may be interpreted differently. Reason: "
+                  << "The default values for the following xml settings have been changed: "
+                  << "FixTiltByShearing (false -> true); StrictSorting (true -> false); ExpectDistanceOne (true -> false).";
+      }
+      else if (version >2)
+      {
+        MITK_WARN << "This reader is only capable of creating DICOMFileReaders of version 1 and 2. "
+          << "Will not continue, because given configuration is meant for version " << version << ".";
         return nullptr;
       }
     }
@@ -96,7 +104,7 @@ mitk::DICOMReaderConfigurator
 
     std::string classname(classnameC);
 
-    double decimalPlacesForOrientation(5);
+    double decimalPlacesForOrientation(mitk::DICOMITKSeriesGDCMReader::GetDefaultDecimalPlacesForOrientation());
     bool useDecimalPlacesForOrientation(false);
     useDecimalPlacesForOrientation =
       rootElement->QueryDoubleAttribute("decimalPlacesForOrientation", &decimalPlacesForOrientation) == TIXML_SUCCESS; // attribute present and a double value
@@ -121,11 +129,15 @@ mitk::DICOMReaderConfigurator
     else
     if (classname == "DICOMITKSeriesGDCMReader")
     {
+      bool simpleVolumeImport = QueryBooleanAttribute(rootElement, "simpleVolumeImport", mitk::DICOMITKSeriesGDCMReader::GetDefaultSimpleVolumeImport());
+
       mitk::DICOMITKSeriesGDCMReader::Pointer reader;
       if (useDecimalPlacesForOrientation)
-        reader = mitk::DICOMITKSeriesGDCMReader::New(decimalPlacesForOrientation);
+        reader = mitk::DICOMITKSeriesGDCMReader::New( decimalPlacesForOrientation, simpleVolumeImport );
       else
-        reader = mitk::DICOMITKSeriesGDCMReader::New();
+        reader = mitk::DICOMITKSeriesGDCMReader::New( mitk::DICOMITKSeriesGDCMReader::GetDefaultDecimalPlacesForOrientation(), simpleVolumeImport );
+
+      // simple volume import that ignores number of frames and inter slice distance
 
       return ConfigureDICOMITKSeriesGDCMReader(reader, rootElement).GetPointer();
     }
@@ -146,18 +158,26 @@ mitk::DICOMReaderConfigurator
   (   s == "true" || s == "on" || s == "1" \
    || s == "TRUE" || s == "ON")
 
+bool
+mitk::DICOMReaderConfigurator
+::QueryBooleanAttribute(const TiXmlElement* element, const char* attributeName, bool defaultValue) const
+{
+  bool value(defaultValue);
+  const char* valueC = element->Attribute(attributeName);
+  if (valueC)
+  {
+    std::string valueS(valueC);
+    value = boolStringTrue(valueS);
+  }
+  return value;
+}
+
 void
 mitk::DICOMReaderConfigurator
 ::ConfigureCommonPropertiesOfThreeDnTDICOMSeriesReader(ThreeDnTDICOMSeriesReader::Pointer reader, TiXmlElement* element) const
 {
   // add the "group3DnT" flag
-  bool group3DnT(true);
-  const char* group3DnTC = element->Attribute("group3DnT");
-  if (group3DnTC)
-  {
-    std::string group3DnTS(group3DnTC);
-    group3DnT = boolStringTrue(group3DnTS);
-  }
+  bool group3DnT = QueryBooleanAttribute(element, "group3DnT", ThreeDnTDICOMSeriesReader::GetDefaultGroup3DandT());
 
   reader->SetGroup3DandT( group3DnT );
 }
@@ -194,21 +214,13 @@ mitk::DICOMReaderConfigurator
   const char* configDescriptionC = element->Attribute("description");
   if (configDescriptionC)
   {
-    std::string configDescription(configDescriptionC);
     reader->SetConfigurationDescription(configDescriptionC);
   }
 
   // "fixTiltByShearing" flag
-  bool fixTiltByShearing(false);
-  const char* fixTiltByShearingC = element->Attribute("fixTiltByShearing");
-  if (fixTiltByShearingC)
-  {
-    std::string fixTiltByShearingS(fixTiltByShearingC);
-    fixTiltByShearing = boolStringTrue(fixTiltByShearingS);
-  }
+  bool fixTiltByShearing = QueryBooleanAttribute(element, "fixTiltByShearing", DICOMITKSeriesGDCMReader::GetDefaultFixTiltByShearing());
 
   reader->SetFixTiltByShearing( fixTiltByShearing );
-
 }
 
 mitk::DICOMITKSeriesGDCMReader::Pointer
@@ -220,24 +232,12 @@ mitk::DICOMReaderConfigurator
   this->ConfigureCommonPropertiesOfDICOMITKSeriesGDCMReader(reader, element);
 
   // "acceptTwoSlicesGroups" flag
-  bool acceptTwoSlicesGroups(true);
-  const char* acceptTwoSlicesGroupsC = element->Attribute("acceptTwoSlicesGroups");
-  if (acceptTwoSlicesGroupsC)
-  {
-    std::string acceptTwoSlicesGroupsS(acceptTwoSlicesGroupsC);
-    acceptTwoSlicesGroups = boolStringTrue(acceptTwoSlicesGroupsS);
-  }
+  bool acceptTwoSlicesGroups = QueryBooleanAttribute(element, "acceptTwoSlicesGroups", true);
 
   reader->SetAcceptTwoSlicesGroups( acceptTwoSlicesGroups );
 
   // "toleratedOriginError" attribute (double)
-  bool toleratedOriginErrorIsAbsolute(false);
-  const char* toleratedOriginErrorIsAbsoluteC = element->Attribute("toleratedOriginErrorIsAbsolute");
-  if (toleratedOriginErrorIsAbsoluteC)
-  {
-    std::string toleratedOriginErrorIsAbsoluteS(toleratedOriginErrorIsAbsoluteC);
-    toleratedOriginErrorIsAbsolute = boolStringTrue(toleratedOriginErrorIsAbsoluteS);
-  }
+  bool toleratedOriginErrorIsAbsolute = QueryBooleanAttribute(element, "toleratedOriginErrorIsAbsolute", false);
 
   double toleratedOriginError(0.3);
   if (element->QueryDoubleAttribute("toleratedOriginError", &toleratedOriginError) == TIXML_SUCCESS) // attribute present and a double value
@@ -291,23 +291,11 @@ mitk::DICOMReaderConfigurator
   mitk::DICOMTagBasedSorter::Pointer tagSorter = mitk::DICOMTagBasedSorter::New();
 
   // "strictSorting" parameter!
-  bool strictSorting(true);
-  const char* strictSortingC = element->Attribute("strictSorting");
-  if (strictSortingC)
-  {
-    std::string strictSortingS(strictSortingC);
-    strictSorting = boolStringTrue(strictSortingS);
-  }
+  bool strictSorting = QueryBooleanAttribute(element, "strictSorting", mitk::DICOMTagBasedSorter::GetDefaultStrictSorting());
   tagSorter->SetStrictSorting(strictSorting);
 
   // "strictSorting" parameter!
-  bool expectDistanceOne(true);
-  const char* expectDistanceOneC = element->Attribute("expectDistanceOne");
-  if (expectDistanceOneC)
-  {
-    std::string expectDistanceOneS(expectDistanceOneC);
-    expectDistanceOne = boolStringTrue(expectDistanceOneS);
-  }
+  bool expectDistanceOne = QueryBooleanAttribute(element, "expectDistanceOne", mitk::DICOMTagBasedSorter::GetDefaultExpectDistanceOne());
   tagSorter->SetExpectDistanceOne(expectDistanceOne);
 
   TiXmlElement* dElement = element->FirstChildElement("Distinguishing");
@@ -442,7 +430,6 @@ mitk::DICOMReaderConfigurator
     throw std::invalid_argument( ss.str() );
   }
 
-  std::string name = requiredStringAttribute(xmlElement, "name");
   std::string groupS = requiredStringAttribute(xmlElement, "group");
   std::string elementS = requiredStringAttribute(xmlElement, "element");
 
@@ -487,17 +474,17 @@ mitk::DICOMReaderConfigurator
   // check possible sub-classes from the most-specific one up to the most generic one
   const DICOMFileReader* cPointer = reader;
   TiXmlElement* root;
-  if (const ClassicDICOMSeriesReader* specificReader = dynamic_cast<const ClassicDICOMSeriesReader*>(cPointer))
+  if (const auto* specificReader = dynamic_cast<const ClassicDICOMSeriesReader*>(cPointer))
   {
     root = this->CreateConfigStringFromReader(specificReader);
   }
   else
-  if (const ThreeDnTDICOMSeriesReader* specificReader = dynamic_cast<const ThreeDnTDICOMSeriesReader*>(cPointer))
+  if (const auto* specificReader = dynamic_cast<const ThreeDnTDICOMSeriesReader*>(cPointer))
   {
     root = this->CreateConfigStringFromReader(specificReader);
   }
   else
-  if (const DICOMITKSeriesGDCMReader* specificReader = dynamic_cast<const DICOMITKSeriesGDCMReader*>(cPointer))
+  if (const auto* specificReader = dynamic_cast<const DICOMITKSeriesGDCMReader*>(cPointer))
   {
     root = this->CreateConfigStringFromReader(specificReader);
   }
@@ -546,7 +533,7 @@ mitk::DICOMReaderConfigurator
       ++sorterIter)
   {
     const DICOMDatasetSorter* sorter = *sorterIter;
-    if (const DICOMTagBasedSorter* specificSorter = dynamic_cast<const DICOMTagBasedSorter*>(sorter))
+    if (const auto* specificSorter = dynamic_cast<const DICOMTagBasedSorter*>(sorter))
     {
       TiXmlElement* sorterTag = this->CreateConfigStringFromDICOMDatasetSorter(specificSorter);
       root->LinkEndChild(sorterTag);
@@ -583,7 +570,7 @@ mitk::DICOMReaderConfigurator
     distinguishingTagsElement->LinkEndChild(tag);
 
     const DICOMTagBasedSorter::TagValueProcessor* processor = sorter->GetTagValueProcessorForDistinguishingTag(*tagIter);
-    if (const DICOMTagBasedSorter::CutDecimalPlaces* specificProcessor = dynamic_cast<const DICOMTagBasedSorter::CutDecimalPlaces*>(processor))
+    if (const auto* specificProcessor = dynamic_cast<const DICOMTagBasedSorter::CutDecimalPlaces*>(processor))
     {
       tag->SetDoubleAttribute("cutDecimalPlaces", specificProcessor->GetPrecision());
     }

@@ -24,11 +24,11 @@ static int GetNumberOfSlices(int renderWindow)
   const QString renderWindowName = QString("stdmulti.widget%1").arg(renderWindow + 1);
   vtkRenderWindow* theRenderWindow = mitk::BaseRenderer::GetRenderWindowByName(renderWindowName.toStdString());
 
-  if (theRenderWindow != NULL)
+  if (theRenderWindow != nullptr)
   {
     mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(theRenderWindow)->GetSliceNavigationController()->GetSlice();
 
-    if (stepper != NULL)
+    if (stepper != nullptr)
       return std::max(1, static_cast<int>(stepper->GetSteps()));
   }
 
@@ -62,7 +62,7 @@ void QmitkSliceAnimationWidget::SetAnimationItem(QmitkAnimationItem* sliceAnimat
 {
   m_AnimationItem = dynamic_cast<QmitkSliceAnimationItem*>(sliceAnimationItem);
 
-  if (m_AnimationItem == NULL)
+  if (m_AnimationItem == nullptr)
     return;
 
   m_Ui->windowComboBox->setCurrentIndex(m_AnimationItem->GetRenderWindow());
@@ -81,7 +81,7 @@ void QmitkSliceAnimationWidget::SetAnimationItem(QmitkAnimationItem* sliceAnimat
 
 void QmitkSliceAnimationWidget::OnRenderWindowChanged(int renderWindow)
 {
-  if (m_AnimationItem == NULL)
+  if (m_AnimationItem == nullptr)
     return;
 
   const int lastSlice = static_cast<int>(GetNumberOfSlices(renderWindow) - 1);
@@ -101,7 +101,7 @@ void QmitkSliceAnimationWidget::OnRenderWindowChanged(int renderWindow)
 
 void QmitkSliceAnimationWidget::OnFromChanged(double from)
 {
-  if (m_AnimationItem == NULL)
+  if (m_AnimationItem == nullptr)
     return;
 
   int intFrom = static_cast<int>(from);
@@ -112,7 +112,7 @@ void QmitkSliceAnimationWidget::OnFromChanged(double from)
 
 void QmitkSliceAnimationWidget::OnToChanged(double to)
 {
-  if (m_AnimationItem == NULL)
+  if (m_AnimationItem == nullptr)
     return;
 
   int intTo = static_cast<int>(to);
@@ -123,7 +123,7 @@ void QmitkSliceAnimationWidget::OnToChanged(double to)
 
 void QmitkSliceAnimationWidget::OnReverseChanged(bool reverse)
 {
-  if (m_AnimationItem == NULL)
+  if (m_AnimationItem == nullptr)
     return;
 
   if (m_AnimationItem->GetReverse() != reverse)

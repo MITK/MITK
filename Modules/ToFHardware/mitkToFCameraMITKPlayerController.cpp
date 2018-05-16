@@ -36,18 +36,18 @@ ToFCameraMITKPlayerController::ToFCameraMITKPlayerController() :
   m_ConnectionCheck(false),
   m_InputFileName(""),
   m_ToFImageType(ToFImageType3D),
-  m_DistanceImage(0),
-  m_AmplitudeImage(0),
-  m_IntensityImage(0),
-  m_RGBImage(0),
-  m_DistanceInfile(NULL),
-  m_AmplitudeInfile(NULL),
-  m_IntensityInfile(NULL),
-  m_RGBInfile(NULL),
-  m_IntensityArray(NULL),
-  m_DistanceArray(NULL),
-  m_AmplitudeArray(NULL),
-  m_RGBArray(NULL),
+  m_DistanceImage(nullptr),
+  m_AmplitudeImage(nullptr),
+  m_IntensityImage(nullptr),
+  m_RGBImage(nullptr),
+  m_DistanceInfile(nullptr),
+  m_AmplitudeInfile(nullptr),
+  m_IntensityInfile(nullptr),
+  m_RGBInfile(nullptr),
+  m_IntensityArray(nullptr),
+  m_DistanceArray(nullptr),
+  m_AmplitudeArray(nullptr),
+  m_RGBArray(nullptr),
   m_DistanceImageFileName(""),
   m_AmplitudeImageFileName(""),
   m_IntensityImageFileName(""),
@@ -69,32 +69,32 @@ void ToFCameraMITKPlayerController::CleanUp()
   if(m_DistanceImage.IsNotNull())
   {
     m_DistanceImage->ReleaseData();
-    m_DistanceImage = NULL;
+    m_DistanceImage = nullptr;
   }
   if(m_AmplitudeImage.IsNotNull())
   {
     m_AmplitudeImage->ReleaseData();
-    m_AmplitudeImage = NULL;
+    m_AmplitudeImage = nullptr;
   }
   if(m_IntensityImage.IsNotNull())
   {
     m_IntensityImage->ReleaseData();
-    m_IntensityImage = NULL;
+    m_IntensityImage = nullptr;
   }
   if(m_RGBImage.IsNotNull())
   {
     m_RGBImage->ReleaseData();
-    m_RGBImage = NULL;
+    m_RGBImage = nullptr;
   }
 
   delete[] this->m_DistanceArray;
-  this->m_DistanceArray = NULL;
+  this->m_DistanceArray = nullptr;
   delete[] this->m_AmplitudeArray;
-  this->m_AmplitudeArray = NULL;
+  this->m_AmplitudeArray = nullptr;
   delete[] this->m_IntensityArray;
-  this->m_IntensityArray = NULL;
+  this->m_IntensityArray = nullptr;
   delete[] this->m_RGBArray;
-  this->m_RGBArray = NULL;
+  this->m_RGBArray = nullptr;
 
   this->m_DistanceImageFileName = "";
   this->m_AmplitudeImageFileName = "";
@@ -120,7 +120,7 @@ bool ToFCameraMITKPlayerController::OpenCameraConnection()
 
       if (!this->m_DistanceImageFileName.empty())
       {
-        m_DistanceImage = mitk::IOUtil::LoadImage(this->m_DistanceImageFileName);
+        m_DistanceImage = mitk::IOUtil::Load<mitk::Image>(this->m_DistanceImageFileName);
       }
       else
       {
@@ -128,7 +128,7 @@ bool ToFCameraMITKPlayerController::OpenCameraConnection()
       }
       if (!this->m_AmplitudeImageFileName.empty())
       {
-        m_AmplitudeImage = mitk::IOUtil::LoadImage(this->m_AmplitudeImageFileName);
+        m_AmplitudeImage = mitk::IOUtil::Load<mitk::Image>(this->m_AmplitudeImageFileName);
       }
       else
       {
@@ -136,7 +136,7 @@ bool ToFCameraMITKPlayerController::OpenCameraConnection()
       }
       if (!this->m_IntensityImageFileName.empty())
       {
-        m_IntensityImage = mitk::IOUtil::LoadImage(this->m_IntensityImageFileName);
+        m_IntensityImage = mitk::IOUtil::Load<mitk::Image>(this->m_IntensityImageFileName);
       }
       else
       {
@@ -144,7 +144,7 @@ bool ToFCameraMITKPlayerController::OpenCameraConnection()
       }
       if (!this->m_RGBImageFileName.empty())
       {
-        m_RGBImage = mitk::IOUtil::LoadImage(this->m_RGBImageFileName);
+        m_RGBImage = mitk::IOUtil::Load<mitk::Image>(this->m_RGBImageFileName);
       }
       else
       {
@@ -170,7 +170,7 @@ bool ToFCameraMITKPlayerController::OpenCameraConnection()
       }
 
       // Check for dimension type
-      mitk::Image::Pointer infoImage = NULL;
+      mitk::Image::Pointer infoImage = nullptr;
       if(m_ImageStatus.at(0))
       {
         infoImage = m_DistanceImage;

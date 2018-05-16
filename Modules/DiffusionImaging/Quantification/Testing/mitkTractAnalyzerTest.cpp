@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
  *  test for the class "mitkTractAnalyzer".
  */
-int mitkTractAnalyzerTest(int argc , char* argv[])
+int mitkTractAnalyzerTest(int, char* argv[])
 {
 
   MITK_TEST_BEGIN("TractAnalyzer");
@@ -42,7 +42,7 @@ int mitkTractAnalyzerTest(int argc , char* argv[])
   mitk::CastToMitkImage(itkImage, mitkImage);
 
   // load point set
-  mitk::PointSet::Pointer pointSet = mitk::IOUtil::LoadPointSet(argv[2]);
+  mitk::PointSet::Pointer pointSet = mitk::IOUtil::Load<mitk::PointSet>(argv[2]);
 
   mitk::TractAnalyzer analyzer;
 

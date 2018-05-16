@@ -156,12 +156,12 @@ protected:
   /**
    * Virtual destructor
    */
-  virtual ~NonUniformBSpline();
+  ~NonUniformBSpline() override;
 
   /**
    * Method to print the object.
    */
-  virtual void PrintSelf( std::ostream& os, Indent indent ) const override;
+  void PrintSelf( std::ostream& os, Indent indent ) const override;
 
   /**
    * Points that the spline attempts to intepolate.

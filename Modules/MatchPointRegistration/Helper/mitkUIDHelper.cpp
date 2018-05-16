@@ -27,7 +27,7 @@ mitk::NodeUIDType mitk::EnsureUID(mitk::DataNode* node)
 {
   if (!node)
   {
-    mitkThrow() << "Cannot ensure node UID. Passed node pointer is NULL.";
+    mitkThrow() << "Cannot ensure node UID. Passed node pointer is nullptr.";
   }
 
   std::string propUID = "";
@@ -62,7 +62,7 @@ mitk::NodeUIDType mitk::EnsureUID(mitk::BaseData* data)
 {
   if (!data)
   {
-    mitkThrow() << "Cannot ensure node UID. Passed node pointer is NULL.";
+    mitkThrow() << "Cannot ensure node UID. Passed node pointer is nullptr.";
   }
 
   BaseProperty::Pointer uidProp = data->GetProperty(mitk::Prop_UID);

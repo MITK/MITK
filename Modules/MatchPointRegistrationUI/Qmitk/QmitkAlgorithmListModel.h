@@ -37,16 +37,16 @@ class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkAlgorithmListModel : public QAbst
   Q_OBJECT
 
 public:
-  QmitkAlgorithmListModel(QObject *parent = NULL);
-  virtual ~QmitkAlgorithmListModel(){};
+  QmitkAlgorithmListModel(QObject *parent = nullptr);
+  ~QmitkAlgorithmListModel() override{};
 
   void SetAlgorithms(::map::deployment::DLLDirectoryBrowser::DLLInfoListType algList);
 
-  virtual Qt::ItemFlags flags(const QModelIndex &index) const;
-  virtual QVariant data(const QModelIndex &index, int role) const;
-  virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-  virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-  virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+  Qt::ItemFlags flags(const QModelIndex &index) const override;
+  QVariant data(const QModelIndex &index, int role) const override;
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+  int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+  int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
 private:
   ::map::deployment::DLLDirectoryBrowser::DLLInfoListType m_AlgList;

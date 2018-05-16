@@ -68,11 +68,11 @@ public:
     AlwaysEnabled
   };
 
-  QmitkToolSelectionBox(QWidget *parent = 0, mitk::DataStorage *storage = 0);
-  virtual ~QmitkToolSelectionBox();
+  QmitkToolSelectionBox(QWidget *parent = nullptr, mitk::DataStorage *storage = nullptr);
+  ~QmitkToolSelectionBox() override;
 
   mitk::ToolManager *GetToolManager();
-  void SetToolManager(mitk::ToolManager &); // no NULL pointer allowed here, a manager is required
+  void SetToolManager(mitk::ToolManager &); // no nullptr pointer allowed here, a manager is required
 
   void setTitle(const QString &title);
 
@@ -83,7 +83,7 @@ public:
     the tool is displayed. Effectively, you can provide a human readable list like "default, lymphnodevolumetry,
     oldERISstuff".
   */
-  void SetDisplayedToolGroups(const std::string &toolGroups = 0);
+  void SetDisplayedToolGroups(const std::string &toolGroups = nullptr);
 
   void OnToolManagerToolModified();
   void OnToolManagerReferenceDataModified();

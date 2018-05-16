@@ -75,32 +75,32 @@ namespace mitk
     /** \brief PlanarCross has either two or four control points, depending on the operation mode. */
     unsigned int GetMaximumNumberOfControlPoints() const override { return this->GetSingleLineMode() ? 2 : 4; }
     /** \brief The cross shall be reset to a single line when a control point is selected. */
-    virtual bool ResetOnPointSelect() override;
+    bool ResetOnPointSelect() override;
 
-    virtual bool ResetOnPointSelectNeeded() const override;
+    bool ResetOnPointSelectNeeded() const override;
 
     /** \brief Returns the number of features available for this PlanarCross (1 or 2). */
-    virtual unsigned int GetNumberOfFeatures() const override;
+    unsigned int GetNumberOfFeatures() const override;
 
-    virtual bool Equals(const mitk::PlanarFigure &other) const override;
+    bool Equals(const mitk::PlanarFigure &other) const override;
 
   protected:
     PlanarCross();
     mitkCloneMacro(Self);
 
     /** \brief Spatially constrain control points of second (orthogonal) line */
-    virtual Point2D ApplyControlPointConstraints(unsigned int index, const Point2D &point) override;
+    Point2D ApplyControlPointConstraints(unsigned int index, const Point2D &point) override;
 
     /** \brief Generates the poly-line representation of the planar figure. */
-    virtual void GeneratePolyLine() override;
+    void GeneratePolyLine() override;
 
     /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
-    virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
+    void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
 
     /** \brief Calculates feature quantities of the planar figure. */
-    virtual void EvaluateFeaturesInternal() override;
+    void EvaluateFeaturesInternal() override;
 
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     // Feature identifiers
     const unsigned int FEATURE_ID_LONGESTDIAMETER;

@@ -75,13 +75,13 @@ namespace mitk
        * called by Update().
        */
 
-      virtual void GenerateData() override;
+      void GenerateData() override;
 
     /**
     * Initializes the output information ( i.e. the geometry information ) of
     * the output of the filter
     */
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
     /**
      * Returns a const reference to the input image (e.g. the original input image that ist used to create the surface)
@@ -195,7 +195,7 @@ namespace mitk
     /**
     * Destructor
     * */
-    virtual ~ImageToSurfaceFilter();
+    ~ImageToSurfaceFilter() override;
 
     /**
      * With the given threshold vtkMarchingCube creates the surface. By default nothing a

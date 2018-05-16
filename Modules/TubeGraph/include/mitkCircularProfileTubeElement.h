@@ -31,7 +31,7 @@ namespace mitk
     CircularProfileTubeElement();
     CircularProfileTubeElement(float x, float y, float z, float d = 0.0f);
     CircularProfileTubeElement(const Point3D, float d = 0.0f);
-    ~CircularProfileTubeElement();
+    ~CircularProfileTubeElement() override;
 
     /**
     * Set the 3D position of the element.
@@ -51,7 +51,7 @@ namespace mitk
     /**
     * Returns the diameter of the circle.
     */
-    const float GetDiameter() const;
+    float GetDiameter() const;
 
     /**
     * Comparison operation between this object and the given object.

@@ -33,10 +33,19 @@ public:
   virtual unsigned char operator() (unsigned char value) const = 0;
 };
 
-class BinaryValueToIndexMapper : public virtual ValueToIndexMapper
+class BinaryValueminusOneToIndexMapper : public virtual ValueToIndexMapper
 {
 public:
   unsigned char operator() (unsigned char value) const
+  {
+    return value-1;
+  }
+};
+
+class BinaryValueToIndexMapper : public virtual ValueToIndexMapper
+{
+public:
+  unsigned char operator() (unsigned char value) const override
   {
     return value;
   }
@@ -45,7 +54,7 @@ public:
 class MultiClassValueToIndexMapper : public virtual ValueToIndexMapper
 {
 public:
-  unsigned char operator() (unsigned char value) const
+  unsigned char operator() (unsigned char value) const override
   {
     if (value == 1 || value == 5)
       return 0;
@@ -57,7 +66,7 @@ public:
 class ProgressionValueToIndexMapper : public virtual ValueToIndexMapper
 {
 public:
-  unsigned char operator() (unsigned char value) const
+  unsigned char operator() (unsigned char value) const override
   {
     if (value == 1 || value == 0)
       return 0;
@@ -122,7 +131,6 @@ private:
   std::vector<unsigned char> m_ConnectionGold;
   std::vector<unsigned char> m_ConnectionTest;
   std::vector<unsigned char> m_ConnectionClass;
-  size_t m_VituralClassCount;
 
   MultiDataVector m_ImageClassStatistic;
   std::vector<std::string> m_ImageNames;

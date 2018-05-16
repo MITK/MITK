@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/QmitkDiffusionImaging">
+        <file>denoisingicon.png</file>
+    </qresource>
+</RCC>

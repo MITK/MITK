@@ -107,13 +107,14 @@ namespace mitk
     typedef ::itk::Image<TPixelType, VImageDimension> InputImageType;
     typedef itk::CastImageFilter<InputImageType, InternalImageType> CastFilterType;
     typedef itk::RescaleIntensityImageFilter<InputImageType, InputImageType> RescaleFilterType;
+    typedef typename RescaleFilterType::OutputImagePixelType RescaleOutputPixelType;
 
     typename CastFilterType::Pointer caster = CastFilterType::New();
     typename RescaleFilterType::Pointer rescaler = RescaleFilterType::New();
 
     rescaler->SetInput(input);
     rescaler->SetOutputMinimum(0);
-    rescaler->SetOutputMaximum(255);
+    rescaler->SetOutputMaximum(std::min(itk::NumericTraits<RescaleOutputPixelType>::max(), static_cast<typename RescaleFilterType::OutputPixelType>(255)));
     caster->SetInput(rescaler->GetOutput());
     caster->Update();
     InternalImageType::Pointer internalImage = caster->GetOutput();
@@ -127,7 +128,7 @@ namespace mitk
     Superclass::PrintSelf(os,indent);
     if (m_Registration.IsNull())
     {
-      os<< "Error. Eval object points to invalid registration (NULL).";
+      os<< "Error. Eval object points to invalid registration (nullptr).";
     }
     else
     {
@@ -137,7 +138,7 @@ namespace mitk
 
     if (m_TargetImage.IsNull())
     {
-      os<< "Error. Eval object points to invalid target image (NULL).";
+      os<< "Error. Eval object points to invalid target image (nullptr).";
     }
     else
     {
@@ -147,7 +148,7 @@ namespace mitk
 
     if (m_MovingImage.IsNull())
     {
-      os<< "Error. Eval object points to invalid moving image (NULL).";
+      os<< "Error. Eval object points to invalid moving image (nullptr).";
     }
     else
     {

@@ -53,9 +53,9 @@ private:
       case (mitk::SliceNavigationController::Sagittal):
         dim = 0;
         break;
-      case (mitk::SliceNavigationController::Original):
+      default: // mitk::SliceNavigationController::Original
         dim = -1;
-        break; // This is just to get rid of a warning
+        break;
     }
 
     /* Fill segmentation
@@ -156,7 +156,7 @@ private:
 public:
   void setUp() override
   {
-    m_ReferenceImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
+    m_ReferenceImage = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Pic3D.nrrd"));
     CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [Pic3D.nrrd]", m_ReferenceImage.IsNotNull());
 
     m_InterpolationController = mitk::SegmentationInterpolationController::GetInstance();

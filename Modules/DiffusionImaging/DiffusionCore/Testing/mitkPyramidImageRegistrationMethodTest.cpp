@@ -37,8 +37,8 @@ int mitkPyramidImageRegistrationMethodTest( int argc, char* argv[] )
 
   MITK_TEST_BEGIN("PyramidImageRegistrationMethodTest");
 
-  mitk::Image::Pointer fixedImage = mitk::IOUtil::LoadImage( argv[1] );
-  mitk::Image::Pointer movingImage = mitk::IOUtil::LoadImage( argv[2] );
+  mitk::Image::Pointer fixedImage = mitk::IOUtil::Load<mitk::Image>( argv[1] );
+  mitk::Image::Pointer movingImage = mitk::IOUtil::Load<mitk::Image>( argv[2] );
 
   std::string type_flag( argv[3] );
 
@@ -106,7 +106,7 @@ int mitkPyramidImageRegistrationMethodTest( int argc, char* argv[] )
 
     if( imageOutput )
     {
-      mitk::IOUtil::SaveImage( registrationMethod->GetResampledMovingImage(), image_out_filename.c_str() );
+      mitk::IOUtil::Save( registrationMethod->GetResampledMovingImage(), image_out_filename.c_str() );
     }
 
 

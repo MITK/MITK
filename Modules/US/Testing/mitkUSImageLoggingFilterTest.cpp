@@ -61,16 +61,16 @@ public:
     m_RandomRestImage1 = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 100, 1, 0.2, 0.3, 0.4);
     m_RandomRestImage2 = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 100, 1, 0.2, 0.3, 0.4);
     m_RandomSingleSliceImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 1, 1, 0.2, 0.3, 0.4);
-    m_RealTestImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
+    m_RealTestImage = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Pic3D.nrrd"));
   }
 
   void tearDown() override
   {
-    m_TestFilter = NULL;
-    m_RandomRestImage1 = NULL;
-    m_RandomRestImage2 = NULL;
-    m_RealTestImage = NULL;
-    m_RandomSingleSliceImage = NULL;
+    m_TestFilter = nullptr;
+    m_RandomRestImage1 = nullptr;
+    m_RandomRestImage2 = nullptr;
+    m_RealTestImage = nullptr;
+    m_RandomSingleSliceImage = nullptr;
   }
 
   void TestInstantiation()

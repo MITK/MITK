@@ -43,14 +43,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include"iconVertiSplit.xpm"
 #include "iconLeaveFullScreen.xpm"
 
-#include <math.h>
+#include <cmath>
 
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
-                                             Qt::WindowFlags f,
+                                             Qt::WindowFlags,
                                              mitk::BaseRenderer *b,
                                              QmitkStdMultiWidget *mw)
-  : QWidget(NULL, Qt::Tool | Qt::FramelessWindowHint),
+  : QWidget(nullptr, Qt::Tool | Qt::FramelessWindowHint),
 
 #else
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
@@ -60,8 +60,8 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
   : QWidget(parent, f),
 #endif
 
-    m_Settings(NULL),
-    m_CrosshairMenu(NULL),
+    m_Settings(nullptr),
+    m_CrosshairMenu(nullptr),
     m_Layout(0),
     m_LayoutDesign(0),
     m_OldLayoutDesign(0),
@@ -71,8 +71,6 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
     m_MultiWidget(mw),
     m_Parent(parent)
 {
-  MITK_DEBUG << "creating renderwindow menu on baserenderer " << b;
-
   // Create Menu Widget
   this->CreateMenuWidget();
   this->setMinimumWidth(61); // DIRTY.. If you add or remove a button, you need to change the size.
@@ -364,7 +362,7 @@ void QmitkRenderWindowMenu::OnFullScreenButton(bool /*checked*/)
 /// \brief
 void QmitkRenderWindowMenu::OnSettingsButton(bool /*checked*/)
 {
-  if (m_Settings == NULL)
+  if (m_Settings == nullptr)
     this->CreateSettingsWidget();
 
   QPoint point = this->mapToGlobal(m_SettingsButton->geometry().topLeft());
@@ -531,7 +529,7 @@ void QmitkRenderWindowMenu::UpdateLayoutDesignList(int layoutDesignIndex)
 {
   m_LayoutDesign = layoutDesignIndex;
 
-  if (m_Settings == NULL)
+  if (m_Settings == nullptr)
     this->CreateSettingsWidget();
 
   switch (m_LayoutDesign)
@@ -846,21 +844,21 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
         if (n)
         {
           bool v;
-          if (n->GetVisibility(v, 0))
+          if (n->GetVisibility(v, nullptr))
             currentState &= v;
         }
         n = this->m_MultiWidget->GetWidgetPlane2();
         if (n)
         {
           bool v;
-          if (n->GetVisibility(v, 0))
+          if (n->GetVisibility(v, nullptr))
             currentState &= v;
         }
         n = this->m_MultiWidget->GetWidgetPlane3();
         if (n)
         {
           bool v;
-          if (n->GetVisibility(v, 0))
+          if (n->GetVisibility(v, nullptr))
             currentState &= v;
         }
       }

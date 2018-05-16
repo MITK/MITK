@@ -42,27 +42,6 @@ private:
   QFrame* contentFrame;
   QWidget* viewForm;
   QWidget* content;
-  //  ViewForm viewForm;
-  //  StandardSystemToolbar systemToolbar;
-  //  CLabel title;
-  //    ProxyControl topCenter;
-  //    SizeCache topCenterCache;
-
-  //    IPropertyListener systemToolbarListener = new IPropertyListener() {
-  //
-  //        public void propertyChanged(Object source, int propId) {
-  //            Point location;
-  //
-  //            if (propId == TabFolderEvent.EVENT_PANE_MENU) {
-  //                location = getPaneMenuLocation();
-  //            } else {
-  //                location = new Point(0,0);
-  //            }
-  //
-  //            fireEvent(propId, getSelection(), location);
-  //        }
-  //
-  //    };
 
   IQtStyleManager* skinManager;
 
@@ -82,7 +61,7 @@ public:
 
   NativeTabFolder(QWidget* parent);
 
-  ~NativeTabFolder();
+  ~NativeTabFolder() override;
 
   void UpdateColors();
 
@@ -142,35 +121,10 @@ public:
    */
   void SetSelectedInfo(const PartInfo& info) override;
 
-  //    /* (non-Javadoc)
-  //     * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getToolbarParent()
-  //     */
-  //    Composite getToolbarParent() {
-  //        return viewForm;
-  //    }
-
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getTabArea()
    */
   QRect GetTabArea() override;
-
-  //    /* (non-Javadoc)
-  //     * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#setToolbar(org.blueberry.swt.widgets.Control)
-  //     */
-  //    void setToolbar(Control toolbarControl) {
-  //
-  //        if (toolbarControl != null) {
-  //            topCenterCache.setControl(toolbarControl);
-  //            topCenter.setTarget(topCenterCache);
-  //            viewForm.setTopCenter(topCenter.getControl());
-  //        } else {
-  //            topCenterCache.setControl(null);
-  //            topCenter.setTarget(null);
-  //            viewForm.setTopCenter(null);
-  //        }
-  //
-  //        super.setToolbar(toolbarControl);
-  //    }
 
   QWidget* GetControl() override;
 

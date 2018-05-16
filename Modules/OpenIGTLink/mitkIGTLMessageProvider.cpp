@@ -98,7 +98,7 @@ void mitk::IGTLMessageProvider::GenerateData()
 
   for (unsigned int index = 0; index < this->GetNumberOfIndexedInputs(); index++)
   {
-    const IGTLMessage* msg = this->GetInput(index);
+    mitk::IGTLMessage::Pointer msg = const_cast<mitk::IGTLMessage*>(this->GetInput(index));
     if (msg == nullptr)
     {
        continue;
@@ -109,13 +109,7 @@ void mitk::IGTLMessageProvider::GenerateData()
       continue;
     }
 
-    igtl::MessageBase::Pointer igtlMsg = msg->GetMessage();
-
-    if ( igtlMsg.IsNotNull() )
-    {
-      //send the message
-      this->m_IGTLDevice->SendMessage(igtlMsg);
-    }
+    this->m_IGTLDevice->SendMessage(msg);
   }
 }
 
@@ -134,7 +128,7 @@ void mitk::IGTLMessageProvider::CreateOutputs()
     return;
 
   this->SetNumberOfIndexedOutputs(1);
-  if (this->GetOutput(0) == NULL)
+  if (this->GetOutput(0) == nullptr)
   {
     DataObjectPointer newOutput = this->MakeOutput(0);
     this->SetNthOutput(0, newOutput);
@@ -180,7 +174,7 @@ void mitk::IGTLMessageProvider::OnIncomingCommand()
   bool isGetMsg = !reqType.find("GET_");
   bool isSTTMsg = !reqType.find("STT_");
   bool isSTPMsg = !reqType.find("STP_");
-  bool isRTSMsg = !reqType.find("RTS_");
+
   //get the type from the request type (remove STT_, STP_, GET_, RTS_)
   std::string type = RemoveRequestPrefixes(requestType);
   //check all microservices if there is a fitting source for the requested type
@@ -210,10 +204,9 @@ void mitk::IGTLMessageProvider::OnIncomingCommand()
       mitk::IGTLMessage::Pointer sourceOutput = source->GetOutput();
       if (sourceOutput.IsNotNull() && sourceOutput->IsDataValid())
       {
-        igtl::MessageBase::Pointer sourceMsg = sourceOutput->GetMessage();
         if ( source.IsNotNull() )
         {
-          this->GetIGTLDevice()->SendMessage(sourceMsg);
+          this->GetIGTLDevice()->SendMessage(sourceOutput);
         }
       }
     }
@@ -258,7 +251,7 @@ bool mitk::IGTLMessageProvider::IsStreaming()
 void mitk::IGTLMessageProvider::StartStreamingOfSource(IGTLMessageSource* src,
                                                        unsigned int fps)
 {
-  if ( src == NULL )
+  if ( src == nullptr )
     return;
 
   //so far the provider allows the streaming of a single source only
@@ -355,13 +348,16 @@ mitk::IGTLMessageSource::Pointer mitk::IGTLMessageProvider::GetFittingSource(con
       return curSource;
   }
   //no service reference was found or found service reference has no valid source
-  return NULL;
+  return nullptr;
 }
 
-void mitk::IGTLMessageProvider::Send(const mitk::IGTLMessage* msg)
+void mitk::IGTLMessageProvider::Send(mitk::IGTLMessage::Pointer msg)
 {
-  if (msg != NULL)
+  if (msg != nullptr)
+  {
+    MITK_INFO << "Sending OpenIGTLink Message: " << msg->ToString();
     this->m_IGTLDevice->SendMessage(msg);
+  }
 }
 
 void
@@ -377,10 +373,26 @@ mitk::IGTLMessageProvider::ConnectTo( mitk::IGTLMessageSource* UpstreamFilter )
 void
 mitk::IGTLMessageProvider::DisconnectFrom( mitk::IGTLMessageSource* UpstreamFilter )
 {
-  for (DataObjectPointerArraySizeType i = 0;
-       i < UpstreamFilter->GetNumberOfOutputs(); i++)
+  if (UpstreamFilter == nullptr)
+    return;
+
+  for (DataObjectPointerArraySizeType i = 0; i < UpstreamFilter->GetNumberOfOutputs(); ++i)
   {
-    this->RemoveInput(UpstreamFilter->GetOutput(i));
+    auto input = UpstreamFilter->GetOutput(i);
+
+    if (input == nullptr)
+      continue;
+
+    auto nb = this->GetNumberOfIndexedInputs();
+
+    for (DataObjectPointerArraySizeType i = 0; i < nb; ++i)
+    {
+      if (this->GetInput(i) == input)
+      {
+        this->RemoveInput(i);
+        break;
+      }
+    }
   }
 }
 

@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBasicCombinationOpenCVImageFilter.h"
 
 // OpenCV
-#include <highgui.h>
+#include <opencv2/videoio.hpp>
 
 namespace mitk {
   /**
@@ -171,21 +171,21 @@ namespace mitk {
 
   protected:
     USImageVideoSource();
-    virtual ~USImageVideoSource();
+    ~USImageVideoSource() override;
 
     /**
       * \brief Next image is gathered from the image source.
       *
       * \param[out] image an OpenCV-Matrix containing this image
       */
-    virtual void GetNextRawImage( cv::Mat& image ) override;
+    void GetNextRawImage( std::vector<cv::Mat>& image ) override;
 
     /**
       * \brief Next image is gathered from the image source.
       *
       * \param[out] image an mitk::Image containing this image
       */
-    virtual void GetNextRawImage( mitk::Image::Pointer& image ) override;
+    void GetNextRawImage( std::vector<mitk::Image::Pointer>& image ) override;
 
     /**
       * \brief The source of the video, managed internally

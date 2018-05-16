@@ -30,8 +30,8 @@ vtkStandardNewMacro(vtkUnstructuredGridMapper);
 //----------------------------------------------------------------------------
 vtkUnstructuredGridMapper::vtkUnstructuredGridMapper()
 {
-  this->GeometryExtractor = 0;
-  this->PolyDataMapper = 0;
+  this->GeometryExtractor = nullptr;
+  this->PolyDataMapper = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -99,7 +99,7 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
 
   // Need a lookup table
   //
-  if (this->LookupTable == 0)
+  if (this->LookupTable == nullptr)
   {
     this->CreateDefaultLookupTable();
   }
@@ -107,7 +107,7 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
 
   // Now can create appropriate mapper
   //
-  if (this->PolyDataMapper == 0)
+  if (this->PolyDataMapper == nullptr)
   {
     vtkGeometryFilter *gf = vtkGeometryFilter::New();
     vtkPolyDataMapper *pm = vtkPolyDataMapper::New();
@@ -127,7 +127,7 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
   if (this->m_BoundingObject)
   {
     mitk::BoundingBox::BoundsArrayType bounds =
-      this->m_BoundingObject->GetGeometry()->CalculateBoundingBoxRelativeToTransform(0)->GetBounds();
+      this->m_BoundingObject->GetGeometry()->CalculateBoundingBoxRelativeToTransform(nullptr)->GetBounds();
     this->GeometryExtractor->SetExtent(bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5]);
     this->GeometryExtractor->ExtentClippingOn();
   }
@@ -144,7 +144,6 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
   this->PolyDataMapper->SetScalarVisibility(this->GetScalarVisibility());
   this->PolyDataMapper->SetUseLookupTableScalarRange(this->GetUseLookupTableScalarRange());
   this->PolyDataMapper->SetScalarRange(this->GetScalarRange());
-  this->PolyDataMapper->SetImmediateModeRendering(this->GetImmediateModeRendering());
   this->PolyDataMapper->SetColorMode(this->GetColorMode());
   this->PolyDataMapper->SetInterpolateScalarsBeforeMapping(this->GetInterpolateScalarsBeforeMapping());
 
@@ -191,12 +190,12 @@ void vtkUnstructuredGridMapper::PrintSelf(ostream &os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-unsigned long vtkUnstructuredGridMapper::GetMTime()
+vtkMTimeType vtkUnstructuredGridMapper::GetMTime()
 {
-  unsigned long mTime = this->vtkMapper::GetMTime();
-  unsigned long time;
+  vtkMTimeType mTime = this->vtkMapper::GetMTime();
+  vtkMTimeType time;
 
-  if (this->LookupTable != NULL)
+  if (this->LookupTable != nullptr)
   {
     time = this->LookupTable->GetMTime();
     mTime = (time > mTime ? time : mTime);

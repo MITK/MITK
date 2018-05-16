@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itk_zlib.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 
 mitk::CompressedImageContainer::CompressedImageContainer() : m_PixelType(nullptr), m_ImageGeometry(nullptr)
 {
@@ -75,7 +75,7 @@ void mitk::CompressedImageContainer::SetImage(Image *image)
     // allocate a buffer as specified by zlib
     unsigned long bufferSize =
       m_OneTimeStepImageSizeInBytes + static_cast<unsigned long>(m_OneTimeStepImageSizeInBytes * 0.2) + 12;
-    unsigned char *byteBuffer = (unsigned char *)malloc(bufferSize);
+    auto *byteBuffer = (unsigned char *)malloc(bufferSize);
 
     if (itk::Object::GetDebug())
     {
@@ -88,7 +88,7 @@ void mitk::CompressedImageContainer::SetImage(Image *image)
     ImageReadAccessor imgAcc(image, image->GetVolumeData(timestep));
     ::Bytef *dest(byteBuffer);
     ::uLongf destLen(bufferSize);
-    ::Bytef *source((unsigned char *)imgAcc.GetData());
+    auto *source((unsigned char *)imgAcc.GetData());
     ::uLongf sourceLen(m_OneTimeStepImageSizeInBytes);
     int zlibRetVal = ::compress(dest, &destLen, source, sourceLen);
     if (itk::Object::GetDebug())
@@ -143,7 +143,7 @@ mitk::Image::Pointer mitk::CompressedImageContainer::GetImage()
   for (auto iter = m_ByteBuffers.begin(); iter != m_ByteBuffers.end(); ++iter, ++timeStep)
   {
     ImageReadAccessor imgAcc(image, image->GetVolumeData(timeStep));
-    ::Bytef *dest((unsigned char *)imgAcc.GetData());
+    auto *dest((unsigned char *)imgAcc.GetData());
     ::uLongf destLen(m_OneTimeStepImageSizeInBytes);
     ::Bytef *source(iter->first);
     ::uLongf sourceLen(iter->second);

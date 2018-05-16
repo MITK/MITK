@@ -72,7 +72,7 @@ mitk::QuantificationObjectFactory::~QuantificationObjectFactory()
 
 mitk::Mapper::Pointer mitk::QuantificationObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)
 {
-  mitk::Mapper::Pointer newMapper=NULL;
+  mitk::Mapper::Pointer newMapper=nullptr;
 
   if ( id == mitk::BaseRenderer::Standard2D )
   {

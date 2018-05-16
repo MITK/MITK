@@ -42,7 +42,7 @@ public:
    */
   QActionContributionItem(QAction* action, const QString& id);
 
-  ~QActionContributionItem();
+  ~QActionContributionItem() override;
 
   /**
    * Compares this action contribution item with another object. Two action
@@ -268,11 +268,6 @@ private:
 
   /** a string inserted in the middle of text that has been shortened */
   //static const QString ellipsis = "...";
-
-  /**
-   * Stores the result of the action. False when the action returned failure.
-   */
-  bool result; // = null;
 
   /**
    * The presentation mode.

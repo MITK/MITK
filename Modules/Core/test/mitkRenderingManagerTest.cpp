@@ -48,7 +48,7 @@ public:
     // check if the default properties are set
     renderingManager->SetProperty("booltest", mitk::BoolProperty::New(true));
 
-    mitk::BoolProperty *prop = dynamic_cast<mitk::BoolProperty *>(renderingManager->GetProperty("booltest"));
+    auto *prop = dynamic_cast<mitk::BoolProperty *>(renderingManager->GetProperty("booltest"));
 
     MITK_TEST_CONDITION(prop->GetValue(), "Testing if getting the bool property")
 

@@ -33,7 +33,7 @@ public:
 
   berryObjectMacro(berry::AlwaysEnabledExpression)
 
-  ~AlwaysEnabledExpression();
+  ~AlwaysEnabledExpression() override;
 
   static const SmartPointer<AlwaysEnabledExpression> INSTANCE;
 

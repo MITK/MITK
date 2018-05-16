@@ -40,8 +40,8 @@ int mitkToFImageWriterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(tofWriter->GetToFImageType()== mitk::ToFImageWriter::ToFImageType3D, "Test initialization of member ToFImageType!");
 
   //set member parameter and test again
-  unsigned int dimX = 255;
-  unsigned int dimY = 188;
+  int dimX = 255;
+  int dimY = 188;
   std::string distanceImageFileName("distImg.pic");
   std::string amplitudeImageFileName("amplImg.pic");
   std::string intensityImageFileName("intImg.pic");

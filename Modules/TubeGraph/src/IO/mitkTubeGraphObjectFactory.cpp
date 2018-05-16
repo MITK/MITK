@@ -37,11 +37,11 @@ mitk::TubeGraphObjectFactory::TubeGraphObjectFactory() : CoreObjectFactoryBase()
 
 mitk::Mapper::Pointer mitk::TubeGraphObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId id)
 {
-  mitk::Mapper::Pointer newMapper = NULL;
+  mitk::Mapper::Pointer newMapper = nullptr;
 
   if (id == mitk::BaseRenderer::Standard3D)
   {
-    if ((dynamic_cast<mitk::TubeGraph *>(node->GetData()) != NULL))
+    if ((dynamic_cast<mitk::TubeGraph *>(node->GetData()) != nullptr))
     {
       newMapper = mitk::TubeGraphVtkMapper3D::New();
       newMapper->SetDataNode(node);
@@ -53,7 +53,7 @@ mitk::Mapper::Pointer mitk::TubeGraphObjectFactory::CreateMapper(mitk::DataNode 
 
 void mitk::TubeGraphObjectFactory::SetDefaultProperties(mitk::DataNode *node)
 {
-  if ((dynamic_cast<mitk::TubeGraph *>(node->GetData()) != NULL))
+  if ((dynamic_cast<mitk::TubeGraph *>(node->GetData()) != nullptr))
   {
     node->SetProperty("Tube Graph.Clip Structures", mitk::BoolProperty::New(false));
     mitk::TubeGraphVtkMapper3D::SetDefaultProperties(node);

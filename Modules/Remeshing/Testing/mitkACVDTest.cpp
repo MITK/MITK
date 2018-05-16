@@ -95,10 +95,10 @@ static void Remesh_SurfaceIsValid_ReturnsRemeshedSurface(const std::string &file
                                                          bool forceManifold,
                                                          bool boundaryFixing)
 {
-  mitk::Surface::ConstPointer surface = mitk::IOUtil::LoadSurface(filename).GetPointer();
+  auto surface = mitk::IOUtil::Load<mitk::Surface>(filename);
   mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(
-    surface, t, numVertices, gradation, subsampling, edgeSplitting, optimizationLevel, forceManifold, boundaryFixing);
-  MITK_TEST_CONDITION(remeshedSurface.IsNotNull() && remeshedSurface->GetVtkPolyData() != NULL &&
+    surface.GetPointer(), t, numVertices, gradation, subsampling, edgeSplitting, optimizationLevel, forceManifold, boundaryFixing);
+  MITK_TEST_CONDITION(remeshedSurface.IsNotNull() && remeshedSurface->GetVtkPolyData() != nullptr &&
                         remeshedSurface->GetVtkPolyData()->GetNumberOfPolys() != 0,
                       "Remesh_SurfaceIsValid_ReturnsRemeshedSurface")
 }

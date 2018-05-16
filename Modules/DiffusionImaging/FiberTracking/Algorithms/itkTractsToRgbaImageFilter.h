@@ -65,7 +65,7 @@ protected:
   TractsToRgbaImageFilter();
   virtual ~TractsToRgbaImageFilter();
 
-  mitk::FiberBundle::Pointer       m_FiberBundle;      ///< input fiber bundle
+  mitk::FiberBundle::Pointer        m_FiberBundle;      ///< input fiber bundle
   float                             m_UpsamplingFactor; ///< use higher resolution for ouput image
   bool                              m_UseImageGeometry; ///< output image is given other geometry than fiberbundle (input image geometry)
   typename InputImageType::Pointer  m_InputImage;

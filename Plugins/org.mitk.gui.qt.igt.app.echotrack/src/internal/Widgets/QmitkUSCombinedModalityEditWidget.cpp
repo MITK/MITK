@@ -53,11 +53,11 @@ void QmitkUSCombinedModalityEditWidget::SetCombinedModality(mitk::USCombinedModa
 
   m_LastCalibrations = m_CombinedModality->SerializeCalibration();
 
-  ui->vendorLineEdit->setText(QString::fromStdString(combinedModality->GetDeviceManufacturer()));
-  ui->nameLineEdit->setText(QString::fromStdString(combinedModality->GetDeviceModel()));
+  ui->vendorLineEdit->setText(QString::fromStdString(combinedModality->GetManufacturer()));
+  ui->nameLineEdit->setText(QString::fromStdString(combinedModality->GetName()));
 
-  ui->ultrasoundDeviceLabel->setText(QString::fromStdString(combinedModality->GetUltrasoundDevice()->GetDeviceManufacturer() + " " +
-    combinedModality->GetUltrasoundDevice()->GetDeviceModel()));
+  ui->ultrasoundDeviceLabel->setText(QString::fromStdString(combinedModality->GetUltrasoundDevice()->GetManufacturer() + " " +
+    combinedModality->GetUltrasoundDevice()->GetName()));
   ui->trackingDeviceLabel->setText(QString::fromStdString(combinedModality->GetNavigationDataSource()->GetName()));
 
   mitk::USDevice::Pointer usDevice = combinedModality->GetUltrasoundDevice();

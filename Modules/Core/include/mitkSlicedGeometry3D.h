@@ -106,10 +106,10 @@ namespace mitk
     //change
     // the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and
     // changes the origin respectively.
-    virtual void ChangeImageGeometryConsideringOriginOffset(const bool isAnImageGeometry) override;
+    void ChangeImageGeometryConsideringOriginOffset(const bool isAnImageGeometry) override;
 
     // virtual void SetTimeBounds( const mitk::TimeBounds& timebounds );
-    virtual const mitk::BoundingBox *GetBoundingBox() const override;
+    const mitk::BoundingBox *GetBoundingBox() const override;
 
     /**
     * \brief Get the number of slices
@@ -171,11 +171,15 @@ namespace mitk
     virtual void SetDirectionVector(const mitk::Vector3D &directionVector);
     itkGetConstMacro(DirectionVector, const mitk::Vector3D &)
 
-      virtual itk::LightObject::Pointer InternalClone() const override;
+      itk::LightObject::Pointer InternalClone() const override;
+
+#ifndef SWIG
 
     static const std::string SLICES;
     const static std::string DIRECTION_VECTOR;
     const static std::string EVENLY_SPACED;
+
+#endif // !SWIG
 
     /**
     * \brief Tell this instance how many PlaneGeometries it shall manage. Bounding
@@ -234,9 +238,9 @@ namespace mitk
                                   bool frontside = true,
                                   bool rotated = false);
 
-    virtual void SetImageGeometry(const bool isAnImageGeometry) override;
+    void SetImageGeometry(const bool isAnImageGeometry) override;
 
-    virtual void ExecuteOperation(Operation *operation) override;
+    void ExecuteOperation(Operation *operation) override;
 
     static double CalculateSpacing(const mitk::Vector3D &spacing, const mitk::Vector3D &d);
 
@@ -245,7 +249,7 @@ namespace mitk
 
     SlicedGeometry3D(const SlicedGeometry3D &other);
 
-    virtual ~SlicedGeometry3D();
+    ~SlicedGeometry3D() override;
 
     /**
     * Reinitialize plane stack after rotation. More precisely, the first plane
@@ -319,7 +323,7 @@ namespace mitk
     //## These virtual function allows a different beahiour in subclasses.
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
-    virtual void PreSetSpacing(const mitk::Vector3D &aSpacing) override;
+    void PreSetSpacing(const mitk::Vector3D &aSpacing) override;
   };
 } // namespace mitk
 

@@ -33,7 +33,7 @@ class QmitkHistogram : public QwtPlotItem
 public:
   explicit QmitkHistogram(const QString &title = QString::null);
   explicit QmitkHistogram(const QwtText &title);
-  virtual ~QmitkHistogram();
+  ~QmitkHistogram() override;
 
   void setData(const QwtIntervalSeriesData &data);
   const QwtIntervalSeriesData &data() const;
@@ -41,9 +41,9 @@ public:
   void setColor(const QColor &);
   QColor color() const;
 
-  virtual QRectF boundingRect() const override;
+  QRectF boundingRect() const override;
 
-  virtual void draw(QPainter *, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &) const override;
+  void draw(QPainter *, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &) const override;
 
   void setBaseline(double reference);
   double baseline() const;

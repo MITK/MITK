@@ -46,7 +46,7 @@ class MITKCONNECTOMICS_EXPORT classname ## Serializer : public EnumerationProper
  \
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) \
     { \
-        if (!element) return NULL; \
+        if (!element) return nullptr; \
             const char* sa( element->Attribute("value") ); \
          \
         std::string s(sa?sa:""); \

@@ -35,12 +35,12 @@ namespace mitk
     mitkClassMacro(OtsuTool3D, AutoSegmentationTool);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual const char *GetName() const override;
-    virtual const char **GetXPM() const override;
+      const char *GetName() const override;
+    const char **GetXPM() const override;
     us::ModuleResource GetIconResource() const override;
 
-    virtual void Activated() override;
-    virtual void Deactivated() override;
+    void Activated() override;
+    void Deactivated() override;
 
     void RunSegmentation(int regions, bool useValley, int numberOfBins);
     void ConfirmSegmentation();
@@ -53,7 +53,7 @@ namespace mitk
 
   protected:
     OtsuTool3D();
-    virtual ~OtsuTool3D();
+    ~OtsuTool3D() override;
 
     template <typename TPixel, unsigned int VImageDimension>
     void CalculatePreview(itk::Image<TPixel, VImageDimension> *itkImage, std::vector<int> regionIDs);

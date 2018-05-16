@@ -54,13 +54,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 {
   if (!registration)
   {
-    mitkThrow() << "Cannot map point set. Passed registration wrapper pointer is NULL.";
+    mitkThrow() << "Cannot map point set. Passed registration wrapper pointer is nullptr.";
   }
   if (!input)
   {
-    mitkThrow() << "Cannot map point set. Passed point set pointer is NULL.";
+    mitkThrow() << "Cannot map point set. Passed point set pointer is nullptr.";
   }
-  if (input->GetTimeSteps()<=timeStep && timeStep>=0)
+  if (static_cast<int>(input->GetTimeSteps())<=timeStep && timeStep>=0)
   {
     mitkThrow() << "Cannot set point set. Selected time step is larger then mitk point set. MITK time step count: "<<input->GetTimeSteps()<<"; selected time step: "<<timeStep;
   }
@@ -132,7 +132,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 {
   if (!registration)
   {
-    mitkThrow() << "Cannot map point set. Passed registration wrapper pointer is NULL.";
+    mitkThrow() << "Cannot map point set. Passed registration wrapper pointer is nullptr.";
   }
   if (!registration->GetRegistration())
   {
@@ -140,7 +140,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   }
   if (!input)
   {
-    mitkThrow() << "Cannot map point set. Passed point set pointer is NULL.";
+    mitkThrow() << "Cannot map point set. Passed point set pointer is nullptr.";
   }
 
   ::mitk::PointSet::Pointer result = map(input, registration->GetRegistration(), timeStep, throwOnMappingError, errorPointValue);

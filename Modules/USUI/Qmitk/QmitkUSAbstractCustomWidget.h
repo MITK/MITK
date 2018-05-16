@@ -24,15 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Microservices
 #include <mitkServiceInterface.h>
-#include <usServiceRegistration.h>
-#include <usServiceProperties.h>
-
-#include <usModuleContext.h>
-
-namespace us {
-  struct PrototypeServiceFactory;
-  class ModuleContext;
-}
 
 /**
   * \brief Abstract superclass for all custom control widgets of mitk::USDevice classes.
@@ -61,7 +52,7 @@ namespace us {
   * mitk::USDevice device = // get the ultrasound device
   *
   * // get service references for ultrasound device
-  * std::string filter = "(ork.mitk.services.UltrasoundCustomWidget.deviceClass=" + device->GetDeviceClass() + ")";
+  * std::string filter = "(org.mitk.services.UltrasoundCustomWidget.deviceClass=" + device->GetDeviceClass() + ")";
   * QString interfaceName ( us_service_interface_iid<QmitkUSAbstractCustomWidget>() );
   * QList<ctkServiceReference> serviceRefs = pluginContext->getServiceReferences(interfaceName, QString::fromStdString(filter));
   *
@@ -80,8 +71,8 @@ class MITKUSUI_EXPORT QmitkUSAbstractCustomWidget : public QWidget
   Q_OBJECT
 
 public:
-  QmitkUSAbstractCustomWidget(QWidget* parent = 0);
-  virtual ~QmitkUSAbstractCustomWidget();
+  QmitkUSAbstractCustomWidget(QWidget* parent = nullptr);
+  ~QmitkUSAbstractCustomWidget() override;
 
   void SetDevice(mitk::USDevice::Pointer device);
   mitk::USDevice::Pointer GetDevice() const;
@@ -103,7 +94,7 @@ public:
   /**
     * \brief Subclass must implement this method to return a pointer to a copy of the object.
     */
-  virtual QmitkUSAbstractCustomWidget* Clone(QWidget* parent = 0) const = 0;
+  virtual QmitkUSAbstractCustomWidget* Clone(QWidget* parent = nullptr) const = 0;
 
   /**
     * \brief Method for initializing the Qt stuff of the widget (setupUI, connect).
@@ -118,7 +109,7 @@ public:
     * Internally use of QmitkUSAbstractCustomWidget::Clone() with additionaly
     * setting an internal flag that the object was really cloned.
     */
-  QmitkUSAbstractCustomWidget* CloneForQt(QWidget* parent = 0) const;
+  QmitkUSAbstractCustomWidget* CloneForQt(QWidget* parent = nullptr) const;
 
   /**
     * \brief Returns the properties of the micro service.
@@ -146,8 +137,7 @@ public:
 
 private:
 
-  mitk::USDevice::Pointer         m_Device;
-  us::PrototypeServiceFactory*    m_PrototypeServiceFactory;
+  mitk::USDevice::Pointer         m_Device; ///< USDevice related to the specific widgets
   bool                            m_IsClonedForQt;
 };
 

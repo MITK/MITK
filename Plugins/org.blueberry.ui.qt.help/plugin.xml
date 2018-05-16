@@ -10,26 +10,26 @@
           name="Help - Contents"
           category="Help"
           class="berry::HelpContentView"
-          icon="resources/help.png" />
+          icon="resources/help.svg" />
 
     <view id="org.blueberry.views.helpindex"
           name="Help - Index"
           category="Help"
           class="berry::HelpIndexView"
-          icon="resources/helpIndex.png" />
+          icon="resources/helpIndex.svg" />
 
     <view id="org.blueberry.views.helpsearch"
           name="Help - Search"
           category="Help"
           class="berry::HelpSearchView"
-          icon="resources/helpSearch.png" />
+          icon="resources/helpSearch.svg" />
   </extension>
 
   <extension point="org.blueberry.ui.editors">
     <editor id="org.blueberry.editors.help"
             name="Help Contents"
             class="berry::HelpEditor"
-            icon="resources/help.png">
+            icon="resources/help.svg">
     </editor>
   </extension>
 
@@ -37,7 +37,7 @@
     <perspective id="org.blueberry.perspectives.help"
                  name="Help"
                  class="berry::HelpPerspective"
-                 icon="resources/help.png">
+                 icon="resources/help.svg">
     </perspective>
   </extension>
 

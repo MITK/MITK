@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlaneOrientationProperty.h"
 #include "mitkPointSetShapeProperty.h"
 #include "mitkRenderingModeProperty.h"
-#include "mitkShaderProperty.h"
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
@@ -43,7 +42,7 @@ class classname##Serializer                                                     
           mitkClassMacro(classname##Serializer, EnumerationPropertySerializer) itkFactorylessNewMacro(Self)            \
             itkCloneMacro(Self)                                                                                        \
                                                                                                                        \
-              virtual BaseProperty::Pointer Deserialize(TiXmlElement * element) override{if (!element) return NULL;    \
+              virtual BaseProperty::Pointer Deserialize(TiXmlElement * element) override{if (!element) return nullptr;    \
     const char *sa(element->Attribute("value"));                                                                       \
                                                                                                                        \
     std::string s(sa ? sa : "");                                                                                       \
@@ -65,7 +64,6 @@ protected:                                                                      
 MITK_REGISTER_SERIALIZER(classname##Serializer);
 
 MITK_REGISTER_ENUM_SUB_SERIALIZER(PlaneOrientationProperty);
-MITK_REGISTER_ENUM_SUB_SERIALIZER(ShaderProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(VtkInterpolationProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(VtkRepresentationProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(VtkResliceInterpolationProperty);

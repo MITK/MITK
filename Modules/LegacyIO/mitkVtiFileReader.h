@@ -49,9 +49,9 @@ namespace mitk
   protected:
     VtiFileReader();
 
-    ~VtiFileReader();
+    ~VtiFileReader() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     //##Description
     //## @brief Time when Header was last read

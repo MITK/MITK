@@ -48,7 +48,7 @@ namespace mitk
   {
   protected:
     TimeGeometry();
-    virtual ~TimeGeometry();
+    ~TimeGeometry() override;
 
     /**
     * \brief Contains a bounding box which includes all time steps
@@ -58,7 +58,7 @@ namespace mitk
     /**
     * \brief Makes a deep copy of the current object
     */
-    virtual LightObject::Pointer InternalClone() const override;
+    LightObject::Pointer InternalClone() const override;
 
   public:
     mitkClassMacroItkParent(TimeGeometry, itk::Object) itkCloneMacro(Self) itkCreateAnotherMacro(Self)
@@ -293,9 +293,9 @@ namespace mitk
     /**
     * \brief Executes the given operation on all time steps
     */
-    virtual void ExecuteOperation(Operation *op) override;
+    void ExecuteOperation(Operation *op) override;
 
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
   }; // end class TimeGeometry
 
   /**

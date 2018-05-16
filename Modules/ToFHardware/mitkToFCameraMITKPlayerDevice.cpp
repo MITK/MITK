@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 ToFCameraMITKPlayerDevice::ToFCameraMITKPlayerDevice() :
-  m_DistanceDataBuffer(NULL), m_AmplitudeDataBuffer(NULL), m_IntensityDataBuffer(NULL), m_RGBDataBuffer(NULL)
+  m_DistanceDataBuffer(nullptr), m_AmplitudeDataBuffer(nullptr), m_IntensityDataBuffer(nullptr), m_RGBDataBuffer(nullptr)
 {
   m_Controller = ToFCameraMITKPlayerController::New();
 }
@@ -109,16 +109,16 @@ ITK_THREAD_RETURN_TYPE ToFCameraMITKPlayerDevice::Acquire(void* pInfoStruct)
 {
   /* extract this pointer from Thread Info structure */
   struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == NULL)
+  if (pInfo == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
-  if (pInfo->UserData == NULL)
+  if (pInfo->UserData == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
   ToFCameraMITKPlayerDevice* toFCameraDevice = (ToFCameraMITKPlayerDevice*)pInfo->UserData;
-  if (toFCameraDevice!=NULL)
+  if (toFCameraDevice!=nullptr)
   {
     mitk::RealTimeClock::Pointer realTimeClock;
     realTimeClock = mitk::RealTimeClock::New();

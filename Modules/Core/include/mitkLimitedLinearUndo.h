@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkEventObject.h>
 #pragma GCC visibility pop
 
+#include <deque>
+
 namespace mitk
 {
   //##Documentation
@@ -38,13 +40,13 @@ namespace mitk
   class MITKCORE_EXPORT LimitedLinearUndo : public UndoModel
   {
   public:
-    typedef std::vector<UndoStackItem *> UndoContainer;
-    typedef std::vector<UndoStackItem *>::reverse_iterator UndoContainerRevIter;
+    typedef std::deque<UndoStackItem *> UndoContainer;
+    typedef std::deque<UndoStackItem *>::reverse_iterator UndoContainerRevIter;
 
     mitkClassMacro(LimitedLinearUndo, UndoModel);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual bool SetOperationEvent(UndoStackItem *stackItem) override;
+      bool SetOperationEvent(UndoStackItem *stackItem) override;
 
     //##Documentation
     //## @brief Undoes the last changes
@@ -53,8 +55,8 @@ namespace mitk
     //##  executes the operation,
     //##  swaps the OperationEvent-Undo with the Operation
     //##  and sets it to Redo-Stack
-    virtual bool Undo() override;
-    virtual bool Undo(bool) override;
+    bool Undo() override;
+    bool Undo(bool) override;
 
     //##Documentation
     //## @brief Undoes all changes until ObjectEventID oeid
@@ -67,8 +69,8 @@ namespace mitk
     //## executes the operation,
     //## swaps the OperationEvent-Operation with the Undo-Operation
     //## and sets it to Undo-Stack
-    virtual bool Redo() override;
-    virtual bool Redo(bool) override;
+    bool Redo() override;
+    bool Redo(bool) override;
 
     //##Documentation
     //## @brief Redoes all changes until ObjectEventID oeid
@@ -76,30 +78,45 @@ namespace mitk
 
     //##Documentation
     //## @brief Clears UndoList and RedoList
-    virtual void Clear() override;
+    void Clear() override;
 
     //##Documentation
     //## @brief Clears the RedoList
-    virtual void ClearRedoList() override;
+    void ClearRedoList() override;
 
     //##Documentation
     //## @brief True, if RedoList is empty
-    virtual bool RedoListEmpty() override;
+    bool RedoListEmpty() override;
+
+    //##Documentation
+    //## @brief Gets the limit on the size of the undo history.
+    //## The undo limit determines how many items can be stored
+    //## in the undo stack. If the value is 0 that means that
+    //## there is no limit.
+    std::size_t GetUndoLimit() const override;
+
+    //##Documentation
+    //## @brief Sets a limit on the size of the undo history.
+    //## If the limit is reached, the oldest undo items will
+    //## be dropped from the bottom of the undo stack.
+    //## The 0 value means that there is no limit.
+    //## @param limit the maximum number of items on the stack
+    void SetUndoLimit(std::size_t limit) override;
 
     //##Documentation
     //## @brief Returns the ObjectEventId of the
     //## top element in the OperationHistory
-    virtual int GetLastObjectEventIdInList() override;
+    int GetLastObjectEventIdInList() override;
 
     //##Documentation
     //## @brief Returns the GroupEventId of the
     //## top element in the OperationHistory
-    virtual int GetLastGroupEventIdInList() override;
+    int GetLastGroupEventIdInList() override;
 
     //##Documentation
     //## @brief Returns the last specified OperationEvent in Undo-list
-    //## corresponding to the given values; if nothing found, then returns NULL
-    virtual OperationEvent *GetLastOfType(OperationActor *destination, OperationType opType) override;
+    //## corresponding to the given values; if nothing found, then returns nullptr
+    OperationEvent *GetLastOfType(OperationActor *destination, OperationType opType) override;
 
   protected:
     //##Documentation
@@ -108,7 +125,7 @@ namespace mitk
 
     //##Documentation
     //## Destructor
-    virtual ~LimitedLinearUndo();
+    ~LimitedLinearUndo() override;
 
     //## @brief Convenience method to free the memory of
     //## elements in the list and to clear the list
@@ -120,6 +137,9 @@ namespace mitk
 
   private:
     int FirstObjectEventIdOfCurrentGroup(UndoContainer &stack);
+
+    std::size_t m_UndoLimit;
+
   };
 
 #pragma GCC visibility push(default)

@@ -49,12 +49,12 @@ namespace mitk {
     /**
     * \brief basic contructor
     */
-    virtual ~LinuxRealTimeClock();
+    ~LinuxRealTimeClock() override;
 
     /**
     * \brief returns the current time in milliseconds as a double
     */
-    virtual double GetCurrentStamp() override;
+    double GetCurrentStamp() override;
 
   }; //namespace
 }

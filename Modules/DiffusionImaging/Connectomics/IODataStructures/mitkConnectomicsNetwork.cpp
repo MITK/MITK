@@ -17,8 +17,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkConnectomicsNetwork.h"
 #include <mitkConnectomicsStatisticsCalculator.h>
+
 #include <boost/graph/clustering_coefficient.hpp>
+
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4172)
+#endif
+
 #include <boost/graph/betweenness_centrality.hpp>
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 /* Constructor and Destructor */
 mitk::ConnectomicsNetwork::ConnectomicsNetwork()
@@ -38,31 +49,29 @@ bool mitk::ConnectomicsNetwork::EdgeExists(
   return boost::edge(vertexA, vertexB, m_Network ).second;
 }
 
-void mitk::ConnectomicsNetwork::IncreaseEdgeWeight(
-  mitk::ConnectomicsNetwork::VertexDescriptorType vertexA, mitk::ConnectomicsNetwork::VertexDescriptorType vertexB )
+void mitk::ConnectomicsNetwork::IncreaseEdgeWeight(mitk::ConnectomicsNetwork::VertexDescriptorType vertexA, mitk::ConnectomicsNetwork::VertexDescriptorType vertexB , double fiber_count)
 {
-  m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].weight++;
+  m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].fiber_count += fiber_count;
 
   SetIsModified( true );
 }
 
-void mitk::ConnectomicsNetwork::AddEdge(
-                                        mitk::ConnectomicsNetwork::VertexDescriptorType vertexA,
+void mitk::ConnectomicsNetwork::AddEdge(mitk::ConnectomicsNetwork::VertexDescriptorType vertexA,
                                         mitk::ConnectomicsNetwork::VertexDescriptorType vertexB
-                                        )
+                                        , double fiber_count)
 {
-  AddEdge(vertexA, vertexB, m_Network[ vertexA ].id, m_Network[ vertexB ].id );
+  AddEdge(vertexA, vertexB, m_Network[ vertexA ].id, m_Network[ vertexB ].id, fiber_count );
 }
 
 void mitk::ConnectomicsNetwork::AddEdge(
                                         mitk::ConnectomicsNetwork::VertexDescriptorType vertexA,
                                         mitk::ConnectomicsNetwork::VertexDescriptorType vertexB,
-                                        int sourceID, int targetID, int weight, double edge_weight )
+                                        int sourceID, int targetID, double fiber_count, double edge_weight )
 {
   boost::add_edge( vertexA, vertexB, m_Network );
   m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].sourceId = sourceID;
   m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].targetId = targetID;
-  m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].weight = weight;
+  m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].fiber_count = fiber_count;
   m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].edge_weight = edge_weight;
 
   SetIsModified( true );
@@ -211,7 +220,7 @@ int mitk::ConnectomicsNetwork::GetNumberOfEdges() const
   return boost::num_edges( m_Network );
 }
 
-int mitk::ConnectomicsNetwork::GetMaximumWeight() const
+double mitk::ConnectomicsNetwork::GetMaximumWeight() const
 {
   int maxWeight( 0 );
 
@@ -225,7 +234,7 @@ int mitk::ConnectomicsNetwork::GetMaximumWeight() const
     int tempWeight;
 
     // the value of an iterator is a descriptor
-    tempWeight = m_Network[ *iterator ].weight;
+    tempWeight = m_Network[ *iterator ].fiber_count;
 
     if( tempWeight > maxWeight )
     {
@@ -477,7 +486,7 @@ void mitk::ConnectomicsNetwork::ImportNetwort( mitk::ConnectomicsNetwork::Pointe
     VertexDescriptorType source = idToVertexMap.find( edgeVector[ loop ].second.sourceId )->second;
     VertexDescriptorType target = idToVertexMap.find( edgeVector[ loop ].second.targetId )->second;
 
-    this->AddEdge( source, target, edgeVector[ loop ].second.sourceId, edgeVector[ loop ].second.targetId, edgeVector[ loop ].second.weight);
+    this->AddEdge( source, target, edgeVector[ loop ].second.sourceId, edgeVector[ loop ].second.targetId, edgeVector[ loop ].second.fiber_count);
   }
 
   this->SetIsModified( true );
@@ -726,7 +735,7 @@ bool mitk::Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNet
   {
     if(verbose)
     {
-      MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] rightHandSide NULL.";
+      MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] rightHandSide nullptr.";
     }
     return false;
   }
@@ -735,7 +744,7 @@ bool mitk::Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNet
   {
     if(verbose)
     {
-      MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] leftHandSide NULL.";
+      MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] leftHandSide nullptr.";
     }
     return false;
   }

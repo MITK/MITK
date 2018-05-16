@@ -86,7 +86,7 @@ protected:
     MergeDiffusionImagesFilter();
     ~MergeDiffusionImagesFilter();
 
-    void GenerateData();
+    void GenerateData() override;
 
     DwiImageContainerType       m_ImageVolumes;     ///< contains input images
     GradientListContainerType   m_GradientLists;    ///< contains gradients of all input images

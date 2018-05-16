@@ -30,7 +30,7 @@ namespace mitk
 {
   struct FileReaderSelector::Item::Impl : us::SharedData
   {
-    Impl() : m_FileReader(NULL), m_ConfidenceLevel(IFileReader::Unsupported), m_Id(-1) {}
+    Impl() : m_FileReader(nullptr), m_ConfidenceLevel(IFileReader::Unsupported), m_Id(-1) {}
     us::ServiceReference<IFileReader> m_FileReaderRef;
     IFileReader *m_FileReader;
     IFileReader::ConfidenceLevel m_ConfidenceLevel;
@@ -77,7 +77,7 @@ namespace mitk
            ++readerIter)
       {
         IFileReader *reader = m_Data->m_ReaderRegistry.GetReader(*readerIter);
-        if (reader == NULL)
+        if (reader == nullptr)
           continue;
         try
         {

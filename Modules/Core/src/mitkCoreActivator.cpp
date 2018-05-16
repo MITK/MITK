@@ -32,7 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSurfaceVtkLegacyIO.h>
 #include <mitkSurfaceVtkXmlIO.h>
 
-#include "mitkDicomSeriesReaderService.h"
 #include "mitkLegacyFileWriterService.h"
 #include <mitkFileWriter.h>
 
@@ -106,133 +105,6 @@ void AddMitkAutoLoadPaths(const std::string &programPath)
 #endif
 }
 
-class ShaderRepositoryTracker : public us::ServiceTracker<mitk::IShaderRepository>
-{
-public:
-  ShaderRepositoryTracker() : Superclass(us::GetModuleContext()) {}
-  virtual void Close() override
-  {
-    us::GetModuleContext()->RemoveModuleListener(this, &ShaderRepositoryTracker::HandleModuleEvent);
-    Superclass::Close();
-  }
-
-  virtual void Open() override
-  {
-    us::GetModuleContext()->AddModuleListener(this, &ShaderRepositoryTracker::HandleModuleEvent);
-    Superclass::Open();
-  }
-
-private:
-  typedef us::ServiceTracker<mitk::IShaderRepository> Superclass;
-
-  TrackedType AddingService(const ServiceReferenceType &reference) override
-  {
-    mitk::IShaderRepository *shaderRepo = Superclass::AddingService(reference);
-    if (shaderRepo)
-    {
-      // Add all existing shaders from modules to the new shader repository.
-      // If the shader repository is registered in a modules activator, the
-      // GetLoadedModules() function call below will also return the module
-      // which is currently registering the repository. The HandleModuleEvent
-      // method contains code to avoid double registrations due to a fired
-      // ModuleEvent::LOADED event after the activators Load() method finished.
-      std::vector<us::Module *> modules = us::ModuleRegistry::GetLoadedModules();
-      for (std::vector<us::Module *>::const_iterator iter = modules.begin(), endIter = modules.end(); iter != endIter;
-           ++iter)
-      {
-        this->AddModuleShaderToRepository(*iter, shaderRepo);
-      }
-
-      m_ShaderRepositories.push_back(shaderRepo);
-    }
-    return shaderRepo;
-  }
-
-  void RemovedService(const ServiceReferenceType & /*reference*/, TrackedType tracked) override
-  {
-    m_ShaderRepositories.erase(std::remove(m_ShaderRepositories.begin(), m_ShaderRepositories.end(), tracked),
-                               m_ShaderRepositories.end());
-  }
-
-  void HandleModuleEvent(const us::ModuleEvent moduleEvent)
-  {
-    if (moduleEvent.GetType() == us::ModuleEvent::LOADED)
-    {
-      std::vector<mitk::IShaderRepository *> shaderRepos;
-      for (std::map<mitk::IShaderRepository *, std::map<long, std::vector<int>>>::const_iterator
-             shaderMapIter = m_ModuleIdToShaderIds.begin(),
-             shaderMapEndIter = m_ModuleIdToShaderIds.end();
-           shaderMapIter != shaderMapEndIter;
-           ++shaderMapIter)
-      {
-        if (shaderMapIter->second.find(moduleEvent.GetModule()->GetModuleId()) == shaderMapIter->second.end())
-        {
-          shaderRepos.push_back(shaderMapIter->first);
-        }
-      }
-      AddModuleShadersToRepositories(moduleEvent.GetModule(), shaderRepos);
-    }
-    else if (moduleEvent.GetType() == us::ModuleEvent::UNLOADED)
-    {
-      RemoveModuleShadersFromRepositories(moduleEvent.GetModule(), m_ShaderRepositories);
-    }
-  }
-
-  void AddModuleShadersToRepositories(us::Module *module, const std::vector<mitk::IShaderRepository *> &shaderRepos)
-  {
-    // search and load shader files
-    std::vector<us::ModuleResource> shaderResources = module->FindResources("Shaders", "*.xml", true);
-    for (std::vector<us::ModuleResource>::iterator i = shaderResources.begin(); i != shaderResources.end(); ++i)
-    {
-      if (*i)
-      {
-        us::ModuleResourceStream rs(*i);
-        for (const auto &shaderRepo : shaderRepos)
-        {
-          int id = (shaderRepo)->LoadShader(rs, i->GetBaseName());
-          if (id >= 0)
-          {
-            m_ModuleIdToShaderIds[shaderRepo][module->GetModuleId()].push_back(id);
-          }
-        }
-        rs.seekg(0, std::ios_base::beg);
-      }
-    }
-  }
-
-  void AddModuleShaderToRepository(us::Module *module, mitk::IShaderRepository *shaderRepo)
-  {
-    std::vector<mitk::IShaderRepository *> shaderRepos;
-    shaderRepos.push_back(shaderRepo);
-    this->AddModuleShadersToRepositories(module, shaderRepos);
-  }
-
-  void RemoveModuleShadersFromRepositories(us::Module *module,
-                                           const std::vector<mitk::IShaderRepository *> &shaderRepos)
-  {
-    for (const auto &shaderRepo : shaderRepos)
-    {
-      std::map<long, std::vector<int>> &moduleIdToShaderIds = m_ModuleIdToShaderIds[shaderRepo];
-      std::map<long, std::vector<int>>::iterator shaderIdsIter = moduleIdToShaderIds.find(module->GetModuleId());
-      if (shaderIdsIter != moduleIdToShaderIds.end())
-      {
-        for (std::vector<int>::iterator idIter = shaderIdsIter->second.begin(); idIter != shaderIdsIter->second.end();
-             ++idIter)
-        {
-          (shaderRepo)->UnloadShader(*idIter);
-        }
-        moduleIdToShaderIds.erase(shaderIdsIter);
-      }
-    }
-  }
-
-private:
-  // Maps to each shader repository a map containing module ids and related
-  // shader registration ids
-  std::map<mitk::IShaderRepository *, std::map<long, std::vector<int>>> m_ModuleIdToShaderIds;
-  std::vector<mitk::IShaderRepository *> m_ShaderRepositories;
-};
-
 class FixedNiftiImageIO : public itk::NiftiImageIO
 {
 public:
@@ -247,7 +119,7 @@ public:
     /** Run-time type information (and related methods). */
     itkTypeMacro(FixedNiftiImageIO, Superclass)
 
-      virtual bool SupportsDimension(unsigned long dim) override
+      bool SupportsDimension(unsigned long dim) override
   {
     return dim > 1 && dim < 5;
   }
@@ -272,8 +144,6 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
     AddMitkAutoLoadPaths(programPath);
   }
 
-  m_ShaderRepositoryTracker.reset(new ShaderRepositoryTracker);
-
   // m_RenderingManager = mitk::RenderingManager::New();
   // context->RegisterService<mitk::RenderingManager>(renderingManager.GetPointer());
   m_PlanePositionManager.reset(new mitk::PlanePositionManagerService);
@@ -294,6 +164,9 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   m_PropertyPersistence.reset(new mitk::PropertyPersistence);
   context->RegisterService<mitk::IPropertyPersistence>(m_PropertyPersistence.get());
 
+  m_PropertyRelations.reset(new mitk::PropertyRelations);
+  context->RegisterService<mitk::IPropertyRelations>(m_PropertyRelations.get());
+
   m_MimeTypeProvider.reset(new mitk::MimeTypeProvider);
   m_MimeTypeProvider->Start();
   m_MimeTypeProviderReg = context->RegisterService<mitk::IMimeTypeProvider>(m_MimeTypeProvider.get());
@@ -307,10 +180,7 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   m_FileWriters.push_back(new mitk::PointSetWriterService());
   m_FileReaders.push_back(new mitk::GeometryDataReaderService());
   m_FileWriters.push_back(new mitk::GeometryDataWriterService());
-  m_FileReaders.push_back(new mitk::DicomSeriesReaderService());
   m_FileReaders.push_back(new mitk::RawImageFileReaderService());
-
-  m_ShaderRepositoryTracker->Open();
 
   /*
     There IS an option to exchange ALL vtkTexture instances against vtkNeverTranslucentTextureFactory.
@@ -365,8 +235,6 @@ void MitkCoreActivator::Unload(us::ModuleContext *)
   {
     delete *mimeTypeIter;
   }
-
-  m_ShaderRepositoryTracker->Close();
 }
 
 void MitkCoreActivator::RegisterDefaultMimeTypes()
@@ -389,7 +257,7 @@ void MitkCoreActivator::RegisterItkReaderWriter()
 
   for (auto &allobject : allobjects)
   {
-    itk::ImageIOBase *io = dynamic_cast<itk::ImageIOBase *>(allobject.GetPointer());
+    auto *io = dynamic_cast<itk::ImageIOBase *>(allobject.GetPointer());
 
     // NiftiImageIO does not provide a correct "SupportsDimension()" methods
     // and the supported read/write extensions are not ordered correctly
@@ -432,7 +300,7 @@ void MitkCoreActivator::RegisterLegacyWriter()
 {
   std::list<itk::LightObject::Pointer> allobjects = itk::ObjectFactoryBase::CreateAllInstance("IOWriter");
 
-  for (std::list<itk::LightObject::Pointer>::iterator i = allobjects.begin(); i != allobjects.end(); ++i)
+  for (auto i = allobjects.begin(); i != allobjects.end(); ++i)
   {
     mitk::FileWriter::Pointer io = dynamic_cast<mitk::FileWriter *>(i->GetPointer());
     if (io)

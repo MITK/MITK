@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkNavigationDataSourceSelectionWidget::QmitkNavigationDataSourceSelectionWidget(QWidget* parent, Qt::WindowFlags f)
 : QWidget(parent, f)
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
   CreateConnections();
 
@@ -72,8 +72,8 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::
     if (!s) //no device selected
       {
         //reset everything
-        m_CurrentSource = NULL;
-        m_CurrentStorage = NULL;
+        m_CurrentSource = nullptr;
+        m_CurrentStorage = nullptr;
         emit NavigationDataSourceSelected(m_CurrentSource);
         return;
       }
@@ -81,7 +81,6 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::
     // Get Source
     us::ModuleContext* context = us::GetModuleContext();
     m_CurrentSource = context->GetService<mitk::NavigationDataSource>(s);
-    std::string id = s.GetProperty(mitk::NavigationDataSource::US_PROPKEY_ID).ToString();
 
     // clear tool list before filling it
     m_Controls->m_ToolView->clear();
@@ -92,14 +91,12 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::
       new QListWidgetItem(tr(m_CurrentSource->GetOutput(i)->GetName()), m_Controls->m_ToolView);
     }
 
-
-    // Create Filter for ToolStorage
-    std::string filter = "("+ mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID + "=" + id + ")";
-
     // Get Storage
+    std::string filter = "(" + mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID + "=" + m_CurrentSource->GetMicroserviceID() + ")";
     std::vector<us::ServiceReference<mitk::NavigationToolStorage> > refs = context->GetServiceReferences<mitk::NavigationToolStorage>(filter);
     if (refs.empty()) return; //no storage was found
     m_CurrentStorage = context->GetService(refs.front());
+
     if (m_CurrentStorage.IsNull())
       {
       MITK_WARN << "Found an invalid storage object!";
@@ -108,7 +105,7 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::
     if (m_CurrentStorage->GetToolCount() != m_CurrentSource->GetNumberOfOutputs()) //there is something wrong with the storage
       {
       MITK_WARN << "Found a tool storage, but it has not the same number of tools like the NavigationDataSource. This storage won't be used because it isn't the right one.";
-      m_CurrentStorage = NULL;
+      m_CurrentStorage = nullptr;
       }
 
     emit NavigationDataSourceSelected(m_CurrentSource);
@@ -128,8 +125,8 @@ int QmitkNavigationDataSourceSelectionWidget::GetSelectedToolID()
 
 mitk::NavigationTool::Pointer QmitkNavigationDataSourceSelectionWidget::GetSelectedNavigationTool()
   {
-    if (this->m_CurrentStorage.IsNull()) return NULL;
-    if (m_Controls->m_ToolView->currentIndex().row() >= m_CurrentStorage->GetToolCount()) return NULL;
+    if (this->m_CurrentStorage.IsNull()) return nullptr;
+    if ((m_Controls->m_ToolView->currentIndex().row() < 0) || (static_cast<unsigned int>(m_Controls->m_ToolView->currentIndex().row()) >= m_CurrentStorage->GetToolCount())) return nullptr;
     return this->m_CurrentStorage->GetTool(m_Controls->m_ToolView->currentIndex().row());
   }
 

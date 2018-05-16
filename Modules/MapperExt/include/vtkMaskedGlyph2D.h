@@ -67,7 +67,7 @@ public:
 
   ///**
   // * If you want to use an arbitrary scalars array, then set its name here.
-  // * By default this in NULL and the filter will use the active scalar array.
+  // * By default this in nullptr and the filter will use the active scalar array.
   // */
   // vtkGetStringMacro(InputScalarsSelection);
   // void SelectInputScalars(const char *fieldName)
@@ -75,7 +75,7 @@ public:
 
   ///**
   // * If you want to use an arbitrary vectors array, then set its name here.
-  // * By default this in NULL and the filter will use the active vector array.
+  // * By default this in nullptr and the filter will use the active vector array.
   // */
   // vtkGetStringMacro(InputVectorsSelection);
   // void SelectInputVectors(const char *fieldName)
@@ -83,7 +83,7 @@ public:
 
   ///**
   // * If you want to use an arbitrary normals array, then set its name here.
-  // * By default this in NULL and the filter will use the active normal array.
+  // * By default this in nullptr and the filter will use the active normal array.
   // */
   // vtkGetStringMacro(InputNormalsSelection);
   // void SelectInputNormals(const char *fieldName)
@@ -91,9 +91,9 @@ public:
 
 protected:
   vtkMaskedGlyph2D();
-  ~vtkMaskedGlyph2D();
+  ~vtkMaskedGlyph2D() override;
 
-  virtual int RequestData(vtkInformation *info,
+  int RequestData(vtkInformation *info,
                           vtkInformationVector **inInfoVec,
                           vtkInformationVector *outInfoVec) override;
 

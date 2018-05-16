@@ -53,7 +53,7 @@ mitk::ModalityProperty::~ModalityProperty()
 
 void mitk::ModalityProperty::AddEnumerationTypes()
 {
-  IdType newId = static_cast<IdType>(EnumerationProperty::Size());
+  auto newId = static_cast<IdType>(EnumerationProperty::Size());
 
   AddEnum("undefined", newId++);
   AddEnum("CR", newId++);            // computer radiography

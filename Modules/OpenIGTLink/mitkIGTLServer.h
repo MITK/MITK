@@ -52,7 +52,7 @@ namespace mitk
     * to it.
     * @throw mitk::Exception Throws an exception if the given port is occupied.
     */
-    virtual bool OpenConnection() override;
+    bool OpenConnection() override;
 
     /**
      * \brief Closes the connection to the device
@@ -60,18 +60,18 @@ namespace mitk
      * This may only be called if there is currently a connection to the
      * device, but device is not running (e.g. object is in Ready state)
      */
-    virtual bool CloseConnection() override;
+    bool CloseConnection() override;
 
     /**
     * \brief Returns the number of client connections of this device
     */
-    virtual unsigned int GetNumberOfConnections() override;
+    unsigned int GetNumberOfConnections() override;
 
   protected:
     /** Constructor */
     IGTLServer(bool ReadFully);
     /** Destructor */
-    virtual ~IGTLServer();
+    ~IGTLServer() override;
 
     /**
     * \brief Call this method to check for other devices that want to connect
@@ -81,21 +81,21 @@ namespace mitk
     * is checking for other devices and if there is one it establishes a
     * connection and adds the socket to m_RegisteredClients.
     */
-    virtual void Connect() override;
+    void Connect() override;
 
     /**
     * \brief Call this method to receive a message.
     *
     * The message will be saved in the receive queue.
     */
-    virtual void Receive() override;
+    void Receive() override;
 
     /**
     * \brief Call this method to send a message.
     * The message will be read from the queue. So far the message is send to all
     * connected sockets (broadcast).
     */
-    virtual void Send() override;
+    void Send() override;
 
     /**
       * \brief Stops the communication with the given sockets.
@@ -111,7 +111,7 @@ namespace mitk
       * This method removes the given socket from the registered clients list
       *
       */
-    virtual void StopCommunicationWithSocket(igtl::Socket* client) override;
+    void StopCommunicationWithSocket(igtl::Socket* client) override;
 
     /**
      * \brief A list with all registered clients

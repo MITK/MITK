@@ -53,7 +53,7 @@ class HelpWindowListener : public IWindowListener
 public:
 
   HelpWindowListener();
-  ~HelpWindowListener();
+  ~HelpWindowListener() override;
 
   void WindowClosed(const IWorkbenchWindow::Pointer& window) override;
   void WindowOpened(const IWorkbenchWindow::Pointer& window) override;

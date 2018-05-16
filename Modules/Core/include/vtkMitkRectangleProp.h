@@ -47,11 +47,11 @@ public:
 
   void SetLineWidth(unsigned int lineWidth);
 
-  int RenderOverlay(vtkViewport *viewport);
+  int RenderOverlay(vtkViewport *viewport) override;
 
 protected:
   vtkMitkRectangleProp();
-  virtual ~vtkMitkRectangleProp();
+  ~vtkMitkRectangleProp() override;
 
   int m_Height;
   int m_Width;

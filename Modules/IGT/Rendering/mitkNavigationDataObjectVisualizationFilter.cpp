@@ -39,7 +39,7 @@ const mitk::BaseData* mitk::NavigationDataObjectVisualizationFilter::GetRepresen
   if (iter != m_RepresentationList.end())
     return iter->second;
 
-  return NULL;
+  return nullptr;
 }
 
 mitk::AffineTransform3D::Pointer mitk::NavigationDataObjectVisualizationFilter::GetOffset(int index)
@@ -47,7 +47,7 @@ mitk::AffineTransform3D::Pointer mitk::NavigationDataObjectVisualizationFilter::
   OffsetPointerMap::const_iterator iter = m_OffsetList.find(index);
   if (iter != m_OffsetList.end())
     return iter->second;
-  return NULL;
+  return nullptr;
 }
 
 
@@ -89,7 +89,7 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
     }
     output->Graft(nd); // copy all information from input to output
     const mitk::BaseData* data = this->GetRepresentationObject(index);
-    if (data == NULL)
+    if (data == nullptr)
     {
       MITK_WARN << "No BaseData associated with input " << index;
       continue;

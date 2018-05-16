@@ -108,7 +108,7 @@ bool ModuleResourceContainer::GetStat(ModuleResourceContainer::Stat& stat) const
 {
   if (IsValid())
   {
-    int fileIndex = mz_zip_reader_locate_file(&d->m_ZipArchive, stat.filePath.c_str(), NULL, 0);
+    int fileIndex = mz_zip_reader_locate_file(&d->m_ZipArchive, stat.filePath.c_str(), nullptr, 0);
     if (fileIndex >= 0)
     {
       return GetStat(fileIndex, stat);
@@ -146,7 +146,7 @@ bool ModuleResourceContainer::GetStat(int index, ModuleResourceContainer::Stat& 
 
 void* ModuleResourceContainer::GetData(int index) const
 {
-  return mz_zip_reader_extract_to_heap(&d->m_ZipArchive, index, NULL, 0);
+  return mz_zip_reader_extract_to_heap(&d->m_ZipArchive, index, nullptr, 0);
 }
 
 const ModuleInfo*ModuleResourceContainer::GetModuleInfo() const

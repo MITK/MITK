@@ -61,7 +61,7 @@ namespace mitk
     /** \brief Apply color and opacity properties read from the PropertyList.
     * The actor is not used in the GLMappers. Called by mapper subclasses.
     */
-    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor = NULL) override;
+    void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor = nullptr) override;
 
     /** \brief Checks visibility and calls the paint method
     *
@@ -84,7 +84,7 @@ namespace mitk
     GLMapper();
 
     /** virtual destructor in order to derive from this class */
-    virtual ~GLMapper();
+    ~GLMapper() override;
 
   private:
     /** copy constructor */

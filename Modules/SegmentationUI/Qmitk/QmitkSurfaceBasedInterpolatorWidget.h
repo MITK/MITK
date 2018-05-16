@@ -60,8 +60,8 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSurfaceBasedInterpolatorWidget : public QWi
   Q_OBJECT
 
 public:
-  QmitkSurfaceBasedInterpolatorWidget(QWidget *parent = 0, const char *name = 0);
-  virtual ~QmitkSurfaceBasedInterpolatorWidget();
+  QmitkSurfaceBasedInterpolatorWidget(QWidget *parent = nullptr, const char *name = nullptr);
+  ~QmitkSurfaceBasedInterpolatorWidget() override;
 
   void SetDataStorage(mitk::DataStorage &storage);
 

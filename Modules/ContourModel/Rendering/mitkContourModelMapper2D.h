@@ -47,10 +47,10 @@ namespace mitk
 
     /** \brief Checks whether this mapper needs to update itself and generate
    * data. */
-    virtual void Update(mitk::BaseRenderer *renderer) override;
+    void Update(mitk::BaseRenderer *renderer) override;
 
     /*+++ methods of MITK-VTK rendering pipeline +++*/
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
     /*+++ END methods of MITK-VTK rendering pipeline +++*/
 
     class MITKCONTOURMODEL_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
@@ -71,7 +71,7 @@ namespace mitk
       /** \brief Default constructor of the local storage. */
       LocalStorage();
       /** \brief Default deconstructor of the local storage. */
-      ~LocalStorage() {}
+      ~LocalStorage() override {}
     };
 
     /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
@@ -81,11 +81,11 @@ namespace mitk
     LocalStorage *GetLocalStorage(mitk::BaseRenderer *renderer);
 
     /** \brief Set the default properties for general image rendering. */
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
   protected:
     ContourModelMapper2D();
-    virtual ~ContourModelMapper2D();
+    ~ContourModelMapper2D() override;
 
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 

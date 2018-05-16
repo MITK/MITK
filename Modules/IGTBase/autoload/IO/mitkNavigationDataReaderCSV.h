@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKNavigationDataReaderCSV_H_HEADER_INCLUDED_
 #define MITKNavigationDataReaderCSV_H_HEADER_INCLUDED_
 
+#include <MitkIGTIOExports.h>
+
 #include <mitkAbstractFileReader.h>
 #include <mitkNavigationDataSet.h>
 
@@ -27,18 +29,18 @@ namespace mitk {
    *  Caution: at the moment only one navigation data is supported which means that only
    *  the data of the first navigation tool in the file is read!
    */
-  class NavigationDataReaderCSV : public AbstractFileReader
+  class MITKIGTIO_EXPORT NavigationDataReaderCSV : public AbstractFileReader
   {
   public:
 
     NavigationDataReaderCSV();
-    virtual ~NavigationDataReaderCSV();
+    ~NavigationDataReaderCSV() override;
 
     /** @return Returns the NavigationDataSet of the first tool in the given file.
      *          Returns an empty NavigationDataSet if the file could not be read.
      */
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
+    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
   protected:
 
@@ -74,7 +76,7 @@ namespace mitk {
 
     NavigationDataReaderCSV(const NavigationDataReaderCSV& other);
 
-    virtual mitk::NavigationDataReaderCSV* Clone() const override;
+    mitk::NavigationDataReaderCSV* Clone() const override;
 
   };
 }

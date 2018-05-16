@@ -28,7 +28,7 @@
 #include "usServiceRegistry_p.h"
 #include "usServiceReferenceBasePrivate.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 US_BEGIN_NAMESPACE
 
@@ -127,22 +127,22 @@ bool ModuleContext::UngetService(const ServiceReferenceBase& reference)
 void ModuleContext::AddServiceListener(const ServiceListener& delegate,
                                        const std::string& filter)
 {
-  d->module->coreCtx->listeners.AddServiceListener(this, delegate, NULL, filter);
+  d->module->coreCtx->listeners.AddServiceListener(this, delegate, nullptr, filter);
 }
 
 void ModuleContext::RemoveServiceListener(const ServiceListener& delegate)
 {
-  d->module->coreCtx->listeners.RemoveServiceListener(this, delegate, NULL);
+  d->module->coreCtx->listeners.RemoveServiceListener(this, delegate, nullptr);
 }
 
 void ModuleContext::AddModuleListener(const ModuleListener& delegate)
 {
-  d->module->coreCtx->listeners.AddModuleListener(this, delegate, NULL);
+  d->module->coreCtx->listeners.AddModuleListener(this, delegate, nullptr);
 }
 
 void ModuleContext::RemoveModuleListener(const ModuleListener& delegate)
 {
-  d->module->coreCtx->listeners.RemoveModuleListener(this, delegate, NULL);
+  d->module->coreCtx->listeners.RemoveModuleListener(this, delegate, nullptr);
 }
 
 void ModuleContext::AddServiceListener(const ServiceListener& delegate, void* data,

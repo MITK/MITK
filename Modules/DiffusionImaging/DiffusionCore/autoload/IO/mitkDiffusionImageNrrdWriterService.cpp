@@ -54,7 +54,7 @@ void mitk::DiffusionImageNrrdWriterService::Write()
 
   if (input.IsNull())
   {
-    MITK_ERROR <<"Sorry, input to DiffusionImageNrrdWriterService is NULL!";
+    MITK_ERROR <<"Sorry, input to DiffusionImageNrrdWriterService is nullptr!";
     return;
   }
   if ( this->GetOutputLocation().empty() )
@@ -81,24 +81,37 @@ void mitk::DiffusionImageNrrdWriterService::Write()
   sprintf( valbuffer, "DWMRI");
   itk::EncapsulateMetaData<std::string>(itkImg->GetMetaDataDictionary(),std::string("modality"),std::string(valbuffer));
 
-  if(mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size())
+  if (mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(input)->Size())
   {
-    sprintf( valbuffer, "%1f", mitk::DiffusionPropertyHelper::GetReferenceBValue(input) );
-    itk::EncapsulateMetaData<std::string>(itkImg->GetMetaDataDictionary(),std::string("DWMRI_b-value"),std::string(valbuffer));
+      MITK_INFO << "Saving original gradient directions";
+      sprintf( valbuffer, "%1f", mitk::DiffusionPropertyHelper::GetReferenceBValue(input) );
+      itk::EncapsulateMetaData<std::string>(itkImg->GetMetaDataDictionary(),std::string("DWMRI_b-value"),std::string(valbuffer));
+
+      for(unsigned int i=0; i<mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size(); i++)
+      {
+        sprintf( keybuffer, "DWMRI_gradient_%04d", i );
+
+        sprintf( valbuffer, "%1f %1f %1f", mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(input)->ElementAt(i).get(0),
+          mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(input)->ElementAt(i).get(1), mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(input)->ElementAt(i).get(2));
+
+        itk::EncapsulateMetaData<std::string>(itkImg->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
+      }
   }
-
-  for(unsigned int i=0; i<mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size(); i++)
+  else if(mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size())
   {
-    sprintf( keybuffer, "DWMRI_gradient_%04d", i );
+      MITK_INFO << "Original gradient directions not found. Saving modified gradient directions";
+      sprintf( valbuffer, "%1f", mitk::DiffusionPropertyHelper::GetReferenceBValue(input) );
+      itk::EncapsulateMetaData<std::string>(itkImg->GetMetaDataDictionary(),std::string("DWMRI_b-value"),std::string(valbuffer));
 
-    /*if(itk::ExposeMetaData<std::string>(input->GetMetaDataDictionary(),
-    std::string(keybuffer),tmp))
-    continue;*/
+      for(unsigned int i=0; i<mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size(); i++)
+      {
+        sprintf( keybuffer, "DWMRI_gradient_%04d", i );
 
-    sprintf( valbuffer, "%1f %1f %1f", mitk::DiffusionPropertyHelper::GetGradientContainer(input)->ElementAt(i).get(0),
-      mitk::DiffusionPropertyHelper::GetGradientContainer(input)->ElementAt(i).get(1), mitk::DiffusionPropertyHelper::GetGradientContainer(input)->ElementAt(i).get(2));
+        sprintf( valbuffer, "%1f %1f %1f", mitk::DiffusionPropertyHelper::GetGradientContainer(input)->ElementAt(i).get(0),
+          mitk::DiffusionPropertyHelper::GetGradientContainer(input)->ElementAt(i).get(1), mitk::DiffusionPropertyHelper::GetGradientContainer(input)->ElementAt(i).get(2));
 
-    itk::EncapsulateMetaData<std::string>(itkImg->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
+        itk::EncapsulateMetaData<std::string>(itkImg->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
+      }
   }
 
   typedef itk::VectorImage<short,3> ImageType;
@@ -106,7 +119,7 @@ void mitk::DiffusionImageNrrdWriterService::Write()
   std::string ext = this->GetMimeType()->GetExtension(this->GetOutputLocation());
   ext = itksys::SystemTools::LowerCase(ext);
 
-  // default extension is .dwi
+  // default extension is .nrrd
   if( ext == "")
   {
     ext = ".nrrd";
@@ -115,10 +128,7 @@ void mitk::DiffusionImageNrrdWriterService::Write()
 
   if (ext == ".hdwi" || ext == ".nrrd" || ext == ".dwi")
   {
-
-    MITK_INFO << "Extension " << ext;
     itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
-    //io->SetNrrdVectorType( nrrdKindList );
     io->SetFileType( itk::ImageIOBase::Binary );
     io->UseCompressionOn();
 
@@ -139,7 +149,6 @@ void mitk::DiffusionImageNrrdWriterService::Write()
       std::cout << e << std::endl;
       throw;
     }
-
   }
 }
 

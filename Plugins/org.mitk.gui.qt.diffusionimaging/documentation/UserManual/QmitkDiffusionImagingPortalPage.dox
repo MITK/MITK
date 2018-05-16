@@ -1,85 +1,48 @@
-/** 
-\page org_mitk_gui_qt_diffusionimaging MITK Diffusion Imaging (MITK-DI)
+/**
+\page org_mitk_gui_qt_diffusionimaging MITK Diffusion
 
 \tableofcontents
 
-This module provides means to diffusion weighted image reconstruction, visualization and quantification. Diffusion tensors as well as different q-ball reconstruction schemes are supported. Q-ball imaging aims at recovering more detailed information about the orientations of fibers from diffusion MRI measurements and, in particular, to resolve the orientations of crossing fibers.
+MITK Diffusion offers a selection of image analysis methods for dMRI processing. It encompasses the research of the <a href="https://www.dkfz.de/en/mic/index.php">Division of Medical Image Computing</a> of the German Cancer Research Center (DKFZ).
 
 \section org_mitk_gui_qt_diffusionimagingComponents Components
 
-MITK Diffusion consists of further components, which have their own documentation, see:
+MITK Diffusion consists of multiple components with their own documentation:
 
-\subsection org_mitk_gui_qt_diffusionimagingComponentsDataImport Data Import
+\subsection sub1 Data formats, import and export
+\li \subpage QmitkDiffusionImagingDataImportPage
 
-  \li \subpage QmitkDiffusionImagingDataImportPage
+\subsection sub2 Preprocessing and Reconstruction
+\li \subpage org_mitk_views_diffusionpreprocessing
+\li \subpage org_mitk_views_simpleregistrationview
+\li \subpage org_mitk_views_headmotioncorrectionview
+\li \subpage org_mitk_views_denoisingview
+\li \subpage org_mitk_views_tensorreconstruction
+\li \subpage org_mitk_views_qballreconstruction
 
-\subsection org_mitk_gui_qt_diffusionimagingComponentsPreprocessingAndReconstruction Preprocessing and Reconstruction
+\subsection sub3 Visualization and Quantification
+\li \subpage org_mitk_views_controlvisualizationpropertiesview
+\li \subpage org_mitk_views_odfdetails
+\li \subpage org_mitk_views_odfmaximaextraction
+\li \subpage org_mitk_views_partialvolumeanalysisview
+\li \subpage org_mitk_views_diffusionquantification
+\li \subpage org_mitk_views_ivim
 
-Register or denoise original data and convert it into tensor or q-ball images.
+\subsection sub4 Fiber Tractography
+\li \subpage org_mitk_views_streamlinetracking
+\li \subpage org_mitk_views_gibbstracking
+\li \subpage org_mitk_views_mlbtview
+\li \subpage org_mitk_views_fiberprocessing
+\li \subpage org_mitk_views_fiberquantification
+\li \subpage org_mitk_views_fiberfit
+\li \subpage org_mitk_views_fiberclustering
 
-  \li \subpage org_mitk_views_diffusionregistrationview
-  \li \subpage org_mitk_views_diffusionpreprocessing
-  \li \subpage QmitkDiffusionImagingReconstructionPage
-  \li \subpage org_mitk_views_controlvisualizationpropertiesview
-  \li \subpage org_mitk_views_odfdetails
-  \li \subpage org_mitk_views_odfmaximaextraction
-  \li \subpage org_mitk_views_denoisingview
+\subsection sub5 Fiberfox dMRI Simulation
+\li \subpage org_mitk_views_fiberfoxview
+\li \subpage org_mitk_views_fieldmapgenerator
 
-\subsection org_mitk_gui_qt_diffusionimagingComponentsFiberTracking Fiber Tracking
+\subsection sub6 TBSS and Connectomics
+\li \subpage org_mitk_views_tractbasedspatialstatistics
+\li \subpage org_mitk_diffusionimagingapp_perspectives_connectomics
 
-Create and work with fiber tractographies.
-  
-  \li \subpage org_mitk_views_fiberprocessing
-  \li \subpage org_mitk_views_gibbstracking
-  \li \subpage org_mitk_views_mlbtview
-  \li \subpage org_mitk_views_stochasticfibertracking
-  \li \subpage org_mitk_views_fiberprocessing
-  \li \subpage org_mitk_views_fiberquantification
-  \li \subpage org_mitk_views_streamlinetracking
-  \li \subpage org_mitk_views_fiberfoxview
-  \li \subpage org_mitk_views_fieldmapgenerator
-  
-\subsection org_mitk_gui_qt_diffusionimagingComponentsQuantification Quantification
-
-Create parameter maps and quantify different properties.
-  
-  \li \subpage org_mitk_views_diffusionquantification
-  \li \subpage org_mitk_views_ivim
-  \li \subpage org_mitk_views_partialvolumeanalysisview
-  \li \subpage org_mitk_views_tractbasedspatialstatistics
- 
-\subsection org_mitk_gui_qt_diffusionimagingComponentsConnectomics Connectomics
-
-Create and analyse connectome networks.
- 
-  \li \subpage org_mitk_diffusionimagingapp_perspectives_connectomics
-
-\section org_mitk_gui_qt_diffusionimagingIssues Known Issues
-
-\li <b>Dicom Import:</b> The dicom import has so far only been implemented for Siemens dicom images. MITK-DI is capable of reading the nrrd format, which is documented elsewhere [1, 2]. These files can be created by combining the raw image data with a corresponding textual header file. The file extension should be changed from *.nrrd to *.dwi or from *.nhdr to *.hdwi respectively in order to let MITK-DI recognize the diffusion related header information provided in the files.
-
-\section org_mitk_gui_qt_diffusionimagingTechnicalDetails Technical Information for Developers
-
-The diffusion imaging module uses additional properties beside the ones in use in other modules, for further information see \ref DiffusionImagingPropertiesPage .
-
-\section org_mitk_gui_qt_diffusionimagingReferences References
-
-Further reading regarding diffusion:
-
-1. http://teem.sourceforge.net/nrrd/format.html
-
-2. http://www.cmake.org/Wiki/Getting_Started_with_the_NRRD_Format
-
-3. C.F.Westin, S.E.Maier, H.Mamata, A.Nabavi, F.A.Jolesz, R.Kikinis, "Processing and visualization for Diffusion tensor MRI", Medical image Analysis, 2002, pp 93-108
-
-5. Tuch, D.S., 2004. Q-ball imaging. Magn Reson Med 52, 1358-1372.
-
-6. Descoteaux, M., Angelino, E., Fitzgibbons, S., Deriche, R., 2007. Regularized, fast, and robust analytical Q-ball imaging. Magn Reson Med 58, 497-510.
-
-7. Aganj, I., Lenglet, C., Sapiro, G., 2009. ODF reconstruction in q-ball imaging with solid angle consideration. Proceedings of the Sixth IEEE International Symposium on Biomedical Imaging Boston, MA.
-
-8. Goh, A., Lenglet, C., Thompson, P.M., Vidal, R., 2009. Estimating Orientation Distribution Functions with Probability Density Constraints and Spatial Regularity. Med Image Comput Comput Assist Interv Int Conf Med Image Comput Comput Assist Interv LNCS 5761, 877 ff.
-
-9. J.-D. Tournier, S. Mori, A. Leemans., 2011. Diffusion Tensor Imaging and Beyond. Magn Reson Med 65, 1532-1556.
-  
 */

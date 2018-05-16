@@ -29,7 +29,7 @@ void mitk::UnstructuredGrid::SetVtkUnstructuredGrid(vtkUnstructuredGrid *grid, u
 
   m_GridSeries[t] = grid;
 
-  // call m_VtkPolyData->Register(NULL) to tell the reference counting that we
+  // call m_VtkPolyData->Register(nullptr) to tell the reference counting that we
   // want to keep a reference on the object
   if (m_GridSeries[t] != nullptr)
     m_GridSeries[t]->Register(grid);
@@ -94,7 +94,7 @@ vtkUnstructuredGrid *mitk::UnstructuredGrid::GetVtkUnstructuredGrid(unsigned int
 
 void mitk::UnstructuredGrid::Graft(const DataObject *data)
 {
-  const UnstructuredGrid *grid = dynamic_cast<const UnstructuredGrid *>(data);
+  const auto *grid = dynamic_cast<const UnstructuredGrid *>(data);
 
   if (grid == nullptr)
     mitkThrow() << "Data object used to graft surface is not a mitk::Surface.";
@@ -128,7 +128,7 @@ mitk::UnstructuredGrid::UnstructuredGrid(const mitk::UnstructuredGrid &other)
     m_GridSeries = other.m_GridSeries;
     m_Initialized = other.m_Initialized;
   }
-  this->SetRequestedRegion(const_cast<mitk::UnstructuredGrid *>(&other));
+  this->SetRequestedRegion(&other);
 }
 
 mitk::UnstructuredGrid::~UnstructuredGrid()
@@ -181,7 +181,7 @@ void mitk::UnstructuredGrid::CalculateBoundingBox()
   }
   timeGeometry->Update();
 
-  mitk::BoundingBox::Pointer bb = const_cast<mitk::BoundingBox *>(timeGeometry->GetBoundingBoxInWorld());
+  mitk::BoundingBox::Pointer bb = timeGeometry->GetBoundingBoxInWorld();
   itkDebugMacro(<< "boundingbox min: " << bb->GetMinimum());
   itkDebugMacro(<< "boundingbox max: " << bb->GetMaximum());
   m_CalculateBoundingBox = false;

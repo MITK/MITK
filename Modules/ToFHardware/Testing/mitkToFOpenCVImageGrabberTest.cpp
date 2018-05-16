@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 static bool CompareImages(mitk::Image::Pointer mitkImage, cv::Mat openCVImage)
 {
   float equal = true;
-  if (static_cast<int>((mitkImage->GetDimension(0))!=openCVImage.cols)||(static_cast<int>(mitkImage->GetDimension(1))!=openCVImage.rows))
+  if (static_cast<int>(mitkImage->GetDimension(0)) != openCVImage.cols || static_cast<int>(mitkImage->GetDimension(1)) != openCVImage.rows)
   {
     equal = false;
   }
@@ -67,7 +67,7 @@ int mitkToFOpenCVImageGrabberTest(int /* argc */, char* /*argv*/[])
   tofImageGrabber->SetProperty("IntensityImageFileName",mitk::StringProperty::New(intensityFileName));
   tofImageGrabber->Update();
 
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(distanceFileName);
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(distanceFileName);
 
   try
   {
@@ -78,11 +78,11 @@ int mitkToFOpenCVImageGrabberTest(int /* argc */, char* /*argv*/[])
     tofOpenCVImageGrabber->StartCapturing();
     cv::Mat cvImage = tofOpenCVImageGrabber->GetImage();
     MITK_TEST_CONDITION_REQUIRED(CompareImages(image,cvImage),"Test distance image");
-    image = mitk::IOUtil::LoadImage(amplitudeFileName);
+    image = mitk::IOUtil::Load<mitk::Image>(amplitudeFileName);
     tofOpenCVImageGrabber->SetImageType(1);
     cvImage = tofOpenCVImageGrabber->GetImage();
     MITK_TEST_CONDITION_REQUIRED(CompareImages(image,cvImage),"Test amplitude image");
-    image = mitk::IOUtil::LoadImage(intensityFileName);
+    image = mitk::IOUtil::Load<mitk::Image>(intensityFileName);
     tofOpenCVImageGrabber->SetImageType(2);
     cvImage = tofOpenCVImageGrabber->GetImage();
     MITK_TEST_CONDITION_REQUIRED(CompareImages(image,cvImage),"Test intensity image");

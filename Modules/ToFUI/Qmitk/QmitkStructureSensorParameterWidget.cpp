@@ -20,8 +20,8 @@ const std::string QmitkStructureSensorParameterWidget::VIEW_ID = "org.mitk.views
 
 QmitkStructureSensorParameterWidget::QmitkStructureSensorParameterWidget(QWidget* p, Qt::WindowFlags f): QWidget(p, f)
 {
-  m_ToFImageGrabber = NULL;
-  m_Controls = NULL;
+  m_ToFImageGrabber = nullptr;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
 }
 

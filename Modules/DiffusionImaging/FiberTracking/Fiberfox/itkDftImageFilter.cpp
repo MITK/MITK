@@ -17,17 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __itkDftImageFilter_txx
 #define __itkDftImageFilter_txx
 
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstdio>
+#include <cstdlib>
 
 #include "itkDftImageFilter.h"
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
 
 namespace itk {
 
@@ -61,10 +58,8 @@ void DftImageFilter< TPixelType >
 
     while( !oit.IsAtEnd() )
     {
-        double kx = oit.GetIndex()[0];
-        double ky = oit.GetIndex()[1];
-//        kx -= (double)szx/2;
-//        ky -= (double)szy/2;
+        float kx = oit.GetIndex()[0];
+        float ky = oit.GetIndex()[1];
 
         if ((int)szx%2==1)
             kx -= (szx-1)/2;
@@ -75,24 +70,12 @@ void DftImageFilter< TPixelType >
         else
             ky -= szy/2;
 
-//        if( kx <  szx/2 )
-//            kx = kx + szx/2;
-//        else
-//            kx = kx - szx/2;
-
-//        if( ky <  szy/2 )
-//            ky = ky + szy/2;
-//        else
-//            ky = ky - szy/2;
-
-        vcl_complex<double> s(0,0);
+        vcl_complex<TPixelType> s(0,0);
         InputIteratorType it(inputImage, inputImage->GetLargestPossibleRegion() );
         while( !it.IsAtEnd() )
         {
-            int x = it.GetIndex()[0];
-            int y = it.GetIndex()[1];
-//            x -= (double)szx/2;
-//            y -= (double)szy/2;
+            float x = it.GetIndex()[0];
+            float y = it.GetIndex()[1];
 
             if ((int)szx%2==1)
                 x -= (szx-1)/2;
@@ -103,9 +86,7 @@ void DftImageFilter< TPixelType >
             else
                 y -= szy/2;
 
-            vcl_complex<double> f(it.Get().real(), it.Get().imag());
-
-            s += f * exp( std::complex<double>(0, -2 * M_PI * (kx*(double)x/szx + ky*(double)y/szy) ) );
+            s += it.Get() * exp( std::complex<TPixelType>(0, -2 * itk::Math::pi * (kx*x/szx + ky*y/szy) ) );
 
             ++it;
         }

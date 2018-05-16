@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkPointListModel::QmitkPointListModel(mitk::DataNode *pointSetNode, int t, QObject *parent)
   : QAbstractListModel(parent),
-    m_PointSetNode(NULL),
+    m_PointSetNode(nullptr),
     m_PointSetModifiedObserverTag(0),
     m_PointSetDeletedObserverTag(0),
     m_TimeStep(t)
@@ -41,7 +41,7 @@ Qt::ItemFlags QmitkPointListModel::flags(const QModelIndex & /*index*/) const
 
 QmitkPointListModel::~QmitkPointListModel()
 {
-  this->ObserveNewPointSet(NULL);
+  this->ObserveNewPointSet(nullptr);
 }
 
 void QmitkPointListModel::SetPointSetNode(mitk::DataNode *pointSetNode)
@@ -73,7 +73,7 @@ int QmitkPointListModel::GetTimeStep() const
 void QmitkPointListModel::ObserveNewPointSet(mitk::DataNode *pointSetNode)
 {
   // remove old observers
-  if (m_PointSetNode != NULL)
+  if (m_PointSetNode != nullptr)
   {
     try // here sometimes an exception is thrown which leads to a crash. So catch this exception but give an error
         // message. See bug 18316 for details.
@@ -312,11 +312,11 @@ void QmitkPointListModel::RemoveSelectedPoint()
 
 mitk::PointSet *QmitkPointListModel::CheckForPointSetInNode(mitk::DataNode *node) const
 {
-  if (node != NULL)
+  if (node != nullptr)
   {
     mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet *>(node->GetData());
     if (pointSet.IsNotNull())
       return pointSet;
   }
-  return NULL;
+  return nullptr;
 }

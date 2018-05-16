@@ -46,13 +46,13 @@ public:
   void testReadFile()
   {
     // Read STL-Image from file
-    mitk::Surface::Pointer surface = mitk::IOUtil::LoadSurface(m_SurfacePath);
+    mitk::Surface::Pointer surface = mitk::IOUtil::Load<mitk::Surface>(m_SurfacePath);
 
     // check some basic stuff
-    CPPUNIT_ASSERT_MESSAGE("Reader output not NULL", surface.IsNotNull());
+    CPPUNIT_ASSERT_MESSAGE("Reader output not nullptr", surface.IsNotNull());
     CPPUNIT_ASSERT_MESSAGE("IsInitialized()", surface->IsInitialized());
-    CPPUNIT_ASSERT_MESSAGE("mitk::Surface::SetVtkPolyData()", (surface->GetVtkPolyData() != NULL));
-    CPPUNIT_ASSERT_MESSAGE("Availability of geometry", (surface->GetGeometry() != NULL));
+    CPPUNIT_ASSERT_MESSAGE("mitk::Surface::SetVtkPolyData()", (surface->GetVtkPolyData() != nullptr));
+    CPPUNIT_ASSERT_MESSAGE("Availability of geometry", (surface->GetGeometry() != nullptr));
 
     // use vtk stl reader for reference
     vtkSmartPointer<vtkSTLReader> myVtkSTLReader = vtkSmartPointer<vtkSTLReader>::New();

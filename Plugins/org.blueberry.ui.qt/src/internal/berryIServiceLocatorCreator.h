@@ -51,7 +51,7 @@ struct BERRY_UI_QT IServiceLocatorCreator : public virtual Object
 
   berryObjectMacro(berry::IServiceLocatorCreator)
 
-  ~IServiceLocatorCreator();
+  ~IServiceLocatorCreator() override;
 
   /**
    * Creates a service locator that can be used for hosting a new service

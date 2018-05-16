@@ -152,8 +152,8 @@ QmitkRegistrationJob::QmitkRegistrationJob(map::algorithm::RegistrationAlgorithm
   m_MovingDataUID = "Missing moving UID";
   m_TargetDataUID = "Missing target UID";
 
-  m_spTargetMask = NULL;
-  m_spMovingMask = NULL;
+  m_spTargetMask = nullptr;
+  m_spMovingMask = nullptr;
 
   m_spCommand = ::itk::MemberCommand<QmitkRegistrationJob>::New();
   m_spCommand->SetCallbackFunction(this, &QmitkRegistrationJob::OnMapAlgorithmEvent);

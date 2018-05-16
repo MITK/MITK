@@ -15,6 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkNavigationDataSet.h"
+#include "mitkPointSet.h"
+#include "mitkBaseRenderer.h"
 
 mitk::NavigationDataSet::NavigationDataSet( unsigned int numberOfTools )
   : m_NavigationDataVectors(std::vector<std::vector<mitk::NavigationData::Pointer> >()), m_NumberOfTools(numberOfTools)
@@ -73,7 +75,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataForIndex
 //  if ( toolIndex >= m_NavigationDataVectors.size() )
 //  {
 //    MITK_WARN("NavigationDataSet") << "There is no tool with index " << toolIndex << ".";
-//    return NULL;
+//    return nullptr;
 //  }
 //
 //  std::vector<mitk::NavigationData::Pointer>::const_iterator it;
@@ -90,7 +92,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataForIndex
 //  if ( it == m_NavigationDataVectors.at(toolIndex).begin() )
 //  {
 //    MITK_WARN("NavigationDataSet") << "No NavigationData was recorded before given timestamp.";
-//    return NULL;
+//    return nullptr;
 //  }
 //
 //  // return last element smaller than the given timestamp
@@ -150,6 +152,27 @@ void mitk::NavigationDataSet::SetRequestedRegion(const DataObject * )
 bool mitk::NavigationDataSet::IsEmpty() const
 {
   return (Size() == 0);
+}
+
+void mitk::NavigationDataSet::ConvertNavigationDataToPointSet() const
+{
+  //iterate over all tools
+  for (unsigned int toolIndex = 0; toolIndex < this->GetNumberOfTools(); ++ toolIndex)
+  {
+    mitk::PointSet::Pointer _tempPointSet = mitk::PointSet::New();
+    //iterate over all time steps
+    for (unsigned int time = 0; time < m_NavigationDataVectors.size(); time++)
+    {
+      _tempPointSet->InsertPoint(time,m_NavigationDataVectors[time][toolIndex]->GetPosition());
+      MITK_DEBUG << m_NavigationDataVectors[time][toolIndex]->GetPosition() << " --- " << _tempPointSet->GetPoint(time);
+    }
+    mitk::DataNode::Pointer dn = mitk::DataNode::New();
+    std::stringstream str;
+    str << "NavigationData Tool " << toolIndex;
+    dn->SetProperty("name", mitk::StringProperty::New(str.str()));
+    dn->SetData(_tempPointSet);
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()->Add(dn);
+  }
 }
 
 // <--- methods necessary for BaseData

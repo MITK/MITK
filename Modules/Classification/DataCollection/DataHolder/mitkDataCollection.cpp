@@ -35,7 +35,7 @@ void
 mitk::DataCollection::Init(std::string name)
 {
   m_Name = name;
-  m_Parent = NULL;
+  m_Parent = nullptr;
 }
 
 size_t mitk::DataCollection::AddData(DataObject::Pointer data, std::string name, std::string filePath)
@@ -207,11 +207,11 @@ template <class ImageType>
 ImageType mitk::DataCollection::GetItkImage(size_t index, ImageType *itkImage)
 {
   Image* image = dynamic_cast<Image*> (GetData(index).GetPointer());
-    if (image != NULL)
+    if (image != nullptr)
   {
     CastToItkImage(image, itkImage );
   }
-  else if (NULL != dynamic_cast<ImageType*>(GetData(index)))
+  else if (nullptr != dynamic_cast<ImageType*>(GetData(index)))
     itkImage = dynamic_cast<ImageType*>(GetData(index));
 }
 
@@ -219,11 +219,11 @@ template <class ImageType>
 ImageType mitk::DataCollection::GetItkImage(std::string name, ImageType* itkImage)
 {
   Image* image = dynamic_cast<Image*> (GetData(NameToIndex(name)).GetPointer());
-    if (image != NULL)
+    if (image != nullptr)
   {
     CastToItkImage(image, itkImage );
   }
-  else if (NULL != dynamic_cast<ImageType*> (GetData(NameToIndex(name))))
+  else if (nullptr != dynamic_cast<ImageType*> (GetData(NameToIndex(name))))
     itkImage = dynamic_cast<ImageType*> (GetData(NameToIndex(name)));
 }
 
@@ -300,13 +300,13 @@ void mitk::DataCollection::Clear()
   for (std::vector<itk::DataObject::Pointer>::iterator it = m_DataVector.begin(); it != m_DataVector.end(); ++it)
   {
     DataCollection* col = dynamic_cast<DataCollection*>((*it).GetPointer()) ;
-    if (col != NULL)
+    if (col != nullptr)
       col->Clear();
     else
-      *it = NULL;
+      *it = nullptr;
 
   }
-  m_Parent = NULL;
+  m_Parent = nullptr;
 }
 
 /* Superclass methods, that need to be implemented */
@@ -365,7 +365,7 @@ mitk::Image::Pointer mitk::DataCollection::GetProbabilityMap(std::vector<std::st
   for (std::vector<std::string>::iterator it = probabilityNamesVector.begin(); it != probabilityNamesVector.end(); ++it)
   {
     ImageType* img = dynamic_cast<ImageType*>(this->GetData((*it)).GetPointer());
-    if (img != NULL)
+    if (img != nullptr)
     {
       composer->SetInput(i, img);
       ++i;

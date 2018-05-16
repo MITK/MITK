@@ -37,7 +37,7 @@ namespace mitk
      */
     SurfaceOperation(mitk::OperationType operationType, vtkPolyData *polyData, unsigned int t);
 
-    virtual ~SurfaceOperation();
+    ~SurfaceOperation() override;
 
     vtkPolyData *GetVtkPolyData();
 

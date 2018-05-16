@@ -145,7 +145,7 @@ bool mitk::Gizmo::RemoveGizmoFromNode(DataNode *node, DataStorage *storage)
 
   for (auto &gizmoChild : *gizmoChildren)
   {
-    Gizmo *gizmo = dynamic_cast<Gizmo *>(gizmoChild->GetData());
+    auto *gizmo = dynamic_cast<Gizmo *>(gizmoChild->GetData());
     if (gizmo)
     {
       storage->Remove(gizmoChild);

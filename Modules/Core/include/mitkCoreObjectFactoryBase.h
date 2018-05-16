@@ -81,7 +81,7 @@ namespace mitk
      * @param fileExtensionsMap input map with the file extensions, e.g. ("*.dcm", "DICOM files")("*.dc3", "DICOM
      * files")
      * @param fileExtensions the converted output string, suitable for the QT QFileDialog widget
-     *                       e.g. "all (*.dcm *.DCM *.dc3 ... *.vti *.hdr *.nrrd *.nhdr );;Q-Ball Images (*.hqbi *qbi)"
+     *                       e.g. "all (*.dcm *.DCM *.dc3 ... *.vti *.hdr *.nrrd *.nhdr );;ODF Images (*.odf *qbi)"
      *
      * @deprecatedSince{2014_10}
      */

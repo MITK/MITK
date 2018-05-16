@@ -37,41 +37,25 @@
 #include "QmitkMimeTypes.h"
 #include "QmitkRenderWindowMenu.h"
 
-QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
-                                     QString name,
-                                     mitk::VtkPropRenderer * /*renderer*/,
-                                     mitk::RenderingManager *renderingManager,
-                                     mitk::BaseRenderer::RenderingMode::Type renderingMode)
-  : QVTKWidget(parent), m_ResendQtEvents(true), m_MenuWidget(NULL), m_MenuWidgetActivated(false), m_LayoutIndex(0)
+QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk::VtkPropRenderer *, mitk::RenderingManager *renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode)
+  : QVTKOpenGLWidget(parent),
+    m_ResendQtEvents(true),
+    m_MenuWidget(nullptr),
+    m_MenuWidgetActivated(false),
+    m_LayoutIndex(0)
 {
-  // Needed if QVTKWidget2 is used instead of QVTKWidget
-  // this will be fixed in VTK source if change 18864 is accepted
-  /*QGLFormat newform = this->format();
-  newform.setSamples(8);
-  this->setFormat(newform);*/
+  m_InternalRenderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+  m_InternalRenderWindow->SetMultiSamples(0);
+  m_InternalRenderWindow->SetAlphaBitPlanes(0);
 
-  QSurfaceFormat surfaceFormat = windowHandle()->format();
-  surfaceFormat.setStencilBufferSize(8);
-  windowHandle()->setFormat(surfaceFormat);
+  this->SetRenderWindow(m_InternalRenderWindow);
 
-  if (renderingMode == mitk::BaseRenderer::RenderingMode::DepthPeeling)
-  {
-    GetRenderWindow()->SetMultiSamples(0);
-    GetRenderWindow()->SetAlphaBitPlanes(1);
-  }
-  else if (renderingMode == mitk::BaseRenderer::RenderingMode::MultiSampling)
-  {
-    GetRenderWindow()->SetMultiSamples(8);
-  }
-  else if (renderingMode == mitk::BaseRenderer::RenderingMode::Standard)
-  {
-    GetRenderWindow()->SetMultiSamples(0);
-  }
+  this->Initialize(renderingManager, name.toStdString().c_str(), renderingMode);
 
-  Initialize(renderingManager, name.toStdString().c_str(), renderingMode); // Initialize mitkRenderWindowBase
-
-  setFocusPolicy(Qt::StrongFocus);
-  setMouseTracking(true);
+  this->setFocusPolicy(Qt::StrongFocus);
+  this->setMouseTracking(true);
+  QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  this->setSizePolicy(sizePolicy);
 }
 
 QmitkRenderWindow::~QmitkRenderWindow()
@@ -115,7 +99,7 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 
   if (!this->HandleEvent(mPressEvent.GetPointer()))
   {
-    QVTKWidget::mousePressEvent(me);
+    QVTKOpenGLWidget::mousePressEvent(me);
   }
 
   if (m_ResendQtEvents)
@@ -130,7 +114,7 @@ void QmitkRenderWindow::mouseDoubleClickEvent(QMouseEvent *me)
 
   if (!this->HandleEvent(mPressEvent.GetPointer()))
   {
-    QVTKWidget::mousePressEvent(me);
+    QVTKOpenGLWidget::mousePressEvent(me);
   }
 
   if (m_ResendQtEvents)
@@ -145,7 +129,7 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 
   if (!this->HandleEvent(mReleaseEvent.GetPointer()))
   {
-    QVTKWidget::mouseReleaseEvent(me);
+    QVTKOpenGLWidget::mouseReleaseEvent(me);
   }
 
   if (m_ResendQtEvents)
@@ -163,7 +147,7 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 
   if (!this->HandleEvent(mMoveEvent.GetPointer()))
   {
-    QVTKWidget::mouseMoveEvent(me);
+    QVTKOpenGLWidget::mouseMoveEvent(me);
   }
 }
 
@@ -175,7 +159,7 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 
   if (!this->HandleEvent(mWheelEvent.GetPointer()))
   {
-    QVTKWidget::wheelEvent(we);
+    QVTKOpenGLWidget::wheelEvent(we);
   }
 
   if (m_ResendQtEvents)
@@ -190,7 +174,7 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
   mitk::InteractionKeyEvent::Pointer keyEvent = mitk::InteractionKeyEvent::New(m_Renderer, key, modifiers);
   if (!this->HandleEvent(keyEvent.GetPointer()))
   {
-    QVTKWidget::keyPressEvent(ke);
+    QVTKOpenGLWidget::keyPressEvent(ke);
   }
 
   if (m_ResendQtEvents)
@@ -200,7 +184,7 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
 void QmitkRenderWindow::enterEvent(QEvent *e)
 {
   // TODO implement new event
-  QVTKWidget::enterEvent(e);
+  QVTKOpenGLWidget::enterEvent(e);
 }
 
 void QmitkRenderWindow::DeferredHideMenu()
@@ -213,25 +197,26 @@ void QmitkRenderWindow::DeferredHideMenu()
 
 void QmitkRenderWindow::leaveEvent(QEvent *e)
 {
-  mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(this->m_Renderer, NULL, "LeaveRenderWindow");
+  mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(this->m_Renderer, nullptr, "LeaveRenderWindow");
 
   this->HandleEvent(internalEvent.GetPointer());
 
   if (m_MenuWidget)
     m_MenuWidget->smoothHide();
 
-  QVTKWidget::leaveEvent(e);
+  QVTKOpenGLWidget::leaveEvent(e);
 }
 
-void QmitkRenderWindow::paintEvent(QPaintEvent * /*event*/)
+//-----------------------------------------------------------------------------
+void QmitkRenderWindow::resizeGL(int w, int h)
 {
-  // We are using our own interaction and thus have to call the rendering manually.
-  this->GetRenderer()->GetRenderingManager()->RequestUpdate(GetRenderWindow());
+  this->GetRenderer()->GetRenderingManager()->ForceImmediateUpdate(GetRenderWindow());
+  QVTKOpenGLWidget::resizeGL(w, h);
 }
 
 void QmitkRenderWindow::moveEvent(QMoveEvent *event)
 {
-  QVTKWidget::moveEvent(event);
+  QVTKOpenGLWidget::moveEvent(event);
 
   // after a move the overlays need to be positioned
   emit moved();
@@ -239,7 +224,7 @@ void QmitkRenderWindow::moveEvent(QMoveEvent *event)
 
 void QmitkRenderWindow::showEvent(QShowEvent *event)
 {
-  QVTKWidget::showEvent(event);
+  QVTKOpenGLWidget::showEvent(event);
 
   // this singleshot is necessary to have the overlays positioned correctly after initial show
   // simple call of moved() is no use here!!
@@ -258,12 +243,12 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state, QmitkStdMultiWidget *stdM
     disconnect(m_MenuWidget, SIGNAL(ChangeCrosshairRotationMode(int)), this, SIGNAL(ChangeCrosshairRotationMode(int)));
 
     delete m_MenuWidget;
-    m_MenuWidget = 0;
+    m_MenuWidget = nullptr;
   }
   else if (m_MenuWidgetActivated && !m_MenuWidget)
   {
     // create render window MenuBar for split, close Window or set new setting.
-    m_MenuWidget = new QmitkRenderWindowMenu(this, 0, m_Renderer, stdMultiWidget);
+    m_MenuWidget = new QmitkRenderWindowMenu(this, nullptr, m_Renderer, stdMultiWidget);
     m_MenuWidget->SetLayoutIndex(m_LayoutIndex);
 
     // create Signal/Slot Connection

@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkVirtualTrackingDevice.h>
-#include <mitkInternalTrackingTool.h>
+#include <mitkTrackingTool.h>
 #include <mitkIOUtil.h>
 
 #include <mitkNavigationData.h>
@@ -154,7 +154,7 @@ int main(int  /*argc*/, char*  /*argv*/[])
 
   //The IO-System needs a filename. Otherwise the output
   //is redirected to the console. See MITK-Concepts page for more details on IO in MITK
-  mitk::IOUtil::SaveBaseData(recorder->GetNavigationDataSet(), filename.str());
+  mitk::IOUtil::Save(recorder->GetNavigationDataSet(), filename.str());
 
   //! [Part III: Record the data with the NavigationDataRecorder]
 
@@ -173,7 +173,7 @@ int main(int  /*argc*/, char*  /*argv*/[])
 
   mitk::NavigationDataSequentialPlayer::Pointer player = mitk::NavigationDataSequentialPlayer::New();
 
-  mitk::NavigationDataSet::Pointer naviDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(filename.str()).GetPointer());
+  mitk::NavigationDataSet::Pointer naviDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(filename.str())[0].GetPointer());
   player->SetNavigationDataSet(naviDataSet);
 
   //From now on, the player provides NavigationDatas in a sequential order. The next position is given, as soon as "update" is called, so this player is not in real time.

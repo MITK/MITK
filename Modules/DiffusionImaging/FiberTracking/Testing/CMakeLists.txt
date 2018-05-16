@@ -6,13 +6,15 @@ mitkAddCustomModuleTest(mitkFiberBundleReaderWriterTest mitkFiberBundleReaderWri
 # Temporarily disabled. Since method relies on random numbers, the behaviour is not consistent across different systems. Solution?
 #mitkAddCustomModuleTest(mitkGibbsTrackingTest mitkGibbsTrackingTest ${MITK_DATA_DIR}/DiffusionImaging/qBallImage.qbi ${MITK_DATA_DIR}/DiffusionImaging/diffusionImageMask.nrrd ${MITK_DATA_DIR}/DiffusionImaging/gibbsTrackingParameters.gtp ${MITK_DATA_DIR}/DiffusionImaging/gibbsTractogram.fib)
 
-mitkAddCustomModuleTest(mitkStreamlineTrackingTest mitkStreamlineTrackingTest ${MITK_DATA_DIR}/DiffusionImaging/tensorImage.dti ${MITK_DATA_DIR}/DiffusionImaging/diffusionImageMask.nrrd ${MITK_DATA_DIR}/DiffusionImaging/streamlineTractogramInterpolated.fib)
-mitkAddCustomModuleTest(mitkLocalFiberPlausibilityTest mitkLocalFiberPlausibilityTest ${MITK_DATA_DIR}/DiffusionImaging/fiberBundleX.fib ${MITK_DATA_DIR}/DiffusionImaging/LDFP_GT_DIRECTION_0.nrrd ${MITK_DATA_DIR}/DiffusionImaging/LDFP_GT_DIRECTION_1.nrrd ${MITK_DATA_DIR}/DiffusionImaging/LDFP_ERROR_IMAGE.nrrd ${MITK_DATA_DIR}/DiffusionImaging/LDFP_NUM_DIRECTIONS.nrrd ${MITK_DATA_DIR}/DiffusionImaging/LDFP_VECTOR_FIELD.fib ${MITK_DATA_DIR}/DiffusionImaging/LDFP_ERROR_IMAGE_IGNORE.nrrd)
 mitkAddCustomModuleTest(mitkFiberTransformationTest mitkFiberTransformationTest ${MITK_DATA_DIR}/DiffusionImaging/fiberBundleX.fib ${MITK_DATA_DIR}/DiffusionImaging/fiberBundleX_transformed.fib)
 mitkAddCustomModuleTest(mitkFiberExtractionTest mitkFiberExtractionTest ${MITK_DATA_DIR}/DiffusionImaging/fiberBundleX.fib ${MITK_DATA_DIR}/DiffusionImaging/fiberBundleX_extracted.fib ${MITK_DATA_DIR}/DiffusionImaging/ROI1.pf ${MITK_DATA_DIR}/DiffusionImaging/ROI2.pf ${MITK_DATA_DIR}/DiffusionImaging/ROI3.pf ${MITK_DATA_DIR}/DiffusionImaging/ROIIMAGE.nrrd ${MITK_DATA_DIR}/DiffusionImaging/fiberBundleX_inside.fib ${MITK_DATA_DIR}/DiffusionImaging/fiberBundleX_outside.fib ${MITK_DATA_DIR}/DiffusionImaging/fiberBundleX_passing-mask.fib ${MITK_DATA_DIR}/DiffusionImaging/fiberBundleX_ending-in-mask.fib ${MITK_DATA_DIR}/DiffusionImaging/fiberBundleX_subtracted.fib ${MITK_DATA_DIR}/DiffusionImaging/fiberBundleX_added.fib)
 mitkAddCustomModuleTest(mitkFiberGenerationTest mitkFiberGenerationTest ${MITK_DATA_DIR}/DiffusionImaging/Fiberfox/Fiducial_0.pf ${MITK_DATA_DIR}/DiffusionImaging/Fiberfox/Fiducial_1.pf ${MITK_DATA_DIR}/DiffusionImaging/Fiberfox/Fiducial_2.pf ${MITK_DATA_DIR}/DiffusionImaging/Fiberfox/uniform.fib ${MITK_DATA_DIR}/DiffusionImaging/Fiberfox/gaussian.fib)
-mitkAddCustomModuleTest(mitkFiberfoxSignalGenerationTest mitkFiberfoxSignalGenerationTest ${MITK_DATA_DIR}/DiffusionImaging/Fiberfox/Signalgen.fib ${MITK_DATA_DIR}/DiffusionImaging/Fiberfox/params/param3 ${MITK_DATA_DIR}/DiffusionImaging/Fiberfox/params/param4 ${MITK_DATA_DIR}/DiffusionImaging/Fiberfox/params/param5 ${MITK_DATA_DIR}/DiffusionImaging/Fiberfox/params/param6 ${MITK_DATA_DIR}/DiffusionImaging/Fiberfox/params/param8)
+
+mitkAddCustomModuleTest(mitkFiberfoxSignalGenerationTest mitkFiberfoxSignalGenerationTest)
 mitkAddCustomModuleTest(mitkMachineLearningTrackingTest mitkMachineLearningTrackingTest)
+mitkAddCustomModuleTest(mitkStreamlineTractographyTest mitkStreamlineTractographyTest)
 mitkAddCustomModuleTest(mitkFiberProcessingTest mitkFiberProcessingTest)
+mitkAddCustomModuleTest(mitkFiberFitTest mitkFiberFitTest)
+mitkAddCustomModuleTest(mitkFiberMapper3DTest mitkFiberMapper3DTest)
 
 ENDIF()

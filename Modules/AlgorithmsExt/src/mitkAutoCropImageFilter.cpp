@@ -44,7 +44,7 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage(itk::Image<TPixel, VImageDimensio
   {
     mitk::StatusBar::GetInstance()->DisplayErrorText(
       "An internal error occurred. Can't convert Image. Please report to bugs@mitk.org");
-    MITK_ERROR << "image is NULL...returning" << std::endl;
+    MITK_ERROR << "image is nullptr...returning" << std::endl;
     return;
   }
 
@@ -181,7 +181,7 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
     plane, inputGeometry->GetSpacing()[2], output->GetSlicedGeometry()->GetSlices());
 
   mitk::TimeGeometry *timeSlicedGeometry = output->GetTimeGeometry();
-  mitk::ProportionalTimeGeometry *propTimeGeometry = dynamic_cast<ProportionalTimeGeometry *>(timeSlicedGeometry);
+  auto *propTimeGeometry = dynamic_cast<ProportionalTimeGeometry *>(timeSlicedGeometry);
   propTimeGeometry->Initialize(slicedGeometry, output->GetDimension(3));
 
   m_TimeOfHeaderInitialization.Modified();

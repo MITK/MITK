@@ -48,7 +48,7 @@ public:
   /*!
   \brief default destructor
   */
-  virtual ~QmitkTrackingSourcesCheckBoxPanelWidget();
+  ~QmitkTrackingSourcesCheckBoxPanelWidget() override;
 
   /*!
   \brief Shows the checkboxes

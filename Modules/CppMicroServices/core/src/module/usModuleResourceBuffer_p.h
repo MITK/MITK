@@ -38,7 +38,7 @@ public:
   explicit ModuleResourceBuffer(void* data, std::size_t size,
                                 std::ios_base::openmode mode);
 
-  ~ModuleResourceBuffer();
+  ~ModuleResourceBuffer() override;
 
 private:
 

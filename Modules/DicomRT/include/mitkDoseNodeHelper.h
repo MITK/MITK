@@ -24,7 +24,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  void MITKDICOMRT_EXPORT ConfigureNodeAsDoseNode(mitk::DataNode* node, mitk::DoseValueAbs referenceDose);
+  /**Helper that ensures that all properties of a dose node are set correctly to visualize the node properly.*/
+  void MITKDICOMRT_EXPORT ConfigureNodeAsDoseNode(mitk::DataNode* doseNode,
+    const mitk::IsoDoseLevelSet* colorPreset,
+    mitk::DoseValueAbs referenceDose,
+    bool showColorWashGlobal = true);
+
+  void MITKDICOMRT_EXPORT ConfigureNodeAsIsoLineNode(mitk::DataNode* doseOutlineNode,
+    const mitk::IsoDoseLevelSet* colorPreset,
+    mitk::DoseValueAbs referenceDose,
+    bool showIsolinesGlobal = true);
+
+
 }
 
 #endif

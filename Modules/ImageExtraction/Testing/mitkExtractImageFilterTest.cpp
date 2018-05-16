@@ -16,16 +16,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCompareImageSliceTestHelper.h"
 #include "mitkCoreObjectFactory.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkExtractImageFilter.h"
 #include "mitkImageTimeSelector.h"
+#include "mitkIOUtil.h"
 
 unsigned int CompareImageSliceTestHelper::m_Dimension0 = 0;
 unsigned int CompareImageSliceTestHelper::m_Dimension1 = 0;
 unsigned int CompareImageSliceTestHelper::m_SliceDimension = 0;
 unsigned int CompareImageSliceTestHelper::m_SliceIndex = 0;
 bool CompareImageSliceTestHelper::m_ComparisonResult = false;
-mitk::Image *CompareImageSliceTestHelper::m_SliceImage = NULL;
+mitk::Image *CompareImageSliceTestHelper::m_SliceImage = nullptr;
 
 class mitkExtractImageFilterTestClass
 {
@@ -335,20 +335,19 @@ int mitkExtractImageFilterTest(int argc, char *argv[])
 
   // load the image
 
-  mitk::Image::Pointer image = NULL;
-  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
+  mitk::Image::Pointer image = nullptr;
   try
   {
     std::cout << "Testing with parameter '" << argv[1] << "'" << std::endl;
-    factory->SetFileName(argv[1]);
-    factory->Update();
+    auto results = mitk::IOUtil::Load(argv[1]);
 
-    if (factory->GetNumberOfOutputs() < 1)
+    if (results.empty())
     {
       std::cerr << "File could not be loaded [FAILED]" << std::endl;
       return EXIT_FAILURE;
     }
-    mitk::DataNode::Pointer node = factory->GetOutput(0);
+
+    mitk::DataNode::Pointer node = results[0];
     image = dynamic_cast<mitk::Image *>(node->GetData());
     if (image.IsNull())
     {
@@ -397,7 +396,7 @@ int mitkExtractImageFilterTest(int argc, char *argv[])
   std::cout << "Testing filter destruction" << std::endl;
 
   // freeing
-  filter = NULL;
+  filter = nullptr;
 
   std::cout << "  (II) Freeing works." << std::endl;
 

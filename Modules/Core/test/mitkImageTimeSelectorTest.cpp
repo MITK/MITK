@@ -37,7 +37,7 @@ static void Setup()
 {
   try
   {
-    m_Image = mitk::IOUtil::LoadImage(m_Filename);
+    m_Image = mitk::IOUtil::Load<mitk::Image>(m_Filename);
   }
   catch (const itk::ExceptionObject &e)
   {
@@ -77,7 +77,7 @@ static void Valid_ImageExpandedByTimestep_ReturnsTrue()
 
   const unsigned int maxTimeStep = m_Image->GetTimeSteps();
   mitk::TimeGeometry *tsg = m_Image->GetTimeGeometry();
-  mitk::ProportionalTimeGeometry *ptg = dynamic_cast<mitk::ProportionalTimeGeometry *>(tsg);
+  auto *ptg = dynamic_cast<mitk::ProportionalTimeGeometry *>(tsg);
   ptg->Expand(maxTimeStep + 1);
   ptg->SetTimeStepGeometry(ptg->GetGeometryForTimeStep(0), maxTimeStep);
 

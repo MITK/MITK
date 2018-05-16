@@ -55,7 +55,7 @@ namespace mitk
       itkGetStringMacro(Value);
     itkSetStringMacro(Value);
 
-    virtual std::string GetValueAsString() const override;
+    std::string GetValueAsString() const override;
 
     static const char *PATH;
 
@@ -67,8 +67,8 @@ namespace mitk
 
     itk::LightObject::Pointer InternalClone() const override;
 
-    virtual bool IsEqual(const BaseProperty &property) const override;
-    virtual bool Assign(const BaseProperty &property) override;
+    bool IsEqual(const BaseProperty &property) const override;
+    bool Assign(const BaseProperty &property) override;
   };
 
 #ifdef _MSC_VER

@@ -1,0 +1,32 @@
+/**
+\page org_mitk_views_fiberquantification Fiber Quantification
+
+This view provides tools to derive additional information (such as tract density images and principal fiber direction maps) from tractograms.
+
+\section SecInput Input Data
+
+- Tractogram: The input streamlines.
+- Reference Image: The output images will have the same geometry as this reference image (optional). If a reference image with DICOM tags is used, the resulting tract envelope can be saved as DICOM Segmentation Object.
+
+\section SecFDI Fiber-derived Images
+
+- Tract density image: Generate a 2D heatmap from a fiber bundle.
+- Normalized TDI: 0-1 normalized version of the TDI.
+- Binary envelope: Generate a binary segmentation from the input tractogram.
+- Fiber bundle image: Generate a 2D rgba image representation of the fiber bundle.
+- Fiber endings image: Generate a 2D image showing the locations of fiber endpoints.
+- Fiber endings pointset: Generate a poinset containing the locations of fiber endpoints (not recommended for large tractograms).
+
+\section SecPD Principal Fiber Directions
+
+Calculate the voxel-wise principal fiber directions (fixels) from a tractogram.
+- Max. Peaks: Maximum number of output directions per voxel.
+- Angular Threshold: Cluster directions that are close together using the specified threshold (in degree).
+- Size Threshold: Discard principal directions with a magnitude smaller than the specified threshold. This value is the vector magnitude raltive to the largest vector in the voxel.
+- Normalization: Normalize the principal fiber directions by the global maximum, the voxel-wise maximum or each direction individually.
+- Output #Directions per Voxel: Generate an image that contains the number of principal directions per voxel as values.
+
+\imageMacro{DirectionExtractionFib.png, "Input fiber bundle",10}
+\imageMacro{DirectionExtractionPeaks.png, "Output principal fiber directions",10}
+
+*/

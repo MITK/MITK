@@ -44,7 +44,7 @@ void mitk::ReduceContourSetFilter::SetInput(unsigned int idx, const mitk::Surfac
 
 void mitk::ReduceContourSetFilter::SetInput(const mitk::Surface *surface)
 {
-  this->SetInput(0, const_cast<mitk::Surface *>(surface));
+  this->SetInput(0, surface);
 }
 
 void mitk::ReduceContourSetFilter::GenerateData()
@@ -62,7 +62,7 @@ void mitk::ReduceContourSetFilter::GenerateData()
 
   for (unsigned int i = 0; i < numberOfInputs; i++)
   {
-    mitk::Surface *currentSurface = const_cast<mitk::Surface *>(this->GetInput(i));
+    auto *currentSurface = this->GetInput(i);
     vtkSmartPointer<vtkPolyData> polyData = currentSurface->GetVtkPolyData();
 
     newPolyData = vtkSmartPointer<vtkPolyData>::New();
@@ -379,7 +379,7 @@ bool mitk::ReduceContourSetFilter::CheckForIntersection(
       continue;
 
     // Get the next polydata to check for intersection
-    vtkSmartPointer<vtkPolyData> poly = const_cast<Surface *>(this->GetInput(i))->GetVtkPolyData();
+    vtkSmartPointer<vtkPolyData> poly = this->GetInput(i)->GetVtkPolyData();
     vtkSmartPointer<vtkCellArray> polygonArray = poly->GetPolys();
     polygonArray->InitTraversal();
     vtkIdType anotherInputPolygonSize(0);

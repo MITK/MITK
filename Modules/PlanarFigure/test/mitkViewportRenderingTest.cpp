@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingTestHelper.h"
 #include "mitkSurface.h"
 #include "mitkTestingMacros.h"
+#include <mitkTestNotRunException.h>
 
 // ITK
 #include <itkVectorContainer.h>
@@ -33,10 +34,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRegressionTestImage.h>
 
 // stdlib
-#include <stdlib.h>
+#include <cstdlib>
 
 int mitkViewportRenderingTest(int argc, char *argv[])
 {
+  try
+  {
+    mitk::RenderingTestHelper openGlTest(640, 480);
+  }
+  catch (const mitk::TestNotRunException &e)
+  {
+    MITK_WARN << "Test not run: " << e.GetDescription();
+    return 77;
+  }
+
   // load all arguments into a datastorage, take last argument as reference rendering
   // setup a renderwindow of fixed size X*Y
   // render the datastorage
@@ -78,7 +89,7 @@ int mitkViewportRenderingTest(int argc, char *argv[])
 
   ObjectsSet::ConstPointer figures =
     renderingHelper.GetDataStorage()->GetSubset(mitk::TNodePredicateDataType<mitk::PlanarFigure>::New());
-  for (ObjectsSet::const_iterator iterFigures = figures->begin(); iterFigures != figures->end(); ++iterFigures)
+  for (auto iterFigures = figures->begin(); iterFigures != figures->end(); ++iterFigures)
   {
     (*iterFigures)->SetProperty("planarfigure.default.line.color", mitk::ColorProperty::New(1.0, 0.0, 0.0)); // red
     (*iterFigures)->SetProperty("planarfigure.drawcontrolpoints", mitk::BoolProperty::New(false));
@@ -88,14 +99,14 @@ int mitkViewportRenderingTest(int argc, char *argv[])
 
   ObjectsSet::ConstPointer surfaces =
     renderingHelper.GetDataStorage()->GetSubset(mitk::TNodePredicateDataType<mitk::Surface>::New());
-  for (ObjectsSet::const_iterator iterSurfaces = surfaces->begin(); iterSurfaces != surfaces->end(); ++iterSurfaces)
+  for (auto iterSurfaces = surfaces->begin(); iterSurfaces != surfaces->end(); ++iterSurfaces)
   {
     (*iterSurfaces)->SetProperty("color", mitk::ColorProperty::New(0.0, 1.0, 0.0)); // green
   }
 
   ObjectsSet::ConstPointer images =
     renderingHelper.GetDataStorage()->GetSubset(mitk::TNodePredicateDataType<mitk::Image>::New());
-  for (ObjectsSet::const_iterator iterImages = images->begin(); iterImages != images->end(); ++iterImages)
+  for (auto iterImages = images->begin(); iterImages != images->end(); ++iterImages)
   {
     (*iterImages)->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(128.0, 256.0))); // green
     int imageWidth = dynamic_cast<mitk::Image *>((*iterImages)->GetData())->GetDimension(0);

@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  ToFImageCsvWriter::ToFImageCsvWriter(): ToFImageWriter(), m_DistanceOutfile(NULL),
-    m_AmplitudeOutfile(NULL), m_IntensityOutfile(NULL)
+  ToFImageCsvWriter::ToFImageCsvWriter(): ToFImageWriter(), m_DistanceOutfile(nullptr),
+    m_AmplitudeOutfile(nullptr), m_IntensityOutfile(nullptr)
   {
     this->m_Extension = std::string(".csv");
   }
@@ -67,7 +67,7 @@ namespace mitk
     }
   }
 
-  void ToFImageCsvWriter::Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData)
+  void ToFImageCsvWriter::Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char*)
   {
     if (this->m_DistanceImageSelected)
     {

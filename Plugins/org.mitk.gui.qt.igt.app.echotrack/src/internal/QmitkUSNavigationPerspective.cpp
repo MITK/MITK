@@ -22,15 +22,10 @@ QmitkUSNavigationPerspective::QmitkUSNavigationPerspective()
 void QmitkUSNavigationPerspective::CreateInitialLayout (berry::IPageLayout::Pointer layout)
 {
   // place navigation plugin on the right side (not closable)
-  layout->AddStandaloneView("org.mitk.views.usmarkerplacement", false, berry::IPageLayout::RIGHT, 0.8f, layout->GetEditorArea());
+  layout->AddStandaloneView("org.mitk.views.usmarkerplacement", false, berry::IPageLayout::RIGHT, 0.75f, layout->GetEditorArea());
 
   // place tracking toolbox and ultrasound support on the left into a folder
   // layout (closeable)
-  berry::IFolderLayout::Pointer leftFolder = layout->CreateFolder("left", berry::IPageLayout::LEFT, 0.3f, layout->GetEditorArea());
-
-  leftFolder->AddView("org.mitk.views.mitkigttrackingtoolbox");
-  leftFolder->AddView("org.mitk.views.ultrasoundsupport");
-
-  layout->GetViewLayout("org.mitk.views.mitkigttrackingtoolbox")->SetCloseable(false);
-  layout->GetViewLayout("org.mitk.views.ultrasoundsupport")->SetCloseable(false);
+  layout->AddStandaloneView("org.mitk.views.ultrasoundsupport", false, berry::IPageLayout::LEFT, 0.3f, layout->GetEditorArea());
+  layout->AddStandaloneView("org.mitk.views.mitkigttrackingtoolbox", false, berry::IPageLayout::BOTTOM, 0.9f, "org.mitk.views.ultrasoundsupport");
 }

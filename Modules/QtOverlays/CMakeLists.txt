@@ -17,5 +17,4 @@ endif()
 # end fix
 
 MITK_CREATE_MODULE(DEPENDS MitkQtWidgets
-                   WARNINGS_AS_ERRORS
 )

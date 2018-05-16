@@ -42,7 +42,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PlyFileReaderService::Read(
   reader->SetFileName(GetInputLocation().c_str());
   reader->Update();
 
-  if (reader->GetOutput() != NULL)
+  if (reader->GetOutput() != nullptr)
   {
     mitk::Surface::Pointer surface = mitk::Surface::New();
     surface->SetVtkPolyData(reader->GetOutput());

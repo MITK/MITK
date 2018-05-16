@@ -19,13 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QGridLayout>
 #include <itkDataObject.h>
 #include <mitkNavigationDataSource.h>
-#include <math.h>
+#include <cmath>
 
 
 
 
 QmitkToolDistanceWidget::QmitkToolDistanceWidget(QWidget* parent)
-: QWidget(parent), m_Controls(NULL), m_DistanceLabels(NULL)
+: QWidget(parent), m_Controls(nullptr), m_DistanceLabels(nullptr)
 {
   this->CreateQtPartControl( this );
 }
@@ -34,8 +34,8 @@ QmitkToolDistanceWidget::~QmitkToolDistanceWidget()
 {
   ClearDistanceMatrix();
   delete m_DistanceLabels;
-  m_DistanceLabels = NULL;
-  m_Controls = NULL;
+  m_DistanceLabels = nullptr;
+  m_Controls = nullptr;
 }
 
 void QmitkToolDistanceWidget::CreateQtPartControl(QWidget *parent)
@@ -66,7 +66,7 @@ void QmitkToolDistanceWidget::CreateToolDistanceMatrix(itk::ProcessObject::DataO
     mitk::NavigationData* navData;
 
 
-    if(m_DistanceLabels == NULL)
+    if(m_DistanceLabels == nullptr)
     {
       m_DistanceLabels = new DistanceLabelType;
     }
@@ -136,7 +136,7 @@ void QmitkToolDistanceWidget::CreateToolDistanceMatrix(itk::ProcessObject::DataO
         navData = dynamic_cast<mitk::NavigationData*>(outputs.at(i).GetPointer());
         nextNavData = dynamic_cast<mitk::NavigationData*>(outputs.at(j++).GetPointer());
 
-        if(navData == NULL || nextNavData == NULL)
+        if(navData == nullptr || nextNavData == nullptr)
           return;
 
         mitk::NavigationData::PositionType::RealType distance =  navData->GetPosition().EuclideanDistanceTo(nextNavData->GetPosition());
@@ -166,7 +166,7 @@ void QmitkToolDistanceWidget::CreateToolDistanceMatrix(itk::ProcessObject::DataO
       delete widget;
     }
    delete this->m_DistanceLabels;
-   this->m_DistanceLabels = NULL;
+   this->m_DistanceLabels = nullptr;
 
    this->m_Controls->m_StatusLabel->setText(QString("For distance information please set up the connection again."));
 

@@ -116,7 +116,7 @@ std::vector<mitk::DataNode *> QmitkDataStorageListModel::GetDataNodes() const
 {
   auto size = m_NodesAndObserverTags.size();
   std::vector<mitk::DataNode *> result(size);
-  for (int i = 0; i < size; ++i)
+  for (std::size_t i = 0; i < size; ++i)
   {
     result[i] = std::get<NODE>(m_NodesAndObserverTags[i]);
   }
@@ -299,12 +299,11 @@ void QmitkDataStorageListModel::OnDataModified(const itk::Object *caller, const 
   OnDataNodeModified(caller, event); // until different implementation
 }
 
-void QmitkDataStorageListModel::OnDataStorageDeleted(const itk::Object *caller, const itk::EventObject & /*event*/)
+void QmitkDataStorageListModel::OnDataStorageDeleted(const itk::Object *, const itk::EventObject &)
 {
   if (m_BlockEvents)
     return;
 
-  // set data storage to nullptr -> empty model
   this->SetDataStorage(nullptr);
 }
 

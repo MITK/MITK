@@ -45,11 +45,11 @@ namespace mitk
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
   protected:
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     VtkVolumeTimeSeriesReader();
 
-    ~VtkVolumeTimeSeriesReader();
+    ~VtkVolumeTimeSeriesReader() override;
 
     //##Description
     //## @brief Time when Header was last read

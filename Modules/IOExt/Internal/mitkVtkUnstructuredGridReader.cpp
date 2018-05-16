@@ -60,7 +60,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::VtkUnstructuredGridReader::
       reader->SetFileName(GetLocalFileName().c_str());
       reader->Update();
 
-      if (reader->GetOutput() != NULL)
+      if (reader->GetOutput() != nullptr)
       {
         mitk::UnstructuredGrid::Pointer grid = mitk::UnstructuredGrid::New();
         grid->SetVtkUnstructuredGrid(reader->GetOutput());
@@ -75,7 +75,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::VtkUnstructuredGridReader::
     reader->SetFileName(GetLocalFileName().c_str());
     reader->Update();
 
-    if (reader->GetOutput() != NULL)
+    if (reader->GetOutput() != nullptr)
     {
       mitk::UnstructuredGrid::Pointer grid = mitk::UnstructuredGrid::New();
       grid->SetVtkUnstructuredGrid(reader->GetOutput());

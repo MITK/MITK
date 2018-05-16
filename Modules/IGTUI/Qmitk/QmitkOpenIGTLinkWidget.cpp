@@ -47,7 +47,7 @@ void QmitkOpenIGTLinkWidget::CreateQtPartControl(QWidget *parent)
   }
 }
 
-mitk::TrackingDevice::Pointer QmitkOpenIGTLinkWidget::ConstructTrackingDevice()
+mitk::TrackingDevice::Pointer QmitkOpenIGTLinkWidget::GetTrackingDevice()
 {
   // Create the Virtual Tracking Device
   mitk::OpenIGTLinkTrackingDevice::Pointer OIGTLDevice = mitk::OpenIGTLinkTrackingDevice::New();

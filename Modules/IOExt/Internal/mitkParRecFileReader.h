@@ -45,13 +45,13 @@ namespace mitk
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
   protected:
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
     ParRecFileReader();
 
-    ~ParRecFileReader();
+    ~ParRecFileReader() override;
 
     //##Description
     //## @brief Time when Header was last read

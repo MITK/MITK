@@ -111,7 +111,7 @@ namespace mitk
     }
     algo->Update();
 
-    if (algo->GetOutput() != NULL)
+    if (algo->GetOutput() != nullptr)
     {
       vtkSmartPointer<vtkPolyData> surfaceWithNormals = algo->GetOutput();
       output->SetVtkPolyData(surfaceWithNormals);
@@ -127,7 +127,7 @@ namespace mitk
     LocaleSwitch localeSwitch("C");
 
     ValidateOutputLocation();
-    const Surface *input = dynamic_cast<const Surface *>(this->GetInput());
+    const auto *input = dynamic_cast<const Surface *>(this->GetInput());
 
     const unsigned int timesteps = input->GetTimeGeometry()->CountTimeSteps();
     for (unsigned int t = 0; t < timesteps; ++t)

@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_gui_qt_diffusionimaging_tbss org.mitk.gui.qt.diffusionimaging.tbss
+  \ingroup MITKPlugins
+
+  \brief This is the diffusionimaging.tbss plugin. 
+  
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_diffusionimaging_tbss_internal Internal
+  \ingroup org_mitk_gui_qt_diffusionimaging_tbss
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.diffusionimaging.tbss plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

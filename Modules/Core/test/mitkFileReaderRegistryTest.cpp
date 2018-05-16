@@ -38,7 +38,7 @@ public:
     m_ServiceReg = this->RegisterService();
   }
 
-  ~DummyReader()
+  ~DummyReader() override
   {
     if (m_ServiceReg)
       m_ServiceReg.Unregister();
@@ -46,7 +46,7 @@ public:
 
   using mitk::AbstractFileReader::Read;
 
-  virtual std::vector<itk::SmartPointer<mitk::BaseData>> Read() override
+  std::vector<itk::SmartPointer<mitk::BaseData>> Read() override
   {
     std::vector<mitk::BaseData::Pointer> result;
     return result;
@@ -72,7 +72,7 @@ public:
     m_ServiceReg = this->RegisterService();
   }
 
-  ~DummyReader2()
+  ~DummyReader2() override
   {
     if (m_ServiceReg)
       m_ServiceReg.Unregister();
@@ -80,7 +80,7 @@ public:
 
   using mitk::AbstractFileReader::Read;
 
-  virtual std::vector<itk::SmartPointer<mitk::BaseData>> Read() override
+  std::vector<itk::SmartPointer<mitk::BaseData>> Read() override
   {
     std::vector<mitk::BaseData::Pointer> result;
     return result;
@@ -158,7 +158,7 @@ int mitkFileReaderRegistryTest(int /*argc*/, char * /*argv*/ [])
 
   //  optionsFilter.push_back("canFly");
   //  returned = readerRegistry->GetReader("test", optionsFilter);
-  //  MITK_TEST_CONDITION_REQUIRED(returned == NULL, "Testing correct return of 0 value when no matching reader was
+  //  MITK_TEST_CONDITION_REQUIRED(returned == nullptr, "Testing correct return of 0 value when no matching reader was
   //  found");
 
   //  // Onward to test the retrieval of multiple readers

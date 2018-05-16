@@ -234,13 +234,13 @@ namespace mitk
     //## transformation consists of first applying self to the source,
     //## followed by other.
     //## This method also changes m_spacing.
-    void Compose(const TransformType *other, bool pre = 0);
+    void Compose(const TransformType *other, bool pre = false);
 
     //##Documentation
     //## @brief Compose new IndexToWorldTransform with a given vtkMatrix4x4.
     //##
     //## Converts the vtkMatrix4x4 into a itk-transform and calls the previous method.
-    void Compose(const vtkMatrix4x4 *vtkmatrix, bool pre = 0);
+    void Compose(const vtkMatrix4x4 *vtkmatrix, bool pre = false);
 
     //##Documentation
     //## @brief Translate the origin by a vector
@@ -249,7 +249,7 @@ namespace mitk
 
     //##Documentation
     //##@brief executes affine operations (translate, rotate, scale)
-    virtual void ExecuteOperation(Operation *operation) override;
+    void ExecuteOperation(Operation *operation) override;
 
     //##Documentation
     //## @brief Convert world coordinates (in mm) of a \em point to (continuous!) index coordinates
@@ -541,7 +541,7 @@ namespace mitk
     // ********************************** Constructor **********************************
     BaseGeometry();
     BaseGeometry(const BaseGeometry &other);
-    virtual ~BaseGeometry();
+    ~BaseGeometry() override;
 
     //##Documentation
     //## @brief clones the geometry
@@ -553,9 +553,9 @@ namespace mitk
     //##  newGeometry->UnRegister();
     //##  return newGeometry.GetPointer();
     //## \endcode
-    virtual itk::LightObject::Pointer InternalClone() const override = 0;
+    itk::LightObject::Pointer InternalClone() const override = 0;
 
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     static const std::string GetTransformAsString(TransformType *transformType);
 

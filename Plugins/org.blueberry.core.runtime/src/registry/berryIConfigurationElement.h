@@ -66,7 +66,7 @@ struct org_blueberry_core_runtime_EXPORT IConfigurationElement : public virtual 
 
   berryObjectMacro(berry::IConfigurationElement)
 
-  virtual ~IConfigurationElement();
+  ~IConfigurationElement() override;
 
   /**
    * Creates and returns a new instance of the executable extension

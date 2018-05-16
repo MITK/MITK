@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOclUtils.h"
 #include "mitkOpenCLActivator.h"
 
+
 //Mitk
 #include <mitkLogMacros.h>
 #include <mitkConfig.h>
@@ -32,10 +33,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
 
+//standard library
+#include <thread>
+
 mitk::OclFilter::OclFilter()
   : m_ClCompilerFlags(""),
-    m_ClProgram(NULL),
-    m_CommandQue(NULL),
+    m_ClProgram(nullptr),
+    m_CommandQue(nullptr),
     m_FilterID("mitkOclFilter"),
     m_Preambel(" "),
     m_Initialized(false)
@@ -44,8 +48,8 @@ mitk::OclFilter::OclFilter()
 
 mitk::OclFilter::OclFilter(const char* filename)
   : m_ClCompilerFlags(""),
-    m_ClProgram(NULL),
-    m_CommandQue(NULL),
+    m_ClProgram(nullptr),
+    m_CommandQue(nullptr),
     m_FilterID(filename),
     m_Preambel(" "),
     m_Initialized(false)
@@ -73,11 +77,107 @@ bool mitk::OclFilter::ExecuteKernel( cl_kernel kernel, unsigned int workSizeDim 
   cl_int clErr = 0;
 
   clErr = clEnqueueNDRangeKernel( this->m_CommandQue, kernel, workSizeDim,
-                                  NULL, this->m_GlobalWorkSize, m_LocalWorkSize, 0, NULL, NULL);
+                                  nullptr, this->m_GlobalWorkSize, m_LocalWorkSize, 0, nullptr, nullptr);
 
   CHECK_OCL_ERR( clErr );
 
   return ( clErr == CL_SUCCESS );
+}
+
+bool mitk::OclFilter::ExecuteKernelChunks( cl_kernel kernel, unsigned int workSizeDim, size_t* chunksDim )
+{
+  size_t offset[3] ={0, 0, 0};
+  cl_int clErr = 0;
+
+  if(workSizeDim == 2)
+  {
+    for(offset[0] = 0; offset[0] < m_GlobalWorkSize[0]; offset[0] += chunksDim[0])
+    {
+      for(offset[1] = 0; offset[1] < m_GlobalWorkSize[1]; offset[1] += chunksDim[1])
+      {
+        clErr |= clEnqueueNDRangeKernel(this->m_CommandQue, kernel, workSizeDim,
+          offset, chunksDim, m_LocalWorkSize, 0, nullptr, nullptr);
+      }
+    }
+  }
+  else if(workSizeDim == 3)
+  {
+    for(offset[0] = 0; offset[0] < m_GlobalWorkSize[0]; offset[0] += chunksDim[0])
+    {
+      for(offset[1] = 0; offset[1] < m_GlobalWorkSize[1]; offset[1] += chunksDim[1])
+      {
+        for(offset[2] = 0; offset[2] < m_GlobalWorkSize[2]; offset[2] += chunksDim[2])
+        {
+          clErr |= clEnqueueNDRangeKernel( this->m_CommandQue, kernel, workSizeDim,
+                                          offset, chunksDim, m_LocalWorkSize, 0, nullptr, nullptr);
+        }
+      }
+    }
+  }
+
+  CHECK_OCL_ERR(clErr);
+
+  return ( clErr == CL_SUCCESS );
+}
+
+bool mitk::OclFilter::ExecuteKernelChunksInBatches(cl_kernel kernel, unsigned int workSizeDim, size_t* chunksDim, size_t batchSize, int waitTimems)
+{
+  size_t offset[3] = { 0, 0, 0 };
+  cl_int clErr = 0;
+
+  unsigned int currentChunk = 0;
+  cl_event* waitFor = new cl_event[batchSize];
+
+  if (workSizeDim == 2)
+  {
+    for (offset[0] = 0; offset[0] < m_GlobalWorkSize[0]; offset[0] += chunksDim[0])
+    {
+      for (offset[1] = 0; offset[1] < m_GlobalWorkSize[1]; offset[1] += chunksDim[1])
+      {
+        if (currentChunk % batchSize == 0 && currentChunk != 0)
+        {
+          clWaitForEvents(batchSize, &waitFor[0]);
+          std::this_thread::sleep_for(std::chrono::milliseconds(waitTimems));
+          clErr |= clEnqueueNDRangeKernel(this->m_CommandQue, kernel, workSizeDim,
+            offset, chunksDim, m_LocalWorkSize, 0, nullptr, &waitFor[0]);
+        }
+        else
+        {
+          clErr |= clEnqueueNDRangeKernel(this->m_CommandQue, kernel, workSizeDim,
+            offset, chunksDim, m_LocalWorkSize, 0, nullptr, &waitFor[currentChunk % batchSize]);
+        }
+        currentChunk++;
+      }
+    }
+  }
+  else if (workSizeDim == 3)
+  {
+    for (offset[0] = 0; offset[0] < m_GlobalWorkSize[0]; offset[0] += chunksDim[0])
+    {
+      for (offset[1] = 0; offset[1] < m_GlobalWorkSize[1]; offset[1] += chunksDim[1])
+      {
+        for (offset[2] = 0; offset[2] < m_GlobalWorkSize[2]; offset[2] += chunksDim[2])
+        {
+          if (currentChunk % batchSize == 0 && currentChunk != 0)
+          {
+            clWaitForEvents(batchSize, &waitFor[0]);
+            std::this_thread::sleep_for(std::chrono::milliseconds(waitTimems));
+            clErr |= clEnqueueNDRangeKernel(this->m_CommandQue, kernel, workSizeDim,
+              offset, chunksDim, m_LocalWorkSize, 0, nullptr, &waitFor[0]);
+          }
+          else
+          {
+            clErr |= clEnqueueNDRangeKernel(this->m_CommandQue, kernel, workSizeDim,
+              offset, chunksDim, m_LocalWorkSize, 0, nullptr, &waitFor[currentChunk % batchSize]);
+          }
+          currentChunk++;
+        }
+      }
+    }
+  }
+  CHECK_OCL_ERR(clErr);
+
+  return (clErr == CL_SUCCESS);
 }
 
 
@@ -97,7 +197,7 @@ bool mitk::OclFilter::Initialize()
     return false;
   }
 
-  if (m_ClProgram == NULL)
+  if (m_ClProgram == nullptr)
   {
     try
     {
@@ -105,7 +205,7 @@ bool mitk::OclFilter::Initialize()
     }
     catch(const mitk::Exception& e)
     {
-      MITK_INFO << "Program not stored in resource manager, compiling.";
+      MITK_INFO << "Program not stored in resource manager, compiling. " << e;
       this->CompileSource();
     }
   }
@@ -123,7 +223,7 @@ void mitk::OclFilter::LoadSourceFiles(CStringList &sourceCode, ClSizeList &sourc
     if( !mdr.IsValid() )
       MITK_WARN << "Could not load resource: " << mdr.GetName() << " is invalid!";
 
-    us:ModuleResourceStream rss(mdr);
+    us::ModuleResourceStream rss(mdr);
 
     // read resource file to a string
     std::istreambuf_iterator<char> eos;
@@ -178,7 +278,7 @@ void mitk::OclFilter::CompileSource()
 
     MITK_DEBUG("ocl.filter") << "cl compiler flags: " << compilerOptions.c_str();
 
-    clErr = clBuildProgram(m_ClProgram, 0, NULL, compilerOptions.c_str(), NULL, NULL);
+    clErr = clBuildProgram(m_ClProgram, 0, nullptr, compilerOptions.c_str(), nullptr, nullptr);
     CHECK_OCL_ERR(clErr);
 
     // if OpenCL Source build failed
@@ -245,4 +345,11 @@ void mitk::OclFilter::SetCompilerFlags(const char* flags)
 bool mitk::OclFilter::IsInitialized()
 {
   return m_Initialized;
+}
+
+unsigned long mitk::OclFilter::GetDeviceMemory()
+{
+  OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(GetModuleContext()->GetServiceReference<OclResourceService>());
+  auto device = resources->GetCurrentDevice();
+  return oclGetGlobalMemSize(device);
 }

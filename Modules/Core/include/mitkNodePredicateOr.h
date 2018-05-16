@@ -37,11 +37,11 @@ namespace mitk
 
     //##Documentation
     //## @brief Standard Destructor
-    virtual ~NodePredicateOr();
+    ~NodePredicateOr() override;
 
     //##Documentation
     //## @brief Checks, if the node fulfills any of the subpredicates conditions
-    virtual bool CheckNode(const DataNode *node) const override;
+    bool CheckNode(const DataNode *node) const override;
 
   protected:
     //##Documentation

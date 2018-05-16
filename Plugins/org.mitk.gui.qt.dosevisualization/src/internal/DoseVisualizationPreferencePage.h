@@ -99,7 +99,7 @@ protected:
   /** Method actualizes the level set model and edit buttons according to the currently selected item in the presets list view*/
   void UpdateLevelSetWidgets();
 
-  /** Method returns the iso dose level set selected in the preset lists. May return NULL if no preset is selected.*/
+  /** Method returns the iso dose level set selected in the preset lists. May return nullptr if no preset is selected.*/
   mitk::IsoDoseLevelSet* GetSelectedIsoLevelSet();
 
   QWidget                 *m_MainControl;

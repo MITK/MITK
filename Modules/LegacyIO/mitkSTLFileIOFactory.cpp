@@ -27,7 +27,7 @@ namespace mitk
     this->RegisterOverride("mitkIOAdapter",
                            "mitkSTLFileReader",
                            "mitk STL Surface IO",
-                           1,
+                           true,
                            itk::CreateObjectFunction<IOAdapter<STLFileReader>>::New());
   }
 

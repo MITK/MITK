@@ -204,7 +204,7 @@ void testSpecialCharacters(Module* module)
 void testBinaryResource(Module* module)
 {
   ModuleResource res = module->GetResource("/icons/cppmicroservices.png");
-  checkResourceInfo(res, "/icons/", "cppmicroservices", "cppmicroservices", "png", "png", 2424, false);
+  checkResourceInfo(res, "/icons/", "cppmicroservices", "cppmicroservices", "png", "png", 2598, false);
 
   ModuleResourceStream rs(res, std::ios_base::binary);
   rs.seekg(0, std::ios_base::end);
@@ -415,7 +415,7 @@ void testResourcesFrom(const std::string& moduleName)
 #endif
 
   Module* moduleR = ModuleRegistry::GetModule(moduleName);
-  US_TEST_CONDITION_REQUIRED(moduleR != NULL, "Test for existing module")
+  US_TEST_CONDITION_REQUIRED(moduleR != nullptr, "Test for existing module")
 
   US_TEST_CONDITION(moduleR->GetName() == moduleName, "Test module name")
 
@@ -449,7 +449,7 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
 #endif
 
   Module* moduleR = ModuleRegistry::GetModule("TestModuleR");
-  US_TEST_CONDITION_REQUIRED(moduleR != NULL, "Test for existing module TestModuleR")
+  US_TEST_CONDITION_REQUIRED(moduleR != nullptr, "Test for existing module TestModuleR")
 
   US_TEST_CONDITION(moduleR->GetName() == "TestModuleR", "Test module name")
 

@@ -197,7 +197,7 @@ mitk::ContourElement::VertexType *mitk::ContourElement::BruteForceGetVertexAt(co
       //k nearest neighbour search
       kdTree->annkSearch(queryPoint, k, indexArray, distanceArray, eps);
 
-      VertexType* ret = NULL;
+      VertexType* ret = nullptr;
 
       try
       {
@@ -205,7 +205,7 @@ mitk::ContourElement::VertexType *mitk::ContourElement::BruteForceGetVertexAt(co
       }
       catch(std::out_of_range ex)
       {
-        //ret stays NULL
+        //ret stays nullptr
         return ret;
       }
 
@@ -217,7 +217,7 @@ mitk::ContourElement::VertexType *mitk::ContourElement::BruteForceGetVertexAt(co
 
       return ret;
   }
-  return NULL;
+  return nullptr;
 }
 */
 

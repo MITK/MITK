@@ -446,7 +446,7 @@ class mitkNavigationDataPlayerTestClass
 
     try
     {
-      std::istream* stream = NULL;
+      std::istream* stream = nullptr;
       mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
       reader->Read( stream );
     }
@@ -465,7 +465,7 @@ class mitkNavigationDataPlayerTestClass
       MITK_INFO <<"In the following, exceptions are tested. Errors will occur and are expected.";
 
 
-      //Case1 Testing if stream=NULL
+      //Case1 Testing if stream=nullptr
       mitk::NavigationDataPlayer::Pointer myTestPlayer1 = mitk::NavigationDataPlayer::New();
       bool exceptionThrown1 = false;
       try
@@ -477,10 +477,10 @@ class mitkNavigationDataPlayerTestClass
        {
        exceptionThrown1 = true;
        myTestPlayer1->StopPlaying();
-       MITK_TEST_OUTPUT(<<"#10: Tested exception for the case when stream=NULL in StartPlaying. Application should not crash.");
+       MITK_TEST_OUTPUT(<<"#10: Tested exception for the case when stream=nullptr in StartPlaying. Application should not crash.");
        }
 
-      MITK_TEST_CONDITION_REQUIRED(exceptionThrown1, "Testing StartPlaying method if exception (stream=NULL) was thrown.");
+      MITK_TEST_CONDITION_REQUIRED(exceptionThrown1, "Testing StartPlaying method if exception (stream=nullptr) was thrown.");
 
       //Case2 Testing if file does not exist
       mitk::NavigationDataPlayer::Pointer myTestPlayer2 = mitk::NavigationDataPlayer::New();

@@ -4,7 +4,7 @@
 namespace mitk {
 
 HistogramStatisticsCalculator::HistogramStatisticsCalculator():
-    m_StatisticsCalculated(false)
+    m_Uniformity(0), m_UPP(0), m_Entropy(0), m_Median(0), m_StatisticsCalculated(false)
 {
 
 }
@@ -72,12 +72,11 @@ void HistogramStatisticsCalculator::CalculateStatistics()
     m_Median = 0;
 
     MeasurementType cumulativeProbability = 0.0;
-    MeasurementType partialProbability;
     bool medianFound(false);
 
     for (unsigned int i = 0; i < nBins; i++)
     {
-        partialProbability = m_Histogram->GetFrequency(i, 0) / double( m_Histogram->GetTotalFrequency() );
+      MeasurementType partialProbability = m_Histogram->GetFrequency(i, 0) / double( m_Histogram->GetTotalFrequency() );
         cumulativeProbability += partialProbability;
 
         if (partialProbability != 0)

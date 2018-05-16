@@ -46,7 +46,7 @@ void QmitkLoadMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer> 
     std::string sName = referenceNode->GetName();
     QString qName;
     qName.sprintf("%s.lsetp",sName.c_str());
-    QString filename = QFileDialog::getOpenFileName(NULL,"Load file",QString(),"LabelSet Preset(*.lsetp)");
+    QString filename = QFileDialog::getOpenFileName(nullptr,"Load file",QString(),"LabelSet Preset(*.lsetp)");
     if ( filename.isEmpty() )
       return;
 
@@ -65,12 +65,12 @@ void QmitkLoadMultiLabelPresetAction::SetFunctionality(berry::QtViewPart* /*func
   //not needed
 }
 
-void QmitkLoadMultiLabelPresetAction::SetSmoothed(bool smoothed)
+void QmitkLoadMultiLabelPresetAction::SetSmoothed(bool)
 {
   //not needed
 }
 
-void QmitkLoadMultiLabelPresetAction::SetDecimated(bool decimated)
+void QmitkLoadMultiLabelPresetAction::SetDecimated(bool)
 {
   //not needed
 }

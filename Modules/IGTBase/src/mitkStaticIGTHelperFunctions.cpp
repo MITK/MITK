@@ -21,7 +21,7 @@ double mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(mitk::Quater
   {
   double returnValue;
 
-  itk::Vector<double,3> point; //caution 5D-Tools: correct verctor along the tool axis is needed
+  itk::Vector<double,3> point; //caution 5D-Tools: correct vector along the tool axis is needed
   point[0] = rotationVector[0];
   point[1] = rotationVector[1];
   point[2] = rotationVector[2];
@@ -47,11 +47,12 @@ double mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(mitk::Quater
 
 double mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(mitk::Quaternion a, mitk::Quaternion b)
 {
-  itk::Vector<double,3> rotationVector = itk::Vector<double,3>();
-  rotationVector[0] = 0;
-  rotationVector[1] = 0;
-  rotationVector[2] = 1000;
-  return GetAngleBetweenTwoQuaterions(a,b,rotationVector);
+  //formula returnValue = 2 * acos ( a <dotproduct> b )
+  //(+ normalization because we need unit quaternions)
+  //derivation from here: https://fgiesen.wordpress.com/2013/01/07/small-note-on-quaternion-distance-metrics/
+  double returnValue = ((a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]) / (sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3])*sqrt(b[0] * b[0] + b[1] * b[1] + b[2] * b[2] + b[3] * b[3])));
+  returnValue = 2 * acos(returnValue);
+  return returnValue;
 }
 
 itk::Matrix<double,3,3> mitk::StaticIGTHelperFunctions::ConvertEulerAnglesToRotationMatrix(double alpha, double beta, double gamma)
@@ -96,12 +97,16 @@ itk::Matrix<double,3,3> mitk::StaticIGTHelperFunctions::ConvertEulerAnglesToRota
 
 double mitk::StaticIGTHelperFunctions::ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform)
 {
-  if (imageFiducials->GetSize() != realWorldFiducials->GetSize()) return -1;
+  if (imageFiducials->GetSize() != realWorldFiducials->GetSize())
+  {
+    MITK_WARN << "Cannot compute FRE, got different numbers of points (1: " << imageFiducials->GetSize() << " /2: " << realWorldFiducials->GetSize() << ")";
+    return -1;
+  }
   double FRE = 0;
   for (int i = 0; i < imageFiducials->GetSize(); i++)
   {
     itk::Point<double> current_image_fiducial_point = imageFiducials->GetPoint(i);
-    if (transform != NULL)
+    if (transform != nullptr)
     {
       current_image_fiducial_point = transform->TransformPoint(imageFiducials->GetPoint(i)[0], imageFiducials->GetPoint(i)[1], imageFiducials->GetPoint(i)[2]);
     }

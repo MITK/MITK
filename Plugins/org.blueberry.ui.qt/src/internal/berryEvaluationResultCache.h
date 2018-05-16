@@ -68,7 +68,7 @@ protected:
 
 public:
 
-  ~EvaluationResultCache();
+  ~EvaluationResultCache() override;
 
   void ClearResult() override;
 

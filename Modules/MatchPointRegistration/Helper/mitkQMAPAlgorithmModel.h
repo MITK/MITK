@@ -44,7 +44,7 @@ class MITKMATCHPOINTREGISTRATION_EXPORT QMAPAlgorithmModel : public QAbstractTab
     Q_OBJECT
 
   public:
-    QMAPAlgorithmModel(QObject *parent = NULL);
+    QMAPAlgorithmModel(QObject *parent = nullptr);
     virtual ~QMAPAlgorithmModel() {};
 
     void SetAlgorithm(map::algorithm::RegistrationAlgorithmBase *pAlgorithm);

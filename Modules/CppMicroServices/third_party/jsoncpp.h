@@ -1202,7 +1202,7 @@ public: // overridden from ValueArrayAllocator
       virtual void destructArray( ValueInternalArray *array ) = 0;
       /** \brief Reallocate array page index.
        * Reallocates an array of pointer on each page.
-       * \param indexes [input] pointer on the current index. May be \c NULL.
+       * \param indexes [input] pointer on the current index. May be \c nullptr.
        *                [output] pointer on the new index of at least
        *                         \a minNewIndexCount pages.
        * \param indexCount [input] current number of pages in the index.
@@ -1697,12 +1697,12 @@ namespace Json {
    {
    public:
       FastWriter();
-      virtual ~FastWriter(){}
+      ~FastWriter() override{}
 
       void enableYAMLCompatibility();
 
    public: // overridden from Writer
-      virtual std::string write( const Value &root ) override;
+      std::string write( const Value &root ) override;
 
    private:
       void writeValue( const Value &value );
@@ -1733,14 +1733,14 @@ namespace Json {
    {
    public:
       StyledWriter();
-      virtual ~StyledWriter(){}
+      ~StyledWriter() override{}
 
    public: // overridden from Writer
       /** \brief Serialize a Value in <a HREF="http://www.json.org">JSON</a> format.
        * \param root Value to serialize.
        * \return String containing the JSON document that represents the root value.
        */
-      virtual std::string write( const Value &root ) override;
+      std::string write( const Value &root ) override;
 
    private:
       void writeValue( const Value &value );

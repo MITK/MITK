@@ -24,9 +24,9 @@ public:
     /** Runtime information support. */
     itkTypeMacro(BinaryImageMaskGenerator, MaskGenerator)
 
-    mitk::Image::Pointer GetMask();
+    mitk::Image::Pointer GetMask() override;
 
-    void SetTimeStep(unsigned int timeStep);
+    void SetTimeStep(unsigned int timeStep) override;
 
     void SetImageMask(mitk::Image::Pointer maskImage);
 

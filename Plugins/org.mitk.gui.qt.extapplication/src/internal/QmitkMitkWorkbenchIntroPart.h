@@ -59,10 +59,10 @@ class QmitkMitkWorkbenchIntroPart : public berry::QtIntroPart
 public:
 
   QmitkMitkWorkbenchIntroPart();
- ~QmitkMitkWorkbenchIntroPart();
+ ~QmitkMitkWorkbenchIntroPart() override;
 
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
   void StandbyStateChanged(bool) override;
 

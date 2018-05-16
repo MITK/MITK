@@ -90,7 +90,7 @@ namespace mitk
 
   protected:
     LandmarkProjector();
-    virtual ~LandmarkProjector();
+    ~LandmarkProjector() override;
 
     //##Documentation
     //## @brief Compute the transform from parameter space to world space incorporating

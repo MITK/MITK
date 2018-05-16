@@ -39,17 +39,17 @@ namespace mitk
   public:
     ColorSequenceCycleH();
 
-    virtual ~ColorSequenceCycleH();
+    ~ColorSequenceCycleH() override;
 
     /*!
     \brief Return another color
     */
-    virtual Color GetNextColor() override;
+    Color GetNextColor() override;
 
     /*!
     \brief Rewind to first color
     */
-    virtual void GoToBegin() override;
+    void GoToBegin() override;
 
     /*!
     \brief Increase the used Hue value.

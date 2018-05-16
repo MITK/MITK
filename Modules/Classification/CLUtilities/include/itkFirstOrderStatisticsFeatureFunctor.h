@@ -35,7 +35,7 @@ struct NeighborhoodFirstOrderStatistics
     double min = 10000000;
     double max = -10000000;
 
-    for (int i = 0; i < it.Size(); ++i)
+    for (unsigned int i = 0; i < it.Size(); ++i)
     {
       double value = it.GetPixel(i);
       mean += value;
@@ -52,7 +52,7 @@ struct NeighborhoodFirstOrderStatistics
     double skewness = 0;
     double kurtosis = 0;
 
-    for (int i = 0; i < it.Size(); ++i)
+    for (unsigned int i = 0; i < it.Size(); ++i)
     {
       double value = it.GetPixel(i);
       double tmpskewness = (value - mean) / stdderivation;

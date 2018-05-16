@@ -41,7 +41,7 @@ public:
   MaskInput2()
   {
     m_MaskingValue = NumericTraits< TMask >::ZeroValue();
-    InitializeOutsideValue( static_cast<TOutput*>( ITK_NULLPTR ) );
+    InitializeOutsideValue( static_cast<TOutput*>( nullptr ) );
   }
   ~MaskInput2() {}
   bool operator!=(const MaskInput2 &) const
@@ -218,10 +218,10 @@ public:
     return this->GetFunctor().GetMaskingValue();
   }
 
-  void BeforeThreadedGenerateData()
+  void BeforeThreadedGenerateData() override
   {
     typedef typename TOutputImage::PixelType PixelType;
-    this->CheckOutsideValue( static_cast<PixelType*>(ITK_NULLPTR) );
+    this->CheckOutsideValue( static_cast<PixelType*>(nullptr) );
   }
 
 #ifdef ITK_USE_CONCEPT_CHECKING
@@ -236,9 +236,9 @@ public:
 
 protected:
   MaskImageFilter2() {}
-  virtual ~MaskImageFilter2() {}
+  ~MaskImageFilter2() override {}
 
-  void PrintSelf(std::ostream & os, Indent indent) const
+  void PrintSelf(std::ostream & os, Indent indent) const override
   {
     Superclass::PrintSelf(os, indent);
     os << indent << "OutsideValue: "  << this->GetOutsideValue() << std::endl;

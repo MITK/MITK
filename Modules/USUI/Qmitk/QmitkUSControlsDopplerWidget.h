@@ -47,7 +47,7 @@ public:
     * will be disabled.
     */
   explicit QmitkUSControlsDopplerWidget(mitk::USControlInterfaceDoppler::Pointer controlInterface, QWidget *parent = nullptr);
-  ~QmitkUSControlsDopplerWidget();
+  ~QmitkUSControlsDopplerWidget() override;
 
 private:
   Ui::QmitkUSControlsDopplerWidget*         ui;

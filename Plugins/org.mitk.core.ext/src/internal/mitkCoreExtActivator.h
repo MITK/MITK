@@ -41,7 +41,7 @@ namespace mitk
 
   public:
 
-    ~CoreExtActivator();
+    ~CoreExtActivator() override;
 
     /**
     * Starts this plug-in and registers object factories.

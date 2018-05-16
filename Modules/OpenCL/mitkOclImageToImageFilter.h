@@ -68,6 +68,7 @@ protected:
    * @return True for success.
    */
   bool InitExec(cl_kernel ckKernel);
+  bool InitExec(cl_kernel ckKernel, unsigned int* dimensions);
 
   /** @brief Get the memory size needed for each element */
   virtual int GetBytesPerElem();

@@ -118,7 +118,7 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbenchPart#dispose()
    */
-  ~EditorIntroAdapterPart();
+  ~EditorIntroAdapterPart() override;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbenchPart#getTitleImage()

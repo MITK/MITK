@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseApplication.h"
 #include "mitkLogMacros.h"
+#include "mitkExceptionMacro.h"
 
 #include "QmitkSafeApplication.h"
 #include "QmitkSingleApplication.h"
@@ -41,6 +42,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTime>
 
 #include <iostream>
+#include <string>
+
+#include <QVTKOpenGLWidget.h>
+#include <vtkGenericOpenGLRenderWindow.h>
 
 namespace mitk
 {
@@ -79,6 +84,38 @@ namespace mitk
   QString BaseApplication::PROP_TESTPLUGIN = "BlueBerry.testplugin";
   QString BaseApplication::PROP_TESTAPPLICATION = "BlueBerry.testapplication";
 
+  static void outputQtMessage(QtMsgType type, const QMessageLogContext &, const QString &msg)
+  {
+    auto message = msg.toStdString();
+
+    switch (type)
+    {
+      case QtDebugMsg:
+        MITK_DEBUG << message;
+        break;
+
+      case QtInfoMsg:
+        MITK_INFO << message;
+        break;
+
+      case QtWarningMsg:
+        MITK_WARN << message;
+        break;
+
+      case QtCriticalMsg:
+        MITK_ERROR << message;
+        break;
+
+      case QtFatalMsg:
+        MITK_ERROR << message;
+        abort();
+
+      default:
+        MITK_INFO << message;
+        break;
+    }
+  }
+
   class SplashCloserCallback : public QRunnable
   {
   public:
@@ -87,7 +124,7 @@ namespace mitk
       this->m_Splashscreen = splashscreen;
     }
 
-    void run()
+    void run() override
     {
       this->m_Splashscreen->close();
     }
@@ -120,7 +157,7 @@ namespace mitk
 
     Impl(int argc, char **argv)
       : m_Argc(argc), m_Argv(argv), m_SingleMode(false), m_SafeMode(true),
-        m_Splashscreen(0), m_SplashscreenClosingCallback(nullptr)
+        m_Splashscreen(nullptr), m_SplashscreenClosingCallback(nullptr)
     {
 #ifdef Q_OS_MAC
       /*
@@ -329,11 +366,11 @@ namespace mitk
 
   BaseApplication::~BaseApplication()
   {
-    if (d->m_Splashscreen != 0)
+    if (d->m_Splashscreen != nullptr)
     {
       delete(d->m_Splashscreen);
     }
-    if (d->m_SplashscreenClosingCallback != 0)
+    if (d->m_SplashscreenClosingCallback != nullptr)
     {
       delete(d->m_SplashscreenClosingCallback);
     }
@@ -505,6 +542,8 @@ namespace mitk
     this->setApplicationName(appName);
     this->setOrganizationName(orgName);
     this->setOrganizationDomain(orgDomain);
+
+    qInstallMessageHandler(outputQtMessage);
   }
 
   void BaseApplication::initialize(Poco::Util::Application &self)
@@ -623,16 +662,21 @@ namespace mitk
   {
     QCoreApplication *qCoreApp = qApp;
 
-// Needed to fix bug #18521, i.e. not responding GUI on Mac OS X with Qt5
+    if (nullptr == qCoreApp)
+    {
+      vtkOpenGLRenderWindow::SetGlobalMaximumNumberOfMultiSamples(0);
+
+      auto defaultFormat = QVTKOpenGLWidget::defaultFormat();
+      defaultFormat.setSamples(0);
+      QSurfaceFormat::setDefaultFormat(defaultFormat);
+
 #ifdef Q_OS_OSX
-    qCoreApp->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+      QCoreApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 
-    qCoreApp->setAttribute(Qt::AA_ShareOpenGLContexts);
+      QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
-    if (!qCoreApp)
-    {
-      if (getSingleMode())
+      if (this->getSingleMode())
       {
         qCoreApp = new QmitkSingleApplication(d->m_Argc, d->m_Argv, getSafeMode());
       }
@@ -644,6 +688,7 @@ namespace mitk
       }
       d->m_QApp.reset(qCoreApp);
     }
+
     return qCoreApp;
   }
 
@@ -691,7 +736,7 @@ namespace mitk
       arguments.push_back(QString::fromStdString(arg));
     }
 
-    if (d->m_Splashscreen != 0)
+    if (d->m_Splashscreen != nullptr)
     {
       // a splash screen is displayed,
       // creating the closing callback
@@ -825,4 +870,30 @@ namespace mitk
 
   void BaseApplication::setProperty(const QString &property, const QVariant &value) { d->m_FWProps[property] = value; }
   QVariant BaseApplication::getProperty(const QString &property) const { return d->getProperty(property); }
+
+  void BaseApplication::installTranslator(QTranslator* translator)
+  {
+    this->getQApplication()->installTranslator(translator);
+  }
+
+  bool BaseApplication::isRunning()
+  {
+    auto app = dynamic_cast<QtSingleApplication*>(this->getQApplication());
+
+    if (nullptr != app)
+      app->isRunning();
+
+    mitkThrow() << "Method not implemented.";
+  }
+
+  void BaseApplication::sendMessage(const QByteArray msg)
+  {
+    auto app = dynamic_cast<QtSingleApplication*>(this->getQApplication());
+
+    if (nullptr != app)
+      app->sendMessage(msg);
+
+    mitkThrow() << "Method not implemented.";
+  }
+
 }

@@ -18,7 +18,6 @@ set(MODULE_TESTS
    mitkClaronInterfaceTest.cpp
    mitkClaronToolTest.cpp
    mitkClaronTrackingDeviceTest.cpp
-   mitkInternalTrackingToolTest.cpp
    mitkNavigationDataDisplacementFilterTest.cpp
    mitkNavigationDataLandmarkTransformFilterTest.cpp
    mitkNavigationDataObjectVisualizationFilterTest.cpp
@@ -64,4 +63,12 @@ set(MODULE_CUSTOM_TESTS
   mitkNavigationToolReaderAndWriterTest.cpp #deactivated because of bug 18835
   mitkNavigationToolStorageSerializerAndDeserializerIntegrationTest.cpp # This test was disabled because of bug 17181.
   mitkNavigationToolStorageSerializerTest.cpp # This test was disabled because of bug 18671
+  #mitkPolhemusTrackingDeviceHardwareTest.cpp
 )
+
+if(MITK_USE_POLHEMUS_TRACKER)
+set(MODULE_CUSTOM_TESTS
+  ${MODULE_CUSTOM_TESTS}
+  mitkPolhemusTrackingDeviceHardwareTest.cpp
+)
+endif(MITK_USE_POLHEMUS_TRACKER)

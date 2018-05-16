@@ -221,7 +221,7 @@ QmitkContourModelToImageWidget::QmitkContourModelToImageWidget(mitk::SliceNaviga
   if( d->m_Controls.dataSelectionWidget->GetSelection(0).IsNotNull() &&
       d->m_Controls.dataSelectionWidget->GetSelection(1).IsNotNull() )
   {
-    OnSelectionChanged( 0, d->m_Controls.dataSelectionWidget->GetSelection(0));
+    OnSelectionChanged(0, d->m_Controls.dataSelectionWidget->GetSelection(0));
   }
 }
 

@@ -38,7 +38,7 @@ class HelpWebView : public QWebEngineView
 
 public:
   explicit HelpWebView(IEditorSite::Pointer editorSite, QWidget *parent, qreal zoom = 0.0);
-  ~HelpWebView();
+  ~HelpWebView() override;
 
   QFont viewerFont() const;
   void setViewerFont(const QFont &font);
@@ -69,6 +69,7 @@ public:
   static bool canOpenPage(const QString &url);
   static bool isLocalUrl(const QUrl &url);
   static bool launchWithExternalApp(const QUrl &url);
+  static const QString m_MissingContextMessage;
   static const QString m_PageNotFoundMessage;
 
 public Q_SLOTS:
@@ -88,7 +89,7 @@ Q_SIGNALS:
   void sourceChanged(const QUrl &);
 
 protected:
-  virtual void wheelEvent(QWheelEvent *) override;
+  void wheelEvent(QWheelEvent *) override;
 
 private Q_SLOTS:
   void actionChanged();

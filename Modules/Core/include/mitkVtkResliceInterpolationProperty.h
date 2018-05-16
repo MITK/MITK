@@ -86,7 +86,7 @@ namespace mitk
      * this function is overridden as protected, so that the user may not add
      * additional invalid interpolation types.
      */
-    virtual bool AddEnum(const std::string &name, const IdType &id) override;
+    bool AddEnum(const std::string &name, const IdType &id) override;
 
     /**
      * Adds the enumeration types as defined by vtk to the list of known
@@ -98,7 +98,7 @@ namespace mitk
     // purposely not implemented
     VtkResliceInterpolationProperty &operator=(const VtkResliceInterpolationProperty &);
 
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    itk::LightObject::Pointer InternalClone() const override;
   };
 
 #ifdef _MSC_VER

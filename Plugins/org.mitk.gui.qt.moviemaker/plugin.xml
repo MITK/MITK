@@ -6,7 +6,8 @@
     <view id="org.mitk.views.moviemaker"
           name="Movie Maker"
           class="QmitkMovieMakerView"
-          icon="resources/camera-video.png" >
+          icon="resources/video-camera.svg"
+          category="General" >
           <description>Take movies of your data</description>
           <keywordReference id="org.mitk.views.moviemaker.Keyword"/>
         </view>
@@ -16,7 +17,8 @@
     <view id="org.mitk.views.screenshotmaker"
           name="Screenshot Maker"
           class="QmitkScreenshotMaker"
-          icon="resources/screenshot_maker.png" >
+          icon="resources/camera.svg"
+          category="General" >
       <description>Take screenshots of your data</description>
       <keywordReference id="org.mitk.views.screenshotmaker.Keyword"/>
     </view>

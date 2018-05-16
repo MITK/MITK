@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QFileDialog>
 #include <QDirIterator>
+#include <QFontDatabase>
 
 namespace berry
 {
@@ -56,7 +57,8 @@ void QtStylePreferencePage::CreateQtControl(QWidget* parent)
   Update();
 
   connect(controls.m_StylesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(StyleChanged(int)));
-  connect(controls.m_IconThemeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(IconThemeChanged(int)));
+  connect(controls.m_FontComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(FontChanged(int)));
+  connect(controls.m_FontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(FontChanged(int)));
   connect(controls.m_PathList, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePathListButtons()));
   connect(controls.m_AddButton, SIGNAL(clicked(bool)), this, SLOT(AddPathClicked(bool)));
   connect(controls.m_EditButton, SIGNAL(clicked(bool)), this, SLOT(EditPathClicked(bool)));
@@ -77,26 +79,25 @@ void QtStylePreferencePage::FillStyleCombo(const berry::IQtStyleManager::Style& 
   controls.m_StylesCombo->setCurrentIndex(styles.indexOf(currentStyle));
 }
 
-void QtStylePreferencePage::FillIconThemeComboBox(const QString currentIconTheme)
+void QtStylePreferencePage::FillFontCombo(const QString& currentFont)
 {
-  controls.m_IconThemeComboBox->clear();
-  berry::IQtStyleManager::IconThemeList iconThemes;
-  styleManager->GetIconThemes(iconThemes);
+  controls.m_FontComboBox->clear();
+  QStringList fonts;
+  styleManager->GetFonts(fonts);
 
-  qSort(iconThemes);
-  for (int i = 0; i < iconThemes.size(); ++i)
+  for (int i = 0; i < fonts.size(); ++i)
   {
-    controls.m_IconThemeComboBox->addItem(iconThemes.at(i).name);
+    controls.m_FontComboBox->addItem(fonts.at(i));
   }
-
-  QString currentTheme = currentIconTheme;
-
-  if(currentTheme == QString(""))
+  controls.m_FontComboBox->setCurrentIndex(fonts.indexOf(currentFont));
+  if (currentFont == QString("<<system>>"))
   {
-    currentTheme = QString("<<default>>");
+    controls.m_FontSizeSpinBox->setEnabled(false);
   }
-
-  controls.m_IconThemeComboBox->setCurrentIndex(iconThemes.indexOf( currentTheme ));
+  else
+  {
+    controls.m_FontSizeSpinBox->setEnabled(true);
+  }
 }
 
 void QtStylePreferencePage::AddPath(const QString& path, bool updateCombo)
@@ -117,10 +118,23 @@ void QtStylePreferencePage::StyleChanged(int /*index*/)
   styleManager->SetStyle(fileName);
 }
 
-void QtStylePreferencePage::IconThemeChanged(int /*index*/)
+void QtStylePreferencePage::FontChanged(int /*index*/)
 {
-  QString themeName = controls.m_IconThemeComboBox->currentText();
-  styleManager->SetIconTheme(themeName);
+  QString fontName = controls.m_FontComboBox->currentText();
+  int fontSize = controls.m_FontSizeSpinBox->value();
+
+  if (fontName == QString("<<system>>"))
+  {
+    controls.m_FontSizeSpinBox->setEnabled(false);
+  }
+  else
+  {
+    controls.m_FontSizeSpinBox->setEnabled(true);
+  }
+
+  styleManager->SetFont(fontName);
+  styleManager->SetFontSize(fontSize);
+  styleManager->UpdateWorkbenchFont();
 }
 
 void QtStylePreferencePage::AddPathClicked(bool /*checked*/)
@@ -206,13 +220,15 @@ bool QtStylePreferencePage::PerformOk()
     paths += path;
   }
 
-  QString currentTheme = QIcon::themeName();
-  if(currentTheme.isEmpty())
-  {
-    currentTheme = QString("<<default>>");
-  }
   m_StylePref->Put(berry::QtPreferences::QT_STYLE_SEARCHPATHS, paths);
-  m_StylePref->Put(berry::QtPreferences::QT_ICON_THEME, currentTheme);
+  m_StylePref->Put(berry::QtPreferences::QT_FONT_NAME,
+      controls.m_FontComboBox->currentText());
+  m_StylePref->Put(berry::QtPreferences::QT_FONT_SIZE,
+      QString::number(controls.m_FontSizeSpinBox->value()));
+
+  m_StylePref->PutBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES,
+    controls.m_ToolbarCategoryCheckBox->isChecked());
+
   return true;
 }
 
@@ -233,15 +249,23 @@ void QtStylePreferencePage::Update()
     AddPath(it.next(), false);
   }
 
-  QString iconTheme = m_StylePref->Get(berry::QtPreferences::QT_ICON_THEME, "<<default>>");
-  styleManager->SetIconTheme( iconTheme );
-
-  QString name = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
-  styleManager->SetStyle(name);
+  QString styleName = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
+  styleManager->SetStyle(styleName);
   oldStyle = styleManager->GetStyle();
-
   FillStyleCombo(oldStyle);
-  FillIconThemeComboBox( iconTheme );
+
+  QString fontName = m_StylePref->Get(berry::QtPreferences::QT_FONT_NAME, "Open Sans");
+  styleManager->SetFont(fontName);
+
+  int fontSize = m_StylePref->Get(berry::QtPreferences::QT_FONT_SIZE, "9").toInt();
+  styleManager->SetFontSize(fontSize);
+  controls.m_FontSizeSpinBox->setValue(fontSize);
+  styleManager->UpdateWorkbenchFont();
+
+  FillFontCombo(styleManager->GetFont());
+
+  controls.m_ToolbarCategoryCheckBox->setChecked(
+    m_StylePref->GetBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES, true));
 }
 
 }

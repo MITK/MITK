@@ -1,0 +1,2139 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+#include "QmitkPartialVolumeAnalysisView.h"
+
+#include <limits>
+
+#include <qlabel.h>
+#include <qspinbox.h>
+#include <qpushbutton.h>
+#include <qcheckbox.h>
+#include <qgroupbox.h>
+#include <qradiobutton.h>
+#include <qlineedit.h>
+#include <qclipboard.h>
+#include <qfiledialog.h>
+
+#include <berryIEditorPart.h>
+#include <berryIWorkbenchPage.h>
+#include <berryPlatform.h>
+
+
+#include "QmitkSliderNavigatorWidget.h"
+#include <QMessageBox>
+
+#include "mitkNodePredicateDataType.h"
+#include "mitkNodePredicateOr.h"
+#include "mitkImageTimeSelector.h"
+#include "mitkProperties.h"
+#include "mitkProgressBar.h"
+#include "mitkImageCast.h"
+#include "mitkImageToItk.h"
+#include "mitkITKImageImport.h"
+#include "mitkDataNodeObject.h"
+#include "mitkNodePredicateData.h"
+#include "mitkPlanarFigureInteractor.h"
+#include "mitkTensorImage.h"
+#include "mitkPlanarCircle.h"
+#include "mitkPlanarRectangle.h"
+#include "mitkPlanarPolygon.h"
+#include "mitkPartialVolumeAnalysisClusteringCalculator.h"
+#include "usModuleRegistry.h"
+
+#include <itkVectorImage.h>
+#include "itkTensorDerivedMeasurementsFilter.h"
+#include "itkDiffusionTensor3D.h"
+#include "itkCartesianToPolarVectorImageFilter.h"
+#include "itkPolarToCartesianVectorImageFilter.h"
+#include "itkBinaryThresholdImageFilter.h"
+#include "itkMaskImageFilter.h"
+#include "itkCastImageFilter.h"
+#include "itkImageMomentsCalculator.h"
+#include <itkResampleImageFilter.h>
+#include <itkGaussianInterpolateImageFunction.h>
+#include <itkNearestNeighborInterpolateImageFunction.h>
+#include <itkImageDuplicator.h>
+
+#include <vnl/vnl_vector.h>
+
+const std::string QmitkPartialVolumeAnalysisView::VIEW_ID =
+        "org.mitk.views.partialvolumeanalysisview";
+
+class QmitkRequestStatisticsUpdateEvent : public QEvent
+{
+public:
+    enum Type
+    {
+        StatisticsUpdateRequest = QEvent::MaxUser - 1025
+    };
+
+    QmitkRequestStatisticsUpdateEvent()
+        : QEvent( (QEvent::Type) StatisticsUpdateRequest ) {};
+};
+
+
+
+typedef itk::Image<short, 3>                 ImageType;
+typedef itk::Image<float, 3>                 FloatImageType;
+typedef itk::Image<itk::Vector<float,3>, 3>  VectorImageType;
+
+inline bool my_isnan(float x)
+{
+    volatile float d = x;
+
+    if(d!=d)
+        return true;
+
+    if(d==d)
+        return false;
+    return d != d;
+
+}
+
+QmitkPartialVolumeAnalysisView::QmitkPartialVolumeAnalysisView(QObject * /*parent*/, const char * /*name*/)
+    : QmitkAbstractView(),
+      m_Controls(nullptr),
+      m_TimeStepperAdapter(nullptr),
+      m_MeasurementInfoRenderer(nullptr),
+      m_MeasurementInfoAnnotation(nullptr),
+      m_IsTensorImage(false),
+      m_SelectedRenderWindow(nullptr),
+      m_LastRenderWindow(nullptr),
+      m_ImageObserverTag(-1),
+      m_ImageMaskObserverTag(-1),
+      m_PlanarFigureObserverTag(-1),
+      m_CurrentStatisticsValid(false),
+      m_StatisticsUpdatePending(false),
+      m_GaussianSigmaChangedSliding(false),
+      m_NumberBinsSliding(false),
+      m_UpsamplingChangedSliding(false),
+      m_EllipseCounter(0),
+      m_RectangleCounter(0),
+      m_PolygonCounter(0),
+      m_CurrentFigureNodeInitialized(false),
+      m_QuantifyClass(2),
+      m_IconTexOFF(new QIcon(":/QmitkPartialVolumeAnalysisView/texIntOFFIcon.png")),
+      m_IconTexON(new QIcon(":/QmitkPartialVolumeAnalysisView/texIntONIcon.png")),
+      m_TexIsOn(true),
+      m_Visible(false)
+{
+
+}
+
+
+QmitkPartialVolumeAnalysisView::~QmitkPartialVolumeAnalysisView()
+{
+    if ( m_SelectedImage.IsNotNull() )
+        m_SelectedImage->RemoveObserver( m_ImageObserverTag );
+    if ( m_SelectedImageMask.IsNotNull() )
+        m_SelectedImageMask->RemoveObserver( m_ImageMaskObserverTag );
+    if ( m_SelectedPlanarFigure.IsNotNull() )
+    {
+        m_SelectedPlanarFigure->RemoveObserver( m_PlanarFigureObserverTag );
+        m_SelectedPlanarFigure->RemoveObserver( m_InitializedObserverTag );
+    }
+
+    this->GetDataStorage()->AddNodeEvent -= mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
+            , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeAddedInDataStorage );
+
+    m_SelectedPlanarFigureNodes->NodeChanged.RemoveListener( mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
+                                                             , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeChanged ) );
+
+    m_SelectedPlanarFigureNodes->NodeRemoved.RemoveListener( mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
+                                                             , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeRemoved ) );
+
+    m_SelectedPlanarFigureNodes->PropertyChanged.RemoveListener( mitk::MessageDelegate2<QmitkPartialVolumeAnalysisView
+                                                                 , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkPartialVolumeAnalysisView::PropertyChanged ) );
+
+    m_SelectedImageNodes->NodeChanged.RemoveListener( mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
+                                                      , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeChanged ) );
+
+    m_SelectedImageNodes->NodeRemoved.RemoveListener( mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
+                                                      , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeRemoved ) );
+
+    m_SelectedImageNodes->PropertyChanged.RemoveListener( mitk::MessageDelegate2<QmitkPartialVolumeAnalysisView
+                                                          , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkPartialVolumeAnalysisView::PropertyChanged ) );
+}
+
+
+void QmitkPartialVolumeAnalysisView::CreateQtPartControl(QWidget *parent)
+{
+    if (m_Controls == nullptr)
+    {
+        m_Controls = new Ui::QmitkPartialVolumeAnalysisViewControls;
+        m_Controls->setupUi(parent);
+        this->CreateConnections();
+    }
+
+    SetHistogramVisibility();
+
+    m_Controls->m_TextureIntON->setIcon(*m_IconTexON);
+
+    m_Controls->m_SimilarAnglesFrame->setVisible(false);
+    m_Controls->m_SimilarAnglesLabel->setVisible(false);
+
+    vtkTextProperty *textProp = vtkTextProperty::New();
+    textProp->SetColor(1.0, 1.0, 1.0);
+
+    m_MeasurementInfoAnnotation = vtkCornerAnnotation::New();
+    m_MeasurementInfoAnnotation->SetMaximumFontSize(12);
+    m_MeasurementInfoAnnotation->SetTextProperty(textProp);
+
+    m_MeasurementInfoRenderer = vtkRenderer::New();
+    m_MeasurementInfoRenderer->AddActor(m_MeasurementInfoAnnotation);
+
+    m_SelectedPlanarFigureNodes = mitk::DataStorageSelection::New(this->GetDataStorage(), false);
+
+    m_SelectedPlanarFigureNodes->NodeChanged.AddListener( mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
+                                                          , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeChanged ) );
+
+    m_SelectedPlanarFigureNodes->NodeRemoved.AddListener( mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
+                                                          , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeRemoved ) );
+
+    m_SelectedPlanarFigureNodes->PropertyChanged.AddListener( mitk::MessageDelegate2<QmitkPartialVolumeAnalysisView
+                                                              , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkPartialVolumeAnalysisView::PropertyChanged ) );
+
+    m_SelectedImageNodes = mitk::DataStorageSelection::New(this->GetDataStorage(), false);
+
+    m_SelectedImageNodes->PropertyChanged.AddListener( mitk::MessageDelegate2<QmitkPartialVolumeAnalysisView
+                                                       , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkPartialVolumeAnalysisView::PropertyChanged ) );
+
+    m_SelectedImageNodes->NodeChanged.AddListener( mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
+                                                   , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeChanged ) );
+
+    m_SelectedImageNodes->NodeRemoved.AddListener( mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
+                                                   , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeRemoved ) );
+
+    this->GetDataStorage()->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
+                                                      , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeAddedInDataStorage ) );
+
+    Select(nullptr,true,true);
+
+    SetAdvancedVisibility();
+}
+
+void QmitkPartialVolumeAnalysisView::SetFocus()
+{
+  m_Controls->m_CircleButton->setFocus();
+}
+
+void QmitkPartialVolumeAnalysisView::SetHistogramVisibility()
+{
+    m_Controls->m_HistogramWidget->setVisible(m_Controls->m_DisplayHistogramCheckbox->isChecked());
+}
+
+void QmitkPartialVolumeAnalysisView::SetAdvancedVisibility()
+{
+    m_Controls->frame_7->setVisible(m_Controls->m_AdvancedCheckbox->isChecked());
+}
+
+void QmitkPartialVolumeAnalysisView::CreateConnections()
+{
+    if ( m_Controls )
+    {
+
+        connect( m_Controls->m_DisplayHistogramCheckbox, SIGNAL( clicked() )
+                 , this, SLOT( SetHistogramVisibility() ) );
+
+        connect( m_Controls->m_AdvancedCheckbox, SIGNAL( clicked() )
+                 , this, SLOT( SetAdvancedVisibility() ) );
+
+
+        connect( m_Controls->m_NumberBinsSlider, SIGNAL( sliderReleased () ),
+                 this, SLOT( NumberBinsReleasedSlider( ) ) );
+        connect( m_Controls->m_UpsamplingSlider, SIGNAL( sliderReleased(  ) ),
+                 this, SLOT( UpsamplingReleasedSlider( ) ) );
+        connect( m_Controls->m_GaussianSigmaSlider, SIGNAL( sliderReleased(  ) ),
+                 this, SLOT( GaussianSigmaReleasedSlider(  ) ) );
+        connect( m_Controls->m_SimilarAnglesSlider, SIGNAL( sliderReleased(  ) ),
+                 this, SLOT( SimilarAnglesReleasedSlider(  ) ) );
+
+        connect( m_Controls->m_NumberBinsSlider, SIGNAL( valueChanged (int) ),
+                 this, SLOT( NumberBinsChangedSlider( int ) ) );
+        connect( m_Controls->m_UpsamplingSlider, SIGNAL( valueChanged( int ) ),
+                 this, SLOT( UpsamplingChangedSlider( int ) ) );
+        connect( m_Controls->m_GaussianSigmaSlider, SIGNAL( valueChanged( int ) ),
+                 this, SLOT( GaussianSigmaChangedSlider( int ) ) );
+        connect( m_Controls->m_SimilarAnglesSlider, SIGNAL( valueChanged( int ) ),
+                 this, SLOT( SimilarAnglesChangedSlider(int) ) );
+
+        connect( m_Controls->m_OpacitySlider, SIGNAL( valueChanged( int ) ),
+                 this, SLOT( OpacityChangedSlider(int) ) );
+
+        connect( (QObject*)(m_Controls->m_ButtonCopyHistogramToClipboard), SIGNAL(clicked()),(QObject*) this, SLOT(ToClipBoard()));
+
+        connect( m_Controls->m_CircleButton, SIGNAL( clicked() )
+                 , this, SLOT( ActionDrawEllipseTriggered() ) );
+
+        connect( m_Controls->m_RectangleButton, SIGNAL( clicked() )
+                 , this, SLOT( ActionDrawRectangleTriggered() ) );
+
+        connect( m_Controls->m_PolygonButton, SIGNAL( clicked() )
+                 , this, SLOT( ActionDrawPolygonTriggered() ) );
+
+        connect( m_Controls->m_GreenRadio, SIGNAL( clicked(bool) )
+                 , this, SLOT( GreenRadio(bool) ) );
+
+        connect( m_Controls->m_PartialVolumeRadio, SIGNAL( clicked(bool) )
+                 , this, SLOT( PartialVolumeRadio(bool) ) );
+
+        connect( m_Controls->m_BlueRadio, SIGNAL( clicked(bool) )
+                 , this, SLOT( BlueRadio(bool) ) );
+
+        connect( m_Controls->m_AllRadio, SIGNAL( clicked(bool) )
+                 , this, SLOT( AllRadio(bool) ) );
+
+        connect( m_Controls->m_EstimateCircle, SIGNAL( clicked() )
+                 , this, SLOT( EstimateCircle() ) );
+
+        connect( (QObject*)(m_Controls->m_TextureIntON), SIGNAL(clicked()), this, SLOT(TextIntON()) );
+
+        connect( m_Controls->m_ExportClusteringResultsButton, SIGNAL(clicked()), this, SLOT(ExportClusteringResults()));
+    }
+}
+
+void QmitkPartialVolumeAnalysisView::ExportClusteringResults()
+{
+    if (m_ClusteringResult.IsNull() || m_SelectedImage.IsNull())
+        return;
+
+    mitk::BaseGeometry* geometry = m_SelectedImage->GetGeometry();
+
+    itk::Image< short, 3>::Pointer referenceImage = itk::Image< short, 3>::New();
+
+    itk::Vector<double,3> newSpacing = geometry->GetSpacing();
+    mitk::Point3D newOrigin = geometry->GetOrigin();
+    mitk::Geometry3D::BoundsArrayType bounds = geometry->GetBounds();
+    newOrigin[0] += bounds.GetElement(0);
+    newOrigin[1] += bounds.GetElement(2);
+    newOrigin[2] += bounds.GetElement(4);
+    itk::Matrix<double, 3, 3> newDirection;
+    itk::ImageRegion<3> imageRegion;
+    for (int i=0; i<3; i++)
+        for (int j=0; j<3; j++)
+            newDirection[j][i] = geometry->GetMatrixColumn(i)[j]/newSpacing[j];
+    imageRegion.SetSize(0, geometry->GetExtent(0));
+    imageRegion.SetSize(1, geometry->GetExtent(1));
+    imageRegion.SetSize(2, geometry->GetExtent(2));
+
+    // apply new image parameters
+    referenceImage->SetSpacing( newSpacing );
+    referenceImage->SetOrigin( newOrigin );
+    referenceImage->SetDirection( newDirection );
+    referenceImage->SetRegions( imageRegion );
+    referenceImage->Allocate();
+
+    typedef itk::Image< float, 3 > OutType;
+    mitk::Image::Pointer mitkInImage = dynamic_cast<mitk::Image*>(m_ClusteringResult->GetData());
+
+    typedef itk::Image< itk::RGBAPixel<unsigned char>, 3 > ItkRgbaImageType;
+    typedef mitk::ImageToItk< ItkRgbaImageType > CasterType;
+
+    CasterType::Pointer caster = CasterType::New();
+    caster->SetInput(mitkInImage);
+    caster->Update();
+    ItkRgbaImageType::Pointer itkInImage = caster->GetOutput();
+
+    typedef itk::ExtractChannelFromRgbaImageFilter< itk::Image< short, 3>, OutType > ExtractionFilterType;
+    ExtractionFilterType::Pointer filter = ExtractionFilterType::New();
+    filter->SetInput(itkInImage);
+    filter->SetChannel(ExtractionFilterType::ALPHA);
+    filter->SetReferenceImage(referenceImage);
+    filter->Update();
+    OutType::Pointer outImg = filter->GetOutput();
+
+    mitk::Image::Pointer img = mitk::Image::New();  img->InitializeByItk(outImg.GetPointer());
+    img->SetVolume(outImg->GetBufferPointer());
+
+    // init data node
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData(img);
+    node->SetName("Clustering Result");
+    GetDataStorage()->Add(node);
+}
+
+void QmitkPartialVolumeAnalysisView::EstimateCircle()
+{
+    typedef itk::Image<unsigned char, 3> SegImageType;
+    SegImageType::Pointer mask_itk = SegImageType::New();
+
+    typedef mitk::ImageToItk<SegImageType> CastType;
+    CastType::Pointer caster = CastType::New();
+    caster->SetInput(m_SelectedImageMask);
+    caster->Update();
+
+    typedef itk::ImageMomentsCalculator< SegImageType > MomentsType;
+    MomentsType::Pointer momentsCalc = MomentsType::New();
+    momentsCalc->SetImage(caster->GetOutput());
+    momentsCalc->Compute();
+    MomentsType::VectorType cog = momentsCalc->GetCenterOfGravity();
+    MomentsType::MatrixType axes = momentsCalc->GetPrincipalAxes();
+
+    // moments-coord conversion
+    // third coordinate min oder max?
+
+    // max-min = extent
+
+    MomentsType::AffineTransformPointer trafo = momentsCalc->GetPhysicalAxesToPrincipalAxesTransform();
+
+    itk::ImageRegionIterator<SegImageType>
+            itimage(caster->GetOutput(), caster->GetOutput()->GetLargestPossibleRegion());
+    itimage.GoToBegin();
+
+    double max = -9999999999.0;
+    double min =  9999999999.0;
+
+    while( !itimage.IsAtEnd() )
+    {
+        if(itimage.Get())
+        {
+            ImageType::IndexType index = itimage.GetIndex();
+
+            itk::Point<float,3> point;
+            caster->GetOutput()->TransformIndexToPhysicalPoint(index,point);
+
+            itk::Point<float,3> newPoint;
+            newPoint = trafo->TransformPoint(point);
+
+            if(newPoint[2]<min)
+                min = newPoint[2];
+
+            if(newPoint[2]>max)
+                max = newPoint[2];
+        }
+        ++itimage;
+    }
+
+    double extent = max - min;
+    MITK_DEBUG << "EXTENT = " << extent;
+
+    mitk::Point3D origin;
+    mitk::Vector3D right, bottom, normal;
+
+    double factor = 1000.0;
+    mitk::FillVector3D(origin, cog[0]-factor*axes[1][0]-factor*axes[2][0],
+                       cog[1]-factor*axes[1][1]-factor*axes[2][1],
+                       cog[2]-factor*axes[1][2]-factor*axes[2][2]);
+    //          mitk::FillVector3D(normal, axis[0][0],axis[0][1],axis[0][2]);
+    mitk::FillVector3D(bottom, 2*factor*axes[1][0], 2*factor*axes[1][1], 2*factor*axes[1][2]);
+    mitk::FillVector3D(right,  2*factor*axes[2][0], 2*factor*axes[2][1], 2*factor*axes[2][2]);
+
+    mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
+    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
+    planegeometry->SetOrigin(origin);
+
+    double len1 = sqrt(axes[1][0]*axes[1][0] + axes[1][1]*axes[1][1] + axes[1][2]*axes[1][2]);
+    double len2 = sqrt(axes[2][0]*axes[2][0] + axes[2][1]*axes[2][1] + axes[2][2]*axes[2][2]);
+
+    mitk::Point2D point1;
+    point1[0] = factor*len1;
+    point1[1] = factor*len2;
+
+    mitk::Point2D point2;
+    point2[0] = factor*len1+extent*.5;
+    point2[1] = factor*len2;
+
+    mitk::PlanarCircle::Pointer circle = mitk::PlanarCircle::New();
+    circle->SetPlaneGeometry(planegeometry);
+    circle->PlaceFigure( point1 );
+    circle->SetControlPoint(0,point1);
+    circle->SetControlPoint(1,point2);
+    //circle->SetCurrentControlPoint( point2 );
+
+    mitk::PlanarFigure::PolyLineType polyline = circle->GetPolyLine( 0 );
+    MITK_DEBUG << "SIZE of planar figure polyline: " << polyline.size();
+
+    AddFigureToDataStorage(circle, "Circle");
+
+}
+
+bool QmitkPartialVolumeAnalysisView::AssertDrawingIsPossible(bool checked)
+{
+    if (m_SelectedImageNodes->GetNode().IsNull())
+    {
+        checked = false;
+        this->HandleException("Please select an image!", dynamic_cast<QWidget *>(this->parent()), true);
+        return false;
+    }
+
+    //this->GetRenderWindowPart(OPEN)->EnableSlicingPlanes(false);
+
+    return checked;
+}
+
+void QmitkPartialVolumeAnalysisView::ActionDrawEllipseTriggered()
+{
+    bool checked = m_Controls->m_CircleButton->isChecked();
+    if(!this->AssertDrawingIsPossible(checked))
+        return;
+
+    mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
+    // using PV_ prefix for planar figures from this view
+    // to distinguish them from that ones created throught the measurement view
+    this->AddFigureToDataStorage(figure, QString("PV_Circle%1").arg(++m_EllipseCounter));
+
+    MITK_DEBUG << "PlanarCircle created ...";
+}
+
+void QmitkPartialVolumeAnalysisView::ActionDrawRectangleTriggered()
+{
+    bool checked = m_Controls->m_RectangleButton->isChecked();
+    if(!this->AssertDrawingIsPossible(checked))
+        return;
+
+    mitk::PlanarRectangle::Pointer figure = mitk::PlanarRectangle::New();
+    // using PV_ prefix for planar figures from this view
+    // to distinguish them from that ones created throught the measurement view
+    this->AddFigureToDataStorage(figure, QString("PV_Rectangle%1").arg(++m_RectangleCounter));
+
+    MITK_DEBUG << "PlanarRectangle created ...";
+}
+
+void QmitkPartialVolumeAnalysisView::ActionDrawPolygonTriggered()
+{
+    bool checked = m_Controls->m_PolygonButton->isChecked();
+    if(!this->AssertDrawingIsPossible(checked))
+        return;
+
+    mitk::PlanarPolygon::Pointer figure = mitk::PlanarPolygon::New();
+    figure->ClosedOn();
+    // using PV_ prefix for planar figures from this view
+    // to distinguish them from that ones created throught the measurement view
+    this->AddFigureToDataStorage(figure, QString("PV_Polygon%1").arg(++m_PolygonCounter));
+
+    MITK_DEBUG << "PlanarPolygon created ...";
+}
+
+void QmitkPartialVolumeAnalysisView::AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
+                                                            const char *propertyKey, mitk::BaseProperty *property )
+{
+
+    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+    newNode->SetName(name.toStdString());
+    newNode->SetData(figure);
+
+    // Add custom property, if available
+    if ( (propertyKey != nullptr) && (property != nullptr) )
+    {
+        newNode->AddProperty( propertyKey, property );
+    }
+
+    // figure drawn on the topmost layer / image
+    this->GetDataStorage()->Add(newNode, m_SelectedImageNodes->GetNode() );
+
+    QList<mitk::DataNode::Pointer> selectedNodes = this->GetDataManagerSelection();
+    for(int i = 0; i < selectedNodes.size(); ++i)
+    {
+        selectedNodes[i]->SetSelected(false);
+    }
+
+    std::vector<mitk::DataNode *> selectedPFNodes = m_SelectedPlanarFigureNodes->GetNodes();
+    for(std::size_t i = 0; i < selectedPFNodes.size(); ++i)
+    {
+        selectedPFNodes[i]->SetSelected(false);
+    }
+    newNode->SetSelected(true);
+
+    Select(newNode);
+}
+
+void QmitkPartialVolumeAnalysisView::PlanarFigureInitialized()
+{
+    if(m_SelectedPlanarFigureNodes->GetNode().IsNull())
+        return;
+
+    m_CurrentFigureNodeInitialized = true;
+
+    this->Select(m_SelectedPlanarFigureNodes->GetNode());
+
+    m_Controls->m_CircleButton->setChecked(false);
+    m_Controls->m_RectangleButton->setChecked(false);
+    m_Controls->m_PolygonButton->setChecked(false);
+
+    //this->GetRenderWindowPart(OPEN)->EnableSlicingPlanes(true);
+    this->RequestStatisticsUpdate();
+
+}
+
+void QmitkPartialVolumeAnalysisView::PlanarFigureFocus(mitk::DataNode* node)
+{
+    mitk::PlanarFigure* _PlanarFigure = 0;
+    _PlanarFigure = dynamic_cast<mitk::PlanarFigure*> (node->GetData());
+
+    if (_PlanarFigure)
+    {
+
+        FindRenderWindow(node);
+
+        const mitk::PlaneGeometry* _PlaneGeometry = _PlanarFigure->GetPlaneGeometry();
+
+        // make node visible
+        if (m_SelectedRenderWindow)
+        {
+            mitk::Point3D centerP = _PlaneGeometry->GetOrigin();
+            m_SelectedRenderWindow->GetSliceNavigationController()->ReorientSlices(
+                        centerP, _PlaneGeometry->GetNormal());
+            m_SelectedRenderWindow->GetSliceNavigationController()->SelectSliceByPoint(
+                        centerP);
+        }
+    }
+}
+
+void QmitkPartialVolumeAnalysisView::FindRenderWindow(mitk::DataNode* node)
+{
+    if (node && dynamic_cast<mitk::PlanarFigure*> (node->GetData()))
+    {
+        m_SelectedRenderWindow = 0;
+        bool PlanarFigureInitializedWindow = false;
+
+        foreach(QmitkRenderWindow * window, this->GetRenderWindowPart()->GetQmitkRenderWindows().values())
+        {
+            if (!m_SelectedRenderWindow && node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow, window->GetRenderer()))
+            {
+                m_SelectedRenderWindow = window;
+            }
+        }
+    }
+}
+
+
+void QmitkPartialVolumeAnalysisView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer> &nodes)
+{
+    m_Controls->m_InputData->setTitle("Please Select Input Data");
+
+    if (!m_Visible)
+        return;
+
+    if ( nodes.empty() )
+    {
+        if (m_ClusteringResult.IsNotNull())
+        {
+            this->GetDataStorage()->Remove(m_ClusteringResult);
+            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        }
+
+        Select(nullptr, true, true);
+    }
+
+    for (int i=0; i<nodes.size(); i++)
+        Select(nodes.at(i));
+}
+
+void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool clearMaskOnFirstArgnullptr, bool clearImageOnFirstArgnullptr )
+{
+    // Clear any unreferenced images
+    this->RemoveOrphanImages();
+
+    bool somethingChanged = false;
+    if(node.IsNull())
+    {
+        somethingChanged = true;
+
+        if(clearMaskOnFirstArgnullptr)
+        {
+            if ( (m_SelectedImageMask.IsNotNull()) && (m_ImageMaskObserverTag >= 0) )
+            {
+                m_SelectedImageMask->RemoveObserver( m_ImageMaskObserverTag );
+                m_ImageMaskObserverTag = -1;
+            }
+
+            if ( (m_SelectedPlanarFigure.IsNotNull()) && (m_PlanarFigureObserverTag >= 0) )
+            {
+                m_SelectedPlanarFigure->RemoveObserver( m_PlanarFigureObserverTag );
+                m_PlanarFigureObserverTag = -1;
+            }
+
+            if ( (m_SelectedPlanarFigure.IsNotNull()) && (m_InitializedObserverTag >= 0) )
+            {
+                m_SelectedPlanarFigure->RemoveObserver( m_InitializedObserverTag );
+                m_InitializedObserverTag = -1;
+            }
+
+            m_SelectedPlanarFigure = nullptr;
+            m_SelectedPlanarFigureNodes->RemoveAllNodes();
+            m_CurrentFigureNodeInitialized = false;
+            m_SelectedRenderWindow = 0;
+
+            m_SelectedMaskNode = nullptr;
+            m_SelectedImageMask = nullptr;
+
+        }
+
+        if(clearImageOnFirstArgnullptr)
+        {
+            if ( (m_SelectedImage.IsNotNull()) && (m_ImageObserverTag >= 0) )
+            {
+                m_SelectedImage->RemoveObserver( m_ImageObserverTag );
+                m_ImageObserverTag = -1;
+            }
+
+            m_SelectedImageNodes->RemoveAllNodes();
+            m_SelectedImage = nullptr;
+
+            m_IsTensorImage = false;
+            m_FAImage = nullptr;
+            m_RDImage = nullptr;
+            m_ADImage = nullptr;
+            m_MDImage = nullptr;
+            m_CAImage = nullptr;
+            m_DirectionComp1Image = nullptr;
+            m_DirectionComp2Image = nullptr;
+            m_AngularErrorImage = nullptr;
+
+            m_Controls->m_SimilarAnglesFrame->setVisible(false);
+            m_Controls->m_SimilarAnglesLabel->setVisible(false);
+        }
+    }
+    else
+    {
+        typedef itk::SimpleMemberCommand< QmitkPartialVolumeAnalysisView > ITKCommandType;
+        ITKCommandType::Pointer changeListener;
+        changeListener = ITKCommandType::New();
+        changeListener->SetCallbackFunction( this, &QmitkPartialVolumeAnalysisView::RequestStatisticsUpdate );
+
+        // Get selected element
+        mitk::TensorImage *selectedTensorImage = dynamic_cast< mitk::TensorImage * >( node->GetData() );
+        mitk::Image *selectedImage = dynamic_cast< mitk::Image * >( node->GetData() );
+        mitk::PlanarFigure *selectedPlanar = dynamic_cast< mitk::PlanarFigure * >( node->GetData() );
+
+        bool isMask = false;
+        bool isImage = false;
+        bool isPlanar = false;
+        bool isTensorImage = false;
+
+        if (selectedTensorImage != nullptr)
+        {
+            isTensorImage = true;
+        }
+        else if(selectedImage != nullptr)
+        {
+            node->GetPropertyValue("binary", isMask);
+            isImage = !isMask;
+        }
+        else if ( (selectedPlanar != nullptr) )
+        {
+            isPlanar = true;
+        }
+
+        // image
+        if(isImage && selectedImage->GetDimension()==3)
+        {
+            if(selectedImage != m_SelectedImage.GetPointer())
+            {
+                somethingChanged = true;
+
+                if ( (m_SelectedImage.IsNotNull()) && (m_ImageObserverTag >= 0) )
+                {
+                    m_SelectedImage->RemoveObserver( m_ImageObserverTag );
+                    m_ImageObserverTag = -1;
+                }
+
+                *m_SelectedImageNodes = node;
+                m_SelectedImage = selectedImage;
+                m_IsTensorImage = false;
+                m_FAImage = nullptr;
+                m_RDImage = nullptr;
+                m_ADImage = nullptr;
+                m_MDImage = nullptr;
+                m_CAImage = nullptr;
+                m_DirectionComp1Image = nullptr;
+                m_DirectionComp2Image = nullptr;
+                m_AngularErrorImage = nullptr;
+
+                // Add change listeners to selected objects
+                m_ImageObserverTag = m_SelectedImage->AddObserver(
+                            itk::ModifiedEvent(), changeListener );
+
+                m_Controls->m_SimilarAnglesFrame->setVisible(false);
+                m_Controls->m_SimilarAnglesLabel->setVisible(false);
+
+                m_Controls->m_SelectedImageLabel->setText( m_SelectedImageNodes->GetNode()->GetName().c_str() );
+            }
+        }
+
+        //planar
+        if(isPlanar)
+        {
+            if(selectedPlanar != m_SelectedPlanarFigure.GetPointer())
+            {
+                MITK_DEBUG << "Planar selection changed";
+                somethingChanged = true;
+
+                // Possibly previous change listeners
+                if ( (m_SelectedPlanarFigure.IsNotNull()) && (m_PlanarFigureObserverTag >= 0) )
+                {
+                    m_SelectedPlanarFigure->RemoveObserver( m_PlanarFigureObserverTag );
+                    m_PlanarFigureObserverTag = -1;
+                }
+
+                if ( (m_SelectedPlanarFigure.IsNotNull()) && (m_InitializedObserverTag >= 0) )
+                {
+                    m_SelectedPlanarFigure->RemoveObserver( m_InitializedObserverTag );
+                    m_InitializedObserverTag = -1;
+                }
+
+                m_SelectedPlanarFigure = selectedPlanar;
+                *m_SelectedPlanarFigureNodes = node;
+                m_CurrentFigureNodeInitialized = selectedPlanar->IsPlaced();
+
+                m_SelectedMaskNode = nullptr;
+                m_SelectedImageMask = nullptr;
+
+                m_PlanarFigureObserverTag = m_SelectedPlanarFigure->AddObserver(
+                            mitk::EndInteractionPlanarFigureEvent(), changeListener );
+
+                if(!m_CurrentFigureNodeInitialized)
+                {
+                    typedef itk::SimpleMemberCommand< QmitkPartialVolumeAnalysisView > ITKCommandType;
+                    ITKCommandType::Pointer initializationCommand;
+                    initializationCommand = ITKCommandType::New();
+
+                    // set the callback function of the member command
+                    initializationCommand->SetCallbackFunction( this, &QmitkPartialVolumeAnalysisView::PlanarFigureInitialized );
+
+                    // add an observer
+                    m_InitializedObserverTag = selectedPlanar->AddObserver( mitk::EndPlacementPlanarFigureEvent(), initializationCommand );
+
+                }
+
+                m_Controls->m_SelectedMaskLabel->setText( m_SelectedPlanarFigureNodes->GetNode()->GetName().c_str() );
+                PlanarFigureFocus(node);
+            }
+        }
+
+        //mask
+        this->m_Controls->m_EstimateCircle->setEnabled(isMask && selectedImage->GetDimension()==3);
+        if(isMask && selectedImage->GetDimension()==3)
+        {
+            if(selectedImage != m_SelectedImage.GetPointer())
+            {
+                somethingChanged = true;
+
+                if ( (m_SelectedImageMask.IsNotNull()) && (m_ImageMaskObserverTag >= 0) )
+                {
+                    m_SelectedImageMask->RemoveObserver( m_ImageMaskObserverTag );
+                    m_ImageMaskObserverTag = -1;
+                }
+
+                m_SelectedMaskNode = node;
+                m_SelectedImageMask = selectedImage;
+                m_SelectedPlanarFigure = nullptr;
+                m_SelectedPlanarFigureNodes->RemoveAllNodes();
+
+                m_ImageMaskObserverTag = m_SelectedImageMask->AddObserver(
+                            itk::ModifiedEvent(), changeListener );
+
+                m_Controls->m_SelectedMaskLabel->setText( m_SelectedMaskNode->GetName().c_str() );
+
+            }
+        }
+
+        //tensor image
+        if(isTensorImage && selectedTensorImage->GetDimension()==3)
+        {
+            if(selectedImage != m_SelectedImage.GetPointer())
+            {
+                somethingChanged = true;
+
+                if ( (m_SelectedImage.IsNotNull()) && (m_ImageObserverTag >= 0) )
+                {
+                    m_SelectedImage->RemoveObserver( m_ImageObserverTag );
+                    m_ImageObserverTag = -1;
+                }
+
+                *m_SelectedImageNodes = node;
+                m_SelectedImage = selectedImage;
+
+                m_IsTensorImage = true;
+
+                ExtractTensorImages(selectedImage);
+
+                // Add change listeners to selected objects
+                m_ImageObserverTag = m_SelectedImage->AddObserver(
+                            itk::ModifiedEvent(), changeListener );
+
+                m_Controls->m_SimilarAnglesFrame->setVisible(true);
+                m_Controls->m_SimilarAnglesLabel->setVisible(true);
+
+                m_Controls->m_SelectedImageLabel->setText( m_SelectedImageNodes->GetNode()->GetName().c_str() );
+            }
+        }
+    }
+
+    if(somethingChanged)
+    {
+        this->SetMeasurementInfoToRenderWindow("");
+
+        if(m_SelectedPlanarFigure.IsNull() && m_SelectedImageMask.IsNull() )
+        {
+            m_Controls->m_SelectedMaskLabel->setText("<font color='red'>mandatory</font>");
+            m_Controls->m_ResampleOptionsFrame->setEnabled(false);
+            m_Controls->m_HistogramWidget->setEnabled(false);
+            m_Controls->m_ClassSelector->setEnabled(false);
+            m_Controls->m_DisplayHistogramCheckbox->setEnabled(false);
+            m_Controls->m_AdvancedCheckbox->setEnabled(false);
+            m_Controls->frame_7->setEnabled(false);
+        }
+        else
+        {
+            m_Controls->m_ResampleOptionsFrame->setEnabled(true);
+            m_Controls->m_HistogramWidget->setEnabled(true);
+            m_Controls->m_ClassSelector->setEnabled(true);
+            m_Controls->m_DisplayHistogramCheckbox->setEnabled(true);
+            m_Controls->m_AdvancedCheckbox->setEnabled(true);
+            m_Controls->frame_7->setEnabled(true);
+        }
+
+        // Clear statistics / histogram GUI if nothing is selected
+        if ( m_SelectedImage.IsNull() )
+        {
+            m_Controls->m_PlanarFigureButtonsFrame->setEnabled(false);
+            m_Controls->m_OpacityFrame->setEnabled(false);
+            m_Controls->m_SelectedImageLabel->setText("<font color='red'>mandatory</font>");
+        }
+        else
+        {
+            m_Controls->m_PlanarFigureButtonsFrame->setEnabled(true);
+            m_Controls->m_OpacityFrame->setEnabled(true);
+        }
+
+        if( !m_Visible || m_SelectedImage.IsNull()
+                || (m_SelectedPlanarFigure.IsNull() && m_SelectedImageMask.IsNull()) )
+        {
+            m_Controls->m_InputData->setTitle("Please Select Input Data");
+            m_Controls->m_HistogramWidget->ClearItemModel();
+            m_CurrentStatisticsValid = false;
+        }
+        else
+        {
+            m_Controls->m_InputData->setTitle("Input Data");
+            this->RequestStatisticsUpdate();
+        }
+    }
+}
+
+
+void QmitkPartialVolumeAnalysisView::ShowClusteringResults()
+{
+
+    typedef itk::Image<unsigned char, 3> MaskImageType;
+    mitk::Image::Pointer mask = 0;
+    MaskImageType::Pointer itkmask = 0;
+
+    if(m_IsTensorImage && m_Controls->m_SimilarAnglesSlider->value() != 0)
+    {
+        typedef itk::Image<float, 3> AngularErrorImageType;
+        typedef mitk::ImageToItk<AngularErrorImageType> CastType;
+        CastType::Pointer caster = CastType::New();
+        caster->SetInput(m_AngularErrorImage);
+        caster->Update();
+
+        typedef itk::BinaryThresholdImageFilter< AngularErrorImageType, MaskImageType > ThreshType;
+        ThreshType::Pointer thresh = ThreshType::New();
+        thresh->SetUpperThreshold((90-m_Controls->m_SimilarAnglesSlider->value())*(itk::Math::pi/180.0));
+        thresh->SetInsideValue(1.0);
+        thresh->SetInput(caster->GetOutput());
+        thresh->Update();
+        itkmask = thresh->GetOutput();
+
+        mask = mitk::Image::New();
+        mask->InitializeByItk(itkmask.GetPointer());
+        mask->SetVolume(itkmask->GetBufferPointer());
+
+        //    GetDataStorage()->Remove(m_newnode);
+        //    m_newnode = mitk::DataNode::New();
+        //    m_newnode->SetData(mask);
+        //    m_newnode->SetName("masking node");
+        //    m_newnode->SetIntProperty( "layer", 1002 );
+        //    GetDataStorage()->Add(m_newnode, m_SelectedImageNodes->GetNode());
+
+    }
+
+    mitk::Image::Pointer clusteredImage;
+    ClusteringType::Pointer clusterer = ClusteringType::New();
+
+    if(m_QuantifyClass==3)
+    {
+
+        if(m_IsTensorImage)
+        {
+            double *green_fa, *green_rd, *green_ad, *green_md;
+            //double *greengray_fa, *greengray_rd, *greengray_ad, *greengray_md;
+            double *gray_fa, *gray_rd, *gray_ad, *gray_md;
+            //double *redgray_fa, *redgray_rd, *redgray_ad, *redgray_md;
+            double *red_fa, *red_rd, *red_ad, *red_md;
+
+            mitk::Image* tmpImg = m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(0);
+            mitk::Image::ConstPointer imgToCluster = tmpImg;
+
+            red_fa   = clusterer->PerformQuantification(imgToCluster, m_CurrentRGBClusteringResults->rgbChannels->r, mask);
+            green_fa = clusterer->PerformQuantification(imgToCluster, m_CurrentRGBClusteringResults->rgbChannels->g, mask);
+            gray_fa  = clusterer->PerformQuantification(imgToCluster, m_CurrentRGBClusteringResults->rgbChannels->b, mask);
+
+            tmpImg = m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(3);
+            mitk::Image::ConstPointer imgToCluster3 = tmpImg;
+
+            red_rd   = clusterer->PerformQuantification(imgToCluster3, m_CurrentRGBClusteringResults->rgbChannels->r, mask);
+            green_rd = clusterer->PerformQuantification(imgToCluster3, m_CurrentRGBClusteringResults->rgbChannels->g, mask);
+            gray_rd  = clusterer->PerformQuantification(imgToCluster3, m_CurrentRGBClusteringResults->rgbChannels->b, mask);
+
+            tmpImg = m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(4);
+            mitk::Image::ConstPointer imgToCluster4 = tmpImg;
+
+            red_ad   = clusterer->PerformQuantification(imgToCluster4, m_CurrentRGBClusteringResults->rgbChannels->r, mask);
+            green_ad = clusterer->PerformQuantification(imgToCluster4, m_CurrentRGBClusteringResults->rgbChannels->g, mask);
+            gray_ad  = clusterer->PerformQuantification(imgToCluster4, m_CurrentRGBClusteringResults->rgbChannels->b, mask);
+
+            tmpImg = m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(5);
+            mitk::Image::ConstPointer imgToCluster5 = tmpImg;
+
+            red_md   = clusterer->PerformQuantification(imgToCluster5, m_CurrentRGBClusteringResults->rgbChannels->r, mask);
+            green_md = clusterer->PerformQuantification(imgToCluster5, m_CurrentRGBClusteringResults->rgbChannels->g, mask);
+            gray_md  = clusterer->PerformQuantification(imgToCluster5, m_CurrentRGBClusteringResults->rgbChannels->b, mask);
+
+            // clipboard
+            QString clipboardText("FA\t%1\t%2\t\t%3\t%4\t\t%5\t%6\t");
+            clipboardText = clipboardText
+                    .arg(red_fa[0]).arg(red_fa[1])
+                    .arg(gray_fa[0]).arg(gray_fa[1])
+                    .arg(green_fa[0]).arg(green_fa[1]);
+            QString clipboardText3("RD\t%1\t%2\t\t%3\t%4\t\t%5\t%6\t");
+            clipboardText3 = clipboardText3
+                    .arg(red_rd[0]).arg(red_rd[1])
+                    .arg(gray_rd[0]).arg(gray_rd[1])
+                    .arg(green_rd[0]).arg(green_rd[1]);
+            QString clipboardText4("AD\t%1\t%2\t\t%3\t%4\t\t%5\t%6\t");
+            clipboardText4 = clipboardText4
+                    .arg(red_ad[0]).arg(red_ad[1])
+                    .arg(gray_ad[0]).arg(gray_ad[1])
+                    .arg(green_ad[0]).arg(green_ad[1]);
+            QString clipboardText5("MD\t%1\t%2\t\t%3\t%4\t\t%5\t%6");
+            clipboardText5 = clipboardText5
+                    .arg(red_md[0]).arg(red_md[1])
+                    .arg(gray_md[0]).arg(gray_md[1])
+                    .arg(green_md[0]).arg(green_md[1]);
+
+            QApplication::clipboard()->setText(clipboardText+clipboardText3+clipboardText4+clipboardText5, QClipboard::Clipboard);
+
+            // now paint infos also on renderwindow
+            QString plainInfoText("%1  %2  %3        \n");
+            plainInfoText = plainInfoText
+                    .arg("Red  ", 20)
+                    .arg("Gray ", 20)
+                    .arg("Green", 20);
+
+            QString plainInfoText0("FA:%1 ± %2%3 ± %4%5 ± %6\n");
+            plainInfoText0 = plainInfoText0
+                    .arg(red_fa[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(red_fa[1], -10, 'g', 2, QLatin1Char( ' ' ))
+                    .arg(gray_fa[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(gray_fa[1], -10, 'g', 2, QLatin1Char( ' ' ))
+                    .arg(green_fa[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(green_fa[1], -10, 'g', 2, QLatin1Char( ' ' ));
+
+            QString plainInfoText3("RDx10³:%1 ± %2%3 ± %4%5 ± %6\n");
+            plainInfoText3 = plainInfoText3
+                    .arg(1000.0 * red_rd[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_rd[1], -10, 'g', 2, QLatin1Char( ' ' ))
+                    .arg(1000.0 * gray_rd[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * gray_rd[1], -10, 'g', 2, QLatin1Char( ' ' ))
+                    .arg(1000.0 * green_rd[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * green_rd[1], -10, 'g', 2, QLatin1Char( ' ' ));
+
+            QString plainInfoText4("ADx10³:%1 ± %2%3 ± %4%5 ± %6\n");
+            plainInfoText4 = plainInfoText4
+                    .arg(1000.0 * red_ad[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_ad[1], -10, 'g', 2, QLatin1Char( ' ' ))
+                    .arg(1000.0 * gray_ad[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * gray_ad[1], -10, 'g', 2, QLatin1Char( ' ' ))
+                    .arg(1000.0 * green_ad[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * green_ad[1], -10, 'g', 2, QLatin1Char( ' ' ));
+
+            QString plainInfoText5("MDx10³:%1 ± %2%3 ± %4%5 ± %6");
+            plainInfoText5 = plainInfoText5
+                    .arg(1000.0 * red_md[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_md[1], -10, 'g', 2, QLatin1Char( ' ' ))
+                    .arg(1000.0 * gray_md[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * gray_md[1], -10, 'g', 2, QLatin1Char( ' ' ))
+                    .arg(1000.0 * green_md[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * green_md[1], -10, 'g', 2, QLatin1Char( ' ' ));
+
+            this->SetMeasurementInfoToRenderWindow(plainInfoText+plainInfoText0+plainInfoText3+plainInfoText4+plainInfoText5);
+
+        }
+        else
+        {
+            double* green;
+            double* gray;
+            double* red;
+
+            mitk::Image* tmpImg = m_CurrentStatisticsCalculator->GetInternalImage();
+            mitk::Image::ConstPointer imgToCluster = tmpImg;
+
+            red = clusterer->PerformQuantification(imgToCluster, m_CurrentRGBClusteringResults->rgbChannels->r);
+            green = clusterer->PerformQuantification(imgToCluster, m_CurrentRGBClusteringResults->rgbChannels->g);
+            gray = clusterer->PerformQuantification(imgToCluster, m_CurrentRGBClusteringResults->rgbChannels->b);
+
+            // clipboard
+            QString clipboardText("%1\t%2\t\t%3\t%4\t\t%5\t%6");
+            clipboardText = clipboardText.arg(red[0]).arg(red[1])
+                    .arg(gray[0]).arg(gray[1])
+                    .arg(green[0]).arg(green[1]);
+            QApplication::clipboard()->setText(clipboardText, QClipboard::Clipboard);
+
+            // now paint infos also on renderwindow
+            QString plainInfoText("Red: %1 ± %2\nGray: %3 ± %4\nGreen: %5 ± %6");
+            plainInfoText = plainInfoText.arg(red[0]).arg(red[1])
+                    .arg(gray[0]).arg(gray[1])
+                    .arg(green[0]).arg(green[1]);
+
+            this->SetMeasurementInfoToRenderWindow(plainInfoText);
+
+        }
+
+
+        clusteredImage = m_CurrentRGBClusteringResults->rgb;
+
+    }
+    else
+    {
+        if(m_IsTensorImage)
+        {
+            double *red_fa, *red_rd, *red_ad, *red_md;
+
+            mitk::Image* tmpImg = m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(0);
+            mitk::Image::ConstPointer imgToCluster = tmpImg;
+            red_fa = clusterer->PerformQuantification(imgToCluster, m_CurrentPerformClusteringResults->clusteredImage, mask);
+
+            tmpImg = m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(3);
+            mitk::Image::ConstPointer imgToCluster3 = tmpImg;
+            red_rd = clusterer->PerformQuantification(imgToCluster3, m_CurrentPerformClusteringResults->clusteredImage, mask);
+
+            tmpImg = m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(4);
+            mitk::Image::ConstPointer imgToCluster4 = tmpImg;
+            red_ad = clusterer->PerformQuantification(imgToCluster4, m_CurrentPerformClusteringResults->clusteredImage, mask);
+
+            tmpImg = m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(5);
+            mitk::Image::ConstPointer imgToCluster5 = tmpImg;
+            red_md = clusterer->PerformQuantification(imgToCluster5, m_CurrentPerformClusteringResults->clusteredImage, mask);
+
+            // clipboard
+            QString clipboardText("FA\t%1\t%2\t");
+            clipboardText = clipboardText
+                    .arg(red_fa[0]).arg(red_fa[1]);
+            QString clipboardText3("RD\t%1\t%2\t");
+            clipboardText3 = clipboardText3
+                    .arg(red_rd[0]).arg(red_rd[1]);
+            QString clipboardText4("AD\t%1\t%2\t");
+            clipboardText4 = clipboardText4
+                    .arg(red_ad[0]).arg(red_ad[1]);
+            QString clipboardText5("MD\t%1\t%2\t");
+            clipboardText5 = clipboardText5
+                    .arg(red_md[0]).arg(red_md[1]);
+
+            QApplication::clipboard()->setText(clipboardText+clipboardText3+clipboardText4+clipboardText5, QClipboard::Clipboard);
+
+            // now paint infos also on renderwindow
+            QString plainInfoText("%1        \n");
+            plainInfoText = plainInfoText
+                    .arg("Red  ", 20);
+
+            QString plainInfoText0("FA:%1 ± %2\n");
+            plainInfoText0 = plainInfoText0
+                    .arg(red_fa[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(red_fa[1], -10, 'g', 2, QLatin1Char( ' ' ));
+
+            QString plainInfoText3("RDx10³:%1 ± %2\n");
+            plainInfoText3 = plainInfoText3
+                    .arg(1000.0 * red_rd[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_rd[1], -10, 'g', 2, QLatin1Char( ' ' ));
+
+            QString plainInfoText4("ADx10³:%1 ± %2\n");
+            plainInfoText4 = plainInfoText4
+                    .arg(1000.0 * red_ad[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_ad[1], -10, 'g', 2, QLatin1Char( ' ' ));
+
+            QString plainInfoText5("MDx10³:%1 ± %2");
+            plainInfoText5 = plainInfoText5
+                    .arg(1000.0 * red_md[0], 10, 'g', 2, QLatin1Char( ' ' )).arg(1000.0 * red_md[1], -10, 'g', 2, QLatin1Char( ' ' ));
+
+            this->SetMeasurementInfoToRenderWindow(plainInfoText+plainInfoText0+plainInfoText3+plainInfoText4+plainInfoText5);
+
+        }
+        else
+        {
+            double* quant;
+
+            mitk::Image* tmpImg = m_CurrentStatisticsCalculator->GetInternalImage();
+            mitk::Image::ConstPointer imgToCluster = tmpImg;
+            quant = clusterer->PerformQuantification(imgToCluster, m_CurrentPerformClusteringResults->clusteredImage);
+
+            // clipboard
+            QString clipboardText("%1\t%2");
+            clipboardText = clipboardText.arg(quant[0]).arg(quant[1]);
+            QApplication::clipboard()->setText(clipboardText, QClipboard::Clipboard);
+
+            // now paint infos also on renderwindow
+            QString plainInfoText("Measurement: %1 ± %2");
+            plainInfoText = plainInfoText.arg(quant[0]).arg(quant[1]);
+
+            this->SetMeasurementInfoToRenderWindow(plainInfoText);
+        }
+
+        clusteredImage = m_CurrentPerformClusteringResults->displayImage;
+
+    }
+
+    if(mask.IsNotNull())
+    {
+        typedef itk::Image<itk::RGBAPixel<unsigned char>,3> RGBImageType;
+        typedef mitk::ImageToItk<RGBImageType> ClusterCasterType;
+        ClusterCasterType::Pointer clCaster = ClusterCasterType::New();
+        clCaster->SetInput(clusteredImage);
+        clCaster->Update();
+        clCaster->GetOutput();
+
+        typedef itk::MaskImageFilter< RGBImageType, MaskImageType, RGBImageType > MaskType;
+        MaskType::Pointer masker = MaskType::New();
+        masker->SetInput1(clCaster->GetOutput());
+        masker->SetInput2(itkmask);
+        masker->Update();
+
+        clusteredImage = mitk::Image::New();
+        clusteredImage->InitializeByItk(masker->GetOutput());
+        clusteredImage->SetVolume(masker->GetOutput()->GetBufferPointer());
+    }
+
+    if(m_ClusteringResult.IsNotNull())
+    {
+        this->GetDataStorage()->Remove(m_ClusteringResult);
+    }
+
+    m_ClusteringResult = mitk::DataNode::New();
+    m_ClusteringResult->SetBoolProperty("helper object", true);
+    m_ClusteringResult->SetIntProperty( "layer", 1000 );
+    m_ClusteringResult->SetBoolProperty("texture interpolation", m_TexIsOn);
+    m_ClusteringResult->SetData(clusteredImage);
+    m_ClusteringResult->SetName("Clusterprobs");
+    this->GetDataStorage()->Add(m_ClusteringResult, m_SelectedImageNodes->GetNode());
+
+    if(m_SelectedPlanarFigure.IsNotNull() && m_SelectedPlanarFigureNodes->GetNode().IsNotNull())
+    {
+        m_SelectedPlanarFigureNodes->GetNode()->SetIntProperty( "layer", 1001 );
+    }
+
+    this->RequestRenderWindowUpdate();
+
+}
+
+
+void QmitkPartialVolumeAnalysisView::UpdateStatistics()
+{
+    if(!m_CurrentFigureNodeInitialized && m_SelectedPlanarFigure.IsNotNull())
+    {
+        MITK_DEBUG << "Selected planar figure not initialized. No stats calculation performed.";
+        return;
+    }
+
+    // Remove any cached images that are no longer referenced elsewhere
+    this->RemoveOrphanImages();
+
+    if ( m_SelectedImage.IsNotNull() )
+    {
+        // Check if a the selected image is a multi-channel image. If yes, statistics
+        // cannot be calculated currently.
+        if ( !m_IsTensorImage && m_SelectedImage->GetPixelType().GetNumberOfComponents() > 1 )
+        {
+            QMessageBox::information( nullptr, "Warning", "Non-tensor multi-component images not supported.");
+
+            m_Controls->m_HistogramWidget->ClearItemModel();
+            m_CurrentStatisticsValid = false;
+            return;
+        }
+
+        m_CurrentStatisticsCalculator = nullptr;
+        if(!m_IsTensorImage)
+        {
+          // Retrieve HistogramStatisticsCalculator from has map (or create a new one
+          // for this image if non-existant)
+          PartialVolumeAnalysisMapType::iterator it =
+              m_PartialVolumeAnalysisMap.find( m_SelectedImage );
+
+          if ( it != m_PartialVolumeAnalysisMap.end() )
+          {
+            m_CurrentStatisticsCalculator = it->second;
+          }
+        }
+        if(m_CurrentStatisticsCalculator.IsNull())
+        {
+            m_CurrentStatisticsCalculator = mitk::PartialVolumeAnalysisHistogramCalculator::New();
+            m_CurrentStatisticsCalculator->SetPlanarFigureThickness(m_Controls->m_PlanarFiguresThickness->value());
+            if(m_IsTensorImage)
+            {
+                m_CurrentStatisticsCalculator->SetImage( m_CAImage );
+                m_CurrentStatisticsCalculator->AddAdditionalResamplingImage( m_FAImage );
+                m_CurrentStatisticsCalculator->AddAdditionalResamplingImage( m_DirectionComp1Image );
+                m_CurrentStatisticsCalculator->AddAdditionalResamplingImage( m_DirectionComp2Image );
+                m_CurrentStatisticsCalculator->AddAdditionalResamplingImage( m_RDImage );
+                m_CurrentStatisticsCalculator->AddAdditionalResamplingImage( m_ADImage );
+                m_CurrentStatisticsCalculator->AddAdditionalResamplingImage( m_MDImage );
+            }
+            else
+            {
+                m_CurrentStatisticsCalculator->SetImage( m_SelectedImage );
+            }
+            m_PartialVolumeAnalysisMap[m_SelectedImage] = m_CurrentStatisticsCalculator;
+            MITK_DEBUG << "Creating StatisticsCalculator";
+        }
+
+        std::string maskName;
+        std::string maskType;
+        unsigned int maskDimension;
+
+        if ( m_SelectedImageMask.IsNotNull() )
+        {
+
+            mitk::PixelType pixelType = m_SelectedImageMask->GetPixelType();
+            MITK_DEBUG << pixelType.GetPixelTypeAsString();
+
+
+            if(pixelType.GetComponentTypeAsString() == "char")
+            {
+                MITK_DEBUG << "Pixel type is char instead of uchar";
+                return;
+            }
+
+
+            if(pixelType.GetBitsPerComponent() == 16)
+            {
+              //convert from ushort to uchar
+              typedef itk::Image<unsigned char, 3> UCharImageType;
+              UCharImageType::Pointer charImage;
+
+
+              if(pixelType.GetComponentTypeAsString() == "short" )
+              {
+                typedef itk::Image<short, 3> ShortImageType;
+
+                ShortImageType::Pointer shortImage;
+                mitk::CastToItkImage( m_SelectedImageMask, shortImage );
+
+                typedef itk::ImageDuplicator< ShortImageType > DuplicatorType;
+                DuplicatorType::Pointer duplicator = DuplicatorType::New();
+                duplicator->SetInputImage( shortImage );
+                duplicator->Update();
+
+                typedef itk::CastImageFilter<ShortImageType, UCharImageType> ImageCasterType;
+
+                ImageCasterType::Pointer caster = ImageCasterType::New();
+                caster->SetInput( duplicator->GetOutput() );
+                caster->Update();
+                charImage = caster->GetOutput();
+
+              }
+              else
+              {
+                typedef itk::Image<unsigned short, 3> UShortImageType;
+
+                UShortImageType::Pointer shortImage;
+                mitk::CastToItkImage( m_SelectedImageMask, shortImage );
+
+                typedef itk::ImageDuplicator< UShortImageType > DuplicatorType;
+                DuplicatorType::Pointer duplicator = DuplicatorType::New();
+                duplicator->SetInputImage( shortImage );
+                duplicator->Update();
+
+                typedef itk::CastImageFilter<UShortImageType, UCharImageType> ImageCasterType;
+
+                ImageCasterType::Pointer caster = ImageCasterType::New();
+                caster->SetInput( duplicator->GetOutput() );
+                caster->Update();
+                charImage = caster->GetOutput();
+              }
+
+              m_SelectedImageMask = nullptr;
+              m_SelectedImageMask = mitk::Image::New();
+              m_SelectedImageMask->InitializeByItk( charImage.GetPointer() );
+              m_SelectedImageMask->SetVolume( charImage->GetBufferPointer() );
+
+              mitk::CastToMitkImage(charImage, m_SelectedImageMask);
+            }
+
+
+            m_CurrentStatisticsCalculator->SetImageMask( m_SelectedImageMask );
+
+
+            m_CurrentStatisticsCalculator->SetMaskingModeToImage();
+
+            maskName = m_SelectedMaskNode->GetName();
+            maskType = m_SelectedImageMask->GetNameOfClass();
+            maskDimension = 3;
+
+            std::stringstream maskLabel;
+            maskLabel << maskName;
+            if ( maskDimension > 0 )
+            {
+                maskLabel << "  [" << maskDimension << "D " << maskType << "]";
+            }
+            m_Controls->m_SelectedMaskLabel->setText( maskLabel.str().c_str() );
+        }
+        else if ( m_SelectedPlanarFigure.IsNotNull() && m_SelectedPlanarFigureNodes->GetNode().IsNotNull())
+        {
+            m_CurrentStatisticsCalculator->SetPlanarFigure( m_SelectedPlanarFigure );
+            m_CurrentStatisticsCalculator->SetMaskingModeToPlanarFigure();
+
+            maskName = m_SelectedPlanarFigureNodes->GetNode()->GetName();
+            maskType = m_SelectedPlanarFigure->GetNameOfClass();
+            maskDimension = 2;
+        }
+        else
+        {
+            m_CurrentStatisticsCalculator->SetMaskingModeToNone();
+
+            maskName = "-";
+            maskType = "";
+            maskDimension = 0;
+        }
+
+        bool statisticsChanged = false;
+        bool statisticsCalculationSuccessful = false;
+
+        // Initialize progress bar
+        mitk::ProgressBar::GetInstance()->AddStepsToDo( 100 );
+
+        // Install listener for progress events and initialize progress bar
+        typedef itk::SimpleMemberCommand< QmitkPartialVolumeAnalysisView > ITKCommandType;
+        ITKCommandType::Pointer progressListener;
+        progressListener = ITKCommandType::New();
+        progressListener->SetCallbackFunction( this, &QmitkPartialVolumeAnalysisView::UpdateProgressBar );
+        unsigned long progressObserverTag = m_CurrentStatisticsCalculator
+                ->AddObserver( itk::ProgressEvent(), progressListener );
+
+        ClusteringType::ParamsType *cparams = 0;
+        ClusteringType::ClusterResultType *cresult = 0;
+        ClusteringType::HistType *chist = 0;
+
+        try
+        {
+            m_CurrentStatisticsCalculator->SetNumberOfBins(m_Controls->m_NumberBins->text().toInt());
+            m_CurrentStatisticsCalculator->SetUpsamplingFactor(m_Controls->m_Upsampling->text().toDouble());
+            m_CurrentStatisticsCalculator->SetGaussianSigma(m_Controls->m_GaussianSigma->text().toDouble());
+
+            // Compute statistics
+            statisticsChanged =
+                    m_CurrentStatisticsCalculator->ComputeStatistics( );
+
+            mitk::Image* tmpImg = m_CurrentStatisticsCalculator->GetInternalImage();
+            mitk::Image::ConstPointer imgToCluster = tmpImg;
+            if(imgToCluster.IsNotNull())
+            {
+
+                // perform clustering
+                const HistogramType *histogram = m_CurrentStatisticsCalculator->GetHistogram( );
+
+                if(histogram != nullptr)
+                {
+                    ClusteringType::Pointer clusterer = ClusteringType::New();
+                    clusterer->SetStepsNumIntegration(200);
+                    clusterer->SetMaxIt(1000);
+
+                    mitk::Image::Pointer pFiberImg;
+                    if(m_QuantifyClass==3)
+                    {
+                        if(m_Controls->m_Quantiles->isChecked())
+                        {
+                            m_CurrentRGBClusteringResults = clusterer->PerformRGBQuantiles(imgToCluster, histogram, m_Controls->m_q1->value(),m_Controls->m_q2->value());
+                        }
+                        else
+                        {
+                            m_CurrentRGBClusteringResults = clusterer->PerformRGBClustering(imgToCluster, histogram);
+                        }
+
+                        pFiberImg = m_CurrentRGBClusteringResults->rgbChannels->r;
+                        cparams = m_CurrentRGBClusteringResults->params;
+                        cresult = m_CurrentRGBClusteringResults->result;
+                        chist = m_CurrentRGBClusteringResults->hist;
+                    }
+                    else
+                    {
+                        if(m_Controls->m_Quantiles->isChecked())
+                        {
+                            m_CurrentPerformClusteringResults =
+                                    clusterer->PerformQuantiles(imgToCluster, histogram, m_Controls->m_q1->value(),m_Controls->m_q2->value());
+                        }
+                        else
+                        {
+                            m_CurrentPerformClusteringResults =
+                                    clusterer->PerformClustering(imgToCluster, histogram, m_QuantifyClass);
+                        }
+
+                        pFiberImg = m_CurrentPerformClusteringResults->clusteredImage;
+                        cparams = m_CurrentPerformClusteringResults->params;
+                        cresult = m_CurrentPerformClusteringResults->result;
+                        chist = m_CurrentPerformClusteringResults->hist;
+                    }
+
+                    if(m_IsTensorImage)
+                    {
+                        m_AngularErrorImage = clusterer->CaculateAngularErrorImage(
+                                    m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(1),
+                                    m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(2),
+                                    pFiberImg);
+
+                        //          GetDataStorage()->Remove(m_newnode2);
+                        //          m_newnode2 = mitk::DataNode::New();
+                        //          m_newnode2->SetData(m_AngularErrorImage);
+                        //          m_newnode2->SetName(("AngularError"));
+                        //          m_newnode2->SetIntProperty( "layer", 1003 );
+                        //          GetDataStorage()->Add(m_newnode2, m_SelectedImageNodes->GetNode());
+
+                        //          newnode = mitk::DataNode::New();
+                        //          newnode->SetData(m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(1));
+                        //          newnode->SetName(("Comp1"));
+                        //          GetDataStorage()->Add(newnode, m_SelectedImageNodes->GetNode());
+
+                        //          newnode = mitk::DataNode::New();
+                        //          newnode->SetData(m_CurrentStatisticsCalculator->GetInternalAdditionalResampledImage(2));
+                        //          newnode->SetName(("Comp2"));
+                        //          GetDataStorage()->Add(newnode, m_SelectedImageNodes->GetNode());
+                    }
+                    ShowClusteringResults();
+                }
+
+            }
+
+            statisticsCalculationSuccessful = true;
+        }
+        catch ( const std::runtime_error &e )
+        {
+            QMessageBox::information( nullptr, "Warning", e.what());
+        }
+        catch ( const std::exception &e )
+        {
+            MITK_ERROR << "Caught exception: " << e.what();
+
+            QMessageBox::information( nullptr, "Warning", e.what());
+        }
+
+        m_CurrentStatisticsCalculator->RemoveObserver( progressObserverTag );
+
+        // Make sure that progress bar closes
+        mitk::ProgressBar::GetInstance()->Progress( 100 );
+
+        if ( statisticsCalculationSuccessful )
+        {
+            if ( statisticsChanged )
+            {
+                // Do not show any error messages
+                m_CurrentStatisticsValid = true;
+            }
+
+            //      m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();
+            m_Controls->m_HistogramWidget->SetParameters(
+                        cparams, cresult, chist );
+            //      m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
+
+        }
+        else
+        {
+            m_Controls->m_SelectedMaskLabel->setText("<font color='red'>mandatory</font>");
+
+            // Clear statistics and histogram
+            m_Controls->m_HistogramWidget->ClearItemModel();
+            m_CurrentStatisticsValid = false;
+
+
+            // If a (non-closed) PlanarFigure is selected, display a line profile widget
+            if ( m_SelectedPlanarFigure.IsNotNull() )
+            {
+                // TODO: enable line profile widget
+                //m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 1 );
+                //m_Controls->m_LineProfileWidget->SetImage( m_SelectedImage );
+                //m_Controls->m_LineProfileWidget->SetPlanarFigure( m_SelectedPlanarFigure );
+                //m_Controls->m_LineProfileWidget->UpdateItemModelFromPath();
+            }
+        }
+    }
+
+}
+
+void QmitkPartialVolumeAnalysisView::SetMeasurementInfoToRenderWindow(const QString& text)
+{
+
+    FindRenderWindow(m_SelectedPlanarFigureNodes->GetNode());
+
+    if(m_LastRenderWindow != m_SelectedRenderWindow)
+    {
+
+        if(m_LastRenderWindow)
+        {
+            QObject::disconnect( m_LastRenderWindow, SIGNAL( destroyed(QObject*) )
+                                 , this, SLOT( OnRenderWindowDelete(QObject*) ) );
+        }
+        m_LastRenderWindow = m_SelectedRenderWindow;
+        if(m_LastRenderWindow)
+        {
+            QObject::connect( m_LastRenderWindow, SIGNAL( destroyed(QObject*) )
+                              , this, SLOT( OnRenderWindowDelete(QObject*) ) );
+        }
+    }
+
+    if(m_LastRenderWindow && m_SelectedPlanarFigureNodes->GetNode().IsNotNull())
+    {
+        if (!text.isEmpty())
+        {
+            m_MeasurementInfoAnnotation->SetText(1, text.toLatin1().data());
+            mitk::VtkLayerController::GetInstance(m_LastRenderWindow->GetRenderWindow())->InsertForegroundRenderer(
+                        m_MeasurementInfoRenderer, true);
+        }
+        else
+        {
+            if (mitk::VtkLayerController::GetInstance(
+                        m_LastRenderWindow->GetRenderWindow()) ->IsRendererInserted(
+                        m_MeasurementInfoRenderer))
+                mitk::VtkLayerController::GetInstance(m_LastRenderWindow->GetRenderWindow())->RemoveRenderer(
+                            m_MeasurementInfoRenderer);
+        }
+    }
+    else
+    {
+        mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
+
+        if ( renderWindowPart == nullptr )
+        {
+            return;
+        }
+
+        if (!text.isEmpty())
+        {
+            m_MeasurementInfoAnnotation->SetText(1, text.toLatin1().data());
+            mitk::VtkLayerController::GetInstance(renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderWindow())->InsertForegroundRenderer(
+                        m_MeasurementInfoRenderer, true);
+        }
+        else
+        {
+            if (mitk::VtkLayerController::GetInstance(
+                        renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderWindow()) ->IsRendererInserted(
+                        m_MeasurementInfoRenderer))
+                mitk::VtkLayerController::GetInstance(renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderWindow())->RemoveRenderer(
+                            m_MeasurementInfoRenderer);
+        }
+    }
+}
+
+void QmitkPartialVolumeAnalysisView::UpdateProgressBar()
+{
+    mitk::ProgressBar::GetInstance()->Progress();
+}
+
+void QmitkPartialVolumeAnalysisView::RequestStatisticsUpdate()
+{
+    if ( !m_StatisticsUpdatePending )
+    {
+        QApplication::postEvent( this, new QmitkRequestStatisticsUpdateEvent );
+        m_StatisticsUpdatePending = true;
+    }
+}
+
+
+void QmitkPartialVolumeAnalysisView::RemoveOrphanImages()
+{
+    PartialVolumeAnalysisMapType::iterator it = m_PartialVolumeAnalysisMap.begin();
+
+    while ( it != m_PartialVolumeAnalysisMap.end() )
+    {
+        mitk::Image *image = it->first;
+        mitk::PartialVolumeAnalysisHistogramCalculator *calculator = it->second;
+        ++it;
+
+        mitk::NodePredicateData::Pointer hasImage = mitk::NodePredicateData::New( image );
+        if ( this->GetDataStorage()->GetNode( hasImage ) == nullptr )
+        {
+            if ( m_SelectedImage == image )
+            {
+                m_SelectedImage = nullptr;
+                m_SelectedImageNodes->RemoveAllNodes();
+            }
+            if ( m_CurrentStatisticsCalculator == calculator )
+            {
+                m_CurrentStatisticsCalculator = nullptr;
+            }
+            m_PartialVolumeAnalysisMap.erase( image );
+            it = m_PartialVolumeAnalysisMap.begin();
+        }
+    }
+}
+
+void QmitkPartialVolumeAnalysisView::ExtractTensorImages(
+        mitk::Image::Pointer tensorimage)
+{
+    typedef itk::Image< itk::DiffusionTensor3D<float>, 3> TensorImageType;
+
+    typedef mitk::ImageToItk<TensorImageType> CastType;
+    CastType::Pointer caster = CastType::New();
+    caster->SetInput(tensorimage);
+    caster->Update();
+    TensorImageType::Pointer image = caster->GetOutput();
+
+    typedef itk::TensorDerivedMeasurementsFilter<float> MeasurementsType;
+    MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
+    measurementsCalculator->SetInput(image );
+    measurementsCalculator->SetMeasure(MeasurementsType::FA);
+    measurementsCalculator->Update();
+    MeasurementsType::OutputImageType::Pointer fa = measurementsCalculator->GetOutput();
+
+    m_FAImage = mitk::Image::New();
+    m_FAImage->InitializeByItk(fa.GetPointer());
+    m_FAImage->SetVolume(fa->GetBufferPointer());
+
+    //  mitk::DataNode::Pointer node = mitk::DataNode::New();
+    //  node->SetData(m_FAImage);
+    //  GetDataStorage()->Add(node);
+
+    measurementsCalculator = MeasurementsType::New();
+    measurementsCalculator->SetInput(image );
+    measurementsCalculator->SetMeasure(MeasurementsType::CA);
+    measurementsCalculator->Update();
+    MeasurementsType::OutputImageType::Pointer ca = measurementsCalculator->GetOutput();
+
+    m_CAImage = mitk::Image::New();
+    m_CAImage->InitializeByItk(ca.GetPointer());
+    m_CAImage->SetVolume(ca->GetBufferPointer());
+
+    //  node = mitk::DataNode::New();
+    //  node->SetData(m_CAImage);
+    //  GetDataStorage()->Add(node);
+
+    measurementsCalculator = MeasurementsType::New();
+    measurementsCalculator->SetInput(image );
+    measurementsCalculator->SetMeasure(MeasurementsType::RD);
+    measurementsCalculator->Update();
+    MeasurementsType::OutputImageType::Pointer rd = measurementsCalculator->GetOutput();
+
+    m_RDImage = mitk::Image::New();
+    m_RDImage->InitializeByItk(rd.GetPointer());
+    m_RDImage->SetVolume(rd->GetBufferPointer());
+
+    //  node = mitk::DataNode::New();
+    //  node->SetData(m_CAImage);
+    //  GetDataStorage()->Add(node);
+
+    measurementsCalculator = MeasurementsType::New();
+    measurementsCalculator->SetInput(image );
+    measurementsCalculator->SetMeasure(MeasurementsType::AD);
+    measurementsCalculator->Update();
+    MeasurementsType::OutputImageType::Pointer ad = measurementsCalculator->GetOutput();
+
+    m_ADImage = mitk::Image::New();
+    m_ADImage->InitializeByItk(ad.GetPointer());
+    m_ADImage->SetVolume(ad->GetBufferPointer());
+
+    //  node = mitk::DataNode::New();
+    //  node->SetData(m_CAImage);
+    //  GetDataStorage()->Add(node);
+
+    measurementsCalculator = MeasurementsType::New();
+    measurementsCalculator->SetInput(image );
+    measurementsCalculator->SetMeasure(MeasurementsType::RA);
+    measurementsCalculator->Update();
+    MeasurementsType::OutputImageType::Pointer md = measurementsCalculator->GetOutput();
+
+    m_MDImage = mitk::Image::New();
+    m_MDImage->InitializeByItk(md.GetPointer());
+    m_MDImage->SetVolume(md->GetBufferPointer());
+
+    //  node = mitk::DataNode::New();
+    //  node->SetData(m_CAImage);
+    //  GetDataStorage()->Add(node);
+
+    typedef DirectionsFilterType::PeakImageType DirImageType;
+    DirectionsFilterType::Pointer dirFilter = DirectionsFilterType::New();
+    dirFilter->SetInput(image );
+    dirFilter->SetUsePolarCoordinates(true);
+    dirFilter->Update();
+    ItkUcharImgType::Pointer numDirImage = dirFilter->GetOutput();
+    DirImageType::Pointer dirImage = dirFilter->GetPeakImage();
+
+    itk::ImageRegionIterator<DirImageType> itd(dirImage, dirImage->GetLargestPossibleRegion());
+    itd.GoToBegin();
+    while( !itd.IsAtEnd() )
+    {
+        DirImageType::PixelType direction = itd.Get();
+        direction = fabs(direction);
+        itd.Set(direction);
+        ++itd;
+    }
+
+    typedef itk::Image<float, 3> CompImageType;
+    CompImageType::Pointer comp1 = CompImageType::New();
+    comp1->SetSpacing( numDirImage->GetSpacing() );   // Set the image spacing
+    comp1->SetOrigin( numDirImage->GetOrigin() );     // Set the image origin
+    comp1->SetDirection( numDirImage->GetDirection() );  // Set the image direction
+    comp1->SetRegions( numDirImage->GetLargestPossibleRegion() );
+    comp1->Allocate();
+
+    CompImageType::Pointer comp2 = CompImageType::New();
+    comp2->SetSpacing( numDirImage->GetSpacing() );   // Set the image spacing
+    comp2->SetOrigin( numDirImage->GetOrigin() );     // Set the image origin
+    comp2->SetDirection( numDirImage->GetDirection() );  // Set the image direction
+    comp2->SetRegions( numDirImage->GetLargestPossibleRegion() );
+    comp2->Allocate();
+
+    itk::ImageRegionIterator<CompImageType> it1(comp1, comp1->GetLargestPossibleRegion());
+    itk::ImageRegionIterator<CompImageType> it2(comp2, comp2->GetLargestPossibleRegion());
+
+    it1.GoToBegin();
+    it2.GoToBegin();
+
+    while( !it2.IsAtEnd() )
+    {
+        DirImageType::IndexType peakIndex;
+        peakIndex[0] = it1.GetIndex()[0];
+        peakIndex[1] = it1.GetIndex()[1];
+        peakIndex[2] = it1.GetIndex()[2];
+        peakIndex[3] = 1;
+
+        it1.Set(dirImage->GetPixel(peakIndex));
+        peakIndex[3] = 2;
+        it2.Set(dirImage->GetPixel(peakIndex));
+        ++it1;
+        ++it2;
+    }
+
+    m_DirectionComp1Image = mitk::Image::New();
+    m_DirectionComp1Image->InitializeByItk(comp1.GetPointer());
+    m_DirectionComp1Image->SetVolume(comp1->GetBufferPointer());
+
+    m_DirectionComp2Image = mitk::Image::New();
+    m_DirectionComp2Image->InitializeByItk(comp2.GetPointer());
+    m_DirectionComp2Image->SetVolume(comp2->GetBufferPointer());
+
+}
+
+void QmitkPartialVolumeAnalysisView::OnRenderWindowDelete(QObject * obj)
+{
+    if(obj == m_LastRenderWindow)
+        m_LastRenderWindow = 0;
+    if(obj == m_SelectedRenderWindow)
+        m_SelectedRenderWindow = 0;
+}
+
+bool QmitkPartialVolumeAnalysisView::event( QEvent *event )
+{
+    if ( event->type() == (QEvent::Type) QmitkRequestStatisticsUpdateEvent::StatisticsUpdateRequest )
+    {
+        // Update statistics
+
+        m_StatisticsUpdatePending = false;
+
+        this->UpdateStatistics();
+        return true;
+    }
+
+    return false;
+}
+
+
+void QmitkPartialVolumeAnalysisView::Activated()
+{
+    mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDataStorage()->GetAll();
+    mitk::DataNode* node = 0;
+    mitk::PlanarFigure* figure = 0;
+    mitk::PlanarFigureInteractor::Pointer figureInteractor = 0;
+
+    // finally add all nodes to the model
+    for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
+        ; it++)
+    {
+        node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
+        figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
+
+        if(figure)
+        {
+          figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
+
+          if(figureInteractor.IsNull())
+          {
+            figureInteractor = mitk::PlanarFigureInteractor::New();
+            us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "MitkPlanarFigure" );
+            figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+            figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+            figureInteractor->SetDataNode( node );
+          }
+        }
+    }
+}
+
+void QmitkPartialVolumeAnalysisView::Deactivated()
+{
+
+}
+
+void QmitkPartialVolumeAnalysisView::ActivatedZombieView(berry::IWorkbenchPartReference::Pointer)
+{
+    this->SetMeasurementInfoToRenderWindow("");
+
+    mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDataStorage()->GetAll();
+    mitk::DataNode* node = 0;
+    mitk::PlanarFigure* figure = 0;
+    mitk::PlanarFigureInteractor::Pointer figureInteractor = 0;
+
+    // finally add all nodes to the model
+    for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
+        ; it++)
+    {
+        node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
+        figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
+
+        if(figure)
+        {
+            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
+
+            if(figureInteractor)
+              figureInteractor->SetDataNode( nullptr );
+        }
+    }
+}
+
+void QmitkPartialVolumeAnalysisView::Hidden()
+{
+    if (m_ClusteringResult.IsNotNull())
+    {
+        this->GetDataStorage()->Remove(m_ClusteringResult);
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+    Select(nullptr, true, true);
+    m_Visible = false;
+}
+
+void QmitkPartialVolumeAnalysisView::Visible()
+{
+    m_Visible = true;
+    berry::IWorkbenchPart::Pointer bla;
+    if (!this->GetCurrentSelection().empty())
+    {
+        this->OnSelectionChanged(bla, this->GetCurrentSelection());
+    }
+    else
+    {
+        this->OnSelectionChanged(bla, this->GetDataManagerSelection());
+    }
+}
+
+void QmitkPartialVolumeAnalysisView::GreenRadio(bool checked)
+{
+    if(checked)
+    {
+        m_Controls->m_PartialVolumeRadio->setChecked(false);
+        m_Controls->m_BlueRadio->setChecked(false);
+        m_Controls->m_AllRadio->setChecked(false);
+        m_Controls->m_ExportClusteringResultsButton->setEnabled(true);
+    }
+
+    m_QuantifyClass = 0;
+
+    RequestStatisticsUpdate();
+}
+
+
+void QmitkPartialVolumeAnalysisView::PartialVolumeRadio(bool checked)
+{
+    if(checked)
+    {
+        m_Controls->m_GreenRadio->setChecked(false);
+        m_Controls->m_BlueRadio->setChecked(false);
+        m_Controls->m_AllRadio->setChecked(false);
+        m_Controls->m_ExportClusteringResultsButton->setEnabled(true);
+    }
+
+    m_QuantifyClass = 1;
+
+    RequestStatisticsUpdate();
+}
+
+void QmitkPartialVolumeAnalysisView::BlueRadio(bool checked)
+{
+    if(checked)
+    {
+        m_Controls->m_PartialVolumeRadio->setChecked(false);
+        m_Controls->m_GreenRadio->setChecked(false);
+        m_Controls->m_AllRadio->setChecked(false);
+        m_Controls->m_ExportClusteringResultsButton->setEnabled(true);
+    }
+
+    m_QuantifyClass = 2;
+
+    RequestStatisticsUpdate();
+}
+
+void QmitkPartialVolumeAnalysisView::AllRadio(bool checked)
+{
+    if(checked)
+    {
+        m_Controls->m_BlueRadio->setChecked(false);
+        m_Controls->m_PartialVolumeRadio->setChecked(false);
+        m_Controls->m_GreenRadio->setChecked(false);
+        m_Controls->m_ExportClusteringResultsButton->setEnabled(false);
+    }
+
+    m_QuantifyClass = 3;
+
+    RequestStatisticsUpdate();
+}
+
+void QmitkPartialVolumeAnalysisView::NumberBinsChangedSlider(int)
+{
+    m_Controls->m_NumberBins->setText(QString("%1").arg(m_Controls->m_NumberBinsSlider->value()*5.0));
+}
+
+void QmitkPartialVolumeAnalysisView::UpsamplingChangedSlider(int)
+{
+    m_Controls->m_Upsampling->setText(QString("%1").arg(m_Controls->m_UpsamplingSlider->value()/10.0));
+}
+
+void QmitkPartialVolumeAnalysisView::GaussianSigmaChangedSlider(int)
+{
+    m_Controls->m_GaussianSigma->setText(QString("%1").arg(m_Controls->m_GaussianSigmaSlider->value()/100.0));
+}
+
+void QmitkPartialVolumeAnalysisView::SimilarAnglesChangedSlider(int)
+{
+    m_Controls->m_SimilarAngles->setText(QString("%1°").arg(90-m_Controls->m_SimilarAnglesSlider->value()));
+    ShowClusteringResults();
+}
+
+void QmitkPartialVolumeAnalysisView::OpacityChangedSlider(int v )
+{
+
+    if(m_SelectedImageNodes->GetNode().IsNotNull())
+    {
+        float opacImag = 1.0f-(v-5)/5.0f;
+        opacImag = opacImag < 0 ? 0 : opacImag;
+        m_SelectedImageNodes->GetNode()->SetFloatProperty("opacity", opacImag);
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+
+    if(m_ClusteringResult.IsNotNull())
+    {
+        float opacClust = v/5.0f;
+        opacClust = opacClust > 1 ? 1 : opacClust;
+        m_ClusteringResult->SetFloatProperty("opacity", opacClust);
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+}
+
+void QmitkPartialVolumeAnalysisView::NumberBinsReleasedSlider( )
+{
+    RequestStatisticsUpdate();
+}
+
+void QmitkPartialVolumeAnalysisView::UpsamplingReleasedSlider( )
+{
+    RequestStatisticsUpdate();
+}
+
+void QmitkPartialVolumeAnalysisView::GaussianSigmaReleasedSlider( )
+{
+    RequestStatisticsUpdate();
+}
+
+void QmitkPartialVolumeAnalysisView::SimilarAnglesReleasedSlider( )
+{
+
+}
+
+void QmitkPartialVolumeAnalysisView::ToClipBoard()
+{
+
+    std::vector<std::vector<double>* > vals  = m_Controls->m_HistogramWidget->m_Vals;
+    QString clipboardText;
+    for (std::vector<std::vector<double>* >::iterator it = vals.begin(); it
+         != vals.end(); ++it)
+    {
+        for (std::vector<double>::iterator it2 = (**it).begin(); it2 != (**it).end(); ++it2)
+        {
+            clipboardText.append(QString("%1 \t").arg(*it2));
+        }
+        clipboardText.append(QString("\n"));
+    }
+
+    QApplication::clipboard()->setText(clipboardText, QClipboard::Clipboard);
+}
+
+void QmitkPartialVolumeAnalysisView::PropertyChanged(const mitk::DataNode* /*node*/, const mitk::BaseProperty* /*prop*/)
+{
+}
+
+void QmitkPartialVolumeAnalysisView::NodeChanged(const mitk::DataNode* /*node*/)
+{
+}
+
+void QmitkPartialVolumeAnalysisView::NodeRemoved(const mitk::DataNode* node)
+{
+    if (dynamic_cast<mitk::PlanarFigure*>(node->GetData()))
+        this->GetDataStorage()->Remove(m_ClusteringResult);
+
+    if(  node == m_SelectedPlanarFigureNodes->GetNode().GetPointer()
+         || node == m_SelectedMaskNode.GetPointer() )
+    {
+        this->Select(nullptr,true,false);
+        SetMeasurementInfoToRenderWindow("");
+    }
+
+    if(  node == m_SelectedImageNodes->GetNode().GetPointer() )
+    {
+        this->Select(nullptr,false,true);
+        SetMeasurementInfoToRenderWindow("");
+    }
+}
+
+void QmitkPartialVolumeAnalysisView::NodeAddedInDataStorage(const mitk::DataNode* node)
+{
+    if(!m_Visible)
+        return;
+
+    mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(node);
+    mitk::PlanarFigure* figure = dynamic_cast<mitk::PlanarFigure*>(nonConstNode->GetData());
+
+    if(figure)
+    {
+
+        // set interactor for new node (if not already set)
+        mitk::PlanarFigureInteractor::Pointer figureInteractor
+                = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
+
+        if(figureInteractor.IsNull())
+        {
+          figureInteractor = mitk::PlanarFigureInteractor::New();
+          us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "MitkPlanarFigure" );
+          figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+          figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+          figureInteractor->SetDataNode( nonConstNode );
+        }
+
+        // remove uninitialized old planars
+        if( m_SelectedPlanarFigureNodes->GetNode().IsNotNull() && m_CurrentFigureNodeInitialized == false )
+        {
+            this->GetDataStorage()->Remove(m_SelectedPlanarFigureNodes->GetNode());
+        }
+
+    }
+}
+
+void QmitkPartialVolumeAnalysisView::TextIntON()
+{
+    if(m_ClusteringResult.IsNotNull())
+    {
+        if(m_TexIsOn)
+        {
+            m_Controls->m_TextureIntON->setIcon(*m_IconTexOFF);
+        }
+        else
+        {
+            m_Controls->m_TextureIntON->setIcon(*m_IconTexON);
+        }
+
+        m_ClusteringResult->SetBoolProperty("texture interpolation", !m_TexIsOn);
+        m_TexIsOn = !m_TexIsOn;
+        this->RequestRenderWindowUpdate();
+    }
+}

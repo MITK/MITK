@@ -52,7 +52,7 @@ public:
    *
    * @param event <code>ServiceEvent</code> object from the framework.
    */
-  void ServiceChanged(const ServiceEvent event);
+  void ServiceChanged(const ServiceEvent event) override;
 
 private:
 
@@ -67,7 +67,7 @@ private:
    *
    * @GuardedBy this
    */
-  void Modified();
+  void Modified() override;
 
   /**
    * Call the specific customizer adding method. This method must not be
@@ -78,7 +78,7 @@ private:
    * @return Customized object for the tracked item or <code>null</code>
    *         if the item is not to be tracked.
    */
-  T CustomizerAdding(ServiceReference<S> item, const ServiceEvent& related);
+  T CustomizerAdding(ServiceReference<S> item, const ServiceEvent& related) override;
 
   /**
    * Call the specific customizer modified method. This method must not be
@@ -89,7 +89,7 @@ private:
    * @param object Customized object for the tracked item.
    */
   void CustomizerModified(ServiceReference<S> item,
-                          const ServiceEvent& related, T object) ;
+                          const ServiceEvent& related, T object) override ;
 
   /**
    * Call the specific customizer removed method. This method must not be
@@ -100,7 +100,7 @@ private:
    * @param object Customized object for the tracked item.
    */
   void CustomizerRemoved(ServiceReference<S> item,
-                         const ServiceEvent& related, T object) ;
+                         const ServiceEvent& related, T object) override ;
 };
 
 US_END_NAMESPACE

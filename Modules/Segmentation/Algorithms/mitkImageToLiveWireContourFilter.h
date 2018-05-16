@@ -63,7 +63,7 @@ namespace mitk
   protected:
     ImageToLiveWireContourFilter();
 
-    virtual ~ImageToLiveWireContourFilter();
+    ~ImageToLiveWireContourFilter() override;
 
     void GenerateData() override;
 

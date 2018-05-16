@@ -32,7 +32,7 @@ class QtLogView : public QWidget
 
 public:
     QtLogView(QWidget *parent = nullptr);
-    ~QtLogView();
+    ~QtLogView() override;
     QtPlatformLogModel *model;
     QSortFilterProxyModel *filterModel;
 

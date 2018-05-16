@@ -95,7 +95,7 @@ namespace mitk
 
   protected:
     GradientBackground();
-    ~GradientBackground();
+    ~GradientBackground() override;
 
     vtkSmartPointer<vtkRenderWindow> m_RenderWindow;
 

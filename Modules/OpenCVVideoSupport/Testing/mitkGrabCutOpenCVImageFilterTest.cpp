@@ -20,17 +20,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkIndex.h"
 #include <itksys/SystemTools.hxx>
 
-#include <highgui.h>
-#include <cv.h>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
 
 #include "mitkOpenCVToMitkImageFilter.h"
 
 static void GrabCutTestLoadedImage(std::string imagePath, std::string maskPath, std::string resultMaskPath)
 {
   // load test images
-  cv::Mat image = cvLoadImage(imagePath.c_str());
-  cv::Mat maskImage = cvLoadImage(maskPath.c_str());
-  cv::Mat resultMaskImage = cvLoadImage(resultMaskPath.c_str());
+  cv::Mat image = cv::imread(imagePath.c_str());
+  cv::Mat maskImage = cv::imread(maskPath.c_str());
+  cv::Mat resultMaskImage = cv::imread(resultMaskPath.c_str());
 
   // make sure that the loaded mask is a gray scale image
   cv::Mat maskImageGray;

@@ -63,7 +63,7 @@ struct BERRY_UI_QT ISelectionListener: public virtual Object
     typedef MessageDelegate1<ISelectionListener, SelectionEvent::Pointer> Delegate;
   };
 
-  virtual ~ISelectionListener();
+  ~ISelectionListener() override;
 
   /**
    * Sent when selection occurs in the control.

@@ -52,9 +52,9 @@ class MITKIMAGESTATISTICS_EXPORT MaskUtilities: public itk::Object
         typename itk::Image<TPixel, VImageDimension>::Pointer ExtractMaskImageRegion();
 
     protected:
-        MaskUtilities(){}
+        MaskUtilities(): m_Image(nullptr), m_Mask(nullptr){}
 
-        ~MaskUtilities(){}
+        ~MaskUtilities() override{}
 
     private:
         itk::Image<TPixel, VImageDimension>* m_Image;

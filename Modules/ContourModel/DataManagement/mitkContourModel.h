@@ -255,7 +255,7 @@ namespace mitk
 
     /** \brief Returns whether the contour model is empty.
     */
-    virtual bool IsEmpty() const override;
+    bool IsEmpty() const override;
 
     /** \brief Returns the vertex at the index position within the container.
     */
@@ -269,7 +269,7 @@ namespace mitk
 
     /** \brief Check if there isn't something at this timestep.
     */
-    virtual bool IsEmptyTimeStep(unsigned int t) const override;
+    bool IsEmptyTimeStep(unsigned int t) const override;
 
     /** \brief Check if mouse cursor is near the contour.
     */
@@ -345,7 +345,7 @@ namespace mitk
 
     /** \brief Initialize all data objects
     */
-    virtual void Initialize() override;
+    void Initialize() override;
 
     /** \brief Initialize object with specs of other contour.
     Note: No data will be copied.
@@ -356,17 +356,17 @@ namespace mitk
     /**
     \brief Inherit from base data - no region support available for contourModel objects.
     */
-    virtual void SetRequestedRegionToLargestPossibleRegion() override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
 
     /**
     \brief Inherit from base data - no region support available for contourModel objects.
     */
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
     /**
     \brief Inherit from base data - no region support available for contourModel objects.
     */
-    virtual bool VerifyRequestedRegion() override;
+    bool VerifyRequestedRegion() override;
 
     /**
     \brief Get the updated geometry with recomputed bounds.
@@ -381,19 +381,19 @@ namespace mitk
     /**
     \brief Inherit from base data - no region support available for contourModel objects.
     */
-    virtual void SetRequestedRegion(const itk::DataObject *data) override;
+    void SetRequestedRegion(const itk::DataObject *data) override;
 
     /**
     \brief Expand the timebounds of the TimeGeometry to given number of timesteps.
     */
-    virtual void Expand(unsigned int timeSteps) override;
+    void Expand(unsigned int timeSteps) override;
 
     /**
     \brief Update the OutputInformation of a ContourModel object
 
     The BoundingBox of the contour will be updated, if necessary.
     */
-    virtual void UpdateOutputInformation() override;
+    void UpdateOutputInformation() override;
 
     /**
     \brief Clear the storage container.
@@ -401,7 +401,7 @@ namespace mitk
     The object is set to initial state. All control points are removed and the number of
     timesteps are set to 1.
     */
-    virtual void Clear() override;
+    void Clear() override;
 
     /**
     \brief overwrite if the Data can be called by an Interactor (StateMachine).
@@ -419,13 +419,13 @@ namespace mitk
 
     ContourModel();
     ContourModel(const mitk::ContourModel &other);
-    virtual ~ContourModel();
+    ~ContourModel() override;
 
     // inherit from BaseData. called by Clear()
-    virtual void ClearData() override;
+    void ClearData() override;
 
     // inherit from BaseData. Initial state of a contour with no vertices and a single timestep.
-    virtual void InitializeEmpty() override;
+    void InitializeEmpty() override;
 
     // Shift a vertex
     void ShiftVertex(VertexType *vertex, mitk::Vector3D &vector);

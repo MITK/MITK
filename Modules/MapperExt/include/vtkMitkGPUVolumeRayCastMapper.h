@@ -41,9 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkVersionMacros.h"
 #include "vtkVolumeMapper.h"
 
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 6)))
-
 class vtkVolumeProperty;
 class vtkRenderWindow;
 
@@ -198,7 +195,7 @@ public:
 
 protected:
   vtkMitkGPUVolumeRayCastMapper();
-  ~vtkMitkGPUVolumeRayCastMapper();
+  ~vtkMitkGPUVolumeRayCastMapper() override;
 
   // Check to see that the render will be OK
   int ValidateRender(vtkRenderer *, vtkVolume *);
@@ -293,7 +290,5 @@ private:
   vtkMitkGPUVolumeRayCastMapper(const vtkMitkGPUVolumeRayCastMapper &); // Not implemented.
   void operator=(const vtkMitkGPUVolumeRayCastMapper &);                // Not implemented.
 };
-
-#endif
 
 #endif

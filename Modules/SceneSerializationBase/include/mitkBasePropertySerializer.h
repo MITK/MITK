@@ -64,7 +64,7 @@ namespace mitk
 
   protected:
     BasePropertySerializer();
-    virtual ~BasePropertySerializer();
+    ~BasePropertySerializer() override;
 
     BaseProperty::ConstPointer m_Property;
   };

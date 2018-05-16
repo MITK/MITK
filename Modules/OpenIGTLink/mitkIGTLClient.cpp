@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include "mitkIGTTimeStamp.h"
 //#include "mitkIGTHardwareException.h"
 #include "igtlTrackingDataMessage.h"
-#include <stdio.h>
+#include <cstdio>
 
 #include <itksys/SystemTools.hxx>
 #include <itkMutexLockHolder.h>
@@ -81,7 +81,7 @@ bool mitk::IGTLClient::OpenConnection()
 
 void mitk::IGTLClient::Receive()
 {
-  MITK_INFO << "Trying to receive message";
+  //MITK_INFO << "Trying to receive message";
   //try to receive a message, if the socket is not present anymore stop the
   //communication
   unsigned int status = this->ReceivePrivate(this->m_Socket);
@@ -96,16 +96,16 @@ void mitk::IGTLClient::Receive()
 
 void mitk::IGTLClient::Send()
 {
-  igtl::MessageBase::Pointer curMessage;
+  mitk::IGTLMessage::Pointer mitkMessage;
 
   //get the latest message from the queue
-  curMessage = this->m_MessageQueue->PullSendMessage();
+  mitkMessage = this->m_MessageQueue->PullSendMessage();
 
   // there is no message => return
-  if (curMessage.IsNull())
+  if (mitkMessage.IsNull())
     return;
 
-  if (!this->SendMessagePrivate(curMessage.GetPointer(), this->m_Socket))
+  if (!this->SendMessagePrivate(mitkMessage, this->m_Socket))
   {
     MITK_WARN("IGTLDevice") << "Could not send the message.";
   }

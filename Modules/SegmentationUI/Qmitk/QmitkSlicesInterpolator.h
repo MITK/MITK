@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSliceNavigationController.h"
 #include "mitkSurfaceInterpolationController.h"
 #include "mitkToolManager.h"
-#include "mitkWeakPointer.h"
 #include <MitkSegmentationUIExports.h>
 
 #include "mitkFeatureBasedEdgeDetectionFilter.h"
@@ -82,7 +81,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSlicesInterpolator : public QWidget
   Q_OBJECT
 
 public:
-  QmitkSlicesInterpolator(QWidget *parent = 0, const char *name = 0);
+  QmitkSlicesInterpolator(QWidget *parent = nullptr, const char *name = nullptr);
 
   /**
     To be called once before real use.
@@ -91,7 +90,7 @@ public:
 
   void Uninitialize();
 
-  virtual ~QmitkSlicesInterpolator();
+  ~QmitkSlicesInterpolator() override;
 
   void SetDataStorage(mitk::DataStorage::Pointer storage);
   mitk::DataStorage *GetDataStorage();
@@ -145,7 +144,7 @@ public slots:
   /**
     Call this from the outside to accept all interpolations
   */
-  void FinishInterpolation(mitk::SliceNavigationController *slicer = NULL);
+  void FinishInterpolation(mitk::SliceNavigationController *slicer = nullptr);
 
 protected slots:
 

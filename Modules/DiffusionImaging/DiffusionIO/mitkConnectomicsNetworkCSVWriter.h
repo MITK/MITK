@@ -41,17 +41,17 @@ namespace mitk
     typedef std::vector< mitk::ConnectomicsNetwork::NetworkNode >  VertexVectorType;
 
     ConnectomicsNetworkCSVWriter();
-    virtual ~ConnectomicsNetworkCSVWriter();
+    ~ConnectomicsNetworkCSVWriter() override;
 
     using AbstractFileWriter::Write;
-    virtual void Write();
+    void Write() override;
 
-    mitk::IFileIO::ConfidenceLevel GetConfidenceLevel() const;
+    mitk::IFileIO::ConfidenceLevel GetConfidenceLevel() const override;
 
   protected:
 
     ConnectomicsNetworkCSVWriter(const ConnectomicsNetworkCSVWriter& other);
-    virtual mitk::ConnectomicsNetworkCSVWriter* Clone() const;
+    mitk::ConnectomicsNetworkCSVWriter* Clone() const override;
 
   };
 

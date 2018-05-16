@@ -47,8 +47,8 @@ public:
 
   void tearDown() override
   {
-    m_ImageToIGTLMessageFilter = NULL;
-    m_TestImage = NULL;
+    m_ImageToIGTLMessageFilter = nullptr;
+    m_TestImage = nullptr;
   }
 
   void TestMinimumImage()

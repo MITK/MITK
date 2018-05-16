@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+
+    <view id="org.mitk.views.diffusionpreprocessing"
+    name="Preprocessing"
+    category="Preprocessing"
+    class="QmitkPreprocessingView"
+    icon="resources/dwi2.png">
+    <keywordReference id="org.mitk.views.diffusionpreprocessing.Keyword"/>
+    </view>
+
+  </extension>
+
+  <extension point="org.blueberry.ui.perspectives">
+
+    <perspective id="org.mitk.perspectives.dwipreprocessing"
+    name="Preprocessing"
+    class="QmitkDwiPreprocessingPerspective"
+    icon="resources/dwi2.png">
+    <description>This perspective contains views for diffusion-weighted image preprocessing such as head motion correction, registration, denoising and gradient manipulation.</description>
+    </perspective>
+
+  </extension>
+
+</plugin>

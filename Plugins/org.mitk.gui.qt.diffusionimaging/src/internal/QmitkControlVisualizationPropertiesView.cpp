@@ -23,20 +23,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkResliceMethodProperty.h"
 #include "mitkRenderingManager.h"
 
-#include "mitkTbssImage.h"
+#include "mitkImageCast.h"
+#include "mitkShImage.h"
 #include "mitkPlanarFigure.h"
 #include "mitkFiberBundle.h"
 #include "QmitkDataStorageComboBox.h"
-#include "QmitkStdMultiWidget.h"
 #include "mitkPlanarFigureInteractor.h"
-#include <mitkQBallImage.h>
+#include <mitkOdfImage.h>
 #include <mitkTensorImage.h>
 #include <mitkImage.h>
 #include <mitkDiffusionPropertyHelper.h>
 #include <mitkConnectomicsNetwork.h>
 #include "usModuleRegistry.h"
-
+#include <mitkPeakImage.h>
+#include <mitkBaseRenderer.h>
 #include "mitkPlaneGeometry.h"
+#include <QmitkRenderWindow.h>
+#include <itkFlipPeaksFilter.h>
+#include <mitkImageToItk.h>
 
 #include "berryIWorkbenchWindow.h"
 #include "berryIWorkbenchPage.h"
@@ -51,7 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "qcolordialog.h"
 #include <QRgb>
 #include <itkMultiThreader.h>
-
+#include <mitkClippingProperty.h>
 #include <ciso646>
 
 #define ROUND(a) ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
@@ -61,10 +65,9 @@ const std::string QmitkControlVisualizationPropertiesView::VIEW_ID = "org.mitk.v
 using namespace berry;
 
 QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView()
-  : QmitkFunctionality(),
-    m_Controls(NULL),
-    m_MultiWidget(NULL),
-    m_NodeUsedForOdfVisualization(NULL),
+  : QmitkAbstractView(),
+    m_Controls(nullptr),
+    m_CurrentSelection(0),
     m_IconTexOFF(new QIcon(":/QmitkDiffusionImaging/texIntOFFIcon.png")),
     m_IconTexON(new QIcon(":/QmitkDiffusionImaging/texIntONIcon.png")),
     m_IconGlyOFF_T(new QIcon(":/QmitkDiffusionImaging/glyphsoff_T.png")),
@@ -73,17 +76,15 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
     m_IconGlyON_C(new QIcon(":/QmitkDiffusionImaging/glyphson_C.png")),
     m_IconGlyOFF_S(new QIcon(":/QmitkDiffusionImaging/glyphsoff_S.png")),
     m_IconGlyON_S(new QIcon(":/QmitkDiffusionImaging/glyphson_S.png")),
-    m_CurrentSelection(0),
-    m_CurrentPickingNode(0),
-    m_GlyIsOn_S(false),
-    m_GlyIsOn_C(false),
     m_GlyIsOn_T(false),
-    m_FiberBundleObserverTag(0),
-    m_FiberBundleObserveOpacityTag(0),
-    m_Color(NULL)
+    m_GlyIsOn_C(false),
+    m_GlyIsOn_S(false),
+    m_CurrentPickingNode(0),
+    m_ColorPropertyObserverTag(0),
+    m_OpacityPropertyObserverTag(0)
 {
   currentThickSlicesMode = 1;
-  m_MyMenu = NULL;
+  m_MyMenu = nullptr;
   int numThread = itk::MultiThreader::GetGlobalMaximumNumberOfThreads();
   if (numThread > 12)
     numThread = 12;
@@ -93,7 +94,7 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
 
 QmitkControlVisualizationPropertiesView::~QmitkControlVisualizationPropertiesView()
 {
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener.data());
+
 }
 
 
@@ -103,59 +104,52 @@ void QmitkControlVisualizationPropertiesView::OnThickSlicesModeSelected( QAction
 
   switch( currentThickSlicesMode )
   {
-    case 0: // toInt() returns 0 'otherwise'.
-    {
-      return; // dummy code/todo: implement stuff.
-      break;
-    }
-    case 1:
-    {
-      this->m_Controls->m_TSMenu->setText("MIP");
-      break;
-    }
-    case 2:
-    {
-      this->m_Controls->m_TSMenu->setText("SUM");
-      break;
-    }
-    case 3:
-    {
-      this->m_Controls->m_TSMenu->setText("WEIGH");
-      break;
-    }
-    default:
-    {
-      return; // dummy code/todo: implement stuff.
-      break;
-    }
+  case 0: // toInt() returns 0 'otherwise'.
+    return; // dummy code/todo: implement stuff.
+
+  case 1:
+    this->m_Controls->m_TSMenu->setText("MIP");
+    break;
+
+  case 2:
+    this->m_Controls->m_TSMenu->setText("SUM");
+    break;
+
+  case 3:
+    this->m_Controls->m_TSMenu->setText("WEIGH");
+    break;
+
+  default:
+    return; // dummy code/todo: implement stuff.
   }
 
-  if( this->m_MultiWidget )
+  if (auto renderWindowPart = this->GetRenderWindowPart(OPEN))
   {
-    mitk::DataNode* n = nullptr;
-    n = this->m_MultiWidget->GetWidgetPlane1();
-    if(n) { n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) ); }
+    /// TODO There is no way to access the individual crosshair planes through the render window part API.
+    /// There could be a new 'mitk::DataNode* mitk::ILinkedRenderWindowPart::GetSlicingPlane(const std::string& name) const'
+    /// function for this purpose. For the time being, I comment out the lines below, but they are valid
+    /// and they have to be re-enabled after the crosshair planes can be accessed again.
 
-    n = nullptr;
-    n = this->m_MultiWidget->GetWidgetPlane2();
-    if(n) { n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) ); }
+    //    mitk::DataNode* n;
+    //    n = renderWindowPart->GetSlicingPlane("axial");
+    //    if (n) { n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) ); }
 
-    n = nullptr;
-    n = this->m_MultiWidget->GetWidgetPlane3();
-    if(n) { n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) ); }
+    //    n = renderWindowPart->GetSlicingPlane("sagittal");
+    //    if (n) { n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) ); }
+
+    //    n = renderWindowPart->GetSlicingPlane("coronal");
+    //    if (n) { n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) ); }
 
 
-    mitk::BaseRenderer::Pointer renderer = nullptr;
-    renderer = this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer();
-    if(renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
+    mitk::BaseRenderer::Pointer renderer;
+    renderer = renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer();
+    if (renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
 
-    renderer = nullptr;
-    renderer = this->GetActiveStdMultiWidget()->GetRenderWindow2()->GetRenderer();
-    if(renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
+    renderer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetRenderer();
+    if (renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
 
-    renderer = nullptr;
-    renderer = this->GetActiveStdMultiWidget()->GetRenderWindow3()->GetRenderer();
-    if(renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
+    renderer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetRenderer();
+    if (renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
 
     renderer->GetRenderingManager()->RequestUpdateAll();
   }
@@ -164,79 +158,63 @@ void QmitkControlVisualizationPropertiesView::OnThickSlicesModeSelected( QAction
 
 void QmitkControlVisualizationPropertiesView::OnTSNumChanged( int num )
 {
-  if( this->m_MultiWidget )
+  if (auto renderWindowPart = this->GetRenderWindowPart(OPEN))
   {
-    if( num==0 )
-    {
-      mitk::DataNode* n = nullptr;
-      n = this->m_MultiWidget->GetWidgetPlane1();
-      if(n)
-      {
-        n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
-        n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-        n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
-      }
 
-      n = nullptr;
-      n = this->m_MultiWidget->GetWidgetPlane2();
-      if(n)
-      {
-        n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
-        n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-        n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
-      }
+    /// TODO There is no way to access the individual crosshair planes through the render window part API.
+    /// There could be a new 'mitk::DataNode* mitk::ILinkedRenderWindowPart::GetSlicingPlane(const std::string& name) const'
+    /// function for this purpose. For the time being, I comment out the lines below, but they are valid
+    /// and they have to be re-enabled after the crosshair planes can be accessed again.
 
-      n = nullptr;
-      n = this->m_MultiWidget->GetWidgetPlane3();
-      if(n)
-      {
-        n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
-        n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-        n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
-      }
-    }
-    else
-    {
-      mitk::DataNode* n = nullptr;
-      n = this->m_MultiWidget->GetWidgetPlane1();
-      if(n)
-      {
-        n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
-        n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-        n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( (num>0) ) );
-      }
-
-      n = nullptr;
-      n = this->m_MultiWidget->GetWidgetPlane2();
-      if(n)
-      {
-        n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
-        n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-        n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( (num>0) ) );
-      }
-
-      n = nullptr;
-      n = this->m_MultiWidget->GetWidgetPlane3();
-      if(n)
-      {
-        n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
-        n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-        n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( (num>0) ) );
-      }
-    }
+    //    if(num==0)
+    //    {
+    //      mitk::DataNode* n;
+    //      n = renderWindowPart->GetSlicingPlane("axial");
+    //      if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
+    //      if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+    //      if(n) n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
+    //
+    //      n = renderWindowPart->GetSlicingPlane("sagittal");
+    //      if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
+    //      if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+    //      if(n) n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
+    //
+    //      n = renderWindowPart->GetSlicingPlane("coronal");
+    //      if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
+    //      if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+    //      if(n) n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
+    //    }
+    //    else
+    //    {
+    //      mitk::DataNode* n;
+    //      n = renderWindowPart->GetSlicingPlane("axial");
+    //      if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
+    //      if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+    //      if(n) n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( (num>0) ) );
+    //
+    //      n = renderWindowPart->GetSlicingPlane("sagittal");
+    //      if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
+    //      if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+    //      if(n) n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( (num>0) ) );
+    //
+    //      n = renderWindowPart->GetSlicingPlane("coronal");
+    //      if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
+    //      if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+    //      if(n) n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( (num>0) ) );
+    //    }
 
     m_TSLabel->setText(QString::number( num*2 + 1 ));
 
-    mitk::BaseRenderer::Pointer renderer = nullptr;
-    renderer = this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer();
+    mitk::BaseRenderer::Pointer renderer;
+    renderer = renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer();
     if(renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
 
     renderer = nullptr;
-    renderer = this->GetActiveStdMultiWidget()->GetRenderWindow2()->GetRenderer();
+    renderer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetRenderer();
     if(renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
 
     renderer = nullptr;
-    renderer = this->GetActiveStdMultiWidget()->GetRenderWindow3()->GetRenderer();
+    renderer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetRenderer();
     if(renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
 
     renderer->GetRenderingManager()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
@@ -273,15 +251,38 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
     }
 #endif
 
-    m_Controls->m_ScalingFrame->setVisible(false);
     m_Controls->m_NormalizationFrame->setVisible(false);
+    m_Controls->m_Crosshair->setVisible(false);
+
+    mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+    if (renderWindow)
+    {
+      m_SliceChangeListener.RenderWindowPartActivated(renderWindow);
+      connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
+    }
+
+    connect(m_Controls->m_SetColor1, SIGNAL(clicked()), this, SLOT(SetColor()));
+    connect(m_Controls->m_SetColor2, SIGNAL(clicked()), this, SLOT(SetColor()));
   }
 }
 
-
-void QmitkControlVisualizationPropertiesView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
+void QmitkControlVisualizationPropertiesView::SetColor()
 {
-  m_MultiWidget = &stdMultiWidget;
+  if(m_SelectedNode)
+  {
+    QColor c = QColorDialog::getColor();
+    float rgb[3];
+    rgb[0] = c.redF();
+    rgb[1] = c.greenF();
+    rgb[2] = c.blueF();
+    m_SelectedNode->SetColor(rgb);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+}
+
+void QmitkControlVisualizationPropertiesView::SetFocus()
+{
+  m_Controls->m_TSMenu->setFocus();
 }
 
 
@@ -304,12 +305,6 @@ void QmitkControlVisualizationPropertiesView::SliceRotation(const itk::EventObje
 }
 
 
-void QmitkControlVisualizationPropertiesView::StdMultiWidgetNotAvailable()
-{
-  m_MultiWidget = NULL;
-}
-
-
 void QmitkControlVisualizationPropertiesView::NodeRemoved(const mitk::DataNode* /*node*/)
 {
 }
@@ -327,28 +322,31 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect( (QObject*)(m_Controls->m_NormalizationDropdown), SIGNAL(currentIndexChanged(int)), this, SLOT(NormalizationDropdownChanged(int)) );
     connect( (QObject*)(m_Controls->m_ScalingFactor), SIGNAL(valueChanged(double)), this, SLOT(ScalingFactorChanged(double)) );
     connect( (QObject*)(m_Controls->m_AdditionalScaling), SIGNAL(currentIndexChanged(int)), this, SLOT(AdditionalScaling(int)) );
-    connect( (QObject*)(m_Controls->m_ScalingCheckbox), SIGNAL(clicked()), this, SLOT(ScalingCheckbox()) );
-    connect((QObject*) m_Controls->m_ResetColoring, SIGNAL(clicked()), (QObject*) this, SLOT(BundleRepresentationResetColoring()));
+    connect((QObject*) m_Controls->m_ResetColoring, SIGNAL(clicked()), (QObject*) this, SLOT(ResetColoring()));
+    connect((QObject*) m_Controls->m_ResetColoring2, SIGNAL(clicked()), (QObject*) this, SLOT(ResetColoring()));
     connect((QObject*) m_Controls->m_FiberFading2D, SIGNAL(clicked()), (QObject*) this, SLOT( Fiber2DfadingEFX() ) );
     connect((QObject*) m_Controls->m_FiberThicknessSlider, SIGNAL(sliderReleased()), (QObject*) this, SLOT( FiberSlicingThickness2D() ) );
     connect((QObject*) m_Controls->m_FiberThicknessSlider, SIGNAL(valueChanged(int)), (QObject*) this, SLOT( FiberSlicingUpdateLabel(int) ));
     connect((QObject*) m_Controls->m_Crosshair, SIGNAL(clicked()), (QObject*) this, SLOT(SetInteractor()));
     connect((QObject*) m_Controls->m_LineWidth, SIGNAL(editingFinished()), (QObject*) this, SLOT(LineWidthChanged()));
     connect((QObject*) m_Controls->m_TubeWidth, SIGNAL(editingFinished()), (QObject*) this, SLOT(TubeRadiusChanged()));
-    connect( (QObject*) m_Controls->m_EllipsoidViewRadioButton, SIGNAL(toggled(bool)), (QObject*) this, SLOT(OnTensorViewChanged() ) );
-    connect( (QObject*) m_Controls->m_colouriseRainbowRadioButton, SIGNAL(toggled(bool)), (QObject*) this, SLOT(OnColourisationModeChanged() ) );
-    connect( (QObject*) m_Controls->m_randomModeRadioButton, SIGNAL(toggled(bool)), (QObject*) this, SLOT(OnRandomModeChanged() ) );
+    connect((QObject*) m_Controls->m_RibbonWidth, SIGNAL(editingFinished()), (QObject*) this, SLOT(RibbonWidthChanged()));
+    connect( (QObject*) m_Controls->m_OdfColorBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(OnColourisationModeChanged() ) );
+    connect((QObject*) m_Controls->m_Clip0, SIGNAL(toggled(bool)), (QObject*) this, SLOT(Toggle3DClipping(bool)));
+    connect((QObject*) m_Controls->m_Clip1, SIGNAL(toggled(bool)), (QObject*) this, SLOT(Toggle3DClipping(bool)));
+    connect((QObject*) m_Controls->m_Clip2, SIGNAL(toggled(bool)), (QObject*) this, SLOT(Toggle3DClipping(bool)));
+    connect((QObject*) m_Controls->m_Clip3, SIGNAL(toggled(bool)), (QObject*) this, SLOT(Toggle3DClipping(bool)));
+    connect((QObject*) m_Controls->m_FlipClipBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(Toggle3DClipping()));
+    connect((QObject*) m_Controls->m_Enable3dPeaks, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(Toggle3DPeaks()));
+
+    connect((QObject*) m_Controls->m_FlipPeaksButton, SIGNAL(clicked()), (QObject*) this, SLOT(FlipPeaks()));
+
+    m_Controls->m_BundleControlsFrame->setVisible(false);
+    m_Controls->m_ImageControlsFrame->setVisible(false);
+    m_Controls->m_PeakImageFrame->setVisible(false);
+    m_Controls->m_lblRotatedPlanesWarning->setVisible(false);
+    m_Controls->m_3DClippingBox->setVisible(false);
   }
-}
-
-
-void QmitkControlVisualizationPropertiesView::Activated()
-{
-}
-
-
-void QmitkControlVisualizationPropertiesView::Deactivated()
-{
 }
 
 
@@ -368,7 +366,7 @@ void QmitkControlVisualizationPropertiesView::NodeAdded(const mitk::DataNode *no
     int displayChannelPropertyValue = 0;
     mitk::BValueMapProperty* bmapproperty
         = static_cast<mitk::BValueMapProperty*>
-        (dimg->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() );
+          (dimg->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() );
 
     mitk::DiffusionPropertyHelper::BValueMapType map = bmapproperty->GetBValueMap();
 
@@ -381,10 +379,14 @@ void QmitkControlVisualizationPropertiesView::NodeAdded(const mitk::DataNode *no
 
 /* OnSelectionChanged is registered to SelectionService, therefore no need to
 implement SelectionService Listener explicitly */
-void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
   m_Controls->m_BundleControlsFrame->setVisible(false);
   m_Controls->m_ImageControlsFrame->setVisible(false);
+  m_Controls->m_PeakImageFrame->setVisible(false);
+  m_Controls->m_3DClippingBox->setVisible(false);
+  m_Controls->m_FlipClipBox->setVisible(false);
+  m_Controls->m_Enable3dPeaks->setVisible(false);
 
   if (nodes.size()>1) // only do stuff if one node is selected
     return;
@@ -393,46 +395,89 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
   m_Controls->m_GlyphFrame->setVisible(false);
   m_Controls->m_TSMenu->setVisible(false);
 
-  m_SelectedNode = NULL;
+  m_SelectedNode = nullptr;
 
   int numOdfImages = 0;
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
+  for (mitk::DataNode::Pointer node: nodes)
   {
-    mitk::DataNode::Pointer node = *it;
     if(node.IsNull())
       continue;
 
     mitk::BaseData* nodeData = node->GetData();
-    if(nodeData == NULL)
+    if(nodeData == nullptr)
       continue;
 
     m_SelectedNode = node;
 
-    if (dynamic_cast<mitk::FiberBundle*>(nodeData))
+    if (dynamic_cast<mitk::PeakImage*>(nodeData))
     {
-      // handle fiber bundle property observers
-      if (m_Color.IsNotNull()) { m_Color->RemoveObserver(m_FiberBundleObserverTag); }
-      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command
-          = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
-      command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::SetFiberBundleCustomColor );
-      m_Color = dynamic_cast<mitk::ColorProperty*>(node->GetProperty("color", NULL));
+      m_Controls->m_PeakImageFrame->setVisible(true);
+
       if (m_Color.IsNotNull())
-        m_FiberBundleObserverTag = m_Color->AddObserver( itk::ModifiedEvent(), command );
+        m_Color->RemoveObserver(m_ColorPropertyObserverTag);
 
-      if (m_Opacity.IsNotNull())
+      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
+      command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::SetCustomColor );
+      m_Color = dynamic_cast<mitk::ColorProperty*>(node->GetProperty("color", nullptr));
+      if (m_Color.IsNotNull())
+        m_ColorPropertyObserverTag = m_Color->AddObserver( itk::ModifiedEvent(), command );
+
+      int ClippingPlaneId = -1;
+      m_SelectedNode->GetPropertyValue("3DClippingPlaneId",ClippingPlaneId);
+      switch(ClippingPlaneId)
       {
-        m_Opacity->RemoveObserver(m_FiberBundleObserveOpacityTag);
+      case 0:
+        m_Controls->m_Clip0->setChecked(1);
+        break;
+      case 1:
+        m_Controls->m_Clip1->setChecked(1);
+        break;
+      case 2:
+        m_Controls->m_Clip2->setChecked(1);
+        break;
+      case 3:
+        m_Controls->m_Clip3->setChecked(1);
+        break;
+      default :
+        m_Controls->m_Clip0->setChecked(1);
       }
-      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command2
-          = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
-      command2->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::SetFiberBundleOpacity );
-      m_Opacity = dynamic_cast<mitk::FloatProperty*>(node->GetProperty("opacity", NULL));
 
-      if (m_Opacity.IsNotNull())
+      m_Controls->m_Enable3dPeaks->setVisible(true);
+      m_Controls->m_3DClippingBox->setVisible(true);
+    }
+    else if (dynamic_cast<mitk::FiberBundle*>(nodeData))
+    {
+      int ClippingPlaneId = -1;
+      m_SelectedNode->GetPropertyValue("3DClippingPlaneId",ClippingPlaneId);
+      switch(ClippingPlaneId)
       {
-        m_FiberBundleObserveOpacityTag = m_Opacity->AddObserver( itk::ModifiedEvent(), command2 );
+      case 0:
+        m_Controls->m_Clip0->setChecked(1);
+        break;
+      case 1:
+        m_Controls->m_Clip1->setChecked(1);
+        break;
+      case 2:
+        m_Controls->m_Clip2->setChecked(1);
+        break;
+      case 3:
+        m_Controls->m_Clip3->setChecked(1);
+        break;
+      default :
+        m_Controls->m_Clip0->setChecked(1);
       }
 
+      // handle fiber property observers
+      if (m_Color.IsNotNull())
+        m_Color->RemoveObserver(m_ColorPropertyObserverTag);
+      itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
+      command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::SetCustomColor );
+      m_Color = dynamic_cast<mitk::ColorProperty*>(node->GetProperty("color", nullptr));
+      if (m_Color.IsNotNull())
+        m_ColorPropertyObserverTag = m_Color->AddObserver( itk::ModifiedEvent(), command );
+
+      m_Controls->m_FlipClipBox->setVisible(true);
+      m_Controls->m_3DClippingBox->setVisible(true);
       m_Controls->m_BundleControlsFrame->setVisible(true);
 
       if(m_CurrentPickingNode != 0 && node.GetPointer() != m_CurrentPickingNode)
@@ -459,7 +504,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
       m_Controls->m_FiberThicknessSlider->setMaximum(max * 10);
       m_Controls->m_FiberThicknessSlider->setValue(range * 10);
     }
-    else if(dynamic_cast<mitk::QBallImage*>(nodeData) || dynamic_cast<mitk::TensorImage*>(nodeData))
+    else if(dynamic_cast<mitk::OdfImage*>(nodeData) || dynamic_cast<mitk::TensorImage*>(nodeData) || dynamic_cast<mitk::ShImage*>(nodeData))
     {
       m_Controls->m_ImageControlsFrame->setVisible(true);
       m_Controls->m_NumberGlyphsFrame->setVisible(true);
@@ -477,41 +522,36 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
       m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_C", m_GlyIsOn_C);
       m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_T", m_GlyIsOn_T);
 
+      if (dynamic_cast<mitk::TensorImage*>(nodeData))
+      {
+        m_Controls->m_NormalizationDropdown->setVisible(false);
+        m_Controls->m_NormalizationLabel->setVisible(false);
+      }
+      else
+      {
+        m_Controls->m_NormalizationDropdown->setVisible(true);
+        m_Controls->m_NormalizationLabel->setVisible(true);
+      }
+
+
       int val;
       node->GetIntProperty("ShowMaxNumber", val);
       m_Controls->m_ShowMaxNumber->setValue(val);
 
-      m_Controls->m_NormalizationDropdown
-          ->setCurrentIndex(dynamic_cast<mitk::EnumerationProperty*>(node->GetProperty("Normalization"))
-                            ->GetValueAsId());
+      m_Controls->m_NormalizationDropdown->setCurrentIndex(dynamic_cast<mitk::EnumerationProperty*>(node->GetProperty("Normalization"))->GetValueAsId());
 
       float fval;
       node->GetFloatProperty("Scaling",fval);
       m_Controls->m_ScalingFactor->setValue(fval);
 
-      m_Controls->m_AdditionalScaling
-          ->setCurrentIndex(dynamic_cast<mitk::EnumerationProperty*>(node->GetProperty("ScaleBy"))->GetValueAsId());
+      m_Controls->m_AdditionalScaling->setCurrentIndex(dynamic_cast<mitk::EnumerationProperty*>(node->GetProperty("ScaleBy"))->GetValueAsId());
 
       bool switchTensorViewValue = false;
       node->GetBoolProperty( "DiffusionCore.Rendering.OdfVtkMapper.SwitchTensorView", switchTensorViewValue );
-      if( dynamic_cast<mitk::TensorImage*>(nodeData) )
-      {
-        m_Controls-> m_EllipsoidViewRadioButton-> setEnabled( true );
-        m_Controls-> m_EllipsoidViewRadioButton-> setChecked( switchTensorViewValue );
-      }
-      else
-      {
-        m_Controls-> m_EllipsoidViewRadioButton-> setEnabled( false );
-        m_Controls-> m_EllipsoidViewRadioButton-> setChecked( false );
-      }
 
       bool colourisationModeBit = false;
-      node-> GetBoolProperty( "DiffusionCore.Rendering.OdfVtkMapper.ColourisationModeBit", colourisationModeBit );
-      m_Controls-> m_colouriseSimpleRadioButton-> setChecked( colourisationModeBit );
-
-      bool randomModeBit = false;
-      node-> GetBoolProperty( "DiffusionCore.Rendering.OdfVtkMapper.RandomModeBit", randomModeBit );
-      m_Controls-> m_randomModeRadioButton-> setChecked( randomModeBit );
+      node->GetBoolProperty("DiffusionCore.Rendering.OdfVtkMapper.ColourisationModeBit", colourisationModeBit );
+      m_Controls->m_OdfColorBox->setCurrentIndex(colourisationModeBit);
 
       numOdfImages++;
     }
@@ -547,9 +587,9 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
 
   int maxTS = 30;
 
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
+  for (auto node: nodes)
   {
-    mitk::Image* image = dynamic_cast<mitk::Image*>((*it)->GetData());
+    mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
     if (image)
     {
       int size = std::max(image->GetDimension(0), std::max(image->GetDimension(1), image->GetDimension(2)));
@@ -620,6 +660,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
   weightedThickSlicesAction->setData(3);
   myMenu->addAction( weightedThickSlicesAction );
 
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   connect( thickSliceModeActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(OnThickSlicesModeSelected(QAction*)) );
 }
 
@@ -629,20 +670,160 @@ void QmitkControlVisualizationPropertiesView::VisibleOdfsON_S()
   m_GlyIsOn_S = m_Controls->m_VisibleOdfsON_S->isChecked();
   if (m_NodeUsedForOdfVisualization.IsNull())
   {
-    MITK_WARN << "ODF visualization activated but m_NodeUsedForOdfVisualization is NULL";
+    MITK_WARN << "ODF visualization activated but m_NodeUsedForOdfVisualization is nullptr";
     return;
   }
   m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_S", m_GlyIsOn_S);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+void QmitkControlVisualizationPropertiesView::Visible()
+{
+  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+  if (renderWindow)
+  {
+    m_SliceChangeListener.RenderWindowPartActivated(renderWindow);
+    connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
+  }
+}
+
+void QmitkControlVisualizationPropertiesView::Hidden()
+{
+
+}
+
+void QmitkControlVisualizationPropertiesView::Activated()
+{
+  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+  if (renderWindow)
+  {
+    m_SliceChangeListener.RenderWindowPartActivated(renderWindow);
+    connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
+  }
+}
+
+void QmitkControlVisualizationPropertiesView::Deactivated()
+{
+}
+
+void QmitkControlVisualizationPropertiesView::FlipPeaks()
+{
+  if (m_SelectedNode.IsNull() || dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData())==nullptr)
+    return;
+
+  std::string name = m_SelectedNode->GetName();
+
+  mitk::Image::Pointer image = dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData());
+
+  typedef mitk::ImageToItk< mitk::PeakImage::ItkPeakImageType > CasterType;
+  CasterType::Pointer caster = CasterType::New();
+  caster->SetInput(image);
+  caster->Update();
+  mitk::PeakImage::ItkPeakImageType::Pointer itkImg = caster->GetOutput();
+
+  itk::FlipPeaksFilter< float >::Pointer flipper = itk::FlipPeaksFilter< float >::New();
+  flipper->SetInput(itkImg);
+  flipper->SetFlipX(m_Controls->m_FlipPeaksX->isChecked());
+  flipper->SetFlipY(m_Controls->m_FlipPeaksY->isChecked());
+  flipper->SetFlipZ(m_Controls->m_FlipPeaksZ->isChecked());
+  flipper->Update();
+
+  mitk::Image::Pointer resultImage = dynamic_cast<mitk::Image*>(mitk::PeakImage::New().GetPointer());
+  mitk::CastToMitkImage(flipper->GetOutput(), resultImage);
+  resultImage->SetVolume(flipper->GetOutput()->GetBufferPointer());
+  m_SelectedNode->SetData(resultImage);
+  m_SelectedNode->SetName(name);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkControlVisualizationPropertiesView::Toggle3DPeaks()
+{
+  if (m_SelectedNode.IsNull() || dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData())==nullptr)
+    return;
+
+  bool enabled = false;
+  m_SelectedNode->GetBoolProperty("Enable3DPeaks", enabled);
+  m_SelectedNode->SetBoolProperty( "Enable3DPeaks", !enabled );
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkControlVisualizationPropertiesView::Toggle3DClipping(bool enabled)
+{
+  if (!enabled || m_SelectedNode.IsNull() || (dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData())==nullptr && dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData())==nullptr))
+    return;
+
+  m_SelectedNode->SetBoolProperty( "3DClippingPlaneFlip", m_Controls->m_FlipClipBox->isChecked() );
+
+  if (m_Controls->m_Clip0->isChecked())
+  {
+    m_SelectedNode->SetIntProperty( "3DClippingPlaneId", 0 );
+    Set3DClippingPlane(true, m_SelectedNode, "");
+  }
+  else if (m_Controls->m_Clip1->isChecked())
+  {
+    m_SelectedNode->SetIntProperty( "3DClippingPlaneId", 1 );
+    Set3DClippingPlane(false, m_SelectedNode, "axial");
+  }
+  else if (m_Controls->m_Clip2->isChecked())
+  {
+    m_SelectedNode->SetIntProperty( "3DClippingPlaneId", 2 );
+    Set3DClippingPlane(false, m_SelectedNode, "sagittal");
+  }
+  else if (m_Controls->m_Clip3->isChecked())
+  {
+    m_SelectedNode->SetIntProperty( "3DClippingPlaneId", 3 );
+    Set3DClippingPlane(false, m_SelectedNode, "coronal");
+  }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkControlVisualizationPropertiesView::OnSliceChanged()
+{
+  mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->GetDataStorage()->GetAll();
+  for (unsigned int i=0; i<nodes->Size(); ++i)
+  {
+    mitk::DataNode::Pointer node = nodes->GetElement(i);
+    int plane_id = -1;
+    node->GetIntProperty("3DClippingPlaneId", plane_id);
+
+    if (plane_id==1)
+      Set3DClippingPlane(false, node, "axial");
+    else if (plane_id==2)
+      Set3DClippingPlane(false, node, "sagittal");
+    else if (plane_id==3)
+      Set3DClippingPlane(false, node, "coronal");
+  }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkControlVisualizationPropertiesView::Set3DClippingPlane(bool disable, mitk::DataNode* node, std::string plane)
+{
+  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+  if (renderWindow && node && (dynamic_cast<mitk::FiberBundle*>(node->GetData()) || dynamic_cast<mitk::PeakImage*>(node->GetData())))
+  {
+    mitk::Vector3D planeNormal; planeNormal.Fill(0.0);
+    mitk::Point3D planeOrigin; planeOrigin.Fill(0.0);
+    if (!disable)
+    {
+      mitk::SliceNavigationController* slicer = renderWindow->GetQmitkRenderWindow(QString(plane.c_str()))->GetSliceNavigationController();
+      mitk::PlaneGeometry::ConstPointer planeGeo = slicer->GetCurrentPlaneGeometry();
+      planeOrigin = this->GetRenderWindowPart()->GetSelectedPosition();
+      planeNormal = planeGeo->GetNormal();
+    }
+    node->SetProperty( "3DClipping", mitk::ClippingProperty::New( planeOrigin, planeNormal ) );
+    if (dynamic_cast<mitk::FiberBundle*>(node->GetData()))
+      dynamic_cast<mitk::FiberBundle*>(node->GetData())->RequestUpdate();
+    else
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+}
 
 void QmitkControlVisualizationPropertiesView::VisibleOdfsON_T()
 {
   m_GlyIsOn_T = m_Controls->m_VisibleOdfsON_T->isChecked();
   if (m_NodeUsedForOdfVisualization.IsNull())
   {
-    MITK_WARN << "ODF visualization activated but m_NodeUsedForOdfVisualization is NULL";
+    MITK_WARN << "ODF visualization activated but m_NodeUsedForOdfVisualization is nullptr";
     return;
   }
   m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_T", m_GlyIsOn_T);
@@ -655,7 +836,7 @@ void QmitkControlVisualizationPropertiesView::VisibleOdfsON_C()
   m_GlyIsOn_C = m_Controls->m_VisibleOdfsON_C->isChecked();
   if (m_NodeUsedForOdfVisualization.IsNull())
   {
-    MITK_WARN << "ODF visualization activated but m_NodeUsedForOdfVisualization is NULL";
+    MITK_WARN << "ODF visualization activated but m_NodeUsedForOdfVisualization is nullptr";
     return;
   }
   m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_C", m_GlyIsOn_C);
@@ -666,7 +847,7 @@ void QmitkControlVisualizationPropertiesView::VisibleOdfsON_C()
 bool QmitkControlVisualizationPropertiesView::IsPlaneRotated()
 {
   mitk::Image* currentImage = dynamic_cast<mitk::Image* >( m_NodeUsedForOdfVisualization->GetData() );
-  if( currentImage == NULL )
+  if( currentImage == nullptr )
   {
     MITK_ERROR << " Casting problems. Returning false";
     return false;
@@ -679,12 +860,14 @@ bool QmitkControlVisualizationPropertiesView::IsPlaneRotated()
   imageNormal1.Normalize();
   imageNormal2.Normalize();
 
+  auto renderWindowPart = this->GetRenderWindowPart();
+
   double eps = 0.000001;
-  // for all 2D renderwindows of m_MultiWidget check alignment
+  // for all 2D renderwindows of the render window part check alignment
   {
     mitk::PlaneGeometry::ConstPointer displayPlane
         = dynamic_cast<const mitk::PlaneGeometry*>
-        ( m_MultiWidget->GetRenderWindow1()->GetRenderer()->GetCurrentWorldGeometry2D() );
+          ( renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer()->GetCurrentWorldPlaneGeometry() );
 
     if (displayPlane.IsNull()) { return false; }
 
@@ -702,7 +885,7 @@ bool QmitkControlVisualizationPropertiesView::IsPlaneRotated()
   {
     mitk::PlaneGeometry::ConstPointer displayPlane
         = dynamic_cast<const mitk::PlaneGeometry*>
-        ( m_MultiWidget->GetRenderWindow2()->GetRenderer()->GetCurrentWorldGeometry2D() );
+          ( renderWindowPart->GetQmitkRenderWindow("sagittal")->GetRenderer()->GetCurrentWorldPlaneGeometry() );
 
     if (displayPlane.IsNull()) { return false; }
 
@@ -720,7 +903,7 @@ bool QmitkControlVisualizationPropertiesView::IsPlaneRotated()
   {
     mitk::PlaneGeometry::ConstPointer displayPlane
         = dynamic_cast<const mitk::PlaneGeometry*>
-        ( m_MultiWidget->GetRenderWindow3()->GetRenderer()->GetCurrentWorldGeometry2D() );
+          ( renderWindowPart->GetQmitkRenderWindow("coronal")->GetRenderer()->GetCurrentWorldPlaneGeometry() );
 
     if (displayPlane.IsNull()) { return false; }
 
@@ -749,8 +932,9 @@ void QmitkControlVisualizationPropertiesView::ShowMaxNumberChanged()
     maxNr = 1;
   }
 
-  if ( dynamic_cast<mitk::QBallImage*>(m_SelectedNode->GetData())
-       || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData()) )
+  if ( dynamic_cast<mitk::OdfImage*>(m_SelectedNode->GetData())
+       || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData())
+       || dynamic_cast<mitk::ShImage*>(m_SelectedNode->GetData()) )
   {
     m_SelectedNode->SetIntProperty("ShowMaxNumber", maxNr);
   }
@@ -766,24 +950,25 @@ void QmitkControlVisualizationPropertiesView::NormalizationDropdownChanged(int n
 
   switch(normDropdown)
   {
-    case 0:
-      normMeth->SetNormalizationToMinMax();
+  case 0:
+    normMeth->SetNormalizationToMinMax();
     break;
-    case 1:
-      normMeth->SetNormalizationToMax();
+  case 1:
+    normMeth->SetNormalizationToMax();
     break;
-    case 2:
-      normMeth->SetNormalizationToNone();
+  case 2:
+    normMeth->SetNormalizationToNone();
     break;
-    case 3:
-      normMeth->SetNormalizationToGlobalMax();
+  case 3:
+    normMeth->SetNormalizationToGlobalMax();
     break;
-    default:
-      normMeth->SetNormalizationToMinMax();
+  default:
+    normMeth->SetNormalizationToMinMax();
   }
 
-  if ( dynamic_cast<mitk::QBallImage*>(m_SelectedNode->GetData())
-       || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData()) )
+  if ( dynamic_cast<mitk::OdfImage*>(m_SelectedNode->GetData())
+       || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData())
+       || dynamic_cast<mitk::ShImage*>(m_SelectedNode->GetData()) )
   {
     m_SelectedNode->SetProperty("Normalization", normMeth.GetPointer());
   }
@@ -794,13 +979,17 @@ void QmitkControlVisualizationPropertiesView::NormalizationDropdownChanged(int n
 
 void QmitkControlVisualizationPropertiesView::ScalingFactorChanged(double scalingFactor)
 {
-  if ( dynamic_cast<mitk::QBallImage*>(m_SelectedNode->GetData())
-       || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData()) )
+  if ( dynamic_cast<mitk::OdfImage*>(m_SelectedNode->GetData())
+       || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData())
+       || dynamic_cast<mitk::ShImage*>(m_SelectedNode->GetData()) )
   {
     m_SelectedNode->SetFloatProperty("Scaling", scalingFactor);
   }
 
-  if(m_MultiWidget){ m_MultiWidget->RequestUpdate(); }
+  if (auto renderWindowPart = this->GetRenderWindowPart())
+  {
+    renderWindowPart->RequestUpdate();
+  }
 }
 
 
@@ -812,45 +1001,33 @@ void QmitkControlVisualizationPropertiesView::AdditionalScaling(int additionalSc
 
   switch(additionalScaling)
   {
-    case 0:
-      scaleBy->SetScaleByNothing();
+  case 0:
+    scaleBy->SetScaleByNothing();
     break;
-    case 1:
-      scaleBy->SetScaleByGFA();
-      //m_Controls->params_frame->setVisible(true);
+  case 1:
+    scaleBy->SetScaleByGFA();
+    //m_Controls->params_frame->setVisible(true);
     break;
 #ifdef DIFFUSION_IMAGING_EXTENDED
-    case 2:
-      scaleBy->SetScaleByPrincipalCurvature();
-      // commented in for SPIE paper, Principle curvature scaling
-      //m_Controls->params_frame->setVisible(true);
+  case 2:
+    scaleBy->SetScaleByPrincipalCurvature();
+    // commented in for SPIE paper, Principle curvature scaling
+    //m_Controls->params_frame->setVisible(true);
     break;
 #endif
-    default:
-      scaleBy->SetScaleByNothing();
+  default:
+    scaleBy->SetScaleByNothing();
   }
 
-  if ( dynamic_cast<mitk::QBallImage*>(m_SelectedNode->GetData())
-       || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData()) )
+  if ( dynamic_cast<mitk::OdfImage*>(m_SelectedNode->GetData())
+       || dynamic_cast<mitk::TensorImage*>(m_SelectedNode->GetData())
+       || dynamic_cast<mitk::ShImage*>(m_SelectedNode->GetData()) )
   {
-    m_SelectedNode->SetProperty("Normalization", scaleBy.GetPointer());
+    m_SelectedNode->SetProperty("ScaleBy", scaleBy.GetPointer());
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
-
-
-void QmitkControlVisualizationPropertiesView::ScalingCheckbox()
-{
-  m_Controls->m_ScalingFrame->setVisible( m_Controls->m_ScalingCheckbox->isChecked() );
-
-  if( ! m_Controls->m_ScalingCheckbox->isChecked() )
-  {
-    m_Controls->m_AdditionalScaling->setCurrentIndex(0);
-    m_Controls->m_ScalingFactor->setValue(1.0);
-  }
-}
-
 
 void QmitkControlVisualizationPropertiesView::Fiber2DfadingEFX()
 {
@@ -892,19 +1069,7 @@ void QmitkControlVisualizationPropertiesView::FiberSlicingUpdateLabel(int value)
   FiberSlicingThickness2D();
 }
 
-
-void QmitkControlVisualizationPropertiesView::SetFiberBundleOpacity(const itk::EventObject& /*e*/)
-{
-  if(m_SelectedNode)
-  {
-    mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData());
-    fib->RequestUpdate();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-}
-
-
-void QmitkControlVisualizationPropertiesView::SetFiberBundleCustomColor(const itk::EventObject& /*e*/)
+void QmitkControlVisualizationPropertiesView::SetCustomColor(const itk::EventObject& /*e*/)
 {
   if(m_SelectedNode && dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData()))
   {
@@ -914,15 +1079,29 @@ void QmitkControlVisualizationPropertiesView::SetFiberBundleCustomColor(const it
     fib->SetFiberColors(color[0]*255, color[1]*255, color[2]*255);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
+  else if (m_SelectedNode && dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData()))
+  {
+    float color[3];
+    m_SelectedNode->GetColor(color);
+    mitk::PeakImage::Pointer img = dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData());
+    img->SetCustomColor(color[0]*255, color[1]*255, color[2]*255);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
 
-void QmitkControlVisualizationPropertiesView::BundleRepresentationResetColoring()
+void QmitkControlVisualizationPropertiesView::ResetColoring()
 {
   if(m_SelectedNode && dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData()))
   {
     mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData());
     fib->ColorFibersByOrientation();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  else if(m_SelectedNode && dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData()))
+  {
+    mitk::PeakImage::Pointer fib = dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData());
+    fib->ColorByOrientation();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -941,63 +1120,65 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
       QmitkRenderWindow* selectedRenderWindow = 0;
       bool PlanarFigureInitializedWindow = false;
 
-      QmitkRenderWindow* RenderWindow1 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow1();
+      auto renderWindowPart = this->GetRenderWindowPart(OPEN);
+
+      QmitkRenderWindow* axialRenderWindow =
+          renderWindowPart->GetQmitkRenderWindow("axial");
 
       if (m_SelectedNode->GetBoolProperty("PlanarFigureInitializedWindow",
-                                          PlanarFigureInitializedWindow, RenderWindow1->GetRenderer()))
+                                          PlanarFigureInitializedWindow, axialRenderWindow->GetRenderer()))
       {
-        selectedRenderWindow = RenderWindow1;
+        selectedRenderWindow = axialRenderWindow;
       }
 
-      QmitkRenderWindow* RenderWindow2 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow2();
+      QmitkRenderWindow* sagittalRenderWindow =
+          renderWindowPart->GetQmitkRenderWindow("sagittal");
 
       if (!selectedRenderWindow && m_SelectedNode->GetBoolProperty(
             "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-            RenderWindow2->GetRenderer()))
+            sagittalRenderWindow->GetRenderer()))
       {
-        selectedRenderWindow = RenderWindow2;
+        selectedRenderWindow = sagittalRenderWindow;
       }
 
-      QmitkRenderWindow* RenderWindow3 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow3();
+      QmitkRenderWindow* coronalRenderWindow =
+          renderWindowPart->GetQmitkRenderWindow("coronal");
 
       if (!selectedRenderWindow && m_SelectedNode->GetBoolProperty(
             "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-            RenderWindow3->GetRenderer()))
+            coronalRenderWindow->GetRenderer()))
       {
-        selectedRenderWindow = RenderWindow3;
+        selectedRenderWindow = coronalRenderWindow;
       }
 
-      QmitkRenderWindow* RenderWindow4 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow4();
+      QmitkRenderWindow* _3DRenderWindow =
+          renderWindowPart->GetQmitkRenderWindow("3d");
 
       if (!selectedRenderWindow && m_SelectedNode->GetBoolProperty(
             "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-            RenderWindow4->GetRenderer()))
+            _3DRenderWindow->GetRenderer()))
       {
-        selectedRenderWindow = RenderWindow4;
+        selectedRenderWindow = _3DRenderWindow;
       }
 
       const mitk::PlaneGeometry* _PlaneGeometry = _PlanarFigure->GetPlaneGeometry();
 
       mitk::VnlVector normal = _PlaneGeometry->GetNormalVnl();
 
-      mitk::Geometry2D::ConstPointer worldGeometry1 =
-          RenderWindow1->GetRenderer()->GetCurrentWorldGeometry2D();
+      mitk::PlaneGeometry::ConstPointer worldGeometry1 =
+          axialRenderWindow->GetRenderer()->GetCurrentWorldPlaneGeometry();
       mitk::PlaneGeometry::ConstPointer _Plane1 =
           dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry1.GetPointer() );
       mitk::VnlVector normal1 = _Plane1->GetNormalVnl();
 
-      mitk::Geometry2D::ConstPointer worldGeometry2 =
-          RenderWindow2->GetRenderer()->GetCurrentWorldGeometry2D();
+      mitk::PlaneGeometry::ConstPointer worldGeometry2 =
+          sagittalRenderWindow->GetRenderer()->GetCurrentWorldPlaneGeometry();
       mitk::PlaneGeometry::ConstPointer _Plane2 =
           dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry2.GetPointer() );
       mitk::VnlVector normal2 = _Plane2->GetNormalVnl();
 
-      mitk::Geometry2D::ConstPointer worldGeometry3 =
-          RenderWindow3->GetRenderer()->GetCurrentWorldGeometry2D();
+      mitk::PlaneGeometry::ConstPointer worldGeometry3 =
+          coronalRenderWindow->GetRenderer()->GetCurrentWorldPlaneGeometry();
       mitk::PlaneGeometry::ConstPointer _Plane3 =
           dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry3.GetPointer() );
       mitk::VnlVector normal3 = _Plane3->GetNormalVnl();
@@ -1013,17 +1194,17 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
 
       if(ang1 < ang2 && ang1 < ang3)
       {
-        selectedRenderWindow = RenderWindow1;
+        selectedRenderWindow = axialRenderWindow;
       }
       else
       {
         if(ang2 < ang3)
         {
-          selectedRenderWindow = RenderWindow2;
+          selectedRenderWindow = sagittalRenderWindow;
         }
         else
         {
-          selectedRenderWindow = RenderWindow3;
+          selectedRenderWindow = coronalRenderWindow;
         }
       }
 
@@ -1107,18 +1288,26 @@ void QmitkControlVisualizationPropertiesView::TubeRadiusChanged()
   }
 }
 
-
-void QmitkControlVisualizationPropertiesView::LineWidthChanged()
+void QmitkControlVisualizationPropertiesView::RibbonWidthChanged()
 {
   if(m_SelectedNode && dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData()))
   {
-    int newWidth = m_Controls->m_LineWidth->value();
-    int currentWidth = 0;
-    m_SelectedNode->GetIntProperty("shape.linewidth", currentWidth);
+    float newWidth = m_Controls->m_RibbonWidth->value();
+    m_SelectedNode->SetFloatProperty("shape.ribbonwidth", newWidth);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+}
+
+void QmitkControlVisualizationPropertiesView::LineWidthChanged()
+{
+  if(m_SelectedNode && dynamic_cast<mitk::PeakImage*>(m_SelectedNode->GetData()))
+  {
+    auto newWidth = m_Controls->m_LineWidth->value();
+    float currentWidth = 0;
+    m_SelectedNode->SetFloatProperty("shape.linewidth", currentWidth);
     if (currentWidth==newWidth)
       return;
-    m_SelectedNode->SetIntProperty("shape.linewidth", newWidth);
-    dynamic_cast<mitk::FiberBundle*>(m_SelectedNode->GetData())->RequestUpdate();
+    m_SelectedNode->SetFloatProperty("shape.linewidth", newWidth);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -1130,85 +1319,15 @@ void QmitkControlVisualizationPropertiesView::Welcome()
       ->ShowIntro(GetSite()->GetWorkbenchWindow(), false);
 }
 
-
-void QmitkControlVisualizationPropertiesView::OnTensorViewChanged()
-{
-  if( m_NodeUsedForOdfVisualization.IsNotNull() )
-  {
-    if( m_Controls-> m_EllipsoidViewRadioButton-> isChecked() )
-    {
-      if ( m_SelectedNode and dynamic_cast<mitk::TensorImage*>( m_SelectedNode->GetData() ) )
-      {
-        m_SelectedNode-> SetProperty( "DiffusionCore.Rendering.OdfVtkMapper.SwitchTensorView", mitk::BoolProperty::New( true ) );
-
-        mitk::OdfNormalizationMethodProperty::Pointer normalizationProperty
-            = mitk::OdfNormalizationMethodProperty::New( mitk::ODFN_MAX );
-
-        m_SelectedNode-> SetProperty( "Normalization", normalizationProperty ); // type OdfNormalizationMethodProperty
-
-        m_Controls-> m_NormalizationDropdown->setCurrentIndex
-            ( dynamic_cast<mitk::EnumerationProperty*>( m_SelectedNode->GetProperty("Normalization") )->GetValueAsId() );
-      }
-      else
-      {
-        m_SelectedNode-> SetProperty( "DiffusionCore.Rendering.OdfVtkMapper.SwitchTensorView", mitk::BoolProperty::New( false ) );
-        m_Controls-> m_OdfViewRadioButton-> setChecked(true);
-        m_Controls-> m_EllipsoidViewRadioButton-> setEnabled(false);
-      }
-    }
-    else if( m_Controls-> m_OdfViewRadioButton-> isChecked() )
-    {
-      m_SelectedNode-> SetProperty( "DiffusionCore.Rendering.OdfVtkMapper.SwitchTensorView", mitk::BoolProperty::New( false ) );
-    }
-    mitk::RenderingManager::GetInstance()-> RequestUpdateAll();
-  }
-  else
-  {
-    MITK_DEBUG << "QmitkControlVisualizationPropertiesView::OnTensorViewChanged()"
-                  " was called but m_NodeUsedForOdfVisualization was Null.";
-  }
-}
-
-
 void QmitkControlVisualizationPropertiesView::OnColourisationModeChanged()
 {
-  if( m_SelectedNode and m_NodeUsedForOdfVisualization.IsNotNull() )
+  if( m_SelectedNode && m_NodeUsedForOdfVisualization.IsNotNull() )
   {
-    if( m_Controls-> m_colouriseRainbowRadioButton-> isChecked() )
-    {
-      m_SelectedNode-> SetProperty( "DiffusionCore.Rendering.OdfVtkMapper.ColourisationModeBit", mitk::BoolProperty::New( false ) );
-    }
-    else if ( m_Controls-> m_colouriseSimpleRadioButton-> isChecked() )
-    {
-      m_SelectedNode-> SetProperty( "DiffusionCore.Rendering.OdfVtkMapper.ColourisationModeBit", mitk::BoolProperty::New( true ) );
-    }
-    mitk::RenderingManager::GetInstance()-> RequestUpdateAll();
+    m_SelectedNode->SetProperty( "DiffusionCore.Rendering.OdfVtkMapper.ColourisationModeBit", mitk::BoolProperty::New( m_Controls->m_OdfColorBox->currentIndex() ) );
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   else
   {
-    MITK_DEBUG << "QmitkControlVisualizationPropertiesView::OnColourisationModeChanged()"
-                  " was called but m_NodeUsedForOdfVisualization was Null.";
-  }
-}
-
-
-void QmitkControlVisualizationPropertiesView::OnRandomModeChanged()
-{
-  if( m_SelectedNode and m_NodeUsedForOdfVisualization.IsNotNull() )
-  {
-    if( m_Controls-> m_randomModeRadioButton-> isChecked() )
-    {
-      m_SelectedNode-> SetProperty( "DiffusionCore.Rendering.OdfVtkMapper.RandomModeBit", mitk::BoolProperty::New( true ) );
-    }
-    else if ( m_Controls-> m_orderedModeRadioButton-> isChecked() )
-    {
-      m_SelectedNode-> SetProperty( "DiffusionCore.Rendering.OdfVtkMapper.RandomModeBit", mitk::BoolProperty::New( false ) );
-    }
-    mitk::RenderingManager::GetInstance()-> RequestUpdateAll();
-  }
-  else
-  {
-    MITK_DEBUG << "QmitkControlVisualizationPropertiesView::OnRandomModeChanged()"
-                  " was called but m_NodeUsedForOdfVisualization was Null.";
+    MITK_DEBUG << "QmitkControlVisualizationPropertiesView::OnColourisationModeChanged() was called but m_NodeUsedForOdfVisualization was Null.";
   }
 }

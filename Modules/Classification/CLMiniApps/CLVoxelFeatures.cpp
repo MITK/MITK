@@ -25,16 +25,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include "mitkCommandLineParser.h"
 
-#include <mitkGIFCooccurenceMatrix.h>
-#include <mitkGIFGrayLevelRunLength.h>
-
 #include "itkDiscreteGaussianImageFilter.h"
 #include <itkLaplacianRecursiveGaussianImageFilter.h>
 #include "itkHessianRecursiveGaussianImageFilter.h"
 #include "itkUnaryFunctorImageFilter.h"
-#include <itkMultiHistogramFilter.h>
 #include "vnl/algo/vnl_symmetric_eigensystem.h"
+#include <itkMultiHistogramFilter.h>
 #include <itkSubtractImageFilter.h>
+#include <itkLocalStatisticFilter.h>
 
 static std::vector<double> splitDouble(std::string str, char delimiter) {
   std::vector<double> internal;
@@ -155,7 +153,7 @@ void
   typename HessianFilterType::Pointer hessianFilter = HessianFilterType::New();
   hessianFilter->SetInput(itkImage);
   hessianFilter->SetSigma(std::sqrt(variance));
-  for (int i = 0; i < VImageDimension; ++i)
+  for (unsigned int i = 0; i < VImageDimension; ++i)
   {
     typename DetFilterType::Pointer detFilter = DetFilterType::New();
     detFilter->SetInput(hessianFilter->GetOutput());
@@ -167,10 +165,37 @@ void
 
 template<typename TPixel, unsigned int VImageDimension>
 void
+LocalHistograms2(itk::Image<TPixel, VImageDimension>* itkImage, std::vector<mitk::Image::Pointer> &out, std::vector<double> params)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::MultiHistogramFilter <ImageType, ImageType> MultiHistogramType;
+
+  double minimum = params[0];
+  double maximum = params[1];
+  int bins = std::round(params[2]);
+
+  double offset = minimum;
+  double delta = (maximum - minimum) / bins;
+
+  typename MultiHistogramType::Pointer filter = MultiHistogramType::New();
+  filter->SetInput(itkImage);
+  filter->SetOffset(offset);
+  filter->SetDelta(delta);
+  filter->SetBins(bins);
+  filter->Update();
+  for (int i = 0; i < bins; ++i)
+  {
+    mitk::Image::Pointer img = mitk::Image::New();
+    mitk::CastToMitkImage(filter->GetOutput(i), img);
+    out.push_back(img);
+  }
+}
+
+template<typename TPixel, unsigned int VImageDimension>
+void
   LocalHistograms(itk::Image<TPixel, VImageDimension>* itkImage, std::vector<mitk::Image::Pointer> &out, double offset, double delta)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<double, VImageDimension> FloatImageType;
   typedef itk::MultiHistogramFilter <ImageType,ImageType> MultiHistogramType;
 
   typename MultiHistogramType::Pointer filter = MultiHistogramType::New();
@@ -178,13 +203,33 @@ void
   filter->SetOffset(offset);
   filter->SetDelta(delta);
   filter->Update();
-  for (int i = 0; i < VImageDimension; ++i)
+  for (int i = 0; i < 11; ++i)
   {
     mitk::Image::Pointer img = mitk::Image::New();
-    mitk::CastToMitkImage(filter->GetOutput(), img);
+    mitk::CastToMitkImage(filter->GetOutput(i), img);
     out.push_back(img);
   }
 }
+
+template<typename TPixel, unsigned int VImageDimension>
+void
+localStatistic(itk::Image<TPixel, VImageDimension>* itkImage, std::vector<mitk::Image::Pointer> &out, int size)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::LocalStatisticFilter <ImageType, ImageType> MultiHistogramType;
+
+  typename MultiHistogramType::Pointer filter = MultiHistogramType::New();
+  filter->SetInput(itkImage);
+  filter->SetSize(size);
+  filter->Update();
+  for (int i = 0; i < 5; ++i)
+  {
+    mitk::Image::Pointer img = mitk::Image::New();
+    mitk::CastToMitkImage(filter->GetOutput(i), img);
+    out.push_back(img);
+  }
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -193,12 +238,15 @@ int main(int argc, char* argv[])
   // required params
   parser.addArgument("image", "i", mitkCommandLineParser::InputImage, "Input Image", "Path to the input VTK polydata", us::Any(), false);
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output text file", "Target file. The output statistic is appended to this file.", us::Any(), false);
+  parser.addArgument("extension", "e", mitkCommandLineParser::OutputFile, "Extension", "File extension. Default is .nii.gz", us::Any(), true);
 
   parser.addArgument("gaussian","g",mitkCommandLineParser::String, "Gaussian Filtering of the input images", "Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
   parser.addArgument("difference-of-gaussian","dog",mitkCommandLineParser::String, "Difference of Gaussian Filtering of the input images", "Difference of Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
   parser.addArgument("laplace-of-gauss","log",mitkCommandLineParser::String, "Laplacian of Gaussian Filtering", "Laplacian of Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
   parser.addArgument("hessian-of-gauss","hog",mitkCommandLineParser::String, "Hessian of Gaussian Filtering", "Hessian of Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
   parser.addArgument("local-histogram", "lh", mitkCommandLineParser::String, "Local Histograms", "Calculate the local histogram based feature. Specify Offset and Delta, for exampel -3;0.6 ", us::Any());
+  parser.addArgument("local-histogram2", "lh2", mitkCommandLineParser::String, "Local Histograms", "Calculate the local histogram based feature. Specify Minimum;Maximum;Bins, for exampel -3;3;6 ", us::Any());
+  parser.addArgument("local-statistic", "ls", mitkCommandLineParser::String, "Local Histograms", "Calculate the local histogram based feature. Specify Offset and Delta, for exampel -3;0.6 ", us::Any());
   // Miniapp Infos
   parser.setCategory("Classification Tools");
   parser.setTitle("Global Image Feature calculator");
@@ -215,13 +263,18 @@ int main(int argc, char* argv[])
   {
     return EXIT_SUCCESS;
   }
-  bool useCooc = parsedArgs.count("cooccurence");
 
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(parsedArgs["image"].ToString());
   std::string filename=parsedArgs["output"].ToString();
 
+  std::string extension = ".nii.gz";
+  if (parsedArgs.count("extension"))
+  {
+    extension = parsedArgs["extension"].ToString();
+  }
+
   ////////////////////////////////////////////////////////////////
-  // CAlculate Gaussian Features
+  // CAlculate Local Histogram
   ////////////////////////////////////////////////////////////////
   MITK_INFO << "Check for Local Histogram...";
   if (parsedArgs.count("local-histogram"))
@@ -235,13 +288,64 @@ int main(int argc, char* argv[])
     else
     {
       AccessByItk_3(image, LocalHistograms, outs, ranges[0], ranges[1]);
-      for (int i = 0; i < outs.size(); ++i)
+      for (std::size_t i = 0; i < outs.size(); ++i)
       {
-        std::string name = filename + "-lh" + us::any_value_to_string<int>(i)+".nii.gz";
-        mitk::IOUtil::SaveImage(outs[i], name);
+        std::string name = filename + "-lh" + us::any_value_to_string<int>(i)+extension;
+        mitk::IOUtil::Save(outs[i], name);
       }
     }
   }
+
+  ////////////////////////////////////////////////////////////////
+  // CAlculate Local Histogram 2
+  ////////////////////////////////////////////////////////////////
+  MITK_INFO << "Check for Local Histogram...";
+  if (parsedArgs.count("local-histogram2"))
+  {
+    std::vector<mitk::Image::Pointer> outs;
+    auto ranges = splitDouble(parsedArgs["local-histogram2"].ToString(), ';');
+    if (ranges.size() < 3)
+    {
+      MITK_INFO << "Missing Delta and Offset for Local Histogram";
+    }
+    else
+    {
+      AccessByItk_2(image, LocalHistograms2, outs, ranges);
+      for (std::size_t i = 0; i < outs.size(); ++i)
+      {
+        std::string name = filename + "-lh2" + us::any_value_to_string<int>(i)+extension;
+        mitk::IOUtil::Save(outs[i], name);
+      }
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // CAlculate Local Statistic
+  ////////////////////////////////////////////////////////////////
+  MITK_INFO << "Check for Local Histogram...";
+  if (parsedArgs.count("local-statistic"))
+  {
+    std::vector<mitk::Image::Pointer> outs;
+    auto ranges = splitDouble(parsedArgs["local-statistic"].ToString(), ';');
+    if (ranges.size() < 1)
+    {
+      MITK_INFO << "Missing Rage";
+    }
+    else
+    {
+      for (std::size_t j = 0; j < ranges.size(); ++j)
+      {
+        AccessByItk_2(image, localStatistic, outs, ranges[j]);
+        for (std::size_t i = 0; i < outs.size(); ++i)
+        {
+          std::string name = filename + "-lstat" + us::any_value_to_string<int>(ranges[j])+ "_" +us::any_value_to_string<int>(i)+extension;
+          mitk::IOUtil::Save(outs[i], name);
+        }
+        outs.clear();
+      }
+    }
+  }
+
 
   ////////////////////////////////////////////////////////////////
   // CAlculate Gaussian Features
@@ -252,12 +356,14 @@ int main(int argc, char* argv[])
     MITK_INFO << "Calculate Gaussian... " << parsedArgs["gaussian"].ToString();
     auto ranges = splitDouble(parsedArgs["gaussian"].ToString(),';');
 
-    for (int i = 0; i < ranges.size(); ++i)
+    for (std::size_t i = 0; i < ranges.size(); ++i)
     {
+      MITK_INFO << "Gaussian with sigma: " << ranges[i];
       mitk::Image::Pointer output;
       AccessByItk_2(image, GaussianFilter, ranges[i], output);
-      std::string name = filename + "-gaussian-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(output, name);
+      MITK_INFO << "Write output:";
+      std::string name = filename + "-gaussian-" + us::any_value_to_string(ranges[i]) + extension;
+      mitk::IOUtil::Save(output, name);
     }
   }
 
@@ -270,12 +376,12 @@ int main(int argc, char* argv[])
     MITK_INFO << "Calculate Difference of Gaussian... " << parsedArgs["difference-of-gaussian"].ToString();
     auto ranges = splitDouble(parsedArgs["difference-of-gaussian"].ToString(),';');
 
-    for (int i = 0; i < ranges.size(); ++i)
+    for (std::size_t i = 0; i < ranges.size(); ++i)
     {
       mitk::Image::Pointer output;
       AccessByItk_2(image, DifferenceOfGaussFilter, ranges[i], output);
-      std::string name = filename + "-dog-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(output, name);
+      std::string name = filename + "-dog-" + us::any_value_to_string(ranges[i]) + extension;
+      mitk::IOUtil::Save(output, name);
     }
   }
 
@@ -288,12 +394,12 @@ int main(int argc, char* argv[])
     MITK_INFO << "Calculate LoG... " << parsedArgs["laplace-of-gauss"].ToString();
     auto ranges = splitDouble(parsedArgs["laplace-of-gauss"].ToString(),';');
 
-    for (int i = 0; i < ranges.size(); ++i)
+    for (std::size_t i = 0; i < ranges.size(); ++i)
     {
       mitk::Image::Pointer output;
       AccessByItk_2(image, LaplacianOfGaussianFilter, ranges[i], output);
-      std::string name = filename + "-log-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(output, name);
+      std::string name = filename + "-log-" + us::any_value_to_string(ranges[i]) + extension;
+      mitk::IOUtil::Save(output, name);
     }
   }
 
@@ -306,19 +412,19 @@ int main(int argc, char* argv[])
     MITK_INFO << "Calculate HoG... " << parsedArgs["hessian-of-gauss"].ToString();
     auto ranges = splitDouble(parsedArgs["hessian-of-gauss"].ToString(),';');
 
-    for (int i = 0; i < ranges.size(); ++i)
+    for (std::size_t i = 0; i < ranges.size(); ++i)
     {
       std::vector<mitk::Image::Pointer> outs;
       outs.push_back(mitk::Image::New());
       outs.push_back(mitk::Image::New());
       outs.push_back(mitk::Image::New());
       AccessByItk_2(image, HessianOfGaussianFilter, ranges[i], outs);
-      std::string name = filename + "-hog0-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(outs[0], name);
-      name = filename + "-hog1-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(outs[1], name);
-      name = filename + "-hog2-" + us::any_value_to_string(ranges[i])+".nii.gz";
-      mitk::IOUtil::SaveImage(outs[2], name);
+      std::string name = filename + "-hog0-" + us::any_value_to_string(ranges[i]) + extension;
+      mitk::IOUtil::Save(outs[0], name);
+      name = filename + "-hog1-" + us::any_value_to_string(ranges[i]) + extension;
+      mitk::IOUtil::Save(outs[1], name);
+      name = filename + "-hog2-" + us::any_value_to_string(ranges[i]) + extension;
+      mitk::IOUtil::Save(outs[2], name);
     }
   }
 

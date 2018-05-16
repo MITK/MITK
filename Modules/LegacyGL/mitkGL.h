@@ -22,7 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #endif
 
 #ifndef __APPLE__
-#include "GL/gl.h"
+//#include "GL/gl.h"
+#include "vtk_glew.h"
 #else
 #include "OpenGL/gl.h"
 #endif

@@ -33,7 +33,7 @@ public:
   QmitkMemoryUsageIndicatorView(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
 
   /// destructor
-  ~QmitkMemoryUsageIndicatorView();
+  ~QmitkMemoryUsageIndicatorView() override;
 
 protected slots:
   void UpdateMemoryUsage();

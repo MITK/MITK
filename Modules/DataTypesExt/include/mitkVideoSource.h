@@ -94,7 +94,7 @@ namespace mitk
     ///
     /// deletes m_CurrentVideoTexture (if not 0)
     ///
-    virtual ~VideoSource();
+    ~VideoSource() override;
 
   protected:
     ///

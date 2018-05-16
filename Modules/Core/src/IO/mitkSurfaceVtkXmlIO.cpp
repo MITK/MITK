@@ -73,7 +73,7 @@ namespace mitk
     }
     reader->Update();
 
-    if (reader->GetOutput() != NULL)
+    if (reader->GetOutput() != nullptr)
     {
       output->SetVtkPolyData(reader->GetOutput());
     }
@@ -91,7 +91,7 @@ namespace mitk
   {
     if (AbstractFileIO::GetReaderConfidenceLevel() == Unsupported)
       return Unsupported;
-    if (this->GetInputStream() == NULL)
+    if (this->GetInputStream() == nullptr)
     {
       // check if the xml vtk reader can handle the file
       vtkSmartPointer<VtkXMLPolyDataReader> xmlReader = vtkSmartPointer<VtkXMLPolyDataReader>::New();
@@ -110,14 +110,14 @@ namespace mitk
   {
     ValidateOutputLocation();
 
-    const Surface *input = dynamic_cast<const Surface *>(this->GetInput());
+    const auto *input = dynamic_cast<const Surface *>(this->GetInput());
 
     const unsigned int timesteps = input->GetTimeGeometry()->CountTimeSteps();
     for (unsigned int t = 0; t < timesteps; ++t)
     {
       std::string fileName;
       vtkSmartPointer<vtkPolyData> polyData = this->GetPolyData(t, fileName);
-      if (polyData.Get() == NULL)
+      if (polyData.Get() == nullptr)
       {
         mitkThrow() << "Cannot write empty surface";
       }

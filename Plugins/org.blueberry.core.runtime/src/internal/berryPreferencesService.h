@@ -57,35 +57,35 @@ class AbstractPreferencesStorage;
     ///
     /// Nothing to do here so far.
     ///
-    virtual ~PreferencesService();
+    ~PreferencesService() override;
 
     /**
     * If no system preference file exists create a new AbstractPreferencesStorage.
     * \see IPreferencesService::GetSystemPreferences()
     */
-    virtual SmartPointer<IPreferences> GetSystemPreferences() override;
+    SmartPointer<IPreferences> GetSystemPreferences() override;
 
     /**
     * If no user preference file exists create a new AbstractPreferencesStorage.
     * \see IPreferencesService::GetUserPreferences()
     */
-    virtual SmartPointer<IPreferences> GetUserPreferences(const QString& name) override;
+    SmartPointer<IPreferences> GetUserPreferences(const QString& name) override;
 
     /**
     * \see IPreferencesService::GetUsers()
     */
-    virtual QStringList GetUsers() const override;
+    QStringList GetUsers() const override;
 
 
     ///
     /// \see IPreferencesService::ImportPreferences()
     ///
-    virtual void ImportPreferences(const QString &f, const QString& name="") override;
+    void ImportPreferences(const QString &f, const QString& name="") override;
 
     ///
     /// \see IPreferencesService::ExportPreferences()
     ///
-    virtual void ExportPreferences(const QString &f, const QString& name="") override;
+    void ExportPreferences(const QString &f, const QString& name="") override;
 
     ///
     /// flushes all preferences

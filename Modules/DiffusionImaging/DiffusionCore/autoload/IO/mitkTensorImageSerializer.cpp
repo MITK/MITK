@@ -37,7 +37,7 @@ mitk::TensorImageSerializer::~TensorImageSerializer()
 std::string mitk::TensorImageSerializer::Serialize()
 {
   const TensorImage* image = dynamic_cast<const TensorImage*>( m_Data.GetPointer() );
-  if (image == NULL)
+  if (image == nullptr)
   {
     MITK_ERROR << " Object at " << (const void*) this->m_Data
               << " is not an mitk::NrrdTensorImage. Cannot serialize as NrrdTensorImage.";
@@ -57,7 +57,7 @@ std::string mitk::TensorImageSerializer::Serialize()
   {
     NrrdTensorImageWriter writer;
     writer.SetOutputLocation(fullname);
-    writer.SetInput(const_cast<TensorImage*>(image));
+    writer.SetInput(image);
     writer.Write();
   }
   catch (std::exception& e)

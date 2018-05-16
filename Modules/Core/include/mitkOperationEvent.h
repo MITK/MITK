@@ -153,7 +153,7 @@ namespace mitk
     //##
     //## removes observers if destination is valid
     //## and frees memory referenced by m_Operation and m_UndoOperation
-    virtual ~OperationEvent();
+    ~OperationEvent() override;
 
     //## @brief Returns the operation
     Operation *GetOperation();
@@ -165,10 +165,10 @@ namespace mitk
 
     //## @brief Swaps the two operations and sets a flag,
     //## that it has been swapped and doOp is undoOp and undoOp is doOp
-    virtual void ReverseOperations() override;
+    void ReverseOperations() override;
 
     //##reverses and executes both operations (used, when moved from undo to redo stack)
-    virtual void ReverseAndExecute() override;
+    void ReverseAndExecute() override;
 
     //## @brief returns true if the destination still is present
     //## and false if it already has been deleted

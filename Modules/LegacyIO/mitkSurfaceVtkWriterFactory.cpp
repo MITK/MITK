@@ -43,7 +43,7 @@ namespace mitk
 
   protected:
     CreateSurfaceWriter() {}
-    ~CreateSurfaceWriter() {}
+    ~CreateSurfaceWriter() override {}
   private:
     CreateSurfaceWriter(const Self &); // purposely not implemented
     void operator=(const Self &);      // purposely not implemented
@@ -54,7 +54,7 @@ namespace mitk
     this->RegisterOverride("IOWriter",
                            "SurfaceVtkWriter",
                            "Surface Vtk Writer",
-                           1,
+                           true,
                            mitk::CreateSurfaceWriter<mitk::SurfaceVtkWriter<vtkXMLPolyDataWriter>>::New());
   }
 

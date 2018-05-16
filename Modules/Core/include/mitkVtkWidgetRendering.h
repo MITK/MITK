@@ -75,25 +75,25 @@ namespace mitk
      * Empty implementation, since the VtkWidgetRendering doesn't
      * support the requested region concept
      */
-    virtual void SetRequestedRegionToLargestPossibleRegion() override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
 
     /**
      * Empty implementation, since the VtkWidgetRendering doesn't
      * support the requested region concept
      */
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
     /**
      * Empty implementation, since the VtkWidgetRendering doesn't
      * support the requested region concept
      */
-    virtual bool VerifyRequestedRegion() override;
+    bool VerifyRequestedRegion() override;
 
     /**
      * Empty implementation, since the VtkWidgetRendering doesn't
      * support the requested region concept
      */
-    virtual void SetRequestedRegion(const itk::DataObject *) override;
+    void SetRequestedRegion(const itk::DataObject *) override;
 
     /**
      * Returns the vtkRenderWindow, which is used
@@ -123,7 +123,7 @@ namespace mitk
     /**
      * Destructor
      */
-    ~VtkWidgetRendering();
+    ~VtkWidgetRendering() override;
 
     vtkRenderWindow *m_RenderWindow;
     vtkRenderer *m_Renderer;

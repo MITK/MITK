@@ -24,13 +24,6 @@ endif()
 if(NOT DEFINED VTK_DIR)
 
   set(additional_cmake_args )
-  if(MINGW)
-    set(additional_cmake_args
-        -DCMAKE_USE_WIN32_THREADS:BOOL=ON
-        -DCMAKE_USE_PTHREADS:BOOL=OFF
-        -DVTK_USE_VIDEO4WINDOWS:BOOL=OFF # no header files provided by MinGW
-        )
-  endif()
 
   # Optionally enable memory leak checks for any objects derived from vtkObject. This
   # will force unit tests to fail if they have any of these memory leaks.
@@ -41,12 +34,7 @@ if(NOT DEFINED VTK_DIR)
       )
 
   if(MITK_USE_Python)
-    if(NOT MITK_USE_SYSTEM_PYTHON)
-     list(APPEND proj_DEPENDENCIES Python)
-     set(_vtk_install_python_dir -DVTK_INSTALL_PYTHON_MODULE_DIR:FILEPATH=${MITK_PYTHON_SITE_DIR})
-    else()
-      set(_vtk_install_python_dir -DVTK_INSTALL_PYTHON_MODULE_DIR:PATH=${ep_prefix}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
-    endif()
+    set(_vtk_install_python_dir -DVTK_INSTALL_PYTHON_MODULE_DIR:PATH=${ep_prefix}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
 
     list(APPEND additional_cmake_args
          -DVTK_WRAP_PYTHON:BOOL=ON
@@ -56,6 +44,7 @@ if(NOT DEFINED VTK_DIR)
          -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
          -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
          -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
+         -DVTK_PYTHON_VERSION:STRING=3
          ${_vtk_install_python_dir}
         )
   else()
@@ -67,9 +56,8 @@ if(NOT DEFINED VTK_DIR)
 
   if(MITK_USE_Qt5)
     list(APPEND additional_cmake_args
-        -DVTK_QT_VERSION:STRING=5
         -DVTK_Group_Qt:BOOL=ON
-        -DVTK_INSTALL_NO_QT_PLUGIN:BOOL=ON
+        -DQt5_DIR:PATH=${Qt5_DIR}
      )
   endif()
 
@@ -79,14 +67,10 @@ if(NOT DEFINED VTK_DIR)
     )
   endif()
 
-  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-7.0.0.tar.gz)
-  set(VTK_URL_MD5 5fe35312db5fb2341139b8e4955c367d)
-
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
-    URL ${VTK_URL}
-    URL_MD5 ${VTK_URL_MD5}
-    PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK.patch
+    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-8.1.0.tar.gz
+    URL_MD5 4fa5eadbc8723ba0b8d203f05376d932
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${ep_common_args}
@@ -96,9 +80,6 @@ if(NOT DEFINED VTK_DIR)
         -DVTK_USE_SYSTEM_FREETYPE:BOOL=${VTK_USE_SYSTEM_FREETYPE}
         -DVTK_LEGACY_REMOVE:BOOL=ON
         -DModule_vtkTestingRendering:BOOL=ON
-        -DVTK_MAKE_INSTANTIATORS:BOOL=ON
-        -DVTK_USE_CXX11_FEATURES:BOOL=ON
-        -DVTK_RENDERING_BACKEND:STRING=OpenGL
         ${additional_cmake_args}
     CMAKE_CACHE_ARGS
       ${ep_common_cache_args}

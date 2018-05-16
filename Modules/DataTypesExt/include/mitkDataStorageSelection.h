@@ -51,7 +51,7 @@ namespace mitk
     DataStorageSelection(mitk::DataStorage *_DataStorage, mitk::NodePredicateBase *_Predicate, bool _AutoAddNodes);
 
   public:
-    virtual ~DataStorageSelection();
+    ~DataStorageSelection() override;
 
     ///
     /// Get the DataStorage.
@@ -151,7 +151,7 @@ namespace mitk
     unsigned int m_DataStorageDeletedTag;
     ///
     /// Holds the predicate that defines this SubSet of Nodes. If m_Predicate
-    /// is NULL all Nodes will be selected.
+    /// is nullptr all Nodes will be selected.
     ///
     mitk::NodePredicateBase::Pointer m_Predicate;
     ///

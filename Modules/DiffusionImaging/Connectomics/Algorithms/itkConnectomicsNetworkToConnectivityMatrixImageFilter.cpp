@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::ConnectomicsNetworkToConnectivityMatrixImageFilter()
   : m_BinaryConnectivity(false)
   , m_RescaleConnectivity(false)
-  , m_InputNetwork(NULL)
+  , m_InputNetwork(nullptr)
 {
 }
 
@@ -51,7 +51,7 @@ void itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::GenerateData()
   typedef boost::graph_traits< NetworkType >::vertex_iterator IteratorType;
 
   // prepare connectivity matrix for data
-  std::vector< std::vector< int > > connectivityMatrix;
+  std::vector< std::vector< double > > connectivityMatrix;
   int numberOfVertices = m_InputNetwork->GetNumberOfVertices();
 
   connectivityMatrix.resize( numberOfVertices );
@@ -103,14 +103,14 @@ void itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::GenerateData()
       DescriptorType toVertexDescriptor = labelToIndexMap.find( positionToLabelVector[ innerLoop ] )->second;
 
 
-      int weight( 0 );
+      double fiber_count( 0 );
 
       if( boost::edge(toVertexDescriptor, fromVertexDescriptor, boostGraph ).second )
       {
-        weight = m_InputNetwork->GetEdge( fromVertexDescriptor , toVertexDescriptor ).weight;;
+        fiber_count = m_InputNetwork->GetEdge( fromVertexDescriptor , toVertexDescriptor ).fiber_count;
       }
-      connectivityMatrix[outerLoop][innerLoop] = weight;
-      connectivityMatrix[innerLoop][outerLoop] = weight;
+      connectivityMatrix[outerLoop][innerLoop] = fiber_count;
+      connectivityMatrix[innerLoop][outerLoop] = fiber_count;
     }
   }
 
@@ -173,8 +173,8 @@ void itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::GenerateData()
     // if desired rescale to the 0-255 range
     while( !it_connect.IsAtEnd() )
     {
-      it_connect.Set( ( unsigned short ) rescaleFactor *
-        connectivityMatrix[ ( counter - counter % numberOfVertices ) / numberOfVertices][ counter % numberOfVertices ]
+      it_connect.Set( ( unsigned short ) (rescaleFactor *
+        connectivityMatrix[ ( counter - counter % numberOfVertices ) / numberOfVertices][ counter % numberOfVertices ])
       );
       ++it_connect;
       counter++;

@@ -70,7 +70,7 @@ void QmitkCtkPythonShell::dropEvent(QDropEvent *event)
   }
 }
 
-bool QmitkCtkPythonShell::canInsertFromMimeData( const QMimeData *source ) const
+bool QmitkCtkPythonShell::canInsertFromMimeData(const QMimeData *) const
 {
   return true;
 }

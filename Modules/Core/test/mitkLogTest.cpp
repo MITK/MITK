@@ -97,7 +97,7 @@ protected:
   static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void *pInfoStruct)
   {
     /* extract this pointer from Thread Info structure */
-    struct itk::MultiThreader::ThreadInfoStruct *pInfo = (struct itk::MultiThreader::ThreadInfoStruct *)pInfoStruct;
+    auto *pInfo = (struct itk::MultiThreader::ThreadInfoStruct *)pInfoStruct;
     if (pInfo == nullptr)
     {
       return ITK_THREAD_RETURN_VALUE;
@@ -106,7 +106,7 @@ protected:
     {
       return ITK_THREAD_RETURN_VALUE;
     }
-    mitkTestLoggingThread *thisthread = (mitkTestLoggingThread *)pInfo->UserData;
+    auto *thisthread = (mitkTestLoggingThread *)pInfo->UserData;
 
     if (thisthread != nullptr)
       thisthread->LogMessages();
@@ -144,7 +144,7 @@ public:
       MITK_ERROR << "Test error stream.";
       MITK_FATAL << "Test fatal stream.";
     }
-    catch (mitk::Exception &e)
+    catch (const mitk::Exception &)
     {
       testSucceded = false;
     }
@@ -174,7 +174,7 @@ public:
       MITK_INFO << testStringStream.str();
       MITK_INFO << testMitkPoint;
     }
-    catch (mitk::Exception &e)
+    catch (const mitk::Exception &)
     {
       testSucceded = false;
     }

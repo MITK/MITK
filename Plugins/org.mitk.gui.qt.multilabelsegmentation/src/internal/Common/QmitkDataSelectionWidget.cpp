@@ -49,14 +49,14 @@ static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget
 
   mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
   mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
-  mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
+  mitk::NodePredicateDataType::Pointer isOdf = mitk::NodePredicateDataType::New("OdfImage");
   mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
 
   mitk::NodePredicateOr::Pointer validImages = mitk::NodePredicateOr::New();
   validImages->AddPredicate(isImage);
   validImages->AddPredicate(isDwi);
   validImages->AddPredicate(isDti);
-  validImages->AddPredicate(isQbi);
+  validImages->AddPredicate(isOdf);
 
   mitk::NodePredicateAnd::Pointer imagePredicate = mitk::NodePredicateAnd::New();
   imagePredicate->AddPredicate(validImages);
@@ -84,7 +84,7 @@ static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget
 
     default:
       assert(false && "Unknown predefined predicate!");
-      return NULL;
+      return nullptr;
   }
 }
 

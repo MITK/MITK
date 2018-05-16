@@ -43,14 +43,14 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     emptyTriple = mitk::RdfTriple();
     title = mitk::RdfUri("dcterms:title");
     seg = mitk::RdfUri("http://mitk.org/wiki/MITK/data/instance.rdf#s0001");
   }
 
-  void tearDown()
+  void tearDown() override
   {
   }
 

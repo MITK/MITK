@@ -23,15 +23,6 @@ if ("${CppMicroServices_DIR}" STREQUAL "${CppMicroServices_DIR_default}")
     set(US_BUILD_TESTING ON)
   endif()
 
-  mitkFunctionCheckCompilerFlags("-std=c++11" US_CXX_FLAGS)
+  mitkFunctionCheckCompilerFlags("-std=c++14" US_CXX_FLAGS)
   add_subdirectory(CppMicroServices)
 endif()
-
-#-----------------------------------------------------------------------------
-# Configure standard MITK modules
-#-----------------------------------------------------------------------------
-
-set(MITK_DEFAULT_SUBPROJECTS MITK-Modules)
-
-include(ModuleList.cmake)
-mitkFunctionWhitelistModules(MITK mitk_modules)

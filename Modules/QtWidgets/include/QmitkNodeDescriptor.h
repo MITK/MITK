@@ -30,31 +30,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /**
  * \ingroup QmitkModule
- * \brief QmitkNodeQmitkNodeDescriptor is <i>Decorator</i> class for
- * the mitk::DataNode which enhances certain mitk::DataNode by additional
- * infos needed by the GUI (Icon, ...)
+ * \brief <i>Decorator</i> class for mitk::DataNode.
  *
- * Moreover, QmitkNodeQmitkNodeDescriptor stores a Menu for actions that can be taken
- * for a certain DataNode, e.g. for DataNodes containing images this menu
- * can be filled with Image Filter Actions, etc.
- *
- * \sa QmitkDataNodeQmitkNodeDescriptorManager
+ * \sa QmitkNodeDescriptorManager
  */
 class MITKQTWIDGETS_EXPORT QmitkNodeDescriptor : public QObject
 {
   Q_OBJECT
 public:
   ///
-  /// Creates a new QmitkNodeQmitkNodeDescriptor
+  /// Creates a new QmitkNodeDescriptor
   ///
   QmitkNodeDescriptor(const QString &_ClassName,
                       const QString &_PathToIcon,
                       mitk::NodePredicateBase *_Predicate,
                       QObject *parent);
+
+  QmitkNodeDescriptor(const QString &_ClassName,
+                      const QIcon &_Icon,
+                      mitk::NodePredicateBase *_Predicate,
+                      QObject *parent);
+
   ///
   /// Deletes all actions
   ///
-  virtual ~QmitkNodeDescriptor();
+  ~QmitkNodeDescriptor() override;
   ///
   /// Returns a name for this class of DataNodes (e.g. "Image", "Image Mask", etc.)
   ///
@@ -62,7 +62,7 @@ public:
   ///
   /// Returns an Icon for this class of DataNodes
   ///
-  virtual QIcon GetIcon() const;
+  virtual QIcon GetIcon(const mitk::DataNode *node) const;
   ///
   /// Returns an Icon for this class of DataNodes
   ///
@@ -95,7 +95,7 @@ public slots:
 
 protected:
   QString m_ClassName;
-  QString m_PathToIcon;
+  QIcon m_Icon;
   mitk::NodePredicateBase::Pointer m_Predicate;
   QList<QAction *> m_Actions;
   QList<QAction *> m_BatchActions;

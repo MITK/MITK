@@ -44,7 +44,7 @@ public:
   static const std::string PLUGIN_ID;
 
   org_mitk_core_services_Activator();
-  ~org_mitk_core_services_Activator();
+  ~org_mitk_core_services_Activator() override;
 
   void start(ctkPluginContext* context) override;
   void stop(ctkPluginContext* context) override;

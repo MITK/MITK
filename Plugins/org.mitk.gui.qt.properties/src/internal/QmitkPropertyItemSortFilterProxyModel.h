@@ -25,7 +25,7 @@ class QmitkPropertyItemSortFilterProxyModel : public QSortFilterProxyModel
 
 public:
   explicit QmitkPropertyItemSortFilterProxyModel(QObject* parent = nullptr);
-  ~QmitkPropertyItemSortFilterProxyModel();
+  ~QmitkPropertyItemSortFilterProxyModel() override;
 
 protected:
   bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;

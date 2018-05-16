@@ -44,7 +44,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkEnumerationProperty.h>
 #include <mitkGridRepresentationProperty.h>
 #include <mitkGridVolumeMapperProperty.h>
-#include <mitkOrganTypeProperty.h>
 #include <mitkVtkInterpolationProperty.h>
 #include <mitkVtkRepresentationProperty.h>
 #include <mitkVtkResliceInterpolationProperty.h>
@@ -61,9 +60,9 @@ public:
   {
     mitk::BaseData::Pointer baseData;
 
-    // NULL pointer Test
+    // nullptr pointer Test
     dataNode->SetData(baseData);
-    MITK_TEST_CONDITION(baseData == dataNode->GetData(), "Testing if a NULL pointer was set correctly")
+    MITK_TEST_CONDITION(baseData == dataNode->GetData(), "Testing if a nullptr pointer was set correctly")
 
     baseData = mitk::Contour::New();
     dataNode->SetData(baseData);
@@ -83,7 +82,7 @@ public:
     mitk::Mapper::Pointer mapper;
 
     dataNode->SetMapper(0, mapper);
-    MITK_TEST_CONDITION(mapper == dataNode->GetMapper(0), "Testing if a NULL pointer was set correctly")
+    MITK_TEST_CONDITION(mapper == dataNode->GetMapper(0), "Testing if a nullptr pointer was set correctly")
 
     mapper = mitk::ContourMapper2D::New();
     dataNode->SetMapper(1, mapper);

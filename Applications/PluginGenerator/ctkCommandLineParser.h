@@ -140,7 +140,7 @@ public:
    */
   ctkCommandLineParser(QSettings *settings, QObject *newParent = nullptr);
 
-  ~ctkCommandLineParser();
+  ~ctkCommandLineParser() override;
 
   /**
    * Parse a given list of command line arguments.

@@ -35,7 +35,7 @@ struct BERRY_UI_QT IIntroDescriptor : public Object
 
   berryObjectMacro(berry::IIntroDescriptor)
 
-  ~IIntroDescriptor();
+  ~IIntroDescriptor() override;
 
   /**
    * Creates an instance of the intro part defined in the descriptor.

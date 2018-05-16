@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usServiceReference.h"
 
 mitk::OclBinaryThresholdImageFilter::OclBinaryThresholdImageFilter()
-: m_ckBinaryThreshold( NULL )
+: m_ckBinaryThreshold( nullptr )
 {
   this->AddSourceFile("BinaryThresholdFilter.cl");
   this->m_FilterID = "BinaryThreshold";

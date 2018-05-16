@@ -50,12 +50,12 @@ namespace berry
     ///
     /// To be implemented in the subclasses.
     ///
-    virtual void Flush(IPreferences* _Preferences) override;
+    void Flush(IPreferences* _Preferences) override;
 
     ///
     /// Nothing to do here
     ///
-    virtual ~XMLPreferencesStorage();
+    ~XMLPreferencesStorage() override;
 
   protected:
     ///

@@ -70,11 +70,11 @@ int mitkKinectV2ControllerTest(int /* argc */, char* /*argv*/[])
 
       std::stringstream ss;
       ss << "C:/tom/test" << i << ".nrrd";
-      mitk::IOUtil::SaveImage(image, ss.str());
+      mitk::IOUtil::Save(image, ss.str());
 
       std::stringstream ss2;
       ss2 << "C:/tom/rgb" << i << ".nrrd";
-      mitk::IOUtil::SaveImage(rgbimage, ss2.str());
+      mitk::IOUtil::Save(rgbimage, ss2.str());
     }
     MITK_INFO << "counter: " << counter;
   }

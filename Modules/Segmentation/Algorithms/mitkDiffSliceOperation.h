@@ -86,7 +86,7 @@ namespace mitk
     /** \brief Get the axis where the slice has to be applied in the volume.*/
     BaseGeometry *GetWorldGeometry() { return this->m_WorldGeometry; }
   protected:
-    virtual ~DiffSliceOperation();
+    ~DiffSliceOperation() override;
 
     /** \brief Callback for image observer.*/
     void OnImageDeleted();

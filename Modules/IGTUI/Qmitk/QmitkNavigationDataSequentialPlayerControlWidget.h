@@ -45,8 +45,8 @@ protected slots:
   void OnUpdateIntervalChanged(int);
 
 public:
-  explicit QmitkNavigationDataSequentialPlayerControlWidget(QWidget *parent = 0);
-  ~QmitkNavigationDataSequentialPlayerControlWidget();
+  explicit QmitkNavigationDataSequentialPlayerControlWidget(QWidget *parent = nullptr);
+  ~QmitkNavigationDataSequentialPlayerControlWidget() override;
 
   void SetPlayer(mitk::NavigationDataSequentialPlayer::Pointer player);
 

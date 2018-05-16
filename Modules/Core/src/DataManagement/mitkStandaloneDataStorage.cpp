@@ -30,7 +30,7 @@ mitk::StandaloneDataStorage::StandaloneDataStorage() : mitk::DataStorage()
 
 mitk::StandaloneDataStorage::~StandaloneDataStorage()
 {
-  for (AdjacencyList::iterator it = m_SourceNodes.begin(); it != m_SourceNodes.end(); ++it)
+  for (auto it = m_SourceNodes.begin(); it != m_SourceNodes.end(); ++it)
   {
     this->RemoveListeners(it->first);
   }
@@ -48,7 +48,7 @@ void mitk::StandaloneDataStorage::Add(mitk::DataNode *node, const mitk::DataStor
     if (!IsInitialized())
       throw std::logic_error("DataStorage not initialized");
     /* check if node is in its own list of sources */
-    if ((parents != NULL) && (std::find(parents->begin(), parents->end(), node) != parents->end()))
+    if ((parents != nullptr) && (std::find(parents->begin(), parents->end(), node) != parents->end()))
       throw std::invalid_argument("Node is it's own parent");
     /* check if node already exists in StandaloneDataStorage */
     if (m_SourceNodes.find(node) != m_SourceNodes.end())
@@ -56,7 +56,7 @@ void mitk::StandaloneDataStorage::Add(mitk::DataNode *node, const mitk::DataStor
 
     /* create parent list if it does not exist */
     mitk::DataStorage::SetOfObjects::ConstPointer sp;
-    if (parents != NULL)
+    if (parents != nullptr)
       sp = parents;
     else
       sp = mitk::DataStorage::SetOfObjects::New();
@@ -77,7 +77,7 @@ void mitk::StandaloneDataStorage::Add(mitk::DataNode *node, const mitk::DataStor
       if (derivedObjects.IsNull())
         m_DerivedNodes[parent] =
           mitk::DataStorage::SetOfObjects::New(); // Create a set of Objects, if it does not already exist
-      mitk::DataStorage::SetOfObjects *deob = const_cast<mitk::DataStorage::SetOfObjects *>(
+      auto *deob = const_cast<mitk::DataStorage::SetOfObjects *>(
         m_DerivedNodes[parent].GetPointer()); // temporarily get rid of const pointer to insert new element
       deob->InsertElement(deob->Size(),
                           node); // node is derived from parent. Insert it into the parents list of derived objects
@@ -95,7 +95,7 @@ void mitk::StandaloneDataStorage::Remove(const mitk::DataNode *node)
 {
   if (!IsInitialized())
     throw std::logic_error("DataStorage not initialized");
-  if (node == NULL)
+  if (node == nullptr)
     return;
 
   // remove ITK modified event listener
@@ -127,13 +127,13 @@ bool mitk::StandaloneDataStorage::Exists(const mitk::DataNode *node) const
 
 void mitk::StandaloneDataStorage::RemoveFromRelation(const mitk::DataNode *node, AdjacencyList &relation)
 {
-  for (AdjacencyList::const_iterator mapIter = relation.cbegin(); mapIter != relation.cend();
+  for (auto mapIter = relation.cbegin(); mapIter != relation.cend();
        ++mapIter)                    // for each node in the relation
     if (mapIter->second.IsNotNull()) // if node has a relation list
     {
       SetOfObjects::Pointer s =
         const_cast<SetOfObjects *>(mapIter->second.GetPointer()); // search for node to be deleted in the relation list
-      SetOfObjects::STLContainerType::iterator relationListIter = std::find(
+      auto relationListIter = std::find(
         s->begin(),
         s->end(),
         node); // this assumes, that the relation list does not contain duplicates (which should be safe to assume)
@@ -156,7 +156,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetAl
   mitk::DataStorage::SetOfObjects::Pointer resultset = mitk::DataStorage::SetOfObjects::New();
   /* Fill resultset with all objects that are managed by the StandaloneDataStorage object */
   unsigned int index = 0;
-  for (AdjacencyList::const_iterator it = m_SourceNodes.cbegin(); it != m_SourceNodes.cend(); ++it)
+  for (auto it = m_SourceNodes.cbegin(); it != m_SourceNodes.cend(); ++it)
     if (it->first.IsNull())
       continue;
     else
@@ -171,13 +171,13 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
   const NodePredicateBase *condition,
   bool onlyDirectlyRelated) const
 {
-  if (node == NULL)
+  if (node == nullptr)
     throw std::invalid_argument("invalid node");
 
   /* Either read direct relations directly from adjacency list */
   if (onlyDirectlyRelated)
   {
-    AdjacencyList::const_iterator it = relation.find(node); // get parents of current node
+    auto it = relation.find(node); // get parents of current node
     if ((it == relation.cend()) || (it->second.IsNull()))   // node not found in list or no set of parents
       return SetOfObjects::ConstPointer(mitk::DataStorage::SetOfObjects::New()); // return an empty set
     else
@@ -197,7 +197,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
     mitk::DataNode::ConstPointer current = openlist.back();    // get element that needs to be processed
     openlist.pop_back();                                       // remove last element, because it gets processed now
     resultset.push_back(current);                              // add current element to resultset
-    AdjacencyList::const_iterator it = relation.find(current); // get parents of current node
+    auto it = relation.find(current); // get parents of current node
     if ((it == relation.cend())                                // if node not found in list
         ||
         (it->second.IsNull()) // or no set of parents available
@@ -220,9 +220,9 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
   /* now finally copy the results to a proper SetOfObjects variable exluding the initial node and checking the condition
    * if any is given */
   mitk::DataStorage::SetOfObjects::Pointer realResultset = mitk::DataStorage::SetOfObjects::New();
-  if (condition != NULL)
+  if (condition != nullptr)
   {
-    for (std::vector<mitk::DataNode::ConstPointer>::const_iterator resultIt = resultset.cbegin();
+    for (auto resultIt = resultset.cbegin();
          resultIt != resultset.cend();
          ++resultIt)
       if ((*resultIt != node) && (condition->CheckNode(*resultIt) == true))
@@ -231,7 +231,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
   }
   else
   {
-    for (std::vector<mitk::DataNode::ConstPointer>::const_iterator resultIt = resultset.cbegin();
+    for (auto resultIt = resultset.cbegin();
          resultIt != resultset.cend();
          ++resultIt)
       if (*resultIt != node)

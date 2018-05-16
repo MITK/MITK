@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <cstdlib>
 #include <ctime>
-#include <math.h>
+#include <cmath>
 
 #include <mitkGeometry3D.h>
 
@@ -104,7 +104,7 @@ public:
     slicer->SetWorldGeometry(TestPlane);
     slicer->Update();
 
-    MITK_TEST_CONDITION_REQUIRED(slicer->GetOutput() != NULL, "Extractor returned a slice");
+    MITK_TEST_CONDITION_REQUIRED(slicer->GetOutput() != nullptr, "Extractor returned a slice");
 
     mitk::Image::Pointer reslicedImage = slicer->GetOutput();
 
@@ -437,7 +437,7 @@ public:
     typedef itk::Image<unsigned short, 3> ImageType;
 
     // set the seed of the rand function
-    srand((unsigned)time(0));
+    srand((unsigned)time(nullptr));
 
     /* setup a random orthogonal plane */
     int sliceindex = 17; // rand() % 32;
@@ -673,7 +673,7 @@ public:
 
     std::string filename = locator->FindFile("sphere_512.nrrd.mhd", "Modules/ImageExtraction/Testing/Data");
 
-    TestVolume = mitk::IOUtil::LoadImage(filename);
+    TestVolume = mitk::IOUtil::Load<mitk::Image>(filename);
 
 #endif
 
@@ -948,7 +948,7 @@ int mitkExtractSliceFilterTest(int /*argc*/, char * /*argv*/ [])
 
   // set reslicer for renderwindow
 
-  mitk::Image::Pointer pic = mitk::IOUtil::LoadImage(filename);
+  mitk::Image::Pointer pic = mitk::IOUtil::Load<mitk::Image>(filename);
   vtkSmartPointer<vtkImageReslice> slicer = vtkSmartPointer<vtkImageReslice>::New();
 
   slicer->SetInput(pic->GetVtkImageData());

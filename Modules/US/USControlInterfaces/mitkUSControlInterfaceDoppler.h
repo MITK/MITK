@@ -32,7 +32,7 @@ namespace mitk {
 
   protected:
     USControlInterfaceDoppler( itk::SmartPointer<USDevice> device );
-    virtual ~USControlInterfaceDoppler( );
+    ~USControlInterfaceDoppler( ) override;
   };
 } // namespace mitk
 

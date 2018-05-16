@@ -90,7 +90,7 @@ void mitk::PixelManipulationTool::CalculateImage()
 
     if (maskNode)
     {
-      mitk::BoundingObject *boundingObject = dynamic_cast<mitk::BoundingObject *>(maskNode->GetData());
+      auto *boundingObject = dynamic_cast<mitk::BoundingObject *>(maskNode->GetData());
 
       if (boundingObject)
       {

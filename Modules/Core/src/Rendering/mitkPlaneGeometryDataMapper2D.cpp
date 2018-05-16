@@ -183,7 +183,7 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer
   // (for the gap at the point where they intersect). A change in any of the
   // other PlaneGeometryData nodes could mean that we render ourself
   // differently, so we check for that here.
-  for (AllInstancesContainer::iterator it = s_AllInstances.begin(); it != s_AllInstances.end(); ++it)
+  for (auto it = s_AllInstances.begin(); it != s_AllInstances.end(); ++it)
   {
     bool generateDataRequired = ls->IsGenerateDataRequired(renderer, this, (*it)->GetDataNode());
     if (generateDataRequired)
@@ -195,7 +195,7 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer
   // Collect all other PlaneGeometryDatas that are being mapped by this mapper
   m_OtherPlaneGeometries.clear();
 
-  for (AllInstancesContainer::iterator it = s_AllInstances.begin(); it != s_AllInstances.end(); ++it)
+  for (auto it = s_AllInstances.begin(); it != s_AllInstances.end(); ++it)
   {
     Self *otherInstance = *it;
 
@@ -211,11 +211,11 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer
     if (!otherNode->IsVisible(renderer))
       continue;
 
-    PlaneGeometryData *otherData = dynamic_cast<PlaneGeometryData *>(otherNode->GetData());
+    auto *otherData = dynamic_cast<PlaneGeometryData *>(otherNode->GetData());
     if (!otherData)
       continue;
 
-    PlaneGeometry *otherGeometry = dynamic_cast<PlaneGeometry *>(otherData->GetPlaneGeometry());
+    auto *otherGeometry = dynamic_cast<PlaneGeometry *>(otherData->GetPlaneGeometry());
     if (otherGeometry && !dynamic_cast<AbstractTransformGeometry *>(otherData->GetPlaneGeometry()))
     {
       m_OtherPlaneGeometries.push_back(otherNode);
@@ -242,7 +242,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
     return;
   }
 
-  PlaneGeometryData::Pointer input = const_cast<PlaneGeometryData *>(this->GetInput());
+  PlaneGeometryData::ConstPointer input = this->GetInput();
   mitk::DataNode *geometryDataNode = renderer->GetCurrentWorldPlaneGeometryNode();
   const PlaneGeometryData *rendererWorldPlaneGeometryData =
     dynamic_cast<PlaneGeometryData *>(geometryDataNode->GetData());
@@ -253,13 +253,13 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
     return; // nothing to do in this case
   }
 
-  const PlaneGeometry *inputPlaneGeometry = dynamic_cast<const PlaneGeometry *>(input->GetPlaneGeometry());
+  const auto *inputPlaneGeometry = dynamic_cast<const PlaneGeometry *>(input->GetPlaneGeometry());
 
-  const PlaneGeometry *worldPlaneGeometry =
+  const auto *worldPlaneGeometry =
     dynamic_cast<const PlaneGeometry *>(rendererWorldPlaneGeometryData->GetPlaneGeometry());
 
-  if (worldPlaneGeometry && dynamic_cast<const AbstractTransformGeometry *>(worldPlaneGeometry) == NULL &&
-      inputPlaneGeometry && dynamic_cast<const AbstractTransformGeometry *>(input->GetPlaneGeometry()) == NULL)
+  if (worldPlaneGeometry && dynamic_cast<const AbstractTransformGeometry *>(worldPlaneGeometry) == nullptr &&
+      inputPlaneGeometry && dynamic_cast<const AbstractTransformGeometry *>(input->GetPlaneGeometry()) == nullptr)
   {
     const BaseGeometry *referenceGeometry = inputPlaneGeometry->GetReferenceGeometry();
 
@@ -291,11 +291,11 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       // calculate the positions of intersection with the line to be
       // rendered; these positions will be stored in lineParams to form a
       // gap afterwards.
-      NodesVectorType::iterator otherPlanesIt = m_OtherPlaneGeometries.begin();
-      NodesVectorType::iterator otherPlanesEnd = m_OtherPlaneGeometries.end();
+      auto otherPlanesIt = m_OtherPlaneGeometries.begin();
+      auto otherPlanesEnd = m_OtherPlaneGeometries.end();
 
       int gapSize = 32;
-      this->GetDataNode()->GetPropertyValue("Crosshair.Gap Size", gapSize, NULL);
+      this->GetDataNode()->GetPropertyValue("Crosshair.Gap Size", gapSize, nullptr);
 
       auto intervals = IntervalSet<double>(SimpleInterval<double>(0, 1));
 
@@ -315,7 +315,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
             continue;
           }
 
-          PlaneGeometry *otherPlaneGeometry = static_cast<PlaneGeometry *>(
+          auto *otherPlaneGeometry = static_cast<PlaneGeometry *>(
             static_cast<PlaneGeometryData *>((*otherPlanesIt)->GetData())->GetPlaneGeometry());
 
           if (otherPlaneGeometry != inputPlaneGeometry && otherPlaneGeometry != worldPlaneGeometry)
@@ -372,7 +372,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       double thickSliceDistance = SlicedGeometry3D::CalculateSpacing(
         referenceGeometry ? referenceGeometry->GetSpacing() : inputPlaneGeometry->GetSpacing(), orthogonalVector);
 
-      IntProperty *intProperty = 0;
+      IntProperty *intProperty = nullptr;
       if (GetDataNode()->GetProperty(intProperty, "reslice.thickslices.num") && intProperty)
         thickSliceDistance *= intProperty->GetValue() + 0.5;
       else
@@ -582,11 +582,11 @@ int mitk::PlaneGeometryDataMapper2D::DetermineThickSliceMode(DataNode *dn, int &
 {
   int thickSlicesMode = 0;
   // determine the state and the extend of the thick-slice mode
-  mitk::ResliceMethodProperty *resliceMethodEnumProperty = 0;
+  mitk::ResliceMethodProperty *resliceMethodEnumProperty = nullptr;
   if (dn->GetProperty(resliceMethodEnumProperty, "reslice.thickslices") && resliceMethodEnumProperty)
     thickSlicesMode = resliceMethodEnumProperty->GetValueAsId();
 
-  IntProperty *intProperty = 0;
+  IntProperty *intProperty = nullptr;
   if (dn->GetProperty(intProperty, "reslice.thickslices.num") && intProperty)
   {
     thickSlicesNum = intProperty->GetValue();
@@ -616,7 +616,7 @@ void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties(BaseRenderer *renderer)
 
   PlaneOrientationProperty *decorationProperty;
   this->GetDataNode()->GetProperty(decorationProperty, "decoration", renderer);
-  if (decorationProperty != NULL)
+  if (decorationProperty != nullptr)
   {
     if (decorationProperty->GetPlaneDecoration() == PlaneOrientationProperty::PLANE_DECORATION_POSITIVE_ORIENTATION)
     {

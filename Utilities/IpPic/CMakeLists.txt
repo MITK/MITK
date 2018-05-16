@@ -15,6 +15,7 @@ mitk_create_module(
   ADDITIONAL_LIBS ${_additional_libs}
   ${_options}
   C_MODULE
+  WARNINGS_NO_ERRORS
 )
 
 target_compile_definitions(${MODULE_TARGET} PRIVATE -DMITK_IPPIC_COMPILE)

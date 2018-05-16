@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   ToFCameraPMDRawDataDevice::ToFCameraPMDRawDataDevice() :
-  m_SourceDataBuffer(NULL), m_SourceDataArray(NULL), m_ShortSourceData(NULL),
+  m_SourceDataBuffer(nullptr), m_SourceDataArray(nullptr), m_ShortSourceData(nullptr),
   m_OriginControllerWidth(0), m_OriginControllerHeight(0)
   {
     m_RawDataSource = ThreadedToFRawDataReconstruction::New();
@@ -147,16 +147,16 @@ namespace mitk
   {
     /* extract this pointer from Thread Info structure */
     struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-    if (pInfo == NULL)
+    if (pInfo == nullptr)
     {
       return ITK_THREAD_RETURN_VALUE;
     }
-    if (pInfo->UserData == NULL)
+    if (pInfo->UserData == nullptr)
     {
       return ITK_THREAD_RETURN_VALUE;
     }
     ToFCameraPMDRawDataDevice* toFCameraDevice = (ToFCameraPMDRawDataDevice*)pInfo->UserData;
-    if (toFCameraDevice!=NULL)
+    if (toFCameraDevice!=nullptr)
     {
       mitk::RealTimeClock::Pointer realTimeClock = mitk::RealTimeClock::New();
       double t1, t2;

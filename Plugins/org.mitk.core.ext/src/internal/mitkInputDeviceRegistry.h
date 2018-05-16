@@ -41,7 +41,7 @@ namespace mitk
     typedef IInputDeviceDescriptor::Pointer InputDeviceDescriptorPtr;
 
     InputDeviceRegistry();
-    ~InputDeviceRegistry();
+    ~InputDeviceRegistry() override;
 
     /**
     * @see mitk::IInputDeviceRegistry::Find(const std::string& id)

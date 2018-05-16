@@ -34,7 +34,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkEditPointDialog : public QDialog
 
 public:
   QmitkEditPointDialog(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
-  virtual ~QmitkEditPointDialog();
+  ~QmitkEditPointDialog() override;
 
   void SetPoint(mitk::PointSet *_PointSet, mitk::PointSet::PointIdentifier _PointId, int timestep = 0);
 

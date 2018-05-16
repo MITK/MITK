@@ -76,7 +76,7 @@ int mitkPlaneFitTest(int, char *[])
 
   // Test PlaneGeometry
   std::cout << "  Test PlaneGeometry: ";
-  mitk::PlaneGeometry *PlaneGeometry = dynamic_cast<mitk::PlaneGeometry *>(PlaneFit->GetOutput()->GetGeometry());
+  auto *PlaneGeometry = dynamic_cast<mitk::PlaneGeometry *>(PlaneFit->GetOutput()->GetGeometry());
   if (PlaneGeometry)
   {
     std::cout << "[PASSED]" << std::endl;

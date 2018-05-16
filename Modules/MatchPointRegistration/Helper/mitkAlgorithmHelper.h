@@ -42,7 +42,7 @@ namespace mitk
   {
   public:
 
-    MITKAlgorithmHelper(map::algorithm::RegistrationAlgorithmBase* algorithm = NULL);
+    MITKAlgorithmHelper(map::algorithm::RegistrationAlgorithmBase* algorithm = nullptr);
 
     void SetData(const mitk::BaseData* moving, const mitk::BaseData* target);
 

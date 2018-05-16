@@ -30,9 +30,9 @@ class MAPRegistrationWrapperObjectFactory : public mitk::CoreObjectFactoryBase
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-    ~MAPRegistrationWrapperObjectFactory();
+    ~MAPRegistrationWrapperObjectFactory() override;
 
-    virtual void SetDefaultProperties(mitk::DataNode* node);
+    void SetDefaultProperties(mitk::DataNode* node) override;
 
     /**
      * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
@@ -51,7 +51,7 @@ class MAPRegistrationWrapperObjectFactory : public mitk::CoreObjectFactoryBase
      */
     DEPRECATED(virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap());
 
-    virtual mitk::Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
+    mitk::Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) override;
 
   protected:
     MAPRegistrationWrapperObjectFactory();

@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "mitkRenderingManager.h"
 #include "mitkProgressBar.h"
+#include <mitkImageWriteAccessor.h>
 
 #include <itkConstantPadImageFilter.h>
 
@@ -78,24 +79,27 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
               mitk::Image::Pointer _cropped3dSlice = this->IncreaseCroppedImageSize(_3dSlice);
 
               // +++ BUG +++ BUG +++ BUG +++ BUG +++ BUG +++ BUG +++ BUG +++
-              void *_data = _cropped3dSlice->GetData();
-
-              // <ToBeRemoved>
-              // We write some stripes into the image
-              if ((i & 1) == 0)
               {
-              int depth = _cropped3dSlice->GetDimension(2);
-              int height = _cropped3dSlice->GetDimension(1);
-              int width = _cropped3dSlice->GetDimension(0);
+                mitk::ImageWriteAccessor writeAccess(_cropped3dSlice);
+                void *_data = writeAccess.GetData();
 
-              for (int z = 0; z < depth; ++z)
-                for (int y = 0; y < height; ++y)
-                  for (int x = 0; x < width; ++x)
-                    reinterpret_cast<unsigned char *>(_data)[(width * height * z) + (width * y) + x] = x & 1;
-              // </ToBeRemoved>
+                // <ToBeRemoved>
+                // We write some stripes into the image
+                if ((i & 1) == 0)
+                {
+                  int depth = _cropped3dSlice->GetDimension(2);
+                  int height = _cropped3dSlice->GetDimension(1);
+                  int width = _cropped3dSlice->GetDimension(0);
+
+                  for (int z = 0; z < depth; ++z)
+                    for (int y = 0; y < height; ++y)
+                      for (int x = 0; x < width; ++x)
+                        reinterpret_cast<unsigned char *>(_data)[(width * height * z) + (width * y) + x] = x & 1;
+                }
+                // </ToBeRemoved>
+
+                image->SetVolume(_data, i);
               }
-
-              image->SetVolume(_data, i);
             }
             node->SetData( image ); // bug fix 3145
           }
@@ -105,7 +109,7 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
           }
           // Reinit node
           mitk::RenderingManager::GetInstance()->InitializeViews(
-            node->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+            node->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
           mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
         }
@@ -118,7 +122,7 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
     }
     else
     {
-      MITK_INFO << "   a NULL node selected";
+      MITK_INFO << "   a nullptr node selected";
     }
   }
 }
@@ -134,8 +138,8 @@ mitk::Image::Pointer QmitkAutocropAction::IncreaseCroppedImageSize( mitk::Image:
   typedef itk::ConstantPadImageFilter< ImageType, PADOutputImageType > PadFilterType;
   PadFilterType::Pointer padFilter = PadFilterType::New();
 
-  unsigned long upperPad[3];
-  unsigned long lowerPad[3];
+  itk::SizeValueType upperPad[3];
+  itk::SizeValueType lowerPad[3];
   int borderLiner = 3;
 
   mitk::Point3D mitkOriginPoint;

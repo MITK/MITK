@@ -129,7 +129,7 @@ public:
    */
   WorkbenchMenuService(IServiceLocator* serviceLocator);
 
-  ~WorkbenchMenuService();
+  ~WorkbenchMenuService() override;
 
   void Dispose() override;
 

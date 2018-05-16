@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkColorProperty.h"
 #include "mitkDataStorage.h"
 #include "mitkLevelWindowProperty.h"
-#include "mitkOrganTypeProperty.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
 #include "mitkVtkResliceInterpolationProperty.h"
@@ -68,7 +67,7 @@ mitk::BinaryThresholdTool::~BinaryThresholdTool()
 
 const char **mitk::BinaryThresholdTool::GetXPM() const
 {
-  return NULL;
+  return nullptr;
 }
 
 us::ModuleResource mitk::BinaryThresholdTool::GetIconResource() const
@@ -107,8 +106,8 @@ void mitk::BinaryThresholdTool::Deactivated()
 {
   m_ToolManager->RoiDataChanged -=
     mitk::MessageDelegate<mitk::BinaryThresholdTool>(this, &mitk::BinaryThresholdTool::OnRoiDataChanged);
-  m_NodeForThresholding = NULL;
-  m_OriginalImageNode = NULL;
+  m_NodeForThresholding = nullptr;
+  m_OriginalImageNode = nullptr;
   try
   {
     if (DataStorage *storage = m_ToolManager->GetDataStorage())
@@ -121,7 +120,7 @@ void mitk::BinaryThresholdTool::Deactivated()
   {
     // don't care
   }
-  m_ThresholdFeedbackNode->SetData(NULL);
+  m_ThresholdFeedbackNode->SetData(nullptr);
 
   Superclass::Deactivated();
 }
@@ -130,6 +129,16 @@ void mitk::BinaryThresholdTool::SetThresholdValue(double value)
 {
   if (m_ThresholdFeedbackNode.IsNotNull())
   {
+    /* If value is not in the min/max range, do nothing. In that case, this
+       method will be called again with a proper value right after. The only
+       known case where this happens is with an [0.0, 1.0[ image, where value
+       could be an epsilon greater than the max. */
+    if (value < m_SensibleMinimumThresholdValue
+     || value > m_SensibleMaximumThresholdValue)
+    {
+      return;
+    }
+
     m_CurrentThresholdValue = value;
     // Bug 19250: The range of 0.01 is rather random. It was 0.001 before and probably due to rounding error propagation
     // in VTK code

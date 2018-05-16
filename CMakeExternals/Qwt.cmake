@@ -18,7 +18,13 @@ if(NOT DEFINED ${proj}_DIR)
   set(patch_cmd ${CMAKE_COMMAND} -Dproj:STRING=${proj} -Dproj_target:STRING=qwt -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake)
   set(qt54patch_cmd ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchQwt-6.1.0.cmake)
 
-  set(additional_cmake_args )
+  set(additional_cmake_args
+  "-DQt5Svg_DIR:PATH=${Qt5Svg_DIR}"
+  "-DQt5OpenGL_DIR:PATH=${Qt5OpenGL_DIR}"
+  "-DQt5PrintSupport_DIR:PATH=${Qt5PrintSupport_DIR}"
+  "-DQt5Concurrent_DIR:PATH=${Qt5Concurrent_DIR}"
+  "-DQt5Designer_DIR:PATH=${Qt5_DIR}Designer"
+  )
   if(CTEST_USE_LAUNCHERS)
     list(APPEND additional_cmake_args
       "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"

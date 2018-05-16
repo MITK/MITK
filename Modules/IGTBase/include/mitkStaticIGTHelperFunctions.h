@@ -27,16 +27,15 @@ namespace mitk {
   public:
   /** Computes the angle in the plane perpendicular to the rotation axis of the two quaterions.
    *  Therefore, a vector is rotated with the difference of both rotations and the angle is computed.
-   *  In some cases you might want to defice this vector e.g., if working with 5D tools. By default
-   *  the vector is defined along the Z-axis which works for Aurora 5D tools.
+   *  In some cases you might want to define this vector e.g., if working with 5D tools. For NDI Aurora
+   *  5D tools you need to defined this vector along the Z-axis.
    *  @return Returns the angle in degrees.
    **/
   static double GetAngleBetweenTwoQuaterions(mitk::Quaternion a, mitk::Quaternion b, itk::Vector<double,3> rotationVector);
 
-  /** Computes the angle in the plane perpendicular to the rotation axis of the two quaterions.
-   *  Therefore, a vector is rotated with the difference of both rotations and the angle is computed.
-   *  In some cases you might want to defice this vector e.g., if working with 5D tools. By default
-   *  the vector is defined along the Z-axis which works for Aurora 5D tools.
+  /** Computes difference between two quaternions in degree, which is the minimum rotation angle between
+   *  these two quaternions.
+   *  The used formula is described here: https://fgiesen.wordpress.com/2013/01/07/small-note-on-quaternion-distance-metrics/
    *  @return Returns the angle in degrees.
    **/
   static double GetAngleBetweenTwoQuaterions(mitk::Quaternion a, mitk::Quaternion b);
@@ -49,6 +48,6 @@ namespace mitk {
   *  @param transform        This transform is applied to the image fiducials before the FRE calculation if it is given.
   *  @return                 Returns the FRE. Returns -1 if there was an error.
   */
-  static double ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform = NULL);
+  static double ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform = nullptr);
   };
 }

@@ -78,7 +78,7 @@ mitk::ToolManager *QmitkToolReferenceDataSelectionBox::GetToolManager()
 }
 
 void QmitkToolReferenceDataSelectionBox::SetToolManager(
-  mitk::ToolManager &newManager) // no NULL pointer allowed here, a manager is required
+  mitk::ToolManager &newManager) // no nullptr pointer allowed here, a manager is required
 {
   m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkToolReferenceDataSelectionBox>(
     this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified);
@@ -102,7 +102,7 @@ void QmitkToolReferenceDataSelectionBox::OnReferenceDataSelected(const mitk::Dat
   emit ReferenceNodeSelected(selectedNode);
 
   m_SelfCall = true;
-  m_ToolManager->SetReferenceData(const_cast<mitk::DataNode *>(selectedNode)); // maybe NULL
+  m_ToolManager->SetReferenceData(const_cast<mitk::DataNode *>(selectedNode)); // maybe nullptr
   m_SelfCall = false;
 
   EnsureOnlyReferenceImageIsVisibile();
@@ -149,7 +149,7 @@ mitk::NodePredicateBase::ConstPointer QmitkToolReferenceDataSelectionBox::GetAll
 
   std::vector<mitk::NodePredicateBase::ConstPointer> m_Predicates;
   m_Predicates.clear();
-  mitk::NodePredicateBase::ConstPointer completePredicate = NULL;
+  mitk::NodePredicateBase::ConstPointer completePredicate = nullptr;
 
   const mitk::ToolManager::ToolVectorTypeConst allTools = m_ToolManager->GetTools();
 

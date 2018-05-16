@@ -46,6 +46,9 @@ public:
     typedef SmartPointer<const Self>                ConstPointer;
     typedef ImageToImageFilter< VectorImage< TInPixelType, 3 >, VectorImage< TInPixelType, 3 > >  Superclass;
 
+    typedef typename Superclass::InputImageType InputImageType;
+    typedef typename Superclass::OutputImageType OutputImageType;
+    typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
@@ -57,21 +60,18 @@ public:
     typedef itk::Image< unsigned char, 3 > UcharImageType;
     typedef itk::Image< unsigned short, 3 > BinImageType;
     typedef itk::Image< TInPixelType, 3 > TInPixelImageType;
-    typedef typename Superclass::InputImageType InputImageType;
-    typedef typename Superclass::OutputImageType OutputImageType;
-    typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
     typedef mitk::DiffusionPropertyHelper::GradientDirectionType GradientDirectionType;
     typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer GradientContainerType;
-    typedef itk::LabelStatisticsImageFilter< TInPixelImageType,BinImageType >  StatisticsFilterType;
-    typedef itk::Statistics::Histogram< typename TInPixelImageType::PixelType  > HistogramType;
-    typedef typename HistogramType::MeasurementType MeasurementType;
-    typedef itk::ShiftScaleImageFilter<TInPixelImageType, DoubleImageType>  ShiftScaleImageFilterType;
+
+    typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
+    typedef ImageRegionConstIterator< UcharImageType > MaskIteratorType;
+
 
     itkSetMacro( GradientDirections, GradientContainerType )
     itkSetMacro( ScalingFactor, TInPixelType )
-    itkSetMacro( UseGlobalReference, bool )
     itkSetMacro( MaskImage, UcharImageType::Pointer )
-    itkSetMacro( Reference, double )
+    itkSetMacro( NewMean, double )
+    itkSetMacro( NewStdev, double )
 
     protected:
         DwiNormilzationFilter();
@@ -85,9 +85,10 @@ public:
     GradientContainerType   m_GradientDirections;
     int                     m_B0Index;
     TInPixelType            m_ScalingFactor;
-    bool                    m_UseGlobalReference;
-    double                  m_Reference;
-
+    double                  m_Mean;
+    double                  m_Stdev;
+    double                  m_NewMean;
+    double                  m_NewStdev;
 };
 
 }

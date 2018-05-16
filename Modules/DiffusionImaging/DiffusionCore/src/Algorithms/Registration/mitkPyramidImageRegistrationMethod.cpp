@@ -20,14 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 
 mitk::PyramidImageRegistrationMethod::PyramidImageRegistrationMethod()
-  : m_FixedImage(NULL),
-    m_MovingImage(NULL),
+  : m_FixedImage(nullptr),
+    m_MovingImage(nullptr),
     m_CrossModalityRegistration(true),
     m_UseAffineTransform(true),
     m_UseWindowedSincInterpolator(false),
     m_UseNearestNeighborInterpolator(false),
     m_UseMask(false),
-    m_EstimatedParameters(0),
+    m_EstimatedParameters(nullptr),
     m_InitialParameters(0),
     m_Verbose(false)
 {
@@ -36,7 +36,7 @@ mitk::PyramidImageRegistrationMethod::PyramidImageRegistrationMethod()
 
 mitk::PyramidImageRegistrationMethod::~PyramidImageRegistrationMethod()
 {
-  if( m_EstimatedParameters != NULL)
+  if( m_EstimatedParameters != nullptr)
   {
     delete [] m_EstimatedParameters;
   }
@@ -98,7 +98,7 @@ mitk::PyramidImageRegistrationMethod::TransformMatrixType mitk::PyramidImageRegi
 ::GetLastRotationMatrix()
 {
   TransformMatrixType output;
-  if( m_EstimatedParameters == NULL )
+  if( m_EstimatedParameters == nullptr )
   {
     output.set_identity();
     return output;
@@ -157,7 +157,7 @@ mitk::Image::Pointer mitk::PyramidImageRegistrationMethod::GetResampledMovingIma
   if( !m_UseAffineTransform )
     dim = 6;
 
-  if (m_EstimatedParameters == NULL)
+  if (m_EstimatedParameters == nullptr)
     m_EstimatedParameters = new double[dim];
 
   double tmpParams[12];
@@ -287,7 +287,7 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
   shrink_factors[0] = max_schedule_val;
   for( unsigned int i=1; i<max_pyramid_lvl; i++)
   {
-    shrink_factors[i] = std::max( shrink_factors[i-1]/2, 1ul);
+	  shrink_factors[i] = std::max(shrink_factors[i - 1] / 2, itk::SizeValueType(1));
   }
 
   if(m_Verbose)
@@ -389,7 +389,7 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
   }
 
 
-  if( m_EstimatedParameters != NULL)
+  if( m_EstimatedParameters != nullptr)
   {
     delete [] m_EstimatedParameters;
   }

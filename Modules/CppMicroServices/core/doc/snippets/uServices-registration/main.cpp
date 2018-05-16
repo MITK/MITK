@@ -54,13 +54,13 @@ context->RegisterService<InterfaceA, InterfaceB>(myService);
 //! [f1]
 class MyServiceFactory : public ServiceFactory
 {
-  virtual InterfaceMap GetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/) override
+  InterfaceMap GetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/) override
   {
     MyService* myService = new MyService;
     return MakeInterfaceMap<InterfaceA>(myService);
   }
 
-  virtual void UngetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/,
+  void UngetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/,
                             const InterfaceMap& service) override
   {
     delete ExtractInterface<InterfaceA>(service);
@@ -77,13 +77,13 @@ context->RegisterService<InterfaceA>(myServiceFactory);
 //! [f2]
 class MyServiceFactory : public ServiceFactory
 {
-  virtual InterfaceMap GetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/) override
+  InterfaceMap GetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/) override
   {
     MyService2* myService = new MyService2;
     return MakeInterfaceMap<InterfaceA,InterfaceB>(myService);
   }
 
-  virtual void UngetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/,
+  void UngetService(Module* /*module*/, const ServiceRegistrationBase& /*registration*/,
                             const InterfaceMap& service) override
   {
     delete ExtractInterface<InterfaceA>(service);

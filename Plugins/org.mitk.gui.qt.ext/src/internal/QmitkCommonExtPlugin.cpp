@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QProcess>
 #include <QMainWindow>
 
-ctkPluginContext* QmitkCommonExtPlugin::_context = 0;
+ctkPluginContext* QmitkCommonExtPlugin::_context = nullptr;
 
 void QmitkCommonExtPlugin::start(ctkPluginContext* context)
 {
@@ -70,7 +70,7 @@ void QmitkCommonExtPlugin::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 
-  this->_context = 0;
+  this->_context = nullptr;
 }
 
 ctkPluginContext* QmitkCommonExtPlugin::getContext()
@@ -106,7 +106,13 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
            try
            {
              const std::string path(arguments[i].toStdString());
-             mitk::IOUtil::Load(path, *dataStorage);
+             auto addedNodes = mitk::IOUtil::Load(path, *dataStorage);
+
+             for (auto const node : *addedNodes )
+             {
+               node->SetIntProperty("layer", argumentsAdded);
+             }
+
              argumentsAdded++;
            }
            catch(...)

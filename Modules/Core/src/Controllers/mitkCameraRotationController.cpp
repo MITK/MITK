@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkPropRenderer.h"
 
 mitk::CameraRotationController::CameraRotationController()
-  : BaseController(), m_LastStepperValue(180), m_Camera(NULL), m_RenderWindow(NULL)
+  : BaseController(), m_LastStepperValue(180), m_Camera(nullptr), m_RenderWindow(nullptr)
 {
   m_Slice->SetAutoRepeat(true);
   m_Slice->SetSteps(360);
@@ -64,7 +64,7 @@ void mitk::CameraRotationController::AcquireCamera()
 {
   BaseRenderer *renderer = mitk::BaseRenderer::GetInstance(m_RenderWindow);
 
-  const mitk::VtkPropRenderer *propRenderer = dynamic_cast<const mitk::VtkPropRenderer *>(renderer);
+  const auto *propRenderer = dynamic_cast<const mitk::VtkPropRenderer *>(renderer);
   if (propRenderer)
   {
     // get vtk renderer
@@ -79,13 +79,13 @@ void mitk::CameraRotationController::AcquireCamera()
         if (!m_Camera)
         {
           m_Camera = vtkcam;
-          m_Camera->Register(NULL);
+          m_Camera->Register(nullptr);
         }
         else
         {
-          m_Camera->UnRegister(NULL);
+          m_Camera->UnRegister(nullptr);
           m_Camera = vtkcam;
-          m_Camera->Register(NULL);
+          m_Camera->Register(nullptr);
         }
       }
     }

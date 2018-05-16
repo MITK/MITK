@@ -229,7 +229,7 @@ namespace mitk
 
     ContourElement();
     ContourElement(const mitk::ContourElement &other);
-    virtual ~ContourElement();
+    ~ContourElement() override;
 
     VertexListType *m_Vertices; // double ended queue with vertices
     bool m_IsClosed;

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 
 #include <vnl/vnl_quaternion.h>
-#include <vnl/vnl_quaternion.txx>
+#include <vnl/vnl_quaternion.hxx>
 
 #include <fstream>
 #include <array>
@@ -41,7 +41,7 @@ static mitk::SlicedGeometry3D::Pointer createSlicedGeometry(const mitk::Point3D 
   slicedGeometry->SetOrigin(origin);
   slicedGeometry->SetSpacing(spacing);
 
-  for (unsigned int i = 0; i < numberOfSlices; ++i)
+  for (int i = 0; i < numberOfSlices; ++i)
   {
     auto planeGeometry = createPlaneGeometry();
     slicedGeometry->SetPlaneGeometry(planeGeometry, i);
@@ -72,13 +72,6 @@ static mitk::Point3D createPoint(mitk::ScalarType x, mitk::ScalarType y, mitk::S
 static mitk::Vector3D createVector(mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z)
 {
   return createArray<mitk::Vector3D>(x, y, z);
-}
-
-static mitk::VnlVector createVnlVector(mitk::ScalarType x, mitk::ScalarType y, mitk::ScalarType z)
-{
-  mitk::VnlVector vector(3);
-  mitk::FillVector3D(vector, x, y, z);
-  return vector;
 }
 
 void mitkSlicedGeometry3D_ChangeImageGeometryConsideringOriginOffset_Test()
@@ -155,7 +148,6 @@ int mitkSlicedGeometry3DTest(int, char *[])
 
   auto right = createVector(widthInMM, 0.0, 0.0);
   auto bottom = createVector(0.0, heightInMM, 0.0);
-  auto normal = createVector(0.0, 0.0, thicknessInMM);
   auto spacing = createVector(1.0, 1.0, thicknessInMM);
 
   auto planeGeometry = mitk::PlaneGeometry::New();

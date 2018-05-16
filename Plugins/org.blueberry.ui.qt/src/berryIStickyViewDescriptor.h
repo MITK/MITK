@@ -41,7 +41,7 @@ struct BERRY_UI_QT IStickyViewDescriptor : public Object {
 
   berryObjectMacro(IStickyViewDescriptor);
 
-  ~IStickyViewDescriptor();
+  ~IStickyViewDescriptor() override;
 
   /**
    * Return the id of the view to be made sticky.

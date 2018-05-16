@@ -96,7 +96,7 @@ namespace itk
           m_BoundingBox[i] = NumericTraits< IndexValueType >::max();
           m_BoundingBox[i + 1] = NumericTraits< IndexValueType >::NonpositiveMin();
           }
-        m_Histogram = ITK_NULLPTR;
+        m_Histogram = nullptr;
       }
 
       // constructor with histogram enabled
@@ -295,23 +295,24 @@ namespace itk
   protected:
     ExtendedLabelStatisticsImageFilter():
         m_GlobalHistogramParametersSet(false),
+        m_MaskNonEmpty(false),
         m_LabelHistogramParametersSet(false),
         m_PreferGlobalHistogramParameters(false)
     {
         m_NumBins.set_size(1);
     }
 
-    virtual ~ExtendedLabelStatisticsImageFilter(){}
+    ~ExtendedLabelStatisticsImageFilter() override{}
 
-    void AfterThreadedGenerateData();
+    void AfterThreadedGenerateData() override;
 
     /** Initialize some accumulators before the threads run. */
-    void BeforeThreadedGenerateData();
+    void BeforeThreadedGenerateData() override;
 
     /** Multi-thread version GenerateData. */
     void  ThreadedGenerateData(const typename TInputImage::RegionType &
                                outputRegionForThread,
-                               ThreadIdType threadId);
+                               ThreadIdType threadId) override;
 
     /** Does the specified label exist? Can only be called after a call
      * a call to Update(). */

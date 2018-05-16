@@ -59,8 +59,8 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLDeviceSetupConnectionWidget : public QWi
      */
     void Initialize(mitk::IGTLDevice::Pointer device);
 
-    QmitkIGTLDeviceSetupConnectionWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-    ~QmitkIGTLDeviceSetupConnectionWidget();
+    QmitkIGTLDeviceSetupConnectionWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+    ~QmitkIGTLDeviceSetupConnectionWidget() override;
 
 //    /**
 //    * \brief Is called when the current device received a message
@@ -104,6 +104,11 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLDeviceSetupConnectionWidget : public QWi
     void OnPortChanged();
     void OnHostnameChanged();
     void OnUpdateFPSLabel();
+
+    /**
+    * \brief Enables/Disables the detailed logging of incoming/outgoing messages
+    */
+    void OnLogMessageDetailsCheckBoxClicked();
 
     /**
     * \brief Enables/Disables the buffering of incoming messages

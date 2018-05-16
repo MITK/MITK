@@ -1,3 +1,5 @@
+mitkFunctionCheckCompilerFlags("-Wno-cpp" CMAKE_CXX_FLAGS)
+
 MITK_CREATE_MODULE( PythonService
   INCLUDE_DIRS
     PRIVATE src/PythonService
@@ -10,7 +12,4 @@ MITK_CREATE_MODULE( PythonService
 
 if(TARGET ${MODULE_TARGET})
   configure_file(PythonPath.h.in "${CMAKE_CURRENT_BINARY_DIR}/PythonPath.h" @ONLY)
-  if(NOT MITK_USE_SYSTEM_PYTHON)
-    target_compile_definitions(${MODULE_TARGET} PRIVATE -DUSE_MITK_BUILTIN_PYTHON)
-  endif()
 endif()

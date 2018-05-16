@@ -22,12 +22,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTubeGraphVertex.h"
 #include "mitkUndirectedGraph.h"
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 4172) // boost/graph/named_function_params.hpp(240): returning address of local variable or temporary
+#endif
+
 #include <boost/graph/undirected_dfs.hpp>
 #include <boost/graph/visitors.hpp>
 #include <boost/property_map/property_map.hpp>
 
 #include <boost/graph/breadth_first_search.hpp>
 #include <boost/pending/property.hpp>
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 namespace mitk
 {
@@ -101,7 +110,7 @@ namespace mitk
   protected:
     TubeGraph();
     TubeGraph(const TubeGraph &graph);
-    virtual ~TubeGraph();
+    ~TubeGraph() override;
 
     TubeGraph &operator=(const TubeGraph &rhs);
 

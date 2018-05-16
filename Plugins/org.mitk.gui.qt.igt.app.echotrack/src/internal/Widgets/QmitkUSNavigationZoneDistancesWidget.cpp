@@ -23,8 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVBoxLayout>
 
 QmitkUSNavigationZoneDistancesWidget::QmitkUSNavigationZoneDistancesWidget(QWidget *parent) :
-  m_SizePropertyKey("zone.size"),
-  QWidget(parent)
+  QWidget(parent),
+  m_SizePropertyKey("zone.size")
 {
   this->setLayout(new QVBoxLayout(this));
 }

@@ -50,12 +50,12 @@ namespace mitk
     mitkClassMacro(BinaryThresholdULTool, AutoSegmentationTool);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual const char **GetXPM() const override;
+      const char **GetXPM() const override;
     us::ModuleResource GetIconResource() const override;
-    virtual const char *GetName() const override;
+    const char *GetName() const override;
 
-    virtual void Activated() override;
-    virtual void Deactivated() override;
+    void Activated() override;
+    void Deactivated() override;
 
     virtual void SetThresholdValues(double lower, double upper);
     virtual void AcceptCurrentThresholdValue();
@@ -63,7 +63,7 @@ namespace mitk
 
   protected:
     BinaryThresholdULTool(); // purposely hidden
-    virtual ~BinaryThresholdULTool();
+    ~BinaryThresholdULTool() override;
 
     void SetupPreviewNode();
 

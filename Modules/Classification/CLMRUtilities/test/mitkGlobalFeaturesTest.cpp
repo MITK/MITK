@@ -141,11 +141,11 @@ public:
   void setUp(void)
   {
     // Load Image Data
-    m_Image = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
+    m_Image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Pic3D.nrrd"));
     mitk::CastToItkImage(m_Image,m_ItkImage);
 
     // Create a single mask with only one pixel within the regions
-    mitk::Image::Pointer mask1 = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
+    mitk::Image::Pointer mask1 = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Pic3D.nrrd"));
     mitk::CastToItkImage(mask1,m_ItkMask);
     m_ItkMask->FillBuffer(0);
     MaskType::IndexType index;
@@ -155,7 +155,7 @@ public:
     mitk::CastToMitkImage(m_ItkMask, m_Mask);
 
     // Create a mask with a covered region
-    mitk::Image::Pointer lmask1 = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
+    mitk::Image::Pointer lmask1 = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Pic3D.nrrd"));
     mitk::CastToItkImage(lmask1,m_ItkMask1);
     m_ItkMask1->FillBuffer(0);
     int range=2;

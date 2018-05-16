@@ -44,7 +44,7 @@ namespace mitk
     LineOperation(OperationType operationType, int cellId, Vector3D vector, int pIdA = -1, int pIdB = -1, int id = -1);
     LineOperation(OperationType operationType, int cellId = -1, int pIdA = -1, int pIdB = -1, int id = -1);
 
-    virtual ~LineOperation(){};
+    ~LineOperation() override{};
 
     // int GetCellId();
     int GetPIdA();

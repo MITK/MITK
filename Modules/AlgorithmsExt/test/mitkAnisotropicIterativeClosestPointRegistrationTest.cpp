@@ -61,11 +61,11 @@ public:
   {
     mitk::CovarianceMatrixCalculator::Pointer matrixCalculator = mitk::CovarianceMatrixCalculator::New();
 
-    m_MovingSurface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("AICPRegistration/head_green.stl"));
-    m_FixedSurface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("AICPRegistration/head_red.stl"));
+    m_MovingSurface = mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("AICPRegistration/head_green.stl"));
+    m_FixedSurface = mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("AICPRegistration/head_red.stl"));
 
-    m_TargetsMovingSurface = mitk::IOUtil::LoadPointSet(GetTestDataFilePath("AICPRegistration/targets_head_green.mps"));
-    m_TargetsFixedSurface = mitk::IOUtil::LoadPointSet(GetTestDataFilePath("AICPRegistration/targets_head_red.mps"));
+    m_TargetsMovingSurface = mitk::IOUtil::Load<mitk::PointSet>(GetTestDataFilePath("AICPRegistration/targets_head_green.mps"));
+    m_TargetsFixedSurface = mitk::IOUtil::Load<mitk::PointSet>(GetTestDataFilePath("AICPRegistration/targets_head_red.mps"));
 
     // compute covariance matrices
     matrixCalculator->SetInputSurface(m_MovingSurface);
@@ -83,11 +83,11 @@ public:
 
   void tearDown() override
   {
-    m_MovingSurface = NULL;
-    m_FixedSurface = NULL;
+    m_MovingSurface = nullptr;
+    m_FixedSurface = nullptr;
 
-    m_TargetsMovingSurface = NULL;
-    m_TargetsFixedSurface = NULL;
+    m_TargetsMovingSurface = nullptr;
+    m_TargetsFixedSurface = nullptr;
 
     m_SigmasMovingSurface.clear();
     m_SigmasFixedSurface.clear();

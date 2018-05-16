@@ -38,8 +38,6 @@ Images can be 3D or 4D.
 In the 4D case, the filters work on the 3D image selected via the
 time slider. The result is also a 3D image.
 
-\sa QmitkFunctionality, QObject
-
 \class QmitkBasicImageProcessing
 \author Tobias Schwarz
 \version 1.0 (3M3)
@@ -78,7 +76,7 @@ public:
   /*!
   \brief Invoked when the DataManager selection changed
   */
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
 
   protected slots:

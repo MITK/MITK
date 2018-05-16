@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::GizmoMapper2D::LocalStorage::LocalStorage()
 {
-  m_VtkPolyDataMapper = vtkSmartPointer<vtkPainterPolyDataMapper>::New();
+  m_VtkPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_Actor->SetMapper(m_VtkPolyDataMapper);
 }

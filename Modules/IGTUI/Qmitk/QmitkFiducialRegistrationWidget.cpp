@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /* VIEW MANAGEMENT */
 QmitkFiducialRegistrationWidget::QmitkFiducialRegistrationWidget(QWidget* parent)
-: QWidget(parent), m_Controls(NULL),m_MultiWidget(NULL), m_ImageFiducialsNode(NULL), m_TrackerFiducialsNode(NULL)
+: QWidget(parent), m_Controls(nullptr),m_MultiWidget(nullptr), m_ImageFiducialsNode(nullptr), m_TrackerFiducialsNode(nullptr)
 {
   CreateQtPartControl(this);
 }
@@ -39,7 +39,7 @@ QmitkFiducialRegistrationWidget::QmitkFiducialRegistrationWidget(QWidget* parent
 
 QmitkFiducialRegistrationWidget::~QmitkFiducialRegistrationWidget()
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
 
   //clean up data nodes
   if (m_DataStorage.IsNotNull())
@@ -122,7 +122,7 @@ void QmitkFiducialRegistrationWidget::SetWidgetAppearanceMode(WidgetAppearanceMo
 
 void QmitkFiducialRegistrationWidget::SetQualityDisplayText( QString text )
 {
-  if (text == NULL)
+  if (text == nullptr)
     return;
   m_Controls->m_RegistrationQualityDisplay->setText(text); // set text on the QLabel
 }
@@ -139,13 +139,13 @@ void QmitkFiducialRegistrationWidget::SetImageFiducialsNode( mitk::DataNode::Poi
 {
   if(imageFiducialsNode.IsNull())
   {
-    FRW_WARN<< "tracker fiducial node is NULL";
+    FRW_WARN<< "tracker fiducial node is nullptr";
     return;
   }
   m_Controls->m_RegistrationImagePoints->SetPointSetNode(imageFiducialsNode); // pass node to pointListWidget
-  if(m_MultiWidget == NULL)
+  if(m_MultiWidget == nullptr)
   {
-    MITK_DEBUG<< "stdMultiWidget is NULL";
+    MITK_DEBUG<< "stdMultiWidget is nullptr";
     return;
   }
   m_Controls->m_RegistrationImagePoints->SetMultiWidget(m_MultiWidget); // pass multiWidget to pointListWidget
@@ -155,13 +155,13 @@ void QmitkFiducialRegistrationWidget::SetTrackerFiducialsNode( mitk::DataNode::P
 {
   if(trackerFiducialsNode.IsNull())
   {
-    FRW_WARN<< "tracker fiducial node is NULL";
+    FRW_WARN<< "tracker fiducial node is nullptr";
     return;
   }
   m_Controls->m_RegistrationTrackingPoints->SetPointSetNode(trackerFiducialsNode); // pass node to pointListWidget
-  if(m_MultiWidget == NULL)
+  if(m_MultiWidget == nullptr)
   {
-    MITK_DEBUG<< "stdMultiWidget is NULL";
+    MITK_DEBUG<< "stdMultiWidget is nullptr";
     return;
   }
   m_Controls->m_RegistrationTrackingPoints->SetMultiWidget(m_MultiWidget); // pass multiWidget to pointListWidget

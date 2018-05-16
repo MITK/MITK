@@ -23,13 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTrackingDevice.h"
 #include "mitkTrackingTool.h"
 #include "mitkIGTTimeStamp.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
+#include <cstdlib>
+#include <cstdio>
+#include <ctime>
 #include <itksys/SystemTools.hxx>
 #include <itkMutexLockHolder.h>
 #include "mitkCommon.h"
-#include <mitkInternalTrackingTool.h>
+#include <mitkTrackingTool.h>
 #include <mitkVector.h>
 #include <itkFastMutexLock.h>
 #include "mitkIGTException.h"
@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  //class OptitrackTragkingDevice;
+  //class OptitrackTrackingDevice;
 
   /** Documentation:
   *   \brief An object of this class represents the a Tool tracked by Optitrack System. You can define
@@ -55,11 +55,11 @@ namespace mitk
   *   \author E. Marinetto (emarinetto@hggm.es) Instituto de Investigación Sanitaria Gregorio Marañón, Madrid, Spain. & M. Noll (matthias.noll@igd.fraunhofer.de) Cognitive Computing & Medical Imaging | Fraunhofer IGD
   *   \ingroup IGT
   */
-  class MITKIGT_EXPORT OptitrackTrackingTool : public InternalTrackingTool
+  class MITKIGT_EXPORT OptitrackTrackingTool : public TrackingTool
   {
   public:
     friend class OptitrackTrackingDevice;
-    mitkClassMacro(mitk::OptitrackTrackingTool, mitk::InternalTrackingTool);
+    mitkClassMacro(mitk::OptitrackTrackingTool, mitk::TrackingTool);
     itkNewMacro(Self);
 
 
@@ -97,12 +97,14 @@ namespace mitk
     * \brief Set the position to a given one
     * @throw mitk::IGTException Throws an exception if
     */
+    using Superclass::SetPosition;
     void SetPosition(mitk::Point3D position, ScalarType eps=0.0);
 
     /**
     * \brief Set the orientation to a given one using a quaternion nomenclature
     * @throw mitk::IGTException Throws an exception if
     */
+    using Superclass::SetOrientation;
     void SetOrientation(mitk::Quaternion orientation, ScalarType eps=0.0);
 
     /**
@@ -178,7 +180,7 @@ namespace mitk
     /**
     * \brief Destructor of the class
     */
-    ~OptitrackTrackingTool();
+    ~OptitrackTrackingTool() override;
 
     /**
     * \brief File of the configuration for the tool

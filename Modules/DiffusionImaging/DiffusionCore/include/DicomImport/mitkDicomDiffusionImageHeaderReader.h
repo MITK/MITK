@@ -88,7 +88,7 @@ namespace mitk
     DicomDiffusionImageHeaderReader();
 
     /** Default d'tor */
-    virtual ~DicomDiffusionImageHeaderReader();
+    ~DicomDiffusionImageHeaderReader() override;
 
     void ReadPublicTags();
     void ReadPublicTags2();

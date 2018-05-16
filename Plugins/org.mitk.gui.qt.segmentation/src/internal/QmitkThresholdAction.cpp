@@ -45,10 +45,10 @@ void QmitkThresholdAction::Run(const QList<DataNode::Pointer> &selectedNodes)
   m_ThresholdingToolManager->RegisterClient();
 
   Tool *binaryThresholdTool = m_ThresholdingToolManager->GetToolById(m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>());
-  if (binaryThresholdTool != NULL)
+  if (binaryThresholdTool != nullptr)
   {
     QmitkBinaryThresholdToolGUI *gui = dynamic_cast<QmitkBinaryThresholdToolGUI *>(binaryThresholdTool->GetGUI("Qmitk", "GUI").GetPointer());
-    if (gui != NULL)
+    if (gui != nullptr)
     {
       QDialog thresholdingDialog(QApplication::activeWindow(), Qt::Window | Qt::WindowStaysOnTopHint);
 
@@ -78,7 +78,7 @@ void QmitkThresholdAction::Run(const QList<DataNode::Pointer> &selectedNodes)
       thresholdingDialog.exec();
       m_ThresholdingToolManager->ActiveToolChanged -= mitk::MessageDelegate<QmitkThresholdAction>(this, &QmitkThresholdAction::OnThresholdingToolManagerToolModified);
 
-      m_ThresholdingToolManager->SetReferenceData(NULL);
+      m_ThresholdingToolManager->SetReferenceData(nullptr);
       m_ThresholdingToolManager->ActivateTool(-1);
       m_SelectedNode = 0;
     }
@@ -112,6 +112,6 @@ void QmitkThresholdAction::SetDecimated(bool)
 {
 }
 
-void QmitkThresholdAction::SetFunctionality(QtViewPart* /*functionality*/)
+void QmitkThresholdAction::SetFunctionality(QtViewPart* /*view*/)
 {
 }

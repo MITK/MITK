@@ -33,10 +33,10 @@ class MITKIGTUI_EXPORT QmitkNDIAuroraWidget : public QmitkNDIAbstractDeviceWidge
 public:
   static const std::string VIEW_ID;
 
-  QmitkNDIAuroraWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  ~QmitkNDIAuroraWidget();
+  QmitkNDIAuroraWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+  ~QmitkNDIAuroraWidget() override;
 
-  virtual void Initialize();
+  void Initialize() override;
 
 private:
   /// \brief Creation of the connections
@@ -44,17 +44,17 @@ private:
 
   void CreateQtPartControl(QWidget *parent);
 protected:
-  virtual void ResetOutput();
-  virtual void AddOutput(std::string s);
-  virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice();
+  void ResetOutput() override;
+  void AddOutput(std::string s) override;
+  mitk::TrackingDevice::Pointer GetTrackingDevice() override;
 
-  virtual void StoreUISettings();
-  virtual void LoadUISettings();
+  void StoreUISettings() override;
+  void LoadUISettings() override;
 
-  virtual void SetPortValueToGUI(int portValue);
-  virtual void SetPortTypeToGUI(int portType);
+  void SetPortValueToGUI(int portValue) override;
+  void SetPortTypeToGUI(int portType) override;
 
-  virtual QmitkNDIAuroraWidget* Clone(QWidget* parent) const;
+  QmitkNDIAuroraWidget* Clone(QWidget* parent) const override;
 
   Ui::QmitkNDIAuroraWidget* m_Controls;
 };

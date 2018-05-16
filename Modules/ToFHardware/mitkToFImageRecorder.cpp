@@ -25,12 +25,12 @@ namespace mitk
 {
 ToFImageRecorder::ToFImageRecorder()
 {
-  this->m_ToFCameraDevice = NULL;
+  this->m_ToFCameraDevice = nullptr;
   this->m_MultiThreader = itk::MultiThreader::New();
   this->m_AbortMutex = itk::FastMutexLock::New();
   this->m_ThreadID = 0;
   this->m_NumOfFrames = 1; //lets record one frame per default
-  this->m_ToFImageWriter = NULL;
+  this->m_ToFImageWriter = nullptr;
   this->m_DistanceImageSelected = true; //lets assume a device only has depth data by default
   this->m_AmplitudeImageSelected = false;
   this->m_IntensityImageSelected = false;
@@ -51,11 +51,11 @@ ToFImageRecorder::ToFImageRecorder()
   this->m_IntensityImageFileName = "";
   this->m_RGBImageFileName = "";
   this->m_ImageSequence = 0;
-  this->m_DistanceArray = NULL;
-  this->m_AmplitudeArray = NULL;
-  this->m_IntensityArray = NULL;
-  this->m_RGBArray = NULL;
-  this->m_SourceDataArray = NULL;
+  this->m_DistanceArray = nullptr;
+  this->m_AmplitudeArray = nullptr;
+  this->m_IntensityArray = nullptr;
+  this->m_RGBArray = nullptr;
+  this->m_SourceDataArray = nullptr;
 }
 
 ToFImageRecorder::~ToFImageRecorder()
@@ -80,7 +80,7 @@ void ToFImageRecorder::StartRecording()
 {
   if (this->m_ToFCameraDevice.IsNull())
   {
-    throw std::invalid_argument("ToFCameraDevice is NULL.");
+    throw std::invalid_argument("ToFCameraDevice is nullptr.");
     return;
   }
   if (this->m_FileFormat.compare(".csv") == 0)
@@ -108,23 +108,23 @@ void ToFImageRecorder::StartRecording()
   this->m_SourceDataSize = this->m_ToFCameraDevice->GetSourceDataSize();
 
   // allocate buffer
-  if(m_IntensityArray == NULL)
+  if(m_IntensityArray == nullptr)
   {
     this->m_IntensityArray = new float[m_ToFPixelNumber];
   }
-  if(this->m_DistanceArray == NULL)
+  if(this->m_DistanceArray == nullptr)
   {
     this->m_DistanceArray = new float[m_ToFPixelNumber];
   }
-  if(this->m_AmplitudeArray == NULL)
+  if(this->m_AmplitudeArray == nullptr)
   {
     this->m_AmplitudeArray = new float[m_ToFPixelNumber];
   }
-  if(this->m_RGBArray == NULL)
+  if(this->m_RGBArray == nullptr)
   {
     this->m_RGBArray = new unsigned char[m_RGBPixelNumber*3];
   }
-  if(this->m_SourceDataArray == NULL)
+  if(this->m_SourceDataArray == nullptr)
   {
     this->m_SourceDataArray = new char[m_SourceDataSize];
   }
@@ -158,16 +158,16 @@ void ToFImageRecorder::WaitForThreadBeingTerminated()
 ITK_THREAD_RETURN_TYPE ToFImageRecorder::RecordData(void* pInfoStruct)
 {
   struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == NULL)
+  if (pInfo == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
-  if (pInfo->UserData == NULL)
+  if (pInfo->UserData == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
   ToFImageRecorder* toFImageRecorder = (ToFImageRecorder*)pInfo->UserData;
-  if (toFImageRecorder!=NULL)
+  if (toFImageRecorder!=nullptr)
   {
 
     ToFCameraDevice::Pointer toFCameraDevice = toFImageRecorder->GetCameraDevice();
@@ -178,7 +178,6 @@ ITK_THREAD_RETURN_TYPE ToFImageRecorder::RecordData(void* pInfoStruct)
     double t1 = 0;
     double t2 = 0;
     t1 = realTimeClock->GetCurrentStamp();
-    bool overflow = false;
     bool printStatus = false;
     int requiredImageSequence = 0;
     int numOfFramesRecorded = 0;

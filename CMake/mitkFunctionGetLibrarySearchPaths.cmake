@@ -74,14 +74,7 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
   # the *_DIR variables. Instead, we should rely on package
   # specific "LIBRARY_DIRS" variables, if they exist.
   if(WIN32)
-    if(SOFA_DIR)
-      list(APPEND _dir_candidates "${SOFA_DIR}/bin")
-    endif()
     list(APPEND _dir_candidates "${ITK_DIR}/bin")
-  else()
-    if(SOFA_DIR)
-      list(APPEND _dir_candidates "${SOFA_DIR}/lib")
-    endif()
   endif()
 
   if(MITK_USE_MatchPoint)
@@ -92,25 +85,24 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
     endif()
   endif()
 
-  if(OpenCV_DIR)
-    set(_opencv_link_directories
-      "${OpenCV_LIB_DIR_DBG}"
-      "${OpenCV_LIB_DIR_OPT}"
-      "${OpenCV_3RDPARTY_LIB_DIR_DBG}"
-      "${OpenCV_3RDPARTY_LIB_DIR_OPT}")
-    list(REMOVE_DUPLICATES _opencv_link_directories)
+  # If OpenCV is built within the MITK superbuild set the binary directory
+  # according to the lib path provided by OpenCV.
+  # In the case where an external OpenCV is provided use the binary directory
+  #  of this OpenCV directory
+  if(MITK_USE_OpenCV)
     if(WIN32)
-      foreach(_opencv_link_directory ${_opencv_link_directories})
-        list(APPEND _dir_candidates "${_opencv_link_directory}/../bin")
-      endforeach()
-    else()
-      list(APPEND _dir_candidates ${_opencv_link_directories})
+      if (EXISTS ${OpenCV_LIB_PATH})
+        list(APPEND _dir_candidates "${OpenCV_LIB_PATH}/../bin") # OpenCV is built in superbuild
+      else()
+        list(APPEND _dir_candidates "${OpenCV_DIR}/bin") # External OpenCV build is used
+      endif()
     endif()
   endif()
 
   if(MITK_USE_Python)
     list(APPEND _dir_candidates "${CTK_DIR}/CMakeExternals/Install/bin")
-    list(APPEND _dir_candidates "${MITK_EXTERNAL_PROJECT_PREFIX}/lib/python2.7/bin")
+    get_filename_component(_python_dir ${PYTHON_EXECUTABLE} DIRECTORY)
+    list(APPEND _dir_candidates "${_python_dir}")
   endif()
 
   if(MITK_USE_TOF_PMDO3 OR MITK_USE_TOF_PMDCAMCUBE OR MITK_USE_TOF_PMDCAMBOARD)

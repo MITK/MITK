@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 
 #include <deque>
+#include <mitkIGTLMessage.h>
 
 //OpenIGTLink
 #include "igtlMessageBase.h"
@@ -53,7 +54,7 @@ namespace mitk {
        */
     enum BufferingType { Infinit, NoBuffering };
 
-    void PushSendMessage(igtl::MessageBase::Pointer message);
+    void PushSendMessage(mitk::IGTLMessage::Pointer message);
 
     /**
     * \brief Adds the message to the queue
@@ -74,7 +75,7 @@ namespace mitk {
     igtl::MessageBase::Pointer PullCommandMessage();
     igtl::StringMessage::Pointer PullStringMessage();
     igtl::TransformMessage::Pointer PullTransformMessage();
-    igtl::MessageBase::Pointer PullSendMessage();
+    mitk::IGTLMessage::Pointer PullSendMessage();
 
     /**
     * \brief Get the number of messages in the queue
@@ -104,14 +105,12 @@ namespace mitk {
     std::string GetLatestMsgDeviceType();
 
     /**
-    * \brief Sets infinite buffering on/off.
-    * Initiale value is enabled.
-    */
-    void EnableInfiniteBuffering(bool enable);
+     */
+    void EnableNoBufferingMode(bool enable);
 
   protected:
     IGTLMessageQueue();
-    virtual ~IGTLMessageQueue();
+    ~IGTLMessageQueue() override;
 
   protected:
     /**
@@ -130,7 +129,7 @@ namespace mitk {
     std::deque< igtl::StringMessage::Pointer > m_StringQueue;
     std::deque< igtl::MessageBase::Pointer > m_MiscQueue;
 
-    std::deque< igtl::MessageBase::Pointer> m_SendQueue;
+    std::deque< mitk::IGTLMessage::Pointer > m_SendQueue;
 
     igtl::MessageBase::Pointer m_Latest_Message;
 

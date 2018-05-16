@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPropertyFilters.h>
 #include <mitkPropertyFilter.h>
 #include <mitkVtkLayerController.h>
-#include <mitkWeakPointer.h>
 #include <mitkPlanarCircle.h>
 #include <mitkPlanarEllipse.h>
 #include <mitkPlanarPolygon.h>

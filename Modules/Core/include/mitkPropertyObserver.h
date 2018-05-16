@@ -59,7 +59,7 @@ namespace mitk
   {
   public:
     PropertyView(const mitk::BaseProperty *);
-    virtual ~PropertyView();
+    ~PropertyView() override;
 
     void OnModified(const itk::EventObject &e);
     void OnDelete(const itk::EventObject &e);
@@ -72,7 +72,7 @@ namespace mitk
   {
   public:
     PropertyEditor(mitk::BaseProperty *);
-    virtual ~PropertyEditor();
+    ~PropertyEditor() override;
 
     void OnModified(const itk::EventObject &e);
     void OnDelete(const itk::EventObject &e);

@@ -46,6 +46,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   : mitk::ImageSource(),
   m_IsFreezed(false),
   m_DeviceState(State_NoState),
+  m_NumberOfOutputs(1),
   m_Manufacturer(manufacturer),
   m_Name(model),
   m_SpawnAcquireThread(true),
@@ -62,7 +63,7 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   this->m_CropArea = empty;
 
   // set number of outputs
-  this->SetNumberOfIndexedOutputs(1);
+  this->SetNumberOfIndexedOutputs(m_NumberOfOutputs);
 
   // create a new output
   mitk::Image::Pointer newOutput = mitk::Image::New();
@@ -114,28 +115,28 @@ mitk::USAbstractControlInterface::Pointer
 mitk::USDevice::GetControlInterfaceCustom()
 {
   MITK_INFO << "Custom control interface does not exist for this object.";
-  return 0;
+  return nullptr;
 }
 
 mitk::USControlInterfaceBMode::Pointer
 mitk::USDevice::GetControlInterfaceBMode()
 {
   MITK_INFO << "Control interface BMode does not exist for this object.";
-  return 0;
+  return nullptr;
 }
 
 mitk::USControlInterfaceProbes::Pointer
 mitk::USDevice::GetControlInterfaceProbes()
 {
   MITK_INFO << "Control interface Probes does not exist for this object.";
-  return 0;
+  return nullptr;
 }
 
 mitk::USControlInterfaceDoppler::Pointer
 mitk::USDevice::GetControlInterfaceDoppler()
 {
   MITK_INFO << "Control interface Doppler does not exist for this object.";
-  return 0;
+  return nullptr;
 }
 
 void mitk::USDevice::SetManufacturer(std::string manufacturer)
@@ -371,7 +372,7 @@ void mitk::USDevice::Deactivate()
   if (!this->GetIsActive())
   {
     MITK_WARN("mitkUSDevice")
-      << "Cannot deactivate a device which is not activae.";
+      << "Cannot deactivate a device which is not active.";
     return;
   }
 
@@ -502,7 +503,7 @@ void mitk::USDevice::UpdateServiceProperty(std::string key, bool value)
 mitk::Image* mitk::USDevice::GetOutput()
 {
 if (this->GetNumberOfOutputs() < 1)
-return NULL;
+return nullptr;
 
 return static_cast<USImage*>(this->ProcessObject::GetPrimaryOutput());
 }
@@ -510,7 +511,7 @@ return static_cast<USImage*>(this->ProcessObject::GetPrimaryOutput());
 mitk::Image* mitk::USDevice::GetOutput(unsigned int idx)
 {
 if (this->GetNumberOfOutputs() < 1)
-return NULL;
+return nullptr;
 return static_cast<USImage*>(this->ProcessObject::GetOutput(idx));
 }
 
@@ -529,13 +530,13 @@ itkExceptionMacro(<<"Requested to graft output " << idx <<
 
 if ( !graft )
 {
-itkExceptionMacro(<<"Requested to graft output with a NULL pointer object" );
+itkExceptionMacro(<<"Requested to graft output with a nullptr pointer object" );
 }
 
 itk::DataObject* output = this->GetOutput(idx);
 if ( !output )
 {
-itkExceptionMacro(<<"Requested to graft output that is a NULL pointer" );
+itkExceptionMacro(<<"Requested to graft output that is a nullptr pointer" );
 }
 // Call Graft on USImage to copy member data
 output->Graft( graft );
@@ -545,12 +546,10 @@ output->Graft( graft );
 
 void mitk::USDevice::GrabImage()
 {
-  mitk::Image::Pointer image = this->GetUSImageSource()->GetNextImage();
+  std::vector<mitk::Image::Pointer> image = this->GetUSImageSource()->GetNextImage();
   m_ImageMutex->Lock();
-  this->SetImage(image);
+  this->SetImageVector(image);
   m_ImageMutex->Unlock();
-  // if (image.IsNotNull() && (image->GetGeometry()!=NULL)){
-  //  MITK_INFO << "Spacing: " << image->GetGeometry()->GetSpacing();}
 }
 
 //########### GETTER & SETTER ##################//
@@ -577,26 +576,34 @@ void mitk::USDevice::GenerateData()
 {
   m_ImageMutex->Lock();
 
-  if (m_Image.IsNull() || !m_Image->IsInitialized())
+  for (unsigned int i = 0; i < m_ImageVector.size() && i < this->GetNumberOfIndexedOutputs(); ++i)
   {
-    m_ImageMutex->Unlock();
-    return;
+    auto& image = m_ImageVector[i];
+    if (image.IsNull() || !image->IsInitialized())
+    {
+      // skip image
+    }
+    else
+    {
+      mitk::Image::Pointer output = this->GetOutput(i);
+
+      if (!output->IsInitialized() ||
+        output->GetDimension(0) != image->GetDimension(0) ||
+        output->GetDimension(1) != image->GetDimension(1) ||
+        output->GetDimension(2) != image->GetDimension(2) ||
+        output->GetPixelType() != image->GetPixelType())
+      {
+        output->Initialize(image->GetPixelType(), image->GetDimension(),
+          image->GetDimensions());
+      }
+
+      // copy contents of the given image into the member variable
+      mitk::ImageReadAccessor inputReadAccessor(image);
+      output->SetImportVolume(inputReadAccessor.GetData());
+
+      output->SetGeometry(image->GetGeometry());
+    }
   }
-
-  mitk::Image::Pointer output = this->GetOutput();
-
-  if (!output->IsInitialized() ||
-    output->GetDimension(0) != m_Image->GetDimension(0) ||
-    output->GetDimension(1) != m_Image->GetDimension(1))
-  {
-    output->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(),
-      m_Image->GetDimensions());
-  }
-
-  mitk::ImageReadAccessor inputReadAccessor(m_Image,
-    m_Image->GetSliceData(0, 0, 0));
-  output->SetSlice(inputReadAccessor.GetData());
-  output->SetGeometry(m_Image->GetGeometry());
   m_ImageMutex->Unlock();
 };
 
@@ -634,7 +641,6 @@ ITK_THREAD_RETURN_TYPE mitk::USDevice::Acquire(void* pInfoStruct)
         device->m_FreezeBarrier->Wait(mutex);
       }
     }
-
     device->GrabImage();
   }
   return ITK_THREAD_RETURN_VALUE;

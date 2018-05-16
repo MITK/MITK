@@ -46,8 +46,8 @@ ModulePrivate::ModulePrivate(Module* qq, CoreModuleContext* coreCtx,
   : coreCtx(coreCtx)
   , info(*info)
   , resourceContainer(info)
-  , moduleContext(0)
-  , moduleActivator(0)
+  , moduleContext(nullptr)
+  , moduleActivator(nullptr)
   , q(qq)
 {
   // Check if the module provides a manifest.json file and if yes, parse it.

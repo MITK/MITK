@@ -56,13 +56,13 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageTestHelper::Crea
     mitk::Point3D testPt2;
     mitk::FillVector3D(testPt2,4,5,6);
     RegLandmarks1->SetPoint(5,testPt2);
-    myTool1->SetToolCalibrationLandmarks(CalLandmarks1);
-    myTool1->SetToolRegistrationLandmarks(RegLandmarks1);
+    myTool1->SetToolControlPoints(CalLandmarks1);
+    myTool1->SetToolLandmarks(RegLandmarks1);
     mitk::Point3D toolTipPos;
     mitk::FillVector3D(toolTipPos,1.3423,2.323,4.332);
     mitk::Quaternion toolTipRot = mitk::Quaternion(0.1,0.2,0.3,0.4);
     myTool1->SetToolTipPosition(toolTipPos);
-    myTool1->SetToolTipOrientation(toolTipRot);
+    myTool1->SetToolAxisOrientation(toolTipRot);
     myStorage->AddTool(myTool1);
 
     return myStorage;
@@ -75,7 +75,7 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageTestHelper::Crea
     myNavigationTool->SetCalibrationFile(toolFilePath);
     mitk::DataNode::Pointer myNode = mitk::DataNode::New();
     myNode->SetName("ClaronTool");
-    myNode->SetData(mitk::IOUtil::LoadSurface(toolSurfacePath1)); //load an stl File
+    myNode->SetData(mitk::IOUtil::Load<mitk::Surface>(toolSurfacePath1)); //load an stl File
     myNavigationTool->SetDataNode(myNode);
     myNavigationTool->SetIdentifier("ClaronTool#1");
     myNavigationTool->SetSerialNumber("0815");
@@ -90,7 +90,7 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageTestHelper::Crea
     myNode2->SetName("AuroraTool");
 
     //load an stl File
-    testSurface2 = mitk::IOUtil::LoadSurface(toolSurfacePath2);
+    testSurface2 = mitk::IOUtil::Load<mitk::Surface>(toolSurfacePath2);
     myNode2->SetData(testSurface2);
 
     myNavigationTool2->SetDataNode(myNode2);

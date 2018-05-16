@@ -2,11 +2,13 @@
 #define mitkLinearSplitting_cpp
 
 #include <mitkLinearSplitting.h>
+#include <mitkPUImpurityLoss.h>
 
 template<class TLossAccumulator>
 mitk::LinearSplitting<TLossAccumulator>::LinearSplitting() :
     m_UsePointWeights(false),
-    m_UseRandomSplit(false)
+    m_UseRandomSplit(false),
+    m_AdditionalData(nullptr)
 {
 }
 
@@ -17,6 +19,20 @@ mitk::LinearSplitting<TLossAccumulator>::LinearSplitting(vigra::ProblemSpec<T> c
     m_UseRandomSplit(false)
 {
     set_external_parameters(ext);
+}
+
+template<class TLossAccumulator>
+void
+mitk::LinearSplitting<TLossAccumulator>::SetAdditionalData(AdditionalRFDataAbstract* data)
+{
+  m_AdditionalData = data;
+}
+
+template<class TLossAccumulator>
+mitk::AdditionalRFDataAbstract *
+mitk::LinearSplitting<TLossAccumulator>::GetAdditionalData() const
+{
+  return m_AdditionalData;
 }
 
 template<class TLossAccumulator>
@@ -82,8 +98,8 @@ mitk::LinearSplitting<TLossAccumulator>::operator()(TDataSourceFeature const &co
     typedef TLossAccumulator LineSearchLoss;
     std::sort(begin, end, vigra::SortSamplesByDimensions<TDataSourceFeature>(column, 0));
 
-    LineSearchLoss left(labels, m_ExtParameter);
-    LineSearchLoss right(labels, m_ExtParameter);
+    LineSearchLoss left(labels, m_ExtParameter, m_AdditionalData);
+    LineSearchLoss right(labels, m_ExtParameter, m_AdditionalData);
 
     if (m_UsePointWeights)
     {
@@ -128,7 +144,7 @@ mitk::LinearSplitting<TLossAccumulator>::operator()(TDataSourceFeature const &co
     else // If Random split is selected, e.g. ExtraTree behaviour
     {
       int size = end - begin + 1;
-      srand(time(NULL));
+      srand(time(nullptr));
       int offset = rand() % size;
       TDataIterator iter = begin + offset;
 
@@ -156,7 +172,7 @@ mitk::LinearSplitting<TLossAccumulator>::LossOfRegion(TDataSourceLabel const & l
                     TArray const & regionResponse)
 {
     typedef TLossAccumulator LineSearchLoss;
-    LineSearchLoss regionLoss(labels, m_ExtParameter);
+    LineSearchLoss regionLoss(labels, m_ExtParameter, m_AdditionalData);
     if (m_UsePointWeights)
     {
         regionLoss.UsePointWeights(true);

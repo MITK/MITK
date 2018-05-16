@@ -53,7 +53,7 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
   public:
 
     QmitkExtWorkbenchWindowAdvisorHack();
-    ~QmitkExtWorkbenchWindowAdvisorHack();
+    ~QmitkExtWorkbenchWindowAdvisorHack() override;
 
     static QmitkExtWorkbenchWindowAdvisorHack* undohack;
 };

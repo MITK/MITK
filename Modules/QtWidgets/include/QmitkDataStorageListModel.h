@@ -52,7 +52,7 @@ public:
                             mitk::NodePredicateBase::Pointer pred = nullptr,
                             QObject *parent = nullptr);
 
-  virtual ~QmitkDataStorageListModel();
+  ~QmitkDataStorageListModel() override;
 
   //! Change the data storage to represent
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage);

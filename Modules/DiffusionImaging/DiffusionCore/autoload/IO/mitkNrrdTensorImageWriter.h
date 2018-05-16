@@ -35,17 +35,17 @@ public:
     typedef mitk::TensorImage InputType;
 
     NrrdTensorImageWriter();
-    virtual ~NrrdTensorImageWriter();
+    ~NrrdTensorImageWriter() override;
 
     using AbstractFileWriter::Write;
-    virtual void Write() override;
+    void Write() override;
 
-    virtual ConfidenceLevel GetConfidenceLevel() const override;
+    ConfidenceLevel GetConfidenceLevel() const override;
 
 protected:
 
   NrrdTensorImageWriter(const NrrdTensorImageWriter& other);
-  virtual mitk::NrrdTensorImageWriter* Clone() const override;
+  mitk::NrrdTensorImageWriter* Clone() const override;
 };
 
 

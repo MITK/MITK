@@ -3,6 +3,7 @@
 
 #include <vigra/multi_array.hxx>
 #include <vigra/random_forest.hxx>
+#include <mitkAdditionalRFData.h>
 
 namespace mitk
 {
@@ -29,7 +30,10 @@ namespace mitk
         double GetPrecision() const;
 
         void SetMaximumTreeDepth(int value);
-        virtual int GetMaximumTreeDepth() const;
+        int GetMaximumTreeDepth() const override;
+
+        void SetAdditionalData(AdditionalRFDataAbstract* data);
+        AdditionalRFDataAbstract* GetAdditionalData() const;
 
         void SetWeights(vigra::MultiArrayView<2, double> weights);
         vigra::MultiArrayView<2, double> GetWeights() const;
@@ -72,6 +76,7 @@ namespace mitk
         vigra::ArrayVector<std::ptrdiff_t> min_indices_;
         vigra::ArrayVector<double> min_thresholds_;
         int bestSplitIndex;
+        AdditionalRFDataAbstract* m_AdditionalData;
 
     };
 }

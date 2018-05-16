@@ -57,7 +57,7 @@ namespace mitk {
     *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
     * To unregister, call UnregisterMicroservice(). Make sure to pass the id of the Device that this tool is connected to.
     */
-    virtual void RegisterAsMicroservice(std::string sourceID);
+    virtual void RegisterAsMicroservice();
 
     /**
     *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
@@ -73,9 +73,12 @@ namespace mitk {
     /**
     *\brief These constants are used in conjunction with Microservices
     */
-    static const std::string US_INTERFACE_NAME; // Name of the interface
-    static const std::string US_PROPKEY_SOURCE_ID; // ID of the device this ToolStorage is associated with
-    static const std::string US_PROPKEY_STORAGE_NAME; // name of the storage
+    // Name of the interface
+    static const std::string US_INTERFACE_NAME;
+    // ID of the NavigationDataSource this ToolStorage is associated with. Can be empty ("") and changed with SetSourceID().
+    static const std::string US_PROPKEY_SOURCE_ID;
+    // name of the storage
+    static const std::string US_PROPKEY_STORAGE_NAME;
 
 
     /**
@@ -89,21 +92,21 @@ namespace mitk {
 
     /**
      * @return Returns the tracking tool at the position "number"
-     *         in the storage. Returns NULL if there is no
+     *         in the storage. Returns nullptr if there is no
      *         tracking tool at this position.
      */
     mitk::NavigationTool::Pointer GetTool(int number);
 
     /**
      * @return Returns the tracking tool with the given identifier.
-     *         Returns NULL if there is no
+     *         Returns nullptr if there is no
      *         tracking tool with this identifier in the storage.
      */
     mitk::NavigationTool::Pointer GetTool(std::string identifier);
 
     /**
      * @return Returns the tracking tool with the given name.
-     *         Returns NULL if there is no
+     *         Returns nullptr if there is no
      *         tracking tool with this name in the storage.
      */
     mitk::NavigationTool::Pointer GetToolByName(std::string name);
@@ -128,7 +131,7 @@ namespace mitk {
     /**
      * @return Returns the number of tools stored in the storage.
      */
-    int GetToolCount();
+    unsigned int GetToolCount();
 
     /**
      * @return Returns true if the storage is empty, false if not.
@@ -137,7 +140,7 @@ namespace mitk {
 
     /**
      * @return Returns the corresponding data storage if one is set to this NavigationToolStorage.
-     *         Returns NULL if none is set.
+     *         Returns nullptr if none is set.
      */
     itkGetMacro(DataStorage,mitk::DataStorage::Pointer);
 
@@ -148,7 +151,18 @@ namespace mitk {
     void SetName(std::string);
 
     /** @return Returns the name of this storage. */
-    itkGetConstMacro(Name,std::string);
+    std::string GetName() const;
+
+    /** Sets the name of this storage. The name should be understandable for the user.
+    *  Something like "NDI Aurora Tool Storage". If a storage is loaded from the harddisk
+    *  the name might be the filename.
+    *  @warning: if your microservice is already registered, you need to call UpdateMicroservice after changing the ID.
+    *  This can't be done inside this functions, as we might use different threads.
+    */
+    void SetSourceID(std::string);
+
+    /** @return Returns the name of this storage. */
+    std::string GetSourceID() const;
 
     /** Locks the storage. A logged storage may not be modified.
      *  If a method tries to modify the storage anyway a waring message is given.
@@ -169,11 +183,12 @@ namespace mitk {
   protected:
     NavigationToolStorage();
     NavigationToolStorage(mitk::DataStorage::Pointer);
-    ~NavigationToolStorage();
+    ~NavigationToolStorage() override;
 
     std::vector<mitk::NavigationTool::Pointer> m_ToolCollection;
     mitk::DataStorage::Pointer m_DataStorage;
     std::string m_Name;
+    std::string m_SourceID;
     bool m_storageLocked;
 
   private:

@@ -30,13 +30,13 @@ public:
   QmitkDataNodeSelection();
   QmitkDataNodeSelection(const QItemSelection& sel);
 
-  virtual berry::Object::Pointer GetFirstElement() const override;
-  virtual iterator Begin() const override;
-  virtual iterator End() const override;
+  berry::Object::Pointer GetFirstElement() const override;
+  iterator Begin() const override;
+  iterator End() const override;
 
-  virtual int Size() const override;
+  int Size() const override;
 
-  virtual ContainerType::Pointer ToVector() const override;
+  ContainerType::Pointer ToVector() const override;
 
   /**
    * @see berry::ISelection::IsEmpty()

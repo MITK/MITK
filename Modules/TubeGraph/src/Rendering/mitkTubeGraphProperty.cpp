@@ -410,37 +410,19 @@ bool mitk::TubeGraphProperty::TubeDescriptorsCompare(const TubeDescriptorType &t
     return false;
 }
 
-bool mitk::TubeGraphProperty::IsEqual(const BaseProperty &property) const
+bool mitk::TubeGraphProperty::IsEqual(const BaseProperty &) const
 { // TODO see ResectionProposalDescriptorProperty
-  // const TubeGraphProperty& other =
-  //  static_cast<const TubeGraphProperty&>(property);
-
-  return true
-    // same number of elements, same name and corresponding elements are equal (set datatype stores them sorted!)
-    /*(m_LDs.size() == other.GetLabelDesriptorSet().size())
-    && (m_ResectionProposalName == other.GetResectionProposalName())
-    && std::equal(m_LDs.begin(), m_LDs.end(), other.GetLabelDesriptorSet().begin())*/;
+  return true;
 }
 
-bool mitk::TubeGraphProperty::Assign(const BaseProperty &property)
+bool mitk::TubeGraphProperty::Assign(const BaseProperty &)
 { // TODO see ResectionProposalDescriptorProperty
-  // const TubeGraphProperty& other =
-  //  static_cast<const TubeGraphProperty&>(property);
-  /* this->m_LDs = other.m_LDs;
-  this->m_ResectionProposalName = other.m_ResectionProposalName;*/
   return true;
 }
 
 std::string mitk::TubeGraphProperty::GetValueAsString() const
 { // TODO
-  std::stringstream result;
-  /* result << "Tube graph: " << this->GetResectionProposalName();
-  result << "\n Number of labels: " << this->GetNumberOfLabels() << "\n";
-  for (LabelDesriptorSet::const_iterator it = m_LDs.begin(); it != m_LDs.end(); it++)
-  result << "Label " << it->m_Name<< ": "
-  << "Label = " << it->m_Label << ", ResectionType = " << it->m_ResectionType
-  << ", Volume = " << it->m_Volume << "\n";*/
-  return result.str();
+  return "";
 }
 
 itk::LightObject::Pointer mitk::TubeGraphProperty::InternalClone() const

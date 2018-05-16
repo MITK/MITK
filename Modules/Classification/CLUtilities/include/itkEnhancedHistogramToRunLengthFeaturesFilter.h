@@ -126,9 +126,17 @@ namespace itk {
       MeasurementType GetGreyLevelNonuniformity() const;
       const MeasurementObjectType* GetGreyLevelNonuniformityOutput() const;
 
+      /** Methods to return the grey level nonuniformity. */
+      MeasurementType GetGreyLevelNonuniformityNormalized() const;
+      const MeasurementObjectType* GetGreyLevelNonuniformityNormalizedOutput() const;
+
       /** Methods to return the run length nonuniformity. */
       MeasurementType GetRunLengthNonuniformity() const;
       const MeasurementObjectType* GetRunLengthNonuniformityOutput() const;
+
+      /** Methods to return the run length nonuniformity. */
+      MeasurementType GetRunLengthNonuniformityNormalized() const;
+      const MeasurementObjectType* GetRunLengthNonuniformityNormalizedOutput() const;
 
       /** Methods to return the low grey level run emphasis. */
       MeasurementType GetLowGreyLevelRunEmphasis() const;
@@ -162,6 +170,18 @@ namespace itk {
       MeasurementType GetNumberOfRuns() const;
       const MeasurementObjectType* GetNumberOfRunsOutput() const;
 
+      /** Methods to return the grey level variance. */
+      MeasurementType GetGreyLevelVariance() const;
+      const MeasurementObjectType* GetGreyLevelVarianceOutput() const;
+
+      /** Methods to return the run length variance. */
+      MeasurementType GetRunLengthVariance() const;
+      const MeasurementObjectType* GetRunLengthVarianceOutput() const;
+
+      /** Methods to return the run entropy. */
+      MeasurementType GetRunEntropy() const;
+      const MeasurementObjectType* GetRunEntropyOutput() const;
+
       itkGetMacro( TotalNumberOfRuns, unsigned long );
 
       itkGetConstMacro(NumberOfVoxels, unsigned long);
@@ -173,7 +193,9 @@ namespace itk {
         ShortRunEmphasis,
         LongRunEmphasis,
         GreyLevelNonuniformity,
+        GreyLevelNonuniformityNormalized,
         RunLengthNonuniformity,
+        RunLengthNonuniformityNormalized,
         LowGreyLevelRunEmphasis,
         HighGreyLevelRunEmphasis,
         ShortRunLowGreyLevelEmphasis,
@@ -181,7 +203,10 @@ namespace itk {
         LongRunLowGreyLevelEmphasis,
         LongRunHighGreyLevelEmphasis,
         RunPercentage,
-        NumberOfRuns
+        NumberOfRuns,
+        GreyLevelVariance,
+        RunLengthVariance,
+        RunEntropy
       }  RunLengthFeatureName;
 
       /** convenience method to access the run length values */
@@ -189,15 +214,15 @@ namespace itk {
 
     protected:
       EnhancedHistogramToRunLengthFeaturesFilter();
-      ~EnhancedHistogramToRunLengthFeaturesFilter() {};
-      virtual void PrintSelf(std::ostream& os, Indent indent) const ITK_OVERRIDE;
+      ~EnhancedHistogramToRunLengthFeaturesFilter() override {};
+      void PrintSelf(std::ostream& os, Indent indent) const ITK_OVERRIDE;
 
       /** Make a DataObject to be used for output output. */
       typedef ProcessObject::DataObjectPointerArraySizeType DataObjectPointerArraySizeType;
       using Superclass::MakeOutput;
-      virtual DataObjectPointer MakeOutput( DataObjectPointerArraySizeType ) ITK_OVERRIDE;
+      DataObjectPointer MakeOutput( DataObjectPointerArraySizeType ) ITK_OVERRIDE;
 
-      virtual void GenerateData() ITK_OVERRIDE;
+      void GenerateData() ITK_OVERRIDE;
 
     private:
       EnhancedHistogramToRunLengthFeaturesFilter(const Self&); //purposely not implemented

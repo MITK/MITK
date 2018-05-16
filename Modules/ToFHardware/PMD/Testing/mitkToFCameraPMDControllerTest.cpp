@@ -62,7 +62,7 @@ int mitkToFCameraPMDControllerTest(int /* argc */, char* /*argv*/[])
   try
   {
 
-  MITK_TEST_CONDITION_REQUIRED(!(testObject.GetPointer() == NULL) ,"Testing initialization class");
+  MITK_TEST_CONDITION_REQUIRED(!(testObject.GetPointer() == nullptr) ,"Testing initialization class");
   MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureHeight()== 200 ,"Testing initialization of CaptureHeight");
   MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureWidth()== 200 ,"Testing initialization of CaptureWidth");
   int numberOfPixels = testObject->GetCaptureHeight()*testObject->GetCaptureWidth();

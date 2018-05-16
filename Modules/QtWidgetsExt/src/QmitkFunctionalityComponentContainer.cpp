@@ -44,15 +44,15 @@ QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObje
   : QmitkBaseFunctionalityComponent(parent, parentName),
     m_UpdateSelector(updateSelector),
     m_ShowSelector(showSelector),
-    m_GUI(NULL),
+    m_GUI(nullptr),
     m_Active(false),
-    m_SelectedItem(NULL),
-    m_FunctionalityComponentContainerGUI(NULL),
+    m_SelectedItem(nullptr),
+    m_FunctionalityComponentContainerGUI(nullptr),
     m_Parent(parent),
     m_ComponentName("ComponentContainer"),
-    m_Spacer(NULL),
-    m_BackButton(NULL),
-    m_NextButton(NULL),
+    m_Spacer(nullptr),
+    m_BackButton(nullptr),
+    m_NextButton(nullptr),
     m_MaximumWidgedStackSize(-1)
 {
   SetAvailability(true);
@@ -99,7 +99,7 @@ QmitkDataStorageComboBox *QmitkFunctionalityComponentContainer::GetTreeNodeSelec
     return m_FunctionalityComponentContainerGUI->m_TreeNodeSelector;
   }
   else
-    return NULL;
+    return nullptr;
 }
 
 QmitkStdMultiWidget *QmitkFunctionalityComponentContainer::GetMultiWidget()
@@ -158,13 +158,13 @@ mitk::DataStorage::Pointer QmitkFunctionalityComponentContainer::GetDataStorage(
 
 void QmitkFunctionalityComponentContainer::DataStorageChanged(mitk::DataStorage::Pointer ds)
 {
-  if (m_FunctionalityComponentContainerGUI != NULL)
+  if (m_FunctionalityComponentContainerGUI != nullptr)
   {
     for (unsigned int i = 0; i < m_AddedChildList.size(); i++)
     {
       QmitkBaseFunctionalityComponent *functionalityComponent =
         dynamic_cast<QmitkBaseFunctionalityComponent *>(m_AddedChildList[i]);
-      if (functionalityComponent != NULL)
+      if (functionalityComponent != nullptr)
       {
         functionalityComponent->DataStorageChanged(ds);
       }
@@ -182,13 +182,13 @@ void QmitkFunctionalityComponentContainer::DataStorageChanged(mitk::DataStorage:
     m_ParentMitkImage = static_cast<mitk::Image *>(
       m_FunctionalityComponentContainerGUI->m_TreeNodeSelector->GetSelectedNode()->GetData());
 
-    if (m_FunctionalityComponentContainerGUI != NULL)
+    if (m_FunctionalityComponentContainerGUI != nullptr)
     {
       for (unsigned int i = 0; i < m_AddedChildList.size(); i++)
       {
         QmitkBaseFunctionalityComponent *functionalityComponent =
           dynamic_cast<QmitkBaseFunctionalityComponent *>(m_AddedChildList[i]);
-        if (functionalityComponent != NULL)
+        if (functionalityComponent != nullptr)
         {
           if (!m_FunctionalityComponentContainerGUI->m_TreeNodeSelector->GetSelectedNode()->GetData())
             return;
@@ -202,7 +202,7 @@ void QmitkFunctionalityComponentContainer::DataStorageChanged(mitk::DataStorage:
 
 void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataNode *item)
 {
-  if (m_FunctionalityComponentContainerGUI != NULL)
+  if (m_FunctionalityComponentContainerGUI != nullptr)
   {
     mitk::DataNode::Pointer selectedItem = const_cast<mitk::DataNode *>(item);
     GetTreeNodeSelector()->SetSelectedNode(selectedItem);
@@ -211,7 +211,7 @@ void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataNode *i
     {
       QmitkBaseFunctionalityComponent *functionalityComponent =
         dynamic_cast<QmitkBaseFunctionalityComponent *>(m_AddedChildList[i]);
-      if (functionalityComponent != NULL)
+      if (functionalityComponent != nullptr)
         functionalityComponent->ImageSelected(item);
     }
   }
@@ -220,13 +220,13 @@ void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataNode *i
   {
     m_ParentMitkImage = static_cast<mitk::Image *>(item->GetData());
 
-    if (m_FunctionalityComponentContainerGUI != NULL)
+    if (m_FunctionalityComponentContainerGUI != nullptr)
     {
       for (unsigned int i = 0; i < m_AddedChildList.size(); i++)
       {
         QmitkBaseFunctionalityComponent *functionalityComponent =
           dynamic_cast<QmitkBaseFunctionalityComponent *>(m_AddedChildList[i]);
-        if (functionalityComponent != NULL)
+        if (functionalityComponent != nullptr)
         {
           functionalityComponent->m_ParentMitkImage = static_cast<mitk::Image *>(item->GetData());
         }
@@ -238,7 +238,7 @@ void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataNode *i
 
 void QmitkFunctionalityComponentContainer::CreateQtPartControl(QWidget *, mitk::DataStorage::Pointer dataStorage)
 {
-  if (m_FunctionalityComponentContainerGUI == NULL)
+  if (m_FunctionalityComponentContainerGUI == nullptr)
   {
     m_GUI = new QWidget;
     m_FunctionalityComponentContainerGUI = new Ui::QmitkFunctionalityComponentContainerGUI;
@@ -266,7 +266,7 @@ QGroupBox *QmitkFunctionalityComponentContainer::GetMainCheckBoxContainer()
 
 void QmitkFunctionalityComponentContainer::SetContentContainerVisibility(bool)
 {
-  if (GetMainCheckBoxContainer() != NULL)
+  if (GetMainCheckBoxContainer() != nullptr)
   {
     if (GetMainCheckBoxContainer()->isChecked())
     {
@@ -279,11 +279,11 @@ void QmitkFunctionalityComponentContainer::SetContentContainerVisibility(bool)
   }
   for (unsigned int i = 0; i < m_AddedChildList.size(); i++)
   {
-    if (m_AddedChildList[i]->GetContentContainer() != NULL)
+    if (m_AddedChildList[i]->GetContentContainer() != nullptr)
     {
       m_AddedChildList[i]->GetContentContainer()->setShown(GetMainCheckBoxContainer()->isChecked());
     }
-    if (m_AddedChildList[i]->GetMainCheckBoxContainer() != NULL)
+    if (m_AddedChildList[i]->GetMainCheckBoxContainer() != nullptr)
     {
       m_AddedChildList[i]->GetMainCheckBoxContainer()->setChecked(GetMainCheckBoxContainer()->isChecked());
     }
@@ -323,13 +323,13 @@ void QmitkFunctionalityComponentContainer::Deactivated()
 
 void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityComponentContainer *component)
 {
-  if (component != NULL)
+  if (component != nullptr)
   {
     QWidget *componentWidget = component->CreateControlWidget(m_GUI);
     AddComponentListener(component);
     m_GUI->layout()->addWidget(componentWidget);
     component->CreateConnections();
-    if (m_Spacer != NULL)
+    if (m_Spacer != nullptr)
     {
       m_GUI->layout()->removeItem(m_Spacer);
     }
@@ -354,7 +354,7 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityCompon
                                                         QString label,
                                                         int stackPage)
 {
-  if (component != NULL)
+  if (component != nullptr)
   {
     QWidget *visibleWidget = m_FunctionalityComponentContainerGUI->m_WidgetStack->currentWidget();
     int idVisibleWidget = m_FunctionalityComponentContainerGUI->m_WidgetStack->indexOf(visibleWidget);
@@ -411,11 +411,11 @@ void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
   {
     boxLayout->addLayout(buttonLayout);
   }
-  if (m_BackButton == NULL)
+  if (m_BackButton == nullptr)
   {
     m_BackButton = new QPushButton("<<", (QWidget *)(m_FunctionalityComponentContainerGUI));
   }
-  if (m_NextButton == NULL)
+  if (m_NextButton == nullptr)
   {
     m_NextButton = new QPushButton(">>", (QWidget *)(m_FunctionalityComponentContainerGUI));
   }
@@ -429,7 +429,7 @@ void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
   m_FunctionalityComponentContainerGUI->m_WidgetStack->setCurrentIndex(1);
   SetWizardText("");
   GetImageContent()->updateGeometry();
-  if (m_Spacer != NULL)
+  if (m_Spacer != nullptr)
   {
     m_GUI->layout()->removeItem(m_Spacer);
   }

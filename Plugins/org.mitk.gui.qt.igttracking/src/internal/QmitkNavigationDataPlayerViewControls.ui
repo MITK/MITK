@@ -28,45 +28,52 @@
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
        <layout class="QFormLayout" name="formLayout_2">
-        <item row="0" column="0">
+        <item row="1" column="0">
          <widget class="QPushButton" name="m_BtnOpenFile">
           <property name="text">
            <string>Open File</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
+        <item row="1" column="1">
          <widget class="QLabel" name="m_LblFilePath">
           <property name="text">
            <string>No navigation data set loaded...</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="3" column="0">
          <widget class="QLabel" name="label_2">
           <property name="text">
            <string>Frames:</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Tools:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
+        <item row="3" column="1">
          <widget class="QLabel" name="m_LblFrames">
           <property name="text">
            <string>N/A</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Tools:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
          <widget class="QLabel" name="m_LblTools">
           <property name="text">
            <string>N/A</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QCheckBox" name="m_ChkConvertToPointSet">
+          <property name="text">
+           <string>Convert navigation data to point set</string>
           </property>
          </widget>
         </item>

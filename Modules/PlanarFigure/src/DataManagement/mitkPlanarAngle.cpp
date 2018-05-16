@@ -160,7 +160,7 @@ void mitk::PlanarAngle::PrintSelf(std::ostream &os, itk::Indent indent) const
 
 bool mitk::PlanarAngle::Equals(const PlanarFigure &other) const
 {
-  const mitk::PlanarAngle *otherAngle = dynamic_cast<const mitk::PlanarAngle *>(&other);
+  const auto *otherAngle = dynamic_cast<const mitk::PlanarAngle *>(&other);
   if (otherAngle)
   {
     return Superclass::Equals(other);

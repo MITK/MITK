@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_gui_qt_igt_app_hummelprotocolmeasurements org.mitk.gui.qt.igt.app.hummelprotocolmeasurements
+  \ingroup MITKPlugins
+
+  \brief This is the org.mitk.gui.qt.igt.app.hummelprotocolmeasurements plugin.
+
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_igt_app_hummelprotocolmeasurements_internal Internal
+  \ingroup org_mitk_gui_qt_igt_app_hummelprotocolmeasurements
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.igt.app.hummelprotocolmeasurements plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

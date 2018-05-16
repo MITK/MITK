@@ -131,7 +131,7 @@ public:
   CommandContributionItem(
       const SmartPointer<CommandContributionItemParameter>& contributionParameters);
 
-  ~CommandContributionItem();
+  ~CommandContributionItem() override;
 
   using ContributionItem::Fill;
 

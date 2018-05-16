@@ -1,64 +1,33 @@
 <RCC>
     <qresource prefix="/QmitkDiffusionImaging">
-        <file>qball.png</file>
-        <file>tensor.png</file>
         <file>dwi.png</file>
         <file>dwiimport.png</file>
-        <file>quantification.png</file>
-        <file>reconodf.png</file>
-        <file>recontensor.png</file>
         <file>texIntONIcon.png</file>
         <file>texIntOFFIcon.png</file>
         <file>vizControls.png</file>
         <file>Refresh_48.png</file>
-        <file>QBallData24.png</file>
         <file>glyphsoff_C.png</file>
         <file>glyphsoff_S.png</file>
         <file>glyphsoff_T.png</file>
         <file>glyphson_C.png</file>
         <file>glyphson_S.png</file>
         <file>glyphson_T.png</file>
-        <file>FiberBundle.png</file>
-        <file>FiberBundle.png</file>
-        <file>connectomics/ConnectomicsNetwork.png</file>
-        <file>connectomics/QmitkRandomParcellationIcon.png</file>
-        <file>rectangle.png</file>
-        <file>circle.png</file>
-        <file>polygon.png</file>
         <file>color24.gif</file>
         <file>color48.gif</file>
         <file>color64.gif</file>
         <file>crosshair.png</file>
         <file>paint2.png</file>
-        <file>IVIM_48.png</file>
         <file>reset.png</file>
         <file>MapperEfx2D.png</file>
         <file>refresh.xpm</file>
+        <file>tensor.png</file>
+        <file>tractogram.png</file>
+        <file>ml_tractogram.png</file>
+        <file>ConnectomicsNetwork.png</file>
         <file>odf.png</file>
-        <file>general_icons/download.ico</file>
-        <file>general_icons/play.ico</file>
-        <file>general_icons/plus.ico</file>
-        <file>general_icons/refresh.ico</file>
-        <file>general_icons/right.ico</file>
-        <file>general_icons/save.ico</file>
-        <file>general_icons/undo.ico</file>
-        <file>general_icons/upload.ico</file>
-        <file>general_icons/abort.ico</file>
-        <file>general_icons/copy1.ico</file>
-        <file>general_icons/copy2.ico</file>
-        <file>general_icons/cut.ico</file>
-        <file>general_icons/deny1.ico</file>
-        <file>general_icons/deny2.ico</file>
-        <file>general_icons/down.ico</file>
-        <file>general_icons/left.ico</file>
-        <file>general_icons/magn_minus.ico</file>
-        <file>general_icons/magn_plus.ico</file>
-        <file>general_icons/search.ico</file>
-        <file>general_icons/stop.ico</file>
-        <file>general_icons/up.ico</file>
-        <file>general_icons/help.ico</file>
-        <file>general_icons/pencil.ico</file>
-        <file>general_icons/edit.ico</file>
-        <file>denoisingicon.png</file>
+        <file>DiffData24.png</file>
+        <file>odf_peaks.png</file>
+        <file>segmentation.svg</file>
+        <file>sh.png</file>
     </qresource>
 </RCC>

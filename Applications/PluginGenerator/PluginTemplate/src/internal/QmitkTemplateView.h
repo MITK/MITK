@@ -26,11 +26,6 @@ class $(view-class-name) : public QmitkAbstractView
 public:
   static const std::string VIEW_ID;
 
-protected slots:
-
-  /// \brief Called when the user clicks the GUI button
-  void DoImageProcessing();
-
 protected:
   virtual void CreateQtPartControl(QWidget *parent) override;
 
@@ -39,6 +34,9 @@ protected:
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
                                   const QList<mitk::DataNode::Pointer> &nodes) override;
+
+  /// \brief Called when the user clicks the GUI button
+  void DoImageProcessing();
 
   Ui::$(view-file-name)Controls m_Controls;
 };

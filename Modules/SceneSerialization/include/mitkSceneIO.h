@@ -53,7 +53,7 @@ namespace mitk
      * objects
      */
     virtual DataStorage::Pointer LoadScene(const std::string &filename,
-                                           DataStorage *storage = NULL,
+                                           DataStorage *storage = nullptr,
                                            bool clearStorageFirst = false);
 
     /**
@@ -97,7 +97,7 @@ namespace mitk
 
   protected:
     SceneIO();
-    virtual ~SceneIO();
+    ~SceneIO() override;
 
     std::string CreateEmptyTempDirectory();
 

@@ -30,7 +30,7 @@ class QHelpEngineWrapper : public QHelpEngine
 public:
 
   QHelpEngineWrapper(const QString &collectionFile);
-  ~QHelpEngineWrapper();
+  ~QHelpEngineWrapper() override;
 
   /*
    * To be called after the initial search for qch files finished.

@@ -82,15 +82,15 @@ namespace mitk
     itkNewMacro(Self);
 
     // virtual methods that need to be implemented
-    virtual void UpdateOutputInformation() override
+    void UpdateOutputInformation() override
     {
       if (this->GetSource())
         this->GetSource()->UpdateOutputInformation();
     }
-    virtual void SetRequestedRegionToLargestPossibleRegion() override {}
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override { return false; }
-    virtual bool VerifyRequestedRegion() override { return true; }
-    virtual void SetRequestedRegion(const itk::DataObject *data) override {}
+    void SetRequestedRegionToLargestPossibleRegion() override {}
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override { return false; }
+    bool VerifyRequestedRegion() override { return true; }
+    void SetRequestedRegion(const itk::DataObject *) override {}
     /** Add a new vertex to the graph */
     VertexDescriptorType AddVertex(const VertexType &vertexData);
 
@@ -155,8 +155,7 @@ namespace mitk
 
   protected:
     UndirectedGraph();
-    UndirectedGraph(const UndirectedGraph<VertexType, EdgeType> &graph);
-    virtual ~UndirectedGraph();
+    ~UndirectedGraph() override;
 
     GraphType m_Graph;
 

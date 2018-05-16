@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkActor.h>
 #include <vtkDepthSortPolyData.h>
-#include <vtkPainterPolyDataMapper.h>
 #include <vtkPlaneCollection.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
@@ -89,20 +88,20 @@ namespace mitk
 
     virtual const mitk::Surface *GetInput();
 
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
     virtual void ApplyAllProperties(mitk::BaseRenderer *renderer, vtkActor *actor);
 
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
   protected:
     SurfaceVtkMapper3D();
 
-    virtual ~SurfaceVtkMapper3D();
+    ~SurfaceVtkMapper3D() override;
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    virtual void ResetMapper(mitk::BaseRenderer *renderer) override;
+    void ResetMapper(mitk::BaseRenderer *renderer) override;
 
     /** Checks whether the specified property is a ClippingProperty and if yes,
      * adds it to m_ClippingPlaneCollection (internal method). */
@@ -115,7 +114,7 @@ namespace mitk
     {
     public:
       vtkSmartPointer<vtkActor> m_Actor;
-      vtkSmartPointer<vtkPainterPolyDataMapper> m_VtkPolyDataMapper;
+      vtkSmartPointer<vtkPolyDataMapper> m_VtkPolyDataMapper;
       vtkSmartPointer<vtkPolyDataNormals> m_VtkPolyDataNormals;
       vtkSmartPointer<vtkPlaneCollection> m_ClippingPlaneCollection;
       vtkSmartPointer<vtkDepthSortPolyData> m_DepthSort;
@@ -123,7 +122,7 @@ namespace mitk
 
       LocalStorage()
       {
-        m_VtkPolyDataMapper = vtkSmartPointer<vtkPainterPolyDataMapper>::New();
+        m_VtkPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
         m_VtkPolyDataNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
         m_Actor = vtkSmartPointer<vtkActor>::New();
         m_ClippingPlaneCollection = vtkSmartPointer<vtkPlaneCollection>::New();
@@ -133,7 +132,7 @@ namespace mitk
         m_DepthSort = vtkSmartPointer<vtkDepthSortPolyData>::New();
       }
 
-      ~LocalStorage() {}
+      ~LocalStorage() override {}
     };
 
     mitk::LocalStorageHandler<LocalStorage> m_LSH;

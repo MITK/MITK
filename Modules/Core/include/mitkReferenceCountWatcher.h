@@ -67,15 +67,15 @@ namespace mitk
     {
       m_DeleteCommand = CommandType::New();
       m_DeleteCommand->SetCallbackFunction(this, &ReferenceCountWatcher::DeleteObserver);
-      if (m_Object != NULL)
+      if (m_Object != nullptr)
         m_ObserverTag = m_Object->AddObserver(itk::DeleteEvent(), m_DeleteCommand);
       m_ReferenceCount = 0;
     }
     //##Documentation
     //## @brief Destructor: remove observer
-    ~ReferenceCountWatcher()
+    ~ReferenceCountWatcher() override
     {
-      if ((m_Deleted == false) && (m_Object != NULL))
+      if ((m_Deleted == false) && (m_Object != nullptr))
       {
         m_Object->RemoveObserver(m_ObserverTag);
       }
@@ -85,7 +85,7 @@ namespace mitk
     //## 0 if it has been destroyed
     int GetReferenceCount() const override
     {
-      if (m_Object == NULL)
+      if (m_Object == nullptr)
         return -1;
       if (m_Deleted)
         return 0;

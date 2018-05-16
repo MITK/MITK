@@ -136,17 +136,17 @@ public:
   {
   }
 
-  virtual ~MessageDelegate()
+  ~MessageDelegate() override
   {
   }
 
   // override function "Call"
-  virtual A Execute()
+  A Execute() override
   {
     return (m_Object->*m_MemberFunctionPointer)(); // execute member function
   }
 
-  bool operator==(const MessageAbstractDelegate<A>* c)
+  bool operator==(const MessageAbstractDelegate<A>* c) override
   {
     const MessageDelegate<R, A>* cmd =
         dynamic_cast<const MessageDelegate<R, A>*> (c);
@@ -160,7 +160,7 @@ public:
     return true;
   }
 
-  MessageAbstractDelegate<A>* Clone() const
+  MessageAbstractDelegate<A>* Clone() const override
   {
     return new MessageDelegate(m_Object, m_MemberFunctionPointer);
   }
@@ -182,17 +182,17 @@ public:
   {
   }
 
-  virtual ~MessageDelegate1()
+  ~MessageDelegate1() override
   {
   }
 
   // override function "Call"
-  virtual A Execute(T t)
+  A Execute(T t) override
   {
     return (m_Object->*m_MemberFunctionPointer)(t); // execute member function
   }
 
-  bool operator==(const MessageAbstractDelegate1<T, A>* c)
+  bool operator==(const MessageAbstractDelegate1<T, A>* c) override
   {
     const MessageDelegate1<R, T, A>* cmd = dynamic_cast<const MessageDelegate1<
         R, T, A>*> (c);
@@ -206,7 +206,7 @@ public:
     return true;
   }
 
-  MessageAbstractDelegate1<T, A>* Clone() const
+  MessageAbstractDelegate1<T, A>* Clone() const override
   {
     return new MessageDelegate1(m_Object, m_MemberFunctionPointer);
   }
@@ -228,17 +228,17 @@ public:
   {
   }
 
-  virtual ~MessageDelegate2()
+  ~MessageDelegate2() override
   {
   }
 
   // override function "Call"
-  virtual A Execute(T t, U u) const
+  A Execute(T t, U u) const override
   {
     return (m_Object->*m_MemberFunctionPointer)(t, u); // execute member function
   }
 
-  bool operator==(const MessageAbstractDelegate2<T, U, A>* c)
+  bool operator==(const MessageAbstractDelegate2<T, U, A>* c) override
   {
     const MessageDelegate2<R, T, U, A>* cmd =
         dynamic_cast<const MessageDelegate2<R, T, U, A>*> (c);
@@ -252,7 +252,7 @@ public:
     return true;
   }
 
-  MessageAbstractDelegate2<T, U, A>* Clone() const
+  MessageAbstractDelegate2<T, U, A>* Clone() const override
   {
     return new MessageDelegate2(m_Object, m_MemberFunctionPointer);
   }
@@ -274,17 +274,17 @@ public:
   {
   }
 
-  virtual ~MessageDelegate3()
+  ~MessageDelegate3() override
   {
   }
 
   // override function "Call"
-  virtual A Execute(T t, U u, V v) const
+  A Execute(T t, U u, V v) const override
   {
     return (m_Object->*m_MemberFunctionPointer)(t, u, v); // execute member function
   }
 
-  bool operator==(const MessageAbstractDelegate3<T, U, V, A>* c)
+  bool operator==(const MessageAbstractDelegate3<T, U, V, A>* c) override
   {
     const MessageDelegate3<R, T, U, V, A>* cmd =
         dynamic_cast<const MessageDelegate3<R, T, U, V, A>*> (c);
@@ -298,7 +298,7 @@ public:
     return true;
   }
 
-  MessageAbstractDelegate3<T, U, V, A>* Clone() const
+  MessageAbstractDelegate3<T, U, V, A>* Clone() const override
   {
     return new MessageDelegate3(m_Object, m_MemberFunctionPointer);
   }
@@ -321,17 +321,17 @@ public:
   {
   }
 
-  virtual ~MessageDelegate4()
+  ~MessageDelegate4() override
   {
   }
 
   // override function "Call"
-  virtual A Execute(T t, U u, V v, W w) const
+  A Execute(T t, U u, V v, W w) const override
   {
     return (m_Object->*m_MemberFunctionPointer)(t, u, v, w); // execute member function
   }
 
-  bool operator==(const MessageAbstractDelegate4<T, U, V, W, A>* c)
+  bool operator==(const MessageAbstractDelegate4<T, U, V, W, A>* c) override
   {
     const MessageDelegate4<R, T, U, V, W, A>* cmd =
         dynamic_cast<const MessageDelegate4<R, T, U, V, W, A>*> (c);
@@ -345,7 +345,7 @@ public:
     return true;
   }
 
-  MessageAbstractDelegate4<T, U, V, W, A>* Clone() const
+  MessageAbstractDelegate4<T, U, V, W, A>* Clone() const override
   {
     return new MessageDelegate4(m_Object, m_MemberFunctionPointer);
   }

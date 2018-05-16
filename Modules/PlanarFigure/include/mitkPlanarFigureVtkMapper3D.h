@@ -40,7 +40,7 @@ namespace mitk
     };
 
   public:
-    static void SetDefaultProperties(DataNode *, BaseRenderer * = NULL, bool = false);
+    static void SetDefaultProperties(DataNode *, BaseRenderer * = nullptr, bool = false);
 
     mitkClassMacro(PlanarFigureVtkMapper3D, VtkMapper);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
@@ -52,7 +52,7 @@ namespace mitk
 
   private:
     PlanarFigureVtkMapper3D();
-    ~PlanarFigureVtkMapper3D();
+    ~PlanarFigureVtkMapper3D() override;
 
     PlanarFigureVtkMapper3D(const Self &);
     Self &operator=(const Self &);

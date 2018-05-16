@@ -43,13 +43,13 @@ namespace mitk
     mitkClassMacroItkParent(DiffImageApplier, itk::Object);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual void ExecuteOperation(Operation *operation) override;
+      void ExecuteOperation(Operation *operation) override;
 
     static DiffImageApplier *GetInstanceForUndo();
 
   protected:
     DiffImageApplier(); // purposely hidden
-    virtual ~DiffImageApplier();
+    ~DiffImageApplier() override;
 
     template <typename TPixel, unsigned int VImageDimension>
     void ItkImageSwitch2DDiff(itk::Image<TPixel, VImageDimension> *image);

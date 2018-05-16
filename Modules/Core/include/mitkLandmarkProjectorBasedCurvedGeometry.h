@@ -37,7 +37,7 @@ namespace mitk
     void SetLandmarkProjector(mitk::LandmarkProjector *aLandmarkProjector);
     itkGetConstObjectMacro(LandmarkProjector, mitk::LandmarkProjector);
 
-    virtual void SetFrameGeometry(const mitk::BaseGeometry *frameGeometry) override;
+    void SetFrameGeometry(const mitk::BaseGeometry *frameGeometry) override;
 
     virtual void ComputeGeometry();
 
@@ -57,7 +57,7 @@ namespace mitk
 
     LandmarkProjectorBasedCurvedGeometry(const LandmarkProjectorBasedCurvedGeometry &other);
 
-    virtual ~LandmarkProjectorBasedCurvedGeometry();
+    ~LandmarkProjectorBasedCurvedGeometry() override;
 
     mitk::LandmarkProjector::Pointer m_LandmarkProjector;
 
@@ -71,7 +71,7 @@ namespace mitk
     //## These virtual function allows a different beahiour in subclasses.
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
-    virtual void PreSetSpacing(const mitk::Vector3D &aSpacing) override { Superclass::PreSetSpacing(aSpacing); };
+    void PreSetSpacing(const mitk::Vector3D &aSpacing) override { Superclass::PreSetSpacing(aSpacing); };
   };
 } // namespace mitk
 

@@ -6,6 +6,6 @@
 \tableofcontents
 
 \section org_mitk_gui_qt_overlaymanagerOverview Overview
-The OverlayManager plugin allows to view all overlays currently managed by the mitk::OverlayManager. Properties of added overlays can be modified. Additionally it is possible to create some basic overlays and add them to the mitk::OverlayManager.
+The OverlayManager plugin allows to view all annotations currently managed. Properties of added annotations can be modified. Additionally it is possible to create some basic overlays and register them.
 
 */

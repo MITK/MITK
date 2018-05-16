@@ -318,11 +318,11 @@ public:
 
 protected:
   MultiGaussianImageSource();
-  ~MultiGaussianImageSource();
-  void PrintSelf(std::ostream & os, Indent indent) const;
+  ~MultiGaussianImageSource() override;
+  void PrintSelf(std::ostream & os, Indent indent) const override;
 
-  virtual void GenerateData();
-  virtual void GenerateOutputInformation();
+  void GenerateData() override;
+  void GenerateOutputInformation() override;
 
 private:
   MultiGaussianImageSource(const MultiGaussianImageSource &); //purposely not implemented

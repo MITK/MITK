@@ -37,7 +37,7 @@ namespace mitk
 
   private:
     ShowSegmentationAsSmoothedSurface();
-    ~ShowSegmentationAsSmoothedSurface();
+    ~ShowSegmentationAsSmoothedSurface() override;
 
     Surface::Pointer m_Surface;
   };

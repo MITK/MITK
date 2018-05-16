@@ -44,8 +44,8 @@ QmitkIGTLDeviceSetupConnectionWidget::QmitkIGTLDeviceSetupConnectionWidget(
   QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f), m_IsClient(false)
 {
-  m_Controls = NULL;
-  this->m_IGTLDevice = NULL;
+  m_Controls = nullptr;
+  this->m_IGTLDevice = nullptr;
   CreateQtPartControl(this);
   m_NumSentFramesSinceLastUpdate = 0;
   m_NumReceivedFramesSinceLastUpdate = 0;
@@ -111,6 +111,8 @@ void QmitkIGTLDeviceSetupConnectionWidget::CreateConnections()
       this, SLOT(OnBufferOutgoingMessages(int)));
     connect(&m_FPSCalculationTimer, SIGNAL(timeout()),
       this, SLOT(OnUpdateFPSLabel()));
+    connect(m_Controls->logMessageDetailsCheckBox, SIGNAL(clicked()),
+      this, SLOT(OnLogMessageDetailsCheckBoxClicked()));
   }
   //this is used for thread seperation, otherwise the worker thread would change the ui elements
   //which would cause an exception
@@ -146,8 +148,10 @@ void QmitkIGTLDeviceSetupConnectionWidget::AdaptGUIToState()
       this->m_Controls->editIP->setEnabled(true);
     }
     this->m_Controls->editPort->setEnabled(true);
-    this->m_Controls->logIncomingMsg->setEnabled(false);
-    this->m_Controls->logOutgoingMsg->setEnabled(false);
+    this->m_Controls->logMessageStatusCheckBox->setChecked(false);
+    this->m_Controls->logMessageDetailsCheckBox->setChecked(false);
+    this->m_Controls->logMessageStatusCheckBox->setEnabled(false);
+    this->m_Controls->logMessageDetailsCheckBox->setEnabled(false);
     this->m_Controls->bufferInMsgCheckBox->setEnabled(false);
     this->m_Controls->bufferOutMsgCheckBox->setEnabled(false);
     this->m_Controls->butConnect->setEnabled(true);
@@ -155,6 +159,12 @@ void QmitkIGTLDeviceSetupConnectionWidget::AdaptGUIToState()
     this->m_Controls->fpsOutLabel->setEnabled(false);
     this->m_Controls->fpsInDescrLabel->setEnabled(false);
     this->m_Controls->fpsOutDescrLabel->setEnabled(false);
+
+    if( this->m_IGTLDevice.IsNotNull() )
+    {
+      this->m_IGTLDevice->SetLogMessages(false);
+    }
+
     break;
   case mitk::IGTLDevice::Ready:
     if (m_IsClient)
@@ -167,8 +177,8 @@ void QmitkIGTLDeviceSetupConnectionWidget::AdaptGUIToState()
     }
     this->m_Controls->editIP->setEnabled(false);
     this->m_Controls->editPort->setEnabled(false);
-    this->m_Controls->logIncomingMsg->setEnabled(true);
-    this->m_Controls->logOutgoingMsg->setEnabled(true);
+    this->m_Controls->logMessageStatusCheckBox->setEnabled(true);
+    this->m_Controls->logMessageDetailsCheckBox->setEnabled(true);
     this->m_Controls->bufferInMsgCheckBox->setEnabled(true);
     this->m_Controls->bufferOutMsgCheckBox->setEnabled(true);
     this->m_Controls->butConnect->setEnabled(true);
@@ -188,8 +198,8 @@ void QmitkIGTLDeviceSetupConnectionWidget::AdaptGUIToState()
     }
     this->m_Controls->editIP->setEnabled(false);
     this->m_Controls->editPort->setEnabled(false);
-    this->m_Controls->logIncomingMsg->setEnabled(true);
-    this->m_Controls->logOutgoingMsg->setEnabled(true);
+    this->m_Controls->logMessageStatusCheckBox->setEnabled(true);
+    this->m_Controls->logMessageDetailsCheckBox->setEnabled(true);
     this->m_Controls->bufferInMsgCheckBox->setEnabled(true);
     this->m_Controls->bufferOutMsgCheckBox->setEnabled(true);
     this->m_Controls->butConnect->setEnabled(true);
@@ -218,7 +228,7 @@ void QmitkIGTLDeviceSetupConnectionWidget::Initialize(
 
     //check if the device is a server or a client
     if (dynamic_cast<mitk::IGTLClient*>(
-      this->m_IGTLDevice.GetPointer()) == NULL)
+      this->m_IGTLDevice.GetPointer()) == nullptr)
     {
       m_IsClient = false;
     }
@@ -271,7 +281,7 @@ void QmitkIGTLDeviceSetupConnectionWidget::Initialize(
   }
   else
   {
-    m_IGTLDevice = NULL;
+    m_IGTLDevice = nullptr;
   }
 }
 
@@ -282,8 +292,15 @@ void QmitkIGTLDeviceSetupConnectionWidget::DisableSourceControls()
   m_Controls->butConnect->setEnabled(false);
   m_Controls->bufferInMsgCheckBox->setEnabled(false);
   m_Controls->bufferOutMsgCheckBox->setEnabled(false);
-  m_Controls->logIncomingMsg->setEnabled(false);
-  m_Controls->logOutgoingMsg->setEnabled(false);
+  this->m_Controls->logMessageStatusCheckBox->setChecked(false);
+  this->m_Controls->logMessageDetailsCheckBox->setChecked(false);
+  this->m_Controls->logMessageStatusCheckBox->setEnabled(false);
+  this->m_Controls->logMessageDetailsCheckBox->setEnabled(false);
+
+  if( this->m_IGTLDevice.IsNotNull() )
+  {
+    this->m_IGTLDevice->SetLogMessages(false);
+  }
 }
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnConnect()
@@ -355,17 +372,16 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnNewConnection()
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnMessageReceived()
 {
-  if (this->m_Controls->logIncomingMsg->isChecked())
+  if( this->m_Controls->logMessageStatusCheckBox->isChecked() )
   {
-    MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Received a message: "
-      << this->m_IGTLDevice->GetMessageQueue()->GetLatestMsgInformationString();
+    MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Received a message.";
   }
   m_NumReceivedFramesSinceLastUpdate++;
 }
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnMessageSent()
 {
-  if (this->m_Controls->logOutgoingMsg->isChecked())
+  if( this->m_Controls->logMessageStatusCheckBox->isChecked() )
   {
     MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Sent a message.";
   }
@@ -374,10 +390,9 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnMessageSent()
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnCommandReceived()
 {
-  if (this->m_Controls->logIncomingMsg->isChecked())
+  if( this->m_Controls->logMessageStatusCheckBox->isChecked() )
   {
-    MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Received a command: "
-      << this->m_IGTLDevice->GetMessageQueue()->GetLatestMsgInformationString();
+    MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Received a command.";
   }
 }
 
@@ -385,7 +400,7 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnBufferIncomingMessages(int state)
 {
   if (this->m_IGTLDevice.IsNotNull())
   {
-    this->m_IGTLDevice->EnableInfiniteBufferingMode(
+    this->m_IGTLDevice->EnableNoBufferingMode(
       this->m_IGTLDevice->GetMessageQueue(), (bool)state);
   }
 }
@@ -394,7 +409,7 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnBufferOutgoingMessages(int state)
 {
   if (this->m_IGTLDevice.IsNotNull())
   {
-    this->m_IGTLDevice->EnableInfiniteBufferingMode(
+    this->m_IGTLDevice->EnableNoBufferingMode(
       this->m_IGTLDevice->GetMessageQueue(), (bool)state);
   }
 }
@@ -407,4 +422,17 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnUpdateFPSLabel()
   this->m_Controls->fpsOutLabel->setText(QString::number(fpsOut));
   m_NumReceivedFramesSinceLastUpdate = 0;
   m_NumSentFramesSinceLastUpdate = 0;
+}
+
+void QmitkIGTLDeviceSetupConnectionWidget::OnLogMessageDetailsCheckBoxClicked()
+{
+  if( this->m_IGTLDevice.IsNull() )
+  {
+    MITK_WARN << "Logging information not passed down to Message Provider.";
+    return;
+  }
+  else
+  {
+    this->m_IGTLDevice->SetLogMessages( this->m_Controls->logMessageDetailsCheckBox->isChecked() );
+  }
 }

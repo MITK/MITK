@@ -75,12 +75,12 @@ void QmitkSliceAnimationItem::Animate(double s)
   const QString renderWindowName = QString("stdmulti.widget%1").arg(this->GetRenderWindow() + 1);
   vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName(renderWindowName.toStdString());
 
-  if (renderWindow == NULL)
+  if (renderWindow == nullptr)
     return;
 
   mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(renderWindow)->GetSliceNavigationController()->GetSlice();
 
-  if (stepper == NULL)
+  if (stepper == nullptr)
     return;
 
   int newPos = this->GetReverse()

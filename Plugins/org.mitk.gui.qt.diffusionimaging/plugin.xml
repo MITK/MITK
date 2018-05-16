@@ -5,216 +5,39 @@
 
   <extension point="org.blueberry.ui.keywords">
 
+  <keyword label="DICOM" id="org.mitk.views.dicomtractogramtageditor.Keyword"/>
+  <keyword label="tractography" id="org.mitk.views.dicomtractogramtageditor.Keyword"/>
+  <keyword label="tracking" id="org.mitk.views.dicomtractogramtageditor.Keyword"/>
+  <keyword label="tractogram" id="org.mitk.views.dicomtractogramtageditor.Keyword"/>
+  <keyword label="tag" id="org.mitk.views.dicomtractogramtageditor.Keyword"/>
+
   <keyword label="DICOM" id="org.mitk.views.diffusiondicomimport.Keyword"/>
   <keyword label="image" id="org.mitk.views.diffusiondicomimport.Keyword"/>
   <keyword label="data" id="org.mitk.views.diffusiondicomimport.Keyword"/>
   <keyword label="load" id="org.mitk.views.diffusiondicomimport.Keyword"/>
 
-  <keyword label="signal" id="org.mitk.views.qballreconstruction.Keyword"/>
-  <keyword label="reconstruction" id="org.mitk.views.qballreconstruction.Keyword"/>
-  <keyword label="ball" id="org.mitk.views.qballreconstruction.Keyword"/>
-  <keyword label="diffusion" id="org.mitk.views.qballreconstruction.Keyword"/>
-  <keyword label="qball" id="org.mitk.views.qballreconstruction.Keyword"/>
-  <keyword label="q-ball" id="org.mitk.views.qballreconstruction.Keyword"/>
-  <keyword label="propagator" id="org.mitk.views.qballreconstruction.Keyword"/>
-  <keyword label="modeling" id="org.mitk.views.qballreconstruction.Keyword"/>
+  </extension>
 
-  <keyword label="signal" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="reconstruction" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="tensor" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="diffusion" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="second order" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="propagator" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="modeling" id="org.mitk.views.tensorreconstruction.Keyword"/>
-  <keyword label="DTI" id="org.mitk.views.tensorreconstruction.Keyword"/>
+  <extension point="org.blueberry.ui.perspectives">
 
-  <keyword label="tractography" id="org.mitk.views.gibbstracking.Keyword"/>
-  <keyword label="tracking" id="org.mitk.views.gibbstracking.Keyword"/>
-  <keyword label="fiber" id="org.mitk.views.gibbstracking.Keyword"/>
-  <keyword label="global" id="org.mitk.views.gibbstracking.Keyword"/>
-  <keyword label="gibbs" id="org.mitk.views.gibbstracking.Keyword"/>
-  <keyword label="diffusion" id="org.mitk.views.gibbstracking.Keyword"/>
-
-  <keyword label="tractography" id="org.mitk.views.streamlinetracking.Keyword"/>
-  <keyword label="tracking" id="org.mitk.views.streamlinetracking.Keyword"/>
-  <keyword label="fiber" id="org.mitk.views.streamlinetracking.Keyword"/>
-  <keyword label="deterministic" id="org.mitk.views.streamlinetracking.Keyword"/>
-  <keyword label="streamline" id="org.mitk.views.streamlinetracking.Keyword"/>
-  <keyword label="tend" id="org.mitk.views.streamlinetracking.Keyword"/>
-  <keyword label="tensorline" id="org.mitk.views.streamlinetracking.Keyword"/>
-  <keyword label="tensorlines" id="org.mitk.views.streamlinetracking.Keyword"/>
-  <keyword label="multi" id="org.mitk.views.streamlinetracking.Keyword"/>
-  <keyword label="tensor" id="org.mitk.views.streamlinetracking.Keyword"/>
-  <keyword label="dti" id="org.mitk.views.streamlinetracking.Keyword"/>
-  <keyword label="diffusion" id="org.mitk.views.streamlinetracking.Keyword"/>
-
-  <keyword label="tractography" id="org.mitk.views.stochasticfibertracking.Keyword"/>
-  <keyword label="tracking" id="org.mitk.views.stochasticfibertracking.Keyword"/>
-  <keyword label="fiber" id="org.mitk.views.stochasticfibertracking.Keyword"/>
-  <keyword label="stochastic" id="org.mitk.views.stochasticfibertracking.Keyword"/>
-  <keyword label="probabilistic" id="org.mitk.views.stochasticfibertracking.Keyword"/>
-  <keyword label="streamline" id="org.mitk.views.stochasticfibertracking.Keyword"/>
-  <keyword label="tensor" id="org.mitk.views.stochasticfibertracking.Keyword"/>
-  <keyword label="dti" id="org.mitk.views.stochasticfibertracking.Keyword"/>
-  <keyword label="diffusion" id="org.mitk.views.stochasticfibertracking.Keyword"/>
-
-  <keyword label="tractography" id="org.mitk.views.mlbtview.Keyword"/>
-  <keyword label="tracking" id="org.mitk.views.mlbtview.Keyword"/>
-  <keyword label="fiber" id="org.mitk.views.mlbtview.Keyword"/>
-  <keyword label="machine" id="org.mitk.views.mlbtview.Keyword"/>
-  <keyword label="learning" id="org.mitk.views.mlbtview.Keyword"/>
-  <keyword label="streamline" id="org.mitk.views.mlbtview.Keyword"/>
-  <keyword label="tensor" id="org.mitk.views.mlbtview.Keyword"/>
-  <keyword label="dwi" id="org.mitk.views.mlbtview.Keyword"/>
-  <keyword label="diffusion" id="org.mitk.views.mlbtview.Keyword"/>
-
-  <keyword label="diffusion" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="signal" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="simulation" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="data" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="synthetic" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="numeric" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="ball" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="dot" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="astrosticks" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="k-space" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="acquisition" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="artifact" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="artefact" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="gibbs ringing" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="spikes" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="distortions" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="aliasing" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="noise" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="fiberfox" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="rician" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="ghost" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="fieldmap" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="generator" id="org.mitk.views.fiberfoxview.Keyword"/>
-  <keyword label="fourier" id="org.mitk.views.fiberfoxview.Keyword"/>
-
-  <keyword label="GFA" id="org.mitk.views.diffusionquantification.Keyword"/>
-  <keyword label="RA" id="org.mitk.views.diffusionquantification.Keyword"/>
-  <keyword label="AD" id="org.mitk.views.diffusionquantification.Keyword"/>
-  <keyword label="RD" id="org.mitk.views.diffusionquantification.Keyword"/>
-  <keyword label="MD" id="org.mitk.views.diffusionquantification.Keyword"/>
-  <keyword label="anisotropy" id="org.mitk.views.diffusionquantification.Keyword"/>
-  <keyword label="fractional" id="org.mitk.views.diffusionquantification.Keyword"/>
-  <keyword label="radial" id="org.mitk.views.diffusionquantification.Keyword"/>
-  <keyword label="axial" id="org.mitk.views.diffusionquantification.Keyword"/>
-  <keyword label="diffusivity" id="org.mitk.views.diffusionquantification.Keyword"/>
-  <keyword label="mean" id="org.mitk.views.diffusionquantification.Keyword"/>
-  <keyword label="generalized" id="org.mitk.views.diffusionquantification.Keyword"/>
-  <keyword label="derived" id="org.mitk.views.diffusionquantification.Keyword"/>
-  
-  <keyword label="default" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
-  <keyword label="diffusion" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
-  <keyword label="data" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
-  <keyword label="standard" id="org.mitk.perspectives.diffusiondefault.Keyword"/>
-
-  <keyword label="processing" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="extract" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="remove" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="fiber" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="bundle" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="color" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="mirror" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="threshold" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="prune" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="select" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="segment" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="dissect" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="modify" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="join" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="merge" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="add" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="subtract" id="org.mitk.views.fiberprocessing.Keyword"/>
-  <keyword label="difference" id="org.mitk.views.fiberprocessing.Keyword"/>
-
-  <keyword label="fiber" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="quantification" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="statistics" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="length" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="number" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="principal" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="direction" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="peak" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="main" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="tract" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="density" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="image" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="TDI" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="envelope" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="hull" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="endpoints" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="end" id="org.mitk.views.fiberquantification.Keyword"/>
-  <keyword label="endings" id="org.mitk.views.fiberquantification.Keyword"/>
-
-  <keyword label="ODF" id="org.mitk.views.odfmaximaextraction.Keyword"/>
-  <keyword label="SH" id="org.mitk.views.odfmaximaextraction.Keyword"/>
-  <keyword label="spherical harmonic" id="org.mitk.views.odfmaximaextraction.Keyword"/>
-  <keyword label="maximum" id="org.mitk.views.odfmaximaextraction.Keyword"/>
-  <keyword label="peak" id="org.mitk.views.odfmaximaextraction.Keyword"/>
-  <keyword label="main" id="org.mitk.views.odfmaximaextraction.Keyword"/>
-  <keyword label="FOD" id="org.mitk.views.odfmaximaextraction.Keyword"/>
-  <keyword label="direction" id="org.mitk.views.odfmaximaextraction.Keyword"/>
-  <keyword label="fODF" id="org.mitk.views.odfmaximaextraction.Keyword"/>
-  <keyword label="dODF" id="org.mitk.views.odfmaximaextraction.Keyword"/>
-
-  <keyword label="ODF" id="org.mitk.views.odfdetails.Keyword"/>
-  <keyword label="dODF" id="org.mitk.views.odfdetails.Keyword"/>
-  <keyword label="fODF" id="org.mitk.views.odfdetails.Keyword"/>
-  <keyword label="FOD" id="org.mitk.views.odfdetails.Keyword"/>
-  <keyword label="statistics" id="org.mitk.views.odfdetails.Keyword"/>
-  <keyword label="values" id="org.mitk.views.odfdetails.Keyword"/>
-  <keyword label="shape" id="org.mitk.views.odfdetails.Keyword"/>
+    <perspective id="org.mitk.perspectives.segmentation"
+    name="Image Segmentation"
+    class="QmitkSegmentationPerspective"
+    icon="resources/segmentation.svg">
+    <description>This perspective contains views to perform manual image segmentation.</description>
+    </perspective>
 
   </extension>
 
-
   <extension point="org.blueberry.ui.views">
-
-    <view id="org.mitk.views.qballreconstruction"
-    name="Q-Balls"
-    category="Signal modeling"
-    icon="resources/qball.png"
-    class="QmitkQBallReconstructionView">
-    <description>Q-Ball reconstruction view</description>
-    <keywordReference id="org.mitk.views.qballreconstruction.Keyword"/>
-    </view>
 
     <view id="org.mitk.views.diffusiondicomimport"
     name="DICOM Import"
-    category="Data handling"
+    category="Data"
     class="QmitkDiffusionDicomImport"
     icon="resources/dwiimport.png">
     <description>Diffusion DICOM data import</description>
     <keywordReference id="org.mitk.views.diffusiondicomimport.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.diffusionpreprocessing"
-    name="Preprocessing"
-    category="Preprocessing"
-    class="QmitkPreprocessingView"
-    icon="resources/dwi2.png">
-    <keywordReference id="org.mitk.views.diffusionpreprocessing.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.diffusionquantification"
-    name="Scalar Indices"
-    category="Quantification"
-    class="QmitkDiffusionQuantificationView"
-    icon="resources/quantification.png">
-    <description>Calculation of tensor and Q-ball derived measures.</description>
-    <keywordReference id="org.mitk.views.diffusionquantification.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.tensorreconstruction"
-    name="Tensors"
-    category="Signal modeling"
-    icon="resources/tensor.png"
-    class="QmitkTensorReconstructionView">
-    <keywordReference id="org.mitk.views.tensorreconstruction.Keyword"/>
     </view>
 
     <view id="org.mitk.views.controlvisualizationpropertiesview"
@@ -224,231 +47,13 @@
     <keywordReference id="org.mitk.views.controlvisualizationpropertiesview.Keyword"/>
     </view>
 
-    <view id="org.mitk.views.ivim"
-    name="IVIM"
-    category="Quantification"
-    class="QmitkIVIMView"
-    icon="resources/IVIM_48.png">
-    <keywordReference id="org.mitk.views.ivim.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.odfdetails"
-    name="ODF Details"
-    category="Quantification"
-    class="QmitkODFDetailsView"
-    icon="resources/OdfDetails.png">
-    <keywordReference id="org.mitk.views.odfdetails.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.gibbstracking"
-    name="Gibbs Tracking"
-    category="Fiber tractography"
-    class="QmitkGibbsTrackingView"
-    icon="resources/GibbsTracking.png">
-    <keywordReference id="org.mitk.views.gibbstracking.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.stochasticfibertracking"
-    name="Stochastic Tracking"
-    category="Fiber tractography"
-    class="QmitkStochasticFiberTrackingView"
-    icon="resources/stochFB.png">
-    <keywordReference id="org.mitk.views.stochasticfibertracking.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.streamlinetracking"
-    name="Streamline Tracking"
-    category="Fiber tractography"
-    class="QmitkStreamlineTrackingView"
-    icon="resources/StreamlineTracking.png">
-    <keywordReference id="org.mitk.views.streamlinetracking.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.fiberquantification"
-    name="Fiber Quantification"
-    category="Fiber processing"
-    class="QmitkFiberQuantificationView"
-    icon="resources/FiberBundleOperations.png">
-    <keywordReference id="org.mitk.views.fiberquantification.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.fiberprocessing"
-    name="Fiber Processing"
-    category="Fiber processing"
-    class="QmitkFiberProcessingView"
-    icon="resources/FiberBundleOperations.png">
-    <keywordReference id="org.mitk.views.fiberprocessing.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.partialvolumeanalysisview"
-    name="PV Analysis"
-    category="Quantification"
-    class="QmitkPartialVolumeAnalysisView"
-    icon="resources/PartialVolumeAnalysis_24.png">
-    <keywordReference id="org.mitk.views.partialvolumeanalysisview.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.tbssskeletonization"
-    name="Tbss Skeletonization"
-    category="Quantification"
-    class="QmitkTbssSkeletonizationView"
-    icon="resources/tbss.png">
-    <keywordReference id="org.mitk.views.tbssskeletonization.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.tractbasedspatialstatistics"
-    name="Tract-based spatial statistics"
-    category="Quantification"
-    class="QmitkTractbasedSpatialStatisticsView"
-    icon="resources/tbss.png">
-    <keywordReference id="org.mitk.views.tractbasedspatialstatistics.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.connectomicsnetworkoperations"
-    name="Network Operations"
-    category="Connectomics"
-    class="QmitkConnectomicsNetworkOperationsView"
-    icon="resources/connectomics/QmitkConnectomicsNetworkOperationsViewIcon_48.png">
-    <keywordReference id="org.mitk.views.connectomicsnetworkoperations.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.connectomicsdata"
-    name="Network Data"
-    category="Connectomics"
-    class="QmitkConnectomicsDataView"
-    icon="resources/connectomics/QmitkConnectomicsDataViewIcon_48.png">
-    <keywordReference id="org.mitk.views.connectomicsdata.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.connectomicsstatistics"
-    name="Network Statistics"
-    category="Connectomics"
-    class="QmitkConnectomicsStatisticsView"
-    icon="resources/connectomics/QmitkConnectomicsStatisticsViewIcon_48.png">
-    <keywordReference id="org.mitk.views.connectomicsstatistics.Keyword"/>
-    </view>
-          
-    <view id="org.mitk.views.randomparcellationview"
-          name="Random Parcellation View"
-          category="Connectomics"
-          class="QmitkRandomParcellationView"
-          icon="resources/connectomics/QmitkRandomParcellationIcon.png" >
-    <keywordReference id="org.mitk.views.randomparcellationview.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.odfmaximaextraction"
-    name="Peak Extraction"
-    category="Signal modeling"
-    class="QmitkOdfMaximaExtractionView"
-    icon="resources/qball_peaks.png">
-    <keywordReference id="org.mitk.views.odfmaximaextraction.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.fiberfoxview"
-    name="Fiberfox"
-    category="Simulated data"
-    class="QmitkFiberfoxView"
-    icon="resources/phantom.png">
-    <description>Diffusion weighted MRI data simulation tool.</description>
-    <keywordReference id="org.mitk.views.fiberfoxview.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.fieldmapgenerator"
-    name="Fieldmap Generator"
-    category="Simulated data"
-    class="QmitkFieldmapGeneratorView"
-    icon="resources/odf.png">
-    <keywordReference id="org.mitk.views.fiberfoxview.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.diffusionregistrationview"
-    name="DWI Registration"
-    category="Registration"
-    class="QmitkDiffusionRegistrationView"
-    icon="resources/diffusionregistration.png">
-    <keywordReference id="org.mitk.views.diffusionregistrationview.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.denoisingview"
-    name="DWI Denoising"
-    category="Preprocessing"
-    class="QmitkDenoisingView"
-    icon="resources/denoisingicon.png">
-    <keywordReference id="org.mitk.views.denoisingview.Keyword"/>
-    </view>
-
-    <view id="org.mitk.views.mlbtview"
-    name="Machine Learning Based Streamline Tractography"
-    category="Fiber tractography"
-    class="QmitkMLBTView"
-    icon="resources/fiberTracking1.png">
-    <keywordReference id="org.mitk.views.mlbtview.Keyword"/>
-    </view>
-  </extension>
-
-
-  <extension point="org.blueberry.ui.perspectives">
-
-    <perspective id="org.mitk.perspectives.fiberprocessings"
-    name="Fiber Processing"
-    class="QmitkFiberProcessingPerspective"
-    icon="resources/FiberBundleOperations.png">
-    <description>This perspective contains all views necessary to post process fibers.</description>
-    <keywordReference id="org.mitk.perspectives.fiberprocessings.Keyword"/>
-    </perspective>
-
-    <perspective id="org.mitk.perspectives.tractography1"
-    name="Global Gibbs Tractography"
+    <view id="org.mitk.views.dicomtractogramtageditor"
+    name="DICOM Tractogram Tag Editor"
     category="Fiber Tractography"
-    class="QmitkGibbsTractographyPerspective"
-    icon="resources/tractography.png">
-    <keywordReference id="org.mitk.perspectives.tractography1.Keyword"/>
-    </perspective>
-
-    <perspective id="org.mitk.perspectives.tractography2"
-    name="Deterministic streamline tractography"
-    category="Fiber Tractography"
-    class="QmitkStreamlineTractographyPerspective"
-    icon="resources/tractography.png">
-    <keywordReference id="org.mitk.perspectives.tractography2.Keyword"/>
-    </perspective>
-
-    <perspective id="org.mitk.perspectives.tractography3"
-    name="Probabilistic streamline tractography"
-    category="Fiber Tractography"
-    class="QmitkProbabilisticTractographyPerspective"
-    icon="resources/tractography.png">
-    <keywordReference id="org.mitk.perspectives.tractography3.Keyword"/>
-    </perspective>
-
-    <perspective id="org.mitk.perspectives.tractography4"
-    name="Machine-learning based tractography"
-    category="Fiber Tractography"
-    class="QmitkMachineLearningTractographyPerspective"
-    icon="resources/tractography.png">
-    <keywordReference id="org.mitk.perspectives.tractography4.Keyword"/>
-    </perspective>
-
-    <perspective id="org.mitk.perspectives.syntheticdata"
-    name="Synthetic Data"
-    class="QmitkDIAppSyntheticDataGenerationPerspective"
-    icon="resources/syntheticdata.png">
-    <keywordReference id="org.mitk.perspectives.syntheticdata.Keyword"/>
-    </perspective>
-
-    <perspective id="org.mitk.perspectives.ivim"
-    name="Intra-Voxel Incoherent Motion (IVIM)"
-    class="QmitkDIAppIVIMPerspective"
-    icon="resources/ivim.png">
-    <keywordReference id="org.mitk.perspectives.ivim.Keyword"/>
-    </perspective>
-    
-    <perspective id="org.mitk.perspectives.diffusiondefault"
-    name="Diffusion"
-    class="QmitkDiffusionDefaultPerspective"
-    icon="resources/dwi.png">
-    <keywordReference id="org.mitk.perspectives.diffusiondefault.Keyword"/>
-    </perspective>
+    class="QmitkDicomTractogramTagEditorView"
+    icon="resources/dwiimport.png">
+    <keywordReference id="org.mitk.views.dicomtractogramtageditor.Keyword"/>
+    </view>
 
   </extension>
 

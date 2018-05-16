@@ -1,0 +1,30 @@
+/**
+\page org_mitk_views_fiberfit Fiber Fit
+
+Linearly fits a scalar weight for each streamline in order to optimally explain the input image. Corrseponding command line tool is MitkFitFibersToImage.
+
+\section SecParams Input Data and Parameters
+
+- Image: The image data used to fit the fiber weights. Possible input types:
+  - Peak images. The input peak magnitudes are approximated using the voxel-wise fixel magnitudes obtained from the input tractogram.
+  - Raw diffusion-weighted images. The dMRI signal is approximated using a tensor model with fixed diffusion parameters. Tensor orientations are determined by the input tractogram.
+  - Sclar valued images (e.g. FA, axon density maps, ...).
+- Tractogram: The method fits a weight for each streamline in the input tractogram. In the command line tool, a list of separate bundles can be used as input.
+- Regularization:
+  - Voxel-wise Variance: Constrain the fiber weights to be similar in one voxe (similar to [1]). Command line tool string "VoxelVariance".
+  - Variance: Constrain the fiber weights to be globally similar (mean squared deaviation of weights from mean weight). Command line tool string "Variance".
+  - Mean-squared magnitude: Enforce small weights using the mean-squared magnitude of the streamlines as regularization factor. Command line tool string "MSM".
+  - Lasso: L1 regularization of the streamline weights. Enforces a sparse weight vector. Command line tool string "Lasso".
+  - Group Lasso: Useful if individual bundles are used as input (command-line tool only). This regularization tries to explain the signal with as few bundles as possible penalizing the bundle-wise root mean squared magnitude of the weighs (see [2]). Command line tool string "GroupLasso".
+  - Group Variance: Constrain the fiber weights to be similar for each bundle individually (command-line tool only). Command line tool string "GrouplVariance".
+  - No regularization. Command line tool string "NONE".
+- Suppress Outliers: Perform second optimization run with an upper weight bound based on the first weight estimation (99% quantile).
+- Output Residuals: Add residual images to the data manager.
+
+[1] Smith, Robert E., Jacques-Donald Tournier, Fernando Calamante, and Alan Connelly. “SIFT2: Enabling Dense Quantitative Assessment of Brain White Matter Connectivity Using Streamlines Tractography.” NeuroImage 119, no. Supplement C (October 1, 2015): 338–51. https://doi.org/10.1016/j.neuroimage.2015.06.092.
+
+[2] Yuan, Ming, and Yi Lin. “Model Selection and Estimation in Regression with Grouped Variables.” Journal of the Royal Statistical Society: Series B (Statistical Methodology) 68, no. 1 (February 1, 2006): 49–67. https://doi.org/10.1111/j.1467-9868.2005.00532.x.
+
+[3] Pestilli, Franco, Jason D. Yeatman, Ariel Rokem, Kendrick N. Kay, and Brian A. Wandell. “Evaluation and Statistical Inference for Human Connectomes.” Nature Methods 11, no. 10 (October 2014): 1058–63. https://doi.org/10.1038/nmeth.3098.
+
+*/

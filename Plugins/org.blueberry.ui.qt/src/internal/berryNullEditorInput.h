@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef BERRYNULLEDITORINPUT_H_
-#define BERRYNULLEDITORINPUT_H_
+#ifndef BERRYnullptrEDITORINPUT_H_
+#define BERRYnullptrEDITORINPUT_H_
 
 #include "berryIEditorInput.h"
 #include "berryEditorReference.h"
@@ -62,4 +62,4 @@ public:
 
 }
 
-#endif /*BERRYNULLEDITORINPUT_H_*/
+#endif /*BERRYnullptrEDITORINPUT_H_*/

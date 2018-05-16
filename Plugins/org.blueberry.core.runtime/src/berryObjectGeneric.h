@@ -38,7 +38,7 @@ class org_blueberry_core_runtime_EXPORT ObjectGeneric : public Object
     ObjectGeneric(T x) : m_Value(x) {}
     //ObjectGeneric(const Self& o) { m_Value = o.m_Value; }
 
-    virtual ~ObjectGeneric()
+    ~ObjectGeneric() override
     {
     }
 

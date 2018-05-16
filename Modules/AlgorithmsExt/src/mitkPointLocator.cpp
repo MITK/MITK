@@ -44,7 +44,7 @@ void mitk::PointLocator::SetPoints(vtkPointSet *pointSet)
 {
   if (pointSet == nullptr)
   {
-    itkWarningMacro("Points are NULL!");
+    itkWarningMacro("Points are nullptr!");
     return;
   }
   vtkPoints *points = pointSet->GetPoints();
@@ -79,7 +79,7 @@ void mitk::PointLocator::SetPoints(mitk::PointSet *points)
 {
   if (points == nullptr)
   {
-    itkWarningMacro("Points are NULL!");
+    itkWarningMacro("Points are nullptr!");
     return;
   }
 
@@ -119,7 +119,7 @@ void mitk::PointLocator::SetPoints(ITKPointSet *pointSet)
 {
   if (pointSet == nullptr)
   {
-    itkWarningMacro("Points are NULL!");
+    itkWarningMacro("Points are nullptr!");
     return;
   }
 

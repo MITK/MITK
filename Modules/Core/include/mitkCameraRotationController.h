@@ -38,7 +38,7 @@ namespace mitk
     void SetRenderWindow(vtkRenderWindow *renWin) { m_RenderWindow = renWin; }
   protected:
     CameraRotationController();
-    virtual ~CameraRotationController();
+    ~CameraRotationController() override;
 
   private:
     int m_LastStepperValue;

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkTrackingTypes.h"
 #include "itkFastMutexLock.h"
+#include "mitkNavigationToolStorage.h"
 
 
 namespace mitk {
@@ -101,7 +102,7 @@ namespace mitk {
       * \brief Returns the tool with the given tool name
       *
       * Note: subclasses can and should implement optimized versions of this method
-      * \return the given tool or NULL if no tool with that name exists
+      * \return the given tool or nullptr if no tool with that name exists
       */
       virtual mitk::TrackingTool* GetToolByName(std::string name) const;
 
@@ -129,13 +130,20 @@ namespace mitk {
       TrackingDeviceState GetState() const;
 
       /**
-       * \brief Deprecated! Use the more specific getDeviceData instead. return device type identifier
+       * \brief Deprecated! Use the more specific getData or GetTrackingDeviceName instead. return device type identifier
        */
     TrackingDeviceType GetType() const;
        /**
        * \brief Deprecated! Use the more specific setDeviceData instead. set device type
        */
     void SetType(TrackingDeviceType type);
+
+    /**
+    * \brief Convenient Method to get the Name of the Tracking Device.
+    * This is identical with GetData().Line and can be used to compare with TrackingDeviceTypeInformation::GetTrackingDeviceName()
+    * to check if you have a specific device.
+    */
+    std::string GetTrackingDeviceName();
 
      /**
        * \brief return device data
@@ -163,6 +171,18 @@ namespace mitk {
      */
     virtual bool IsDeviceInstalled();
 
+    /** @return Returns true if this device can autodetects its tools. */
+    virtual bool AutoDetectToolsAvailable();
+
+    /** @return Returns true if it is possible to add a single tool. Default return is true.*/
+    virtual bool AddSingleToolIsAvailable();
+
+    /** Autodetects tools from this device and returns them as a navigation tool storage.
+     *  @return Returns the detected tools. Returns an empty storage if no tools are present
+     *          or if detection is not possible
+     */
+    virtual mitk::NavigationToolStorage::Pointer AutoDetectTools();
+
     private:
       TrackingDeviceState m_State; ///< current object state (Setup, Ready or Tracking)
     protected:
@@ -174,7 +194,7 @@ namespace mitk {
 
 
       TrackingDevice();
-      virtual ~TrackingDevice();
+      ~TrackingDevice() override;
 
     TrackingDeviceData m_Data; ///< current device Data
 

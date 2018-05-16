@@ -104,7 +104,7 @@ public:
       std::cout << "ITS EMPTY1!" << std::endl;
 
     CPPUNIT_ASSERT_MESSAGE("Testing mitkUnstructuredGrid generation!",
-                           testFilter->GetOutput()->GetVtkUnstructuredGrid() != NULL);
+                           testFilter->GetOutput()->GetVtkUnstructuredGrid() != nullptr);
   }
 
   void testScoring()

@@ -33,10 +33,10 @@ namespace mitk
   {
   public:
     ObjFileReaderService();
-    virtual ~ObjFileReaderService();
+    ~ObjFileReaderService() override;
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
+    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
     static mitk::CustomMimeType mimeType;
 

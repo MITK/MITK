@@ -42,7 +42,7 @@ namespace mitk
   public:
     SurfaceVtkIO(const std::string &baseDataType, const CustomMimeType &mimeType, const std::string &description);
 
-    virtual ConfidenceLevel GetWriterConfidenceLevel() const override;
+    ConfidenceLevel GetWriterConfidenceLevel() const override;
 
   protected:
     vtkSmartPointer<vtkPolyData> GetPolyData(unsigned int t, std::string &fileName);

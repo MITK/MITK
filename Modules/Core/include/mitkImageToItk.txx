@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageToItk.h"
 #include "mitkImageWriteAccessor.h"
 
+#include <memory>
+
 template <typename TImageType>
 struct SetLengthHelper
 {
@@ -112,14 +114,14 @@ void mitk::ImageToItk<TOutputImage>::GenerateData()
     helper.SetVectorLength(pixelType.GetNumberOfComponents());
   }
 
-  mitk::ImageAccessorBase *imageAccess;
+  std::unique_ptr<mitk::ImageAccessorBase> imageAccess;
   if (m_ConstInput)
   {
-    imageAccess = new mitk::ImageReadAccessor(input, static_cast<const ImageDataItem *>(nullptr), m_Options);
+    imageAccess.reset(new mitk::ImageReadAccessor(input, nullptr, m_Options));
   }
   else
   {
-    imageAccess = new mitk::ImageWriteAccessor(input, static_cast<const ImageDataItem *>(nullptr), m_Options);
+    imageAccess.reset(new mitk::ImageWriteAccessor(input, nullptr, m_Options));
   }
 
   // hier wird momentan wohl nur der erste Channel verwendet??!!
@@ -139,13 +141,11 @@ void mitk::ImageToItk<TOutputImage>::GenerateData()
     output->Allocate();
 
     memcpy(output->GetBufferPointer(), imageAccess->GetData(), sizeof(InternalPixelType) * noBytes);
-
-    delete imageAccess;
   }
   else
   {
     itkDebugMacro("do not copyMem ...");
-    typedef itk::ImportMitkImageContainer<unsigned long, InternalPixelType> ImportContainerType;
+    typedef itk::ImportMitkImageContainer<itk::SizeValueType, InternalPixelType> ImportContainerType;
     typename ImportContainerType::Pointer import;
 
     import = ImportContainerType::New();
@@ -153,7 +153,7 @@ void mitk::ImageToItk<TOutputImage>::GenerateData()
 
     itkDebugMacro(<< "size of container = " << import->Size());
     // import->SetImageDataItem(m_ImageDataItem);
-    import->SetImageAccessor(imageAccess, sizeof(InternalPixelType) * noBytes);
+    import->SetImageAccessor(imageAccess.release(), sizeof(InternalPixelType) * noBytes);
 
     output->SetPixelContainer(import);
     itkDebugMacro(<< "size of container = " << import->Size());

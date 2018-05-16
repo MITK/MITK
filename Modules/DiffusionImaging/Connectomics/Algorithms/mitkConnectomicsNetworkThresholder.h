@@ -85,7 +85,7 @@ namespace mitk
 
     //////////////////// Functions ///////////////////////
     ConnectomicsNetworkThresholder();
-    ~ConnectomicsNetworkThresholder();
+    ~ConnectomicsNetworkThresholder() override;
 
     mitk::ConnectomicsNetwork::Pointer ThresholdByRandomRemoval( mitk::ConnectomicsNetwork::Pointer input, double targetDensity );
     mitk::ConnectomicsNetwork::Pointer ThresholdBelowDensity( mitk::ConnectomicsNetwork::Pointer input, double targetDensity );

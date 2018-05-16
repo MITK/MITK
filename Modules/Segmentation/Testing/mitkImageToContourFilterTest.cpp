@@ -40,16 +40,16 @@ public:
   {
     // Load the image
     // TODO Move/create segmentation subfolder
-    m_EmptySlice = mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/ImageToContour/EmptySlice.nrrd"));
+    m_EmptySlice = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("SurfaceInterpolation/ImageToContour/EmptySlice.nrrd"));
     CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [EmptySlice.nrrd]", m_EmptySlice.IsNotNull());
 
     m_SliceWithSingleContour =
-      mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/ImageToContour/SliceWithSingleContour.nrrd"));
+      mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("SurfaceInterpolation/ImageToContour/SliceWithSingleContour.nrrd"));
     CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [SliceWithSingleContour.nrrd]",
                            m_SliceWithSingleContour.IsNotNull());
 
     m_SliceWithTwoContours =
-      mitk::IOUtil::LoadImage(GetTestDataFilePath("SurfaceInterpolation/ImageToContour/SliceWithTwoContours.nrrd"));
+      mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("SurfaceInterpolation/ImageToContour/SliceWithTwoContours.nrrd"));
     CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [SliceWithTwoContours.nrrd]",
                            m_SliceWithTwoContours.IsNotNull());
 
@@ -79,7 +79,7 @@ public:
     mitk::Surface::Pointer contour = m_ContourExtractor->GetOutput();
 
     mitk::Surface::Pointer referenceContour =
-      mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/SingleContour.vtk"));
+      mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("SurfaceInterpolation/Reference/SingleContour.vtk"));
 
     CPPUNIT_ASSERT_MESSAGE(
       "Extracted contour has wrong number of points!",
@@ -102,7 +102,7 @@ public:
     mitk::Surface::Pointer contour = m_ContourExtractor->GetOutput(0);
 
     mitk::Surface::Pointer referenceContour =
-      mitk::IOUtil::LoadSurface(GetTestDataFilePath("SurfaceInterpolation/Reference/TwoContours.vtk"));
+      mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("SurfaceInterpolation/Reference/TwoContours.vtk"));
 
     CPPUNIT_ASSERT_MESSAGE(
       "Extracted contour1 has wrong number of points!",

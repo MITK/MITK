@@ -49,7 +49,7 @@ namespace mitk
                                const mitk::Point2D &currentDisplayCoordinate,
                                const mitk::Point2D &startCoordinateInMM);
 
-    virtual ~DisplayCoordinateOperation();
+    ~DisplayCoordinateOperation() override;
 
     mitk::BaseRenderer *GetRenderer();
 

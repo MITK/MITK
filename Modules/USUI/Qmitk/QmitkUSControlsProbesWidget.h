@@ -51,7 +51,7 @@ public:
     * will be disabled.
     */
   explicit QmitkUSControlsProbesWidget(mitk::USControlInterfaceProbes::Pointer controlInterface, QWidget *parent = nullptr);
-  ~QmitkUSControlsProbesWidget();
+  ~QmitkUSControlsProbesWidget() override;
 
 private:
   Ui::QmitkUSControlsProbesWidget*         ui;

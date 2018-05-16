@@ -30,10 +30,10 @@ class ConnectomicsNetworkSerializer : public BaseDataSerializer
     mitkClassMacro( ConnectomicsNetworkSerializer, BaseDataSerializer );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
-    virtual std::string Serialize() override;
+    std::string Serialize() override;
   protected:
     ConnectomicsNetworkSerializer();
-    virtual ~ConnectomicsNetworkSerializer();
+    ~ConnectomicsNetworkSerializer() override;
 };
 } // namespace
 #endif

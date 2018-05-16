@@ -56,7 +56,7 @@ struct BERRY_UI_QT IWorkbenchWindowConfigurer : public Object
 
   berryObjectMacro(berry::IWorkbenchWindowConfigurer)
 
-  ~IWorkbenchWindowConfigurer();
+  ~IWorkbenchWindowConfigurer() override;
 
   /**
    * Returns the underlying workbench window.

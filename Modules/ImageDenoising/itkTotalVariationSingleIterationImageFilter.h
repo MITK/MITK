@@ -75,7 +75,7 @@ namespace itk
      * is provided.
      *
      * \sa ImageToImageFilter::GenerateInputRequestedRegion() */
-    virtual void GenerateInputRequestedRegion() throw(InvalidRequestedRegionError);
+    void GenerateInputRequestedRegion() override;
 
     itkSetMacro(Lambda, double);
     itkGetMacro(Lambda, double);
@@ -84,8 +84,8 @@ namespace itk
     typename InputImageType::Pointer GetOriginialImage() { return this->m_OriginalImage; }
   protected:
     TotalVariationSingleIterationImageFilter();
-    virtual ~TotalVariationSingleIterationImageFilter() {}
-    void PrintSelf(std::ostream &os, Indent indent) const;
+    ~TotalVariationSingleIterationImageFilter() override {}
+    void PrintSelf(std::ostream &os, Indent indent) const override;
 
     /** MedianImageFilter can be implemented as a multithreaded filter.
      * Therefore, this implementation provides a ThreadedGenerateData()
@@ -97,9 +97,9 @@ namespace itk
      *
      * \sa ImageToImageFilter::ThreadedGenerateData(),
      *     ImageToImageFilter::GenerateData() */
-    void ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
+    void ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId) override;
 
-    void BeforeThreadedGenerateData();
+    void BeforeThreadedGenerateData() override;
 
     typename LocalVariationImageType::Pointer m_LocalVariation;
 

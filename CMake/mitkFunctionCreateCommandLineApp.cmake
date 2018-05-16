@@ -31,7 +31,7 @@ function(mitkFunctionCreateCommandLineApp)
      )
 
   set(_function_options
-
+       WARNINGS_NO_ERRORS
      )
 
   cmake_parse_arguments(CMDAPP "${_function_options}" "${_function_params}" "${_function_multiparams}" ${ARGN})
@@ -43,12 +43,16 @@ function(mitkFunctionCreateCommandLineApp)
   if(NOT CMDAPP_CPP_FILES)
     set(CMDAPP_CPP_FILES ${CMDAPP_NAME}.cpp)
   endif()
-
+  if(CMDAPP_WARNINGS_NO_ERRORS)
+    LIST(APPEND _CMDAPP_OPTIONS WARNINGS_NO_ERRORS)
+  endif()
   mitk_create_executable(${CMDAPP_NAME}
   DEPENDS MitkCommandLine ${CMDAPP_DEPENDS}
   PACKAGE_DEPENDS ${CMDAPP_PACKAGE_DEPENDS}
   CPP_FILES ${CMDAPP_CPP_FILES}
+  ${_CMDAPP_OPTIONS}
   )
+  MITK_INSTALL_TARGETS(EXECUTABLES ${EXECUTABLE_TARGET} )
 
   if(EXECUTABLE_IS_ENABLED)
 

@@ -59,12 +59,23 @@ class VectorTraits<itk::Index<3>>
 public:
   typedef itk::Index<3>::IndexValueType ValueType;
 };
-
 template <>
-class VectorTraits<long int[3]>
+class VectorTraits<itk::SizeValueType[3]>
 {
 public:
-  typedef long int ValueType;
+	typedef itk::SizeValueType ValueType;
+};
+template <>
+class VectorTraits<itk::IndexValueType[3]>
+{
+public:
+	typedef itk::IndexValueType ValueType;
+};
+template <>
+class VectorTraits<unsigned int[3]>
+{
+public:
+	typedef unsigned int ValueType;
 };
 template <>
 class VectorTraits<float[3]>
@@ -84,13 +95,6 @@ class VectorTraits<vnl_vector_fixed<mitk::ScalarType, 3>>
 {
 public:
   typedef mitk::ScalarType ValueType;
-};
-
-template <>
-class VectorTraits<long unsigned int[3]>
-{
-public:
-  typedef long unsigned int ValueType;
 };
 
 template <>

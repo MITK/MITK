@@ -36,7 +36,7 @@ QmitkSliderNavigatorWidget::QmitkSliderNavigatorWidget(QWidget *parent, Qt::Wind
   this->connect(m_Slider, SIGNAL(valueChanged(double)), SLOT(slider_valueChanged(double)));
   this->connect(m_SpinBox, SIGNAL(valueChanged(double)), SLOT(spinBox_valueChanged(double)));
 
-  // this avoids trying to use m_Stepper until it is set to something != NULL
+  // this avoids trying to use m_Stepper until it is set to something != nullptr
   // (additionally to the avoiding recursions during refetching)
   m_InRefetch = true;
 
@@ -127,7 +127,7 @@ void QmitkSliderNavigatorWidget::SetStepper(mitk::Stepper *stepper)
 {
   m_Stepper = stepper;
 
-  // this avoids trying to use m_Stepper until it is set to something != NULL
+  // this avoids trying to use m_Stepper until it is set to something != nullptr
   // (additionally to the avoiding recursions during refetching)
   m_InRefetch = (stepper == nullptr);
 }

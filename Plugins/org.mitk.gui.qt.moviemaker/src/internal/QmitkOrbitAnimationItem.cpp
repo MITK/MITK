@@ -52,12 +52,12 @@ void QmitkOrbitAnimationItem::Animate(double s)
 {
   vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4");
 
-  if (renderWindow == NULL)
+  if (renderWindow == nullptr)
     return;
 
   mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(renderWindow)->GetCameraRotationController()->GetSlice();
 
-  if (stepper == NULL)
+  if (stepper == nullptr)
     return;
 
   int newPos = this->GetReverse()

@@ -19,9 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::NavigationDataReferenceTransformFilter::NavigationDataReferenceTransformFilter() : mitk::NavigationDataLandmarkTransformFilter()
-,m_QuaternionTransform(NULL)
-,m_SourceLandmarksFromNavigationDatas(NULL)
-,m_TargetLandmarksFromNavigationDatas(NULL)
+,m_QuaternionTransform(nullptr)
+,m_SourceLandmarksFromNavigationDatas(nullptr)
+,m_TargetLandmarksFromNavigationDatas(nullptr)
 {
   // initialize transform and point containers
   m_QuaternionTransform = QuaternionTransformType::New();
@@ -32,7 +32,7 @@ mitk::NavigationDataReferenceTransformFilter::NavigationDataReferenceTransformFi
 
 mitk::NavigationDataReferenceTransformFilter::~NavigationDataReferenceTransformFilter()
 {
-  m_QuaternionTransform = NULL;
+  m_QuaternionTransform = nullptr;
 }
 
 

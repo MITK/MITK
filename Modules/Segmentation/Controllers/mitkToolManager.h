@@ -74,7 +74,7 @@ namespace mitk
     assumption that something actually changed.
         - mitk::ToolSelectedEvent is sent when a (truly) different tool was activated. In reaction to this event you can
     ask for the active Tool using
-          GetActiveTool or GetActiveToolID (where NULL or -1 indicate that NO tool is active at the moment).
+          GetActiveTool or GetActiveToolID (where nullptr or -1 indicate that NO tool is active at the moment).
 
     Design descisions:
 
@@ -147,7 +147,7 @@ namespace mitk
     int GetActiveToolID();
 
     /**
-      \return NULL for "No tool is active"
+      \return nullptr for "No tool is active"
     */
     Tool *GetActiveTool();
 
@@ -201,7 +201,7 @@ namespace mitk
       \brief Get the current working data.
       \warning If there is a list of items, this method will only return the first list item.
     */
-    DataNode *GetWorkingData(int);
+    DataNode *GetWorkingData(unsigned int);
 
     /*
      \brief Get the current roi data
@@ -258,7 +258,7 @@ namespace mitk
       oldERISstuff".
     */
     ToolManager(DataStorage *storage); // purposely hidden
-    virtual ~ToolManager();
+    ~ToolManager() override;
 
     ToolVectorType m_Tools;
 

@@ -49,13 +49,27 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLMessageSourceSelectionWidget :
   public:
     static const std::string VIEW_ID;
 
-    QmitkIGTLMessageSourceSelectionWidget(QWidget* parent = 0,
-                                          Qt::WindowFlags f = 0);
-    ~QmitkIGTLMessageSourceSelectionWidget();
+    QmitkIGTLMessageSourceSelectionWidget(QWidget* parent = nullptr,
+                                          Qt::WindowFlags f = nullptr);
+    ~QmitkIGTLMessageSourceSelectionWidget() override;
 
     /** @return Returns the currently selected OpenIGTLink message source.
      * Returns null if no source is selected at the moment. */
     mitk::IGTLMessageSource::Pointer GetSelectedIGTLMessageSource();
+
+    /** @brief Automatically selects the first available OpenIGTLink message source
+      * of the messageSourceSelectionWidget as message source and assigns it to the
+      * class member m_CurrentIGTLMessageSource.
+      * If there is no OpenIGTLink message source available, a nullptr will be assigned
+      * to the m_CurrentIGTLMessageSource. It is important to call this method whenever
+      * a new OpenIGTLink client connects to the active OpenIGTLink server. Otherwise,
+      * the connection between PLUS and MITK or between Slicer and MITK won't work
+      * automatically.
+      *
+      * @return The pointer to the automatically selected message source. This might
+      *         be a nullptr, if there is no message source available.
+      */
+    mitk::IGTLMessageSource::Pointer AutoSelectFirstIGTLMessageSource();
 
   signals:
     /** @brief This signal is emitted when a new OpenIGTLink message source is

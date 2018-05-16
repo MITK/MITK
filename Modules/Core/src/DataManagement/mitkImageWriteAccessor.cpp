@@ -97,7 +97,7 @@ void mitk::ImageWriteAccessor::OrganizeWriteAccess()
     {
       ImageAccessorBase *w = *it;
 
-      if (Overlap(w))
+      if ((w->m_Options & IgnoreLock) == 0 && Overlap(w))
       {
         // An Overlap was detected.
 

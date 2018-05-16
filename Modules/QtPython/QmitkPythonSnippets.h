@@ -42,7 +42,7 @@ class MITKQTPYTHON_EXPORT QmitkPythonSnippets: public QWidget
     QmitkPythonSnippets( const QString& _AutoSaveFileName="", QWidget* parent=0 );
     ///
     /// delete d pointer
-    virtual ~QmitkPythonSnippets();
+    ~QmitkPythonSnippets() override;
     ///
     /// read string map from xml file
     static bool LoadStringMap( const QString& filename, QStringMap& oldMap );

@@ -81,51 +81,51 @@ namespace mitk
     * \warning existing files will be overridden
     * \warning do not use "." in file names at the end
     */
-    DEPRECATED( itkSetStringMacro(FileName));
+    itkSetStringMacro(FileName);
 
     /**
     * \brief Returns the file name of the recording file (in OutputMode NormalFile and ZipFile)
     */
-    DEPRECATED( itkGetStringMacro(FileName));
+    itkGetStringMacro(FileName);
 
     /**
     * \brief If true the recorder will never overwrite a file
     */
-    DEPRECATED( itkSetMacro(DoNotOverwriteFiles,bool));
+    itkSetMacro(DoNotOverwriteFiles,bool);
 
     /**
     * \brief Returns whether the NavigationDataRecorderDeprecated is recording or not
     */
-    DEPRECATED( itkGetMacro(Recording,bool));
+    itkGetMacro(Recording,bool);
 
     /**
     * \brief Returns the recording mode
     */
-    DEPRECATED( itkGetMacro(RecordingMode,RecordingMode));
+    itkGetMacro(RecordingMode,RecordingMode);
 
     /**
     * \brief Returns the number of data sets / frames which were recorded by the NavigationDataRecorderDeprecated since start
     */
-    DEPRECATED( itkGetMacro(RecordCounter,int));
+    itkGetMacro(RecordCounter,int);
 
     /**
     * \brief Sets a limit of recorded data sets / frames. Recording will be stopped if the number is reached. -1 disables the limit, -1 is default value as well.
     */
-    DEPRECATED( itkSetMacro(RecordCountLimit,int));
+    itkSetMacro(RecordCountLimit,int);
 
     /**
     * \brief Adds the input NavigationDatas
     */
-    DEPRECATED( virtual void AddNavigationData(const NavigationData* nd));
+    virtual void AddNavigationData(const NavigationData* nd);
 
     ///
     /// set an additional attribute for a specified navigation data
     /// this will be written for each navigation data and may be
     /// updated before calling Update()
     ///
-    DEPRECATED( void SetAdditionalAttribute( const NavigationData* nd, const std::string& attributeName
-      , const std::string& attributeValue ));
-    DEPRECATED(void RemoveAdditionalAttribute( const NavigationData* nd ));
+    void SetAdditionalAttribute( const NavigationData* nd, const std::string& attributeName
+      , const std::string& attributeValue );
+    void RemoveAdditionalAttribute( const NavigationData* nd );
 
     /**
     * Documentation
@@ -135,7 +135,7 @@ namespace mitk
     *        the method StartRecording is called again.
     * @throw mitk::IGTException Throws an exception if no file name or file path is set.
     */
-    DEPRECATED( void StartRecording());
+    void StartRecording();
 
     /**
     * Documentation
@@ -143,30 +143,30 @@ namespace mitk
     * Does nothing if it is already recording and method StartRecorded is called
     * @throw mitk::IGTException Throws an exception if the stream is not good.
     */
-    DEPRECATED( void StartRecording(std::ostream* stream));
+    void StartRecording(std::ostream* stream);
 
     /**Documentation
     * \brief Stops the recording and closes the stream
     */
-    DEPRECATED( void StopRecording());
+    void StopRecording();
 
     /**Documentation
     * \brief Every call of update causes one line for each added NavigationData in the output if the recording was started
     */
 
-    DEPRECATED( virtual void Update());
+    void Update() override;
 
     /**Documentation
     * \brief Sets the recording mode which causes different types of output streams
     * see enum RecordingMode
     */
-    DEPRECATED( void SetRecordingMode(RecordingMode mode));
+    void SetRecordingMode(RecordingMode mode);
 
     /**Documentation
     * \brief Sets the output format which causes different formats of output streams. The XML format is default.
     *  Also see enum OutputFormat for more information.
     */
-    DEPRECATED( itkSetMacro(OutputFormat,mitk::NavigationDataRecorderDeprecated::OutputFormatEnum));
+    itkSetMacro(OutputFormat,mitk::NavigationDataRecorderDeprecated::OutputFormatEnum);
 
   protected:
 
@@ -174,11 +174,11 @@ namespace mitk
     * \brief filter execute method here it is not used
     *
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     NavigationDataRecorderDeprecated();
 
-    virtual ~NavigationDataRecorderDeprecated();
+    ~NavigationDataRecorderDeprecated() override;
 
     std::string m_FileName; ///< stores the file name and path
 

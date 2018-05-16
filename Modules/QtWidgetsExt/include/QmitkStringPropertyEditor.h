@@ -28,11 +28,11 @@ class MITKQTWIDGETSEXT_EXPORT QmitkStringPropertyEditor : public QLineEdit, publ
 
 public:
   QmitkStringPropertyEditor(mitk::StringProperty *, QWidget *parent);
-  virtual ~QmitkStringPropertyEditor();
+  ~QmitkStringPropertyEditor() override;
 
 protected:
-  virtual void PropertyChanged() override;
-  virtual void PropertyRemoved() override;
+  void PropertyChanged() override;
+  void PropertyRemoved() override;
 
   mitk::StringProperty *m_StringProperty;
 

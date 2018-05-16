@@ -45,7 +45,7 @@ public:
   void setUp() override
   {
     std::string path = GetTestDataFilePath("IGT-Data/RecordedNavigationData.xml");
-    m_NavigationDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(path).GetPointer());
+    m_NavigationDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(path)[0].GetPointer());
 
 
     m_Player = mitk::NavigationDataSequentialPlayer::New();

@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkUGVisualizationView.h"
-#include "QmitkStdMultiWidget.h"
 
 #include <mitkUnstructuredGrid.h>
 #include <mitkGridRepresentationProperty.h>
@@ -32,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkBoolPropertyWidget.h>
 
 #include <QWidgetAction>
+
+#include <QMenu>
 
 
 class UGVisVolumeObserver : public mitk::PropertyView
@@ -45,13 +46,13 @@ public:
 
 protected:
 
-  virtual void PropertyChanged() override
+  void PropertyChanged() override
   {
     m_View->m_VolumeMode = m_BoolProperty->GetValue();
     m_View->UpdateEnablement();
   }
 
-  virtual void PropertyRemoved() override
+  void PropertyRemoved() override
   {
     m_View->m_VolumeMode = false;
     m_Property = 0;
@@ -68,7 +69,7 @@ const std::string QmitkUGVisualizationView::VIEW_ID = "org.mitk.views.ugvisualiz
 
 
 QmitkUGVisualizationView::QmitkUGVisualizationView()
-: QmitkFunctionality(), m_MultiWidget(0), m_Outline2DAction(0), m_Outline2DWidget(0),
+: QmitkAbstractView(), m_Outline2DAction(0), m_Outline2DWidget(0),
   m_LODAction(0), m_ScalarVisibilityAction(0), m_ScalarVisibilityWidget(0),
   m_FirstVolumeRepId(-1), m_ShowTFGeneratorWidget(true), m_ShowScalarOpacityWidget(false),
   m_ShowColorWidget(true), m_ShowGradientOpacityWidget(false), m_ShowTFGeneratorAction(0),
@@ -153,6 +154,11 @@ void QmitkUGVisualizationView::CreateConnections()
   connect(m_ShowTFGeneratorAction, SIGNAL(triggered(bool)), this, SLOT(ShowTFGeneratorWidget(bool)));
 }
 
+void QmitkUGVisualizationView::SetFocus()
+{
+  m_Controls.m_OptionsButton->setFocus();
+}
+
 void QmitkUGVisualizationView::UpdateRenderWindow()
 {
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -200,7 +206,7 @@ void QmitkUGVisualizationView::UpdateGUI()
   bool enable = false;
 
   mitk::DataNode* node = 0;
-  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  auto nodes = this->GetDataManagerSelection();
   if (!nodes.empty())
   {
     node = nodes.front();
@@ -273,19 +279,7 @@ void QmitkUGVisualizationView::UpdateGUI()
 }
 
 
-void QmitkUGVisualizationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
-{
-  m_MultiWidget = &stdMultiWidget;
-}
-
-
-void QmitkUGVisualizationView::StdMultiWidgetNotAvailable()
-{
-  m_MultiWidget = 0;
-}
-
-
-void QmitkUGVisualizationView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkUGVisualizationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& /*nodes*/)
 {
   UpdateGUI();
 }

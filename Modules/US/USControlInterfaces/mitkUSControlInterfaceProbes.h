@@ -94,7 +94,7 @@ public:
 
 protected:
   USControlInterfaceProbes( itk::SmartPointer<USDevice> device );
-  virtual ~USControlInterfaceProbes( );
+  ~USControlInterfaceProbes( ) override;
 };
 } // namespace mitk
 

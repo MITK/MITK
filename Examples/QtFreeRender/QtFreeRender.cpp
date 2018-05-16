@@ -62,7 +62,7 @@ vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering2;
 vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering3;
 vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering4;
 
-mitk::SliceNavigationController *m_TimeNavigationController = NULL;
+mitk::SliceNavigationController *m_TimeNavigationController = nullptr;
 
 mitk::DataStorage::Pointer m_DataStorage;
 mitk::DataNode::Pointer m_PlaneNode1;
@@ -186,19 +186,19 @@ void Fit()
   vtkObject::GlobalWarningDisplayOff();
 
   vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget1->GetVtkRenderWindow())->GetVtkRenderer();
-  if (vtkrenderer != NULL)
+  if (vtkrenderer != nullptr)
     vtkrenderer->ResetCamera();
 
   vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget2->GetVtkRenderWindow())->GetVtkRenderer();
-  if (vtkrenderer != NULL)
+  if (vtkrenderer != nullptr)
     vtkrenderer->ResetCamera();
 
   vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget3->GetVtkRenderWindow())->GetVtkRenderer();
-  if (vtkrenderer != NULL)
+  if (vtkrenderer != nullptr)
     vtkrenderer->ResetCamera();
 
   vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget4->GetVtkRenderWindow())->GetVtkRenderer();
-  if (vtkrenderer != NULL)
+  if (vtkrenderer != nullptr)
     vtkrenderer->ResetCamera();
 
   vtkObject::SetGlobalWarningDisplay(w);
@@ -311,7 +311,7 @@ int main(int argc, char *argv[])
   Fit();
 
   // Initialize the RenderWindows
-  mitk::TimeGeometry::Pointer geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
+  auto geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
   m_DataStorage->Print(std::cout);

@@ -94,7 +94,7 @@ public:
   ///
   /// Deletes all Descriptors in the list
   ///
-  virtual ~QmitkNodeDescriptorManager();
+  ~QmitkNodeDescriptorManager() override;
 
 protected:
   ///

@@ -34,7 +34,7 @@ static vtkSmartPointer<vtkPolyData> DeepCopy(vtkPolyData *other)
 
 static void Update(vtkPolyData * /*polyData*/)
 {
-  //  if (polyData != NULL)
+  //  if (polyData != nullptr)
   //    polyData->Update(); //VTK6_TODO vtk pipeline
 }
 
@@ -136,7 +136,7 @@ bool mitk::Surface::IsEmptyTimeStep(unsigned int t) const
   if (!IsInitialized())
     return false;
 
-  vtkPolyData *polyData = const_cast<Surface *>(this)->GetVtkPolyData(t);
+  vtkPolyData *polyData = this->GetVtkPolyData(t);
 
   return polyData == nullptr || (polyData->GetNumberOfLines() == 0 && polyData->GetNumberOfPolys() == 0 &&
                                  polyData->GetNumberOfStrips() == 0 && polyData->GetNumberOfVerts() == 0);
@@ -194,7 +194,7 @@ void mitk::Surface::CalculateBoundingBox()
     BaseGeometry::Pointer geometry = timeGeometry->GetGeometryForTimeStep(i);
 
     if (geometry.IsNull())
-      mitkThrow() << "Time-sliced geometry is invalid (equals NULL).";
+      mitkThrow() << "Time-sliced geometry is invalid (equals nullptr).";
 
     geometry->SetFloatBounds(bounds);
   }
@@ -235,7 +235,7 @@ bool mitk::Surface::VerifyRequestedRegion()
 
 void mitk::Surface::SetRequestedRegion(const itk::DataObject *data)
 {
-  const mitk::Surface *surface = dynamic_cast<const mitk::Surface *>(data);
+  const auto *surface = dynamic_cast<const mitk::Surface *>(data);
 
   if (surface != nullptr)
     m_RequestedRegion = surface->GetRequestedRegion();
@@ -246,7 +246,7 @@ void mitk::Surface::SetRequestedRegion(const itk::DataObject *data)
 void mitk::Surface::SetRequestedRegion(Surface::RegionType *region)
 {
   if (region == nullptr)
-    mitkThrow() << "Requested region is invalid (equals NULL)";
+    mitkThrow() << "Requested region is invalid (equals nullptr)";
 
   m_RequestedRegion = *region;
 }
@@ -255,7 +255,7 @@ void mitk::Surface::CopyInformation(const itk::DataObject *data)
 {
   Superclass::CopyInformation(data);
 
-  const mitk::Surface *surface = dynamic_cast<const mitk::Surface *>(data);
+  const auto *surface = dynamic_cast<const mitk::Surface *>(data);
 
   if (surface == nullptr)
     mitkThrow() << "Data object used to get largest possible region is not a mitk::Surface.";
@@ -290,7 +290,7 @@ void mitk::Surface::ExecuteOperation(Operation *operation)
   {
     case OpSURFACECHANGED:
     {
-      mitk::SurfaceOperation *surfaceOperation = dynamic_cast<mitk::SurfaceOperation *>(operation);
+      auto *surfaceOperation = dynamic_cast<mitk::SurfaceOperation *>(operation);
 
       if (surfaceOperation == nullptr)
         break;
@@ -324,7 +324,7 @@ unsigned int mitk::Surface::GetSizeOfPolyDataSeries() const
 
 void mitk::Surface::Graft(const DataObject *data)
 {
-  const Surface *surface = dynamic_cast<const Surface *>(data);
+  const auto *surface = dynamic_cast<const Surface *>(data);
 
   if (surface == nullptr)
     mitkThrow() << "Data object used to graft surface is not a mitk::Surface.";
@@ -335,7 +335,7 @@ void mitk::Surface::Graft(const DataObject *data)
   for (unsigned int i = 0; i < surface->GetSizeOfPolyDataSeries(); ++i)
   {
     m_PolyDatas.push_back(vtkSmartPointer<vtkPolyData>::New());
-    m_PolyDatas.back()->DeepCopy(const_cast<mitk::Surface *>(surface)->GetVtkPolyData(i));
+    m_PolyDatas.back()->DeepCopy(surface->GetVtkPolyData(i));
   }
 }
 
@@ -374,7 +374,7 @@ bool mitk::Equal(vtkPolyData *leftHandSide, vtkPolyData *rightHandSide, mitk::Sc
   if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal( vtkPolyData* leftHandSide, vtkPolyData* rightHandSide, mitk::ScalarType eps, bool "
-                  "verbose ) does not work for NULL pointer input.";
+                  "verbose ) does not work for nullptr pointer input.";
     return false;
   }
   return Equal(*leftHandSide, *rightHandSide, eps, verbose);
@@ -474,7 +474,7 @@ bool mitk::Equal(mitk::Surface *leftHandSide, mitk::Surface *rightHandSide, mitk
   if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal( mitk::Surface* leftHandSide, mitk::Surface* rightHandSide, mitk::ScalarType eps, bool "
-                  "verbose ) does not work with NULL pointer input.";
+                  "verbose ) does not work with nullptr pointer input.";
     return false;
   }
   return Equal(*leftHandSide, *rightHandSide, eps, verbose);

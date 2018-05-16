@@ -87,7 +87,7 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
 
   berryObjectMacro(berry::IWorkbench)
 
-  virtual ~IWorkbench();
+  ~IWorkbench() override;
 
   /**
    * Returns the display for this workbench.

@@ -43,7 +43,7 @@ namespace mitk{
   const NavigationData* mitk::NavigationDataVisualizationFilter::GetInput( void )
   {
     if (this->GetNumberOfInputs() < 1)
-      return NULL;
+      return nullptr;
 
     return static_cast<const NavigationData*>(this->ProcessObject::GetInput(0));
   }
@@ -51,7 +51,7 @@ namespace mitk{
   const NavigationData* mitk::NavigationDataVisualizationFilter::GetInput( unsigned int idx )
   {
     if (this->GetNumberOfInputs() < 1)
-      return NULL;
+      return nullptr;
 
     return static_cast<const NavigationData*>(this->ProcessObject::GetInput(idx));
   }

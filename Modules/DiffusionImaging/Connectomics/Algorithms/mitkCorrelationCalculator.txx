@@ -437,7 +437,7 @@ mitk::ConnectomicsNetwork::Pointer mitk::CorrelationCalculator<T>::GetConnectomi
       boost::add_edge( vertexA, vertexB, *boostGraph );
       (*boostGraph)[ boost::edge(vertexA, vertexB, *boostGraph ).first ].sourceId = (*boostGraph)[vertexA].id;
       (*boostGraph)[ boost::edge(vertexA, vertexB, *boostGraph ).first ].targetId = (*boostGraph)[vertexB].id;
-      (*boostGraph)[ boost::edge(vertexA, vertexB, *boostGraph ).first ].weight = 1;
+      (*boostGraph)[ boost::edge(vertexA, vertexB, *boostGraph ).first ].fiber_count = 1;
       (*boostGraph)[ boost::edge(vertexA, vertexB, *boostGraph ).first ].edge_weight = m_CorrelationMatrix[i][j];
     }
   }

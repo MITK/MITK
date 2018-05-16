@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNode.h>
 #include "mitkDataStorage.h"
 
-class QmitkStdMultiWidget;
-
 namespace mitk
 {
   /**

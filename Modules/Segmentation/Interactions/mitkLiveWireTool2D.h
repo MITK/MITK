@@ -52,11 +52,11 @@ namespace mitk
     mitkClassMacro(LiveWireTool2D, SegTool2D);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual const char **GetXPM() const override;
-    virtual us::ModuleResource GetCursorIconResource() const override;
+      const char **GetXPM() const override;
+    us::ModuleResource GetCursorIconResource() const override;
     us::ModuleResource GetIconResource() const override;
 
-    virtual const char *GetName() const override;
+    const char *GetName() const override;
 
     /// \brief Convert all current contour objects to binary segmentation image.
     void ConfirmSegmentation();
@@ -66,12 +66,12 @@ namespace mitk
 
   protected:
     LiveWireTool2D();
-    virtual ~LiveWireTool2D();
+    ~LiveWireTool2D() override;
 
     void ConnectActionsAndFunctions() override;
 
-    virtual void Activated() override;
-    virtual void Deactivated() override;
+    void Activated() override;
+    void Deactivated() override;
 
     /// \brief Initialize tool
     virtual void OnInitLiveWire(StateMachineAction *, InteractionEvent *interactionEvent);

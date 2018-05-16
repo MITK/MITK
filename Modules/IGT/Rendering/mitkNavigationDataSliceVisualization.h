@@ -125,7 +125,7 @@ class MITKIGT_EXPORT NavigationDataSliceVisualization : public NavigationDataToN
 
   protected:
     NavigationDataSliceVisualization();
-    virtual void GenerateData();
+    void GenerateData() override;
 
     BaseRenderer::Pointer m_Renderer;
     Vector3D m_TipOffset;

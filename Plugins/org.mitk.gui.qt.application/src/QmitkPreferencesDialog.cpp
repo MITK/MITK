@@ -485,4 +485,5 @@ void QmitkPreferencesDialog::UpdateTree()
       d->m_PrefPages.front().treeWidgetItem->setSelected(true);
   }
 
+  d->m_PreferencesTree->expandAll();
 }

@@ -32,7 +32,7 @@ namespace mbilog
   class MBILOG_EXPORT TextBackendBase : public BackendBase
   {
   public:
-    virtual ~TextBackendBase();
+    ~TextBackendBase() override;
 
     /** \brief This method is called by the mbi logging mechanism if the object is registered in
      *         the mbi logging mechanism and a logging message is emitted.
@@ -40,7 +40,7 @@ namespace mbilog
      *  \param logMessage Logging message which was emitted.
      *
      */
-    virtual void ProcessMessage(const mbilog::LogMessage &logMessage) = 0;
+    void ProcessMessage(const mbilog::LogMessage &logMessage) override = 0;
 
   protected:
     /** \brief Method formats the given LogMessage in the smart/short format and writes it to std::cout.

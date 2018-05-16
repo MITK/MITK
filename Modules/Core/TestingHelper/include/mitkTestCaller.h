@@ -100,7 +100,7 @@ namespace mitk
       m_Fixture->m_Parameter = param;
     }
 
-    ~TestCaller()
+    ~TestCaller() override
     {
       if (m_OwnFixture)
         delete m_Fixture;

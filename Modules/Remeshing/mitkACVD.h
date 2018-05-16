@@ -54,7 +54,7 @@ namespace mitk
      * parameter.
      * \param[in] optimizationLevel Minimize distance between input surface and remeshed surface.
      * \param[in] boundaryFixing Keep original surface boundaries by adding additional polygons.
-     * \return Returns the remeshed surface or NULL if input surface is invalid.
+     * \return Returns the remeshed surface or nullptr if input surface is invalid.
      */
     MITKREMESHING_EXPORT Surface::Pointer Remesh(Surface::ConstPointer surface,
                                                  unsigned int t,
@@ -88,7 +88,7 @@ namespace mitk
 
     private:
       RemeshFilter();
-      ~RemeshFilter();
+      ~RemeshFilter() override;
 
       unsigned int m_TimeStep;
       int m_NumVertices;

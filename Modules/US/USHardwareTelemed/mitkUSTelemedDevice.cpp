@@ -56,7 +56,7 @@ mitk::USControlInterfaceDoppler::Pointer mitk::USTelemedDevice::GetControlInterf
 
 bool mitk::USTelemedDevice::OnInitialization()
 {
-  CoInitialize(NULL); // initialize COM library
+  CoInitialize(nullptr); // initialize COM library
 
   return true;
 }
@@ -66,7 +66,7 @@ bool mitk::USTelemedDevice::OnConnection()
   // create main Telemed API COM library object
   HRESULT hr;
 
-  hr = CoCreateInstance(Usgfw2Lib::CLSID_Usgfw2, NULL, CLSCTX_INPROC_SERVER, Usgfw2Lib::IID_IUsgfw2,(LPVOID*) &m_UsgMainInterface);
+  hr = CoCreateInstance(Usgfw2Lib::CLSID_Usgfw2, nullptr, CLSCTX_INPROC_SERVER, Usgfw2Lib::IID_IUsgfw2,(LPVOID*) &m_UsgMainInterface);
   if (FAILED(hr))
   {
     SAFE_RELEASE(m_UsgMainInterface);
@@ -200,22 +200,22 @@ void mitk::USTelemedDevice::SetActiveDataView(Usgfw2Lib::IUsgDataView* usgDataVi
 
 void mitk::USTelemedDevice::ConnectDeviceChangeSink( )
 {
-  IConnectionPointContainer* cpc = NULL;
+  IConnectionPointContainer* cpc = nullptr;
   HRESULT hr = m_UsgMainInterface->QueryInterface(IID_IConnectionPointContainer, (void**)&cpc);
   if (hr != S_OK)
-    cpc = NULL;
+    cpc = nullptr;
 
-  if (cpc != NULL)
+  if (cpc != nullptr)
     hr = cpc->FindConnectionPoint(Usgfw2Lib::IID_IUsgDeviceChangeSink, &m_UsgDeviceChangeCpnt);
 
   if (hr != S_OK)
   {
-    m_UsgDeviceChangeCpnt = NULL;
+    m_UsgDeviceChangeCpnt = nullptr;
     m_UsgDeviceChangeCpntCookie = 0;
   }
   SAFE_RELEASE(cpc);
 
-  if (m_UsgDeviceChangeCpnt != NULL)
+  if (m_UsgDeviceChangeCpnt != nullptr)
     hr = m_UsgDeviceChangeCpnt->Advise((IUnknown*)((Usgfw2Lib::IUsgDeviceChangeSink*)this), &m_UsgDeviceChangeCpntCookie);
 }
 
@@ -284,15 +284,15 @@ STDMETHODIMP  mitk::USTelemedDevice::QueryInterface(REFIID riid, void** ppv)
 
 HRESULT mitk::USTelemedDevice::GetTypeInfoCount(UINT *pctinfo)
 {
-  if (pctinfo == NULL) return E_INVALIDARG;
+  if (pctinfo == nullptr) return E_INVALIDARG;
   *pctinfo = 0;
   return S_OK;
 }
 
 HRESULT mitk::USTelemedDevice::GetTypeInfo(UINT itinfo, LCID lcid, ITypeInfo** pptinfo)
 {
-  if (pptinfo == NULL) return E_INVALIDARG;
-  *pptinfo = NULL;
+  if (pptinfo == nullptr) return E_INVALIDARG;
+  *pptinfo = nullptr;
   if(itinfo != 0) return DISP_E_BADINDEX;
   return S_OK;
 }
@@ -310,8 +310,8 @@ HRESULT mitk::USTelemedDevice::Invoke(DISPID dispIdMember, const IID &riid, LCID
     if (pDispParams->cArgs != 2) // we need 2 arguments
       return S_OK;
 
-    IUnknown *unkn = NULL;
-    ULONG *res = NULL;
+    IUnknown *unkn = nullptr;
+    ULONG *res = nullptr;
 
     VARIANTARG* p1;
     VARIANTARG* p;

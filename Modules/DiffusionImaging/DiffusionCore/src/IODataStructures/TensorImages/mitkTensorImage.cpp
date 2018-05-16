@@ -57,11 +57,10 @@ const vtkImageData*mitk::TensorImage::GetVtkImageData(int t, int n) const
 
 void mitk::TensorImage::ConstructRgbImage() const
 {
-    typedef itk::Image<itk::DiffusionTensor3D<float>,3> ImageType;
-    typedef itk::TensorToRgbImageFilter<ImageType> FilterType;
+    typedef itk::TensorToRgbImageFilter<ItkTensorImageType> FilterType;
     FilterType::Pointer filter = FilterType::New();
 
-    ImageType::Pointer itkvol = ImageType::New();
+    ItkTensorImageType::Pointer itkvol = ItkTensorImageType::New();
     mitk::CastToItkImage(this, itkvol);
     filter->SetInput(itkvol);
     filter->Update();

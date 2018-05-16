@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkWatershedToolGUI, "")
 
-QmitkWatershedToolGUI::QmitkWatershedToolGUI() : QmitkToolGUI(), m_SliderThreshold(NULL), m_SliderLevel(NULL)
+QmitkWatershedToolGUI::QmitkWatershedToolGUI() : QmitkToolGUI(), m_SliderThreshold(nullptr), m_SliderLevel(nullptr)
 {
   // create the visible widgets
   QGridLayout *layout = new QGridLayout(this);

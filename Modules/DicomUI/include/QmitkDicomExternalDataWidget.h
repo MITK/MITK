@@ -60,7 +60,7 @@ public:
   /**
   * \brief QmitkDicomExternalDataWidget destructor.
   */
-  virtual ~QmitkDicomExternalDataWidget();
+  ~QmitkDicomExternalDataWidget() override;
 
   /**
   * \brief CreateQtPartControl(QWidget *parent) sets the view objects from ui_QmitkDicomExternalDataWidgetControls.h.

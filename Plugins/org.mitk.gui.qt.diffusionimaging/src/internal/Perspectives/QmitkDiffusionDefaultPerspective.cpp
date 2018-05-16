@@ -25,19 +25,22 @@ void QmitkDiffusionDefaultPerspective::CreateInitialLayout(berry::IPageLayout::P
 
     QString editorArea = layout->GetEditorArea();
 
-    layout->AddStandaloneView("org.mitk.views.viewnavigatorview", false, berry::IPageLayout::LEFT, 0.25f, editorArea);
+    layout->AddStandaloneViewPlaceholder("org.mitk.views.viewnavigatorview", berry::IPageLayout::LEFT, 0.3f, editorArea, false);
 
     layout->AddStandaloneView("org.mitk.views.datamanager", false, berry::IPageLayout::LEFT, 0.3f, editorArea);
 
     layout->AddStandaloneView("org.mitk.views.controlvisualizationpropertiesview", false, berry::IPageLayout::BOTTOM, .15f, "org.mitk.views.datamanager");
 
     berry::IFolderLayout::Pointer left =
-            layout->CreateFolder("org.mbi.diffusionimaginginternal.leftcontrols", berry::IPageLayout::BOTTOM, 0.1f, "org.mitk.views.controlvisualizationpropertiesview");
+            layout->CreateFolder("org.mbi.diffusionimaginginternal.leftcontrols", berry::IPageLayout::BOTTOM, 0.15f, "org.mitk.views.controlvisualizationpropertiesview");
 
     layout->AddStandaloneViewPlaceholder("org.mitk.views.imagenavigator", berry::IPageLayout::BOTTOM, .7f, "org.mbi.diffusionimaginginternal.leftcontrols", false);
 
     /////////////////////////////////////////////
     // here goes the perspective specific stuff
     /////////////////////////////////////////////
+
+    left->AddView("org.mitk.views.diffusiondicomimport");
+    left->AddView("org.mitk.views.diffusionpreprocessing");
 
 }

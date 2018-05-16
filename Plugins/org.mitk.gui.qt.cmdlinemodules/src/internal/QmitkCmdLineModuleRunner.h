@@ -137,12 +137,12 @@ private:
 
   /**
    * \brief Saves temporary image to file.
-   * \param[in] node non-NULL pointer to node containing a non-NULL mitk::Image.
+   * \param[in] node non-nullptr pointer to node containing a non-nullptr mitk::Image.
    * \param[out] errorMessage which if not empty means an error occurred.
    * \return QTemporaryFile temporary file that the caller is responsible for deleting.
    *
-   * If the returned QTemporaryFile is NULL, check errorMessage.
-   * If the returned QTemporaryFile is not-NULL, there could still be data in the errorMessage.
+   * If the returned QTemporaryFile is nullptr, check errorMessage.
+   * If the returned QTemporaryFile is not-nullptr, there could still be data in the errorMessage.
    * It could be that this method tried n file extensions, before finding a successful one.
    * In this case, the returned QTemporaryFile is the successful one, and the errorMessage contains error messages of all the failed attempts.
    */

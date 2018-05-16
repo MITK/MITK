@@ -245,6 +245,17 @@ int mitkPropertyListTest(int /*argc*/, char * /*argv*/ [])
       return EXIT_FAILURE;
     }
   }
+  {
+
+    std::cout << "Testing RemoveProperty(): ";
+    propList->RemoveProperty("test");
+    if (propList->GetProperty("test")!=nullptr)
+    {
+      std::cout << "[FAILED]" << std::endl;
+      return EXIT_FAILURE;
+    }
+    std::cout << "[PASSED]" << std::endl;
+  }
 
   std::cout << "[TEST DONE]" << std::endl;
   return EXIT_SUCCESS;

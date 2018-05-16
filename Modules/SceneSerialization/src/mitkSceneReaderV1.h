@@ -24,7 +24,7 @@ namespace mitk
     mitkClassMacro(SceneReaderV1, SceneReader);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual bool LoadScene(TiXmlDocument &document,
+      bool LoadScene(TiXmlDocument &document,
                              const std::string &workingDirectory,
                              DataStorage *storage) override;
 

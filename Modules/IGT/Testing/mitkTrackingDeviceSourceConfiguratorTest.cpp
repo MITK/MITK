@@ -99,9 +99,9 @@ static void TestInvalidClaronTrackingDevice()
   MITK_TEST_CONDITION_REQUIRED(testInstance->GetUpdatedNavigationToolStorage()->GetToolCount()==1,"..testing if navigation tool storage is still there");
 
   MITK_TEST_OUTPUT(<<"Testing other invalid test cases");
-  testInstance = mitk::TrackingDeviceSourceConfigurator::New(claronStorage,NULL);
+  testInstance = mitk::TrackingDeviceSourceConfigurator::New(claronStorage,nullptr);
   MITK_TEST_CONDITION_REQUIRED(!testInstance->IsCreateTrackingDeviceSourcePossible(),"..(1) testing if factory class detects the invalid data");
-  testInstance = mitk::TrackingDeviceSourceConfigurator::New(NULL,testDevice);
+  testInstance = mitk::TrackingDeviceSourceConfigurator::New(nullptr,testDevice);
   MITK_TEST_CONDITION_REQUIRED(!testInstance->IsCreateTrackingDeviceSourcePossible(),"..(2) testing if factory class detects the invalid data");
 }
 

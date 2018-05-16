@@ -36,11 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkResampleImageFilter.h"
 #include "itkResampleDwiImageFilter.h"
 
-using namespace std;
-
 typedef itk::Image<double, 3> InputImageType;
 typedef itk::Image<unsigned char, 3> BinaryImageType;
-
 
 static mitk::Image::Pointer TransformToReference(mitk::Image *reference, mitk::Image *moving, bool sincInterpol = false, bool nn = false)
 {
@@ -278,20 +275,10 @@ static mitk::Image::Pointer ResampleBySpacing(mitk::Image *input, float *spacing
   image->InitializeByItk(_pResizeFilter->GetOutput());
   mitk::GrabItkImageMemory( _pResizeFilter->GetOutput(), image);
   return image;
-
 }
 
-/// Save images according to file type
-static void SaveImage(std::string fileName, mitk::Image* image, std::string fileType )
+static mitk::Image::Pointer ResampleDWIbySpacing(mitk::Image::Pointer input, float* spacing)
 {
-  std::cout << "----Save to " << fileName;
-
-  mitk::IOUtil::Save(image, fileName);
-}
-
-mitk::Image::Pointer ResampleDWIbySpacing(mitk::Image::Pointer input, float* spacing, bool useLinInt = true)
-{
-
   itk::Vector<double, 3> spacingVector;
   spacingVector[0] = spacing[0];
   spacingVector[1] = spacing[1];
@@ -309,8 +296,8 @@ mitk::Image::Pointer ResampleDWIbySpacing(mitk::Image::Pointer input, float* spa
   resampler->Update();
 
   mitk::Image::Pointer output = mitk::GrabItkImageMemory( resampler->GetOutput() );
-  output->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer(input) ) );
-  output->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( mitk::DiffusionPropertyHelper::GetReferenceBValue(input) ) );
+  output->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer(input) ) );
+  output->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( mitk::DiffusionPropertyHelper::GetReferenceBValue(input) ) );
   mitk::DiffusionPropertyHelper propertyHelper( output );
   propertyHelper.InitializeImage();
 
@@ -324,7 +311,7 @@ int main( int argc, char* argv[] )
 
   parser.setTitle("Image Resampler");
   parser.setCategory("Preprocessing Tools");
-  parser.setContributor("MBI");
+  parser.setContributor("MIC");
   parser.setDescription("Resample an image to eigther a specific spacing or to a reference image.");
 
   // Add command line argument names
@@ -337,7 +324,7 @@ int main( int argc, char* argv[] )
   parser.addArgument("nearest-neigh", "n", mitkCommandLineParser::Bool, "Nearest Neighbor:", "Use Nearest Neighbor interpolation instead of linear interpolation ",us::Any());
 
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
   // Handle special arguments
   bool useSpacing = false;
@@ -363,15 +350,15 @@ int main( int argc, char* argv[] )
     }
   }
 
-  std::string outputFile = us::any_cast<string>(parsedArgs["output"]);
-  std::string inputFile = us::any_cast<string>(parsedArgs["input"]);
+  std::string outputFile = us::any_cast<std::string>(parsedArgs["output"]);
+  std::string inputFile = us::any_cast<std::string>(parsedArgs["input"]);
 
   std::vector<std::string> spacings;
-  float spacing[3];
+  float spacing[] = { 0.0f, 0.0f, 0.0f };
   if (parsedArgs.count("spacing"))
   {
 
-    std::string arg =  us::any_cast<string>(parsedArgs["spacing"]);
+    std::string arg =  us::any_cast<std::string>(parsedArgs["spacing"]);
     if (arg != "")
     {
       spacings = split(arg ,',');
@@ -385,7 +372,7 @@ int main( int argc, char* argv[] )
   std::string refImageFile = "";
   if (parsedArgs.count("reference"))
   {
-    refImageFile =  us::any_cast<string>(parsedArgs["reference"]);
+    refImageFile =  us::any_cast<std::string>(parsedArgs["reference"]);
   }
 
   if (refImageFile =="" && useSpacing == false)
@@ -397,9 +384,9 @@ int main( int argc, char* argv[] )
 
   mitk::Image::Pointer refImage;
   if (!useSpacing)
-    refImage = mitk::IOUtil::LoadImage(refImageFile);
+    refImage = mitk::IOUtil::Load<mitk::Image>(refImageFile);
 
-  mitk::Image::Pointer inputDWI = mitk::IOUtil::LoadImage(inputFile);
+  mitk::Image::Pointer inputDWI = mitk::IOUtil::Load<mitk::Image>(inputFile);
   if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(inputDWI.GetPointer()))
   {
     mitk::Image::Pointer outputImage;
@@ -416,7 +403,7 @@ int main( int argc, char* argv[] )
 
     return EXIT_SUCCESS;
   }
-  mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage(inputFile);
+  mitk::Image::Pointer inputImage = mitk::IOUtil::Load<mitk::Image>(inputFile);
 
 
   mitk::Image::Pointer resultImage;
@@ -427,7 +414,7 @@ int main( int argc, char* argv[] )
     resultImage = TransformToReference(refImage,inputImage,useLinearInterpol,useNN);
 
 
-  mitk::IOUtil::SaveImage(resultImage, outputFile);
+  mitk::IOUtil::Save(resultImage, outputFile);
 
   return EXIT_SUCCESS;
 }

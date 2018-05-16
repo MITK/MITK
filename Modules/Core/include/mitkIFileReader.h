@@ -63,7 +63,7 @@ namespace mitk
    */
   struct MITKCORE_EXPORT IFileReader : public IFileIO
   {
-    virtual ~IFileReader();
+    ~IFileReader() override;
 
     /**
      * \brief Set the input location.
@@ -76,7 +76,7 @@ namespace mitk
      * @param location A custom label for the input stream.
      * @param is The input stream.
      *
-     * If \c is is \c NULL, this clears the current input stream and \c location
+     * If \c is is \c nullptr, this clears the current input stream and \c location
      * is interpreted as a file-system path. Otherwise, \c location is a custom
      * label describing the input stream \c is.
      */
@@ -121,6 +121,11 @@ namespace mitk
      * \throws mitk::Exception
      */
     virtual DataStorage::SetOfObjects::Pointer Read(mitk::DataStorage &ds) = 0;
+
+    /**
+     * @return A list of files that were loaded during the last call of Read.
+     */
+    virtual std::vector< std::string > GetReadFiles() = 0;
   };
 
 } // namespace mitk

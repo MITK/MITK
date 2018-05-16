@@ -46,7 +46,7 @@ int mitkToFImageCsvWriterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(csvWriter.GetPointer(), "Testing initialization of test object!");
   MITK_TEST_CONDITION_REQUIRED(csvWriter->GetExtension() == ".csv", "Testing correct initialization of member variable extension!");
 
-  srand(time(0));
+  srand(time(nullptr));
 
   unsigned int dimX = 100 + rand()%100;
   unsigned int dimY = 100 + rand()%100;
@@ -115,9 +115,9 @@ int mitkToFImageCsvWriterTest(int /* argc */, char* /*argv*/[])
   }
   csvWriter->Close(); //close file
 
-  FILE* distanceInfile = NULL;
-  FILE* amplitudeInfile = NULL;
-  FILE* intensityInfile = NULL;
+  FILE* distanceInfile = nullptr;
+  FILE* amplitudeInfile = nullptr;
+  FILE* intensityInfile = nullptr;
 
   //open file again
   OpenCsvFile(&(distanceInfile), distanceImageFileName);

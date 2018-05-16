@@ -318,7 +318,7 @@ bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData *reference, cons
       // bad, multiple comparators, need to add ranking or something
     }
 
-    BaseDataCompare *comparator = us::GetModuleContext()->GetService<BaseDataCompare>(comparators.front());
+    auto *comparator = us::GetModuleContext()->GetService<BaseDataCompare>(comparators.front());
     if (!comparator)
     {
       MITK_ERROR << "Service lookup error, cannot get comparator for class " << reference->GetNameOfClass();

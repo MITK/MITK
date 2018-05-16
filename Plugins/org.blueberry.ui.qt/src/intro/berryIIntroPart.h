@@ -59,7 +59,7 @@ struct BERRY_UI_QT IIntroPart : public virtual Object
 
   berryObjectMacro(berry::IIntroPart)
 
-  ~IIntroPart();
+  ~IIntroPart() override;
 
     /**
    * The property id for <code>getTitleImage</code> and

@@ -48,18 +48,18 @@ namespace mitk
 
     virtual void SetWorkingImage(mitk::Image *_arg);
 
-    virtual void ConnectActionsAndFunctions() override;
+    void ConnectActionsAndFunctions() override;
 
   protected:
     ContourModelLiveWireInteractor();
-    virtual ~ContourModelLiveWireInteractor();
+    ~ContourModelLiveWireInteractor() override;
 
-    virtual bool OnCheckPointClick(const InteractionEvent *interactionEvent) override;
-    virtual bool IsHovering(const InteractionEvent *interactionEvent) override;
+    bool OnCheckPointClick(const InteractionEvent *interactionEvent) override;
+    bool IsHovering(const InteractionEvent *interactionEvent) override;
 
-    virtual void OnMovePoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
-    virtual void OnDeletePoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
-    virtual void OnFinishEditing(StateMachineAction *, InteractionEvent *interactionEvent) override;
+    void OnMovePoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
+    void OnDeletePoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
+    void OnFinishEditing(StateMachineAction *, InteractionEvent *interactionEvent) override;
 
     int SplitContourFromSelectedVertex(mitk::ContourModel *srcContour,
                                        mitk::ContourModel *destContour,

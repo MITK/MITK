@@ -64,7 +64,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled)
   }
 
   Module* moduleAL = ModuleRegistry::GetModule("TestModuleAL");
-  US_TEST_CONDITION_REQUIRED(moduleAL != NULL, "Test for existing module TestModuleAL")
+  US_TEST_CONDITION_REQUIRED(moduleAL != nullptr, "Test for existing module TestModuleAL")
 
   US_TEST_CONDITION(moduleAL->GetName() == "TestModuleAL", "Test module name")
 
@@ -76,7 +76,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled)
   Module* moduleAL_1 = ModuleRegistry::GetModule("TestModuleAL_1");
   if (autoLoadEnabled)
   {
-    US_TEST_CONDITION_REQUIRED(moduleAL_1 != NULL, "Test for existing auto-loaded module TestModuleAL_1")
+    US_TEST_CONDITION_REQUIRED(moduleAL_1 != nullptr, "Test for existing auto-loaded module TestModuleAL_1")
     US_TEST_CONDITION(moduleAL_1->GetName() == "TestModuleAL_1", "Test module name")
     US_TEST_CONDITION_REQUIRED(!loadedModules.Empty(), "Test for PROP_AUTOLOADED_MODULES property")
     US_TEST_CONDITION_REQUIRED(loadedModules.Type() == typeid(std::vector<std::string>), "Test for PROP_AUTOLOADED_MODULES property type")
@@ -89,7 +89,7 @@ void testDefaultAutoLoadPath(bool autoLoadEnabled)
   }
   else
   {
-    US_TEST_CONDITION_REQUIRED(moduleAL_1 == NULL, "Test for non-existing auto-loaded module TestModuleAL_1")
+    US_TEST_CONDITION_REQUIRED(moduleAL_1 == nullptr, "Test for non-existing auto-loaded module TestModuleAL_1")
     US_TEST_CONDITION_REQUIRED(loadedModules.Empty(), "Test for empty PROP_AUTOLOADED_MODULES property")
   }
 
@@ -130,7 +130,7 @@ void testCustomAutoLoadPath()
   }
 
   Module* moduleAL2 = ModuleRegistry::GetModule("TestModuleAL2");
-  US_TEST_CONDITION_REQUIRED(moduleAL2 != NULL, "Test for existing module TestModuleAL2")
+  US_TEST_CONDITION_REQUIRED(moduleAL2 != nullptr, "Test for existing module TestModuleAL2")
 
   US_TEST_CONDITION(moduleAL2->GetName() == "TestModuleAL2", "Test module name")
 
@@ -140,13 +140,13 @@ void testCustomAutoLoadPath()
 
   Module* moduleAL2_1 = ModuleRegistry::GetModule("TestModuleAL2_1");
 #ifdef US_ENABLE_AUTOLOADING_SUPPORT
-  US_TEST_CONDITION_REQUIRED(moduleAL2_1 != NULL, "Test for existing auto-loaded module TestModuleAL2_1")
+  US_TEST_CONDITION_REQUIRED(moduleAL2_1 != nullptr, "Test for existing auto-loaded module TestModuleAL2_1")
   US_TEST_CONDITION(moduleAL2_1->GetName() == "TestModuleAL2_1", "Test module name")
 
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADING, moduleAL2_1));
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleAL2_1));
 #else
-  US_TEST_CONDITION_REQUIRED(moduleAL2_1 == NULL, "Test for non-existing aut-loaded module TestModuleAL2_1")
+  US_TEST_CONDITION_REQUIRED(moduleAL2_1 == nullptr, "Test for non-existing aut-loaded module TestModuleAL2_1")
 #endif
 
   pEvts.push_back(ModuleEvent(ModuleEvent::LOADED, moduleAL2));

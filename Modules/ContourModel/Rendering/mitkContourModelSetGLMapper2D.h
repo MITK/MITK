@@ -45,22 +45,20 @@ namespace mitk
       /**
       * reimplemented from Baseclass
       */
-      virtual void Paint(BaseRenderer *renderer) override;
+      void MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type) override;
 
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 
   protected:
     ContourModelSetGLMapper2D();
 
-    virtual ~ContourModelSetGLMapper2D();
-
-    void InternalDrawContour(mitk::ContourModel *contour, mitk::BaseRenderer *renderer) override;
+    ~ContourModelSetGLMapper2D() override;
 
   private:
     /**
-    * return a refernce of the rendered data object
+    * return a reference of the rendered data object
     */
     ContourModelSet *GetInput(void);
   };

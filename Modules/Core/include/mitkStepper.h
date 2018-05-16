@@ -117,7 +117,7 @@ namespace mitk
 
   protected:
     Stepper();
-    virtual ~Stepper();
+    ~Stepper() override;
 
     void Increase();
 

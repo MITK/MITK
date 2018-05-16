@@ -71,7 +71,7 @@ namespace mitk
 
   protected:
     StateMachineState(const std::string &name, const std::string &stateMode);
-    ~StateMachineState();
+    ~StateMachineState() override;
 
   private:
     /**

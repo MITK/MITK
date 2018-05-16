@@ -29,7 +29,7 @@ namespace mitk
     mitkClassMacro(IntPropertySerializer, BasePropertySerializer);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual TiXmlElement *Serialize() override
+      TiXmlElement *Serialize() override
     {
       if (const IntProperty *prop = dynamic_cast<const IntProperty *>(m_Property.GetPointer()))
       {
@@ -41,7 +41,7 @@ namespace mitk
         return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
       if (!element)
         return nullptr;
@@ -59,7 +59,7 @@ namespace mitk
 
   protected:
     IntPropertySerializer() {}
-    virtual ~IntPropertySerializer() {}
+    ~IntPropertySerializer() override {}
   };
 
 } // namespace

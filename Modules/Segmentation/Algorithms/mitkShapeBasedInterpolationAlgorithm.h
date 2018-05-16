@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkShapeBasedInterpolationAlgorithm_h_Included
 #define mitkShapeBasedInterpolationAlgorithm_h_Included
 
-#include "mitkLegacyAdaptors.h"
 #include "mitkSegmentationInterpolationAlgorithm.h"
 #include <MitkSegmentationExports.h>
 

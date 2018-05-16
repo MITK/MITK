@@ -34,7 +34,7 @@ class MITKRTUI_EXPORT QmitkFreeIsoDoseLevelWidget : public QWidget, private Ui::
   Q_OBJECT
 
 public:
-  QmitkFreeIsoDoseLevelWidget(QWidget* parent=0);
+  explicit QmitkFreeIsoDoseLevelWidget(QWidget* parent=nullptr);
 
   mitk::DoseValueAbs getReferenceDose() const;
   mitk::IsoDoseLevel* getIsoDoseLevel() const;

@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef BERRYINULLSELECTIONLISTENER_H_
-#define BERRYINULLSELECTIONLISTENER_H_
+#ifndef BERRYInullptrSELECTIONLISTENER_H_
+#define BERRYInullptrSELECTIONLISTENER_H_
 
 #include "berryISelectionListener.h"
 
@@ -41,7 +41,7 @@ namespace berry
  */
 struct BERRY_UI_QT INullSelectionListener : public ISelectionListener
 {
-  ~INullSelectionListener();
+  ~INullSelectionListener() override;
 };
 
 /**
@@ -98,4 +98,4 @@ private:
 
 }
 
-#endif /* BERRYINULLSELECTIONLISTENER_H_ */
+#endif /* BERRYInullptrSELECTIONLISTENER_H_ */

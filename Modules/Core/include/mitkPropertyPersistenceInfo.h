@@ -95,9 +95,9 @@ namespace mitk
     */
     PropertyPersistenceInfo(const std::string &name, const std::string &mimeTypeName);
 
-    virtual ~PropertyPersistenceInfo();
+    ~PropertyPersistenceInfo() override;
 
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
   private:
     PropertyPersistenceInfo(const Self &other);

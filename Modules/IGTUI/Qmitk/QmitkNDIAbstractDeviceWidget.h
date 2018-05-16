@@ -34,12 +34,12 @@ class MITKIGTUI_EXPORT QmitkNDIAbstractDeviceWidget : public QmitkAbstractTracki
 public:
   static const std::string VIEW_ID;
 
-  QmitkNDIAbstractDeviceWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  ~QmitkNDIAbstractDeviceWidget();
+  QmitkNDIAbstractDeviceWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+  ~QmitkNDIAbstractDeviceWidget() override;
 
-  virtual void Initialize() = 0;
+  void Initialize() override = 0;
 
-  virtual void AddOutput(std::string s) = 0;
+  void AddOutput(std::string s) override = 0;
 
 signals:
   void PortsScanned(int Port, QString result, int PortType);
@@ -60,8 +60,8 @@ private:
 protected:
   void InitializeNDIWidget();
 
-  QThread* m_ScanPortsWorkerThread;
   QmitkTrackingDeviceConfigurationWidgetScanPortsWorker* m_ScanPortsWorker;
+  QThread* m_ScanPortsWorkerThread;
 
   virtual void SetPortValueToGUI(int portValue) = 0;
   virtual void SetPortTypeToGUI(int portType) = 0;

@@ -38,14 +38,14 @@ namespace mitk
      */
     ImageVtkReadAccessor(ImageConstPointer iP, const ImageDataItem *iDI, const vtkImageData *imageDataVtk);
 
-    ~ImageVtkReadAccessor();
+    ~ImageVtkReadAccessor() override;
 
     const vtkImageData *GetVtkImageData() const;
 
     // vtkTypeMacro(ImageVtkWriteAccessor,vtkDataSet)
 
   protected:
-    virtual const Image *GetImage() const override;
+    const Image *GetImage() const override;
 
   private:
     // due to smart pointer issues, the image is only kept as a weak pointer.

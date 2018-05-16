@@ -79,7 +79,7 @@ public:
 
   void tearDown(void) override
   {
-    //   a_vtkPoints = NULL;
+    //   a_vtkPoints = nullptr;
   }
 
   void Mitk2Itk_PointCompatibility()

@@ -30,6 +30,13 @@ set(H_FILES
   mitkMAPRegistrationWrapperObjectFactory.h
   mitkRegEvaluationObjectFactory.h
   mitkRegEvaluationObject.h
+  algorithms/mitkMultiModalAffineDefaultRegistrationAlgorithm.h
+  algorithms/mitkMultiModalRigidDefaultRegistrationAlgorithm.h
+  algorithms/mitkMultiModalTransDefaultRegistrationAlgorithm.h
+  algorithms/mitkFastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm.h
+  algorithms/mitkLevelSetMotionMultiResDefaultRegistrationAlgorithm.h
+  algorithms/mitkRigidClosedFormPointsDefaultRegistrationAlgorithm.h
+  algorithms/mitkRigidICPDefaultRegistrationAlgorithm.h
   Helper/mitkUIDHelper.h
   Helper/mitkAlgorithmHelper.h
   Helper/mitkMaskedAlgorithmHelper.h

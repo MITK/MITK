@@ -17,7 +17,7 @@ set(MOC_H_FILES
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/icon.png
+  resources/crop.svg
   plugin.xml
 )
 

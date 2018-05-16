@@ -36,7 +36,7 @@ public:
 
   LogImpl(const QSharedPointer<ctkPlugin>& plugin);
 
-  ~LogImpl();
+  ~LogImpl() override;
 
   void AddLogListener(ILogListener* listener) override;
 

@@ -55,7 +55,7 @@ bool mitk::TargetPointsCalculator::DoCalculate()
 
   if (m_Method == mitk::TargetPointsCalculator::EvenlyDistributedTargetPoints)
   {
-    mitk::Image::Pointer binaryImage = this->CreateBinaryImage(m_Input);
+    mitk::Image::Pointer binaryImage = this->CreateBinaryImage();
     this->m_Output = this->CreateTargetPoints(binaryImage);
   }
   else if (m_Method == mitk::TargetPointsCalculator::OneTargetPointInCenterOfGravity)
@@ -85,7 +85,7 @@ std::string mitk::TargetPointsCalculator::GetErrorMessage()
   return m_ErrorMessage;
 }
 
-mitk::Image::Pointer mitk::TargetPointsCalculator::CreateBinaryImage(mitk::Surface::Pointer input)
+mitk::Image::Pointer mitk::TargetPointsCalculator::CreateBinaryImage()
 {
   //################################################################################
   //###################### create binary image out of stl ##########################
@@ -97,19 +97,6 @@ mitk::Image::Pointer mitk::TargetPointsCalculator::CreateBinaryImage(mitk::Surfa
   const mitk::BoundingBox *boundingBox = this->m_Input->GetGeometry()->GetBoundingBox();
   mitk::BoundingBox::PointType minimum = boundingBox->GetMinimum();
   mitk::BoundingBox::PointType maximum = boundingBox->GetMaximum();
-
-  // calculate image parameters
-  float spacingFactor = 1;
-  unsigned int dim[3];
-  dim[0] = ROUND(spacingFactor * (abs(maximum[0] - minimum[0])));
-  dim[1] = ROUND(spacingFactor * (abs(maximum[1] - minimum[1])));
-  dim[2] = ROUND(spacingFactor * (abs(maximum[2] - minimum[2])));
-
-  auto origin = new float[3];
-  origin[0] = minimum[0];
-  origin[1] = minimum[1];
-  origin[2] = minimum[2];
-  itk::Size<3> size = {dim[0], dim[1], dim[2]};
 
   // create white itk image
   ImageType::Pointer image = ImageType::New();
@@ -164,7 +151,7 @@ mitk::PointSet::Pointer mitk::TargetPointsCalculator::CreateTargetPoints(mitk::I
   mitk::CastToItkImage(binaryImage, itkImage);
 
   itk::Index<3> begin = {{0, 0, 0}};
-  itk::Index<3> end = {{binaryImage->GetDimension(0), binaryImage->GetDimension(1), binaryImage->GetDimension(2)}};
+  itk::Index<3> end = {{static_cast<signed long>(binaryImage->GetDimension(0)), static_cast<signed long>(binaryImage->GetDimension(1)), static_cast<signed long>(binaryImage->GetDimension(2))}};
 
   mitk::Point3D beginWorld;
   mitk::Point3D endWorld;

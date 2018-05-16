@@ -14,15 +14,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "mitkIGTConfig.h"
 #include "mitkIGTActivator.h"
 
 //All Tracking devices, which should be available by default
 #include "mitkNDIAuroraTypeInformation.h"
 #include "mitkNDIPolarisTypeInformation.h"
 #include "mitkVirtualTrackerTypeInformation.h"
+#ifdef MITK_USE_MICRON_TRACKER
 #include "mitkMicronTrackerTypeInformation.h"
+#endif
+#ifdef MITK_USE_OPTITRACK_TRACKER
 #include "mitkNPOptitrackTrackingTypeInformation.h"
+#endif
 #include "mitkOpenIGTLinkTypeInformation.h"
+#ifdef MITK_USE_POLHEMUS_TRACKER
+#include "mitkPolhemusTrackerTypeInformation.h"
+#endif
 
 namespace mitk
 {
@@ -39,11 +47,18 @@ namespace mitk
   {
     m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::NDIAuroraTypeInformation());
     m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::NDIPolarisTypeInformation());
-    m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::MicronTrackerTypeInformation());
-    m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::NPOptitrackTrackingTypeInformation());
     m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::VirtualTrackerTypeInformation());
     m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::OpenIGTLinkTypeInformation());
-    m_DeviceTypeCollection.RegisterAsMicroservice();
+#ifdef MITK_USE_OPTITRACK_TRACKER
+    m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::NPOptitrackTrackingTypeInformation());
+#endif
+#ifdef MITK_USE_MICRON_TRACKER
+    m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::MicronTrackerTypeInformation());
+#endif
+#ifdef MITK_USE_POLHEMUS_TRACKER
+    m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::PolhemusTrackerTypeInformation());
+#endif
+	m_DeviceTypeCollection.RegisterAsMicroservice();
   }
 
   void IGTActivator::Unload(us::ModuleContext*)

@@ -29,11 +29,11 @@ namespace mitk
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
+    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
     // -------------- AbstractFileWriter -------------
 
-    virtual void Write() override;
+    void Write() override;
 
   private:
     SurfaceStlIO *IOClone() const override;

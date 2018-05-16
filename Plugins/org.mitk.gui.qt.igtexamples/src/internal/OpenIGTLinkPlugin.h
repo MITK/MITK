@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTLClient.h"
 #include "mitkIGTL2DImageDeviceSource.h"
 #include "mitkIGTL3DImageDeviceSource.h"
-#include "mitkIGTLTransformDeviceSource.h"
+#include "mitkIGTLTrackingDataDeviceSource.h"
 
 //mitk
 #include "mitkNavigationDataObjectVisualizationFilter.h"
@@ -85,7 +85,7 @@ protected:
 
   mitk::IGTL2DImageDeviceSource::Pointer m_IGTL2DImageDeviceSource;
   mitk::IGTL3DImageDeviceSource::Pointer m_IGTL3DImageDeviceSource;
-  mitk::IGTLTransformDeviceSource::Pointer m_IGTLTransformDeviceSource;
+  mitk::IGTLTrackingDataDeviceSource::Pointer m_IGTLTransformDeviceSource;
 
   mitk::IGTLClient::Pointer m_IGTLClient;
 

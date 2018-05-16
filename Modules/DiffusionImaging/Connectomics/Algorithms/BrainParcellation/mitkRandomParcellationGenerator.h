@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //To use pair
 #include <utility>
+#include <itkMersenneTwisterRandomVariateGenerator.h>
 
 namespace mitk
 {
@@ -43,6 +44,9 @@ namespace mitk
   {
   public:
     typedef itk::Image< TPixel, VImageDimension > ImageType;
+    typedef itk::Statistics::MersenneTwisterRandomVariateGenerator ItkRngType;
+
+    RandomParcellationGenerator();
 
     //Set-Functions
     void SetImage(itk::Image<TPixel, VImageDimension> *);
@@ -119,6 +123,7 @@ namespace mitk
     bool m_MergingWithNumberParcels;
     bool m_MergingWithSmallestParcel;
     bool m_JustMergeSmallParcels;
+    ItkRngType::Pointer m_RandGen;
   };
 }
 

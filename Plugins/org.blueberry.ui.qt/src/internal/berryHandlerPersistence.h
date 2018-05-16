@@ -88,7 +88,7 @@ public:
   HandlerPersistence(IHandlerService* handlerService,
                      IEvaluationService* evaluationService);
 
-  ~HandlerPersistence();
+  ~HandlerPersistence() override;
 
   bool HandlersNeedUpdating(const QList<SmartPointer<IExtension> >& extensions);
 

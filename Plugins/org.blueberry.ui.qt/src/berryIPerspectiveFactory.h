@@ -88,7 +88,7 @@ struct BERRY_UI_QT IPerspectiveFactory : public Object
 
   berryObjectMacro(berry::IPerspectiveFactory)
 
-  ~IPerspectiveFactory();
+  ~IPerspectiveFactory() override;
 
   /**
    * Creates the initial layout for a page.

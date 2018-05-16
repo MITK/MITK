@@ -48,7 +48,7 @@ struct BERRY_UI_QT IActionBarConfigurer : public Object
 
   berryObjectMacro(berry::IActionBarConfigurer)
 
-  ~IActionBarConfigurer();
+  ~IActionBarConfigurer() override;
 
   /**
    * Returns the workbench window configurer for the window

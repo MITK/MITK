@@ -40,7 +40,7 @@ public:
 
   QmitkXnatExperimentWidget(QWidget *parent = nullptr);
   QmitkXnatExperimentWidget(Mode mode, QWidget *parent = nullptr);
-  ~QmitkXnatExperimentWidget();
+  ~QmitkXnatExperimentWidget() override;
 
   void SetExperiment(ctkXnatExperiment *experiment);
   ctkXnatExperiment *GetExperiment() const;

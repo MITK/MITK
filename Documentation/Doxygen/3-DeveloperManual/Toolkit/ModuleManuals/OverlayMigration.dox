@@ -1,0 +1,37 @@
+/**
+
+\page OverlayMigration Migration Guide from Overlays to the new Annotation concept
+
+\tableofcontents
+
+\section Howto How to adapt your code
+All classes have been renamed from "Overlay" to "Annotation", e.g. the mitk::TextOverlay2D is now mitk::TextAnnotation2D. Most of the interface of mitk::Overlay remains unchanged in
+mitk::Annotation, but it is no longer registered at the mitk::OverlayManager. Instead, mitk::ManualPlacementAnnotationRenderer and mitk::LayoutAnnotationRenderer are used the register an annotation.
+
+\code
+  // Old Overlay registration:
+  overlayManager->AddOverlay(textOverlay3D.GetPointer(), renderer);
+\endcode
+\code
+  // New Annotation registration:
+  mitk::ManualPlacementAnnotationRenderer::AddAnnotation(textAnnotation3D, renderer);
+\endcode
+
+A single mitk::Annotation is no longer automatically registered in all available RenderWindows. Each mitk::Annotation is shown only once. The user is also responsible for the memory management.
+When a created mitk::Annotation has no more SmartPointer references, it disappears.
+
+The Layouter concept was implemented in the mitk::LayoutAnnotationRenderer:
+\code
+  // Old way to layout an mitk::Overlay:
+  verlayManager->AddOverlay(textOverlay.GetPointer());
+  overlayManager->AddLayouter(
+    mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(), renderer2D).GetPointer());
+  overlayManager->SetLayouter(textOverlay.GetPointer(), mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(), renderer2D);
+\endcode
+\code
+  // New way to layout an mitk::Annotation:
+  mitk::LayoutAnnotationRenderer::AddAnnotation(textAnnotation, rendererID, mitk::LayoutAnnotationRenderer::TopLeft, 5, 5, 1);
+  // The layouter gets parameters for margins and the priority for the placement in the RenderWindow corners.
+\endcode
+
+*/

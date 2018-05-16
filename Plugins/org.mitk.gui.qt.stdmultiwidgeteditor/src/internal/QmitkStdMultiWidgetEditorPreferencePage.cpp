@@ -119,20 +119,20 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   //QmitkStdMultiWidgetEditor::InitializePreferences(). Therefore,
   //all default values here are not relevant.
   //gradient background colors
-  m_WidgetBackgroundColor1[0] = m_Preferences->Get("widget1 first background color", "#000000");
-  m_WidgetBackgroundColor2[0] = m_Preferences->Get("widget1 second background color", "#000000");
-  m_WidgetBackgroundColor1[1] = m_Preferences->Get("widget2 first background color", "#000000");
-  m_WidgetBackgroundColor2[1] = m_Preferences->Get("widget2 second background color", "#000000");
-  m_WidgetBackgroundColor1[2] = m_Preferences->Get("widget3 first background color", "#000000");
-  m_WidgetBackgroundColor2[2] = m_Preferences->Get("widget3 second background color", "#000000");
-  m_WidgetBackgroundColor1[3] = m_Preferences->Get("widget4 first background color", "#191919");
-  m_WidgetBackgroundColor2[3] = m_Preferences->Get("widget4 second background color", "#7F7F7F");
+  m_WidgetBackgroundColor1[0] = m_Preferences->Get("widget1 first background color", "#1d1d1c");
+  m_WidgetBackgroundColor2[0] = m_Preferences->Get("widget1 second background color", "#1d1d1c");
+  m_WidgetBackgroundColor1[1] = m_Preferences->Get("widget2 first background color", "#1d1d1c");
+  m_WidgetBackgroundColor2[1] = m_Preferences->Get("widget2 second background color", "#1d1d1c");
+  m_WidgetBackgroundColor1[2] = m_Preferences->Get("widget3 first background color", "#1d1d1c");
+  m_WidgetBackgroundColor2[2] = m_Preferences->Get("widget3 second background color", "#1d1d1c");
+  m_WidgetBackgroundColor1[3] = m_Preferences->Get("widget4 first background color", "#1d1d1c");
+  m_WidgetBackgroundColor2[3] = m_Preferences->Get("widget4 second background color", "#adb1b6");
 
   //decoration colors
-  m_WidgetDecorationColor[0] = m_Preferences->Get("widget1 decoration color", "#FF0000");
-  m_WidgetDecorationColor[1] = m_Preferences->Get("widget2 decoration color", "#00FF00");
-  m_WidgetDecorationColor[2] = m_Preferences->Get("widget3 decoration color", "#0000FF");
-  m_WidgetDecorationColor[3] = m_Preferences->Get("widget4 decoration color", "#FFFF00");
+  m_WidgetDecorationColor[0] = m_Preferences->Get("widget1 decoration color", "#c00000");
+  m_WidgetDecorationColor[1] = m_Preferences->Get("widget2 decoration color", "#0fad00");
+  m_WidgetDecorationColor[2] = m_Preferences->Get("widget3 decoration color", "#0080ff");
+  m_WidgetDecorationColor[3] = m_Preferences->Get("widget4 decoration color", "#fec500");
 
   //annotation text
   m_WidgetAnnotation[0] = m_Preferences->Get("widget1 corner annotation", "Axial");
@@ -254,18 +254,10 @@ void QmitkStdMultiWidgetEditorPreferencePage::OnWidgetComboBoxChanged(int i)
   m_Ui->m_RenderWindowDecorationText->setText(m_WidgetAnnotation[i]);
 }
 
-void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)
+void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int )
 {
-  if( i == 0 )
-  {
+  //if( i == 0 )
+  //{
     m_CurrentRenderingMode = "Standard";
-  }
-  else if( i == 1 )
-  {
-    m_CurrentRenderingMode = "Multisampling";
-  }
-  else if( i == 2 )
-  {
-    m_CurrentRenderingMode = "DepthPeeling";
-  }
+  //}
 }

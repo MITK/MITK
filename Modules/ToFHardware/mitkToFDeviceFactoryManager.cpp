@@ -98,6 +98,6 @@ namespace mitk
       }
     }
     MITK_ERROR << "No device generated!";
-    return NULL;
+    return nullptr;
   }
 }

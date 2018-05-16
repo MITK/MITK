@@ -51,7 +51,7 @@ namespace mitk
     * \brief Returns the id of the control-point that corresponds to the given
     * polyline-point.
     */
-    int GetControlPointForPolylinePoint(int indexOfPolylinePoint, int polyLineIndex) const;
+    int GetControlPointForPolylinePoint(int indexOfPolylinePoint, int polyLineIndex) const override;
 
     /** \brief Parameter w_tension defines the tension.
      * the higher w_tension, the lower the "tension" on points.
@@ -65,7 +65,7 @@ namespace mitk
     void IncreaseSubdivisions();
     void DecreaseSubdivisions();
 
-    virtual bool Equals(const mitk::PlanarFigure &other) const override;
+    bool Equals(const mitk::PlanarFigure &other) const override;
 
   protected:
     PlanarSubdivisionPolygon();
@@ -73,7 +73,7 @@ namespace mitk
     mitkCloneMacro(Self);
 
     /** \brief Generates the poly-line representation of the planar figure. */
-    virtual void GeneratePolyLine() override;
+    void GeneratePolyLine() override;
 
     float m_TensionParameter;
     int m_SubdivisionRounds;

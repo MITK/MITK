@@ -343,8 +343,8 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::extractModuleSub
           const VertexDescriptorType vertexB = graphToSubgraphVertexMap->find( adjacentVertex )->second;
           const int sourceID = network->GetNode( vertexA ).id;
           const int targetID = network->GetNode( vertexB ).id;
-          const int weight = network->GetEdge( iter->first, graphToSubgraphVertexMap->find( adjacentVertex )->first ).weight;
-          subNetwork->AddEdge( vertexA , vertexB, sourceID, targetID, weight );
+          const double fiber_count = network->GetEdge( iter->first, graphToSubgraphVertexMap->find( adjacentVertex )->first ).fiber_count;
+          subNetwork->AddEdge( vertexA , vertexB, sourceID, targetID, fiber_count );
         }
       }
     }

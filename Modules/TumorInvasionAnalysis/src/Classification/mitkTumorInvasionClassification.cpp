@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIOUtil.h"
 #include <fstream>
 // To initialize random number generator
-#include <time.h>
+#include <ctime>
 
 static void EnsureDataImageInCollection(mitk::DataCollection::Pointer collection,
                                         std::string origin,
@@ -53,7 +53,7 @@ static void EnsureDataImageInCollection(mitk::DataCollection::Pointer collection
   for (std::size_t i = 0; i < collection->Size(); ++i)
   {
     mitk::DataCollection *newCol = dynamic_cast<mitk::DataCollection *>(collection->GetData(i).GetPointer());
-    if (newCol != 0)
+    if (newCol != nullptr)
     {
       EnsureDataImageInCollection(newCol, origin, target);
     }
@@ -72,7 +72,7 @@ mitk::TumorInvasionClassification::TumorInvasionClassification()
 
 void mitk::TumorInvasionClassification::SelectTrainingSamples(mitk::DataCollection *collection, unsigned int mode)
 {
-  srand(time(NULL));
+  srand(time(nullptr));
   MITK_INFO << "LearnProgressionFeatures: Selecting training voxels.";
   switch (mode)
   {
@@ -495,7 +495,7 @@ void mitk::TumorInvasionClassification::SelectTrainingSamples(mitk::DataCollecti
 
 void mitk::TumorInvasionClassification::PrepareResponseSamples(mitk::DataCollection *collection)
 {
-  srand(time(NULL));
+  srand(time(nullptr));
   MITK_INFO << "PrepareResponseSamples: Selecting training voxels.";
 
   EnsureDataImageInCollection(collection, m_TumorID, "WEIGHTS");
@@ -614,7 +614,7 @@ void mitk::TumorInvasionClassification::LearnProgressionFeatures(mitk::DataColle
 void mitk::TumorInvasionClassification::PredictInvasion(mitk::DataCollection *collection,
                                                         std::vector<std::string> modalitiesList)
 {
-  if (collection != NULL)
+  if (collection != nullptr)
   {
     MITK_INFO << "Evaluating Forest";
 
@@ -636,7 +636,7 @@ void mitk::TumorInvasionClassification::PredictInvasion(mitk::DataCollection *co
     }
   }
   else
-    MITK_ERROR << "TumorInvasionClassification::PredictInvasion - provided collection is NULL.";
+    MITK_ERROR << "TumorInvasionClassification::PredictInvasion - provided collection is nullptr.";
 }
 
 void mitk::TumorInvasionClassification::SanitizeResults(mitk::DataCollection *collection, std::string resultID)

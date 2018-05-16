@@ -51,12 +51,12 @@ mitk::PlanarFigureVtkMapper3D::~PlanarFigureVtkMapper3D()
 
 void mitk::PlanarFigureVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor)
 {
-  if (actor == NULL)
+  if (actor == nullptr)
     return;
 
   const mitk::DataNode *dataNode = this->GetDataNode();
 
-  if (dataNode == NULL)
+  if (dataNode == nullptr)
     return;
 
   bool selected = false;
@@ -75,12 +75,12 @@ void mitk::PlanarFigureVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer 
 
 void mitk::PlanarFigureVtkMapper3D::ApplyPlanarFigureProperties(BaseRenderer *renderer, vtkActor *actor)
 {
-  if (actor == NULL)
+  if (actor == nullptr)
     return;
 
   const mitk::DataNode *dataNode = this->GetDataNode();
 
-  if (dataNode == NULL)
+  if (dataNode == nullptr)
     return;
 
   bool render = false;
@@ -101,12 +101,12 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer *render
 
   const DataNode *node = this->GetDataNode();
 
-  if (node == NULL)
+  if (node == nullptr)
     return;
 
-  PlanarFigure *planarFigure = dynamic_cast<PlanarFigure *>(node->GetData());
+  auto *planarFigure = dynamic_cast<PlanarFigure *>(node->GetData());
 
-  if (planarFigure == NULL || !planarFigure->IsPlaced())
+  if (planarFigure == nullptr || !planarFigure->IsPlaced())
     return;
 
   LocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
@@ -125,11 +125,11 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer *render
   {
     localStorage->m_LastMTime = mTime;
 
-    const PlaneGeometry *planeGeometry = dynamic_cast<const PlaneGeometry *>(planarFigure->GetPlaneGeometry());
-    const AbstractTransformGeometry *abstractTransformGeometry =
+    const auto *planeGeometry = dynamic_cast<const PlaneGeometry *>(planarFigure->GetPlaneGeometry());
+    const auto *abstractTransformGeometry =
       dynamic_cast<const AbstractTransformGeometry *>(planarFigure->GetPlaneGeometry());
 
-    if (planeGeometry == NULL && abstractTransformGeometry == NULL)
+    if (planeGeometry == nullptr && abstractTransformGeometry == nullptr)
       return;
 
     const size_t numPolyLines = planarFigure->GetPolyLinesSize();
@@ -152,9 +152,9 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer *render
       if (numPoints < 2)
         continue;
 
-      PolyLine::const_iterator polyLineEnd = polyLine.cend();
+      auto polyLineEnd = polyLine.cend();
 
-      for (PolyLine::const_iterator polyLineIt = polyLine.cbegin(); polyLineIt != polyLineEnd; ++polyLineIt)
+      for (auto polyLineIt = polyLine.cbegin(); polyLineIt != polyLineEnd; ++polyLineIt)
       {
         Point3D point;
         planeGeometry->Map(*polyLineIt, point);

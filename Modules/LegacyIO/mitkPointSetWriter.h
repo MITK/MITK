@@ -109,24 +109,24 @@ namespace mitk
     /**
     * @brief Return the possible file extensions for the data type associated with the writer
     */
-    virtual std::vector<std::string> GetPossibleFileExtensions() override;
+    std::vector<std::string> GetPossibleFileExtensions() override;
 
-    virtual std::string GetSupportedBaseData() const override;
+    std::string GetSupportedBaseData() const override;
 
     /**
     * @brief Return the extension to be added to the filename.
     */
-    virtual std::string GetFileExtension() override;
+    std::string GetFileExtension() override;
 
     /**
     * @brief Check if the Writer can write the Content of the
     */
-    virtual bool CanWriteDataType(DataNode *) override;
+    bool CanWriteDataType(DataNode *) override;
 
     /**
     * @brief Return the MimeType of the saved File.
     */
-    virtual std::string GetWritenMIMEType() override;
+    std::string GetWritenMIMEType() override;
 
     using mitk::FileWriter::SetInput;
     /**
@@ -148,12 +148,12 @@ namespace mitk
     /**
      * Virtual destructor.
      */
-    virtual ~PointSetWriter();
+    ~PointSetWriter() override;
 
     /**
      * Writes the XML file
      */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     /**
      * Resizes the number of inputs of the writer.

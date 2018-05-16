@@ -35,7 +35,7 @@ void mitk::RegionVoxelCounter<TPixel, VImageDimension>::SetImage(itk::Image<TPix
 
 //Other Functions
 template <typename TPixel, unsigned int VImageDimension>
-int mitk::RegionVoxelCounter<TPixel, VImageDimension>::VoxelWithValue(int value)
+int mitk::RegionVoxelCounter<TPixel, VImageDimension>::VoxelWithValue(TPixel value)
 {
   itk::ImageRegionIterator<ImageType> it_region(m_Image, m_Region);
   int counter(0);

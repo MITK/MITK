@@ -47,7 +47,7 @@ public:
   QmitkRedoAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window);
   QmitkRedoAction(const QIcon & icon, berry::IWorkbenchWindow* window);
 
-  ~QmitkRedoAction();
+  ~QmitkRedoAction() override;
 
   protected slots:
 

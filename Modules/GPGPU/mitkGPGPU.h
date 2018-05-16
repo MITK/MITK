@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKGPGPU_H
 #define MITKGPGPU_H
 
-#include <GL/glew.h>
+#include <vtk_glew.h>
 
 #include <MitkGPGPUExports.h>
 

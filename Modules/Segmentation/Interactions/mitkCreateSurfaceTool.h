@@ -37,17 +37,17 @@ namespace mitk
     mitkClassMacro(CreateSurfaceTool, SegmentationsProcessingTool);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual const char **GetXPM() const override;
-    virtual const char *GetName() const override;
+      const char **GetXPM() const override;
+    const char *GetName() const override;
 
     void OnSurfaceCalculationDone();
 
   protected:
-    virtual bool ProcessOneWorkingData(DataNode *node) override;
-    virtual std::string GetErrorMessage() override;
+    bool ProcessOneWorkingData(DataNode *node) override;
+    std::string GetErrorMessage() override;
 
     CreateSurfaceTool(); // purposely hidden
-    virtual ~CreateSurfaceTool();
+    ~CreateSurfaceTool() override;
   };
 
 } // namespace

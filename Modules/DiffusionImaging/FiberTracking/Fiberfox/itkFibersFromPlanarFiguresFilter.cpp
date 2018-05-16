@@ -15,16 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "itkFibersFromPlanarFiguresFilter.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 // MITK
 #include <itkOrientationDistributionFunction.h>
-#include <itkDiffusionQballGeneralizedFaImageFilter.h>
+#include <itkDiffusionOdfGeneralizedFaImageFilter.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkFiberBuilder.h>
 #include <mitkMetropolisHastingsSampler.h>
-#include <itkTensorImageToQBallImageFilter.h>
+#include <itkTensorImageToOdfImageFilter.h>
 #include <mitkGibbsEnergyComputer.h>
 #include <mitkRotationOperation.h>
 #include <mitkInteractionConst.h>
@@ -36,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 
 // MISC
-#include <math.h>
+#include <cmath>
 
 namespace itk{
 
@@ -56,7 +53,7 @@ void FibersFromPlanarFiguresFilter::GeneratePoints()
     Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
     randGen->SetSeed((unsigned int)0);
     m_2DPoints.clear();
-    int count = 0;
+    unsigned int count = 0;
 
     while (count < m_Parameters.m_Density)
     {
@@ -91,9 +88,9 @@ void FibersFromPlanarFiguresFilter::GenerateData()
         vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
         vtkSmartPointer<vtkPoints> m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
 
-        vector< mitk::PlanarEllipse::Pointer > bundle = m_Parameters.m_Fiducials.at(i);
+        std::vector< mitk::PlanarEllipse::Pointer > bundle = m_Parameters.m_Fiducials.at(i);
 
-        vector< unsigned int > fliplist;
+        std::vector< unsigned int > fliplist;
         if (i<m_Parameters.m_FlipList.size())
             fliplist = m_Parameters.m_FlipList.at(i);
         else
@@ -102,7 +99,7 @@ void FibersFromPlanarFiguresFilter::GenerateData()
             fliplist.resize(bundle.size(), 0);
 
         GeneratePoints();
-        for (int j=0; j<m_Parameters.m_Density; j++)
+        for (unsigned int j = 0; j < m_Parameters.m_Density; ++j)
         {
             vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
 
@@ -132,7 +129,7 @@ void FibersFromPlanarFiguresFilter::GenerateData()
             newP[1] = m_2DPoints.at(j)[1];
             double alpha = acos(eDir[0]);
             if (eDir[1]>0)
-                alpha = 2*M_PI-alpha;
+                alpha = 2*itk::Math::pi-alpha;
             vnl_matrix_fixed<double, 2, 2> eRot;
             eRot[0][0] = cos(alpha);
             eRot[1][1] = eRot[0][0];
@@ -170,7 +167,8 @@ void FibersFromPlanarFiguresFilter::GenerateData()
 
                 eDir = p1-p0; eDir.Normalize();
                 mitk::Vector2D tDir2 = p3-p0; tDir2.Normalize();
-                mitk::Vector2D temp; temp.SetVnlVector(tRot.transpose() * tDir2.GetVnlVector());
+                mitk::Vector2D temp; temp.Fill(0);
+                temp.SetVnlVector(tRot.transpose() * tDir2.GetVnlVector());
 
                 // apply twist
                 tRot[0][0] = tDir[0]*tDir2[0] + tDir[1]*tDir2[1];
@@ -201,7 +199,7 @@ void FibersFromPlanarFiguresFilter::GenerateData()
 
                 alpha = acos(eDir[0]);
                 if (eDir[1]>0)
-                    alpha = 2*M_PI-alpha;
+                    alpha = 2*itk::Math::pi-alpha;
                 eRot[0][0] = cos(alpha);
                 eRot[1][1] = eRot[0][0];
                 eRot[1][0] = sin(alpha);

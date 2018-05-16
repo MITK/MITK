@@ -69,7 +69,7 @@ namespace mitk
                             unsigned int timeStep = 0,
                             unsigned int sliceDimension = 2,
                             unsigned int sliceIndex = 0);
-    virtual ~ApplyDiffImageOperation();
+    ~ApplyDiffImageOperation() override;
 
     // Unfortunately cannot use itkGet/SetMacros here, since Operation does not inherit itk::Object
     unsigned int GetSliceIndex() { return m_SliceIndex; }

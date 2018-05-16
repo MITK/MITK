@@ -38,15 +38,15 @@ namespace mitk
       */
     static void Initialize();
 
-    virtual void DisplayText(const char *t) override;
+    void DisplayText(const char *t) override;
 
-    virtual void DisplayErrorText(const char *t) override;
+    void DisplayErrorText(const char *t) override;
 
-    virtual void DisplayWarningText(const char *t) override;
+    void DisplayWarningText(const char *t) override;
 
-    virtual void DisplayGenericWarningText(const char *t) override;
+    void DisplayGenericWarningText(const char *t) override;
 
-    virtual void DisplayDebugText(const char *t) override;
+    void DisplayDebugText(const char *t) override;
 
   protected:
   };

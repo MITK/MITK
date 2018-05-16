@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStatusBar.h"
 #include "mitkTimeHelper.h"
 
-#include <math.h>
+#include <cmath>
 
 #include "vtkMatrix4x4.h"
 #include "vtkSmartPointer.h"
@@ -38,12 +38,12 @@ namespace mitk
 {
   BoundingShapeCropper::BoundingShapeCropper()
     : m_Geometry(nullptr),
-      m_OutsideValue(0),
-      m_UseCropTimeStepOnly(false),
-      m_CurrentTimeStep(0),
-      m_UseWholeInputRegion(false),
-      m_InputTimeSelector(mitk::ImageTimeSelector::New()),
-      m_OutputTimeSelector(mitk::ImageTimeSelector::New())
+    m_OutsideValue(0),
+    m_UseCropTimeStepOnly(false),
+    m_CurrentTimeStep(0),
+    m_UseWholeInputRegion(false),
+    m_InputTimeSelector(mitk::ImageTimeSelector::New()),
+    m_OutputTimeSelector(mitk::ImageTimeSelector::New())
   {
     this->SetNumberOfIndexedInputs(2);
     this->SetNumberOfRequiredInputs(2);
@@ -74,7 +74,7 @@ namespace mitk
     {
       mitk::StatusBar::GetInstance()->DisplayErrorText(
         "An internal error occurred. Can't convert Image. Please report to bugs@mitk.org");
-      std::cout << " image is NULL...returning" << std::endl;
+      std::cout << " image is nullptr...returning" << std::endl;
       return;
     }
 
@@ -115,8 +115,8 @@ namespace mitk
     Point3D center = this->m_Geometry->GetGeometry()->GetCenter();
     auto translation = vtkSmartPointer<vtkTransform>::New();
     translation->Translate(center[0] - imageTransform->GetElement(0, 3),
-                           center[1] - imageTransform->GetElement(1, 3),
-                           center[2] - imageTransform->GetElement(2, 3));
+      center[1] - imageTransform->GetElement(1, 3),
+      center[2] - imageTransform->GetElement(2, 3));
     auto transform = vtkSmartPointer<vtkTransform>::New();
     transform->SetMatrix(imageTransform);
     transform->PostMultiply();
@@ -140,10 +140,10 @@ namespace mitk
       transform->GetInverse()->TransformPoint(p2, p2);
       // check if the world point is within bounds
       bool isInside = (p2[0] >= (-extent[0] / 2.0)) && (p2[0] <= (extent[0] / 2.0)) && (p2[1] >= (-extent[1] / 2.0)) &&
-                      (p2[1] <= (extent[1] / 2.0)) && (p2[2] >= (-extent[2] / 2.0)) && (p2[2] <= (extent[2] / 2.0));
+        (p2[1] <= (extent[1] / 2.0)) && (p2[2] >= (-extent[2] / 2.0)) && (p2[2] <= (extent[2] / 2.0));
 
       if ((!this->m_UseCropTimeStepOnly && isInside) ||
-          (this->m_UseCropTimeStepOnly && timeStep == this->m_CurrentTimeStep && isInside))
+        (this->m_UseCropTimeStepOnly && timeStep == this->m_CurrentTimeStep && isInside))
       {
         outputIt.Set((TOutputPixel)inputIt.Value());
       }
@@ -171,10 +171,10 @@ namespace mitk
   {
     mitk::Image *output = this->GetOutput();
     if ((output->IsInitialized() == false) || (m_Geometry.IsNull()) ||
-        (m_Geometry->GetTimeGeometry()->CountTimeSteps() == 0))
+      (m_Geometry->GetTimeGeometry()->CountTimeSteps() == 0))
       return;
 
-    GenerateTimeInInputRegion(output, const_cast<mitk::Image *>(this->GetInput()));
+    GenerateTimeInInputRegion(output, this->GetInput());
   }
 
   void BoundingShapeCropper::GenerateOutputInformation()
@@ -184,7 +184,7 @@ namespace mitk
     if ((output->IsInitialized()) && (output->GetPipelineMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
       return;
 
-    mitk::Image::Pointer input = const_cast<mitk::Image *>(this->GetInput());
+    mitk::Image::Pointer input = this->GetInput();
 
     if (input.IsNull())
     {
@@ -215,11 +215,17 @@ namespace mitk
     mitk::BoundingBox::PointType min = bsBoxRelativeToImage->GetMinimum();
     mitk::SlicedData::SizeType size = m_InputRequestedRegion.GetSize(); // init times and channels
     mitk::BoundingBox::PointType max = bsBoxRelativeToImage->GetMaximum();
+    mitk::Point<BoundingBox::PointType::CoordRepType, 5> maxCorrected;
+    maxCorrected[0] = max[0];
+    maxCorrected[1] = max[1];
+    maxCorrected[2] = max[2];
+    maxCorrected[3] = input->GetDimensions()[3];
+    maxCorrected[4] = 0;
 
     for (unsigned int i = 0; i < dimension; i++)
     {
       index[i] = (mitk::SlicedData::IndexType::IndexValueType)(std::ceil(min[i]));
-      size[i] = (mitk::SlicedData::SizeType::SizeValueType)(std::ceil(max[i]) - index[i]);
+      size[i] = (mitk::SlicedData::SizeType::SizeValueType)(std::ceil(maxCorrected[i]) - index[i]);
     }
     mitk::SlicedData::RegionType bsRegion(index, size);
 
@@ -277,7 +283,7 @@ namespace mitk
       return;
 
     if ((output->IsInitialized() == false) || (m_Geometry.IsNull()) ||
-        (m_Geometry->GetTimeGeometry()->CountTimeSteps() == 0))
+      (m_Geometry->GetTimeGeometry()->CountTimeSteps() == 0))
       return;
 
     m_InputTimeSelector->SetInput(input);
@@ -333,5 +339,4 @@ namespace mitk
     m_OutputTimeSelector->SetInput(nullptr);
     m_TimeOfHeaderInitialization.Modified();
   }
-
 } // of namespace mitk

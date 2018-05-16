@@ -31,7 +31,7 @@ signals:
 
 public:
   QClickableLabel2(QWidget *parent, Qt::WindowFlags f = nullptr) : QLabel(parent, f) {}
-  virtual void mouseReleaseEvent(QMouseEvent *) override { emit clicked(); }
+  void mouseReleaseEvent(QMouseEvent *) override { emit clicked(); }
 };
 
 /// @ingroup Widgets
@@ -41,11 +41,11 @@ class MITKQTWIDGETSEXT_EXPORT QmitkStringPropertyOnDemandEdit : public QFrame, p
 
 public:
   QmitkStringPropertyOnDemandEdit(mitk::StringProperty *, QWidget *parent);
-  virtual ~QmitkStringPropertyOnDemandEdit();
+  ~QmitkStringPropertyOnDemandEdit() override;
 
 protected:
-  virtual void PropertyChanged() override;
-  virtual void PropertyRemoved() override;
+  void PropertyChanged() override;
+  void PropertyRemoved() override;
 
   mitk::StringProperty *m_StringProperty;
 

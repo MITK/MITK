@@ -1,15 +1,14 @@
 # The entries in the mitk_modules list must be
 # ordered according to their dependencies.
 
-set(mitk_modules
+set(MITK_MODULES
   Core
   CommandLine
   AppUtil
-  DCMTesting
   RDF
   LegacyIO
   DataTypesExt
-  Overlays
+  Annotation
   LegacyGL
   AlgorithmsExt
   MapperExt
@@ -20,7 +19,6 @@ set(mitk_modules
   PlanarFigure
   ImageDenoising
   ImageExtraction
-  LegacyAdaptors
   SceneSerialization
   Gizmo
   GraphAlgorithms
@@ -30,52 +28,51 @@ set(mitk_modules
   SurfaceInterpolation
   Segmentation
   PlanarFigureSegmentation
-  OpenViewCore
   QtWidgets
   QtWidgetsExt
-  C3js
-  QmlItems
+  Chart
   SegmentationUI
-  DiffusionImaging
+  MatchPointRegistration
+  MatchPointRegistrationUI
+  Classification
   GPGPU
   OpenIGTLink
   IGTBase
   IGT
   CameraCalibration
-  RigidRegistration
-  RigidRegistrationUI
-  DeformableRegistration
-  DeformableRegistrationUI
   OpenCL
   OpenCVVideoSupport
   QtOverlays
   ToFHardware
   ToFProcessing
   ToFUI
+  PhotoacousticsHardware
+  PhotoacousticsAlgorithms
+  PhotoacousticsLib
   US
   USUI
   DicomUI
-  Simulation
   Remeshing
   Python
   QtPython
   Persistence
   OpenIGTLinkUI
   IGTUI
-  VtkShaders
   DicomRT
   RTUI
   IOExt
   XNAT
   TubeGraph
   BiophotonicsHardware
-  Classification
+  DiffusionImaging
   TumorInvasionAnalysis
-  MatchPointRegistration
-  MatchPointRegistrationUI
   BoundingShape
+  RenderWindowManager
+  RenderWindowManagerUI
+  CEST
+  BasicImageProcessing
 )
 
 if(MITK_ENABLE_PIC_READER)
-  list(APPEND mitk_modules IpPicSupportIO)
+  list(APPEND MITK_MODULES IpPicSupportIO)
 endif()

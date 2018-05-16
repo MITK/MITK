@@ -58,7 +58,7 @@ namespace mitk
                    bool selected = true,
                    PointSpecificationType type = PTUNDEFINED);
 
-    virtual ~PointOperation();
+    ~PointOperation() override;
 
     Point3D GetPoint();
 

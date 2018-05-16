@@ -55,10 +55,10 @@ namespace mitk
 
   protected:
     ContourTool(int paintingPixelValue = 1); // purposely hidden
-    virtual ~ContourTool();
+    ~ContourTool() override;
 
-    virtual void Activated() override;
-    virtual void Deactivated() override;
+    void Activated() override;
+    void Deactivated() override;
 
     virtual void OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent);
     virtual void OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent);

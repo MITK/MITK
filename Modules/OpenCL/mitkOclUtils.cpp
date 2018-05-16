@@ -30,7 +30,7 @@ cl_int oclGetPlatformID(cl_platform_id* selectedPlatform)
   cl_platform_id* clPlatformIDs;
   cl_int ciErrNum = 0;
 
-  ciErrNum = clGetPlatformIDs( 0, NULL, &num_platforms);
+  ciErrNum = clGetPlatformIDs( 0, nullptr, &num_platforms);
   if ( ciErrNum != CL_SUCCESS)
   {
     MITK_ERROR<<" Error " << ciErrNum << " in clGetPlatformIDs() \n";
@@ -40,7 +40,7 @@ cl_int oclGetPlatformID(cl_platform_id* selectedPlatform)
   {
     clPlatformIDs = new cl_platform_id[num_platforms];
 
-    ciErrNum = clGetPlatformIDs( num_platforms, clPlatformIDs, NULL);
+    ciErrNum = clGetPlatformIDs( num_platforms, clPlatformIDs, nullptr);
     if(ciErrNum == CL_SUCCESS)
     {
       *selectedPlatform = clPlatformIDs[0];
@@ -60,7 +60,7 @@ void oclPrintMemObjectInfo(cl_mem memobj)
 
   // CL_MEM_TYPE
   cl_mem_object_type objtype;
-  clErr = clGetMemObjectInfo( memobj, CL_MEM_TYPE, sizeof(cl_mem_object_type),&objtype, NULL);
+  clErr = clGetMemObjectInfo( memobj, CL_MEM_TYPE, sizeof(cl_mem_object_type),&objtype, nullptr);
   CHECK_OCL_ERR( clErr );
 
   switch(objtype)
@@ -81,7 +81,7 @@ void oclPrintMemObjectInfo(cl_mem memobj)
 
   // CL_MEM_FLAGS
   cl_mem_flags flags;
-  clErr = clGetMemObjectInfo( memobj, CL_MEM_FLAGS, sizeof(cl_mem_flags),&flags, NULL);
+  clErr = clGetMemObjectInfo( memobj, CL_MEM_FLAGS, sizeof(cl_mem_flags),&flags, nullptr);
   CHECK_OCL_ERR( clErr );
 
   switch(flags)
@@ -102,28 +102,28 @@ void oclPrintMemObjectInfo(cl_mem memobj)
 
   // get CL_MEM_SIZE
   size_t memsize;
-  clErr = clGetMemObjectInfo( memobj, CL_MEM_SIZE, sizeof(memsize),&memsize, NULL);
+  clErr = clGetMemObjectInfo( memobj, CL_MEM_SIZE, sizeof(memsize),&memsize, nullptr);
   CHECK_OCL_ERR( clErr );
 
   MITK_INFO << "CL_MEM_SIZE \t" << memsize << "\n";
 
   // get CL_MEM_HOST_PTR
   float *hostptr;
-  clErr = clGetMemObjectInfo( memobj, CL_MEM_HOST_PTR, sizeof(void*), (void*) &hostptr, NULL);
+  clErr = clGetMemObjectInfo( memobj, CL_MEM_HOST_PTR, sizeof(void*), (void*) &hostptr, nullptr);
   CHECK_OCL_ERR( clErr );
 
   MITK_INFO << "CL_MEM_HOST_PTR \t" << hostptr << "\n";
 
   // get CL_CONTEXT
   cl_context gpuctxt;
-  clErr = clGetMemObjectInfo( memobj, CL_MEM_CONTEXT, sizeof(cl_context), &gpuctxt, NULL);
+  clErr = clGetMemObjectInfo( memobj, CL_MEM_CONTEXT, sizeof(cl_context), &gpuctxt, nullptr);
   CHECK_OCL_ERR( clErr );
 
   MITK_INFO << "CL_CONTEXT \t\t" << gpuctxt << "\n";
 
   // get CL_MEM_REFERENCE_COUNT
   cl_uint refs;
-  clErr = clGetMemObjectInfo( memobj, CL_MEM_REFERENCE_COUNT, sizeof(cl_uint), &refs, NULL);
+  clErr = clGetMemObjectInfo( memobj, CL_MEM_REFERENCE_COUNT, sizeof(cl_uint), &refs, nullptr);
   CHECK_OCL_ERR(clErr);
 
   MITK_INFO << "CL_REF_COUNT \t" << refs << "\n";
@@ -135,12 +135,12 @@ void oclPrintDeviceInfo(cl_device_id device)
 {
   char device_string[1024];
 
-  clGetDeviceInfo(device, CL_DEVICE_NAME, sizeof(device_string), &device_string, NULL);
+  clGetDeviceInfo(device, CL_DEVICE_NAME, sizeof(device_string), &device_string, nullptr);
   MITK_INFO("ocl.log")<< " Device : " << device_string;
 
   // CL_DEVICE_INFO
   cl_device_type type;
-  clGetDeviceInfo(device, CL_DEVICE_TYPE, sizeof(type), &type, NULL);
+  clGetDeviceInfo(device, CL_DEVICE_TYPE, sizeof(type), &type, nullptr);
   if( type & CL_DEVICE_TYPE_CPU )
     MITK_INFO("ocl.log")<<"  CL_DEVICE_TYPE: CL_DEVICE_TYPE_CPU";
   if( type & CL_DEVICE_TYPE_GPU )
@@ -152,58 +152,62 @@ void oclPrintDeviceInfo(cl_device_id device)
 
   // CL_DEVICE_MAX_COMPUTE_UNITS
   cl_uint compute_units;
-  clGetDeviceInfo(device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(compute_units), &compute_units, NULL);
+  clGetDeviceInfo(device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(compute_units), &compute_units, nullptr);
   MITK_INFO("ocl.log")<<"  CL_DEVICE_MAX_COMPUTE_UNITS:" << compute_units;
 
   // CL_DEVICE_MAX_WORK_GROUP_SIZE
   size_t workitem_size[3];
-  clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(workitem_size), &workitem_size, NULL);
+  clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(workitem_size), &workitem_size, nullptr);
   MITK_INFO("ocl.log")<<"  CL_DEVICE_MAX_WORK_ITEM_SIZES:\t"<< workitem_size[0]<< workitem_size[1]<< workitem_size[2];
 
   // CL_DEVICE_MAX_WORK_GROUP_SIZE
   size_t workgroup_size;
-  clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(workgroup_size), &workgroup_size, NULL);
+  clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(workgroup_size), &workgroup_size, nullptr);
   MITK_INFO("ocl.log")<<"  CL_DEVICE_MAX_WORK_GROUP_SIZE:" << workgroup_size;
 
   // CL_DEVICE_MAX_CLOCK_FREQUENCY
   cl_uint clock_frequency;
-  clGetDeviceInfo(device, CL_DEVICE_MAX_CLOCK_FREQUENCY, sizeof(clock_frequency), &clock_frequency, NULL);
+  clGetDeviceInfo(device, CL_DEVICE_MAX_CLOCK_FREQUENCY, sizeof(clock_frequency), &clock_frequency, nullptr);
   MITK_INFO("ocl.log")<<"  CL_DEVICE_MAX_CLOCK_FREQUENCY:"<< clock_frequency / 1000;
 
   // CL_DEVICE_IMAGE_SUPPORT
   cl_bool image_support;
-  clGetDeviceInfo(device, CL_DEVICE_IMAGE_SUPPORT, sizeof(image_support), &image_support, NULL);
+  clGetDeviceInfo(device, CL_DEVICE_IMAGE_SUPPORT, sizeof(image_support), &image_support, nullptr);
   MITK_INFO("ocl.log")<<"  CL_DEVICE_IMAGE_SUPPORT:\t" << image_support;
 
   // CL_DEVICE_GLOBAL_MEM_SIZE
   cl_ulong mem_size;
-  clGetDeviceInfo(device, CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(mem_size), &mem_size, NULL);
+  clGetDeviceInfo(device, CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(mem_size), &mem_size, nullptr);
   MITK_INFO("ocl.log")<<"  CL_DEVICE_GLOBAL_MEM_SIZE:\t\t"<<(unsigned int)(mem_size / (1024 * 1024))<<"Mbytes";
 
   // CL_DEVICE_LOCAL_MEM_SIZE
-  clGetDeviceInfo(device, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(mem_size), &mem_size, NULL);
+  clGetDeviceInfo(device, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(mem_size), &mem_size, nullptr);
   MITK_INFO("ocl.log")<<"  CL_DEVICE_LOCAL_MEM_SIZE:\t\t"<<  (unsigned int)(mem_size / (1024)) <<"KByte\n";
 
+  // CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE
+  clGetDeviceInfo(device, CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, sizeof(mem_size), &mem_size, nullptr);
+  MITK_INFO("ocl.log") << "  CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE:\t\t" << (unsigned int)(mem_size / (1024)) << "KByte";
+
   //check for image support properties
-  clGetDeviceInfo(device, CL_DEVICE_IMAGE2D_MAX_WIDTH, sizeof(workgroup_size), &workgroup_size, NULL);
+  clGetDeviceInfo(device, CL_DEVICE_IMAGE2D_MAX_WIDTH, sizeof(workgroup_size), &workgroup_size, nullptr);
   MITK_INFO("ocl.log")<<"  CL_DEVICE_IMAGE2D_MAX_WIDTH:\t" << workgroup_size;
 
-  clGetDeviceInfo(device, CL_DEVICE_IMAGE2D_MAX_HEIGHT, sizeof(workgroup_size), &workgroup_size, NULL);
+  clGetDeviceInfo(device, CL_DEVICE_IMAGE2D_MAX_HEIGHT, sizeof(workgroup_size), &workgroup_size, nullptr);
   MITK_INFO("ocl.log")<<"  CL_DEVICE_IMAGE2D_MAX_HEIGHT:\t" << workgroup_size;
 
-  clGetDeviceInfo(device, CL_DEVICE_IMAGE3D_MAX_WIDTH, sizeof(workgroup_size), &workgroup_size, NULL);
+  clGetDeviceInfo(device, CL_DEVICE_IMAGE3D_MAX_WIDTH, sizeof(workgroup_size), &workgroup_size, nullptr);
   MITK_INFO("ocl.log")<<"  CL_DEVICE_IMAGE3D_MAX_WIDTH:\t" << workgroup_size;
 
-  clGetDeviceInfo(device, CL_DEVICE_IMAGE3D_MAX_HEIGHT, sizeof(workgroup_size), &workgroup_size, NULL);
+  clGetDeviceInfo(device, CL_DEVICE_IMAGE3D_MAX_HEIGHT, sizeof(workgroup_size), &workgroup_size, nullptr);
   MITK_INFO("ocl.log")<<"  CL_DEVICE_IMAGE3D_MAX_HEIGHT:\t" << workgroup_size;
 
-  clGetDeviceInfo(device, CL_DEVICE_IMAGE3D_MAX_DEPTH, sizeof(workgroup_size), &workgroup_size, NULL);
+  clGetDeviceInfo(device, CL_DEVICE_IMAGE3D_MAX_DEPTH, sizeof(workgroup_size), &workgroup_size, nullptr);
   MITK_INFO("ocl.log")<<"  CL_DEVICE_IMAGE3D_MAX_DEPTH:\t" << workgroup_size;
 
 
   // CL_DEVICE_QUEUE_PROPERTIES
   cl_command_queue_properties queue_properties;
-  clGetDeviceInfo(device, CL_DEVICE_QUEUE_PROPERTIES, sizeof(queue_properties), &queue_properties, NULL);
+  clGetDeviceInfo(device, CL_DEVICE_QUEUE_PROPERTIES, sizeof(queue_properties), &queue_properties, nullptr);
   if( queue_properties & CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE )
     MITK_INFO("ocl.log")<<"  CL_DEVICE_QUEUE_PROPERTIES:\t\t"<< "CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE";
   if( queue_properties & CL_QUEUE_PROFILING_ENABLE )
@@ -211,12 +215,22 @@ void oclPrintDeviceInfo(cl_device_id device)
 
 }
 
+cl_ulong oclGetGlobalMemSize(cl_device_id device)
+{
+  cl_ulong mem_size;
+  clGetDeviceInfo(device, CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(mem_size), &mem_size, nullptr);
+  return mem_size;
+}
+
 std::string GetOclErrorAsString( int _clErr )
 {
-  std::string returnString("CL_SUCCESS\n");
+  std::string returnString("unkown error number: "+std::to_string(_clErr)+" \n");
 
   switch(_clErr)
   {
+  case CL_SUCCESS:
+    returnString =  "CL_SUCCESS\n";
+    break;
   case CL_DEVICE_NOT_FOUND:
     returnString =  "CL_DEVICE_NOT_FOUND\n";
     break;
@@ -361,7 +375,7 @@ std::string GetOclErrorAsString( int _clErr )
 
 void GetOclError(int _clErr)
 {
-  if(_clErr == CL_SUCCESS )
+  if(_clErr == CL_SUCCESS)
     MITK_WARN << "Called GetOclErr() with no error value: [CL_SUCCESS]";
   else
     MITK_ERROR << GetOclErrorAsString(_clErr);
@@ -518,7 +532,7 @@ void oclLogBinary(cl_program clProg, cl_device_id clDev)
 {
   // Grab the number of devices associated with the program
   cl_uint num_devices;
-  clGetProgramInfo(clProg, CL_PROGRAM_NUM_DEVICES, sizeof(cl_uint), &num_devices, NULL);
+  clGetProgramInfo(clProg, CL_PROGRAM_NUM_DEVICES, sizeof(cl_uint), &num_devices, nullptr);
 
   // Grab the device ids
   cl_device_id* devices = (cl_device_id*) malloc(num_devices * sizeof(cl_device_id));
@@ -526,7 +540,7 @@ void oclLogBinary(cl_program clProg, cl_device_id clDev)
 
   // Grab the sizes of the binaries
   size_t* binary_sizes = (size_t*)malloc(num_devices * sizeof(size_t));
-  clGetProgramInfo(clProg, CL_PROGRAM_BINARY_SIZES, num_devices * sizeof(size_t), binary_sizes, NULL);
+  clGetProgramInfo(clProg, CL_PROGRAM_BINARY_SIZES, num_devices * sizeof(size_t), binary_sizes, nullptr);
 
   // Now get the binaries
   char** ptx_code = (char**)malloc(num_devices * sizeof(char*));
@@ -534,7 +548,7 @@ void oclLogBinary(cl_program clProg, cl_device_id clDev)
   {
     ptx_code[i] = (char*)malloc(binary_sizes[i]);
   }
-  clGetProgramInfo(clProg, CL_PROGRAM_BINARIES, 0, ptx_code, NULL);
+  clGetProgramInfo(clProg, CL_PROGRAM_BINARIES, 0, ptx_code, nullptr);
 
   // Find the index of the device of interest
   unsigned int idx = 0;
@@ -563,7 +577,7 @@ void oclLogBuildInfo(cl_program clProg, cl_device_id clDev)
 {
   char cBuildLog[10240];
 
-  clGetProgramBuildInfo(clProg, clDev, CL_PROGRAM_BUILD_LOG, sizeof(cBuildLog), cBuildLog, NULL);
+  clGetProgramBuildInfo(clProg, clDev, CL_PROGRAM_BUILD_LOG, sizeof(cBuildLog), cBuildLog, nullptr);
   MITK_INFO<< "\n Program Build Log: \n -----------------------\n";
   MITK_INFO<< cBuildLog;
 }

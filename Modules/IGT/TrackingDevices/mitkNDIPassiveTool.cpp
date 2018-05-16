@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::NDIPassiveTool::NDIPassiveTool()
-: InternalTrackingTool(),
+: TrackingTool(),
 m_SROMData(nullptr),
 m_SROMDataLength(0),
 m_TrackingPriority(Dynamic),

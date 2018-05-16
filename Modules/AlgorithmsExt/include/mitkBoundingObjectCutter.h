@@ -69,13 +69,13 @@ namespace mitk
 
   protected:
     BoundingObjectCutter();
-    virtual ~BoundingObjectCutter();
+    ~BoundingObjectCutter() override;
 
     virtual const PixelType GetOutputPixelType();
 
-    virtual void GenerateInputRequestedRegion() override;
-    virtual void GenerateOutputInformation() override;
-    virtual void GenerateData() override;
+    void GenerateInputRequestedRegion() override;
+    void GenerateOutputInformation() override;
+    void GenerateData() override;
 
     template <typename TPixel, unsigned int VImageDimension, typename TOutputPixel>
     friend void CutImageWithOutputTypeSelect(itk::Image<TPixel, VImageDimension> *inputItkImage,

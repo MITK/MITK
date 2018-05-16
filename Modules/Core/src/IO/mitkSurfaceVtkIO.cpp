@@ -36,12 +36,12 @@ namespace mitk
 
   vtkSmartPointer<vtkPolyData> SurfaceVtkIO::GetPolyData(unsigned int t, std::string &fileName)
   {
-    const Surface *input = dynamic_cast<const Surface *>(this->GetInput());
+    const auto *input = dynamic_cast<const Surface *>(this->GetInput());
 
     vtkSmartPointer<vtkTransformPolyDataFilter> transformPolyData = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
 
     // surfaces do not have to exist in all timesteps; therefor, only write valid surfaces
-    if (input->GetVtkPolyData(t) == NULL)
+    if (input->GetVtkPolyData(t) == nullptr)
       return vtkSmartPointer<vtkPolyData>();
 
     std::string baseName = this->GetOutputLocation();

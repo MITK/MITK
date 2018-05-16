@@ -65,7 +65,7 @@ namespace mitk
     /*!
     \brief Returns all image data at once.
     */
-    void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray, int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL);
+    void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray, int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=nullptr);
 
   protected:
 

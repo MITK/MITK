@@ -96,7 +96,7 @@ namespace mitk
 
   protected:
     InteractionEvent(BaseRenderer *);
-    virtual ~InteractionEvent();
+    ~InteractionEvent() override;
 
     friend MITKCORE_EXPORT bool operator==(const InteractionEvent &, const InteractionEvent &);
     virtual bool IsEqual(const InteractionEvent &other) const;

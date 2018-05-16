@@ -47,7 +47,7 @@ namespace mitk {
   protected:
 
     USDevicePersistence();
-    virtual ~USDevicePersistence(){}
+    ~USDevicePersistence() override{}
 
     QString USVideoDeviceToString(mitk::USVideoDevice::Pointer d);
     mitk::USVideoDevice::Pointer StringToUSVideoDevice(QString s);

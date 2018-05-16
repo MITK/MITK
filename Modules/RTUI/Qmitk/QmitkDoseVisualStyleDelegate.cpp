@@ -61,7 +61,7 @@ void QmitkDoseVisualStyleDelegate::paint(QPainter *painter, const QStyleOptionVi
   QApplication::style()->drawControl(QStyle::CE_CheckBox,&BtnStyle,painter );
 }
 
-bool QmitkDoseVisualStyleDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
+bool QmitkDoseVisualStyleDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &,
   const QModelIndex &index)
 {
   Q_ASSERT(event);

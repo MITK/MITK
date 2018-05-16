@@ -105,7 +105,7 @@ private:
 public:
 
   ApplicationContainer(ctkPluginContext* context, IExtensionRegistry* extensionRegistry);
-  ~ApplicationContainer();
+  ~ApplicationContainer() override;
 
   void Start();
   void Stop();

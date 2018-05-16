@@ -67,11 +67,11 @@ class MITKDICOMREADER_EXPORT DICOMSortCriterion : public itk::LightObject
   protected:
 
     DICOMSortCriterion( DICOMSortCriterion::Pointer secondaryCriterion );
-    virtual ~DICOMSortCriterion();
+    ~DICOMSortCriterion() override;
 
     bool NextLevelIsLeftBeforeRight(const mitk::DICOMDatasetAccess* left, const mitk::DICOMDatasetAccess* right) const;
 
-    DICOMSortCriterion(const DICOMSortCriterion& other);
+    explicit DICOMSortCriterion(const DICOMSortCriterion& other);
     DICOMSortCriterion& operator=(const DICOMSortCriterion& other);
 
     DICOMSortCriterion::Pointer m_SecondaryCriterion;

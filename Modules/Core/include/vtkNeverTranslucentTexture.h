@@ -54,7 +54,7 @@ class MITKCORE_EXPORT vtkNeverTranslucentTexture : public vtkOpenGLTexture
 {
 public:
   static vtkNeverTranslucentTexture *New();
-  vtkTypeMacro(vtkNeverTranslucentTexture, vtkTexture);
+  vtkTypeMacro(vtkNeverTranslucentTexture, vtkOpenGLTexture);
   void PrintSelf(ostream &os, vtkIndent indent) override;
 
   /**
@@ -66,7 +66,7 @@ public:
     only fully transparent pixels and fully opaque pixels and the
     Interpolate flag is turn off.
   */
-  virtual int IsTranslucent() override;
+  int IsTranslucent() override;
 
 protected:
   vtkNeverTranslucentTexture();
@@ -91,7 +91,7 @@ public:
   vtkNeverTranslucentTextureFactory();
 
   static vtkNeverTranslucentTextureFactory *New();
-  virtual const char *GetVTKSourceVersion() override;
+  const char *GetVTKSourceVersion() override;
   const char *GetDescription() override;
 
 protected:

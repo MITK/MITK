@@ -42,7 +42,7 @@ private:
 public:
   void setUp() override
   {
-    m_Surface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("RenderingTestData/Stanford_bunny.stl"));
+    m_Surface = mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("RenderingTestData/Stanford_bunny.stl"));
 
     // saved results
     CovarianceMatrix m1, m2, m3;
@@ -85,7 +85,7 @@ public:
 
   void tearDown() override
   {
-    m_Surface = NULL;
+    m_Surface = nullptr;
     m_Reference.clear();
   }
 

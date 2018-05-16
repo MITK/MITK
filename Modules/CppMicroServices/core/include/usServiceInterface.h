@@ -191,7 +191,7 @@ struct MakeInterfaceMap
    */
   template<class Impl>
   MakeInterfaceMap(Impl* impl)
-    : m_factory(NULL)
+    : m_factory(nullptr)
     , m_interface1(static_cast<I1*>(impl))
     , m_interface2(static_cast<I2*>(impl))
     , m_interface3(static_cast<I3*>(impl))
@@ -204,13 +204,13 @@ struct MakeInterfaceMap
    */
   MakeInterfaceMap(ServiceFactory* factory)
     : m_factory(factory)
-    , m_interface1(NULL)
-    , m_interface2(NULL)
-    , m_interface3(NULL)
+    , m_interface1(nullptr)
+    , m_interface2(nullptr)
+    , m_interface3(nullptr)
   {
-    if (factory == NULL)
+    if (factory == nullptr)
     {
-      throw ServiceException("The service factory argument must not be NULL.");
+      throw ServiceException("The service factory argument must not be nullptr.");
     }
   }
 
@@ -241,19 +241,19 @@ struct MakeInterfaceMap<I1,I2,void>
 
   template<class Impl>
   MakeInterfaceMap(Impl* impl)
-    : m_factory(NULL)
+    : m_factory(nullptr)
     , m_interface1(static_cast<I1*>(impl))
     , m_interface2(static_cast<I2*>(impl))
   {}
 
   MakeInterfaceMap(ServiceFactory* factory)
     : m_factory(factory)
-    , m_interface1(NULL)
-    , m_interface2(NULL)
+    , m_interface1(nullptr)
+    , m_interface2(nullptr)
   {
-    if (factory == NULL)
+    if (factory == nullptr)
     {
-      throw ServiceException("The service factory argument must not be NULL.");
+      throw ServiceException("The service factory argument must not be nullptr.");
     }
   }
 
@@ -281,17 +281,17 @@ struct MakeInterfaceMap<I1,void,void>
 
   template<class Impl>
   MakeInterfaceMap(Impl* impl)
-    : m_factory(NULL)
+    : m_factory(nullptr)
     , m_interface1(static_cast<I1*>(impl))
   {}
 
   MakeInterfaceMap(ServiceFactory* factory)
     : m_factory(factory)
-    , m_interface1(NULL)
+    , m_interface1(nullptr)
   {
-    if (factory == NULL)
+    if (factory == nullptr)
     {
-      throw ServiceException("The service factory argument must not be NULL.");
+      throw ServiceException("The service factory argument must not be nullptr.");
     }
   }
 
@@ -321,7 +321,7 @@ struct MakeInterfaceMap<void,void,void>;
  *
  * @param map a InterfaceMap instance.
  * @return The service interface pointer for the service interface id of the
- *         \c I1 interface type or NULL if \c map does not contain an entry
+ *         \c I1 interface type or nullptr if \c map does not contain an entry
  *         for the given type.
  *
  * @see MakeInterfaceMap
@@ -334,7 +334,7 @@ I1* ExtractInterface(const InterfaceMap& map)
   {
     return reinterpret_cast<I1*>(iter->second);
   }
-  return NULL;
+  return nullptr;
 }
 
 US_END_NAMESPACE

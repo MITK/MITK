@@ -63,7 +63,7 @@ void QmitkFreeIsoDoseLevelWidget::
   {
     if(!level)
     {
-      mitkThrow() << "Error. Cannot set iso dose level for widget to NULL pointer.";
+      mitkThrow() << "Error. Cannot set iso dose level for widget to nullptr pointer.";
     }
 
     this->m_IsoDoseLevel = level;

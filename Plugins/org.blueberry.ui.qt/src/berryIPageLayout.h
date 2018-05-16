@@ -191,7 +191,7 @@ struct BERRY_UI_QT IPageLayout : public Object
      * A variable used to represent a ratio which has not been specified.
      * @since 2.0
      */
-    static const float NULL_RATIO; // = -2f;
+    static const float nullptr_RATIO; // = -2f;
 
     /**
      * Adds an action set with the given id to this page layout.

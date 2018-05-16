@@ -67,8 +67,8 @@ bool mitk::ClaronInterface::StartTracking()
     //Step 3: Wait for 20 frames
     for (int i=0; i<20; i++)//the first 20 frames are auto-adjustment frames, we ignore them
     {
-      MTC( Cameras_GrabFrame(NULL) ); //Grab a frame (all cameras together)
-      MTC( Markers_ProcessFrame(NULL) ); //Proces the frame(s) to obtain measurements
+      MTC( Cameras_GrabFrame(0) ); //Grab a frame (all cameras together)
+      MTC( Markers_ProcessFrame(0) ); //Proces the frame(s) to obtain measurements
     }
 
     //Step 4: Initialize IdentifiedMarkers and PoseXf
@@ -126,7 +126,7 @@ std::vector<mitk::claronToolHandle> mitk::ClaronInterface::GetAllActiveTools()
   //Those results can be accessed until the next call to Markers_ProcessFrame, when they
   //are updated to reflect the next frame's content.
   //First, we will obtain the collection of the markers that were identified.
-  MTC( Markers_IdentifiedMarkersGet(NULL, IdentifiedMarkers) );
+  MTC( Markers_IdentifiedMarkersGet(0, IdentifiedMarkers) );
 
   //Now we iterate on the identified markers and add them to the returnvalue
   for (int j=1; j<=Collection_Count(IdentifiedMarkers); j++)
@@ -141,8 +141,8 @@ std::vector<mitk::claronToolHandle> mitk::ClaronInterface::GetAllActiveTools()
 
 void mitk::ClaronInterface::GrabFrame()
 {
-  MTC( Cameras_GrabFrame(NULL) ); //Grab a frame
-  MTC( Markers_ProcessFrame(NULL) ); //Process the frame(s)
+  MTC( Cameras_GrabFrame(0) ); //Grab a frame
+  MTC( Markers_ProcessFrame(0) ); //Process the frame(s)
 }
 
 std::vector<double> mitk::ClaronInterface::GetTipPosition(mitk::claronToolHandle c)

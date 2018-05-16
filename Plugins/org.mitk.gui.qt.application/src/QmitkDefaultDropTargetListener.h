@@ -33,7 +33,7 @@ class MITK_QT_APP QmitkDefaultDropTargetListener : public berry::IDropTargetList
 {
 public:
   QmitkDefaultDropTargetListener();
-  virtual ~QmitkDefaultDropTargetListener();
+  ~QmitkDefaultDropTargetListener() override;
 
   Events::Types GetDropTargetEventTypes() const override;
 

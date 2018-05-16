@@ -46,17 +46,17 @@ namespace mitk
     int GetWheelDelta() const;
     void SetWheelDelta(int delta);
 
-    virtual bool IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const override;
+    bool IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const override;
 
   protected:
-    MouseWheelEvent(BaseRenderer * = NULL,
+    MouseWheelEvent(BaseRenderer * = nullptr,
                     const Point2D &mousePosition = Point2D(),
                     MouseButtons buttonStates = NoButton,
                     ModifierKeys modifiers = NoKey,
                     int wheelDelta = 0);
-    virtual ~MouseWheelEvent();
+    ~MouseWheelEvent() override;
 
-    virtual bool IsEqual(const InteractionEvent &) const override;
+    bool IsEqual(const InteractionEvent &) const override;
 
   private:
     int m_WheelDelta;

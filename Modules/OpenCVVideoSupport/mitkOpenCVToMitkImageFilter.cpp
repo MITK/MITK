@@ -46,7 +46,7 @@ namespace mitk{
 
   void OpenCVToMitkImageFilter::SetOpenCVImage(const IplImage* image)
   {
-    const cv::Mat cvMat = cv::Mat(image);
+    const cv::Mat cvMat = cv::cvarrToMat(image, false);
     this->SetOpenCVMat(cvMat);
   }
 
@@ -144,7 +144,9 @@ namespace mitk{
     mitkImage->GetGeometry(timeStep)->SetSpacing(this->GetOutput()->GetGeometry()->GetSpacing());
     mitkImage->GetGeometry(timeStep)->SetOrigin(this->GetOutput()->GetGeometry()->GetOrigin());
     mitkImage->GetGeometry(timeStep)->SetIndexToWorldTransform(this->GetOutput()->GetGeometry()->GetIndexToWorldTransform());
-    mitkImage->SetImportVolume(this->GetOutput()->GetData(), timeStep);
+
+    mitk::ImageReadAccessor readAccess(this->GetOutput());
+    mitkImage->SetImportVolume(readAccess.GetData(), timeStep);
 
     mitkImage->Modified();
     mitkImage->Update();

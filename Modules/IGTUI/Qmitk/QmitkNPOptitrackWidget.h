@@ -33,10 +33,10 @@ class MITKIGTUI_EXPORT QmitkNPOptitrackWidget : public QmitkAbstractTrackingDevi
 public:
   static const std::string VIEW_ID;
 
-  QmitkNPOptitrackWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  ~QmitkNPOptitrackWidget();
+  QmitkNPOptitrackWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+  ~QmitkNPOptitrackWidget() override;
 
-  virtual void Initialize();
+  void Initialize() override;
 
 signals:
 
@@ -52,17 +52,17 @@ private:
 
   void CreateQtPartControl(QWidget *parent);
 protected:
-  virtual QmitkNPOptitrackWidget* Clone(QWidget* parent) const;
+  QmitkNPOptitrackWidget* Clone(QWidget* parent) const override;
 
   std::string m_OptitrackCalibrationFile;
 
   Ui::QmitkNPOptitrackWidget* m_Controls;
 
 public:
-  virtual void ResetOutput();
-  virtual void AddOutput(std::string s);
-  virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice();
+  void ResetOutput() override;
+  void AddOutput(std::string s) override;
+  mitk::TrackingDevice::Pointer GetTrackingDevice() override;
 
-  virtual bool IsDeviceInstalled();
+  bool IsDeviceInstalled() override;
 };
 #endif

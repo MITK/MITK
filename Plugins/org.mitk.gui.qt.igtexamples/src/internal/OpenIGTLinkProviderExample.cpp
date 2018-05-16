@@ -140,12 +140,11 @@ void OpenIGTLinkProviderExample::CreatePipeline()
 
     //create small sphere and use it as surface
     mitk::Surface::Pointer mySphere = mitk::Surface::New();
-    vtkSphereSource *vtkData = vtkSphereSource::New();
+    vtkSmartPointer<vtkSphereSource> vtkData = vtkSmartPointer<vtkSphereSource>::New();
     vtkData->SetRadius(2.0f);
     vtkData->SetCenter(0.0, 0.0, 0.0);
     vtkData->Update();
     mySphere->SetVtkPolyData(vtkData->GetOutput());
-    vtkData->Delete();
     newNode->SetData(mySphere);
 
     this->GetDataStorage()->Add(newNode);
@@ -207,13 +206,13 @@ void OpenIGTLinkProviderExample::OnOpenFile(){
 
   // FIXME Filter for correct files and use correct Reader
   QString filter = tr("NavigationData File (*.csv *.xml)");
-  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Open NavigationData Set"), "", filter);
+  QString fileName = QFileDialog::getOpenFileName(nullptr, tr("Open NavigationData Set"), "", filter);
 
   if ( fileName.isNull() ) { return; } // user pressed cancel
 
   try
   {
-    m_NavDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(fileName.toStdString()).GetPointer());
+    m_NavDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(fileName.toStdString())[0].GetPointer());
   }
   catch ( const mitk::Exception &e )
   {
@@ -256,7 +255,7 @@ void OpenIGTLinkProviderExample::ResizeBoundingBox()
 {
   // get all nodes
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetAll();
-  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
+  auto bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs)->Clone();
 
   if (bounds.IsNull())
   {

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITK_COLLECTION_WRITER_H
 #define MITK_COLLECTION_WRITER_H
 
-#include "mitkCommon.h"
+//#include "mitkCommon.h"
 #include "mitkDataCollection.h"
 #include "mitkCollectionReader.h"
 #include <MitkDataCollectionExports.h>

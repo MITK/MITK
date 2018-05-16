@@ -19,10 +19,11 @@
 
 #include "mitkRenderWindowBase.h"
 
-#include "QVTKWidget.h"
 #include "QmitkRenderWindowMenu.h"
 #include <MitkQtWidgetsExports.h>
+
 #include <vtkGenericOpenGLRenderWindow.h>
+#include <QVTKOpenGLWidget.h>
 
 #include "mitkBaseRenderer.h"
 #include "mitkInteractionEventConst.h"
@@ -36,18 +37,18 @@ class QInputEvent;
  * \ingroup QmitkModule
  * \brief MITK implementation of the QVTKWidget
  */
-class MITKQTWIDGETS_EXPORT QmitkRenderWindow : public QVTKWidget, public mitk::RenderWindowBase
+class MITKQTWIDGETS_EXPORT QmitkRenderWindow : public QVTKOpenGLWidget, public mitk::RenderWindowBase
 {
   Q_OBJECT
 
 public:
   QmitkRenderWindow(
-    QWidget *parent = 0,
-    QString name = "unnamed renderwindow",
-    mitk::VtkPropRenderer *renderer = NULL,
-    mitk::RenderingManager *renderingManager = NULL,
+    QWidget *parent = nullptr,
+    const QString &name = "unnamed renderwindow",
+    mitk::VtkPropRenderer *renderer = nullptr,
+    mitk::RenderingManager *renderingManager = nullptr,
     mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
-  virtual ~QmitkRenderWindow();
+  ~QmitkRenderWindow() override;
 
   /**
    * \brief Whether Qt events should be passed to parent (default: true)
@@ -79,46 +80,48 @@ public:
   void HideRenderWindowMenu();
 
   // Activate or Deactivate MenuWidget.
-  void ActivateMenuWidget(bool state, QmitkStdMultiWidget *stdMultiWidget = 0);
+  void ActivateMenuWidget(bool state, QmitkStdMultiWidget *stdMultiWidget = nullptr);
 
   bool GetActivateMenuWidgetFlag() { return m_MenuWidgetActivated; }
   // Get it from the QVTKWidget parent
-  virtual vtkRenderWindow *GetVtkRenderWindow() override { return GetRenderWindow(); }
-  virtual vtkRenderWindowInteractor *GetVtkRenderWindowInteractor() override { return NULL; }
+  vtkRenderWindow *GetVtkRenderWindow() override { return GetRenderWindow(); }
+  vtkRenderWindowInteractor *GetVtkRenderWindowInteractor() override { return nullptr; }
   void FullScreenMode(bool state);
 
 protected:
   // overloaded move handler
-  virtual void moveEvent(QMoveEvent *event) override;
+  void moveEvent(QMoveEvent *event) override;
   // overloaded show handler
   void showEvent(QShowEvent *event) override;
-  // overloaded paint handler
-  virtual void paintEvent(QPaintEvent *event) override;
   // overloaded mouse press handler
-  virtual void mousePressEvent(QMouseEvent *event) override;
+  void mousePressEvent(QMouseEvent *event) override;
   // overloaded mouse double-click handler
-  virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
   // overloaded mouse move handler
-  virtual void mouseMoveEvent(QMouseEvent *event) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
   // overloaded mouse release handler
-  virtual void mouseReleaseEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
   // overloaded key press handler
-  virtual void keyPressEvent(QKeyEvent *event) override;
+  void keyPressEvent(QKeyEvent *event) override;
   // overloaded enter handler
-  virtual void enterEvent(QEvent *) override;
+  void enterEvent(QEvent *) override;
   // overloaded leave handler
-  virtual void leaveEvent(QEvent *) override;
+  void leaveEvent(QEvent *) override;
+
+  // Overloaded resize handler, see decs in QVTKOpenGLWidget.
+  // Basically, we have to ensure the VTK rendering is updated for each change in window size.
+  void resizeGL(int w, int h) Q_DECL_OVERRIDE;
 
   /// \brief Simply says we accept the event type.
-  virtual void dragEnterEvent(QDragEnterEvent *event) override;
+  void dragEnterEvent(QDragEnterEvent *event) override;
 
   /// \brief If the dropped type is application/x-mitk-datanodes we process the request by converting to mitk::DataNode
   /// pointers and emitting the NodesDropped signal.
-  virtual void dropEvent(QDropEvent *event) override;
+  void dropEvent(QDropEvent *event) override;
 
 #ifndef QT_NO_WHEELEVENT
   // overload wheel mouse event
-  virtual void wheelEvent(QWheelEvent *) override;
+  void wheelEvent(QWheelEvent *) override;
 #endif
 
   void AdjustRenderWindowMenuVisibility(const QPoint &pos);
@@ -162,6 +165,8 @@ private:
   bool m_MenuWidgetActivated;
 
   unsigned int m_LayoutIndex;
+
+  vtkSmartPointer<vtkGenericOpenGLRenderWindow> m_InternalRenderWindow;
 };
 
 #endif

@@ -64,7 +64,7 @@ QmitkMorphologicalOperationsWidget::~QmitkMorphologicalOperationsWidget()
 {
 }
 
-void QmitkMorphologicalOperationsWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode* selection)
+void QmitkMorphologicalOperationsWidget::OnSelectionChanged(unsigned int, const mitk::DataNode*)
 {
   QmitkDataSelectionWidget* m_DataSelectionWidget = m_Controls.m_DataSelectionWidget;
   mitk::DataNode::Pointer node = m_DataSelectionWidget->GetSelection(0);

@@ -26,8 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMultiThreader.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkTestingMacros.h>
-#include <stdlib.h>
-#include <time.h>
+#include <cstdlib>
+#include <ctime>
 
 struct ThreadData
 {
@@ -42,20 +42,20 @@ itk::SimpleFastMutexLock testMutex;
 ITK_THREAD_RETURN_TYPE ThreadMethod(void *data)
 {
   /* extract data pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct *pInfo = (struct itk::MultiThreader::ThreadInfoStruct *)data;
+  auto *pInfo = (struct itk::MultiThreader::ThreadInfoStruct *)data;
 
   // some data validity checking
-  if (pInfo == NULL)
+  if (pInfo == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
-  if (pInfo->UserData == NULL)
+  if (pInfo->UserData == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
 
   // obtain user data for processing
-  ThreadData *threadData = (ThreadData *)pInfo->UserData;
+  auto *threadData = (ThreadData *)pInfo->UserData;
 
   srand(pInfo->ThreadID);
 
@@ -174,10 +174,10 @@ int mitkImageAccessorTest(int argc, char *argv[])
     std::cout << "no file specified [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  mitk::Image::Pointer image = NULL;
+  mitk::Image::Pointer image = nullptr;
   try
   {
-    image = mitk::IOUtil::LoadImage(std::string(argv[1]));
+    image = mitk::IOUtil::Load<mitk::Image>(std::string(argv[1]));
 
     if (image.IsNull())
     {
@@ -203,7 +203,7 @@ int mitkImageAccessorTest(int argc, char *argv[])
   try
   {
     mitk::ImageWriteAccessor first(image);
-    mitk::ImageReadAccessor second(image, NULL, mitk::ImageAccessorBase::IgnoreLock);
+    mitk::ImageReadAccessor second(image, nullptr, mitk::ImageAccessorBase::IgnoreLock);
     MITK_TEST_CONDITION_REQUIRED(true, "Testing the option flag \"IgnoreLock\" in ReadAccessor");
   }
   catch (const mitk::Exception & /*e*/)
@@ -222,7 +222,7 @@ int mitkImageAccessorTest(int argc, char *argv[])
   itk::Barrier::Pointer barrier = itk::Barrier::New();
   barrier->Initialize(noOfThreads + 1); // add one for we stop the base thread when the worker threads are processing
 
-  ThreadData *threadData = new ThreadData;
+  auto *threadData = new ThreadData;
   threadData->m_Barrier = barrier;
   threadData->m_NoOfThreads = noOfThreads;
   threadData->data = image;

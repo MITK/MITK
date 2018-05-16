@@ -122,12 +122,12 @@ namespace mitk
 
     LabelGroup::Label *GetLabelByName(LabelGroup *labelGroup, std::string labelName);
 
-    virtual std::string GetValueAsString() const override;
+    std::string GetValueAsString() const override;
 
   protected:
     TubeGraphProperty();
     TubeGraphProperty(const TubeGraphProperty &other);
-    virtual ~TubeGraphProperty();
+    ~TubeGraphProperty() override;
 
   private:
     std::vector<TubeDescriptorType> m_ActiveTubes;
@@ -140,9 +140,9 @@ namespace mitk
     // purposely not implemented
     TubeGraphProperty &operator=(const TubeGraphProperty &);
 
-    virtual bool IsEqual(const BaseProperty &property) const override;
-    virtual bool Assign(const BaseProperty &property) override;
-    virtual itk::LightObject::Pointer InternalClone() const override;
+    bool IsEqual(const BaseProperty &property) const override;
+    bool Assign(const BaseProperty &property) override;
+    itk::LightObject::Pointer InternalClone() const override;
   };
 
 } // namespace mitk

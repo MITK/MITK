@@ -3,5 +3,4 @@ MITK_CREATE_MODULE(
     PUBLIC include
     PRIVATE src
   DEPENDS MitkCore
-  WARNINGS_AS_ERRORS
 )

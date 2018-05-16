@@ -44,8 +44,8 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPointListViewWidget : public QListWidget
 signals:
   void PointSelectionChanged(); ///< this signal is emmitted, if the selection of a point in the pointset is changed
 public:
-  QmitkPointListViewWidget(QWidget *parent = 0);
-  ~QmitkPointListViewWidget();
+  QmitkPointListViewWidget(QWidget *parent = nullptr);
+  ~QmitkPointListViewWidget() override;
 
   /// assign a point set for observation
   void SetPointSet(mitk::PointSet *pointSet);
@@ -66,10 +66,10 @@ public:
   int GetTimeStep() const;
 
   /// observer for point set "modified" events
-  void OnPointSetChanged(const itk::Object * /*obj*/);
+  void OnPointSetChanged();
 
   /// observer for point set "delete" events
-  void OnPointSetDeleted(const itk::Object * /*obj*/);
+  void OnPointSetDeleted();
 
 protected slots:
   ///
@@ -89,6 +89,10 @@ protected:
 
 protected:
   mitk::WeakPointer<mitk::PointSet> m_PointSet;
+
+  unsigned long m_PointSetDeletedTag;
+  unsigned long m_PointSetModifiedTag;
+
   int m_TimeStep;
 
   bool m_SelfCall;

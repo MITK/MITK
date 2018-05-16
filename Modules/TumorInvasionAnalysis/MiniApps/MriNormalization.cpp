@@ -59,10 +59,10 @@ int main(int argc, char *argv[])
   }
 
   std::string outFile = us::any_cast<string>(parsedArgs["output"]);
-  mitk::Image::Pointer inputFile = mitk::IOUtil::LoadImage(us::any_cast<string>(parsedArgs["input"]));
-  mitk::Image::Pointer maxMask = mitk::IOUtil::LoadImage(us::any_cast<string>(parsedArgs["maxMask"]));
-  mitk::Image::Pointer minMask = mitk::IOUtil::LoadImage(us::any_cast<string>(parsedArgs["minMask"]));
-  mitk::Image::Pointer excludeMask = mitk::IOUtil::LoadImage(us::any_cast<string>(parsedArgs["excludeMask"]));
+  mitk::Image::Pointer inputFile = mitk::IOUtil::Load<mitk::Image>(us::any_cast<string>(parsedArgs["input"]));
+  mitk::Image::Pointer maxMask = mitk::IOUtil::Load<mitk::Image>(us::any_cast<string>(parsedArgs["maxMask"]));
+  mitk::Image::Pointer minMask = mitk::IOUtil::Load<mitk::Image>(us::any_cast<string>(parsedArgs["minMask"]));
+  mitk::Image::Pointer excludeMask = mitk::IOUtil::Load<mitk::Image>(us::any_cast<string>(parsedArgs["excludeMask"]));
 
   SeedImage::Pointer itkMaxImage = SeedImage::New();
   SeedImage::Pointer itkMinImage = SeedImage::New();

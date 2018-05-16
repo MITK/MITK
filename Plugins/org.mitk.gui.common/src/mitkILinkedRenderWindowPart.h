@@ -32,7 +32,7 @@ namespace mitk {
  */
 struct MITK_GUI_COMMON_PLUGIN ILinkedRenderWindowPart : public virtual IRenderWindowPart {
 
-  ~ILinkedRenderWindowPart();
+  ~ILinkedRenderWindowPart() override;
 
 
   /**

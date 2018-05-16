@@ -54,7 +54,7 @@ public:
 
   itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    QmitkAdaptiveRegionGrowingToolGUI(QWidget *parent = 0);
+    QmitkAdaptiveRegionGrowingToolGUI(QWidget *parent = nullptr);
 
   /** \brief Method to create the connections for the component. This Method is obligatory even if no connections is
    * needed*/
@@ -173,7 +173,7 @@ protected:
   mitk::AdaptiveRegionGrowingTool::Pointer m_RegionGrow3DTool;
 
   /** \brief Destructor. */
-  virtual ~QmitkAdaptiveRegionGrowingToolGUI();
+  ~QmitkAdaptiveRegionGrowingToolGUI() override;
 
   // Pointer to the main widget to be able to reach the renderer
   QmitkStdMultiWidget *m_MultiWidget;

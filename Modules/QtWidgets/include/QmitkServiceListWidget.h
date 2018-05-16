@@ -66,8 +66,8 @@ private:
 public:
   static const std::string VIEW_ID;
 
-  QmitkServiceListWidget(QWidget *p = 0, Qt::WindowFlags f1 = 0);
-  virtual ~QmitkServiceListWidget();
+  QmitkServiceListWidget(QWidget *p = nullptr, Qt::WindowFlags f1 = nullptr);
+  ~QmitkServiceListWidget() override;
 
   /** \brief Set if the first entry of the list should be selected automatically if no entry was selected before. */
   void SetAutomaticallySelectFirstEntry(bool automaticallySelectFirstEntry);
@@ -107,10 +107,10 @@ public:
   template <class T>
   std::vector<T *> GetAllServices()
   {
-    // if (this->m_Controls->m_ServiceList->currentRow()==-1) return NULL;
+    // if (this->m_Controls->m_ServiceList->currentRow()==-1) return nullptr;
     std::vector<us::ServiceReferenceU> refs = GetAllServiceReferences();
     std::vector<T *> result;
-    for (int i = 0; i < refs.size(); i++)
+    for (std::size_t i = 0; i < refs.size(); i++)
     {
       result.push_back(m_Context->GetService(us::ServiceReference<T>(refs[i])));
     }
@@ -123,13 +123,13 @@ public:
   *  Make sure you pass the appropriate type, or else this call will fail.
   *  Usually, you will pass the class itself, not the SmartPointer, but the function returns a pointer. Example:
   *  \verbatim mitk::USDevice::Pointer device = GetSelectedService<mitk::USDevice>(); \endverbatim
-  *  @return Returns the current selected device. Returns NULL if no device is selected.
+  *  @return Returns the current selected device. Returns nullptr if no device is selected.
   */
   template <class T>
   T *GetSelectedService()
   {
     if (this->m_Controls->m_ServiceList->currentRow() == -1)
-      return NULL;
+      return nullptr;
     us::ServiceReferenceU ref = GetServiceForListItem(this->m_Controls->m_ServiceList->currentItem());
     return (m_Context->GetService(us::ServiceReference<T>(ref)));
   }

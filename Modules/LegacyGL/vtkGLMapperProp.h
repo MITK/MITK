@@ -49,7 +49,7 @@ public:
 
 protected:
   vtkGLMapperProp();
-  virtual ~vtkGLMapperProp();
+  ~vtkGLMapperProp() override;
 
   mitk::GLMapper *m_WrappedGLMapper;
   mitk::BaseRenderer *m_BaseRenderer;

@@ -45,7 +45,7 @@ namespace mitk
        * @param idx the index of the output for which an object should be created
        * @returns the new object
        */
-    virtual itk::DataObject::Pointer MakeOutput(DataObjectPointerArraySizeType idx) override;
+    itk::DataObject::Pointer MakeOutput(DataObjectPointerArraySizeType idx) override;
 
     /**
        * This is a default implementation to make sure we have something.
@@ -53,13 +53,13 @@ namespace mitk
        * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
        * virtual.
        */
-    virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
+    itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
 
-    virtual void GenerateInputRequestedRegion() override;
+    void GenerateInputRequestedRegion() override;
 
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     const mitk::ContourModelSet *GetInput(void);
 
@@ -77,7 +77,7 @@ namespace mitk
   protected:
     ContourModelSetToImageFilter();
 
-    virtual ~ContourModelSetToImageFilter();
+    ~ContourModelSetToImageFilter() override;
 
     /**
        * @brief Initializes the volume of the output image with zeros

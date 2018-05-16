@@ -51,7 +51,7 @@ class BERRY_UI_QT WorkbenchPart : public QObject,
 public:
   berryObjectMacro(WorkbenchPart, QObject, IWorkbenchPart, IExecutableExtension)
 
-  ~WorkbenchPart();
+  ~WorkbenchPart() override;
 
 private:
   QString m_Title;
@@ -199,7 +199,7 @@ public:
    * @param parent the parent control
    * @see IWorkbenchPart
    */
-  virtual void CreatePartControl(QWidget* parent) override = 0;
+  void CreatePartControl(QWidget* parent) override = 0;
 
   /* (non-Javadoc)
      * Asks this part to take focus within the workbench.
@@ -210,7 +210,7 @@ public:
      *
      * @see IWorkbenchPart
      */
-  virtual void SetFocus() override = 0;
+  void SetFocus() override = 0;
 
   /*
    * Method declared on IWorkbenchPart.

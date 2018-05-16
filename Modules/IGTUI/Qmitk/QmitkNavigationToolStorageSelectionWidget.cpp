@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkNavigationToolStorageSelectionWidget::QmitkNavigationToolStorageSelectionWidget(QWidget* parent, Qt::WindowFlags f)
 : QWidget(parent, f)
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
   CreateConnections();
 
@@ -53,6 +53,8 @@ void QmitkNavigationToolStorageSelectionWidget::CreateConnections()
   if ( m_Controls )
   {
     connect( (QObject*)(m_Controls->m_ServiceListWidget), SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(NavigationToolStorageSelected(us::ServiceReferenceU)) );
+    connect((QObject*)(m_Controls->m_ServiceListWidget), SIGNAL(ServiceModified(us::ServiceReferenceU)), this, SLOT(NavigationToolStorageSelected(us::ServiceReferenceU)));
+
 
   }
 
@@ -66,7 +68,7 @@ void QmitkNavigationToolStorageSelectionWidget::NavigationToolStorageSelected(us
     if (!s) //nothing selected
       {
         //reset everything
-        m_CurrentStorage = NULL;
+        m_CurrentStorage = nullptr;
         emit NavigationToolStorageSelected(m_CurrentStorage);
         return;
       }

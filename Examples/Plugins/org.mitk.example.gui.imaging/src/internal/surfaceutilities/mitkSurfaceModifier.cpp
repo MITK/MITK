@@ -57,7 +57,7 @@ mitk::Point3D mitk::SurfaceModifier::PerturbePointAlongAxis(mitk::Point3D point,
 }
 
 mitk::Point3D mitk::SurfaceModifier::PerturbePoint(
-  mitk::Point3D point, double varianceX, double varianceY, double varianceZ, double maxNoiseVectorLenght)
+  mitk::Point3D point, double varianceX, double varianceY, double varianceZ)
 {
   if (m_myRandomGenerator.IsNull())
     m_myRandomGenerator = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
@@ -76,7 +76,7 @@ bool mitk::SurfaceModifier::TransformSurface(mitk::Surface::Pointer surface,
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   points->ShallowCopy(surface->GetVtkPolyData()->GetPoints());
 
-  for (unsigned int i = 0; i < points->GetNumberOfPoints(); i++)
+  for (vtkIdType i = 0; i < points->GetNumberOfPoints(); i++)
   {
     double p[3];
     points->GetPoint(i, p);
@@ -143,7 +143,7 @@ bool mitk::SurfaceModifier::AddOutlierToSurface(
 {
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   points->ShallowCopy(surface->GetVtkPolyData()->GetPoints());
-  for (unsigned int i = 0; i < points->GetNumberOfPoints(); i++)
+  for (vtkIdType i = 0; i < points->GetNumberOfPoints(); i++)
   {
     double p[3];
     points->GetPoint(i, p);
@@ -163,11 +163,11 @@ bool mitk::SurfaceModifier::AddOutlierToSurface(
 }
 
 bool mitk::SurfaceModifier::PerturbeSurface(
-  mitk::Surface::Pointer surface, double varianceX, double varianceY, double varianceZ, double maxNoiseVectorLenght)
+  mitk::Surface::Pointer surface, double varianceX, double varianceY, double varianceZ, double)
 {
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   points->ShallowCopy(surface->GetVtkPolyData()->GetPoints());
-  for (unsigned int i = 0; i < points->GetNumberOfPoints(); i++)
+  for (vtkIdType i = 0; i < points->GetNumberOfPoints(); i++)
   {
     double p[3];
     points->GetPoint(i, p);
@@ -175,7 +175,7 @@ bool mitk::SurfaceModifier::PerturbeSurface(
     point[0] = p[0];
     point[1] = p[1];
     point[2] = p[2];
-    point = PerturbePoint(point, varianceX, varianceY, varianceZ, maxNoiseVectorLenght);
+    point = PerturbePoint(point, varianceX, varianceY, varianceZ);
     p[0] = point[0];
     p[1] = point[1];
     p[2] = point[2];

@@ -89,7 +89,7 @@ public:
 
     mitk::CastToItkImage(m_TestImage, diffImage);
 
-    CPPUNIT_ASSERT_MESSAGE("Casting scalar double (MITK) image to scalar float tensor (ITK). Result shouldn't be NULL.",
+    CPPUNIT_ASSERT_MESSAGE("Casting scalar double (MITK) image to scalar float tensor (ITK). Result shouldn't be nullptr.",
                            diffImage.IsNotNull());
   }
 
@@ -111,7 +111,7 @@ public:
 
     mitk::CastToItkImage(m_TestImage, diffImage);
     MITK_TEST_CONDITION_REQUIRED(diffImage.IsNotNull(),
-                                 "Casting float tensor (MITK) image to float tensor (ITK). Result shouldn't be NULL");
+                                 "Casting float tensor (MITK) image to float tensor (ITK). Result shouldn't be nullptr");
 
     mitk::Image::Pointer mitkImageAfterCast = mitk::ImportItkImage(diffImage);
     MITK_ASSERT_EQUAL(mitkImageAfterCast, m_TestImage, "Same type, images shoul be equal.");
@@ -131,7 +131,7 @@ public:
     ItkImageType::Pointer itkImage = ItkImageType::New();
 
     std::string m_ImagePath = GetTestDataFilePath("Pic3D.nrrd");
-    mitk::Image::Pointer testDataImage = mitk::IOUtil::LoadImage(m_ImagePath);
+    mitk::Image::Pointer testDataImage = mitk::IOUtil::Load<mitk::Image>(m_ImagePath);
 
     // modify ITK image
     itk::Matrix<double, 3, 3> dir = itkImage->GetDirection();
@@ -148,13 +148,13 @@ public:
   {
     itk::Image<short, 3>::Pointer itkImage;
     std::string m_ImagePath = GetTestDataFilePath("Pic3D.nrrd");
-    mitk::Image::Pointer testDataImage = mitk::IOUtil::LoadImage(m_ImagePath);
+    mitk::Image::Pointer testDataImage = mitk::IOUtil::Load<mitk::Image>(m_ImagePath);
 
     mitk::CastToItkImage(testDataImage, itkImage);
     mitk::Image::Pointer mitkImageAfterCast = mitk::ImportItkImage(itkImage);
 
     // dereference itk image
-    itkImage = 0;
+    itkImage = nullptr;
 
     MITK_ASSERT_EQUAL(mitkImageAfterCast, testDataImage, "Cast with test data followed by import produces same images");
   }

@@ -61,14 +61,14 @@ public:
 
 protected:
   vtkMitkThickSlicesFilter();
-  ~vtkMitkThickSlicesFilter(){};
+  ~vtkMitkThickSlicesFilter() override{};
 
   int HandleBoundaries;
   int Dimensionality;
 
-  virtual int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
-  virtual int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
 
   void ThreadedRequestData(vtkInformation *,
                            vtkInformationVector **,

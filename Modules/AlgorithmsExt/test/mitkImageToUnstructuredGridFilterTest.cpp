@@ -38,7 +38,7 @@ public:
    * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used
    * members for a new test case. (If the members are not used in a test, the method does not need to be called).
    */
-  void setUp() override { m_BallImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("BallBinary30x30x30.nrrd")); }
+  void setUp() override { m_BallImage = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("BallBinary30x30x30.nrrd")); }
   void testImageToUnstructuredGridFilterInitialization()
   {
     mitk::ImageToUnstructuredGridFilter::Pointer testFilter = mitk::ImageToUnstructuredGridFilter::New();
@@ -58,7 +58,7 @@ public:
     mitk::ImageToUnstructuredGridFilter::Pointer testFilter = mitk::ImageToUnstructuredGridFilter::New();
     testFilter->SetInput(m_BallImage);
     testFilter->Update();
-    CPPUNIT_ASSERT_MESSAGE("Testing UnstructuredGrid generation!", testFilter->GetOutput() != NULL);
+    CPPUNIT_ASSERT_MESSAGE("Testing UnstructuredGrid generation!", testFilter->GetOutput() != nullptr);
   }
 
   void testThreshold()

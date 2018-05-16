@@ -41,8 +41,8 @@ namespace mitk
 
     us::ModuleContext *m_Context;
 
-    virtual TrackedType AddingService(const ServiceReferenceType &reference) override;
-    virtual void RemovedService(const ServiceReferenceType &reference, TrackedType tracked) override;
+    TrackedType AddingService(const ServiceReferenceType &reference) override;
+    void RemovedService(const ServiceReferenceType &reference, TrackedType tracked) override;
 
   private slots:
     void SessionOpened();

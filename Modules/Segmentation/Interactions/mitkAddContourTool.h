@@ -52,15 +52,15 @@ namespace mitk
     mitkClassMacro(AddContourTool, ContourTool);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual const char **GetXPM() const override;
-    virtual us::ModuleResource GetCursorIconResource() const override;
+      const char **GetXPM() const override;
+    us::ModuleResource GetCursorIconResource() const override;
     us::ModuleResource GetIconResource() const override;
 
-    virtual const char *GetName() const override;
+    const char *GetName() const override;
 
   protected:
     AddContourTool(); // purposely hidden
-    virtual ~AddContourTool();
+    ~AddContourTool() override;
   };
 
 } // namespace

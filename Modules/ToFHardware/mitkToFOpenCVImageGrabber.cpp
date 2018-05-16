@@ -29,12 +29,12 @@ namespace mitk
 {
   ToFOpenCVImageGrabber::ToFOpenCVImageGrabber()
   {
-    m_CurrentOpenCVIntensityImage = NULL;
-    m_CurrentOpenCVAmplitudeImage = NULL;
-    m_CurrentOpenCVDistanceImage = NULL;
+    m_CurrentOpenCVIntensityImage = nullptr;
+    m_CurrentOpenCVAmplitudeImage = nullptr;
+    m_CurrentOpenCVDistanceImage = nullptr;
     m_ImageType = 0;
     m_ImageDepth = IPL_DEPTH_32F;
-    m_ImageGrabber = NULL;
+    m_ImageGrabber = nullptr;
   }
 
   ToFOpenCVImageGrabber::~ToFOpenCVImageGrabber()
@@ -78,24 +78,21 @@ namespace mitk
         ImageReadAccessor currentAmplAcc(currentMITKAmplitudeImage, currentMITKAmplitudeImage->GetSliceData(0, 0, 0));
         float* amplitudeFloatData = (float*) currentAmplAcc.GetData();
         memcpy(m_CurrentOpenCVAmplitudeImage->imageData,(unsigned char*)amplitudeFloatData,numOfPixel*sizeof(float));
-        cv::Mat image(m_CurrentOpenCVAmplitudeImage);
-        return image;
+        return cv::cvarrToMat(m_CurrentOpenCVAmplitudeImage, false);
       }
       else if (m_ImageType==2)
       {
         ImageReadAccessor currentIntenAcc(currentMITKIntensityImage, currentMITKIntensityImage->GetSliceData(0, 0, 0));
         float* intensityFloatData = (float*) currentIntenAcc.GetData();
         memcpy(m_CurrentOpenCVIntensityImage->imageData,(unsigned char*)intensityFloatData,numOfPixel*sizeof(float));
-        cv::Mat image(m_CurrentOpenCVIntensityImage);
-        return image;
+        return cv::cvarrToMat(m_CurrentOpenCVIntensityImage, false);
       }
       else
       {
         ImageReadAccessor currentDistAcc(currentMITKDistanceImage, currentMITKDistanceImage->GetSliceData(0, 0, 0));
         float* distanceFloatData = (float*) currentDistAcc.GetData();
         memcpy(m_CurrentOpenCVDistanceImage->imageData,(unsigned char*)distanceFloatData,numOfPixel*sizeof(float));
-        cv::Mat image(m_CurrentOpenCVDistanceImage);
-        return image;
+        return cv::cvarrToMat(m_CurrentOpenCVDistanceImage, false);
       }
     }
     else
@@ -103,20 +100,17 @@ namespace mitk
       if (m_ImageType==1)
       {
         this->MapScalars(currentMITKAmplitudeImage, m_CurrentOpenCVAmplitudeImage);
-        cv::Mat image(m_CurrentOpenCVAmplitudeImage);
-        return image;
+        return cv::cvarrToMat(m_CurrentOpenCVAmplitudeImage, false);
       }
       else if (m_ImageType==2)
       {
         this->MapScalars(currentMITKIntensityImage, m_CurrentOpenCVIntensityImage);
-        cv::Mat image(m_CurrentOpenCVIntensityImage);
-        return image;
+        return cv::cvarrToMat(m_CurrentOpenCVIntensityImage, false);
       }
       else
       {
         this->MapScalars(currentMITKDistanceImage, m_CurrentOpenCVDistanceImage);
-        cv::Mat image(m_CurrentOpenCVDistanceImage);
-        return image;
+        return cv::cvarrToMat(m_CurrentOpenCVDistanceImage, false);
       }
     }
   }

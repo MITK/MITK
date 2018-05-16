@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 
 mitk::NavigationDataSliceVisualization::NavigationDataSliceVisualization() : mitk::NavigationDataToNavigationDataFilter(),
-  m_Renderer(NULL),
+  m_Renderer(nullptr),
   m_ViewDirection(Axial)
 {
   m_TipOffset[0] = 0.0f;
@@ -114,8 +114,8 @@ void mitk::NavigationDataSliceVisualization::GenerateData()
       const int slicingPlaneXAxis = AxialOblique == m_ViewDirection ? 0 : 2;
 
       // The column 0 is the slicing plane's x-axis, column 1 is the slicing plane's y-axis
-      const mitk::Geometry2D::TransformType::MatrixType &m =
-            m_Renderer->GetCurrentWorldGeometry2D()->GetIndexToWorldTransform()->GetMatrix();
+      const mitk::PlaneGeometry::TransformType::MatrixType &m =
+            m_Renderer->GetCurrentWorldPlaneGeometry()->GetIndexToWorldTransform()->GetMatrix();
 
       // Rotate the tool trajectory vector into world coordinate frame (assuming
       // NavigationData has passed through a NavigationDataTransformFilter to
@@ -168,8 +168,8 @@ void mitk::NavigationDataSliceVisualization::GenerateData()
 
       // The second column of the Index-to-World matrix is the positive y-axis
       // of the current slicing plane in world coordinates.
-      const mitk::Geometry2D::TransformType::MatrixType &m =
-            m_Renderer->GetCurrentWorldGeometry2D()->GetIndexToWorldTransform()->GetMatrix();
+      const mitk::PlaneGeometry::TransformType::MatrixType &m =
+            m_Renderer->GetCurrentWorldPlaneGeometry()->GetIndexToWorldTransform()->GetMatrix();
       mitk::Vector3D currentSlicingPlaneUpVector;
       mitk::FillVector3D(currentSlicingPlaneUpVector, m[0][1], m[1][1], m[2][1]);
       mitk::Vector3D worldUpVector = m_WorldVerticalVector;

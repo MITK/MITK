@@ -38,7 +38,7 @@ mitk::TrackingDeviceSourceConfigurator::TrackingDeviceSourceConfigurator(mitk::N
 if (NavigationTools.IsNotNull())
   {
   m_NavigationTools = mitk::NavigationToolStorage::New();
-  for (int i=0; i<NavigationTools->GetToolCount(); i++)
+  for (unsigned int i=0; i<NavigationTools->GetToolCount(); i++)
       {
       m_NavigationTools->AddTool(NavigationTools->GetTool(i));
       }
@@ -63,17 +63,17 @@ bool mitk::TrackingDeviceSourceConfigurator::IsCreateTrackingDeviceSourcePossibl
 {
 if (m_NavigationTools.IsNull())
   {
-  m_ErrorMessage = "NavigationToolStorage is NULL!";
+  m_ErrorMessage = "NavigationToolStorage is nullptr!";
   return false;
   }
 else if (m_TrackingDevice.IsNull())
   {
-  m_ErrorMessage = "TrackingDevice is NULL!";
+  m_ErrorMessage = "TrackingDevice is nullptr!";
   return false;
   }
 else
   {
-  for (int i=0; i<m_NavigationTools->GetToolCount(); i++)
+  for (unsigned int i=0; i<m_NavigationTools->GetToolCount(); i++)
     {
     if (m_NavigationTools->GetTool(i)->GetTrackingDeviceType() != m_TrackingDevice->GetType())
       {
@@ -94,7 +94,7 @@ return this->CreateTrackingDeviceSource(dummy);
 
 mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::CreateTrackingDeviceSource(mitk::NavigationDataObjectVisualizationFilter::Pointer &visualizationFilter)
 {
-  if (!this->IsCreateTrackingDeviceSourcePossible()) {MITK_WARN << "Cannot create tracking decive: " << m_ErrorMessage; return NULL;}
+  if (!this->IsCreateTrackingDeviceSourcePossible()) {MITK_WARN << "Cannot create tracking decive: " << m_ErrorMessage; return nullptr;}
 
   mitk::TrackingDeviceSource::Pointer returnValue;
 
@@ -114,11 +114,11 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
       CreateTrackingDeviceSource(m_TrackingDevice,m_NavigationTools, &m_ErrorMessage, &m_ToolCorrespondencesInToolStorage);
 
   //TODO: insert other tracking systems?
-  if (returnValue.IsNull()) {MITK_WARN << "Cannot create tracking decive: " << m_ErrorMessage; return NULL;}
+  if (returnValue.IsNull()) {MITK_WARN << "Cannot create tracking decive: " << m_ErrorMessage; return nullptr;}
 
   //create visualization filter
   visualizationFilter = CreateNavigationDataObjectVisualizationFilter(returnValue,m_NavigationTools);
-  if (visualizationFilter.IsNull()) {MITK_WARN << "Cannot create tracking decive: " << m_ErrorMessage; return NULL;}
+  if (visualizationFilter.IsNull()) {MITK_WARN << "Cannot create tracking decive: " << m_ErrorMessage; return nullptr;}
 
   return returnValue;
 }
@@ -141,7 +141,7 @@ mitk::NavigationDataObjectVisualizationFilter::Pointer mitk::TrackingDeviceSourc
     if (currentTool.IsNull())
       {
       this->m_ErrorMessage = "Error: did not find corresponding tool in tracking device after initialization.";
-      return NULL;
+      return nullptr;
       }
     returnValue->SetInput(i,trackingDeviceSource->GetOutput(i));
     returnValue->SetRepresentationObject(i,currentTool->GetDataNode()->GetData());

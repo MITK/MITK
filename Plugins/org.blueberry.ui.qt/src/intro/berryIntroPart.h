@@ -142,7 +142,7 @@ public:
    * <code>IIntroPart</code> method disposes the title image loaded by
    * <code>setInitializationData</code>. Subclasses may extend.
    */
-  ~IntroPart();
+  ~IntroPart() override;
 
   /**
    * This implementation of the method declared by <code>IAdaptable</code>
@@ -187,8 +187,7 @@ public:
    * @exception PartInitException
    *                if this part was not initialized successfully
    */
-  void Init(IIntroSite::Pointer site, IMemento::Pointer memento)
-      throw (PartInitException) override;
+  void Init(IIntroSite::Pointer site, IMemento::Pointer memento) override;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.intro.IIntroPart#removePropertyListener(org.eclipse.ui.IPropertyListener)

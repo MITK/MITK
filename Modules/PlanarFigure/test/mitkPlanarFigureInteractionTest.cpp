@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIOUtil.h>
 #include <mitkInteractionTestHelper.h>
+#include <mitkRenderingTestHelper.h>
 #include <mitkPlanarFigureInteractor.h>
 #include <mitkPlanarFigureReader.h>
 #include <mitkPlanarFigureWriter.h>
@@ -78,7 +79,7 @@ public:
     mitk::InteractionTestHelper interactionTestHelper(GetTestDataFilePath(interactionXmlPath));
 
     // Load a bounding image
-    mitk::Image::Pointer testImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
+    mitk::Image::Pointer testImage = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Pic3D.nrrd"));
     figure->SetGeometry(testImage->GetGeometry());
 
     mitk::DataNode::Pointer dn = mitk::DataNode::New();
@@ -195,6 +196,11 @@ public:
     figure = mitk::PlanarRectangle::New();
     RunTest(figure, "InteractionTestData/Interactions/Rectangle.xml", "InteractionTestData/ReferenceData/Rectangle.pf");
   }
+
+  // this is only for the OpenGL check
+  mitkPlanarFigureInteractionTestSuite() : m_RenderingTestHelper(300, 300) {}
+  private:
+    mitk::RenderingTestHelper m_RenderingTestHelper;
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkPlanarFigureInteraction)

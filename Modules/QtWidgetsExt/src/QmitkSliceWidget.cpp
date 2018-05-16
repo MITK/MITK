@@ -28,7 +28,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget *parent, const char *name, Qt::Window
 {
   this->setupUi(this);
 
-  if (name != 0)
+  if (name != nullptr)
     this->setObjectName(name);
 
   popUp = new QMenu(this);
@@ -39,7 +39,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget *parent, const char *name, Qt::Window
   QObject::connect(popUp, SIGNAL(triggered(QAction *)), this, SLOT(ChangeView(QAction *)));
   setPopUpEnabled(false);
 
-  m_SlicedGeometry = 0;
+  m_SlicedGeometry = nullptr;
   m_View = mitk::SliceNavigationController::Axial;
 
   QHBoxLayout *hlayout = new QHBoxLayout(container);
@@ -148,12 +148,12 @@ void QmitkSliceWidget::InitWidget(mitk::SliceNavigationController::ViewDirection
 
   mitk::BaseGeometry::Pointer geometry = static_cast<mitk::BaseGeometry *>(m_SlicedGeometry->Clone().GetPointer());
 
-  const mitk::BoundingBox::Pointer boundingbox = m_DataStorage->ComputeVisibleBoundingBox(GetRenderer(), NULL);
+  const mitk::BoundingBox::Pointer boundingbox = m_DataStorage->ComputeVisibleBoundingBox(GetRenderer(), nullptr);
 
   if (boundingbox->GetPoints()->Size() > 0)
   {
     // let's see if we have data with a limited live-span ...
-    mitk::TimeBounds timebounds = m_DataStorage->ComputeTimeBounds(GetRenderer(), NULL);
+    mitk::TimeBounds timebounds = m_DataStorage->ComputeTimeBounds(GetRenderer(), nullptr);
 
     mitk::ProportionalTimeGeometry::Pointer timeGeometry = mitk::ProportionalTimeGeometry::New();
     timeGeometry->Initialize(geometry, 1);
@@ -163,7 +163,7 @@ void QmitkSliceWidget::InitWidget(mitk::SliceNavigationController::ViewDirection
       timeGeometry->SetStepDuration(1.0);
     }
 
-    if (const_cast<mitk::BoundingBox *>(timeGeometry->GetBoundingBoxInWorld())->GetDiagonalLength2() >= mitk::eps)
+    if (timeGeometry->GetBoundingBoxInWorld()->GetDiagonalLength2() >= mitk::eps)
     {
       controller->SetInputWorldTimeGeometry(timeGeometry);
       controller->Update();

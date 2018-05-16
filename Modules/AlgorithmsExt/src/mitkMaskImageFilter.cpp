@@ -59,7 +59,7 @@ void mitk::MaskImageFilter::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
 
   mitk::Image *output = this->GetOutput();
-  mitk::Image *input = const_cast<mitk::Image *>(this->GetInput());
+  mitk::Image *input = this->GetInput();
   mitk::Image *mask = m_Mask;
   if ((output->IsInitialized() == false) || (mask == nullptr) || (mask->GetTimeGeometry()->CountTimeSteps() == 0))
     return;

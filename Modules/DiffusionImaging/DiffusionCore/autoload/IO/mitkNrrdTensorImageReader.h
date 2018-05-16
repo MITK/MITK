@@ -42,10 +42,10 @@ namespace mitk
 
     NrrdTensorImageReader(const NrrdTensorImageReader& other);
     NrrdTensorImageReader();
-    virtual ~NrrdTensorImageReader();
+    ~NrrdTensorImageReader() override;
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+    std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   protected:
 
@@ -55,7 +55,7 @@ namespace mitk
 
     us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
 
-    itk::DiffusionTensor3D<float> ConvertMatrixTypeToFixedArrayType(const itk::DiffusionTensor3D<float>::Superclass::MatrixType & matrix);
+    TensorImage::PixelType ConvertMatrixTypeToFixedArrayType(const TensorImage::PixelType::Superclass::MatrixType & matrix);
   };
 
 } //namespace MITK

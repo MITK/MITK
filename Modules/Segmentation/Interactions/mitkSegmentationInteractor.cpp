@@ -19,8 +19,9 @@
 #include "mitkLabelSetImage.h"
 #include "mitkToolManager.h"
 #include "mitkToolManagerProvider.h"
+#include <mitkImagePixelReadAccessor.h>
 
-#include <string.h>
+#include <cstring>
 
 void mitk::SegmentationInteractor::ConnectActionsAndFunctions()
 {
@@ -32,7 +33,7 @@ void mitk::SegmentationInteractor::ConnectActionsAndFunctions()
 bool mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  InteractionPositionEvent *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
 
   // MLI TODO
   // m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
@@ -44,11 +45,12 @@ bool mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction *, Inter
   DataNode *workingNode(toolManager->GetWorkingData(0));
   if (workingNode)
   {
-    mitk::LabelSetImage *workingImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
+    auto *workingImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
     assert(workingImage);
 
     int timestep = positionEvent->GetSender()->GetTimeStep();
-    int pixelValue = workingImage->GetPixelValueByWorldCoordinate(positionEvent->GetPositionInWorld(), timestep);
+    int pixelValue = static_cast<int>(workingImage->GetPixelValueByWorldCoordinate(positionEvent->GetPositionInWorld(), timestep));
+
     workingImage->GetActiveLabelSet()->SetActiveLabel(pixelValue); // can be the background
 
     // Call Events

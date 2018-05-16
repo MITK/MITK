@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itksys/SystemTools.hxx"
 
 
-mitk::ToFImageRecorderFilter::ToFImageRecorderFilter(): m_RecordingStarted(false), m_ToFImageWriter(0)
+mitk::ToFImageRecorderFilter::ToFImageRecorderFilter(): m_RecordingStarted(false), m_ToFImageWriter(nullptr)
 {
   m_FileExtension = "";
 }
@@ -120,20 +120,20 @@ void mitk::ToFImageRecorderFilter::SetToFImageWriter(mitk::ToFImageWriter::Point
   m_ToFImageWriter = tofImageWriter;
 }
 
-void mitk::ToFImageRecorderFilter::SetInput(  mitk::Image* input )
+void mitk::ToFImageRecorderFilter::SetInput(const InputImageType *input )
 {
   this->SetInput(0,input);
 }
 
-void mitk::ToFImageRecorderFilter::SetInput( unsigned int idx,  mitk::Image* input )
+void mitk::ToFImageRecorderFilter::SetInput( unsigned int idx,  const InputImageType* input )
 {
-  if ((input == NULL) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
+  if ((input == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to nullptr, reduce the number of inputs by one
   {
-    this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
+    this->SetNumberOfIndexedInputs(this->GetNumberOfInputs() - 1);
   }
   else if(idx == 0 || idx == 1 || idx == 2)
   {
-    this->ProcessObject::SetNthInput(idx, input);   // Process object is not const-correct so the const_cast is required here
+    this->ProcessObject::SetNthInput(idx, const_cast<InputImageType*>(input));   // Process object is not const-correct so the const_cast is required here
     unsigned int xDim = input->GetDimension(0);
     unsigned int yDim = input->GetDimension(1);
     m_ToFImageWriter->SetToFCaptureWidth(xDim);
@@ -151,15 +151,15 @@ mitk::Image* mitk::ToFImageRecorderFilter::GetInput()
 mitk::Image* mitk::ToFImageRecorderFilter::GetInput( unsigned int idx )
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast< mitk::Image*>(this->ProcessObject::GetInput(idx));
 }
 
 void mitk::ToFImageRecorderFilter::CreateOutputsForAllInputs()
 {
-  this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
+  this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());  // create outputs for all inputs
   for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
-    if (this->GetOutput(idx) == NULL)
+    if (this->GetOutput(idx) == nullptr)
     {
     DataObjectPointer newOutput = this->MakeOutput(idx);
     this->SetNthOutput(idx, newOutput);

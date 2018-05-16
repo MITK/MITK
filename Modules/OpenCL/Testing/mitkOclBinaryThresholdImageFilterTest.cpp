@@ -66,7 +66,7 @@ public:
 
   void tearDown()
   {
-    m_oclBinaryFilter = NULL;
+    m_oclBinaryFilter = nullptr;
   }
 
   void SetInput_2DImage_ThrowsException()

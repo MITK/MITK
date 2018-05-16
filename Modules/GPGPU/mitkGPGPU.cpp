@@ -481,15 +481,15 @@ CS_VREDRAW;                    // redraw if size changes
 wcx.lpfnWndProc = MainWndProc;     // points to window procedure
 wcx.cbClsExtra = 0;                // no extra class memory
 wcx.cbWndExtra = 0;                // no extra window memory
-wcx.hInstance = GetModuleHandle(NULL);         // handle to inst ance
-wcx.hIcon = LoadIcon(NULL,
+wcx.hInstance = GetModuleHandle(nullptr);         // handle to inst ance
+wcx.hIcon = LoadIcon(nullptr,
 IDI_APPLICATION);              // predefined app. icon
-wcx.hCursor = LoadCursor(NULL,
+wcx.hCursor = LoadCursor(nullptr,
 IDC_ARROW);                    // predefined arrow
-wcx.hbrBackground = NULL;                  // white background brush
+wcx.hbrBackground = nullptr;                  // white background brush
 wcx.lpszMenuName = (LPCSTR) "MainMenu";    // name of menu resource
 wcx.lpszClassName = (LPCSTR) "MainWClass";  // name of window class
-wcx.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+wcx.hIconSm = LoadIcon(nullptr, IDI_APPLICATION);
 
 // Register the window class.
 
@@ -502,10 +502,10 @@ WS_EX_CLIENTEDGE,
 (LPCSTR)"Anatomy of a Window",
 WS_OVERLAPPEDWINDOW,
 CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
-NULL,
-NULL,
-GetModuleHandle(NULL),
-NULL);
+nullptr,
+nullptr,
+GetModuleHandle(nullptr),
+nullptr);
 windowHandle = desktopWindow;
 ShowWindow(desktopWindow, SW_RESTORE);
 

@@ -74,7 +74,7 @@ void QmitkToFDeviceGeneration::OnToFCameraConnected()
     }
     else
     {
-      QMessageBox::warning(NULL, "Warning", QString("No Device Factory selected. Unable to create a Device!\nPlease select an other Factory!"));
+      QMessageBox::warning(nullptr, "Warning", QString("No Device Factory selected. Unable to create a Device!\nPlease select an other Factory!"));
     }
 
 }

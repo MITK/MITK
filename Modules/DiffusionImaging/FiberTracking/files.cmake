@@ -6,6 +6,8 @@ set(CPP_FILES
   IODataStructures/FiberBundle/mitkFiberBundle.cpp
   IODataStructures/FiberBundle/mitkTrackvis.cpp
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
+  IODataStructures/mitkTractographyForest.cpp
+  IODataStructures/mitkFiberfoxParameters.cpp
 
   # Interactions
 
@@ -16,6 +18,12 @@ set(CPP_FILES
   Algorithms/GibbsTracking/mitkGibbsEnergyComputer.cpp
   Algorithms/GibbsTracking/mitkFiberBuilder.cpp
   Algorithms/GibbsTracking/mitkSphereInterpolator.cpp
+
+  Algorithms/itkStreamlineTrackingFilter.cpp
+  Algorithms/TrackingHandlers/mitkTrackingDataHandler.cpp
+  Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.cpp
+  Algorithms/TrackingHandlers/mitkTrackingHandlerPeaks.cpp
+  Algorithms/TrackingHandlers/mitkTrackingHandlerOdf.cpp
 )
 
 set(H_FILES
@@ -23,6 +31,7 @@ set(H_FILES
   IODataStructures/FiberBundle/mitkFiberBundle.h
   IODataStructures/FiberBundle/mitkTrackvis.h
   IODataStructures/mitkFiberfoxParameters.h
+  IODataStructures/mitkTractographyForest.h
 
   # Algorithms
   Algorithms/itkTractDensityImageFilter.h
@@ -32,11 +41,20 @@ set(H_FILES
   Algorithms/itkEvaluateDirectionImagesFilter.h
   Algorithms/itkEvaluateTractogramDirectionsFilter.h
   Algorithms/itkFiberCurvatureFilter.h
+  Algorithms/itkFitFibersToImageFilter.h
+  Algorithms/itkTractClusteringFilter.h
+  Algorithms/itkFiberExtractionFilter.h
+  Algorithms/itkTdiToVolumeFractionFilter.h
 
   # Tractography
+  Algorithms/TrackingHandlers/mitkTrackingDataHandler.h
+  Algorithms/TrackingHandlers/mitkTrackingHandlerRandomForest.h
+  Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.h
+  Algorithms/TrackingHandlers/mitkTrackingHandlerPeaks.h
+  Algorithms/TrackingHandlers/mitkTrackingHandlerOdf.h
+
   Algorithms/itkGibbsTrackingFilter.h
   Algorithms/itkStochasticTractographyFilter.h
-  Algorithms/itkStreamlineTrackingFilter.h
   Algorithms/GibbsTracking/mitkParticle.h
   Algorithms/GibbsTracking/mitkParticleGrid.h
   Algorithms/GibbsTracking/mitkMetropolisHastingsSampler.h
@@ -45,8 +63,18 @@ set(H_FILES
   Algorithms/GibbsTracking/mitkGibbsEnergyComputer.h
   Algorithms/GibbsTracking/mitkSphereInterpolator.h
   Algorithms/GibbsTracking/mitkFiberBuilder.h
-  Algorithms/MLTracking/mitkTrackingForestHandler.h
-  Algorithms/MLTracking/itkMLBSTrackingFilter.h
+
+  Algorithms/itkStreamlineTrackingFilter.h
+
+  # Clustering
+  Algorithms/ClusteringMetrics/mitkClusteringMetric.h
+  Algorithms/ClusteringMetrics/mitkClusteringMetricEuclideanMean.h
+  Algorithms/ClusteringMetrics/mitkClusteringMetricEuclideanMax.h
+  Algorithms/ClusteringMetrics/mitkClusteringMetricEuclideanStd.h
+  Algorithms/ClusteringMetrics/mitkClusteringMetricAnatomic.h
+  Algorithms/ClusteringMetrics/mitkClusteringMetricScalarMap.h
+  Algorithms/ClusteringMetrics/mitkClusteringMetricInnerAngles.h
+  Algorithms/ClusteringMetrics/mitkClusteringMetricLength.h
 
   # Fiberfox
   Fiberfox/itkFibersFromPlanarFiguresFilter.h
@@ -75,7 +103,4 @@ set(RESOURCE_FILES
   # Binary directory resources
   FiberTrackingLUTBaryCoords.bin
   FiberTrackingLUTIndices.bin
-
-  # Shaders
-  Shaders/mitkShaderFiberClipping.xml
 )

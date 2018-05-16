@@ -41,20 +41,20 @@ public:
 
   //##Documentation
   //##@brief Destructor
-  virtual ~QmitkProgressBar();
+  ~QmitkProgressBar() override;
 
   //##Documentation
   //## @brief Sets whether the current progress value is displayed.
-  virtual void SetPercentageVisible(bool visible) override;
+  void SetPercentageVisible(bool visible) override;
 
   //##Documentation
   //## @brief Adds steps to totalSteps.
-  virtual void AddStepsToDo(unsigned int steps) override;
+  void AddStepsToDo(unsigned int steps) override;
 
   //##Documentation
   //## @brief Sets the current amount of progress to current progress + steps.
   //## @param: steps the number of steps done since last Progress(int steps) call.
-  virtual void Progress(unsigned int steps) override;
+  void Progress(unsigned int steps) override;
 
 signals:
 

@@ -28,30 +28,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 class MITKDIFFUSIONCORE_EXPORT vtkOdfSource : public vtkPolyDataAlgorithm
 {
 public:
+
   vtkTypeMacro(vtkOdfSource,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  typedef itk::OrientationDistributionFunction<float, QBALL_ODFSIZE> OdfType;
+  typedef itk::OrientationDistributionFunction<float, ODF_SAMPLING_SIZE> OdfType;
   // Description:
   // Construct sphere with radius=0.5 and default resolution 8 in both Phi
   // and Theta directions. Theta ranges from (0,360) and phi (0,180) degrees.
   static vtkOdfSource *New();
 
-  vtkSetMacro(Scale,double);
-  vtkGetMacro(Scale,double);
+  vtkSetMacro(Scale,double)
+  vtkGetMacro(Scale,double)
 
-  vtkSetMacro(AdditionalScale,double);
-  vtkGetMacro(AdditionalScale,double);
+  vtkSetMacro(AdditionalScale,double)
+  vtkGetMacro(AdditionalScale,double)
 
-  vtkSetMacro(Normalization,int);
-  vtkGetMacro(Normalization,int);
+  vtkSetMacro(Normalization,int)
+  vtkGetMacro(Normalization,int)
 
-  vtkSetMacro(Odf,OdfType);
-  vtkGetMacro(Odf,OdfType);
+  vtkSetMacro(Odf,OdfType)
+  vtkGetMacro(Odf,OdfType)
+
+  vtkSetMacro(UseCustomColor,bool)
+  vtkGetMacro(UseCustomColor,bool)
+
+  void SetColor(int r, int g, int b)
+  {
+    this->r = r;
+    this->g = g;
+    this->b = b;
+  }
 
 protected:
   vtkOdfSource();
-  ~vtkOdfSource() {}
+  ~vtkOdfSource() override;
 
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
   int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
@@ -60,6 +71,11 @@ protected:
   double  Scale;
   double  AdditionalScale;
   int     Normalization;
+  int r;
+  int g;
+  int b;
+  bool    UseCustomColor;
+  vtkSmartPointer<vtkLookupTable> lut;
 
 private:
   vtkOdfSource(const vtkOdfSource&);  // Not implemented.

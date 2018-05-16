@@ -37,9 +37,9 @@ class MITKQTWIDGETS_EXPORT QmitkRenderingManagerFactory : public mitk::Rendering
 public:
   QmitkRenderingManagerFactory();
 
-  ~QmitkRenderingManagerFactory();
+  ~QmitkRenderingManagerFactory() override;
 
-  virtual mitk::RenderingManager::Pointer CreateRenderingManager() const override;
+  mitk::RenderingManager::Pointer CreateRenderingManager() const override;
 
 private:
 };

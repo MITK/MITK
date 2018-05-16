@@ -54,7 +54,7 @@ public:
       image->GetDimensions()[0] == 10 && image->GetDimensions()[1] == 10 && image->GetDimensions()[2] == 1,
       "Resulting image has correct size");
 
-    unsigned char *value = static_cast<unsigned char *>(image->GetScalarPointer(0, 0, 0));
+    auto *value = static_cast<unsigned char *>(image->GetScalarPointer(0, 0, 0));
     MITK_INFO << "Evaluating projection mode: " << projection;
     MITK_INFO << "expected value: " << static_cast<double>(expectedValue);
     MITK_INFO << "actual value: " << static_cast<double>(value[0]);

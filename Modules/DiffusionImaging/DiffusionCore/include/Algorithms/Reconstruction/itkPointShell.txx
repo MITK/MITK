@@ -20,13 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vnl/vnl_vector_fixed.h"
 #include "vnl/vnl_matrix_fixed.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 namespace itk
 {
-#define DIST_POINTSHELL_PI M_PI
-
 template<int NPoints, class TMatrixType >
 TMatrixType *
 PointShell<NPoints, TMatrixType >
@@ -39,19 +34,19 @@ PointShell<NPoints, TMatrixType >
   auto phi
       = new vnl_vector_fixed<double,NPoints>();
 
-  double C = sqrt(4*DIST_POINTSHELL_PI);
+  double C = sqrt(4*itk::Math::pi);
 
   (*phi)(0) = 0.0;
   (*phi)(NPoints-1) = 0.0;
 
   for(int i=0; i<NPoints; i++)
   {
-    (*theta)(i) = acos(-1.0+2.0*i/(NPoints-1.0)) - DIST_POINTSHELL_PI / 2.0;
+    (*theta)(i) = acos(-1.0+2.0*i/(NPoints-1.0)) - itk::Math::pi / 2.0;
     if( i>0 && i<NPoints-1)
     {
       (*phi)(i) = ((*phi)(i-1) + C /
                    sqrt(NPoints*(1-(-1.0+2.0*i/(NPoints-1.0))*(-1.0+2.0*i/(NPoints-1.0)))));
-      // % (2*DIST_POINTSHELL_PI);
+      // % (2*itk::Math::pi);
     }
   }
 

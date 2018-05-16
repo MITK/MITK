@@ -26,7 +26,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkAboutDialog : public QDialog
 
 public:
   QmitkAboutDialog(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
-  virtual ~QmitkAboutDialog();
+  ~QmitkAboutDialog() override;
 
   QString GetAboutText() const;
   QString GetCaptionText() const;

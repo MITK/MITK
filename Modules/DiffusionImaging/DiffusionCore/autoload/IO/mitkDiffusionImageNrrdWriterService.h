@@ -32,12 +32,12 @@ class DiffusionImageNrrdWriterService : public mitk::AbstractFileWriter
 public:
 
     DiffusionImageNrrdWriterService();
-    virtual ~DiffusionImageNrrdWriterService();
+    ~DiffusionImageNrrdWriterService() override;
 
     using AbstractFileWriter::Write;
-    virtual void Write() override;
+    void Write() override;
 
-    virtual ConfidenceLevel GetConfidenceLevel() const override;
+    ConfidenceLevel GetConfidenceLevel() const override;
 
     typedef mitk::DiffusionPropertyHelper::ImageType                        VectorImageType;
     typedef mitk::DiffusionPropertyHelper::GradientDirectionType            GradientDirectionType;
@@ -47,7 +47,7 @@ public:
   protected:
 
     DiffusionImageNrrdWriterService(const DiffusionImageNrrdWriterService& other);
-    virtual mitk::DiffusionImageNrrdWriterService* Clone() const override;
+    mitk::DiffusionImageNrrdWriterService* Clone() const override;
 
 
 };

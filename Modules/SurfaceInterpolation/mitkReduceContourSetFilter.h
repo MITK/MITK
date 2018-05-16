@@ -90,8 +90,8 @@ namespace mitk
     void SetUseProgressBar(bool);
 
     using itk::ProcessObject::SetInput;
-    virtual void SetInput(const mitk::Surface *surface);
-    virtual void SetInput(unsigned int idx, const mitk::Surface *surface);
+    void SetInput(const mitk::Surface *surface) override;
+    void SetInput(unsigned int idx, const mitk::Surface *surface) override;
 
     /**
       \brief Set the stepsize which the progress bar should proceed
@@ -102,9 +102,9 @@ namespace mitk
 
   protected:
     ReduceContourSetFilter();
-    virtual ~ReduceContourSetFilter();
-    virtual void GenerateData() override;
-    virtual void GenerateOutputInformation() override;
+    ~ReduceContourSetFilter() override;
+    void GenerateData() override;
+    void GenerateOutputInformation() override;
 
   private:
     void ReduceNumberOfPointsByNthPoint(

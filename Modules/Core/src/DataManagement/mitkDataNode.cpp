@@ -82,11 +82,11 @@ void mitk::DataNode::SetData(mitk::BaseData *baseData)
   }
 }
 
-mitk::DataNode::DataNode() : m_PropertyListModifiedObserverTag(0)
+mitk::DataNode::DataNode()
+  : m_PropertyList(PropertyList::New()),
+    m_PropertyListModifiedObserverTag(0)
 {
   m_Mappers.resize(10);
-
-  m_PropertyList = PropertyList::New();
 
   // subscribe for modified event
   itk::MemberCommand<mitk::DataNode>::Pointer _PropertyListModifiedCommand = itk::MemberCommand<mitk::DataNode>::New();
@@ -138,7 +138,7 @@ MBI_STD::ostream &mitk::operator<<(MBI_STD::ostream &o, mitk::DataNode::Pointer 
   operator<<(MBI_STD::ostream &o, mitk::DataNode::Pointer &dtn)
 #endif
 {
-  if (dtn->GetData() != NULL)
+  if (dtn->GetData() != nullptr)
     o << dtn->GetData()->GetNameOfClass();
   else
     o << "empty data";
@@ -149,7 +149,7 @@ void mitk::DataNode::SetMapper(MapperSlotId id, mitk::Mapper *mapper)
 {
   m_Mappers[id] = mapper;
 
-  if (mapper != NULL)
+  if (mapper != nullptr)
     mapper->SetDataNode(this);
 }
 
@@ -194,7 +194,7 @@ void mitk::DataNode::CopyInformation(const itk::DataObject * /*data*/)
 }
 mitk::PropertyList *mitk::DataNode::GetPropertyList(const mitk::BaseRenderer *renderer) const
 {
-  if (renderer == NULL)
+  if (renderer == nullptr)
     return m_PropertyList;
 
   return this->GetPropertyList(renderer->GetName());
@@ -220,44 +220,30 @@ void mitk::DataNode::ConcatenatePropertyList(PropertyList *pList, bool replace)
   m_PropertyList->ConcatenatePropertyList(pList, replace);
 }
 
-mitk::BaseProperty *mitk::DataNode::GetProperty(const char *propertyKey, const mitk::BaseRenderer *renderer) const
+mitk::BaseProperty *mitk::DataNode::GetProperty(const char *propertyKey, const mitk::BaseRenderer *renderer, bool fallBackOnDataProperties) const
 {
-  if (propertyKey == NULL)
-    return NULL;
+  if (nullptr == propertyKey)
+    return nullptr;
 
-  // renderer specified?
-  if (renderer)
+  if (nullptr != renderer)
   {
-    std::string rendererName = renderer->GetName();
+    auto it = m_MapOfPropertyLists.find(renderer->GetName());
 
-    MapOfPropertyLists::const_iterator it;
-    // check for the renderer specific property
-    it = m_MapOfPropertyLists.find(rendererName);
-    if (it != m_MapOfPropertyLists.end()) // found
+    if (m_MapOfPropertyLists.end() != it)
     {
-      mitk::BaseProperty::Pointer property;
-      property = it->second->GetProperty(propertyKey);
-      if (property.IsNotNull()) // found an enabled property in the render specific list
+      auto property = it->second->GetProperty(propertyKey);
+
+      if (nullptr != property)
         return property;
-      else                                               // found a renderer specific list, but not the desired property
-        return m_PropertyList->GetProperty(propertyKey); // return renderer unspecific property
     }
-    else // didn't find the property list of the given renderer
-    {
-      // return the renderer unspecific property if there is one
-      return m_PropertyList->GetProperty(propertyKey);
-    }
-  }
-  else // no specific renderer given; use the renderer independent one
-  {
-    mitk::BaseProperty::Pointer property;
-    property = m_PropertyList->GetProperty(propertyKey);
-    if (property.IsNotNull())
-      return property;
   }
 
-  // only to satisfy compiler!
-  return NULL;
+  auto property = m_PropertyList->GetProperty(propertyKey);
+
+  if (nullptr == property && fallBackOnDataProperties && m_Data.IsNotNull())
+    property = m_Data->GetProperty(propertyKey);
+
+  return property;
 }
 
 mitk::DataNode::GroupTagList mitk::DataNode::GetGroupTags() const
@@ -265,7 +251,7 @@ mitk::DataNode::GroupTagList mitk::DataNode::GetGroupTags() const
   GroupTagList groups;
   const PropertyList::PropertyMap *propertyMap = m_PropertyList->GetMap();
 
-  for (PropertyList::PropertyMap::const_iterator groupIter =
+  for (auto groupIter =
          propertyMap->begin(); // m_PropertyList is created in the constructor, so we don't check it here
        groupIter != propertyMap->end();
        ++groupIter)
@@ -436,16 +422,16 @@ void mitk::DataNode::SetIntProperty(const char *propertyKey, int intValue, const
 }
 void mitk::DataNode::SetBoolProperty(const char *propertyKey,
                                      bool boolValue,
-                                     const mitk::BaseRenderer *renderer /*=NULL*/)
+                                     const mitk::BaseRenderer *renderer /*=nullptr*/)
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::BoolProperty::New(boolValue));
 }
 
 void mitk::DataNode::SetFloatProperty(const char *propertyKey,
                                       float floatValue,
-                                      const mitk::BaseRenderer *renderer /*=NULL*/)
+                                      const mitk::BaseRenderer *renderer /*=nullptr*/)
 {
-  if (dynamic_cast<DoubleProperty *>(this->GetProperty(propertyKey, renderer)) != NULL)
+  if (dynamic_cast<DoubleProperty *>(this->GetProperty(propertyKey, renderer)) != nullptr)
   {
     MITK_WARN << "Setting float property " << propertyKey
               << " although a double property with the same name already exists";
@@ -455,7 +441,7 @@ void mitk::DataNode::SetFloatProperty(const char *propertyKey,
 
 void mitk::DataNode::SetDoubleProperty(const char *propertyKey, double doubleValue, const mitk::BaseRenderer *renderer)
 {
-  if (dynamic_cast<FloatProperty *>(this->GetProperty(propertyKey, renderer)) != NULL)
+  if (dynamic_cast<FloatProperty *>(this->GetProperty(propertyKey, renderer)) != nullptr)
   {
     MITK_WARN << "Setting double property " << propertyKey
               << " although a float property with the same name already exists";
@@ -465,7 +451,7 @@ void mitk::DataNode::SetDoubleProperty(const char *propertyKey, double doubleVal
 
 void mitk::DataNode::SetStringProperty(const char *propertyKey,
                                        const char *stringValue,
-                                       const mitk::BaseRenderer *renderer /*=NULL*/)
+                                       const mitk::BaseRenderer *renderer /*=nullptr*/)
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::StringProperty::New(stringValue));
 }
@@ -489,7 +475,7 @@ void mitk::DataNode::AddProperty(const char *propertyKey,
                                  const mitk::BaseRenderer *renderer,
                                  bool overwrite)
 {
-  if ((overwrite) || (GetProperty(propertyKey, renderer) == NULL))
+  if ((overwrite) || (GetProperty(propertyKey, renderer) == nullptr))
   {
     SetProperty(propertyKey, propertyValue, renderer);
   }
@@ -501,8 +487,8 @@ vtkLinearTransform *mitk::DataNode::GetVtkTransform(int t) const
 
   mitk::BaseGeometry *geometry = m_Data->GetGeometry(t);
 
-  if (geometry == NULL)
-    return NULL;
+  if (geometry == nullptr)
+    return nullptr;
 
   return geometry->GetVtkTransform();
 }
@@ -596,4 +582,155 @@ mitk::DataInteractor::Pointer mitk::DataNode::GetDataInteractor() const
 void mitk::DataNode::PropertyListModified(const itk::Object * /*caller*/, const itk::EventObject &)
 {
   Modified();
+}
+
+mitk::BaseProperty::ConstPointer mitk::DataNode::GetConstProperty(const std::string &propertyKey, const std::string &contextName, bool fallBackOnDefaultContext) const
+{
+  if (propertyKey.empty())
+    return nullptr;
+
+  if (!contextName.empty())
+  {
+    auto propertyListIter = m_MapOfPropertyLists.find(contextName);
+
+    if (m_MapOfPropertyLists.end() != propertyListIter)
+    {
+      BaseProperty::ConstPointer property = propertyListIter->second->GetProperty(propertyKey);
+
+      if (property.IsNotNull())
+        return property;
+    }
+  }
+
+  if (contextName.empty() || fallBackOnDefaultContext)
+  {
+    BaseProperty::ConstPointer property = m_PropertyList->GetProperty(propertyKey);
+
+    if (property.IsNull() && m_Data.IsNotNull())
+      property = m_Data->GetProperty(propertyKey.c_str());
+
+    return property;
+  }
+
+  return nullptr;
+}
+
+mitk::BaseProperty * mitk::DataNode::GetNonConstProperty(const std::string &propertyKey, const std::string &contextName, bool fallBackOnDefaultContext)
+{
+  if (propertyKey.empty())
+    return nullptr;
+
+  if (!contextName.empty())
+  {
+    auto propertyListIter = m_MapOfPropertyLists.find(contextName);
+
+    if (m_MapOfPropertyLists.end() != propertyListIter)
+    {
+      auto property = propertyListIter->second->GetProperty(propertyKey);
+
+      if (nullptr != property)
+        return property;
+    }
+  }
+
+  if (contextName.empty() || fallBackOnDefaultContext)
+  {
+    auto property = m_PropertyList->GetProperty(propertyKey);
+
+    if (nullptr == property && m_Data.IsNotNull())
+      property = m_Data->GetProperty(propertyKey.c_str());
+
+    return property;
+  }
+
+  return nullptr;
+}
+
+void mitk::DataNode::SetProperty(const std::string &propertyKey, BaseProperty *property, const std::string &contextName, bool fallBackOnDefaultContext)
+{
+  if (propertyKey.empty())
+    mitkThrow() << "Property key is empty.";
+
+  if (!contextName.empty())
+  {
+    auto propertyListIter = m_MapOfPropertyLists.find(contextName);
+
+    if (m_MapOfPropertyLists.end() != propertyListIter)
+    {
+      propertyListIter->second->SetProperty(propertyKey, property);
+      return;
+    }
+  }
+
+  if (contextName.empty() || fallBackOnDefaultContext)
+  {
+    m_PropertyList->SetProperty(propertyKey, property);
+    return;
+  }
+
+  mitkThrow() << "Unknown property context.";
+}
+
+void mitk::DataNode::RemoveProperty(const std::string &propertyKey, const std::string &contextName, bool fallBackOnDefaultContext)
+{
+  if (propertyKey.empty())
+    mitkThrow() << "Property key is empty.";
+
+  if (!contextName.empty())
+  {
+    auto propertyListIter = m_MapOfPropertyLists.find(contextName);
+
+    if (m_MapOfPropertyLists.end() != propertyListIter)
+    {
+      propertyListIter->second->RemoveProperty(propertyKey);
+      return;
+    }
+  }
+
+  if (contextName.empty() || fallBackOnDefaultContext)
+  {
+    m_PropertyList->RemoveProperty(propertyKey);
+    return;
+  }
+
+  mitkThrow() << "Unknown property context.";
+}
+
+std::vector<std::string> mitk::DataNode::GetPropertyKeys(const std::string &contextName, bool includeDefaultContext) const
+{
+  std::vector<std::string> propertyKeys;
+
+  if (contextName.empty())
+  {
+    for (auto property : *m_PropertyList->GetMap())
+      propertyKeys.push_back(property.first);
+
+    return propertyKeys;
+  }
+
+  auto propertyListIter = m_MapOfPropertyLists.find(contextName);
+
+  if (m_MapOfPropertyLists.end() != propertyListIter)
+  {
+    for (auto property : *propertyListIter->second->GetMap())
+      propertyKeys.push_back(property.first);
+  }
+
+  if (includeDefaultContext)
+  {
+    for (auto property : *m_PropertyList->GetMap())
+    {
+      auto propertyKeyIter = std::find(propertyKeys.begin(), propertyKeys.end(), property.first);
+
+      if (propertyKeys.end() == propertyKeyIter)
+        propertyKeys.push_back(property.first);
+    }
+  }
+
+  return propertyKeys;
+}
+
+std::vector<std::string> mitk::DataNode::GetPropertyContextNames() const
+{
+  return this->GetPropertyListNames();
 }

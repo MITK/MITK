@@ -51,7 +51,7 @@ struct ISourceProvider : public virtual Object
 
   typedef QHash<QString, Object::ConstPointer> StateMapType;
 
-  ~ISourceProvider();
+  ~ISourceProvider() override;
 
 
   /**

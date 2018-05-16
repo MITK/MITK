@@ -2,7 +2,7 @@
   \defgroup org_mitk_gui_qt_overlaymanager org.mitk.gui.qt.overlaymanager
   \ingroup MITKPlugins
 
-  \brief This is the overlaymanager plugin. Overlays that have been addded to the OverlayManager can be viewed and modified. The plugin also allows to add new overlays.
+  \brief This is the overlaymanager plugin. Annotations that have been addded to the OverlayManager can be viewed and modified. The plugin also allows to add new annotations.
 
 */
 

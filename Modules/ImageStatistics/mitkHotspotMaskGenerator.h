@@ -69,7 +69,7 @@ namespace mitk
         /**
         @brief Computes and returns the hotspot mask. The hotspot mask has the same size as the input image. The hopspot has value 1, the remaining pixels are set to 0
          */
-        mitk::Image::Pointer GetMask();
+        mitk::Image::Pointer GetMask() override;
 
         /**
         @brief Returns the image index where the hotspot is located
@@ -85,12 +85,12 @@ namespace mitk
          * @brief SetTimeStep is used to set the time step for which the mask is to be generated
          * @param timeStep
          */
-        void SetTimeStep(unsigned int timeStep);
+        void SetTimeStep(unsigned int timeStep) override;
 
     protected:
         HotspotMaskGenerator();
 
-        ~HotspotMaskGenerator();
+        ~HotspotMaskGenerator() override;
 
         class ImageExtrema
         {
@@ -159,7 +159,6 @@ namespace mitk
         itk::Image<unsigned short, 3>::Pointer m_internalMask3D;
         double m_HotspotRadiusinMM;
         bool m_HotspotMustBeCompletelyInsideImage;
-        bool m_HotspotParamsChanged;
         unsigned short m_Label;
         vnl_vector<int> m_ConvolutionImageMinIndex, m_ConvolutionImageMaxIndex;
         unsigned long m_InternalMaskUpdateTime;

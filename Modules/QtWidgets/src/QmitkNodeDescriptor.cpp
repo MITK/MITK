@@ -25,9 +25,17 @@ QmitkNodeDescriptor::QmitkNodeDescriptor(const QString &_ClassName,
                                          const QString &_PathToIcon,
                                          mitk::NodePredicateBase *_Predicate,
                                          QObject *parent)
+  : QmitkNodeDescriptor(_ClassName, QIcon(_PathToIcon), _Predicate, parent)
+{
+}
+
+QmitkNodeDescriptor::QmitkNodeDescriptor(const QString &_ClassName,
+                                         const QIcon &_Icon,
+                                         mitk::NodePredicateBase *_Predicate,
+                                         QObject *parent)
   : QObject(parent),
     m_ClassName(_ClassName),
-    m_PathToIcon(_PathToIcon),
+    m_Icon(_Icon),
     m_Predicate(_Predicate),
     m_Separator(new QAction(this))
 {
@@ -39,9 +47,9 @@ QString QmitkNodeDescriptor::GetNameOfClass() const
   return m_ClassName;
 }
 
-QIcon QmitkNodeDescriptor::GetIcon() const
+QIcon QmitkNodeDescriptor::GetIcon(const mitk::DataNode *) const
 {
-  return QIcon(m_PathToIcon);
+  return m_Icon;
 }
 
 QList<QAction *> QmitkNodeDescriptor::GetActions() const
@@ -82,7 +90,7 @@ void QmitkNodeDescriptor::RemoveAction(QAction *_Action)
     m_BatchActions.removeAt(indexOfWidgetAction);
   }
 
-  if (_Action != 0)
+  if (_Action != nullptr)
   {
     QObject::disconnect(_Action, SIGNAL(destroyed(QObject *)), this, SLOT(ActionDestroyed(QObject *)));
   }

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIGTLClient.h>
 #include <mitkIGTLDeviceSource.h>
 #include <mitkIGTL2DImageDeviceSource.h>
-#include <mitkIGTLTransformDeviceSource.h>
+#include <mitkIGTLTrackingDataDeviceSource.h>
 #include <mitkIGTLMessageToUSImageFilter.h>
 
 namespace mitk
@@ -43,25 +43,25 @@ namespace mitk
     // To open a device (Manufacturer, Model, Hostname, Port, IsServer)
     mitkNewMacro5Param(Self, std::string, std::string, std::string, int, bool);
 
-    virtual std::string GetDeviceClass();
-    virtual USImageSource::Pointer GetUSImageSource();
+    std::string GetDeviceClass() override;
+    USImageSource::Pointer GetUSImageSource() override;
 
     USIGTLDevice(std::string manufacturer, std::string model, std::string host,
       int port, bool server);
 
   protected:
-    virtual bool OnInitialization();
-    virtual bool OnConnection();
-    virtual bool OnDisconnection();
-    virtual bool OnActivation();
-    virtual bool OnDeactivation();
+    bool OnInitialization() override;
+    bool OnConnection() override;
+    bool OnDisconnection() override;
+    bool OnActivation() override;
+    bool OnDeactivation() override;
 
   private:
     std::string m_Host;
     int m_Port;
     mitk::IGTLDevice::Pointer m_Device;
     mitk::IGTL2DImageDeviceSource::Pointer m_DeviceSource;
-    mitk::IGTLTransformDeviceSource::Pointer m_TransformDeviceSource;
+    mitk::IGTLTrackingDataDeviceSource::Pointer m_TransformDeviceSource;
     mitk::IGTLMessageToUSImageFilter::Pointer m_Filter;
   };
 }  // namespace mitk

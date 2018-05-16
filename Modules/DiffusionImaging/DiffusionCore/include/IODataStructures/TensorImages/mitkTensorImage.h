@@ -37,20 +37,24 @@ namespace mitk
 
   public:
 
-    mitkClassMacro( TensorImage, Image );
+    typedef float ScalarPixelType;
+    typedef itk::DiffusionTensor3D<ScalarPixelType> PixelType;
+    typedef itk::Image<PixelType,3> ItkTensorImageType;
+
+    mitkClassMacro( TensorImage, Image )
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
     virtual vtkImageData* GetNonRgbVtkImageData(int t = 0, int n = 0);
 
-    virtual vtkImageData* GetVtkImageData(int t = 0, int n = 0) override;
-    virtual const vtkImageData* GetVtkImageData(int t = 0, int n = 0) const override;
+    vtkImageData* GetVtkImageData(int t = 0, int n = 0) override;
+    const vtkImageData* GetVtkImageData(int t = 0, int n = 0) const override;
 
     virtual void ConstructRgbImage() const;
 
   protected:
     TensorImage();
-    virtual ~TensorImage();
+    ~TensorImage() override;
 
     mutable mitk::Image::Pointer m_RgbImage;
 

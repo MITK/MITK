@@ -3,8 +3,9 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.properties"
           name="Properties"
+          category="Data"
           class="QmitkPropertyTreeView"
-          icon="resources/icon.png" >
+          icon="resources/property_list.svg" >
           <description>View, Set, and Change properties of DataNodes</description>
     </view>
   </extension>

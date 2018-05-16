@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOclBinaryThresholdImageFilter.h"
 
 mitk::OclBinaryThresholdImageFilter::OclBinaryThresholdImageFilter()
-: m_ckBinaryThreshold( NULL )
+: m_ckBinaryThreshold( nullptr )
 {
 //! [Create]
   std::string path = "BinaryThresholdFilter.cl";

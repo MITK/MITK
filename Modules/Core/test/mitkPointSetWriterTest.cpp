@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 
 #include <iostream>
-#include <time.h>
+#include <ctime>
 
 /**
  *  Test for the class "mitkPointSetFileWriter".
@@ -36,7 +36,7 @@ int mitkPointSetWriterTest(int /* argc */, char * /*argv*/ [])
   MITK_TEST_BEGIN("PointSetWriter")
 
   // create pointSet
-  srand(time(NULL));
+  srand(time(nullptr));
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
   int numberOfPoints = rand() % 100;
   for (int i = 0; i <= numberOfPoints + 1; i++)

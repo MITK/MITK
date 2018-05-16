@@ -57,7 +57,7 @@ public:
 
 protected:
   QmitkLiveWireTool2DGUI();
-  virtual ~QmitkLiveWireTool2DGUI();
+  ~QmitkLiveWireTool2DGUI() override;
 
   Ui::QmitkLiveWireTool2DGUIControls m_Controls;
 

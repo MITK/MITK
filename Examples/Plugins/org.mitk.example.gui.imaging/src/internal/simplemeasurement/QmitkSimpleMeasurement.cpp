@@ -49,7 +49,7 @@ QmitkSimpleMeasurement::~QmitkSimpleMeasurement()
 
   if (m_PointSetInteractor.IsNotNull())
   {
-    m_SelectedPointSetNode->SetDataInteractor(NULL);
+    m_SelectedPointSetNode->SetDataInteractor(nullptr);
   }
 }
 
@@ -75,7 +75,7 @@ void QmitkSimpleMeasurement::ActivatedZombieView(berry::SmartPointer<berry::IWor
   // something else was selected. remove old interactor
   if (m_PointSetInteractor.IsNotNull())
   {
-    m_SelectedPointSetNode->SetDataInteractor(NULL);
+    m_SelectedPointSetNode->SetDataInteractor(nullptr);
   }
 }
 
@@ -191,7 +191,7 @@ void QmitkSimpleMeasurement::OnSelectionChanged(berry::IWorkbenchPart::Pointer /
   // something else was selected. remove old interactor
   if (m_PointSetInteractor.IsNotNull())
   {
-    m_SelectedPointSetNode->SetDataInteractor(NULL);
+    m_SelectedPointSetNode->SetDataInteractor(nullptr);
   }
 
   bool pointsetCreatedByThis = false;

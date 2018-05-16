@@ -51,7 +51,7 @@ mitk::GetCurrentDICOMTagsOfInterest()
     MITK_WARN << "DICOM tag error: multiple service for DICOM tags of interest found. Using just one.";
   }
 
-  IDICOMTagsOfInterest* toiRegister = us::GetModuleContext()->GetService<mitk::IDICOMTagsOfInterest>(toiRegisters.front());
+  auto* toiRegister = us::GetModuleContext()->GetService<mitk::IDICOMTagsOfInterest>(toiRegisters.front());
   if (!toiRegister)
   {
     MITK_ERROR << "Service lookup error, cannot get DICOM tag of interest service ";
@@ -65,7 +65,7 @@ mitk::GetDefaultDICOMTagsOfInterest()
 {
   DICOMTagPathMapType result;
     //These tags are copied from DICOMSeriesReader. The old naming style (deprecated)
-    //is keept for backwards compatibility until it is removed.
+    //is kept for backwards compatibility until it is removed.
     //Below we have also already added the properties with the new naming style
 
     // Patient module
@@ -130,6 +130,35 @@ mitk::GetDefaultDICOMTagsOfInterest()
     /*dicom.InstitutionName*/ result.insert(MakeEntry(DICOMTag(0x0008, 0x0080)));
     /*dicom.StationName*/ result.insert(MakeEntry(DICOMTag(0x0008, 0x1010)));
     /*dicom.DoseGridScaling*/ result.insert(MakeEntry(DICOMTag(0x3004, 0x000e)));
+
+    //Additions for RTPLAN
+    DICOMTagPath doseReferenceSequence;
+    doseReferenceSequence.AddAnySelection(0x300A, 0x0010);
+    DICOMTagPath fractionGroupSequence;
+    fractionGroupSequence.AddAnySelection(0x300A, 0x0070);
+    DICOMTagPath beamSequence;
+    beamSequence.AddAnySelection(0x300A, 0x00B0);
+    DICOMTagPath referencedStructureSetSequence;
+    referencedStructureSetSequence.AddAnySelection(0x300C, 0x0060);
+    result.insert(MakeEntry(DICOMTagPath(doseReferenceSequence).AddElement(0x300A, 0x0013))); //dicom.DoseReferenceSequence.DoseReferenceUID
+    result.insert(MakeEntry(DICOMTagPath(doseReferenceSequence).AddElement(0x300A, 0x0016))); //dicom.DoseReferenceSequence.DoseReferenceDescription
+    result.insert(MakeEntry(DICOMTagPath(doseReferenceSequence).AddElement(0x300A, 0x0026))); //dicom.DoseReferenceSequence.TargetPrescriptionDose
+    result.insert(MakeEntry(DICOMTagPath(fractionGroupSequence).AddElement(0x300A, 0x0078))); //dicom.FractionGroupSequence.NumberOfFractionsPlanned
+    result.insert(MakeEntry(DICOMTagPath(fractionGroupSequence).AddElement(0x300A, 0x0080))); //dicom.FractionGroupSequence.NumberOfBeams
+    result.insert(MakeEntry(DICOMTagPath(beamSequence).AddElement(0x300A, 0x00C6)));          //dicom.BeamSequence.RadiationType
+    result.insert(MakeEntry(DICOMTagPath(referencedStructureSetSequence).AddElement(0x0008, 0x1155))); //dicom.ReferencedStructureSetSequence.ReferencedSOPInstanceUID
+
+    //Additions for RTSTRUCT
+    DICOMTagPath structureSetROISequence;
+    structureSetROISequence.AddAnySelection(0x3006, 0x0020);
+    result.insert(MakeEntry(DICOMTagPath(structureSetROISequence).AddElement(0x3006, 0x0022))); //dicom.StructureSetROISequence.ROINumber
+    result.insert(MakeEntry(DICOMTagPath(structureSetROISequence).AddElement(0x3006, 0x0026))); //dicom.StructureSetROISequence.ROIName
+    result.insert(MakeEntry(DICOMTagPath(structureSetROISequence).AddElement(0x3006, 0x0024))); //dicom.StructureSetROISequence.ReferencedFrameOfReferenceUID
+
+    //Additions for RTDOSE
+    DICOMTagPath planReferenceSequence;
+    planReferenceSequence.AddAnySelection(0x300C, 0x0002);
+    result.insert(MakeEntry(DICOMTagPath(planReferenceSequence).AddElement(0x0008, 0x1155))); //dicom.PlanReferenceSequence.ReferencedSOPInstanceUID
 
     //Additions for PET
     DICOMTagPath radioPharmaRootTag;

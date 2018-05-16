@@ -28,7 +28,7 @@ QmitkUSDeviceManagerWidget::QmitkUSDeviceManagerWidget(QWidget* parent,
   Qt::WindowFlags f)
   : QWidget(parent, f)
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
 }
 
@@ -188,6 +188,7 @@ void QmitkUSDeviceManagerWidget::OnDeviceSelectionChanged(
   {
     m_Controls->m_BtnActivate->setEnabled(false);
     m_Controls->m_BtnRemove->setEnabled(false);
+    m_Controls->m_BtnEdit->setEnabled(false);
     return;
   }
   std::string isConnected =

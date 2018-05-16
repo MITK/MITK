@@ -47,7 +47,7 @@ struct org_blueberry_core_runtime_EXPORT IProduct : public virtual Object
 {
   berryObjectMacro(IProduct);
 
-  virtual ~IProduct();
+  ~IProduct() override;
 
   /**
    * Returns the application associated with this product.  This information is used

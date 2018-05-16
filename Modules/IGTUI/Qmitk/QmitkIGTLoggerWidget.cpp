@@ -37,9 +37,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 QmitkIGTLoggerWidget::QmitkIGTLoggerWidget(QWidget* parent, Qt::WindowFlags f)
-: QWidget(parent, f), m_Recorder(NULL), m_RecordingActivated(false)
+: QWidget(parent, f), m_Recorder(nullptr), m_RecordingActivated(false)
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
   CreateConnections();
 
@@ -54,8 +54,8 @@ QmitkIGTLoggerWidget::QmitkIGTLoggerWidget(QWidget* parent, Qt::WindowFlags f)
 QmitkIGTLoggerWidget::~QmitkIGTLoggerWidget()
 {
   m_RecordingTimer->stop();
-  m_Recorder = NULL;
-  m_RecordingTimer = NULL;
+  m_Recorder = nullptr;
+  m_RecordingTimer = nullptr;
 }
 
 void QmitkIGTLoggerWidget::CreateQtPartControl(QWidget *parent)
@@ -94,12 +94,12 @@ void QmitkIGTLoggerWidget::OnStartRecording(bool recording)
 
   if (m_Recorder.IsNull())
   {
-    QMessageBox::warning(NULL, "Warning", QString("Please start tracking before recording!"));
+    QMessageBox::warning(nullptr, "Warning", QString("Please start tracking before recording!"));
     return;
   }
   if (m_CmpFilename.isEmpty())
   {
-    QMessageBox::warning(NULL, "Warning", QString("Please specify filename!"));
+    QMessageBox::warning(nullptr, "Warning", QString("Please specify filename!"));
     return;
   }
 
@@ -120,7 +120,7 @@ void QmitkIGTLoggerWidget::OnStartRecording(bool recording)
       }
       catch (std::exception& e)
       {
-        QMessageBox::warning(NULL, "IGT-Tracking Logger: Error", QString("Error while recording tracking data: %1").arg(e.what()));
+        QMessageBox::warning(nullptr, "IGT-Tracking Logger: Error", QString("Error while recording tracking data: %1").arg(e.what()));
         mitk::StatusBar::GetInstance()->DisplayText(""); // Display recording message for 75ms in status bar
       }
       m_Controls->m_pbStartRecording->setText("Stop recording");
@@ -166,12 +166,12 @@ void QmitkIGTLoggerWidget::StopRecording()
   try
   {
     // write NavigationDataSet on StopRecording
-    mitk::IOUtil::SaveBaseData(m_Recorder->GetNavigationDataSet(), m_CmpFilename.toStdString());
+    mitk::IOUtil::Save(m_Recorder->GetNavigationDataSet(), m_CmpFilename.toStdString());
   }
   catch(const std::exception &e)
   {
     // TODO: catch must be adapted when new file writer are merged to master
-    QMessageBox::warning(NULL, "IGT-Tracking Logger: Error", QString("Error while writing tracking data: %1").arg(e.what()));
+    QMessageBox::warning(nullptr, "IGT-Tracking Logger: Error", QString("Error while writing tracking data: %1").arg(e.what()));
     MITK_WARN << "File could not be written.";
   }
 
@@ -215,7 +215,7 @@ void QmitkIGTLoggerWidget::UpdateOutputFileName()
   m_CmpFilename = m_Controls->m_leOutputFile->text();
   if (m_CmpFilename.isEmpty())
   {
-    QMessageBox::warning(NULL, "Warning", QString("Please enter valid path! Using previous path again."));
+    QMessageBox::warning(nullptr, "Warning", QString("Please enter valid path! Using previous path again."));
      m_CmpFilename=oldName;
      m_Controls->m_leOutputFile->setText(m_CmpFilename);
   }
@@ -243,7 +243,7 @@ void QmitkIGTLoggerWidget::UpdateRecordingTime()
     m_MilliSeconds.toInt(&success);
     if (!success)
     {
-      QMessageBox::warning(NULL, "Warning", QString("Please enter a number!"));
+      QMessageBox::warning(nullptr, "Warning", QString("Please enter a number!"));
       this->SetDefaultRecordingSettings();
       return;
     }
@@ -261,7 +261,7 @@ void QmitkIGTLoggerWidget::UpdateRecordingTime()
     m_Samples.toInt(&success);
     if (!success)
     {
-      QMessageBox::warning(NULL, "Warning", QString("Please enter a number!"));
+      QMessageBox::warning(nullptr, "Warning", QString("Please enter a number!"));
       this->SetDefaultRecordingSettings();
       return;
     }
@@ -293,7 +293,7 @@ void QmitkIGTLoggerWidget::SetOutputFileName()
 
   if(dir.isEmpty())
   {
-    QMessageBox::warning(NULL, "Warning", QString("Could not load current working directory"));
+    QMessageBox::warning(nullptr, "Warning", QString("Could not load current working directory"));
     return;
   }
   if(dir.endsWith("/")||dir.endsWith("\\"))

@@ -31,7 +31,7 @@
 US_BEGIN_NAMESPACE
 
 ServiceReferenceBase::ServiceReferenceBase()
-  : d(new ServiceReferenceBasePrivate(0))
+  : d(new ServiceReferenceBasePrivate(nullptr))
 {
 
 }
@@ -60,7 +60,7 @@ void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
 
 ServiceReferenceBase::operator bool_type() const
 {
-  return GetModule() != 0 ? &ServiceReferenceBase::d : NULL;
+  return GetModule() != nullptr ? &ServiceReferenceBase::d : nullptr;
 }
 
 ServiceReferenceBase& ServiceReferenceBase::operator=(int null)
@@ -69,7 +69,7 @@ ServiceReferenceBase& ServiceReferenceBase::operator=(int null)
   {
     if (!d->ref.Deref())
       delete d;
-    d = new ServiceReferenceBasePrivate(0);
+    d = new ServiceReferenceBasePrivate(nullptr);
   }
   return *this;
 }
@@ -97,9 +97,9 @@ void ServiceReferenceBase::GetPropertyKeys(std::vector<std::string>& keys) const
 
 Module* ServiceReferenceBase::GetModule() const
 {
-  if (d->registration == 0 || d->registration->module == 0)
+  if (d->registration == nullptr || d->registration->module == nullptr)
   {
-    return 0;
+    return nullptr;
   }
 
   return d->registration->module->q;
@@ -197,7 +197,7 @@ std::ostream& operator<<(std::ostream& os, const ServiceReferenceBase& serviceRe
 {
   if (serviceRef)
   {
-    assert(serviceRef.GetModule() != NULL);
+    assert(serviceRef.GetModule() != nullptr);
 
     os << "Reference for service object registered from "
        << serviceRef.GetModule()->GetName() << " " << serviceRef.GetModule()->GetVersion()

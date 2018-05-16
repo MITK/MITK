@@ -106,7 +106,7 @@ class MITKDICOMREADER_EXPORT DICOMReaderConfigurator : public itk::LightObject
   protected:
 
     DICOMReaderConfigurator();
-    virtual ~DICOMReaderConfigurator();
+    ~DICOMReaderConfigurator() override;
 
   private:
 
@@ -136,6 +136,9 @@ class MITKDICOMREADER_EXPORT DICOMReaderConfigurator : public itk::LightObject
     TiXmlElement* CreateDICOMFileReaderTag(const DICOMFileReader* reader) const;
     const char* toString(bool) const;
     std::string toHexString(unsigned int i) const;
+
+    /** Helper that queries an boolean xml attribute. If the attribute does not exist, the passed default value is used.*/
+    bool QueryBooleanAttribute(const TiXmlElement* element, const char* attributeName, bool defaultValue) const;
  };
 
 } // namespace

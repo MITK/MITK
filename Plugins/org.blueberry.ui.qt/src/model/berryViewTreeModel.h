@@ -37,7 +37,7 @@ public:
   ViewTreeModel(const IWorkbenchWindow* window,
                 QObject* parent = nullptr);
 
-  ~ViewTreeModel();
+  ~ViewTreeModel() override;
 
   enum Role {
     Description = Qt::UserRole,

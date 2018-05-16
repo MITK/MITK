@@ -215,7 +215,7 @@ namespace mitk
 
   protected:
     NonBlockingAlgorithm(); // use smart pointers
-    virtual ~NonBlockingAlgorithm();
+    ~NonBlockingAlgorithm() override;
 
     void DefineTriggerParameter(const char *);
     void UnDefineTriggerParameter(const char *);

@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkOverlayController::QmitkOverlayController(QmitkRenderWindow *rw, mitk::PropertyList *pl)
   : QObject(), m_RenderWindow(rw), m_PropertyList(pl)
 {
-  if (m_RenderWindow == NULL)
+  if (m_RenderWindow == nullptr)
   {
     MITK_ERROR << "invalid QmitkRenderWindow";
     return;
@@ -310,13 +310,13 @@ void QmitkOverlayController::SetOverlayVisibility(bool visible)
 void QmitkOverlayController::AddOverlay(QmitkOverlay *overlay)
 {
   // if no renderwindow has been set, it's not possible to add overlays...
-  if (m_RenderWindow == NULL)
+  if (m_RenderWindow == nullptr)
   {
     MITK_ERROR << "invalid QmitkRenderWindow";
     return;
   }
 
-  if (overlay != NULL)
+  if (overlay != nullptr)
   {
     // get desired position and layer of the overlay
     QmitkOverlay::DisplayPosition pos = overlay->GetPosition();
@@ -343,7 +343,7 @@ void QmitkOverlayController::AddOverlay(QmitkOverlay *overlay)
 
 void QmitkOverlayController::UpdateOverlayData(QmitkOverlay *overlay)
 {
-  if (overlay != NULL)
+  if (overlay != nullptr)
   {
     overlay->GenerateData(m_PropertyList);
     AdjustOverlayPosition(overlay->GetPosition());
@@ -354,7 +354,7 @@ void QmitkOverlayController::RemoveAllOverlays()
 {
   foreach (QmitkOverlay *overlay, m_AllOverlays)
   {
-    overlay->GetWidget()->setParent(NULL);
+    overlay->GetWidget()->setParent(nullptr);
     overlay->GetWidget()->hide();
     overlay->deleteLater();
   }
@@ -364,7 +364,7 @@ void QmitkOverlayController::RemoveAllOverlays()
 
 void QmitkOverlayController::RemoveOverlay(QmitkOverlay *overlay)
 {
-  if (overlay != NULL)
+  if (overlay != nullptr)
   {
     // get desired position and layer of the overlay
     QmitkOverlay::DisplayPosition pos = overlay->GetPosition();
@@ -374,7 +374,7 @@ void QmitkOverlayController::RemoveOverlay(QmitkOverlay *overlay)
     if (iter != m_AllOverlays.end())
     {
       m_AllOverlays.erase(iter);
-      overlay->GetWidget()->setParent(NULL);
+      overlay->GetWidget()->setParent(nullptr);
       overlay->GetWidget()->hide();
 
       if (m_PositionedOverlays[pos]->layout()->isEmpty())

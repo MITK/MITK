@@ -171,7 +171,7 @@ void mitk::LabelSetImageToSurfaceFilter::InternalProcessing(const itk::Image<TPi
   this->GetInput()->GetGeometry()->IndexToWorld(origin, origin);
   newGeometry->SetOrigin(origin);
 
-  vtkImageData *vtkimage = const_cast<vtkImageData *>(m_ResultImage->GetVtkImageData(0));
+  auto *vtkimage = m_ResultImage->GetVtkImageData(0);
 
   vtkSmartPointer<vtkImageChangeInformation> indexCoordinatesImageFilter =
     vtkSmartPointer<vtkImageChangeInformation>::New();

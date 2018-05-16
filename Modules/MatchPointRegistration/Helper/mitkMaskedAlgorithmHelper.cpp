@@ -160,7 +160,6 @@ namespace mitk
   template<typename TPixelType, unsigned int VImageDimension>
   void MaskedAlgorithmHelper::DoConvertMask(const itk::Image<TPixelType,VImageDimension>* mask)
   {
-    typedef itk::Image<TPixelType,VImageDimension> ImageType;
     typedef itk::ImageMaskSpatialObject<VImageDimension> SpatialType;
 
     typename SpatialType::Pointer spatial = SpatialType::New();

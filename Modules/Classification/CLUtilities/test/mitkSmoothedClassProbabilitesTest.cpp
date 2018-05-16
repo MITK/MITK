@@ -44,10 +44,10 @@ public:
   {
 
     // Load Image Data
-    p1 = mitk::IOUtil::LoadImage(GetTestDataFilePath("Classification/Algorithm/ResultProb_Class-0_0.nrrd"));
-    p2 = mitk::IOUtil::LoadImage(GetTestDataFilePath("Classification/Algorithm/ResultProb_Class-1_0.nrrd"));
-    p3 = mitk::IOUtil::LoadImage(GetTestDataFilePath("Classification/Algorithm/ResultProb_Class-2_0.nrrd"));
-    pmask = mitk::IOUtil::LoadImage(GetTestDataFilePath("Classification/Algorithm/mask.nrrd"));
+    p1 = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Classification/Algorithm/ResultProb_Class-0_0.nrrd"));
+    p2 = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Classification/Algorithm/ResultProb_Class-1_0.nrrd"));
+    p3 = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Classification/Algorithm/ResultProb_Class-2_0.nrrd"));
+    pmask = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Classification/Algorithm/mask.nrrd"));
 
     mitk::CastToItkImage(p1,i1);
     mitk::CastToItkImage(p2,i2);

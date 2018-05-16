@@ -72,7 +72,7 @@ namespace mitk
       \brief Getter for a specific plane position with a given ID
 
       \a ID the ID of the plane position
-      \return Returns a RestorePlanePositionOperation which can be executed by th SliceNavigationController or NULL for
+      \return Returns a RestorePlanePositionOperation which can be executed by th SliceNavigationController or nullptr for
       an
       invalid ID
     */

@@ -42,10 +42,10 @@ namespace mitk {
       mitkClassMacroItkParent(IGTLMessage, itk::DataObject);
       itkFactorylessNewMacro(Self);
       itkCloneMacro(Self);
-      mitkNewMacro2Param(Self, igtl::MessageBase::Pointer,std::string);
+      mitkNewMacro1Param(Self, igtl::MessageBase::Pointer);
 
       /**
-      * \brief type that holds the time at which the data was recorded
+      * \brief type that holds the time at which the data was recorded in milliseconds
       */
       typedef double TimeStampType;
 
@@ -89,14 +89,14 @@ namespace mitk {
       * SmartPointers to the same IGTLMessage object since separate DataObjects
       * are still maintained.
       */
-      virtual void Graft(const DataObject *data) override;
+      void Graft(const DataObject *data) override;
 
       /**
       * \brief copy meta data of a IGTLMessage object
       *
       * copies all meta data from IGTLMessage data to this object
       */
-      virtual void CopyInformation(const DataObject* data) override;
+      void CopyInformation(const DataObject* data) override;
 
       /**
       * \brief Prints the object information to the given stream os.
@@ -104,6 +104,8 @@ namespace mitk {
       * \param indent Defines the indentation of the output.
       */
       void PrintSelf(std::ostream& os, itk::Indent indent) const override;
+
+      std::string ToString() const;
 
       /** Compose with another IGTLMessage
        *
@@ -136,9 +138,9 @@ namespace mitk {
       /**
        * Creates a IGTLMessage object from an igtl::MessageBase and a given name.
        */
-      IGTLMessage(igtl::MessageBase::Pointer message, std::string name = "");
+      IGTLMessage(igtl::MessageBase::Pointer message);
 
-      virtual ~IGTLMessage();
+      ~IGTLMessage() override;
 
       /**
       * \brief holds the actual OpenIGTLink message

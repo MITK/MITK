@@ -26,8 +26,8 @@ if(MITK_USE_MatchPoint)
       set(download_step SOURCE_DIR ${MatchPoint_SOURCE_DIR})
     else()
       set(download_step
-          URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/MatchPoint_rev1681.tar.gz
-          URL_MD5 fa18c890751a192ac72803d115a1c702
+          URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/MatchPoint_rev_24ef6072.tar.gz
+          URL_MD5 b0a0d7d63da5071db8e73dd6e6b4db7c
          )
     endif()
 
@@ -41,9 +41,11 @@ if(MITK_USE_MatchPoint)
          -DBUILD_TESTING:BOOL=OFF
          -DITK_DIR:PATH=${ITK_DIR} #/src/ITK-build
          -DMAP_USE_SYSTEM_GDCM:BOOL=ON
+         -DMAP_USE_SYSTEM_HDF5:BOOL=ON
          -DMAP_DISABLE_ITK_IO_FACTORY_AUTO_REGISTER:BOOL=ON
          -DMAP_WRAP_Plastimatch:BOOL=ON
          -DGDCM_DIR:PATH=${GDCM_DIR}
+         -DHDF5_DIR:PATH=${HDF5_DIR}
        CMAKE_CACHE_ARGS
          ${ep_common_cache_args}
        CMAKE_CACHE_DEFAULT_ARGS

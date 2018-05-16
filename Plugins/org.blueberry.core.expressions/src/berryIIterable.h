@@ -39,7 +39,7 @@ struct BERRY_EXPRESSIONS IIterable : public Object
   typedef QList<Object::Pointer>::iterator iterator;
   typedef QList<Object::Pointer>::const_iterator const_iterator;
 
-  virtual ~IIterable();
+  ~IIterable() override;
 
   /**
    * Returns an iterator to iterate over the elements.

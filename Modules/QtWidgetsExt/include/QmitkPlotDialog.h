@@ -55,7 +55,7 @@ public:
   /**
   * Virtual destructor
   */
-  virtual ~QmitkPlotDialog();
+  ~QmitkPlotDialog() override;
 
   /**
   * Returns the instance of the QmitkPlotWidget. This may be used

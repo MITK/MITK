@@ -65,9 +65,9 @@ namespace mitk
     mitkClassMacro(PlaneGeometryDataToSurfaceFilter, SurfaceSource);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual void GenerateOutputInformation() override;
+      void GenerateOutputInformation() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     const PlaneGeometryData *GetInput(void);
     const PlaneGeometryData *GetInput(unsigned int idx);
@@ -157,7 +157,7 @@ namespace mitk
   protected:
     PlaneGeometryDataToSurfaceFilter();
 
-    virtual ~PlaneGeometryDataToSurfaceFilter();
+    ~PlaneGeometryDataToSurfaceFilter() override;
 
     /** \brief Source to create the vtk-representation of the parameter space rectangle of the PlaneGeometry
     */

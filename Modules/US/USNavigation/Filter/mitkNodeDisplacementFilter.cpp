@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
         << "Null Node passed to NodeDisplacementFilter. Ignoring Node....";
       return false;
     }
-    if (node->GetData() == 0)
+    if (node->GetData() == nullptr)
     {
       MITK_WARN("NodeDisplacementFilter")
         << "Empty Node passed to NodeDisplacementFilter. Ignoring Node....";
@@ -96,7 +96,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   mitk::DataNode::Pointer mitk::NodeDisplacementFilter::GetNode (unsigned int i)
   {
     if (i < m_Nodes.size() ) { return m_Nodes.at(i); }
-    else { return NULL; }
+    else { return nullptr; }
   }
 
   std::vector< mitk::DataNode::Pointer > mitk::NodeDisplacementFilter::GetNodes()

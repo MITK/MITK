@@ -22,6 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <Colortables/HotIron.h>
 #include <Colortables/Jet.h>
+#include <Colortables/Inferno.h>
+#include <Colortables/Viridis.h>
+#include <Colortables/Plasma.h>
+#include <Colortables/Magma.h>
 #include <Colortables/PET20.h>
 #include <Colortables/PETColor.h>
 #include <mitkLookupTableProperty.h>
@@ -32,6 +36,10 @@ const char *const mitk::LookupTable::typenameList[] = {
   "Hot Iron",
   "Jet",
   "Jet Transparent",
+  "Plasma",
+  "Inferno",
+  "Viridis",
+  "Magma",
   "Legacy Binary",
   "Legacy Rainbow Color",
   "Multilabel",
@@ -88,6 +96,18 @@ void mitk::LookupTable::SetType(const mitk::LookupTable::LookupTableType type)
       break;
     case (mitk::LookupTable::JET_TRANSPARENT):
       this->BuildJetLookupTable(true);
+      break;
+    case (mitk::LookupTable::PLASMA):
+	    this->BuildPlasmaLookupTable();
+	    break;
+	  case (mitk::LookupTable::INFERNO):
+	    this->BuildInfernoLookupTable();
+      break;
+	  case (mitk::LookupTable::VIRIDIS):
+	    this->BuildViridisLookupTable();
+	    break;
+    case (mitk::LookupTable::MAGMA):
+      this->BuildMagmaLookupTable();
       break;
     case (mitk::LookupTable::LEGACY_BINARY):
       this->BuildLegacyBinaryLookupTable();
@@ -576,6 +596,70 @@ void mitk::LookupTable::BuildLegacyRainbowColorLookupTable()
   lut->SetHueRange(0.6667, 0.0);
   lut->SetTableRange(0.0, 20.0);
   lut->Build();
+
+  m_LookupTable = lut;
+  this->Modified();
+}
+
+void mitk::LookupTable::BuildPlasmaLookupTable()
+{
+	vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+	lut->SetNumberOfTableValues(256);
+	lut->Build();
+
+	for (int i = 0; i < 256; i++)
+	{
+		lut->SetTableValue(
+			i, (double)Plasma[i][0] / 255.0, (double)Plasma[i][1] / 255.0, (double)Plasma[i][2] / 255.0, 1.0);
+	}
+
+	m_LookupTable = lut;
+	this->Modified();
+}
+
+void mitk::LookupTable::BuildInfernoLookupTable()
+{
+	vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+	lut->SetNumberOfTableValues(256);
+	lut->Build();
+
+	for (int i = 0; i < 256; i++)
+	{
+		lut->SetTableValue(
+			i, (double)Inferno[i][0] / 255.0, (double)Inferno[i][1] / 255.0, (double)Inferno[i][2] / 255.0, 1.0);
+	}
+
+	m_LookupTable = lut;
+	this->Modified();
+}
+
+void mitk::LookupTable::BuildViridisLookupTable()
+{
+	vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+	lut->SetNumberOfTableValues(256);
+	lut->Build();
+
+	for (int i = 0; i < 256; i++)
+	{
+		lut->SetTableValue(
+			i, (double)Viridis[i][0] / 255.0, (double)Viridis[i][1] / 255.0, (double)Viridis[i][2] / 255.0, 1.0);
+	}
+
+	m_LookupTable = lut;
+	this->Modified();
+}
+
+void mitk::LookupTable::BuildMagmaLookupTable()
+{
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+  lut->SetNumberOfTableValues(256);
+  lut->Build();
+
+  for (int i = 0; i < 256; i++)
+  {
+    lut->SetTableValue(
+      i, (double)Magma[i][0] / 255.0, (double)Magma[i][1] / 255.0, (double)Magma[i][2] / 255.0, 1.0);
+  }
 
   m_LookupTable = lut;
   this->Modified();

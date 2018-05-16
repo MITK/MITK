@@ -38,12 +38,12 @@ class ActivatorSL1 :
 public:
 
   ActivatorSL1()
-    : tracker(0), context(0)
+    : tracker(nullptr), context(nullptr)
   {
 
   }
 
-  ~ActivatorSL1()
+  ~ActivatorSL1() override
   {
     delete tracker;
   }

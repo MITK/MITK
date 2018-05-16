@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkWeakPointer.h>
 #include <itkOpenCVImageBridge.h>
 #include <MitkOpenCVVideoSupportExports.h>
+#include <opencv2/core.hpp>
 
 #include "mitkImageSliceSelector.h"
 
@@ -50,7 +51,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
         ///
         /// \brief get the input MITK image
         ///
-        itkGetMacro(Image, mitk::Image*);
+        mitk::Image* GetImage();
 
         ///
         /// \brief get the input MITK image
@@ -88,7 +89,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
         void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* image );
 
         ImageToOpenCVImageFilter();
-        ~ImageToOpenCVImageFilter();
+        ~ImageToOpenCVImageFilter() override;
 
         ///
         /// Saves if the filter should copy the data or just reference it

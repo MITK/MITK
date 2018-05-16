@@ -885,15 +885,6 @@ namespace mitk
     return resultImage;
   }
 
-  static inline int clamp(int x)
-  {
-    if (x < 0)
-      x = 0;
-    else if (x > 255)
-      x = 255;
-    return x;
-  }
-
   mitk::Image::Pointer mitkColourImageProcessor::CombineRGBAImage(
     const unsigned char *input, const unsigned char *input2, int sizeX, int sizeY, int sizeZ)
   {

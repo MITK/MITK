@@ -32,17 +32,17 @@ public:
 
   Product(IBranding* branding);
 
-  QString GetApplication() const;
+  QString GetApplication() const override;
 
-  QSharedPointer<ctkPlugin> GetDefiningPlugin() const;
+  QSharedPointer<ctkPlugin> GetDefiningPlugin() const override;
 
-  QString GetDescription() const;
+  QString GetDescription() const override;
 
-  QString GetId() const;
+  QString GetId() const override;
 
-  QString GetName() const;
+  QString GetName() const override;
 
-  QString GetProperty(const QString& key) const;
+  QString GetProperty(const QString& key) const override;
 
 private:
 

@@ -116,7 +116,7 @@ public:
    */
   static Workbench* GetInstance();
 
-  virtual ~Workbench();
+  ~Workbench() override;
 
   /*
    * (non-Javadoc)

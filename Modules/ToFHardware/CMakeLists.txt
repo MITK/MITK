@@ -3,7 +3,7 @@ mitkMacroGetPMDPlatformString(_PLATFORM_STRING)
 
 MITK_CREATE_MODULE(
   SUBPROJECTS MITK-ToF
-  DEPENDS MitkOpenCVVideoSupport MitkIGTBase MitkLegacyAdaptors MitkCameraCalibration
+  DEPENDS MitkOpenCVVideoSupport MitkIGTBase MitkCameraCalibration MitkIpPic
   PACKAGE_DEPENDS ITK|ITKIONRRD
   ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
 )

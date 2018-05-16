@@ -46,14 +46,14 @@ namespace mitk
     typedef std::vector<StackDescriptionItem>
       StackDescription; /// a list of pairs (int,string), representing a stack with ObjectEventIDs and descriptions
 
-    virtual bool SetOperationEvent(UndoStackItem *undoStackItem) override;
+    bool SetOperationEvent(UndoStackItem *undoStackItem) override;
 
     virtual StackDescription GetUndoDescriptions();
     virtual StackDescription GetRedoDescriptions();
 
   protected:
     VerboseLimitedLinearUndo();
-    virtual ~VerboseLimitedLinearUndo();
+    ~VerboseLimitedLinearUndo() override;
   };
 
 } // namespace mitk

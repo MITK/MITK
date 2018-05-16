@@ -87,7 +87,7 @@ public:
   {
     RegistrationType* registration = dynamic_cast< RegistrationType* >( caller );
 
-    if( registration == NULL)
+    if( registration == nullptr)
       return;
 
     MITK_DEBUG << "\t - Pyramid level " << registration->GetCurrentLevel();
@@ -98,7 +98,7 @@ public:
 
     OptimizerType* optimizer = dynamic_cast< OptimizerType* >(registration->GetOptimizer());
 
-    if( optimizer == NULL)
+    if( optimizer == nullptr)
     { MITK_WARN("OptCommand") << "Cast to optimizer failed";
           return;
     }
@@ -131,7 +131,7 @@ public:
   {
     RegistrationType* registration = dynamic_cast< RegistrationType* >( caller );
 
-    if( registration == NULL)
+    if( registration == nullptr)
       return;
 
     MITK_DEBUG << "\t - Pyramid level " << registration->GetCurrentLevel();
@@ -140,7 +140,7 @@ public:
 
     OptimizerType* optimizer = dynamic_cast< OptimizerType* >( registration->GetOptimizer() );
 
-    if( optimizer == NULL)
+    if( optimizer == nullptr)
     { MITK_WARN("OptCommand4") << "Cast to optimizer failed";
           return;
     }

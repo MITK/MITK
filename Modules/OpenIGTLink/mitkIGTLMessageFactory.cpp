@@ -280,7 +280,7 @@ mitk::IGTLMessageFactory::CreateInstance(igtl::MessageHeader::Pointer msgHeader)
   {
     if (this->m_NewMethods[messageType] != nullptr)
     {
-      // Call tracker New() function if tracker not NULL
+      // Call tracker New() function if tracker not nullptr
       return (*this->m_NewMethods[messageType])();
     }
     else

@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
 *  Test for synthetic connectomics generation and connectomics network functionality
 */
-int mitkConnectomicsNetworkTest(int argc, char* argv[])
+int mitkConnectomicsNetworkTest(int, char* [])
 {
   // Test begins
   MITK_TEST_BEGIN("mitkConnectomicsNetworkTest");
@@ -41,7 +41,6 @@ int mitkConnectomicsNetworkTest(int argc, char* argv[])
 
   // Typedefs
   typedef mitk::ConnectomicsNetwork::VertexDescriptorType VertexType;
-  typedef mitk::ConnectomicsNetwork::EdgeDescriptorType EdgeType;
   typedef mitk::ConnectomicsNetwork::NetworkNode NodeType;
 
   // The test network
@@ -152,92 +151,92 @@ int mitkConnectomicsNetworkTest(int argc, char* argv[])
 
   edge.sourceId = 0;
   edge.targetId = 1;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 0;
   edge.targetId = 2;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 0;
   edge.targetId = 4;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 1;
   edge.targetId = 4;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 1;
   edge.targetId = 3;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 2;
   edge.targetId = 3;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 3;
   edge.targetId = 4;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 4;
   edge.targetId = 5;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 5;
   edge.targetId = 6;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 5;
   edge.targetId = 7;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 5;
   edge.targetId = 8;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 7;
   edge.targetId = 8;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 6;
   edge.targetId = 8;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 6;
   edge.targetId = 9;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 3;
   edge.targetId = 10;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 9;
   edge.targetId = 10;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 10;
   edge.targetId = 11;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   edge.sourceId = 9;
   edge.targetId = 11;
-  edge.weight = 2;
+  edge.fiber_count = 2;
   inEdges.push_back( edge );
 
   // further variables
@@ -355,15 +354,15 @@ int mitkConnectomicsNetworkTest(int argc, char* argv[])
       // there are two methods to add nodes
       if( loop % 2 == 0 )
       {
-        network->AddEdge(sourceVertex, targetVertex);
-        for( int remaining( inEdges[loop].weight ); remaining > 1; remaining-- )
+        network->AddEdge(sourceVertex, targetVertex, 1);
+        for( int remaining( inEdges[loop].fiber_count ); remaining > 1; remaining-- )
         {
-          network->IncreaseEdgeWeight( sourceVertex, targetVertex );
+          network->IncreaseEdgeWeight( sourceVertex, targetVertex, 1 );
         }
       }
       else
       {
-        network->AddEdge(sourceVertex, targetVertex, sourceId, targetId, inEdges[loop].weight );
+        network->AddEdge(sourceVertex, targetVertex, sourceId, targetId, inEdges[loop].fiber_count );
       }
     }
 
@@ -424,15 +423,15 @@ int mitkConnectomicsNetworkTest(int argc, char* argv[])
       // there are two methods to add nodes
       if( loop % 2 == 0 )
       {
-        network->AddEdge(sourceVertex, targetVertex);
-        for( int remaining( inEdges[loop].weight ); remaining > 1; remaining-- )
+        network->AddEdge(sourceVertex, targetVertex, 1);
+        for( int remaining( inEdges[loop].fiber_count ); remaining > 1; remaining-- )
         {
-          network->IncreaseEdgeWeight( sourceVertex, targetVertex );
+          network->IncreaseEdgeWeight( sourceVertex, targetVertex, 1 );
         }
       }
       else
       {
-        network->AddEdge(sourceVertex, targetVertex, sourceId, targetId, inEdges[loop].weight );
+        network->AddEdge(sourceVertex, targetVertex, sourceId, targetId, inEdges[loop].fiber_count );
       }
     }
 

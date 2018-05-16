@@ -41,12 +41,12 @@ namespace mitk
 
     /**
      * Allocates an array of a given number of elements. Each element
-     * has a size of sizeof(ElementType). The function returns NULL, if the array
+     * has a size of sizeof(ElementType). The function returns nullptr, if the array
      * could not be allocated.
      * @param numberOfElements the number of elements of the array
      * @param noThrow if set to false, an exception is thrown if memory allocation
      *                fails. If set to true, a itk::MemoryAllocationError is thrown
-     * @returns a pointer to the allocated array. If noThrow == true, NULL is returned
+     * @returns a pointer to the allocated array. If noThrow == true, nullptr is returned
      *          if memory allocation failed.
      */
     template <typename ElementType>
@@ -73,12 +73,12 @@ namespace mitk
 
     /**
      * Deletes an array of elements previously allocated by AllocateElements.
-     * @param elements the array to delete. Not that NULL is an accepted value.
+     * @param elements the array to delete. Not that nullptr is an accepted value.
      */
     template <typename ElementType>
     static void DeleteElements(ElementType *elements)
     {
-      if (elements != NULL)
+      if (elements != nullptr)
       {
         delete[] elements;
       }

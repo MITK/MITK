@@ -27,9 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::Mapper::Pointer mitk::GizmoObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId id)
 {
-  mitk::Mapper::Pointer newMapper = NULL;
+  mitk::Mapper::Pointer newMapper = nullptr;
 
-  if ((dynamic_cast<mitk::Gizmo *>(node->GetData()) != NULL))
+  if ((dynamic_cast<mitk::Gizmo *>(node->GetData()) != nullptr))
   {
     if (id == mitk::BaseRenderer::Standard2D)
     {
@@ -43,7 +43,7 @@ mitk::Mapper::Pointer mitk::GizmoObjectFactory::CreateMapper(mitk::DataNode *nod
 
 void mitk::GizmoObjectFactory::SetDefaultProperties(mitk::DataNode *node)
 {
-  if ((dynamic_cast<mitk::Gizmo *>(node->GetData()) != NULL))
+  if ((dynamic_cast<mitk::Gizmo *>(node->GetData()) != nullptr))
   {
     GizmoMapper2D::SetDefaultProperties(node);
   }

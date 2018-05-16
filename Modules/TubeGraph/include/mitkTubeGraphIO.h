@@ -40,14 +40,14 @@ namespace mitk
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
-    virtual std::vector<BaseData::Pointer> Read() override;
+    std::vector<BaseData::Pointer> Read() override;
 
-    virtual ConfidenceLevel GetReaderConfidenceLevel() const override;
+    ConfidenceLevel GetReaderConfidenceLevel() const override;
 
     // -------------- AbstractFileWriter -------------
 
-    virtual void Write() override;
-    virtual ConfidenceLevel GetWriterConfidenceLevel() const override;
+    void Write() override;
+    ConfidenceLevel GetWriterConfidenceLevel() const override;
 
     static CustomMimeType TUBEGRAPH_MIMETYPE() // tsf
     {

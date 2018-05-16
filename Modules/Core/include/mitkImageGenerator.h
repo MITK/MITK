@@ -104,7 +104,7 @@ namespace mitk
       output->Initialize(output_type, reference->GetDimension(), reference->GetDimensions());
 
       // get a pointer to the image buffer to write into
-      TPixelType *imageBuffer = NULL;
+      TPixelType *imageBuffer = nullptr;
       try
       {
         mitk::ImageWriteAccessor writeAccess(output);
@@ -221,6 +221,10 @@ namespace mitk
         {
           // use the integer randomGenerator with mod 256 to generate unsigned char values
           imageBuffer[i] = (unsigned char)((int)randomGenerator->GetIntegerVariate((int)randomMax)) % 256;
+        }
+        else if (type.GetComponentType() == itk::ImageIOBase::USHORT)
+        {
+          imageBuffer[i] = (unsigned short)((int)randomGenerator->GetIntegerVariate((int)randomMax)) % 65536;
         }
         else
         {

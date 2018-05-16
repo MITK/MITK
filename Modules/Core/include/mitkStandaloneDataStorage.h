@@ -51,7 +51,7 @@ namespace mitk
       //## of source objects, that were used to create this object. The new object will have
       //## a 'was created from' relation to its source objects.
       //## the addition of a new object will fire the notification mechanism.
-      //## If the node parameter is NULL or if the DataNode has already been added,
+      //## If the node parameter is nullptr or if the DataNode has already been added,
       //## an exception will be thrown.
       void Add(mitk::DataNode *node, const mitk::DataStorage::SetOfObjects *parents = nullptr) override;
 
@@ -63,7 +63,7 @@ namespace mitk
     //##Documentation
     //## @brief Checks if a node exists in the StandaloneDataStorage
     //##
-    virtual bool Exists(const mitk::DataNode *node) const override;
+    bool Exists(const mitk::DataNode *node) const override;
 
     //##Documentation
     //## @brief returns a set of source objects for a given node that meet the given condition(s).
@@ -104,7 +104,7 @@ namespace mitk
     StandaloneDataStorage();
     //##Documentation
     //## @brief Standard Destructor
-    virtual ~StandaloneDataStorage();
+    ~StandaloneDataStorage() override;
 
     //##Documentation
     //## @brief convenience method to check if the object has been initialized (i.e. a data tree has been set)
@@ -123,7 +123,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Prints the contents of the StandaloneDataStorage to os. Do not call directly, call ->Print() instead
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     //##Documentation
     //## @brief Nodes and their relation are stored in m_SourceNodes

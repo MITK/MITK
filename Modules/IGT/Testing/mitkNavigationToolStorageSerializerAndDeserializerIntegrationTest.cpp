@@ -55,7 +55,7 @@ private:
 
 public:
   /**@brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).*/
-  void setUp()
+  void setUp() override
   {
   try {
       m_FileName1 = mitk::IOUtil::CreateTemporaryFile();
@@ -73,10 +73,10 @@ public:
   m_Deserializer = mitk::NavigationToolStorageDeserializer::New(DataStorage);
   }
 
-  void tearDown()
+  void tearDown() override
   {
-  m_Serializer = NULL;
-  m_Deserializer = NULL;
+  m_Serializer = nullptr;
+  m_Deserializer = nullptr;
   try
     {
       std::remove(m_FileName1.c_str());
@@ -115,14 +115,14 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing deserialization of tool storage with tool registrations",readStorage.IsNotNull());
     CPPUNIT_ASSERT_MESSAGE(" ..Testing number of tools in storage",readStorage->GetToolCount()==1);
 
-    mitk::PointSet::Pointer readRegLandmarks = readStorage->GetTool(0)->GetToolRegistrationLandmarks();
-    mitk::PointSet::Pointer readCalLandmarks = readStorage->GetTool(0)->GetToolCalibrationLandmarks();
+    mitk::PointSet::Pointer readRegLandmarks = readStorage->GetTool(0)->GetToolLandmarks();
+    mitk::PointSet::Pointer readCalLandmarks = readStorage->GetTool(0)->GetToolControlPoints();
 
     CPPUNIT_ASSERT_MESSAGE("..Testing if tool registration landmarks have been stored and loaded correctly.",((readRegLandmarks->GetPoint(5)[0] == 4)&&(readRegLandmarks->GetPoint(5)[1] == 5)&&(readRegLandmarks->GetPoint(5)[2] == 6)));
     CPPUNIT_ASSERT_MESSAGE("..Testing if tool calibration landmarks have been stored and loaded correctly.",((readCalLandmarks->GetPoint(0)[0] == 1)&&(readCalLandmarks->GetPoint(0)[1] == 2)&&(readCalLandmarks->GetPoint(0)[2] == 3)));
 
     mitk::Point3D readToolTipPos = readStorage->GetTool(0)->GetToolTipPosition();
-    mitk::Quaternion readToolTipRot = readStorage->GetTool(0)->GetToolTipOrientation();
+    mitk::Quaternion readToolTipRot = readStorage->GetTool(0)->GetToolAxisOrientation();
 
     CPPUNIT_ASSERT_MESSAGE("..Testing if tool tip position has been stored and loaded correctly.",
       ((float(readToolTipPos[0]) == float(1.3423))&&

@@ -47,7 +47,7 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char * /*argv*/ [])
   mitk::Surface::Pointer input = const_cast<mitk::Surface *>(filter->GetInput());
   MITK_ASSERT_EQUAL(input, surface, "GetInput() should return correct input. ");
 
-  MITK_TEST_CONDITION(filter->GetInput(5) == nullptr, "GetInput(5) should return NULL. ");
+  MITK_TEST_CONDITION(filter->GetInput(5) == nullptr, "GetInput(5) should return nullptr. ");
 
   MITK_TEST_OUTPUT(<< "Testing whether Output is created correctly : ");
   MITK_TEST_CONDITION(filter->GetNumberOfOutputs() == filter->GetNumberOfInputs(),

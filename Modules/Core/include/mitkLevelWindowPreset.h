@@ -40,7 +40,7 @@ namespace mitk
 
   protected:
     LevelWindowPreset();
-    ~LevelWindowPreset();
+    ~LevelWindowPreset() override;
 
   private:
     //##Documentation

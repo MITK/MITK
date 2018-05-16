@@ -50,7 +50,7 @@ namespace mitk
 
   us::Any FileReaderWriterBase::GetOption(const std::string &name) const
   {
-    Options::const_iterator iter = m_Options.find(name);
+    auto iter = m_Options.find(name);
     if (iter != m_Options.end())
     {
       return iter->second;
@@ -125,7 +125,7 @@ namespace mitk
       {
         rank = us::any_cast<int>(rankProp);
       }
-      long id = us::any_cast<long>(reference.GetProperty(us::ServiceConstants::SERVICE_ID()));
+      auto id = us::any_cast<long>(reference.GetProperty(us::ServiceConstants::SERVICE_ID()));
       result = MimeType(*m_CustomMimeType, rank, id);
     }
     catch (const us::BadAnyCastException &e)
@@ -151,8 +151,8 @@ namespace mitk
 
   us::ServiceRegistration<CustomMimeType> FileReaderWriterBase::RegisterMimeType(us::ModuleContext *context)
   {
-    if (context == NULL)
-      throw std::invalid_argument("The context argument must not be NULL.");
+    if (context == nullptr)
+      throw std::invalid_argument("The context argument must not be nullptr.");
 
     CoreServicePointer<IMimeTypeProvider> mimeTypeProvider(CoreServices::GetMimeTypeProvider(context));
 

@@ -63,7 +63,7 @@ void mitk::SlicedData::UpdateOutputInformation()
     m_RequestedRegionInitialized = true;
   }
 
-  m_LastRequestedRegionWasOutsideOfTheBufferedRegion = 0;
+  m_LastRequestedRegionWasOutsideOfTheBufferedRegion = false;
 }
 
 void mitk::SlicedData::PrepareForNewData()
@@ -172,7 +172,7 @@ void mitk::SlicedData::SetRequestedRegion(const itk::DataObject *data)
 {
   m_UseLargestPossibleRegion = false;
 
-  const mitk::SlicedData *slicedData = dynamic_cast<const mitk::SlicedData *>(data);
+  const auto *slicedData = dynamic_cast<const mitk::SlicedData *>(data);
 
   if (slicedData)
   {
@@ -279,7 +279,7 @@ void mitk::SlicedData::SetGeometry(BaseGeometry *aGeometry3D)
     SlicedGeometry3D::Pointer slicedGeometry = dynamic_cast<SlicedGeometry3D *>(aGeometry3D);
     if (slicedGeometry.IsNull())
     {
-      PlaneGeometry *geometry2d = dynamic_cast<PlaneGeometry *>(aGeometry3D);
+      auto *geometry2d = dynamic_cast<PlaneGeometry *>(aGeometry3D);
       if (geometry2d != nullptr && dynamic_cast<mitk::AbstractTransformGeometry *>(aGeometry3D) == nullptr)
       {
         if ((GetSlicedGeometry()->GetPlaneGeometry(0) == geometry2d) && (GetSlicedGeometry()->GetSlices() == 1))
@@ -337,7 +337,7 @@ void mitk::SlicedData::SetOrigin(const mitk::Point3D &origin)
       }
     }
     // ProportionalTimeGeometry* timeGeometry = dynamic_cast<ProportionalTimeGeometry *>(GetTimeGeometry());
-    // if(timeGeometry != NULL)
+    // if(timeGeometry != nullptr)
     //{
     //  timeGeometry->Initialize(slicedGeometry, steps);
     //  break;

@@ -49,7 +49,7 @@ public:
 
   protected slots:
 
-  void NewStorageByWidget(mitk::NavigationToolStorage::Pointer storage, std::string);
+  void NewStorageByWidget(mitk::NavigationToolStorage::Pointer storage);
   void ToolStorageSelected(mitk::NavigationToolStorage::Pointer);
 
 protected:

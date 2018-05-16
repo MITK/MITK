@@ -37,12 +37,12 @@ class QmitkMappingJob;
 \ingroup ${plugin_target}_internal
 */
 class QmitkMatchPointRegistrationManipulator : public QmitkAbstractView, public mitk::IRenderWindowPartListener
-{  
+{
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-public:  
+public:
 
   static const std::string VIEW_ID;
 
@@ -65,21 +65,9 @@ public:
   void OnStoreBtnPushed();
   void OnSettingsChanged(mitk::DataNode*);
 
-  void OnRotXChanged(double);
-  void OnRotYChanged(double);
-  void OnRotZChanged(double);
+  void OnSelectionChanged();
 
-  void OnTransXChanged(double);
-  void OnTransYChanged(double);
-  void OnTransZChanged(double);
-
-  void OnRotXSlideChanged(int);
-  void OnRotYSlideChanged(int);
-  void OnRotZSlideChanged(int);
-
-  void OnTransXSlideChanged(int);
-  void OnTransYSlideChanged(int);
-  void OnTransZSlideChanged(int);
+  void OnRegistrationChanged();
 
   void OnCenterTypeChanged(int);
 
@@ -87,6 +75,7 @@ public:
 
   void OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData, const QmitkMappingJob* job);
 
+  void Error(QString msg);
 
 protected:
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
@@ -105,7 +94,7 @@ protected:
 private:
   QWidget *m_Parent;
 
-  void Error(QString msg);
+
 
   /** Methods returns a list of all eval nodes in the data manager.*/
   QList<mitk::DataNode::Pointer> GetEvalNodes();
@@ -113,7 +102,7 @@ private:
   /**
   * Checks if appropriated nodes are selected in the data manager. If nodes are selected,
   * they are stored m_spSelectedRegNode, m_spSelectedInputNode and m_spSelectedRefNode.
-  * They are also checked for vadility.*/
+  * They are also checked for validity.*/
   void CheckInputs();
 
   /**
@@ -123,16 +112,8 @@ private:
   /** Initialize the state of the view, so the manipulation can start.*/
   void InitSession();
 
-  /** Stops session, removes all obsolite members (e.g. RegEvalObject). After that the view is in a valid but inactive state.*/
+  /** Stops session, removes all obsolete members (e.g. RegEvalObject). After that the view is in a valid but inactive state.*/
   void StopSession();
-
-  /**
-  * Updates the widgets that manipulate the transform according to the transform.*/
-  void UpdateTransformWidgets();
-
-  /**
-  * Updates the transform according to the widgets that manipulate the transform.*/
-  void UpdateTransform(bool updateRotation = false);
 
   void ConfigureTransformCenter(int centerType);
 
@@ -142,6 +123,10 @@ private:
 
   itk::TimeStamp m_selectedNodeTime;
   itk::TimeStamp m_currentPositionTime;
+
+  bool m_activeManipulation;
+  bool m_autoMoving;
+  bool m_autoTarget;
 
   /** @brief currently valid selected position in the inspector*/
   mitk::Point3D m_currentSelectedPosition;
@@ -156,19 +141,12 @@ private:
 
 
   mitk::MAPRegistrationWrapper::Pointer m_CurrentRegistrationWrapper;
-  typedef itk::Euler3DTransform<::map::core::continuous::ScalarType> TransformType;
-  TransformType::Pointer m_InverseCurrentTransform;
-  TransformType::Pointer m_DirectCurrentTransform;
-  typedef map::core::Registration<3, 3> MAPRegistrationType;
-  MAPRegistrationType::Pointer m_CurrentRegistration;
-  MAPRegistrationType::ConstPointer m_SelectedPreReg;
-
-  bool m_autoTarget;
-  bool m_autoMoving;
-  bool m_activeManipulation;
+  map::core::RegistrationBase::Pointer m_CurrentRegistration;
+  using MAPRegistrationType = map::core::Registration<3, 3>;
+  MAPRegistrationType::Pointer m_SelectedPreReg;
 
   bool m_internalUpdate;
-  const std::string HelperNodeName;
+  static const std::string HelperNodeName;
 };
 
 #endif // MatchPoint_h

@@ -93,7 +93,7 @@ private:
 public:
 
   QtTracker();
-  ~QtTracker();
+  ~QtTracker() override;
 
   QRect GetRectangle() const;
   void SetRectangle(const QRect& rectangle);

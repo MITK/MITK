@@ -34,7 +34,7 @@ namespace mitk
     PlaneOperation(OperationType operationType, Point3D point, Vector3D normal);
     PlaneOperation(OperationType operationType, Point3D point, Vector3D axisVec0, Vector3D axisVec1);
 
-    virtual ~PlaneOperation();
+    ~PlaneOperation() override;
 
     Vector3D GetNormal();
     Vector3D GetAxisVec0();

@@ -17,14 +17,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryAbstractUICTKPlugin.h"
 
 #include "internal/berryBundleUtility.h"
-#include "internal/berryWorkbenchPlugin.h"
+#include "berryWorkbenchPlugin.h"
 
+#include "berryQtStyleManager.h"
 #include "berryPlatformUI.h"
 #include "berryIPreferencesService.h"
 #include "berryIPreferences.h"
 
+#include <QApplication>
 #include <QIcon>
 #include <QImage>
+#include <QString>
 
 namespace berry
 {
@@ -268,6 +271,10 @@ QIcon AbstractUICTKPlugin::ImageDescriptorFromPlugin(
   }
 
   QByteArray imgContent = plugin->getResource(imageFilePath);
+
+  if (imageFilePath.endsWith(".svg", Qt::CaseInsensitive))
+    return QtStyleManager::ThemeIcon(imgContent);
+
   QImage image = QImage::fromData(imgContent);
   QPixmap pixmap = QPixmap::fromImage(image);
   return QIcon(pixmap);

@@ -36,8 +36,8 @@ set(MOC_H_FILES
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/camera-video.png
-  resources/screenshot_maker.png
+  resources/video-camera.svg
+  resources/camera.svg
   plugin.xml
 )
 

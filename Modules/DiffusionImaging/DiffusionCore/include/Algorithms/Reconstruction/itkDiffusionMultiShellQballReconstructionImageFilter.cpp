@@ -29,21 +29,21 @@ DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::DiffusionMultiShellQballReconstructionImageFilter() :
   m_ReconstructionType(Mode_Standard1Shell),
   m_Interpolation_Flag(false),
-  m_Interpolation_SHT1_inv(NULL),
-  m_Interpolation_SHT2_inv(NULL),
-  m_Interpolation_SHT3_inv(NULL),
-  m_TARGET_SH_shell1(NULL),
-  m_TARGET_SH_shell2(NULL),
-  m_TARGET_SH_shell3(NULL),
+  m_Interpolation_SHT1_inv(nullptr),
+  m_Interpolation_SHT2_inv(nullptr),
+  m_Interpolation_SHT3_inv(nullptr),
+  m_TARGET_SH_shell1(nullptr),
+  m_TARGET_SH_shell2(nullptr),
+  m_TARGET_SH_shell3(nullptr),
   m_MaxDirections(0),
-  m_CoeffReconstructionMatrix(NULL),
-  m_ODFSphericalHarmonicBasisMatrix(NULL),
-  m_GradientDirectionContainer(NULL),
+  m_CoeffReconstructionMatrix(nullptr),
+  m_ODFSphericalHarmonicBasisMatrix(nullptr),
+  m_GradientDirectionContainer(nullptr),
   m_NumberOfGradientDirections(0),
   m_NumberOfBaselineImages(0),
   m_Threshold(0),
-  m_BZeroImage(NULL),
-  m_CoefficientImage(NULL),
+  m_BZeroImage(nullptr),
+  m_CoefficientImage(nullptr),
   m_BValue(1.0),
   m_Lambda(0.0),
   m_IsHemisphericalArrangementOfGradientDirections(false),
@@ -79,6 +79,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     for( gdcit = m_GradientDirectionContainer->Begin(); gdcit != m_GradientDirectionContainer->End(); ++gdcit)
     {
       double bValueKey = int(((m_BValue * gdcit.Value().two_norm() * gdcit.Value().two_norm())+7.5)/10)*10;
+      MITK_INFO << bValueKey;
       m_BValueMap[bValueKey].push_back(gdcit.Index());
     }
 
@@ -135,7 +136,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
   for(int i=0; i<NrOdfDirections; i++)
   {
     out[i] = out[i] < 0 ? 0 : out[i];
-    out[i] *= M_PI * 4 / NrOdfDirections;
+    out[i] *= itk::Math::pi * 4 / NrOdfDirections;
   }
 }
 
@@ -669,10 +670,10 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       // approximate ODF coeffs
       vnl_vector<double>  coeffs = ( (*m_CoeffReconstructionMatrix) * SignalVector );
-      coeffs[0] = 1.0/(2.0*sqrt(M_PI));
+      coeffs[0] = 1.0/(2.0*sqrt(itk::Math::pi));
 
       odf = element_cast<double, TO>(( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs )).data_block();
-      odf *= (M_PI*4/NODF);
+      odf *= (itk::Math::pi*4/NODF);
     }
     // set ODF to ODF-Image
     oit.Set( odf );
@@ -688,7 +689,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::NumericalNShellReconstruction(const OutputImageRegionType& outputRegionForThread)
+::NumericalNShellReconstruction(const OutputImageRegionType& /*outputRegionForThread*/)
 {
 
   /* itk::LevenbergMarquardtOptimizer::Pointer optimizer = itk::LevenbergMarquardtOptimizer::New();
@@ -933,12 +934,12 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       vnl_vector<double> coeffs((*m_CoeffReconstructionMatrix) *SignalVector );
 
       // the first coeff is a fix value
-      coeffs[0] = 1.0/(2.0*sqrt(M_PI));
+      coeffs[0] = 1.0/(2.0*sqrt(itk::Math::pi));
       coeffPixel = element_cast<double, TO>(coeffs).data_block();
 
       // Cast the Signal-Type from double to float for the ODF-Image
       odf = element_cast<double, TO>( (*m_ODFSphericalHarmonicBasisMatrix) * coeffs ).data_block();
-      odf *= ((M_PI*4)/NODF);
+      odf *= ((itk::Math::pi*4)/NODF);
     }
 
     // set ODF to ODF-Image
@@ -1034,7 +1035,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   // Compute FunkRadon Transformation Matrix Associated to SHBasis Order lj
   for(int i=0; i<NumberOfCoeffs; i++)
   {
-    (*FRTMatrix)(i,i) = 2.0 * M_PI * mitk::sh::legendre0((*SHOrderAssociation)[i]);
+    (*FRTMatrix)(i,i) = 2.0 * itk::Math::pi * mitk::sh::legendre0((*SHOrderAssociation)[i]);
   }
 
   MatrixDoublePtr temp(new vnl_matrix<double>(((SHBasisMatrix->transpose()) * (*SHBasisMatrix)) + (m_Lambda  * (*LaplacianBaltrami))));
@@ -1043,7 +1044,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
   MatrixDoublePtr inverse(new vnl_matrix<double>(NumberOfCoeffs,NumberOfCoeffs));
   (*inverse) = pseudo_inv->inverse();
 
-  const double factor = (1.0/(16.0*M_PI*M_PI));
+  const double factor = (1.0/(16.0*itk::Math::pi*itk::Math::pi));
   MatrixDoublePtr SignalReonstructionMatrix (new vnl_matrix<double>((*inverse) * (SHBasisMatrix->transpose())));
   m_CoeffReconstructionMatrix = new vnl_matrix<double>(( factor * ((*FRTMatrix) * ((*SHEigenvalues) * (*SignalReonstructionMatrix))) ));
 

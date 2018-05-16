@@ -124,7 +124,7 @@ void mitk::ClippedSurfaceBoundsCalculator::Update()
   else if (m_Geometry3D.IsNotNull())
   {
     // go through all slices of the image, ...
-    const mitk::SlicedGeometry3D *slicedGeometry3D =
+    const auto *slicedGeometry3D =
       dynamic_cast<const mitk::SlicedGeometry3D *>(m_Geometry3D.GetPointer());
     int allSlices = slicedGeometry3D->GetSlices();
     this->CalculateIntersectionPoints(dynamic_cast<mitk::PlaneGeometry *>(slicedGeometry3D->GetPlaneGeometry(0)));

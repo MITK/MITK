@@ -31,7 +31,7 @@ class MITKQTPYTHON_EXPORT QmitkPythonTextEditor : public QWidget
 
 public:
   QmitkPythonTextEditor(QWidget *parent = 0);
-  virtual ~QmitkPythonTextEditor();
+  ~QmitkPythonTextEditor() override;
 public slots:
   void Paste(const QString& command);
 
@@ -41,8 +41,8 @@ protected slots:
   void on_RunScript_triggered(bool checked=false);
 
 protected:
-  void dragEnterEvent(QDragEnterEvent *event);
-  void dropEvent(QDropEvent *event);
+  void dragEnterEvent(QDragEnterEvent *event) override;
+  void dropEvent(QDropEvent *event) override;
   //bool canInsertFromMimeData( const QMimeData *source ) const;
   QString ReadFile(const QString &filename);
 

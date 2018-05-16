@@ -63,7 +63,7 @@ public:
   ///
   /// disables all video backgrounds
   ///
-  virtual ~QmitkVideoBackground();
+  ~QmitkVideoBackground() override;
 
   ///
   /// \brief add a RenderWindow in which the video is displayed.

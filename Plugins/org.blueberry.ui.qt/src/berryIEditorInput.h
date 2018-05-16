@@ -71,7 +71,7 @@ struct BERRY_UI_QT IEditorInput : public virtual Object, public virtual IAdaptab
 {
   berryObjectMacro(berry::IEditorInput)
 
-  ~IEditorInput();
+  ~IEditorInput() override;
 
   /**
    * Returns whether the editor input exists.
@@ -128,7 +128,7 @@ struct BERRY_UI_QT IEditorInput : public virtual Object, public virtual IAdaptab
    * Returns true if two editor inputs are the same
    *
    */
-  virtual bool operator==(const Object* o) const = 0;
+  bool operator==(const Object* o) const override = 0;
 };
 
 }

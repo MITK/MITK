@@ -74,7 +74,7 @@ namespace mitk
     IsoDoseLevel();
     IsoDoseLevel(const IsoDoseLevel & other);
     IsoDoseLevel(const DoseValueType & value, const ColorType& color, bool visibleIsoLine = true, bool visibleColorWash = true );
-    virtual ~IsoDoseLevel();
+    ~IsoDoseLevel() override;
 
     mitkCloneMacro(IsoDoseLevel);
 

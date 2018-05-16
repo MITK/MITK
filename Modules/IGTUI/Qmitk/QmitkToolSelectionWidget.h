@@ -44,7 +44,7 @@ public:
   /*!
   \brief default destructor
   */
-  virtual ~QmitkToolSelectionWidget();
+  ~QmitkToolSelectionWidget() override;
 
   /*!
   \brief This method returns the current selected index from the tool combobox.

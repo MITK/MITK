@@ -22,8 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMultiThreader.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkIOUtil.h>
-#include <cv.h>
-#include <highgui.h>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
 
 /** Documentation
 *
@@ -136,11 +136,11 @@ public:
 
   void setUp() override
   {
-    image1 = cvLoadImage(GetTestDataFilePath("NrrdWritingTestImage.jpg").c_str());
-    image2 = cvLoadImage(GetTestDataFilePath("Png2D-bw.png").c_str());
-    image3 = cvLoadImage(GetTestDataFilePath("OpenCV-Data/CroppedImage.png").c_str());
-    image4 = cvLoadImage(GetTestDataFilePath("OpenCV-Data/GrabCutMask.png").c_str());
-    image5 = cvLoadImage(GetTestDataFilePath("OpenCV-Data/GrabCutOutput.png").c_str());
+    image1 = cv::imread(GetTestDataFilePath("NrrdWritingTestImage.jpg").c_str());
+    image2 = cv::imread(GetTestDataFilePath("Png2D-bw.png").c_str());
+    image3 = cv::imread(GetTestDataFilePath("OpenCV-Data/CroppedImage.png").c_str());
+    image4 = cv::imread(GetTestDataFilePath("OpenCV-Data/GrabCutMask.png").c_str());
+    image5 = cv::imread(GetTestDataFilePath("OpenCV-Data/GrabCutOutput.png").c_str());
 
     testFilter = mitk::OpenCVToMitkImageFilter::New();
 

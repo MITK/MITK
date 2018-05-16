@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageWriteAccessor.h"
 
 USTelemedScanConverterPlugin::USTelemedScanConverterPlugin( )
-  : m_Plugin(NULL), m_OutputImage(NULL), m_OutputImageMutex(NULL)
+  : m_Plugin(nullptr), m_OutputImage(nullptr), m_OutputImageMutex(nullptr)
 {
 }
 
@@ -69,7 +69,7 @@ STDMETHODIMP USTelemedScanConverterPlugin::InterimOutBufferCB (
   // initialize mitk::Image with given image size on the first time
   if ( ! m_OutputImage->IsInitialized() )
   {
-    unsigned int dim[]={(nOutX2 - nOutX1), (nOutY2 - nOutY1)}; // image dimensions
+    unsigned int dim[]={static_cast<unsigned int>(abs(nOutX2 - nOutX1)), static_cast<unsigned int>(abs(nOutY2 - nOutY1))}; // image dimensions
 
     m_OutputImage->Initialize(mitk::MakeScalarPixelType<BYTE>(), 2, dim);
   }
@@ -84,10 +84,10 @@ STDMETHODIMP USTelemedScanConverterPlugin::InterimOutBufferCB (
 
 void USTelemedScanConverterPlugin::ReleasePlugin()
 {
-  if (m_Plugin != NULL)
+  if (m_Plugin != nullptr)
   {
     // remove this callback from Telemed API plugin
-    m_Plugin->SetCallback(NULL,USPC_BUFFER_INTERIM_OUTPUT);
+    m_Plugin->SetCallback(nullptr,USPC_BUFFER_INTERIM_OUTPUT);
   }
 }
 
@@ -104,12 +104,12 @@ STDMETHODIMP USTelemedScanConverterPlugin::SetScanConverterPlugin(IDispatch* plu
 
   HRESULT hr;
 
-  // it is ok to call this method with a NULL plugin to remove
+  // it is ok to call this method with a nullptr plugin to remove
   // a previous callback
-  if (plugin == NULL)
+  if (plugin == nullptr)
   {
     MITK_INFO("IUsgfwScanConverterPluginCB")("ScanConverterPlugin")
-      << "NULL plugin set to the scan converter. The callback for the previous plugin is removed now.";
+      << "nullptr plugin set to the scan converter. The callback for the previous plugin is removed now.";
     return S_OK;
   }
 

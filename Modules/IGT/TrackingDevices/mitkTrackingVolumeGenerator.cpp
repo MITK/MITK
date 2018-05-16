@@ -32,10 +32,69 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
 
+#include <mitkCoreServices.h>
+#include <mitkIFileReader.h>
 #include <mitkIOUtil.h>
+#include <mitkIOMimeTypes.h>
+#include <mitkMimeType.h>
+#include <mitkIMimeTypeProvider.h>
 
 #include "mitkUnspecifiedTrackingTypeInformation.h"
 #include "mitkTrackingDeviceTypeCollection.h"
+
+#include <algorithm>
+
+namespace {
+
+//! Workaround until IOUtil::Load will guarantee to load mitk::Surface
+//! even in presence of reader services that load STL as another type of
+//! BaseData (T19825).
+mitk::Surface::Pointer LoadCoreSurface(const us::ModuleResource& usResource)
+{
+  us::ModuleResourceStream resStream(usResource, std::ios_base::in);
+
+  mitk::CoreServicePointer<mitk::IMimeTypeProvider> mimeTypeProvider(mitk::CoreServices::GetMimeTypeProvider());
+  // get mime types for file (extension) and for surfaces
+  std::vector<mitk::MimeType> mimetypesForFile = mimeTypeProvider->GetMimeTypesForFile(usResource.GetResourcePath());
+  std::vector<mitk::MimeType> mimetypesForSurface = mimeTypeProvider->GetMimeTypesForCategory(mitk::IOMimeTypes::CATEGORY_SURFACES());
+
+  // construct our candidates as the intersection of both sets because we need something that
+  // handles the type type _and_ produces a surface out of it
+  std::vector<mitk::MimeType> mimetypes;
+
+  std::sort(mimetypesForFile.begin(), mimetypesForFile.end());
+  std::sort(mimetypesForSurface.begin(), mimetypesForSurface.end());
+  std::set_intersection(mimetypesForFile.begin(), mimetypesForFile.end(),
+                        mimetypesForSurface.begin(), mimetypesForSurface.end(),
+                        std::back_inserter(mimetypes));
+
+  mitk::Surface::Pointer surface;
+  if (mimetypes.empty())
+  {
+    mitkThrow() << "No mimetype for resource stream: " << usResource.GetResourcePath();
+    return surface;
+  }
+
+  mitk::FileReaderRegistry fileReaderRegistry;
+  std::vector<us::ServiceReference<mitk::IFileReader>> refs = fileReaderRegistry.GetReferences(mimetypes[0]);
+  if (refs.empty())
+  {
+    mitkThrow() << "No reader available for resource stream: " << usResource.GetResourcePath();
+    return surface;
+  }
+
+  mitk::IFileReader *reader = fileReaderRegistry.GetReader(refs[0]);
+  reader->SetInput(usResource.GetResourcePath(), &resStream);
+  auto basedatas = reader->Read();
+  if (!basedatas.empty())
+  {
+    surface = dynamic_cast<mitk::Surface*>(basedatas.front().GetPointer());
+  }
+
+  return surface;
+}
+
+} // unnamed namespace
 
 
 mitk::TrackingVolumeGenerator::TrackingVolumeGenerator()
@@ -59,7 +118,6 @@ void mitk::TrackingVolumeGenerator::GenerateData()
 {
   mitk::Surface::Pointer output = this->GetOutput();  //the surface wich represents the tracking volume
 
-  std::string filepath = ""; // Full path to file (wil be resolved later)
   std::string filename = this->m_Data.VolumeModelLocation; // Name of the file or possibly a magic String, e.g. "cube"
 
   MITK_INFO << "volume: " << filename;
@@ -80,27 +138,32 @@ void mitk::TrackingVolumeGenerator::GenerateData()
   if (filename.compare("") == 0) // empty String means no model, return empty output
   {
     // initialize with empty poly data (otherwise old surfaces may be returned) => so an empty surface is returned
-    vtkPolyData *emptyPolyData = vtkPolyData::New();
+    vtkSmartPointer<vtkPolyData> emptyPolyData = vtkSmartPointer<vtkPolyData>::New();
     output->SetVtkPolyData(emptyPolyData);
-    emptyPolyData->Delete();
     return;
   }
 
   // from here on, we assume that filename contains an actual filename and not a magic string
 
   us::Module* module = us::GetModuleContext()->GetModule();
-
   us::ModuleResource moduleResource = module->GetResource(filename);
 
-  std::vector<mitk::BaseData::Pointer> data = mitk::IOUtil::Load(moduleResource);
+  // TODO one would want to call mitk::IOUtils::Load(moduleResource) here.
+  //      However this function is not guaranteed to find a reader that loads
+  //      named resource as a Surface (given the presence of alternative readers
+  //      that produce another data type but has a higher ranking than the core
+  //      surface reader) - see bug T22608.
+  mitk::Surface::Pointer fileoutput = LoadCoreSurface(moduleResource);
 
-   if(data.empty())
-     MITK_ERROR << "Exception while reading file:";
-
-   mitk::Surface::Pointer fileoutput = dynamic_cast<mitk::Surface*>(data[0].GetPointer());
-
-   output->SetVtkPolyData(fileoutput->GetVtkPolyData());
-
+  if (fileoutput == nullptr)
+  {
+     MITK_ERROR << "Exception while casting data loaded from file: " << moduleResource.GetResourcePath();
+     output->SetVtkPolyData(vtkSmartPointer<vtkPolyData>(vtkPolyData::New()));
+  }
+  else
+  {
+      output->SetVtkPolyData(fileoutput->GetVtkPolyData());
+  }
 }
 
 void mitk::TrackingVolumeGenerator::SetTrackingDeviceType(mitk::TrackingDeviceType deviceType)

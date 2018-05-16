@@ -276,7 +276,7 @@ namespace mitk
             StatisticsContainer();
 
         private:
-            itk::LightObject::Pointer InternalClone() const
+            itk::LightObject::Pointer InternalClone() const override
             {
                 itk::LightObject::Pointer ioPtr = Superclass::InternalClone();
                 Self::Pointer rval = dynamic_cast<Self*>(ioPtr.GetPointer());

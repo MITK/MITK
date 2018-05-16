@@ -53,11 +53,11 @@ public:
     options[mitk::IOConstants::SIZE_Z()] = 91;
     options[mitk::IOConstants::ENDIANNESS()] = mitk::IOConstants::ENDIANNESS_LITTLE();
     mitk::Image::Pointer readFile =
-      dynamic_cast<mitk::Image *>(mitk::IOUtil::Load(m_ImagePath, options).front().GetPointer());
+      mitk::IOUtil::Load<mitk::Image >(m_ImagePath, options);
     CPPUNIT_ASSERT_MESSAGE("Testing reading a raw file.", readFile.IsNotNull());
 
     // compare with the reference image
-    mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage(m_ImagePathNrrdRef);
+    mitk::Image::Pointer compareImage = mitk::IOUtil::Load<mitk::Image>(m_ImagePathNrrdRef);
     MITK_ASSERT_EQUAL(
       compareImage, readFile, "Testing if image is equal to the same image as reference file loaded with mitk");
   }

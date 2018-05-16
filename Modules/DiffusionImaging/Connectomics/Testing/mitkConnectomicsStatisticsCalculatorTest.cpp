@@ -78,7 +78,7 @@ public:
 
   void tearDown() override
   {
-    m_Network = NULL;
+    m_Network = nullptr;
     m_NetworkPath = "";
   }
 

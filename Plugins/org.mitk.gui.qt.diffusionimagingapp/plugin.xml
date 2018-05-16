@@ -10,7 +10,7 @@
   <extension id="diffusion" point="org.blueberry.core.runtime.products">
     <product name="MITK Diffusion" application="org.mitk.qt.diffusionimagingapp" />
   </extension>
-  
+
   <extension point="org.blueberry.ui.intro">
     <intro id="org.mitk.qt.diffusionimagingappintro"
       class="QmitkDiffusionImagingAppIntroPart"
@@ -24,7 +24,25 @@
     <perspective id="org.mitk.diffusionimagingapp.perspectives.welcome"
       name="Data Display"
       class="QmitkWelcomePerspective"
-      icon="resources/perspectives/icon_home.png"/>
+      icon="resources/icon_home.png"/>
+  </extension>
+
+
+  <extension point="org.blueberry.ui.preferencePages">
+    <page
+      id="org.blueberry.ui.preferencePages.Style"
+      name="Themes"
+      category="org.mitk.GeneralPreferencePage"
+      class="berry::ExtensionFactory:stylePreferencePage">
+      <keywordreference id="org.blueberry.ui.style"/>
+    </page>
+    <page
+      id="org.blueberry.ui.preferencePages.Perspectives"
+      name="Perspectives"
+      category="org.mitk.GeneralPreferencePage"
+      class="berry::ExtensionFactory:perspectivesPreferencePage">
+      <keywordreference id="org.blueberry.ui.perspectives"/>
+    </page>
   </extension>
 
 </plugin>

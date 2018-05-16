@@ -47,7 +47,7 @@ public:
   QmitkUndoAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window);
   QmitkUndoAction(const QIcon & icon, berry::IWorkbenchWindow* window);
 
-  ~QmitkUndoAction();
+  ~QmitkUndoAction() override;
 
   protected slots:
 

@@ -134,7 +134,7 @@ namespace mitk
     const Rotation &GetTransformR() const { return m_Rotation; }
   protected:
     WeightedPointTransform();
-    ~WeightedPointTransform();
+    ~WeightedPointTransform() override;
 
     /** Threshold used to terminate the algorithm.*/
     double m_Threshold;

@@ -27,13 +27,13 @@ namespace mitk
   public:
     LegacyFileWriterService(mitk::FileWriter::Pointer legacyWriter, const std::string &description);
 
-    ~LegacyFileWriterService();
+    ~LegacyFileWriterService() override;
 
     using AbstractFileWriter::Write;
 
-    virtual void Write() override;
+    void Write() override;
 
-    virtual ConfidenceLevel GetConfidenceLevel() const override;
+    ConfidenceLevel GetConfidenceLevel() const override;
 
   private:
     LegacyFileWriterService *Clone() const override;

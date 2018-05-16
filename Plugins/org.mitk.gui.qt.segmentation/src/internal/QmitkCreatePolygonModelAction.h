@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Data members
 #include <mitkDataNode.h>
 
-class QmitkStdMultiWidget;
-
 class MITK_QT_SEGMENTATION QmitkCreatePolygonModelAction : public QObject, public mitk::IContextMenuAction
 {
   Q_OBJECT
@@ -41,7 +39,7 @@ public:
   void SetDataStorage(mitk::DataStorage *dataStorage) override;
   void SetSmoothed(bool smoothed) override;
   void SetDecimated(bool decimated) override;
-  void SetFunctionality(berry::QtViewPart *functionality) override;
+  void SetFunctionality(berry::QtViewPart* view) override;
 
   void OnSurfaceCalculationDone();
 

@@ -287,7 +287,7 @@ void mitk::PaintbrushTool::OnMousePressed(StateMachineAction *, InteractionEvent
   if (m_WorkingSlice.IsNull())
     return;
 
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if (!positionEvent)
     return;
 
@@ -329,7 +329,7 @@ void mitk::PaintbrushTool::OnPrimaryButtonPressedMoved(StateMachineAction *, Int
   */
 void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, bool leftMouseButtonPressed)
 {
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
 
   CheckIfCurrentSliceHasChanged(positionEvent);
 
@@ -379,8 +379,8 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
   contour->Expand(timestep + 1);
   contour->SetClosed(true, timestep);
 
-  ContourModel::VertexIterator it = m_MasterContour->Begin();
-  ContourModel::VertexIterator end = m_MasterContour->End();
+  auto it = m_MasterContour->Begin();
+  auto end = m_MasterContour->End();
 
   while (it != end)
   {
@@ -399,7 +399,7 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
 
     DataNode *workingNode(m_ToolManager->GetWorkingData(0));
     Image::Pointer image = dynamic_cast<Image *>(workingNode->GetData());
-    LabelSetImage *labelImage = dynamic_cast<LabelSetImage *>(image.GetPointer());
+    auto *labelImage = dynamic_cast<LabelSetImage *>(image.GetPointer());
 
     int activeColor = 1;
     if (labelImage)
@@ -504,7 +504,7 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
 void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   // When mouse is released write segmentationresult back into image
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if (!positionEvent)
     return;
 
@@ -519,7 +519,7 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
 /**
   Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0.
   */
-void mitk::PaintbrushTool::OnInvertLogic(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::PaintbrushTool::OnInvertLogic(StateMachineAction *, InteractionEvent *)
 {
   // Inversion only for 0 and 1 as painting values
   if (m_PaintingPixelValue == 1)
@@ -538,7 +538,7 @@ void mitk::PaintbrushTool::OnInvertLogic(StateMachineAction *, InteractionEvent 
 void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event)
 {
   const PlaneGeometry *planeGeometry((event->GetSender()->GetCurrentWorldPlaneGeometry()));
-  const AbstractTransformGeometry *abstractTransformGeometry(
+  const auto *abstractTransformGeometry(
     dynamic_cast<const AbstractTransformGeometry *>(event->GetSender()->GetCurrentWorldPlaneGeometry()));
   DataNode *workingNode(m_ToolManager->GetWorkingData(0));
 
@@ -552,7 +552,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
 
   if (m_CurrentPlane.IsNull() || m_WorkingSlice.IsNull())
   {
-    m_CurrentPlane = const_cast<PlaneGeometry *>(planeGeometry);
+    m_CurrentPlane = planeGeometry;
     m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
     m_WorkingNode->ReplaceProperty("color", workingNode->GetProperty("color"));
     m_WorkingNode->SetData(m_WorkingSlice);
@@ -570,7 +570,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
       m_CurrentPlane = nullptr;
       m_WorkingSlice = nullptr;
       m_WorkingNode = nullptr;
-      m_CurrentPlane = const_cast<PlaneGeometry *>(planeGeometry);
+      m_CurrentPlane = planeGeometry;
       m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
 
       m_WorkingNode = mitk::DataNode::New();

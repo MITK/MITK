@@ -81,7 +81,7 @@ void QmitkConvertSurfaceToLabelAction::Run( const QList<mitk::DataNode::Pointer>
     }
     else
     {
-      MITK_INFO << "   a NULL node was selected";
+      MITK_INFO << "   a nullptr node was selected";
     }
   }
 }

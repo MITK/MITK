@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 
 //std headers
-#include <stdio.h>
+#include <cstdio>
 
 mitk::NavigationToolWriter::NavigationToolWriter()
   {
@@ -55,8 +55,8 @@ bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTo
   // this bug, the geometry is set to identity for the saving progress and restored later.
   mitk::BaseGeometry::Pointer geometryBackup;
   if (  Tool->GetDataNode().IsNotNull()
-        && (Tool->GetDataNode()->GetData()!=NULL)
-        && (Tool->GetDataNode()->GetData()->GetGeometry()!=NULL)
+        && (Tool->GetDataNode()->GetData()!=nullptr)
+        && (Tool->GetDataNode()->GetData()->GetGeometry()!=nullptr)
         )
       {
       geometryBackup = Tool->GetDataNode()->GetData()->GetGeometry()->Clone();
@@ -101,10 +101,14 @@ bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTo
 
 mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::NavigationTool::Pointer Tool)
   {
-  mitk::DataNode::Pointer thisTool = mitk::DataNode::New();
+    mitk::DataNode::Pointer thisTool = Tool->GetDataNode();
   //Name
-    if (Tool->GetDataNode().IsNull()) thisTool->SetName("none");
-    else thisTool->SetName(Tool->GetDataNode()->GetName().c_str());
+    if (Tool->GetDataNode().IsNull())
+    {
+      thisTool = mitk::DataNode::New();
+      thisTool->SetName("none");
+    }
+    
   //Identifier
     thisTool->AddProperty("identifier",mitk::StringProperty::New(Tool->GetIdentifier().c_str()));
   //Serial Number
@@ -115,22 +119,22 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
     thisTool->AddProperty("tracking tool type",mitk::IntProperty::New(Tool->GetType()));
   //Calibration File Name
     thisTool->AddProperty("toolfileName",mitk::StringProperty::New(GetFileWithoutPath(Tool->GetCalibrationFile())));
-  //Surface
-    if (Tool->GetDataNode().IsNotNull()) if (Tool->GetDataNode()->GetData()!=NULL) thisTool->SetData(Tool->GetDataNode()->GetData());
-
   //Tool Landmarks
-    thisTool->AddProperty("ToolRegistrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolRegistrationLandmarks())));
-    thisTool->AddProperty("ToolCalibrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolCalibrationLandmarks())));
+    thisTool->AddProperty("ToolRegistrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolLandmarks())));
+    thisTool->AddProperty("ToolCalibrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolControlPoints())));
 
   //Tool Tip
     if (Tool->IsToolTipSet())
     {
       thisTool->AddProperty("ToolTipPosition",mitk::StringProperty::New(ConvertPointToString(Tool->GetToolTipPosition())));
-      thisTool->AddProperty("ToolTipOrientation",mitk::StringProperty::New(ConvertQuaternionToString(Tool->GetToolTipOrientation())));
+      thisTool->AddProperty("ToolAxisOrientation",mitk::StringProperty::New(ConvertQuaternionToString(Tool->GetToolAxisOrientation())));
     }
 
+  //Tool Axis
+    thisTool->AddProperty("ToolAxis", mitk::StringProperty::New(ConvertPointToString(Tool->GetToolAxis())));
+
   //Material is not needed, to avoid errors in scene serialization we have to do this:
-    thisTool->ReplaceProperty("material",NULL);
+    thisTool->RemoveProperty("material");
 
 
   return thisTool;

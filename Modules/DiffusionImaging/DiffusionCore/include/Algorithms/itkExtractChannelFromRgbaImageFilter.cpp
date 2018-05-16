@@ -118,7 +118,7 @@ namespace itk{
       if (pz < 0 || pz >= d-1)
         continue;
 
-      OutPixelType out;
+      OutPixelType out = 0.0f;
       switch (m_Channel)
       {
       case RED:

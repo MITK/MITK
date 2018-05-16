@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QMITKControlVisualizationPropertiesView_H_INCLUDED
 #define _QMITKControlVisualizationPropertiesView_H_INCLUDED
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 
 #include <string>
 
@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkControlVisualizationPropertiesViewControls.h"
 
 #include "mitkEnumerationProperty.h"
+#include <mitkILifecycleAwarePart.h>
+#include <QmitkSliceNavigationListener.h>
 
 /*!
  * \ingroup org_mitk_gui_qt_diffusionquantification_internal
@@ -35,10 +37,8 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \brief QmitkControlVisualizationPropertiesView
  *
  * Document your class here.
- *
- * \sa QmitkFunctionality
  */
-class QmitkControlVisualizationPropertiesView : public QmitkFunctionality//, public berry::ISizeProvider
+class QmitkControlVisualizationPropertiesView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
 
   friend struct CvpSelListener;
@@ -58,67 +58,58 @@ class QmitkControlVisualizationPropertiesView : public QmitkFunctionality//, pub
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
-  /// \brief Called when the functionality is activated
-  virtual void Activated() override;
-
-  virtual void Deactivated() override;
-
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-  virtual void StdMultiWidgetNotAvailable() override;
 
 protected slots:
 
   void VisibleOdfsON_S();
   void VisibleOdfsON_T();
   void VisibleOdfsON_C();
-
   void ShowMaxNumberChanged();
   void NormalizationDropdownChanged(int);
   void ScalingFactorChanged(double);
   void AdditionalScaling(int);
-  void ScalingCheckbox();
-
   void OnThickSlicesModeSelected( QAction* action );
   void OnTSNumChanged(int num);
-
-  void BundleRepresentationResetColoring();
+  void ResetColoring();
   void PlanarFigureFocus();
   void Fiber2DfadingEFX();
   void FiberSlicingThickness2D();
   void FiberSlicingUpdateLabel(int);
   void LineWidthChanged();
   void TubeRadiusChanged();
-
+  void RibbonWidthChanged();
   void SetInteractor();
-
+  void Toggle3DClipping(bool enabled=true);
+  void FlipPeaks();
   void Welcome();
-
-  /// \brief Slot function for switching tensor view between ODF q-balls and ellipsoids from tensors.
-  void OnTensorViewChanged();
+  void OnSliceChanged();
+  void SetColor();
+  void Toggle3DPeaks();
 
   /// \brief Slot function for switching colourisation mode of glyphs.
   void OnColourisationModeChanged();
 
-  /// \brief Slot function for switching glyph placement mode.
-  void OnRandomModeChanged();
-
 protected:
+
+  virtual void SetFocus() override;
+  virtual void Activated() override;
+  virtual void Deactivated() override;
+  virtual void Visible() override;
+  virtual void Hidden() override;
 
   virtual void NodeRemoved(const mitk::DataNode* node) override;
 
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
+  /// \brief called by QmitkAbstractView when DataManager's selection has changed
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   virtual void NodeAdded(const mitk::DataNode *node) override;
-  void SetFiberBundleCustomColor(const itk::EventObject& /*e*/);
-  void SetFiberBundleOpacity(const itk::EventObject& /*e*/);
+  void SetCustomColor(const itk::EventObject& /*e*/);
   bool IsPlaneRotated();
 
   void SliceRotation(const itk::EventObject&);
+  void Set3DClippingPlane(bool disable, mitk::DataNode *node, std::string plane);
 
   Ui::QmitkControlVisualizationPropertiesViewControls* m_Controls;
-
-  QmitkStdMultiWidget* m_MultiWidget;
 
   QScopedPointer<berry::ISelectionListener> m_SelListener;
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
@@ -147,10 +138,12 @@ protected:
   mitk::DataNode::Pointer m_SelectedNode;
   mitk::DataNode* m_CurrentPickingNode;
 
-  unsigned long m_FiberBundleObserverTag;
-  unsigned long m_FiberBundleObserveOpacityTag;
+  unsigned long m_ColorPropertyObserverTag;
+  unsigned long m_OpacityPropertyObserverTag;
   mitk::ColorProperty::Pointer m_Color;
   mitk::FloatProperty::Pointer m_Opacity;
+
+  QmitkSliceNavigationListener  m_SliceChangeListener;
 };
 
 

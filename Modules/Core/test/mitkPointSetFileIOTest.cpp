@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itksys/SystemTools.hxx>
 #include <random>
-#include <time.h>
+#include <ctime>
 #include <vector>
 
 // unsigned int numberOfTestPointSets = 1;
@@ -107,7 +107,7 @@ public:
   {
     try
     {
-      m_SavedPointSet = NULL;
+      m_SavedPointSet = nullptr;
 
       std::ofstream tmpStream;
       m_FilePath = mitk::IOUtil::CreateTemporaryFile(tmpStream) + ".mps";
@@ -127,8 +127,8 @@ public:
   {
     try
     {
-      mitk::PointSet::Pointer pointSet = mitk::IOUtil::LoadPointSet(m_FilePath);
-      MITK_TEST_CONDITION(pointSet.IsNotNull(), "Testing if the loaded Data are NULL");
+      mitk::PointSet::Pointer pointSet = mitk::IOUtil::Load<mitk::PointSet>(m_FilePath);
+      MITK_TEST_CONDITION(pointSet.IsNotNull(), "Testing if the loaded Data are nullptr");
 
       bool identical(true);
       PointSetCompare(pointSet.GetPointer(), m_SavedPointSet.GetPointer(), identical);

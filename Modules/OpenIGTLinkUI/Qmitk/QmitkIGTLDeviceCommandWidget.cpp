@@ -44,8 +44,8 @@ QmitkIGTLDeviceCommandWidget::QmitkIGTLDeviceCommandWidget(
     QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f), m_IsClient(false), m_MessageReceivedObserverTag(0), m_CommandReceivedObserverTag(0), m_LostConnectionObserverTag(0), m_NewConnectionObserverTag(0), m_StateModifiedObserverTag(0)
 {
-  m_Controls = NULL;
-  this->m_IGTLDevice = NULL;
+  m_Controls = nullptr;
+  this->m_IGTLDevice = nullptr;
   CreateQtPartControl(this);
 }
 
@@ -161,7 +161,7 @@ void QmitkIGTLDeviceCommandWidget::Initialize(mitk::IGTLDevice::Pointer device)
 
     //check if the device is a server or a client
     if ( dynamic_cast<mitk::IGTLClient*>(
-           this->m_IGTLDevice.GetPointer()) == NULL )
+           this->m_IGTLDevice.GetPointer()) == nullptr )
     {
       m_IsClient = false;
     }
@@ -206,7 +206,7 @@ void QmitkIGTLDeviceCommandWidget::Initialize(mitk::IGTLDevice::Pointer device)
   }
   else
   {
-    m_IGTLDevice = NULL;
+    m_IGTLDevice = nullptr;
   }
 
   this->AdaptGUIToState();
@@ -241,7 +241,7 @@ void QmitkIGTLDeviceCommandWidget::OnSendCommand()
         SetResolution(this->m_Controls->fpsSpinBox->value());
   }
 
-  m_IGTLDevice->SendMessage(m_CurrentCommand.GetPointer());
+  m_IGTLDevice->SendMessage(mitk::IGTLMessage::New(m_CurrentCommand));
 }
 
 void QmitkIGTLDeviceCommandWidget::OnCommandChanged(

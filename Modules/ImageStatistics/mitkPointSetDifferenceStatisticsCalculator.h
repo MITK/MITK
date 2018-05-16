@@ -90,7 +90,7 @@ protected:
 
   PointSetDifferenceStatisticsCalculator();
   PointSetDifferenceStatisticsCalculator(mitk::PointSet::Pointer,mitk::PointSet::Pointer);
-  virtual ~PointSetDifferenceStatisticsCalculator();
+  ~PointSetDifferenceStatisticsCalculator() override;
 
   /*!
   \brief Method for computing the complete statistics of the differences between the given point sets.

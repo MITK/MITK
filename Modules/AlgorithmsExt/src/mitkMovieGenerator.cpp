@@ -16,8 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkMovieGenerator.h"
 #include "mitkConfig.h"
-#include "mitkGL.h"
 #include <mitkRenderingManager.h>
+#include "vtk_glew.h"
 
 #if WIN32
 #ifndef __GNUC__
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #endif
 
 mitk::MovieGenerator::MovieGenerator()
-  : m_stepper(NULL), m_renderer(NULL), m_width(0), m_height(0), m_initialized(false), m_FrameRate(20)
+  : m_stepper(nullptr), m_renderer(nullptr), m_width(0), m_height(0), m_initialized(false), m_FrameRate(20)
 {
   m_fileName[0] = 0;
 }
@@ -42,7 +42,7 @@ mitk::MovieGenerator::Pointer mitk::MovieGenerator::New()
 {
   Pointer smartPtr;
   MovieGenerator *rawPtr = ::itk::ObjectFactory<MovieGenerator>::Create();
-  if (rawPtr == NULL)
+  if (rawPtr == nullptr)
   {
 #ifdef WIN32
 #ifndef __GNUC__
@@ -54,7 +54,7 @@ mitk::MovieGenerator::Pointer mitk::MovieGenerator::New()
 #endif
   }
   smartPtr = rawPtr;
-  if (rawPtr != NULL)
+  if (rawPtr != nullptr)
     rawPtr->UnRegister();
   return smartPtr;
 }
@@ -77,7 +77,7 @@ bool mitk::MovieGenerator::WriteMovie()
     }
     int imgSize = 3 * m_width * m_height;
     printf("Video size = %i x %i\n", m_width, m_height);
-    GLbyte *data = new GLbyte[imgSize];
+    auto *data = new GLbyte[imgSize];
 
     // duplicate steps if pingPong option is switched to on.
     unsigned int numOfSteps = m_stepper->GetSteps();
@@ -116,7 +116,7 @@ bool mitk::MovieGenerator::WriteCurrentFrameToMovie()
       return false;
     }
     int imgSize = 3 * m_width * m_height;
-    GLbyte *data = new GLbyte[imgSize];
+    auto *data = new GLbyte[imgSize];
 
     RenderingManager::GetInstance()->ForceImmediateUpdate(m_renderer->GetRenderWindow());
     glReadPixels(5, 5, m_width, m_height, GL_BGR, GL_UNSIGNED_BYTE, (void *)data);

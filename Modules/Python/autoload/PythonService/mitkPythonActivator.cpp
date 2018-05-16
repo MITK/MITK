@@ -32,7 +32,7 @@ namespace mitk
     {
     public:
 
-        void Load(us::ModuleContext* context)
+        void Load(us::ModuleContext* context) override
         {
           MITK_DEBUG << "PythonActivator::Load";
           // Registering PythonService as MicroService
@@ -44,7 +44,7 @@ namespace mitk
           m_PythonServiceRegistration = context->RegisterService<mitk::IPythonService>(m_PythonService.GetPointer(), _PythonServiceProps);
         }
 
-        void Unload(us::ModuleContext* context)
+        void Unload(us::ModuleContext*) override
         {
           MITK_DEBUG("PythonActivator") << "PythonActivator::Unload";
           MITK_DEBUG("PythonActivator") << "m_PythonService GetReferenceCount " << m_PythonService->GetReferenceCount();
@@ -53,7 +53,7 @@ namespace mitk
           MITK_DEBUG("PythonActivator") << "m_PythonService GetReferenceCount " << m_PythonService->GetReferenceCount();
         }
 
-        virtual ~PythonActivator()
+        ~PythonActivator() override
         {
         }
 

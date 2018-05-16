@@ -101,7 +101,7 @@ namespace mitk
     FileSearchVectorType m_SearchDirectories;
 
     StandardFileLocations();
-    virtual ~StandardFileLocations();
+    ~StandardFileLocations() override;
 
     std::string SearchDirectoriesForFile(const char *filename);
 

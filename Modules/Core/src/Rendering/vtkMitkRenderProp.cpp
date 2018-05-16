@@ -77,7 +77,7 @@ int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
 {
   typedef std::map<int, mitk::Mapper *> MappersMapType;
   const MappersMapType mappersMap = m_VtkPropRenderer->GetMappersMap();
-  for (MappersMapType::const_iterator it = mappersMap.cbegin(); it != mappersMap.cend(); ++it)
+  for (auto it = mappersMap.cbegin(); it != mappersMap.cend(); ++it)
   {
     mitk::Mapper *mapper = (*it).second;
 
@@ -87,7 +87,7 @@ int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
       // Due to VTK 5.2 bug, we need to initialize the Paths object in vtkPropAssembly
       // manually (see issue #8186 committed to VTK's Mantis issue tracker)
       // --> VTK bug resolved on 2008-12-01
-      vtkPropAssembly *propAssembly = dynamic_cast<vtkPropAssembly *>(vtkMapper->GetVtkProp(m_VtkPropRenderer));
+      auto *propAssembly = dynamic_cast<vtkPropAssembly *>(vtkMapper->GetVtkProp(m_VtkPropRenderer));
       if (propAssembly)
       {
         propAssembly->InitPathTraversal();

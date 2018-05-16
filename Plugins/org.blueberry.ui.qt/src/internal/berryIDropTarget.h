@@ -39,7 +39,7 @@ struct BERRY_UI_QT IDropTarget : public Object
 
   berryObjectMacro(IDropTarget)
 
-  ~IDropTarget();
+  ~IDropTarget() override;
 
   /**
    * Drops the object in this position

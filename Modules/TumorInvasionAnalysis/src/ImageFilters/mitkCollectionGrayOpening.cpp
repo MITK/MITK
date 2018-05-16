@@ -30,7 +30,7 @@ void mitk::CollectionGrayOpening::PerformGrayOpening(mitk::DataCollection *dataC
   for (size_t patient = 0; patient < dataCollection->Size(); ++patient)
   {
     DataCollection *dataPatient = dynamic_cast<DataCollection *>(dataCollection->GetData(patient).GetPointer());
-    if (dataPatient == NULL)
+    if (dataPatient == nullptr)
       MITK_ERROR << "PerformGrayOpening - Structure of DataCollection is invalid at patient level. Data inconsistent!";
 
     if (dataPatient->Size() == 0)
@@ -39,7 +39,7 @@ void mitk::CollectionGrayOpening::PerformGrayOpening(mitk::DataCollection *dataC
     for (size_t timeStep = 0; timeStep < dataPatient->Size(); ++timeStep)
     {
       DataCollection *dataTimeStep = dynamic_cast<DataCollection *>(dataPatient->GetData(timeStep).GetPointer());
-      if (dataTimeStep == NULL)
+      if (dataTimeStep == nullptr)
         MITK_ERROR
           << "DilateBinaryByName- Structure of DataCollection is invalid at time step level. Data inconsistent!";
 

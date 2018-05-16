@@ -51,9 +51,7 @@ public:
   /*!
   /brief standard destructor. */
   ~QmitkImageStatisticsCalculationThread();
-  /*!
-   *\brief Automatically calculate bin size to obtain 200 bins. */
-  void SetUseDefaultNBins(bool useDefault);
+
   /*!
   /brief Initializes the object with necessary data. */
   void Initialize( mitk::Image::Pointer image, mitk::Image::Pointer binaryImage, mitk::PlanarFigure::Pointer planarFig );
@@ -77,16 +75,10 @@ public:
   bool GetIgnoreZeroValueVoxel();
   /*!
   /brief Set bin size for histogram resolution.*/
-  void SetHistogramBinSize( double size);
+  void SetHistogramNBins( unsigned int nbins);
   /*!
   /brief Get bin size for histogram resolution.*/
-  double GetHistogramBinSize() const;
-  /*!
-  /brief Set bin size for histogram resolution.*/
-  void SetHistogramNBins( double size);
-  /*!
-  /brief Get bin size for histogram resolution.*/
-  double GetHistogramNBins() const;
+  unsigned int GetHistogramNBins() const;
   /*!
   /brief Returns the histogram of the currently selected time step. */
   HistogramType::Pointer GetTimeStepHistogram(unsigned int t = 0);
@@ -111,13 +103,10 @@ private:
   std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> m_StatisticsVector; ///< member variable holds the result structs.
   int m_TimeStep;                                                 ///< member variable holds the time step for statistics calculation
   bool m_IgnoreZeros;                                             ///< member variable holds flag to indicate if zero valued voxel should be suppressed
-  double m_HistogramBinSize;                                      ///< member variable holds the bin size for histogram resolution.
+  unsigned int m_HistogramNBins;                                      ///< member variable holds the bin size for histogram resolution.
   bool m_StatisticChanged;                                        ///< flag set if statistics have changed
   bool m_CalculationSuccessful;                                   ///< flag set if statistics calculation was successful
   std::vector<HistogramType::Pointer> m_HistogramVector;          ///< member holds the histograms of all time steps.
   std::string m_message;
-  bool m_UseDefaultNBins;
-  unsigned int m_nBinsForHistogramStatistics;
-  bool m_prioritizeNBinsOverBinSize;
 };
 #endif // QMITKIMAGESTATISTICSCALCULATIONTHREAD_H_INCLUDED

@@ -14,7 +14,6 @@ set(CPP_FILES
   Qmitk/QmitkIGTConnectionWidget.cpp
   Qmitk/QmitkToolSelectionWidget.cpp
   Qmitk/QmitkNavigationToolCreationWidget.cpp
-  Qmitk/QmitkNavigationToolCreationAdvancedWidget.cpp
   Qmitk/QmitkNavigationDataSourceSelectionWidget.cpp
   Qmitk/QmitkInteractiveTransformationWidget.cpp
   Qmitk/QmitkNavigationToolStorageSelectionWidget.cpp
@@ -34,6 +33,7 @@ set(CPP_FILES
   Qmitk/QmitkTrackingDeviceConfigurationWidgetConnectionWorker.cpp
   Qmitk/QmitkNDIAbstractDeviceWidget.cpp
   Qmitk/QmitkAbstractTrackingDeviceWidget.cpp
+  Qmitk/QmitkIGTCommonHelper.cpp
 )
 
 set(UI_FILES
@@ -50,7 +50,6 @@ set(UI_FILES
   Qmitk/QmitkIGTConnectionWidgetControls.ui
   Qmitk/QmitkToolSelectionWidgetControls.ui
   Qmitk/QmitkNavigationToolCreationWidget.ui
-  Qmitk/QmitkNavigationToolCreationAdvancedWidgetControls.ui
   Qmitk/QmitkNavigationDataSourceSelectionWidgetControls.ui
   Qmitk/QmitkInteractiveTransformationWidgetControls.ui
   Qmitk/QmitkNavigationToolStorageSelectionWidgetControls.ui
@@ -82,7 +81,6 @@ set(MOC_H_FILES
   Qmitk/QmitkIGTConnectionWidget.h
   Qmitk/QmitkToolSelectionWidget.h
   Qmitk/QmitkNavigationToolCreationWidget.h
-  Qmitk/QmitkNavigationToolCreationAdvancedWidget.h
   Qmitk/QmitkNavigationDataSourceSelectionWidget.h
   Qmitk/QmitkInteractiveTransformationWidget.h
   Qmitk/QmitkNavigationToolStorageSelectionWidget.h
@@ -101,7 +99,14 @@ set(MOC_H_FILES
   Qmitk/QmitkTrackingDeviceConfigurationWidgetConnectionWorker.h
   Qmitk/QmitkNDIAbstractDeviceWidget.h
   Qmitk/QmitkAbstractTrackingDeviceWidget.h
+  Qmitk/QmitkIGTCommonHelper.h
 )
+
+if(MITK_USE_POLHEMUS_TRACKER)
+  set(CPP_FILES ${CPP_FILES} Qmitk/QmitkPolhemusTrackerWidget.cpp)
+  set(UI_FILES ${UI_FILES} Qmitk/QmitkPolhemusTrackerWidget.ui)
+  set(MOC_H_FILES ${MOC_H_FILES} Qmitk/QmitkPolhemusTrackerWidget.h)
+endif(MITK_USE_POLHEMUS_TRACKER)
 
 set(QRC_FILES
   resources/IGTUI.qrc

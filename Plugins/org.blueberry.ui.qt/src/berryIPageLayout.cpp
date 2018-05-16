@@ -52,6 +52,6 @@ const float IPageLayout::DEFAULT_VIEW_RATIO = 0.5f;
 
 const float IPageLayout::INVALID_RATIO = -1.0;
 
-const float IPageLayout::NULL_RATIO = -2.0;
+const float IPageLayout::nullptr_RATIO = -2.0;
 
 }

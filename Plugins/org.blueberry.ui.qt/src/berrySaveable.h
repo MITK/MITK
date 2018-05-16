@@ -142,7 +142,7 @@ public:
    * @param object
    * @return true if this Saveable is equal to the given object
    */
-  virtual bool operator<(const Object* object) const = 0;
+  bool operator<(const Object* object) const override = 0;
 
   /**
    * Clients must implement equals and hashCode as defined in
@@ -166,7 +166,7 @@ public:
    *
    * @return a hash code
    */
-  virtual uint HashCode() const = 0;
+  uint HashCode() const override = 0;
 
   /**
    * Saves this saveable, or prepares this saveable for a background save
@@ -277,7 +277,7 @@ protected:
    *
    * @since 3.3
    */
-  virtual Object* GetAdapter(const QString& adapter) const override;
+  Object* GetAdapter(const QString& adapter) const override;
 };
 
 }

@@ -56,7 +56,7 @@ class mitkNavigationDataSourceTestClass
     MITK_TEST_CONDITION(myFilter->GetNumberOfOutputs() == 0, "testing initial number of outputs");
     myFilter->CreateOutput();
     MITK_TEST_CONDITION(myFilter->GetNumberOfOutputs() == 1, "testing SetNumberOfOutputs() and MakeOutput()");
-    MITK_TEST_CONDITION(dynamic_cast<mitk::NavigationData*>(myFilter->GetOutput()) != NULL, "test GetOutput() returning valid output object");
+    MITK_TEST_CONDITION(dynamic_cast<mitk::NavigationData*>(myFilter->GetOutput()) != nullptr, "test GetOutput() returning valid output object");
     }
 
   static void TestMethodsNormalCases()

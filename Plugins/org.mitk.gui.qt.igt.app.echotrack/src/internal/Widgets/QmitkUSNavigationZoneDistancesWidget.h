@@ -69,10 +69,9 @@ public:
   void UpdateDistancesToNeedlePosition(itk::SmartPointer<mitk::NavigationData> needle);
 
 protected:
+  std::string                                     m_SizePropertyKey;
   QVector<itk::SmartPointer<mitk::DataNode> >     m_ZoneNodes;
   QVector<QmitkZoneProgressBar*>                  m_ZoneProgressBars;
-
-  std::string                                     m_SizePropertyKey;
 };
 
 #endif // QMITKUSNAVIGATIONZONEDISTANCESWIDGET_H

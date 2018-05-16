@@ -136,7 +136,7 @@ void mitk::PlanarRectangle::PrintSelf(std::ostream &os, itk::Indent indent) cons
 
 bool mitk::PlanarRectangle::Equals(const mitk::PlanarFigure &other) const
 {
-  const mitk::PlanarRectangle *otherRectangle = dynamic_cast<const mitk::PlanarRectangle *>(&other);
+  const auto *otherRectangle = dynamic_cast<const mitk::PlanarRectangle *>(&other);
   if (otherRectangle)
   {
     return Superclass::Equals(other);

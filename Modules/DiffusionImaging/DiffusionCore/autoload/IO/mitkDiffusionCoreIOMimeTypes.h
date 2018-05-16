@@ -31,17 +31,50 @@ public:
   {
   public:
     DiffusionImageNrrdMimeType();
-    virtual bool AppliesTo(const std::string &path) const override;
-    virtual DiffusionImageNrrdMimeType* Clone() const override;
+    bool AppliesTo(const std::string &path) const override;
+    DiffusionImageNrrdMimeType* Clone() const override;
   };
 
   class  DiffusionImageNiftiMimeType : public CustomMimeType
   {
   public:
     DiffusionImageNiftiMimeType();
-    virtual bool AppliesTo(const std::string &path) const override;
-    virtual DiffusionImageNiftiMimeType* Clone() const override;
+    bool AppliesTo(const std::string &path) const override;
+    DiffusionImageNiftiMimeType* Clone() const override;
   };
+
+  class  DiffusionImageFslMimeType : public CustomMimeType
+  {
+  public:
+    DiffusionImageFslMimeType();
+    bool AppliesTo(const std::string &path) const override;
+    DiffusionImageFslMimeType* Clone() const override;
+  };
+
+  class  DiffusionImageDicomMimeType : public CustomMimeType
+  {
+  public:
+    DiffusionImageDicomMimeType();
+    bool AppliesTo(const std::string &path) const override;
+    DiffusionImageDicomMimeType* Clone() const override;
+  };
+
+  class  PeakImageMimeType : public CustomMimeType
+  {
+  public:
+    PeakImageMimeType();
+    bool AppliesTo(const std::string &path) const override;
+    PeakImageMimeType* Clone() const override;
+  };
+
+  class  SHImageMimeType : public CustomMimeType
+  {
+  public:
+    SHImageMimeType();
+    bool AppliesTo(const std::string &path) const override;
+    SHImageMimeType* Clone() const override;
+  };
+
   // Get all Diffusion Mime Types
   static std::vector<CustomMimeType*> Get();
 
@@ -49,18 +82,30 @@ public:
 
   static DiffusionImageNrrdMimeType DWI_NRRD_MIMETYPE();
   static DiffusionImageNiftiMimeType DWI_NIFTI_MIMETYPE();
-  static CustomMimeType DTI_MIMETYPE(); // dti, hdti
-  static CustomMimeType QBI_MIMETYPE(); // qbi, hqbi
+  static DiffusionImageFslMimeType DWI_FSL_MIMETYPE();
+  static DiffusionImageDicomMimeType DWI_DICOM_MIMETYPE();
+  static PeakImageMimeType PEAK_MIMETYPE();
+  static CustomMimeType DTI_MIMETYPE(); // dti
+  static CustomMimeType ODF_MIMETYPE(); // odf, qbi
+  static SHImageMimeType SH_MIMETYPE(); // spherical harmonics coefficients
 
+  static std::string PEAK_MIMETYPE_NAME();
   static std::string DWI_NRRD_MIMETYPE_NAME();
   static std::string DWI_NIFTI_MIMETYPE_NAME();
+  static std::string DWI_FSL_MIMETYPE_NAME();
+  static std::string DWI_DICOM_MIMETYPE_NAME();
   static std::string DTI_MIMETYPE_NAME();
-  static std::string QBI_MIMETYPE_NAME();
+  static std::string ODF_MIMETYPE_NAME();
+  static std::string SH_MIMETYPE_NAME();
 
+  static std::string PEAK_MIMETYPE_DESCRIPTION();
   static std::string DWI_NRRD_MIMETYPE_DESCRIPTION();
   static std::string DWI_NIFTI_MIMETYPE_DESCRIPTION();
+  static std::string DWI_FSL_MIMETYPE_DESCRIPTION();
+  static std::string DWI_DICOM_MIMETYPE_DESCRIPTION();
   static std::string DTI_MIMETYPE_DESCRIPTION();
-  static std::string QBI_MIMETYPE_DESCRIPTION();
+  static std::string ODF_MIMETYPE_DESCRIPTION();
+  static std::string SH_MIMETYPE_DESCRIPTION();
 
 private:
 

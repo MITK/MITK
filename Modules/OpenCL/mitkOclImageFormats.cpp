@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOclImageFormats.h"
 
 mitk::OclImageFormats::OclImageFormats()
-    :m_Image2DSupport( NULL ), m_Image3DSupport( NULL ),
-    m_GpuContext( NULL )
+    :m_Image2DSupport( nullptr ), m_Image3DSupport( nullptr ),
+    m_GpuContext( nullptr )
 {
     //todo: what happens here?
     const unsigned int matrixSize = MAX_FORMATS * MAX_DATA_TYPES;
@@ -209,7 +209,7 @@ void mitk::OclImageFormats::SortFormats(cl_image_format *formats, cl_uint count,
 
 void mitk::OclImageFormats::CollectAvailableFormats()
 {
-    if( this->m_GpuContext == NULL)
+    if( this->m_GpuContext == nullptr)
     {
         mitkThrow() << "No GPU context was set! Use SetGPUContext() before calling this method!";
     }

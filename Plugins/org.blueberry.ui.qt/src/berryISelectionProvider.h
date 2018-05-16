@@ -39,7 +39,7 @@ struct BERRY_UI_QT ISelectionProvider : public virtual Object
 
   berryObjectMacro(berry::ISelectionProvider)
 
-  ~ISelectionProvider();
+  ~ISelectionProvider() override;
 
     /**
      * Adds a listener for selection changes in this selection provider.

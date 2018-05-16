@@ -34,9 +34,9 @@ class ActivatorSL3 :
 
 public:
 
-  ActivatorSL3() : tracker(0), context(0) {}
+  ActivatorSL3() : tracker(nullptr), context(nullptr) {}
 
-  ~ActivatorSL3()
+  ~ActivatorSL3() override
   { delete tracker; }
 
   void Load(ModuleContext* context) override

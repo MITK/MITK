@@ -71,7 +71,7 @@ void QmitkVolumetryView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*par
     m_ParentWidget->setEnabled(true);
   }
 
-  if (m_SelectedDataNode.IsNull() || m_SelectedDataNode.GetPointer() == m_OverlayNode.GetPointer())
+  if (m_SelectedDataNode.IsExpired() || m_SelectedDataNode == m_OverlayNode)
   {
     m_SelectedDataNode = nullptr;
     m_ParentWidget->setEnabled(false);
@@ -91,7 +91,7 @@ void QmitkVolumetryView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*par
   m_Controls->m_SaveCsvButton->setEnabled(false);
   m_Controls->m_TextEdit->clear();
 
-  mitk::Image *image = dynamic_cast<mitk::Image *>(m_SelectedDataNode->GetData());
+  mitk::Image *image = dynamic_cast<mitk::Image *>(m_SelectedDataNode.Lock()->GetData());
   image->Update();
   if (image && image->IsInitialized())
   {
@@ -117,9 +117,9 @@ void QmitkVolumetryView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*par
 
 void QmitkVolumetryView::OnCalculateVolume()
 {
-  if (m_SelectedDataNode.IsNotNull())
+  if (!m_SelectedDataNode.IsExpired())
   {
-    mitk::Image *image = dynamic_cast<mitk::Image *>(m_SelectedDataNode->GetData());
+    mitk::Image *image = dynamic_cast<mitk::Image *>(m_SelectedDataNode.Lock()->GetData());
     std::cout << "Dimension:" << image->GetDimension() << std::endl;
     std::cout << "Dimension[3]:" << image->GetDimension(3) << std::endl;
     mitk::VolumeCalculator::Pointer volCalc = mitk::VolumeCalculator::New();
@@ -134,9 +134,9 @@ void QmitkVolumetryView::OnCalculateVolume()
 
 void QmitkVolumetryView::OnTimeSeriesButtonClicked()
 {
-  if (m_SelectedDataNode.IsNotNull())
+  if (!m_SelectedDataNode.IsExpired())
   {
-    mitk::Image *image = dynamic_cast<mitk::Image *>(m_SelectedDataNode->GetData());
+    mitk::Image *image = dynamic_cast<mitk::Image *>(m_SelectedDataNode.Lock()->GetData());
     mitk::VolumeCalculator::Pointer volCalc = mitk::VolumeCalculator::New();
     volCalc->SetImage(image);
     volCalc->SetThreshold(m_Controls->m_ThresholdSlider->value());
@@ -156,12 +156,12 @@ void QmitkVolumetryView::OnTimeSeriesButtonClicked()
 
 const mitk::DataNode *QmitkVolumetryView::GetImageNode() const
 {
-  return m_SelectedDataNode;
+  return m_SelectedDataNode.Lock();
 }
 
 void QmitkVolumetryView::UpdateSlider()
 {
-  if (m_SelectedDataNode.IsNotNull() && dynamic_cast<mitk::Image *>(m_SelectedDataNode->GetData()))
+  if (!m_SelectedDataNode.IsExpired() && dynamic_cast<mitk::Image *>(m_SelectedDataNode.Lock()->GetData()))
   {
     int intSliderValue = (int)m_Controls->m_ThresholdSlider->value();
     QString stringSliderValue;
@@ -190,17 +190,19 @@ void QmitkVolumetryView::OnThresholdSliderChanged(int value)
 
 void QmitkVolumetryView::CreateOverlayChild()
 {
-  if (m_SelectedDataNode.IsNotNull())
+  if (!m_SelectedDataNode.IsExpired())
   {
+    auto selectedDataNode = m_SelectedDataNode.Lock();
+
     m_OverlayNode = mitk::DataNode::New();
     mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New("volume threshold overlay image");
-    m_OverlayNode->SetProperty("reslice interpolation", m_SelectedDataNode->GetProperty("reslice interpolation"));
+    m_OverlayNode->SetProperty("reslice interpolation", selectedDataNode->GetProperty("reslice interpolation"));
     m_OverlayNode->SetProperty("name", nameProp);
-    m_OverlayNode->SetData(m_SelectedDataNode->GetData());
+    m_OverlayNode->SetData(selectedDataNode->GetData());
     m_OverlayNode->SetColor(0.0, 1.0, 0.0);
     m_OverlayNode->SetOpacity(.25);
     int layer = 0;
-    m_SelectedDataNode->GetIntProperty("layer", layer);
+    selectedDataNode->GetIntProperty("layer", layer);
     m_OverlayNode->SetIntProperty("layer", layer + 1);
     m_OverlayNode->SetLevelWindow(mitk::LevelWindow(m_Controls->m_ThresholdSlider->value(), 1));
 
@@ -215,7 +217,7 @@ mitk::DataNode *QmitkVolumetryView::GetOverlayNode() const
 
 mitk::Image *QmitkVolumetryView::GetImage() const
 {
-  return dynamic_cast<mitk::Image *>(m_SelectedDataNode->GetData());
+  return dynamic_cast<mitk::Image *>(m_SelectedDataNode.Lock()->GetData());
 }
 
 void QmitkVolumetryView::OnSaveCsvButtonClicked()
@@ -239,9 +241,9 @@ void QmitkVolumetryView::OnSaveCsvButtonClicked()
     }
     else
     {
-      // QMessageBox::critical(NULL,"Save Error!",QString("Saving of CSV failed! Couldn't open output file \"") +
+      // QMessageBox::critical(nullptr,"Save Error!",QString("Saving of CSV failed! Couldn't open output file \"") +
       // saveFile + QString("\""),QMessageBox:Ok,QMessageBox::NoButton);
-      // QMessageBox::critical(NULL,"Save Error!","Saving of CSV failed! Couldn't open output file \"" + saveFile.name()
+      // QMessageBox::critical(nullptr,"Save Error!","Saving of CSV failed! Couldn't open output file \"" + saveFile.name()
       // +"\"",QMessageBox::Ok,QMessageBox::NoButton);
     }
   }

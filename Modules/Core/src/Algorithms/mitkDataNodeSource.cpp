@@ -59,7 +59,7 @@ mitk::DataNodeSource::OutputType *mitk::DataNodeSource::GetOutput(DataObjectPoin
 
 const mitk::DataNodeSource::OutputType *mitk::DataNodeSource::GetOutput(DataObjectPointerArraySizeType idx) const
 {
-  const OutputType *out = dynamic_cast<const OutputType *>(this->ProcessObject::GetOutput(idx));
+  const auto *out = dynamic_cast<const OutputType *>(this->ProcessObject::GetOutput(idx));
 
   if (out == nullptr && this->ProcessObject::GetOutput(idx) != nullptr)
   {

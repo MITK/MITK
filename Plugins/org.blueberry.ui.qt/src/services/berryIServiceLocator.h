@@ -49,7 +49,7 @@ struct BERRY_UI_QT IServiceLocator : public virtual Object
 
   berryObjectMacro(berry::IServiceLocator, Object)
 
-  ~IServiceLocator();
+  ~IServiceLocator() override;
 
   /**
    * Retrieves the service corresponding to the given API.

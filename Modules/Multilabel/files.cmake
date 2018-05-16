@@ -10,6 +10,8 @@ set(CPP_FILES
   mitkLabelSetImageVtkMapper2D.cpp
   mitkMultilabelObjectFactory.cpp
   mitkLabelSetIOHelper.cpp
+  mitkDICOMSegmentationPropertyHelper.cpp
+  mitkDICOMSegmentationConstants.cpp
 )
 
 set(RESOURCE_FILES

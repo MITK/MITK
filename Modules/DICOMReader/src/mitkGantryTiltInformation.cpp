@@ -150,7 +150,7 @@ mitk::GantryTiltInformation
 ::MakeFromTagValues(
     const std::string& origin1String,
     const std::string& origin2String,
-    const std::string orientationString,
+    const std::string& orientationString,
     unsigned int numberOfSlicesApart)
 {
   Vector3D right; right.Fill(0.0);

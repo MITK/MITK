@@ -1,0 +1,7 @@
+/**
+
+\page org_mitk_views_diffusionquantification Scalar Indices
+
+The scalar indices view allows the calculation of different scalar measures for raw diffusion-weighted images (MD, ADC), tensors (Fractional Anisotropy, Relative Anisotropy, Axial Diffusivity, Radial Diffusivity) or ODFs (Generalized Fractional Anisotropy).
+
+*/

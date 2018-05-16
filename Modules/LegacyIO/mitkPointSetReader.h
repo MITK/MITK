@@ -100,12 +100,12 @@ namespace mitk
     /**
      * Virtual destructor
      */
-    virtual ~PointSetReader();
+    ~PointSetReader() override;
 
     /**
      * Actually reads the point sets from the given file
      */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     virtual mitk::PointSet::Pointer ReadPoint(mitk::PointSet::Pointer newPointSet,
                                               TiXmlElement *currentTimeSeries,
@@ -114,7 +114,7 @@ namespace mitk
     /**
      * Does nothing in the current implementation
      */
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
     /**
      * Resizes the output-objects according to the given number.

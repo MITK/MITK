@@ -16,7 +16,6 @@ set(CPP_FILES
   DicomImport/mitkDiffusionHeaderGEDICOMFileReader.cpp
   DicomImport/mitkDiffusionHeaderPhilipsDICOMFileReader.cpp
 
-
   # DataStructures -> DWI
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageHeaderInformation.cpp
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageCorrectionFilter.cpp
@@ -34,12 +33,17 @@ set(CPP_FILES
   IODataStructures/Properties/mitkGradientDirectionsPropertySerializer.cpp
   IODataStructures/Properties/mitkMeasurementFramePropertySerializer.cpp
 
-  # DataStructures -> QBall
-  IODataStructures/QBallImages/mitkQBallImageSource.cpp
-  IODataStructures/QBallImages/mitkQBallImage.cpp
+  # DataStructures -> Odf
+  IODataStructures/OdfImages/mitkOdfImageSource.cpp
+  IODataStructures/OdfImages/mitkOdfImage.cpp
+  IODataStructures/mitkShImage.cpp
+  IODataStructures/mitkShImageSource.cpp
 
   # DataStructures -> Tensor
   IODataStructures/TensorImages/mitkTensorImage.cpp
+
+  # DataStructures -> Peaks
+  IODataStructures/mitkPeakImage.cpp
 
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
   Rendering/mitkVectorImageVtkGlyphMapper3D.cpp
@@ -86,6 +90,14 @@ set(H_FILES
   include/Algorithms/Reconstruction/itkOrientationDistributionFunction.h
   include/Algorithms/Reconstruction/itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h
   include/Algorithms/Reconstruction/itkDiffusionKurtosisReconstructionImageFilter.h
+  include/Algorithms/Reconstruction/itkBallAndSticksImageFilter.h
+  include/Algorithms/Reconstruction/itkMultiTensorImageFilter.h
+
+  # Fitting functions
+  include/Algorithms/Reconstruction/FittingFunctions/mitkAbstractFitter.h
+  include/Algorithms/Reconstruction/FittingFunctions/mitkMultiTensorFitter.h
+  include/Algorithms/Reconstruction/FittingFunctions/mitkBallStickFitter.h
+
 
   # MultishellProcessing
   include/Algorithms/Reconstruction/MultishellProcessing/itkRadialMultishellToSingleshellImageFilter.h
@@ -104,8 +116,8 @@ set(H_FILES
   include/IODataStructures/DiffusionWeightedImages/mitkDiffusionImageTransformedCreationFilter.h
 
   # Algorithms
-  include/Algorithms/itkDiffusionQballGeneralizedFaImageFilter.h
-  include/Algorithms/itkDiffusionQballPrepareVisualizationImageFilter.h
+  include/Algorithms/itkDiffusionOdfGeneralizedFaImageFilter.h
+  include/Algorithms/itkDiffusionOdfPrepareVisualizationImageFilter.h
   include/Algorithms/itkElectrostaticRepulsionDiffusionGradientReductionFilter.h
   include/Algorithms/itkTensorDerivedMeasurementsFilter.h
   include/Algorithms/itkBrainMaskExtractionImageFilter.h
@@ -125,10 +137,7 @@ set(H_FILES
   include/Algorithms/itkExtractChannelFromRgbaImageFilter.h
   include/Algorithms/itkTensorReconstructionWithEigenvalueCorrectionFilter.h
   include/Algorithms/itkMergeDiffusionImagesFilter.h
-  include/Algorithms/itkDwiPhantomGenerationFilter.h
   include/Algorithms/itkFiniteDiffOdfMaximaExtractionFilter.h
-  include/Algorithms/itkMrtrixPeakImageConverter.h
-  include/Algorithms/itkFslPeakImageConverter.h
   include/Algorithms/itkShCoefficientImageImporter.h
   include/Algorithms/itkShCoefficientImageExporter.h
   include/Algorithms/itkOdfMaximaExtractionFilter.h
@@ -139,6 +148,8 @@ set(H_FILES
   include/Algorithms/itkSplitDWImageFilter.h
   include/Algorithms/itkRemoveDwiChannelFilter.h
   include/Algorithms/itkExtractDwiChannelFilter.h
+  include/Algorithms/itkFlipPeaksFilter.h
+  include/Algorithms/itkShToOdfImageFilter.h
 
   include/Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.h
   include/Algorithms/itkNonLocalMeansDenoisingFilter.h

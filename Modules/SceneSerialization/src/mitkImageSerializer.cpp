@@ -31,7 +31,7 @@ mitk::ImageSerializer::~ImageSerializer()
 
 std::string mitk::ImageSerializer::Serialize()
 {
-  const Image *image = dynamic_cast<const Image *>(m_Data.GetPointer());
+  const auto *image = dynamic_cast<const Image *>(m_Data.GetPointer());
   if (!image)
   {
     MITK_ERROR << " Object at " << (const void *)this->m_Data << " is not an mitk::Image. Cannot serialize as image.";

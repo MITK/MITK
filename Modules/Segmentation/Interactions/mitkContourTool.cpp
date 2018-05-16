@@ -64,7 +64,7 @@ void mitk::ContourTool::Deactivated()
 */
 void mitk::ContourTool::OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if (!positionEvent)
     return;
 
@@ -94,7 +94,7 @@ void mitk::ContourTool::OnMousePressed(StateMachineAction *, InteractionEvent *i
 */
 void mitk::ContourTool::OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if (!positionEvent)
     return;
 
@@ -117,7 +117,7 @@ void mitk::ContourTool::OnMouseReleased(StateMachineAction *, InteractionEvent *
   // working image corresponds to that
   FeedbackContourTool::SetFeedbackContourVisible(false);
 
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   // const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent)
     return;
@@ -129,7 +129,7 @@ void mitk::ContourTool::OnMouseReleased(StateMachineAction *, InteractionEvent *
   if (!workingNode)
     return;
 
-  Image *image = dynamic_cast<Image *>(workingNode->GetData());
+  auto *image = dynamic_cast<Image *>(workingNode->GetData());
   const PlaneGeometry *planeGeometry((positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()));
   if (!image || !planeGeometry)
     return;
@@ -137,7 +137,7 @@ void mitk::ContourTool::OnMouseReleased(StateMachineAction *, InteractionEvent *
   // Check if it is a multilabel-image
   // If yes, get the new drawing color from it.
   // Otherwise nothing happens.
-  mitk::LabelSetImage *labelSetImage = dynamic_cast<LabelSetImage *>(image);
+  auto *labelSetImage = dynamic_cast<LabelSetImage *>(image);
   if (labelSetImage)
   {
     mitk::Label *label = labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer());
@@ -148,7 +148,7 @@ void mitk::ContourTool::OnMouseReleased(StateMachineAction *, InteractionEvent *
     m_CurrentLabelID = 1;
   }
 
-  const AbstractTransformGeometry *abstractTransformGeometry(
+  const auto *abstractTransformGeometry(
     dynamic_cast<const AbstractTransformGeometry *>(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()));
   if (!image || abstractTransformGeometry)
     return;
@@ -185,7 +185,7 @@ void mitk::ContourTool::OnMouseReleased(StateMachineAction *, InteractionEvent *
 /**
   Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0.
 */
-void mitk::ContourTool::OnInvertLogic(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::ContourTool::OnInvertLogic(StateMachineAction *, InteractionEvent *)
 {
   // Inversion only for 0 and 1 as painting values
   if (m_PaintingPixelValue == 1)

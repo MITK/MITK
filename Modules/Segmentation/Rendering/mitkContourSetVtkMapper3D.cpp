@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRenderer.h>
 #include <vtkTubeFilter.h>
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 
@@ -85,7 +85,7 @@ void mitk::ContourSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *re
 
   m_Actor->VisibilityOn();
 
-  if (renderer->GetCurrentWorldPlaneGeometryUpdateTime() > 0 < this->GetInput()->GetMTime())
+  if (renderer->GetCurrentWorldPlaneGeometryUpdateTime() > 0UL && renderer->GetCurrentWorldPlaneGeometryUpdateTime() < this->GetInput()->GetMTime())
   {
     m_ContourSet = vtkPolyData::New();
 
@@ -94,14 +94,14 @@ void mitk::ContourSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *re
 
     mitk::ContourSet::Pointer input = const_cast<mitk::ContourSet *>(this->GetInput());
     mitk::ContourSet::ContourVectorType contourVec = input->GetContours();
-    mitk::ContourSet::ContourIterator contourIt = contourVec.begin();
+    auto contourIt = contourVec.begin();
 
     vtkIdType firstPointIndex = 0, lastPointIndex = 0;
 
     vtkIdType ptIndex = 0;
     while (contourIt != contourVec.end())
     {
-      mitk::Contour *nextContour = (mitk::Contour *)(*contourIt).second;
+      auto *nextContour = (mitk::Contour *)(*contourIt).second;
       Contour::InputType idx = nextContour->GetContourPath()->StartOfInput();
 
       Contour::InputType end = nextContour->GetContourPath()->EndOfInput();
@@ -153,8 +153,6 @@ void mitk::ContourSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *re
     m_Actor->GetProperty()->SetColor(rgba);
     m_Actor->SetMapper(m_VtkPolyDataMapper);
   }
-
-  SetVtkMapperImmediateModeRendering(m_VtkPolyDataMapper);
 }
 
 const mitk::ContourSet *mitk::ContourSetVtkMapper3D::GetInput()

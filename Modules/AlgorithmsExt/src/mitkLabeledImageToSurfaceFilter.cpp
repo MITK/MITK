@@ -120,7 +120,7 @@ void mitk::LabeledImageToSurfaceFilter::GenerateData()
   mitk::Image *image = (mitk::Image *)GetInput();
   if (image == nullptr)
   {
-    itkWarningMacro("Image is NULL");
+    itkWarningMacro("Image is nullptr");
     return;
   }
 

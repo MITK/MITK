@@ -264,7 +264,7 @@ void Command::FirePostExecuteSuccess(const Object::Pointer returnValue)
   {
     CommandTracing::PrintTrace("COMMANDS", "execute" + CommandTracing::SEPARATOR
                                + "success: id=" + this->GetId() + "; returnValue=" +
-                               (returnValue.IsNull() ? QString("NULL") : returnValue->ToString()));
+                               (returnValue.IsNull() ? QString("nullptr") : returnValue->ToString()));
   }
 
   executionEvents.postExecuteSuccess(this->GetId(), returnValue);

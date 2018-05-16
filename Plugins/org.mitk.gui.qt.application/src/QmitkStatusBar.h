@@ -46,33 +46,33 @@ public:
 
     //##Documentation
     //##@brief Destructor
-    virtual ~QmitkStatusBar();
+    ~QmitkStatusBar() override;
 
 
     //##Documentation
     //## @brief Send a string to the applications StatusBar (QStatusBar).
-    virtual void DisplayText(const char* t) override;
-    virtual void DisplayText(const char* t, int ms) override;
+    void DisplayText(const char* t) override;
+    void DisplayText(const char* t, int ms) override;
 
     //##Documentation
     //## @brief Send a string as an error message to StatusBar.
     //## The implementation calls DisplayText()
-    virtual void DisplayErrorText(const char *t) override { this->DisplayText(t); };
-    virtual void DisplayWarningText(const char *t) override { this->DisplayText(t); };
-    virtual void DisplayWarningText(const char *t, int ms) override { this->DisplayText(t, ms); };
-    virtual void DisplayGenericOutputText(const char *t) override {this->DisplayText(t);}
-    virtual void DisplayDebugText(const char *t) override { this->DisplayText(t); };
-    virtual void DisplayGreyValueText(const char *t) override;
+    void DisplayErrorText(const char *t) override { this->DisplayText(t); };
+    void DisplayWarningText(const char *t) override { this->DisplayText(t); };
+    void DisplayWarningText(const char *t, int ms) override { this->DisplayText(t, ms); };
+    void DisplayGenericOutputText(const char *t) override {this->DisplayText(t);}
+    void DisplayDebugText(const char *t) override { this->DisplayText(t); };
+    void DisplayGreyValueText(const char *t) override;
 
     //##Documentation
     //## @brief removes any temporary message being shown.
-    virtual void Clear() override;
+    void Clear() override;
 
     //##Documentation
     //## @brief Set the QSizeGrip of the window
     //## (the triangle in the lower right Windowcorner for changing the size)
     //## to enabled or disabled
-    virtual void SetSizeGripEnabled(bool enable) override;
+    void SetSizeGripEnabled(bool enable) override;
 
 private:
     //static Pointer m_Instance;

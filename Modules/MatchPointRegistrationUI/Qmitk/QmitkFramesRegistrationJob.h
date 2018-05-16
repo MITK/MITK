@@ -54,9 +54,9 @@ class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkFramesRegistrationJob : public QO
 
 public:
   QmitkFramesRegistrationJob(map::algorithm::RegistrationAlgorithmBase *pAlgorithm);
-  ~QmitkFramesRegistrationJob();
+  ~QmitkFramesRegistrationJob() override;
 
-  void run();
+  void run() override;
 
 signals:
   void Finished();

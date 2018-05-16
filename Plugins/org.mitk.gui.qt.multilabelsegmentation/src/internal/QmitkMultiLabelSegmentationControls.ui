@@ -709,7 +709,6 @@
   <zorder>groupBox_DataSelection</zorder>
   <zorder>m_tw2DTools</zorder>
   <zorder>m_gbInterpolation</zorder>
-  <zorder>verticalSpacer</zorder>
   <zorder>groupBox_Layer</zorder>
   <zorder>groupBox_Labels</zorder>
  </widget>

@@ -37,21 +37,21 @@ public:
   static const QString MITK_SURFACE_VAR_NAME;
 
   QmitkPythonVariableStackTableModel(QObject *parent = 0);
-  virtual ~QmitkPythonVariableStackTableModel();
+  ~QmitkPythonVariableStackTableModel() override;
 
-  int rowCount(const QModelIndex &parent = QModelIndex()) const;
-  int columnCount(const QModelIndex &parent = QModelIndex()) const;
-  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-  Qt::ItemFlags flags( const QModelIndex& index ) const;
-  virtual QVariant headerData(int section, Qt::Orientation orientation,
-                              int role) const;
+  int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+  int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+  Qt::ItemFlags flags( const QModelIndex& index ) const override;
+  QVariant headerData(int section, Qt::Orientation orientation,
+                              int role) const override;
 
-  QStringList mimeTypes() const;
-  bool dropMimeData ( const QMimeData *, Qt::DropAction, int, int, const QModelIndex & );
-  Qt::DropActions supportedDropActions() const;
+  QStringList mimeTypes() const override;
+  bool dropMimeData ( const QMimeData *, Qt::DropAction, int, int, const QModelIndex & ) override;
+  Qt::DropActions supportedDropActions() const override;
   //Qt::DropActions supportedDragActions() const;
 
-  void CommandExecuted(const std::string& pythonCommand);
+  void CommandExecuted(const std::string& pythonCommand) override;
 
   std::vector<mitk::PythonVariable> GetVariableStack() const;
 private:

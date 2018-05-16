@@ -100,19 +100,27 @@ namespace mitk
 
     int _DebugEnabled = d->m_EndoDebug->GetDebugEnabled();
     if( elem->QueryIntAttribute("DebugEnabled",&_DebugEnabled) != TIXML_SUCCESS )
+    {
       endodebug("DebugEnabled attribute not found");
+    }
 
     int _ShowImagesInDebug = d->m_EndoDebug->GetShowImagesInDebug();
     if( elem->QueryIntAttribute("ShowImagesInDebug",&_ShowImagesInDebug) != TIXML_SUCCESS )
+    {
       endodebug("ShowImagesInDebug attribute not found");
+    }
 
     int _ShowImagesTimeOut = static_cast<int>(d->m_EndoDebug->GetShowImagesTimeOut());
     if( elem->QueryIntAttribute("ShowImagesTimeOut",&_ShowImagesTimeOut) != TIXML_SUCCESS )
+    {
       endodebug("ShowImagesTimeOut attribute not found");
+    }
 
     std::string _DebugImagesOutputDirectory = d->m_EndoDebug->GetDebugImagesOutputDirectory();
     if( elem->QueryStringAttribute("DebugImagesOutputDirectory",&_DebugImagesOutputDirectory) != TIXML_SUCCESS )
+    {
       endodebug("DebugImagesOutputDirectory attribute not found");
+    }
 
     std::set<std::string> _FilesToDebug;
     std::string _FilesToDebugString;

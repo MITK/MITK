@@ -1,0 +1,6 @@
+/**
+\page org_mitk_views_denoisingview DWI Denoising
+
+This view provides several methods to denoise diffusion-weighted images. Simply select the image to denoise and press the start button. The default parameters should work relatively well. The NLM method is by far the slowest.
+
+*/

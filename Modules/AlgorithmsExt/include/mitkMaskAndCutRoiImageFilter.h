@@ -60,7 +60,7 @@ namespace mitk
 
   protected:
     MaskAndCutRoiImageFilter();
-    ~MaskAndCutRoiImageFilter();
+    ~MaskAndCutRoiImageFilter() override;
 
     void GenerateData() override;
 

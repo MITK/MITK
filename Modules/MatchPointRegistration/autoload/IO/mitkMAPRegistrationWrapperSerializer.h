@@ -32,11 +32,11 @@ class MAPRegistrationWrapperSerializer : public BaseDataSerializer
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-    virtual std::string Serialize();
+    std::string Serialize() override;
 
   protected:
     MAPRegistrationWrapperSerializer();
-    virtual ~MAPRegistrationWrapperSerializer();
+    ~MAPRegistrationWrapperSerializer() override;
 };
 } // namespace
 #endif

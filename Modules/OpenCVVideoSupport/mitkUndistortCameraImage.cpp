@@ -131,7 +131,7 @@ void mitk::UndistortCameraImage::UndistortImageFast(IplImage * src, IplImage* ds
   if(!src)
     return;
 
-  /*if(dst == NULL)
+  /*if(dst == nullptr)
     dst = src;
 
   if(src->nChannels == 3)
@@ -140,13 +140,13 @@ void mitk::UndistortCameraImage::UndistortImageFast(IplImage * src, IplImage* ds
     IplImage *g = cvCreateImage(cvGetSize(src),src->depth,1);//subpixel
     IplImage *b = cvCreateImage(cvGetSize(src),src->depth,1);//subpixel
 
-    cvSplit(src, r,g,b, NULL);
+    cvSplit(src, r,g,b, nullptr);
 
     cvRemap( r, r, m_mapX, m_mapY ); // Undistort image
     cvRemap( g, g, m_mapX, m_mapY ); // Undistort image
     cvRemap( b, b, m_mapX, m_mapY ); // Undistort image
 
-    cvMerge(r,g,b, NULL, dst);
+    cvMerge(r,g,b, nullptr, dst);
   }
   else
   {
@@ -154,10 +154,10 @@ void mitk::UndistortCameraImage::UndistortImageFast(IplImage * src, IplImage* ds
   }*/
 
 
-  /*if(m_tempImage == NULL)
+  /*if(m_tempImage == nullptr)
     m_tempImage = cvCreateImage(cvSize(src->width,src->height),src->depth,src->nChannels);*/
 
-  /*if(dst == NULL)
+  /*if(dst == nullptr)
     dst = cvCreateImage(cvSize(src->width,src->height),src->depth,src->nChannels);*/
 
   if(!dst)
@@ -176,7 +176,7 @@ void mitk::UndistortCameraImage::UndistortImageFast(IplImage * src, IplImage* ds
 
   /*m_tempImage->origin = src->origin;
 
-  if(dst == NULL)
+  if(dst == nullptr)
     memcpy( src->imageData, m_tempImage->imageData, m_tempImage->imageSize );
   else
     memcpy( dst->imageData, m_tempImage->imageData, m_tempImage->imageSize );

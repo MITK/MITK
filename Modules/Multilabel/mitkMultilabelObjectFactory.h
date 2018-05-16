@@ -27,17 +27,17 @@ namespace mitk
   {
   public:
     mitkClassMacro(MultilabelObjectFactory, CoreObjectFactoryBase);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) virtual Mapper::Pointer
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self) Mapper::Pointer
       CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
-    virtual void SetDefaultProperties(mitk::DataNode *node) override;
-    virtual const char *GetFileExtensions() override;
-    virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-    virtual const char *GetSaveFileExtensions() override;
-    virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
+    void SetDefaultProperties(mitk::DataNode *node) override;
+    const char *GetFileExtensions() override;
+    mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
+    const char *GetSaveFileExtensions() override;
+    mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
 
   protected:
     MultilabelObjectFactory();
-    ~MultilabelObjectFactory();
+    ~MultilabelObjectFactory() override;
     void CreateFileExtensionsMap();
     MultimapType m_FileExtensionsMap;
     MultimapType m_SaveFileExtensionsMap;

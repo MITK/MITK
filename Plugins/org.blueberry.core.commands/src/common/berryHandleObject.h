@@ -132,7 +132,7 @@ public:
      *
      * @return The hash code for this object.
      */
-   virtual uint HashCode() const override
+   uint HashCode() const override
    {
      if (hashCode == HASH_CODE_NOT_COMPUTED)
      {

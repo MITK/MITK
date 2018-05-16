@@ -26,7 +26,7 @@ mitk::LabeledImageLookupTable::LabeledImageLookupTable() : m_LevelWindow(128, 25
   if (m_LookupTable == nullptr)
   {
     itkWarningMacro(
-      "LookupTable is NULL, it should have been initialized by the default constructor of mitk::LookupTable");
+      "LookupTable is nullptr, it should have been initialized by the default constructor of mitk::LookupTable");
     m_LookupTable = vtkLookupTable::New();
   }
   m_LookupTable->SetNumberOfTableValues(256);
@@ -70,7 +70,7 @@ mitk::LabeledImageLookupTable::~LabeledImageLookupTable()
 mitk::LabeledImageLookupTable &mitk::LabeledImageLookupTable::operator=(const mitk::LookupTable &other)
 {
   LookupTable::operator=(other);
-  if (const LabeledImageLookupTable *lut = dynamic_cast<const LabeledImageLookupTable *>(&other))
+  if (const auto *lut = dynamic_cast<const LabeledImageLookupTable *>(&other))
   {
     this->m_LevelWindow = lut->m_LevelWindow;
   }
@@ -93,7 +93,7 @@ void mitk::LabeledImageLookupTable::SetColorForLabel(const mitk::LabeledImageLoo
 {
   if (m_LookupTable == nullptr)
   {
-    itkWarningMacro("LookupTable is NULL, but it should have been initialized by the constructor");
+    itkWarningMacro("LookupTable is nullptr, but it should have been initialized by the constructor");
     return;
   }
   m_LookupTable->SetTableValue(label, r, g, b, a);
@@ -109,7 +109,7 @@ double *mitk::LabeledImageLookupTable::GetColorForLabel(const mitk::LabeledImage
 {
   if (m_LookupTable == nullptr)
   {
-    itkWarningMacro("LookupTable is NULL, but it should have been initialized by the constructor");
+    itkWarningMacro("LookupTable is nullptr, but it should have been initialized by the constructor");
     return nullptr;
   }
   return m_LookupTable->GetTableValue(label);

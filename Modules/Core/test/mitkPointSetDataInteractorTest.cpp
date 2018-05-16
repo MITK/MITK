@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingConfig.h>
 
 #include "mitkInteractionTestHelper.h"
+#include <mitkRenderingTestHelper.h>
 #include <mitkIOUtil.h>
 #include <mitkPointSet.h>
 #include <mitkPointSetDataInteractor.h>
@@ -65,10 +66,13 @@ public:
   void tearDown()
   {
     // destroy all objects
-    m_TestPointSetNode->SetDataInteractor(NULL);
-    m_TestPointSetNode = NULL;
-    m_TestPointSet = NULL;
-    m_DataInteractor = NULL;
+    if (m_TestPointSetNode != nullptr)
+    {
+      m_TestPointSetNode->SetDataInteractor(nullptr);
+    }
+    m_TestPointSetNode = nullptr;
+    m_TestPointSet = nullptr;
+    m_DataInteractor = nullptr;
   }
 
   void AddPointInteraction()
@@ -80,7 +84,7 @@ public:
     std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/TestAddPoints.xml");
 
     std::string pic3D = GetTestDataFilePath("Pic3D.nrrd");
-    mitk::Image::Pointer referenceImage = mitk::IOUtil::LoadImage(pic3D);
+    mitk::Image::Pointer referenceImage = mitk::IOUtil::Load<mitk::Image>(pic3D);
     mitk::DataNode::Pointer refDN = mitk::DataNode::New();
     refDN->SetData(referenceImage);
 
@@ -95,7 +99,7 @@ public:
     interactionTestHelper.PlaybackInteraction();
 
     // Load the reference PointSet
-    mitk::PointSet::Pointer referencePointSet = mitk::IOUtil::LoadPointSet(referencePointSetPath);
+    mitk::PointSet::Pointer referencePointSet = mitk::IOUtil::Load<mitk::PointSet>(referencePointSetPath);
 
     // Compare reference with the result of the interaction. Last parameter (false) is set to ignore the geometries.
     // They are not stored in a file and therefore not equal.
@@ -113,7 +117,7 @@ public:
       GetTestDataFilePath("InteractionTestData/Interactions/PointSetDataInteractor_PointsAdd2d3d.xml");
 
     std::string pic3D = GetTestDataFilePath("Pic3D.nrrd");
-    mitk::Image::Pointer referenceImage = mitk::IOUtil::LoadImage(pic3D);
+    mitk::Image::Pointer referenceImage = mitk::IOUtil::Load<mitk::Image>(pic3D);
     mitk::DataNode::Pointer refDN = mitk::DataNode::New();
     refDN->SetData(referenceImage);
 
@@ -128,7 +132,7 @@ public:
     interactionTestHelper.PlaybackInteraction();
 
     // Load the reference PointSet
-    mitk::PointSet::Pointer referencePointSet = mitk::IOUtil::LoadPointSet(referencePointSetPath);
+    mitk::PointSet::Pointer referencePointSet = mitk::IOUtil::Load<mitk::PointSet>(referencePointSetPath);
 
     // Compare reference with the result of the interaction. Last parameter (false) is set to ignore the geometries.
     // They are not stored in a file and therefore not equal.
@@ -144,7 +148,7 @@ public:
 
   void EvaluateState(std::string &refPsFile, mitk::PointSet::Pointer ps, int selected)
   {
-    mitk::PointSet::Pointer refPs = mitk::IOUtil::LoadPointSet(refPsFile);
+    mitk::PointSet::Pointer refPs = mitk::IOUtil::Load<mitk::PointSet>(refPsFile);
     refPs->UpdateOutputInformation();
     ps->UpdateOutputInformation();
 
@@ -172,7 +176,7 @@ public:
     std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/TestMoveRemovePoints.xml");
 
     std::string pic3D = GetTestDataFilePath("Pic3D.nrrd");
-    mitk::Image::Pointer referenceImage = mitk::IOUtil::LoadImage(pic3D);
+    mitk::Image::Pointer referenceImage = mitk::IOUtil::Load<mitk::Image>(pic3D);
     mitk::DataNode::Pointer refDN = mitk::DataNode::New();
     refDN->SetData(referenceImage);
 
@@ -187,12 +191,17 @@ public:
     interactionTestHelper.PlaybackInteraction();
 
     // Load the reference PointSet
-    mitk::PointSet::Pointer referencePointSet = mitk::IOUtil::LoadPointSet(referencePointSetPath);
+    mitk::PointSet::Pointer referencePointSet = mitk::IOUtil::Load<mitk::PointSet>(referencePointSetPath);
 
     // Compare reference with the result of the interaction. Last parameter (false) is set to ignore the geometries.
     // They are not stored in a file and therefore not equal.
     CPPUNIT_ASSERT_MESSAGE("", mitk::Equal(referencePointSet, m_TestPointSet, .001, true, false));
   }
+
+  // this is only for the OpenGL check
+  mitkPointSetDataInteractorTestSuite() : m_RenderingTestHelper(300, 300) {}
+  private:
+    mitk::RenderingTestHelper m_RenderingTestHelper;
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkPointSetDataInteractor)

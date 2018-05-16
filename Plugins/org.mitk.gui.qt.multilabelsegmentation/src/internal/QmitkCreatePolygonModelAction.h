@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Data members
 #include <mitkDataNode.h>
 
-class QmitkStdMultiWidget;
-
 class MITK_QT_SEGMENTATION QmitkCreatePolygonModelAction : public QObject, public mitk::IContextMenuAction
 {
   Q_OBJECT

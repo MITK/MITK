@@ -47,8 +47,8 @@ namespace mitk
 
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
-    virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
+      vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+    void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
     bool SplinesAreAvailable();
 
@@ -65,11 +65,11 @@ namespace mitk
   protected:
     SplineVtkMapper3D();
 
-    virtual ~SplineVtkMapper3D();
+    ~SplineVtkMapper3D() override;
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    virtual void ApplyAllProperties(BaseRenderer *renderer, vtkActor *actor) override;
+    void ApplyAllProperties(BaseRenderer *renderer, vtkActor *actor) override;
 
     vtkActor *m_SplinesActor;
 

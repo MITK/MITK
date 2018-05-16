@@ -27,7 +27,7 @@ mitk::SurfaceToSurfaceFilter::~SurfaceToSurfaceFilter()
 
 void mitk::SurfaceToSurfaceFilter::SetInput(const mitk::Surface *surface)
 {
-  this->SetInput(0, const_cast<mitk::Surface *>(surface));
+  this->SetInput(0, surface);
 }
 
 void mitk::SurfaceToSurfaceFilter::SetInput(unsigned int idx, const mitk::Surface *surface)

@@ -43,7 +43,7 @@ mitk::ConnectomicsHistogramsContainer * mitk::ConnectomicsHistogramCache::operat
   for(auto iter = cache.begin(); iter != cache.end(); iter++)
   {
     ConnectomicsHistogramsCacheElement *e = dynamic_cast<ConnectomicsHistogramsCacheElement *>(*iter);
-    BaseData *p_tmp = e->baseData.GetPointer();
+    BaseData *p_tmp = e->baseData.Lock();
 
     if(p_tmp == p_BaseData)
     {

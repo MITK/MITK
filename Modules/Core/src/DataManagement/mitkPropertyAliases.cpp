@@ -28,7 +28,7 @@ public:
   AliasEquals(const std::string &alias) : m_Alias(alias) {}
   bool operator()(const std::pair<std::string, std::vector<std::string>> &element)
   {
-    std::vector<std::string>::const_iterator iter = std::find(element.second.begin(), element.second.end(), m_Alias);
+    auto iter = std::find(element.second.begin(), element.second.end(), m_Alias);
     return iter != element.second.end();
   }
 
@@ -52,7 +52,7 @@ bool mitk::PropertyAliases::AddAlias(const std::string &propertyName,
     return false;
 
   AliasesMap &aliases = m_Aliases[className];
-  AliasesMapIterator iter = aliases.find(propertyName);
+  auto iter = aliases.find(propertyName);
 
   if (iter != aliases.end())
   {
@@ -110,11 +110,11 @@ void mitk::PropertyAliases::RemoveAlias(const std::string &propertyName,
   if (!propertyName.empty() && !alias.empty())
   {
     AliasesMap &aliases = m_Aliases[className];
-    AliasesMapIterator iter = aliases.find(propertyName);
+    auto iter = aliases.find(propertyName);
 
     if (iter != aliases.end())
     {
-      std::vector<std::string>::iterator aliasIter = std::find(iter->second.begin(), iter->second.end(), alias);
+      auto aliasIter = std::find(iter->second.begin(), iter->second.end(), alias);
 
       if (aliasIter != iter->second.end())
       {

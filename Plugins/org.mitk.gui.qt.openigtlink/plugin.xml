@@ -4,7 +4,8 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.openigtlinkmanager"
           name="OpenIGTLink Manager"
-          class="OpenIGTLinkManager"
+          category="IGT"
+          class="QmitkOpenIGTLinkManager"
           icon="resources/icon_openigtlink_manager.svg" />
   </extension>
 

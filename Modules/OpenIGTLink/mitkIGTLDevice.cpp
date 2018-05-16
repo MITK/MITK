@@ -40,6 +40,7 @@ m_Name("Unspecified Device"),
 m_StopCommunication(false),
 m_Hostname("127.0.0.1"),
 m_PortNumber(-1),
+m_LogMessages(false),
 m_MultiThreader(nullptr), m_SendThreadID(0), m_ReceiveThreadID(0), m_ConnectThreadID(0)
 {
   m_ReadFully = ReadFully;
@@ -135,7 +136,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
 
   //MITK_INFO << "Server received r = " << r;
 
-  MITK_INFO << "Received r = " << r;
+  //MITK_INFO << "Received r = " << r;
 
   if (r == 0) //connection error
   {
@@ -174,7 +175,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
       //      std::cerr << "Dev type and name: " << headerMsg->GetDeviceType() << " "
       //                << headerMsg->GetDeviceName() << std::endl;
 
-      //      headerMsg->Print(std::cout);
+      // headerMsg->Print(std::cout);
 
       //check the type of the received message
       //if it is a GET_, STP_ or RTS_ command push it into the command queue
@@ -232,6 +233,8 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
         }
         else
         {
+          if(m_LogMessages)
+            MITK_INFO << "Received Message: " << mitk::IGTLMessage::New(curMessage)->ToString();
           this->m_MessageQueue->PushMessage(curMessage);
           this->InvokeEvent(MessageReceivedEvent());
         }
@@ -239,7 +242,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
       }
       else
       {
-        MITK_ERROR("IGTLDevice") << "Received a valid header but could not "
+        MITK_WARN("IGTLDevice") << "Received a valid header but could not "
           << "read the whole message.";
         return IGTL_STATUS_UNKNOWN_ERROR;
       }
@@ -247,7 +250,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
     else
     {
       //CRC check failed
-      MITK_ERROR << "CRC Check failed";
+      MITK_WARN << "CRC Check failed";
       return IGTL_STATUS_CHECKSUM_ERROR;
     }
   }
@@ -255,23 +258,17 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
   {
     //Message size information and actual data size don't match.
     //this state is not suppossed to be reached, return unknown error
-    MITK_ERROR << "IGTL status unknown";
+    MITK_WARN << "IGTL status unknown";
     return IGTL_STATUS_UNKNOWN_ERROR;
   }
 }
 
-void mitk::IGTLDevice::SendMessage(const mitk::IGTLMessage* msg)
+void mitk::IGTLDevice::SendMessage(mitk::IGTLMessage::Pointer msg)
 {
-  this->SendMessage(msg->GetMessage());
-}
-
-void mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
-{
-  //add the message to the queue
   m_MessageQueue->PushSendMessage(msg);
 }
 
-unsigned int mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg,
+unsigned int mitk::IGTLDevice::SendMessagePrivate(mitk::IGTLMessage::Pointer msg,
   igtl::Socket::Pointer socket)
 {
   //check the input message
@@ -282,16 +279,16 @@ unsigned int mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg
     return false;
   }
 
-  // add the name of this device to the message
-  msg->SetDeviceName(this->GetName().c_str());
+  igtl::MessageBase* sendMessage = msg->GetMessage();
 
   // Pack (serialize) and send
-  msg->Pack();
+  sendMessage->Pack();
 
-  int sendSuccess = socket->Send(msg->GetPackPointer(), msg->GetPackSize());
+  int sendSuccess = socket->Send(sendMessage->GetPackPointer(), sendMessage->GetPackSize());
 
   if (sendSuccess)
   {
+    if (m_LogMessages) { MITK_INFO << "Send IGTL message: " << msg->ToString(); }
     this->InvokeEvent(MessageSentEvent());
     return IGTL_STATUS_OK;
   }
@@ -432,11 +429,11 @@ bool mitk::IGTLDevice::SendRTSMessage(const char* type)
   //create a return message
   igtl::MessageBase::Pointer rtsMsg =
     this->m_MessageFactory->CreateInstance(returnType);
-  //if retMsg is NULL there is no return message defined and thus it is not
+  //if retMsg is nullptr there is no return message defined and thus it is not
   //necessary to send one back
   if (rtsMsg.IsNotNull())
   {
-    this->SendMessage(rtsMsg);
+    this->SendMessage(mitk::IGTLMessage::New(rtsMsg));
     return true;
   }
   else
@@ -485,12 +482,16 @@ igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextCommand()
 {
   return m_MessageQueue->PullCommandMessage();
 }
+void mitk::IGTLDevice::EnableNoBufferingMode(bool enable)
+{
+  m_MessageQueue->EnableNoBufferingMode(enable);
+}
 
-void mitk::IGTLDevice::EnableInfiniteBufferingMode(
+void mitk::IGTLDevice::EnableNoBufferingMode(
   mitk::IGTLMessageQueue::Pointer queue,
   bool enable)
 {
-  queue->EnableInfiniteBuffering(enable);
+  queue->EnableNoBufferingMode(enable);
 }
 
 ITK_THREAD_RETURN_TYPE mitk::IGTLDevice::ThreadStartSending(void* pInfoStruct)

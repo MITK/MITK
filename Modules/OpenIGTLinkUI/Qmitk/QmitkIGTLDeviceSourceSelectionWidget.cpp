@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkIGTLDeviceSourceSelectionWidget::QmitkIGTLDeviceSourceSelectionWidget(QWidget* parent, Qt::WindowFlags f)
 : QWidget(parent, f)
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
 }
 
@@ -68,7 +68,7 @@ void QmitkIGTLDeviceSourceSelectionWidget::IGTLDeviceSourceSelected(us::ServiceR
     if (!s) //nothing selected
       {
         //reset everything
-        this->m_CurrentIGTLDeviceSource = NULL;
+        this->m_CurrentIGTLDeviceSource = nullptr;
         emit IGTLDeviceSourceSelected(this->m_CurrentIGTLDeviceSource);
         return;
       }

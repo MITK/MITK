@@ -44,7 +44,7 @@ namespace mitk
      * Sets the filename of the file to write.
      * @param _arg the name of the file to write.
      */
-    virtual void SetFileName(const char *fileName) override;
+    void SetFileName(const char *fileName) override;
     virtual void SetFileName(const std::string &fileName);
 
     /**
@@ -100,24 +100,24 @@ namespace mitk
 
     //##Documentation
     //## @brief Return the possible file extensions for the data type associated with the writer
-    virtual std::vector<std::string> GetPossibleFileExtensions() override;
+    std::vector<std::string> GetPossibleFileExtensions() override;
 
-    virtual std::string GetSupportedBaseData() const override;
+    std::string GetSupportedBaseData() const override;
 
     /**
     * @brief Return the extension to be added to the filename.
     */
-    virtual std::string GetFileExtension() override;
+    std::string GetFileExtension() override;
 
     /**
     * @brief Check if the Writer can write the Content of the
     */
-    virtual bool CanWriteDataType(DataNode *) override;
+    bool CanWriteDataType(DataNode *) override;
 
     /**
     * @brief Return the MimeType of the saved File.
     */
-    virtual std::string GetWritenMIMEType() override;
+    std::string GetWritenMIMEType() override;
 
     using Superclass::SetInput;
     /**
@@ -131,11 +131,11 @@ namespace mitk
     const mitk::Image *GetInput();
 
     // FileWriterWithInformation methods
-    virtual const char *GetDefaultFilename() override;
-    virtual const char *GetFileDialogPattern() override;
-    virtual const char *GetDefaultExtension() override;
-    virtual bool CanWriteBaseDataType(BaseData::Pointer data) override;
-    virtual void DoWrite(BaseData::Pointer data) override;
+    const char *GetDefaultFilename() override;
+    const char *GetFileDialogPattern() override;
+    const char *GetDefaultExtension() override;
+    bool CanWriteBaseDataType(BaseData::Pointer data) override;
+    void DoWrite(BaseData::Pointer data) override;
 
     void SetUseCompression(bool useCompression);
 
@@ -148,9 +148,9 @@ namespace mitk
     /**
      * Virtual destructor.
      */
-    virtual ~ImageWriter();
+    ~ImageWriter() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     virtual void WriteByITK(mitk::Image *image, const std::string &fileName);
 

@@ -62,25 +62,12 @@
        <string>Standard Rendering</string>
       </property>
      </item>
-     <item>
-      <property name="text">
-       <string>Enable Multisampling (Antialiasing)</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Enable Depth Peeling</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item row="7" column="0" colspan="3">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>* Changes require restart of MITK.
- Depth Peeling is only supported by Windows.
- For other OS, use Standard Rendering and enable
- the property 'Depth Sorting' in the property list of the surface data node.</string>
+      <string>* Changes require restart of MITK.</string>
      </property>
     </widget>
    </item>

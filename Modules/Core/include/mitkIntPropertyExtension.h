@@ -47,7 +47,7 @@ namespace mitk
     IntPropertyExtension();
     IntPropertyExtension(int minimum, int maximum, int singleStep = 1);
 
-    ~IntPropertyExtension();
+    ~IntPropertyExtension() override;
 
     struct Impl;
     Impl *m_Impl;

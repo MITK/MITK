@@ -20,9 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 mitk::VirtualTrackingTool::VirtualTrackingTool()
-: InternalTrackingTool(), m_Spline(NULL), m_SplineLength(0.0), m_Velocity(0.1)
+: TrackingTool(), m_Spline(SplineType::New()), m_SplineLength(0.0), m_Velocity(0.1)
 {
-  m_Spline = SplineType::New();
 }
 
 mitk::VirtualTrackingTool::~VirtualTrackingTool()

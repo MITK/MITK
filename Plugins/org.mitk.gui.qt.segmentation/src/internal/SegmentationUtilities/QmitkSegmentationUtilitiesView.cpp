@@ -14,23 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// #define ENABLE_CTK_WIDGETS_WIDGET
-
 #include "QmitkSegmentationUtilitiesView.h"
 #include "BooleanOperations/QmitkBooleanOperationsWidget.h"
 #include "ContourModelToImage/QmitkContourModelToImageWidget.h"
 #include "ImageMasking/QmitkImageMaskingWidget.h"
 #include "MorphologicalOperations/QmitkMorphologicalOperationsWidget.h"
 #include "SurfaceToImage/QmitkSurfaceToImageWidget.h"
-#include "CTKWidgets/QmitkCTKWidgetsWidget.h"
 
 QmitkSegmentationUtilitiesView::QmitkSegmentationUtilitiesView()
   : m_BooleanOperationsWidget(nullptr),
     m_ContourModelToImageWidget(nullptr),
     m_ImageMaskingWidget(nullptr),
     m_MorphologicalOperationsWidget(nullptr),
-    m_SurfaceToImageWidget(nullptr),
-    m_CTKWidgetsWidget(nullptr)
+    m_SurfaceToImageWidget(nullptr)
 {
 }
 
@@ -59,11 +55,6 @@ void QmitkSegmentationUtilitiesView::CreateQtPartControl(QWidget* parent)
   this->AddUtilityWidget(m_ImageMaskingWidget, QIcon(":/SegmentationUtilities/ImageMasking_48x48.png"), "Image Masking");
   this->AddUtilityWidget(m_MorphologicalOperationsWidget, QIcon(":/SegmentationUtilities/MorphologicalOperations_48x48.png"), "Morphological Operations");
   this->AddUtilityWidget(m_SurfaceToImageWidget, QIcon(":/SegmentationUtilities/SurfaceToImage_48x48.png"), "Surface To Image");
-
-#ifdef ENABLE_CTK_WIDGETS_WIDGET
-  m_CTKWidgetsWidget = new QmitkCTKWidgetsWidget(timeNavigationController, parent);
-  this->AddUtilityWidget(m_CTKWidgetsWidget, QIcon(":/SegmentationUtilities/CTKWidgets_48x48.png"), "CTK Widgets");
-#endif
 }
 
 void QmitkSegmentationUtilitiesView::AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text)
@@ -85,10 +76,6 @@ void QmitkSegmentationUtilitiesView::RenderWindowPartActivated(mitk::IRenderWind
   m_ImageMaskingWidget->SetTimeNavigationController(timeNavigationController);
   m_MorphologicalOperationsWidget->SetTimeNavigationController(timeNavigationController);
   m_SurfaceToImageWidget->SetTimeNavigationController(timeNavigationController);
-
-#ifdef ENABLE_CTK_WIDGETS_WIDGET
-  m_CTKWidgetsWidget->SetTimeNavigationController(timeNavigationController);
-#endif
 }
 
 void QmitkSegmentationUtilitiesView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
@@ -98,8 +85,4 @@ void QmitkSegmentationUtilitiesView::RenderWindowPartDeactivated(mitk::IRenderWi
   m_ImageMaskingWidget->SetTimeNavigationController(nullptr);
   m_MorphologicalOperationsWidget->SetTimeNavigationController(nullptr);
   m_SurfaceToImageWidget->SetTimeNavigationController(nullptr);
-
-#ifdef ENABLE_CTK_WIDGETS_WIDGET
-  m_CTKWidgetsWidget->SetTimeNavigationController(NULL);
-#endif
 }

@@ -107,7 +107,7 @@ void SpectroCamRecorder::DoImageProcessing()
     //if (!node)
     //{
     //  // Nothing selected. Inform the user and return
-    //  QMessageBox::information( NULL, "Template", "Please load and select an image before starting image processing.");
+    //  QMessageBox::information( nullptr, "Template", "Please load and select an image before starting image processing.");
     //  return;
     //}
 

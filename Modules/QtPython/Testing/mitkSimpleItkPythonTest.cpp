@@ -80,7 +80,7 @@ sitk::Image mitk::MitkToSimpleItkImage( mitk::Image* image )
 mitk::Image::Pointer mitk::SimpleItkToMitkImage( sitk::Image& sitkImage )
 {
   mitk::Image::Pointer image = mitk::Image::New();
-  void* buffer = NULL;
+  void* buffer = nullptr;
   mitk::PixelType pixelType = MakeScalarPixelType<short>();
   std::vector<double> sitkSpacing = sitkImage.GetSpacing();
   double spacing[3] = { sitkSpacing[0], sitkSpacing[1], sitkSpacing[2] };

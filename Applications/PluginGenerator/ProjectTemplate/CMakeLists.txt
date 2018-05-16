@@ -1,14 +1,14 @@
-cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 
 # Change project and application name to your own
 set(MY_PROJECT_NAME $(project-name))
 set(MY_APP_NAME $(project-app-name))
 
 #-----------------------------------------------------------------------------
-# Set the language standard (MITK requires C++11)
+# Set the language standard (MITK requires C++14)
 #-----------------------------------------------------------------------------
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED 1)
 set(CMAKE_CXX_EXTENSIONS 0)
 

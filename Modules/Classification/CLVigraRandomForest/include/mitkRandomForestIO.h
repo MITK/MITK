@@ -33,16 +33,16 @@ public:
 
     RandomForestFileIO();
     RandomForestFileIO(const mitk::RandomForestFileIO& other);
-    virtual ~RandomForestFileIO();
+    ~RandomForestFileIO() override;
 
     using AbstractFileIO::Write;
-    virtual void Write();
+    void Write() override;
 
     using AbstractFileIO::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read();
+    std::vector<itk::SmartPointer<BaseData> > Read() override;
 
-    virtual ConfidenceLevel GetReaderConfidenceLevel() const;
-    virtual ConfidenceLevel GetWriterConfidenceLevel() const;
+    ConfidenceLevel GetReaderConfidenceLevel() const override;
+    ConfidenceLevel GetWriterConfidenceLevel() const override;
 
 
   protected:
@@ -52,7 +52,7 @@ public:
 //    virtual mitk::DecisionForestFileIO* Clone() const;
 
   private:
-    virtual AbstractFileIO* IOClone() const;
+    AbstractFileIO* IOClone() const override;
 
 
 

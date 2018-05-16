@@ -115,19 +115,19 @@ public:
         m_NewSpacing[2] /= sampling[2];
     }
 
-    virtual void UpdateOutputInformation();
+    void UpdateOutputInformation() override;
 
     virtual void PropagateRequestedRegion(){}
 
-    virtual void PropagateRequestedRegion(itk::DataObject *output){}
+    void PropagateRequestedRegion(itk::DataObject *) override{}
 
-    virtual void VerifyInputInformation(){}
+    void VerifyInputInformation() override{}
 
     protected:
         ResampleDwiImageFilter();
-    ~ResampleDwiImageFilter(){}
+    ~ResampleDwiImageFilter() override{}
 
-    void GenerateData();
+    void GenerateData() override;
 
     DoubleVectorType m_NewSpacing;
     ImageRegion<3>   m_NewImageRegion;

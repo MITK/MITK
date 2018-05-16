@@ -42,16 +42,16 @@ namespace mitk
       mitkNewMacro1Param( DICOMGDCMImageFrameInfo, const DICOMImageFrameInfo::Pointer& );
       mitkNewMacro2Param( DICOMGDCMImageFrameInfo, const DICOMImageFrameInfo::Pointer&, gdcm::Scanner::TagToValue const&);
 
-      virtual ~DICOMGDCMImageFrameInfo();
+      ~DICOMGDCMImageFrameInfo() override;
 
-      virtual DICOMDatasetFinding GetTagValueAsString(const DICOMTag&) const override;
+      DICOMDatasetFinding GetTagValueAsString(const DICOMTag&) const override;
 
-      virtual FindingsListType GetTagValueAsString(const DICOMTagPath& path) const override;
+      FindingsListType GetTagValueAsString(const DICOMTagPath& path) const override;
 
       std::string GetFilenameIfAvailable() const override;
 
     protected:
-      DICOMGDCMImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo);
+      explicit DICOMGDCMImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo);
       DICOMGDCMImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo, gdcm::Scanner::TagToValue const& tagToValueMapping);
       DICOMGDCMImageFrameInfo(const std::string& filename = "", unsigned int frameNo = 0);
 

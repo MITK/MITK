@@ -3,6 +3,5 @@ mitk_create_module(
   PACKAGE_DEPENDS
     PUBLIC CppUnit
     PRIVATE VTK|vtkTestingRendering tinyxml OpenGL
-  WARNINGS_AS_ERRORS
 )
 

@@ -26,7 +26,7 @@ mitk::InternalEvent::InternalEvent(mitk::BaseRenderer *baseRenderer,
 
 bool mitk::InternalEvent::IsEqual(const mitk::InteractionEvent &interactionEvent) const
 {
-  const mitk::InternalEvent &internalEvent = static_cast<const mitk::InternalEvent &>(interactionEvent);
+  const auto &internalEvent = static_cast<const mitk::InternalEvent &>(interactionEvent);
   return (m_SignalName == internalEvent.GetSignalName() && Superclass::IsEqual(interactionEvent));
 }
 
@@ -46,5 +46,5 @@ mitk::DataInteractor *mitk::InternalEvent::GetTargetInteractor() const
 
 bool mitk::InternalEvent::IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const
 {
-  return (NULL != dynamic_cast<InternalEvent *>(baseClass.GetPointer()));
+  return (nullptr != dynamic_cast<InternalEvent *>(baseClass.GetPointer()));
 }

@@ -40,7 +40,7 @@ private:
 
   static const QString TYPE;
 
-  class NULL_PROPERTY_TESTER_ : public IPropertyTester
+  class nullptr_PROPERTY_TESTER_ : public IPropertyTester
   {
   public:
     bool Handles(const QString&  /*namespaze*/, const QString&  /*property*/) override
@@ -66,7 +66,7 @@ private:
     }
   };
 
-  static const NULL_PROPERTY_TESTER_ NULL_PROPERTY_TESTER;
+  static const nullptr_PROPERTY_TESTER_ nullptr_PROPERTY_TESTER;
 
   /*
    * Map containing all already created type extension object.
@@ -88,7 +88,7 @@ public:
   static bool DEBUG;
 
   TypeExtensionManager(const QString& extensionPoint);
-  ~TypeExtensionManager();
+  ~TypeExtensionManager() override;
 
   Property::Pointer GetProperty(Object::ConstPointer receiver,
                                 const QString& namespaze, const QString& method);
@@ -116,10 +116,10 @@ private:
 
   /*synchronized*/void InitializeCaches();
 
-  virtual void Added(const QList<SmartPointer<IExtension> >& extensions) override;
-  virtual void Removed(const QList<SmartPointer<IExtension> >& extensions) override;
-  virtual void Added(const QList<SmartPointer<IExtensionPoint> >& extensionPoints) override;
-  virtual void Removed(const QList<SmartPointer<IExtensionPoint> >& extensionPoints) override;
+  void Added(const QList<SmartPointer<IExtension> >& extensions) override;
+  void Removed(const QList<SmartPointer<IExtension> >& extensions) override;
+  void Added(const QList<SmartPointer<IExtensionPoint> >& extensionPoints) override;
+  void Removed(const QList<SmartPointer<IExtensionPoint> >& extensionPoints) override;
 };
 
 }

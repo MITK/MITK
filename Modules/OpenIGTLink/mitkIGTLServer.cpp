@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkIGTLServer.h"
-#include <stdio.h>
+#include <cstdio>
 
 #include <itksys/SystemTools.hxx>
 #include <itkMutexLockHolder.h>
@@ -135,7 +135,7 @@ void mitk::IGTLServer::Receive()
     }
     else if (status != 1)
     {
-      MITK_WARN("IGTLServer") << "IGTL Message with status: " << status;
+      MITK_DEBUG("IGTLServer") << "IGTL Message with status: " << status;
     }
   }
   m_ReceiveListMutex->Unlock();
@@ -150,10 +150,8 @@ void mitk::IGTLServer::Receive()
 
 void mitk::IGTLServer::Send()
 {
-  igtl::MessageBase::Pointer curMessage;
-
   //get the latest message from the queue
-  curMessage = this->m_MessageQueue->PullSendMessage();
+  mitk::IGTLMessage::Pointer curMessage = this->m_MessageQueue->PullSendMessage();
 
   // there is no message => return
   if (curMessage.IsNull())
@@ -173,7 +171,7 @@ void mitk::IGTLServer::Send()
   for (it = this->m_RegisteredClients.begin(); it != it_end; ++it)
   {
     //maybe there should be a check here if the current socket is still active
-    this->SendMessagePrivate(curMessage.GetPointer(), *it);
+    this->SendMessagePrivate(curMessage, *it);
     MITK_DEBUG("IGTLServer") << "Sent IGTL Message";
   }
   m_SentListMutex->Unlock();

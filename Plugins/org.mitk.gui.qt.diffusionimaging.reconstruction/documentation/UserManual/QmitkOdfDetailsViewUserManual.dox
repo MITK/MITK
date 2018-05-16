@@ -1,0 +1,8 @@
+/**
+\page org_mitk_views_odfdetails ODF Details
+
+This view provides detailed information about the orentation distribution function at the current crosshair position (if a Tensor/ODF image is selected). A visualization of the ODF as well as statistical information are displayed.
+
+\imageMacro{odfdetails.png,"The ODF Details View",10.01}
+
+*/

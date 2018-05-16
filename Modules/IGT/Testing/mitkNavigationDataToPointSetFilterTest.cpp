@@ -164,40 +164,6 @@ static void TestMode4D()
     , "Testing the correct ring buffer behavior");
 }
 
-static void TestMode3DMean()
-{
-  Setup();
-  m_NavigationDataToPointSetFilter->SetOperationMode(mitk::NavigationDataToPointSetFilter::Mode3DMean);
-  int numberForMean = 5;
-  m_NavigationDataToPointSetFilter->SetNumberForMean(numberForMean);
-
-  MITK_TEST_CONDITION(mitk::Equal(m_NavigationDataToPointSetFilter->GetNumberForMean(), numberForMean), "Testing get/set for numberForMean");
-
-  mitk::NavigationDataSequentialPlayer::Pointer player = mitk::NavigationDataSequentialPlayer::New();
-
-  std::string file(MITK_IGT_DATA_DIR);
-  file.append("/NavigationDataTestData_2Tools.xml");
-
-  mitk::NavigationDataSet::Pointer dataset = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(file).GetPointer());
-  player->SetNavigationDataSet(dataset);
-
-  for (unsigned int i = 0; i < player->GetNumberOfOutputs(); i++)
-  {
-    m_NavigationDataToPointSetFilter->SetInput(i, player->GetOutput(i));
-  }
-
-  mitk::PointSet::Pointer pointSet0 = m_NavigationDataToPointSetFilter->GetOutput();
-  mitk::PointSet::Pointer pointSet1 = m_NavigationDataToPointSetFilter->GetOutput(1);
-
-  m_NavigationDataToPointSetFilter->Update();
-
-  MITK_TEST_CONDITION(pointSet0->GetPoint(0)[0] == 3.0 && pointSet0->GetPoint(0)[1] == 2.0 && pointSet0->GetPoint(0)[2] == 5.0,
-    "Testing the average of first input");
-
-  MITK_TEST_CONDITION(pointSet1->GetPoint(0)[0] == 30.0 && pointSet1->GetPoint(0)[1] == 20.0 && pointSet1->GetPoint(0)[2] == 50.0,
-    "Testing the average of second input");
-}
-
 static void NavigationDataToPointSetFilterContructor_DefaultCall_IsNotEmpty()
 {
   Setup();

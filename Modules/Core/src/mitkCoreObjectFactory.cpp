@@ -90,7 +90,7 @@ mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance()
 
 mitk::CoreObjectFactory::~CoreObjectFactory()
 {
-  for (std::map<mitk::CoreObjectFactoryBase *, std::list<mitk::LegacyFileReaderService *>>::iterator iter =
+  for (auto iter =
          m_LegacyReaders.begin();
        iter != m_LegacyReaders.end();
        ++iter)
@@ -101,7 +101,7 @@ mitk::CoreObjectFactory::~CoreObjectFactory()
     }
   }
 
-  for (std::map<mitk::CoreObjectFactoryBase *, std::list<mitk::LegacyFileWriterService *>>::iterator iter =
+  for (auto iter =
          m_LegacyWriters.begin();
        iter != m_LegacyWriters.end();
        ++iter)
@@ -115,7 +115,7 @@ mitk::CoreObjectFactory::~CoreObjectFactory()
 
 void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode *node)
 {
-  if (node == NULL)
+  if (node == nullptr)
     return;
 
   mitk::DataNode::Pointer nodePointer = node;
@@ -145,7 +145,7 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode *node)
     mitk::PointSetVtkMapper2D::SetDefaultProperties(node);
     mitk::PointSetVtkMapper3D::SetDefaultProperties(node);
   }
-  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end(); ++it)
+  for (auto it = m_ExtraFactories.begin(); it != m_ExtraFactories.end(); ++it)
   {
     (*it)->SetDefaultProperties(node);
   }
@@ -167,11 +167,11 @@ mitk::CoreObjectFactory::CoreObjectFactory()
 
 mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId id)
 {
-  mitk::Mapper::Pointer newMapper = NULL;
-  mitk::Mapper::Pointer tmpMapper = NULL;
+  mitk::Mapper::Pointer newMapper = nullptr;
+  mitk::Mapper::Pointer tmpMapper = nullptr;
 
   // check whether extra factories provide mapper
-  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end(); ++it)
+  for (auto it = m_ExtraFactories.begin(); it != m_ExtraFactories.end(); ++it)
   {
     tmpMapper = (*it)->CreateMapper(node, id);
     if (tmpMapper.IsNotNull())
@@ -184,24 +184,24 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode *node
 
     if (id == mitk::BaseRenderer::Standard2D)
     {
-      if ((dynamic_cast<Image *>(data) != NULL))
+      if ((dynamic_cast<Image *>(data) != nullptr))
       {
         newMapper = mitk::ImageVtkMapper2D::New();
         newMapper->SetDataNode(node);
       }
-      else if ((dynamic_cast<PlaneGeometryData *>(data) != NULL))
+      else if ((dynamic_cast<PlaneGeometryData *>(data) != nullptr))
       {
         newMapper = mitk::PlaneGeometryDataMapper2D::New();
         newMapper->SetDataNode(node);
       }
-      else if ((dynamic_cast<Surface *>(data) != NULL))
+      else if ((dynamic_cast<Surface *>(data) != nullptr))
       {
         newMapper = mitk::SurfaceVtkMapper2D::New();
         // cast because SetDataNode is not virtual
-        mitk::SurfaceVtkMapper2D *castedMapper = dynamic_cast<mitk::SurfaceVtkMapper2D *>(newMapper.GetPointer());
+        auto *castedMapper = dynamic_cast<mitk::SurfaceVtkMapper2D *>(newMapper.GetPointer());
         castedMapper->SetDataNode(node);
       }
-      else if ((dynamic_cast<PointSet *>(data) != NULL))
+      else if ((dynamic_cast<PointSet *>(data) != nullptr))
       {
         newMapper = mitk::PointSetVtkMapper2D::New();
         newMapper->SetDataNode(node);
@@ -209,17 +209,17 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode *node
     }
     else if (id == mitk::BaseRenderer::Standard3D)
     {
-      if ((dynamic_cast<PlaneGeometryData *>(data) != NULL))
+      if ((dynamic_cast<PlaneGeometryData *>(data) != nullptr))
       {
         newMapper = mitk::PlaneGeometryDataVtkMapper3D::New();
         newMapper->SetDataNode(node);
       }
-      else if ((dynamic_cast<Surface *>(data) != NULL))
+      else if ((dynamic_cast<Surface *>(data) != nullptr))
       {
         newMapper = mitk::SurfaceVtkMapper3D::New();
         newMapper->SetDataNode(node);
       }
-      else if ((dynamic_cast<PointSet *>(data) != NULL))
+      else if ((dynamic_cast<PointSet *>(data) != nullptr))
       {
         newMapper = mitk::PointSetVtkMapper3D::New();
         newMapper->SetDataNode(node);
@@ -233,7 +233,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode *node
 const char *mitk::CoreObjectFactory::GetFileExtensions()
 {
   MultimapType aMap;
-  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end(); ++it)
+  for (auto it = m_ExtraFactories.begin(); it != m_ExtraFactories.end(); ++it)
   {
     aMap = (*it)->GetFileExtensionsMap();
     this->MergeFileExtensions(m_FileExtensionsMap, aMap);
@@ -245,11 +245,11 @@ const char *mitk::CoreObjectFactory::GetFileExtensions()
 void mitk::CoreObjectFactory::MergeFileExtensions(MultimapType &fileExtensionsMap, MultimapType inputMap)
 {
   std::pair<MultimapType::iterator, MultimapType::iterator> pairOfIter;
-  for (MultimapType::iterator it = inputMap.begin(); it != inputMap.end(); ++it)
+  for (auto it = inputMap.begin(); it != inputMap.end(); ++it)
   {
     bool duplicateFound = false;
     pairOfIter = fileExtensionsMap.equal_range((*it).first);
-    for (MultimapType::iterator it2 = pairOfIter.first; it2 != pairOfIter.second; ++it2)
+    for (auto it2 = pairOfIter.first; it2 != pairOfIter.second; ++it2)
     {
       // cout << "  [" << (*it).first << ", " << (*it).second << "]" << endl;
       std::string aString = (*it2).second;
@@ -290,7 +290,7 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
 const char *mitk::CoreObjectFactory::GetSaveFileExtensions()
 {
   MultimapType aMap;
-  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end(); ++it)
+  for (auto it = m_ExtraFactories.begin(); it != m_ExtraFactories.end(); ++it)
   {
     aMap = (*it)->GetSaveFileExtensionsMap();
     this->MergeFileExtensions(m_SaveFileExtensionsMap, aMap);
@@ -314,7 +314,7 @@ mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters(
   fileWritersSet.insert(allWriters.begin(), allWriters.end());
 
   // collect all extra factories
-  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end(); ++it)
+  for (auto it = m_ExtraFactories.begin(); it != m_ExtraFactories.end(); ++it)
   {
     FileWriterList list2 = (*it)->GetFileWriters();
 
@@ -336,7 +336,7 @@ void mitk::CoreObjectFactory::MapEvent(const mitk::Event *, const int)
 std::string mitk::CoreObjectFactory::GetDescriptionForExtension(const std::string &extension)
 {
   std::multimap<std::string, std::string> fileExtensionMap = GetSaveFileExtensionsMap();
-  for (std::multimap<std::string, std::string>::iterator it = fileExtensionMap.begin(); it != fileExtensionMap.end();
+  for (auto it = fileExtensionMap.begin(); it != fileExtensionMap.end();
        ++it)
     if (it->first == extension)
       return it->second;
@@ -351,7 +351,7 @@ void mitk::CoreObjectFactory::RegisterLegacyReaders(mitk::CoreObjectFactoryBase 
 
   std::map<std::string, std::vector<std::string>> extensionsByCategories;
   std::multimap<std::string, std::string> fileExtensionMap = factory->GetFileExtensionsMap();
-  for (std::multimap<std::string, std::string>::iterator it = fileExtensionMap.begin(); it != fileExtensionMap.end();
+  for (auto it = fileExtensionMap.begin(); it != fileExtensionMap.end();
        ++it)
   {
     std::string extension = it->first;
@@ -370,7 +370,7 @@ void mitk::CoreObjectFactory::RegisterLegacyReaders(mitk::CoreObjectFactoryBase 
 
 void mitk::CoreObjectFactory::UnRegisterLegacyReaders(mitk::CoreObjectFactoryBase *factory)
 {
-  std::map<mitk::CoreObjectFactoryBase *, std::list<mitk::LegacyFileReaderService *>>::iterator iter =
+  auto iter =
     m_LegacyReaders.find(factory);
   if (iter != m_LegacyReaders.end())
   {
@@ -394,14 +394,14 @@ void mitk::CoreObjectFactory::RegisterLegacyWriters(mitk::CoreObjectFactoryBase 
 
   MultimapType fileExtensionMap = factory->GetSaveFileExtensionsMap();
 
-  for (mitk::CoreObjectFactory::FileWriterList::iterator it = writers.begin(); it != writers.end(); ++it)
+  for (auto it = writers.begin(); it != writers.end(); ++it)
   {
     std::vector<std::string> extensions = (*it)->GetPossibleFileExtensions();
     if (extensions.empty())
       continue;
 
     std::string description;
-    for (std::vector<std::string>::iterator ext = extensions.begin(); ext != extensions.end(); ++ext)
+    for (auto ext = extensions.begin(); ext != extensions.end(); ++ext)
     {
       if (ext->empty())
         continue;
@@ -418,7 +418,7 @@ void mitk::CoreObjectFactory::RegisterLegacyWriters(mitk::CoreObjectFactoryBase 
         extensionWithStar.insert(extensionWithStar.begin(), '*');
       }
 
-      for (MultimapType::iterator fileExtensionIter = fileExtensionMap.begin();
+      for (auto fileExtensionIter = fileExtensionMap.begin();
            fileExtensionIter != fileExtensionMap.end();
            ++fileExtensionIter)
       {
@@ -444,7 +444,7 @@ void mitk::CoreObjectFactory::RegisterLegacyWriters(mitk::CoreObjectFactoryBase 
 
 void mitk::CoreObjectFactory::UnRegisterLegacyWriters(mitk::CoreObjectFactoryBase *factory)
 {
-  std::map<mitk::CoreObjectFactoryBase *, std::list<mitk::LegacyFileWriterService *>>::iterator iter =
+  auto iter =
     m_LegacyWriters.find(factory);
   if (iter != m_LegacyWriters.end())
   {

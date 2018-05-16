@@ -93,16 +93,16 @@ namespace mitk
     // Active current renderwindow
     virtual void MakeCurrent();
 
-    virtual void SetDataStorage(
+    void SetDataStorage(
       mitk::DataStorage *storage) override; ///< set the datastorage that will be used for rendering
 
-    virtual void InitRenderer(vtkRenderWindow *renderwindow) override;
+    void InitRenderer(vtkRenderWindow *renderwindow) override;
     virtual void Update(mitk::DataNode *datatreenode);
-    virtual void SetMapperID(const MapperSlotId mapperId) override;
+    void SetMapperID(const MapperSlotId mapperId) override;
 
     // Size
-    virtual void InitSize(int w, int h) override;
-    virtual void Resize(int w, int h) override;
+    void InitSize(int w, int h) override;
+    void Resize(int w, int h) override;
 
     // Picking
     enum PickingMode
@@ -124,8 +124,8 @@ namespace mitk
     itkSetEnumMacro(PickingMode, PickingMode);
     itkGetEnumMacro(PickingMode, PickingMode);
 
-    virtual void PickWorldPoint(const Point2D &displayPoint, Point3D &worldPoint) const override;
-    virtual mitk::DataNode *PickObject(const Point2D &displayPosition, Point3D &worldPosition) const override;
+    void PickWorldPoint(const Point2D &displayPoint, Point3D &worldPoint) const override;
+    mitk::DataNode *PickObject(const Point2D &displayPosition, Point3D &worldPosition) const override;
 
     /**
     * @brief WriteSimpleText Write a text in a renderwindow.
@@ -162,7 +162,7 @@ namespace mitk
      * (e.g. after loading an additional dataset), to ensure that the view is
      * aligned correctly.
      */
-    virtual bool SetWorldGeometryToDataStorageBounds() override;
+    bool SetWorldGeometryToDataStorageBounds() override;
 
     /**
      * \brief Used by vtkPointPicker/vtkPicker.
@@ -198,8 +198,8 @@ namespace mitk
       vtkRenderWindow *renWin = nullptr,
       mitk::RenderingManager *rm = nullptr,
       mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
-    virtual ~VtkPropRenderer();
-    virtual void Update() override;
+    ~VtkPropRenderer() override;
+    void Update() override;
 
     static void RenderingCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
 

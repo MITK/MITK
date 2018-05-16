@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Poco/Path.h>
 #include <QSettings>
 
+#include <QmitkIGTCommonHelper.h>
+
 const std::string QmitkMicronTrackerWidget::VIEW_ID = "org.mitk.views.NDIMicronTrackerWidget";
 
 QmitkMicronTrackerWidget::QmitkMicronTrackerWidget(QWidget* parent, Qt::WindowFlags f)
@@ -76,7 +78,7 @@ void QmitkMicronTrackerWidget::AddOutput(std::string s)
   m_Controls->m_outputTextMicronTracker->verticalScrollBar()->setValue(m_Controls->m_outputTextMicronTracker->verticalScrollBar()->maximum());
 }
 
-mitk::TrackingDevice::Pointer QmitkMicronTrackerWidget::ConstructTrackingDevice()
+mitk::TrackingDevice::Pointer QmitkMicronTrackerWidget::GetTrackingDevice()
 {
   mitk::ClaronTrackingDevice::Pointer newDevice = mitk::ClaronTrackingDevice::New();
   if (this->m_MTCalibrationFile.empty()) //if configuration file for MicronTracker is empty: load default
@@ -147,10 +149,11 @@ bool QmitkMicronTrackerWidget::IsDeviceInstalled()
 
 void QmitkMicronTrackerWidget::SetMTCalibrationFileClicked()
 {
-  std::string filename = QFileDialog::getOpenFileName(NULL, tr("Open Calibration File"), "/", "*.*").toLatin1().data();
+  std::string filename = QFileDialog::getOpenFileName(nullptr, tr("Open Calibration File"), QmitkIGTCommonHelper::GetLastFileLoadPath(), "*.*").toLatin1().data();
   if (filename == "") { return; }
   else
   {
+    QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(QString::fromStdString(filename));
     m_MTCalibrationFile = filename;
     Poco::Path myPath = Poco::Path(m_MTCalibrationFile.c_str());
     m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString(myPath.getFileName().c_str()));

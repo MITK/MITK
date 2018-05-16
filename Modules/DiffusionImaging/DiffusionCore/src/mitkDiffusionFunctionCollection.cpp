@@ -15,19 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkDiffusionFunctionCollection.h"
-#include <math.h>
 #include "mitkNumericTypes.h"
-
-// for Windows
-#ifndef M_PI
-#define M_PI  3.14159265358979323846
-#endif
 
 // Namespace ::SH
 #include <boost/math/special_functions/legendre.hpp>
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 #include <boost/version.hpp>
-
+#include <itkPointShell.h>
 
 // Namespace ::Gradients
 #include "itkVectorContainer.h"
@@ -43,23 +37,23 @@ double mitk::sh::factorial(int number) {
   return result;
 }
 
-void mitk::sh::Cart2Sph(double x, double y, double z, double *cart)
+void mitk::sh::Cart2Sph(double x, double y, double z, double *spherical)
 {
   double phi, th, rad;
   rad = sqrt(x*x+y*y+z*z);
   if( rad < mitk::eps )
   {
-    th = M_PI/2;
-    phi = M_PI/2;
+    th = itk::Math::pi/2;
+    phi = itk::Math::pi/2;
   }
   else
   {
     th = acos(z/rad);
     phi = atan2(y, x);
   }
-  cart[0] = phi;
-  cart[1] = th;
-  cart[2] = rad;
+  spherical[0] = phi;
+  spherical[1] = th;
+  spherical[2] = rad;
 }
 
 double mitk::sh::legendre0(int l)
@@ -78,20 +72,63 @@ double mitk::sh::legendre0(int l)
   }
 }
 
-
-double mitk::sh::Yj(int m, int l, double theta, double phi)
+double mitk::sh::Yj(int m, int l, float theta, float phi, bool mrtrix)
 {
-  if (m<0)
-    return sqrt(2.0)*::boost::math::spherical_harmonic_r(l, -m, theta, phi);
-  else if (m==0)
-    return ::boost::math::spherical_harmonic_r(l, m, theta, phi);
+  if (!mrtrix)
+  {
+    if (m<0)
+      return sqrt(2.0)*::boost::math::spherical_harmonic_r(l, -m, theta, phi);
+    else if (m==0)
+      return ::boost::math::spherical_harmonic_r(l, m, theta, phi);
+    else
+      return pow(-1.0,m)*sqrt(2.0)*::boost::math::spherical_harmonic_i(l, m, theta, phi);
+  }
   else
-    return pow(-1.0,m)*sqrt(2.0)*::boost::math::spherical_harmonic_i(l, m, theta, phi);
+  {
+    double plm = ::boost::math::legendre_p<float>(l,abs(m),-cos(theta));
+    double mag = sqrt((double)(2*l+1)/(4.0*itk::Math::pi)*::boost::math::factorial<float>(l-abs(m))/::boost::math::factorial<float>(l+abs(m)))*plm;
+    if (m>0)
+      return mag*cos(m*phi);
+    else if (m==0)
+      return mag;
+    else
+      return mag*sin(-m*phi);
+  }
 
   return 0;
 }
 
+vnl_matrix<float> mitk::sh::CalcShBasisForDirections(int sh_order, vnl_matrix<double> U, bool mrtrix)
+{
+  vnl_matrix<float> sh_basis  = vnl_matrix<float>(U.cols(), (sh_order*sh_order + sh_order + 2)/2 + sh_order );
+  for(unsigned int i=0; i<U.cols(); i++)
+  {
+    double x = U(0,i);
+    double y = U(1,i);
+    double z = U(2,i);
+    double spherical[3];
+    mitk::sh::Cart2Sph(x,y,z,spherical);
+    U(0,i) = spherical[0];
+    U(1,i) = spherical[1];
+    U(2,i) = spherical[2];
+  }
 
+  for(unsigned int i=0; i<U.cols(); i++)
+  {
+    for(int k=0; k<=sh_order; k+=2)
+    {
+      for(int m=-k; m<=k; m++)
+      {
+        int j = (k*k + k + 2)/2 + m - 1;
+        double phi = U(0,i);
+        double th = U(1,i);
+        sh_basis(i,j) = mitk::sh::Yj(m,k,th,phi, mrtrix);
+      }
+    }
+  }
+
+  return sh_basis;
+}
 
 //------------------------- gradients-function ------------------------------------
 
@@ -117,7 +154,7 @@ std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections(const BValueMa
       bool directionExist = false;
       while(containerIt != directioncontainer.end())
       {
-        if (fabs(dot(refGradientsContainer->ElementAt(*containerIt), refGradientsContainer->ElementAt(wntIndex)))  > 0.9998)
+        if (fabs(dot_product(refGradientsContainer->ElementAt(*containerIt), refGradientsContainer->ElementAt(wntIndex)))  > 0.9998)
         {
           directionExist = true;
           break;
@@ -155,19 +192,11 @@ bool mitk::gradients::CheckForDifferingShellDirections(const BValueMap & refBVal
       IndiciesVector currentShell = mapIterator->second;
       IndiciesVector testShell = mapIterator_2->second;
       for (unsigned int i = 0; i< currentShell.size(); i++)
-        if (fabs(dot(refGradientsContainer->ElementAt(currentShell[i]), refGradientsContainer->ElementAt(testShell[i])))  <= 0.9998) { return true; }
+        if (fabs(dot_product(refGradientsContainer->ElementAt(currentShell[i]), refGradientsContainer->ElementAt(testShell[i])))  <= 0.9998) { return true; }
 
     }
   }
   return false;
-}
-
-
-template<typename type>
-double mitk::gradients::dot (vnl_vector_fixed< type ,3> const& v1, vnl_vector_fixed< type ,3 > const& v2 )
-{
-  double result = (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]) / (v1.two_norm() * v2.two_norm());
-  return result ;
 }
 
 vnl_matrix<double> mitk::gradients::ComputeSphericalFromCartesian(const IndiciesVector & refShell, const GradientDirectionContainerType * refGradientsContainer)
@@ -234,7 +263,7 @@ mitk::gradients::GradientDirectionContainerType::Pointer mitk::gradients::Create
       bool directionExist = false;
       while(containerIt != directioncontainer->End())
       {
-        if (fabs(dot(containerIt.Value(), origninalGradentcontainer->ElementAt(wntIndex)))  > 0.9998)
+        if (fabs(dot_product(containerIt.Value(), origninalGradentcontainer->ElementAt(wntIndex)))  > 0.9998)
         {
           directionExist = true;
           break;

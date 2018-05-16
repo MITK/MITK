@@ -312,7 +312,7 @@ public:
      */
     protected: void SavePresentationState();
 
-    public: ~PartStack();
+    public: ~PartStack() override;
 
     /**
      * See LayoutPart#Dispose

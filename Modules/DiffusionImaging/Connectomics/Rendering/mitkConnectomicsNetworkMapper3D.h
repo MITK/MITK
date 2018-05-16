@@ -14,14 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef ConnectomicsNetworkMapper3D_H_HEADER_INCLUDED
 #define ConnectomicsNetworkMapper3D_H_HEADER_INCLUDED
 
 // VTK includes
 
-#include <vtkSmartPointer.h>
 #include "vtkPropAssembly.h"
+#include <vtkSmartPointer.h>
 
 // MITK includes
 // base class
@@ -33,44 +32,44 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkActor.h>
 
-#include <vtkPolyData.h>
-#include <vtkSphereSource.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkDoubleArray.h>
-#include <vtkPoints.h>
-#include <vtkPolyLine.h>
 #include <vtkLineSource.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
+#include <vtkPolyLine.h>
 #include <vtkProperty.h>
+#include <vtkSphereSource.h>
 
-#include <vtkTubeFilter.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkTubeFilter.h>
 
 #include <vtkRenderWindow.h>
-#include <vtkRenderer.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkRenderer.h>
 
-#include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkInteractorStyleTrackball.h>
+#include <vtkInteractorStyleTrackballCamera.h>
 
-#include <vtkRegularPolygonSource.h>
-#include "mitkTextOverlay2D.h"
-#include "mitkTextOverlay3D.h"
-#include <vtkPolyDataMapper2D.h>
-#include <vtkActor2D.h>
-#include <vtkProperty2D.h>
-#include <mitkOverlayManager.h>
 #include "mitkFreeSurferParcellationTranslator.h"
+#include "mitkTextAnnotation2D.h"
+#include "mitkTextAnnotation3D.h"
 #include "mitkVtkInteractorStyle.h"
+#include <mitkManualPlacementAnnotationRenderer.h>
+#include <vtkActor2D.h>
+#include <vtkPolyDataMapper2D.h>
+#include <vtkProperty2D.h>
+#include <vtkRegularPolygonSource.h>
 
-#include <vector>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include <MitkConnectomicsExports.h>
 
-namespace mitk {
-
+namespace mitk
+{
   /**
     * \brief Mapper for Networks
     * \ingroup Mapper
@@ -79,24 +78,20 @@ namespace mitk {
   class MITKCONNECTOMICS_EXPORT ConnectomicsNetworkMapper3D : public VtkMapper
   {
   public:
-
     mitkClassMacro(ConnectomicsNetworkMapper3D, VtkMapper);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override; //looks like deprecated.. should be replaced bz GetViewProp()
-    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false );
+      vtkProp *GetVtkProp(
+        mitk::BaseRenderer *renderer) override; // looks like deprecated.. should be replaced bz GetViewProp()
+    static void SetDefaultProperties(DataNode *node, BaseRenderer *renderer = nullptr, bool overwrite = false);
 
-    static void SetVtkMapperImmediateModeRendering(vtkMapper* mapper);
+    void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
-
-    virtual const mitk::ConnectomicsNetwork* GetInput();
+    virtual const mitk::ConnectomicsNetwork *GetInput();
 
   protected:
-
     ConnectomicsNetworkMapper3D();
-    virtual ~ConnectomicsNetworkMapper3D();
+    ~ConnectomicsNetworkMapper3D() override;
 
     void UpdateVtkObjects();
 
@@ -108,11 +103,11 @@ namespace mitk {
     bool PropertiesChanged();
 
     // Create vectors for customizing color and radius and return maximum
-    double FillNodeParameterVector( std::vector< double > * parameterVector, std::string parameterName );
-    double FillEdgeParameterVector( std::vector< double > * parameterVector, std::string parameterName );
+    double FillNodeParameterVector(std::vector<double> *parameterVector, std::string parameterName);
+    double FillEdgeParameterVector(std::vector<double> *parameterVector, std::string parameterName);
 
-    void FillNodeFilterBoolVector( std::vector< bool > * boolVector, std::string parameterName );
-    void FillEdgeFilterBoolVector( std::vector< bool > * boolVector, std::string parameterName );
+    void FillNodeFilterBoolVector(std::vector<bool> *boolVector, std::string parameterName);
+    void FillEdgeFilterBoolVector(std::vector<bool> *boolVector, std::string parameterName);
 
     // Property storing members
     std::string m_ChosenRenderingScheme;
@@ -142,7 +137,7 @@ namespace mitk {
     mitk::FreeSurferParcellationTranslator::Pointer m_Translator;
     std::string m_AllNodeLabels;
 
-    mitk::TextOverlay3D::Pointer m_TextOverlay3D;
+    mitk::TextAnnotation3D::Pointer m_TextOverlay3D;
   };
 
 } // namespace mitk

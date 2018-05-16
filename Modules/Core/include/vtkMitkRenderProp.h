@@ -50,24 +50,24 @@ public:
    * \brief Used by vtkPointPicker/vtkPicker.
    * This will query a list of all objects in MITK and provide every vtk based mapper to the picker.
    */
-  virtual void InitPathTraversal() override;
+  void InitPathTraversal() override;
 
   /**
    * \brief Used by vtkPointPicker/vtkPicker.
    * This will query a list of all objects in MITK and provide every vtk based mapper to the picker.
    */
-  virtual vtkAssemblyPath *GetNextPath() override;
+  vtkAssemblyPath *GetNextPath() override;
 
-  virtual int GetNumberOfPaths() override;
+  int GetNumberOfPaths() override;
 
   // BUG (#1551) added method for depth peeling support
-  virtual int HasTranslucentPolygonalGeometry() override;
-  virtual int RenderTranslucentPolygonalGeometry(vtkViewport *) override;
-  virtual int RenderVolumetricGeometry(vtkViewport *) override;
+  int HasTranslucentPolygonalGeometry() override;
+  int RenderTranslucentPolygonalGeometry(vtkViewport *) override;
+  int RenderVolumetricGeometry(vtkViewport *) override;
 
 protected:
   vtkMitkRenderProp();
-  ~vtkMitkRenderProp();
+  ~vtkMitkRenderProp() override;
 
   mitk::VtkPropRenderer::Pointer m_VtkPropRenderer;
 };

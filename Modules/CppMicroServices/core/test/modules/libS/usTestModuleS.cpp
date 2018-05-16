@@ -116,8 +116,8 @@ class TestModuleSActivator : public ModuleActivator
 
 public:
 
-  TestModuleSActivator() : s(0) {}
-  ~TestModuleSActivator() { delete s; }
+  TestModuleSActivator() : s(nullptr) {}
+  ~TestModuleSActivator() override { delete s; }
 
   void Load(ModuleContext* context) override
   {

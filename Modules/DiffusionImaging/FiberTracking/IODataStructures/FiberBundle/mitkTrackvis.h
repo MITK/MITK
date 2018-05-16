@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyLine.h>
 #include <itkSize.h>
 
-using namespace std;
-
 // Structure to hold metadata of a TrackVis file
 // ---------------------------------------------
 struct TrackVis_header
@@ -60,14 +58,14 @@ struct TrackVis_header
 class MITKFIBERTRACKING_EXPORT TrackVisFiberReader
 {
 private:
-    string              m_Filename;
+    std::string         m_Filename;
     FILE*               m_FilePointer;
 
 public:
     TrackVis_header     m_Header;
 
-    short   create(string m_Filename, const mitk::FiberBundle* fib);
-    short   open( string m_Filename );
+    short   create(std::string m_Filename, const mitk::FiberBundle* fib, bool lps);
+    short   open(std::string m_Filename );
     short   read( mitk::FiberBundle* fib );
     short   append(const mitk::FiberBundle* fib );
     void    writeHdr();

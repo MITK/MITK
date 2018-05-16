@@ -140,10 +140,10 @@ namespace mitk
     typedef DataType::PointDataContainerIterator PointDataIterator;
     typedef DataType::PointDataContainerIterator PointDataConstIterator;
 
-    virtual void Expand(unsigned int timeSteps) override;
+    void Expand(unsigned int timeSteps) override;
 
     /** \brief executes the given Operation */
-    virtual void ExecuteOperation(Operation *operation) override;
+    void ExecuteOperation(Operation *operation) override;
 
     /** \brief returns the current size of the point-list */
     virtual int GetSize(unsigned int t = 0) const;
@@ -255,14 +255,14 @@ namespace mitk
      */
     int SearchPoint(Point3D point, ScalarType distance, int t = 0) const;
 
-    virtual bool IsEmptyTimeStep(unsigned int t) const override;
+    bool IsEmptyTimeStep(unsigned int t) const override;
 
     // virtual methods, that need to be implemented
-    virtual void UpdateOutputInformation() override;
-    virtual void SetRequestedRegionToLargestPossibleRegion() override;
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
-    virtual bool VerifyRequestedRegion() override;
-    virtual void SetRequestedRegion(const itk::DataObject *data) override;
+    void UpdateOutputInformation() override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    bool VerifyRequestedRegion() override;
+    void SetRequestedRegion(const itk::DataObject *data) override;
 
     // Method for subclasses
     virtual void OnPointSetChange(){};
@@ -272,13 +272,13 @@ namespace mitk
 
     PointSet();
     PointSet(const PointSet &other);
-    virtual ~PointSet();
+    ~PointSet() override;
 
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override; ///< print content of the object to os
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override; ///< print content of the object to os
 
-    virtual void ClearData() override;
+    void ClearData() override;
 
-    virtual void InitializeEmpty() override;
+    void InitializeEmpty() override;
 
     /** \brief swaps point coordinates and point data of the points with identifiers id1 and id2 */
     bool SwapPointContents(PointIdentifier id1, PointIdentifier id2, int t = 0);

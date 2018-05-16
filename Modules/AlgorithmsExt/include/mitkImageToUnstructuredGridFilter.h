@@ -41,10 +41,10 @@ namespace mitk
       itkCloneMacro(Self)
 
       /** This method is called by Update(). */
-      virtual void GenerateData() override;
+      void GenerateData() override;
 
     /** Initializes the output information */
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
     /** Returns a const reference to the input image */
     const mitk::Image *GetInput(void) const;
@@ -64,6 +64,7 @@ namespace mitk
     /** Returns the threshold */
     double GetThreshold();
 
+    /** Returns the number of extracted points after edge detection */
     itkGetMacro(NumberOfExtractedPoints, int)
 
       protected :
@@ -72,7 +73,7 @@ namespace mitk
       ImageToUnstructuredGridFilter();
 
     /** Destructor */
-    virtual ~ImageToUnstructuredGridFilter();
+    ~ImageToUnstructuredGridFilter() override;
 
     /**
      * Access method for extracting the points from the input image
@@ -80,15 +81,15 @@ namespace mitk
     template <typename TPixel, unsigned int VImageDimension>
     void ExtractPoints(const itk::Image<TPixel, VImageDimension> *image);
 
+    /** The number of points extracted by the filter */
+    int m_NumberOfExtractedPoints;
   private:
+
     /**
      * Geometry of the input image, needed to tranform the image points
      * into world points
      */
     mitk::BaseGeometry *m_Geometry;
-
-    /** The number of points extracted by the filter */
-    int m_NumberOfExtractedPoints;
 
     /** Threshold for extracting the points */
     double m_Threshold;

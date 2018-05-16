@@ -69,26 +69,20 @@ bool mitk::PlanarCross::ResetOnPointSelect()
     default:
       // Nothing selected --> nothing to reset
       return false;
-
     case 0:
-    {
       // Control point 0 selected: exchange points 0 and 1
-      const Point2D tmpPoint = this->GetControlPoint(0);
-      this->SetControlPoint(0, this->GetControlPoint(1));
-      this->SetControlPoint(1, tmpPoint);
-      // FALLS THROUGH!
-    }
-
+      {
+        const Point2D tmpPoint = this->GetControlPoint(0);
+        this->SetControlPoint(0, this->GetControlPoint(1));
+        this->SetControlPoint(1, tmpPoint);
+      }
+      // FALLTHRU!
     case 1:
-    {
       // Control point 0 or 1 selected: reset number of control points to two
       this->ResetNumberOfControlPoints(2);
       this->SelectControlPoint(1);
       return true;
-    }
-
     case 2:
-    {
       // Control point 2 selected: replace point 0 with point 3 and point 1 with point 2
       this->SetControlPoint(0, this->GetControlPoint(3));
       this->SetControlPoint(1, this->GetControlPoint(2));
@@ -97,10 +91,7 @@ bool mitk::PlanarCross::ResetOnPointSelect()
       this->ResetNumberOfControlPoints(2);
       this->SelectControlPoint(1);
       return true;
-    }
-
     case 3:
-    {
       // Control point 3 selected: replace point 0 with point 2 and point 1 with point 3
 
       this->SetControlPoint(0, this->GetControlPoint(2));
@@ -110,7 +101,6 @@ bool mitk::PlanarCross::ResetOnPointSelect()
       this->ResetNumberOfControlPoints(2);
       this->SelectControlPoint(1);
       return true;
-    }
   }
 }
 
@@ -333,7 +323,7 @@ void mitk::PlanarCross::PrintSelf(std::ostream &os, itk::Indent indent) const
 
 bool mitk::PlanarCross::Equals(const mitk::PlanarFigure &other) const
 {
-  const mitk::PlanarCross *otherCross = dynamic_cast<const mitk::PlanarCross *>(&other);
+  const auto *otherCross = dynamic_cast<const mitk::PlanarCross *>(&other);
   if (otherCross)
   {
     return Superclass::Equals(other);

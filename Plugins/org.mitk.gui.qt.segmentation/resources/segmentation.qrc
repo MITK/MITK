@@ -1,6 +1,6 @@
 <RCC>
   <qresource prefix="/segmentation" >
     <file>btnNew.png</file>
-    <file>segmentation.png</file>
+    <file>segmentation.svg</file>
   </qresource>
 </RCC>

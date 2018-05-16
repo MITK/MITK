@@ -18,13 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _SPHEREINTERPOLATOR
 
 #include <MitkFiberTrackingExports.h>
-
 #include <vnl/vnl_vector_fixed.h>
-
 #include <vector>
-
-using namespace std;
-
 
 /**
  * \brief Lookuptable based trilinear interpolation of spherically arranged scalar values.
@@ -42,12 +37,12 @@ public:
     float b;
     bool    m_ValidState;
 
-    vector< float > barycoords;
-    vector< int >   indices;
+    std::vector< float > barycoords;
+    std::vector< int >   indices;
     vnl_vector_fixed< int, 3 >     idx;
     vnl_vector_fixed< float, 3 >   interpw;
 
-    SphereInterpolator(const string& lutPath);
+    SphereInterpolator(const std::string& lutPath);
 
     inline bool IsInValidState() const
     {
@@ -144,7 +139,7 @@ public:
 
 protected:
 
-    bool LoadLookuptables(const string& lutPath);
+    bool LoadLookuptables(const std::string& lutPath);
 
     bool LoadLookuptables();
 

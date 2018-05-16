@@ -62,7 +62,7 @@ void
   }
 
   mitk::Image::Pointer img = mitk::ImportItkImage(itkMask1);
-  mitk::IOUtil::SaveImage(img, output);
+  mitk::IOUtil::Save(img, output);
 }
 
 int main(int argc, char* argv[])
@@ -92,9 +92,9 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
-  mitk::Image::Pointer im2= mitk::IOUtil::LoadImage(parsedArgs["image2"].ToString());
-  mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(parsedArgs["mask"].ToString());
+  mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(parsedArgs["image"].ToString());
+  mitk::Image::Pointer im2= mitk::IOUtil::Load<mitk::Image>(parsedArgs["image2"].ToString());
+  mitk::Image::Pointer mask = mitk::IOUtil::Load<mitk::Image>(parsedArgs["mask"].ToString());
 
   AccessByItk_3(image, Normalize, im2, mask, parsedArgs["output"].ToString());
 

@@ -47,9 +47,6 @@ class QTimer;
   <li>Preprocessing of the distance data: Threshold, median, average and bilateral filtering; surface generation</li>
   <li>Simple measurement and PointSet definition</li>
   </ul>
-
-  \sa QmitkFunctionality
-  \ingroup Functionalities
 */
 class QmitkToFUtilView : public QmitkAbstractView, public mitk::IZombieViewPart
 {
@@ -64,11 +61,10 @@ public:
   QmitkToFUtilView();
   ~QmitkToFUtilView();
 
-
   virtual void CreateQtPartControl(QWidget *parent) override;
-  /// \brief Called when the functionality is activated.
+  /// \brief Called when the view gets activated.
   virtual void Activated() override;
-  /// \brief Called when the functionality is deactivated. In this case the zombie view of this functionality becomes active!
+  /// \brief Called when the view gets deactivated. In this case the zombie view of this view becomes active!
   virtual void ActivatedZombieView(berry::IWorkbenchPartReference::Pointer zombieView) override;
 
   virtual void Deactivated() override;
@@ -119,7 +115,7 @@ protected:
 
   Ui::QmitkToFUtilViewControls* m_Controls;
 
-  QmitkStdMultiWidget* m_MultiWidget;
+  bool m_Framerateoutput; ///< defines if the framerate is computed condinously
 
   QTimer* m_Frametimer; ///< Timer used to continuously update the images
 

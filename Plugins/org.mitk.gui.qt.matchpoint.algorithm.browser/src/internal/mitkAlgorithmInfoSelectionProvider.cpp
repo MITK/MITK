@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-AlgorithmInfoSelectionProvider::AlgorithmInfoSelectionProvider() : _selection(NULL)
+AlgorithmInfoSelectionProvider::AlgorithmInfoSelectionProvider() : _selection(nullptr)
 {
 
 }

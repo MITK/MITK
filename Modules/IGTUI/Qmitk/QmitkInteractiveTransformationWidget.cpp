@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk includes
 #include "mitkRenderingManager.h"
+#include "mitkBaseRenderer.h"
 #include "mitkNavigationData.h"
 
 // vtk includes
@@ -27,12 +28,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkInteractiveTransformationWidget::VIEW_ID = "org.mitk.views.interactivetransformationwidget";
 
 QmitkInteractiveTransformationWidget::QmitkInteractiveTransformationWidget(QWidget* parent, Qt::WindowFlags f)
-: QWidget(parent, f), m_Geometry(nullptr), m_ResetGeometry(nullptr), m_Controls(nullptr)
+  : QDialog(parent, f), m_Controls(nullptr), m_Geometry(nullptr)
 {
   CreateQtPartControl(this);
   CreateConnections();
-  m_TranslationVector.Fill(0.0f);
-  m_RotateSliderPos.Fill(0.0f);
+
+  m_ResetGeometry = mitk::Geometry3D::New();
+
+
+  this->setWindowTitle("Edit Tool Tip and Tool Orientation");
 }
 
 QmitkInteractiveTransformationWidget::~QmitkInteractiveTransformationWidget()
@@ -51,179 +55,180 @@ void QmitkInteractiveTransformationWidget::CreateQtPartControl(QWidget *parent)
 
 void QmitkInteractiveTransformationWidget::CreateConnections()
 {
-  if ( m_Controls )
+  if (m_Controls)
   {
     // translations
-    connect( (QObject*)(m_Controls->m_XTransSlider), SIGNAL(valueChanged(int)), this, SLOT(OnXTranslationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_XTransSpinBox), SIGNAL(valueChanged(int)), this, SLOT(OnXTranslationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_YTransSlider), SIGNAL(valueChanged(int)), this, SLOT(OnYTranslationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_YTransSpinBox), SIGNAL(valueChanged(int)), this, SLOT(OnYTranslationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_ZTransSlider), SIGNAL(valueChanged(int)), this, SLOT(OnZTranslationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_ZTransSpinBox), SIGNAL(valueChanged(int)), this, SLOT(OnZTranslationValueChanged(int)) );
+    connect(m_Controls->m_XTransSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnXTranslationValueChanged);
+    connect(m_Controls->m_XTransSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnXTranslationValueChanged);
+
+    connect(m_Controls->m_YTransSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnYTranslationValueChanged);
+    connect(m_Controls->m_YTransSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnYTranslationValueChanged);
+
+    connect(m_Controls->m_ZTransSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnZTranslationValueChanged);
+    connect(m_Controls->m_ZTransSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnZTranslationValueChanged);
 
     // rotations
-    connect( (QObject*)(m_Controls->m_XRotSlider), SIGNAL(valueChanged(int)), this, SLOT(OnXRotationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_XRotSpinBox), SIGNAL(valueChanged(int)), this, SLOT(OnXRotationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_YRotSlider), SIGNAL(valueChanged(int)), this, SLOT(OnYRotationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_YRotSpinBox), SIGNAL(valueChanged(int)), this, SLOT(OnYRotationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_ZRotSlider), SIGNAL(valueChanged(int)), this, SLOT(OnZRotationValueChanged(int)) );
-    connect( (QObject*)(m_Controls->m_ZRotSpinBox), SIGNAL(valueChanged(int)), this, SLOT(OnZRotationValueChanged(int)) );
+    connect(m_Controls->m_XRotSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnXRotationValueChanged);
+    connect(m_Controls->m_XRotSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnXRotationValueChanged);
 
-    connect( (QObject*)(m_Controls->m_ResetPB), SIGNAL(clicked()), this, SLOT(OnResetGeometry()) );
-    connect( (QObject*)(m_Controls->m_UseManipulatedToolTipPB), SIGNAL(clicked()), this, SLOT(OnApplyManipulatedToolTip()) );
+    connect(m_Controls->m_YRotSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnYRotationValueChanged);
+    connect(m_Controls->m_YRotSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnYRotationValueChanged);
+
+    connect(m_Controls->m_ZRotSpinBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &QmitkInteractiveTransformationWidget::OnZRotationValueChanged);
+    connect(m_Controls->m_ZRotSlider, &QSlider::valueChanged, this, &QmitkInteractiveTransformationWidget::OnZRotationValueChanged);
+
+    connect((QObject*)(m_Controls->m_ResetPB), SIGNAL(clicked()), this, SLOT(OnResetGeometryToIdentity()));
+    connect((QObject*)(m_Controls->m_RevertChanges), SIGNAL(clicked()), this, SLOT(OnRevertChanges()));
+    connect((QObject*)(m_Controls->m_UseManipulatedToolTipPB), SIGNAL(clicked()), this, SLOT(OnApplyManipulatedToolTip()));
+    connect((QObject*)(m_Controls->m_Cancel), SIGNAL(clicked()), this, SLOT(OnCancel()));
   }
 }
 
-void QmitkInteractiveTransformationWidget::SetGeometry( mitk::BaseGeometry::Pointer geometry, mitk::BaseGeometry::Pointer defaultValues )
+void QmitkInteractiveTransformationWidget::SetToolToEdit(const mitk::NavigationTool::Pointer _tool)
 {
-  m_Geometry = geometry;
-  m_ResetGeometry = geometry->Clone();
+  //If there is already a tool, remove it's node first.
+  if (m_ToolToEdit)
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()
+    ->Remove(m_ToolToEdit->GetDataNode());
 
-  //set default values
-  if (defaultValues.IsNotNull())
-    {
-    //first: some conversion
-    mitk::NavigationData::Pointer transformConversionHelper = mitk::NavigationData::New(defaultValues->GetIndexToWorldTransform());
-    double eulerAlphaDegrees = transformConversionHelper->GetOrientation().rotation_euler_angles()[0] / vnl_math::pi * 180;
-    double eulerBetaDegrees = transformConversionHelper->GetOrientation().rotation_euler_angles()[1] / vnl_math::pi * 180;
-    double eulerGammaDegrees = transformConversionHelper->GetOrientation().rotation_euler_angles()[2] / vnl_math::pi * 180;
+  m_ToolToEdit = _tool->Clone();
+  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()
+    ->Add(m_ToolToEdit->GetDataNode());
+  m_ToolToEdit->GetDataNode()->SetName("Tool Tip to be edited");
 
-    //set translation
-    OnXTranslationValueChanged(defaultValues->GetIndexToWorldTransform()->GetOffset()[0]);
-    OnYTranslationValueChanged(defaultValues->GetIndexToWorldTransform()->GetOffset()[1]);
-    OnZTranslationValueChanged(defaultValues->GetIndexToWorldTransform()->GetOffset()[2]);
+  //change color to red
+  m_ToolToEdit->GetDataNode()->SetProperty("color", mitk::ColorProperty::New(1, 0, 0));
 
-    //set rotation
-    OnXRotationValueChanged(eulerAlphaDegrees);
-    OnYRotationValueChanged(eulerBetaDegrees);
-    OnZRotationValueChanged(eulerGammaDegrees);
-    }
-  else
-    {
-    //reset everything
-    OnXTranslationValueChanged(0);
-    OnYTranslationValueChanged(0);
-    OnZTranslationValueChanged(0);
-    OnXRotationValueChanged(0);
-    OnYRotationValueChanged(0);
-    OnZRotationValueChanged(0);
-    }
+  //use the set-fuction via vtk matrix, 'cause this garantees a deep copy and not just sharing a pointer.
+  m_Geometry = m_ToolToEdit->GetDataNode()->GetData()->GetGeometry();
+  m_ResetGeometry->SetIndexToWorldTransformByVtkMatrix(m_Geometry->GetVtkMatrix()); //Remember the original values to be able to reset and abort everything
 }
 
-mitk::BaseGeometry::Pointer QmitkInteractiveTransformationWidget::GetGeometry()
+void QmitkInteractiveTransformationWidget::SetDefaultOffset(const mitk::Point3D _defaultValues)
 {
-  return m_Geometry;
+  m_Geometry->SetOrigin(_defaultValues);
+  m_ResetGeometry->SetOrigin(_defaultValues); //Remember the original values to be able to reset and abort everything
+  SetValuesToGUI(m_Geometry->GetIndexToWorldTransform());
 }
 
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-// Section to allow interactive positioning of the moving surface
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-void QmitkInteractiveTransformationWidget::OnXTranslationValueChanged( int v )
+void QmitkInteractiveTransformationWidget::SetDefaultRotation(const mitk::Quaternion _defaultValues)
 {
-  mitk::Vector3D translationParams;
-  translationParams[0] = v;
-  translationParams[1] = m_Controls->m_YTransSlider->value();
-  translationParams[2] = m_Controls->m_ZTransSlider->value();
-  SetSliderX(v);
-  this->Translate(translationParams);
+  // Conversion to navigation data / transform
+  mitk::NavigationData::Pointer rotationTransform = mitk::NavigationData::New(m_Geometry->GetIndexToWorldTransform());
+  rotationTransform->SetOrientation(_defaultValues);
+  m_Geometry->SetIndexToWorldTransform(rotationTransform->GetAffineTransform3D());
+
+  //For ResetGeometry, use the set-fuction via vtk matrix, 'cause this garantees a deep copy and not just sharing a pointer.
+  m_ResetGeometry->SetIndexToWorldTransformByVtkMatrix(m_Geometry->GetVtkMatrix()); //Remember the original values to be able to reset and abort everything
+  SetValuesToGUI(m_Geometry->GetIndexToWorldTransform());
 }
 
-void QmitkInteractiveTransformationWidget::SetSliderX(int v)
+void QmitkInteractiveTransformationWidget::SetValuesToGUI(const mitk::AffineTransform3D::Pointer _defaultValues)
 {
-  m_Controls->m_XTransSlider->setValue(v);
-  m_Controls->m_XTransSpinBox->setValue(v);
-}
 
-void QmitkInteractiveTransformationWidget::OnYTranslationValueChanged( int v )
-{
-  mitk::Vector3D translationParams;
-  translationParams[0] = m_Controls->m_XTransSlider->value();
-  translationParams[1] = v;
-  translationParams[2] = m_Controls->m_ZTransSlider->value();
-  SetSliderY(v);
-  this->Translate(translationParams);
-}
+  //Set toolTip values in gui
+  m_Controls->m_XTransSlider->setValue(_defaultValues->GetOffset()[0]);
+  m_Controls->m_YTransSlider->setValue(_defaultValues->GetOffset()[1]);
+  m_Controls->m_ZTransSlider->setValue(_defaultValues->GetOffset()[2]);
 
-void QmitkInteractiveTransformationWidget::SetSliderY(int v)
-{
-  m_Controls->m_YTransSlider->setValue(v);
-  m_Controls->m_YTransSpinBox->setValue(v);
-}
+  //first: some conversion
+  mitk::NavigationData::Pointer transformConversionHelper = mitk::NavigationData::New(_defaultValues);
+  double eulerAlphaDegrees = transformConversionHelper->GetOrientation().rotation_euler_angles()[0] / vnl_math::pi * 180;
+  double eulerBetaDegrees = transformConversionHelper->GetOrientation().rotation_euler_angles()[1] / vnl_math::pi * 180;
+  double eulerGammaDegrees = transformConversionHelper->GetOrientation().rotation_euler_angles()[2] / vnl_math::pi * 180;
 
-void QmitkInteractiveTransformationWidget::OnZTranslationValueChanged( int v )
-{
-  mitk::Vector3D translationParams;
-  translationParams[0] = m_Controls->m_XTransSlider->value();
-  translationParams[1] = m_Controls->m_YTransSlider->value();
-  translationParams[2] = v;
-  SetSliderZ(v);
-  this->Translate(translationParams);
-}
+  m_Controls->m_XRotSpinBox->setValue(eulerAlphaDegrees);
+  m_Controls->m_YRotSpinBox->setValue(eulerBetaDegrees);
+  m_Controls->m_ZRotSpinBox->setValue(eulerGammaDegrees);
 
-void QmitkInteractiveTransformationWidget::SetSliderZ(int v)
-{
-  m_Controls->m_ZTransSlider->setValue(v);
-  m_Controls->m_ZTransSpinBox->setValue(v);
-}
-
-void QmitkInteractiveTransformationWidget::Translate( mitk::Vector3D translateVector)
-{
-  mitk::Vector3D translateVec;
-
-  // transform the translation vector
-  translateVec[0] = translateVector[0] - m_TranslationVector[0];
-  translateVec[1] = translateVector[1] - m_TranslationVector[1];
-  translateVec[2] = translateVector[2] - m_TranslationVector[2];
-
-  // set the new translation vector to member variable
-  m_TranslationVector[0] = translateVector[0];
-  m_TranslationVector[1] = translateVector[1];
-  m_TranslationVector[2] = translateVector[2];
-
-  m_Geometry->Translate( translateVec );
-  qApp->processEvents();
+  //Update view
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkInteractiveTransformationWidget::OnXRotationValueChanged( int v )
+void QmitkInteractiveTransformationWidget::SetSynchronizedVauesToSliderAndSpinbox(QDoubleSpinBox* _spinbox, QSlider* _slider, double _value)
+{
+//block signals to avoid loop between slider and spinbox. Unblock at the end of the function!
+  _spinbox->blockSignals(true);
+  _slider->blockSignals(true);
+  _spinbox->setValue(_value);
+  _slider->setValue(_value);
+//unblock signals. See above, don't remove this line. Unblock at the end of the function!
+  _spinbox->blockSignals(false);//
+  _slider->blockSignals(false);//
+}
+
+void QmitkInteractiveTransformationWidget::OnXTranslationValueChanged(double v)
+{
+  //Set values to member variable
+  mitk::Point3D translationParams = m_Geometry->GetOrigin();
+  translationParams[0] = v;
+  m_Geometry->SetOrigin(translationParams);
+
+  SetSynchronizedVauesToSliderAndSpinbox(m_Controls->m_XTransSpinBox, m_Controls->m_XTransSlider, v);
+
+  //Update view
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+}
+
+void QmitkInteractiveTransformationWidget::OnYTranslationValueChanged(double v)
+{
+  //Set values to member variable
+  mitk::Point3D translationParams = m_Geometry->GetOrigin();
+  translationParams[1] = v;
+  m_Geometry->SetOrigin(translationParams);
+
+  SetSynchronizedVauesToSliderAndSpinbox(m_Controls->m_YTransSpinBox, m_Controls->m_YTransSlider, v);
+
+  //Update view
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkInteractiveTransformationWidget::OnZTranslationValueChanged(double v)
+{
+  //Set values to member variable
+  mitk::Point3D translationParams = m_Geometry->GetOrigin();
+  translationParams[2] = v;
+  m_Geometry->SetOrigin(translationParams);
+
+  SetSynchronizedVauesToSliderAndSpinbox(m_Controls->m_ZTransSpinBox, m_Controls->m_ZTransSlider, v);
+
+  //Update view
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkInteractiveTransformationWidget::OnXRotationValueChanged(double v)
 {
   mitk::Vector3D rotationParams;
   rotationParams[0] = v;
-  rotationParams[1] = m_Controls->m_YRotSlider->value();
-  rotationParams[2] = m_Controls->m_ZRotSlider->value();
+  rotationParams[1] = m_Controls->m_YRotSpinBox->value();
+  rotationParams[2] = m_Controls->m_ZRotSpinBox->value();
 
-  m_Controls->m_XRotSlider->setValue(v);
-  m_Controls->m_XRotSpinBox->setValue(v);
+  SetSynchronizedVauesToSliderAndSpinbox(m_Controls->m_XRotSpinBox, m_Controls->m_XRotSlider, v);
 
   this->Rotate(rotationParams);
 }
 
-void QmitkInteractiveTransformationWidget::OnYRotationValueChanged( int v )
+void QmitkInteractiveTransformationWidget::OnYRotationValueChanged(double v)
 {
   mitk::Vector3D rotationParams;
-  rotationParams[0] = m_Controls->m_XRotSlider->value();
+  rotationParams[0] = m_Controls->m_XRotSpinBox->value();
   rotationParams[1] = v;
-  rotationParams[2] = m_Controls->m_ZRotSlider->value();
+  rotationParams[2] = m_Controls->m_ZRotSpinBox->value();
 
-  m_Controls->m_YRotSlider->setValue(v);
-  m_Controls->m_YRotSpinBox->setValue(v);
+  SetSynchronizedVauesToSliderAndSpinbox(m_Controls->m_YRotSpinBox, m_Controls->m_YRotSlider, v);
 
   this->Rotate(rotationParams);
 }
 
-void QmitkInteractiveTransformationWidget::OnZRotationValueChanged( int v )
+void QmitkInteractiveTransformationWidget::OnZRotationValueChanged(double v)
 {
   mitk::Vector3D rotationParams;
-  rotationParams[0]=m_Controls->m_XRotSlider->value();
-  rotationParams[1]=m_Controls->m_YRotSlider->value();
-  rotationParams[2]=v;
-  m_Controls->m_ZRotSlider->setValue(v);
-  m_Controls->m_ZRotSpinBox->setValue(v);
+  rotationParams[0] = m_Controls->m_XRotSpinBox->value();
+  rotationParams[1] = m_Controls->m_YRotSpinBox->value();
+  rotationParams[2] = v;
+
+  SetSynchronizedVauesToSliderAndSpinbox(m_Controls->m_ZRotSpinBox, m_Controls->m_ZRotSlider, v);
 
   this->Rotate(rotationParams);
 }
@@ -236,52 +241,60 @@ void QmitkInteractiveTransformationWidget::Rotate(mitk::Vector3D rotateVector)
   double radianZ = rotateVector[2] * vnl_math::pi / 180;
 
   //1: from euler angles to quaternion
-  mitk::Quaternion rotation(radianX,radianY,radianZ);
+  mitk::Quaternion rotation(radianX, radianY, radianZ);
 
   //2: Conversion to navigation data / transform
-  mitk::NavigationData::Pointer rotationTransform = mitk::NavigationData::New();
+  mitk::NavigationData::Pointer rotationTransform = mitk::NavigationData::New(m_Geometry->GetIndexToWorldTransform());
   rotationTransform->SetOrientation(rotation);
 
-  //3: Apply transform
-
-  //also remember old transform, but without rotation, because rotation is completely stored in the sliders
-  mitk::NavigationData::Pointer oldTransform = mitk::NavigationData::New(m_Geometry->GetIndexToWorldTransform());
-  mitk::Quaternion identity(0,0,0,1);
-  oldTransform->SetOrientation(identity);
-
-  //compose old transform with the new one
-  rotationTransform->Compose(oldTransform);
-
-  //and apply it...
   m_Geometry->SetIndexToWorldTransform(rotationTransform->GetAffineTransform3D());
-  qApp->processEvents();
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkInteractiveTransformationWidget::OnResetGeometry()
+void QmitkInteractiveTransformationWidget::OnResetGeometryToIdentity()
 {
-  m_Controls->m_XRotSlider->setValue(0);
-  m_Controls->m_YRotSlider->setValue(0);
-  m_Controls->m_ZRotSlider->setValue(0);
-  m_Controls->m_XRotSpinBox->setValue(0);
-  m_Controls->m_YRotSpinBox->setValue(0);
-  m_Controls->m_ZRotSpinBox->setValue(0);
-
-  m_Controls->m_XTransSlider->setValue(0);
-  m_Controls->m_YTransSlider->setValue(0);
-  m_Controls->m_ZTransSlider->setValue(0);
-  m_Controls->m_XTransSpinBox->setValue(0);
-  m_Controls->m_YTransSpinBox->setValue(0);
-  m_Controls->m_ZTransSpinBox->setValue(0);
-  qApp->processEvents();
-
   // reset the input to its initial state.
   m_Geometry->SetIdentity();
-  m_Geometry->Compose(m_ResetGeometry->GetVtkTransform()->GetMatrix());
+
+  //Update Sliders
+  this->SetValuesToGUI(m_Geometry->GetIndexToWorldTransform());
+  //Refresh view
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkInteractiveTransformationWidget::OnRevertChanges()
+{
+  // reset the input to its initial state.
+  m_Geometry->SetIndexToWorldTransformByVtkMatrix(m_ResetGeometry->GetVtkMatrix());
+
+  //Update Sliders
+  this->SetValuesToGUI(m_Geometry->GetIndexToWorldTransform());
+  //Refresh view
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkInteractiveTransformationWidget::OnApplyManipulatedToolTip()
 {
-  emit ApplyManipulatedToolTip();
+  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()
+    ->Remove(m_ToolToEdit->GetDataNode());
+
+  mitk::AffineTransform3D::Pointer toolTip = m_Geometry->GetIndexToWorldTransform();
+  emit EditToolTipFinished(toolTip);
+  this->close();
+}
+
+void QmitkInteractiveTransformationWidget::reject()
+{
+  OnCancel();
+}
+
+void QmitkInteractiveTransformationWidget::OnCancel()
+{
+  QDialog::reject();
+
+  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()
+    ->Remove(m_ToolToEdit->GetDataNode());
+
+  emit EditToolTipFinished(nullptr);
 }

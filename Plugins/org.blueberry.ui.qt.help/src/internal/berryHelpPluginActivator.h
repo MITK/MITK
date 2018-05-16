@@ -55,7 +55,7 @@ class HelpPluginActivator : public QObject, public ctkPluginActivator
 public:
 
   HelpPluginActivator();
-  ~HelpPluginActivator();
+  ~HelpPluginActivator() override;
 
   void start(ctkPluginContext* context) override;
   void stop(ctkPluginContext* context) override;

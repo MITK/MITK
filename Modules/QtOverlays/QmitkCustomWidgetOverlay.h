@@ -49,7 +49,7 @@ public:
   /**
   * @brief Default Destructor
   **/
-  virtual ~QmitkCustomWidgetOverlay();
+  ~QmitkCustomWidgetOverlay() override;
 
   void SetWidget(QWidget *widget);
 

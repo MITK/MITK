@@ -49,13 +49,13 @@ public:
 
   using QtSelectionProvider::SetSelection;
 
-  void SetSelection(berry::ISelection::ConstPointer selection, QItemSelectionModel::SelectionFlags flags);
+  void SetSelection(const berry::ISelection::ConstPointer& selection, QItemSelectionModel::SelectionFlags flags) override;
 
 protected:
 
   mitk::DataNodeSelection::ConstPointer GetDataNodeSelection() const;
 
-  virtual void FireSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected) override;
+  void FireSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected) override;
 };
 
 #endif /* QMITKDATATREENODESELECTIONPROVIDER_H_ */

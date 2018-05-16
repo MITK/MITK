@@ -61,15 +61,15 @@ namespace mitk
   {
   public:
     ContourModelWriter();
-    virtual ~ContourModelWriter();
+    ~ContourModelWriter() override;
 
     using AbstractFileWriter::Write;
-    virtual void Write() override;
+    void Write() override;
 
   protected:
     ContourModelWriter(const ContourModelWriter &other);
 
-    virtual mitk::ContourModelWriter *Clone() const override;
+    mitk::ContourModelWriter *Clone() const override;
 
     /**
      * Converts an arbitrary type to a string. The type has to

@@ -21,9 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIGTTimeStamp.h"
 #include "mitkIGTException.h"
+#include "mitkIGTHardwareException.h"
 
 mitk::TrackingDeviceSource::TrackingDeviceSource()
-  : mitk::NavigationDataSource(), m_TrackingDevice(NULL)
+  : mitk::NavigationDataSource(), m_TrackingDevice(nullptr)
 {
 }
 
@@ -39,7 +40,7 @@ mitk::TrackingDeviceSource::~TrackingDeviceSource()
     {
       this->Disconnect();
     }
-    m_TrackingDevice = NULL;
+    m_TrackingDevice = nullptr;
   }
 }
 
@@ -126,7 +127,7 @@ void mitk::TrackingDeviceSource::CreateOutputs(){
   MITK_DEBUG << "Number of outputs at start of method CreateOutputs(): " << numberOfOutputs;
   for (unsigned int idx = 0; idx < m_TrackingDevice->GetToolCount(); ++idx)
   {
-    if (this->GetOutput(idx) == NULL)
+    if (this->GetOutput(idx) == nullptr)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);
       static_cast<mitk::NavigationData*>(newOutput.GetPointer())->SetName(m_TrackingDevice->GetTool(idx)->GetToolName()); // set NavigationData name to ToolName
@@ -142,16 +143,18 @@ void mitk::TrackingDeviceSource::Connect()
     throw std::invalid_argument("mitk::TrackingDeviceSource: No tracking device set");
   if (this->IsConnected())
     return;
-  try {m_TrackingDevice->OpenConnection();}
+  try
+  {
+    //Try to open the connection. If it didn't work (fals is returned from OpenConnection by the tracking device), throw an exception.
+    if (!m_TrackingDevice->OpenConnection())
+    {
+      mitkThrowException(mitk::IGTHardwareException) << "Could not open connection.";
+    }
+  }
   catch (mitk::IGTException &e)
   {
     throw std::runtime_error(std::string("mitk::TrackingDeviceSource: Could not open connection to tracking device. Error: ") + e.GetDescription());
   }
-
-  /* NDI Aurora needs a connection to discover tools that are connected to it.
-  Therefore we need to create outputs for these tools now */
-  //if (m_TrackingDevice->GetType() == mitk::NDIAurora)
-  //this->CreateOutputs();
 }
 
 void mitk::TrackingDeviceSource::StartTracking()

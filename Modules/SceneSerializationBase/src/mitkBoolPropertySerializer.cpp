@@ -29,7 +29,7 @@ namespace mitk
     mitkClassMacro(BoolPropertySerializer, BasePropertySerializer);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual TiXmlElement *Serialize() override
+      TiXmlElement *Serialize() override
     {
       if (const BoolProperty *prop = dynamic_cast<const BoolProperty *>(m_Property.GetPointer()))
       {
@@ -48,7 +48,7 @@ namespace mitk
         return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
       if (!element)
         return nullptr;
@@ -57,7 +57,7 @@ namespace mitk
 
   protected:
     BoolPropertySerializer() {}
-    virtual ~BoolPropertySerializer() {}
+    ~BoolPropertySerializer() override {}
   };
 
 } // namespace

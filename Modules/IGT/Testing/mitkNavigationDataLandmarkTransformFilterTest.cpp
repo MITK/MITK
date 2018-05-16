@@ -94,7 +94,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
     MITK_TEST_CONDITION(myFilter->GetInput(0) == nd1, "Testing Set-/GetInput() ND1");
 
     mitk::NavigationData* output1 = myFilter->GetOutput();
-    MITK_TEST_CONDITION_REQUIRED(output1 != NULL, "Testing GetOutput() ND1");
+    MITK_TEST_CONDITION_REQUIRED(output1 != nullptr, "Testing GetOutput() ND1");
 
     MITK_TEST_CONDITION(myFilter->IsInitialized() == false, "Testing IsInitialized() before setting source points");
 
@@ -121,7 +121,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
     MITK_TEST_CONDITION(myFilter->GetInput(1) == nd2, "Testing Set-/GetInput() ND2");
 
     mitk::NavigationData* output2 = myFilter->GetOutput(1);
-    MITK_TEST_CONDITION_REQUIRED(output2 != NULL, "Testing GetOutput() ND2");
+    MITK_TEST_CONDITION_REQUIRED(output2 != nullptr, "Testing GetOutput() ND2");
 
     //------------------------update output1 but check result2------------------------
     output1->Update();
@@ -137,7 +137,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
     MITK_TEST_CONDITION(myFilter->GetInput(1) == nd2, "Testing Set-/GetInput() ND2 after updating value");
 
     output2 = myFilter->GetOutput(1);
-    MITK_TEST_CONDITION_REQUIRED(output2 != NULL, "Testing GetOutput() ND2 after updating value");
+    MITK_TEST_CONDITION_REQUIRED(output2 != nullptr, "Testing GetOutput() ND2 after updating value");
 
     //------------------------update output2 and check result2------------------------
     output2->Update();
@@ -270,7 +270,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
 
 
     //------------------------rotate orientation------------------------
-    myFilter=NULL;
+    myFilter=nullptr;
     myFilter = mitk::NavigationDataLandmarkTransformFilter::New();
 
     mitk::FillVector3D(sPoint1, 1.1, 1.1, 1.1);

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMovieGenerator.h"
 #include <MitkOpenCVVideoSupportExports.h>
 #include <memory.h>
-#include <string.h>
+#include <cstring>
 
 // OpenCV includes
 #include "cv.h"
@@ -39,14 +39,14 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  virtual void SetFileName( const char *fileName ) override;
+  void SetFileName( const char *fileName ) override;
 
   void SetFourCCCodec(char* codec)
   {
     m_FourCCCodec = codec;
   }
 
-  virtual void SetFrameRate(int rate);
+  void SetFrameRate(unsigned int rate) override;
 
   ///
   /// if true the movie will be cutted by a 10 pixel margin
@@ -59,13 +59,13 @@ protected:
   MovieGeneratorOpenCV();
 
   //! called directly before the first frame is added
-  virtual bool InitGenerator() override;
+  bool InitGenerator() override;
 
   //! used to add a frame
-  virtual bool AddFrame( void *data ) override;
+  bool AddFrame( void *data ) override;
 
   //! called after the last frame is added
-  virtual bool TerminateGenerator() override;
+  bool TerminateGenerator() override;
 
   //! name of output file
   std::string m_sFile;
@@ -80,9 +80,6 @@ private:
   IplImage *        m_currentFrame;
 
   char *            m_FourCCCodec;
-
-  //! frame counter
-  long m_lFrame;
 
   bool m_RemoveColouredFrame;
 };

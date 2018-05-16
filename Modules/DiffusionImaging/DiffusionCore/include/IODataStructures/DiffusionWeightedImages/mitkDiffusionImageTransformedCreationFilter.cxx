@@ -189,15 +189,16 @@ void mitk::DiffusionImageTransformedCreationFilter<TTransformType>
   creator->Update();
 
   mitk::Image::Pointer output = creator->GetOutput();
+  mitk::DiffusionPropertyHelper::CopyProperties(resampled_output, output, true);
 
   typedef mitk::DiffusionPropertyHelper DPH;
   float BValue = mitk::DiffusionPropertyHelper::GetReferenceBValue( creator->GetOutput() );
 
   mitk::BValueMapProperty::BValueMap BValueMap = mitk::BValueMapProperty::CreateBValueMap( mitk::DiffusionPropertyHelper::GetGradientContainer( creator->GetOutput() ), BValue );
-  output->SetProperty( DPH::GRADIENTCONTAINERPROPERTYNAME.c_str(),  mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer( creator->GetOutput() ))  );
-  output->SetProperty( DPH::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( mitk::DiffusionPropertyHelper::GetMeasurementFrame( creator->GetOutput() ) ) );
-  output->SetProperty( DPH::BVALUEMAPPROPERTYNAME.c_str(), mitk::BValueMapProperty::New( BValueMap ) );
-  output->SetProperty( DPH::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( BValue ) );
+  output->GetPropertyList()->ReplaceProperty( DPH::GRADIENTCONTAINERPROPERTYNAME.c_str(),  mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer( creator->GetOutput() ))  );
+  output->GetPropertyList()->ReplaceProperty( DPH::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( mitk::DiffusionPropertyHelper::GetMeasurementFrame( creator->GetOutput() ) ) );
+  output->GetPropertyList()->ReplaceProperty( DPH::BVALUEMAPPROPERTYNAME.c_str(), mitk::BValueMapProperty::New( BValueMap ) );
+  output->GetPropertyList()->ReplaceProperty( DPH::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( BValue ) );
 
   // correct gradients
   mitk::DiffusionImageCorrectionFilter::Pointer corrector = mitk::DiffusionImageCorrectionFilter::New();

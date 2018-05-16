@@ -58,8 +58,8 @@ class MITKTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkToFPointSetWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
-    virtual ~QmitkToFPointSetWidget();
+    QmitkToFPointSetWidget(QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
+    ~QmitkToFPointSetWidget() override;
 
     /* @brief This method is part of the widget an needs not to be called seperately. */
     virtual void CreateQtPartControl(QWidget *parent);
@@ -73,7 +73,7 @@ class MITKTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
     \param dataStorage DataStorage to add PointSets
     \param distanceImage range image used to calculate 3D PointSet from 2D index
     */
-    void InitializeWidget(QHash<QString, QmitkRenderWindow*> renderWindowHashMap, mitk::DataStorage::Pointer dataStorage, mitk::CameraIntrinsics::Pointer cameraIntrinsics=NULL);
+    void InitializeWidget(QHash<QString, QmitkRenderWindow*> renderWindowHashMap, mitk::DataStorage::Pointer dataStorage, mitk::CameraIntrinsics::Pointer cameraIntrinsics=nullptr);
     /*!
     \brief cleans up the widget when it's functionality is not used anymore.
     Removes observers and deletes foreground renderer

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+
+    <view id="org.mitk.views.fiberfoxview"
+    name="Fiberfox"
+    category="Simulated data"
+    class="QmitkFiberfoxView"
+    icon="resources/phantom.png">
+    <description>Diffusion weighted MRI data simulation tool.</description>
+    <keywordReference id="org.mitk.views.fiberfoxview.Keyword"/>
+    </view>
+
+    <view id="org.mitk.views.fieldmapgenerator"
+    name="Fieldmap Generator"
+    category="Simulated data"
+    class="QmitkFieldmapGeneratorView"
+    icon="resources/fieldmap.png">
+    <keywordReference id="org.mitk.views.fiberfoxview.Keyword"/>
+    </view>
+
+  </extension>
+
+
+  <extension point="org.blueberry.ui.perspectives">
+
+    <perspective id="org.mitk.perspectives.syntheticdata"
+    name="Fiberfox MRI Simulations"
+    class="QmitkDIAppSyntheticDataGenerationPerspective"
+    icon="resources/syntheticdata.png">
+    <keywordReference id="org.mitk.perspectives.syntheticdata.Keyword"/>
+    </perspective>
+
+  </extension>
+
+
+  <extension point="org.blueberry.ui.keywords">
+
+  <keyword label="diffusion" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="signal" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="simulation" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="data" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="synthetic" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="numeric" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="ball" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="dot" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="astrosticks" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="k-space" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="acquisition" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="artifact" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="artefact" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="gibbs ringing" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="spikes" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="distortions" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="aliasing" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="noise" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="fiberfox" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="rician" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="ghost" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="fieldmap" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="generator" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="fourier" id="org.mitk.views.fiberfoxview.Keyword"/>
+
+  </extension>
+
+</plugin>

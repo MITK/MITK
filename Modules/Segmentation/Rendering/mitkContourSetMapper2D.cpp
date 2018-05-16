@@ -32,7 +32,18 @@ mitk::ContourSetMapper2D::~ContourSetMapper2D()
 {
 }
 
-void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer *renderer)
+void mitk::ContourSetMapper2D::ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor * /*actor*/)
+{
+  float rgba[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  // check for color prop and use it for rendering if it exists
+  GetDataNode()->GetColor(rgba, renderer, "color");
+  // check for opacity prop and use it for rendering if it exists
+  GetDataNode()->GetOpacity(rgba[3], renderer, "opacity");
+
+  glColor4fv(rgba);
+}
+
+void mitk::ContourSetMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType /*type*/)
 {
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
@@ -50,7 +61,7 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer *renderer)
 
     mitk::ContourSet::Pointer input = const_cast<mitk::ContourSet *>(this->GetInput());
     mitk::ContourSet::ContourVectorType contourVec = input->GetContours();
-    mitk::ContourSet::ContourIterator contourIt = contourVec.begin();
+    auto contourIt = contourVec.begin();
 
     while (contourIt != contourVec.end())
     {

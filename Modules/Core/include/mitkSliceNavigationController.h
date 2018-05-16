@@ -279,7 +279,7 @@ namespace mitk
     /**
      * \brief Set the RenderingManager to be used
      *
-     * If \a NULL, the default RenderingManager will be used.
+     * If \a nullptr, the default RenderingManager will be used.
      */
     itkSetObjectMacro(RenderingManager, RenderingManager);
     mitk::RenderingManager *GetRenderingManager() const;
@@ -295,10 +295,10 @@ namespace mitk
       typedef itk::AnyEvent Superclass;
 
       TimeGeometryEvent(TimeGeometry *aTimeGeometry, unsigned int aPos) : m_TimeGeometry(aTimeGeometry), m_Pos(aPos) {}
-      virtual ~TimeGeometryEvent() {}
-      virtual const char *GetEventName() const override { return "TimeGeometryEvent"; }
-      virtual bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
-      virtual ::itk::EventObject *MakeObject() const override { return new Self(m_TimeGeometry, m_Pos); }
+      ~TimeGeometryEvent() override {}
+      const char *GetEventName() const override { return "TimeGeometryEvent"; }
+      bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
+      ::itk::EventObject *MakeObject() const override { return new Self(m_TimeGeometry, m_Pos); }
       TimeGeometry *GetTimeGeometry() const { return m_TimeGeometry; }
       unsigned int GetPos() const { return m_Pos; }
     private:
@@ -428,7 +428,7 @@ namespace mitk
 
     /** \brief Gets the BaseRenderer associated with this SNC (if any). While
      * the BaseRenderer is not directly used by SNC, this is a convenience
-     * method to enable BaseRenderer access via the SNC. Returns NULL if no
+     * method to enable BaseRenderer access via the SNC. Returns nullptr if no
      * BaseRenderer has been specified*/
     BaseRenderer *GetRenderer() const;
 
@@ -473,7 +473,7 @@ namespace mitk
 
   protected:
     SliceNavigationController();
-    virtual ~SliceNavigationController();
+    ~SliceNavigationController() override;
 
     mitk::BaseGeometry::ConstPointer m_InputWorldGeometry3D;
     mitk::TimeGeometry::ConstPointer m_InputWorldTimeGeometry;

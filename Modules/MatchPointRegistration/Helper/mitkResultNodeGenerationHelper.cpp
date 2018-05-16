@@ -25,7 +25,7 @@ mitk::DataNode::Pointer
 {
   if (resultReg.IsNull())
   {
-    mitkThrow() << "Cannot generate registration result node. Passed registration wrapper points to NULL.";
+    mitkThrow() << "Cannot generate registration result node. Passed registration wrapper points to nullptr.";
   }
 
   mitk::DataNode::Pointer m_spRegNode = mitk::DataNode::New();
@@ -45,7 +45,7 @@ mitk::DataNode::Pointer
 {
   if (mappedData.IsNull())
   {
-    mitkThrow() << "Cannot generate mapping result node. Passed mapped data points to NULL.";
+    mitkThrow() << "Cannot generate mapping result node. Passed mapped data points to nullptr.";
   }
 
   mitk::DataNode::Pointer mappedDataNode = mitk::DataNode::New();

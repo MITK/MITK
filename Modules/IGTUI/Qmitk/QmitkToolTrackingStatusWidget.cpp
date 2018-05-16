@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 QmitkToolTrackingStatusWidget::QmitkToolTrackingStatusWidget(QWidget* parent)
-  : QWidget(parent), m_Controls(NULL), m_StatusLabels(NULL), m_NavigationDatas(NULL), m_NavDatasNewFlag(false)
+  : QWidget(parent), m_Controls(nullptr), m_StatusLabels(nullptr), m_NavigationDatas(nullptr), m_NavDatasNewFlag(false), m_previewToolStorage(nullptr)
 {
   m_ShowPositions = false;
   m_ShowQuaternions = false;
@@ -64,15 +64,16 @@ void QmitkToolTrackingStatusWidget::SetTextAlignment(Qt::AlignmentFlag alignment
 
 QmitkToolTrackingStatusWidget::~QmitkToolTrackingStatusWidget()
 {
-  //m_Controls = NULL;
-  if (m_StatusLabels!=NULL) {delete m_StatusLabels;}
-  if (m_NavigationDatas != NULL)
+  m_Context->RemoveServiceListener(this, &QmitkToolTrackingStatusWidget::OnServiceEvent);
+  //m_Controls = nullptr;
+  if (m_StatusLabels!=nullptr) {delete m_StatusLabels;}
+  if (m_NavigationDatas != nullptr)
   {
     m_NavigationDatas->clear();
     if (m_NavDatasNewFlag)
     {
       delete m_NavigationDatas;
-}
+    }
   }
 }
 
@@ -108,16 +109,16 @@ void QmitkToolTrackingStatusWidget::CreateConnections()
 void QmitkToolTrackingStatusWidget::SetNavigationDatas(std::vector<mitk::NavigationData::Pointer>* navDatas)
 {
   m_NavigationDatas = navDatas;
-  m_previewToolStorage = NULL;
+  m_previewToolStorage = nullptr;
 }
 
 void QmitkToolTrackingStatusWidget::AddNavigationData(mitk::NavigationData::Pointer nd)
 {
-  if(m_NavigationDatas == NULL)
+  if(m_NavigationDatas == nullptr)
   {
     m_NavigationDatas = new std::vector<mitk::NavigationData::Pointer>();
     m_NavDatasNewFlag = true;
-    m_previewToolStorage = NULL;
+    m_previewToolStorage = nullptr;
     }
 
   m_NavigationDatas->push_back(nd);
@@ -125,7 +126,7 @@ void QmitkToolTrackingStatusWidget::AddNavigationData(mitk::NavigationData::Poin
 
 void QmitkToolTrackingStatusWidget::Refresh(int posPrecision, int quatPrecision)
 {
-  if(m_NavigationDatas == NULL || m_NavigationDatas->size() <= 0)
+  if(m_NavigationDatas == nullptr || m_NavigationDatas->size() <= 0)
     {
     RemoveGuiLabels();
     AddEmptyLabel();
@@ -155,7 +156,7 @@ void QmitkToolTrackingStatusWidget::Refresh(int posPrecision, int quatPrecision)
         m_StatusLabels->at(i)->setText(name+pos+quat);
 
       if(navData->IsDataValid())
-        m_StatusLabels->at(i)->setStyleSheet("QLabel{background-color: #8bff8b }");
+        m_StatusLabels->at(i)->setStyleSheet("QLabel{background-color: #1F641C }");
       else
         m_StatusLabels->at(i)->setStyleSheet("QLabel{background-color: #ff7878 }");
   }
@@ -165,7 +166,7 @@ void QmitkToolTrackingStatusWidget::ShowStatusLabels()
 {
   RemoveGuiLabels();
 
-  if(m_NavigationDatas == NULL || m_NavigationDatas->size() <= 0)
+  if(m_NavigationDatas == nullptr || m_NavigationDatas->size() <= 0)
     {
     RemoveGuiLabels();
     AddEmptyLabel();
@@ -188,8 +189,9 @@ void QmitkToolTrackingStatusWidget::ShowStatusLabels()
     label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
     m_StatusLabels->append(label);
-    if (m_Style == QmitkToolTrackingStatusWidget::VerticalUpperStyle) m_Controls->m_VerticalLayout->addWidget(m_StatusLabels->at(i));
-    else m_Controls->m_GridLayout->addWidget(m_StatusLabels->at(i),0,i);
+    if (m_Style == QmitkToolTrackingStatusWidget::VerticalUpperStyle) 
+      m_Controls->m_VerticalLayout->addWidget(m_StatusLabels->at(i));
+    else m_Controls->m_GridLayout->addWidget(m_StatusLabels->at(i),i,0);
   }
 }
 
@@ -206,7 +208,7 @@ void QmitkToolTrackingStatusWidget::PreShowTools(mitk::NavigationToolStorage::Po
     label->setObjectName(name);
     label->setAlignment(m_Alignment | Qt::AlignVCenter);
     label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    label->setStyleSheet("QLabel{background-color: #dddddd }");
+	label->setStyleSheet("QLabel{background-color: #dddddd; color: #000000 }");
     if (m_Style == QmitkToolTrackingStatusWidget::VerticalUpperStyle) m_Controls->m_VerticalLayout->addWidget(label);
     else m_Controls->m_GridLayout->addWidget(label);
   }
@@ -219,13 +221,13 @@ void QmitkToolTrackingStatusWidget::RemoveStatusLabels()
   RemoveGuiLabels();
 
   //clear members
-  if(m_StatusLabels != NULL && m_StatusLabels->size() > 0)
+  if(m_StatusLabels != nullptr && m_StatusLabels->size() > 0)
     {
     delete m_StatusLabels;
     m_StatusLabels = new QVector< QLabel* >();
     }
 
-  if(m_NavigationDatas != NULL && m_NavigationDatas->size() > 0)
+  if(m_NavigationDatas != nullptr && m_NavigationDatas->size() > 0)
     {
     if (m_NavDatasNewFlag)
     {
@@ -266,7 +268,7 @@ void QmitkToolTrackingStatusWidget::AddEmptyLabel()
   label->setObjectName("No tools loaded yet.");
   label->setAlignment(m_Alignment | Qt::AlignVCenter);
   label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-  label->setStyleSheet("QLabel{background-color: #dddddd }");
+  label->setStyleSheet("QLabel{background-color: #dddddd; color: #000000 }");
   if (m_Style == QmitkToolTrackingStatusWidget::VerticalUpperStyle) m_Controls->m_VerticalLayout->addWidget(label);
   else m_Controls->m_GridLayout->addWidget(label);
 }

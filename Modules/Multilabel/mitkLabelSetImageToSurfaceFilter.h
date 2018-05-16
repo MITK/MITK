@@ -112,7 +112,7 @@ namespace mitk
   protected:
     LabelSetImageToSurfaceFilter();
 
-    virtual ~LabelSetImageToSurfaceFilter();
+    ~LabelSetImageToSurfaceFilter() override;
 
     /**
     * Transforms a point by a 4x4 matrix
@@ -149,9 +149,9 @@ namespace mitk
 
     mitk::Vector3D m_InputImageSpacing;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
 
     //  mitk::ProcessObserver::Pointer m_Observer;
   };

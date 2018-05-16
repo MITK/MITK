@@ -31,7 +31,7 @@ namespace mitk
   PropertyView::PropertyView(const mitk::BaseProperty *property) : m_Property(property)
   {
     if (!property)
-      throw std::invalid_argument("NULL pointer makes no sense in PropertyView()"); // no NULL property allowed
+      throw std::invalid_argument("nullptr pointer makes no sense in PropertyView()"); // no nullptr property allowed
 
     {
       itk::ReceptorMemberCommand<PropertyView>::Pointer command = itk::ReceptorMemberCommand<PropertyView>::New();
@@ -49,7 +49,7 @@ namespace mitk
   {
     if (m_Property)
     {
-      mitk::BaseProperty *prop = const_cast<mitk::BaseProperty *>(m_Property);
+      auto *prop = const_cast<mitk::BaseProperty *>(m_Property);
       prop->RemoveObserver(m_ModifiedTag);
       prop->RemoveObserver(m_DeleteTag);
       m_Property = nullptr;
@@ -72,7 +72,7 @@ namespace mitk
     PropertyRemoved();
     if (m_Property)
     {
-      mitk::BaseProperty *prop = const_cast<mitk::BaseProperty *>(m_Property);
+      auto *prop = const_cast<mitk::BaseProperty *>(m_Property);
       prop->RemoveObserver(m_ModifiedTag);
       prop->RemoveObserver(m_DeleteTag);
       m_Property = nullptr;
@@ -84,7 +84,7 @@ namespace mitk
   PropertyEditor::PropertyEditor(mitk::BaseProperty *property) : m_Property(property)
   {
     if (!property)
-      throw std::invalid_argument("NULL pointer makes no sense in PropertyEditor()"); // no NULL property allowed
+      throw std::invalid_argument("nullptr pointer makes no sense in PropertyEditor()"); // no nullptr property allowed
 
     {
       itk::ReceptorMemberCommand<PropertyEditor>::Pointer command = itk::ReceptorMemberCommand<PropertyEditor>::New();

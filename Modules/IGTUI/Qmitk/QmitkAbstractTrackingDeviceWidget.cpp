@@ -20,10 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkAbstractTrackingDeviceWidget::QmitkAbstractTrackingDeviceWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
-  , isInitialized(false)
-  , m_TestConnectionWorker(NULL)
-  , m_TestConnectionWorkerThread(NULL)
+  , m_TestConnectionWorker(nullptr)
+  , m_TestConnectionWorkerThread(nullptr)
   , m_ErrorMessage("")
+  , isInitialized(false)
 {
 }
 
@@ -53,7 +53,7 @@ void QmitkAbstractTrackingDeviceWidget::TestConnection()
 {
   this->setEnabled(false);
   //construct a tracking device:
-  mitk::TrackingDevice::Pointer testTrackingDevice = ConstructTrackingDevice();
+  mitk::TrackingDevice::Pointer testTrackingDevice = GetTrackingDevice();
   m_TestConnectionWorker->SetTrackingDevice(testTrackingDevice);
   m_TestConnectionWorkerThread->start();
 }

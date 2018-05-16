@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>317</width>
-    <height>337</height>
+    <height>420</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -67,6 +67,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="m_ShowToolAxisN">
+     <property name="text">
+      <string>Show Tool Axis</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QCheckBox" name="m_EnableAblationMarking">
      <property name="text">
       <string>Enable Manual Ablation Zone Marking</string>
@@ -76,7 +83,7 @@
    <item>
     <widget class="QGroupBox" name="m_AblationZonesBox">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="title">
       <string>Ablation Zones</string>

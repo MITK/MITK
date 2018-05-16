@@ -18,11 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkRegionGrowingTool_h_Included
 
 #include "mitkFeedbackContourTool.h"
-#include "mitkLegacyAdaptors.h"
 #include <MitkSegmentationExports.h>
 #include <array>
-
-struct mitkIpPicDescriptor;
 
 namespace us
 {
@@ -62,20 +59,20 @@ namespace mitk
     mitkClassMacro(RegionGrowingTool, FeedbackContourTool);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      virtual const char **GetXPM() const override;
-    virtual us::ModuleResource GetCursorIconResource() const override;
+      const char **GetXPM() const override;
+    us::ModuleResource GetCursorIconResource() const override;
     us::ModuleResource GetIconResource() const override;
 
-    virtual const char *GetName() const override;
+    const char *GetName() const override;
 
   protected:
     RegionGrowingTool(); // purposely hidden
-    virtual ~RegionGrowingTool();
+    ~RegionGrowingTool() override;
 
     void ConnectActionsAndFunctions() override;
 
-    virtual void Activated() override;
-    virtual void Deactivated() override;
+    void Activated() override;
+    void Deactivated() override;
 
     /**
      * @brief OnMousePressed is called when the user clicks.
@@ -148,7 +145,6 @@ namespace mitk
     int m_ScreenXDifference;
 
   private:
-    ScalarType m_VisibleWindow;
     ScalarType m_MouseDistanceScaleFactor;
     int m_PaintingPixelValue;
     bool m_FillFeedbackContour;

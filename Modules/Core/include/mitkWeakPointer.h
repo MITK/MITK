@@ -14,176 +14,399 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __mitkWeakPointer_h
-#define __mitkWeakPointer_h
+#ifndef mitkWeakPointer_h
+#define mitkWeakPointer_h
 
-#include "mitkMessage.h"
-#include <MitkCoreExports.h>
-
-#include <iostream>
 #include <itkCommand.h>
+#include <functional>
 
 namespace mitk
 {
-  /** \class WeakPointer
-   * \brief Implements a weak reference to an object.
-   *
-   * Extends the standard itk WeakPointer by listening to delete events of itk::Objects.
-   * When an itk::Object is deleted the WeakPointer sets its internal Pointer to 0.
-   * This enables checking against 0 and avoids crashes by accessing changed memory.
-   * Furthermore it dispatches Modified events with the mitkMessageDelegate system which is
-   * much easier to use.
-   */
-  template <class TObjectType>
-  class WeakPointer
+  template <class T>
+  class WeakPointer final
   {
   public:
-    /** Extract infoirmation from template parameter. */
-    typedef TObjectType ObjectType;
+    using DeleteEventCallbackType = std::function<void ()>;
 
-    typedef Message1<const itk::Object *> itkObjectEvent;
-    //##Documentation
-    //## @brief AddEvent is emitted when the object pointed to gets deleted
-    itkObjectEvent ObjectDelete;
-
-    //##Documentation
-    //## @brief AddEvent is emitted when the object pointed to gets modified
-    itkObjectEvent ObjectModified;
-
-    /** Constructor.  */
-    WeakPointer() : m_DeleteObserverTag(-1), m_ModifiedObserverTag(-1), m_Pointer(nullptr) {}
-    /** Copy constructor.  */
-    WeakPointer(const WeakPointer<ObjectType> &p)
-      : m_DeleteObserverTag(-1), m_ModifiedObserverTag(-1), m_Pointer(p.m_Pointer)
+    WeakPointer() noexcept
+      : m_RawPointer(nullptr)
     {
-      this->AddDeleteAndModifiedObserver();
     }
 
-    /** Constructor to pointer p.  */
-    WeakPointer(ObjectType *p) : m_DeleteObserverTag(-1), m_ModifiedObserverTag(-1), m_Pointer(p)
+    WeakPointer(T *rawPointer)
+      : m_RawPointer(rawPointer)
     {
-      this->AddDeleteAndModifiedObserver();
+      this->AddDeleteEventObserver();
     }
 
-    /** Destructor.  */
-    ~WeakPointer()
+    WeakPointer(const WeakPointer &other)
+      : m_RawPointer(other.m_RawPointer)
     {
-      this->RemoveDeleteAndModifiedObserver();
-
-      m_Pointer = nullptr;
+      this->AddDeleteEventObserver();
     }
 
-    /** Overload operator ->.  */
-    ObjectType *operator->() const { return m_Pointer; }
-    /** Return pointer to object.  */
-    operator ObjectType *() const { return m_Pointer; }
-    /** Template comparison operators. */
-    template <typename R>
-    bool operator==(R r) const
+    WeakPointer(WeakPointer &&other)
+      : m_RawPointer(other.m_RawPointer)
     {
-      return (m_Pointer == (ObjectType *)r);
-    }
-    template <typename R>
-    bool operator!=(R r) const
-    {
-      return (m_Pointer != (ObjectType *)r);
+      other.RemoveDeleteEventObserver();
+      other.m_RawPointer = nullptr;
+      this->AddDeleteEventObserver();
     }
 
-    /** Access function to pointer. */
-    ObjectType *GetPointer() const { return m_Pointer; }
-    /** Comparison of pointers. Less than comparison.  */
-    bool operator<(const WeakPointer &r) const { return (void *)m_Pointer < (void *)r.m_Pointer; }
-    /** Comparison of pointers. Greater than comparison.  */
-    bool operator>(const WeakPointer &r) const { return (void *)m_Pointer > (void *)r.m_Pointer; }
-    /** Comparison of pointers. Less than or equal to comparison.  */
-    bool operator<=(const WeakPointer &r) const { return (void *)m_Pointer <= (void *)r.m_Pointer; }
-    /** Comparison of pointers. Greater than or equal to comparison.  */
-    bool operator>=(const WeakPointer &r) const { return (void *)m_Pointer >= (void *)r.m_Pointer; }
-    /** Test if the pointer has been initialized */
-    bool IsNotNull() const { return m_Pointer != nullptr; }
-    bool IsNull() const { return m_Pointer == nullptr; }
-    /** Overload operator assignment.  */
-    WeakPointer &operator=(const WeakPointer &r) { return this->operator=(r.GetPointer()); }
-    /** Overload operator assignment.  */
-    WeakPointer &operator=(ObjectType *r)
+    ~WeakPointer() noexcept
     {
-      this->RemoveDeleteAndModifiedObserver();
-      m_Pointer = r;
-      this->AddDeleteAndModifiedObserver();
+      try
+      {
+        this->RemoveDeleteEventObserver();
+      }
+      catch (...)
+      {
+        // Swallow. Otherwise, the application would terminate if another
+        // exception is already propagating.
+      }
+    }
+
+    // Prefer classic implementation to copy-and-swap idiom. Swapping is
+    // non-trivial for this class as the observed object is keeping references
+    // to its observers.
+    WeakPointer & operator =(const WeakPointer &other)
+    {
+      if (this != &other)
+      {
+        this->RemoveDeleteEventObserver();
+        m_RawPointer = other.m_RawPointer;
+        this->AddDeleteEventObserver();
+      }
+
       return *this;
     }
 
-    /** Function to print object pointed to.  */
-    ObjectType *Print(std::ostream &os) const
+    WeakPointer & operator =(WeakPointer &&other)
     {
-      // This prints the object pointed to by the pointer
-      (*m_Pointer).Print(os);
-      return m_Pointer;
+      // No check for self-assignment as it is allowed to assume that the
+      // parameter is a unique reference to this argument.
+
+      this->RemoveDeleteEventObserver();
+      m_RawPointer = other.m_RawPointer;
+      other.m_RawPointer = nullptr;
+      this->AddDeleteEventObserver();
+
+      return *this;
     }
 
-    ///
-    /// \brief Gets called when the object is deleted or modified.
-    ///
-    void OnObjectDelete(const itk::Object *caller, const itk::EventObject &)
+    WeakPointer & operator =(std::nullptr_t)
     {
-      // do not unsubscribe from this object. this would invalidate the iterator of the
-      // event listener vector (in itk::Object) and would lead to a crash
-      // instead: do nothing->object is going to be dead soon...
-      // this->RemoveDeleteAndModifiedObserver();
-      m_Pointer = nullptr;
-      m_DeleteObserverTag = -1;
-      m_ModifiedObserverTag = -1;
-      ObjectDelete.Send(caller);
+      this->RemoveDeleteEventObserver();
+      m_RawPointer = nullptr;
+
+      return *this;
     }
 
-    void OnObjectModified(const itk::Object *caller, const itk::EventObject &) { ObjectModified.Send(caller); }
+    WeakPointer & operator =(T *other)
+    {
+      if (m_RawPointer != other)
+      {
+        this->RemoveDeleteEventObserver();
+        m_RawPointer = other;
+        this->AddDeleteEventObserver();
+      }
+
+      return *this;
+    }
+
+    explicit operator bool() const noexcept
+    {
+      return nullptr != m_RawPointer;
+    }
+
+    bool IsExpired() const noexcept
+    {
+      return !*this;
+    }
+
+    itk::SmartPointer<T> Lock() const
+    {
+      return m_RawPointer;
+    }
+
+    void SetDeleteEventCallback(const DeleteEventCallbackType &callback)
+    {
+      m_DeleteEventCallback = callback;
+    }
+
   private:
-    void AddDeleteAndModifiedObserver()
+    void AddDeleteEventObserver()
     {
-      if (m_DeleteObserverTag == -1 && m_ModifiedObserverTag == -1 && m_Pointer != nullptr)
+      if (nullptr != m_RawPointer)
       {
-        // add observer for delete event
-        typename itk::MemberCommand<WeakPointer<TObjectType>>::Pointer onObjectDelete =
-          itk::MemberCommand<WeakPointer<TObjectType>>::New();
-
-        onObjectDelete->SetCallbackFunction(this, &WeakPointer<TObjectType>::OnObjectDelete);
-        m_DeleteObserverTag = m_Pointer->AddObserver(itk::DeleteEvent(), onObjectDelete);
-
-        // add observer for modified event
-        typename itk::MemberCommand<WeakPointer<TObjectType>>::Pointer onObjectModified =
-          itk::MemberCommand<WeakPointer<TObjectType>>::New();
-
-        onObjectModified->SetCallbackFunction(this, &WeakPointer<TObjectType>::OnObjectModified);
-        m_ModifiedObserverTag = m_Pointer->AddObserver(itk::ModifiedEvent(), onObjectModified);
+        auto command = itk::SimpleMemberCommand<WeakPointer>::New();
+        command->SetCallbackFunction(this, &WeakPointer::OnDeleteEvent);
+        m_ObserverTag = m_RawPointer->AddObserver(itk::DeleteEvent(), command);
       }
     }
 
-    void RemoveDeleteAndModifiedObserver()
+    void RemoveDeleteEventObserver()
     {
-      if (m_DeleteObserverTag >= 0 && m_ModifiedObserverTag >= 0 && m_Pointer != nullptr)
-      {
-        m_Pointer->RemoveObserver(m_DeleteObserverTag);
-        m_Pointer->RemoveObserver(m_ModifiedObserverTag);
-
-        m_DeleteObserverTag = -1;
-        m_ModifiedObserverTag = -1;
-      }
+      if (nullptr != m_RawPointer)
+        m_RawPointer->RemoveObserver(m_ObserverTag);
     }
 
-    long m_DeleteObserverTag;
-    long m_ModifiedObserverTag;
+    void OnDeleteEvent() noexcept
+    {
+      // Don't remove any observers from the observed object as it is about to
+      // die and can't handle this operation anymore.
 
-    /** The pointer to the object referred to by this smart pointer. */
-    ObjectType *m_Pointer;
+      m_RawPointer = nullptr;
+
+      if (m_DeleteEventCallback)
+        m_DeleteEventCallback();
+    }
+
+    // The following comparison operators need access to class internals.
+    // All remaining comparison operators are implemented as non-member
+    // non-friend functions that use logical combinations of these non-member
+    // friend functions.
+
+    friend bool operator ==(const WeakPointer &left, const WeakPointer &right) noexcept
+    {
+      return left.m_RawPointer == right.m_RawPointer;
+    }
+
+    // Also covers comparisons to T::Pointer and T::ConstPointer as
+    // itk::SmartPointer can be implicitly converted to a raw pointer.
+    friend bool operator ==(const WeakPointer &left, const T *right) noexcept
+    {
+      return left.m_RawPointer == right;
+    }
+
+    friend bool operator <(const WeakPointer &left, const WeakPointer &right) noexcept
+    {
+      // The specialization of std::less for any pointer type yields a total
+      // order, even if the built-in operator < doesn't.
+      return std::less<T*>()(left.m_RawPointer, right.m_RawPointer);
+    }
+
+    friend bool operator <(const WeakPointer &left, std::nullptr_t right) noexcept
+    {
+      return std::less<T*>()(left.m_RawPointer, right);
+    }
+
+    friend bool operator <(std::nullptr_t left, const WeakPointer &right) noexcept
+    {
+      return std::less<T*>()(left, right.m_RawPointer);
+    }
+
+    friend bool operator <(const WeakPointer &left, const T *right) noexcept
+    {
+      return std::less<T*>()(left.m_RawPointer, right);
+    }
+
+    friend bool operator <(const T *left, const WeakPointer &right) noexcept
+    {
+      return std::less<T*>()(left, right.m_RawPointer);
+    }
+
+    T *m_RawPointer;
+
+    // m_ObserverTag is completely managed by the two methods
+    // AddDeleteEventObserver() and RemoveDeleteEventObserver(). There
+    // isn't any need to initialize or use it at all outside of these methods.
+    unsigned long m_ObserverTag;
+
+    DeleteEventCallbackType m_DeleteEventCallback;
   };
+}
 
-  template <typename T>
-  std::ostream &operator<<(std::ostream &os, WeakPointer<T> p)
-  {
-    p.Print(os);
-    return os;
-  }
+template <class T>
+bool operator !=(const mitk::WeakPointer<T> &left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return !(left == right);
+}
 
-} // end namespace mitk
+template <class T>
+bool operator <=(const mitk::WeakPointer<T> &left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return !(right < left);
+}
+
+template <class T>
+bool operator >(const mitk::WeakPointer<T> &left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return right < left;
+}
+
+template <class T>
+bool operator >=(const mitk::WeakPointer<T> &left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return !(left < right);
+}
+
+template <class T>
+bool operator ==(const mitk::WeakPointer<T> &left, std::nullptr_t) noexcept
+{
+  return !left;
+}
+
+template <class T>
+bool operator !=(const mitk::WeakPointer<T> &left, std::nullptr_t right) noexcept
+{
+  return !(left == right);
+}
+
+template <class T>
+bool operator ==(std::nullptr_t, const mitk::WeakPointer<T> &right) noexcept
+{
+  return !right;
+}
+
+template <class T>
+bool operator !=(std::nullptr_t left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return !(left == right);
+}
+
+template <class T>
+bool operator <=(const mitk::WeakPointer<T> &left, std::nullptr_t right) noexcept
+{
+  return !(right < left);
+}
+
+template <class T>
+bool operator >(const mitk::WeakPointer<T> &left, std::nullptr_t right) noexcept
+{
+  return right < left;
+}
+
+template <class T>
+bool operator >=(const mitk::WeakPointer<T> &left, std::nullptr_t right) noexcept
+{
+  return !(left < right);
+}
+
+template <class T>
+bool operator <=(std::nullptr_t left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return !(right < left);
+}
+
+template <class T>
+bool operator >(std::nullptr_t left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return right < left;
+}
+
+template <class T>
+bool operator >=(std::nullptr_t left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return !(left < right);
+}
+
+template <class T>
+bool operator !=(const mitk::WeakPointer<T> &left, const T *right) noexcept
+{
+  return !(left == right);
+}
+
+template <class T>
+bool operator <=(const mitk::WeakPointer<T> &left, const T *right) noexcept
+{
+  return !(right < left);
+}
+
+template <class T>
+bool operator >(const mitk::WeakPointer<T> &left, const T *right) noexcept
+{
+  return right < left;
+}
+
+template <class T>
+bool operator >=(const mitk::WeakPointer<T> &left, const T *right) noexcept
+{
+  return !(left < right);
+}
+
+template <class T>
+bool operator ==(const T *left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return right == left;
+}
+
+template <class T>
+bool operator !=(const T *left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return !(right == left);
+}
+
+template <class T>
+bool operator <=(const T *left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return !(right < left);
+}
+
+template <class T>
+bool operator >(const T *left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return right < left;
+}
+
+template <class T>
+bool operator >=(const T *left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return !(left < right);
+}
+
+template <class T>
+bool operator !=(const mitk::WeakPointer<T> &left, itk::SmartPointer<T> right) noexcept
+{
+  return !(left == right);
+}
+
+template <class T>
+bool operator <=(const mitk::WeakPointer<T> &left, itk::SmartPointer<T> right) noexcept
+{
+  return !(right < left);
+}
+
+template <class T>
+bool operator >(const mitk::WeakPointer<T> &left, itk::SmartPointer<T> right) noexcept
+{
+  return right < left;
+}
+
+template <class T>
+bool operator >=(const mitk::WeakPointer<T> &left, itk::SmartPointer<T> right) noexcept
+{
+  return !(left < right);
+}
+
+template <class T>
+bool operator ==(itk::SmartPointer<T> left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return right == left;
+}
+
+template <class T>
+bool operator !=(itk::SmartPointer<T> left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return !(right == left);
+}
+
+template <class T>
+bool operator <=(itk::SmartPointer<T> left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return !(right < left);
+}
+
+template <class T>
+bool operator >(itk::SmartPointer<T> left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return right < left;
+}
+
+template <class T>
+bool operator >=(itk::SmartPointer<T> left, const mitk::WeakPointer<T> &right) noexcept
+{
+  return !(left < right);
+}
 
 #endif

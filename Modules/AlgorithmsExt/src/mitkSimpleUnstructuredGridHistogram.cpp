@@ -39,7 +39,7 @@ namespace mitk
 
   void SimpleUnstructuredGridHistogram::ComputeFromBaseData(BaseData *source)
   {
-    UnstructuredGrid *grid = dynamic_cast<UnstructuredGrid *>(source);
+    auto *grid = dynamic_cast<UnstructuredGrid *>(source);
     // m_UGHistogram->Initialize(grid);
 
     vtkUnstructuredGrid *vtkUGrid = grid->GetVtkUnstructuredGrid();

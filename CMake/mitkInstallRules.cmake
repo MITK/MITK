@@ -50,7 +50,7 @@ if(MACOSX_BUNDLE_NAMES)
             DESTINATION "${bundle_name}.app/Contents/MacOS/iconengines"
             CONFIGURATIONS Release)
     # related to MITK:T19679-InstallQtWebEnginProcess
-    if(MITK_USE_Qt5_WebEngine)
+    if(MITK_USE_Qt5)
         get_filename_component(ABS_DIR_HELPERS "${_qmake_path}/../lib/QtWebEngineCore.framework/Helpers" REALPATH)
         install(DIRECTORY ${ABS_DIR_HELPERS}
                 DESTINATION "${bundle_name}.app/Contents/Frameworks/QtWebEngineCore.framework/"
@@ -76,9 +76,9 @@ if(WIN32)
     install(FILES "${_qmake_path}/../plugins/iconengines/qsvgicon.dll"
             DESTINATION "bin/plugins/iconengines"
             CONFIGURATIONS Release)
-    if(MITK_USE_Qt5_WebEngine)
-      MITK_INSTALL( FILES "${_qmake_path}/QtWebEngineProcess.exe")
-    endif()
+
+    MITK_INSTALL( FILES "${_qmake_path}/QtWebEngineProcess.exe")
+
     install(DIRECTORY "${_qmake_path}/../resources/"
             DESTINATION "bin/resources/"
             CONFIGURATIONS Release)
@@ -153,15 +153,28 @@ else()
 
 # We need to install Webengineprocess and related files on unix as well
   if(UNIX)
-      if(MITK_USE_Qt5_WebEngine)
-        get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
-                   PROPERTY IMPORT_LOCATION)
-        get_filename_component(_qmake_path "${_qmake_location}" DIRECTORY)
-        MITK_INSTALL_HELPER_APP( EXECUTABLES "${_qmake_path}/../libexec/QtWebEngineProcess")
-        install(DIRECTORY "${_qmake_path}/../resources/"
-            DESTINATION "bin/resources/")
-        install(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales/"
-            DESTINATION "bin/translations/qtwebengine_locales/")
+    if(MITK_USE_Qt5)
+      get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
+                 PROPERTY IMPORT_LOCATION)
+      get_filename_component(_qmake_path "${_qmake_location}" DIRECTORY)
+
+      install(FILES "${_qmake_path}/../plugins/platforms/libqxcb.so"
+              DESTINATION "bin/plugins/platforms")
+      install(FILES "${_qmake_path}/../plugins/sqldrivers/libqsqlite.so"
+              DESTINATION "bin/plugins/sqldrivers")
+      install(FILES "${_qmake_path}/../plugins/imageformats/libqsvg.so"
+              DESTINATION "bin/plugins/imageformats")
+      install(FILES "${_qmake_path}/../plugins/iconengines/libqsvgicon.so"
+              DESTINATION "bin/plugins/iconengines")
+      install(FILES "${_qmake_path}/../plugins/xcbglintegrations/libqxcb-glx-integration.so"
+              DESTINATION "bin/plugins/xcbglintegrations")
+
+      MITK_INSTALL_HELPER_APP( EXECUTABLES "${_qmake_path}/../libexec/QtWebEngineProcess")
+
+      install(DIRECTORY "${_qmake_path}/../resources/"
+              DESTINATION "bin/resources/")
+      install(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales/"
+              DESTINATION "bin/translations/qtwebengine_locales/")
     endif()
   endif()
 
@@ -175,4 +188,17 @@ if(MITK_USE_MatchPoint)
   install(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/bin/"
             DESTINATION "bin"
             FILES_MATCHING PATTERN "MAPAlgorithms*")
+endif()
+
+if(MITK_USE_BetData)
+  install(DIRECTORY "${BetData_DIR}"
+            DESTINATION "bin"
+            FILES_MATCHING PATTERN "*")
+endif()
+
+#install SimpleITK libs that are currently not auto detected
+if(MITK_USE_SimpleITK)
+  install(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/bin/"
+            DESTINATION "bin"
+            FILES_MATCHING PATTERN "SimpleITK*")
 endif()

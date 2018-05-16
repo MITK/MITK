@@ -30,8 +30,8 @@ typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
 mitk::TrackingDevice::TrackingDevice() :
-m_Data(mitk::UnspecifiedTrackingTypeInformation::GetDeviceDataUnspecified()),
   m_State(mitk::TrackingDevice::Setup),
+  m_Data(mitk::UnspecifiedTrackingTypeInformation::GetDeviceDataUnspecified()),
   m_StopTracking(false),
   m_RotationMode(mitk::TrackingDevice::RotationStandard)
 
@@ -52,6 +52,21 @@ return true;
 //this is the default for all tracking device
 //If a device needs installation please reimplement
 //this method in the subclass.
+}
+
+bool mitk::TrackingDevice::AutoDetectToolsAvailable()
+{
+  return false;
+}
+
+bool mitk::TrackingDevice::AddSingleToolIsAvailable()
+{
+  return true;
+}
+
+mitk::NavigationToolStorage::Pointer mitk::TrackingDevice::AutoDetectTools()
+{
+  return mitk::NavigationToolStorage::New();
 }
 
 
@@ -75,7 +90,7 @@ void mitk::TrackingDevice::SetState( TrackingDeviceState state )
   this->Modified();
 }
 
-void mitk::TrackingDevice::SetRotationMode(RotationMode r)
+void mitk::TrackingDevice::SetRotationMode(RotationMode)
 {
   MITK_WARN << "Rotation mode switching is not implemented for this device. Leaving it at mitk::TrackingDevice::RotationStandard";
 }
@@ -136,3 +151,7 @@ mitk::TrackingTool* mitk::TrackingDevice::GetToolByName( std::string name ) cons
   return nullptr;
 }
 
+std::string mitk::TrackingDevice::GetTrackingDeviceName()
+{
+  return this->GetData().Line;
+}

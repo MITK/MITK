@@ -96,6 +96,42 @@ public:
   static void GaussianFilter(mitk::Image::Pointer image, mitk::Image::Pointer & smoothed ,double sigma);
 
   ///
+  /// \brief SubtractGaussianFilter
+  /// \param image
+  /// \param smoothed (Result is sigma1-sigma2)
+  /// \param sigma1
+  /// \param sigma2
+  ///
+  static void DifferenceOfGaussianFilter(mitk::Image::Pointer image, mitk::Image::Pointer & smoothed, double sigma1, double sigma2);
+
+  ///
+  /// \brief Laplacian of Gaussian
+  /// \param image
+  /// \param smoothed (Result is sigma1-sigma2)
+  /// \param sigma1
+  /// \param sigma2
+  ///
+  static void LaplacianOfGaussianFilter(mitk::Image::Pointer image, mitk::Image::Pointer & smoothed, double sigma1);
+
+  ///
+  /// \brief SubtractGaussianFilter
+  /// \param image
+  /// \param smoothed (Result is sigma1-sigma2)
+  /// \param sigma1
+  /// \param sigma2
+  ///
+  static void HessianOfGaussianFilter(mitk::Image::Pointer image, std::vector<mitk::Image::Pointer> &out, double sigma);
+
+  ///
+  /// \brief Local Histogram
+  /// \param image
+  /// \param smoothed (Result is sigma1-sigma2)
+  /// \param sigma1
+  /// \param sigma2
+  ///
+  static void LocalHistogram(mitk::Image::Pointer image, std::vector<mitk::Image::Pointer> &out, int Bins, int NeighbourhoodSize);
+
+  ///
   /// \brief transform
   /// \param matrix
   /// \param mask
@@ -306,7 +342,7 @@ public:
   template <class TImageType1, class TImageType2>
   static void itkSampleLabel(TImageType1* image, TImageType2* output, double acceptrate, unsigned int label)
   {
-    std::srand (time(NULL));
+    std::srand (time(nullptr));
 
     itk::ImageRegionConstIterator< TImageType1 > inputIter(image, image->GetLargestPossibleRegion());
     itk::ImageRegionIterator< TImageType2 > outputIter(output, output->GetLargestPossibleRegion());
@@ -325,7 +361,7 @@ public:
   template <class TImageType>
   static void itkSampleLabel(TImageType* image, mitk::Image::Pointer & output, unsigned int n_samples_drawn)
   {
-    std::srand (time(NULL));
+    std::srand (time(nullptr));
 
     typename TImageType::Pointer itk_out = TImageType::New();
     itk_out->SetRegions(image->GetLargestPossibleRegion());
@@ -514,11 +550,20 @@ private:
   template<class TImageType>
   static void itkGaussianFilter(TImageType * image, mitk::Image::Pointer & smoothed ,double sigma);
 
+  template<class TImageType>
+  static void itkDifferenceOfGaussianFilter(TImageType * image, mitk::Image::Pointer & smoothed, double sigma1, double sigma2);
+
   template<typename TImageType>
   static void itkProbabilityMap(const TImageType * sourceImage, double mean, double std_dev, mitk::Image::Pointer& resultImage);
 
+  template<typename TPixel, unsigned int VImageDimension>
+  static void itkHessianOfGaussianFilter(itk::Image<TPixel, VImageDimension>* itkImage, double variance, std::vector<mitk::Image::Pointer> &out);
 
+  template<typename TPixel, unsigned int VImageDimension>
+  static void itkLaplacianOfGaussianFilter(itk::Image<TPixel, VImageDimension>* itkImage, double variance, mitk::Image::Pointer &output);
 
+  template<typename TPixel, unsigned int VImageDimension>
+  static void itkLocalHistograms(itk::Image<TPixel, VImageDimension>* itkImage, std::vector<mitk::Image::Pointer> &out, int size, int bins);
 };
 
 } //namespace MITK

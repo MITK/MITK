@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIntroPartAdapterSite.h"
 
 #include "internal/berryWorkbench.h"
-#include "internal/berryWorkbenchPlugin.h"
+#include "berryWorkbenchPlugin.h"
 
 namespace berry
 {
@@ -76,7 +76,7 @@ QString ViewIntroAdapterPart::GetPartName() const
 }
 
 void ViewIntroAdapterPart::Init(IViewSite::Pointer site,
-    IMemento::Pointer memento) throw (PartInitException)
+    IMemento::Pointer memento)
 {
   ViewPart::Init(site);
   Workbench* workbench =

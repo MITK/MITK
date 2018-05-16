@@ -71,7 +71,7 @@ struct BERRY_UI_QT IWorkbenchPage : public IPartService, public ISelectionServic
 
   berryObjectMacro(berry::IWorkbenchPage)
 
-  ~IWorkbenchPage();
+  ~IWorkbenchPage() override;
 
   /**
    * An optional attribute within a workspace marker (<code>IMarker</code>)

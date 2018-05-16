@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageMaskSpatialObject.h"
 #include "itkNotImageFilter.h"
 #include <itkCenteredVersorTransformInitializer.h>
+#include <itkOptimizerParameters.h>
+
 #include <vnl/vnl_matrix_fixed.h>
 
 #include "mitkImage.h"
@@ -172,7 +174,7 @@ public:
    */
   void GetParameters( double* paramArray)
   {
-    if( m_EstimatedParameters == NULL )
+    if( m_EstimatedParameters == nullptr )
     {
       mitkThrow() << "No parameters were estimated yet, call Update() first.";
     }
@@ -194,7 +196,7 @@ public:
    */
   ParametersType GetLastRegistrationParameters()
   {
-    if( m_EstimatedParameters == NULL )
+    if( m_EstimatedParameters == nullptr )
     {
       mitkThrow() << "No parameters were estimated yet, call Update() first.";
     }
@@ -205,7 +207,7 @@ public:
 
     ParametersType params(dim);
 
-    params.SetData( m_EstimatedParameters );
+    params.SetDataSameSize( m_EstimatedParameters );
     return params;
   }
 
@@ -284,7 +286,7 @@ public:
 protected:
   PyramidImageRegistrationMethod();
 
-  ~PyramidImageRegistrationMethod();
+  ~PyramidImageRegistrationMethod() override;
 
   /** Fixed image, used as reference for registration */
   mitk::Image::Pointer m_FixedImage;

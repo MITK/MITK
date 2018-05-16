@@ -74,7 +74,7 @@ bool mitk::ConnectomicsNetworkThresholder::CheckValidity()
   if( m_Network.IsNull() )
   {
     valid = false;
-    MITK_ERROR << "Network is NULL.";
+    MITK_ERROR << "Network is nullptr.";
   }
 
   switch(m_ThresholdingScheme)
@@ -149,7 +149,7 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::Thresho
       double tempWeight;
 
       // the value of an iterator is a descriptor
-      tempWeight = (*boostGraph)[ *iterator ].weight;
+      tempWeight = (*boostGraph)[ *iterator ].fiber_count;
 
       if( mitk::Equal( tempWeight, minWeight ) )
       {
@@ -227,7 +227,7 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsNetworkThresholder::Thresho
       if( iterator != end )
       {
         // If the edge is below the target threshold it is deleted
-        if( (*boostGraph)[ *iterator ].weight < targetThreshold )
+        if( (*boostGraph)[ *iterator ].fiber_count < targetThreshold )
         {
           edgeHasBeenRemoved = true;
           // this invalidates all iterators

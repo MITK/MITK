@@ -41,7 +41,7 @@ class SavePerspectiveDialog : public QDialog
 public:
 
   SavePerspectiveDialog(PerspectiveRegistry& perspReg, QWidget *parent = nullptr);
-  ~SavePerspectiveDialog();
+  ~SavePerspectiveDialog() override;
 
   void SetInitialSelection(const SmartPointer<IPerspectiveDescriptor>& initialSelection);
 
@@ -51,7 +51,7 @@ public:
 
 protected:
 
-  virtual void accept() override;
+  void accept() override;
 
   Q_SLOT void PerspectiveNameChanged(const QString& name);
   Q_SLOT void PerspectiveSelected(const QItemSelection& selected, const QItemSelection& deselected);

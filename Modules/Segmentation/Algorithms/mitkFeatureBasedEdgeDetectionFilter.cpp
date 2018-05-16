@@ -142,8 +142,6 @@ void mitk::FeatureBasedEdgeDetectionFilter::ContourSearch(itk::Image<TPixel, VIm
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::BinaryContourImageFilter<ImageType, ImageType> binaryContourImageFilterType;
-  typedef unsigned short OutputPixelType;
-  typedef itk::Image<OutputPixelType, VImageDimension> OutputImageType;
 
   typename binaryContourImageFilterType::Pointer binaryContourFilter = binaryContourImageFilterType::New();
   binaryContourFilter->SetInput(originalImage);

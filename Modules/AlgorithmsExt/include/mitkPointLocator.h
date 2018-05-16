@@ -161,7 +161,7 @@ namespace mitk
     /**
      * destructor
      */
-    ~PointLocator();
+    ~PointLocator() override;
 
     /**
      * Initializes the ann search tree using previously defined points

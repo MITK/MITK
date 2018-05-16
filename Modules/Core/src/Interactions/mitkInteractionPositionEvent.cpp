@@ -46,5 +46,5 @@ mitk::InteractionPositionEvent::~InteractionPositionEvent()
 
 bool mitk::InteractionPositionEvent::IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const
 {
-  return (dynamic_cast<InteractionPositionEvent *>(baseClass.GetPointer()) != NULL);
+  return (dynamic_cast<InteractionPositionEvent *>(baseClass.GetPointer()) != nullptr);
 }

@@ -41,6 +41,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIProduct.h>
 #include <berryIWorkbenchPartConstants.h>
 #include <berryQtPreferences.h>
+#include <berryQtStyleManager.h>
+#include <berryWorkbenchPlugin.h>
 
 #include <internal/berryQtShowViewAction.h>
 #include <internal/berryQtOpenPerspectiveAction.h>
@@ -74,7 +76,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUndoController.h"
 #include "mitkVerboseLimitedLinearUndo.h"
 #include <QToolBar>
+#include <QToolButton>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QLabel>
 #include <QmitkAboutDialog.h>
 
@@ -526,27 +530,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   }
   mainWindow->setContextMenuPolicy(Qt::PreventContextMenu);
 
-  /*mainWindow->setStyleSheet("color: white;"
-  "background-color: #808080;"
-  "selection-color: #659EC7;"
-  "selection-background-color: #808080;"
-  " QMenuBar {"
-  "background-color: #808080; }");*/
-
-  // Load selected icon theme
-
-  QStringList searchPaths = QIcon::themeSearchPaths();
-  searchPaths.push_front( QString(":/org_mitk_icons/icons/") );
-  QIcon::setThemeSearchPaths( searchPaths );
-
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-  berry::IPreferences::Pointer stylePref = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
-  QString iconTheme = stylePref->Get(berry::QtPreferences::QT_ICON_THEME, "<<default>>");
-  if( iconTheme == QString( "<<default>>" ) )
-  {
-    iconTheme = QString( "tango" );
-  }
-  QIcon::setThemeName( iconTheme );
+  // Load icon theme
+  QIcon::setThemeSearchPaths(QStringList() << QStringLiteral(":/org_mitk_icons/icons/"));
+  QIcon::setThemeName(QStringLiteral("awesome"));
 
   // ==== Application menu ============================
 
@@ -559,14 +545,16 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   menuBar->setNativeMenuBar(false);
 #endif
 
-  QAction* fileOpenAction = new QmitkFileOpenAction(QIcon::fromTheme("document-open",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-open.svg")), window);
+  auto basePath = QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/");
+
+  auto fileOpenAction = new QmitkFileOpenAction(berry::QtStyleManager::ThemeIcon(basePath + "document-open.svg"), window);
   fileOpenAction->setShortcut(QKeySequence::Open);
-  QAction* fileSaveAction = new QmitkFileSaveAction(QIcon(":/org.mitk.gui.qt.ext/Save_48.png"), window);
+  auto fileSaveAction = new QmitkFileSaveAction(berry::QtStyleManager::ThemeIcon(basePath + "document-save.svg"), window);
   fileSaveAction->setShortcut(QKeySequence::Save);
   fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
-  fileSaveProjectAction->setIcon(QIcon::fromTheme("document-save",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-save.svg")));
+  fileSaveProjectAction->setIcon(berry::QtStyleManager::ThemeIcon(basePath + "document-save.svg"));
   closeProjectAction = new QmitkCloseProjectAction(window);
-  closeProjectAction->setIcon(QIcon::fromTheme("edit-delete",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-delete.svg")));
+  closeProjectAction->setIcon(berry::QtStyleManager::ThemeIcon(basePath + "edit-delete.svg"));
 
   auto   perspGroup = new QActionGroup(menuBar);
   std::map<QString, berry::IViewDescriptor::Pointer> VDMap;
@@ -632,20 +620,20 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     fileMenu->addSeparator();
 
     QAction* fileExitAction = new QmitkFileExitAction(window);
-    fileExitAction->setIcon(QIcon::fromTheme("system-log-out",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/system-log-out.svg")));
+    fileExitAction->setIcon(berry::QtStyleManager::ThemeIcon(basePath + "system-log-out.svg"));
     fileExitAction->setShortcut(QKeySequence::Quit);
     fileExitAction->setObjectName("QmitkFileExitAction");
     fileMenu->addAction(fileExitAction);
 
     // another bad hack to get an edit/undo menu...
     QMenu* editMenu = menuBar->addMenu("&Edit");
-    undoAction = editMenu->addAction(QIcon::fromTheme("edit-undo",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-undo.svg")),
+    undoAction = editMenu->addAction(berry::QtStyleManager::ThemeIcon(basePath + "edit-undo.svg"),
       "&Undo",
       QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onUndo()),
       QKeySequence("CTRL+Z"));
     undoAction->setToolTip("Undo the last action (not supported by all modules)");
-    redoAction = editMenu->addAction(QIcon::fromTheme("edit-redo",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-redo.svg"))
-      , "&Redo",
+    redoAction = editMenu->addAction(berry::QtStyleManager::ThemeIcon(basePath + "edit-redo.svg"),
+      "&Redo",
       QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onRedo()),
       QKeySequence("CTRL+Y"));
     redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
@@ -660,7 +648,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     QMenu* perspMenu = windowMenu->addMenu("&Open Perspective");
 
-    QMenu* viewMenu;
+    QMenu* viewMenu = nullptr;
     if (showViewMenuItem)
     {
       viewMenu = windowMenu->addMenu("Show &View");
@@ -732,11 +720,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   }
   else
   {
-    //undoAction = new QAction(QIcon::fromTheme("edit-undo",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-undo.svg")),
-    //  "&Undo", nullptr);
-    undoAction = new QmitkUndoAction(QIcon::fromTheme("edit-undo",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-undo.svg")), nullptr);
+    undoAction = new QmitkUndoAction(berry::QtStyleManager::ThemeIcon(basePath + "edit-undo.svg"), nullptr);
     undoAction->setShortcut(QKeySequence::Undo);
-    redoAction = new QmitkRedoAction(QIcon::fromTheme("edit-redo",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-redo.svg")), nullptr);
+    redoAction = new QmitkRedoAction(berry::QtStyleManager::ThemeIcon(basePath + "edit-redo.svg"), nullptr);
     redoAction->setShortcut(QKeySequence::Redo);
   }
 
@@ -750,12 +736,13 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextBesideIcon );
 #endif
 
-  imageNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator", nullptr);
+  basePath = QStringLiteral(":/org.mitk.gui.qt.ext/");
+  imageNavigatorAction = new QAction(berry::QtStyleManager::ThemeIcon(basePath + "image_navigator.svg"), "&Image Navigator", nullptr);
   bool imageNavigatorViewFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.imagenavigator");
 
   if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
   {
-    openDicomEditorAction = new QmitkOpenDicomEditorAction(QIcon(":/org.mitk.gui.qt.ext/dcm-icon.png"),window);
+    openDicomEditorAction = new QmitkOpenDicomEditorAction(berry::QtStyleManager::ThemeIcon(basePath + "dicom.svg"), window);
   }
 
   if (imageNavigatorViewFound)
@@ -778,7 +765,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     imageNavigatorAction->setToolTip("Toggle image navigator for navigating through image");
   }
 
-  viewNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/view-manager_48.png"),"&View Navigator", nullptr);
+  viewNavigatorAction = new QAction(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org.mitk.gui.qt.ext/view-manager.svg")),"&View Navigator", nullptr);
   viewNavigatorFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.viewnavigatorview");
   if (viewNavigatorFound)
   {
@@ -831,21 +818,69 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   else
     delete qPerspectiveToolbar;
 
-  // ==== View Toolbar ==================================
-  auto   qToolbar = new QToolBar;
-  qToolbar->setObjectName("viewToolBar");
-
   if (showViewToolbar)
   {
-    mainWindow->addToolBar(qToolbar);
+    auto prefService = berry::WorkbenchPlugin::GetDefault()->GetPreferencesService();
+    berry::IPreferences::Pointer stylePrefs = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
+    bool showCategoryNames = stylePrefs->GetBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES, true);
 
-    for (auto viewAction : viewActions)
+    // Order view descriptors by category
+
+    QMultiMap<QString, berry::IViewDescriptor::Pointer> categoryViewDescriptorMap;
+
+    for (auto labelViewDescriptorPair : VDMap)
     {
-      qToolbar->addAction(viewAction);
+      auto viewDescriptor = labelViewDescriptorPair.second;
+      auto category = !viewDescriptor->GetCategoryPath().isEmpty()
+        ? viewDescriptor->GetCategoryPath().back()
+        : QString();
+
+      categoryViewDescriptorMap.insert(category, viewDescriptor);
+    }
+
+    // Create a separate toolbar for each category
+
+    for (auto category : categoryViewDescriptorMap.uniqueKeys())
+    {
+      auto viewDescriptorsInCurrentCategory = categoryViewDescriptorMap.values(category);
+
+      if (!viewDescriptorsInCurrentCategory.isEmpty())
+      {
+        auto toolbar = new QToolBar;
+        toolbar->setObjectName(category + " View Toolbar");
+        mainWindow->addToolBar(toolbar);
+
+        if (showCategoryNames && !category.isEmpty())
+        {
+          auto categoryButton = new QToolButton;
+          categoryButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+          categoryButton->setText(category);
+          categoryButton->setStyleSheet("background: transparent; margin: 0; padding: 0;");
+          toolbar->addWidget(categoryButton);
+
+          connect(categoryButton, &QToolButton::clicked, [toolbar]()
+          {
+            for (QWidget* widget : toolbar->findChildren<QWidget*>())
+            {
+              if (QStringLiteral("qt_toolbar_ext_button") == widget->objectName() && widget->isVisible())
+              {
+                QMouseEvent pressEvent(QEvent::MouseButtonPress, QPointF(0.0f, 0.0f), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                QMouseEvent releaseEvent(QEvent::MouseButtonRelease, QPointF(0.0f, 0.0f), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+                QApplication::sendEvent(widget, &pressEvent);
+                QApplication::sendEvent(widget, &releaseEvent);
+              }
+            }
+          });
+        }
+
+        for (auto viewDescriptor : viewDescriptorsInCurrentCategory)
+        {
+          auto viewAction = new berry::QtShowViewAction(window, viewDescriptor);
+          toolbar->addAction(viewAction);
+        }
+      }
     }
   }
-  else
-    delete qToolbar;
 
   QSettings settings(GetQSettingsFile(), QSettings::IniFormat);
   mainWindow->restoreState(settings.value("ToolbarPosition").toByteArray());

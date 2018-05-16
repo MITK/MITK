@@ -21,8 +21,7 @@ using namespace mitk;
 
 template< class ScalarType >
 StickModel< ScalarType >::StickModel()
-    : m_Diffusivity(0.001)
-    , m_BValue(1000)
+  : m_Diffusivity(0.001)
 {
 
 }
@@ -34,49 +33,42 @@ StickModel< ScalarType >::~StickModel()
 }
 
 template< class ScalarType >
-ScalarType StickModel< ScalarType >::SimulateMeasurement(unsigned int dir)
+ScalarType StickModel< ScalarType >::SimulateMeasurement(unsigned int dir, GradientType& fiberDirection)
 {
-    ScalarType signal = 0;
+  ScalarType signal = 0;
 
-    if (dir>=this->m_GradientList.size())
-        return signal;
-
-    this->m_FiberDirection.Normalize();
-
-    GradientType g = this->m_GradientList[dir];
-    ScalarType bVal = g.GetNorm(); bVal *= bVal;
-
-    if (bVal>0.0001)
-    {
-        ScalarType dot = this->m_FiberDirection*g;
-        signal = std::exp( -m_BValue * bVal * m_Diffusivity*dot*dot );
-    }
-    else
-        signal = 1;
-
+  if (dir>=this->m_GradientList.size())
     return signal;
+
+  GradientType g = this->m_GradientList[dir];
+  if (g.GetNorm()>0.0001)
+  {
+    ScalarType dot = fiberDirection*g;
+    signal = std::exp( -this->m_BValue*m_Diffusivity*dot*dot ); // skip * bVal becaus bVal is already encoded in the dot product (norm of g encodes b-value relative to baseline b-value m_BValue)
+  }
+  else
+    signal = 1;
+
+  return signal;
 }
 
 template< class ScalarType >
-typename StickModel< ScalarType >::PixelType StickModel< ScalarType >::SimulateMeasurement()
+typename StickModel< ScalarType >::PixelType StickModel< ScalarType >::SimulateMeasurement(GradientType &fiberDirection)
 {
-    this->m_FiberDirection.Normalize();
-    PixelType signal;
-    signal.SetSize(this->m_GradientList.size());
+  PixelType signal;
+  signal.SetSize(this->m_GradientList.size());
 
-    for( unsigned int i=0; i<this->m_GradientList.size(); i++)
+  for( unsigned int i=0; i<this->m_GradientList.size(); i++)
+  {
+    GradientType g = this->m_GradientList[i];
+    if (g.GetNorm()>0.0001)
     {
-        GradientType g = this->m_GradientList[i];
-        ScalarType bVal = g.GetNorm(); bVal *= bVal;
-
-        if (bVal>0.0001)
-        {
-            ScalarType dot = this->m_FiberDirection*g;
-            signal[i] = std::exp( -m_BValue * bVal * m_Diffusivity*dot*dot );
-        }
-        else
-            signal[i] = 1;
+      ScalarType dot = fiberDirection*g;
+      signal[i] = std::exp( -this->m_BValue*m_Diffusivity*dot*dot ); // skip * bVal becaus bVal is already encoded in the dot product (norm of g encodes b-value relative to baseline b-value m_BValue)
     }
+    else
+      signal[i] = 1;
+  }
 
-    return signal;
+  return signal;
 }

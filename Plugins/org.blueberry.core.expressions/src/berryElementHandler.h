@@ -50,7 +50,7 @@ public:
 
   berryObjectMacro(ElementHandler);
 
-  ~ElementHandler();
+  ~ElementHandler() override;
 
   /**
    * The default element handler which can cope with all XML expression elements

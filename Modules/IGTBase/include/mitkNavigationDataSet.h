@@ -135,15 +135,18 @@ namespace mitk {
     virtual NavigationDataSetConstIterator End() const;
 
     // virtual methods, that need to be implemented, but aren't reasonable for NavigationData
-    virtual void SetRequestedRegionToLargestPossibleRegion( ) override;
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion( ) override;
-    virtual bool VerifyRequestedRegion( ) override;
-    virtual void SetRequestedRegion( const itk::DataObject *data ) override;
+    void SetRequestedRegionToLargestPossibleRegion( ) override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion( ) override;
+    bool VerifyRequestedRegion( ) override;
+    void SetRequestedRegion( const itk::DataObject *data ) override;
 
     /**
     * \brief This overrid is probably a little hacky. See Bug 19086.
     */
-    virtual bool IsEmpty() const override;
+    bool IsEmpty() const override;
+
+    //Converts Navigation Data for each tool to a Point Set and adds it to the data storage
+    void ConvertNavigationDataToPointSet() const;
 
   protected:
     /**
@@ -151,7 +154,7 @@ namespace mitk {
     * @param numTools How many tools are used with this mitk::NavigationDataSet.
     */
     NavigationDataSet( unsigned int numTools );
-    virtual ~NavigationDataSet( );
+    ~NavigationDataSet( ) override;
 
     /**
     * \brief Holds all the mitk::NavigationData objects managed by this class.

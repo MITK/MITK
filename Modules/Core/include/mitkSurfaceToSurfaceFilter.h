@@ -74,7 +74,7 @@ namespace mitk
   protected:
     SurfaceToSurfaceFilter();
 
-    virtual ~SurfaceToSurfaceFilter();
+    ~SurfaceToSurfaceFilter() override;
   };
 
 } // namespace mitk

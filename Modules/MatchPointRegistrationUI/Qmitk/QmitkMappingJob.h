@@ -69,9 +69,9 @@ class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkMappingJob : public QObject,
 
 public:
   QmitkMappingJob();
-  ~QmitkMappingJob();
+  ~QmitkMappingJob() override;
 
-  void run();
+  void run() override;
 
 signals:
   void Error(QString err);

@@ -37,7 +37,7 @@ namespace mitk
           (optional -T /directory/to/save/differenceImage)]
         @param argv Given parameters. If no data is inserted via commandline, you can add data
         later via AddNodeToDataStorage().
-        @param renderingMode Enable Standard, Multisample or DepthPeeling
+        @param renderingMode The rendering mode.
       **/
     RenderingTestHelper(
       int width,
@@ -189,7 +189,7 @@ namespace mitk
        * @brief Initialize Internal method to initialize the renderwindow and set the datastorage.
        * @param width Height of renderwindow.
        * @param height Width of renderwindow.
-       * @param renderingMode Enable Standard, Multisampling or Depthpeeling
+       * @param renderingMode The rendering mode.
        */
     void Initialize(
       int width,

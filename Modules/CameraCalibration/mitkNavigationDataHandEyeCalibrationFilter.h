@@ -69,7 +69,7 @@ namespace mitk {
     /*
     * \brief Transfer the information from the input to the associated BaseData
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
 
   protected:
@@ -81,7 +81,7 @@ namespace mitk {
     /**
     * \brief Destructor
     **/
-    ~NavigationDataHandEyeCalibrationFilter();
+    ~NavigationDataHandEyeCalibrationFilter() override;
 
     /**
     * \brief Map of the BaseDatas that should be transformed.

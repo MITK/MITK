@@ -56,9 +56,9 @@ namespace mitk
   protected:
     PadImageFilter();
 
-    virtual ~PadImageFilter();
+    ~PadImageFilter() override;
 
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
   private:
     bool m_BinaryFilter;

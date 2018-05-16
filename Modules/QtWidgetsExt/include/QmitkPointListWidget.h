@@ -24,9 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataInteractor.h>
 #include <mitkDataNode.h>
 #include <mitkPointSet.h>
-#include <mitkSliceNavigationController.h>
 
 #include <QPushButton>
+#include <QToolButton>
 
 /*!
  * \brief Widget for regular operations on point sets
@@ -55,21 +55,10 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPointListWidget : public QWidget
   Q_OBJECT
 
 public:
-  QmitkPointListWidget(QWidget *parent = 0, int orientation = 0);
-  ~QmitkPointListWidget();
+  QmitkPointListWidget(QWidget *parent = nullptr, int orientation = 0);
+  ~QmitkPointListWidget() override;
 
   void SetupConnections();
-
-  ///@{
-  /**
-  * \brief Sets the SliceNavigationController of the three 2D Renderwindows.
-  *  If they are defined, they can be used to automatically set the crosshair to the selected point
-  * \deprecatedSince{2013_03} Use AddSliceNavigationController and RemoveSliceNavigationController instead.
-  */
-  DEPRECATED(void SetSnc1(mitk::SliceNavigationController *snc));
-  DEPRECATED(void SetSnc2(mitk::SliceNavigationController *snc));
-  DEPRECATED(void SetSnc3(mitk::SliceNavigationController *snc));
-  ///@}
 
   /**
    * @brief Add a mitk::SliceNavigationController instance.
@@ -127,6 +116,7 @@ protected slots:
   void MoveSelectedPointUp();
   void OnBtnAddPoint(bool checked);
   void OnBtnAddPointManually();
+  void OnTimeStepChanged(int timeStep);
 
   /*!
   \brief pass through signal from PointListView that point selection has changed
@@ -140,7 +130,6 @@ protected:
   void ObserveNewNode(mitk::DataNode *node);
 
   QmitkPointListView *m_PointListView;
-  QmitkStdMultiWidget *m_MultiWidget;
 
   mitk::DataNode::Pointer m_PointSetNode;
 
@@ -153,15 +142,15 @@ protected:
   QPushButton *m_LoadPointsBtn;
   QPushButton *m_ToggleAddPoint;
   QPushButton *m_AddPoint;
-
-  mitk::SliceNavigationController *m_Snc1;
-  mitk::SliceNavigationController *m_Snc2;
-  mitk::SliceNavigationController *m_Snc3;
+  QLabel *m_TimeStepDisplay;
+  QLabel *m_TimeStepLabel;
 
   mitk::DataInteractor::Pointer m_DataInteractor;
   int m_TimeStep;
   bool m_EditAllowed;
   unsigned long m_NodeObserverTag;
+
+  QmitkPointListModel *m_PointListModel;
 };
 
 #endif

@@ -87,7 +87,7 @@ namespace mitk
     /**
      * Destructor
      */
-    ~RenderWindowFrame();
+    ~RenderWindowFrame() override;
 
     vtkSmartPointer<vtkRenderWindow> m_RenderWindow;
     vtkSmartPointer<vtkRenderer> m_RectangleRenderer;

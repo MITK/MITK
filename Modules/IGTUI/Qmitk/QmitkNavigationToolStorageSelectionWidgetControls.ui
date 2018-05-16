@@ -6,16 +6,22 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>199</width>
-    <height>111</height>
+    <width>448</width>
+    <height>150</height>
    </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>16777215</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QmitkServiceListWidget" name="m_ServiceListWidget">
+    <widget class="QmitkServiceListWidget" name="m_ServiceListWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -29,8 +35,9 @@
  <customwidgets>
   <customwidget>
    <class>QmitkServiceListWidget</class>
-   <extends>QListWidget</extends>
+   <extends>QWidget</extends>
    <header>QmitkServiceListWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include <mitkDataNode.h>
 #include <mitkPointSet.h>
-#include <mitkTrackingTool.h>
 #include <mitkTrackingTypes.h>
 #include <mitkSurface.h>
 #include <MitkIGTExports.h>
@@ -68,10 +67,6 @@ namespace mitk {
     itkGetConstMacro(SpatialObject,itk::SpatialObject<3>::Pointer);
     itkSetMacro(SpatialObject,itk::SpatialObject<3>::Pointer);
 
-    //TrackingTool:
-    itkGetConstMacro(TrackingTool,mitk::TrackingTool::Pointer);
-    itkSetMacro(TrackingTool,mitk::TrackingTool::Pointer);
-
     //CalibrationFile:
     itkGetConstMacro(CalibrationFile,std::string);
     void SetCalibrationFile(const std::string filename);
@@ -79,8 +74,16 @@ namespace mitk {
     //Tool tip definition:
     itkGetConstMacro(ToolTipPosition,mitk::Point3D);
     itkSetMacro(ToolTipPosition,mitk::Point3D);
-    itkGetConstMacro(ToolTipOrientation,mitk::Quaternion);
-    itkSetMacro(ToolTipOrientation,mitk::Quaternion);
+    itkGetConstMacro(ToolAxisOrientation,mitk::Quaternion);
+    itkSetMacro(ToolAxisOrientation,mitk::Quaternion);
+
+    //Tool Axis definition:
+    /** @return Returns the main tool axis which is defined as the z-coordinate of the tool coordinate system. */
+    mitk::Point3D GetToolAxis();
+    /** Convenience function to define the tool orientation given the main tool axis. As the main tool axis 
+    is defined as the negative z-axis of the tool coordinate system, the tool orientation is calculated as 
+    a rotation of the actual tool axis in tool coordinates as obtained by a calibration  to the main axis.*/
+    void SetToolAxis(mitk::Point3D toolAxis);
 
     /** @return Returns the tooltip as transform object. */
     mitk::AffineTransform3D::Pointer GetToolTipTransform();
@@ -91,14 +94,14 @@ namespace mitk {
     //Tool Landmarks:
     /** For overview, here are descriptons of the two types of tool landmarks:
      *
-     *  tool calibration landmarks: These landmarks may be used clearly define the tools pose only by
+     *  control points: These landmarks may be used clearly define the tools pose only by
      *  using landmarks in the tool coordinate system. E.g., two landmarks for a 5DoF tool and three
      *  landmarks for a 6DoF tool. These landmarks may be used, e.g., for a point based registration
      *  of a tool from image space to tracking space.
      *
-     *  tool registration landmarks: These landmarks are designed for representing defined landmarks
-     *  on a tools surface. The number of these landmarks might exeed the number of tool calibration
-     *  landmarks for reasons of redundancy and averaging. They are used for, e.g., manually registering
+     *  tool landmarks: These landmarks are designed for representing defined landmarks
+     *  on a tools surface. The number of these landmarks might exeed the number of tool control points
+     *  for reasons of redundancy and averaging. They are used for, e.g., manually registering
      *  the pose of a tool by visual markers in a CT scan. If you would use these landmarks to do a
      *  point based registration from image space to tracking space later, you might overweight the
      *  tool because of two many landmarks compared to other markers.
@@ -107,19 +110,19 @@ namespace mitk {
      *          tool that can be used for registration. The landmarks should be given in tool coordinates.
      *          If there are no landmarks defined for this tool the method returns an empty point set.
      */
-    itkGetConstMacro(ToolRegistrationLandmarks,mitk::PointSet::Pointer);
-    /** @brief  Sets the tool registration landmarks which represent markers / special points on a
+    itkGetConstMacro(ToolLandmarks,mitk::PointSet::Pointer);
+    /** @brief  Sets the tool landmarks which represent markers / special points on a
      *          tool that can be used for registration. The landmarks should be given in tool coordinates.
      */
-    itkSetMacro(ToolRegistrationLandmarks,mitk::PointSet::Pointer);
-    /** @return Returns the tool calibration landmarks for calibration of the defined points in the
-      *         tool coordinate system, e.g. 2 landmarks for a 5DoF tool and 3 landmarks for a 6DoF tool.
+    itkSetMacro(ToolLandmarks,mitk::PointSet::Pointer);
+    /** @return Returns the tool control point in the tool coordinate system, e.g. 2 landmarks for a 5DoF
+      *         tool and 3 landmarks for a 6DoF tool.
       */
-    itkGetConstMacro(ToolCalibrationLandmarks,mitk::PointSet::Pointer);
+    itkGetConstMacro(ToolControlPoints,mitk::PointSet::Pointer);
     /** @brief  Sets the tool calibration landmarks for calibration of defined points in the
       *         tool coordinate system, e.g. 2 landmarks for a 5DoF tool and 3 landmarks for a 6DoF tool.
       */
-    itkSetMacro(ToolCalibrationLandmarks,mitk::PointSet::Pointer);
+    itkSetMacro(ToolControlPoints,mitk::PointSet::Pointer);
 
     //SerialNumber:
     itkGetConstMacro(SerialNumber,std::string);
@@ -138,7 +141,7 @@ namespace mitk {
      */
     std::string GetToolName();
     //ToolSurface (only getter):
-    /** @return Returns the surface of this navigation tool. Returns NULL if there is
+    /** @return Returns the surface of this navigation tool. Returns nullptr if there is
      *          no surface (for example because the data node has not been set yet).
      *
      *          Note: There is no setter for the surface,
@@ -156,13 +159,25 @@ namespace mitk {
       * SmartPointers to the same NavigationTool object since separate DataObjects are
       * still maintained.
       */
-    virtual void Graft(const DataObject *data) override;
+    void Graft(const DataObject *data) override;
+
+
+    /**
+    * Return all relevant information as string, e.g. to display all tool information
+    */
+    std::string GetStringWithAllToolInformation() const;
+
+
+    void SetDefaultSurface();
+
     //#######################
 
   protected:
 
     NavigationTool();
-    ~NavigationTool();
+    NavigationTool(const NavigationTool &other);
+    ~NavigationTool() override;
+    itk::LightObject::Pointer InternalClone() const override;
 
     //## data structure of a navigation tool object ##
     std::string m_Identifier;
@@ -171,8 +186,6 @@ namespace mitk {
     mitk::DataNode::Pointer m_DataNode;
     /** @brief This member variable holds a mathamatical description of the tool */
     itk::SpatialObject<3>::Pointer m_SpatialObject;
-    /** @brief This member variable holds a pointer to the corresponding tracking tool in the hardware. */
-    mitk::TrackingTool::Pointer m_TrackingTool;
     /** @brief The path to the calibration file of the tool. */
     std::string m_CalibrationFile;
     /** @brief A unique serial number of the tool which is needed to identify the tool correctly. This is very important
@@ -181,16 +194,15 @@ namespace mitk {
     /** @brief   This member holds the tracking device type of the tool. */
     mitk::TrackingDeviceType m_TrackingDeviceType;
     /** @brief Holds landmarks for tool registration. */
-    mitk::PointSet::Pointer m_ToolRegistrationLandmarks;
-    /** @brief Holds landmarks for calibration of the defined points in the tool coordinate system,
+    mitk::PointSet::Pointer m_ToolLandmarks;
+    /** @brief Holds control points in the tool coordinate system,
       *        e.g. 2 landmarks for a 5DoF tool and 3 landmarks for a 6DoF tool.
       */
-    mitk::PointSet::Pointer m_ToolCalibrationLandmarks;
+    mitk::PointSet::Pointer m_ToolControlPoints;
     /** @brief Holds the position of the tool tip. */
     mitk::Point3D m_ToolTipPosition;
-    /** @brief Holds the orientation of the tool tip. */
-    mitk::Quaternion m_ToolTipOrientation;
-    //#################################################
+    /** @brief Holds the transformation of the main tool axis to the negative z-axis (0,0,-1) */
+    mitk::Quaternion m_ToolAxisOrientation;
 
   };
 } // namespace mitk

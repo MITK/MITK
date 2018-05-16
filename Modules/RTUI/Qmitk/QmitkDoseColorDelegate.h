@@ -32,13 +32,13 @@ public:
   ///
   /// Creates a new PropertyDelegate.
   ///
-  QmitkDoseColorDelegate(QObject *parent = 0);
+  explicit QmitkDoseColorDelegate(QObject *parent = nullptr);
 
   bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
-    const QModelIndex &index);
+    const QModelIndex &index) override;
 
   void paint(QPainter *painter, const QStyleOptionViewItem &option,
-    const QModelIndex &index) const;
+    const QModelIndex &index) const override;
 };
 
 #endif

@@ -798,7 +798,7 @@ namespace mitk
     {
       case OpORIENT:
       {
-        mitk::PlaneOperation *planeOp = dynamic_cast<mitk::PlaneOperation *>(operation);
+        auto *planeOp = dynamic_cast<mitk::PlaneOperation *>(operation);
         if (planeOp == nullptr)
         {
           return;
@@ -825,7 +825,7 @@ namespace mitk
       }
       case OpRESTOREPLANEPOSITION:
       {
-        RestorePlanePositionOperation *op = dynamic_cast<mitk::RestorePlanePositionOperation *>(operation);
+        auto *op = dynamic_cast<mitk::RestorePlanePositionOperation *>(operation);
         if (op == nullptr)
         {
           return;
@@ -875,7 +875,7 @@ namespace mitk
     pt2d_mm[0] = pt3d_units[0] * GetExtentInMM(0) / GetExtent(0);
     pt2d_mm[1] = pt3d_units[1] * GetExtentInMM(1) / GetExtent(1);
     pt3d_units[2] = 0;
-    return const_cast<BoundingBox *>(this->GetBoundingBox())->IsInside(pt3d_units);
+    return this->GetBoundingBox()->IsInside(pt3d_units);
   }
 
   void PlaneGeometry::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const
@@ -926,7 +926,7 @@ namespace mitk
     Superclass::WorldToIndex(pt3d_mm, pt3d_units);
     pt3d_units[2] = 0;
     projectedPt3d_mm = GetIndexToWorldTransform()->TransformPoint(pt3d_units);
-    return const_cast<BoundingBox *>(this->GetBoundingBox())->IsInside(pt3d_units);
+    return this->GetBoundingBox()->IsInside(pt3d_units);
   }
 
   bool PlaneGeometry::Project(const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const
@@ -954,7 +954,7 @@ namespace mitk
 
     Point3D pt3d_units;
     Superclass::WorldToIndex(atPt3d_mm, pt3d_units);
-    return const_cast<BoundingBox *>(this->GetBoundingBox())->IsInside(pt3d_units);
+    return this->GetBoundingBox()->IsInside(pt3d_units);
   }
 
   bool PlaneGeometry::Map(const mitk::Point3D &atPt3d_mm,

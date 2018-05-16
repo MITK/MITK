@@ -26,7 +26,7 @@ TiXmlElement *mitk::ProportionalTimeGeometryToXML::ToXML(const ProportionalTimeG
 {
   assert(timeGeom);
 
-  TiXmlElement *timeGeomElem = new TiXmlElement("ProportionalTimeGeometry");
+  auto *timeGeomElem = new TiXmlElement("ProportionalTimeGeometry");
   timeGeomElem->SetAttribute("NumberOfTimeSteps", timeGeom->CountTimeSteps());
   // TinyXML cannot serialize infinity (default value for time step)
   // So we guard this value and the first time point against serialization problems

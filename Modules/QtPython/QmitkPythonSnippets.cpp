@@ -141,8 +141,7 @@ QmitkPythonSnippets::QmitkPythonSnippets( const QString& _AutoSaveFileName, QWid
   d->m_Content->setObjectName(QString::fromUtf8("Content"));
   d->m_Content->setEnabled(false);
 
-  QmitkPythonScriptEditorHighlighter* highlighter =
-      new QmitkPythonScriptEditorHighlighter( d->m_Content->document() );
+  new QmitkPythonScriptEditorHighlighter( d->m_Content->document() );
 
   d->m_Layout = new QGridLayout;
   d->m_Layout->addWidget( d->m_Toolbar, 0, 0, 1, 1 );
@@ -294,7 +293,7 @@ void QmitkPythonSnippets::on_Name_currentIndexChanged(int i)
   }
 }
 
-void QmitkPythonSnippets::SaveStringMap(const QString &filename, const QmitkPythonSnippets::QStringMap &map) const
+void QmitkPythonSnippets::SaveStringMap(const QString &filename, const QmitkPythonSnippets::QStringMap &) const
 {
   MITK_DEBUG("QmitkPythonSnippets") << "saving to xml file " << filename.toStdString();
 

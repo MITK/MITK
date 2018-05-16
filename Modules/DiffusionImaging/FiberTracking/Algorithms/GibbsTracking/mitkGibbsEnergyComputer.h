@@ -19,12 +19,12 @@ class MITKFIBERTRACKING_EXPORT GibbsEnergyComputer : public EnergyComputer
 {
   public:
 
-    typedef itk::Vector<float, QBALL_ODFSIZE>   OdfVectorType;
-    typedef itk::Image<OdfVectorType, 3>        ItkQBallImgType;
+    typedef itk::Vector<float, ODF_SAMPLING_SIZE>   OdfVectorType;
+    typedef itk::Image<OdfVectorType, 3>        ItkOdfImgType;
     typedef itk::Image<float, 3>                ItkFloatImageType;
     typedef itk::Statistics::MersenneTwisterRandomVariateGenerator ItkRandGenType;
 
-    GibbsEnergyComputer(ItkQBallImgType* qballImage, ItkFloatImageType* mask, ParticleGrid* particleGrid, SphereInterpolator* interpolator, ItkRandGenType* randGen);
+    GibbsEnergyComputer(ItkOdfImgType* OdfImage, ItkFloatImageType* mask, ParticleGrid* particleGrid, SphereInterpolator* interpolator, ItkRandGenType* randGen);
 
     virtual ~GibbsEnergyComputer();
 
@@ -39,7 +39,7 @@ class MITKFIBERTRACKING_EXPORT GibbsEnergyComputer : public EnergyComputer
     float EvaluateOdf(vnl_vector_fixed<float, 3>& pos, vnl_vector_fixed<float, 3> dir);
   protected:
 
-    ItkQBallImgType*                m_Image;
+    ItkOdfImgType*                m_Image;
 
 };
 

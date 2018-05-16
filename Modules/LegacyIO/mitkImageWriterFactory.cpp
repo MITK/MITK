@@ -42,7 +42,7 @@ namespace mitk
 
   protected:
     CreateImageWriter() {}
-    ~CreateImageWriter() {}
+    ~CreateImageWriter() override {}
   private:
     CreateImageWriter(const Self &); // purposely not implemented
     void operator=(const Self &);    // purposely not implemented
@@ -51,7 +51,7 @@ namespace mitk
   ImageWriterFactory::ImageWriterFactory()
   {
     this->RegisterOverride(
-      "IOWriter", "ImageWriter", "Image Writer", 1, mitk::CreateImageWriter<mitk::ImageWriter>::New());
+      "IOWriter", "ImageWriter", "Image Writer", true, mitk::CreateImageWriter<mitk::ImageWriter>::New());
   }
 
   ImageWriterFactory::~ImageWriterFactory() {}

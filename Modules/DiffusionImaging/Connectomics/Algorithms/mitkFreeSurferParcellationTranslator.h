@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 
 using namespace mitk;
-using namespace std;
 
 namespace mitk
 {
@@ -42,12 +41,12 @@ namespace mitk
   {
       /*###########      Constructors, Typedefs and Enumerations      ###########*/
     public:
-      typedef map<string, string>  NameTable;
+      typedef std::map<std::string, std::string>  NameTable;
       mitkClassMacroItkParent( FreeSurferParcellationTranslator, itk::Object )
       itkNewMacro(    FreeSurferParcellationTranslator )
     protected:
       FreeSurferParcellationTranslator();
-      ~FreeSurferParcellationTranslator();
+      ~FreeSurferParcellationTranslator() override;
 
 
       /*###########      Methods      ###########*/
@@ -67,13 +66,13 @@ namespace mitk
        * @param name the label should be assigned to
        * @return label
        */
-      virtual const string              GetLabel( const string & name ) const;
+      virtual const std::string              GetLabel( const std::string & name ) const;
       /**
        * @brief Get the label assigned to the given name
        * @param name the label should be assigned to
        * @return label
        */
-      virtual int                       GetLabelAsNumber( const string & name ) const;
+      virtual int                       GetLabelAsNumber( const std::string & name ) const;
       /**
        * @brief Return the lookup table
        * @return lookup table
@@ -84,13 +83,13 @@ namespace mitk
        * @param label
        * @return name
        */
-      virtual const string              GetName( const string & label ) const;
+      virtual const std::string              GetName( const std::string & label ) const;
       /**
        * @brief Get the name assigned to the given label
        * @param label
        * @return name
        */
-      virtual const string              GetName( int label ) const;
+      virtual const std::string              GetName( int label ) const;
       /**
        * @brief Get the transfer function
        * @return transfer function

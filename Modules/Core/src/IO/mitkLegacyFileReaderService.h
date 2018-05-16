@@ -30,10 +30,10 @@ namespace mitk
     LegacyFileReaderService(const LegacyFileReaderService &other);
 
     LegacyFileReaderService(const std::vector<std::string> &extensions, const std::string &category);
-    virtual ~LegacyFileReaderService();
+    ~LegacyFileReaderService() override;
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
+    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
   private:
     LegacyFileReaderService *Clone() const override;

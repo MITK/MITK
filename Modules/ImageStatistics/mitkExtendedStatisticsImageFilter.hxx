@@ -30,10 +30,10 @@ namespace itk
       m_SumOfCubes(1),
       m_SumOfQuadruples(1),
       m_Count(1),
-      m_ThreadMin(1),
-      m_ThreadMax(1),
       m_PositivePixelCount(1),
       m_ThreadSumOfPositivePixels(1),
+      m_ThreadMin(1),
+      m_ThreadMax(1),
       m_UseHistogram(false),
       m_HistogramCalculated(false)
   {
@@ -74,18 +74,15 @@ namespace itk
     case 12:
       {
         return RealObjectType::New().GetPointer();
-        break;
       }
     case 13:
     {
       return RealObjectType::New().GetPointer();
-      break;
     }
     default:
       {
         // might as well make an image
         return Superclass::MakeOutput( output );
-        break;
       }
     }
   }
@@ -413,7 +410,7 @@ namespace itk
         {
         typename HistogramType::IndexType index;
         index.SetSize(1);
-        for ( unsigned int bin = 0; bin < m_NumBins; bin++ )
+        for ( int bin = 0; bin < m_NumBins; ++bin )
           {
           index[0] = bin;
           m_Histogram->IncreaseFrequency( bin, m_HistogramPerThread[i]->GetFrequency(bin) );

@@ -51,9 +51,9 @@ namespace mitk
             // check direction
             DirectionType imageDirection = m_Image->GetDirection();
             DirectionType maskDirection = m_Mask->GetDirection();
-            for( int i = 0; i < imageDirection.ColumnDimensions; ++i )
+            for(unsigned int i = 0; i < imageDirection.ColumnDimensions; ++i )
             {
-              for( int j = 0; j < imageDirection.ColumnDimensions; ++j )
+              for(unsigned int j = 0; j < imageDirection.ColumnDimensions; ++j )
               {
                 double differenceDirection = imageDirection[i][j] - maskDirection[i][j];
                 if ( fabs( differenceDirection ) > mitk::eps )

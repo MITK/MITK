@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkTrackingDeviceConfigurationWidget.h"
 
 #include "mitkNDIPolarisTypeInformation.h"
+#include "mitkNDIAuroraTypeInformation.h"
 
 #include <QSettings>
 
@@ -25,7 +26,6 @@ const std::string QmitkTrackingDeviceConfigurationWidget::VIEW_ID = "org.mitk.vi
 QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
   , m_Controls(nullptr)
-  , m_TrackingDevice(nullptr)
   , m_DeviceToWidgetIndexMap()
 {
   //initializations
@@ -48,7 +48,6 @@ QmitkTrackingDeviceConfigurationWidget::~QmitkTrackingDeviceConfigurationWidget(
 {
   StoreUISettings();
   delete m_Controls;
-  m_TrackingDevice = nullptr;
 }
 
 void QmitkTrackingDeviceConfigurationWidget::CreateQtPartControl(QWidget *parent)
@@ -190,23 +189,16 @@ void QmitkTrackingDeviceConfigurationWidget::AddOutput(std::string s)
   currentWidget->repaint();
 }
 
-mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructTrackingDevice()
+mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::GetTrackingDevice()
 {
   QmitkAbstractTrackingDeviceWidget* currentWidget = this->GetWidget(this->GetCurrentDeviceName());
 
-  if (currentWidget == nullptr)
+  if (currentWidget == nullptr || !currentWidget->IsDeviceInstalled())
   {
     return nullptr;
   }
 
-  return currentWidget->ConstructTrackingDevice();
-}
-
-mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::GetTrackingDevice()
-{
-  m_TrackingDevice = ConstructTrackingDevice();
-  if (m_TrackingDevice.IsNull() || !m_TrackingDevice->IsDeviceInstalled()) return nullptr;
-  else return this->m_TrackingDevice;
+  return currentWidget->GetTrackingDevice();
 }
 
 void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()
@@ -344,4 +336,27 @@ QmitkAbstractTrackingDeviceWidget* QmitkTrackingDeviceConfigurationWidget::GetWi
   }
 
   return nullptr;
+}
+
+void QmitkTrackingDeviceConfigurationWidget::OnConnected(bool _success)
+{
+  this->GetWidget(this->GetCurrentDeviceName())->OnConnected(_success);
+}
+void QmitkTrackingDeviceConfigurationWidget::OnDisconnected(bool _success)
+{
+  this->GetWidget(this->GetCurrentDeviceName())->OnDisconnected(_success);
+}
+
+void QmitkTrackingDeviceConfigurationWidget::OnStartTracking(bool _success)
+{
+  this->GetWidget(this->GetCurrentDeviceName())->OnStartTracking(_success);
+}
+void QmitkTrackingDeviceConfigurationWidget::OnStopTracking(bool _success)
+{
+  this->GetWidget(this->GetCurrentDeviceName())->OnStopTracking(_success);
+}
+
+void QmitkTrackingDeviceConfigurationWidget::OnToolStorageChanged()
+{
+  this->GetWidget(this->GetCurrentDeviceName())->OnToolStorageChanged();
 }

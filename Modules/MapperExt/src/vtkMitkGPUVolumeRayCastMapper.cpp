@@ -29,10 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 =========================================================================*/
 
 #include "vtkMitkGPUVolumeRayCastMapper.h"
-
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 6)))
-
 #include "vtkCamera.h"
 #include "vtkCellData.h"
 #include "vtkCommand.h" // for VolumeMapperRender{Start|End|Progress}Event
@@ -49,9 +45,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkTimerLog.h"
 #include "vtkVolume.h"
 #include "vtkVolumeProperty.h"
-#include <assert.h>
+#include <cassert>
 
-vtkInstantiatorNewMacro(vtkMitkGPUVolumeRayCastMapper);
 vtkCxxSetObjectMacro(vtkMitkGPUVolumeRayCastMapper, MaskInput, vtkImageData);
 vtkCxxSetObjectMacro(vtkMitkGPUVolumeRayCastMapper, TransformedInput, vtkImageData);
 
@@ -299,7 +294,7 @@ int vtkMitkGPUVolumeRayCastMapper::ValidateRender(vtkRenderer *ren, vtkVolume *v
 
   if (goodSoFar && !this->TransformedInput)
   {
-    vtkErrorMacro("Input is NULL but is required");
+    vtkErrorMacro("Input is nullptr but is required");
     goodSoFar = 0;
   }
 
@@ -618,6 +613,7 @@ void vtkMitkGPUVolumeRayCastMapper::ClipCroppingRegionPlanes()
     {
       this->ClippedCroppingRegionPlanes[i] = volBounds[i];
     }
+
     else
     {
       this->ClippedCroppingRegionPlanes[i] = this->CroppingRegionPlanes[i];
@@ -625,5 +621,3 @@ void vtkMitkGPUVolumeRayCastMapper::ClipCroppingRegionPlanes()
     ++i;
   }
 }
-
-#endif

@@ -39,7 +39,7 @@ class org_blueberry_core_runtime_EXPORT ExtensionTracker : public IExtensionTrac
 public:
 
   ExtensionTracker();
-  ~ExtensionTracker();
+  ~ExtensionTracker() override;
 
   /**
    * Construct a new instance of the extension tracker using the given registry

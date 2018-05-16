@@ -27,7 +27,7 @@ class mitkSpectralUnmixingTestSuite : public mitk::TestFixture
 
 private:
   mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter;
-  mitk::Image *inputImage;
+  mitk::Image::Pointer inputImage;
   std::vector<float> m_inputWavelengths;
   std::vector<float> m_CorrectResult;
 
@@ -37,18 +37,14 @@ public:
   {
     MITK_INFO << "setUp ... ";
     //Set empty input image:
+    inputImage = mitk::Image::New();
     mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();
     const int NUMBER_OF_SPATIAL_DIMENSIONS = 3;
     auto* dimensions = new unsigned int[NUMBER_OF_SPATIAL_DIMENSIONS];
 
-    //Set dimensions of input inmage;
-    unsigned int xDim = 1;
-    unsigned int yDim = 1;
-    unsigned int zDim = 3;
-
-    dimensions[0] = xDim;
-    dimensions[0] = yDim;
-    dimensions[2] = zDim;
+    dimensions[0] = 1;
+    dimensions[0] = 1;
+    dimensions[2] = 3;
 
     //Initialie empty input image:
     inputImage->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);
@@ -71,39 +67,27 @@ public:
     std::vector<float> m_Value;
     for (unsigned int j = 0; j < m_inputWavelengths.size(); ++j)
     {
-      m_Value.push_back(fracHb*(m_PropertyCalculator->GetAbsorptionForWavelength(
-        static_cast<mitk::pa::PropertyCalculator::MapType>(1), m_inputWavelengths[j]))*
-        fracHbO2*(m_PropertyCalculator->GetAbsorptionForWavelength(
-          static_cast<mitk::pa::PropertyCalculator::MapType>(2), m_inputWavelengths[j])));
+      m_Value.push_back(
+        fracHb * (m_PropertyCalculator->GetAbsorptionForWavelength(
+          mitk::pa::PropertyCalculator::MapType::OXYGENATED, m_inputWavelengths[j]))
+        + fracHbO2 * (m_PropertyCalculator->GetAbsorptionForWavelength(
+          mitk::pa::PropertyCalculator::MapType::DEOXYGENATED, m_inputWavelengths[j])));
     }
 
-    //Write pixel values into image (1 dimension equals 1 wavelength:
-    mitk::ImageWriteAccessor writeAccess(inputImage);
+    float* data = new(float[3]);
+    data[0] = m_Value[0];
+    data[1] = m_Value[1];
+    data[2] = m_Value[2];
 
-    for (int x = 0; x < xDim; ++x)
-    {
-      for (int y = 0; y < yDim; ++y)
-      {
-        for (int z = 0; z < zDim; ++z)
-        {
-          // write value[z] @ pixel
-          float* writeBuffer = (float *)writeAccess.GetData();
-          writeBuffer[z] = m_Value[z];
-        }
-      }
-    }
-    MITK_INFO << "[DONE]";
-  }
+    inputImage->SetImportVolume(data);
+    delete[] data;
 
-  void testSUAlgorithm()
-  {
-    MITK_INFO << "START FILTER TEST ... ";
     //Set input into filter
     auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
     m_SpectralUnmixingFilter->SetInput(inputImage);
 
     // Set Algortihm to filter
-    int SetAlgorithmIndex = 0; // 0-7
+    int SetAlgorithmIndex = mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr;
     m_SpectralUnmixingFilter->SetAlgorithm(SetAlgorithmIndex);
 
     //Set wavelengths to filter
@@ -120,13 +104,25 @@ public:
     m_SpectralUnmixingFilter->AddChromophore(
       mitk::pa::SpectralUnmixingFilterBase::ChromophoreType::DEOXYGENATED_HEMOGLOBIN);
 
+    MITK_INFO << "[DONE]";
+  }
+
+  void testSUAlgorithm()
+  {
+    MITK_INFO << "START FILTER TEST ... ";
+
     //compare filter result (output) with theoretical result
     float threshold = 1e-5;
     for (int i = 0; i < 2; ++i)
     {
       mitk::Image::Pointer output = m_SpectralUnmixingFilter->GetOutput(i);
-      MITK_INFO << "output: " << output;
-      //CPPUNIT_ASSERT((output - m_CorrectResult[i])<threshold);
+
+      mitk::ImageReadAccessor readAccess(output);
+
+      const float* inputDataArray = ((const float*)readAccess.GetData());
+
+      auto pixel = inputDataArray[0];
+      CPPUNIT_ASSERT((pixel - m_CorrectResult[i])<threshold);
     }
     MITK_INFO << "FILTER TEST SUCCESFULL :)";
   }

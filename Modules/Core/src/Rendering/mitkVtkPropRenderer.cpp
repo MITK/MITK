@@ -535,7 +535,8 @@ void mitk::VtkPropRenderer::UpdatePaths()
       Mapper *mapper = (*iter)->GetMapper(BaseRenderer::Standard3D);
       if (mapper)
       {
-        VtkMapper *vtkmapper = dynamic_cast<VtkMapper *>(mapper);
+        auto *vtkmapper = dynamic_cast<VtkMapper *>(mapper);
+        if (vtkmapper)
         {
           vtkProp *prop = vtkmapper->GetVtkProp(this);
           if (prop && prop->GetVisibility())

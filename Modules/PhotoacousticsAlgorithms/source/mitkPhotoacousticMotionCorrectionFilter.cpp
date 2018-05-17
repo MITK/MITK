@@ -40,11 +40,99 @@ mitk::PhotoacousticMotionCorrectionFilter::
 mitk::PhotoacousticMotionCorrectionFilter::
     ~PhotoacousticMotionCorrectionFilter() {}
 
-// TODO: Find out how to throw the right errors
+// Setters and Getters
+// TODO: refactor member variables
+void mitk::PhotoacousticMotionCorrectionFilter::SetBatchSize(unsigned int batch) {
+  m_batch = batch;
+}
+
+unsigned int mitk::PhotoacousticMotionCorrectionFilter::GetBatchSize() {
+  return m_batch;
+}
+
+void mitk::PhotoacousticMotionCorrectionFilter::SetPyrScale(double pyr_scale) {
+  m_pyr_scale = pyr_scale;
+}
+
+double mitk::PhotoacousticMotionCorrectionFilter::GetPyrScale() {
+  return m_pyr_scale;
+}
+
+void mitk::PhotoacousticMotionCorrectionFilter::SetLevels(unsigned int levels) {
+  m_levels = levels;
+}
+
+unsigned int mitk::PhotoacousticMotionCorrectionFilter::GetLevels() {
+  return m_levels;
+}
+
+void mitk::PhotoacousticMotionCorrectionFilter::SetWindowSize(unsigned int winsize) {
+  m_winsize = winsize;
+}
+
+unsigned int mitk::PhotoacousticMotionCorrectionFilter::GetWindowSize() {
+  return m_winsize;
+}
+
+void mitk::PhotoacousticMotionCorrectionFilter::SetIterations(unsigned int iterations) {
+  m_iterations = iterations;
+}
+
+unsigned int mitk::PhotoacousticMotionCorrectionFilter::GetIterations() {
+  return m_iterations;
+}
+
+void mitk::PhotoacousticMotionCorrectionFilter::SetPolyN(unsigned int poly_n) {
+  m_poly_n = poly_n;
+}
+
+unsigned int mitk::PhotoacousticMotionCorrectionFilter::GetPolyN() {
+  return m_poly_n;
+}
+
+void mitk::PhotoacousticMotionCorrectionFilter::SetPolySigma(double poly_sigma) {
+  m_poly_sigma = poly_sigma;
+}
+
+double mitk::PhotoacousticMotionCorrectionFilter::GetPolySigma() {
+  return m_poly_sigma;
+}
+
+void mitk::PhotoacousticMotionCorrectionFilter::SetFlags(unsigned int flags) {
+  m_flags = flags;
+}
+
+unsigned int mitk::PhotoacousticMotionCorrectionFilter::GetFlags() {
+  return m_flags;
+}
+
+void mitk::PhotoacousticMotionCorrectionFilter::SetPaInput(const mitk::Image::Pointer input) {
+  this->SetInput(0, input);
+}
+
+mitk::Image::Pointer mitk::PhotoacousticMotionCorrectionFilter::GetPaInput() {
+  return this->GetInput(0);
+}
+
+void mitk::PhotoacousticMotionCorrectionFilter::SetUsInput(const mitk::Image::Pointer input) {
+  this->SetInput(1, input);
+}
+
+mitk::Image::Pointer mitk::PhotoacousticMotionCorrectionFilter::GetUsInput() {
+  return this->GetInput(1);
+}
+
+mitk::Image::Pointer mitk::PhotoacousticMotionCorrectionFilter::GetPaOutput() {
+  return this->GetOutput(0);
+}
+
+mitk::Image::Pointer mitk::PhotoacousticMotionCorrectionFilter::GetUsOutput() {
+  return this->GetOutput(1);
+}
+
 void mitk::PhotoacousticMotionCorrectionFilter::CheckInput(mitk::Image::Pointer paImage, mitk::Image::Pointer usImage) {
   // Check that we actually got some images
   if (!paImage || !usImage) {
-    // TODO: Throw some error here
     MITK_INFO << "We did not get two images!";
     throw std::invalid_argument("One of the images was NULL.");
   }
@@ -53,7 +141,6 @@ void mitk::PhotoacousticMotionCorrectionFilter::CheckInput(mitk::Image::Pointer 
   if (paImage->GetDimension() != 3 || usImage->GetDimension() != 3) {
     MITK_INFO << "Mismatching image dimensions detected in the motion "
       "compensation filter.";
-    // TODO: Throw some error here
     throw std::invalid_argument("Both images must have dimension 3.");
   }
 
@@ -62,7 +149,6 @@ void mitk::PhotoacousticMotionCorrectionFilter::CheckInput(mitk::Image::Pointer 
     if (paImage->GetDimensions()[i] != usImage->GetDimensions()[i]) {
       MITK_INFO << "Mismatching image dimensions detected in the motion "
         "compensation filter.";
-      // TODO: Throw some error here
       throw std::invalid_argument("Both images must have the same length in each dimension.");
     }
   }

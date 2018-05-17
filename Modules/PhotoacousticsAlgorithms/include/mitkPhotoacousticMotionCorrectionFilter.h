@@ -53,7 +53,30 @@ namespace mitk
 
     /* void SetInput(Image::Pointer paImage, Image::Pointer usImage); */
 
-    // TODO: implement setters and getters for all the parameters
+    void SetBatchSize(unsigned int);
+    unsigned int GetBatchSize();
+    void SetPyrScale(double);
+    double GetPyrScale();
+    void SetLevels(unsigned int);
+    unsigned int GetLevels();
+    void SetWindowSize(unsigned int);
+    unsigned int GetWindowSize();
+    void SetIterations(unsigned int);
+    unsigned int GetIterations();
+    void SetPolyN(unsigned int);
+    unsigned int GetPolyN();
+    void SetPolySigma(double);
+    double GetPolySigma();
+    void SetFlags(unsigned int);
+    unsigned int GetFlags();
+
+    // Wrapper for SetInput, GetInput and GetOutput
+    void SetPaInput(const mitk::Image::Pointer);
+    mitk::Image::Pointer GetPaInput();
+    void SetUsInput(const mitk::Image::Pointer);
+    mitk::Image::Pointer GetUsInput();
+    mitk::Image::Pointer GetPaOutput();
+    mitk::Image::Pointer GetUsOutput();
 
   protected:
     PhotoacousticMotionCorrectionFilter();

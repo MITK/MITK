@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBasePropertySerializer.h"
 
 #include "mitkProperties.h"
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 
 #include <MitkSceneSerializationBaseExports.h>
 

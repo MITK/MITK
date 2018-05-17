@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #define RAPIDXML_NO_EXCEPTIONS
 #include <boost/foreach.hpp>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <itkImageFileWriter.h>
 #include <itkImageFileReader.h>
 #include <mitkLog.h>

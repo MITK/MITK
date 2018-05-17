@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkCoreObjectFactory.h>
 #include "mitkImage.h"
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include "mitkCommandLineParser.h"
 #include <mitkIOUtil.h>
 #include <itksys/SystemTools.hxx>

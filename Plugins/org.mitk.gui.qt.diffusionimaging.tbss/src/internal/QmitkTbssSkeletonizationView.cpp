@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMatrix4x4.h>
 
 // Boost
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 
 
 

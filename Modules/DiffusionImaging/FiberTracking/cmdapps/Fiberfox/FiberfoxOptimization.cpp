@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommandLineParser.h"
 
 #include <itkTractsToDWIImageFilter.h>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkFiberfoxParameters.h>

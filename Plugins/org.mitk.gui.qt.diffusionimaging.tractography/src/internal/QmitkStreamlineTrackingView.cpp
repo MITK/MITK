@@ -53,7 +53,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkTensorImageToOdfImageFilter.h>
 #include <omp.h>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 
 const std::string QmitkStreamlineTrackingView::VIEW_ID = "org.mitk.views.streamlinetracking";
 const std::string id_DataManager = "org.mitk.views.datamanager";

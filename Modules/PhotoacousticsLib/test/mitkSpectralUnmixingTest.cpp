@@ -18,6 +18,7 @@
 
 #include <mitkPASpectralUnmixingFilterBase.h>
 #include <mitkPALinearSpectralUnmixingFilter.h>
+#include <mitkImageReadAccessor.h>
 
 class mitkSpectralUnmixingTestSuite : public mitk::TestFixture
 {
@@ -62,24 +63,22 @@ public:
     m_CorrectResult.push_back(fracHb);
     m_CorrectResult.push_back(fracHbO2);
 
-    //Calculate values of wavelengths and multiply with fractions to get pixel values:
-    mitk::pa::PropertyCalculator::Pointer m_PropertyCalculator;
-    std::vector<float> m_Value;
-    for (unsigned int j = 0; j < m_inputWavelengths.size(); ++j)
-    {
-      m_Value.push_back(
-        fracHb * (m_PropertyCalculator->GetAbsorptionForWavelength(
-          mitk::pa::PropertyCalculator::MapType::OXYGENATED, m_inputWavelengths[j]))
-        + fracHbO2 * (m_PropertyCalculator->GetAbsorptionForWavelength(
-          mitk::pa::PropertyCalculator::MapType::DEOXYGENATED, m_inputWavelengths[j])));
-    }
+    //Calculate values of wavelengths (750,800,850 nm) and multiply with fractions to get pixel values:
+    float px1 = fracHb * 7.52 + fracHbO2 * 2.77;
+    float px2 = fracHb * 4.08 + fracHbO2 * 4.37;
+    float px3 = fracHb * 3.7 + fracHbO2 * 5.67;
+    std::vector<float> m_Value{px1,px2,px3};
 
-    float* data = new(float[3]);
+    float *data = new(float[3]);
     data[0] = m_Value[0];
     data[1] = m_Value[1];
     data[2] = m_Value[2];
 
-    inputImage->SetImportVolume(data);
+    MITK_INFO << "data0 " << data[0];
+    MITK_INFO << "data1 " << data[1];
+    MITK_INFO << "data2 " << data[2];
+
+    inputImage->SetImportVolume(data); // fails here but data is correct!
     delete[] data;
 
     //Set input into filter
@@ -87,8 +86,7 @@ public:
     m_SpectralUnmixingFilter->SetInput(inputImage);
 
     // Set Algortihm to filter
-    int SetAlgorithmIndex = mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr;
-    m_SpectralUnmixingFilter->SetAlgorithm(SetAlgorithmIndex);
+    m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr);
 
     //Set wavelengths to filter
     for (unsigned int imageIndex = 0; imageIndex < m_inputWavelengths.size(); imageIndex++)

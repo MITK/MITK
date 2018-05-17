@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTransferFunctionPropertySerializer.h"
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <mitkLocaleSwitch.h>
 
 namespace mitk

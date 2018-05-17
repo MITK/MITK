@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractsToVectorImageFilter.h>
 #include <itkTractsToFiberEndingsImageFilter.h>
 
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 
 const std::string QmitkFiberQuantificationView::VIEW_ID = "org.mitk.views.fiberquantification";
 using namespace mitk;

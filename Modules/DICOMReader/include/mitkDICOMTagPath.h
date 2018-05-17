@@ -146,7 +146,7 @@ namespace mitk
     DICOMTagPath(const DICOMTag& tag);
     explicit DICOMTagPath(unsigned int group, unsigned int element);
 
-    ~DICOMTagPath();
+    virtual ~DICOMTagPath();
 
     virtual void Reset();
 

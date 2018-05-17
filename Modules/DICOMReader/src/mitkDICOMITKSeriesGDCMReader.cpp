@@ -397,7 +397,7 @@ mitk::ReaderImplementationLevel
   gdcm::UIDs uidKnowledge;
   uidKnowledge.SetFromUID( sopClassUID.c_str() );
 
-  gdcm::UIDs::TSType gdcmType = uidKnowledge;
+  gdcm::UIDs::TSName gdcmType = static_cast<gdcm::UIDs::TSName>((gdcm::UIDs::TSType)uidKnowledge);
 
   switch ( gdcmType )
   {

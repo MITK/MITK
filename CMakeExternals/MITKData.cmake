@@ -21,7 +21,7 @@ if(BUILD_TESTING)
     GIT_REPOSITORY https://phabricator.mitk.org/source/mitkdata.git
     GIT_TAG ${revision_tag}
 #   URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/mitk-data_${revision_tag}.tar.gz
-    UPDATE_COMMAND ""
+#   UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
     INSTALL_COMMAND ""

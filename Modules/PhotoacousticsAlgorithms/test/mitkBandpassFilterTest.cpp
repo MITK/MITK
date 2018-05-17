@@ -48,6 +48,7 @@ private:
   const float HIGHPASS_FREQENCY = MAX_FREQUENCY * 0.8f; // [MHz]
   const float LOWPASS_FREQENCY = MAX_FREQUENCY * 0.1f; // [MHz]
   const float ALPHA = 0; // 0 = box, 1 = von Hann; changing this may make the test invalid
+  const float EPSILON_FFT = 0.00001f;
 
 public:
 
@@ -133,7 +134,7 @@ public:
               unsigned int outPos = x + y * DATA_XY_DIM + z * DATA_XY_DIM * DATA_XY_DIM;
               std::complex<float> value = fftResult->GetPixel({ x,y,z });
               CPPUNIT_ASSERT_MESSAGE(std::string("Expected 0, got (" + std::to_string(value.real()) + " + " + std::to_string(value.imag()) + "i) at " + std::to_string(x)+"-"+std::to_string(y)+"-"+std::to_string(z)),
-                (abs(value.real()) < 0.00001) && (abs(value.imag() < 0.00001)));
+                (abs(value.real()) < EPSILON_FFT) && (abs(value.imag() < EPSILON_FFT)));
             }
           }
         }
@@ -147,7 +148,7 @@ public:
               unsigned int outPos = x + y * DATA_XY_DIM + z * DATA_XY_DIM * DATA_XY_DIM;
               std::complex<float> value = fftResult->GetPixel({ x,y,z });
               CPPUNIT_ASSERT_MESSAGE(std::string("Expected 0, got (" + std::to_string(value.real()) + " + " + std::to_string(value.imag()) + "i) at " + std::to_string(x) + "-" + std::to_string(y) + "-" + std::to_string(z)),
-                (abs(value.real()) < 0.00001) && (abs(value.imag() < 0.00001)));
+                (abs(value.real()) < EPSILON_FFT) && (abs(value.imag() < EPSILON_FFT)));
             }
           }
         }

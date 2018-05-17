@@ -72,7 +72,7 @@ namespace mitk
     gdcm::UIDs uidKnowledge;
     uidKnowledge.SetFromUID(m_SOPClassUID.c_str());
 
-    gdcm::UIDs::TSType uid = uidKnowledge;
+    gdcm::UIDs::TSName uid = static_cast<gdcm::UIDs::TSName>((gdcm::UIDs::TSType)uidKnowledge);
 
     switch (uid)
     {

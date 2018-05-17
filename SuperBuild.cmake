@@ -31,9 +31,6 @@ if(UNIX AND NOT APPLE)
   # Check for libtiff4-dev
   mitkFunctionCheckPackageHeader(tiff.h libtiff4-dev)
 
-  # Check for libwrap0-dev
-  mitkFunctionCheckPackageHeader(tcpd.h libwrap0-dev)
-
 endif()
 
 # We need a proper patch program. On Linux and MacOS, we assume

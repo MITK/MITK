@@ -64,7 +64,10 @@ namespace mitk
     void CheckInput(mitk::Image::Pointer paImage, mitk::Image::Pointer usImage);
     void InitializeOutput(mitk::Image::Pointer paInput, mitk::Image::Pointer usInput, mitk::Image::Pointer paOutput, mitk::Image::Pointer usOutput);
     void SetOutputData(mitk::Image::Pointer input, mitk::Image::Pointer output);
-    //##Description
+    void PerformCorrection(mitk::Image::Pointer paInput, mitk::Image::Pointer usInput, mitk::Image::Pointer paOutput, mitk::Image::Pointer usOutput);
+    cv::Mat GetMatrix(const mitk::Image::Pointer input, unsigned int i);
+    void EnterMatrixInPosition(cv::Mat mat, mitk::Image::Pointer output, unsigned int i);
+     //##Description
     //## @brief Time when Header was last initialized
     /* itk::TimeStamp m_TimeOfHeaderInitialization; */
 
@@ -81,6 +84,7 @@ namespace mitk
     // TODO: Note that there is always a float conversion inbetween
     itk::Image<float>::Pointer m_itkPaImage, m_itkUsImage;
     mitk::OpenCVToMitkImageFilter::Pointer m_OpenCVToImageFilter = mitk::OpenCVToMitkImageFilter::New();
+    mitk::ImageToOpenCVImageFilter::Pointer m_ImageToOpenCVFilter = mitk::ImageToOpenCVImageFilter::New();
   };
 }
 #endif

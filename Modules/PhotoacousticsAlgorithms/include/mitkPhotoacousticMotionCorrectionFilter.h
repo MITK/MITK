@@ -59,22 +59,23 @@ namespace mitk
 
     itkFactorylessNewMacro(Self);
 
-    void SetBatchSize(unsigned int);
-    unsigned int GetBatchSize();
-    void SetPyrScale(double);
-    double GetPyrScale();
-    void SetLevels(unsigned int);
-    unsigned int GetLevels();
-    void SetWindowSize(unsigned int);
-    unsigned int GetWindowSize();
-    void SetIterations(unsigned int);
-    unsigned int GetIterations();
-    void SetPolyN(unsigned int);
-    unsigned int GetPolyN();
-    void SetPolySigma(double);
-    double GetPolySigma();
-    void SetFlags(unsigned int);
-    unsigned int GetFlags();
+    // Setters and Getters for the class variables
+    itkSetMacro(Batch, unsigned int);
+    itkSetMacro(PyrScale, double);
+    itkSetMacro(Levels, unsigned int);
+    itkSetMacro(WinSize, unsigned int);
+    itkSetMacro(Iterations, unsigned int);
+    itkSetMacro(PolyN, unsigned int);
+    itkSetMacro(PolySigma, double);
+    itkSetMacro(Flags, unsigned int);
+    itkGetMacro(Batch, unsigned int);
+    itkGetMacro(PyrScale, double);
+    itkGetMacro(Levels, unsigned int);
+    itkGetMacro(WinSize, unsigned int);
+    itkGetMacro(Iterations, unsigned int);
+    itkGetMacro(PolyN, unsigned int);
+    itkGetMacro(PolySigma, double);
+    itkGetMacro(Flags, unsigned int);
 
     // Wrapper for SetInput, GetInput and GetOutput
     void SetPaInput(const mitk::Image::Pointer);

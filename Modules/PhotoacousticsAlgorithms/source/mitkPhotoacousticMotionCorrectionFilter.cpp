@@ -41,6 +41,72 @@ mitk::PhotoacousticMotionCorrectionFilter::
     ~PhotoacousticMotionCorrectionFilter() {}
 
 /*!
+ * \brief Wrapper which sets the photoacoustic image as the correct input
+ *
+ * This method is a wrapper around the @c SetInput method. It is implemented for convenience such that you do not have to remember which input is for which image.
+ *
+ * @param input The photoacoustic image
+ */
+void mitk::PhotoacousticMotionCorrectionFilter::SetPaInput(mitk::Image::Pointer input) {
+  this->SetInput(0, input);
+}
+
+/*!
+  * \brief Wrapper which gets the photoacoustic image out of the correct input
+  *
+  * This method is a wrapper around the @c GetInput method. It is implemented for convenience such that you do not have to remember which input is for which image.
+  *
+  * @return The photoacoustic image
+  */
+mitk::Image::Pointer mitk::PhotoacousticMotionCorrectionFilter::GetPaInput() {
+  return this->GetInput(0);
+}
+
+/*!
+ * \brief Wrapper which sets the ultrasonic image as the correct input
+ *
+ * This method is a wrapper around the @c SetInput method. It is implemented for convenience such that you do not have to remember which input is for which image.
+ *
+ * @param input The ultrasonic image
+ */
+void mitk::PhotoacousticMotionCorrectionFilter::SetUsInput(mitk::Image::Pointer input) {
+  this->SetInput(1, input);
+}
+
+/*!
+  * \brief Wrapper which gets the ultrasonic image out of the correct input
+  *
+  * This method is a wrapper around the @c GetInput method. It is implemented for convenience such that you do not have to remember which input is for which image.
+  *
+  * @return The ultrasonic image
+  */
+mitk::Image::Pointer mitk::PhotoacousticMotionCorrectionFilter::GetUsInput() {
+  return this->GetInput(1);
+}
+
+/*!
+  * \brief Wrapper which gets the photoacoustic image out of the correct output
+  *
+  * This method is a wrapper around the @c GetOutput method. It is implemented for convenience such that you do not have to remember which output is for which image.
+  *
+  * @return The photoacoustic image
+  */
+mitk::Image::Pointer mitk::PhotoacousticMotionCorrectionFilter::GetPaOutput() {
+  return this->GetOutput(0);
+}
+
+/*!
+  * \brief Wrapper which gets the ultrasonic image out of the correct output
+  *
+  * This method is a wrapper around the @c GetOutput method. It is implemented for convenience such that you do not have to remember which output is for which image.
+  *
+  * @return The ultrasonic image
+  */
+mitk::Image::Pointer mitk::PhotoacousticMotionCorrectionFilter::GetUsOutput() {
+  return this->GetOutput(1);
+}
+
+/*!
  * \brief Validate the input images
  *
  * The input images have to be non-empty, 3d and have to coincide in the length in each dimension. If any of these conditions are violated, the method will throw an @c invalid_argument exception.

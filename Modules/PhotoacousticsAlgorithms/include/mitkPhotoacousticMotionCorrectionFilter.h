@@ -78,9 +78,9 @@ namespace mitk
     itkGetMacro(Flags, unsigned int);
 
     // Wrapper for SetInput, GetInput and GetOutput
-    void SetPaInput(const mitk::Image::Pointer);
+    void SetPaInput(mitk::Image::Pointer);
     mitk::Image::Pointer GetPaInput();
-    void SetUsInput(const mitk::Image::Pointer);
+    void SetUsInput(mitk::Image::Pointer);
     mitk::Image::Pointer GetUsInput();
     mitk::Image::Pointer GetPaOutput();
     mitk::Image::Pointer GetUsOutput();

@@ -98,14 +98,13 @@ namespace mitk
     // InputData
     /* mitk::Image::Pointer m_paImage, m_usImage, m_paCompensated, m_usCompensated; */
     // Parameters
-    double m_pyr_scale, m_poly_sigma;
-    unsigned int m_levels, m_winsize, m_iterations, m_poly_n, m_flags, m_batch;
+    double m_PyrScale, m_PolySigma;
+    unsigned int m_Levels, m_WinSize, m_Iterations, m_PolyN, m_Flags, m_Batch;
     /* // Stuff that OpenCV needs */
     cv::UMat m_UsRef, m_PaMat, m_UsMat, m_Flow;
     cv::Mat m_PaRes, m_UsRes, m_PaMatC, m_UsMatC;
     // middle step conversion from MITK::image to cv::Mat
     // TODO: Note that there is always a float conversion inbetween
-    itk::Image<float>::Pointer m_itkPaImage, m_itkUsImage;
     mitk::OpenCVToMitkImageFilter::Pointer m_OpenCVToImageFilter = mitk::OpenCVToMitkImageFilter::New();
     mitk::ImageToOpenCVImageFilter::Pointer m_ImageToOpenCVFilter = mitk::ImageToOpenCVImageFilter::New();
   };

@@ -22,14 +22,14 @@ mitk::PhotoacousticMotionCorrectionFilter::
   // Set the defaults for the OpticalFlowFarneback algorithm
   // The values are taken directly out of Thomas's
   // US-CV-Based-Optical-Flow-Carotis.ipyn
-  m_batch = 5;
-  m_pyr_scale = 0.5;
-  m_levels = 1;
-  m_winsize = 40;
-  m_iterations = 2;
-  m_poly_n = 7;
-  m_poly_sigma = 1.5;
-  m_flags = 0;
+  m_Batch = 5;
+  m_PyrScale = 0.5;
+  m_Levels = 1;
+  m_WinSize = 40;
+  m_Iterations = 2;
+  m_PolyN = 7;
+  m_PolySigma = 1.5;
+  m_Flags = 0;
 
   this->SetNumberOfIndexedInputs(2);
   this->SetNumberOfIndexedOutputs(2);
@@ -43,67 +43,67 @@ mitk::PhotoacousticMotionCorrectionFilter::
 // Setters and Getters
 // TODO: refactor member variables
 void mitk::PhotoacousticMotionCorrectionFilter::SetBatchSize(unsigned int batch) {
-  m_batch = batch;
+  m_Batch = batch;
 }
 
 unsigned int mitk::PhotoacousticMotionCorrectionFilter::GetBatchSize() {
-  return m_batch;
+  return m_Batch;
 }
 
 void mitk::PhotoacousticMotionCorrectionFilter::SetPyrScale(double pyr_scale) {
-  m_pyr_scale = pyr_scale;
+  m_PyrScale = pyr_scale;
 }
 
 double mitk::PhotoacousticMotionCorrectionFilter::GetPyrScale() {
-  return m_pyr_scale;
+  return m_PyrScale;
 }
 
 void mitk::PhotoacousticMotionCorrectionFilter::SetLevels(unsigned int levels) {
-  m_levels = levels;
+  m_Levels = levels;
 }
 
 unsigned int mitk::PhotoacousticMotionCorrectionFilter::GetLevels() {
-  return m_levels;
+  return m_Levels;
 }
 
 void mitk::PhotoacousticMotionCorrectionFilter::SetWindowSize(unsigned int winsize) {
-  m_winsize = winsize;
+  m_WinSize = winsize;
 }
 
 unsigned int mitk::PhotoacousticMotionCorrectionFilter::GetWindowSize() {
-  return m_winsize;
+  return m_WinSize;
 }
 
 void mitk::PhotoacousticMotionCorrectionFilter::SetIterations(unsigned int iterations) {
-  m_iterations = iterations;
+  m_Iterations = iterations;
 }
 
 unsigned int mitk::PhotoacousticMotionCorrectionFilter::GetIterations() {
-  return m_iterations;
+  return m_Iterations;
 }
 
 void mitk::PhotoacousticMotionCorrectionFilter::SetPolyN(unsigned int poly_n) {
-  m_poly_n = poly_n;
+  m_PolyN = poly_n;
 }
 
 unsigned int mitk::PhotoacousticMotionCorrectionFilter::GetPolyN() {
-  return m_poly_n;
+  return m_PolyN;
 }
 
 void mitk::PhotoacousticMotionCorrectionFilter::SetPolySigma(double poly_sigma) {
-  m_poly_sigma = poly_sigma;
+  m_PolySigma = poly_sigma;
 }
 
 double mitk::PhotoacousticMotionCorrectionFilter::GetPolySigma() {
-  return m_poly_sigma;
+  return m_PolySigma;
 }
 
 void mitk::PhotoacousticMotionCorrectionFilter::SetFlags(unsigned int flags) {
-  m_flags = flags;
+  m_Flags = flags;
 }
 
 unsigned int mitk::PhotoacousticMotionCorrectionFilter::GetFlags() {
-  return m_flags;
+  return m_Flags;
 }
 
 void mitk::PhotoacousticMotionCorrectionFilter::SetPaInput(const mitk::Image::Pointer input) {
@@ -191,10 +191,10 @@ void mitk::PhotoacousticMotionCorrectionFilter::PerformCorrection(mitk::Image::P
 
     // If batch size was set to 0, use one single batch for the whole data set.
     unsigned int batch;
-    if (m_batch == 0) {
+    if (m_Batch == 0) {
       batch = paInput->GetDimensions()[2];
     } else {
-      batch = m_batch;
+      batch = m_Batch;
     }
 
     // At the beginning of a batch we set the new reference image and directly write the result images
@@ -204,9 +204,9 @@ void mitk::PhotoacousticMotionCorrectionFilter::PerformCorrection(mitk::Image::P
       m_UsRes = m_UsMatC.clone();
       m_PaRes = m_PaMatC.clone();
     } else {
-      cv::calcOpticalFlowFarneback(m_UsRef, m_UsMat, m_Flow, m_pyr_scale, m_levels,
-                                   m_winsize, m_iterations, m_poly_n,
-                                   m_poly_sigma, 0);
+      cv::calcOpticalFlowFarneback(m_UsRef, m_UsMat, m_Flow, m_PyrScale, m_Levels,
+                                   m_WinSize, m_Iterations, m_PolyN,
+                                   m_PolySigma, m_Flags);
 
       // Apply the flow to the matrices
       cv::remap(m_PaMatC, m_PaRes, m_Flow, cv::noArray(), cv::INTER_LINEAR);

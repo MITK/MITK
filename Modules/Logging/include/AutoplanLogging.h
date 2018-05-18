@@ -25,6 +25,8 @@
 // boost log::attributes
 #include <boost/log/attributes/mutable_constant.hpp>
 
+#include <ctime>
+
 #include <MitkLoggingExports.h>
 
 #include <ThreadPoolUtilities.h>
@@ -108,6 +110,8 @@ namespace Logger
 
       Utilities::TaskGroup m_TaskGroup;
 
+      clock_t m_StartTime;
+
     public:
       boost::log::sources::severity_logger< boost::log::trivial::severity_level > lg;
       boost::shared_ptr< std::stringstream > getDataStream() const;
@@ -127,6 +131,9 @@ namespace Logger
       void resetData() const;
       std::string getData() const;
       std::string getDataFromDate(std::string dateTime) const;
+
+      void setStartTime(clock_t time);
+      void computeRunningTime(clock_t time);
   };
 
   namespace details

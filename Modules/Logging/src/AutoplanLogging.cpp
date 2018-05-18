@@ -195,6 +195,7 @@ namespace Logger
     , fullNameAttribute(std::string())
     , organizationAttribute(std::string())
     , customField(std::string())
+    , m_StartTime(clock())
   {
     dataBackend =
       boost::make_shared< boost::log::sinks::text_ostream_backend >();
@@ -381,6 +382,18 @@ namespace Logger
   void Log::resetRunningTime()
   {
     setCustomField(std::string(""), std::string(""));
+  }
+
+  void Log::setStartTime(clock_t time)
+  {
+    //Autoplan start time
+    m_StartTime = time;
+  }
+
+  void Log::computeRunningTime(clock_t time)
+  {
+    double runningTime = double(time - m_StartTime) / CLOCKS_PER_SEC;
+    setRunningTime(runningTime);
   }
 
   // returns true in case of date time parse success

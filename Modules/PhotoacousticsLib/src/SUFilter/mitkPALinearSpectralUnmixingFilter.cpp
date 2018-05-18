@@ -97,10 +97,10 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
     mitkThrow() << "nothing implemented";
   }
 
-  double relativeError = (EndmemberMatrix*resultVector - inputVector).norm() / inputVector.norm(); // norm() is L2 norm
+  /*double relativeError = (EndmemberMatrix*resultVector - inputVector).norm() / inputVector.norm(); // norm() is L2 norm
   MITK_INFO << "relativ error: " << relativeError;
   float accuracyLevel = .1;
   bool resultIsApprox = inputVector.isApprox(EndmemberMatrix*resultVector, accuracyLevel);
-  MITK_INFO << "IS APPROX RESULT: " << resultIsApprox;
+  MITK_INFO << "IS APPROX RESULT: " << resultIsApprox;*/
   return resultVector;
 }

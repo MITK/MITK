@@ -44,7 +44,7 @@ public:
     auto* dimensions = new unsigned int[NUMBER_OF_SPATIAL_DIMENSIONS];
 
     dimensions[0] = 1;
-    dimensions[0] = 1;
+    dimensions[1] = 1;
     dimensions[2] = 3;
 
     //Initialie empty input image:
@@ -69,7 +69,7 @@ public:
     float px3 = fracHb * 3.7 + fracHbO2 * 5.67;
     std::vector<float> m_Value{px1,px2,px3};
 
-    float *data = new(float[3]);
+    float* data = new float[3];
     data[0] = m_Value[0];
     data[1] = m_Value[1];
     data[2] = m_Value[2];
@@ -78,7 +78,7 @@ public:
     MITK_INFO << "data1 " << data[1];
     MITK_INFO << "data2 " << data[2];
 
-    inputImage->SetImportVolume(data); // fails here but data is correct!
+    inputImage->SetImportVolume(data, mitk::Image::ImportMemoryManagementType::CopyMemory); // fails here but data is correct!
     delete[] data;
 
     //Set input into filter
@@ -108,7 +108,7 @@ public:
   void testSUAlgorithm()
   {
     MITK_INFO << "START FILTER TEST ... ";
-
+    m_SpectralUnmixingFilter->SetInput(inputImage);
     //compare filter result (output) with theoretical result
     float threshold = 1e-5;
     for (int i = 0; i < 2; ++i)

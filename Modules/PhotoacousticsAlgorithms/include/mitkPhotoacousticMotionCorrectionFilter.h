@@ -38,10 +38,19 @@ namespace mitk
   /*!
   * \brief Class implementing a mitk::ImageToImageFilter for PAUS motion correction.
   *
-  *  TODO: Write down all the parameters needed.
   *  The filter takes a stack of PA and US images. It then computes the optical flow
-  *  within the US image and compensates the PA images for the flow. Afterwards it
-  *  returns the stack of PA images.
+  *  within the US image and compensates the PA and US images for the flow. Afterwards it
+  *  returns the stack of PA and US images.
+  *
+  * @param m_Batch Determines how many slices belong together and will be motion compensated with regard to the first image in the batch. If the variable is set to 0, the whole time series will be processed as one batch.
+  * @param m_PyrScale See @c pyr_scale in @c cv::calcOpticalFlowFarneback
+  * @param m_Levels See @c levels in @c cv::calcOpticalFlowFarneback
+  * @param m_WinSize See @c winsize in @c cv::calcOpticalFlowFarneback
+  * @param m_Iterations See @c iterations in @c cv::calcOpticalFlowFarneback
+  * @param m_PolyN See @c poly_n in @c cv::calcOpticalFlowFarneback
+  * @param m_PolySigma See @c poly_sigma in @c cv::calcOpticalFlowFarneback
+  * @param m_Flags See @c flags in @c cv::calcOpticalFlowFarneback
+  * @see https://docs.opencv.org/3.0-beta/modules/video/doc/motion_analysis_and_object_tracking.html#calcopticalflowfarneback
   */
   class MITKPHOTOACOUSTICSALGORITHMS_EXPORT PhotoacousticMotionCorrectionFilter : public ImageToImageFilter
   {
@@ -49,9 +58,6 @@ namespace mitk
     mitkClassMacro(PhotoacousticMotionCorrectionFilter, ImageToImageFilter);
 
     itkFactorylessNewMacro(Self);
-    /* itkCloneMacro(Self); */
-
-    /* void SetInput(Image::Pointer paImage, Image::Pointer usImage); */
 
     void SetBatchSize(unsigned int);
     unsigned int GetBatchSize();

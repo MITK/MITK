@@ -41,7 +41,6 @@ mitk::PhotoacousticMotionCorrectionFilter::
     ~PhotoacousticMotionCorrectionFilter() {}
 
 // Setters and Getters
-// TODO: refactor member variables
 void mitk::PhotoacousticMotionCorrectionFilter::SetBatchSize(unsigned int batch) {
   m_Batch = batch;
 }
@@ -130,6 +129,15 @@ mitk::Image::Pointer mitk::PhotoacousticMotionCorrectionFilter::GetUsOutput() {
   return this->GetOutput(1);
 }
 
+/*!
+ * \brief Validate the input images
+ *
+ * The input images have to be non-empty, 3d and have to coincide in the length in each dimension. If any of these conditions are violated, the method will throw an @c invalid_argument exception.
+ *
+ * @param paImage A mitk image
+ * @param usImage A mitk image
+ * @warning If the two images are not 3d and do not coincide in the length in each dimension, this method will throw an @c invalid_argument exception.
+ */
 void mitk::PhotoacousticMotionCorrectionFilter::CheckInput(mitk::Image::Pointer paImage, mitk::Image::Pointer usImage) {
   // Check that we actually got some images
   if (!paImage || !usImage) {
@@ -155,6 +163,16 @@ void mitk::PhotoacousticMotionCorrectionFilter::CheckInput(mitk::Image::Pointer 
 
 }
 
+/*!
+ * \brief Assure that the output images have the same dimensions as the input images.
+ *
+ * The output images need to have the same dimensions as the input images. This will be checked here. If the dimensions do not match, the output will be reinitialized and the image data from the input images will be copied to the output images (in order to make sure that they have a valid data pointer).
+ *
+ * @param paInput Pointer to the photoacoustic input image
+ * @param usInput Pointer to the ultrasonic input image
+ * @param paOutput Pointer to the photoacoustic output image
+ * @param usOutput Pointer to the ultrasonic output image
+ */
 void mitk::PhotoacousticMotionCorrectionFilter::InitializeOutput(mitk::Image::Pointer paInput, mitk::Image::Pointer usInput, mitk::Image::Pointer paOutput, mitk::Image::Pointer usOutput) {
   if (paOutput->GetDimension() != 3) {
     MITK_INFO << "I jump in here.";
@@ -171,12 +189,30 @@ void mitk::PhotoacousticMotionCorrectionFilter::InitializeOutput(mitk::Image::Po
   }
 }
 
+/*!
+ * \brief Copy the image data from the input image to the output image
+ *
+ * This method copys the image data from @p input to @p output. This method assumes that the dimensions of the two images match and will not test this.
+ *
+ * @param input A mitk image
+ * @param output A mitk image
+ */
 void mitk::PhotoacousticMotionCorrectionFilter::SetOutputData(mitk::Image::Pointer input, mitk::Image::Pointer output) {
   output->Initialize(input);
   mitk::ImageReadAccessor accessor(input);
   output->SetImportVolume(accessor.GetData());
 }
 
+/*!
+ * \brief This method performs the actual motion compensation.
+ *
+ * This method uses the ultrasonic input image @p usInput to compute the optical flow in the time series of 2d images. Then it compensates both the @p usInput and @p paInput for it and saves the result in @p usOutput and @p paOutput respectively. In the background the OpenCV Farneback algorithm is used for the flow determination.
+ *
+ * @param paInput The photoacoustic input image
+ * @param usInput The ultrasonic input image
+ * @param paOutput The photoacoustic output image
+ * @param usOutput The ultrasonic output image
+ */
 void mitk::PhotoacousticMotionCorrectionFilter::PerformCorrection(mitk::Image::Pointer paInput, mitk::Image::Pointer usInput, mitk::Image::Pointer paOutput, mitk::Image::Pointer usOutput) {
 
   for(unsigned int i = 0; i < paInput->GetDimensions()[2]; i++) {
@@ -219,6 +255,16 @@ void mitk::PhotoacousticMotionCorrectionFilter::PerformCorrection(mitk::Image::P
   }
 }
 
+/*!
+ * \brief Extract a 2d slice as OpenCV matrix.
+ *
+ * This method extracts slice @p i from the 3-dimensional image @p input and converts it to a OpenCV matrix. Internally, the mitkImageToOpenCVImageFilter is used.
+ * 
+ * @param input A 3d image from which a slice is extracted as a 2d OpenCV matrix.
+ * @param i Determines the slice to be extracted.
+ * @return returns a OpenCV matrix containing the 2d slice.
+ */
+
 cv::Mat mitk::PhotoacousticMotionCorrectionFilter::GetMatrix(const mitk::Image::Pointer input, unsigned int i) {
 
   // Access slice i of image input
@@ -232,6 +278,16 @@ cv::Mat mitk::PhotoacousticMotionCorrectionFilter::GetMatrix(const mitk::Image::
   return m_ImageToOpenCVFilter->GetOpenCVMat();
 }
 
+/*!
+ * \brief Insert a OpenCV matrix as a slice into an image
+ *
+ * This method converts the 2d OpenCV matrix @p mat into an mitk image using the mitkOpenCVToMitkImageFilter. Afterwards it inserts the image as slice @p i into the 3d mitk image @p output.
+ *
+ * @param mat The matrix to be inserted as a slice
+ * @param output The 3d image the matrix is inserted into
+ * @param i The index of the slice to be replaced.
+ */
+
 void mitk::PhotoacousticMotionCorrectionFilter::EnterMatrixInPosition(cv::Mat mat, mitk::Image::Pointer output, unsigned int i) {
 
   m_OpenCVToImageFilter->SetOpenCVMat(mat);
@@ -242,6 +298,14 @@ void mitk::PhotoacousticMotionCorrectionFilter::EnterMatrixInPosition(cv::Mat ma
   output->SetSlice(accessor.GetData(), i);
 }
 
+
+/*!
+ * \brief Apply OpenCV algorithm to compensate motion in a 2d image time series
+ *
+ * This method uses two 3d mitk images. Both will be interpreted as time series of 2d images. @c GetInput(0) should be a photoacoustic image whereas @c GetInput(1) should be an ultrasound image. The input will be validated and then converted to OpenCV matrices. In the end the Farneback algorithm will be used to compute the optical flow in consecutive images and compensate for this flow. The Output will be two 3d mitk images of the same dimensions as the input containing the compensated data.
+ *
+ * @warning The input images need to be 3-dimensional (with the same size in each dimension). Otherwise, an @c invalid_argument exception will be thrown.
+ */
 // TODO: remove debug messages
 void mitk::PhotoacousticMotionCorrectionFilter::GenerateData() {
   MITK_INFO << "Start motion compensation.";
@@ -265,8 +329,5 @@ void mitk::PhotoacousticMotionCorrectionFilter::GenerateData() {
   // m_ImageToOpenCVFilter->SetImage(paInput);
   this->PerformCorrection(paInput, usInput, paOutput, usOutput);
 
-  // MITK_INFO << "Input: " << usInput;
-  // MITK_INFO << "Output: " << usOutput;
-  // MITK_INFO << "Output2: " << paOutput;
-  MITK_INFO << "We succeeded in running through the whole thing!";
+  MITK_INFO << "Motion compensation accomplished.";
 }

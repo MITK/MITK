@@ -42,6 +42,9 @@
 
 #include <boost/phoenix/bind.hpp>
 
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+
 struct ThrowAwayPattern _ = {};
 
 namespace
@@ -196,6 +199,7 @@ namespace Logger
     , organizationAttribute(std::string())
     , customField(std::string())
     , m_StartTime(clock())
+    , sessionTag(boost::uuids::random_generator()())
   {
     dataBackend =
       boost::make_shared< boost::log::sinks::text_ostream_backend >();
@@ -247,7 +251,7 @@ namespace Logger
         boost::log::keywords::min_free_space = 100 * 1024 * 1024    /*< minimum free space on the drive, in bytes >*/
       ));
       sink->set_formatter(
-        boost::log::expressions::format("{\"datetime\": \"%8%\", \"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\" %9%}")
+        boost::log::expressions::format("{\"datetime\": \"%8%\", \"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\", \"sessiontag\": \"%9%\" %10%}")
         % boost::phoenix::bind(&MessageForLogstash, boost::log::expressions::attr<std::string>("Message"))
         % boost::log::expressions::attr<std::string>("ComputerName")
         % boost::log::expressions::attr<std::string>("UserName")
@@ -256,6 +260,7 @@ namespace Logger
         % boost::log::expressions::attr<std::string>("FullName")
         % boost::log::expressions::attr<std::string>("Organization")
         % boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT)
+        % boost::log::expressions::attr<boost::uuids::uuid>("SessionTag")
         % boost::log::expressions::attr<std::string>("CustomField")
       );
 
@@ -288,7 +293,7 @@ namespace Logger
         );
       } else {
         sink2->set_formatter(
-          boost::log::expressions::format("{\"datetime\": \"%8%\", \"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\" %9%}")
+          boost::log::expressions::format("{\"datetime\": \"%8%\", \"user\": \"%3%@%2%\", \"severity\": \"%4%\", \"source\": \"%5%\", \"fullname\": \"%6%\", \"organization\": \"%7%\", \"message\": \"%1%\", \"sessiontag\": \"%9%\" %10%}")
           % boost::phoenix::bind(&MessageForLogstash, boost::log::expressions::attr<std::string>("Message"))
           % boost::log::expressions::attr<std::string>("ComputerName")
           % boost::log::expressions::attr<std::string>("UserName")
@@ -297,6 +302,7 @@ namespace Logger
           % boost::log::expressions::attr<std::string>("FullName")
           % boost::log::expressions::attr<std::string>("Organization")
           % boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT)
+          % boost::log::expressions::attr<boost::uuids::uuid>("SessionTag")
           % boost::log::expressions::attr<std::string>("CustomField")
         );
       }
@@ -349,6 +355,8 @@ namespace Logger
     boost::log::core::get()->add_global_attribute("Organization", organizationAttribute);
 
     boost::log::core::get()->add_global_attribute("CustomField", customField);
+
+    boost::log::core::get()->add_global_attribute("SessionTag", sessionTag);
 
     boost::log::add_common_attributes();
     boost::log::core::get()->flush();

@@ -12,6 +12,7 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/current_function.hpp>
 #include <boost/xpressive/xpressive.hpp>
+#include <boost/uuid/uuid.hpp>
 
 // boost log
 #include <boost/log/trivial.hpp>
@@ -106,6 +107,7 @@ namespace Logger
       boost::log::attributes::mutable_constant<std::string> sourceAttribute;
       boost::log::attributes::mutable_constant<std::string> fullNameAttribute;
       boost::log::attributes::mutable_constant<std::string> organizationAttribute;
+      boost::log::attributes::mutable_constant<boost::uuids::uuid> sessionTag;
       boost::log::attributes::mutable_constant<std::string> customField;
 
       Utilities::TaskGroup m_TaskGroup;

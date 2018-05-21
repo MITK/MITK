@@ -12,6 +12,7 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/current_function.hpp>
 #include <boost/xpressive/xpressive.hpp>
+#include <boost/uuid/uuid.hpp>
 
 // boost log
 #include <boost/log/trivial.hpp>
@@ -24,6 +25,8 @@
 
 // boost log::attributes
 #include <boost/log/attributes/mutable_constant.hpp>
+
+#include <ctime>
 
 #include <MitkLoggingExports.h>
 
@@ -104,9 +107,12 @@ namespace Logger
       boost::log::attributes::mutable_constant<std::string> sourceAttribute;
       boost::log::attributes::mutable_constant<std::string> fullNameAttribute;
       boost::log::attributes::mutable_constant<std::string> organizationAttribute;
+      boost::log::attributes::mutable_constant<boost::uuids::uuid> sessionTag;
       boost::log::attributes::mutable_constant<std::string> customField;
 
       Utilities::TaskGroup m_TaskGroup;
+
+      clock_t m_StartTime;
 
     public:
       boost::log::sources::severity_logger< boost::log::trivial::severity_level > lg;
@@ -127,6 +133,9 @@ namespace Logger
       void resetData() const;
       std::string getData() const;
       std::string getDataFromDate(std::string dateTime) const;
+
+      void setStartTime(clock_t time);
+      void computeRunningTime(clock_t time);
   };
 
   namespace details

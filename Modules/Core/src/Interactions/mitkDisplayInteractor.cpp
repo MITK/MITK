@@ -755,15 +755,19 @@ void mitk::DisplayInteractor::Swivel(mitk::StateMachineAction *, mitk::Interacti
 void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::InteractionEvent *event)
 {
   const auto *posEvent = dynamic_cast<const InteractionPositionEvent *>(event);
-
-  if (!posEvent)
+  if (nullptr == posEvent)
+  {
     return;
+  }
 
-  std::string statusText;
+  mitk::BaseRenderer::Pointer renderer = posEvent->GetSender();
+
   TNodePredicateDataType<mitk::Image>::Pointer isImageData = TNodePredicateDataType<mitk::Image>::New();
-
-  mitk::DataStorage::SetOfObjects::ConstPointer nodes =
-    posEvent->GetSender()->GetDataStorage()->GetSubset(isImageData).GetPointer();
+  mitk::DataStorage::SetOfObjects::ConstPointer nodes = renderer->GetDataStorage()->GetSubset(isImageData).GetPointer();
+  if (nodes.IsNull())
+  {
+    return;
+  }
 
   // posEvent->GetPositionInWorld() would return the world position at the
   // time of initiating the interaction. However, we need to update the
@@ -771,7 +775,7 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
   // translate the same display position with the renderer again to
   // get the new world position.
   Point3D worldposition;
-  event->GetSender()->DisplayToWorld(posEvent->GetPointerPositionOnScreen(), worldposition);
+  renderer->DisplayToWorld(posEvent->GetPointerPositionOnScreen(), worldposition);
 
   mitk::Image::Pointer image3D;
   mitk::DataNode::Pointer node;
@@ -780,28 +784,25 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
   int component = 0;
 
   node = this->GetTopLayerNode(nodes, worldposition, posEvent->GetSender());
-  if (node.IsNotNull())
+  if (node.IsNull())
   {
-    bool isBinary(false);
-    node->GetBoolProperty("binary", isBinary);
-    if (isBinary)
+    return;
+  }
+
+  bool isBinary(false);
+  node->GetBoolProperty("binary", isBinary);
+  if (isBinary)
+  {
+    mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes =
+      posEvent->GetSender()->GetDataStorage()->GetSources(node, nullptr, true);
+    if (!sourcenodes->empty())
     {
-      mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes =
-        posEvent->GetSender()->GetDataStorage()->GetSources(node, nullptr, true);
-      if (!sourcenodes->empty())
-      {
-        topSourceNode = this->GetTopLayerNode(sourcenodes, worldposition, posEvent->GetSender());
-      }
-      if (topSourceNode.IsNotNull())
-      {
-        image3D = dynamic_cast<mitk::Image *>(topSourceNode->GetData());
-        topSourceNode->GetIntProperty("Image.Displayed Component", component);
-      }
-      else
-      {
-        image3D = dynamic_cast<mitk::Image *>(node->GetData());
-        node->GetIntProperty("Image.Displayed Component", component);
-      }
+      topSourceNode = this->GetTopLayerNode(sourcenodes, worldposition, posEvent->GetSender());
+    }
+    if (topSourceNode.IsNotNull())
+    {
+      image3D = dynamic_cast<mitk::Image *>(topSourceNode->GetData());
+      topSourceNode->GetIntProperty("Image.Displayed Component", component);
     }
     else
     {
@@ -809,24 +810,27 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
       node->GetIntProperty("Image.Displayed Component", component);
     }
   }
+  else
+  {
+    image3D = dynamic_cast<mitk::Image *>(node->GetData());
+    node->GetIntProperty("Image.Displayed Component", component);
+  }
 
   // get the position and gray value from the image and build up status bar text
   auto statusBar = StatusBar::GetInstance();
-
   if (image3D.IsNotNull() && statusBar != nullptr)
   {
     itk::Index<3> p;
     image3D->GetGeometry()->WorldToIndex(worldposition, p);
 
     auto pixelType = image3D->GetChannelDescriptor().GetPixelType().GetPixelType();
-
     if (pixelType == itk::ImageIOBase::RGB || pixelType == itk::ImageIOBase::RGBA)
     {
       std::string pixelValue = "Pixel RGB(A) value: ";
       pixelValue.append(ConvertCompositePixelValueToString(image3D, p));
       statusBar->DisplayImageInfo(worldposition, p, posEvent->GetSender()->GetTime(), pixelValue.c_str());
     }
-    else if ( pixelType == itk::ImageIOBase::DIFFUSIONTENSOR3D || pixelType == itk::ImageIOBase::SYMMETRICSECONDRANKTENSOR )
+    else if (pixelType == itk::ImageIOBase::DIFFUSIONTENSOR3D || pixelType == itk::ImageIOBase::SYMMETRICSECONDRANKTENSOR)
     {
       std::string pixelValue = "See ODF Details view. ";
       statusBar->DisplayImageInfo(worldposition, p, posEvent->GetSender()->GetTime(), pixelValue.c_str());

@@ -78,7 +78,7 @@ public:
     MITK_INFO << "data1 " << data[1];
     MITK_INFO << "data2 " << data[2];
 
-    inputImage->SetImportVolume(data, mitk::Image::ImportMemoryManagementType::CopyMemory); // fails here but data is correct!
+    inputImage->SetImportVolume(data, mitk::Image::ImportMemoryManagementType::CopyMemory);
     delete[] data;
 
     //Set input into filter
@@ -108,7 +108,10 @@ public:
   void testSUAlgorithm()
   {
     MITK_INFO << "START FILTER TEST ... ";
-    m_SpectralUnmixingFilter->SetInput(inputImage);
+    auto m_LinearSpectralUnmixing = mitk::pa::LinearSpectralUnmixingFilter::New();
+    auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+    m_LinearSpectralUnmixing->SetInput(inputImage);
+
     //compare filter result (output) with theoretical result
     float threshold = 1e-5;
     for (int i = 0; i < 2; ++i)

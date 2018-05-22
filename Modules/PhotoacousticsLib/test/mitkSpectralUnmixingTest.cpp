@@ -31,6 +31,7 @@ private:
   mitk::Image::Pointer inputImage;
   std::vector<float> m_inputWavelengths;
   std::vector<float> m_CorrectResult;
+  float threshold;
 
 public:
 
@@ -47,7 +48,6 @@ public:
     dimensions[1] = 1;
     dimensions[2] = 3;
 
-    //Initialie empty input image:
     inputImage->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);
 
     //Set wavelengths for unmixing:
@@ -56,14 +56,15 @@ public:
     m_inputWavelengths.push_back(850);
 
     //Set fraction of Hb and HbO2 to unmix:
-    float fracHb = 0.3;
-    float fracHbO2 = 0.67;
-
-    //Fractions are also correct unmixing result:
+    float fracHb = 0.396579;
+    float fracHbO2 = 0.594845;
     m_CorrectResult.push_back(fracHbO2);
     m_CorrectResult.push_back(fracHb);
 
-    //Calculate values of wavelengths (750,800,850 nm) and multiply with fractions to get pixel values:
+    //Set threshold 1 digit
+    threshold = 0.000001;
+
+    //Multiply values of wavelengths (750,800,850 nm) with fractions to get pixel values:
     float px1 = fracHb * 7.52 + fracHbO2 * 2.77;
     float px2 = fracHb * 4.08 + fracHbO2 * 4.37;
     float px3 = fracHb * 3.7 + fracHbO2 * 5.67;
@@ -74,13 +75,8 @@ public:
     data[1] = m_Value[1];
     data[2] = m_Value[2];
 
-    MITK_INFO << "data0 " << data[0];
-    MITK_INFO << "data1 " << data[1];
-    MITK_INFO << "data2 " << data[2];
-
     inputImage->SetImportVolume(data, mitk::Image::ImportMemoryManagementType::CopyMemory);
     delete[] data;
-
     MITK_INFO << "[DONE]";
   }
 
@@ -92,7 +88,14 @@ public:
     m_SpectralUnmixingFilter->SetInput(inputImage);
 
     // Set Algortihm to filter
-    m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr);
+    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr);
+    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::ldlt);
+    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::llt);
+    m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::colPivHouseholderQr);
+    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::jacobiSvd);
+    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivLu);
+    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivHouseholderQr);
+    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::test);
 
     //Set wavelengths to filter
     for (unsigned int imageIndex = 0; imageIndex < m_inputWavelengths.size(); imageIndex++)
@@ -104,12 +107,10 @@ public:
     //Set Chromophores to filter
     m_SpectralUnmixingFilter->AddChromophore(
       mitk::pa::SpectralUnmixingFilterBase::ChromophoreType::OXYGENATED_HEMOGLOBIN);
-
     m_SpectralUnmixingFilter->AddChromophore(
       mitk::pa::SpectralUnmixingFilterBase::ChromophoreType::DEOXYGENATED_HEMOGLOBIN);
 
     m_SpectralUnmixingFilter->Update();
-    float threshold = 1e-5;
 
     for (int i = 0; i < 2; ++i)
     {
@@ -117,10 +118,7 @@ public:
       mitk::ImageReadAccessor readAccess(output);
       const float* inputDataArray = ((const float*)readAccess.GetData());
       auto pixel = inputDataArray[0];
-
-      MITK_INFO << "CorrectResult: " << m_CorrectResult[i];
-      MITK_INFO << "FilterResult: " << pixel;
-
+      /*For pixel values and results look at: [...]mitk-superbuild\MITK-build\Modules\PhotoacousticsLib\test\*/
       CPPUNIT_ASSERT(std::abs(pixel - m_CorrectResult[i])<threshold);
     }
     MITK_INFO << "FILTER TEST SUCCESFULL :)";

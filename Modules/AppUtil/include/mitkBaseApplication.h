@@ -17,10 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKBASEAPPLICATION_H
 #define MITKBASEAPPLICATION_H
 
+#include <thread>
 #include <functional>
-
-#include <boost/thread.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <chrono>
 
 #include <MitkAppUtilExports.h>
 
@@ -52,7 +51,7 @@ public:
     , m_DrawProgress(drawProgress)
   {
     m_App->setProperty("loading", QVariant(true));
-    m_WorkThread = boost::thread(boost::bind(&SplashCloserCallback::update, this));
+    m_WorkThread = std::thread(std::bind(&SplashCloserCallback::update, this));
   }
 
   void update()
@@ -69,7 +68,8 @@ public:
         m_Progress += .01f;
       }
       m_DrawProgress(m_Progress, m_Invert);
-      boost::this_thread::sleep(boost::posix_time::milliseconds(5));
+      std::chrono::seconds fiveSec(5);
+      std::this_thread::sleep_for(fiveSec);
       m_Working = m_App->property("loading").toBool();
     }
     m_Splashscreen->close();
@@ -86,7 +86,7 @@ private:
   bool m_Working;
   bool m_Invert;
   float m_Progress = 0.f;
-  boost::thread m_WorkThread;
+  std::thread m_WorkThread;
   QSplashScreen* m_Splashscreen;
   std::function<void(float, bool)> m_DrawProgress;
 };
@@ -166,6 +166,7 @@ public:
 
   static QString ARG_SPLASH_IMAGE;
   static QString ARG_AUTOPLAN_VERSION;
+  static QString ARG_AUTOPLAN_LICENSE;
 
   static QString ARG_XARGS;
 

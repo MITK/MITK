@@ -122,7 +122,7 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
         writeBuffer[x*yDim + y] = resultVector[outputIdx]; 
       }
       myfile << "Input Pixel(x,y): " << x << "," << y << "\n" << inputVector << "\n";
-      myfile << "Result: "  << "\n Hb: " << resultVector[0] << "\n HbO2: " << resultVector[1] <<"\n";
+      myfile << "Result: "  << "\n HbO2: " << resultVector[0] << "\n Hb: " << resultVector[1] <<"\n";
     }
   }
   MITK_INFO << "GENERATING DATA...[DONE]";

@@ -200,22 +200,22 @@ void SpectralUnmixing::DoImageProcessing()
       
       m_SpectralUnmixingFilter->Update();
 
-      if (DeOxbool)
-      {
-        mitk::Image::Pointer Hb = m_SpectralUnmixingFilter->GetOutput(0);
-        mitk::DataNode::Pointer dataNodeHb = mitk::DataNode::New();
-        dataNodeHb->SetData(Hb);
-        dataNodeHb->SetName("Hb");
-        this->GetDataStorage()->Add(dataNodeHb);
-      }
-
       if (Oxbool)
       {
-        mitk::Image::Pointer HbO2 = m_SpectralUnmixingFilter->GetOutput(1);
+        mitk::Image::Pointer HbO2 = m_SpectralUnmixingFilter->GetOutput(0);
         mitk::DataNode::Pointer dataNodeHbO2 = mitk::DataNode::New();
         dataNodeHbO2->SetData(HbO2);
         dataNodeHbO2->SetName("HbO2");
         this->GetDataStorage()->Add(dataNodeHbO2);
+      }
+
+      if (DeOxbool)
+      {
+        mitk::Image::Pointer Hb = m_SpectralUnmixingFilter->GetOutput(1);
+        mitk::DataNode::Pointer dataNodeHb = mitk::DataNode::New();
+        dataNodeHb->SetData(Hb);
+        dataNodeHb->SetName("Hb");
+        this->GetDataStorage()->Add(dataNodeHb);
       }
 
       mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());

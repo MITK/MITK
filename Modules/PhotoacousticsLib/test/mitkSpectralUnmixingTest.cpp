@@ -60,8 +60,8 @@ public:
     float fracHbO2 = 0.67;
 
     //Fractions are also correct unmixing result:
-    m_CorrectResult.push_back(fracHb);
     m_CorrectResult.push_back(fracHbO2);
+    m_CorrectResult.push_back(fracHb);
 
     //Calculate values of wavelengths (750,800,850 nm) and multiply with fractions to get pixel values:
     float px1 = fracHb * 7.52 + fracHbO2 * 2.77;
@@ -81,7 +81,13 @@ public:
     inputImage->SetImportVolume(data, mitk::Image::ImportMemoryManagementType::CopyMemory);
     delete[] data;
 
-    //Set input into filter
+    MITK_INFO << "[DONE]";
+  }
+
+  void testSUAlgorithm()
+  {
+    MITK_INFO << "START FILTER TEST ... ";
+    // Set input image
     auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
     m_SpectralUnmixingFilter->SetInput(inputImage);
 
@@ -102,28 +108,20 @@ public:
     m_SpectralUnmixingFilter->AddChromophore(
       mitk::pa::SpectralUnmixingFilterBase::ChromophoreType::DEOXYGENATED_HEMOGLOBIN);
 
-    MITK_INFO << "[DONE]";
-  }
-
-  void testSUAlgorithm()
-  {
-    MITK_INFO << "START FILTER TEST ... ";
-    auto m_LinearSpectralUnmixing = mitk::pa::LinearSpectralUnmixingFilter::New();
-    auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
-    m_LinearSpectralUnmixing->SetInput(inputImage);
-
-    //compare filter result (output) with theoretical result
+    m_SpectralUnmixingFilter->Update();
     float threshold = 1e-5;
+
     for (int i = 0; i < 2; ++i)
     {
       mitk::Image::Pointer output = m_SpectralUnmixingFilter->GetOutput(i);
-
       mitk::ImageReadAccessor readAccess(output);
-
       const float* inputDataArray = ((const float*)readAccess.GetData());
-
       auto pixel = inputDataArray[0];
-      CPPUNIT_ASSERT((pixel - m_CorrectResult[i])<threshold);
+
+      MITK_INFO << "CorrectResult: " << m_CorrectResult[i];
+      MITK_INFO << "FilterResult: " << pixel;
+
+      CPPUNIT_ASSERT(std::abs(pixel - m_CorrectResult[i])<threshold);
     }
     MITK_INFO << "FILTER TEST SUCCESFULL :)";
   }

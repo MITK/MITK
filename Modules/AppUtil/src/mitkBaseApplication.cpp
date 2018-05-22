@@ -63,6 +63,7 @@ QString BaseApplication::ARG_TESTAPPLICATION = "BlueBerry.testapplication";
 
 QString BaseApplication::ARG_SPLASH_IMAGE = "BlueBerry.splashscreen";
 QString BaseApplication::ARG_AUTOPLAN_VERSION = "BlueBerry.autoplanversion";
+QString BaseApplication::ARG_AUTOPLAN_LICENSE = "BlueBerry.autoplanlicense";
 
 QString BaseApplication::ARG_NO_REGISTRY_CACHE = "BlueBerry.noRegistryCache";
 QString BaseApplication::ARG_NO_LAZY_REGISTRY_CACHE_LOADING = "BlueBerry.noLazyRegistryCacheLoading";
@@ -827,6 +828,7 @@ void BaseApplication::initializeSplashScreen(QCoreApplication * application)
 {
   QVariant pixmapFileNameProp = d->getProperty(ARG_SPLASH_IMAGE);
   QVariant autoplanVersion = d->getProperty(ARG_AUTOPLAN_VERSION);
+  QVariant autoplanLicense = d->getProperty(ARG_AUTOPLAN_LICENSE);
   if (!pixmapFileNameProp.isNull())
   {
     QString pixmapFileName = pixmapFileNameProp.toString();
@@ -839,6 +841,24 @@ void BaseApplication::initializeSplashScreen(QCoreApplication * application)
       {
         QString autoplanVersionString = autoplanVersion.toString();
         d->m_Splashscreen->showMessage( autoplanVersionString, Qt::AlignBottom | Qt::AlignRight, Qt::white);
+        application->processEvents();
+      }
+      if (!autoplanLicense.isNull())
+      {
+        QString autoplanLicenseString = autoplanLicense.toString();
+        auto licenseLines = autoplanLicenseString.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
+        QPainter licensehPainter;
+        licensehPainter.begin(&pixmap);
+        licensehPainter.setPen(Qt::white);
+        auto yPosition = 220;
+        for (QString licenseLine : licenseLines) {
+          licensehPainter.drawText(5, yPosition, licenseLine);
+          yPosition += 20;
+        }
+        licensehPainter.end();
+        // QSplashScreen can only have one message on it, use painter for second one
+        //d->m_Splashscreen->showMessage( autoplanLicenseString, Qt::AlignBottom | Qt::AlignLeft, Qt::white);
+        application->processEvents();
       }
       m_drawProgress = [this, pixmap, application] (float progress, bool invert) mutable
       {

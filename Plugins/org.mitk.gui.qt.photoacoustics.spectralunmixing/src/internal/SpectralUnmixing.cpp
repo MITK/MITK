@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Include to perform Spectral Unmixing
 #include "mitkPASpectralUnmixingFilterBase.h"
 #include "mitkPALinearSpectralUnmixingFilter.h"
-
+#include "mitkPASpectralUnmixingSO2.h"
 
 const std::string SpectralUnmixing::VIEW_ID = "org.mitk.views.spectralunmixing";
 
@@ -219,6 +219,38 @@ void SpectralUnmixing::DoImageProcessing()
       }
 
       mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+
+      //*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      //FRAGE zu SetInput: reicht es dort einen image pointer anzugeben?
+      bool sO2bool = m_Controls.checkBoxsO2->isChecked();
+      if (sO2bool)
+      {
+        if (DeOxbool)
+        {
+          if (Oxbool)
+          {
+            MITK_INFO << "CALCULATE OXYGEN SATURATION ...";
+            auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
+            m_sO2->SetInput(m_SpectralUnmixingFilter->GetOutput(0));
+            m_sO2->SetInput(m_SpectralUnmixingFilter->GetOutput(1));
+            m_sO2->Update();
+
+            mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
+            mitk::DataNode::Pointer dataNodesO2 = mitk::DataNode::New();
+            dataNodesO2->SetData(sO2);
+            dataNodesO2->SetName("sO2");
+            this->GetDataStorage()->Add(dataNodesO2);
+
+            MITK_INFO << "[DONE]";
+          }
+          else
+            mitkThrow() << "SELECT CHROMOPHORE OXYHEMOGLOBIN!";
+        }
+        else
+          mitkThrow() << "SELECT CHROMOPHORE DEOXYHEMOGLOBIN!";
+      }
+      mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+      //*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++/**/
 
       MITK_INFO << "Adding images to DataStorage...[DONE]";
     }

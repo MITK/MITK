@@ -23,6 +23,7 @@ SET(H_FILES
   include/mitkPAExceptions.h
   include/mitkPASpectralUnmixingFilterBase.h
   include/mitkPALinearSpectralUnmixingFilter.h
+  include/mitkPASpectralUnmixingSO2.h
 )
 
 set(CPP_FILES
@@ -49,7 +50,7 @@ set(CPP_FILES
   Utils/Thread/mitkPAMonteCarloThreadHandler.cpp
   SUFilter/mitkPASpectralUnmixingFilterBase.cpp
   SUFilter/mitkPALinearSpectralUnmixingFilter.cpp
-
+  SUFilter/mitkPASpectralUnmixingSO2.cpp
 )
 
 set(RESOURCE_FILES

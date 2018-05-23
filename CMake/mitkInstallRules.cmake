@@ -45,7 +45,23 @@ if(MITK_USE_Qt5)
       "${_qmake_path}/../plugins/platforms/libqxcb-glx-integration.so")
   endif()
 
-  # TODO: Install QtWebEngineProcess
+  # Install Qt WebEngine
+
+  set(_install_DESTINATION "")
+
+  if(NOT APPLE)
+    if(WIN32)
+      MITK_INSTALL(FILES "${_qmake_path}/QtWebEngineProcess.exe")
+    elseif(UNIX)
+      MITK_INSTALL(FILES "${_qmake_path}/../libexec/QtWebEngineProcess")
+    endif()
+
+    set(_install_DESTINATION "resources")
+    MITK_INSTALL(DIRECTORY "${_qmake_path}/../resources/")
+
+    set(_install_DESTINATION "translations/qtwebengine_locales")
+    MITK_INSTALL(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales/")
+  endif()
 endif()
 
 # Install CTK Qt designer plugins

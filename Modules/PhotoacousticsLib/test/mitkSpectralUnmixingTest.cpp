@@ -68,12 +68,11 @@ public:
     float px1 = fracHb * 7.52 + fracHbO2 * 2.77;
     float px2 = fracHb * 4.08 + fracHbO2 * 4.37;
     float px3 = fracHb * 3.7 + fracHbO2 * 5.67;
-    std::vector<float> m_Value{px1,px2,px3};
 
     float* data = new float[3];
-    data[0] = m_Value[0];
-    data[1] = m_Value[1];
-    data[2] = m_Value[2];
+    data[0] = px1;
+    data[1] = px2;
+    data[2] = px3;
 
     inputImage->SetImportVolume(data, mitk::Image::ImportMemoryManagementType::CopyMemory);
     delete[] data;
@@ -118,7 +117,7 @@ public:
       mitk::ImageReadAccessor readAccess(output);
       const float* inputDataArray = ((const float*)readAccess.GetData());
       auto pixel = inputDataArray[0];
-      /*For pixel values and results look at: [...]mitk-superbuild\MITK-build\Modules\PhotoacousticsLib\test\*/
+      /*For printed pixel values and results look at: [...]\mitk-superbuild\MITK-build\Modules\PhotoacousticsLib\test\*/
       CPPUNIT_ASSERT(std::abs(pixel - m_CorrectResult[i])<threshold);
     }
     MITK_INFO << "FILTER TEST SUCCESFULL :)";

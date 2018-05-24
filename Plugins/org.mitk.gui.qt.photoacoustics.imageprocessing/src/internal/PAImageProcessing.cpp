@@ -957,10 +957,11 @@ void BmodeThread::run()
   mitk::Image::Pointer resultImage = m_FilterBank->ApplyBmodeFilter(m_InputImage,
     m_Method, m_UseLogfilter);
 
-  double desiredSpacing[2]{ m_InputImage->GetGeometry()->GetSpacing()[0], m_ResampleSpacing };
-
-  resultImage = m_FilterBank->ApplyResampling(resultImage, desiredSpacing);
-
+  if (m_ResampleSpacing != 0)
+  {
+    double desiredSpacing[2]{ m_InputImage->GetGeometry()->GetSpacing()[0], m_ResampleSpacing };
+    resultImage = m_FilterBank->ApplyResampling(resultImage, desiredSpacing);
+  }
   emit result(resultImage, "_bmode");
 }
 

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBasePropertySerializer.h"
 #include "mitkVectorProperty.h"
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 
 #include <limits>
 #include <cmath>

@@ -143,10 +143,10 @@ namespace mitk {
      */
     mitkNewMessage2Macro(PropertyChanged, const std::string&, const std::string&)
 
-      /**
-       * \return keys for the microservice properties of ultrasound devices
-       */
-       static mitk::USDevice::PropertyKeys GetPropertyKeys();
+    /**
+     * \return keys for the microservice properties of ultrasound devices
+     */
+    static mitk::USDevice::PropertyKeys GetPropertyKeys();
 
     /**
     * \brief Default getter for the custom control interface.
@@ -313,9 +313,9 @@ namespace mitk {
     void SetComment(std::string comment);
 
     itkGetMacro(DeviceState, DeviceStates)
-      itkGetMacro(ServiceProperties, us::ServiceProperties)
+    itkGetMacro(ServiceProperties, us::ServiceProperties)
 
-      void GrabImage();
+    void GrabImage();
 
     virtual void SetSpacing(double xSpacing, double ySpacing);
 
@@ -342,7 +342,6 @@ namespace mitk {
     static ITK_THREAD_RETURN_TYPE ConnectThread(void* pInfoStruct);
 
     std::vector<mitk::Image::Pointer> m_ImageVector;
-    //mitk::Image::Pointer m_OutputImage;
 
     // Variables to determine if spacing was calibrated and needs to be applied to the incoming images
     mitk::Vector3D m_Spacing;

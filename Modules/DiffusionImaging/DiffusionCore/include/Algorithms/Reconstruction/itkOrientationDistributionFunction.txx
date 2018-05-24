@@ -853,7 +853,6 @@ OrientationDistributionFunction<T, NOdfDirections>
   // delete n highest local maxima from list
   // and return remaining highest
   int maxidx = -1;
-  std::vector<int>::iterator itMax;
   for( int i=0; i<=n; i++ )
   {
     maxidx = -1;

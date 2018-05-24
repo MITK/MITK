@@ -195,29 +195,22 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     usFunctionCheckCompilerFlags("-fstack-protector-all" US_CXX_FLAGS)
   endif()
 
-  if(MINGW)
-    # suppress warnings about auto imported symbols
-    set(US_CXX_FLAGS "-Wl,--enable-auto-import ${US_CXX_FLAGS}")
-    # we need to define a Windows version
-    set(US_CXX_FLAGS "-D_WIN32_WINNT=0x0500 ${US_CXX_FLAGS}")
+  # Enable visibility support (only for gcc >= 4.5)
+  # We only support hidden visibility with gcc for now.
+  #
+  # Clang has troubles with correctly marking template declarations and explicit template
+  # instantiations as exported across shared library boundaries. Specifically, comparing
+  # type_info objects from STL types does not work (used in us::Any::Type() == typeid(std::string))
+  # which could be related to the default visibility of STL types declared in libstdc++ and/or libc++
+  # but also to using RTLD_LOCAL or RTLD_GLOBAL when loading shared libraries via dlopen().
+  #
+  # See http://comments.gmane.org/gmane.comp.compilers.clang.scm/50028
+  # and http://llvm.org/bugs/show_bug.cgi?id=10113
+  #
+  if(_have_visibility AND NOT ${GCC_VERSION} VERSION_LESS "4.5")
+    set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
   else()
-    # Enable visibility support (only for gcc >= 4.5)
-    # We only support hidden visibility with gcc for now.
-    #
-    # Clang has troubles with correctly marking template declarations and explicit template
-    # instantiations as exported across shared library boundaries. Specifically, comparing
-    # type_info objects from STL types does not work (used in us::Any::Type() == typeid(std::string))
-    # which could be related to the default visibility of STL types declared in libstdc++ and/or libc++
-    # but also to using RTLD_LOCAL or RTLD_GLOBAL when loading shared libraries via dlopen().
-    #
-    # See http://comments.gmane.org/gmane.comp.compilers.clang.scm/50028
-    # and http://llvm.org/bugs/show_bug.cgi?id=10113
-    #
-    if(_have_visibility AND NOT ${GCC_VERSION} VERSION_LESS "4.5")
-      set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
-    else()
-      set(US_GCC_RTTI_WORKAROUND_NEEDED 1)
-    endif()
+    set(US_GCC_RTTI_WORKAROUND_NEEDED 1)
   endif()
 
   usFunctionCheckCompilerFlags("-O1 -D_FORTIFY_SOURCE=2" _fortify_source_flag)

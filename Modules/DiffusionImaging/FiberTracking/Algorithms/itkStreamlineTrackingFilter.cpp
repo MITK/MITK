@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileWriter.h>
 #include "itkPointShell.h"
 #include <itkRescaleIntensityImageFilter.h>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <TrackingHandlers/mitkTrackingDataHandler.h>
 #include <TrackingHandlers/mitkTrackingHandlerOdf.h>
 #include <TrackingHandlers/mitkTrackingHandlerPeaks.h>

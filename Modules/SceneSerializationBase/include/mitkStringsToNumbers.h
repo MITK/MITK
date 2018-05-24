@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkVectorPropertySerializer_h
 #define mitkVectorPropertySerializer_h
 
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 
 namespace mitk
 {

@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageDataItem.h"
 #include <mitkLocaleSwitch.h>
 #include <mitkIOUtil.h>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 
 namespace mitk
 {

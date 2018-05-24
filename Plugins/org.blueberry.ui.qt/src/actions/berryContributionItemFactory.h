@@ -127,6 +127,8 @@ public:
     */
    static const QScopedPointer<ContributionItemFactory> PERSPECTIVES_SHORTLIST;
 
+   virtual ~ContributionItemFactory() = default;
+
 };
 
 }

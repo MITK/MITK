@@ -56,19 +56,9 @@ function(_itk_create_factory_register_manager)
 endfunction()
 _itk_create_factory_register_manager()
 
-# this is needed for libraries which link to Mitk and need
-# symbols from explicitly instantiated templates
-if(MINGW)
-  get_target_property(_mitkCore_MINGW_linkflags ${MODULE_TARGET} LINK_FLAGS)
-  if(NOT _mitkCore_MINGW_linkflags)
-    set(_mitkCore_MINGW_linkflags "")
-  endif(NOT _mitkCore_MINGW_linkflags)
-  set_target_properties(${MODULE_TARGET} PROPERTIES LINK_FLAGS "${_mitkCore_MINGW_linkflags} -Wl,--export-all-symbols")
-endif(MINGW)
-
-if(MSVC_IDE OR MSVC_VERSION OR MINGW)
+if(MSVC_IDE OR MSVC_VERSION)
   target_link_libraries(${MODULE_TARGET} PRIVATE psapi.lib)
-endif(MSVC_IDE OR MSVC_VERSION OR MINGW)
+endif()
 
 add_subdirectory(TestingHelper)
 

@@ -70,6 +70,7 @@ set(MITK_MODULES
   RenderWindowManager
   RenderWindowManagerUI
   CEST
+  BasicImageProcessing
 )
 
 if(MITK_ENABLE_PIC_READER)

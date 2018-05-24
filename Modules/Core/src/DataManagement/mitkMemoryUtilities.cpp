@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMemoryUtilities.h"
 
 #include <cstdio>
-#if _MSC_VER || __MINGW32__
+#if _MSC_VER
 #include <windows.h>
 #include <psapi.h>
 #elif defined(__APPLE__)
@@ -39,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 size_t mitk::MemoryUtilities::GetProcessMemoryUsage()
 {
-#if _MSC_VER || __MINGW32__
+#if _MSC_VER
   size_t size = 0;
   DWORD pid = GetCurrentProcessId();
   PROCESS_MEMORY_COUNTERS pmc;
@@ -73,7 +73,7 @@ size_t mitk::MemoryUtilities::GetProcessMemoryUsage()
  */
 size_t mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam()
 {
-#if _MSC_VER || __MINGW32__
+#if _MSC_VER
   MEMORYSTATUSEX statex;
   statex.dwLength = sizeof(statex);
   GlobalMemoryStatusEx(&statex);

@@ -90,9 +90,6 @@ protected slots:
   void GenerateMultiplanarScreenshots();
   void Generate3DHighresScreenshot();
   void GenerateMultiplanar3DHighresScreenshot();
-  void View1();
-  void View2();
-  void View3();
   void SelectBackgroundColor();
 
 protected:

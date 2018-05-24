@@ -16,6 +16,7 @@ set(CPP_FILES
   GlobalImageFeatures/mitkGIFImageDescriptionFeatures.cpp
   GlobalImageFeatures/mitkGIFFirstOrderStatistics.cpp
   GlobalImageFeatures/mitkGIFFirstOrderHistogramStatistics.cpp
+  GlobalImageFeatures/mitkGIFFirstOrderNumericStatistics.cpp
   GlobalImageFeatures/mitkGIFVolumetricStatistics.cpp
   GlobalImageFeatures/mitkGIFNeighbouringGreyLevelDependenceFeatures.cpp
   GlobalImageFeatures/mitkGIFNeighbourhoodGreyLevelDifference.cpp

@@ -117,10 +117,6 @@ protected:
   */
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
   /*!
-  @brief called by QmitkFunctionality when DataNode is removed from DataManager
-  */
-  void NodeRemoved(const mitk::DataNode* node) override;
-  /*!
   @brief Sets the selected bounding object as current bounding object and set up interactor
   */
   void OnComboBoxSelectionChanged(const mitk::DataNode* node);
@@ -158,14 +154,12 @@ private:
 
   void ProcessImage(bool crop);
 
-  QList<QString> m_BoundingObjectNames;
-
   /*!
   * @brief Resets GUI to default
   */
   void setDefaultGUI();
 
-  QString getAdaptedBoundingObjectName(const QString& name) const;
+  QString AdaptBoundingObjectName(const QString& name) const;
 
   // cropping parameter
   mitk::ScalarType m_CropOutsideValue;

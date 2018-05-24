@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryQtPreferences.h>
 #include <vtkLookupTable.h>
 #include <QClipboard>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <QmitkChartWidget.h>
 
 const std::string QmitkTractometryView::VIEW_ID = "org.mitk.views.tractometry";

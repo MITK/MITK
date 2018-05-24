@@ -44,15 +44,25 @@ mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   : mitk::ImageSource(),
-  m_IsFreezed(false),
-  m_DeviceState(State_NoState),
-  m_NumberOfOutputs(1),
-  m_Manufacturer(manufacturer),
-  m_Name(model),
-  m_SpawnAcquireThread(true),
+  m_FreezeBarrier(nullptr),
+  m_FreezeMutex(),
   m_MultiThreader(itk::MultiThreader::New()),
   m_ImageMutex(itk::FastMutexLock::New()),
   m_ThreadID(-1),
+  m_ImageVector(),
+  m_Spacing(),
+  m_IGTLServer(nullptr),
+  m_IGTLMessageProvider(nullptr),
+  m_ImageToIGTLMsgFilter(nullptr),
+  m_IsFreezed(false),
+  m_DeviceState(State_NoState),
+  m_NumberOfOutputs(1),
+  m_ServiceProperties(),
+  m_ServiceRegistration(),
+  m_Manufacturer(manufacturer),
+  m_Name(model),
+  m_Comment(),
+  m_SpawnAcquireThread(true),
   m_UnregisteringStarted(false)
 {
   USImageCropArea empty;
@@ -72,12 +82,22 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
 
 mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
   : mitk::ImageSource(),
-  m_IsFreezed(false),
-  m_DeviceState(State_NoState),
-  m_SpawnAcquireThread(true),
+  m_FreezeBarrier(nullptr),
+  m_FreezeMutex(),
   m_MultiThreader(itk::MultiThreader::New()),
   m_ImageMutex(itk::FastMutexLock::New()),
   m_ThreadID(-1),
+  m_ImageVector(),
+  m_Spacing(),
+  m_IGTLServer(nullptr),
+  m_IGTLMessageProvider(nullptr),
+  m_ImageToIGTLMsgFilter(nullptr),
+  m_IsFreezed(false),
+  m_DeviceState(State_NoState),
+  m_NumberOfOutputs(1),
+  m_ServiceProperties(),
+  m_ServiceRegistration(),
+  m_SpawnAcquireThread(true),
   m_UnregisteringStarted(false)
 {
   m_Manufacturer = metadata->GetDeviceManufacturer();
@@ -92,7 +112,7 @@ mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
   this->m_CropArea = empty;
 
   // set number of outputs
-  this->SetNumberOfIndexedOutputs(1);
+  this->SetNumberOfIndexedOutputs(m_NumberOfOutputs);
 
   // create a new output
   mitk::Image::Pointer newOutput = mitk::Image::New();

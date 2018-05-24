@@ -42,7 +42,7 @@ set(WITH_DOCUMENTATION FALSE)
 #set(DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY ) # for example: $ENV{HOME}/Projects/Doxygen
 set(CTEST_BUILD_CONFIGURATION "Release")
 set(CTEST_TEST_TIMEOUT 500)
-if(UNIX OR MINGW)
+if(UNIX)
   set(CTEST_BUILD_FLAGS "-j4") # Use multiple CPU cores to build
 else()
   set(CTEST_BUILD_FLAGS "")

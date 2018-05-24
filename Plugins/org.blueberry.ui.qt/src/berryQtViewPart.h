@@ -17,13 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYQTVIEWPART_H_
 #define BERRYQTVIEWPART_H_
 
-#ifdef __MINGW32__
-// We need to inlclude winbase.h here in order to declare
-// atomic intrinsics like InterlockedIncrement correctly.
-// Otherwhise, they would be declared wrong within qatomic_windows.h .
-#include <windows.h>
-#endif
-
 #include <berryViewPart.h>
 
 #include <org_blueberry_ui_qt_Export.h>

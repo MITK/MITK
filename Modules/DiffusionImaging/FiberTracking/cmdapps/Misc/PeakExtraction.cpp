@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommandLineParser.h"
 #include <itkShCoefficientImageImporter.h>
 #include <itkFlipImageFilter.h>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <boost/algorithm/string.hpp>
 
 #include <mitkIOUtil.h>

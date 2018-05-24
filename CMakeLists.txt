@@ -558,7 +558,7 @@ if(NOT MITK_FAST_TESTING)
   endif()
 endif()
 
-if(NOT UNIX AND NOT MINGW)
+if(NOT UNIX)
   set(MITK_WIN32_FORCE_STATIC "STATIC" CACHE INTERNAL "Use this variable to always build static libraries on non-unix platforms")
 endif()
 
@@ -689,12 +689,6 @@ endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   mitkFunctionCheckCAndCXXCompilerFlags("-fstack-protector-all" MITK_C_FLAGS MITK_CXX_FLAGS)
-
-  if(MINGW)
-    # suppress warnings about auto imported symbols
-    set(MITK_SHARED_LINKER_FLAGS "-Wl,--enable-auto-import ${MITK_SHARED_LINKER_FLAGS}")
-  endif()
-
   set(MITK_CXX_FLAGS_RELEASE "-U_FORTIFY_SOURCES -D_FORTIFY_SOURCE=2 ${MITK_CXX_FLAGS_RELEASE}")
 endif()
 

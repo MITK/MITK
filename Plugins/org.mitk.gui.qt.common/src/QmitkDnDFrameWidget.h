@@ -17,13 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkDndFrameWidget_h
 #define QmitkDndFrameWidget_h
 
-#ifdef __MINGW32__
-// We need to inlclude winbase.h here in order to declare
-// atomic intrinsics like InterlockedIncrement correctly.
-// Otherwhise, they would be declared wrong within qatomic_windows.h .
-#include <windows.h>
-#endif
-
 #include <QWidget>
 #include <org_mitk_gui_qt_common_Export.h>
 //drag&drop

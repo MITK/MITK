@@ -1,20 +1,11 @@
 #
-# - This module finds the languages supported by MITK, and
-#present the option to enable support
+# This module finds the languages supported by MITK, and
+# present the option to enable support.
 #
 
 #
-# Currently this will search for Python,
-# Java, TCL, Ruby, C#, R, and additionally it give the option to wrap LUA. will be added
 # This script is based on SimpleITK scripts.
 #
-
-#include(sitkTargetLinkLibrariesWithDynamicLookup)
-#
-#sitk_check_dynamic_lookup(MODULE
-#  SHARED
-#  SITK_UNDEFINED_SYMBOLS_ALLOWED
-#  )
 
 option(WRAP_DEFAULT "The default initial value for wrapping a language when it is detected on the system." OFF)
 mark_as_advanced(WRAP_DEFAULT)
@@ -39,36 +30,6 @@ endmacro()
 #
 # Setup the option for each language
 #
-
-#-----------------------------------------------------------
-# Lua
-
-#set_QUIET( WRAP_LUA )
-#find_package ( Lua ${_QUIET} )
-#
-#if ( LUA_FOUND )
-#  set( WRAP_LUA_DEFAULT ${WRAP_DEFAULT} )
-#else()
-#  set( WRAP_LUA_DEFAULT OFF )
-#endif()
-#
-#set( LUA_ADDITIONAL_LIBRARIES "" CACHE STRING "Additional libraries which may be needed for lua such as readline.")
-#mark_as_advanced( LUA_ADDITIONAL_LIBRARIES )
-#
-#option ( WRAP_LUA "Wrap Lua" ${WRAP_LUA_DEFAULT} )
-#
-#if ( WRAP_LUA )
-#  find_package( LuaInterp REQUIRED )
-#  list( APPEND SITK_LANGUAGES_VARS
-#    LUA_EXECUTABLE
-#    LUA_LIBRARIES
-#    LUA_INCLUDE_DIR
-#    LUA_VERSION_STRING
-#    LUA_MATH_LIBRARY
-#    LUA_ADDITIONAL_LIBRARIES
-#    )
-#endif()
-
 
 #-----------------------------------------------------------
 # Python
@@ -100,7 +61,6 @@ if ( WRAP_PYTHON )
     PYTHON_EXECUTABLE
     PYTHON_LIBRARY
     PYTHON_INCLUDE_DIR
-    #  PYTHON_INCLUDE_PATH ( deprecated )
     )
 # Debian "jessie" has this additional variable required to match
 # python versions.
@@ -110,149 +70,3 @@ if ( WRAP_PYTHON )
       )
   endif()
 endif ()
-
-
-#-----------------------------------------------------------
-# Java
-
-#set_QUIET( WRAP_JAVA )
-#find_package ( Java COMPONENTS Development Runtime ${_QUIET} )
-#find_package ( JNI ${_QUIET} )
-#if ( JAVA_FOUND AND JNI_FOUND )
-#  set( WRAP_JAVA_DEFAULT ${WRAP_DEFAULT} )
-#else ( ${JAVA_FOUND} AND JNI_FOUND )
-#  set( WRAP_JAVA_DEFAULT OFF )
-#endif ( )
-#
-#option ( WRAP_JAVA "Wrap Java" ${WRAP_JAVA_DEFAULT} )
-#
-#if ( WRAP_JAVA )
-#  list( APPEND SITK_LANGUAGES_VARS
-#    Java_JAVA_EXECUTABLE
-#    Java_JAVAC_EXECUTABLE
-#    Java_JAR_EXECUTABLE
-#    Java_JAVADOC_EXECUTABLE
-#    Java_JAVAH_EXECUTABLE
-#    Java_VERSION_STRING
-#    Java_VERSION_MAJOR
-#    Java_VERSION_MINOR
-#    Java_VERSION_PATCH
-#    Java_VERSION_TWEAK
-#    Java_VERSION
-#    Java_INCLUDE_DIRS
-#    Java_LIBRARIES
-#    JNI_INCLUDE_DIRS
-#    JNI_LIBRARIES
-#    JAVA_AWT_LIBRARY
-#    JAVA_JVM_LIBRARY
-#    JAVA_INCLUDE_PATH
-#    JAVA_INCLUDE_PATH2
-#    JAVA_AWT_INCLUDE_PATH
-#    )
-#endif()
-#
-
-#-----------------------------------------------------------
-# Tcl
-
-#set_QUIET(WRAP_TCL)
-#
-#find_package ( TCL ${_QUIET} )
-#
-#if ( TCL_FOUND )
-#  set ( WRAP_TCL_DEFAULT ${WRAP_DEFAULT} )
-#else ( )
-#  set ( WRAP_TCL_DEFAULT OFF )
-#endif ( )
-#
-#option ( WRAP_TCL "Wrap Tcl" ${WRAP_TCL_DEFAULT} )
-#
-#if ( WRAP_TCL )
-#  list( APPEND SITK_LANGUAGES_VARS
-#    TCL_LIBRARY
-#    TCL_INCLUDE_PATH
-#    TCL_TCLSH
-#    TK_LIBRARY
-#    TK_INCLUDE_PATH
-#    TK_WISH
-#    )
-#endif()
-#
-#
-##-----------------------------------------------------------
-## Ruby
-#
-#set_QUIET( WRAP_RUBY )
-#
-#find_package ( Ruby ${_QUIET} )
-#if ( RUBY_FOUND )
-#  set ( WRAP_RUBY_DEFAULT ${WRAP_DEFAULT} )
-#else ( )
-#  set ( WRAP_RUBY_DEFAULT OFF )
-#endif ( )
-#
-#option ( WRAP_RUBY "Wrap Ruby" ${WRAP_RUBY_DEFAULT} )
-#
-#if ( WRAP_RUBY )
-#  list( APPEND SITK_LANGUAGES_VARS
-#    RUBY_EXECUTABLE
-#    RUBY_INCLUDE_DIRS
-#    RUBY_LIBRARY
-#    RUBY_VERSION
-#    RUBY_FOUND
-#    RUBY_INCLUDE_PATH
-#    )
-#endif()
-#
-#
-##-----------------------------------------------------------
-##  CSharp
-#
-#set_QUIET( WRAP_CSHARP )
-#
-#find_package( CSharp ${_QUIET} )
-#if ( CSHARP_FOUND AND NOT MINGW )
-#  set ( WRAP_CSHARP_DEFAULT ${WRAP_DEFAULT} )
-#else ()
-#  set ( WRAP_CSHARP_DEFAULT OFF )
-#endif ()
-#
-#option ( WRAP_CSHARP "Wrap C#" ${WRAP_CSHARP_DEFAULT} )
-#
-#if ( WRAP_CSHARP )
-#  list( APPEND SITK_LANGUAGES_VARS
-#    CSHARP_COMPILER
-#    CSHARP_INTERPRETER
-#    CSHARP_PLATFORM
-#    )
-#endif()
-#
-#
-##-----------------------------------------------------------
-##  R
-#
-#set_QUIET( WRAP_R )
-#
-#find_package(R ${_QUIET})
-#if ( R_FOUND AND NOT WIN32 )
-#  set ( WRAP_R_DEFAULT ${WRAP_DEFAULT} )
-#else( )
-#  set ( WRAP_R_DEFAULT OFF )
-#endif( )
-#
-#option ( WRAP_R "Wrap R" ${WRAP_R_DEFAULT} )
-#
-#if ( WRAP_R )
-#  list( APPEND SITK_LANGUAGES_VARS
-#    R_INCLUDE_DIR
-#    R_LIBRARIES
-#    R_LIBRARY_BASE
-#    R_COMMAND
-#    RSCRIPT_EXECUTABLE )
-#endif()
-#
-#
-#if( WIN32 )
-#  mark_as_advanced( WRAP_R )
-#endif()
-#

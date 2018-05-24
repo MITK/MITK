@@ -23,7 +23,6 @@ message("Using MITK version of GetPrerequisites.cmake")
 # ::
 #
 #    dumpbin (Windows)
-#    objdump (MinGW on Windows)
 #    ldd (Linux/Unix)
 #    otool (Mac OSX)
 #
@@ -654,9 +653,9 @@ function(get_prerequisites_clear_cache)
 endfunction(get_prerequisites_clear_cache)
 
 function(get_prerequisites target prerequisites_var exclude_system recurse exepath dirs)
-  
+
   # See if we know the answer from our cache. If so, we are done early
-  
+
   # incorporate all parameters into cache key
   string(SHA1 param_hash "${exclude_system}_${recurse}_${exepath}_${dirs}")
   set(prerequisites_cache_var_name "prerequisites_cache_${target}_${param_hash}")
@@ -734,7 +733,7 @@ function(get_prerequisites target prerequisites_var exclude_system recurse exepa
       find_program(gp_dumpbin "dumpbin" PATHS ${gp_cmd_paths})
       if(gp_dumpbin)
         set(gp_tool "dumpbin")
-      else() # Try harder. Maybe we're on MinGW
+      else() # Try harder.
         set(gp_tool "objdump")
       endif()
     endif()
@@ -1014,7 +1013,7 @@ function(get_prerequisites target prerequisites_var exclude_system recurse exepa
 
   # Update our cache
   set_property(GLOBAL PROPERTY ${prerequisites_cache_var_name} "${targets_added}")
- 
+
   get_property(cache_variables GLOBAL PROPERTY prerequisites_cachevariables)
   if (cache_variables)
     list(APPEND cache_variables ${prerequisites_cache_var_name})
@@ -1023,7 +1022,7 @@ function(get_prerequisites target prerequisites_var exclude_system recurse exepa
     set(cache_variables ${prerequisites_cache_var_name})
   endif()
   set_property(GLOBAL PROPERTY prerequisites_cachevariables ${cache_variables})
- 
+
   message("Analyzed prerequisites of ${target}")
 endfunction()
 

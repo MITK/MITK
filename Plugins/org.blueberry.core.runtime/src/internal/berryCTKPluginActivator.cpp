@@ -109,7 +109,7 @@ ApplicationContainer* org_blueberry_core_runtime_Activator::GetContainer()
   return appContainer.data();
 }
 
-#if defined(Q_OS_LINUX) || defined(Q_OS_DARWIN) || defined(Q_CC_MINGW)
+#if defined(Q_OS_LINUX) || defined(Q_OS_DARWIN)
 
 #include <dlfcn.h>
 QString org_blueberry_core_runtime_Activator::getPluginId(void *symbol)

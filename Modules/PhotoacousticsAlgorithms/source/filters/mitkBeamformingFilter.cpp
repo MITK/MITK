@@ -78,7 +78,8 @@ void mitk::BeamformingFilter::GenerateOutputInformation()
 
   mitk::Vector3D spacing;
   spacing[0] = m_Conf->GetPitchInMeters() * m_Conf->GetTransducerElements() * 1000 / m_Conf->GetReconstructionLines();
-  spacing[1] = (m_Conf->GetTimeSpacing() * m_Conf->GetInputDim()[1]) / 2 * m_Conf->GetSpeedOfSound() * 1000 / m_Conf->GetSamplesPerLine();
+  spacing[1] = (m_Conf->GetTimeSpacing() * m_Conf->GetInputDim()[1]) / (2-(int)m_Conf->GetIsPhotoacousticImage()) * 
+    m_Conf->GetSpeedOfSound() * 1000 / m_Conf->GetSamplesPerLine();
   spacing[2] = 1;
 
   output->GetGeometry()->SetSpacing(spacing);

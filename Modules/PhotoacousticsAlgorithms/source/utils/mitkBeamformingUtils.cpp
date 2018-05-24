@@ -100,7 +100,7 @@ void mitk::BeamformingUtils::DASQuadraticLine(
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = (float)sample / outputS * inputS / 2;
+    s_i = (float)sample / outputS * inputS / (2-(int)config->GetIsPhotoacousticImage());
 
     part = part_multiplicator*s_i;
 
@@ -162,7 +162,7 @@ void mitk::BeamformingUtils::DASSphericalLine(
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = (float)sample / outputS * inputS / 2;
+    s_i = (float)sample / outputS * inputS / (2 - (int)config->GetIsPhotoacousticImage());
 
     part = part_multiplicator*s_i;
 
@@ -226,7 +226,7 @@ void mitk::BeamformingUtils::DMASQuadraticLine(
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = sample / outputS * inputS / 2;
+    s_i = sample / outputS * inputS / (2 - (int)config->GetIsPhotoacousticImage());
 
     part = part_multiplicator*s_i;
 
@@ -313,7 +313,7 @@ void mitk::BeamformingUtils::DMASSphericalLine(
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = (float)sample / outputS * inputS / 2;
+    s_i = (float)sample / outputS * inputS / (2 - (int)config->GetIsPhotoacousticImage());
 
     part = part_multiplicator*s_i;
 
@@ -400,7 +400,7 @@ void mitk::BeamformingUtils::sDMASQuadraticLine(
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = sample / outputS * inputS / 2;
+    s_i = sample / outputS * inputS / (2 - (int)config->GetIsPhotoacousticImage());
 
     part = part_multiplicator*s_i;
 
@@ -490,7 +490,7 @@ void mitk::BeamformingUtils::sDMASSphericalLine(
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = (float)sample / outputS * inputS / 2;
+    s_i = (float)sample / outputS * inputS / (2 - (int)config->GetIsPhotoacousticImage());
 
     part = part_multiplicator*s_i;
 

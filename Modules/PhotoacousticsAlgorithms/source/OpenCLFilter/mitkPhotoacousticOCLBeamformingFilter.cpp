@@ -28,7 +28,7 @@ mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter(Beamf
   m_UsedLinesBuffer(nullptr),
   m_Conf(settings)
 {
-  MITK_INFO << "Initializing OCL beamforming Filter...";
+  MITK_INFO << "Instantiating OCL beamforming Filter...";
   this->AddSourceFile("DAS.cl");
   this->AddSourceFile("DMAS.cl");
   this->AddSourceFile("sDMAS.cl");
@@ -46,7 +46,7 @@ mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter(Beamf
 
   m_UsedLinesCalculation = mitk::OCLUsedLinesCalculation::New(m_Conf);
   m_DelayCalculation = mitk::OCLDelayCalculation::New(m_Conf);
-  MITK_INFO << "Initializing OCL beamforming Filter...[Done]";
+  MITK_INFO << "Instantiating OCL beamforming Filter...[Done]";
 }
 
 mitk::PhotoacousticOCLBeamformingFilter::~PhotoacousticOCLBeamformingFilter()
@@ -86,7 +86,6 @@ void mitk::PhotoacousticOCLBeamformingFilter::UpdateDataBuffers()
 
   try
   {
-    MITK_INFO << "Updating Workgroup size for new dimensions";
     size_t outputSize = (size_t)m_Conf->GetReconstructionLines() * (size_t)m_Conf->GetSamplesPerLine() *
       (size_t)m_Conf->GetInputDim()[2];
     m_OutputDim[0] = m_Conf->GetReconstructionLines();

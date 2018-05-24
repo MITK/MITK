@@ -13,6 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+
 #include "mitkPluginActivator.h"
 
 #include "QmitkMultiLabelSegmentationView.h"
@@ -53,17 +54,11 @@ void mitk::PluginActivator::start(ctkPluginContext *context)
   m_Context = context;
 }
 
-void mitk::PluginActivator::stop(ctkPluginContext* context)
+void mitk::PluginActivator::stop(ctkPluginContext*)
 {
-  Q_UNUSED(context)
-  m_Context = nullptr;
 }
 
 ctkPluginContext* mitk::PluginActivator::getContext()
 {
   return m_Context;
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-Q_EXPORT_PLUGIN2(org_mitk_gui_qt_multilabelsegmentation, mitk::PluginActivator)
-#endif

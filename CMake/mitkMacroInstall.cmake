@@ -36,7 +36,7 @@ endmacro()
 macro(_fixup_target)
 
   if(NOT intermediate_dir)
-    if(WIN32 AND NOT MINGW)
+    if(WIN32)
       set(intermediate_dir Release)
     else()
       set(intermediate_dir .)

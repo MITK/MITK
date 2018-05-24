@@ -162,7 +162,7 @@ set(${PROJECT_NAME}_VERSION_STRING "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT
 option(${PROJECT_NAME}_SHOW_CONSOLE_WINDOW "Use this to enable or disable the console window when starting GUI Applications" ON)
 mark_as_advanced(${PROJECT_NAME}_SHOW_CONSOLE_WINDOW)
 
-if(NOT UNIX AND NOT MINGW)
+if(NOT UNIX)
   set(MITK_WIN32_FORCE_STATIC "STATIC")
 endif()
 
@@ -189,8 +189,7 @@ endif(APPLE)
 # Set symbol visibility Flags
 #-----------------------------------------------------------------------------
 
-# MinGW does not export all symbols automatically, so no need to set flags
-if(CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
+if(CMAKE_COMPILER_IS_GNUCXX)
   # The MITK module build system does not yet support default hidden visibility
   set(VISIBILITY_CXX_FLAGS ) # "-fvisibility=hidden -fvisibility-inlines-hidden")
 endif()

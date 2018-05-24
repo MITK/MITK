@@ -1316,6 +1316,10 @@ write_basic_config_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Confi
 # might do a find_package(MITK REQUIRED).
 add_subdirectory(Applications)
 
+if(MSVC AND TARGET MitkWorkbench)
+  set_directory_properties(PROPERTIES VS_STARTUP_PROJECT MitkWorkbench)
+endif()
+
 #-----------------------------------------------------------------------------
 # MITK Examples
 #-----------------------------------------------------------------------------

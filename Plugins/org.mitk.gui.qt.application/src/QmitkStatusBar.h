@@ -62,6 +62,8 @@ public:
     virtual void DisplayWarningText(const char *t, int ms) override { this->DisplayText(t, ms); };
     virtual void DisplayGenericOutputText(const char *t) override {this->DisplayText(t);}
     virtual void DisplayDebugText(const char *t) override { this->DisplayText(t); };
+    void DisplayLicenseText(const char *t);
+    void HideLicenseWarning();
     virtual void DisplayGreyValueText(const char *t) override;
 
     //##Documentation
@@ -78,6 +80,8 @@ private:
     //static Pointer m_Instance;
     QStatusBar* m_StatusBar;
     QLabel* m_GreyValueLabel;
+    QLabel* m_LicenseWarningIcon;
+    QLabel* m_LicenseLabel;
 
 };
 

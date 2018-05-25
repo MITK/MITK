@@ -48,6 +48,29 @@ void QmitkStatusBar::DisplayText(const char* t, int ms)
   // TODO bug #1357
   //qApp->processEvents(); // produces crashes!
 }
+
+/**
+ * Show the grey value text in the statusbar
+ */
+void QmitkStatusBar::DisplayLicenseText(const char* t)
+{
+  QString text(t);
+  if (!m_LicenseLabel->isVisible()) {
+    m_LicenseWarningIcon->show();
+    m_LicenseLabel->show();
+  }
+  m_LicenseLabel->setText(text);
+}
+
+void QmitkStatusBar::HideLicenseWarning()
+{
+  if (m_LicenseLabel->isVisible()) {
+    m_LicenseLabel->clear();
+    m_LicenseWarningIcon->hide();
+    m_LicenseLabel->hide();
+  }
+}
+
 /**
  * Show the grey value text in the statusbar
  */
@@ -80,11 +103,22 @@ QmitkStatusBar::QmitkStatusBar(QStatusBar* instance)
 :StatusBarImplementation()
 {
     m_StatusBar = instance;
+    m_LicenseWarningIcon = new QLabel(m_StatusBar,nullptr);
+    m_LicenseLabel = new QLabel(m_StatusBar,nullptr);
     m_GreyValueLabel = new QLabel(m_StatusBar,nullptr);
     int xResolution = QApplication::desktop()->screenGeometry(0).width()-100;
     m_GreyValueLabel->setMaximumSize(QSize(xResolution,50));
     m_GreyValueLabel->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Fixed);
-    m_StatusBar->addPermanentWidget(m_GreyValueLabel);
+
+    m_LicenseLabel->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Fixed);
+    m_LicenseWarningIcon->setPixmap(QPixmap(":/org.mitk.gui.qt.application/warning.png"));
+
+    m_LicenseWarningIcon->hide();
+    m_LicenseLabel->hide();
+
+    m_StatusBar->addPermanentWidget(m_LicenseWarningIcon, 0);
+    m_StatusBar->addPermanentWidget(m_LicenseLabel, 0);
+    m_StatusBar->addPermanentWidget(m_GreyValueLabel, 1);
     mitk::StatusBar::SetImplementation(this);
     QObject::connect(m_StatusBar, &QObject::destroyed, [=]() {
       m_StatusBar = nullptr;

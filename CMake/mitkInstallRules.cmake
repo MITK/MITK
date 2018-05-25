@@ -47,20 +47,27 @@ if(MITK_USE_Qt5)
 
   # Install Qt WebEngine
 
-  set(_install_DESTINATION "")
+  if(APPLE)
+    set(_install_DESTINATION "../Frameworks/QtWebEngineCore.framework")
 
-  if(NOT APPLE)
+    get_filename_component(_real_path "${_qmake_path}/../lib/QtWebEngineCore.framework/Helpers" REALPATH)
+    MITK_INSTALL(DIRECTORY ${_real_path})
+
+    get_filename_component(_real_path "${_qmake_path}/../lib/QtWebEngineCore.framework/Resources" REALPATH)
+    MITK_INSTALL(DIRECTORY ${_real_path})
+  else()
+    set(_install_DESTINATION "")
+
     if(WIN32)
       MITK_INSTALL(FILES "${_qmake_path}/QtWebEngineProcess.exe")
     elseif(UNIX)
       MITK_INSTALL(FILES "${_qmake_path}/../libexec/QtWebEngineProcess")
     endif()
 
-    set(_install_DESTINATION "resources")
-    MITK_INSTALL(DIRECTORY "${_qmake_path}/../resources/")
+    MITK_INSTALL(DIRECTORY "${_qmake_path}/../resources")
 
-    set(_install_DESTINATION "translations/qtwebengine_locales")
-    MITK_INSTALL(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales/")
+    set(_install_DESTINATION "translations")
+    MITK_INSTALL(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales")
   endif()
 endif()
 

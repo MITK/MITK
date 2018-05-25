@@ -68,18 +68,13 @@ public:
       true,
       3000,
       128,
-      0,
-      false,
-      (unsigned int*) nullptr,
       inputDimensions,
       false,
+      16,
       mitk::BeamformingSettings::DelayCalc::Spherical,
       mitk::BeamformingSettings::Apodization::Box,
       128,
-      mitk::BeamformingSettings::BeamformingAlgorithm::DAS,
-      false,
-      0.0f,
-      0.0f);
+      mitk::BeamformingSettings::BeamformingAlgorithm::DAS);
 
     return outputSettings;
   }

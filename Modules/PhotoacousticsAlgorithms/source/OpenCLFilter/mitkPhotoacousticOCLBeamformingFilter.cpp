@@ -26,6 +26,7 @@ mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter(Beamf
   m_MemoryLocationsBuffer(nullptr),
   m_DelaysBuffer(nullptr),
   m_UsedLinesBuffer(nullptr),
+  m_inputSlices(1),
   m_Conf(settings)
 {
   MITK_INFO << "Instantiating OCL beamforming Filter...";
@@ -87,10 +88,10 @@ void mitk::PhotoacousticOCLBeamformingFilter::UpdateDataBuffers()
   try
   {
     size_t outputSize = (size_t)m_Conf->GetReconstructionLines() * (size_t)m_Conf->GetSamplesPerLine() *
-      (size_t)m_Conf->GetInputDim()[2];
+      (size_t)m_inputSlices;
     m_OutputDim[0] = m_Conf->GetReconstructionLines();
     m_OutputDim[1] = m_Conf->GetSamplesPerLine();
-    m_OutputDim[2] = m_Conf->GetInputDim()[2];
+    m_OutputDim[2] = m_inputSlices;
     this->InitExec(this->m_PixelCalculation, m_OutputDim, outputSize, sizeof(float));
   }
   catch (const mitk::Exception& e)
@@ -149,11 +150,11 @@ void mitk::PhotoacousticOCLBeamformingFilter::Execute()
   clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_ushort), &(this->m_ApodArraySize));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[0]));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[1]));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[2]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_uint), &(m_OutputDim[2]));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 9, sizeof(cl_uint), &(reconstructionLines));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 10, sizeof(cl_uint), &(samplesPerLine));
 
-  // execute the filter on a 3D NDRange
+  // execute the filter on a 2D/3D NDRange
   if (m_OutputDim[2] == 1 || m_ChunkSize[2] == 1)
   {
     if (!this->ExecuteKernelChunksInBatches(m_PixelCalculation, 2, m_ChunkSize, 16, 50))
@@ -176,7 +177,6 @@ us::Module *mitk::PhotoacousticOCLBeamformingFilter::GetModule()
 
 bool mitk::PhotoacousticOCLBeamformingFilter::Initialize()
 {
-  MITK_INFO << "Initializing OCL Beamforming Filter...";
   bool buildErr = true;
   cl_int clErr = 0;
 
@@ -211,15 +211,14 @@ bool mitk::PhotoacousticOCLBeamformingFilter::Initialize()
 
   CHECK_OCL_ERR(clErr);
 
-  MITK_INFO << "Initializing OCL Beamforming Filter...[Done]";
-
   return (OclFilter::IsInitialized() && buildErr);
 }
 
-void mitk::PhotoacousticOCLBeamformingFilter::SetInput(mitk::Image::Pointer image)
+void mitk::PhotoacousticOCLBeamformingFilter::SetInput(mitk::Image::Pointer image, unsigned int inputSlices)
 {
   OclDataSetToDataSetFilter::SetInput(image);
   m_InputImage = image;
+  m_inputSlices = inputSlices;
 }
 
 void mitk::PhotoacousticOCLBeamformingFilter::SetInput(void* data, unsigned int* dimensions, unsigned int BpE)

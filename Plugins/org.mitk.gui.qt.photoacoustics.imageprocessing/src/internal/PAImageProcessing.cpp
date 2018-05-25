@@ -504,7 +504,11 @@ void PAImageProcessing::StartCropThread()
       connect(thread, &CropThread::result, this, &PAImageProcessing::HandleResults);
       connect(thread, &CropThread::finished, thread, &QObject::deleteLater);
 
-      thread->setConfig(m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), 0, image->GetDimension(2) - 1);
+      if(m_Controls.Partial->isChecked())
+        thread->setConfig(m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), m_Controls.boundLow->value(), m_Controls.boundHigh->value());
+      else
+        thread->setConfig(m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), 0, image->GetDimension(2) - 1);
+
       thread->setInputImage(image);
       thread->setFilterBank(m_FilterBank);
 
@@ -801,15 +805,9 @@ mitk::BeamformingSettings::Pointer PAImageProcessing::CreateBeamformingSettings(
     isPAImage = true;
   }
 
-  bool partial = m_Controls.Partial->isChecked();
-  unsigned int cropBoundLow = m_Controls.boundLow->value();
-  unsigned int cropBoundHigh = m_Controls.boundHigh->value();
-
-  unsigned int* cropBounds = new unsigned int[2]{ cropBoundLow, cropBoundHigh };
-
   return mitk::BeamformingSettings::New(pitchInMeters,
-    speedOfSound, timeSpacing, angle, isPAImage, samplesPerLine, reconstructionLines, 0, partial,
-    cropBounds, image->GetDimensions(), useGPU, delay, apod,
+    speedOfSound, timeSpacing, angle, isPAImage, samplesPerLine, reconstructionLines,
+    image->GetDimensions(), useGPU, 16, delay, apod,
     apodizatonArraySize, algorithm, useBandpass, 50, 50);
 }
 
@@ -982,7 +980,7 @@ void CropThread::run()
 {
   mitk::Image::Pointer resultImage;
 
-  resultImage = m_FilterBank->ApplyCropping(m_InputImage, m_CutAbove, m_CutBelow, 0, 0, 0, 0);
+  resultImage = m_FilterBank->ApplyCropping(m_InputImage, m_CutAbove, m_CutBelow, 0, 0, m_CutSliceFirst, m_InputImage->GetDimension(2) - m_CutSliceLast);
 
   emit result(resultImage, "_cropped");
 }

@@ -31,18 +31,13 @@ mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,
   bool isPhotoacousticImage,
   unsigned int samplesPerLine,
   unsigned int reconstructionLines,
-  unsigned int upperCutoff,
-  bool partial,
-  unsigned int* cropBounds,
   unsigned int* inputDim,
   bool useGPU,
+  unsigned int GPUBatchSize,
   DelayCalc delayCalculationMethod,
   Apodization apod,
   unsigned int apodizationArraySize,
-  BeamformingAlgorithm algorithm,
-  bool useBP,
-  float BPHighPass,
-  float BPLowPass
+  BeamformingAlgorithm algorithm
 ) :
   m_PitchInMeters(pitchInMeters),
   m_SpeedOfSound(speedOfSound),
@@ -51,17 +46,12 @@ mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,
   m_IsPhotoacousticImage(isPhotoacousticImage),
   m_SamplesPerLine(samplesPerLine),
   m_ReconstructionLines(reconstructionLines),
-  m_UpperCutoff(upperCutoff),
-  m_Partial(partial),
-  m_CropBounds(cropBounds),
   m_UseGPU(useGPU),
+  m_GPUBatchSize(GPUBatchSize),
   m_DelayCalculationMethod(delayCalculationMethod),
   m_Apod(apod),
   m_ApodizationArraySize(apodizationArraySize),
-  m_Algorithm(algorithm),
-  m_UseBP(useBP),
-  m_BPHighPass(BPHighPass),
-  m_BPLowPass(BPLowPass)
+  m_Algorithm(algorithm)
 {
   if (inputDim == nullptr)
   {
@@ -83,9 +73,6 @@ mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,
     break;
   }
 
-  if (m_CropBounds == nullptr)
-    m_CropBounds = new unsigned int[2]{ 0, 0 };
-
   m_InputDim = new unsigned int[3]{ inputDim[0], inputDim[1], inputDim[2] };
 
   m_TransducerElements = m_InputDim[0];
@@ -100,13 +87,6 @@ mitk::BeamformingSettings::~BeamformingSettings()
     MITK_INFO << "Deleting apodization function...";
     delete[] m_ApodizationFunction;
     MITK_INFO << "Deleting apodization function...[Done]";
-  }
-
-  if (m_CropBounds != nullptr)
-  {
-    MITK_INFO << "Deleting crop bounds...";
-    delete[] m_CropBounds;
-    MITK_INFO << "Deleting crop bounds...[Done]";
   }
 
   if (m_InputDim != nullptr)

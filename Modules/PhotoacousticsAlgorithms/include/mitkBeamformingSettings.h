@@ -63,19 +63,14 @@ namespace mitk {
     itkGetConstMacro(TransducerElements, unsigned int);
     itkGetConstMacro(SamplesPerLine, unsigned int);
     itkGetConstMacro(ReconstructionLines, unsigned int);
-    itkGetConstMacro(UpperCutoff, unsigned int);
-    itkGetConstMacro(Partial, bool);
-    itkGetConstMacro(CropBounds, const unsigned int*);
     itkGetConstMacro(InputDim, const unsigned int*);
     itkGetConstMacro(UseGPU, bool);
+    itkGetConstMacro(GPUBatchSize, unsigned int);
     itkGetConstMacro(DelayCalculationMethod, DelayCalc);
     itkGetConstMacro(ApodizationFunction, const float*);
     itkGetConstMacro(Apod, Apodization);
     itkGetConstMacro(ApodizationArraySize, int);
     itkGetConstMacro(Algorithm, BeamformingAlgorithm);
-    itkGetConstMacro(UseBP, bool);
-    itkGetConstMacro(BPHighPass, float);
-    itkGetConstMacro(BPLowPass, float);
 
     /** \brief function for mitk::PhotoacousticOCLBeamformingFilter to check whether buffers need to be updated
     * this method only checks parameters relevant for the openCL implementation
@@ -101,18 +96,13 @@ namespace mitk {
       bool isPhotoacousticImage,
       unsigned int samplesPerLine,
       unsigned int reconstructionLines,
-      unsigned int upperCutoff,
-      bool partial,
-      unsigned int* cropBounds,
       unsigned int* inputDim,
       bool useGPU,
+      unsigned int GPUBatchSize,
       DelayCalc delayCalculationMethod,
       Apodization apod,
       unsigned int apodizationArraySize,
-      BeamformingAlgorithm algorithm,
-      bool useBP,
-      float BPHighPass,
-      float BPLowPass)
+      BeamformingAlgorithm algorithm)
     {
       Pointer smartPtr = new BeamformingSettings(pitchInMeters,
         speedOfSound,
@@ -121,18 +111,13 @@ namespace mitk {
         isPhotoacousticImage,
         samplesPerLine,
         reconstructionLines,
-        upperCutoff,
-        partial,
-        cropBounds,
         inputDim,
         useGPU,
+        GPUBatchSize,
         delayCalculationMethod,
         apod,
         apodizationArraySize,
-        algorithm,
-        useBP,
-        BPHighPass,
-        BPLowPass);
+        algorithm);
       smartPtr->UnRegister();
       return smartPtr;
     }
@@ -152,18 +137,13 @@ namespace mitk {
       bool isPhotoacousticImage,
       unsigned int samplesPerLine,
       unsigned int reconstructionLines,
-      unsigned int upperCutoff,
-      bool partial,
-      unsigned int* cropBounds,
       unsigned int* inputDim,
       bool useGPU,
+      unsigned int GPUBatchSize,
       DelayCalc delayCalculationMethod,
       Apodization apod,
       unsigned int apodizationArraySize,
-      BeamformingAlgorithm algorithm,
-      bool useBP,
-      float BPHighPass,
-      float BPLowPass
+      BeamformingAlgorithm algorithm
     );
 
     ~BeamformingSettings();
@@ -200,18 +180,6 @@ namespace mitk {
     */
     unsigned int m_ReconstructionLines;
 
-    /** \brief Sets how many voxels should be cut off from the top of the image before beamforming, to potentially avoid artifacts.
-    */
-    unsigned int m_UpperCutoff;
-
-    /** \brief Sets whether only the slices selected by mitk::BeamformingSettings::CropBounds should be beamformed.
-    */
-    bool m_Partial;
-
-    /** \brief Sets the first and last slice to be beamformed.
-    */
-    const unsigned int* m_CropBounds;
-
     /** \brief Sets the dimensions of the inputImage.
     */
     const unsigned int* m_InputDim;
@@ -219,6 +187,10 @@ namespace mitk {
     /** \brief Decides whether GPU computing should be used
     */
     bool m_UseGPU;
+
+    unsigned int m_GPUBatchSize;
+    /** \brief Sets the amount of image slices in batches when GPU is used
+    */
 
     /** \brief Sets how the delays for beamforming should be calculated.
     */
@@ -237,18 +209,6 @@ namespace mitk {
     /** \brief Sets the used beamforming algorithm.
     */
     BeamformingAlgorithm m_Algorithm;
-
-    /** \brief Sets whether after beamforming a bandpass should be automatically applied
-    */
-    bool m_UseBP;
-
-    /** \brief Sets the position at which lower frequencies are completely cut off in Hz.
-    */
-    float m_BPHighPass;
-
-    /** \brief Sets the position at which higher frequencies are completely cut off in Hz.
-    */
-    float m_BPLowPass;
   };
 }
 #endif //MITK_BEAMFORMING_SETTINGS

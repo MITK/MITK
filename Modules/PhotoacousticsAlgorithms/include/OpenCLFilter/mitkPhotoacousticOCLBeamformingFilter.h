@@ -47,7 +47,7 @@ namespace mitk
     /**
     * @brief SetInput Set the input data through an image. Arbitrary images are supported
     */
-    void SetInput(Image::Pointer image);
+    void SetInput(Image::Pointer image, unsigned int inputSlices);
     /**
     *  brief SetInput Manually set the input data while providing 3 dimensions and memory size of the input data (Bytes per element).
     */
@@ -106,6 +106,7 @@ namespace mitk
 
     const float* m_Apodisation;
     unsigned short m_ApodArraySize;
+    unsigned int m_inputSlices;
 
     unsigned short m_PAImage;
 

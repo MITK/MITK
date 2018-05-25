@@ -220,27 +220,22 @@ void mitk::BeamformingFilter::GenerateData()
 
       unsigned long availableMemory = m_BeamformingOclFilter->GetDeviceMemory();
 
-      unsigned int batchSize = 16;
+      unsigned int batchSize = m_Conf->GetGPUBatchSize();
       unsigned int batches = (unsigned int)((float)input->GetDimension(2) / batchSize) + (input->GetDimension(2) % batchSize > 0);
 
       unsigned int batchDim[] = { input->GetDimension(0), input->GetDimension(1), batchSize };
       unsigned int batchDimLast[] = { input->GetDimension(0), input->GetDimension(1), input->GetDimension(2) % batchSize };
 
       // the following safeguard is probably only needed for absurdly small GPU memory
-      for (batchSize = 16;
-        (unsigned long)batchSize *
+      if((unsigned long)batchSize *
         ((unsigned long)(batchDim[0] * batchDim[1]) * 4 + // single input image (float)
         (unsigned long)(m_Conf->GetReconstructionLines() * m_Conf->GetSamplesPerLine()) * 4) // single output image (float)
           > availableMemory -
         (unsigned long)(m_Conf->GetReconstructionLines() / 2 * m_Conf->GetSamplesPerLine()) * 2 - // Delays buffer (unsigned short)
         (unsigned long)(m_Conf->GetReconstructionLines() * m_Conf->GetSamplesPerLine()) * 3 * 2 - // UsedLines buffer (unsigned short)
-        50 * 1024 * 1024; // 50 MB buffer for local data, system purposes etc
-        --batchSize)
+        50 * 1024 * 1024)// 50 MB buffer for local data, system purposes etc
       {
-      }
-      if (batchSize < 1)
-      {
-        MITK_ERROR << "device memory too small for GPU beamforming";
+        MITK_ERROR << "device memory too small for GPU beamforming; try decreasing the batch size";
         return;
       }
 
@@ -248,7 +243,7 @@ void mitk::BeamformingFilter::GenerateData()
 
       for (unsigned int i = 0; i < batches; ++i)
       {
-        m_ProgressHandle(input->GetDimension(2) / batches * i, "performing reconstruction");
+        m_ProgressHandle(100.f * (float)i / (float)batches, "performing reconstruction");
 
         mitk::Image::Pointer inputBatch = mitk::Image::New();
         unsigned int num_Slices = 1;
@@ -266,9 +261,9 @@ void mitk::BeamformingFilter::GenerateData()
         inputBatch->SetSpacing(input->GetGeometry()->GetSpacing());
 
         inputBatch->SetImportVolume(&(((float*)copy.GetData())[input->GetDimension(0) * input->GetDimension(1) * batchSize * i]));
-
+        
         m_BeamformingOclFilter->SetApodisation(m_Conf->GetApodizationFunction(), m_Conf->GetApodizationArraySize());
-        m_BeamformingOclFilter->SetInput(inputBatch);
+        m_BeamformingOclFilter->SetInput(inputBatch, num_Slices);
         m_BeamformingOclFilter->Update();
 
         void* out = m_BeamformingOclFilter->GetOutput();

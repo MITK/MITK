@@ -106,6 +106,7 @@ private:
   const float SPEED_OF_SOUND = 1540; // m/s
   const float SPACING_X = 0.3; // mm
   const float SPACING_Y = 0.00625 / 2; // us
+  const unsigned int GPU_BATCH_SIZE = 16;
 
 public:
 
@@ -187,18 +188,13 @@ public:
       true,
       RECONSTRUCTED_SAMPLES,
       RECONSTRUCTED_LINES,
-      0,
-      false,
-      nullptr,
       inputDim,
       UseGPU,
+      GPU_BATCH_SIZE,
       mitk::BeamformingSettings::DelayCalc::Spherical,
       mitk::BeamformingSettings::Apodization::Box,
       ELEMENTS * 2,
-      alg,
-      false,
-      0,
-      0);
+      alg);
   }
 
   void testBeamformingCPU_DAS()

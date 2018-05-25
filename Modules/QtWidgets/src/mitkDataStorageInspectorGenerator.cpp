@@ -18,9 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usGetModuleContext.h"
 
 #include "mitkLogMacros.h"
-#include "QmitkDataStorageInspectorGenerator.h"
+#include "mitkDataStorageInspectorGenerator.h"
 
-mitk::IDataStorageInspectorProvider* QmitkDataStorageInspectorGenerator::GetProvider(const IDType& id)
+mitk::IDataStorageInspectorProvider* mitk::DataStorageInspectorGenerator::GetProvider(const IDType& id)
 {
   mitk::IDataStorageInspectorProvider* result = nullptr;
 
@@ -39,7 +39,7 @@ mitk::IDataStorageInspectorProvider* QmitkDataStorageInspectorGenerator::GetProv
   return result;
 };
 
-QmitkDataStorageInspectorGenerator::ProviderMapType QmitkDataStorageInspectorGenerator::GetProviders()
+mitk::DataStorageInspectorGenerator::ProviderMapType mitk::DataStorageInspectorGenerator::GetProviders()
 {
   std::vector<us::ServiceReference<mitk::IDataStorageInspectorProvider> > providerRegisters = us::GetModuleContext()->GetServiceReferences<mitk::IDataStorageInspectorProvider>();
 
@@ -54,8 +54,8 @@ QmitkDataStorageInspectorGenerator::ProviderMapType QmitkDataStorageInspectorGen
   return result;
 };
 
-QmitkDataStorageInspectorGenerator::QmitkDataStorageInspectorGenerator()
+mitk::DataStorageInspectorGenerator::DataStorageInspectorGenerator()
 = default;
 
-QmitkDataStorageInspectorGenerator::~QmitkDataStorageInspectorGenerator()
+mitk::DataStorageInspectorGenerator::~DataStorageInspectorGenerator()
 = default;

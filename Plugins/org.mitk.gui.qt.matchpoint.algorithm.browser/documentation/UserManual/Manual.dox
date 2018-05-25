@@ -1,7 +1,7 @@
 /**
 \page org_mitk_gui_qt_matchpoint_algorithm_browser The MatchPoint Algorithm Browser View
 
-\imageMacro{map-icon-browser.png, "Icon of the MatchPoint Algorithm Browser", 3}
+\imageMacro{map-icon-browser.svg, "Icon of the MatchPoint Algorithm Browser", 3}
 
 \li \ref MAP_BROWSER_Introduction
 \li \ref MAP_BROWSER_Contact

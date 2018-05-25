@@ -70,15 +70,3 @@ if(MITK_USE_Qt5)
     MITK_INSTALL(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales")
   endif()
 endif()
-
-# Install CTK Qt designer plugins
-
-if(MITK_USE_CTK AND EXISTS ${CTK_DESIGNERPLUGINS_DIR})
-  set(_install_DESTINATION "plugins/designer")
-  if(NOT CMAKE_CFG_INTDIR STREQUAL ".")
-    set(_release_dir "Release/")
-  else()
-    set(_release_dir "")
-  endif()
-  MITK_INSTALL(DIRECTORY "${CTK_DESIGNERPLUGINS_DIR}/designer/${_release_dir}")
-endif()

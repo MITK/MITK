@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKDATASTORAGELISTVIEWWIDGET_H
-#define QMITKDATASTORAGELISTVIEWWIDGET_H
+#ifndef QMITKDATASTORAGELISTINSPECTOR_H
+#define QMITKDATASTORAGELISTINSPECTOR_H
 
 #include <MitkQtWidgetsExports.h>
 
@@ -47,4 +47,4 @@ protected:
   Ui_QmitkDataStorageListInspector m_Controls;
 };
 
-#endif // QMITKABSTRACTDATASTORAGEMODEL_H
+#endif // QMITKDATASTORAGELISTINSPECTOR_H

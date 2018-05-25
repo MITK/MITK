@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIQtPreferencePage.h"
 #include "berryIPreferences.h"
 
-#include "QmitkDataStorageInspectorGenerator.h"
+#include "mitkDataStorageInspectorGenerator.h"
 
 #include "ui_QmitkNodeSelectionPreferencePage.h"
 
@@ -84,7 +84,7 @@ protected:
   QWidget                 *m_MainControl;
   Ui::QmitkNodeSelectionPreferencePage* m_Controls;
 
-  QmitkDataStorageInspectorGenerator::ProviderMapType m_Providers;
+  mitk::DataStorageInspectorGenerator::ProviderMapType m_Providers;
 
 };
 

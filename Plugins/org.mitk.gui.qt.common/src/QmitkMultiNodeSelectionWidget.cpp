@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkMultiNodeSelectionWidget.h"
 
 #include <QmitkNodeSelectionDialog.h>
-#include <QmitkModelViewSelectionConnector.h>
 #include <QmitkCustomVariants.h>
 
 QmitkMultiNodeSelectionWidget::QmitkMultiNodeSelectionWidget(QWidget* parent) : QmitkAbstractNodeSelectionWidget(parent)
@@ -59,6 +58,12 @@ QmitkMultiNodeSelectionWidget::NodeList QmitkMultiNodeSelectionWidget::CompileEm
 }
 
 void QmitkMultiNodeSelectionWidget::OnNodePredicateChanged(mitk::NodePredicateBase* /*newPredicate*/)
+{
+  this->UpdateInfo();
+  this->UpdateList();
+};
+
+void QmitkMultiNodeSelectionWidget::OnDataStorageChanged()
 {
   this->UpdateInfo();
   this->UpdateList();

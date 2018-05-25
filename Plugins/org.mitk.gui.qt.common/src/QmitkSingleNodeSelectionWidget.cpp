@@ -18,10 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSingleNodeSelectionWidget.h"
 
 #include <QmitkNodeSelectionDialog.h>
-#include <QmitkModelViewSelectionConnector.h>
-
-#include "QPainter"
-#include "QTextDocument"
 
 QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent) : QmitkAbstractNodeSelectionWidget(parent)
 {
@@ -80,7 +76,11 @@ QmitkSingleNodeSelectionWidget::NodeList QmitkSingleNodeSelectionWidget::Compile
 
 void QmitkSingleNodeSelectionWidget::OnNodePredicateChanged(mitk::NodePredicateBase* /*newPredicate*/)
 {
-    m_SelectedNode = this->ExtractCurrentValidSelection(m_ExternalSelection);
+  m_SelectedNode = this->ExtractCurrentValidSelection(m_ExternalSelection);
+};
+
+void QmitkSingleNodeSelectionWidget::OnDataStorageChanged()
+{
 };
 
 void QmitkSingleNodeSelectionWidget::OnClearSelection()

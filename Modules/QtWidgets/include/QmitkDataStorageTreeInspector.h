@@ -49,4 +49,4 @@ protected:
   Ui_QmitkDataStorageTreeInspector m_Controls;
 };
 
-#endif // QMITKABSTRACTDATASTORAGEMODEL_H
+#endif // QMITKDATASTORAGETREEINSPECTOR_H

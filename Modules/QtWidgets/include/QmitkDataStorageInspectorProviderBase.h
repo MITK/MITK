@@ -60,7 +60,7 @@ protected:
    * \brief Set the service ranking for this file reader.
    *
    * Default is zero and should only be chosen differently for a reason.
-   * The ranking is used to determine which reader to use if several
+   * The ranking is used to determine which provider to use if several
    * equivalent providers have been found.
    * It may be used to replace a default provider from MITK in your own project.
    */
@@ -76,4 +76,4 @@ private:
 #include "QmitkDataStorageInspectorProviderBase.tpp"
 #endif
 
-#endif /* __MODEL_FIT_PROVIDER_BASE_H */
+#endif /* __QMITK_DATA_STORAGE_INSPECTOR_PROVIDER_BASE_H */

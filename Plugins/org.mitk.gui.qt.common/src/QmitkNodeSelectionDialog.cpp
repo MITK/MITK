@@ -17,15 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkNodeSelectionDialog.h"
 
-#include <QmitkDataStorageInspectorGenerator.h>
+#include <mitkDataStorageInspectorGenerator.h>
 #include <QmitkDataStorageTreeInspector.h>
 #include <QmitkNodeSelectionPreferenceHelper.h>
 
-QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint) : QDialog(parent), m_NodePredicate(nullptr), m_SelectOnlyVisibleNodes(false)
+QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint) : QDialog(parent),
+  m_NodePredicate(nullptr), m_SelectOnlyVisibleNodes(false), m_SelectedNodes(NodeList()), m_SelectionMode(QAbstractItemView::SingleSelection)
 {
   m_Controls.setupUi(this);
 
-  auto providers = QmitkDataStorageInspectorGenerator::GetProviders();
+  auto providers = mitk::DataStorageInspectorGenerator::GetProviders();
   auto visibleProviders = mitk::GetVisibleDataStorageInspectors();
   auto favoriteID = mitk::GetFavoriteDataStorageInspector();
 

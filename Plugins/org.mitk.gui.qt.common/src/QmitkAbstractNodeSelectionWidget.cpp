@@ -17,9 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkAbstractNodeSelectionWidget.h"
 
-#include <QmitkNodeSelectionDialog.h>
-#include <QmitkModelViewSelectionConnector.h>
-
 QmitkAbstractNodeSelectionWidget::QmitkAbstractNodeSelectionWidget(QWidget* parent) : QWidget(parent), m_InvalidInfo("<b><font color=\"red\">Error. Select data.</font></b>"),
 m_EmptyInfo("Empty. Make a selection."), m_PopUpTitel("Select a data node"), m_PopUpHint(""),
 m_IsOptional(false), m_SelectOnlyVisibleNodes(true)
@@ -31,6 +28,8 @@ void QmitkAbstractNodeSelectionWidget::SetDataStorage(mitk::DataStorage* dataSto
   if (m_DataStorage != dataStorage)
   {
     m_DataStorage = dataStorage;
+    this->OnDataStorageChanged();
+    this->UpdateInfo();
   }
 };
 

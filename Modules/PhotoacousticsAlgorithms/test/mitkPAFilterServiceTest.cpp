@@ -41,21 +41,25 @@ class mitkPAFilterServiceTestSuite : public mitk::TestFixture
 private:
 
   mitk::PhotoacousticFilterService::Pointer m_PhotoacousticFilterService;
+  mitk::BeamformingSettings::Pointer m_BeamformingSettings;
+  unsigned int* inputDimensions;
+  const int xDim = 16;
+  const int yDim = 128;
+  const int length = yDim * xDim;
 
 public:
 
   void setUp() override
   {
     m_PhotoacousticFilterService = mitk::PhotoacousticFilterService::New();
+    m_BeamformingSettings = CreateBeamformingSettings();
   }
 
-  mitk::BeamformingSettings::Pointer CreateEmptyBeamformingSettings()
+  mitk::BeamformingSettings::Pointer CreateBeamformingSettings()
   {
-    return CreateFunctionalBeamformingSettings();
-  }
-
-  mitk::BeamformingSettings::Pointer CreateFunctionalBeamformingSettings()
-  {
+    inputDimensions = new unsigned int[length];
+    inputDimensions[0] = yDim;
+    inputDimensions[1] = xDim;
     mitk::BeamformingSettings::Pointer outputSettings = mitk::BeamformingSettings::New(
       (float)(0.3 / 1000),
       (float)(1500),
@@ -64,10 +68,10 @@ public:
       true,
       3000,
       128,
-      20,
+      0,
       false,
       (unsigned int*) nullptr,
-      (unsigned int*) nullptr,
+      inputDimensions,
       false,
       mitk::BeamformingSettings::DelayCalc::Spherical,
       mitk::BeamformingSettings::Apodization::Box,
@@ -82,22 +86,15 @@ public:
 
   void testRunning()
   {
-    int xDim = 3;
-    int yDim = 3;
-    int length = yDim * xDim;
     float* testArray = new float[length];
     for (int i = 0; i < length; ++i)
     {
       testArray[i] = 0;
     }
 
-    unsigned int NUMBER_OF_SPATIAL_DIMENSIONS = 2;
-    unsigned int* dimensions = new unsigned int[NUMBER_OF_SPATIAL_DIMENSIONS];
-    dimensions[0] = yDim;
-    dimensions[1] = xDim;
     mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();
     mitk::Image::Pointer testImage = mitk::Image::New();
-    testImage->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);
+    testImage->Initialize(pixelType, 2, inputDimensions);
     testImage->SetImportSlice(testArray, 0, 0, 0, mitk::Image::ImportMemoryManagementType::CopyMemory);
     delete[] testArray;
 
@@ -109,22 +106,21 @@ public:
       CPPUNIT_ASSERT_MESSAGE(std::string("Input array already not correct: " + std::to_string(inputArray[i])), abs(inputArray[i]) < 1e-5f);
     }
 
-    mitk::BeamformingSettings::Pointer config = CreateEmptyBeamformingSettings();
-    auto output = m_PhotoacousticFilterService->ApplyBeamforming(testImage, config);
+    auto output = m_PhotoacousticFilterService->ApplyBeamforming(testImage, m_BeamformingSettings);
 
     mitk::ImageReadAccessor readAccess(output);
     const float* outputArray = (const float*)readAccess.GetData();
 
     for (int i = 0; i < length; ++i)
     {
-      CPPUNIT_ASSERT_MESSAGE(std::string("Ouput array not correct: " + std::to_string(abs(outputArray[i]))), abs(outputArray[i]) < 1e-5f);
+      CPPUNIT_ASSERT_MESSAGE(std::string("Output array not correct: " + std::to_string(abs(outputArray[i]))), abs(outputArray[i]) < 1e-5f);
     }
-    delete[] dimensions;
   }
 
   void tearDown() override
   {
     m_PhotoacousticFilterService = nullptr;
+    delete[] inputDimensions;
   }
 };
 

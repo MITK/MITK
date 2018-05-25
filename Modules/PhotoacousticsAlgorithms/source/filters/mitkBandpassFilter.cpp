@@ -45,6 +45,23 @@ mitk::BandpassFilter::~BandpassFilter()
   MITK_INFO << "Destructed BandpassFilter.";
 }
 
+void mitk::BandpassFilter::SanityCheckPreconditions()
+{
+  auto input = GetInput();
+
+  std::string type = input->GetPixelType().GetTypeAsString();
+  if (!(type == "scalar (float)" || type == " (float)"))
+  {
+    MITK_ERROR << "This filter can currently only handle float type images.";
+    mitkThrow() << "This filter can currently only handle float type images.";
+  }
+  if(m_HighPass > m_LowPass)
+  {
+    MITK_ERROR << "High Pass is higher than Low Pass; aborting.";
+    mitkThrow() << "High Pass is higher than Low Pass; aborting.";
+  }
+}
+
 itk::Image<float, 3U>::Pointer BPFunction(mitk::Image::Pointer reference,
   float cutoffFrequencyPixelHighPass,
   float cutoffFrequencyPixelLowPass,
@@ -150,6 +167,7 @@ itk::Image<float, 3U>::Pointer BPFunction(mitk::Image::Pointer reference,
 
 void mitk::BandpassFilter::GenerateData()
 {
+  SanityCheckPreconditions();
   auto input = GetInput();
 
   if (!(input->GetPixelType().GetTypeAsString() == "scalar (float)" || input->GetPixelType().GetTypeAsString() == " (float)"))

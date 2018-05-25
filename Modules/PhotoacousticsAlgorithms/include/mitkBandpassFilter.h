@@ -44,6 +44,8 @@ namespace mitk {
 
     ~BandpassFilter() override;
 
+    void SanityCheckPreconditions();
+
     float m_HighPass;
     float m_LowPass;
     float m_HighPassAlpha;

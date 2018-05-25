@@ -49,13 +49,21 @@ void mitk::CropImageFilter::SanityCheckPreconditions()
   }
 
   if (m_XPixelsCropStart + m_XPixelsCropEnd >= inputImage->GetDimension(0))
+  {
+    MITK_ERROR << "X Crop area too large for selected input image";
     mitkThrow() << "X Crop area too large for selected input image";
+  }
   if (m_YPixelsCropStart + m_YPixelsCropEnd >= inputImage->GetDimension(1))
+  {
+    MITK_ERROR << "Y Crop area too large for selected input image";
     mitkThrow() << "Y Crop area too large for selected input image";
+  }
+
   if (inputImage->GetDimension() == 3)
   {
     if (m_ZPixelsCropStart + m_ZPixelsCropEnd >= inputImage->GetDimension(2))
     {
+      MITK_ERROR << "Y Crop area too large for selected input image";
       mitkThrow() << "Z Crop area too large for selected input image";
     }
   }

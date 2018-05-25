@@ -137,17 +137,28 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyCropping(
   int right, int left,
   int zStart, int zEnd)
 {
-  auto floatImage = ConvertToFloat(inputImage);
-  mitk::CropImageFilter::Pointer cropImageFilter = mitk::CropImageFilter::New();
-  cropImageFilter->SetInput(floatImage);
-  cropImageFilter->SetXPixelsCropStart(left);
-  cropImageFilter->SetXPixelsCropEnd(right);
-  cropImageFilter->SetYPixelsCropStart(above);
-  cropImageFilter->SetYPixelsCropEnd(below);
-  cropImageFilter->SetZPixelsCropStart(zStart);
-  cropImageFilter->SetZPixelsCropEnd(zEnd);
-  cropImageFilter->Update();
-  return cropImageFilter->GetOutput();
+  try
+  {
+    auto floatImage = ConvertToFloat(inputImage);
+    mitk::CropImageFilter::Pointer cropImageFilter = mitk::CropImageFilter::New();
+    cropImageFilter->SetInput(floatImage);
+    cropImageFilter->SetXPixelsCropStart(left);
+    cropImageFilter->SetXPixelsCropEnd(right);
+    cropImageFilter->SetYPixelsCropStart(above);
+    cropImageFilter->SetYPixelsCropEnd(below);
+    cropImageFilter->SetZPixelsCropStart(zStart);
+    cropImageFilter->SetZPixelsCropEnd(zEnd);
+    cropImageFilter->Update();
+    return cropImageFilter->GetOutput();
+  }
+  catch (mitk::Exception &e)
+  {
+    std::string errorMessage = "Caught unexpected exception ";
+    errorMessage.append(e.what());
+    MITK_ERROR << errorMessage;
+
+    return inputImage;
+  }
 }
 
 mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBeamforming(
@@ -184,15 +195,27 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBandpassFilter(
   float BPHighPass, float BPLowPass,
   float alphaHighPass, float alphaLowPass)
 {
-  auto floatData = ConvertToFloat(data);
-  mitk::BandpassFilter::Pointer bandpassFilter = mitk::BandpassFilter::New();
-  bandpassFilter->SetInput(floatData);
-  bandpassFilter->SetHighPass(BPHighPass);
-  bandpassFilter->SetLowPass(BPLowPass);
-  bandpassFilter->SetHighPassAlpha(alphaHighPass);
-  bandpassFilter->SetLowPassAlpha(alphaLowPass);
-  bandpassFilter->Update();
-  return bandpassFilter->GetOutput();
+  try 
+  {
+    auto floatData = ConvertToFloat(data);
+    mitk::BandpassFilter::Pointer bandpassFilter = mitk::BandpassFilter::New();
+    bandpassFilter->SetInput(floatData);
+    bandpassFilter->SetHighPass(BPHighPass);
+    bandpassFilter->SetLowPass(BPLowPass);
+    bandpassFilter->SetHighPassAlpha(alphaHighPass);
+    bandpassFilter->SetLowPassAlpha(alphaLowPass);
+    bandpassFilter->Update();
+    return bandpassFilter->GetOutput();
+  }
+
+  catch (mitk::Exception &e)
+  {
+    std::string errorMessage = "Caught unexpected exception ";
+    errorMessage.append(e.what());
+    MITK_ERROR << errorMessage;
+
+    return data;
+  }
 }
 
 mitk::Image::Pointer mitk::PhotoacousticFilterService::ConvertToFloat(mitk::Image::Pointer inputImage)

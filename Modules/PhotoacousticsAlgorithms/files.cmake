@@ -21,8 +21,6 @@ list(APPEND CPP_FILES
 ENDIF(MITK_USE_OpenCL)
 
 set(RESOURCE_FILES
-  BModeAbs.cl
-  BModeAbsLog.cl
   UsedLinesCalculation.cl
   DelayCalculation.cl
   DMAS.cl

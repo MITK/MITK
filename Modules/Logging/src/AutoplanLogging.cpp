@@ -197,7 +197,7 @@ namespace Logger
     : sourceAttribute(std::string())
     , fullNameAttribute(std::string())
     , organizationAttribute(std::string())
-    , customField(std::string())
+    , additionalField(std::string())
     , m_StartTime(clock())
     , sessionTag(boost::uuids::random_generator()())
   {
@@ -261,7 +261,7 @@ namespace Logger
         % boost::log::expressions::attr<std::string>("Organization")
         % boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT)
         % boost::log::expressions::attr<boost::uuids::uuid>("SessionTag")
-        % boost::log::expressions::attr<std::string>("CustomField")
+        % boost::log::expressions::attr<std::string>("AdditionalField")
       );
 
       /// Add the sink to the core
@@ -303,7 +303,7 @@ namespace Logger
           % boost::log::expressions::attr<std::string>("Organization")
           % boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT)
           % boost::log::expressions::attr<boost::uuids::uuid>("SessionTag")
-          % boost::log::expressions::attr<std::string>("CustomField")
+          % boost::log::expressions::attr<std::string>("AdditionalField")
         );
       }
 
@@ -354,7 +354,7 @@ namespace Logger
     boost::log::core::get()->add_global_attribute("FullName", fullNameAttribute);
     boost::log::core::get()->add_global_attribute("Organization", organizationAttribute);
 
-    boost::log::core::get()->add_global_attribute("CustomField", customField);
+    boost::log::core::get()->add_global_attribute("AdditionalField", additionalField);
 
     boost::log::core::get()->add_global_attribute("SessionTag", sessionTag);
 
@@ -373,23 +373,15 @@ namespace Logger
     organizationAttribute.set(organization);
   }
 
-  void Log::setCustomField(const std::string& field, const std::string& value)
+  void Log::setAdditionalField(const std::string& field, const std::string& value)
   {
-    std::string str("");
-    if (!field.empty()) {
-      str = ", \"" + field + "\" : \"" + value + "\"";
-    }
-    customField.set(str);
+    const std::string str = field.empty() ? std::string() : ",\"" + field + "\":" + value;
+    additionalField.set(str);
   }
 
-  void Log::setRunningTime(double time)
+  void Log::resetAdditionalField()
   {
-    setCustomField(std::string("runningtime"), std::to_string(time));
-  }
-
-  void Log::resetRunningTime()
-  {
-    setCustomField(std::string(""), std::string(""));
+    additionalField.set("");
   }
 
   void Log::setStartTime(clock_t time)
@@ -401,7 +393,7 @@ namespace Logger
   void Log::computeRunningTime(clock_t time)
   {
     double runningTime = double(time - m_StartTime) / CLOCKS_PER_SEC;
-    setRunningTime(runningTime);
+    setAdditionalField("runningTime", std::to_string(runningTime));
   }
 
   // returns true in case of date time parse success

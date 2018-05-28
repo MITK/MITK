@@ -165,9 +165,9 @@ void mitk::Tool::Deactivated()
 
   double runningTime = double(clock() - m_StartTime) / CLOCKS_PER_SEC;
 
-  Logger::Log::get().setRunningTime(runningTime);
+  Logger::Log::get().setAdditionalField("runningtime", std::to_string(runningTime));
   AUTOPLAN_INFO << this->GetName() << ": Deactivated";
-  Logger::Log::get().resetRunningTime();
+  Logger::Log::get().resetAdditionalField();
 }
 
 const char* mitk::Tool::GetCaption() const

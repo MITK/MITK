@@ -20,11 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 // render window manager UI module
 #include "MitkRenderWindowManagerUIExports.h"
 #include "ui_QmitkRenderWindowManipulatorWidget.h"
+#include <QmitkDataStorageLayerStackModel.h>
 
 // render window manager module
 #include <mitkRenderWindowLayerController.h>
 #include <mitkRenderWindowViewDirectionController.h>
-#include <QmitkRenderWindowDataModel.h>
 
 // qt
 #include <QWidget>
@@ -46,6 +46,10 @@ class MITKRENDERWINDOWMANAGERUI_EXPORT QmitkRenderWindowManipulatorWidget : publ
 public:
 
   QmitkRenderWindowManipulatorWidget(mitk::DataStorage::Pointer dataStorage, QWidget* parent = nullptr);
+  /**
+  * @brief Get the table view that displays the layer stack inside this widget
+  */
+  QTableView* GetLayerStackTableView();
   /**
   * @brief Set the controlled base renderer.
   */
@@ -78,6 +82,7 @@ public:
   void HideDataNodeInAllRenderer(const mitk::DataNode* dataNode);
 
 Q_SIGNALS:
+
   void AddLayerButtonClicked();
 
 private Q_SLOTS:
@@ -100,9 +105,10 @@ private:
   Ui::QmitkRenderWindowManipulatorWidget m_Controls;
 
   mitk::DataStorage::Pointer m_DataStorage;
-  std::unique_ptr<QmitkRenderWindowDataModel> m_RenderWindowDataModel;
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
   std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
+
+  QmitkDataStorageLayerStackModel* m_StorageModel;
 };
 
 #endif // QMITKRENDERWINDOWMANIPULATORWIDGET_H

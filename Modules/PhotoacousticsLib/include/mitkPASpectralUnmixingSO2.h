@@ -30,16 +30,13 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT SpectralUnmixingSO2 : public mitk::ImageToImageFilter
     {
     public:
-
       mitkClassMacro(SpectralUnmixingSO2, mitk::ImageToImageFilter)
 
     protected:
       SpectralUnmixingSO2();
       virtual ~SpectralUnmixingSO2();
 
-
     private:
-      
       virtual void GenerateData() override;
       virtual void InitializeOutputs();
       virtual void CheckPreConditions(mitk::Image::Pointer inputHbO2, mitk::Image::Pointer inputHb);

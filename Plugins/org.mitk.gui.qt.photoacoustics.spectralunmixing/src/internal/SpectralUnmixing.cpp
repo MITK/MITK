@@ -218,11 +218,41 @@ void SpectralUnmixing::DoImageProcessing()
         this->GetDataStorage()->Add(dataNodeHb);
       }
 
-      mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+      //mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 
       //*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       //FRAGE zu SetInput: reicht es dort einen image pointer anzugeben?
+      //wenn ja zweite Variante wenn nein dann erste. funktioniern aber leider beide nicht:/
       bool sO2bool = m_Controls.checkBoxsO2->isChecked();
+
+      //1:
+      /*
+      mitk::Image::Pointer HbO2 = m_SpectralUnmixingFilter->GetOutput(0);
+      mitk::DataNode::Pointer dataNodeHbO2 = mitk::DataNode::New();
+      dataNodeHbO2->SetData(HbO2);
+      mitk::BaseData *dataHbO2 = dataNodeHbO2->GetData();
+      mitk::Image *imageHbO2 = dynamic_cast<mitk::Image *>(dataHbO2);
+
+      mitk::Image::Pointer Hb = m_SpectralUnmixingFilter->GetOutput(1);
+      mitk::DataNode::Pointer dataNodeHb = mitk::DataNode::New();
+      dataNodeHb->SetData(Hb);
+      mitk::BaseData *dataHb = dataNodeHb->GetData();
+      mitk::Image *imageHb = dynamic_cast<mitk::Image *>(dataHb);
+
+      auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
+      m_sO2->SetInput(0,imageHbO2);
+      m_sO2->SetInput(1,imageHb);
+
+      m_sO2->Update();
+
+      mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
+      mitk::DataNode::Pointer dataNodesO2 = mitk::DataNode::New();
+      dataNodesO2->SetData(sO2);
+      dataNodesO2->SetName("sO2");
+      this->GetDataStorage()->Add(dataNodesO2);/**/
+
+      //2:
+      /*
       if (sO2bool)
       {
         if (DeOxbool)
@@ -231,8 +261,13 @@ void SpectralUnmixing::DoImageProcessing()
           {
             MITK_INFO << "CALCULATE OXYGEN SATURATION ...";
             auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
-            m_sO2->SetInput(m_SpectralUnmixingFilter->GetOutput(0));
-            m_sO2->SetInput(m_SpectralUnmixingFilter->GetOutput(1));
+            m_sO2->SetInput(0, m_SpectralUnmixingFilter->GetOutput(0));
+            m_sO2->SetInput(1, m_SpectralUnmixingFilter->GetOutput(1));
+
+            //http://docs.mitk.org/nightly/PipelineingConceptPage.html
+            //m_SpectralUnmixingFilter->Update();
+            //m_sO2->SetInput(m_SpectralUnmixingFilter->GetOutput()); 
+
             m_sO2->Update();
 
             mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
@@ -249,8 +284,9 @@ void SpectralUnmixing::DoImageProcessing()
         else
           mitkThrow() << "SELECT CHROMOPHORE DEOXYHEMOGLOBIN!";
       }
-      mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
-      //*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++/**/
+      mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());/**/
+
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++/**/
 
       MITK_INFO << "Adding images to DataStorage...[DONE]";
     }

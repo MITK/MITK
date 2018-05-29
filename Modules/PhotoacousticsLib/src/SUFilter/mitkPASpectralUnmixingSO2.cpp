@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::pa::SpectralUnmixingSO2::SpectralUnmixingSO2()
 {
+  //this->SetNumberOfIndexedInputs(2);
   this->SetNumberOfIndexedOutputs(1);
   this->SetNthOutput(0, mitk::Image::New());
 }
@@ -39,6 +40,7 @@ void mitk::pa::SpectralUnmixingSO2::GenerateData()
   mitk::Image::Pointer inputHbO2 = GetInput(0);
   mitk::Image::Pointer inputHb = GetInput(1);
 
+  CheckPreConditions(inputHbO2, inputHb);
 
   unsigned int xDim = inputHbO2->GetDimensions()[0];
   unsigned int yDim = inputHbO2->GetDimensions()[1];
@@ -56,9 +58,6 @@ void mitk::pa::SpectralUnmixingSO2::GenerateData()
   const float* inputDataArrayHbO2 = ((const float*)readAccessHbO2.GetData());
   const float* inputDataArrayHb = ((const float*)readAccessHb.GetData());
 
-  CheckPreConditions(inputHbO2, inputHb);
-
-  //loop over every pixel @ x,y plane
   for (unsigned int x = 0; x < xDim; x++)
   {
     for (unsigned int y = 0; y < yDim; y++)
@@ -80,14 +79,9 @@ void mitk::pa::SpectralUnmixingSO2::CheckPreConditions(mitk::Image::Pointer inpu
 {
   unsigned int xDimHb = inputHb->GetDimensions()[0];
   unsigned int yDimHb = inputHb->GetDimensions()[1];
-  unsigned int sizeHb = xDimHb * yDimHb;
 
   unsigned int xDimHbO2 = inputHbO2->GetDimensions()[0];
   unsigned int yDimHbO2 = inputHbO2->GetDimensions()[1];
-  unsigned int sizeHbO2 = xDimHbO2 * yDimHbO2;
-
-  if (sizeHb != sizeHbO2)
-    mitkThrow() << "SIZE ERROR!";
 
   if (xDimHb != xDimHbO2 || yDimHb != yDimHbO2)
     mitkThrow() << "DIMENTIONALITY ERROR!";
@@ -99,7 +93,6 @@ void mitk::pa::SpectralUnmixingSO2::InitializeOutputs()
 {
   unsigned int numberOfInputs = GetNumberOfIndexedInputs();
   unsigned int numberOfOutputs = GetNumberOfIndexedOutputs();
-  MITK_INFO << "InputsSO2: " << numberOfInputs << " OutputsSO: " << numberOfOutputs;
 
   //  Set dimensions (2) and pixel type (float) for output
   mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();

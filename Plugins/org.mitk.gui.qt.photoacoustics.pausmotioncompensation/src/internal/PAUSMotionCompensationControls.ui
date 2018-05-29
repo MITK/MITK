@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>242</width>
-    <height>391</height>
+    <height>555</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -27,6 +27,26 @@
      </property>
      <property name="text">
       <string>Please select 2 images!</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>Photoacoustic image</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="comboBoxPA"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="buttonPerformImageProcessing">
+     <property name="toolTip">
+      <string>Do image processing</string>
+     </property>
+     <property name="text">
+      <string>Start processing</string>
      </property>
     </widget>
    </item>
@@ -129,12 +149,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="buttonPerformImageProcessing">
-     <property name="toolTip">
-      <string>Do image processing</string>
-     </property>
+    <widget class="QPushButton" name="buttonUpdateParameters">
      <property name="text">
-      <string>Start processing</string>
+      <string>Update Parameters</string>
      </property>
     </widget>
    </item>

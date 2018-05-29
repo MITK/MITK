@@ -53,9 +53,9 @@ protected:
 
   /// \brief Called when the user clicks the GUI button
   void DoImageProcessing();
+  void DoUpdateParameters();
 
   Ui::PAUSMotionCompensationControls m_Controls;
-  
   mitk::PhotoacousticMotionCorrectionFilter::Pointer m_Filter = mitk::PhotoacousticMotionCorrectionFilter::New();
 };
 

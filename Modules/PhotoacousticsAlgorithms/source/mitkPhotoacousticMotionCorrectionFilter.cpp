@@ -145,16 +145,31 @@ void mitk::PhotoacousticMotionCorrectionFilter::PerformCorrection(
                                    m_Levels, m_WinSize, m_Iterations, m_PolyN,
                                    m_PolySigma, m_Flags);
 
-      // TODO: reshape flow
+      m_Map = this->ComputeFlowMap(m_Flow);
+
       // Apply the flow to the matrices
-      cv::remap(m_PaMat, m_PaRes, m_Flow, cv::noArray(), cv::INTER_LINEAR);
-      cv::remap(m_UsMat, m_UsRes, m_Flow, cv::noArray(), cv::INTER_LINEAR);
+      cv::remap(m_PaMat, m_PaRes, m_Map, cv::noArray(), cv::INTER_LINEAR);
+      cv::remap(m_UsMat, m_UsRes, m_Map, cv::noArray(), cv::INTER_LINEAR);
     }
 
     // Enter the matrix as a slice at position i into output
     this->InsertMatrixAsSlice(m_PaRes, paOutput, i);
     this->InsertMatrixAsSlice(m_UsRes, usOutput, i);
   }
+}
+
+// Copied from https://stackoverflow.com/questions/17459584/opencv-warping-image-based-on-calcopticalflowfarneback
+cv::Mat mitk::PhotoacousticMotionCorrectionFilter::ComputeFlowMap(cv::Mat flow) {
+  cv::Mat map(flow.size(), flow.type());
+
+  for (int y = 0; y < map.rows; ++y) {
+    for(int x = 0; x < map.cols; ++x) {
+      cv::Point2f f = flow.at<cv::Point2f>(y,x);
+      map.at<cv::Point2f>(y,x) = cv::Point2f(x + f.x, y + f.y);
+    }
+  }
+
+  return map;
 }
 
 cv::Mat mitk::PhotoacousticMotionCorrectionFilter::GetMatrix(

@@ -168,8 +168,8 @@ public:
   }
 
   void testStaticSliceCorrection() {
-    // image->SetSlice(data2d, 0);
-    // image->SetSlice(data2d, 1);
+    image->SetSlice(data2d, 0);
+    image->SetSlice(data2d, 1);
     filter->SetInput(0, image);
     filter->SetInput(1, image);
     filter->Update();

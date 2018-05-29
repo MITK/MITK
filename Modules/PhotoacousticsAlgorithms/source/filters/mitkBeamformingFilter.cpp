@@ -35,8 +35,11 @@ mitk::BeamformingFilter::BeamformingFilter(mitk::BeamformingSettings::Pointer se
   this->SetNumberOfRequiredInputs(1);
 
   m_ProgressHandle = [](int, std::string) {};
-
+#if defined(PHOTOACOUSTICS_USE_GPU)
   m_BeamformingOclFilter = mitk::PhotoacousticOCLBeamformingFilter::New(m_Conf);
+#else
+  m_BeamformingOclFilter = mitk::PhotoacousticOCLBeamformingFilter::New();
+#endif
 
   MITK_INFO << "Instantiating BeamformingFilter...[Done]";
 }

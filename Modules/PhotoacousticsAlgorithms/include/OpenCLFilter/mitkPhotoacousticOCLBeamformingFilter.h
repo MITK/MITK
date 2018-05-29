@@ -22,10 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #if defined(PHOTOACOUSTICS_USE_GPU) || DOXYGEN
 
 #include "mitkOclDataSetToDataSetFilter.h"
-
+#include "mitkBeamformingSettings.h"
 #include "mitkPhotoacousticOCLDelayCalculation.h"
 #include "mitkPhotoacousticOCLUsedLinesCalculation.h"
-#include "mitkBeamformingSettings.h"
 
 #include <chrono>
 

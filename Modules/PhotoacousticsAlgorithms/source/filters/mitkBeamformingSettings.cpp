@@ -20,8 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::BeamformingSettings::BeamformingSettings(std::string xmlFile)
 {
-  MITK_ERROR << "Not implemented yet.";
-  mitkThrow() << "Not implemented yet.";
+  if((xmlFile.length())>0)
+  {
+    MITK_ERROR << "Not implemented yet.";
+    mitkThrow() << "Not implemented yet.";
+  }
 }
 
 mitk::BeamformingSettings::BeamformingSettings(float pitchInMeters,

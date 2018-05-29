@@ -146,7 +146,7 @@ public:
       spacing[1] = SPACING_Y;
       spacing[2] = 1;
       inputImage->SetSpacing(spacing);
-      inputImage->SetImportVolume((const void*)image.GetData(), mitk::Image::RtlCopyMemory);
+      inputImage->SetImportVolume((const void*)image.GetData(), mitk::Image::CopyMemory);
 
       // setup the beamforming filter
       m_BeamformingFilter->SetInput(inputImage);

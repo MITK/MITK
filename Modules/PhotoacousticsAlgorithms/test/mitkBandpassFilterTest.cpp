@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "../ITKFilter/ITKUltrasound/itkFFT1DRealToComplexConjugateImageFilter.h"
 #include "mitkImageCast.h"
 #include "mitkITKImageImport.h"
-#include "itkComplexToModulusImageFilter.h."
+#include "itkComplexToModulusImageFilter.h"
 
 class mitkBandpassFilterTestSuite : public mitk::TestFixture
 {
@@ -113,7 +113,7 @@ public:
       mitk::CastToItkImage(outputImage, image);
 
       typedef itk::FFT1DRealToComplexConjugateImageFilter<RealImageType> ForwardFFTFilterType;
-      typedef ForwardFFTFilterType::OutputImageType ComplexImageType;
+      // typedef ForwardFFTFilterType::OutputImageType ComplexImageType;
       ForwardFFTFilterType::Pointer forwardFFTFilter = ForwardFFTFilterType::New();
       forwardFFTFilter->SetInput(image);
       forwardFFTFilter->SetDirection(1);
@@ -131,7 +131,7 @@ public:
           {
             for (unsigned int x = 0; x < DATA_XY_DIM; ++x)
             {
-              unsigned int outPos = x + y * DATA_XY_DIM + z * DATA_XY_DIM * DATA_XY_DIM;
+              // unsigned int outPos = x + y * DATA_XY_DIM + z * DATA_XY_DIM * DATA_XY_DIM;
               std::complex<float> value = fftResult->GetPixel({ x,y,z });
               CPPUNIT_ASSERT_MESSAGE(std::string("Expected 0, got (" + std::to_string(value.real()) + " + " + std::to_string(value.imag()) + "i) at " + std::to_string(x)+"-"+std::to_string(y)+"-"+std::to_string(z)),
                 (abs(value.real()) < EPSILON_FFT) && (abs(value.imag() < EPSILON_FFT)));
@@ -145,7 +145,7 @@ public:
           {
             for (unsigned int x = 0; x < DATA_XY_DIM; ++x)
             {
-              unsigned int outPos = x + y * DATA_XY_DIM + z * DATA_XY_DIM * DATA_XY_DIM;
+              // unsigned int outPos = x + y * DATA_XY_DIM + z * DATA_XY_DIM * DATA_XY_DIM;
               std::complex<float> value = fftResult->GetPixel({ x,y,z });
               CPPUNIT_ASSERT_MESSAGE(std::string("Expected 0, got (" + std::to_string(value.real()) + " + " + std::to_string(value.imag()) + "i) at " + std::to_string(x) + "-" + std::to_string(y) + "-" + std::to_string(z)),
                 (abs(value.real()) < EPSILON_FFT) && (abs(value.imag() < EPSILON_FFT)));

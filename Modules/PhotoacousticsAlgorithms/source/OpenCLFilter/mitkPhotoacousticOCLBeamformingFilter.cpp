@@ -21,13 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::PhotoacousticOCLBeamformingFilter::PhotoacousticOCLBeamformingFilter(BeamformingSettings::Pointer settings) :
   m_PixelCalculation(NULL),
+  m_inputSlices(1),
+  m_Conf(settings),
   m_InputImage(mitk::Image::New()),
   m_ApodizationBuffer(nullptr),
   m_MemoryLocationsBuffer(nullptr),
   m_DelaysBuffer(nullptr),
-  m_UsedLinesBuffer(nullptr),
-  m_inputSlices(1),
-  m_Conf(settings)
+  m_UsedLinesBuffer(nullptr)
 {
   MITK_INFO << "Instantiating OCL beamforming Filter...";
   this->AddSourceFile("DAS.cl");
@@ -244,7 +244,7 @@ mitk::Image::Pointer mitk::PhotoacousticOCLBeamformingFilter::GetOutputAsImage()
     outputImage->Initialize(this->GetOutputType(), dimension, dimensions);
     outputImage->SetSpacing(p_slg->GetSpacing());
     outputImage->SetImportVolume(pData, 0, 0, mitk::Image::ImportMemoryManagementType::CopyMemory);
-    delete[] pData;
+    free(pData);
   }
 
   MITK_DEBUG << "Image Initialized.";

@@ -19,12 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageWriteAccessor.h>
 
 mitk::CropImageFilter::CropImageFilter() :
-  m_XPixelsCropEnd(0),
-  m_YPixelsCropEnd(0),
-  m_ZPixelsCropEnd(0),
   m_XPixelsCropStart(0),
   m_YPixelsCropStart(0),
-  m_ZPixelsCropStart(0)
+  m_ZPixelsCropStart(0),
+  m_XPixelsCropEnd(0),
+  m_YPixelsCropEnd(0),
+  m_ZPixelsCropEnd(0)
 {
   MITK_INFO << "Instantiating CropImageFilter...";
   SetNumberOfIndexedInputs(1);

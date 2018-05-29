@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkMultiplyImageFilter.h"
 #include "mitkITKImageImport.h"
 #include "mitkIOUtil.h"
-#include "itkComplexToModulusImageFilter.h."
+#include "itkComplexToModulusImageFilter.h"
 
 mitk::BandpassFilter::BandpassFilter() :
   m_HighPass(0),

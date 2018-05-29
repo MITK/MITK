@@ -58,12 +58,12 @@ namespace mitk {
     void SanityCheckPreconditions();
 
     unsigned int m_XPixelsCropStart;
-    unsigned int m_XPixelsCropEnd;
     unsigned int m_YPixelsCropStart;
-    unsigned int m_YPixelsCropEnd;
     unsigned int m_ZPixelsCropStart;
-    unsigned int m_ZPixelsCropEnd;
-  };
+    unsigned int m_XPixelsCropEnd;
+    unsigned int m_YPixelsCropEnd;
+    unsigned int m_ZPixelsCropEnd; 
+ };
 } // namespace mitk
 
 #endif //MITK_CROP_IMAGE_FILTER

@@ -164,6 +164,11 @@ void mitk::PlanarFigureInteractor::MoveAnnotations(StateMachineAction*, Interact
 
   planarFigure->InvokeEvent( StartInteractionPlanarFigureEvent() );
 
+  // Horisontal offset to reduce mouse "jumping" effect on motion start AUT-3682
+  if (point2D[0] >= 20) {
+    point2D[0] -= 20;
+  }
+
   // Move current control point to this point
   planarFigure->SetAnnotationsPosition( point2D );
 

@@ -143,7 +143,7 @@ public:
 
   // I tried to catch the error myself in the filter, but itk does some magic beforehand
   void testNullPtr1() {
-    filter->SetInput(0, NULL);
+    filter->SetInput(0, nullptr);
     filter->SetInput(1, image);
     CPPUNIT_ASSERT_THROW(filter->Update(), itk::ExceptionObject);
   }
@@ -151,13 +151,13 @@ public:
   // Now I am allowed to catch it myself, because the first input is fine -.-
   void testNullPtr2() {
     filter->SetInput(0, image);
-    filter->SetInput(1, NULL);
+    filter->SetInput(1, nullptr);
     CPPUNIT_ASSERT_THROW(filter->Update(), std::invalid_argument);
   }
 
   void testNullPtr3() {
-    filter->SetInput(0, NULL);
-    filter->SetInput(1, NULL);
+    filter->SetInput(0, nullptr);
+    filter->SetInput(1, nullptr);
     CPPUNIT_ASSERT_THROW(filter->Update(), itk::ExceptionObject);
   }
 

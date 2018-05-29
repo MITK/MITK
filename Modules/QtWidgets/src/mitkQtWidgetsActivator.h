@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <memory>
 
-#include "QmitkIDataStorageInspectorProvider.h"
+#include "mitkIDataStorageInspectorProvider.h"
 
 /*
  * This is the module activator for the "QtWidgets" module.

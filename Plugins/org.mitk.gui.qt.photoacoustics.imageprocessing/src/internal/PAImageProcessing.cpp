@@ -780,7 +780,6 @@ mitk::BeamformingSettings::Pointer PAImageProcessing::CreateBeamformingSettings(
   unsigned int reconstructionLines = m_Controls.Lines->value();
   unsigned int apodizatonArraySize = m_Controls.Lines->value();
   float angle = m_Controls.Angle->value(); // [deg]
-  bool useBandpass = m_Controls.UseBP->isChecked();
   bool useGPU = m_Controls.UseGPUBf->isChecked();
 
   float timeSpacing;
@@ -808,7 +807,7 @@ mitk::BeamformingSettings::Pointer PAImageProcessing::CreateBeamformingSettings(
   return mitk::BeamformingSettings::New(pitchInMeters,
     speedOfSound, timeSpacing, angle, isPAImage, samplesPerLine, reconstructionLines,
     image->GetDimensions(), useGPU, 16, delay, apod,
-    apodizatonArraySize, algorithm, useBandpass, 50, 50);
+    apodizatonArraySize, algorithm);
 }
 
 void PAImageProcessing::EnableControls()

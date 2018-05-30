@@ -88,8 +88,8 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
     MITK_INFO << inputDataArray[i];/**/
 
   // test to see pixel values @ txt file
-  ofstream myfile;
-  myfile.open("PASpectralUnmixingPixelValues.txt");
+  //ofstream myfile;
+  //myfile.open("PASpectralUnmixingPixelValues.txt");
 
   //loop over every pixel @ x,y plane
   for (unsigned int x = 0; x < xDim; x++)
@@ -121,12 +121,12 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
         float* writeBuffer = (float *)writeOutput.GetData();
         writeBuffer[x*yDim + y] = resultVector[outputIdx]; 
       }
-      myfile << "Input Pixel(x,y): " << x << "," << y << "\n" << inputVector << "\n";
-      myfile << "Result: "  << "\n HbO2: " << resultVector[0] << "\n Hb: " << resultVector[1] <<"\n";
+      //myfile << "Input Pixel(x,y): " << x << "," << y << "\n" << inputVector << "\n";
+      //myfile << "Result: "  << "\n HbO2: " << resultVector[0] << "\n Hb: " << resultVector[1] <<"\n";
     }
   }
   MITK_INFO << "GENERATING DATA...[DONE]";
-  myfile.close();
+  //myfile.close();
 }
 
 void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(unsigned int size, unsigned int NumberOfInputImages, const float* inputDataArray)

@@ -4,8 +4,9 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.spectralunmixing"
           name="Spectral Unmixing"
+          category="Photoacoustics"
           class="SpectralUnmixing"
-          icon="resources/icon.xpm" />
+          icon="resources/spectralunmixing.svg" />
   </extension>
 
 </plugin>

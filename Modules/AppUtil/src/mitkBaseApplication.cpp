@@ -850,7 +850,8 @@ void BaseApplication::initializeSplashScreen(QCoreApplication * application)
         QPainter licensehPainter;
         licensehPainter.begin(&pixmap);
         licensehPainter.setPen(Qt::white);
-        auto yPosition = 220;
+        // y offset for license text depends on 1 line or 3 line license
+        auto yPosition = (licenseLines.count() == 1) ? 220 + 20 + 20 : 220;
         for (QString licenseLine : licenseLines) {
           licensehPainter.drawText(5, yPosition, licenseLine);
           yPosition += 20;

@@ -2517,3 +2517,23 @@ void QmitkStdMultiWidget::ResetTransformation(mitk::VtkPropRenderer* renderer)
     }
   }
 }
+
+void QmitkStdMultiWidget::UpdateFullSreenMode()
+{
+  switch (m_Layout) {
+  case LAYOUT_WIDGET1:
+    this->GetRenderWindow1()->FullScreenMode(true);
+    break;
+  case LAYOUT_WIDGET2:
+    this->GetRenderWindow2()->FullScreenMode(true);
+    break;
+  case LAYOUT_WIDGET3:
+    this->GetRenderWindow3()->FullScreenMode(true);
+    break;
+  case LAYOUT_BIG_3D:
+    this->GetRenderWindow4()->FullScreenMode(true);
+    break;
+  }
+
+  m_RenderingManager->RequestUpdateAll();
+}

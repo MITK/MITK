@@ -167,6 +167,8 @@ public:
   typedef void (QmitkStdMultiWidget::*FunctionSet)(bool);
   std::vector<FunctionSet> getFuncSetDisplayAnnotation();
 
+  void UpdateFullSreenMode();
+
 protected:
 
   bool m_displayMetaInfo;

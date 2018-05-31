@@ -987,6 +987,10 @@ void QmitkRenderWindowMenu::SetFullScreenMode(bool state)
 {
   m_FullScreenMode = state;
 
+  //Move Widget and show again
+  this->MoveWidgetToCorrectPos(1.0f);
+
   //change icon
   this->ChangeFullScreenIcon();
+  DeferredShowMenu();
 }

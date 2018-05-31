@@ -212,7 +212,7 @@ private:
 
   bool m_LastPointWasValid;
 
-  //mitk::PlanarFigure::Pointer m_PlanarFigure;
+  Point2D annotationMoveOffset;
 };
 
 }

@@ -230,7 +230,7 @@ public slots:
 
   void InitPositionTracking();
 
-  void AddDisplayPlaneSubTree(const std::string& multiWidget);
+  void AddDisplayPlaneSubTree(const std::string& parentWidget);
 
   void EnableStandardLevelWindow();
 

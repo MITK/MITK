@@ -164,10 +164,8 @@ void mitk::PlanarFigureInteractor::MoveAnnotations(StateMachineAction*, Interact
 
   planarFigure->InvokeEvent( StartInteractionPlanarFigureEvent() );
 
-  // Horisontal offset to reduce mouse "jumping" effect on motion start AUT-3682
-  if (point2D[0] >= 20) {
-    point2D[0] -= 20;
-  }
+  point2D[0] -= annotationMoveOffset[0] + 8.8; // there is additional contant offset
+  point2D[1] -= annotationMoveOffset[1] - 8.8; // and I have no idea where it comes from
 
   // Move current control point to this point
   planarFigure->SetAnnotationsPosition( point2D );
@@ -649,18 +647,31 @@ bool mitk::PlanarFigureInteractor::CheckAnnotationHovering( const InteractionEve
 
   const mitk::Point2D displayPosition = positionEvent->GetPointerPositionOnScreen();
 
-  /* debug anootation position
-  std::cout << "xB: " << annotationsBox.Position[0] << std::endl;
-  std::cout << "yB: " << annotationsBox.Position[1] << std::endl;
-  std::cout << "x: " << displayPosition[0] << std::endl;
-  std::cout << "y: " << displayPosition[1] << std::endl;
-  */
-
   if ( displayPosition[0] > annotationsBox.Position[0]
     && displayPosition[1] < annotationsBox.Position[1]
     && displayPosition[0] < annotationsBox.Position[0] + annotationsBox.Size[0]
     && displayPosition[1] > annotationsBox.Position[1] - annotationsBox.Size[1])
   {
+    const mitk::PlaneGeometry *planarFigureGeometry = planarFigure->GetPlaneGeometry();
+    if ( planarFigureGeometry == nullptr )
+      return false;
+
+    Point2D point2DPosition;
+    planarFigureGeometry->Map( positionEvent->GetPositionInWorld(), point2DPosition );
+
+    Point2D point2DAnnotationD;
+    Point3D point2DAnnotationW;
+    point2DAnnotationD[0] = annotationsBox.Position[0];
+    point2DAnnotationD[1] = annotationsBox.Position[1];
+    Point2D point2DAnnotation;
+
+    const mitk::BaseRenderer *renderer = interactionEvent->GetSender();
+    renderer->DisplayToWorld(point2DAnnotationD, point2DAnnotationW);
+    planarFigureGeometry->Map( point2DAnnotationW, point2DAnnotation );
+
+    annotationMoveOffset[0] = point2DPosition[0] - point2DAnnotation[0];
+    annotationMoveOffset[1] = point2DPosition[1] - point2DAnnotation[1];
+
     return true;
   }
   else

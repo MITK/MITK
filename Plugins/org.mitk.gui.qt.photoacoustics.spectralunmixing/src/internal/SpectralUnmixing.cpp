@@ -205,7 +205,7 @@ void SpectralUnmixing::DoImageProcessing()
         mitk::Image::Pointer HbO2 = m_SpectralUnmixingFilter->GetOutput(0);
         mitk::DataNode::Pointer dataNodeHbO2 = mitk::DataNode::New();
         dataNodeHbO2->SetData(HbO2);
-        dataNodeHbO2->SetName("HbO2: " + Algorithm);
+        dataNodeHbO2->SetName("HbO2 " + Algorithm);
         this->GetDataStorage()->Add(dataNodeHbO2);
       }
 
@@ -214,7 +214,7 @@ void SpectralUnmixing::DoImageProcessing()
         mitk::Image::Pointer Hb = m_SpectralUnmixingFilter->GetOutput(1);
         mitk::DataNode::Pointer dataNodeHb = mitk::DataNode::New();
         dataNodeHb->SetData(Hb);
-        dataNodeHb->SetName("Hb: " + Algorithm);
+        dataNodeHb->SetName("Hb " + Algorithm);
         this->GetDataStorage()->Add(dataNodeHb);
       }
 

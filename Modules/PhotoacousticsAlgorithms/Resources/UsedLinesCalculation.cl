@@ -20,7 +20,9 @@ __kernel void ckUsedLines(
   unsigned int inputL,
   unsigned int inputS,
   unsigned int outputL,
-  unsigned int outputS
+  unsigned int outputS,
+  char isPAImage,
+  float percentOfImageReconstructed // parameters
 )
 {
   // get thread identifier
@@ -34,7 +36,7 @@ __kernel void ckUsedLines(
   if ( globalPosX < outputL && globalPosY < outputS)
   {
     float l_i = (float)globalPosX / outputL * inputL;
-    float s_i = (float)globalPosY / outputS * inputS / 2;
+    float s_i = (float)globalPosY / (float)outputS * (float)inputS / (2-isPAImage) * percentOfImageReconstructed;
 
     float part = partMult * s_i;
     if (part < 1)

@@ -76,15 +76,15 @@ void mitk::BeamformingFilter::GenerateOutputInformation()
   if ((output->IsInitialized()) && (this->GetMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
     return;
 
-  unsigned int dim[] = { m_Conf->GetReconstructionLines(), m_Conf->GetSamplesPerLine(), input->GetDimension(2) };
-  output->Initialize(mitk::MakeScalarPixelType<float>(), 3, dim);
-
   mitk::Vector3D spacing;
   spacing[0] = m_Conf->GetPitchInMeters() * m_Conf->GetTransducerElements() * 1000 / m_Conf->GetReconstructionLines();
-  spacing[1] = (m_Conf->GetTimeSpacing() * m_Conf->GetInputDim()[1]) / (2-(int)m_Conf->GetIsPhotoacousticImage()) * 
-    m_Conf->GetSpeedOfSound() * 1000 / m_Conf->GetSamplesPerLine();
+  float desiredYSpacing = m_Conf->GetReconstructionDepth() * 1000 / m_Conf->GetSamplesPerLine();
+  float maxYSpacing = m_Conf->GetSpeedOfSound() * m_Conf->GetTimeSpacing() * input->GetDimension(1) / m_Conf->GetSamplesPerLine() * 1000;
+  spacing[1] = desiredYSpacing < maxYSpacing ? desiredYSpacing : maxYSpacing;
   spacing[2] = 1;
 
+  unsigned int dim[] = { m_Conf->GetReconstructionLines(), m_Conf->GetSamplesPerLine(), input->GetDimension(2)};
+  output->Initialize(mitk::MakeScalarPixelType<float>(), 3, dim);
   output->GetGeometry()->SetSpacing(spacing);
   output->GetGeometry()->Modified();
   output->SetPropertyList(input->GetPropertyList()->Clone());

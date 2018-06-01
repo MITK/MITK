@@ -83,12 +83,19 @@ void mitk::OCLUsedLinesCalculation::Execute()
 
   unsigned int reconLines = this->m_Conf->GetReconstructionLines();
   unsigned int samplesPerLine = this->m_Conf->GetSamplesPerLine();
+  char isPAImage = this->m_Conf->GetIsPhotoacousticImage();
+
+  float percentOfImageReconstructed = (float)(m_Conf->GetReconstructionDepth()) /
+    (float)(m_Conf->GetInputDim()[1] * m_Conf->GetSpeedOfSound() * m_Conf->GetTimeSpacing() / (float)(2 - (int)m_Conf->GetIsPhotoacousticImage()));
+  percentOfImageReconstructed = percentOfImageReconstructed <= 1 ? percentOfImageReconstructed : 1;
 
   clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_float), &(this->m_part));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[0]));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[1]));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_uint), &(reconLines));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_uint), &(samplesPerLine));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_char), &(isPAImage));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_float), &(percentOfImageReconstructed));
 
   CHECK_OCL_ERR(clErr);
 

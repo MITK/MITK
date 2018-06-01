@@ -38,7 +38,7 @@ namespace mitk {
 
     /** \brief Available delay calculation methods:
     * - Spherical delay for best results.
-    * - A quadratic Taylor approximation for slightly faster results with hardly any quality loss.
+    * - DEPRECATED quadratic Taylor approximation for slightly faster results with hardly any quality loss.
     */
     enum DelayCalc { QuadApprox, Spherical };
 
@@ -71,6 +71,7 @@ namespace mitk {
     itkGetConstMacro(Apod, Apodization);
     itkGetConstMacro(ApodizationArraySize, int);
     itkGetConstMacro(Algorithm, BeamformingAlgorithm);
+    itkGetConstMacro(ReconstructionDepth, float);
 
     /** \brief function for mitk::PhotoacousticOCLBeamformingFilter to check whether buffers need to be updated
     * this method only checks parameters relevant for the openCL implementation
@@ -84,6 +85,7 @@ namespace mitk {
         (abs(lhs->GetPitchInMeters() - rhs->GetPitchInMeters()) < 0.000001f) && // 0.0001 mm error margin
         (lhs->GetReconstructionLines() == rhs->GetReconstructionLines()) &&
         (lhs->GetSamplesPerLine() == rhs->GetSamplesPerLine()) &&
+        (lhs->GetReconstructionDepth() == rhs->GetReconstructionDepth()) &&
         (abs(lhs->GetSpeedOfSound() - rhs->GetSpeedOfSound()) < 0.01f) &&
         (abs(lhs->GetTimeSpacing() - rhs->GetTimeSpacing()) < 0.00000000001f) && //0.01 ns error margin
         (lhs->GetTransducerElements() == rhs->GetTransducerElements()));
@@ -97,6 +99,7 @@ namespace mitk {
       unsigned int samplesPerLine,
       unsigned int reconstructionLines,
       unsigned int* inputDim,
+      float reconstructionDepth,
       bool useGPU,
       unsigned int GPUBatchSize,
       DelayCalc delayCalculationMethod,
@@ -112,6 +115,7 @@ namespace mitk {
         samplesPerLine,
         reconstructionLines,
         inputDim,
+        reconstructionDepth,
         useGPU,
         GPUBatchSize,
         delayCalculationMethod,
@@ -138,6 +142,7 @@ namespace mitk {
       unsigned int samplesPerLine,
       unsigned int reconstructionLines,
       unsigned int* inputDim,
+      float reconstructionDepth,
       bool useGPU,
       unsigned int GPUBatchSize,
       DelayCalc delayCalculationMethod,
@@ -209,6 +214,10 @@ namespace mitk {
     /** \brief Sets the used beamforming algorithm.
     */
     BeamformingAlgorithm m_Algorithm;
+
+    /** \brief The Depth up to which the filter should reconstruct the image [m]
+    */
+    float m_ReconstructionDepth;
   };
 }
 #endif //MITK_BEAMFORMING_SETTINGS

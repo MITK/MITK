@@ -69,6 +69,7 @@ public:
       3000,
       128,
       inputDimensions,
+      yDim * (0.0125 / 1000000) * (1500),
       false,
       16,
       mitk::BeamformingSettings::DelayCalc::Spherical,

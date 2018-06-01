@@ -189,6 +189,7 @@ public:
       RECONSTRUCTED_SAMPLES,
       RECONSTRUCTED_LINES,
       inputDim,
+      SPEED_OF_SOUND * (SPACING_Y / 1000000) * SAMPLES,
       UseGPU,
       GPU_BATCH_SIZE,
       mitk::BeamformingSettings::DelayCalc::Spherical,

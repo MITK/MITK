@@ -750,15 +750,7 @@ mitk::BeamformingSettings::Pointer PAImageProcessing::CreateBeamformingSettings(
   else if ("sDMAS" == m_Controls.BFAlgorithm->currentText())
     algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::sDMAS;
 
-  mitk::BeamformingSettings::DelayCalc delay;
-  if ("Quad. Approx." == m_Controls.DelayCalculation->currentText())
-  {
-    delay = mitk::BeamformingSettings::DelayCalc::QuadApprox;
-  }
-  else if ("Spherical Wave" == m_Controls.DelayCalculation->currentText())
-  {
-    delay = mitk::BeamformingSettings::DelayCalc::Spherical;
-  }
+  mitk::BeamformingSettings::DelayCalc delay = mitk::BeamformingSettings::DelayCalc::Spherical;
 
   mitk::BeamformingSettings::Apodization apod;
   if ("Von Hann" == m_Controls.Apodization->currentText())
@@ -804,9 +796,11 @@ mitk::BeamformingSettings::Pointer PAImageProcessing::CreateBeamformingSettings(
     isPAImage = true;
   }
 
+  float reconstructionDepth = m_Controls.ReconstructionDepth->value() / 1000.f; // [m]
+
   return mitk::BeamformingSettings::New(pitchInMeters,
     speedOfSound, timeSpacing, angle, isPAImage, samplesPerLine, reconstructionLines,
-    image->GetDimensions(), useGPU, 16, delay, apod,
+    image->GetDimensions(), reconstructionDepth, useGPU, 16, delay, apod,
     apodizatonArraySize, algorithm);
 }
 
@@ -836,7 +830,7 @@ void PAImageProcessing::EnableControls()
   m_Controls.boundHigh->setEnabled(true);
   m_Controls.boundLow->setEnabled(true);
   m_Controls.BFAlgorithm->setEnabled(true);
-  m_Controls.DelayCalculation->setEnabled(true);
+  m_Controls.ReconstructionDepth->setEnabled(true);
   m_Controls.ImageType->setEnabled(true);
   m_Controls.Apodization->setEnabled(true);
   m_Controls.UseBP->setEnabled(true);
@@ -889,7 +883,7 @@ void PAImageProcessing::DisableControls()
   m_Controls.boundHigh->setEnabled(false);
   m_Controls.boundLow->setEnabled(false);
   m_Controls.BFAlgorithm->setEnabled(false);
-  m_Controls.DelayCalculation->setEnabled(false);
+  m_Controls.ReconstructionDepth->setEnabled(false);
   m_Controls.ImageType->setEnabled(false);
   m_Controls.Apodization->setEnabled(false);
   m_Controls.UseBP->setEnabled(false);

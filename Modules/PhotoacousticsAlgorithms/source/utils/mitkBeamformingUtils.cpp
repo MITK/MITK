@@ -95,12 +95,15 @@ void mitk::BeamformingUtils::DASQuadraticLine(
 
   short usedLines = (maxLine - minLine);
 
-  //quadratic delay
-  l_i = line / outputL * inputL;
+  float percentOfImageReconstructed = (float)(config->GetReconstructionDepth()) /
+    (float)(inputS * config->GetSpeedOfSound() * config->GetTimeSpacing() / (float)(2 - (int)config->GetIsPhotoacousticImage()));
+  percentOfImageReconstructed = percentOfImageReconstructed <= 1 ? percentOfImageReconstructed : 1;
+
+  l_i = (float)line / outputL * inputL;
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = (float)sample / outputS * inputS / (2-(int)config->GetIsPhotoacousticImage());
+    s_i = (float)sample / outputS * inputS / (float)(2 - (int)config->GetIsPhotoacousticImage()) * percentOfImageReconstructed;
 
     part = part_multiplicator*s_i;
 
@@ -156,13 +159,15 @@ void mitk::BeamformingUtils::DASSphericalLine(
 
   short usedLines = (maxLine - minLine);
 
-  //exact delay
+  float percentOfImageReconstructed = (float)(config->GetReconstructionDepth()) /
+    (float)(inputS * config->GetSpeedOfSound() * config->GetTimeSpacing() / (float)(2 - (int)config->GetIsPhotoacousticImage()));
+  percentOfImageReconstructed = percentOfImageReconstructed <= 1 ? percentOfImageReconstructed : 1;
 
   l_i = (float)line / outputL * inputL;
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = (float)sample / outputS * inputS / (2 - (int)config->GetIsPhotoacousticImage());
+    s_i = (float)sample / outputS * inputS / (float)(2 - (int)config->GetIsPhotoacousticImage()) * percentOfImageReconstructed;
 
     part = part_multiplicator*s_i;
 
@@ -221,12 +226,15 @@ void mitk::BeamformingUtils::DMASQuadraticLine(
   float mult = 0;
   short usedLines = (maxLine - minLine);
 
-  //quadratic delay
-  l_i = line / outputL * inputL;
+  float percentOfImageReconstructed = (float)(config->GetReconstructionDepth()) /
+    (float)(inputS * config->GetSpeedOfSound() * config->GetTimeSpacing() / (float)(2 - (int)config->GetIsPhotoacousticImage()));
+  percentOfImageReconstructed = percentOfImageReconstructed <= 1 ? percentOfImageReconstructed : 1;
+
+  l_i = (float)line / outputL * inputL;
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = sample / outputS * inputS / (2 - (int)config->GetIsPhotoacousticImage());
+    s_i = (float)sample / outputS * inputS / (float)(2 - (int)config->GetIsPhotoacousticImage()) * percentOfImageReconstructed;
 
     part = part_multiplicator*s_i;
 
@@ -307,13 +315,15 @@ void mitk::BeamformingUtils::DMASSphericalLine(
 
   short usedLines = (maxLine - minLine);
 
-  //exact delay
+  float percentOfImageReconstructed = (float)(config->GetReconstructionDepth()) /
+    (float)(inputS * config->GetSpeedOfSound() * config->GetTimeSpacing() / (float)(2 - (int)config->GetIsPhotoacousticImage()));
+  percentOfImageReconstructed = percentOfImageReconstructed <= 1 ? percentOfImageReconstructed : 1;
 
   l_i = (float)line / outputL * inputL;
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = (float)sample / outputS * inputS / (2 - (int)config->GetIsPhotoacousticImage());
+    s_i = (float)sample / outputS * inputS / (float)(2 - (int)config->GetIsPhotoacousticImage()) * percentOfImageReconstructed;
 
     part = part_multiplicator*s_i;
 
@@ -395,12 +405,15 @@ void mitk::BeamformingUtils::sDMASQuadraticLine(
   float mult = 0;
   short usedLines = (maxLine - minLine);
 
-  //quadratic delay
-  l_i = line / outputL * inputL;
+  float percentOfImageReconstructed = (float)(config->GetReconstructionDepth()) /
+    (float)(inputS * config->GetSpeedOfSound() * config->GetTimeSpacing() / (float)(2 - (int)config->GetIsPhotoacousticImage()));
+  percentOfImageReconstructed = percentOfImageReconstructed <= 1 ? percentOfImageReconstructed : 1;
+
+  l_i = (float)line / outputL * inputL;
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = sample / outputS * inputS / (2 - (int)config->GetIsPhotoacousticImage());
+    s_i = (float)sample / outputS * inputS / (float)(2 - (int)config->GetIsPhotoacousticImage()) * percentOfImageReconstructed;
 
     part = part_multiplicator*s_i;
 
@@ -484,13 +497,15 @@ void mitk::BeamformingUtils::sDMASSphericalLine(
 
   short usedLines = (maxLine - minLine);
 
-  //exact delay
+  float percentOfImageReconstructed = (float)(config->GetReconstructionDepth()) /
+    (float)(inputS * config->GetSpeedOfSound() * config->GetTimeSpacing() / (float)(2 - (int)config->GetIsPhotoacousticImage()));
+  percentOfImageReconstructed = percentOfImageReconstructed <= 1 ? percentOfImageReconstructed : 1;
 
   l_i = (float)line / outputL * inputL;
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = (float)sample / outputS * inputS / (2 - (int)config->GetIsPhotoacousticImage());
+    s_i = (float)sample / outputS * inputS / (float)(2 - (int)config->GetIsPhotoacousticImage()) * percentOfImageReconstructed;
 
     part = part_multiplicator*s_i;
 

@@ -92,6 +92,10 @@ void mitk::OCLDelayCalculation::Execute()
   unsigned int reconstructionLines = this->m_Conf->GetReconstructionLines();
   unsigned int samplesperLine = this->m_Conf->GetSamplesPerLine();
 
+  float percentOfImageReconstructed = (float)(m_Conf->GetReconstructionDepth()) /
+    (float)(m_Conf->GetInputDim()[1] * m_Conf->GetSpeedOfSound() * m_Conf->GetTimeSpacing() / (float)(2 - (int)m_Conf->GetIsPhotoacousticImage()));
+  percentOfImageReconstructed = percentOfImageReconstructed <= 1 ? percentOfImageReconstructed : 1;
+
   clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_mem), &(this->m_UsedLines));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[0]));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[1]));
@@ -99,6 +103,7 @@ void mitk::OCLDelayCalculation::Execute()
   clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_uint), &(samplesperLine));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_char), &(this->m_IsPAImage));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_float), &(this->m_DelayMultiplicatorRaw));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_float), &(percentOfImageReconstructed));
 
   CHECK_OCL_ERR(clErr);
 

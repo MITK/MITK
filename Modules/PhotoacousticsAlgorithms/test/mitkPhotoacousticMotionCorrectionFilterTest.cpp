@@ -59,7 +59,7 @@ public:
     mitk::PixelType pt = mitk::MakeScalarPixelType<float>();
     float * data = new float[8] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     float * data4d = new float[16];
-    data2d = new float[4] {1.0, 0.0, 0.0, 0.0};
+    data2d = new float[4] {500.0, -500.5, 1000.0, 0.5};
     image->Initialize(pt, 3, dimensions);
     image->SetVolume(data);
     image4d->Initialize(pt, 4, dim2);
@@ -177,6 +177,7 @@ public:
     mitk::Image::Pointer out2 = filter->GetOutput(1);
     MITK_ASSERT_EQUAL(image, out1, "Check that static image does not get changed.");
   }
+
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkPhotoacousticMotionCorrectionFilter)

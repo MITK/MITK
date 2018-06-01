@@ -31,6 +31,9 @@ mitk::PhotoacousticMotionCorrectionFilter::
   m_PolySigma = 1.5;
   m_Flags = 0;
 
+  m_MaxValue = 255.0;
+  m_MinValue = 0.0;
+
   this->SetNumberOfIndexedInputs(2);
   this->SetNumberOfIndexedOutputs(2);
   this->SetNthOutput(0, mitk::Image::New());
@@ -137,11 +140,13 @@ void mitk::PhotoacousticMotionCorrectionFilter::PerformCorrection(
     // At the beginning of a batch we set the new reference image and directly
     // write the result images
     if (i % batch == 0) {
-      m_UsRef = m_UsMat.clone();
+      // Rescale reference to full char resolution
+      m_UsRef = this->FitMatrixToChar(m_UsMat);
       m_UsRes = m_UsMat.clone();
       m_PaRes = m_PaMat.clone();
     } else {
-      cv::calcOpticalFlowFarneback(m_UsRef, m_UsMat, m_Flow, m_PyrScale,
+      cv::Mat UsMatRescaled = this->FitMatrixToChar(m_UsMat);
+      cv::calcOpticalFlowFarneback(m_UsRef, UsMatRescaled, m_Flow, m_PyrScale,
                                    m_Levels, m_WinSize, m_Iterations, m_PolyN,
                                    m_PolySigma, m_Flags);
 
@@ -170,6 +175,16 @@ cv::Mat mitk::PhotoacousticMotionCorrectionFilter::ComputeFlowMap(cv::Mat flow) 
   }
 
   return map;
+}
+
+cv::Mat mitk::PhotoacousticMotionCorrectionFilter::FitMatrixToChar(cv::Mat mat) {
+
+  if (m_MaxValue == m_MinValue) {
+
+    return mat.clone();
+  }
+
+  return MAX_MATRIX*(mat.clone() - m_MinValue) / (m_MaxValue - m_MinValue);
 }
 
 cv::Mat mitk::PhotoacousticMotionCorrectionFilter::GetMatrix(
@@ -211,6 +226,10 @@ void mitk::PhotoacousticMotionCorrectionFilter::GenerateData() {
 
   // Check the output images and (re-)initialize, if necessary.
   this->InitializeOutputIfNecessary(paInput, usInput, paOutput, usOutput);
+
+  // Set Max and Min of ultrasonic image
+  this->m_MaxValue = usInput->GetStatistics()->GetScalarValueMax();
+  this->m_MinValue = usInput->GetStatistics()->GetScalarValueMin();
 
   // m_ImageToOpenCVFilter->SetImage(paInput);
   this->PerformCorrection(paInput, usInput, paOutput, usOutput);

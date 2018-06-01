@@ -33,8 +33,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include <mitkImageToOpenCVImageFilter.h>
 #include <mitkOpenCVToMitkImageFilter.h>
+#include <mitkImageStatisticsHolder.h>
 
 #define IMAGE_DIMENSION 3 /*!< All images need to have dimension 3*/
+#define MAX_MATRIX 255.0 /*!< Rescaling constant to maximum character*/
 
 namespace mitk
 {
@@ -235,6 +237,19 @@ namespace mitk
      * @return returns a OpenCV matrix containing the 2d slice.
      */
     cv::Mat GetMatrix(const mitk::Image::Pointer input, unsigned int i);
+
+    /*!
+     * \brief Rescale matrix such that the values lie between 0 and 255
+     *
+     * This method rescales the matrix such that its values lie between 0 and 255. In order to do that it uses the maximum and the minimum of the input ultrasonic image.
+     *
+     * @warning This is a specialized method which does not perform the operation in general, but only if the matrix stems from the right ultrasonic image. Therefore, the method should only be called internally.
+     *
+     * @param mat The OpenCV matrix to be rescaled
+     * @return The rescaled OpenCV matrix
+     */
+    cv::Mat FitMatrixToChar(cv::Mat mat);
+
     /*!
      * \brief Insert a OpenCV matrix as a slice into an image
      *
@@ -273,6 +288,8 @@ namespace mitk
                               motion compensated with regard to the first image in the
                               batch. If the variable is set to 0, the whole time series will
                               be processed as one batch. */
+    float m_MaxValue; /*!< The maximum of the ultrasonic image*/
+    float m_MinValue; /*!< The minimum of the ultrasonic image*/
 
     // Stuff that OpenCV needs
     cv::Mat m_UsRef; /*!< Contains the reference ultrasonic image to which the

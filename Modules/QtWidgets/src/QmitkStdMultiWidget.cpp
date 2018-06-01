@@ -1433,7 +1433,7 @@ void QmitkStdMultiWidget::InitPositionTracking()
 // TODO POSITIONTRACKER
 }
 
-void QmitkStdMultiWidget::AddDisplayPlaneSubTree(const std::string& multiWidget)
+void QmitkStdMultiWidget::AddDisplayPlaneSubTree(const std::string& parentWidget)
 {
   // add the displayed planes of the multiwidget to a node to which the subtree
   // @a planesSubTree points ...
@@ -1447,7 +1447,7 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree(const std::string& multiWidget)
   m_PlaneNode1->SetProperty("name", mitk::StringProperty::New(std::string(renderer1->GetName()) + ".plane"));
   m_PlaneNode1->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_PlaneNode1->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_PlaneNode1->SetProperty("multiWidget", mitk::StringProperty::New(multiWidget));
+  m_PlaneNode1->SetProperty("parentWidget", mitk::StringProperty::New(parentWidget));
   mapper = mitk::PlaneGeometryDataMapper2D::New();
   m_PlaneNode1->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
@@ -1458,7 +1458,7 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree(const std::string& multiWidget)
   m_PlaneNode2->SetProperty("name", mitk::StringProperty::New(std::string(renderer2->GetName()) + ".plane"));
   m_PlaneNode2->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_PlaneNode2->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_PlaneNode2->SetProperty("multiWidget", mitk::StringProperty::New(multiWidget));
+  m_PlaneNode2->SetProperty("parentWidget", mitk::StringProperty::New(parentWidget));
   mapper = mitk::PlaneGeometryDataMapper2D::New();
   m_PlaneNode2->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
@@ -1469,14 +1469,14 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree(const std::string& multiWidget)
   m_PlaneNode3->SetProperty("name", mitk::StringProperty::New(std::string(renderer3->GetName()) + ".plane"));
   m_PlaneNode3->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_PlaneNode3->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_PlaneNode3->SetProperty("multiWidget", mitk::StringProperty::New(multiWidget));
+  m_PlaneNode3->SetProperty("parentWidget", mitk::StringProperty::New(parentWidget));
   mapper = mitk::PlaneGeometryDataMapper2D::New();
   m_PlaneNode3->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
   m_ParentNodeForGeometryPlanes = mitk::DataNode::New();
   m_ParentNodeForGeometryPlanes->SetProperty("name", mitk::StringProperty::New("Widgets"));
   m_ParentNodeForGeometryPlanes->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_ParentNodeForGeometryPlanes->SetProperty("multiWidget", mitk::StringProperty::New(multiWidget));
+  m_ParentNodeForGeometryPlanes->SetProperty("parentWidget", mitk::StringProperty::New(parentWidget));
 }
 
 mitk::SliceNavigationController* QmitkStdMultiWidget::GetTimeNavigationController()

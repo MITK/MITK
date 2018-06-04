@@ -18,8 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITK_SINGLE_NODE_SELECTION_WIDGET_H
 #define QMITK_SINGLE_NODE_SELECTION_WIDGET_H
 
-#include <QmitkModelViewSelectionConnector.h>
-
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
@@ -50,14 +48,6 @@ public:
 
   using NodeList = QmitkAbstractNodeSelectionWidget::NodeList;
 
-Q_SIGNALS:
-  /*
-  * @brief A signal that will be emitted if the selected node has changed.
-  *
-  * @param nodes		A list of data nodes that are newly selected.
-  */
-  void CurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
-
 public Q_SLOTS:
   virtual void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
   virtual void SetCurrentSelection(NodeList selectedNodes) override;
@@ -73,7 +63,9 @@ protected:
   void EditSelection();
   virtual void UpdateInfo() override;
 
-  virtual void OnNodePredicateChanged(mitk::NodePredicateBase* newPredicate);
+  virtual void OnNodePredicateChanged(mitk::NodePredicateBase* newPredicate) override;
+  virtual void OnDataStorageChanged() override;
+
 
   NodeList m_ExternalSelection;
   mitk::DataNode::Pointer m_SelectedNode;

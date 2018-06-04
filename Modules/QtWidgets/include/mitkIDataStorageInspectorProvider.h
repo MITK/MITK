@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __I_ABSTRACT_DATA_STORAGE_PROVIDER_H
-#define __I_ABSTRACT_DATA_STORAGE_PROVIDER_H
+#ifndef __I_DATA_STORAGE_INSPECTOR_PROVIDER_H
+#define __I_DATA_STORAGE_INSPECTOR_PROVIDER_H
 
 #include <mitkServiceInterface.h>
 
@@ -68,4 +68,4 @@ namespace mitk
 
 MITK_DECLARE_SERVICE_INTERFACE(mitk::IDataStorageInspectorProvider, "org.mitk.IDataStorageInspectorProvider")
 
-#endif /* __I_MODEL_FIT_PROVIDER_H */
+#endif /* __I_DATA_STORAGE_INSPECTOR_PROVIDER_H */

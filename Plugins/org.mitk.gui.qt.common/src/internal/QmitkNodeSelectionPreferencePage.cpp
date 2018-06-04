@@ -98,10 +98,10 @@ void QmitkNodeSelectionPreferencePage::PerformCancel()
 //-----------------------------------------------------------------------------
 void QmitkNodeSelectionPreferencePage::Update()
 {
-  m_Providers = QmitkDataStorageInspectorGenerator::GetProviders();
+  m_Providers = mitk::DataStorageInspectorGenerator::GetProviders();
 
   auto visibleProviders = mitk::GetVisibleDataStorageInspectors();
-  auto allProviders = QmitkDataStorageInspectorGenerator::GetProviders();
+  auto allProviders = mitk::DataStorageInspectorGenerator::GetProviders();
   auto favorite = mitk::GetFavoriteDataStorageInspector();
 
   auto finding = m_Providers.find(favorite);

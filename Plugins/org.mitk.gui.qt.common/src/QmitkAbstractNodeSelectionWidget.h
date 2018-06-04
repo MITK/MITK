@@ -18,8 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITK_ABSTRACT_NODE_SELECTION_WIDGET_H
 #define QMITK_ABSTRACT_NODE_SELECTION_WIDGET_H
 
-#include <QmitkModelViewSelectionConnector.h>
-
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
@@ -132,8 +130,12 @@ protected:
   /**Member is called if the display of the selected nodes should be updated.*/
   virtual void UpdateInfo() = 0;
 
-  /**Member is called if the predicate has changed. Thus the selection might change to.*/
+  /**Member is called if the predicate has changed. Thus the selection might change to. The new (changed) predicate
+  is passed with the function call. It is the same like this->GetNodePredicate() called in the function call.*/
   virtual void OnNodePredicateChanged(mitk::NodePredicateBase* newPredicate) = 0;
+
+  /**Member is called if the data storage has changed. Thus the selection might change to.*/
+  virtual void OnDataStorageChanged() = 0;
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   mitk::NodePredicateBase::Pointer m_NodePredicate;

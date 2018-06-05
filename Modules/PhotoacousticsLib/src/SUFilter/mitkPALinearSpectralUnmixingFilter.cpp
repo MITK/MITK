@@ -27,6 +27,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
 
+//vigra
+#include <vigra/matrix.hxx>
+#include <vigra/regression.hxx>
+#include <vigra/quadprog.hxx>
+
 mitk::pa::LinearSpectralUnmixingFilter::LinearSpectralUnmixingFilter()
 {
  
@@ -104,7 +109,10 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
   //testing new algorithms:
   if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::test == algorithmIndex)
   {
-    //mitkThrow() << "nothing implemented";
+    //resultVector = NNLSLARS(EndmemberMatrix, inputVector);
+    //resultVector = NNLSGoldfarb(EndmemberMatrix, inputVector);
+
+    mitkThrow() << "nothing implemented";/*
     Eigen::LLT<Eigen::MatrixXf> lltOfA(EndmemberMatrix); // compute the Cholesky decomposition of A
     if (lltOfA.info() == Eigen::NumericalIssue)
       MITK_INFO << "not positive semi definite";
@@ -112,7 +120,7 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
       MITK_INFO << "semi definite";
     resultVector = EndmemberMatrix.fullPivHouseholderQr().solve(inputVector);//works :)
     //resultVector = EndmemberMatrix.completeOrthogonalDecomposition().solve(inputVector); //not a member of Eigen?
-    //resultVector = EndmemberMatrix.bdcSvd().solve(inputVector); //not a member of Eigen?
+    //resultVector = EndmemberMatrix.bdcSvd().solve(inputVector); //not a member of Eigen?*/
   }
 
   /*double relativeError = (EndmemberMatrix*resultVector - inputVector).norm() / inputVector.norm(); // norm() is L2 norm
@@ -122,3 +130,69 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
   MITK_INFO << "IS APPROX RESULT: " << resultIsApprox;*/
   return resultVector;
 }
+
+/* Wohin copyright hinweis?
+Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::NNLSLARS(
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
+{
+  using namespace vigra;
+  using namespace vigra::linalg;
+
+  int numberOfWavelengths = EndmemberMatrix.rows();
+  int numberOfChromophores = EndmemberMatrix.cols();
+  int size = numberOfChromophores * numberOfWavelengths;
+
+  std::vector<float> A_data;
+
+  for (int i = 0; i < numberOfWavelengths; ++i)
+  {
+    for (int j = 0; j < numberOfChromophores; ++j)
+    {
+      A_data.push_back(EndmemberMatrix(i, j));
+    }
+  }
+
+  const float* Adat = A_data.data;
+
+
+  vigra::Matrix<float> A(Shape2(numberOfWavelengths, numberOfChromophores), Adat);
+  vigra::Matrix<float> b(Shape2(numberOfWavelengths, 1), Bdat);
+  vigra::Matrix<float> x(Shape2(numberOfChromophores, 1));
+
+  // minimize (A*x-b)^2  s.t. x>=0 using least angle regression (LARS algorithm)
+  nonnegativeLeastSquares(A, b, x);
+
+  Eigen::VectorXf result;
+  for (int k = 0; k < numberOfChromophores; ++k)
+  {
+    result[k] = x(k, 0);
+  }
+  return result;
+}
+
+Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::NNLSGoldfarb(
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
+{
+  using namespace vigra;
+  using namespace vigra::linalg;
+
+  int numberOfWavelengths = EndmemberMatrix.rows();
+  int numberOfChromophores = EndmemberMatrix.cols();
+  Matrix<float> A(Shape2(numberOfWavelengths, numberOfChromophores), EndmemberMatrix);
+  Matrix<float> b(Shape2(numberOfWavelengths, 1), inputVector);
+  Matrix<float> x(Shape2(numberOfChromophores, 1));
+
+  Matrix<float> eye(identityMatrix<float>(3)),
+    zeros(Shape2(3, 1)),
+    empty,
+    U = transpose(A)*A,
+    v = -transpose(A)*b;
+  x = 0;
+
+  // minimize (A*x-b)^2  s.t. x>=0 using the Goldfarb-Idnani algorithm
+  quadraticProgramming(U, v, empty, empty, eye, zeros, x);
+
+  return x;
+}
+
+/**/

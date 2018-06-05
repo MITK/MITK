@@ -252,37 +252,35 @@ void SpectralUnmixing::DoImageProcessing()
       this->GetDataStorage()->Add(dataNodesO2);/**/
 
       //2:
-      /*
+      //*
       if (sO2bool)
       {
-        if (DeOxbool)
-        {
-          if (Oxbool)
-          {
-            MITK_INFO << "CALCULATE OXYGEN SATURATION ...";
-            auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
-            m_sO2->SetInput(0, m_SpectralUnmixingFilter->GetOutput(0));
-            m_sO2->SetInput(1, m_SpectralUnmixingFilter->GetOutput(1));
-
-            //http://docs.mitk.org/nightly/PipelineingConceptPage.html
-            //m_SpectralUnmixingFilter->Update();
-            //m_sO2->SetInput(m_SpectralUnmixingFilter->GetOutput()); 
-
-            m_sO2->Update();
-
-            mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
-            mitk::DataNode::Pointer dataNodesO2 = mitk::DataNode::New();
-            dataNodesO2->SetData(sO2);
-            dataNodesO2->SetName("sO2");
-            this->GetDataStorage()->Add(dataNodesO2);
-
-            MITK_INFO << "[DONE]";
-          }
-          else
-            mitkThrow() << "SELECT CHROMOPHORE OXYHEMOGLOBIN!";
-        }
-        else
+        if (!DeOxbool)
           mitkThrow() << "SELECT CHROMOPHORE DEOXYHEMOGLOBIN!";
+        if (!Oxbool)
+          mitkThrow() << "SELECT CHROMOPHORE OXYHEMOGLOBIN!";
+
+        MITK_INFO << "CALCULATE OXYGEN SATURATION ...";
+        auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
+        auto output1 = m_SpectralUnmixingFilter->GetOutput(0);
+        auto output2 = m_SpectralUnmixingFilter->GetOutput(1);
+
+        m_sO2->SetInput(0, output1);
+        m_sO2->SetInput(1, output2);
+
+        //http://docs.mitk.org/nightly/PipelineingConceptPage.html
+        //m_SpectralUnmixingFilter->Update();
+        //m_sO2->SetInput(m_SpectralUnmixingFilter->GetOutput()); 
+
+        m_sO2->Update();
+
+        mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
+        mitk::DataNode::Pointer dataNodesO2 = mitk::DataNode::New();
+        dataNodesO2->SetData(sO2);
+        dataNodesO2->SetName("sO2");
+        this->GetDataStorage()->Add(dataNodesO2);
+
+        MITK_INFO << "[DONE]";
       }
       mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());/**/
 

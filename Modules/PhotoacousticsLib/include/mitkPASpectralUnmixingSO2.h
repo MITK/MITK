@@ -30,7 +30,8 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT SpectralUnmixingSO2 : public mitk::ImageToImageFilter
     {
     public:
-      mitkClassMacro(SpectralUnmixingSO2, mitk::ImageToImageFilter)
+      mitkClassMacro(SpectralUnmixingSO2, mitk::ImageToImageFilter);
+      itkFactorylessNewMacro(Self);
 
     protected:
       SpectralUnmixingSO2();

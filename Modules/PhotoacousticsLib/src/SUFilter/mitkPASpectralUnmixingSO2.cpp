@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::pa::SpectralUnmixingSO2::SpectralUnmixingSO2()
 {
-  //this->SetNumberOfIndexedInputs(2);
+  this->SetNumberOfIndexedInputs(2);
   this->SetNumberOfIndexedOutputs(1);
   this->SetNthOutput(0, mitk::Image::New());
 }

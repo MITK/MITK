@@ -62,6 +62,7 @@ void mitk::pa::SpectralUnmixingSO2::GenerateData()
   {
     for (unsigned int y = 0; y < yDim; y++)
     {
+      // Calculate SO2 and write to output
       unsigned int pixelNumber = x * yDim + y;
       float pixelHb = inputDataArrayHb[pixelNumber];
       float pixelHbO2 = inputDataArrayHbO2[pixelNumber];

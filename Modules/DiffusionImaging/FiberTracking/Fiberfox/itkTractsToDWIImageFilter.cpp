@@ -46,7 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDiffusionTensor3DReconstructionImageFilter.h>
 #include <itkDiffusionTensor3D.h>
 #include <itkTractDensityImageFilter.h>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <itkTractsToVectorImageFilter.h>
 #include <itkInvertIntensityImageFilter.h>
 #include <itkShiftScaleImageFilter.h>

@@ -14,27 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "org_mitk_gui_qt_cest_Activator.h"
-
-#include <QtPlugin>
-
 #include "QmitkCESTStatisticsView.h"
 
-namespace mitk {
-
-void org_mitk_gui_qt_cest_Activator::start(ctkPluginContext* context)
+void mitk::org_mitk_gui_qt_cest_Activator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkCESTStatisticsView, context)
 }
 
-void org_mitk_gui_qt_cest_Activator::stop(ctkPluginContext* context)
+void mitk::org_mitk_gui_qt_cest_Activator::stop(ctkPluginContext*)
 {
-  Q_UNUSED(context)
 }
-
-}
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_mitk_gui_qt_cest, mitk::org_mitk_gui_qt_cest_Activator)
-#endif

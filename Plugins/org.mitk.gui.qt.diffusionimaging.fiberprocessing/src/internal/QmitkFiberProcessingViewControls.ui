@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ui version="4.0">
  <class>QmitkFiberProcessingViewControls</class>
  <widget class="QWidget" name="QmitkFiberProcessingViewControls">
@@ -15,7 +15,7 @@
   </property>
   <property name="styleSheet">
    <string>QCommandLinkButton {
-  font-weight: normal;
+  font-weight: lighter;
 }
 
 QCommandLinkButton:disabled {
@@ -24,30 +24,23 @@ QCommandLinkButton:disabled {
 }
 
 QToolBox::tab {
-  border: 1px solid #434346;
   font-weight: bold;
 }
 
 QToolBox::tab:hover {
-  background-color: #434346;
   font-weight: bold;
 }
 
 QToolBox::tab:selected {
-  background-color: #1c97ea;
-  border: 1px solid #1c97ea;
   font-weight: bold;
 }
 
 QGroupBox {
-  border: 1px solid #434346;
-  background-color: #2d2d30;
-  margin-top: 8px;
-  padding-top: 8px;
+  background-color: transparent;
 }
 
 QGroupBox, QGroupBox:disabled {
-  background-color: #2d2d30;
+  background-color: transparent;
 }</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
@@ -212,11 +205,12 @@ QGroupBox, QGroupBox:disabled {
                 <string>Draw circular ROI. Select reference fiber bundle to execute.</string>
                </property>
                <property name="text">
-                <string/>
+                <string></string>
                </property>
                <property name="icon">
                 <iconset resource="../../../org.mitk.gui.qt.diffusionimaging.fiberfox/resources/QmitkDiffusionImaging.qrc">
-                 <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>:/QmitkDiffusionImaging/circle.png</iconset>
+                 <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>
+:/QmitkDiffusionImaging/circle.png                </iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -257,11 +251,12 @@ QGroupBox, QGroupBox:disabled {
                 <string>Draw polygonal ROI. Select reference fiber bundle to execute.</string>
                </property>
                <property name="text">
-                <string/>
+                <string></string>
                </property>
                <property name="icon">
                 <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-                 <normaloff>:/QmitkDiffusionImaging/polygon.png</normaloff>:/QmitkDiffusionImaging/polygon.png</iconset>
+                 <normaloff>:/QmitkDiffusionImaging/polygon.png</normaloff>
+:/QmitkDiffusionImaging/polygon.png                </iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -493,7 +488,7 @@ QGroupBox, QGroupBox:disabled {
           <item row="2" column="2">
            <widget class="QDoubleSpinBox" name="m_FiberExtractionFractionBox">
             <property name="toolTip">
-             <string>Minimum overlap of streamlines and ROI in terms of streamline length. Zero means that one streamline point inside the ROI is enough to be considered as &quot;overlapping&quot;.</string>
+             <string>Minimum overlap of streamlines and ROI in terms of streamline length. Zero means that one streamline point inside the ROI is enough to be considered as "overlapping".</string>
             </property>
             <property name="decimals">
              <number>3</number>
@@ -758,10 +753,10 @@ QGroupBox, QGroupBox:disabled {
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="m_ExtractDirX"/>
+           <widget class="QDoubleSpinBox" name="m_ExtractDirX"></widget>
           </item>
           <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="m_ExtractDirY"/>
+           <widget class="QDoubleSpinBox" name="m_ExtractDirY"></widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_4">
@@ -771,7 +766,7 @@ QGroupBox, QGroupBox:disabled {
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="m_ExtractDirZ"/>
+           <widget class="QDoubleSpinBox" name="m_ExtractDirZ"></widget>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_5">
@@ -908,7 +903,7 @@ QGroupBox, QGroupBox:disabled {
           </font>
          </property>
          <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
           <string>Remove</string>
@@ -1183,7 +1178,7 @@ QGroupBox, QGroupBox:disabled {
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QmitkDataStorageComboBox" name="m_ColorMapBox"/>
+           <widget class="QmitkDataStorageComboBox" name="m_ColorMapBox"></widget>
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_12">
@@ -1352,7 +1347,7 @@ QGroupBox, QGroupBox:disabled {
           </font>
          </property>
          <property name="toolTip">
-          <string/>
+          <string></string>
          </property>
          <property name="text">
           <string>Execute</string>
@@ -1555,7 +1550,7 @@ QGroupBox, QGroupBox:disabled {
       <item row="0" column="1">
        <widget class="QLabel" name="m_FibLabel">
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" color:#ff0000;"&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -1565,7 +1560,7 @@ QGroupBox, QGroupBox:disabled {
       <item row="1" column="1">
        <widget class="QLabel" name="m_PfLabel">
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;needed for extraction&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" color:#969696;"&gt;needed for extraction&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -1618,8 +1613,8 @@ QGroupBox, QGroupBox:disabled {
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../org.mitk.gui.qt.diffusionimaging.fiberfox/resources/QmitkDiffusionImaging.qrc"/>
-  <include location="../../resources/QmitkDiffusionImaging.qrc"/>
+  <include location="../../../org.mitk.gui.qt.diffusionimaging.fiberfox/resources/QmitkDiffusionImaging.qrc"></include>
+  <include location="../../resources/QmitkDiffusionImaging.qrc"></include>
  </resources>
- <connections/>
+ <connections></connections>
 </ui>

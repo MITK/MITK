@@ -489,10 +489,6 @@ function(mitk_create_module)
 
       set_property(TARGET ${MODULE_TARGET} PROPERTY US_MODULE_NAME ${_us_module_name})
 
-      if(MINGW)
-        target_link_libraries(${MODULE_TARGET} ssp) # add stack smash protection lib
-      endif()
-
       # Add additional library search directories to a global property which
       # can be evaluated by other CMake macros, e.g. our install scripts.
       if(MODULE_ADDITIONAL_LIBS)

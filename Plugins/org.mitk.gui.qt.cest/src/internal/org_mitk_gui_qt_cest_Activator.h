@@ -14,30 +14,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef org_mitk_gui_qt_cest_Activator_h
 #define org_mitk_gui_qt_cest_Activator_h
 
 #include <ctkPluginActivator.h>
 
-namespace mitk {
-
-class org_mitk_gui_qt_cest_Activator :
-  public QObject, public ctkPluginActivator
+namespace mitk
 {
-  Q_OBJECT
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_cest")
-#endif
-  Q_INTERFACES(ctkPluginActivator)
+  class org_mitk_gui_qt_cest_Activator : public QObject, public ctkPluginActivator
+  {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_cest")
+    Q_INTERFACES(ctkPluginActivator)
 
-public:
-
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
-
-}; // org_mitk_gui_qt_cest_Activator
-
+  public:
+    void start(ctkPluginContext* context);
+    void stop(ctkPluginContext* context);
+  };
 }
 
-#endif // org_mitk_gui_qt_cest_Activator_h
+#endif

@@ -27,6 +27,7 @@ namespace mitk {
   public:
     static CustomMimeType NAVIGATIONDATASETXML_MIMETYPE();
     static CustomMimeType NAVIGATIONDATASETCSV_MIMETYPE();
+    static CustomMimeType USDEVICEINFORMATIONXML_MIMETYPE();
   };
 }
 

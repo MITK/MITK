@@ -11,17 +11,17 @@
       icon="resources/crop.svg"
       class="QmitkImageCropper" >
       <description>Crop images to a given size</description>
-      <keywordReference id="org.mitk.views.xnat.imagecropper.ViewKeyword"/>
+      <keywordReference id="org.mitk.views.imagecropper.ViewKeyword"/>
     </view>
   </extension>
 
   <extension point="org.blueberry.ui.keywords">
-    <keyword id="org.mitk.views.imagecropper.ViewKeyword"  label="Size" />
-    <keyword id="org.mitk.views.imagecropper.ViewKeyword"  label="Match Size" />
-    <keyword id="org.mitk.views.imagecropper.ViewKeyword"  label="Resizing" />
-    <keyword id="org.mitk.views.imagecropper.ViewKeyword"  label="Changing Dimension" />
-    <keyword id="org.mitk.views.imagecropper.ViewKeyword"  label="Image Dimension" />
-    <keyword id="org.mitk.views.imagecropper.ViewKeyword"  label="Image cropping" />
+    <keyword id="org.mitk.views.imagecropper.ViewKeyword" label="Size" />
+    <keyword id="org.mitk.views.imagecropper.ViewKeyword" label="Match Size" />
+    <keyword id="org.mitk.views.imagecropper.ViewKeyword" label="Resizing" />
+    <keyword id="org.mitk.views.imagecropper.ViewKeyword" label="Changing Dimension" />
+    <keyword id="org.mitk.views.imagecropper.ViewKeyword" label="Image Dimension" />
+    <keyword id="org.mitk.views.imagecropper.ViewKeyword" label="Image cropping" />
   </extension>
 
 </plugin>

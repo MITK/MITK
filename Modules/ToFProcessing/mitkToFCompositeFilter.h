@@ -19,8 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include "mitkImageToImageFilter.h"
 #include <MitkToFProcessingExports.h>
-#include <cv.h>
 #include <itkBilateralImageFilter.h>
+#include "opencv2/core.hpp"
 
 typedef itk::Image<float, 2> ItkImageType2D;
 typedef itk::Image<float, 3> ItkImageType3D;

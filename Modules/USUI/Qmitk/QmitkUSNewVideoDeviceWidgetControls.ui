@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>333</width>
+    <width>332</width>
     <height>972</height>
    </rect>
   </property>
@@ -19,18 +19,15 @@
   <property name="windowTitle">
    <string>QmitkUSNewVideoDeviceWidget</string>
   </property>
-  <layout class="QFormLayout" name="formLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="sizeConstraint">
     <enum>QLayout::SetDefaultConstraint</enum>
-   </property>
-   <property name="fieldGrowthPolicy">
-    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
    </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>10</number>
    </property>
    <property name="rightMargin">
     <number>0</number>
@@ -38,7 +35,137 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
-   <item row="1" column="0" colspan="2">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="m_BtnDone">
+       <property name="text">
+        <string>Add Video Device</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USUI.qrc">
+         <normaloff>:/USUI/accept.png</normaloff>:/USUI/accept.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_BtnCancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USUI.qrc">
+         <normaloff>:/USUI/restart.png</normaloff>:/USUI/restart.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="m_BtnLoadConfiguration">
+       <property name="text">
+        <string>Load Device Configuration</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_BtnSave">
+       <property name="text">
+        <string>Save-&gt;File</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USUI.qrc">
+         <normaloff>:/USUI/accept.png</normaloff>:/USUI/accept.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="m_BoxMetadata">
+     <property name="title">
+      <string>Metadata:</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="m_Manufacturer">
+        <property name="text">
+         <string>Unknown Manufacturer</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Model</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_6">
+        <property name="font">
+         <font>
+          <weight>50</weight>
+          <bold>false</bold>
+          <underline>true</underline>
+         </font>
+        </property>
+        <property name="text">
+         <string>Device Information:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Comment</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Manufacturer</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="m_Model">
+        <property name="text">
+         <string>Unknown Model</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="m_Comment">
+        <property name="text">
+         <string>None</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_12">
+        <property name="text">
+         <string>Name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="m_DeviceName">
+        <property name="text">
+         <string>USVideoDevice</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="m_GroupBoxVideoSource">
      <property name="title">
       <string>Video Source:</string>
@@ -172,7 +299,296 @@
      </layout>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item>
+    <widget class="QGroupBox" name="m_GroupBoxEditProbes">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>180</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Edit Probes</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="7" column="1">
+       <widget class="QDoubleSpinBox" name="m_YSpacingSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>6</number>
+        </property>
+        <property name="minimum">
+         <double>0.000001000000000</double>
+        </property>
+        <property name="maximum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLineEdit" name="m_AddDepths">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::WheelFocus</enum>
+        </property>
+        <property name="placeholderText">
+         <string>Enter a depth to add to the chosen probe</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="m_ProbesLabel">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Probes</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QPushButton" name="m_BtnAddDepths">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::WheelFocus</enum>
+        </property>
+        <property name="text">
+         <string>Add Depth</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="m_CroppingRightLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Cropping Right</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="m_CroppingTopLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Cropping Top</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="0">
+       <widget class="QLabel" name="m_CroppingBottomLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Cropping Bottom</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLineEdit" name="m_ProbeNameLineEdit">
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string>Enter the name of the probe</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="m_AddNewProbePushButton">
+        <property name="text">
+         <string>Add New Probe</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="m_YSpacingLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Spacing Y-direction</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="m_XSpacingLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Spacing X-direction</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QDoubleSpinBox" name="m_XSpacingSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="decimals">
+         <number>6</number>
+        </property>
+        <property name="minimum">
+         <double>0.000001000000000</double>
+        </property>
+        <property name="maximum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QPushButton" name="m_BtnRemoveProbe">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::WheelFocus</enum>
+        </property>
+        <property name="text">
+         <string>Remove this Probe</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QComboBox" name="m_Probes">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QComboBox" name="m_Depths">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QPushButton" name="m_BtnRemoveDepth">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::WheelFocus</enum>
+        </property>
+        <property name="text">
+         <string>Remove this Depth</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QLabel" name="m_ScanningDepthsLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Scanning depths for chosen probe</string>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="1">
+       <widget class="QSpinBox" name="m_CroppingLeftSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximum">
+         <number>400</number>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
+       <widget class="QSpinBox" name="m_CroppingTopSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximum">
+         <number>400</number>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="0">
+       <widget class="QLabel" name="m_CroppingLeftLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Cropping Left</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="1">
+       <widget class="QSpinBox" name="m_CroppingRightSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximum">
+         <number>400</number>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="1">
+       <widget class="QSpinBox" name="m_CroppingBottomSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximum">
+         <number>400</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
       <string>Video Options:</string>
@@ -191,82 +607,7 @@
      </layout>
     </widget>
    </item>
-   <item row="4" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="m_BtnDone">
-       <property name="text">
-        <string>Add Video Device</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources/USUI.qrc">
-         <normaloff>:/USUI/accept.png</normaloff>:/USUI/accept.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="m_BtnCancel">
-       <property name="text">
-        <string>Cancel</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources/USUI.qrc">
-         <normaloff>:/USUI/restart.png</normaloff>:/USUI/restart.png</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="3" column="0" colspan="2">
-    <widget class="QGroupBox" name="groupBox_4">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>50</width>
-       <height>130</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Add Probes</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string notr="true">Enter the names of the probes of the VideoDevice and, separated by commas, its scanning depths. If you want to add several probes separate the probes and their informations by semicolons E.g. ACV,100,120,150;BDW,90,100;CSV,120,150,180</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::AutoText</enum>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-        <property name="indent">
-         <number>-2</number>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="m_ProbesInformation"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="5" column="1">
+   <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
       <string>Override:</string>
@@ -344,180 +685,6 @@
         </property>
         <property name="wordWrap">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <widget class="QGroupBox" name="m_GroupBoxEditProbes">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>180</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Edit Probes</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Probes</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QComboBox" name="m_Probes">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="m_BtnRemoveProbe">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::WheelFocus</enum>
-        </property>
-        <property name="text">
-         <string>Remove this Probe</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="2">
-       <widget class="QLabel" name="label_7">
-        <property name="text">
-         <string>Scanning Depths for chosen Probe</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QComboBox" name="m_Depths">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QPushButton" name="m_BtnRemoveDepth">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::WheelFocus</enum>
-        </property>
-        <property name="text">
-         <string>Remove this Depth</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" colspan="2">
-       <widget class="QLabel" name="label_11">
-        <property name="text">
-         <string>Enter Scanning Depths you want to add to chosen Probe.
-Seperate them by commas. E.g. 120,150,180</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLineEdit" name="m_AddDepths">
-        <property name="focusPolicy">
-         <enum>Qt::WheelFocus</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QPushButton" name="m_BtnAddDepths">
-        <property name="focusPolicy">
-         <enum>Qt::WheelFocus</enum>
-        </property>
-        <property name="text">
-         <string>Add Depths</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="0" column="0" colspan="2">
-    <widget class="QGroupBox" name="m_BoxMetadata">
-     <property name="title">
-      <string>Metadata:</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Comment</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="label_6">
-        <property name="font">
-         <font>
-          <weight>50</weight>
-          <bold>false</bold>
-          <underline>true</underline>
-         </font>
-        </property>
-        <property name="text">
-         <string>Device Information:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Manufacturer</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="m_Manufacturer">
-        <property name="text">
-         <string>Unknown Manufacturer</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Model</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="m_Model">
-        <property name="text">
-         <string>Unknown Model</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLineEdit" name="m_Comment">
-        <property name="text">
-         <string>None</string>
         </property>
        </widget>
       </item>

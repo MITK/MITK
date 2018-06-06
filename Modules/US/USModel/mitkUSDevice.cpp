@@ -44,15 +44,25 @@ mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   : mitk::ImageSource(),
-  m_IsFreezed(false),
-  m_DeviceState(State_NoState),
-  m_NumberOfOutputs(1),
-  m_Manufacturer(manufacturer),
-  m_Name(model),
-  m_SpawnAcquireThread(true),
+  m_FreezeBarrier(nullptr),
+  m_FreezeMutex(),
   m_MultiThreader(itk::MultiThreader::New()),
   m_ImageMutex(itk::FastMutexLock::New()),
   m_ThreadID(-1),
+  m_ImageVector(),
+  m_Spacing(),
+  m_IGTLServer(nullptr),
+  m_IGTLMessageProvider(nullptr),
+  m_ImageToIGTLMsgFilter(nullptr),
+  m_IsFreezed(false),
+  m_DeviceState(State_NoState),
+  m_NumberOfOutputs(1),
+  m_ServiceProperties(),
+  m_ServiceRegistration(),
+  m_Manufacturer(manufacturer),
+  m_Name(model),
+  m_Comment(),
+  m_SpawnAcquireThread(true),
   m_UnregisteringStarted(false)
 {
   USImageCropArea empty;
@@ -72,12 +82,22 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
 
 mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
   : mitk::ImageSource(),
-  m_IsFreezed(false),
-  m_DeviceState(State_NoState),
-  m_SpawnAcquireThread(true),
+  m_FreezeBarrier(nullptr),
+  m_FreezeMutex(),
   m_MultiThreader(itk::MultiThreader::New()),
   m_ImageMutex(itk::FastMutexLock::New()),
   m_ThreadID(-1),
+  m_ImageVector(),
+  m_Spacing(),
+  m_IGTLServer(nullptr),
+  m_IGTLMessageProvider(nullptr),
+  m_ImageToIGTLMsgFilter(nullptr),
+  m_IsFreezed(false),
+  m_DeviceState(State_NoState),
+  m_NumberOfOutputs(1),
+  m_ServiceProperties(),
+  m_ServiceRegistration(),
+  m_SpawnAcquireThread(true),
   m_UnregisteringStarted(false)
 {
   m_Manufacturer = metadata->GetDeviceManufacturer();
@@ -92,7 +112,7 @@ mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
   this->m_CropArea = empty;
 
   // set number of outputs
-  this->SetNumberOfIndexedOutputs(1);
+  this->SetNumberOfIndexedOutputs(m_NumberOfOutputs);
 
   // create a new output
   mitk::Image::Pointer newOutput = mitk::Image::New();
@@ -372,7 +392,7 @@ void mitk::USDevice::Deactivate()
   if (!this->GetIsActive())
   {
     MITK_WARN("mitkUSDevice")
-      << "Cannot deactivate a device which is not active.";
+      << "Cannot deactivate a device which is not activae.";
     return;
   }
 
@@ -426,13 +446,14 @@ void mitk::USDevice::SetIsFreezed(bool freeze)
 
 bool mitk::USDevice::GetIsFreezed()
 {
+  /*
   if (!this->GetIsActive())
   {
     MITK_WARN("mitkUSDevice")("mitkUSTelemedDevice")
       << "Cannot get freeze state if the hardware interface is not ready. "
       "Returning false...";
     return false;
-  }
+  }*/
 
   return m_IsFreezed;
 }
@@ -572,6 +593,28 @@ std::string mitk::USDevice::GetDeviceModel() { return m_Name; }
 
 std::string mitk::USDevice::GetDeviceComment() { return m_Comment; }
 
+void mitk::USDevice::SetSpacing(double xSpacing, double ySpacing)
+{
+  m_Spacing[0] = xSpacing;
+  m_Spacing[1] = ySpacing;
+  m_Spacing[2] = 1;
+
+
+  if( m_ImageVector.size() > 0 )
+  {
+    for( size_t index = 0; index < m_ImageVector.size(); ++index )
+    {
+      auto& image = m_ImageVector[index];
+      if( image.IsNotNull() && image->IsInitialized() )
+      {
+        image->GetGeometry()->SetSpacing(m_Spacing);
+      }
+    }
+    this->Modified();
+  }
+  MITK_INFO << "Spacing: " << m_Spacing;
+}
+
 void mitk::USDevice::GenerateData()
 {
   m_ImageMutex->Lock();
@@ -600,10 +643,9 @@ void mitk::USDevice::GenerateData()
       // copy contents of the given image into the member variable
       mitk::ImageReadAccessor inputReadAccessor(image);
       output->SetImportVolume(inputReadAccessor.GetData());
-
       output->SetGeometry(image->GetGeometry());
     }
-  }
+  }  
   m_ImageMutex->Unlock();
 };
 

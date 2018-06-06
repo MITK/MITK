@@ -15,25 +15,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 =========================================================================*/
 
 #include "mitkPluginActivator.h"
-
-#include <QtPlugin>
-
 #include "QmitkIGTTrackingSemiAutomaticMeasurementView.h"
 #include "QmitkIGTTrackingDataEvaluationView.h"
 
-namespace mitk {
-  void PluginActivator::start(ctkPluginContext* context)
-  {
-    BERRY_REGISTER_EXTENSION_CLASS(QmitkIGTTrackingSemiAutomaticMeasurementView, context)
-      BERRY_REGISTER_EXTENSION_CLASS(QmitkIGTTrackingDataEvaluationView, context)
-  }
-
-  void PluginActivator::stop(ctkPluginContext* context)
-  {
-    Q_UNUSED(context)
-  }
+void mitk::PluginActivator::start(ctkPluginContext* context)
+{
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkIGTTrackingSemiAutomaticMeasurementView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkIGTTrackingDataEvaluationView, context)
 }
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-Q_EXPORT_PLUGIN2(org_mitk_gui_qt_igttrackingsemiautomaticmeasurement, mitk::PluginActivator)
-#endif
+void mitk::PluginActivator::stop(ctkPluginContext*)
+{
+}

@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define RAPIDXML_NO_EXCEPTIONS
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/foreach.hpp>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <mitkPlanarFigureComposite.h>
 
 

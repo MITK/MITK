@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImage.h>
 
+#include "opencv2/imgproc.hpp"
+
 mitk::ToFCompositeFilter::ToFCompositeFilter() : m_SegmentationMask(nullptr), m_ImageWidth(0), m_ImageHeight(0), m_ImageSize(0),
 m_IplDistanceImage(nullptr), m_IplOutputImage(nullptr), m_ItkInputImage(nullptr), m_ApplyTemporalMedianFilter(false), m_ApplyAverageFilter(false),
   m_ApplyMedianFilter(false), m_ApplyThresholdFilter(false), m_ApplyMaskSegmentation(false), m_ApplyBilateralFilter(false), m_DataBuffer(nullptr),

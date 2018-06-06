@@ -92,12 +92,12 @@ void
   double maskVoxelSpacingY = mask->GetSpacing()[1];
   double maskVoxelSpacingZ = mask->GetSpacing()[2];
 
-  unsigned int maskMinimumX = maskDimensionX;
-  unsigned int maskMaximumX = 0;
-  unsigned int maskMinimumY = maskDimensionY;
-  unsigned int maskMaximumY = 0;
-  unsigned int maskMinimumZ = maskDimensionZ;
-  unsigned int maskMaximumZ = 0;
+  int maskMinimumX = maskDimensionX;
+  int maskMaximumX = 0;
+  int maskMinimumY = maskDimensionY;
+  int maskMaximumY = 0;
+  int maskMinimumZ = maskDimensionZ;
+  int maskMaximumZ = 0;
 
   //
   //  Calculate surface in different directions

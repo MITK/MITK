@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <tinyxml.h>
 
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 
 TiXmlElement *mitk::ProportionalTimeGeometryToXML::ToXML(const ProportionalTimeGeometry *timeGeom)
 {

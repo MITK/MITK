@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCustomMimeType.h>
 #include "mitkDiffusionIOMimeTypes.h"
 #include <vtkTransformPolyDataFilter.h>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 
 #include "dcmtk/config/osconfig.h"    /* make sure OS specific configuration is included first */
 #include "dcmtk/dcmtract/trctractographyresults.h"

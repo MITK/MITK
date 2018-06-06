@@ -40,7 +40,7 @@ public:
     m_Image = mitk::Image::New();
     mitk::PixelType pixelType = mitk::MakeScalarPixelType<unsigned char>();
 
-    std::array<unsigned int, 3> dimensions = { 1700, 1700, 1700 };
+    std::array<unsigned int, 3> dimensions = {{ 1700, 1700, 1700 }};
     m_Image->Initialize(pixelType, 3, dimensions.data());
   }
 

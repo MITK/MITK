@@ -21,7 +21,7 @@
   </property>
   <property name="styleSheet">
    <string>QCommandLinkButton {
-  font-weight: normal;
+  font-weight: lighter;
 }
 
 QCommandLinkButton:disabled {
@@ -30,30 +30,23 @@ QCommandLinkButton:disabled {
 }
 
 QToolBox::tab {
-  border: 1px solid #434346;
   font-weight: bold;
 }
 
 QToolBox::tab:hover {
-  background-color: #434346;
   font-weight: bold;
 }
 
 QToolBox::tab:selected {
-  background-color: #1c97ea;
-  border: 1px solid #1c97ea;
   font-weight: bold;
 }
 
 QGroupBox {
-  border: 1px solid #434346;
-  background-color: #2d2d30;
-  margin-top: 8px;
-  padding-top: 8px;
+  background-color: transparent;
 }
 
 QGroupBox, QGroupBox:disabled {
-  background-color: #2d2d30;
+  background-color: transparent;
 }</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_11">
@@ -233,7 +226,7 @@ QGroupBox, QGroupBox:disabled {
         <x>0</x>
         <y>0</y>
         <width>421</width>
-        <height>267</height>
+        <height>262</height>
        </rect>
       </property>
       <attribute name="label">
@@ -733,7 +726,7 @@ QGroupBox, QGroupBox:disabled {
         <x>0</x>
         <y>0</y>
         <width>421</width>
-        <height>359</height>
+        <height>351</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1154,7 +1147,7 @@ QGroupBox, QGroupBox:disabled {
        <item row="3" column="0">
         <widget class="QLabel" name="m_PriorLabel_4">
          <property name="text">
-          <string>New Directions From Prior:</string>
+          <string>New Directions from Prior:</string>
          </property>
         </widget>
        </item>
@@ -1167,7 +1160,7 @@ QGroupBox, QGroupBox:disabled {
           <string></string>
          </property>
          <property name="checked">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
         </widget>
        </item>

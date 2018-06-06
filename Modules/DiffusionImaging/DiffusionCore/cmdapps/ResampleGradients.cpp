@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkBaseData.h>
 #include "mitkCommandLineParser.h"
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <mitkCoreObjectFactory.h>
 #include <mitkIOUtil.h>
 

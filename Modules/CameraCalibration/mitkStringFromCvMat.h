@@ -16,12 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkStringFromCvMat_h
 #define mitkStringFromCvMat_h
 
-#include <cv.h>
 #include <string>
 #include <mitkObservable.h>
 #include <mitkAlgorithm.h>
 #include <mitkEndoMacros.h>
 #include <sstream>
+
+#include "opencv2/core.hpp"
 
 namespace mitk
 {

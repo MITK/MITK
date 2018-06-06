@@ -206,8 +206,8 @@ void QmitkSimpleRegistrationView::OnRegResultIsAvailable(mitk::MAPRegistrationWr
     else
       resultNode->SetName("Registered (affine)");
   }
-  resultNode->SetOpacity(0.6);
-  resultNode->SetColor(0.0, 0.0, 1.0);
+//  resultNode->SetOpacity(0.6);
+//  resultNode->SetColor(0.0, 0.0, 1.0);
   GetDataStorage()->Add(resultNode);
 
   mitk::RenderingManager::GetInstance()->InitializeViews( resultNode->GetData()->GetTimeGeometry(),

@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileWriter.h>
 #include <mitkPeakImage.h>
 #include <itkFitFibersToImageFilter.h>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <itkTractDensityImageFilter.h>
 
 typedef itksys::SystemTools ist;

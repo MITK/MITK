@@ -74,7 +74,7 @@ void QmitkToFCompositeFilterWidget::CreateConnections()
     connect( (QObject*)(m_Controls->m_MedianFilterCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnMedianFilterCheckBoxChecked(bool)) );
     connect( (QObject*)(m_Controls->m_ShowAdvancedOptionsCheckbox), SIGNAL(toggled(bool)), this, SLOT(OnShowAdvancedOptionsCheckboxChecked(bool)) );
 
-    connect(m_Controls->m_ThresholdFilterRangeSlider, SIGNAL(spanChanged(int, int)  ),this, SLOT( OnSpanChanged(int , int ) ));
+    connect(m_Controls->m_ThresholdFilterRangeSlider, SIGNAL(valuesChanged(int, int)  ),this, SLOT( OnSpanChanged(int , int ) ));
 
     //reset button
     connect(m_Controls->m_ThresholdFilterRangeSliderReset, SIGNAL(pressed()), this, SLOT(OnResetThresholdFilterRangeSlider()));

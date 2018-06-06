@@ -155,9 +155,9 @@ namespace mitk
       inline TOutput operator()(const TInput & A) const
       {
         if (valueLeft)
-          return std::pow<TOutput>(value, A);
+          return static_cast<TOutput>(std::pow(value, A));
         else
-          return std::pow<TOutput>(A, value);
+          return static_cast<TOutput>(std::pow(A, value));
       }
 
       bool valueLeft = false;

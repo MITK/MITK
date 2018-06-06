@@ -17,13 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKEXTAPPWORKBENCHADVISOR_H_
 #define QMITKEXTAPPWORKBENCHADVISOR_H_
 
-#ifdef __MINGW32__
-// We need to inlclude winbase.h here in order to declare
-// atomic intrinsics like InterlockedIncrement correctly.
-// Otherwhise, they would be declared wrong within qatomic_windows.h .
-#include <windows.h>
-#endif
-
 #include <berryQtWorkbenchAdvisor.h>
 
 class QmitkExtAppWorkbenchAdvisor: public berry::QtWorkbenchAdvisor

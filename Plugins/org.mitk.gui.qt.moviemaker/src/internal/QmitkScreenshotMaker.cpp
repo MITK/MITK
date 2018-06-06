@@ -75,9 +75,6 @@ void QmitkScreenshotMaker::CreateConnections()
     if (m_Controls)
     {
         connect((QObject*) m_Controls->m_AllViews, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateMultiplanar3DHighresScreenshot()));
-        connect((QObject*) m_Controls->m_View1, SIGNAL(clicked()), (QObject*) this, SLOT(View1()));
-        connect((QObject*) m_Controls->m_View2, SIGNAL(clicked()), (QObject*) this, SLOT(View2()));
-        connect((QObject*) m_Controls->m_View3, SIGNAL(clicked()), (QObject*) this, SLOT(View3()));
         connect((QObject*) m_Controls->m_Shot, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateMultiplanarScreenshots()));
         connect((QObject*) m_Controls->m_BackgroundColor, SIGNAL(clicked()), (QObject*) this, SLOT(SelectBackgroundColor()));
         connect((QObject*) m_Controls->btnScreenshot, SIGNAL(clicked()), this, SLOT(GenerateScreenshot()));
@@ -301,24 +298,6 @@ vtkCamera* QmitkScreenshotMaker::GetCam()
         }
     }
     return cam;
-}
-
-void QmitkScreenshotMaker::View1()
-{
-    GetCam()->Elevation( 45 );
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkScreenshotMaker::View2()
-{
-    GetCam()->Azimuth(45);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkScreenshotMaker::View3()
-{
-    GetCam()->Roll(45);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkScreenshotMaker::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)

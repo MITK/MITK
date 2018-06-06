@@ -203,8 +203,7 @@ qt5_wrap_cpp(_qwt_designer_sources
 qt5_add_resources(_qwt_designer_sources designer/qwt_designer_plugin.qrc)
 
 add_library(qwt_designer_plugin SHARED ${_qwt_designer_sources})
-target_link_libraries(qwt_designer_plugin qwt)
-qt5_use_modules(qwt_designer_plugin Designer)
+target_link_libraries(qwt_designer_plugin qwt Qt5::Designer)
 
 set_target_properties(qwt_designer_plugin PROPERTIES
                       SOVERSION ${${PROJECT_NAME}_VERSION}

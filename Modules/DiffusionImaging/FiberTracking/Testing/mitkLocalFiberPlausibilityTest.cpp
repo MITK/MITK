@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usAny.h>
 #include <itkImageFileWriter.h>
 #include <mitkIOUtil.h>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <iostream>
 #include <fstream>
 #include <itksys/SystemTools.hxx>

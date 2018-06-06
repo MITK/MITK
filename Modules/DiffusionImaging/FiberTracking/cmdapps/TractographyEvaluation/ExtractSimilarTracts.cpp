@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkFiberBundle.h>
 #include <mitkCommandLineParser.h>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <mitkIOUtil.h>
 #include <itkTractClusteringFilter.h>
 #include <mitkClusteringMetricEuclideanMean.h>

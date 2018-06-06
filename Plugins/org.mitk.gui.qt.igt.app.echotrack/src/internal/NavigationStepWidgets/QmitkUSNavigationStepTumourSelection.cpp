@@ -136,7 +136,6 @@ bool QmitkUSNavigationStepTumourSelection::OnRestartStep()
   ui->tumourSizeSlider->setValue(0);
   ui->tumourSizeSlider->blockSignals(false);
 
-  emit SignalNoLongerReadyForNextStep();
 
   return QmitkUSAbstractNavigationStep::OnRestartStep();
 }

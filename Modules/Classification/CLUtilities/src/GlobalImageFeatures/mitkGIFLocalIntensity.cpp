@@ -122,7 +122,7 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
   //  ++iter;
   //}
 
-  itk::LocalIntensityFilter<ImageType>::Pointer filter = itk::LocalIntensityFilter<ImageType>::New();
+  typename itk::LocalIntensityFilter<ImageType>::Pointer filter = itk::LocalIntensityFilter<ImageType>::New();
   filter->SetInput(itkImage);
   filter->SetMask(itkMask);
   filter->SetRange(range);

@@ -253,7 +253,6 @@ namespace itk
     }
 
     int count = 0;
-    bool inbounds = true;
 
     iter.NeedToUseBoundaryConditionOff();
     iterMask.NeedToUseBoundaryConditionOff();

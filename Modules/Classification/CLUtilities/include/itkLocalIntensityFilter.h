@@ -50,6 +50,8 @@ namespace itk
     typedef typename TInputImage::IndexType  IndexType;
     typedef typename TInputImage::PixelType  PixelType;
 
+    typedef Image<unsigned short, TInputImage::ImageDimension> MaskImageType;
+
     /** Image related typedefs. */
     itkStaticConstMacro(ImageDimension, unsigned int,
       TInputImage::ImageDimension);
@@ -64,59 +66,41 @@ namespace itk
     typedef SimpleDataObjectDecorator< RealType >  RealObjectType;
     typedef SimpleDataObjectDecorator< PixelType > PixelObjectType;
 
-    /** Return the computed Minimum. */
-    PixelType GetMinimum() const
-    {
-      return this->GetMinimumOutput()->Get();
-    }
-    PixelObjectType * GetMinimumOutput();
-
-    const PixelObjectType * GetMinimumOutput() const;
-
-    /** Return the computed Maximum. */
-    PixelType GetMaximum() const
-    {
-      return this->GetMaximumOutput()->Get();
-    }
-    PixelObjectType * GetMaximumOutput();
-
-    const PixelObjectType * GetMaximumOutput() const;
-
     /** Return the computed Mean. */
-    RealType GetMean() const
+    RealType GetLocalPeak() const
     {
-      return this->GetMeanOutput()->Get();
+      return this->GetLocalPeakOutput()->Get();
     }
-    RealObjectType * GetMeanOutput();
+    RealObjectType * GetLocalPeakOutput();
 
-    const RealObjectType * GetMeanOutput() const;
+    const RealObjectType * GetLocalPeakOutput() const;
 
     /** Return the computed Standard Deviation. */
-    RealType GetSigma() const
+    RealType GetGlobalPeak() const
     {
-      return this->GetSigmaOutput()->Get();
+      return this->GetGlobalPeakOutput()->Get();
     }
-    RealObjectType * GetSigmaOutput();
+    RealObjectType * GetGlobalPeakOutput();
 
-    const RealObjectType * GetSigmaOutput() const;
+    const RealObjectType * GetGlobalPeakOutput() const;
 
     /** Return the computed Variance. */
-    RealType GetVariance() const
+    RealType GetLocalMaximum() const
     {
-      return this->GetVarianceOutput()->Get();
+      return this->GetLocalMaximumOutput()->Get();
     }
-    RealObjectType * GetVarianceOutput();
+    RealObjectType * GetLocalMaximumOutput();
 
-    const RealObjectType * GetVarianceOutput() const;
+    const RealObjectType * GetLocalMaximumOutput() const;
 
-    /** Return the compute Sum. */
-    RealType GetSum() const
+    void SetMask(typename MaskImageType::Pointer mask)
     {
-      return this->GetSumOutput()->Get();
+      m_Mask = mask;
     }
-    RealObjectType * GetSumOutput();
 
-    const RealObjectType * GetSumOutput() const;
+    itkSetMacro(Range, double);
+    itkGetMacro(Range, double);
+    itkGetConstMacro(Range, double);
 
     /** Make a DataObject of the correct type to be used as the specified
     * output. */
@@ -165,6 +149,8 @@ namespace itk
     Array< RealType >       m_ThreadLocalMaximum;
     Array< RealType >       m_ThreadLocalPeakValue;
     Array< RealType >       m_ThreadGlobalPeakValue;
+    typename MaskImageType::Pointer m_Mask;
+    double m_Range;
   }; // end of class
 } // end namespace itk
 

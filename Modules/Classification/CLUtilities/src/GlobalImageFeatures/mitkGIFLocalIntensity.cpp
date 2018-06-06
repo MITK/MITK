@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // ITK
 #include <itkImageRegionIteratorWithIndex.h>
 #include <itkNeighborhoodIterator.h>
+#include <itkLocalIntensityFilter.h>
+
 // STL
 #include <limits>
 
@@ -47,79 +49,87 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
   mitk::CastToItkImage(mask, itkMask);
 
   double range = params.range;
-  double minimumSpacing = std::numeric_limits<double>::max();
-  itkImage->GetSpacing();
-  for (unsigned int i = 0; i < VImageDimension; ++i)
-  {
-    minimumSpacing = (minimumSpacing < itkImage->GetSpacing()[i]) ? minimumSpacing : itkImage->GetSpacing()[i];
-  }
-  typename ImageType::SizeType regionSize;
-  int offset = std::ceil(range / minimumSpacing);
-  regionSize.Fill(offset);
+  //double minimumSpacing = 1;
+  //typename ImageType::SizeType regionSize;
+  //int offset = std::ceil(range / minimumSpacing);
+  //regionSize.Fill(1);
+  //for (unsigned int i = 0; i < VImageDimension; ++i)
+  //{
+  //  minimumSpacing = itkImage->GetSpacing()[i];
+  //  offset = std::ceil(range / minimumSpacing);
+  //  regionSize[i] = offset;
+  //}
 
-  itk::NeighborhoodIterator<ImageType> iter(regionSize, itkImage, itkImage->GetLargestPossibleRegion());
-  itk::NeighborhoodIterator<MaskType> iterMask(regionSize, itkMask, itkMask->GetLargestPossibleRegion());
+  //itk::NeighborhoodIterator<ImageType> iter(regionSize, itkImage, itkImage->GetLargestPossibleRegion());
+  //itk::NeighborhoodIterator<MaskType> iterMask(regionSize, itkMask, itkMask->GetLargestPossibleRegion());
 
-  typename ImageType::PointType origin;
-  typename ImageType::PointType localPoint;
-  itk::Index<VImageDimension> index;
+  //typename ImageType::PointType origin;
+  //typename ImageType::PointType localPoint;
+  //itk::Index<VImageDimension> index;
 
-  double tmpPeakValue;
-  double globalPeakValue = 0;
-  double localPeakValue = 0;
-  TPixel localMaximum = 0;
+  //double tmpPeakValue;
+  //double globalPeakValue = 0;
+  //double localPeakValue = 0;
+  //TPixel localMaximum = 0;
 
-  std::vector<bool> vectorIsInRange;
-  index = iter.GetIndex();
-  itkImage->TransformIndexToPhysicalPoint(index, origin);
-  for (itk::SizeValueType i = 0; i < iter.Size(); ++i)
-  {
-    itkImage->TransformIndexToPhysicalPoint(iter.GetIndex(i), localPoint);
-    double dist = origin.EuclideanDistanceTo(localPoint);
-    vectorIsInRange.push_back((dist < params.range));
-  }
+  //std::vector<bool> vectorIsInRange;
+  //index = iter.GetIndex();
+  //itkImage->TransformIndexToPhysicalPoint(index, origin);
+  //for (itk::SizeValueType i = 0; i < iter.Size(); ++i)
+  //{
+  //  itkImage->TransformIndexToPhysicalPoint(iter.GetIndex(i), localPoint);
+  //  double dist = origin.EuclideanDistanceTo(localPoint);
+  //  vectorIsInRange.push_back((dist < params.range));
+  //}
 
-  int count = 0;
-  bool inbounds = true;
+  //int count = 0;
+  //bool inbounds = true;
 
-  iter.NeedToUseBoundaryConditionOff();
-  iterMask.NeedToUseBoundaryConditionOff();
+  //iter.NeedToUseBoundaryConditionOff();
+  //iterMask.NeedToUseBoundaryConditionOff();
 
-  while (!iter.IsAtEnd())
-  {
-    if (iterMask.GetCenterPixel() > 0)
-    {
-      tmpPeakValue = 0;
-      count = 0;
-      for (itk::SizeValueType i = 0; i < iter.Size(); ++i)
-      {
-        if (vectorIsInRange[i] )
-        {
-          if (iter.IndexInBounds(i))
-          {
-            tmpPeakValue += iter.GetPixel(i);
-            ++count;
-          }
-        }
-      }
-      tmpPeakValue /= count;
-      globalPeakValue = std::max<double>(tmpPeakValue, globalPeakValue);
-      auto currentCenterPixelValue = iter.GetCenterPixel();
-      if (localMaximum == currentCenterPixelValue)
-      {
-        localPeakValue = std::max<double>(tmpPeakValue,localPeakValue);
-      }
-      else if (localMaximum < currentCenterPixelValue)
-      {
-        localMaximum = currentCenterPixelValue;
-        localPeakValue = tmpPeakValue;
-      }
-    }
-    ++iterMask;
-    ++iter;
-  }
-  featureList.push_back(std::make_pair(params.prefix + "Local Intensity Peak", localPeakValue));
-  featureList.push_back(std::make_pair(params.prefix + "Global Intensity Peak", globalPeakValue));
+  //while (!iter.IsAtEnd())
+  //{
+  //  if (iterMask.GetCenterPixel() > 0)
+  //  {
+  //    tmpPeakValue = 0;
+  //    count = 0;
+  //    for (itk::SizeValueType i = 0; i < iter.Size(); ++i)
+  //    {
+  //      if (vectorIsInRange[i] )
+  //      {
+  //        if (iter.IndexInBounds(i))
+  //        {
+  //          tmpPeakValue += iter.GetPixel(i);
+  //          ++count;
+  //        }
+  //      }
+  //    }
+  //    tmpPeakValue /= count;
+  //    globalPeakValue = std::max<double>(tmpPeakValue, globalPeakValue);
+  //    auto currentCenterPixelValue = iter.GetCenterPixel();
+  //    if (localMaximum == currentCenterPixelValue)
+  //    {
+  //      localPeakValue = std::max<double>(tmpPeakValue,localPeakValue);
+  //    }
+  //    else if (localMaximum < currentCenterPixelValue)
+  //    {
+  //      localMaximum = currentCenterPixelValue;
+  //      localPeakValue = tmpPeakValue;
+  //    }
+  //  }
+  //  ++iterMask;
+  //  ++iter;
+  //}
+
+  itk::LocalIntensityFilter<ImageType>::Pointer filter = itk::LocalIntensityFilter<ImageType>::New();
+  filter->SetInput(itkImage);
+  filter->SetMask(itkMask);
+  filter->SetRange(range);
+  filter->Update();
+
+  featureList.push_back(std::make_pair(params.prefix + "2. Local Intensity Peak", filter->GetLocalPeak()));
+  featureList.push_back(std::make_pair(params.prefix + "2. Global Intensity Peak", filter->GetGlobalPeak()));
 }
 
 

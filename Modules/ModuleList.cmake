@@ -69,6 +69,8 @@ set(MITK_MODULES
   BoundingShape
   RenderWindowManager
   RenderWindowManagerUI
+  SemanticRelations
+  SemanticRelationsUI
   CEST
   BasicImageProcessing
 )

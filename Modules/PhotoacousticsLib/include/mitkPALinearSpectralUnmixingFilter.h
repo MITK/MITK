@@ -53,6 +53,12 @@ namespace mitk {
     private:
       mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType algorithmIndex;
 
+      int factorial(int n);
+      virtual Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> GenerateA(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
+        Eigen::VectorXf inputVector, int i);
+      Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> GenerateD2(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> A);
+      float simplexVolume(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> Matrix);
+
     };
   }
 }

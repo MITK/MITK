@@ -34,17 +34,18 @@ namespace mitk {
       virtual ~SpectralUnmixingFilterSimplex();
 
     private:
-      int factorial(int n);
 
       virtual Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
         Eigen::VectorXf inputVector) override;
 
-      Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> GenerateA(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
+     /* int factorial(int n);
+
+      virtual Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> GenerateA(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
         Eigen::VectorXf inputVector, int i);
 
 
       Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> GenerateD2(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> A);
-      float simplexVolume(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> Matrix);
+      float simplexVolume(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> Matrix);*/
 
     };
   }

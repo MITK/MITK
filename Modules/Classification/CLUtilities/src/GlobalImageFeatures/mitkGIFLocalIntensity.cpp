@@ -69,20 +69,31 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
   double localPeakValue = 0;
   TPixel localMaximum = 0;
 
+  std::vector<bool> vectorIsInRange;
+  index = iter.GetIndex();
+  itkImage->TransformIndexToPhysicalPoint(index, origin);
+  for (itk::SizeValueType i = 0; i < iter.Size(); ++i)
+  {
+    itkImage->TransformIndexToPhysicalPoint(iter.GetIndex(i), localPoint);
+    double dist = origin.EuclideanDistanceTo(localPoint);
+    vectorIsInRange.push_back((dist < params.range));
+  }
+
   int count = 0;
+  bool inbounds = true;
+
+  iter.NeedToUseBoundaryConditionOff();
+  iterMask.NeedToUseBoundaryConditionOff();
+
   while (!iter.IsAtEnd())
   {
     if (iterMask.GetCenterPixel() > 0)
     {
       tmpPeakValue = 0;
       count = 0;
-      index = iter.GetIndex();
-      itkImage->TransformIndexToPhysicalPoint(index, origin);
       for (itk::SizeValueType i = 0; i < iter.Size(); ++i)
       {
-        itkImage->TransformIndexToPhysicalPoint(iter.GetIndex(i), localPoint);
-        double dist = origin.EuclideanDistanceTo(localPoint);
-        if (dist < 6.2)
+        if (vectorIsInRange[i] )
         {
           if (iter.IndexInBounds(i))
           {
@@ -93,13 +104,14 @@ CalculateIntensityPeak(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Imag
       }
       tmpPeakValue /= count;
       globalPeakValue = std::max<double>(tmpPeakValue, globalPeakValue);
-      if (localMaximum == iter.GetCenterPixel())
+      auto currentCenterPixelValue = iter.GetCenterPixel();
+      if (localMaximum == currentCenterPixelValue)
       {
         localPeakValue = std::max<double>(tmpPeakValue,localPeakValue);
       }
-      else if (localMaximum < iter.GetCenterPixel())
+      else if (localMaximum < currentCenterPixelValue)
       {
-        localMaximum = iter.GetCenterPixel();
+        localMaximum = currentCenterPixelValue;
         localPeakValue = tmpPeakValue;
       }
     }

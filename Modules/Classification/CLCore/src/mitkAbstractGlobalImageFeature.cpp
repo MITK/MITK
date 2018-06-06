@@ -231,8 +231,6 @@ void  mitk::AbstractGlobalImageFeature::InitializeQuantifierFromParameters(const
 
 void  mitk::AbstractGlobalImageFeature::InitializeQuantifier(const Image::Pointer & feature, const Image::Pointer &mask, unsigned int defaultBins)
 {
-  MITK_INFO << GetUseMinimumIntensity() << " " << GetUseMaximumIntensity() << " " << GetUseBins() << " " << GetUseBinsize();
-
   m_Quantifier = IntensityQuantifier::New();
   if (GetUseMinimumIntensity() && GetUseMaximumIntensity() && GetUseBinsize())
     m_Quantifier->InitializeByBinsizeAndMaximum(GetMinimumIntensity(), GetMaximumIntensity(), GetBinsize());

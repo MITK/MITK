@@ -24,6 +24,9 @@ SET(H_FILES
   include/mitkPASpectralUnmixingFilterBase.h
   include/mitkPALinearSpectralUnmixingFilter.h
   include/mitkPASpectralUnmixingSO2.h
+  include/mitkPASpectralUnmixingFilterLagrange.h
+  include/mitkPASpectralUnmixingFilterSimplex.h
+  include/mitkPASpectralUnmixingFilterVigra.h
 )
 
 set(CPP_FILES
@@ -51,6 +54,9 @@ set(CPP_FILES
   SUFilter/mitkPASpectralUnmixingFilterBase.cpp
   SUFilter/mitkPALinearSpectralUnmixingFilter.cpp
   SUFilter/mitkPASpectralUnmixingSO2.cpp
+  SUFilter/mitkPASpectralUnmixingFilterSimplex.cpp
+  SUFilter/mitkPASpectralUnmixingFilterVigra.cpp
+  SUFilter/mitkPASpectralUnmixingFilterLagrange.cpp
 )
 
 set(RESOURCE_FILES

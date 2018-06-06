@@ -213,7 +213,7 @@ namespace itk
     ::ThreadedGenerateData(const RegionType & outputRegionForThread,
       ThreadIdType threadId)
   {
-    typename TInputImage::ConstPointer itkImage = GetInput();
+    typename TInputImage::ConstPointer itkImage = this->GetInput();
     typename MaskImageType::Pointer itkMask = m_Mask;
 
     double range = m_Range;

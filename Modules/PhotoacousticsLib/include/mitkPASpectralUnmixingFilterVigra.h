@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkPASpectralUnmixingFilterBase.h>
 #include <MitkPhotoacousticsLibExports.h>
+#include <mitkPALinearSpectralUnmixingFilter.h>
 
 namespace mitk {
   namespace pa {
@@ -27,18 +28,31 @@ namespace mitk {
     public:
 
       mitkClassMacro(SpectralUnmixingFilterVigra, SpectralUnmixingFilterBase)
-        //itkFactorylessNewMacro(Self)
+        itkFactorylessNewMacro(Self)
+
+      enum VigraAlgortihmType
+      {
+        LARS,
+        GOLDFARB,
+        WEIGHTED,
+        vigratest
+      };
+
+      void mitk::pa::SpectralUnmixingFilterVigra::SetAlgorithm(VigraAlgortihmType SetAlgorithmIndex);
 
     protected:
       SpectralUnmixingFilterVigra();
       virtual ~SpectralUnmixingFilterVigra();
- 
+
+      virtual Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
+        Eigen::VectorXf inputVector) override;
       virtual Eigen::VectorXf NNLSLARS(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
         Eigen::VectorXf inputVector);
       virtual Eigen::VectorXf NNLSGoldfarb(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
         Eigen::VectorXf inputVector);
 
     private:
+      mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType algorithmIndex;
 
     };
   }

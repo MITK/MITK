@@ -69,6 +69,32 @@ mitk::pa::SpectralUnmixingFilterVigra::~SpectralUnmixingFilterVigra()
 
 }
 
+void mitk::pa::SpectralUnmixingFilterVigra::SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType SetAlgorithmIndex)
+{
+  algorithmIndex = SetAlgorithmIndex;
+}
+
+Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::SpectralUnmixingAlgorithm(
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
+{
+  Eigen::Vector2f resultVector;
+
+  if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LARS == algorithmIndex)
+    resultVector = NNLSLARS(EndmemberMatrix, inputVector);
+
+  if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::GOLDFARB == algorithmIndex)
+    resultVector = NNLSGoldfarb(EndmemberMatrix, inputVector);
+
+  if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED == algorithmIndex)
+    mitkThrow() << "nothing implemented";
+
+  if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::vigratest == algorithmIndex)
+    mitkThrow() << "nothing implemented";
+
+  return resultVector;
+}
+
+
 Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::NNLSLARS(
   Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
 {

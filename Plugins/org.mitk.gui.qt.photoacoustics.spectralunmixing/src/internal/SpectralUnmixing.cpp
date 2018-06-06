@@ -31,6 +31,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPASpectralUnmixingFilterBase.h"
 #include "mitkPALinearSpectralUnmixingFilter.h"
 #include "mitkPASpectralUnmixingSO2.h"
+#include "mitkPASpectralUnmixingFilterVigra.h"
+#include "mitkPASpectralUnmixingFilterLagrange.h"
+#include "mitkPASpectralUnmixingFilterSimplex.h"
 
 const std::string SpectralUnmixing::VIEW_ID = "org.mitk.views.spectralunmixing";
 
@@ -126,37 +129,97 @@ void SpectralUnmixing::DoImageProcessing()
       message << ".";
       MITK_INFO << message.str();
 
-      auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
-
-      m_SpectralUnmixingFilter->SetInput(image);
-
       // Set Algortihm to filter
       auto qs = m_Controls.QComboBoxAlgorithm->currentText();
       std::string Algorithm = qs.toUtf8().constData();
 
+      auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+      m_SpectralUnmixingFilter->SetInput(image);
+
       if (Algorithm == "householderQr")
+      {
+        //auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+        //m_SpectralUnmixingFilter->SetInput(image);
         m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr);
+      }
 
       else if (Algorithm == "ldlt")
+      {
+        //auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+        //m_SpectralUnmixingFilter->SetInput(image);
         m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::ldlt);
+      }
 
       else if (Algorithm == "llt")
+      {
+        //auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+        //m_SpectralUnmixingFilter->SetInput(image);
         m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::llt);
+      }
 
       else if (Algorithm == "colPivHouseholderQr")
+      {
+        //auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+        //m_SpectralUnmixingFilter->SetInput(image);
         m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::colPivHouseholderQr);
+      }
 
       else if (Algorithm == "jacobiSvd")
+      {
+        //auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+        //m_SpectralUnmixingFilter->SetInput(image);
         m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::jacobiSvd);
+      }
 
       else if (Algorithm == "fullPivLu")
+      {
+        //auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+        //m_SpectralUnmixingFilter->SetInput(image);
         m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivLu);
+      }
 
       else if (Algorithm == "fullPivHouseholderQr")
+      {
+        //auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+        //m_SpectralUnmixingFilter->SetInput(image);
         m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivHouseholderQr);
+      }
 
       else if (Algorithm == "test")
+      {
+        //auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+        //m_SpectralUnmixingFilter->SetInput(image);
         m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::test);
+      }
+
+      else if (Algorithm == "Lars")
+      {
+        auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
+        //m_SpectralUnmixingFilter->SetInput(image);
+        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LARS);
+      }
+
+      else if (Algorithm == "Goldfarb")
+      {
+        auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
+        //m_SpectralUnmixingFilter->SetInput(image);
+        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::GOLDFARB);
+      }
+
+      else if (Algorithm == "weighted")
+      {
+        auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
+        //m_SpectralUnmixingFilter->SetInput(image);
+        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED);
+      }
+
+      else if (Algorithm == "vigratest")
+      {
+        auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
+        //m_SpectralUnmixingFilter->SetInput(image);
+        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::vigratest);
+      }
+
       else
         mitkThrow() << "ALGORITHM ERROR!";
 

@@ -47,15 +47,8 @@ namespace mitk {
       LinearSpectralUnmixingFilter();
       virtual ~LinearSpectralUnmixingFilter();
  
-
-      // Test algorithm for SU --> later a new class should be set up
       virtual Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
         Eigen::VectorXf inputVector) override;
-      virtual Eigen::VectorXf NNLSLARS(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
-        Eigen::VectorXf inputVector);
-      virtual Eigen::VectorXf NNLSGoldfarb(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
-        Eigen::VectorXf inputVector);
-
 
     private:
       mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType algorithmIndex;

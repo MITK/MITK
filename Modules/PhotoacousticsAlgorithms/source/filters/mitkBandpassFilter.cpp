@@ -271,4 +271,14 @@ void mitk::BandpassFilter::GenerateData()
   inverseFFTFilter->SetDirection(1);
 
   GrabItkImageMemory(inverseFFTFilter->GetOutput(), output);
+
+  double spacing_x = input->GetGeometry()->GetSpacing()[0];
+  double spacing_y = input->GetGeometry()->GetSpacing()[1];
+  double dim[2] = { spacing_x, spacing_y };
+  auto resampledOutput = m_FilterService->ApplyResampling(output, dim);
+
+  output->Initialize(mitk::MakeScalarPixelType<float>(), 3, input->GetDimensions());
+  output->SetSpacing(resampledOutput->GetGeometry()->GetSpacing());
+  ImageReadAccessor copy(resampledOutput);
+  output->SetImportVolume(copy.GetData());
 }

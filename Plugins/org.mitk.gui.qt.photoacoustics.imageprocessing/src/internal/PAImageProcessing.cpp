@@ -530,7 +530,7 @@ void PAImageProcessing::StartBandpassThread()
   if (!node)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information(NULL, "Template", "Please load and select an image before starting image cropping.");
+    QMessageBox::information(NULL, "Template", "Please load and select an image before applying a bandpass filter.");
     return;
   }
 
@@ -973,8 +973,7 @@ void CropThread::run()
 {
   mitk::Image::Pointer resultImage;
 
-  resultImage = m_FilterBank->ApplyCropping(m_InputImage, m_CutAbove, m_CutBelow, 0, 0, m_CutSliceFirst, m_InputImage->GetDimension(2) - m_CutSliceLast);
-
+  resultImage = m_FilterBank->ApplyCropping(m_InputImage, m_CutAbove, m_CutBelow, 0, 0, m_CutSliceFirst, (m_InputImage->GetDimension(2) - 1)  - m_CutSliceLast);
   emit result(resultImage, "_cropped");
 }
 

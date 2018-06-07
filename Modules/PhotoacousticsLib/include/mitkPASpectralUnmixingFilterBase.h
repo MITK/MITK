@@ -34,7 +34,7 @@ namespace mitk {
     {
     public:
 
-      mitkClassMacro(SpectralUnmixingFilterBase, mitk::ImageToImageFilter)
+      mitkClassMacro(SpectralUnmixingFilterBase, mitk::ImageToImageFilter);
 
       // Contains all (so far) possible chromophores
       enum ChromophoreType

@@ -50,6 +50,10 @@ namespace mitk {
         Eigen::VectorXf inputVector);
       virtual Eigen::VectorXf NNLSGoldfarb(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
         Eigen::VectorXf inputVector);
+      virtual Eigen::VectorXf weightedLeastSquares(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
+        Eigen::VectorXf inputVector);
+      virtual Eigen::VectorXf LS(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
+        Eigen::VectorXf inputVector);
 
     private:
       mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType algorithmIndex;

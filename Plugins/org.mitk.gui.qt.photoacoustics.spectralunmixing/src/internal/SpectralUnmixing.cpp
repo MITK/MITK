@@ -133,106 +133,103 @@ void SpectralUnmixing::DoImageProcessing()
       auto qs = m_Controls.QComboBoxAlgorithm->currentText();
       std::string Algorithm = qs.toUtf8().constData();
 
-      //auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
-
       mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter;
-
-      //m_SpectralUnmixingFilter->SetInput(image);
 
       if (Algorithm == "householderQr")
       {
         m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
-        dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(m_SpectralUnmixingFilter.GetPointer())->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr);
+        dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(m_SpectralUnmixingFilter.GetPointer())
+          ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr);
       }
 
-      //all other enums, if solution adapt to them!:
-      /*
       else if (Algorithm == "ldlt")
       {
         m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
-        //m_SpectralUnmixingFilter->SetInput(image);
-        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::ldlt);
+        dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(m_SpectralUnmixingFilter.GetPointer())
+          ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::ldlt);
       }
 
       else if (Algorithm == "llt")
       {
         m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
-        //m_SpectralUnmixingFilter->SetInput(image);
-        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::llt);
+        dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(m_SpectralUnmixingFilter.GetPointer())
+          ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::llt);
       }
 
       else if (Algorithm == "colPivHouseholderQr")
       {
-        //auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
-        //m_SpectralUnmixingFilter->SetInput(image);
-        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::colPivHouseholderQr);
+        m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+        dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(m_SpectralUnmixingFilter.GetPointer())
+          ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::colPivHouseholderQr);
       }
 
       else if (Algorithm == "jacobiSvd")
       {
-        //auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
-        //m_SpectralUnmixingFilter->SetInput(image);
-        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::jacobiSvd);
+        m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+        dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(m_SpectralUnmixingFilter.GetPointer())
+          ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::jacobiSvd);
       }
 
       else if (Algorithm == "fullPivLu")
       {
-        //auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
-        //m_SpectralUnmixingFilter->SetInput(image);
-        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivLu);
+        m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+        dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(m_SpectralUnmixingFilter.GetPointer())
+          ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivLu);
       }
 
       else if (Algorithm == "fullPivHouseholderQr")
       {
-        //auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
-        m_SpectralUnmixingFilter->SetInput(image);
-        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivHouseholderQr);
+        m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+        dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(m_SpectralUnmixingFilter.GetPointer())
+          ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivHouseholderQr);
       }
 
       else if (Algorithm == "test")
       {
-        auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
-        m_SpectralUnmixingFilter->SetInput(image);
-        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::test);
+        m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+        dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(m_SpectralUnmixingFilter.GetPointer())
+          ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::test);
       }
       
       else if (Algorithm == "Lars")
       {
-        auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
-        m_SpectralUnmixingFilter->SetInput(image);
-        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LARS);
+        m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
+        dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra*>(m_SpectralUnmixingFilter.GetPointer())
+          ->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LARS);
       }
 
       else if (Algorithm == "Goldfarb")
       {
-        auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
-        m_SpectralUnmixingFilter->SetInput(image);
-        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::GOLDFARB);
+        m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
+        dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra*>(m_SpectralUnmixingFilter.GetPointer())
+          ->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::GOLDFARB);
       }
 
       else if (Algorithm == "weighted")
       {
-        auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
-        m_SpectralUnmixingFilter->SetInput(image);
-        m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED);
+        m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
+        dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra*>(m_SpectralUnmixingFilter.GetPointer())
+          ->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED);
       }
-      */ // all other enums
-      
-      else if (Algorithm == "test")
+
+      else if (Algorithm == "vigratest")
       {
         m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
-        dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra*>(m_SpectralUnmixingFilter.GetPointer())->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LARS);
+        dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra*>(m_SpectralUnmixingFilter.GetPointer())
+          ->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::vigratest);
+      }
+
+      else if (Algorithm == "SimplexMax")
+      {
+        m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterSimplex::New();
+        dynamic_cast<mitk::pa::SpectralUnmixingFilterSimplex*>(m_SpectralUnmixingFilter.GetPointer());
       }
 
       else
-        mitkThrow() << "ALGORITHM ERROR!";
+        mitkThrow() << "404 ALGORITHM NOT FOUND!";
 
       m_SpectralUnmixingFilter->SetInput(image);
 
-      //itk::SmartPointer<mitk::pa::SpectralUnmixingFilterBase> m_SpectralUnmixingFilterBase;
-      //m_SpectralUnmixingFilterBase->mitk::pa::SpectralUnmixingFilterBase::New();
-
-      
       // Wavelength implementation into filter
       for (unsigned int imageIndex = 0; imageIndex < m_Wavelengths.size(); imageIndex++)
       {

@@ -24,49 +24,6 @@
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="1" column="0">
-        <widget class="QLabel" name="labelWarning">
-         <property name="styleSheet">
-          <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
-         </property>
-         <property name="text">
-          <string>Please select an image!</string>
-         </property>
-        </widget>
-       </item>
-       <item row="20" column="0">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="4" column="0">
-        <widget class="QPushButton" name="buttonPerformImageProcessing">
-         <property name="toolTip">
-          <string>Do image processing</string>
-         </property>
-         <property name="text">
-          <string>Perform spectral unmixing</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="0">
-        <widget class="QCheckBox" name="checkBoxOx">
-         <property name="text">
-          <string>Oxyhemoglobin</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
        <item row="12" column="0">
         <widget class="QCheckBox" name="checkBoxDeOx">
          <property name="enabled">
@@ -83,6 +40,49 @@
          </property>
          <property name="tristate">
           <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0">
+        <widget class="QCheckBox" name="checkBoxOx">
+         <property name="text">
+          <string>Oxyhemoglobin</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QPushButton" name="buttonPerformImageProcessing">
+         <property name="toolTip">
+          <string>Do image processing</string>
+         </property>
+         <property name="text">
+          <string>Perform spectral unmixing</string>
+         </property>
+        </widget>
+       </item>
+       <item row="20" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="labelWarning">
+         <property name="styleSheet">
+          <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
+         </property>
+         <property name="text">
+          <string>Please select an image!</string>
          </property>
         </widget>
        </item>
@@ -120,6 +120,30 @@
        </item>
        <item row="15" column="0">
         <widget class="QComboBox" name="QComboBoxAlgorithm">
+         <property name="font">
+          <font>
+           <family>MS Shell Dlg 2</family>
+          </font>
+         </property>
+         <property name="editable">
+          <bool>true</bool>
+         </property>
+         <property name="maxVisibleItems">
+          <number>21</number>
+         </property>
+         <property name="maxCount">
+          <number>2147483647</number>
+         </property>
+         <item>
+          <property name="text">
+           <string>==CHOSE ALGORITHM==</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>==EIGEN==</string>
+          </property>
+         </item>
          <item>
           <property name="text">
            <string>householderQr</string>
@@ -132,7 +156,11 @@
          </item>
          <item>
           <property name="text">
-           <string>llt</string>
+           <string comment="43" extracomment="ewrwer">llt</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>.</normaloff>.</iconset>
           </property>
          </item>
          <item>
@@ -158,6 +186,51 @@
          <item>
           <property name="text">
            <string>test</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>==Vigra==</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>LARS</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Goldfarb</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>weighted</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>vigratest</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>==Others==</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>SimplexMax</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Lagrange</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>otherstest</string>
           </property>
          </item>
         </widget>

@@ -77,19 +77,7 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
 
   if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::test == algorithmIndex)
   {
-    int numberOfChromophores = EndmemberMatrix.cols();
-
-    float VolumeMax = simplexVolume(EndmemberMatrix);
-    for (int i = 0; i < numberOfChromophores; ++i)
-    {
-      Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> A = GenerateA(EndmemberMatrix, inputVector, i);
-      float Volume = simplexVolume(A);
-      //MITK_INFO << "VolumeMax: " << VolumeMax;
-      //MITK_INFO << "Volume: " << Volume;
-      //MITK_INFO << "Result vector[i]: " << Volume / VolumeMax;
-      resultVector[i] = Volume / VolumeMax;
-    }
-    //mitkThrow() << "404";
+    mitkThrow() << "404";
   }
 
   /*double relativeError = (EndmemberMatrix*resultVector - inputVector).norm() / inputVector.norm(); // norm() is L2 norm
@@ -109,85 +97,3 @@ This method avoids dividing by zero, so that the non-existence of a solution doe
 If there exists more than one solution, this method will arbitrarily choose one.
 If you need a complete analysis of the space of solutions, take the one solution obtained by this method and add to it
 elements of the kernel, as determined by kernel().*/
-
-
-Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::LinearSpectralUnmixingFilter::GenerateA
-(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector, int i)
-{
-  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> A = EndmemberMatrix;
-  int numberOfChromophores = EndmemberMatrix.cols();
-
-  for (int j = 0; j < numberOfChromophores; ++j)
-  {
-    A(i, j) = inputVector(j);
-  }
-
-  return A;
-}
-
-Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::LinearSpectralUnmixingFilter::GenerateD2
-(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> A)
-{
-  int numberOfChromophores = A.cols();
-
-  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> D2(numberOfChromophores, numberOfChromophores);
-
-  for (int i = 0; i < numberOfChromophores; ++i)
-  {
-    for (int j = 0; j < numberOfChromophores; ++j)
-    {
-      Eigen::VectorXf x = A.col(i) - A.col(j);
-      //MITK_INFO << "a_col_i: " <<A.col(i);
-      //MITK_INFO << "a_col_j: " <<A.col(j);
-      //MITK_INFO << "x: " <<x;
-      Eigen::VectorXf y = x;
-      float foo = x.dot(y);
-      //MITK_INFO << "x*y: " << foo;
-
-      D2(i, j) = foo;
-    }
-  }
-
-  return D2;
-}
-
-float  mitk::pa::LinearSpectralUnmixingFilter::simplexVolume(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> Matrix)
-{
-  float Volume;
-  int numberOfChromophores = Matrix.cols();
-  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> C(numberOfChromophores + 1, numberOfChromophores + 1);
-  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> D2 = GenerateD2(Matrix);
-
-  for (int i = 0; i < numberOfChromophores; ++i)
-  {
-    for (int j = 0; j < numberOfChromophores; ++j)
-    {
-      C(i, j) = D2(i, j);
-    }
-    C(i, numberOfChromophores) = 1;
-    for (int k = 0; k < numberOfChromophores; ++k)
-    {
-      C(numberOfChromophores, k) = 1;
-    }
-    C(numberOfChromophores, numberOfChromophores) = 0;
-  }
-
-  float detC = -C.determinant();// determinate von C
-  float denominator = (factorial(numberOfChromophores - 1)) ^ 2 * 2 ^ (numberOfChromophores - 1)*(-1) ^ numberOfChromophores;
-  Volume = std::sqrt(detC / denominator);
-  //MITK_INFO << "detC: " << detC;
-
-  //MITK_INFO << "denominator: " << denominator;
-
-  //MITK_INFO << "Volume: " << Volume;
-
-  return Volume;
-}
-
-int mitk::pa::LinearSpectralUnmixingFilter::factorial(int n)
-{
-  if (n == 1)
-    return 1;
-  else
-    return n * factorial(n - 1);
-}

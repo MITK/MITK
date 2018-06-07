@@ -189,6 +189,10 @@ namespace mitk {
     */
     const unsigned int* m_InputDim;
 
+    /** \brief The Depth up to which the filter should reconstruct the image [m]
+    */
+    float m_ReconstructionDepth;
+
     /** \brief Decides whether GPU computing should be used
     */
     bool m_UseGPU;
@@ -214,10 +218,6 @@ namespace mitk {
     /** \brief Sets the used beamforming algorithm.
     */
     BeamformingAlgorithm m_Algorithm;
-
-    /** \brief The Depth up to which the filter should reconstruct the image [m]
-    */
-    float m_ReconstructionDepth;
   };
 }
 #endif //MITK_BEAMFORMING_SETTINGS

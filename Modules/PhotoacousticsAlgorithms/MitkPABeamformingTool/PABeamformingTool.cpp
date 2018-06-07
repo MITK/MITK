@@ -190,6 +190,7 @@ mitk::BeamformingSettings::Pointer ParseSettings(InputParameters &input)
     input.inputImage->GetDimension(1),
     input.inputImage->GetDimension(0),
     input.inputImage->GetDimensions(),
+    0.04,
     false,
     16,
     mitk::BeamformingSettings::DelayCalc::Spherical,

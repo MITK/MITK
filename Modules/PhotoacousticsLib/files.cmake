@@ -3,9 +3,11 @@ SET(H_FILES
   include/mitkPAVector.h
   include/mitkPATissueGeneratorParameters.h
   include/mitkPAInSilicoTissueVolume.h
+  include/mitkPAPhantomTissueGenerator.h
   include/mitkPATissueGenerator.h
   include/mitkPAVesselTree.h
   include/mitkPAVessel.h
+  include/mitkPAVesselDrawer.h
   include/mitkPAVesselMeanderStrategy.h
   include/mitkPANoiseGenerator.h
   include/mitkPAVolume.h
@@ -33,6 +35,7 @@ set(CPP_FILES
   Domain/Volume/mitkPAComposedVolume.cpp
   Domain/Volume/mitkPAFluenceYOffsetPair.cpp
   Generator/mitkPATissueGenerator.cpp
+  Generator/mitkPAPhantomTissueGenerator.cpp
   Generator/mitkPANoiseGenerator.cpp
   Generator/mitkPASlicedVolumeGenerator.cpp
   Generator/mitkPASimulationBatchGenerator.cpp
@@ -45,6 +48,7 @@ set(CPP_FILES
   Utils/ProbeDesign/mitkPAProbe.cpp
   Utils/ProbeDesign/mitkPALightSource.cpp
   Utils/Thread/mitkPAMonteCarloThreadHandler.cpp
+  Utils/mitkPAVesselDrawer.cpp
 )
 
 set(RESOURCE_FILES

@@ -35,18 +35,20 @@ namespace mitk
     {
     public:
 
-      mitkClassMacroItkParent(Volume, itk::LightObject)
+      mitkClassMacroItkParent(Volume, itk::LightObject);
 
-        /**
-        *@brief returns smartpointer reference to a new instance of this objects.
-        *  The given data array will be freed upon calling this constructor.
-        *@param data
-        *@param xDim
-        *@param yDim
-        *@param zDim
-        *@return smartpointer reference to a new instance of this object
-        */
-        static Volume::Pointer New(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim);
+      /**
+      *@brief returns smartpointer reference to a new instance of this objects.
+      *  The given data array will be freed upon calling this constructor.
+      *@param data
+      *@param xDim
+      *@param yDim
+      *@param zDim
+      *@return smartpointer reference to a new instance of this object
+      */
+      static Volume::Pointer New(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim, double spacing);
+
+      static Volume::Pointer New(mitk::Image::Pointer image);
 
       /**
        * @brief GetData. Returns data at wanted position. For performance reasons, this method will not check,
@@ -109,7 +111,11 @@ namespace mitk
       *@brief convenience method to enable consistent access to the dat array
       *@return a 1d index from 3d pixel coordinates
       */
-      int GetIndex(unsigned int x, unsigned int y, unsigned int z);
+      long long GetIndex(unsigned int x, unsigned int y, unsigned int z);
+
+      double GetSpacing();
+
+      void SetSpacing(double spacing);
 
     protected:
       /**
@@ -123,8 +129,9 @@ namespace mitk
        * @param yDim y dimension of the data
        * @param zDim z dimension of the data
        */
-      Volume(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim);
-      ~Volume() override;
+      Volume(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim, double spacing);
+      Volume(mitk::Image::Pointer image);
+      virtual ~Volume();
 
       const int NUMBER_OF_SPATIAL_DIMENSIONS = 3;
 

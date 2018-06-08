@@ -10,7 +10,10 @@ MITK_CREATE_MODULE(
   SUBPROJECTS
   DEPENDS ${dependencies_list}
   #AUTOLOAD_WITH MitkCore
-  INCLUDE_DIRS PUBLIC Algorithms/ITKUltrasound Algorithms Algorithms/OCL
+  INCLUDE_DIRS PUBLIC include
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
   PACKAGE_DEPENDS ITK|ITKFFT+ITKImageCompose+ITKImageIntensity
 )
+
+add_subdirectory(test)
+add_subdirectory(MitkPABeamformingTool)

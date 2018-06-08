@@ -41,7 +41,9 @@ public:
     returnParameters->SetXDim(rand() % 50 + 1);
     returnParameters->SetYDim(rand() % 50 + 1);
     returnParameters->SetZDim(rand() % 50 + 1);
-    returnParameters->SetBackgroundAbsorption(rand() % 100 / 10.0);
+    double absorb = rand() % 100 / 10.0;
+    returnParameters->SetMinBackgroundAbsorption(absorb);
+    returnParameters->SetMaxBackgroundAbsorption(absorb);
     returnParameters->SetBackgroundScattering(rand() % 100 / 10.0);
     returnParameters->SetBackgroundAnisotropy(rand() % 100 / 10.0);
     int min = rand() % 10;

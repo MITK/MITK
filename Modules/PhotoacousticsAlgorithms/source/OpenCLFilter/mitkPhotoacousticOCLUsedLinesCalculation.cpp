@@ -19,8 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usServiceReference.h"
 #include "mitkImageReadAccessor.h"
 
-mitk::OCLUsedLinesCalculation::OCLUsedLinesCalculation()
-  : m_PixelCalculation(NULL)
+mitk::OCLUsedLinesCalculation::OCLUsedLinesCalculation(mitk::BeamformingSettings::Pointer settings)
+  : m_PixelCalculation(NULL),
+  m_Conf(settings)
 {
   this->AddSourceFile("UsedLinesCalculation.cl");
   this->m_FilterID = "UsedLinesCalculation";
@@ -62,7 +63,7 @@ void mitk::OCLUsedLinesCalculation::Execute()
 {
   cl_int clErr = 0;
 
-  unsigned int gridDim[3] = { m_Conf.ReconstructionLines, m_Conf.SamplesPerLine, 1 };
+  unsigned int gridDim[3] = { m_Conf->GetReconstructionLines(), m_Conf->GetSamplesPerLine(), 1 };
   size_t outputSize = gridDim[0] * gridDim[1] * 3;
 
   try
@@ -76,13 +77,25 @@ void mitk::OCLUsedLinesCalculation::Execute()
   }
 
   // This calculation is the same for all kernels, so for performance reasons simply perform it here instead of within the kernels
-  m_part = (tan(m_Conf.Angle / 360 * 2 * itk::Math::pi) * ((m_Conf.SpeedOfSound * m_Conf.TimeSpacing)) / (m_Conf.Pitch * m_Conf.TransducerElements)) * m_Conf.inputDim[0];
-  
+  m_part = (tan(m_Conf->GetAngle() / 360 * 2 * itk::Math::pi) *
+    ((m_Conf->GetSpeedOfSound() * m_Conf->GetTimeSpacing())) /
+    (m_Conf->GetPitchInMeters() * m_Conf->GetTransducerElements())) * m_Conf->GetInputDim()[0];
+
+  unsigned int reconLines = this->m_Conf->GetReconstructionLines();
+  unsigned int samplesPerLine = this->m_Conf->GetSamplesPerLine();
+  char isPAImage = this->m_Conf->GetIsPhotoacousticImage();
+
+  float percentOfImageReconstructed = (float)(m_Conf->GetReconstructionDepth()) /
+    (float)(m_Conf->GetInputDim()[1] * m_Conf->GetSpeedOfSound() * m_Conf->GetTimeSpacing() / (float)(2 - (int)m_Conf->GetIsPhotoacousticImage()));
+  percentOfImageReconstructed = percentOfImageReconstructed <= 1 ? percentOfImageReconstructed : 1;
+
   clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_float), &(this->m_part));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_uint), &(this->m_Conf.inputDim[0]));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_uint), &(this->m_Conf.inputDim[1]));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_uint), &(this->m_Conf.ReconstructionLines));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_uint), &(this->m_Conf.SamplesPerLine));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[0]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[1]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_uint), &(reconLines));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_uint), &(samplesPerLine));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_char), &(isPAImage));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_float), &(percentOfImageReconstructed));
 
   CHECK_OCL_ERR(clErr);
 

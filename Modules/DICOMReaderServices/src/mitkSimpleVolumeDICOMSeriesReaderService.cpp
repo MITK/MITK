@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   SimpleVolumeDICOMSeriesReaderService::SimpleVolumeDICOMSeriesReaderService()
-  : BaseDICOMReaderService("MITK Simple Volume Importer")
+  : BaseDICOMReaderService("MITK Simple 3D Volume Importer")
 {
   this->RegisterService();
 }

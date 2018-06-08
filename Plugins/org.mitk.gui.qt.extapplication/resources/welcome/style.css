@@ -7,9 +7,10 @@ body{
 
 h1{
   margin: 0px;
-  padding: 0px;
+  padding: 5px;
   font-family: "Open Sans", sans-serif;
   color: rgb(255, 255, 255);
+  background: rgba(45, 92, 126, 1);
 }
 
 img{border:none;}
@@ -19,7 +20,6 @@ img{border:none;}
   min-height:1060px;
   height:100%;
   padding-top: 1%;
-  background: linear-gradient(to bottom, rgba(45, 92, 136, 1) 0%, rgba(45, 92, 126, 1) 5.49%, rgb(255, 255, 255) 5.5%, rgba(45, 92, 126, 0.15) 100%);
 }
 
 #welcome{
@@ -41,7 +41,6 @@ img{border:none;}
 #manualButtonField {
   min-width:500px;
   max-width:700px;
-  height: 200px;
   margin: auto;
 }
 
@@ -52,7 +51,6 @@ img{border:none;}
 #generatedButtonField{
   min-width:500px;
   max-width:700px;
-  height: 220px;
   margin: auto;
 }
 
@@ -68,6 +66,7 @@ img{border:none;}
   margin-right:32px;
   margin-top:5px;
   z-index:2;
+  text-align: center;
 }
 
 .genericButton{
@@ -94,7 +93,7 @@ img{border:none;}
     border: 2px solid rgba(45, 92, 136, 1);
 }
 
-.welcomTutorialButton {
+.welcomeTutorialButton {
     background-image: url(qrc:/org.mitk.gui.qt.welcomescreen/pics/WelcomeMITK.png);
 }
 
@@ -105,7 +104,8 @@ img{border:none;}
     text-decoration: none;
     cursor: pointer;
     color: #2d5a88;
-    padding-left: 10px;
+    padding-left: 0px;
+    margin: auto;
 }
 
 .textLink:hover{

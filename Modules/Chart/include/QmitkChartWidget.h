@@ -173,6 +173,8 @@ public:
 
   void SetShowLegend(bool show);
 
+  void SetStackedData(bool stacked);
+
   /*!
   * \brief Displays the chart in the widget
   * \param showSubChart if a subchart is displayed inside the widget or not (see http://c3js.org/samples/options_subchart.html).

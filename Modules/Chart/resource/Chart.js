@@ -10,6 +10,7 @@ GenerateChart()
 var chartData;
 var xValues=[];
 var yValues=[];
+var dataLabels=[];
 var xs = {};
 var dataColors = {};
 var chartTypes = {};
@@ -22,37 +23,41 @@ window.onload = function()
   new QWebChannel(qt.webChannelTransport, function(channel) {
     chartData = channel.objects.chartData;
 
-	var count = 0;
+  var count = 0;
 	for(var propertyName in channel.objects) {
-		if (propertyName != 'chartData'){
+	  if (propertyName != 'chartData')
+	  {
 			var xDataTemp = channel.objects[propertyName].m_XData
 			var yDataTemp = channel.objects[propertyName].m_YData
-			var dataLabelsTemp;
+			var dataLabel = channel.objects[propertyName].m_Label
+			dataLabels.push(dataLabel)
+
 			//add label to x array
 			xDataTemp.unshift('x'+count.toString())
-			dataLabelsTemp = channel.objects[propertyName].m_Label
-
-			xs[dataLabelsTemp] = 'x'+count.toString()
+			xs[dataLabel] = 'x' + count.toString()
 			
 			xDataTemp.push(null); //append null value, to make sure the last tick on x-axis is displayed correctly
-			yDataTemp.unshift(dataLabelsTemp)
+			yDataTemp.unshift(dataLabel)
 			yDataTemp.push(null); //append null value, to make sure the last tick on y-axis is displayed correctly
 			xValues[count] = xDataTemp
 			yValues[count] = yDataTemp
-			dataColors[dataLabelsTemp] = channel.objects[propertyName].m_Color
-			chartTypes[dataLabelsTemp] = channel.objects[propertyName].m_ChartType
+			dataColors[dataLabel] = channel.objects[propertyName].m_Color
+			chartTypes[dataLabel] = channel.objects[propertyName].m_ChartType
 
-			if (channel.objects[propertyName].m_LineStyleName=="solid"){
-				lineStyle[dataLabelsTemp]= ''
+			if (channel.objects[propertyName].m_LineStyleName == "solid")
+			{
+			  lineStyle[dataLabel] = ''
 			}
-			else {
-				lineStyle[dataLabelsTemp]= [{'style':'dashed'}]
+			else
+			{
+			  lineStyle[dataLabel] = [{ 'style': 'dashed' }]
 			}
 
 			count++;
 		}
 	}
-    setupChart(chartData)
+
+  setupChart(chartData)
 
   });
 }
@@ -71,9 +76,10 @@ window.onresize = function () {
   });
 }
 
-function ReloadChart(showSubchart)
+function ReloadChart(showSubchart, stackDataString)
 { 
     chartData.m_ShowSubchart = showSubchart;
+    chartData.m_StackedData = stackDataString;
     
     setupChart(chartData);
 }
@@ -97,7 +103,7 @@ function setupChart(chartData)
 
   chart.load({
 	  xs: xs,
-		columns: columns
+	  columns: columns
   });
 }
 
@@ -122,26 +128,43 @@ link = document.getElementsByTagName("link")[0];
 //Here, the chart magic takes place. C3js is called
 function GenerateChart(chartData)
 {
-	if (chartData === undefined)
+	if (chartData == undefined)
 	{
 		chartData = {}
 	}
-	//adaption for bar ratio indepenend of amount of data points
+
+	if (dataLabels == undefined)
+	{
+    dataLabels = []
+	}
+
+	var groupLabels = [];
+	if (chartData.m_StackedData == true)
+	{
+    groupLabels = dataLabels
+  }
+
+	//adaption for bar ratio independent of amount of data points
 	//otherwise, bars could be covered.
 	var barRatio;
-	try {
+  try
+  {
 		barRatio = 0.8*Math.exp(-0.015*xValues[0].length);
 	}
-	catch (err){
+  catch (err)
+  {
 		barRatio=0.42
 	}
 	var formatCharacter;
-	if (chartData.m_UsePercentageInPieChart==true){
+	if (chartData.m_UsePercentageInPieChart == true)
+	{
 		formatCharacter = '%'
 	}
-	else{
+	else
+	{
 		formatCharacter = '.1f'
 	}
+
   chart = c3.generate({
 	title:{
 		text: chartData.m_diagramTitle,
@@ -157,6 +180,7 @@ function GenerateChart(chartData)
         },
 		colors: dataColors,
 		regions: lineStyle,
+		groups: [groupLabels]
     },
     legend: {
         position: chartData.m_LegendPosition,

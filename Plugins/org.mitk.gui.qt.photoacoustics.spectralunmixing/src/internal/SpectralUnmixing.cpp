@@ -129,6 +129,33 @@ void SpectralUnmixing::DoImageProcessing()
       message << ".";
       MITK_INFO << message.str();
 
+      /*/+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+      std::vector<double> listOfWavelengths;
+      double tmpWavelength = 0;
+      int currentRow = 0;
+      bool success = false;
+
+      do
+      {
+        if (currentRow != 0) listOfWavelengths.push_back(tmpWavelength);
+        if (m_Controls.inputtable->item(0, currentRow))
+        {
+          QString test = m_Controls.inputtable->item(0, currentRow)->text();
+          tmpWavelength = test.toDouble(&success);
+          currentRow++;
+        }
+        else
+          tmpWavelength = 0;
+
+        if (success == 0)
+          tmpWavelength = 0;
+      } while (tmpWavelength<1200 && tmpWavelength>300);
+
+      MITK_INFO << "listOfWavelengths" << listOfWavelengths;
+
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+
       // Set Algortihm to filter
       auto qs = m_Controls.QComboBoxAlgorithm->currentText();
       std::string Algorithm = qs.toUtf8().constData();
@@ -251,7 +278,7 @@ void SpectralUnmixing::DoImageProcessing()
         MITK_INFO << "- Oxyhemoglobin";
         // Set chromophore Oxyhemoglobon:
         m_SpectralUnmixingFilter->AddChromophore(
-        mitk::pa::SpectralUnmixingFilterBase::ChromophoreType::OXYGENATED_HEMOGLOBIN);
+        mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
       }
       if (DeOxbool)
       {
@@ -259,7 +286,7 @@ void SpectralUnmixing::DoImageProcessing()
          MITK_INFO << "- Deoxygenated hemoglobin";
         // Set chromophore Deoxygenated hemoglobin:
          m_SpectralUnmixingFilter->AddChromophore(
-        mitk::pa::SpectralUnmixingFilterBase::ChromophoreType::DEOXYGENATED_HEMOGLOBIN);
+        mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
       }
       if (numberofChromophores == 0)
       {

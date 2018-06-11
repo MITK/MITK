@@ -49,7 +49,7 @@ void mitk::pa::SpectralUnmixingFilterBase::AddWavelength(int wavelength)
   m_Wavelength.push_back(wavelength);
 }
 
-void mitk::pa::SpectralUnmixingFilterBase::AddChromophore(ChromophoreType chromophore)
+void mitk::pa::SpectralUnmixingFilterBase::AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType chromophore)
 {
   m_Chromophore.push_back(chromophore);
 }
@@ -112,6 +112,8 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
         inputVector[z] = pixel;
       }
       Eigen::VectorXf resultVector = SpectralUnmixingAlgorithm(EndmemberMatrix, inputVector);
+      //Eigen::VectorXf resultVector = SpectralUnmixingAlgorithm(m_Chromophore, inputVector);
+
 
       // write output
       for (int outputIdx = 0; outputIdx < GetNumberOfIndexedOutputs(); ++outputIdx)
@@ -194,15 +196,15 @@ Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingF
       //writes @ Matrix element (i,j) the absorbtion wavelength of the propertycalculator.cpp
       //'i+1' because MapType is defined different then ChromophoreType
       EndmemberMatrix(i,j)= m_PropertyCalculator->GetAbsorptionForWavelength(
-      static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[j]+1), m_Wavelength[i]);
+      static_cast<mitk::pa::PropertyCalculator::ChromophoreType>(m_Chromophore[j]+1), m_Wavelength[i]);
             
-      /* Tests to see what gets written in the Matrix:
-      auto testtype = m_PropertyCalculator->GetAbsorptionForWavelength(
-      static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[j]+1), m_Wavelength[i]);
-      MITK_INFO << "TEST_TYPE Matrix: " << typeid(EndmemberMatrix(i,j)).name();
-      MITK_INFO << "map type: " << static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[j]+1);
+      //* Tests to see what gets written in the Matrix:
+      //auto testtype = m_PropertyCalculator->GetAbsorptionForWavelength(
+      //static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[j]+1), m_Wavelength[i]);
+      //MITK_INFO << "TEST_TYPE Matrix: " << typeid(EndmemberMatrix(i,j)).name();
+      MITK_INFO << "ChromophoreType: " << static_cast<mitk::pa::PropertyCalculator::ChromophoreType>(m_Chromophore[j]+1);
       MITK_INFO << "wavelength: " << m_Wavelength[i];
-      MITK_INFO << "Matrixelement: (" << i << ", " << j << ") Absorbtion: " << EndmemberMatrix(i, j);/**/
+      //MITK_INFO << "Matrixelement: (" << i << ", " << j << ") Absorbtion: " << EndmemberMatrix(i, j);/**/
       
       if (EndmemberMatrix(i, j) == 0)
       {

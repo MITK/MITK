@@ -48,17 +48,18 @@ namespace mitk {
         STANDARD_TISSUE = 5
       };
 
-      enum MapType
+      enum ChromophoreType
       {
         OXYGENATED = 1,
         DEOXYGENATED = 2,
         WATER = 3,
         FATTY = 4,
-        MELANIN = 5
+        MELANIN = 5,
+        ONEENDMEMBER = 6
       };
 
       double GetAbsorptionForWavelength(
-        MapType mapType, int wavelength);
+        ChromophoreType ChromophoreType, int wavelength);
 
       Properties CalculatePropertyForSpecificWavelength(
         TissueType tissueType, int wavelength, double oxygenSaturatonInFraction = 0);

@@ -37,14 +37,10 @@ namespace mitk {
       mitkClassMacro(SpectralUnmixingFilterBase, mitk::ImageToImageFilter);
 
       // Contains all (so far) possible chromophores
-      enum ChromophoreType
-      {
-        OXYGENATED_HEMOGLOBIN,
-        DEOXYGENATED_HEMOGLOBIN
-      };
+
 
       // Void to creat m_vector of all chosen chromophores with push back method
-      void AddChromophore(ChromophoreType);
+      void AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType);
       
       // Void to creat m_vector of all wavelengths with push back method
       void AddWavelength(int wavelength);
@@ -55,7 +51,7 @@ namespace mitk {
       SpectralUnmixingFilterBase();
       virtual ~SpectralUnmixingFilterBase();
 
-      std::vector<ChromophoreType> m_Chromophore;
+      std::vector<mitk::pa::PropertyCalculator::ChromophoreType> m_Chromophore;
       std::vector<int> m_Wavelength; 
 
       virtual Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,

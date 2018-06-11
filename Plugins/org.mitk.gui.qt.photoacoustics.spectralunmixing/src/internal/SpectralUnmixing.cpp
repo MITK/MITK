@@ -170,7 +170,7 @@ void SpectralUnmixing::DoImageProcessing()
           ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::test);
       }
       
-      else if (Algorithm == "Lars")
+      else if (Algorithm == "LARS")
       {
         m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
         dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra*>(m_SpectralUnmixingFilter.GetPointer())
@@ -226,6 +226,8 @@ void SpectralUnmixing::DoImageProcessing()
       unsigned int numberofChromophores = 0;
       DeOxbool = m_Controls.checkBoxDeOx->isChecked();
       Oxbool = m_Controls.checkBoxOx->isChecked();
+      bool Melaninbool = m_Controls.checkBoxMelanin->isChecked();
+      bool Onebool = m_Controls.checkBoxAdd->isChecked();
       if (DeOxbool || Oxbool)
       {
         MITK_INFO << "CHOSEN CHROMOPHORES:";
@@ -246,13 +248,26 @@ void SpectralUnmixing::DoImageProcessing()
          m_SpectralUnmixingFilter->AddChromophore(
         mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
       }
+      if (Melaninbool)
+      {
+        numberofChromophores += 1;
+        MITK_INFO << "- Melanin";
+        m_SpectralUnmixingFilter->AddChromophore(
+          mitk::pa::PropertyCalculator::ChromophoreType::MELANIN);
+      }
+      if (Onebool)
+      {
+        numberofChromophores += 1;
+        MITK_INFO << "- Additional Chromophore";
+        m_SpectralUnmixingFilter->AddChromophore(
+          mitk::pa::PropertyCalculator::ChromophoreType::ONEENDMEMBER);
+      }
       if (numberofChromophores == 0)
       {
         mitkThrow() << "PRESS 'IGNORE' AND CHOOSE A CHROMOPHORE!";
       }
-              
+
       MITK_INFO << "Updating Filter...";
-      
       m_SpectralUnmixingFilter->Update();
 
       // Write Output images to Data Storage
@@ -272,6 +287,24 @@ void SpectralUnmixing::DoImageProcessing()
         dataNodeHb->SetData(Hb);
         dataNodeHb->SetName("Hb " + Algorithm);
         this->GetDataStorage()->Add(dataNodeHb);
+      }
+
+      if (Melaninbool)
+      {
+        mitk::Image::Pointer Melanin = m_SpectralUnmixingFilter->GetOutput(2);
+        mitk::DataNode::Pointer dataNodeMelanin = mitk::DataNode::New();
+        dataNodeMelanin->SetData(Melanin);
+        dataNodeMelanin->SetName("Melanin " + Algorithm);
+        this->GetDataStorage()->Add(dataNodeMelanin);
+      }
+
+      if (Onebool)
+      {
+        mitk::Image::Pointer One = m_SpectralUnmixingFilter->GetOutput(3);
+        mitk::DataNode::Pointer dataNodeOne = mitk::DataNode::New();
+        dataNodeOne->SetData(One);
+        dataNodeOne->SetName("One " + Algorithm);
+        this->GetDataStorage()->Add(dataNodeOne);
       }
 
       //Calculate oxygen saturation

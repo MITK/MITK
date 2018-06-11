@@ -24,12 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
 
-// For testing reasons
-#include <random>
-
 mitk::pa::SpectralUnmixingFilterBase::SpectralUnmixingFilterBase()
 {
-  this->SetNumberOfIndexedOutputs(2);
+  this->SetNumberOfIndexedOutputs(4);// find solution
 
   for (unsigned int i = 0; i<GetNumberOfIndexedOutputs(); i++)
   {
@@ -202,7 +199,10 @@ Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingF
     else if (m_Chromophore[j] == mitk::pa::PropertyCalculator::ChromophoreType::MELANIN)
     {
       for (unsigned int i = 0; i < numberOfWavelengths; ++i)
+      {
         EndmemberMatrixEigen(i, j) = propertyElement(m_Chromophore[j], m_Wavelength[i]);
+        MITK_INFO << "MELANIN." << EndmemberMatrixEigen(i, j);
+      }
     }
     else if (m_Chromophore[j] == mitk::pa::PropertyCalculator::ChromophoreType::ONEENDMEMBER)
     {

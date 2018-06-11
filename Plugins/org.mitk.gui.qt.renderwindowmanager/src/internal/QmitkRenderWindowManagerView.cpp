@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseRenderer.h>
 #include <mitkDataNode.h>
 
+// org.mitk.gui.qt.common
+#include <QmitkNodeSelectionDialog.h>
+
 const std::string QmitkRenderWindowManagerView::VIEW_ID = "org.mitk.views.renderwindowmanager";
 
 void QmitkRenderWindowManagerView::SetFocus()
@@ -34,6 +37,7 @@ void QmitkRenderWindowManagerView::SetFocus()
 
 void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
 {
+  m_Parent = parent;
   // create GUI widgets
   m_Controls.setupUi(parent);
   // add custom render window manager UI widget to the 'renderWindowManagerTab'
@@ -48,10 +52,26 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
     m_Controls.comboBoxRenderWindowSelection->addItem(renderer->GetName());
   }
 
-  OnRenderWindowSelectionChanged(m_Controls.comboBoxRenderWindowSelection->itemText(0));
+  SetUpConnections();
 
+  OnRenderWindowSelectionChanged(m_Controls.comboBoxRenderWindowSelection->itemText(0));
+}
+
+void QmitkRenderWindowManagerView::SetUpConnections()
+{
   connect(m_Controls.comboBoxRenderWindowSelection, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(OnRenderWindowSelectionChanged(const QString&)));
   connect(m_RenderWindowManipulatorWidget, SIGNAL(AddLayerButtonClicked()), this, SLOT(OnAddLayerButtonClicked()));
+
+  m_ModelViewSelectionConnector = std::make_unique<QmitkModelViewSelectionConnector>();
+  try
+  {
+    m_ModelViewSelectionConnector->SetView(m_RenderWindowManipulatorWidget->GetLayerStackTableView());
+  }
+  catch (mitk::Exception& e)
+  {
+    mitkReThrow(e) << "Cannot connect the model-view pair signals and slots.";
+  }
+  m_SelectionServiceConnector = std::make_unique<QmitkSelectionServiceConnector>();
 }
 
 void QmitkRenderWindowManagerView::SetControlledRenderer()
@@ -77,21 +97,43 @@ void QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged(const QString 
 
 void QmitkRenderWindowManagerView::OnAddLayerButtonClicked()
 {
-  QList<mitk::DataNode::Pointer> nodes = GetDataManagerSelection();
-  for (mitk::DataNode* dataNode : nodes)
-  {
-    if (nullptr != dataNode)
-    {
-      m_RenderWindowManipulatorWidget->AddLayer(dataNode);
+  QmitkNodeSelectionDialog* dialog = new QmitkNodeSelectionDialog(m_Parent, "Select nodes to add to the render window", "");
+  dialog->SetDataStorage(GetDataStorage());
+  dialog->SetSelectOnlyVisibleNodes(true);
+  dialog->SetSelectionMode(QAbstractItemView::MultiSelection);
 
-      // get child nodes of the current node
-      mitk::DataStorage::SetOfObjects::ConstPointer derivedNodes = GetDataStorage()->GetDerivations(dataNode, nullptr, false);
-      for (mitk::DataStorage::SetOfObjects::ConstIterator it = derivedNodes->Begin(); it != derivedNodes->End(); ++it)
+  if (QDialog::Accepted == dialog->exec())
+  {
+    auto nodes = dialog->GetSelectedNodes();
+    for (mitk::DataNode* dataNode : nodes)
+    {
+      if (nullptr != dataNode)
       {
-        m_RenderWindowManipulatorWidget->AddLayer(it->Value());
+        m_RenderWindowManipulatorWidget->AddLayer(dataNode);
+
+        // get child nodes of the current node
+        mitk::DataStorage::SetOfObjects::ConstPointer derivedNodes = GetDataStorage()->GetDerivations(dataNode, nullptr, false);
+        for (mitk::DataStorage::SetOfObjects::ConstIterator it = derivedNodes->Begin(); it != derivedNodes->End(); ++it)
+        {
+          m_RenderWindowManipulatorWidget->AddLayer(it->Value());
+        }
       }
     }
   }
+
+  delete dialog;
+}
+
+void QmitkRenderWindowManagerView::SetSelectionProvider()
+{
+  m_SelectionProvider = QmitkDataNodeSelectionProvider::Pointer(new QmitkDataNodeSelectionProvider);
+  m_SelectionProvider->SetItemSelectionModel(m_RenderWindowManipulatorWidget->GetLayerStackTableView()->selectionModel());
+  GetSite()->SetSelectionProvider(berry::ISelectionProvider::Pointer(m_SelectionProvider));
+
+  // This function is called during the creation of the GUI. It is overridden in this class to create a custom selection provider.
+  // This view is used as a selection provider (not used as a selection listener)
+  m_SelectionServiceConnector->SetAsSelectionProvider(m_SelectionProvider.GetPointer());
+  connect(m_ModelViewSelectionConnector.get(), SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), m_SelectionServiceConnector.get(), SLOT(ChangeServiceSelection(QList<mitk::DataNode::Pointer>)));
 }
 
 void QmitkRenderWindowManagerView::NodeAdded(const mitk::DataNode* node)

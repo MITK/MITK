@@ -17,7 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // render window manager UI module
 #include "QmitkRenderWindowManipulatorWidget.h"
 
+// qt widgets module
 #include "QmitkCustomVariants.h"
+#include "QmitkEnums.h"
 
 // mitk core
 #include <mitkBaseRenderer.h>
@@ -28,13 +30,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkRenderWindowManipulatorWidget::QmitkRenderWindowManipulatorWidget(mitk::DataStorage::Pointer dataStorage, QWidget* parent /*=nullptr*/)
   : QWidget(parent)
   , m_DataStorage(dataStorage)
+  , m_StorageModel(nullptr)
 {
   Init();
 }
 
 void QmitkRenderWindowManipulatorWidget::Init()
 {
-  // create GUI from the Qt Designer's .ui file
   m_Controls.setupUi(this);
 
   // initialize the render window layer controller and the render window view direction controller
@@ -44,15 +46,15 @@ void QmitkRenderWindowManipulatorWidget::Init()
   m_RenderWindowLayerController->SetDataStorage(m_DataStorage);
   m_RenderWindowViewDirectionController->SetDataStorage(m_DataStorage);
 
-  // create a new model
-  m_RenderWindowDataModel = std::make_unique<QmitkRenderWindowDataModel>(this);
-  m_RenderWindowDataModel->SetDataStorage(m_DataStorage);
+  m_Controls.layerStackTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  m_Controls.layerStackTableView->horizontalHeader()->setStretchLastSection(true);
+  m_Controls.layerStackTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+  m_Controls.layerStackTableView->setSelectionMode(QAbstractItemView::SingleSelection);
 
-  m_Controls.renderWindowTableView->setModel(m_RenderWindowDataModel.get());
-  m_Controls.renderWindowTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-  m_Controls.renderWindowTableView->horizontalHeader()->setStretchLastSection(true);
-  m_Controls.renderWindowTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_Controls.renderWindowTableView->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_StorageModel = new QmitkDataStorageLayerStackModel(this);
+  m_StorageModel->SetDataStorage(m_DataStorage);
+
+  m_Controls.layerStackTableView->setModel(m_StorageModel);
 
   SetUpConnections();
 }
@@ -84,6 +86,11 @@ void QmitkRenderWindowManipulatorWidget::SetUpConnections()
   connect(m_Controls.radioButtonSagittal, SIGNAL(clicked()), changeViewDirectionSignalMapper, SLOT(map()));
 }
 
+QTableView* QmitkRenderWindowManipulatorWidget::GetLayerStackTableView()
+{
+  return m_Controls.layerStackTableView;
+}
+
 void QmitkRenderWindowManipulatorWidget::SetControlledRenderer(RenderWindowLayerUtilities::RendererVector controlledRenderer)
 {
   m_RenderWindowLayerController->SetControlledRenderer(controlledRenderer);
@@ -92,8 +99,13 @@ void QmitkRenderWindowManipulatorWidget::SetControlledRenderer(RenderWindowLayer
 
 void QmitkRenderWindowManipulatorWidget::SetActiveRenderWindow(const QString &renderWindowId)
 {
+  if (nullptr == m_StorageModel)
+  {
+    return;
+  }
+
   std::string currentRendererName = renderWindowId.toStdString();
-  m_RenderWindowDataModel->SetCurrentRenderer(currentRendererName);
+  m_StorageModel->SetCurrentRenderer(currentRendererName);
 
   mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(currentRendererName);
   if (nullptr == selectedRenderer)
@@ -120,7 +132,12 @@ void QmitkRenderWindowManipulatorWidget::SetActiveRenderWindow(const QString &re
 
 void QmitkRenderWindowManipulatorWidget::AddLayer(mitk::DataNode* dataNode)
 {
-  m_RenderWindowLayerController->InsertLayerNode(dataNode, -1, m_RenderWindowDataModel->GetCurrentRenderer());
+  if (nullptr == m_StorageModel)
+  {
+    return;
+  }
+
+  m_RenderWindowLayerController->InsertLayerNode(dataNode, -1, m_StorageModel->GetCurrentRenderer());
 }
 
 void QmitkRenderWindowManipulatorWidget::AddLayerToAllRenderer(mitk::DataNode* dataNode)
@@ -135,45 +152,60 @@ void QmitkRenderWindowManipulatorWidget::HideDataNodeInAllRenderer(const mitk::D
 
 void QmitkRenderWindowManipulatorWidget::RemoveLayer()
 {
-  QModelIndex selectedIndex = m_Controls.renderWindowTableView->currentIndex();
+  if (nullptr == m_StorageModel)
+  {
+    return;
+  }
+
+  QModelIndex selectedIndex = m_Controls.layerStackTableView->currentIndex();
   if (selectedIndex.isValid())
   {
 
-    QVariant qvariantDataNode = m_RenderWindowDataModel->data(selectedIndex, Qt::UserRole);
+    QVariant qvariantDataNode = m_StorageModel->data(selectedIndex, QmitkDataNodeRawPointerRole);
     if (qvariantDataNode.canConvert<mitk::DataNode*>())
     {
       mitk::DataNode* dataNode = qvariantDataNode.value<mitk::DataNode*>();
-      m_RenderWindowLayerController->RemoveLayerNode(dataNode, m_RenderWindowDataModel->GetCurrentRenderer());
-      m_Controls.renderWindowTableView->clearSelection();
+      m_RenderWindowLayerController->RemoveLayerNode(dataNode, m_StorageModel->GetCurrentRenderer());
+      m_Controls.layerStackTableView->clearSelection();
     }
   }
 }
 
 void QmitkRenderWindowManipulatorWidget::SetAsBaseLayer()
 {
-  QModelIndex selectedIndex = m_Controls.renderWindowTableView->currentIndex();
+  if (nullptr == m_StorageModel)
+  {
+    return;
+  }
+
+  QModelIndex selectedIndex = m_Controls.layerStackTableView->currentIndex();
   if (selectedIndex.isValid())
   {
-    QVariant qvariantDataNode = m_RenderWindowDataModel->data(selectedIndex, Qt::UserRole);
+    QVariant qvariantDataNode = m_StorageModel->data(selectedIndex, QmitkDataNodeRawPointerRole);
     if (qvariantDataNode.canConvert<mitk::DataNode*>())
     {
       mitk::DataNode* dataNode = qvariantDataNode.value<mitk::DataNode*>();
-      m_RenderWindowLayerController->SetBaseDataNode(dataNode, m_RenderWindowDataModel->GetCurrentRenderer());
-      m_Controls.renderWindowTableView->clearSelection();
+      m_RenderWindowLayerController->SetBaseDataNode(dataNode, m_StorageModel->GetCurrentRenderer());
+      m_Controls.layerStackTableView->clearSelection();
     }
   }
 }
 
 void QmitkRenderWindowManipulatorWidget::MoveLayer(const QString &direction)
 {
-  QModelIndex selectedIndex = m_Controls.renderWindowTableView->currentIndex();
+  if (nullptr == m_StorageModel)
+  {
+    return;
+  }
+
+  QModelIndex selectedIndex = m_Controls.layerStackTableView->currentIndex();
   if (selectedIndex.isValid())
   {
-    QVariant qvariantDataNode = m_RenderWindowDataModel->data(selectedIndex, Qt::UserRole);
+    QVariant qvariantDataNode = m_StorageModel->data(selectedIndex, QmitkDataNodeRawPointerRole);
     if (qvariantDataNode.canConvert<mitk::DataNode*>())
     {
       mitk::DataNode* dataNode = qvariantDataNode.value<mitk::DataNode*>();
-      const mitk::BaseRenderer* selectedRenderer = m_RenderWindowDataModel->GetCurrentRenderer();
+      const mitk::BaseRenderer* selectedRenderer = m_StorageModel->GetCurrentRenderer();
 
       bool success = false;
       if ("up" == direction)
@@ -182,7 +214,11 @@ void QmitkRenderWindowManipulatorWidget::MoveLayer(const QString &direction)
         if (success)
         {
           // node has been successfully moved up
-          m_Controls.renderWindowTableView->selectRow(selectedIndex.row() - 1);
+          QTableView* tableView = dynamic_cast<QTableView*>(m_Controls.layerStackTableView);
+          if (nullptr != tableView)
+          {
+            tableView->selectRow(selectedIndex.row() - 1);
+          }
         }
       }
       else
@@ -191,7 +227,11 @@ void QmitkRenderWindowManipulatorWidget::MoveLayer(const QString &direction)
         if (success)
         {
           // node has been successfully moved down
-          m_Controls.renderWindowTableView->selectRow(selectedIndex.row() + 1);
+          QTableView* tableView = dynamic_cast<QTableView*>(m_Controls.layerStackTableView);
+          if (nullptr != tableView)
+          {
+            tableView->selectRow(selectedIndex.row() + 1);
+          }
         }
       }
     }
@@ -200,17 +240,33 @@ void QmitkRenderWindowManipulatorWidget::MoveLayer(const QString &direction)
 
 void QmitkRenderWindowManipulatorWidget::ResetRenderer()
 {
-  m_RenderWindowLayerController->ResetRenderer(true, m_RenderWindowDataModel->GetCurrentRenderer());
-  m_Controls.renderWindowTableView->clearSelection();
+  if (nullptr == m_StorageModel)
+  {
+    return;
+  }
+
+  m_RenderWindowLayerController->ResetRenderer(true, m_StorageModel->GetCurrentRenderer());
+  m_Controls.layerStackTableView->clearSelection();
 }
 
 void QmitkRenderWindowManipulatorWidget::ClearRenderer()
 {
-  m_RenderWindowLayerController->ResetRenderer(false, m_RenderWindowDataModel->GetCurrentRenderer());
-  m_Controls.renderWindowTableView->clearSelection();
+  if (nullptr == m_StorageModel)
+  {
+    return;
+  }
+
+  m_RenderWindowLayerController->ResetRenderer(false, m_StorageModel->GetCurrentRenderer());
+  m_Controls.layerStackTableView->clearSelection();
 }
 
 void QmitkRenderWindowManipulatorWidget::ChangeViewDirection(const QString &viewDirection)
 {
-  m_RenderWindowViewDirectionController->SetViewDirectionOfRenderer(viewDirection.toStdString(), m_RenderWindowDataModel->GetCurrentRenderer());
+  if (nullptr == m_StorageModel)
+  {
+    return;
+
+  }
+
+  m_RenderWindowViewDirectionController->SetViewDirectionOfRenderer(viewDirection.toStdString(), m_StorageModel->GetCurrentRenderer());
 }

@@ -37,12 +37,13 @@ Eigen::VectorXf mitk::pa::SpectralUnmixingFilterSimplex::SpectralUnmixingAlgorit
   int numberOfChromophores = EndmemberMatrix.cols();
 
   Eigen::VectorXf resultVector(numberOfChromophores);
-
+  Eigen::VectorXf normalizedInputVector(EndmemberMatrix.rows());
+  normalizedInputVector = Normalization(EndmemberMatrix, inputVector);
 
   float VolumeMax = simplexVolume(EndmemberMatrix);
   for (int i = 0; i < numberOfChromophores; ++i)
   {
-    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> A = GenerateA(EndmemberMatrix, inputVector, i);
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> A = GenerateA(EndmemberMatrix, normalizedInputVector, i);
     float Volume = simplexVolume(A);
     //MITK_INFO << "VolumeMax: " << VolumeMax;
     //MITK_INFO << "Volume: " << Volume;
@@ -135,4 +136,34 @@ int mitk::pa::SpectralUnmixingFilterSimplex::factorial(int n)
     return 1;
   else
     return n * factorial(n - 1);
+}
+
+Eigen::VectorXf mitk::pa::SpectralUnmixingFilterSimplex::Normalization(
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
+{
+  int numberOfWavelengths = inputVector.rows();
+  Eigen::VectorXf result(numberOfWavelengths);
+  float NormalizationFactor = 1;
+  float foo;
+  float norm = 0;
+
+  for (int i = 0; i < numberOfWavelengths; ++i)
+  {
+    foo = EndmemberMatrix(i, 0) - EndmemberMatrix(i, 1);
+    if (std::abs(foo) > norm)
+      norm = std::abs(foo);
+  }
+
+ofstream myfile;
+myfile.open("SimplexNormalisation.txt");
+
+  for (int i = 0; i < numberOfWavelengths; ++i)
+  {
+    NormalizationFactor = inputVector[i] * 2 / norm;  
+    myfile << "Normalizationfactor " << NormalizationFactor << "\n";
+    result[i]=(inputVector[i]/NormalizationFactor);
+  }
+myfile.close();
+
+  return result;
 }

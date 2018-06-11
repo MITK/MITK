@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPASpectralUnmixingFilterBase.h>
 #include <MitkPhotoacousticsLibExports.h>
 
-#include "mitkPAPropertyCalculator.h"
-
 namespace mitk {
   namespace pa {
     class MITKPHOTOACOUSTICSLIB_EXPORT LinearSpectralUnmixingFilter : public SpectralUnmixingFilterBase
@@ -54,13 +52,6 @@ namespace mitk {
 
     private:
       mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType algorithmIndex;
-
-      virtual Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> CalculateEndmemberMatrix(
-        std::vector<mitk::pa::PropertyCalculator::ChromophoreType> m_Chromophore, std::vector<int> m_Wavelength);
-      PropertyCalculator::Pointer m_PropertyCalculatorEigen;
-
-      virtual float propertyElement(mitk::pa::PropertyCalculator::ChromophoreType, int wavelength);
-
     };
   }
 }

@@ -36,7 +36,7 @@ mitk::pa::SpectralUnmixingFilterBase::SpectralUnmixingFilterBase()
     this->SetNthOutput(i, mitk::Image::New());
   }
 
-  m_PropertyCalculator = mitk::pa::PropertyCalculator::New();
+  m_PropertyCalculatorEigen = mitk::pa::PropertyCalculator::New();
 }
 
 mitk::pa::SpectralUnmixingFilterBase::~SpectralUnmixingFilterBase()
@@ -72,7 +72,7 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
 
   InitializeOutputs();
   
-  auto EndmemberMatrix = AddEndmemberMatrix();
+  auto EndmemberMatrix = CalculateEndmemberMatrix(m_Chromophore, m_Wavelength); //Eigen Endmember Matrix
   
   // Copy input image into array
   mitk::ImageReadAccessor readAccess(input);
@@ -180,39 +180,46 @@ void mitk::pa::SpectralUnmixingFilterBase::InitializeOutputs()
 
 //Matrix with #chromophores colums and #wavelengths rows
 //so Matrix Element (i,j) contains the Absorbtion of chromophore j @ wavelength i
-Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingFilterBase::AddEndmemberMatrix()
+Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingFilterBase::CalculateEndmemberMatrix(
+  std::vector<mitk::pa::PropertyCalculator::ChromophoreType> m_Chromophore, std::vector<int> m_Wavelength)
 {
   unsigned int numberOfChromophores = m_Chromophore.size(); //columns
   unsigned int numberOfWavelengths = m_Wavelength.size(); //rows
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrixEigen(numberOfWavelengths, numberOfChromophores);
 
-  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix(numberOfWavelengths, numberOfChromophores);
-
-  //loop over i rows (Wavelengths)
-  for(unsigned int i = 0; i < numberOfWavelengths; ++i)
+  for (unsigned int j = 0; j < numberOfChromophores; ++j)
   {
-    //loop over j columns (Chromophores)
-    for (unsigned int j = 0; j < numberOfChromophores; ++j)
+    if (m_Chromophore[j] == mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED)
     {
-      //writes @ Matrix element (i,j) the absorbtion wavelength of the propertycalculator.cpp
-      //'i+1' because MapType is defined different then ChromophoreType
-      EndmemberMatrix(i,j)= m_PropertyCalculator->GetAbsorptionForWavelength(
-      static_cast<mitk::pa::PropertyCalculator::ChromophoreType>(m_Chromophore[j]+1), m_Wavelength[i]);
-            
-      //* Tests to see what gets written in the Matrix:
-      //auto testtype = m_PropertyCalculator->GetAbsorptionForWavelength(
-      //static_cast<mitk::pa::PropertyCalculator::MapType>(m_Chromophore[j]+1), m_Wavelength[i]);
-      //MITK_INFO << "TEST_TYPE Matrix: " << typeid(EndmemberMatrix(i,j)).name();
-      MITK_INFO << "ChromophoreType: " << static_cast<mitk::pa::PropertyCalculator::ChromophoreType>(m_Chromophore[j]+1);
-      MITK_INFO << "wavelength: " << m_Wavelength[i];
-      //MITK_INFO << "Matrixelement: (" << i << ", " << j << ") Absorbtion: " << EndmemberMatrix(i, j);/**/
-      
-      if (EndmemberMatrix(i, j) == 0)
-      {
-        m_Wavelength.clear();
-        mitkThrow() << "WAVELENGTH "<< m_Wavelength[i] << "nm NOT SUPPORTED!";
-      }
+      for (unsigned int i = 0; i < numberOfWavelengths; ++i)
+        EndmemberMatrixEigen(i, j) = propertyElement(m_Chromophore[j], m_Wavelength[i]);
     }
+    else if (m_Chromophore[j] == mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED)
+    {
+      for (unsigned int i = 0; i < numberOfWavelengths; ++i)
+        EndmemberMatrixEigen(i, j) = propertyElement(m_Chromophore[j], m_Wavelength[i]);
+    }
+    else if (m_Chromophore[j] == mitk::pa::PropertyCalculator::ChromophoreType::MELANIN)
+    {
+      for (unsigned int i = 0; i < numberOfWavelengths; ++i)
+        EndmemberMatrixEigen(i, j) = propertyElement(m_Chromophore[j], m_Wavelength[i]);
+    }
+    else if (m_Chromophore[j] == mitk::pa::PropertyCalculator::ChromophoreType::ONEENDMEMBER)
+    {
+      for (unsigned int i = 0; i < numberOfWavelengths; ++i)
+        EndmemberMatrixEigen(i, j) = 1;
+    }
+    else
+      mitkThrow() << "404 CHROMOPHORE NOT FOUND!";
   }
-  MITK_INFO << "GENERATING ENMEMBERMATRIX [DONE]!";
-  return EndmemberMatrix;
+  //MITK_INFO << "GENERATING ENMEMBERMATRIX [DONE]!";
+  return EndmemberMatrixEigen;
+}
+
+float mitk::pa::SpectralUnmixingFilterBase::propertyElement(mitk::pa::PropertyCalculator::ChromophoreType Chromophore, int Wavelength)
+{
+  float value = m_PropertyCalculatorEigen->GetAbsorptionForWavelength(Chromophore, Wavelength);
+  if (value == 0)
+    mitkThrow() << "WAVELENGTH " << Wavelength << "nm NOT SUPPORTED!";
+  return value;
 }

@@ -64,11 +64,11 @@ namespace mitk {
       virtual void GenerateData() override;
       virtual void InitializeOutputs();
 
-      // Void to creat Eigen::Matrix of all absorbtions
-      // @ specific wavelength (columns) of chromophores (rows)
-      Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> AddEndmemberMatrix();
+      virtual Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> CalculateEndmemberMatrix(
+        std::vector<mitk::pa::PropertyCalculator::ChromophoreType> m_Chromophore, std::vector<int> m_Wavelength);
+      PropertyCalculator::Pointer m_PropertyCalculatorEigen;
 
-      PropertyCalculator::Pointer m_PropertyCalculator;
+      virtual float propertyElement(mitk::pa::PropertyCalculator::ChromophoreType, int wavelength);
             
     };
   }

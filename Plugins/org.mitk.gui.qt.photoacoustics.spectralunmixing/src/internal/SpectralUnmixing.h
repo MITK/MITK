@@ -45,7 +45,6 @@ protected:
   /// \brief Called when the user clicks the GUI button
   void DoImageProcessing();
 
-  virtual void Wavelength();
   virtual void ClearWavelength();
 
   Ui::SpectralUnmixingControls m_Controls;

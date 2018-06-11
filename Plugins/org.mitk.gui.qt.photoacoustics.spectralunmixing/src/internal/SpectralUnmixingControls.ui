@@ -68,38 +68,6 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="ButtonAddWavelength">
-       <property name="text">
-        <string>Add Wavelength [nm]</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="Line" name="line">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="spinBoxAddWavelength">
-       <property name="maximum">
-        <number>2000</number>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QPushButton" name="ButtonClearWavelength">
-     <property name="text">
-      <string>Clear all Wavelengths</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QTableWidget" name="inputtable">
      <property name="minimumSize">
       <size>

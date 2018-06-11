@@ -47,27 +47,6 @@ void SpectralUnmixing::CreateQtPartControl(QWidget *parent)
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
   connect(m_Controls.buttonPerformImageProcessing, &QPushButton::clicked, this, &SpectralUnmixing::DoImageProcessing);
-  connect(m_Controls.ButtonAddWavelength, &QPushButton::clicked, this, &SpectralUnmixing::Wavelength);
-  connect(m_Controls.ButtonClearWavelength, &QPushButton::clicked, this, &SpectralUnmixing::ClearWavelength);
-}
-
-// Adds Wavelength @ Plugin with button
-void SpectralUnmixing::Wavelength()
-{
-  if (m_Wavelengths.empty())
-  {
-      size = 0;
-  }
-
-  unsigned int wavelength = m_Controls.spinBoxAddWavelength->value();
-  m_Wavelengths.push_back(wavelength);
-  size += 1; // size implemented like this because '.size' is const
-  MITK_INFO << "ALL WAVELENGTHS: ";
-
-  for (int i = 0; i < size; ++i)
-  {
-    MITK_INFO << m_Wavelengths[i] << "nm";
-  }
 }
 
 void SpectralUnmixing::ClearWavelength()
@@ -128,33 +107,6 @@ void SpectralUnmixing::DoImageProcessing()
       }
       message << ".";
       MITK_INFO << message.str();
-
-      /*/+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-      std::vector<double> listOfWavelengths;
-      double tmpWavelength = 0;
-      int currentRow = 0;
-      bool success = false;
-
-      do
-      {
-        if (currentRow != 0) listOfWavelengths.push_back(tmpWavelength);
-        if (m_Controls.inputtable->item(0, currentRow))
-        {
-          QString test = m_Controls.inputtable->item(0, currentRow)->text();
-          tmpWavelength = test.toDouble(&success);
-          currentRow++;
-        }
-        else
-          tmpWavelength = 0;
-
-        if (success == 0)
-          tmpWavelength = 0;
-      } while (tmpWavelength<1200 && tmpWavelength>300);
-
-      MITK_INFO << "listOfWavelengths" << listOfWavelengths;
-
-      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
       // Set Algortihm to filter
       auto qs = m_Controls.QComboBoxAlgorithm->currentText();
@@ -257,11 +209,17 @@ void SpectralUnmixing::DoImageProcessing()
 
       m_SpectralUnmixingFilter->SetInput(image);
 
-      // Wavelength implementation into filter
-      for (unsigned int imageIndex = 0; imageIndex < m_Wavelengths.size(); imageIndex++)
+      // Wavelength implementation
+      ClearWavelength();
+      int col = 0;
+      int Wavelength = 1;
+      while (m_Controls.inputtable->item(0, col) && Wavelength > 0)
       {
-        unsigned int wavelength = m_Wavelengths[imageIndex];
-        m_SpectralUnmixingFilter->AddWavelength(wavelength);
+        QString Text = m_Controls.inputtable->item(0, col)->text();
+        Wavelength = Text.toInt();
+        if (Wavelength > 0)
+          m_SpectralUnmixingFilter->AddWavelength(Wavelength);
+        ++col;
       }
 
       // Checking which chromophores wanted for SU if none throw exeption!
@@ -346,7 +304,6 @@ void SpectralUnmixing::DoImageProcessing()
         MITK_INFO << "[DONE]";
       }
       mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
-
       MITK_INFO << "Adding images to DataStorage...[DONE]";
     }
   }

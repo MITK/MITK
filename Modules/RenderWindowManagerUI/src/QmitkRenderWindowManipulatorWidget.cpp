@@ -155,7 +155,6 @@ void QmitkRenderWindowManipulatorWidget::RemoveLayer()
   if (nullptr == m_StorageModel)
   {
     return;
-
   }
 
   QModelIndex selectedIndex = m_Controls.layerStackTableView->currentIndex();
@@ -177,13 +176,12 @@ void QmitkRenderWindowManipulatorWidget::SetAsBaseLayer()
   if (nullptr == m_StorageModel)
   {
     return;
-
   }
 
   QModelIndex selectedIndex = m_Controls.layerStackTableView->currentIndex();
   if (selectedIndex.isValid())
   {
-    QVariant qvariantDataNode = m_StorageModel->data(selectedIndex, Qt::UserRole);
+    QVariant qvariantDataNode = m_StorageModel->data(selectedIndex, QmitkDataNodeRawPointerRole);
     if (qvariantDataNode.canConvert<mitk::DataNode*>())
     {
       mitk::DataNode* dataNode = qvariantDataNode.value<mitk::DataNode*>();
@@ -198,13 +196,12 @@ void QmitkRenderWindowManipulatorWidget::MoveLayer(const QString &direction)
   if (nullptr == m_StorageModel)
   {
     return;
-
   }
 
   QModelIndex selectedIndex = m_Controls.layerStackTableView->currentIndex();
   if (selectedIndex.isValid())
   {
-    QVariant qvariantDataNode = m_StorageModel->data(selectedIndex, Qt::UserRole);
+    QVariant qvariantDataNode = m_StorageModel->data(selectedIndex, QmitkDataNodeRawPointerRole);
     if (qvariantDataNode.canConvert<mitk::DataNode*>())
     {
       mitk::DataNode* dataNode = qvariantDataNode.value<mitk::DataNode*>();
@@ -246,7 +243,6 @@ void QmitkRenderWindowManipulatorWidget::ResetRenderer()
   if (nullptr == m_StorageModel)
   {
     return;
-
   }
 
   m_RenderWindowLayerController->ResetRenderer(true, m_StorageModel->GetCurrentRenderer());
@@ -258,7 +254,6 @@ void QmitkRenderWindowManipulatorWidget::ClearRenderer()
   if (nullptr == m_StorageModel)
   {
     return;
-
   }
 
   m_RenderWindowLayerController->ResetRenderer(false, m_StorageModel->GetCurrentRenderer());

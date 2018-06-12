@@ -170,14 +170,14 @@ void SpectralUnmixing::DoImageProcessing()
           ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::test);
       }
       
-      else if (Algorithm == "LARS")
+      else if (Algorithm == "NNLARS")
       {
         m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
         dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra*>(m_SpectralUnmixingFilter.GetPointer())
           ->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LARS);
       }
 
-      else if (Algorithm == "Goldfarb")
+      else if (Algorithm == "NNGoldfarb")
       {
         m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
         dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra*>(m_SpectralUnmixingFilter.GetPointer())

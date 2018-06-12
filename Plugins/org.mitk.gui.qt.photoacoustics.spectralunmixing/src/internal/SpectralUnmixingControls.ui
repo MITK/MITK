@@ -625,12 +625,37 @@
      </item>
      <item>
       <property name="text">
-       <string>==EIGEN==</string>
+       <string>==QR decomposition==</string>
       </property>
      </item>
      <item>
       <property name="text">
        <string>householderQr</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>colPivHouseholderQr</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>fullPivHouseholderQr</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>==LU decompositon</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>fullPivLu</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>==Cholesky decompostion==</string>
       </property>
      </item>
      <item>
@@ -649,7 +674,7 @@
      </item>
      <item>
       <property name="text">
-       <string>colPivHouseholderQr</string>
+       <string>==Least squares==</string>
       </property>
      </item>
      <item>
@@ -659,42 +684,17 @@
      </item>
      <item>
       <property name="text">
-       <string>fullPivLu</string>
+       <string>NNLARS</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>fullPivHouseholderQr</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>test</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>==Vigra==</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>LARS</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Goldfarb</string>
+       <string>NNGoldfarb</string>
       </property>
      </item>
      <item>
       <property name="text">
        <string>weighted</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>vigratest</string>
       </property>
      </item>
      <item>
@@ -714,7 +714,17 @@
      </item>
      <item>
       <property name="text">
-       <string>otherstest</string>
+       <string>==Test algorithms==</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>test</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>vigratest</string>
       </property>
      </item>
     </widget>
@@ -806,20 +816,6 @@
    </item>
    <item>
     <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="checkBoxChrono">
-     <property name="text">
-      <string>Chrono</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="Line" name="line_7">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>

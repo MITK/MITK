@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
 
+#include <chrono>
+
 mitk::pa::SpectralUnmixingFilterBase::SpectralUnmixingFilterBase()
 {
   this->SetNumberOfIndexedOutputs(4);// find solution
@@ -88,6 +90,8 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
   ofstream myfile;
   myfile.open("PASpectralUnmixingPixelValues.txt");
 
+  std::chrono::steady_clock::time_point _start(std::chrono::steady_clock::now());
+
   //loop over every pixel @ x,y plane
   for (unsigned int x = 0; x < xDim; x++)
   {
@@ -125,8 +129,10 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
         << resultVector[2] << "Result vector size" << resultVector.size() << "\n";
     }
   }
+  std::chrono::steady_clock::time_point _end(std::chrono::steady_clock::now());
   MITK_INFO << "GENERATING DATA...[DONE]";
   myfile.close();
+  MITK_INFO << "Chrono: " << std::chrono::duration_cast<std::chrono::duration<double>>(    _end - _start).count() << "s";
 }
 
 void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(unsigned int size, unsigned int NumberOfInputImages, const float* inputDataArray)

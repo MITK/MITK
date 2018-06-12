@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLabelSetImage.h>
 
 // c++
-#include <algorithm>
+#include <iterator>
 
 std::vector<mitk::ISemanticRelationsObserver*> mitk::SemanticRelations::m_ObserverVector;
 

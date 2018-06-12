@@ -85,8 +85,8 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
     MITK_INFO << inputDataArray[i];/**/
 
   // test to see pixel values @ txt file
-  //ofstream myfile;
-  //myfile.open("PASpectralUnmixingPixelValues.txt");
+  ofstream myfile;
+  myfile.open("PASpectralUnmixingPixelValues.txt");
 
   //loop over every pixel @ x,y plane
   for (unsigned int x = 0; x < xDim; x++)
@@ -120,12 +120,13 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
         float* writeBuffer = (float *)writeOutput.GetData();
         writeBuffer[x*yDim + y] = resultVector[outputIdx]; 
       }
-      //myfile << "Input Pixel(x,y): " << x << "," << y << "\n" << inputVector << "\n";
-      //myfile << "Result: "  << "\n HbO2: " << resultVector[0] << "\n Hb: " << resultVector[1] <<"\n";
+      myfile << "Input Pixel(x,y): " << x << "," << y << "\n" << inputVector << "\n";
+      myfile << "Result: "  << "\n HbO2: " << resultVector[0] << "\n Hb: " << resultVector[1] << "\n Mel: "
+        << resultVector[2] << "Result vector size" << resultVector.size() << "\n";
     }
   }
   MITK_INFO << "GENERATING DATA...[DONE]";
-  //myfile.close();
+  myfile.close();
 }
 
 void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(unsigned int size, unsigned int NumberOfInputImages, const float* inputDataArray)
@@ -201,7 +202,7 @@ Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingF
       for (unsigned int i = 0; i < numberOfWavelengths; ++i)
       {
         EndmemberMatrixEigen(i, j) = propertyElement(m_Chromophore[j], m_Wavelength[i]);
-        MITK_INFO << "MELANIN." << EndmemberMatrixEigen(i, j);
+        MITK_INFO << "MELANIN " << EndmemberMatrixEigen(i, j);
       }
     }
     else if (m_Chromophore[j] == mitk::pa::PropertyCalculator::ChromophoreType::ONEENDMEMBER)
@@ -212,7 +213,8 @@ Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingF
     else
       mitkThrow() << "404 CHROMOPHORE NOT FOUND!";
   }
-  //MITK_INFO << "GENERATING ENMEMBERMATRIX [DONE]!";
+  MITK_INFO << "GENERATING ENMEMBERMATRIX [DONE]!";
+  MITK_INFO << "endmember matrix: " << EndmemberMatrixEigen;
   return EndmemberMatrixEigen;
 }
 

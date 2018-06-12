@@ -59,7 +59,7 @@ namespace mitk {
       };
 
       double GetAbsorptionForWavelength(
-        ChromophoreType ChromophoreType, int wavelength);
+        ChromophoreType chromophoreType, int wavelength);
 
       Properties CalculatePropertyForSpecificWavelength(
         TissueType tissueType, int wavelength, double oxygenSaturatonInFraction = 0);

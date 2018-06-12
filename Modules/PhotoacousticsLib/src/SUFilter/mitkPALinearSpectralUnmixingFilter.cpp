@@ -39,7 +39,7 @@ void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(mitk::pa::LinearSpectr
 Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorithm(
   Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
 {
-  Eigen::Vector2f resultVector;
+  Eigen::VectorXf resultVector;
 
   if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::colPivHouseholderQr == algorithmIndex)
     resultVector = EndmemberMatrix.colPivHouseholderQr().solve(inputVector);

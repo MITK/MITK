@@ -17,32 +17,11 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string>QCommandLinkButton {
-  font-weight: lighter;
-}
-
-QCommandLinkButton:disabled {
+   <string>QCommandLinkButton:disabled {
   border: none;
-  font-weight: lighter;
-}
-
-QToolBox::tab {
-  font-weight: bold;
-}
-
-QToolBox::tab:hover {
-  font-weight: bold;
-}
-
-QToolBox::tab:selected {
-  font-weight: bold;
 }
 
 QGroupBox {
-  background-color: transparent;
-}
-
-QGroupBox, QGroupBox:disabled {
   background-color: transparent;
 }</string>
   </property>

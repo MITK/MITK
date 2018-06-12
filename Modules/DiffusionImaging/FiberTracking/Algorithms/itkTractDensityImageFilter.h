@@ -55,9 +55,6 @@ public:
   itkGetMacro( UseImageGeometry, bool)                          ///< use input image geometry to initialize output image
   itkSetMacro( FiberBundle, mitk::FiberBundle::Pointer)         ///< input fiber bundle
   itkSetMacro( InputImage, typename OutputImageType::Pointer)   ///< use input image geometry to initialize output image
-  itkSetMacro( UseTrilinearInterpolation, bool )
-  itkSetMacro( DoFiberResampling, bool )
-  itkSetMacro( WorkOnFiberCopy, bool )
   itkGetMacro( MaxDensity, OutPixelType)
   itkGetMacro( NumCoveredVoxels, unsigned int)
 

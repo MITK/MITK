@@ -174,14 +174,6 @@ int main(int argc, char* argv[])
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image", "Fiberbundles"}, {});
     mitk::Image::Pointer inputImage = dynamic_cast<mitk::PeakImage*>(mitk::IOUtil::Load(peak_file_name, &functor)[0].GetPointer());
 
-    float minSpacing = 1;
-    if(inputImage->GetGeometry()->GetSpacing()[0]<inputImage->GetGeometry()->GetSpacing()[1] && inputImage->GetGeometry()->GetSpacing()[0]<inputImage->GetGeometry()->GetSpacing()[2])
-      minSpacing = inputImage->GetGeometry()->GetSpacing()[0];
-    else if (inputImage->GetGeometry()->GetSpacing()[1] < inputImage->GetGeometry()->GetSpacing()[2])
-      minSpacing = inputImage->GetGeometry()->GetSpacing()[1];
-    else
-      minSpacing = inputImage->GetGeometry()->GetSpacing()[2];
-
     // Load mask file. Fit is only performed inside the mask
     itk::FitFibersToImageFilter::UcharImgType::Pointer mask = nullptr;
     if (mask_file.compare("")!=0)
@@ -235,7 +227,6 @@ int main(int argc, char* argv[])
         continue;
       if (fib->GetNumFibers()<=0)
         continue;
-      fib->ResampleLinear(minSpacing/10.0);
       input_candidates.push_back(fib);
     }
     std::cout.rdbuf (old);              // <-- restore
@@ -250,11 +241,6 @@ int main(int argc, char* argv[])
     mitk::FiberBundle::Pointer anchor_tractogram = mitk::IOUtil::Load<mitk::FiberBundle>(anchors_file);
     if ( !(anchor_tractogram.IsNull() || anchor_tractogram->GetNumFibers()==0) )
     {
-      std::streambuf *old = cout.rdbuf(); // <-- save
-      std::stringstream ss;
-      std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-      anchor_tractogram->ResampleLinear(minSpacing/10.0);
-      std::cout.rdbuf (old);              // <-- restore
       input_reference.push_back(anchor_tractogram);
 
       // Fit known tracts to peak image to obtain underexplained image
@@ -265,7 +251,6 @@ int main(int argc, char* argv[])
       fitter->SetFilterOutliers(filter_outliers);
       fitter->SetPeakImage(peak_image);
       fitter->SetVerbose(true);
-      fitter->SetResampleFibers(false);
       fitter->SetMaskImage(mask);
       fitter->SetRegularization(VnlCostFunction::REGU::NONE);
       fitter->Update();
@@ -313,7 +298,7 @@ int main(int argc, char* argv[])
         int m_idx = 0;
         for (auto ref_mask : reference_masks)
         {
-          float overlap = fib->GetOverlap(ref_mask, false);
+          float overlap = fib->GetOverlap(ref_mask);
           if (overlap>best_overlap)
           {
             best_overlap = overlap;
@@ -356,7 +341,6 @@ int main(int argc, char* argv[])
       fitter->SetFilterOutliers(filter_outliers);
       fitter->SetVerbose(true);
       fitter->SetPeakImage(peak_image);
-      fitter->SetResampleFibers(false);
       fitter->SetMaskImage(mask);
       fitter->SetTractograms(input_candidates);
       fitter->SetFitIndividualFibers(true);
@@ -402,7 +386,7 @@ int main(int argc, char* argv[])
         int m_idx = 0;
         for (auto ref_mask : reference_masks)
         {
-          float overlap = fib->GetOverlap(ref_mask, false);
+          float overlap = fib->GetOverlap(ref_mask);
           if (overlap>best_overlap)
           {
             best_overlap = overlap;
@@ -468,7 +452,6 @@ int main(int argc, char* argv[])
           fitter->SetFilterOutliers(filter_outliers);
           fitter->SetVerbose(false);
           fitter->SetPeakImage(peak_image);
-          fitter->SetResampleFibers(false);
           fitter->SetMaskImage(mask);
           // ******************************
           fitter->SetTractograms({input_candidates.at(i)});
@@ -531,7 +514,7 @@ int main(int argc, char* argv[])
         i = 0;
         for (auto ref_mask : reference_masks)
         {
-          float overlap = best_candidate->GetOverlap(ref_mask, false);
+          float overlap = best_candidate->GetOverlap(ref_mask);
           if (overlap>best_overlap)
           {
             best_overlap = overlap;

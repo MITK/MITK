@@ -1,6 +1,7 @@
 #include "itkFitFibersToImageFilter.h"
 
 #include <boost/progress.hpp>
+#include <mitkDiffusionFunctionCollection.h>
 
 namespace itk{
 
@@ -13,7 +14,6 @@ FitFibersToImageFilter::FitFibersToImageFilter()
   , m_GradientTolerance(1e-5)
   , m_Lambda(0.1)
   , m_MaxIterations(20)
-  , m_FiberSampling(10)
   , m_Coverage(0)
   , m_Overshoot(0)
   , m_RMSE(0.0)
@@ -23,8 +23,6 @@ FitFibersToImageFilter::FitFibersToImageFilter()
   , m_MinWeight(1.0)
   , m_MaxWeight(1.0)
   , m_Verbose(true)
-  , m_DeepCopy(true)
-  , m_ResampleFibers(true)
   , m_NumUnknowns(0)
   , m_NumResiduals(0)
   , m_NumCoveredDirections(0)
@@ -45,6 +43,15 @@ FitFibersToImageFilter::~FitFibersToImageFilter()
 
 }
 
+itk::Point<float, 3> FitFibersToImageFilter::GetItkPoint(double point[3])
+{
+  itk::Point<float, 3> itkPoint;
+  itkPoint[0] = point[0];
+  itkPoint[1] = point[1];
+  itkPoint[2] = point[2];
+  return itkPoint;
+}
+
 void FitFibersToImageFilter::CreateDiffSystem()
 {
   sz_x = m_DiffImage->GetLargestPossibleRegion().GetSize(0);
@@ -53,25 +60,7 @@ void FitFibersToImageFilter::CreateDiffSystem()
   dim_four_size = m_DiffImage->GetVectorLength();
   int num_voxels = sz_x*sz_y*sz_z;
 
-  float minSpacing = 1;
-  if(m_DiffImage->GetSpacing()[0]<m_DiffImage->GetSpacing()[1] && m_DiffImage->GetSpacing()[0]<m_DiffImage->GetSpacing()[2])
-    minSpacing = m_DiffImage->GetSpacing()[0];
-  else if (m_DiffImage->GetSpacing()[1] < m_DiffImage->GetSpacing()[2])
-    minSpacing = m_DiffImage->GetSpacing()[1];
-  else
-    minSpacing = m_DiffImage->GetSpacing()[2];
-
-  if (m_ResampleFibers)
-    for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
-    {
-      std::streambuf *old = cout.rdbuf(); // <-- save
-      std::stringstream ss;
-      std::cout.rdbuf (ss.rdbuf());
-      if (m_DeepCopy)
-        m_Tractograms[bundle] = m_Tractograms.at(bundle)->GetDeepCopy();
-      m_Tractograms.at(bundle)->ResampleLinear(minSpacing/m_FiberSampling);
-      std::cout.rdbuf (old);
-    }
+  auto spacing = m_DiffImage->GetSpacing();
 
   m_NumResiduals = num_voxels * dim_four_size;
 
@@ -88,6 +77,10 @@ void FitFibersToImageFilter::CreateDiffSystem()
   fiber_count = 0;
   vnl_vector<int> voxel_indicator; voxel_indicator.set_size(sz_x*sz_y*sz_z); voxel_indicator.fill(0);
 
+  int numFibers = 0;
+  for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
+    numFibers += m_Tractograms.at(bundle)->GetNumFibers();
+  boost::progress_display disp(numFibers);
   m_GroupSizes.clear();
   for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
   {
@@ -95,6 +88,7 @@ void FitFibersToImageFilter::CreateDiffSystem()
     m_GroupSizes.push_back(m_Tractograms.at(bundle)->GetNumFibers());
     for (int i=0; i<m_Tractograms.at(bundle)->GetNumFibers(); ++i)
     {
+      ++disp;
       vtkCell* cell = polydata->GetCell(i);
       int numPoints = cell->GetNumberOfPoints();
       vtkPoints* points = cell->GetPoints();
@@ -104,64 +98,71 @@ void FitFibersToImageFilter::CreateDiffSystem()
 
       for (int j=0; j<numPoints-1; ++j)
       {
-        double* p1 = points->GetPoint(j);
-        PointType3 p;
-        p[0]=p1[0];
-        p[1]=p1[1];
-        p[2]=p1[2];
+        PointType3 startVertex = GetItkPoint(points->GetPoint(j));
+        itk::Index<3> startIndex;
+        itk::ContinuousIndex<float, 3> startIndexCont;
+        m_DiffImage->TransformPhysicalPointToIndex(startVertex, startIndex);
+        m_DiffImage->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
 
-        itk::Index<3> idx3;
-        m_DiffImage->TransformPhysicalPointToIndex(p, idx3);
-        if (!m_DiffImage->GetLargestPossibleRegion().IsInside(idx3) || (m_MaskImage.IsNotNull() && m_MaskImage->GetPixel(idx3)==0))
-          continue;
+        PointType3 endVertex = GetItkPoint(points->GetPoint(j+1));
+        itk::Index<3> endIndex;
+        itk::ContinuousIndex<float, 3> endIndexCont;
+        m_DiffImage->TransformPhysicalPointToIndex(endVertex, endIndex);
+        m_DiffImage->TransformPhysicalPointToContinuousIndex(endVertex, endIndexCont);
 
-        double* p2 = points->GetPoint(j+1);
         mitk::DiffusionSignalModel<>::GradientType fiber_dir;
-        fiber_dir[0] = p[0]-p2[0];
-        fiber_dir[1] = p[1]-p2[1];
-        fiber_dir[2] = p[2]-p2[2];
+        fiber_dir[0] = endVertex[0]-startVertex[0];
+        fiber_dir[1] = endVertex[1]-startVertex[1];
+        fiber_dir[2] = endVertex[2]-startVertex[2];
         fiber_dir.Normalize();
 
-        int x = idx3[0];
-        int y = idx3[1];
-        int z = idx3[2];
-
-        mitk::DiffusionSignalModel<>::PixelType simulated_pixel = m_SignalModel->SimulateMeasurement(fiber_dir);
-        VectorImgType::PixelType measured_pixel = m_DiffImage->GetPixel(idx3);
-
-        double simulated_mean = 0;
-        double measured_mean = 0;
-        int num_nonzero_g = 0;
-        for (int g=0; g<dim_four_size; ++g)
+        std::vector< std::pair< itk::Index<3>, double > > segments = mitk::imv::IntersectImage(spacing, startIndex, endIndex, startIndexCont, endIndexCont);
+        for (std::pair< itk::Index<3>, double > seg : segments)
         {
-          if( m_SignalModel->GetGradientDirection(g).GetNorm()<mitk::eps )
+          if (!m_DiffImage->GetLargestPossibleRegion().IsInside(seg.first) || (m_MaskImage.IsNotNull() && m_MaskImage->GetPixel(seg.first)==0))
             continue;
-          simulated_mean += simulated_pixel[g];
-          measured_mean += (double)measured_pixel[g];
-          ++num_nonzero_g;
-        }
-        simulated_mean /= num_nonzero_g;
-        measured_mean /= num_nonzero_g;
-        simulated_pixel -= simulated_mean;
 
-        if (voxel_indicator[x + sz_x*y + sz_x*sz_y*z]==0)
-          m_MeanSignal += measured_mean;
-        m_MeanTractDensity += simulated_mean;
-        voxel_indicator[x + sz_x*y + sz_x*sz_y*z] = 1;
+          int x = seg.first[0];
+          int y = seg.first[1];
+          int z = seg.first[2];
 
-        for (int g=0; g<dim_four_size; ++g)
-        {
-          unsigned int linear_index = x + sz_x*y + sz_x*sz_y*z + sz_x*sz_y*sz_z*g;
+          mitk::DiffusionSignalModel<>::PixelType simulated_pixel = m_SignalModel->SimulateMeasurement(fiber_dir)*seg.second;
+          VectorImgType::PixelType measured_pixel = m_DiffImage->GetPixel(seg.first);
 
-          if (m_FitIndividualFibers)
+          double simulated_mean = 0;
+          double measured_mean = 0;
+          int num_nonzero_g = 0;
+          for (int g=0; g<dim_four_size; ++g)
           {
-            b[linear_index] = (double)measured_pixel[g] - measured_mean;
-            A.put(linear_index, fiber_count, A.get(linear_index, fiber_count) + simulated_pixel[g]);
+            if( m_SignalModel->GetGradientDirection(g).GetNorm()<mitk::eps )
+              continue;
+            simulated_mean += simulated_pixel[g];
+            measured_mean += (double)measured_pixel[g];
+            ++num_nonzero_g;
           }
-          else
+          simulated_mean /= num_nonzero_g;
+          measured_mean /= num_nonzero_g;
+          simulated_pixel -= simulated_mean;
+
+          if (voxel_indicator[x + sz_x*y + sz_x*sz_y*z]==0)
+            m_MeanSignal += measured_mean;
+          m_MeanTractDensity += simulated_mean;
+          voxel_indicator[x + sz_x*y + sz_x*sz_y*z] = 1;
+
+          for (int g=0; g<dim_four_size; ++g)
           {
-            b[linear_index] = (double)measured_pixel[g] - measured_mean;
-            A.put(linear_index, bundle, A.get(linear_index, bundle) + simulated_pixel[g]);
+            unsigned int linear_index = x + sz_x*y + sz_x*sz_y*z + sz_x*sz_y*sz_z*g;
+
+            if (m_FitIndividualFibers)
+            {
+              b[linear_index] = (double)measured_pixel[g] - measured_mean;
+              A.put(linear_index, fiber_count, A.get(linear_index, fiber_count) + simulated_pixel[g]);
+            }
+            else
+            {
+              b[linear_index] = (double)measured_pixel[g] - measured_mean;
+              A.put(linear_index, bundle, A.get(linear_index, bundle) + simulated_pixel[g]);
+            }
           }
         }
 
@@ -193,25 +194,37 @@ void FitFibersToImageFilter::CreatePeakSystem()
   dim_four_size = m_PeakImage->GetLargestPossibleRegion().GetSize(3)/3 + 1; // +1 for zero - peak
   int num_voxels = sz_x*sz_y*sz_z;
 
-  float minSpacing = 1;
-  if(m_PeakImage->GetSpacing()[0]<m_PeakImage->GetSpacing()[1] && m_PeakImage->GetSpacing()[0]<m_PeakImage->GetSpacing()[2])
-    minSpacing = m_PeakImage->GetSpacing()[0];
-  else if (m_PeakImage->GetSpacing()[1] < m_PeakImage->GetSpacing()[2])
-    minSpacing = m_PeakImage->GetSpacing()[1];
-  else
-    minSpacing = m_PeakImage->GetSpacing()[2];
+  itk::Vector< double, 3 > spacing;
+  spacing[0] = m_PeakImage->GetSpacing()[0];
+  spacing[1] = m_PeakImage->GetSpacing()[1];
+  spacing[2] = m_PeakImage->GetSpacing()[2];
 
-  if (m_ResampleFibers)
-    for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
-    {
-      std::streambuf *old = cout.rdbuf(); // <-- save
-      std::stringstream ss;
-      std::cout.rdbuf (ss.rdbuf());
-      if (m_DeepCopy)
-        m_Tractograms[bundle] = m_Tractograms.at(bundle)->GetDeepCopy();
-      m_Tractograms.at(bundle)->ResampleLinear(minSpacing/m_FiberSampling);
-      std::cout.rdbuf (old);
-    }
+  PointType3 origin;
+  origin[0] = m_PeakImage->GetOrigin()[0];
+  origin[1] = m_PeakImage->GetOrigin()[1];
+  origin[2] = m_PeakImage->GetOrigin()[2];
+
+  UcharImgType::RegionType::SizeType size;
+  size[0] = m_PeakImage->GetLargestPossibleRegion().GetSize()[0];
+  size[1] = m_PeakImage->GetLargestPossibleRegion().GetSize()[1];
+  size[2] = m_PeakImage->GetLargestPossibleRegion().GetSize()[2];
+  UcharImgType::RegionType imageRegion; imageRegion.SetSize(size);
+
+  itk::Matrix<double, 3, 3> direction;
+  for (int r=0; r<3; r++)
+    for (int c=0; c<3; c++)
+      direction[r][c] = m_PeakImage->GetDirection()[r][c];
+
+  if (m_MaskImage.IsNull())
+  {
+    m_MaskImage = UcharImgType::New();
+    m_MaskImage->SetSpacing( spacing );
+    m_MaskImage->SetOrigin( origin );
+    m_MaskImage->SetDirection( direction );
+    m_MaskImage->SetRegions( imageRegion );
+    m_MaskImage->Allocate();
+    m_MaskImage->FillBuffer(1);
+  }
 
   m_NumResiduals = num_voxels * dim_four_size;
 
@@ -228,6 +241,11 @@ void FitFibersToImageFilter::CreatePeakSystem()
   fiber_count = 0;
 
   m_GroupSizes.clear();
+
+  int numFibers = 0;
+  for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
+    numFibers += m_Tractograms.at(bundle)->GetNumFibers();
+  boost::progress_display disp(numFibers);
   for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
   {
     vtkSmartPointer<vtkPolyData> polydata = m_Tractograms.at(bundle)->GetFiberPolyData();
@@ -235,6 +253,7 @@ void FitFibersToImageFilter::CreatePeakSystem()
     m_GroupSizes.push_back(m_Tractograms.at(bundle)->GetNumFibers());
     for (int i=0; i<m_Tractograms.at(bundle)->GetNumFibers(); ++i)
     {
+      ++disp;
       vtkCell* cell = polydata->GetCell(i);
       int numPoints = cell->GetNumberOfPoints();
       vtkPoints* points = cell->GetPoints();
@@ -244,54 +263,66 @@ void FitFibersToImageFilter::CreatePeakSystem()
 
       for (int j=0; j<numPoints-1; ++j)
       {
-        double* p1 = points->GetPoint(j);
-        PointType4 p;
-        p[0]=p1[0];
-        p[1]=p1[1];
-        p[2]=p1[2];
-        p[3]=0;
+        PointType3 startVertex = GetItkPoint(points->GetPoint(j));
+        itk::Index<3> startIndex;
+        itk::ContinuousIndex<float, 3> startIndexCont;
+        m_MaskImage->TransformPhysicalPointToIndex(startVertex, startIndex);
+        m_MaskImage->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
 
-        itk::Index<4> idx4;
-        m_PeakImage->TransformPhysicalPointToIndex(p, idx4);
-        itk::Index<3> idx3; idx3[0] = idx4[0]; idx3[1] = idx4[1]; idx3[2] = idx4[2];
-        if (!m_PeakImage->GetLargestPossibleRegion().IsInside(idx4) || (m_MaskImage.IsNotNull() && m_MaskImage->GetPixel(idx3)==0))
-          continue;
+        PointType3 endVertex = GetItkPoint(points->GetPoint(j+1));
+        itk::Index<3> endIndex;
+        itk::ContinuousIndex<float, 3> endIndexCont;
+        m_MaskImage->TransformPhysicalPointToIndex(endVertex, endIndex);
+        m_MaskImage->TransformPhysicalPointToContinuousIndex(endVertex, endIndexCont);
 
-        double* p2 = points->GetPoint(j+1);
         vnl_vector_fixed<float,3> fiber_dir;
-        fiber_dir[0] = p[0]-p2[0];
-        fiber_dir[1] = p[1]-p2[1];
-        fiber_dir[2] = p[2]-p2[2];
+        fiber_dir[0] = endVertex[0]-startVertex[0];
+        fiber_dir[1] = endVertex[1]-startVertex[1];
+        fiber_dir[2] = endVertex[2]-startVertex[2];
         fiber_dir.normalize();
 
-        double w = 1;
-        int peak_id = dim_four_size-1;
-
-        double peak_mag = 0;
-        GetClosestPeak(idx4, m_PeakImage, fiber_dir, peak_id, w, peak_mag);
-
-        int x = idx4[0];
-        int y = idx4[1];
-        int z = idx4[2];
-
-        unsigned int linear_index = x + sz_x*y + sz_x*sz_y*z + sz_x*sz_y*sz_z*peak_id;
-
-        if (b[linear_index] == 0 && peak_id<dim_four_size-1)
+        std::vector< std::pair< itk::Index<3>, double > > segments = mitk::imv::IntersectImage(spacing, startIndex, endIndex, startIndexCont, endIndexCont);
+        for (std::pair< itk::Index<3>, double > seg : segments)
         {
-          m_NumCoveredDirections++;
-          m_MeanSignal += peak_mag;
-        }
-        m_MeanTractDensity += w;
+          if (!m_MaskImage->GetLargestPossibleRegion().IsInside(seg.first) || m_MaskImage->GetPixel(seg.first)==0)
+            continue;
 
-        if (m_FitIndividualFibers)
-        {
-          b[linear_index] = peak_mag;
-          A.put(linear_index, fiber_count, A.get(linear_index, fiber_count) + w);
-        }
-        else
-        {
-          b[linear_index] = peak_mag;
-          A.put(linear_index, bundle, A.get(linear_index, bundle) + w);
+          itk::Index<4> idx4;
+          idx4[0]=seg.first[0];
+          idx4[1]=seg.first[1];
+          idx4[2]=seg.first[2];
+          idx4[3]=0;
+
+          double w = 1;
+          int peak_id = dim_four_size-1;
+
+          double peak_mag = 0;
+          GetClosestPeak(idx4, m_PeakImage, fiber_dir, peak_id, w, peak_mag);
+          w *= seg.second;
+
+          int x = idx4[0];
+          int y = idx4[1];
+          int z = idx4[2];
+
+          unsigned int linear_index = x + sz_x*y + sz_x*sz_y*z + sz_x*sz_y*sz_z*peak_id;
+
+          if (b[linear_index] == 0 && peak_id<dim_four_size-1)
+          {
+            m_NumCoveredDirections++;
+            m_MeanSignal += peak_mag;
+          }
+          m_MeanTractDensity += w;
+
+          if (m_FitIndividualFibers)
+          {
+            b[linear_index] = peak_mag;
+            A.put(linear_index, fiber_count, A.get(linear_index, fiber_count) + w);
+          }
+          else
+          {
+            b[linear_index] = peak_mag;
+            A.put(linear_index, bundle, A.get(linear_index, bundle) + w);
+          }
         }
       }
 
@@ -317,26 +348,7 @@ void FitFibersToImageFilter::CreateScalarSystem()
   sz_z = m_ScalarImage->GetLargestPossibleRegion().GetSize(2);
   int num_voxels = sz_x*sz_y*sz_z;
 
-  float minSpacing = 1;
-  if(m_ScalarImage->GetSpacing()[0]<m_ScalarImage->GetSpacing()[1] && m_ScalarImage->GetSpacing()[0]<m_ScalarImage->GetSpacing()[2])
-    minSpacing = m_ScalarImage->GetSpacing()[0];
-  else if (m_ScalarImage->GetSpacing()[1] < m_ScalarImage->GetSpacing()[2])
-    minSpacing = m_ScalarImage->GetSpacing()[1];
-  else
-    minSpacing = m_ScalarImage->GetSpacing()[2];
-
-  if (m_ResampleFibers)
-    for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
-    {
-      std::streambuf *old = cout.rdbuf(); // <-- save
-      std::stringstream ss;
-      std::cout.rdbuf (ss.rdbuf());
-      if (m_DeepCopy)
-        m_Tractograms[bundle] = m_Tractograms.at(bundle)->GetDeepCopy();
-      m_Tractograms.at(bundle)->ResampleLinear(minSpacing/m_FiberSampling);
-      std::cout.rdbuf (old);
-    }
-
+  auto spacing = m_ScalarImage->GetSpacing();
   m_NumResiduals = num_voxels;
 
   MITK_INFO << "Num. unknowns: " << m_NumUnknowns;
@@ -351,6 +363,10 @@ void FitFibersToImageFilter::CreateScalarSystem()
   int numCoveredVoxels = 0;
   fiber_count = 0;
 
+  int numFibers = 0;
+  for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
+    numFibers += m_Tractograms.at(bundle)->GetNumFibers();
+  boost::progress_display disp(numFibers);
   m_GroupSizes.clear();
   for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
   {
@@ -359,46 +375,55 @@ void FitFibersToImageFilter::CreateScalarSystem()
     m_GroupSizes.push_back(m_Tractograms.at(bundle)->GetNumFibers());
     for (int i=0; i<m_Tractograms.at(bundle)->GetNumFibers(); ++i)
     {
+      ++disp;
       vtkCell* cell = polydata->GetCell(i);
       int numPoints = cell->GetNumberOfPoints();
       vtkPoints* points = cell->GetPoints();
 
-      for (int j=0; j<numPoints; ++j)
+      for (int j=0; j<numPoints-1; ++j)
       {
-        double* p1 = points->GetPoint(j);
-        PointType3 p;
-        p[0]=p1[0];
-        p[1]=p1[1];
-        p[2]=p1[2];
+        PointType3 startVertex = GetItkPoint(points->GetPoint(j));
+        itk::Index<3> startIndex;
+        itk::ContinuousIndex<float, 3> startIndexCont;
+        m_ScalarImage->TransformPhysicalPointToIndex(startVertex, startIndex);
+        m_ScalarImage->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
 
-        itk::Index<3> idx3;
-        m_ScalarImage->TransformPhysicalPointToIndex(p, idx3);
-        if (!m_ScalarImage->GetLargestPossibleRegion().IsInside(idx3) || (m_MaskImage.IsNotNull() && m_MaskImage->GetPixel(idx3)==0))
-          continue;
+        PointType3 endVertex = GetItkPoint(points->GetPoint(j+1));
+        itk::Index<3> endIndex;
+        itk::ContinuousIndex<float, 3> endIndexCont;
+        m_ScalarImage->TransformPhysicalPointToIndex(endVertex, endIndex);
+        m_ScalarImage->TransformPhysicalPointToContinuousIndex(endVertex, endIndexCont);
 
-        float image_value = m_ScalarImage->GetPixel(idx3);
-        int x = idx3[0];
-        int y = idx3[1];
-        int z = idx3[2];
-
-        unsigned int linear_index = x + sz_x*y + sz_x*sz_y*z;
-
-        if (b[linear_index] == 0)
+        std::vector< std::pair< itk::Index<3>, double > > segments = mitk::imv::IntersectImage(spacing, startIndex, endIndex, startIndexCont, endIndexCont);
+        for (std::pair< itk::Index<3>, double > seg : segments)
         {
-          numCoveredVoxels++;
-          m_MeanSignal += image_value;
-        }
-        m_MeanTractDensity += 1;
+          if (!m_ScalarImage->GetLargestPossibleRegion().IsInside(seg.first) || (m_MaskImage.IsNotNull() && m_MaskImage->GetPixel(seg.first)==0))
+            continue;
 
-        if (m_FitIndividualFibers)
-        {
-          b[linear_index] = image_value;
-          A.put(linear_index, fiber_count, A.get(linear_index, fiber_count) + 1);
-        }
-        else
-        {
-          b[linear_index] = image_value;
-          A.put(linear_index, bundle, A.get(linear_index, bundle) + 1);
+          float image_value = m_ScalarImage->GetPixel(seg.first);
+          int x = seg.first[0];
+          int y = seg.first[1];
+          int z = seg.first[2];
+
+          unsigned int linear_index = x + sz_x*y + sz_x*sz_y*z;
+
+          if (b[linear_index] == 0)
+          {
+            numCoveredVoxels++;
+            m_MeanSignal += image_value;
+          }
+          m_MeanTractDensity += seg.second;
+
+          if (m_FitIndividualFibers)
+          {
+            b[linear_index] = image_value;
+            A.put(linear_index, fiber_count, A.get(linear_index, fiber_count) + seg.second);
+          }
+          else
+          {
+            b[linear_index] = image_value;
+            A.put(linear_index, bundle, A.get(linear_index, bundle) + seg.second);
+          }
         }
       }
 
@@ -449,6 +474,7 @@ void FitFibersToImageFilter::GenerateData()
   else
     mitkThrow() << "No input image set!";
 
+  MITK_INFO << "Initializing optimizer";
   double init_lambda = fiber_count;  // initialization for lambda estimation
 
   itk::TimeProbe clock;

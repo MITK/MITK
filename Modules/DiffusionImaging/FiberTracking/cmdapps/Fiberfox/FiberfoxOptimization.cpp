@@ -181,13 +181,13 @@ double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dw
 
           double fa_diff = std::fabs(it2.Get()/fa - 1.0);
           double md_diff = std::fabs(it4.Get()/it3.Get() - 1.0);
-          error += std::pow(mod, 4) * (fa_diff + md_diff);
+          error += mod * (fa_diff + md_diff);
           count += 2;
 
           if (b0_contrast && it_diff1.Get()[0]>0)
           {
             double b0_diff = (double)it_diff2.Get()[0]/it_diff1.Get()[0] - 1.0;
-            error += std::pow(mod, 4) * std::fabs(b0_diff);
+            error += std::fabs(b0_diff);
             ++count;
           }
         }
@@ -220,13 +220,13 @@ double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dw
             }
 
           double fa_diff = fabs(it2.Get()/fa - 1.0);
-          error += std::pow(mod, 4) * fa_diff;
+          error += mod * fa_diff;
           ++count;
 
           if (b0_contrast && it_diff1.Get()[0]>0)
           {
             double b0_diff = (double)it_diff2.Get()[0]/it_diff1.Get()[0] - 1.0;
-            error += std::pow(mod, 4) * std::fabs(b0_diff);
+            error += std::fabs(b0_diff);
             ++count;
           }
         }
@@ -439,13 +439,17 @@ FiberfoxParameters MakeProposalVolume(double old_tdi_thr, double old_sqrt, doubl
     std::normal_distribution<double> normal_dist(0, old_tdi_thr*0.1*temperature);
     new_tdi_thr = old_tdi_thr + normal_dist(randgen);
     while (new_tdi_thr<=0.01)
+    {
       new_tdi_thr = old_tdi_thr + normal_dist(randgen);
+    }
   }
   {
     std::normal_distribution<double> normal_dist(0, old_sqrt*0.1*temperature);
     new_sqrt = old_sqrt + normal_dist(randgen);
     while (new_sqrt<=0.01)
+    {
       new_sqrt = old_sqrt + normal_dist(randgen);
+    }
   }
 
   itk::TdiToVolumeFractionFilter< double >::Pointer fraction_generator = itk::TdiToVolumeFractionFilter< double >::New();
@@ -588,11 +592,6 @@ int main(int argc, char* argv[])
     MITK_INFO << "Optimizing global signal scale";
     possible_proposals.push_back(2);
   }
-  if (possible_proposals.empty())
-  {
-    MITK_INFO << "Incompatible options. Nothing to optimize.";
-    return EXIT_FAILURE;
-  }
 
   itk::ImageFileReader< itk::Image< unsigned char, 3 > >::Pointer reader = itk::ImageFileReader< itk::Image< unsigned char, 3 > >::New();
   reader->SetFileName( us::any_cast<std::string>(parsedArgs["mask"]) );
@@ -648,7 +647,7 @@ int main(int argc, char* argv[])
     reader->Update();
     fa_image = reader->GetOutput();
 
-    int binsPerDimension = 20;
+    int binsPerDimension = 10;
     using ImageToHistogramFilterType = itk::Statistics::MaskedImageToHistogramFilter< itk::Image< double,3 >, itk::Image< unsigned char,3 > >;
 
     ImageToHistogramFilterType::HistogramType::MeasurementVectorType lowerBound(binsPerDimension);
@@ -679,8 +678,8 @@ int main(int argc, char* argv[])
     MITK_INFO << "FA histogram modifiers:";
     for(unsigned int i = 0; i < histogram->GetSize()[0]; ++i)
     {
-      histogram_modifiers.push_back((double)max/histogram->GetFrequency(i));
-      MITK_INFO << std::pow(histogram_modifiers.back(), 4);
+      histogram_modifiers.push_back(1.0 - (double)histogram->GetFrequency(i)/(double)max);
+      MITK_INFO << histogram_modifiers.back();
     }
     if (fa_error)
       MITK_INFO << "Using FA error measure.";
@@ -698,6 +697,12 @@ int main(int argc, char* argv[])
   if (fa_error && fa_image.IsNull())
   {
     MITK_INFO << "Incompatible options. Need FA image to calculate FA error.";
+    return EXIT_FAILURE;
+  }
+
+  if (possible_proposals.empty())
+  {
+    MITK_INFO << "Incompatible options. Nothing to optimize.";
     return EXIT_FAILURE;
   }
 
@@ -720,8 +725,8 @@ int main(int argc, char* argv[])
 
   double old_tdi_thr = tdi_threshold;
   double old_sqrt = sqrt;
-  double new_tdi_thr;
-  double new_sqrt;
+  double new_tdi_thr = old_tdi_thr;
+  double new_sqrt = old_sqrt;
   MITK_INFO << "\n\n";
   MITK_INFO << "Iterations: " << iterations;
   MITK_INFO << "start_temp: " << start_temp;
@@ -777,6 +782,7 @@ int main(int argc, char* argv[])
     }
     }
 
+    MITK_INFO << "Simulating and testing proposal ...";
     std::streambuf *old = cout.rdbuf(); // <-- save
     std::stringstream ss;
     std::cout.rdbuf (ss.rdbuf());

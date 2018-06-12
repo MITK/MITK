@@ -113,6 +113,27 @@ void mitk::pa::SpectralUnmixingSO2::InitializeOutputs()
 
 float mitk::pa::SpectralUnmixingSO2::calculateSO2(float Hb, float HbO2)
 {
+  float MinHb = m_SO2Settings[0];
+  float MinHbO2 = m_SO2Settings[1];
+  float MinSum = m_SO2Settings[2];
+  float MinSO2 = m_SO2Settings[3];
   float result = HbO2 / (Hb + HbO2);
-  return result;
+
+  if (MinHb != 0 && MinHb > Hb)
+    return 0;
+  else if (MinHbO2 != 0 && MinHbO2 > HbO2)
+    return 0;
+  else if (MinSum != 0 && MinSum > Hb + HbO2)
+    return 0;
+  else if (MinSO2 != 0 && 100*result > MinSO2)
+    return result;
+  else if (MinSO2 != 0 && result < MinSO2)
+    return 0;
+  else
+    return result;
+}
+
+void mitk::pa::SpectralUnmixingSO2::AddSO2Settings(float value)
+{
+  m_SO2Settings.push_back(value);
 }

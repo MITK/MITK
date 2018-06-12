@@ -32,10 +32,13 @@ namespace mitk {
     public:
       mitkClassMacro(SpectralUnmixingSO2, mitk::ImageToImageFilter);
       itkFactorylessNewMacro(Self);
+      virtual void AddSO2Settings(float value);
 
     protected:
       SpectralUnmixingSO2();
       virtual ~SpectralUnmixingSO2();
+      std::vector<int> m_SO2Settings;
+
 
     private:
       virtual void GenerateData() override;

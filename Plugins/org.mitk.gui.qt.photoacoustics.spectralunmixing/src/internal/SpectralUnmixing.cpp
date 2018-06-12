@@ -320,6 +320,21 @@ void SpectralUnmixing::DoImageProcessing()
         MITK_INFO << "CALCULATE OXYGEN SATURATION ...";
         // Initialize pipeline from SU filter class to SO2 class
         auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
+
+        // Oxygen Saturation Setting
+        for (int i = 0; i < 4; ++i)
+        {
+          if (m_Controls.inputtable->item(0, i))
+          {
+            QString Text = m_Controls.tableSO2->item(0, i)->text();
+            float value = Text.toFloat();
+            MITK_INFO << "value: " << value;
+            m_sO2->AddSO2Settings(value);
+          }
+          else
+            m_sO2->AddSO2Settings(0);
+        }
+
         auto output1 = m_SpectralUnmixingFilter->GetOutput(0);
         auto output2 = m_SpectralUnmixingFilter->GetOutput(1);
         m_sO2->SetInput(0, output1);

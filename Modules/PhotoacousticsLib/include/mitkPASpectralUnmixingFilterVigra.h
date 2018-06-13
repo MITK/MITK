@@ -30,11 +30,12 @@ namespace mitk {
       mitkClassMacro(SpectralUnmixingFilterVigra, SpectralUnmixingFilterBase)
         itkFactorylessNewMacro(Self)
 
-      enum VigraAlgortihmType
+        enum VigraAlgortihmType
       {
         LARS,
         GOLDFARB,
         WEIGHTED,
+        LS,
         vigratest
       };
 

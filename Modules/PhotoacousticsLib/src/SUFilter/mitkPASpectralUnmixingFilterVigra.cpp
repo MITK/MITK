@@ -77,9 +77,9 @@ void mitk::pa::SpectralUnmixingFilterVigra::SetAlgorithm(mitk::pa::SpectralUnmix
 Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::SpectralUnmixingAlgorithm(
   Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
 {
-  Eigen::VectorXf resultVector;
   int numberOfWavelengths = EndmemberMatrix.rows();
   int numberOfChromophores = EndmemberMatrix.cols();
+  Eigen::VectorXf resultVector(numberOfChromophores);
 
   using namespace vigra;
   using namespace vigra::linalg;
@@ -130,18 +130,20 @@ Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::SpectralUnmixingAlgorithm
     vigra::linalg::weightedLeastSquares(A, b, weigths, x);
   }
 
+  else if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LS == algorithmIndex)
+    linearSolve(A, b, x);
+
   else if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::vigratest == algorithmIndex)
     linearSolve(A, b, x);
-  //mitkThrow() << "nothing implemented";
+    //mitkThrow() << "nothing implemented";
 
   else
     mitkThrow() << "404 VIGRA ALGORITHM NOT FOUND";
 
-  Eigen::VectorXf result(numberOfChromophores);
   for (int k = 0; k < numberOfChromophores; ++k)
   {
     float test = x(k, 0);
-    result[k] = test;
+    resultVector[k] = test;
   }
 
   return resultVector;

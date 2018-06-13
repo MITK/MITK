@@ -679,6 +679,11 @@
      </item>
      <item>
       <property name="text">
+       <string>LS</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>jacobiSvd</string>
       </property>
      </item>

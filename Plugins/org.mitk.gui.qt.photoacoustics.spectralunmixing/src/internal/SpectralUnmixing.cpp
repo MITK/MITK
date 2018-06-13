@@ -191,6 +191,13 @@ void SpectralUnmixing::DoImageProcessing()
           ->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED);
       }
 
+      else if (Algorithm == "LS")
+      {
+        m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
+        dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra*>(m_SpectralUnmixingFilter.GetPointer())
+          ->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LS);
+      }
+
       else if (Algorithm == "vigratest")
       {
         m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();

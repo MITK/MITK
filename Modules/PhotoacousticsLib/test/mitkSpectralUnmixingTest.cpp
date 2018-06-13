@@ -105,9 +105,9 @@ public:
 
     //Set Chromophores to filter
     m_SpectralUnmixingFilter->AddChromophore(
-      mitk::pa::SpectralUnmixingFilterBase::ChromophoreType::OXYGENATED_HEMOGLOBIN);
+      mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
     m_SpectralUnmixingFilter->AddChromophore(
-      mitk::pa::SpectralUnmixingFilterBase::ChromophoreType::DEOXYGENATED_HEMOGLOBIN);
+      mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
 
     m_SpectralUnmixingFilter->Update();
 

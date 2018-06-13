@@ -44,10 +44,12 @@ void mitk::pa::SpectralUnmixingSO2::GenerateData()
 
   unsigned int xDim = inputHbO2->GetDimensions()[0];
   unsigned int yDim = inputHbO2->GetDimensions()[1];
-  unsigned int size = xDim * yDim;
+  unsigned int zDim = inputHbO2->GetDimensions()[2];
+  unsigned int size = xDim * yDim*zDim;
 
   MITK_INFO << "x dimension: " << xDim;
   MITK_INFO << "y dimension: " << yDim;
+  MITK_INFO << "z dimension: " << zDim;
 
   InitializeOutputs();
 
@@ -62,15 +64,18 @@ void mitk::pa::SpectralUnmixingSO2::GenerateData()
   {
     for (unsigned int y = 0; y < yDim; y++)
     {
-      // Calculate SO2 and write to output
-      unsigned int pixelNumber = x * yDim + y;
-      float pixelHb = inputDataArrayHb[pixelNumber];
-      float pixelHbO2 = inputDataArrayHbO2[pixelNumber];
-      float resultSO2 = calculateSO2(pixelHb, pixelHbO2);
-      auto output = GetOutput(0);
-      mitk::ImageWriteAccessor writeOutput(output);
-      float* writeBuffer = (float *)writeOutput.GetData();
-      writeBuffer[x*yDim + y] = resultSO2;
+      for (unsigned int z = 0;z < zDim; z++)
+      {
+        // Calculate SO2 and write to output
+        unsigned int pixelNumber = (xDim*yDim * z) + x * yDim + y;
+        float pixelHb = inputDataArrayHb[pixelNumber];
+        float pixelHbO2 = inputDataArrayHbO2[pixelNumber];
+        float resultSO2 = calculateSO2(pixelHb, pixelHbO2);
+        auto output = GetOutput(0);
+        mitk::ImageWriteAccessor writeOutput(output);
+        float* writeBuffer = (float *)writeOutput.GetData();
+        writeBuffer[(xDim*yDim * z) + x * yDim + y] = resultSO2;
+      }
     }
   }
   MITK_INFO << "GENERATING DATA...[DONE]";
@@ -80,11 +85,13 @@ void mitk::pa::SpectralUnmixingSO2::CheckPreConditions(mitk::Image::Pointer inpu
 {
   unsigned int xDimHb = inputHb->GetDimensions()[0];
   unsigned int yDimHb = inputHb->GetDimensions()[1];
+  unsigned int zDimHb = inputHb->GetDimensions()[2];
 
   unsigned int xDimHbO2 = inputHbO2->GetDimensions()[0];
   unsigned int yDimHbO2 = inputHbO2->GetDimensions()[1];
+  unsigned int zDimHbO2 = inputHbO2->GetDimensions()[2];
 
-  if (xDimHb != xDimHbO2 || yDimHb != yDimHbO2)
+  if (xDimHb != xDimHbO2 || yDimHb != yDimHbO2 || zDimHb != zDimHbO2)
     mitkThrow() << "DIMENTIONALITY ERROR!";
 
   MITK_INFO << "CHECK PRECONDITIONS ...[DONE]";
@@ -95,9 +102,9 @@ void mitk::pa::SpectralUnmixingSO2::InitializeOutputs()
   unsigned int numberOfInputs = GetNumberOfIndexedInputs();
   unsigned int numberOfOutputs = GetNumberOfIndexedOutputs();
 
-  //  Set dimensions (2) and pixel type (float) for output
+  //  Set dimensions (3) and pixel type (float) for output
   mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();
-  const int NUMBER_OF_SPATIAL_DIMENSIONS = 2;
+  const int NUMBER_OF_SPATIAL_DIMENSIONS = 3;
   auto* dimensions = new unsigned int[NUMBER_OF_SPATIAL_DIMENSIONS];
   for(unsigned int dimIdx=0; dimIdx<NUMBER_OF_SPATIAL_DIMENSIONS; dimIdx++)
   {

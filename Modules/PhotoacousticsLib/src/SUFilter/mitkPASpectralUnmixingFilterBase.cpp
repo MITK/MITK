@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::pa::SpectralUnmixingFilterBase::SpectralUnmixingFilterBase()
 {
-  this->SetNumberOfIndexedOutputs(4);// find solution --> 4 is max outputs
+  this->SetNumberOfIndexedOutputs(3);// find solution --> 4 is max outputs
 
   for (unsigned int i = 0; i<GetNumberOfIndexedOutputs(); i++)
   {
@@ -71,6 +71,7 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
 
   unsigned int sequenceSize = m_Wavelength.size();
   unsigned int TotalNumberOfSequences = NumberOfInputImages / sequenceSize;
+  MITK_INFO << "TotalNumberOfSequences: " << TotalNumberOfSequences;
 
   InitializeOutputs(TotalNumberOfSequences);
   
@@ -89,6 +90,7 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
   std::chrono::steady_clock::time_point _start(std::chrono::steady_clock::now());
   for (unsigned int SequenceCounter = 0; SequenceCounter < TotalNumberOfSequences;++SequenceCounter)
   {
+    MITK_INFO << "SequenceCounter: " << SequenceCounter;
     //loop over every pixel @ x,y plane
     for (unsigned int x = 0; x < xDim; x++)
     {
@@ -157,7 +159,7 @@ void mitk::pa::SpectralUnmixingFilterBase::InitializeOutputs(unsigned int TotalN
   unsigned int numberOfOutputs = GetNumberOfIndexedOutputs();
   MITK_INFO << "Inputs: " << numberOfInputs << " Outputs: " << numberOfOutputs;
 
-  //  Set dimensions (2) and pixel type (float) for output
+  //  Set dimensions (3) and pixel type (float) for output
   mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();
   const int NUMBER_OF_SPATIAL_DIMENSIONS = 3;
   auto* dimensions = new unsigned int[NUMBER_OF_SPATIAL_DIMENSIONS];

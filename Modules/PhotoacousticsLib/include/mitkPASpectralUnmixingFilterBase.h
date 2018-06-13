@@ -52,7 +52,7 @@ namespace mitk {
       virtual void CheckPreConditions(unsigned int size, unsigned int NumberOfInputImages, const float* inputDataArray);
 
       virtual void GenerateData() override;
-      virtual void InitializeOutputs();
+      virtual void InitializeOutputs(unsigned int TotalNumberOfSequences);
 
       virtual Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> CalculateEndmemberMatrix(
         std::vector<mitk::pa::PropertyCalculator::ChromophoreType> m_Chromophore, std::vector<int> m_Wavelength);

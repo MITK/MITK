@@ -78,159 +78,11 @@ Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::SpectralUnmixingAlgorithm
   Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
 {
   Eigen::VectorXf resultVector;
-
-  if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LARS == algorithmIndex)
-    resultVector = NNLSLARS(EndmemberMatrix, inputVector);
-
-  if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::GOLDFARB == algorithmIndex)
-    resultVector = NNLSGoldfarb(EndmemberMatrix, inputVector);
-
-  if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED == algorithmIndex)
-    resultVector = weightedLeastSquares(EndmemberMatrix, inputVector);
-
-  if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::vigratest == algorithmIndex)
-    resultVector = LS(EndmemberMatrix, inputVector);
-    //mitkThrow() << "nothing implemented";
-
-  return resultVector;
-}
-
-
-Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::NNLSLARS(
-  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
-{
-  using namespace vigra;
-  using namespace vigra::linalg;
-
   int numberOfWavelengths = EndmemberMatrix.rows();
   int numberOfChromophores = EndmemberMatrix.cols();
 
-  std::vector<double> A_data;
-  std::vector<double> B_data;
-
-  for (int i = 0; i < numberOfWavelengths; ++i)
-  {
-    B_data.push_back(inputVector(i));
-    for (int j = 0; j < numberOfChromophores; ++j)
-    {
-      A_data.push_back(EndmemberMatrix(i, j));
-    }
-  }
-
-  const double* Adat = A_data.data();
-  const double* Bdat = B_data.data();
-
-  vigra::Matrix<double> A(Shape2(numberOfWavelengths, numberOfChromophores), Adat);
-  vigra::Matrix<double> b(Shape2(numberOfWavelengths, 1), Bdat);
-  vigra::Matrix<double> x(Shape2(numberOfChromophores, 1));
-
-  // minimize (A*x-b)^2  s.t. x>=0 using least angle regression (LARS algorithm)
-  nonnegativeLeastSquares(A, b, x);
-
-  Eigen::VectorXf result(numberOfChromophores);
-  for (int k = 0; k < numberOfChromophores; ++k)
-  {
-    float test = x(k, 0);
-    result[k] = test;
-  }
-  return result;
-}
-
-Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::LS(
-  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
-{
   using namespace vigra;
   using namespace vigra::linalg;
-
-  int numberOfWavelengths = EndmemberMatrix.rows();
-  int numberOfChromophores = EndmemberMatrix.cols();
-
-  std::vector<double> A_data;
-  std::vector<double> B_data;
-
-  for (int i = 0; i < numberOfWavelengths; ++i)
-  {
-    B_data.push_back(inputVector(i));
-    for (int j = 0; j < numberOfChromophores; ++j)
-    {
-      A_data.push_back(EndmemberMatrix(i, j));
-    }
-  }
-
-  const double* Adat = A_data.data();
-  const double* Bdat = B_data.data();
-
-  vigra::Matrix<double> A(Shape2(numberOfWavelengths, numberOfChromophores), Adat);
-  vigra::Matrix<double> b(Shape2(numberOfWavelengths, 1), Bdat);
-  vigra::Matrix<double> x(Shape2(numberOfChromophores, 1));
-
-  // minimize (A*x-b)^2  s.t. x>=0 using least angle regression (LARS algorithm)
-  linearSolve(A, b, x);
-
-  Eigen::VectorXf result(numberOfChromophores);
-  for (int k = 0; k < numberOfChromophores; ++k)
-  {
-    float test = x(k, 0);
-    result[k] = test;
-  }
-  return result;
-}
-
-Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::NNLSGoldfarb(
-  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
-{
-  using namespace vigra;
-  using namespace vigra::linalg;
-
-  int numberOfWavelengths = EndmemberMatrix.rows();
-  int numberOfChromophores = EndmemberMatrix.cols();
-
-  std::vector<double> A_data;
-  std::vector<double> B_data;
-
-  for (int i = 0; i < numberOfWavelengths; ++i)
-  {
-    B_data.push_back(inputVector(i));
-    for (int j = 0; j < numberOfChromophores; ++j)
-    {
-      A_data.push_back(EndmemberMatrix(i, j));
-    }
-  }
-
-  const double* Adat = A_data.data();
-  const double* Bdat = B_data.data();
-
-  vigra::Matrix<double> A(Shape2(numberOfWavelengths, numberOfChromophores), Adat);
-  vigra::Matrix<double> b(Shape2(numberOfWavelengths, 1), Bdat);
-  vigra::Matrix<double> x(Shape2(numberOfChromophores, 1));
-
-  vigra::Matrix<double> eye(identityMatrix<double>(numberOfChromophores)),
-    zeros(Shape2(numberOfChromophores, 1)),
-    empty,
-    U = transpose(A)*A,
-    v = -transpose(A)*b;
-  x = 0;
-
-  // minimize (A*x-b)^2  s.t. x>=0 using the Goldfarb-Idnani algorithm
-  quadraticProgramming(U, v, empty, empty, eye, zeros, x);
-
-  Eigen::VectorXf result(numberOfChromophores);
-  for (int k = 0; k < numberOfChromophores; ++k)
-  {
-    float test = x(k, 0);
-    result[k] = test;
-  }
-  return result;
-}
-
-Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::weightedLeastSquares(
-  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
-{
-  using namespace vigra;
-  using namespace vigra::linalg;
-
-  int numberOfWavelengths = EndmemberMatrix.rows();
-  int numberOfChromophores = EndmemberMatrix.cols();
 
   std::vector<double> A_data;
   std::vector<double> B_data;
@@ -247,14 +99,43 @@ Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::weightedLeastSquares(
 
   const double* Adat = A_data.data();
   const double* Bdat = B_data.data();
-  const double* weightsdat = weightsvec.data();
 
   vigra::Matrix<double> A(Shape2(numberOfWavelengths, numberOfChromophores), Adat);
   vigra::Matrix<double> b(Shape2(numberOfWavelengths, 1), Bdat);
-  vigra::Matrix<double> weigths(Shape2(numberOfWavelengths, 1), weightsdat);
   vigra::Matrix<double> x(Shape2(numberOfChromophores, 1));
 
-  vigra::linalg::weightedLeastSquares(A, b, weigths, x);
+  // minimize (A*x-b)^2  s.t. x>=0 using least angle regression (LARS algorithm)
+  if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LARS == algorithmIndex)
+    nonnegativeLeastSquares(A, b, x);
+
+  else if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::GOLDFARB == algorithmIndex)
+  {
+    vigra::Matrix<double> eye(identityMatrix<double>(numberOfChromophores)),
+      zeros(Shape2(numberOfChromophores, 1)),
+      empty,
+      U = transpose(A)*A,
+      v = -transpose(A)*b;
+    x = 0;
+
+    // minimize (A*x-b)^2  s.t. x>=0 using the Goldfarb-Idnani algorithm
+    quadraticProgramming(U, v, empty, empty, eye, zeros, x);
+  }
+
+  else if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED == algorithmIndex)
+  {
+    std::vector<double> weightsvec = { 1,1,1,1,1 }; //am besten über GUI Eingabe festlegen
+    const double* weightsdat = weightsvec.data();
+    vigra::Matrix<double> weigths(Shape2(numberOfWavelengths, 1), weightsdat);
+
+    vigra::linalg::weightedLeastSquares(A, b, weigths, x);
+  }
+
+  else if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::vigratest == algorithmIndex)
+    linearSolve(A, b, x);
+  //mitkThrow() << "nothing implemented";
+
+  else
+    mitkThrow() << "404 VIGRA ALGORITHM NOT FOUND";
 
   Eigen::VectorXf result(numberOfChromophores);
   for (int k = 0; k < numberOfChromophores; ++k)
@@ -262,5 +143,6 @@ Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::weightedLeastSquares(
     float test = x(k, 0);
     result[k] = test;
   }
-  return result;
+
+  return resultVector;
 }

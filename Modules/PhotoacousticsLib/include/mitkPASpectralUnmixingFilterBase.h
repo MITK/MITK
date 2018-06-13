@@ -33,19 +33,10 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT SpectralUnmixingFilterBase : public mitk::ImageToImageFilter
     {
     public:
-
       mitkClassMacro(SpectralUnmixingFilterBase, mitk::ImageToImageFilter);
 
-      // Contains all (so far) possible chromophores
-
-
-      // Void to creat m_vector of all chosen chromophores with push back method
       void AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType);
-      
-      // Void to creat m_vector of all wavelengths with push back method
       void AddWavelength(int wavelength);
-
-
 
     protected:
       SpectralUnmixingFilterBase();
@@ -58,7 +49,6 @@ namespace mitk {
         Eigen::VectorXf inputVector) = 0;
 
     private:
-      // Void checking precondtions possibly throwing exeptions
       virtual void CheckPreConditions(unsigned int size, unsigned int NumberOfInputImages, const float* inputDataArray);
 
       virtual void GenerateData() override;
@@ -69,7 +59,6 @@ namespace mitk {
       PropertyCalculator::Pointer m_PropertyCalculatorEigen;
 
       virtual float propertyElement(mitk::pa::PropertyCalculator::ChromophoreType, int wavelength);
-            
     };
   }
 }

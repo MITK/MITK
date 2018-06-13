@@ -75,20 +75,13 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
   
   // Copy input image into array
   mitk::ImageReadAccessor readAccess(input);
-
   const float* inputDataArray = ((const float*)readAccess.GetData());
 
   CheckPreConditions(size, zDim, inputDataArray);
 
-  /* READ OUT INPUTARRAY
-  MITK_INFO << "Info Array:";
-  int numberOfPixels= 6;
-  for (int i=0; i< numberOfPixels; ++i)
-    MITK_INFO << inputDataArray[i];/**/
-
   // test to see pixel values @ txt file
-  ofstream myfile;
-  myfile.open("PASpectralUnmixingPixelValues.txt");
+  //ofstream myfile;
+  //myfile.open("PASpectralUnmixingPixelValues.txt");
 
   std::chrono::steady_clock::time_point _start(std::chrono::steady_clock::now());
 
@@ -104,17 +97,10 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
         unsigned int pixelNumber = (xDim*yDim*z) + x * yDim + y;
         auto pixel = inputDataArray[pixelNumber];
 
-        //MITK_INFO << "Pixel_values: " << pixel;
-
-        // dummy values for pixel for testing purposes
-        //float pixel = rand();
-
         //write all wavelength absorbtion values for one(!) pixel to a vector
         inputVector[z] = pixel;
       }
       Eigen::VectorXf resultVector = SpectralUnmixingAlgorithm(EndmemberMatrix, inputVector);
-      //Eigen::VectorXf resultVector = SpectralUnmixingAlgorithm(m_Chromophore, inputVector);
-
 
       // write output
       for (int outputIdx = 0; outputIdx < GetNumberOfIndexedOutputs(); ++outputIdx)
@@ -124,14 +110,14 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
         float* writeBuffer = (float *)writeOutput.GetData();
         writeBuffer[x*yDim + y] = resultVector[outputIdx]; 
       }
-      myfile << "Input Pixel(x,y): " << x << "," << y << "\n" << inputVector << "\n";
-      myfile << "Result: "  << "\n HbO2: " << resultVector[0] << "\n Hb: " << resultVector[1] << "\n Mel: "
-        << resultVector[2] << "Result vector size" << resultVector.size() << "\n";
+      //myfile << "Input Pixel(x,y): " << x << "," << y << "\n" << inputVector << "\n";
+      //myfile << "Result: "  << "\n HbO2: " << resultVector[0] << "\n Hb: " << resultVector[1] << "\n Mel: "
+      //  << resultVector[2] << "Result vector size" << resultVector.size() << "\n";
     }
   }
   std::chrono::steady_clock::time_point _end(std::chrono::steady_clock::now());
   MITK_INFO << "GENERATING DATA...[DONE]";
-  myfile.close();
+  //myfile.close();
   MITK_INFO << "Chrono: " << std::chrono::duration_cast<std::chrono::duration<double>>(    _end - _start).count() << "s";
 }
 
@@ -142,7 +128,7 @@ void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(unsigned int size,
     mitkThrow() << "CHECK INPUTS! WAVELENGTHERROR";
 
   // Checking if number of wavelengths >= number of chromophores
-  if (m_Chromophore.size() > m_Wavelength.size())
+  if (m_Chromophore.size() >= m_Wavelength.size())
     mitkThrow() << "PRESS 'IGNORE' AND ADD MORE WAVELENGTHS!";
 
   // Checking if pixel type is float
@@ -163,7 +149,7 @@ void mitk::pa::SpectralUnmixingFilterBase::InitializeOutputs()
 {
   unsigned int numberOfInputs = GetNumberOfIndexedInputs();
   unsigned int numberOfOutputs = GetNumberOfIndexedOutputs();
-  //MITK_INFO << "Inputs: " << numberOfInputs << " Outputs: " << numberOfOutputs;
+  MITK_INFO << "Inputs: " << numberOfInputs << " Outputs: " << numberOfOutputs;
 
   //  Set dimensions (2) and pixel type (float) for output
   mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();
@@ -220,7 +206,6 @@ Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingF
       mitkThrow() << "404 CHROMOPHORE NOT FOUND!";
   }
   MITK_INFO << "GENERATING ENMEMBERMATRIX [DONE]!";
-  MITK_INFO << "endmember matrix: " << EndmemberMatrixEigen;
   return EndmemberMatrixEigen;
 }
 

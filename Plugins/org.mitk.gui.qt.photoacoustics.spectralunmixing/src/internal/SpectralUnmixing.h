@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_SpectralUnmixingControls.h"
 
-#include "mitkPAPropertyCalculator.h"
-
 class SpectralUnmixing : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
@@ -48,10 +46,7 @@ protected:
   virtual void ClearWavelength();
 
   Ui::SpectralUnmixingControls m_Controls;
-  mitk::pa::PropertyCalculator::Pointer m_PropertyCalculator;
 
-  // Add Wavelengths with button:
-  int size = 0;
   std::vector<int> m_Wavelengths;
 
   // Selection of Chromophores

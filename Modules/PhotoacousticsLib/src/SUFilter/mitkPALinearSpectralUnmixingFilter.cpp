@@ -79,5 +79,6 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
   bool resultIsApprox = inputVector.isApprox(EndmemberMatrix*resultVector, accuracyLevel);
   MITK_INFO << "IS APPROX RESULT: " << resultIsApprox;*/
   //MITK_INFO << "Result vector: " << resultVector;
+  //++++++++++++++++++Maybe add this as additional ouptu image++++++++++++++++++++++
   return resultVector;
 }

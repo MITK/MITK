@@ -108,7 +108,7 @@ void SpectralUnmixing::DoImageProcessing()
       message << ".";
       MITK_INFO << message.str();
 
-      // Set Algortihm to filter
+      //Tranfer GUI information(Algortihm) to filter
       auto qs = m_Controls.QComboBoxAlgorithm->currentText();
       std::string Algorithm = qs.toUtf8().constData();
 
@@ -209,7 +209,7 @@ void SpectralUnmixing::DoImageProcessing()
 
       m_SpectralUnmixingFilter->SetInput(image);
 
-      // Wavelength implementation
+      //Tranfer GUI information(Wavelength) to filter
       ClearWavelength();
       int col = 0;
       int Wavelength = 1;
@@ -222,7 +222,7 @@ void SpectralUnmixing::DoImageProcessing()
         ++col;
       }
 
-      // Checking which chromophores wanted for SU if none throw exeption!
+      //Tranfer GUI information(Chromophores) to filter
       unsigned int numberofChromophores = 0;
       DeOxbool = m_Controls.checkBoxDeOx->isChecked();
       Oxbool = m_Controls.checkBoxOx->isChecked();
@@ -236,7 +236,6 @@ void SpectralUnmixing::DoImageProcessing()
       {
         numberofChromophores += 1;
         MITK_INFO << "- Oxyhemoglobin";
-        // Set chromophore Oxyhemoglobon:
         m_SpectralUnmixingFilter->AddChromophore(
         mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
       }
@@ -244,7 +243,6 @@ void SpectralUnmixing::DoImageProcessing()
       {
         numberofChromophores += 1;
          MITK_INFO << "- Deoxygenated hemoglobin";
-        // Set chromophore Deoxygenated hemoglobin:
          m_SpectralUnmixingFilter->AddChromophore(
         mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
       }
@@ -269,11 +267,12 @@ void SpectralUnmixing::DoImageProcessing()
 
       MITK_INFO << "Updating Filter...";
       m_SpectralUnmixingFilter->Update();
-
+      int outputCounter = 0;
       // Write Output images to Data Storage
       if (Oxbool)
       {
-        mitk::Image::Pointer HbO2 = m_SpectralUnmixingFilter->GetOutput(0);
+        mitk::Image::Pointer HbO2 = m_SpectralUnmixingFilter->GetOutput(outputCounter);
+        outputCounter += 1;
         mitk::DataNode::Pointer dataNodeHbO2 = mitk::DataNode::New();
         dataNodeHbO2->SetData(HbO2);
         dataNodeHbO2->SetName("HbO2 " + Algorithm);
@@ -282,7 +281,8 @@ void SpectralUnmixing::DoImageProcessing()
 
       if (DeOxbool)
       {
-        mitk::Image::Pointer Hb = m_SpectralUnmixingFilter->GetOutput(1);
+        mitk::Image::Pointer Hb = m_SpectralUnmixingFilter->GetOutput(outputCounter);
+        outputCounter += 1;
         mitk::DataNode::Pointer dataNodeHb = mitk::DataNode::New();
         dataNodeHb->SetData(Hb);
         dataNodeHb->SetName("Hb " + Algorithm);
@@ -291,7 +291,8 @@ void SpectralUnmixing::DoImageProcessing()
 
       if (Melaninbool)
       {
-        mitk::Image::Pointer Melanin = m_SpectralUnmixingFilter->GetOutput(2);
+        mitk::Image::Pointer Melanin = m_SpectralUnmixingFilter->GetOutput(outputCounter);
+        outputCounter += 1;
         mitk::DataNode::Pointer dataNodeMelanin = mitk::DataNode::New();
         dataNodeMelanin->SetData(Melanin);
         dataNodeMelanin->SetName("Melanin " + Algorithm);
@@ -300,7 +301,7 @@ void SpectralUnmixing::DoImageProcessing()
 
       if (Onebool)
       {
-        mitk::Image::Pointer One = m_SpectralUnmixingFilter->GetOutput(3);
+        mitk::Image::Pointer One = m_SpectralUnmixingFilter->GetOutput(outputCounter);
         mitk::DataNode::Pointer dataNodeOne = mitk::DataNode::New();
         dataNodeOne->SetData(One);
         dataNodeOne->SetName("One " + Algorithm);
@@ -318,7 +319,6 @@ void SpectralUnmixing::DoImageProcessing()
           mitkThrow() << "SELECT CHROMOPHORE OXYHEMOGLOBIN!";
 
         MITK_INFO << "CALCULATE OXYGEN SATURATION ...";
-        // Initialize pipeline from SU filter class to SO2 class
         auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
 
         // Oxygen Saturation Setting
@@ -334,6 +334,8 @@ void SpectralUnmixing::DoImageProcessing()
           else
             m_sO2->AddSO2Settings(0);
         }
+
+        // Initialize pipeline from SU filter class to SO2 class
 
         auto output1 = m_SpectralUnmixingFilter->GetOutput(0);
         auto output2 = m_SpectralUnmixingFilter->GetOutput(1);

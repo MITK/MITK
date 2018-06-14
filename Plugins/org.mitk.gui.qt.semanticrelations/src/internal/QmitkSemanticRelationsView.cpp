@@ -68,7 +68,7 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
 
 void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* node)
 {
-  // ToDo: automatically remove node from storage, so that there will be no access anymore
+  OnImageRemoved(node);
 }
 
 void QmitkSemanticRelationsView::OnCaseIDSelectionChanged(const QString& caseID)

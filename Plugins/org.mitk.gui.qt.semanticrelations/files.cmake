@@ -1,5 +1,6 @@
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
+  QmitkSemanticRelationsNodeSelectionDialog.cpp
   QmitkSemanticRelationsView.cpp
 )
 
@@ -9,6 +10,7 @@ set(UI_FILES
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
+  src/internal/QmitkSemanticRelationsNodeSelectionDialog.h
   src/internal/QmitkSemanticRelationsView.h
 )
 

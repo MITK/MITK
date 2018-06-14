@@ -18,63 +18,75 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITKPATIENTTABLEMODEL_H
 
 // semantic relations module
-#include <mitkSemanticRelations.h>
 #include <mitkSemanticTypes.h>
 
-// qt
-#include <QAbstractTableModel>
+// semantic relations UI module
+#include <QmitkSemanticRelationsModel.h>
 
 // mitk core
 #include <mitkDataNode.h>
 
+// qt
+#include <QPixmap>
+
 /*
-* @brief The QmitkPatientTableModel is the model for the 'QmitkPatientTableWidget' and holds the control point data and information type data of the currently selected case.
+* @brief The QmitkPatientTableModel is a subclass of the QmitkSemanticRelationsModel and holds the control point data and information type data of the currently selected case.
 *
 *   The QmitkPatientTableModel uses the 'data' function to return either the data node of a table cell or the thumbnail of the underlying image.
 *   The horizontal header of the table shows the control points of the current case and the vertical header of the table shows the information types of the current case.
 *   Using the 'GetFilteredData'-function of the SemanticRelations-class the model is able to retrieve the correct data node for each table entry.
 *
-*   Additionally the QmitkPatientTableWidget holds the QPixmaps of the known data nodes in order to return a thumbnail, if needed.
-*
-*   If the 'QmitkPatientTableWidget' is updated, the 'SetCurrentCaseID'-function is called, which leads to a fresh retrieval of the control point data
-*   and the information type data.
+*   Additionally the model creates and holds the QPixmaps of the known data nodes in order to return a thumbnail, if needed.
 */
-class QmitkPatientTableModel : public QAbstractTableModel
+class QmitkPatientTableModel : public QmitkSemanticRelationsModel
 {
   Q_OBJECT 
    
 public:
 
-  QmitkPatientTableModel(std::shared_ptr<mitk::SemanticRelations> semanticRelations, QObject* parent = nullptr);
+  QmitkPatientTableModel(QObject* parent = nullptr);
   ~QmitkPatientTableModel();
 
   //////////////////////////////////////////////////////////////////////////
   // overridden functions from QAbstractItemModel
   //////////////////////////////////////////////////////////////////////////
-  virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
+  virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+  virtual QModelIndex parent(const QModelIndex &child) const override;
+
   virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
   virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+
   virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-  //virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+
   virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+  virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
   //////////////////////////////////////////////////////////////////////////
   /// end override
   /////////////////////////////////////////////////////////////////////////
 
-  const mitk::SemanticTypes::CaseID& GetCurrentCaseID() const { return m_CaseID; }
-  void SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID);
-  void SetPixmapOfNode(const mitk::DataNode* dataNode, QPixmap* pixmapFromImage);
-  void SetPatientData();
-  /*
-  * @brief Updates the table model with the current control point data and information type data from the semantic relations model, 
-  *        if the 'caseID' is equal to the currently selected case ID of the table model.
-  *        This function can be called from an observer of SemanticRelations (e.g. a table view that uses this model)
-  *        in order to propagate the Update-request to this model.
+  /**
+  * @brief The function uses the ID of the node to see if a pixmap was already set. If not, the given pixmap
+  *        is used and stored inside a member variable. If the pixmap was already set, it will be overwritten.
+  *        Using 'nullptr' as a pixmap will erase the entry for the given data node.
+  *
+  * @param dataNode           The data node whose pixmap should be set
+  * @param  pixmapFromImage   The pixmap that shows an image of the content of the data node
   */
-  void Update(const mitk::SemanticTypes::CaseID& caseID);
+  void SetPixmapOfNode(const mitk::DataNode* dataNode, QPixmap* pixmapFromImage);
 
-Q_SIGNALS:
-  void ModelUpdated();
+protected:
+
+  // the following functions have to be overridden but are not implemented in this model
+  virtual void NodePredicateChanged() override;
+  virtual void NodeAdded(const mitk::DataNode* node) override;
+  virtual void NodeChanged(const mitk::DataNode* node) override;
+  virtual void NodeRemoved(const mitk::DataNode* node) override;
+  /**
+  * @brief Overridden from 'QmitkSemanticRelationsModel': This function retrieves all control points
+  *        and information types of the current case and stores them to define the header of the table.
+  *        Furthermore all images are retrieved and the pixmap of the images are generated and stored.
+  */
+  virtual void SetData() override;
 
 private:
 
@@ -89,10 +101,8 @@ private:
   */
   mitk::DataNode* GetCurrentDataNode(const QModelIndex &index) const;
 
-  std::shared_ptr<mitk::SemanticRelations> m_SemanticRelations;
-  mitk::SemanticTypes::CaseID m_CaseID;
-
   std::map<std::string, QPixmap> m_PixmapMap;
+
   std::vector<mitk::SemanticTypes::InformationType> m_InformationTypes;
   std::vector<mitk::SemanticTypes::ControlPoint> m_ControlPoints;
 

@@ -28,13 +28,14 @@ class mitkSpectralUnmixingTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkSpectralUnmixingTestSuite);
   MITK_TEST(testEigenSUAlgorithm);
   MITK_TEST(testVigraSUAlgorithm);
-  MITK_TEST(testSimplexSUAlgorithm);
+  //MITK_TEST(testSimplexSUAlgorithm);
   CPPUNIT_TEST_SUITE_END();
 
 private:
   mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter;
   mitk::Image::Pointer inputImage;
-  std::vector<float> m_inputWavelengths;
+  std::vector<int> m_inputWavelengths;
+  std::vector<double> m_inputWeights;
   std::vector<float> m_CorrectResult;
   float threshold;
 
@@ -58,6 +59,9 @@ public:
     //Set wavelengths for unmixing:
     m_inputWavelengths.push_back(750);
     m_inputWavelengths.push_back(800);
+
+    m_inputWeights.push_back(50);
+    m_inputWeights.push_back(100);
 
     //Set fraction of Hb and HbO2 to unmix:
     float fracHb = 100;
@@ -93,15 +97,7 @@ public:
     auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
     m_SpectralUnmixingFilter->SetInput(inputImage);
 
-    // Set Algortihm to filter
-    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr);
-    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::ldlt);
-    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::llt);
-    m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::colPivHouseholderQr);
-    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::jacobiSvd);
-    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivLu);
-    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivHouseholderQr);
-    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::test);
+
 
     //Set wavelengths to filter
     for (unsigned int imageIndex = 0; imageIndex < m_inputWavelengths.size(); imageIndex++)
@@ -116,25 +112,38 @@ public:
     m_SpectralUnmixingFilter->AddChromophore(
       mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
 
-    m_SpectralUnmixingFilter->Update();
-
-
-    /*For printed pixel values and results look at: [...]\mitk-superbuild\MITK-build\Modules\PhotoacousticsLib\test\*/
     ofstream myfile;
     myfile.open("EigenTestResult.txt");
-    for (int i = 0; i < 2; ++i)
+
+    std::vector<mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType> m_Eigen = {
+    mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr, /* mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::ldlt, 
+    mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::llt,*/ mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::colPivHouseholderQr,
+    mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::jacobiSvd, mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivLu,
+    mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivHouseholderQr/*mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::test*/};
+
+    for (int Algorithmidx = 0; Algorithmidx < m_Eigen.size();++Algorithmidx)
     {
-      mitk::Image::Pointer output = m_SpectralUnmixingFilter->GetOutput(i);
-      mitk::ImageReadAccessor readAccess(output);
-      const float* inputDataArray = ((const float*)readAccess.GetData());
-      auto pixel = inputDataArray[0];
-      auto pixel2 = inputDataArray[1];
+      m_SpectralUnmixingFilter->SetAlgorithm(m_Eigen[Algorithmidx]);
 
-      myfile << "Output "<<i<<": "<<"\n" << inputDataArray[0] << "\n" << inputDataArray[1] << "\n";
-      myfile << "Correct Result: "  << "\n" << m_CorrectResult[i] << "\n" << m_CorrectResult[i+2] << "\n";
+      m_SpectralUnmixingFilter->Update();
 
-      CPPUNIT_ASSERT(std::abs(pixel - m_CorrectResult[i])<threshold);
-      CPPUNIT_ASSERT(std::abs(pixel2 - m_CorrectResult[i+2])<threshold);
+
+      /*For printed pixel values and results look at: [...]\mitk-superbuild\MITK-build\Modules\PhotoacousticsLib\test\*/
+
+      for (int i = 0; i < 2; ++i)
+      {
+        mitk::Image::Pointer output = m_SpectralUnmixingFilter->GetOutput(i);
+        mitk::ImageReadAccessor readAccess(output);
+        const float* inputDataArray = ((const float*)readAccess.GetData());
+        auto pixel = inputDataArray[0];
+        auto pixel2 = inputDataArray[1];
+
+        myfile << "Algorithmidx: " << Algorithmidx << "\n Output " << i << ": " << "\n" << inputDataArray[0] << "\n" << inputDataArray[1] << "\n";
+        myfile << "Correct Result: " << "\n" << m_CorrectResult[i] << "\n" << m_CorrectResult[i + 2] << "\n";
+
+        CPPUNIT_ASSERT(std::abs(pixel - m_CorrectResult[i]) < threshold);
+        CPPUNIT_ASSERT(std::abs(pixel2 - m_CorrectResult[i + 2]) < threshold);
+      }
     }
     myfile.close();
     MITK_INFO << "EIGEN FILTER TEST SUCCESFULL :)";
@@ -147,17 +156,15 @@ public:
     auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
     m_SpectralUnmixingFilter->SetInput(inputImage);
 
-    m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LARS);
-    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::GOLDFARB);
-    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED); //ADD WIEGHTS!
-    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LS);
-    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::vigratest);
+
 
     //Set wavelengths to filter
     for (unsigned int imageIndex = 0; imageIndex < m_inputWavelengths.size(); imageIndex++)
     {
       unsigned int wavelength = m_inputWavelengths[imageIndex];
+      double Weight = m_inputWeights[imageIndex];
       m_SpectralUnmixingFilter->AddWavelength(wavelength);
+      m_SpectralUnmixingFilter->AddWeight(Weight);
     }
 
     //Set Chromophores to filter
@@ -166,25 +173,38 @@ public:
     m_SpectralUnmixingFilter->AddChromophore(
       mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
 
-    m_SpectralUnmixingFilter->Update();
 
+    std::vector<mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType> Vigra = {
+    mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LARS, mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::GOLDFARB,
+    mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED, mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LS/*,
+    mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::vigratest*/};
 
-    /*For printed pixel values and results look at: [...]\mitk-superbuild\MITK-build\Modules\PhotoacousticsLib\test\*/
     ofstream myfile;
     myfile.open("VigraTestResult.txt");
-    for (int i = 0; i < 2; ++i)
+
+    for (int Algorithmidx = 0; Algorithmidx < Vigra.size();++Algorithmidx)
     {
-      mitk::Image::Pointer output = m_SpectralUnmixingFilter->GetOutput(i);
-      mitk::ImageReadAccessor readAccess(output);
-      const float* inputDataArray = ((const float*)readAccess.GetData());
-      auto pixel = inputDataArray[0];
-      auto pixel2 = inputDataArray[1];
+      m_SpectralUnmixingFilter->SetAlgorithm(Vigra[0]);
 
-      myfile << "Output " << i << ": " << "\n" << inputDataArray[0] << "\n" << inputDataArray[1] << "\n";
-      myfile << "Correct Result: " << "\n" << m_CorrectResult[i] << "\n" << m_CorrectResult[i + 2] << "\n";
+      m_SpectralUnmixingFilter->Update();
 
-      CPPUNIT_ASSERT(std::abs(pixel - m_CorrectResult[i])<threshold);
-      CPPUNIT_ASSERT(std::abs(pixel2 - m_CorrectResult[i + 2])<threshold);
+
+      /*For printed pixel values and results look at: [...]\mitk-superbuild\MITK-build\Modules\PhotoacousticsLib\test\*/
+
+      for (int i = 0; i < 2; ++i)
+      {
+        mitk::Image::Pointer output = m_SpectralUnmixingFilter->GetOutput(i);
+        mitk::ImageReadAccessor readAccess(output);
+        const float* inputDataArray = ((const float*)readAccess.GetData());
+        auto pixel = inputDataArray[0];
+        auto pixel2 = inputDataArray[1];
+
+        myfile << "Algorithmidx: " << Algorithmidx << "\n Output " << i << ": " << "\n" << inputDataArray[0] << "\n" << inputDataArray[1] << "\n";
+        myfile << "Correct Result: " << "\n" << m_CorrectResult[i] << "\n" << m_CorrectResult[i + 2] << "\n";
+
+        CPPUNIT_ASSERT(std::abs(pixel - m_CorrectResult[i]) < threshold);
+        CPPUNIT_ASSERT(std::abs(pixel2 - m_CorrectResult[i + 2]) < threshold);
+      }
     }
     myfile.close();
     MITK_INFO << "VIGRA FILTER TEST SUCCESFULL :)";

@@ -979,7 +979,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Some setups' hardware produces signal delays that need to be cropped out of the image before performing beamforming. To do this, select this box.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>Consider Hardware Delay</string>
+          <string>Consider Hardware Delay [µs]</string>
          </property>
          <property name="checked">
           <bool>false</bool>

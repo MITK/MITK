@@ -89,7 +89,6 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   m_Controls.UseImageSpacing->setToolTip("Image spacing of y-Axis must be in us, x-Axis in mm.");
   m_Controls.UseImageSpacing->setToolTipDuration(5000);
   m_Controls.ProgressInfo->setVisible(false);
-  m_Controls.UseBP->hide();
   m_Controls.UseGPUBmode->hide();
 
 #ifndef PHOTOACOUSTICS_USE_GPU
@@ -104,13 +103,13 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
 
 void PAImageProcessing::UseSignalDelay()
 {
-  if (m_Controls.UseSignalDelay->checked())
+  if (m_Controls.UseSignalDelay->isChecked())
   {
-    m_Controls.SignalDelay->enabled(true);
+    m_Controls.SignalDelay->setEnabled(true);
   }
   else
   {
-    m_Controls.SignalDelay->enabled(false);
+    m_Controls.SignalDelay->setEnabled(false);
   }
 }
 
@@ -257,7 +256,7 @@ void PAImageProcessing::BatchProcessing()
       float BPHighPass = 1000000 * m_Controls.BPhigh->value(); // [Hz]
       float BPLowPass = maxFrequency - 1000000 * m_Controls.BPlow->value(); // [Hz]
 
-      if (BPLowPass > maxFrequency && m_Controls.UseBP->isChecked())
+      if (BPLowPass > maxFrequency)
       {
         QMessageBox Msgbox;
         Msgbox.setText("LowPass too low, disabled it.");
@@ -265,7 +264,7 @@ void PAImageProcessing::BatchProcessing()
 
         BPLowPass = 0;
       }
-      if (BPLowPass < 0 && m_Controls.UseBP->isChecked())
+      if (BPLowPass < 0)
       {
         QMessageBox Msgbox;
         Msgbox.setText("LowPass too high, disabled it.");
@@ -273,7 +272,7 @@ void PAImageProcessing::BatchProcessing()
 
         BPLowPass = 0;
       }
-      if (BPHighPass > maxFrequency &&  m_Controls.UseBP->isChecked())
+      if (BPHighPass > maxFrequency)
       {
         QMessageBox Msgbox;
         Msgbox.setText("HighPass too high, disabled it.");
@@ -379,7 +378,7 @@ void PAImageProcessing::StartBeamformingThread()
 
       thread->setConfig(BFconfig);
 
-      if (m_Controls.UseSignalDelay->checked())
+      if (m_Controls.UseSignalDelay->isChecked())
         thread->setSignalDelay(m_Controls.SignalDelay->value());
 
       thread->setInputImage(image);
@@ -851,7 +850,6 @@ void PAImageProcessing::EnableControls()
   m_Controls.ReconstructionDepth->setEnabled(true);
   m_Controls.ImageType->setEnabled(true);
   m_Controls.Apodization->setEnabled(true);
-  m_Controls.UseBP->setEnabled(true);
 
 #ifdef PHOTOACOUSTICS_USE_GPU
   m_Controls.UseGPUBf->setEnabled(true);
@@ -904,7 +902,6 @@ void PAImageProcessing::DisableControls()
   m_Controls.ReconstructionDepth->setEnabled(false);
   m_Controls.ImageType->setEnabled(false);
   m_Controls.Apodization->setEnabled(false);
-  m_Controls.UseBP->setEnabled(false);
 
 #ifdef PHOTOACOUSTICS_USE_GPU
   m_Controls.UseGPUBf->setEnabled(false);
@@ -945,7 +942,8 @@ void BeamformingThread::run()
   mitk::Image::Pointer preprocessedImage = m_InputImage;
   if (m_SignalDelay != 0)
   {
-    int cropPixels = std::round(m_SignalDelay / m_BFconfig->GetTimeSpacing());
+    int cropPixels = std::round(m_SignalDelay / m_BFconfig->GetTimeSpacing() / 1000000);
+    MITK_INFO << cropPixels;
     preprocessedImage = m_FilterBank->ApplyCropping(m_InputImage, cropPixels, 0, 0, 0, 0, m_InputImage->GetDimension(2) - 1);
   }
 

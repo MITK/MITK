@@ -1,4 +1,4 @@
-///*===================================================================
+//*===================================================================
 
 //The Medical Imaging Interaction Toolkit (MITK)
 
@@ -18,12 +18,17 @@
 
 #include <mitkPASpectralUnmixingFilterBase.h>
 #include <mitkPALinearSpectralUnmixingFilter.h>
+#include <mitkPASpectralUnmixingFilterVigra.h>
+#include <mitkPASpectralUnmixingFilterSimplex.h>
+#include <mitkPASpectralUnmixingSO2.h>
 #include <mitkImageReadAccessor.h>
 
 class mitkSpectralUnmixingTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkSpectralUnmixingTestSuite);
-  MITK_TEST(testSUAlgorithm);
+  MITK_TEST(testEigenSUAlgorithm);
+  MITK_TEST(testVigraSUAlgorithm);
+  MITK_TEST(testSimplexSUAlgorithm);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -46,40 +51,42 @@ public:
 
     dimensions[0] = 1;
     dimensions[1] = 1;
-    dimensions[2] = 3;
+    dimensions[2] = 5;
 
     inputImage->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);
 
     //Set wavelengths for unmixing:
     m_inputWavelengths.push_back(750);
     m_inputWavelengths.push_back(800);
-    m_inputWavelengths.push_back(850);
 
     //Set fraction of Hb and HbO2 to unmix:
-    float fracHb = 0.396579;
-    float fracHbO2 = 0.594845;
+    float fracHb = 100;
+    float fracHbO2 = 300;
     m_CorrectResult.push_back(fracHbO2);
     m_CorrectResult.push_back(fracHb);
-
-    //Set threshold 1 digit
-    threshold = 0.000001;
+    m_CorrectResult.push_back(fracHbO2 + 10);
+    m_CorrectResult.push_back(fracHb - 10);
+    threshold = .01;
 
     //Multiply values of wavelengths (750,800,850 nm) with fractions to get pixel values:
     float px1 = fracHb * 7.52 + fracHbO2 * 2.77;
     float px2 = fracHb * 4.08 + fracHbO2 * 4.37;
-    float px3 = fracHb * 3.7 + fracHbO2 * 5.67;
+    float px3 = (fracHb - 10) * 7.52 + (fracHbO2 + 10) * 2.77;
+    float px4 = (fracHb - 10) * 4.08 + (fracHbO2 + 10) * 4.37;
 
     float* data = new float[3];
     data[0] = px1;
     data[1] = px2;
     data[2] = px3;
+    data[3] = px4;
+    data[5] = 200;
 
     inputImage->SetImportVolume(data, mitk::Image::ImportMemoryManagementType::CopyMemory);
     delete[] data;
     MITK_INFO << "[DONE]";
   }
 
-  void testSUAlgorithm()
+  void testEigenSUAlgorithm()
   {
     MITK_INFO << "START FILTER TEST ... ";
     // Set input image
@@ -111,16 +118,120 @@ public:
 
     m_SpectralUnmixingFilter->Update();
 
+
+    /*For printed pixel values and results look at: [...]\mitk-superbuild\MITK-build\Modules\PhotoacousticsLib\test\*/
+    ofstream myfile;
+    myfile.open("EigenTestResult.txt");
     for (int i = 0; i < 2; ++i)
     {
       mitk::Image::Pointer output = m_SpectralUnmixingFilter->GetOutput(i);
       mitk::ImageReadAccessor readAccess(output);
       const float* inputDataArray = ((const float*)readAccess.GetData());
       auto pixel = inputDataArray[0];
-      /*For printed pixel values and results look at: [...]\mitk-superbuild\MITK-build\Modules\PhotoacousticsLib\test\*/
+      auto pixel2 = inputDataArray[1];
+
+      myfile << "Output "<<i<<": "<<"\n" << inputDataArray[0] << "\n" << inputDataArray[1] << "\n";
+      myfile << "Correct Result: "  << "\n" << m_CorrectResult[i] << "\n" << m_CorrectResult[i+2] << "\n";
+
       CPPUNIT_ASSERT(std::abs(pixel - m_CorrectResult[i])<threshold);
+      CPPUNIT_ASSERT(std::abs(pixel2 - m_CorrectResult[i+2])<threshold);
     }
-    MITK_INFO << "FILTER TEST SUCCESFULL :)";
+    myfile.close();
+    MITK_INFO << "EIGEN FILTER TEST SUCCESFULL :)";
+  }
+
+  void testVigraSUAlgorithm()
+  {
+    MITK_INFO << "START FILTER TEST ... ";
+    // Set input image
+    auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
+    m_SpectralUnmixingFilter->SetInput(inputImage);
+
+    m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LARS);
+    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::GOLDFARB);
+    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED); //ADD WIEGHTS!
+    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LS);
+    //m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::vigratest);
+
+    //Set wavelengths to filter
+    for (unsigned int imageIndex = 0; imageIndex < m_inputWavelengths.size(); imageIndex++)
+    {
+      unsigned int wavelength = m_inputWavelengths[imageIndex];
+      m_SpectralUnmixingFilter->AddWavelength(wavelength);
+    }
+
+    //Set Chromophores to filter
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
+
+    m_SpectralUnmixingFilter->Update();
+
+
+    /*For printed pixel values and results look at: [...]\mitk-superbuild\MITK-build\Modules\PhotoacousticsLib\test\*/
+    ofstream myfile;
+    myfile.open("VigraTestResult.txt");
+    for (int i = 0; i < 2; ++i)
+    {
+      mitk::Image::Pointer output = m_SpectralUnmixingFilter->GetOutput(i);
+      mitk::ImageReadAccessor readAccess(output);
+      const float* inputDataArray = ((const float*)readAccess.GetData());
+      auto pixel = inputDataArray[0];
+      auto pixel2 = inputDataArray[1];
+
+      myfile << "Output " << i << ": " << "\n" << inputDataArray[0] << "\n" << inputDataArray[1] << "\n";
+      myfile << "Correct Result: " << "\n" << m_CorrectResult[i] << "\n" << m_CorrectResult[i + 2] << "\n";
+
+      CPPUNIT_ASSERT(std::abs(pixel - m_CorrectResult[i])<threshold);
+      CPPUNIT_ASSERT(std::abs(pixel2 - m_CorrectResult[i + 2])<threshold);
+    }
+    myfile.close();
+    MITK_INFO << "VIGRA FILTER TEST SUCCESFULL :)";
+  }
+
+  void testSimplexSUAlgorithm()
+  {
+    MITK_INFO << "START FILTER TEST ... ";
+    // Set input image
+    auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterSimplex::New();
+    m_SpectralUnmixingFilter->SetInput(inputImage);
+
+    //Set wavelengths to filter
+    for (unsigned int imageIndex = 0; imageIndex < m_inputWavelengths.size(); imageIndex++)
+    {
+      unsigned int wavelength = m_inputWavelengths[imageIndex];
+      m_SpectralUnmixingFilter->AddWavelength(wavelength);
+    }
+
+    //Set Chromophores to filter
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
+
+    m_SpectralUnmixingFilter->Update();
+
+
+    /*For printed pixel values and results look at: [...]\mitk-superbuild\MITK-build\Modules\PhotoacousticsLib\test\*/
+    ofstream myfile;
+    myfile.open("SimplexTestResult.txt");
+    for (int i = 0; i < 2; ++i)
+    {
+      mitk::Image::Pointer output = m_SpectralUnmixingFilter->GetOutput(i);
+      mitk::ImageReadAccessor readAccess(output);
+      const float* inputDataArray = ((const float*)readAccess.GetData());
+      auto pixel = inputDataArray[0];
+      auto pixel2 = inputDataArray[1];
+
+      myfile << "Output " << i << ": " << "\n" << inputDataArray[0] << "\n" << inputDataArray[1] << "\n";
+      myfile << "Correct Result: " << "\n" << m_CorrectResult[i] << "\n" << m_CorrectResult[i + 2] << "\n";
+
+      CPPUNIT_ASSERT(std::abs(pixel - m_CorrectResult[i])<threshold);
+      CPPUNIT_ASSERT(std::abs(pixel2 - m_CorrectResult[i + 2])<threshold);
+    }
+    myfile.close();
+    MITK_INFO << "SIMPLEX FILTER TEST SUCCESFULL :)";
   }
 
   void tearDown() override

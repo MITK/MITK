@@ -186,6 +186,8 @@ namespace mitk
     // FUNCTIONS
     void UnselectAll(unsigned int timeStep , ScalarType timeInMs);
     void SelectPoint(int position, unsigned int timeStep  , ScalarType timeInMS);
+
+    virtual int getInsertPosition(unsigned int timeStep);
   };
 
 }

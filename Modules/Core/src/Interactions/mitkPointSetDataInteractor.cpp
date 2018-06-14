@@ -43,6 +43,22 @@ void mitk::PointSetDataInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("removePoint", RemovePoint);
 }
 
+int mitk::PointSetDataInteractor::getInsertPosition(unsigned int timeStep)
+{
+  int lastPosition = 0;
+  mitk::PointSet::PointsIterator it, end;
+  it = m_PointSet->Begin(timeStep);
+  end = m_PointSet->End(timeStep);
+  while (it != end)
+  {
+    if (!m_PointSet->IndexExists(lastPosition, timeStep))
+      break;
+    ++it;
+    ++lastPosition;
+  }
+  return lastPosition;
+}
+
 void mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
 {
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
@@ -57,31 +73,27 @@ void mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineActi
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
-    mitk::Point3D itkPoint = positionEvent->GetPositionInWorld();
+    mitk::Point3D itkPoint;
+    const mitk::BaseRenderer::Pointer sender = interactionEvent->GetSender();
+    if (mitk::BaseRenderer::GetInstance(sender->GetRenderWindow())->GetMapperID() == mitk::BaseRenderer::Standard2D) {
+      itkPoint = positionEvent->GetPlanePositionInWorld();
+    } else {
+      itkPoint = positionEvent->GetPositionInWorld();
+    }
 
     this->UnselectAll( timeStep, timeInMs);
-
-    int lastPosition = 0;
-    mitk::PointSet::PointsIterator it, end;
-    it = m_PointSet->Begin(timeStep);
-    end = m_PointSet->End(timeStep);
-    while( it != end )
-    {
-      if (!m_PointSet->IndexExists(lastPosition,timeStep))
-        break;
-      ++it;
-      ++lastPosition;
-    }
 
     // Insert a Point to the PointSet
     // 2) Create the Operation inserting the point
 
-    PointOperation* doOp = new mitk::PointOperation(OpINSERT,timeInMs, itkPoint, lastPosition);
+    auto position = getInsertPosition(timeStep);
+
+    PointOperation* doOp = new mitk::PointOperation(OpINSERT,timeInMs, itkPoint, position);
 
     // 3) If Undo is enabled, also create the inverse Operation
     if (m_UndoEnabled)
     {
-      PointOperation *undoOp = new mitk::PointOperation( OpREMOVE,timeInMs, itkPoint, lastPosition);
+      PointOperation *undoOp = new mitk::PointOperation( OpREMOVE,timeInMs, itkPoint, position);
       // 4) Do and Undo Operations are combined in an Operation event which also contains the target of the operations (here m_PointSet)
       OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp, "Add point");
       // 5) Store the Operation in the UndoController

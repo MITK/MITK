@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations plugin
 #include "QmitkSemanticRelationsView.h"
+#include "QmitkSemanticRelationsNodeSelectionDialog.h"
 
 // semantic relations module
 #include <mitkNodePredicates.h>
@@ -32,11 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkSemanticRelationsView::VIEW_ID = "org.mitk.views.semanticrelations";
 
 QmitkSemanticRelationsView::QmitkSemanticRelationsView()
-  : m_PatientTableWidget(nullptr)
-  , m_SimpleDatamanagerWidget(nullptr)
-  , m_SelectPatientNodeDialog(nullptr)
-  , m_SimpleDatamanagerNodeDialog(nullptr)
-  , m_SemanticRelations(nullptr)
+  : m_SemanticRelations(nullptr)
 {
   // nothing here
 }
@@ -49,6 +46,7 @@ void QmitkSemanticRelationsView::SetFocus()
 void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
 {
   // create GUI widgets
+  m_Parent = parent;
   m_Controls.setupUi(parent);
 
   // initialize the semantic relations
@@ -61,17 +59,6 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
   m_Controls.gridLayout->addWidget(m_LesionInfoWidget, 3, 0, 1, 3);
   connect(m_LesionInfoWidget, SIGNAL(JumpToPosition(const mitk::Point3D&)), SLOT(OnJumpToPosition(const mitk::Point3D&)));
   connect(m_LesionInfoWidget, SIGNAL(ImageRemoved(const mitk::DataNode*)), SLOT(OnImageRemoved(const mitk::DataNode*)));
-
-  m_PatientTableWidget = new QmitkPatientTableWidget(GetDataStorage());
-
-  m_SelectPatientNodeDialog = new QmitkSelectNodeDialog(parent);
-  m_SelectPatientNodeDialog->setWindowTitle("Select patient image node");
-  m_SelectPatientNodeDialog->SetSelectionWidget(m_PatientTableWidget);
-
-  m_SimpleDatamanagerWidget = new QmitkSimpleDatamanagerWidget(GetDataStorage());
-  m_SimpleDatamanagerNodeDialog = new QmitkSelectNodeDialog(parent);
-  m_SimpleDatamanagerNodeDialog->setWindowTitle("Select node");
-  m_SimpleDatamanagerNodeDialog->SetSelectionWidget(m_SimpleDatamanagerWidget);
 
   // connect buttons to modify semantic relations
   connect(m_Controls.addLesionPushButton, SIGNAL(clicked()), SLOT(OnAddLesionButtonClicked()));
@@ -88,28 +75,35 @@ void QmitkSemanticRelationsView::OnCaseIDSelectionChanged(const QString& caseID)
 {
   m_CaseID = caseID.toStdString();
   m_LesionInfoWidget->SetCurrentCaseID(m_CaseID);
-  m_PatientTableWidget->SetCurrentCaseID(m_CaseID);
 }
 
 void QmitkSemanticRelationsView::OnSelectPatientNodeButtonClicked()
 {
-  int dialogReturnValue = m_SelectPatientNodeDialog->exec();
-  if (QDialog::Rejected == dialogReturnValue)
-  {
-    return;
-  }
+  QmitkSemanticRelationsNodeSelectionDialog* dialog = new QmitkSemanticRelationsNodeSelectionDialog(m_Parent, "Select patient image to set a current patient", "");
+  dialog->SetDataStorage(GetDataStorage());
+  dialog->setWindowTitle("Select patient image node");
+  dialog->SetNodePredicate(mitk::NodePredicates::GetImagePredicate());
+  dialog->SetSelectOnlyVisibleNodes(true);
+  dialog->SetSelectionMode(QAbstractItemView::SingleSelection);
+  dialog->SetCaseID(m_CaseID);
 
-  mitk::DataNode* selectedDataNode = m_SelectPatientNodeDialog->GetSelectedDataNode();
-  if (nullptr == selectedDataNode)
+  if (QDialog::Accepted == dialog->exec())
   {
-    m_Controls.selectedPatientNodeLineEdit->clear();
+    auto nodes = dialog->GetSelectedNodes();
+    for (mitk::DataNode* dataNode : nodes)
+    {
+      if (nullptr != dataNode)
+      {
+        m_Controls.selectedPatientNodeLineEdit->setText(QString::fromStdString(dataNode->GetName()));
+        //m_PatientInfoWidget->SetPatientInfo(node);
+        //m_PatientInfoWidget->show();
+      }
+      else
+      {
+        m_Controls.selectedPatientNodeLineEdit->clear();
+      }
+    }
   }
-  else
-  {
-    m_Controls.selectedPatientNodeLineEdit->setText(QString::fromStdString(selectedDataNode->GetName()));
-  }
-  //m_PatientInfoWidget->SetPatientInfo(node);
-  //m_PatientInfoWidget->show();
 }
 
 void QmitkSemanticRelationsView::OnJumpToPosition(const mitk::Point3D& position)
@@ -161,134 +155,111 @@ void QmitkSemanticRelationsView::OnAddSegmentationButtonClicked()
     return;
   }
 
-  int dialogReturnValue = m_SimpleDatamanagerNodeDialog->exec();
-  if (QDialog::Rejected == dialogReturnValue)
+  QmitkSemanticRelationsNodeSelectionDialog* dialog = new QmitkSemanticRelationsNodeSelectionDialog(m_Parent, "Select segmentations to add to the semantic relations storage", "");
+  dialog->SetDataStorage(GetDataStorage());
+  dialog->setWindowTitle("Select segmentation node");
+  dialog->SetNodePredicate(mitk::NodePredicates::GetSegmentationPredicate());
+  dialog->SetSelectOnlyVisibleNodes(true);
+  dialog->SetSelectionMode(QAbstractItemView::MultiSelection);
+  dialog->SetCaseID(m_CaseID);
+
+  if (QDialog::Accepted == dialog->exec())
   {
-    return;
-  }
+    auto nodes = dialog->GetSelectedNodes();
+    for (mitk::DataNode* dataNode : nodes)
+    {
+      if (nullptr == dataNode)
+      {
+        continue;
+      }
 
-  mitk::DataNode* selectedDataNode = m_SimpleDatamanagerNodeDialog->GetSelectedDataNode();
-  if (nullptr == selectedDataNode)
-  {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("No valid segmentation node selected.");
-    msgBox.setText("In order to add a segmentation, please specify a valid segmentation node.");
-    msgBox.setIcon(QMessageBox::Warning);
-    msgBox.exec();
-    return;
-  }
+      mitk::BaseData* baseData = dataNode->GetData();
+      if (nullptr == baseData)
+      {
+        continue;
+      }
 
-  if (!mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(selectedDataNode))
-  {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("No segmentation selected");
-    msgBox.setText("In order to add a segmentation, please specify a valid segmentation node.");
-    msgBox.setIcon(QMessageBox::Warning);
-    msgBox.exec();
-    return;
-  }
+      // continue with valid segmentation data
+      // get parent node of the current segmentation node with the node predicate
+      mitk::DataStorage::SetOfObjects::ConstPointer parentNodes = GetDataStorage()->GetSources(dataNode, mitk::NodePredicates::GetImagePredicate(), false);
 
-  mitk::BaseData* baseData = selectedDataNode->GetData();
-  if (nullptr == baseData)
-  {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("No valid base data.");
-    msgBox.setText("In order to link the selected lesion to a segmentation, please specify a valid segmentation node.");
-    msgBox.setIcon(QMessageBox::Warning);
-    msgBox.exec();
-    return;
-  }
+      // check for already existing, identifying base properties
+      mitk::BaseProperty* caseIDProperty = baseData->GetProperty("DICOM.0010.0010");
+      mitk::BaseProperty* nodeIDProperty = baseData->GetProperty("DICOM.0020.000E");
+      if (nullptr == caseIDProperty && nullptr == nodeIDProperty)
+      {
+        MITK_INFO << "No DICOM tags for case and node identification found. Transferring DICOM tags from the parent node to the selected segmentation node.";
 
-  // continue with valid segmentation data
-  // get parent node of the current segmentation node with the node predicate
-  mitk::DataStorage::SetOfObjects::ConstPointer parentNodes = GetDataStorage()->GetSources(selectedDataNode, mitk::NodePredicates::GetImagePredicate(), false);
+        mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(parentNodes->front());
+        mitk::SemanticTypes::ID nodeID = mitk::GetIDFromDataNode(parentNodes->front());
+        // transfer DICOM tags to the segmentation node
+        mitk::StringProperty::Pointer caseIDTag = mitk::StringProperty::New(caseID);
+        baseData->SetProperty("DICOM.0010.0010", caseIDTag); // DICOM tag is "PatientName"
 
-  // check for already existing, identifying base properties
-  mitk::BaseProperty* caseIDProperty = baseData->GetProperty("DICOM.0010.0010");
-  mitk::BaseProperty* nodeIDProperty = baseData->GetProperty("DICOM.0020.000E");
-  if (nullptr == caseIDProperty && nullptr == nodeIDProperty)
-  {
-    MITK_INFO << "No DICOM tags for case and node identification found. Transferring DICOM tags from the parent node to the selected segmentation node.";
+        // add UID to distinguish between different segmentations of the same parent node
+        mitk::StringProperty::Pointer nodeIDTag = mitk::StringProperty::New(nodeID + mitk::UIDGeneratorBoost::GenerateUID());
+        baseData->SetProperty("DICOM.0020.000E", nodeIDTag); // DICOM tag is "SeriesInstanceUID"
+      }
 
-    mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(parentNodes->front());
-    mitk::SemanticTypes::ID nodeID = mitk::GetIDFromDataNode(parentNodes->front());
-    // transfer DICOM tags to the segmentation node
-    mitk::StringProperty::Pointer caseIDTag = mitk::StringProperty::New(caseID);
-    baseData->SetProperty("DICOM.0010.0010", caseIDTag); // DICOM tag is "PatientName"
-
-    // add UID to distinguish between different segmentations of the same parent node
-    mitk::StringProperty::Pointer nodeIDTag = mitk::StringProperty::New(nodeID + mitk::UIDGeneratorBoost::GenerateUID());
-    baseData->SetProperty("DICOM.0020.000E", nodeIDTag); // DICOM tag is "SeriesInstanceUID"
-  }
-
-  try
-  {
-    m_SemanticRelations->AddSegmentation(selectedDataNode, parentNodes->front());
-  }
-  catch (mitk::Exception& e)
-  {
-    std::stringstream exceptionMessage; exceptionMessage << e;
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("Could not add the selected segmentation.");
-    msgBox.setText("The program wasn't able to correctly add the selected segmentation.\n"
-      "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
-    msgBox.setIcon(QMessageBox::Warning);
-    msgBox.exec();
+      try
+      {
+        m_SemanticRelations->AddSegmentation(dataNode, parentNodes->front());
+      }
+      catch (mitk::Exception& e)
+      {
+        std::stringstream exceptionMessage; exceptionMessage << e;
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Could not add the selected segmentation.");
+        msgBox.setText("The program wasn't able to correctly add the selected segmentation.\n"
+          "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
+      }
+    }
   }
 }
 
 void QmitkSemanticRelationsView::OnAddImageButtonClicked()
 {
-  int dialogReturnValue = m_SimpleDatamanagerNodeDialog->exec();
-  if (QDialog::Rejected == dialogReturnValue)
-  {
-    return;
-  }
+  QmitkSemanticRelationsNodeSelectionDialog* dialog = new QmitkSemanticRelationsNodeSelectionDialog(m_Parent, "Select images to add to the semantic relations storage", "");
+  dialog->SetDataStorage(GetDataStorage());
+  dialog->setWindowTitle("Select image node");
+  dialog->SetNodePredicate(mitk::NodePredicates::GetImagePredicate());
+  dialog->SetSelectOnlyVisibleNodes(true);
+  dialog->SetSelectionMode(QAbstractItemView::MultiSelection);
+  dialog->SetCaseID(m_CaseID);
 
-  mitk::DataNode* selectedDataNode = m_SimpleDatamanagerNodeDialog->GetSelectedDataNode();
-  if (nullptr == selectedDataNode)
+  if (QDialog::Accepted == dialog->exec())
   {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("No valid image node selected.");
-    msgBox.setText("In order to add an image, please specify a valid image node.");
-    msgBox.setIcon(QMessageBox::Warning);
-    msgBox.exec();
-    return;
-  }
-
-  if (!mitk::NodePredicates::GetImagePredicate()->CheckNode(selectedDataNode))
-  {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("No image selected");
-    msgBox.setText("In order to add an image, please specify a valid image node.");
-    msgBox.setIcon(QMessageBox::Warning);
-    msgBox.exec();
-    return;
-  }
-
-  try
-  {
-    // add the image to the semantic relations storage
-    m_SemanticRelations->AddImage(selectedDataNode);
-    m_PatientTableWidget->SetPixmapOfNode(selectedDataNode);
-    mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(selectedDataNode);
-    AddToComboBox(caseID);
-  }
-  catch (mitk::Exception& e)
-  {
-    std::stringstream exceptionMessage; exceptionMessage << e;
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("Could not add the selected image.");
-    msgBox.setText("The program wasn't able to correctly add the selected image.\n"
-      "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
-    msgBox.setIcon(QMessageBox::Warning);
-    msgBox.exec();
+    auto nodes = dialog->GetSelectedNodes();
+    for (mitk::DataNode* dataNode : nodes)
+    {
+      if (nullptr != dataNode)
+      {
+        try
+        {
+          // add the image to the semantic relations storage
+          m_SemanticRelations->AddImage(dataNode);
+          mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(dataNode);
+          AddToComboBox(caseID);
+        }
+        catch (mitk::Exception& e)
+        {
+          std::stringstream exceptionMessage; exceptionMessage << e;
+          QMessageBox msgBox;
+          msgBox.setWindowTitle("Could not add the selected image.");
+          msgBox.setText("The program wasn't able to correctly add the selected images.\n"
+            "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
+          msgBox.setIcon(QMessageBox::Warning);
+          msgBox.exec();
+        }
+      }
+    }
   }
 }
 
 void QmitkSemanticRelationsView::OnImageRemoved(const mitk::DataNode* imageNode)
 {
-  m_PatientTableWidget->DeletePixmapOfNode(imageNode);
   mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(imageNode);
   RemoveFromComboBox(caseID);
 }

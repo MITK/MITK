@@ -77,8 +77,10 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.StepCropping, SIGNAL(clicked()), this, SLOT(UpdateSaveBoxes()));
   connect(m_Controls.StepBandpass, SIGNAL(clicked()), this, SLOT(UpdateSaveBoxes()));
   connect(m_Controls.StepBMode, SIGNAL(clicked()), this, SLOT(UpdateSaveBoxes()));
+  connect(m_Controls.UseSignalDelay, SIGNAL(clicked()), this, SLOT(UseSignalDelay()));
 
   UpdateSaveBoxes();
+  UseSignalDelay();
   m_Controls.DoResampling->setChecked(false);
   m_Controls.ResamplingValue->setEnabled(false);
   m_Controls.progressBar->setMinimum(0);
@@ -98,6 +100,18 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
 #endif
 
   UseImageSpacing();
+}
+
+void PAImageProcessing::UseSignalDelay()
+{
+  if (m_Controls.UseSignalDelay->checked())
+  {
+    m_Controls.SignalDelay->enabled(true);
+  }
+  else
+  {
+    m_Controls.SignalDelay->enabled(false);
+  }
 }
 
 void PAImageProcessing::ChangedSOSBandpass()
@@ -364,6 +378,10 @@ void PAImageProcessing::StartBeamformingThread()
       connect(thread, &BeamformingThread::finished, thread, &QObject::deleteLater);
 
       thread->setConfig(BFconfig);
+
+      if (m_Controls.UseSignalDelay->checked())
+        thread->setSignalDelay(m_Controls.SignalDelay->value());
+
       thread->setInputImage(image);
       thread->setFilterBank(m_FilterBank);
 
@@ -924,18 +942,29 @@ void PAImageProcessing::UseImageSpacing()
 
 void BeamformingThread::run()
 {
-  mitk::Image::Pointer resultImage = mitk::Image::New();
-  mitk::Image::Pointer resultImageBuffer;
+  mitk::Image::Pointer preprocessedImage = m_InputImage;
+  if (m_SignalDelay != 0)
+  {
+    int cropPixels = std::round(m_SignalDelay / m_BFconfig->GetTimeSpacing());
+    preprocessedImage = m_FilterBank->ApplyCropping(m_InputImage, cropPixels, 0, 0, 0, 0, m_InputImage->GetDimension(2) - 1);
+  }
+
+  mitk::Image::Pointer resultImage;
   std::function<void(int, std::string)> progressHandle = [this](int progress, std::string progressInfo) {
     emit updateProgress(progress, progressInfo);
   };
-  resultImageBuffer = m_FilterBank->ApplyBeamforming(m_InputImage, m_BFconfig, progressHandle);
-  emit result(resultImageBuffer, "_bf");
+  resultImage = m_FilterBank->ApplyBeamforming(preprocessedImage, m_BFconfig, progressHandle);
+  emit result(resultImage, "_bf");
 }
 
 void BeamformingThread::setConfig(mitk::BeamformingSettings::Pointer BFconfig)
 {
   m_BFconfig = BFconfig;
+}
+
+void BeamformingThread::setSignalDelay(float delay)
+{
+  m_SignalDelay = delay;
 }
 
 void BeamformingThread::setInputImage(mitk::Image::Pointer image)

@@ -567,7 +567,7 @@
        <property name="verticalSpacing">
         <number>2</number>
        </property>
-       <item row="21" column="0">
+       <item row="20" column="0">
         <widget class="QDoubleSpinBox" name="SpeedOfSound">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -592,7 +592,7 @@
          </property>
         </widget>
        </item>
-       <item row="16" column="1">
+       <item row="15" column="1">
         <widget class="QCheckBox" name="UseImageSpacing">
          <property name="text">
           <string>Auto Get Depth</string>
@@ -602,14 +602,14 @@
          </property>
         </widget>
        </item>
-       <item row="25" column="1">
+       <item row="24" column="1">
         <widget class="QPushButton" name="buttonApplyBeamforming">
          <property name="text">
           <string>Apply Beamforming</string>
          </property>
         </widget>
        </item>
-       <item row="16" column="0">
+       <item row="15" column="0">
         <widget class="QLabel" name="label_14">
          <property name="text">
           <string/>
@@ -623,14 +623,14 @@
          </property>
         </widget>
        </item>
-       <item row="17" column="1">
+       <item row="16" column="1">
         <widget class="QLabel" name="label">
          <property name="text">
           <string>[mm] Scan Depth</string>
          </property>
         </widget>
        </item>
-       <item row="19" column="0">
+       <item row="18" column="0">
         <widget class="QDoubleSpinBox" name="Pitch">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -655,14 +655,14 @@
          </property>
         </widget>
        </item>
-       <item row="20" column="1">
+       <item row="19" column="1">
         <widget class="QLabel" name="label_5">
          <property name="text">
           <string>Transducer Elements</string>
          </property>
         </widget>
        </item>
-       <item row="17" column="0">
+       <item row="16" column="0">
         <widget class="QDoubleSpinBox" name="ScanDepth">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -684,14 +684,14 @@
          </property>
         </widget>
        </item>
-       <item row="19" column="1">
+       <item row="18" column="1">
         <widget class="QLabel" name="label_3">
          <property name="text">
           <string>[mm] Transducer Pitch</string>
          </property>
         </widget>
        </item>
-       <item row="20" column="0">
+       <item row="19" column="0">
         <widget class="QSpinBox" name="ElementCount">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -713,7 +713,7 @@
          </property>
         </widget>
        </item>
-       <item row="22" column="0">
+       <item row="21" column="0">
         <widget class="QSpinBox" name="Samples">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -735,7 +735,7 @@
          </property>
         </widget>
        </item>
-       <item row="23" column="0">
+       <item row="22" column="0">
         <widget class="QSpinBox" name="Lines">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -757,21 +757,21 @@
          </property>
         </widget>
        </item>
-       <item row="22" column="1">
+       <item row="21" column="1">
         <widget class="QLabel" name="label_6">
          <property name="text">
           <string>Samples</string>
          </property>
         </widget>
        </item>
-       <item row="23" column="1">
+       <item row="22" column="1">
         <widget class="QLabel" name="label_7">
          <property name="text">
           <string>Reconstruction Lines</string>
          </property>
         </widget>
        </item>
-       <item row="25" column="0">
+       <item row="24" column="0">
         <widget class="QProgressBar" name="progressBar">
          <property name="enabled">
           <bool>true</bool>
@@ -874,7 +874,7 @@
          </property>
         </widget>
        </item>
-       <item row="21" column="1">
+       <item row="20" column="1">
         <widget class="QLabel" name="label_2">
          <property name="text">
           <string>[m/s] Speed of Sound</string>
@@ -887,7 +887,7 @@
        <item row="1" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_3"/>
        </item>
-       <item row="26" column="0">
+       <item row="25" column="0">
         <widget class="QLabel" name="ProgressInfo">
          <property name="text">
           <string/>
@@ -901,16 +901,6 @@
          </property>
          <property name="checked">
           <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="15" column="1">
-        <widget class="QCheckBox" name="UseBP">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="text">
-          <string>Auto Use Bandpass</string>
          </property>
         </widget>
        </item>
@@ -943,21 +933,21 @@
          </property>
         </widget>
        </item>
-       <item row="26" column="1">
+       <item row="25" column="1">
         <widget class="QLabel" name="labelWarning4">
          <property name="text">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;Please select an image!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
-       <item row="18" column="1">
+       <item row="17" column="1">
         <widget class="QLabel" name="ReconstructionDepthLabel">
          <property name="text">
           <string>[mm] Reconstruction Depth</string>
          </property>
         </widget>
        </item>
-       <item row="18" column="0">
+       <item row="17" column="0">
         <widget class="QDoubleSpinBox" name="ReconstructionDepth">
          <property name="decimals">
           <number>4</number>
@@ -970,6 +960,29 @@
          </property>
          <property name="value">
           <double>10.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QDoubleSpinBox" name="SignalDelay">
+         <property name="singleStep">
+          <double>0.100000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QCheckBox" name="UseSignalDelay">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Some setups' hardware produces signal delays that need to be cropped out of the image before performing beamforming. To do this, select this box.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Consider Hardware Delay</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
          </property>
         </widget>
        </item>

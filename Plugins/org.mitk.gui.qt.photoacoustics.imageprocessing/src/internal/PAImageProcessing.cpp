@@ -869,6 +869,8 @@ void PAImageProcessing::EnableControls()
   m_Controls.Lines->setEnabled(true);
   m_Controls.Angle->setEnabled(true);
   m_Controls.buttonApplyBeamforming->setEnabled(true);
+  m_Controls.UseSignalDelay->setEnabled(true);
+  m_Controls.SignalDelay->setEnabled(true);
 }
 
 void PAImageProcessing::DisableControls()
@@ -921,6 +923,8 @@ void PAImageProcessing::DisableControls()
   m_Controls.Lines->setEnabled(false);
   m_Controls.Angle->setEnabled(false);
   m_Controls.buttonApplyBeamforming->setEnabled(false);
+  m_Controls.UseSignalDelay->setEnabled(false);
+  m_Controls.SignalDelay->setEnabled(false);
 }
 
 void PAImageProcessing::UseImageSpacing()

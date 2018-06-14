@@ -141,8 +141,7 @@ Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::SpectralUnmixingAlgorithm
     linearSolve(A, b, x);
 
   else if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::vigratest == algorithmIndex)
-    linearSolve(A, b, x);
-    //mitkThrow() << "nothing implemented";
+    mitkThrow() << "nothing implemented";
 
   else
     mitkThrow() << "404 VIGRA ALGORITHM NOT FOUND";

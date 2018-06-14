@@ -366,7 +366,7 @@ void SpectralUnmixing::DoImageProcessing()
         mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
         mitk::DataNode::Pointer dataNodesO2 = mitk::DataNode::New();
         dataNodesO2->SetData(sO2);
-        dataNodesO2->SetName("sO2");
+        dataNodesO2->SetName("sO2" + Algorithm);
         this->GetDataStorage()->Add(dataNodesO2);
 
         MITK_INFO << "[DONE]";

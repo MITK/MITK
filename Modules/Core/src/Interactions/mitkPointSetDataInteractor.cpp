@@ -49,10 +49,10 @@ int mitk::PointSetDataInteractor::getInsertPosition(unsigned int timeStep)
   mitk::PointSet::PointsIterator it, end;
   it = m_PointSet->Begin(timeStep);
   end = m_PointSet->End(timeStep);
-  while (it != end)
-  {
-    if (!m_PointSet->IndexExists(lastPosition, timeStep))
+  while (it != end) {
+    if (!m_PointSet->IndexExists(lastPosition, timeStep)) {
       break;
+    }
     ++it;
     ++lastPosition;
   }

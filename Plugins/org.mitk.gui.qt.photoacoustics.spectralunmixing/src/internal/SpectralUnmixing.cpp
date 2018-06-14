@@ -189,6 +189,17 @@ void SpectralUnmixing::DoImageProcessing()
         m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
         dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra*>(m_SpectralUnmixingFilter.GetPointer())
           ->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED);
+        //Tranfer GUI information(Weights) to filter
+        int colunm = 0;
+        int Weight = 1;
+        while (m_Controls.inputtable->item(1, colunm) && Weight > 0)
+        {
+          QString Text = m_Controls.inputtable->item(1, colunm)->text();
+          Weight = Text.toInt();
+          if (Weight > 0)
+            m_SpectralUnmixingFilter->AddWeight(Weight);
+          ++colunm;
+        }
       }
 
       else if (Algorithm == "LS")

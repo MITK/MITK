@@ -53,6 +53,12 @@ void mitk::pa::SpectralUnmixingFilterBase::AddChromophore(mitk::pa::PropertyCalc
   m_Chromophore.push_back(chromophore);
 }
 
+void mitk::pa::SpectralUnmixingFilterBase::AddWeight(int Weight)
+{
+  m_Weight.push_back(Weight);
+  MITK_INFO << "Weight: " << m_Weight[m_Weight.size()-1];
+}
+
 void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
 {
   MITK_INFO << "GENERATING DATA..";
@@ -86,10 +92,13 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
   // test to see pixel values @ txt file
   //ofstream myfile;
   //myfile.open("PASpectralUnmixingPixelValues.txt");
-
   std::chrono::steady_clock::time_point _start(std::chrono::steady_clock::now());
+
+  myfile.open("SimplexNormalisation.txt");
+
   for (unsigned int SequenceCounter = 0; SequenceCounter < TotalNumberOfSequences;++SequenceCounter)
   {
+
     MITK_INFO << "SequenceCounter: " << SequenceCounter;
     //loop over every pixel @ x,y plane
     for (unsigned int x = 0; x < xDim; x++)
@@ -123,9 +132,12 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
     }
   }
   std::chrono::steady_clock::time_point _end(std::chrono::steady_clock::now());
+  std::chrono::steady_clock::time_point _test(std::chrono::steady_clock::now());
+  MITK_INFO << "Chronotets: " << std::chrono::duration_cast<std::chrono::duration<double>>(_test - _start).count() << "s";
+
+  MITK_INFO << "Chrono: " << std::chrono::duration_cast<std::chrono::duration<double>>(_end - _start).count() << "s";
   MITK_INFO << "GENERATING DATA...[DONE]";
-  //myfile.close();
-  MITK_INFO << "Chrono: " << std::chrono::duration_cast<std::chrono::duration<double>>(    _end - _start).count() << "s";
+  myfile.close();
 }
 
 void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(unsigned int size, unsigned int NumberOfInputImages, const float* inputDataArray)

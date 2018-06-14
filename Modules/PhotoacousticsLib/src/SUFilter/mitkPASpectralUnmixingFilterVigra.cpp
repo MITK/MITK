@@ -74,6 +74,7 @@ void mitk::pa::SpectralUnmixingFilterVigra::SetAlgorithm(mitk::pa::SpectralUnmix
   algorithmIndex = SetAlgorithmIndex;
 }
 
+
 Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::SpectralUnmixingAlgorithm(
   Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
 {
@@ -86,7 +87,7 @@ Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::SpectralUnmixingAlgorithm
 
   std::vector<double> A_data;
   std::vector<double> B_data;
-  std::vector<double> weightsvec = { 1,1,1,1,1 }; //am besten über GUI Eingabe festlegen
+
 
   for (int i = 0; i < numberOfWavelengths; ++i)
   {
@@ -123,7 +124,13 @@ Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::SpectralUnmixingAlgorithm
 
   else if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED == algorithmIndex)
   {
-    std::vector<double> weightsvec = { 1,1,1,1,1 }; //am besten über GUI Eingabe festlegen
+    std::vector<double> weightsvec;
+    for (int i = 0; i < m_Weight.size(); ++i)
+    {
+      double value = double (m_Weight[i]) / 100.0;
+      weightsvec.push_back(value);
+    }
+
     const double* weightsdat = weightsvec.data();
     vigra::Matrix<double> weigths(Shape2(numberOfWavelengths, 1), weightsdat);
 

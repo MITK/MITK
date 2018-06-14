@@ -37,6 +37,9 @@ namespace mitk {
 
       void AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType);
       void AddWavelength(int wavelength);
+      void AddWeight(int Weight);
+      ofstream myfile;
+
 
     protected:
       SpectralUnmixingFilterBase();
@@ -47,6 +50,9 @@ namespace mitk {
 
       virtual Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
         Eigen::VectorXf inputVector) = 0;
+
+      std::vector<int> m_Weight;
+
 
     private:
       virtual void CheckPreConditions(unsigned int size, unsigned int NumberOfInputImages, const float* inputDataArray);

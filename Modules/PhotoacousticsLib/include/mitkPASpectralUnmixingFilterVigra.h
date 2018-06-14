@@ -40,7 +40,6 @@ namespace mitk {
       };
 
       void mitk::pa::SpectralUnmixingFilterVigra::SetAlgorithm(VigraAlgortihmType SetAlgorithmIndex);
-
     protected:
       SpectralUnmixingFilterVigra();
       virtual ~SpectralUnmixingFilterVigra();

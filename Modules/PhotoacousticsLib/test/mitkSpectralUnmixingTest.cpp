@@ -29,6 +29,7 @@ class mitkSpectralUnmixingTestSuite : public mitk::TestFixture
   MITK_TEST(testEigenSUAlgorithm);
   MITK_TEST(testVigraSUAlgorithm);
   //MITK_TEST(testSimplexSUAlgorithm);
+  MITK_TEST(testSO2);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -70,7 +71,7 @@ public:
     m_CorrectResult.push_back(fracHb);
     m_CorrectResult.push_back(fracHbO2 + 10);
     m_CorrectResult.push_back(fracHb - 10);
-    threshold = .01;
+    threshold = 0.01;
 
     //Multiply values of wavelengths (750,800,850 nm) with fractions to get pixel values:
     float px1 = fracHb * 7.52 + fracHbO2 * 2.77;
@@ -252,6 +253,39 @@ public:
     }
     myfile.close();
     MITK_INFO << "SIMPLEX FILTER TEST SUCCESFULL :)";
+  }
+
+  void testSO2()
+  {
+    MITK_INFO << "START SO2 TEST ... ";
+    auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
+    m_sO2->SetInput(0, inputImage);
+    m_sO2->SetInput(1, inputImage);
+    std::vector<float> m_CorrectSO2Result = { 0.5, 0.5, 0.5, 0.5, 0.5 };
+    std::vector<float> SO2Settings = { 0, 0, 0, 0 }; // active settings are not tested
+    for (int i = 0; i < SO2Settings.size(); ++i)
+      m_sO2->AddSO2Settings(SO2Settings[i]);
+    m_sO2->Update();
+
+    /*For printed pixel values and results look at: [...]\mitk-superbuild\MITK-build\Modules\PhotoacousticsLib\test\*/
+    ofstream myfile;
+    myfile.open("SO2TestResult.txt");
+
+    mitk::Image::Pointer output = m_sO2->GetOutput(0);
+    mitk::ImageReadAccessor readAccess(output);
+    const float* inputDataArray = ((const float*)readAccess.GetData());
+
+    for (unsigned int Pixel = 0; Pixel < inputImage->GetDimensions()[2]; ++Pixel)
+    {
+      auto Value = inputDataArray[0];
+
+      myfile << "Output " << Pixel << ": " << "\n" << Value <<"\n";
+      myfile << "Correct Result: " << "\n" << m_CorrectSO2Result[Pixel] << "\n";
+
+      CPPUNIT_ASSERT(std::abs(Value - m_CorrectSO2Result[Pixel]) < threshold);
+    }
+    myfile.close();
+    MITK_INFO << "SO2 TEST SUCCESFULL :)";
   }
 
   void tearDown() override

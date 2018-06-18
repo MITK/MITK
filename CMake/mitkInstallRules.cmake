@@ -39,6 +39,9 @@ if(MITK_USE_Qt5)
     MITK_INSTALL(FILES "${_qmake_path}/../plugins/platforms/qwindows.dll")
   elseif(APPLE)
     MITK_INSTALL(FILES "${_qmake_path}/../plugins/platforms/libqcocoa.dylib")
+
+    set(_install_DESTINATION "plugins/styles")
+    MITK_INSTALL(FILES "${_qmake_path}/../plugins/styles/libqmacstyle.dylib")
   elseif(UNIX)
     MITK_INSTALL(FILES
       "${_qmake_path}/../plugins/platforms/libqxcb.so"

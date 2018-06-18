@@ -111,7 +111,7 @@
      </row>
      <row>
       <property name="text">
-       <string>Weights</string>
+       <string>Weights [%]</string>
       </property>
      </row>
      <column>

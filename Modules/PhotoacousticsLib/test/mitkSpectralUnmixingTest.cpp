@@ -28,8 +28,8 @@ class mitkSpectralUnmixingTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkSpectralUnmixingTestSuite);
   MITK_TEST(testEigenSUAlgorithm);
   MITK_TEST(testVigraSUAlgorithm);
-  //MITK_TEST(testSimplexSUAlgorithm); --> RESULT FAILS
-  //MITK_TEST(testSO2); --> SO2 Settings FAILS
+  //MITK_TEST(testSimplexSUAlgorithm);// --> RESULT FAILS
+  MITK_TEST(testSO2); //--> SO2 Settings FAILS
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -259,8 +259,8 @@ public:
     auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
     m_sO2->SetInput(0, inputImage);
     m_sO2->SetInput(1, inputImage);
-    std::vector<float> m_CorrectSO2Result = { 0.5, 0.5, 0, 0.5, 0 };
-    std::vector<float> SO2Settings = { 1, 1537, 1, 49 }; // active settings (sum, fraction) are not tested (for false case) --> BUT ALL FALSE
+    std::vector<float> m_CorrectSO2Result = { 0.5, 0.5, 0.5, 0.5, 0 };
+    std::vector<float> SO2Settings = { 1, 1, 1, 49 }; // active settings (sum, fraction) are not tested (for false case) --> BUT ALL FALSE
     for (int i = 0; i < SO2Settings.size(); ++i)
       m_sO2->AddSO2Settings(SO2Settings[i]);
     m_sO2->Update();
@@ -275,7 +275,7 @@ public:
 
     for (unsigned int Pixel = 0; Pixel < inputImage->GetDimensions()[2]; ++Pixel)
     {
-      auto Value = inputDataArray[0];
+      auto Value = inputDataArray[Pixel];
 
       myfile << "Output " << Pixel << ": " << "\n" << Value <<"\n";
       myfile << "Correct Result: " << "\n" << m_CorrectSO2Result[Pixel] << "\n";

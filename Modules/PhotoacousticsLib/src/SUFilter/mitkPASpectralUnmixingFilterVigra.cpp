@@ -28,33 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageWriteAccessor.h>
 
 //vigra
-/*
-The VIGRA License
-=================
-(identical to the MIT X11 License)
-
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or
-sell copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the
-Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
-*/
 #include <vigra/matrix.hxx>
 #include <vigra/regression.hxx>
 #include <vigra/quadprog.hxx>
@@ -91,10 +64,10 @@ Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::SpectralUnmixingAlgorithm
 
   for (int i = 0; i < numberOfWavelengths; ++i)
   {
-    B_data.push_back(inputVector(i));
+    B_data.push_back((double)inputVector(i));
     for (int j = 0; j < numberOfChromophores; ++j)
     {
-      A_data.push_back(EndmemberMatrix(i, j));
+      A_data.push_back((double)EndmemberMatrix(i, j));
     }
   }
 
@@ -147,10 +120,7 @@ Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::SpectralUnmixingAlgorithm
     mitkThrow() << "404 VIGRA ALGORITHM NOT FOUND";
 
   for (int k = 0; k < numberOfChromophores; ++k)
-  {
-    float test = x(k, 0);
-    resultVector[k] = test;
-  }
+    resultVector[k] = (float)x(k, 0);
 
   return resultVector;
 }

@@ -29,7 +29,7 @@ class mitkSpectralUnmixingTestSuite : public mitk::TestFixture
   MITK_TEST(testEigenSUAlgorithm);
   MITK_TEST(testVigraSUAlgorithm);
   //MITK_TEST(testSimplexSUAlgorithm);// --> RESULT FAILS
-  MITK_TEST(testSO2); //--> SO2 Settings FAILS
+  MITK_TEST(testSO2);
   CPPUNIT_TEST_SUITE_END();
 
 private:

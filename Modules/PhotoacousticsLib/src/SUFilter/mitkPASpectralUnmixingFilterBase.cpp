@@ -56,7 +56,6 @@ void mitk::pa::SpectralUnmixingFilterBase::AddChromophore(mitk::pa::PropertyCalc
 void mitk::pa::SpectralUnmixingFilterBase::AddWeight(int Weight)
 {
   m_Weight.push_back(Weight);
-  MITK_INFO << "Weight: " << m_Weight[m_Weight.size()-1];
 }
 
 void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
@@ -142,7 +141,6 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
 
 void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(unsigned int size, unsigned int NumberOfInputImages, const float* inputDataArray)
 {
-  // Checking if number of Inputs == added wavelengths
   if (m_Wavelength.size() < NumberOfInputImages)
     MITK_WARN << "NUMBER OF WAVELENGTHS < NUMBER OF INPUT IMAGES";
 
@@ -151,17 +149,12 @@ void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(unsigned int size,
 
   // Checking if number of wavelengths >= number of chromophores
   if (m_Chromophore.size() > m_Wavelength.size())
-    mitkThrow() << "PRESS 'IGNORE' AND ADD MORE WAVELENGTHS!";
+    mitkThrow() << "ADD MORE WAVELENGTHS!";
 
   // Checking if pixel type is float
-  int maxPixel = size;
-  for (int i = 0; i < maxPixel; ++i)
-  {
-    if (typeid(inputDataArray[i]).name() != typeid(float).name())
-      mitkThrow() << "PIXELTYPE ERROR! FLOAT 32 REQUIRED";
+  if (typeid(inputDataArray[0]).name() != typeid(float).name())
+    mitkThrow() << "PIXELTYPE ERROR! FLOAT 32 REQUIRED";
 
-    else continue;
-  }
   MITK_INFO << "CHECK PRECONDITIONS ...[DONE]";
 }
 
@@ -203,18 +196,18 @@ Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingF
     if (m_Chromophore[j] == mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED)
     {
       for (unsigned int i = 0; i < numberOfWavelengths; ++i)
-        EndmemberMatrixEigen(i, j) = propertyElement(m_Chromophore[j], m_Wavelength[i]);
+        EndmemberMatrixEigen(i, j) = PropertyElement(m_Chromophore[j], m_Wavelength[i]);
     }
     else if (m_Chromophore[j] == mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED)
     {
       for (unsigned int i = 0; i < numberOfWavelengths; ++i)
-        EndmemberMatrixEigen(i, j) = propertyElement(m_Chromophore[j], m_Wavelength[i]);
+        EndmemberMatrixEigen(i, j) = PropertyElement(m_Chromophore[j], m_Wavelength[i]);
     }
     else if (m_Chromophore[j] == mitk::pa::PropertyCalculator::ChromophoreType::MELANIN)
     {
       for (unsigned int i = 0; i < numberOfWavelengths; ++i)
       {
-        EndmemberMatrixEigen(i, j) = propertyElement(m_Chromophore[j], m_Wavelength[i]);
+        EndmemberMatrixEigen(i, j) = PropertyElement(m_Chromophore[j], m_Wavelength[i]);
         MITK_INFO << "MELANIN " << EndmemberMatrixEigen(i, j);
       }
     }
@@ -230,7 +223,7 @@ Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> mitk::pa::SpectralUnmixingF
   return EndmemberMatrixEigen;
 }
 
-float mitk::pa::SpectralUnmixingFilterBase::propertyElement(mitk::pa::PropertyCalculator::ChromophoreType Chromophore, int Wavelength)
+float mitk::pa::SpectralUnmixingFilterBase::PropertyElement(mitk::pa::PropertyCalculator::ChromophoreType Chromophore, int Wavelength)
 {
   float value = m_PropertyCalculatorEigen->GetAbsorptionForWavelength(Chromophore, Wavelength);
   if (value == 0)

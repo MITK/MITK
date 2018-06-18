@@ -30,6 +30,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
   namespace pa {
+    /**
+    * documentation
+    *\brief ,,,,
+    */
     class MITKPHOTOACOUSTICSLIB_EXPORT SpectralUnmixingFilterBase : public mitk::ImageToImageFilter
     {
     public:
@@ -64,7 +68,7 @@ namespace mitk {
         std::vector<mitk::pa::PropertyCalculator::ChromophoreType> m_Chromophore, std::vector<int> m_Wavelength);
       PropertyCalculator::Pointer m_PropertyCalculatorEigen;
 
-      virtual float propertyElement(mitk::pa::PropertyCalculator::ChromophoreType, int wavelength);
+      virtual float PropertyElement(mitk::pa::PropertyCalculator::ChromophoreType, int wavelength);
     };
   }
 }

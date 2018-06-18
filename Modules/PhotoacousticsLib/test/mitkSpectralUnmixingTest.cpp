@@ -256,31 +256,60 @@ public:
   void testSO2()
   {
     MITK_INFO << "START SO2 TEST ... ";
-    auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
-    m_sO2->SetInput(0, inputImage);
-    m_sO2->SetInput(1, inputImage);
-    std::vector<float> m_CorrectSO2Result = { 0.5, 0.5, 0.5, 0.5, 0 };
-    std::vector<float> SO2Settings = { 1, 1, 1, 49 }; // active settings (sum, fraction) are not tested (for false case) --> BUT ALL FALSE
-    for (int i = 0; i < SO2Settings.size(); ++i)
-      m_sO2->AddSO2Settings(SO2Settings[i]);
-    m_sO2->Update();
+    std::vector<float> CorrectSO2Result1 = { 0, 0, 0, 0, 0 };
+    std::vector<float> Test1 = { 0,0,0,51 };
+    std::vector<float> CorrectSO2Result2 = { 0, 0.5, 0, 0.5, 0 };
+    std::vector<float> Test2 = { 1584, 0, 0, 0 };
+    std::vector<float> CorrectSO2Result3 = { 0.5, 0.5, 0, 0.5, 0 };
+    std::vector<float> Test3 = { 0, 1536, 0, 0 };
+    std::vector<float> CorrectSO2Result4 = { 0.5, 0.5, 0, 0.5, 0 };
+    std::vector<float> Test4 = { 0, 0, 3072, 49 };
+    std::vector<float> CorrectSO2Result5 = { 0.5, 0.5, 0.5, 0.5, 0 };
+    std::vector<float> Test5 = { 1, 1, 1, 49 };
+
+    std::vector<std::vector<float>> TestList;
+    std::vector<std::vector<float>> ResultList;
+
+    TestList.push_back(Test1);
+    TestList.push_back(Test2);
+    TestList.push_back(Test3);
+    TestList.push_back(Test4);
+    TestList.push_back(Test5);
+
+    ResultList.push_back(CorrectSO2Result1);
+    ResultList.push_back(CorrectSO2Result2);
+    ResultList.push_back(CorrectSO2Result3);
+    ResultList.push_back(CorrectSO2Result4);
+    ResultList.push_back(CorrectSO2Result5);
 
     /*For printed pixel values and results look at: [...]\mitk-superbuild\MITK-build\Modules\PhotoacousticsLib\test\*/
     ofstream myfile;
     myfile.open("SO2TestResult.txt");
 
-    mitk::Image::Pointer output = m_sO2->GetOutput(0);
-    mitk::ImageReadAccessor readAccess(output);
-    const float* inputDataArray = ((const float*)readAccess.GetData());
-
-    for (unsigned int Pixel = 0; Pixel < inputImage->GetDimensions()[2]; ++Pixel)
+    for (int k = 0; k < 5; ++k)
     {
-      auto Value = inputDataArray[Pixel];
+      std::vector<float> SO2Settings = TestList[k];
+      std::vector<float> m_CorrectSO2Result = ResultList[k];
+      auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
+      m_sO2->SetInput(0, inputImage);
+      m_sO2->SetInput(1, inputImage);
+      for (int i = 0; i < SO2Settings.size(); ++i)
+        m_sO2->AddSO2Settings(SO2Settings[i]);
+      m_sO2->Update();
 
-      myfile << "Output " << Pixel << ": " << "\n" << Value <<"\n";
-      myfile << "Correct Result: " << "\n" << m_CorrectSO2Result[Pixel] << "\n";
+      mitk::Image::Pointer output = m_sO2->GetOutput(0);
+      mitk::ImageReadAccessor readAccess(output);
+      const float* inputDataArray = ((const float*)readAccess.GetData());
 
-      CPPUNIT_ASSERT(std::abs(Value - m_CorrectSO2Result[Pixel]) < threshold);
+      for (unsigned int Pixel = 0; Pixel < inputImage->GetDimensions()[2]; ++Pixel)
+      {
+        auto Value = inputDataArray[Pixel];
+
+        myfile << "Output(Test "<<  k <<") "<< Pixel << ": " << "\n" << Value << "\n";
+        myfile << "Correct Result: " << "\n" << m_CorrectSO2Result[Pixel] << "\n";
+
+        CPPUNIT_ASSERT(std::abs(Value - m_CorrectSO2Result[Pixel]) < threshold);
+      }
     }
     myfile.close();
     MITK_INFO << "SO2 TEST SUCCESFULL :)";

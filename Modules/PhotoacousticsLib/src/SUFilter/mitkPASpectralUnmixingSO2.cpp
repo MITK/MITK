@@ -132,7 +132,8 @@ float mitk::pa::SpectralUnmixingSO2::calculateSO2(float Hb, float HbO2)
     MITK_WARN << "SO2 VALUE NAN! WILL BE SET TO ZERO!";
     return zero;
   }
-  else {
+  else
+  {
     if (MinHb != 0 && MinHb > Hb)
       return zero;
     else if (MinHbO2 != 0 && MinHbO2 > HbO2)

@@ -39,7 +39,6 @@ namespace mitk {
       virtual ~SpectralUnmixingSO2();
       std::vector<int> m_SO2Settings;
 
-
     private:
       virtual void GenerateData() override;
       virtual void InitializeOutputs();

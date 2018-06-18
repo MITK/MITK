@@ -26,9 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations UI module
 #include <QmitkLesionInfoWidget.h>
-#include <QmitkPatientTableWidget.h>
-#include <QmitkSimpleDatamanagerWidget.h>
-#include <QmitkSelectNodeDialog.h>
 
 // blueberry
 #include <berryISelectionListener.h>
@@ -83,12 +80,9 @@ private:
   void AddToComboBox(const mitk::SemanticTypes::CaseID& caseID);
   void RemoveFromComboBox(const mitk::SemanticTypes::CaseID& caseID);
 
+  QWidget* m_Parent;
   Ui::QmitkSemanticRelationsControls m_Controls;
   QmitkLesionInfoWidget* m_LesionInfoWidget;
-  QmitkPatientTableWidget* m_PatientTableWidget;
-  QmitkSimpleDatamanagerWidget* m_SimpleDatamanagerWidget;
-  QmitkSelectNodeDialog* m_SelectPatientNodeDialog;
-  QmitkSelectNodeDialog* m_SimpleDatamanagerNodeDialog;
 
   mitk::SemanticTypes::CaseID m_CaseID;
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;

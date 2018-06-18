@@ -39,11 +39,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   /*
-  * @brief  Extracts a specific DICOM tag (currently "0x0010, 0x0020": PatientID) from the node's base data
+  * @brief  Extracts a specific DICOM tag from the node's base data
   *         and returns the tag as a string. This tag string is used as an identifier for the patient (case).
   *
   * @pre    The given data node or the node's base data has to be valid (!nullptr).
-  * @pre    The node's base data has to have the "0x0010, 0x0020" DICOM Tag property set.
+  * @pre    The node's base data has to have the specific DICOM Tag property set.
   * @throw  mitk::Exception if the given data node, the node's base data or the extracted DICOM tag are invalid (==nullptr).
   *
   * @par dataNode   The data node, of which the DICOM tag should be extracted.

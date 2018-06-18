@@ -43,8 +43,8 @@ mitk::SemanticTypes::CaseID mitk::GetCaseIDFromDataNode(const mitk::DataNode* da
   // two alternatives can be used:
   //        - DICOM tag "0x0010, 0x0010" is PatientName
   //        - DICOM tag "0x0010, 0x0020" is PatientID
-  // in the current implementation the PatientID (0x0010, 0x0020) is used
-  mitk::BaseProperty* dicomTag = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0020).c_str());
+  // in the current implementation the PatientID (0x0010, 0x0010) is used
+  mitk::BaseProperty* dicomTag = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0010).c_str());
   if (nullptr == dicomTag)
   {
     mitkThrow() << "Not a valid DICOM property.";

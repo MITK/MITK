@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
+#include <mitkPASpectralUnmixingFilterBase.h>
 
 #include "ui_SpectralUnmixingControls.h"
 
@@ -48,6 +49,8 @@ protected:
   Ui::SpectralUnmixingControls m_Controls;
 
   std::vector<int> m_Wavelengths;
+
+  mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algorithm);
 
   // Selection of Chromophores
   bool DeOxbool;

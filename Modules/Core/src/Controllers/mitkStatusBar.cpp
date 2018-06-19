@@ -98,8 +98,9 @@ namespace mitk
     WriteCommonImageInfo(stream, point, index, time);
     stream << "; Pixel value: ";
 
-    if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
+    if ((fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01) && pixelValue != 0.0) {
       stream << std::scientific;
+    }
 
     stream << pixelValue;
 

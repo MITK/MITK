@@ -107,7 +107,8 @@ namespace mitk {
     */
     mitk::Image::Pointer ApplyBandpassFilter(mitk::Image::Pointer data,
       float BPHighPass, float BPLowPass,
-      float alphaHighPass, float alphaLowPass);
+      float alphaHighPass, float alphaLowPass,
+      float timeSpacing, float SpeedOfSound, bool IsBFImage);
 
   protected:
     PhotoacousticFilterService();

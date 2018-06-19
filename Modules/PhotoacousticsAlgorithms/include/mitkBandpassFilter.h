@@ -38,6 +38,9 @@ namespace mitk {
     itkSetMacro(LowPass, float);
     itkSetMacro(HighPassAlpha, float);
     itkSetMacro(LowPassAlpha, float);
+    itkSetMacro(SpeedOfSound, float);
+    itkSetMacro(TimeSpacing, float);
+    itkSetMacro(IsBFImage, bool);
 
   protected:
     BandpassFilter();
@@ -46,6 +49,9 @@ namespace mitk {
 
     void SanityCheckPreconditions();
 
+    float m_SpeedOfSound;
+    float m_TimeSpacing;
+    bool m_IsBFImage;
     float m_HighPass;
     float m_LowPass;
     float m_HighPassAlpha;

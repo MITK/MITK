@@ -73,3 +73,5 @@ if(MITK_USE_Qt5)
     MITK_INSTALL(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales")
   endif()
 endif()
+
+set(_install_DESTINATION "") # IMPORTANT: Restore default install destination!

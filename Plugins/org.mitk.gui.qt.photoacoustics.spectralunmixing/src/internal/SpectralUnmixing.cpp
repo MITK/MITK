@@ -54,6 +54,67 @@ void SpectralUnmixing::ClearWavelength()
   m_Wavelengths.clear();
 }
 
+void SpectralUnmixing::SetWavlength(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter)
+{
+  ClearWavelength();
+  int col = 0;
+  int Wavelength = 1;
+  while (m_Controls.inputtable->item(0, col) && Wavelength > 0)
+  {
+    QString Text = m_Controls.inputtable->item(0, col)->text();
+    Wavelength = Text.toInt();
+    if (Wavelength > 0)
+      m_SpectralUnmixingFilter->AddWavelength(Wavelength);
+    MITK_INFO(PluignVerbose) << "Wavelength: " << Wavelength << "nm \n";
+    ++col;
+  }
+}
+
+void SpectralUnmixing::SetChromophore(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter)
+{
+  unsigned int numberofChromophores = 0;
+  DeOxbool = m_Controls.checkBoxDeOx->isChecked();
+  Oxbool = m_Controls.checkBoxOx->isChecked();
+  Melaninbool = m_Controls.checkBoxMelanin->isChecked();
+  Onebool = m_Controls.checkBoxAdd->isChecked();
+  if (DeOxbool || Oxbool || Melaninbool || Onebool)
+  {
+    MITK_INFO(PluignVerbose) << "CHOSEN CHROMOPHORES:";
+  }
+  if (Oxbool)
+  {
+    numberofChromophores += 1;
+    MITK_INFO(PluignVerbose) << "- Oxyhemoglobin";
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
+  }
+  if (DeOxbool)
+  {
+    numberofChromophores += 1;
+    MITK_INFO(PluignVerbose) << "- Deoxygenated hemoglobin";
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
+  }
+  if (Melaninbool)
+  {
+    numberofChromophores += 1;
+    MITK_INFO(PluignVerbose) << "- Melanin";
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::MELANIN);
+  }
+  if (Onebool)
+  {
+    numberofChromophores += 1;
+    MITK_INFO(PluignVerbose) << "- Additional Chromophore";
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::ONEENDMEMBER);
+  }
+  if (numberofChromophores == 0)
+  {
+    mitkThrow() << "PRESS 'IGNORE' AND CHOOSE A CHROMOPHORE!";
+  }
+}
+
 void SpectralUnmixing::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
                                                 const QList<mitk::DataNode::Pointer> &nodes)
 {
@@ -210,78 +271,44 @@ void SpectralUnmixing::DoImageProcessing()
         message << "'" << name << "'";
       }
       message << ".";
-      MITK_INFO << message.str();
+      MITK_INFO(PluignVerbose) << message.str();
 
-      //Tranfer GUI information(Algortihm) to filter
+
+      //*******************************************************************************************************************
+
+      //Read GUI information(algorithm)
       auto qs = m_Controls.QComboBoxAlgorithm->currentText();
       std::string Algorithm = qs.toUtf8().constData();
 
       mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter = GetFilterInstance(Algorithm);
 
-      
-
       m_SpectralUnmixingFilter->SetInput(image);
 
-      //Tranfer GUI information(Wavelength) to filter
-      ClearWavelength();
-      int col = 0;
-      int Wavelength = 1;
-      while (m_Controls.inputtable->item(0, col) && Wavelength > 0)
-      {
-        QString Text = m_Controls.inputtable->item(0, col)->text();
-        Wavelength = Text.toInt();
-        if (Wavelength > 0)
-          m_SpectralUnmixingFilter->AddWavelength(Wavelength);
-        ++col;
-      }
+      SetWavlength(m_SpectralUnmixingFilter);
 
-      //Tranfer GUI information(Chromophores) to filter
-      unsigned int numberofChromophores = 0;
-      DeOxbool = m_Controls.checkBoxDeOx->isChecked();
-      Oxbool = m_Controls.checkBoxOx->isChecked();
-      bool Melaninbool = m_Controls.checkBoxMelanin->isChecked();
-      bool Onebool = m_Controls.checkBoxAdd->isChecked();
-      if (DeOxbool || Oxbool)
-      {
-        MITK_INFO << "CHOSEN CHROMOPHORES:";
-      }
-      if (Oxbool)
-      {
-        numberofChromophores += 1;
-        MITK_INFO << "- Oxyhemoglobin";
-        m_SpectralUnmixingFilter->AddChromophore(
-        mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
-      }
-      if (DeOxbool)
-      {
-        numberofChromophores += 1;
-         MITK_INFO << "- Deoxygenated hemoglobin";
-         m_SpectralUnmixingFilter->AddChromophore(
-        mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
-      }
-      if (Melaninbool)
-      {
-        numberofChromophores += 1;
-        MITK_INFO << "- Melanin";
-        m_SpectralUnmixingFilter->AddChromophore(
-          mitk::pa::PropertyCalculator::ChromophoreType::MELANIN);
-      }
-      if (Onebool)
-      {
-        numberofChromophores += 1;
-        MITK_INFO << "- Additional Chromophore";
-        m_SpectralUnmixingFilter->AddChromophore(
-          mitk::pa::PropertyCalculator::ChromophoreType::ONEENDMEMBER);
-      }
-      if (numberofChromophores == 0)
-      {
-        mitkThrow() << "PRESS 'IGNORE' AND CHOOSE A CHROMOPHORE!";
-      }
+      SetChromophore(m_SpectralUnmixingFilter);
 
-      MITK_INFO << "Updating Filter...";
+      MITK_INFO(PluignVerbose) << "Updating Filter...";
       m_SpectralUnmixingFilter->Update();
-      int outputCounter = 0;
+      
+
+
       // Write Output images to Data Storage
+      int outputCounter = 0;
+      std::vector<std::string> chromophoreVec = { "HbO2",  "Hb", "Melanin", "Static Endmember" };
+      std::vector<bool> boolVec = { Oxbool, DeOxbool, Melaninbool, Onebool};
+      mitk::Image::Pointer m_Output;
+      for (unsigned int chromophore; chromophore < chromophoreVec.size(); ++chromophore)
+      {
+        if (boolVec[chromophore] == false)
+          continue;
+        else
+        {
+          m_Output = m_SpectralUnmixingFilter->GetOutput(outputCounter++);
+          WriteOutputToDataStorage(m_Output, chromophoreVec[chromophore] + Algorithm);
+        }
+      }
+
       if (Oxbool)
       {
         mitk::Image::Pointer HbO2 = m_SpectralUnmixingFilter->GetOutput(outputCounter++);
@@ -328,7 +355,7 @@ void SpectralUnmixing::DoImageProcessing()
         if (!Oxbool)
           mitkThrow() << "SELECT CHROMOPHORE OXYHEMOGLOBIN!";
 
-        MITK_INFO << "CALCULATE OXYGEN SATURATION ...";
+        MITK_INFO(PluignVerbose) << "CALCULATE OXYGEN SATURATION ...";
         auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
 
         // Oxygen Saturation Setting
@@ -338,7 +365,7 @@ void SpectralUnmixing::DoImageProcessing()
           {
             QString Text = m_Controls.tableSO2->item(0, i)->text();
             float value = Text.toFloat();
-            MITK_INFO << "value: " << value;
+            MITK_INFO(PluignVerbose) << "value: " << value;
             m_sO2->AddSO2Settings(value);
           }
           else
@@ -361,7 +388,7 @@ void SpectralUnmixing::DoImageProcessing()
         dataNodesO2->SetName("sO2" + Algorithm);
         this->GetDataStorage()->Add(dataNodesO2);
 
-        MITK_INFO << "[DONE]";
+        MITK_INFO(PluignVerbose) << "[DONE]";
       }
       mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
       MITK_INFO << "Adding images to DataStorage...[DONE]";

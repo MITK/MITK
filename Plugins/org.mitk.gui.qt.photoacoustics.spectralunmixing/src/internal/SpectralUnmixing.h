@@ -26,35 +26,57 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class SpectralUnmixing : public QmitkAbstractView
 {
-  // this is needed for all Qt objects that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
-  Q_OBJECT
+   // this is needed for all Qt objects that should have a Qt meta-object
+   // (everything that derives from QObject and wants to have signal/slots)
+   Q_OBJECT
 
-public:
-  static const std::string VIEW_ID;
+  public:
+    static const std::string VIEW_ID;
+   
+  protected:
+    virtual void CreateQtPartControl(QWidget *parent) override;
+    virtual void SetFocus() override;
   
-protected:
-  virtual void CreateQtPartControl(QWidget *parent) override;
-  virtual void SetFocus() override;
+    /// \brief called by QmitkFunctionality when DataManager's selection has changed
+    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
+                                   const QList<mitk::DataNode::Pointer> &nodes) override;
 
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-                                  const QList<mitk::DataNode::Pointer> &nodes) override;
+    /// \brief Called when the user clicks the GUI button
+    void DoImageProcessing();
 
-  /// \brief Called when the user clicks the GUI button
-  void DoImageProcessing();
+    virtual void ClearWavelength();
+  
+     Ui::SpectralUnmixingControls m_Controls;
+  
+     std::vector<int> m_Wavelengths;
+  
+     mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algorithm);
 
-  virtual void ClearWavelength();
+    // Selection of Chromophores
+    bool DeOxbool;
+    bool Oxbool;
+    bool Melaninbool;
+    bool Onebool;
+    bool PluignVerbose = false;
+  private:
 
-  Ui::SpectralUnmixingControls m_Controls;
+    /*
+    * \brief passes the wavelength information from the GUI on to the spectral unmixing filter base method
+    * "AddWavelength". 
+    * @param m_SpectralUnmixingFilter is a pointer of the spectral unmixing filter base
+    */
+    virtual void SetWavlength(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter);
 
-  std::vector<int> m_Wavelengths;
+    /*
+    * \brief passes the chromophore information from the GUI on to the spectral unmixing filter base method
+    * "AddChromophore".
+    * @param m_SpectralUnmixingFilter is a pointer of the spectral unmixing filter base
+    * @throw "PRESS 'IGNORE' AND CHOOSE A CHROMOPHORE!" if no chromophore was chosen
+    */
+    virtual void SetChromophore(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter);
 
-  mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algorithm);
+    virtual void WriteOutputToDataStorage(mitk::Image::Pointer m_Image, std::string name);
 
-  // Selection of Chromophores
-  bool DeOxbool;
-  bool Oxbool;
 };
 
 #endif // SpectralUnmixing_h

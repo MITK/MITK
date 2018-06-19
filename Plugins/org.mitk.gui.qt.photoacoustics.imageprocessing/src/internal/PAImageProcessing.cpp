@@ -742,7 +742,7 @@ void PAImageProcessing::SetResampling()
 
 mitk::BeamformingSettings::Pointer PAImageProcessing::CreateBeamformingSettings(mitk::Image::Pointer image)
 {
-  mitk::BeamformingSettings::BeamformingAlgorithm algorithm;
+  mitk::BeamformingSettings::BeamformingAlgorithm algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DAS;
   if ("DAS" == m_Controls.BFAlgorithm->currentText())
     algorithm = mitk::BeamformingSettings::BeamformingAlgorithm::DAS;
   else if ("DMAS" == m_Controls.BFAlgorithm->currentText())
@@ -752,7 +752,7 @@ mitk::BeamformingSettings::Pointer PAImageProcessing::CreateBeamformingSettings(
 
   mitk::BeamformingSettings::DelayCalc delay = mitk::BeamformingSettings::DelayCalc::Spherical;
 
-  mitk::BeamformingSettings::Apodization apod;
+  mitk::BeamformingSettings::Apodization apod = mitk::BeamformingSettings::Apodization::Box;
   if ("Von Hann" == m_Controls.Apodization->currentText())
   {
     apod = mitk::BeamformingSettings::Apodization::Hann;
@@ -786,7 +786,7 @@ mitk::BeamformingSettings::Pointer PAImageProcessing::CreateBeamformingSettings(
     timeSpacing = (2 * m_Controls.ScanDepth->value() / 1000 / speedOfSound) / image->GetDimension(1);
   }
 
-  bool isPAImage;
+  bool isPAImage = true;
   if ("US Image" == m_Controls.ImageType->currentText())
   {
     isPAImage = false;

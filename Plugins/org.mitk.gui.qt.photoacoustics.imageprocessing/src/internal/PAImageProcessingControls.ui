@@ -86,7 +86,7 @@
             <string>Save</string>
            </property>
            <property name="checked">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -136,16 +136,16 @@
        <item>
         <widget class="QComboBox" name="BModeMethod">
          <property name="currentText">
-          <string>Absolute Filter</string>
+          <string>Envelope Detection</string>
          </property>
          <item>
           <property name="text">
-           <string>Absolute Filter</string>
+           <string>Envelope Detection</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Envelope Detection</string>
+           <string>Absolute Filter</string>
           </property>
          </item>
         </widget>
@@ -393,7 +393,7 @@
             <double>0.100000000000000</double>
            </property>
            <property name="value">
-            <double>0.000000000000000</double>
+            <double>0.500000000000000</double>
            </property>
           </widget>
          </item>
@@ -410,7 +410,7 @@
             <string>If not checked, treat input as raw US/PA data with Y-axis a time coordinate [us]</string>
            </property>
            <property name="text">
-            <string>Use Position Space Coordinates</string>
+            <string>Assume Spatial Coordinates</string>
            </property>
           </widget>
          </item>
@@ -456,7 +456,7 @@
             <number>99999</number>
            </property>
            <property name="value">
-            <number>300</number>
+            <number>0</number>
            </property>
           </widget>
          </item>
@@ -483,7 +483,7 @@
             <number>5</number>
            </property>
            <property name="value">
-            <number>800</number>
+            <number>0</number>
            </property>
           </widget>
          </item>

@@ -56,7 +56,6 @@ namespace mitk {
     * - "PIXELTYPE ERROR! FLOAT 32 REQUIRED": The MITK input image has to consist out of floats.
     * - "ERROR! REMOVE WAVELENGTHS!": One needs at least the same amount of images (z-dimension) then added wavelengths.
     * - "ADD MORE WAVELENGTHS!": One needs at least the same amount of wavelengths then added chromophores.
-    * - "404 CHROMOPHORE NOT FOUND!": The chromophore is not a memeber of the enum "ChromophoreType" OR not supported by the filter.
     * - "WAVELENGTH XXX nm NOT SUPPORTED!": The wavelength is not part of the proptery calculater data base. The data base can be found @ 
     *   [...]\mitk\Modules\PhotoacousticsLib\Resources\spectralLIB.dat
     */

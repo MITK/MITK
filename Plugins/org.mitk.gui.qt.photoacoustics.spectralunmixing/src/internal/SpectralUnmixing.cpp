@@ -173,13 +173,6 @@ mitk::pa::SpectralUnmixingFilterBase::Pointer SpectralUnmixing::GetFilterInstanc
       ->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LS);
   }
 
-  else if (algorithm == "vigratest")
-  {
-    spectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
-    dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra*>(spectralUnmixingFilter.GetPointer())
-      ->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::vigratest);
-  }
-
   else if (algorithm == "SimplexMax")
   {
     spectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterSimplex::New();

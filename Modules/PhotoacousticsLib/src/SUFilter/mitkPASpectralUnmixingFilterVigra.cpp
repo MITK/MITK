@@ -16,13 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPASpectralUnmixingFilterVigra.h"
 
-// Includes for AddEnmemberMatrix
-#include "mitkPAPropertyCalculator.h"
-#include <eigen3/Eigen/Dense>
-
-// Testing algorithms
-#include <eigen3\Eigen\src\SVD\JacobiSVD.h>
-
 // ImageAccessor
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
@@ -34,96 +27,75 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::pa::SpectralUnmixingFilterVigra::SpectralUnmixingFilterVigra()
 {
- 
 }
 
 mitk::pa::SpectralUnmixingFilterVigra::~SpectralUnmixingFilterVigra()
 {
-
 }
 
-void mitk::pa::SpectralUnmixingFilterVigra::SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType SetAlgorithmIndex)
+void mitk::pa::SpectralUnmixingFilterVigra::SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType algorithmName)
 {
-  algorithmIndex = SetAlgorithmIndex;
+  algorithmName = algorithmName;
 }
 
 void mitk::pa::SpectralUnmixingFilterVigra::AddWeight(unsigned int weight)
 {
-  m_Weight.push_back(weight);
+  double value = double(weight) / 100.0;
+  weightsvec.push_back(value);
 }
 
 Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::SpectralUnmixingAlgorithm(
-  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> endmemberMatrix, Eigen::VectorXf inputVector)
 {
-  int numberOfWavelengths = EndmemberMatrix.rows();
-  int numberOfChromophores = EndmemberMatrix.cols();
-  Eigen::VectorXf resultVector(numberOfChromophores);
+  unsigned int numberOfWavelengths = endmemberMatrix.rows();
+  unsigned int numberOfChromophores = endmemberMatrix.cols();
 
-  using namespace vigra;
-  using namespace vigra::linalg;
-
-  std::vector<double> A_data;
-  std::vector<double> B_data;
-
-
-  for (int i = 0; i < numberOfWavelengths; ++i)
+  // writes endmemberMatrix and inputVector into vigra::Matrix<double>
+  std::vector<double> aData;
+  std::vector<double> bData;
+  for (unsigned int i = 0; i < numberOfWavelengths; ++i)
   {
-    B_data.push_back((double)inputVector(i));
-    for (int j = 0; j < numberOfChromophores; ++j)
-    {
-      A_data.push_back((double)EndmemberMatrix(i, j));
-    }
+    bData.push_back((double)inputVector(i));
+    for (unsigned int j = 0; j < numberOfChromophores; ++j)
+      aData.push_back((double)endmemberMatrix(i, j));
   }
+  const double* aDat = aData.data();
+  const double* bDat = bData.data();
 
-  const double* Adat = A_data.data();
-  const double* Bdat = B_data.data();
+  vigra::Matrix<double> A(vigra::Shape2(numberOfWavelengths, numberOfChromophores), aDat);
+  vigra::Matrix<double> b(vigra::Shape2(numberOfWavelengths, 1), bDat);
+  vigra::Matrix<double> x(vigra::Shape2(numberOfChromophores, 1));
 
-  vigra::Matrix<double> A(Shape2(numberOfWavelengths, numberOfChromophores), Adat);
-  vigra::Matrix<double> b(Shape2(numberOfWavelengths, 1), Bdat);
-  vigra::Matrix<double> x(Shape2(numberOfChromophores, 1));
-
-  // minimize (A*x-b)^2  s.t. x>=0 using least angle regression (LARS algorithm)
-  if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LARS == algorithmIndex)
+  if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LARS == algorithmName)
     nonnegativeLeastSquares(A, b, x);
 
-  else if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::GOLDFARB == algorithmIndex)
+  else if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::GOLDFARB == algorithmName)
   {
-    vigra::Matrix<double> eye(identityMatrix<double>(numberOfChromophores)),
-      zeros(Shape2(numberOfChromophores, 1)),
+    vigra::linalg::Matrix<double> eye(vigra::linalg::identityMatrix<double>(numberOfChromophores)),
+      zeros(vigra::Shape2(numberOfChromophores, 1)),
       empty,
-      U = transpose(A)*A,
-      v = -transpose(A)*b;
-    x = 0;
-
-    // minimize (A*x-b)^2  s.t. x>=0 using the Goldfarb-Idnani algorithm
-    quadraticProgramming(U, v, empty, empty, eye, zeros, x);
+      U = vigra::linalg::transpose(A)*A,
+      // v= -transpose(A)*b replaced by -v used in "quadraticProgramming"
+      v = vigra::linalg::transpose(A)*b;
+      x = 0;
+    quadraticProgramming(U, -v, empty, empty, eye, zeros, x);
   }
 
-  else if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED == algorithmIndex)
+  else if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED == algorithmName)
   {
-    std::vector<double> weightsvec;
-    for (int i = 0; i < m_Weight.size(); ++i)
-    {
-      double value = double (m_Weight[i]) / 100.0;
-      weightsvec.push_back(value);
-    }
-
     const double* weightsdat = weightsvec.data();
-    vigra::Matrix<double> weigths(Shape2(numberOfWavelengths, 1), weightsdat);
-
+    vigra::Matrix<double> weigths(vigra::Shape2(numberOfWavelengths, 1), weightsdat);
     vigra::linalg::weightedLeastSquares(A, b, weigths, x);
   }
 
-  else if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LS == algorithmIndex)
+  else if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::LS == algorithmName)
     linearSolve(A, b, x);
-
-  else if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::vigratest == algorithmIndex)
-    mitkThrow() << "nothing implemented";
 
   else
     mitkThrow() << "404 VIGRA ALGORITHM NOT FOUND";
 
-  for (int k = 0; k < numberOfChromophores; ++k)
+  Eigen::VectorXf resultVector(numberOfChromophores);
+  for (unsigned int k = 0; k < numberOfChromophores; ++k)
     resultVector[k] = (float)x(k, 0);
 
   return resultVector;

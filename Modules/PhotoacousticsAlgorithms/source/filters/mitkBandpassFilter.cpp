@@ -176,6 +176,7 @@ void mitk::BandpassFilter::GenerateData()
 
   double powerOfTwo = std::log2(input->GetDimension(1));
   int finalSize = 0;
+  double spacingResize = 1;
 
   // check if this is a power of two by checking that log2 is int
   if (std::fmod(powerOfTwo, 1.0) >= std::numeric_limits<double>::epsilon())
@@ -185,6 +186,7 @@ void mitk::BandpassFilter::GenerateData()
     double spacing_y = input->GetGeometry()->GetSpacing()[1] * ((double)input->GetDimensions()[1]) / finalSize;
     double dim[2] = {spacing_x, spacing_y};
     resampledInput = m_FilterService->ApplyResampling(input, dim);
+    spacingResize = (double)input->GetDimension(1) / finalSize;
   }
 
   // do a fourier transform, multiply with an appropriate window for the filter, and transform back
@@ -212,8 +214,9 @@ void mitk::BandpassFilter::GenerateData()
   if (m_HighPass > m_LowPass)
     mitkThrow() << "High pass frequency higher than low pass frequency, abort";
 
-  float singleVoxel =
-    2 * M_PI / ((float)resampledInput->GetGeometry()->GetSpacing()[1] * resampledInput->GetDimension(1)); // [MHz]
+  float singleVoxel = spacingResize / (m_TimeSpacing * resampledInput->GetDimension(1)); // [Hz]
+  if(m_IsBFImage)
+    singleVoxel = spacingResize / (resampledInput->GetGeometry()->GetSpacing()[1] / 1e3 / m_SpeedOfSound * resampledInput->GetDimension(1)); // [Hz]
   float cutoffPixelHighPass = std::min((m_HighPass / singleVoxel), (float)resampledInput->GetDimension(1) / 2.0f);
   float cutoffPixelLowPass = std::min((m_LowPass / singleVoxel), (float)resampledInput->GetDimension(1) / 2.0f);
 

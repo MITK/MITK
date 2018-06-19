@@ -193,7 +193,8 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBeamforming(
 mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBandpassFilter(
   mitk::Image::Pointer data,
   float BPHighPass, float BPLowPass,
-  float alphaHighPass, float alphaLowPass)
+  float alphaHighPass, float alphaLowPass,
+  float TimeSpacing, float SpeedOfSound, bool IsBFImage)
 {
   try 
   {
@@ -204,6 +205,9 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBandpassFilter(
     bandpassFilter->SetLowPass(BPLowPass);
     bandpassFilter->SetHighPassAlpha(alphaHighPass);
     bandpassFilter->SetLowPassAlpha(alphaLowPass);
+    bandpassFilter->SetSpeedOfSound(SpeedOfSound);
+    bandpassFilter->SetTimeSpacing(TimeSpacing);
+    bandpassFilter->SetIsBFImage(IsBFImage);
     bandpassFilter->Update();
     return bandpassFilter->GetOutput();
   }

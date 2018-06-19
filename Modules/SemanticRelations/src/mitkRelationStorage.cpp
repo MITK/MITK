@@ -781,12 +781,13 @@ void mitk::RelationStorage::OverwriteLesion(const SemanticTypes::CaseID& caseID,
   const auto existingLesion = std::find(lesionVectorValue.begin(), lesionVectorValue.end(), lesion.UID);
   if (existingLesion != lesionVectorValue.end())
   {
-    // overwrite the lesion with the new, given lesion class UID
     std::string lesionID = *existingLesion;
+
+    // overwrite the referenced lesion class UID with the new, given lesion class UID
     std::string lesionClassID = lesion.lesionClass.UID;
     propertyList->SetStringProperty(lesionID.c_str(), lesionClassID.c_str());
 
-    // overwrite the lesion class with the lesion class UID as key and the class type as value
+    // overwrite the lesion class with the lesion class UID as key and the new, given class type as value
     std::string lesionClassType = lesion.lesionClass.classType;
     propertyList->SetStringProperty(lesionClassID.c_str(), lesionClassType.c_str());
   }

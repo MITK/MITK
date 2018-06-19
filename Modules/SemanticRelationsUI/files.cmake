@@ -4,6 +4,7 @@ set(CPP_FILES
   mitkModuleActivator.cpp
   QmitkControlPointDialog.cpp
   QmitkLesionInfoWidget.cpp
+  QmitkLesionTextDialog.cpp
   QmitkPatientTableInspector.cpp
   QmitkPatientTableModel.cpp
   QmitkSelectNodeDialog.cpp
@@ -16,6 +17,7 @@ set(CPP_FILES
 set(MOC_H_FILES
  include/QmitkControlPointDialog.h
  include/QmitkLesionInfoWidget.h
+ include/QmitkLesionTextDialog.h
  include/QmitkPatientTableInspector.h
  include/QmitkPatientTableModel.h
  include/QmitkSelectNodeDialog.h

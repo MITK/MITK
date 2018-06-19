@@ -16,10 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations UI module
 #include "QmitkLesionInfoWidget.h"
+#include "QmitkLesionTextDialog.h"
 
 #include "QmitkCustomVariants.h"
 
 // semantic relations module
+#include <mitkLesionManager.h>
 #include <mitkNodePredicates.h>
 #include <mitkUIDGeneratorBoost.h>
 
@@ -30,12 +32,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 
 // qt
+#include <QCompleter>
 #include <QListWidget>
 #include <QMenu>
 #include <QMessageBox>
 #include <QString>
 
-const QBrush QmitkLesionInfoWidget::DEFAULT_BACKGROUND_COLOR = QBrush(Qt::white);
+const QBrush QmitkLesionInfoWidget::DEFAULT_BACKGROUND_COLOR = QBrush(Qt::transparent);
 const QBrush QmitkLesionInfoWidget::SELECTED_BACKGROUND_COLOR = QBrush(Qt::green);
 const QBrush QmitkLesionInfoWidget::CONNECTED_BACKGROUND_COLOR = QBrush(Qt::darkGreen);
 
@@ -375,9 +378,9 @@ void QmitkLesionInfoWidget::OnLesionListContextMenuRequested(const QPoint& pos)
     return;
   }
 
-  mitk::SemanticTypes::Lesion selectedLesion;
-  selectedLesion.UID = currentItem->text().toStdString();
-  if (selectedLesion.UID.empty())
+  mitk::SemanticTypes::ID selectedLesionUID;
+  selectedLesionUID = currentItem->text().toStdString();
+  if (selectedLesionUID.empty())
   {
     // no UID found; cannot create a lesion
     return;
@@ -387,17 +390,17 @@ void QmitkLesionInfoWidget::OnLesionListContextMenuRequested(const QPoint& pos)
 
   QAction* linkToSegmentation = new QAction("Link to segmentation", this);
   linkToSegmentation->setEnabled(true);
-  connect(linkToSegmentation, &QAction::triggered, [this, selectedLesion] { OnLinkToSegmentation(selectedLesion); });
+  connect(linkToSegmentation, &QAction::triggered, [this, selectedLesionUID] { OnLinkToSegmentation(selectedLesionUID); });
   menu->addAction(linkToSegmentation);
 
   QAction* setLesionClass = new QAction("Set lesion class", this);
   setLesionClass->setEnabled(true);
-  connect(setLesionClass, &QAction::triggered, [this, selectedLesion] { OnSetLesionClass(selectedLesion); });
+  connect(setLesionClass, &QAction::triggered, [this, selectedLesionUID] { OnSetLesionClass(selectedLesionUID); });
   menu->addAction(setLesionClass);
 
   QAction* removeLesion = new QAction("Remove lesion", this);
   removeLesion->setEnabled(true);
-  connect(removeLesion, &QAction::triggered, [this, selectedLesion] { OnRemoveLesion(selectedLesion); });
+  connect(removeLesion, &QAction::triggered, [this, selectedLesionUID] { OnRemoveLesion(selectedLesionUID); });
   menu->addAction(removeLesion);
 
   menu->popup(QCursor::pos());
@@ -466,8 +469,16 @@ void QmitkLesionInfoWidget::OnImageListContextMenuRequested(const QPoint& pos)
   menu->popup(QCursor::pos());
 }
 
-void QmitkLesionInfoWidget::OnLinkToSegmentation(const mitk::SemanticTypes::Lesion& selectedLesion)
+void QmitkLesionInfoWidget::OnLinkToSegmentation(const mitk::SemanticTypes::ID& selectedLesionUID)
 {
+  // retrieve the full lesion with its lesion class using the given lesion UID
+  mitk::SemanticTypes::Lesion selectedLesion = mitk::GetLesionByUID(selectedLesionUID, m_SemanticRelations->GetAllLesionsOfCase(m_CaseID));
+  if (selectedLesion.UID.empty())
+  {
+    // could not find lesion information for the selected lesion
+    return;
+  }
+
   int dialogReturnValue = m_SimpleDatamanagerNodeDialog->exec();
   if (QDialog::Rejected == dialogReturnValue)
   {
@@ -522,7 +533,54 @@ void QmitkLesionInfoWidget::OnLinkToSegmentation(const mitk::SemanticTypes::Lesi
   }
 }
 
-void QmitkLesionInfoWidget::OnRemoveLesion(const mitk::SemanticTypes::Lesion& selectedLesion)
+void QmitkLesionInfoWidget::OnSetLesionClass(const mitk::SemanticTypes::ID& selectedLesionUID)
+{
+  // retrieve the full lesion with its lesion class using the given lesion UID
+  mitk::SemanticTypes::Lesion selectedLesion = mitk::GetLesionByUID(selectedLesionUID, m_SemanticRelations->GetAllLesionsOfCase(m_CaseID));
+  if (selectedLesion.UID.empty())
+  {
+    // could not find lesion information for the selected lesion
+    return;
+  }
+
+  // use the lesion information to set the input text for the dialog
+  QmitkLesionTextDialog* inputDialog = new QmitkLesionTextDialog(this);
+  inputDialog->setWindowTitle("Set lesion class");
+  inputDialog->SetLineEditText(selectedLesion.lesionClass.classType);
+
+  // prepare the completer for the dialogs input text field
+  mitk::LesionClassVector allLesionClasses = m_SemanticRelations->GetAllLesionClassesOfCase(m_CaseID);
+
+  QStringList wordList;
+  for (const auto& lesionClass : allLesionClasses)
+  {
+    wordList << QString::fromStdString(lesionClass.classType);
+  }
+  QCompleter* completer = new QCompleter(wordList, this);
+  completer->setCaseSensitivity(Qt::CaseInsensitive);
+  inputDialog->GetLineEdit()->setCompleter(completer);
+
+  int dialogReturnValue = inputDialog->exec();
+  if (QDialog::Rejected == dialogReturnValue)
+  {
+    return;
+  }
+
+  // retrieve the new input lesion class type and check for an already existing lesion class types
+  std::string newLesionClassType = inputDialog->GetLineEditText().toStdString();
+  mitk::SemanticTypes::LesionClass existingLesionClass = mitk::FindExistingLesionClass(newLesionClassType, allLesionClasses);
+  if (existingLesionClass.UID.empty())
+  {
+    // could not find lesion class information for the new lesion class type
+    // create a new lesion class for the selected lesion
+    existingLesionClass = mitk::GenerateNewLesionClass(newLesionClassType);
+  }
+
+  selectedLesion.lesionClass = existingLesionClass;
+  m_SemanticRelations->OverwriteLesion(m_CaseID, selectedLesion);
+}
+
+void QmitkLesionInfoWidget::OnRemoveLesion(const mitk::SemanticTypes::ID& selectedLesionUID)
 {
   if (m_CaseID.empty())
   {
@@ -531,6 +589,14 @@ void QmitkLesionInfoWidget::OnRemoveLesion(const mitk::SemanticTypes::Lesion& se
     msgBox.setText("In order to remove a lesion, please specify the current case / patient.");
     msgBox.setIcon(QMessageBox::Warning);
     msgBox.exec();
+    return;
+  }
+
+  // retrieve the full lesion with its lesion class using the given lesion UID
+  mitk::SemanticTypes::Lesion selectedLesion = mitk::GetLesionByUID(selectedLesionUID, m_SemanticRelations->GetAllLesionsOfCase(m_CaseID));
+  if (selectedLesion.UID.empty())
+  {
+    // could not find lesion information for the selected lesion
     return;
   }
 
@@ -548,12 +614,6 @@ void QmitkLesionInfoWidget::OnRemoveLesion(const mitk::SemanticTypes::Lesion& se
     msgBox.setIcon(QMessageBox::Warning);
     msgBox.exec();
   }
-}
-
-void QmitkLesionInfoWidget::OnSetLesionClass(const mitk::SemanticTypes::Lesion& selectedLesion)
-{
-  // get lesion class from user input and generate UID for lesion class
-  //m_SemanticRelations->OverwriteLesion()
 }
 
 void QmitkLesionInfoWidget::OnUnlinkFromLesion(const mitk::DataNode* selectedSegmentation)

@@ -92,7 +92,7 @@ namespace mitk
     };
 
     /*
-    * @brief The concept of a lesion.
+    * @brief The concept of a lesion class.
     */
     struct LesionClass
     {

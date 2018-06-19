@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSemanticRelationsNodeSelectionDialog.h"
 
 // semantic relations module
+#include <mitkLesionManager.h>
 #include <mitkNodePredicates.h>
 #include <mitkSemanticRelationException.h>
 #include <mitkUIDGeneratorBoost.h>
@@ -31,12 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 const std::string QmitkSemanticRelationsView::VIEW_ID = "org.mitk.views.semanticrelations";
-
-QmitkSemanticRelationsView::QmitkSemanticRelationsView()
-  : m_SemanticRelations(nullptr)
-{
-  // nothing here
-}
 
 void QmitkSemanticRelationsView::SetFocus()
 {
@@ -55,7 +50,7 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.caseIDComboBox, SIGNAL(currentIndexChanged(const QString&)), SLOT(OnCaseIDSelectionChanged(const QString&)));
   connect(m_Controls.selectPatientNodePushButton, SIGNAL(clicked()), SLOT(OnSelectPatientNodeButtonClicked()));
 
-  m_LesionInfoWidget = new QmitkLesionInfoWidget(GetDataStorage());
+  m_LesionInfoWidget = new QmitkLesionInfoWidget(GetDataStorage(), m_Parent);
   m_Controls.gridLayout->addWidget(m_LesionInfoWidget, 3, 0, 1, 3);
   connect(m_LesionInfoWidget, SIGNAL(JumpToPosition(const mitk::Point3D&)), SLOT(OnJumpToPosition(const mitk::Point3D&)));
   connect(m_LesionInfoWidget, SIGNAL(ImageRemoved(const mitk::DataNode*)), SLOT(OnImageRemoved(const mitk::DataNode*)));
@@ -128,11 +123,7 @@ void QmitkSemanticRelationsView::OnAddLesionButtonClicked()
     return;
   }
 
-  mitk::SemanticTypes::Lesion newLesion;
-  newLesion.UID = mitk::UIDGeneratorBoost::GenerateUID();
-  newLesion.lesionClass = mitk::SemanticTypes::LesionClass();
-  newLesion.lesionClass.UID = mitk::UIDGeneratorBoost::GenerateUID();
-
+  mitk::SemanticTypes::Lesion newLesion = mitk::GenerateNewLesion();
   try
   {
     m_SemanticRelations->AddLesion(m_CaseID, newLesion);

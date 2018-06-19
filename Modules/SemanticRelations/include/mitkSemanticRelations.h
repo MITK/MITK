@@ -55,6 +55,7 @@ namespace mitk
     ~SemanticRelations();
 
     typedef std::vector<SemanticTypes::Lesion> LesionVector;
+    typedef std::vector<SemanticTypes::LesionClass> LesionClassVector;
     typedef std::vector<SemanticTypes::ControlPoint> ControlpointVector;
     typedef std::vector<SemanticTypes::InformationType> InformationTypeVector;
     typedef std::vector<DataNode::Pointer> DataNodeVector;
@@ -87,8 +88,14 @@ namespace mitk
     * @return        A vector of lesions.
     */
     LesionVector GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID) const;
+    /**
+    * @brief
+    *
+    *
+    */
+    LesionClassVector GetAllLesionClassesOfCase(const SemanticTypes::CaseID& caseID) const;
     /*
-    * @brief  Returns a vector of all lesions that are valid for the given case, given a specific lesion
+    * @brief  Returns a vector of all lesions that are valid for the given case, given a specific control point.
     *
     * @par caseID         The current case identifier is defined by the given string.
     * @par controlPoint   A specific control point which has to be available at a returned (found) lesion:

@@ -54,7 +54,6 @@ class QmitkSemanticRelationsView : public QmitkAbstractView
 public:
 
   static const std::string VIEW_ID;
-  QmitkSemanticRelationsView();
 
 protected:
 

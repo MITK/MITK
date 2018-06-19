@@ -77,6 +77,33 @@ mitk::SemanticRelations::LesionVector mitk::SemanticRelations::GetAllLesionsOfCa
   return allLesions;
 }
 
+mitk::SemanticRelations::LesionClassVector mitk::SemanticRelations::GetAllLesionClassesOfCase(const SemanticTypes::CaseID& caseID) const
+{
+  LesionVector allLesionsOfCase = GetAllLesionsOfCase(caseID);
+  LesionClassVector allLesionClassesOfCase;
+
+  for (const auto& lesion : allLesionsOfCase)
+  {
+    allLesionClassesOfCase.push_back(lesion.lesionClass);
+  }
+
+  // remove duplicate entries
+  auto lessThan = [](const SemanticTypes::LesionClass& lesionClassL, const SemanticTypes::LesionClass& lesionClassR)
+  {
+    return lesionClassL.UID < lesionClassR.UID;
+  };
+
+  auto equal = [](const SemanticTypes::LesionClass& lesionClassL, const SemanticTypes::LesionClass& lesionClassR)
+  {
+    return lesionClassL.UID == lesionClassR.UID;
+  };
+
+  std::sort(allLesionClassesOfCase.begin(), allLesionClassesOfCase.end(), lessThan);
+  allLesionClassesOfCase.erase(std::unique(allLesionClassesOfCase.begin(), allLesionClassesOfCase.end(), equal), allLesionClassesOfCase.end());
+
+  return allLesionClassesOfCase;
+}
+
 mitk::SemanticRelations::LesionVector mitk::SemanticRelations::GetAllLesionsInImage(const DataNode* imageNode) const
 {
   if (nullptr == imageNode)

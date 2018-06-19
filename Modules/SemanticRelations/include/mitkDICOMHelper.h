@@ -83,6 +83,21 @@ namespace mitk
   *                 the underlying base data is invalid or the DICOM tag does not exist for the given data node).
   */
   MITKSEMANTICRELATIONS_EXPORT SemanticTypes::Date GetDICOMDateFromDataNode(const mitk::DataNode* dataNode);
+  /**
+  * @brief Extracts a specific DICOM tag from the node's base data and returns the tag as a string.
+  *        This tag string is used as the modality of the image data.
+  *
+  * @pre    The given data node or the node's base data has to be valid (!nullptr).
+  * @pre    The node's base data has to have the "0x0008, 0x0060" DICOM Tag property set.
+  * @throw  mitk::Exception if the given data node, the node's base data or the extracted DICOM tag are invalid (==nullptr).
+  *
+  * @par dataNode   The data node, of which the DICOM tag should be extracted.
+  *
+  * @return         The extracted DICOM tag as string.
+  *                 An empty string, if the DICOM tag can not be extracted (i.e. the data node or
+  *                 the underlying base data is invalid or the DICOM tag does not exist for the given data node).
+  */
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::InformationType GetDICOMModalityFromDataNode(const mitk::DataNode* dataNode);
   /*
   * @brief Removes leading and trailing whitespace from the given string.
   *

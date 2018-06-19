@@ -102,6 +102,30 @@ mitk::SemanticTypes::Date mitk::GetDICOMDateFromDataNode(const mitk::DataNode* d
   return GetDateFromString(acquisitionDateAsString);
 }
 
+mitk::SemanticTypes::InformationType mitk::GetDICOMModalityFromDataNode(const mitk::DataNode* dataNode)
+{
+  if (nullptr == dataNode)
+  {
+    mitkThrow() << "Not a valid data node.";
+  }
+
+  mitk::BaseData* baseData = dataNode->GetData();
+  if (nullptr == baseData)
+  {
+    mitkThrow() << "No valid base data.";
+  }
+
+  // extract suitable DICOM tag to use as the information type
+  // DICOM tag "0x0008, 0x0060" is Modality
+  mitk::BaseProperty* dicomTag = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str());
+  if (nullptr == dicomTag)
+  {
+    mitkThrow() << "Not a valid DICOM property.";
+  }
+  std::string dicomTagAsString = dicomTag->GetValueAsString();
+  return dicomTagAsString;
+}
+
 std::string mitk::TrimDICOM(const std::string& identifier)
 {
   if (identifier.empty())

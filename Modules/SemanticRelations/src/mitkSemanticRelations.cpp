@@ -433,7 +433,9 @@ void mitk::SemanticRelations::AddImage(const mitk::DataNode* imageNode)
   m_RelationStorage->AddCase(caseID);
   m_RelationStorage->AddImage(caseID, nodeID);
 
-  AddInformationTypeToImage(imageNode, "unspecified");
+
+  SemanticTypes::InformationType informationType = GetDICOMModalityFromDataNode(imageNode);
+  AddInformationTypeToImage(imageNode, informationType);
 
   // find the correct control point for this image
   std::vector<SemanticTypes::ControlPoint> allControlPoints = GetAllControlPointsOfCase(caseID);
@@ -460,21 +462,20 @@ void mitk::SemanticRelations::AddImage(const mitk::DataNode* imageNode)
       // create a new control point for the image data
       SemanticTypes::ControlPoint newControlPoint = GenerateControlPoint(imageNode);
       AddControlPointAndLinkData(imageNode, newControlPoint);
-      NotifyObserver(caseID);
     }
     else
     {
       // found a control point that was extended
       OverwriteControlPointAndLinkData(imageNode, extendedControlPoint);
-      NotifyObserver(caseID);
     }
   }
   else
   {
     // found a fitting control point
     LinkDataToControlPoint(imageNode, fittingControlPoint);
-    NotifyObserver(caseID);
   }
+
+  NotifyObserver(caseID);
 }
 
 void mitk::SemanticRelations::RemoveImage(const mitk::DataNode* imageNode)

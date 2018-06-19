@@ -47,6 +47,10 @@ void mitk::pa::SpectralUnmixingFilterVigra::SetAlgorithm(mitk::pa::SpectralUnmix
   algorithmIndex = SetAlgorithmIndex;
 }
 
+void mitk::pa::SpectralUnmixingFilterVigra::AddWeight(unsigned int weight)
+{
+  m_Weight.push_back(weight);
+}
 
 Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::SpectralUnmixingAlgorithm(
   Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)

@@ -39,10 +39,13 @@ namespace mitk {
         vigratest
       };
 
+      void AddWeight(unsigned int weight);
+
       void mitk::pa::SpectralUnmixingFilterVigra::SetAlgorithm(VigraAlgortihmType SetAlgorithmIndex);
     protected:
       SpectralUnmixingFilterVigra();
       virtual ~SpectralUnmixingFilterVigra();
+      std::vector<int> m_Weight;
 
       virtual Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
         Eigen::VectorXf inputVector) override;

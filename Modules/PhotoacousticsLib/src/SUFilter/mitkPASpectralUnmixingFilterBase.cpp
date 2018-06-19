@@ -53,11 +53,6 @@ void mitk::pa::SpectralUnmixingFilterBase::AddChromophore(mitk::pa::PropertyCalc
   m_Chromophore.push_back(chromophore);
 }
 
-void mitk::pa::SpectralUnmixingFilterBase::AddWeight(unsigned int weight)
-{
-  m_Weight.push_back(weight);
-}
-
 void mitk::pa::SpectralUnmixingFilterBase::Verbose(bool verbose)
 {
   m_Verbose = verbose;

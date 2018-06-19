@@ -82,7 +82,6 @@ namespace mitk {
       */
       void AddWavelength(int wavelength);
 
-      void AddWeight(unsigned int weight); // has to be a part of the vigra class
       ofstream myfile; // just for testing purposes; has to be removeed
 
     protected:
@@ -111,7 +110,6 @@ namespace mitk {
 
       std::vector<mitk::pa::PropertyCalculator::ChromophoreType> m_Chromophore;
       std::vector<int> m_Wavelength;
-      std::vector<int> m_Weight; // has to be a part of the vigra class
 
     private:
       /*

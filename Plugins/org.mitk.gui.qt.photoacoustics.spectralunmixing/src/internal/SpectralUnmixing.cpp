@@ -160,7 +160,8 @@ mitk::pa::SpectralUnmixingFilterBase::Pointer SpectralUnmixing::GetFilterInstanc
       QString Text = m_Controls.inputtable->item(1, colunm)->text();
       Weight = Text.toInt();
       if (Weight > 0)
-        spectralUnmixingFilter->AddWeight(Weight);
+        dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra*>(spectralUnmixingFilter.GetPointer())
+        ->AddWeight(Weight);
       ++colunm;
     }
   }

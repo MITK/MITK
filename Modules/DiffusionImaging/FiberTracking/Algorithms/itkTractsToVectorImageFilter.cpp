@@ -13,7 +13,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <boost/progress.hpp>
-
+#include <mitkDiffusionFunctionCollection.h>
 
 namespace itk{
 
@@ -27,7 +27,6 @@ TractsToVectorImageFilter< PixelType >::TractsToVectorImageFilter():
   m_NormalizationMethod(GLOBAL_MAX),
   m_AngularThreshold(0.7),
   m_Epsilon(0.999),
-  m_UseWorkingCopy(true),
   m_MaxNumDirections(3),
   m_SizeThreshold(0.3)
 {
@@ -141,21 +140,6 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
   m_DirectionImage->Allocate();
   m_DirectionImage->FillBuffer(0.0);
 
-  // resample fiber bundle
-  double minSpacing = 1;
-  if(m_OutImageSpacing[0]<m_OutImageSpacing[1] && m_OutImageSpacing[0]<m_OutImageSpacing[2])
-    minSpacing = m_OutImageSpacing[0];
-  else if (m_OutImageSpacing[1] < m_OutImageSpacing[2])
-    minSpacing = m_OutImageSpacing[1];
-  else
-    minSpacing = m_OutImageSpacing[2];
-
-  if (m_UseWorkingCopy)
-    m_FiberBundle = m_FiberBundle->GetDeepCopy();
-
-  // resample fiber bundle for sufficient voxel coverage
-  m_FiberBundle->ResampleLinear(minSpacing/10);
-
   // iterate over all fibers
   vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
   int numFibers = m_FiberBundle->GetNumFibers();
@@ -175,55 +159,65 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
       continue;
 
     vnl_vector_fixed<double, 3> dir;
-    itk::Point<double, 3> worldPos;
     vnl_vector<double> v;
-
 
     float fiberWeight = m_FiberBundle->GetFiberWeight(i);
 
     for( int j=0; j<numPoints-1; j++)
     {
-      // get current position along fiber in world coordinates
-      double* temp = points->GetPoint(j);
-      worldPos = GetItkPoint(temp);
-      itk::Index<3> index;
-      m_MaskImage->TransformPhysicalPointToIndex(worldPos, index);
-      if (!m_MaskImage->GetLargestPossibleRegion().IsInside(index) || m_MaskImage->GetPixel(index)==0)
-        continue;
+      itk::Point<float, 3> startVertex = GetItkPoint(points->GetPoint(j));
+      itk::Index<3> startIndex;
+      itk::ContinuousIndex<float, 3> startIndexCont;
+      m_MaskImage->TransformPhysicalPointToIndex(startVertex, startIndex);
+      m_MaskImage->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
 
-      // get fiber tangent direction at this position
-      v = GetVnlVector(temp);
-      dir = GetVnlVector(points->GetPoint(j+1))-v;
+      itk::Point<float, 3> endVertex = GetItkPoint(points->GetPoint(j + 1));
+      itk::Index<3> endIndex;
+      itk::ContinuousIndex<float, 3> endIndexCont;
+      m_MaskImage->TransformPhysicalPointToIndex(endVertex, endIndex);
+      m_MaskImage->TransformPhysicalPointToContinuousIndex(endVertex, endIndexCont);
+
+      dir[0] = endVertex[0]-startVertex[0];
+      dir[1] = endVertex[1]-startVertex[1];
+      dir[2] = endVertex[2]-startVertex[2];
       if (dir.is_zero())
         continue;
       dir.normalize();
 
-      // add direction to container
-      unsigned int idx = index[0] + outImageSize[0]*(index[1] + outImageSize[1]*index[2]);
-      DirectionContainerType::Pointer dirCont;
-      if (m_DirectionsContainer->IndexExists(idx))
+      std::vector< std::pair< itk::Index<3>, double > > segments = mitk::imv::IntersectImage(spacing3, startIndex, endIndex, startIndexCont, endIndexCont);
+      for (std::pair< itk::Index<3>, double > segment : segments)
       {
-        peakLengths->ElementAt(idx).push_back(fiberWeight);
+        if (!m_MaskImage->GetLargestPossibleRegion().IsInside(segment.first) || m_MaskImage->GetPixel(segment.first)==0)
+          continue;
 
-        dirCont = m_DirectionsContainer->GetElement(idx);
-        if (dirCont.IsNull())
+        // add direction to container
+        unsigned int idx = segment.first[0] + outImageSize[0]*(segment.first[1] + outImageSize[1]*segment.first[2]);
+        DirectionContainerType::Pointer dirCont;
+        if (m_DirectionsContainer->IndexExists(idx))
+        {
+          peakLengths->ElementAt(idx).push_back(fiberWeight*segment.second);
+
+          dirCont = m_DirectionsContainer->GetElement(idx);
+          if (dirCont.IsNull())
+          {
+            dirCont = DirectionContainerType::New();
+            dirCont->push_back(dir);
+            m_DirectionsContainer->InsertElement(idx, dirCont);
+          }
+          else
+            dirCont->push_back(dir);
+        }
+        else
         {
           dirCont = DirectionContainerType::New();
           dirCont->push_back(dir);
           m_DirectionsContainer->InsertElement(idx, dirCont);
-        }
-        else
-          dirCont->push_back(dir);
-      }
-      else
-      {
-        dirCont = DirectionContainerType::New();
-        dirCont->push_back(dir);
-        m_DirectionsContainer->InsertElement(idx, dirCont);
 
-        std::vector< double > lengths; lengths.push_back(fiberWeight);
-        peakLengths->InsertElement(idx, lengths);
+          std::vector< double > lengths; lengths.push_back(fiberWeight*segment.second);
+          peakLengths->InsertElement(idx, lengths);
+        }
       }
+
     }
   }
 

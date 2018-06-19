@@ -57,8 +57,6 @@ public:
   itkSetMacro( AngularThreshold, float)                               ///< cluster directions that are closer together than the specified threshold
   itkGetMacro( AngularThreshold, float)                               ///< cluster directions that are closer together than the specified threshold
   itkSetMacro( NormalizationMethod, NormalizationMethods)             ///< normalization method of peaks
-  itkSetMacro( UseWorkingCopy, bool)                                  ///< Do not modify input fiber bundle. Use a copy.
-  itkGetMacro( UseWorkingCopy, bool)                                  ///< Do not modify input fiber bundle. Use a copy.
   itkSetMacro( MaxNumDirections, unsigned long)                       ///< If more directions are extracted, only the largest are kept.
   itkGetMacro( MaxNumDirections, unsigned long)                       ///< If more directions are extracted, only the largest are kept.
   itkSetMacro( MaskImage, ItkUcharImgType::Pointer)                   ///< only process voxels inside mask
@@ -87,7 +85,6 @@ protected:
   ItkUcharImgType::Pointer            m_MaskImage;                        ///< only voxels inside the binary mask are processed
   itk::Vector<float>                  m_OutImageSpacing;                  ///< spacing of output image
   ContainerType::Pointer              m_DirectionsContainer;              ///< container for fiber directions
-  bool                                m_UseWorkingCopy;                   ///< do not modify input fiber bundle but work on copy
   unsigned long                       m_MaxNumDirections;                 ///< if more directions per voxel are extracted, only the largest are kept
   float                               m_SizeThreshold;
 

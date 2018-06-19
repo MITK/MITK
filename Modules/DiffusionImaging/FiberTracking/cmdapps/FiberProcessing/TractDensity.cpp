@@ -141,7 +141,6 @@ int main(int argc, char* argv[])
       generator->SetFiberBundle(fib);
       generator->SetBinaryOutput(binary);
       generator->SetOutputAbsoluteValues(!normalize);
-      generator->SetWorkOnFiberCopy(false);
       generator->SetUpsamplingFactor(upsampling);
 
       if (ref_img.IsNotNull())
@@ -172,7 +171,6 @@ int main(int argc, char* argv[])
       generator->SetFiberBundle(fib);
       generator->SetBinaryOutput(binary);
       generator->SetOutputAbsoluteValues(!normalize);
-      generator->SetWorkOnFiberCopy(false);
       generator->SetUpsamplingFactor(upsampling);
 
       if (ref_img.IsNotNull())

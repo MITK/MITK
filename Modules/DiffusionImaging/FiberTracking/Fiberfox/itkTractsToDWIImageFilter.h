@@ -145,7 +145,6 @@ protected:
     std::string                                 m_SpikeLog;
 
     // signal generation
-    FiberBundleType                             m_FiberBundleWorkingCopy;   ///< we work on an upsampled version of the input bundle
     FiberBundleType                             m_FiberBundleTransformed;   ///< transformed bundle simulating headmotion
     itk::Vector<double,3>                       m_WorkingSpacing;
     itk::Point<double,3>                        m_WorkingOrigin;

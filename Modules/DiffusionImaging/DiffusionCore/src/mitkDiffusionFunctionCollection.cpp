@@ -27,6 +27,105 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVectorContainer.h"
 #include "vnl/vnl_vector.h"
 
+#include <vtkBox.h>
+#include <vtkMath.h>
+
+// Intersect a finite line (with end points p0 and p1) with all of the
+// cells of a vtkImageData
+std::vector< std::pair< itk::Index<3>, double > > mitk::imv::IntersectImage(itk::Vector<double,3>& spacing, itk::Index<3>& si, itk::Index<3>& ei, itk::ContinuousIndex<float, 3>& sf, itk::ContinuousIndex<float, 3>& ef)
+{
+  std::vector< std::pair< itk::Index<3>, double > > out;
+  if (si == ei)
+  {
+    double d[3];
+    for (int i=0; i<3; ++i)
+      d[i] = (sf[i]-ef[i])*spacing[i];
+    double len = std::sqrt( d[0]*d[0] + d[1]*d[1] + d[2]*d[2] );
+    out.push_back(  std::pair< itk::Index<3>, double >(si, len) );
+    return out;
+  }
+
+  double bounds[6];
+
+  double entrancePoint[3];
+  double exitPoint[3];
+
+  double startPoint[3];
+  double endPoint[3];
+
+  double t0, t1;
+  for (int i=0; i<3; ++i)
+  {
+    startPoint[i] = sf[i];
+    endPoint[i] = ef[i];
+
+    if (si[i]>ei[i])
+    {
+      int t = si[i];
+      si[i] = ei[i];
+      ei[i] = t;
+    }
+  }
+
+  for (int x = si[0]; x<=ei[0]; ++x)
+    for (int y = si[1]; y<=ei[1]; ++y)
+      for (int z = si[2]; z<=ei[2]; ++z)
+      {
+        bounds[0] = (double)x - 0.5;
+        bounds[1] = (double)x + 0.5;
+        bounds[2] = (double)y - 0.5;
+        bounds[3] = (double)y + 0.5;
+        bounds[4] = (double)z - 0.5;
+        bounds[5] = (double)z + 0.5;
+
+        int entryPlane;
+        int exitPlane;
+        int hit = vtkBox::IntersectWithLine(bounds,
+                                            startPoint,
+                                            endPoint,
+                                            t0,
+                                            t1,
+                                            entrancePoint,
+                                            exitPoint,
+                                            entryPlane,
+                                            exitPlane);
+        if (hit)
+        {
+          if (entryPlane>=0 && exitPlane>=0)
+          {
+            double d[3];
+            for (int i=0; i<3; ++i)
+              d[i] = (exitPoint[i] - entrancePoint[i])*spacing[i];
+            double len = std::sqrt( d[0]*d[0] + d[1]*d[1] + d[2]*d[2] );
+
+            itk::Index<3> idx; idx[0] = x; idx[1] = y; idx[2] = z;
+            out.push_back(  std::pair< itk::Index<3>, double >(idx, len) );
+          }
+          else if (entryPlane>=0)
+          {
+            double d[3];
+            for (int i=0; i<3; ++i)
+              d[i] = (ef[i] - entrancePoint[i])*spacing[i];
+            double len = std::sqrt( d[0]*d[0] + d[1]*d[1] + d[2]*d[2] );
+
+            itk::Index<3> idx; idx[0] = x; idx[1] = y; idx[2] = z;
+            out.push_back(  std::pair< itk::Index<3>, double >(idx, len) );
+          }
+          else if (exitPlane>=0)
+          {
+            double d[3];
+            for (int i=0; i<3; ++i)
+              d[i] = (exitPoint[i]-sf[i])*spacing[i];
+            double len = std::sqrt( d[0]*d[0] + d[1]*d[1] + d[2]*d[2] );
+
+            itk::Index<3> idx; idx[0] = x; idx[1] = y; idx[2] = z;
+            out.push_back(  std::pair< itk::Index<3>, double >(idx, len) );
+          }
+        }
+      }
+  return out;
+}
+
 //------------------------- SH-function ------------------------------------
 
 double mitk::sh::factorial(int number) {
@@ -238,7 +337,7 @@ vnl_matrix<double> mitk::gradients::ComputeSphericalHarmonicsBasis(const vnl_mat
 }
 
 mitk::gradients::GradientDirectionContainerType::Pointer mitk::gradients::CreateNormalizedUniqueGradientDirectionContainer(const mitk::gradients::BValueMap & bValueMap,
-    const GradientDirectionContainerType *origninalGradentcontainer)
+                                                                                                                           const GradientDirectionContainerType *origninalGradentcontainer)
 {
   mitk::gradients::GradientDirectionContainerType::Pointer directioncontainer = mitk::gradients::GradientDirectionContainerType::New();
   auto mapIterator = bValueMap.begin();

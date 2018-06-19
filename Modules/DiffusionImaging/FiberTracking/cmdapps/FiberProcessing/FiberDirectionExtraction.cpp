@@ -121,7 +121,6 @@ int main(int argc, char* argv[])
       fOdfFilter->SetNormalizationMethod(itk::TractsToVectorImageFilter<float>::NormalizationMethods::MAX_VEC_NORM);
       break;
     }
-    fOdfFilter->SetUseWorkingCopy(false);
     fOdfFilter->SetSizeThreshold(peakThreshold);
     fOdfFilter->SetMaxNumDirections(maxNumDirs);
     fOdfFilter->Update();

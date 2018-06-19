@@ -61,6 +61,7 @@ public:
   void SetResampling();
   void UseImageSpacing();
   void UpdateImageInfo();
+  void UseSignalDelay();
 
   /** \brief Beamforming is being performed in a separate thread to keep the workbench from freezing.
   */
@@ -135,7 +136,10 @@ signals:
   void message(std::string);
 
 public:
+  BeamformingThread() : m_SignalDelay(0) {}
+
   void setConfig(mitk::BeamformingSettings::Pointer BFconfig);
+  void setSignalDelay(float delay);
   void setInputImage(mitk::Image::Pointer image);
   void setFilterBank(mitk::PhotoacousticFilterService::Pointer filterBank)
   {
@@ -146,6 +150,7 @@ protected:
   mitk::BeamformingSettings::Pointer m_BFconfig;
   mitk::Image::Pointer m_InputImage;
   int m_Cutoff;
+  float m_SignalDelay; // [us]
 
   mitk::PhotoacousticFilterService::Pointer m_FilterBank;
 };

@@ -95,7 +95,6 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         fOdfFilter->SetMaxNumDirections(3);
         fOdfFilter->SetSizeThreshold(0.3);
 
-        fOdfFilter->SetUseWorkingCopy(false);
         fOdfFilter->SetNumberOfThreads(1);
         fOdfFilter->Update();
         itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer direction_image = fOdfFilter->GetDirectionImage();

@@ -734,9 +734,21 @@ foreach(ep ${MITK_EXTERNAL_PROJECTS})
       # Prefer config mode first because it finds external
       # <proj>Config.cmake files pointed at by <proj>_DIR variables.
       # Otherwise, existing Find<proj>.cmake files could fail.
+
+      if(DEFINED ${_package}_DIR)
+        #we store the information because it will be overwritten by find_package
+        #and would get lost for all EPs that use on Find<proj>.cmake instead of config
+        #files.
+        set(_temp_EP_${_package}_dir ${${_package}_DIR})
+      endif(DEFINED ${_package}_DIR)
+
       find_package(${_package} QUIET CONFIG)
       string(TOUPPER "${_package}" _package_uc)
       if(NOT (${_package}_FOUND OR ${_package_uc}_FOUND))
+        if(DEFINED _temp_EP_${_package}_dir)
+            set(${_package}_DIR ${_temp_EP_${_package}_dir} CACHE PATH "externaly set dir of the package ${_package}" FORCE)
+        endif(DEFINED _temp_EP_${_package}_dir)
+
         find_package(${_package} REQUIRED)
       endif()
     endif()

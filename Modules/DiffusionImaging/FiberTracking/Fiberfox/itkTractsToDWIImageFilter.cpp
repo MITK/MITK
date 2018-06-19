@@ -60,8 +60,7 @@ namespace itk
 
 template< class PixelType >
 TractsToDWIImageFilter< PixelType >::TractsToDWIImageFilter()
-  : m_FiberBundle(nullptr)
-  , m_StatusText("")
+  : m_StatusText("")
   , m_UseConstantRandSeed(false)
   , m_RandGen(itk::Statistics::MersenneTwisterRandomVariateGenerator::New())
 {
@@ -240,7 +239,7 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
                                      -compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2)%2 ) / 2.0);
         idft->SetZidx(z);
         idft->SetCoilPosition(coilPositions.at(c));
-        idft->SetFiberBundle(m_FiberBundleWorkingCopy);
+        idft->SetFiberBundle(m_FiberBundle);
         idft->SetTranslation(m_Translations.at(g));
         idft->SetRotation(m_Rotations.at(g));
         idft->SetDiffusionGradientDirection(m_Parameters.m_SignalGen.GetGradientDirection(g));
@@ -778,35 +777,13 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
 template< class PixelType >
 void TractsToDWIImageFilter< PixelType >::InitializeFiberData()
 {
-  // resample fiber bundle for sufficient voxel coverage
-  PrintToLog("Resampling fibers ...");
-  m_SegmentVolume = 0.0001;
-  float minSpacing = 1;
-  if( m_WorkingSpacing[0]<m_WorkingSpacing[1]
-      && m_WorkingSpacing[0]<m_WorkingSpacing[2])
-  {
-    minSpacing = m_WorkingSpacing[0];
-  }
-  else if (m_WorkingSpacing[1] < m_WorkingSpacing[2])
-  {
-    minSpacing = m_WorkingSpacing[1];
-  }
-  else
-  {
-    minSpacing = m_WorkingSpacing[2];
-  }
-
-  // working copy is needed because we need to resample the fibers but do not want to change the original bundle
-  m_FiberBundleWorkingCopy = m_FiberBundle->GetDeepCopy();
-  double volumeAccuracy = 10;
-  m_FiberBundleWorkingCopy->ResampleLinear(minSpacing/volumeAccuracy);
   m_mmRadius = m_Parameters.m_SignalGen.m_AxonRadius/1000;
 
   auto caster = itk::CastImageFilter< itk::Image<unsigned char, 3>, itk::Image<float, 3> >::New();
   caster->SetInput(m_TransformedMaskImage);
   caster->Update();
 
-  vtkSmartPointer<vtkFloatArray> weights = m_FiberBundleWorkingCopy->GetFiberWeights();
+  vtkSmartPointer<vtkFloatArray> weights = m_FiberBundle->GetFiberWeights();
   float mean_weight = 0;
   for (int i=0; i<weights->GetSize(); i++)
     mean_weight += weights->GetValue(i);
@@ -814,47 +791,47 @@ void TractsToDWIImageFilter< PixelType >::InitializeFiberData()
 
   if (mean_weight>0.000001)
     for (int i=0; i<weights->GetSize(); i++)
-      m_FiberBundleWorkingCopy->SetFiberWeight(i, weights->GetValue(i)/mean_weight);
+      m_FiberBundle->SetFiberWeight(i, weights->GetValue(i)/mean_weight);
   else
     PrintToLog("\nWarning: streamlines have VERY low weights. Average weight: " + boost::lexical_cast<std::string>(mean_weight) + ". Possible source of calculation errors.", false, true, true);
 
 
   auto density_calculator = itk::TractDensityImageFilter< itk::Image<float, 3> >::New();
-  density_calculator->SetFiberBundle(m_FiberBundleWorkingCopy);
+  density_calculator->SetFiberBundle(m_FiberBundle);
   density_calculator->SetInputImage(caster->GetOutput());
   density_calculator->SetBinaryOutput(false);
   density_calculator->SetUseImageGeometry(true);
-  density_calculator->SetDoFiberResampling(false);
   density_calculator->SetOutputAbsoluteValues(true);
-  density_calculator->SetWorkOnFiberCopy(false);
   density_calculator->Update();
   float max_density = density_calculator->GetMaxDensity();
 
+  float voxel_volume = m_WorkingSpacing[0]*m_WorkingSpacing[1]*m_WorkingSpacing[2];
   if (m_mmRadius>0)
   {
-    m_SegmentVolume = itk::Math::pi*m_mmRadius*m_mmRadius*minSpacing/volumeAccuracy;
     std::stringstream stream;
-    stream << std::fixed << setprecision(2) << max_density * m_SegmentVolume;
+    stream << std::fixed << setprecision(2) << itk::Math::pi*m_mmRadius*m_mmRadius*max_density;
     std::string s = stream.str();
     PrintToLog("\nMax. fiber volume: " + s + "mm².", false, true, true);
+
+    {
+      float full_radius = 1000*std::sqrt(voxel_volume/(max_density*itk::Math::pi));
+      std::stringstream stream;
+      stream << std::fixed << setprecision(2) << full_radius;
+      std::string s = stream.str();
+      PrintToLog("\nA full fiber voxel corresponds to a fiber radius of ~" + s + "µm, given the current fiber configuration.", false, true, true);
+    }
   }
   else
   {
+    m_mmRadius = std::sqrt(voxel_volume/(max_density*itk::Math::pi));
     std::stringstream stream;
-    stream << std::fixed << setprecision(2) << max_density * m_SegmentVolume;
+    stream << std::fixed << setprecision(2) << m_mmRadius*1000;
     std::string s = stream.str();
-    PrintToLog("\nMax. fiber volume: " + s + "mm² (before rescaling to voxel volume).", false, true, true);
+    PrintToLog("\nSetting fiber radius to " + s + "µm to obtain full voxel.", false, true, true);
   }
-  float voxel_volume = m_WorkingSpacing[0]*m_WorkingSpacing[1]*m_WorkingSpacing[2];
-  float new_seg_vol = voxel_volume/max_density;
-  float new_fib_radius = 1000*std::sqrt(new_seg_vol*volumeAccuracy/(minSpacing*itk::Math::pi));
-  std::stringstream stream;
-  stream << std::fixed << setprecision(2) << new_fib_radius;
-  std::string s = stream.str();
-  PrintToLog("\nA full fiber voxel corresponds to a fiber radius of ~" + s + "µm, given the current fiber configuration.", false, true, true);
 
   // a second fiber bundle is needed to store the transformed version of the m_FiberBundleWorkingCopy
-  m_FiberBundleTransformed = m_FiberBundleWorkingCopy;
+  m_FiberBundleTransformed = m_FiberBundle;
 }
 
 
@@ -1010,7 +987,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     PrintToLog("\n", false, false, true);
     PrintToLog("\n", false, false, true);
 
-    int numFibers = m_FiberBundleWorkingCopy->GetNumFibers();
+    int numFibers = m_FiberBundle->GetNumFibers();
     boost::progress_display disp(numFibers*m_Parameters.m_SignalGen.GetNumVolumes());
 
     if (m_FiberBundle->GetMeanFiberLength()<5.0)
@@ -1071,7 +1048,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
           if (numPoints<2)
             continue;
 
-          for( int j=0; j<numPoints; j++)
+          for( int j=0; j<numPoints - 1; j++)
           {
             if (this->GetAbortGenerateData())
             {
@@ -1079,39 +1056,52 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
               continue;
             }
 
-            itk::Point<float, 3> vertex = points_copy.at(j);
             itk::Vector<double> v = points_copy.at(j);
 
-            itk::Vector<double, 3> dir(3);
-            if (j<numPoints-1) { dir = points_copy.at(j+1)-v; }
-            else { dir = v-points_copy.at(j-1); }
-
+            itk::Vector<double, 3> dir = points_copy.at(j+1)-v;
             if ( dir.GetSquaredNorm()<0.0001 || dir[0]!=dir[0] || dir[1]!=dir[1] || dir[2]!=dir[2] )
-              continue;
-
-            itk::Index<3> idx;
-            itk::ContinuousIndex<float, 3> contIndex;
-            m_TransformedMaskImage->TransformPhysicalPointToIndex(vertex, idx);
-            m_TransformedMaskImage->TransformPhysicalPointToContinuousIndex(vertex, contIndex);
-
-            if (!m_TransformedMaskImage->GetLargestPossibleRegion().IsInside(idx) || m_TransformedMaskImage->GetPixel(idx)<=0)
               continue;
             dir.Normalize();
 
-            // generate signal for each fiber compartment
-            for (int k=0; k<numFiberCompartments; k++)
+            itk::Point<float, 3> startVertex = points_copy.at(j);
+            itk::Index<3> startIndex;
+            itk::ContinuousIndex<float, 3> startIndexCont;
+            m_TransformedMaskImage->TransformPhysicalPointToIndex(startVertex, startIndex);
+            m_TransformedMaskImage->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
+
+            itk::Point<float, 3> endVertex = points_copy.at(j+1);
+            itk::Index<3> endIndex;
+            itk::ContinuousIndex<float, 3> endIndexCont;
+            m_TransformedMaskImage->TransformPhysicalPointToIndex(endVertex, endIndex);
+            m_TransformedMaskImage->TransformPhysicalPointToContinuousIndex(endVertex, endIndexCont);
+
+            std::vector< std::pair< itk::Index<3>, double > > segments = mitk::imv::IntersectImage(m_WorkingSpacing, startIndex, endIndex, startIndexCont, endIndexCont);
+
+            for (std::pair< itk::Index<3>, double > seg : segments)
             {
-              DoubleDwiType::PixelType pix = m_CompartmentImages.at(k)->GetPixel(idx);
-              pix[g] += fiberWeight*m_SegmentVolume*m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g, dir);
-              m_CompartmentImages.at(k)->SetPixel(idx, pix);
+              if (!m_TransformedMaskImage->GetLargestPossibleRegion().IsInside(seg.first) || m_TransformedMaskImage->GetPixel(seg.first)<=0)
+                continue;
+
+              // generate signal for each fiber compartment
+              for (int k=0; k<numFiberCompartments; k++)
+              {
+                DoubleDwiType::PixelType pix = m_CompartmentImages.at(k)->GetPixel(seg.first);
+
+                float seg_volume = seg.second*fiberWeight*itk::Math::pi*m_mmRadius*m_mmRadius;
+
+                pix[g] += seg_volume*m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g, dir);
+                m_CompartmentImages.at(k)->SetPixel(seg.first, pix);
+
+                if (k==0)
+                {
+                  // update fiber volume image
+                  double vol = intraAxonalVolumeImage->GetPixel(seg.first) + seg_volume;
+                  intraAxonalVolumeImage->SetPixel(seg.first, vol);
+                  if (vol>maxVolume) { maxVolume = vol; }
+                }
+              }
+
             }
-
-            // update fiber volume image
-            double vol = intraAxonalVolumeImage->GetPixel(idx) + m_SegmentVolume*fiberWeight;
-            intraAxonalVolumeImage->SetPixel(idx, vol);
-
-            // we assume that the first volume is always unweighted!
-            if (vol>maxVolume) { maxVolume = vol; }
           }
 
 #pragma omp critical
@@ -1426,7 +1416,7 @@ void TractsToDWIImageFilter< PixelType >::SimulateMotion(int g)
     if ( m_Parameters.m_SignalGen.m_DoRandomizeMotion )
     {
       // either undo last transform or work on fresh copy of untransformed fibers
-      m_FiberBundleTransformed = m_FiberBundleWorkingCopy->GetDeepCopy();
+      m_FiberBundleTransformed = m_FiberBundle->GetDeepCopy();
 
       m_Rotation[0] = m_RandGen->GetVariateWithClosedRange(m_Parameters.m_SignalGen.m_Rotation[0]*2)
           -m_Parameters.m_SignalGen.m_Rotation[0];
@@ -1527,13 +1517,13 @@ itk::Point<double, 3> TractsToDWIImageFilter< PixelType >::GetMovedPoint(itk::In
     m_UpsampledMaskImage->TransformIndexToPhysicalPoint(index, transformed_point);
     if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
     {
-      transformed_point = m_FiberBundleWorkingCopy->TransformPoint(transformed_point.GetVnlVector(),
+      transformed_point = m_FiberBundle->TransformPoint(transformed_point.GetVnlVector(),
                                                                    m_Rotation[0],m_Rotation[1],m_Rotation[2],
           m_Translation[0],m_Translation[1],m_Translation[2]);
     }
     else
     {
-      transformed_point = m_FiberBundleWorkingCopy->TransformPoint(transformed_point.GetVnlVector(),
+      transformed_point = m_FiberBundle->TransformPoint(transformed_point.GetVnlVector(),
                                                                    m_Rotation[0]*m_MotionCounter,m_Rotation[1]*m_MotionCounter,m_Rotation[2]*m_MotionCounter,
           m_Translation[0]*m_MotionCounter,m_Translation[1]*m_MotionCounter,m_Translation[2]*m_MotionCounter);
     }
@@ -1543,13 +1533,13 @@ itk::Point<double, 3> TractsToDWIImageFilter< PixelType >::GetMovedPoint(itk::In
     m_TransformedMaskImage->TransformIndexToPhysicalPoint(index, transformed_point);
     if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
     {
-      transformed_point = m_FiberBundleWorkingCopy->TransformPoint( transformed_point.GetVnlVector(),
+      transformed_point = m_FiberBundle->TransformPoint( transformed_point.GetVnlVector(),
                                                                     -m_Rotation[0], -m_Rotation[1], -m_Rotation[2],
           -m_Translation[0], -m_Translation[1], -m_Translation[2] );
     }
     else
     {
-      transformed_point = m_FiberBundleWorkingCopy->TransformPoint( transformed_point.GetVnlVector(),
+      transformed_point = m_FiberBundle->TransformPoint( transformed_point.GetVnlVector(),
                                                                     -m_Rotation[0]*m_MotionCounter, -m_Rotation[1]*m_MotionCounter, -m_Rotation[2]*m_MotionCounter,
           -m_Translation[0]*m_MotionCounter, -m_Translation[1]*m_MotionCounter, -m_Translation[2]*m_MotionCounter );
     }

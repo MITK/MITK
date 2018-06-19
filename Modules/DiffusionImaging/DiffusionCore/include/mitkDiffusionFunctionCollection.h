@@ -28,9 +28,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk{
 
-class imv
+class MITKDIFFUSIONCORE_EXPORT imv
 {
 public:
+
+  static std::vector< std::pair< itk::Index<3>, double > > IntersectImage(itk::Vector<double,3>& spacing, itk::Index<3>& si, itk::Index<3>& ei, itk::ContinuousIndex<float, 3>& sf, itk::ContinuousIndex<float, 3>& ef);
 
   template< class TPixelType, class TOutPixelType=TPixelType >
   static TOutPixelType GetImageValue(const itk::Point<float, 3>& itkP, bool interpolate, typename itk::LinearInterpolateImageFunction< itk::Image< TPixelType, 3 >, float >::Pointer interpolator)

@@ -128,9 +128,9 @@ int main(int argc, char* argv[])
   try
   {
     MITK_INFO << "Loading data";
-    std::streambuf *old = cout.rdbuf(); // <-- save
-    std::stringstream ss;
-    std::cout.rdbuf (ss.rdbuf());       // <-- redirect
+//    std::streambuf *old = cout.rdbuf(); // <-- save
+//    std::stringstream ss;
+//    std::cout.rdbuf (ss.rdbuf());       // <-- redirect
     std::vector< mitk::FiberBundle::Pointer > input_tracts;
 
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image", "Fiberbundles"}, {});
@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
         fib_names.push_back(item);
       }
     }
-    std::cout.rdbuf (old);              // <-- restore
+//    std::cout.rdbuf (old);              // <-- restore
 
     itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
 

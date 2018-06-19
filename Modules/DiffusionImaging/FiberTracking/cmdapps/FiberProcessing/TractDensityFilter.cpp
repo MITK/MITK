@@ -78,7 +78,6 @@ int main(int argc, char* argv[])
     generator->SetFiberBundle(inputTractogram);
     generator->SetBinaryOutput(false);
     generator->SetOutputAbsoluteValues(false);
-    generator->SetWorkOnFiberCopy(true);
     generator->Update();
 
     itk::FiberExtractionFilter<float>::Pointer extractor = itk::FiberExtractionFilter<float>::New();

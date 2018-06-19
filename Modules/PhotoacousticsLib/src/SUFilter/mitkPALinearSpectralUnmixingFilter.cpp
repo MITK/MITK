@@ -37,33 +37,36 @@ void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(mitk::pa::LinearSpectr
 }
 
 Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorithm(
-  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix, Eigen::VectorXf inputVector)
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> endmemberMatrix, Eigen::VectorXf inputVector)
 {
   Eigen::VectorXf resultVector;
 
   if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::HOUSEHOLDERQR == algorithmName)
-    resultVector = EndmemberMatrix.householderQr().solve(inputVector);
+    resultVector = endmemberMatrix.householderQr().solve(inputVector);
 
   else if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::LDLT == algorithmName)
   {
     mitkThrow() << "algorithm not working";
-    resultVector = EndmemberMatrix.ldlt().solve(inputVector);
+    resultVector = endmemberMatrix.ldlt().solve(inputVector);
   }
 
   else if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::LLT == algorithmName)
-    resultVector = EndmemberMatrix.llt().solve(inputVector);
+  {
+    mitkThrow() << "algorithm not working";
+    resultVector = endmemberMatrix.llt().solve(inputVector);
+  }
 
   else if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::COLPIVHOUSEHOLDERQR == algorithmName)
-    resultVector = EndmemberMatrix.colPivHouseholderQr().solve(inputVector);
+    resultVector = endmemberMatrix.colPivHouseholderQr().solve(inputVector);
 
   else if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::JACOBISVD == algorithmName)
-    resultVector = EndmemberMatrix.jacobiSvd(Eigen::ComputeFullU | Eigen::ComputeFullV).solve(inputVector);
+    resultVector = endmemberMatrix.jacobiSvd(Eigen::ComputeFullU | Eigen::ComputeFullV).solve(inputVector);
 
   else if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::FULLPIVLU == algorithmName)
-    resultVector = EndmemberMatrix.fullPivLu().solve(inputVector);
+    resultVector = endmemberMatrix.fullPivLu().solve(inputVector);
 
   else if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::FULLPIVHOUSEHOLDERQR == algorithmName)
-    resultVector = EndmemberMatrix.fullPivHouseholderQr().solve(inputVector);
+    resultVector = endmemberMatrix.fullPivHouseholderQr().solve(inputVector);
   else
     mitkThrow() << "404 VIGRA ALGORITHM NOT FOUND";
 

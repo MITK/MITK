@@ -115,10 +115,10 @@ public:
     myfile.open("EigenTestResult.txt");
 
     std::vector<mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType> m_Eigen = {
-    mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr, /* mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::ldlt, 
-    mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::llt,*/ mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::colPivHouseholderQr,
-    mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::jacobiSvd, mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivLu,
-    mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivHouseholderQr/*mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::test*/};
+    mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::HOUSEHOLDERQR, /* mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::LDLT,
+    mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::LLT,*/ mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::COLPIVHOUSEHOLDERQR,
+    mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::JACOBISVD, mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::FULLPIVLU,
+    mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::FULLPIVHOUSEHOLDERQR};
 
     for (int Algorithmidx = 0; Algorithmidx < m_Eigen.size();++Algorithmidx)
     {

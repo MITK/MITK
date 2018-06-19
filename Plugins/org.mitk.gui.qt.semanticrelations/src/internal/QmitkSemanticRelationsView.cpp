@@ -186,7 +186,7 @@ void QmitkSemanticRelationsView::OnAddSegmentationButtonClicked()
       // check for already existing, identifying base properties
       mitk::BaseProperty* caseIDProperty = baseData->GetProperty("DICOM.0010.0010");
       mitk::BaseProperty* nodeIDProperty = baseData->GetProperty("DICOM.0020.000E");
-      if (nullptr == caseIDProperty && nullptr == nodeIDProperty)
+      if (nullptr == caseIDProperty || nullptr == nodeIDProperty)
       {
         MITK_INFO << "No DICOM tags for case and node identification found. Transferring DICOM tags from the parent node to the selected segmentation node.";
 

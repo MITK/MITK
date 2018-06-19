@@ -31,9 +31,9 @@ namespace mitk {
     * with the unmixing result.
     *
     * Input:
-    * - endmemberMatrix Matrix with number of chromophores colums and number of wavelengths rows so matrix element (i,j) contains
+    * - endmemberMatrix Eigen Matrix with number of chromophores colums and number of wavelengths rows so matrix element (i,j) contains
     *   the absorbtion of chromophore j @ wavelength i taken from the database by PropertyElement method.
-    * - inputVector Vector containing values of one pixel of XY-plane image with number of wavelength rows (z-dimension of a sequenece)
+    * - inputVector Eigen Vector containing values of one pixel of XY-plane image with number of wavelength rows (z-dimension of a sequenece)
     *   so the pixelvalue of the first wavelength is stored in inputVector[0] and so on.
     *
     * Output:
@@ -80,7 +80,7 @@ namespace mitk {
       * method.
       * @param algorithmName has to be a mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType
       */
-      void mitk::pa::SpectralUnmixingFilterVigra::SetAlgorithm(VigraAlgortihmType algorithmName);
+      void mitk::pa::SpectralUnmixingFilterVigra::SetAlgorithm(VigraAlgortihmType inputAlgorithmName);
 
     protected:
       SpectralUnmixingFilterVigra();

@@ -33,9 +33,9 @@ mitk::pa::SpectralUnmixingFilterVigra::~SpectralUnmixingFilterVigra()
 {
 }
 
-void mitk::pa::SpectralUnmixingFilterVigra::SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType algorithmName)
+void mitk::pa::SpectralUnmixingFilterVigra::SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType inputAlgorithmName)
 {
-  algorithmName = algorithmName;
+  algorithmName = inputAlgorithmName;
 }
 
 void mitk::pa::SpectralUnmixingFilterVigra::AddWeight(unsigned int weight)

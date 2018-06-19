@@ -22,6 +22,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
   namespace pa {
+    /**
+    * \brief This filter is subclass of the spectral unmixing filter base. All algorithms in this class are
+    * based on the Eigen open source c++ library. It takes a multispectral pixel as input and returns a vector
+    * with the unmixing result.
+    *
+    * Input:
+    * - endmemberMatrix Eigen Matrix with number of chromophores colums and number of wavelengths rows so matrix element (i,j) contains
+    *   the absorbtion of chromophore j @ wavelength i taken from the database by PropertyElement method.
+    * - inputVector Eigen Vector containing values of one pixel of XY-plane image with number of wavelength rows (z-dimension of a sequenece)
+    *   so the pixelvalue of the first wavelength is stored in inputVector[0] and so on.
+    *
+    * Output:
+    * - Eigen vector with unmixing result of one multispectral pixel. The ith element of the vector corresponds to the ith entry of the
+    *   m_Chromophore vector.
+    *
+    * Algorithms (see AlgortihmType enum):
+    * - HOUSEHOLDERQR computes the solution by QR decomposition
+    * - COLPIVHOUSEHOLDERQR computes the solution by QR decomposition
+    * - FULLPIVHOUSEHOLDERQR computes the solution by QR decomposition
+    * - LDLT computes the solution by Cholesky decomposition
+    * - LLT computes the solution by Cholesky decomposition
+    * - JACOBISVD computes the solution by singular value decomposition uses least square solver
+    *
+    * Possible exceptions:
+    * - "algorithm not working": doesn't work now (2018/06/19)
+    * - "404 VIGRA ALGORITHM NOT FOUND": Algorithm not implemented
+    */
+
     class MITKPHOTOACOUSTICSLIB_EXPORT LinearSpectralUnmixingFilter : public SpectralUnmixingFilterBase
     {
     public:
@@ -29,29 +57,46 @@ namespace mitk {
       mitkClassMacro(LinearSpectralUnmixingFilter, SpectralUnmixingFilterBase)
         itkFactorylessNewMacro(Self)
 
+      /**
+      * \brief Contains all implemented Eigen algorithms for spectral unmixing. For detailed information of the algorithms look at the
+      * mitkPALinearSpectralUnmixingFilter.h documentation (section Algorithms).
+      */
       enum AlgortihmType
       {
-        householderQr,
-        ldlt,
-        llt,
-        colPivHouseholderQr,
-        jacobiSvd,
-        fullPivLu,
-        fullPivHouseholderQr,
-        test
+        HOUSEHOLDERQR,
+        LDLT,
+        LLT,
+        COLPIVHOUSEHOLDERQR,
+        JACOBISVD,
+        FULLPIVLU,
+        FULLPIVHOUSEHOLDERQR
       };
 
-      void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(AlgortihmType SetAlgorithmIndex);
+      /**
+      * \brief Takes a mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType and fix it for usage at the "SpectralUnmixingAlgorithm" method.
+      * @param algorithmName has to be a mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType
+      */
+      void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(AlgortihmType inputAlgorithmName);
 
     protected:
       LinearSpectralUnmixingFilter();
       virtual ~LinearSpectralUnmixingFilter();
  
+      /**
+      * \brief overrides the baseclass method with a mehtod to calculate the spectral unmixing result vector. Herain the class performs the
+      * algorithm set by the "SetAlgorithm" method and writes the result into a Eigen vector which is the return value.
+      * @param endmemberMatrix Matrix with number of chromophores colums and number of wavelengths rows so matrix element (i,j) contains
+      * the absorbtion of chromophore j @ wavelength i taken from the database by PropertyElement method.
+      * @param inputVector Vector containing values of one pixel of XY-plane image with number of wavelength rows (z-dimension of a sequenece)
+      * so the pixelvalue of the first wavelength is stored in inputVector[0] and so on.
+      * @throw if the algorithmName is not a member of the enum VigraAlgortihmType
+      * @throw if one chooses the ldlt solver which doens't work yet
+      */
       virtual Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
         Eigen::VectorXf inputVector) override;
 
     private:
-      mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType algorithmIndex;
+      mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType algorithmName;
     };
   }
 }

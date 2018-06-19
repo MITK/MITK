@@ -74,63 +74,55 @@ void SpectralUnmixing::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*sourc
 
 mitk::pa::SpectralUnmixingFilterBase::Pointer SpectralUnmixing::GetFilterInstance(std::string algorithm)
 {
-
   mitk::pa::SpectralUnmixingFilterBase::Pointer spectralUnmixingFilter;
 
   if (algorithm == "householderQr")
   {
     spectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
     dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(spectralUnmixingFilter.GetPointer())
-      ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr);
+      ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::HOUSEHOLDERQR);
   }
 
   else if (algorithm == "ldlt")
   {
     spectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
     dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(spectralUnmixingFilter.GetPointer())
-      ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::ldlt);
+      ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::LDLT);
   }
 
   else if (algorithm == "llt")
   {
     spectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
     dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(spectralUnmixingFilter.GetPointer())
-      ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::llt);
+      ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::LLT);
   }
 
   else if (algorithm == "colPivHouseholderQr")
   {
     spectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
     dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(spectralUnmixingFilter.GetPointer())
-      ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::colPivHouseholderQr);
+      ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::COLPIVHOUSEHOLDERQR);
   }
 
   else if (algorithm == "jacobiSvd")
   {
     spectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
     dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(spectralUnmixingFilter.GetPointer())
-      ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::jacobiSvd);
+      ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::JACOBISVD);
   }
 
   else if (algorithm == "fullPivLu")
   {
     spectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
     dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(spectralUnmixingFilter.GetPointer())
-      ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivLu);
+      ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::FULLPIVLU);
   }
 
   else if (algorithm == "fullPivHouseholderQr")
   {
     spectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
     dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(spectralUnmixingFilter.GetPointer())
-      ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivHouseholderQr);
-  }
-
-  else if (algorithm == "test")
-  {
-    spectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
-    dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(spectralUnmixingFilter.GetPointer())
-      ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::test);
+      ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::FULLPIVHOUSEHOLDERQR);
   }
 
   else if (algorithm == "NNLARS")

@@ -31,9 +31,9 @@ mitk::pa::LinearSpectralUnmixingFilter::~LinearSpectralUnmixingFilter()
 {
 }
 
-void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType SetAlgorithmIndex)
+void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType inputAlgorithmName)
 {
-  algorithmIndex = SetAlgorithmIndex;
+  algorithmName = inputAlgorithmName;
 }
 
 Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorithm(
@@ -41,37 +41,31 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
 {
   Eigen::VectorXf resultVector;
 
-  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::colPivHouseholderQr == algorithmIndex)
-    resultVector = EndmemberMatrix.colPivHouseholderQr().solve(inputVector);
-
-  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::llt == algorithmIndex)
-    resultVector = EndmemberMatrix.llt().solve(inputVector);
-
-  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr == algorithmIndex)
+  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::HOUSEHOLDERQR == algorithmName)
     resultVector = EndmemberMatrix.householderQr().solve(inputVector);
 
-  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::ldlt == algorithmIndex)
+  else if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::LDLT == algorithmName)
   {
     mitkThrow() << "algorithm not working";
     resultVector = EndmemberMatrix.ldlt().solve(inputVector);
   }
 
-  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::jacobiSvd == algorithmIndex)
+  else if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::LLT == algorithmName)
+    resultVector = EndmemberMatrix.llt().solve(inputVector);
+
+  else if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::COLPIVHOUSEHOLDERQR == algorithmName)
+    resultVector = EndmemberMatrix.colPivHouseholderQr().solve(inputVector);
+
+  else if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::JACOBISVD == algorithmName)
     resultVector = EndmemberMatrix.jacobiSvd(Eigen::ComputeFullU | Eigen::ComputeFullV).solve(inputVector);
 
-  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivLu == algorithmIndex)
+  else if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::FULLPIVLU == algorithmName)
     resultVector = EndmemberMatrix.fullPivLu().solve(inputVector);
 
-  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::householderQr == algorithmIndex)
-    resultVector = EndmemberMatrix.householderQr().solve(inputVector);
-
-  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::fullPivHouseholderQr == algorithmIndex)
+  else if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::FULLPIVHOUSEHOLDERQR == algorithmName)
     resultVector = EndmemberMatrix.fullPivHouseholderQr().solve(inputVector);
-
-  if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::test == algorithmIndex)
-  {
-    mitkThrow() << "404 NO ALGORITHM IMPLEMENTED";
-  }
+  else
+    mitkThrow() << "404 VIGRA ALGORITHM NOT FOUND";
 
   /*double relativeError = (EndmemberMatrix*resultVector - inputVector).norm() / inputVector.norm(); // norm() is L2 norm
   MITK_INFO << "relativ error: " << relativeError;

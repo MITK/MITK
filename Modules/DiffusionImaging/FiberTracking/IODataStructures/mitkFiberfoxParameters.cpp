@@ -712,13 +712,20 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
       }
       else
       {
-        BOOST_FOREACH( boost::property_tree::ptree::value_type const& v2, v1.second.get_child("gradients") )
+        try
         {
-          SignalGenerationParameters::GradientType g;
-          g[0] = ReadVal<double>(v2,"x",0);
-          g[1] = ReadVal<double>(v2,"y",0);
-          g[2] = ReadVal<double>(v2,"z",0);
-          gradients.push_back(g);
+          BOOST_FOREACH( boost::property_tree::ptree::value_type const& v2, v1.second.get_child("gradients") )
+          {
+            SignalGenerationParameters::GradientType g;
+            g[0] = ReadVal<double>(v2,"x",0);
+            g[1] = ReadVal<double>(v2,"y",0);
+            g[2] = ReadVal<double>(v2,"z",0);
+            gradients.push_back(g);
+          }
+        }
+        catch(...)
+        {
+          MITK_INFO << "WARNING: Fiberfox parameters without any gradient directions loaded.";
         }
         m_SignalGen.SetGradienDirections(gradients);
       }

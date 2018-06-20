@@ -51,20 +51,18 @@ void mitk::pa::SpectralUnmixingSO2::GenerateData()
   unsigned int xDim = inputHbO2->GetDimensions()[0];
   unsigned int yDim = inputHbO2->GetDimensions()[1];
   unsigned int zDim = inputHbO2->GetDimensions()[2];
-  unsigned int size = xDim * yDim*zDim;
-
-  MITK_INFO(m_Verbose) << "x dimension: " << xDim;
-  MITK_INFO(m_Verbose) << "y dimension: " << yDim;
-  MITK_INFO(m_Verbose) << "z dimension: " << zDim;
 
   InitializeOutputs();
 
-  // Copy input image into array
   mitk::ImageReadAccessor readAccessHbO2(inputHbO2);
   mitk::ImageReadAccessor readAccessHb(inputHb);
 
   const float* inputDataArrayHbO2 = ((const float*)readAccessHbO2.GetData());
   const float* inputDataArrayHb = ((const float*)readAccessHb.GetData());
+
+  auto output = GetOutput(0);
+  mitk::ImageWriteAccessor writeOutput(output);
+  float* writeBuffer = (float *)writeOutput.GetData();
 
   for (unsigned int x = 0; x < xDim; x++)
   {
@@ -72,14 +70,10 @@ void mitk::pa::SpectralUnmixingSO2::GenerateData()
     {
       for (unsigned int z = 0;z < zDim; z++)
       {
-        // Calculate SO2 and write to output
         unsigned int pixelNumber = (xDim*yDim * z) + x * yDim + y;
         float pixelHb = inputDataArrayHb[pixelNumber];
         float pixelHbO2 = inputDataArrayHbO2[pixelNumber];
         float resultSO2 = calculateSO2(pixelHb, pixelHbO2);
-        auto output = GetOutput(0);
-        mitk::ImageWriteAccessor writeOutput(output);
-        float* writeBuffer = (float *)writeOutput.GetData();
         writeBuffer[(xDim*yDim * z) + x * yDim + y] = resultSO2;
       }
     }
@@ -108,7 +102,6 @@ void mitk::pa::SpectralUnmixingSO2::InitializeOutputs()
   unsigned int numberOfInputs = GetNumberOfIndexedInputs();
   unsigned int numberOfOutputs = GetNumberOfIndexedOutputs();
 
-  //  Set dimensions (3) and pixel type (float) for output
   mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();
   const int NUMBER_OF_SPATIAL_DIMENSIONS = 3;
   auto* dimensions = new unsigned int[NUMBER_OF_SPATIAL_DIMENSIONS];
@@ -117,7 +110,6 @@ void mitk::pa::SpectralUnmixingSO2::InitializeOutputs()
     dimensions[dimIdx] = GetInput()->GetDimensions()[dimIdx];
   }
 
-  // Initialize numberOfOutput pictures with pixel type and dimensions
   for (unsigned int outputIdx = 0; outputIdx < numberOfOutputs; outputIdx++)
   {
     GetOutput(outputIdx)->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);

@@ -77,7 +77,7 @@ namespace mitk {
       /**
       * \brief AddWavelength takes integers and writes them at the end of the m_Wavelength vector. The first call of the method then
       * corresponds to the first input image and so on.
-      * @wavelength database supports integers between 300 and 1000 nm
+      * @param wavelength database supports integers between 300 and 1000 nm
       */
       void AddWavelength(int wavelength);
 

@@ -103,9 +103,12 @@ private Q_SLOTS:
   void OnLesionListContextMenuRequested(const QPoint&);
   void OnSegmentationListContextMenuRequested(const QPoint&);
   void OnImageListContextMenuRequested(const QPoint&);
+
   void OnLinkToSegmentation(const mitk::SemanticTypes::ID&);
+  void OnSetLesionName(const mitk::SemanticTypes::ID&);
   void OnSetLesionClass(const mitk::SemanticTypes::ID&);
   void OnRemoveLesion(const mitk::SemanticTypes::ID&);
+
   void OnUnlinkFromLesion(const mitk::DataNode*);
   void OnRemoveSegmentation(const mitk::DataNode*);
   void OnRemoveImage(const mitk::DataNode*);

@@ -393,6 +393,11 @@ void QmitkLesionInfoWidget::OnLesionListContextMenuRequested(const QPoint& pos)
   connect(linkToSegmentation, &QAction::triggered, [this, selectedLesionUID] { OnLinkToSegmentation(selectedLesionUID); });
   menu->addAction(linkToSegmentation);
 
+  QAction* setLesionName = new QAction("Set lesion name", this);
+  setLesionName->setEnabled(true);
+  connect(setLesionName, &QAction::triggered, [this, selectedLesionUID] { OnSetLesionName(selectedLesionUID); });
+  menu->addAction(setLesionName);
+
   QAction* setLesionClass = new QAction("Set lesion class", this);
   setLesionClass->setEnabled(true);
   connect(setLesionClass, &QAction::triggered, [this, selectedLesionUID] { OnSetLesionClass(selectedLesionUID); });
@@ -531,6 +536,33 @@ void QmitkLesionInfoWidget::OnLinkToSegmentation(const mitk::SemanticTypes::ID& 
     msgBox.setIcon(QMessageBox::Warning);
     msgBox.exec();
   }
+}
+
+void QmitkLesionInfoWidget::OnSetLesionName(const mitk::SemanticTypes::ID& selectedLesionUID)
+{
+  // retrieve the full lesion with its lesion class using the given lesion UID
+  mitk::SemanticTypes::Lesion selectedLesion = mitk::GetLesionByUID(selectedLesionUID, m_SemanticRelations->GetAllLesionsOfCase(m_CaseID));
+  if (selectedLesion.UID.empty())
+  {
+    // could not find lesion information for the selected lesion
+    return;
+  }
+
+  // use the lesion information to set the input text for the dialog
+  QmitkLesionTextDialog* inputDialog = new QmitkLesionTextDialog(this);
+  inputDialog->setWindowTitle("Set lesion name");
+  inputDialog->SetLineEditText(selectedLesion.name);
+
+  int dialogReturnValue = inputDialog->exec();
+  if (QDialog::Rejected == dialogReturnValue)
+  {
+    return;
+  }
+
+  std::string newLesionName = inputDialog->GetLineEditText().toStdString();
+
+  selectedLesion.name = newLesionName;
+  m_SemanticRelations->OverwriteLesion(m_CaseID, selectedLesion);
 }
 
 void QmitkLesionInfoWidget::OnSetLesionClass(const mitk::SemanticTypes::ID& selectedLesionUID)

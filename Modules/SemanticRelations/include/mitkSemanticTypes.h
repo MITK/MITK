@@ -106,6 +106,7 @@ namespace mitk
     struct Lesion
     {
       ID UID;
+      std::string name = "";
       LesionClass lesionClass;
     };
 

@@ -632,43 +632,42 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
   }
 
   // resample mask image and frequency map to fit upsampled geometry
-  if (m_Parameters.m_SignalGen.m_DoAddGibbsRinging)
+  if (m_Parameters.m_SignalGen.m_MaskImage.IsNotNull() && m_Parameters.m_SignalGen.m_MaskImage->GetLargestPossibleRegion()!=m_WorkingImageRegion)
   {
-    if (m_Parameters.m_SignalGen.m_MaskImage.IsNotNull())
-    {
-      // rescale mask image (otherwise there are problems with the resampling)
-      auto rescaler = itk::RescaleIntensityImageFilter<ItkUcharImgType,ItkUcharImgType>::New();
-      rescaler->SetInput(0,m_Parameters.m_SignalGen.m_MaskImage);
-      rescaler->SetOutputMaximum(100);
-      rescaler->SetOutputMinimum(0);
-      rescaler->Update();
+    PrintToLog("Resampling tissue mask", false);
+    // rescale mask image (otherwise there are problems with the resampling)
+    auto rescaler = itk::RescaleIntensityImageFilter<ItkUcharImgType,ItkUcharImgType>::New();
+    rescaler->SetInput(0,m_Parameters.m_SignalGen.m_MaskImage);
+    rescaler->SetOutputMaximum(100);
+    rescaler->SetOutputMinimum(0);
+    rescaler->Update();
 
-      // resample mask image
-      auto resampler = itk::ResampleImageFilter<ItkUcharImgType, ItkUcharImgType>::New();
-      resampler->SetInput(rescaler->GetOutput());
-      resampler->SetOutputParametersFromImage(m_Parameters.m_SignalGen.m_MaskImage);
-      resampler->SetSize(m_WorkingImageRegion.GetSize());
-      resampler->SetOutputSpacing(m_WorkingSpacing);
-      resampler->SetOutputOrigin(m_WorkingOrigin);
-      auto nn_interpolator = itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType, double>::New();
-      resampler->SetInterpolator(nn_interpolator);
-      resampler->Update();
-      m_Parameters.m_SignalGen.m_MaskImage = resampler->GetOutput();
-    }
-    // resample frequency map
-    if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull())
-    {
-      auto resampler = itk::ResampleImageFilter<ItkFloatImgType, ItkFloatImgType>::New();
-      resampler->SetInput(m_Parameters.m_SignalGen.m_FrequencyMap);
-      resampler->SetOutputParametersFromImage(m_Parameters.m_SignalGen.m_FrequencyMap);
-      resampler->SetSize(m_WorkingImageRegion.GetSize());
-      resampler->SetOutputSpacing(m_WorkingSpacing);
-      resampler->SetOutputOrigin(m_WorkingOrigin);
-      auto nn_interpolator = itk::NearestNeighborInterpolateImageFunction<ItkFloatImgType, double>::New();
-      resampler->SetInterpolator(nn_interpolator);
-      resampler->Update();
-      m_Parameters.m_SignalGen.m_FrequencyMap = resampler->GetOutput();
-    }
+    // resample mask image
+    auto resampler = itk::ResampleImageFilter<ItkUcharImgType, ItkUcharImgType>::New();
+    resampler->SetInput(rescaler->GetOutput());
+    resampler->SetOutputParametersFromImage(m_Parameters.m_SignalGen.m_MaskImage);
+    resampler->SetSize(m_WorkingImageRegion.GetSize());
+    resampler->SetOutputSpacing(m_WorkingSpacing);
+    resampler->SetOutputOrigin(m_WorkingOrigin);
+    auto nn_interpolator = itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType, double>::New();
+    resampler->SetInterpolator(nn_interpolator);
+    resampler->Update();
+    m_Parameters.m_SignalGen.m_MaskImage = resampler->GetOutput();
+  }
+  // resample frequency map
+  if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull() && m_Parameters.m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion()!=m_WorkingImageRegion)
+  {
+    PrintToLog("Resampling frequency map", false);
+    auto resampler = itk::ResampleImageFilter<ItkFloatImgType, ItkFloatImgType>::New();
+    resampler->SetInput(m_Parameters.m_SignalGen.m_FrequencyMap);
+    resampler->SetOutputParametersFromImage(m_Parameters.m_SignalGen.m_FrequencyMap);
+    resampler->SetSize(m_WorkingImageRegion.GetSize());
+    resampler->SetOutputSpacing(m_WorkingSpacing);
+    resampler->SetOutputOrigin(m_WorkingOrigin);
+    auto nn_interpolator = itk::NearestNeighborInterpolateImageFunction<ItkFloatImgType, double>::New();
+    resampler->SetInterpolator(nn_interpolator);
+    resampler->Update();
+    m_Parameters.m_SignalGen.m_FrequencyMap = resampler->GetOutput();
   }
 
   m_MaskImageSet = true;
@@ -689,10 +688,6 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
   }
   else
   {
-    if (m_Parameters.m_SignalGen.m_MaskImage->GetLargestPossibleRegion()!=m_WorkingImageRegion)
-    {
-      itkExceptionMacro("Mask image and specified DWI geometry are not matching!");
-    }
     PrintToLog("Using tissue mask", false);
   }
 

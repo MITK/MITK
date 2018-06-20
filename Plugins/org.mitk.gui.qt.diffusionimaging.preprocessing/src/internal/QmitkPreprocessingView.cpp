@@ -1748,6 +1748,7 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
   filter->SetNumGradientDirections(newNumGradientDirections);
   filter->SetOriginalBValueMap(originalShellMap);
   filter->SetShellSelectionBValueMap(shellSlectionMap);
+  filter->SetUseFirstN(m_Controls->m_KeepFirstNBox->isChecked());
   filter->Update();
 
   mitk::Image::Pointer newImage = mitk::GrabItkImageMemory( filter->GetOutput() );

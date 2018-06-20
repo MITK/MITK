@@ -194,11 +194,12 @@ std::vector< TractClusteringFilter::Cluster > TractClusteringFilter::ClusterStep
   if (!distances.empty())
   {
     std::vector< Cluster > outC;
-//#pragma omp parallel for
+#pragma omp parallel for
     for (int c=0; c<(int)C.size(); c++)
     {
 
       std::vector< Cluster > tempC = ClusterStep(C.at(c).I, distances);
+#pragma omp critical
       AppendCluster(outC, tempC);
     }
     return outC;
@@ -219,6 +220,7 @@ void TractClusteringFilter::MergeDuplicateClusters(std::vector< TractClusteringF
     m_MergeDuplicateThreshold = m_Distances.at(0)/2;
   bool found = true;
 
+
   MITK_INFO << "Merging duplicate clusters with distance threshold " << m_MergeDuplicateThreshold;
   int start = 0;
   while (found && m_MergeDuplicateThreshold>mitk::eps)
@@ -237,7 +239,7 @@ void TractClusteringFilter::MergeDuplicateClusters(std::vector< TractClusteringF
       std::vector< bool > flip_indices;
 
 #pragma omp parallel for
-      for (int k2=0; k2<(int)clusters.size(); ++k2)
+      for (int k2=start+1; k2<(int)clusters.size(); ++k2)
       {
         if (k1!=k2)
         {

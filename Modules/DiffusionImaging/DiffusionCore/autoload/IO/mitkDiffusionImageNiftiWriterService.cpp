@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iostream>
 #include <fstream>
-
+#include <mitkDiffusionFunctionCollection.h>
 
 mitk::DiffusionImageNiftiWriterService::DiffusionImageNiftiWriterService()
   : AbstractFileWriter(mitk::Image::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_DESCRIPTION())
@@ -203,79 +203,27 @@ void mitk::DiffusionImageNiftiWriterService::Write()
       throw;
     }
 
+
+    std::string base_path = itksys::SystemTools::GetFilenamePath(this->GetOutputLocation());
+    std::string bvals_file = this->GetMimeType()->GetFilenameWithoutExtension(this->GetOutputLocation());
+    if (!base_path.empty())
+        bvals_file = base_path + "/" + bvals_file;
+    bvals_file += ".bvals";
+
+    std::string bvecs_file = this->GetMimeType()->GetFilenameWithoutExtension(this->GetOutputLocation());
+    if (!base_path.empty())
+        bvecs_file = base_path + "/" + bvecs_file;
+    bvecs_file += ".bvecs";
+
     if(mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(input)->Size())
     {
       MITK_INFO << "Saving original gradient directions";
-      std::ofstream myfile;
-
-      std::string base_path = itksys::SystemTools::GetFilenamePath(this->GetOutputLocation());
-      std::string fname = this->GetMimeType()->GetFilenameWithoutExtension(this->GetOutputLocation());
-      MITK_INFO << this->GetOutputLocation();
-      if (!base_path.empty())
-          fname = base_path + "/" + fname;
-
-      fname += ".bvals";
-      myfile.open (fname.c_str());
-      for(unsigned int i=0; i<mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(input)->Size(); i++)
-      {
-        double twonorm = mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(input)->ElementAt(i).two_norm();
-        myfile << mitk::DiffusionPropertyHelper::GetReferenceBValue(input)*twonorm*twonorm << " ";
-      }
-      myfile.close();
-
-      std::ofstream myfile2;
-      std::string fname2 = this->GetMimeType()->GetFilenameWithoutExtension(this->GetOutputLocation());
-      if (!base_path.empty())
-          fname2 = base_path + "/" + fname2;
-      fname2 += ".bvecs";
-      myfile2.open (fname2.c_str());
-      for(int j=0; j<3; j++)
-      {
-        for(unsigned int i=0; i<mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(input)->Size(); i++)
-        {
-          //need to modify the length
-          GradientDirectionContainerType::Pointer grads = mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(input);
-          GradientDirectionType direction = grads->ElementAt(i);
-          direction.normalize();
-          myfile2 << direction.get(j) << " ";
-          //myfile2 << input->GetDirections()->ElementAt(i).get(j) << " ";
-        }
-        myfile2 << std::endl;
-      }
+      mitk::gradients::WriteBvalsBvecs(bvals_file, bvecs_file, mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(input), mitk::DiffusionPropertyHelper::GetReferenceBValue(input));
     }
     else if(mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size())
     {
       MITK_INFO << "Original gradient directions not found. Saving modified gradient directions";
-      std::ofstream myfile;
-      std::string fname = itksys::SystemTools::GetFilenamePath( this->GetOutputLocation() ) + "/"
-        + this->GetMimeType()->GetFilenameWithoutExtension( this->GetOutputLocation() );
-      fname += ".bvals";
-      myfile.open (fname.c_str());
-      for(unsigned int i=0; i<mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size(); i++)
-      {
-        double twonorm = mitk::DiffusionPropertyHelper::GetGradientContainer(input)->ElementAt(i).two_norm();
-        myfile << mitk::DiffusionPropertyHelper::GetReferenceBValue(input)*twonorm*twonorm << " ";
-      }
-      myfile.close();
-
-      std::ofstream myfile2;
-      std::string fname2 = itksys::SystemTools::GetFilenamePath( this->GetOutputLocation() ) + "/"
-        + this->GetMimeType()->GetFilenameWithoutExtension( this->GetOutputLocation() );
-      fname2 += ".bvecs";
-      myfile2.open (fname2.c_str());
-      for(int j=0; j<3; j++)
-      {
-        for(unsigned int i=0; i<mitk::DiffusionPropertyHelper::GetGradientContainer(input)->Size(); i++)
-        {
-          //need to modify the length
-          GradientDirectionContainerType::Pointer grads = mitk::DiffusionPropertyHelper::GetGradientContainer(input);
-          GradientDirectionType direction = grads->ElementAt(i);
-          direction.normalize();
-          myfile2 << direction.get(j) << " ";
-          //myfile2 << input->GetDirections()->ElementAt(i).get(j) << " ";
-        }
-        myfile2 << std::endl;
-      }
+      mitk::gradients::WriteBvalsBvecs(bvals_file, bvecs_file, mitk::DiffusionPropertyHelper::GetGradientContainer(input), mitk::DiffusionPropertyHelper::GetReferenceBValue(input));
     }
   }
 }

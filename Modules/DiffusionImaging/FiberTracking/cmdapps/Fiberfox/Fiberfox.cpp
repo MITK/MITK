@@ -136,17 +136,29 @@ int main(int argc, char* argv[])
     {
       MITK_INFO << "Loading template image";
       typedef itk::VectorImage< short, 3 >    ItkDwiType;
+      typedef itk::Image< short, 3 >    ItkImageType;
       mitk::BaseData::Pointer templateData = mitk::IOUtil::Load(us::any_cast<std::string>(parsedArgs["template"]), &functor)[0];
-      mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(templateData.GetPointer());
+      mitk::Image::Pointer template_image = dynamic_cast<mitk::Image*>(templateData.GetPointer());
 
-      ItkDwiType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi);
-
-      parameters.m_SignalGen.m_ImageRegion = itkVectorImagePointer->GetLargestPossibleRegion();
-      parameters.m_SignalGen.m_ImageSpacing = itkVectorImagePointer->GetSpacing();
-      parameters.m_SignalGen.m_ImageOrigin = itkVectorImagePointer->GetOrigin();
-      parameters.m_SignalGen.m_ImageDirection = itkVectorImagePointer->GetDirection();
-      parameters.SetBvalue(static_cast<mitk::FloatProperty*>(dwi->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue());
-      parameters.SetGradienDirections(static_cast<mitk::GradientDirectionsProperty*>( dwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer());
+      if (mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(template_image))
+      {
+        ItkDwiType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::GetItkVectorImage(template_image);
+        parameters.m_SignalGen.m_ImageRegion = itkVectorImagePointer->GetLargestPossibleRegion();
+        parameters.m_SignalGen.m_ImageSpacing = itkVectorImagePointer->GetSpacing();
+        parameters.m_SignalGen.m_ImageOrigin = itkVectorImagePointer->GetOrigin();
+        parameters.m_SignalGen.m_ImageDirection = itkVectorImagePointer->GetDirection();
+        parameters.SetBvalue(static_cast<mitk::FloatProperty*>(template_image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue());
+        parameters.SetGradienDirections(static_cast<mitk::GradientDirectionsProperty*>( template_image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer());
+      }
+      else
+      {
+        ItkImageType::Pointer itkImagePointer = ItkImageType::New();
+        mitk::CastToItkImage(template_image, itkImagePointer);
+        parameters.m_SignalGen.m_ImageRegion = itkImagePointer->GetLargestPossibleRegion();
+        parameters.m_SignalGen.m_ImageSpacing = itkImagePointer->GetSpacing();
+        parameters.m_SignalGen.m_ImageOrigin = itkImagePointer->GetOrigin();
+        parameters.m_SignalGen.m_ImageDirection = itkImagePointer->GetDirection();
+      }
     }
   }
   else if ( dynamic_cast<mitk::Image*>(inputData.GetPointer()) )  // add artifacts to existing image

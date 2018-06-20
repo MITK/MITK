@@ -102,12 +102,12 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
 
   BValueMap manipulatedMap = m_InputBValueMap;
 
+  IndicesVector final_gradient_indices;
   int shellCounter = 0;
   for(BValueMap::iterator it = m_InputBValueMap.begin(); it != m_InputBValueMap.end(); it++ )
   {
     srand(randSeed);
 
-    // initialize index vectors
     m_UsedGradientIndices.clear();
     m_UnusedGradientIndices.clear();
 
@@ -184,7 +184,11 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
       manipulatedMap[it->first] = m_UsedGradientIndices;
       shellCounter++;
     }
+
+    for (auto gidx : m_UsedGradientIndices)
+      final_gradient_indices.push_back(gidx);
   }
+  std::sort(final_gradient_indices.begin(), final_gradient_indices.end());
 
   int vecLength = 0 ;
   for(BValueMap::iterator it = manipulatedMap.begin(); it != manipulatedMap.end(); it++)
@@ -198,7 +202,7 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
   outImage->SetLargestPossibleRegion( this->GetInput()->GetLargestPossibleRegion());
   outImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
   outImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
-  outImage->SetVectorLength( vecLength ); // Set the vector length
+  outImage->SetVectorLength( final_gradient_indices.size() ); // Set the vector length
   outImage->Allocate();
 
   itk::ImageRegionIterator< OutputImageType > newIt(outImage, outImage->GetLargestPossibleRegion());
@@ -210,8 +214,8 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
 
   // initial new value of voxel
   OutputPixelType newVec;
-  newVec.SetSize( vecLength );
-  newVec.AllocateElements( vecLength );
+  newVec.SetSize( final_gradient_indices.size() );
+  newVec.AllocateElements( final_gradient_indices.size() );
 
   // generate new pixel values
   while(!newIt.IsAtEnd())
@@ -220,13 +224,16 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
     newVec.Fill(0.0);
     InputPixelType oldVec = oldIt.Get();
 
-    int index = 0;
-    for(BValueMap::iterator it=manipulatedMap.begin(); it!=manipulatedMap.end(); it++)
-      for(unsigned int j=0; j<it->second.size(); j++)
-      {
-        newVec[index] = oldVec[it->second.at(j)];
-        index++;
-      }
+    for (unsigned int i=0; i<final_gradient_indices.size(); ++i)
+      newVec[i] = oldVec[final_gradient_indices.at(i)];
+
+//    int index = 0;
+//    for(BValueMap::iterator it=manipulatedMap.begin(); it!=manipulatedMap.end(); it++)
+//      for(unsigned int j=0; j<it->second.size(); j++)
+//      {
+//        newVec[index] = oldVec[it->second.at(j)];
+//        index++;
+//      }
     newIt.Set(newVec);
 
     ++newIt;
@@ -235,13 +242,16 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
 
   // set new gradient directions
   m_GradientDirections = GradientDirectionContainerType::New();
-  int index = 0;
-  for(BValueMap::iterator it = manipulatedMap.begin(); it != manipulatedMap.end(); it++)
-    for(unsigned int j = 0; j < it->second.size(); j++)
-    {
-      m_GradientDirections->InsertElement(index, m_OriginalGradientDirections->at(it->second.at(j)));
-      index++;
-    }
+  for (unsigned int i=0; i<final_gradient_indices.size(); ++i)
+    m_GradientDirections->InsertElement(i, m_OriginalGradientDirections->at(final_gradient_indices.at(i)));
+
+//  int index = 0;
+//  for(BValueMap::iterator it = manipulatedMap.begin(); it != manipulatedMap.end(); it++)
+//    for(unsigned int j = 0; j < it->second.size(); j++)
+//    {
+//      m_GradientDirections->InsertElement(index, m_OriginalGradientDirections->at(it->second.at(j)));
+//      index++;
+//    }
 
   this->SetNumberOfRequiredOutputs (1);
   this->SetNthOutput (0, outImage);

@@ -114,7 +114,7 @@ typedef itk::VectorImage< short, 3 > ItkDwiType;
 #include <mitkITKImageImport.h>
 #include "mitkPreferenceListReaderOptionsFunctor.h"
 
-mitk::Image::Pointer DoReduceGradientDirections(mitk::Image::Pointer image, double BValue, unsigned int numOfGradientsToKeep)
+mitk::Image::Pointer DoReduceGradientDirections(mitk::Image::Pointer image, double BValue, unsigned int numOfGradientsToKeep, bool use_first_n)
 {
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
@@ -165,6 +165,7 @@ mitk::Image::Pointer DoReduceGradientDirections(mitk::Image::Pointer image, doub
   filter->SetNumGradientDirections(newNumGradientDirections);
   filter->SetOriginalBValueMap(originalShellMap);
   filter->SetShellSelectionBValueMap(shellSlectionMap);
+  filter->SetUseFirstN(use_first_n);
   filter->Update();
   std::cout << "2" << std::endl;
 
@@ -201,8 +202,9 @@ int main(int argc, char* argv[])
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "input image", us::Any(), false);
     parser.addArgument("output", "o", mitkCommandLineParser::String, "Output:", "output image", us::Any(), false);
-    parser.addArgument("bValue", "b", mitkCommandLineParser::Float, "b-value:", "float", 1000, false);
-    parser.addArgument("nrOfGradients", "n", mitkCommandLineParser::Int, "Nr of gradients:", "integer", 32, false);
+    parser.addArgument("b_value", "", mitkCommandLineParser::Float, "b-value:", "float", 1000, false);
+    parser.addArgument("num_gradients", "", mitkCommandLineParser::Int, "Nr of gradients:", "integer", 32, false);
+    parser.addArgument("use_first_n", "", mitkCommandLineParser::Bool, "Use first N:", "no optimization, simply use first n gradients", 0);
 
 
     std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -212,14 +214,17 @@ int main(int argc, char* argv[])
 
     std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
     std::string outFileName = us::any_cast<std::string>(parsedArgs["output"]);
-    double bValue = us::any_cast<float>(parsedArgs["bValue"]);
-    unsigned int nrOfGradients = us::any_cast<int>(parsedArgs["nrOfGradients"]);
+    double bValue = us::any_cast<float>(parsedArgs["b_value"]);
+    unsigned int nrOfGradients = us::any_cast<int>(parsedArgs["num_gradients"]);
+    bool use_first_n = false;
+    if (parsedArgs.count("use_first_n"))
+      use_first_n = true;
 
     try
     {
         mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({ "Diffusion Weighted Images" }, {});
         mitk::Image::Pointer mitkImage = mitk::IOUtil::Load<mitk::Image>(inFileName, &functor);
-        mitk::Image::Pointer newImage = DoReduceGradientDirections(mitkImage, bValue, nrOfGradients);
+        mitk::Image::Pointer newImage = DoReduceGradientDirections(mitkImage, bValue, nrOfGradients, use_first_n);
         //mitk::IOUtil::Save(newImage, outFileName); //save as dwi image
         mitk::IOUtil::Save(newImage, "application/vnd.mitk.nii.gz", outFileName);  //save as nifti image
 

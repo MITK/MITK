@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::pa::SpectralUnmixingFilterBase::SpectralUnmixingFilterBase()
 {
-  this->SetNumberOfIndexedOutputs(3);// find solution --> 4 is max outputs
+  this->SetNumberOfIndexedOutputs(4);// find solution --> 4 is max outputs
 
   for (unsigned int i = 0; i<GetNumberOfIndexedOutputs(); i++)
   {

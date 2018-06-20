@@ -37,10 +37,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMaskedImageToHistogramFilter.h>
 #include <itkTdiToVolumeFractionFilter.h>
 #include <itkImageFileReader.h>
+#include <itkTensorReconstructionWithEigenvalueCorrectionFilter.h>
 
 using namespace mitk;
 
-double CalcErrorSignal(const std::vector<double>& histo_mod, itk::VectorImage< short, 3 >* reference, itk::VectorImage< short, 3 >* simulation, itk::Image< unsigned char,3 >::Pointer mask, itk::Image< double,3 >::Pointer fa)
+double CalcErrorSignal(const std::vector<double>& histo_mod, itk::VectorImage< short, 3 >* reference, itk::VectorImage< short, 3 >* simulation, itk::Image< unsigned char,3 >::ConstPointer mask, itk::Image< double,3 >::ConstPointer fa)
 {
   typedef itk::Image< double, 3 > DoubleImageType;
   typedef itk::VectorImage< short, 3 > DwiImageType;
@@ -113,7 +114,7 @@ double CalcErrorSignal(const std::vector<double>& histo_mod, itk::VectorImage< s
   return -1;
 }
 
-double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dwi1, itk::VectorImage< short, 3 >* dwi2, itk::Image< unsigned char,3 >::Pointer mask, itk::Image< double,3 >::Pointer fa1, itk::Image< double,3 >::Pointer md1, bool b0_contrast)
+double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dwi1, const itk::VectorImage< short, 3 >* dwi2, itk::Image< unsigned char,3 >::ConstPointer mask, itk::Image< double,3 >::ConstPointer fa1, itk::Image< double,3 >::ConstPointer md1, bool b0_contrast)
 {
   typedef itk::TensorDerivedMeasurementsFilter<double> MeasurementsType;
   typedef itk::Image< double, 3 > DoubleImageType;
@@ -121,15 +122,21 @@ double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dw
 
   DwiType::Pointer dwi1_itk = mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi1);
   typedef itk::DiffusionTensor3DReconstructionImageFilter<short, short, double > TensorReconstructionImageFilterType;
+
   DoubleImageType::Pointer fa2;
   {
     mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientContainerCopy = mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::New();
     for(auto it = mitk::DiffusionPropertyHelper::GetGradientContainer(dwi1)->Begin(); it != mitk::DiffusionPropertyHelper::GetGradientContainer(dwi1)->End(); it++)
       gradientContainerCopy->push_back(it.Value());
 
+    typename itk::ImageDuplicator<itk::VectorImage< short, 3 >>::Pointer duplicator = itk::ImageDuplicator<itk::VectorImage< short, 3 >>::New();
+    duplicator->SetInputImage(dwi2);
+    duplicator->Update();
+    auto working_dwi = duplicator->GetOutput();
+
     TensorReconstructionImageFilterType::Pointer tensorReconstructionFilter = TensorReconstructionImageFilterType::New();
     tensorReconstructionFilter->SetBValue( mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi1) );
-    tensorReconstructionFilter->SetGradientImage(gradientContainerCopy, dwi2 );
+    tensorReconstructionFilter->SetGradientImage(gradientContainerCopy, working_dwi );
     tensorReconstructionFilter->Update();
 
     MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
@@ -142,9 +149,14 @@ double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dw
   DoubleImageType::Pointer md2;
   if (md1.IsNotNull())
   {
+    typename itk::ImageDuplicator<itk::VectorImage< short, 3 >>::Pointer duplicator = itk::ImageDuplicator<itk::VectorImage< short, 3 >>::New();
+    duplicator->SetInputImage(dwi2);
+    duplicator->Update();
+    auto working_dwi = duplicator->GetOutput();
+
     typedef itk::AdcImageFilter< short, double > AdcFilterType;
     AdcFilterType::Pointer filter = AdcFilterType::New();
-    filter->SetInput( dwi2 );
+    filter->SetInput( working_dwi );
     filter->SetGradientDirections( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi1) );
     filter->SetB_value( mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi1) );
     filter->SetFitSignal(false);
@@ -181,6 +193,7 @@ double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dw
 
           double fa_diff = std::fabs(it2.Get()/fa - 1.0);
           double md_diff = std::fabs(it4.Get()/it3.Get() - 1.0);
+
           error += mod * (fa_diff + md_diff);
           count += 2;
 
@@ -518,6 +531,7 @@ int main(int argc, char* argv[])
   parser.addArgument("iterations", "", mitkCommandLineParser::Int, "Iterations:", "Number of optimizations steps", 1000);
   parser.addArgument("start_temp", "", mitkCommandLineParser::Float, "Start temperature:", "Higher temperature means larger parameter change proposals", 1.0);
   parser.addArgument("end_temp", "", mitkCommandLineParser::Float, "End temperature:", "Higher temperature means larger parameter change proposals", 0.1);
+  parser.addArgument("raise_histo", "", mitkCommandLineParser::Float, "Raise histogram modifiers:", "Raise histogram modifiers by the specified power.", 1.0);
   parser.endGroup();
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -533,7 +547,7 @@ int main(int argc, char* argv[])
   parameters.LoadParameters(paramName);
   typedef itk::VectorImage< short, 3 >    ItkDwiType;
   mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images", "Fiberbundles"}, {});
-  auto dwi = mitk::IOUtil::Load<mitk::Image>(us::any_cast<std::string>(parsedArgs["dmri"]), &functor);
+  mitk::Image::Pointer dwi = mitk::IOUtil::Load<mitk::Image>(us::any_cast<std::string>(parsedArgs["dmri"]), &functor);
   ItkDwiType::Pointer reference = mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi);
   parameters.m_SignalGen.m_ImageRegion = reference->GetLargestPossibleRegion();
   parameters.m_SignalGen.m_ImageSpacing = reference->GetSpacing();
@@ -559,6 +573,10 @@ int main(int argc, char* argv[])
   float tdi_threshold=0.75;
   if (parsedArgs.count("tdi_threshold"))
     tdi_threshold = us::any_cast<float>(parsedArgs["tdi_threshold"]);
+
+  float raise_histo=1.0;
+  if (parsedArgs.count("raise_histo"))
+    raise_histo = us::any_cast<float>(parsedArgs["raise_histo"]);
 
   float sqrt=1.0;
   if (parsedArgs.count("sqrt"))
@@ -596,7 +614,7 @@ int main(int argc, char* argv[])
   itk::ImageFileReader< itk::Image< unsigned char, 3 > >::Pointer reader = itk::ImageFileReader< itk::Image< unsigned char, 3 > >::New();
   reader->SetFileName( us::any_cast<std::string>(parsedArgs["mask"]) );
   reader->Update();
-  itk::Image< unsigned char,3 >::Pointer mask = reader->GetOutput();
+  itk::Image< unsigned char,3 >::ConstPointer mask = reader->GetOutput();
 
   std::vector< itk::Image< double, 3 >::Pointer > fracs;
   if ( parsedArgs.count("tdi")>0 && parsedArgs.count("wm")>0 && parsedArgs.count("gm")>0 && parsedArgs.count("dgm")>0 && parsedArgs.count("csf")>0 )
@@ -639,7 +657,7 @@ int main(int argc, char* argv[])
   }
 
   std::vector< double > histogram_modifiers;
-  itk::Image< double,3 >::Pointer fa_image = nullptr;
+  itk::Image< double,3 >::ConstPointer fa_image = nullptr;
   if (fa_file.compare("")!=0)
   {
     itk::ImageFileReader< itk::Image< double, 3 > >::Pointer reader = itk::ImageFileReader< itk::Image< double, 3 > >::New();
@@ -678,13 +696,13 @@ int main(int argc, char* argv[])
     MITK_INFO << "FA histogram modifiers:";
     for(unsigned int i = 0; i < histogram->GetSize()[0]; ++i)
     {
-      histogram_modifiers.push_back(1.0 - (double)histogram->GetFrequency(i)/(double)max);
+      histogram_modifiers.push_back( std::pow(1.0 - (double)histogram->GetFrequency(i)/(double)max, raise_histo) );
       MITK_INFO << histogram_modifiers.back();
     }
     if (fa_error)
       MITK_INFO << "Using FA error measure.";
   }
-  itk::Image< double,3 >::Pointer md_image = nullptr;
+  itk::Image< double,3 >::ConstPointer md_image = nullptr;
   if (md_file.compare("")!=0)
   {
     itk::ImageFileReader< itk::Image< double, 3 > >::Pointer reader = itk::ImageFileReader< itk::Image< double, 3 > >::New();

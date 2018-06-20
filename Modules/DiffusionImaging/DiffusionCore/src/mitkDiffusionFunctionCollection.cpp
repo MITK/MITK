@@ -17,18 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionFunctionCollection.h"
 #include "mitkNumericTypes.h"
 
-// Namespace ::SH
 #include <boost/math/special_functions/legendre.hpp>
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 #include <boost/version.hpp>
 #include <itkPointShell.h>
-
-// Namespace ::Gradients
 #include "itkVectorContainer.h"
 #include "vnl/vnl_vector.h"
-
 #include <vtkBox.h>
 #include <vtkMath.h>
+#include <itksys/SystemTools.hxx>
 
 // Intersect a finite line (with end points p0 and p1) with all of the
 // cells of a vtkImageData
@@ -230,6 +227,136 @@ vnl_matrix<float> mitk::sh::CalcShBasisForDirections(int sh_order, vnl_matrix<do
 }
 
 //------------------------- gradients-function ------------------------------------
+
+
+mitk::gradients::GradientDirectionContainerType::Pointer mitk::gradients::ReadBvalsBvecs(std::string bvals_file, std::string bvecs_file, double& reference_bval)
+{
+  mitk::gradients::GradientDirectionContainerType::Pointer directioncontainer = mitk::gradients::GradientDirectionContainerType::New();
+
+  std::vector<float> bvec_entries;
+  if (!itksys::SystemTools::FileExists(bvecs_file))
+    mitkThrow() << "bvecs file not existing: " << bvecs_file;
+  else
+  {
+    std::string line;
+    std::ifstream myfile (bvecs_file.c_str());
+    if (myfile.is_open())
+    {
+      while ( myfile.good() )
+      {
+        std::string line2;
+        getline (myfile,line2);
+
+        std::stringstream iss;
+        iss << line2;
+
+        while(getline(iss,line, ' '))
+        {
+          // remove any potenial control sequences that might be introduced by lines ending in a single space
+          line.erase(std::remove_if(line.begin(), line.end(),
+                                    [](char c) { return std::isspace(c) || std::iscntrl(c); } ), line.end());
+
+          if (line.length() > 0 ) // otherwise string contained only control characters before, empty string are converted to 0 by atof resulting in a broken b-value list
+          {
+            bvec_entries.push_back(atof(line.c_str()));
+          }
+        }
+      }
+      myfile.close();
+    }
+    else
+    {
+      mitkThrow() << "Unable to open bvecs file: " << bvecs_file;
+    }
+  }
+
+  std::vector<float> bval_entries;
+  if (!itksys::SystemTools::FileExists(bvals_file))
+    mitkThrow() << "bvals file not existing: " << bvals_file;
+  else
+  {
+    std::string line;
+    std::ifstream myfile (bvals_file.c_str());
+    if (myfile.is_open())
+    {
+      while ( myfile.good() )
+      {
+        getline (myfile,line, ' ');
+        // remove any potenial control sequences that might be introduced by lines ending in a single space
+        line.erase(std::remove_if(line.begin(), line.end(),
+                                  [](char c) { return std::isspace(c) || std::iscntrl(c); } ), line.end());
+
+        if (line.length() > 0 ) // otherwise string contained only control characters before, empty string are converted to 0 by atof resulting in a broken b-value list
+        {
+          bval_entries.push_back(atof(line.c_str()));
+        }
+
+
+      }
+      myfile.close();
+    }
+    else
+    {
+      mitkThrow() << "Unable to open bvals file: " << bvals_file;
+    }
+  }
+
+  // Take the largest entry in bvals as the reference b-value
+  reference_bval = -1;
+  unsigned int numb = bval_entries.size();
+  for(unsigned int i=0; i<numb; i++)
+    if (bval_entries.at(i)>reference_bval)
+      reference_bval = bval_entries.at(i);
+
+  for(unsigned int i=0; i<numb; i++)
+  {
+    double b_val = bval_entries.at(i);
+
+    mitk::gradients::GradientDirectionType vec;
+    vec[0] = bvec_entries.at(i);
+    vec[1] = bvec_entries.at(i+numb);
+    vec[2] = bvec_entries.at(i+2*numb);
+
+    // Adjust the vector length to encode gradient strength
+    double factor = b_val/reference_bval;
+    if(vec.magnitude() > 0)
+    {
+      vec.normalize();
+      vec[0] = sqrt(factor)*vec[0];
+      vec[1] = sqrt(factor)*vec[1];
+      vec[2] = sqrt(factor)*vec[2];
+    }
+
+    directioncontainer->InsertElement(i,vec);
+  }
+
+  return directioncontainer;
+}
+
+void mitk::gradients::WriteBvalsBvecs(std::string bvals_file, std::string bvecs_file, GradientDirectionContainerType::Pointer gradients, double reference_bval)
+{
+  std::ofstream myfile;
+  myfile.open (bvals_file.c_str());
+  for(unsigned int i=0; i<gradients->Size(); i++)
+  {
+    double twonorm = gradients->ElementAt(i).two_norm();
+    myfile << std::round(reference_bval*twonorm*twonorm) << " ";
+  }
+  myfile.close();
+
+  std::ofstream myfile2;
+  myfile2.open (bvecs_file.c_str());
+  for(int j=0; j<3; j++)
+  {
+    for(unsigned int i=0; i<gradients->Size(); i++)
+    {
+      GradientDirectionType direction = gradients->ElementAt(i);
+      direction.normalize();
+      myfile2 << direction.get(j) << " ";
+    }
+    myfile2 << std::endl;
+  }
+}
 
 std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections(const BValueMap & refBValueMap, GradientDirectionContainerType *refGradientsContainer )
 {

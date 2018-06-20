@@ -152,6 +152,7 @@ namespace mitk
     unsigned int GetNumBaselineVolumes();                    ///< Get number of non-diffusion-weighted image volumes
     unsigned int GetNumVolumes();                            ///< Get number of baseline and diffusion-weighted image volumes
     GradientListType GetGradientDirections();                ///< Return gradient direction container
+    mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer GetItkGradientContainer();
     GradientType GetGradientDirection(unsigned int i);
     std::vector< int > GetBvalues();                         ///< Returns a vector with all unique b-values (determined by the gradient magnitudes)
     double GetBvalue();

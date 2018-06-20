@@ -50,6 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
 #include <QmitkStyleManager.h>
+#include <mitkLevelWindowProperty.h>
 
 const std::string QmitkDiffusionQuantificationView::VIEW_ID = "org.mitk.views.diffusionquantification";
 
@@ -317,6 +318,10 @@ void QmitkDiffusionQuantificationView::DoAdcCalculation(bool fit)
       imageNode->SetName((name+"_ADC").toStdString().c_str());
     else
       imageNode->SetName((name+"_MD").toStdString().c_str());
+
+    mitk::LevelWindow lw;
+    lw.SetLevelWindow(0.0015, 0.003);
+    imageNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( lw ) );
     GetDataStorage()->Add(imageNode, node);
   }
 }
@@ -549,6 +554,10 @@ void QmitkDiffusionQuantificationView::OdfQuantification(int method)
     lut_prop->SetLookupTable( lut );
     new_node->SetProperty("LookupTable", lut_prop );
 
+    mitk::LevelWindow lw;
+    lw.SetLevelWindow(0.5, 1.0);
+    new_node->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( lw ) );
+
     GetDataStorage()->Add(new_node, node);
 
     mitk::StatusBar::GetInstance()->DisplayText("Computation complete.");
@@ -585,6 +594,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(int method)
 
     typedef itk::TensorDerivedMeasurementsFilter<TTensorPixelType> MeasurementsType;
 
+    mitk::LevelWindow lw;
     if(method == 0) //FA
     {
       MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
@@ -593,7 +603,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(int method)
       measurementsCalculator->Update();
       multi->SetInput(measurementsCalculator->GetOutput());
       nodename = QString(nodename.c_str()).append("_FA").toStdString();
-
+      lw.SetLevelWindow(0.5, 1.0);
     }
     else if(method == 1) //RA
     {
@@ -603,7 +613,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(int method)
       measurementsCalculator->Update();
       multi->SetInput(measurementsCalculator->GetOutput());
       nodename = QString(nodename.c_str()).append("_RA").toStdString();
-
+      lw.SetLevelWindow(0.015, 0.03);
     }
     else if(method == 2) // AD (Axial diffusivity)
     {
@@ -613,6 +623,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(int method)
       measurementsCalculator->Update();
       multi->SetInput(measurementsCalculator->GetOutput());
       nodename = QString(nodename.c_str()).append("_AD").toStdString();
+      lw.SetLevelWindow(0.0015, 0.003);
     }
     else if(method == 3) // RD (Radial diffusivity, (Lambda2+Lambda3)/2
     {
@@ -622,6 +633,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(int method)
       measurementsCalculator->Update();
       multi->SetInput(measurementsCalculator->GetOutput());
       nodename = QString(nodename.c_str()).append("_RD").toStdString();
+      lw.SetLevelWindow(0.0015, 0.003);
     }
     else if(method == 4) // 1-(Lambda2+Lambda3)/(2*Lambda1)
     {
@@ -631,6 +643,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(int method)
       measurementsCalculator->Update();
       multi->SetInput(measurementsCalculator->GetOutput());
       nodename = QString(nodename.c_str()).append("_CA").toStdString();
+      lw.SetLevelWindow(0.5, 1.0);
     }
     else if(method == 5) // MD (Mean Diffusivity, (Lambda1+Lambda2+Lambda3)/3 )
     {
@@ -640,6 +653,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(int method)
       measurementsCalculator->Update();
       multi->SetInput(measurementsCalculator->GetOutput());
       nodename = QString(nodename.c_str()).append("_MD").toStdString();
+      lw.SetLevelWindow(0.0015, 0.003);
     }
 
     multi->Update();
@@ -657,6 +671,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(int method)
     mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
     lut_prop->SetLookupTable( lut );
     new_node->SetProperty("LookupTable", lut_prop );
+    new_node->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( lw ) );
 
     GetDataStorage()->Add(new_node, node);
 

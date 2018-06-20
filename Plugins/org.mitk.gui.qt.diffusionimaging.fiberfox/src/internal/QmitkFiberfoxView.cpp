@@ -2282,6 +2282,11 @@ void QmitkFiberfoxView::GenerateImage()
           m_Controls->m_SpacingX->value(),
           m_Controls->m_SpacingY->value(),
           m_Controls->m_SpacingZ->value());
+    mitk::Point3D origin;
+    origin[0] = m_Controls->m_SpacingX->value()/2;
+    origin[1] = m_Controls->m_SpacingY->value()/2;
+    origin[2] = m_Controls->m_SpacingZ->value()/2;
+    image->SetOrigin(origin);
 
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( image );

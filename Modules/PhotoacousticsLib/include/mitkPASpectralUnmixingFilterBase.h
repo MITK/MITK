@@ -81,6 +81,12 @@ namespace mitk {
       */
       void AddWavelength(int wavelength);
 
+      /*
+      * \brief Verbose gives more information to the console. Default value is false.
+      * @param m_Verbose is the boolian to activate the MITK_INFO logged to the console
+      */
+      virtual void Verbose(bool verbose);
+
       ofstream myfile; // just for testing purposes; has to be removeed
 
     protected:
@@ -100,11 +106,6 @@ namespace mitk {
       virtual Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> endmemberMatrix,
         Eigen::VectorXf inputVector) = 0;
 
-      /*
-      * \brief Verbose gives more information to the console. Default value is false.
-      * @param m_Verbose is the boolian to activate the MITK_INFO logged to the console
-      */
-      virtual void Verbose(bool verbose);
       bool m_Verbose = false;
 
       std::vector<mitk::pa::PropertyCalculator::ChromophoreType> m_Chromophore;

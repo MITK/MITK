@@ -47,6 +47,33 @@ void SpectralUnmixing::CreateQtPartControl(QWidget *parent)
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
   connect(m_Controls.buttonPerformImageProcessing, &QPushButton::clicked, this, &SpectralUnmixing::DoImageProcessing);
+  m_Controls.tableWeight->hide();
+  m_Controls.tableSO2->hide();
+  connect((QObject*)(m_Controls.QComboBoxAlgorithm), SIGNAL(currentIndexChanged(int)), this, SLOT(ChangeGUIWeight()));
+  connect((QObject*)(m_Controls.checkBoxsO2), SIGNAL(clicked()), this, SLOT(ChangeGUISO2()));
+}
+
+void SpectralUnmixing::ChangeGUIWeight()
+{
+  auto qs = m_Controls.QComboBoxAlgorithm->currentText();
+  std::string Algorithm = qs.toUtf8().constData();
+  if (Algorithm == "weighted")
+    m_Controls.tableWeight->show();
+  else
+    m_Controls.tableWeight->hide();
+}
+
+void SpectralUnmixing::ChangeGUISO2()
+{
+  if (m_Controls.checkBoxsO2->isChecked())
+    m_Controls.tableSO2->show();
+  else
+    m_Controls.tableSO2->hide();
+}
+
+void SpectralUnmixing::SetVerboseMode(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter, bool PluginVerbose)
+{
+  m_SpectralUnmixingFilter->Verbose(PluginVerbose);
 }
 
 void SpectralUnmixing::SetWavlength(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter)
@@ -58,8 +85,10 @@ void SpectralUnmixing::SetWavlength(mitk::pa::SpectralUnmixingFilterBase::Pointe
     QString Text = m_Controls.inputtable->item(0, col)->text();
     Wavelength = Text.toInt();
     if (Wavelength > 0)
+    {
       m_SpectralUnmixingFilter->AddWavelength(Wavelength);
-    MITK_INFO(PluignVerbose) << "Wavelength: " << Wavelength << "nm \n";
+      MITK_INFO(PluginVerbose) << "Wavelength: " << Wavelength << "nm \n";
+    }
     ++col;
   }
 }
@@ -77,7 +106,7 @@ void SpectralUnmixing::SetChromophore(mitk::pa::SpectralUnmixingFilterBase::Poin
   {
     if (boolVec[chromo] == true)
     {
-      MITK_INFO(PluignVerbose) << "+ " << chromophoreNameVec[chromo];
+      MITK_INFO(PluginVerbose) << "Chromophore: " << chromophoreNameVec[chromo];
       m_SpectralUnmixingFilter->AddChromophore(m_ChromoType[chromo]);
       numberofChromophores += 1;
     }
@@ -180,13 +209,16 @@ mitk::pa::SpectralUnmixingFilterBase::Pointer SpectralUnmixing::GetFilterInstanc
     //Tranfer GUI information(Weights) to filter
     int colunm = 0;
     int Weight = 1;
-    while (m_Controls.inputtable->item(1, colunm) && Weight > 0)
+    while (m_Controls.tableWeight->item(0, colunm) && Weight > 0)
     {
-      QString Text = m_Controls.inputtable->item(1, colunm)->text();
+      QString Text = m_Controls.tableWeight->item(0, colunm)->text();
       Weight = Text.toInt();
       if (Weight > 0)
+      {
         dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra*>(spectralUnmixingFilter.GetPointer())
-        ->AddWeight(Weight);
+          ->AddWeight(Weight);
+        MITK_INFO(PluginVerbose) << "Weight: " << Weight;
+      }
       ++colunm;
     }
   }
@@ -218,7 +250,7 @@ void SpectralUnmixing::SetSO2Settings(mitk::pa::SpectralUnmixingSO2::Pointer m_s
     {
       QString Text = m_Controls.tableSO2->item(0, i)->text();
       float value = Text.toFloat();
-      MITK_INFO(PluignVerbose) << "SO2 setting value: " << value;
+      MITK_INFO(PluginVerbose) << "SO2 setting value: " << value;
       m_sO2->AddSO2Settings(value);
     }
     else
@@ -228,14 +260,14 @@ void SpectralUnmixing::SetSO2Settings(mitk::pa::SpectralUnmixingSO2::Pointer m_s
 
 void SpectralUnmixing::CalculateSO2(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter, std::vector<bool> boolVec)
 {
-  MITK_INFO(PluignVerbose) << "CALCULATE OXYGEN SATURATION ...";
+  MITK_INFO(PluginVerbose) << "CALCULATE OXYGEN SATURATION ...";
 
   if (!boolVec[0])
     mitkThrow() << "SELECT CHROMOPHORE DEOXYHEMOGLOBIN!";
   if (!boolVec[1])
     mitkThrow() << "SELECT CHROMOPHORE OXYHEMOGLOBIN!";
   auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
-
+  m_sO2->Verbose(PluginVerbose);
   SetSO2Settings(m_sO2);
 
   // Initialize pipeline from SU filter class to SO2 class
@@ -249,7 +281,7 @@ void SpectralUnmixing::CalculateSO2(mitk::pa::SpectralUnmixingFilterBase::Pointe
   mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
 
   WriteOutputToDataStorage(sO2, "sO2");
-  MITK_INFO(PluignVerbose) << "[DONE]";
+  MITK_INFO(PluginVerbose) << "[DONE]";
 }
 
 void SpectralUnmixing::WriteOutputToDataStorage(mitk::Image::Pointer m_Image, std::string name)
@@ -294,7 +326,9 @@ void SpectralUnmixing::DoImageProcessing()
         message << "'" << name << "'";
       }
       message << ".";
-      MITK_INFO(PluignVerbose) << message.str();
+
+      PluginVerbose = m_Controls.checkBoxVerbose->isChecked();
+      MITK_INFO(PluginVerbose) << message.str();
 
       GenerateOutput(image);
     }
@@ -312,11 +346,12 @@ void SpectralUnmixing::GenerateOutput(mitk::Image::Pointer image)
   std::string Algorithm = qs.toUtf8().constData();
 
   mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter = GetFilterInstance(Algorithm);
+  SetVerboseMode(m_SpectralUnmixingFilter, PluginVerbose);
   m_SpectralUnmixingFilter->SetInput(image);
   SetWavlength(m_SpectralUnmixingFilter);
   SetChromophore(m_SpectralUnmixingFilter, boolVec, chromophoreNameVec);
 
-  MITK_INFO(PluignVerbose) << "Updating Filter...";
+  MITK_INFO(PluginVerbose) << "Updating Filter...";
   m_SpectralUnmixingFilter->Update();
 
   int outputCounter = 0;
@@ -334,5 +369,5 @@ void SpectralUnmixing::GenerateOutput(mitk::Image::Pointer image)
     CalculateSO2(m_SpectralUnmixingFilter, boolVec);
 
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
-  MITK_INFO(PluignVerbose) << "Adding images to DataStorage...[DONE]";
+  MITK_INFO(PluginVerbose) << "Adding images to DataStorage...[DONE]";
 }

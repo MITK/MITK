@@ -33,11 +33,17 @@ namespace mitk {
       mitkClassMacro(SpectralUnmixingSO2, mitk::ImageToImageFilter);
       itkFactorylessNewMacro(Self);
       virtual void AddSO2Settings(float value);
+      /*
+      * \brief Verbose gives more information to the console. Default value is false.
+      * @param m_Verbose is the boolian to activate the MITK_INFO logged to the console
+      */
+      virtual void Verbose(bool verbose);
 
     protected:
       SpectralUnmixingSO2();
       virtual ~SpectralUnmixingSO2();
       std::vector<int> m_SO2Settings;
+      bool m_Verbose = false;
 
     private:
       virtual void GenerateData() override;

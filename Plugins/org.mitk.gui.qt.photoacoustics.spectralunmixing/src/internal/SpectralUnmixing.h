@@ -50,6 +50,7 @@ class SpectralUnmixing : public QmitkAbstractView
     virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
                                    const QList<mitk::DataNode::Pointer> &nodes) override;
 
+
     /**
     * \brief Called when the user clicks the GUI button. Checks if the selected data is an image. Then performs spectral
     * unmixing via the GenerateOutput method based on the spectral unmixing filter base and its subclasses.
@@ -57,6 +58,14 @@ class SpectralUnmixing : public QmitkAbstractView
     */
     void DoImageProcessing();
   
+    /**
+    * \brief slots are there to show/hide input tables for weights- and SO2 settings ig they are not needed
+    */
+  public slots:
+    void ChangeGUIWeight();
+    void ChangeGUISO2();
+
+  protected:
     Ui::SpectralUnmixingControls m_Controls;
 
     /**
@@ -67,7 +76,13 @@ class SpectralUnmixing : public QmitkAbstractView
     */
     mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algorithm);
 
-    bool PluignVerbose = true;
+    /**
+    * \brief passes the algorithm information if verbose mode is requested from the GUI on to the spectral unmixing filter
+    * @param m_SpectralUnmixingFilter is a pointer of the spectral unmixing filter base
+    * @param PluginVerbose is the GUI information bool
+    */
+    virtual void SetVerboseMode(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter, bool PluginVerbose);
+    bool PluginVerbose = true;
 
   private:
 

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
 
+
 mitk::pa::SpectralUnmixingSO2::SpectralUnmixingSO2()
 {
   this->SetNumberOfIndexedInputs(2);
@@ -32,9 +33,14 @@ mitk::pa::SpectralUnmixingSO2::~SpectralUnmixingSO2()
 
 }
 
+void mitk::pa::SpectralUnmixingSO2::Verbose(bool verbose)
+{
+  m_Verbose = verbose;
+}
+
 void mitk::pa::SpectralUnmixingSO2::GenerateData()
 {
-  MITK_INFO << "GENERATING DATA..";
+  MITK_INFO(m_Verbose) << "GENERATING DATA..";
 
   // Get input image
   mitk::Image::Pointer inputHbO2 = GetInput(0);
@@ -47,9 +53,9 @@ void mitk::pa::SpectralUnmixingSO2::GenerateData()
   unsigned int zDim = inputHbO2->GetDimensions()[2];
   unsigned int size = xDim * yDim*zDim;
 
-  MITK_INFO << "x dimension: " << xDim;
-  MITK_INFO << "y dimension: " << yDim;
-  MITK_INFO << "z dimension: " << zDim;
+  MITK_INFO(m_Verbose) << "x dimension: " << xDim;
+  MITK_INFO(m_Verbose) << "y dimension: " << yDim;
+  MITK_INFO(m_Verbose) << "z dimension: " << zDim;
 
   InitializeOutputs();
 
@@ -78,7 +84,7 @@ void mitk::pa::SpectralUnmixingSO2::GenerateData()
       }
     }
   }
-  MITK_INFO << "GENERATING DATA...[DONE]";
+  MITK_INFO(m_Verbose) << "GENERATING DATA...[DONE]";
 }
 
 void mitk::pa::SpectralUnmixingSO2::CheckPreConditions(mitk::Image::Pointer inputHbO2, mitk::Image::Pointer inputHb)
@@ -94,7 +100,7 @@ void mitk::pa::SpectralUnmixingSO2::CheckPreConditions(mitk::Image::Pointer inpu
   if (xDimHb != xDimHbO2 || yDimHb != yDimHbO2 || zDimHb != zDimHbO2)
     mitkThrow() << "DIMENTIONALITY ERROR!";
 
-  MITK_INFO << "CHECK PRECONDITIONS ...[DONE]";
+  MITK_INFO(m_Verbose) << "CHECK PRECONDITIONS ...[DONE]";
 }
 
 void mitk::pa::SpectralUnmixingSO2::InitializeOutputs()
@@ -129,7 +135,7 @@ float mitk::pa::SpectralUnmixingSO2::calculateSO2(float Hb, float HbO2)
 
   if (result != result)
   {
-    MITK_WARN << "SO2 VALUE NAN! WILL BE SET TO ZERO!";
+    MITK_WARN(m_Verbose) << "SO2 VALUE NAN! WILL BE SET TO ZERO!";
     return zero;
   }
   else

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>398</width>
-    <height>607</height>
+    <height>620</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -510,7 +510,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Chromophore settings</string>
+      <string>Chromophore selection</string>
      </property>
     </widget>
    </item>

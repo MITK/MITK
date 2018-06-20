@@ -207,7 +207,7 @@ mitk::pa::SpectralUnmixingFilterBase::Pointer SpectralUnmixing::GetFilterInstanc
     dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra*>(spectralUnmixingFilter.GetPointer())
       ->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED);
     //Tranfer GUI information(Weights) to filter
-    int colunm = 0;
+    unsigned int colunm = 0;
     int Weight = 1;
     while (m_Controls.tableWeight->item(0, colunm) && Weight > 0)
     {
@@ -279,7 +279,7 @@ void SpectralUnmixing::CalculateSO2(mitk::pa::SpectralUnmixingFilterBase::Pointe
   m_sO2->Update();
 
   mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
-
+  sO2->SetSpacing(output1->GetGeometry()->GetSpacing());
   WriteOutputToDataStorage(sO2, "sO2");
   MITK_INFO(PluginVerbose) << "[DONE]";
 }
@@ -361,6 +361,7 @@ void SpectralUnmixing::GenerateOutput(mitk::Image::Pointer image)
     if (boolVec[chromophore] != false)
     {
       m_Output = m_SpectralUnmixingFilter->GetOutput(outputCounter++);
+      m_Output->SetSpacing(image->GetGeometry()->GetSpacing());
       WriteOutputToDataStorage(m_Output, chromophoreNameVec[chromophore] + Algorithm);
     }
   }

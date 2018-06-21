@@ -28,13 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::pa::SpectralUnmixingFilterBase::SpectralUnmixingFilterBase()
 {
-  this->SetNumberOfIndexedOutputs(4);// find solution --> 4 is max outputs
-
-  for (unsigned int i = 0; i<GetNumberOfIndexedOutputs(); i++)
-  {
-    this->SetNthOutput(i, mitk::Image::New());
-  }
-
   m_PropertyCalculatorEigen = mitk::pa::PropertyCalculator::New();
 }
 
@@ -152,6 +145,11 @@ void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(unsigned int numbe
 void mitk::pa::SpectralUnmixingFilterBase::InitializeOutputs(unsigned int totalNumberOfSequences)
 {
   MITK_INFO(m_Verbose) << "Initialize Outputs ...";
+
+  this->SetNumberOfIndexedOutputs(m_Chromophore.size());
+  for (unsigned int i = 0; i<GetNumberOfIndexedOutputs(); i++)
+    this->SetNthOutput(i, mitk::Image::New());
+
   unsigned int numberOfInputs = GetNumberOfIndexedInputs();
   unsigned int numberOfOutputs = GetNumberOfIndexedOutputs();
   MITK_INFO(m_Verbose) << "Inputs: " << numberOfInputs << " Outputs: " << numberOfOutputs;
@@ -160,9 +158,7 @@ void mitk::pa::SpectralUnmixingFilterBase::InitializeOutputs(unsigned int totalN
   const int NUMBER_OF_SPATIAL_DIMENSIONS = 3;
   auto* dimensions = new unsigned int[NUMBER_OF_SPATIAL_DIMENSIONS];
   for (unsigned int dimIdx = 0; dimIdx < 2; dimIdx++)
-  {
     dimensions[dimIdx] = GetInput()->GetDimensions()[dimIdx];
-  }
   dimensions[2] = totalNumberOfSequences;
 
   for (unsigned int outputIdx = 0; outputIdx < numberOfOutputs; outputIdx++)

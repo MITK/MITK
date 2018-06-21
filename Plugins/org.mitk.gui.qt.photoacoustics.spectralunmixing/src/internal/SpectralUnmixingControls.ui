@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>398</width>
-    <height>620</height>
+    <height>643</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -956,6 +956,20 @@
     <widget class="QCheckBox" name="checkBoxVerbose">
      <property name="text">
       <string>Verbose Mode (additional console outputs)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="checkBoxChrono">
+     <property name="text">
+      <string>Chrono</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="checkBoxError">
+     <property name="text">
+      <string>Relative error image</string>
      </property>
     </widget>
    </item>

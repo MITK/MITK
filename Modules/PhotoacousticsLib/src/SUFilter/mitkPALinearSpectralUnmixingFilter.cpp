@@ -70,12 +70,5 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
   else
     mitkThrow() << "404 VIGRA ALGORITHM NOT FOUND";
 
-  /*double relativeError = (EndmemberMatrix*resultVector - inputVector).norm() / inputVector.norm(); // norm() is L2 norm
-  MITK_INFO << "relativ error: " << relativeError;
-  float accuracyLevel = .1;
-  bool resultIsApprox = inputVector.isApprox(EndmemberMatrix*resultVector, accuracyLevel);
-  MITK_INFO << "IS APPROX RESULT: " << resultIsApprox;*/
-  //MITK_INFO << "Result vector: " << resultVector;
-  //++++++++++++++++++Maybe add this as additional ouptu image++++++++++++++++++++++
   return resultVector;
 }

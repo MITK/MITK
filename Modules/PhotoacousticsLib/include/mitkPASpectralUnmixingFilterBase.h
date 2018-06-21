@@ -83,9 +83,21 @@ namespace mitk {
 
       /*
       * \brief Verbose gives more information to the console. Default value is false.
-      * @param m_Verbose is the boolian to activate the MITK_INFO logged to the console
+      * @param verbose is the boolian to activate the MITK_INFO logged to the console
       */
       virtual void Verbose(bool verbose);
+
+      /**
+      * \brief AddOutputs takes an integer and sets indexed outputs
+      * @param outputs integer correponds to the number of output images
+      */
+      virtual void AddOutputs(unsigned int outputs);
+
+      /*
+      * \brief RelativeError returns a image which compare the L2 norm of the input vector with the unmixing result
+      * @param relativeError is the boolian to activate this tool
+      */
+      virtual void RelativeError(bool relativeError);
 
       ofstream myfile; // just for testing purposes; has to be removeed
 
@@ -107,6 +119,7 @@ namespace mitk {
         Eigen::VectorXf inputVector) = 0;
 
       bool m_Verbose = false;
+      bool m_RelativeError = false;
 
       std::vector<mitk::pa::PropertyCalculator::ChromophoreType> m_Chromophore;
       std::vector<int> m_Wavelength;

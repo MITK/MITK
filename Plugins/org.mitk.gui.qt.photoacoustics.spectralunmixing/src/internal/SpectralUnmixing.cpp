@@ -35,6 +35,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPASpectralUnmixingFilterLagrange.h"
 #include "mitkPASpectralUnmixingFilterSimplex.h"
 
+#include <numeric>
+#include <thread>
+
 const std::string SpectralUnmixing::VIEW_ID = "org.mitk.views.spectralunmixing";
 
 void SpectralUnmixing::SetFocus()
@@ -52,6 +55,24 @@ void SpectralUnmixing::CreateQtPartControl(QWidget *parent)
   connect((QObject*)(m_Controls.QComboBoxAlgorithm), SIGNAL(currentIndexChanged(int)), this, SLOT(ChangeGUIWeight()));
   connect((QObject*)(m_Controls.checkBoxsO2), SIGNAL(clicked()), this, SLOT(ChangeGUISO2()));
 }
+
+void SpectralUnmixing::SwitchGUIControls(bool change)
+{
+  MITK_INFO(PluginVerbose) << "ENABLE GUI " << change;
+  m_Controls.inputtable->setEnabled(change);
+  m_Controls.checkBoxOx->setEnabled(change);
+  m_Controls.checkBoxDeOx->setEnabled(change);
+  m_Controls.checkBoxMelanin->setEnabled(change);
+  m_Controls.checkBoxAdd->setEnabled(change);
+  m_Controls.QComboBoxAlgorithm->setEnabled(change);
+  m_Controls.tableWeight->setEnabled(change);
+  m_Controls.checkBoxsO2->setEnabled(change);
+  m_Controls.tableSO2->setEnabled(change);
+  m_Controls.checkBoxVerbose->setEnabled(change);
+  m_Controls.checkBoxChrono->setEnabled(change);
+  m_Controls.buttonPerformImageProcessing->setEnabled(change);
+}
+
 
 void SpectralUnmixing::ChangeGUIWeight()
 {
@@ -326,11 +347,18 @@ void SpectralUnmixing::DoImageProcessing()
         message << "'" << name << "'";
       }
       message << ".";
+      SwitchGUIControls(false);
+      std::chrono::steady_clock::time_point _start(std::chrono::steady_clock::now());
 
       PluginVerbose = m_Controls.checkBoxVerbose->isChecked();
       MITK_INFO(PluginVerbose) << message.str();
 
       GenerateOutput(image);
+
+      std::chrono::steady_clock::time_point _end(std::chrono::steady_clock::now());
+      MITK_INFO(m_Controls.checkBoxChrono->isChecked()) << "Time for image Processing: "
+        << std::chrono::duration_cast<std::chrono::duration<double>>(_end - _start).count();
+      SwitchGUIControls(true);
     }
   }
 }
@@ -339,7 +367,7 @@ void SpectralUnmixing::GenerateOutput(mitk::Image::Pointer image)
 {
   std::vector<bool> boolVec = { m_Controls.checkBoxOx->isChecked(),  m_Controls.checkBoxDeOx->isChecked(),
     m_Controls.checkBoxMelanin->isChecked(), m_Controls.checkBoxAdd->isChecked() };
-  std::vector<std::string> chromophoreNameVec = { "HbO2",  "Hb", "Melanin", "Static Endmember" };
+  std::vector<std::string> outputNameVec = { "HbO2",  "Hb", "Melanin", "Static Endmember" };
 
   //Read GUI information(algorithm)
   auto qs = m_Controls.QComboBoxAlgorithm->currentText();
@@ -347,22 +375,29 @@ void SpectralUnmixing::GenerateOutput(mitk::Image::Pointer image)
 
   mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter = GetFilterInstance(Algorithm);
   SetVerboseMode(m_SpectralUnmixingFilter, PluginVerbose);
+  m_SpectralUnmixingFilter->RelativeError(m_Controls.checkBoxError->isChecked());
   m_SpectralUnmixingFilter->SetInput(image);
   SetWavlength(m_SpectralUnmixingFilter);
-  SetChromophore(m_SpectralUnmixingFilter, boolVec, chromophoreNameVec);
+  SetChromophore(m_SpectralUnmixingFilter, boolVec, outputNameVec);
+
+  boolVec.push_back(m_Controls.checkBoxError->isChecked());
+  outputNameVec.push_back("Relative Error");
+
+  m_SpectralUnmixingFilter->AddOutputs(std::accumulate(boolVec.begin(), boolVec.end(), 0));
+  MITK_INFO(PluginVerbose) << "Number of indexed outputs: " << std::accumulate(boolVec.begin(), boolVec.end(), 0);
 
   MITK_INFO(PluginVerbose) << "Updating Filter...";
   m_SpectralUnmixingFilter->Update();
 
   int outputCounter = 0;
   mitk::Image::Pointer m_Output;
-  for (unsigned int chromophore = 0; chromophore < chromophoreNameVec.size(); ++chromophore)
+  for (unsigned int chromophore = 0; chromophore < outputNameVec.size(); ++chromophore)
   {
     if (boolVec[chromophore] != false)
     {
       m_Output = m_SpectralUnmixingFilter->GetOutput(outputCounter++);
       m_Output->SetSpacing(image->GetGeometry()->GetSpacing());
-      WriteOutputToDataStorage(m_Output, chromophoreNameVec[chromophore] + Algorithm);
+      WriteOutputToDataStorage(m_Output, outputNameVec[chromophore] + Algorithm);
     }
   }
 

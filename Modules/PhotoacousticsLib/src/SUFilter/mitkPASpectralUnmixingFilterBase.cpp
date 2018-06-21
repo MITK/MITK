@@ -36,6 +36,13 @@ mitk::pa::SpectralUnmixingFilterBase::~SpectralUnmixingFilterBase()
 
 }
 
+void mitk::pa::SpectralUnmixingFilterBase::AddOutputs(unsigned int outputs)
+{
+  this->SetNumberOfIndexedOutputs(outputs);
+  for (unsigned int i = 0; i<GetNumberOfIndexedOutputs(); i++)
+    this->SetNthOutput(i, mitk::Image::New());
+}
+
 void mitk::pa::SpectralUnmixingFilterBase::AddWavelength(int wavelength)
 {
   m_Wavelength.push_back(wavelength);
@@ -49,6 +56,11 @@ void mitk::pa::SpectralUnmixingFilterBase::AddChromophore(mitk::pa::PropertyCalc
 void mitk::pa::SpectralUnmixingFilterBase::Verbose(bool verbose)
 {
   m_Verbose = verbose;
+}
+
+void mitk::pa::SpectralUnmixingFilterBase::RelativeError(bool relativeError)
+{
+  m_RelativeError = relativeError;
 }
 
 void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
@@ -101,12 +113,23 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
           unsigned int pixelNumber = (xDim*yDim*(z+sequenceCounter*sequenceSize)) + x * yDim + y;
           auto pixel = inputDataArray[pixelNumber];
 
-          //write all wavelength absorbtion values for one(!) pixel of a sequence to a vector
           inputVector[z] = pixel;
         }
         Eigen::VectorXf resultVector = SpectralUnmixingAlgorithm(endmemberMatrix, inputVector);
 
-        for (int outputIdx = 0; outputIdx < GetNumberOfIndexedOutputs(); ++outputIdx)
+        unsigned int outputCounter = GetNumberOfIndexedOutputs();
+        if (m_RelativeError == true)
+        {
+          // because rel error is output[IndexedOutputs() - 1] and loop over chromophore outputs has to end at [IndexedOutputs() - 2]
+          outputCounter -= 1;
+          float relativeError = (endmemberMatrix*resultVector - inputVector).norm() / inputVector.norm(); // norm() is L2 norm
+          auto output = GetOutput(outputCounter);
+          mitk::ImageWriteAccessor writeOutput(output);
+          float* writeBuffer = (float *)writeOutput.GetData();
+          writeBuffer[(xDim*yDim * sequenceCounter) + x * yDim + y] = relativeError;
+        }
+
+        for (unsigned int outputIdx = 0; outputIdx < outputCounter; ++outputIdx)
         {
           auto output = GetOutput(outputIdx);
           mitk::ImageWriteAccessor writeOutput(output);
@@ -145,10 +168,6 @@ void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(unsigned int numbe
 void mitk::pa::SpectralUnmixingFilterBase::InitializeOutputs(unsigned int totalNumberOfSequences)
 {
   MITK_INFO(m_Verbose) << "Initialize Outputs ...";
-
-  this->SetNumberOfIndexedOutputs(m_Chromophore.size());
-  for (unsigned int i = 0; i<GetNumberOfIndexedOutputs(); i++)
-    this->SetNthOutput(i, mitk::Image::New());
 
   unsigned int numberOfInputs = GetNumberOfIndexedInputs();
   unsigned int numberOfOutputs = GetNumberOfIndexedOutputs();

@@ -128,6 +128,12 @@ class SpectralUnmixing : public QmitkAbstractView
     * @param image has to be an MITK image (pointer). For the request on the image look at the docu of the mitkPASpectralUnmixngFilterBase.h
     */
     virtual void GenerateOutput(mitk::Image::Pointer image);
+
+    /**
+    * \brief enables/disables GUI
+    * @param change true means GUI buttons enabled, false disabled respectively
+    */
+    virtual void SwitchGUIControls(bool change);
 };
 
 #endif // SpectralUnmixing_h

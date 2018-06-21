@@ -328,7 +328,6 @@ void mitk::FiberfoxParameters::SaveParameters(std::string filename)
   parameters.put("fiberfox.image.tEcho", m_SignalGen.m_tEcho);
   parameters.put("fiberfox.image.tLine", m_SignalGen.m_tLine);
   parameters.put("fiberfox.image.tInhom", m_SignalGen.m_tInhom);
-  parameters.put("fiberfox.image.bvalue", m_SignalGen.m_Bvalue);
   parameters.put("fiberfox.image.simulatekspace", m_SignalGen.m_SimulateKspaceAcquisition);
   parameters.put("fiberfox.image.axonRadius", m_SignalGen.m_AxonRadius);
   parameters.put("fiberfox.image.doSimulateRelaxation", m_SignalGen.m_DoSimulateRelaxation);
@@ -681,7 +680,6 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
       m_SignalGen.m_tEcho = ReadVal<float>(v1,"tEcho", m_SignalGen.m_tEcho);
       m_SignalGen.m_tLine = ReadVal<float>(v1,"tLine", m_SignalGen.m_tLine);
       m_SignalGen.m_tInhom = ReadVal<float>(v1,"tInhom", m_SignalGen.m_tInhom);
-      m_SignalGen.m_Bvalue = ReadVal<double>(v1,"bvalue", m_SignalGen.m_Bvalue);
       m_SignalGen.m_SimulateKspaceAcquisition = ReadVal<bool>(v1,"simulatekspace", m_SignalGen.m_SimulateKspaceAcquisition);
 
       m_SignalGen.m_AxonRadius = ReadVal<double>(v1,"axonRadius", m_SignalGen.m_AxonRadius);
@@ -703,15 +701,14 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
       m_SignalGen.m_Rotation[1] = ReadVal<float>(v1,"artifacts.rotation1", m_SignalGen.m_Rotation[1]);
       m_SignalGen.m_Rotation[2] = ReadVal<float>(v1,"artifacts.rotation2", m_SignalGen.m_Rotation[2]);
 
-
-      // m_SignalGen.SetNumWeightedVolumes(ReadVal<unsigned int>(v1,"numgradients", m_SignalGen.GetNumWeightedVolumes()));
-      SignalGenerationParameters::GradientListType gradients;
       if (itksys::SystemTools::FileExists(filename+".bvals") && itksys::SystemTools::FileExists(filename+".bvecs"))
       {
         m_SignalGen.SetGradienDirections( mitk::gradients::ReadBvalsBvecs(filename+".bvals", filename+".bvecs", m_SignalGen.m_Bvalue) );
       }
       else
       {
+        m_SignalGen.m_Bvalue = ReadVal<double>(v1,"bvalue", m_SignalGen.m_Bvalue);
+        SignalGenerationParameters::GradientListType gradients;
         try
         {
           BOOST_FOREACH( boost::property_tree::ptree::value_type const& v2, v1.second.get_child("gradients") )
@@ -934,8 +931,6 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
 
         if (signalModel!=nullptr)
         {
-          signalModel->SetGradientList(gradients);
-
           try
           {
             itk::ImageFileReader<ItkDoubleImgType>::Pointer reader = itk::ImageFileReader<ItkDoubleImgType>::New();
@@ -961,6 +956,8 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
 
     }
   }
+
+  UpdateSignalModels();
 
   try
   {

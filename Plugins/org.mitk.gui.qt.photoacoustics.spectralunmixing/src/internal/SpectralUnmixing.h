@@ -32,6 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 * oxy- and deoxyhemoglobin are selected in the GUI.
 *
 * For further information look at the documentation of the mitkPASpectralUnmixingFilterBase.h
+*
+* @exeption if the GenerateOutput method throws a exception the plugin will show a QMessageBox with the exception
+* message at the GUI
 */
 class SpectralUnmixing : public QmitkAbstractView
 {
@@ -97,7 +100,7 @@ class SpectralUnmixing : public QmitkAbstractView
     * @param m_SpectralUnmixingFilter is a pointer of the spectral unmixing filter base
     * @param boolVec is a vector which contains the information which chromophore was checked in the GUI
     * @param chromophoreNameVec contains the names of all chromophores as strings
-    * @throw "PRESS 'IGNORE' AND CHOOSE A CHROMOPHORE!" if no chromophore was chosen
+    * @throws "PRESS 'IGNORE' AND CHOOSE A CHROMOPHORE!" if no chromophore was chosen
     */
     virtual void SetChromophore(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter, std::vector<bool> boolVec, std::vector<std::string> chromophoreNameVec);
 
@@ -119,7 +122,7 @@ class SpectralUnmixing : public QmitkAbstractView
     * input images are the output for oxy- and deoxyhemoglobin from the GenerateOutput method (spectral unmixing filter results).
     * @param m_SpectralUnmixingFilter is a pointer of the spectral unmixing filter base to get the filter output images as sO2 input
     * @param boolVec is a vector which contains the information which chromophore was checked in the GUI
-    * @throw if oxy- or deoxyhemoglobin was not selected in the GUI
+    * @throws if oxy- or deoxyhemoglobin was not selected in the GUI
     */
     virtual void CalculateSO2(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter, std::vector<bool> boolVec);
 

@@ -353,7 +353,11 @@ void SpectralUnmixing::DoImageProcessing()
       PluginVerbose = m_Controls.checkBoxVerbose->isChecked();
       MITK_INFO(PluginVerbose) << message.str();
 
-      GenerateOutput(image);
+      try { GenerateOutput(image); }
+      catch (const mitk::Exception& e)
+      {
+        QMessageBox::information(nullptr, "Template", e.GetDescription());
+      }
 
       std::chrono::steady_clock::time_point _end(std::chrono::steady_clock::now());
       MITK_INFO(m_Controls.checkBoxChrono->isChecked()) << "Time for image Processing: "

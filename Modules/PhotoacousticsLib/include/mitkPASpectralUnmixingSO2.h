@@ -82,7 +82,7 @@ namespace mitk {
 
       /*
       * \brief Checks if the dimensions of the input images are equal.
-      * @throw if tey are not
+      * @throws if tey are not
       */
       virtual void CheckPreConditions(mitk::Image::Pointer inputHbO2, mitk::Image::Pointer inputHb);
 

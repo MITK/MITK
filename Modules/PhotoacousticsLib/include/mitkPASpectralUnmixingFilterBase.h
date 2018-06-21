@@ -137,9 +137,9 @@ namespace mitk {
       * @param numberOfInputImages corresponds to the z-dimension of the MITK input image
       * @param inputDataArray contains every pixel of the MITK input image. Accessable like pseudo multidimensional array, that means 
       * pixel(x,y,z) = (xdim * yDim * z) + x * yDim + y where eg. "xdim" means the total size of the MITK input image in x direction.
-      * @throw if there are more wavelength then images
-      * @throw if there are more chromophores then wavelengths
-      * @throw if the pixel type is not float 32
+      * @throws if there are more wavelength then images
+      * @throws if there are more chromophores then wavelengths
+      * @throws if the pixel type is not float 32
       */
       virtual void CheckPreConditions(unsigned int numberOfInputImages, const float* inputDataArray);
 
@@ -165,7 +165,7 @@ namespace mitk {
       * at every wavelength and is therefor not part of the database. If this one is the selected chromophore the return value is 1 for every wavelength.
       * @param wavelength has to be integer between 300 and 1000 nm
       * @param chromophore has to be a mitk::pa::PropertyCalculator::ChromophoreType
-      * @throw if mitk::pa::PropertyCalculator::GetAbsorptionForWavelengt returns 0, because this means that the delivered wavelength is not in the database.
+      * @throws if mitk::pa::PropertyCalculator::GetAbsorptionForWavelengt returns 0, because this means that the delivered wavelength is not in the database.
       */
       virtual float PropertyElement(mitk::pa::PropertyCalculator::ChromophoreType, int wavelength);
 

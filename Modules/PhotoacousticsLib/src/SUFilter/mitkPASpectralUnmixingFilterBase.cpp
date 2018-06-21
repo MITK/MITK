@@ -79,6 +79,8 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
 
   unsigned int sequenceSize = m_Wavelength.size();
   unsigned int totalNumberOfSequences = numberOfInputImages / sequenceSize;
+  if (totalNumberOfSequences == 0) //means that more chromophores then wavelengths
+    mitkThrow() << "ERROR! REMOVE WAVELENGTHS!";
   MITK_INFO(m_Verbose) << "TotalNumberOfSequences: " << totalNumberOfSequences;
 
   InitializeOutputs(totalNumberOfSequences);
@@ -153,11 +155,8 @@ void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(unsigned int numbe
   if (m_Wavelength.size() < numberOfInputImages)
     MITK_WARN << "NUMBER OF WAVELENGTHS < NUMBER OF INPUT IMAGES";
 
-  if (m_Wavelength.size() > numberOfInputImages)
-    mitkThrow() << "ERROR! REMOVE WAVELENGTHS!";
-
   if (m_Chromophore.size() > m_Wavelength.size())
-    mitkThrow() << "ADD MORE WAVELENGTHS!";
+    mitkThrow() << "ADD MORE WAVELENGTHS OR REMOVE ENDMEMBERS!";
 
   if (typeid(inputDataArray[0]).name() != typeid(float).name())
     mitkThrow() << "PIXELTYPE ERROR! FLOAT 32 REQUIRED";

@@ -94,7 +94,7 @@ namespace mitk {
       * the absorbtion of chromophore j @ wavelength i taken from the database by PropertyElement method.
       * @param inputVector Vector containing values of one pixel of XY-plane image with number of wavelength rows (z-dimension of a sequenece)
       * so the pixelvalue of the first wavelength is stored in inputVector[0] and so on.
-      * @throw if the algorithmName is not a member of the enum VigraAlgortihmType
+      * @throws if the algorithmName is not a member of the enum VigraAlgortihmType
       */
       virtual Eigen::VectorXf SpectralUnmixingAlgorithm(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> EndmemberMatrix,
         Eigen::VectorXf inputVector) override;

@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkBox.h>
 #include <vtkMath.h>
 #include <itksys/SystemTools.hxx>
+#include <boost/algorithm/string.hpp>
 
 // Intersect a finite line (with end points p0 and p1) with all of the
 // cells of a vtkImageData
@@ -242,23 +243,22 @@ mitk::gradients::GradientDirectionContainerType::Pointer mitk::gradients::ReadBv
     std::ifstream myfile (bvecs_file.c_str());
     if (myfile.is_open())
     {
-      while ( myfile.good() )
+      while (std::getline(myfile, line))
       {
-        std::string line2;
-        getline (myfile,line2);
-
-        std::stringstream iss;
-        iss << line2;
-
-        while(getline(iss,line, ' '))
+        std::vector<std::string> strs;
+        boost::split(strs,line,boost::is_any_of("\t \n"));
+        for (auto token : strs)
         {
-          // remove any potenial control sequences that might be introduced by lines ending in a single space
-          line.erase(std::remove_if(line.begin(), line.end(),
-                                    [](char c) { return std::isspace(c) || std::iscntrl(c); } ), line.end());
-
-          if (line.length() > 0 ) // otherwise string contained only control characters before, empty string are converted to 0 by atof resulting in a broken b-value list
+          if (!token.empty())
           {
-            bvec_entries.push_back(atof(line.c_str()));
+            try
+            {
+              bvec_entries.push_back(boost::lexical_cast<float>(token));
+            }
+            catch(...)
+            {
+              mitkThrow() << "Encountered invalid bvecs file entry >" << token << "<";
+            }
           }
         }
       }
@@ -266,10 +266,11 @@ mitk::gradients::GradientDirectionContainerType::Pointer mitk::gradients::ReadBv
     }
     else
     {
-      mitkThrow() << "Unable to open bvecs file: " << bvecs_file;
+      mitkThrow() << "bvecs file could not be opened: " << bvals_file;
     }
   }
 
+  reference_bval = -1;
   std::vector<float> bval_entries;
   if (!itksys::SystemTools::FileExists(bvals_file))
     mitkThrow() << "bvals file not existing: " << bvals_file;
@@ -279,43 +280,42 @@ mitk::gradients::GradientDirectionContainerType::Pointer mitk::gradients::ReadBv
     std::ifstream myfile (bvals_file.c_str());
     if (myfile.is_open())
     {
-      while ( myfile.good() )
+      while (std::getline(myfile, line))
       {
-        getline (myfile,line, ' ');
-        // remove any potenial control sequences that might be introduced by lines ending in a single space
-        line.erase(std::remove_if(line.begin(), line.end(),
-                                  [](char c) { return std::isspace(c) || std::iscntrl(c); } ), line.end());
-
-        if (line.length() > 0 ) // otherwise string contained only control characters before, empty string are converted to 0 by atof resulting in a broken b-value list
+        std::vector<std::string> strs;
+        boost::split(strs,line,boost::is_any_of("\t \n"));
+        for (auto token : strs)
         {
-          bval_entries.push_back(atof(line.c_str()));
+          if (!token.empty())
+          {
+            try {
+              bval_entries.push_back(boost::lexical_cast<float>(token));
+              if (bval_entries.back()>reference_bval)
+                reference_bval = bval_entries.back();
+            }
+            catch(...)
+            {
+              mitkThrow() << "Encountered invalid bvals file entry >" << token << "<";
+            }
+          }
         }
-
-
       }
       myfile.close();
     }
     else
     {
-      mitkThrow() << "Unable to open bvals file: " << bvals_file;
+      mitkThrow() << "bvals file could not be opened: " << bvals_file;
     }
   }
 
-  // Take the largest entry in bvals as the reference b-value
-  reference_bval = -1;
-  unsigned int numb = bval_entries.size();
-  for(unsigned int i=0; i<numb; i++)
-    if (bval_entries.at(i)>reference_bval)
-      reference_bval = bval_entries.at(i);
-
-  for(unsigned int i=0; i<numb; i++)
+  for(unsigned int i=0; i<bval_entries.size(); i++)
   {
     double b_val = bval_entries.at(i);
 
     mitk::gradients::GradientDirectionType vec;
     vec[0] = bvec_entries.at(i);
-    vec[1] = bvec_entries.at(i+numb);
-    vec[2] = bvec_entries.at(i+2*numb);
+    vec[1] = bvec_entries.at(i+bval_entries.size());
+    vec[2] = bvec_entries.at(i+2*bval_entries.size());
 
     // Adjust the vector length to encode gradient strength
     double factor = b_val/reference_bval;

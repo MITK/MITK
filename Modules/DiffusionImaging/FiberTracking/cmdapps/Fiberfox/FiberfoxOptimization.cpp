@@ -422,20 +422,10 @@ FiberfoxParameters MakeProposalDiff(FiberfoxParameters old_params, double temper
   std::random_device r;
   std::default_random_engine randgen(r());
 
-  std::uniform_int_distribution<int> uint1(0, new_params.m_NonFiberModelList.size() + new_params.m_FiberModelList.size() - 1);
+  std::uniform_int_distribution<int> uint1(0, new_params.m_FiberModelList.size() - 1);
   unsigned int prop = uint1(randgen);
-
-  if (prop<new_params.m_NonFiberModelList.size())
-  {
-    MITK_INFO << "Proposal D (Non-Fiber " << prop << ")";
-    ProposeDiffusivities( new_params.m_NonFiberModelList[prop], temperature );
-  }
-  else
-  {
-    prop -= new_params.m_NonFiberModelList.size();
-    MITK_INFO << "Proposal D (Fiber " << prop  << ")";
-    ProposeDiffusivities( new_params.m_FiberModelList[prop], temperature );
-  }
+  MITK_INFO << "Proposal D (Fiber " << prop  << ")";
+  ProposeDiffusivities( new_params.m_FiberModelList[prop], temperature );
 
   return new_params;
 }
@@ -515,6 +505,8 @@ int main(int argc, char* argv[])
   parser.addArgument("fa_error", "", mitkCommandLineParser::Bool, "Optimize FA", "Optimize FA instead of raw signal. Requires FA image.");
   parser.addArgument("fa_image", "", mitkCommandLineParser::InputFile, "FA image:", "Weight error by FA histogram. Always necessary with option fa_error!");
   parser.addArgument("md_image", "", mitkCommandLineParser::InputFile, "MD image:", "Optimize MD in conjunction with FA (recommended when optimizing FA).");
+  parser.addArgument("use_histo", "", mitkCommandLineParser::Bool, "Use histogram modifiers:", "Modify error per voxel by corresponding FA frequency.");
+  parser.addArgument("raise_histo", "", mitkCommandLineParser::Float, "Raise histogram modifiers:", "Raise histogram modifiers by the specified power.", 1.0);
   parser.endGroup();
 
   parser.beginGroup("4. Optimization of volume fraction maps:");
@@ -531,7 +523,6 @@ int main(int argc, char* argv[])
   parser.addArgument("iterations", "", mitkCommandLineParser::Int, "Iterations:", "Number of optimizations steps", 1000);
   parser.addArgument("start_temp", "", mitkCommandLineParser::Float, "Start temperature:", "Higher temperature means larger parameter change proposals", 1.0);
   parser.addArgument("end_temp", "", mitkCommandLineParser::Float, "End temperature:", "Higher temperature means larger parameter change proposals", 0.1);
-  parser.addArgument("raise_histo", "", mitkCommandLineParser::Float, "Raise histogram modifiers:", "Raise histogram modifiers by the specified power.", 1.0);
   parser.endGroup();
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -585,6 +576,10 @@ int main(int argc, char* argv[])
   bool fa_error=false;
   if (parsedArgs.count("fa_error"))
     fa_error = true;
+
+  bool use_histo=false;
+  if (parsedArgs.count("use_histo"))
+    use_histo = true;
 
   std::string fa_file = "";
   if (parsedArgs.count("fa_image"))
@@ -665,39 +660,42 @@ int main(int argc, char* argv[])
     reader->Update();
     fa_image = reader->GetOutput();
 
-    int binsPerDimension = 10;
-    using ImageToHistogramFilterType = itk::Statistics::MaskedImageToHistogramFilter< itk::Image< double,3 >, itk::Image< unsigned char,3 > >;
-
-    ImageToHistogramFilterType::HistogramType::MeasurementVectorType lowerBound(binsPerDimension);
-    lowerBound.Fill(0.0);
-
-    ImageToHistogramFilterType::HistogramType::MeasurementVectorType upperBound(binsPerDimension);
-    upperBound.Fill(1.0);
-
-    ImageToHistogramFilterType::HistogramType::SizeType size(1);
-    size.Fill(binsPerDimension);
-
-    ImageToHistogramFilterType::Pointer imageToHistogramFilter = ImageToHistogramFilterType::New();
-    imageToHistogramFilter->SetInput( fa_image );
-    imageToHistogramFilter->SetHistogramBinMinimum( lowerBound );
-    imageToHistogramFilter->SetHistogramBinMaximum( upperBound );
-    imageToHistogramFilter->SetHistogramSize( size );
-    imageToHistogramFilter->SetMaskImage(mask);
-    imageToHistogramFilter->SetMaskValue(1);
-    imageToHistogramFilter->Update();
-
-    ImageToHistogramFilterType::HistogramType* histogram = imageToHistogramFilter->GetOutput();
-    unsigned int max = 0;
-    for(unsigned int i = 0; i < histogram->GetSize()[0]; ++i)
+    if (use_histo)
     {
-      if (histogram->GetFrequency(i)>max)
-        max = histogram->GetFrequency(i);
-    }
-    MITK_INFO << "FA histogram modifiers:";
-    for(unsigned int i = 0; i < histogram->GetSize()[0]; ++i)
-    {
-      histogram_modifiers.push_back( std::pow(1.0 - (double)histogram->GetFrequency(i)/(double)max, raise_histo) );
-      MITK_INFO << histogram_modifiers.back();
+      int binsPerDimension = 10;
+      using ImageToHistogramFilterType = itk::Statistics::MaskedImageToHistogramFilter< itk::Image< double,3 >, itk::Image< unsigned char,3 > >;
+
+      ImageToHistogramFilterType::HistogramType::MeasurementVectorType lowerBound(binsPerDimension);
+      lowerBound.Fill(0.0);
+
+      ImageToHistogramFilterType::HistogramType::MeasurementVectorType upperBound(binsPerDimension);
+      upperBound.Fill(1.0);
+
+      ImageToHistogramFilterType::HistogramType::SizeType size(1);
+      size.Fill(binsPerDimension);
+
+      ImageToHistogramFilterType::Pointer imageToHistogramFilter = ImageToHistogramFilterType::New();
+      imageToHistogramFilter->SetInput( fa_image );
+      imageToHistogramFilter->SetHistogramBinMinimum( lowerBound );
+      imageToHistogramFilter->SetHistogramBinMaximum( upperBound );
+      imageToHistogramFilter->SetHistogramSize( size );
+      imageToHistogramFilter->SetMaskImage(mask);
+      imageToHistogramFilter->SetMaskValue(1);
+      imageToHistogramFilter->Update();
+
+      ImageToHistogramFilterType::HistogramType* histogram = imageToHistogramFilter->GetOutput();
+      unsigned int max = 0;
+      for(unsigned int i = 0; i < histogram->GetSize()[0]; ++i)
+      {
+        if (histogram->GetFrequency(i)>max)
+          max = histogram->GetFrequency(i);
+      }
+      MITK_INFO << "FA histogram modifiers:";
+      for(unsigned int i = 0; i < histogram->GetSize()[0]; ++i)
+      {
+        histogram_modifiers.push_back( std::pow(1.0 - (double)histogram->GetFrequency(i)/(double)max, raise_histo) );
+        MITK_INFO << histogram_modifiers.back();
+      }
     }
     if (fa_error)
       MITK_INFO << "Using FA error measure.";

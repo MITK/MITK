@@ -45,7 +45,7 @@ if(MITK_USE_Qt5)
   elseif(UNIX)
     MITK_INSTALL(FILES
       "${_qmake_path}/../plugins/platforms/libqxcb.so"
-      "${_qmake_path}/../plugins/platforms/libqxcb-glx-integration.so")
+      "${_qmake_path}/../plugins/xcbglintegrations/libqxcb-glx-integration.so")
   endif()
 
   # Install Qt WebEngine

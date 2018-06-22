@@ -47,7 +47,7 @@ public:
   {
     QmitkExtWorkbenchWindowAdvisor::PostWindowOpen();
     berry::IWorkbenchWindowConfigurer::Pointer configurer = GetWindowConfigurer();
-//    configurer->GetWindow()->GetWorkbench()->GetIntroManager()->ShowIntro(configurer->GetWindow(), false);
+    configurer->GetWindow()->GetWorkbench()->GetIntroManager()->ShowIntro(configurer->GetWindow(), false);
   }
 
 };

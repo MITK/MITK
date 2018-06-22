@@ -3,7 +3,7 @@ MITK_CREATE_MODULE( DicomRTIO
     PRIVATE src/IO
   DEPENDS
     PUBLIC MitkDicomRT
-    PRIVATE MitkDicomReaderServices
+    PRIVATE MitkDICOMReaderServices
   PACKAGE_DEPENDS PUBLIC DCMTK
   AUTOLOAD_WITH MitkCore
 )

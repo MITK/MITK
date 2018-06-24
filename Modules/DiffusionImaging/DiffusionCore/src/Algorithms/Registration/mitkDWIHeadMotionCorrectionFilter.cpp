@@ -80,7 +80,9 @@ void mitk::DWIHeadMotionCorrectionFilter::GenerateData()
 
   // Extract unweighted volumes
   mitk::BValueMapProperty::BValueMap bval_map = DPH::GetBValueMap(input);
-  int first_unweighted_index = bval_map.at(0).front();
+  
+  int first_unweighted_index = bval_map.begin()->second.front();
+  MITK_INFO << "Reference b-value: " << bval_map.begin()->first << " (volume " << first_unweighted_index << ")";
 
   ExtractorType::Pointer filter = ExtractorType::New();
   filter->SetInput( itkVectorImagePointer);

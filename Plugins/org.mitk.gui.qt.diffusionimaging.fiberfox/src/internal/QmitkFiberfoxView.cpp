@@ -639,18 +639,13 @@ FiberfoxParameters QmitkFiberfoxView::UpdateImageParameters(bool all, bool save)
       parameters.m_SignalGen.m_ImageDirection = itkImg->GetDirection();
     }
 
-    if (parameters.m_SignalGen.m_ImageRegion.GetSize(0)==itkImg->GetLargestPossibleRegion().GetSize(0) &&
-        parameters.m_SignalGen.m_ImageRegion.GetSize(1)==itkImg->GetLargestPossibleRegion().GetSize(1) &&
-        parameters.m_SignalGen.m_ImageRegion.GetSize(2)==itkImg->GetLargestPossibleRegion().GetSize(2))
-    {
-      parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
-      itk::ImageDuplicator<ItkFloatImgType>::Pointer duplicator = itk::ImageDuplicator<ItkFloatImgType>::New();
-      duplicator->SetInputImage(itkImg);
-      duplicator->Update();
-      parameters.m_SignalGen.m_FrequencyMap = duplicator->GetOutput();
-      parameters.m_Misc.m_ArtifactModelString += "_DISTORTED";
-      parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Distortions", BoolProperty::New(true));
-    }
+    parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
+    itk::ImageDuplicator<ItkFloatImgType>::Pointer duplicator = itk::ImageDuplicator<ItkFloatImgType>::New();
+    duplicator->SetInputImage(itkImg);
+    duplicator->Update();
+    parameters.m_SignalGen.m_FrequencyMap = duplicator->GetOutput();
+    parameters.m_Misc.m_ArtifactModelString += "_DISTORTED";
+    parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Distortions", BoolProperty::New(true));
   }
 
   parameters.m_SignalGen.m_EddyStrength = 0;

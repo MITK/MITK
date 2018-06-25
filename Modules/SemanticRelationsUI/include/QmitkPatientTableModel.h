@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSemanticTypes.h>
 
 // semantic relations UI module
-#include <QmitkSemanticRelationsModel.h>
+#include <QmitkAbstractSemanticRelationsStorageModel.h>
 
 // mitk core
 #include <mitkDataNode.h>
@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QPixmap>
 
 /*
-* @brief The QmitkPatientTableModel is a subclass of the QmitkSemanticRelationsModel and holds the control point data and information type data of the currently selected case.
+* @brief The QmitkPatientTableModel is a subclass of the QmitkAbstractSemanticRelationsStorageModel and holds the semantic relations data of the currently selected case.
 *
 *   The QmitkPatientTableModel uses the 'data' function to return either the data node of a table cell or the thumbnail of the underlying image.
 *   The horizontal header of the table shows the control points of the current case and the vertical header of the table shows the information types of the current case.
@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 *   Additionally the model creates and holds the QPixmaps of the known data nodes in order to return a thumbnail, if needed.
 */
-class QmitkPatientTableModel : public QmitkSemanticRelationsModel
+class QmitkPatientTableModel : public QmitkAbstractSemanticRelationsStorageModel
 {
   Q_OBJECT 
    
@@ -64,6 +64,22 @@ public:
   /// end override
   /////////////////////////////////////////////////////////////////////////
 
+protected:
+
+  // the following functions have to be overridden but are not implemented in this model
+  virtual void NodePredicateChanged() override;
+  virtual void NodeAdded(const mitk::DataNode* node) override;
+  virtual void NodeChanged(const mitk::DataNode* node) override;
+  virtual void NodeRemoved(const mitk::DataNode* node) override;
+  /**
+  * @brief Overridden from 'QmitkAbstractSemanticRelationsStorageModel': This function retrieves all control points
+  *        and information types of the current case and stores them to define the header of the table.
+  *        Furthermore all images are retrieved and the pixmap of the images are generated and stored.
+  */
+  virtual void SetData() override;
+
+private:
+
   /**
   * @brief The function uses the ID of the node to see if a pixmap was already set. If not, the given pixmap
   *        is used and stored inside a member variable. If the pixmap was already set, it will be overwritten.
@@ -74,21 +90,9 @@ public:
   */
   void SetPixmapOfNode(const mitk::DataNode* dataNode, QPixmap* pixmapFromImage);
 
-protected:
+  void SetLesionPresence(const mitk::DataNode* dataNode, bool lesionPresence);
 
-  // the following functions have to be overridden but are not implemented in this model
-  virtual void NodePredicateChanged() override;
-  virtual void NodeAdded(const mitk::DataNode* node) override;
-  virtual void NodeChanged(const mitk::DataNode* node) override;
-  virtual void NodeRemoved(const mitk::DataNode* node) override;
-  /**
-  * @brief Overridden from 'QmitkSemanticRelationsModel': This function retrieves all control points
-  *        and information types of the current case and stores them to define the header of the table.
-  *        Furthermore all images are retrieved and the pixmap of the images are generated and stored.
-  */
-  virtual void SetData() override;
-
-private:
+  bool IsLesionPresentOnDataNode(const mitk::DataNode* dataNode) const;
 
   /*
   * @brief Returns the data node that is associated with the given table entry (index).
@@ -102,9 +106,11 @@ private:
   mitk::DataNode* GetCurrentDataNode(const QModelIndex &index) const;
 
   std::map<std::string, QPixmap> m_PixmapMap;
+  std::map<std::string, bool> m_LesionPresence;
 
   std::vector<mitk::SemanticTypes::InformationType> m_InformationTypes;
   std::vector<mitk::SemanticTypes::ControlPoint> m_ControlPoints;
+  std::vector<mitk::DataNode::Pointer> m_AllDataNodes;
 
 };
 

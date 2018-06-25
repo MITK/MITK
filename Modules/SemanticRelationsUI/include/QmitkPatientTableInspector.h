@@ -19,25 +19,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations UI module
 #include "MitkSemanticRelationsUIExports.h"
+#include <QmitkAbstractSemanticRelationsStorageInspector.h>
 #include <QmitkPatientTableModel.h>
 
 #include "ui_QmitkPatientTableInspector.h"
 
 // qt widgets module
-#include "QmitkAbstractDataStorageInspector.h"
 #include "QmitkEnums.h"
 
 // qt
 #include <QMenu>
 
 /*
-* @brief The QmitkPatientTableInspector is a QmitkAbstractDataStorageInspector that shows the currently available data of
-*        the patient table model in a control point-information type matrix.
+* @brief The QmitkPatientTableInspector is a QmitkAbstractSemanticRelationsStorageInspector that shows the currently
+*        available data of the semantic relations storage model in a control-point - information type matrix.
 *
-*   The QmitkpatientTableInspector uses the QmitkPatientTableModel, a QmitkAbstractDataStorageModel that
-*   presents the semantic relations data as a table, showing a QPixmap as thumbnail for the image data.
+*   The QmitkPatientTableInspector uses the QmitkSemanticRelationsStorageModel, a QmitkAbstractDataStorageModel that
+*   presents the semantic relations data as a table, showing a QPixmap as thumbnail for the data nodes.
 */
-class MITKSEMANTICRELATIONSUI_EXPORT QmitkPatientTableInspector : public QmitkAbstractDataStorageInspector
+class MITKSEMANTICRELATIONSUI_EXPORT QmitkPatientTableInspector : public QmitkAbstractSemanticRelationsStorageInspector
 {
   Q_OBJECT
 
@@ -50,22 +50,18 @@ public:
 
   virtual void SetSelectionMode(SelectionMode mode) override;
   virtual SelectionMode GetSelectionMode() const override;
-  /**
-  * @brief Extends the abstract base class to allow setting the current case ID which is needed to access the
-  *        semantic relations storage. The function sets the case ID in the storage model.
-  *
-  * @param caseID    A case ID as string
-  */
-  void SetCaseID(const mitk::SemanticTypes::CaseID& caseID);
+
+  virtual void SetCaseID(const mitk::SemanticTypes::CaseID& caseID) override;
+  virtual void SetLesion(const mitk::SemanticTypes::Lesion& lesion) override;
 
 protected:
 
-  virtual void QmitkPatientTableInspector::Initialize() override;
+  virtual void Initialize() override;
 
 private Q_SLOTS:
 
-  void OnPatientTableModelUpdated();
-  void OnPatientTableViewContextMenuRequested(const QPoint&);
+  void OnModelUpdated();
+  void OnTableViewContextMenuRequested(const QPoint&);
   void OnContextMenuSetInformationType();
   void OnContextMenuSetControlPoint();
 

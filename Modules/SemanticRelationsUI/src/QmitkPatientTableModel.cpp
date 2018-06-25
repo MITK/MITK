@@ -14,15 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// semantic relations ui plugin
+// semantic relations UI module
 #include "QmitkPatientTableModel.h"
 #include "QmitkSemanticRelationsUIHelper.h"
+
+// semantic relations module
+#include <mitkNodePredicates.h>
+#include <mitkSemanticRelationException.h>
 
 #include "QmitkCustomVariants.h"
 #include "QmitkEnums.h"
 
 QmitkPatientTableModel::QmitkPatientTableModel(QObject* parent /*= nullptr*/)
-  : QmitkSemanticRelationsModel(parent)
+  : QmitkAbstractSemanticRelationsStorageModel(parent)
 {
   // nothing here
 }
@@ -136,7 +140,11 @@ Qt::ItemFlags QmitkPatientTableModel::flags(const QModelIndex &index) const
   mitk::DataNode* dataNode = GetCurrentDataNode(index);
   if (nullptr != dataNode)
   {
-    flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    auto it = m_LesionPresence.find(mitk::GetIDFromDataNode(dataNode));
+    if (it != m_LesionPresence.end())
+    {
+      return it->second ? flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable : flags;
+    }
   }
 
   return flags;
@@ -187,6 +195,21 @@ void QmitkPatientTableModel::SetPixmapOfNode(const mitk::DataNode* dataNode, QPi
   }
 }
 
+void QmitkPatientTableModel::SetLesionPresence(const mitk::DataNode* dataNode, bool lesionPresence)
+{
+  mitk::SemanticTypes::ID nodeID = mitk::GetIDFromDataNode(dataNode);
+  std::map<std::string, bool>::iterator iter = m_LesionPresence.find(nodeID);
+  if (iter != m_LesionPresence.end())
+  {
+    // key already existing, overwrite already stored bool value
+      iter->second = lesionPresence;
+  }
+  else
+  {
+    m_LesionPresence.insert(std::make_pair(nodeID, lesionPresence));
+  }
+}
+
 void QmitkPatientTableModel::SetData()
 {
   // get all control points of current case
@@ -196,22 +219,67 @@ void QmitkPatientTableModel::SetData()
   // get all information types points of current case
   m_InformationTypes = m_SemanticRelations->GetAllInformationTypesOfCase(m_CaseID);
 
-  std::vector<mitk::DataNode::Pointer> allDataNodes = m_SemanticRelations->GetAllImagesOfCase(m_CaseID);
-  for (const auto& dataNode : allDataNodes)
+  m_AllDataNodes = m_SemanticRelations->GetAllImagesOfCase(m_CaseID);
+  for (const auto& dataNode : m_AllDataNodes)
   {
+    // set the pixmap for the current node
     QPixmap pixmapFromImage = QmitkSemanticRelationsUIHelper::GetPixmapFromImageNode(dataNode);
     SetPixmapOfNode(dataNode, &pixmapFromImage);
+
+    // set the lesion presence for the current node
+    bool lesionPresence = IsLesionPresentOnDataNode(dataNode);
+    SetLesionPresence(dataNode, lesionPresence);
   }
+}
+
+bool QmitkPatientTableModel::IsLesionPresentOnDataNode(const mitk::DataNode* dataNode) const
+{
+  if (m_DataStorage.IsExpired())
+  {
+    return false;
+  }
+
+  auto dataStorage = m_DataStorage.Lock();
+  try
+  {
+    mitk::SemanticRelations::DataNodeVector allSegmentationsOfLesion = m_SemanticRelations->GetAllSegmentationsOfLesion(m_CaseID, m_Lesion);
+    for (const auto& segmentation : allSegmentationsOfLesion)
+    {
+      // get parent node of the current segmentation node with the node predicate
+      mitk::DataStorage::SetOfObjects::ConstPointer parentNodes = dataStorage->GetSources(segmentation, mitk::NodePredicates::GetImagePredicate(), false);
+      for (auto it = parentNodes->Begin(); it != parentNodes->End(); ++it)
+      {
+        if (dataNode == it.Value())
+        {
+          // found a segmentation of the node that is represented by the selected lesion
+          return true;
+        }
+      }
+    }
+  }
+  catch (const mitk::SemanticRelationException&)
+  {
+    return false;
+  }
+
+  return false;
 }
 
 mitk::DataNode* QmitkPatientTableModel::GetCurrentDataNode(const QModelIndex& index) const
 {
   mitk::SemanticTypes::ControlPoint currentControlPoint = m_ControlPoints.at(index.column());
   mitk::SemanticTypes::InformationType currentInformationType = m_InformationTypes.at(index.row());
-  std::vector<mitk::DataNode::Pointer> filteredDataNodes = m_SemanticRelations->GetFilteredData(m_CaseID, currentControlPoint, currentInformationType);
-  if (filteredDataNodes.empty())
+  try
+  {
+    std::vector<mitk::DataNode::Pointer> filteredDataNodes = m_SemanticRelations->GetFilteredData(m_CaseID, currentControlPoint, currentInformationType);
+    if (filteredDataNodes.empty())
+    {
+      return nullptr;
+    }
+    return filteredDataNodes.front();
+  }
+  catch (const mitk::SemanticRelationException&)
   {
     return nullptr;
   }
-  return filteredDataNodes.front();
 }

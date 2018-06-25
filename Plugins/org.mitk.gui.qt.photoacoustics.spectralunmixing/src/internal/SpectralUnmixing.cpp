@@ -36,13 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPASpectralUnmixingFilterSimplex.h"
 
 #include <numeric>
-#include <Qthread>
 #include <QtConcurrentRun>
-#include <QFuture>
-#include <QFutureWatcher>
-#include <qmessagebox.h>
-
-#include <thread>
 
 const std::string SpectralUnmixing::VIEW_ID = "org.mitk.views.spectralunmixing";
 
@@ -58,14 +52,14 @@ void SpectralUnmixing::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.buttonPerformImageProcessing, &QPushButton::clicked, this, &SpectralUnmixing::DoImageProcessing);
   m_Controls.tableWeight->hide();
   m_Controls.tableSO2->hide();
-  connect((QObject*)(m_Controls.QComboBoxAlgorithm), SIGNAL(currentIndexChanged(int)), this, SLOT(ChangeGUIWeight()));
-  connect((QObject*)(m_Controls.checkBoxsO2), SIGNAL(clicked()), this, SLOT(ChangeGUISO2()));
-  this->connect(this, SIGNAL(finishSignal()), this, SLOT(finishMethod()));
+  connect((QObject*)(m_Controls.QComboBoxAlgorithm), SIGNAL(currentIndexChanged(int)), this, SLOT(EnableGUIWeight()));
+  connect((QObject*)(m_Controls.checkBoxsO2), SIGNAL(clicked()), this, SLOT(EnableGUISO2()));
+  this->connect(this, SIGNAL(finishSignal()), this, SLOT(storeOutputs()));
+  this->connect(this, SIGNAL(crashSignal()), this, SLOT(crashInfo()));
 }
 
 void SpectralUnmixing::SwitchGUIControls(bool change)
 {
-  MITK_INFO(PluginVerbose) << "ENABLE GUI " << change;
   m_Controls.inputtable->setEnabled(change);
   m_Controls.checkBoxOx->setEnabled(change);
   m_Controls.checkBoxDeOx->setEnabled(change);
@@ -81,8 +75,7 @@ void SpectralUnmixing::SwitchGUIControls(bool change)
   m_Controls.checkBoxError->setEnabled(change);
 }
 
-
-void SpectralUnmixing::ChangeGUIWeight()
+void SpectralUnmixing::EnableGUIWeight()
 {
   auto qs = m_Controls.QComboBoxAlgorithm->currentText();
   std::string Algorithm = qs.toUtf8().constData();
@@ -92,7 +85,7 @@ void SpectralUnmixing::ChangeGUIWeight()
     m_Controls.tableWeight->hide();
 }
 
-void SpectralUnmixing::ChangeGUISO2()
+void SpectralUnmixing::EnableGUISO2()
 {
   if (m_Controls.checkBoxsO2->isChecked())
     m_Controls.tableSO2->show();
@@ -321,7 +314,7 @@ void SpectralUnmixing::WriteOutputToDataStorage(mitk::Image::Pointer m_Image, st
   this->GetDataStorage()->Add(dataNodeOutput);
 }
 
-void SpectralUnmixing::GenerateOutput(mitk::Image::Pointer image)
+void SpectralUnmixing::Settings(mitk::Image::Pointer image)
 {
   boolVec = { m_Controls.checkBoxOx->isChecked(),  m_Controls.checkBoxDeOx->isChecked(),
     m_Controls.checkBoxMelanin->isChecked(), m_Controls.checkBoxAdd->isChecked() };
@@ -344,21 +337,10 @@ void SpectralUnmixing::GenerateOutput(mitk::Image::Pointer image)
 
   m_SpectralUnmixingFilter->AddOutputs(std::accumulate(boolVec.begin(), boolVec.end(), 0));
   MITK_INFO(PluginVerbose) << "Number of indexed outputs: " << std::accumulate(boolVec.begin(), boolVec.end(), 0);
-
-  MITK_INFO(PluginVerbose) << "Updating Filter...";
-  QtConcurrent::run(this, &SpectralUnmixing::WorkingThread, m_SpectralUnmixingFilter);
-
-
-  //WorkingThread(m_SpectralUnmixingFilter);
-  //m_SpectralUnmixingFilter->Update();
-
-
 }
 
-void SpectralUnmixing::finishMethod()
+void SpectralUnmixing::storeOutputs()
 {
-  MITK_INFO << "This is a finishMethod string \n";
-
   int outputCounter = 0;
   mitk::Image::Pointer m_Output;
   for (unsigned int chromophore = 0; chromophore < outputNameVec.size(); ++chromophore)
@@ -383,15 +365,25 @@ void SpectralUnmixing::finishMethod()
   SwitchGUIControls(true);
 }
 
-void SpectralUnmixing::WorkingThread(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter)
+void SpectralUnmixing::WorkingThreadUpdateFilter(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter)
 {
-  MITK_INFO << "This is a WorkingThread string \n";
   SwitchGUIControls(false);
+  try
+  {
+    m_SpectralUnmixingFilter->Update();
+    emit finishSignal();
+  }
+  catch (const mitk::Exception& e)
+  {
+    SwitchGUIControls(true);
+    MITK_ERROR << e.GetDescription();
+    emit crashSignal();
+  }
+}
 
-  m_SpectralUnmixingFilter->Update();
-
-  MITK_INFO << "Filter Update";
-  emit finishSignal();
+void SpectralUnmixing::crashInfo()
+{
+  QMessageBox::information(nullptr, "Template", "ERROR! For more information have a look at the console.");
 }
 
 void SpectralUnmixing::DoImageProcessing()
@@ -428,19 +420,21 @@ void SpectralUnmixing::DoImageProcessing()
         message << "'" << name << "'";
       }
       message << ".";
-      _start = std::chrono::steady_clock::now();
 
+      _start = std::chrono::steady_clock::now();
       PluginVerbose = m_Controls.checkBoxVerbose->isChecked();
       MITK_INFO(PluginVerbose) << message.str();
 
-      GenerateOutput(image);
-      /*try { GenerateOutput(image); }
+      try
+      {
+        Settings(image);
+        MITK_INFO(PluginVerbose) << "Updating Filter...";
+        QtConcurrent::run(this, &SpectralUnmixing::WorkingThreadUpdateFilter, m_SpectralUnmixingFilter);
+      }
       catch (const mitk::Exception& e)
       {
         QMessageBox::information(nullptr, "Template", e.GetDescription());
-      }*/
-
-
+      }
     }
   }
 }

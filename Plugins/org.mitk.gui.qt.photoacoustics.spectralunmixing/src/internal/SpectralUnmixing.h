@@ -55,9 +55,11 @@ class SpectralUnmixing : public QmitkAbstractView
 
 
     /**
-    * \brief Called when the user clicks the GUI button. Checks if the selected data is an image. Then performs spectral
-    * unmixing via the GenerateOutput method based on the spectral unmixing filter base and its subclasses.
+    * \brief Called when the user clicks the GUI button. Checks if the selected data is an image. Then passen on the GUI
+    * information using the Settings method. Afterwards it performs spectral unmixing via the WorkingThreadUpdateFilter
+    * method in a own thread. The spectral unmixing is based on the spectral unmixing filter base and its subclasses.
     * @exception if nothing is selected. Inform the user and return
+    * @exception if settings fails. Informs with the mitkthorw information of the filter as QMessageBox
     */
     void DoImageProcessing();
   
@@ -65,14 +67,33 @@ class SpectralUnmixing : public QmitkAbstractView
     * \brief slots are there to show/hide input tables for weights- and SO2 settings ig they are not needed
     */
   public slots:
-    void ChangeGUIWeight();
-    void ChangeGUISO2();
+    void EnableGUIWeight();
+    void EnableGUISO2();
 
+    /**
+    * \brief slot waits for finishSignal of the working thread and starts storeOutputs
+    */
   public slots:
-    void finishMethod();
+    /**
+    * \brief slot does the image post processing
+    * - GetOutput from m_SpectralUnmixingFilter
+    * - calles WriteOutputToDataStorage
+    * - if (true) calls CalculateSO2
+    * - does the rendering
+    * - if (true) shows the chrono result
+    * - switches the GUI back on
+    */
+    void storeOutputs();
   signals:
     void finishSignal();
 
+    /**
+    * \brief slot waits for crashSignal and if neccessary ends working thread
+    */
+    public slots:
+    void crashInfo();
+  signals:
+    void crashSignal();
 
   protected:
     Ui::SpectralUnmixingControls m_Controls;
@@ -81,18 +102,11 @@ class SpectralUnmixing : public QmitkAbstractView
     * \brief passes the algorithm information from the GUI on to the spectral unmixing filter base subclass method
     * "SetAlgortihm" and initializes the subclassFilter::Pointer.
     * @param algorithm has to be a string which can be assigned to the mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType
-    * @thorw if the algorithm string doesn't match to an implemented algorithm
+    * @throws if the algorithm string doesn't match to an implemented algorithm
     */
     mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algorithm);
 
-    /**
-    * \brief passes the algorithm information if verbose mode is requested from the GUI on to the spectral unmixing filter
-    * @param m_SpectralUnmixingFilter is a pointer of the spectral unmixing filter base
-    * @param PluginVerbose is the GUI information bool
-    */
-    virtual void SetVerboseMode(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter, bool PluginVerbose);
     bool PluginVerbose = true;
-
     mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter;
     std::vector<std::string> outputNameVec;
     std::vector<bool> boolVec;
@@ -100,11 +114,38 @@ class SpectralUnmixing : public QmitkAbstractView
     bool sO2Bool;
     mitk::Image *image;
     std::chrono::steady_clock::time_point _start;
+
   private:
+    /*
+    * \brief thread
+    * - disables GUI
+    * - tries Filter->Update() method
+    *   - gives finishSignal which calls storeOutputs
+    * - cathes by enables GUI and gives crashSignal
+    */
+    void WorkingThreadUpdateFilter(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter);
 
+    /**
+    * \brief takes an MITK image as input and performs spectral unmixing based on the spectral unmixing filter base and its subclasses.
+    * Therefor it first passes all information from the GUI into the filter by using the "set"methods of the plugin, which then are calling
+    * the "add" methods of the filter(base).
+    * @param image has to be an MITK image (pointer). For the request on the image look at the docu of the mitkPASpectralUnmixngFilterBase.h
+    */
+    virtual void Settings(mitk::Image::Pointer image);
 
+    /*
+    * \brief The method takes a image pointer and a file name which then will get to the data storage.
+    * @param m_Image is a mitk_::Image::Pointer pointing at the output which one wants to get stored
+    * @param name has to be a string and will be the file name
+    */
+    virtual void WriteOutputToDataStorage(mitk::Image::Pointer m_Image, std::string name);
 
-    void WorkingThread(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter);
+    /**
+    * \brief passes the algorithm information if verbose mode is requested from the GUI on to the spectral unmixing filter
+    * @param m_SpectralUnmixingFilter is a pointer of the spectral unmixing filter base
+    * @param PluginVerbose is the GUI information bool
+    */
+    virtual void SetVerboseMode(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter, bool PluginVerbose);
 
     /*
     * \brief passes the wavelength information from the GUI on to the spectral unmixing filter base method "AddWavelength".
@@ -120,13 +161,6 @@ class SpectralUnmixing : public QmitkAbstractView
     * @throws "PRESS 'IGNORE' AND CHOOSE A CHROMOPHORE!" if no chromophore was chosen
     */
     virtual void SetChromophore(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter, std::vector<bool> boolVec, std::vector<std::string> chromophoreNameVec);
-
-    /*
-    * \brief The method takes a image pointer and a file name which then will get to the data storage.
-    * @param m_Image is a mitk_::Image::Pointer pointing at the output which one wants to get stored
-    * @param name has to be a string and will be the file name
-    */
-    virtual void WriteOutputToDataStorage(mitk::Image::Pointer m_Image, std::string name);
 
     /**
     * \brief passes the SetSO2Settings information from the GUI on to the spectral unmixing SO2 filter method "AddSO2Settings".
@@ -144,17 +178,10 @@ class SpectralUnmixing : public QmitkAbstractView
     virtual void CalculateSO2(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter, std::vector<bool> boolVec);
 
     /**
-    * \brief takes an MITK image as input and performs spectral unmixing based on the spectral unmixing filter base and its subclasses.
-    * @param image has to be an MITK image (pointer). For the request on the image look at the docu of the mitkPASpectralUnmixngFilterBase.h
-    */
-    virtual void GenerateOutput(mitk::Image::Pointer image);
-
-    /**
     * \brief enables/disables GUI
     * @param change true means GUI buttons enabled, false disabled respectively
     */
     virtual void SwitchGUIControls(bool change);
-
 };
 
 #endif // SpectralUnmixing_h

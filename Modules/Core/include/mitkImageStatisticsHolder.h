@@ -33,8 +33,9 @@ namespace mitk
     but for having a clear interface, all statistics computation is moved to the ImageStatisticsHolder class.
 
     Each mitk::Image holds a normal pointer to its StatisticsHolder object. To get access to the methods, use the
-    GetStatistics() method
-    in mitk::Image class.
+    GetStatistics() method in mitk::Image class.
+
+    Minimum or maximum might by infinite values. 2nd minimum and maximum are guaranteed to be finite values.
     */
   class MITKCORE_EXPORT ImageStatisticsHolder
   {
@@ -58,7 +59,9 @@ namespace mitk
     virtual ScalarType GetScalarValueMax(int t = 0, unsigned int component = 0);
 
     //##Documentation
-    //## \brief Get the second smallest value for scalar images. Recomputation performed only when necessary.
+    //## \brief Get the second smallest value for scalar images.
+    //## Recomputation performed only when necessary.
+    //## \post The returned value is always a finite value.
     virtual ScalarType GetScalarValue2ndMin(int t = 0, unsigned int component = 0);
 
     //##Documentation
@@ -73,6 +76,7 @@ namespace mitk
 
     //##Documentation
     //## \brief Get the second smallest value for scalar images, but do not recompute it first
+    //## \post The returned value is always a finite value.
     virtual mitk::ScalarType GetScalarValue2ndMinNoRecompute(unsigned int t = 0) const
     {
       if (t < m_Scalar2ndMin.size())
@@ -83,10 +87,12 @@ namespace mitk
 
     //##Documentation
     //## \brief Get the second largest value for scalar images
+    //## \post The returned value is always a finite value.
     virtual ScalarType GetScalarValue2ndMax(int t = 0, unsigned int component = 0);
 
     //##Documentation
     //## \brief Get the largest value for scalar images, but do not recompute it first
+    //## \post The returned value is always a finite value.
     virtual mitk::ScalarType GetScalarValueMaxNoRecompute(unsigned int t = 0)
     {
       if (t < m_ScalarMax.size())

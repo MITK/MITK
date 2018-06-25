@@ -14,6 +14,7 @@ set(CPP_FILES
 )
 
 set(MOC_H_FILES
+ include/QmitkAbstractSemanticRelationsStorageInspector.h
  include/QmitkAbstractSemanticRelationsStorageModel.h
  include/QmitkControlPointDialog.h
  include/QmitkLesionInfoWidget.h

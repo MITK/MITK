@@ -42,6 +42,7 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("", "f", mitkCommandLineParser::InputFile, "Fixed:", "fixed image", us::Any(), false);
   parser.addArgument("", "m", mitkCommandLineParser::InputFile, "Moving:", "moving image", us::Any(), false);
+  parser.addArgument("", "c", mitkCommandLineParser::StringList, "Coregister:", "apply transform to these images too", us::Any(), false);
   parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output:", "output image", us::Any(), false);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -52,6 +53,10 @@ int main(int argc, char* argv[])
   std::string f = us::any_cast<std::string>(parsedArgs["f"]);
   std::string m = us::any_cast<std::string>(parsedArgs["m"]);
   std::string o = us::any_cast<std::string>(parsedArgs["o"]);
+
+  mitkCommandLineParser::StringContainerType coregister;
+  if (parsedArgs.count("c"))
+    coregister = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["c"]);
 
   try
   {
@@ -99,6 +104,13 @@ int main(int argc, char* argv[])
     mitk::MAPRegistrationWrapper::Pointer reg = helper.GetMITKRegistrationWrapper();
 
     mitk::Image::Pointer registered_image = mitk::ImageMappingHelper::refineGeometry(moving, reg, true);
+
+    for (auto co : coregister)
+    {
+      std::string out = itksys::SystemTools::GetFilenamePath(o) + "/" + itksys::SystemTools::GetFilenameName(co);
+      mitk::Image::Pointer co_image = mitk::IOUtil::Load<mitk::Image>(co);
+      mitk::IOUtil::Save(mitk::ImageMappingHelper::refineGeometry(co_image, reg, true), out);
+    }
 
     if (mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(registered_image))
     {

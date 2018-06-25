@@ -376,14 +376,15 @@ void SpectralUnmixing::WorkingThreadUpdateFilter(mitk::pa::SpectralUnmixingFilte
   catch (const mitk::Exception& e)
   {
     SwitchGUIControls(true);
-    MITK_ERROR << e.GetDescription();
+    errorMessage = e.GetDescription();
     emit crashSignal();
   }
 }
 
 void SpectralUnmixing::crashInfo()
 {
-  QMessageBox::information(nullptr, "Template", "ERROR! For more information have a look at the console.");
+  const char *error = errorMessage.c_str();
+  QMessageBox::information(nullptr, "Template", error);
 }
 
 void SpectralUnmixing::DoImageProcessing()

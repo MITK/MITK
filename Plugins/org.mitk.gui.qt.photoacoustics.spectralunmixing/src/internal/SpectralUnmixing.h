@@ -88,7 +88,7 @@ class SpectralUnmixing : public QmitkAbstractView
     void finishSignal();
 
     /**
-    * \brief slot waits for crashSignal and if neccessary ends working thread
+    * \brief slot waits for crashSignal and if neccessary ends working thread and shows QMessageBox with the error message
     */
     public slots:
     void crashInfo();
@@ -114,6 +114,7 @@ class SpectralUnmixing : public QmitkAbstractView
     bool sO2Bool;
     mitk::Image *image;
     std::chrono::steady_clock::time_point _start;
+    std::string errorMessage;
 
   private:
     /*

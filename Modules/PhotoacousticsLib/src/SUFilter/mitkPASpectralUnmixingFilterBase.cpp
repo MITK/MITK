@@ -96,7 +96,7 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
 
   unsigned int outputCounter = GetNumberOfIndexedOutputs();
   std::vector<float*> writteBufferVector;
-  for (int i = 0; i < outputCounter; ++i)
+  for (unsigned int i = 0; i < outputCounter; ++i)
   {
     auto output = GetOutput(i);
     mitk::ImageWriteAccessor writeOutput(output);

@@ -14,30 +14,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// semantic relations plugin
-#include "QmitkPatientTableModel.h"
+// semantic relations UI module
+#include "QmitkAbstractSemanticRelationsStorageModel.h"
 
 #include "QmitkCustomVariants.h"
 
-QmitkSemanticRelationsModel::QmitkSemanticRelationsModel(QObject* parent /*= nullptr*/)
+QmitkAbstractSemanticRelationsStorageModel::QmitkAbstractSemanticRelationsStorageModel(QObject* parent /*= nullptr*/)
   : QmitkAbstractDataStorageModel(parent)
   , m_SemanticRelations(nullptr)
 {
   // nothing here
 }
 
-QmitkSemanticRelationsModel::~QmitkSemanticRelationsModel()
+QmitkAbstractSemanticRelationsStorageModel::~QmitkAbstractSemanticRelationsStorageModel()
 {
   // nothing here
 }
 
-void QmitkSemanticRelationsModel::SetCaseID(const mitk::SemanticTypes::CaseID& caseID)
+void QmitkAbstractSemanticRelationsStorageModel::SetCaseID(const mitk::SemanticTypes::CaseID& caseID)
 {
   m_CaseID = caseID;
   UpdateModelData();
 }
 
-void QmitkSemanticRelationsModel::UpdateModelData(const mitk::SemanticTypes::CaseID& caseID)
+void QmitkAbstractSemanticRelationsStorageModel::SetLesion(const mitk::SemanticTypes::Lesion& lesion)
+{
+  m_Lesion = lesion;
+  UpdateModelData();
+}
+
+void QmitkAbstractSemanticRelationsStorageModel::UpdateModelData(const mitk::SemanticTypes::CaseID& caseID)
 {
   // if the case ID of updated instance is equal to the currently active caseID
   if (caseID == m_CaseID)
@@ -46,7 +52,7 @@ void QmitkSemanticRelationsModel::UpdateModelData(const mitk::SemanticTypes::Cas
   }
 }
 
-void QmitkSemanticRelationsModel::UpdateModelData()
+void QmitkAbstractSemanticRelationsStorageModel::UpdateModelData()
 {
   if (nullptr == m_SemanticRelations)
   {
@@ -62,7 +68,7 @@ void QmitkSemanticRelationsModel::UpdateModelData()
   emit ModelUpdated();
 }
 
-void QmitkSemanticRelationsModel::DataStorageChanged()
+void QmitkAbstractSemanticRelationsStorageModel::DataStorageChanged()
 {
   m_SemanticRelations = std::make_shared<mitk::SemanticRelations>(m_DataStorage.Lock());
   UpdateModelData();

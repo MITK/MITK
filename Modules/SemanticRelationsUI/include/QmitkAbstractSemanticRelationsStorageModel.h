@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKSEMANTICRELATIONSMODEL_H
-#define QMITKSEMANTICRELATIONSMODEL_H
+#ifndef QMITKABSTRACTSEMANTICRELATIONSSTORAGEMODEL_H
+#define QMITKABSTRACTSEMANTICRELATIONSSTORAGEMODEL_H
 
 // semantic relations module
 #include <mitkSemanticRelations.h>
@@ -25,17 +25,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkAbstractDataStorageModel.h"
 
 /*
-* @brief The QmitkSemanticRelationsModel is a subclass of 'QmitkAbstractDataStorageModel' and provides additional
-*        functionality to set and store a semantic relations instance and the current case ID.
+* @brief The QmitkAbstractSemanticRelationsStorageModel is a subclass of 'QmitkAbstractDataStorageModel' and provides additional
+*        functionality to set and store a semantic relations instance, the current case ID and the current lesion.
 */
-class QmitkSemanticRelationsModel : public QmitkAbstractDataStorageModel
+class QmitkAbstractSemanticRelationsStorageModel : public QmitkAbstractDataStorageModel
 {
-  Q_OBJECT 
-   
+  Q_OBJECT
+
 public:
 
-  QmitkSemanticRelationsModel(QObject* parent = nullptr);
-  ~QmitkSemanticRelationsModel();
+  QmitkAbstractSemanticRelationsStorageModel(QObject* parent = nullptr);
+  virtual ~QmitkAbstractSemanticRelationsStorageModel();
 
   std::shared_ptr<mitk::SemanticRelations> GetSemanticRelations() const { return m_SemanticRelations; }
   /**
@@ -45,14 +45,23 @@ public:
   */
   void SetCaseID(const mitk::SemanticTypes::CaseID& caseID);
 
-  const mitk::SemanticTypes::CaseID& GetCurrentCaseID() const { return m_CaseID; }
+  const mitk::SemanticTypes::CaseID& GetCaseID() const { return m_CaseID; }
+  /**
+  * @brief Sets the current lesion which can be used to show on which images the lesion is visible.
+  *
+  * @param lesion   The selected lesion
+  */
+  void SetLesion(const mitk::SemanticTypes::Lesion& lesion);
+
+  const mitk::SemanticTypes::Lesion& GetLesion() const { return m_Lesion; }
+
   /*
-  * @brief Updates the table model with the current control point data and information type data from the semantic relations model,
+  * @brief Updates the semantic relations storage model with the current data from the semantic relations model,
   *        if the case ID is equal to the currently selected case ID of the table model.
   */
   void UpdateModelData(const mitk::SemanticTypes::CaseID& caseID);
   /*
-  * @brief Updates the table model with the current control point data and information type data from the semantic relations model
+  * @brief Updates the semantic relations storage model with the current data from the semantic relations model
   *        and the current case ID.
   */
   void UpdateModelData();
@@ -77,6 +86,7 @@ protected:
 
   std::shared_ptr<mitk::SemanticRelations> m_SemanticRelations;
   mitk::SemanticTypes::CaseID m_CaseID;
+  mitk::SemanticTypes::Lesion m_Lesion;
 };
 
-#endif // QMITKSEMANTICRELATIONSMODEL_H
+#endif // QMITKABSTRACTSEMANTICRELATIONSSTORAGEMODEL_H

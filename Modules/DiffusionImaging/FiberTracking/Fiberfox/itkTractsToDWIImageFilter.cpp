@@ -645,10 +645,11 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
     // resample mask image
     auto resampler = itk::ResampleImageFilter<ItkUcharImgType, ItkUcharImgType>::New();
     resampler->SetInput(rescaler->GetOutput());
-    resampler->SetOutputParametersFromImage(m_Parameters.m_SignalGen.m_MaskImage);
     resampler->SetSize(m_WorkingImageRegion.GetSize());
     resampler->SetOutputSpacing(m_WorkingSpacing);
     resampler->SetOutputOrigin(m_WorkingOrigin);
+    resampler->SetOutputDirection(m_Parameters.m_SignalGen.m_ImageDirection);
+    resampler->SetOutputStartIndex ( m_WorkingImageRegion.GetIndex() );
     auto nn_interpolator = itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType, double>::New();
     resampler->SetInterpolator(nn_interpolator);
     resampler->Update();
@@ -660,10 +661,11 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
     PrintToLog("Resampling frequency map", false);
     auto resampler = itk::ResampleImageFilter<ItkFloatImgType, ItkFloatImgType>::New();
     resampler->SetInput(m_Parameters.m_SignalGen.m_FrequencyMap);
-    resampler->SetOutputParametersFromImage(m_Parameters.m_SignalGen.m_FrequencyMap);
     resampler->SetSize(m_WorkingImageRegion.GetSize());
     resampler->SetOutputSpacing(m_WorkingSpacing);
     resampler->SetOutputOrigin(m_WorkingOrigin);
+    resampler->SetOutputDirection(m_Parameters.m_SignalGen.m_ImageDirection);
+    resampler->SetOutputStartIndex ( m_WorkingImageRegion.GetIndex() );
     auto nn_interpolator = itk::NearestNeighborInterpolateImageFunction<ItkFloatImgType, double>::New();
     resampler->SetInterpolator(nn_interpolator);
     resampler->Update();

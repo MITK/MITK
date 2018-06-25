@@ -62,8 +62,8 @@ if(MITK_USE_OpenCV)
       )
     endif()
 
-    set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/opencv-3.4.1.zip)
-    set(opencv_url_md5 8464ce888f4c283895626950bada1e44)
+    set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/opencv-3.4.1.tar.gz)
+    set(opencv_url_md5 a0b7a47899e67b3490ea31edc4f6e8e6)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${opencv_url}
@@ -78,6 +78,8 @@ if(MITK_USE_OpenCV)
         -DWITH_CUDA:BOOL=OFF
         -DWITH_VTK:BOOL=OFF
         -DENABLE_CXX11:BOOL=ON
+        -DWITH_IPP:BOOL=OFF
+        -DBUILD_IPP_IW:BOOL=OFF
         ${additional_cmake_args}
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}

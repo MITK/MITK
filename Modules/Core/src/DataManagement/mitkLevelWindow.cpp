@@ -360,6 +360,16 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
     minValue -= additionalRange;
     maxValue += additionalRange;
   }
+
+  if (!std::isfinite(minValue))
+  {
+    minValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(0);
+  }
+  if (!std::isfinite(maxValue))
+  {
+    maxValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(0);
+  }
+
   SetRangeMinMax(minValue, maxValue);
   SetDefaultBoundaries(minValue, maxValue);
   /*
@@ -432,7 +442,16 @@ void mitk::LevelWindow::SetToImageRange(const mitk::Image *image)
     return;
 
   ScalarType minValue = image->GetStatistics()->GetScalarValueMin(0);
+  if (!std::isfinite(minValue))
+  {
+    minValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(0);
+  }
   ScalarType maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(0);
+  if (!std::isfinite(maxValue))
+  {
+    maxValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(0);
+  }
+
   SetRangeMinMax(minValue, maxValue);
   SetDefaultBoundaries(minValue, maxValue);
   SetWindowBounds(minValue, maxValue);

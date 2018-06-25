@@ -27,9 +27,12 @@ namespace mitk
   * @brief The LevelWindow class Class to store level/window values.
   *
   * Current min and max value are stored in m_LowerWindowBound and m_UpperWindowBound.
-  * The maximum and minimum of valid value range is stored in m_RangeMin and m_RangeMax.
   * m_DefaultLevel amd m_DefaultWindow store the initial Level/Window values for the image.
   * m_DefaultRangeMin and m_DefaultRangeMax store the initial minrange and maxrange for the image.
+  *
+  * The finite maximum and minimum of valid value range is stored in m_RangeMin and m_RangeMax.
+  * If deduced from an image by default the minimum or maximum of it statistics is used. If one
+  * of these values are infinite the 2nd extrimum (which is guaranteed to be finite), will be used.
   *
   * See documentation of SetAuto for information on how the level window is initialized from an image.
   *

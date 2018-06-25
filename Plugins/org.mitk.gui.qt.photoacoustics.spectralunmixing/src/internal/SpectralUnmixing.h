@@ -68,6 +68,12 @@ class SpectralUnmixing : public QmitkAbstractView
     void ChangeGUIWeight();
     void ChangeGUISO2();
 
+  public slots:
+    void finishMethod();
+  signals:
+    void finishSignal();
+
+
   protected:
     Ui::SpectralUnmixingControls m_Controls;
 
@@ -87,7 +93,18 @@ class SpectralUnmixing : public QmitkAbstractView
     virtual void SetVerboseMode(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter, bool PluginVerbose);
     bool PluginVerbose = true;
 
+    mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter;
+    std::vector<std::string> outputNameVec;
+    std::vector<bool> boolVec;
+    std::string Algorithm;
+    bool sO2Bool;
+    mitk::Image *image;
+    std::chrono::steady_clock::time_point _start;
   private:
+
+
+
+    void WorkingThread(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter);
 
     /*
     * \brief passes the wavelength information from the GUI on to the spectral unmixing filter base method "AddWavelength".
@@ -137,6 +154,7 @@ class SpectralUnmixing : public QmitkAbstractView
     * @param change true means GUI buttons enabled, false disabled respectively
     */
     virtual void SwitchGUIControls(bool change);
+
 };
 
 #endif // SpectralUnmixing_h

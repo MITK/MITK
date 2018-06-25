@@ -36,6 +36,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPASpectralUnmixingFilterSimplex.h"
 
 #include <numeric>
+#include <Qthread>
+#include <QtConcurrentRun>
+#include <QFuture>
+#include <QFutureWatcher>
+#include <qmessagebox.h>
+
 #include <thread>
 
 const std::string SpectralUnmixing::VIEW_ID = "org.mitk.views.spectralunmixing";
@@ -54,6 +60,7 @@ void SpectralUnmixing::CreateQtPartControl(QWidget *parent)
   m_Controls.tableSO2->hide();
   connect((QObject*)(m_Controls.QComboBoxAlgorithm), SIGNAL(currentIndexChanged(int)), this, SLOT(ChangeGUIWeight()));
   connect((QObject*)(m_Controls.checkBoxsO2), SIGNAL(clicked()), this, SLOT(ChangeGUISO2()));
+  this->connect(this, SIGNAL(finishSignal()), this, SLOT(finishMethod()));
 }
 
 void SpectralUnmixing::SwitchGUIControls(bool change)
@@ -71,6 +78,7 @@ void SpectralUnmixing::SwitchGUIControls(bool change)
   m_Controls.checkBoxVerbose->setEnabled(change);
   m_Controls.checkBoxChrono->setEnabled(change);
   m_Controls.buttonPerformImageProcessing->setEnabled(change);
+  m_Controls.checkBoxError->setEnabled(change);
 }
 
 
@@ -313,6 +321,79 @@ void SpectralUnmixing::WriteOutputToDataStorage(mitk::Image::Pointer m_Image, st
   this->GetDataStorage()->Add(dataNodeOutput);
 }
 
+void SpectralUnmixing::GenerateOutput(mitk::Image::Pointer image)
+{
+  boolVec = { m_Controls.checkBoxOx->isChecked(),  m_Controls.checkBoxDeOx->isChecked(),
+    m_Controls.checkBoxMelanin->isChecked(), m_Controls.checkBoxAdd->isChecked() };
+  outputNameVec = { "HbO2",  "Hb", "Melanin", "Static Endmember" };
+  sO2Bool = (m_Controls.checkBoxsO2->isChecked());
+
+  //Read GUI information(algorithm)
+  auto qs = m_Controls.QComboBoxAlgorithm->currentText();
+  Algorithm = qs.toUtf8().constData();
+
+  m_SpectralUnmixingFilter = GetFilterInstance(Algorithm);
+  SetVerboseMode(m_SpectralUnmixingFilter, PluginVerbose);
+  m_SpectralUnmixingFilter->RelativeError(m_Controls.checkBoxError->isChecked());
+  m_SpectralUnmixingFilter->SetInput(image);
+  SetWavlength(m_SpectralUnmixingFilter);
+  SetChromophore(m_SpectralUnmixingFilter, boolVec, outputNameVec);
+
+  boolVec.push_back(m_Controls.checkBoxError->isChecked());
+  outputNameVec.push_back("Relative Error");
+
+  m_SpectralUnmixingFilter->AddOutputs(std::accumulate(boolVec.begin(), boolVec.end(), 0));
+  MITK_INFO(PluginVerbose) << "Number of indexed outputs: " << std::accumulate(boolVec.begin(), boolVec.end(), 0);
+
+  MITK_INFO(PluginVerbose) << "Updating Filter...";
+  QtConcurrent::run(this, &SpectralUnmixing::WorkingThread, m_SpectralUnmixingFilter);
+
+
+  //WorkingThread(m_SpectralUnmixingFilter);
+  //m_SpectralUnmixingFilter->Update();
+
+
+}
+
+void SpectralUnmixing::finishMethod()
+{
+  MITK_INFO << "This is a finishMethod string \n";
+
+  int outputCounter = 0;
+  mitk::Image::Pointer m_Output;
+  for (unsigned int chromophore = 0; chromophore < outputNameVec.size(); ++chromophore)
+  {
+    if (boolVec[chromophore] != false)
+    {
+      m_Output = m_SpectralUnmixingFilter->GetOutput(outputCounter++);
+      m_Output->SetSpacing(image->GetGeometry()->GetSpacing());
+      WriteOutputToDataStorage(m_Output, outputNameVec[chromophore] + Algorithm);
+    }
+  }
+
+  if (sO2Bool)
+    CalculateSO2(m_SpectralUnmixingFilter, boolVec);
+
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+  MITK_INFO(PluginVerbose) << "Adding images to DataStorage...[DONE]";
+
+  std::chrono::steady_clock::time_point _end(std::chrono::steady_clock::now());
+  MITK_INFO(m_Controls.checkBoxChrono->isChecked()) << "Time for image Processing: "
+    << std::chrono::duration_cast<std::chrono::duration<double>>(_end - _start).count();
+  SwitchGUIControls(true);
+}
+
+void SpectralUnmixing::WorkingThread(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter)
+{
+  MITK_INFO << "This is a WorkingThread string \n";
+  SwitchGUIControls(false);
+
+  m_SpectralUnmixingFilter->Update();
+
+  MITK_INFO << "Filter Update";
+  emit finishSignal();
+}
+
 void SpectralUnmixing::DoImageProcessing()
 {
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
@@ -335,7 +416,7 @@ void SpectralUnmixing::DoImageProcessing()
   if (data)
   {
     // test if this data item is an image or not (could also be a surface or something totally different)
-    mitk::Image *image = dynamic_cast<mitk::Image *>(data);
+    image = dynamic_cast<mitk::Image *>(data);
     if (image)
     {
       std::stringstream message;
@@ -347,67 +428,19 @@ void SpectralUnmixing::DoImageProcessing()
         message << "'" << name << "'";
       }
       message << ".";
-      SwitchGUIControls(false);
-      std::chrono::steady_clock::time_point _start(std::chrono::steady_clock::now());
+      _start = std::chrono::steady_clock::now();
 
       PluginVerbose = m_Controls.checkBoxVerbose->isChecked();
       MITK_INFO(PluginVerbose) << message.str();
 
-      try { GenerateOutput(image); }
+      GenerateOutput(image);
+      /*try { GenerateOutput(image); }
       catch (const mitk::Exception& e)
       {
         QMessageBox::information(nullptr, "Template", e.GetDescription());
-      }
+      }*/
 
-      std::chrono::steady_clock::time_point _end(std::chrono::steady_clock::now());
-      MITK_INFO(m_Controls.checkBoxChrono->isChecked()) << "Time for image Processing: "
-        << std::chrono::duration_cast<std::chrono::duration<double>>(_end - _start).count();
-      SwitchGUIControls(true);
+
     }
   }
-}
-
-void SpectralUnmixing::GenerateOutput(mitk::Image::Pointer image)
-{
-  std::vector<bool> boolVec = { m_Controls.checkBoxOx->isChecked(),  m_Controls.checkBoxDeOx->isChecked(),
-    m_Controls.checkBoxMelanin->isChecked(), m_Controls.checkBoxAdd->isChecked() };
-  std::vector<std::string> outputNameVec = { "HbO2",  "Hb", "Melanin", "Static Endmember" };
-
-  //Read GUI information(algorithm)
-  auto qs = m_Controls.QComboBoxAlgorithm->currentText();
-  std::string Algorithm = qs.toUtf8().constData();
-
-  mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter = GetFilterInstance(Algorithm);
-  SetVerboseMode(m_SpectralUnmixingFilter, PluginVerbose);
-  m_SpectralUnmixingFilter->RelativeError(m_Controls.checkBoxError->isChecked());
-  m_SpectralUnmixingFilter->SetInput(image);
-  SetWavlength(m_SpectralUnmixingFilter);
-  SetChromophore(m_SpectralUnmixingFilter, boolVec, outputNameVec);
-
-  boolVec.push_back(m_Controls.checkBoxError->isChecked());
-  outputNameVec.push_back("Relative Error");
-
-  m_SpectralUnmixingFilter->AddOutputs(std::accumulate(boolVec.begin(), boolVec.end(), 0));
-  MITK_INFO(PluginVerbose) << "Number of indexed outputs: " << std::accumulate(boolVec.begin(), boolVec.end(), 0);
-
-  MITK_INFO(PluginVerbose) << "Updating Filter...";
-  m_SpectralUnmixingFilter->Update();
-
-  int outputCounter = 0;
-  mitk::Image::Pointer m_Output;
-  for (unsigned int chromophore = 0; chromophore < outputNameVec.size(); ++chromophore)
-  {
-    if (boolVec[chromophore] != false)
-    {
-      m_Output = m_SpectralUnmixingFilter->GetOutput(outputCounter++);
-      m_Output->SetSpacing(image->GetGeometry()->GetSpacing());
-      WriteOutputToDataStorage(m_Output, outputNameVec[chromophore] + Algorithm);
-    }
-  }
-
-  if (m_Controls.checkBoxsO2->isChecked())
-    CalculateSO2(m_SpectralUnmixingFilter, boolVec);
-
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
-  MITK_INFO(PluginVerbose) << "Adding images to DataStorage...[DONE]";
 }

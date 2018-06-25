@@ -174,7 +174,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
               val = readAccess.GetPixelByIndexSafe(idx);
             }
           }
-          catch (mitk::Exception e)
+          catch (const mitk::Exception &e)
           {
             // If value is outside the image's region ignore it
             MITK_WARN << e.what();

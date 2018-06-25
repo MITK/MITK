@@ -215,7 +215,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
 
     /* Check exception on adding the same object again */
     MITK_TEST_OUTPUT(<< "Check exception on adding the same object again: ");
-    MITK_TEST_FOR_EXCEPTION(..., ds->Add(n1, parents1));
+    MITK_TEST_FOR_EXCEPTION(std::exception, ds->Add(n1, parents1));
     MITK_TEST_CONDITION(ds->GetAll()->Size() == 1, "Test if object count is correct after exception");
 
     /* Add an object that has a source object */
@@ -709,14 +709,14 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
 
   /* Checking for node is it's own parent exception */
   {
-    MITK_TEST_FOR_EXCEPTION_BEGIN(...);
+    MITK_TEST_FOR_EXCEPTION_BEGIN(std::exception);
     mitk::DataNode::Pointer extra = mitk::DataNode::New();
     extra->SetProperty("name", mitk::StringProperty::New("extra"));
     mitk::DataStorage::SetOfObjects::Pointer p = mitk::DataStorage::SetOfObjects::New();
     p->push_back(n1);
     p->push_back(extra); // extra is parent of extra!!!
     ds->Add(extra, p);
-    MITK_TEST_FOR_EXCEPTION_END(...);
+    MITK_TEST_FOR_EXCEPTION_END(std::exception);
   }
 
   /* Checking reference count of node after add and remove */

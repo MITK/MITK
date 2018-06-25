@@ -86,7 +86,7 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener,
       US_TEST_CONDITION(mc->UngetService(refs.front()), "Test if Service UnGet for first service returns true");
       US_TEST_CONDITION(mc->UngetService(refs.back()), "Test if Service UnGet for second service returns true");
     }
-    catch (const std::logic_error le)
+    catch (const std::logic_error &le)
     {
       US_TEST_FAILED_MSG(<< "UnGetService exception: " << le.what())
     }

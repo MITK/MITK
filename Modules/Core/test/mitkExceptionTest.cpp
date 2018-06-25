@@ -81,7 +81,7 @@ public:
     {
       myExceptionTestObject->throwExceptionManually();
     }
-    catch (mitk::Exception)
+    catch (const mitk::Exception &)
     {
       exceptionThrown = true;
     }
@@ -92,7 +92,7 @@ public:
     {
       myExceptionTestObject->throwSpecializedExceptionManually();
     }
-    catch (SpecializedTestException)
+    catch (const SpecializedTestException &)
     {
       exceptionThrown = true;
     }
@@ -137,7 +137,7 @@ public:
     {
       myExceptionTestObject->throwExceptionManually("message1", " and message2");
     }
-    catch (mitk::Exception &e)
+    catch (const mitk::Exception &e)
     {
       thrownMessage = e.GetDescription();
       exceptionThrown = true;
@@ -157,7 +157,7 @@ public:
     {
       myExceptionTestObject->throwExceptionWithThrowMacro();
     }
-    catch (mitk::Exception)
+    catch (const mitk::Exception &)
     {
       exceptionThrown = true;
     }
@@ -172,7 +172,7 @@ public:
     {
       myExceptionTestObject->throwExceptionWithThrowMacro("test123");
     }
-    catch (mitk::Exception &e)
+    catch (const mitk::Exception &e)
     {
       exceptionThrown = true;
       messageText = e.GetDescription();
@@ -189,7 +189,7 @@ public:
     {
       myExceptionTestObject->throwSpecializedExceptionWithThrowMacro("test123");
     }
-    catch (mitk::Exception &e)
+    catch (const mitk::Exception &e)
     {
       exceptionThrown = true;
       messageText = e.GetDescription();
@@ -206,7 +206,7 @@ public:
     {
       myExceptionTestObject->throwSpecializedExceptionWithThrowMacro2("test123");
     }
-    catch (SpecializedTestException &e)
+    catch (const SpecializedTestException &e)
     {
       exceptionThrown = true;
       messageText = e.GetDescription();
@@ -294,7 +294,7 @@ public:
     {
       myExceptionTestObject->reThrowExceptionWithReThrowMacro("Test original message.", "Test rethrow message.");
     }
-    catch (mitk::Exception &e)
+    catch (const mitk::Exception &e)
     {
       message = e.GetDescription();
       exceptionThrown = true;

@@ -119,7 +119,7 @@ US_END_NAMESPACE
     US_PREPEND_NAMESPACE(TestManager)::GetInstance().TestFailed();                            \
     US_TEST_OUTPUT( << "Expected an '" << #EXCEPTIONCLASS << "' exception. [FAILED]")         \
   }                                                                                           \
-  catch (EXCEPTIONCLASS) {                                                                    \
+  catch (const EXCEPTIONCLASS &) {                                                                    \
     US_TEST_OUTPUT(<< "Caught an expected '" << #EXCEPTIONCLASS                               \
                    << "' exception. [PASSED]")                                                \
     US_PREPEND_NAMESPACE(TestManager)::GetInstance().TestPassed();                            \

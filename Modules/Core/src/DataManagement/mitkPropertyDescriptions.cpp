@@ -59,7 +59,7 @@ bool mitk::PropertyDescriptions::AddDescriptionRegEx(const std::string &property
   {
     std::regex checker(propertyRegEx); // no exception => valid we can change the info
   }
-  catch (std::regex_error)
+  catch (const std::regex_error &)
   {
     return false;
   }

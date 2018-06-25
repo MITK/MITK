@@ -50,7 +50,7 @@ if(NOT DEFINED ITK_DIR)
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.13.0.tar.xz
      URL_MD5 3badf70cfb0093054453f66c5974c5a4
      # work with external GDCM
-     # PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.11.0.patch
+     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-VNL-2018-05-16.patch
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}

@@ -132,7 +132,7 @@ int mitkImageSliceSelectorTest(int argc, char *argv[])
     }
     std::cout<<"Part 1b [PASSED] ";
   }
-  catch ( itk::ExceptionObject &err)
+  catch (const  itk::ExceptionObject &err)
   {
     std::cout<<"Part 1(with expected exception) ... seems to be not ITK 2.0.0 [PASSED]"<<std::endl;
     std::cout<<err<<std::endl;
@@ -144,7 +144,7 @@ int mitkImageSliceSelectorTest(int argc, char *argv[])
   {
     slice->UpdateLargestPossibleRegion();
   }
-  catch (itk::ExceptionObject)
+  catch (const itk::ExceptionObject &)
   {
     std::cout << "Part 2 [FAILED]" << std::endl;
     return EXIT_FAILURE;

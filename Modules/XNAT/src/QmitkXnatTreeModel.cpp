@@ -122,7 +122,7 @@ void QmitkXnatTreeModel::fetchMore(const QModelIndex &index)
   {
     ctkXnatTreeModel::fetchMore(index);
   }
-  catch (ctkRuntimeException e)
+  catch (const ctkRuntimeException& e)
   {
     QmitkHttpStatusCodeHandler::HandleErrorMessage(e.what());
     emit Error(index);

@@ -270,7 +270,7 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   {
     boost::property_tree::read_json(jsonStream, root);
   }
-  catch (boost::property_tree::json_parser_error e)
+  catch (const boost::property_tree::json_parser_error &e)
   {
     mitkThrow() << "Could not parse json file. Error was:\n" << e.what();
   }
@@ -370,7 +370,7 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   {
     MITK_WARN << "Could not determine sampling type.";
   }
-  
+
   //persist all properties
   mitk::IPropertyPersistence *persSrv = GetPersistenceService();
   if (persSrv)

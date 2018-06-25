@@ -48,7 +48,7 @@ void ViewRegistryReader::ReadCategory(const IConfigurationElement::Pointer& elem
     Category<IViewDescriptor::Pointer>::Pointer cat(new Category<IViewDescriptor::Pointer>(element));
     viewRegistry->Add(cat);
   }
-  catch (CoreException e)
+  catch (const CoreException &e)
   {
     // log an error since its not safe to show a dialog here
     WorkbenchPlugin::Log(
@@ -85,7 +85,7 @@ void ViewRegistryReader::ReadSticky(const SmartPointer<IConfigurationElement> &e
   {
     viewRegistry->Add(StickyViewDescriptor::Pointer(new StickyViewDescriptor(element)));
   }
-  catch (CoreException& e)
+  catch (const CoreException& e)
   {
     //TODO IStatus
     // log an error since its not safe to open a dialog here
@@ -102,7 +102,7 @@ void ViewRegistryReader::ReadView(const SmartPointer<IConfigurationElement> &ele
     ViewDescriptor::Pointer desc(new ViewDescriptor(element));
     viewRegistry->Add(desc);
   }
-  catch (CoreException e)
+  catch (const CoreException &e)
   {
     // log an error since its not safe to open a dialog here
     WorkbenchPlugin::Log(

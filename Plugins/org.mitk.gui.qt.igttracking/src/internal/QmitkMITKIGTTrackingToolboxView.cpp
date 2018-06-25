@@ -234,6 +234,13 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     m_Controls->m_RenderWarningLabel->setVisible(false);
     m_Controls->m_TrackingFrozenLabel->setVisible(false);
 
+
+    //initialize projection buttons
+    //first it is disabled when the tool is connected check box for projection and axis is enabled
+    m_Controls->showHideToolAxisCheckBox->setEnabled(false);
+    m_Controls->showHideToolProjectionCheckBox->setEnabled(false);
+    m_Controls->m_toolselector->setEnabled(false);
+
     //Update List of available models for selected tool.
     std::vector<mitk::TrackingDeviceData> Compatibles;
     if ((m_Controls == nullptr) || //check all these stuff for NULL, latterly this causes crashes from time to time
@@ -441,7 +448,7 @@ void QmitkMITKIGTTrackingToolboxView::OnShowHideToolProjectionClicked()
     RemoveAllToolProjections();
     m_Controls->showHideToolAxisCheckBox->setEnabled(false);
   }
-  if( m_NeedleProjectionFilter.IsNotNull() )
+  if(m_NeedleProjectionFilter->GetNumberOfInputs())
   {
     m_NeedleProjectionFilter->Update();
   }
@@ -466,7 +473,7 @@ void QmitkMITKIGTTrackingToolboxView::OnShowHideToolAxisClicked()
     m_ShowHideToolAxis = false;
   }
   //Update the filter
-  if( m_NeedleProjectionFilter.IsNotNull() )
+  if(m_NeedleProjectionFilter->GetNumberOfInputs())
   {
     m_NeedleProjectionFilter->Update();
   }
@@ -514,6 +521,14 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
   //start worker thread
   m_WorkerThread->start();
   //! [Thread 4]
+
+
+  //enable checkboxes for projection and tool axis
+  m_Controls->showHideToolAxisCheckBox->setEnabled(true);
+  m_Controls->showHideToolProjectionCheckBox->setEnabled(true);
+  m_Controls->m_toolselector->setEnabled(true);
+
+
 
   //disable buttons
   this->m_Controls->m_MainWidget->setEnabled(false);

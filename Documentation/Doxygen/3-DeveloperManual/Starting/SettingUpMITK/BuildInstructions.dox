@@ -24,17 +24,16 @@ You need:
      clients available). We recomment using Git, but see below for a way how to
      get the current source code without using it.
   -# <a href="http://www.cmake.org">CMake</a> (version \minimumCMakeVersion or higher)
-  -# <a href="http://qt.io">Qt</a> 5.6 or 5.7.1 if you plan to develop Qt-based
+  -# <a href="http://qt.io">Qt</a> 5.10.1 if you plan to develop Qt-based
      applications
-  -# If you are using <b>Mac OS X</b> you need an XCode installation as it
+  -# If you are using <b>macOS</b> you need an XCode installation as it
      provides the neccessary compilers and SDKs
 
 \section BuildInstructions_Qt A note about Qt
 
 As we do not provide Qt in the MITK superbuild you need to install Qt manually.
-Installing Qt dramatically improved since Qt 5, as The Qt Company provides
-<a href="http://www.qt.io/download/">sophisticated online installers for all
-supported platforms</a>.
+The Qt Company provides <a href="http://www.qt.io/download/">online installers
+for all supported platforms</a>.
 
 \section BuildInstructions_Get_Source Get a source tree
 

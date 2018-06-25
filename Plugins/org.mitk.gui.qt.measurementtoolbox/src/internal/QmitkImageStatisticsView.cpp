@@ -92,16 +92,6 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
     m_Controls->m_ErrorMessageLabel->hide();
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex(0);
     m_Controls->m_BinSizeFrame->setEnabled(false);
-    #if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
-      m_Controls->m_StatisticsWidgetStack->setVisible(false);
-      m_Controls->label_HistogramIsInvisibleWarning->setEnabled(true);
-      m_Controls->label_HistogramIsInvisibleWarning->setVisible(true);
-      m_Controls->label_HistogramIsInvisibleWarning->setText("<font color='red'>Histogram is not visible because Qt 5.10 is required. You can use the button <i>Copy to Clipboard</i> below to retrieve values.</font>");
-      m_Controls->groupBox_plot->setVisible(false);
-    #else
-      m_Controls->label_HistogramIsInvisibleWarning->setVisible(false);
-    #endif
-
   }
 }
 
@@ -215,11 +205,7 @@ void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject& e)
   if ((this->m_SelectedImage->GetTimeSteps() == 1 && timestep == 0) ||
       this->m_SelectedImage->GetTimeSteps() > 1)
   {
-    // display histogram for selected timestep
-    //bug in Qt thats leads to crash in debug builds. Fixed in Qt 5.10
-    #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-      m_Controls->m_JSHistogram->Clear();
-    #endif
+    m_Controls->m_JSHistogram->Clear();
     QmitkImageStatisticsCalculationThread::HistogramType::ConstPointer histogram =
         (QmitkImageStatisticsCalculationThread::HistogramType::ConstPointer)this->m_CalculationThread->GetTimeStepHistogram(timestep);
 
@@ -416,11 +402,7 @@ void QmitkImageStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointe
 
 void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Pointer> &selectedNodes)
 {
-  //Clear Histogram if data node is deselected
-  //bug in Qt thats leads to crash in debug builds. Fixed in Qt 5.10
-  #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
   m_Controls->m_JSHistogram->Clear();
-  #endif
 
   if( this->m_StatisticsUpdatePending )
   {
@@ -826,10 +808,7 @@ void QmitkImageStatisticsView::OnHistogramNBinsCheckBoxValueChanged()
 
 void QmitkImageStatisticsView::WriteStatisticsToGUI()
 {
-  //bug in Qt thats leads to crash in debug builds. Fixed in Qt 5.10
-  #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
   m_Controls->m_JSHistogram->Clear();
-  #endif
   m_IntensityProfileList.clear();
 
   //Disconnect OnLineRadioButtonSelected() to prevent reloading chart when radiobutton is checked programmatically

@@ -38,7 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * Technical details: The javascript code is embedded in a QWebEngineView. The actual js code is implemented in resource\Chart.js.
 * \sa http://c3js.org for further information about the used javaScript library.
-* \warning We had issues with Qt versions <5.10. So we highly encourage to use Qt 5.10 or newer if this module is used.
 * \ingroup Modules/Chart
 */
 class MITKCHART_EXPORT QmitkChartWidget : public QWidget
@@ -49,7 +48,7 @@ public:
   /*!
   * \brief enum of diagram types.
   */
-	enum class ChartType { 
+  enum class ChartType {
     bar, /*!< bar chart, see http://c3js.org/samples/chart_bar.html */
     line, /*!< line chart, see http://c3js.org/samples/simple_multiple.html */
     spline, /*!< spline chart (smoothed line chart), see http://c3js.org/samples/chart_spline.html */
@@ -103,7 +102,7 @@ public:
   * \details each entry represents a data point: key: value --> x-value: y-value.
   * \param label the name of the data that is also used as identifier.
   * \param chartType the chart type that should be used for this data entry
-  * \note the data can be cleared with ClearDiagram() 
+  * \note the data can be cleared with ClearDiagram()
   * \note If the label name already exists, the name is replaced with a unique one by concatenating numbers to it.
   * \warning Pie chart is significantly different than the other chart types. Here, the data given by AddData1D is summed. Each entry represents a different category.
   */

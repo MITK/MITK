@@ -16,11 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsHolder.h"
 
 #include "mitkHistogramGenerator.h"
-//#include "mitkImageTimeSelector.h"
 #include <mitkProperties.h>
 
 mitk::ImageStatisticsHolder::ImageStatisticsHolder(mitk::Image *image)
-  : m_Image(image) /*, m_TimeSelectorForExtremaObject(nullptr)*/
+  : m_Image(image)
 {
   m_CountOfMinValuedVoxels.resize(1, 0);
   m_CountOfMaxValuedVoxels.resize(1, 0);
@@ -31,18 +30,11 @@ mitk::ImageStatisticsHolder::ImageStatisticsHolder(mitk::Image *image)
 
   mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
   m_HistogramGeneratorObject = generator;
-
-  // m_Image = image;
-
-  // create time selector
-  // this->GetTimeSelector();
 }
 
 mitk::ImageStatisticsHolder::~ImageStatisticsHolder()
 {
   m_HistogramGeneratorObject = nullptr;
-  // m_TimeSelectorForExtremaObject = nullptr;
-  // m_Image = nullptr;
 }
 
 const mitk::ImageStatisticsHolder::HistogramType *mitk::ImageStatisticsHolder::GetScalarHistogram(
@@ -70,16 +62,11 @@ bool mitk::ImageStatisticsHolder::IsValidTimeStep(int t) const
 
 mitk::ImageTimeSelector::Pointer mitk::ImageStatisticsHolder::GetTimeSelector()
 {
-  // if(m_TimeSelectorForExtremaObject.IsNull())
-  //{
-  //  m_TimeSelectorForExtremaObject = ImageTimeSelector::New();
-
   ImageTimeSelector::Pointer timeSelector =
-    ImageTimeSelector::New(); // static_cast<mitk::ImageTimeSelector*>( m_TimeSelectorForExtremaObject.GetPointer() );
+    ImageTimeSelector::New();
   timeSelector->SetInput(m_Image);
-  //}
 
-  return timeSelector; // static_cast<ImageTimeSelector*>( m_TimeSelectorForExtremaObject.GetPointer() );
+  return timeSelector;
 }
 
 void mitk::ImageStatisticsHolder::Expand(unsigned int timeSteps)
@@ -142,16 +129,6 @@ void mitk::_ComputeExtremaInItkImage(const ItkImageType *itkImage, mitk::ImageSt
   while (!it.IsAtEnd())
   {
     value = it.Get();
-//  if ( (value > mitkImage->m_ScalarMin) && (value < mitkImage->m_Scalar2ndMin) )        mitkImage->m_Scalar2ndMin =
-//  value;
-//  else if ( (value < mitkImage->m_ScalarMax) && (value > mitkImage->m_Scalar2ndMax) )   mitkImage->m_Scalar2ndMax =
-//  value;
-//  else if (value > mitkImage->m_ScalarMax)                                              mitkImage->m_ScalarMax =
-//  value;
-//  else if (value < mitkImage->m_ScalarMin)                                              mitkImage->m_ScalarMin =
-//  value;
-
-// if numbers start with 2ndMin or 2ndMax and never have that value again, the previous above logic failed
 #ifdef BOUNDINGOBJECT_IGNORE
     if (value > -32765)
     {
@@ -200,9 +177,6 @@ void mitk::_ComputeExtremaInItkImage(const ItkImageType *itkImage, mitk::ImageSt
     statisticsHolder->m_Scalar2ndMax[t] = statisticsHolder->m_Scalar2ndMin[t] = statisticsHolder->m_ScalarMax[t];
   }
   statisticsHolder->m_LastRecomputeTimeStamp.Modified();
-  // MITK_DEBUG <<"extrema "<<itk::NumericTraits<TPixel>::NonpositiveMin()<<" "<<mitkImage->m_ScalarMin<<"
-  // "<<mitkImage->m_Scalar2ndMin<<" "<<mitkImage->m_Scalar2ndMax<<" "<<mitkImage->m_ScalarMax<<"
-  // "<<itk::NumericTraits<TPixel>::max();
 }
 
 template <typename ItkImageType>
@@ -233,16 +207,6 @@ void mitk::_ComputeExtremaInItkVectorImage(const ItkImageType *itkImage,
   while (!it.IsAtEnd())
   {
     double value = it.Get()[component];
-//  if ( (value > mitkImage->m_ScalarMin) && (value < mitkImage->m_Scalar2ndMin) )        mitkImage->m_Scalar2ndMin =
-//  value;
-//  else if ( (value < mitkImage->m_ScalarMax) && (value > mitkImage->m_Scalar2ndMax) )   mitkImage->m_Scalar2ndMax =
-//  value;
-//  else if (value > mitkImage->m_ScalarMax)                                              mitkImage->m_ScalarMax =
-//  value;
-//  else if (value < mitkImage->m_ScalarMin)                                              mitkImage->m_ScalarMin =
-//  value;
-
-// if numbers start with 2ndMin or 2ndMax and never have that value again, the previous above logic failed
 #ifdef BOUNDINGOBJECT_IGNORE
     if (value > -32765)
     {
@@ -291,9 +255,6 @@ void mitk::_ComputeExtremaInItkVectorImage(const ItkImageType *itkImage,
     statisticsHolder->m_Scalar2ndMax[t] = statisticsHolder->m_Scalar2ndMin[t] = statisticsHolder->m_ScalarMax[t];
   }
   statisticsHolder->m_LastRecomputeTimeStamp.Modified();
-  // MITK_DEBUG <<"extrema "<<itk::NumericTraits<TPixel>::NonpositiveMin()<<" "<<mitkImage->m_ScalarMin<<"
-  // "<<mitkImage->m_Scalar2ndMin<<" "<<mitkImage->m_Scalar2ndMax<<" "<<mitkImage->m_ScalarMax<<"
-  // "<<itk::NumericTraits<TPixel>::max();
 }
 
 void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t, unsigned int component)

@@ -372,15 +372,6 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
 
   SetRangeMinMax(minValue, maxValue);
   SetDefaultBoundaries(minValue, maxValue);
-  /*
-  if ( tryPicTags ) // level and window will be set by informations provided directly by the mitkIpPicDescriptor
-  {
-  if ( SetAutoByPicTags(const_cast<Image*>(image)->GetPic()) )
-  {
-  return;
-  }
-  }
-  */
 
   unsigned int numPixelsInDataset = image->GetDimensions()[0];
   for (unsigned int k = 0; k < image->GetDimension(); ++k)

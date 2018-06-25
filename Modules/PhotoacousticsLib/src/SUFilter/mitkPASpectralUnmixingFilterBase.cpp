@@ -24,8 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
 
-#include <chrono>
-
 mitk::pa::SpectralUnmixingFilterBase::SpectralUnmixingFilterBase()
 {
   m_PropertyCalculatorEigen = mitk::pa::PropertyCalculator::New();
@@ -96,6 +94,22 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
   // test to see pixel values @ txt file
   myfile.open("SimplexNormalisation.txt");
 
+  unsigned int outputCounter = GetNumberOfIndexedOutputs();
+  std::vector<float*> writteBufferVector;
+  for (int i = 0; i < outputCounter; ++i)
+  {
+    auto output = GetOutput(i);
+    mitk::ImageWriteAccessor writeOutput(output);
+    float* writeBuffer = (float *)writeOutput.GetData();
+    writteBufferVector.push_back(writeBuffer);
+  }
+
+  if (m_RelativeError == true)
+  {
+    // -1 because rel error is output[IndexedOutputs() - 1] and loop over chromophore outputs has to end at [IndexedOutputs() - 2]
+    outputCounter -= 1;
+  }
+
   for (unsigned int sequenceCounter = 0; sequenceCounter < totalNumberOfSequences; ++sequenceCounter)
   {
     MITK_INFO(m_Verbose) << "SequenceCounter: " << sequenceCounter;
@@ -122,28 +136,17 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
         unsigned int outputCounter = GetNumberOfIndexedOutputs();
         if (m_RelativeError == true)
         {
-          // because rel error is output[IndexedOutputs() - 1] and loop over chromophore outputs has to end at [IndexedOutputs() - 2]
-          outputCounter -= 1;
           float relativeError = (endmemberMatrix*resultVector - inputVector).norm() / inputVector.norm(); // norm() is L2 norm
-          auto output = GetOutput(outputCounter);
-          mitk::ImageWriteAccessor writeOutput(output);
-          float* writeBuffer = (float *)writeOutput.GetData();
-          writeBuffer[(xDim*yDim * sequenceCounter) + x * yDim + y] = relativeError;
+          writteBufferVector[outputCounter][(xDim*yDim * sequenceCounter) + x * yDim + y] = relativeError;
         }
 
         for (unsigned int outputIdx = 0; outputIdx < outputCounter; ++outputIdx)
         {
-          auto output = GetOutput(outputIdx);
-          mitk::ImageWriteAccessor writeOutput(output);
-          float* writeBuffer = (float *)writeOutput.GetData();
-          writeBuffer[(xDim*yDim * sequenceCounter) + x * yDim + y] = resultVector[outputIdx];
+          writteBufferVector[outputIdx][(xDim*yDim * sequenceCounter) + x * yDim + y] = resultVector[outputIdx];
         }
       }
     }
   }
-  std::chrono::steady_clock::time_point _end(std::chrono::steady_clock::now());
-  std::chrono::steady_clock::time_point _test(std::chrono::steady_clock::now());
-
   MITK_INFO(m_Verbose) << "GENERATING DATA...[DONE]";
   myfile.close();
 }

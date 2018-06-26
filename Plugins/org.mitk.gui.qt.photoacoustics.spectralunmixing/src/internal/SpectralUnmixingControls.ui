@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>398</width>
-    <height>643</height>
+    <height>666</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -68,6 +68,9 @@
       <font>
        <pointsize>10</pointsize>
       </font>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;* \brief All values have to be intergers. They need to have the same order than the wavelength at the image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="showGrid">
       <bool>true</bool>
@@ -509,6 +512,9 @@
        <bold>true</bold>
       </font>
      </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;* \brief Select as least one Absorber. It's not possible to select more absorbers then wavelengths.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string>Chromophore selection</string>
      </property>
@@ -516,6 +522,9 @@
    </item>
    <item>
     <widget class="QCheckBox" name="checkBoxOx">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;* \brief One of the main absorbers in near infrared spectrum.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string>Oxyhemoglobin</string>
      </property>
@@ -528,6 +537,9 @@
     <widget class="QCheckBox" name="checkBoxDeOx">
      <property name="enabled">
       <bool>true</bool>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;* \brief One of the main absorbers in near infrared spectrum.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Deoxygenated hemoglobin</string>
@@ -545,6 +557,9 @@
    </item>
    <item>
     <widget class="QCheckBox" name="checkBoxMelanin">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;* \brief One of the main absorbers in near infrared spectrum.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string>Melanin</string>
      </property>
@@ -552,6 +567,9 @@
    </item>
    <item>
     <widget class="QCheckBox" name="checkBoxAdd">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;* \brief This endmember will be unmixed with 1 at all wavelgnths.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string>Static Endmember</string>
      </property>
@@ -572,6 +590,9 @@
        <bold>true</bold>
       </font>
      </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;* \brief One needs to choose an spectral unmixing algorithm.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string>Unmixing algorithm</string>
      </property>
@@ -586,6 +607,9 @@
       <font>
        <family>MS Shell Dlg 2</family>
       </font>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;* \brief For detailed information about the algorithms please have a look at the documentation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="editable">
       <bool>false</bool>
@@ -708,6 +732,9 @@
        <width>380</width>
        <height>81</height>
       </size>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;* \brief the weights are at the same order as the wavelength&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="autoFillBackground">
       <bool>false</bool>
@@ -869,6 +896,9 @@
    </item>
    <item>
     <widget class="QCheckBox" name="checkBoxsO2">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;* \brief calculates HbO2/(HbO2+Hb) if De- and oxyhemoglobin are selected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string>calculate sO2</string>
      </property>
@@ -885,29 +915,35 @@
        <height>82</height>
       </size>
      </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;* \brief below threshold calculated sO2 value will set to zero&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <row>
       <property name="text">
-       <string>Value</string>
+       <string>Threshold</string>
       </property>
      </row>
      <column>
       <property name="text">
-       <string>Min Hb</string>
+       <string>Hb</string>
+      </property>
+      <property name="toolTip">
+       <string/>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Min HbO2</string>
+       <string>HbO2</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Min Sum</string>
+       <string>Sum</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Min SO2 %</string>
+       <string>SO2 %</string>
       </property>
      </column>
      <item row="0" column="0">
@@ -954,6 +990,9 @@
    </item>
    <item>
     <widget class="QCheckBox" name="checkBoxVerbose">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;* \brief This mode will give additional console outputs for debugging.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string>Verbose Mode (additional console outputs)</string>
      </property>
@@ -961,6 +1000,9 @@
    </item>
    <item>
     <widget class="QCheckBox" name="checkBoxChrono">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;* \brief This checkbox will start Chrono and takes the time between clicking of the &amp;quot;Perform spectral unmixing&amp;quot; button until the GUI enables again.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string>Chrono</string>
      </property>
@@ -968,6 +1010,9 @@
    </item>
    <item>
     <widget class="QCheckBox" name="checkBoxError">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;* \brief Calculates the realtive error between unmixing result and the input image in the L2 norm.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string>Relative error image</string>
      </property>

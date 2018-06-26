@@ -338,7 +338,8 @@ void mitk::FiberfoxParameters::SaveParameters(std::string filename)
   parameters.put("fiberfox.image.artifacts.eddyStrength", m_SignalGen.m_EddyStrength);
   parameters.put("fiberfox.image.artifacts.eddyTau", m_SignalGen.m_Tau);
   parameters.put("fiberfox.image.artifacts.aliasingfactor", m_SignalGen.m_CroppingFactor);
-  parameters.put("fiberfox.image.artifacts.addringing", m_SignalGen.m_DoAddGibbsRinging);
+  parameters.put("fiberfox.image.artifacts.drift", m_SignalGen.m_Drift);
+
   parameters.put("fiberfox.image.artifacts.doAddMotion", m_SignalGen.m_DoAddMotion);
   parameters.put("fiberfox.image.artifacts.randomMotion", m_SignalGen.m_DoRandomizeMotion);
   parameters.put("fiberfox.image.artifacts.translation0", m_SignalGen.m_Translation[0]);
@@ -348,12 +349,16 @@ void mitk::FiberfoxParameters::SaveParameters(std::string filename)
   parameters.put("fiberfox.image.artifacts.rotation1", m_SignalGen.m_Rotation[1]);
   parameters.put("fiberfox.image.artifacts.rotation2", m_SignalGen.m_Rotation[2]);
   parameters.put("fiberfox.image.artifacts.motionvolumes", m_Misc.m_MotionVolumesBox);
-  parameters.put("fiberfox.image.artifacts.addnoise", m_Misc.m_CheckAddNoiseBox);
-  parameters.put("fiberfox.image.artifacts.addghosts", m_Misc.m_CheckAddGhostsBox);
-  parameters.put("fiberfox.image.artifacts.addaliasing", m_Misc.m_CheckAddAliasingBox);
-  parameters.put("fiberfox.image.artifacts.addspikes", m_Misc.m_CheckAddSpikesBox);
-  parameters.put("fiberfox.image.artifacts.addeddycurrents", m_Misc.m_CheckAddEddyCurrentsBox);
-  parameters.put("fiberfox.image.artifacts.doAddDistortions", m_Misc.m_CheckAddDistortionsBox);
+
+  parameters.put("fiberfox.image.artifacts.addringing", m_SignalGen.m_DoAddGibbsRinging);
+  parameters.put("fiberfox.image.artifacts.addnoise", m_Misc.m_DoAddNoise);
+  parameters.put("fiberfox.image.artifacts.addghosts", m_Misc.m_DoAddGhosts);
+  parameters.put("fiberfox.image.artifacts.addaliasing", m_Misc.m_DoAddAliasing);
+  parameters.put("fiberfox.image.artifacts.addspikes", m_Misc.m_DoAddSpikes);
+  parameters.put("fiberfox.image.artifacts.addeddycurrents", m_Misc.m_DoAddEddyCurrents);
+  parameters.put("fiberfox.image.artifacts.doAddDistortions", m_Misc.m_DoAddDistortions);
+  parameters.put("fiberfox.image.artifacts.doAddDrift", m_SignalGen.m_DoAddDrift);
+
   parameters.put("fiberfox.image.outputvolumefractions", m_Misc.m_CheckOutputVolumeFractionsBox);
   parameters.put("fiberfox.image.showadvanced", m_Misc.m_CheckAdvancedSignalOptionsBox);
   parameters.put("fiberfox.image.signalmodelstring", m_Misc.m_SignalModelString);
@@ -639,12 +644,12 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
       m_Misc.m_OutputPath = ReadVal<std::string>(v1,"outpath", m_Misc.m_OutputPath);
       m_Misc.m_CheckOutputVolumeFractionsBox = ReadVal<bool>(v1,"outputvolumefractions", m_Misc.m_CheckOutputVolumeFractionsBox);
       m_Misc.m_CheckAdvancedSignalOptionsBox = ReadVal<bool>(v1,"showadvanced", m_Misc.m_CheckAdvancedSignalOptionsBox);
-      m_Misc.m_CheckAddDistortionsBox = ReadVal<bool>(v1,"artifacts.doAddDistortions", m_Misc.m_CheckAddDistortionsBox);
-      m_Misc.m_CheckAddNoiseBox = ReadVal<bool>(v1,"artifacts.addnoise", m_Misc.m_CheckAddNoiseBox);
-      m_Misc.m_CheckAddGhostsBox = ReadVal<bool>(v1,"artifacts.addghosts", m_Misc.m_CheckAddGhostsBox);
-      m_Misc.m_CheckAddAliasingBox = ReadVal<bool>(v1,"artifacts.addaliasing", m_Misc.m_CheckAddAliasingBox);
-      m_Misc.m_CheckAddSpikesBox = ReadVal<bool>(v1,"artifacts.addspikes", m_Misc.m_CheckAddSpikesBox);
-      m_Misc.m_CheckAddEddyCurrentsBox = ReadVal<bool>(v1,"artifacts.addeddycurrents", m_Misc.m_CheckAddEddyCurrentsBox);
+      m_Misc.m_DoAddDistortions = ReadVal<bool>(v1,"artifacts.doAddDistortions", m_Misc.m_DoAddDistortions);
+      m_Misc.m_DoAddNoise = ReadVal<bool>(v1,"artifacts.addnoise", m_Misc.m_DoAddNoise);
+      m_Misc.m_DoAddGhosts = ReadVal<bool>(v1,"artifacts.addghosts", m_Misc.m_DoAddGhosts);
+      m_Misc.m_DoAddAliasing = ReadVal<bool>(v1,"artifacts.addaliasing", m_Misc.m_DoAddAliasing);
+      m_Misc.m_DoAddSpikes = ReadVal<bool>(v1,"artifacts.addspikes", m_Misc.m_DoAddSpikes);
+      m_Misc.m_DoAddEddyCurrents = ReadVal<bool>(v1,"artifacts.addeddycurrents", m_Misc.m_DoAddEddyCurrents);
 
       m_SignalGen.m_ImageRegion.SetSize(0, ReadVal<int>(v1,"basic.size.x",m_SignalGen.m_ImageRegion.GetSize(0)));
       m_SignalGen.m_ImageRegion.SetSize(1, ReadVal<int>(v1,"basic.size.y",m_SignalGen.m_ImageRegion.GetSize(1)));
@@ -689,11 +694,13 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
       m_SignalGen.m_EddyStrength = ReadVal<float>(v1,"artifacts.eddyStrength", m_SignalGen.m_EddyStrength);
       m_SignalGen.m_Tau = ReadVal<float>(v1,"artifacts.eddyTau", m_SignalGen.m_Tau);
       m_SignalGen.m_CroppingFactor = ReadVal<float>(v1,"artifacts.aliasingfactor", m_SignalGen.m_CroppingFactor);
+      m_SignalGen.m_Drift = ReadVal<float>(v1,"artifacts.drift", m_SignalGen.m_Drift);
       m_SignalGen.m_DoAddGibbsRinging = ReadVal<bool>(v1,"artifacts.addringing", m_SignalGen.m_DoAddGibbsRinging);
       m_SignalGen.m_DoSimulateRelaxation = ReadVal<bool>(v1,"doSimulateRelaxation", m_SignalGen.m_DoSimulateRelaxation);
       m_SignalGen.m_DoDisablePartialVolume = ReadVal<bool>(v1,"doDisablePartialVolume", m_SignalGen.m_DoDisablePartialVolume);
       m_SignalGen.m_DoAddMotion = ReadVal<bool>(v1,"artifacts.doAddMotion", m_SignalGen.m_DoAddMotion);
       m_SignalGen.m_DoRandomizeMotion = ReadVal<bool>(v1,"artifacts.randomMotion", m_SignalGen.m_DoRandomizeMotion);
+      m_SignalGen.m_DoAddDrift = ReadVal<bool>(v1,"artifacts.doAddDrift", m_SignalGen.m_DoAddDrift);
       m_SignalGen.m_Translation[0] = ReadVal<float>(v1,"artifacts.translation0", m_SignalGen.m_Translation[0]);
       m_SignalGen.m_Translation[1] = ReadVal<float>(v1,"artifacts.translation1", m_SignalGen.m_Translation[1]);
       m_SignalGen.m_Translation[2] = ReadVal<float>(v1,"artifacts.translation2", m_SignalGen.m_Translation[2]);

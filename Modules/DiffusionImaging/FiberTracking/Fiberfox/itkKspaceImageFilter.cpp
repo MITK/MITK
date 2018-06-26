@@ -178,7 +178,9 @@ namespace itk {
     float kyMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1);
     float xMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(0); // scanner coverage in x-direction
     float yMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(1); // scanner coverage in y-direction
-    float yMaxFov = yMax*m_Parameters->m_SignalGen.m_CroppingFactor;               // actual FOV in y-direction (in x-direction FOV=xMax)
+    float yMaxFov = yMax;
+    if (m_Parameters->m_Misc.m_DoAddAliasing)
+        yMaxFov *= m_Parameters->m_SignalGen.m_CroppingFactor;               // actual FOV in y-direction (in x-direction FOV=xMax)
 
     float numPix = kxMax*kyMax;
     // Adjust noise variance since it is the intended variance in physical space and not in k-space:
@@ -200,7 +202,7 @@ namespace itk {
       // calculate eddy current decay factor
       // (TODO: vielleicht umbauen dass hier die zeit vom letzten diffusionsgradienten an genommen wird. doku dann auch entsprechend anpassen.)
       float eddyDecay = 0;
-      if ( m_Parameters->m_Misc.m_CheckAddEddyCurrentsBox && m_Parameters->m_SignalGen.m_EddyStrength>0)
+      if ( m_Parameters->m_Misc.m_DoAddEddyCurrents && m_Parameters->m_SignalGen.m_EddyStrength>0)
       {
         eddyDecay = std::exp(-tRead/m_Parameters->m_SignalGen.m_Tau );
       }
@@ -235,10 +237,13 @@ namespace itk {
         else{ ky -= kyMax/2; }
 
         // add ghosting by adding gradient delay induced offset
-        if (out_idx[1]%2 == 1)
-          kx -= m_Parameters->m_SignalGen.m_KspaceLineOffset;
-        else
-          kx += m_Parameters->m_SignalGen.m_KspaceLineOffset;
+        if (m_Parameters->m_Misc.m_DoAddGhosts)
+        {
+          if (out_idx[1]%2 == 1)
+            kx -= m_Parameters->m_SignalGen.m_KspaceLineOffset;
+          else
+            kx += m_Parameters->m_SignalGen.m_KspaceLineOffset;
+        }
 
         vcl_complex<ScalarType> s(0,0);
         InputIteratorType it(m_CompartmentImages.at(0), m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
@@ -269,12 +274,12 @@ namespace itk {
 
           // simulate eddy currents and other distortions
           float omega = 0;   // frequency offset
-          if (  m_Parameters->m_SignalGen.m_EddyStrength>0 && m_Parameters->m_Misc.m_CheckAddEddyCurrentsBox && !m_IsBaseline)
+          if (  m_Parameters->m_SignalGen.m_EddyStrength>0 && m_Parameters->m_Misc.m_DoAddEddyCurrents && !m_IsBaseline)
           {
             omega += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2]) * eddyDecay;
           }
 
-          if (m_Parameters->m_SignalGen.m_FrequencyMap.IsNotNull()) // simulate distortions
+          if (m_Parameters->m_Misc.m_DoAddDistortions && m_Parameters->m_SignalGen.m_FrequencyMap.IsNotNull()) // simulate distortions
           {
             itk::Point<double, 3> point3D;
             itk::Image<float, 3>::IndexType index; index[0] = input_idx[0]; index[1] = input_idx[1]; index[2] = m_Zidx;
@@ -306,7 +311,7 @@ namespace itk {
         if (m_SpikesPerSlice>0 && sqrt(s.imag()*s.imag()+s.real()*s.real()) > sqrt(m_Spike.imag()*m_Spike.imag()+m_Spike.real()*m_Spike.real()) )
           m_Spike = s;
 
-        if (m_Parameters->m_SignalGen.m_NoiseVariance>0 && m_Parameters->m_Misc.m_CheckAddNoiseBox)
+        if (m_Parameters->m_SignalGen.m_NoiseVariance>0 && m_Parameters->m_Misc.m_DoAddNoise)
           s = vcl_complex<ScalarType>(s.real()+randGen->GetNormalVariate(0,noiseVar), s.imag()+randGen->GetNormalVariate(0,noiseVar));
 
         outputImage->SetPixel(kIdx, s);

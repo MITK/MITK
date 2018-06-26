@@ -25,7 +25,7 @@ if(MITK_USE_DCMQI)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://github.com/nolden/dcmqi.git
-      GIT_TAG 8772b4e8d4babeb6e828b3fdb834cb9a4d1d7997
+      GIT_TAG d067f81c8a8e43900b91861f771013406868672f
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

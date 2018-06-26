@@ -30,8 +30,8 @@ if(MITK_USE_DCMTK)
       LIST_SEPARATOR ${sep}
       # specific version post-3.6.2 without the API change which breaks DCMQI
       # 065a4b + 525490
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk_2ceb446c.tar.gz
-      URL_MD5 a4802436feffdb135d7d1e1e8917d1fa
+      GIT_REPOSITORY http://git.dcmtk.org/dcmtk.git
+      GIT_TAG 29f9de10c2e8576147f16475b156bba98d14ba7d
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
          ${ep_common_args}

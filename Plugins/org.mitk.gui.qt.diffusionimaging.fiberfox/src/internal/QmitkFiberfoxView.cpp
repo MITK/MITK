@@ -349,6 +349,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_SpikeFrame->setVisible(false);
     m_Controls->m_AliasingFrame->setVisible(false);
     m_Controls->m_MotionArtifactFrame->setVisible(false);
+    m_Controls->m_DriftFrame->setVisible(false);
     m_ParameterFile = QDir::currentPath()+"/param.ffp";
 
     m_Controls->m_AbortSimulationButton->setVisible(false);
@@ -419,6 +420,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
     connect((QObject*) m_Controls->m_AddSpikes, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddSpikes(int)));
     connect((QObject*) m_Controls->m_AddAliasing, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddAliasing(int)));
     connect((QObject*) m_Controls->m_AddMotion, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddMotion(int)));
+    connect((QObject*) m_Controls->m_AddDrift, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddDrift(int)));
 
     connect((QObject*) m_Controls->m_ConstantRadiusBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnConstantRadius(int)));
     connect((QObject*) m_Controls->m_CopyBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(CopyBundles()));
@@ -580,37 +582,44 @@ FiberfoxParameters QmitkFiberfoxView::UpdateImageParameters(bool all, bool save)
   parameters.m_SignalGen.m_SimulateKspaceAcquisition = parameters.m_SignalGen.m_DoSimulateRelaxation;
 
   // N/2 ghosts
-  parameters.m_Misc.m_CheckAddGhostsBox = m_Controls->m_AddGhosts->isChecked();
+  parameters.m_Misc.m_DoAddGhosts = m_Controls->m_AddGhosts->isChecked();
+  parameters.m_SignalGen.m_KspaceLineOffset = m_Controls->m_kOffsetBox->value();
   if (m_Controls->m_AddGhosts->isChecked())
   {
     parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
     parameters.m_Misc.m_ArtifactModelString += "_GHOST";
-    parameters.m_SignalGen.m_KspaceLineOffset = m_Controls->m_kOffsetBox->value();
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Ghost", DoubleProperty::New(parameters.m_SignalGen.m_KspaceLineOffset));
   }
-  else
-    parameters.m_SignalGen.m_KspaceLineOffset = 0;
 
   // Aliasing
-  parameters.m_Misc.m_CheckAddAliasingBox = m_Controls->m_AddAliasing->isChecked();
+  parameters.m_Misc.m_DoAddAliasing = m_Controls->m_AddAliasing->isChecked();
+  parameters.m_SignalGen.m_CroppingFactor = (100-m_Controls->m_WrapBox->value())/100;
   if (m_Controls->m_AddAliasing->isChecked())
   {
     parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
     parameters.m_Misc.m_ArtifactModelString += "_ALIASING";
-    parameters.m_SignalGen.m_CroppingFactor = (100-m_Controls->m_WrapBox->value())/100;
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Aliasing", DoubleProperty::New(m_Controls->m_WrapBox->value()));
   }
 
   // Spikes
-  parameters.m_Misc.m_CheckAddSpikesBox = m_Controls->m_AddSpikes->isChecked();
+  parameters.m_Misc.m_DoAddSpikes = m_Controls->m_AddSpikes->isChecked();
+  parameters.m_SignalGen.m_Spikes = m_Controls->m_SpikeNumBox->value();
+  parameters.m_SignalGen.m_SpikeAmplitude = m_Controls->m_SpikeScaleBox->value();
   if (m_Controls->m_AddSpikes->isChecked())
   {
     parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
-    parameters.m_SignalGen.m_Spikes = m_Controls->m_SpikeNumBox->value();
-    parameters.m_SignalGen.m_SpikeAmplitude = m_Controls->m_SpikeScaleBox->value();
     parameters.m_Misc.m_ArtifactModelString += "_SPIKES";
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Spikes.Number", IntProperty::New(parameters.m_SignalGen.m_Spikes));
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Spikes.Amplitude", DoubleProperty::New(parameters.m_SignalGen.m_SpikeAmplitude));
+  }
+
+  // Drift
+  parameters.m_SignalGen.m_DoAddDrift = m_Controls->m_AddDrift->isChecked();
+  parameters.m_SignalGen.m_Drift = m_Controls->m_DriftFactor->value()/100;
+  if (m_Controls->m_AddDrift->isChecked())
+  {
+    parameters.m_Misc.m_ArtifactModelString += "_DRIFT";
+    parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Drift", FloatProperty::New(parameters.m_SignalGen.m_Drift));
   }
 
   // gibbs ringing
@@ -623,7 +632,7 @@ FiberfoxParameters QmitkFiberfoxView::UpdateImageParameters(bool all, bool save)
   }
 
   // add distortions
-  parameters.m_Misc.m_CheckAddDistortionsBox = m_Controls->m_AddDistortions->isChecked();
+  parameters.m_Misc.m_DoAddDistortions = m_Controls->m_AddDistortions->isChecked();
   if (m_Controls->m_AddDistortions->isChecked() && m_Controls->m_FrequencyMapBox->GetSelectedNode().IsNotNull())
   {
     mitk::DataNode::Pointer fMapNode = m_Controls->m_FrequencyMapBox->GetSelectedNode();
@@ -648,12 +657,11 @@ FiberfoxParameters QmitkFiberfoxView::UpdateImageParameters(bool all, bool save)
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Distortions", BoolProperty::New(true));
   }
 
-  parameters.m_SignalGen.m_EddyStrength = 0;
-  parameters.m_Misc.m_CheckAddEddyCurrentsBox = m_Controls->m_AddEddy->isChecked();
+  parameters.m_SignalGen.m_EddyStrength = m_Controls->m_EddyGradientStrength->value();
+  parameters.m_Misc.m_DoAddEddyCurrents = m_Controls->m_AddEddy->isChecked();
   if (m_Controls->m_AddEddy->isChecked())
   {
     parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
-    parameters.m_SignalGen.m_EddyStrength = m_Controls->m_EddyGradientStrength->value();
     parameters.m_Misc.m_ArtifactModelString += "_EDDY";
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Eddy-strength", DoubleProperty::New(parameters.m_SignalGen.m_EddyStrength));
   }
@@ -789,64 +797,60 @@ FiberfoxParameters QmitkFiberfoxView::UpdateImageParameters(bool all, bool save)
   }
 
   // Noise
-  parameters.m_Misc.m_CheckAddNoiseBox = m_Controls->m_AddNoise->isChecked();
-  parameters.m_SignalGen.m_NoiseVariance = 0;
+  parameters.m_Misc.m_DoAddNoise = m_Controls->m_AddNoise->isChecked();
+  parameters.m_SignalGen.m_NoiseVariance = m_Controls->m_NoiseLevel->value();
   if (m_Controls->m_AddNoise->isChecked())
   {
-    double noiseVariance = m_Controls->m_NoiseLevel->value();
-
     switch (m_Controls->m_NoiseDistributionBox->currentIndex())
     {
       case 0:
       {
-        if (noiseVariance>0)
+        if (parameters.m_SignalGen.m_NoiseVariance>0)
         {
           parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
           parameters.m_Misc.m_ArtifactModelString += "_COMPLEX-GAUSSIAN-";
-          parameters.m_SignalGen.m_NoiseVariance = m_Controls->m_NoiseLevel->value();
           parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Complex Gaussian"));
         }
         break;
       }
       case 1:
       {
-        if (noiseVariance>0)
+        if (parameters.m_SignalGen.m_NoiseVariance>0)
         {
           parameters.m_NoiseModel = std::make_shared< mitk::RicianNoiseModel<ScalarType> >();
           parameters.m_Misc.m_ArtifactModelString += "_RICIAN-";
           parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Rician"));
-          parameters.m_NoiseModel->SetNoiseVariance(noiseVariance);
+          parameters.m_NoiseModel->SetNoiseVariance(parameters.m_SignalGen.m_NoiseVariance);
         }
         break;
       }
       case 2:
       {
-        if (noiseVariance>0)
+        if (parameters.m_SignalGen.m_NoiseVariance>0)
         {
           parameters.m_NoiseModel = std::make_shared< mitk::ChiSquareNoiseModel<ScalarType> >();
           parameters.m_Misc.m_ArtifactModelString += "_CHISQUARED-";
           parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Chi-squared"));
-          parameters.m_NoiseModel->SetNoiseVariance(noiseVariance);
+          parameters.m_NoiseModel->SetNoiseVariance(parameters.m_SignalGen.m_NoiseVariance);
         }
         break;
       }
       default:
       {
-        if (noiseVariance>0)
+        if (parameters.m_SignalGen.m_NoiseVariance>0)
         {
           parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
           parameters.m_Misc.m_ArtifactModelString += "_COMPLEX-GAUSSIAN-";
-          parameters.m_SignalGen.m_NoiseVariance = m_Controls->m_NoiseLevel->value();
           parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Complex Gaussian"));
         }
         break;
       }
     }
 
-    if (noiseVariance>0)
+    if (parameters.m_SignalGen.m_NoiseVariance>0)
     {
-      parameters.m_Misc.m_ArtifactModelString += QString::number(noiseVariance).toStdString();
-      parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Variance", DoubleProperty::New(noiseVariance));
+      parameters.m_Misc.m_ArtifactModelString += QString::number(parameters.m_SignalGen.m_NoiseVariance).toStdString();
+      parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Variance", DoubleProperty::New(parameters.m_SignalGen.m_NoiseVariance));
     }
   }
 
@@ -1412,7 +1416,7 @@ void QmitkFiberfoxView::LoadParameters()
 
   if (parameters.m_NoiseModel!=nullptr)
   {
-    m_Controls->m_AddNoise->setChecked(parameters.m_Misc.m_CheckAddNoiseBox);
+    m_Controls->m_AddNoise->setChecked(parameters.m_Misc.m_DoAddNoise);
     if (dynamic_cast<mitk::RicianNoiseModel<double>*>(parameters.m_NoiseModel.get()))
     {
       m_Controls->m_NoiseDistributionBox->setCurrentIndex(0);
@@ -1425,20 +1429,22 @@ void QmitkFiberfoxView::LoadParameters()
   }
   else
   {
-    m_Controls->m_AddNoise->setChecked(parameters.m_Misc.m_CheckAddNoiseBox);
+    m_Controls->m_AddNoise->setChecked(parameters.m_Misc.m_DoAddNoise);
     m_Controls->m_NoiseLevel->setValue(parameters.m_SignalGen.m_NoiseVariance);
   }
 
   m_Controls->m_VolumeFractionsBox->setChecked(parameters.m_Misc.m_CheckOutputVolumeFractionsBox);
   m_Controls->m_AdvancedOptionsBox_2->setChecked(parameters.m_Misc.m_CheckAdvancedSignalOptionsBox);
-  m_Controls->m_AddGhosts->setChecked(parameters.m_Misc.m_CheckAddGhostsBox);
-  m_Controls->m_AddAliasing->setChecked(parameters.m_Misc.m_CheckAddAliasingBox);
-  m_Controls->m_AddDistortions->setChecked(parameters.m_Misc.m_CheckAddDistortionsBox);
-  m_Controls->m_AddSpikes->setChecked(parameters.m_Misc.m_CheckAddSpikesBox);
-  m_Controls->m_AddEddy->setChecked(parameters.m_Misc.m_CheckAddEddyCurrentsBox);
+  m_Controls->m_AddGhosts->setChecked(parameters.m_Misc.m_DoAddGhosts);
+  m_Controls->m_AddAliasing->setChecked(parameters.m_Misc.m_DoAddAliasing);
+  m_Controls->m_AddDistortions->setChecked(parameters.m_Misc.m_DoAddDistortions);
+  m_Controls->m_AddSpikes->setChecked(parameters.m_Misc.m_DoAddSpikes);
+  m_Controls->m_AddEddy->setChecked(parameters.m_Misc.m_DoAddEddyCurrents);
+  m_Controls->m_AddDrift->setChecked(parameters.m_SignalGen.m_DoAddDrift);
 
   m_Controls->m_kOffsetBox->setValue(parameters.m_SignalGen.m_KspaceLineOffset);
   m_Controls->m_WrapBox->setValue(100*(1-parameters.m_SignalGen.m_CroppingFactor));
+  m_Controls->m_DriftFactor->setValue(100*parameters.m_SignalGen.m_Drift);
   m_Controls->m_SpikeNumBox->setValue(parameters.m_SignalGen.m_Spikes);
   m_Controls->m_SpikeScaleBox->setValue(parameters.m_SignalGen.m_SpikeAmplitude);
   m_Controls->m_EddyGradientStrength->setValue(parameters.m_SignalGen.m_EddyStrength);
@@ -1798,6 +1804,14 @@ void QmitkFiberfoxView::OnAddMotion(int value)
     m_Controls->m_MotionArtifactFrame->setVisible(true);
   else
     m_Controls->m_MotionArtifactFrame->setVisible(false);
+}
+
+void QmitkFiberfoxView::OnAddDrift(int value)
+{
+  if (value>0)
+    m_Controls->m_DriftFrame->setVisible(true);
+  else
+    m_Controls->m_DriftFrame->setVisible(false);
 }
 
 void QmitkFiberfoxView::OnAddAliasing(int value)

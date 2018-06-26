@@ -123,8 +123,9 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
   m_KspaceImage->FillBuffer(nullPix);
 
   std::vector< unsigned int > spikeVolume;
-  for (unsigned int i=0; i<m_Parameters.m_SignalGen.m_Spikes; i++)
-    spikeVolume.push_back(m_RandGen->GetIntegerVariate()%(compartment_images.at(0)->GetVectorLength()));
+  if (m_Parameters.m_Misc.m_DoAddSpikes)
+    for (unsigned int i=0; i<m_Parameters.m_SignalGen.m_Spikes; i++)
+      spikeVolume.push_back(m_RandGen->GetIntegerVariate()%(compartment_images.at(0)->GetVectorLength()));
   std::sort (spikeVolume.begin(), spikeVolume.end());
   std::reverse (spikeVolume.begin(), spikeVolume.end());
 
@@ -500,8 +501,9 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
 
   // initialize output dwi image
   m_Parameters.m_SignalGen.m_CroppedRegion = m_Parameters.m_SignalGen.m_ImageRegion;
-  m_Parameters.m_SignalGen.m_CroppedRegion.SetSize( 1, m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(1)
-                                                    *m_Parameters.m_SignalGen.m_CroppingFactor);
+  if (m_Parameters.m_Misc.m_DoAddAliasing)
+    m_Parameters.m_SignalGen.m_CroppedRegion.SetSize( 1, m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(1)
+                                                      *m_Parameters.m_SignalGen.m_CroppingFactor);
 
   itk::Point<double,3> shiftedOrigin = m_Parameters.m_SignalGen.m_ImageOrigin;
   shiftedOrigin[1] += (m_Parameters.m_SignalGen.m_ImageRegion.GetSize(1)
@@ -776,7 +778,7 @@ void TractsToDWIImageFilter< PixelType >::InitializeFiberData()
 {
   m_mmRadius = m_Parameters.m_SignalGen.m_AxonRadius/1000;
 
-  auto caster = itk::CastImageFilter< itk::Image<unsigned char, 3>, itk::Image<float, 3> >::New();
+  auto caster = itk::CastImageFilter< itk::Image<unsigned char, 3>, itk::Image<double, 3> >::New();
   caster->SetInput(m_TransformedMaskImage);
   caster->Update();
 
@@ -793,16 +795,16 @@ void TractsToDWIImageFilter< PixelType >::InitializeFiberData()
     PrintToLog("\nWarning: streamlines have VERY low weights. Average weight: " + boost::lexical_cast<std::string>(mean_weight) + ". Possible source of calculation errors.", false, true, true);
 
 
-  auto density_calculator = itk::TractDensityImageFilter< itk::Image<float, 3> >::New();
+  auto density_calculator = itk::TractDensityImageFilter< itk::Image<double, 3> >::New();
   density_calculator->SetFiberBundle(m_FiberBundle);
   density_calculator->SetInputImage(caster->GetOutput());
   density_calculator->SetBinaryOutput(false);
   density_calculator->SetUseImageGeometry(true);
   density_calculator->SetOutputAbsoluteValues(true);
   density_calculator->Update();
-  float max_density = density_calculator->GetMaxDensity();
+  double max_density = density_calculator->GetMaxDensity();
 
-  float voxel_volume = m_WorkingSpacing[0]*m_WorkingSpacing[1]*m_WorkingSpacing[2];
+  double voxel_volume = m_WorkingSpacing[0]*m_WorkingSpacing[1]*m_WorkingSpacing[2];
   if (m_mmRadius>0)
   {
     std::stringstream stream;
@@ -811,7 +813,7 @@ void TractsToDWIImageFilter< PixelType >::InitializeFiberData()
     PrintToLog("\nMax. fiber volume: " + s + "mm².", false, true, true);
 
     {
-      float full_radius = 1000*std::sqrt(voxel_volume/(max_density*itk::Math::pi));
+      double full_radius = 1000*std::sqrt(voxel_volume/(max_density*itk::Math::pi));
       std::stringstream stream;
       stream << std::fixed << setprecision(2) << full_radius;
       std::string s = stream.str();
@@ -949,9 +951,6 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     while (m_Parameters.m_FiberModelList.size()>1)
       m_Parameters.m_FiberModelList.pop_back();
 
-  //    int baselineIndex = m_Parameters.m_SignalGen.GetFirstBaselineIndex();
-  //    if (baselineIndex<0) { itkExceptionMacro("No baseline index found!"); }
-
   if (!m_Parameters.m_SignalGen.m_SimulateKspaceAcquisition)  // No upsampling of input image needed if no k-space simulation is performed
     m_Parameters.m_SignalGen.m_DoAddGibbsRinging = false;
 
@@ -981,6 +980,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     PrintToLog("b-values: ", false, false, true);
     for (auto v : bVals)
       PrintToLog(boost::lexical_cast<std::string>(v) + " ", false, false, true);
+
     PrintToLog("\n", false, false, true);
     PrintToLog("\n", false, false, true);
 
@@ -1082,12 +1082,15 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
               // generate signal for each fiber compartment
               for (int k=0; k<numFiberCompartments; k++)
               {
-                DoubleDwiType::PixelType pix = m_CompartmentImages.at(k)->GetPixel(seg.first);
+                double seg_volume = seg.second*fiberWeight*itk::Math::pi*m_mmRadius*m_mmRadius;
+                double signal_add = seg_volume*m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g, dir);
 
-                float seg_volume = seg.second*fiberWeight*itk::Math::pi*m_mmRadius*m_mmRadius;
-
-                pix[g] += seg_volume*m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g, dir);
-                m_CompartmentImages.at(k)->SetPixel(seg.first, pix);
+#pragma omp critical
+                {
+                  DoubleDwiType::PixelType pix = m_CompartmentImages.at(k)->GetPixel(seg.first);
+                  pix[g] += signal_add;
+                  m_CompartmentImages.at(k)->SetPixel(seg.first, m_CompartmentImages.at(k)->GetPixel(seg.first));
+                }
 
                 if (k==0)
                 {
@@ -1254,21 +1257,21 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     }
     }
 
-    if (m_Parameters.m_SignalGen.m_NoiseVariance>0 && m_Parameters.m_Misc.m_CheckAddNoiseBox)
+    if (m_Parameters.m_SignalGen.m_NoiseVariance>0 && m_Parameters.m_Misc.m_DoAddNoise)
       PrintToLog("Simulating complex Gaussian noise", false);
     if (m_Parameters.m_SignalGen.m_DoSimulateRelaxation)
       PrintToLog("Simulating signal relaxation", false);
-    if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull())
+    if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull() && m_Parameters.m_Misc.m_DoAddDistortions)
       PrintToLog("Simulating distortions", false);
     if (m_Parameters.m_SignalGen.m_DoAddGibbsRinging)
       PrintToLog("Simulating ringing artifacts", false);
-    if (m_Parameters.m_SignalGen.m_EddyStrength>0)
+    if (m_Parameters.m_Misc.m_DoAddEddyCurrents && m_Parameters.m_SignalGen.m_EddyStrength>0)
       PrintToLog("Simulating eddy currents", false);
-    if (m_Parameters.m_SignalGen.m_Spikes>0)
+    if (m_Parameters.m_Misc.m_DoAddSpikes && m_Parameters.m_SignalGen.m_Spikes>0)
       PrintToLog("Simulating spikes", false);
-    if (m_Parameters.m_SignalGen.m_CroppingFactor<1.0)
+    if (m_Parameters.m_Misc.m_DoAddAliasing && m_Parameters.m_SignalGen.m_CroppingFactor<1.0)
       PrintToLog("Simulating aliasing artifacts", false);
-    if (m_Parameters.m_SignalGen.m_KspaceLineOffset>0)
+    if (m_Parameters.m_Misc.m_DoAddGhosts && m_Parameters.m_SignalGen.m_KspaceLineOffset>0)
       PrintToLog("Simulating ghosts", false);
 
     doubleOutImage = SimulateKspaceAcquisition(m_CompartmentImages);
@@ -1296,10 +1299,12 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
   }
 
   PrintToLog("Finalizing image");
+  if (m_Parameters.m_SignalGen.m_DoAddDrift && m_Parameters.m_SignalGen.m_Drift>0.0)
+    PrintToLog("Adding signal drift", false);
   if (signalScale>1)
-    PrintToLog(" Scaling signal", false);
+    PrintToLog("Scaling signal", false);
   if (m_Parameters.m_NoiseModel)
-    PrintToLog(" Adding noise", false);
+    PrintToLog("Adding noise", false);
   unsigned int window = 0;
   unsigned int min = itk::NumericTraits<unsigned int>::max();
   ImageRegionIterator<OutputImageType> it4 (m_OutputImage, m_OutputImage->GetLargestPossibleRegion());
@@ -1327,6 +1332,15 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
     typename OutputImageType::IndexType index = it4.GetIndex();
     signal = doubleOutImage->GetPixel(index)*signalScale;
+
+    for (unsigned int i=0; i<signal.Size(); i++)
+    {
+      if (m_Parameters.m_SignalGen.m_DoAddDrift)
+      {
+        double df = -m_Parameters.m_SignalGen.m_Drift/(signal.Size()*signal.Size());
+        signal[i] += signal[i]*df*i*i;
+      }
+    }
 
     if (m_Parameters.m_NoiseModel)
       m_Parameters.m_NoiseModel->AddNoise(signal);
@@ -1361,7 +1375,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     PrintToLog(m_MotionLog, false, false);
   }
 
-  if (m_Parameters.m_SignalGen.m_Spikes>0)
+  if (m_Parameters.m_Misc.m_DoAddSpikes && m_Parameters.m_SignalGen.m_Spikes>0)
   {
     PrintToLog("\nSpike log:", false);
     PrintToLog(m_SpikeLog, false, false);

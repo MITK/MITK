@@ -45,7 +45,8 @@ namespace mitk {
     *
     * Output:
     * The output will be one MITK image per chosen chromophore. Where the XY-plane is a image and the Z-direction represents recordings for different
-    * sequences.
+    * sequences. Furthermore it is possible to creat an output image that contains the information about the relative error between unmixing result
+    * and the input image.
     *
     * Subclasses:
     * - mitkPASpectralUnmixingFilterVigra

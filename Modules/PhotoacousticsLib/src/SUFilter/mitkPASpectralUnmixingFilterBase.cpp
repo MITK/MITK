@@ -133,7 +133,6 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
         }
         Eigen::VectorXf resultVector = SpectralUnmixingAlgorithm(endmemberMatrix, inputVector);
 
-        unsigned int outputCounter = GetNumberOfIndexedOutputs();
         if (m_RelativeError == true)
         {
           float relativeError = (endmemberMatrix*resultVector - inputVector).norm() / inputVector.norm(); // norm() is L2 norm

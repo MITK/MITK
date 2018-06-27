@@ -392,6 +392,7 @@ void SpectralUnmixing::storeOutputs()
   std::chrono::steady_clock::time_point _end(std::chrono::steady_clock::now());
   MITK_INFO(m_Controls.checkBoxChrono->isChecked()) << "Time for image Processing: "
     << std::chrono::duration_cast<std::chrono::duration<double>>(_end - _start).count();
+  QApplication::setOverrideCursor(Qt::ArrowCursor);
   SwitchGUIControls(true);
 }
 
@@ -460,10 +461,12 @@ void SpectralUnmixing::DoImageProcessing()
       {
         Settings(image);
         MITK_INFO(PluginVerbose) << "Updating Filter...";
+        QApplication::setOverrideCursor(Qt::WaitCursor);
         QtConcurrent::run(this, &SpectralUnmixing::WorkingThreadUpdateFilter, m_SpectralUnmixingFilter);
       }
       catch (const mitk::Exception& e)
       {
+        QApplication::setOverrideCursor(Qt::ArrowCursor);
         QMessageBox::information(nullptr, "Template", e.GetDescription());
       }
     }

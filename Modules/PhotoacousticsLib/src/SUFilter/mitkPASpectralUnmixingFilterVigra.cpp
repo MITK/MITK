@@ -83,6 +83,8 @@ Eigen::VectorXf mitk::pa::SpectralUnmixingFilterVigra::SpectralUnmixingAlgorithm
 
   else if (mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED == algorithmName)
   {
+    if (weightsvec.size() != numberOfWavelengths)
+      mitkThrow() << "Number of weights and wavelengths doesn't match! OR Invalid weight!";
     const double* weightsdat = weightsvec.data();
     vigra::Matrix<double> weigths(vigra::Shape2(numberOfWavelengths, 1), weightsdat);
     vigra::linalg::weightedLeastSquares(A, b, weigths, x);

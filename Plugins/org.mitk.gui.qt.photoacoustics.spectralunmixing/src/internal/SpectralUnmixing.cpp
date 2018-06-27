@@ -249,9 +249,9 @@ mitk::pa::SpectralUnmixingFilterBase::Pointer SpectralUnmixing::GetFilterInstanc
       Weight = Text.toInt();
       if (Weight > 0)
       {
+        MITK_INFO(PluginVerbose) << "Weight: " << Weight;
         dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra*>(spectralUnmixingFilter.GetPointer())
           ->AddWeight(Weight);
-        MITK_INFO(PluginVerbose) << "Weight: " << Weight;
       }
       ++colunm;
     }
@@ -406,6 +406,7 @@ void SpectralUnmixing::WorkingThreadUpdateFilter(mitk::pa::SpectralUnmixingFilte
   }
   catch (const mitk::Exception& e)
   {
+    QApplication::setOverrideCursor(Qt::ArrowCursor);
     SwitchGUIControls(true);
     errorMessage = e.GetDescription();
     emit crashSignal();

@@ -179,6 +179,7 @@ mitk::pa::SpectralUnmixingFilterBase::Pointer SpectralUnmixing::GetFilterInstanc
 
   else if (algorithm == "ldlt")
   {
+    MITK_WARN << "Unfortunaly algorithm is likley to fail!";
     spectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
     dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(spectralUnmixingFilter.GetPointer())
       ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::LDLT);
@@ -186,6 +187,7 @@ mitk::pa::SpectralUnmixingFilterBase::Pointer SpectralUnmixing::GetFilterInstanc
 
   else if (algorithm == "llt")
   {
+    MITK_WARN << "Unfortunaly algorithm is likley to fail!";
     spectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
     dynamic_cast<mitk::pa::LinearSpectralUnmixingFilter*>(spectralUnmixingFilter.GetPointer())
       ->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::LLT);

@@ -46,14 +46,24 @@ Eigen::VectorXf mitk::pa::LinearSpectralUnmixingFilter::SpectralUnmixingAlgorith
 
   else if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::LDLT == algorithmName)
   {
-    mitkThrow() << "algorithm not working";
-    resultVector = endmemberMatrix.ldlt().solve(inputVector);
+    Eigen::LLT<Eigen::MatrixXf> lltOfA(endmemberMatrix);
+    if (lltOfA.info() == Eigen::NumericalIssue)
+    {
+      mitkThrow() << "Possibly non semi-positive definitie endmembermatrix!";
+    }
+    else
+      resultVector = endmemberMatrix.ldlt().solve(inputVector);
   }
 
   else if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::LLT == algorithmName)
   {
-    mitkThrow() << "algorithm not working";
-    resultVector = endmemberMatrix.llt().solve(inputVector);
+    Eigen::LLT<Eigen::MatrixXf> lltOfA(endmemberMatrix);
+    if (lltOfA.info() == Eigen::NumericalIssue)
+    {
+      mitkThrow() << "Possibly non semi-positive definitie endmembermatrix!";
+    }
+    else
+      resultVector = endmemberMatrix.llt().solve(inputVector);
   }
 
   else if (mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::COLPIVHOUSEHOLDERQR == algorithmName)

@@ -100,6 +100,12 @@ namespace mitk {
       */
       virtual void RelativeError(bool relativeError);
 
+      /**
+      * \brief AddRelativeErrorSettings takes integers and writes them at the end of the m_RelativeErrorSettings vector.
+      * @param value has to be a integer
+      */
+      virtual void AddRelativeErrorSettings(int value);
+
       ofstream myfile; // just for testing purposes; has to be removeed
 
     protected:
@@ -124,6 +130,7 @@ namespace mitk {
 
       std::vector<mitk::pa::PropertyCalculator::ChromophoreType> m_Chromophore;
       std::vector<int> m_Wavelength;
+      std::vector<int> m_RelativeErrorSettings;
 
     private:
       /*
@@ -169,6 +176,15 @@ namespace mitk {
       * @throws if mitk::pa::PropertyCalculator::GetAbsorptionForWavelengt returns 0, because this means that the delivered wavelength is not in the database.
       */
       virtual float PropertyElement(mitk::pa::PropertyCalculator::ChromophoreType, int wavelength);
+
+      /*
+      * \brief calculates the relative error between the input image and the unmixing result in the L2 norm
+      * @param endmemberMatrix is a Eigen matrix containing the endmember information
+      * @param inputVector is a Eigen vector containing the multispectral information of one pixel
+      * @param resultVector is a Eigen vector containing the spectral unmmixing result
+      */
+      float CalculateRelativeError(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> endmemberMatrix,
+        Eigen::VectorXf inputVector, Eigen::VectorXf resultVector);
 
       PropertyCalculator::Pointer m_PropertyCalculatorEigen;
     };

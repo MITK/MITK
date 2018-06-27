@@ -52,8 +52,10 @@ void SpectralUnmixing::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.buttonPerformImageProcessing, &QPushButton::clicked, this, &SpectralUnmixing::DoImageProcessing);
   m_Controls.tableWeight->hide();
   m_Controls.tableSO2->hide();
+  m_Controls.tableError->hide();
   connect((QObject*)(m_Controls.QComboBoxAlgorithm), SIGNAL(currentIndexChanged(int)), this, SLOT(EnableGUIWeight()));
   connect((QObject*)(m_Controls.checkBoxsO2), SIGNAL(clicked()), this, SLOT(EnableGUISO2()));
+  connect((QObject*)(m_Controls.checkBoxError), SIGNAL(clicked()), this, SLOT(EnableGUIError()));
   this->connect(this, SIGNAL(finishSignal()), this, SLOT(storeOutputs()));
   this->connect(this, SIGNAL(crashSignal()), this, SLOT(crashInfo()));
 }
@@ -91,6 +93,14 @@ void SpectralUnmixing::EnableGUISO2()
     m_Controls.tableSO2->show();
   else
     m_Controls.tableSO2->hide();
+}
+
+void SpectralUnmixing::EnableGUIError()
+{
+  if (m_Controls.checkBoxError->isChecked())
+    m_Controls.tableError->show();
+  else
+    m_Controls.tableError->hide();
 }
 
 void SpectralUnmixing::SetVerboseMode(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter, bool PluginVerbose)
@@ -280,6 +290,22 @@ void SpectralUnmixing::SetSO2Settings(mitk::pa::SpectralUnmixingSO2::Pointer m_s
   }
 }
 
+void SpectralUnmixing::SetRelativeErrorSettings(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter)
+{
+  for (unsigned int i = 0; i < 2; ++i)
+  {
+    if (m_Controls.tableError->item(0, i))
+    {
+      QString Text = m_Controls.tableError->item(0, i)->text();
+      int value = Text.toInt();
+      MITK_INFO(PluginVerbose) << "Relative error setting value: " << value;
+      m_SpectralUnmixingFilter->AddRelativeErrorSettings(value);
+    }
+    else
+      m_SpectralUnmixingFilter->AddRelativeErrorSettings(0);
+  }
+}
+
 void SpectralUnmixing::CalculateSO2(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter, std::vector<bool> boolVec)
 {
   MITK_INFO(PluginVerbose) << "CALCULATE OXYGEN SATURATION ...";
@@ -334,6 +360,8 @@ void SpectralUnmixing::Settings(mitk::Image::Pointer image)
 
   boolVec.push_back(m_Controls.checkBoxError->isChecked());
   outputNameVec.push_back("Relative Error");
+  if (m_Controls.checkBoxError->isChecked())
+    SetRelativeErrorSettings(m_SpectralUnmixingFilter);
 
   m_SpectralUnmixingFilter->AddOutputs(std::accumulate(boolVec.begin(), boolVec.end(), 0));
   MITK_INFO(PluginVerbose) << "Number of indexed outputs: " << std::accumulate(boolVec.begin(), boolVec.end(), 0);

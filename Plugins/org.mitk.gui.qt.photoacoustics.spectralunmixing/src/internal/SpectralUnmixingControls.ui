@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>398</width>
-    <height>666</height>
+    <width>325</width>
+    <height>742</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -925,15 +925,15 @@
      </row>
      <column>
       <property name="text">
-       <string>Hb</string>
-      </property>
-      <property name="toolTip">
-       <string/>
+       <string>HbO2</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>HbO2</string>
+       <string>Hb</string>
+      </property>
+      <property name="toolTip">
+       <string/>
       </property>
      </column>
      <column>
@@ -948,12 +948,12 @@
      </column>
      <item row="0" column="0">
       <property name="text">
-       <string>100</string>
+       <string>200</string>
       </property>
      </item>
      <item row="0" column="1">
       <property name="text">
-       <string>200</string>
+       <string>100</string>
       </property>
      </item>
      <item row="0" column="2">
@@ -1019,6 +1019,44 @@
     </widget>
    </item>
    <item>
+    <widget class="QTableWidget" name="tableError">
+     <property name="maximumSize">
+      <size>
+       <width>307</width>
+       <height>70</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;* \brief below the threshold calculated relative error will set to zero&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <row>
+      <property name="text">
+       <string>Threshold</string>
+      </property>
+     </row>
+     <column>
+      <property name="text">
+       <string>HbO2</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Hb</string>
+      </property>
+     </column>
+     <item row="0" column="0">
+      <property name="text">
+       <string>150</string>
+      </property>
+     </item>
+     <item row="0" column="1">
+      <property name="text">
+       <string>200</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="buttonPerformImageProcessing">
      <property name="toolTip">
       <string>Do image processing</string>
@@ -1042,8 +1080,8 @@
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>20</width>
-       <height>40</height>
+       <width>17</width>
+       <height>54</height>
       </size>
      </property>
     </spacer>

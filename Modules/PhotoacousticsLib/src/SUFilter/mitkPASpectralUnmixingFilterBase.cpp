@@ -61,6 +61,11 @@ void mitk::pa::SpectralUnmixingFilterBase::RelativeError(bool relativeError)
   m_RelativeError = relativeError;
 }
 
+void mitk::pa::SpectralUnmixingFilterBase::AddRelativeErrorSettings(int value)
+{
+  m_RelativeErrorSettings.push_back(value);
+}
+
 void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
 {
   MITK_INFO(m_Verbose) << "GENERATING DATA..";
@@ -135,7 +140,7 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
 
         if (m_RelativeError == true)
         {
-          float relativeError = (endmemberMatrix*resultVector - inputVector).norm() / inputVector.norm(); // norm() is L2 norm
+          float relativeError = CalculateRelativeError(endmemberMatrix, inputVector, resultVector);
           writteBufferVector[outputCounter][(xDim*yDim * sequenceCounter) + x * yDim + y] = relativeError;
         }
 
@@ -214,4 +219,16 @@ float mitk::pa::SpectralUnmixingFilterBase::PropertyElement(mitk::pa::PropertyCa
     else
       return value;
   }
+}
+
+float mitk::pa::SpectralUnmixingFilterBase::CalculateRelativeError(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> endmemberMatrix,
+  Eigen::VectorXf inputVector, Eigen::VectorXf resultVector)
+{
+  float relativeError = (endmemberMatrix*resultVector - inputVector).norm() / inputVector.norm();
+  for (int i = 0; i < 2; ++i)
+  {
+    if (resultVector[i] < m_RelativeErrorSettings[i])
+      return 0;
+  }
+  return relativeError;
 }

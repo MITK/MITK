@@ -64,11 +64,12 @@ class SpectralUnmixing : public QmitkAbstractView
     void DoImageProcessing();
   
     /**
-    * \brief slots are there to show/hide input tables for weights- and SO2 settings ig they are not needed
+    * \brief slots are there to show/hide input tables for weights-, relative error and SO2 settings ig they are not needed
     */
   public slots:
     void EnableGUIWeight();
     void EnableGUISO2();
+    void EnableGUIError();
 
     /**
     * \brief slot waits for finishSignal of the working thread and starts storeOutputs
@@ -117,7 +118,7 @@ class SpectralUnmixing : public QmitkAbstractView
     std::string errorMessage;
 
   private:
-    /*
+    /**
     * \brief thread
     * - disables GUI
     * - tries Filter->Update() method
@@ -134,7 +135,7 @@ class SpectralUnmixing : public QmitkAbstractView
     */
     virtual void Settings(mitk::Image::Pointer image);
 
-    /*
+    /**
     * \brief The method takes a image pointer and a file name which then will get to the data storage.
     * @param m_Image is a mitk_::Image::Pointer pointing at the output which one wants to get stored
     * @param name has to be a string and will be the file name
@@ -148,13 +149,13 @@ class SpectralUnmixing : public QmitkAbstractView
     */
     virtual void SetVerboseMode(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter, bool PluginVerbose);
 
-    /*
+    /**
     * \brief passes the wavelength information from the GUI on to the spectral unmixing filter base method "AddWavelength".
     * @param m_SpectralUnmixingFilter is a pointer of the spectral unmixing filter base
     */
     virtual void SetWavlength(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter);
 
-    /*
+    /**
     * \brief passes the chromophore information from the GUI on to the spectral unmixing filter base method "AddChromophore".
     * @param m_SpectralUnmixingFilter is a pointer of the spectral unmixing filter base
     * @param boolVec is a vector which contains the information which chromophore was checked in the GUI
@@ -162,6 +163,12 @@ class SpectralUnmixing : public QmitkAbstractView
     * @throws "PRESS 'IGNORE' AND CHOOSE A CHROMOPHORE!" if no chromophore was chosen
     */
     virtual void SetChromophore(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter, std::vector<bool> boolVec, std::vector<std::string> chromophoreNameVec);
+
+    /**
+    * \brief passes the SetRelativeErrorSettings information from the GUI on to the spectral unmixing filter base method "AddRelativeErrorSettings".
+    * @param m_SpectralUnmixingFilter is a pointer of the spectral unmixing filter base#
+    */
+    virtual void SetRelativeErrorSettings(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter);
 
     /**
     * \brief passes the SetSO2Settings information from the GUI on to the spectral unmixing SO2 filter method "AddSO2Settings".

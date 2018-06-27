@@ -96,7 +96,10 @@ public:
     MITK_INFO << "START FILTER TEST ... ";
     // Set input image
     auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+    m_SpectralUnmixingFilter->Verbose(true);
+    m_SpectralUnmixingFilter->RelativeError(false);
     m_SpectralUnmixingFilter->SetInput(inputImage);
+    m_SpectralUnmixingFilter->AddOutputs(2);
 
     //Set wavelengths to filter
     for (unsigned int imageIndex = 0; imageIndex < m_inputWavelengths.size(); imageIndex++)
@@ -154,7 +157,9 @@ public:
     // Set input image
     auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
     m_SpectralUnmixingFilter->SetInput(inputImage);
-
+    m_SpectralUnmixingFilter->AddOutputs(2);
+    m_SpectralUnmixingFilter->Verbose(true);
+    m_SpectralUnmixingFilter->RelativeError(false);
 
 
     //Set wavelengths to filter
@@ -215,6 +220,9 @@ public:
     // Set input image
     auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterSimplex::New();
     m_SpectralUnmixingFilter->SetInput(inputImage);
+    m_SpectralUnmixingFilter->AddOutputs(2);
+    m_SpectralUnmixingFilter->Verbose(true);
+    m_SpectralUnmixingFilter->RelativeError(false);
 
     //Set wavelengths to filter
     for (unsigned int imageIndex = 0; imageIndex < m_inputWavelengths.size(); imageIndex++)

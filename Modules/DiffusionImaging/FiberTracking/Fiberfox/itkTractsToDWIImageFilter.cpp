@@ -980,12 +980,16 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     PrintToLog("b-values: ", false, false, true);
     for (auto v : bVals)
       PrintToLog(boost::lexical_cast<std::string>(v) + " ", false, false, true);
+    PrintToLog("\nVolumes: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.GetNumVolumes()), false, true, true);
 
     PrintToLog("\n", false, false, true);
     PrintToLog("\n", false, false, true);
 
+    unsigned int image_size_x = m_WorkingImageRegion.GetSize(0);
+    unsigned int region_size_y = m_WorkingImageRegion.GetSize(1);
+    unsigned int num_gradients = m_Parameters.m_SignalGen.GetNumVolumes();
     int numFibers = m_FiberBundle->GetNumFibers();
-    boost::progress_display disp(numFibers*m_Parameters.m_SignalGen.GetNumVolumes());
+    boost::progress_display disp(numFibers*num_gradients);
 
     if (m_FiberBundle->GetMeanFiberLength()<5.0)
       omp_set_num_threads(2);
@@ -993,7 +997,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false, true, false);
     PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false, false);
 
-    for (unsigned int g=0; g<m_Parameters.m_SignalGen.GetNumVolumes(); ++g)
+    for (unsigned int g=0; g<num_gradients; ++g)
     {
       // move fibers
       SimulateMotion(g);
@@ -1015,6 +1019,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
       intraAxonalVolumeImage->Allocate();
       intraAxonalVolumeImage->FillBuffer(0);
       maxVolume = 0;
+      double* intraAxBuffer = intraAxonalVolumeImage->GetBufferPointer();
 
       if (this->GetAbortGenerateData())
         continue;
@@ -1023,8 +1028,11 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
       // generate fiber signal (if there are any fiber models present)
       if (!m_Parameters.m_FiberModelList.empty())
       {
+        std::vector< double* > buffers;
+        for (unsigned int i=0; i<m_CompartmentImages.size(); ++i)
+          buffers.push_back(m_CompartmentImages.at(i)->GetBufferPointer());
 #pragma omp parallel for
-        for( int i=0; i<numFibers; i++ )
+        for( int i=0; i<numFibers; ++i )
         {
           if (this->GetAbortGenerateData())
             continue;
@@ -1045,7 +1053,8 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
           if (numPoints<2)
             continue;
 
-          for( int j=0; j<numPoints - 1; j++)
+          double seg_volume = fiberWeight*itk::Math::pi*m_mmRadius*m_mmRadius;
+          for( int j=0; j<numPoints - 1; ++j)
           {
             if (this->GetAbortGenerateData())
             {
@@ -1074,29 +1083,30 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
             std::vector< std::pair< itk::Index<3>, double > > segments = mitk::imv::IntersectImage(m_WorkingSpacing, startIndex, endIndex, startIndexCont, endIndexCont);
 
-            for (std::pair< itk::Index<3>, double > seg : segments)
+            // generate signal for each fiber compartment
+            for (int k=0; k<numFiberCompartments; ++k)
             {
-              if (!m_TransformedMaskImage->GetLargestPossibleRegion().IsInside(seg.first) || m_TransformedMaskImage->GetPixel(seg.first)<=0)
-                continue;
-
-              // generate signal for each fiber compartment
-              for (int k=0; k<numFiberCompartments; k++)
+              double signal_add = m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g, dir)*seg_volume;
+              for (std::pair< itk::Index<3>, double > seg : segments)
               {
-                double seg_volume = seg.second*fiberWeight*itk::Math::pi*m_mmRadius*m_mmRadius;
-                double signal_add = seg_volume*m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g, dir);
+                if (!m_TransformedMaskImage->GetLargestPossibleRegion().IsInside(seg.first) || m_TransformedMaskImage->GetPixel(seg.first)<=0)
+                  continue;
 
-#pragma omp critical
-                {
-                  DoubleDwiType::PixelType pix = m_CompartmentImages.at(k)->GetPixel(seg.first);
-                  pix[g] += signal_add;
-                  m_CompartmentImages.at(k)->SetPixel(seg.first, m_CompartmentImages.at(k)->GetPixel(seg.first));
-                }
+                double seg_signal = seg.second*signal_add;
 
+                unsigned int linear_index = g + num_gradients*seg.first[0] + num_gradients*image_size_x*seg.first[1] + num_gradients*image_size_x*region_size_y*seg.first[2];
+
+                // update dMRI volume
+#pragma omp atomic
+                buffers[k][linear_index] += seg_signal;
+
+                // update fiber volume image
                 if (k==0)
                 {
-                  // update fiber volume image
-                  double vol = intraAxonalVolumeImage->GetPixel(seg.first) + seg_volume;
-                  intraAxonalVolumeImage->SetPixel(seg.first, vol);
+                  linear_index = seg.first[0] + image_size_x*seg.first[1] + image_size_x*region_size_y*seg.first[2];
+#pragma omp atomic
+                  intraAxBuffer[linear_index] += seg.second*seg_volume;
+                  double vol = intraAxBuffer[linear_index];
                   if (vol>maxVolume) { maxVolume = vol; }
                 }
               }
@@ -1257,22 +1267,22 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     }
     }
 
-    if (m_Parameters.m_SignalGen.m_NoiseVariance>0 && m_Parameters.m_Misc.m_DoAddNoise)
-      PrintToLog("Simulating complex Gaussian noise", false);
     if (m_Parameters.m_SignalGen.m_DoSimulateRelaxation)
       PrintToLog("Simulating signal relaxation", false);
+    if (m_Parameters.m_SignalGen.m_NoiseVariance>0 && m_Parameters.m_Misc.m_DoAddNoise)
+      PrintToLog("Simulating complex Gaussian noise: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_NoiseVariance), false);
     if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull() && m_Parameters.m_Misc.m_DoAddDistortions)
       PrintToLog("Simulating distortions", false);
     if (m_Parameters.m_SignalGen.m_DoAddGibbsRinging)
       PrintToLog("Simulating ringing artifacts", false);
     if (m_Parameters.m_Misc.m_DoAddEddyCurrents && m_Parameters.m_SignalGen.m_EddyStrength>0)
-      PrintToLog("Simulating eddy currents", false);
+      PrintToLog("Simulating eddy currents: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_EddyStrength), false);
     if (m_Parameters.m_Misc.m_DoAddSpikes && m_Parameters.m_SignalGen.m_Spikes>0)
-      PrintToLog("Simulating spikes", false);
+      PrintToLog("Simulating spikes: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_Spikes), false);
     if (m_Parameters.m_Misc.m_DoAddAliasing && m_Parameters.m_SignalGen.m_CroppingFactor<1.0)
-      PrintToLog("Simulating aliasing artifacts", false);
+      PrintToLog("Simulating aliasing: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_CroppingFactor), false);
     if (m_Parameters.m_Misc.m_DoAddGhosts && m_Parameters.m_SignalGen.m_KspaceLineOffset>0)
-      PrintToLog("Simulating ghosts", false);
+      PrintToLog("Simulating ghosts: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_KspaceLineOffset), false);
 
     doubleOutImage = SimulateKspaceAcquisition(m_CompartmentImages);
     signalScale = 1; // already scaled in SimulateKspaceAcquisition()
@@ -1300,11 +1310,11 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
   PrintToLog("Finalizing image");
   if (m_Parameters.m_SignalGen.m_DoAddDrift && m_Parameters.m_SignalGen.m_Drift>0.0)
-    PrintToLog("Adding signal drift", false);
+    PrintToLog("Adding signal drift: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_Drift), false);
   if (signalScale>1)
     PrintToLog("Scaling signal", false);
   if (m_Parameters.m_NoiseModel)
-    PrintToLog("Adding noise", false);
+    PrintToLog("Adding noise: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_NoiseVariance), false);
   unsigned int window = 0;
   unsigned int min = itk::NumericTraits<unsigned int>::max();
   ImageRegionIterator<OutputImageType> it4 (m_OutputImage, m_OutputImage->GetLargestPossibleRegion());
@@ -1529,13 +1539,13 @@ itk::Point<double, 3> TractsToDWIImageFilter< PixelType >::GetMovedPoint(itk::In
     if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
     {
       transformed_point = m_FiberBundle->TransformPoint(transformed_point.GetVnlVector(),
-                                                                   m_Rotation[0],m_Rotation[1],m_Rotation[2],
+                                                        m_Rotation[0],m_Rotation[1],m_Rotation[2],
           m_Translation[0],m_Translation[1],m_Translation[2]);
     }
     else
     {
       transformed_point = m_FiberBundle->TransformPoint(transformed_point.GetVnlVector(),
-                                                                   m_Rotation[0]*m_MotionCounter,m_Rotation[1]*m_MotionCounter,m_Rotation[2]*m_MotionCounter,
+                                                        m_Rotation[0]*m_MotionCounter,m_Rotation[1]*m_MotionCounter,m_Rotation[2]*m_MotionCounter,
           m_Translation[0]*m_MotionCounter,m_Translation[1]*m_MotionCounter,m_Translation[2]*m_MotionCounter);
     }
   }
@@ -1545,13 +1555,13 @@ itk::Point<double, 3> TractsToDWIImageFilter< PixelType >::GetMovedPoint(itk::In
     if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
     {
       transformed_point = m_FiberBundle->TransformPoint( transformed_point.GetVnlVector(),
-                                                                    -m_Rotation[0], -m_Rotation[1], -m_Rotation[2],
+                                                         -m_Rotation[0], -m_Rotation[1], -m_Rotation[2],
           -m_Translation[0], -m_Translation[1], -m_Translation[2] );
     }
     else
     {
       transformed_point = m_FiberBundle->TransformPoint( transformed_point.GetVnlVector(),
-                                                                    -m_Rotation[0]*m_MotionCounter, -m_Rotation[1]*m_MotionCounter, -m_Rotation[2]*m_MotionCounter,
+                                                         -m_Rotation[0]*m_MotionCounter, -m_Rotation[1]*m_MotionCounter, -m_Rotation[2]*m_MotionCounter,
           -m_Translation[0]*m_MotionCounter, -m_Translation[1]*m_MotionCounter, -m_Translation[2]*m_MotionCounter );
     }
   }

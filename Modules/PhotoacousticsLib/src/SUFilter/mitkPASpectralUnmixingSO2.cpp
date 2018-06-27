@@ -73,7 +73,7 @@ void mitk::pa::SpectralUnmixingSO2::GenerateData()
         unsigned int pixelNumber = (xDim*yDim * z) + x * yDim + y;
         float pixelHb = inputDataArrayHb[pixelNumber];
         float pixelHbO2 = inputDataArrayHbO2[pixelNumber];
-        float resultSO2 = calculateSO2(pixelHb, pixelHbO2);
+        float resultSO2 = CalculateSO2(pixelHb, pixelHbO2);
         writeBuffer[(xDim*yDim * z) + x * yDim + y] = resultSO2;
       }
     }
@@ -116,38 +116,40 @@ void mitk::pa::SpectralUnmixingSO2::InitializeOutputs()
   }
 }
 
-float mitk::pa::SpectralUnmixingSO2::calculateSO2(float Hb, float HbO2)
+float mitk::pa::SpectralUnmixingSO2::CalculateSO2(float Hb, float HbO2)
 {
-  float MinHb = m_SO2Settings[0];
-  float MinHbO2 = m_SO2Settings[1];
-  float MinSum = m_SO2Settings[2];
-  float MinSO2 = m_SO2Settings[3];
   float result = HbO2 / (Hb + HbO2);
-  float zero = 0.0;
 
   if (result != result)
   {
     MITK_WARN(m_Verbose) << "SO2 VALUE NAN! WILL BE SET TO ZERO!";
-    return zero;
+    return 0;
   }
   else
   {
-    if (MinHb != 0 && MinHb > Hb)
-      return zero;
-    else if (MinHbO2 != 0 && MinHbO2 > HbO2)
-      return zero;
-    else if (MinSum != 0 && MinSum > Hb + HbO2)
-      return zero;
-    else if (MinSO2 != 0 && 100 * result > MinSO2)
-      return result;
-    else if (MinSO2 != 0 && result < MinSO2)
-      return zero;
-    else
-      return result;
+    if (SO2ValueNotSiginificant(Hb, HbO2, result))
+      return 0;
+    else return result;
   }
 }
 
-void mitk::pa::SpectralUnmixingSO2::AddSO2Settings(float value)
+void mitk::pa::SpectralUnmixingSO2::AddSO2Settings(int value)
 {
   m_SO2Settings.push_back(value);
+}
+
+bool mitk::pa::SpectralUnmixingSO2::SO2ValueNotSiginificant(float Hb, float HbO2, float result)
+{
+  std::vector<int> significant;
+  significant.push_back(HbO2);
+  significant.push_back(Hb);
+  significant.push_back(HbO2 + Hb);
+  significant.push_back(100*(result));
+
+  for (unsigned int i = 0; i < m_SO2Settings.size(); ++i)
+  {
+    if (m_SO2Settings[i] >= significant[i])
+      return true;
+  }
+  return false;
 }

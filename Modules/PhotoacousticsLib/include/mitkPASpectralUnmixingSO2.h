@@ -48,11 +48,11 @@ namespace mitk {
 
       /**
       * \brief AddSO2Settings takes integers and writes them at the end of the m_SO2Settings vector.
-      * @param value has to be a integer
+      * @param value of the Setting
       */
-      virtual void AddSO2Settings(float value);
+      virtual void AddSO2Settings(int value);
 
-      /*
+      /**
       * \brief Verbose gives more information to the console. Default value is false.
       * @param m_Verbose is the boolian to activate the MITK_INFO logged to the console
       */
@@ -69,31 +69,36 @@ namespace mitk {
       bool m_Verbose = false;
 
     private:
-      /*
+      /**
       * \brief Inherit from the "ImageToImageFilter" Superclass. Herain it calls InitializeOutputs and the CheckPreConditions
       * methods and enables pixelwise access to the inputs to calculate the oxygen saturation via the "calculate SO2" method.
       */
       virtual void GenerateData() override;
 
-      /*
+      /**
       * \brief Initialized output images with the same size like the input image. The pixel type is set to float.
       */
       virtual void InitializeOutputs();
 
-      /*
+      /**
       * \brief Checks if the dimensions of the input images are equal.
       * @throws if tey are not
       */
       virtual void CheckPreConditions(mitk::Image::Pointer inputHbO2, mitk::Image::Pointer inputHb);
 
-      /*
-      * \brief calculates HbO2 / (Hb + HbO2) and afterwards checks if the result and inputs are above threshold values of the
-      * settings. If they are not the method returns zero otherwise it returns the calculated result.
+      /**
+      * \brief calculates HbO2 / (Hb + HbO2) and afterwards checks if the result is significant (SO2ValueNotSiginificant method).
+      * If not the method returns zero otherwise it returns the calculated result.
       * @param pixelHb is the pixel value of the Hb input.
       * @param pixelHb is the pixel value of the Hb input.
       * @warn if the HbO2 value is NAN (in patricular if Hb == -HbO2), but result will be set to zero
       */
-      float calculateSO2(float pixelHb, float pixelHbO2);
+      float CalculateSO2(float pixelHb, float pixelHbO2);
+
+      /**
+      * \brief return true if SO2 result is not significant by checking if the input values are above the threshold of the settings
+      */
+      bool SO2ValueNotSiginificant(float Hb, float HbO2, float result);
     };
   }
 }

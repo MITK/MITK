@@ -278,10 +278,10 @@ void SpectralUnmixing::SetSO2Settings(mitk::pa::SpectralUnmixingSO2::Pointer m_s
 {
   for (unsigned int i = 0; i < 4; ++i)
   {
-    if (m_Controls.inputtable->item(0, i))
+    if (m_Controls.tableSO2->item(0, i))
     {
       QString Text = m_Controls.tableSO2->item(0, i)->text();
-      float value = Text.toFloat();
+      int value = Text.toInt();
       MITK_INFO(PluginVerbose) << "SO2 setting value: " << value;
       m_sO2->AddSO2Settings(value);
     }

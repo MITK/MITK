@@ -65,13 +65,13 @@ namespace mitk
     * @brief Adds the given concrete observer to the vector that holds all currently registered observer.
     *        If the observer is already registered, it will not be added to the observer vector.
     *
-    * @par observer   The concrete observer to register.
+    * @param observer   The concrete observer to register.
     */
     virtual void AddObserver(ISemanticRelationsObserver* observer) override;
     /*
     * @brief Removes the given concrete observer from the vector that holds all currently registered observer.
     *
-    * @par observer   The concrete observer to unregister.
+    * @param observer   The concrete observer to unregister.
     */
     virtual void RemoveObserver(ISemanticRelationsObserver* observer) override;
 
@@ -83,15 +83,15 @@ namespace mitk
     *         The lesions may be marked by a segmentation or may be empty - with no connection to a specific image / segmentation of the case data.
     *         If no lesions are stored for the current case, an empty vector is returned.
     *
-    * @par caseID    The current case identifier is defined by the given string.
+    * @param caseID    The current case identifier is defined by the given string.
     * @return        A vector of lesions.
     */
     LesionVector GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID) const;
     /*
     * @brief  Returns a vector of all lesions that are valid for the given case, given a specific lesion
     *
-    * @par caseID         The current case identifier is defined by the given string.
-    * @par controlPoint   A specific control point which has to be available at a returned (found) lesion:
+    * @param caseID         The current case identifier is defined by the given string.
+    * @param controlPoint   A specific control point which has to be available at a returned (found) lesion:
     *                     Only those lesions are returned for which the image of the associated segmentation is linked to the given control point.
     *                     If the control point instance does not exist, an empty vector is returned.
     * @return             A vector of control points.
@@ -106,7 +106,7 @@ namespace mitk
     * @throw  mitk::Exception if the given image data node is invalid (==nullptr).
     * @pre    The image node has to have associated segmentation nodes (child nodes) in order to reference a lesion.
     *
-    * @par imageNode    The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param imageNode    The current case identifier is extracted from the given data node, which contains DICOM information about the case.
     * @return           A vector of lesions.
     */
     LesionVector GetAllLesionsInImage(const DataNode* imageNode) const;
@@ -118,7 +118,7 @@ namespace mitk
     * @pre    The segmentation data node has to represent a lesion. If not, the retrieved lesion will be empty, which leads to an exception.
     * @throw  SemanticRelationException, if the segmentation does not represent an existing lesion (this can be checked via 'IsRepresentingALesion').
     *
-    * @par segmentationNode   The segmentation identifier is extracted from the given data node.
+    * @param segmentationNode   The segmentation identifier is extracted from the given data node.
     * @return                 The represented lesion.
     */
     SemanticTypes::Lesion GetRepresentedLesion(const DataNode* segmentationNode) const;
@@ -126,7 +126,7 @@ namespace mitk
     * @brief  Check if the given segmentation refers to an existing lesion instance.
     *         This function can be used before calling 'GetRepresentedLesion' in order to avoid a possible exception.
     *
-    * @par segmentationNode   The segmentation identifier is extracted from the given data node.
+    * @param segmentationNode   The segmentation identifier is extracted from the given data node.
     * @return                 True, if the segmentation refers to an existing lesion; false otherwise.
     */
     bool IsRepresentingALesion(const DataNode* segmentationNode) const;
@@ -138,7 +138,7 @@ namespace mitk
     * @pre    The data storage member has to be valid (!nullptr).
     * @throw  mitk::Exception if the data storage member is invalid (==nullptr).
     *
-    * @par caseID    The current case identifier is defined by the given string.
+    * @param caseID    The current case identifier is defined by the given string.
     * @return        A vector of data nodes representing segmentations.
     */
     mitk::SemanticRelations::DataNodeVector GetAllSegmentationsOfCase(const SemanticTypes::CaseID& caseID) const;
@@ -151,8 +151,8 @@ namespace mitk
     * @pre    The UID of the lesion has to exist for a lesion instance.
     * @throw  SemanticRelationException, if UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
     *
-    * @par caseID   The current case identifier is defined by the given string.
-    * @par lesion   A Lesion with a UID that identifies the corresponding lesion instance.
+    * @param caseID   The current case identifier is defined by the given string.
+    * @param lesion   A Lesion with a UID that identifies the corresponding lesion instance.
     * @return       A vector of data nodes representing segmentations that define the given lesion.
     */
     DataNodeVector GetAllSegmentationsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const;
@@ -162,7 +162,7 @@ namespace mitk
     * @pre    The data storage member has to be valid (!nullptr).
     * @throw  mitk::Exception if the data storage member is invalid (==nullptr).
     *
-    * @par caseID    The current case identifier is defined by the given string.
+    * @param caseID    The current case identifier is defined by the given string.
     * @return        A vector of data nodes representing images.
     */
     DataNodeVector GetAllImagesOfCase(const SemanticTypes::CaseID& caseID) const;
@@ -173,8 +173,8 @@ namespace mitk
     * @pre    The UID of the lesion has to exist for a lesion instance.
     * @throw  SemanticRelationException, if UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
     *
-    * @par caseID   The current case identifier is defined by the given string.
-    * @par lesion   A Lesion with a UID that identifies the corresponding lesion instance.
+    * @param caseID   The current case identifier is defined by the given string.
+    * @param lesion   A Lesion with a UID that identifies the corresponding lesion instance.
     * @return       A vector of data nodes representing images on which the lesions are visible.
     */
     DataNodeVector GetAllImagesOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const;
@@ -183,23 +183,23 @@ namespace mitk
     *         This function can be used before calling 'GetAllSegmentationsOfLesion' in order to avoid a possible exception.
     *         This function can be used before calling 'AddLesionInstance' in order to avoid a possible exception.
     *
-    * @par caseID   The current case identifier is defined by the given string.
-    * @par lesion   A Lesion with a UID that identifies the corresponding lesion instance.
+    * @param caseID   The current case identifier is defined by the given string.
+    * @param lesion   A Lesion with a UID that identifies the corresponding lesion instance.
     * @return       True, if the lesion instance exists; false otherwise.
     */
     bool InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const;
     /*
     * @brief Return a vector of all control points that are valid for the given case.
     *
-    * @par caseID           The current case identifier is defined by the given string.
+    * @param caseID           The current case identifier is defined by the given string.
     * @return               A vector of control points.
     */
     ControlpointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID) const;
     /*
     * @brief Return a vector of all control points that are valid for the given case, given a specific lesion
     *
-    * @par caseID           The current case identifier is defined by the given string.
-    * @par lesion           A specific lesion which has to be available at a returned (found) control point:
+    * @param caseID           The current case identifier is defined by the given string.
+    * @param lesion           A specific lesion which has to be available at a returned (found) control point:
     *                       Only those control points are returned for which an associated data has a segmentation that references the given lesion.
     *                       If the lesion does not exists, an empty vector is returned.
     * @return               A vector of control points.
@@ -208,8 +208,8 @@ namespace mitk
     /*
     * @brief Return a vector of all control points that are valid for the given case, given a specific information type.
     *
-    * @par caseID           The current case identifier is defined by the given string.
-    * @par informationType  A specific information type which has to be available at a returned (found) control point:
+    * @param caseID           The current case identifier is defined by the given string.
+    * @param informationType  A specific information type which has to be available at a returned (found) control point:
     *                       Only those control points are returned for which an associated data has the given information type.
     *                       If the information type instance does not exists, an empty vector is returned.
     * @return               A vector of control points.
@@ -223,44 +223,44 @@ namespace mitk
     * @pre    The given data node has to be valid (!nullptr).
     * @throw  mitk::Exception if the given data node is invalid (==nullptr).
     *
-    * @par dataNode   The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param dataNode   The current case identifier is extracted from the given data node, which contains DICOM information about the case.
     * @return         The control point of the given data node.
     */
     SemanticTypes::ControlPoint GetControlPointOfData(const DataNode* dataNode) const;
     /*
-    * @brief  Return a vector of all data nodes that link to the given control point.
+    * @brief  Return a vector of all image nodes that link to the given control point.
     *         If the control point is not referred to by any data node, an empty vector is returned.
     *
     * @pre    The UID of the control point has to exist for a control point instance.
     * @throw  SemanticRelationException, if the UID of the control point does not exist for a control point instance (this can be checked via 'InstanceExists').
     *
-    * @par caseID         The current case identifier is defined by the given string.
-    * @par controlPoint   A control point with a UID that identifies the corresponding control point instance.
-    * @return             A vector of data nodes that link to the given control point.
+    * @param caseID         The current case identifier is defined by the given string.
+    * @param controlPoint   A control point with a UID that identifies the corresponding control point instance.
+    * @return             A vector of image nodes that link to the given control point.
     */
-    DataNodeVector GetAllDataOfControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const;
+    DataNodeVector GetAllImagesOfControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const;
     /*
     * @brief  Check if the given control point instance exists.
     *         This function can be used before calling 'GetAllDataOfControlPoint' in order to avoid a possible exception.
     *         This function can be used before adding, linking and unlinking control points to avoid a possible exception.
     *
-    * @par caseID         The current case identifier is defined by the given string.
-    * @par controlPoint   A control point with a UID that identifies the corresponding control point instance.
+    * @param caseID         The current case identifier is defined by the given string.
+    * @param controlPoint   A control point with a UID that identifies the corresponding control point instance.
     * @return             True, if the control point instance exists; false otherwise.
     */
     bool InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const;
     /*
     * @brief  Return a vector of all information types that are valid for the given case.
     *
-    * @par caseID         The current case identifier is defined by the given string.
+    * @param caseID         The current case identifier is defined by the given string.
     * @return             A vector of information types.
     */
     InformationTypeVector GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID) const;
     /*
     * @brief  Return a vector of all information types that are valid for the given case, given a specific control point.
     *
-    * @par caseID         The current case identifier is defined by the given string.
-    * @par controlPoint   A specific control point which has to be available at a returned (found) information type:
+    * @param caseID         The current case identifier is defined by the given string.
+    * @param controlPoint   A specific control point which has to be available at a returned (found) information type:
     *                     Only those information types are returned for which an associated data is linked to the given control point.
     *                     If the control point instance does not exist, an empty vector is returned.
     * @return             A vector of information types.
@@ -273,41 +273,56 @@ namespace mitk
     * @pre    The given image data node has to be valid (!nullptr).
     * @throw  mitk::Exception if the given image data node is invalid (==nullptr).
     *
-    * @par imageNode    The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param imageNode    The current case identifier is extracted from the given data node, which contains DICOM information about the case.
     * @return           The information type of the given data node.
     */
     SemanticTypes::InformationType GetInformationTypeOfImage(const DataNode* imageNode) const;
     /*
-    * @brief  Return a vector of all data nodes that are defined as the given information type.
+    * @brief  Return a vector of all image nodes that are defined with the given information type.
     *
     * @pre    The information type has to exist for the given case (and is therefore used by at least one data node).
     * @throw  SemanticRelationException, if the information type is not used by any data node (this can be checked via 'InstanceExists').
     *
-    * @par caseID             The current case identifier is defined by the given string.
-    * @par informationType    An information type that identifies the corresponding information type instance.
-    * @return                 A vector of data nodes that are defined as the given information type.
+    * @param caseID             The current case identifier is defined by the given string.
+    * @param informationType    An information type that identifies the corresponding information type instance.
+    * @return                 A vector of image nodes that are defined with the given information type.
     */
-    DataNodeVector GetAllDataOfInformationType(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const;
+    DataNodeVector GetAllImagesOfInformationType(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const;
     /*
-    * @brief  Return a vector of all data nodes that are defined as the given information type with the given control point.
-
+    * @brief  Return a vector of all image nodes that are defined with the given information type and with the given control point.
+    *
     * @pre    The UID of the control point has to exist for a control point instance.
     *         The information type has to exist for the given case (and is therefore used by at least one data node).
     * @throw  SemanticRelationException, if the UID of the control point does not exist for a control point instance (this can be checked via 'InstanceExists') or
-    *                                    if the information type is not used by any data node (this can be checked via 'InstanceExists')
+    *                                    if the information type is not used by any data node (this can be checked via 'InstanceExists').
     *
-    * @par caseID             The current case identifier is defined by the given string.
-    * @par controlPoint       A control point with a UID that identifies the corresponding control point instance.
-    * @par informationType    An information type that identifies the corresponding information type instance.
-    * @return                 A vector of data nodes that are defined as the given information type with the given control point.
+    * @param caseID             The current case identifier is defined by the given string.
+    * @param controlPoint       A control point with a UID that identifies the corresponding control point instance.
+    * @param informationType    An information type that identifies the corresponding information type instance.
+    * @return                   A vector of image nodes that are defined with the given information type with the given control point.
     */
-    DataNodeVector GetFilteredData(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::InformationType& informationType) const;
+    DataNodeVector GetAllSpecificImages(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::InformationType& informationType) const;
+    /**
+    * @brief Return a vector of all segmentation nodes that are defined with the given information type and with the given control point.
+    *        The function uses the 'GetAllSpecificImages'-function to retrieve the specific images and then searches for the derived nodes (segmentation child nodes).
+    *
+    * @pre    The UID of the control point has to exist for a control point instance.
+    *         The information type has to exist for the given case (and is therefore used by at least one data node).
+    * @throw  SemanticRelationException, if the UID of the control point does not exist for a control point instance (this can be checked via 'InstanceExists') or
+    *                                    if the information type is not used by any data node (this can be checked via 'InstanceExists').
+    *
+    * @param caseID             The current case identifier is defined by the given string.
+    * @param controlPoint       A control point with a UID that identifies the corresponding control point instance.
+    * @param informationType    An information type that identifies the corresponding information type instance.
+    * @return                   A vector of segmentation nodes that are defined with the given information type with the given control point.
+    */
+    DataNodeVector GetAllSpecificSegmentations(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::InformationType& informationType) const;
     /*
     * @brief  Check if the given information type exists.
     *         This function can be used before calling 'GetAllDataOfInformationType' in order to avoid a possible exception.
     *
-    * @par caseID             The current case identifier is defined by the given string.
-    * @par informationType    An information type
+    * @param caseID             The current case identifier is defined by the given string.
+    * @param informationType    An information type
     * @return                 True, if the information type exists; false otherwise.
     */
     bool InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const;
@@ -331,7 +346,7 @@ namespace mitk
     * @pre    The given image data node has to be valid (!nullptr).
     * @throw  mitk::Exception if the given image data node is invalid (==nullptr).
     *
-    * @par imageNode   The current case identifier and node identifier is extracted from the given image data node, which contains DICOM information about the case and the node.
+    * @param imageNode   The current case identifier and node identifier is extracted from the given image data node, which contains DICOM information about the case and the node.
     */
     void AddImage(const DataNode* imageNode);
     /*
@@ -340,7 +355,7 @@ namespace mitk
     * @pre    The given image data node has to be valid (!nullptr).
     * @throw  mitk::Exception if the given image data node is invalid (==nullptr).
     *
-    * @par imageNode   The current case identifier and node identifier is extracted from the given image data node, which contains DICOM information about the case and the node.
+    * @param imageNode   The current case identifier and node identifier is extracted from the given image data node, which contains DICOM information about the case and the node.
     */
     void RemoveImage(const DataNode* imageNode);
     /*
@@ -349,8 +364,8 @@ namespace mitk
     * @pre    The UID of the lesion must not already exist for a lesion instance.
     * @throw  SemanticRelationException, it the UID of the lesion already exists for a lesion instance (this can be checked via 'InstanceExists').
     *
-    * @par caseID   The current case identifier is defined by the given string.
-    * @par lesion   The lesion instance to add.
+    * @param caseID   The current case identifier is defined by the given string.
+    * @param lesion   The lesion instance to add.
     */
     void AddLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
     /*
@@ -359,8 +374,8 @@ namespace mitk
     * @pre    The UID of the lesion has to exist for a lesion instance.
     * @throw  SemanticRelationException, if the UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
     *
-    * @par caseID   The current case identifier is defined by the given string.
-    * @par lesion   The lesion instance that overwrites an existing lesion.
+    * @param caseID   The current case identifier is defined by the given string.
+    * @param lesion   The lesion instance that overwrites an existing lesion.
     */
     void OverwriteLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
     /*
@@ -373,8 +388,8 @@ namespace mitk
     * @pre    The UID of the lesion must not already exist for a lesion instance.
     * @throw  SemanticRelationException, if the UID of the lesion already exists for a lesion instance (this can be checked via 'InstanceExists').
     *
-    * @par segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
-    * @par lesion             The lesion instance to add and link.
+    * @param segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
+    * @param lesion             The lesion instance to add and link.
     */
     void AddLesionAndLinkSegmentation(const DataNode* segmentationNode, const SemanticTypes::Lesion& lesion);
     /*
@@ -385,15 +400,15 @@ namespace mitk
     * @pre    The function needs to assure that no segmentation is still representing (linked to) this lesion.
     * @throw  SemanticRelationException, if the lesion instance to remove is still linked to by any segmentation (this can be checked via 'GetAllSegmentationsOfLesion').
     *
-    * @par caseID   The current case identifier is defined by the given string.
-    * @par lesion   The lesion instance to remove.
+    * @param caseID   The current case identifier is defined by the given string.
+    * @param lesion   The lesion instance to remove.
     */
     void RemoveLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
     /*
     * @brief  Add a segmentation instance to the set of already existing segmentations - with no connection to a specific lesion.
     *
-    * @par segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
-    * @par parentNode         The node identifier of the parent node is extracted from the given parent data node.
+    * @param segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
+    * @param parentNode         The node identifier of the parent node is extracted from the given parent data node.
     */
     void AddSegmentation(const DataNode* segmentationNode, const DataNode* parentNode);
     /*
@@ -405,8 +420,8 @@ namespace mitk
     * @pre    The UID of the lesion has to exist for a lesion instance.
     * @throw  SemanticRelationException, if the UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
     *
-    * @par segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
-    * @par lesion             The lesion instance to link.
+    * @param segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
+    * @param lesion             The lesion instance to link.
     */
     void LinkSegmentationToLesion(const DataNode* segmentationNode, const SemanticTypes::Lesion& lesion);
     /*
@@ -416,7 +431,7 @@ namespace mitk
     * @pre    The given segmentation data node has to be valid (!nullptr).
     * @throw  mitk::Exception if the given segmentation data node is invalid (==nullptr).
     *
-    * @par segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
+    * @param segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
     */
     void UnlinkSegmentationFromLesion(const DataNode* segmentationNode);
     /*
@@ -425,7 +440,7 @@ namespace mitk
     * @pre    The given segmentation data node has to be valid (!nullptr).
     * @throw  mitk::Exception if the given segmentation data node is invalid (==nullptr).
     *
-    * @par segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
+    * @param segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
     */
     void RemoveSegmentation(const DataNode* segmentationNode);
     /*
@@ -441,9 +456,9 @@ namespace mitk
     * @pre    The given control point must contain the date of the given data node (if parameter 'checkConsistence = true').
     * @throw  SemanticRelationException, if the given control point does not contain the date of the given data node and 'checkConsistence = true' (this can be checked via 'ControlPointManager::InsideControlPoint').
     *
-    * @par dataNode         The current case identifier is extracted from the given data node, which contains DICOM information about the case.
-    * @par controlPoint     The control point instance to add. For a newly added control point always has "startDate = endDate".
-    * @par checkConsistence If true, the function checks, whether the date of the data node actually lies inside the control point to link.
+    * @param dataNode         The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param controlPoint     The control point instance to add. For a newly added control point always has "startDate = endDate".
+    * @param checkConsistence If true, the function checks, whether the date of the data node actually lies inside the control point to link.
     */
     void AddControlPointAndLinkData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence = true);
     /*
@@ -461,9 +476,9 @@ namespace mitk
     * @pre    The given control point must not overlap with an already existing control point.
     * @throw  SemanticRelationException, if the given control point overlaps with an already existing control point interval (this can be checked via 'CheckOverlappingControlPoint').
     *
-    * @par dataNode         The current case identifier is extracted from the given data node, which contains DICOM information about the case.
-    * @par controlPoint     The control point instance that overwrites an existing control point.
-    * @par checkConsistence If true, the function checks, whether the date of the data node actually lies inside the control point to link.
+    * @param dataNode         The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param controlPoint     The control point instance that overwrites an existing control point.
+    * @param checkConsistence If true, the function checks, whether the date of the data node actually lies inside the control point to link.
     */
     void OverwriteControlPointAndLinkData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence = true);
     /*
@@ -476,9 +491,9 @@ namespace mitk
     * @pre    The given control point must contain the date of the given data node (if parameter 'checkConsistence = true').
     * @throw  SemanticRelationException, if the given control point does not contain the date of the given data node and 'checkConsistence = true' (this can be checked via 'ControlPointManager::InsideControlPoint').
     *
-    * @par dataNode         The current case identifier is extracted from the given data node, which contains DICOM information about the case.
-    * @par controlPoint     The control point instance to add link.
-    * @par checkConsistence If true, the function checks, whether the date of the data node actually lies inside the control point to link.
+    * @param dataNode         The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param controlPoint     The control point instance to add link.
+    * @param checkConsistence If true, the function checks, whether the date of the data node actually lies inside the control point to link.
     */
     void LinkDataToControlPoint(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence = true);
     /*
@@ -487,7 +502,7 @@ namespace mitk
     *           - if not, the control point instance will be removed (has to be removed since a control point with no associated data is not allowed).
     *           - if so, the function has to make sure that the control point instance is shortened to its minimum time period (e.g. moving the end point to an earlier date).
     *
-    * @par dataNode       The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param dataNode       The current case identifier is extracted from the given data node, which contains DICOM information about the case.
     */
     void UnlinkDataFromControlPoint(const DataNode* dataNode);
     /*
@@ -497,8 +512,8 @@ namespace mitk
     * @throw  mitk::Exception if the given image data node is invalid (==nullptr).
     * @post   If the information type instance did not exist before, it is now added.
     *
-    * @par imageNode        The current case identifier is extracted from the given data node, which contains DICOM information about the case.
-    * @par informationType  An information type that identifies the corresponding information type instance.
+    * @param imageNode        The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param informationType  An information type that identifies the corresponding information type instance.
     */
     void AddInformationTypeToImage(const DataNode* imageNode, const SemanticTypes::InformationType& informationType);
     /*
@@ -510,7 +525,7 @@ namespace mitk
     * @pre    The given image data node has to be valid (!nullptr).
     * @throw  mitk::Exception if the given image data node is invalid (==nullptr).
     *
-    * @par imageNode        The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param imageNode        The current case identifier is extracted from the given data node, which contains DICOM information about the case.
     */
     void RemoveInformationTypeFromImage(const DataNode* imageNode);
 
@@ -528,16 +543,16 @@ namespace mitk
     *        The view's caseID was set before in the GUI. The parts of the view that observe changes in the semantic relations are only updated,
     *        if the given case ID is equal to the observer's current caseID and thus the observer currently shows the semantic information of the given case.
     *
-    * @par  caseID    The caseID that identifies the currently active patient / case.
+    * @param  caseID    The caseID that identifies the currently active patient / case.
     */
     virtual void NotifyObserver(const mitk::SemanticTypes::CaseID& caseID) const override;
     /*
     * @brief  Determine if the given control point contains images, which are connected to segmentations that represent the given lesion.
     *         If the lesion or the control point are not correctly stored, the function returns false.
     *
-    * @par caseID         The current case identifier is defined by the given string.
-    * @par lesion         A Lesion with a UID that identifies the corresponding lesion instance.
-    * @par controlPoint   A control point with a UID that identifies the corresponding control point instance.
+    * @param caseID         The current case identifier is defined by the given string.
+    * @param lesion         A Lesion with a UID that identifies the corresponding lesion instance.
+    * @param controlPoint   A control point with a UID that identifies the corresponding control point instance.
     *
     * @return             True, if the given control point contains data that is related to the given lesion; false otherwise.
     */
@@ -546,9 +561,9 @@ namespace mitk
     * @brief  Determine if the given control point contains images, which refer to the given information type.
     *         If the information type or the control point are not correctly stored, the function returns false.
     *
-    * @par caseID           The current case identifier is defined by the given string.
-    * @par informationType  An information type that identifies the corresponding information type instance.
-    * @par controlPoint     A control point with a UID that identifies the corresponding control point instance.
+    * @param caseID           The current case identifier is defined by the given string.
+    * @param informationType  An information type that identifies the corresponding information type instance.
+    * @param controlPoint     A control point with a UID that identifies the corresponding control point instance.
     *
     * @return               True, if the given control point contains data that is related to the given information type; false otherwise.
     */
@@ -561,8 +576,8 @@ namespace mitk
     *         If the UID does not already exists, the previous and next control point are found by comparing the dates of the already
     *         existing control points and the given control point.
     *
-    * @par caseID         The current case identifier is defined by the given string.
-    * @par controlPoint   A control point with a UID that identifies the corresponding control point instance.
+    * @param caseID         The current case identifier is defined by the given string.
+    * @param controlPoint   A control point with a UID that identifies the corresponding control point instance.
     */
     bool CheckOverlappingControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
     /*
@@ -572,8 +587,8 @@ namespace mitk
     *         If the UID does not already exist, the already existing control points are tested to see if they contain the
     *         given control point.
     *
-    * @par caseID         The current case identifier is defined by the given string.
-    * @par controlPoint   A control point with a UID that identifies the corresponding control point instance.
+    * @param caseID         The current case identifier is defined by the given string.
+    * @param controlPoint   A control point with a UID that identifies the corresponding control point instance.
     */
     bool CheckContainingControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
   };

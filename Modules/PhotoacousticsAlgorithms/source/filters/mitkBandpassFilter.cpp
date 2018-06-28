@@ -182,17 +182,15 @@ void mitk::BandpassFilter::GenerateData()
   if (std::fmod(powerOfTwo, 1.0) >= std::numeric_limits<double>::epsilon())
   {
     finalSize = (int)pow(2, std::ceil(powerOfTwo));
-    double spacing_x = input->GetGeometry()->GetSpacing()[0];
-    double spacing_y = input->GetGeometry()->GetSpacing()[1] * ((double)input->GetDimensions()[1]) / finalSize;
-    double dim[2] = {spacing_x, spacing_y};
-    resampledInput = m_FilterService->ApplyResampling(input, dim);
+    double dim[2] = {(double)input->GetDimension(0), (double)finalSize };
+    resampledInput = m_FilterService->ApplyResamplingToDim(input, dim);
     spacingResize = (double)input->GetDimension(1) / finalSize;
   }
 
   // do a fourier transform, multiply with an appropriate window for the filter, and transform back
   typedef itk::Image<float, 3> RealImageType;
+  MITK_INFO << resampledInput->GetDimension(0) << " " << resampledInput->GetDimension(1) << " " << resampledInput->GetDimension(2) << "asd" << sizeof(long double);
   RealImageType::Pointer image;
-
   mitk::CastToItkImage(resampledInput, image);
   typedef itk::FFT1DRealToComplexConjugateImageFilter<RealImageType> ForwardFFTFilterType;
   typedef ForwardFFTFilterType::OutputImageType ComplexImageType;

@@ -102,4 +102,9 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.fit.demo:ON
   org.mitk.gui.qt.fit.inspector:ON
   org.mitk.gui.qt.fit.genericfitting:ON
+  org.mitk.gui.qt.pharmacokinetics.mri:ON
+  org.mitk.gui.qt.pharmacokinetics.pet:ON
+  org.mitk.gui.qt.pharmacokinetics.simulation:ON
+  org.mitk.gui.qt.pharmacokinetics.curvedescriptor:ON
+  org.mitk.gui.qt.pharmacokinetics.concentration.mri:ON
 )

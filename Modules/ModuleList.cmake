@@ -72,6 +72,8 @@ set(MITK_MODULES
   CEST
   FitMIData
   FitMIDataUI
+  Pharmacokinetics
+  PharmacokineticsUI
 )
 
 if(MITK_ENABLE_PIC_READER)

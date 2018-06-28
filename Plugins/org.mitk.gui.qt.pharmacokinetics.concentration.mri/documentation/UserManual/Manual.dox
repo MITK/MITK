@@ -1,0 +1,10 @@
+/**
+\page org_mitk_gui_qt_pharmacokinetics_concentration_mri The Concentration Curve Converter View
+
+\li \ref org_mitk_gui_qt_pharmacokinetics_concentration_mri_Introduction
+
+\section org_mitk_gui_qt_pharmacokinetics_concentration_mri_Introduction Introduction
+This view offers the to posibility to convert MRI image signals into concentration images.
+Theses concentration images can e.g. be used for perfusion model fitting.
+
+*/

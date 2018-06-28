@@ -1,0 +1,66 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+#include "mitkDescriptionParameterImageGeneratorBase.h"
+
+mitk::DescriptionParameterImageGeneratorBase::DescriptionParameterImageGeneratorBase() = default;
+mitk::DescriptionParameterImageGeneratorBase::~DescriptionParameterImageGeneratorBase() = default;
+
+bool
+  mitk::DescriptionParameterImageGeneratorBase::HasOutdatedResult() const
+{
+  bool result = this->GetMTime() > this->m_GenerationTimeStamp;
+
+  return result;
+};
+
+void
+  mitk::DescriptionParameterImageGeneratorBase::CheckValidInputs() const
+{
+};
+
+
+void
+  mitk::DescriptionParameterImageGeneratorBase::Generate()
+{
+  CheckValidInputs();
+
+  if (!this->HasOutdatedResult())
+  { //still up to date -> nothing to do
+    return;
+  }
+
+  ParameterImageMapType paramImages;
+
+  DoParameterCalculationAndGetResults(paramImages);
+
+  m_ParameterImageMap = paramImages;
+
+  this->m_GenerationTimeStamp.Modified();
+};
+
+mitk::DescriptionParameterImageGeneratorBase::ParameterImageMapType
+  mitk::DescriptionParameterImageGeneratorBase::GetParameterImages()
+{
+  if (this->HasOutdatedResult())
+  {
+    Generate();
+  }
+
+
+  return m_ParameterImageMap;
+};
+

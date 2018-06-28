@@ -99,7 +99,7 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyBmodeFilter(
 
 mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyResampling(
   mitk::Image::Pointer inputImage,
-  double outputSpacing[2])
+  double *outputSpacing)
 {
   typedef itk::Image< float, 3 > itkFloatImageType;
 
@@ -122,6 +122,41 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyResampling(
 
   outputSizeItk[0] = outputSizeItk[0] * (floatImage->GetGeometry()->GetSpacing()[0] / outputSpacing[0]);
   outputSizeItk[1] = outputSizeItk[1] * (floatImage->GetGeometry()->GetSpacing()[1] / outputSpacing[1]);
+
+  resampleImageFilter->SetInput(itkImage);
+  resampleImageFilter->SetSize(outputSizeItk);
+  resampleImageFilter->SetOutputSpacing(outputSpacingItk);
+
+  resampleImageFilter->UpdateLargestPossibleRegion();
+  return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
+}
+
+
+mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyResamplingToDim(
+  mitk::Image::Pointer inputImage,
+  double *outputDimension)
+{
+  typedef itk::Image< float, 3 > itkFloatImageType;
+
+  auto floatImage = ConvertToFloat(inputImage);
+
+  typedef itk::ResampleImageFilter < itkFloatImageType, itkFloatImageType > ResampleImageFilter;
+  ResampleImageFilter::Pointer resampleImageFilter = ResampleImageFilter::New();
+
+  itkFloatImageType::Pointer itkImage;
+
+  mitk::CastToItkImage(floatImage, itkImage);
+
+  itkFloatImageType::SpacingType outputSpacingItk;
+  itkFloatImageType::SizeType inputSizeItk = itkImage->GetLargestPossibleRegion().GetSize();
+  itkFloatImageType::SizeType outputSizeItk = inputSizeItk;
+
+  outputSizeItk[0] = outputDimension[0];
+  outputSizeItk[1] = outputDimension[1];
+
+  outputSpacingItk[0] = (double)outputSizeItk[0] / (double)inputSizeItk[0] * floatImage->GetGeometry()->GetSpacing()[0];
+  outputSpacingItk[1] = (double)outputSizeItk[1] / (double)inputSizeItk[1] * floatImage->GetGeometry()->GetSpacing()[1];
+  outputSpacingItk[2] = itkImage->GetSpacing()[2];
 
   resampleImageFilter->SetInput(itkImage);
   resampleImageFilter->SetSize(outputSizeItk);

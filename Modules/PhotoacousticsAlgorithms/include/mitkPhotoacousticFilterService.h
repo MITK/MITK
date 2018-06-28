@@ -68,7 +68,9 @@ namespace mitk {
     * @param outputSize An array of dimensions the image should be resampled to.
     * @return The processed image is returned after the filter has finished.
     */
-    mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, double outputSpacing[2]);
+    mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, double* outputSpacing);
+
+    mitk::Image::Pointer ApplyResamplingToDim(mitk::Image::Pointer inputImage, double* outputDimension);
 
     /** \brief Beamforms the given image
     *

@@ -110,28 +110,28 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
     }
     
   //Identifier
-    thisTool->AddProperty("identifier",mitk::StringProperty::New(Tool->GetIdentifier().c_str()));
+    thisTool->AddProperty("identifier",mitk::StringProperty::New(Tool->GetIdentifier().c_str()), NULL, true);
   //Serial Number
-    thisTool->AddProperty("serial number",mitk::StringProperty::New(Tool->GetSerialNumber().c_str()));
+    thisTool->AddProperty("serial number",mitk::StringProperty::New(Tool->GetSerialNumber().c_str()), NULL, true);
   //Tracking Device
-    thisTool->AddProperty("tracking device type",mitk::StringProperty::New(Tool->GetTrackingDeviceType()));
+    thisTool->AddProperty("tracking device type",mitk::StringProperty::New(Tool->GetTrackingDeviceType()), NULL, true);
   //Tool Type
-    thisTool->AddProperty("tracking tool type",mitk::IntProperty::New(Tool->GetType()));
+    thisTool->AddProperty("tracking tool type",mitk::IntProperty::New(Tool->GetType()), NULL, true);
   //Calibration File Name
-    thisTool->AddProperty("toolfileName",mitk::StringProperty::New(GetFileWithoutPath(Tool->GetCalibrationFile())));
+    thisTool->AddProperty("toolfileName",mitk::StringProperty::New(GetFileWithoutPath(Tool->GetCalibrationFile())), NULL, true);
   //Tool Landmarks
-    thisTool->AddProperty("ToolRegistrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolLandmarks())));
-    thisTool->AddProperty("ToolCalibrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolControlPoints())));
+    thisTool->AddProperty("ToolRegistrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolLandmarks())), NULL, true);
+    thisTool->AddProperty("ToolCalibrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolControlPoints())), NULL, true);
 
   //Tool Tip
     if (Tool->IsToolTipSet())
     {
-      thisTool->AddProperty("ToolTipPosition",mitk::StringProperty::New(ConvertPointToString(Tool->GetToolTipPosition())));
-      thisTool->AddProperty("ToolAxisOrientation",mitk::StringProperty::New(ConvertQuaternionToString(Tool->GetToolAxisOrientation())));
+      thisTool->AddProperty("ToolTipPosition",mitk::StringProperty::New(ConvertPointToString(Tool->GetToolTipPosition())), NULL, true);
+      thisTool->AddProperty("ToolAxisOrientation",mitk::StringProperty::New(ConvertQuaternionToString(Tool->GetToolAxisOrientation())), NULL, true);
     }
 
   //Tool Axis
-    thisTool->AddProperty("ToolAxis", mitk::StringProperty::New(ConvertPointToString(Tool->GetToolAxis())));
+    thisTool->AddProperty("ToolAxis", mitk::StringProperty::New(ConvertPointToString(Tool->GetToolAxis())),NULL,true);
 
   //Material is not needed, to avoid errors in scene serialization we have to do this:
     thisTool->RemoveProperty("material");

@@ -469,6 +469,7 @@ void QmitkIGTNavigationToolCalibration::OnManualEditToolTipFinished(mitk::Affine
     QString resultString = QString("Manual edited values are written to ") + m_ToolToCalibrate->GetToolName().c_str();
     ApplyToolTipTransform(tempND, resultString.toStdString());
     m_Controls.m_ResultText->setText(resultString);
+    m_ComputedToolTipTransformation = tempND;
   }
 
   UpdateManualToolTipCalibrationView();

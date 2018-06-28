@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // qt
 #include <QInputDialog>
+#include <QSignalMapper>
 
 QmitkPatientTableInspector::QmitkPatientTableInspector(QWidget* parent/* =nullptr*/)
 {
@@ -89,6 +90,11 @@ void QmitkPatientTableInspector::OnModelUpdated()
 {
   m_Controls.tableView->resizeRowsToContents();
   m_Controls.tableView->resizeColumnsToContents();
+}
+
+void QmitkPatientTableInspector::OnNodeButtonClicked(const QString& nodeType)
+{
+  m_StorageModel->SetNodeType(nodeType.toStdString());
 }
 
 void QmitkPatientTableInspector::OnTableViewContextMenuRequested(const QPoint& pos)
@@ -238,4 +244,12 @@ void QmitkPatientTableInspector::SetUpConnections()
 {
   connect(m_StorageModel, SIGNAL(ModelUpdated()), SLOT(OnModelUpdated()));
   connect(m_Controls.tableView, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(OnTableViewContextMenuRequested(const QPoint&)));
+
+  QSignalMapper* nodeButtonSignalMapper = new QSignalMapper(this);
+  nodeButtonSignalMapper->setMapping(m_Controls.imageNodeButton, QString("Image"));
+  nodeButtonSignalMapper->setMapping(m_Controls.segmentationNodeButton, QString("Segmentation"));
+  connect(nodeButtonSignalMapper, SIGNAL(mapped(const QString&)), this, SLOT(OnNodeButtonClicked(const QString&)));
+  connect(m_Controls.imageNodeButton, SIGNAL(clicked()), nodeButtonSignalMapper, SLOT(map()));
+  connect(m_Controls.segmentationNodeButton, SIGNAL(clicked()), nodeButtonSignalMapper, SLOT(map()));
+  m_Controls.imageNodeButton->setChecked(true);
 }

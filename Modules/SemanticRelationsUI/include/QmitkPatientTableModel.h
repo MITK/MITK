@@ -64,6 +64,8 @@ public:
   /// end override
   /////////////////////////////////////////////////////////////////////////
 
+  void SetNodeType(const std::string& nodeType);
+
 protected:
 
   // the following functions have to be overridden but are not implemented in this model
@@ -77,6 +79,8 @@ protected:
   *        Furthermore all images are retrieved and the pixmap of the images are generated and stored.
   */
   virtual void SetData() override;
+
+  void SetDataNodes();
 
 private:
 
@@ -105,12 +109,12 @@ private:
   */
   mitk::DataNode* GetCurrentDataNode(const QModelIndex &index) const;
 
-  std::map<std::string, QPixmap> m_PixmapMap;
-  std::map<std::string, bool> m_LesionPresence;
+  std::map<mitk::DataNode::ConstPointer, QPixmap> m_PixmapMap;
+  std::map<mitk::DataNode::ConstPointer, bool> m_LesionPresence;
 
   std::vector<mitk::SemanticTypes::InformationType> m_InformationTypes;
   std::vector<mitk::SemanticTypes::ControlPoint> m_ControlPoints;
-  std::vector<mitk::DataNode::Pointer> m_AllDataNodes;
+  std::string m_SelectedNodeType;
 
 };
 

@@ -61,6 +61,7 @@ protected:
 private Q_SLOTS:
 
   void OnModelUpdated();
+  void OnNodeButtonClicked(const QString& nodeType);
   void OnTableViewContextMenuRequested(const QPoint&);
   void OnContextMenuSetInformationType();
   void OnContextMenuSetControlPoint();

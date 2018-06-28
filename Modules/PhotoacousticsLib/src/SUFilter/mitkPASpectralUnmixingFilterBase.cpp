@@ -36,6 +36,8 @@ mitk::pa::SpectralUnmixingFilterBase::~SpectralUnmixingFilterBase()
 
 void mitk::pa::SpectralUnmixingFilterBase::AddOutputs(unsigned int outputs)
 {
+  if (outputs == 0)
+    mitkThrow() << "ADD OUTPUTS HAS TO BE LARGER THEN ZERO!";
   this->SetNumberOfIndexedOutputs(outputs);
   for (unsigned int i = 0; i<GetNumberOfIndexedOutputs(); i++)
     this->SetNthOutput(i, mitk::Image::New());
@@ -80,21 +82,19 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
   MITK_INFO(m_Verbose) << "y dimension: " << yDim;
   MITK_INFO(m_Verbose) << "z dimension: " << numberOfInputImages;
 
-  unsigned int sequenceSize = m_Wavelength.size();
-  unsigned int totalNumberOfSequences = numberOfInputImages / sequenceSize;
-  if (totalNumberOfSequences == 0) //means that more chromophores then wavelengths
-    mitkThrow() << "ERROR! REMOVE WAVELENGTHS!";
-  MITK_INFO(m_Verbose) << "TotalNumberOfSequences: " << totalNumberOfSequences;
-
-  InitializeOutputs(totalNumberOfSequences);
-  
-  auto endmemberMatrix = CalculateEndmemberMatrix(m_Chromophore, m_Wavelength);
-  
   // Copy input image into array
   mitk::ImageReadAccessor readAccess(input);
   const float* inputDataArray = ((const float*)readAccess.GetData());
 
   CheckPreConditions(numberOfInputImages, inputDataArray);
+
+  unsigned int sequenceSize = m_Wavelength.size();
+  unsigned int totalNumberOfSequences = numberOfInputImages / sequenceSize;
+  MITK_INFO(m_Verbose) << "TotalNumberOfSequences: " << totalNumberOfSequences;
+
+  InitializeOutputs(totalNumberOfSequences);
+  
+  auto endmemberMatrix = CalculateEndmemberMatrix(m_Chromophore, m_Wavelength);
 
   // test to see pixel values @ txt file
   myfile.open("SimplexNormalisation.txt");
@@ -159,6 +159,9 @@ void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(unsigned int numbe
 {
   MITK_INFO(m_Verbose) << "CHECK PRECONDITIONS ...";
 
+  if (m_Chromophore.size() == 0 || m_Wavelength.size() == 0)
+    mitkThrow() << "NO WAVELENGHTS/CHROMOPHORES SELECTED!";
+
   if (m_Wavelength.size() < numberOfInputImages)
     MITK_WARN << "NUMBER OF WAVELENGTHS < NUMBER OF INPUT IMAGES";
 
@@ -167,6 +170,9 @@ void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(unsigned int numbe
 
   if (typeid(inputDataArray[0]).name() != typeid(float).name())
     mitkThrow() << "PIXELTYPE ERROR! FLOAT 32 REQUIRED";
+
+  if ((m_Chromophore.size()+ m_RelativeError )!= GetNumberOfIndexedOutputs())
+    mitkThrow() << "INDEX ERROR! NUMBER OF OUTPUTS DOESN'T FIT TO OTHER SETTIGNS!";
 
   MITK_INFO(m_Verbose) << "...[DONE]";
 }

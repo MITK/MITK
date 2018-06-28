@@ -59,6 +59,9 @@ namespace mitk {
     * - "ADD MORE WAVELENGTHS!": One needs at least the same amount of wavelengths then added chromophores.
     * - "WAVELENGTH XXX nm NOT SUPPORTED!": The wavelength is not part of the proptery calculater data base. The data base can be found @ 
     *   [...]\mitk\Modules\PhotoacousticsLib\Resources\spectralLIB.dat
+    * - "ADD OUTPUTS HAS TO BE LARGER THEN ZERO!"
+    * - "NO WAVELENGHTS/CHROMOPHORES SELECZED!
+    * - "INDEX ERROR! NUMBER OF OUTPUTS DOESN'T FIT TO OTHER SETTIGNS!"
     */
 
     class MITKPHOTOACOUSTICSLIB_EXPORT SpectralUnmixingFilterBase : public mitk::ImageToImageFilter
@@ -91,6 +94,7 @@ namespace mitk {
       /**
       * \brief AddOutputs takes an integer and sets indexed outputs
       * @param outputs integer correponds to the number of output images
+      * @throws if outputs == 0
       */
       virtual void AddOutputs(unsigned int outputs);
 
@@ -149,6 +153,8 @@ namespace mitk {
       * @throws if there are more wavelength then images
       * @throws if there are more chromophores then wavelengths
       * @throws if the pixel type is not float 32
+      * @throws if no chromophores or wavelengths selected as input
+      * @throws if the number of indexed outputs does'nt fit to the expected number
       */
       virtual void CheckPreConditions(unsigned int numberOfInputImages, const float* inputDataArray);
 

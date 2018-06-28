@@ -30,6 +30,11 @@ class mitkSpectralUnmixingTestSuite : public mitk::TestFixture
   MITK_TEST(testVigraSUAlgorithm);
   //MITK_TEST(testSimplexSUAlgorithm);// --> RESULT FAILS
   MITK_TEST(testSO2);
+  MITK_TEST(testWavelengthExceptions);
+  MITK_TEST(testNoChromophoresSelected);
+  MITK_TEST(testInputImage);
+  MITK_TEST(testAddOutput);
+  MITK_TEST(testWeightsError);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -91,12 +96,13 @@ public:
     MITK_INFO << "[DONE]";
   }
 
+  // Tests implemented EIGEN algortihms with correct inputs
   void testEigenSUAlgorithm()
   {
     MITK_INFO << "START FILTER TEST ... ";
     // Set input image
     auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
-    m_SpectralUnmixingFilter->Verbose(true);
+    m_SpectralUnmixingFilter->Verbose(false);
     m_SpectralUnmixingFilter->RelativeError(false);
     m_SpectralUnmixingFilter->SetInput(inputImage);
     m_SpectralUnmixingFilter->AddOutputs(2);
@@ -151,6 +157,7 @@ public:
     MITK_INFO << "EIGEN FILTER TEST SUCCESFULL :)";
   }
 
+  // Tests implemented VIGRA algortihms with correct inputs
   void testVigraSUAlgorithm()
   {
     MITK_INFO << "START FILTER TEST ... ";
@@ -158,7 +165,7 @@ public:
     auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
     m_SpectralUnmixingFilter->SetInput(inputImage);
     m_SpectralUnmixingFilter->AddOutputs(2);
-    m_SpectralUnmixingFilter->Verbose(true);
+    m_SpectralUnmixingFilter->Verbose(false);
     m_SpectralUnmixingFilter->RelativeError(false);
 
 
@@ -221,7 +228,7 @@ public:
     auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterSimplex::New();
     m_SpectralUnmixingFilter->SetInput(inputImage);
     m_SpectralUnmixingFilter->AddOutputs(2);
-    m_SpectralUnmixingFilter->Verbose(true);
+    m_SpectralUnmixingFilter->Verbose(false);
     m_SpectralUnmixingFilter->RelativeError(false);
 
     //Set wavelengths to filter
@@ -261,6 +268,7 @@ public:
     MITK_INFO << "SIMPLEX FILTER TEST SUCCESFULL :)";
   }
 
+  // Tests SO2 Filter with correct inputs
   void testSO2()
   {
     MITK_INFO << "START SO2 TEST ... ";
@@ -322,6 +330,276 @@ public:
     myfile.close();
     MITK_INFO << "SO2 TEST SUCCESFULL :)";
   }
+
+  // Test exceptions for wrong wavelength inputs
+  void testWavelengthExceptions()
+  {
+    MITK_INFO << "START WavelengthExceptions TEST ... ";
+    // Set input image
+    auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+    m_SpectralUnmixingFilter->Verbose(false);
+    m_SpectralUnmixingFilter->RelativeError(false);
+    m_SpectralUnmixingFilter->SetInput(inputImage);
+    m_SpectralUnmixingFilter->AddOutputs(2);
+
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
+
+    m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::HOUSEHOLDERQR);
+
+    MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+      m_SpectralUnmixingFilter->Update();
+    MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+
+    m_SpectralUnmixingFilter->AddWavelength(300);
+
+    MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+      m_SpectralUnmixingFilter->Update();
+    MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+
+    m_SpectralUnmixingFilter->AddWavelength(299);
+
+    MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+      m_SpectralUnmixingFilter->Update();
+    MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+    MITK_INFO << "DONE";
+  }
+
+  // Test exceptions for wrong chromophore inputs
+  void testNoChromophoresSelected()
+  {
+    MITK_INFO << "testNoChromophoresSelected";
+    // Set input image
+    auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+    m_SpectralUnmixingFilter->Verbose(false);
+    m_SpectralUnmixingFilter->RelativeError(false);
+    m_SpectralUnmixingFilter->SetInput(inputImage);
+    m_SpectralUnmixingFilter->AddOutputs(2);
+
+    //Set wavelengths to filter
+    for (unsigned int imageIndex = 0; imageIndex < m_inputWavelengths.size(); imageIndex++)
+    {
+      unsigned int wavelength = m_inputWavelengths[imageIndex];
+      m_SpectralUnmixingFilter->AddWavelength(wavelength);
+    }
+
+    m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::HOUSEHOLDERQR);
+
+    MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+      m_SpectralUnmixingFilter->Update();
+    MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+  }
+
+  // Test exceptions for wrong input image
+  void testInputImage()
+  {
+    MITK_INFO << "INPUT IMAGE TEST";
+    inputImage = nullptr;
+    // Set input image
+    auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+    m_SpectralUnmixingFilter->Verbose(false);
+    m_SpectralUnmixingFilter->RelativeError(false);
+    //m_SpectralUnmixingFilter->SetInput(inputImage);
+    m_SpectralUnmixingFilter->AddOutputs(2);
+
+    //Set wavelengths to filter
+    for (unsigned int imageIndex = 0; imageIndex < m_inputWavelengths.size(); imageIndex++)
+    {
+      unsigned int wavelength = m_inputWavelengths[imageIndex];
+      m_SpectralUnmixingFilter->AddWavelength(wavelength);
+    }
+
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
+
+    m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::HOUSEHOLDERQR);
+
+    MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+      m_SpectralUnmixingFilter->Update();
+    MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+
+    inputImage = mitk::Image::New();
+    mitk::PixelType pixelType = mitk::MakeScalarPixelType<double>();
+    const int NUMBER_OF_SPATIAL_DIMENSIONS = 3;
+    auto* dimensions = new unsigned int[NUMBER_OF_SPATIAL_DIMENSIONS];
+
+    dimensions[0] = 1;
+    dimensions[1] = 1;
+    dimensions[2] = 5;
+
+    inputImage->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);
+
+    double* data = new double[3];
+    data[0] = 1;
+    data[1] = 2;
+    data[2] = 3;
+    data[3] = 4;
+    data[5] = 0;
+
+    inputImage->SetImportVolume(data, mitk::Image::ImportMemoryManagementType::CopyMemory);
+    delete[] data;
+
+    m_SpectralUnmixingFilter->SetInput(inputImage);
+
+    MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+      m_SpectralUnmixingFilter->Update();
+    MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+
+    for (int i = 0; i < 2; ++i)
+    {
+      mitk::Image::Pointer output = m_SpectralUnmixingFilter->GetOutput(i);
+      mitk::ImageReadAccessor readAccess(output);
+      const float* inputDataArray = ((const float*)readAccess.GetData());
+      auto pixel = inputDataArray[0];
+      auto pixel2 = inputDataArray[1];
+
+      CPPUNIT_ASSERT(std::abs(pixel - m_CorrectResult[i]) < threshold);
+      CPPUNIT_ASSERT(std::abs(pixel2 - m_CorrectResult[i + 2]) < threshold);
+    }
+  }
+
+  // Test exceptions for addOutputs method
+  void testAddOutput()
+  {
+    MITK_INFO << "addOutputs TEST";
+
+    // Set input image
+    auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+    m_SpectralUnmixingFilter->Verbose(false);
+    m_SpectralUnmixingFilter->RelativeError(false);
+    m_SpectralUnmixingFilter->SetInput(inputImage);
+
+    //Set wavelengths to filter
+    for (unsigned int imageIndex = 0; imageIndex < m_inputWavelengths.size(); imageIndex++)
+    {
+      unsigned int wavelength = m_inputWavelengths[imageIndex];
+      m_SpectralUnmixingFilter->AddWavelength(wavelength);
+    }
+
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
+
+    m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::HOUSEHOLDERQR);
+
+    for (int i = 0; i < 4; ++i)
+    {
+      MITK_INFO << "i: " << i;
+      if (i != 2)
+      {
+        MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+          m_SpectralUnmixingFilter->AddOutputs(i);
+          m_SpectralUnmixingFilter->Update();
+        MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+      }
+      else
+      {
+        m_SpectralUnmixingFilter->AddOutputs(2);
+        m_SpectralUnmixingFilter->Update();
+        for (int i = 0; i < 2; ++i)
+        {
+          mitk::Image::Pointer output = m_SpectralUnmixingFilter->GetOutput(i);
+          mitk::ImageReadAccessor readAccess(output);
+          const float* inputDataArray = ((const float*)readAccess.GetData());
+          auto pixel = inputDataArray[0];
+          auto pixel2 = inputDataArray[1];
+
+          CPPUNIT_ASSERT(std::abs(pixel - m_CorrectResult[i]) < threshold);
+          CPPUNIT_ASSERT(std::abs(pixel2 - m_CorrectResult[i + 2]) < threshold);
+        }
+      }
+    }
+  }
+
+  // Test exceptions for weights error
+  void testWeightsError()
+  {
+    MITK_INFO << "testWeightsError";
+
+    // Set input image
+    auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterVigra::New();
+    m_SpectralUnmixingFilter->Verbose(false);
+    m_SpectralUnmixingFilter->RelativeError(false);
+    m_SpectralUnmixingFilter->SetInput(inputImage);
+    m_SpectralUnmixingFilter->AddOutputs(2);
+
+    //Set wavelengths to filter
+    for (unsigned int imageIndex = 0; imageIndex < m_inputWavelengths.size(); imageIndex++)
+    {
+      unsigned int wavelength = m_inputWavelengths[imageIndex];
+      m_SpectralUnmixingFilter->AddWavelength(wavelength);
+    }
+
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
+
+    m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED);
+
+    MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+    m_SpectralUnmixingFilter->Update();
+    MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+
+    m_SpectralUnmixingFilter->AddWeight(50);
+    MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+    m_SpectralUnmixingFilter->Update();
+    MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+
+    m_SpectralUnmixingFilter->AddWeight(50);
+    m_SpectralUnmixingFilter->Update();
+
+    for (int i = 0; i < 2; ++i)
+    {
+      mitk::Image::Pointer output = m_SpectralUnmixingFilter->GetOutput(i);
+      mitk::ImageReadAccessor readAccess(output);
+      const float* inputDataArray = ((const float*)readAccess.GetData());
+      auto pixel = inputDataArray[0];
+      auto pixel2 = inputDataArray[1];
+
+      CPPUNIT_ASSERT(std::abs(pixel - m_CorrectResult[i]) < threshold);
+      CPPUNIT_ASSERT(std::abs(pixel2 - m_CorrectResult[i + 2]) < threshold);
+    }
+  }
+
+  // TEST TEMPLATE:
+  /*
+  // Test exceptions for
+  void test()
+  {
+    MITK_INFO << "TEST";
+
+    // Set input image
+    auto m_SpectralUnmixingFilter = mitk::pa::LinearSpectralUnmixingFilter::New();
+    m_SpectralUnmixingFilter->Verbose(false);
+    m_SpectralUnmixingFilter->RelativeError(false);
+    m_SpectralUnmixingFilter->SetInput(inputImage);
+    m_SpectralUnmixingFilter->AddOutputs(2);
+
+    //Set wavelengths to filter
+    for (unsigned int imageIndex = 0; imageIndex < m_inputWavelengths.size(); imageIndex++)
+    {
+      unsigned int wavelength = m_inputWavelengths[imageIndex];
+      m_SpectralUnmixingFilter->AddWavelength(wavelength);
+    }
+
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
+    m_SpectralUnmixingFilter->AddChromophore(
+      mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
+
+    m_SpectralUnmixingFilter->SetAlgorithm(mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::HOUSEHOLDERQR);
+
+    //MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+      m_SpectralUnmixingFilter->Update();
+    //MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+
+  }*/
 
   void tearDown() override
   {

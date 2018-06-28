@@ -163,7 +163,7 @@ void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(unsigned int numbe
     mitkThrow() << "NO WAVELENGHTS/CHROMOPHORES SELECTED!";
 
   if (m_Wavelength.size() < numberOfInputImages)
-    MITK_WARN << "NUMBER OF WAVELENGTHS < NUMBER OF INPUT IMAGES";
+    MITK_WARN(m_Verbose) << "NUMBER OF WAVELENGTHS < NUMBER OF INPUT IMAGES";
 
   if (m_Chromophore.size() > m_Wavelength.size())
     mitkThrow() << "ADD MORE WAVELENGTHS OR REMOVE ENDMEMBERS!";
@@ -171,7 +171,7 @@ void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(unsigned int numbe
   if (typeid(inputDataArray[0]).name() != typeid(float).name())
     mitkThrow() << "PIXELTYPE ERROR! FLOAT 32 REQUIRED";
 
-  if ((m_Chromophore.size()+ m_RelativeError )!= GetNumberOfIndexedOutputs())
+  if ((m_Chromophore.size()+ m_RelativeError )!= GetNumberOfIndexedOutputs() || numberOfInputImages < GetNumberOfIndexedOutputs())
     mitkThrow() << "INDEX ERROR! NUMBER OF OUTPUTS DOESN'T FIT TO OTHER SETTIGNS!";
 
   MITK_INFO(m_Verbose) << "...[DONE]";

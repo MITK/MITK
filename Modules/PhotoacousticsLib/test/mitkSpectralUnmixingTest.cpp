@@ -28,8 +28,9 @@ class mitkSpectralUnmixingTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkSpectralUnmixingTestSuite);
   MITK_TEST(testEigenSUAlgorithm);
   MITK_TEST(testVigraSUAlgorithm);
-  //MITK_TEST(testSimplexSUAlgorithm);// --> RESULT FAILS
+  MITK_TEST(testSimplexSUAlgorithm);
   MITK_TEST(testSO2);
+  MITK_TEST(testExceptionSO2);
   MITK_TEST(testWavelengthExceptions);
   MITK_TEST(testNoChromophoresSelected);
   MITK_TEST(testInputImage);
@@ -49,7 +50,6 @@ public:
 
   void setUp() override
   {
-    MITK_INFO << "setUp ... ";
     //Set empty input image:
     inputImage = mitk::Image::New();
     mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();
@@ -93,7 +93,6 @@ public:
 
     inputImage->SetImportVolume(data, mitk::Image::ImportMemoryManagementType::CopyMemory);
     delete[] data;
-    MITK_INFO << "[DONE]";
   }
 
   // Tests implemented EIGEN algortihms with correct inputs
@@ -228,7 +227,7 @@ public:
     auto m_SpectralUnmixingFilter = mitk::pa::SpectralUnmixingFilterSimplex::New();
     m_SpectralUnmixingFilter->SetInput(inputImage);
     m_SpectralUnmixingFilter->AddOutputs(2);
-    m_SpectralUnmixingFilter->Verbose(false);
+    m_SpectralUnmixingFilter->Verbose(true);
     m_SpectralUnmixingFilter->RelativeError(false);
 
     //Set wavelengths to filter
@@ -266,6 +265,42 @@ public:
     }
     myfile.close();
     MITK_INFO << "SIMPLEX FILTER TEST SUCCESFULL :)";
+  }
+
+  // Tests SO2 Filter with unequal inputs
+  void testExceptionSO2()
+  {
+    MITK_INFO << "START EXCEPTION SO2 TEST ... ";
+
+    auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
+    m_sO2->SetInput(0, inputImage);
+
+    inputImage = nullptr;
+    inputImage = mitk::Image::New();
+    mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();
+    const int NUMBER_OF_SPATIAL_DIMENSIONS = 3;
+    auto* dimensions = new unsigned int[NUMBER_OF_SPATIAL_DIMENSIONS];
+
+    dimensions[0] = 1;
+    dimensions[1] = 1;
+    dimensions[2] = 4;
+
+    inputImage->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);
+
+    float* data = new float[3];
+    data[0] = 1;
+    data[1] = 2;
+    data[2] = 3;
+    data[3] = 4;
+
+    inputImage->SetImportVolume(data, mitk::Image::ImportMemoryManagementType::CopyMemory);
+    delete[] data;
+
+    m_sO2->SetInput(1, inputImage);
+
+    MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+      m_sO2->Update();
+    MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
   }
 
   // Tests SO2 Filter with correct inputs
@@ -321,7 +356,7 @@ public:
       {
         auto Value = inputDataArray[Pixel];
 
-        myfile << "Output(Test "<<  k <<") "<< Pixel << ": " << "\n" << Value << "\n";
+        myfile << "Output(Test " << k << ") " << Pixel << ": " << "\n" << Value << "\n";
         myfile << "Correct Result: " << "\n" << m_CorrectSO2Result[Pixel] << "\n";
 
         CPPUNIT_ASSERT(std::abs(Value - m_CorrectSO2Result[Pixel]) < threshold);
@@ -607,7 +642,6 @@ public:
     inputImage = nullptr;
     m_inputWavelengths.clear();
     m_CorrectResult.clear();
-    MITK_INFO << "tearDown ... [DONE]";
   }
 };
 

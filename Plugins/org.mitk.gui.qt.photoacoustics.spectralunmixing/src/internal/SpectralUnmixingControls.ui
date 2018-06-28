@@ -996,6 +996,9 @@
      <property name="text">
       <string>Verbose Mode (additional console outputs)</string>
      </property>
+     <property name="tristate">
+      <bool>false</bool>
+     </property>
     </widget>
    </item>
    <item>

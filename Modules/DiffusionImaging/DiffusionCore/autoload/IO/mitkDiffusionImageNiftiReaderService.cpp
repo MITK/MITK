@@ -302,9 +302,9 @@ void DiffusionImageNiftiReaderService::InternalRead()
         else if (itksys::SystemTools::FileExists(base+".bvec"))
           bvals_file = base+".bvec";
         else if (itksys::SystemTools::FileExists(base_path+"bvecs"))
-          bvals_file = base_path + "bvecs";
+          bvecs_file = base_path + "bvecs";
         else if (itksys::SystemTools::FileExists(base_path+"bvec"))
-          bvals_file = base_path + "bvec";
+          bvecs_file = base_path + "bvec";
 
         DiffusionVectors = mitk::gradients::ReadBvalsBvecs(bvals_file, bvecs_file, BValue);
 

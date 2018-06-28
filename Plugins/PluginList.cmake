@@ -99,4 +99,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.matchpoint.manipulator:OFF
   org.mitk.gui.qt.preprocessing.resampling:OFF
   org.mitk.gui.qt.cest:OFF
+  org.mitk.gui.qt.fit.demo:ON
+  org.mitk.gui.qt.fit.inspector:ON
+  org.mitk.gui.qt.fit.genericfitting:ON
 )

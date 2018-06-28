@@ -70,6 +70,8 @@ set(MITK_MODULES
   RenderWindowManager
   RenderWindowManagerUI
   CEST
+  FitMIData
+  FitMIDataUI
 )
 
 if(MITK_ENABLE_PIC_READER)

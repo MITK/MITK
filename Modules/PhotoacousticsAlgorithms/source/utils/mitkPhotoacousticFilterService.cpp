@@ -154,9 +154,13 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyResamplingToDim(
   outputSizeItk[0] = outputDimension[0];
   outputSizeItk[1] = outputDimension[1];
 
-  outputSpacingItk[0] = (double)outputSizeItk[0] / (double)inputSizeItk[0] * floatImage->GetGeometry()->GetSpacing()[0];
-  outputSpacingItk[1] = (double)outputSizeItk[1] / (double)inputSizeItk[1] * floatImage->GetGeometry()->GetSpacing()[1];
+  MITK_INFO << outputSizeItk[0] << " " << outputSizeItk[1];
+
+  outputSpacingItk[0] = (double)inputSizeItk[0] / (double)outputSizeItk[0]  * floatImage->GetGeometry()->GetSpacing()[0];
+  outputSpacingItk[1] = (double)inputSizeItk[1] / (double)outputSizeItk[1]  * floatImage->GetGeometry()->GetSpacing()[1];
   outputSpacingItk[2] = itkImage->GetSpacing()[2];
+
+  MITK_INFO << outputSpacingItk[0] << " " << outputSpacingItk[1];
 
   resampleImageFilter->SetInput(itkImage);
   resampleImageFilter->SetSize(outputSizeItk);

@@ -958,6 +958,12 @@ void BeamformingThread::run()
     preprocessedImage = m_FilterBank->ApplyCropping(m_InputImage, cropPixels, 0, 0, 0, 0, m_InputImage->GetDimension(2) - 1);
   }
 
+  m_BFconfig = mitk::BeamformingSettings::New(m_BFconfig->GetPitchInMeters(), m_BFconfig->GetSpeedOfSound(),
+    m_BFconfig->GetTimeSpacing(), m_BFconfig->GetAngle(), m_BFconfig->GetIsPhotoacousticImage(), m_BFconfig->GetSamplesPerLine(),
+    m_BFconfig->GetReconstructionLines(), preprocessedImage->GetDimensions(), m_BFconfig->GetReconstructionDepth(),
+    m_BFconfig->GetUseGPU(), m_BFconfig->GetGPUBatchSize(), m_BFconfig->GetDelayCalculationMethod(), m_BFconfig->GetApod(), 
+    m_BFconfig->GetApodizationArraySize(), m_BFconfig->GetAlgorithm());
+
   mitk::Image::Pointer resultImage;
   std::function<void(int, std::string)> progressHandle = [this](int progress, std::string progressInfo) {
     emit updateProgress(progress, progressInfo);

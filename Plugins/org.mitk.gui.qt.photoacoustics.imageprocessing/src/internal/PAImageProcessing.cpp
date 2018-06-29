@@ -313,9 +313,12 @@ void PAImageProcessing::BatchProcessing()
       else if (m_Controls.BModeMethod->currentText() == "Envelope Detection")
         image = m_FilterBank->ApplyBmodeFilter(image, mitk::PhotoacousticFilterService::BModeMethod::EnvelopeDetection, m_UseLogfilter);
 
-      double desiredSpacing[2]{ image->GetGeometry()->GetSpacing()[0], m_ResampleSpacing };
+      if (m_ResampleSpacing != 0)
+      {
+        double desiredSpacing[2]{ image->GetGeometry()->GetSpacing()[0], m_ResampleSpacing };
 
-      image = m_FilterBank->ApplyResampling(image, desiredSpacing);
+        image = m_FilterBank->ApplyResampling(image, desiredSpacing);
+      }
 
       if (saveSteps[3])
       {

@@ -4,7 +4,7 @@ MITK_CREATE_MODULE(FitMIData
     PRIVATE src/Common src/Functors src/Models src/TestingHelper
   DEPENDS
     PUBLIC MitkCore MitkSceneSerializationBase
-    PRIVATE	MitkFormulaParser MitkMultilabel
+    PRIVATE	MitkMultilabel
   PACKAGE_DEPENDS
     PUBLIC ITK|ITKOptimizers
     PRIVATE Boost

@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <qwt_plot_marker.h>
 
-#include "FormulaParser.h"
+#include "mitkFormulaParser.h"
 #include "mitkScalarListLookupTableProperty.h"
 #include "mitkModelFitConstants.h"
 #include "mitkExtractTimeGrid.h"
@@ -737,7 +737,7 @@ ModelFitInspectorView::CalcCurveFromFunction(const mitk::Point3D& position,
 
   mitk::ParameterValueMapType parameterMap = mitk::ExtractParameterValueMapFromModelFit(m_currentFit, position);
 
-  FormulaParsing::FormulaParser<double> parser(&parameterMap);
+  mitk::FormulaParser parser(&parameterMap);
   unsigned int timestep = m_renderWindowPart->GetTimeNavigationController()->GetTime()->
                           GetPos();
 
@@ -882,7 +882,7 @@ bool ModelFitInspectorView::RefreshPlotData()
           {
             curveData = CalcCurveFromFunction(m_currentSelectedPosition, interpolatedTimeGrid);
           }
-          catch (const FormulaParsing::FormulaParserException& e)
+          catch (const mitk::FormulaParserException& e)
           {
             MITK_ERROR << "Error while parsing modelfit function: " << e.what();
           }

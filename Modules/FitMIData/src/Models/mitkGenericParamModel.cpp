@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkGenericParamModel.h"
-#include "FormulaParser.h"
+#include "mitkFormulaParser.h"
 
 const std::string mitk::GenericParamModel::NAME_STATIC_PARAMETER_number = "number_of_parameters";
 
@@ -110,7 +110,7 @@ mitk::GenericParamModel::ComputeModelfunction(const ParametersType& parameters) 
     parameterMap.insert(std::make_pair(paramNames[i], parameters[i]));
   }
 
-  FormulaParsing::FormulaParser<double> formulaParser(&parameterMap);
+  FormulaParser formulaParser(&parameterMap);
 
   TimeGridType::const_iterator timeGridEnd = m_TimeGrid.end();
   ModelResultType::iterator signalPos = signal.begin();

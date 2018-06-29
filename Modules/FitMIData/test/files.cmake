@@ -12,4 +12,5 @@ SET(MODULE_TESTS
   mitkSimpleBarrierConstraintCheckerTest.cpp
   mitkMVConstrainedCostFunctionDecoratorTest.cpp
   mitkConcreteModelFactoryBaseTest.cpp
+  mitkFormulaParserTest.cpp
 )

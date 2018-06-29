@@ -483,18 +483,6 @@ public:
     MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
       m_SpectralUnmixingFilter->Update();
     MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
-
-    for (int i = 0; i < 2; ++i)
-    {
-      mitk::Image::Pointer output = m_SpectralUnmixingFilter->GetOutput(i);
-      mitk::ImageReadAccessor readAccess(output);
-      const float* inputDataArray = ((const float*)readAccess.GetData());
-      auto pixel = inputDataArray[0];
-      auto pixel2 = inputDataArray[1];
-
-      CPPUNIT_ASSERT(std::abs(pixel - m_CorrectResult[i]) < threshold);
-      CPPUNIT_ASSERT(std::abs(pixel2 - m_CorrectResult[i + 2]) < threshold);
-    }
   }
 
   // Test exceptions for addOutputs method

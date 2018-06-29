@@ -94,6 +94,12 @@ void mitk::pa::SpectralUnmixingSO2::CheckPreConditions(mitk::Image::Pointer inpu
   if (xDimHb != xDimHbO2 || yDimHb != yDimHbO2 || zDimHb != zDimHbO2)
     mitkThrow() << "DIMENTIONALITY ERROR!";
 
+  if (inputHbO2->GetPixelType() != mitk::MakeScalarPixelType<float>())
+    mitkThrow() << "PIXELTYPE ERROR! FLOAT REQUIRED";
+
+  if (inputHb->GetPixelType() != mitk::MakeScalarPixelType<float>())
+    mitkThrow() << "PIXELTYPE ERROR! FLOAT REQUIRED";
+
   MITK_INFO(m_Verbose) << "CHECK PRECONDITIONS ...[DONE]";
 }
 

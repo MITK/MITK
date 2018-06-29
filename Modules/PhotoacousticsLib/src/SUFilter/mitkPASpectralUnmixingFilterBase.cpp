@@ -73,6 +73,7 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
   MITK_INFO(m_Verbose) << "GENERATING DATA..";
 
   mitk::Image::Pointer input = GetInput(0);
+  CheckPreConditions(input);
 
   unsigned int xDim = input->GetDimensions()[0];
   unsigned int yDim = input->GetDimensions()[1];
@@ -85,8 +86,6 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
   // Copy input image into array
   mitk::ImageReadAccessor readAccess(input);
   const float* inputDataArray = ((const float*)readAccess.GetData());
-
-  CheckPreConditions(numberOfInputImages, inputDataArray);
 
   unsigned int sequenceSize = m_Wavelength.size();
   unsigned int totalNumberOfSequences = numberOfInputImages / sequenceSize;
@@ -155,23 +154,23 @@ void mitk::pa::SpectralUnmixingFilterBase::GenerateData()
   myfile.close();
 }
 
-void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(unsigned int numberOfInputImages, const float* inputDataArray)
+void mitk::pa::SpectralUnmixingFilterBase::CheckPreConditions(mitk::Image::Pointer input)
 {
   MITK_INFO(m_Verbose) << "CHECK PRECONDITIONS ...";
 
   if (m_Chromophore.size() == 0 || m_Wavelength.size() == 0)
     mitkThrow() << "NO WAVELENGHTS/CHROMOPHORES SELECTED!";
 
-  if (m_Wavelength.size() < numberOfInputImages)
+  if (m_Wavelength.size() < input->GetDimensions()[2])
     MITK_WARN(m_Verbose) << "NUMBER OF WAVELENGTHS < NUMBER OF INPUT IMAGES";
 
   if (m_Chromophore.size() > m_Wavelength.size())
     mitkThrow() << "ADD MORE WAVELENGTHS OR REMOVE ENDMEMBERS!";
 
-  if (typeid(inputDataArray[0]).name() != typeid(float).name())
-    mitkThrow() << "PIXELTYPE ERROR! FLOAT 32 REQUIRED";
+  if (input->GetPixelType() != mitk::MakeScalarPixelType<float>())
+    mitkThrow() << "PIXELTYPE ERROR! FLOAT REQUIRED";
 
-  if ((m_Chromophore.size()+ m_RelativeError )!= GetNumberOfIndexedOutputs() || numberOfInputImages < GetNumberOfIndexedOutputs())
+  if ((m_Chromophore.size()+ m_RelativeError )!= GetNumberOfIndexedOutputs() || input->GetDimensions()[2] < GetNumberOfIndexedOutputs())
     mitkThrow() << "INDEX ERROR! NUMBER OF OUTPUTS DOESN'T FIT TO OTHER SETTIGNS!";
 
   MITK_INFO(m_Verbose) << "...[DONE]";

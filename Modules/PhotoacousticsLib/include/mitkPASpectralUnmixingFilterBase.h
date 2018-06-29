@@ -147,16 +147,14 @@ namespace mitk {
 
       /*
       * \brief Checks if there are a suitable amount of wavelengths and if the input image consists of floats.
-      * @param numberOfInputImages corresponds to the z-dimension of the MITK input image
-      * @param inputDataArray contains every pixel of the MITK input image. Accessable like pseudo multidimensional array, that means 
-      * pixel(x,y,z) = (xdim * yDim * z) + x * yDim + y where eg. "xdim" means the total size of the MITK input image in x direction.
+      * @param input pointer on the MITK input image
       * @throws if there are more wavelength then images
       * @throws if there are more chromophores then wavelengths
       * @throws if the pixel type is not float 32
       * @throws if no chromophores or wavelengths selected as input
       * @throws if the number of indexed outputs does'nt fit to the expected number
       */
-      virtual void CheckPreConditions(unsigned int numberOfInputImages, const float* inputDataArray);
+      virtual void CheckPreConditions(mitk::Image::Pointer input);
 
       /*
       * \brief Inherit from the "ImageToImageFilter" Superclass. Herain it calls InitializeOutputs, CalculateEndmemberMatrix and

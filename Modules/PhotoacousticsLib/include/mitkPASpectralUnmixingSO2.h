@@ -81,8 +81,9 @@ namespace mitk {
       virtual void InitializeOutputs();
 
       /**
-      * \brief Checks if the dimensions of the input images are equal.
-      * @throws if tey are not
+      * \brief Checks if the dimensions of the input images are equal and made out of floating poinhts.
+      * @throws if the inputs don't have the same size
+      * @throws if input images don't consist of floats
       */
       virtual void CheckPreConditions(mitk::Image::Pointer inputHbO2, mitk::Image::Pointer inputHb);
 

@@ -248,7 +248,13 @@ void mitk::CameraController::Zoom(ScalarType factor, const Point2D& zoomPointInM
     //Move camera in a way that the clicked point stays visible on the display where it was.
     Point2D planePoint = GetCameraPositionOnPlane();
 
-    planePoint = planePoint + ((zoomPointInMM - planePoint) * (factor - 1));
+    // Check if zoom point inside image
+    // If this is the case, adjust plane point accordingly
+    double widthInMM = this->GetRenderer()->GetCurrentWorldPlaneGeometry()->GetExtentInMM(0);
+    double heightInMM = this->GetRenderer()->GetCurrentWorldPlaneGeometry()->GetExtentInMM(1);
+    if (zoomPointInMM[0] >= 0. && zoomPointInMM[0] < widthInMM && zoomPointInMM[1] >= 0. && zoomPointInMM[1] < heightInMM) {
+      planePoint = planePoint + ((zoomPointInMM - planePoint) * (factor - 1));
+    }
 
     AdjustConstrainedCameraPosition(planePoint);
 

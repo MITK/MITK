@@ -92,7 +92,7 @@ data(const QModelIndex& index, int role) const
 
   QVariant result;
 
-  if (index.row() < m_Checker->GetNumberOfConstraints())
+  if (static_cast<unsigned int>(index.row()) < m_Checker->GetNumberOfConstraints())
   {
     const mitk::SimpleBarrierConstraintChecker::Constraint constraint = m_Checker->GetConstraint(
           static_cast<unsigned int>(index.row()));
@@ -196,7 +196,7 @@ flags(const QModelIndex& index) const
 {
   Qt::ItemFlags flags = QAbstractItemModel::flags(index);
 
-  if (index.row() < m_Checker->GetNumberOfConstraints())
+  if (static_cast<unsigned int>(index.row()) < m_Checker->GetNumberOfConstraints())
   {
     if (index.column() < NUMBER_OF_CONSTRAINT_ASPECTS && index.column() >= 0)
     {
@@ -239,7 +239,7 @@ bool
 QmitkSimpleBarrierModel::
 setData(const QModelIndex& index, const QVariant& value, int role)
 {
-  if (!index.isValid() || (m_Checker->GetNumberOfConstraints() <= index.row())
+  if (!index.isValid() || (m_Checker->GetNumberOfConstraints() <= static_cast<unsigned int>(index.row()))
       || (index.column() >= NUMBER_OF_CONSTRAINT_ASPECTS))
   {
     return false;
@@ -310,7 +310,7 @@ void QmitkSimpleBarrierModel::addConstraint()
 
 void QmitkSimpleBarrierModel::deleteConstraint(const QModelIndex& index)
 {
-  if (!index.isValid() || (m_Checker->GetNumberOfConstraints() <= index.row())
+  if (!index.isValid() || (m_Checker->GetNumberOfConstraints() <= static_cast<unsigned int>(index.row()))
       || (index.column() >= NUMBER_OF_CONSTRAINT_ASPECTS))
   {
     return;

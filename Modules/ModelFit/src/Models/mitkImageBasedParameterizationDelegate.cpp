@@ -30,7 +30,7 @@ mitk::ImageBasedParameterizationDelegate::ParametersType mitk::ImageBasedParamet
 
     for (const auto& pos : this->m_ParameterImageMap)
     {
-      ParametersType::ValueType value;
+      ParametersType::ValueType value = 0.0;
       mitkPixelTypeMultiplex3(AccessPixel, pos.second->GetChannelDescriptor().GetPixelType(), pos.second, currentPosition, value);
 
       initialParameters[pos.first] = value;

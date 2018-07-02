@@ -277,6 +277,7 @@ void mitk::BeamformingFilter::GenerateData()
             &(((float*)out)[m_Conf->GetReconstructionLines() * m_Conf->GetSamplesPerLine() * slice]),
             batchSize * i + slice, 0, 0, mitk::Image::ImportMemoryManagementType::CopyMemory);
         }
+        free(out);
       }
     }
     catch (mitk::Exception &e)

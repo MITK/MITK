@@ -3,7 +3,7 @@ MITK_CREATE_MODULE(Pharmacokinetics
     PUBLIC ${MITK_BINARY_DIR}
     PRIVATE src/Common src/Functors src/Models src/DescriptionParameters src/SimulationFramework
   DEPENDS
-    PUBLIC MitkCore MitkFitMIData
+    PUBLIC MitkCore MitkModelFit
 	PRIVATE MitkMultilabel
   PACKAGE_DEPENDS
     PUBLIC ITK|ITKOptimizers

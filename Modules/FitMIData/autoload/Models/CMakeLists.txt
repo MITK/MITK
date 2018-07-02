@@ -1,6 +1,0 @@
-MITK_CREATE_MODULE(FitMIDataModelsServices
-  DEPENDS
-    PUBLIC MitkFitMIData
-    PRIVATE MitkCore
-  AUTOLOAD_WITH MitkFitMIData
-)

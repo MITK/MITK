@@ -70,8 +70,8 @@ set(MITK_MODULES
   RenderWindowManager
   RenderWindowManagerUI
   CEST
-  FitMIData
-  FitMIDataUI
+  ModelFit
+  ModelFitUI
   Pharmacokinetics
   PharmacokineticsUI
 )

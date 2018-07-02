@@ -2,7 +2,7 @@
   \defgroup org_mitk_gui_qt_fit_demo org.mitk.gui.qt.fit.demo
   \ingroup MITKPlugins
 
-  \brief Plugin to demonstrate the fitting module FitMIData and a simple fit generator.
+  \brief Plugin to demonstrate the fitting module ModelFit and a simple fit generator.
 
 */
 

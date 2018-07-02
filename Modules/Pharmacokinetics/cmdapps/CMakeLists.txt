@@ -26,7 +26,7 @@ if(BUILD_PerfusionMiniApps)
       set(dependencies_list ${dependencies})
 
       mitk_create_executable(${appname}
-      DEPENDS MitkFitMIData MitkPharmacokinetics MitkCommandLine ${dependencies_list}
+      DEPENDS MitkModelFit MitkPharmacokinetics MitkCommandLine ${dependencies_list}
       PACKAGE_DEPENDS ITK
       CPP_FILES ${appname}.cpp
       )

@@ -4,6 +4,6 @@
 \li \ref FDEMO_Introduction
 
 \section FDEMO_Introduction Introduction
-This is a very simple view that demonstrates how a fit generator can be implemented using the module FitMIData.
+This is a very simple view that demonstrates how a fit generator can be implemented using the module ModelFit.
 In addition the view can be used to generate a demo fit to explore other components like the fit explorer.
 */

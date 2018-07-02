@@ -1,0 +1,40 @@
+# Find iconv library
+#
+# Released under BSD license
+#
+#  LIBICONV_INCLUDE_DIRS - where to find iconv.h, etc
+#  LIBICONV_LIBRARIES    - Lists of libraries when using libiconv
+#  LIBICONV_FOUND        - True if libiconv found
+
+INCLUDE(FindPackageHandleStandardArgs)
+# INCLUDE(dcmtkTryCompile)
+
+# Look for the header file
+FIND_PATH(LIBICONV_INCLUDE_DIRS NAMES iconv.h)
+MARK_AS_ADVANCED(LIBICONV_INCLUDE_DIRS)
+
+# Look for the library
+SET(LIBICONV_LIBS libiconv libcharset)
+
+SET(LIBICONV_LIBRARIES)
+FOREACH(lib ${LIBICONV_LIBS})
+  FIND_LIBRARY(${lib}_LIBRARY_RELEASE
+    NAMES ${lib}${CMAKE_RELEASE_POSTFIX}
+    )
+  MARK_AS_ADVANCED(${lib}_LIBRARY_RELEASE)
+
+  IF(${lib}_LIBRARY_RELEASE)
+    LIST(APPEND LIBICONV_LIBRARIES optimized ${${lib}_LIBRARY_RELEASE})
+  ENDIF()
+
+  FIND_LIBRARY(${lib}_LIBRARY_DEBUG
+    NAMES ${lib}${DCMTK_CMAKE_DEBUG_POSTFIX}
+    )
+  MARK_AS_ADVANCED($(lib)_LIBRARY_DEBUG)
+
+  IF(${lib}_LIBRARY_DEBUG)
+    LIST(APPEND LIBICONV_LIBRARIES debug ${${lib}_LIBRARY_DEBUG})
+  ENDIF()
+ENDFOREACH()
+
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(LIBICONV REQUIRED_VARS LIBICONV_LIBRARIES LIBICONV_INCLUDE_DIRS)

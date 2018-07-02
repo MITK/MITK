@@ -11,6 +11,9 @@ if(MITK_USE_DCMTK)
 
   set(proj DCMTK)
   set(proj_DEPENDENCIES )
+  if(WIN32)
+      set(proj_DEPENDENCIES LIBICONV)
+  endif()
   set(DCMTK_DEPENDS ${proj})
 
   if(NOT DEFINED DCMTK_DIR)
@@ -26,15 +29,22 @@ if(MITK_USE_DCMTK)
       )
     endif()
     if(WIN32)
+      if(LIBICONV_DIR STREQUAL "")
+        set(LIBICONV_DIR ${ep_prefix})
+      endif()
       list(APPEND additional_args
         "-DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS:BOOL=ON"
         "-DDCMTK_WIDE_CHAR_MAIN_FUNCTION:BOOL=ON"
+        "-DDCMTK_WITH_ICONV:BOOL=ON"
+        "-DLIBICONV_DIR:PATH=${LIBICONV_DIR}"
+        "-DDCMTK_ENABLE_CHARSET_CONVERSION:STRING=libiconv"
       )
     endif()
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY "git@github.com:samsmu/dcmtk.git"
+      GIT_TAG "origin/develop-2018-06-20"
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
          ${ep_common_args}
@@ -49,7 +59,6 @@ if(MITK_USE_DCMTK)
          -DDCMTK_WITH_PNG:BOOL=OFF # see bug #9894
          -DDCMTK_WITH_TIFF:BOOL=OFF  # see bug #9894
          -DDCMTK_WITH_XML:BOOL=OFF  # see bug #9894
-         -DDCMTK_WITH_ICONV:BOOL=OFF  # see bug #9894
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS

@@ -71,6 +71,10 @@ set(MITK_MODULES
   RenderWindowManagerUI
   CEST
   BasicImageProcessing
+  ModelFit
+  ModelFitUI
+  Pharmacokinetics
+  PharmacokineticsUI
 )
 
 if(MITK_ENABLE_PIC_READER)

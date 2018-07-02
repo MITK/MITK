@@ -100,4 +100,12 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.matchpoint.manipulator:OFF
   org.mitk.gui.qt.preprocessing.resampling:OFF
   org.mitk.gui.qt.cest:OFF
+  org.mitk.gui.qt.fit.demo:OFF
+  org.mitk.gui.qt.fit.inspector:OFF
+  org.mitk.gui.qt.fit.genericfitting:OFF
+  org.mitk.gui.qt.pharmacokinetics.mri:OFF
+  org.mitk.gui.qt.pharmacokinetics.pet:OFF
+  org.mitk.gui.qt.pharmacokinetics.simulation:OFF
+  org.mitk.gui.qt.pharmacokinetics.curvedescriptor:OFF
+  org.mitk.gui.qt.pharmacokinetics.concentration.mri:OFF
 )

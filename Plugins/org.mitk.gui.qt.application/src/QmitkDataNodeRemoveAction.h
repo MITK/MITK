@@ -14,40 +14,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKFILESAVEACTION_H_
-#define QMITKFILESAVEACTION_H_
+#ifndef QMITKDATANODEREMOVEACTION_H
+#define QMITKDATANODEREMOVEACTION_H
 
 #include <org_mitk_gui_qt_application_Export.h>
 
-#include <berryIWorkbenchWindow.h>
+#include "QmitkAbstractDataNodeAction.h"
 
 // qt
 #include <QAction>
-#include <QIcon>
 
-class QmitkFileSaveActionPrivate;
-
-class MITK_QT_APP QmitkFileSaveAction : public QAction
+class MITK_QT_APP QmitkDataNodeRemoveAction : public QAction, public QmitkAbstractDataNodeAction
 {
   Q_OBJECT
 
 public:
 
-  QmitkFileSaveAction(berry::IWorkbenchWindow::Pointer window);
-  QmitkFileSaveAction(const QIcon& icon, berry::IWorkbenchWindow::Pointer window);
-  QmitkFileSaveAction(const QIcon& icon, berry::IWorkbenchWindow* window);
+  QmitkDataNodeRemoveAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
+  QmitkDataNodeRemoveAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkFileSaveAction() override;
+  virtual ~QmitkDataNodeRemoveAction() override;
 
-protected slots:
+private Q_SLOTS:
 
-  virtual void Run();
+  void OnActionTriggered(bool);
+
+protected:
+
+  virtual void InitializeAction() override;
 
 private:
 
-  const QScopedPointer<QmitkFileSaveActionPrivate> d;
+  QWidget* m_Parent;
 
 };
 
-
-#endif /*QMITKFILESAVEACTION_H_*/
+#endif // QMITKDATANODEREMOVEACTION_H

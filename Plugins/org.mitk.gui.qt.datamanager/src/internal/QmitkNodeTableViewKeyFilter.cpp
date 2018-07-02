@@ -53,37 +53,37 @@ bool QmitkNodeTableViewKeyFilter::eventFilter( QObject *obj, QEvent *event )
     if(_KeySequence == _MakeAllInvisible)
     {
       // trigger deletion of selected node(s)
-      _DataManagerView->MakeAllNodesInvisible(true);
+      _DataManagerView->OnMakeAllNodesInvisible(true);
       // return true: this means the delete key event is not send to the table
       return true;
     }
     else if(_KeySequence == _DeleteSelectedNodes)
     {
       // trigger deletion of selected node(s)
-      _DataManagerView->RemoveSelectedNodes(true);
+      _DataManagerView->OnRemoveSelectedNodes(true);
       // return true: this means the delete key event is not send to the table
       return true;
     }
     else if(_KeySequence == _ToggleVisibility)
     {
       // trigger deletion of selected node(s)
-      _DataManagerView->ToggleVisibilityOfSelectedNodes(true);
+      _DataManagerView->OnToggleVisibilityOfSelectedNodes(true);
       // return true: this means the delete key event is not send to the table
       return true;
     }
     else if(_KeySequence == _Reinit)
     {
-      _DataManagerView->ReinitSelectedNodes(true);
+      _DataManagerView->OnReinitSelectedNodes(true);
       return true;
     }
     else if(_KeySequence == _GlobalReinit)
     {
-      _DataManagerView->GlobalReinit(true);
+      _DataManagerView->OnGlobalReinit(true);
       return true;
     }
     else if(_KeySequence == _ShowInfo)
     {
-      _DataManagerView->ShowInfoDialogForSelectedNodes(true);
+      _DataManagerView->OnShowInfoDialogForSelectedNodes(true);
       return true;
     }
   }

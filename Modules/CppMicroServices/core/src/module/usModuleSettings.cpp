@@ -42,10 +42,11 @@ namespace {
 #endif
     if (in.empty()) return in;
     std::string::const_iterator lastChar = --in.end();
-    while (lastChar != in.begin() && std::isspace(*lastChar)) lastChar--;
+    // Don't trim unsuported symbols
+    while (lastChar != in.begin() && *lastChar >= 0 && std::isspace(*lastChar)) lastChar--;
     if (*lastChar != separator) lastChar++;
     std::string::const_iterator firstChar = in.begin();
-    while (firstChar < lastChar && std::isspace(*firstChar)) firstChar++;
+    while (firstChar < lastChar && *firstChar >= 0 && std::isspace(*firstChar)) firstChar++;
     return std::string(firstChar, lastChar);
   }
 

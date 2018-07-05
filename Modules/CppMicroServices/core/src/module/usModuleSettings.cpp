@@ -43,10 +43,10 @@ namespace {
     if (in.empty()) return in;
     std::string::const_iterator lastChar = --in.end();
     // Don't trim unsuported symbols
-    while (lastChar != in.begin() && (*lastChar >= 0 && *lastChar < 255) && std::isspace(*lastChar)) lastChar--;
+    while (lastChar != in.begin() && *lastChar >= 0 && std::isspace(*lastChar)) lastChar--;
     if (*lastChar != separator) lastChar++;
     std::string::const_iterator firstChar = in.begin();
-    while (firstChar < lastChar && (*firstChar >= 0 && *firstChar < 255) && std::isspace(*firstChar)) firstChar++;
+    while (firstChar < lastChar && *firstChar >= 0 && std::isspace(*firstChar)) firstChar++;
     return std::string(firstChar, lastChar);
   }
 

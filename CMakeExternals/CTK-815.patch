@@ -1,0 +1,40 @@
+From b3dbdbca7ecc9519b1e5472d81356de5e54b74a2 Mon Sep 17 00:00:00 2001
+From: cnd <cynede@gentoo.org>
+Date: Wed, 4 Jul 2018 17:17:19 +0400
+Subject: [PATCH] Don't close QSqlDatabase from different thread
+
+call shutdown from the same thread
+closes #814
+---
+ Libs/PluginFramework/ctkPluginFramework_p.cpp | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/Libs/PluginFramework/ctkPluginFramework_p.cpp b/Libs/PluginFramework/ctkPluginFramework_p.cpp
+index 844cbdb09..a958ed4bf 100644
+--- a/Libs/PluginFramework/ctkPluginFramework_p.cpp
++++ b/Libs/PluginFramework/ctkPluginFramework_p.cpp
+@@ -146,7 +146,7 @@ void ctkPluginFrameworkPrivate::shutdown(bool restart)
+       {
+         const bool wa = wasActive;
+         shuttingDown.fetchAndStoreOrdered(1);
+-        QtConcurrent::run(this, &ctkPluginFrameworkPrivate::shutdown0, restart, wa);
++        shutdown0(restart, wa);
+       }
+       catch (const ctkException& e)
+       {
+@@ -168,7 +168,6 @@ void ctkPluginFrameworkPrivate::shutdown0(bool restart, bool wasActive)
+   try
+   {
+     {
+-      Locker sync(&lock);
+       waitOnOperation(&lock, QString("Framework::") + (restart ? "update" : "stop"), true);
+       operation = DEACTIVATING;
+       state = ctkPlugin::STOPPING;
+@@ -184,7 +183,6 @@ void ctkPluginFrameworkPrivate::shutdown0(bool restart, bool wasActive)
+     }
+ 
+     {
+-      Locker sync(&lock);
+       fwCtx->uninit();
+       shuttingDown.fetchAndStoreOrdered(0);
+       shutdownDone_unlocked(restart);

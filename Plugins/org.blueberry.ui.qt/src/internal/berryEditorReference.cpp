@@ -319,7 +319,7 @@ IWorkbenchPart::Pointer EditorReference::CreatePart()
       try
       {
         input = this->GetEditorInput();
-      } catch (PartInitException &e1)
+      } catch (const PartInitException&)
       {
         input = new NullEditorInput(EditorReference::Pointer(this));
       }
@@ -524,7 +524,7 @@ IEditorPart::Pointer EditorReference::GetEmptyEditor(
   try
   {
     input = this->GetEditorInput();
-  } catch (const PartInitException &e1)
+  } catch (const PartInitException&)
   {
     input = new NullEditorInput(EditorReference::Pointer(this));
   }

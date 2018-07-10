@@ -190,12 +190,6 @@ if(MITK_USE_MatchPoint)
             FILES_MATCHING PATTERN "MAPAlgorithms*")
 endif()
 
-if(MITK_USE_BetData)
-  install(DIRECTORY "${BetData_DIR}"
-            DESTINATION "bin"
-            FILES_MATCHING PATTERN "*")
-endif()
-
 #install SimpleITK libs that are currently not auto detected
 if(MITK_USE_SimpleITK)
   install(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/bin/"

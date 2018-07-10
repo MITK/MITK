@@ -147,8 +147,8 @@ int main(int argc, char* argv[])
         parameters.m_SignalGen.m_ImageSpacing = itkVectorImagePointer->GetSpacing();
         parameters.m_SignalGen.m_ImageOrigin = itkVectorImagePointer->GetOrigin();
         parameters.m_SignalGen.m_ImageDirection = itkVectorImagePointer->GetDirection();
-        parameters.SetBvalue(static_cast<mitk::FloatProperty*>(template_image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue());
-        parameters.SetGradienDirections(static_cast<mitk::GradientDirectionsProperty*>( template_image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer());
+        parameters.SetBvalue(mitk::DiffusionPropertyHelper::GetReferenceBValue(template_image));
+        parameters.SetGradienDirections(mitk::DiffusionPropertyHelper::GetGradientContainer(template_image));
       }
       else
       {
@@ -173,12 +173,8 @@ int main(int argc, char* argv[])
     parameters.m_SignalGen.m_ImageSpacing = itkVectorImagePointer->GetSpacing();
     parameters.m_SignalGen.m_ImageOrigin = itkVectorImagePointer->GetOrigin();
     parameters.m_SignalGen.m_ImageDirection = itkVectorImagePointer->GetDirection();
-    parameters.SetBvalue(static_cast<mitk::FloatProperty*>
-                                      (diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
-                                      ->GetValue());
-    parameters.SetGradienDirections( static_cast<mitk::GradientDirectionsProperty*>
-                                                 ( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
-                                                 ->GetGradientDirectionsContainer() );
+    parameters.SetBvalue(mitk::DiffusionPropertyHelper::GetReferenceBValue(diffImg));
+    parameters.SetGradienDirections(mitk::DiffusionPropertyHelper::GetGradientContainer(diffImg));
 
     tractsToDwiFilter->SetInputImage(itkVectorImagePointer);
   }
@@ -191,13 +187,10 @@ int main(int argc, char* argv[])
   tractsToDwiFilter->SetParameters(parameters);
   tractsToDwiFilter->Update();
 
-  mitk::Image::Pointer image = mitk::GrabItkImageMemory( tractsToDwiFilter->GetOutput() );
-  image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(),
-                                             mitk::GradientDirectionsProperty::New( parameters.m_SignalGen.GetGradientDirections() ) );
-  image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(),
-                                             mitk::FloatProperty::New( parameters.m_SignalGen.GetBvalue() ) );
-  mitk::DiffusionPropertyHelper propertyHelper( image );
-  propertyHelper.InitializeImage();
+  mitk::Image::Pointer image = mitk::GrabItkImageMemory(tractsToDwiFilter->GetOutput());
+  mitk::DiffusionPropertyHelper::SetGradientContainer(image, parameters.m_SignalGen.GetItkGradientContainer());
+  mitk::DiffusionPropertyHelper::SetReferenceBValue(image, parameters.m_SignalGen.GetBvalue());
+  mitk::DiffusionPropertyHelper::InitializeImage(image);
 
   if (file_extension=="")
     mitk::IOUtil::Save(image, "application/vnd.mitk.nii.gz", outName+".nii.gz");

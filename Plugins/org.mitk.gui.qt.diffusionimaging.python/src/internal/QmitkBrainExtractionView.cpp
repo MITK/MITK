@@ -37,9 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkNodePredicateDimension.h>
 #include <mitkNodePredicateAnd.h>
-#include <usModuleContext.h>
-#include <usModuleResource.h>
-#include <usGetModuleContext.h>
 #include <mitkIOUtil.h>
 #include <mitkIPythonService.h>
 #include <itkResampleImageFilter.h>
@@ -125,10 +122,15 @@ std::string QmitkBrainExtractionView::GetPythonFile(std::string filename)
 
   if ( ist::FileExists(bet_dir + filename) )
     out = bet_dir + filename;
-  else if ( ist::FileExists( ist::GetCurrentWorkingDirectory() + filename) )
-    out = ist::GetCurrentWorkingDirectory() + filename;
-  else if ( ist::FileExists( ist::GetCurrentWorkingDirectory() + "BetData/" + filename) )
-    out = ist::GetCurrentWorkingDirectory() + "BetData/" + filename;
+  else
+  {
+    for (auto dir : mitk::bet::search_dirs)
+      if ( ist::FileExists( ist::GetCurrentWorkingDirectory() + dir + filename) )
+      {
+        out = ist::GetCurrentWorkingDirectory() + dir + filename;
+        break;
+      }
+  }
 
   return out;
 }
@@ -140,15 +142,15 @@ void QmitkBrainExtractionView::StartBrainExtraction()
 
   bool missing_file = false;
   std::string missing_file_string = "";
-  if ( GetPythonFile("brain_extraction_script.py").empty() )
+  if ( GetPythonFile("run_mitk.py").empty() )
   {
-    missing_file_string += "Brain extraction script file missing: brain_extraction_script.py\n\n";
+    missing_file_string += "Brain extraction script file missing: run_mitk.py\n\n";
     missing_file = true;
   }
 
-  if ( GetPythonFile("brain_extraction_model.model").empty() )
+  if ( GetPythonFile("model_final.model").empty() )
   {
-    missing_file_string += "Brain extraction model file missing: brain_extraction_model.model\n\n";
+    missing_file_string += "Brain extraction model file missing: model_final.model\n\n";
     missing_file = true;
   }
 
@@ -171,13 +173,18 @@ void QmitkBrainExtractionView::StartBrainExtraction()
     mitk::IPythonService* m_PythonService = dynamic_cast<mitk::IPythonService*> ( context->GetService<mitk::IPythonService>(m_PythonServiceRef) );
     mitk::IPythonService::ForceLoadModule();
 
+    std::string pythonpath = std::string(BetData_DIR);
+    for (auto dir : mitk::bet::search_dirs)
+      pythonpath += "','" + ist::GetCurrentWorkingDirectory() + dir;
+
     m_PythonService->Execute("import SimpleITK as sitk");
     m_PythonService->Execute("import SimpleITK._SimpleITK as _SimpleITK");
     m_PythonService->Execute("import numpy");
     m_PythonService->CopyToPythonAsSimpleItkImage( mitk_image, "in_image");
-    m_PythonService->Execute("model_file=\""+GetPythonFile("brain_extraction_model.model")+"\"");
+    m_PythonService->Execute("paths=['"+pythonpath+"']");
+    m_PythonService->Execute("model_file=\""+GetPythonFile("model_final.model")+"\"");
     m_PythonService->Execute("config_file=\""+GetPythonFile("basic_config_just_like_braintumor.py")+"\"");
-    m_PythonService->ExecuteScript( GetPythonFile("brain_extraction_script.py") );
+    m_PythonService->ExecuteScript( GetPythonFile("run_mitk.py") );
 
     {
       mitk::Image::Pointer image = m_PythonService->CopySimpleItkImageFromPython("brain_mask");
@@ -194,9 +201,8 @@ void QmitkBrainExtractionView::StartBrainExtraction()
 
       if(mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(mitk_image))
       {
-        mitk::DiffusionPropertyHelper propertyHelper(image);
         mitk::DiffusionPropertyHelper::CopyProperties(mitk_image, image, true);
-        propertyHelper.InitializeImage();
+        mitk::DiffusionPropertyHelper::InitializeImage(image);
       }
 
       mitk::DataNode::Pointer corrected_node = mitk::DataNode::New();

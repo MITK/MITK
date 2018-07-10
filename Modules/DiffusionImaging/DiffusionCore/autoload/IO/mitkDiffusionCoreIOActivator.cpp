@@ -77,29 +77,7 @@ namespace mitk
       m_NrrdOdfImageWriter = new NrrdOdfImageWriter();
       m_ShImageWriter = new ShImageWriter();
 
-      //register relevant properties
-      //non-persistent properties
-      mitk::CoreServices::GetPropertyDescriptions()->AddDescription(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME, "This map stores which b values belong to which gradients.");
-      mitk::CoreServices::GetPropertyDescriptions()->AddDescription(mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME, "The original gradients used during acquisition. This property may be empty.");
-      //persistent properties
-      mitk::CoreServices::GetPropertyDescriptions()->AddDescription(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME, "The reference b value the gradients are normalized to.");
-      mitk::CoreServices::GetPropertyDescriptions()->AddDescription(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME, "The measurment frame used during acquisition.");
-      mitk::CoreServices::GetPropertyDescriptions()->AddDescription(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME, "The gradients after applying measurement frame and image matrix.");
-      mitk::CoreServices::GetPropertyDescriptions()->AddDescription(mitk::DiffusionPropertyHelper::MODALITY, "Defines the modality used for acquisition. DWMRI signifies diffusion weighted images.");
-
-      mitk::PropertyPersistenceInfo::Pointer PPI_referenceBValue = mitk::PropertyPersistenceInfo::New();
-      PPI_referenceBValue->SetNameAndKey(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME, "DWMRI_b-value");
-      mitk::PropertyPersistenceInfo::Pointer PPI_measurementFrame = mitk::PropertyPersistenceInfo::New();
-      PPI_measurementFrame->SetNameAndKey(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME, "measurement frame");
-      mitk::PropertyPersistenceInfo::Pointer PPI_gradientContainer = mitk::PropertyPersistenceInfo::New();
-      PPI_gradientContainer->SetNameAndKey(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME, "DWMRI_gradient");
-      mitk::PropertyPersistenceInfo::Pointer PPI_modality = mitk::PropertyPersistenceInfo::New();
-      PPI_modality->SetNameAndKey(mitk::DiffusionPropertyHelper::MODALITY, "modality");
-
-      mitk::CoreServices::GetPropertyPersistence()->AddInfo(PPI_referenceBValue.GetPointer() , true);
-      mitk::CoreServices::GetPropertyPersistence()->AddInfo(PPI_measurementFrame.GetPointer(), true);
-      mitk::CoreServices::GetPropertyPersistence()->AddInfo(PPI_gradientContainer.GetPointer(), true);
-      mitk::CoreServices::GetPropertyPersistence()->AddInfo(PPI_modality.GetPointer(), true);
+      mitk::DiffusionPropertyHelper::SetupProperties();
     }
 
     void Unload(us::ModuleContext*) override

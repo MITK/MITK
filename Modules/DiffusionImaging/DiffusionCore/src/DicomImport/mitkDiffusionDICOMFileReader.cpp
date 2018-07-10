@@ -135,8 +135,8 @@ bool mitk::DiffusionDICOMFileReader
   }
 
   // initialize the output image
-  output_image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( directions ) );
-  output_image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( max_bvalue ) );
+  mitk::DiffusionPropertyHelper::SetOriginalGradientContainer(output_image, directions);
+  mitk::DiffusionPropertyHelper::SetReferenceBValue(output_image, max_bvalue);
 
   if( is_mosaic && this->m_ResolveMosaic )
   {
@@ -156,8 +156,7 @@ bool mitk::DiffusionDICOMFileReader
     mitk::CastToMitkImage( helper.LoadToVector<short, 3>( filenames ), output_image );
   }
 
-  mitk::DiffusionPropertyHelper propertyHelper( output_image );
-  propertyHelper.InitializeImage();
+  mitk::DiffusionPropertyHelper::InitializeImage(output_image);
   output_image->SetProperty("diffusion.dicom.importname", mitk::StringProperty::New( helper.GetOutputName(filenames) ) );
 
   block.SetMitkImage( (mitk::Image::Pointer) output_image );

@@ -180,15 +180,8 @@ void QmitkDiffusionQuantificationView::DoBallStickCalculation()
     mitk::CastToItkImage(image, itkVectorImagePointer);
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput( itkVectorImagePointer );
-
-    filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>
-                                   ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
-                                   ->GetGradientDirectionsContainer() );
-
-    filter->SetB_value( static_cast<mitk::FloatProperty*>
-                        (image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
-                        ->GetValue() );
-
+    filter->SetGradientDirections(mitk::DiffusionPropertyHelper::GetGradientContainer(image));
+    filter->SetB_value(mitk::DiffusionPropertyHelper::GetReferenceBValue(image));
     filter->Update();
 
     mitk::Image::Pointer newImage = mitk::Image::New();
@@ -217,13 +210,12 @@ void QmitkDiffusionQuantificationView::DoBallStickCalculation()
     {
       mitk::Image::Pointer dOut = mitk::GrabItkImageMemory( filter->GetOutDwi().GetPointer() );
 
-      dOut->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() );
-      dOut->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() );
-      mitk::DiffusionPropertyHelper propertyHelper( dOut );
-      propertyHelper.InitializeImage();
+      mitk::DiffusionPropertyHelper::SetGradientContainer(dOut, mitk::DiffusionPropertyHelper::GetGradientContainer(image) );
+      mitk::DiffusionPropertyHelper::SetReferenceBValue(dOut, mitk::DiffusionPropertyHelper::GetReferenceBValue(image) );
+      mitk::DiffusionPropertyHelper::InitializeImage(dOut);
 
       mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-      imageNode->SetData( dOut );
+      imageNode->SetData(dOut);
       QString name = node->GetName().c_str();
       imageNode->SetName((name+"_Estimated-DWI").toStdString().c_str());
       GetDataStorage()->Add(imageNode, node);
@@ -244,15 +236,8 @@ void QmitkDiffusionQuantificationView::DoMultiTensorCalculation()
     mitk::CastToItkImage(image, itkVectorImagePointer);
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput( itkVectorImagePointer );
-
-    filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>
-                                   ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
-                                   ->GetGradientDirectionsContainer() );
-
-    filter->SetB_value( static_cast<mitk::FloatProperty*>
-                        (image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
-                        ->GetValue() );
-
+    filter->SetGradientDirections(mitk::DiffusionPropertyHelper::GetGradientContainer(image));
+    filter->SetB_value(mitk::DiffusionPropertyHelper::GetReferenceBValue(image));
     filter->Update();
 
     typedef mitk::TensorImage::ItkTensorImageType TensorImageType;

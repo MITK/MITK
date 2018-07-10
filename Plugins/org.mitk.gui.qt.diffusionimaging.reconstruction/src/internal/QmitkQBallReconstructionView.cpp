@@ -111,7 +111,7 @@ struct QbrShellSelection
 
   void GenerateCheckboxes()
   {
-    BValueMapType origMap = static_cast<mitk::BValueMapProperty*>(m_Image->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
+    BValueMapType origMap = mitk::DiffusionPropertyHelper::GetBValueMap(m_Image);
     BValueMapType::iterator itStart = origMap.begin();
     itStart++;
     BValueMapType::iterator itEnd = origMap.end();
@@ -142,7 +142,7 @@ struct QbrShellSelection
 
   BValueMapType GetBValueSelctionMap()
   {
-    BValueMapType inputMap = static_cast<mitk::BValueMapProperty*>(m_Image->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
+    BValueMapType inputMap = mitk::DiffusionPropertyHelper::GetBValueMap(m_Image);
     BValueMapType outputMap;
 
     unsigned int val = 0;
@@ -472,8 +472,8 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction(mitk::DataNode::
     mitk::CastToItkImage(vols, itkVectorImagePointer);
 
     QballReconstructionImageFilterType::Pointer filter = QballReconstructionImageFilterType::New();
-    filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( vols->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
-    filter->SetBValue( static_cast<mitk::FloatProperty*>(vols->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+    filter->SetGradientImage(mitk::DiffusionPropertyHelper::GetGradientContainer(vols), itkVectorImagePointer);
+    filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(vols));
     filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
 
     std::string nodePostfix;
@@ -594,9 +594,8 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::
   ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
   mitk::CastToItkImage(vols, itkVectorImagePointer);
 
-  filter->SetBValue( static_cast<mitk::FloatProperty*>(vols->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
-  filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( vols->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
-
+  filter->SetGradientImage(mitk::DiffusionPropertyHelper::GetGradientContainer(vols), itkVectorImagePointer);
+  filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(vols));
   filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
   filter->SetLambda(lambda);
 
@@ -774,7 +773,7 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
   mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
   filter->SetBValueMap(m_ShellSelectorMap[dataNodePointer]->GetBValueSelctionMap());
-  filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( dwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer, static_cast<mitk::FloatProperty*>(dwi->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+  filter->SetGradientImage(mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer, mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
   filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
   filter->SetLambda(lambda);
   filter->Update();
@@ -838,7 +837,7 @@ void QmitkQBallReconstructionView::PreviewThreshold(int threshold)
     typedef itk::B0ImageExtractionImageFilter<short, short> FilterType;
     FilterType::Pointer filterB0 = FilterType::New();
     filterB0->SetInput( itkVectorImagePointer );
-    filterB0->SetDirections( static_cast<mitk::GradientDirectionsProperty*>( vols->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
+    filterB0->SetDirections(mitk::DiffusionPropertyHelper::GetGradientContainer(vols));
     filterB0->Update();
 
     mitk::Image::Pointer mitkImage = mitk::Image::New();

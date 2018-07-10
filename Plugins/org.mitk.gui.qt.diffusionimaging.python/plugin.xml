@@ -12,6 +12,14 @@
     <keywordReference id="org.mitk.views.brainextraction.Keyword"/>
     </view>
 
+    <view id="org.mitk.views.dipyreconstruction"
+    name="Dipy ODF Reconstructions"
+    category="Signal modeling"
+    class="QmitkDipyReconstructionsView"
+    icon="resources/dipy.png">
+    <keywordReference id="org.mitk.views.dipyreconstruction.Keyword"/>
+    </view>
+
   </extension>
 
 </plugin>

@@ -574,6 +574,7 @@ void mitk::FiberfoxParameters::GenerateGradientHalfShell()
 
 void mitk::FiberfoxParameters::LoadParameters(std::string filename)
 {
+  srand(time(0));
   m_MissingTags = "";
   if(filename.empty()) { return; }
 
@@ -740,7 +741,8 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
 
       if ( m_Misc.m_MotionVolumesBox == "random" )
       {
-        for ( size_t i=0; i < m_SignalGen.GetNumVolumes(); ++i )
+        m_SignalGen.m_MotionVolumes.push_back(0);
+        for ( size_t i=1; i < m_SignalGen.GetNumVolumes(); ++i )
         {
           m_SignalGen.m_MotionVolumes.push_back( bool( rand()%2 ) );
         }

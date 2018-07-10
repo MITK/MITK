@@ -18,17 +18,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkIOUtil.h>
 #include "mitkCommandLineParser.h"
-#include <itksys/SystemTools.hxx>
+#include <mitkDWIHeadMotionCorrectionFilter.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
+#include <itksys/SystemTools.hxx>
+
 
 
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
 
-  parser.setTitle("DIMP");
+  parser.setTitle("HeadMotionCorrection");
   parser.setCategory("Preprocessing Tools");
-  parser.setDescription("TEMPORARY: Converts DICOM to other image types");
+  parser.setDescription("Simple affine head-motion correction tool");
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
@@ -46,13 +48,18 @@ int main(int argc, char* argv[])
   try
   {
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
-    mitk::Image::Pointer source = mitk::IOUtil::Load<mitk::Image>(imageName, &functor);
+    mitk::Image::Pointer in_image = mitk::IOUtil::Load<mitk::Image>(imageName, &functor);
+
+    mitk::DWIHeadMotionCorrectionFilter::Pointer registerer = mitk::DWIHeadMotionCorrectionFilter::New();
+    registerer->SetInput(in_image);
+    registerer->Update();
+    mitk::Image::Pointer out_image = registerer->GetCorrectedImage();
 
     std::string ext = itksys::SystemTools::GetFilenameExtension(outImage);
     if (ext==".nii" || ext==".nii.gz")
-      mitk::IOUtil::Save(source, "application/vnd.mitk.nii.gz", outImage);
+      mitk::IOUtil::Save(out_image, "application/vnd.mitk.nii.gz", outImage);
     else
-      mitk::IOUtil::Save(source, outImage);
+      mitk::IOUtil::Save(out_image, outImage);
   }
   catch (itk::ExceptionObject e)
   {

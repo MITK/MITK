@@ -38,10 +38,6 @@ int mitkExtractSingleShellTest( int argc, char* argv[] )
     */
   mitk::Image::Pointer dwimage = mitk::IOUtil::Load<mitk::Image>( argv[1] );
 
-  mitk::GradientDirectionsProperty::Pointer gradientsProperty = static_cast<mitk::GradientDirectionsProperty *>( dwimage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() );
-
-  MITK_TEST_CONDITION_REQUIRED( gradientsProperty.IsNotNull(), "Input is a dw-image");
-
   unsigned int extract_value = 0;
   std::istringstream input(argv[3]);
 
@@ -52,7 +48,7 @@ int mitkExtractSingleShellTest( int argc, char* argv[] )
 
   // GetShellSelection from GUI
   BValueMap shellSelectionMap;
-  BValueMap originalShellMap = static_cast<mitk::BValueMapProperty*>(dwimage->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
+  BValueMap originalShellMap = mitk::DiffusionPropertyHelper::GetBValueMap(dwimage);
   std::vector<unsigned int> newNumGradientDirections;
 
   shellSelectionMap[extract_value] = originalShellMap[extract_value];
@@ -62,7 +58,7 @@ int mitkExtractSingleShellTest( int argc, char* argv[] )
   mitk::CastToItkImage(dwimage, itkVectorImagePointer);
   itk::VectorImage< short, 3 > *vectorImage = itkVectorImagePointer.GetPointer();
 
-  mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientContainer = static_cast<mitk::GradientDirectionsProperty*>( dwimage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
+  mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientContainer = mitk::DiffusionPropertyHelper::GetGradientContainer(dwimage);
   FilterType::Pointer filter = FilterType::New();
   filter->SetInput(vectorImage);
   filter->SetOriginalGradientDirections(gradientContainer);
@@ -81,9 +77,8 @@ int mitkExtractSingleShellTest( int argc, char* argv[] )
 
   mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( filter->GetOutput() );
   mitk::DiffusionPropertyHelper::CopyProperties(dwimage, outImage, true);
-  outImage->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetGradientDirections() ) );
-  mitk::DiffusionPropertyHelper propertyHelper( outImage );
-  propertyHelper.InitializeImage();
+  mitk::DiffusionPropertyHelper::SetGradientContainer(outImage, filter->GetGradientDirections());
+  mitk::DiffusionPropertyHelper::InitializeImage( outImage );
 
   /*
    * 3. Write output data

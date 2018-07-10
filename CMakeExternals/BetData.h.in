@@ -19,4 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #define BetData_DIR "@BetData_DIR@"
 
+namespace mitk
+{
+namespace bet
+{
+std::vector< std::string > search_dirs = {"/","/bin/","/BetData/","/bin/BetData/"};
+}
+}
+
 #endif

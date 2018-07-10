@@ -33,10 +33,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkDwiGradientLengthCorrectionFilter.h"
 
 itk::DwiGradientLengthCorrectionFilter::DwiGradientLengthCorrectionFilter()
-    : m_ReferenceBValue(0)
-    , m_RoundingValue(0)
-    , m_ReferenceGradientDirectionContainer(nullptr)
-    , m_OutputGradientDirectionContainer(nullptr)
+  : m_ReferenceBValue(0)
+  , m_RoundingValue(0)
+  , m_ReferenceGradientDirectionContainer(nullptr)
+  , m_OutputGradientDirectionContainer(nullptr)
 {
 }
 
@@ -47,40 +47,40 @@ itk::DwiGradientLengthCorrectionFilter::~DwiGradientLengthCorrectionFilter()
 void itk::DwiGradientLengthCorrectionFilter::GenerateData()
 {
 
-    if(m_ReferenceBValue == 0 || m_RoundingValue == 0 || m_ReferenceGradientDirectionContainer.IsNull())
-        itkExceptionMacro("Wrong initialization");
+  if(m_ReferenceBValue == 0 || m_RoundingValue == 0 || m_ReferenceGradientDirectionContainer.IsNull())
+    itkExceptionMacro("Wrong initialization");
 
-    m_OutputGradientDirectionContainer = GradientDirectionContainerType::New();
+  m_OutputGradientDirectionContainer = GradientDirectionContainerType::New();
 
-    m_NewBValue = itk::NumericTraits<double>::max();
-    GradientDirectionContainerType::ConstIterator it = m_ReferenceGradientDirectionContainer->Begin();
-    for(; it != m_ReferenceGradientDirectionContainer->End(); ++it)
+  m_NewBValue = itk::NumericTraits<double>::max();
+  GradientDirectionContainerType::ConstIterator it = m_ReferenceGradientDirectionContainer->Begin();
+  for(; it != m_ReferenceGradientDirectionContainer->End(); ++it)
+  {
+    const double twonorm = it.Value().two_norm();
+    const double currentBValue = m_ReferenceBValue*twonorm*twonorm ;
+    const double roundedBValue = int((currentBValue + 0.5 * m_RoundingValue)/m_RoundingValue)*m_RoundingValue;
+
+    if (roundedBValue<m_NewBValue && roundedBValue>1)
+      m_NewBValue = roundedBValue;
+  }
+
+  it = m_ReferenceGradientDirectionContainer->Begin();
+  for(; it != m_ReferenceGradientDirectionContainer->End(); ++it)
+  {
+    const double twonorm = it.Value().two_norm();
+    const double currentBValue = m_ReferenceBValue*twonorm*twonorm ;
+    const double roundedBValue = int((currentBValue + 0.5 * m_RoundingValue)/m_RoundingValue)*m_RoundingValue;
+
+    if (roundedBValue>1)
     {
-        const double twonorm = it.Value().two_norm();
-        const double currentBValue = m_ReferenceBValue*twonorm*twonorm ;
-        const double roundedBValue = int((currentBValue + 0.5 * m_RoundingValue)/m_RoundingValue)*m_RoundingValue;
-
-        if (roundedBValue<m_NewBValue && roundedBValue>1)
-            m_NewBValue = roundedBValue;
+      const double f = std::sqrt(roundedBValue/m_NewBValue);
+      GradientDirectionType grad = it.Value();
+      m_OutputGradientDirectionContainer->push_back( grad.normalize() * f );
     }
-
-    it = m_ReferenceGradientDirectionContainer->Begin();
-    for(; it != m_ReferenceGradientDirectionContainer->End(); ++it)
+    else
     {
-        const double twonorm = it.Value().two_norm();
-        const double currentBValue = m_ReferenceBValue*twonorm*twonorm ;
-        const double roundedBValue = int((currentBValue + 0.5 * m_RoundingValue)/m_RoundingValue)*m_RoundingValue;
-
-        if (roundedBValue>1)
-        {
-            const double f = std::sqrt(roundedBValue/m_NewBValue);
-            GradientDirectionType grad = it.Value();
-            m_OutputGradientDirectionContainer->push_back( grad.normalize() * f );
-        }
-        else
-        {
-            GradientDirectionType grad; grad.fill(0.0);
-            m_OutputGradientDirectionContainer->push_back( grad );
-        }
+      GradientDirectionType grad; grad.fill(0.0);
+      m_OutputGradientDirectionContainer->push_back( grad );
     }
+  }
 }

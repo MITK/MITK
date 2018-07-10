@@ -72,8 +72,7 @@ public:
 
     map[1000] = indices2;
     bvaluemap_prop = mitk::BValueMapProperty::New(map).GetPointer();
-    propList->SetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str(),bvaluemap_prop);
-
+    propList->SetProperty(mitk::DiffusionPropertyHelper::GetBvaluePropertyName().c_str(), bvaluemap_prop);
 
     mitk::GradientDirectionsProperty::GradientDirectionsContainerType::Pointer gdc;
     gdc = mitk::GradientDirectionsProperty::GradientDirectionsContainerType::New();
@@ -95,7 +94,7 @@ public:
 
 
     gradientdirection_prop = mitk::GradientDirectionsProperty::New(gdc.GetPointer()).GetPointer();
-    propList->ReplaceProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), gradientdirection_prop);
+    propList->ReplaceProperty(mitk::DiffusionPropertyHelper::GetGradientContainerPropertyName().c_str(), gradientdirection_prop);
 
     mitk::MeasurementFrameProperty::MeasurementFrameType mft;
 
@@ -108,7 +107,7 @@ public:
     mft.set_row(2,row2);
 
     measurementframe_prop = mitk::MeasurementFrameProperty::New(mft).GetPointer();
-    propList->ReplaceProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), measurementframe_prop);
+    propList->ReplaceProperty(mitk::DiffusionPropertyHelper::GetGradientContainerPropertyName().c_str(), measurementframe_prop);
   }
 
   void tearDown() override

@@ -111,13 +111,6 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
     m_UsedGradientIndices.clear();
     m_UnusedGradientIndices.clear();
 
-    if ( it->second.size() <= m_NumGradientDirections[shellCounter] )
-    {
-      itkWarningMacro( << "current directions: " << it->second.size() << " wanted directions: " << m_NumGradientDirections[shellCounter]);
-      m_NumGradientDirections[shellCounter] = it->second.size();
-      shellCounter++;
-      continue;
-    }
     MITK_INFO << "Shell number: " << shellCounter;
     unsigned int c=0;
     for (unsigned int i=0; i<it->second.size(); i++)
@@ -129,7 +122,12 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
       c++;
     }
 
-    if (!m_UseFirstN)
+    if ( it->second.size() <= m_NumGradientDirections[shellCounter] )
+    {
+      itkWarningMacro( << "current directions: " << it->second.size() << " wanted directions: " << m_NumGradientDirections[shellCounter]);
+      m_NumGradientDirections[shellCounter] = it->second.size();
+    }
+    else if (!m_UseFirstN)
     {
       double minAngle = Costs();
       double newMinAngle = 0;
@@ -176,14 +174,9 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
           iUsed = iUsed % m_UsedGradientIndices.size();
         }
       }
-      manipulatedMap[it->first] = m_UsedGradientIndices;
-      shellCounter++;
     }
-    else
-    {
-      manipulatedMap[it->first] = m_UsedGradientIndices;
-      shellCounter++;
-    }
+    manipulatedMap[it->first] = m_UsedGradientIndices;
+    shellCounter++;
 
     for (auto gidx : m_UsedGradientIndices)
       final_gradient_indices.push_back(gidx);
@@ -227,13 +220,13 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
     for (unsigned int i=0; i<final_gradient_indices.size(); ++i)
       newVec[i] = oldVec[final_gradient_indices.at(i)];
 
-//    int index = 0;
-//    for(BValueMap::iterator it=manipulatedMap.begin(); it!=manipulatedMap.end(); it++)
-//      for(unsigned int j=0; j<it->second.size(); j++)
-//      {
-//        newVec[index] = oldVec[it->second.at(j)];
-//        index++;
-//      }
+    //    int index = 0;
+    //    for(BValueMap::iterator it=manipulatedMap.begin(); it!=manipulatedMap.end(); it++)
+    //      for(unsigned int j=0; j<it->second.size(); j++)
+    //      {
+    //        newVec[index] = oldVec[it->second.at(j)];
+    //        index++;
+    //      }
     newIt.Set(newVec);
 
     ++newIt;
@@ -245,13 +238,13 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
   for (unsigned int i=0; i<final_gradient_indices.size(); ++i)
     m_GradientDirections->InsertElement(i, m_OriginalGradientDirections->at(final_gradient_indices.at(i)));
 
-//  int index = 0;
-//  for(BValueMap::iterator it = manipulatedMap.begin(); it != manipulatedMap.end(); it++)
-//    for(unsigned int j = 0; j < it->second.size(); j++)
-//    {
-//      m_GradientDirections->InsertElement(index, m_OriginalGradientDirections->at(it->second.at(j)));
-//      index++;
-//    }
+  //  int index = 0;
+  //  for(BValueMap::iterator it = manipulatedMap.begin(); it != manipulatedMap.end(); it++)
+  //    for(unsigned int j = 0; j < it->second.size(); j++)
+  //    {
+  //      m_GradientDirections->InsertElement(index, m_OriginalGradientDirections->at(it->second.at(j)));
+  //      index++;
+  //    }
 
   this->SetNumberOfRequiredOutputs (1);
   this->SetNthOutput (0, outImage);

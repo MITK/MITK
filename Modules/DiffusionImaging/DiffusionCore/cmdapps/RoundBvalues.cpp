@@ -18,22 +18,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkIOUtil.h>
 #include "mitkCommandLineParser.h"
-#include <itksys/SystemTools.hxx>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
+#include <itksys/SystemTools.hxx>
+#include <itkDwiGradientLengthCorrectionFilter.h>
+#include <mitkDiffusionPropertyHelper.h>
 
 
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
 
-  parser.setTitle("DIMP");
+  parser.setTitle("RoundBvalues");
   parser.setCategory("Preprocessing Tools");
-  parser.setDescription("TEMPORARY: Converts DICOM to other image types");
+  parser.setDescription("Round b-values");
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("in", "i", mitkCommandLineParser::InputFile, "Input:", "input image", us::Any(), false);
   parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output:", "output image", us::Any(), false);
+  parser.addArgument("to_nearest", "", mitkCommandLineParser::Int, "To nearest:", "integer", 1000);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -43,16 +46,47 @@ int main(int argc, char* argv[])
   std::string imageName = us::any_cast<std::string>(parsedArgs["in"]);
   std::string outImage = us::any_cast<std::string>(parsedArgs["out"]);
 
+  int to_nearest = 1000;
+  if (parsedArgs.count("to_nearest"))
+    to_nearest = us::any_cast<int>(parsedArgs["to_nearest"]);
+
   try
   {
+    typedef mitk::DiffusionPropertyHelper PropHelper;
+
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
-    mitk::Image::Pointer source = mitk::IOUtil::Load<mitk::Image>(imageName, &functor);
+    mitk::Image::Pointer in_image = mitk::IOUtil::Load<mitk::Image>(imageName, &functor);
+
+    if (!PropHelper::IsDiffusionWeightedImage(in_image))
+    {
+      mitkThrow() << "Input is not a diffusion weighted image: " << imageName;
+    }
+
+    typedef itk::DwiGradientLengthCorrectionFilter FilterType;
+
+    auto itkVectorImagePointer = PropHelper::GetItkVectorImage(in_image);
+
+    FilterType::Pointer filter = FilterType::New();
+    filter->SetRoundingValue(to_nearest);
+    filter->SetReferenceBValue(PropHelper::GetReferenceBValue(in_image));
+    filter->SetReferenceGradientDirectionContainer(PropHelper::GetGradientContainer(in_image));
+    filter->Update();
+
+    mitk::Image::Pointer newImage = mitk::Image::New();
+    newImage->InitializeByItk( itkVectorImagePointer.GetPointer() );
+    newImage->SetImportVolume( itkVectorImagePointer->GetBufferPointer(), 0, 0, mitk::Image::CopyMemory);
+    itkVectorImagePointer->GetPixelContainer()->ContainerManageMemoryOff();
+
+    PropHelper::CopyProperties(in_image, newImage, true);
+    PropHelper::SetReferenceBValue(newImage, filter->GetNewBValue());
+    PropHelper::SetGradientContainer(newImage, filter->GetOutputGradientDirectionContainer());
+    PropHelper::InitializeImage(newImage);
 
     std::string ext = itksys::SystemTools::GetFilenameExtension(outImage);
     if (ext==".nii" || ext==".nii.gz")
-      mitk::IOUtil::Save(source, "application/vnd.mitk.nii.gz", outImage);
+      mitk::IOUtil::Save(newImage, "application/vnd.mitk.nii.gz", outImage);
     else
-      mitk::IOUtil::Save(source, outImage);
+      mitk::IOUtil::Save(newImage, outImage);
   }
   catch (itk::ExceptionObject e)
   {

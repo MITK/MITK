@@ -160,7 +160,7 @@ void QmitkTensorReconstructionView::ResidualClicked(int slice, int volume)
     correctNode = mitk::DataNode::New();
     correctNode = m_Controls->m_ResBox1->GetSelectedNode();
 
-    GradientDirectionContainerType::Pointer dirs = static_cast<mitk::GradientDirectionsProperty*>( diffImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
+    GradientDirectionContainerType::Pointer dirs = mitk::DiffusionPropertyHelper::GetGradientContainer(diffImage);
 
     for(itk::SizeValueType i=0; i<dirs->Size() && i<=(itk::SizeValueType)volume; i++)
     {
@@ -300,7 +300,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
       TTensorPixelType, DiffusionPixelType > FilterType;
 
   GradientDirectionContainerType* gradients
-      =  static_cast<mitk::GradientDirectionsProperty*>( diffImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
+      =  mitk::DiffusionPropertyHelper::GetGradientContainer(diffImage);
 
   // Find the min and the max values from a baseline image
   mitk::ImageStatisticsHolder *stats = diffImage->GetStatistics();
@@ -308,7 +308,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
   //Initialize filter that calculates the modeled diffusion weighted signals
   FilterType::Pointer filter = FilterType::New();
   filter->SetInput( tensorImage );
-  filter->SetBValue( static_cast<mitk::FloatProperty*>(diffImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue());
+  filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(diffImage));
   filter->SetGradientList(gradients);
   filter->SetMin(stats->GetScalarValueMin());
   filter->SetMax(stats->GetScalarValueMax());
@@ -318,9 +318,8 @@ void QmitkTensorReconstructionView::ResidualCalculation()
   // TENSORS TO DATATREE
   mitk::Image::Pointer image = mitk::GrabItkImageMemory( filter->GetOutput() );
   mitk::DiffusionPropertyHelper::CopyProperties(diffImage, image, true);
-  image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( gradients ) );
-  mitk::DiffusionPropertyHelper propertyHelper( image );
-  propertyHelper.InitializeImage();
+  mitk::DiffusionPropertyHelper::SetGradientContainer(image, gradients);
+  mitk::DiffusionPropertyHelper::InitializeImage( image );
 
   mitk::DataNode::Pointer node = mitk::DataNode::New();
   node->SetData( image );
@@ -333,7 +332,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
 
   GetDataStorage()->Add(node, m_Controls->m_ResBox2->GetSelectedNode());
 
-  BValueMapType map = static_cast<mitk::BValueMapProperty*>(image->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();;
+  BValueMapType map = mitk::DiffusionPropertyHelper::GetBValueMap(image);
   std::vector< unsigned int > b0Indices = map[0];
 
 
@@ -579,7 +578,7 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr()
       mitk::CastToItkImage(vols, itkVectorImagePointer);
 
       ReconstructionFilter::Pointer reconFilter = ReconstructionFilter::New();
-      reconFilter->SetBValue( static_cast<mitk::FloatProperty*>(vols->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+      reconFilter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(vols));
       reconFilter->SetGradientImage( gradientContainerCopy, itkVectorImagePointer);
       reconFilter->SetB0Threshold(b0Threshold);
       reconFilter->Update();
@@ -647,8 +646,8 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction()
       TensorReconstructionImageFilterType::Pointer tensorReconstructionFilter = TensorReconstructionImageFilterType::New();
 
       GradientDirectionContainerType::Pointer gradientContainerCopy = GradientDirectionContainerType::New();
-      for(GradientDirectionContainerType::ConstIterator it = static_cast<mitk::GradientDirectionsProperty*>( vols->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->Begin();
-          it != static_cast<mitk::GradientDirectionsProperty*>( vols->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->End(); it++)
+      for(GradientDirectionContainerType::ConstIterator it = mitk::DiffusionPropertyHelper::GetGradientContainer(vols)->Begin();
+          it != mitk::DiffusionPropertyHelper::GetGradientContainer(vols)->End(); it++)
       {
         gradientContainerCopy->push_back(it.Value());
       }
@@ -656,7 +655,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction()
       ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
       mitk::CastToItkImage(vols, itkVectorImagePointer);
 
-      tensorReconstructionFilter->SetBValue(  static_cast<mitk::FloatProperty*>(vols->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+      tensorReconstructionFilter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(vols));
       tensorReconstructionFilter->SetGradientImage( gradientContainerCopy, itkVectorImagePointer );
       tensorReconstructionFilter->SetThreshold( m_Controls->m_TensorReconstructionThreshold->value() );
       tensorReconstructionFilter->Update();
@@ -861,11 +860,9 @@ void QmitkTensorReconstructionView::DoTensorsToDWI()
 
       mitk::Image::Pointer image = mitk::GrabItkImageMemory( filter->GetOutput() );
 
-      image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( gradientList ) );
-      image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( bVal ) );
-      image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New() );
-      mitk::DiffusionPropertyHelper propertyHelper( image );
-      propertyHelper.InitializeImage();
+      mitk::DiffusionPropertyHelper::SetGradientContainer(image, gradientList);
+      mitk::DiffusionPropertyHelper::SetReferenceBValue(image, bVal);
+      mitk::DiffusionPropertyHelper::InitializeImage( image );
 
       mitk::DataNode::Pointer node=mitk::DataNode::New();
       node->SetData( image );

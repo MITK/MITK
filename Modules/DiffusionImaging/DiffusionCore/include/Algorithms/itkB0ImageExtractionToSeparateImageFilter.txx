@@ -18,6 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkB0ImageExtractionToSeparateImageFilter.h"
 
+#include <itkImageRegionConstIterator.h>
+#include <itkImageRegionIterator.h>
+
 template< class TInputImagePixelType,
           class TOutputImagePixelType>
 itk::B0ImageExtractionToSeparateImageFilter< TInputImagePixelType, TOutputImagePixelType >

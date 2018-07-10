@@ -19,11 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKDIFFUSIONIMAGECORRECTIONFILTER_CPP
 
 #include "mitkDiffusionImageCorrectionFilter.h"
-#include <mitkDiffusionPropertyHelper.h>
 
 #include <vnl/algo/vnl_symmetric_eigensystem.h>
 #include <vnl/vnl_inverse.h>
+#include <mitkDiffusionPropertyHelper.h>
 
+typedef mitk::DiffusionPropertyHelper DPH;
 
 mitk::DiffusionImageCorrectionFilter::DiffusionImageCorrectionFilter()
 {
@@ -71,43 +72,42 @@ void mitk::DiffusionImageCorrectionFilter
     mitkThrow() << " No diffusion image given! ";
   }
 
-  GradientDirectionContainerPointerType directions = static_cast<mitk::GradientDirectionsProperty*>( m_SourceImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
-  GradientDirectionContainerPointerType corrected_directions =
-      GradientDirectionContainerType::New();
+  DPH::GradientDirectionsContainerType::Pointer directions = DPH::GetGradientContainer(m_SourceImage);
+  DPH::GradientDirectionsContainerType::Pointer corrected_directions = DPH::GradientDirectionsContainerType::New();
+
+  mitk::BValueMapProperty::BValueMap bval_map = DPH::GetBValueMap(m_SourceImage);
+  size_t first_unweighted_index = bval_map.begin()->second.front();
 
   unsigned int transformed = 0;
   for(size_t i=0; i< directions->Size(); i++ )
   {
 
     // skip b-zero images
-    if( directions->ElementAt(i).one_norm() <= 0.0 )
+    if(i==first_unweighted_index)
     {
-      corrected_directions->push_back( directions->ElementAt(i) );
+      corrected_directions->push_back(directions->ElementAt(i));
       continue;
     }
 
-    GradientDirectionType corrected = GetRotationComponent(
-                                          transformations.at(transformed))
-                                        * directions->ElementAt(i);
+    auto corrected = GetRotationComponent(transformations.at(transformed)) * directions->ElementAt(i);
     // store the corrected direction
-    corrected_directions->push_back( corrected );
+    corrected_directions->push_back(corrected);
     transformed++;
   }
 
   // replace the old directions with the corrected ones
-  m_SourceImage->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( corrected_directions ) );
+  DPH::SetGradientContainer(m_SourceImage, corrected_directions);
 }
 
 
-void mitk::DiffusionImageCorrectionFilter
-::CorrectDirections( const TransformMatrixType& transformation)
+void mitk::DiffusionImageCorrectionFilter::CorrectDirections( const TransformMatrixType& transformation)
 {
   if( m_SourceImage.IsNull() )
   {
     mitkThrow() << " No diffusion image given! ";
   }
   TransformsVectorType transfVec;
-  for (unsigned int i=0; i< static_cast<mitk::GradientDirectionsProperty*>( m_SourceImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer()->Size();i++)
+  for (unsigned int i=0; i< DPH::GetGradientContainer(m_SourceImage)->Size();i++)
   {
     transfVec.push_back(transformation);
   }

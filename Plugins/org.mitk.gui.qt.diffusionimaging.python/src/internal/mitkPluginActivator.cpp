@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPluginActivator.h"
 
 #include "src/internal/QmitkBrainExtractionView.h"
+#include "src/internal/QmitkDipyReconstructionsView.h"
 #include <usModuleInitialization.h>
 
 
@@ -32,6 +33,7 @@ ctkPluginContext* mitk::PluginActivator::GetContext()
 void mitk::PluginActivator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkBrainExtractionView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDipyReconstructionsView, context)
   m_Context = context;
 }
 

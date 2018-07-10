@@ -1,4 +1,4 @@
-#if(MITK_USE_Python)
+if(MITK_USE_Python)
 
 project(MitkDiffusion)
 
@@ -37,7 +37,8 @@ set(_plugins
   org.mitk.gui.qt.datamanager
   org.mitk.gui.qt.measurementtoolbox
   org.mitk.gui.qt.segmentation
-#  org.mitk.gui_qt.multilabelsegmentation
+  org.mitk.gui_qt.multilabelsegmentation
+  org.mitk.gui.qt.python
   org.mitk.gui.qt.volumevisualization
   org.mitk.gui.qt.diffusionimaging
   org.mitk.gui.qt.diffusionimaging.connectomics
@@ -49,11 +50,11 @@ set(_plugins
   org.mitk.gui.qt.diffusionimaging.reconstruction
   org.mitk.gui.qt.diffusionimaging.tractography
   org.mitk.gui.qt.diffusionimaging.registration
-#  org.mitk.gui.qt.diffusionimaging.python
+  org.mitk.gui.qt.diffusionimaging.python
   org.mitk.gui.qt.diffusionimaging.denoising
-#  org.mitk.gui.qt.matchpoint.algorithm.browser
-#  org.mitk.gui.qt.matchpoint.algorithm.control
-#  org.mitk.gui.qt.matchpoint.mapper
+  org.mitk.gui.qt.matchpoint.algorithm.browser
+  org.mitk.gui.qt.matchpoint.algorithm.control
+  org.mitk.gui.qt.matchpoint.mapper
   org.mitk.gui.qt.imagenavigator
   org.mitk.gui.qt.moviemaker
   org.mitk.gui.qt.basicimageprocessing
@@ -100,4 +101,4 @@ if(MITK_MODULES_ENABLED_PLUGINS)
   add_dependencies(${DIFFUSIONAPP_NAME} ${MITK_MODULES_ENABLED_PLUGINS})
 endif()
 
-# endif() # MITK_USE_PYTHON
+endif() # MITK_USE_PYTHON

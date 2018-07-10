@@ -183,8 +183,7 @@ void QmitkSimpleRegistrationView::OnRegResultIsAvailable(mitk::MAPRegistrationWr
 
   if (mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image))
   {
-    mitk::DiffusionPropertyHelper propertyHelper( image );
-    propertyHelper.InitializeImage();
+    mitk::DiffusionPropertyHelper::InitializeImage( image );
   }
 
   mitk::DataNode::Pointer resultNode = mitk::DataNode::New();

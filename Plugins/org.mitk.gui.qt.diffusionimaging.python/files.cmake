@@ -7,26 +7,30 @@ set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
 
   QmitkBrainExtractionView.cpp
+  QmitkDipyReconstructionsView.cpp
 )
 
 set(UI_FILES
   src/internal/QmitkBrainExtractionViewControls.ui
+  src/internal/QmitkDipyReconstructionsViewControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
 
   src/internal/QmitkBrainExtractionView.h
+  src/internal/QmitkDipyReconstructionsView.h
 )
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
 
   resources/dwi2.png
+  resources/dipy.png
 )
 
 set(QRC_FILES
-
+  resources/diffusion_python_resources.qrc
 )
 
 

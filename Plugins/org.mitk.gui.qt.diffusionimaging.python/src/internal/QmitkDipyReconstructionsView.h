@@ -20,19 +20,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIStructuredSelection.h>
 
 #include <QmitkAbstractView.h>
-#include "ui_QmitkHeadMotionCorrectionViewControls.h"
-
+#include "ui_QmitkDipyReconstructionsViewControls.h"
 #include <mitkImage.h>
-
 #include <QThread>
 #include <QTime>
 
-typedef short DiffusionPixelType;
+#include <mitkDiffusionPropertyHelper.h>
+
 
 /*!
 \brief View for diffusion image registration / head motion correction
 */
-class QmitkHeadMotionCorrectionView : public QmitkAbstractView
+class QmitkDipyReconstructionsView : public QmitkAbstractView
 {
 
   // this is needed for all Qt objects that should have a Qt meta-object
@@ -43,15 +42,18 @@ public:
 
   static const std::string VIEW_ID;
 
-  QmitkHeadMotionCorrectionView();
-  virtual ~QmitkHeadMotionCorrectionView();
+  typedef itk::VectorImage< short, 3 >        ItkDwiType;
+  typedef mitk::GradientDirectionsProperty    GradProp;
+
+  QmitkDipyReconstructionsView();
+  virtual ~QmitkDipyReconstructionsView();
 
   virtual void CreateQtPartControl(QWidget *parent) override;
   void SetFocus() override;
 
 protected slots:
 
-  void StartCorrection();
+  void StartFit();
   void UpdateGUI();             ///< update button activity etc. dpending on current datamanager selection
 
 
@@ -60,10 +62,7 @@ protected:
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
-  Ui::QmitkHeadMotionCorrectionViewControls* m_Controls;
-
-  mitk::Image::Pointer      m_DiffusionImage;
-  std::vector< mitk::DataNode::Pointer >            m_SelectedDiffusionNodes;
+  Ui::QmitkDipyReconstructionsViewControls* m_Controls;
 
 private:
 

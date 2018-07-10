@@ -317,12 +317,11 @@ void DiffusionImageNiftiReaderService::InternalRead()
 
       // create BValueMap
       mitk::BValueMapProperty::BValueMap BValueMap = mitk::BValueMapProperty::CreateBValueMap(DiffusionVectors,BValue);
-      outputForCache->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( DiffusionVectors ) );
-      outputForCache->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( MeasurementFrame ) );
-      outputForCache->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str(), mitk::BValueMapProperty::New( BValueMap ) );
-      outputForCache->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( BValue ) );
-      mitk::DiffusionPropertyHelper propertyHelper( outputForCache );
-      propertyHelper.InitializeImage();
+      mitk::DiffusionPropertyHelper::SetOriginalGradientContainer(outputForCache, DiffusionVectors);
+      mitk::DiffusionPropertyHelper::SetMeasurementFrame(outputForCache, MeasurementFrame);
+      mitk::DiffusionPropertyHelper::SetBValueMap(outputForCache, BValueMap);
+      mitk::DiffusionPropertyHelper::SetReferenceBValue(outputForCache, BValue);
+      mitk::DiffusionPropertyHelper::InitializeImage(outputForCache);
 
       // Since we have already read the tree, we can store it in a cache variable
       // so that it can be assigned to the DataObject in GenerateData();

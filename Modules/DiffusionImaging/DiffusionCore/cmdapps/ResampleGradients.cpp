@@ -127,9 +127,7 @@ mitk::Image::Pointer DoReduceGradientDirections(mitk::Image::Pointer image, doub
   typedef mitk::BValueMapProperty::BValueMap BValueMap;
 
   BValueMap shellSlectionMap;
-  BValueMap originalShellMap = static_cast<mitk::BValueMapProperty*>
-    (image->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )
-      ->GetBValueMap();
+  BValueMap originalShellMap = mitk::DiffusionPropertyHelper::GetBValueMap(image);
 
   std::vector<unsigned int> newNumGradientDirections;
 
@@ -150,10 +148,7 @@ mitk::Image::Pointer DoReduceGradientDirections(mitk::Image::Pointer image, doub
     //return;
   }
 
-  itk::DwiGradientLengthCorrectionFilter::GradientDirectionContainerType::Pointer gradientContainer
-      = static_cast<mitk::GradientDirectionsProperty*>
-        ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
-          ->GetGradientDirectionsContainer();
+  auto gradientContainer = mitk::DiffusionPropertyHelper::GetGradientContainer(image);
 
 
   ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
@@ -175,12 +170,8 @@ mitk::Image::Pointer DoReduceGradientDirections(mitk::Image::Pointer image, doub
 
   mitk::Image::Pointer newImage = mitk::GrabItkImageMemory( filter->GetOutput() );
   mitk::DiffusionPropertyHelper::CopyProperties(image, newImage, true);
-
-  newImage->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(),
-                         mitk::GradientDirectionsProperty::New( filter->GetGradientDirections() ) );
-
-  mitk::DiffusionPropertyHelper propertyHelper( newImage );
-  propertyHelper.InitializeImage(); //needed?
+  mitk::DiffusionPropertyHelper::SetGradientContainer(newImage, filter->GetGradientDirections());
+  mitk::DiffusionPropertyHelper::InitializeImage( newImage );
 
   return newImage;
 }

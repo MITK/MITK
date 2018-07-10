@@ -544,8 +544,8 @@ int main(int argc, char* argv[])
   parameters.m_SignalGen.m_ImageSpacing = reference->GetSpacing();
   parameters.m_SignalGen.m_ImageOrigin = reference->GetOrigin();
   parameters.m_SignalGen.m_ImageDirection = reference->GetDirection();
-  parameters.SetBvalue(static_cast<mitk::FloatProperty*>(dwi->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue());
-  parameters.SetGradienDirections(static_cast<mitk::GradientDirectionsProperty*>( dwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer());
+  parameters.SetBvalue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
+  parameters.SetGradienDirections(mitk::DiffusionPropertyHelper::GetGradientContainer(dwi));
 
   auto tracts = mitk::IOUtil::Load<mitk::FiberBundle>(tract_file, &functor);
 
@@ -729,12 +729,9 @@ int main(int argc, char* argv[])
   ItkDwiType::Pointer sim = tractsToDwiFilter->GetOutput();
   {
     mitk::Image::Pointer image = mitk::GrabItkImageMemory( tractsToDwiFilter->GetOutput() );
-    image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(),
-                                               mitk::GradientDirectionsProperty::New( parameters.m_SignalGen.GetGradientDirections() ) );
-    image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(),
-                                               mitk::FloatProperty::New( parameters.m_SignalGen.GetBvalue() ) );
-    mitk::DiffusionPropertyHelper propertyHelper( image );
-    propertyHelper.InitializeImage();
+    mitk::DiffusionPropertyHelper::SetGradientContainer(image, parameters.m_SignalGen.GetItkGradientContainer());
+    mitk::DiffusionPropertyHelper::SetReferenceBValue(image, parameters.m_SignalGen.GetBvalue());
+    mitk::DiffusionPropertyHelper::InitializeImage( image );
     mitk::IOUtil::Save(image, out_folder + "/initial.dwi");
   }
 
@@ -825,12 +822,9 @@ int main(int argc, char* argv[])
       std::stringstream ss;
       std::cout.rdbuf (ss.rdbuf());
       mitk::Image::Pointer image = mitk::GrabItkImageMemory( tractsToDwiFilter->GetOutput() );
-      image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(),
-                                                 mitk::GradientDirectionsProperty::New( parameters.m_SignalGen.GetGradientDirections() ) );
-      image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(),
-                                                 mitk::FloatProperty::New( parameters.m_SignalGen.GetBvalue() ) );
-      mitk::DiffusionPropertyHelper propertyHelper( image );
-      propertyHelper.InitializeImage();
+      mitk::DiffusionPropertyHelper::SetGradientContainer(image, parameters.m_SignalGen.GetItkGradientContainer());
+      mitk::DiffusionPropertyHelper::SetReferenceBValue(image, parameters.m_SignalGen.GetBvalue());
+      mitk::DiffusionPropertyHelper::InitializeImage( image );
       mitk::IOUtil::Save(image, out_folder + "/optimized.dwi");
 
       proposal.SaveParameters(out_folder + "/optimized.ffp");

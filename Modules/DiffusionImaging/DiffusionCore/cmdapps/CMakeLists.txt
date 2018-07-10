@@ -20,6 +20,9 @@ if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
     ShToOdfImage^^
     DImp^^
     DReg^^
+    HeadMotionCorrection^^
+    DmriDenoising^^
+    RoundBvalues^^
     )
 
     foreach(diffusioncorecmdapp ${diffusioncorecmdapps})
@@ -33,7 +36,7 @@ if(BUILD_DiffusionCoreCmdApps OR MITK_BUILD_ALL_APPS)
 
       mitkFunctionCreateCommandLineApp(
         NAME ${appname}
-        DEPENDS MitkCore MitkDiffusionCore ${dependencies_list}
+        DEPENDS MitkCore MitkDiffusionCore MitkImageDenoising ${dependencies_list}
         PACKAGE_DEPENDS ITK
       )
     endforeach()

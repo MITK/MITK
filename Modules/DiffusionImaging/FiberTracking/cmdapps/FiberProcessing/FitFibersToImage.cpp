@@ -245,32 +245,28 @@ int main(int argc, char* argv[])
       {
         mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( fitter->GetFittedImageDiff().GetPointer() );
         mitk::DiffusionPropertyHelper::CopyProperties(mitk_image, outImage, true);
-        mitk::DiffusionPropertyHelper propertyHelper( outImage );
-        propertyHelper.InitializeImage();
+        mitk::DiffusionPropertyHelper::InitializeImage( outImage );
         mitk::IOUtil::Save(outImage, "application/vnd.mitk.nii.gz", outRoot + "_fitted_image.nii.gz");
       }
 
       {
         mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( fitter->GetResidualImageDiff().GetPointer() );
         mitk::DiffusionPropertyHelper::CopyProperties(mitk_image, outImage, true);
-        mitk::DiffusionPropertyHelper propertyHelper( outImage );
-        propertyHelper.InitializeImage();
+        mitk::DiffusionPropertyHelper::InitializeImage( outImage );
         mitk::IOUtil::Save(outImage, "application/vnd.mitk.nii.gz", outRoot + "_residual_image.nii.gz");
       }
 
       {
         mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( fitter->GetOverexplainedImageDiff().GetPointer() );
         mitk::DiffusionPropertyHelper::CopyProperties(mitk_image, outImage, true);
-        mitk::DiffusionPropertyHelper propertyHelper( outImage );
-        propertyHelper.InitializeImage();
+        mitk::DiffusionPropertyHelper::InitializeImage( outImage );
         mitk::IOUtil::Save(outImage, "application/vnd.mitk.nii.gz", outRoot + "_overexplained_image.nii.gz");
       }
 
       {
         mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( fitter->GetUnderexplainedImageDiff().GetPointer() );
         mitk::DiffusionPropertyHelper::CopyProperties(mitk_image, outImage, true);
-        mitk::DiffusionPropertyHelper propertyHelper( outImage );
-        propertyHelper.InitializeImage();
+        mitk::DiffusionPropertyHelper::InitializeImage( outImage );
         mitk::IOUtil::Save(outImage, "application/vnd.mitk.nii.gz", outRoot + "_underexplained_image.nii.gz");
       }
     }

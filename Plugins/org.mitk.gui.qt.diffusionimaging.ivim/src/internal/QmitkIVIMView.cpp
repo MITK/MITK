@@ -302,7 +302,7 @@ void QmitkIVIMView::AutoThreshold()
 
   // find bzero index
   int index = -1;
-  DirContainerType::Pointer directions = static_cast<mitk::GradientDirectionsProperty*>( dimg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
+  auto directions = mitk::DiffusionPropertyHelper::GetGradientContainer(dimg);
   for(DirContainerType::ConstIterator it = directions->Begin();
       it != directions->End(); ++it)
   {
@@ -389,8 +389,8 @@ void QmitkIVIMView::FittIVIMStart()
     // KURTOSIS
     KurtosisFilterType::Pointer filter = KurtosisFilterType::New();
     filter->SetInput(vecimg);
-    filter->SetReferenceBValue( static_cast<mitk::FloatProperty*>(img->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
-    filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>( img->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
+    filter->SetReferenceBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(img));
+    filter->SetGradientDirections(mitk::DiffusionPropertyHelper::GetGradientContainer(img));
     filter->SetSmoothingSigma( this->m_Controls->m_SigmaSpinBox->value() );
 
     if( this->m_Controls->m_UseKurtosisBoundsCB->isChecked() )
@@ -451,11 +451,7 @@ void QmitkIVIMView::FittIVIMStart()
   }
   else
   {
-    FittIVIM(vecimg,
-             static_cast<mitk::GradientDirectionsProperty*>( img->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(),
-             static_cast<mitk::FloatProperty*>(img->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(),
-             true,
-             dummy);
+    FittIVIM(vecimg, mitk::DiffusionPropertyHelper::GetGradientContainer(img), mitk::DiffusionPropertyHelper::GetReferenceBValue(img), true, dummy);
 
     OutputToDatastorage(m_Controls->m_DwiBox->GetSelectedNode());
   }
@@ -546,15 +542,15 @@ void QmitkIVIMView::OnSliceChanged()
     if( m_Controls->m_ModelTabSelectionWidget->currentIndex() )
     {
       success = FitKurtosis(roiImage,
-                            static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(),
-                            static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(),
+                            mitk::DiffusionPropertyHelper::GetGradientContainer(diffusionImg),
+                            mitk::DiffusionPropertyHelper::GetReferenceBValue(diffusionImg),
                             newstart);
     }
     else
     {
       success = FittIVIM(roiImage,
-                         static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(),
-                         static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(),
+                         mitk::DiffusionPropertyHelper::GetGradientContainer(diffusionImg),
+                         mitk::DiffusionPropertyHelper::GetReferenceBValue(diffusionImg),
                          false,
                          crosspos);
     }
@@ -627,15 +623,15 @@ void QmitkIVIMView::OnSliceChanged()
     if( m_Controls->m_ModelTabSelectionWidget->currentIndex() )
     {
       success = FitKurtosis(roiImage,
-                            static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(),
-                            static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(),
+                            mitk::DiffusionPropertyHelper::GetGradientContainer(diffusionImg),
+                            mitk::DiffusionPropertyHelper::GetReferenceBValue(diffusionImg),
                             index);
     }
     else
     {
       success = FittIVIM(roiImage,
-                         static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(),
-                         static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(),
+                         mitk::DiffusionPropertyHelper::GetGradientContainer(diffusionImg),
+                         mitk::DiffusionPropertyHelper::GetReferenceBValue(diffusionImg),
                          false,
                          index);
     }

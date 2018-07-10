@@ -392,7 +392,7 @@ void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
   {
     if (m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage().IsNotNull())
     {
-      PrintToLog("Using volume fraction map for fiber compartment " + boost::lexical_cast<std::string>(i+1));
+      PrintToLog("Using volume fraction map for fiber compartment " + boost::lexical_cast<std::string>(i+1), false);
       fibVolImages++;
     }
   }
@@ -403,7 +403,7 @@ void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
   {
     if (m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage().IsNotNull())
     {
-      PrintToLog("Using volume fraction map for non-fiber compartment " + boost::lexical_cast<std::string>(i+1));
+      PrintToLog("Using volume fraction map for non-fiber compartment " + boost::lexical_cast<std::string>(i+1), false);
       nonfibVolImages++;
     }
   }
@@ -418,7 +418,7 @@ void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
   {
     PrintToLog("Calculating missing non-fiber volume fraction image by inverting the other.\n"
                "Assuming non-fiber volume fraction images to contain values relative to the"
-               " remaining non-fiber volume, not absolute values.");
+               " remaining non-fiber volume, not absolute values.", false);
 
     auto inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
     inverter->SetMaximum(1.0);
@@ -465,7 +465,7 @@ void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
   {
     PrintToLog("Not all fiber compartments are using an associated volume fraction image.\n"
                "Assuming non-fiber volume fraction images to contain values relative to the"
-               " remaining non-fiber volume, not absolute values.");
+               " remaining non-fiber volume, not absolute values.", false);
     m_UseRelativeNonFiberVolumeFractions = true;
 
     //        itk::ImageFileWriter<ItkDoubleImgType>::Pointer wr = itk::ImageFileWriter<ItkDoubleImgType>::New();
@@ -523,6 +523,9 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
   temp.Fill(0.0);
   m_OutputImage->FillBuffer(temp);
 
+  PrintToLog("Output image spacing: [" + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_ImageSpacing[0]) + "," + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_ImageSpacing[1]) + "," + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_ImageSpacing[2]) + "]", false);
+  PrintToLog("Output image size: [" + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(0)) + "," + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(1)) + "," + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(2)) + "]", false);
+
   // images containing real and imaginary part of the dMRI signal for each coil
   m_OutputImagesReal.clear();
   m_OutputImagesImag.clear();
@@ -571,6 +574,9 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
   m_WorkingOrigin[2] -= m_Parameters.m_SignalGen.m_ImageSpacing[2]/2;
   m_WorkingOrigin[2] += m_WorkingSpacing[2]/2;
   m_VoxelVolume = m_WorkingSpacing[0]*m_WorkingSpacing[1]*m_WorkingSpacing[2];
+
+  PrintToLog("Working image spacing: [" + boost::lexical_cast<std::string>(m_WorkingSpacing[0]) + "," + boost::lexical_cast<std::string>(m_WorkingSpacing[1]) + "," + boost::lexical_cast<std::string>(m_WorkingSpacing[2]) + "]", false);
+  PrintToLog("Working image size: [" + boost::lexical_cast<std::string>(m_WorkingImageRegion.GetSize(0)) + "," + boost::lexical_cast<std::string>(m_WorkingImageRegion.GetSize(1)) + "," + boost::lexical_cast<std::string>(m_WorkingImageRegion.GetSize(2)) + "]", false);
 
   // generate double images to store the individual compartment signals
   m_CompartmentImages.clear();
@@ -926,12 +932,14 @@ bool TractsToDWIImageFilter< PixelType >::PrepareLogFile()
 template< class PixelType >
 void TractsToDWIImageFilter< PixelType >::GenerateData()
 {
+  PrintToLog("\n**********************************************", false);
   // prepare logfile
   if ( ! PrepareLogFile() )
   {
     this->SetAbortGenerateData( true );
     return;
   }
+  PrintToLog("Starting Fiberfox dMRI simulation");
 
   m_TimeProbe.Start();
 
@@ -1423,6 +1431,8 @@ void TractsToDWIImageFilter< PixelType >::PrintToLog(std::string m, bool addTime
     if (stdOut)
       std::cout << "\n";
   }
+
+  m_Logfile.flush();
 }
 
 template< class PixelType >

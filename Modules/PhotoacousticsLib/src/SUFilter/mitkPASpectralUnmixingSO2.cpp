@@ -134,7 +134,9 @@ float mitk::pa::SpectralUnmixingSO2::CalculateSO2(float Hb, float HbO2)
   else
   {
     if (SO2ValueNotSiginificant(Hb, HbO2, result))
+    {
       return 0;
+    }
     else return result;
   }
 }
@@ -146,7 +148,7 @@ void mitk::pa::SpectralUnmixingSO2::AddSO2Settings(int value)
 
 bool mitk::pa::SpectralUnmixingSO2::SO2ValueNotSiginificant(float Hb, float HbO2, float result)
 {
-  std::vector<int> significant;
+  std::vector<float> significant;
   significant.push_back(HbO2);
   significant.push_back(Hb);
   significant.push_back(HbO2 + Hb);
@@ -154,8 +156,10 @@ bool mitk::pa::SpectralUnmixingSO2::SO2ValueNotSiginificant(float Hb, float HbO2
 
   for (unsigned int i = 0; i < m_SO2Settings.size(); ++i)
   {
-    if (m_SO2Settings[i] >= significant[i])
+    if (m_SO2Settings[i] > significant[i] && (std::abs(m_SO2Settings[i] - significant[i]) > 1e-7))
+    {
       return true;
+    }
   }
   return false;
 }

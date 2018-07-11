@@ -105,7 +105,7 @@ void mitk::pa::SpectralUnmixingSO2::CheckPreConditions(mitk::Image::Pointer inpu
 
 void mitk::pa::SpectralUnmixingSO2::InitializeOutputs()
 {
-  unsigned int numberOfInputs = GetNumberOfIndexedInputs();
+  // UNUSED unsigned int numberOfInputs = GetNumberOfIndexedInputs();
   unsigned int numberOfOutputs = GetNumberOfIndexedOutputs();
 
   mitk::PixelType pixelType = mitk::MakeScalarPixelType<float>();

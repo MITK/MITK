@@ -129,7 +129,7 @@ public:
     mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::JACOBISVD, mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::FULLPIVLU,
     mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType::FULLPIVHOUSEHOLDERQR};
 
-    for (int Algorithmidx = 0; Algorithmidx < m_Eigen.size();++Algorithmidx)
+    for (unsigned int Algorithmidx = 0; Algorithmidx < m_Eigen.size();++Algorithmidx)
     {
       m_SpectralUnmixingFilter->SetAlgorithm(m_Eigen[Algorithmidx]);
 
@@ -193,7 +193,7 @@ public:
     ofstream myfile;
     myfile.open("VigraTestResult.txt");
 
-    for (int Algorithmidx = 0; Algorithmidx < Vigra.size();++Algorithmidx)
+    for (unsigned int Algorithmidx = 0; Algorithmidx < Vigra.size();++Algorithmidx)
     {
       m_SpectralUnmixingFilter->SetAlgorithm(Vigra[0]);
 
@@ -345,7 +345,7 @@ public:
       auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
       m_sO2->SetInput(0, inputImage);
       m_sO2->SetInput(1, inputImage);
-      for (int i = 0; i < SO2Settings.size(); ++i)
+      for (unsigned int i = 0; i < SO2Settings.size(); ++i)
         m_sO2->AddSO2Settings(SO2Settings[i]);
       m_sO2->Update();
 

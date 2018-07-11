@@ -76,7 +76,7 @@ namespace mitk {
       * \brief Takes a mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType and fix it for usage at the "SpectralUnmixingAlgorithm" method.
       * @param algorithmName has to be a mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType
       */
-      void mitk::pa::LinearSpectralUnmixingFilter::SetAlgorithm(AlgortihmType inputAlgorithmName);
+      void SetAlgorithm(AlgortihmType inputAlgorithmName);
 
     protected:
       LinearSpectralUnmixingFilter();
@@ -96,7 +96,7 @@ namespace mitk {
         Eigen::VectorXf inputVector) override;
 
     private:
-      mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType algorithmName;
+      AlgortihmType algorithmName;
     };
   }
 }

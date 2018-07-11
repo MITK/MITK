@@ -80,7 +80,7 @@ namespace mitk {
       * method.
       * @param algorithmName has to be a mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType
       */
-      void mitk::pa::SpectralUnmixingFilterVigra::SetAlgorithm(VigraAlgortihmType inputAlgorithmName);
+      void SetAlgorithm(VigraAlgortihmType inputAlgorithmName);
 
     protected:
       SpectralUnmixingFilterVigra();
@@ -101,7 +101,7 @@ namespace mitk {
 
     private:
       std::vector<double> weightsvec;
-      mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType algorithmName;
+      SpectralUnmixingFilterVigra::VigraAlgortihmType algorithmName;
     };
   }
 }

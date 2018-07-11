@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPALinearSpectralUnmixingFilter.h"
 
 // Testing algorithms
-#include <eigen3\Eigen\src\SVD\JacobiSVD.h>
+#include <eigen3/Eigen/src/SVD/JacobiSVD.h>
 
 // ImageAccessor
 #include <mitkImageReadAccessor.h>

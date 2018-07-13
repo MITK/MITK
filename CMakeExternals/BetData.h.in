@@ -17,13 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BetData_h
 #define BetData_h
 
-#define BetData_DIR "@BetData_DIR@"
+//#define BetData_DIR "@BetData_DIR@"
 
 namespace mitk
 {
 namespace bet
 {
-std::vector< std::string > search_dirs = {"/","/bin/","/BetData/","/bin/BetData/"};
+std::vector< std::string > relative_search_dirs = {"/","/bin/","/BetData/","/bin/BetData/"};
+std::vector< std::string > absolute_search_dirs = {"@BetData_DIR@"};
 }
 }
 

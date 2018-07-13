@@ -88,6 +88,9 @@ namespace mitk
         /// \return true if a variable with this name is defined in the __main__ namespace, false otherwise
         virtual bool DoesVariableExist(const std::string& name) const = 0;
         ///
+        /// \return value of variable with this name as string, empty string if variable does not exist
+        virtual std::string GetVariable(const std::string& name) const = 0;
+        ///
         /// adds a command observer which is informed after a command was issued with "Execute"
         virtual void AddPythonCommandObserver( PythonCommandObserver* observer ) = 0;
         ///

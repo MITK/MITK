@@ -51,6 +51,9 @@ namespace mitk
       /// \see IPythonService::DoesVariableExist()
       bool DoesVariableExist(const std::string& name) const;
       ///
+      /// \see IPythonService::GetVariable()
+      std::string GetVariable(const std::string& name) const;
+      ///
       /// \see IPythonService::AddPythonCommandObserver()
       void AddPythonCommandObserver( PythonCommandObserver* observer );
       ///
@@ -89,6 +92,7 @@ namespace mitk
       ///
       /// \return the ctk abstract python manager instance
       ctkAbstractPythonManager* GetPythonManager();
+
   protected:
       QString GetTempDataFileName(const std::string &ext) const;
   private:

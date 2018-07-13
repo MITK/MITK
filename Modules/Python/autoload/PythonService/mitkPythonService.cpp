@@ -188,6 +188,7 @@ void mitk::PythonService::ExecuteScript( const std::string& pythonScript )
   std::ifstream t(pythonScript.c_str());
   std::string str((std::istreambuf_iterator<char>(t)),
                   std::istreambuf_iterator<char>());
+  t.close();
 
   m_PythonManager.executeString(QString::fromStdString(str));
 }
@@ -213,22 +214,32 @@ std::vector<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const
       tempObject = PyObject_GetAttrString( object, name.c_str() );
       attrType = tempObject->ob_type->tp_name;
 
-      //disabled due to strange errors, see T24085
-      //strTempObject = PyObject_Repr(tempObject);
-      //if(strTempObject && ( PyUnicode_Check(strTempObject) || PyString_Check(strTempObject) ) )
-      //  attrValue = PyString_AsString(strTempObject);
-      //else
-      //  attrValue = "";
+      if(tempObject && ( PyUnicode_Check(tempObject) || PyString_Check(tempObject) ) )
+        attrValue = PyString_AsString(tempObject);
+      else
+        attrValue = "";
 
       mitk::PythonVariable var;
       var.m_Name = name;
-      //var.m_Value = attrValue;
+      var.m_Value = attrValue;
       var.m_Type = attrType;
       list.push_back(var);
     }
   }
 
   return list;
+}
+
+std::string mitk::PythonService::GetVariable(const std::string& name) const
+{
+  std::vector<mitk::PythonVariable> allVars = this->GetVariableStack();
+  for(unsigned int i = 0; i< allVars.size(); i++)
+  {
+    if( allVars.at(i).m_Name == name )
+      return allVars.at(i).m_Value;
+  }
+
+  return "";
 }
 
 bool mitk::PythonService::DoesVariableExist(const std::string& name) const

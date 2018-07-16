@@ -3,7 +3,7 @@
 
 This view provides tools to derive additional information (such as tract density images and principal fiber direction maps) from tractograms.
 
-\section SecInput Input Data
+\section SecFiberQuantInput Input Data
 
 - Tractogram: The input streamlines.
 - Reference Image: The output images will have the same geometry as this reference image (optional). If a reference image with DICOM tags is used, the resulting tract envelope can be saved as DICOM Segmentation Object.

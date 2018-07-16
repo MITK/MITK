@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <cmath>
 #include <boost/progress.hpp>
 #include <mitkDiffusionFunctionCollection.h>
+#include <boost/lexical_cast.hpp>
 
 namespace itk{
 
@@ -43,6 +44,7 @@ FiberExtractionFilter< PixelType >::FiberExtractionFilter()
   , m_OnlySelfConnections(false)
   , m_SplitLabels(false)
   , m_MinFibersPerTract(0)
+  , m_PairedStartEndLabels(false)
 {
   m_Interpolator = itk::LinearInterpolateImageFunction< itk::Image< PixelType, 3 >, float >::New();
 }
@@ -65,6 +67,12 @@ void FiberExtractionFilter< PixelType >::SetRoiImages(const std::vector<ItkInput
     }
   }
   m_RoiImages = rois;
+}
+
+template< class PixelType >
+void FiberExtractionFilter< PixelType >::SetRoiImageNames(const std::vector< std::string > roi_names)
+{
+  m_RoiImageNames = roi_names;
 }
 
 template< class PixelType >
@@ -95,7 +103,7 @@ bool FiberExtractionFilter< PixelType >::IsPositive(const itk::Point<float, 3>& 
 }
 
 template< class PixelType >
-std::vector< std::pair<unsigned int, unsigned int> > FiberExtractionFilter< PixelType >::GetPositiveLabels() const
+std::vector< std::string > FiberExtractionFilter< PixelType >::GetPositiveLabels() const
 {
   return m_PositiveLabels;
 }
@@ -230,7 +238,7 @@ void FiberExtractionFilter< PixelType >::ExtractLabels(mitk::FiberBundle::Pointe
   MITK_INFO << "Extracting fibers by labels";
   vtkSmartPointer<vtkPolyData> polydata = fib->GetFiberPolyData();
 
-  std::vector< std::map< std::pair< unsigned int, unsigned int >, std::vector< long > > > positive_ids;
+  std::vector< std::map< std::string, std::vector< long > > > positive_ids;
   positive_ids.resize(m_RoiImages.size());
 
   std::vector< long > negative_ids; // fibers not overlapping with ANY label
@@ -252,54 +260,89 @@ void FiberExtractionFilter< PixelType >::ExtractLabels(mitk::FiberBundle::Pointe
 
         int inside = 0;
 
-        // check first fiber point
-        short label1 = -1;
-        {
-          double* p = points->GetPoint(0);
-          itk::Point<float, 3> itkP;
-          itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
+        double* p1 = points->GetPoint(0);
+        itk::Point<float, 3> itkP1;
+        itkP1[0] = p1[0]; itkP1[1] = p1[1]; itkP1[2] = p1[2];
+        short label1 = mitk::imv::GetImageValue<PixelType>(itkP1, m_Interpolate, m_Interpolator);
 
-          label1 = mitk::imv::GetImageValue<PixelType>(itkP, m_Interpolate, m_Interpolator);
+        double* p2 = points->GetPoint(numPoints-1);
+        itk::Point<float, 3> itkP2;
+        itkP2[0] = p2[0]; itkP2[1] = p2[1]; itkP2[2] = p2[2];
+        short label2 = mitk::imv::GetImageValue<PixelType>(itkP2, m_Interpolate, m_Interpolator);
+
+        if (!m_Labels.empty())  // extract fibers from all pairwise label combinations
+        {
           for (auto l : m_Labels)
           {
             if (l==label1)
-            {
               inside++;
-              break;
-            }
-          }
-        }
-
-        // check second fiber point
-        short label2 = -1;
-        {
-          double* p = points->GetPoint(numPoints-1);
-          itk::Point<float, 3> itkP;
-          itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
-
-          label2 = mitk::imv::GetImageValue<PixelType>(itkP, m_Interpolate, m_Interpolator);
-          for (auto l : m_Labels)
-          {
             if (l==label2)
-            {
               inside++;
+            if (inside==2)
               break;
+          }
+        }
+        else  // extract fibers between start and end labels
+        {
+          m_BothEnds = true;  // if we have start and end labels it does not make sense to not use both endpoints
+          if (m_PairedStartEndLabels)
+          {
+            if (m_StartLabels.size()!=m_EndLabels.size())
+              mitkThrow() << "Start and end label lists must have same size if paired labels are used";
+            for (unsigned int ii=0; ii<m_StartLabels.size(); ++ii)
+              if ( (m_StartLabels.at(ii)==label1 && m_EndLabels.at(ii)==label2) || (m_StartLabels.at(ii)==label2 && m_EndLabels.at(ii)==label1) )
+              {
+                inside = 2;
+                break;
+              }
+          }
+          else
+          {
+            for (unsigned int ii=0; ii<m_StartLabels.size(); ++ii)
+            {
+              for (unsigned int jj=0; jj<m_EndLabels.size(); ++jj)
+              {
+                if ( (m_StartLabels.at(ii)==label1 && m_EndLabels.at(ii)==label2) || (m_StartLabels.at(ii)==label2 && m_EndLabels.at(ii)==label1) )
+                {
+                  inside = 2;
+                  break;
+                }
+              }
+              if (inside==2)
+                break;
             }
           }
         }
 
-        if ( (inside==2 && (!m_SkipSelfConnections || label1!=label2)) || (inside==2 && m_OnlySelfConnections && label1==label2) )
+        std::string key;
+        if (label1<label2)
+          key = boost::lexical_cast<std::string>(label1) + "-" + boost::lexical_cast<std::string>(label2);
+        else
+          key = boost::lexical_cast<std::string>(label2) + "-" + boost::lexical_cast<std::string>(label1);
+        if (m<m_RoiImageNames.size())
+          key = m_RoiImageNames.at(m) + "_" + key;
+
+        if (m_BothEnds)
         {
-          std::pair< unsigned int, unsigned int > key;
-          if (label1<label2)
-            key = std::pair< unsigned int, unsigned int >(label1, label2);
-          else
-            key = std::pair< unsigned int, unsigned int >(label2, label1);
-          positive = true;
-          if ( positive_ids[m].count(key)==0 )
-            positive_ids[m].insert( std::pair< std::pair< unsigned int, unsigned int >, std::vector< long > >( key, {i}) );
-          else
-            positive_ids[m][key].push_back(i);
+          if ( (inside==2 && (!m_SkipSelfConnections || label1!=label2)) || (inside==2 && m_OnlySelfConnections && label1==label2) )
+          {
+            positive = true;
+            if ( positive_ids[m].count(key)==0 )
+              positive_ids[m].insert( std::pair< std::string, std::vector< long > >( key, {i}) );
+            else
+              positive_ids[m][key].push_back(i);
+          }
+        }
+        else
+        {
+          if ( (inside>=1 && (!m_SkipSelfConnections || label1!=label2)) || (inside==2 && m_OnlySelfConnections && label1==label2) )
+          {
+            positive = true;
+            if ( positive_ids[m].count(key)==0 )
+              positive_ids[m].insert( std::pair< std::string, std::vector< long > >( key, {i}) );
+            else
+              positive_ids[m][key].push_back(i);
+          }
         }
       }
     if (!positive)
@@ -334,6 +377,18 @@ template< class PixelType >
 void FiberExtractionFilter< PixelType >::SetLabels(const std::vector<unsigned short> &Labels)
 {
   m_Labels = Labels;
+}
+
+template< class PixelType >
+void FiberExtractionFilter< PixelType >::SetStartLabels(const std::vector<unsigned short> &Labels)
+{
+  m_StartLabels = Labels;
+}
+
+template< class PixelType >
+void FiberExtractionFilter< PixelType >::SetEndLabels(const std::vector<unsigned short> &Labels)
+{
+  m_EndLabels = Labels;
 }
 
 template< class PixelType >
@@ -376,7 +431,7 @@ void FiberExtractionFilter< PixelType >::GenerateData()
     ExtractOverlap(fib);
   else if (m_Mode == MODE::ENDPOINTS)
   {
-    if (m_InputType==INPUT::LABEL_MAP && m_BothEnds)
+    if (m_InputType==INPUT::LABEL_MAP)
       ExtractLabels(fib);
     else
       ExtractEndpoints(fib);

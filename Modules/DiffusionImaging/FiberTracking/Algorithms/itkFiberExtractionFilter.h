@@ -72,13 +72,17 @@ public:
   itkSetMacro( OnlySelfConnections, bool )  ///< Only keep streamlines between two identical labels
   itkSetMacro( SplitLabels, bool )          ///< Output a separate tractogram for each label-->label tract
   itkSetMacro( MinFibersPerTract, unsigned int )  ///< Discard positives with less fibers
+  itkSetMacro( PairedStartEndLabels, bool )
 
   void SetRoiImages(const std::vector< ItkInputImgType* > &rois);
+  void SetRoiImageNames(const std::vector< std::string > roi_names);
   void SetLabels(const std::vector<unsigned short> &Labels);
+  void SetStartLabels(const std::vector<unsigned short> &Labels);
+  void SetEndLabels(const std::vector<unsigned short> &Labels);
 
   std::vector<mitk::FiberBundle::Pointer> GetPositives() const; ///< Get positive tracts (filtered by the input ROIs)
   std::vector<mitk::FiberBundle::Pointer> GetNegatives() const; ///< Get negative tracts (not filtered by the ROIs)
-  std::vector<std::pair<unsigned int, unsigned int> > GetPositiveLabels() const;  ///< In case of label extraction, this vector contains the labels corresponding to the positive tracts
+  std::vector< std::string > GetPositiveLabels() const;  ///< In case of label extraction, this vector contains the labels corresponding to the positive tracts
 
 protected:
 
@@ -97,6 +101,7 @@ protected:
   std::vector< mitk::FiberBundle::Pointer >   m_Positives;
   std::vector< mitk::FiberBundle::Pointer >   m_Negatives;
   std::vector< ItkInputImgType* >             m_RoiImages;
+  std::vector< std::string >                  m_RoiImageNames;
   bool                                        m_DontResampleFibers;
   MODE                                        m_Mode;
   INPUT                                       m_InputType;
@@ -111,7 +116,10 @@ protected:
   bool                                        m_OnlySelfConnections;
   bool                                        m_SplitLabels;
   unsigned int                                m_MinFibersPerTract;
-  std::vector< std::pair< unsigned int, unsigned int > >  m_PositiveLabels;
+  std::vector< unsigned short >               m_StartLabels;
+  std::vector< unsigned short >               m_EndLabels;
+  bool                                        m_PairedStartEndLabels;
+  std::vector< std::string >                  m_PositiveLabels;
   typename itk::LinearInterpolateImageFunction< itk::Image< PixelType, 3 >, float >::Pointer   m_Interpolator;
 };
 }

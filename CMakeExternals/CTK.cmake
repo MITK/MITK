@@ -63,6 +63,7 @@ if(MITK_USE_CTK)
       CMAKE_GENERATOR ${gen}
       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch
             COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK-815.patch
+            COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTKLocalization.patch
       CMAKE_ARGS
         ${ep_common_args}
         ${ctk_optional_cache_args}

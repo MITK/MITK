@@ -27,6 +27,7 @@ if(MITK_USE_Poco)
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/poco-1.6.1-all.tar.gz
       URL_MD5 05961d10195d0f760b707752e88938e9
       CMAKE_GENERATOR ${gen}
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/PocoLocalization.patch
       CMAKE_ARGS
         ${ep_common_args}
         ${additional_cmake_args}

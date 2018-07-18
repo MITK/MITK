@@ -16,9 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkSemanticRelationsNodeSelectionDialog.h"
 
-#include <mitkDataStorageInspectorGenerator.h>
-#include <QmitkDataStorageTreeInspector.h>
-#include <QmitkNodeSelectionPreferenceHelper.h>
+// semantic relations ui module
+#include <QmitkAbstractSemanticRelationsStorageInspector.h>
 
 QmitkSemanticRelationsNodeSelectionDialog::QmitkSemanticRelationsNodeSelectionDialog(QWidget* parent, QString title, QString hint)
   : QmitkNodeSelectionDialog(parent, title, hint)
@@ -30,10 +29,22 @@ void QmitkSemanticRelationsNodeSelectionDialog::SetCaseID(const mitk::SemanticTy
 {
   for (auto panel : m_Panels)
   {
-    QmitkPatientTableInspector* patientTableInspector = dynamic_cast<QmitkPatientTableInspector*>(panel);
-    if (nullptr != patientTableInspector)
+    QmitkAbstractSemanticRelationsStorageInspector* semanticRelationsStorageInspector = dynamic_cast<QmitkAbstractSemanticRelationsStorageInspector*>(panel);
+    if (nullptr != semanticRelationsStorageInspector)
     {
-      patientTableInspector->SetCaseID(caseID);
+      semanticRelationsStorageInspector->SetCaseID(caseID);
+    }
+  }
+}
+
+void QmitkSemanticRelationsNodeSelectionDialog::SetLesion(const mitk::SemanticTypes::Lesion& lesion)
+{
+  for (auto panel : m_Panels)
+  {
+    QmitkAbstractSemanticRelationsStorageInspector* semanticRelationsStorageInspector = dynamic_cast<QmitkAbstractSemanticRelationsStorageInspector*>(panel);
+    if (nullptr != semanticRelationsStorageInspector)
+    {
+      semanticRelationsStorageInspector->SetLesion(lesion);
     }
   }
 }

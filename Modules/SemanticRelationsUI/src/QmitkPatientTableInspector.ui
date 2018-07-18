@@ -27,10 +27,33 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QTableView" name="view"/>
+    <widget class="QRadioButton" name="imageNodeButton">
+     <property name="text">
+      <string>Show image nodes</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">nodeButtonGroup</string>
+     </attribute>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="segmentationNodeButton">
+     <property name="text">
+      <string>Show segmentation nodes</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">nodeButtonGroup</string>
+     </attribute>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableView" name="tableView"/>
    </item>
   </layout>
  </widget>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="nodeButtonGroup"/>
+ </buttongroups>
 </ui>

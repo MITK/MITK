@@ -24,7 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void mitk::SemanticRelationsUIActivator::Load(us::ModuleContext* /*context*/)
 {
-  m_PatientTableInspector.reset(new QmitkDataStorageInspectorProviderBase<QmitkPatientTableInspector>("org.mitk.QmitkPatientTableInspector", "Patient table", "Displays the content of the semantic relations storage in a control-point - modality table."));
+  m_PatientTableInspector.reset(new QmitkDataStorageInspectorProviderBase<QmitkPatientTableInspector>("org.mitk.QmitkPatientTableInspector",
+                                "Patient table inspector", "Displays the content of the semantic relations storage in a control-point - modality table."));
  }
 
 void mitk::SemanticRelationsUIActivator::Unload(us::ModuleContext* /*context*/)

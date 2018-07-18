@@ -86,6 +86,7 @@ void QmitkSemanticRelationsView::OnSelectPatientNodeButtonClicked()
   dialog->SetSelectOnlyVisibleNodes(true);
   dialog->SetSelectionMode(QAbstractItemView::SingleSelection);
   dialog->SetCaseID(m_CaseID);
+  dialog->SetLesion(m_LesionInfoWidget->GetSelectedLesion());
 
   if (QDialog::Accepted == dialog->exec())
   {

@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations UI module
 #include "QmitkPatientTableInspector.h"
-#include "QmitkPatientTableModel.h"
 #include "QmitkControlPointDialog.h"
 
 #include "QmitkCustomVariants.h"
@@ -24,50 +23,49 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations module
 #include <mitkDICOMHelper.h>
 #include <mitkSemanticRelationException.h>
-#include <mitkSemanticTypes.h>
 #include <mitkUIDGeneratorBoost.h>
 
 // qt
 #include <QInputDialog>
+#include <QSignalMapper>
 
 QmitkPatientTableInspector::QmitkPatientTableInspector(QWidget* parent/* =nullptr*/)
-  : QmitkAbstractDataStorageInspector(parent)
 {
   m_Controls.setupUi(this);
 
-  m_Controls.view->horizontalHeader()->setHighlightSections(false);
-  m_Controls.view->verticalHeader()->setHighlightSections(false);
-  m_Controls.view->setSelectionMode(QAbstractItemView::SingleSelection);
-  m_Controls.view->setSelectionBehavior(QAbstractItemView::SelectItems);
-  m_Controls.view->setContextMenuPolicy(Qt::CustomContextMenu);
+  m_Controls.tableView->horizontalHeader()->setHighlightSections(false);
+  m_Controls.tableView->verticalHeader()->setHighlightSections(false);
+  m_Controls.tableView->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_Controls.tableView->setSelectionBehavior(QAbstractItemView::SelectItems);
+  m_Controls.tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
   m_StorageModel = new QmitkPatientTableModel(this);
 
-  m_Controls.view->setModel(m_StorageModel);
+  m_Controls.tableView->setModel(m_StorageModel);
 
-  m_ContextMenu = new QMenu(m_Controls.view);
+  m_ContextMenu = new QMenu(m_Controls.tableView);
 
   SetUpConnections();
 }
 
 QAbstractItemView* QmitkPatientTableInspector::GetView()
 {
-  return m_Controls.view;
+  return m_Controls.tableView;
 }
 
 const QAbstractItemView* QmitkPatientTableInspector::GetView() const
 {
-  return m_Controls.view;
+  return m_Controls.tableView;
 }
 
 void QmitkPatientTableInspector::SetSelectionMode(SelectionMode mode)
 {
-  m_Controls.view->setSelectionMode(mode);
+  m_Controls.tableView->setSelectionMode(mode);
 }
 
 QmitkPatientTableInspector::SelectionMode QmitkPatientTableInspector::GetSelectionMode() const
 {
-  return m_Controls.view->selectionMode();
+  return m_Controls.tableView->selectionMode();
 }
 
 void QmitkPatientTableInspector::SetCaseID(const mitk::SemanticTypes::CaseID& caseID)
@@ -75,23 +73,33 @@ void QmitkPatientTableInspector::SetCaseID(const mitk::SemanticTypes::CaseID& ca
   m_StorageModel->SetCaseID(caseID);
 }
 
+void QmitkPatientTableInspector::SetLesion(const mitk::SemanticTypes::Lesion& lesion)
+{
+  m_StorageModel->SetLesion(lesion);
+}
+
 void QmitkPatientTableInspector::Initialize()
 {
   m_StorageModel->SetDataStorage(m_DataStorage.Lock());
   m_StorageModel->SetNodePredicate(m_NodePredicate);
 
-  m_Connector->SetView(m_Controls.view);
+  m_Connector->SetView(m_Controls.tableView);
 }
 
-void QmitkPatientTableInspector::OnPatientTableModelUpdated()
+void QmitkPatientTableInspector::OnModelUpdated()
 {
-  m_Controls.view->resizeRowsToContents();
-  m_Controls.view->resizeColumnsToContents();
+  m_Controls.tableView->resizeRowsToContents();
+  m_Controls.tableView->resizeColumnsToContents();
 }
 
-void QmitkPatientTableInspector::OnPatientTableViewContextMenuRequested(const QPoint& pos)
+void QmitkPatientTableInspector::OnNodeButtonClicked(const QString& nodeType)
 {
-  QModelIndex selectedIndex = m_Controls.view->indexAt(pos);
+  m_StorageModel->SetNodeType(nodeType.toStdString());
+}
+
+void QmitkPatientTableInspector::OnTableViewContextMenuRequested(const QPoint& pos)
+{
+  QModelIndex selectedIndex = m_Controls.tableView->indexAt(pos);
   if (!selectedIndex.isValid())
   {
     return;
@@ -119,7 +127,7 @@ void QmitkPatientTableInspector::OnPatientTableViewContextMenuRequested(const QP
 void QmitkPatientTableInspector::OnContextMenuSetInformationType()
 {
   bool ok = false;
-  QString text = QInputDialog::getText(m_Controls.view, tr("Set information type of selected node"), tr("Information type:"), QLineEdit::Normal, "", &ok);
+  QString text = QInputDialog::getText(m_Controls.tableView, tr("Set information type of selected node"), tr("Information type:"), QLineEdit::Normal, "", &ok);
   if (ok && !text.isEmpty())
   {
     m_StorageModel->GetSemanticRelations()->RemoveInformationTypeFromImage(m_SelectedDataNode);
@@ -130,7 +138,7 @@ void QmitkPatientTableInspector::OnContextMenuSetInformationType()
 
 void QmitkPatientTableInspector::OnContextMenuSetControlPoint()
 {
-  QmitkControlPointDialog* inputDialog = new QmitkControlPointDialog(m_Controls.view);
+  QmitkControlPointDialog* inputDialog = new QmitkControlPointDialog(m_Controls.tableView);
   inputDialog->setWindowTitle("Set control point");
   inputDialog->SetCurrentDate(mitk::GetDICOMDateFromDataNode(m_SelectedDataNode));
 
@@ -153,7 +161,7 @@ void QmitkPatientTableInspector::OnContextMenuSetControlPoint()
   date.month = userSelectedDate.month();
   date.day = userSelectedDate.day();
 
-  std::vector<mitk::SemanticTypes::ControlPoint> allControlPoints = m_StorageModel->GetSemanticRelations()->GetAllControlPointsOfCase(m_StorageModel->GetCurrentCaseID());
+  std::vector<mitk::SemanticTypes::ControlPoint> allControlPoints = m_StorageModel->GetSemanticRelations()->GetAllControlPointsOfCase(m_StorageModel->GetCaseID());
   if (!allControlPoints.empty())
   {
     // need to check if an already existing control point fits/contains the user control point
@@ -234,6 +242,14 @@ void QmitkPatientTableInspector::OnContextMenuSetControlPoint()
 
 void QmitkPatientTableInspector::SetUpConnections()
 {
-  connect(m_StorageModel, SIGNAL(ModelUpdated()), SLOT(OnPatientTableModelUpdated()));
-  connect(m_Controls.view, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(OnPatientTableViewContextMenuRequested(const QPoint&)));
+  connect(m_StorageModel, SIGNAL(ModelUpdated()), SLOT(OnModelUpdated()));
+  connect(m_Controls.tableView, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(OnTableViewContextMenuRequested(const QPoint&)));
+
+  QSignalMapper* nodeButtonSignalMapper = new QSignalMapper(this);
+  nodeButtonSignalMapper->setMapping(m_Controls.imageNodeButton, QString("Image"));
+  nodeButtonSignalMapper->setMapping(m_Controls.segmentationNodeButton, QString("Segmentation"));
+  connect(nodeButtonSignalMapper, SIGNAL(mapped(const QString&)), this, SLOT(OnNodeButtonClicked(const QString&)));
+  connect(m_Controls.imageNodeButton, SIGNAL(clicked()), nodeButtonSignalMapper, SLOT(map()));
+  connect(m_Controls.segmentationNodeButton, SIGNAL(clicked()), nodeButtonSignalMapper, SLOT(map()));
+  m_Controls.imageNodeButton->setChecked(true);
 }

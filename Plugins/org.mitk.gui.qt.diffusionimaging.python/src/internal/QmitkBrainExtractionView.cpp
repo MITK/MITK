@@ -118,19 +118,28 @@ void QmitkBrainExtractionView::SetFocus()
 std::string QmitkBrainExtractionView::GetPythonFile(std::string filename)
 {
   std::string out = "";
-
+  std::string exec_dir = QCoreApplication::applicationDirPath().toStdString();
   for (auto dir : mitk::bet::relative_search_dirs)
+  {
     if ( ist::FileExists( ist::GetCurrentWorkingDirectory() + dir + filename) )
     {
       out = ist::GetCurrentWorkingDirectory() + dir + filename;
       return out;
     }
+    if ( ist::FileExists( exec_dir + dir + filename) )
+    {
+      out = exec_dir + dir + filename;
+      return out;
+    }
+  }
   for (auto dir : mitk::bet::absolute_search_dirs)
+  {
     if ( ist::FileExists( dir + filename) )
     {
       out = dir + filename;
       return out;
     }
+  }
 
   return out;
 }
@@ -179,9 +188,12 @@ void QmitkBrainExtractionView::StartBrainExtraction()
     m_PythonService->Execute("import numpy");
 
     // extend python search path
+    std::string exec_dir = QCoreApplication::applicationDirPath().toStdString();
     std::string pythonpath = "";
     for (auto dir : mitk::bet::relative_search_dirs)
       pythonpath += "','" + ist::GetCurrentWorkingDirectory() + dir;
+    for (auto dir : mitk::bet::relative_search_dirs)
+      pythonpath += "','" + exec_dir + dir;
     for (auto dir : mitk::bet::absolute_search_dirs)
       pythonpath += "','" + dir;
     m_PythonService->Execute("paths=['"+pythonpath+"']");

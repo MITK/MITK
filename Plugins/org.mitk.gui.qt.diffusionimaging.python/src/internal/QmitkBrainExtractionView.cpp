@@ -118,19 +118,28 @@ void QmitkBrainExtractionView::SetFocus()
 std::string QmitkBrainExtractionView::GetPythonFile(std::string filename)
 {
   std::string out = "";
-
+  QString exec_dir = QCoreApplication::applicationDirPath();
   for (auto dir : mitk::bet::relative_search_dirs)
+  {
     if ( ist::FileExists( ist::GetCurrentWorkingDirectory() + dir + filename) )
     {
       out = ist::GetCurrentWorkingDirectory() + dir + filename;
       return out;
     }
+    if ( ist::FileExists( exec_dir.toStdString() + dir + filename) )
+    {
+      out = exec_dir.toStdString() + dir + filename;
+      return out;
+    }
+  }
   for (auto dir : mitk::bet::absolute_search_dirs)
+  {
     if ( ist::FileExists( dir + filename) )
     {
       out = dir + filename;
       return out;
     }
+  }
 
   return out;
 }

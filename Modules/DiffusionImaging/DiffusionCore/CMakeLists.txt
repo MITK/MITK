@@ -18,4 +18,5 @@ endif()
 
 add_subdirectory(Testing)
 add_subdirectory(cmdapps)
+add_subdirectory(cmdapps_python)
 add_subdirectory(autoload/IO)

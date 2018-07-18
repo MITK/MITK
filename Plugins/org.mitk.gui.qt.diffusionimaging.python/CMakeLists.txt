@@ -14,10 +14,4 @@ mitk_create_plugin(
 #set(_install_DESTINATION "BetData")
 MITK_INSTALL(DIRECTORY ${BetData_DIR}/)
 
-#if(WIN32)
-#  file(COPY ${BetData_DIR}/ DESTINATION ${CMAKE_BINARY_DIR}/bin/${build_type}/ FILES_MATCHING PATTERN "*")
-#else()
-#  file(COPY ${BetData_DIR}/ DESTINATION ${CMAKE_BINARY_DIR}/bin FILES_MATCHING PATTERN "*")
-#endif()
-
 endif()

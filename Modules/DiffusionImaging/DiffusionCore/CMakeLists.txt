@@ -18,5 +18,9 @@ endif()
 
 add_subdirectory(Testing)
 add_subdirectory(cmdapps)
-add_subdirectory(cmdapps_python)
 add_subdirectory(autoload/IO)
+
+if(MITK_USE_Python)
+MITK_INSTALL(FILES PythonRequirements.txt)
+add_subdirectory(cmdapps_python)
+endif()

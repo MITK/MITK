@@ -32,25 +32,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <BetData.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 
+#include <boost/algorithm/string.hpp>
+
 typedef mitk::DiffusionPropertyHelper DPH;
 typedef itksys::SystemTools ist;
 
-std::string GetPythonFile(std::string filename)
+std::string GetPythonFile(std::string filename, std::string exec_dir)
 {
   std::string out = "";
-
   for (auto dir : mitk::bet::relative_search_dirs)
+  {
+    if ( ist::FileExists( exec_dir + dir + filename) )
+    {
+      out = exec_dir + dir + filename;
+      return out;
+    }
     if ( ist::FileExists( ist::GetCurrentWorkingDirectory() + dir + filename) )
     {
       out = ist::GetCurrentWorkingDirectory() + dir + filename;
       return out;
     }
+  }
   for (auto dir : mitk::bet::absolute_search_dirs)
+  {
     if ( ist::FileExists( dir + filename) )
     {
       out = dir + filename;
       return out;
     }
+  }
 
   return out;
 }
@@ -76,24 +86,25 @@ int main(int argc, char* argv[])
   std::string i = us::any_cast<std::string>(parsedArgs["i"]);
   std::string o = us::any_cast<std::string>(parsedArgs["o"]);
 
+  std::string exec_dir = ist::GetFilenamePath(argv[0]);
   mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
   mitk::Image::Pointer mitk_image = mitk::IOUtil::Load<mitk::Image>(i, &functor);
 
   bool missing_file = false;
   std::string missing_file_string = "";
-  if ( GetPythonFile("run_mitk.py").empty() )
+  if ( GetPythonFile("run_mitk.py", exec_dir).empty() )
   {
     missing_file_string += "Brain extraction script file missing: run_mitk.py\n\n";
     missing_file = true;
   }
 
-  if ( GetPythonFile("model_final.model").empty() )
+  if ( GetPythonFile("model_final.model", exec_dir).empty() )
   {
     missing_file_string += "Brain extraction model file missing: model_final.model\n\n";
     missing_file = true;
   }
 
-  if ( GetPythonFile("basic_config_just_like_braintumor.py").empty() )
+  if ( GetPythonFile("basic_config_just_like_braintumor.py", exec_dir).empty() )
   {
     missing_file_string += "Config file missing: basic_config_just_like_braintumor.py\n\n";
     missing_file = true;
@@ -118,19 +129,21 @@ int main(int argc, char* argv[])
   std::string pythonpath = "";
   for (auto dir : mitk::bet::relative_search_dirs)
     pythonpath += "','" + ist::GetCurrentWorkingDirectory() + dir;
+  for (auto dir : mitk::bet::relative_search_dirs)
+    pythonpath += "','" + exec_dir + dir;
   for (auto dir : mitk::bet::absolute_search_dirs)
     pythonpath += "','" + dir;
   m_PythonService->Execute("paths=['"+pythonpath+"']");
 
   // set input files (model and config)
-  m_PythonService->Execute("model_file=\""+GetPythonFile("model_final.model")+"\"");
-  m_PythonService->Execute("config_file=\""+GetPythonFile("basic_config_just_like_braintumor.py")+"\"");
+  m_PythonService->Execute("model_file=\""+GetPythonFile("model_final.model", exec_dir)+"\"");
+  m_PythonService->Execute("config_file=\""+GetPythonFile("basic_config_just_like_braintumor.py", exec_dir)+"\"");
 
   // copy input  image to python
   m_PythonService->CopyToPythonAsSimpleItkImage( mitk_image, "in_image");
 
   // run segmentation script
-  m_PythonService->ExecuteScript( GetPythonFile("run_mitk.py") );
+  m_PythonService->ExecuteScript( GetPythonFile("run_mitk.py", exec_dir) );
 
   // clean up after running script (better way than deleting individual variables?)
   if(m_PythonService->DoesVariableExist("in_image"))
@@ -140,23 +153,39 @@ int main(int argc, char* argv[])
   if(!m_PythonService->GetVariable("error_string").empty())
     mitkThrow() << m_PythonService->GetVariable("error_string");
 
-  {
-    mitk::Image::Pointer image = m_PythonService->CopySimpleItkImageFromPython("brain_mask");
-    mitk::IOUtil::Save(image, o + "_BrainMask.nii.gz");
-  }
+  // get output images and add to datastorage
+  std::string output_variables = m_PythonService->GetVariable("output_variables");
+  std::vector<std::string> outputs;
+  boost::split(outputs, output_variables, boost::is_any_of(","));
 
-  {
-    mitk::Image::Pointer image = m_PythonService->CopySimpleItkImageFromPython("brain_extracted");
+  std::string output_types = m_PythonService->GetVariable("output_types");
+  std::vector<std::string> types;
+  boost::split(types, output_types, boost::is_any_of(","));
 
-    if(mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(mitk_image))
+  for (unsigned int i=0; i<outputs.size(); ++i)
+  {
+    if (m_PythonService->DoesVariableExist(outputs.at(i)))
     {
-      mitk::DiffusionPropertyHelper::CopyProperties(mitk_image, image, true);
-      mitk::DiffusionPropertyHelper::InitializeImage(image);
-      mitk::IOUtil::Save(image, "application/vnd.mitk.nii.gz", o + "_SkullStripped.nii.gz");
+      mitk::Image::Pointer image = m_PythonService->CopySimpleItkImageFromPython(outputs.at(i));
+
+      if(types.at(i)=="input" && mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(mitk_image))
+      {
+        mitk::DiffusionPropertyHelper::CopyProperties(mitk_image, image, true);
+        mitk::DiffusionPropertyHelper::InitializeImage(image);
+      }
+
+      mitk::DataNode::Pointer corrected_node = mitk::DataNode::New();
+      corrected_node->SetData( image );
+      std::string name = o + "_";
+      name += outputs.at(i);
+
+      if(types.at(i)=="input" && mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(mitk_image))
+        mitk::IOUtil::Save(image, "application/vnd.mitk.nii.gz", name+".nii.gz");
+      else
+        mitk::IOUtil::Save(image, name+".nii.gz");
     }
-    else
-      mitk::IOUtil::Save(image, o + "_SkullStripped.nii.gz");
   }
 
+  MITK_INFO << "Finished brain extraction";
   return EXIT_SUCCESS;
 }

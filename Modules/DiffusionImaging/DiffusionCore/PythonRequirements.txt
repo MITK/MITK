@@ -1,0 +1,5 @@
+numpy
+SimpleITK
+dipy
+sklearn
+https://github.com/MIC-DKFZ/batchgenerators/archive/master.zip

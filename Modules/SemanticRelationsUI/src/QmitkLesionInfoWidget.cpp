@@ -122,7 +122,7 @@ void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* current,
   }
 
   // only the UID is needed to identify a representing lesion
-  m_CurrentLesion.UID = current->text().toStdString();
+  m_CurrentLesion.UID = current->data(Qt::UserRole).toString().toStdString();
   if (false == m_SemanticRelations->InstanceExists(m_CaseID, m_CurrentLesion))
   {
     // no UID found; cannot create a lesion
@@ -180,16 +180,15 @@ void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* current,
 
 void QmitkLesionInfoWidget::OnLesionItemDoubleClicked(QListWidgetItem* clickedItem)
 {
-  if (nullptr == m_SemanticRelations)
+  if (nullptr == clickedItem
+   || nullptr == m_SemanticRelations)
   {
     return;
   }
 
-  if (nullptr == clickedItem)
-  {
-    // no item clicked; cannot retrieve the current lesion
-    return;
-  }
+  // only the UID is needed to identify a representing lesion
+  m_CurrentLesion.UID = clickedItem->data(Qt::UserRole).toString().toStdString();
+  m_CurrentLesion.name = clickedItem->text().toStdString();
 }
 
 void QmitkLesionInfoWidget::OnCurrentSegmentationItemChanged(QListWidgetItem* current, QListWidgetItem* /*previous*/)
@@ -237,10 +236,14 @@ void QmitkLesionInfoWidget::OnCurrentSegmentationItemChanged(QListWidgetItem* cu
     {
       // set background color for the represented lesion of the currently selected segmentation
       mitk::SemanticTypes::Lesion representedLesion = m_SemanticRelations->GetRepresentedLesion(m_CurrentSegmentation);
-      QList<QListWidgetItem*> items = m_Controls.lesionListWidget->findItems(QString::fromStdString(representedLesion.UID), Qt::MatchExactly);
-      for (auto& item : items)
+      for (int i = 0; i < m_Controls.lesionListWidget->count(); ++i)
       {
-        item->setBackground(SELECTED_BACKGROUND_COLOR);
+        QListWidgetItem* item = m_Controls.lesionListWidget->item(i);
+        std::string currentLesionUID = item->data(Qt::UserRole).toString().toStdString();
+        if (currentLesionUID == representedLesion.UID)
+        {
+          item->setBackground(SELECTED_BACKGROUND_COLOR);
+        }
       }
     }
     catch (mitk::Exception& e)
@@ -262,7 +265,6 @@ void QmitkLesionInfoWidget::OnSegmentationItemDoubleClicked(QListWidgetItem* cli
   if (nullptr == clickedItem
    || nullptr == m_DataStorage)
   {
-    // no item clicked; cannot retrieve the current segmentation
     return;
   }
 
@@ -332,12 +334,16 @@ void QmitkLesionInfoWidget::OnCurrentImageItemChanged(QListWidgetItem* current, 
     {
       if (m_SemanticRelations->IsRepresentingALesion(it->Value()))
       {
-        // set background color for the represented lesion of the current segmentation
-        mitk::SemanticTypes::Lesion representedLesion = m_SemanticRelations->GetRepresentedLesion(it->Value());
-        QList<QListWidgetItem*> items = m_Controls.lesionListWidget->findItems(QString::fromStdString(representedLesion.UID), Qt::MatchExactly);
-        for (auto& item : items)
+        // set background color for the represented lesion of the currently selected segmentation
+        mitk::SemanticTypes::Lesion representedLesion = m_SemanticRelations->GetRepresentedLesion(m_CurrentSegmentation);
+        for (int i = 0; i < m_Controls.lesionListWidget->count(); ++i)
         {
-          item->setBackground(SELECTED_BACKGROUND_COLOR);
+          QListWidgetItem* item = m_Controls.lesionListWidget->item(i);
+          std::string currentLesionUID = item->data(Qt::UserRole).toString().toStdString();
+          if (currentLesionUID == representedLesion.UID)
+          {
+            item->setBackground(SELECTED_BACKGROUND_COLOR);
+          }
         }
       }
     }
@@ -357,14 +363,9 @@ void QmitkLesionInfoWidget::OnCurrentImageItemChanged(QListWidgetItem* current, 
 
 void QmitkLesionInfoWidget::OnImageItemDoubleClicked(QListWidgetItem* clickedItem)
 {
-  if (nullptr == m_SemanticRelations)
+  if (nullptr == clickedItem
+    || nullptr == m_SemanticRelations)
   {
-    return;
-  }
-
-  if (nullptr == clickedItem)
-  {
-    // no item clicked; cannot retrieve the current image
     return;
   }
 }
@@ -379,7 +380,7 @@ void QmitkLesionInfoWidget::OnLesionListContextMenuRequested(const QPoint& pos)
   }
 
   mitk::SemanticTypes::ID selectedLesionUID;
-  selectedLesionUID = currentItem->text().toStdString();
+  selectedLesionUID = currentItem->data(Qt::UserRole).toString().toStdString();
   if (selectedLesionUID.empty())
   {
     // no UID found; cannot create a lesion
@@ -707,6 +708,7 @@ void QmitkLesionInfoWidget::ResetLesionListWidget()
 {
   m_Controls.lesionListWidget->clear();
   m_CurrentLesion.UID = "";
+  m_CurrentLesion.name = "";
 
   // create lesion list widget entries with the current lesions
   mitk::SemanticRelations::LesionVector allLesionsOfCase = m_SemanticRelations->GetAllLesionsOfCase(m_CaseID);
@@ -716,7 +718,21 @@ void QmitkLesionInfoWidget::ResetLesionListWidget()
   }
   for (const auto& lesion : allLesionsOfCase)
   {
-    m_Controls.lesionListWidget->addItem(QString::fromStdString(lesion.UID));
+    // store the UID as 'UserRole' data in the widget item
+    QListWidgetItem* lesionItem = new QListWidgetItem;
+    lesionItem->setData(Qt::UserRole, QString::fromStdString(lesion.UID));
+
+    // use the lesion UID for the item text, if the lesion name is non-existent
+    if (lesion.name.empty())
+    {
+      lesionItem->setText(QString::fromStdString(lesion.UID));
+    }
+    else
+    {
+      lesionItem->setText(QString::fromStdString(lesion.name));
+    }
+
+    m_Controls.lesionListWidget->addItem(lesionItem);
   }
 }
 

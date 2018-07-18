@@ -99,6 +99,48 @@ void* GetSymbol_impl(const ModuleInfo& moduleInfo, const char* symbol)
 
 #include <windows.h>
 
+std::string WstrToUtf8Str(const std::wstring& wstr)
+{
+  std::string retStr;
+  if (!wstr.empty()) {
+    int sizeRequired = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, NULL, 0, NULL, NULL);
+
+    if (sizeRequired > 0) {
+      std::vector<char> utf8String(sizeRequired);
+      int bytesConverted = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(),
+        -1, &utf8String[0], (int)utf8String.size(), NULL,
+        NULL);
+      if (bytesConverted != 0) {
+        retStr = &utf8String[0];
+      } else {
+        // Error
+      }
+    }
+  }
+  return retStr;
+}
+
+std::wstring Utf8StrToWStr(const std::string& str)
+{
+  std::wstring retStr;
+  if (!str.empty()) {
+    int sizeRequired = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL, 0);
+
+    if (sizeRequired > 0) {
+      std::vector<wchar_t> utf16String(sizeRequired);
+      int bytesConverted = MultiByteToWideChar(CP_ACP, 0, str.c_str(),
+        -1, &utf16String[0], (int)utf16String.size());
+      if (bytesConverted != 0) {
+        retStr = &utf16String[0];
+      } else {
+        // Error
+      }
+    }
+  }
+  return retStr;
+}
+
+
 std::string GetLibraryPath_impl(void *symbol)
 {
   HMODULE handle = 0;
@@ -111,10 +153,11 @@ std::string GetLibraryPath_impl(void *symbol)
     return "";
   }
 
-  char modulePath[512];
-  if (GetModuleFileName(handle, modulePath, 512))
+  wchar_t modulePathBytes[512];
+  if (GetModuleFileNameW(handle, modulePathBytes, 512))
   {
-    return modulePath;
+    std::wstring modulePath = modulePathBytes;
+    return WstrToUtf8Str(modulePath);
   }
 
   US_DEBUG << "GetLibraryPath_impl():GetModuleFileName() " << GetLastErrorStr();
@@ -130,7 +173,7 @@ void* GetSymbol_impl(const ModuleInfo& moduleInfo, const char* symbol)
   }
   else
   {
-    handle = GetModuleHandle(moduleInfo.location.c_str());
+    handle = GetModuleHandleW(Utf8StrToWStr(moduleInfo.location).c_str());
   }
 
   if (!handle)

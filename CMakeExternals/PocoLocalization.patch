@@ -1,0 +1,179 @@
+--- a/Foundation/src/UnicodeConverter.cpp	2015-08-04 09:20:56.000000000 +0400
++++ b/Foundation/src/UnicodeConverter.cpp	2018-07-17 16:17:48.330544900 +0400
+@@ -22,9 +22,68 @@
+ #include "Poco/UTF32Encoding.h"
+ #include <cstring>
+
++#ifdef _WIN32
++#include <vector>
++#include <codecvt>
++#endif //_WIN32
+
+ namespace Poco {
+
++#ifdef _WIN32
++std::string UnicodeConverter::WstrToUtf8Str(const std::wstring& wstr)
++{
++  std::string retStr;
++  if (!wstr.empty()) {
++    int sizeRequired = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, NULL, 0, NULL, NULL);
++
++    if (sizeRequired > 0) {
++      std::vector<char> utf8String(sizeRequired);
++      int bytesConverted = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(),
++        -1, &utf8String[0], (int)utf8String.size(), NULL,
++        NULL);
++      if (bytesConverted != 0) {
++        retStr = &utf8String[0];
++      }
++      else {
++        // Error
++      }
++    }
++  }
++  return retStr;
++}
++
++std::wstring UnicodeConverter::Utf8StrToWStr(const std::string& str)
++{
++  std::wstring retStr;
++  if (!str.empty()) {
++    int sizeRequired = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL, 0);
++
++    if (sizeRequired > 0) {
++      std::vector<wchar_t> utf16String(sizeRequired);
++      int bytesConverted = MultiByteToWideChar(CP_ACP, 0, str.c_str(),
++        -1, &utf16String[0], (int)utf16String.size());
++      if (bytesConverted != 0) {
++        retStr = &utf16String[0];
++      }
++      else {
++        // Error
++      }
++    }
++  }
++  return retStr;
++}
++#else
++std::string UnicodeConverter::WstrToUtf8Str(const std::wstring& wstr)
++{
++  return "Unimplemented";
++}
++
++std::wstring UnicodeConverter::Utf8StrToWStr(const std::string& str)
++{
++  return L"Unimplemented";
++}
++
++#endif // _WIN32
+
+ void UnicodeConverter::convert(const std::string& utf8String, UTF32String& utf32String)
+ {
+@@ -64,9 +123,11 @@
+ 	convert(utf8String, std::strlen(utf8String), utf32String);
+ }
+
+-
+ void UnicodeConverter::convert(const std::string& utf8String, UTF16String& utf16String)
+ {
++#ifdef _WIN32
++  utf16String = Utf8StrToWStr(utf8String);
++#else
+ 	utf16String.clear();
+ 	UTF8Encoding utf8Encoding;
+ 	TextIterator it(utf8String, utf8Encoding);
+@@ -85,11 +146,14 @@
+ 			utf16String += (UTF16Char) (cc & 0x3ff) | 0xdc00;
+ 		}
+ 	}
++#endif //_WIN32
+ }
+
+-
+ void UnicodeConverter::convert(const char* utf8String,  std::size_t length, UTF16String& utf16String)
+ {
++#ifdef _WIN32
++  utf16String = Utf8StrToWStr(utf8String);
++#else
+ 	if (!utf8String || !length)
+ 	{
+ 		utf16String.clear();
+@@ -97,11 +161,14 @@
+ 	}
+
+ 	convert(std::string(utf8String, utf8String + length), utf16String);
++#endif // _WIN32
+ }
+
+-
+ void UnicodeConverter::convert(const char* utf8String, UTF16String& utf16String)
+ {
++#ifdef _WIN32
++  utf16String = Utf8StrToWStr(utf8String);
++#else
+ 	if (!utf8String || !std::strlen(utf8String))
+ 	{
+ 		utf16String.clear();
+@@ -109,18 +176,23 @@
+ 	}
+
+ 	convert(std::string(utf8String), utf16String);
++#endif // _WIN32
+ }
+
+
+ void UnicodeConverter::convert(const UTF16String& utf16String, std::string& utf8String)
+ {
++#ifdef _WIN32
++  utf8String = WstrToUtf8Str(utf16String);
++#else
+ 	utf8String.clear();
+ 	UTF8Encoding utf8Encoding;
+ 	UTF16Encoding utf16Encoding;
+ 	TextConverter converter(utf16Encoding, utf8Encoding);
+ 	converter.convert(utf16String.data(), (int) utf16String.length() * sizeof(UTF16Char), utf8String);
+-}
++#endif // _WIN32
+
++}
+
+ void UnicodeConverter::convert(const UTF32String& utf32String, std::string& utf8String)
+ {
+@@ -134,11 +206,15 @@
+
+ void UnicodeConverter::convert(const UTF16Char* utf16String,  std::size_t length, std::string& utf8String)
+ {
++#ifdef _WIN32
++  utf8String = WstrToUtf8Str(utf16String);
++#else
+ 	utf8String.clear();
+ 	UTF8Encoding utf8Encoding;
+ 	UTF16Encoding utf16Encoding;
+ 	TextConverter converter(utf16Encoding, utf8Encoding);
+ 	converter.convert(utf16String, (int) length * sizeof(UTF16Char), utf8String);
++#endif // _WIN32
+ }
+
+
+@@ -150,7 +226,11 @@
+
+ void UnicodeConverter::convert(const UTF16Char* utf16String, std::string& utf8String)
+ {
++#ifdef _WIN32
++  utf8String = WstrToUtf8Str(utf16String);
++#else
+ 	toUTF8(utf16String, UTFStrlen(utf16String), utf8String);
++#endif
+ }
+
+
+--- a/Foundation/include/Poco/UnicodeConverter.h	2015-08-04 09:20:55.000000000 +0400
++++ b/Foundation/include/Poco/UnicodeConverter.h	2018-07-16 16:52:03.226060800 +0400
+@@ -134,6 +134,9 @@
+ 		for (p = ptr; *p; ++p);
+ 		return p - ptr;
+ 	}
++
++  static std::string WstrToUtf8Str(const std::wstring& wstr);
++  static std::wstring Utf8StrToWStr(const std::string& str);
+ };

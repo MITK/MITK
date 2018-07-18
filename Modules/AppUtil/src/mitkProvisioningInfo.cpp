@@ -32,7 +32,7 @@ const QString ProvisioningInfo::intermediateOutDir = QString(CMAKE_INTDIR);
 const QString ProvisioningInfo::intermediateOutDir = QString();
 #endif
 
-ProvisioningInfo::ProvisioningInfo(const std::string& file)
+ProvisioningInfo::ProvisioningInfo(const QString& file)
 {
   this->readProvisioningFile(file);
 }
@@ -52,9 +52,9 @@ QList<QUrl> ProvisioningInfo::getPluginsToStart() const
   return pluginsToStart;
 }
 
-void ProvisioningInfo::readProvisioningFile(const std::string& filePath)
+void ProvisioningInfo::readProvisioningFile(const QString& filePath)
 {
-  QFile file(QString(filePath.c_str()));
+  QFile file(filePath);
   if (!file.open(QFile::ReadOnly)) {
     MITK_INFO << "Error open file!";
     MITK_INFO << file.errorString().toStdString();
@@ -77,7 +77,7 @@ void ProvisioningInfo::readProvisioningFile(const std::string& filePath)
       if (keyword.isEmpty())
       {
         MITK_WARN << "Keyword missing in line " << count
-                  << " of provisioning file " << filePath;
+                  << " of provisioning file " << filePath.toStdString();
         continue;
       }
 
@@ -103,7 +103,7 @@ void ProvisioningInfo::readProvisioningFile(const std::string& filePath)
       {
         MITK_WARN << "Keyword " << keyword.toStdString() << " in line "
                   << count << " of provisioning file "
-                  << filePath << " unknown";
+                  << filePath.toStdString() << " unknown";
         continue;
       }
 
@@ -111,7 +111,7 @@ void ProvisioningInfo::readProvisioningFile(const std::string& filePath)
       {
         MITK_WARN << "Value after keyword " << keyword.toStdString()
                   << " missing in line " << count
-                  << " of provisioning file " << filePath;
+                  << " of provisioning file " << filePath.toStdString();
         continue;
       }
 

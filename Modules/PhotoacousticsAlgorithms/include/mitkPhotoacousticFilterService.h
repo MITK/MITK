@@ -95,7 +95,7 @@ namespace mitk {
     * @param maxSlice The last slice to be present in the resulting image.
     * @return The processed image is returned after the filter has finished. For the purposes of this module, the returned image is always of type float.
     */
-    mitk::Image::Pointer ApplyCropping(mitk::Image::Pointer inputImage, int above, int below, int right, int left, int minSlice, int maxSlice);
+    mitk::Image::Pointer ApplyCropping(mitk::Image::Pointer inputImage, int above, int below, int right, int left, int minSlice, int maxSlice, int* errCode);
 
     /** \brief Applies a Bandpass filter to the given image
     *

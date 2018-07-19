@@ -218,6 +218,24 @@ void PAImageProcessing::BatchProcessing()
     // Beamforming
     if (doSteps[0])
     {
+      if (m_Controls.UseSignalDelay->isChecked())
+      {
+        float signalDelay = m_Controls.SignalDelay->value();
+        if (signalDelay != 0)
+        {
+          int cropPixels = std::round(signalDelay / BFconfig->GetTimeSpacing() / 1000000);
+          MITK_INFO << cropPixels;
+          int errCode = 0;
+          image = m_FilterBank->ApplyCropping(image, cropPixels, 0, 0, 0, 0, image->GetDimension(2) - 1, &errCode);
+
+          BFconfig = mitk::BeamformingSettings::New(BFconfig->GetPitchInMeters(), BFconfig->GetSpeedOfSound(),
+            BFconfig->GetTimeSpacing(), BFconfig->GetAngle(), BFconfig->GetIsPhotoacousticImage(), BFconfig->GetSamplesPerLine(),
+            BFconfig->GetReconstructionLines(), image->GetDimensions(), BFconfig->GetReconstructionDepth(),
+            BFconfig->GetUseGPU(), BFconfig->GetGPUBatchSize(), BFconfig->GetDelayCalculationMethod(), BFconfig->GetApod(),
+            BFconfig->GetApodizationArraySize(), BFconfig->GetAlgorithm());
+        }
+      }
+
       std::function<void(int, std::string)> progressHandle = [this](int progress, std::string progressInfo) {
         this->UpdateProgress(progress, progressInfo);
       };
@@ -237,7 +255,18 @@ void PAImageProcessing::BatchProcessing()
     {
       m_Controls.ProgressInfo->setText("cropping image");
 
-      image = m_FilterBank->ApplyCropping(image, m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), 0, 0, 0, 0);
+      int errCode = 0;
+      image = m_FilterBank->ApplyCropping(image, m_Controls.CutoffAbove->value(), m_Controls.CutoffBelow->value(), 0, 0, 0, 0, &errCode);
+
+      if (errCode == -1)
+      {
+        QMessageBox Msgbox;
+        Msgbox.setText("It has been attempted to cut off more pixels than the image contains. Aborting batch processing.");
+        Msgbox.exec();
+        m_Controls.progressBar->setVisible(false);
+        EnableControls();
+        return;
+      }
 
       if (saveSteps[1])
       {
@@ -398,6 +427,19 @@ void PAImageProcessing::StartBeamformingThread()
 
 void PAImageProcessing::HandleResults(mitk::Image::Pointer image, std::string nameExtension)
 {
+  if (image == nullptr)
+  {
+    QMessageBox Msgbox;
+    Msgbox.setText("An error has occurred during processing; please see the console output.");
+    Msgbox.exec();
+
+    // disable progress bar
+    m_Controls.progressBar->setVisible(false);
+    m_Controls.ProgressInfo->setVisible(false);
+    EnableControls();
+
+    return;
+  }
   MITK_INFO << "Handling results...";
   auto newNode = mitk::DataNode::New();
   newNode->SetData(image);
@@ -953,25 +995,25 @@ void PAImageProcessing::UseImageSpacing()
 
 void BeamformingThread::run()
 {
-  mitk::Image::Pointer preprocessedImage = m_InputImage;
   if (m_SignalDelay != 0)
   {
     int cropPixels = std::round(m_SignalDelay / m_BFconfig->GetTimeSpacing() / 1000000);
     MITK_INFO << cropPixels;
-    preprocessedImage = m_FilterBank->ApplyCropping(m_InputImage, cropPixels, 0, 0, 0, 0, m_InputImage->GetDimension(2) - 1);
-  }
+    int errCode = 0;
+    m_InputImage = m_FilterBank->ApplyCropping(m_InputImage, cropPixels, 0, 0, 0, 0, 0, &errCode);
 
-  m_BFconfig = mitk::BeamformingSettings::New(m_BFconfig->GetPitchInMeters(), m_BFconfig->GetSpeedOfSound(),
-    m_BFconfig->GetTimeSpacing(), m_BFconfig->GetAngle(), m_BFconfig->GetIsPhotoacousticImage(), m_BFconfig->GetSamplesPerLine(),
-    m_BFconfig->GetReconstructionLines(), preprocessedImage->GetDimensions(), m_BFconfig->GetReconstructionDepth(),
-    m_BFconfig->GetUseGPU(), m_BFconfig->GetGPUBatchSize(), m_BFconfig->GetDelayCalculationMethod(), m_BFconfig->GetApod(), 
-    m_BFconfig->GetApodizationArraySize(), m_BFconfig->GetAlgorithm());
+    m_BFconfig = mitk::BeamformingSettings::New(m_BFconfig->GetPitchInMeters(), m_BFconfig->GetSpeedOfSound(),
+      m_BFconfig->GetTimeSpacing(), m_BFconfig->GetAngle(), m_BFconfig->GetIsPhotoacousticImage(), m_BFconfig->GetSamplesPerLine(),
+      m_BFconfig->GetReconstructionLines(), m_InputImage->GetDimensions(), m_BFconfig->GetReconstructionDepth(),
+      m_BFconfig->GetUseGPU(), m_BFconfig->GetGPUBatchSize(), m_BFconfig->GetDelayCalculationMethod(), m_BFconfig->GetApod(),
+      m_BFconfig->GetApodizationArraySize(), m_BFconfig->GetAlgorithm());
+  }
 
   mitk::Image::Pointer resultImage;
   std::function<void(int, std::string)> progressHandle = [this](int progress, std::string progressInfo) {
     emit updateProgress(progress, progressInfo);
   };
-  resultImage = m_FilterBank->ApplyBeamforming(preprocessedImage, m_BFconfig, progressHandle);
+  resultImage = m_FilterBank->ApplyBeamforming(m_InputImage, m_BFconfig, progressHandle);
   emit result(resultImage, "_bf");
 }
 
@@ -1020,7 +1062,15 @@ void CropThread::run()
 {
   mitk::Image::Pointer resultImage;
 
-  resultImage = m_FilterBank->ApplyCropping(m_InputImage, m_CutAbove, m_CutBelow, 0, 0, m_CutSliceFirst, (m_InputImage->GetDimension(2) - 1)  - m_CutSliceLast);
+
+  int errCode = 0;
+
+  resultImage = m_FilterBank->ApplyCropping(m_InputImage, m_CutAbove, m_CutBelow, 0, 0, m_CutSliceFirst, (m_InputImage->GetDimension(2) - 1)  - m_CutSliceLast, &errCode);
+  if (errCode == -1)
+  {
+    emit result(nullptr, "_cropped");
+    return;
+  }
   emit result(resultImage, "_cropped");
 }
 

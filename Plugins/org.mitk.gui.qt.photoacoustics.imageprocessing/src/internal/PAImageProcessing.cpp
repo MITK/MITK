@@ -226,7 +226,17 @@ void PAImageProcessing::BatchProcessing()
           int cropPixels = std::round(signalDelay / BFconfig->GetTimeSpacing() / 1000000);
           MITK_INFO << cropPixels;
           int errCode = 0;
-          image = m_FilterBank->ApplyCropping(image, cropPixels, 0, 0, 0, 0, image->GetDimension(2) - 1, &errCode);
+          image = m_FilterBank->ApplyCropping(image, cropPixels, 0, 0, 0, 0, 0, &errCode);
+
+          if (errCode == -1)
+          {
+            QMessageBox Msgbox;
+            Msgbox.setText("It has been attempted to cut off more pixels than the image contains. Aborting batch processing.");
+            Msgbox.exec();
+            m_Controls.progressBar->setVisible(false);
+            EnableControls();
+            return;
+          }
 
           BFconfig = mitk::BeamformingSettings::New(BFconfig->GetPitchInMeters(), BFconfig->GetSpeedOfSound(),
             BFconfig->GetTimeSpacing(), BFconfig->GetAngle(), BFconfig->GetIsPhotoacousticImage(), BFconfig->GetSamplesPerLine(),

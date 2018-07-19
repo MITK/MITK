@@ -48,11 +48,11 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
   m_LesionInfoWidget = new QmitkLesionInfoWidget(GetDataStorage(), parent);
   m_Controls.gridLayout->addWidget(m_LesionInfoWidget);
 
-  connect(m_Controls.caseIDComboBox, SIGNAL(currentIndexChanged(const QString&)), SLOT(OnCaseIDSelectionChanged(const QString&)));
+  connect(m_Controls.caseIDComboBox, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged), this, &QmitkSemanticRelationsView::OnCaseIDSelectionChanged);
 
-  connect(m_LesionInfoWidget, SIGNAL(ImageAdded(const mitk::SemanticTypes::CaseID&)), SLOT(AddToComboBox(const mitk::SemanticTypes::CaseID&)));
-  connect(m_LesionInfoWidget, SIGNAL(JumpToPosition(const mitk::Point3D&)), SLOT(OnJumpToPosition(const mitk::Point3D&)));
-  connect(m_LesionInfoWidget, SIGNAL(ImageRemoved(const mitk::DataNode*)), SLOT(OnImageRemoved(const mitk::DataNode*)));
+  connect(m_LesionInfoWidget, &QmitkLesionInfoWidget::ImageAdded, this, &QmitkSemanticRelationsView::AddToComboBox);
+  connect(m_LesionInfoWidget, &QmitkLesionInfoWidget::JumpToPosition, this, &QmitkSemanticRelationsView::OnJumpToPosition);
+  connect(m_LesionInfoWidget, &QmitkLesionInfoWidget::ImageRemoved, this, &QmitkSemanticRelationsView::OnImageRemoved);
 }
 
 void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* node)

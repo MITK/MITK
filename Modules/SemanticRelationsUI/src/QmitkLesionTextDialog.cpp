@@ -38,8 +38,8 @@ QmitkLesionTextDialog::QmitkLesionTextDialog(QWidget* parent)
   QPushButton* cancelButton = new QPushButton(tr("Cancel"), this);
   acceptButton->setDefault(true);
 
-  connect(acceptButton, SIGNAL(clicked()), SLOT(accept()));
-  connect(cancelButton, SIGNAL(clicked()), SLOT(reject()));
+  connect(acceptButton, &QPushButton::clicked, this, &QmitkLesionTextDialog::accept);
+  connect(cancelButton, &QPushButton::clicked, this, &QmitkLesionTextDialog::reject);
 
   QBoxLayout* horizontalLayout = new QHBoxLayout();
   horizontalLayout->setSpacing(5);

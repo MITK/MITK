@@ -76,22 +76,22 @@ void QmitkLesionInfoWidget::Init()
 void QmitkLesionInfoWidget::SetUpConnections()
 {
   // connect buttons to modify semantic relations
-  connect(m_Controls.addLesionPushButton, SIGNAL(clicked()), SLOT(OnAddLesionButtonClicked()));
-  connect(m_Controls.addSegmentationPushButton, SIGNAL(clicked()), SLOT(OnAddSegmentationButtonClicked()));
-  connect(m_Controls.addImagePushButton, SIGNAL(clicked()), SLOT(OnAddImageButtonClicked()));
+  connect(m_Controls.addLesionPushButton, &QPushButton::clicked, this, &QmitkLesionInfoWidget::OnAddLesionButtonClicked);
+  connect(m_Controls.addSegmentationPushButton, &QPushButton::clicked, this, &QmitkLesionInfoWidget::OnAddSegmentationButtonClicked);
+  connect(m_Controls.addImagePushButton, &QPushButton::clicked, this, &QmitkLesionInfoWidget::OnAddImageButtonClicked);
 
   // connect each list widget with a custom slots
-  connect(m_Controls.lesionListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), SLOT(OnCurrentLesionItemChanged(QListWidgetItem*, QListWidgetItem*)));
-  connect(m_Controls.lesionListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), SLOT(OnLesionItemDoubleClicked(QListWidgetItem*)));
-  connect(m_Controls.segmentationListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), SLOT(OnCurrentSegmentationItemChanged(QListWidgetItem*, QListWidgetItem*)));
-  connect(m_Controls.segmentationListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), SLOT(OnSegmentationItemDoubleClicked(QListWidgetItem*)));
-  connect(m_Controls.imageListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), SLOT(OnCurrentImageItemChanged(QListWidgetItem*, QListWidgetItem*)));
-  connect(m_Controls.imageListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), SLOT(OnImageItemDoubleClicked(QListWidgetItem*)));
+  connect(m_Controls.lesionListWidget, &QListWidget::currentItemChanged, this, &QmitkLesionInfoWidget::OnCurrentLesionItemChanged);
+  connect(m_Controls.lesionListWidget, &QListWidget::itemDoubleClicked, this, &QmitkLesionInfoWidget::OnLesionItemDoubleClicked);
+  connect(m_Controls.segmentationListWidget, &QListWidget::currentItemChanged, this, &QmitkLesionInfoWidget::OnCurrentSegmentationItemChanged);
+  connect(m_Controls.segmentationListWidget, &QListWidget::itemDoubleClicked, this, &QmitkLesionInfoWidget::OnSegmentationItemDoubleClicked);
+  connect(m_Controls.imageListWidget, &QListWidget::currentItemChanged, this, &QmitkLesionInfoWidget::OnCurrentImageItemChanged);
+  connect(m_Controls.imageListWidget, &QListWidget::itemDoubleClicked, this, &QmitkLesionInfoWidget::OnImageItemDoubleClicked);
 
   // connect context menu entries
-  connect(m_Controls.lesionListWidget, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(OnLesionListContextMenuRequested(const QPoint&)));
-  connect(m_Controls.segmentationListWidget, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(OnSegmentationListContextMenuRequested(const QPoint&)));
-  connect(m_Controls.imageListWidget, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(OnImageListContextMenuRequested(const QPoint&)));
+  connect(m_Controls.lesionListWidget, &QListWidget::customContextMenuRequested, this, &QmitkLesionInfoWidget::OnLesionListContextMenuRequested);
+  connect(m_Controls.segmentationListWidget, &QListWidget::customContextMenuRequested, this, &QmitkLesionInfoWidget::OnSegmentationListContextMenuRequested);
+  connect(m_Controls.imageListWidget, &QListWidget::customContextMenuRequested, this, &QmitkLesionInfoWidget::OnImageListContextMenuRequested);
 }
 
 void QmitkLesionInfoWidget::SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID)

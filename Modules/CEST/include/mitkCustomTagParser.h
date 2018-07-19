@@ -29,8 +29,22 @@ namespace mitk
   (0x0029, 0x1020) to extract relevant CEST data.
 
   An initial parsing determines whether the provided string belongs to CEST data at all.
-  If the "tSequenceFileName" is of the format "{WHATEVER}CEST_Rev####" it is assumed that the
-  data is indeed CEST data and was taken with revision #### (not limited to four digits).
+  To make the check and extract the revision number the following rules are aplied: \n
+  <ol>
+    <li>Sequence name (tSequenceFileName) must either
+      <ol>
+        <li>start with the substring "CEST" (case insensitiv), or</li>
+        <li>contain the substring "_CEST" (case insensitiv).</li>
+      </ol>
+    </li>
+    <li>Sequence name (tSequenceFileName) must contain the substring "_Rev" (case insensitiv).</li>
+    <li>All numbers after "_Rev" represent the revision number; until either
+      <ol>
+        <li>the next _, or</li>
+        <li>end of sequence name.</li>
+      </ol>
+    </li>
+  </ol>
 
   Which custom parameters to save and to which property name can be controlled by a json file.
   This file can be either provided as a resource for the MitkCEST module during compilation or
@@ -67,6 +81,12 @@ namespace mitk
     mitk::PropertyList::Pointer ParseDicomProperty(mitk::TemporoSpatialStringProperty *dicomProperty);
     /// parse the provided string and return a property list based on the closest revision parameter mapping
     mitk::PropertyList::Pointer ParseDicomPropertyString(std::string dicomPropertyString);
+
+    /** Extract the revision out of the passed sequenceFileName. If the file name is not a valid CEST file name
+      (see rules in the class documentation) exceptions will be thrown. If the file name is valid but contains no
+      revision number an empty string will be returned.
+    */
+    static std::string ExtractRevision(std::string sequenceFileName);
 
     void SetParseStrategy(std::string parseStrategy);
     void SetRevisionMappingStrategy(std::string revisionMappingStrategy);

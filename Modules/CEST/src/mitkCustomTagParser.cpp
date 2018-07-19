@@ -126,6 +126,53 @@ mitk::CustomTagParser::CustomTagParser(std::string relevantFile) : m_ClosestInte
   m_RevisionMappingStrategy = "Fuzzy";
 }
 
+std::string mitk::CustomTagParser::ExtractRevision(std::string sequenceFileName)
+{
+  //all rules are case insesitive. Thus we convert everything to lower case
+  //in order to check everything only once.
+  std::string cestPrefix = "cest";
+  std::string cestPrefix2 = "_cest";
+  std::string cestPrefix3 = "\\cest"; //this version covers the fact that the strings extracted
+                                      //from the SIEMENS tag has an additional prefix that is seperated by backslash.
+  std::string revisionPrefix = "_rev";
+  std::transform(sequenceFileName.begin(), sequenceFileName.end(), sequenceFileName.begin(), ::tolower);
+
+  bool isCEST = sequenceFileName.compare(0, cestPrefix.length(), cestPrefix) == 0;
+  std::size_t foundPosition = 0;
+
+  if (!isCEST)
+  {
+    foundPosition = sequenceFileName.find(cestPrefix2);
+    isCEST = foundPosition != std::string::npos;
+  }
+
+  if (!isCEST)
+  {
+    foundPosition = sequenceFileName.find(cestPrefix3);
+    isCEST = foundPosition != std::string::npos;
+  }
+
+  if (!isCEST)
+  {
+    mitkThrow() << "Invalid CEST sequence file name. No CEST prefix found. Could not extract revision.";
+  }
+
+  foundPosition = sequenceFileName.find(revisionPrefix, foundPosition);
+  if (foundPosition == std::string::npos)
+  {
+    mitkThrow() << "Invalid CEST sequence file name. No revision prefix was found in CEST sequence file name. Could not extract revision.";
+  }
+
+  std::string revisionString = sequenceFileName.substr(foundPosition + revisionPrefix.length(), std::string::npos);
+  std::size_t firstNoneNumber = revisionString.find_first_not_of("0123456789");
+  if (firstNoneNumber != std::string::npos)
+  {
+    revisionString.erase(firstNoneNumber, std::string::npos);
+  }
+
+  return revisionString;
+}
+
 mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std::string dicomPropertyString)
 {
   auto results = mitk::PropertyList::New();
@@ -170,24 +217,17 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
     }
   }
 
-  // determine what revision we are using to handle parameters appropriately
-  std::string revisionPrefix = "CEST_Rev";
-  std::string lowerRevisionPrefix = revisionPrefix;
-  std::string lowerParameter = privateParameters["tSequenceFileName"];
-  std::transform(lowerRevisionPrefix.begin(), lowerRevisionPrefix.end(), lowerRevisionPrefix.begin(), ::tolower );
-  std::transform(lowerParameter.begin(), lowerParameter.end(), lowerParameter.begin(), ::tolower);
+  std::string revisionString = "";
 
-  std::size_t foundPosition = lowerParameter.find(lowerRevisionPrefix);
-  if (foundPosition == std::string::npos)
+  try
   {
-    MITK_ERROR << "Could not find revision information.";
+    revisionString = ExtractRevision(privateParameters["tSequenceFileName"]);
+  }
+  catch (const std::exception &e)
+  {
+    MITK_ERROR << "Cannot deduce revision information. Reason: "<< e.what();
     return results;
   }
-
-  std::string revisionString =
-    privateParameters["tSequenceFileName"].substr(foundPosition + revisionPrefix.length(), std::string::npos);
-  std::size_t firstNonNumber = revisionString.find_first_not_of("0123456789");
-  revisionString.erase(firstNonNumber, std::string::npos);
 
   results->SetProperty(m_RevisionPropertyName, mitk::StringProperty::New(revisionString));
 

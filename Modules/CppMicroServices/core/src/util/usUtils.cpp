@@ -82,30 +82,9 @@ bool load_impl(const std::string& modulePath)
 
 const char DIR_SEP = '\\';
 
-std::wstring Utf8StrToWStr(const std::string& str)
-{
-  std::wstring retStr;
-  if (!str.empty()) {
-    int sizeRequired = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL, 0);
-
-    if (sizeRequired > 0) {
-      std::vector<wchar_t> utf16String(sizeRequired);
-      int bytesConverted = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, &utf16String[0], (int)utf16String.size());
-      if (bytesConverted != 0) {
-        retStr = &utf16String[0];
-      } else  {
-        // Error
-      }
-    }
-  }
-  return retStr;
-}
-
 bool load_impl(const std::string& modulePath)
 {
-  
-  std::wstring test = Utf8StrToWStr(modulePath);
-  void* handle = LoadLibraryW(test.c_str());
+  void* handle = LoadLibrary(modulePath.c_str());
   if (handle == NULL)
   {
     US_WARN << us::GetLastErrorStr();

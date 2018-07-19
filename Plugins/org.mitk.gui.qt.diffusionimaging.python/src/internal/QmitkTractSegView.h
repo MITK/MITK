@@ -20,16 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIStructuredSelection.h>
 
 #include <QmitkAbstractView.h>
-#include "ui_QmitkBrainExtractionViewControls.h"
-#include <mitkImage.h>
-
-#include <mitkDiffusionPropertyHelper.h>
-
+#include "ui_QmitkTractSegViewControls.h"
 
 /*!
 \brief
 */
-class QmitkBrainExtractionView : public QmitkAbstractView
+class QmitkTractSegView : public QmitkAbstractView
 {
 
   // this is needed for all Qt objects that should have a Qt meta-object
@@ -40,21 +36,16 @@ public:
 
   static const std::string VIEW_ID;
 
-  typedef itk::VectorImage< short, 3 >        ItkDwiType;
-  typedef mitk::GradientDirectionsProperty    GradProp;
-
-  QmitkBrainExtractionView();
-  virtual ~QmitkBrainExtractionView();
+  QmitkTractSegView();
+  virtual ~QmitkTractSegView();
 
   virtual void CreateQtPartControl(QWidget *parent) override;
   void SetFocus() override;
 
 protected slots:
 
-  void StartBrainExtraction();
+  void Start();
   void UpdateGUI();             ///< update button activity etc. dpending on current datamanager selection
-
-  std::string GetPythonFile(std::string filename);
 
 
 protected:
@@ -62,10 +53,7 @@ protected:
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
-  Ui::QmitkBrainExtractionViewControls* m_Controls;
-
-  mitk::Image::Pointer      m_DiffusionImage;
-  std::vector< mitk::DataNode::Pointer >            m_SelectedDiffusionNodes;
+  Ui::QmitkTractSegViewControls* m_Controls;
 
 private:
 

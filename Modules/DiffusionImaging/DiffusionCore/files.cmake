@@ -150,12 +150,12 @@ set(H_FILES
   include/Algorithms/itkExtractDwiChannelFilter.h
   include/Algorithms/itkFlipPeaksFilter.h
   include/Algorithms/itkShToOdfImageFilter.h
-
+  include/Algorithms/itkFourDToVectorImageFilter.h
+  include/Algorithms/itkVectorImageToFourDImageFilter.h
   include/Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.h
   include/Algorithms/itkNonLocalMeansDenoisingFilter.h
   include/Algorithms/itkVectorImageToImageFilter.h
-
-
+  include/Algorithms/itkSplitVectorImageFilter.h
 )
 
 set( TOOL_FILES

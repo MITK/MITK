@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkDataStorageTreeInspector.h>
 #include <QmitkNodeSelectionPreferenceHelper.h>
 
+// semantic relations ui module
+#include <QmitkPatientTableInspector.h>
+
 QmitkSemanticRelationsNodeSelectionDialog::QmitkSemanticRelationsNodeSelectionDialog(QWidget* parent, QString title, QString hint)
   : QmitkNodeSelectionDialog(parent, title, hint)
 {

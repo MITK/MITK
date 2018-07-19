@@ -20,9 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations module
 #include <mitkSemanticTypes.h>
 
-// semantic relations ui module
-#include <QmitkPatientTableInspector.h>
-
 // org.mitk.gui.qt.common plugin
 #include <QmitkNodeSelectionDialog.h>
 

@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations UI module
 #include <ui_QmitkLesionInfoWidgetControls.h>
-#include <QmitkSimpleDatamanagerWidget.h>
-#include <QmitkSelectNodeDialog.h>
 
 // semantic relations module
 #include <mitkSemanticRelations.h>
@@ -140,9 +138,6 @@ private:
   mitk::DataStorage* m_DataStorage;
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
   mitk::SemanticTypes::CaseID m_CaseID;
-
-  QmitkSimpleDatamanagerWidget* m_SimpleDatamanagerWidget;
-  QmitkSelectNodeDialog* m_SimpleDatamanagerNodeDialog;
 
   mitk::SemanticTypes::Lesion m_CurrentLesion;
   mitk::DataNode::Pointer m_CurrentSegmentation;

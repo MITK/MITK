@@ -164,7 +164,7 @@ typedef struct dirent
 typedef struct DIR
 {
    dirent           curentry;                  /* Current directory entry */
-   WIN32_FIND_DATAW find_data;                 /* Private file data */
+   WIN32_FIND_DATAA find_data;                 /* Private file data */
    int              cached;                    /* True if data is valid */
    HANDLE           search_handle;             /* Win32 search handle */
    char             patt[MAX_PATH + 3];        /* Initial directory name */
@@ -192,48 +192,6 @@ static void rewinddir(DIR* dirp);
 #define DIRENT_SET_ERRNO(x) (errno = (x))
 #endif
 
-const char* wcharToCharArray(wchar_t* warr)
-{
-  std::wstring wstr(warr);
-  std::string retStr;
-  if (!wstr.empty()) {
-    int sizeRequired = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, NULL, 0, NULL, NULL);
-
-    if (sizeRequired > 0) {
-      std::vector<char> utf8String(sizeRequired);
-      int bytesConverted = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(),
-        -1, &utf8String[0], (int)utf8String.size(), NULL,
-        NULL);
-      if (bytesConverted != 0) {
-        retStr = &utf8String[0];
-      } else {
-        // Error
-      }
-    }
-  }
-  return retStr.c_str();
-}
-
-const wchar_t* charToWcharArray(const char* ch_arr)
-{
-  std::string str(ch_arr);
-  std::wstring retStr;
-  if (!str.empty()) {
-    int sizeRequired = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL, 0);
-
-    if (sizeRequired > 0) {
-      std::vector<wchar_t> utf16String(sizeRequired);
-      int bytesConverted = MultiByteToWideChar(CP_ACP, 0, str.c_str(),
-        -1, &utf16String[0], (int)utf16String.size());
-      if (bytesConverted != 0) {
-        retStr = &utf16String[0];
-      } else {
-        // Error
-      }
-    }
-  }
-  return retStr.c_str();
-}
 
 /*****************************************************************************
  * Open directory stream DIRNAME for read and return a pointer to the
@@ -264,9 +222,7 @@ static DIR *opendir(const char *dirname)
        * allows rewinddir() to function correctly when the current working
        * directory is changed between opendir() and rewinddir().
        */
-      wchar_t path[MAX_PATH];
-      if (GetFullPathNameW (charToWcharArray(dirname), MAX_PATH, path, NULL)) {
-         strncpy(dirp->patt, wcharToCharArray(path), MAX_PATH);
+      if (GetFullPathNameA (dirname, MAX_PATH, dirp->patt, NULL)) {
          char *p;
 
          /* append the search pattern "\\*\0" to the directory name */
@@ -278,7 +234,7 @@ static DIR *opendir(const char *dirname)
          *p = '\0';
 
          /* open directory stream and retrieve the first entry */
-         dirp->search_handle = FindFirstFileW (charToWcharArray(dirp->patt), &dirp->find_data);
+         dirp->search_handle = FindFirstFileA (dirp->patt, &dirp->find_data);
          if (dirp->search_handle != INVALID_HANDLE_VALUE) {
             /* a directory entry is now waiting in memory */
             dirp->cached = 1;
@@ -329,7 +285,7 @@ static struct dirent *readdir(DIR *dirp)
       if (dirp->search_handle == INVALID_HANDLE_VALUE) {
          return NULL;
       }
-      if (FindNextFileW (dirp->search_handle, &dirp->find_data) == FALSE) {
+      if (FindNextFileA (dirp->search_handle, &dirp->find_data) == FALSE) {
          /* the very last entry has been processed or an error occured */
          FindClose (dirp->search_handle);
          dirp->search_handle = INVALID_HANDLE_VALUE;
@@ -339,7 +295,7 @@ static struct dirent *readdir(DIR *dirp)
 
    /* copy as a multibyte character string */
    DIRENT_STRNCPY ( dirp->curentry.d_name,
-             wcharToCharArray(dirp->find_data.cFileName),
+             dirp->find_data.cFileName,
              sizeof(dirp->curentry.d_name) );
    dirp->curentry.d_name[MAX_PATH] = '\0';
 
@@ -400,7 +356,7 @@ static void rewinddir(DIR* dirp)
       }
 
       /* open new search handle and retrieve the first entry */
-      dirp->search_handle = FindFirstFileW(charToWcharArray(dirp->patt), &dirp->find_data);
+      dirp->search_handle = FindFirstFileA (dirp->patt, &dirp->find_data);
       if (dirp->search_handle != INVALID_HANDLE_VALUE) {
          /* a directory entry is now waiting in memory */
          dirp->cached = 1;

@@ -1000,7 +1000,7 @@ void BeamformingThread::run()
     int cropPixels = std::round(m_SignalDelay / m_BFconfig->GetTimeSpacing() / 1000000);
     MITK_INFO << cropPixels;
     int errCode = 0;
-    m_InputImage = m_FilterBank->ApplyCropping(m_InputImage, cropPixels, 0, 0, 0, 0, m_InputImage->GetDimension(2) - 1, &errCode);
+    m_InputImage = m_FilterBank->ApplyCropping(m_InputImage, cropPixels, 0, 0, 0, 0, 0, &errCode);
 
     m_BFconfig = mitk::BeamformingSettings::New(m_BFconfig->GetPitchInMeters(), m_BFconfig->GetSpeedOfSound(),
       m_BFconfig->GetTimeSpacing(), m_BFconfig->GetAngle(), m_BFconfig->GetIsPhotoacousticImage(), m_BFconfig->GetSamplesPerLine(),

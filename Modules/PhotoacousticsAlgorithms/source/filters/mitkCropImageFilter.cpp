@@ -102,7 +102,7 @@ void mitk::CropImageFilter::GenerateData()
   ImageWriteAccessor accW(outputImage);
   float* outputData = (float*)(accW.GetData());
 
-  unsigned int zLength = inputImage->GetDimension() == 3 ? outputDim[2] : 0;
+  unsigned int zLength = inputImage->GetDimension() == 3 ? outputDim[2] : 1;
 
   for (unsigned int sl = 0; sl < zLength; ++sl)
   {

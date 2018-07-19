@@ -174,8 +174,10 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyCropping(
   mitk::Image::Pointer inputImage,
   int above, int below,
   int right, int left,
-  int zStart, int zEnd)
+  int zStart, int zEnd,
+  int* errCode)
 {
+  *errCode = 0;
   try
   {
     auto floatImage = ConvertToFloat(inputImage);
@@ -195,8 +197,12 @@ mitk::Image::Pointer mitk::PhotoacousticFilterService::ApplyCropping(
     std::string errorMessage = "Caught unexpected exception ";
     errorMessage.append(e.what());
     MITK_ERROR << errorMessage;
+    *errCode = -1;
+    mitk::Image::Pointer ret = mitk::Image::New();
+    unsigned int dim[3] = { 1,1,1 };
+    ret->Initialize(MakeScalarPixelType<float>(), 3, dim);
 
-    return inputImage;
+    return ret;
   }
 }
 

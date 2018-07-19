@@ -57,7 +57,14 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
 
 void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* node)
 {
-  OnImageRemoved(node);
+  if (mitk::NodePredicates::GetImagePredicate()->CheckNode(node))
+  {
+    m_LesionInfoWidget->OnRemoveImage(node);
+  }
+  else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(node))
+  {
+    m_LesionInfoWidget->OnRemoveSegmentation(node);
+  }
 }
 
 void QmitkSemanticRelationsView::OnCaseIDSelectionChanged(const QString& caseID)

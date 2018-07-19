@@ -124,9 +124,13 @@ private Q_SLOTS:
 
   // slots for the context menu actions of the segmentation list widget
   void OnUnlinkFromLesion(const mitk::DataNode*);
-  void OnRemoveSegmentation(const mitk::DataNode*);
+
  
-  // slot for the context menu action of the image list widget
+public Q_SLOTS:
+
+  // slots for the context menu action of the image / segmentation list widget
+  // the slots are also used from the semantic relations view if a node in the data storage is removed
+  void OnRemoveSegmentation(const mitk::DataNode*);
   void OnRemoveImage(const mitk::DataNode*);
 
 private:

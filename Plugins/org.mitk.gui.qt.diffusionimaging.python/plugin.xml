@@ -8,7 +8,7 @@
     name="Brain Extraction"
     category="Preprocessing"
     class="QmitkBrainExtractionView"
-    icon="resources/dwi2.png">
+    icon="resources/brain_extraction.png">
     <keywordReference id="org.mitk.views.brainextraction.Keyword"/>
     </view>
 
@@ -17,6 +17,14 @@
     category="Signal modeling"
     class="QmitkDipyReconstructionsView"
     icon="resources/dipy.png">
+    <keywordReference id="org.mitk.views.dipyreconstruction.Keyword"/>
+    </view>
+
+    <view id="org.mitk.views.tractseg"
+    name="TractSeg"
+    category="Segmentation"
+    class="QmitkTractSegView"
+    icon="resources/tract_seg.png">
     <keywordReference id="org.mitk.views.dipyreconstruction.Keyword"/>
     </view>
 

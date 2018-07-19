@@ -385,6 +385,7 @@ try:
     odf_image.SetOrigin(in_image.GetOrigin())
     odf_image.SetSpacing(in_image.GetSpacing())
     odf_image.SetDirection(in_image.GetDirection())
+
 except Exception as e:
     error_string = str(e)
     print(error_string)

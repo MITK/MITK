@@ -164,6 +164,7 @@ protected:
 
   bool m_AutoSelectionEnabled;
 
+  mitk::NodePredicateNot::Pointer m_IsNotAHelperObject;
   mitk::NodePredicateAnd::Pointer m_IsOfTypeImagePredicate;
   mitk::NodePredicateOr::Pointer m_IsASegmentationImagePredicate;
   mitk::NodePredicateAnd::Pointer m_IsAPatientImagePredicate;

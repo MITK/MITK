@@ -37,6 +37,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkVectorImageToFourDImageFilter.h>
 #include <itkSplitVectorImageFilter.h>
 #include <itkFlipPeaksFilter.h>
+#include <mitkLookupTable.h>
+#include <mitkLookupTableProperty.h>
+#include <mitkLevelWindow.h>
+#include <mitkLevelWindowProperty.h>
 
 const std::string QmitkTractSegView::VIEW_ID = "org.mitk.views.tractseg";
 
@@ -62,7 +66,8 @@ void QmitkTractSegView::CreateQtPartControl( QWidget *parent )
     m_Controls->setupUi( parent );
     connect( m_Controls->m_ImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGUI()) );
     connect( m_Controls->m_StartButton, SIGNAL(clicked()), this, SLOT(Start()) );
-    connect( m_Controls->m_OutputTypeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGUI()) );
+    connect( m_Controls->m_OutputBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGUI()) );
+    connect( m_Controls->m_ModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGUI()) );
     this->m_Parent = parent;
 
     m_Controls->m_ImageBox->SetDataStorage(this->GetDataStorage());
@@ -83,6 +88,15 @@ void QmitkTractSegView::UpdateGUI()
     m_Controls->m_StartButton->setEnabled(true);
   else
     m_Controls->m_StartButton->setEnabled(false);
+
+  m_Controls->m_CollapseBox->setVisible(true);
+  m_Controls->m_thresholdFrame->setVisible(true);
+
+  if (m_Controls->m_OutputBox->currentIndex()==3 || m_Controls->m_OutputBox->currentIndex()==1)
+    m_Controls->m_thresholdFrame->setVisible(false);
+
+  if (m_Controls->m_OutputBox->currentIndex()>0)
+    m_Controls->m_CollapseBox->setVisible(false);
 }
 
 void QmitkTractSegView::SetFocus()
@@ -93,6 +107,7 @@ void QmitkTractSegView::SetFocus()
 
 void QmitkTractSegView::Start()
 {
+  std::locale::global(std::locale::classic());
   mitk::DataNode::Pointer node = m_Controls->m_ImageBox->GetSelectedNode();
   mitk::Image::Pointer input_image = dynamic_cast<mitk::Image*>(node->GetData());
 
@@ -150,30 +165,30 @@ void QmitkTractSegView::Start()
   if (m_PythonService->DoesVariableExist("segmentation"))
     m_PythonService->Execute("del segmentation");
 
-  switch(m_Controls->m_OutputTypeBox->currentIndex())
-  {
-  case 0:
-  {
+  if(m_Controls->m_ModeBox->currentIndex()==0)
     m_PythonService->Execute("output_type=\"tract_segmentation\"");
-    break;
-  }
-  case 1:
-  {
+  else if(m_Controls->m_ModeBox->currentIndex()==1)
     m_PythonService->Execute("output_type=\"endings_segmentation\"");
-    break;
-  }
-  case 2:
-  {
-    m_PythonService->Execute("output_type=\"TOM\"");
-    break;
-  }
-  }
 
-  if (m_Controls->m_CollapseBox->isChecked())
+  if(m_Controls->m_OutputBox->currentIndex()==3)
+    m_PythonService->Execute("output_type=\"TOM\"");
+
+
+  if (m_Controls->m_CollapseBox->isChecked() && m_Controls->m_OutputBox->currentIndex()==0)
     m_PythonService->Execute("collapse=True");
   else
     m_PythonService->Execute("collapse=False");
+
   m_PythonService->Execute("get_probs=False");
+  m_PythonService->Execute("dropout_sampling=False");
+
+  if (m_Controls->m_OutputBox->currentIndex()==1)
+    m_PythonService->Execute("get_probs=True");
+  else if (m_Controls->m_OutputBox->currentIndex()==2)
+    m_PythonService->Execute("dropout_sampling=True");
+
+  m_PythonService->Execute("threshold=" + boost::lexical_cast<std::string>(m_Controls->m_SegThresholdBox->value()));
+
   m_PythonService->Execute("verbose=False");
   m_PythonService->Execute(data.toStdString(), mitk::IPythonService::MULTI_LINE_COMMAND);
 
@@ -210,27 +225,69 @@ void QmitkTractSegView::Start()
   {
     mitk::Image::Pointer out_image = m_PythonService->CopySimpleItkImageFromPython("segmentation");
 
-    if (!m_Controls->m_CollapseBox->isChecked())
+    if (!m_Controls->m_CollapseBox->isChecked() || m_Controls->m_OutputBox->currentIndex()>0)
     {
-      itk::VectorImage<unsigned char>::Pointer vectorImage = itk::VectorImage<unsigned char>::New();
-      mitk::CastToItkImage(out_image, vectorImage);
-      itk::SplitVectorImageFilter<unsigned char>::Pointer splitter = itk::SplitVectorImageFilter<unsigned char>::New();
-      splitter->SetInputImage(vectorImage);
-      splitter->GenerateData();
-      int c = 0;
-      for (auto itk_seg : splitter->GetOutputImages())
+      if (m_Controls->m_OutputBox->currentIndex()>0)
       {
-        mitk::DataNode::Pointer seg = mitk::DataNode::New();
-        seg->SetData( mitk::GrabItkImageMemory(itk_seg) );
-        seg->SetBoolProperty("binary", true);
-        if (m_Controls->m_OutputTypeBox->currentIndex()==0)
-          seg->SetName(large_name_list.at(c));
-        else if (c%2==0)
-          seg->SetName(small_name_list.at(c/2) + "_Start");
-        else if (c%2==1)
-          seg->SetName(small_name_list.at((c-1)/2) + "_End");
-        GetDataStorage()->Add(seg, node);
-        ++c;
+        itk::VectorImage<float>::Pointer vectorImage = itk::VectorImage<float>::New();
+        mitk::CastToItkImage(out_image, vectorImage);
+        itk::SplitVectorImageFilter<float>::Pointer splitter = itk::SplitVectorImageFilter<float>::New();
+        splitter->SetInputImage(vectorImage);
+        splitter->GenerateData();
+        int c = 0;
+        for (auto itk_seg : splitter->GetOutputImages())
+        {
+          mitk::DataNode::Pointer seg = mitk::DataNode::New();
+          seg->SetData( mitk::GrabItkImageMemory(itk_seg) );
+          if (m_Controls->m_ModeBox->currentIndex()==0)
+            seg->SetName(large_name_list.at(c));
+          else
+            seg->SetName(small_name_list.at(c));
+
+          mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+          lut->SetType( mitk::LookupTable::JET_TRANSPARENT );
+          mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
+          lut_prop->SetLookupTable( lut );
+          seg->SetProperty("LookupTable", lut_prop );
+          mitk::LevelWindow lw; lw.SetRangeMinMax(0.0,1.0);
+          seg->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( lw ) );
+
+          GetDataStorage()->Add(seg, node);
+          ++c;
+        }
+      }
+      else
+      {
+        itk::VectorImage<unsigned char>::Pointer vectorImage = itk::VectorImage<unsigned char>::New();
+        mitk::CastToItkImage(out_image, vectorImage);
+        itk::SplitVectorImageFilter<unsigned char>::Pointer splitter = itk::SplitVectorImageFilter<unsigned char>::New();
+        splitter->SetInputImage(vectorImage);
+        splitter->GenerateData();
+        int c = 0;
+        for (auto itk_seg : splitter->GetOutputImages())
+        {
+          mitk::DataNode::Pointer seg = mitk::DataNode::New();
+          seg->SetData( mitk::GrabItkImageMemory(itk_seg) );
+          if (m_Controls->m_ModeBox->currentIndex()==0)
+          {
+            seg->SetName(large_name_list.at(c));
+            seg->SetBoolProperty("binary", true);
+          }
+          else
+          {
+            mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+            lut->SetType( mitk::LookupTable::MULTILABEL );
+            mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
+            lut_prop->SetLookupTable( lut );
+            seg->SetProperty("LookupTable", lut_prop );
+            mitk::LevelWindow lw; lw.SetRangeMinMax(0,2);
+            seg->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( lw ) );
+
+            seg->SetName(small_name_list.at(c));
+          }
+          GetDataStorage()->Add(seg, node);
+          ++c;
+        }
       }
     }
     else
@@ -238,10 +295,28 @@ void QmitkTractSegView::Start()
       mitk::DataNode::Pointer seg = mitk::DataNode::New();
       seg->SetData(out_image);
 
-      if (m_Controls->m_OutputTypeBox->currentIndex()==0)
+      mitk::LevelWindow lw;
+      if (m_Controls->m_ModeBox->currentIndex()==0)
+      {
         seg->SetName("TractLabels");
-      else if (m_Controls->m_OutputTypeBox->currentIndex()==1)
+        lw.SetRangeMinMax(0, 72);
+      }
+      else
+      {
         seg->SetName("TractEndpointRegionLabels");
+        lw.SetRangeMinMax(0, 40);
+      }
+
+      if (m_Controls->m_OutputBox->currentIndex()==0)
+      {
+        mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+        lut->SetType( mitk::LookupTable::MULTILABEL );
+        mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
+        lut_prop->SetLookupTable( lut );
+        seg->SetProperty("LookupTable", lut_prop );
+        seg->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( lw ) );
+      }
+
       GetDataStorage()->Add(seg, node);
     }
 

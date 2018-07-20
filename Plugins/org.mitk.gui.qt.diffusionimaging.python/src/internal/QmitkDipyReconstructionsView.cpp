@@ -32,6 +32,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionPropertyHelper.h>
 #include <mitkOdfImage.h>
 #include <mitkImageCast.h>
+#include <itkVectorImageToFourDImageFilter.h>
+#include <mitkPeakImage.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDimension.h>
 
 const std::string QmitkDipyReconstructionsView::VIEW_ID = "org.mitk.views.dipyreconstruction";
 
@@ -63,6 +69,14 @@ void QmitkDipyReconstructionsView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_ImageBox->SetDataStorage(this->GetDataStorage());
     mitk::NodePredicateIsDWI::Pointer isDwi = mitk::NodePredicateIsDWI::New();
     m_Controls->m_ImageBox->SetPredicate( isDwi );
+
+    mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+    mitk::TNodePredicateDataType<mitk::Image>::Pointer isImagePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
+    mitk::NodePredicateAnd::Pointer isBinary3dImage = mitk::NodePredicateAnd::New( mitk::NodePredicateAnd::New( isImagePredicate, isBinaryPredicate ), mitk::NodePredicateDimension::New(3));
+
+    m_Controls->m_MaskBox->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_MaskBox->SetPredicate( isBinary3dImage );
+    m_Controls->m_MaskBox->SetZeroEntryText("--");
 
     UpdateGUI();
   }
@@ -181,6 +195,21 @@ void QmitkDipyReconstructionsView::StartFit()
   m_PythonService->Execute("import SimpleITK._SimpleITK as _SimpleITK");
   m_PythonService->Execute("import numpy");
   m_PythonService->CopyToPythonAsSimpleItkImage( input_image, "in_image");
+  m_PythonService->Execute("mask=None");
+  if (m_Controls->m_MaskBox->GetSelectedNode().IsNotNull())
+  {
+    auto mitk_mask = dynamic_cast<mitk::Image*>(m_Controls->m_MaskBox->GetSelectedNode()->GetData());
+    if (mitk_mask->GetLargestPossibleRegion().GetSize()==input_image->GetLargestPossibleRegion().GetSize())
+      m_PythonService->CopyToPythonAsSimpleItkImage( mitk_mask, "mask");
+    else
+      MITK_INFO << "Mask image not used. Does not match data size: " << mitk_mask->GetLargestPossibleRegion().GetSize() << " vs. "
+                << input_image->GetLargestPossibleRegion().GetSize();
+  }
+
+  m_PythonService->Execute("normalize_peaks=False");
+  if (m_Controls->m_NormalizePeaks->isChecked())
+    m_PythonService->Execute("normalize_peaks=True");
+
   std::string model = "3D-SHORE";
   switch(m_Controls->m_ModelBox->currentIndex())
   {
@@ -222,7 +251,15 @@ void QmitkDipyReconstructionsView::StartFit()
   }
   }
   m_PythonService->Execute("model_type='"+model+"'");
-  m_PythonService->Execute("calculate_peak_image=False");
+
+  m_PythonService->Execute("num_peaks=0");
+  if (m_Controls->m_DoCalculatePeaks->isChecked())
+  {
+    m_PythonService->Execute("num_peaks=" + boost::lexical_cast<std::string>(m_Controls->m_NumPeaks->value()));
+    m_PythonService->Execute("min_separation_angle=" + boost::lexical_cast<std::string>(m_Controls->m_SepAngle->value()));
+    m_PythonService->Execute("relative_peak_threshold=" + boost::lexical_cast<std::string>(m_Controls->m_RelativeThreshold->value()));
+  }
+
   m_PythonService->Execute("data=False");
   m_PythonService->Execute("bvals=" + bvals);
   m_PythonService->Execute("bvecs=" + bvecs);
@@ -256,5 +293,27 @@ void QmitkDipyReconstructionsView::StartFit()
     odfs->SetName(name.toStdString() + "_" + model);
     GetDataStorage()->Add(odfs, node);
     m_PythonService->Execute("del odf_image");
+  }
+
+  if (m_Controls->m_DoCalculatePeaks->isChecked() && m_PythonService->DoesVariableExist("peak_image"))
+  {
+    mitk::Image::Pointer out_image = m_PythonService->CopySimpleItkImageFromPython("peak_image");
+    itk::VectorImage<float>::Pointer vectorImage = itk::VectorImage<float>::New();
+    mitk::CastToItkImage(out_image, vectorImage);
+
+    itk::VectorImageToFourDImageFilter< float >::Pointer converter = itk::VectorImageToFourDImageFilter< float >::New();
+    converter->SetInputImage(vectorImage);
+    converter->GenerateData();
+    mitk::PeakImage::ItkPeakImageType::Pointer itk_peaks = converter->GetOutputImage();
+
+    mitk::Image::Pointer mitk_peaks = dynamic_cast<mitk::Image*>(mitk::PeakImage::New().GetPointer());
+    mitk::CastToMitkImage(itk_peaks, mitk_peaks);
+    mitk_peaks->SetVolume(itk_peaks->GetBufferPointer());
+
+    mitk::DataNode::Pointer seg = mitk::DataNode::New();
+    seg->SetData( mitk_peaks );
+    seg->SetName("Peaks");
+    GetDataStorage()->Add(seg, node);
+    m_PythonService->Execute("del peak_image");
   }
 }

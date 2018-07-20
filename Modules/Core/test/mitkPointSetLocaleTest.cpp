@@ -166,7 +166,7 @@ public:
     // QuickFix for MAC OS X
     // See for more the Bug #3894 comments
 #if defined(__APPLE__) || defined(MACOSX)
-    alllocales.push_back("C");
+    m_AllLocales.push_back("C");
 #endif
 
     // write a reference file using the "C" locale once

@@ -636,7 +636,7 @@ QGroupBox {
       <item row="1" column="0">
        <widget class="QLabel" name="label_30">
         <property name="text">
-         <string>Mas. Normalize Peaks:</string>
+         <string>Normalize Peaks:</string>
         </property>
        </widget>
       </item>

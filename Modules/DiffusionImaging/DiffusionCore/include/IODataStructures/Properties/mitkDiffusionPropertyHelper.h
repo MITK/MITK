@@ -65,6 +65,8 @@ namespace mitk
     static void SetBValueMap(mitk::Image* image, BValueMapType map);
     static void SetOriginalGradientContainer(mitk::Image* image, GradientDirectionsContainerType::Pointer g_cont);
     static void SetGradientContainer(mitk::Image* image, GradientDirectionsContainerType::Pointer g_cont);
+    static void RotateGradients(mitk::Image* image, vnl_matrix_fixed<double, 3, 3> rotation_matrix, bool normalize_columns);
+    static void RotateOriginalGradients(mitk::Image* image, vnl_matrix_fixed<double, 3, 3> rotation_matrix, bool normalize_columns);
 
     static void AverageRedundantGradients(mitk::Image* image, double precision);
     static void InitializeImage(mitk::Image* image);

@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkComposeImageFilter.h>
 #include <mitkFiberBundle.h>
 #include <mitkRegistrationHelper.h>
+#include <mitkDiffusionImageCorrectionFilter.h>
 
 // Qt
 #include <QThreadPool>
@@ -140,7 +141,7 @@ void QmitkSimpleRegistrationView::OnRegResultIsAvailable(mitk::MAPRegistrationWr
   mitk::Image::Pointer movingImage = dynamic_cast<mitk::Image*>(m_MovingImageNode->GetData());
   mitk::Image::Pointer image;
 
-  if (m_RegistrationType==0)
+  if (m_RegistrationType==0 && !m_Controls->m_ResampleBox->isChecked())
   {
     image = mitk::ImageMappingHelper::refineGeometry(movingImage, spResultRegistration, true);
   }
@@ -178,13 +179,17 @@ void QmitkSimpleRegistrationView::OnRegResultIsAvailable(mitk::MAPRegistrationWr
 
       image = mitk::GrabItkImageMemory( composer->GetOutput() );
       mitk::DiffusionPropertyHelper::CopyProperties(movingImage, image, true);
+
+      auto reg = spResultRegistration->GetRegistration();
+      typedef mitk::DiffusionImageCorrectionFilter CorrectionFilterType;
+      CorrectionFilterType::Pointer corrector = CorrectionFilterType::New();
+      corrector->SetImage( image );
+      corrector->CorrectDirections( mitk::MITKRegistrationHelper::getAffineMatrix(reg, false)->GetMatrix().GetVnlMatrix() );
     }
   }
 
   if (mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image))
-  {
     mitk::DiffusionPropertyHelper::InitializeImage( image );
-  }
 
   mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
   resultNode->SetData(image);

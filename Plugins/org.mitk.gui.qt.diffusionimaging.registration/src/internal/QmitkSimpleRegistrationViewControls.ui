@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>QmitkSimpleRegistrationViewControls</class>
  <widget class="QWidget" name="QmitkSimpleRegistrationViewControls">
@@ -63,7 +63,7 @@ QGroupBox {
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string></string>
+         <string/>
         </property>
         <property name="text">
          <string>Start Registration</string>
@@ -91,6 +91,13 @@ QGroupBox {
          <property name="bottomMargin">
           <number>0</number>
          </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Registration Type:</string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="1">
           <widget class="QComboBox" name="m_RegBox">
            <item>
@@ -105,17 +112,10 @@ QGroupBox {
            </item>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Registration Type:</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="1">
           <widget class="QCheckBox" name="m_RegOutputBox">
            <property name="text">
-            <string></string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -123,6 +123,20 @@ QGroupBox {
           <widget class="QLabel" name="label_4">
            <property name="text">
             <string>Output Registration Object:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Always Resample to Target:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QCheckBox" name="m_ResampleBox">
+           <property name="text">
+            <string/>
            </property>
           </widget>
          </item>
@@ -151,7 +165,7 @@ QGroupBox {
           <number>0</number>
          </property>
          <item row="1" column="1">
-          <widget class="QmitkDataStorageComboBox" name="m_MovingImageBox"></widget>
+          <widget class="QmitkDataStorageComboBox" name="m_MovingImageBox"/>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_2">
@@ -161,7 +175,7 @@ QGroupBox {
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QmitkDataStorageComboBox" name="m_FixedImageBox"></widget>
+          <widget class="QmitkDataStorageComboBox" name="m_FixedImageBox"/>
          </item>
          <item row="1" column="2">
           <widget class="QSpinBox" name="m_MovingChannelBox">
@@ -223,7 +237,7 @@ QGroupBox {
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string></string>
+         <string/>
         </property>
         <property name="text">
          <string>Start Tractography Registration</string>
@@ -256,7 +270,7 @@ QGroupBox {
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QmitkDataStorageComboBox" name="m_RegObjectBox"></widget>
+          <widget class="QmitkDataStorageComboBox" name="m_RegObjectBox"/>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_6">
@@ -266,7 +280,7 @@ QGroupBox {
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QmitkDataStorageComboBox" name="m_TractoBox"></widget>
+          <widget class="QmitkDataStorageComboBox" name="m_TractoBox"/>
          </item>
         </layout>
        </widget>
@@ -283,6 +297,6 @@ QGroupBox {
    <header location="global">QmitkDataStorageComboBox.h</header>
   </customwidget>
  </customwidgets>
- <resources></resources>
- <connections></connections>
+ <resources/>
+ <connections/>
 </ui>

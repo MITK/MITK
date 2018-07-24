@@ -193,7 +193,6 @@ public:
     itkGetMacro( CoefficientImage, typename CoefficientImageType::Pointer)
 
     itkSetMacro( BValue, float)
-    itkGetMacro( BValue, float)
     itkSetMacro( Lambda, double )
     itkGetMacro( Lambda, double )
 

@@ -472,8 +472,8 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction(mitk::DataNode::
     mitk::CastToItkImage(vols, itkVectorImagePointer);
 
     QballReconstructionImageFilterType::Pointer filter = QballReconstructionImageFilterType::New();
-    filter->SetGradientImage(mitk::DiffusionPropertyHelper::GetGradientContainer(vols), itkVectorImagePointer);
     filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(vols));
+    filter->SetGradientImage(mitk::DiffusionPropertyHelper::GetGradientContainer(vols), itkVectorImagePointer);
     filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
 
     std::string nodePostfix;
@@ -594,8 +594,8 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::
   ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
   mitk::CastToItkImage(vols, itkVectorImagePointer);
 
-  filter->SetGradientImage(mitk::DiffusionPropertyHelper::GetGradientContainer(vols), itkVectorImagePointer);
   filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(vols));
+  filter->SetGradientImage(mitk::DiffusionPropertyHelper::GetGradientContainer(vols), itkVectorImagePointer);
   filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
   filter->SetLambda(lambda);
 

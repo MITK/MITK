@@ -192,11 +192,8 @@ public:
     itkGetMacro( ODFSumImage, typename FloatImageType::Pointer)
     itkGetMacro( CoefficientImage, typename CoefficientImageType::Pointer)
 
-    itkSetMacro( BValue, TOdfPixelType)
-#ifdef GetBValue
-#undef GetBValue
-#endif
-    itkGetConstReferenceMacro( BValue, TOdfPixelType)
+    itkSetMacro( BValue, float)
+    itkGetMacro( BValue, float)
     itkSetMacro( Lambda, double )
     itkGetMacro( Lambda, double )
 
@@ -246,7 +243,7 @@ private:
     /** Threshold on the reference image data */
     ReferencePixelType                                m_Threshold;
     /** LeBihan's b-value for normalizing tensors */
-    TOdfPixelType                                     m_BValue;
+    float                                             m_BValue;
     typename BZeroImageType::Pointer                  m_BZeroImage;
     double                                            m_Lambda;
     bool                                              m_DirectionsDuplicated;

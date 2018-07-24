@@ -139,18 +139,10 @@ QGroupBox {
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QmitkDataStorageComboBox" name="m_ForestBox">
-           <property name="toolTip">
-            <string>Random forest for machine learning based tractography.</string>
+          <widget class="QmitkSingleNodeSelectionWidget" name="m_ForestSelectionWidget" native="true">
+           <property name="styleSheet">
+            <string notr="true"/>
            </property>
-           <property name="sizeAdjustPolicy">
-            <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-           </property>
-           <item>
-            <property name="text">
-             <string>-</string>
-            </property>
-           </item>
           </widget>
          </item>
         </layout>
@@ -211,7 +203,7 @@ QGroupBox {
         <x>0</x>
         <y>0</y>
         <width>421</width>
-        <height>262</height>
+        <height>254</height>
        </rect>
       </property>
       <attribute name="label">
@@ -266,7 +258,7 @@ QGroupBox {
              <item row="2" column="1">
               <widget class="QSpinBox" name="m_NumSeedsBox">
                <property name="toolTip">
-                <string>Number of seed points equally distributed around selected position.</string>
+                <string>Number of seed points equally distributed around selected position. </string>
                </property>
                <property name="minimum">
                 <number>1</number>
@@ -440,7 +432,27 @@ QGroupBox {
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item row="1" column="1">
+          <item row="2" column="0">
+           <widget class="QLabel" name="m_SeedsPerVoxelLabel">
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string>Seeds per Voxel:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string>Seed Image:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
            <widget class="QSpinBox" name="m_SeedsPerVoxelBox">
             <property name="toolTip">
              <string>Number of seed points placed in each voxel.</string>
@@ -453,38 +465,10 @@ QGroupBox {
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="m_SeedsPerVoxelLabel">
-            <property name="toolTip">
-             <string/>
-            </property>
-            <property name="text">
-             <string>Seeds per Voxel:</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="1">
-           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_SeedImageBox">
-            <property name="toolTip">
-             <string>Seed points are only placed inside the regions defined in the seed image. If no seed image is selected, the whole image is seeded.</string>
-            </property>
-            <property name="sizeAdjustPolicy">
-             <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-            </property>
-            <item>
-             <property name="text">
-              <string>-</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="toolTip">
-             <string/>
-            </property>
-            <property name="text">
-             <string>Seed Image:</string>
+           <widget class="QmitkSingleNodeSelectionWidget" name="m_SeedImageSelectionWidget" native="true">
+            <property name="styleSheet">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -525,7 +509,7 @@ QGroupBox {
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>224</height>
+        <height>232</height>
        </rect>
       </property>
       <attribute name="label">
@@ -543,21 +527,6 @@ QGroupBox {
          <property name="text">
           <string>Mask Image:</string>
          </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_StopImageBox">
-         <property name="toolTip">
-          <string>Fibers that enter a region defined in this image will stop immediately.</string>
-         </property>
-         <property name="sizeAdjustPolicy">
-          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-         </property>
-         <item>
-          <property name="text">
-           <string>-</string>
-          </property>
-         </item>
         </widget>
        </item>
        <item row="3" column="1">
@@ -625,21 +594,6 @@ QGroupBox {
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
-        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TargetImageBox">
-         <property name="toolTip">
-          <string>The target image is used for the endpoint constraint strategy defined above.</string>
-         </property>
-         <property name="sizeAdjustPolicy">
-          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-         </property>
-         <item>
-          <property name="text">
-           <string>-</string>
-          </property>
-         </item>
-        </widget>
-       </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_11">
          <property name="toolTip">
@@ -650,21 +604,6 @@ QGroupBox {
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MaskImageBox">
-         <property name="toolTip">
-          <string>Fibers that leave the regions defined in this image will stop immediately.</string>
-         </property>
-         <property name="sizeAdjustPolicy">
-          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-         </property>
-         <item>
-          <property name="text">
-           <string>-</string>
-          </property>
-         </item>
-        </widget>
-       </item>
        <item row="4" column="0">
         <widget class="QLabel" name="m_TargetImageLabel">
          <property name="toolTip">
@@ -673,21 +612,6 @@ QGroupBox {
          <property name="text">
           <string>Target ROI Image:</string>
          </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_ExclusionImageBox">
-         <property name="toolTip">
-          <string>Fibers that enter a region defined in this image will be discarded.</string>
-         </property>
-         <property name="sizeAdjustPolicy">
-          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-         </property>
-         <item>
-          <property name="text">
-           <string>-</string>
-          </property>
-         </item>
         </widget>
        </item>
        <item row="6" column="0">
@@ -703,6 +627,18 @@ QGroupBox {
          </property>
         </spacer>
        </item>
+       <item row="0" column="1">
+        <widget class="QmitkSingleNodeSelectionWidget" name="m_MaskImageSelectionWidget" native="true"/>
+       </item>
+       <item row="1" column="1">
+        <widget class="QmitkSingleNodeSelectionWidget" name="m_StopImageSelectionWidget" native="true"/>
+       </item>
+       <item row="2" column="1">
+        <widget class="QmitkSingleNodeSelectionWidget" name="m_ExclusionImageSelectionWidget" native="true"/>
+       </item>
+       <item row="4" column="1">
+        <widget class="QmitkSingleNodeSelectionWidget" name="m_TargetImageSelectionWidget" native="true"/>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_trackingparam">
@@ -711,7 +647,7 @@ QGroupBox {
         <x>0</x>
         <y>0</y>
         <width>421</width>
-        <height>351</height>
+        <height>343</height>
        </rect>
       </property>
       <attribute name="label">
@@ -849,21 +785,6 @@ QGroupBox {
          <property name="value">
           <number>-1</number>
          </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_FaImageBox">
-         <property name="toolTip">
-          <string>If an image is selected, the stopping criterion is not calculated from the input image but instead the selected image is used.</string>
-         </property>
-         <property name="sizeAdjustPolicy">
-          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-         </property>
-         <item>
-          <property name="text">
-           <string>-</string>
-          </property>
-         </item>
         </widget>
        </item>
        <item row="5" column="0">
@@ -1044,6 +965,9 @@ QGroupBox {
          </property>
         </widget>
        </item>
+       <item row="3" column="1">
+        <widget class="QmitkSingleNodeSelectionWidget" name="m_FaImageSelectionWidget" native="true"/>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_prior">
@@ -1052,7 +976,7 @@ QGroupBox {
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>224</height>
+        <height>232</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1109,13 +1033,6 @@ QGroupBox {
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_PriorImageBox">
-         <property name="toolTip">
-          <string/>
-         </property>
-        </widget>
-       </item>
        <item row="4" column="0">
         <spacer name="verticalSpacer_7">
          <property name="orientation">
@@ -1149,6 +1066,9 @@ QGroupBox {
          </property>
         </widget>
        </item>
+       <item row="0" column="1">
+        <widget class="QmitkSingleNodeSelectionWidget" name="m_PriorImageSelectionWidget" native="true"/>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_neighborhood">
@@ -1157,7 +1077,7 @@ QGroupBox {
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>224</height>
+        <height>232</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1287,7 +1207,7 @@ QGroupBox {
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>224</height>
+        <height>232</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1456,7 +1376,7 @@ QGroupBox {
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>224</height>
+        <height>232</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1560,14 +1480,10 @@ QGroupBox {
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkDataStorageComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">QmitkDataStorageComboBox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QmitkDataStorageComboBoxWithSelectNone</class>
-   <extends>QComboBox</extends>
-   <header>QmitkDataStorageComboBoxWithSelectNone.h</header>
+   <class>QmitkSingleNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

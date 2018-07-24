@@ -189,7 +189,6 @@ void mitk::BandpassFilter::GenerateData()
 
   // do a fourier transform, multiply with an appropriate window for the filter, and transform back
   typedef itk::Image<float, 3> RealImageType;
-  MITK_INFO << resampledInput->GetDimension(0) << " " << resampledInput->GetDimension(1) << " " << resampledInput->GetDimension(2) << "asd" << sizeof(long double);
   RealImageType::Pointer image;
   mitk::CastToItkImage(resampledInput, image);
   typedef itk::FFT1DRealToComplexConjugateImageFilter<RealImageType> ForwardFFTFilterType;
@@ -255,10 +254,8 @@ void mitk::BandpassFilter::GenerateData()
 
   GrabItkImageMemory(inverseFFTFilter->GetOutput(), output);
 
-  double spacing_x = input->GetGeometry()->GetSpacing()[0];
-  double spacing_y = input->GetGeometry()->GetSpacing()[1];
-  double dim[2] = {spacing_x, spacing_y};
-  auto resampledOutput = m_FilterService->ApplyResampling(output, dim);
+  double dim[2] = { (double)input->GetDimension(0), (double)input->GetDimension(1) };
+  auto resampledOutput = m_FilterService->ApplyResamplingToDim(output, dim);
 
   output->Initialize(mitk::MakeScalarPixelType<float>(), 3, input->GetDimensions());
   output->SetSpacing(resampledOutput->GetGeometry()->GetSpacing());

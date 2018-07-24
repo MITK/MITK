@@ -928,7 +928,7 @@ bool mitk::PythonService::IsSimpleItkPythonWrappingAvailable()
 {
   this->Execute( "import SimpleITK as sitk\n", IPythonService::SINGLE_LINE_COMMAND );
   // directly access cpp lib
-  this->Execute( "import _SimpleITK\n", IPythonService::SINGLE_LINE_COMMAND );
+  this->Execute( "import SimpleITK._SimpleITK as _SimpleITK\n", IPythonService::SINGLE_LINE_COMMAND );
   m_ItkWrappingAvailable = !this->PythonErrorOccured();
 
   // check for numpy

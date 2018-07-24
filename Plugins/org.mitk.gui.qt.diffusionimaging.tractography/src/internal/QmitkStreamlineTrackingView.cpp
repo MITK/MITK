@@ -392,6 +392,8 @@ bool QmitkStreamlineTrackingView::CheckAndStoreLastParams(QObject* obj)
       new_val = boost::lexical_cast<std::string>(qobject_cast<QDoubleSpinBox*>(obj)->value());
     else if (qobject_cast<QSpinBox*>(obj)!=nullptr)
       new_val = boost::lexical_cast<std::string>(qobject_cast<QSpinBox*>(obj)->value());
+    else
+      return true;
 
     if (m_LastTractoParams.find(obj->objectName())==m_LastTractoParams.end())
     {

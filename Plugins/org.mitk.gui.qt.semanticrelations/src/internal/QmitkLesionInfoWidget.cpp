@@ -208,7 +208,7 @@ void QmitkLesionInfoWidget::OnAddSegmentationButtonClicked()
     {
       m_SemanticRelations->AddSegmentation(dataNode, parentNodes->front());
     }
-    catch (mitk::Exception& e)
+    catch (const mitk::SemanticRelationException& e)
     {
       std::stringstream exceptionMessage; exceptionMessage << e;
       QMessageBox msgBox;
@@ -217,6 +217,7 @@ void QmitkLesionInfoWidget::OnAddSegmentationButtonClicked()
         "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
       msgBox.setIcon(QMessageBox::Warning);
       msgBox.exec();
+      return;
     }
   }
 }
@@ -249,7 +250,7 @@ void QmitkLesionInfoWidget::OnAddImageButtonClicked()
         mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(dataNode);
         emit ImageAdded(caseID);
       }
-      catch (mitk::Exception& e)
+      catch (const mitk::SemanticRelationException& e)
       {
         std::stringstream exceptionMessage; exceptionMessage << e;
         QMessageBox msgBox;
@@ -258,6 +259,7 @@ void QmitkLesionInfoWidget::OnAddImageButtonClicked()
           "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
         msgBox.setIcon(QMessageBox::Warning);
         msgBox.exec();
+        return;
       }
     }
   }
@@ -293,7 +295,7 @@ void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* current,
   current->setBackground(SELECTED_BACKGROUND_COLOR);
   try
   {
-    // set background color for all corresponding segmentations of the currently selected lesion
+    // get all corresponding segmentations of the currently selected lesion and set the background color
     mitk::SemanticRelations::DataNodeVector allSegmentationsOfLesion = m_SemanticRelations->GetAllSegmentationsOfLesion(m_CaseID, m_CurrentLesion);
     for (const auto& segmentation : allSegmentationsOfLesion)
     {
@@ -303,8 +305,7 @@ void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* current,
         item->setBackground(SELECTED_BACKGROUND_COLOR);
       }
 
-      // set background color for all corresponding images of the current segmentation
-      // get parent node of the current segmentation node with the node predicate
+      // get parent nodes of the current segmentation node and set the background color
       mitk::DataStorage::SetOfObjects::ConstPointer parentNodes = m_DataStorage->GetSources(segmentation, mitk::NodePredicates::GetImagePredicate(), false);
       for (auto it = parentNodes->Begin(); it != parentNodes->End(); ++it)
       {
@@ -316,7 +317,7 @@ void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* current,
       }
     }
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::SemanticRelationException& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox;
@@ -369,8 +370,8 @@ void QmitkLesionInfoWidget::OnCurrentSegmentationItemChanged(QListWidgetItem* cu
   }
 
   current->setBackground(SELECTED_BACKGROUND_COLOR);
-  // set background color for all corresponding images of the current segmentation
-  // get parent node of the current segmentation node with the node predicate
+
+  // get parent nodes of the current segmentation node and set the background color
   mitk::DataStorage::SetOfObjects::ConstPointer parentNodes = m_DataStorage->GetSources(m_CurrentSegmentation, mitk::NodePredicates::GetImagePredicate(), false);
   for (auto it = parentNodes->Begin(); it != parentNodes->End(); ++it)
   {
@@ -381,11 +382,11 @@ void QmitkLesionInfoWidget::OnCurrentSegmentationItemChanged(QListWidgetItem* cu
     }
   }
 
+  // get represented lesion of the current segmentation node and set the background color
   if (m_SemanticRelations->IsRepresentingALesion(m_CurrentSegmentation))
   {
     try
     {
-      // set background color for the represented lesion of the currently selected segmentation
       mitk::SemanticTypes::Lesion representedLesion = m_SemanticRelations->GetRepresentedLesion(m_CurrentSegmentation);
       for (int i = 0; i < m_Controls.lesionListWidget->count(); ++i)
       {
@@ -397,7 +398,7 @@ void QmitkLesionInfoWidget::OnCurrentSegmentationItemChanged(QListWidgetItem* cu
         }
       }
     }
-    catch (mitk::Exception& e)
+    catch (const mitk::SemanticRelationException& e)
     {
       std::stringstream exceptionMessage; exceptionMessage << e;
       QMessageBox msgBox;
@@ -470,8 +471,7 @@ void QmitkLesionInfoWidget::OnCurrentImageItemChanged(QListWidgetItem* current, 
 
   current->setBackground(SELECTED_BACKGROUND_COLOR);
 
-  // set background color for all corresponding segmentations of the current image
-  // get child nodes of the current image node with the segmentation predicate
+  // get child nodes of the current image node and set the background color
   mitk::DataStorage::SetOfObjects::ConstPointer segmentationNodes = m_DataStorage->GetDerivations(m_CurrentImage, mitk::NodePredicates::GetSegmentationPredicate(), false);
   for (auto it = segmentationNodes->Begin(); it != segmentationNodes->End(); ++it)
   {
@@ -483,9 +483,9 @@ void QmitkLesionInfoWidget::OnCurrentImageItemChanged(QListWidgetItem* current, 
 
     try
     {
+      // get represented lesion of the current segmentation node and set the background color
       if (m_SemanticRelations->IsRepresentingALesion(it->Value()))
       {
-        // set background color for the represented lesion of the currently selected segmentation
         mitk::SemanticTypes::Lesion representedLesion = m_SemanticRelations->GetRepresentedLesion(it->Value());
         for (int i = 0; i < m_Controls.lesionListWidget->count(); ++i)
         {
@@ -498,7 +498,7 @@ void QmitkLesionInfoWidget::OnCurrentImageItemChanged(QListWidgetItem* current, 
         }
       }
     }
-    catch (mitk::Exception& e)
+    catch (const mitk::SemanticRelationException& e)
     {
       std::stringstream exceptionMessage; exceptionMessage << e;
       QMessageBox msgBox;
@@ -703,7 +703,7 @@ void QmitkLesionInfoWidget::OnLinkToSegmentation(const mitk::SemanticTypes::ID& 
   {
     m_SemanticRelations->LinkSegmentationToLesion(selectedDataNode, selectedLesion);
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::SemanticRelationException& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox;
@@ -813,7 +813,7 @@ void QmitkLesionInfoWidget::OnRemoveLesion(const mitk::SemanticTypes::ID& select
   {
     m_SemanticRelations->RemoveLesion(m_CaseID, selectedLesion);
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::SemanticRelationException& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox;
@@ -831,7 +831,7 @@ void QmitkLesionInfoWidget::OnUnlinkFromLesion(const mitk::DataNode* selectedSeg
   {
     m_SemanticRelations->UnlinkSegmentationFromLesion(selectedSegmentation);
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::SemanticRelationException& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox;
@@ -849,7 +849,7 @@ void QmitkLesionInfoWidget::OnRemoveSegmentation(const mitk::DataNode* selectedS
   {
     m_SemanticRelations->RemoveSegmentation(selectedSegmentation);
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::SemanticRelationException& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox;
@@ -868,7 +868,7 @@ void QmitkLesionInfoWidget::OnRemoveImage(const mitk::DataNode* selectedImage)
     m_SemanticRelations->RemoveImage(selectedImage);
     emit ImageRemoved(selectedImage);
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::SemanticRelationException& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox;
@@ -930,7 +930,7 @@ void QmitkLesionInfoWidget::ResetSegmentationListWidget()
       m_Controls.segmentationListWidget->addItem(QString::fromStdString(segmentation->GetName()));
     }
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::SemanticRelationException& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox;
@@ -961,7 +961,7 @@ void QmitkLesionInfoWidget::ResetImageListWidget()
       m_Controls.imageListWidget->addItem(QString::fromStdString(image->GetName()));
     }
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::SemanticRelationException& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox;

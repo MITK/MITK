@@ -108,12 +108,12 @@ mitk::SemanticRelations::LesionVector mitk::SemanticRelations::GetAllLesionsInIm
 {
   if (nullptr == imageNode)
   {
-    mitkThrow() << "Not a valid image data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid image data node.";
   }
 
   if (m_DataStorage.IsNull())
   {
-    mitkThrow() << "Not a valid data storage.";
+    mitkThrowException(SemanticRelationException) << "Not a valid data storage.";
   }
 
   LesionVector allLesionsInImage;
@@ -139,7 +139,7 @@ mitk::SemanticTypes::Lesion mitk::SemanticRelations::GetRepresentedLesion(const 
 {
   if (nullptr == segmentationNode)
   {
-    mitkThrow() << "Not a valid segmentation data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid segmentation data node.";
   }
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
@@ -163,7 +163,7 @@ bool mitk::SemanticRelations::IsRepresentingALesion(const DataNode* segmentation
     SemanticTypes::Lesion representedLesion = GetRepresentedLesion(segmentationNode);
     return true;
   }
-  catch (const SemanticRelationException&)
+  catch (const Exception&)
   {
     return false;
   }
@@ -173,7 +173,7 @@ mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllSegmentat
 {
   if (m_DataStorage.IsNull())
   {
-    mitkThrow() << "Not a valid data storage.";
+    mitkThrowException(SemanticRelationException) << "Not a valid data storage.";
   }
   return m_RelationStorage->GetAllSegmentationsOfCase(caseID);
 }
@@ -182,7 +182,7 @@ mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllSegmentat
 {
   if (m_DataStorage.IsNull())
   {
-    mitkThrow() << "Not a valid data storage.";
+    mitkThrowException(SemanticRelationException) << "Not a valid data storage.";
   }
 
   if (InstanceExists(caseID, lesion))
@@ -217,7 +217,7 @@ mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllImagesOfC
 {
   if (m_DataStorage.IsNull())
   {
-    mitkThrow() << "Not a valid data storage.";
+    mitkThrowException(SemanticRelationException) << "Not a valid data storage.";
   }
   return m_RelationStorage->GetAllImagesOfCase(caseID);
 }
@@ -226,7 +226,7 @@ mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllImagesOfL
 {
   if (m_DataStorage.IsNull())
   {
-    mitkThrow() << "Not a valid data storage.";
+    mitkThrowException(SemanticRelationException) << "Not a valid data storage.";
   }
 
   DataNodeVector allImagesOfLesion;
@@ -298,7 +298,7 @@ mitk::SemanticTypes::ControlPoint mitk::SemanticRelations::GetControlPointOfData
 {
   if (nullptr == dataNode)
   {
-    mitkThrow() << "Not a valid data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid data node.";
   }
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
@@ -363,7 +363,7 @@ mitk::SemanticTypes::InformationType mitk::SemanticRelations::GetInformationType
 {
   if (nullptr == imageNode)
   {
-    mitkThrow() << "Not a valid image data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid image data node.";
   }
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
@@ -450,7 +450,7 @@ void mitk::SemanticRelations::AddImage(const mitk::DataNode* imageNode)
 {
   if (nullptr == imageNode)
   {
-    mitkThrow() << "Not a valid data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid data node.";
   }
 
   // continue with a valid data node
@@ -509,7 +509,7 @@ void mitk::SemanticRelations::RemoveImage(const mitk::DataNode* imageNode)
 {
   if (nullptr == imageNode)
   {
-    mitkThrow() << "Not a valid data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid data node.";
   }
 
   // continue with a valid data node
@@ -552,7 +552,7 @@ void mitk::SemanticRelations::AddLesionAndLinkSegmentation(const DataNode* segme
 {
   if (nullptr == segmentationNode)
   {
-    mitkThrow() << "Not a valid segmentation data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid segmentation data node.";
   }
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
@@ -588,12 +588,12 @@ void mitk::SemanticRelations::AddSegmentation(const mitk::DataNode* segmentation
 {
   if (nullptr == segmentationNode)
   {
-    mitkThrow() << "Not a valid segmentation data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid segmentation data node.";
   }
 
   if (nullptr == parentNode)
   {
-    mitkThrow() << "Not a valid parent data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid parent data node.";
   }
 
   // continue with a valid data node
@@ -609,7 +609,7 @@ void mitk::SemanticRelations::LinkSegmentationToLesion(const DataNode* segmentat
 {
   if (nullptr == segmentationNode)
   {
-    mitkThrow() << "Not a valid segmentation data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid segmentation data node.";
   }
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
@@ -629,7 +629,7 @@ void mitk::SemanticRelations::UnlinkSegmentationFromLesion(const DataNode* segme
 {
   if (nullptr == segmentationNode)
   {
-    mitkThrow() << "Not a valid segmentation data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid segmentation data node.";
   }
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(segmentationNode);
@@ -642,7 +642,7 @@ void mitk::SemanticRelations::RemoveSegmentation(const mitk::DataNode* segmentat
 {
   if (nullptr == segmentationNode)
   {
-    mitkThrow() << "Not a valid segmentation data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid segmentation data node.";
   }
 
   // continue with a valid data node
@@ -656,7 +656,7 @@ void mitk::SemanticRelations::AddControlPointAndLinkData(const DataNode* dataNod
 {
   if (nullptr == dataNode)
   {
-    mitkThrow() << "Not a valid data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid data node.";
   }
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
@@ -691,7 +691,7 @@ void mitk::SemanticRelations::OverwriteControlPointAndLinkData(const DataNode* d
 {
   if (nullptr == dataNode)
   {
-    mitkThrow() << "Not a valid data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid data node.";
   }
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
@@ -745,7 +745,7 @@ void mitk::SemanticRelations::LinkDataToControlPoint(const DataNode* dataNode, c
 {
   if (nullptr == dataNode)
   {
-    mitkThrow() << "Not a valid data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid data node.";
   }
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
@@ -775,7 +775,7 @@ void mitk::SemanticRelations::UnlinkDataFromControlPoint(const DataNode* dataNod
 {
   if (nullptr == dataNode)
   {
-    mitkThrow() << "Not a valid data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid data node.";
   }
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
@@ -807,7 +807,7 @@ void mitk::SemanticRelations::AddInformationTypeToImage(const DataNode* imageNod
 {
   if (nullptr == imageNode)
   {
-    mitkThrow() << "Not a valid image data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid image data node.";
   }
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
@@ -819,7 +819,7 @@ void mitk::SemanticRelations::RemoveInformationTypeFromImage(const DataNode* ima
 {
   if (nullptr == imageNode)
   {
-    mitkThrow() << "Not a valid image data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid image data node.";
   }
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);

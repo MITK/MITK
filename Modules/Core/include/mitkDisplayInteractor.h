@@ -51,6 +51,8 @@ namespace mitk
     void SetSelectionMode(bool selection);
     static bool GetMouseRotationMode();
 
+    static void SetSynchronization(bool on);
+
     static void RotateCamera(BaseRenderer* renderer, bool clockwise);
     static void MirrorCamera(BaseRenderer* renderer, bool horizontal);
     static void ResetCamera(BaseRenderer* renderer);
@@ -310,6 +312,7 @@ namespace mitk
     * 3D view selection mode
     */
     static bool m_MouseRotationMode;
+    static bool s_PanZoomSynchronization;
     bool m_SelectionMode;
     /// <summary>
     /// TODO: select world point on multiwidget

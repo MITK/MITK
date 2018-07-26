@@ -123,6 +123,7 @@ public:
 
   /** Get a list of all registered RenderWindows */
   const RenderWindowVector &GetAllRegisteredRenderWindows();
+  static const RenderWindowVector &GetGenerallyAllRegisteredRenderWindows();
 
     /** Requests an update for the specified RenderWindow, to be executed as
    * soon as the main loop is ready for rendering. */
@@ -335,6 +336,8 @@ protected:
 
   RenderWindowList m_RenderWindowList;
   RenderWindowVector m_AllRenderWindows;
+  // то есть все и вообще все!
+  static RenderWindowVector s_GenerallyAllRenderWindows;
 
   struct RenderWindowCallbacks
   {

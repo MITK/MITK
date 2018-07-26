@@ -1558,7 +1558,8 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   mitk::DataStorage::SetOfObjects::ConstPointer nodes = m_DataStorage->GetSubset(isImageData).GetPointer();
   mitk::Point3D crosshairPos = GetCrossPosition();
   mitk::BaseRenderer* baseRenderer = mitkWidget1->GetSliceNavigationController()->GetRenderer();
-  mitk::DataNode::Pointer node = mitk::FindTopmostVisibleNode(nodes, crosshairPos, baseRenderer->GetTime(), baseRenderer);
+  auto globalCurrentTimePoint = baseRenderer->GetTime();
+  mitk::DataNode::Pointer node = mitk::FindTopmostVisibleNode(nodes, crosshairPos, globalCurrentTimePoint, baseRenderer);
 
   mitk::DataNode::Pointer topSourceNode;
   mitk::Image::Pointer image;
@@ -1573,7 +1574,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = m_DataStorage->GetSources(node, nullptr, true);
       if (!sourcenodes->empty())
       {
-        topSourceNode = mitk::FindTopmostVisibleNode(sourcenodes, crosshairPos, baseRenderer->GetTime(), baseRenderer);
+        topSourceNode = mitk::FindTopmostVisibleNode(sourcenodes, crosshairPos,globalCurrentTimePoint, baseRenderer);
       }
       if (topSourceNode.IsNotNull())
       {
@@ -1611,18 +1612,18 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess,
                             image->GetChannelDescriptor().GetPixelType(),
                             image,
-                            image->GetVolumeData(baseRenderer->GetTimeStep()),
+                            image->GetVolumeData(image->GetTimeGeometry()->TimePointToTimeStep(globalCurrentTimePoint)),
                             p,
                             pixelValue,
                             component);
 
     if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
     {
-      stream << "; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: " << std::scientific << pixelValue << "  ";
+      stream << "; Time: " <<globalCurrentTimePoint << " ms; Pixelvalue: " << std::scientific << pixelValue << "  ";
     }
     else
     {
-      stream << "; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: " << pixelValue << "  ";
+      stream << "; Time: " <<globalCurrentTimePoint << " ms; Pixelvalue: " << pixelValue << "  ";
     }
   }
   else

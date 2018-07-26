@@ -165,6 +165,7 @@ void QmitkImageNavigatorView::UpdateStatusBar()
   {
     mitk::Point3D position = m_IRenderWindowPart->GetSelectedPosition();
     mitk::BaseRenderer::Pointer baseRenderer = mitk::BaseRenderer::GetInstance(m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetVtkRenderWindow());
+    auto globalCurrentTimePoint = baseRenderer->GetTime();
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
 
     mitk::DataStorage::SetOfObjects::ConstPointer nodes = GetDataStorage()->GetSubset(isImageData).GetPointer();
@@ -177,7 +178,7 @@ void QmitkImageNavigatorView::UpdateStatusBar()
 
       int component = 0;
 
-      node = mitk::FindTopmostVisibleNode(nodes, position, baseRenderer->GetTime(), baseRenderer);
+      node = mitk::FindTopmostVisibleNode(nodes, position, globalCurrentTimePoint, baseRenderer);
 
       if (node.IsNotNull())
       {
@@ -188,7 +189,7 @@ void QmitkImageNavigatorView::UpdateStatusBar()
           mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = GetDataStorage()->GetSources(node, nullptr, true);
           if (!sourcenodes->empty())
           {
-            topSourceNode = mitk::FindTopmostVisibleNode(sourcenodes, position, baseRenderer->GetTime(), baseRenderer);
+            topSourceNode = mitk::FindTopmostVisibleNode(sourcenodes, position, globalCurrentTimePoint, baseRenderer);
           }
           if (topSourceNode.IsNotNull())
           {
@@ -222,12 +223,12 @@ void QmitkImageNavigatorView::UpdateStatusBar()
         {
           std::string pixelValue = "Pixel RGB(A) value: ";
           pixelValue.append(ConvertCompositePixelValueToString(image3D, p));
-          statusBar->DisplayImageInfo(position, p, baseRenderer->GetTime(), pixelValue.c_str());
+          statusBar->DisplayImageInfo(position, p, globalCurrentTimePoint, pixelValue.c_str());
         }
         else if (pixelType == itk::ImageIOBase::DIFFUSIONTENSOR3D || pixelType == itk::ImageIOBase::SYMMETRICSECONDRANKTENSOR)
         {
           std::string pixelValue = "See ODF Details view. ";
-          statusBar->DisplayImageInfo(position, p, baseRenderer->GetTime(), pixelValue.c_str());
+          statusBar->DisplayImageInfo(position, p, globalCurrentTimePoint, pixelValue.c_str());
         }
         else
         {
@@ -238,11 +239,11 @@ void QmitkImageNavigatorView::UpdateStatusBar()
             mitk::FastSinglePixelAccess,
             image3D->GetChannelDescriptor().GetPixelType(),
             image3D,
-            image3D->GetVolumeData(renderer->GetTimeStep()),
+            image3D->GetVolumeData(image3D->GetTimeGeometry()->TimePointToTimeStep(globalCurrentTimePoint)),
             p,
             pixelValue,
             component);
-          statusBar->DisplayImageInfo(position, p, baseRenderer->GetTime(), pixelValue);
+          statusBar->DisplayImageInfo(position, p, globalCurrentTimePoint, pixelValue);
         }
       }
       else

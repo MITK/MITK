@@ -156,7 +156,7 @@ bool mitk::pa::SpectralUnmixingSO2::SO2ValueNotSiginificant(float Hb, float HbO2
 
   for (unsigned int i = 0; i < m_SO2Settings.size(); ++i)
   {
-    if (m_SO2Settings[i] > significant[i] && (std::abs(m_SO2Settings[i] - significant[i]) > 1e-7))
+    if (m_SO2Settings[i] != 0 && m_SO2Settings[i] > significant[i] && (std::abs(m_SO2Settings[i] - significant[i]) > 1e-7))
     {
       return true;
     }

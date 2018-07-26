@@ -27,24 +27,26 @@ mitk::DataNode::Pointer generateModelFitTestNode()
 {
   mitk::DataNode::Pointer node = mitk::DataNode::New();
   node->SetName("Param1");
-  node->SetStringProperty("modelfit.testEmpty", "");
-  node->SetStringProperty("modelfit.testValid", "test");
-
+  auto testImage = mitk::Image::New();
+  node->SetData(testImage);
+  testImage->SetProperty("modelfit.testEmpty", mitk::StringProperty::New(""));
+  testImage->SetProperty("modelfit.testValid", mitk::StringProperty::New("test"));
   mitk::EnsureModelFitUID(node);
-  node->SetStringProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(),"Fit1");
-  node->SetStringProperty(mitk::ModelFitConstants::FIT_TYPE_PROPERTY_NAME().c_str(),mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED().c_str());
-  node->SetStringProperty(mitk::ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME().c_str(),"input UID");
 
-  node->SetStringProperty(mitk::ModelFitConstants::MODEL_TYPE_PROPERTY_NAME().c_str(),"TestModels");
-  node->SetStringProperty(mitk::ModelFitConstants::MODEL_NAME_PROPERTY_NAME().c_str(),"TestModel_1");
-  node->SetStringProperty(mitk::ModelFitConstants::MODEL_FUNCTION_PROPERTY_NAME().c_str(),"");
-  node->SetStringProperty(mitk::ModelFitConstants::MODEL_FUNCTION_CLASS_PROPERTY_NAME().c_str(),"ModelClass");
-  node->SetStringProperty(mitk::ModelFitConstants::MODEL_X_PROPERTY_NAME().c_str(),"myX");
+  testImage->SetProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), mitk::StringProperty::New("Fit1"));
+  testImage->SetProperty(mitk::ModelFitConstants::FIT_TYPE_PROPERTY_NAME().c_str(), mitk::StringProperty::New(mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED().c_str()));
+  testImage->SetProperty(mitk::ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME().c_str(), mitk::StringProperty::New("input UID"));
 
-  node->SetStringProperty(mitk::ModelFitConstants::XAXIS_NAME_PROPERTY_NAME().c_str(),mitk::ModelFitConstants::XAXIS_NAME_VALUE_DEFAULT().c_str());
-  node->SetStringProperty(mitk::ModelFitConstants::XAXIS_UNIT_PROPERTY_NAME().c_str(),"h");
-  node->SetStringProperty(mitk::ModelFitConstants::YAXIS_NAME_PROPERTY_NAME().c_str(),mitk::ModelFitConstants::YAXIS_NAME_VALUE_DEFAULT().c_str());
-  node->SetStringProperty(mitk::ModelFitConstants::YAXIS_UNIT_PROPERTY_NAME().c_str(),"kg");
+  testImage->SetProperty(mitk::ModelFitConstants::MODEL_TYPE_PROPERTY_NAME().c_str(), mitk::StringProperty::New("TestModels"));
+  testImage->SetProperty(mitk::ModelFitConstants::MODEL_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New("TestModel_1"));
+  testImage->SetProperty(mitk::ModelFitConstants::MODEL_FUNCTION_PROPERTY_NAME().c_str(), mitk::StringProperty::New(""));
+  testImage->SetProperty(mitk::ModelFitConstants::MODEL_FUNCTION_CLASS_PROPERTY_NAME().c_str(), mitk::StringProperty::New("ModelClass"));
+  testImage->SetProperty(mitk::ModelFitConstants::MODEL_X_PROPERTY_NAME().c_str(), mitk::StringProperty::New("myX"));
+
+  testImage->SetProperty(mitk::ModelFitConstants::XAXIS_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New(mitk::ModelFitConstants::XAXIS_NAME_VALUE_DEFAULT().c_str()));
+  testImage->SetProperty(mitk::ModelFitConstants::XAXIS_UNIT_PROPERTY_NAME().c_str(), mitk::StringProperty::New("h"));
+  testImage->SetProperty(mitk::ModelFitConstants::YAXIS_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New(mitk::ModelFitConstants::YAXIS_NAME_VALUE_DEFAULT().c_str()));
+  testImage->SetProperty(mitk::ModelFitConstants::YAXIS_UNIT_PROPERTY_NAME().c_str(), mitk::StringProperty::New("kg"));
 
   return node;
 }
@@ -71,24 +73,24 @@ mitk::StandaloneDataStorage::Pointer generateModelFitTestStorage()
   node1->SetData(paramImage);
   node1->SetName("Param1");
   mitk::EnsureModelFitUID(node1);
-  node1->SetStringProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(),"Fit1");
-  node1->SetStringProperty(mitk::ModelFitConstants::FIT_TYPE_PROPERTY_NAME().c_str(),mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED().c_str());
-  node1->SetStringProperty(mitk::ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME().c_str(),inputUID.c_str());
+  paramImage->SetProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), mitk::StringProperty::New("Fit1"));
+  paramImage->SetProperty(mitk::ModelFitConstants::FIT_TYPE_PROPERTY_NAME().c_str(), mitk::StringProperty::New(mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED().c_str()));
+  paramImage->SetProperty(mitk::ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME().c_str(), mitk::StringProperty::New(inputUID.c_str()));
 
-  node1->SetStringProperty(mitk::ModelFitConstants::MODEL_TYPE_PROPERTY_NAME().c_str(),"TestModels");
-  node1->SetStringProperty(mitk::ModelFitConstants::MODEL_NAME_PROPERTY_NAME().c_str(),"TestModel_1");
-  node1->SetStringProperty(mitk::ModelFitConstants::MODEL_FUNCTION_PROPERTY_NAME().c_str(),"");
-  node1->SetStringProperty(mitk::ModelFitConstants::MODEL_FUNCTION_CLASS_PROPERTY_NAME().c_str(),"ModelClass");
-  node1->SetStringProperty(mitk::ModelFitConstants::MODEL_X_PROPERTY_NAME().c_str(),"myX");
+  paramImage->SetProperty(mitk::ModelFitConstants::MODEL_TYPE_PROPERTY_NAME().c_str(), mitk::StringProperty::New("TestModels"));
+  paramImage->SetProperty(mitk::ModelFitConstants::MODEL_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New("TestModel_1"));
+  paramImage->SetProperty(mitk::ModelFitConstants::MODEL_FUNCTION_PROPERTY_NAME().c_str(), mitk::StringProperty::New(""));
+  paramImage->SetProperty(mitk::ModelFitConstants::MODEL_FUNCTION_CLASS_PROPERTY_NAME().c_str(), mitk::StringProperty::New("ModelClass"));
+  paramImage->SetProperty(mitk::ModelFitConstants::MODEL_X_PROPERTY_NAME().c_str(), mitk::StringProperty::New("myX"));
 
-  node1->SetStringProperty(mitk::ModelFitConstants::XAXIS_NAME_PROPERTY_NAME().c_str(),mitk::ModelFitConstants::XAXIS_NAME_VALUE_DEFAULT().c_str());
-  node1->SetStringProperty(mitk::ModelFitConstants::XAXIS_UNIT_PROPERTY_NAME().c_str(),"h");
-  node1->SetStringProperty(mitk::ModelFitConstants::YAXIS_NAME_PROPERTY_NAME().c_str(),mitk::ModelFitConstants::YAXIS_NAME_VALUE_DEFAULT().c_str());
-  node1->SetStringProperty(mitk::ModelFitConstants::YAXIS_UNIT_PROPERTY_NAME().c_str(),"kg");
+  paramImage->SetProperty(mitk::ModelFitConstants::XAXIS_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New(mitk::ModelFitConstants::XAXIS_NAME_VALUE_DEFAULT().c_str()));
+  paramImage->SetProperty(mitk::ModelFitConstants::XAXIS_UNIT_PROPERTY_NAME().c_str(), mitk::StringProperty::New("h"));
+  paramImage->SetProperty(mitk::ModelFitConstants::YAXIS_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New(mitk::ModelFitConstants::YAXIS_NAME_VALUE_DEFAULT().c_str()));
+  paramImage->SetProperty(mitk::ModelFitConstants::YAXIS_UNIT_PROPERTY_NAME().c_str(), mitk::StringProperty::New("kg"));
 
-  node1->SetStringProperty(mitk::ModelFitConstants::PARAMETER_NAME_PROPERTY_NAME().c_str(),"Param1");
-  node1->SetStringProperty(mitk::ModelFitConstants::PARAMETER_UNIT_PROPERTY_NAME().c_str(),"b");
-  node1->SetStringProperty(mitk::ModelFitConstants::PARAMETER_TYPE_PROPERTY_NAME().c_str(),mitk::ModelFitConstants::PARAMETER_TYPE_VALUE_PARAMETER().c_str());
+  paramImage->SetProperty(mitk::ModelFitConstants::PARAMETER_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New("Param1"));
+  paramImage->SetProperty(mitk::ModelFitConstants::PARAMETER_UNIT_PROPERTY_NAME().c_str(), mitk::StringProperty::New("b"));
+  paramImage->SetProperty(mitk::ModelFitConstants::PARAMETER_TYPE_PROPERTY_NAME().c_str(), mitk::StringProperty::New(mitk::ModelFitConstants::PARAMETER_TYPE_VALUE_PARAMETER().c_str()));
 
   storage->Add(node1,parents);
 
@@ -98,42 +100,44 @@ mitk::StandaloneDataStorage::Pointer generateModelFitTestStorage()
   mitk::Image::Pointer paramImage2 = mitk::Image::New();
   node2->SetData(paramImage2);
   mitk::EnsureModelFitUID(node2);
-  node2->SetStringProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(),"Fit1");
-  node2->SetStringProperty(mitk::ModelFitConstants::FIT_TYPE_PROPERTY_NAME().c_str(),mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED().c_str());
-  node2->SetStringProperty(mitk::ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME().c_str(),inputUID.c_str());
+  paramImage2->SetProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), mitk::StringProperty::New("Fit1"));
+  paramImage2->SetProperty(mitk::ModelFitConstants::FIT_TYPE_PROPERTY_NAME().c_str(), mitk::StringProperty::New(mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED().c_str()));
+  paramImage2->SetProperty(mitk::ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME().c_str(), mitk::StringProperty::New(inputUID.c_str()));
 
-  node2->SetStringProperty(mitk::ModelFitConstants::MODEL_TYPE_PROPERTY_NAME().c_str(),"TestModels");
-  node2->SetStringProperty(mitk::ModelFitConstants::MODEL_NAME_PROPERTY_NAME().c_str(),"TestModel_1");
-  node2->SetStringProperty(mitk::ModelFitConstants::MODEL_FUNCTION_PROPERTY_NAME().c_str(),"");
-  node2->SetStringProperty(mitk::ModelFitConstants::MODEL_FUNCTION_CLASS_PROPERTY_NAME().c_str(),"ModelClass");
-  node2->SetStringProperty(mitk::ModelFitConstants::MODEL_X_PROPERTY_NAME().c_str(),"myX");
+  paramImage2->SetProperty(mitk::ModelFitConstants::MODEL_TYPE_PROPERTY_NAME().c_str(), mitk::StringProperty::New("TestModels"));
+  paramImage2->SetProperty(mitk::ModelFitConstants::MODEL_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New("TestModel_1"));
+  paramImage2->SetProperty(mitk::ModelFitConstants::MODEL_FUNCTION_PROPERTY_NAME().c_str(), mitk::StringProperty::New(""));
+  paramImage2->SetProperty(mitk::ModelFitConstants::MODEL_FUNCTION_CLASS_PROPERTY_NAME().c_str(), mitk::StringProperty::New("ModelClass"));
+  paramImage2->SetProperty(mitk::ModelFitConstants::MODEL_X_PROPERTY_NAME().c_str(), mitk::StringProperty::New("myX"));
 
-  node2->SetStringProperty(mitk::ModelFitConstants::XAXIS_NAME_PROPERTY_NAME().c_str(),mitk::ModelFitConstants::XAXIS_NAME_VALUE_DEFAULT().c_str());
-  node2->SetStringProperty(mitk::ModelFitConstants::XAXIS_UNIT_PROPERTY_NAME().c_str(),"h");
-  node2->SetStringProperty(mitk::ModelFitConstants::YAXIS_NAME_PROPERTY_NAME().c_str(),mitk::ModelFitConstants::YAXIS_NAME_VALUE_DEFAULT().c_str());
-  node2->SetStringProperty(mitk::ModelFitConstants::YAXIS_UNIT_PROPERTY_NAME().c_str(),"kg");
+  paramImage2->SetProperty(mitk::ModelFitConstants::XAXIS_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New(mitk::ModelFitConstants::XAXIS_NAME_VALUE_DEFAULT().c_str()));
+  paramImage2->SetProperty(mitk::ModelFitConstants::XAXIS_UNIT_PROPERTY_NAME().c_str(), mitk::StringProperty::New("h"));
+  paramImage2->SetProperty(mitk::ModelFitConstants::YAXIS_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New(mitk::ModelFitConstants::YAXIS_NAME_VALUE_DEFAULT().c_str()));
+  paramImage2->SetProperty(mitk::ModelFitConstants::YAXIS_UNIT_PROPERTY_NAME().c_str(), mitk::StringProperty::New("kg"));
 
-  node2->SetStringProperty(mitk::ModelFitConstants::PARAMETER_NAME_PROPERTY_NAME().c_str(),"Param2");
-  node2->SetStringProperty(mitk::ModelFitConstants::PARAMETER_UNIT_PROPERTY_NAME().c_str(),"a");
-  node2->SetStringProperty(mitk::ModelFitConstants::PARAMETER_TYPE_PROPERTY_NAME().c_str(),mitk::ModelFitConstants::PARAMETER_TYPE_VALUE_DERIVED_PARAMETER().c_str());
+  paramImage2->SetProperty(mitk::ModelFitConstants::PARAMETER_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New("Param2"));
+  paramImage2->SetProperty(mitk::ModelFitConstants::PARAMETER_UNIT_PROPERTY_NAME().c_str(), mitk::StringProperty::New("a"));
+  paramImage2->SetProperty(mitk::ModelFitConstants::PARAMETER_TYPE_PROPERTY_NAME().c_str(), mitk::StringProperty::New(mitk::ModelFitConstants::PARAMETER_TYPE_VALUE_DERIVED_PARAMETER().c_str()));
 
   storage->Add(node2, parents);
 
   //create result for Fit 2
   mitk::DataNode::Pointer node3 = mitk::DataNode::New();
   node3->SetName("Param_Other");
+  mitk::Image::Pointer paramImage3 = mitk::Image::New();
+  node3->SetData(paramImage3);
   mitk::EnsureModelFitUID(node3);
-  node3->SetStringProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(),"Fit2");
-  node3->SetStringProperty(mitk::ModelFitConstants::FIT_TYPE_PROPERTY_NAME().c_str(),mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED().c_str());
-  node3->SetStringProperty(mitk::ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME().c_str(),inputUID.c_str());
+  paramImage3->SetProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), mitk::StringProperty::New("Fit2"));
+  paramImage3->SetProperty(mitk::ModelFitConstants::FIT_TYPE_PROPERTY_NAME().c_str(), mitk::StringProperty::New(mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED().c_str()));
+  paramImage3->SetProperty(mitk::ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME().c_str(), mitk::StringProperty::New(inputUID.c_str()));
 
-  node3->SetStringProperty(mitk::ModelFitConstants::MODEL_TYPE_PROPERTY_NAME().c_str(),"TestModels");
-  node3->SetStringProperty(mitk::ModelFitConstants::MODEL_NAME_PROPERTY_NAME().c_str(),"TestModel_2");
-  node3->SetStringProperty(mitk::ModelFitConstants::MODEL_FUNCTION_PROPERTY_NAME().c_str(),"");
-  node3->SetStringProperty(mitk::ModelFitConstants::MODEL_FUNCTION_CLASS_PROPERTY_NAME().c_str(),"ModelClass_B");
+  paramImage3->SetProperty(mitk::ModelFitConstants::MODEL_TYPE_PROPERTY_NAME().c_str(), mitk::StringProperty::New("TestModels"));
+  paramImage3->SetProperty(mitk::ModelFitConstants::MODEL_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New("TestModel_2"));
+  paramImage3->SetProperty(mitk::ModelFitConstants::MODEL_FUNCTION_PROPERTY_NAME().c_str(), mitk::StringProperty::New(""));
+  paramImage3->SetProperty(mitk::ModelFitConstants::MODEL_FUNCTION_CLASS_PROPERTY_NAME().c_str(), mitk::StringProperty::New("ModelClass_B"));
 
-  node3->SetStringProperty(mitk::ModelFitConstants::PARAMETER_NAME_PROPERTY_NAME().c_str(),"Param_Other");
-  node3->SetStringProperty(mitk::ModelFitConstants::PARAMETER_UNIT_PROPERTY_NAME().c_str(),"a");
+  paramImage3->SetProperty(mitk::ModelFitConstants::PARAMETER_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New("Param_Other"));
+  paramImage3->SetProperty(mitk::ModelFitConstants::PARAMETER_UNIT_PROPERTY_NAME().c_str(), mitk::StringProperty::New("a"));
 
   storage->Add(node3, parents);
 

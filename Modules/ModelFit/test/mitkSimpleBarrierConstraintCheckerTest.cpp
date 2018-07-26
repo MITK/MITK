@@ -36,13 +36,12 @@ int mitkSimpleBarrierConstraintCheckerTest(int  /*argc*/, char*[] /*argv[]*/)
 
   mitk::SimpleBarrierConstraintChecker::Pointer checker = mitk::SimpleBarrierConstraintChecker::New();
 
+  double defaultMaxPenalty = 1e15;
+
   //check freshly created checker; 
-	MITK_TEST_CONDITION_REQUIRED(checker->GetNumberOfConstraints() == 0,
-								 "Testing GetNumberOfConstraints for new checker.");
-	MITK_TEST_CONDITION_REQUIRED(checker->GetFailedConstraintValue() == 1e6,
-								 "Testing GetNumberOfConstraints for new checker.");
-	MITK_TEST_CONDITION_REQUIRED(checker->GetMaxConstraintPenalty() == 1e6,
-								 "Testing GetNumberOfConstraints for new checker.");
+  MITK_TEST_CONDITION_REQUIRED(checker->GetNumberOfConstraints() == 0, "Testing GetNumberOfConstraints for new checker.");
+  MITK_TEST_CONDITION_REQUIRED(checker->GetFailedConstraintValue() == defaultMaxPenalty, "Testing GetNumberOfConstraints for new checker.");
+  MITK_TEST_CONDITION_REQUIRED(checker->GetMaxConstraintPenalty() == defaultMaxPenalty, "Testing GetNumberOfConstraints for new checker.");
 
   //configure checker (test setter)
   checker->SetLowerBarrier(0,5);
@@ -78,14 +77,14 @@ int mitkSimpleBarrierConstraintCheckerTest(int  /*argc*/, char*[] /*argv[]*/)
   MITK_TEST_CONDITION_REQUIRED(checker->GetPenaltySum(p2) == penalties[0] + penalties[1] + penalties[2] + penalties[3], "Testing penalty sum of test parameters p2.");
 
   penalties = checker->GetPenalties(p3);
-  MITK_TEST_CONDITION_REQUIRED(penalties[0] == 1e6, "Testing penalty 1 of test parameters p3.");
+  MITK_TEST_CONDITION_REQUIRED(penalties[0] == defaultMaxPenalty, "Testing penalty 1 of test parameters p3.");
   MITK_TEST_CONDITION_REQUIRED(penalties[1] == 0.0, "Testing penalty 2 of test parameters p3.");
   MITK_TEST_CONDITION_REQUIRED(penalties[2] == 0.0, "Testing penalty 3 of test parameters p3.");
   MITK_TEST_CONDITION_REQUIRED(penalties[3] == 0.0, "Testing penalty 4 of test parameters p3.");
   MITK_TEST_CONDITION_REQUIRED(checker->GetPenaltySum(p3) == penalties[0] + penalties[1] + penalties[2] + penalties[3], "Testing penalty sum of test parameters p3.");
 
   penalties = checker->GetPenalties(p4);
-  MITK_TEST_CONDITION_REQUIRED(penalties[0] == 1e6, "Testing penalty 1 of test parameters p4.");
+  MITK_TEST_CONDITION_REQUIRED(penalties[0] == defaultMaxPenalty, "Testing penalty 1 of test parameters p4.");
   MITK_TEST_CONDITION_REQUIRED(penalties[1] == -1*log(2/3.), "Testing penalty 2 of test parameters p4.");
   MITK_TEST_CONDITION_REQUIRED(penalties[2] == 0.0, "Testing penalty 3 of test parameters p4.");
   MITK_TEST_CONDITION_REQUIRED(penalties[3] == 0.0, "Testing penalty 4 of test parameters p4.");
@@ -93,7 +92,7 @@ int mitkSimpleBarrierConstraintCheckerTest(int  /*argc*/, char*[] /*argv[]*/)
 
   penalties = checker->GetPenalties(p5);
   MITK_TEST_CONDITION_REQUIRED(penalties[0] == 0.0, "Testing penalty 1 of test parameters p5.");
-  MITK_TEST_CONDITION_REQUIRED(penalties[1] == 1e6, "Testing penalty 2 of test parameters p5.");
+  MITK_TEST_CONDITION_REQUIRED(penalties[1] == defaultMaxPenalty, "Testing penalty 2 of test parameters p5.");
   MITK_TEST_CONDITION_REQUIRED(penalties[2] == 0.0, "Testing penalty 3 of test parameters p5.");
   MITK_TEST_CONDITION_REQUIRED(penalties[3] == 0.0, "Testing penalty 4 of test parameters p5.");
   MITK_TEST_CONDITION_REQUIRED(checker->GetPenaltySum(p5) == penalties[0] + penalties[1] + penalties[2] + penalties[3], "Testing penalty sum of test parameters p5.");
@@ -108,7 +107,7 @@ int mitkSimpleBarrierConstraintCheckerTest(int  /*argc*/, char*[] /*argv[]*/)
   penalties = checker->GetPenalties(p7);
   MITK_TEST_CONDITION_REQUIRED(penalties[0] == 0.0, "Testing penalty 1 of test parameters p7.");
   MITK_TEST_CONDITION_REQUIRED(penalties[1] == 0.0, "Testing penalty 2 of test parameters p7.");
-  MITK_TEST_CONDITION_REQUIRED(penalties[2] == 1e6, "Testing penalty 3 of test parameters p7.");
+  MITK_TEST_CONDITION_REQUIRED(penalties[2] == defaultMaxPenalty, "Testing penalty 3 of test parameters p7.");
   MITK_TEST_CONDITION_REQUIRED(penalties[3] == 0.0, "Testing penalty 4 of test parameters p7.");
   MITK_TEST_CONDITION_REQUIRED(checker->GetPenaltySum(p7) == penalties[0] + penalties[1] + penalties[2] + penalties[3], "Testing penalty sum of test parameters p7.");
 
@@ -116,7 +115,7 @@ int mitkSimpleBarrierConstraintCheckerTest(int  /*argc*/, char*[] /*argv[]*/)
   MITK_TEST_CONDITION_REQUIRED(penalties[0] == 0.0, "Testing penalty 1 of test parameters p8.");
   MITK_TEST_CONDITION_REQUIRED(penalties[1] == 0.0, "Testing penalty 2 of test parameters p8.");
   MITK_TEST_CONDITION_REQUIRED(penalties[2] == 0.0, "Testing penalty 3 of test parameters p8.");
-  MITK_TEST_CONDITION_REQUIRED(penalties[3] == 1e6, "Testing penalty 4 of test parameters p8.");
+  MITK_TEST_CONDITION_REQUIRED(penalties[3] == defaultMaxPenalty, "Testing penalty 4 of test parameters p8.");
   MITK_TEST_CONDITION_REQUIRED(checker->GetPenaltySum(p8) == penalties[0] + penalties[1] + penalties[2] + penalties[3], "Testing penalty sum of test parameters p8.");
 
   penalties = checker->GetPenalties(p9);

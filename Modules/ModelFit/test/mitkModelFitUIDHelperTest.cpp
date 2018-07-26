@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include "mitkTestingMacros.h"
 #include "mitkDataNode.h"
+#include "mitkImage.h"
 #include "mitkStandaloneDataStorage.h"
 
 #include "mitkModelFitUIDHelper.h"
@@ -26,7 +27,9 @@ int mitkModelFitUIDHelperTest(int  /*argc*/, char*[] /*argv[]*/)
   MITK_TEST_BEGIN("mitkModelFitUIDHelperTest")
 
   mitk::DataNode::Pointer node1 = mitk::DataNode::New();
+  node1->SetData(mitk::Image::New());
   mitk::DataNode::Pointer node2 = mitk::DataNode::New();
+  node2->SetData(mitk::Image::New());
 
   mitk::DataNode* nullNode = nullptr;
   mitk::BaseData* nullData = nullptr;

@@ -82,7 +82,7 @@ protected:
 
     virtual MeasureType CalcMeasure(const ParametersType &parameters, const SignalType& signal) const;
 
-    MVConstrainedCostFunctionDecorator() : m_FailureThreshold(1e6), m_ActivateFailureThreshold(true),
+    MVConstrainedCostFunctionDecorator() : m_FailureThreshold(1e15), m_ActivateFailureThreshold(true),
       m_EvaluationCount(0), m_PenaltyCount(0), m_FailureCount(0), m_LastFailedParameter(-1)
     {
     }

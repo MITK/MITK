@@ -96,6 +96,8 @@ int mitkMVConstrainedCostFunctionDecoratorTest(int  /*argc*/, char*[] /*argv[]*/
   checker->SetLowerBarrier(0,1,4);
   checker->SetUpperBarrier(0,100);
 
+  double defaultMaxPenalty = 1e15;
+
   ///////////////////////
   //Tests
 
@@ -104,7 +106,7 @@ int mitkMVConstrainedCostFunctionDecoratorTest(int  /*argc*/, char*[] /*argv[]*/
 								 "Testing GetWrappedCostFunction for new decorator.");
   MITK_TEST_CONDITION_REQUIRED(decorator->GetConstraintChecker() == NULL,
 								 "Testing GetWrappedCostFunction for new decorator.");
-  MITK_TEST_CONDITION_REQUIRED(decorator->GetFailureThreshold() == 1e6,
+  MITK_TEST_CONDITION_REQUIRED(decorator->GetFailureThreshold() == defaultMaxPenalty,
 								 "Testing GetWrappedCostFunction for new decorator.");
 
   MITK_TEST_FOR_EXCEPTION(mitk::Exception, decorator->GetValue(p1));
@@ -117,11 +119,11 @@ int mitkMVConstrainedCostFunctionDecoratorTest(int  /*argc*/, char*[] /*argv[]*/
 
 
   mitk::MVModelFitCostFunction::MeasureType measure = decorator->GetValue(p1);
-  MITK_TEST_CONDITION_REQUIRED(measure[0] == 1e6, "Testing measure 1 with parameters p1.");
-  MITK_TEST_CONDITION_REQUIRED(measure[1] == 1e6, "Testing measure 2 with parameters p1.");
-  MITK_TEST_CONDITION_REQUIRED(measure[2] == 1e6, "Testing measure 3 with parameters p1.");
-  MITK_TEST_CONDITION_REQUIRED(measure[3] == 1e6, "Testing measure 3 with parameters p1.");
-  MITK_TEST_CONDITION_REQUIRED(measure[4] == 1e6, "Testing measure 3 with parameters p1.");
+  MITK_TEST_CONDITION_REQUIRED(measure[0] == defaultMaxPenalty, "Testing measure 1 with parameters p1.");
+  MITK_TEST_CONDITION_REQUIRED(measure[1] == defaultMaxPenalty, "Testing measure 2 with parameters p1.");
+  MITK_TEST_CONDITION_REQUIRED(measure[2] == defaultMaxPenalty, "Testing measure 3 with parameters p1.");
+  MITK_TEST_CONDITION_REQUIRED(measure[3] == defaultMaxPenalty, "Testing measure 3 with parameters p1.");
+  MITK_TEST_CONDITION_REQUIRED(measure[4] == defaultMaxPenalty, "Testing measure 3 with parameters p1.");
   MITK_TEST_CONDITION_REQUIRED(innerCF->m_calls == 0, "Checking calls with parameters p1.");
 
   measure = decorator->GetValue(p2);
@@ -131,16 +133,16 @@ int mitkMVConstrainedCostFunctionDecoratorTest(int  /*argc*/, char*[] /*argv[]*/
   MITK_TEST_CONDITION_REQUIRED(innerCF->m_calls == 1, "Checking calls with parameters p2.");
 
   measure = decorator->GetValue(p3);
-  MITK_TEST_CONDITION_REQUIRED(measure[0] == 1e6, "Testing measure 1 with parameters p3.");
-  MITK_TEST_CONDITION_REQUIRED(measure[1] == 1e6, "Testing measure 2 with parameters p3.");
-  MITK_TEST_CONDITION_REQUIRED(measure[2] == 1e6, "Testing measure 3 with parameters p3.");
+  MITK_TEST_CONDITION_REQUIRED(measure[0] == defaultMaxPenalty, "Testing measure 1 with parameters p3.");
+  MITK_TEST_CONDITION_REQUIRED(measure[1] == defaultMaxPenalty, "Testing measure 2 with parameters p3.");
+  MITK_TEST_CONDITION_REQUIRED(measure[2] == defaultMaxPenalty, "Testing measure 3 with parameters p3.");
   MITK_TEST_CONDITION_REQUIRED(innerCF->m_calls == 1, "Checking calls with parameters p3.");
 
   decorator->SetActivateFailureThreshold(false);
   measure = decorator->GetValue(p3);
-  MITK_TEST_CONDITION_REQUIRED(measure[0] == 100+1e6, "Testing measure 1 with parameters p3 (deactiveated threshold).");
-  MITK_TEST_CONDITION_REQUIRED(measure[1] == 50+1e6, "Testing measure 2 with parameters p3 (deactiveated threshold).");
-  MITK_TEST_CONDITION_REQUIRED(measure[2] == 250+1e6, "Testing measure 3 with parameters p3 (deactiveated threshold).");
+  MITK_TEST_CONDITION_REQUIRED(measure[0] == 100+defaultMaxPenalty, "Testing measure 1 with parameters p3 (deactiveated threshold).");
+  MITK_TEST_CONDITION_REQUIRED(measure[1] == 50+defaultMaxPenalty, "Testing measure 2 with parameters p3 (deactiveated threshold).");
+  MITK_TEST_CONDITION_REQUIRED(measure[2] == 250+defaultMaxPenalty, "Testing measure 3 with parameters p3 (deactiveated threshold).");
   MITK_TEST_CONDITION_REQUIRED(innerCF->m_calls ==2, "Checking calls with parameters p3 (deactiveated threshold).");
   decorator->SetActivateFailureThreshold(true);
 

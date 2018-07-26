@@ -38,6 +38,7 @@ namespace mitk
 
   RenderingManager::Pointer RenderingManager::s_Instance = 0;
   RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = 0;
+  std::vector< vtkRenderWindow* > RenderingManager::s_GenerallyAllRenderWindows;
 
   RenderingManager
     ::RenderingManager()
@@ -66,6 +67,12 @@ namespace mitk
     RenderWindowVector::iterator it;
     for (it = m_AllRenderWindows.begin(); it != m_AllRenderWindows.end(); ++it)
     {
+      RenderWindowVector::iterator rw_it = std::find(RenderingManager::s_GenerallyAllRenderWindows.begin(), RenderingManager::s_GenerallyAllRenderWindows.end(), *it);
+      if (rw_it != RenderingManager::s_GenerallyAllRenderWindows.cend())
+      {
+        RenderingManager::s_GenerallyAllRenderWindows.erase(rw_it);
+      }
+
       (*it)->UnRegister(NULL);
 
       RenderWindowCallbacksList::iterator callbacks_it = this->m_RenderWindowCallbacksList.find(*it);
@@ -151,6 +158,7 @@ namespace mitk
     {
       m_RenderWindowList[renderWindow] = RENDERING_INACTIVE;
       m_AllRenderWindows.push_back(renderWindow);
+      RenderingManager::s_GenerallyAllRenderWindows.push_back(renderWindow);
 
       if (m_DataStorage.IsNotNull())
         mitk::BaseRenderer::GetInstance(renderWindow)->SetDataStorage(m_DataStorage.GetPointer());
@@ -212,6 +220,13 @@ namespace mitk
         (*rw_it)->UnRegister(NULL);
         m_AllRenderWindows.erase(rw_it);
       }
+
+      rw_it = std::find(RenderingManager::s_GenerallyAllRenderWindows.begin(), RenderingManager::s_GenerallyAllRenderWindows.end(), renderWindow);
+
+      if (rw_it != RenderingManager::s_GenerallyAllRenderWindows.cend())
+      {
+        RenderingManager::s_GenerallyAllRenderWindows.erase(rw_it);
+      }
     }
   }
 
@@ -220,6 +235,13 @@ namespace mitk
     ::GetAllRegisteredRenderWindows()
   {
     return m_AllRenderWindows;
+  }
+
+  const RenderingManager::RenderWindowVector&
+    RenderingManager
+    ::GetGenerallyAllRegisteredRenderWindows()
+  {
+    return RenderingManager::s_GenerallyAllRenderWindows;
   }
 
   void

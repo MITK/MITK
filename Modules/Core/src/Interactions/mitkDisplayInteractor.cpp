@@ -95,6 +95,7 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
 
 double mitk::DisplayInteractor::m_ClockRotationSpeed = 90.;
 bool mitk::DisplayInteractor::m_MouseRotationMode = false;
+bool mitk::DisplayInteractor::s_PanZoomSynchronization = false;
 
 mitk::DisplayInteractor::DisplayInteractor()
   : m_Selector(true)
@@ -133,6 +134,11 @@ void mitk::DisplayInteractor::SetSelectionMode(bool selection)
 bool mitk::DisplayInteractor::GetMouseRotationMode()
 {
   return m_MouseRotationMode;
+}
+
+void mitk::DisplayInteractor::SetSynchronization(bool on)
+{
+  mitk::DisplayInteractor::s_PanZoomSynchronization = on;
 }
 
 bool mitk::DisplayInteractor::IsOverObject(const InteractionEvent* interactionEvent)
@@ -459,8 +465,26 @@ void mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* intera
   }
   // perform translation
   Vector2D moveVector = (positionEvent->GetPointerPositionOnScreen() - m_LastDisplayCoordinate) * invertModifier;
-  sender->GetCameraController()->MoveBy(moveVector);
-  sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+
+  if (s_PanZoomSynchronization)
+  {
+    auto allRenderWindows = mitk::RenderingManager::GetGenerallyAllRegisteredRenderWindows();
+    for(vtkRenderWindow* renderWindow : allRenderWindows)
+    {
+      const BaseRenderer::Pointer ren = BaseRenderer::GetInstance(renderWindow);
+      bool sameDirection = (ren->GetSliceNavigationController()->GetDefaultViewDirection() == sender->GetSliceNavigationController()->GetDefaultViewDirection());
+      if (sameDirection)
+      {
+        ren->GetCameraController()->MoveBy(moveVector);
+        ren->GetRenderingManager()->RequestUpdate(renderWindow);
+      }
+    }
+  }
+  else
+  {
+    sender->GetCameraController()->MoveBy(moveVector);
+    sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+  }
   m_LastDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
 }
 
@@ -513,8 +537,25 @@ void mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
 
   if (factor != 1.0)
   {
-    sender->GetCameraController()->Zoom(factor, m_StartCoordinateInMM);
-    sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+    if (s_PanZoomSynchronization)
+    {
+      auto allRenderWindows = mitk::RenderingManager::GetGenerallyAllRegisteredRenderWindows();
+      for(vtkRenderWindow* renderWindow : allRenderWindows)
+      {
+        const BaseRenderer::Pointer ren = BaseRenderer::GetInstance(renderWindow);
+        bool sameDirection = (ren->GetSliceNavigationController()->GetDefaultViewDirection() == sender->GetSliceNavigationController()->GetDefaultViewDirection());
+        if (sameDirection)
+        {
+          ren->GetCameraController()->Zoom(factor, m_StartCoordinateInMM);
+          ren->GetRenderingManager()->RequestUpdate(renderWindow);
+        }
+      }
+    }
+    else
+    {
+      sender->GetCameraController()->Zoom(factor, m_StartCoordinateInMM);
+      sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+    }
   }
 
   m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;

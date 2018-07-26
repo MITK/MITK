@@ -718,6 +718,7 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
   TNodePredicateDataType<mitk::Image>::Pointer isImageData = TNodePredicateDataType<mitk::Image>::New();
 
   mitk::BaseRenderer* baseRenderer = posEvent->GetSender();
+  auto globalCurrentTimePoint = baseRenderer->GetTime();
   mitk::DataStorage::SetOfObjects::ConstPointer nodes = baseRenderer->GetDataStorage()->GetSubset(isImageData).GetPointer();
 
   // posEvent->GetPositionInWorld() would return the world position at the
@@ -734,7 +735,7 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
 
   int component = 0;
 
-  node = FindTopmostVisibleNode(nodes, worldposition, baseRenderer->GetTime(), baseRenderer);
+  node = FindTopmostVisibleNode(nodes, worldposition, globalCurrentTimePoint, baseRenderer);
   if (node.IsNotNull())
   {
     bool isBinary(false);
@@ -744,7 +745,7 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
       mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = baseRenderer->GetDataStorage()->GetSources(node, nullptr, true);
       if (!sourcenodes->empty())
       {
-        topSourceNode = mitk::FindTopmostVisibleNode(sourcenodes, worldposition, baseRenderer->GetTime(), baseRenderer);
+        topSourceNode = mitk::FindTopmostVisibleNode(sourcenodes, worldposition, globalCurrentTimePoint, baseRenderer);
       }
       if (topSourceNode.IsNotNull())
       {
@@ -778,12 +779,12 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
     {
       std::string pixelValue = "Pixel RGB(A) value: ";
       pixelValue.append(ConvertCompositePixelValueToString(image3D, p));
-      statusBar->DisplayImageInfo(worldposition, p, baseRenderer->GetTime(), pixelValue.c_str());
+      statusBar->DisplayImageInfo(worldposition, p, globalCurrentTimePoint, pixelValue.c_str());
     }
     else if ( pixelType == itk::ImageIOBase::DIFFUSIONTENSOR3D || pixelType == itk::ImageIOBase::SYMMETRICSECONDRANKTENSOR )
     {
       std::string pixelValue = "See ODF Details view. ";
-      statusBar->DisplayImageInfo(worldposition, p, baseRenderer->GetTime(), pixelValue.c_str());
+      statusBar->DisplayImageInfo(worldposition, p, globalCurrentTimePoint, pixelValue.c_str());
     }
     else
     {
@@ -791,11 +792,11 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
       mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess,
         image3D->GetChannelDescriptor().GetPixelType(),
         image3D,
-        image3D->GetVolumeData(baseRenderer->GetTimeStep()),
+        image3D->GetVolumeData(image3D->GetTimeGeometry()->TimePointToTimeStep(globalCurrentTimePoint)),
         p,
         pixelValue,
         component);
-      statusBar->DisplayImageInfo(worldposition, p, baseRenderer->GetTime(), pixelValue);
+      statusBar->DisplayImageInfo(worldposition, p, globalCurrentTimePoint, pixelValue);
     }
   }
   else

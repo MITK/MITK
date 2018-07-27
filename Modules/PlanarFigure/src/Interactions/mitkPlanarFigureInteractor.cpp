@@ -164,8 +164,8 @@ void mitk::PlanarFigureInteractor::MoveAnnotations(StateMachineAction*, Interact
 
   planarFigure->InvokeEvent( StartInteractionPlanarFigureEvent() );
 
-  point2D[0] -= annotationMoveOffset[0] + 8.8; // there is additional contant offset
-  point2D[1] -= annotationMoveOffset[1] - 8.8; // and I have no idea where it comes from
+  point2D[0] -= annotationMoveOffset[0];
+  point2D[1] -= annotationMoveOffset[1];
 
   // Move current control point to this point
   planarFigure->SetAnnotationsPosition( point2D );
@@ -673,9 +673,7 @@ bool mitk::PlanarFigureInteractor::CheckAnnotationHovering( const InteractionEve
     annotationMoveOffset[1] = point2DPosition[1] - point2DAnnotation[1];
 
     return true;
-  }
-  else
-  {
+  } else {
     return false;
   }
 }

@@ -842,10 +842,15 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::PlanarFigure * planarF
       planarFigure->GetAnnotationsPosition(), displayPoint,
       planarFigurePlaneGeometry, rendererPlaneGeometry, renderer );
 
-    m_AnnotationOverlay->SetPosition2D( displayPoint );
-    m_AnnotationOverlay->SetOrientation( mitk::TextOrientation::TextRigth );
+    displayPoint[0] = displayPoint[0] * m_DevicePixelRatio;
+    displayPoint[1] = displayPoint[1] * m_DevicePixelRatio;
+
+    m_AnnotationOverlay->SetPosition2D(displayPoint);
+    m_AnnotationOverlay->SetOrientation(mitk::TextOrientation::TextRigth);
+
     mitk::Point2D offset_;
-    offset_.Fill(5);
+    offset_[0] = -planarFigure->GetAnnotaionsBoundingBox().Size[1] / 2;
+    offset_[1] = -planarFigure->GetAnnotaionsBoundingBox().Size[1] / 2;
     m_AnnotationOverlay->SetOffsetVector(offset_);
   } else {
     mitk::Point2D offset;

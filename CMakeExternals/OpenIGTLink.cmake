@@ -15,14 +15,9 @@ if(MITK_USE_OpenIGTLink)
   if(NOT DEFINED OpenIGTLink_DIR)
 
     set(additional_cmake_args )
-    if(MINGW)
-      set(additional_cmake_args
-          -DCMAKE_USE_WIN32_THREADS:BOOL=ON
-          -DCMAKE_USE_PTHREADS:BOOL=OFF)
-    endif()
 
     if(CTEST_USE_LAUNCHERS)
-      list(APPEND additional_cmake_args
+      set(additional_cmake_args
         "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
       )
     endif()

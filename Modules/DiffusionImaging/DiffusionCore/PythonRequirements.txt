@@ -1,0 +1,6 @@
+numpy
+SimpleITK
+dipy
+sklearn
+https://github.com/MIC-DKFZ/batchgenerators/archive/master.zip
+https://github.com/MIC-DKFZ/TractSeg/archive/v1.3.zip

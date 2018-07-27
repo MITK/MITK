@@ -48,23 +48,22 @@ public:
   void SetLineStyle(const std::string& label, LineStyle style);
 
   void SetYAxisScale(AxisScale scale);
-
   void SetXAxisLabel(const std::string& label);
-
   void SetYAxisLabel(const std::string& label);
 
   void SetTitle(const std::string &title);
 
-  void SetLegendPosition(LegendPosition position);
+  void SetChartType(QmitkChartWidget::ChartType chartType);
+  void SetChartTypeByLabel(const std::string& label, QmitkChartWidget::ChartType chartType);
 
+  void SetLegendPosition(LegendPosition position);
   void SetShowLegend(bool show);
 
-  void SetShowDataPoints(bool showDataPoints = false);
+  void SetStackedData(bool stacked);
 
   void Show(bool showSubChart);
 
-  void SetChartType(QmitkChartWidget::ChartType chartType);
-  void SetChartTypeByLabel(const std::string& label, QmitkChartWidget::ChartType chartType);
+  void SetShowDataPoints(bool showDataPoints = false);
 
   std::string ConvertChartTypeToString(QmitkChartWidget::ChartType chartType) const;
 
@@ -135,7 +134,23 @@ QmitkChartWidget::Impl::~Impl()
 {
 }
 
-void QmitkChartWidget::Impl::AddData1D(const std::vector<double>& data1D, const std::string& label, QmitkChartWidget::ChartType chartType) {
+std::string CheckForCorrectHex(const std::string& colorName)
+{
+  std::regex rgx("([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})");
+  std::smatch match;
+
+  if (!colorName.empty() && colorName.at(0) != '#' && std::regex_search(colorName.begin(), colorName.end(), match, rgx))
+  {
+    return "#" + colorName;
+  }
+  else
+  {
+    return colorName;
+  }
+}
+
+void QmitkChartWidget::Impl::AddData1D(const std::vector<double>& data1D, const std::string& label, QmitkChartWidget::ChartType chartType)
+{
   std::map<double, double> transformedData2D;
   unsigned int count = 0;
   //transform the 1D data to 2D data
@@ -191,20 +206,6 @@ void QmitkChartWidget::Impl::ClearData()
   m_C3xyData.clear();
 }
 
-std::string CheckForCorrectHex(const std::string& colorName)
-{
-  std::regex rgx("([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})");
-  std::smatch match;
-
-  if (!colorName.empty() && colorName.at(0)!='#' && std::regex_search(colorName.begin(), colorName.end(), match, rgx))
-  {
-    return "#" + colorName;
-  }
-  else {
-    return colorName;
-  }
-}
-
 void QmitkChartWidget::Impl::SetColor(const std::string& label, const std::string& colorName)
 {
   auto element = GetDataElementByLabel(label);
@@ -232,30 +233,6 @@ void QmitkChartWidget::Impl::SetYAxisScale(AxisScale scale)
   m_C3Data.SetYAxisScale(QString::fromStdString(axisScaleName));
 }
 
-QmitkChartxyData* QmitkChartWidget::Impl::GetDataElementByLabel(const std::string& label) const
-{
-  for (const auto& qmitkChartxyData : m_C3xyData)
-  {
-    if (qmitkChartxyData->GetLabel().toString() == label.c_str())
-    {
-      return qmitkChartxyData.get();
-    }
-  }
-
-  MITK_WARN << "label " << label << " not found in QmitkChartWidget";
-  return nullptr;
-}
-
-QList<QVariant> QmitkChartWidget::Impl::GetDataLabels(const ChartxyDataVector& c3xyData) const
-{
-  QList<QVariant> dataLabels;
-  for (auto element = c3xyData.begin(); element != c3xyData.end(); ++element)
-  {
-    dataLabels.push_back((*element)->GetLabel());
-  }
-  return dataLabels;
-}
-
 void QmitkChartWidget::Impl::SetXAxisLabel(const std::string& label)
 {
   m_C3Data.SetXAxisLabel(QString::fromStdString(label));
@@ -269,38 +246,6 @@ void QmitkChartWidget::Impl::SetYAxisLabel(const std::string& label)
 void QmitkChartWidget::Impl::SetTitle(const std::string& title)
 {
   m_C3Data.SetTitle(QString::fromStdString(title));
-}
-
-void QmitkChartWidget::Impl::SetLegendPosition(QmitkChartWidget::LegendPosition legendPosition)
-{
-  const std::string legendPositionName(m_LegendPositionToName.at(legendPosition));
-  m_C3Data.SetLegendPosition(QString::fromStdString(legendPositionName));
-}
-
-void QmitkChartWidget::Impl::SetShowLegend(bool show)
-{
-  m_C3Data.SetShowLegend(show);
-}
-
-void QmitkChartWidget::Impl::SetShowDataPoints(bool showDataPoints)
-{
-  if (showDataPoints == true) {
-    m_C3Data.SetDataPointSize(3);
-  }
-  else {
-    m_C3Data.SetDataPointSize(0);
-  }
-}
-
-void QmitkChartWidget::Impl::Show(bool showSubChart)
-{
-  if (m_C3xyData.empty())
-  {
-    mitkThrow() << "no data available for display in chart";
-  }
-
-  m_C3Data.SetAppearance(showSubChart, m_C3xyData.front()->GetChartType() == QVariant("pie"));
-  InitializeJavaScriptChart();
 }
 
 void QmitkChartWidget::Impl::SetChartType(QmitkChartWidget::ChartType chartType)
@@ -330,14 +275,48 @@ void QmitkChartWidget::Impl::SetChartTypeByLabel(const std::string& label, Qmitk
   }
 }
 
+void QmitkChartWidget::Impl::SetLegendPosition(QmitkChartWidget::LegendPosition legendPosition)
+{
+  const std::string legendPositionName(m_LegendPositionToName.at(legendPosition));
+  m_C3Data.SetLegendPosition(QString::fromStdString(legendPositionName));
+}
+
+void QmitkChartWidget::Impl::SetShowLegend(bool show)
+{
+  m_C3Data.SetShowLegend(show);
+}
+
+void QmitkChartWidget::Impl::SetStackedData(bool stacked)
+{
+  m_C3Data.SetStackedData(stacked);
+}
+
+void QmitkChartWidget::Impl::Show(bool showSubChart)
+{
+  if (m_C3xyData.empty())
+  {
+    mitkThrow() << "no data available for display in chart";
+  }
+
+  m_C3Data.SetAppearance(showSubChart, m_C3xyData.front()->GetChartType() == QVariant("pie"));
+  InitializeJavaScriptChart();
+}
+
+void QmitkChartWidget::Impl::SetShowDataPoints(bool showDataPoints)
+{
+  if (showDataPoints == true)
+  {
+    m_C3Data.SetDataPointSize(3);
+  }
+  else
+  {
+    m_C3Data.SetDataPointSize(0);
+  }
+}
+
 std::string QmitkChartWidget::Impl::ConvertChartTypeToString(QmitkChartWidget::ChartType chartType) const
 {
   return m_ChartTypeToName.at(chartType);
-}
-
-void QmitkChartWidget::Impl::CallJavaScriptFuntion(const QString& command)
-{
-  m_WebEngineView->page()->runJavaScript(command);
 }
 
 void QmitkChartWidget::Impl::ClearJavaScriptChart()
@@ -358,6 +337,11 @@ void QmitkChartWidget::Impl::InitializeJavaScriptChart()
   m_WebEngineView->load(QUrl(QStringLiteral("qrc:///C3js/QmitkChartWidget.html")));
 }
 
+void QmitkChartWidget::Impl::CallJavaScriptFuntion(const QString& command)
+{
+  m_WebEngineView->page()->runJavaScript(command);
+}
+
 std::string QmitkChartWidget::Impl::GetUniqueLabelName(const QList<QVariant>& labelList, const std::string& label) const
 {
   QString currentLabel = QString::fromStdString(label);
@@ -370,6 +354,30 @@ std::string QmitkChartWidget::Impl::GetUniqueLabelName(const QList<QVariant>& la
   return currentLabel.toStdString();
 }
 
+QmitkChartxyData* QmitkChartWidget::Impl::GetDataElementByLabel(const std::string& label) const
+{
+  for (const auto& qmitkChartxyData : m_C3xyData)
+  {
+    if (qmitkChartxyData->GetLabel().toString() == label.c_str())
+    {
+      return qmitkChartxyData.get();
+    }
+  }
+
+  MITK_WARN << "label " << label << " not found in QmitkChartWidget";
+  return nullptr;
+}
+
+QList<QVariant> QmitkChartWidget::Impl::GetDataLabels(const ChartxyDataVector& c3xyData) const
+{
+  QList<QVariant> dataLabels;
+  for (auto element = c3xyData.begin(); element != c3xyData.end(); ++element)
+  {
+    dataLabels.push_back((*element)->GetLabel());
+  }
+  return dataLabels;
+}
+
 QmitkChartWidget::QmitkChartWidget(QWidget* parent)
   : QWidget(parent)
   , m_Impl(new Impl(this))
@@ -380,9 +388,19 @@ QmitkChartWidget::~QmitkChartWidget()
 {
 }
 
+void QmitkChartWidget::AddData1D(const std::vector<double>& data1D, const std::string& label, ChartType type)
+{
+  m_Impl->AddData1D(data1D, label, type);
+}
+
 void QmitkChartWidget::AddData2D(const std::map<double, double>& data2D, const std::string& label, ChartType type)
 {
   m_Impl->AddData2D(data2D, label, type);
+}
+
+void QmitkChartWidget::RemoveData(const std::string& label)
+{
+  m_Impl->RemoveData(label);
 }
 
 void QmitkChartWidget::SetColor(const std::string& label, const std::string& colorName)
@@ -400,16 +418,6 @@ void QmitkChartWidget::SetYAxisScale(AxisScale scale)
   m_Impl->SetYAxisScale(scale);
 }
 
-void QmitkChartWidget::AddData1D(const std::vector<double>& data1D, const std::string& label, ChartType type)
-{
-  m_Impl->AddData1D(data1D, label, type);
-}
-
-void QmitkChartWidget::RemoveData(const std::string& label)
-{
-  m_Impl->RemoveData(label);
-}
-
 void QmitkChartWidget::SetXAxisLabel(const std::string & label)
 {
 	m_Impl->SetXAxisLabel(label);
@@ -423,11 +431,6 @@ void QmitkChartWidget::SetYAxisLabel(const std::string & label)
 void QmitkChartWidget::SetTitle(const std::string & title)
 {
   m_Impl->SetTitle(title);
-}
-
-void QmitkChartWidget::SetShowDataPoints(bool showDataPoints)
-{
-  m_Impl->SetShowDataPoints(showDataPoints);
 }
 
 void QmitkChartWidget::SetChartTypeForAllDataAndReload(ChartType type)
@@ -450,9 +453,19 @@ void QmitkChartWidget::SetShowLegend(bool show)
   m_Impl->SetShowLegend(show);
 }
 
+void QmitkChartWidget::SetStackedData(bool stacked)
+{
+  m_Impl->SetStackedData(stacked);
+}
+
 void QmitkChartWidget::Show(bool showSubChart)
 {
   m_Impl->Show(showSubChart);
+}
+
+void QmitkChartWidget::SetShowDataPoints(bool showDataPoints)
+{
+  m_Impl->SetShowDataPoints(showDataPoints);
 }
 
 void QmitkChartWidget::Clear()
@@ -485,6 +498,7 @@ void QmitkChartWidget::SetTheme(ChartStyle themeEnabled)
 void QmitkChartWidget::Reload(bool showSubChart)
 {
   QString subChartString;
+
   if (showSubChart)
   {
     subChartString = "true";
@@ -493,6 +507,7 @@ void QmitkChartWidget::Reload(bool showSubChart)
   {
     subChartString = "false";
   }
+
   const QString command = QString("ReloadChart(" + subChartString + ")");
   m_Impl->CallJavaScriptFuntion(command);
 }

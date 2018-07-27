@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PETDynamicViewControls</class>
+ <widget class="QWidget" name="PETDynamicViewControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>745</width>
+    <height>898</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkTemplate</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Selected Time Series:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="timeserieslabel">
+         <property name="text">
+          <string>No series selected.</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Selected Mask:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="masklabel">
+         <property name="text">
+          <string>No mask selected.</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Fitting strategy</string>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <property name="spacing">
+         <number>5</number>
+        </property>
+        <property name="margin">
+         <number>5</number>
+        </property>
+        <item>
+         <widget class="QRadioButton" name="radioPixelBased">
+          <property name="text">
+           <string>Pixel based</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioROIbased">
+          <property name="text">
+           <string>ROI based</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Message</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="errorMessageLabel">
+         <property name="text">
+          <string>-</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QComboBox" name="comboModel">
+     <item>
+      <property name="text">
+       <string>Select pharmacokinetic modell...</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupAIF">
+     <property name="title">
+      <string>AIF Mask:</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <widget class="QRadioButton" name="radioAIFImage">
+        <property name="text">
+         <string>Select AIF from Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="labelAIFMask">
+          <property name="text">
+           <string>AIF Mask:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QCheckBox" name="checkDedicatedAIFImage">
+          <property name="text">
+           <string>Dedicated AIF Image:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QmitkDataStorageComboBox" name="comboAIFMask" native="true"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QmitkDataStorageComboBox" name="comboAIFImage" native="true"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QRadioButton" name="radioAIFFile">
+          <property name="text">
+           <string>Select AIF from File:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="aifFilePath"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAIFFile">
+          <property name="text">
+           <string>Browse</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Whole Blood to Plasma Correction:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="HCLSpinBox"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_FitConfiguration">
+     <property name="title">
+      <string>Model Fit Configuration</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QToolBox" name="toolBox">
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
+        <widget class="QWidget" name="groupStartParameter">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>701</width>
+           <height>129</height>
+          </rect>
+         </property>
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="whatsThis">
+          <string/>
+         </property>
+         <attribute name="label">
+          <string>Start Parameters</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QRadioButton" name="radioButton_StartParameters">
+            <property name="text">
+             <string>Enter parameter starting values manually:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QmitkInitialValuesManagerWidget" name="initialValuesManager" native="true"/>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="groupConstraints">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>701</width>
+           <height>129</height>
+          </rect>
+         </property>
+         <attribute name="label">
+          <string>Constraints</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <widget class="QCheckBox" name="checkBox_Constraints">
+            <property name="text">
+             <string>Enter Constraints for Fit Parameters</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QmitkSimpleBarrierManagerWidget" name="constraintManager" native="true"/>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Fitting name:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineFitName"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnModelling">
+     <property name="text">
+      <string>Start Modelling</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTextEdit" name="infoBox">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkSimpleBarrierManagerWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkSimpleBarrierManagerWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkInitialValuesManagerWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkInitialValuesManagerWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkDataStorageComboBox.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

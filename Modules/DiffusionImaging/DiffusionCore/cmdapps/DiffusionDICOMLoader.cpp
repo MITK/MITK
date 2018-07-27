@@ -287,11 +287,11 @@ int main(int argc, char* argv[])
       vnl_matrix_fixed< double, 3, 3 > mf; mf.set_identity();
 
       image = mitk::GrabItkImageMemory( filter->GetOutput() );
-      image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetOutputGradients() ) );
-      image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( filter->GetB_Value() ) );
-      image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( mf ) );
-      mitk::DiffusionPropertyHelper propertyHelper( image );
-      propertyHelper.InitializeImage();
+
+      mitk::DiffusionPropertyHelper::SetGradientContainer(image, filter->GetOutputGradients());
+      mitk::DiffusionPropertyHelper::SetReferenceBValue(image, filter->GetB_Value());
+      mitk::DiffusionPropertyHelper::SetMeasurementFrame(image, mf);
+      mitk::DiffusionPropertyHelper::InitializeImage( image );
     }
     // just output the image if there was only one folder found
     else

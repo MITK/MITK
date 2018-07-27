@@ -717,8 +717,9 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
   std::string statusText;
   TNodePredicateDataType<mitk::Image>::Pointer isImageData = TNodePredicateDataType<mitk::Image>::New();
 
-  mitk::DataStorage::SetOfObjects::ConstPointer nodes =
-    posEvent->GetSender()->GetDataStorage()->GetSubset(isImageData).GetPointer();
+  mitk::BaseRenderer* baseRenderer = posEvent->GetSender();
+  auto globalCurrentTimePoint = baseRenderer->GetTime();
+  mitk::DataStorage::SetOfObjects::ConstPointer nodes = baseRenderer->GetDataStorage()->GetSubset(isImageData).GetPointer();
 
   // posEvent->GetPositionInWorld() would return the world position at the
   // time of initiating the interaction. However, we need to update the
@@ -734,18 +735,17 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
 
   int component = 0;
 
-  node = this->GetTopLayerNode(nodes, worldposition, posEvent->GetSender());
+  node = FindTopmostVisibleNode(nodes, worldposition, globalCurrentTimePoint, baseRenderer);
   if (node.IsNotNull())
   {
     bool isBinary(false);
     node->GetBoolProperty("binary", isBinary);
     if (isBinary)
     {
-      mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes =
-        posEvent->GetSender()->GetDataStorage()->GetSources(node, nullptr, true);
+      mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = baseRenderer->GetDataStorage()->GetSources(node, nullptr, true);
       if (!sourcenodes->empty())
       {
-        topSourceNode = this->GetTopLayerNode(sourcenodes, worldposition, posEvent->GetSender());
+        topSourceNode = mitk::FindTopmostVisibleNode(sourcenodes, worldposition, globalCurrentTimePoint, baseRenderer);
       }
       if (topSourceNode.IsNotNull())
       {
@@ -779,12 +779,12 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
     {
       std::string pixelValue = "Pixel RGB(A) value: ";
       pixelValue.append(ConvertCompositePixelValueToString(image3D, p));
-      statusBar->DisplayImageInfo(worldposition, p, posEvent->GetSender()->GetTime(), pixelValue.c_str());
+      statusBar->DisplayImageInfo(worldposition, p, globalCurrentTimePoint, pixelValue.c_str());
     }
     else if ( pixelType == itk::ImageIOBase::DIFFUSIONTENSOR3D || pixelType == itk::ImageIOBase::SYMMETRICSECONDRANKTENSOR )
     {
       std::string pixelValue = "See ODF Details view. ";
-      statusBar->DisplayImageInfo(worldposition, p, posEvent->GetSender()->GetTime(), pixelValue.c_str());
+      statusBar->DisplayImageInfo(worldposition, p, globalCurrentTimePoint, pixelValue.c_str());
     }
     else
     {
@@ -792,11 +792,11 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
       mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess,
         image3D->GetChannelDescriptor().GetPixelType(),
         image3D,
-        image3D->GetVolumeData(posEvent->GetSender()->GetTimeStep()),
+        image3D->GetVolumeData(image3D->GetTimeGeometry()->TimePointToTimeStep(globalCurrentTimePoint)),
         p,
         pixelValue,
         component);
-      statusBar->DisplayImageInfo(worldposition, p, posEvent->GetSender()->GetTime(), pixelValue);
+      statusBar->DisplayImageInfo(worldposition, p, globalCurrentTimePoint, pixelValue);
     }
   }
   else
@@ -923,54 +923,4 @@ bool mitk::DisplayInteractor::GetBoolProperty(mitk::PropertyList::Pointer proper
       return false;
     }
   }
-}
-
-mitk::DataNode::Pointer mitk::DisplayInteractor::GetTopLayerNode(DataStorage::SetOfObjects::ConstPointer nodes,
-                                                                 Point3D worldposition,
-                                                                 BaseRenderer* baseRender)
-{
-  DataNode::Pointer topLayerNode;
-
-  if (nodes.IsNull())
-    return nullptr;
-
-  int maxLayer = std::numeric_limits<int>::min();
-
-  for (auto node : *nodes)
-  {
-    if (node.IsNull())
-      continue;
-
-    bool isHelperObject = false;
-    node->GetBoolProperty("helper object", isHelperObject);
-
-    if (isHelperObject)
-      continue;
-
-    auto data = node->GetData();
-
-    if (nullptr == data)
-      continue;
-
-    auto geometry = data->GetGeometry();
-
-    if (nullptr == geometry || !geometry->IsInside(worldposition))
-      continue;
-
-    int layer = 0;
-
-    if (!node->GetIntProperty("layer", layer))
-      continue;
-
-    if (layer <= maxLayer)
-      continue;
-
-    if (!node->IsVisible(baseRender))
-      continue;
-
-    topLayerNode = node;
-    maxLayer = layer;
-  }
-
-  return topLayerNode;
 }

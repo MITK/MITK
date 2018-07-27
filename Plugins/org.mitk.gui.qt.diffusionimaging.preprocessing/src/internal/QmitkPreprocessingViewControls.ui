@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>QmitkPreprocessingViewControls</class>
  <widget class="QWidget" name="QmitkPreprocessingViewControls">
@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>503</width>
-    <height>813</height>
+    <height>1001</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -26,40 +26,12 @@
    <bool>true</bool>
   </property>
   <property name="styleSheet">
-   <string>QCommandLinkButton {
-  font-weight: normal;
-}
-
-QCommandLinkButton:disabled {
+   <string>QCommandLinkButton:disabled {
   border: none;
-  font-weight: lighter;
-}
-
-QToolBox::tab {
-  border: 1px solid #434346;
-  font-weight: bold;
-}
-
-QToolBox::tab:hover {
-  background-color: #434346;
-  font-weight: bold;
-}
-
-QToolBox::tab:selected {
-  background-color: #1c97ea;
-  border: 1px solid #1c97ea;
-  font-weight: bold;
 }
 
 QGroupBox {
-  border: 1px solid #434346;
-  background-color: #2d2d30;
-  margin-top: 8px;
-  padding-top: 8px;
-}
-
-QGroupBox, QGroupBox:disabled {
-  background-color: #2d2d30;
+  background-color: transparent;
 }</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_18">
@@ -87,7 +59,7 @@ QGroupBox, QGroupBox:disabled {
       <item row="0" column="0">
        <widget class="QLabel" name="label_5">
         <property name="toolTip">
-         <string></string>
+         <string/>
         </property>
         <property name="text">
          <string>Image:</string>
@@ -240,10 +212,10 @@ QGroupBox, QGroupBox:disabled {
              <string>Sometimes the gradient directions are not located on one half sphere.</string>
             </property>
             <property name="statusTip">
-             <string></string>
+             <string/>
             </property>
             <property name="whatsThis">
-             <string notr="true"></string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string>Mirror gradients to half sphere</string>
@@ -259,10 +231,10 @@ QGroupBox, QGroupBox:disabled {
              <string>Generate pointset displaying the gradient vectors (applied measurement frame).</string>
             </property>
             <property name="statusTip">
-             <string></string>
+             <string/>
             </property>
             <property name="whatsThis">
-             <string notr="true"></string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string>Show gradients</string>
@@ -278,10 +250,10 @@ QGroupBox, QGroupBox:disabled {
              <string>Generate pointset displaying the gradient vectors (applied measurement frame).</string>
             </property>
             <property name="statusTip">
-             <string></string>
+             <string/>
             </property>
             <property name="whatsThis">
-             <string notr="true"></string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string>Flip gradients</string>
@@ -297,10 +269,10 @@ QGroupBox, QGroupBox:disabled {
              <string>Retain only the specified number of gradient directions and according image volumes. The retained directions are spread equally over the half sphere using an iterative energy repulsion strategy.</string>
             </property>
             <property name="statusTip">
-             <string></string>
+             <string/>
             </property>
             <property name="whatsThis">
-             <string notr="true"></string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string>Reduce number of gradients</string>
@@ -374,13 +346,23 @@ QGroupBox, QGroupBox:disabled {
              <string>By default, the image matrix is applied to the image gradients. This button removes this additional rotation.</string>
             </property>
             <property name="statusTip">
-             <string></string>
+             <string/>
             </property>
             <property name="whatsThis">
-             <string notr="true"></string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string>Clear rotation of gradients</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="1">
+           <widget class="QCheckBox" name="m_KeepFirstNBox">
+            <property name="toolTip">
+             <string>Don't optimize gradients to retain, simply keep first n gradients per b-value.</string>
+            </property>
+            <property name="text">
+             <string>first n</string>
             </property>
            </widget>
           </item>
@@ -422,7 +404,7 @@ QGroupBox, QGroupBox:disabled {
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QSpinBox" name="m_RemoveGradientBox"></widget>
+           <widget class="QSpinBox" name="m_RemoveGradientBox"/>
           </item>
           <item row="1" column="0">
            <widget class="QCommandLinkButton" name="m_ExtractGradientButton">
@@ -435,7 +417,7 @@ QGroupBox, QGroupBox:disabled {
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QSpinBox" name="m_ExtractGradientBox"></widget>
+           <widget class="QSpinBox" name="m_ExtractGradientBox"/>
           </item>
          </layout>
         </widget>
@@ -511,13 +493,13 @@ QGroupBox, QGroupBox:disabled {
              <item row="0" column="1">
               <widget class="QDoubleSpinBox" name="m_Blur">
                <property name="toolTip">
-                <string comment='Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.' extracomment='Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.'>Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.</string>
+                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
                </property>
                <property name="statusTip">
-                <string comment='Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.' extracomment='Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.'>Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.</string>
+                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
                </property>
                <property name="whatsThis">
-                <string comment='Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.' extracomment='Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.'>Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.</string>
+                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
                </property>
                <property name="decimals">
                 <number>6</number>
@@ -536,13 +518,13 @@ QGroupBox, QGroupBox:disabled {
              <item row="0" column="0">
               <widget class="QLabel" name="label">
                <property name="toolTip">
-                <string comment='Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.' extracomment='Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.'>Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.</string>
+                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
                </property>
                <property name="statusTip">
-                <string comment='Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.' extracomment='Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.'>Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.</string>
+                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
                </property>
                <property name="whatsThis">
-                <string comment='Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.' extracomment='Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.'>Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" &gt; 0 is configured.</string>
+                <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
                </property>
                <property name="text">
                 <string>Merge radius</string>
@@ -561,10 +543,10 @@ QGroupBox, QGroupBox:disabled {
              <string>Merges selected DWIs of same dimension. If several b-values are present, the resulting image will contain multiple b-shells.</string>
             </property>
             <property name="statusTip">
-             <string></string>
+             <string/>
             </property>
             <property name="whatsThis">
-             <string notr="true"></string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string>Merge selected DWIs</string>
@@ -580,10 +562,10 @@ QGroupBox, QGroupBox:disabled {
              <string>Normalizes the diffusion-weighted image values across all weighted volumes to the given mean and standard deviation.</string>
             </property>
             <property name="statusTip">
-             <string></string>
+             <string/>
             </property>
             <property name="whatsThis">
-             <string notr="true"></string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string>Normalize image values</string>
@@ -667,10 +649,10 @@ QGroupBox, QGroupBox:disabled {
              <string>Multiple acquistions of one gradient direction can be averaged. Due to rounding errors, similar gradients often differ in the last decimal positions. The Merge radius allows to average them by taking all directions within a certain radius into account.</string>
             </property>
             <property name="statusTip">
-             <string></string>
+             <string/>
             </property>
             <property name="whatsThis">
-             <string notr="true"></string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string>Average repetitions</string>
@@ -774,10 +756,10 @@ QGroupBox, QGroupBox:disabled {
              <string>Merges selected DWIs of same dimension. If several b-values are present, the resulting image will contain multiple b-shells.</string>
             </property>
             <property name="statusTip">
-             <string></string>
+             <string/>
             </property>
             <property name="whatsThis">
-             <string notr="true"></string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string>Flip axis</string>
@@ -1017,13 +999,13 @@ QGroupBox, QGroupBox:disabled {
                 <bool>false</bool>
                </property>
                <property name="toolTip">
-                <string></string>
+                <string/>
                </property>
                <property name="statusTip">
-                <string></string>
+                <string/>
                </property>
                <property name="whatsThis">
-                <string notr="true"></string>
+                <string notr="true"/>
                </property>
                <property name="text">
                 <string>Resample image</string>
@@ -1122,7 +1104,7 @@ QGroupBox, QGroupBox:disabled {
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QSpinBox" name="m_XstartBox"></widget>
+           <widget class="QSpinBox" name="m_XstartBox"/>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_10">
@@ -1146,19 +1128,19 @@ QGroupBox, QGroupBox:disabled {
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QSpinBox" name="m_XendBox"></widget>
+           <widget class="QSpinBox" name="m_XendBox"/>
           </item>
           <item row="1" column="1">
-           <widget class="QSpinBox" name="m_YstartBox"></widget>
+           <widget class="QSpinBox" name="m_YstartBox"/>
           </item>
           <item row="1" column="2">
-           <widget class="QSpinBox" name="m_YendBox"></widget>
+           <widget class="QSpinBox" name="m_YendBox"/>
           </item>
           <item row="2" column="1">
-           <widget class="QSpinBox" name="m_ZstartBox"></widget>
+           <widget class="QSpinBox" name="m_ZstartBox"/>
           </item>
           <item row="2" column="2">
-           <widget class="QSpinBox" name="m_ZendBox"></widget>
+           <widget class="QSpinBox" name="m_ZendBox"/>
           </item>
          </layout>
         </widget>
@@ -1227,13 +1209,13 @@ QGroupBox, QGroupBox:disabled {
           <bool>false</bool>
          </property>
          <property name="toolTip">
-          <string></string>
+          <string/>
          </property>
          <property name="statusTip">
-          <string></string>
+          <string/>
          </property>
          <property name="whatsThis">
-          <string notr="true"></string>
+          <string notr="true"/>
          </property>
          <property name="text">
           <string>Apply new header information</string>
@@ -1614,10 +1596,10 @@ QGroupBox, QGroupBox:disabled {
           <string>If multiple baseline acquisitions are present, the default behaviour is to output an averaged image.</string>
          </property>
          <property name="statusTip">
-          <string></string>
+          <string/>
          </property>
          <property name="whatsThis">
-          <string notr="true"></string>
+          <string notr="true"/>
          </property>
          <property name="text">
           <string>Estimate binary brain mask</string>
@@ -1659,10 +1641,10 @@ QGroupBox, QGroupBox:disabled {
           <string>If multiple baseline acquisitions are present, the default behaviour is to output an averaged image.</string>
          </property>
          <property name="statusTip">
-          <string></string>
+          <string/>
          </property>
          <property name="whatsThis">
-          <string notr="true"></string>
+          <string notr="true"/>
          </property>
          <property name="text">
           <string>Extract baseline image</string>
@@ -1685,7 +1667,7 @@ QGroupBox, QGroupBox:disabled {
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11"></layoutdefault>
+ <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
    <class>QmitkDataStorageComboBox</class>
@@ -1761,6 +1743,6 @@ QGroupBox, QGroupBox:disabled {
   <tabstop>m_ExtractBrainMask</tabstop>
   <tabstop>m_BrainMaskIterationsBox</tabstop>
  </tabstops>
- <resources></resources>
- <connections></connections>
+ <resources/>
+ <connections/>
 </ui>

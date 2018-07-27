@@ -397,7 +397,7 @@ mitk::ReaderImplementationLevel
   gdcm::UIDs uidKnowledge;
   uidKnowledge.SetFromUID( sopClassUID.c_str() );
 
-  gdcm::UIDs::TSType gdcmType = uidKnowledge;
+  gdcm::UIDs::TSName gdcmType = static_cast<gdcm::UIDs::TSName>((gdcm::UIDs::TSType)uidKnowledge);
 
   switch ( gdcmType )
   {
@@ -523,11 +523,15 @@ void mitk::DICOMITKSeriesGDCMReader::EnsureMandatorySortersArePresent(
   splitter->AddDistinguishingTag( DICOMTag(0x0018, 0x1164) ); // Imager Pixel Spacing
   splitter->AddDistinguishingTag( DICOMTag(0x0020, 0x0037), new mitk::DICOMTagBasedSorter::CutDecimalPlaces(decimalPlacesForOrientation) ); // Image Orientation (Patient)
   splitter->AddDistinguishingTag( DICOMTag(0x0018, 0x0050) ); // Slice Thickness
-  if ( !simpleVolumeImport )
+  if ( simpleVolumeImport )
   {
-    std::cout << "Simple volume reading: ignoring number of frames" << std::endl;
+    MITK_DEBUG << "Simple volume reading: ignoring number of frames";
+  }
+  else
+  {
     splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0008) ); // Number of Frames
   }
+
   this->AddSortingElement( splitter, true ); // true = at front
 
   if ( m_EquiDistantBlocksSorter.IsNull() )

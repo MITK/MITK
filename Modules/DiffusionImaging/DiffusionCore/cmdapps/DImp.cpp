@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkIOUtil.h>
 #include "mitkCommandLineParser.h"
+#include <itksys/SystemTools.hxx>
+#include <mitkPreferenceListReaderOptionsFunctor.h>
 
-/*!
-\brief Copies transformation matrix of one image to another
-*/
+
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
@@ -45,8 +45,14 @@ int main(int argc, char* argv[])
 
   try
   {
-    mitk::Image::Pointer source = mitk::IOUtil::Load<mitk::Image>(imageName);
-    mitk::IOUtil::Save(source, outImage);
+    mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
+    mitk::Image::Pointer source = mitk::IOUtil::Load<mitk::Image>(imageName, &functor);
+
+    std::string ext = itksys::SystemTools::GetFilenameExtension(outImage);
+    if (ext==".nii" || ext==".nii.gz")
+      mitk::IOUtil::Save(source, "application/vnd.mitk.nii.gz", outImage);
+    else
+      mitk::IOUtil::Save(source, outImage);
   }
   catch (itk::ExceptionObject e)
   {

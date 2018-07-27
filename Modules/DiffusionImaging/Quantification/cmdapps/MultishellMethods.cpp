@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkOdfImage.h>
 #include <mitkBaseData.h>
 #include "mitkCommandLineParser.h"
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 
 #include <itkRadialMultishellToSingleshellImageFilter.h>
 #include <itkADCAverageFunctor.h>
@@ -92,8 +92,8 @@ int main(int argc, char* argv[])
       roundfilter->SetReferenceGradientDirectionContainer(mitk::DiffusionPropertyHelper::GetGradientContainer(dwi));
       roundfilter->Update();
 
-      dwi->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( roundfilter->GetNewBValue()  ) );
-      dwi->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( roundfilter->GetOutputGradientDirectionContainer() ) );
+      mitk::DiffusionPropertyHelper::SetReferenceBValue(dwi, roundfilter->GetNewBValue());
+      mitk::DiffusionPropertyHelper::SetGradientContainer(dwi, roundfilter->GetOutputGradientDirectionContainer());
 
       // filter input parameter
       const mitk::DiffusionPropertyHelper::BValueMapType
@@ -142,10 +142,10 @@ int main(int argc, char* argv[])
         filter->Update();
         // create new DWI image
         mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( filter->GetOutput() );
-        outImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( targetBValue  ) );
-        outImage->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetTargetGradientDirections() ) );
-        mitk::DiffusionPropertyHelper propertyHelper( outImage );
-        propertyHelper.InitializeImage();
+
+        mitk::DiffusionPropertyHelper::SetReferenceBValue(outImage, targetBValue);
+        mitk::DiffusionPropertyHelper::SetGradientContainer(outImage, filter->GetTargetGradientDirections());
+        mitk::DiffusionPropertyHelper::InitializeImage( outImage );
 
         mitk::IOUtil::Save(outImage, (outName + "_ADC.dwi").c_str());
       }
@@ -165,10 +165,10 @@ int main(int argc, char* argv[])
         filter->Update();
         // create new DWI image
         mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( filter->GetOutput() );
-        outImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( targetBValue  ) );
-        outImage->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetTargetGradientDirections() ) );
-        mitk::DiffusionPropertyHelper propertyHelper( outImage );
-        propertyHelper.InitializeImage();
+
+        mitk::DiffusionPropertyHelper::SetReferenceBValue(outImage, targetBValue);
+        mitk::DiffusionPropertyHelper::SetGradientContainer(outImage, filter->GetTargetGradientDirections());
+        mitk::DiffusionPropertyHelper::InitializeImage( outImage );
 
         mitk::IOUtil::Save(outImage, (std::string(outName) + "_AKC.dwi").c_str());
       }
@@ -188,10 +188,10 @@ int main(int argc, char* argv[])
         filter->Update();
         // create new DWI image
         mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( filter->GetOutput() );
-        outImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( targetBValue  ) );
-        outImage->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetTargetGradientDirections() ) );
-        mitk::DiffusionPropertyHelper propertyHelper( outImage );
-        propertyHelper.InitializeImage();
+
+        mitk::DiffusionPropertyHelper::SetReferenceBValue(outImage, targetBValue);
+        mitk::DiffusionPropertyHelper::SetGradientContainer(outImage, filter->GetTargetGradientDirections());
+        mitk::DiffusionPropertyHelper::InitializeImage( outImage );
 
         mitk::IOUtil::Save(outImage, (std::string(outName) + "_BiExp.dwi").c_str());
       }

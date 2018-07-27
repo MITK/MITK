@@ -65,7 +65,7 @@ void QmitkHeadMotionCorrectionView::CreateQtPartControl( QWidget *parent )
     m_Controls = new Ui::QmitkHeadMotionCorrectionViewControls;
     m_Controls->setupUi( parent );
     connect( m_Controls->m_ImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGUI()) );
-    connect( m_Controls->m_RegistrationStartButton, SIGNAL(clicked()), this, SLOT(StartRegistration()) );
+    connect( m_Controls->m_RegistrationStartButton, SIGNAL(clicked()), this, SLOT(StartCorrection()) );
     this->m_Parent = parent;
 
     m_Controls->m_ImageBox->SetDataStorage(this->GetDataStorage());
@@ -100,7 +100,7 @@ void QmitkHeadMotionCorrectionView::SetFocus()
   m_Controls->m_RegistrationStartButton->setFocus();
 }
 
-void QmitkHeadMotionCorrectionView::StartRegistration()
+void QmitkHeadMotionCorrectionView::StartCorrection()
 {
   mitk::DataNode::Pointer node = m_Controls->m_ImageBox->GetSelectedNode();
   mitk::Image::Pointer inImage = dynamic_cast<mitk::Image*>(node->GetData());
@@ -111,7 +111,7 @@ void QmitkHeadMotionCorrectionView::StartRegistration()
     return;
   }
 
-  DWIHeadMotionCorrectionFilterType::Pointer registerer = DWIHeadMotionCorrectionFilterType::New();
+  mitk::DWIHeadMotionCorrectionFilter::Pointer registerer = mitk::DWIHeadMotionCorrectionFilter::New();
   registerer->SetInput(inImage);
   registerer->Update();
   mitk::Image::Pointer image = registerer->GetCorrectedImage();

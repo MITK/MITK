@@ -50,6 +50,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateFunction.h>
 #include <mitkRenderingManager.h>
 #include <mitkProperties.h>
 
@@ -116,8 +117,6 @@ void QmitkImageCropper::CreateQtPartControl(QWidget *parent)
   setDefaultGUI();
   m_Controls.labelWarningRotation->setVisible(false);
 
-  m_BoundingObjectNames.clear();
-
   m_Advanced = false;
   this->OnAdvancedSettingsButtonToggled();
   m_ParentWidget = parent;
@@ -182,20 +181,19 @@ mitk::Geometry3D::Pointer QmitkImageCropper::InitializeWithImageGeometry(mitk::B
   return boundingGeometry;
 }
 
-QString QmitkImageCropper::getAdaptedBoundingObjectName(const QString& name) const
+QString QmitkImageCropper::AdaptBoundingObjectName(const QString& name) const
 {
-  bool nameNotTaken = false;
   unsigned int counter = 2;
-  QString newName;
-  while (!nameNotTaken)
+  QString newName = QString("%1 %2").arg(name).arg(counter);
+
+  while (nullptr != this->GetDataStorage()->GetNode(mitk::NodePredicateFunction::New([&newName](const mitk::DataNode *node)
   {
-    newName = name + "_" + QString::number(counter);
-    if (!m_BoundingObjectNames.contains(newName))
-    {
-      nameNotTaken = true;
-    }
-    ++counter;
+    return 0 == node->GetName().compare(newName.toStdString());
+  })))
+  {
+    newName = QString("%1 %2").arg(name).arg(++counter);
   }
+
   return newName;
 }
 
@@ -204,28 +202,15 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
   if (!m_ImageNode.IsExpired())
   {
     auto imageNode = m_ImageNode.Lock();
+    QString name = QString::fromStdString(imageNode->GetName() + " Bounding Shape");
 
-    bool ok = false;
-    QString defaultName = "BoundingShape";
-    if (m_BoundingObjectNames.contains(defaultName))
+    auto boundingShape = this->GetDataStorage()->GetNode(mitk::NodePredicateFunction::New([&name](const mitk::DataNode *node)
     {
-      defaultName = getAdaptedBoundingObjectName(defaultName);
-    }
-    QString name = QInputDialog::getText(QApplication::activeWindow()
-      , "Add cropping shape...", "Enter name for the new cropping shape", QLineEdit::Normal, defaultName, &ok);
-    if (!ok)
-      return;
+      return 0 == node->GetName().compare(name.toStdString());
+    }));
 
-    if (name == "")
-    {
-      name = "Bounding Shape";
-    }
-    if (m_BoundingObjectNames.contains(name))
-    {
-      name = getAdaptedBoundingObjectName(name);
-      QMessageBox::information(nullptr, "Information", "Bounding object name already exists. It was changed to: " + name);
-    }
-    m_BoundingObjectNames.append(name);
+    if (nullptr != boundingShape)
+      name = this->AdaptBoundingObjectName(name);
 
     m_Controls.buttonCropping->setEnabled(true);
     m_Controls.buttonMasking->setEnabled(true);
@@ -303,8 +288,8 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
     {
       m_ImageNode = nodes[0];
       m_Controls.groupBoundingObject->setEnabled(true);
-      m_Controls.labelWarningImage->setStyleSheet(" QLabel { color: rgb(0, 0, 0) }");
-      m_Controls.labelWarningImage->setText(QString::fromStdString("File name: " + nodes[0]->GetName()));
+      m_Controls.labelWarningImage->setStyleSheet("");
+      m_Controls.labelWarningImage->setText(QString::fromStdString("Selected image: " + nodes[0]->GetName()));
       m_Controls.buttonCreateNewBoundingBox->setEnabled(true);
 
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(nodes[0]->GetData());
@@ -397,22 +382,6 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
       setDefaultGUI();
       m_ParentWidget->setEnabled(true);
       m_Controls.labelWarningRotation->setVisible(false);
-    }
-  }
-}
-
-void QmitkImageCropper::NodeRemoved(const mitk::DataNode * node)
-{
-  QList<QString>::iterator it = m_BoundingObjectNames.begin();
-  while (it != m_BoundingObjectNames.end())
-  {
-    if (node->GetName() == it->toStdString())
-    {
-      it = m_BoundingObjectNames.erase(it);
-    }
-    else
-    {
-      ++it;
     }
   }
 }

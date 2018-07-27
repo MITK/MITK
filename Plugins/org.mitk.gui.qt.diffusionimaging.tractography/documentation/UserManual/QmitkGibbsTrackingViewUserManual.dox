@@ -15,7 +15,7 @@ Mandatory Input:
 Optional Input:
 \li Mask Image: White matter probability mask. Corresponds to the probability to generate fiber segments in the respective voxel.
 
-\section QmitkGibbsTrackingUserManualParameters ODF Reconstruction
+\section QmitkGibbsTrackingUserManualParameters Parameters
 
 \li Number of iterations: More iterations causes the algorithm to be more stable but also to take longer to finish the tracking. Recommended: minimum 10^8 iterations for full brain tractography.
 \li Particle length/width/weight controlling the contribution of each particle to the model M

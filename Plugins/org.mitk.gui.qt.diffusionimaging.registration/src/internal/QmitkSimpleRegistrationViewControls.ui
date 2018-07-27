@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>QmitkSimpleRegistrationViewControls</class>
  <widget class="QWidget" name="QmitkSimpleRegistrationViewControls">
@@ -14,40 +14,12 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string>QCommandLinkButton {
-  font-weight: normal;
-}
-
-QCommandLinkButton:disabled {
+   <string>QCommandLinkButton:disabled {
   border: none;
-  font-weight: lighter;
-}
-
-QToolBox::tab {
-  border: 1px solid #434346;
-  font-weight: bold;
-}
-
-QToolBox::tab:hover {
-  background-color: #434346;
-  font-weight: bold;
-}
-
-QToolBox::tab:selected {
-  background-color: #1c97ea;
-  border: 1px solid #1c97ea;
-  font-weight: bold;
 }
 
 QGroupBox {
-  border: 1px solid #434346;
-  background-color: #2d2d30;
-  margin-top: 8px;
-  padding-top: 8px;
-}
-
-QGroupBox, QGroupBox:disabled {
-  background-color: #2d2d30;
+  background-color: transparent;
 }</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
@@ -91,7 +63,7 @@ QGroupBox, QGroupBox:disabled {
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string></string>
+         <string/>
         </property>
         <property name="text">
          <string>Start Registration</string>
@@ -119,6 +91,13 @@ QGroupBox, QGroupBox:disabled {
          <property name="bottomMargin">
           <number>0</number>
          </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Registration Type:</string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="1">
           <widget class="QComboBox" name="m_RegBox">
            <item>
@@ -133,17 +112,10 @@ QGroupBox, QGroupBox:disabled {
            </item>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Registration Type:</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="1">
           <widget class="QCheckBox" name="m_RegOutputBox">
            <property name="text">
-            <string></string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -151,6 +123,20 @@ QGroupBox, QGroupBox:disabled {
           <widget class="QLabel" name="label_4">
            <property name="text">
             <string>Output Registration Object:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Always Resample to Target:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QCheckBox" name="m_ResampleBox">
+           <property name="text">
+            <string/>
            </property>
           </widget>
          </item>
@@ -179,7 +165,7 @@ QGroupBox, QGroupBox:disabled {
           <number>0</number>
          </property>
          <item row="1" column="1">
-          <widget class="QmitkDataStorageComboBox" name="m_MovingImageBox"></widget>
+          <widget class="QmitkDataStorageComboBox" name="m_MovingImageBox"/>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_2">
@@ -189,7 +175,7 @@ QGroupBox, QGroupBox:disabled {
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QmitkDataStorageComboBox" name="m_FixedImageBox"></widget>
+          <widget class="QmitkDataStorageComboBox" name="m_FixedImageBox"/>
          </item>
          <item row="1" column="2">
           <widget class="QSpinBox" name="m_MovingChannelBox">
@@ -251,7 +237,7 @@ QGroupBox, QGroupBox:disabled {
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string></string>
+         <string/>
         </property>
         <property name="text">
          <string>Start Tractography Registration</string>
@@ -284,7 +270,7 @@ QGroupBox, QGroupBox:disabled {
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QmitkDataStorageComboBox" name="m_RegObjectBox"></widget>
+          <widget class="QmitkDataStorageComboBox" name="m_RegObjectBox"/>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_6">
@@ -294,7 +280,7 @@ QGroupBox, QGroupBox:disabled {
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QmitkDataStorageComboBox" name="m_TractoBox"></widget>
+          <widget class="QmitkDataStorageComboBox" name="m_TractoBox"/>
          </item>
         </layout>
        </widget>
@@ -311,6 +297,6 @@ QGroupBox, QGroupBox:disabled {
    <header location="global">QmitkDataStorageComboBox.h</header>
   </customwidget>
  </customwidgets>
- <resources></resources>
- <connections></connections>
+ <resources/>
+ <connections/>
 </ui>

@@ -30,25 +30,27 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT VesselProperties : public itk::Object
     {
     public:
-      mitkClassMacroItkParent(VesselProperties, itk::Object)
-        itkFactorylessNewMacro(Self)
-        mitkNewMacro1Param(Self, Self::Pointer)
+      mitkClassMacroItkParent(VesselProperties, itk::Object);
+      itkFactorylessNewMacro(Self);
+      mitkNewMacro1Param(Self, Self::Pointer);
 
-        itkGetMacro(PositionVector, Vector::Pointer)
-        itkGetMacro(DirectionVector, Vector::Pointer)
-        itkGetMacro(RadiusInVoxel, double)
-        itkGetMacro(AbsorptionCoefficient, double)
-        itkGetMacro(ScatteringCoefficient, double)
-        itkGetMacro(AnisotopyCoefficient, double)
-        itkGetMacro(BifurcationFrequency, double)
+      itkGetMacro(PositionVector, Vector::Pointer);
+      itkGetMacro(DirectionVector, Vector::Pointer);
+      itkGetMacro(RadiusInVoxel, double);
+      itkGetMacro(AbsorptionCoefficient, double);
+      itkGetMacro(ScatteringCoefficient, double);
+      itkGetMacro(AnisotopyCoefficient, double);
+      itkGetMacro(BifurcationFrequency, double);
+      itkGetMacro(DoPartialVolume, bool);
 
-        itkSetMacro(PositionVector, Vector::Pointer)
-        itkSetMacro(DirectionVector, Vector::Pointer)
-        itkSetMacro(RadiusInVoxel, double)
-        itkSetMacro(AbsorptionCoefficient, double)
-        itkSetMacro(ScatteringCoefficient, double)
-        itkSetMacro(AnisotopyCoefficient, double)
-        itkSetMacro(BifurcationFrequency, double)
+      itkSetMacro(PositionVector, Vector::Pointer);
+      itkSetMacro(DirectionVector, Vector::Pointer);
+      itkSetMacro(RadiusInVoxel, double);
+      itkSetMacro(AbsorptionCoefficient, double);
+      itkSetMacro(ScatteringCoefficient, double);
+      itkSetMacro(AnisotopyCoefficient, double);
+      itkSetMacro(BifurcationFrequency, double);
+      itkSetMacro(DoPartialVolume, bool);
 
     protected:
       VesselProperties();
@@ -63,6 +65,7 @@ namespace mitk {
       double m_ScatteringCoefficient;
       double m_AnisotopyCoefficient;
       double m_BifurcationFrequency;
+      bool m_DoPartialVolume;
     };
 
     /**

@@ -25,12 +25,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <itkLinearInterpolateImageFunction.h>
 #include <mitkImage.h>
+#include <mitkDiffusionPropertyHelper.h>
 
 namespace mitk{
 
-class imv
+class MITKDIFFUSIONCORE_EXPORT imv
 {
 public:
+
+  static std::vector< std::pair< itk::Index<3>, double > > IntersectImage(itk::Vector<double,3>& spacing, itk::Index<3>& si, itk::Index<3>& ei, itk::ContinuousIndex<float, 3>& sf, itk::ContinuousIndex<float, 3>& ef);
 
   template< class TPixelType, class TOutPixelType=TPixelType >
   static TOutPixelType GetImageValue(const itk::Point<float, 3>& itkP, bool interpolate, typename itk::LinearInterpolateImageFunction< itk::Image< TPixelType, 3 >, float >::Pointer interpolator)
@@ -100,17 +103,21 @@ class MITKDIFFUSIONCORE_EXPORT gradients
 {
 private:
   typedef std::vector<unsigned int> IndiciesVector;
-  typedef std::map<unsigned int, IndiciesVector > BValueMap;
-  typedef itk::VectorContainer< unsigned int, vnl_vector_fixed< double, 3 > > GradientDirectionContainerType;
-  typedef vnl_vector_fixed<double , 3 > GradientDirectionType;
+  typedef mitk::BValueMapProperty::BValueMap  BValueMap;
+
+  typedef DiffusionPropertyHelper::GradientDirectionsContainerType GradientDirectionContainerType;
+  typedef DiffusionPropertyHelper::GradientDirectionType GradientDirectionType;
 
 public:
+
+  static GradientDirectionContainerType::Pointer ReadBvalsBvecs(std::string bvals_file, std::string bvecs_file, double& reference_bval);
+  static void WriteBvalsBvecs(std::string bvals_file, std::string bvecs_file, GradientDirectionContainerType::Pointer gradients, double reference_bval);
   static std::vector<unsigned int> GetAllUniqueDirections(const BValueMap &bValueMap, GradientDirectionContainerType *refGradientsContainer );
 
   static bool CheckForDifferingShellDirections(const BValueMap &bValueMap, GradientDirectionContainerType::ConstPointer refGradientsContainer);
   static vnl_matrix<double> ComputeSphericalHarmonicsBasis(const vnl_matrix<double> & QBallReference, const unsigned int & LOrder);
   static vnl_matrix<double> ComputeSphericalFromCartesian(const IndiciesVector  & refShell, const GradientDirectionContainerType * refGradientsContainer);
-  static mitk::gradients::GradientDirectionContainerType::Pointer CreateNormalizedUniqueGradientDirectionContainer(const BValueMap &bValueMap, const GradientDirectionContainerType * origninalGradentcontainer);
+  static GradientDirectionContainerType::Pointer CreateNormalizedUniqueGradientDirectionContainer(const BValueMap &bValueMap, const GradientDirectionContainerType * origninalGradentcontainer);
 };
 
 }

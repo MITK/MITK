@@ -34,6 +34,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.diffusionimagingapp:OFF
   org.mitk.gui.qt.datamanager:ON
   org.mitk.gui.qt.datamanagerlight:OFF
+  org.mitk.gui.qt.datastorageviewertest:OFF
   org.mitk.gui.qt.properties:ON
   org.mitk.gui.qt.basicimageprocessing:OFF
   org.mitk.gui.qt.dicom:OFF
@@ -76,6 +77,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.tubegraph:OFF
   org.mitk.gui.qt.ugvisualization:OFF
   org.mitk.gui.qt.photoacoustics.pausviewer:OFF
+  org.mitk.gui.qt.photoacoustics.pausmotioncompensation:OFF
   org.mitk.gui.qt.photoacoustics.imageprocessing:OFF
   org.mitk.gui.qt.photoacoustics.simulation:OFF
   org.mitk.gui.qt.ultrasound:OFF
@@ -99,4 +101,12 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.matchpoint.manipulator:OFF
   org.mitk.gui.qt.preprocessing.resampling:OFF
   org.mitk.gui.qt.cest:OFF
+  org.mitk.gui.qt.fit.demo:OFF
+  org.mitk.gui.qt.fit.inspector:OFF
+  org.mitk.gui.qt.fit.genericfitting:OFF
+  org.mitk.gui.qt.pharmacokinetics.mri:OFF
+  org.mitk.gui.qt.pharmacokinetics.pet:OFF
+  org.mitk.gui.qt.pharmacokinetics.simulation:OFF
+  org.mitk.gui.qt.pharmacokinetics.curvedescriptor:OFF
+  org.mitk.gui.qt.pharmacokinetics.concentration.mri:OFF
 )

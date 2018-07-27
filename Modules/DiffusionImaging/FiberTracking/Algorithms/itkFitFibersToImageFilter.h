@@ -347,16 +347,10 @@ public:
   itkGetMacro( Lambda, double)
   itkSetMacro( MaxIterations, int)
   itkGetMacro( MaxIterations, int)
-  itkSetMacro( FiberSampling, float)
-  itkGetMacro( FiberSampling, float)
   itkSetMacro( FilterOutliers, bool)
   itkGetMacro( FilterOutliers, bool)
   itkSetMacro( Verbose, bool)
   itkGetMacro( Verbose, bool)
-  itkSetMacro( DeepCopy, bool)
-  itkGetMacro( DeepCopy, bool)
-  itkSetMacro( ResampleFibers, bool)
-  itkGetMacro( ResampleFibers, bool)
 
   itkGetMacro( Weights, vnl_vector<double>)
   itkGetMacro( RmsDiffPerBundle, vnl_vector<double>)
@@ -403,6 +397,7 @@ protected:
   FitFibersToImageFilter();
   virtual ~FitFibersToImageFilter();
 
+  itk::Point<float, 3> GetItkPoint(double point[3]);
   void GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer m_PeakImage , vnl_vector_fixed<float,3> fiber_dir, int& id, double& w, double& peak_mag );
 
   void CreatePeakSystem();
@@ -422,7 +417,6 @@ protected:
   double                                      m_GradientTolerance;
   double                                      m_Lambda;
   int                                         m_MaxIterations;
-  float                                       m_FiberSampling;
   double                                      m_Coverage;
   double                                      m_Overshoot;
   double                                      m_RMSE;
@@ -432,8 +426,6 @@ protected:
   double                                      m_MinWeight;
   double                                      m_MaxWeight;
   bool                                        m_Verbose;
-  bool                                        m_DeepCopy;
-  bool                                        m_ResampleFibers;
   unsigned int                                m_NumUnknowns;
   unsigned int                                m_NumResiduals;
   unsigned int                                m_NumCoveredDirections;

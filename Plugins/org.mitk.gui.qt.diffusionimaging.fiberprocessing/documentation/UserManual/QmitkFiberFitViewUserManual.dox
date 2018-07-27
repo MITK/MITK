@@ -3,7 +3,7 @@
 
 Linearly fits a scalar weight for each streamline in order to optimally explain the input image. Corrseponding command line tool is MitkFitFibersToImage.
 
-\section SecParams Input Data and Parameters
+\section SecFiberFitParams Input Data and Parameters
 
 - Image: The image data used to fit the fiber weights. Possible input types:
   - Peak images. The input peak magnitudes are approximated using the voxel-wise fixel magnitudes obtained from the input tractogram.

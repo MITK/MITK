@@ -388,7 +388,12 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   }
 }
 
-
+template< class T, class TG, class TO, int L, int NODF>
+void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
+::AfterThreadedGenerateData()
+{
+  MITK_INFO << "Finished reconstruction";
+}
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
@@ -599,7 +604,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     break;
   }
   clock.Stop();
-  MITK_INFO << "Reconstruction in : " << clock.GetTotal() << " s";
 }
 
 
@@ -681,8 +685,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     ++git;
 
   }
-
-  MITK_INFO << "One Thread finished reconstruction";
 }
 
 //#include "itkLevenbergMarquardtOptimizer.h"
@@ -958,9 +960,6 @@ template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T, TG, TO, L, NODF>::
 ComputeSphericalHarmonicsBasis(vnl_matrix<double> * QBallReference, vnl_matrix<double> *SHBasisOutput, int LOrder , vnl_matrix<double>* LaplaciaBaltramiOutput, vnl_vector<int>* SHOrderAssociation, vnl_matrix<double>* SHEigenvalues)
 {
-
-  // MITK_INFO << *QBallReference;
-
   for(unsigned int i=0; i< (*SHBasisOutput).rows(); i++)
   {
     for(int k = 0; k <= LOrder; k += 2)

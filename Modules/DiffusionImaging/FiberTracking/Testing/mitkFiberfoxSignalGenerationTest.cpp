@@ -191,15 +191,14 @@ public:
     tractsToDwiFilter->Update();
 
     mitk::Image::Pointer testImage = mitk::GrabItkImageMemory( tractsToDwiFilter->GetOutput() );
-    testImage->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( parameters.m_SignalGen.GetGradientDirections() ) );
-    testImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( parameters.m_SignalGen.GetBvalue() ) );
+    mitk::DiffusionPropertyHelper::SetGradientContainer(testImage, parameters.m_SignalGen.GetItkGradientContainer());
+    mitk::DiffusionPropertyHelper::SetReferenceBValue(testImage, parameters.m_SignalGen.GetBvalue());
 
-    mitk::DiffusionPropertyHelper propertyHelper( testImage );
-    propertyHelper.InitializeImage();
+    mitk::DiffusionPropertyHelper::InitializeImage( testImage );
 
     if (refImage.IsNotNull())
     {
-      if( static_cast<mitk::GradientDirectionsProperty*>( refImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer().IsNotNull() )
+      if(mitk::DiffusionPropertyHelper::GetGradientContainer(refImage).IsNotNull() )
       {
         ItkDwiType::Pointer itkTestImagePointer = ItkDwiType::New();
         mitk::CastToItkImage(testImage, itkTestImagePointer);

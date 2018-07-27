@@ -11,4 +11,7 @@ mitk_create_plugin(
   PACKAGE_DEPENDS Qt5|Network BetData
 )
 
+#set(_install_DESTINATION "BetData")
+MITK_INSTALL(DIRECTORY ${BetData_DIR}/)
+
 endif()

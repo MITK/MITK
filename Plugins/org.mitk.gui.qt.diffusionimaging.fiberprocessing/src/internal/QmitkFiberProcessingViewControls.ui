@@ -14,40 +14,12 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string>QCommandLinkButton {
-  font-weight: normal;
-}
-
-QCommandLinkButton:disabled {
+   <string>QCommandLinkButton:disabled {
   border: none;
-  font-weight: lighter;
-}
-
-QToolBox::tab {
-  border: 1px solid #434346;
-  font-weight: bold;
-}
-
-QToolBox::tab:hover {
-  background-color: #434346;
-  font-weight: bold;
-}
-
-QToolBox::tab:selected {
-  background-color: #1c97ea;
-  border: 1px solid #1c97ea;
-  font-weight: bold;
 }
 
 QGroupBox {
-  border: 1px solid #434346;
-  background-color: #2d2d30;
-  margin-top: 8px;
-  padding-top: 8px;
-}
-
-QGroupBox, QGroupBox:disabled {
-  background-color: #2d2d30;
+  background-color: transparent;
 }</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
@@ -65,6 +37,12 @@ QGroupBox, QGroupBox:disabled {
    </property>
    <item row="1" column="0">
     <widget class="QToolBox" name="toolBoxx">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -1417,7 +1395,7 @@ QGroupBox, QGroupBox:disabled {
         <x>0</x>
         <y>0</y>
         <width>367</width>
-        <height>172</height>
+        <height>168</height>
        </rect>
       </property>
       <attribute name="label">

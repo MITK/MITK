@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseData.h>
 #include <mitkFiberBundle.h>
 #include "mitkCommandLineParser.h"
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <mitkCoreObjectFactory.h>
 #include <mitkIOUtil.h>
 #include <itkTractDensityImageFilter.h>
@@ -141,7 +141,6 @@ int main(int argc, char* argv[])
       generator->SetFiberBundle(fib);
       generator->SetBinaryOutput(binary);
       generator->SetOutputAbsoluteValues(!normalize);
-      generator->SetWorkOnFiberCopy(false);
       generator->SetUpsamplingFactor(upsampling);
 
       if (ref_img.IsNotNull())
@@ -172,7 +171,6 @@ int main(int argc, char* argv[])
       generator->SetFiberBundle(fib);
       generator->SetBinaryOutput(binary);
       generator->SetOutputAbsoluteValues(!normalize);
-      generator->SetWorkOnFiberCopy(false);
       generator->SetUpsamplingFactor(upsampling);
 
       if (ref_img.IsNotNull())

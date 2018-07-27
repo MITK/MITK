@@ -105,8 +105,6 @@ QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Po
   int resWidth = imageSource->GetResolutionOverrideWidth();
   int resHight = imageSource->GetResolutionOverrideHeight();
 
-  mitk::USImageVideoSource::USImageRoi roi = imageSource->GetRegionOfInterest();
-
   QString probes = ""; //ACV$100%1%1%0$120%2%2%0$140%2%2%5!BDW$90%1%1%2$100%1%1%8!CSV$50%1%2%3$60%2%2%5
 
   char probesSeperator = '!';
@@ -137,10 +135,6 @@ QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Po
     + QString::number(resOverride) + seperator
     + QString::number(resWidth) + seperator
     + QString::number(resHight) + seperator
-    + QString::number(roi.topLeftX) + seperator
-    + QString::number(roi.topLeftY) + seperator
-    + QString::number(roi.bottomRightX) + seperator
-    + QString::number(roi.bottomRightY) + seperator
     + probes
     ;
 
@@ -150,7 +144,14 @@ QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Po
 
 QString mitk::USDevicePersistence::USProbeToString(mitk::USProbe::Pointer p)
 {
-  QString probe = p->GetName().c_str();
+  QString probe = QString::fromStdString(p->GetName());
+  QString croppingSeparator = QString(",");
+  probe = probe + croppingSeparator + QString::number(p->GetProbeCropping().top)
+                + croppingSeparator + QString::number(p->GetProbeCropping().right)
+                + croppingSeparator + QString::number(p->GetProbeCropping().bottom)
+                + croppingSeparator + QString::number(p->GetProbeCropping().left)
+                + croppingSeparator;
+
   char depthSeperator = '$';
   char spacingSeperator = '%';
   std::map<int, mitk::Vector3D> depthsAndSpacing = p->GetDepthsAndSpacing();
@@ -171,7 +172,7 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
   std::string seperators = "|";
   std::string text = s.toStdString();
   split(text, seperators, data);
-  if (data.size() != 14)
+  if (data.size() != 10)
   {
     MITK_ERROR << "Cannot parse US device! (Size: " << data.size() << ")";
     return mitk::USVideoDevice::New("INVALID", "INVALID", "INVALID");
@@ -186,11 +187,6 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
   bool resOverride = (QString(data.at(6).c_str())).toInt();
   int resWidth = (QString(data.at(7).c_str())).toInt();
   int resHight = (QString(data.at(8).c_str())).toInt();
-  mitk::USImageVideoSource::USImageRoi cropArea;
-  cropArea.topLeftX = (QString(data.at(9).c_str())).toInt();
-  cropArea.topLeftY = (QString(data.at(10).c_str())).toInt();
-  cropArea.bottomRightX = (QString(data.at(11).c_str())).toInt();
-  cropArea.bottomRightY = (QString(data.at(12).c_str())).toInt();
 
   // Create Device
   mitk::USVideoDevice::Pointer returnValue;
@@ -223,9 +219,7 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
     imageSource->SetResolutionOverride(true);
   }
 
-  // Set Crop Area
-  imageSource->SetRegionOfInterest(cropArea);
-  std::string probes = data.at(13);
+  std::string probes = data.at(9);
   std::string probesSeperator = "!";
   std::vector<std::string> probesVector;
   split(probes, probesSeperator, probesVector);
@@ -241,18 +235,34 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
 mitk::USProbe::Pointer mitk::USDevicePersistence::StringToUSProbe(std::string s)
 {
   mitk::USProbe::Pointer probe = mitk::USProbe::New();
+  std::string croppingSeparator = ",";
   std::string spacingSeperator = "%";
   std::string depthSeperator = "$";
+  std::vector<std::string> probeCropping;
+  split(s, croppingSeparator, probeCropping);
+
   std::vector<std::string> depthsWithSpacings;
   split(s, depthSeperator, depthsWithSpacings);
 
+  //The first entry of the probeCropping vector is the name of the ultrasound probe:
+  std::string probeName = probeCropping.at(0);
+  probe->SetName(probeName);
+  //The entries 1, 2, 3 and 4 of the probeCropping vector are the cropping top,
+  // right, bottom and left:
+  if( probeCropping.size() >= 6 )
+  {
+    QString top = QString::fromStdString(probeCropping.at(1));
+    QString right = QString::fromStdString(probeCropping.at(2));
+    QString bottom = QString::fromStdString(probeCropping.at(3));
+    QString left = QString::fromStdString(probeCropping.at(4));
+    probe->SetProbeCropping(top.toUInt(), bottom.toUInt(), left.toUInt(), right.toUInt());
+  }
+
   for (std::vector<std::string>::iterator it = depthsWithSpacings.begin(); it != depthsWithSpacings.end(); it++)
   {
-    if (it == depthsWithSpacings.begin()) //first element is the name of the probe
-    {
-      probe->SetName(*it);
-    }
-    else //other elements are the scanning depths of the probe and the spacing
+    //The first element is the name of the probe and the cropping entries.
+    //other elements are the scanning depths of the probe and the spacing
+    if (it != depthsWithSpacings.begin())
     {
       std::vector<std::string> spacings;
       split(*it, spacingSeperator, spacings);

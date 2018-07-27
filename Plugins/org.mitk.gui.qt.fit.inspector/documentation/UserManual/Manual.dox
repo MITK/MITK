@@ -1,0 +1,14 @@
+/**
+\page org_mitk_gui_qt_fit_inspector Model Fit Inspector
+
+\image html mf.png "Icon of Model Fit Inspector"
+
+Available sections:
+  - \ref org_mitk_gui_qt_fit_inspectorOverview
+
+\section org_mitk_gui_qt_fit_inspectorOverview Overview
+The view can be used to inspect the following things:
+#1 raw data if it has multiple time steps
+#2 Fits and the fitted data
+
+*/

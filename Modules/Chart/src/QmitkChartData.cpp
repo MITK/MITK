@@ -16,7 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkChartData.h>
 
-QmitkChartData::QmitkChartData() : m_ShowSubchart(true), m_YAxisScale("")
+QmitkChartData::QmitkChartData()
+  : m_ShowSubchart(true)
+  , m_YAxisScale("")
+  , m_StackedData(false)
 {
 }
 

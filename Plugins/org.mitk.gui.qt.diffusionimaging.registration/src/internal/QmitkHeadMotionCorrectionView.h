@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkHeadMotionCorrectionViewControls.h"
 
 #include <mitkImage.h>
-#include <mitkDWIHeadMotionCorrectionFilter.h>
 
 #include <QThread>
 #include <QTime>
@@ -50,12 +49,10 @@ public:
   virtual void CreateQtPartControl(QWidget *parent) override;
   void SetFocus() override;
 
-  typedef mitk::DWIHeadMotionCorrectionFilter       DWIHeadMotionCorrectionFilterType;
-
 protected slots:
 
-    void StartRegistration();
-    void UpdateGUI();             ///< update button activity etc. dpending on current datamanager selection
+  void StartCorrection();
+  void UpdateGUI();             ///< update button activity etc. dpending on current datamanager selection
 
 
 protected:

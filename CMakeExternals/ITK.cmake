@@ -22,16 +22,7 @@ set(ITK_DEPENDS ${proj})
 
 if(NOT DEFINED ITK_DIR)
 
-  set(additional_cmake_args )
-  if(MINGW)
-    set(additional_cmake_args
-        -DCMAKE_USE_WIN32_THREADS:BOOL=ON
-        -DCMAKE_USE_PTHREADS:BOOL=OFF)
-  endif()
-
-  list(APPEND additional_cmake_args
-       -DUSE_WRAP_ITK:BOOL=OFF
-      )
+  set(additional_cmake_args -DUSE_WRAP_ITK:BOOL=OFF)
 
   if(MITK_USE_OpenCV)
     list(APPEND additional_cmake_args

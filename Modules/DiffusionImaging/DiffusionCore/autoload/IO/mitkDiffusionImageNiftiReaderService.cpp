@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageDataItem.h>
 #include <mitkLocaleSwitch.h>
 #include "mitkIOUtil.h"
-
+#include <mitkDiffusionFunctionCollection.h>
 
 namespace mitk
 {
@@ -273,168 +273,40 @@ void DiffusionImageNiftiReaderService::InternalRead()
       // Diffusion Image information START
       GradientDirectionContainerType::Pointer DiffusionVectors = GradientDirectionContainerType::New();
       MeasurementFrameType MeasurementFrame;
-      float BValue = -1;
+      double BValue = -1;
       // Diffusion Image information END
 
       if(ext == ".fsl" || ext == ".fslgz" || ext == ".nii" || ext == ".nii.gz")
       {
-        // some parsing depending on the extension
-        bool useFSLstyle( true );
-        std::string bvecsExtension("");
-        std::string bvalsExtension("");
-
         std::string base_path = itksys::SystemTools::GetFilenamePath(this->GetInputLocation());
         std::string base = this->GetMimeType()->GetFilenameWithoutExtension(this->GetInputLocation());
         if (!base_path.empty())
         {
-            base = base_path + "/" + base;
-            base_path += "/";
+          base = base_path + "/" + base;
+          base_path += "/";
         }
 
         // check for possible file names
-        {
-          if( useFSLstyle && itksys::SystemTools::FileExists( std::string( base + ".bvec").c_str() )
-              && itksys::SystemTools::FileExists( std::string( base + ".bval").c_str() )
-              )
-          {
-            useFSLstyle = false;
-            bvecsExtension = ".bvec";
-            bvalsExtension = ".bval";
-          }
+        std::string bvals_file, bvecs_file;
+        if (itksys::SystemTools::FileExists(base+".bvals"))
+          bvals_file = base+".bvals";
+        else if (itksys::SystemTools::FileExists(base+".bval"))
+          bvals_file = base+".bval";
+        else if (itksys::SystemTools::FileExists(base_path+"bvals"))
+          bvals_file = base_path + "bvals";
+        else if (itksys::SystemTools::FileExists(base_path+"bval"))
+          bvals_file = base_path + "bval";
 
-          if( useFSLstyle && itksys::SystemTools::FileExists( std::string( base + ".bvecs").c_str() )
-              && itksys::SystemTools::FileExists( std::string( base + ".bvals").c_str() )
-              )
-          {
-            useFSLstyle = false;
-            bvecsExtension = ".bvecs";
-            bvalsExtension = ".bvals";
-          }
-        }
+        if (itksys::SystemTools::FileExists(std::string(base+".bvecs").c_str()))
+          bvecs_file = base+".bvecs";
+        else if (itksys::SystemTools::FileExists(base+".bvec"))
+          bvals_file = base+".bvec";
+        else if (itksys::SystemTools::FileExists(base_path+"bvecs"))
+          bvecs_file = base_path + "bvecs";
+        else if (itksys::SystemTools::FileExists(base_path+"bvec"))
+          bvecs_file = base_path + "bvec";
 
-        std::string line;
-        std::vector<float> bvec_entries;
-        std::string fname = this->GetInputLocation();
-        if( useFSLstyle )
-        {
-          fname += ".bvecs";
-        }
-        else
-        {
-          fname = std::string( base + bvecsExtension);
-        }
-
-        // for hcp data
-        if ( !itksys::SystemTools::FileExists( fname.c_str() ) )
-        {
-            if ( itksys::SystemTools::FileExists( std::string( base_path + "bvec").c_str() ) )
-                fname = std::string( base_path + "bvec");
-            else  if ( itksys::SystemTools::FileExists( std::string( base_path + "bvecs").c_str() ) )
-                fname = std::string( base_path + "bvecs");
-        }
-
-        std::ifstream myfile (fname.c_str());
-        if (myfile.is_open())
-        {
-          while ( myfile.good() )
-          {
-            std::string line2;
-            getline (myfile,line2);
-
-            std::stringstream iss;
-            iss << line2;
-
-            while(getline(iss,line, ' '))
-            {
-              // remove any potenial control sequences that might be introduced by lines ending in a single space
-              line.erase(std::remove_if(line.begin(), line.end(),
-                                        [](char c) { return std::isspace(c) || std::iscntrl(c); } ), line.end());
-
-              if (line.length() > 0 ) // otherwise string contained only control characters before, empty string are converted to 0 by atof resulting in a broken b-value list
-              {
-                bvec_entries.push_back(atof(line.c_str()));
-              }
-            }
-          }
-          myfile.close();
-        }
-        else
-        {
-          MITK_INFO << "Unable to open bvecs file. Expected name: " << fname;
-        }
-
-        std::vector<float> bval_entries;
-        std::string fname2 = this->GetInputLocation();
-        if( useFSLstyle )
-        {
-          fname2 += ".bvals";
-        }
-        else
-        {
-          fname2 = std::string( base + bvalsExtension);
-        }
-
-        // for hcp data
-        if ( !itksys::SystemTools::FileExists( fname2.c_str() ) )
-        {
-            if ( itksys::SystemTools::FileExists( std::string( base_path + "bval").c_str() ) )
-                fname2 = std::string( base_path + "bval");
-            else  if ( itksys::SystemTools::FileExists( std::string( base_path + "bvals").c_str() ) )
-                fname2 = std::string( base_path + "bvals");
-        }
-
-        std::ifstream myfile2 (fname2.c_str());
-        if (myfile2.is_open())
-        {
-          while ( myfile2.good() )
-          {
-            getline (myfile2,line, ' ');
-            // remove any potenial control sequences that might be introduced by lines ending in a single space
-            line.erase(std::remove_if(line.begin(), line.end(),
-                                      [](char c) { return std::isspace(c) || std::iscntrl(c); } ), line.end());
-
-            if (line.length() > 0 ) // otherwise string contained only control characters before, empty string are converted to 0 by atof resulting in a broken b-value list
-            {
-              bval_entries.push_back(atof(line.c_str()));
-            }
-
-
-          }
-          myfile2.close();
-        }
-        else
-        {
-          MITK_INFO << "Unable to open bvals file. Expected name: " << fname2;
-        }
-
-
-        // Take the largest entry in bvals as the reference b-value
-        BValue = -1;
-        unsigned int numb = bval_entries.size();
-        for(unsigned int i=0; i<numb; i++)
-          if (bval_entries.at(i)>BValue)
-            BValue = bval_entries.at(i);
-
-        for(unsigned int i=0; i<numb; i++)
-        {
-          float b_val = bval_entries.at(i);
-
-          vnl_vector_fixed< double, 3 > vec;
-          vec[0] = bvec_entries.at(i);
-          vec[1] = bvec_entries.at(i+numb);
-          vec[2] = bvec_entries.at(i+2*numb);
-
-          // Adjust the vector length to encode gradient strength
-          float factor = b_val/BValue;
-          if(vec.magnitude() > 0)
-          {
-            vec[0] = sqrt(factor)*vec[0];
-            vec[1] = sqrt(factor)*vec[1];
-            vec[2] = sqrt(factor)*vec[2];
-          }
-
-          DiffusionVectors->InsertElement(i,vec);
-        }
+        DiffusionVectors = mitk::gradients::ReadBvalsBvecs(bvals_file, bvecs_file, BValue);
 
         for(int i=0; i<3; i++)
           for(int j=0; j<3; j++)
@@ -445,12 +317,11 @@ void DiffusionImageNiftiReaderService::InternalRead()
 
       // create BValueMap
       mitk::BValueMapProperty::BValueMap BValueMap = mitk::BValueMapProperty::CreateBValueMap(DiffusionVectors,BValue);
-      outputForCache->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( DiffusionVectors ) );
-      outputForCache->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( MeasurementFrame ) );
-      outputForCache->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str(), mitk::BValueMapProperty::New( BValueMap ) );
-      outputForCache->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( BValue ) );
-      mitk::DiffusionPropertyHelper propertyHelper( outputForCache );
-      propertyHelper.InitializeImage();
+      mitk::DiffusionPropertyHelper::SetOriginalGradientContainer(outputForCache, DiffusionVectors);
+      mitk::DiffusionPropertyHelper::SetMeasurementFrame(outputForCache, MeasurementFrame);
+      mitk::DiffusionPropertyHelper::SetBValueMap(outputForCache, BValueMap);
+      mitk::DiffusionPropertyHelper::SetReferenceBValue(outputForCache, BValue);
+      mitk::DiffusionPropertyHelper::InitializeImage(outputForCache);
 
       // Since we have already read the tree, we can store it in a cache variable
       // so that it can be assigned to the DataObject in GenerateData();

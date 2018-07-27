@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryPlatformUI.h>
 #include <mitkLogMacros.h>
+#include "QmitkNodeSelectionPreferencePage.h"
 
 QmitkCommonActivator* QmitkCommonActivator::m_Instance = nullptr;
 ctkPluginContext* QmitkCommonActivator::m_Context = nullptr;
@@ -53,6 +54,8 @@ QmitkCommonActivator::start(ctkPluginContext* context)
   {
     MITK_ERROR << "BlueBerry Workbench not running!";
   }
+
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkNodeSelectionPreferencePage, context)
 }
 
 void

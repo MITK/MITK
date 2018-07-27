@@ -123,6 +123,17 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
 
   float mr = m_LevelWindow.GetRange();
   float smallestLevelableValue = 1e-9;
+
+  //This check is needed as safe guard. LevelWindow is refactored to only deduce finite ranges
+  //from images, but old scene serialization may contain infinite ranges that overwrite the new
+  //business logic. This roots in two many "jobs" LevelWindow" is used for; see also T24962.
+  //Until LevelWindow and this widget is refactored the check was the minimal invasive fix.
+  if (!std::isfinite(mr))
+  {
+    mr = m_LevelWindow.GetWindow();
+  }
+
+
   // avoiding a division by 0 while still enabling small level windows
   if (mr < smallestLevelableValue)
     mr = smallestLevelableValue;
@@ -134,6 +145,24 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
   {
     double minRange = (double)m_LevelWindow.GetRangeMin();
     double maxRange = (double)m_LevelWindow.GetRangeMax();
+
+    //This check is needed as safe guard. LevelWindow is refactored to only deduce finite ranges
+    //from images, but old scene serialization may contain infinite ranges that overwrite the new
+    //business logic. This roots in two many "jobs" LevelWindow" is used for; see also T24962.
+    //Until LevelWindow and this widget is refactored the check was the minimal invasive fix.
+    if (!std::isfinite(minRange))
+    {
+      minRange = m_LevelWindow.GetLowerWindowBound();
+    }
+    //This check is needed as safe guard. LevelWindow is refactored to only deduce finite ranges
+    //from images, but old scene serialization may contain infinite ranges that overwrite the new
+    //business logic. This roots in two many "jobs" LevelWindow" is used for; see also T24962.
+    //Until LevelWindow and this widget is refactored the check was the minimal invasive fix.
+    if (!std::isfinite(maxRange))
+    {
+      maxRange = m_LevelWindow.GetUpperWindowBound();
+    }
+
     int yValue = m_MoveHeight + (int)(minRange * fact);
     QString s = " 0";
     if (minRange < 0 && maxRange > 0)

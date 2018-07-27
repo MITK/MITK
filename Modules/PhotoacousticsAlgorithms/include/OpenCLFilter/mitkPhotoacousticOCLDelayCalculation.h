@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOclDataSetToDataSetFilter.h"
 #include <itkObject.h>
-#include "mitkPhotoacousticBeamformingSettings.h"
+#include "mitkBeamformingSettings.h"
 
 namespace mitk
 {
@@ -34,21 +34,11 @@ namespace mitk
 
   class OCLDelayCalculation : public OclDataSetToDataSetFilter, public itk::Object
   {
-
   public:
     mitkClassMacroItkParent(OCLDelayCalculation, itk::Object);
-    itkNewMacro(Self);
+    mitkNewMacro1Param(Self, mitk::BeamformingSettings::Pointer);
 
     void Update();
-
-    /** \brief Sets a new configuration to use.
-    *
-    * @param conf The configuration set to use for the calculation of the delays.
-    */
-    void SetConfig(BeamformingSettings conf)
-    {
-      m_Conf = conf;
-    }
 
     /** \brief Sets the usedLines buffer object to use for the calculation of the delays.
     *
@@ -61,7 +51,7 @@ namespace mitk
 
   protected:
 
-    OCLDelayCalculation();
+    OCLDelayCalculation(mitk::BeamformingSettings::Pointer settings);
     virtual ~OCLDelayCalculation();
 
     /** Initialize the filter */
@@ -87,7 +77,7 @@ namespace mitk
     /** The OpenCL kernel for the filter */
     cl_kernel m_PixelCalculation;
 
-    BeamformingSettings m_Conf;
+    BeamformingSettings::Pointer m_Conf;
     cl_mem m_UsedLines;
     unsigned int m_BufferSize;
     float m_DelayMultiplicatorRaw;

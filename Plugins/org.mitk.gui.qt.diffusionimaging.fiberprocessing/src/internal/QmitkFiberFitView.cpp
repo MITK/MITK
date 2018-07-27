@@ -219,8 +219,7 @@ void QmitkFiberFitView::StartFit()
     {
       mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( fitter->GetFittedImageDiff().GetPointer() );
       mitk::DiffusionPropertyHelper::CopyProperties(mitk_image, outImage, true);
-      mitk::DiffusionPropertyHelper propertyHelper( outImage );
-      propertyHelper.InitializeImage();
+      mitk::DiffusionPropertyHelper::InitializeImage( outImage );
 
       mitk::DataNode::Pointer new_node = mitk::DataNode::New();
       new_node->SetData(outImage);
@@ -231,8 +230,7 @@ void QmitkFiberFitView::StartFit()
     {
       mitk::Image::Pointer outImage = mitk::GrabItkImageMemory( fitter->GetResidualImageDiff().GetPointer() );
       mitk::DiffusionPropertyHelper::CopyProperties(mitk_image, outImage, true);
-      mitk::DiffusionPropertyHelper propertyHelper( outImage );
-      propertyHelper.InitializeImage();
+      mitk::DiffusionPropertyHelper::InitializeImage( outImage );
 
       mitk::DataNode::Pointer new_node = mitk::DataNode::New();
       new_node->SetData(outImage);

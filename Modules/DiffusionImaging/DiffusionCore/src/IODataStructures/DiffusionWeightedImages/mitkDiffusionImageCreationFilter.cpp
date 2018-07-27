@@ -132,10 +132,10 @@ void mitk::DiffusionImageCreationFilter::GenerateData()
 
   // create BValueMap
   mitk::BValueMapProperty::BValueMap BValueMap = mitk::BValueMapProperty::CreateBValueMap( DiffusionVectors, BValue );
-  outputForCache->GetPropertyList()->ReplaceProperty( DPH::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( DiffusionVectors ) );
-  outputForCache->GetPropertyList()->ReplaceProperty( DPH::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( MeasurementFrame ) );
-  outputForCache->GetPropertyList()->ReplaceProperty( DPH::BVALUEMAPPROPERTYNAME.c_str(), mitk::BValueMapProperty::New( BValueMap ) );
-  outputForCache->GetPropertyList()->ReplaceProperty( DPH::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( BValue ) );
+  DPH::SetGradientContainer(outputForCache, DiffusionVectors);
+  DPH::SetMeasurementFrame(outputForCache, MeasurementFrame);
+  DPH::SetBValueMap(outputForCache, BValueMap);
+  DPH::SetReferenceBValue(outputForCache, BValue);
 
   outputForCache->Modified();
 }

@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // misc
 #include <cmath>
 #include <boost/progress.hpp>
+#include <vtkBox.h>
+#include <mitkDiffusionFunctionCollection.h>
 
 namespace itk{
 
@@ -34,9 +36,6 @@ TractDensityImageFilter< OutputImageType >::TractDensityImageFilter()
   , m_BinaryOutput(false)
   , m_UseImageGeometry(false)
   , m_OutputAbsoluteValues(false)
-  , m_UseTrilinearInterpolation(false)
-  , m_DoFiberResampling(true)
-  , m_WorkOnFiberCopy(true)
   , m_MaxDensity(0)
   , m_NumCoveredVoxels(0)
 {
@@ -121,25 +120,7 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
   // set/initialize output
   OutPixelType* outImageBufferPointer = (OutPixelType*)outImage->GetBufferPointer();
 
-  // resample fiber bundle
-  float minSpacing = 1;
-  if(newSpacing[0]<newSpacing[1] && newSpacing[0]<newSpacing[2])
-    minSpacing = newSpacing[0];
-  else if (newSpacing[1] < newSpacing[2])
-    minSpacing = newSpacing[1];
-  else
-    minSpacing = newSpacing[2];
-
-  if (m_DoFiberResampling)
-  {
-    MITK_INFO << "TractDensityImageFilter: resampling fibers to ensure sufficient voxel coverage";
-    if (m_WorkOnFiberCopy)
-      m_FiberBundle = m_FiberBundle->GetDeepCopy();
-    m_FiberBundle->ResampleLinear(minSpacing/10);
-  }
-
   MITK_INFO << "TractDensityImageFilter: starting image generation";
-
   vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
 
   int numFibers = m_FiberBundle->GetNumFibers();
@@ -154,97 +135,30 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
     float weight = m_FiberBundle->GetFiberWeight(i);
 
     // fill output image
-    for( int j=0; j<numPoints; j++)
+    for( int j=0; j<numPoints-1; j++)
     {
-      itk::Point<float, 3> vertex = GetItkPoint(points->GetPoint(j));
-      itk::Index<3> index;
-      itk::ContinuousIndex<float, 3> contIndex;
-      outImage->TransformPhysicalPointToIndex(vertex, index);
-      outImage->TransformPhysicalPointToContinuousIndex(vertex, contIndex);
+      itk::Point<float, 3> startVertex = GetItkPoint(points->GetPoint(j));
+      itk::Index<3> startIndex;
+      itk::ContinuousIndex<float, 3> startIndexCont;
+      outImage->TransformPhysicalPointToIndex(startVertex, startIndex);
+      outImage->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
 
-      if (!m_UseTrilinearInterpolation && outImage->GetLargestPossibleRegion().IsInside(index))
+      itk::Point<float, 3> endVertex = GetItkPoint(points->GetPoint(j + 1));
+      itk::Index<3> endIndex;
+      itk::ContinuousIndex<float, 3> endIndexCont;
+      outImage->TransformPhysicalPointToIndex(endVertex, endIndex);
+      outImage->TransformPhysicalPointToContinuousIndex(endVertex, endIndexCont);
+
+      std::vector< std::pair< itk::Index<3>, double > > segments = mitk::imv::IntersectImage(newSpacing, startIndex, endIndex, startIndexCont, endIndexCont);
+      for (std::pair< itk::Index<3>, double > segment : segments)
       {
-        if (outImage->GetPixel(index)==0)
+        if (outImage->GetPixel(segment.first)==0)
           m_NumCoveredVoxels++;
 
         if (m_BinaryOutput)
-          outImage->SetPixel(index, 1);
+          outImage->SetPixel(segment.first, 1);
         else
-          outImage->SetPixel(index, outImage->GetPixel(index)+weight);
-        continue;
-      }
-
-      float frac_x = contIndex[0] - index[0];
-      float frac_y = contIndex[1] - index[1];
-      float frac_z = contIndex[2] - index[2];
-
-      if (frac_x<0)
-      {
-        index[0] -= 1;
-        frac_x += 1;
-      }
-      if (frac_y<0)
-      {
-        index[1] -= 1;
-        frac_y += 1;
-      }
-      if (frac_z<0)
-      {
-        index[2] -= 1;
-        frac_z += 1;
-      }
-
-      frac_x = 1-frac_x;
-      frac_y = 1-frac_y;
-      frac_z = 1-frac_z;
-
-      // int coordinates inside image?
-      if (index[0] < 0 || index[0] >= w-1)
-        continue;
-      if (index[1] < 0 || index[1] >= h-1)
-        continue;
-      if (index[2] < 0 || index[2] >= d-1)
-        continue;
-
-
-      if (outImageBufferPointer[( index[0]   + w*(index[1]  + h*index[2]  ))]==0)
-        m_NumCoveredVoxels++;
-      if (outImageBufferPointer[( index[0]   + w*(index[1]+1+ h*index[2]  ))]==0)
-        m_NumCoveredVoxels++;
-      if (outImageBufferPointer[( index[0]   + w*(index[1]  + h*index[2]+h))]==0)
-        m_NumCoveredVoxels++;
-      if (outImageBufferPointer[( index[0]   + w*(index[1]+1+ h*index[2]+h))]==0)
-        m_NumCoveredVoxels++;
-      if (outImageBufferPointer[( index[0]+1 + w*(index[1]  + h*index[2]  ))]==0)
-        m_NumCoveredVoxels++;
-      if (outImageBufferPointer[( index[0]+1 + w*(index[1]  + h*index[2]+h))]==0)
-        m_NumCoveredVoxels++;
-      if (outImageBufferPointer[( index[0]+1 + w*(index[1]+1+ h*index[2]  ))]==0)
-        m_NumCoveredVoxels++;
-      if (outImageBufferPointer[( index[0]+1 + w*(index[1]+1+ h*index[2]+h))]==0)
-        m_NumCoveredVoxels++;
-
-      if (m_BinaryOutput)
-      {
-        outImageBufferPointer[( index[0]   + w*(index[1]  + h*index[2]  ))] = 1;
-        outImageBufferPointer[( index[0]   + w*(index[1]+1+ h*index[2]  ))] = 1;
-        outImageBufferPointer[( index[0]   + w*(index[1]  + h*index[2]+h))] = 1;
-        outImageBufferPointer[( index[0]   + w*(index[1]+1+ h*index[2]+h))] = 1;
-        outImageBufferPointer[( index[0]+1 + w*(index[1]  + h*index[2]  ))] = 1;
-        outImageBufferPointer[( index[0]+1 + w*(index[1]  + h*index[2]+h))] = 1;
-        outImageBufferPointer[( index[0]+1 + w*(index[1]+1+ h*index[2]  ))] = 1;
-        outImageBufferPointer[( index[0]+1 + w*(index[1]+1+ h*index[2]+h))] = 1;
-      }
-      else
-      {
-        outImageBufferPointer[( index[0]   + w*(index[1]  + h*index[2]  ))] += (  frac_x)*(  frac_y)*(  frac_z);
-        outImageBufferPointer[( index[0]   + w*(index[1]+1+ h*index[2]  ))] += (  frac_x)*(1-frac_y)*(  frac_z);
-        outImageBufferPointer[( index[0]   + w*(index[1]  + h*index[2]+h))] += (  frac_x)*(  frac_y)*(1-frac_z);
-        outImageBufferPointer[( index[0]   + w*(index[1]+1+ h*index[2]+h))] += (  frac_x)*(1-frac_y)*(1-frac_z);
-        outImageBufferPointer[( index[0]+1 + w*(index[1]  + h*index[2]  ))] += (1-frac_x)*(  frac_y)*(  frac_z);
-        outImageBufferPointer[( index[0]+1 + w*(index[1]  + h*index[2]+h))] += (1-frac_x)*(  frac_y)*(1-frac_z);
-        outImageBufferPointer[( index[0]+1 + w*(index[1]+1+ h*index[2]  ))] += (1-frac_x)*(1-frac_y)*(  frac_z);
-        outImageBufferPointer[( index[0]+1 + w*(index[1]+1+ h*index[2]+h))] += (1-frac_x)*(1-frac_y)*(1-frac_z);
+          outImage->SetPixel(segment.first, outImage->GetPixel(segment.first)+segment.second * weight);
       }
     }
   }

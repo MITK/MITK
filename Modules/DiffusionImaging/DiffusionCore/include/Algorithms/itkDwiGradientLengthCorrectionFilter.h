@@ -29,44 +29,44 @@ class MITKDIFFUSIONCORE_EXPORT DwiGradientLengthCorrectionFilter : public Proces
 {
 
 public:
-    typedef DwiGradientLengthCorrectionFilter                                                           Self;
-    typedef SmartPointer<Self>                                                                          Pointer;
-    typedef SmartPointer<const Self>                                                                    ConstPointer;
-    typedef ProcessObject                                                                               Superclass;
+  typedef DwiGradientLengthCorrectionFilter                                                           Self;
+  typedef SmartPointer<Self>                                                                          Pointer;
+  typedef SmartPointer<const Self>                                                                    ConstPointer;
+  typedef ProcessObject                                                                               Superclass;
 
-    typedef vnl_vector_fixed< double, 3 >                                                               GradientDirectionType;
-    typedef itk::VectorContainer< unsigned int, GradientDirectionType >                                 GradientDirectionContainerType;
+  typedef vnl_vector_fixed< double, 3 >                                                               GradientDirectionType;
+  typedef itk::VectorContainer< unsigned int, GradientDirectionType >                                 GradientDirectionContainerType;
 
-    /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-    itkTypeMacro(DwiGradientLengthCorrectionFilter,ProcessObject)
+  /** Method for creation through the object factory. */
+  itkFactorylessNewMacro(Self)
+  itkCloneMacro(Self)
+  itkTypeMacro(DwiGradientLengthCorrectionFilter,ProcessObject)
 
-    void GenerateData() override;
+  void GenerateData() override;
 
-    void Update() override{
-        this->GenerateData();
-    }
+  void Update() override{
+    this->GenerateData();
+  }
 
-    // input
-    itkSetMacro(RoundingValue, int)
-    itkSetMacro(ReferenceBValue, double)
-    itkSetMacro(ReferenceGradientDirectionContainer, GradientDirectionContainerType::Pointer)
+  // input
+  itkSetMacro(RoundingValue, int)
+  itkSetMacro(ReferenceBValue, double)
+  itkSetMacro(ReferenceGradientDirectionContainer, GradientDirectionContainerType::Pointer)
 
-    // output
-    itkGetMacro(OutputGradientDirectionContainer, GradientDirectionContainerType::Pointer)
-    itkGetMacro(NewBValue, double)
+  // output
+  itkGetMacro(OutputGradientDirectionContainer, GradientDirectionContainerType::Pointer)
+  itkGetMacro(NewBValue, double)
 
-    protected:
-        DwiGradientLengthCorrectionFilter();
-    ~DwiGradientLengthCorrectionFilter() override;
+  protected:
+    DwiGradientLengthCorrectionFilter();
+  ~DwiGradientLengthCorrectionFilter() override;
 
-    double m_NewBValue;
-    double m_ReferenceBValue;
-    int m_RoundingValue;
+  double m_NewBValue;
+  double m_ReferenceBValue;
+  int m_RoundingValue;
 
-    GradientDirectionContainerType::Pointer m_ReferenceGradientDirectionContainer;
-    GradientDirectionContainerType::Pointer m_OutputGradientDirectionContainer;
+  GradientDirectionContainerType::Pointer m_ReferenceGradientDirectionContainer;
+  GradientDirectionContainerType::Pointer m_OutputGradientDirectionContainer;
 };
 
 

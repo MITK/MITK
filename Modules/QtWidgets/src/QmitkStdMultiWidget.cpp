@@ -1549,52 +1549,23 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEvent()
   }
 }
 
-mitk::DataNode::Pointer QmitkStdMultiWidget::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes)
-{
-  mitk::Point3D crosshairPos = this->GetCrossPosition();
-  mitk::DataNode::Pointer node;
-  int maxlayer = -32768;
-
-  if (nodes.IsNotNull())
-  {
-    mitk::BaseRenderer *baseRenderer = this->mitkWidget1->GetSliceNavigationController()->GetRenderer();
-    // find node with largest layer, that is the node shown on top in the render window
-    for (unsigned int x = 0; x < nodes->size(); x++)
-    {
-      if ((nodes->at(x)->GetData()->GetGeometry() != nullptr) &&
-          nodes->at(x)->GetData()->GetGeometry()->IsInside(crosshairPos))
-      {
-        int layer = 0;
-        if (!(nodes->at(x)->GetIntProperty("layer", layer)))
-          continue;
-        if (layer > maxlayer)
-        {
-          if (static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible(baseRenderer))
-          {
-            node = nodes->at(x);
-            maxlayer = layer;
-          }
-        }
-      }
-    }
-  }
-  return node;
-}
-
 void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
 {
   m_PendingCrosshairPositionEvent = false;
 
   // find image with highest layer
   mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
-  mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->m_DataStorage->GetSubset(isImageData).GetPointer();
+  mitk::DataStorage::SetOfObjects::ConstPointer nodes = m_DataStorage->GetSubset(isImageData).GetPointer();
+  mitk::Point3D crosshairPos = GetCrossPosition();
+  mitk::BaseRenderer* baseRenderer = mitkWidget1->GetSliceNavigationController()->GetRenderer();
+  auto globalCurrentTimePoint = baseRenderer->GetTime();
+  mitk::DataNode::Pointer node = mitk::FindTopmostVisibleNode(nodes, crosshairPos, globalCurrentTimePoint, baseRenderer);
 
-  mitk::DataNode::Pointer node;
   mitk::DataNode::Pointer topSourceNode;
   mitk::Image::Pointer image;
   bool isBinary = false;
-  node = this->GetTopLayerNode(nodes);
   int component = 0;
+
   if (node.IsNotNull())
   {
     node->GetBoolProperty("binary", isBinary);
@@ -1603,7 +1574,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = m_DataStorage->GetSources(node, nullptr, true);
       if (!sourcenodes->empty())
       {
-        topSourceNode = this->GetTopLayerNode(sourcenodes);
+        topSourceNode = mitk::FindTopmostVisibleNode(sourcenodes, crosshairPos,globalCurrentTimePoint, baseRenderer);
       }
       if (topSourceNode.IsNotNull())
       {
@@ -1623,11 +1594,9 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     }
   }
 
-  mitk::Point3D crosshairPos = this->GetCrossPosition();
   std::string statusText;
   std::stringstream stream;
   itk::Index<3> p;
-  mitk::BaseRenderer *baseRenderer = this->mitkWidget1->GetSliceNavigationController()->GetRenderer();
   unsigned int timestep = baseRenderer->GetTimeStep();
 
   if (image.IsNotNull() && (image->GetTimeSteps() > timestep))
@@ -1643,18 +1612,18 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess,
                             image->GetChannelDescriptor().GetPixelType(),
                             image,
-                            image->GetVolumeData(baseRenderer->GetTimeStep()),
+                            image->GetVolumeData(image->GetTimeGeometry()->TimePointToTimeStep(globalCurrentTimePoint)),
                             p,
                             pixelValue,
                             component);
 
     if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
     {
-      stream << "; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: " << std::scientific << pixelValue << "  ";
+      stream << "; Time: " <<globalCurrentTimePoint << " ms; Pixelvalue: " << std::scientific << pixelValue << "  ";
     }
     else
     {
-      stream << "; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: " << pixelValue << "  ";
+      stream << "; Time: " <<globalCurrentTimePoint << " ms; Pixelvalue: " << pixelValue << "  ";
     }
   }
   else

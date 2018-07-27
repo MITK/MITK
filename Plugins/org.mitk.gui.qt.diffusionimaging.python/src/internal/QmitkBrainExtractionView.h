@@ -22,14 +22,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 #include "ui_QmitkBrainExtractionViewControls.h"
 #include <mitkImage.h>
-#include <QThread>
-#include <QTime>
 
 #include <mitkDiffusionPropertyHelper.h>
 
 
 /*!
-\brief View for diffusion image registration / head motion correction
+\brief
 */
 class QmitkBrainExtractionView : public QmitkAbstractView
 {

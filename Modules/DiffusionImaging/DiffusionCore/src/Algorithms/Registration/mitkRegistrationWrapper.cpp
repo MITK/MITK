@@ -153,8 +153,7 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
     GrabItkImageMemory(duplicator->GetOutput(), img);
 
     mitk::DiffusionPropertyHelper::CopyProperties(diffImages, img, false);
-    mitk::DiffusionPropertyHelper propertyHelper( img );
-    propertyHelper.InitializeImage();
+    mitk::DiffusionPropertyHelper::InitializeImage(img);
 
     mitk::DiffusionImageCorrectionFilter::Pointer correctionFilter = mitk::DiffusionImageCorrectionFilter::New();
 
@@ -172,17 +171,10 @@ void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImag
   itk::B0ImageExtractionImageFilter<short,short >::Pointer b0Extraction = itk::B0ImageExtractionImageFilter<short,short>::New();
   offset[0]=offset[1]=offset[2]=0;
 
-  typedef itk::VectorImage<short, 3> ITKDiffusionImageType;
-
-
-
   if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( fixedDwi ) )
   { // Set b0 extraction as fixed image
-    mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer fixedGradientDirections =
-        static_cast<mitk::GradientDirectionsProperty*>( fixedDwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
-    ITKDiffusionImageType::Pointer itkFixedDwiPointer = ITKDiffusionImageType::New();
-    mitk::CastToItkImage(fixedDwi, itkFixedDwiPointer);
-
+    auto fixedGradientDirections = mitk::DiffusionPropertyHelper::GetGradientContainer(fixedDwi);
+    auto itkFixedDwiPointer = mitk::DiffusionPropertyHelper::GetItkVectorImage(fixedDwi);
     b0Extraction->SetInput( itkFixedDwiPointer );
     b0Extraction->SetDirections(fixedGradientDirections);
     b0Extraction->Update();
@@ -193,11 +185,8 @@ void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImag
   }
   if (mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( movingDwi ))
   { // Set b0 extraction as moving image
-    mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer movingGradientDirections =
-        static_cast<mitk::GradientDirectionsProperty*>( movingDwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
-
-    ITKDiffusionImageType::Pointer itkMovingDwiPointer = ITKDiffusionImageType::New();
-    mitk::CastToItkImage(movingDwi, itkMovingDwiPointer);
+    auto movingGradientDirections = mitk::DiffusionPropertyHelper::GetGradientContainer(movingDwi);
+    auto itkMovingDwiPointer = mitk::DiffusionPropertyHelper::GetItkVectorImage(movingDwi);
 
     b0Extraction->SetInput( itkMovingDwiPointer );
     b0Extraction->SetDirections(movingGradientDirections);

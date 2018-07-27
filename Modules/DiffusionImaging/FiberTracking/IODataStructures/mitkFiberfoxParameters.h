@@ -85,10 +85,12 @@ namespace mitk
       , m_EddyStrength(300)
       , m_Tau(70)
       , m_CroppingFactor(1)
+      , m_Drift(0.06)
       , m_DoAddGibbsRinging(false)
       , m_DoSimulateRelaxation(true)
       , m_DoAddMotion(false)
       , m_DoRandomizeMotion(true)
+      , m_DoAddDrift(false)
       , m_FrequencyMap(nullptr)
       , m_MaskImage(nullptr)
       , m_Bvalue(1000)
@@ -134,10 +136,12 @@ namespace mitk
     float                               m_EddyStrength;             ///< Strength of eddy current induced gradients in mT/m.
     float                               m_Tau;                      ///< Eddy current decay constant (in ms)
     float                               m_CroppingFactor;           ///< FOV size in y-direction is multiplied by this factor. Causes aliasing artifacts.
+    float                               m_Drift;                    ///< Global signal decrease by the end of the acquisition.
     bool                                m_DoAddGibbsRinging;        ///< Add Gibbs ringing artifact
     bool                                m_DoSimulateRelaxation;     ///< Add T2 relaxation effects
     bool                                m_DoAddMotion;              ///< Enable motion artifacts.
     bool                                m_DoRandomizeMotion;        ///< Toggles between random and linear motion.
+    bool                                m_DoAddDrift;               ///< Add quadratic signal drift.
     std::vector< bool >                 m_MotionVolumes;            ///< Indicates the image volumes that are affected by motion
     ///< with positive numbers, inverted logic with negative numbers.
     itk::Vector<float,3>                m_Translation;              ///< Maximum translational motion.
@@ -152,6 +156,7 @@ namespace mitk
     unsigned int GetNumBaselineVolumes();                    ///< Get number of non-diffusion-weighted image volumes
     unsigned int GetNumVolumes();                            ///< Get number of baseline and diffusion-weighted image volumes
     GradientListType GetGradientDirections();                ///< Return gradient direction container
+    mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer GetItkGradientContainer();
     GradientType GetGradientDirection(unsigned int i);
     std::vector< int > GetBvalues();                         ///< Returns a vector with all unique b-values (determined by the gradient magnitudes)
     double GetBvalue();
@@ -224,12 +229,12 @@ namespace mitk
       , m_OutputPrefix("fiberfox")
       , m_CheckOutputVolumeFractionsBox(false)
       , m_CheckAdvancedSignalOptionsBox(false)
-      , m_CheckAddNoiseBox(false)
-      , m_CheckAddGhostsBox(false)
-      , m_CheckAddAliasingBox(false)
-      , m_CheckAddSpikesBox(false)
-      , m_CheckAddEddyCurrentsBox(false)
-      , m_CheckAddDistortionsBox(false)
+      , m_DoAddNoise(false)
+      , m_DoAddGhosts(false)
+      , m_DoAddAliasing(false)
+      , m_DoAddSpikes(false)
+      , m_DoAddEddyCurrents(false)
+      , m_DoAddDistortions(false)
       , m_MotionVolumesBox("random")
       , m_CheckRealTimeFibersBox(true)
       , m_CheckAdvancedFiberOptionsBox(false)
@@ -249,12 +254,12 @@ namespace mitk
     // image generation
     bool                m_CheckOutputVolumeFractionsBox;
     bool                m_CheckAdvancedSignalOptionsBox;
-    bool                m_CheckAddNoiseBox;
-    bool                m_CheckAddGhostsBox;
-    bool                m_CheckAddAliasingBox;
-    bool                m_CheckAddSpikesBox;
-    bool                m_CheckAddEddyCurrentsBox;
-    bool                m_CheckAddDistortionsBox;
+    bool                m_DoAddNoise;
+    bool                m_DoAddGhosts;
+    bool                m_DoAddAliasing;
+    bool                m_DoAddSpikes;
+    bool                m_DoAddEddyCurrents;
+    bool                m_DoAddDistortions;
     std::string         m_MotionVolumesBox;
     // fiber generation
     bool                m_CheckRealTimeFibersBox;

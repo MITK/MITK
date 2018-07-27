@@ -1,0 +1,8 @@
+/**
+\page org_mitk_gui_qt_pharmacokinetics_mri The DCE MR Perfusion Datafit View
+
+\section org_mitk_gui_qt_pharmacokinetics_mri_Overview Overview
+
+This plug-in offers the possibilities to fit several pharmacokinetic modells onto DCE MR perfusion images.
+
+*/

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommandLineParser.h"
 #include <usAny.h>
 #include <mitkIOUtil.h>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <mitkCoreObjectFactory.h>
 #include <mitkFiberBundle.h>
 #include <mitkImageCast.h>
@@ -77,7 +77,6 @@ int main(int argc, char* argv[])
   try
   {
     itk::TractDensityImageFilter< ItkFloatImgType >::Pointer filter = itk::TractDensityImageFilter< ItkFloatImgType >::New();
-    filter->SetDoFiberResampling(true);
     filter->SetUpsamplingFactor(0.25);
     filter->SetBinaryOutput(true);
     MITK_INFO << "Loading references";
@@ -121,7 +120,6 @@ int main(int argc, char* argv[])
       std::cout.rdbuf (ss.rdbuf());       // <-- redirect
       bool is_overlapping = false;
       mitk::FiberBundle::Pointer fib = mitk::IOUtil::Load<mitk::FiberBundle>(f);
-      fib->ResampleLinear(2);
 
       float overlap = 0;
       float max_overlap = 0;
@@ -130,7 +128,7 @@ int main(int argc, char* argv[])
       std::string overlap_string = ist::GetFilenameWithoutExtension(f);
       for (auto m : masks)
       {
-        overlap = fib->GetOverlap(m, false);
+        overlap = fib->GetOverlap(m);
         if (overlap>max_overlap)
         {
           max_overlap = overlap;

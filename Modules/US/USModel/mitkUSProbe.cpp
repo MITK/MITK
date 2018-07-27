@@ -17,17 +17,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSProbe.h"
 #include <string>
 
-mitk::USProbe::USProbe() : itk::Object()
+mitk::USProbe::USProbe() : itk::Object(), m_CurrentDepth(0)
 {
 }
 
 mitk::USProbe::USProbe(std::string identifier)
-  : m_Name(identifier)
+  : m_Name(identifier), m_CurrentDepth(0)
 {
 }
 
 mitk::USProbe::~USProbe()
 {
+}
+
+void mitk::USProbe::SetProbeCropping(unsigned int top, unsigned int bottom, unsigned int left, unsigned int right)
+{
+  m_Cropping.top = top;
+  m_Cropping.bottom = bottom;
+  m_Cropping.left = left;
+  m_Cropping.right = right;
+}
+
+mitk::USProbe::USProbeCropping mitk::USProbe::GetProbeCropping()
+{
+  return m_Cropping;
 }
 
 bool mitk::USProbe::IsEqualToProbe(mitk::USProbe::Pointer probe)
@@ -51,7 +64,7 @@ void mitk::USProbe::SetDepth(int depth)
   mitk::Vector3D defaultSpacing;
   defaultSpacing[0] = 1;
   defaultSpacing[1] = 1;
-  defaultSpacing[2] = 0;
+  defaultSpacing[2] = 1;
 
   m_DepthsAndSpacings.insert(std::pair<int, mitk::Vector3D>(depth, defaultSpacing));
 }
@@ -79,10 +92,20 @@ mitk::Vector3D mitk::USProbe::GetSpacingForGivenDepth(int givenDepth)
     spacing[2] = it->second[2];
   }
   else
-  { //spacing does not exist, so set default spacing (1,1,0)
+  { //spacing does not exist, so set default spacing (1,1,1)
     spacing[0] = 1;
     spacing[1] = 1;
-    spacing[2] = 0;
+    spacing[2] = 1;
   }
   return spacing;
+}
+
+bool mitk::USProbe::IsDepthAndSpacingEmpty()
+{
+  if( m_DepthsAndSpacings.size() == 0 )
+  {
+    return true;
+  }
+
+  return false;
 }

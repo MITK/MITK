@@ -590,7 +590,7 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,ShOrder,NrOdfDire
   }
 
   if (m_BValue<0)
-    itkExceptionMacro("B-value needs to best before gradient image!");
+    mitkThrow() << "B-value needs to be set before gradient image! " << m_BValue;
 
   unsigned int numImages = gradientDirection->Size();
   this->m_NumberOfBaselineImages = 0;

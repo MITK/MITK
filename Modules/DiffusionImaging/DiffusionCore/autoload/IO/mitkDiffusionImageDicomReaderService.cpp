@@ -191,22 +191,11 @@ std::vector<itk::SmartPointer<mitk::BaseData> > DiffusionImageDicomReaderService
       tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0028, 0x0008) ); // Number of Frames
       //tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x0052) ); // Frame of Reference UID
 
-      // gdcmReader->AddSortingElement( tagSorter );
-      //mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
-
-      mitk::DICOMSortCriterion::ConstPointer sorting =
-          mitk::SortByImagePositionPatient::New(  // Image Position (Patient)
-                                                  //mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0013), // instance number
-                                                  mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0012), // aqcuisition number
-                                                                             mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0032), // aqcuisition time
-                                                                                                        mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0018, 0x1060), // trigger time
-                                                                                                                                   mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0018) // SOP instance UID (last resort, not really meaningful but decides clearly)
-                                                                                                                                                              ).GetPointer()
-                                                                                                                                   ).GetPointer()
-                                                                                                        ).GetPointer()
-                                                                             ).GetPointer()
-                                                  // ).GetPointer()
-                                                  ).GetPointer();
+      auto tag_sop_instance_uid = mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0018), nullptr ); // SOP instance UID (last resort, not really meaningful but decides clearly)
+      auto tag_trigger_time = mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0018, 0x1060), tag_sop_instance_uid.GetPointer() ); // trigger time
+      auto tag_aqcuisition_time = mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0032), tag_trigger_time.GetPointer()); // aqcuisition time
+      auto tag_aqcuisition_number = mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0012), tag_aqcuisition_time.GetPointer()); // aqcuisition number
+      mitk::DICOMSortCriterion::ConstPointer sorting = mitk::SortByImagePositionPatient::New(tag_aqcuisition_number.GetPointer()).GetPointer();
       tagSorter->SetSortCriterion( sorting );
 
       // mosaic

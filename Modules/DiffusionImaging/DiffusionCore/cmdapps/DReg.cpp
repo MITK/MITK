@@ -25,11 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRegistrationHelper.h>
 #include <mitkImageMappingHelper.h>
 #include <itksys/SystemTools.hxx>
+#include <mitkPreferenceListReaderOptionsFunctor.h>
 
 typedef mitk::DiffusionPropertyHelper DPH;
-/*!
-\brief Copies transformation matrix of one image to another
-*/
+
+
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
@@ -57,8 +57,10 @@ int main(int argc, char* argv[])
   {
     typedef itk::Image< float, 3 > ItkFloatImageType;
 
-    mitk::Image::Pointer fixed = mitk::IOUtil::Load<mitk::Image>(f);
-    mitk::Image::Pointer moving = mitk::IOUtil::Load<mitk::Image>(m);
+    mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
+    mitk::Image::Pointer fixed = mitk::IOUtil::Load<mitk::Image>(f, &functor);
+    mitk::Image::Pointer moving = mitk::IOUtil::Load<mitk::Image>(m, &functor);
+
     mitk::Image::Pointer fixed_single = fixed;
     mitk::Image::Pointer moving_single = moving;
 
@@ -102,8 +104,7 @@ int main(int argc, char* argv[])
 
     if (mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(registered_image))
     {
-      mitk::DiffusionPropertyHelper propertyHelper( registered_image );
-      propertyHelper.InitializeImage();
+      mitk::DiffusionPropertyHelper::InitializeImage( registered_image );
 
       std::string file_extension = itksys::SystemTools::GetFilenameExtension(o);
       if (file_extension==".nii" || file_extension==".nii.gz")

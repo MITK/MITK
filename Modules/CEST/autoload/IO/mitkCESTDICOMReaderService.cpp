@@ -74,30 +74,37 @@ namespace mitk
     const std::string parseStrategy = options.find("Force type")->second.ToString();
     const std::string mappingStrategy = options.find("Revision mapping")->second.ToString();
 
-    mitk::StringList relevantFiles = this->GetRelevantFiles();
-
-    mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
-
-    DICOMTag siemensCESTprivateTag(0x0029, 0x1020);
-
-    scanner->AddTag(siemensCESTprivateTag);
-    scanner->SetInputFiles(relevantFiles);
-    scanner->Scan();
-    mitk::DICOMTagCache::Pointer tagCache = scanner->GetScanCache();
-
-    DICOMImageFrameList imageFrameList = mitk::ConvertToDICOMImageFrameList(tagCache->GetFrameInfoList());
-    DICOMImageFrameInfo *firstFrame = imageFrameList.begin()->GetPointer();
-
-    std::string byteString = tagCache->GetTagValue(firstFrame, siemensCESTprivateTag).value;
-
-    mitk::CustomTagParser tagParser(relevantFiles[0]);
-    tagParser.SetParseStrategy(parseStrategy);
-    tagParser.SetRevisionMappingStrategy(mappingStrategy);
-
-    auto parsedPropertyList = tagParser.ParseDicomPropertyString(byteString);
-
     for (auto &item : result)
     {
+      auto prop = item->GetProperty("files");
+      auto fileProp = dynamic_cast<mitk::StringLookupTableProperty*>(prop.GetPointer());
+      if (!fileProp)
+      {
+        mitkThrow() << "Cannot load CEST file. Property \"files\" is missing after BaseDICOMReaderService::Read().";
+      }
+
+      mitk::StringList relevantFiles = { fileProp->GetValue().GetTableValue(0) };
+
+      mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
+
+      DICOMTag siemensCESTprivateTag(0x0029, 0x1020);
+
+      scanner->AddTag(siemensCESTprivateTag);
+      scanner->SetInputFiles(relevantFiles);
+      scanner->Scan();
+      mitk::DICOMTagCache::Pointer tagCache = scanner->GetScanCache();
+
+      DICOMImageFrameList imageFrameList = mitk::ConvertToDICOMImageFrameList(tagCache->GetFrameInfoList());
+      DICOMImageFrameInfo *firstFrame = imageFrameList.begin()->GetPointer();
+
+      std::string byteString = tagCache->GetTagValue(firstFrame, siemensCESTprivateTag).value;
+
+      mitk::CustomTagParser tagParser(relevantFiles[0]);
+      tagParser.SetParseStrategy(parseStrategy);
+      tagParser.SetRevisionMappingStrategy(mappingStrategy);
+
+      auto parsedPropertyList = tagParser.ParseDicomPropertyString(byteString);
+
       item->GetPropertyList()->ConcatenatePropertyList(parsedPropertyList);
     }
 

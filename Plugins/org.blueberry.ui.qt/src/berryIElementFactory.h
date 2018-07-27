@@ -46,7 +46,7 @@ struct IMemento;
  */
 struct BERRY_UI_QT IElementFactory
 {
-  ~IElementFactory();
+  virtual ~IElementFactory();
 
   /**
    * Re-creates and returns an object from the state captured within the given

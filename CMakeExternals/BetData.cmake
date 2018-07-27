@@ -16,8 +16,10 @@ set(BetData_DEPENDS ${proj})
 
 if(NOT DEFINED BetData_DIR)
 
+  set(BetData_DIR ${ep_prefix}/src/${proj}/)
+
   ExternalProject_Add(${proj}
-    URL http://mitk.org/download/data/MITK-BET-20171220.tar.gz
+    URL http://mitk.org/download/data/MITK-BET-20180711.tar.gz
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
@@ -25,7 +27,6 @@ if(NOT DEFINED BetData_DIR)
     DEPENDS ${proj_DEPENDENCIES}
   )
 
-  set(BetData_DIR ${ep_prefix}/src/${proj}/)
   configure_file(${CMAKE_CURRENT_LIST_DIR}/${proj}.h.in ${CMAKE_BINARY_DIR}/${proj}.h)
 
 else()

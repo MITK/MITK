@@ -27,7 +27,7 @@ foreach(i RANGE 7)
   list(APPEND US_BUILD_CONFIGURATION ${i})
 endforeach()
 
-if(WIN32 AND NOT MINGW)
+if(WIN32)
   set(US_CMAKE_GENERATOR
       "Visual Studio 9 2008"
       "Visual Studio 10"

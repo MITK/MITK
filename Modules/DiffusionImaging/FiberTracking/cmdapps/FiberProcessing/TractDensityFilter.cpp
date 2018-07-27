@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommandLineParser.h"
 #include <usAny.h>
 #include <mitkIOUtil.h>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <mitkFiberBundle.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
@@ -78,7 +78,6 @@ int main(int argc, char* argv[])
     generator->SetFiberBundle(inputTractogram);
     generator->SetBinaryOutput(false);
     generator->SetOutputAbsoluteValues(false);
-    generator->SetWorkOnFiberCopy(true);
     generator->Update();
 
     itk::FiberExtractionFilter<float>::Pointer extractor = itk::FiberExtractionFilter<float>::New();

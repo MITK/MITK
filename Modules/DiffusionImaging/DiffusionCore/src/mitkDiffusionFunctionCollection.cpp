@@ -17,15 +17,112 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionFunctionCollection.h"
 #include "mitkNumericTypes.h"
 
-// Namespace ::SH
 #include <boost/math/special_functions/legendre.hpp>
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 #include <boost/version.hpp>
 #include <itkPointShell.h>
-
-// Namespace ::Gradients
 #include "itkVectorContainer.h"
 #include "vnl/vnl_vector.h"
+#include <vtkBox.h>
+#include <vtkMath.h>
+#include <itksys/SystemTools.hxx>
+#include <boost/algorithm/string.hpp>
+
+// Intersect a finite line (with end points p0 and p1) with all of the
+// cells of a vtkImageData
+std::vector< std::pair< itk::Index<3>, double > > mitk::imv::IntersectImage(itk::Vector<double,3>& spacing, itk::Index<3>& si, itk::Index<3>& ei, itk::ContinuousIndex<float, 3>& sf, itk::ContinuousIndex<float, 3>& ef)
+{
+  std::vector< std::pair< itk::Index<3>, double > > out;
+  if (si == ei)
+  {
+    double d[3];
+    for (int i=0; i<3; ++i)
+      d[i] = (sf[i]-ef[i])*spacing[i];
+    double len = std::sqrt( d[0]*d[0] + d[1]*d[1] + d[2]*d[2] );
+    out.push_back(  std::pair< itk::Index<3>, double >(si, len) );
+    return out;
+  }
+
+  double bounds[6];
+
+  double entrancePoint[3];
+  double exitPoint[3];
+
+  double startPoint[3];
+  double endPoint[3];
+
+  double t0, t1;
+  for (int i=0; i<3; ++i)
+  {
+    startPoint[i] = sf[i];
+    endPoint[i] = ef[i];
+
+    if (si[i]>ei[i])
+    {
+      int t = si[i];
+      si[i] = ei[i];
+      ei[i] = t;
+    }
+  }
+
+  for (int x = si[0]; x<=ei[0]; ++x)
+    for (int y = si[1]; y<=ei[1]; ++y)
+      for (int z = si[2]; z<=ei[2]; ++z)
+      {
+        bounds[0] = (double)x - 0.5;
+        bounds[1] = (double)x + 0.5;
+        bounds[2] = (double)y - 0.5;
+        bounds[3] = (double)y + 0.5;
+        bounds[4] = (double)z - 0.5;
+        bounds[5] = (double)z + 0.5;
+
+        int entryPlane;
+        int exitPlane;
+        int hit = vtkBox::IntersectWithLine(bounds,
+                                            startPoint,
+                                            endPoint,
+                                            t0,
+                                            t1,
+                                            entrancePoint,
+                                            exitPoint,
+                                            entryPlane,
+                                            exitPlane);
+        if (hit)
+        {
+          if (entryPlane>=0 && exitPlane>=0)
+          {
+            double d[3];
+            for (int i=0; i<3; ++i)
+              d[i] = (exitPoint[i] - entrancePoint[i])*spacing[i];
+            double len = std::sqrt( d[0]*d[0] + d[1]*d[1] + d[2]*d[2] );
+
+            itk::Index<3> idx; idx[0] = x; idx[1] = y; idx[2] = z;
+            out.push_back(  std::pair< itk::Index<3>, double >(idx, len) );
+          }
+          else if (entryPlane>=0)
+          {
+            double d[3];
+            for (int i=0; i<3; ++i)
+              d[i] = (ef[i] - entrancePoint[i])*spacing[i];
+            double len = std::sqrt( d[0]*d[0] + d[1]*d[1] + d[2]*d[2] );
+
+            itk::Index<3> idx; idx[0] = x; idx[1] = y; idx[2] = z;
+            out.push_back(  std::pair< itk::Index<3>, double >(idx, len) );
+          }
+          else if (exitPlane>=0)
+          {
+            double d[3];
+            for (int i=0; i<3; ++i)
+              d[i] = (exitPoint[i]-sf[i])*spacing[i];
+            double len = std::sqrt( d[0]*d[0] + d[1]*d[1] + d[2]*d[2] );
+
+            itk::Index<3> idx; idx[0] = x; idx[1] = y; idx[2] = z;
+            out.push_back(  std::pair< itk::Index<3>, double >(idx, len) );
+          }
+        }
+      }
+  return out;
+}
 
 //------------------------- SH-function ------------------------------------
 
@@ -131,6 +228,135 @@ vnl_matrix<float> mitk::sh::CalcShBasisForDirections(int sh_order, vnl_matrix<do
 }
 
 //------------------------- gradients-function ------------------------------------
+
+
+mitk::gradients::GradientDirectionContainerType::Pointer mitk::gradients::ReadBvalsBvecs(std::string bvals_file, std::string bvecs_file, double& reference_bval)
+{
+  mitk::gradients::GradientDirectionContainerType::Pointer directioncontainer = mitk::gradients::GradientDirectionContainerType::New();
+
+  std::vector<float> bvec_entries;
+  if (!itksys::SystemTools::FileExists(bvecs_file))
+    mitkThrow() << "bvecs file not existing: " << bvecs_file;
+  else
+  {
+    std::string line;
+    std::ifstream myfile (bvecs_file.c_str());
+    if (myfile.is_open())
+    {
+      while (std::getline(myfile, line))
+      {
+        std::vector<std::string> strs;
+        boost::split(strs,line,boost::is_any_of("\t \n"));
+        for (auto token : strs)
+        {
+          if (!token.empty())
+          {
+            try
+            {
+              bvec_entries.push_back(boost::lexical_cast<float>(token));
+            }
+            catch(...)
+            {
+              mitkThrow() << "Encountered invalid bvecs file entry >" << token << "<";
+            }
+          }
+        }
+      }
+      myfile.close();
+    }
+    else
+    {
+      mitkThrow() << "bvecs file could not be opened: " << bvals_file;
+    }
+  }
+
+  reference_bval = -1;
+  std::vector<float> bval_entries;
+  if (!itksys::SystemTools::FileExists(bvals_file))
+    mitkThrow() << "bvals file not existing: " << bvals_file;
+  else
+  {
+    std::string line;
+    std::ifstream myfile (bvals_file.c_str());
+    if (myfile.is_open())
+    {
+      while (std::getline(myfile, line))
+      {
+        std::vector<std::string> strs;
+        boost::split(strs,line,boost::is_any_of("\t \n"));
+        for (auto token : strs)
+        {
+          if (!token.empty())
+          {
+            try {
+              bval_entries.push_back(boost::lexical_cast<float>(token));
+              if (bval_entries.back()>reference_bval)
+                reference_bval = bval_entries.back();
+            }
+            catch(...)
+            {
+              mitkThrow() << "Encountered invalid bvals file entry >" << token << "<";
+            }
+          }
+        }
+      }
+      myfile.close();
+    }
+    else
+    {
+      mitkThrow() << "bvals file could not be opened: " << bvals_file;
+    }
+  }
+
+  for(unsigned int i=0; i<bval_entries.size(); i++)
+  {
+    double b_val = bval_entries.at(i);
+
+    mitk::gradients::GradientDirectionType vec;
+    vec[0] = bvec_entries.at(i);
+    vec[1] = bvec_entries.at(i+bval_entries.size());
+    vec[2] = bvec_entries.at(i+2*bval_entries.size());
+
+    // Adjust the vector length to encode gradient strength
+    double factor = b_val/reference_bval;
+    if(vec.magnitude() > 0)
+    {
+      vec.normalize();
+      vec[0] = sqrt(factor)*vec[0];
+      vec[1] = sqrt(factor)*vec[1];
+      vec[2] = sqrt(factor)*vec[2];
+    }
+
+    directioncontainer->InsertElement(i,vec);
+  }
+
+  return directioncontainer;
+}
+
+void mitk::gradients::WriteBvalsBvecs(std::string bvals_file, std::string bvecs_file, GradientDirectionContainerType::Pointer gradients, double reference_bval)
+{
+  std::ofstream myfile;
+  myfile.open (bvals_file.c_str());
+  for(unsigned int i=0; i<gradients->Size(); i++)
+  {
+    double twonorm = gradients->ElementAt(i).two_norm();
+    myfile << std::round(reference_bval*twonorm*twonorm) << " ";
+  }
+  myfile.close();
+
+  std::ofstream myfile2;
+  myfile2.open (bvecs_file.c_str());
+  for(int j=0; j<3; j++)
+  {
+    for(unsigned int i=0; i<gradients->Size(); i++)
+    {
+      GradientDirectionType direction = gradients->ElementAt(i);
+      direction.normalize();
+      myfile2 << direction.get(j) << " ";
+    }
+    myfile2 << std::endl;
+  }
+}
 
 std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections(const BValueMap & refBValueMap, GradientDirectionContainerType *refGradientsContainer )
 {
@@ -238,7 +464,7 @@ vnl_matrix<double> mitk::gradients::ComputeSphericalHarmonicsBasis(const vnl_mat
 }
 
 mitk::gradients::GradientDirectionContainerType::Pointer mitk::gradients::CreateNormalizedUniqueGradientDirectionContainer(const mitk::gradients::BValueMap & bValueMap,
-    const GradientDirectionContainerType *origninalGradentcontainer)
+                                                                                                                           const GradientDirectionContainerType *origninalGradentcontainer)
 {
   mitk::gradients::GradientDirectionContainerType::Pointer directioncontainer = mitk::gradients::GradientDirectionContainerType::New();
   auto mapIterator = bValueMap.begin();

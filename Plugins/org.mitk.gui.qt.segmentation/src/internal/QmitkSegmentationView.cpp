@@ -69,9 +69,9 @@ QmitkSegmentationView::QmitkSegmentationView()
   validImages->AddPredicate(isDti);
   validImages->AddPredicate(isOdf);
 
-  mitk::NodePredicateNot::Pointer isNotAHelperObject = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
+  m_IsNotAHelperObject = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
 
-  m_IsOfTypeImagePredicate = mitk::NodePredicateAnd::New(validImages, isNotAHelperObject);
+  m_IsOfTypeImagePredicate = mitk::NodePredicateAnd::New(validImages, m_IsNotAHelperObject);
 
   mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
   mitk::NodePredicateNot::Pointer isNotBinaryPredicate = mitk::NodePredicateNot::New(isBinaryPredicate);
@@ -593,22 +593,29 @@ void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
       if (m_IsASegmentationImagePredicate->CheckNode(selectedNode))
       {
         // set all nodes to invisible
-        mitk::DataStorage::SetOfObjects::ConstPointer allImages = GetDataStorage()->GetSubset(m_IsOfTypeImagePredicate);
+        mitk::DataStorage::SetOfObjects::ConstPointer allImages = GetDataStorage()->GetSubset(m_IsNotAHelperObject);
         for (mitk::DataStorage::SetOfObjects::const_iterator iter = allImages->begin(); iter != allImages->end(); ++iter)
         {
           (*iter)->SetVisibility(false);
         }
 
-        // if a segmentation is selected find a possible patient image
+        // if a segmentation is selected find a possible patient image (a parent node)
         mitk::DataStorage::SetOfObjects::ConstPointer sources = GetDataStorage()->GetSources(selectedNode, m_IsAPatientImagePredicate);
-        mitk::DataNode::Pointer refNode;
+        mitk::DataNode::Pointer sourceNode;
         if (sources->Size() != 0)
         {
           // found one or more sources - use the first one
-          refNode = sources->ElementAt(0);
-          refNode->SetVisibility(true);
+          sourceNode = sources->ElementAt(0);
+          sourceNode->SetVisibility(true);
           selectedNode->SetVisibility(true);
-          SetToolManagerSelection(refNode, selectedNode);
+          SetToolManagerSelection(sourceNode, selectedNode);
+
+          // set all child nodes of the segmentation to visible
+          mitk::DataStorage::SetOfObjects::ConstPointer derivations = GetDataStorage()->GetDerivations(selectedNode, m_IsNotAHelperObject, false);
+          for (mitk::DataStorage::SetOfObjects::const_iterator iter = derivations->begin(); iter != derivations->end(); ++iter)
+          {
+            (*iter)->SetVisibility(true);
+          }
         }
         else
         {
@@ -616,18 +623,24 @@ void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
           mitk::DataStorage::SetOfObjects::ConstPointer possiblePatientImages = GetDataStorage()->GetSubset(m_IsAPatientImagePredicate);
           for (mitk::DataStorage::SetOfObjects::ConstIterator iter = possiblePatientImages->Begin(); iter != possiblePatientImages->End(); ++iter)
           {
-            refNode = iter->Value();
-
+            sourceNode = iter->Value();
             if (CheckForSameGeometry(selectedNode, iter->Value()))
             {
-              refNode->SetVisibility(true);
+              sourceNode->SetVisibility(true);
               selectedNode->SetVisibility(true);
-              SetToolManagerSelection(refNode, selectedNode);
+              SetToolManagerSelection(sourceNode, selectedNode);
+
+              // set all child nodes of the segmentation to visible
+              mitk::DataStorage::SetOfObjects::ConstPointer derivations = GetDataStorage()->GetDerivations(selectedNode, m_IsNotAHelperObject, false);
+              for (mitk::DataStorage::SetOfObjects::const_iterator iter = derivations->begin(); iter != derivations->end(); ++iter)
+              {
+                (*iter)->SetVisibility(true);
+              }
 
               // doing this we can assure that the segmentation is always visible if the segmentation and the patient image are at the
               // same level in the data manager
               int layer(10);
-              refNode->GetIntProperty("layer", layer);
+              sourceNode->GetIntProperty("layer", layer);
               layer++;
               selectedNode->SetProperty("layer", mitk::IntProperty::New(layer));
               return;
@@ -1017,19 +1030,9 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    // create signal/slot connections
    connect(m_Controls->patImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnPatientComboBoxSelectionChanged(const mitk::DataNode*)));
    connect(m_Controls->segImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnSegmentationComboBoxSelectionChanged(const mitk::DataNode*)));
-   connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
-   //  connect( m_Controls->CreateSegmentationFromSurface, SIGNAL(clicked()), this, SLOT(CreateSegmentationFromSurface()) );
-   //  connect( m_Controls->widgetStack, SIGNAL(currentChanged(int)), this, SLOT(ToolboxStackPageChanged(int)) );
-
-   connect( m_Controls->tabWidgetSegmentationTools, SIGNAL(currentChanged(int)), this, SLOT(OnTabWidgetChanged(int)));
-
-   //  connect(m_Controls->MaskSurfaces,  SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
-   //      this, SLOT( OnSurfaceSelectionChanged( ) ) );
-
+   connect(m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()));
+   connect(m_Controls->tabWidgetSegmentationTools, SIGNAL(currentChanged(int)), this, SLOT(OnTabWidgetChanged(int)));
    connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalShowMarkerNodes(bool)), this, SLOT(OnShowMarkerNodes(bool)));
-
-   //  m_Controls->MaskSurfaces->SetDataStorage(this->GetDataStorage());
-   //  m_Controls->MaskSurfaces->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
 
    mitk::DataStorage::SetOfObjects::ConstPointer patientImages = GetDataStorage()->GetSubset(m_IsAPatientImagePredicate);
    if (!patientImages->empty())

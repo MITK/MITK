@@ -364,11 +364,7 @@ void QmitkControlVisualizationPropertiesView::NodeAdded(const mitk::DataNode *no
     // if there is no b0 image in the dataset, the GetB0Indices() returns a vector of size 0
     // and hence we cannot set the Property directly to .front()
     int displayChannelPropertyValue = 0;
-    mitk::BValueMapProperty* bmapproperty
-        = static_cast<mitk::BValueMapProperty*>
-          (dimg->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() );
-
-    mitk::DiffusionPropertyHelper::BValueMapType map = bmapproperty->GetBValueMap();
+    mitk::DiffusionPropertyHelper::BValueMapType map = mitk::DiffusionPropertyHelper::GetBValueMap(dimg);
 
     if( map[0].size() > 0) { displayChannelPropertyValue = map[0].front(); }
 

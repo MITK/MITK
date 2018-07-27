@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommandLineParser.h"
 
 #include <itkTractsToDWIImageFilter.h>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkFiberfoxParameters.h>
@@ -37,10 +37,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMaskedImageToHistogramFilter.h>
 #include <itkTdiToVolumeFractionFilter.h>
 #include <itkImageFileReader.h>
+#include <itkTensorReconstructionWithEigenvalueCorrectionFilter.h>
 
 using namespace mitk;
 
-double CalcErrorSignal(const std::vector<double>& histo_mod, itk::VectorImage< short, 3 >* reference, itk::VectorImage< short, 3 >* simulation, itk::Image< unsigned char,3 >::Pointer mask, itk::Image< double,3 >::Pointer fa)
+double CalcErrorSignal(const std::vector<double>& histo_mod, itk::VectorImage< short, 3 >* reference, itk::VectorImage< short, 3 >* simulation, itk::Image< unsigned char,3 >::ConstPointer mask, itk::Image< double,3 >::ConstPointer fa)
 {
   typedef itk::Image< double, 3 > DoubleImageType;
   typedef itk::VectorImage< short, 3 > DwiImageType;
@@ -113,7 +114,7 @@ double CalcErrorSignal(const std::vector<double>& histo_mod, itk::VectorImage< s
   return -1;
 }
 
-double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dwi1, itk::VectorImage< short, 3 >* dwi2, itk::Image< unsigned char,3 >::Pointer mask, itk::Image< double,3 >::Pointer fa1, itk::Image< double,3 >::Pointer md1, bool b0_contrast)
+double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dwi1, const itk::VectorImage< short, 3 >* dwi2, itk::Image< unsigned char,3 >::ConstPointer mask, itk::Image< double,3 >::ConstPointer fa1, itk::Image< double,3 >::ConstPointer md1, bool b0_contrast)
 {
   typedef itk::TensorDerivedMeasurementsFilter<double> MeasurementsType;
   typedef itk::Image< double, 3 > DoubleImageType;
@@ -121,15 +122,21 @@ double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dw
 
   DwiType::Pointer dwi1_itk = mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi1);
   typedef itk::DiffusionTensor3DReconstructionImageFilter<short, short, double > TensorReconstructionImageFilterType;
+
   DoubleImageType::Pointer fa2;
   {
     mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientContainerCopy = mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::New();
     for(auto it = mitk::DiffusionPropertyHelper::GetGradientContainer(dwi1)->Begin(); it != mitk::DiffusionPropertyHelper::GetGradientContainer(dwi1)->End(); it++)
       gradientContainerCopy->push_back(it.Value());
 
+    typename itk::ImageDuplicator<itk::VectorImage< short, 3 >>::Pointer duplicator = itk::ImageDuplicator<itk::VectorImage< short, 3 >>::New();
+    duplicator->SetInputImage(dwi2);
+    duplicator->Update();
+    auto working_dwi = duplicator->GetOutput();
+
     TensorReconstructionImageFilterType::Pointer tensorReconstructionFilter = TensorReconstructionImageFilterType::New();
     tensorReconstructionFilter->SetBValue( mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi1) );
-    tensorReconstructionFilter->SetGradientImage(gradientContainerCopy, dwi2 );
+    tensorReconstructionFilter->SetGradientImage(gradientContainerCopy, working_dwi );
     tensorReconstructionFilter->Update();
 
     MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
@@ -142,9 +149,14 @@ double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dw
   DoubleImageType::Pointer md2;
   if (md1.IsNotNull())
   {
+    typename itk::ImageDuplicator<itk::VectorImage< short, 3 >>::Pointer duplicator = itk::ImageDuplicator<itk::VectorImage< short, 3 >>::New();
+    duplicator->SetInputImage(dwi2);
+    duplicator->Update();
+    auto working_dwi = duplicator->GetOutput();
+
     typedef itk::AdcImageFilter< short, double > AdcFilterType;
     AdcFilterType::Pointer filter = AdcFilterType::New();
-    filter->SetInput( dwi2 );
+    filter->SetInput( working_dwi );
     filter->SetGradientDirections( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi1) );
     filter->SetB_value( mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi1) );
     filter->SetFitSignal(false);
@@ -181,13 +193,14 @@ double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dw
 
           double fa_diff = std::fabs(it2.Get()/fa - 1.0);
           double md_diff = std::fabs(it4.Get()/it3.Get() - 1.0);
-          error += std::pow(mod, 4) * (fa_diff + md_diff);
+
+          error += mod * (fa_diff + md_diff);
           count += 2;
 
           if (b0_contrast && it_diff1.Get()[0]>0)
           {
             double b0_diff = (double)it_diff2.Get()[0]/it_diff1.Get()[0] - 1.0;
-            error += std::pow(mod, 4) * std::fabs(b0_diff);
+            error += std::fabs(b0_diff);
             ++count;
           }
         }
@@ -220,13 +233,13 @@ double CalcErrorFA(const std::vector<double>& histo_mod, mitk::Image::Pointer dw
             }
 
           double fa_diff = fabs(it2.Get()/fa - 1.0);
-          error += std::pow(mod, 4) * fa_diff;
+          error += mod * fa_diff;
           ++count;
 
           if (b0_contrast && it_diff1.Get()[0]>0)
           {
             double b0_diff = (double)it_diff2.Get()[0]/it_diff1.Get()[0] - 1.0;
-            error += std::pow(mod, 4) * std::fabs(b0_diff);
+            error += std::fabs(b0_diff);
             ++count;
           }
         }
@@ -409,20 +422,10 @@ FiberfoxParameters MakeProposalDiff(FiberfoxParameters old_params, double temper
   std::random_device r;
   std::default_random_engine randgen(r());
 
-  std::uniform_int_distribution<int> uint1(0, new_params.m_NonFiberModelList.size() + new_params.m_FiberModelList.size() - 1);
+  std::uniform_int_distribution<int> uint1(0, new_params.m_FiberModelList.size() - 1);
   unsigned int prop = uint1(randgen);
-
-  if (prop<new_params.m_NonFiberModelList.size())
-  {
-    MITK_INFO << "Proposal D (Non-Fiber " << prop << ")";
-    ProposeDiffusivities( new_params.m_NonFiberModelList[prop], temperature );
-  }
-  else
-  {
-    prop -= new_params.m_NonFiberModelList.size();
-    MITK_INFO << "Proposal D (Fiber " << prop  << ")";
-    ProposeDiffusivities( new_params.m_FiberModelList[prop], temperature );
-  }
+  MITK_INFO << "Proposal D (Fiber " << prop  << ")";
+  ProposeDiffusivities( new_params.m_FiberModelList[prop], temperature );
 
   return new_params;
 }
@@ -439,13 +442,17 @@ FiberfoxParameters MakeProposalVolume(double old_tdi_thr, double old_sqrt, doubl
     std::normal_distribution<double> normal_dist(0, old_tdi_thr*0.1*temperature);
     new_tdi_thr = old_tdi_thr + normal_dist(randgen);
     while (new_tdi_thr<=0.01)
+    {
       new_tdi_thr = old_tdi_thr + normal_dist(randgen);
+    }
   }
   {
     std::normal_distribution<double> normal_dist(0, old_sqrt*0.1*temperature);
     new_sqrt = old_sqrt + normal_dist(randgen);
     while (new_sqrt<=0.01)
+    {
       new_sqrt = old_sqrt + normal_dist(randgen);
+    }
   }
 
   itk::TdiToVolumeFractionFilter< double >::Pointer fraction_generator = itk::TdiToVolumeFractionFilter< double >::New();
@@ -498,6 +505,8 @@ int main(int argc, char* argv[])
   parser.addArgument("fa_error", "", mitkCommandLineParser::Bool, "Optimize FA", "Optimize FA instead of raw signal. Requires FA image.");
   parser.addArgument("fa_image", "", mitkCommandLineParser::InputFile, "FA image:", "Weight error by FA histogram. Always necessary with option fa_error!");
   parser.addArgument("md_image", "", mitkCommandLineParser::InputFile, "MD image:", "Optimize MD in conjunction with FA (recommended when optimizing FA).");
+  parser.addArgument("use_histo", "", mitkCommandLineParser::Bool, "Use histogram modifiers:", "Modify error per voxel by corresponding FA frequency.");
+  parser.addArgument("raise_histo", "", mitkCommandLineParser::Float, "Raise histogram modifiers:", "Raise histogram modifiers by the specified power.", 1.0);
   parser.endGroup();
 
   parser.beginGroup("4. Optimization of volume fraction maps:");
@@ -529,14 +538,14 @@ int main(int argc, char* argv[])
   parameters.LoadParameters(paramName);
   typedef itk::VectorImage< short, 3 >    ItkDwiType;
   mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images", "Fiberbundles"}, {});
-  auto dwi = mitk::IOUtil::Load<mitk::Image>(us::any_cast<std::string>(parsedArgs["dmri"]), &functor);
+  mitk::Image::Pointer dwi = mitk::IOUtil::Load<mitk::Image>(us::any_cast<std::string>(parsedArgs["dmri"]), &functor);
   ItkDwiType::Pointer reference = mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi);
   parameters.m_SignalGen.m_ImageRegion = reference->GetLargestPossibleRegion();
   parameters.m_SignalGen.m_ImageSpacing = reference->GetSpacing();
   parameters.m_SignalGen.m_ImageOrigin = reference->GetOrigin();
   parameters.m_SignalGen.m_ImageDirection = reference->GetDirection();
-  parameters.SetBvalue(static_cast<mitk::FloatProperty*>(dwi->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue());
-  parameters.SetGradienDirections(static_cast<mitk::GradientDirectionsProperty*>( dwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer());
+  parameters.SetBvalue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
+  parameters.SetGradienDirections(mitk::DiffusionPropertyHelper::GetGradientContainer(dwi));
 
   auto tracts = mitk::IOUtil::Load<mitk::FiberBundle>(tract_file, &functor);
 
@@ -556,6 +565,10 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("tdi_threshold"))
     tdi_threshold = us::any_cast<float>(parsedArgs["tdi_threshold"]);
 
+  float raise_histo=1.0;
+  if (parsedArgs.count("raise_histo"))
+    raise_histo = us::any_cast<float>(parsedArgs["raise_histo"]);
+
   float sqrt=1.0;
   if (parsedArgs.count("sqrt"))
     sqrt = us::any_cast<float>(parsedArgs["sqrt"]);
@@ -563,6 +576,10 @@ int main(int argc, char* argv[])
   bool fa_error=false;
   if (parsedArgs.count("fa_error"))
     fa_error = true;
+
+  bool use_histo=false;
+  if (parsedArgs.count("use_histo"))
+    use_histo = true;
 
   std::string fa_file = "";
   if (parsedArgs.count("fa_image"))
@@ -588,16 +605,11 @@ int main(int argc, char* argv[])
     MITK_INFO << "Optimizing global signal scale";
     possible_proposals.push_back(2);
   }
-  if (possible_proposals.empty())
-  {
-    MITK_INFO << "Incompatible options. Nothing to optimize.";
-    return EXIT_FAILURE;
-  }
 
   itk::ImageFileReader< itk::Image< unsigned char, 3 > >::Pointer reader = itk::ImageFileReader< itk::Image< unsigned char, 3 > >::New();
   reader->SetFileName( us::any_cast<std::string>(parsedArgs["mask"]) );
   reader->Update();
-  itk::Image< unsigned char,3 >::Pointer mask = reader->GetOutput();
+  itk::Image< unsigned char,3 >::ConstPointer mask = reader->GetOutput();
 
   std::vector< itk::Image< double, 3 >::Pointer > fracs;
   if ( parsedArgs.count("tdi")>0 && parsedArgs.count("wm")>0 && parsedArgs.count("gm")>0 && parsedArgs.count("dgm")>0 && parsedArgs.count("csf")>0 )
@@ -640,7 +652,7 @@ int main(int argc, char* argv[])
   }
 
   std::vector< double > histogram_modifiers;
-  itk::Image< double,3 >::Pointer fa_image = nullptr;
+  itk::Image< double,3 >::ConstPointer fa_image = nullptr;
   if (fa_file.compare("")!=0)
   {
     itk::ImageFileReader< itk::Image< double, 3 > >::Pointer reader = itk::ImageFileReader< itk::Image< double, 3 > >::New();
@@ -648,44 +660,47 @@ int main(int argc, char* argv[])
     reader->Update();
     fa_image = reader->GetOutput();
 
-    int binsPerDimension = 20;
-    using ImageToHistogramFilterType = itk::Statistics::MaskedImageToHistogramFilter< itk::Image< double,3 >, itk::Image< unsigned char,3 > >;
-
-    ImageToHistogramFilterType::HistogramType::MeasurementVectorType lowerBound(binsPerDimension);
-    lowerBound.Fill(0.0);
-
-    ImageToHistogramFilterType::HistogramType::MeasurementVectorType upperBound(binsPerDimension);
-    upperBound.Fill(1.0);
-
-    ImageToHistogramFilterType::HistogramType::SizeType size(1);
-    size.Fill(binsPerDimension);
-
-    ImageToHistogramFilterType::Pointer imageToHistogramFilter = ImageToHistogramFilterType::New();
-    imageToHistogramFilter->SetInput( fa_image );
-    imageToHistogramFilter->SetHistogramBinMinimum( lowerBound );
-    imageToHistogramFilter->SetHistogramBinMaximum( upperBound );
-    imageToHistogramFilter->SetHistogramSize( size );
-    imageToHistogramFilter->SetMaskImage(mask);
-    imageToHistogramFilter->SetMaskValue(1);
-    imageToHistogramFilter->Update();
-
-    ImageToHistogramFilterType::HistogramType* histogram = imageToHistogramFilter->GetOutput();
-    unsigned int max = 0;
-    for(unsigned int i = 0; i < histogram->GetSize()[0]; ++i)
+    if (use_histo)
     {
-      if (histogram->GetFrequency(i)>max)
-        max = histogram->GetFrequency(i);
-    }
-    MITK_INFO << "FA histogram modifiers:";
-    for(unsigned int i = 0; i < histogram->GetSize()[0]; ++i)
-    {
-      histogram_modifiers.push_back((double)max/histogram->GetFrequency(i));
-      MITK_INFO << std::pow(histogram_modifiers.back(), 4);
+      int binsPerDimension = 10;
+      using ImageToHistogramFilterType = itk::Statistics::MaskedImageToHistogramFilter< itk::Image< double,3 >, itk::Image< unsigned char,3 > >;
+
+      ImageToHistogramFilterType::HistogramType::MeasurementVectorType lowerBound(binsPerDimension);
+      lowerBound.Fill(0.0);
+
+      ImageToHistogramFilterType::HistogramType::MeasurementVectorType upperBound(binsPerDimension);
+      upperBound.Fill(1.0);
+
+      ImageToHistogramFilterType::HistogramType::SizeType size(1);
+      size.Fill(binsPerDimension);
+
+      ImageToHistogramFilterType::Pointer imageToHistogramFilter = ImageToHistogramFilterType::New();
+      imageToHistogramFilter->SetInput( fa_image );
+      imageToHistogramFilter->SetHistogramBinMinimum( lowerBound );
+      imageToHistogramFilter->SetHistogramBinMaximum( upperBound );
+      imageToHistogramFilter->SetHistogramSize( size );
+      imageToHistogramFilter->SetMaskImage(mask);
+      imageToHistogramFilter->SetMaskValue(1);
+      imageToHistogramFilter->Update();
+
+      ImageToHistogramFilterType::HistogramType* histogram = imageToHistogramFilter->GetOutput();
+      unsigned int max = 0;
+      for(unsigned int i = 0; i < histogram->GetSize()[0]; ++i)
+      {
+        if (histogram->GetFrequency(i)>max)
+          max = histogram->GetFrequency(i);
+      }
+      MITK_INFO << "FA histogram modifiers:";
+      for(unsigned int i = 0; i < histogram->GetSize()[0]; ++i)
+      {
+        histogram_modifiers.push_back( std::pow(1.0 - (double)histogram->GetFrequency(i)/(double)max, raise_histo) );
+        MITK_INFO << histogram_modifiers.back();
+      }
     }
     if (fa_error)
       MITK_INFO << "Using FA error measure.";
   }
-  itk::Image< double,3 >::Pointer md_image = nullptr;
+  itk::Image< double,3 >::ConstPointer md_image = nullptr;
   if (md_file.compare("")!=0)
   {
     itk::ImageFileReader< itk::Image< double, 3 > >::Pointer reader = itk::ImageFileReader< itk::Image< double, 3 > >::New();
@@ -701,6 +716,12 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  if (possible_proposals.empty())
+  {
+    MITK_INFO << "Incompatible options. Nothing to optimize.";
+    return EXIT_FAILURE;
+  }
+
   itk::TractsToDWIImageFilter< short >::Pointer tractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
   tractsToDwiFilter->SetFiberBundle(tracts);
   tractsToDwiFilter->SetParameters(parameters);
@@ -708,20 +729,17 @@ int main(int argc, char* argv[])
   ItkDwiType::Pointer sim = tractsToDwiFilter->GetOutput();
   {
     mitk::Image::Pointer image = mitk::GrabItkImageMemory( tractsToDwiFilter->GetOutput() );
-    image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(),
-                                               mitk::GradientDirectionsProperty::New( parameters.m_SignalGen.GetGradientDirections() ) );
-    image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(),
-                                               mitk::FloatProperty::New( parameters.m_SignalGen.GetBvalue() ) );
-    mitk::DiffusionPropertyHelper propertyHelper( image );
-    propertyHelper.InitializeImage();
+    mitk::DiffusionPropertyHelper::SetGradientContainer(image, parameters.m_SignalGen.GetItkGradientContainer());
+    mitk::DiffusionPropertyHelper::SetReferenceBValue(image, parameters.m_SignalGen.GetBvalue());
+    mitk::DiffusionPropertyHelper::InitializeImage( image );
     mitk::IOUtil::Save(image, out_folder + "/initial.dwi");
   }
 
 
   double old_tdi_thr = tdi_threshold;
   double old_sqrt = sqrt;
-  double new_tdi_thr;
-  double new_sqrt;
+  double new_tdi_thr = old_tdi_thr;
+  double new_sqrt = old_sqrt;
   MITK_INFO << "\n\n";
   MITK_INFO << "Iterations: " << iterations;
   MITK_INFO << "start_temp: " << start_temp;
@@ -777,6 +795,7 @@ int main(int argc, char* argv[])
     }
     }
 
+    MITK_INFO << "Simulating and testing proposal ...";
     std::streambuf *old = cout.rdbuf(); // <-- save
     std::stringstream ss;
     std::cout.rdbuf (ss.rdbuf());
@@ -803,12 +822,9 @@ int main(int argc, char* argv[])
       std::stringstream ss;
       std::cout.rdbuf (ss.rdbuf());
       mitk::Image::Pointer image = mitk::GrabItkImageMemory( tractsToDwiFilter->GetOutput() );
-      image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(),
-                                                 mitk::GradientDirectionsProperty::New( parameters.m_SignalGen.GetGradientDirections() ) );
-      image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(),
-                                                 mitk::FloatProperty::New( parameters.m_SignalGen.GetBvalue() ) );
-      mitk::DiffusionPropertyHelper propertyHelper( image );
-      propertyHelper.InitializeImage();
+      mitk::DiffusionPropertyHelper::SetGradientContainer(image, parameters.m_SignalGen.GetItkGradientContainer());
+      mitk::DiffusionPropertyHelper::SetReferenceBValue(image, parameters.m_SignalGen.GetBvalue());
+      mitk::DiffusionPropertyHelper::InitializeImage( image );
       mitk::IOUtil::Save(image, out_folder + "/optimized.dwi");
 
       proposal.SaveParameters(out_folder + "/optimized.ffp");

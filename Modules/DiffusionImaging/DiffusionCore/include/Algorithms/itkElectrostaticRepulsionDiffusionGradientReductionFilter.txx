@@ -44,8 +44,9 @@ namespace itk
 template <class TInputScalarType, class TOutputScalarType>
 ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutputScalarType>
 ::ElectrostaticRepulsionDiffusionGradientReductionFilter()
+  : m_UseFirstN(false)
 {
-    this->SetNumberOfRequiredInputs( 1 );
+  this->SetNumberOfRequiredInputs( 1 );
 }
 
 template <class TInputScalarType, class TOutputScalarType>
@@ -53,40 +54,40 @@ double
 ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutputScalarType>
 ::Costs()
 {
-    double costs = 2*itk::Math::pi;
-    for (IndicesVector::iterator it = m_UsedGradientIndices.begin(); it!=m_UsedGradientIndices.end(); ++it)
-    {
-        for (IndicesVector::iterator it2 = m_UsedGradientIndices.begin(); it2!=m_UsedGradientIndices.end(); ++it2)
-            if (it != it2)
-            {
-                vnl_vector_fixed<double,3> v1 = m_OriginalGradientDirections->at(*it);
-                vnl_vector_fixed<double,3> v2 = m_OriginalGradientDirections->at(*it2);
+  double costs = 2*itk::Math::pi;
+  for (IndicesVector::iterator it = m_UsedGradientIndices.begin(); it!=m_UsedGradientIndices.end(); ++it)
+  {
+    for (IndicesVector::iterator it2 = m_UsedGradientIndices.begin(); it2!=m_UsedGradientIndices.end(); ++it2)
+      if (it != it2)
+      {
+        vnl_vector_fixed<double,3> v1 = m_OriginalGradientDirections->at(*it);
+        vnl_vector_fixed<double,3> v2 = m_OriginalGradientDirections->at(*it2);
 
-                v1.normalize(); v2.normalize();
-                double temp = dot_product(v1,v2);
-                if (temp>1)
-                    temp = 1;
-                else if (temp<-1)
-                    temp = -1;
+        v1.normalize(); v2.normalize();
+        double temp = dot_product(v1,v2);
+        if (temp>1)
+          temp = 1;
+        else if (temp<-1)
+          temp = -1;
 
-                double angle = acos(temp);
+        double angle = acos(temp);
 
-                if (angle<costs)
-                    costs = angle;
+        if (angle<costs)
+          costs = angle;
 
-                temp = dot_product(-v1,v2);
-                if (temp>1)
-                    temp = 1;
-                else if (temp<-1)
-                    temp = -1;
+        temp = dot_product(-v1,v2);
+        if (temp>1)
+          temp = 1;
+        else if (temp<-1)
+          temp = -1;
 
-                angle = acos(temp);
-                if (angle<costs)
-                    costs = angle;
-            }
-    }
+        angle = acos(temp);
+        if (angle<costs)
+          costs = angle;
+      }
+  }
 
-    return costs;
+  return costs;
 }
 
 template <class TInputScalarType, class TOutputScalarType>
@@ -94,149 +95,160 @@ void
 ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutputScalarType>
 ::GenerateData()
 {
-    unsigned int randSeed = time(nullptr);
+  unsigned int randSeed = time(nullptr);
 
-    if(m_InputBValueMap.empty() || m_NumGradientDirections.size()!=m_InputBValueMap.size())
-        mitkThrow() << "Vector of the number of desired gradient directions contains more elements than the specified target b-value map.";
+  if(m_InputBValueMap.empty() || m_NumGradientDirections.size()!=m_InputBValueMap.size())
+    mitkThrow() << "Vector of the number of desired gradient directions contains more elements than the specified target b-value map.";
 
-    BValueMap manipulatedMap = m_InputBValueMap;
+  BValueMap manipulatedMap = m_InputBValueMap;
 
-    int shellCounter = 0;
-    for(BValueMap::iterator it = m_InputBValueMap.begin(); it != m_InputBValueMap.end(); it++ )
+  IndicesVector final_gradient_indices;
+  int shellCounter = 0;
+  for(BValueMap::iterator it = m_InputBValueMap.begin(); it != m_InputBValueMap.end(); it++ )
+  {
+    srand(randSeed);
+
+    m_UsedGradientIndices.clear();
+    m_UnusedGradientIndices.clear();
+
+    MITK_INFO << "Shell number: " << shellCounter;
+    unsigned int c=0;
+    for (unsigned int i=0; i<it->second.size(); i++)
     {
-        srand(randSeed);
+      if (c<m_NumGradientDirections[shellCounter])
+        m_UsedGradientIndices.push_back(it->second.at(i));
+      else
+        m_UnusedGradientIndices.push_back(it->second.at(i));
+      c++;
+    }
 
-        // initialize index vectors
-        m_UsedGradientIndices.clear();
-        m_UnusedGradientIndices.clear();
+    if ( it->second.size() <= m_NumGradientDirections[shellCounter] )
+    {
+      itkWarningMacro( << "current directions: " << it->second.size() << " wanted directions: " << m_NumGradientDirections[shellCounter]);
+      m_NumGradientDirections[shellCounter] = it->second.size();
+    }
+    else if (!m_UseFirstN)
+    {
+      double minAngle = Costs();
+      double newMinAngle = 0;
 
-        if ( it->second.size() <= m_NumGradientDirections[shellCounter] )
+      MITK_INFO << "minimum angle: " << 180*minAngle/itk::Math::pi;
+      int stagnationCount = 0;
+      int rejectionCount = 0;
+      int maxRejections = m_NumGradientDirections[shellCounter] * 1000;
+      if (maxRejections<10000)
+        maxRejections = 10000;
+      int iUsed = 0;
+      if (m_UsedGradientIndices.size()>0)
+      {
+        while ( stagnationCount<1000 && rejectionCount<maxRejections )
         {
-            itkWarningMacro( << "current directions: " << it->second.size() << " wanted directions: " << m_NumGradientDirections[shellCounter]);
-            m_NumGradientDirections[shellCounter] = it->second.size();
-            shellCounter++;
-            continue;
-        }
-        MITK_INFO << "Shell number: " << shellCounter;
+          // make proposal for new gradient configuration by randomly removing one of the currently used directions and instead adding one of the unused directions
+          //int iUsed = rand() % m_UsedGradientIndices.size();
+          int iUnUsed = rand() % m_UnusedGradientIndices.size();
+          int vUsed = m_UsedGradientIndices.at(iUsed);
+          int vUnUsed = m_UnusedGradientIndices.at(iUnUsed);
+          m_UsedGradientIndices.at(iUsed) = vUnUsed;
+          m_UnusedGradientIndices.at(iUnUsed) = vUsed;
 
-        unsigned int c=0;
+          newMinAngle = Costs();          // calculate costs of proposed configuration
+          if (newMinAngle > minAngle)     // accept or reject proposal
+          {
+            MITK_INFO << "minimum angle: " << 180*newMinAngle/itk::Math::pi;
 
-        for (unsigned int i=0; i<it->second.size(); i++)
-        {
-            if (c<m_NumGradientDirections[shellCounter])
-                m_UsedGradientIndices.push_back(it->second.at(i));
+            if ( (newMinAngle-minAngle)<0.01 )
+              stagnationCount++;
             else
-                m_UnusedGradientIndices.push_back(it->second.at(i));
-            c++;
+              stagnationCount = 0;
+
+            minAngle = newMinAngle;
+            rejectionCount = 0;
+          }
+          else
+          {
+            rejectionCount++;
+            m_UsedGradientIndices.at(iUsed) = vUsed;
+            m_UnusedGradientIndices.at(iUnUsed) = vUnUsed;
+          }
+          iUsed++;
+          iUsed = iUsed % m_UsedGradientIndices.size();
         }
-
-        double minAngle = Costs();
-        double newMinAngle = 0;
-
-        MITK_INFO << "minimum angle: " << 180*minAngle/itk::Math::pi;
-        int stagnationCount = 0;
-        int rejectionCount = 0;
-        int maxRejections = m_NumGradientDirections[shellCounter] * 1000;
-        if (maxRejections<10000)
-            maxRejections = 10000;
-        int iUsed = 0;
-        if (m_UsedGradientIndices.size()>0)
-            while ( stagnationCount<1000 && rejectionCount<maxRejections )
-            {
-                // make proposal for new gradient configuration by randomly removing one of the currently used directions and instead adding one of the unused directions
-                //int iUsed = rand() % m_UsedGradientIndices.size();
-                int iUnUsed = rand() % m_UnusedGradientIndices.size();
-                int vUsed = m_UsedGradientIndices.at(iUsed);
-                int vUnUsed = m_UnusedGradientIndices.at(iUnUsed);
-                m_UsedGradientIndices.at(iUsed) = vUnUsed;
-                m_UnusedGradientIndices.at(iUnUsed) = vUsed;
-
-                newMinAngle = Costs();          // calculate costs of proposed configuration
-                if (newMinAngle > minAngle)     // accept or reject proposal
-                {
-                    MITK_INFO << "minimum angle: " << 180*newMinAngle/itk::Math::pi;
-
-                    if ( (newMinAngle-minAngle)<0.01 )
-                        stagnationCount++;
-                    else
-                        stagnationCount = 0;
-
-                    minAngle = newMinAngle;
-                    rejectionCount = 0;
-                }
-                else
-                {
-                    rejectionCount++;
-                    m_UsedGradientIndices.at(iUsed) = vUsed;
-                    m_UnusedGradientIndices.at(iUnUsed) = vUnUsed;
-                }
-                iUsed++;
-                iUsed = iUsed % m_UsedGradientIndices.size();
-            }
-        manipulatedMap[it->first] = m_UsedGradientIndices;
-        shellCounter++;
+      }
     }
+    manipulatedMap[it->first] = m_UsedGradientIndices;
+    shellCounter++;
 
-    int vecLength = 0 ;
-    for(BValueMap::iterator it = manipulatedMap.begin(); it != manipulatedMap.end(); it++)
-        vecLength += it->second.size();
+    for (auto gidx : m_UsedGradientIndices)
+      final_gradient_indices.push_back(gidx);
+  }
+  std::sort(final_gradient_indices.begin(), final_gradient_indices.end());
 
-    // initialize output image
-    typename OutputImageType::Pointer outImage = OutputImageType::New();
-    outImage->SetSpacing( this->GetInput()->GetSpacing() );   // Set the image spacing
-    outImage->SetOrigin( this->GetInput()->GetOrigin() );     // Set the image origin
-    outImage->SetDirection( this->GetInput()->GetDirection() );  // Set the image direction
-    outImage->SetLargestPossibleRegion( this->GetInput()->GetLargestPossibleRegion());
-    outImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
-    outImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
-    outImage->SetVectorLength( vecLength ); // Set the vector length
-    outImage->Allocate();
+  int vecLength = 0 ;
+  for(BValueMap::iterator it = manipulatedMap.begin(); it != manipulatedMap.end(); it++)
+    vecLength += it->second.size();
 
-    itk::ImageRegionIterator< OutputImageType > newIt(outImage, outImage->GetLargestPossibleRegion());
-    newIt.GoToBegin();
+  // initialize output image
+  typename OutputImageType::Pointer outImage = OutputImageType::New();
+  outImage->SetSpacing( this->GetInput()->GetSpacing() );   // Set the image spacing
+  outImage->SetOrigin( this->GetInput()->GetOrigin() );     // Set the image origin
+  outImage->SetDirection( this->GetInput()->GetDirection() );  // Set the image direction
+  outImage->SetLargestPossibleRegion( this->GetInput()->GetLargestPossibleRegion());
+  outImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
+  outImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
+  outImage->SetVectorLength( final_gradient_indices.size() ); // Set the vector length
+  outImage->Allocate();
 
-    typename InputImageType::Pointer inImage = const_cast<InputImageType*>(this->GetInput(0));
-    itk::ImageRegionIterator< InputImageType > oldIt(inImage, inImage->GetLargestPossibleRegion());
-    oldIt.GoToBegin();
+  itk::ImageRegionIterator< OutputImageType > newIt(outImage, outImage->GetLargestPossibleRegion());
+  newIt.GoToBegin();
 
-    // initial new value of voxel
-    OutputPixelType newVec;
-    newVec.SetSize( vecLength );
-    newVec.AllocateElements( vecLength );
+  typename InputImageType::Pointer inImage = const_cast<InputImageType*>(this->GetInput(0));
+  itk::ImageRegionIterator< InputImageType > oldIt(inImage, inImage->GetLargestPossibleRegion());
+  oldIt.GoToBegin();
 
-    // generate new pixel values
-    while(!newIt.IsAtEnd())
-    {
-        // init new vector with zeros
-        newVec.Fill(0.0);
-        InputPixelType oldVec = oldIt.Get();
+  // initial new value of voxel
+  OutputPixelType newVec;
+  newVec.SetSize( final_gradient_indices.size() );
+  newVec.AllocateElements( final_gradient_indices.size() );
 
-        int index = 0;
-        for(BValueMap::iterator it=manipulatedMap.begin(); it!=manipulatedMap.end(); it++)
-            for(unsigned int j=0; j<it->second.size(); j++)
-            {
-                newVec[index] = oldVec[it->second.at(j)];
-                index++;
-            }
-        newIt.Set(newVec);
+  // generate new pixel values
+  while(!newIt.IsAtEnd())
+  {
+    // init new vector with zeros
+    newVec.Fill(0.0);
+    InputPixelType oldVec = oldIt.Get();
 
-        ++newIt;
-        ++oldIt;
-    }
+    for (unsigned int i=0; i<final_gradient_indices.size(); ++i)
+      newVec[i] = oldVec[final_gradient_indices.at(i)];
 
-    // set new gradient directions
-    m_GradientDirections = GradientDirectionContainerType::New();
-    int index = 0;
-    for(BValueMap::iterator it = manipulatedMap.begin(); it != manipulatedMap.end(); it++)
-        for(unsigned int j = 0; j < it->second.size(); j++)
-        {
-            m_GradientDirections->InsertElement(index, m_OriginalGradientDirections->at(it->second.at(j)));
-            index++;
-        }
+    //    int index = 0;
+    //    for(BValueMap::iterator it=manipulatedMap.begin(); it!=manipulatedMap.end(); it++)
+    //      for(unsigned int j=0; j<it->second.size(); j++)
+    //      {
+    //        newVec[index] = oldVec[it->second.at(j)];
+    //        index++;
+    //      }
+    newIt.Set(newVec);
 
-    this->SetNumberOfRequiredOutputs (1);
-    this->SetNthOutput (0, outImage);
-    MITK_INFO << "...done";
+    ++newIt;
+    ++oldIt;
+  }
+
+  // set new gradient directions
+  m_GradientDirections = GradientDirectionContainerType::New();
+  for (unsigned int i=0; i<final_gradient_indices.size(); ++i)
+    m_GradientDirections->InsertElement(i, m_OriginalGradientDirections->at(final_gradient_indices.at(i)));
+
+  //  int index = 0;
+  //  for(BValueMap::iterator it = manipulatedMap.begin(); it != manipulatedMap.end(); it++)
+  //    for(unsigned int j = 0; j < it->second.size(); j++)
+  //    {
+  //      m_GradientDirections->InsertElement(index, m_OriginalGradientDirections->at(it->second.at(j)));
+  //      index++;
+  //    }
+
+  this->SetNumberOfRequiredOutputs (1);
+  this->SetNthOutput (0, outImage);
+  MITK_INFO << "...done";
 }
 
 template <class TInputScalarType, class TOutputScalarType>
@@ -247,10 +259,10 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
   Superclass::UpdateOutputInformation();
 
   int vecLength = 0 ;
-    for(unsigned int index = 0; index < m_NumGradientDirections.size(); index++)
-    {
-      vecLength += m_NumGradientDirections[index];
-    }
+  for(unsigned int index = 0; index < m_NumGradientDirections.size(); index++)
+  {
+    vecLength += m_NumGradientDirections[index];
+  }
 
   this->GetOutput()->SetVectorLength( vecLength );
 }

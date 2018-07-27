@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usAny.h>
 #include <itkImageFileWriter.h>
 #include <mitkIOUtil.h>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <iostream>
 #include <fstream>
 #include <itksys/SystemTools.hxx>
@@ -95,7 +95,6 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         fOdfFilter->SetMaxNumDirections(3);
         fOdfFilter->SetSizeThreshold(0.3);
 
-        fOdfFilter->SetUseWorkingCopy(false);
         fOdfFilter->SetNumberOfThreads(1);
         fOdfFilter->Update();
         itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer direction_image = fOdfFilter->GetDirectionImage();

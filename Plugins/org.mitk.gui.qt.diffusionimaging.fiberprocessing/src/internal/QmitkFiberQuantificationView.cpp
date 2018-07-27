@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractsToVectorImageFilter.h>
 #include <itkTractsToFiberEndingsImageFilter.h>
 
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 
 const std::string QmitkFiberQuantificationView::VIEW_ID = "org.mitk.views.fiberquantification";
 using namespace mitk;
@@ -143,7 +143,6 @@ void QmitkFiberQuantificationView::CalculateFiberDirections()
     fOdfFilter->SetNormalizationMethod(itk::TractsToVectorImageFilter<float>::NormalizationMethods::MAX_VEC_NORM);
     break;
   }
-  fOdfFilter->SetUseWorkingCopy(true);
   fOdfFilter->SetSizeThreshold(m_Controls->m_PeakThreshold->value());
   fOdfFilter->SetMaxNumDirections(m_Controls->m_MaxNumDirections->value());
   fOdfFilter->Update();

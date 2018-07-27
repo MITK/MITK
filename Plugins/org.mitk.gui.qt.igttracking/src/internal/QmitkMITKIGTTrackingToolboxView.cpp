@@ -234,6 +234,13 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     m_Controls->m_RenderWarningLabel->setVisible(false);
     m_Controls->m_TrackingFrozenLabel->setVisible(false);
 
+
+    //initialize projection buttons
+    //first it is disabled when the tool is connected check box for projection and axis is enabled
+    m_Controls->showHideToolAxisCheckBox->setEnabled(false);
+    m_Controls->showHideToolProjectionCheckBox->setEnabled(false);
+    m_Controls->m_toolselector->setEnabled(false);
+
     //Update List of available models for selected tool.
     std::vector<mitk::TrackingDeviceData> Compatibles;
     if ((m_Controls == nullptr) || //check all these stuff for NULL, latterly this causes crashes from time to time
@@ -441,7 +448,7 @@ void QmitkMITKIGTTrackingToolboxView::OnShowHideToolProjectionClicked()
     RemoveAllToolProjections();
     m_Controls->showHideToolAxisCheckBox->setEnabled(false);
   }
-  if( m_NeedleProjectionFilter.IsNotNull() )
+  if(m_NeedleProjectionFilter->GetNumberOfInputs())
   {
     m_NeedleProjectionFilter->Update();
   }
@@ -466,7 +473,7 @@ void QmitkMITKIGTTrackingToolboxView::OnShowHideToolAxisClicked()
     m_ShowHideToolAxis = false;
   }
   //Update the filter
-  if( m_NeedleProjectionFilter.IsNotNull() )
+  if(m_NeedleProjectionFilter->GetNumberOfInputs())
   {
     m_NeedleProjectionFilter->Update();
   }
@@ -514,6 +521,14 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
   //start worker thread
   m_WorkerThread->start();
   //! [Thread 4]
+
+
+  //enable checkboxes for projection and tool axis
+  m_Controls->showHideToolAxisCheckBox->setEnabled(true);
+  m_Controls->showHideToolProjectionCheckBox->setEnabled(true);
+  m_Controls->m_toolselector->setEnabled(true);
+
+
 
   //disable buttons
   this->m_Controls->m_MainWidget->setEnabled(false);
@@ -843,7 +858,7 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
     m_Worker->SetTrackingDevice(m_Controls->m_ConfigurationWidget->GetTrackingDevice().GetPointer());
     m_Worker->SetDataStorage(this->GetDataStorage());
     m_WorkerThread->start();
-    m_TimeoutTimer->start(7000);
+    m_TimeoutTimer->start(30000);
     //disable controls until worker thread is finished
     this->m_Controls->m_MainWidget->setEnabled(false);
   }
@@ -1369,7 +1384,7 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
   settings.beginGroup(QString::fromStdString(VIEW_ID));
 
   // set some widgets and attributes by the values from the QSettings
-  m_Controls->m_ShowTrackingVolume->setChecked(settings.value("ShowTrackingVolume", true).toBool());
+  m_Controls->m_ShowTrackingVolume->setChecked(settings.value("ShowTrackingVolume", false).toBool());
   m_Controls->m_EnableOpenIGTLinkMicroService->setChecked(settings.value("EnableOpenIGTLinkMicroService", true).toBool());
   m_Controls->m_VolumeSelectionBox->setCurrentIndex(settings.value("VolumeSelectionBox", 0).toInt());
   m_Controls->m_OpenIGTLinkDataFormat->setCurrentIndex(settings.value("OpenIGTLinkDataFormat", 0).toInt());
@@ -1397,9 +1412,9 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
       m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
       m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
     }
-    catch (mitk::IGTException)
+    catch (mitk::IGTException e)
     {
-      MITK_WARN("QmitkMITKIGTTrackingToolBoxView") << "Error during restoring tools. Problems with file (" << m_ToolStorageFilename.toStdString() << "), please check the file?";
+      MITK_WARN("QmitkMITKIGTTrackingToolBoxView") << "Error during restoring tools. Problems with file (" << m_ToolStorageFilename.toStdString() << "), please check the file? Error message: "<<e.GetDescription();
       this->OnResetTools(); //if there where errors reset the tool storage to avoid problems later on
     }
   }

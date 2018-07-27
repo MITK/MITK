@@ -107,7 +107,7 @@ public:
     FiberBundle::Pointer           ExtractFiberSubset(DataNode *roi, DataStorage* storage);
     std::vector<long>              ExtractFiberIdSubset(DataNode* roi, DataStorage* storage);
     FiberBundle::Pointer           RemoveFibersOutside(ItkUcharImgType* mask, bool invert=false);
-    float                          GetOverlap(ItkUcharImgType* mask, bool do_resampling);
+    float                          GetOverlap(ItkUcharImgType* mask);
     mitk::FiberBundle::Pointer     SubsampleFibers(float factor);
 
     // get/set data

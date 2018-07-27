@@ -11,6 +11,7 @@ set(target_libraries
   org_mitk_gui_qt_datamanager
   org_mitk_gui_qt_segmentation
   org_mitk_gui_qt_multilabelsegmentation
+  org_mitk_gui_qt_python
   org_mitk_gui_qt_volumevisualization
   org_mitk_gui_qt_diffusionimaging
   org_mitk_gui_qt_diffusionimaging_connectomics
@@ -22,11 +23,11 @@ set(target_libraries
   org_mitk_gui_qt_diffusionimaging_reconstruction
   org_mitk_gui_qt_diffusionimaging_tractography
   org_mitk_gui_qt_diffusionimaging_registration
-#  org_mitk_gui_qt_diffusionimaging_python
+  org_mitk_gui_qt_diffusionimaging_python
   org_mitk_gui_qt_diffusionimaging_denoising
-#  org_mitk_gui_qt_matchpoint_algorithm_browser
-#  org_mitk_gui_qt_matchpoint_algorithm_control
-#  org_mitk_gui_qt_matchpoint_mapper
+  org_mitk_gui_qt_matchpoint_algorithm_browser
+  org_mitk_gui_qt_matchpoint_algorithm_control
+  org_mitk_gui_qt_matchpoint_mapper
   org_mitk_gui_qt_imagenavigator
   org_mitk_gui_qt_moviemaker
   org_mitk_gui_qt_measurementtoolbox

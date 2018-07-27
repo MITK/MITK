@@ -558,7 +558,7 @@ if(NOT MITK_FAST_TESTING)
   endif()
 endif()
 
-if(NOT UNIX AND NOT MINGW)
+if(NOT UNIX)
   set(MITK_WIN32_FORCE_STATIC "STATIC" CACHE INTERNAL "Use this variable to always build static libraries on non-unix platforms")
 endif()
 
@@ -689,12 +689,6 @@ endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   mitkFunctionCheckCAndCXXCompilerFlags("-fstack-protector-all" MITK_C_FLAGS MITK_CXX_FLAGS)
-
-  if(MINGW)
-    # suppress warnings about auto imported symbols
-    set(MITK_SHARED_LINKER_FLAGS "-Wl,--enable-auto-import ${MITK_SHARED_LINKER_FLAGS}")
-  endif()
-
   set(MITK_CXX_FLAGS_RELEASE "-U_FORTIFY_SOURCES -D_FORTIFY_SOURCE=2 ${MITK_CXX_FLAGS_RELEASE}")
 endif()
 
@@ -740,9 +734,21 @@ foreach(ep ${MITK_EXTERNAL_PROJECTS})
       # Prefer config mode first because it finds external
       # <proj>Config.cmake files pointed at by <proj>_DIR variables.
       # Otherwise, existing Find<proj>.cmake files could fail.
+
+      if(DEFINED ${_package}_DIR)
+        #we store the information because it will be overwritten by find_package
+        #and would get lost for all EPs that use on Find<proj>.cmake instead of config
+        #files.
+        set(_temp_EP_${_package}_dir ${${_package}_DIR})
+      endif(DEFINED ${_package}_DIR)
+
       find_package(${_package} QUIET CONFIG)
       string(TOUPPER "${_package}" _package_uc)
       if(NOT (${_package}_FOUND OR ${_package_uc}_FOUND))
+        if(DEFINED _temp_EP_${_package}_dir)
+            set(${_package}_DIR ${_temp_EP_${_package}_dir} CACHE PATH "externaly set dir of the package ${_package}" FORCE)
+        endif(DEFINED _temp_EP_${_package}_dir)
+
         find_package(${_package} REQUIRED)
       endif()
     endif()
@@ -1315,6 +1321,10 @@ write_basic_config_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Confi
 # This must come after MITKConfig.h was generated, since applications
 # might do a find_package(MITK REQUIRED).
 add_subdirectory(Applications)
+
+if(MSVC AND TARGET MitkWorkbench)
+  set_directory_properties(PROPERTIES VS_STARTUP_PROJECT MitkWorkbench)
+endif()
 
 #-----------------------------------------------------------------------------
 # MITK Examples

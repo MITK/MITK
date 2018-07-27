@@ -9,7 +9,7 @@ macro(MITK_INSTALL_HELPER_APP)
   # TODO: how to supply to correct intermediate directory??
   # CMAKE_CFG_INTDIR is not expanded to actual values inside the install(CODE "...") macro ...
   set(intermediate_dir .)
-  if(WIN32 AND NOT MINGW)
+  if(WIN32)
     set(intermediate_dir Release)
   endif()
 

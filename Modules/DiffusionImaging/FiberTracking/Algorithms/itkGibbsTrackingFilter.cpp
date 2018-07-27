@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // #include <QFile>
 #include <tinyxml.h>
 #include <boost/progress.hpp>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <boost/algorithm/string.hpp>
 
 namespace itk{

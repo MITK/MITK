@@ -46,7 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDiffusionTensor3DReconstructionImageFilter.h>
 #include <itkDiffusionTensor3D.h>
 #include <itkTractDensityImageFilter.h>
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 #include <itkTractsToVectorImageFilter.h>
 #include <itkInvertIntensityImageFilter.h>
 #include <itkShiftScaleImageFilter.h>
@@ -60,8 +60,7 @@ namespace itk
 
 template< class PixelType >
 TractsToDWIImageFilter< PixelType >::TractsToDWIImageFilter()
-  : m_FiberBundle(nullptr)
-  , m_StatusText("")
+  : m_StatusText("")
   , m_UseConstantRandSeed(false)
   , m_RandGen(itk::Statistics::MersenneTwisterRandomVariateGenerator::New())
 {
@@ -124,8 +123,9 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
   m_KspaceImage->FillBuffer(nullPix);
 
   std::vector< unsigned int > spikeVolume;
-  for (unsigned int i=0; i<m_Parameters.m_SignalGen.m_Spikes; i++)
-    spikeVolume.push_back(m_RandGen->GetIntegerVariate()%(compartment_images.at(0)->GetVectorLength()));
+  if (m_Parameters.m_Misc.m_DoAddSpikes)
+    for (unsigned int i=0; i<m_Parameters.m_SignalGen.m_Spikes; i++)
+      spikeVolume.push_back(m_RandGen->GetIntegerVariate()%(compartment_images.at(0)->GetVectorLength()));
   std::sort (spikeVolume.begin(), spikeVolume.end());
   std::reverse (spikeVolume.begin(), spikeVolume.end());
 
@@ -240,7 +240,7 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
                                      -compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2)%2 ) / 2.0);
         idft->SetZidx(z);
         idft->SetCoilPosition(coilPositions.at(c));
-        idft->SetFiberBundle(m_FiberBundleWorkingCopy);
+        idft->SetFiberBundle(m_FiberBundle);
         idft->SetTranslation(m_Translations.at(g));
         idft->SetRotation(m_Rotations.at(g));
         idft->SetDiffusionGradientDirection(m_Parameters.m_SignalGen.GetGradientDirection(g));
@@ -392,7 +392,7 @@ void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
   {
     if (m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage().IsNotNull())
     {
-      PrintToLog("Using volume fraction map for fiber compartment " + boost::lexical_cast<std::string>(i+1));
+      PrintToLog("Using volume fraction map for fiber compartment " + boost::lexical_cast<std::string>(i+1), false);
       fibVolImages++;
     }
   }
@@ -403,7 +403,7 @@ void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
   {
     if (m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage().IsNotNull())
     {
-      PrintToLog("Using volume fraction map for non-fiber compartment " + boost::lexical_cast<std::string>(i+1));
+      PrintToLog("Using volume fraction map for non-fiber compartment " + boost::lexical_cast<std::string>(i+1), false);
       nonfibVolImages++;
     }
   }
@@ -418,7 +418,7 @@ void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
   {
     PrintToLog("Calculating missing non-fiber volume fraction image by inverting the other.\n"
                "Assuming non-fiber volume fraction images to contain values relative to the"
-               " remaining non-fiber volume, not absolute values.");
+               " remaining non-fiber volume, not absolute values.", false);
 
     auto inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
     inverter->SetMaximum(1.0);
@@ -465,7 +465,7 @@ void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
   {
     PrintToLog("Not all fiber compartments are using an associated volume fraction image.\n"
                "Assuming non-fiber volume fraction images to contain values relative to the"
-               " remaining non-fiber volume, not absolute values.");
+               " remaining non-fiber volume, not absolute values.", false);
     m_UseRelativeNonFiberVolumeFractions = true;
 
     //        itk::ImageFileWriter<ItkDoubleImgType>::Pointer wr = itk::ImageFileWriter<ItkDoubleImgType>::New();
@@ -501,8 +501,9 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
 
   // initialize output dwi image
   m_Parameters.m_SignalGen.m_CroppedRegion = m_Parameters.m_SignalGen.m_ImageRegion;
-  m_Parameters.m_SignalGen.m_CroppedRegion.SetSize( 1, m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(1)
-                                                    *m_Parameters.m_SignalGen.m_CroppingFactor);
+  if (m_Parameters.m_Misc.m_DoAddAliasing)
+    m_Parameters.m_SignalGen.m_CroppedRegion.SetSize( 1, m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(1)
+                                                      *m_Parameters.m_SignalGen.m_CroppingFactor);
 
   itk::Point<double,3> shiftedOrigin = m_Parameters.m_SignalGen.m_ImageOrigin;
   shiftedOrigin[1] += (m_Parameters.m_SignalGen.m_ImageRegion.GetSize(1)
@@ -521,6 +522,9 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
   temp.SetSize(m_Parameters.m_SignalGen.GetNumVolumes());
   temp.Fill(0.0);
   m_OutputImage->FillBuffer(temp);
+
+  PrintToLog("Output image spacing: [" + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_ImageSpacing[0]) + "," + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_ImageSpacing[1]) + "," + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_ImageSpacing[2]) + "]", false);
+  PrintToLog("Output image size: [" + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(0)) + "," + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(1)) + "," + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(2)) + "]", false);
 
   // images containing real and imaginary part of the dMRI signal for each coil
   m_OutputImagesReal.clear();
@@ -570,6 +574,9 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
   m_WorkingOrigin[2] -= m_Parameters.m_SignalGen.m_ImageSpacing[2]/2;
   m_WorkingOrigin[2] += m_WorkingSpacing[2]/2;
   m_VoxelVolume = m_WorkingSpacing[0]*m_WorkingSpacing[1]*m_WorkingSpacing[2];
+
+  PrintToLog("Working image spacing: [" + boost::lexical_cast<std::string>(m_WorkingSpacing[0]) + "," + boost::lexical_cast<std::string>(m_WorkingSpacing[1]) + "," + boost::lexical_cast<std::string>(m_WorkingSpacing[2]) + "]", false);
+  PrintToLog("Working image size: [" + boost::lexical_cast<std::string>(m_WorkingImageRegion.GetSize(0)) + "," + boost::lexical_cast<std::string>(m_WorkingImageRegion.GetSize(1)) + "," + boost::lexical_cast<std::string>(m_WorkingImageRegion.GetSize(2)) + "]", false);
 
   // generate double images to store the individual compartment signals
   m_CompartmentImages.clear();
@@ -633,43 +640,44 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
   }
 
   // resample mask image and frequency map to fit upsampled geometry
-  if (m_Parameters.m_SignalGen.m_DoAddGibbsRinging)
+  if (m_Parameters.m_SignalGen.m_MaskImage.IsNotNull() && m_Parameters.m_SignalGen.m_MaskImage->GetLargestPossibleRegion()!=m_WorkingImageRegion)
   {
-    if (m_Parameters.m_SignalGen.m_MaskImage.IsNotNull())
-    {
-      // rescale mask image (otherwise there are problems with the resampling)
-      auto rescaler = itk::RescaleIntensityImageFilter<ItkUcharImgType,ItkUcharImgType>::New();
-      rescaler->SetInput(0,m_Parameters.m_SignalGen.m_MaskImage);
-      rescaler->SetOutputMaximum(100);
-      rescaler->SetOutputMinimum(0);
-      rescaler->Update();
+    PrintToLog("Resampling tissue mask", false);
+    // rescale mask image (otherwise there are problems with the resampling)
+    auto rescaler = itk::RescaleIntensityImageFilter<ItkUcharImgType,ItkUcharImgType>::New();
+    rescaler->SetInput(0,m_Parameters.m_SignalGen.m_MaskImage);
+    rescaler->SetOutputMaximum(100);
+    rescaler->SetOutputMinimum(0);
+    rescaler->Update();
 
-      // resample mask image
-      auto resampler = itk::ResampleImageFilter<ItkUcharImgType, ItkUcharImgType>::New();
-      resampler->SetInput(rescaler->GetOutput());
-      resampler->SetOutputParametersFromImage(m_Parameters.m_SignalGen.m_MaskImage);
-      resampler->SetSize(m_WorkingImageRegion.GetSize());
-      resampler->SetOutputSpacing(m_WorkingSpacing);
-      resampler->SetOutputOrigin(m_WorkingOrigin);
-      auto nn_interpolator = itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType, double>::New();
-      resampler->SetInterpolator(nn_interpolator);
-      resampler->Update();
-      m_Parameters.m_SignalGen.m_MaskImage = resampler->GetOutput();
-    }
-    // resample frequency map
-    if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull())
-    {
-      auto resampler = itk::ResampleImageFilter<ItkFloatImgType, ItkFloatImgType>::New();
-      resampler->SetInput(m_Parameters.m_SignalGen.m_FrequencyMap);
-      resampler->SetOutputParametersFromImage(m_Parameters.m_SignalGen.m_FrequencyMap);
-      resampler->SetSize(m_WorkingImageRegion.GetSize());
-      resampler->SetOutputSpacing(m_WorkingSpacing);
-      resampler->SetOutputOrigin(m_WorkingOrigin);
-      auto nn_interpolator = itk::NearestNeighborInterpolateImageFunction<ItkFloatImgType, double>::New();
-      resampler->SetInterpolator(nn_interpolator);
-      resampler->Update();
-      m_Parameters.m_SignalGen.m_FrequencyMap = resampler->GetOutput();
-    }
+    // resample mask image
+    auto resampler = itk::ResampleImageFilter<ItkUcharImgType, ItkUcharImgType>::New();
+    resampler->SetInput(rescaler->GetOutput());
+    resampler->SetSize(m_WorkingImageRegion.GetSize());
+    resampler->SetOutputSpacing(m_WorkingSpacing);
+    resampler->SetOutputOrigin(m_WorkingOrigin);
+    resampler->SetOutputDirection(m_Parameters.m_SignalGen.m_ImageDirection);
+    resampler->SetOutputStartIndex ( m_WorkingImageRegion.GetIndex() );
+    auto nn_interpolator = itk::NearestNeighborInterpolateImageFunction<ItkUcharImgType, double>::New();
+    resampler->SetInterpolator(nn_interpolator);
+    resampler->Update();
+    m_Parameters.m_SignalGen.m_MaskImage = resampler->GetOutput();
+  }
+  // resample frequency map
+  if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull() && m_Parameters.m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion()!=m_WorkingImageRegion)
+  {
+    PrintToLog("Resampling frequency map", false);
+    auto resampler = itk::ResampleImageFilter<ItkFloatImgType, ItkFloatImgType>::New();
+    resampler->SetInput(m_Parameters.m_SignalGen.m_FrequencyMap);
+    resampler->SetSize(m_WorkingImageRegion.GetSize());
+    resampler->SetOutputSpacing(m_WorkingSpacing);
+    resampler->SetOutputOrigin(m_WorkingOrigin);
+    resampler->SetOutputDirection(m_Parameters.m_SignalGen.m_ImageDirection);
+    resampler->SetOutputStartIndex ( m_WorkingImageRegion.GetIndex() );
+    auto nn_interpolator = itk::NearestNeighborInterpolateImageFunction<ItkFloatImgType, double>::New();
+    resampler->SetInterpolator(nn_interpolator);
+    resampler->Update();
+    m_Parameters.m_SignalGen.m_FrequencyMap = resampler->GetOutput();
   }
 
   m_MaskImageSet = true;
@@ -690,10 +698,6 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
   }
   else
   {
-    if (m_Parameters.m_SignalGen.m_MaskImage->GetLargestPossibleRegion()!=m_WorkingImageRegion)
-    {
-      itkExceptionMacro("Mask image and specified DWI geometry are not matching!");
-    }
     PrintToLog("Using tissue mask", false);
   }
 
@@ -778,35 +782,13 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
 template< class PixelType >
 void TractsToDWIImageFilter< PixelType >::InitializeFiberData()
 {
-  // resample fiber bundle for sufficient voxel coverage
-  PrintToLog("Resampling fibers ...");
-  m_SegmentVolume = 0.0001;
-  float minSpacing = 1;
-  if( m_WorkingSpacing[0]<m_WorkingSpacing[1]
-      && m_WorkingSpacing[0]<m_WorkingSpacing[2])
-  {
-    minSpacing = m_WorkingSpacing[0];
-  }
-  else if (m_WorkingSpacing[1] < m_WorkingSpacing[2])
-  {
-    minSpacing = m_WorkingSpacing[1];
-  }
-  else
-  {
-    minSpacing = m_WorkingSpacing[2];
-  }
-
-  // working copy is needed because we need to resample the fibers but do not want to change the original bundle
-  m_FiberBundleWorkingCopy = m_FiberBundle->GetDeepCopy();
-  double volumeAccuracy = 10;
-  m_FiberBundleWorkingCopy->ResampleLinear(minSpacing/volumeAccuracy);
   m_mmRadius = m_Parameters.m_SignalGen.m_AxonRadius/1000;
 
-  auto caster = itk::CastImageFilter< itk::Image<unsigned char, 3>, itk::Image<float, 3> >::New();
+  auto caster = itk::CastImageFilter< itk::Image<unsigned char, 3>, itk::Image<double, 3> >::New();
   caster->SetInput(m_TransformedMaskImage);
   caster->Update();
 
-  vtkSmartPointer<vtkFloatArray> weights = m_FiberBundleWorkingCopy->GetFiberWeights();
+  vtkSmartPointer<vtkFloatArray> weights = m_FiberBundle->GetFiberWeights();
   float mean_weight = 0;
   for (int i=0; i<weights->GetSize(); i++)
     mean_weight += weights->GetValue(i);
@@ -814,47 +796,47 @@ void TractsToDWIImageFilter< PixelType >::InitializeFiberData()
 
   if (mean_weight>0.000001)
     for (int i=0; i<weights->GetSize(); i++)
-      m_FiberBundleWorkingCopy->SetFiberWeight(i, weights->GetValue(i)/mean_weight);
+      m_FiberBundle->SetFiberWeight(i, weights->GetValue(i)/mean_weight);
   else
     PrintToLog("\nWarning: streamlines have VERY low weights. Average weight: " + boost::lexical_cast<std::string>(mean_weight) + ". Possible source of calculation errors.", false, true, true);
 
 
-  auto density_calculator = itk::TractDensityImageFilter< itk::Image<float, 3> >::New();
-  density_calculator->SetFiberBundle(m_FiberBundleWorkingCopy);
+  auto density_calculator = itk::TractDensityImageFilter< itk::Image<double, 3> >::New();
+  density_calculator->SetFiberBundle(m_FiberBundle);
   density_calculator->SetInputImage(caster->GetOutput());
   density_calculator->SetBinaryOutput(false);
   density_calculator->SetUseImageGeometry(true);
-  density_calculator->SetDoFiberResampling(false);
   density_calculator->SetOutputAbsoluteValues(true);
-  density_calculator->SetWorkOnFiberCopy(false);
   density_calculator->Update();
-  float max_density = density_calculator->GetMaxDensity();
+  double max_density = density_calculator->GetMaxDensity();
 
+  double voxel_volume = m_WorkingSpacing[0]*m_WorkingSpacing[1]*m_WorkingSpacing[2];
   if (m_mmRadius>0)
   {
-    m_SegmentVolume = itk::Math::pi*m_mmRadius*m_mmRadius*minSpacing/volumeAccuracy;
     std::stringstream stream;
-    stream << std::fixed << setprecision(2) << max_density * m_SegmentVolume;
+    stream << std::fixed << setprecision(2) << itk::Math::pi*m_mmRadius*m_mmRadius*max_density;
     std::string s = stream.str();
     PrintToLog("\nMax. fiber volume: " + s + "mm².", false, true, true);
+
+    {
+      double full_radius = 1000*std::sqrt(voxel_volume/(max_density*itk::Math::pi));
+      std::stringstream stream;
+      stream << std::fixed << setprecision(2) << full_radius;
+      std::string s = stream.str();
+      PrintToLog("\nA full fiber voxel corresponds to a fiber radius of ~" + s + "µm, given the current fiber configuration.", false, true, true);
+    }
   }
   else
   {
+    m_mmRadius = std::sqrt(voxel_volume/(max_density*itk::Math::pi));
     std::stringstream stream;
-    stream << std::fixed << setprecision(2) << max_density * m_SegmentVolume;
+    stream << std::fixed << setprecision(2) << m_mmRadius*1000;
     std::string s = stream.str();
-    PrintToLog("\nMax. fiber volume: " + s + "mm² (before rescaling to voxel volume).", false, true, true);
+    PrintToLog("\nSetting fiber radius to " + s + "µm to obtain full voxel.", false, true, true);
   }
-  float voxel_volume = m_WorkingSpacing[0]*m_WorkingSpacing[1]*m_WorkingSpacing[2];
-  float new_seg_vol = voxel_volume/max_density;
-  float new_fib_radius = 1000*std::sqrt(new_seg_vol*volumeAccuracy/(minSpacing*itk::Math::pi));
-  std::stringstream stream;
-  stream << std::fixed << setprecision(2) << new_fib_radius;
-  std::string s = stream.str();
-  PrintToLog("\nA full fiber voxel corresponds to a fiber radius of ~" + s + "µm, given the current fiber configuration.", false, true, true);
 
   // a second fiber bundle is needed to store the transformed version of the m_FiberBundleWorkingCopy
-  m_FiberBundleTransformed = m_FiberBundleWorkingCopy;
+  m_FiberBundleTransformed = m_FiberBundle;
 }
 
 
@@ -950,12 +932,14 @@ bool TractsToDWIImageFilter< PixelType >::PrepareLogFile()
 template< class PixelType >
 void TractsToDWIImageFilter< PixelType >::GenerateData()
 {
+  PrintToLog("\n**********************************************", false);
   // prepare logfile
   if ( ! PrepareLogFile() )
   {
     this->SetAbortGenerateData( true );
     return;
   }
+  PrintToLog("Starting Fiberfox dMRI simulation");
 
   m_TimeProbe.Start();
 
@@ -974,9 +958,6 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
   if (m_Parameters.m_SignalGen.m_DoDisablePartialVolume)  // no partial volume? remove all but first fiber compartment
     while (m_Parameters.m_FiberModelList.size()>1)
       m_Parameters.m_FiberModelList.pop_back();
-
-  //    int baselineIndex = m_Parameters.m_SignalGen.GetFirstBaselineIndex();
-  //    if (baselineIndex<0) { itkExceptionMacro("No baseline index found!"); }
 
   if (!m_Parameters.m_SignalGen.m_SimulateKspaceAcquisition)  // No upsampling of input image needed if no k-space simulation is performed
     m_Parameters.m_SignalGen.m_DoAddGibbsRinging = false;
@@ -1007,11 +988,16 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     PrintToLog("b-values: ", false, false, true);
     for (auto v : bVals)
       PrintToLog(boost::lexical_cast<std::string>(v) + " ", false, false, true);
+    PrintToLog("\nVolumes: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.GetNumVolumes()), false, true, true);
+
     PrintToLog("\n", false, false, true);
     PrintToLog("\n", false, false, true);
 
-    int numFibers = m_FiberBundleWorkingCopy->GetNumFibers();
-    boost::progress_display disp(numFibers*m_Parameters.m_SignalGen.GetNumVolumes());
+    unsigned int image_size_x = m_WorkingImageRegion.GetSize(0);
+    unsigned int region_size_y = m_WorkingImageRegion.GetSize(1);
+    unsigned int num_gradients = m_Parameters.m_SignalGen.GetNumVolumes();
+    int numFibers = m_FiberBundle->GetNumFibers();
+    boost::progress_display disp(numFibers*num_gradients);
 
     if (m_FiberBundle->GetMeanFiberLength()<5.0)
       omp_set_num_threads(2);
@@ -1019,7 +1005,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false, true, false);
     PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false, false);
 
-    for (unsigned int g=0; g<m_Parameters.m_SignalGen.GetNumVolumes(); ++g)
+    for (unsigned int g=0; g<num_gradients; ++g)
     {
       // move fibers
       SimulateMotion(g);
@@ -1041,6 +1027,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
       intraAxonalVolumeImage->Allocate();
       intraAxonalVolumeImage->FillBuffer(0);
       maxVolume = 0;
+      double* intraAxBuffer = intraAxonalVolumeImage->GetBufferPointer();
 
       if (this->GetAbortGenerateData())
         continue;
@@ -1049,8 +1036,11 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
       // generate fiber signal (if there are any fiber models present)
       if (!m_Parameters.m_FiberModelList.empty())
       {
+        std::vector< double* > buffers;
+        for (unsigned int i=0; i<m_CompartmentImages.size(); ++i)
+          buffers.push_back(m_CompartmentImages.at(i)->GetBufferPointer());
 #pragma omp parallel for
-        for( int i=0; i<numFibers; i++ )
+        for( int i=0; i<numFibers; ++i )
         {
           if (this->GetAbortGenerateData())
             continue;
@@ -1071,7 +1061,8 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
           if (numPoints<2)
             continue;
 
-          for( int j=0; j<numPoints; j++)
+          double seg_volume = fiberWeight*itk::Math::pi*m_mmRadius*m_mmRadius;
+          for( int j=0; j<numPoints - 1; ++j)
           {
             if (this->GetAbortGenerateData())
             {
@@ -1079,39 +1070,56 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
               continue;
             }
 
-            itk::Point<float, 3> vertex = points_copy.at(j);
             itk::Vector<double> v = points_copy.at(j);
 
-            itk::Vector<double, 3> dir(3);
-            if (j<numPoints-1) { dir = points_copy.at(j+1)-v; }
-            else { dir = v-points_copy.at(j-1); }
-
+            itk::Vector<double, 3> dir = points_copy.at(j+1)-v;
             if ( dir.GetSquaredNorm()<0.0001 || dir[0]!=dir[0] || dir[1]!=dir[1] || dir[2]!=dir[2] )
-              continue;
-
-            itk::Index<3> idx;
-            itk::ContinuousIndex<float, 3> contIndex;
-            m_TransformedMaskImage->TransformPhysicalPointToIndex(vertex, idx);
-            m_TransformedMaskImage->TransformPhysicalPointToContinuousIndex(vertex, contIndex);
-
-            if (!m_TransformedMaskImage->GetLargestPossibleRegion().IsInside(idx) || m_TransformedMaskImage->GetPixel(idx)<=0)
               continue;
             dir.Normalize();
 
+            itk::Point<float, 3> startVertex = points_copy.at(j);
+            itk::Index<3> startIndex;
+            itk::ContinuousIndex<float, 3> startIndexCont;
+            m_TransformedMaskImage->TransformPhysicalPointToIndex(startVertex, startIndex);
+            m_TransformedMaskImage->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
+
+            itk::Point<float, 3> endVertex = points_copy.at(j+1);
+            itk::Index<3> endIndex;
+            itk::ContinuousIndex<float, 3> endIndexCont;
+            m_TransformedMaskImage->TransformPhysicalPointToIndex(endVertex, endIndex);
+            m_TransformedMaskImage->TransformPhysicalPointToContinuousIndex(endVertex, endIndexCont);
+
+            std::vector< std::pair< itk::Index<3>, double > > segments = mitk::imv::IntersectImage(m_WorkingSpacing, startIndex, endIndex, startIndexCont, endIndexCont);
+
             // generate signal for each fiber compartment
-            for (int k=0; k<numFiberCompartments; k++)
+            for (int k=0; k<numFiberCompartments; ++k)
             {
-              DoubleDwiType::PixelType pix = m_CompartmentImages.at(k)->GetPixel(idx);
-              pix[g] += fiberWeight*m_SegmentVolume*m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g, dir);
-              m_CompartmentImages.at(k)->SetPixel(idx, pix);
+              double signal_add = m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g, dir)*seg_volume;
+              for (std::pair< itk::Index<3>, double > seg : segments)
+              {
+                if (!m_TransformedMaskImage->GetLargestPossibleRegion().IsInside(seg.first) || m_TransformedMaskImage->GetPixel(seg.first)<=0)
+                  continue;
+
+                double seg_signal = seg.second*signal_add;
+
+                unsigned int linear_index = g + num_gradients*seg.first[0] + num_gradients*image_size_x*seg.first[1] + num_gradients*image_size_x*region_size_y*seg.first[2];
+
+                // update dMRI volume
+#pragma omp atomic
+                buffers[k][linear_index] += seg_signal;
+
+                // update fiber volume image
+                if (k==0)
+                {
+                  linear_index = seg.first[0] + image_size_x*seg.first[1] + image_size_x*region_size_y*seg.first[2];
+#pragma omp atomic
+                  intraAxBuffer[linear_index] += seg.second*seg_volume;
+                  double vol = intraAxBuffer[linear_index];
+                  if (vol>maxVolume) { maxVolume = vol; }
+                }
+              }
+
             }
-
-            // update fiber volume image
-            double vol = intraAxonalVolumeImage->GetPixel(idx) + m_SegmentVolume*fiberWeight;
-            intraAxonalVolumeImage->SetPixel(idx, vol);
-
-            // we assume that the first volume is always unweighted!
-            if (vol>maxVolume) { maxVolume = vol; }
           }
 
 #pragma omp critical
@@ -1267,22 +1275,22 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     }
     }
 
-    if (m_Parameters.m_SignalGen.m_NoiseVariance>0 && m_Parameters.m_Misc.m_CheckAddNoiseBox)
-      PrintToLog("Simulating complex Gaussian noise", false);
     if (m_Parameters.m_SignalGen.m_DoSimulateRelaxation)
       PrintToLog("Simulating signal relaxation", false);
-    if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull())
+    if (m_Parameters.m_SignalGen.m_NoiseVariance>0 && m_Parameters.m_Misc.m_DoAddNoise)
+      PrintToLog("Simulating complex Gaussian noise: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_NoiseVariance), false);
+    if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull() && m_Parameters.m_Misc.m_DoAddDistortions)
       PrintToLog("Simulating distortions", false);
     if (m_Parameters.m_SignalGen.m_DoAddGibbsRinging)
       PrintToLog("Simulating ringing artifacts", false);
-    if (m_Parameters.m_SignalGen.m_EddyStrength>0)
-      PrintToLog("Simulating eddy currents", false);
-    if (m_Parameters.m_SignalGen.m_Spikes>0)
-      PrintToLog("Simulating spikes", false);
-    if (m_Parameters.m_SignalGen.m_CroppingFactor<1.0)
-      PrintToLog("Simulating aliasing artifacts", false);
-    if (m_Parameters.m_SignalGen.m_KspaceLineOffset>0)
-      PrintToLog("Simulating ghosts", false);
+    if (m_Parameters.m_Misc.m_DoAddEddyCurrents && m_Parameters.m_SignalGen.m_EddyStrength>0)
+      PrintToLog("Simulating eddy currents: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_EddyStrength), false);
+    if (m_Parameters.m_Misc.m_DoAddSpikes && m_Parameters.m_SignalGen.m_Spikes>0)
+      PrintToLog("Simulating spikes: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_Spikes), false);
+    if (m_Parameters.m_Misc.m_DoAddAliasing && m_Parameters.m_SignalGen.m_CroppingFactor<1.0)
+      PrintToLog("Simulating aliasing: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_CroppingFactor), false);
+    if (m_Parameters.m_Misc.m_DoAddGhosts && m_Parameters.m_SignalGen.m_KspaceLineOffset>0)
+      PrintToLog("Simulating ghosts: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_KspaceLineOffset), false);
 
     doubleOutImage = SimulateKspaceAcquisition(m_CompartmentImages);
     signalScale = 1; // already scaled in SimulateKspaceAcquisition()
@@ -1309,10 +1317,12 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
   }
 
   PrintToLog("Finalizing image");
+  if (m_Parameters.m_SignalGen.m_DoAddDrift && m_Parameters.m_SignalGen.m_Drift>0.0)
+    PrintToLog("Adding signal drift: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_Drift), false);
   if (signalScale>1)
-    PrintToLog(" Scaling signal", false);
+    PrintToLog("Scaling signal", false);
   if (m_Parameters.m_NoiseModel)
-    PrintToLog(" Adding noise", false);
+    PrintToLog("Adding noise: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_NoiseVariance), false);
   unsigned int window = 0;
   unsigned int min = itk::NumericTraits<unsigned int>::max();
   ImageRegionIterator<OutputImageType> it4 (m_OutputImage, m_OutputImage->GetLargestPossibleRegion());
@@ -1340,6 +1350,15 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
     typename OutputImageType::IndexType index = it4.GetIndex();
     signal = doubleOutImage->GetPixel(index)*signalScale;
+
+    for (unsigned int i=0; i<signal.Size(); i++)
+    {
+      if (m_Parameters.m_SignalGen.m_DoAddDrift)
+      {
+        double df = -m_Parameters.m_SignalGen.m_Drift/(signal.Size()*signal.Size());
+        signal[i] += signal[i]*df*i*i;
+      }
+    }
 
     if (m_Parameters.m_NoiseModel)
       m_Parameters.m_NoiseModel->AddNoise(signal);
@@ -1374,7 +1393,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     PrintToLog(m_MotionLog, false, false);
   }
 
-  if (m_Parameters.m_SignalGen.m_Spikes>0)
+  if (m_Parameters.m_Misc.m_DoAddSpikes && m_Parameters.m_SignalGen.m_Spikes>0)
   {
     PrintToLog("\nSpike log:", false);
     PrintToLog(m_SpikeLog, false, false);
@@ -1412,6 +1431,8 @@ void TractsToDWIImageFilter< PixelType >::PrintToLog(std::string m, bool addTime
     if (stdOut)
       std::cout << "\n";
   }
+
+  m_Logfile.flush();
 }
 
 template< class PixelType >
@@ -1426,7 +1447,7 @@ void TractsToDWIImageFilter< PixelType >::SimulateMotion(int g)
     if ( m_Parameters.m_SignalGen.m_DoRandomizeMotion )
     {
       // either undo last transform or work on fresh copy of untransformed fibers
-      m_FiberBundleTransformed = m_FiberBundleWorkingCopy->GetDeepCopy();
+      m_FiberBundleTransformed = m_FiberBundle->GetDeepCopy();
 
       m_Rotation[0] = m_RandGen->GetVariateWithClosedRange(m_Parameters.m_SignalGen.m_Rotation[0]*2)
           -m_Parameters.m_SignalGen.m_Rotation[0];
@@ -1527,14 +1548,14 @@ itk::Point<double, 3> TractsToDWIImageFilter< PixelType >::GetMovedPoint(itk::In
     m_UpsampledMaskImage->TransformIndexToPhysicalPoint(index, transformed_point);
     if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
     {
-      transformed_point = m_FiberBundleWorkingCopy->TransformPoint(transformed_point.GetVnlVector(),
-                                                                   m_Rotation[0],m_Rotation[1],m_Rotation[2],
+      transformed_point = m_FiberBundle->TransformPoint(transformed_point.GetVnlVector(),
+                                                        m_Rotation[0],m_Rotation[1],m_Rotation[2],
           m_Translation[0],m_Translation[1],m_Translation[2]);
     }
     else
     {
-      transformed_point = m_FiberBundleWorkingCopy->TransformPoint(transformed_point.GetVnlVector(),
-                                                                   m_Rotation[0]*m_MotionCounter,m_Rotation[1]*m_MotionCounter,m_Rotation[2]*m_MotionCounter,
+      transformed_point = m_FiberBundle->TransformPoint(transformed_point.GetVnlVector(),
+                                                        m_Rotation[0]*m_MotionCounter,m_Rotation[1]*m_MotionCounter,m_Rotation[2]*m_MotionCounter,
           m_Translation[0]*m_MotionCounter,m_Translation[1]*m_MotionCounter,m_Translation[2]*m_MotionCounter);
     }
   }
@@ -1543,14 +1564,14 @@ itk::Point<double, 3> TractsToDWIImageFilter< PixelType >::GetMovedPoint(itk::In
     m_TransformedMaskImage->TransformIndexToPhysicalPoint(index, transformed_point);
     if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
     {
-      transformed_point = m_FiberBundleWorkingCopy->TransformPoint( transformed_point.GetVnlVector(),
-                                                                    -m_Rotation[0], -m_Rotation[1], -m_Rotation[2],
+      transformed_point = m_FiberBundle->TransformPoint( transformed_point.GetVnlVector(),
+                                                         -m_Rotation[0], -m_Rotation[1], -m_Rotation[2],
           -m_Translation[0], -m_Translation[1], -m_Translation[2] );
     }
     else
     {
-      transformed_point = m_FiberBundleWorkingCopy->TransformPoint( transformed_point.GetVnlVector(),
-                                                                    -m_Rotation[0]*m_MotionCounter, -m_Rotation[1]*m_MotionCounter, -m_Rotation[2]*m_MotionCounter,
+      transformed_point = m_FiberBundle->TransformPoint( transformed_point.GetVnlVector(),
+                                                         -m_Rotation[0]*m_MotionCounter, -m_Rotation[1]*m_MotionCounter, -m_Rotation[2]*m_MotionCounter,
           -m_Translation[0]*m_MotionCounter, -m_Translation[1]*m_MotionCounter, -m_Translation[2]*m_MotionCounter );
     }
   }

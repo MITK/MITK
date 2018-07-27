@@ -150,10 +150,6 @@ namespace mitk
     typedef std::vector<SliceNavigationController *> SNCVector;
 
   private:
-    mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes,
-                                            mitk::Point3D worldposition,
-                                            BaseRenderer *ren);
-
     /**
      * @brief UpdateStatusBar
      * @param image3D

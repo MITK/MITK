@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCameraIntrinsics.h>
 #include "mitkCameraIntrinsics.h"
 #include <mitkPointSet.h>
-#include <cv.h>
 
 #include <vtkSmartPointer.h>
 #include <vtkIdList.h>

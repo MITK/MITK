@@ -13,15 +13,15 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
     <widget class="QLabel" name="scanningDepthLabel">
      <property name="text">
       <string>Depth Control</string>
      </property>
     </widget>
    </item>
-   <item>
+   <item row="1" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QToolButton" name="scanningDepthNext">
@@ -56,14 +56,14 @@
      </item>
     </layout>
    </item>
-   <item>
+   <item row="2" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Frequency Control</string>
      </property>
     </widget>
    </item>
-   <item>
+   <item row="3" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QToolButton" name="scanningFrequencyPrev">
@@ -92,14 +92,38 @@
      </item>
     </layout>
    </item>
-   <item>
-    <widget class="QLabel" name="scanninPowerLabel">
-     <property name="text">
-      <string>Power Control</string>
-     </property>
-    </widget>
+   <item row="4" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <item>
+      <widget class="QLabel" name="scanningPowerLabel">
+       <property name="text">
+        <string>Power Control :</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="scanningPowerLabel_value">
+       <property name="text">
+        <string>100 %</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
-   <item>
+   <item row="5" column="0" colspan="2">
     <widget class="QSlider" name="scanningPowerSlider">
      <property name="minimumSize">
       <size>
@@ -124,7 +148,7 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item row="6" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <widget class="QLabel" name="label_2">
@@ -183,14 +207,38 @@
      </item>
     </layout>
    </item>
-   <item>
-    <widget class="QLabel" name="scanningGainLabel">
-     <property name="text">
-      <string>Gain Control</string>
-     </property>
-    </widget>
+   <item row="7" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
+     <item>
+      <widget class="QLabel" name="scanningGainLabel">
+       <property name="text">
+        <string>Gain Control :</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="scanningGainLabel_value">
+       <property name="text">
+        <string>100 %</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_6">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
-   <item>
+   <item row="8" column="0" colspan="2">
     <widget class="QSlider" name="scanningGainSlider">
      <property name="minimumSize">
       <size>
@@ -206,7 +254,7 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item row="9" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
       <widget class="QLabel" name="label_4">
@@ -265,14 +313,38 @@
      </item>
     </layout>
    </item>
-   <item>
-    <widget class="QLabel" name="scanningDynamicRangeLabel">
-     <property name="text">
-      <string>Dynamic Range Control</string>
-     </property>
-    </widget>
+   <item row="10" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_9">
+     <item>
+      <widget class="QLabel" name="scanningDynamicRangeLabel">
+       <property name="text">
+        <string>Dynamic Range Control :</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="scanningDynamicRangeLabel_value">
+       <property name="text">
+        <string>80 dB</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_7">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
-   <item>
+   <item row="11" column="0" colspan="2">
     <widget class="QSlider" name="scanningDynamicRangeSlider">
      <property name="minimumSize">
       <size>
@@ -288,7 +360,7 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item row="12" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
       <widget class="QLabel" name="label_6">
@@ -347,14 +419,38 @@
      </item>
     </layout>
    </item>
-   <item>
-    <widget class="QLabel" name="scanningRejectionLabel">
-     <property name="text">
-      <string>Rejection Control</string>
-     </property>
-    </widget>
+   <item row="13" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_10">
+     <item>
+      <widget class="QLabel" name="scanningRejectionLabel">
+       <property name="text">
+        <string>Rejection Control :</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="scanningRejectionLabel_value">
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_8">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
-   <item>
+   <item row="14" column="0" colspan="2">
     <widget class="QSlider" name="scanningRejectionSlider">
      <property name="minimumSize">
       <size>
@@ -370,7 +466,7 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item row="15" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_6">
      <item>
       <widget class="QLabel" name="label_8">
@@ -429,7 +525,7 @@
      </item>
     </layout>
    </item>
-   <item>
+   <item row="16" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

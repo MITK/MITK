@@ -193,10 +193,9 @@ void QmitkDenoisingView::StartDenoising()
   }
   }
 
-  denoised_image->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( static_cast<mitk::GradientDirectionsProperty*>( input_image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() ) );
-  denoised_image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>(input_image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
-  mitk::DiffusionPropertyHelper propertyHelper( denoised_image );
-  propertyHelper.InitializeImage();
+  mitk::DiffusionPropertyHelper::SetGradientContainer(denoised_image, mitk::DiffusionPropertyHelper::GetGradientContainer(input_image) );
+  mitk::DiffusionPropertyHelper::SetReferenceBValue(denoised_image, mitk::DiffusionPropertyHelper::GetReferenceBValue(input_image) );
+  mitk::DiffusionPropertyHelper::InitializeImage(denoised_image);
 
   denoised_image_node->SetData( denoised_image );
   GetDataStorage()->Add(denoised_image_node, m_ImageNode);

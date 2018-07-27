@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingManager.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
+#include <QFileInfo>
 
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/arrayobject.h>
@@ -41,7 +42,7 @@ static char* pHome = nullptr;
 #endif
 
 mitk::PythonService::PythonService()
-: m_ItkWrappingAvailable( true ), m_OpenCVWrappingAvailable( true ), m_VtkWrappingAvailable( true ), m_ErrorOccured( false )
+  : m_ItkWrappingAvailable( true ), m_OpenCVWrappingAvailable( true ), m_VtkWrappingAvailable( true ), m_ErrorOccured( false )
 {
   {
     MITK_DEBUG << "will init python if necessary";
@@ -60,13 +61,8 @@ mitk::PythonService::PythonService()
     {
       //TODO a better way to do this
 #ifndef WIN32
-#if defined (__APPLE__) || defined(MACOSX)
-      const char* library = "libpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.dylib";
-#else
-      const char* library = "libpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.so";
-#endif
       dlerror();
-      if(dlopen(library, RTLD_NOW | RTLD_GLOBAL) == 0 )
+      if(dlopen(PYTHON_LIBRARY, RTLD_NOW | RTLD_GLOBAL) == 0 )
       {
         mitkThrow() << "Python runtime could not be loaded: " << dlerror();
       }
@@ -189,7 +185,12 @@ std::string mitk::PythonService::Execute(const std::string &stdpythonCommand, in
 
 void mitk::PythonService::ExecuteScript( const std::string& pythonScript )
 {
-  m_PythonManager.executeFile(QString::fromStdString(pythonScript));
+  std::ifstream t(pythonScript.c_str());
+  std::string str((std::istreambuf_iterator<char>(t)),
+                  std::istreambuf_iterator<char>());
+  t.close();
+
+  m_PythonManager.executeString(QString::fromStdString(str));
 }
 
 std::vector<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const
@@ -213,22 +214,32 @@ std::vector<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const
       tempObject = PyObject_GetAttrString( object, name.c_str() );
       attrType = tempObject->ob_type->tp_name;
 
-      //disabled due to strange errors, see T24085
-      //strTempObject = PyObject_Repr(tempObject);
-      //if(strTempObject && ( PyUnicode_Check(strTempObject) || PyString_Check(strTempObject) ) )
-      //  attrValue = PyString_AsString(strTempObject);
-      //else
-      //  attrValue = "";
+      if(tempObject && ( PyUnicode_Check(tempObject) || PyString_Check(tempObject) ) )
+        attrValue = PyString_AsString(tempObject);
+      else
+        attrValue = "";
 
       mitk::PythonVariable var;
       var.m_Name = name;
-      //var.m_Value = attrValue;
+      var.m_Value = attrValue;
       var.m_Type = attrType;
       list.push_back(var);
     }
   }
 
   return list;
+}
+
+std::string mitk::PythonService::GetVariable(const std::string& name) const
+{
+  std::vector<mitk::PythonVariable> allVars = this->GetVariableStack();
+  for(unsigned int i = 0; i< allVars.size(); i++)
+  {
+    if( allVars.at(i).m_Name == name )
+      return allVars.at(i).m_Value;
+  }
+
+  return "";
 }
 
 bool mitk::PythonService::DoesVariableExist(const std::string& name) const
@@ -372,9 +383,9 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
     }
   }
   else if ( ioPixelType == itk::ImageIOBase::VECTOR ||
-      ioPixelType == itk::ImageIOBase::RGB ||
-      ioPixelType == itk::ImageIOBase::RGBA
-  )
+            ioPixelType == itk::ImageIOBase::RGB ||
+            ioPixelType == itk::ImageIOBase::RGBA
+            )
   {
     if( pixelType.GetComponentType() == itk::ImageIOBase::DOUBLE ) {
       npy_type = NPY_DOUBLE;
@@ -419,8 +430,8 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
 
   // add temp array it to the python dictionary to access it in python code
   const int status = PyDict_SetItemString( pyDict,QString("%1_numpy_array")
-      .arg(varName).toStdString().c_str(),
-      npyArray );
+                                           .arg(varName).toStdString().c_str(),
+                                           npyArray );
 
 
   // sanity check
@@ -429,18 +440,18 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
 
 
   command.append( QString("%1 = sitk.Image(%2,sitk.%3,%4)\n").arg(varName)
-      .arg(dimensionString)
-      .arg(QString(sitk_type.c_str())).arg(QString::number(pixelType.GetNumberOfComponents())) );
+                  .arg(dimensionString)
+                  .arg(QString(sitk_type.c_str())).arg(QString::number(pixelType.GetNumberOfComponents())) );
   command.append( QString("%1.SetSpacing([%2,%3,%4])\n").arg(varName)
-      .arg(QString::number(spacing[0]))
+                  .arg(QString::number(spacing[0]))
       .arg(QString::number(spacing[1]))
       .arg(QString::number(spacing[2])) );
   command.append( QString("%1.SetOrigin([%2,%3,%4])\n").arg(varName)
-      .arg(QString::number(origin[0]))
+                  .arg(QString::number(origin[0]))
       .arg(QString::number(origin[1]))
       .arg(QString::number(origin[2])) );
   command.append( QString("%1.SetDirection([%2,%3,%4,%5,%6,%7,%8,%9,%10])\n").arg(varName)
-      .arg(QString::number(xDirection[0]))
+                  .arg(QString::number(xDirection[0]))
       .arg(QString::number(xDirection[1]))
       .arg(QString::number(xDirection[2]))
       .arg(QString::number(yDirection[0]))
@@ -449,7 +460,7 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
       .arg(QString::number(zDirection[0]))
       .arg(QString::number(zDirection[1]))
       .arg(QString::number(zDirection[2]))
-  );
+      );
   // directly access the cpp api from the lib
   command.append( QString("_SimpleITK._SetImageFromArray(%1_numpy_array,%1)\n").arg(varName) );
   command.append( QString("del %1_numpy_array").arg(varName) );
@@ -753,8 +764,8 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::
 
   // add temp array it to the python dictionary to access it in python code
   const int status = PyDict_SetItemString( pyDict,QString("%1_numpy_array")
-      .arg(varName).toStdString().c_str(),
-      npyArray );
+                                           .arg(varName).toStdString().c_str(),
+                                           npyArray );
   // sanity check
   if ( status != 0 )
     return false;
@@ -764,8 +775,8 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::
   //command.append( QString("  del %1\n").arg(varName));
   command.append( QString("%1_array_tmp=%1_numpy_array.copy()\n").arg(varName));
   command.append( QString("%1_array_tmp=%1_array_tmp.reshape(%2,%3,%4)\n").arg( varName,
-      QString::number(imgDim[1]),
-      QString::number(imgDim[0]),
+                                                                                QString::number(imgDim[1]),
+                  QString::number(imgDim[0]),
       QString::number(pixelType.GetNumberOfComponents())));
 
   command.append( QString("%1 = %1_array_tmp[:,...,::-1]\n").arg(varName));
@@ -917,7 +928,7 @@ bool mitk::PythonService::IsSimpleItkPythonWrappingAvailable()
 {
   this->Execute( "import SimpleITK as sitk\n", IPythonService::SINGLE_LINE_COMMAND );
   // directly access cpp lib
-  this->Execute( "import _SimpleITK\n", IPythonService::SINGLE_LINE_COMMAND );
+  this->Execute( "import SimpleITK._SimpleITK as _SimpleITK\n", IPythonService::SINGLE_LINE_COMMAND );
   m_ItkWrappingAvailable = !this->PythonErrorOccured();
 
   // check for numpy

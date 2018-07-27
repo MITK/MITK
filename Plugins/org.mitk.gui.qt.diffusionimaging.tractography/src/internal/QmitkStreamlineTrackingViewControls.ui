@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>QmitkStreamlineTrackingViewControls</class>
  <widget class="QWidget" name="QmitkStreamlineTrackingViewControls">
@@ -20,40 +20,12 @@
    <string>QmitkTemplate</string>
   </property>
   <property name="styleSheet">
-   <string>QCommandLinkButton {
-  font-weight: normal;
-}
-
-QCommandLinkButton:disabled {
+   <string>QCommandLinkButton:disabled {
   border: none;
-  font-weight: lighter;
-}
-
-QToolBox::tab {
-  border: 1px solid #434346;
-  font-weight: bold;
-}
-
-QToolBox::tab:hover {
-  background-color: #434346;
-  font-weight: bold;
-}
-
-QToolBox::tab:selected {
-  background-color: #1c97ea;
-  border: 1px solid #1c97ea;
-  font-weight: bold;
 }
 
 QGroupBox {
-  border: 1px solid #434346;
-  background-color: #2d2d30;
-  margin-top: 8px;
-  padding-top: 8px;
-}
-
-QGroupBox, QGroupBox:disabled {
-  background-color: #2d2d30;
+  background-color: transparent;
 }</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_11">
@@ -149,7 +121,7 @@ QGroupBox, QGroupBox:disabled {
             <string>Input Image. ODF, tensor, peak, and, in case of ML tractography, raw diffusion-weighted images are currently supported.</string>
            </property>
            <property name="text">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" color:#ff0000;"&gt;select image in data-manager&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;select image in data-manager&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="wordWrap">
             <bool>true</bool>
@@ -159,7 +131,7 @@ QGroupBox, QGroupBox:disabled {
          <item row="1" column="0">
           <widget class="QLabel" name="m_ForestLabel">
            <property name="toolTip">
-            <string></string>
+            <string/>
            </property>
            <property name="text">
             <string>Tractography Forest:</string>
@@ -167,18 +139,10 @@ QGroupBox, QGroupBox:disabled {
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QmitkDataStorageComboBox" name="m_ForestBox">
-           <property name="toolTip">
-            <string>Random forest for machine learning based tractography.</string>
+          <widget class="QmitkSingleNodeSelectionWidget" name="m_ForestSelectionWidget" native="true">
+           <property name="styleSheet">
+            <string notr="true"/>
            </property>
-           <property name="sizeAdjustPolicy">
-            <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-           </property>
-           <item>
-            <property name="text">
-             <string>-</string>
-            </property>
-           </item>
           </widget>
          </item>
         </layout>
@@ -224,6 +188,12 @@ QGroupBox, QGroupBox:disabled {
        <height>0</height>
       </size>
      </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -233,7 +203,7 @@ QGroupBox, QGroupBox:disabled {
         <x>0</x>
         <y>0</y>
         <width>421</width>
-        <height>267</height>
+        <height>254</height>
        </rect>
       </property>
       <attribute name="label">
@@ -288,7 +258,7 @@ QGroupBox, QGroupBox:disabled {
              <item row="2" column="1">
               <widget class="QSpinBox" name="m_NumSeedsBox">
                <property name="toolTip">
-                <string>Number of seed points equally distributed around selected position.</string>
+                <string>Number of seed points equally distributed around selected position. </string>
                </property>
                <property name="minimum">
                 <number>1</number>
@@ -304,7 +274,7 @@ QGroupBox, QGroupBox:disabled {
              <item row="1" column="0">
               <widget class="QLabel" name="m_FaThresholdLabel_4">
                <property name="toolTip">
-                <string></string>
+                <string/>
                </property>
                <property name="text">
                 <string>Radius:</string>
@@ -333,7 +303,7 @@ QGroupBox, QGroupBox:disabled {
              <item row="2" column="0">
               <widget class="QLabel" name="m_SeedsPerVoxelLabel_4">
                <property name="toolTip">
-                <string></string>
+                <string/>
                </property>
                <property name="text">
                 <string>Num. Seeds:</string>
@@ -405,7 +375,7 @@ QGroupBox, QGroupBox:disabled {
           <item row="0" column="0">
            <widget class="QLabel" name="m_TrialsPerSeedLabel">
             <property name="toolTip">
-             <string></string>
+             <string/>
             </property>
             <property name="text">
              <string>Trials Per Seed:</string>
@@ -415,7 +385,7 @@ QGroupBox, QGroupBox:disabled {
           <item row="1" column="0">
            <widget class="QLabel" name="m_FaThresholdLabel_2">
             <property name="toolTip">
-             <string></string>
+             <string/>
             </property>
             <property name="text">
              <string>Max. Num. Fibers:</string>
@@ -462,7 +432,27 @@ QGroupBox, QGroupBox:disabled {
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item row="1" column="1">
+          <item row="2" column="0">
+           <widget class="QLabel" name="m_SeedsPerVoxelLabel">
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string>Seeds per Voxel:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string>Seed Image:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
            <widget class="QSpinBox" name="m_SeedsPerVoxelBox">
             <property name="toolTip">
              <string>Number of seed points placed in each voxel.</string>
@@ -475,38 +465,10 @@ QGroupBox, QGroupBox:disabled {
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="m_SeedsPerVoxelLabel">
-            <property name="toolTip">
-             <string></string>
-            </property>
-            <property name="text">
-             <string>Seeds per Voxel:</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="1">
-           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_SeedImageBox">
-            <property name="toolTip">
-             <string>Seed points are only placed inside the regions defined in the seed image. If no seed image is selected, the whole image is seeded.</string>
-            </property>
-            <property name="sizeAdjustPolicy">
-             <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-            </property>
-            <item>
-             <property name="text">
-              <string>-</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="toolTip">
-             <string></string>
-            </property>
-            <property name="text">
-             <string>Seed Image:</string>
+           <widget class="QmitkSingleNodeSelectionWidget" name="m_SeedImageSelectionWidget" native="true">
+            <property name="styleSheet">
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -547,7 +509,7 @@ QGroupBox, QGroupBox:disabled {
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>224</height>
+        <height>232</height>
        </rect>
       </property>
       <attribute name="label">
@@ -560,26 +522,11 @@ QGroupBox, QGroupBox:disabled {
        <item row="0" column="0">
         <widget class="QLabel" name="label_7">
          <property name="toolTip">
-          <string></string>
+          <string/>
          </property>
          <property name="text">
           <string>Mask Image:</string>
          </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_StopImageBox">
-         <property name="toolTip">
-          <string>Fibers that enter a region defined in this image will stop immediately.</string>
-         </property>
-         <property name="sizeAdjustPolicy">
-          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-         </property>
-         <item>
-          <property name="text">
-           <string>-</string>
-          </property>
-         </item>
         </widget>
        </item>
        <item row="3" column="1">
@@ -630,7 +577,7 @@ QGroupBox, QGroupBox:disabled {
        <item row="3" column="0">
         <widget class="QLabel" name="label_10">
          <property name="toolTip">
-          <string></string>
+          <string/>
          </property>
          <property name="text">
           <string>Endpoint Constraints:</string>
@@ -640,76 +587,31 @@ QGroupBox, QGroupBox:disabled {
        <item row="1" column="0">
         <widget class="QLabel" name="label_9">
          <property name="toolTip">
-          <string></string>
+          <string/>
          </property>
          <property name="text">
           <string>Stop ROI Image:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
-        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TargetImageBox">
-         <property name="toolTip">
-          <string>The target image is used for the endpoint constraint strategy defined above.</string>
-         </property>
-         <property name="sizeAdjustPolicy">
-          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-         </property>
-         <item>
-          <property name="text">
-           <string>-</string>
-          </property>
-         </item>
-        </widget>
-       </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_11">
          <property name="toolTip">
-          <string></string>
+          <string/>
          </property>
          <property name="text">
           <string>Exclusion ROI Image:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MaskImageBox">
-         <property name="toolTip">
-          <string>Fibers that leave the regions defined in this image will stop immediately.</string>
-         </property>
-         <property name="sizeAdjustPolicy">
-          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-         </property>
-         <item>
-          <property name="text">
-           <string>-</string>
-          </property>
-         </item>
-        </widget>
-       </item>
        <item row="4" column="0">
         <widget class="QLabel" name="m_TargetImageLabel">
          <property name="toolTip">
-          <string></string>
+          <string/>
          </property>
          <property name="text">
           <string>Target ROI Image:</string>
          </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_ExclusionImageBox">
-         <property name="toolTip">
-          <string>Fibers that enter a region defined in this image will be discarded.</string>
-         </property>
-         <property name="sizeAdjustPolicy">
-          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-         </property>
-         <item>
-          <property name="text">
-           <string>-</string>
-          </property>
-         </item>
         </widget>
        </item>
        <item row="6" column="0">
@@ -725,6 +627,18 @@ QGroupBox, QGroupBox:disabled {
          </property>
         </spacer>
        </item>
+       <item row="0" column="1">
+        <widget class="QmitkSingleNodeSelectionWidget" name="m_MaskImageSelectionWidget" native="true"/>
+       </item>
+       <item row="1" column="1">
+        <widget class="QmitkSingleNodeSelectionWidget" name="m_StopImageSelectionWidget" native="true"/>
+       </item>
+       <item row="2" column="1">
+        <widget class="QmitkSingleNodeSelectionWidget" name="m_ExclusionImageSelectionWidget" native="true"/>
+       </item>
+       <item row="4" column="1">
+        <widget class="QmitkSingleNodeSelectionWidget" name="m_TargetImageSelectionWidget" native="true"/>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_trackingparam">
@@ -733,7 +647,7 @@ QGroupBox, QGroupBox:disabled {
         <x>0</x>
         <y>0</y>
         <width>421</width>
-        <height>359</height>
+        <height>343</height>
        </rect>
       </property>
       <attribute name="label">
@@ -795,7 +709,7 @@ QGroupBox, QGroupBox:disabled {
        <item row="2" column="0">
         <widget class="QLabel" name="m_FaThresholdLabel">
          <property name="toolTip">
-          <string></string>
+          <string/>
          </property>
          <property name="text">
           <string>Cutoff:</string>
@@ -805,7 +719,7 @@ QGroupBox, QGroupBox:disabled {
        <item row="3" column="0">
         <widget class="QLabel" name="mFaImageLabel">
          <property name="toolTip">
-          <string></string>
+          <string/>
          </property>
          <property name="text">
           <string>FA/GFA Image:</string>
@@ -815,7 +729,7 @@ QGroupBox, QGroupBox:disabled {
        <item row="0" column="0">
         <widget class="QLabel" name="m_FaThresholdLabel_3">
          <property name="toolTip">
-          <string></string>
+          <string/>
          </property>
          <property name="text">
           <string>Mode:</string>
@@ -825,7 +739,7 @@ QGroupBox, QGroupBox:disabled {
        <item row="7" column="0">
         <widget class="QLabel" name="m_AngularThresholdLabel">
          <property name="toolTip">
-          <string></string>
+          <string/>
          </property>
          <property name="text">
           <string>Angular Threshold:</string>
@@ -860,7 +774,7 @@ QGroupBox, QGroupBox:disabled {
           <string>Maximum allowed angular SDTEV over 4 voxel lengths. Default: no loop check.</string>
          </property>
          <property name="statusTip">
-          <string></string>
+          <string/>
          </property>
          <property name="minimum">
           <number>-1</number>
@@ -873,25 +787,10 @@ QGroupBox, QGroupBox:disabled {
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_FaImageBox">
-         <property name="toolTip">
-          <string>If an image is selected, the stopping criterion is not calculated from the input image but instead the selected image is used.</string>
-         </property>
-         <property name="sizeAdjustPolicy">
-          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-         </property>
-         <item>
-          <property name="text">
-           <string>-</string>
-          </property>
-         </item>
-        </widget>
-       </item>
        <item row="5" column="0">
         <widget class="QLabel" name="m_StepsizeLabel">
          <property name="toolTip">
-          <string></string>
+          <string/>
          </property>
          <property name="text">
           <string>Step Size:</string>
@@ -942,7 +841,7 @@ QGroupBox, QGroupBox:disabled {
           <string>If you are using dODF images as input, it is advisable to sharpen the ODFs (min-max normalize and raise to the power of 4). This is not necessary for CSD fODFs, since they are naturally much sharper.</string>
          </property>
          <property name="text">
-          <string></string>
+          <string/>
          </property>
         </widget>
        </item>
@@ -959,7 +858,7 @@ QGroupBox, QGroupBox:disabled {
        <item row="6" column="0">
         <widget class="QLabel" name="m_MinTractLengthLabel">
          <property name="toolTip">
-          <string></string>
+          <string/>
          </property>
          <property name="text">
           <string>Min. Tract Length:</string>
@@ -988,7 +887,7 @@ QGroupBox, QGroupBox:disabled {
        <item row="4" column="0">
         <widget class="QLabel" name="m_OdfCutoffLabel">
          <property name="toolTip">
-          <string></string>
+          <string/>
          </property>
          <property name="text">
           <string>ODF Cutoff:</string>
@@ -1020,7 +919,7 @@ QGroupBox, QGroupBox:disabled {
        <item row="8" column="0">
         <widget class="QLabel" name="m_LoopCheckLabel">
          <property name="toolTip">
-          <string></string>
+          <string/>
          </property>
          <property name="text">
           <string>Loop Check:</string>
@@ -1049,7 +948,7 @@ QGroupBox, QGroupBox:disabled {
        <item row="10" column="0">
         <widget class="QLabel" name="m_gLabel">
          <property name="toolTip">
-          <string></string>
+          <string/>
          </property>
          <property name="text">
           <string>g:</string>
@@ -1059,12 +958,15 @@ QGroupBox, QGroupBox:disabled {
        <item row="1" column="0">
         <widget class="QLabel" name="m_FaThresholdLabel_5">
          <property name="toolTip">
-          <string></string>
+          <string/>
          </property>
          <property name="text">
           <string>Sharpen ODFs:</string>
          </property>
         </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QmitkSingleNodeSelectionWidget" name="m_FaImageSelectionWidget" native="true"/>
        </item>
       </layout>
      </widget>
@@ -1074,7 +976,7 @@ QGroupBox, QGroupBox:disabled {
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>224</height>
+        <height>232</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1124,17 +1026,10 @@ QGroupBox, QGroupBox:disabled {
           <string>Restrict tractography to regions where the prior is valid.</string>
          </property>
          <property name="text">
-          <string></string>
+          <string/>
          </property>
          <property name="checked">
           <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_PriorImageBox">
-         <property name="toolTip">
-          <string></string>
          </property>
         </widget>
        </item>
@@ -1154,7 +1049,7 @@ QGroupBox, QGroupBox:disabled {
        <item row="3" column="0">
         <widget class="QLabel" name="m_PriorLabel_4">
          <property name="text">
-          <string>New Directions From Prior:</string>
+          <string>New Directions from Prior:</string>
          </property>
         </widget>
        </item>
@@ -1164,12 +1059,15 @@ QGroupBox, QGroupBox:disabled {
           <string>If unchecked, the prior cannot create directions where there are none in the data.</string>
          </property>
          <property name="text">
-          <string></string>
+          <string/>
          </property>
          <property name="checked">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
         </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QmitkSingleNodeSelectionWidget" name="m_PriorImageSelectionWidget" native="true"/>
        </item>
       </layout>
      </widget>
@@ -1179,7 +1077,7 @@ QGroupBox, QGroupBox:disabled {
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>224</height>
+        <height>232</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1239,7 +1137,7 @@ QGroupBox, QGroupBox:disabled {
           <item row="0" column="0">
            <widget class="QLabel" name="m_SeedsPerVoxelLabel_2">
             <property name="toolTip">
-             <string></string>
+             <string/>
             </property>
             <property name="text">
              <string>Num. Samples:</string>
@@ -1259,7 +1157,7 @@ QGroupBox, QGroupBox:disabled {
           <item row="1" column="0">
            <widget class="QLabel" name="m_SamplingDistanceLabel">
             <property name="toolTip">
-             <string></string>
+             <string/>
             </property>
             <property name="text">
              <string>Sampling Distance:</string>
@@ -1309,7 +1207,7 @@ QGroupBox, QGroupBox:disabled {
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>224</height>
+        <height>232</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1447,7 +1345,7 @@ QGroupBox, QGroupBox:disabled {
           <item row="7" column="0">
            <widget class="QLabel" name="m_SeedsPerVoxelLabel_3">
             <property name="toolTip">
-             <string></string>
+             <string/>
             </property>
             <property name="text">
              <string>Flip directions:</string>
@@ -1478,7 +1376,7 @@ QGroupBox, QGroupBox:disabled {
         <x>0</x>
         <y>0</y>
         <width>435</width>
-        <height>224</height>
+        <height>232</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1579,19 +1477,15 @@ QGroupBox, QGroupBox:disabled {
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11"></layoutdefault>
+ <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkDataStorageComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">QmitkDataStorageComboBox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QmitkDataStorageComboBoxWithSelectNone</class>
-   <extends>QComboBox</extends>
-   <header>QmitkDataStorageComboBoxWithSelectNone.h</header>
+   <class>QmitkSingleNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
- <resources></resources>
- <connections></connections>
+ <resources/>
+ <connections/>
 </ui>

@@ -54,6 +54,7 @@ class mitkCustomTagParserTestSuite : public mitk::TestFixture
   MITK_TEST(ValidPropertyAlternatingOffset_Success);
   MITK_TEST(ValidPropertySimpleOffset_Success);
   MITK_TEST(ValidPropertyListOffset_Success);
+  MITK_TEST(ExtractRevision);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -341,6 +342,36 @@ public:
     {
       MITK_ERROR << "Could not delete test offset list file";
     }
+  }
+
+  void ExtractRevision()
+  {
+    std::string empty = "";
+    std::string invalidRule1a = "CESaaaaaaa";
+    std::string invalidRule1b = "aaaCESTaaa";
+    std::string invalidRule2a = "CESTaaaa";
+    std::string invalidRule2b = "aaa_CESTaaa";
+    std::string invalidRule3a = "CESTaaa_REVaaaa";
+    std::string valid1 = "CEST_REV12345";
+    std::string valid2 = "aaa_CESTaaaa_REV2";
+    std::string valid3 = "CESTaaaa_REV3_c";
+    std::string valid4 = "cest_rev4";
+    std::string valid5 = "aaa_cestaaaa_rev5";
+    std::string valid6 = "cestaaaa_rev6_c";
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("Verify exception on empty", mitk::CustomTagParser::ExtractRevision(empty), mitk::Exception);
+    CPPUNIT_ASSERT_THROW_MESSAGE("Verify exception on invalidRule1a", mitk::CustomTagParser::ExtractRevision(invalidRule1a), mitk::Exception);
+    CPPUNIT_ASSERT_THROW_MESSAGE("Verify exception on invalidRule1b", mitk::CustomTagParser::ExtractRevision(invalidRule1b), mitk::Exception);
+    CPPUNIT_ASSERT_THROW_MESSAGE("Verify exception on invalidRule2a", mitk::CustomTagParser::ExtractRevision(invalidRule2a), mitk::Exception);
+    CPPUNIT_ASSERT_THROW_MESSAGE("Verify exception on invalidRule2b", mitk::CustomTagParser::ExtractRevision(invalidRule2b), mitk::Exception);
+    CPPUNIT_ASSERT_MESSAGE("Verify empty revision on invalidRule3a", mitk::CustomTagParser::ExtractRevision(invalidRule3a) == "");
+    CPPUNIT_ASSERT_MESSAGE("Extract revision from valid1.", mitk::CustomTagParser::ExtractRevision(valid1) == "12345");
+    CPPUNIT_ASSERT_MESSAGE("Extract revision from valid2.", mitk::CustomTagParser::ExtractRevision(valid2) == "2");
+    CPPUNIT_ASSERT_MESSAGE("Extract revision from valid3.", mitk::CustomTagParser::ExtractRevision(valid3) == "3");
+    CPPUNIT_ASSERT_MESSAGE("Extract revision from valid4.", mitk::CustomTagParser::ExtractRevision(valid4) == "4");
+    CPPUNIT_ASSERT_MESSAGE("Extract revision from valid5.", mitk::CustomTagParser::ExtractRevision(valid5) == "5");
+    CPPUNIT_ASSERT_MESSAGE("Extract revision from valid6.", mitk::CustomTagParser::ExtractRevision(valid6) == "6");
+
   }
 };
 

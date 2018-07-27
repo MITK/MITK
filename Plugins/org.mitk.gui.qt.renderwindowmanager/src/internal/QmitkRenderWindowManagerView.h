@@ -26,8 +26,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 // blueberry
 #include <berryISelectionListener.h>
 
-// qt
+// mitk gui qt common plugin
 #include <QmitkAbstractView.h>
+#include "QmitkModelViewSelectionConnector.h"
+#include "QmitkSelectionServiceConnector.h"
 
 /**
 * @brief RenderWindowManager
@@ -61,8 +63,13 @@ private Q_SLOTS:
 
 private:
 
+  void SetUpConnections();
   void SetControlledRenderer();
 
+  /**
+  * @brief see QmitkAbstractView
+  */
+  void SetSelectionProvider() override;
   /**
   * @brief Reacts to a node that has been added to the data storage.
   *     1. Insert new node into the node list of all render windows, if it is an "globalObject_RWM"-node.
@@ -76,6 +83,10 @@ private:
   Ui::QmitkRenderWindowManagerControls m_Controls;
 
   QmitkRenderWindowManipulatorWidget* m_RenderWindowManipulatorWidget;
+  std::unique_ptr<QmitkModelViewSelectionConnector> m_ModelViewSelectionConnector;
+  std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
+  QmitkDataNodeSelectionProvider::Pointer m_SelectionProvider;
+
   RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;
 };
 

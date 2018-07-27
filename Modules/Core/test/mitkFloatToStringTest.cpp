@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestFixture.h"
 #include "mitkTestingMacros.h"
 
-#include <boost/lexical_cast.hpp>
+#include <mitkLexicalCast.h>
 
 #include "mitkEqual.h"
 #include <cmath>

@@ -54,10 +54,10 @@ if(MITK_USE_Qt5)
     set(_install_DESTINATION "../Frameworks/QtWebEngineCore.framework")
 
     get_filename_component(_real_path "${_qmake_path}/../lib/QtWebEngineCore.framework/Helpers" REALPATH)
-    MITK_INSTALL(DIRECTORY ${_real_path})
+    MITK_INSTALL(DIRECTORY ${_real_path} USE_SOURCE_PERMISSIONS)
 
-    get_filename_component(_real_path "${_qmake_path}/../lib/QtWebEngineCore.framework/Resources" REALPATH)
-    MITK_INSTALL(DIRECTORY ${_real_path})
+    # Translations are included in the Resources directory of
+    # QtWebEngineCore.framework and are installed by default.
   else()
     set(_install_DESTINATION "")
 

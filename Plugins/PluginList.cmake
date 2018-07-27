@@ -79,6 +79,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.photoacoustics.pausviewer:OFF
   org.mitk.gui.qt.photoacoustics.imageprocessing:OFF
   org.mitk.gui.qt.photoacoustics.simulation:OFF
+  org.mitk.gui.qt.photoacoustics.spectralunmixing:OFF
   org.mitk.gui.qt.ultrasound:OFF
   org.mitk.gui.qt.volumevisualization:OFF
   org.mitk.gui.qt.eventrecorder:OFF

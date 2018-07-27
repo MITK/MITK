@@ -472,6 +472,10 @@ void mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* intera
     for(vtkRenderWindow* renderWindow : allRenderWindows)
     {
       const BaseRenderer::Pointer ren = BaseRenderer::GetInstance(renderWindow);
+      if (ren->GetMapperID() == BaseRenderer::Standard3D)
+      {
+        continue;
+      }
       bool sameDirection = (ren->GetSliceNavigationController()->GetDefaultViewDirection() == sender->GetSliceNavigationController()->GetDefaultViewDirection());
       if (sameDirection)
       {
@@ -543,6 +547,10 @@ void mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
       for(vtkRenderWindow* renderWindow : allRenderWindows)
       {
         const BaseRenderer::Pointer ren = BaseRenderer::GetInstance(renderWindow);
+        if (ren->GetMapperID() == BaseRenderer::Standard3D)
+        {
+          continue;
+        }
         bool sameDirection = (ren->GetSliceNavigationController()->GetDefaultViewDirection() == sender->GetSliceNavigationController()->GetDefaultViewDirection());
         if (sameDirection)
         {

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPASpectralUnmixingFilterBase.h>
 #include <mitkPASpectralUnmixingSO2.h>
 
+#include <chrono>
 #include "ui_SpectralUnmixingControls.h"
 
 /**

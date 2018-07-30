@@ -29,7 +29,6 @@ set(MODULE_TESTS
   mitkMCThreadHandlerTest.cpp
   mitkSimulationBatchGeneratorTest.cpp
   mitkPropertyCalculatorTest.cpp
-  mitkPhotoacousticImageSavingTest.cpp
 )
 
 set(RESOURCE_FILES

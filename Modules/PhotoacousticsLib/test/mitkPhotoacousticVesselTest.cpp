@@ -151,8 +151,6 @@ public:
 
     m_TestVessel->ExpandVessel(m_TestInSilicoVolume, m_StraightLine, 0, nullptr);
 
-    mitk::IOUtil::Save(m_TestInSilicoVolume->GetAbsorptionVolume()->AsMitkImage(), "C:/Users/groehl/Desktop/test.nrrd");
-
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4)),
       abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4) - 10) <= mitk::eps);
     CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 5, 4)),

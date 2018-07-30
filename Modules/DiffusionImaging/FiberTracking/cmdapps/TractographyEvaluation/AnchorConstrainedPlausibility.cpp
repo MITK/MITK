@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkFitFibersToImageFilter.h>
 #include <mitkLexicalCast.h>
 #include <itkTractDensityImageFilter.h>
+#include <itkFlipPeaksFilter.h>
 
 typedef itksys::SystemTools ist;
 typedef itk::Point<float, 4> PointType4;
@@ -96,7 +97,7 @@ int main(int argc, char* argv[])
   parser.addArgument("", "c", mitkCommandLineParser::InputDirectory, "Candidates folder:", "folder containing candidate tracts", us::Any(), false);
   parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output folder:", "output folder", us::Any(), false);
 
-  parser.addArgument("anchor_masks", "", mitkCommandLineParser::StringList, "Reference Masks:", "reference tract masks for accuracy evaluation");
+  parser.addArgument("reference_mask_folders", "", mitkCommandLineParser::StringList, "Reference Mask Folder(s):", "Folder(s) containing reference tract masks for accuracy evaluation");
   parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask image:", "scoring is only performed inside the mask image");
   parser.addArgument("greedy_add", "", mitkCommandLineParser::Bool, "Greedy:", "if enabled, the candidate tracts are not jointly fitted to the residual image but one after the other employing a greedy scheme", false);
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
@@ -105,6 +106,9 @@ int main(int argc, char* argv[])
   parser.addArgument("use_num_streamlines", "", mitkCommandLineParser::Bool, "Use number of streamlines as score:", "Don't fit candidates, simply use number of streamlines per candidate as score", false);
   parser.addArgument("use_weights", "", mitkCommandLineParser::Bool, "Use input weights as score:", "Don't fit candidates, simply use first input streamline weight per candidate as score", false);
   parser.addArgument("filter_zero_weights", "", mitkCommandLineParser::Bool, "Filter zero-weights", "Remove streamlines with weight 0 from candidates", false);
+  parser.addArgument("flipx", "", mitkCommandLineParser::Bool, "Flip x", "flip along x-axis", false);
+  parser.addArgument("flipy", "", mitkCommandLineParser::Bool, "Flip y", "flip along y-axis", false);
+  parser.addArgument("flipz", "", mitkCommandLineParser::Bool, "Flip z", "flip along z-axis", false);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -114,6 +118,11 @@ int main(int argc, char* argv[])
   std::string peak_file_name = us::any_cast<std::string>(parsedArgs["p"]);
   std::string candidate_tract_folder = us::any_cast<std::string>(parsedArgs["c"]);
   std::string out_folder = us::any_cast<std::string>(parsedArgs["o"]);
+
+  if (!out_folder.empty() && out_folder.back() != '/')
+    out_folder += "/";
+  if (!candidate_tract_folder.empty() && candidate_tract_folder.back() != '/')
+    candidate_tract_folder += "/";
 
   bool greedy_add = false;
   if (parsedArgs.count("greedy_add"))
@@ -135,9 +144,9 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("mask"))
     mask_file = us::any_cast<std::string>(parsedArgs["mask"]);
 
-  mitkCommandLineParser::StringContainerType anchor_mask_files_folders;
-  if (parsedArgs.count("anchor_masks"))
-    anchor_mask_files_folders = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["anchor_masks"]);
+  mitkCommandLineParser::StringContainerType reference_mask_files_folders;
+  if (parsedArgs.count("reference_mask_folders"))
+    reference_mask_files_folders = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["reference_mask_folders"]);
 
   std::string regu = "NONE";
   if (parsedArgs.count("regu"))
@@ -150,6 +159,19 @@ int main(int argc, char* argv[])
   bool use_num_streamlines = false;
   if (parsedArgs.count("use_num_streamlines"))
     use_num_streamlines = us::any_cast<bool>(parsedArgs["use_num_streamlines"]);
+
+
+  bool flipx = false;
+  if (parsedArgs.count("flipx"))
+    flipx = us::any_cast<bool>(parsedArgs["flipx"]);
+
+  bool flipy = false;
+  if (parsedArgs.count("flipy"))
+    flipy = us::any_cast<bool>(parsedArgs["flipy"]);
+
+  bool flipz = false;
+  if (parsedArgs.count("z"))
+    flipz = us::any_cast<bool>(parsedArgs["flipz"]);
 
   try
   {
@@ -185,10 +207,13 @@ int main(int argc, char* argv[])
     // Load masks covering the true positives for evaluation purposes
     std::vector< itk::FitFibersToImageFilter::UcharImgType::Pointer > reference_masks;
     std::vector< std::string > anchor_mask_files;
-    for (auto filename : anchor_mask_files_folders)
+    for (auto filename : reference_mask_files_folders)
     {
       if (itksys::SystemTools::PathExists(filename))
       {
+        if (!filename.empty() && filename.back() != '/')
+          filename += "/";
+
         auto list = get_file_list(filename, {".nrrd",".nii.gz",".nii"});
         for (auto f : list)
         {
@@ -232,6 +257,17 @@ int main(int argc, char* argv[])
     std::cout.rdbuf (old);              // <-- restore
     MITK_INFO << "Loaded " << candidate_tract_files.size() << " candidate tracts.";
     MITK_INFO << "Loaded " << reference_masks.size() << " reference masks.";
+
+    if (flipx || flipy || flipz)
+    {
+      itk::FlipPeaksFilter< float >::Pointer flipper = itk::FlipPeaksFilter< float >::New();
+      flipper->SetInput(peak_image);
+      flipper->SetFlipX(flipx);
+      flipper->SetFlipY(flipy);
+      flipper->SetFlipZ(flipz);
+      flipper->Update();
+      peak_image = flipper->GetOutput();
+    }
 
     double rmse = 0.0;
     int iteration = 0;

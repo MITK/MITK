@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Intersect a finite line (with end points p0 and p1) with all of the
 // cells of a vtkImageData
-std::vector< std::pair< itk::Index<3>, double > > mitk::imv::IntersectImage(itk::Vector<double,3>& spacing, itk::Index<3>& si, itk::Index<3>& ei, itk::ContinuousIndex<float, 3>& sf, itk::ContinuousIndex<float, 3>& ef)
+std::vector< std::pair< itk::Index<3>, double > > mitk::imv::IntersectImage(const itk::Vector<double,3>& spacing, itk::Index<3>& si, itk::Index<3>& ei, itk::ContinuousIndex<float, 3>& sf, itk::ContinuousIndex<float, 3>& ef)
 {
   std::vector< std::pair< itk::Index<3>, double > > out;
   if (si == ei)

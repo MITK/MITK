@@ -33,7 +33,16 @@ class MITKDIFFUSIONCORE_EXPORT imv
 {
 public:
 
-  static std::vector< std::pair< itk::Index<3>, double > > IntersectImage(itk::Vector<double,3>& spacing, itk::Index<3>& si, itk::Index<3>& ei, itk::ContinuousIndex<float, 3>& sf, itk::ContinuousIndex<float, 3>& ef);
+  static std::vector< std::pair< itk::Index<3>, double > > IntersectImage(const itk::Vector<double,3>& spacing, itk::Index<3>& si, itk::Index<3>& ei, itk::ContinuousIndex<float, 3>& sf, itk::ContinuousIndex<float, 3>& ef);
+
+  static itk::Point<float, 3> GetItkPoint(double point[3])
+  {
+    itk::Point<float, 3> itkPoint;
+    itkPoint[0] = point[0];
+    itkPoint[1] = point[1];
+    itkPoint[2] = point[2];
+    return itkPoint;
+  }
 
   template< class TPixelType, class TOutPixelType=TPixelType >
   static TOutPixelType GetImageValue(const itk::Point<float, 3>& itkP, bool interpolate, typename itk::LinearInterpolateImageFunction< itk::Image< TPixelType, 3 >, float >::Pointer interpolator)

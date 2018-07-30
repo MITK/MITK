@@ -77,9 +77,10 @@ int main(int argc, char* argv[])
   parser.addArgument("overlap_fraction", "", mitkCommandLineParser::Float, "Overlap fraction:", "Extract by overlap, not by endpoints. Extract fibers that overlap to at least the provided factor (0-1) with the ROI.", -1);
   parser.addArgument("invert", "", mitkCommandLineParser::Bool, "Invert:", "get streamlines not positive for any of the ROI images", false);
   parser.addArgument("output_negatives", "", mitkCommandLineParser::Bool, "Negatives:", "output negatives", false);
-  parser.addArgument("interpolate", "", mitkCommandLineParser::Bool, "Interpolate:", "interpolate ROI images", false);
+  parser.addArgument("interpolate", "", mitkCommandLineParser::Bool, "Interpolate:", "interpolate ROI images (only for endpoint based extraction)", false);
   parser.addArgument("threshold", "", mitkCommandLineParser::Float, "Threshold:", "positive means ROI image value threshold", 0.5);
   parser.addArgument("min_fibers", "", mitkCommandLineParser::Int, "Min. num. fibers:", "discard positive tracts with less fibers", 0);
+  parser.addArgument("split_rois", "", mitkCommandLineParser::Bool, "Split ROIs:", "output a separate tractogram for each ROI", false);
   parser.endGroup();
 
 
@@ -106,6 +107,10 @@ int main(int argc, char* argv[])
   bool split_labels = false;
   if (parsedArgs.count("split_labels"))
     split_labels = us::any_cast<bool>(parsedArgs["split_labels"]);
+
+  bool split_rois = false;
+  if (parsedArgs.count("split_rois"))
+    split_rois = us::any_cast<bool>(parsedArgs["split_rois"]);
 
   bool skip_self_connections = false;
   if (parsedArgs.count("skip_self_connections"))
@@ -188,6 +193,7 @@ int main(int argc, char* argv[])
     extractor->SetStartLabels(short_start_labels);
     extractor->SetEndLabels(short_end_labels);
     extractor->SetSplitLabels(split_labels);
+    extractor->SetSplitByRoi(split_rois);
     extractor->SetMinFibersPerTract(min_fibers);
     extractor->SetSkipSelfConnections(skip_self_connections);
     extractor->SetPairedStartEndLabels(paired);
@@ -197,26 +203,20 @@ int main(int argc, char* argv[])
       extractor->SetInputType(itk::FiberExtractionFilter<float>::INPUT::LABEL_MAP);
     extractor->Update();
 
-    mitk::FiberBundle::Pointer newFib = mitk::FiberBundle::New(nullptr);
     if (invert)
       mitk::IOUtil::Save(extractor->GetNegatives().at(0), outFib + ".trk");
     else
     {
-      if (!split_labels)
+      int c = 0;
+      std::vector< std::string > positive_labels = extractor->GetPositiveLabels();
+      for (auto fib : extractor->GetPositives())
       {
-        newFib = newFib->AddBundles(extractor->GetPositives());
-        mitk::IOUtil::Save(newFib, outFib + ".trk");
-      }
-      else
-      {
-        int c = 0;
-        std::vector< std::string > positive_labels = extractor->GetPositiveLabels();
-        for (auto fib : extractor->GetPositives())
-        {
-          std::string l = positive_labels.at(c);
+        std::string l = positive_labels.at(c);
+        if (l.size()>0)
           mitk::IOUtil::Save(fib, outFib + "_" + l + ".trk");
-          ++c;
-        }
+        else
+          mitk::IOUtil::Save(fib, outFib + ".trk");
+        ++c;
       }
     }
 
@@ -227,21 +227,17 @@ int main(int argc, char* argv[])
         mitk::IOUtil::Save(extractor->GetNegatives().at(0), outFib + "_negatives.trk");
       else
       {
-        if (!split_labels)
+        int c = 0;
+        std::vector< std::string > positive_labels = extractor->GetPositiveLabels();
+        for (auto fib : extractor->GetPositives())
         {
-          newFib = newFib->AddBundles(extractor->GetPositives());
-          mitk::IOUtil::Save(newFib, outFib + "_negatives.trk");
-        }
-        else
-        {
-          int c = 0;
-          std::vector< std::string > positive_labels = extractor->GetPositiveLabels();
-          for (auto fib : extractor->GetPositives())
-          {
-            std::string l = positive_labels.at(c);
+          std::string l = positive_labels.at(c);
+
+          if (l.size()>0)
             mitk::IOUtil::Save(fib, outFib + "_" + l + "_negatives.trk");
-            ++c;
-          }
+          else
+            mitk::IOUtil::Save(fib, outFib + "_negatives.trk");
+          ++c;
         }
       }
     }

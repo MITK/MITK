@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
     std::vector< float > distances;
     distances.push_back(distance);
 
-    mitk::FiberBundle::Pointer anchor_tractogram = mitk::FiberBundle::New(nullptr);
+    mitk::FiberBundle::Pointer extracted = mitk::FiberBundle::New(nullptr);
     unsigned int c = 0;
     for (auto ref_fib : ref_fibs)
     {
@@ -190,8 +190,8 @@ int main(int argc, char* argv[])
             result_fibs.push_back(mitk::FiberBundle::New(fib->GeneratePolyDataByIds(clusters.at(cluster_index), weights)));
           result = result->AddBundles(result_fibs);
 
-          anchor_tractogram = anchor_tractogram->AddBundle(result);
-          mitk::IOUtil::Save(result, out_root + "anchor_" + ist::GetFilenameName(ref_bundle_files.at(c)));
+          extracted = extracted->AddBundle(result);
+          mitk::IOUtil::Save(result, out_root + "extracted_" + ist::GetFilenameName(ref_bundle_files.at(c)));
 
           fib = mitk::FiberBundle::New(fib->GeneratePolyDataByIds(clusters.back(), weights));
           resampled_fib = mitk::FiberBundle::New(resampled_fib->GeneratePolyDataByIds(clusters.back(), weights));
@@ -212,11 +212,11 @@ int main(int argc, char* argv[])
         break;
       ++c;
     }
-    MITK_INFO << "Streamlines in anchor tractogram: " << anchor_tractogram->GetNumFibers();
-    mitk::IOUtil::Save(anchor_tractogram, out_root + "anchor_tractogram.trk");
+    MITK_INFO << "Extracted streamlines: " << extracted->GetNumFibers();
+    mitk::IOUtil::Save(extracted, out_root + "extracted_streamlines.trk");
 
-    MITK_INFO << "Streamlines remaining in candidate tractogram: " << fib->GetNumFibers();
-    mitk::IOUtil::Save(fib, out_root + "candidate_tractogram.trk");
+    MITK_INFO << "Residual streamlines: " << fib->GetNumFibers();
+    mitk::IOUtil::Save(fib, out_root + "residual_streamlines.trk");
   }
   catch (itk::ExceptionObject e)
   {

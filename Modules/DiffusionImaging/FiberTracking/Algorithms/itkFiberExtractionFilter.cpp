@@ -42,6 +42,7 @@ FiberExtractionFilter< PixelType >::FiberExtractionFilter()
   , m_Labels({1})
   , m_SkipSelfConnections(false)
   , m_OnlySelfConnections(false)
+  , m_SplitByRoi(false)
   , m_SplitLabels(false)
   , m_MinFibersPerTract(0)
   , m_PairedStartEndLabels(false)
@@ -114,7 +115,7 @@ void FiberExtractionFilter< PixelType >::ExtractOverlap(mitk::FiberBundle::Point
   MITK_INFO << "Extracting fibers (min. overlap " << m_OverlapFraction << ")";
   vtkSmartPointer<vtkPolyData> polydata = fib->GetFiberPolyData();
 
-  std::vector< std::vector< long > > positive_ids;
+  std::vector< std::vector< long > > positive_ids;  // one ID vector per ROI
   positive_ids.resize(m_RoiImages.size());
 
   std::vector< long > negative_ids; // fibers not overlapping with ANY mask
@@ -132,26 +133,36 @@ void FiberExtractionFilter< PixelType >::ExtractOverlap(mitk::FiberBundle::Point
     {
       auto roi = m_RoiImages.at(m);
       m_Interpolator->SetInputImage(roi);
-      int inside = 0;
-      int outside = 0;
-      for (int j=0; j<numPoints; j++)
+      PixelType inside = 0;
+      PixelType outside = 0;
+      for (int j=0; j<numPoints-1; j++)
       {
-        double* p = points->GetPoint(j);
+        itk::Point<float, 3> startVertex = mitk::imv::GetItkPoint(points->GetPoint(j));
+        itk::Index<3> startIndex;
+        itk::ContinuousIndex<float, 3> startIndexCont;
+        roi->TransformPhysicalPointToIndex(startVertex, startIndex);
+        roi->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
 
-        itk::Point<float, 3> itkP;
-        itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
+        itk::Point<float, 3> endVertex = mitk::imv::GetItkPoint(points->GetPoint(j + 1));
+        itk::Index<3> endIndex;
+        itk::ContinuousIndex<float, 3> endIndexCont;
+        roi->TransformPhysicalPointToIndex(endVertex, endIndex);
+        roi->TransformPhysicalPointToContinuousIndex(endVertex, endIndexCont);
 
-        if ( IsPositive(itkP) )
-          inside++;
-        else
-          outside++;
-
-        if ((float)inside/numPoints > m_OverlapFraction)
+        std::vector< std::pair< itk::Index<3>, double > > segments = mitk::imv::IntersectImage(roi->GetSpacing(), startIndex, endIndex, startIndexCont, endIndexCont);
+        for (std::pair< itk::Index<3>, double > segment : segments)
         {
-          positive = true;
-          positive_ids[m].push_back(i);
-          break;
+          if (roi->GetPixel(segment.first)>=m_Threshold)
+            inside += segment.second;
+          else
+            outside += segment.second;
         }
+      }
+
+      if ((float)inside/(inside+outside) >= m_OverlapFraction)
+      {
+        positive = true;
+        positive_ids[m].push_back(i);
       }
     }
     if (!positive)
@@ -161,9 +172,31 @@ void FiberExtractionFilter< PixelType >::ExtractOverlap(mitk::FiberBundle::Point
   if (!m_NoNegatives)
     m_Negatives.push_back(CreateFib(negative_ids));
   if (!m_NoPositives)
-    for (auto ids : positive_ids)
-      if (ids.size()>=m_MinFibersPerTract)
-        m_Positives.push_back(CreateFib(ids));
+  {
+    for (unsigned int i=0; i<positive_ids.size(); ++i)
+    {
+      std::string name;
+      if (i<m_RoiImageNames.size())
+        name = m_RoiImageNames.at(i);
+      else
+        name = "Roi" + boost::lexical_cast<std::string>(i);
+
+      if (positive_ids.at(i).size()>=m_MinFibersPerTract)
+      {
+        m_Positives.push_back(CreateFib(positive_ids.at(i)));
+        m_PositiveLabels.push_back(name);
+      }
+    }
+    if (!m_SplitByRoi)
+    {
+      mitk::FiberBundle::Pointer output = mitk::FiberBundle::New(nullptr);
+      output = output->AddBundles(m_Positives);
+      m_Positives.clear();
+      m_Positives.push_back(output);
+      m_PositiveLabels.clear();
+      m_PositiveLabels.push_back("");
+    }
+  }
 }
 
 template< class PixelType >
@@ -172,7 +205,7 @@ void FiberExtractionFilter< PixelType >::ExtractEndpoints(mitk::FiberBundle::Poi
   MITK_INFO << "Extracting fibers (endpoints in mask)";
   vtkSmartPointer<vtkPolyData> polydata = fib->GetFiberPolyData();
 
-  std::vector< std::vector< long > > positive_ids;
+  std::vector< std::vector< long > > positive_ids;  // one ID vector per ROI
   positive_ids.resize(m_RoiImages.size());
 
   std::vector< long > negative_ids; // fibers not overlapping with ANY mask
@@ -227,9 +260,31 @@ void FiberExtractionFilter< PixelType >::ExtractEndpoints(mitk::FiberBundle::Poi
   if (!m_NoNegatives)
     m_Negatives.push_back(CreateFib(negative_ids));
   if (!m_NoPositives)
-    for (auto ids : positive_ids)
-      if (ids.size()>=m_MinFibersPerTract)
-        m_Positives.push_back(CreateFib(ids));
+  {
+    for (unsigned int i=0; i<positive_ids.size(); ++i)
+    {
+      std::string name;
+      if (i<m_RoiImageNames.size())
+        name = m_RoiImageNames.at(i);
+      else
+        name = "Roi" + boost::lexical_cast<std::string>(i);
+
+      if (positive_ids.at(i).size()>=m_MinFibersPerTract)
+      {
+        m_Positives.push_back(CreateFib(positive_ids.at(i)));
+        m_PositiveLabels.push_back(name);
+      }
+    }
+    if (!m_SplitByRoi)
+    {
+      mitk::FiberBundle::Pointer output = mitk::FiberBundle::New(nullptr);
+      output = output->AddBundles(m_Positives);
+      m_Positives.clear();
+      m_Positives.push_back(output);
+      m_PositiveLabels.clear();
+      m_PositiveLabels.push_back("");
+    }
+  }
 }
 
 template< class PixelType >
@@ -238,8 +293,7 @@ void FiberExtractionFilter< PixelType >::ExtractLabels(mitk::FiberBundle::Pointe
   MITK_INFO << "Extracting fibers by labels";
   vtkSmartPointer<vtkPolyData> polydata = fib->GetFiberPolyData();
 
-  std::vector< std::map< std::string, std::vector< long > > > positive_ids;
-  positive_ids.resize(m_RoiImages.size());
+  std::map< std::string, std::vector< long > > positive_ids;
 
   std::vector< long > negative_ids; // fibers not overlapping with ANY label
 
@@ -314,23 +368,33 @@ void FiberExtractionFilter< PixelType >::ExtractLabels(mitk::FiberBundle::Pointe
           }
         }
 
-        std::string key;
-        if (label1<label2)
-          key = boost::lexical_cast<std::string>(label1) + "-" + boost::lexical_cast<std::string>(label2);
-        else
-          key = boost::lexical_cast<std::string>(label2) + "-" + boost::lexical_cast<std::string>(label1);
-        if (m<m_RoiImageNames.size())
-          key = m_RoiImageNames.at(m) + "_" + key;
+        std::string key = "";
+
+        if (m_SplitLabels)
+        {
+          if (label1<label2)
+            key = boost::lexical_cast<std::string>(label1) + "-" + boost::lexical_cast<std::string>(label2);
+          else
+            key = boost::lexical_cast<std::string>(label2) + "-" + boost::lexical_cast<std::string>(label1);
+        }
+
+        if (m_SplitByRoi)
+        {
+          if (m<m_RoiImageNames.size())
+            key = m_RoiImageNames.at(m) + "_" + key;
+          else
+            key = "Roi" + boost::lexical_cast<std::string>(m) + "_" + key;
+        }
 
         if (m_BothEnds)
         {
           if ( (inside==2 && (!m_SkipSelfConnections || label1!=label2)) || (inside==2 && m_OnlySelfConnections && label1==label2) )
           {
             positive = true;
-            if ( positive_ids[m].count(key)==0 )
-              positive_ids[m].insert( std::pair< std::string, std::vector< long > >( key, {i}) );
+            if ( positive_ids.count(key)==0 )
+              positive_ids.insert( std::pair< std::string, std::vector< long > >( key, {i}) );
             else
-              positive_ids[m][key].push_back(i);
+              positive_ids[key].push_back(i);
           }
         }
         else
@@ -338,10 +402,10 @@ void FiberExtractionFilter< PixelType >::ExtractLabels(mitk::FiberBundle::Pointe
           if ( (inside>=1 && (!m_SkipSelfConnections || label1!=label2)) || (inside==2 && m_OnlySelfConnections && label1==label2) )
           {
             positive = true;
-            if ( positive_ids[m].count(key)==0 )
-              positive_ids[m].insert( std::pair< std::string, std::vector< long > >( key, {i}) );
+            if ( positive_ids.count(key)==0 )
+              positive_ids.insert( std::pair< std::string, std::vector< long > >( key, {i}) );
             else
-              positive_ids[m][key].push_back(i);
+              positive_ids[key].push_back(i);
           }
         }
       }
@@ -353,23 +417,23 @@ void FiberExtractionFilter< PixelType >::ExtractLabels(mitk::FiberBundle::Pointe
     m_Negatives.push_back(CreateFib(negative_ids));
   if (!m_NoPositives)
   {
-    for (auto labels : positive_ids)
-      for (auto tuple : labels)
-      {
-        if (tuple.second.size()>=m_MinFibersPerTract)
-        {
-          m_Positives.push_back(CreateFib(tuple.second));
-          m_PositiveLabels.push_back(tuple.first);
-        }
-      }
-    if (!m_SplitLabels)
+    for (auto label : positive_ids)
     {
-      mitk::FiberBundle::Pointer output = mitk::FiberBundle::New(nullptr);
-      output = output->AddBundles(m_Positives);
-      m_Positives.clear();
-      m_Positives.push_back(output);
-      m_PositiveLabels.clear();
+      if (label.second.size()>=m_MinFibersPerTract)
+      {
+        m_Positives.push_back(CreateFib(label.second));
+        m_PositiveLabels.push_back(label.first);
+      }
     }
+
+//    if (!m_SplitLabels)
+//    {
+//      mitk::FiberBundle::Pointer output = mitk::FiberBundle::New(nullptr);
+//      output = output->AddBundles(m_Positives);
+//      m_Positives.clear();
+//      m_Positives.push_back(output);
+//      m_PositiveLabels.clear();
+//    }
   }
 }
 
@@ -411,20 +475,6 @@ void FiberExtractionFilter< PixelType >::GenerateData()
   {
     MITK_INFO << "No fibers in tractogram!";
     return;
-  }
-
-  if (m_Mode==MODE::OVERLAP && !m_DontResampleFibers)
-  {
-    float minSpacing = 1;
-    for (auto mask : m_RoiImages)
-    {
-      for (int i=0; i<3; ++i)
-        if(mask->GetSpacing()[i]<minSpacing)
-          minSpacing = mask->GetSpacing()[i];
-    }
-
-    fib = m_InputFiberBundle->GetDeepCopy();
-    fib->ResampleLinear(minSpacing/5);
   }
 
   if (m_Mode == MODE::OVERLAP)

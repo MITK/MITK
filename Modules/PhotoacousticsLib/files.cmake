@@ -3,11 +3,9 @@ SET(H_FILES
   include/mitkPAVector.h
   include/mitkPATissueGeneratorParameters.h
   include/mitkPAInSilicoTissueVolume.h
-  include/mitkPAPhantomTissueGenerator.h
   include/mitkPATissueGenerator.h
   include/mitkPAVesselTree.h
   include/mitkPAVessel.h
-  include/mitkPAVesselDrawer.h
   include/mitkPAVesselMeanderStrategy.h
   include/mitkPANoiseGenerator.h
   include/mitkPAVolume.h
@@ -23,6 +21,12 @@ SET(H_FILES
   include/mitkPAVesselProperties.h
   include/mitkPASimulationBatchGeneratorParameters.h
   include/mitkPAExceptions.h
+  include/mitkPASpectralUnmixingFilterBase.h
+  include/mitkPALinearSpectralUnmixingFilter.h
+  include/mitkPASpectralUnmixingSO2.h
+  include/mitkPASpectralUnmixingFilterLagrange.h
+  include/mitkPASpectralUnmixingFilterSimplex.h
+  include/mitkPASpectralUnmixingFilterVigra.h
 )
 
 set(CPP_FILES
@@ -35,7 +39,6 @@ set(CPP_FILES
   Domain/Volume/mitkPAComposedVolume.cpp
   Domain/Volume/mitkPAFluenceYOffsetPair.cpp
   Generator/mitkPATissueGenerator.cpp
-  Generator/mitkPAPhantomTissueGenerator.cpp
   Generator/mitkPANoiseGenerator.cpp
   Generator/mitkPASlicedVolumeGenerator.cpp
   Generator/mitkPASimulationBatchGenerator.cpp
@@ -48,6 +51,12 @@ set(CPP_FILES
   Utils/ProbeDesign/mitkPAProbe.cpp
   Utils/ProbeDesign/mitkPALightSource.cpp
   Utils/Thread/mitkPAMonteCarloThreadHandler.cpp
+  SUFilter/mitkPASpectralUnmixingFilterBase.cpp
+  SUFilter/mitkPALinearSpectralUnmixingFilter.cpp
+  SUFilter/mitkPASpectralUnmixingSO2.cpp
+  SUFilter/mitkPASpectralUnmixingFilterSimplex.cpp
+  SUFilter/mitkPASpectralUnmixingFilterVigra.cpp
+  SUFilter/mitkPASpectralUnmixingFilterLagrange.cpp
   Utils/mitkPAVesselDrawer.cpp
 )
 

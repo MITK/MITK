@@ -1,4 +1,4 @@
-set(dependencies_list MitkCore MitkAlgorithmsExt)
+set(dependencies_list MitkCore MitkAlgorithmsExt MitkOpenCVVideoSupport)
 
 IF(MITK_USE_OpenCL)
   add_definitions(-DPHOTOACOUSTICS_USE_GPU)
@@ -12,7 +12,7 @@ MITK_CREATE_MODULE(
   #AUTOLOAD_WITH MitkCore
   INCLUDE_DIRS PUBLIC include
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
-  PACKAGE_DEPENDS ITK|ITKFFT+ITKImageCompose+ITKImageIntensity
+  PACKAGE_DEPENDS ITK|ITKFFT+ITKImageCompose+ITKImageIntensity OpenCV 
 )
 
 add_subdirectory(test)

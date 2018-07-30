@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPASpectralUnmixingFilterLagrange.h"
 #include "mitkPASpectralUnmixingFilterSimplex.h"
 
+#include <chrono>
 #include <numeric>
 #include <QtConcurrentRun>
 

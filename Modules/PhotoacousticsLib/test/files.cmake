@@ -11,6 +11,7 @@ set(MODULE_TESTS
   # none
 
   ################## DISABLED TESTS #####################################################
+  #mitkMCThreadHandlerTest.cpp #Timing issue
 
   ################# RUNNING TESTS #######################################################
 
@@ -26,11 +27,9 @@ set(MODULE_TESTS
   mitkPhotoacousticComposedVolumeTest.cpp
   mitkPhotoacousticNoiseGeneratorTest.cpp
   mitkPhotoacousticIOTest.cpp
-  mitkMCThreadHandlerTest.cpp
   mitkSimulationBatchGeneratorTest.cpp
   mitkPropertyCalculatorTest.cpp
-  mitkSpectralUnmixingTest.cpp
-  mitkPhotoacousticImageSavingTest.cpp
+
 )
 
 set(RESOURCE_FILES

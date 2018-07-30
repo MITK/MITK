@@ -1,4 +1,4 @@
-OPTION(BUILD_PhotoacousticPhantomGenerator "Build MiniApp for generating a PA phantom in silico" ON)
+OPTION(BUILD_PhotoacousticPhantomGenerator "Build MiniApp for generating a PA phantom in silico" OFF)
 
 IF(BUILD_PhotoacousticPhantomGenerator)
   PROJECT( MitkPAPhantomGenerator )

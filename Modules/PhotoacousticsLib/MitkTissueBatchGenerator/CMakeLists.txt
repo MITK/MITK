@@ -1,4 +1,4 @@
-OPTION(BUILD_PhotoacousticTissueBatchGenerator "Build MiniApp for batch generating of photoacoustic tissue" ON)
+OPTION(BUILD_PhotoacousticTissueBatchGenerator "Build MiniApp for batch generating of photoacoustic tissue" OFF)
 
 IF(BUILD_PhotoacousticTissueBatchGenerator)
   PROJECT( MitkTissueBatchGenerator )

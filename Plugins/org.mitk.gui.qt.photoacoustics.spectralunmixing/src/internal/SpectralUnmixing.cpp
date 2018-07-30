@@ -58,9 +58,15 @@ void SpectralUnmixing::CreateQtPartControl(QWidget *parent)
   connect((QObject*)(m_Controls.checkBoxError), SIGNAL(clicked()), this, SLOT(EnableGUIError()));
   this->connect(this, SIGNAL(finishSignal()), this, SLOT(storeOutputs()));
   this->connect(this, SIGNAL(crashSignal()), this, SLOT(crashInfo()));
+  this->connect(this, SIGNAL(enableSignal()), this, SLOT(EnableGUIControl()));
 }
 
-void SpectralUnmixing::SwitchGUIControls(bool change)
+void SpectralUnmixing::EnableGUIControl()
+{
+  SwitchGUIControl(false);
+}
+
+void SpectralUnmixing::SwitchGUIControl(bool change)
 {
   m_Controls.inputtable->setEnabled(change);
   m_Controls.checkBoxOx->setEnabled(change);
@@ -393,12 +399,13 @@ void SpectralUnmixing::storeOutputs()
   MITK_INFO(m_Controls.checkBoxChrono->isChecked()) << "Time for image Processing: "
     << std::chrono::duration_cast<std::chrono::duration<double>>(_end - _start).count();
   QApplication::setOverrideCursor(Qt::ArrowCursor);
-  SwitchGUIControls(true);
+  SwitchGUIControl(true);
 }
 
 void SpectralUnmixing::WorkingThreadUpdateFilter(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter)
 {
-  SwitchGUIControls(false);
+  //SwitchGUIControl(false);
+  emit enableSignal();
   try
   {
     m_SpectralUnmixingFilter->Update();
@@ -407,7 +414,7 @@ void SpectralUnmixing::WorkingThreadUpdateFilter(mitk::pa::SpectralUnmixingFilte
   catch (const mitk::Exception& e)
   {
     QApplication::setOverrideCursor(Qt::ArrowCursor);
-    SwitchGUIControls(true);
+    SwitchGUIControl(true);
     errorMessage = e.GetDescription();
     emit crashSignal();
   }

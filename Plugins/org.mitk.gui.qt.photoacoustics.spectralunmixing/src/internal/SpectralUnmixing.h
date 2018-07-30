@@ -88,6 +88,11 @@ class SpectralUnmixing : public QmitkAbstractView
   signals:
     void finishSignal();
 
+  public slots:
+  void EnableGUIControl();
+  signals:
+    void enableSignal();
+
     /**
     * \brief slot waits for crashSignal and if neccessary ends working thread and shows QMessageBox with the error message
     */
@@ -189,7 +194,7 @@ class SpectralUnmixing : public QmitkAbstractView
     * \brief enables/disables GUI
     * @param change true means GUI buttons enabled, false disabled respectively
     */
-    virtual void SwitchGUIControls(bool change);
+    virtual void SwitchGUIControl(bool change);
 };
 
 #endif // SpectralUnmixing_h

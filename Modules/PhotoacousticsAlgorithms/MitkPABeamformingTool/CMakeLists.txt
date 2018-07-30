@@ -1,4 +1,4 @@
-OPTION(BUILD_PhotoacousticBeamformingTool "Build MiniApp for beamforming of a PA image" ON)
+OPTION(BUILD_PhotoacousticBeamformingTool "Build MiniApp for beamforming of a PA image" OFF)
 
 IF(BUILD_PhotoacousticBeamformingTool)
   PROJECT( MitkPABeamformingTool )

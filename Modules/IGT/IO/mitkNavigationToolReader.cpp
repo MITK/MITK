@@ -198,11 +198,6 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   node->RemoveProperty("ToolTipPosition");
   node->RemoveProperty("ToolAxisOrientation");
 
-  //Tool Axis
-  std::string ToolAxisString;
-  node->GetStringProperty("ToolAxis", ToolAxisString);
-  returnValue->SetToolAxis(ConvertStringToPoint(ToolAxisString));
-
   return returnValue;
 }
 

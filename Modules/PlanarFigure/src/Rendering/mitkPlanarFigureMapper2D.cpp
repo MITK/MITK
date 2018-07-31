@@ -323,6 +323,29 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
   }
 }
 
+void mitk::PlanarFigureMapper2D::DrawAnnotationHelperLine(
+  mitk::PlanarFigure* figure,
+  Point2D& anchorPoint,
+  const PlaneGeometry* planarFigurePlaneGeometry,
+  const PlaneGeometry* rendererPlaneGeometry,
+  const mitk::BaseRenderer * renderer)
+{
+    const auto helperPolyLine = figure->GetAnnotationHelperPolyLine(
+      renderer->GetScaleFactorMMPerDisplayUnit(),
+      renderer->GetViewportSize()[1]
+    );
+
+    if (!helperPolyLine.empty() && helperPolyLine.size() == 2) {
+      this->PaintPolyLine(
+        helperPolyLine,
+        false,
+        anchorPoint,
+        planarFigurePlaneGeometry,
+        rendererPlaneGeometry,
+        renderer
+      );
+    }
+}
 
 
 void mitk::PlanarFigureMapper2D::TransformObjectToDisplay(
@@ -642,7 +665,6 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
     }
   }
 
-
   //adapt opacity values to global "opacity" property
   for( unsigned int i = 0; i < PF_COUNT; ++i )
   {
@@ -849,8 +871,8 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::PlanarFigure * planarF
     m_AnnotationOverlay->SetOrientation(mitk::TextOrientation::TextRigth);
 
     mitk::Point2D offset_;
-    offset_[0] = -planarFigure->GetAnnotaionsBoundingBox().Size[1] / 2;
-    offset_[1] = -planarFigure->GetAnnotaionsBoundingBox().Size[1] / 2;
+    offset_[0] = -planarFigure->GetAnnotaionsBoundingBox().Size[1] / 2.0;
+    offset_[1] = -planarFigure->GetAnnotaionsBoundingBox().Size[1] / 2.0;
     m_AnnotationOverlay->SetOffsetVector(offset_);
   } else {
     mitk::Point2D offset;
@@ -880,6 +902,8 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::PlanarFigure * planarF
     bounds.Position[0] -= bounds.Size[0];
   }
   planarFigure->SetAnnotaionsBoundingBox(bounds);
+
+
 }
 
 void mitk::PlanarFigureMapper2D::RenderQuantities( const mitk::PlanarFigure * planarFigure,
@@ -1001,6 +1025,15 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
                            rendererPlaneGeometry,
                            renderer );
 
+    glEnable(GL_LINE_STIPPLE);
+
+    this->DrawAnnotationHelperLine(
+      planarFigure,
+      anchorPoint,
+      planarFigurePlaneGeometry,
+      rendererPlaneGeometry,
+      renderer);
+
     // cleanup
     delete[] colorVector;
   }
@@ -1050,6 +1083,15 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
                            planarFigurePlaneGeometry,
                            rendererPlaneGeometry,
                            renderer );
+
+    glEnable(GL_LINE_STIPPLE);
+
+    this->DrawAnnotationHelperLine(
+      planarFigure,
+      anchorPoint,
+      planarFigurePlaneGeometry,
+      rendererPlaneGeometry,
+      renderer);
 
     // cleanup
     delete[] shadow;
@@ -1109,6 +1151,15 @@ void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode line
       planarFigurePlaneGeometry,
       rendererPlaneGeometry,
       renderer );
+
+    glEnable(GL_LINE_STIPPLE);
+
+    this->DrawAnnotationHelperLine(
+      planarFigure,
+      anchorPoint,
+      planarFigurePlaneGeometry,
+      rendererPlaneGeometry,
+      renderer);
 
     // cleanup
     delete[] colorVector;

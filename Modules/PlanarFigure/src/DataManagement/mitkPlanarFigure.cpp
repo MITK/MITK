@@ -32,7 +32,8 @@ mitk::PlanarFigure::PlanarFigure()
   m_HelperLinesUpToDate(false),
   m_FeaturesUpToDate(false),
   m_FeaturesMTime( 0 ),
-  m_ImageNode(0)
+  m_ImageNode(0),
+  m_AnnotationHelperLineUpToDate(false)
 {
   m_HelperPolyLinesToBePainted = BoolContainerType::New();
 
@@ -63,7 +64,9 @@ mitk::PlanarFigure::PlanarFigure(const Self& other)
     m_Features(other.m_Features),
     m_FeaturesMTime(other.m_FeaturesMTime),
     m_DisplaySize(other.m_DisplaySize),
-    m_ImageNode(other.m_ImageNode)
+    m_ImageNode(other.m_ImageNode),
+    m_AnnotationHelperPolyLine(other.m_AnnotationHelperPolyLine),
+    m_AnnotationHelperLineUpToDate(other.m_AnnotationHelperLineUpToDate)
 {
   m_HelperPolyLinesToBePainted = BoolContainerType::New();
   for( unsigned long i=0; i<other.m_HelperPolyLinesToBePainted->Size(); ++i )
@@ -149,6 +152,8 @@ bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D& point, int positi
     m_HelperLinesUpToDate = false;
     m_FeaturesUpToDate = false;
 
+    m_AnnotationHelperLineUpToDate = false;
+
     // one control point more
     ++m_NumberOfControlPoints;
     return true;
@@ -191,6 +196,8 @@ bool mitk::PlanarFigure::SetControlPoint( unsigned int index, const Point2D& poi
     m_PolyLineUpToDate = false;
     m_HelperLinesUpToDate = false;
     m_FeaturesUpToDate = false;
+
+    m_AnnotationHelperLineUpToDate = false;
   }
 
   return controlPointSetCorrectly;
@@ -230,6 +237,9 @@ bool mitk::PlanarFigure::SetAnnotationsPosition( const Point2D& point )
 {
   m_DetachedAnnotations = true;
   m_AnnotationPosition = point;
+
+  m_AnnotationHelperLineUpToDate = false;
+
   return true;
 }
 
@@ -362,6 +372,26 @@ const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetHelperPolyLine( un
   return helperPolyLine;
 }
 
+const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetAnnotationHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight)
+{
+  mitk::PlanarFigure::PolyLineType helperPolyLine;
+  if (this->IsAnnotationsDetached() && (!m_AnnotationHelperLineUpToDate || m_DisplaySize.first != mmPerDisplayUnit || m_DisplaySize.second != displayHeight))
+  {
+    this->ClearAnnotationHelperPolyLine();
+
+    this->AppendPointToAnnotationHelperPolyLine(this->GetControlPoint(m_ControlPoints.size() - 1));
+    this->AppendPointToAnnotationHelperPolyLine(this->GetAnnotationsPosition());
+
+    m_AnnotationHelperLineUpToDate = true;
+
+    // store these parameters to be able to check next time if somebody zoomed in or out
+    m_DisplaySize.first = mmPerDisplayUnit;
+    m_DisplaySize.second = displayHeight;
+  }
+
+  return m_AnnotationHelperPolyLine;
+}
+
 void mitk::PlanarFigure::ClearHelperPolyLines()
 {
   for ( std::vector<PolyLineType>::size_type i=0; i<m_HelperPolyLines.size(); i++ )
@@ -369,6 +399,12 @@ void mitk::PlanarFigure::ClearHelperPolyLines()
     m_HelperPolyLines.at(i).clear();
   }
   m_HelperLinesUpToDate = false;
+}
+
+void mitk::PlanarFigure::ClearAnnotationHelperPolyLine()
+{
+  m_AnnotationHelperPolyLine.clear();
+  m_AnnotationHelperLineUpToDate = false;
 }
 
 /** \brief Returns the number of features available for this PlanarFigure
@@ -652,7 +688,6 @@ unsigned short mitk::PlanarFigure::GetHelperPolyLinesSize() const
   return m_HelperPolyLines.size();
 }
 
-
 bool mitk::PlanarFigure::IsHelperToBePainted(unsigned int index) const
 {
   return m_HelperPolyLinesToBePainted->GetElement( index );
@@ -685,6 +720,8 @@ void mitk::PlanarFigure::RemoveControlPoint( unsigned int index )
   m_PolyLineUpToDate = false;
   m_HelperLinesUpToDate = false;
   m_FeaturesUpToDate = false;
+
+  m_AnnotationHelperLineUpToDate = false;
 
   --m_NumberOfControlPoints;
 }
@@ -728,6 +765,12 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLi
   {
     MITK_ERROR << "Tried to add point to HelperPolyLine " << index+1 << ", although only " << m_HelperPolyLines.size() << " exists";
   }
+}
+
+void mitk::PlanarFigure::AppendPointToAnnotationHelperPolyLine(PolyLineElement element)
+{
+  m_AnnotationHelperPolyLine.push_back(element);
+  m_AnnotationHelperLineUpToDate = false;
 }
 
 bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const

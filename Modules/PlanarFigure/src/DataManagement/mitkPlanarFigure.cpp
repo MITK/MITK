@@ -224,6 +224,7 @@ bool mitk::PlanarFigure::IsAnnotationsDetached()
 void mitk::PlanarFigure::SetAnnotationsDetached(bool detached)
 {
   m_DetachedAnnotations = detached;
+  this->ClearAnnotationHelperPolyLine();
 }
 
 
@@ -374,7 +375,6 @@ const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetHelperPolyLine( un
 
 const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetAnnotationHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight)
 {
-  mitk::PlanarFigure::PolyLineType helperPolyLine;
   if (this->IsAnnotationsDetached() && (!m_AnnotationHelperLineUpToDate || m_DisplaySize.first != mmPerDisplayUnit || m_DisplaySize.second != displayHeight))
   {
     this->ClearAnnotationHelperPolyLine();

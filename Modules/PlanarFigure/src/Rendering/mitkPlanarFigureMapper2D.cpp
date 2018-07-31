@@ -330,23 +330,20 @@ void mitk::PlanarFigureMapper2D::DrawAnnotationHelperLine(
   const PlaneGeometry* rendererPlaneGeometry,
   const mitk::BaseRenderer * renderer)
 {
-    const auto helperPolyLine = figure->GetAnnotationHelperPolyLine(
-      renderer->GetScaleFactorMMPerDisplayUnit(),
-      renderer->GetViewportSize()[1]
-    );
+  const auto helperPolyLine = figure->GetAnnotationHelperPolyLine(
+    renderer->GetScaleFactorMMPerDisplayUnit(),
+    renderer->GetViewportSize()[1]
+  );
 
-    if (!helperPolyLine.empty() && helperPolyLine.size() == 2) {
-      this->PaintPolyLine(
-        helperPolyLine,
-        false,
-        anchorPoint,
-        planarFigurePlaneGeometry,
-        rendererPlaneGeometry,
-        renderer
-      );
-    }
+  this->PaintPolyLine(
+    helperPolyLine,
+    false,
+    anchorPoint,
+    planarFigurePlaneGeometry,
+    rendererPlaneGeometry,
+    renderer
+  );
 }
-
 
 void mitk::PlanarFigureMapper2D::TransformObjectToDisplay(
   const mitk::Point2D &point2D,

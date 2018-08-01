@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkCommon.h>
 #include <chrono>
+#include <boost>
 
 #include "mitkPASpectralUnmixingFilterBase.h"
 #include "mitkPALinearSpectralUnmixingFilter.h"
@@ -28,6 +29,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkException.h>
 
 #include <itksys/SystemTools.hxx>
+
+struct InputParameters
+{
+	std::string inputPath;
+	std::string savePath;
+	
+}
 
 InputParameters parseInput(int argc, char* argv[])
 {
@@ -54,19 +62,16 @@ InputParameters parseInput(int argc, char* argv[])
   if (parsedArgs.size() == 0)
     exit(-1);
 
-  if (parsedArgs.count("empty-volume"))
-  {
-    input.empty = us::any_cast<bool>(parsedArgs["empty-volume"]);
-  }
-  else
-  {
-    input.empty = false;
-  }
 
   if (parsedArgs.count("savePath"))
   {
     input.saveFolderPath = us::any_cast<std::string>(parsedArgs["savePath"]);
   }
+  else
+  {
+	  mitkThrow() << "Error: No savePath";
+  }
+  
 
   MITK_INFO << "Parsing arguments...[Done]";
   return input;
@@ -120,110 +125,64 @@ mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algo
     return spectralUnmixingFilter;
 }
 
+
 int main(int argc, char * argv[])
 {
+	auto params = parseArguments(argc, argv);
+	
+	auto inputPathname = params.inputPath);
+	auto outputPath = params.savePath);
+	
+	std::vector<std::string> stringvec
+	boost::filesystem::path p(inputPathname);
+    boost::filesystem::directory_iterator start(p);
+    boost::filesystem::directory_iterator end;
+    std::transform(start, end, std::back_inserter(stringvec), path_leaf_string());
+	
 	std::vector<std::string> algorithms = {'QR', 'LU', 'SVD', 'NNLS', 'WLS'},
 	
-	
-	
-	for (int i; i < 5; ++i)
+	for (unsigned int filename = 0; filename < numberOfInputs; ++filename)
 	{
-		mitk::pa::LinearSpectralUnmixingFilter::Pointer m_SpectralUnmixingFilter;
-		m_SpectralUnmixingFilter = GetFilterInstance(algorithms[i]);
+		m_inputImage = mitk::IOUtil::Load<mitk::Image>(stringvec[filename]);
+		for (unsigned alg = 0; alg < 5; ++alg)
+		{
+			mitk::pa::LinearSpectralUnmixingFilter::Pointer m_SpectralUnmixingFilter;
+			m_SpectralUnmixingFilter = GetFilterInstance(algorithms[alg]);
 		
-		m_SpectralUnmixingFilter->SetInput(inputImage);
-		m_SpectralUnmixingFilter->AddOutputs(2);
-		m_SpectralUnmixingFilter->Verbose(false);
-		m_SpectralUnmixingFilter->RelativeError(false);
-        m_SpectralUnmixingFilter->AddWavelength(757);
-        m_SpectralUnmixingFilter->AddWavelength(797);
-        m_SpectralUnmixingFilter->AddWavelength(847);
-		m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
-		m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
+			m_SpectralUnmixingFilter->SetInput(m_inputImage);
+			m_SpectralUnmixingFilter->AddOutputs(2);
+			m_SpectralUnmixingFilter->Verbose(false);
+			m_SpectralUnmixingFilter->RelativeError(false);
+			m_SpectralUnmixingFilter->AddWavelength(757);
+			m_SpectralUnmixingFilter->AddWavelength(797);
+			m_SpectralUnmixingFilter->AddWavelength(847);
+			m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
+			m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
 		
-	    m_SpectralUnmixingFilter->Update();
+			m_SpectralUnmixingFilter->Update();
 		
-		auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
-		m_sO2->Verbose(false);
-		auto output1 = m_SpectralUnmixingFilter->GetOutput(0);
-		auto output2 = m_SpectralUnmixingFilter->GetOutput(1);
+			auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
+			m_sO2->Verbose(false);
+			auto output1 = m_SpectralUnmixingFilter->GetOutput(0);
+			auto output2 = m_SpectralUnmixingFilter->GetOutput(1);
 		
-		# save outputs! 
-		
-		
-		m_sO2->SetInput(0, output1);
-		m_sO2->SetInput(1, output2);
+			std::string unmixingOutputHbO2 = outputPath + '/SUOutput/HbO2_' + stringvec[filename];
+			std::string unmixingOutputHb = outputPath + '/SUOutput/Hb_' + stringvec[filename];
+			
+			mitk::IOUtil::Save(output1, unmixingOutputHbO2);
+			mitk::IOUtil::Save(output2, unmixingOutputHb);
+
+			m_sO2->SetInput(0, output1);
+			m_sO2->SetInput(1, output2);
   
-		m_sO2->Update();
+			m_sO2->Update();
 
-		mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
-		sO2->SetSpacing(output1->GetGeometry()->GetSpacing());
-		WriteOutputToDataStorage(sO2, "sO2");
-		
-		# save output!!
-		
+			mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
+			sO2->SetSpacing(output1->GetGeometry()->GetSpacing());
+			
+			std::string outputSo2 = outputPath + '/So2/So2_' + stringvec[filename];
+			mitk::IOUtil::Save(sO2, outputSo2);
+		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-
-
-
-  auto input = parseInput(argc, argv);
-  auto parameters = CreatePhantom_04_04_18_Parameters();
-  if (input.empty)
-  {
-    parameters->SetMaxNumberOfVessels(0);
-    parameters->SetMinNumberOfVessels(0);
-  }
-  MITK_INFO(input.verbose) << "Generating tissue..";
-  auto resultTissue = InSilicoTissueGenerator::GenerateInSilicoData(parameters);
-  MITK_INFO(input.verbose) << "Generating tissue..[Done]";
-
-  auto inputfolder = std::string(input.saveFolderPath + "input/");
-  auto outputfolder = std::string(input.saveFolderPath + "output/");
-  if (!itksys::SystemTools::FileIsDirectory(inputfolder))
-  {
-    itksys::SystemTools::MakeDirectory(inputfolder);
-  }
-  if (!itksys::SystemTools::FileIsDirectory(outputfolder))
-  {
-    itksys::SystemTools::MakeDirectory(outputfolder);
-  }
-
-  std::string savePath = input.saveFolderPath + "input/Phantom_" + input.identifyer +
-    ".nrrd";
-  mitk::IOUtil::Save(resultTissue->ConvertToMitkImage(), savePath);
-  std::string outputPath = input.saveFolderPath + "output/Phantom_" + input.identifyer +
-    "/";
-
-  resultTissue = nullptr;
-
-  if (!itksys::SystemTools::FileIsDirectory(outputPath))
-  {
-    itksys::SystemTools::MakeDirectory(outputPath);
-  }
-
-  outputPath = outputPath + "Fluence_Phantom_" + input.identifyer;
-
-  MITK_INFO(input.verbose) << "Simulating fluence..";
-
-  int result = -4;
-
-  std::string cmdString = std::string(input.exePath + " -i " + savePath + " -o " +
-    (outputPath + ".nrrd") +
-    " -yo " + "0" + " -p " + input.probePath +
-    " -n 10000000");
-
-  MITK_INFO << "Executing: " << cmdString;
-
-  result = std::system(cmdString.c_str());
-
-  MITK_INFO << result;
-  MITK_INFO(input.verbose) << "Simulating fluence..[Done]";
+	MITK_INFO << "Spectral Unmixing DONE";
 }

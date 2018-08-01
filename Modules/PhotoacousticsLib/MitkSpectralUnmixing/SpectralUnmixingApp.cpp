@@ -29,34 +29,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itksys/SystemTools.hxx>
 
-using namespace mitk::pa;
-
-TissueGeneratorParameters::Pointer CreatePhantom_04_04_18_Parameters()
-{
-  auto returnParameters = TissueGeneratorParameters::New();
-  returnParameters->SetAirThicknessInMillimeters(12);
-
-  return returnParameters;
-}
-
-struct InputParameters
-{
-  std::string saveFolderPath;
-  std::string identifyer;
-  std::string exePath;
-  std::string probePath;
-  bool empty;
-  bool verbose;
-};
-
 InputParameters parseInput(int argc, char* argv[])
 {
   MITK_INFO << "Parsing arguments...";
   mitkCommandLineParser parser;
 
   parser.setCategory("MITK-Photoacoustics");
-  parser.setTitle("Mitk Tissue Batch Generator");
-  parser.setDescription("Creates in silico tissue in batch processing and automatically calculates fluence values for the central slice of the volume.");
+  parser.setTitle("Mitk Spectral Unmixing App");
+  parser.setDescription("Batch processing for spectral Unmixing.");
   parser.setContributor("Computer Assisted Medical Interventions, DKFZ");
 
   parser.setArgumentPrefix("--", "-");
@@ -66,26 +46,6 @@ InputParameters parseInput(int argc, char* argv[])
     "savePath", "s", mitkCommandLineParser::InputDirectory,
     "Input save folder (directory)", "input save folder",
     us::Any(), false);
-  parser.addArgument(
-    "mitkMcxyz", "m", mitkCommandLineParser::OutputFile,
-    "MitkMcxyz binary (file)", "path to the MitkMcxyz binary",
-    us::Any(), false);
-  parser.endGroup();
-
-  parser.beginGroup("Optional parameters");
-  parser.addArgument(
-    "probe", "p", mitkCommandLineParser::OutputFile,
-    "xml probe file (file)", "file to the definition of the used probe (*.xml)",
-    us::Any());
-  parser.addArgument(
-    "verbose", "v", mitkCommandLineParser::Bool,
-    "Verbose Output", "Whether to produce verbose, or rather debug output");
-  parser.addArgument(
-    "identifyer", "i", mitkCommandLineParser::String,
-    "Generator identifyer (string)", "A unique identifyer for the calculation instance");
-  parser.addArgument(
-    "empty-volume", "e", mitkCommandLineParser::Bool,
-    "omit vessel structures (boolean flag)", "Whether to create an empty volume with no structures inside.");
   parser.endGroup();
 
   InputParameters input;
@@ -103,39 +63,11 @@ InputParameters parseInput(int argc, char* argv[])
     input.empty = false;
   }
 
-  if (parsedArgs.count("verbose"))
-  {
-    input.verbose = us::any_cast<bool>(parsedArgs["verbose"]);
-  }
-  else
-  {
-    input.verbose = false;
-  }
-
   if (parsedArgs.count("savePath"))
   {
     input.saveFolderPath = us::any_cast<std::string>(parsedArgs["savePath"]);
   }
 
-  if (parsedArgs.count("mitkMcxyz"))
-  {
-    input.exePath = us::any_cast<std::string>(parsedArgs["mitkMcxyz"]);
-  }
-
-  if (parsedArgs.count("probe"))
-  {
-    input.probePath = us::any_cast<std::string>(parsedArgs["probe"]);
-  }
-
-  if (parsedArgs.count("identifyer"))
-  {
-    input.identifyer = us::any_cast<std::string>(parsedArgs["identifyer"]);
-  }
-  else
-  {
-    auto uid = mitk::UIDGenerator("", 8);
-    input.identifyer = uid.GetUID();
-  }
   MITK_INFO << "Parsing arguments...[Done]";
   return input;
 }
@@ -188,34 +120,6 @@ mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algo
     return spectralUnmixingFilter;
 }
 
-
-void CalculateSO2(mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter, std::vector<bool> boolVec)
-{
-  MITK_INFO(PluginVerbose) << "CALCULATE OXYGEN SATURATION ...";
-
-  if (!boolVec[0])
-    mitkThrow() << "SELECT CHROMOPHORE DEOXYHEMOGLOBIN!";
-  if (!boolVec[1])
-    mitkThrow() << "SELECT CHROMOPHORE OXYHEMOGLOBIN!";
-  auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
-  m_sO2->Verbose(PluginVerbose);
-  SetSO2Settings(m_sO2);
-
-  // Initialize pipeline from SU filter class to SO2 class
-  auto output1 = m_SpectralUnmixingFilter->GetOutput(0);
-  auto output2 = m_SpectralUnmixingFilter->GetOutput(1);
-  m_sO2->SetInput(0, output1);
-  m_sO2->SetInput(1, output2);
-
-  m_sO2->Update();
-
-  mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
-  sO2->SetSpacing(output1->GetGeometry()->GetSpacing());
-  WriteOutputToDataStorage(sO2, "sO2");
-  MITK_INFO(PluginVerbose) << "[DONE]";
-}
-
-
 int main(int argc, char * argv[])
 {
 	std::vector<std::string> algorithms = {'QR', 'LU', 'SVD', 'NNLS', 'WLS'},
@@ -227,7 +131,6 @@ int main(int argc, char * argv[])
 		mitk::pa::LinearSpectralUnmixingFilter::Pointer m_SpectralUnmixingFilter;
 		m_SpectralUnmixingFilter = GetFilterInstance(algorithms[i]);
 		
-		m_SpectralUnmixingFilter->SetAlgorithm(algorithms[i]);
 		m_SpectralUnmixingFilter->SetInput(inputImage);
 		m_SpectralUnmixingFilter->AddOutputs(2);
 		m_SpectralUnmixingFilter->Verbose(false);

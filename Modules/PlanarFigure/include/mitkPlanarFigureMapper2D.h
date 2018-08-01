@@ -238,6 +238,12 @@ protected:
     const PlaneGeometry* rendererPlaneGeometry,
     const mitk::BaseRenderer * renderer);
 
+  void DrawAnnotationHelperLine( mitk::PlanarFigure* figure,
+    Point2D& anchorPoint,
+    const PlaneGeometry* planarFigurePlaneGeometry,
+    const PlaneGeometry* rendererPlaneGeometry,
+    const mitk::BaseRenderer * renderer);
+
   void InitializeDefaultPlanarFigureProperties();
 
   void InitializePlanarFigurePropertiesFromDataNode( const mitk::DataNode* node );

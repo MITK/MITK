@@ -183,6 +183,7 @@ public:
    * (for text, angles, etc.). */
   const PolyLineType GetHelperPolyLine( unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight );
 
+  const PolyLineType GetAnnotationHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight);
 
   /** \brief Sets the position of the PreviewControlPoint. Automatically sets it visible.*/
   void SetPreviewControlPoint( const Point2D& point );
@@ -335,6 +336,8 @@ protected:
    * Must be implemented in sub-classes. */
   virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) = 0;
 
+  void GenerateAnnotationHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight);
+
   /** \brief Calculates quantities of all features of this planar figure.
    * Must be implemented in sub-classes. */
   virtual void EvaluateFeaturesInternal() = 0;
@@ -360,8 +363,12 @@ protected:
   /** \brief Append a point to the HelperPolyLine # index */
   void AppendPointToHelperPolyLine( unsigned int index, PolyLineElement element );
 
+  void AppendPointToAnnotationHelperPolyLine(PolyLineElement element);
+
   /** \brief clears the list of HelperPolyLines. Call before re-calculating a new HelperPolyline. */
   void ClearHelperPolyLines();
+
+  void ClearAnnotationHelperPolyLine();
 
   virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const override;
 
@@ -375,6 +382,8 @@ protected:
   std::vector<PolyLineType> m_PolyLines;
   std::vector<PolyLineType> m_HelperPolyLines;
   BoolContainerType::Pointer m_HelperPolyLinesToBePainted;
+
+  PolyLineType m_AnnotationHelperPolyLine;
 
   // this point is used to store the coordiantes an additional 'ControlPoint' that is rendered
   // when the mouse cursor is above the figure (and not a control-point) and when the
@@ -415,6 +424,7 @@ private:
   bool m_HelperLinesUpToDate;
   bool m_FeaturesUpToDate;
 
+  bool m_AnnotationHelperLineUpToDate;
 
   // Vector of features available for this geometric figure
   typedef std::vector< Feature > FeatureVectorType;

@@ -247,7 +247,7 @@ void QmitkDataManagerView::NodeTreeViewRowsInserted(const QModelIndex& parent, i
   // a new row was inserted
   if (m_CurrentRowCount == 0 && m_NodeTreeModel->rowCount() == 1)
   {
-    OpenRenderWindowPart();
+    mitk::WorkbenchUtil::OpenRenderWindowPart(GetSite()->GetPage());
     m_CurrentRowCount = m_NodeTreeModel->rowCount();
   }
 }
@@ -293,16 +293,4 @@ void QmitkDataManagerView::ShowIn(const QString& editorId)
 QItemSelectionModel* QmitkDataManagerView::GetDataNodeSelectionModel() const
 {
   return m_NodeTreeView->selectionModel();
-}
-
-mitk::IRenderWindowPart* QmitkDataManagerView::OpenRenderWindowPart(bool activatedEditor/* = true*/)
-{
-  if (activatedEditor)
-  {
-    return GetRenderWindowPart(QmitkAbstractView::ACTIVATE | QmitkAbstractView::OPEN);
-  }
-  else
-  {
-    return GetRenderWindowPart(QmitkAbstractView::BRING_TO_FRONT | QmitkAbstractView::OPEN);
-  }
 }

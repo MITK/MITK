@@ -34,7 +34,7 @@ struct InputParameters
 {
 	std::string inputPath;
 	std::string savePath;
-	
+	int numberOfInputs;
 }
 
 InputParameters parseInput(int argc, char* argv[])
@@ -51,8 +51,16 @@ InputParameters parseInput(int argc, char* argv[])
 
   parser.beginGroup("Required parameters");
   parser.addArgument(
+    "inputPath", "s", mitkCommandLineParser::InputDirectory,
+    "Input folder (directory)", "input folder",
+    us::Any(), false);
+  parser.addArgument(
     "savePath", "s", mitkCommandLineParser::InputDirectory,
     "Input save folder (directory)", "input save folder",
+    us::Any(), false);
+  parser.addArgument(
+    "numberOfInputs", "s", mitkCommandLineParser::InputDirectory,
+    "Number of Input files", "number of inputs",
     us::Any(), false);
   parser.endGroup();
 
@@ -62,7 +70,14 @@ InputParameters parseInput(int argc, char* argv[])
   if (parsedArgs.size() == 0)
     exit(-1);
 
-
+  if (parsedArgs.count("inputPath"))
+  {
+    input.saveFolderPath = us::any_cast<std::string>(parsedArgs["inputPath"]);
+  }
+  else
+  {
+	  mitkThrow() << "Error: No inputPath";
+  }
   if (parsedArgs.count("savePath"))
   {
     input.saveFolderPath = us::any_cast<std::string>(parsedArgs["savePath"]);
@@ -128,12 +143,14 @@ mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algo
 
 int main(int argc, char * argv[])
 {
-	auto params = parseArguments(argc, argv);
+	auto params = parseInput(argc, argv);
 	
-	auto inputPathname = params.inputPath);
-	auto outputPath = params.savePath);
+	auto inputPathname = params.inputPath;
+	auto outputPath = params.savePath;
+	auto numberOfInputs = params.numberOfInputs;
+
 	
-	std::vector<std::string> stringvec
+	std::vector<std::string> stringvec;
 	boost::filesystem::path p(inputPathname);
     boost::filesystem::directory_iterator start(p);
     boost::filesystem::directory_iterator end;
@@ -166,8 +183,8 @@ int main(int argc, char * argv[])
 			auto output1 = m_SpectralUnmixingFilter->GetOutput(0);
 			auto output2 = m_SpectralUnmixingFilter->GetOutput(1);
 		
-			std::string unmixingOutputHbO2 = outputPath + '/SUOutput/HbO2_' + stringvec[filename];
-			std::string unmixingOutputHb = outputPath + '/SUOutput/Hb_' + stringvec[filename];
+			std::string unmixingOutputHbO2 = outputPath + '/SUOutput/' + algorithms[alg] + '/HbO2_' + stringvec[filename];
+			std::string unmixingOutputHb = outputPath + '/SUOutput/' + algorithms[alg] + '/Hb_' + stringvec[filename] ;
 			
 			mitk::IOUtil::Save(output1, unmixingOutputHbO2);
 			mitk::IOUtil::Save(output2, unmixingOutputHb);
@@ -180,7 +197,7 @@ int main(int argc, char * argv[])
 			mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
 			sO2->SetSpacing(output1->GetGeometry()->GetSpacing());
 			
-			std::string outputSo2 = outputPath + '/So2/So2_' + stringvec[filename];
+			std::string outputSo2 = outputPath + '/So2/' + algorithms[alg] + '/So2_' + stringvec[filename];
 			mitk::IOUtil::Save(sO2, outputSo2);
 		}
 	}

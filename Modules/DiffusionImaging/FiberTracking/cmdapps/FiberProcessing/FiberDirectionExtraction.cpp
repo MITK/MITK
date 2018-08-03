@@ -40,21 +40,23 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input tractogram (.fib/.trk)", us::Any(), false);
-  parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
-  parser.addArgument("mask", "m", mitkCommandLineParser::InputFile, "Mask:", "mask image");
-  parser.addArgument("athresh", "a", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
-  parser.addArgument("peakthresh", "t", mitkCommandLineParser::Float, "Peak size threshold:", "peak size threshold relative to largest peak in voxel", 0.2, true);
-  parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose:", "output optional and intermediate calculation results");
-  parser.addArgument("numdirs", "d", mitkCommandLineParser::Int, "Max. num. directions:", "maximum number of fibers per voxel", 3, true);
-  parser.addArgument("normalization", "n", mitkCommandLineParser::Int, "Normalization method:", "1=global maximum, 2=single vector, 3=voxel-wise maximum", 1);
-  parser.addArgument("file_ending", "f", mitkCommandLineParser::String, "Image type:", ".nrrd, .nii, .nii.gz");
+  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "input tractogram (.fib/.trk)", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
+  parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask:", "mask image");
+  parser.addArgument("athresh", "", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
+  parser.addArgument("peakthresh", "", mitkCommandLineParser::Float, "Peak size threshold:", "peak size threshold relative to largest peak in voxel", 0.2, true);
+  parser.addArgument("only_mask_geometry", "", mitkCommandLineParser::Bool, "Only mask geometry:", "don't use content of mask image, only use it's geometry", false);
+  parser.addArgument("verbose", "", mitkCommandLineParser::Bool, "Verbose:", "output optional and intermediate calculation results");
+  parser.addArgument("numdirs", "", mitkCommandLineParser::Int, "Max. num. directions:", "maximum number of fibers per voxel", 3, true);
+  parser.addArgument("normalization", "", mitkCommandLineParser::Int, "Normalization method:", "1=global maximum, 2=single vector, 3=voxel-wise maximum", 1);
+  parser.addArgument("file_ending", "", mitkCommandLineParser::String, "Image type:", ".nrrd, .nii, .nii.gz (default)");
+
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  std::string fibFile = us::any_cast<std::string>(parsedArgs["input"]);
+  std::string fibFile = us::any_cast<std::string>(parsedArgs["i"]);
 
   std::string maskImage("");
   if (parsedArgs.count("mask"))
@@ -68,11 +70,15 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("athresh"))
     angularThreshold = us::any_cast<float>(parsedArgs["athresh"]);
 
-  std::string outRoot = us::any_cast<std::string>(parsedArgs["out"]);
+  std::string outRoot = us::any_cast<std::string>(parsedArgs["o"]);
 
   bool verbose = false;
   if (parsedArgs.count("verbose"))
     verbose = us::any_cast<bool>(parsedArgs["verbose"]);
+
+  bool only_mask_geometry = false;
+  if (parsedArgs.count("only_mask_geometry"))
+    only_mask_geometry = us::any_cast<bool>(parsedArgs["only_mask_geometry"]);
 
   int maxNumDirs = 3;
   if (parsedArgs.count("numdirs"))
@@ -82,7 +88,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("normalization"))
     normalization = us::any_cast<int>(parsedArgs["normalization"]);
 
-  std::string file_ending = ".nrrd";
+  std::string file_ending = ".nii.gz";
   if (parsedArgs.count("file_ending"))
     file_ending = us::any_cast<std::string>(parsedArgs["file_ending"]);
 
@@ -107,6 +113,7 @@ int main(int argc, char* argv[])
     // extract directions from fiber bundle
     itk::TractsToVectorImageFilter<float>::Pointer fOdfFilter = itk::TractsToVectorImageFilter<float>::New();
     fOdfFilter->SetFiberBundle(inputTractogram);
+    fOdfFilter->SetOnlyUseMaskGeometry(only_mask_geometry);
     fOdfFilter->SetMaskImage(itkMaskImage);
     fOdfFilter->SetAngularThreshold(cos(angularThreshold*itk::Math::pi/180));
     switch (normalization)

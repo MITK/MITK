@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
   parser.addArgument("max_clusters", "", mitkCommandLineParser::Int, "Max. clusters:", "");
   parser.addArgument("merge_clusters", "", mitkCommandLineParser::Float, "Merge clusters:", "", -1.0);
   parser.addArgument("output_centroids", "", mitkCommandLineParser::Bool, "Output centroids:", "");
-  parser.addArgument("metrics", "", mitkCommandLineParser::StringList, "Metrics:", "EU_MEAN, EU_STD, EU_MAX, ANAT, MAP, LENGTH");
+  parser.addArgument("metrics", "", mitkCommandLineParser::StringList, "Metrics:", "EU_MEAN (default), EU_STD, EU_MAX, ANAT, MAP, LENGTH");
   parser.addArgument("metric_weights", "", mitkCommandLineParser::StringList, "Metric weights:", "add one float weight for each used metric");
   parser.addArgument("input_centroids", "", mitkCommandLineParser::String, "Input centroids:", "");
   parser.addArgument("scalar_map", "", mitkCommandLineParser::String, "Scalar map:", "");

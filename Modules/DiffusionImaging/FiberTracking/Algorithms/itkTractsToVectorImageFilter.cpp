@@ -28,7 +28,8 @@ TractsToVectorImageFilter< PixelType >::TractsToVectorImageFilter():
   m_AngularThreshold(0.7),
   m_Epsilon(0.999),
   m_MaxNumDirections(3),
-  m_SizeThreshold(0.3)
+  m_SizeThreshold(0.3),
+  m_OnlyUseMaskGeometry(false)
 {
   this->SetNumberOfRequiredOutputs(1);
 }
@@ -187,7 +188,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
       std::vector< std::pair< itk::Index<3>, double > > segments = mitk::imv::IntersectImage(spacing3, startIndex, endIndex, startIndexCont, endIndexCont);
       for (std::pair< itk::Index<3>, double > segment : segments)
       {
-        if (!m_MaskImage->GetLargestPossibleRegion().IsInside(segment.first) || m_MaskImage->GetPixel(segment.first)==0)
+        if (!m_MaskImage->GetLargestPossibleRegion().IsInside(segment.first) || (!m_OnlyUseMaskGeometry && m_MaskImage->GetPixel(segment.first)==0))
           continue;
 
         // add direction to container

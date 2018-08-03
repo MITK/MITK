@@ -76,16 +76,16 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("in", "i", mitkCommandLineParser::InputFile, "Input Folder:", "input folder", us::Any(), false);
-  parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output Folder:", "output folder", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input Folder:", "input folder", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output Folder:", "output folder", us::Any(), false);
   parser.addArgument("overlap", "", mitkCommandLineParser::Float, "Overlap threshold:", "Tracts with overlap larger than this threshold are merged", 0.8, false);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  std::string input_folder = us::any_cast<std::string>(parsedArgs["in"]);
-  std::string out_folder = us::any_cast<std::string>(parsedArgs["out"]);
+  std::string input_folder = us::any_cast<std::string>(parsedArgs["i"]);
+  std::string out_folder = us::any_cast<std::string>(parsedArgs["o"]);
 
   float overlap = 0.8;
   if (parsedArgs.count("overlap"))
@@ -203,7 +203,6 @@ int main(int argc, char* argv[])
           if (mat.get(r,c)>0)
           {
             fib = fib->AddBundle(fibs.at(c));
-            MITK_INFO << c;
             used[c] = true;
           }
         }

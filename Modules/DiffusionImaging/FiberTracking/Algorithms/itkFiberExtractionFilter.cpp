@@ -128,7 +128,8 @@ void FiberExtractionFilter< PixelType >::ExtractOverlap(mitk::FiberBundle::Point
     int numPoints = cell->GetNumberOfPoints();
     vtkPoints* points = cell->GetPoints();
 
-    bool positive = false;
+    float best_ol = 0;
+    int best_ol_idx = -1;
     for (unsigned int m=0; m<m_RoiImages.size(); ++m)
     {
       auto roi = m_RoiImages.at(m);
@@ -152,6 +153,8 @@ void FiberExtractionFilter< PixelType >::ExtractOverlap(mitk::FiberBundle::Point
         std::vector< std::pair< itk::Index<3>, double > > segments = mitk::imv::IntersectImage(roi->GetSpacing(), startIndex, endIndex, startIndexCont, endIndexCont);
         for (std::pair< itk::Index<3>, double > segment : segments)
         {
+          if (!roi->GetLargestPossibleRegion().IsInside(segment.first))
+            continue;
           if (roi->GetPixel(segment.first)>=m_Threshold)
             inside += segment.second;
           else
@@ -159,14 +162,17 @@ void FiberExtractionFilter< PixelType >::ExtractOverlap(mitk::FiberBundle::Point
         }
       }
 
-      if ((float)inside/(inside+outside) >= m_OverlapFraction)
+      float overlap = (float)inside/(inside+outside);
+      if (overlap > best_ol && overlap >= m_OverlapFraction)
       {
-        positive = true;
-        positive_ids[m].push_back(i);
+        best_ol_idx = m;
+        best_ol = overlap;
       }
     }
-    if (!positive)
+    if (best_ol_idx<0)
       negative_ids.push_back(i);
+    else
+      positive_ids.at(best_ol_idx).push_back(i);
   }
 
   if (!m_NoNegatives)

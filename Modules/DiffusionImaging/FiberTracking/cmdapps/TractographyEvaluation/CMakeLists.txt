@@ -17,6 +17,8 @@ if(BUILD_DiffusionTractographyEvaluationCmdApps OR MITK_BUILD_ALL_APPS)
     MergeOverlappingTracts^^MitkFiberTracking
     ExtractSimilarTracts^^MitkFiberTracking
     AnchorConstrainedPlausibility^^MitkFiberTracking
+    CalculateOverlap^^MitkFiberTracking
+    CheckEpsAndOverlap^^MitkFiberTracking
     # LocalDirectionalFiberPlausibility^^MitkFiberTracking # HAS TO USE NEW PEAK IMAGE FORMAT
     )
 

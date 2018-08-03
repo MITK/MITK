@@ -90,6 +90,7 @@ int main(int argc, char* argv[])
 
   std::string inFib = us::any_cast<std::string>(parsedArgs["input"]);
   std::string outFib = us::any_cast<std::string>(parsedArgs["out"]);
+
   mitkCommandLineParser::StringContainerType roi_files = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["rois"]);
 
   bool both_ends = false;
@@ -157,6 +158,9 @@ int main(int argc, char* argv[])
     // load fiber bundle
     mitk::FiberBundle::Pointer inputTractogram = mitk::IOUtil::Load<mitk::FiberBundle>(inFib);
 
+    std::streambuf *old = cout.rdbuf(); // <-- save
+    std::stringstream ss;
+    std::cout.rdbuf (ss.rdbuf());       // <-- redirect
     std::vector< ItkFloatImgType::Pointer > roi_images;
     std::vector< std::string > roi_names;
     for (std::size_t i=0; i<roi_files.size(); ++i)
@@ -164,6 +168,8 @@ int main(int argc, char* argv[])
       roi_images.push_back( LoadItkImage(roi_files.at(i)) );
       roi_names.push_back(itksys::SystemTools::GetFilenameWithoutExtension(roi_files.at(i)));
     }
+    std::cout.rdbuf (old);              // <-- restore
+    MITK_INFO << "Loaded " << roi_images.size() << " ROI images.";
 
     std::vector< ItkFloatImgType* > roi_images2;
     for (auto roi : roi_images)
@@ -203,8 +209,12 @@ int main(int argc, char* argv[])
       extractor->SetInputType(itk::FiberExtractionFilter<float>::INPUT::LABEL_MAP);
     extractor->Update();
 
+    std::string ext = itksys::SystemTools::GetFilenameExtension(outFib);
+    if (ext.empty())
+      ext = ".trk";
+    outFib = itksys::SystemTools::GetFilenamePath(outFib) + '/' + itksys::SystemTools::GetFilenameWithoutExtension(outFib);
     if (invert)
-      mitk::IOUtil::Save(extractor->GetNegatives().at(0), outFib + ".trk");
+      mitk::IOUtil::Save(extractor->GetNegatives().at(0), outFib + ext);
     else
     {
       int c = 0;
@@ -213,9 +223,9 @@ int main(int argc, char* argv[])
       {
         std::string l = positive_labels.at(c);
         if (l.size()>0)
-          mitk::IOUtil::Save(fib, outFib + "_" + l + ".trk");
+          mitk::IOUtil::Save(fib, outFib + "_" + l + ext);
         else
-          mitk::IOUtil::Save(fib, outFib + ".trk");
+          mitk::IOUtil::Save(fib, outFib + ext);
         ++c;
       }
     }
@@ -224,7 +234,7 @@ int main(int argc, char* argv[])
     {
       invert = !invert;
       if (invert)
-        mitk::IOUtil::Save(extractor->GetNegatives().at(0), outFib + "_negatives.trk");
+        mitk::IOUtil::Save(extractor->GetNegatives().at(0), outFib + "_negatives" + ext);
       else
       {
         int c = 0;
@@ -234,9 +244,9 @@ int main(int argc, char* argv[])
           std::string l = positive_labels.at(c);
 
           if (l.size()>0)
-            mitk::IOUtil::Save(fib, outFib + "_" + l + "_negatives.trk");
+            mitk::IOUtil::Save(fib, outFib + "_" + l + "_negatives" + ext);
           else
-            mitk::IOUtil::Save(fib, outFib + "_negatives.trk");
+            mitk::IOUtil::Save(fib, outFib + "_negatives" + ext);
           ++c;
         }
       }

@@ -1011,6 +1011,122 @@ void mitk::FiberBundle::GenerateFiberIds()
 
 }
 
+float mitk::FiberBundle::GetNumEpFractionInMask(ItkUcharImgType* mask, bool different_label)
+{
+  vtkSmartPointer<vtkPolyData> PolyData = m_FiberPolyData;
+
+  MITK_INFO << "Calculating EP-Fraction";
+
+  boost::progress_display disp(m_NumFibers);
+  unsigned int in_mask = 0;
+
+  for (int i=0; i<m_NumFibers; i++)
+  {
+    ++disp;
+    vtkCell* cell = PolyData->GetCell(i);
+    int numPoints = cell->GetNumberOfPoints();
+    vtkPoints* points = cell->GetPoints();
+
+    itk::Point<float, 3> startVertex = GetItkPoint(points->GetPoint(0));
+    itk::Index<3> startIndex;
+    mask->TransformPhysicalPointToIndex(startVertex, startIndex);
+
+    itk::Point<float, 3> endVertex = GetItkPoint(points->GetPoint(numPoints-1));
+    itk::Index<3> endIndex;
+    mask->TransformPhysicalPointToIndex(endVertex, endIndex);
+
+    if (mask->GetLargestPossibleRegion().IsInside(startIndex) && mask->GetLargestPossibleRegion().IsInside(endIndex))
+    {
+      float v1 = mask->GetPixel(startIndex);
+      if (v1 < 0.5)
+        continue;
+      float v2 = mask->GetPixel(startIndex);
+      if (v2 < 0.5)
+        continue;
+
+      if (!different_label)
+        ++in_mask;
+      else if (v1 != v2)
+        ++in_mask;
+    }
+  }
+  return float(in_mask)/m_NumFibers;
+}
+
+std::tuple<float, float> mitk::FiberBundle::GetDirectionalOverlap(ItkUcharImgType* mask, mitk::PeakImage::ItkPeakImageType* peak_image)
+{
+  vtkSmartPointer<vtkPolyData> PolyData = m_FiberPolyData;
+
+  MITK_INFO << "Calculating overlap";
+  auto spacing = mask->GetSpacing();
+  boost::progress_display disp(m_NumFibers);
+  float length_sum = 0;
+  float in_mask_length = 0;
+  float aligned_length = 0;
+  for (int i=0; i<m_NumFibers; i++)
+  {
+    ++disp;
+    vtkCell* cell = PolyData->GetCell(i);
+    int numPoints = cell->GetNumberOfPoints();
+    vtkPoints* points = cell->GetPoints();
+
+    for (int j=0; j<numPoints-1; j++)
+    {
+      itk::Point<float, 3> startVertex = GetItkPoint(points->GetPoint(j));
+      itk::Index<3> startIndex;
+      itk::ContinuousIndex<float, 3> startIndexCont;
+      mask->TransformPhysicalPointToIndex(startVertex, startIndex);
+      mask->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
+
+      itk::Point<float, 3> endVertex = GetItkPoint(points->GetPoint(j + 1));
+      itk::Index<3> endIndex;
+      itk::ContinuousIndex<float, 3> endIndexCont;
+      mask->TransformPhysicalPointToIndex(endVertex, endIndex);
+      mask->TransformPhysicalPointToContinuousIndex(endVertex, endIndexCont);
+      
+      vnl_vector_fixed< float, 3 > fdir;
+      fdir[0] = endVertex[0] - startVertex[0];
+      fdir[1] = endVertex[1] - startVertex[1];
+      fdir[2] = endVertex[2] - startVertex[2];
+      fdir.normalize();
+
+      std::vector< std::pair< itk::Index<3>, double > > segments = mitk::imv::IntersectImage(spacing, startIndex, endIndex, startIndexCont, endIndexCont);
+      for (std::pair< itk::Index<3>, double > segment : segments)
+      {
+        if ( mask->GetLargestPossibleRegion().IsInside(segment.first) && mask->GetPixel(segment.first) > 0 )
+        {
+          in_mask_length += segment.second;
+          
+          mitk::PeakImage::ItkPeakImageType::IndexType idx4; 
+          idx4[0] = segment.first[0]; 
+          idx4[1] = segment.first[1]; 
+          idx4[2] = segment.first[2];
+          
+          vnl_vector_fixed< float, 3 > peak;
+          idx4[3] = 0;
+          peak[0] = peak_image->GetPixel(idx4);
+          idx4[3] = 1;
+          peak[1] = peak_image->GetPixel(idx4);
+          idx4[3] = 2;
+          peak[2] = peak_image->GetPixel(idx4);
+          peak.normalize();
+          
+          float f = 1.0 - std::acos(std::fabs(dot_product(fdir, peak))) * 2.0/itk::Math::pi;
+          aligned_length += segment.second * f;
+        }
+        length_sum += segment.second;
+      }
+    }
+  }
+
+  if (length_sum==0)
+  {
+    MITK_INFO << "Fiber length sum is zero!";
+    return std::make_tuple(0,0);
+  }
+  return std::make_tuple(aligned_length/length_sum, in_mask_length/length_sum);
+}
+
 float mitk::FiberBundle::GetOverlap(ItkUcharImgType* mask)
 {
   vtkSmartPointer<vtkPolyData> PolyData = m_FiberPolyData;
@@ -1041,16 +1157,12 @@ float mitk::FiberBundle::GetOverlap(ItkUcharImgType* mask)
       mask->TransformPhysicalPointToIndex(endVertex, endIndex);
       mask->TransformPhysicalPointToContinuousIndex(endVertex, endIndexCont);
 
-      double d[3];
-      for (int i=0; i<3; ++i)
-        d[i] = (endVertex[i]-startVertex[i])*spacing[i];
-      length_sum += std::sqrt( d[0]*d[0] + d[1]*d[1] + d[2]*d[2] );
-
       std::vector< std::pair< itk::Index<3>, double > > segments = mitk::imv::IntersectImage(spacing, startIndex, endIndex, startIndexCont, endIndexCont);
       for (std::pair< itk::Index<3>, double > segment : segments)
       {
-        if ( mask->GetLargestPossibleRegion().IsInside(segment.first) && mask->GetPixel(segment.first) != 0 )
+        if ( mask->GetLargestPossibleRegion().IsInside(segment.first) && mask->GetPixel(segment.first) > 0 )
           in_mask_length += segment.second;
+        length_sum += segment.second;
       }
     }
   }

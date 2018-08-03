@@ -76,6 +76,7 @@ std::vector< std::string > get_file_list(const std::string& path, std::vector< s
       }
     }
   }
+  std::sort(file_list.begin(), file_list.end());
   return file_list;
 }
 
@@ -92,12 +93,14 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "a", mitkCommandLineParser::InputFile, "Anchor tractogram:", "anchor tracts in one tractogram file", us::Any(), false);
+  parser.addArgument("", "a", mitkCommandLineParser::InputFile, "Anchor tractogram:", "anchor tracts in one tractogram file", us::Any());
   parser.addArgument("", "p", mitkCommandLineParser::InputFile, "Input peaks:", "input peak image", us::Any(), false);
   parser.addArgument("", "c", mitkCommandLineParser::InputDirectory, "Candidates folder:", "folder containing candidate tracts", us::Any(), false);
   parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output folder:", "output folder", us::Any(), false);
 
   parser.addArgument("reference_mask_folders", "", mitkCommandLineParser::StringList, "Reference Mask Folder(s):", "Folder(s) containing reference tract masks for accuracy evaluation");
+  parser.addArgument("reference_peaks_folders", "", mitkCommandLineParser::StringList, "Reference Peaks Folder(s):", "Folder(s) containing reference peak images for accuracy evaluation");
+  
   parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask image:", "scoring is only performed inside the mask image");
   parser.addArgument("greedy_add", "", mitkCommandLineParser::Bool, "Greedy:", "if enabled, the candidate tracts are not jointly fitted to the residual image but one after the other employing a greedy scheme", false);
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda:", "modifier for regularization", 0.1);
@@ -114,7 +117,6 @@ int main(int argc, char* argv[])
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  std::string anchors_file = us::any_cast<std::string>(parsedArgs["a"]);
   std::string peak_file_name = us::any_cast<std::string>(parsedArgs["p"]);
   std::string candidate_tract_folder = us::any_cast<std::string>(parsedArgs["c"]);
   std::string out_folder = us::any_cast<std::string>(parsedArgs["o"]);
@@ -148,6 +150,10 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("reference_mask_folders"))
     reference_mask_files_folders = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["reference_mask_folders"]);
 
+  mitkCommandLineParser::StringContainerType reference_peaks_files_folders;
+  if (parsedArgs.count("reference_peaks_folders"))
+    reference_peaks_files_folders = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["reference_peaks_folders"]);
+
   std::string regu = "NONE";
   if (parsedArgs.count("regu"))
     regu = us::any_cast<std::string>(parsedArgs["regu"]);
@@ -170,7 +176,7 @@ int main(int argc, char* argv[])
     flipy = us::any_cast<bool>(parsedArgs["flipy"]);
 
   bool flipz = false;
-  if (parsedArgs.count("z"))
+  if (parsedArgs.count("flipz"))
     flipz = us::any_cast<bool>(parsedArgs["flipz"]);
 
   try
@@ -191,6 +197,7 @@ int main(int argc, char* argv[])
 
     ofstream logfile;
     logfile.open (out_folder + "log.txt");
+    logfile << "V3\n";
 
     itk::ImageFileWriter< PeakImgType >::Pointer peak_image_writer = itk::ImageFileWriter< PeakImgType >::New();
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image", "Fiberbundles"}, {});
@@ -234,9 +241,40 @@ int main(int argc, char* argv[])
         reference_masks.push_back(ref_mask);
       }
     }
+    
+    typedef mitk::ImageToItk< PeakImgType > CasterType;
+    std::vector< PeakImgType::Pointer > reference_peaks;
+    for (auto filename : reference_peaks_files_folders)
+    {
+        MITK_INFO << filename;
+      if (itksys::SystemTools::PathExists(filename))
+      {
+        if (!filename.empty() && filename.back() != '/')
+          filename += "/";
+
+        auto list = get_file_list(filename, {".nrrd",".nii.gz",".nii"});
+        for (auto f : list)
+        {
+          mitk::Image::Pointer ref_mitk_peaks = mitk::IOUtil::Load<mitk::Image>(f);
+          CasterType::Pointer caster = CasterType::New();
+          caster->SetInput(ref_mitk_peaks);
+          caster->Update();
+          PeakImgType::Pointer peak_image = caster->GetOutput();
+          reference_peaks.push_back(peak_image);
+        }
+      }
+      else if (itksys::SystemTools::FileExists(filename))
+      {
+        mitk::Image::Pointer ref_mitk_peaks = mitk::IOUtil::Load<mitk::Image>(filename);
+        CasterType::Pointer caster = CasterType::New();
+        caster->SetInput(ref_mitk_peaks);
+        caster->Update();
+        PeakImgType::Pointer peak_image = caster->GetOutput();
+        reference_peaks.push_back(peak_image);
+      }
+    }
 
     // Load peak image
-    typedef mitk::ImageToItk< PeakImgType > CasterType;
     CasterType::Pointer caster = CasterType::New();
     caster->SetInput(inputImage);
     caster->Update();
@@ -257,6 +295,7 @@ int main(int argc, char* argv[])
     std::cout.rdbuf (old);              // <-- restore
     MITK_INFO << "Loaded " << candidate_tract_files.size() << " candidate tracts.";
     MITK_INFO << "Loaded " << reference_masks.size() << " reference masks.";
+    MITK_INFO << "Loaded " << reference_peaks.size() << " reference peaks.";
 
     if (flipx || flipy || flipz)
     {
@@ -272,38 +311,47 @@ int main(int argc, char* argv[])
     double rmse = 0.0;
     int iteration = 0;
     std::string name = "NOANCHOR";
-    // Load reference tractogram consisting of all known tracts
-    std::vector< mitk::FiberBundle::Pointer > input_reference;
-    mitk::FiberBundle::Pointer anchor_tractogram = mitk::IOUtil::Load<mitk::FiberBundle>(anchors_file);
-    if ( !(anchor_tractogram.IsNull() || anchor_tractogram->GetNumFibers()==0) )
+
+    if (parsedArgs.count("a"))
     {
-      input_reference.push_back(anchor_tractogram);
+      // Load reference tractogram consisting of all known tracts
+      std::string anchors_file = us::any_cast<std::string>(parsedArgs["a"]);
+      mitk::FiberBundle::Pointer anchor_tractogram = mitk::IOUtil::Load<mitk::FiberBundle>(anchors_file);
+      if ( !(anchor_tractogram.IsNull() || anchor_tractogram->GetNumFibers()==0) )
+      {
+        // Fit known tracts to peak image to obtain underexplained image
+        MITK_INFO << "Fit anchor tracts";
+        itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
+        fitter->SetTractograms({anchor_tractogram});
+        fitter->SetLambda(lambda);
+        fitter->SetFilterOutliers(filter_outliers);
+        fitter->SetPeakImage(peak_image);
+        fitter->SetVerbose(true);
+        fitter->SetMaskImage(mask);
+        fitter->SetRegularization(VnlCostFunction::REGU::NONE);
 
-      // Fit known tracts to peak image to obtain underexplained image
-      MITK_INFO << "Fit anchor tracts";
-      itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
-      fitter->SetTractograms(input_reference);
-      fitter->SetLambda(lambda);
-      fitter->SetFilterOutliers(filter_outliers);
-      fitter->SetPeakImage(peak_image);
-      fitter->SetVerbose(true);
-      fitter->SetMaskImage(mask);
-      fitter->SetRegularization(VnlCostFunction::REGU::NONE);
-      fitter->Update();
-      rmse = fitter->GetRMSE();
-      vnl_vector<double> rms_diff = fitter->GetRmsDiffPerBundle();
-      logfile << "RMS_DIFF: " << setprecision(5) << rms_diff[0] << " " << name << " RMSE: " << rmse << "\n";
+        fitter->Update();
+        rmse = fitter->GetRMSE();
+        vnl_vector<double> rms_diff = fitter->GetRmsDiffPerBundle();
+        logfile << "RMS_DIFF: " << setprecision(5) << rms_diff[0] << " " << name << " RMSE: " << rmse << "\n";
 
-      name = ist::GetFilenameWithoutExtension(anchors_file);
-      mitk::FiberBundle::Pointer anchor_tracts = fitter->GetTractograms().at(0);
-      anchor_tracts->SetFiberColors(255,255,255);
-      mitk::IOUtil::Save(anchor_tracts, out_folder + boost::lexical_cast<std::string>((int)(100000*rms_diff[0])) + "_" + name + ".fib");
+        name = ist::GetFilenameWithoutExtension(anchors_file);
+        mitk::FiberBundle::Pointer anchor_tracts = fitter->GetTractograms().at(0);
+        anchor_tracts->SetFiberColors(255,255,255);
+        mitk::IOUtil::Save(anchor_tracts, out_folder + boost::lexical_cast<std::string>((int)(100000*rms_diff[0])) + "_" + name + ".fib");
 
-      peak_image = fitter->GetUnderexplainedImage();
-      peak_image_writer->SetInput(peak_image);
-      peak_image_writer->SetFileName(out_folder + "Residual_" + name + ".nii.gz");
-      peak_image_writer->Update();
+        peak_image = fitter->GetUnderexplainedImage();
+        peak_image_writer->SetInput(peak_image);
+        peak_image_writer->SetFileName(out_folder + "Residual_" + name + ".nii.gz");
+        peak_image_writer->Update();
+      }
     }
+    
+    struct Overlap {
+        float v1;
+        float v2;
+        int i;
+    };
 
     if (use_weights || use_num_streamlines)
     {
@@ -328,19 +376,44 @@ int main(int argc, char* argv[])
         std::stringstream ss;
         std::cout.rdbuf (ss.rdbuf());       // <-- redirect
         mitk::IOUtil::Save(fib, out_folder + boost::lexical_cast<std::string>((int)(mod*score)) + "_" + bundle_name + ".fib");
-
-        float best_overlap = 0;
-        int best_overlap_index = -1;
-        int m_idx = 0;
-        for (auto ref_mask : reference_masks)
+        
+        Overlap classic; classic.v1 = 0; classic.v2 = 0; classic.i = -1;
+        Overlap directional; directional.v1 = 0; directional.v2 = 0; directional.i = -1;
+        if(reference_masks.size()==reference_peaks.size())
         {
-          float overlap = fib->GetOverlap(ref_mask);
-          if (overlap>best_overlap)
-          {
-            best_overlap = overlap;
-            best_overlap_index = m_idx;
-          }
-          ++m_idx;
+            for (unsigned int i=0; i<reference_masks.size(); ++i)
+            {
+              auto ref_mask = reference_masks.at(i);
+              auto ref_peak = reference_peaks.at(i);
+              float overlap = 0;
+              float directional_overlap = 0;
+              std::tie(directional_overlap, overlap) = fib->GetDirectionalOverlap(ref_mask, ref_peak);
+              if (directional_overlap>directional.v1)
+              {
+                directional.v1 = directional_overlap;
+                directional.v2 = overlap;
+                directional.i = i;
+              }
+              if (overlap>classic.v1)
+              {
+                classic.v1 = overlap;
+                classic.v2 = directional_overlap;
+                classic.i = i;
+              }
+            } 
+        }
+        else
+        {
+            for (unsigned int i=0; i<reference_masks.size(); ++i)
+            {
+              auto ref_mask = reference_masks.at(i);
+              float overlap = fib->GetOverlap(ref_mask);
+              if (overlap>classic.v1)
+              {
+                classic.v1 = overlap;
+                classic.i = i;
+              }
+            }
         }
 
         unsigned int num_voxels = 0;
@@ -361,8 +434,12 @@ int main(int argc, char* argv[])
         std::cout.rdbuf (old);              // <-- restore
 
         logfile << "RMS_DIFF: " << setprecision(5) << score << " " << bundle_name << " " << num_voxels << " " << fib->GetNumFibers() << " " << weight_sum << "\n";
-        if (best_overlap_index>=0)
-          logfile << "Best_overlap: " << setprecision(5) << best_overlap << " " << ist::GetFilenameWithoutExtension(anchor_mask_files.at(best_overlap_index)) << "\n";
+        if (classic.i>=0)
+        {
+          logfile << "Best_overlap: " << setprecision(5) << classic.v1 << " " << classic.v2 << " " << ist::GetFilenameWithoutExtension(anchor_mask_files.at(classic.i)) << "\n";
+          if (directional.i>=0)
+            logfile << "Best_dir_overlap: " << setprecision(5) << directional.v1 << " " << directional.v2 << " " << ist::GetFilenameWithoutExtension(anchor_mask_files.at(directional.i)) << "\n";
+        }
         else
           logfile << "No_overlap\n";
         ++c;
@@ -399,15 +476,9 @@ int main(int argc, char* argv[])
       fitter->Update();
       vnl_vector<double> rms_diff = fitter->GetRmsDiffPerBundle();
 
-//      vnl_vector<double> log_rms_diff = rms_diff-rms_diff.min_value() + 1;
-//      log_rms_diff = log_rms_diff.apply(std::log);
-//      log_rms_diff /= log_rms_diff.max_value();
       int c = 0;
       for (auto fib : input_candidates)
       {
-//        fib->SetFiberWeights( log_rms_diff[c] );
-//        fib->ColorFibersByOrientation();
-
         std::string bundle_name = ist::GetFilenameWithoutExtension(candidate_tract_files.at(c));
 
         std::streambuf *old = cout.rdbuf(); // <-- save
@@ -417,18 +488,43 @@ int main(int argc, char* argv[])
           fib = fib->FilterByWeights(0);
         mitk::IOUtil::Save(fib, out_folder + boost::lexical_cast<std::string>((int)(100000*rms_diff[c])) + "_" + bundle_name + ".fib");
 
-        float best_overlap = 0;
-        int best_overlap_index = -1;
-        int m_idx = 0;
-        for (auto ref_mask : reference_masks)
+        Overlap classic; classic.v1 = 0; classic.v2 = 0; classic.i = -1;
+        Overlap directional; directional.v1 = 0; directional.v2 = 0; directional.i = -1;
+        if(reference_masks.size()==reference_peaks.size())
         {
-          float overlap = fib->GetOverlap(ref_mask);
-          if (overlap>best_overlap)
-          {
-            best_overlap = overlap;
-            best_overlap_index = m_idx;
-          }
-          ++m_idx;
+            for (unsigned int i=0; i<reference_masks.size(); ++i)
+            {
+              auto ref_mask = reference_masks.at(i);
+              auto ref_peak = reference_peaks.at(i);
+              float overlap = 0;
+              float directional_overlap = 0;
+              std::tie(directional_overlap, overlap) = fib->GetDirectionalOverlap(ref_mask, ref_peak);
+              if (directional_overlap>directional.v1)
+              {
+                directional.v1 = directional_overlap;
+                directional.v2 = overlap;
+                directional.i = i;
+              }
+              if (overlap>classic.v1)
+              {
+                classic.v1 = overlap;
+                classic.v2 = directional_overlap;
+                classic.i = i;
+              }
+            } 
+        }
+        else
+        {
+            for (unsigned int i=0; i<reference_masks.size(); ++i)
+            {
+              auto ref_mask = reference_masks.at(i);
+              float overlap = fib->GetOverlap(ref_mask);
+              if (overlap>classic.v1)
+              {
+                classic.v1 = overlap;
+                classic.i = i;
+              }
+            }
         }
 
         unsigned int num_voxels = 0;
@@ -449,8 +545,12 @@ int main(int argc, char* argv[])
         std::cout.rdbuf (old);              // <-- restore
 
         logfile << "RMS_DIFF: " << setprecision(5) << rms_diff[c] << " " << bundle_name << " " << num_voxels << " " << fib->GetNumFibers() << " " << weight_sum << "\n";
-        if (best_overlap_index>=0)
-          logfile << "Best_overlap: " << setprecision(5) << best_overlap << " " << ist::GetFilenameWithoutExtension(anchor_mask_files.at(best_overlap_index)) << "\n";
+        if (classic.i>=0)
+        {
+          logfile << "Best_overlap: " << setprecision(5) << classic.v1 << " " << classic.v2 << " " << ist::GetFilenameWithoutExtension(anchor_mask_files.at(classic.i)) << "\n";
+          if (directional.i>=0)
+            logfile << "Best_dir_overlap: " << setprecision(5) << directional.v1 << " " << directional.v2 << " " << ist::GetFilenameWithoutExtension(anchor_mask_files.at(directional.i)) << "\n";
+        }
         else
           logfile << "No_overlap\n";
 

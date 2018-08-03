@@ -378,6 +378,7 @@ public:
 
   void tearDown() override
   {
+    m_TissueGeneratorParameters = nullptr;
     m_PhotoacousticVolume = nullptr;
   }
 };

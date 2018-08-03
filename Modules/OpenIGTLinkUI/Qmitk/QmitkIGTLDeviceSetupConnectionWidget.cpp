@@ -37,6 +37,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //poco headers
 #include <Poco/Path.h>
 
+#include <QRegExpValidator>
+
 const std::string QmitkIGTLDeviceSetupConnectionWidget::VIEW_ID =
 "org.mitk.views.igtldevicesetupconnectionwidget";
 

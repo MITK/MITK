@@ -70,7 +70,7 @@ public:
     {
       m_ComposedVolume->GetFluenceValue(0, 0, 0, 0);
     }
-    catch (const mitk::Exception &e)
+    catch (const mitk::Exception &)
     {
       caughtException = true;
     }
@@ -132,7 +132,7 @@ public:
     {
       m_ComposedVolume->GetYOffsetForFluenceComponentInPixels(0);
     }
-    catch (const mitk::Exception &e)
+    catch (const mitk::Exception &)
     {
       caughtException = true;
     }

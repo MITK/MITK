@@ -11,5 +11,6 @@ add_subdirectory(MitkMCxyz)
 
 add_subdirectory(MitkTissueBatchGenerator)
 add_subdirectory(MitkPAPhantomGenerator)
+add_subdirectory(MitkSpectralUnmixing)
 
 add_subdirectory(test)

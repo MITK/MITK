@@ -196,6 +196,7 @@ protected:
   mitk::NavigationDataSource::Pointer m_NavigationDataSource;
   mitk::NavigationToolStorage::Pointer m_CurrentStorage;
 
+  itk::SmartPointer<mitk::DataNode> m_BaseNode;
   itk::SmartPointer<mitk::DataNode> m_ImageStreamNode;
 
 private:

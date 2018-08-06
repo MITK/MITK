@@ -123,6 +123,7 @@ void QmitkUSNavigationProcessWidget::SetDataStorage(itk::SmartPointer<mitk::Data
     dataStorage->Add(m_BaseNode);
   }
 
+  /*
   // base node and image stream node may be the same node
   if ( strcmp(QmitkUSAbstractNavigationStep::DATANAME_BASENODE, QmitkUSAbstractNavigationStep::DATANAME_IMAGESTREAM) != 0)
   {
@@ -151,7 +152,7 @@ void QmitkUSNavigationProcessWidget::SetDataStorage(itk::SmartPointer<mitk::Data
     dataStorage->Add(m_SettingsNode, m_BaseNode);
   }
 
-  if (m_SettingsWidget) { m_SettingsWidget->SetSettingsNode(m_SettingsNode); }
+  if (m_SettingsWidget) { m_SettingsWidget->SetSettingsNode(m_SettingsNode); }*/
 
 }
 

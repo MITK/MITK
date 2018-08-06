@@ -186,7 +186,13 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
   connect(ui->m_RenderWindowSelection, SIGNAL(valueChanged(int)), this, SLOT(OnRenderWindowSelection()));
   connect(ui->m_RefreshView, SIGNAL(clicked()), this, SLOT(OnRefreshView()));
 
-  ui->navigationProcessWidget->SetDataStorage(this->GetDataStorage());
+  m_BaseNode = this->GetDataStorage()->GetNamedNode(QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
+  if (m_BaseNode.IsNull())
+  {
+    m_BaseNode = mitk::DataNode::New();
+    m_BaseNode->SetName(QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
+    this->GetDataStorage()->Add(m_BaseNode);
+  }
 
   connect(ui->m_initializeTargetMarking, SIGNAL(clicked()), this, SLOT(OnInitializeTargetMarking()));
   connect(ui->m_initializeCritStructureMarking, SIGNAL(clicked()), this, SLOT(OnInitializeCriticalStructureMarking()));
@@ -197,7 +203,6 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
 
   connect(ui->m_settingsWidget, SIGNAL(SettingsChanged(itk::SmartPointer<mitk::DataNode>)), this, SLOT(OnSettingsChanged(itk::SmartPointer<mitk::DataNode>)));
 
-  ui->navigationProcessWidget->SetSettingsWidget(new QmitkUSNavigationCombinedSettingsWidget(m_Parent));
 }
 
 void QmitkUSNavigationMarkerPlacement::OnInitializeTargetMarking()
@@ -302,7 +307,6 @@ void QmitkUSNavigationMarkerPlacement::OnTimeout()
   if (m_CombinedModality.IsNotNull() &&
     !this->m_CombinedModality->GetUltrasoundDevice()->GetIsFreezed()) // if the combined modality is freezed: do nothing
   {
-    ui->navigationProcessWidget->UpdateNavigationProgress();
     m_AblationZonesDisplacementFilter->Update();
 
 
@@ -470,7 +474,6 @@ void QmitkUSNavigationMarkerPlacement::OnStartExperiment()
 
       // experiment is running now
       ui->runningLabel->setPixmap(m_IconRunning);
-      ui->navigationProcessWidget->EnableInteraction(true);
 
       // (re)start timer for navigation step durations
       m_NavigationStepTimer->Reset();
@@ -508,17 +511,12 @@ void QmitkUSNavigationMarkerPlacement::OnFinishExperiment()
     << "Position of target: " << m_TargetNodeDisplacementFilter->GetRawDisplacementNavigationData(0)->GetPosition();
   MITK_INFO("USNavigationLogging") << "Total duration: " << m_NavigationStepTimer->GetTotalDuration();
 
-  ui->navigationProcessWidget->FinishCurrentNavigationStep();
   m_ImageAndNavigationDataLoggingTimer->stop();
 
   ui->runningLabel->setPixmap(m_IconNotRunning);
-  ui->navigationProcessWidget->EnableInteraction(false);
 
   m_NavigationStepTimer->Stop();
 
-  // make sure that the navigation process will be start from beginning at the
-  // next experiment
-  ui->navigationProcessWidget->ResetNavigationProcess();
 
   ui->finishExperimentButton->setDisabled(true);
   ui->startExperimentButton->setEnabled(true);
@@ -574,8 +572,6 @@ void QmitkUSNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk:
   ui->runningLabel->setVisible(experimentMode);
   if (experimentMode && !m_IsExperimentRunning)
   {
-    ui->navigationProcessWidget->ResetNavigationProcess();
-    ui->navigationProcessWidget->EnableInteraction(false);
     ui->runningLabel->setPixmap(m_IconNotRunning);
   }
   else if (!experimentMode)
@@ -584,7 +580,6 @@ void QmitkUSNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk:
     {
       this->OnFinishExperiment();
     }
-    ui->navigationProcessWidget->EnableInteraction(true);
   }
 
   // get the results directory from the settings and use home directory if

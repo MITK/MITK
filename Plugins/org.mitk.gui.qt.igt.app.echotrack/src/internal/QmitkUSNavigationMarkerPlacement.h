@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 
 #include "IO/mitkUSNavigationLoggingBackend.h"
-#include "Widgets/QmitkUSNavigationProcessWidget.h"
 #include "mitkNavigationDataRecorder.h"
 #include "mitkNodeDisplacementFilter.h"
 #include "mitkUSImageLoggingFilter.h"
@@ -196,6 +195,7 @@ protected:
   mitk::NavigationDataSource::Pointer m_NavigationDataSource;
   mitk::NavigationToolStorage::Pointer m_CurrentStorage;
 
+  itk::SmartPointer<mitk::DataNode> m_BaseNode;
   itk::SmartPointer<mitk::DataNode> m_ImageStreamNode;
 
 private:

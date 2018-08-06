@@ -70,9 +70,9 @@ if(MITK_USE_Qt5)
     set(_install_DESTINATION "")
 
     if(WIN32)
-      MITK_INSTALL(FILES "${_qmake_path}/QtWebEngineProcess.exe")
+      MITK_INSTALL(PROGRAMS "${_qmake_path}/QtWebEngineProcess.exe")
     elseif(UNIX)
-      MITK_INSTALL(FILES "${_qmake_path}/../libexec/QtWebEngineProcess")
+      MITK_INSTALL(PROGRAMS "${_qmake_path}/../libexec/QtWebEngineProcess")
     endif()
 
     MITK_INSTALL(DIRECTORY "${_qmake_path}/../resources")

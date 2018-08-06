@@ -180,7 +180,7 @@ namespace mitk
   mitk::TestManager::GetInstance()->TestFailed();                                                                      \
   MITK_TEST_OUTPUT(<< "Expected an '" << #EXCEPTIONCLASS << "' exception. [FAILED]")                                   \
   }                                                                                                                    \
-  catch (EXCEPTIONCLASS)                                                                                               \
+  catch (const EXCEPTIONCLASS &)                                                                                               \
   {                                                                                                                    \
     MITK_TEST_OUTPUT(<< "Caught an expected '" << #EXCEPTIONCLASS << "' exception. [PASSED]")                          \
     mitk::TestManager::GetInstance()->TestPassed();                                                                    \

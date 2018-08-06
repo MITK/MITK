@@ -154,7 +154,7 @@ public:
     {
       this->throwExceptionManually();
     }
-    catch (mitk::Exception)
+    catch (const mitk::Exception &)
     {
       m_ExceptionThrown = true;
     }
@@ -167,7 +167,7 @@ public:
     {
       this->throwSpecializedExceptionManually();
     }
-    catch (SpecializedTestException)
+    catch (const SpecializedTestException &)
     {
       m_ExceptionThrown = true;
     }
@@ -217,7 +217,7 @@ public:
     {
       this->throwExceptionManually("message1", " and message2");
     }
-    catch (mitk::Exception &e)
+    catch (const mitk::Exception &e)
     {
       thrownMessage = e.GetDescription();
       m_ExceptionThrown = true;
@@ -233,7 +233,7 @@ public:
     {
       this->throwExceptionWithThrowMacro();
     }
-    catch (mitk::Exception)
+    catch (const mitk::Exception &)
     {
       m_ExceptionThrown = true;
     }
@@ -247,7 +247,7 @@ public:
     {
       this->throwExceptionWithThrowMacro("test123");
     }
-    catch (mitk::Exception &e)
+    catch (const mitk::Exception &e)
     {
       m_ExceptionThrown = true;
       m_MessageText = e.GetDescription();
@@ -262,7 +262,7 @@ public:
     {
       this->throwSpecializedExceptionWithThrowMacro("test123");
     }
-    catch (mitk::Exception &e)
+    catch (const mitk::Exception &e)
     {
       m_ExceptionThrown = true;
       m_MessageText = e.GetDescription();
@@ -278,7 +278,7 @@ public:
     {
       this->throwSpecializedExceptionWithThrowMacro2("test123");
     }
-    catch (SpecializedTestException &e)
+    catch (const SpecializedTestException &e)
     {
       m_ExceptionThrown = true;
       m_MessageText = e.GetDescription();
@@ -355,7 +355,7 @@ public:
     {
       this->reThrowExceptionWithReThrowMacro("Test original message.", "Test rethrow message.");
     }
-    catch (mitk::Exception &e)
+    catch (const mitk::Exception &e)
     {
       m_Message = e.GetDescription();
       m_ExceptionThrown = true;

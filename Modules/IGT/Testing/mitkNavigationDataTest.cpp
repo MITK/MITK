@@ -412,7 +412,7 @@ static void TestInverseError()
   quaternion.fill(0);
   nd->SetOrientation(quaternion);
 
-  MITK_TEST_FOR_EXCEPTION(mitk::Exception&, nd->GetInverse());
+  MITK_TEST_FOR_EXCEPTION(mitk::Exception, nd->GetInverse());
 }
 
 /**
@@ -465,7 +465,7 @@ static void TestAffineConstructorErrorTransposedNotInverse()
   rotation[1][0] = 2; // this matrix has determinant = 1 (triangular matrix with ones in diagonal) but transposed != inverse
   mitk::AffineTransform3D::Pointer affineTransform3D = CreateAffineTransform(rotation, offsetVector);
 
-  MITK_TEST_FOR_EXCEPTION(mitk::Exception&, mitk::NavigationData::New(affineTransform3D));
+  MITK_TEST_FOR_EXCEPTION(mitk::Exception, mitk::NavigationData::New(affineTransform3D));
 }
 
 /**
@@ -479,7 +479,7 @@ static void TestAffineConstructorErrorDeterminantNonEqualOne()
   rotation[0][0] = 2; // determinant for diagonal matrices is product of diagonal elements => det = 2
   mitk::AffineTransform3D::Pointer affineTransform3D = CreateAffineTransform(rotation, offsetVector);
 
-  MITK_TEST_FOR_EXCEPTION(mitk::Exception&, mitk::NavigationData::New(affineTransform3D));
+  MITK_TEST_FOR_EXCEPTION(mitk::Exception, mitk::NavigationData::New(affineTransform3D));
 }
 
 

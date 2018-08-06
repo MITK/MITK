@@ -307,7 +307,7 @@ std::vector<itk::Index<2>> mitk::CorrectorAlgorithm::FindSeedPoints(
     itk::Index<2> firstPoint = GetFirstPoint(segment, pic);
     seedPoints.push_back(firstPoint);
   }
-  catch (mitk::Exception e)
+  catch (const mitk::Exception&)
   {
     return seedPoints;
   }

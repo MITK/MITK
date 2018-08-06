@@ -134,6 +134,9 @@ void QmitkImageCropper::OnDataSelectionChanged(const mitk::DataNode*)
     m_CroppingObject = dynamic_cast<mitk::GeometryData*>(m_CroppingObjectNode->GetData());
     m_Advanced = true;
 
+    m_BoundingShapeInteractor->EnableInteraction(true);
+    m_BoundingShapeInteractor->SetDataNode(m_CroppingObjectNode);
+
     mitk::RenderingManager::GetInstance()->InitializeViews();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }

@@ -602,11 +602,11 @@ EditorSite::Pointer EditorManager::CreateSite(IEditorReference::Pointer ref,
     }
 
   }
-  catch (PartInitException e)
+  catch (const PartInitException &e)
   {
     throw e;
   }
-  catch (std::exception e)
+  catch (const std::exception &e)
   {
     throw PartInitException(QString("An exception was thrown during initialization: ") + e.what());
   }

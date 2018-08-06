@@ -76,7 +76,7 @@
 
     #include <pthread.h>
 
-    #define US_THREADS_MUTEX(x)           pthread_mutex_t (x);
+    #define US_THREADS_MUTEX(x)           pthread_mutex_t x;
     #define US_THREADS_MUTEX_INIT(x)      ::pthread_mutex_init(&x, 0)
     #define US_THREADS_MUTEX_CTOR(x)      : x()
     #define US_THREADS_MUTEX_DELETE(x)    ::pthread_mutex_destroy (&x)

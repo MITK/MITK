@@ -203,7 +203,7 @@ void frame020a(ModuleContext* mc, TestModuleListener& listener,
     {
       US_TEST_CONDITION(mc->UngetService(sr1), "Test if Service UnGet returns true");
     }
-    catch (const std::logic_error le)
+    catch (const std::logic_error& le)
     {
       US_TEST_FAILED_MSG(<< "UnGetService exception: " << le.what())
     }

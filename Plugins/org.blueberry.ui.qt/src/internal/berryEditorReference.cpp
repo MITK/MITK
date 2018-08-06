@@ -289,7 +289,7 @@ IWorkbenchPart::Pointer EditorReference::CreatePart()
   try
   {
     result = this->CreatePartHelper().Cast<IWorkbenchPart> ();
-  } catch (PartInitException e)
+  } catch (const PartInitException &e)
   {
     // If unable to create the part, create an error part instead
     // and pass the error to the status handling facility
@@ -319,7 +319,7 @@ IWorkbenchPart::Pointer EditorReference::CreatePart()
       try
       {
         input = this->GetEditorInput();
-      } catch (PartInitException e1)
+      } catch (const PartInitException&)
       {
         input = new NullEditorInput(EditorReference::Pointer(this));
       }
@@ -507,7 +507,7 @@ IEditorPart::Pointer EditorReference::CreatePartHelper()
 
     return part;
 
-  } catch (std::exception e)
+  } catch (const std::exception &e)
   {
     throw PartInitException(e.what());
   }
@@ -524,7 +524,7 @@ IEditorPart::Pointer EditorReference::GetEmptyEditor(
   try
   {
     input = this->GetEditorInput();
-  } catch (PartInitException e1)
+  } catch (const PartInitException&)
   {
     input = new NullEditorInput(EditorReference::Pointer(this));
   }
@@ -544,7 +544,7 @@ IEditorPart::Pointer EditorReference::GetEmptyEditor(
   try
   {
     part->CreatePartControl(pane->GetControl());
-  } catch (std::exception e)
+  } catch (const std::exception &e)
   {
     //StatusManager.getManager().handle(
     //    StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));

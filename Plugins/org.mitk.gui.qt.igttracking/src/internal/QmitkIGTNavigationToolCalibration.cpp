@@ -469,6 +469,7 @@ void QmitkIGTNavigationToolCalibration::OnManualEditToolTipFinished(mitk::Affine
     QString resultString = QString("Manual edited values are written to ") + m_ToolToCalibrate->GetToolName().c_str();
     ApplyToolTipTransform(tempND, resultString.toStdString());
     m_Controls.m_ResultText->setText(resultString);
+    m_ComputedToolTipTransformation = tempND;
   }
 
   UpdateManualToolTipCalibrationView();
@@ -501,9 +502,16 @@ void QmitkIGTNavigationToolCalibration::OnGetPositions()
 
 void QmitkIGTNavigationToolCalibration::OnCalibrateToolAxis()
 {
+  if (!m_ComputedToolTipTransformation)
+  {
+    MITK_ERROR << "Please compute tool tip first.";
+    QMessageBox::information(NULL, "Error", "Please compute / specifiy tool tip first");
+    return;
+  }
   if (!m_AxisCalibration_ToolToCalibrate || !m_AxisCalibration_NavDataCalibratingTool)
   {
     MITK_ERROR << "Please record position first.";
+    QMessageBox::information(NULL, "Error", "Please record position first");
     return;
   }
 

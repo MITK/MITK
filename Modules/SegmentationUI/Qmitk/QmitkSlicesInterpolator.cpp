@@ -554,7 +554,7 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::Eve
       }
     }
   }
-  catch (std::bad_cast)
+  catch (const std::bad_cast &)
   {
     return false; // so what
   }
@@ -952,7 +952,7 @@ void ::QmitkSlicesInterpolator::RunPlaneSuggestion()
   {
     planeProposer.CreatePlaneInfo();
   }
-  catch (mitk::Exception &e)
+  catch (const mitk::Exception &e)
   {
     MITK_ERROR << e.what();
   }

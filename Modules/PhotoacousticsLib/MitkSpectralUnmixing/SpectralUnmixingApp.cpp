@@ -141,7 +141,7 @@ mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algo
 
     std::vector<int> weigthVec = {39, 45, 47};
 
-    for (int i; i < 3; ++i)
+    for (int i = 0; i < 3; ++i)
     {
       dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra *>(spectralUnmixingFilter.GetPointer())
         ->AddWeight(weigthVec[i]);
@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
   auto outputPath = params.savePath;
   auto numberOfInputs = params.numberOfInputs;
 
-  // std::vector<std::string> stringvec;
+  std::vector<std::string> stringvec = { inputPathname };
   // boost::filesystem::path p(inputPathname);
   // boost::filesystem::directory_iterator start(p);
   // boost::filesystem::directory_iterator end;
@@ -172,10 +172,9 @@ int main(int argc, char *argv[])
   {
     // m_inputImage = mitk::IOUtil::Load<mitk::Image>(stringvec[filename]);
     auto m_inputImage = mitk::IOUtil::Load<mitk::Image>(inputPathname);
-    for (unsigned alg = 0; alg < 5; ++alg)
+    for (unsigned alg = 0; alg < 1; ++alg)
     {
-      mitk::pa::LinearSpectralUnmixingFilter::Pointer m_SpectralUnmixingFilter;
-      m_SpectralUnmixingFilter = GetFilterInstance(algorithms[alg]);
+      mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter = GetFilterInstance(algorithms[alg]);
 
       m_SpectralUnmixingFilter->SetInput(m_inputImage);
       m_SpectralUnmixingFilter->AddOutputs(2);

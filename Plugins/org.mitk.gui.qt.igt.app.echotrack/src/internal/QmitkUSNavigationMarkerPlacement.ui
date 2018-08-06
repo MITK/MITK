@@ -47,8 +47,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>520</width>
-            <height>77</height>
+            <width>93</width>
+            <height>57</height>
            </rect>
           </property>
           <attribute name="label">
@@ -208,35 +208,9 @@
      </property>
     </widget>
    </item>
-   <item>
-    <widget class="QStackedWidget" name="stackedWidget">
-     <property name="currentIndex">
-      <number>1</number>
-     </property>
-     <widget class="QWidget" name="page_5">
-      <widget class="QmitkUSNavigationProcessWidget" name="navigationProcessWidget" native="true">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>512</width>
-         <height>237</height>
-        </rect>
-       </property>
-      </widget>
-     </widget>
-     <widget class="QWidget" name="page_6"/>
-    </widget>
-   </item>
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>QmitkUSNavigationProcessWidget</class>
-   <extends>QWidget</extends>
-   <header>src/internal/Widgets/QmitkUSNavigationProcessWidget.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>QmitkUSNavigationStepCombinedModality</class>
    <extends>QWidget</extends>

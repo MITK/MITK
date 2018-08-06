@@ -193,5 +193,9 @@ macro(_fixup_target)
     include(BundleUtilities)
 
     fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${_target_location}\" \"\${PLUGINS}\" \"\${DIRS}\")
+
+    if(APPLE)
+      include(FixMacOSInstaller)
+    endif()
   ")
 endmacro()

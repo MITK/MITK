@@ -96,6 +96,7 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
 double mitk::DisplayInteractor::m_ClockRotationSpeed = 90.;
 bool mitk::DisplayInteractor::m_MouseRotationMode = false;
 bool mitk::DisplayInteractor::s_PanZoomSynchronization = false;
+bool mitk::DisplayInteractor::s_PanZoomSynchronizationStudy = true;
 
 mitk::DisplayInteractor::DisplayInteractor()
   : m_Selector(true)
@@ -136,9 +137,10 @@ bool mitk::DisplayInteractor::GetMouseRotationMode()
   return m_MouseRotationMode;
 }
 
-void mitk::DisplayInteractor::SetSynchronization(bool on)
+void mitk::DisplayInteractor::SetSynchronization(bool on, bool studySync)
 {
   mitk::DisplayInteractor::s_PanZoomSynchronization = on;
+  mitk::DisplayInteractor::s_PanZoomSynchronizationStudy = studySync;
 }
 
 bool mitk::DisplayInteractor::IsOverObject(const InteractionEvent* interactionEvent)
@@ -469,6 +471,7 @@ void mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* intera
   if (s_PanZoomSynchronization)
   {
     auto allRenderWindows = mitk::RenderingManager::GetGenerallyAllRegisteredRenderWindows();
+    std::string sourceStudy(sender->GetStudyUID());
     for(vtkRenderWindow* renderWindow : allRenderWindows)
     {
       const BaseRenderer::Pointer ren = BaseRenderer::GetInstance(renderWindow);
@@ -479,6 +482,13 @@ void mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* intera
       bool sameDirection = (ren->GetSliceNavigationController()->GetDefaultViewDirection() == sender->GetSliceNavigationController()->GetDefaultViewDirection());
       if (sameDirection)
       {
+        if (mitk::DisplayInteractor::s_PanZoomSynchronizationStudy)
+        {
+          if (sourceStudy != ren->GetStudyUID())
+          {
+            continue;
+          }
+        }
         ren->GetCameraController()->MoveBy(moveVector);
         ren->GetRenderingManager()->RequestUpdate(renderWindow);
       }
@@ -543,6 +553,7 @@ void mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
   {
     if (s_PanZoomSynchronization)
     {
+      std::string sourceStudy(sender->GetStudyUID());
       auto allRenderWindows = mitk::RenderingManager::GetGenerallyAllRegisteredRenderWindows();
       for(vtkRenderWindow* renderWindow : allRenderWindows)
       {
@@ -554,6 +565,13 @@ void mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
         bool sameDirection = (ren->GetSliceNavigationController()->GetDefaultViewDirection() == sender->GetSliceNavigationController()->GetDefaultViewDirection());
         if (sameDirection)
         {
+          if (mitk::DisplayInteractor::s_PanZoomSynchronizationStudy)
+          {
+            if (sourceStudy != ren->GetStudyUID())
+            {
+              continue;
+            }
+          }
           ren->GetCameraController()->Zoom(factor, m_StartCoordinateInMM);
           ren->GetRenderingManager()->RequestUpdate(renderWindow);
         }

@@ -381,7 +381,7 @@ QmitkUSAbstractNavigationStep::FilterVector QmitkUSNavigationStepMarkerIntervent
 
 void QmitkUSNavigationStepMarkerIntervention::OnSetCombinedModality()
 {
-  mitk::USCombinedModality::Pointer combinedModality = this->GetCombinedModality(false);
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = this->GetCombinedModality(false);
   if (combinedModality.IsNotNull())
   {
     mitk::AffineTransform3D::Pointer calibration = combinedModality->GetCalibration();
@@ -487,7 +487,7 @@ void QmitkUSNavigationStepMarkerIntervention::OnFreeze(bool freezed)
 {
   if (freezed)
   {
-    this->GetCombinedModality()->SetIsFreezed(true);
+    this->GetCombinedModality()->GetUltrasoundDevice()->SetIsFreezed(true);
     // load state machine and event config for data interactor
     m_PointMarkInteractor->LoadStateMachine("USPointMarkInteractions.xml", us::ModuleRegistry::GetModule("MitkUS"));
     m_PointMarkInteractor->SetEventConfig("globalConfig.xml");
@@ -514,7 +514,7 @@ void QmitkUSNavigationStepMarkerIntervention::OnFreeze(bool freezed)
   else
   {
     m_PointMarkInteractor->SetDataNode(0);
-    this->GetCombinedModality()->SetIsFreezed(false);
+    this->GetCombinedModality()->GetUltrasoundDevice()->SetIsFreezed(false);
   }
 }
 
@@ -967,7 +967,7 @@ void QmitkUSNavigationStepMarkerIntervention::CalculateTargetPlacementQuality()
 
 void QmitkUSNavigationStepMarkerIntervention::UpdateSensorsNames()
 {
-  mitk::USCombinedModality::Pointer combinedModality = this->GetCombinedModality(false);
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = this->GetCombinedModality(false);
   if (combinedModality.IsNull())
   {
     return;

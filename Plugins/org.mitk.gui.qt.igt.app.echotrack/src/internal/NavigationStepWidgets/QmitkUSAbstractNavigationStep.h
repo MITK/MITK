@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 
 #include "mitkDataStorage.h"
-#include "mitkUSCombinedModality.h"
+#include "mitkAbstractUltrasoundTrackerDevice.h"
 
 namespace itk {
 template<class T> class SmartPointer;
@@ -65,7 +65,7 @@ signals:
    * This signal is mainly for steps which creates the combined modality. The
    * new combined modality is given as a parameter.
    */
-  void SignalCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality>);
+  void SignalCombinedModalityChanged(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice>);
 
   /**
    * \brief Signals that an intermediate result was produced.
@@ -135,7 +135,7 @@ public:
    * \brief Sets the combined modality for the navigation step.
    * OnSetCombinedModality() is called internal.
    */
-  void SetCombinedModality(itk::SmartPointer<mitk::USCombinedModality> combinedModality);
+  void SetCombinedModality(itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> combinedModality);
 
   /**
    * \brief Should be called to start the navigation step.
@@ -278,7 +278,7 @@ protected:
    * \return the combined modality set by SetCombinedModality(); can only be null if the parameter throwNull is set to false
    * \throws mitk::Exception if the combined modality is null and the parameter throwNull is set to true
    */
-  itk::SmartPointer<mitk::USCombinedModality> GetCombinedModality(bool throwNull = true);
+  itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> GetCombinedModality(bool throwNull = true);
 
   /**
    * \brief Returns node with the given name and the given source node (parent) from the data storage.
@@ -303,7 +303,7 @@ protected:
 
 private:
   itk::SmartPointer<mitk::DataStorage>        m_DataStorage;
-  itk::SmartPointer<mitk::USCombinedModality> m_CombinedModality;
+  itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> m_CombinedModality;
 
   NavigationStepState                         m_NavigationStepState;
 };

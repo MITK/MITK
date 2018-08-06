@@ -86,6 +86,7 @@ bool QmitkUSNavigationStepZoneMarking::OnFinishStep()
 
 bool QmitkUSNavigationStepZoneMarking::OnActivateStep()
 {
+  m_ZoneDisplacementFilter->ConnectTo(this->GetCombinedModality()->GetNavigationDataSource());
   m_ZoneDisplacementFilter->SelectInput(m_ReferenceSensorIndex);
 
   emit SignalReadyForNextStep();
@@ -105,6 +106,7 @@ void QmitkUSNavigationStepZoneMarking::OnUpdate()
   if (m_NavigationDataSource.IsNull()) { return; }
 
   m_NavigationDataSource->Update();
+  m_ZoneDisplacementFilter->Update();
 
   bool valid = m_NavigationDataSource->GetOutput(m_ReferenceSensorIndex)->IsDataValid();
 
@@ -156,7 +158,7 @@ QmitkUSAbstractNavigationStep::FilterVector QmitkUSNavigationStepZoneMarking::Ge
 
 void QmitkUSNavigationStepZoneMarking::OnFreeze(bool freezed)
 {
-  if (freezed) this->GetCombinedModality()->SetIsFreezed(true);
+  if (freezed) this->GetCombinedModality()->GetUltrasoundDevice()->SetIsFreezed(true);
 
   ui->zoneAddingExplanationLabel->setEnabled(freezed);
 
@@ -173,7 +175,7 @@ void QmitkUSNavigationStepZoneMarking::OnFreeze(bool freezed)
     ui->zonesWidget->OnAbortAddingZone();
   }
 
-  if (!freezed) this->GetCombinedModality()->SetIsFreezed(false);
+  if (!freezed) this->GetCombinedModality()->GetUltrasoundDevice()->SetIsFreezed(false);
 }
 
 void QmitkUSNavigationStepZoneMarking::OnZoneAdded()
@@ -232,7 +234,7 @@ void QmitkUSNavigationStepZoneMarking::OnZoneRemoved()
 
 void QmitkUSNavigationStepZoneMarking::OnSetCombinedModality()
 {
-  mitk::USCombinedModality::Pointer combinedModality = this->GetCombinedModality(false);
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = this->GetCombinedModality(false);
   if (combinedModality.IsNotNull())
   {
     m_NavigationDataSource = combinedModality->GetNavigationDataSource();
@@ -251,7 +253,8 @@ void QmitkUSNavigationStepZoneMarking::UpdateReferenceSensorName()
   {
     try
     {
-      m_ReferenceSensorIndex = m_NavigationDataSource->GetOutputIndex(m_ReferenceSensorName);
+      //m_ReferenceSensorIndex = m_NavigationDataSource->GetOutputIndex(m_ReferenceSensorName);
+      m_ReferenceSensorIndex = 1;
     }
     catch ( const std::exception &e )
     {

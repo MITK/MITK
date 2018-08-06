@@ -156,7 +156,8 @@ bool QmitkUSNavigationStepTumourSelection::OnActivateStep()
   m_Interactor->LoadStateMachine(m_StateMachineFilename, us::ModuleRegistry::GetModule("MitkUS"));
   m_Interactor->SetEventConfig("globalConfig.xml");
 
-  m_NodeDisplacementFilter->SelectInput(m_ReferenceSensorIndex);
+  m_NodeDisplacementFilter->ConnectTo(this->GetCombinedModality()->GetNavigationDataSource());
+  m_NodeDisplacementFilter->SelectInput(1);//m_ReferenceSensorIndex
 
   //target selection is optional
   if (m_targetSelectionOptional) { emit SignalReadyForNextStep(); }
@@ -185,6 +186,7 @@ void QmitkUSNavigationStepTumourSelection::OnUpdate()
   if (m_NavigationDataSource.IsNull()) { return; }
 
   m_NavigationDataSource->Update();
+  m_NodeDisplacementFilter->Update();
 
   bool valid = m_NavigationDataSource->GetOutput(m_ReferenceSensorIndex)->IsDataValid();
 
@@ -248,7 +250,7 @@ QmitkUSAbstractNavigationStep::FilterVector QmitkUSNavigationStepTumourSelection
 
 void QmitkUSNavigationStepTumourSelection::OnFreeze(bool freezed)
 {
-  if (freezed) this->GetCombinedModality()->SetIsFreezed(true);
+  if (freezed) this->GetCombinedModality()->GetUltrasoundDevice()->SetIsFreezed(true);
 
   ui->tumourSelectionExplanation1Label->setEnabled(freezed);
   ui->tumourSelectionExplanation2Label->setEnabled(freezed);
@@ -276,12 +278,12 @@ void QmitkUSNavigationStepTumourSelection::OnFreeze(bool freezed)
     }
   }
 
-  if (!freezed) this->GetCombinedModality()->SetIsFreezed(false);
+  if (!freezed) this->GetCombinedModality()->GetUltrasoundDevice()->SetIsFreezed(false);
 }
 
 void QmitkUSNavigationStepTumourSelection::OnSetCombinedModality()
 {
-  mitk::USCombinedModality::Pointer combinedModality = this->GetCombinedModality(false);
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = this->GetCombinedModality(false);
   if (combinedModality.IsNotNull())
   {
     m_NavigationDataSource = combinedModality->GetNavigationDataSource();
@@ -421,6 +423,7 @@ void QmitkUSNavigationStepTumourSelection::UpdateReferenceSensorName()
 
   if (this->GetNavigationStepState() >= QmitkUSAbstractNavigationStep::State_Active)
   {
+    MITK_INFO << "############### " << m_NodeDisplacementFilter->GetNumberOfIndexedInputs();
     m_NodeDisplacementFilter->SelectInput(m_ReferenceSensorIndex);
   }
 

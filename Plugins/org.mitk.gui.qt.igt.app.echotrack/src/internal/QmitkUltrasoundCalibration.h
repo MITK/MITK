@@ -216,7 +216,7 @@ protected:
   /**
   * \brief The combined modality used for imaging and tracking.
   */
-  mitk::USCombinedModality::Pointer m_CombinedModality;
+  mitk::AbstractUltrasoundTrackerDevice::Pointer m_CombinedModality;
 
   /**
   * \brief NavigationDataSource used for tracking data.

@@ -89,7 +89,7 @@ public:
   virtual QString GetTitle();
   virtual bool GetIsRestartable();
 
-  mitk::USCombinedModality::Pointer GetSelectedCombinedModality();
+  mitk::AbstractUltrasoundTrackerDevice::Pointer GetSelectedCombinedModality();
 
   void SetCalibrationLoadedNecessary(bool);
 
@@ -106,7 +106,7 @@ protected:
   /**
    * \brief The Combined Modality which was selected by the user.
    */
-  itk::SmartPointer<mitk::USCombinedModality> m_CombinedModality;
+  itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> m_CombinedModality;
 
   std::string m_LoadedCalibration; //<<< Temporary saving point for loaded calibration data.
   std::string m_LastCalibrationFilename; //<<< saves the filename last loaded calibration

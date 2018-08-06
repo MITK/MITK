@@ -14,31 +14,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkUSCombinedModality.h"
+#include "mitkTrackedUltrasound.h"
 #include "mitkImageReadAccessor.h"
 #include <mitkNavigationDataSmoothingFilter.h>
 #include <mitkNavigationDataDelayFilter.h>
+#include "mitkNavigationDataDisplacementFilter.h"
 #include "mitkTrackingDeviceSource.h"
 
-mitk::USCombinedModality::USCombinedModality( USDevice::Pointer usDevice,
+
+
+
+mitk::TrackedUltrasound::TrackedUltrasound( USDevice::Pointer usDevice,
                                               NavigationDataSource::Pointer trackingDevice,
                                               bool trackedUltrasoundActive )
   : AbstractUltrasoundTrackerDevice( usDevice, trackingDevice, trackedUltrasoundActive )
 {
-
 }
 
-mitk::USCombinedModality::~USCombinedModality()
+mitk::TrackedUltrasound::~TrackedUltrasound()
 {
-
 }
 
-void mitk::USCombinedModality::GenerateData()
+void mitk::TrackedUltrasound::GenerateData()
 {
   if (m_UltrasoundDevice->GetIsFreezed()) { return; } //if the image is freezed: do nothing
 
   //get next image from ultrasound image source
-  mitk::Image::Pointer image = m_UltrasoundDevice->GetUSImageSource()->GetNextImage()[0];
+  mitk::Image::Pointer image = m_UltrasoundDevice->GetUSImageSource()->GetNextImage();
 
   if (image.IsNull() || !image->IsInitialized()) //check the image
   {
@@ -65,7 +67,7 @@ void mitk::USCombinedModality::GenerateData()
     {
       // transform image according to callibration if one is set
       // for current configuration of probe and depth
-      this->GetOutput()->GetGeometry()->SetIndexToWorldTransform(calibrationIterator->second);
+      m_DisplacementFilter->SetTransformation(calibrationIterator->second);
     }
   }
 }

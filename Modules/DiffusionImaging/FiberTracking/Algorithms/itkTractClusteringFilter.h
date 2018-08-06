@@ -106,6 +106,7 @@ protected:
 
   std::vector< Cluster > ClusterStep(std::vector< long > f_indices, std::vector< float > distances);
 
+  std::vector< TractClusteringFilter::Cluster > MergeDuplicateClusters2(std::vector< TractClusteringFilter::Cluster >& clusters);
   void MergeDuplicateClusters(std::vector< TractClusteringFilter::Cluster >& clusters);
   std::vector< Cluster > AddToKnownClusters(std::vector< long > f_indices, std::vector<vnl_matrix<float> > &centroids);
   void AppendCluster(std::vector< Cluster >& a, std::vector< Cluster >&b);

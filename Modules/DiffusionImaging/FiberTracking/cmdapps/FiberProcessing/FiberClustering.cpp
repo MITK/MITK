@@ -26,6 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkClusteringMetricScalarMap.h>
 #include <mitkClusteringMetricInnerAngles.h>
 #include <mitkClusteringMetricLength.h>
+#include <itksys/SystemTools.hxx>
+
+typedef itksys::SystemTools ist;
 
 mitk::FiberBundle::Pointer LoadFib(std::string filename)
 {
@@ -57,6 +60,8 @@ int main(int argc, char* argv[])
   parser.addArgument("max_clusters", "", mitkCommandLineParser::Int, "Max. clusters:", "");
   parser.addArgument("merge_clusters", "", mitkCommandLineParser::Float, "Merge clusters:", "", -1.0);
   parser.addArgument("output_centroids", "", mitkCommandLineParser::Bool, "Output centroids:", "");
+  parser.addArgument("only_centroids", "", mitkCommandLineParser::Bool, "Output only centroids:", "");
+  parser.addArgument("merge_centroids", "", mitkCommandLineParser::Bool, "Merge centroids:", "");
   parser.addArgument("metrics", "", mitkCommandLineParser::StringList, "Metrics:", "EU_MEAN (default), EU_STD, EU_MAX, ANAT, MAP, LENGTH");
   parser.addArgument("metric_weights", "", mitkCommandLineParser::StringList, "Metric weights:", "add one float weight for each used metric");
   parser.addArgument("input_centroids", "", mitkCommandLineParser::String, "Input centroids:", "");
@@ -70,6 +75,14 @@ int main(int argc, char* argv[])
 
   std::string inFileName = us::any_cast<std::string>(parsedArgs["i"]);
   std::string out_root = us::any_cast<std::string>(parsedArgs["o"]);
+
+  bool only_centroids = false;
+  if (parsedArgs.count("only_centroids"))
+    only_centroids = us::any_cast<bool>(parsedArgs["only_centroids"]);
+
+  bool merge_centroids = false;
+  if (parsedArgs.count("merge_centroids"))
+    merge_centroids = us::any_cast<bool>(parsedArgs["merge_centroids"]);
 
   int cluster_size = 10;
   if (parsedArgs.count("cluster_size"))
@@ -220,15 +233,24 @@ int main(int argc, char* argv[])
     std::streambuf *old = cout.rdbuf(); // <-- save
     std::stringstream ss;
     std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-    unsigned int c = 0;
-    for (auto f : tracts)
-    {
-      mitk::IOUtil::Save(f, out_root + "Cluster_" + boost::lexical_cast<std::string>(c) + file_ending);
 
-      if (output_centroids)
-        mitk::IOUtil::Save(centroids.at(c), out_root + "Centroid_" + boost::lexical_cast<std::string>(c) + file_ending);
-      ++c;
+    if (!only_centroids)
+      for (unsigned int i=0; i<tracts.size(); ++i)
+        mitk::IOUtil::Save(tracts.at(i), out_root + "Cluster_" + boost::lexical_cast<std::string>(i) + file_ending);
+
+
+    if (output_centroids && !merge_centroids)
+    {
+      for (unsigned int i=0; i<centroids.size(); ++i)
+        mitk::IOUtil::Save(centroids.at(i), out_root + "Centroid_" + boost::lexical_cast<std::string>(i) + file_ending);
     }
+    else if (output_centroids)
+    {
+      mitk::FiberBundle::Pointer centroid = mitk::FiberBundle::New();
+      centroid = centroid->AddBundles(centroids);
+      mitk::IOUtil::Save(centroid, out_root + ist::GetFilenameWithoutExtension(inFileName) + "_Centroids" + file_ending);
+    }
+
     std::cout.rdbuf (old);              // <-- restore
 
   }

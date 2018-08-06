@@ -214,6 +214,63 @@ void TractClusteringFilter::AppendCluster(std::vector< Cluster >& a, std::vector
     a.push_back(c);
 }
 
+std::vector< TractClusteringFilter::Cluster > TractClusteringFilter::MergeDuplicateClusters2(std::vector< TractClusteringFilter::Cluster >& clusters)
+{
+  if (m_MergeDuplicateThreshold<0)
+    m_MergeDuplicateThreshold = m_Distances.at(0)/2;
+
+  MITK_INFO << "Merging duplicate clusters with distance threshold " << m_MergeDuplicateThreshold;
+
+  std::vector< TractClusteringFilter::Cluster > new_clusters;
+  for (Cluster c1 : clusters)
+  {
+    vnl_matrix<float> t = c1.h / c1.n;
+
+    int min_idx = -1;
+    float min_d = 99999;
+    bool flip = false;
+
+#pragma omp parallel for
+    for (unsigned int k2=0; k2<new_clusters.size(); ++k2)
+    {
+      Cluster c2 = new_clusters.at(k2);
+      vnl_matrix<float> v = c2.h / c2.n;
+
+      bool f = false;
+      float d = 0;
+      for (auto m : m_Metrics)
+        d += m->CalculateDistance(t, v, f);
+      d /= m_Metrics.size();
+
+#pragma omp critical
+      if (d<min_d && d<m_MergeDuplicateThreshold)
+      {
+        min_d = d;
+        min_idx = k2;
+        flip = f;
+      }
+    }
+
+    if (min_idx<0)
+      new_clusters.push_back(c1);
+    else
+    {
+      for (int i=0; i<c1.n; ++i)
+      {
+        new_clusters[min_idx].I.push_back(c1.I.at(i));
+        new_clusters[min_idx].n += 1;
+      }
+      if (!flip)
+        new_clusters[min_idx].h += c1.h;
+      else
+        new_clusters[min_idx].h += c1.h.fliplr();
+    }
+  }
+
+  MITK_INFO << "\nNumber of clusters after merging duplicates: " << new_clusters.size();
+  return new_clusters;
+}
+
 void TractClusteringFilter::MergeDuplicateClusters(std::vector< TractClusteringFilter::Cluster >& clusters)
 {
   if (m_MergeDuplicateThreshold<0)
@@ -395,7 +452,7 @@ void TractClusteringFilter::GenerateData()
     MITK_INFO << "Clustering fibers";
     clusters = ClusterStep(f_indices, m_Distances);
     MITK_INFO << "Number of clusters: " << clusters.size();
-    MergeDuplicateClusters(clusters);
+    clusters = MergeDuplicateClusters2(clusters);
     std::sort(clusters.begin(),clusters.end());
   }
   else
@@ -411,7 +468,7 @@ void TractClusteringFilter::GenerateData()
     no_match = clusters.back();
     clusters.pop_back();
     MITK_INFO << "Number of clusters: " << clusters.size();
-    MergeDuplicateClusters(clusters);
+    clusters = MergeDuplicateClusters2(clusters);
   }
 
   MITK_INFO << "Clustering finished";

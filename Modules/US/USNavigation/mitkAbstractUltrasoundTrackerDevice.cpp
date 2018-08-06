@@ -321,26 +321,6 @@ void mitk::AbstractUltrasoundTrackerDevice::SetDelayCount( unsigned int delayCou
   m_DelayFilter->SetDelay(delayCount);
 }
 
-itk::SmartPointer<mitk::USAbstractControlInterface> mitk::AbstractUltrasoundTrackerDevice::GetControlInterfaceCustom()
-{
-  return itk::SmartPointer<USAbstractControlInterface>();
-}
-
-itk::SmartPointer<mitk::USControlInterfaceBMode> mitk::AbstractUltrasoundTrackerDevice::GetControlInterfaceBMode()
-{
-  return itk::SmartPointer<USControlInterfaceBMode>();
-}
-
-itk::SmartPointer<mitk::USControlInterfaceProbes> mitk::AbstractUltrasoundTrackerDevice::GetControlInterfaceProbes()
-{
-  return itk::SmartPointer<USControlInterfaceProbes>();
-}
-
-itk::SmartPointer<mitk::USControlInterfaceDoppler> mitk::AbstractUltrasoundTrackerDevice::GetControlInterfaceDoppler()
-{
-  return itk::SmartPointer<USControlInterfaceDoppler>();
-}
-
 void mitk::AbstractUltrasoundTrackerDevice::GenerateData()
 {
 }

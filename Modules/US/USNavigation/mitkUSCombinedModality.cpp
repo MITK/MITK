@@ -36,56 +36,14 @@ mitk::USCombinedModality::~USCombinedModality()
 {
 }
 
-mitk::USAbstractControlInterface::Pointer mitk::USCombinedModality::GetControlInterfaceCustom()
-{
-  if (m_UltrasoundDevice.IsNull())
-  {
-    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-    mitkThrow() << "UltrasoundDevice must not be null.";
-  }
-
-  return m_UltrasoundDevice->GetControlInterfaceCustom();
-}
-
-mitk::USControlInterfaceBMode::Pointer mitk::USCombinedModality::GetControlInterfaceBMode()
-{
-  if (m_UltrasoundDevice.IsNull())
-  {
-    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-    mitkThrow() << "UltrasoundDevice must not be null.";
-  }
-
-  return m_UltrasoundDevice->GetControlInterfaceBMode();
-}
-
-mitk::USControlInterfaceProbes::Pointer mitk::USCombinedModality::GetControlInterfaceProbes()
-{
-  if (m_UltrasoundDevice.IsNull())
-  {
-    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-    mitkThrow() << "UltrasoundDevice must not be null.";
-  }
-
-  return m_UltrasoundDevice->GetControlInterfaceProbes();
-}
-
-mitk::USControlInterfaceDoppler::Pointer mitk::USCombinedModality::GetControlInterfaceDoppler()
-{
-  if (m_UltrasoundDevice.IsNull())
-  {
-    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
-    mitkThrow() << "UltrasoundDevice must not be null.";
-  }
-
-  return m_UltrasoundDevice->GetControlInterfaceDoppler();
-}
-
 
 void mitk::USCombinedModality::GenerateData()
 {
   if (m_UltrasoundDevice->GetIsFreezed()) { return; } //if the image is freezed: do nothing
   //get next image from ultrasound image source
-  mitk::Image::Pointer image = m_UltrasoundDevice->GetOutput(); //GetUSImageSource()->GetNextImage();
+  //FOR LATER: Be aware if the for loop behaves correct, if the UltrasoundDevice has more than 1 output.
+  int i = 0;
+  mitk::Image::Pointer image = m_UltrasoundDevice->GetUSImageSource()->GetNextImage().at(i);
   if (image.IsNull() || !image->IsInitialized()) //check the image
   {
     MITK_WARN << "Invalid image in USCombinedModality, aborting!";

@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 
 #include "IO/mitkUSNavigationLoggingBackend.h"
-#include "Widgets/QmitkUSNavigationProcessWidget.h"
 #include "mitkNavigationDataRecorder.h"
 #include "mitkNodeDisplacementFilter.h"
 #include "mitkUSImageLoggingFilter.h"

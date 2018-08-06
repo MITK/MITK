@@ -147,8 +147,6 @@ void QmitkUltrasoundCalibration::CreateQtPartControl(QWidget *parent)
   m_Controls.m_CalibTrackingStatus->ShowStatusLabels();
   m_Controls.m_EvalTrackingStatus->ShowStatusLabels();
 
-  m_OverrideSpacing = false;
-
   // General & Device Selection
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(Update()));
   //connect(m_Controls.m_ToolBox, SIGNAL(currentChanged(int)), this, SLOT(OnTabSwitch(int)));
@@ -669,14 +667,24 @@ void QmitkUltrasoundCalibration::OnCalibration()
 
   transform->SetSourceLandmarks(this->ConvertPointSetToVtkPolyData(m_CalibPointsImage)->GetPoints());
   transform->SetTargetLandmarks(this->ConvertPointSetToVtkPolyData(m_CalibPointsTool)->GetPoints());
-  if (m_Controls.m_ScaleTransform->isChecked())
+
+  if( !m_CombinedModality->GetIsTrackedUltrasoundActive() )
   {
-    transform->SetModeToSimilarity();
-  } //use affine transform
+    if (m_Controls.m_ScaleTransform->isChecked())
+    {
+      transform->SetModeToSimilarity();
+    } //use affine transform
+    else
+    {
+      transform->SetModeToRigidBody();
+    } //use similarity transform: scaling is not touched
+    MITK_INFO << "TEST";
+  }
   else
   {
-    transform->SetModeToRigidBody();
-  } //use similarity transform: scaling is not touched
+    transform->SetModeToRigidBody();//use similarity transform: scaling is not touched
+  }
+
   transform->Modified();
   transform->Update();
 
@@ -727,7 +735,12 @@ void QmitkUltrasoundCalibration::OnCalibration()
   MITK_INFO << "Calibration transform: " << calibTransform;
 
   m_Transformation = mitk::AffineTransform3D::New();
-  if (!m_Controls.m_ScaleTransform->isChecked()) { m_Transformation->Compose(oldUSImageTransform); }
+  if( !m_CombinedModality->GetIsTrackedUltrasoundActive() )
+  {
+    if( !m_Controls.m_ScaleTransform->isChecked() ) { m_Transformation->Compose(oldUSImageTransform); }
+    MITK_INFO << "Used old USImageTransform";
+  }
+
   m_Transformation->Compose(calibTransform);
 
   MITK_INFO << "New combined transform: " << m_Transformation;
@@ -905,21 +918,17 @@ void QmitkUltrasoundCalibration::Update()
   m_Controls.m_EvalTrackingStatus->Refresh();
 
   // Update US Image
-  m_CombinedModality->Modified();
-  m_CombinedModality->Update();
-  mitk::Image::Pointer m_Image = m_CombinedModality->GetOutput();
   if (m_Image.IsNotNull() && m_Image->IsInitialized())
   {
-    if (m_OverrideSpacing)
-    {
-      m_Image->GetGeometry()->SetSpacing(m_Spacing);
-    }
-    if (m_Image.IsNotNull() && m_Image->IsInitialized())
-    {
-      m_Node->SetData(m_Image);
-    }
+    m_Node->SetData(m_Image);
   }
-  m_Node->SetData(m_Image); //Workaround because image is not initalized, maybe problem of the Ultrasound view?
+  else
+  {
+    mitk::Image::Pointer m_Image = m_CombinedModality->GetUltrasoundDevice()->GetOutput();
+    m_Node->SetData(m_Image); //Workaround because image is not initalized, maybe problem of the Ultrasound view?
+  }
+  m_CombinedModality->Modified();
+  m_CombinedModality->Update();
 
   // Update Needle Projection
   m_NeedleProjectionFilter->Update();
@@ -941,7 +950,7 @@ void QmitkUltrasoundCalibration::SwitchFreeze()
     }
 
     m_CombinedModality->Update();
-    m_Image = m_CombinedModality->GetOutput();
+    m_Image = m_CombinedModality->GetUltrasoundDevice()->GetOutput();
     if (m_Image.IsNotNull() && m_Image->IsInitialized())
     {
       m_Node->SetData(m_Image);
@@ -1115,14 +1124,7 @@ void QmitkUltrasoundCalibration::OnCalculateSpacing()
   double xSpacing = 30 / xDistance;
   double ySpacing = 20 / yDistance;
 
-  m_Spacing[0] = xSpacing;
-  m_Spacing[1] = ySpacing;
-  m_Spacing[2] = 1;
-
-  MITK_INFO << m_Spacing;
-
-  //Make sure the new spacing is applied to the USVideoDeviceImages
-  m_OverrideSpacing = true;
+  m_CombinedModality->GetUltrasoundDevice()->SetSpacing(xSpacing, ySpacing);
 
   //Now that the spacing is set clear all stuff and return to Calibration
   m_SpacingPoints->Clear();
@@ -1136,6 +1138,5 @@ void QmitkUltrasoundCalibration::OnUSDepthChanged(const std::string& key, const 
   //whenever depth of USImage is changed the spacing should no longer be overwritten
   if (key == mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH)
   {
-    m_OverrideSpacing = false;
   }
 }

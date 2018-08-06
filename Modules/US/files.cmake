@@ -12,6 +12,8 @@ USModel/mitkUSVideoDevice.cpp
 USModel/mitkUSVideoDeviceCustomControls.cpp
 USModel/mitkUSProbe.cpp
 USModel/mitkUSDevicePersistence.cpp
+USModel/mitkUSDeviceReaderXML.cpp
+USModel/mitkUSDeviceWriterXML.cpp
 
 ## Filters and Sources
 USFilters/mitkUSImageLoggingFilter.cpp

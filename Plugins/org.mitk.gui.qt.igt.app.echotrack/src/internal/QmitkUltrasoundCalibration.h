@@ -246,10 +246,6 @@ protected:
 
   unsigned long m_NewConnectionObserverTag;
 
-  // Variables to determine if spacing was calibrated and needs to be applied to the incoming images
-  mitk::Vector3D m_Spacing;
-  bool m_OverrideSpacing;
-
   /**
   * \brief The current Ultrasound Image.
   */

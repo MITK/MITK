@@ -97,6 +97,11 @@ namespace mitk {
     std::vector<mitk::USProbe::Pointer> GetAllProbes();
 
     /**
+    * \brief Cleans the std::vector containing all configured probes.
+    */
+    void DeleteAllProbes();
+
+    /**
     * \brief Return current active probe for this USVideoDevice
     * Returns a pointer to the probe that is currently in use. If there were probes set while creating or modifying this USVideoDevice.
     * Returns null otherwise
@@ -123,6 +128,22 @@ namespace mitk {
     \brief True, if this Device plays back a file, false if it recieves data from a device
     */
     bool GetIsSourceFile();
+
+    /**
+    * \brief Sets the first existing probe or the default probe of the video device
+    * as the current probe of it.
+    */
+    void SetDefaultProbeAsCurrentProbe();
+
+    /**
+    * \brief Sets the probe with the given name as current probe if the named probe exists.
+    */
+    void SetCurrentProbe( std::string probename );
+
+    /**
+    * \brief Sets the given spacing of the current depth of the current probe.
+    */
+    void SetSpacing( double xSpacing, double ySpacing ) override;
 
     itkGetMacro(ImageVector, std::vector<mitk::Image::Pointer>);
     itkGetMacro(DeviceID, int);
@@ -184,6 +205,12 @@ namespace mitk {
     * \brief Is called during the deactivation process. After a call to this method the device should still be connected, but not producing images anymore.
     */
     virtual bool OnDeactivation() override;
+
+    /**
+    * \brief Grabs the next frame from the Video input.
+    * This method is called internally, whenever Update() is invoked by an Output.
+    */
+    virtual void GenerateData() override;
 
     /**
     * \brief The image source that we use to aquire data

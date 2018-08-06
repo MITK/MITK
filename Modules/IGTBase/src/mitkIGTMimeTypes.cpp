@@ -36,3 +36,13 @@ mitk::CustomMimeType mitk::IGTMimeTypes::NAVIGATIONDATASETCSV_MIMETYPE()
   mimeType.AddExtension("csv");
   return mimeType;
 }
+
+mitk::CustomMimeType mitk::IGTMimeTypes::USDEVICEINFORMATIONXML_MIMETYPE()
+{
+  mitk::CustomMimeType mimeType(IOMimeTypes::DEFAULT_BASE_NAME() + ".USDeviceInformation.xml");
+  std::string category = "USDeviceInformation";
+  mimeType.SetComment("USDeviceInformation (XML)");
+  mimeType.SetCategory(category);
+  mimeType.AddExtension("xml");
+  return mimeType;
+}

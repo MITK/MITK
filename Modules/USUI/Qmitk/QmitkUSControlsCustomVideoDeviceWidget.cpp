@@ -74,6 +74,12 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnDeviceSet()
       std::string probeName = (*it)->GetName();
       ui->m_ProbeIdentifier->addItem(QString::fromUtf8(probeName.data(), probeName.size()));
     }
+
+    m_ControlInterface->SetDefaultProbeAsCurrentProbe();
+
+    SetDepthsForProbe( ui->m_ProbeIdentifier->currentText().toStdString() );
+    m_ControlInterface->SetNewDepth( ui->m_UsDepth->currentText().toDouble() );
+
     connect(ui->m_UsDepth, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnDepthChanged()));
     connect(ui->m_ProbeIdentifier, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnProbeChanged()));
 
@@ -138,6 +144,7 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnCropAreaChanged()
 void QmitkUSControlsCustomVideoDeviceWidget::OnDepthChanged()
 {
   double depth = ui->m_UsDepth->currentText().toDouble();
+  MITK_INFO << "OnDepthChanged() " << depth;
   m_ControlInterface->SetNewDepth(depth);
 }
 

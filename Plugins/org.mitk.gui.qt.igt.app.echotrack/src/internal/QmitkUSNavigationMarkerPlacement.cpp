@@ -179,7 +179,6 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
 {
   m_Parent = parent;
   ui->setupUi(parent);
-
   connect(ui->startExperimentButton, SIGNAL(clicked()), this, SLOT(OnStartExperiment()));
   connect(ui->finishExperimentButton, SIGNAL(clicked()), this, SLOT(OnFinishExperiment()));
   connect(ui->m_enableNavigationLayout, SIGNAL(clicked()), this, SLOT(OnChangeLayoutClicked()));
@@ -217,7 +216,6 @@ void QmitkUSNavigationMarkerPlacement::OnInitializeTargetMarking()
   ui->m_TargetMarkingWidget->OnActivateStep();
   ui->m_TargetMarkingWidget->OnStartStep();
   ui->m_TargetMarkingWidget->Update();
-
 }
 void QmitkUSNavigationMarkerPlacement::OnInitializeCriticalStructureMarking()
 {

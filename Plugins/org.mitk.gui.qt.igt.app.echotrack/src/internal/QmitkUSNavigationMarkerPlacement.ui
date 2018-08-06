@@ -47,8 +47,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>512</width>
-            <height>86</height>
+            <width>520</width>
+            <height>77</height>
            </rect>
           </property>
           <attribute name="label">
@@ -72,8 +72,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>115</width>
-            <height>67</height>
+            <width>93</width>
+            <height>57</height>
            </rect>
           </property>
           <attribute name="label">
@@ -97,8 +97,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>512</width>
-            <height>86</height>
+            <width>93</width>
+            <height>57</height>
            </rect>
           </property>
           <attribute name="label">
@@ -129,6 +129,68 @@
        <item>
         <widget class="QmitkUSNavigationCombinedSettingsWidget" name="m_settingsWidget" native="true"/>
        </item>
+       <item>
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QCheckBox" name="m_enableNavigationLayout">
+           <property name="text">
+            <string>Enable Navigation Render Window Layout with RenderWindow</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="m_RenderWindowSelection">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>3</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="m_RefreshView">
+           <property name="text">
+            <string>Refresh view</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="Line" name="line_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="finishExperimentButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Finish Experiment</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="startExperimentButton">
+         <property name="text">
+          <string>Start New Experiment</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -143,61 +205,6 @@
      </property>
      <property name="text">
       <string/>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QCheckBox" name="m_enableNavigationLayout">
-       <property name="text">
-        <string>Enable Navigation Render Window Layout with RenderWindow</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="m_RenderWindowSelection">
-       <property name="minimum">
-        <number>1</number>
-       </property>
-       <property name="maximum">
-        <number>3</number>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="m_RefreshView">
-       <property name="text">
-        <string>Refresh view</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QPushButton" name="finishExperimentButton">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Finish Experiment</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="startExperimentButton">
-     <property name="text">
-      <string>Start New Experiment</string>
      </property>
     </widget>
    </item>

@@ -40,9 +40,10 @@ if(MITK_USE_Qt5)
   elseif(APPLE)
     MITK_INSTALL(FILES "${_qmake_path}/../plugins/platforms/libqcocoa.dylib")
   elseif(UNIX)
-    MITK_INSTALL(FILES
-      "${_qmake_path}/../plugins/platforms/libqxcb.so"
-      "${_qmake_path}/../plugins/xcbglintegrations/libqxcb-glx-integration.so")
+    MITK_INSTALL(FILES "${_qmake_path}/../plugins/platforms/libqxcb.so")
+
+    set(_install_DESTINATION "plugins/xcbglintegrations")
+    MITK_INSTALL(FILES "${_qmake_path}/../plugins/xcbglintegrations/libqxcb-glx-integration.so")
   endif()
 
   # Install platform-specific Qt styles

@@ -91,11 +91,8 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::
       new QListWidgetItem(tr(m_CurrentSource->GetOutput(i)->GetName()), m_Controls->m_ToolView);
     }
 
-    // Get Storage
-    std::string filter = "(" + mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID + "=" + m_CurrentSource->GetMicroserviceID() + ")";
-    std::vector<us::ServiceReference<mitk::NavigationToolStorage> > refs = context->GetServiceReferences<mitk::NavigationToolStorage>(filter);
-    if (refs.empty()) return; //no storage was found
-    m_CurrentStorage = context->GetService(refs.front());
+    // Get corresponding tool storage
+    m_CurrentStorage = m_CurrentSource->GetToolMetaDataCollection();
 
     if (m_CurrentStorage.IsNull())
       {

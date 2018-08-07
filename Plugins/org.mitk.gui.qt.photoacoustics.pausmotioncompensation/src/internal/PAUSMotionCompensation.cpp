@@ -134,8 +134,8 @@ void PAUSMotionCompensation::DoImageProcessing()
       try{
         m_Filter->Update();
       }
-      catch (const std::exception& e) {
-        QMessageBox::information(nullptr, "Warning", "Please make sure that both input images have the same dimension(s).");
+      catch (const mitk::Exception& e) {
+        QMessageBox::information(nullptr, "Warning", e.GetDescription());
       }
       mitk::Image::Pointer paOutput = m_Filter->GetPaOutput();
       mitk::Image::Pointer usOutput = m_Filter->GetUsOutput();

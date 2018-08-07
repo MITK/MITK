@@ -478,17 +478,6 @@ namespace mitk {
 
     bool m_SpawnAcquireThread;
 
-    /**
-    *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
-    */
-    us::ServiceRegistration<Self> m_ServiceRegistration;
-
-    /**
-    * \brief Properties of the device's Microservice.
-    */
-    us::ServiceProperties m_ServiceProperties;
-
-
     bool m_UnregisteringStarted;
   };
 } // namespace mitk

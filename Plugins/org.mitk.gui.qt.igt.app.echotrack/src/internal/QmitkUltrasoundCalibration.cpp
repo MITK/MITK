@@ -1096,7 +1096,7 @@ void QmitkUltrasoundCalibration::OnFreezeClicked()
   {
     //deactivate Imaging
     m_Timer->stop();
-    m_CombinedModality->SetIsFreezed(true);
+    m_CombinedModality->GetUltrasoundDevice()->SetIsFreezed(true);
     m_Controls.m_SpacingAddPoint->setEnabled(true);
   }
   //SwitchFreeze();
@@ -1152,7 +1152,5 @@ void QmitkUltrasoundCalibration::OnUSDepthChanged(const std::string& key, const 
   //whenever depth of USImage is changed the spacing should no longer be overwritten
   if (key == mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH)
   {
-
-    m_OverrideSpacing = false;
   }
 }

@@ -213,12 +213,6 @@ namespace mitk {
     virtual void GenerateData() override;
 
     /**
-    * \brief Grabs the next frame from the Video input.
-    * This method is called internally, whenever Update() is invoked by an Output.
-    */
-    virtual void GenerateData() override;
-
-    /**
     * \brief The image source that we use to aquire data
     */
     mitk::USImageVideoSource::Pointer m_Source;

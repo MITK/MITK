@@ -115,6 +115,9 @@ namespace mitk
 
     virtual void SetDataStorage(DataStorage* storage);  ///< set the datastorage that will be used for rendering
 
+    void SetStudyUID(std::string studyUID);
+    std::string GetStudyUID();
+
     //##Documentation
     //## return the DataStorage that is used for rendering
     virtual DataStorage::Pointer GetDataStorage() const
@@ -194,20 +197,20 @@ namespace mitk
     */
     DEPRECATED(void SetWorldGeometry3D(TimeSlicedGeometry* geometry));
 
-      itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry)
-      itkGetObjectMacro(WorldTimeGeometry, TimeGeometry)
+    itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry)
+    itkGetObjectMacro(WorldTimeGeometry, TimeGeometry)
 
-      //##Documentation
-      //## @brief Get the current 3D-worldgeometry (m_CurrentWorldGeometry) used for 3D-rendering
-      itkGetConstObjectMacro(CurrentWorldGeometry, BaseGeometry)
+    //##Documentation
+    //## @brief Get the current 3D-worldgeometry (m_CurrentWorldGeometry) used for 3D-rendering
+    itkGetConstObjectMacro(CurrentWorldGeometry, BaseGeometry)
 
-      //##Documentation
-      //## @brief Get the current 2D-worldgeometry (m_CurrentWorldPlaneGeometry) used for 2D-rendering
-      itkGetConstObjectMacro(CurrentWorldPlaneGeometry, PlaneGeometry)
-      /**
-      * \deprecatedSince{2014_10} Please use GetCurrentWorldPlaneGeometry
-      */
-      DEPRECATED(const PlaneGeometry* GetCurrentWorldGeometry2D()){ return GetCurrentWorldPlaneGeometry(); };
+    //##Documentation
+    //## @brief Get the current 2D-worldgeometry (m_CurrentWorldPlaneGeometry) used for 2D-rendering
+    itkGetConstObjectMacro(CurrentWorldPlaneGeometry, PlaneGeometry)
+    /**
+    * \deprecatedSince{2014_10} Please use GetCurrentWorldPlaneGeometry
+    */
+    DEPRECATED(const PlaneGeometry* GetCurrentWorldGeometry2D()){ return GetCurrentWorldPlaneGeometry(); };
 
     //##Documentation
     //## Calculates the bounds of the DataStorage (if it contains any valid data),
@@ -241,12 +244,12 @@ namespace mitk
 
     itkGetConstMacro(Slice, unsigned int)
 
-      //##Documentation
-      //## @brief Set/Get m_TimeStep which defines together with m_Slice the 2D geometry
-      //## stored in m_WorldTimeGeometry used as m_CurrentWorldPlaneGeometry
-      //##
-      //## \sa m_TimeStep
-      virtual void SetTimeStep(unsigned int timeStep);
+    //##Documentation
+    //## @brief Set/Get m_TimeStep which defines together with m_Slice the 2D geometry
+    //## stored in m_WorldTimeGeometry used as m_CurrentWorldPlaneGeometry
+    //##
+    //## \sa m_TimeStep
+    virtual void SetTimeStep(unsigned int timeStep);
 
     itkGetConstMacro(TimeStep, unsigned int)
 
@@ -258,14 +261,14 @@ namespace mitk
 
     itkGetConstMacro(Component, unsigned int);
 
-      //##Documentation
-      //## @brief Get the time-step of a BaseData object which
-      //## exists at the time of the currently displayed content
-      //##
-      //## Returns -1 or mitk::BaseData::m_TimeSteps if there
-      //## is no data at the current time.
-      //## \sa GetTimeStep, m_TimeStep
-      int GetTimeStep(const BaseData* data) const;
+    //##Documentation
+    //## @brief Get the time-step of a BaseData object which
+    //## exists at the time of the currently displayed content
+    //##
+    //## Returns -1 or mitk::BaseData::m_TimeSteps if there
+    //## is no data at the current time.
+    //## \sa GetTimeStep, m_TimeStep
+    int GetTimeStep(const BaseData* data) const;
 
     //##Documentation
     //## @brief Get the time in ms of the currently displayed content
@@ -298,13 +301,13 @@ namespace mitk
     //## which is supposed to be a SliceNavigationController::GeometryComponentEvent
     virtual void SetGeometryComponent(const itk::EventObject& geometryComponentEvent);
 
-      //##Documentation
-      //## @brief Get a DataNode pointing to a data object containing the current 2D-worldgeometry m_CurrentWorldPlaneGeometry (for 2D rendering)
-      itkGetObjectMacro(CurrentWorldPlaneGeometryNode, DataNode)
-      /**
-      * \deprecatedSince{2014_10} Please use GetCurrentWorldPlaneGeometryNode
-      */
-      DEPRECATED(DataNode* GetCurrentWorldGeometry2DNode()){ return GetCurrentWorldPlaneGeometryNode(); };
+    //##Documentation
+    //## @brief Get a DataNode pointing to a data object containing the current 2D-worldgeometry m_CurrentWorldPlaneGeometry (for 2D rendering)
+    itkGetObjectMacro(CurrentWorldPlaneGeometryNode, DataNode)
+    /**
+    * \deprecatedSince{2014_10} Please use GetCurrentWorldPlaneGeometryNode
+    */
+    DEPRECATED(DataNode* GetCurrentWorldGeometry2DNode()){ return GetCurrentWorldPlaneGeometryNode(); };
 
     //##Documentation
     //## @brief Sets timestamp of CurrentWorldPlaneGeometry and forces so reslicing in that renderwindow
@@ -349,28 +352,28 @@ namespace mitk
     //##Documentation
     //## @brief Get the MapperSlotId to use.
     itkGetMacro(MapperID, MapperSlotId)
-      itkGetConstMacro(MapperID, MapperSlotId)
+    itkGetConstMacro(MapperID, MapperSlotId)
 
-      //##Documentation
-      //## @brief Set the MapperSlotId to use.
-      itkSetMacro(MapperID, MapperSlotId)
+    //##Documentation
+    //## @brief Set the MapperSlotId to use.
+    itkSetMacro(MapperID, MapperSlotId)
 
     virtual int* GetSize () const;
     virtual int *GetViewportSize() const;
 
-      void SetSliceNavigationController(SliceNavigationController* SlicenavigationController);
-      itkGetObjectMacro(CameraController, CameraController)
-      itkGetObjectMacro(SliceNavigationController, SliceNavigationController)
-      itkGetObjectMacro(CameraRotationController, CameraRotationController)
+    void SetSliceNavigationController(SliceNavigationController* SlicenavigationController);
+    itkGetObjectMacro(CameraController, CameraController)
+    itkGetObjectMacro(SliceNavigationController, SliceNavigationController)
+    itkGetObjectMacro(CameraRotationController, CameraRotationController)
 
-      itkGetMacro(EmptyWorldGeometry, bool)
+    itkGetMacro(EmptyWorldGeometry, bool)
 
-      //##Documentation
-      //## @brief Tells if the displayed region is shifted and rescaled if the render window is resized.
-      itkGetMacro(KeepDisplayedRegion, bool)
-      //##Documentation
-      //## @brief Tells if the displayed region should be shifted and rescaled if the render window is resized.
-      itkSetMacro(KeepDisplayedRegion, bool)
+    //##Documentation
+    //## @brief Tells if the displayed region is shifted and rescaled if the render window is resized.
+    itkGetMacro(KeepDisplayedRegion, bool)
+    //##Documentation
+    //## @brief Tells if the displayed region should be shifted and rescaled if the render window is resized.
+    itkSetMacro(KeepDisplayedRegion, bool)
 
     //##Documentation
     //## @brief get the name of the Renderer
@@ -586,8 +589,9 @@ namespace mitk
     * rendering enabled */
     unsigned int m_NumberOfVisibleLODEnabledMappers;
 
-    // Local Storage Handling for mappers
+    std::string m_StudyUID;
 
+  // Local Storage Handling for mappers
   protected:
 
     std::list<mitk::BaseLocalStorageHandler*> m_RegisteredLocalStorageHandlers;

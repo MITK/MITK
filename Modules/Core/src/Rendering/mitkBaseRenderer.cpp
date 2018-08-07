@@ -119,6 +119,7 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
   , m_Name(name)
   , m_EmptyWorldGeometry(true)
   , m_NumberOfVisibleLODEnabledMappers(0)
+  , m_StudyUID()
 {
   m_Bounds[0] = 0;
   m_Bounds[1] = 0;
@@ -197,6 +198,16 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
     mitk::VtkLayerController::AddInstance(m_RenderWindow, m_VtkRenderer);
   }
   mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertSceneRenderer(m_VtkRenderer);
+}
+
+void mitk::BaseRenderer::SetStudyUID(std::string studyUID)
+{
+  m_StudyUID = studyUID;
+}
+
+std::string mitk::BaseRenderer::GetStudyUID()
+{
+  return m_StudyUID;
 }
 
 mitk::BaseRenderer::~BaseRenderer()

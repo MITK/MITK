@@ -179,7 +179,7 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
 {
   m_Parent = parent;
   ui->setupUi(parent);
-    
+
   connect(ui->startExperimentButton, SIGNAL(clicked()), this, SLOT(OnStartExperiment()));
   connect(ui->finishExperimentButton, SIGNAL(clicked()), this, SLOT(OnFinishExperiment()));
   connect(ui->m_enableNavigationLayout, SIGNAL(clicked()), this, SLOT(OnChangeLayoutClicked()));
@@ -202,25 +202,31 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
   ui->runningLabel->setPixmap(m_IconNotRunning);
 
   connect(ui->m_settingsWidget, SIGNAL(SettingsChanged(itk::SmartPointer<mitk::DataNode>)), this, SLOT(OnSettingsChanged(itk::SmartPointer<mitk::DataNode>)));
-  
+
 }
 
-void QmitkUSNavigationMarkerPlacement::OnInitializeTargetMarking()
+void QmitkUSNavigationMarkerPlacement::ReInitializeSettingsNodesAndImageStream()
 {
   m_SettingsNode = mitk::DataNode::New();
   ui->m_settingsWidget->OnSetSettingsNode(m_SettingsNode, true);
   InitImageStream();
   m_CombinedModality = ui->m_CombinedModalityCreationWidget->GetSelectedCombinedModality();
+}
+
+void QmitkUSNavigationMarkerPlacement::OnInitializeTargetMarking()
+{
+  ReInitializeSettingsNodesAndImageStream();
   ui->m_TargetMarkingWidget->SetCombinedModality(m_CombinedModality);
   ui->m_TargetMarkingWidget->SetDataStorage(this->GetDataStorage());
   ui->m_TargetMarkingWidget->OnSettingsChanged(m_SettingsNode);
   ui->m_TargetMarkingWidget->OnActivateStep();
   ui->m_TargetMarkingWidget->OnStartStep();
   ui->m_TargetMarkingWidget->Update();
-  
+
 }
 void QmitkUSNavigationMarkerPlacement::OnInitializeCriticalStructureMarking()
 {
+  ReInitializeSettingsNodesAndImageStream();
   ui->m_CriticalStructuresWidget->SetCombinedModality(m_CombinedModality);
   ui->m_CriticalStructuresWidget->SetDataStorage(this->GetDataStorage());
   ui->m_CriticalStructuresWidget->OnSettingsChanged(m_SettingsNode);
@@ -230,6 +236,8 @@ void QmitkUSNavigationMarkerPlacement::OnInitializeCriticalStructureMarking()
 }
 void QmitkUSNavigationMarkerPlacement::OnInitializeNavigation()
 {
+
+  ReInitializeSettingsNodesAndImageStream();
   ui->m_NavigationWidget->SetCombinedModality(m_CombinedModality);
   ui->m_NavigationWidget->SetDataStorage(this->GetDataStorage());
   ui->m_NavigationWidget->OnSettingsChanged(m_SettingsNode);

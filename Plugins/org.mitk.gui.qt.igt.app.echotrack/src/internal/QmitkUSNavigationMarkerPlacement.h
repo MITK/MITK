@@ -151,6 +151,8 @@ protected:
   */
   void Convert2DImagesTo3D(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
 
+  void ReInitializeSettingsNodesAndImageStream();
+
   void UpdateToolStorage();
 
   void CreateOverlays();

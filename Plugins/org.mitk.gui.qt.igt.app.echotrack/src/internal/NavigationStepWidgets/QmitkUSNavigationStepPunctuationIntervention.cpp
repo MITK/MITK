@@ -151,11 +151,14 @@ void QmitkUSNavigationStepPunctuationIntervention::OnShowToolAxisEnabled(int ena
 
 void QmitkUSNavigationStepPunctuationIntervention::OnUpdate()
 {
+  if (this->GetCombinedModality(false).IsNull()) return;
   // get navigation data source and make sure that it is not null
   mitk::NavigationDataSource::Pointer navigationDataSource =
-      this->GetCombinedModality()->GetNavigationDataSource();
+    this->GetCombinedModality()->GetNavigationDataSource();
+
   if ( navigationDataSource.IsNull() )
   {
+
     MITK_ERROR("QmitkUSAbstractNavigationStep")("QmitkUSNavigationStepPunctuationIntervention")
     << "Navigation Data Source of Combined Modality must not be null.";
     mitkThrow() << "Navigation Data Source of Combined Modality must not be null.";
@@ -164,6 +167,8 @@ void QmitkUSNavigationStepPunctuationIntervention::OnUpdate()
   this->UpdateBodyMarkerStatus(navigationDataSource->GetOutput(1));
   // update critical structures
   this->UpdateCriticalStructures(navigationDataSource->GetOutput(0),m_NeedleProjectionFilter->GetProjection());
+
+  m_NeedleProjectionFilter->Update();
 
   //Update Distance to US image
   mitk::Point3D point1 = m_NeedleProjectionFilter->GetProjection()->GetPoint(0);
@@ -194,7 +199,8 @@ QmitkUSNavigationStepPunctuationIntervention::FilterVector QmitkUSNavigationStep
 
 void QmitkUSNavigationStepPunctuationIntervention::OnSetCombinedModality()
 {
-  mitk::USCombinedModality::Pointer combinedModality = this->GetCombinedModality(false);
+  mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality = this->GetCombinedModality(false);
+  m_NeedleProjectionFilter->ConnectTo(combinedModality->GetNavigationDataSource());
   if ( combinedModality.IsNotNull() )
   {
     // set calibration of the combined modality to the needle projection filter

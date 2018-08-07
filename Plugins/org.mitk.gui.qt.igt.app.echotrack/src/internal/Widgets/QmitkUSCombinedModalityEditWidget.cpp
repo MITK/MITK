@@ -44,7 +44,7 @@ QmitkUSCombinedModalityEditWidget::~QmitkUSCombinedModalityEditWidget()
   delete ui;
 }
 
-void QmitkUSCombinedModalityEditWidget::SetCombinedModality(mitk::USCombinedModality::Pointer combinedModality)
+void QmitkUSCombinedModalityEditWidget::SetCombinedModality(mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality)
 {
   m_CalibrationsDataModel->SetCombinedModality(combinedModality);
 
@@ -53,8 +53,8 @@ void QmitkUSCombinedModalityEditWidget::SetCombinedModality(mitk::USCombinedModa
 
   m_LastCalibrations = m_CombinedModality->SerializeCalibration();
 
-  ui->vendorLineEdit->setText(QString::fromStdString(combinedModality->GetManufacturer()));
-  ui->nameLineEdit->setText(QString::fromStdString(combinedModality->GetName()));
+  ui->vendorLineEdit->setText(QString::fromStdString(combinedModality->GetUltrasoundDevice()->GetManufacturer()));
+  ui->nameLineEdit->setText(QString::fromStdString(combinedModality->GetUltrasoundDevice()->GetName()));
 
   ui->ultrasoundDeviceLabel->setText(QString::fromStdString(combinedModality->GetUltrasoundDevice()->GetManufacturer() + " " +
     combinedModality->GetUltrasoundDevice()->GetName()));
@@ -72,8 +72,8 @@ void QmitkUSCombinedModalityEditWidget::OnSaveButtonClicked()
 {
   if ( m_CombinedModality.IsNotNull() )
   {
-    m_CombinedModality->SetManufacturer(ui->vendorLineEdit->text().toStdString());
-    m_CombinedModality->SetName(ui->nameLineEdit->text().toStdString());
+    m_CombinedModality->GetUltrasoundDevice()->SetManufacturer(ui->vendorLineEdit->text().toStdString());
+    m_CombinedModality->GetUltrasoundDevice()->SetName(ui->nameLineEdit->text().toStdString());
 
     m_LastCalibrations = m_CombinedModality->SerializeCalibration();
   }

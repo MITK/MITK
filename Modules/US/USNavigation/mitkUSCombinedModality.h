@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkUSNavigationExports.h>
 #include "mitkUSDevice.h"
+#include "mitkImageSource.h"
+#include "mitkAbstractUltrasoundTrackerDevice.h"
 #include "mitkNavigationDataSource.h"
 
 namespace itk {
@@ -26,15 +28,13 @@ namespace itk {
 }
 
 namespace mitk {
-  class NavigationDataSmoothingFilter;
-  class NavigationDataDelayFilter;
   class USControlInterfaceBMode;
   class USControlInterfaceProbes;
   class USControlInterfaceDoppler;
 
   /**
    * \brief Combination of USDevice and NavigationDataSource.
-   * This class can be used as any USDevice subclass. Additionally tracking data be
+   * This class can be used as an ImageSource subclass. Additionally tracking data be
    * retrieved from the NavigationDataSource returned by GetTrackingDevice().
    *
    * A calibration of the ultrasound image stream to the navigation datas can be set
@@ -42,15 +42,12 @@ namespace mitk {
    * The ultrasound images are transformed according to this calibration in the
    * GenerateData() method.
    */
-  class MITKUSNAVIGATION_EXPORT USCombinedModality : public USDevice
+  class MITKUSNAVIGATION_EXPORT USCombinedModality : public mitk::AbstractUltrasoundTrackerDevice
   {
   public:
-    static const std::string DeviceClassIdentifier;
-    static const char*       DefaultProbeIdentifier;
-    static const char*       ProbeAndDepthSeperator;
 
-    mitkClassMacro(USCombinedModality, USDevice);
-    mitkNewMacro4Param(USCombinedModality, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, std::string, std::string);
+    mitkClassMacro(USCombinedModality, mitk::AbstractUltrasoundTrackerDevice);
+    mitkNewMacro3Param(USCombinedModality, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, bool);
 
     itkGetMacro(UltrasoundDevice, itk::SmartPointer<USDevice>);
     itkSetMacro(UltrasoundDevice, itk::SmartPointer<USDevice>);
@@ -193,7 +190,9 @@ namespace mitk {
     static const std::string US_PROPKEY_CLASS;
     static const std::string US_PROPKEY_ID;
   protected:
-    USCombinedModality(USDevice::Pointer usDevice, itk::SmartPointer<NavigationDataSource> trackingDevice, std::string manufacturer = "", std::string model = "");
+    USCombinedModality( USDevice::Pointer usDevice,
+                        itk::SmartPointer<NavigationDataSource> trackingDevice,
+                        bool trackedUltrasoundActive = false );
     ~USCombinedModality() override;
 
     /**

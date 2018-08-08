@@ -46,7 +46,7 @@ namespace mitk
     /**
     * @brief SetInput Set the input data through an image. Arbitrary images are supported
     */
-    void SetInput(Image::Pointer image, unsigned int inputSlices);
+    void SetInput(Image::Pointer image);
     /**
     *  brief SetInput Manually set the input data while providing 3 dimensions and memory size of the input data (Bytes per element).
     */

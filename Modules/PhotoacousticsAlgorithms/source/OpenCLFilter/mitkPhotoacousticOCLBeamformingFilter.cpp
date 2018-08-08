@@ -150,19 +150,19 @@ void mitk::PhotoacousticOCLBeamformingFilter::Execute()
   clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_ushort), &(this->m_ApodArraySize));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[0]));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[1]));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_uint), &(m_OutputDim[2]));
+  clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_uint), &(m_inputSlices));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 9, sizeof(cl_uint), &(reconstructionLines));
   clErr |= clSetKernelArg(this->m_PixelCalculation, 10, sizeof(cl_uint), &(samplesPerLine));
 
   // execute the filter on a 2D/3D NDRange
   if (m_OutputDim[2] == 1 || m_ChunkSize[2] == 1)
   {
-    if (!this->ExecuteKernelChunksInBatches(m_PixelCalculation, 2, m_ChunkSize, 16, 50))
+    if (!this->ExecuteKernelChunksInBatches(m_PixelCalculation, 2, m_ChunkSize, m_inputSlices, 50))
       mitkThrow() << "openCL Error when executing Kernel";
   }
   else
   {
-    if (!this->ExecuteKernelChunksInBatches(m_PixelCalculation, 3, m_ChunkSize, 16, 50))
+    if (!this->ExecuteKernelChunksInBatches(m_PixelCalculation, 3, m_ChunkSize, m_inputSlices, 50))
       mitkThrow() << "openCL Error when executing Kernel";
   }
 
@@ -214,11 +214,11 @@ bool mitk::PhotoacousticOCLBeamformingFilter::Initialize()
   return (OclFilter::IsInitialized() && buildErr);
 }
 
-void mitk::PhotoacousticOCLBeamformingFilter::SetInput(mitk::Image::Pointer image, unsigned int inputSlices)
+void mitk::PhotoacousticOCLBeamformingFilter::SetInput(mitk::Image::Pointer image)
 {
   OclDataSetToDataSetFilter::SetInput(image);
   m_InputImage = image;
-  m_inputSlices = inputSlices;
+  m_inputSlices = image->GetDimension(2);
 }
 
 void mitk::PhotoacousticOCLBeamformingFilter::SetInput(void* data, unsigned int* dimensions, unsigned int BpE)

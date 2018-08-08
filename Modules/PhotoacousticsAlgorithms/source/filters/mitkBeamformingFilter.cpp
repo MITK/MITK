@@ -266,7 +266,7 @@ void mitk::BeamformingFilter::GenerateData()
         inputBatch->SetImportVolume(&(((float*)copy.GetData())[input->GetDimension(0) * input->GetDimension(1) * batchSize * i]));
         
         m_BeamformingOclFilter->SetApodisation(m_Conf->GetApodizationFunction(), m_Conf->GetApodizationArraySize());
-        m_BeamformingOclFilter->SetInput(inputBatch, num_Slices);
+        m_BeamformingOclFilter->SetInput(inputBatch);
         m_BeamformingOclFilter->Update();
 
         void* out = m_BeamformingOclFilter->GetOutput();

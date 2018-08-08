@@ -21,8 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommandLineParser.h>
 #include <usAny.h>
 #include <mitkIOUtil.h>
-#include <itksys/SystemTools.hxx>
-#include <itkDirectory.h>
 #include <mitkFiberBundle.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <itkImageFileWriter.h>
@@ -30,29 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkFitFibersToImageFilter.h>
 #include <mitkTensorModel.h>
 #include <mitkITKImageImport.h>
+#include <mitkDiffusionDataIOHelper.h>
 
-typedef itksys::SystemTools ist;
 typedef itk::Point<float, 4> PointType4;
 typedef itk::Image< float, 4 >  PeakImgType;
-
-std::vector< std::string > get_file_list(const std::string& path)
-{
-  std::vector< std::string > file_list;
-  itk::Directory::Pointer dir = itk::Directory::New();
-
-  if (dir->Load(path.c_str()))
-  {
-    int n = dir->GetNumberOfFiles();
-    for (int r = 0; r < n; r++)
-    {
-      const char *filename = dir->GetFile(r);
-      std::string ext = ist::GetFilenameExtension(filename);
-      if (ext==".fib" || ext==".trk")
-        file_list.push_back(path + '/' + filename);
-    }
-  }
-  return file_list;
-}
 
 /*!
 \brief Fits the tractogram to the input peak image by assigning a weight to each fiber (similar to https://doi.org/10.1016/j.neuroimage.2015.06.092).
@@ -128,37 +107,11 @@ int main(int argc, char* argv[])
   try
   {
     MITK_INFO << "Loading data";
-//    std::streambuf *old = cout.rdbuf(); // <-- save
-//    std::stringstream ss;
-//    std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-    std::vector< mitk::FiberBundle::Pointer > input_tracts;
 
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Peak Image", "Fiberbundles"}, {});
 
     std::vector< std::string > fib_names;
-    for (auto item : fib_files)
-    {
-      if ( ist::FileIsDirectory(item) )
-      {
-        for ( auto fibFile : get_file_list(item) )
-        {
-          mitk::FiberBundle::Pointer inputTractogram = mitk::IOUtil::Load<mitk::FiberBundle>(fibFile);
-          if (inputTractogram.IsNull())
-            continue;
-          input_tracts.push_back(inputTractogram);
-          fib_names.push_back(fibFile);
-        }
-      }
-      else
-      {
-        mitk::FiberBundle::Pointer inputTractogram = mitk::IOUtil::Load<mitk::FiberBundle>(item);
-        if (inputTractogram.IsNull())
-          continue;
-        input_tracts.push_back(inputTractogram);
-        fib_names.push_back(item);
-      }
-    }
-//    std::cout.rdbuf (old);              // <-- restore
+    auto input_tracts = mitk::DiffusionDataIOHelper::load_fibs(fib_files, &fib_names);
 
     itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
 

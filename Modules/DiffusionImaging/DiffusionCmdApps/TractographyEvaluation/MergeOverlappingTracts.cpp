@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usAny.h>
 #include <mitkIOUtil.h>
 #include <mitkLexicalCast.h>
-#include <itksys/SystemTools.hxx>
-#include <itkDirectory.h>
 #include <mitkFiberBundle.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <fstream>
@@ -33,35 +31,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractDensityImageFilter.h>
 #include <itkImageRegionConstIterator.h>
 #include <itkImageFileWriter.h>
+#include <mitkDiffusionDataIOHelper.h>
 
-typedef itksys::SystemTools ist;
 typedef itk::Image<unsigned char, 3>    ItkFloatImgType;
 typedef itk::Image<unsigned int, 3>    ItkUIntImgType;
 
-std::vector< std::string > get_file_list(const std::string& path, std::vector< std::string > extensions={".fib", ".trk"})
-{
-  std::vector< std::string > file_list;
-  itk::Directory::Pointer dir = itk::Directory::New();
-
-  if (dir->Load(path.c_str()))
-  {
-    int n = dir->GetNumberOfFiles();
-    for (int r = 0; r < n; r++)
-    {
-      const char *filename = dir->GetFile(r);
-      std::string ext = ist::GetFilenameExtension(filename);
-      for (auto e : extensions)
-      {
-        if (ext==e)
-        {
-          file_list.push_back(path + '/' + filename);
-          break;
-        }
-      }
-    }
-  }
-  return file_list;
-}
 
 /*!
 \brief
@@ -96,20 +70,12 @@ int main(int argc, char* argv[])
     if (!ist::PathExists(out_folder))
       ist::MakeDirectory(out_folder);
 
-    std::vector< std::string > fib_files = get_file_list(input_folder, {".fib", ".trk", ".tck"});
-    if (fib_files.empty())
-      return EXIT_FAILURE;
+    std::vector< mitk::FiberBundle::Pointer > fibs = mitk::DiffusionDataIOHelper::load_fibs({input_folder});
+
 
     std::streambuf *old = cout.rdbuf(); // <-- save
     std::stringstream ss;
     std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-
-    std::vector< mitk::FiberBundle::Pointer > fibs;
-    for (std::string f : fib_files)
-    {
-      mitk::FiberBundle::Pointer fib = mitk::IOUtil::Load<mitk::FiberBundle>(f);
-      fibs.push_back(fib);
-    }
 
     mitk::FiberBundle::Pointer combined = mitk::FiberBundle::New();
     combined = combined->AddBundles(fibs);

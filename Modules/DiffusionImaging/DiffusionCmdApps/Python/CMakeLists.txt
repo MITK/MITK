@@ -26,8 +26,8 @@ if(BUILD_DiffusionPythonCmdApps OR MITK_BUILD_ALL_APPS)
 
       mitkFunctionCreateCommandLineApp(
         NAME ${appname}
-        DEPENDS CppMicroServices MitkCore MitkDiffusionCore MitkPython  ${dependencies_list}
-        PACKAGE_DEPENDS ITK
+        DEPENDS CppMicroServices MitkDiffusionCmdApps MitkPython  ${dependencies_list}
+        PACKAGE_DEPENDS
       )
     endforeach()
 

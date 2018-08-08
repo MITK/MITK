@@ -34,14 +34,19 @@ TractDistanceFilter::~TractDistanceFilter()
     delete m;
 }
 
-std::vector<int> TractDistanceFilter::GetIndices() const
+vnl_matrix<float> TractDistanceFilter::GetAllDistances() const
 {
-  return m_Indices;
+  return m_AllDistances;
 }
 
-std::vector<float> TractDistanceFilter::GetDistances() const
+vnl_vector<int> TractDistanceFilter::GetMinIndices() const
 {
-  return m_Distances;
+  return m_MinIndices;
+}
+
+vnl_vector<float> TractDistanceFilter::GetMinDistances() const
+{
+  return m_MinDistances;
 }
 
 void TractDistanceFilter::SetTracts2(const std::vector<FiberBundle::Pointer> &Tracts2)
@@ -132,8 +137,8 @@ void TractDistanceFilter::GenerateData()
     return;
   }
 
-  m_Indices.clear();
-  m_Distances.clear();
+  m_MinIndices.clear();
+  m_MinDistances.clear();
   std::vector<std::vector<vnl_matrix<float>>> T1;
   std::vector<std::vector<vnl_matrix<float>>> T2;
 
@@ -152,23 +157,26 @@ void TractDistanceFilter::GenerateData()
 
   disp.restart(m_Metrics.size() * num_fibs1 * num_fibs2);
 
-  m_Indices.resize(T1.size());
-  m_Distances.resize(T1.size());
+  m_AllDistances.set_size(T1.size(), T2.size());
+
+  m_MinIndices.set_size(T1.size());
+  m_MinDistances.set_size(T1.size());
+
 #pragma omp parallel for
   for (unsigned int i=0; i<T1.size(); ++i)
   {
     auto tracto1 = T1.at(i);
-#pragma omp critical
-    m_Distances[i] = 99999;
+    m_MinDistances[i] = 99999;
     for (unsigned int j=0; j<T2.size(); ++j)
     {
       auto tracto2 = T2.at(j);
       float d = calc_distance(tracto1, tracto2);
-#pragma omp critical
-      if (d < m_Distances[i])
+      m_AllDistances[i][j] = d;
+
+      if (d < m_MinDistances[i])
       {
-        m_Distances[i] = d;
-        m_Indices[i] = j;
+        m_MinDistances[i] = d;
+        m_MinIndices[i] = j;
       }
     }
   }

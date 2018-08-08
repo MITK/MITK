@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>385</width>
-    <height>684</height>
+    <height>711</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,9 +53,9 @@ QGroupBox {
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-18</y>
         <width>353</width>
-        <height>441</height>
+        <height>503</height>
        </rect>
       </property>
       <attribute name="label">
@@ -65,7 +65,189 @@ QGroupBox {
        <string>Extract a fiber subset from the selected fiber bundle using manually placed planar figures as waypoints or binary regions of interest.</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_14">
-       <item row="5" column="0">
+       <item row="7" column="0">
+        <spacer name="verticalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="4" column="0">
+        <widget class="QFrame" name="m_MaskExtractionFrame">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_19">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="2" column="0">
+           <widget class="QLabel" name="m_FiberExtractionFractionLabel">
+            <property name="text">
+             <string>Min. overlap:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="m_FiberExtractionThresholdLabel">
+            <property name="text">
+             <string>Threshold:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_20">
+            <property name="text">
+             <string>Min. num. fibers:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QDoubleSpinBox" name="m_FiberExtractionThresholdBox">
+            <property name="toolTip">
+             <string>Threshold on ROI image for positions to be considered as positive.</string>
+            </property>
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="maximum">
+             <double>9999.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.500000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QComboBox" name="m_ExtractionBoxMask">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <item>
+             <property name="text">
+              <string>Ending in ROI</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Not ending in ROI</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Passing ROI</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Not passing ROI</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Labelmap</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QCheckBox" name="m_BothEnds">
+            <property name="text">
+             <string>Both ends</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QCheckBox" name="m_InterpolateRoiBox">
+            <property name="text">
+             <string>Interpolate ROI </string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2">
+           <widget class="QSpinBox" name="m_MinExtractedFibersBox">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>999999999</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>Extract fibers:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QDoubleSpinBox" name="m_FiberExtractionFractionBox">
+            <property name="toolTip">
+             <string>Minimum overlap of streamlines and ROI in terms of streamline length. Zero means that one streamline point inside the ROI is enough to be considered as &quot;overlapping&quot;.</string>
+            </property>
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="maximum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="m_LabelsLabel">
+            <property name="text">
+             <string>Labels:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="2">
+           <widget class="QLineEdit" name="m_LabelsBox">
+            <property name="toolTip">
+             <string>Label values seperated by whitespace.</string>
+            </property>
+            <property name="text">
+             <string>ALL</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="6" column="0">
         <widget class="QCommandLinkButton" name="m_ExtractFibersButton">
          <property name="enabled">
           <bool>false</bool>
@@ -95,18 +277,25 @@ QGroupBox {
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <spacer name="verticalSpacer_5">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+       <item row="0" column="0">
+        <widget class="QComboBox" name="m_ExtractionMethodBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
+         <item>
+          <property name="text">
+           <string>Extract using planar figures</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Extract using ROI image</string>
+          </property>
+         </item>
+        </widget>
        </item>
        <item row="3" column="0">
         <widget class="QFrame" name="m_ExtactionFramePF">
@@ -403,35 +592,33 @@ QGroupBox {
          </layout>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QComboBox" name="m_ExtractionMethodBox">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <item>
-          <property name="text">
-           <string>Extract using planar figures</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Extract using ROI image</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QFrame" name="m_MaskExtractionFrame">
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_3">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>-34</y>
+        <width>353</width>
+        <height>456</height>
+       </rect>
+      </property>
+      <attribute name="label">
+       <string>Fiber Removal</string>
+      </attribute>
+      <attribute name="toolTip">
+       <string>Remove fibers that satisfy certain criteria from the selected bundle.</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="1" column="0">
+        <widget class="QFrame" name="m_RemoveDirectionFrame">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
-         <layout class="QGridLayout" name="gridLayout_19">
+         <layout class="QGridLayout" name="gridLayout_2">
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -444,133 +631,193 @@ QGroupBox {
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_17">
-            <property name="text">
-             <string>Min. overlap:</string>
-            </property>
-           </widget>
-          </item>
+          <property name="horizontalSpacing">
+           <number>0</number>
+          </property>
           <item row="0" column="0">
-           <widget class="QLabel" name="label_16">
+           <widget class="QLabel" name="label">
             <property name="text">
-             <string>Extract fibers:</string>
+             <string>X:</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QCheckBox" name="m_BothEnds">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_3">
             <property name="text">
-             <string>Both ends</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
+             <string>Y:</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="2">
-           <widget class="QDoubleSpinBox" name="m_FiberExtractionFractionBox">
-            <property name="toolTip">
-             <string>Minimum overlap of streamlines and ROI in terms of streamline length. Zero means that one streamline point inside the ROI is enough to be considered as &quot;overlapping&quot;.</string>
-            </property>
-            <property name="decimals">
-             <number>3</number>
-            </property>
-            <property name="maximum">
-             <double>1.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>0.100000000000000</double>
-            </property>
-           </widget>
+          <item row="0" column="1">
+           <widget class="QDoubleSpinBox" name="m_ExtractDirX"/>
           </item>
-          <item row="0" column="2">
-           <widget class="QComboBox" name="m_ExtractionBoxMask">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <item>
-             <property name="text">
-              <string>Ending in ROI</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Not ending in ROI</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Passing ROI</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Not passing ROI</string>
-             </property>
-            </item>
-           </widget>
+          <item row="1" column="1">
+           <widget class="QDoubleSpinBox" name="m_ExtractDirY"/>
           </item>
-          <item row="4" column="0">
-           <widget class="QCheckBox" name="m_InterpolateRoiBox">
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_4">
             <property name="text">
-             <string>Interpolate ROI</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
+             <string>Z:</string>
             </property>
            </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="m_ExtractDirZ"/>
           </item>
           <item row="3" column="0">
-           <widget class="QLabel" name="label_19">
+           <widget class="QLabel" name="label_5">
             <property name="text">
-             <string>Threshold:</string>
+             <string>Angle:</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="2">
-           <widget class="QDoubleSpinBox" name="m_FiberExtractionThresholdBox">
+          <item row="3" column="1">
+           <widget class="QDoubleSpinBox" name="m_ExtractAngle">
             <property name="toolTip">
-             <string>Threshold on ROI image for positions to be considered as positive.</string>
+             <string>Angular deviation threshold in degree</string>
             </property>
             <property name="decimals">
-             <number>3</number>
+             <number>1</number>
             </property>
             <property name="maximum">
-             <double>9999.000000000000000</double>
+             <double>90.000000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.100000000000000</double>
+             <double>1.000000000000000</double>
             </property>
             <property name="value">
-             <double>0.500000000000000</double>
+             <double>25.000000000000000</double>
             </property>
            </widget>
           </item>
          </layout>
         </widget>
        </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="page_3">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>367</width>
-        <height>408</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>Fiber Removal</string>
-      </attribute>
-      <attribute name="toolTip">
-       <string>Remove fibers that satisfy certain criteria from the selected bundle.</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="4" column="0">
+        <widget class="QFrame" name="m_RemoveByWeightFrame">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_20">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string>Weight threshold:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QDoubleSpinBox" name="m_WeightThresholdBox">
+            <property name="toolTip">
+             <string>Only fibers with weight larger than this threshold are kept.</string>
+            </property>
+            <property name="decimals">
+             <number>5</number>
+            </property>
+            <property name="maximum">
+             <double>99999.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QCommandLinkButton" name="m_RemoveButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="text">
+          <string>Remove</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QComboBox" name="m_RemovalMethodBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <item>
+          <property name="text">
+           <string>Remove fibers in direction</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Remove fibers by length</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Remove fibers by curvature</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Remove fiber parts outside mask</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Remove fiber parts inside mask</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Remove fibers by weight</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Remove fibers by tract density</string>
+          </property>
+         </item>
+        </widget>
+       </item>
        <item row="3" column="0">
         <widget class="QFrame" name="m_RemoveCurvatureFrame">
          <property name="frameShape">
@@ -697,88 +944,18 @@ QGroupBox {
          </layout>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QFrame" name="m_RemoveDirectionFrame">
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
+       <item row="7" column="0">
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
          </property>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <property name="horizontalSpacing">
-           <number>0</number>
-          </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>X:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Y:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="m_ExtractDirX"/>
-          </item>
-          <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="m_ExtractDirY"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Z:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="m_ExtractDirZ"/>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>Angle:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QDoubleSpinBox" name="m_ExtractAngle">
-            <property name="toolTip">
-             <string>Angular deviation threshold in degree</string>
-            </property>
-            <property name="decimals">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <double>90.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>1.000000000000000</double>
-            </property>
-            <property name="value">
-             <double>25.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
+        </spacer>
        </item>
        <item row="2" column="0">
         <widget class="QFrame" name="m_RemoveLengthFrame">
@@ -864,97 +1041,14 @@ QGroupBox {
         </widget>
        </item>
        <item row="5" column="0">
-        <widget class="QCommandLinkButton" name="m_RemoveButton">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>200</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>11</pointsize>
-          </font>
-         </property>
-         <property name="toolTip">
-          <string/>
-         </property>
-         <property name="text">
-          <string>Remove</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <spacer name="verticalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="0">
-        <widget class="QComboBox" name="m_RemovalMethodBox">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <item>
-          <property name="text">
-           <string>Remove fibers in direction</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Remove fibers by length</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Remove fibers by curvature</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Remove fiber parts outside mask</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Remove fiber parts inside mask</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Remove fibers by weight</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QFrame" name="m_RemoveByWeightFrame">
+        <widget class="QFrame" name="m_RemoveByDensityFrame">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
-         <layout class="QGridLayout" name="gridLayout_20">
+         <layout class="QGridLayout" name="gridLayout_21">
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -967,29 +1061,64 @@ QGroupBox {
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <property name="spacing">
+          <property name="horizontalSpacing">
            <number>0</number>
           </property>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_18">
-            <property name="text">
-             <string>Weight threshold:</string>
-            </property>
-           </widget>
-          </item>
+          <property name="verticalSpacing">
+           <number>6</number>
+          </property>
           <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="m_WeightThresholdBox">
+           <widget class="QDoubleSpinBox" name="m_DensityThresholdBox">
             <property name="toolTip">
-             <string>Only fibers with weight larger than this threshold are kept.</string>
+             <string/>
             </property>
             <property name="decimals">
              <number>5</number>
             </property>
+            <property name="minimum">
+             <double>0.000000000000000</double>
+            </property>
             <property name="maximum">
-             <double>99999.000000000000000</double>
+             <double>10.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.100000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.010000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_19">
+            <property name="text">
+             <string>Density threshold:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_21">
+            <property name="text">
+             <string>Min. overlap:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="m_DensityOverlapBox">
+            <property name="toolTip">
+             <string>Tracts have to spend at least this fraction of their length inside the specified density region.</string>
+            </property>
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="maximum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.500000000000000</double>
             </property>
            </widget>
           </item>
@@ -1395,7 +1524,7 @@ QGroupBox {
         <x>0</x>
         <y>0</y>
         <width>367</width>
-        <height>168</height>
+        <height>182</height>
        </rect>
       </property>
       <attribute name="label">

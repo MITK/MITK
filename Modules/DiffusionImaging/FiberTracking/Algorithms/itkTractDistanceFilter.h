@@ -60,9 +60,11 @@ public:
 
   void SetTracts2(const std::vector<FiberBundle::Pointer> &Tracts2);
 
-  std::vector<float> GetDistances() const;
+  vnl_vector<float> GetMinDistances() const;
 
-  std::vector<int> GetIndices() const;
+  vnl_vector<int> GetMinIndices() const;
+
+  vnl_matrix<float> GetAllDistances() const;
 
 protected:
 
@@ -73,13 +75,14 @@ protected:
   TractDistanceFilter();
   virtual ~TractDistanceFilter();
 
-  std::vector< FiberBundle::Pointer >         m_Tracts1;
-  std::vector< FiberBundle::Pointer >         m_Tracts2;
-  unsigned int                                m_NumPoints;
-  std::vector< mitk::ClusteringMetric* >      m_Metrics;
-  std::vector< float >                        m_Distances;
-  std::vector< int >                          m_Indices;
-  boost::progress_display                     disp;
+  std::vector<FiberBundle::Pointer>         m_Tracts1;
+  std::vector<FiberBundle::Pointer>         m_Tracts2;
+  unsigned int                              m_NumPoints;
+  std::vector<mitk::ClusteringMetric*>      m_Metrics;
+  vnl_vector<float>                         m_MinDistances;
+  vnl_vector<int>                           m_MinIndices;
+  vnl_matrix<float>                         m_AllDistances;
+  boost::progress_display                   disp;
 };
 }
 

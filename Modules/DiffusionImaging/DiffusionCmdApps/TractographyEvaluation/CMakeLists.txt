@@ -12,13 +12,16 @@ if(BUILD_DiffusionTractographyEvaluationCmdApps OR MITK_BUILD_ALL_APPS)
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
     set( diffusionTractographyEvaluationcmdapps
-    PeaksAngularError^^MitkFiberTracking
-    TractometerMetrics^^MitkFiberTracking
-    MergeOverlappingTracts^^MitkFiberTracking
-    ExtractSimilarTracts^^MitkFiberTracking
-    AnchorConstrainedPlausibility^^MitkFiberTracking
-    CalculateOverlap^^MitkFiberTracking
-    CheckEpsAndOverlap^^MitkFiberTracking
+    PeaksAngularError^^
+    TractometerMetrics^^
+    MergeOverlappingTracts^^
+    GetOverlappingTracts^^
+    ExtractSimilarTracts^^
+    AnchorConstrainedPlausibility^^
+    CalculateOverlap^^
+    CheckEpsAndOverlap^^
+    ReferenceSimilarity^^
+    TractDistance^^
     # LocalDirectionalFiberPlausibility^^MitkFiberTracking # HAS TO USE NEW PEAK IMAGE FORMAT
     )
 
@@ -33,8 +36,8 @@ if(BUILD_DiffusionTractographyEvaluationCmdApps OR MITK_BUILD_ALL_APPS)
 
       mitkFunctionCreateCommandLineApp(
         NAME ${appname}
-        DEPENDS MitkCore MitkDiffusionCore ${dependencies_list}
-        PACKAGE_DEPENDS ITK
+        DEPENDS MitkDiffusionCmdApps ${dependencies_list}
+        PACKAGE_DEPENDS
       )
     endforeach()
 

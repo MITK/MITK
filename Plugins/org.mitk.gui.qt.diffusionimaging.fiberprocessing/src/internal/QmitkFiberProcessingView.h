@@ -100,13 +100,14 @@ protected:
   void CompressSelectedBundles();   ///< remove points below certain error threshold
   void WeightFibers();
   void ApplyWeightThreshold();
+  void ApplyDensityThreshold();
 
   void RemoveWithMask(bool removeInside);
   void RemoveDir();
   void ApplyCurvatureThreshold();   ///< remove/split fibers with a too high curvature threshold
   void PruneBundle();               ///< remove too short/too long fibers
 
-  void ExtractWithMask(bool onlyEnds, bool invert);
+  void ExtractWithMask(bool onlyEnds, bool invert, bool labelmap);
   void ExtractWithPlanarFigure(bool interactive=false);
 
   void OnEndInteraction();

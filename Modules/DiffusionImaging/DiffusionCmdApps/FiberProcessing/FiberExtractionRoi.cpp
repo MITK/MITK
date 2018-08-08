@@ -64,9 +64,10 @@ int main(int argc, char* argv[])
   parser.endGroup();
 
   parser.beginGroup("2. Label based extraction:");
-  parser.addArgument("labels", "", mitkCommandLineParser::StringList, "Labels:", "positive means roi image value in labels vector", us::Any());
   parser.addArgument("split_labels", "", mitkCommandLineParser::Bool, "Split labels:", "output a separate tractogram for each label-->label tract", false);
   parser.addArgument("skip_self_connections", "", mitkCommandLineParser::Bool, "Skip self connections:", "ignore streamlines between two identical labels", false);
+  parser.addArgument("all_labels", "", mitkCommandLineParser::Bool, "All labels:", "use all labels (0 is excluded)", false);
+  parser.addArgument("labels", "", mitkCommandLineParser::StringList, "Labels:", "positive means roi image value in labels vector", us::Any());
   parser.addArgument("start_labels", "", mitkCommandLineParser::StringList, "Start Labels:", "use separate start and end labels instead of one mixed set", us::Any());
   parser.addArgument("end_labels", "", mitkCommandLineParser::StringList, "End Labels:", "use separate start and end labels instead of one mixed set", us::Any());
   parser.addArgument("paired", "", mitkCommandLineParser::Bool, "Paired:", "start and end label list are paired", false);
@@ -104,6 +105,10 @@ int main(int argc, char* argv[])
   unsigned int min_fibers = 0;
   if (parsedArgs.count("min_fibers"))
     min_fibers = us::any_cast<int>(parsedArgs["min_fibers"]);
+
+  bool all_labels = false;
+  if (parsedArgs.count("all_labels"))
+    all_labels = us::any_cast<bool>(parsedArgs["all_labels"]);
 
   bool split_labels = false;
   if (parsedArgs.count("split_labels"))
@@ -205,7 +210,7 @@ int main(int argc, char* argv[])
     extractor->SetPairedStartEndLabels(paired);
     if (!any_point)
       extractor->SetMode(itk::FiberExtractionFilter<float>::MODE::ENDPOINTS);
-    if (short_labels.size()>0 || short_start_labels.size()>0 || short_end_labels.size()>0)
+    if (all_labels || short_labels.size()>0 || short_start_labels.size()>0 || short_end_labels.size()>0)
       extractor->SetInputType(itk::FiberExtractionFilter<float>::INPUT::LABEL_MAP);
     extractor->Update();
 

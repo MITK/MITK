@@ -23,10 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qmitk
 #include "QmitkFiberProcessingView.h"
 
-// Qt
 #include <QMessageBox>
 
-// MITK
 #include <mitkNodePredicateProperty.h>
 #include <mitkImageCast.h>
 #include <mitkPointSet.h>
@@ -46,7 +44,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateOr.h>
 
-// ITK
 #include <itkResampleImageFilter.h>
 #include <itkGaussianInterpolateImageFunction.h>
 #include <itkImageRegionIteratorWithIndex.h>
@@ -55,6 +52,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegion.h>
 #include <itkTractsToRgbaImageFilter.h>
 #include <itkFiberExtractionFilter.h>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 const std::string QmitkFiberProcessingView::VIEW_ID = "org.mitk.views.fiberprocessing";
 const std::string id_DataManager = "org.mitk.views.datamanager";
@@ -115,28 +115,51 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
     mitk::NodePredicateNot::Pointer noDiffusionImage = mitk::NodePredicateNot::New(isDiffusionImage);
     mitk::NodePredicateAnd::Pointer finalPredicate = mitk::NodePredicateAnd::New(isMitkImage, noDiffusionImage);
     m_Controls->m_ColorMapBox->SetPredicate(finalPredicate);
-
-    m_Controls->label_17->setVisible(false);
-    m_Controls->m_FiberExtractionFractionBox->setVisible(false);
   }
 
   UpdateGui();
+  OnMaskExtractionChanged();
 }
 
 void QmitkFiberProcessingView::OnMaskExtractionChanged()
 {
+  m_Controls->m_FiberExtractionFractionLabel->setVisible(false);
+  m_Controls->m_FiberExtractionFractionBox->setVisible(false);
+
+  m_Controls->m_FiberExtractionThresholdLabel->setVisible(false);
+  m_Controls->m_FiberExtractionThresholdBox->setVisible(false);
+
+  m_Controls->m_InterpolateRoiBox->setVisible(false);
+  m_Controls->m_BothEnds->setVisible(false);
+
+  m_Controls->m_LabelsBox->setVisible(false);
+  m_Controls->m_LabelsLabel->setVisible(false);
+
   if (m_Controls->m_ExtractionBoxMask->currentIndex() == 2 || m_Controls->m_ExtractionBoxMask->currentIndex() == 3)
   {
-    m_Controls->label_17->setVisible(true);
+    m_Controls->m_FiberExtractionFractionLabel->setVisible(true);
     m_Controls->m_FiberExtractionFractionBox->setVisible(true);
-    m_Controls->m_BothEnds->setVisible(false);
+
+    m_Controls->m_FiberExtractionThresholdLabel->setVisible(true);
+    m_Controls->m_FiberExtractionThresholdBox->setVisible(true);
+
+    m_Controls->m_InterpolateRoiBox->setVisible(true);
   }
-  else
+  else if (m_Controls->m_ExtractionBoxMask->currentIndex() == 0 || m_Controls->m_ExtractionBoxMask->currentIndex() == 1)
   {
-    m_Controls->label_17->setVisible(false);
-    m_Controls->m_FiberExtractionFractionBox->setVisible(false);
     if (m_Controls->m_ExtractionBoxMask->currentIndex() != 3)
       m_Controls->m_BothEnds->setVisible(true);
+    m_Controls->m_InterpolateRoiBox->setVisible(true);
+
+    m_Controls->m_FiberExtractionThresholdLabel->setVisible(true);
+    m_Controls->m_FiberExtractionThresholdBox->setVisible(true);
+  }
+  else if (m_Controls->m_ExtractionBoxMask->currentIndex() == 4)
+  {
+    m_Controls->m_BothEnds->setVisible(true);
+
+    m_Controls->m_LabelsBox->setVisible(true);
+    m_Controls->m_LabelsLabel->setVisible(true);
   }
 }
 
@@ -242,6 +265,11 @@ void QmitkFiberProcessingView::Remove()
     ApplyWeightThreshold();
     break;
   }
+  case 6:
+  {
+    ApplyDensityThreshold();
+    break;
+  }
   }
 }
 
@@ -260,22 +288,27 @@ void QmitkFiberProcessingView::Extract()
     {
     {
     case 0:
-        ExtractWithMask(true, false);
+        ExtractWithMask(true, false, false);
         break;
     }
     {
     case 1:
-        ExtractWithMask(true, true);
+        ExtractWithMask(true, true, false);
         break;
     }
     {
     case 2:
-        ExtractWithMask(false, false);
+        ExtractWithMask(false, false, false);
         break;
     }
     {
     case 3:
-        ExtractWithMask(false, true);
+        ExtractWithMask(false, true, false);
+        break;
+    }
+    {
+    case 4:
+        ExtractWithMask(true, false, true);
         break;
     }
     }
@@ -313,6 +346,45 @@ void QmitkFiberProcessingView::ApplyWeightThreshold()
       newFib->ColorFibersByFiberWeights(false, true);
       node->SetData(newFib);
     }
+    else
+      QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers.");
+  }
+  RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkFiberProcessingView::ApplyDensityThreshold()
+{
+  float thr = this->m_Controls->m_DensityThresholdBox->value();
+  float ol = this->m_Controls->m_DensityOverlapBox->value();
+  std::vector< DataNode::Pointer > nodes = m_SelectedFB;
+  for (auto node : nodes)
+  {
+    mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+
+    itk::TractDensityImageFilter< ItkFloatImageType >::Pointer generator = itk::TractDensityImageFilter< ItkFloatImageType >::New();
+    generator->SetFiberBundle(fib);
+    generator->SetBinaryOutput(false);
+    generator->SetOutputAbsoluteValues(false);
+    generator->Update();
+
+    itk::FiberExtractionFilter<float>::Pointer extractor = itk::FiberExtractionFilter<float>::New();
+    extractor->SetRoiImages({generator->GetOutput()});
+    extractor->SetInputFiberBundle(fib);
+    extractor->SetOverlapFraction(ol);
+    extractor->SetInterpolate(true);
+    extractor->SetThreshold(thr);
+    extractor->SetNoNegatives(true);
+    extractor->Update();
+
+    if (extractor->GetPositives().empty())
+    {
+      QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers.");
+      continue;
+    }
+
+    mitk::FiberBundle::Pointer newFib = extractor->GetPositives().at(0);
+    if (newFib->GetNumFibers()>0)
+      node->SetData(newFib);
     else
       QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers.");
   }
@@ -383,7 +455,7 @@ void QmitkFiberProcessingView::RemoveWithMask(bool removeInside)
   RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkFiberProcessingView::ExtractWithMask(bool onlyEnds, bool invert)
+void QmitkFiberProcessingView::ExtractWithMask(bool onlyEnds, bool invert, bool labelmap)
 {
   if (m_RoiImageNode.IsNull())
     return;
@@ -391,61 +463,102 @@ void QmitkFiberProcessingView::ExtractWithMask(bool onlyEnds, bool invert)
   mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_RoiImageNode->GetData());
   for (auto node : m_SelectedFB)
   {
+    std::string roi_name = m_RoiImageNode->GetName();
     mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
-    QString name(node->GetName().c_str());
-
     ItkFloatImageType::Pointer mask = ItkFloatImageType::New();
     mitk::CastToItkImage(mitkMask, mask);
 
     itk::FiberExtractionFilter<float>::Pointer extractor = itk::FiberExtractionFilter<float>::New();
     extractor->SetInputFiberBundle(fib);
     extractor->SetRoiImages({mask});
+    extractor->SetRoiImageNames({roi_name});
     extractor->SetThreshold(m_Controls->m_FiberExtractionThresholdBox->value());
     extractor->SetOverlapFraction(m_Controls->m_FiberExtractionFractionBox->value());
     extractor->SetBothEnds(m_Controls->m_BothEnds->isChecked());
     extractor->SetInterpolate(m_Controls->m_InterpolateRoiBox->isChecked());
+    extractor->SetMinFibersPerTract(m_Controls->m_MinExtractedFibersBox->value());
+    extractor->SetSplitByRoi(true);
     if (invert)
       extractor->SetNoPositives(true);
     else
       extractor->SetNoNegatives(true);
+
+    if (labelmap)
+    {
+      std::string labels_string = m_Controls->m_LabelsBox->text().toStdString();
+      if (labels_string!="ALL")
+      {
+        std::vector<std::string> strs;
+        boost::split(strs,labels_string,boost::is_any_of(" ,;\t"));
+
+        std::vector< unsigned short > labels_vector;
+        for (auto v : strs)
+        {
+          try{
+            unsigned short l = boost::lexical_cast<unsigned short>(v);
+            labels_vector.push_back(l);
+          }
+          catch(...)
+          {
+
+          }
+        }
+        extractor->SetLabels(labels_vector);
+      }
+
+      extractor->SetInterpolate(false);
+      extractor->SetInputType(itk::FiberExtractionFilter<float>::INPUT::LABEL_MAP);
+      extractor->SetSplitLabels(true);
+      onlyEnds = true;
+    }
+
     if (onlyEnds)
       extractor->SetMode(itk::FiberExtractionFilter<float>::MODE::ENDPOINTS);
     extractor->Update();
 
-    mitk::FiberBundle::Pointer newFib;
+    std::vector< mitk::FiberBundle::Pointer > newFibs;
     if (invert)
-      newFib = extractor->GetNegatives().at(0);
+      newFibs = extractor->GetNegatives();
     else
-      newFib = extractor->GetPositives().at(0);
+      newFibs = extractor->GetPositives();
 
-    if (newFib.IsNull() || newFib->GetNumFibers()<=0)
+    if (newFibs.empty())
     {
-      QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers.");
+      QMessageBox::information(nullptr, "No output generated:", "No fibers could be extracted.");
       continue;
     }
 
-    DataNode::Pointer newNode = DataNode::New();
-    newNode->SetData(newFib);
+    auto labels = extractor->GetPositiveLabels();
+    MITK_INFO << labels.size();
 
-    if (invert)
+    for (unsigned int i=0; i<newFibs.size(); ++i)
     {
-      name += "_not";
+      DataNode::Pointer newNode = DataNode::New();
+      auto fib = newFibs.at(i);
 
-      if (onlyEnds)
-        name += "-ending-in-mask";
-      else
-        name += "-passing-mask";
-    }
-    else
-    {
-      if (onlyEnds)
-        name += "_ending-in-mask";
-      else
-        name += "_passing-mask";
-    }
+      newNode->SetData(fib);
+      std::string name = roi_name;
+      if (i<labels.size())
+        name = labels.at(i);
 
-    newNode->SetName(name.toStdString());
-    GetDataStorage()->Add(newNode);
+      if (invert)
+      {
+        if (onlyEnds)
+          name = "not-ending-in-" + name;
+        else
+          name = "not-passing-" + name;
+      }
+      else if (!labelmap)
+      {
+        if (onlyEnds)
+          name = "ending-in-" + name;
+        else
+          name = "passing-" + name;
+      }
+
+      newNode->SetName(name);
+      GetDataStorage()->Add(newNode, node);
+    }
     node->SetVisibility(false);
   }
 }
@@ -901,6 +1014,7 @@ void QmitkFiberProcessingView::UpdateGui()
   m_Controls->m_RemoveLengthFrame->setVisible(false);
   m_Controls->m_RemoveCurvatureFrame->setVisible(false);
   m_Controls->m_RemoveByWeightFrame->setVisible(false);
+  m_Controls->m_RemoveByDensityFrame->setVisible(false);
   m_Controls->m_SmoothFibersFrame->setVisible(false);
   m_Controls->m_CompressFibersFrame->setVisible(false);
   m_Controls->m_ColorFibersFrame->setVisible(false);
@@ -948,6 +1062,11 @@ void QmitkFiberProcessingView::UpdateGui()
     break;
   case 5:
     m_Controls->m_RemoveByWeightFrame->setVisible(true);
+    if ( fibSelected )
+      m_Controls->m_RemoveButton->setEnabled(true);
+    break;
+  case 6:
+    m_Controls->m_RemoveByDensityFrame->setVisible(true);
     if ( fibSelected )
       m_Controls->m_RemoveButton->setEnabled(true);
     break;

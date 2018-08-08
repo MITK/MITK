@@ -12,18 +12,16 @@ if(BUILD_DiffusionFiberProcessingCmdApps OR MITK_BUILD_ALL_APPS)
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
     set( diffusionFiberProcessingcmdapps
-    TractDensity^^MitkFiberTracking
-    Sift2WeightCopy^^MitkFiberTracking
-    FiberExtraction^^MitkFiberTracking
-    FiberExtractionRoi^^MitkFiberTracking
-    FiberProcessing^^MitkFiberTracking
-    FitFibersToImage^^MitkFiberTracking
-    FiberDirectionExtraction^^MitkFiberTracking
-    FiberJoin^^MitkFiberTracking
-    FiberClustering^^MitkFiberTracking
-    GetOverlappingTracts^^MitkFiberTracking
-    TractDensityFilter^^MitkFiberTracking
-    TractDistance^^MitkFiberTracking
+    TractDensity^^
+    Sift2WeightCopy^^
+    FiberExtraction^^
+    FiberExtractionRoi^^
+    FiberProcessing^^
+    FitFibersToImage^^
+    FiberDirectionExtraction^^
+    FiberJoin^^
+    FiberClustering^^
+    TractDensityFilter^^
     )
 
     foreach(diffusionFiberProcessingcmdapp ${diffusionFiberProcessingcmdapps})
@@ -37,8 +35,8 @@ if(BUILD_DiffusionFiberProcessingCmdApps OR MITK_BUILD_ALL_APPS)
 
       mitkFunctionCreateCommandLineApp(
         NAME ${appname}
-        DEPENDS MitkCore MitkDiffusionCore ${dependencies_list}
-        PACKAGE_DEPENDS ITK
+        DEPENDS MitkDiffusionCmdApps ${dependencies_list}
+        PACKAGE_DEPENDS
       )
     endforeach()
 

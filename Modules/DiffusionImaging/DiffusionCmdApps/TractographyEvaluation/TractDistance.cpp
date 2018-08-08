@@ -22,36 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkClusteringMetricEuclideanMean.h>
 #include <mitkClusteringMetricEuclideanMax.h>
 #include <mitkClusteringMetricEuclideanStd.h>
-#include <itksys/SystemTools.hxx>
-#include <itkDirectory.h>
+#include <mitkDiffusionDataIOHelper.h>
 
-typedef itksys::SystemTools ist;
-
-std::vector< std::string > get_file_list(const std::string& path, std::vector< std::string > extensions={".fib", ".trk"})
-{
-  std::vector< std::string > file_list;
-  itk::Directory::Pointer dir = itk::Directory::New();
-
-  if (dir->Load(path.c_str()))
-  {
-    int n = dir->GetNumberOfFiles();
-    for (int r = 0; r < n; r++)
-    {
-      const char *filename = dir->GetFile(r);
-      std::string ext = ist::GetFilenameExtension(filename);
-      for (auto e : extensions)
-      {
-        if (ext==e)
-        {
-          file_list.push_back(path + '/' + filename);
-          break;
-        }
-      }
-    }
-  }
-  std::sort(file_list.begin(), file_list.end());
-  return file_list;
-}
 
 int main(int argc, char* argv[])
 {
@@ -98,26 +70,11 @@ int main(int argc, char* argv[])
 
   try
   {
-    std::streambuf *old = cout.rdbuf(); // <-- save
-    std::stringstream ss;
-    std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-    std::vector< mitk::FiberBundle::Pointer > tractograms1;
-    std::vector< mitk::FiberBundle::Pointer > tractograms2;
+    std::vector<std::string> t1_files;
+    std::vector< mitk::FiberBundle::Pointer > tractograms1 = mitk::DiffusionDataIOHelper::load_fibs({t1_folder}, &t1_files);
+    std::vector<std::string> t2_files;
+    std::vector< mitk::FiberBundle::Pointer > tractograms2 = mitk::DiffusionDataIOHelper::load_fibs({t2_folder}, &t2_files);
 
-    auto t1_files = get_file_list(t1_folder, {".fib",".trk",".tck"});
-    for (auto f : t1_files)
-    {
-      mitk::FiberBundle::Pointer fib = mitk::IOUtil::Load<mitk::FiberBundle>(f);
-      tractograms1.push_back(fib);
-    }
-    auto t2_files = get_file_list(t2_folder, {".fib",".trk",".tck"});
-    for (auto f : t2_files)
-    {
-      mitk::FiberBundle::Pointer fib = mitk::IOUtil::Load<mitk::FiberBundle>(f);
-      tractograms2.push_back(fib);
-    }
-
-    std::cout.rdbuf (old);              // <-- restore
     MITK_INFO << "Loaded " << tractograms1.size() << " source tractograms.";
     MITK_INFO << "Loaded " << tractograms2.size() << " target tractograms.";
 
@@ -151,15 +108,15 @@ int main(int argc, char* argv[])
     distance_calculator->SetMetrics(metrics);
     distance_calculator->Update();
     MITK_INFO << "Distances:";
-    auto distances = distance_calculator->GetDistances();
-    auto indices = distance_calculator->GetIndices();
+    auto distances = distance_calculator->GetMinDistances();
+    auto indices = distance_calculator->GetMinIndices();
 
     ofstream logfile;
     logfile.open (out_file);
     for (unsigned int i=0; i<distances.size(); ++i)
     {
-      std::cout << ist::GetFilenameWithoutExtension(t1_files.at(i)) << " << " << ist::GetFilenameWithoutExtension(t2_files.at(indices.at(i))) << ": " << distances.at(i) << std::endl;
-      logfile << ist::GetFilenameWithoutExtension(t1_files.at(i)) << " " << ist::GetFilenameWithoutExtension(t2_files.at(indices.at(i))) << " " << distances.at(i) << std::endl;
+      std::cout << ist::GetFilenameWithoutExtension(t1_files.at(i)) << " << " << ist::GetFilenameWithoutExtension(t2_files.at(indices[i])) << ": " << distances[i] << std::endl;
+      logfile << ist::GetFilenameWithoutExtension(t1_files.at(i)) << " " << ist::GetFilenameWithoutExtension(t2_files.at(indices[i])) << " " << distances[i] << std::endl;
     }
     logfile.close();
   }

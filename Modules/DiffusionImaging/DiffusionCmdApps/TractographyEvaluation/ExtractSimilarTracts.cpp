@@ -24,27 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkClusteringMetricEuclideanStd.h>
 #include <mitkClusteringMetricAnatomic.h>
 #include <mitkClusteringMetricScalarMap.h>
-#include <itksys/SystemTools.hxx>
+#include <mitkDiffusionDataIOHelper.h>
 
-typedef itksys::SystemTools ist;
 typedef itk::Image<unsigned char, 3>    ItkFloatImgType;
-
-mitk::FiberBundle::Pointer LoadFib(std::string filename)
-{
-  std::vector<mitk::BaseData::Pointer> fibInfile = mitk::IOUtil::Load(filename);
-  if( fibInfile.empty() )
-    std::cout << "File " << filename << " could not be read!";
-  mitk::BaseData::Pointer baseData = fibInfile.at(0);
-  return dynamic_cast<mitk::FiberBundle*>(baseData.GetPointer());
-}
-
-ItkFloatImgType::Pointer LoadItkImage(const std::string& filename)
-{
-  mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(filename);
-  ItkFloatImgType::Pointer itkMask = ItkFloatImgType::New();
-  mitk::CastToItkImage(img, itkMask);
-  return itkMask;
-}
 
 /*!
 \brief Spatially cluster fibers
@@ -61,6 +43,7 @@ int main(int argc, char* argv[])
   parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "input fiber bundle (.fib, .trk, .tck)", us::Any(), false);
   parser.addArgument("ref_tracts", "", mitkCommandLineParser::StringList, "Ref. Tracts:", "reference tracts (.fib, .trk, .tck)", us::Any(), false);
   parser.addArgument("ref_masks", "", mitkCommandLineParser::StringList, "Ref. Masks:", "reference bundle masks", us::Any());
+
   parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
   parser.addArgument("distance", "", mitkCommandLineParser::Int, "Distance:", "", 10);
   parser.addArgument("metric", "", mitkCommandLineParser::String, "Metric:", "EU_MEAN (default), EU_STD, EU_MAX");
@@ -97,7 +80,7 @@ int main(int argc, char* argv[])
 
   try
   {
-    mitk::FiberBundle::Pointer fib = LoadFib(in_fib);
+    mitk::FiberBundle::Pointer fib = mitk::IOUtil::Load<mitk::FiberBundle>(in_fib);
 
     std::srand(0);
     if (subsample<1.0)
@@ -106,32 +89,8 @@ int main(int argc, char* argv[])
     mitk::FiberBundle::Pointer resampled_fib = fib->GetDeepCopy();
     resampled_fib->ResampleToNumPoints(12);
 
-    std::vector< mitk::FiberBundle::Pointer > ref_fibs;
-    std::vector< ItkFloatImgType::Pointer > ref_masks;
-    for (std::size_t i=0; i<ref_bundle_files.size(); ++i)
-    {
-      MITK_INFO << "Loading " << ist::GetFilenameName(ref_bundle_files.at(i));
-      if (i<ref_mask_files.size())
-        MITK_INFO << "Loading " << ist::GetFilenameName(ref_mask_files.at(i));
-
-      std::streambuf *old = cout.rdbuf(); // <-- save
-      std::stringstream ss;
-      std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-      try
-      {
-        ref_fibs.push_back(LoadFib(ref_bundle_files.at(i)));
-        if (i<ref_mask_files.size())
-          ref_masks.push_back(LoadItkImage(ref_mask_files.at(i)));
-        else
-          ref_masks.push_back(nullptr);
-        std::cout.rdbuf (old);              // <-- restore
-      }
-      catch(...){
-        std::cout.rdbuf (old);              // <-- restore
-        std::cout << "could not load: " << ref_bundle_files.at(i);
-        return EXIT_FAILURE;
-      }
-    }
+    auto ref_fibs = mitk::DiffusionDataIOHelper::load_fibs(ref_bundle_files);
+    auto ref_masks = mitk::DiffusionDataIOHelper::load_itk_images<ItkFloatImgType>(ref_mask_files);
 
     std::vector< float > distances;
     distances.push_back(distance);

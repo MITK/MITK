@@ -12,8 +12,8 @@ if(BUILD_DiffusionConnectomicsCmdApps OR MITK_BUILD_ALL_APPS)
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
     set( DiffusionConnectomicscmdapps
-    NetworkCreation^^MitkFiberTracking_MitkConnectomics
-    NetworkStatistics^^MitkConnectomics
+    NetworkCreation^^
+    NetworkStatistics^^
     )
 
     foreach(DiffusionConnectomicscmdapp ${DiffusionConnectomicscmdapps})
@@ -27,8 +27,8 @@ if(BUILD_DiffusionConnectomicsCmdApps OR MITK_BUILD_ALL_APPS)
 
       mitkFunctionCreateCommandLineApp(
         NAME ${appname}
-        DEPENDS MitkCore MitkDiffusionCore ${dependencies_list}
-        PACKAGE_DEPENDS ITK
+        DEPENDS MitkDiffusionCmdApps ${dependencies_list}
+        PACKAGE_DEPENDS
       )
     endforeach()
 

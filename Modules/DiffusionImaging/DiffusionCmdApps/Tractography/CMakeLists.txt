@@ -1,6 +1,6 @@
-option(BUILD_DiffusionFiberfoxCmdApps "Build commandline tools for diffusion data simulation (Fiberfox)" OFF)
+option(BUILD_DiffusionTractographyCmdApps "Build commandline tools for diffusion fiber tractography" OFF)
 
-if(BUILD_DiffusionFiberfoxCmdApps OR MITK_BUILD_ALL_APPS)
+if(BUILD_DiffusionTractographyCmdApps OR MITK_BUILD_ALL_APPS)
 
   # needed include directories
   include_directories(
@@ -11,14 +11,15 @@ if(BUILD_DiffusionFiberfoxCmdApps OR MITK_BUILD_ALL_APPS)
     # list of diffusion cmdapps
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
-    set( diffusionFiberfoxcmdapps
-    Fiberfox^^MitkFiberTracking
-    FiberfoxOptimization^^MitkFiberTracking
+    set( diffusiontractographycmdapps
+    StreamlineTractography^^
+    GlobalTractography^^
+    RfTraining^^
     )
 
-    foreach(diffusionFiberfoxcmdapp ${diffusionFiberfoxcmdapps})
+    foreach(diffusiontractographycmdapp ${diffusiontractographycmdapps})
       # extract cmd app name and dependencies
-      string(REPLACE "^^" "\\;" cmdapp_info ${diffusionFiberfoxcmdapp})
+      string(REPLACE "^^" "\\;" cmdapp_info ${diffusiontractographycmdapp})
       set(cmdapp_info_list ${cmdapp_info})
       list(GET cmdapp_info_list 0 appname)
       list(GET cmdapp_info_list 1 raw_dependencies)
@@ -27,8 +28,8 @@ if(BUILD_DiffusionFiberfoxCmdApps OR MITK_BUILD_ALL_APPS)
 
       mitkFunctionCreateCommandLineApp(
         NAME ${appname}
-        DEPENDS MitkCore MitkDiffusionCore ${dependencies_list}
-        PACKAGE_DEPENDS ITK
+        DEPENDS MitkDiffusionCmdApps ${dependencies_list}
+        PACKAGE_DEPENDS
       )
     endforeach()
 

@@ -39,7 +39,7 @@ FiberExtractionFilter< PixelType >::FiberExtractionFilter()
   , m_NoPositives(false)
   , m_Interpolate(false)
   , m_Threshold(0.5)
-  , m_Labels({1})
+  , m_Labels()
   , m_SkipSelfConnections(false)
   , m_OnlySelfConnections(false)
   , m_SplitByRoi(false)
@@ -342,9 +342,10 @@ void FiberExtractionFilter< PixelType >::ExtractLabels(mitk::FiberBundle::Pointe
               break;
           }
         }
-        else  // extract fibers between start and end labels
+        else if (!m_StartLabels.empty() || !m_EndLabels.empty()) // extract fibers between start and end labels
         {
-          m_BothEnds = true;  // if we have start and end labels it does not make sense to not use both endpoints
+          if (!m_StartLabels.empty() && !m_EndLabels.empty())
+            m_BothEnds = true;  // if we have start and end labels it does not make sense to not use both endpoints
           if (m_PairedStartEndLabels)
           {
             if (m_StartLabels.size()!=m_EndLabels.size())
@@ -360,18 +361,28 @@ void FiberExtractionFilter< PixelType >::ExtractLabels(mitk::FiberBundle::Pointe
           {
             for (unsigned int ii=0; ii<m_StartLabels.size(); ++ii)
             {
-              for (unsigned int jj=0; jj<m_EndLabels.size(); ++jj)
+              if ( m_StartLabels.at(ii)==label1 || m_StartLabels.at(ii)==label2 )
               {
-                if ( (m_StartLabels.at(ii)==label1 && m_EndLabels.at(ii)==label2) || (m_StartLabels.at(ii)==label2 && m_EndLabels.at(ii)==label1) )
-                {
-                  inside = 2;
-                  break;
-                }
-              }
-              if (inside==2)
+                ++inside;
                 break;
+              }
+            }
+            for (unsigned int jj=0; jj<m_EndLabels.size(); ++jj)
+            {
+              if ( m_EndLabels.at(jj)==label1 || m_EndLabels.at(jj)==label2 )
+              {
+                ++inside;
+                break;
+              }
             }
           }
+        }
+        else  // use all labels
+        {
+          if (label1!=0)
+            ++inside;
+          if (label2!=0)
+            ++inside;
         }
 
         std::string key = "";
@@ -431,15 +442,6 @@ void FiberExtractionFilter< PixelType >::ExtractLabels(mitk::FiberBundle::Pointe
         m_PositiveLabels.push_back(label.first);
       }
     }
-
-//    if (!m_SplitLabels)
-//    {
-//      mitk::FiberBundle::Pointer output = mitk::FiberBundle::New(nullptr);
-//      output = output->AddBundles(m_Positives);
-//      m_Positives.clear();
-//      m_Positives.push_back(output);
-//      m_PositiveLabels.clear();
-//    }
   }
 }
 

@@ -12,4 +12,3 @@ MITK_CREATE_MODULE(
 )
 
 add_subdirectory(Testing)
-add_subdirectory(cmdapps)

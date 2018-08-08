@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarFigure.h>
 #include <mitkPixelTypeTraits.h>
 #include <mitkPlanarFigureComposite.h>
-
+#include <mitkPeakImage.h>
 
 //includes storing fiberdata
 #include <vtkSmartPointer.h>
@@ -108,6 +108,8 @@ public:
     std::vector<long>              ExtractFiberIdSubset(DataNode* roi, DataStorage* storage);
     FiberBundle::Pointer           RemoveFibersOutside(ItkUcharImgType* mask, bool invert=false);
     float                          GetOverlap(ItkUcharImgType* mask);
+    std::tuple<float, float>       GetDirectionalOverlap(ItkUcharImgType* mask, mitk::PeakImage::ItkPeakImageType* peak_image);
+    float                          GetNumEpFractionInMask(ItkUcharImgType* mask, bool different_label);
     mitk::FiberBundle::Pointer     SubsampleFibers(float factor);
 
     // get/set data

@@ -152,6 +152,8 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
       std::vector< std::pair< itk::Index<3>, double > > segments = mitk::imv::IntersectImage(newSpacing, startIndex, endIndex, startIndexCont, endIndexCont);
       for (std::pair< itk::Index<3>, double > segment : segments)
       {
+        if (!outImage->GetLargestPossibleRegion().IsInside(segment.first))
+          continue;
         if (outImage->GetPixel(segment.first)==0)
           m_NumCoveredVoxels++;
 

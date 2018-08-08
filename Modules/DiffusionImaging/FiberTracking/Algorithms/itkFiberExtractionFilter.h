@@ -66,11 +66,12 @@ public:
   itkSetMacro( DontResampleFibers, bool )   ///< Don't resample input fibers to ensure coverage
   itkSetMacro( NoNegatives, bool )          ///< Don't create output tractograms from negative streamlines (save the computation)
   itkSetMacro( NoPositives, bool )          ///< Don't create output tractograms from positive streamlines (save the computation)
-  itkSetMacro( Interpolate, bool )          ///< Interpolate input ROI image
+  itkSetMacro( Interpolate, bool )          ///< Interpolate input ROI image (only relevant for ENDPOINTS mode
   itkSetMacro( Threshold, float )           ///< Threshold on input ROI image value to determine positives/negatives
   itkSetMacro( SkipSelfConnections, bool )  ///< Ignore streamlines between two identical labels
   itkSetMacro( OnlySelfConnections, bool )  ///< Only keep streamlines between two identical labels
   itkSetMacro( SplitLabels, bool )          ///< Output a separate tractogram for each label-->label tract
+  itkSetMacro( SplitByRoi, bool )           ///< Output a separate tractogram for each ROI image
   itkSetMacro( MinFibersPerTract, unsigned int )  ///< Discard positives with less fibers
   itkSetMacro( PairedStartEndLabels, bool )
 
@@ -114,6 +115,7 @@ protected:
   std::vector< unsigned short >               m_Labels;
   bool                                        m_SkipSelfConnections;
   bool                                        m_OnlySelfConnections;
+  bool                                        m_SplitByRoi;
   bool                                        m_SplitLabels;
   unsigned int                                m_MinFibersPerTract;
   std::vector< unsigned short >               m_StartLabels;

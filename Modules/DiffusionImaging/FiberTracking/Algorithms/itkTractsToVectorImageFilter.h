@@ -61,6 +61,7 @@ public:
   itkGetMacro( MaxNumDirections, unsigned long)                       ///< If more directions are extracted, only the largest are kept.
   itkSetMacro( MaskImage, ItkUcharImgType::Pointer)                   ///< only process voxels inside mask
   itkSetMacro( FiberBundle, mitk::FiberBundle::Pointer)               ///< input fiber bundle
+  itkSetMacro( OnlyUseMaskGeometry, bool)                             ///< don't use content of mask image, only use it's geometry
   itkGetMacro( ClusteredDirectionsContainer, ContainerType::Pointer)  ///< output directions
   itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)          ///< number of directions per voxel
   itkGetMacro( DirectionImage, typename ItkDirectionImageType::Pointer)        ///< output directions
@@ -87,6 +88,7 @@ protected:
   ContainerType::Pointer              m_DirectionsContainer;              ///< container for fiber directions
   unsigned long                       m_MaxNumDirections;                 ///< if more directions per voxel are extracted, only the largest are kept
   float                               m_SizeThreshold;
+  bool                                m_OnlyUseMaskGeometry;
 
   // output datastructures
   typename ItkDirectionImageType::Pointer m_DirectionImage;

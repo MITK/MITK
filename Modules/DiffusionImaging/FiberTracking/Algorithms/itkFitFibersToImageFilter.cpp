@@ -616,8 +616,6 @@ void FitFibersToImageFilter::GenerateData()
       }
       double d_rms = cost.S->get_rms_error(temp_weights) - m_RMSE;
       m_RmsDiffPerBundle[bundle] = d_rms;
-      m_Tractograms.at(bundle)->Compress(0.1);
-      m_Tractograms.at(bundle)->ColorFibersByFiberWeights(false, true);
     }
   }
   else
@@ -632,8 +630,6 @@ void FitFibersToImageFilter::GenerateData()
       m_RmsDiffPerBundle[i] = d_rms;
 
       m_Tractograms.at(i)->SetFiberWeights(m_Weights[i]);
-      m_Tractograms.at(i)->Compress(0.1);
-      m_Tractograms.at(i)->ColorFibersByFiberWeights(false, true);
     }
   }
   std::cout.rdbuf (old);

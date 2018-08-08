@@ -154,6 +154,7 @@ void QmitkFiberFitView::StartFit()
   fitter->Update();
 
   mitk::FiberBundle::Pointer output_tracts = fitter->GetTractograms().at(0);
+  output_tracts->ColorFibersByFiberWeights(false, true);
   mitk::DataNode::Pointer new_node = mitk::DataNode::New();
   new_node->SetData(output_tracts);
   new_node->SetName("Fitted");

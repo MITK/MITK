@@ -43,6 +43,7 @@ set(H_FILES
   Algorithms/itkFiberCurvatureFilter.h
   Algorithms/itkFitFibersToImageFilter.h
   Algorithms/itkTractClusteringFilter.h
+  Algorithms/itkTractDistanceFilter.h
   Algorithms/itkFiberExtractionFilter.h
   Algorithms/itkTdiToVolumeFractionFilter.h
 

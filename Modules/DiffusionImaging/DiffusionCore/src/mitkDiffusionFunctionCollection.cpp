@@ -153,6 +153,15 @@ void mitk::sh::Cart2Sph(double x, double y, double z, double *spherical)
   spherical[2] = rad;
 }
 
+vnl_vector_fixed<double, 3> mitk::sh::Sph2Cart(const double& theta, const double& phi, const double& rad)
+{
+  vnl_vector_fixed<double, 3> dir;
+  dir[0] = rad * sin(theta) * cos(phi);
+  dir[1] = rad * sin(theta) * sin(phi);
+  dir[2] = rad * cos(theta);
+  return dir;
+}
+
 double mitk::sh::legendre0(int l)
 {
   if( l%2 != 0 )
@@ -225,6 +234,39 @@ vnl_matrix<float> mitk::sh::CalcShBasisForDirections(int sh_order, vnl_matrix<do
   }
 
   return sh_basis;
+}
+
+float mitk::sh::GetValue(const vnl_vector<float> &coefficients, const int &sh_order, const double theta, const double phi, const bool mrtrix)
+{
+  float val = 0;
+  for(int k=0; k<=sh_order; k+=2)
+  {
+    for(int m=-k; m<=k; m++)
+    {
+      int j = (k*k + k + 2)/2 + m - 1;
+      val += coefficients[j] * mitk::sh::Yj(m, k, theta, phi, mrtrix);
+    }
+  }
+
+  return val;
+}
+
+float mitk::sh::GetValue(const vnl_vector<float> &coefficients, const int &sh_order, const vnl_vector_fixed<double, 3> &dir, const bool mrtrix)
+{
+  double spherical[3];
+  mitk::sh::Cart2Sph(dir[0], dir[1], dir[2], spherical);
+
+  float val = 0;
+  for(int k=0; k<=sh_order; k+=2)
+  {
+    for(int m=-k; m<=k; m++)
+    {
+      int j = (k*k + k + 2)/2 + m - 1;
+      val += coefficients[j] * mitk::sh::Yj(m, k, spherical[1], spherical[0], mrtrix);
+    }
+  }
+
+  return val;
 }
 
 //------------------------- gradients-function ------------------------------------

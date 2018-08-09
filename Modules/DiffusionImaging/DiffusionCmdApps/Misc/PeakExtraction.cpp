@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImageFileWriter.h>
 #include <itkResampleImageFilter.h>
-#include <itkFiniteDiffOdfMaximaExtractionFilter.h>
+#include <itkOdfMaximaExtractionFilter.h>
 
 #include <mitkImage.h>
 #include <mitkOdfImage.h>
@@ -40,17 +40,22 @@ int StartPeakExtraction(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("image", "i", mitkCommandLineParser::InputFile, "Input image", "sh coefficient image", us::Any(), false);
   parser.addArgument("outroot", "o", mitkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
-  parser.addArgument("mask", "m", mitkCommandLineParser::InputFile, "Mask", "mask image");
-  parser.addArgument("normalization", "n", mitkCommandLineParser::Int, "Normalization", "0=no norm, 1=max norm, 2=single vec norm", 1, true);
-  parser.addArgument("numpeaks", "p", mitkCommandLineParser::Int, "Max. number of peaks", "maximum number of extracted peaks", 2, true);
-  parser.addArgument("peakthres", "r", mitkCommandLineParser::Float, "Peak threshold", "peak threshold relative to largest peak", 0.4, true);
-  parser.addArgument("abspeakthres", "a", mitkCommandLineParser::Float, "Absolute peak threshold", "absolute peak threshold weighted with local GFA value", 0.06, true);
-  parser.addArgument("shConvention", "s", mitkCommandLineParser::String, "Use specified SH-basis", "use specified SH-basis (MITK, FSL, MRtrix)", std::string("MITK"), true);
-  parser.addArgument("noFlip", "f", mitkCommandLineParser::Bool, "No flip", "do not flip input image to match MITK coordinate convention");
-  parser.addArgument("clusterThres", "c", mitkCommandLineParser::Float, "Clustering threshold", "directions closer together than the specified angular threshold will be clustered (in rad)", 0.9);
-  parser.addArgument("flipX", "fx", mitkCommandLineParser::Bool, "Flip X", "Flip peaks in x direction");
-  parser.addArgument("flipY", "fy", mitkCommandLineParser::Bool, "Flip Y", "Flip peaks in y direction");
-  parser.addArgument("flipZ", "fz", mitkCommandLineParser::Bool, "Flip Z", "Flip peaks in z direction");
+  parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask", "mask image");
+  parser.addArgument("normalization", "", mitkCommandLineParser::Int, "Normalization", "0=no norm, 1=max norm, 2=single vec norm", 1, true);
+  parser.addArgument("numpeaks", "", mitkCommandLineParser::Int, "Max. number of peaks", "maximum number of extracted peaks", 2, true);
+
+  parser.addArgument("rel_peakthr", "", mitkCommandLineParser::Float, "Relative peak threshold", "peak threshold relative to largest peak", 0.4, true);
+  parser.addArgument("abs_peakthr", "", mitkCommandLineParser::Float, "Absolute peak threshold", "absolute peak magnitude threshold", 0.03, true);
+  parser.addArgument("angular_thr", "", mitkCommandLineParser::Float, "Angular threshold", "in degree", 15);
+
+  parser.addArgument("shConvention", "", mitkCommandLineParser::String, "Use specified SH-basis", "use specified SH-basis (MRtrix, FSL)", std::string("MRtrix"), true);
+
+
+  parser.addArgument("flipX", "", mitkCommandLineParser::Bool, "Flip X", "Flip peaks in x direction");
+  parser.addArgument("flipY", "", mitkCommandLineParser::Bool, "Flip Y", "Flip peaks in y direction");
+  parser.addArgument("flipZ", "", mitkCommandLineParser::Bool, "Flip Z", "Flip peaks in z direction");
+  parser.addArgument("scale_by_gfa", "", mitkCommandLineParser::Bool, "Scale by GFA", "Scale ODF values and peaks by GFA");
+
 
 
   parser.setCategory("Preprocessing Tools");
@@ -79,21 +84,22 @@ int StartPeakExtraction(int argc, char* argv[])
   if (parsedArgs.count("numpeaks"))
     numPeaks = us::any_cast<int>(parsedArgs["numpeaks"]);
 
-  float peakThres = 0.4;
-  if (parsedArgs.count("peakthres"))
-    peakThres = us::any_cast<float>(parsedArgs["peakthres"]);
+  float rel_peakthr = 0.4;
+  if (parsedArgs.count("rel_peakthr"))
+    rel_peakthr = us::any_cast<float>(parsedArgs["rel_peakthr"]);
 
-  float absPeakThres = 0.06;
-  if (parsedArgs.count("abspeakthres"))
-    absPeakThres = us::any_cast<float>(parsedArgs["abspeakthres"]);
+  float abs_peakthr = 0.03;
+  if (parsedArgs.count("abs_peakthr"))
+    abs_peakthr = us::any_cast<float>(parsedArgs["abs_peakthr"]);
 
-  float clusterThres = 0.9;
-  if (parsedArgs.count("clusterThres"))
-    clusterThres = us::any_cast<float>(parsedArgs["clusterThres"]);
+  float angular_thr = 15;
+  if (parsedArgs.count("angular_thr"))
+    angular_thr = us::any_cast<float>(parsedArgs["angular_thr"]);
+  angular_thr = cos((float)angular_thr*itk::Math::pi / 180);
 
-  bool noFlip = false;
-  if (parsedArgs.count("noFlip"))
-    noFlip = us::any_cast<bool>(parsedArgs["noFlip"]);
+  bool scale_by_gfa = false;
+  if (parsedArgs.count("scale_by_gfa"))
+    scale_by_gfa = us::any_cast<bool>(parsedArgs["scale_by_gfa"]);
 
   bool flipX = false;
   if (parsedArgs.count("flipX"))
@@ -114,8 +120,8 @@ int StartPeakExtraction(int argc, char* argv[])
   else
     std::cout << "no mask image selected";
   std::cout << "numpeaks: " << numPeaks;
-  std::cout << "peakthres: " << peakThres;
-  std::cout << "abspeakthres: " << absPeakThres;
+  std::cout << "peakthres: " << rel_peakthr;
+  std::cout << "abspeakthres: " << abs_peakthr;
   std::cout << "shOrder: " << shOrder;
 
   try
@@ -124,29 +130,9 @@ int StartPeakExtraction(int argc, char* argv[])
     mitk::Image::Pointer mask = mitk::IOUtil::Load<mitk::Image>(maskImageName);
 
     typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
-    typedef itk::FiniteDiffOdfMaximaExtractionFilter< float, shOrder, 20242 > MaximaExtractionFilterType;
+    typedef itk::OdfMaximaExtractionFilter< float, shOrder, 20242 > MaximaExtractionFilterType;
     typename MaximaExtractionFilterType::Pointer peak_extraction_filter = MaximaExtractionFilterType::New();
 
-    int toolkitConvention = 0;
-
-    if (parsedArgs.count("shConvention"))
-    {
-      std::string convention = us::any_cast<std::string>(parsedArgs["shConvention"]).c_str();
-      if ( boost::algorithm::equals(convention, "FSL") )
-      {
-        toolkitConvention = 1;
-        std::cout << "Using FSL SH-basis";
-      }
-      else if ( boost::algorithm::equals(convention, "MRtrix") )
-      {
-        toolkitConvention = 2;
-        std::cout << "Using MRtrix SH-basis";
-      }
-      else
-        std::cout << "Using MITK SH-basis";
-    }
-    else
-      std::cout << "Using MITK SH-basis";
 
     ItkUcharImgType::Pointer itkMaskImage = nullptr;
     if (mask.IsNotNull())
@@ -162,85 +148,38 @@ int StartPeakExtraction(int argc, char* argv[])
       }
     }
 
-    if (toolkitConvention>0)
+    if (parsedArgs.count("shConvention"))
     {
-      std::cout << "Converting coefficient image to MITK format";
-      typedef itk::ShCoefficientImageImporter< float, shOrder > ConverterType;
-      typedef mitk::ImageToItk< itk::Image< float, 4 > > CasterType;
-      CasterType::Pointer caster = CasterType::New();
-      caster->SetInput(image);
-      caster->Update();
-      itk::Image< float, 4 >::Pointer itkImage = caster->GetOutput();
-
-      typename ConverterType::Pointer converter = ConverterType::New();
-
-      if (noFlip)
-      {
-        converter->SetInputImage(itkImage);
-      }
+      std::string convention = us::any_cast<std::string>(parsedArgs["shConvention"]).c_str();
+      if ( convention=="FSL" )
+        peak_extraction_filter->SetToolkit(MaximaExtractionFilterType::FSL);
       else
-      {
-        std::cout << "Flipping image";
-        itk::FixedArray<bool, 4> flipAxes;
-        flipAxes[0] = true;
-        flipAxes[1] = true;
-        flipAxes[2] = false;
-        flipAxes[3] = false;
-        itk::FlipImageFilter< itk::Image< float, 4 > >::Pointer flipper = itk::FlipImageFilter< itk::Image< float, 4 > >::New();
-        flipper->SetInput(itkImage);
-        flipper->SetFlipAxes(flipAxes);
-        flipper->Update();
-        itk::Image< float, 4 >::Pointer flipped = flipper->GetOutput();
-        itk::Matrix< double,4,4 > m = itkImage->GetDirection(); m[0][0] *= -1; m[1][1] *= -1;
-        flipped->SetDirection(m);
-
-        itk::Point< float, 4 > o = itkImage->GetOrigin();
-        o[0] -= (flipped->GetLargestPossibleRegion().GetSize(0)-1);
-        o[1] -= (flipped->GetLargestPossibleRegion().GetSize(1)-1);
-        flipped->SetOrigin(o);
-        converter->SetInputImage(flipped);
-      }
-
-      std::cout << "Starting conversion";
-      switch (toolkitConvention)
-      {
-      case 1:
-        peak_extraction_filter->SetToolkit(MaximaExtractionFilterType::FSL);
-        break;
-      case 2:
         peak_extraction_filter->SetToolkit(MaximaExtractionFilterType::MRTRIX);
-        break;
-      default:
-        peak_extraction_filter->SetToolkit(MaximaExtractionFilterType::FSL);
-        break;
-      }
-      converter->GenerateData();
-      peak_extraction_filter->SetInput(converter->GetCoefficientImage());
     }
     else
+      peak_extraction_filter->SetToolkit(MaximaExtractionFilterType::MRTRIX);
+
+    try{
+      typedef mitk::ImageToItk< typename MaximaExtractionFilterType::CoefficientImageType > CasterType;
+      typename CasterType::Pointer caster = CasterType::New();
+      caster->SetInput(image);
+      caster->Update();
+      peak_extraction_filter->SetInput(caster->GetOutput());
+    }
+    catch(...)
     {
-      try{
-        typedef mitk::ImageToItk< typename MaximaExtractionFilterType::CoefficientImageType > CasterType;
-        typename CasterType::Pointer caster = CasterType::New();
-        caster->SetInput(image);
-        caster->Update();
-        peak_extraction_filter->SetInput(caster->GetOutput());
-      }
-      catch(...)
-      {
-        std::cout << "wrong image type";
-        return EXIT_FAILURE;
-      }
+      std::cout << "wrong image type";
+      return EXIT_FAILURE;
     }
 
     peak_extraction_filter->SetMaxNumPeaks(numPeaks);
-    peak_extraction_filter->SetPeakThreshold(peakThres);
-    peak_extraction_filter->SetAbsolutePeakThreshold(absPeakThres);
-    peak_extraction_filter->SetAngularThreshold(1);
-    peak_extraction_filter->SetClusteringThreshold(clusterThres);
+    peak_extraction_filter->SetPeakThreshold(rel_peakthr);
+    peak_extraction_filter->SetAbsolutePeakThreshold(abs_peakthr);
+    peak_extraction_filter->SetAngularThreshold(angular_thr);
     peak_extraction_filter->SetFlipX(flipX);
     peak_extraction_filter->SetFlipY(flipY);
     peak_extraction_filter->SetFlipZ(flipZ);
+    peak_extraction_filter->SetScaleByGfa(scale_by_gfa);
 
     switch (normalization)
     {

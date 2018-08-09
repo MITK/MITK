@@ -137,7 +137,6 @@ set(H_FILES
   include/Algorithms/itkExtractChannelFromRgbaImageFilter.h
   include/Algorithms/itkTensorReconstructionWithEigenvalueCorrectionFilter.h
   include/Algorithms/itkMergeDiffusionImagesFilter.h
-  include/Algorithms/itkFiniteDiffOdfMaximaExtractionFilter.h
   include/Algorithms/itkShCoefficientImageImporter.h
   include/Algorithms/itkShCoefficientImageExporter.h
   include/Algorithms/itkOdfMaximaExtractionFilter.h

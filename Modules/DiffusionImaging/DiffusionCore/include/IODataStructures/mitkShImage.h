@@ -35,7 +35,7 @@ namespace mitk
 
   public:
 
-    typedef itk::Image<float,4 >  ShOnDiskType; // we store the sh images in MRtrix 4D float format and convert the on load to 3D multi-component images
+    typedef itk::Image<float,4 >  ShOnDiskType; // we store the sh images in MRtrix 4D float format and convert on load to 3D multi-component images
 
     mitkClassMacro( ShImage, Image )
     itkFactorylessNewMacro(Self)

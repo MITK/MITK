@@ -723,8 +723,7 @@ void QmitkUltrasoundCalibration::OnCalibration()
   this->GetDataStorage()->Add(CalibPointsImageTransformed);
 
   // Set output variable
-
-  mitk::AffineTransform3D::Pointer oldUSImageTransform = m_Image->GetGeometry()->GetIndexToWorldTransform(); //including spacing!
+  mitk::AffineTransform3D::Pointer oldUSImageTransform = m_CombinedModality->GetUltrasoundDevice()->GetOutput()->GetGeometry()->GetIndexToWorldTransform(); //including spacing!
 
   MITK_INFO << "Old US Image transform: " << oldUSImageTransform;
 

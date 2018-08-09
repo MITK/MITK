@@ -48,9 +48,9 @@ OdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
 ::OdfMaximaExtractionFilter()
   : m_NormalizationMethod(MAX_VEC_NORM)
   , m_MaxNumPeaks(2)
-  , m_PeakThreshold(0.4)
+  , m_RelativePeakThreshold(0.4)
   , m_AbsolutePeakThreshold(0)
-  , m_AngularThreshold(0.866025)
+  , m_AngularThreshold(0.9)
   , m_NumCoeffs((ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder)
   , m_Toolkit(MRTRIX)
   , m_FlipX(false)
@@ -58,6 +58,7 @@ OdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
   , m_FlipZ(false)
   , m_ApplyDirectionMatrix(false)
   , m_ScaleByGfa(false)
+  , m_Iterations(10)
 {
   this->SetNumberOfRequiredInputs(1);
 }
@@ -85,7 +86,7 @@ double OdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
       flag = true;
       std::vector< int > neighbours = odf.GetNeighbors(i);
       for (unsigned int j=0; j<neighbours.size(); j++)
-        if (val<=odf.GetElement(neighbours.at(j)))
+        if (val<odf.GetElement(neighbours.at(j)))
         {
           flag = false;
           break;
@@ -194,7 +195,7 @@ void OdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
   MITK_INFO << "Starting peak extraction";
   MITK_INFO << "SH order: " << ShOrder;
   MITK_INFO << "Maximum peaks: " << m_MaxNumPeaks;
-  MITK_INFO << "Relative threshold: " << m_PeakThreshold;
+  MITK_INFO << "Relative threshold: " << m_RelativePeakThreshold;
   MITK_INFO << "Absolute threshold: " << m_AbsolutePeakThreshold;
   MITK_INFO << "Angular threshold: " << m_AngularThreshold;
   this->SetNumberOfThreads(1);
@@ -246,7 +247,7 @@ void OdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
     }
 
     std::vector< DirectionType > candidates, final_peaks;
-    double scale = FindCandidatePeaks(odf, max*m_PeakThreshold*0.9, candidates);       // find all local maxima
+    double scale = FindCandidatePeaks(odf, max*m_RelativePeakThreshold*0.9, candidates);       // find all local maxima
 
     max = 0;
     for (unsigned int i=0; i<candidates.size(); ++i)
@@ -260,31 +261,26 @@ void OdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
 
       VnlCostFunction cost;
       if (m_Toolkit==Toolkit::MRTRIX)
-        cost.SetProblem(coeffs, ShOrder, true);
+        cost.SetProblem(coeffs, ShOrder, true, max);
       else
-        cost.SetProblem(coeffs, ShOrder, false);
+        cost.SetProblem(coeffs, ShOrder, false, max);
 
       vnl_lbfgsb minimizer(cost);
       minimizer.set_f_tolerance(1e-6);
-      minimizer.set_projected_gradient_tolerance(1e-6);
-      minimizer.set_trace(false);
+//      minimizer.set_trace(true);
 
-      vnl_vector<double> l; l.set_size(2); l.fill(0);
-      vnl_vector<double> u; u.set_size(2); u.fill(itk::Math::pi);
+      vnl_vector<double> l; l.set_size(2); l[0] = 0; l[1] = -itk::Math::pi;
+      vnl_vector<double> u; u.set_size(2); u[0] = itk::Math::pi; u[1] = itk::Math::pi;
       vnl_vector<long> bound_selection; bound_selection.set_size(2); bound_selection.fill(2);
       minimizer.set_bound_selection(bound_selection);
       minimizer.set_lower_bound(l);
       minimizer.set_upper_bound(u);
-      minimizer.set_max_function_evals(5);
+      if (m_Iterations>0)
+        minimizer.set_max_function_evals(m_Iterations);
       minimizer.minimize(x);
 
-      float v = 0;
-      if (m_Toolkit==Toolkit::MRTRIX)
-        v = mitk::sh::GetValue(coeffs, ShOrder, x[0], x[1], true)*scale;
-      else
-        v = mitk::sh::GetValue(coeffs, ShOrder, x[0], x[1], false)*scale;
+      float v = -minimizer.get_end_error()*scale;
       candidates[i] = mitk::sh::Sph2Cart(x[0], x[1], v);
-
       if (v>max)
         max = v;
     }
@@ -296,7 +292,7 @@ void OdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
     {
       DirectionType v1 = candidates.at(i);
       double val = v1.magnitude();
-      if (val<max*m_PeakThreshold || val<m_AbsolutePeakThreshold)
+      if (val<max*m_RelativePeakThreshold || val<m_AbsolutePeakThreshold)
         break;
 
       bool flag = true;

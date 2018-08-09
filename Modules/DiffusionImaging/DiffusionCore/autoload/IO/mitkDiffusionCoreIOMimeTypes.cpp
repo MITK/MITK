@@ -431,6 +431,10 @@ DiffusionCoreIOMimeTypes::SHImageMimeType::SHImageMimeType() : CustomMimeType(SH
 
 bool DiffusionCoreIOMimeTypes::SHImageMimeType::AppliesTo(const std::string &path) const
 {
+  std::string ext = itksys::SystemTools::GetFilenameExtension(path);
+  if (ext==".shi")
+    return true;
+
   {
     try
     {

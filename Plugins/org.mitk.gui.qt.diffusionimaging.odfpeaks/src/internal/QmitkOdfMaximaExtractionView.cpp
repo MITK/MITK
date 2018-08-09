@@ -275,9 +275,8 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction(Image *image)
 
   filter->SetAngularThreshold(cos((float)m_Controls->m_AngularThreshold->value()*itk::Math::pi / 180));
   filter->SetMaxNumPeaks(m_Controls->m_MaxNumPeaksBox->value());
-  filter->SetPeakThreshold(m_Controls->m_PeakThresholdBox->value());
+  filter->SetRelativePeakThreshold(m_Controls->m_PeakThresholdBox->value());
   filter->SetAbsolutePeakThreshold(m_Controls->m_AbsoluteThresholdBox->value());
-//  filter->SetNumberOfThreads(1);
   filter->SetScaleByGfa(m_Controls->m_ScaleByGfaBox->isChecked());
 
   if (m_Controls->m_MaskBox->GetSelectedNode().IsNotNull())

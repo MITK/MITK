@@ -173,7 +173,7 @@ int StartPeakExtraction(int argc, char* argv[])
     }
 
     peak_extraction_filter->SetMaxNumPeaks(numPeaks);
-    peak_extraction_filter->SetPeakThreshold(rel_peakthr);
+    peak_extraction_filter->SetRelativePeakThreshold(rel_peakthr);
     peak_extraction_filter->SetAbsolutePeakThreshold(abs_peakthr);
     peak_extraction_filter->SetAngularThreshold(angular_thr);
     peak_extraction_filter->SetFlipX(flipX);

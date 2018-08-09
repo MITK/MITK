@@ -37,11 +37,13 @@ public:
   bool mrtrix;
   int ShOrder;
   vnl_vector<float> coeffs;
-  void SetProblem(vnl_vector<float>& coeffs, int ShOrder, bool mrtrix)
+  double max;
+  void SetProblem(vnl_vector<float>& coeffs, int ShOrder, bool mrtrix, double max)
   {
     this->coeffs = coeffs;
     this->ShOrder = ShOrder;
     this->mrtrix = mrtrix;
+    this->max = max;
   }
 
   VnlCostFunction(const int NumVars=2) : vnl_cost_function(NumVars)
@@ -51,12 +53,7 @@ public:
   // cost function
   double f(vnl_vector<double> const &x)
   {
-    float v = mitk::sh::GetValue(coeffs, ShOrder, x[0], x[1], mrtrix);
-    if (v<=0)
-      v = 0.0000001;
-
-    double cost = 1.0/v;
-    return cost;
+    return -mitk::sh::GetValue(coeffs, ShOrder, x[0], x[1], mrtrix);
   }
 
   // gradient of cost function
@@ -119,7 +116,7 @@ Image< unsigned char, 3 > >
 
     // input
     itkSetMacro( MaxNumPeaks, unsigned int)                 ///< maximum number of peaks per voxel. if more peaks are detected, only the largest are kept.
-    itkSetMacro( PeakThreshold, double)                     ///< threshold on the peak length relative to the largest peak inside the current voxel
+    itkSetMacro( RelativePeakThreshold, double)             ///< threshold on the peak length relative to the largest peak inside the current voxel
     itkSetMacro( AbsolutePeakThreshold, double)             ///< hard threshold on the peak length of all local maxima
     itkSetMacro( AngularThreshold, double)                  ///< directions closer together than the specified threshold are discarded
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)       ///< only voxels inside the binary mask are processed
@@ -129,6 +126,7 @@ Image< unsigned char, 3 > >
     itkSetMacro( FlipZ, bool)                               ///< flip peaks in z direction
     itkSetMacro( ApplyDirectionMatrix, bool)
     itkSetMacro( ScaleByGfa, bool)
+    itkSetMacro( Iterations, int)
 
     // output
     itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer )
@@ -155,7 +153,7 @@ Image< unsigned char, 3 > >
 
     NormalizationMethods                        m_NormalizationMethod;  ///< normalization method of ODF peaks
     unsigned int                                m_MaxNumPeaks;          ///< maximum number of peaks per voxel. if more peaks are detected, only the largest are kept.
-    double                                      m_PeakThreshold;        ///< threshold on the peak length relative to the largest peak inside the current voxel
+    double                                      m_RelativePeakThreshold;        ///< threshold on the peak length relative to the largest peak inside the current voxel
     double                                      m_AbsolutePeakThreshold;///< hard threshold on the peak length of all local maxima
     vnl_matrix< float >                         m_ShBasis;              ///< container for evaluated SH base functions
     double                                      m_AngularThreshold;
@@ -171,6 +169,7 @@ Image< unsigned char, 3 > >
     bool                                        m_FlipZ;
     bool                                        m_ApplyDirectionMatrix;
     bool                                        m_ScaleByGfa;
+    int                                         m_Iterations;
 
     Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen;
 };

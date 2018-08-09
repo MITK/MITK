@@ -63,7 +63,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
         /// !!!ATTENTION!!! Do not forget to release this image again with cvReleaseImage().
         /// \return the produced OpenCVImage or 0 if an error occured!
         ///
-        IplImage* GetOpenCVImage();
+        cv::Mat GetOpenCVImage();
 
         ///
         /// RUNS the conversion and returns the produced image as cv::Mat.
@@ -95,7 +95,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
         /// Saves if the filter should copy the data or just reference it
         ///
         mitk::WeakPointer<mitk::Image> m_Image;
-        IplImage* m_OpenCVImage;
+        cv::Mat m_OpenCVImage;
 
   private:
     ImageSliceSelector::Pointer m_sliceSelector;

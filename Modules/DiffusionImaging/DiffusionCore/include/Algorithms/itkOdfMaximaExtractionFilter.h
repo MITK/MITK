@@ -17,122 +17,159 @@
 #ifndef __itkOdfMaximaExtractionFilter_h_
 #define __itkOdfMaximaExtractionFilter_h_
 
+#include "itkImageToImageFilter.h"
+#include "vnl/vnl_vector_fixed.h"
+#include "vnl/vnl_matrix.h"
+#include "vnl/algo/vnl_svd.h"
+#include "itkVectorContainer.h"
+#include "itkVectorImage.h"
 #include <mitkFiberBundle.h>
-
-#include <itkImageToImageFilter.h>
-#include <itkVectorContainer.h>
+#include <mitkPeakImage.h>
+#include <mitkShImage.h>
 #include <itkOrientationDistributionFunction.h>
-#include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
+#include <vnl/algo/vnl_lbfgsb.h>
+#include <mitkDiffusionFunctionCollection.h>
 
-namespace itk{
-/** \class OdfMaximaExtractionFilter
-Class that estimates the maxima of the 4th order SH representation of an ODF using analytic calculations (according to Aganj et al, MICCAI, 2010)
- */
-
-template< class TOdfPixelType >
-class OdfMaximaExtractionFilter : public ProcessObject
+class VnlCostFunction : public vnl_cost_function
 {
-
 public:
 
-  enum NormalizationMethods {
-    NO_NORM,            ///< don't normalize peaks
-    SINGLE_VEC_NORM,    ///< normalize peaks to length 1
-    MAX_VEC_NORM        ///< largest peak is normalized to length 1, other peaks relative to it
-  };
+  bool mrtrix;
+  int ShOrder;
+  vnl_vector<float> coeffs;
+  double max;
+  void SetProblem(vnl_vector<float>& coeffs, int ShOrder, bool mrtrix, double max)
+  {
+    this->coeffs = coeffs;
+    this->ShOrder = ShOrder;
+    this->mrtrix = mrtrix;
+    this->max = max;
+  }
 
-  typedef OdfMaximaExtractionFilter Self;
-  typedef SmartPointer<Self>                      Pointer;
-  typedef SmartPointer<const Self>                ConstPointer;
-  typedef ProcessObject Superclass;
+  VnlCostFunction(const int NumVars=2) : vnl_cost_function(NumVars)
+  {
+  }
 
-   /** Method for creation through the object factory. */
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  // cost function
+  double f(vnl_vector<double> const &x)
+  {
+    return -mitk::sh::GetValue(coeffs, ShOrder, x[0], x[1], mrtrix);
+  }
 
-  /** Runtime information support. */
-  itkTypeMacro(OdfMaximaExtractionFilter, ImageToImageFilter)
+  // gradient of cost function
+  void gradf(vnl_vector<double> const &x, vnl_vector<double> &dx)
+  {
+    fdgradf(x, dx);
+  }
+};
 
-  typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,ODF_SAMPLING_SIZE> QballReconstructionFilterType;
-  typedef QballReconstructionFilterType::CoefficientImageType                                       CoefficientImageType;
-  typedef CoefficientImageType::PixelType                                                           CoefficientPixelType;
-  typedef itk::VectorImage< short, 3 >                                                              DiffusionImageType;
-  typedef vnl_vector_fixed< double, 3 >                                                             Vector3D;
-  typedef VectorContainer< unsigned int, Vector3D >                                                 DirectionContainerType;
-  typedef VectorContainer< unsigned int, DirectionContainerType::Pointer >                          ContainerType;
-  typedef itk::Image<unsigned char, 3>                                                              ItkUcharImgType;
-  typedef itk::Image< itk::Vector< float, 3 >, 3>                                                   ItkDirectionImage;
-  typedef itk::VectorContainer< unsigned int, ItkDirectionImage::Pointer >                          ItkDirectionImageContainer;
 
-  // output
-  itkGetMacro( OutputFiberBundle, mitk::FiberBundle::Pointer)                  ///< vector field (peak sizes rescaled for visualization purposes)
-  itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)                    ///< number of peaks per voxel
-  itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)    ///< container for output peaks
+namespace itk{
 
-  // input
-  itkSetMacro( MaskImage, ItkUcharImgType::Pointer)                 ///< only voxels inside the binary mask are processed
-  itkSetMacro( NormalizationMethod, NormalizationMethods)           ///< normalization method of ODF peaks
-  itkSetMacro( DiffusionGradients, DirectionContainerType::Pointer) ///< input for qball reconstruction
-  itkSetMacro( DiffusionImage, DiffusionImageType::Pointer)         ///< input for qball reconstruction
-  itkSetMacro( Bvalue, float)                                       ///< input for qball reconstruction
-  itkSetMacro( ShCoeffImage, CoefficientImageType::Pointer)         ///< conatins spherical harmonic coefficients
-  itkSetMacro( MaxNumPeaks, unsigned int)                           ///< if more peaks are found, only the largest are kept
-  itkSetMacro( PeakThreshold, double)                               ///< threshold on peak length relative to the largest peak in the current voxel
+/**
+* \brief Extract ODF peaks by searching all local maxima on a roughly sampled sphere and a successive gradient descent optimization
+*/
 
-  void GenerateData() override;
+template< class PixelType, int ShOrder, int NrOdfDirections >
+class OdfMaximaExtractionFilter : public ImageToImageFilter< Image< Vector< PixelType, (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder >, 3 >,
+Image< unsigned char, 3 > >
+{
 
-protected:
-  OdfMaximaExtractionFilter();
-  ~OdfMaximaExtractionFilter(){}
+    public:
 
-  /** CSA Qball reconstruction (SH order 4) **/
-  bool ReconstructQballImage();
+    enum Toolkit {  ///< SH coefficient convention (depends on toolkit)
+        FSL,
+        MRTRIX
+    };
 
-  /** calculate roots of cubic equation ax³ + bx² + cx + d = 0 using cardanos method **/
-  std::vector<double> SolveCubic(const double& a, const double& b, const double& c, const double& d);
+    enum NormalizationMethods {
+        NO_NORM,            ///< no length normalization of the output peaks
+        SINGLE_VEC_NORM,    ///< normalize the single peaks to length 1
+        MAX_VEC_NORM        ///< normalize all peaks according to their length in comparison to the largest peak in the respective voxel (0-1)
+    };
 
-  /** derivatives of SH representation of the ODF **/
-  double ODF_dtheta2(const double& sn, const double& cs, const double& A, const double& B, const double& C, const double& D, const double& E, const double& F, const double& G, const double& H);
+    typedef OdfMaximaExtractionFilter Self;
+    typedef SmartPointer<Self>                      Pointer;
+    typedef SmartPointer<const Self>                ConstPointer;
+    typedef ImageToImageFilter< Image< Vector< PixelType, (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder >, 3 >,
+            Image< unsigned char, 3 > > Superclass;
 
-  /** derivatives of SH representation of the ODF **/
-  double ODF_dphi2(const double& sn, const double& cs, const double& A, const double& B, const double& C, const double& D, const double& E, const double& F, const double& G, const double& H);
+    /** Method for creation through the object factory. */
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-  /** derivatives of SH representation of the ODF **/
-  double ODF_dtheta(const double& sn, const double& cs, const double& A, const double& B, const double& C, const double& D, const double& E, const double& F, const double& G, const double& H);
+    /** Runtime information support. */
+    itkTypeMacro(OdfMaximaExtractionFilter, ImageToImageFilter)
 
-  /** calculate all directions fullfilling the maximum consitions **/
-  void FindCandidatePeaks(const CoefficientPixelType& SHcoeff);
+    typedef typename Superclass::InputImageType           CoefficientImageType;
+    typedef typename CoefficientImageType::RegionType     CoefficientImageRegionType;
+    typedef typename CoefficientImageType::PixelType      CoefficientPixelType;
+    typedef typename Superclass::OutputImageType          OutputImageType;
+    typedef typename Superclass::OutputImageRegionType    OutputImageRegionType;
+    typedef typename Superclass::InputImageRegionType     InputImageRegionType;
+    typedef mitk::PeakImage::ItkPeakImageType             PeakImageType;
 
-  /** cluster the peaks detected by FindCandidatePeaks and retain maximum m_MaxNumPeaks **/
-  std::vector< Vector3D > ClusterPeaks(const CoefficientPixelType& shCoeff);
+    typedef OrientationDistributionFunction<PixelType, NrOdfDirections>   OdfType;
+    typedef itk::Image<unsigned char, 3>                                  ItkUcharImgType;
 
-  void Cart2Sph(const std::vector< Vector3D >& dir,  vnl_matrix<double>& sphCoords);
-  vnl_matrix<double> CalcShBasis(vnl_matrix<double>& sphCoords, const int& shOrder);
+    typedef vnl_vector_fixed< double, 3 >                                  DirectionType;
 
-  // diffusion weighted image (mandatory input)
-  DirectionContainerType::Pointer           m_DiffusionGradients;   ///< input for qball reconstruction
-  DiffusionImageType::Pointer               m_DiffusionImage;       ///< input for qball reconstruction
-  float                                     m_Bvalue;               ///< input for qball reconstruction
+    // input
+    itkSetMacro( MaxNumPeaks, unsigned int)                 ///< maximum number of peaks per voxel. if more peaks are detected, only the largest are kept.
+    itkSetMacro( RelativePeakThreshold, double)             ///< threshold on the peak length relative to the largest peak inside the current voxel
+    itkSetMacro( AbsolutePeakThreshold, double)             ///< hard threshold on the peak length of all local maxima
+    itkSetMacro( AngularThreshold, double)                  ///< directions closer together than the specified threshold are discarded
+    itkSetMacro( MaskImage, ItkUcharImgType::Pointer)       ///< only voxels inside the binary mask are processed
+    itkSetMacro( NormalizationMethod, NormalizationMethods) ///< normalization method of ODF peaks
+    itkSetMacro( FlipX, bool)                               ///< flip peaks in x direction
+    itkSetMacro( FlipY, bool)                               ///< flip peaks in y direction
+    itkSetMacro( FlipZ, bool)                               ///< flip peaks in z direction
+    itkSetMacro( ApplyDirectionMatrix, bool)
+    itkSetMacro( ScaleByGfa, bool)
+    itkSetMacro( Iterations, int)
 
-  // binary mask image (optional input)
-  ItkUcharImgType::Pointer                  m_MaskImage;            ///< only voxels inside the binary mask are processed
+    // output
+    itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer )
+    itkGetMacro( PeakImage, PeakImageType::Pointer )
 
-  // input parameters
-  NormalizationMethods                      m_NormalizationMethod;  ///< normalization for peaks
-  double                                    m_PeakThreshold;        ///< threshold on peak length relative to the largest peak in the current voxel
-  unsigned int                              m_MaxNumPeaks;          ///< if more peaks are found, only the largest are kept
+    itkSetMacro( Toolkit, Toolkit)  ///< define SH coefficient convention (depends on toolkit)
+    itkGetMacro( Toolkit, Toolkit)  ///< SH coefficient convention (depends on toolkit)
 
-  // intermediate results
-  CoefficientImageType::Pointer                 m_ShCoeffImage;     ///< conatins spherical harmonic coefficients
-  std::vector< vnl_vector_fixed< double, 2 > >  m_CandidatePeaks;   ///< container for candidate peaks (all extrema, also minima)
+    protected:
+    OdfMaximaExtractionFilter();
+    ~OdfMaximaExtractionFilter(){}
 
-  // output data
-  mitk::FiberBundle::Pointer               m_OutputFiberBundle;        ///< vector field (peak sizes rescaled for visualization purposes)
-  ItkUcharImgType::Pointer                  m_NumDirectionsImage;       ///< number of peaks per voxel
-  ItkDirectionImageContainer::Pointer       m_DirectionImageContainer;  ///< output peaks
+    void BeforeThreadedGenerateData();
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadID );
+    void AfterThreadedGenerateData();
 
-private:
+    /** Extract all local maxima from the densely sampled ODF surface. Thresholding possible. **/
+    double FindCandidatePeaks(OdfType& odf, double odfMax, std::vector< DirectionType >& inDirs);
 
+    /** Cluster input directions within a certain angular threshold **/
+    std::vector< DirectionType > MeanShiftClustering(std::vector< DirectionType >& inDirs);
+
+    private:
+
+    NormalizationMethods                        m_NormalizationMethod;  ///< normalization method of ODF peaks
+    unsigned int                                m_MaxNumPeaks;          ///< maximum number of peaks per voxel. if more peaks are detected, only the largest are kept.
+    double                                      m_RelativePeakThreshold;        ///< threshold on the peak length relative to the largest peak inside the current voxel
+    double                                      m_AbsolutePeakThreshold;///< hard threshold on the peak length of all local maxima
+    vnl_matrix< float >                         m_ShBasis;              ///< container for evaluated SH base functions
+    double                                      m_AngularThreshold;
+    const int                                   m_NumCoeffs;            ///< number of spherical harmonics coefficients
+
+    PeakImageType::Pointer                      m_PeakImage;
+    ItkUcharImgType::Pointer                    m_NumDirectionsImage;     ///< number of peaks per voxel
+    ItkUcharImgType::Pointer                    m_MaskImage;              ///< only voxels inside the binary mask are processed
+
+    Toolkit                                     m_Toolkit;
+    bool                                        m_FlipX;
+    bool                                        m_FlipY;
+    bool                                        m_FlipZ;
+    bool                                        m_ApplyDirectionMatrix;
+    bool                                        m_ScaleByGfa;
+    int                                         m_Iterations;
 };
 
 }

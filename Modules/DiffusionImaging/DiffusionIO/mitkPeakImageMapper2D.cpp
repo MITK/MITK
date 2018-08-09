@@ -94,7 +94,7 @@ void mitk::PeakImageMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *render
 
   mitk::SliceNavigationController::Pointer sliceContr = renderer->GetSliceNavigationController();
   mitk::PlaneGeometry::ConstPointer planeGeo = sliceContr->GetCurrentPlaneGeometry();
-  mitk::Point3D plane_origin = planeGeo->GetCenter();
+  mitk::Point3D plane_origin = planeGeo->GetOrigin();
 
   mitk::DataNode* node = this->GetDataNode();
   mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
@@ -111,17 +111,18 @@ void mitk::PeakImageMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *render
   clipping_plane_thickness /= 2.0;
 
   mitk::Vector3D plane_normal = planeGeo->GetNormal();
+  plane_normal.Normalize();
   double vnormal[3];
   double vp1[3];
   double vp2[3];
 
-  vp1[0] = plane_origin[0] + plane_normal[0] * clipping_plane_thickness;
-  vp1[1] = plane_origin[1] + plane_normal[1] * clipping_plane_thickness;
-  vp1[2] = plane_origin[2] + plane_normal[2] * clipping_plane_thickness;
+  vp1[0] = plane_origin[0] - plane_normal[0] * clipping_plane_thickness;
+  vp1[1] = plane_origin[1] - plane_normal[1] * clipping_plane_thickness;
+  vp1[2] = plane_origin[2] - plane_normal[2] * clipping_plane_thickness;
 
-  vp2[0] = plane_origin[0] - plane_normal[0] * clipping_plane_thickness;
-  vp2[1] = plane_origin[1] - plane_normal[1] * clipping_plane_thickness;
-  vp2[2] = plane_origin[2] - plane_normal[2] * clipping_plane_thickness;
+  vp2[0] = plane_origin[0] + plane_normal[0] * clipping_plane_thickness;
+  vp2[1] = plane_origin[1] + plane_normal[1] * clipping_plane_thickness;
+  vp2[2] = plane_origin[2] + plane_normal[2] * clipping_plane_thickness;
 
   {
     vnormal[0] = vp2[0] - vp1[0];

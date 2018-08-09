@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>QmitkOdfMaximaExtractionViewControls</class>
  <widget class="QWidget" name="QmitkOdfMaximaExtractionViewControls">
@@ -109,10 +109,10 @@ QGroupBox {
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QmitkDataStorageComboBox" name="m_ImageBox"></widget>
+          <widget class="QmitkDataStorageComboBox" name="m_ImageBox"/>
          </item>
          <item row="1" column="1">
-          <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MaskBox"></widget>
+          <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MaskBox"/>
          </item>
         </layout>
        </widget>
@@ -261,23 +261,6 @@ QGroupBox {
          <property name="horizontalSpacing">
           <number>6</number>
          </property>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="text">
-            <string>Max. Peaks:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>Relative Threshold:</string>
-           </property>
-          </widget>
-         </item>
          <item row="3" column="1">
           <widget class="QDoubleSpinBox" name="m_PeakThresholdBox">
            <property name="enabled">
@@ -299,7 +282,17 @@ QGroupBox {
             <double>0.100000000000000</double>
            </property>
            <property name="value">
-            <double>0.500000000000000</double>
+            <double>0.400000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="text">
+            <string>Max. Peaks:</string>
            </property>
           </widget>
          </item>
@@ -348,40 +341,13 @@ QGroupBox {
           </widget>
          </item>
          <item row="5" column="0">
-          <widget class="QLabel" name="label_10">
-           <property name="text">
-            <string>Clustering Angle:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QSpinBox" name="m_ClusteringAngleBox">
-           <property name="toolTip">
-            <string>Cluster close directions. Define "close" here.</string>
-           </property>
-           <property name="maximum">
-            <number>90</number>
-           </property>
-           <property name="value">
-            <number>30</number>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>Absolute Threshold:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0">
           <widget class="QLabel" name="label_11">
            <property name="text">
             <string>Angular Threshold:</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
+         <item row="5" column="1">
           <widget class="QSpinBox" name="m_AngularThreshold">
            <property name="toolTip">
             <string>Discard smaller peaks in the defined angle around the maximum peaks that were too far away to be clustered.</string>
@@ -393,7 +359,35 @@ QGroupBox {
             <number>90</number>
            </property>
            <property name="value">
-            <number>0</number>
+            <number>15</number>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Absolute Threshold:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Relative Threshold:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>Scale by GFA:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QCheckBox" name="m_ScaleByGfaBox">
+           <property name="text">
+            <string/>
            </property>
           </widget>
          </item>
@@ -471,6 +465,6 @@ QGroupBox {
    <header>QmitkDataStorageComboBoxWithSelectNone.h</header>
   </customwidget>
  </customwidgets>
- <resources></resources>
- <connections></connections>
+ <resources/>
+ <connections/>
 </ui>

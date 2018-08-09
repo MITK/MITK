@@ -189,9 +189,6 @@ void OdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
   else
     m_ShBasis = mitk::sh::CalcShBasisForDirections(ShOrder, dir_matrix, false);
 
-  randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
-  randGen->SetSeed(time(0));
-
   MITK_INFO << "Starting peak extraction";
   MITK_INFO << "SH order: " << ShOrder;
   MITK_INFO << "Maximum peaks: " << m_MaxNumPeaks;

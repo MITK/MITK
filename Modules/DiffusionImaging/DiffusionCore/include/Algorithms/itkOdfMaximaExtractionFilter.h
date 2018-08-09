@@ -170,8 +170,6 @@ Image< unsigned char, 3 > >
     bool                                        m_ApplyDirectionMatrix;
     bool                                        m_ScaleByGfa;
     int                                         m_Iterations;
-
-    Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen;
 };
 
 }

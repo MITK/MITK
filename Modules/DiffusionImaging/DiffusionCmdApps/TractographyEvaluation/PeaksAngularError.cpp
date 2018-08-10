@@ -27,181 +27,145 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLexicalCast.h>
 #include <iostream>
 #include <fstream>
+#include <mitkPeakImage.h>
+#include <mitkDiffusionDataIOHelper.h>
+#include <mitkLocaleSwitch.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+
+typedef itk::Image< unsigned char, 3 >  ItkUcharImageType;
 
 /*!
 \brief Calculate angular error between two sets of directions stored in multiple 3D vector images where each pixel corresponds to a vector (itk::Image< itk::Vector< float, 3>, 3 >)
 */
 int main(int argc, char* argv[])
 {
-    mitkCommandLineParser parser;
-    parser.setArgumentPrefix("--", "-");
-    parser.addArgument("test", "t", mitkCommandLineParser::StringList, "Test images", "test direction images", us::Any(), false);
-    parser.addArgument("reference", "r", mitkCommandLineParser::StringList, "Reference images", "reference direction images", us::Any(), false);
-    parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
-    parser.addArgument("mask", "m", mitkCommandLineParser::InputFile, "Mask", "mask image");
-    parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose", "output optional and intermediate calculation results");
-    parser.addArgument("ignore", "i", mitkCommandLineParser::Bool, "Ignore", "don't increase error for missing or too many directions");
+  mitkCommandLineParser parser;
+  parser.setArgumentPrefix("--", "-");
+  parser.addArgument("test", "", mitkCommandLineParser::StringList, "Test images", "test direction images", us::Any(), false);
+  parser.addArgument("reference", "", mitkCommandLineParser::StringList, "Reference images", "reference direction images", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
+  parser.addArgument("masks", "", mitkCommandLineParser::StringList, "Mask(s)", "mask image(s)");
+  parser.addArgument("verbose", "", mitkCommandLineParser::Bool, "Verbose", "output optional and intermediate calculation results");
+  parser.addArgument("ignore", "", mitkCommandLineParser::Bool, "Ignore", "don't increase error for missing or too many directions");
 
-    parser.setCategory("Fiber Tracking Evaluation");
-    parser.setTitle("Peaks Angular Error");
-    parser.setDescription("Calculate angular error between two sets of directions stored in multiple 3D vector images where each pixel corresponds to a vector (itk::Image< itk::Vector< float, 3>, 3 >)");
-    parser.setContributor("MIC");
+  parser.setCategory("Fiber Tracking Evaluation");
+  parser.setTitle("Peaks Angular Error");
+  parser.setDescription("Calculate angular error between two sets of directions stored in multiple 3D vector images where each pixel corresponds to a vector (itk::Image< itk::Vector< float, 3>, 3 >)");
+  parser.setContributor("MIC");
 
-    std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
-    if (parsedArgs.size()==0)
-        return EXIT_FAILURE;
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  if (parsedArgs.size()==0)
+    return EXIT_FAILURE;
 
-    mitkCommandLineParser::StringContainerType testImages = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["test"]);
-    mitkCommandLineParser::StringContainerType referenceImages = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["reference"]);
+  mitkCommandLineParser::StringContainerType testImages = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["test"]);
+  mitkCommandLineParser::StringContainerType referenceImages = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["reference"]);
 
-    std::string maskImage("");
-    if (parsedArgs.count("mask"))
-        maskImage = us::any_cast<std::string>(parsedArgs["mask"]);
+  mitkCommandLineParser::StringContainerType maskImages;
+  if (parsedArgs.count("masks"))
+    maskImages = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["masks"]);
 
-    std::string outRoot = us::any_cast<std::string>(parsedArgs["out"]);
+  std::string outRoot = us::any_cast<std::string>(parsedArgs["o"]);
 
-    bool verbose = false;
-    if (parsedArgs.count("verbose"))
-        verbose = us::any_cast<bool>(parsedArgs["verbose"]);
+  bool verbose = false;
+  if (parsedArgs.count("verbose"))
+    verbose = us::any_cast<bool>(parsedArgs["verbose"]);
 
-    bool ignore = false;
-    if (parsedArgs.count("ignore"))
-        ignore = us::any_cast<bool>(parsedArgs["ignore"]);
+  bool ignore = false;
+  if (parsedArgs.count("ignore"))
+    ignore = us::any_cast<bool>(parsedArgs["ignore"]);
 
-    try
+  try
+  {
+    typedef itk::ComparePeakImagesFilter< float > EvaluationFilterType;
+
+    auto directionImageContainer = mitk::DiffusionDataIOHelper::load_itk_images<EvaluationFilterType::PeakImageType>(testImages);
+
+    // load reference directions
+    auto referenceImageContainer = mitk::DiffusionDataIOHelper::load_itk_images<EvaluationFilterType::PeakImageType>(referenceImages);
+
+    // load/create mask image
+    auto itkMaskImages = mitk::DiffusionDataIOHelper::load_itk_images<ItkUcharImageType>(maskImages);
+
+    if (directionImageContainer.size()!=referenceImageContainer.size())
+      mitkThrow() << "Matching number of test and reference image required!";
+
+    for (unsigned int i=0; i<directionImageContainer.size(); ++i)
     {
-        typedef itk::Image<unsigned char, 3>                                    ItkUcharImgType;
-        typedef itk::Image< itk::Vector< float, 3>, 3 >                         ItkDirectionImage3DType;
-        typedef itk::VectorContainer< unsigned int, ItkDirectionImage3DType::Pointer >   ItkDirectionImageContainerType;
-        typedef itk::EvaluateDirectionImagesFilter< float >                     EvaluationFilterType;
+      // evaluate directions
+      EvaluationFilterType::Pointer evaluationFilter = EvaluationFilterType::New();
+      evaluationFilter->SetTestImage(directionImageContainer.at(i));
+      evaluationFilter->SetReferenceImage(referenceImageContainer.at(i));
+      if (i<maskImages.size())
+        evaluationFilter->SetMaskImage(itkMaskImages.at(i));
+      evaluationFilter->SetIgnoreMissingDirections(ignore);
+      evaluationFilter->Update();
 
-        ItkDirectionImageContainerType::Pointer directionImageContainer = ItkDirectionImageContainerType::New();
-        for (unsigned int i=0; i<testImages.size(); i++)
-        {
-            try
-            {
-                mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(testImages.at(i));
-                typedef mitk::ImageToItk< ItkDirectionImage3DType > CasterType;
-                CasterType::Pointer caster = CasterType::New();
-                caster->SetInput(img);
-                caster->Update();
-                ItkDirectionImage3DType::Pointer itkImg = caster->GetOutput();
-                directionImageContainer->InsertElement(directionImageContainer->Size(),itkImg);
-            }
-            catch(...){ std::cout << "could not load: " << referenceImages.at(i); }
-        }
+      if (verbose)
+      {
+        mitk::LocaleSwitch localeSwitch("C");
+        EvaluationFilterType::OutputImageType::Pointer angularErrorImage = evaluationFilter->GetOutput(0);
+        typedef itk::ImageFileWriter< EvaluationFilterType::OutputImageType > WriterType;
+        WriterType::Pointer writer = WriterType::New();
 
-        // load reference directions
-        ItkDirectionImageContainerType::Pointer referenceImageContainer = ItkDirectionImageContainerType::New();
-        for (unsigned int i=0; i<referenceImages.size(); i++)
-        {
-            try
-            {
-                mitk::Image::Pointer img = mitk::IOUtil::Load<mitk::Image>(referenceImages.at(i));
-                typedef mitk::ImageToItk< ItkDirectionImage3DType > CasterType;
-                CasterType::Pointer caster = CasterType::New();
-                caster->SetInput(img);
-                caster->Update();
-                ItkDirectionImage3DType::Pointer itkImg = caster->GetOutput();
-                referenceImageContainer->InsertElement(referenceImageContainer->Size(),itkImg);
-            }
-            catch(...){ std::cout << "could not load: " << referenceImages.at(i); }
-        }
+        std::string outfilename = outRoot;
+        outfilename.append("_ERROR_IMAGE.nrrd");
 
-        // load/create mask image
-        ItkUcharImgType::Pointer itkMaskImage = ItkUcharImgType::New();
-        if (maskImage.compare("")==0)
-        {
-            ItkDirectionImage3DType::Pointer dirImg = referenceImageContainer->GetElement(0);
-            itkMaskImage->SetSpacing( dirImg->GetSpacing() );
-            itkMaskImage->SetOrigin( dirImg->GetOrigin() );
-            itkMaskImage->SetDirection( dirImg->GetDirection() );
-            itkMaskImage->SetLargestPossibleRegion( dirImg->GetLargestPossibleRegion() );
-            itkMaskImage->SetBufferedRegion( dirImg->GetLargestPossibleRegion() );
-            itkMaskImage->SetRequestedRegion( dirImg->GetLargestPossibleRegion() );
-            itkMaskImage->Allocate();
-            itkMaskImage->FillBuffer(1);
-        }
-        else
-        {
-            mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::Load<mitk::Image>(maskImage);
-            mitk::CastToItkImage(mitkMaskImage, itkMaskImage);
-        }
+        writer->SetFileName(outfilename.c_str());
+        writer->SetInput(angularErrorImage);
+        writer->Update();
+      }
 
-        // evaluate directions
-        EvaluationFilterType::Pointer evaluationFilter = EvaluationFilterType::New();
-        evaluationFilter->SetImageSet(directionImageContainer);
-        evaluationFilter->SetReferenceImageSet(referenceImageContainer);
-        evaluationFilter->SetMaskImage(itkMaskImage);
-        evaluationFilter->SetIgnoreMissingDirections(ignore);
-        evaluationFilter->Update();
+      std::string logFile = outRoot;
+      logFile.append("_ANGULAR_ERROR.csv");
 
-        if (verbose)
-        {
-            EvaluationFilterType::OutputImageType::Pointer angularErrorImage = evaluationFilter->GetOutput(0);
-            typedef itk::ImageFileWriter< EvaluationFilterType::OutputImageType > WriterType;
-            WriterType::Pointer writer = WriterType::New();
+      ofstream file;
+      file.open (logFile.c_str());
 
-            std::string outfilename = outRoot;
-            outfilename.append("_ERROR_IMAGE.nrrd");
+      std::string sens = "Mean:";
+      sens.append(",");
+      sens.append(boost::lexical_cast<std::string>(evaluationFilter->GetMeanAngularError()));
+      sens.append(";\n");
 
-            writer->SetFileName(outfilename.c_str());
-            writer->SetInput(angularErrorImage);
-            writer->Update();
-        }
+      sens.append("Median:");
+      sens.append(",");
+      sens.append(boost::lexical_cast<std::string>(evaluationFilter->GetMedianAngularError()));
+      sens.append(";\n");
 
-        std::string logFile = outRoot;
-        logFile.append("_ANGULAR_ERROR.csv");
+      sens.append("Maximum:");
+      sens.append(",");
+      sens.append(boost::lexical_cast<std::string>(evaluationFilter->GetMaxAngularError()));
+      sens.append(";\n");
 
-        ofstream file;
-        file.open (logFile.c_str());
+      sens.append("Minimum:");
+      sens.append(",");
+      sens.append(boost::lexical_cast<std::string>(evaluationFilter->GetMinAngularError()));
+      sens.append(";\n");
 
-        std::string sens = "Mean:";
-        sens.append(",");
-        sens.append(boost::lexical_cast<std::string>(evaluationFilter->GetMeanAngularError()));
-        sens.append(";\n");
+      sens.append("STDEV:");
+      sens.append(",");
+      sens.append(boost::lexical_cast<std::string>(std::sqrt(evaluationFilter->GetVarAngularError())));
+      sens.append(";\n");
 
-        sens.append("Median:");
-        sens.append(",");
-        sens.append(boost::lexical_cast<std::string>(evaluationFilter->GetMedianAngularError()));
-        sens.append(";\n");
-
-        sens.append("Maximum:");
-        sens.append(",");
-        sens.append(boost::lexical_cast<std::string>(evaluationFilter->GetMaxAngularError()));
-        sens.append(";\n");
-
-        sens.append("Minimum:");
-        sens.append(",");
-        sens.append(boost::lexical_cast<std::string>(evaluationFilter->GetMinAngularError()));
-        sens.append(";\n");
-
-        sens.append("STDEV:");
-        sens.append(",");
-        sens.append(boost::lexical_cast<std::string>(std::sqrt(evaluationFilter->GetVarAngularError())));
-        sens.append(";\n");
-
-        file << sens;
-
-        file.close();
+      file << sens;
+      file.close();
     }
-    catch (itk::ExceptionObject e)
-    {
-        std::cout << e;
-        return EXIT_FAILURE;
-    }
-    catch (std::exception e)
-    {
-        std::cout << e.what();
-        return EXIT_FAILURE;
-    }
-    catch (...)
-    {
-        std::cout << "ERROR!?!";
-        return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
+  }
+  catch (itk::ExceptionObject e)
+  {
+    std::cout << e;
+    return EXIT_FAILURE;
+  }
+  catch (std::exception e)
+  {
+    std::cout << e.what();
+    return EXIT_FAILURE;
+  }
+  catch (...)
+  {
+    std::cout << "ERROR!?!";
+    return EXIT_FAILURE;
+  }
+  return EXIT_SUCCESS;
 }

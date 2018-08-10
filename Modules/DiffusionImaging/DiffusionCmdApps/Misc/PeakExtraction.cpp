@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkFlipImageFilter.h>
 #include <mitkLexicalCast.h>
 #include <boost/algorithm/string.hpp>
-
+#include <mitkLocaleSwitch.h>
 #include <mitkIOUtil.h>
 
 template<int shOrder>
@@ -197,6 +197,7 @@ int StartPeakExtraction(int argc, char* argv[])
     std::cout << "Starting extraction";
     peak_extraction_filter->Update();
 
+    mitk::LocaleSwitch localeSwitch("C");
     // write direction image
     {
       typename MaximaExtractionFilterType::PeakImageType::Pointer itkImg = peak_extraction_filter->GetPeakImage();

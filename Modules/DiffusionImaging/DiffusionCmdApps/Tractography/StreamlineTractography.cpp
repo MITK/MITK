@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommandLineParser.h>
 #include <mitkLog.h>
 #include <usAny.h>
-#include <itkImageFileWriter.h>
 #include <mitkIOUtil.h>
 #include <iostream>
 #include <fstream>

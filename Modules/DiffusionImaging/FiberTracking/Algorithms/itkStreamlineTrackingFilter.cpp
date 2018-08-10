@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
-#include <itkImageFileWriter.h>
 #include "itkPointShell.h"
 #include <itkRescaleIntensityImageFilter.h>
 #include <mitkLexicalCast.h>

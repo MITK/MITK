@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkEvaluateDirectionImagesFilter.h>
 #include <itkTractsToVectorImageFilter.h>
 #include <mitkCoreObjectFactory.h>
+#include <mitkLocaleSwitch.h>
 
 /*!
 \brief Extract principal fiber directions from a tractogram
@@ -132,6 +133,7 @@ int main(int argc, char* argv[])
     fOdfFilter->SetMaxNumDirections(maxNumDirs);
     fOdfFilter->Update();
 
+    mitk::LocaleSwitch localeSwitch("C");
     {
       itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = fOdfFilter->GetDirectionImage();
       typedef itk::ImageFileWriter< itk::TractsToVectorImageFilter<float>::ItkDirectionImageType > WriterType;

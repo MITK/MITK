@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageRegionIterator.h"
 #include "itkImageFileReader.h"
 #include <mitkIOUtil.h>
+#include <mitkLocaleSwitch.h>
 
 template< class D, class T >
 mitk::TeemDiffusionTensor3DReconstructionImageFilter<D,T>
@@ -160,6 +161,7 @@ mitk::TeemDiffusionTensor3DReconstructionImageFilter<D,T>
   sprintf( filename, "tensors_%d.nhdr", random_integer);
   file_replace(filename,"3D-masked-symmetric-matrix","vector");
 
+  mitk::LocaleSwitch localeSwitch("C");
   // read result as mitk::Image and provide it in m_Output
   typedef itk::ImageFileReader<VectorImageType> FileReaderType;
   typename FileReaderType::Pointer reader = FileReaderType::New();

@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
-#include <itkImageFileWriter.h>
 #include <mitkSingleShotEpi.h>
 #include <mitkCartesianReadout.h>
 #include <mitkDiffusionFunctionCollection.h>

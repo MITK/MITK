@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include <istream>
 
-#include <itkImageFileWriter.h>
 #include <itkMetaDataObject.h>
 #include <itkVectorImage.h>
 #include <mitkImageCast.h>

@@ -26,74 +26,76 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommandLineParser.h"
 #include <itksys/SystemTools.hxx>
 #include <mitkIOUtil.h>
+#include <mitkLocaleSwitch.h>
 
 /**
  * Convert files from one ending to the other
  */
 int main(int argc, char* argv[])
 {
-    mitkCommandLineParser parser;
-    parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
-    parser.addArgument("outFile", "o", mitkCommandLineParser::OutputFile, "Output file", "output file", us::Any(), false);
-    parser.addArgument("b0Threshold", "t", mitkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0, true);
+  mitkCommandLineParser parser;
+  parser.setArgumentPrefix("--", "-");
+  parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
+  parser.addArgument("outFile", "o", mitkCommandLineParser::OutputFile, "Output file", "output file", us::Any(), false);
+  parser.addArgument("b0Threshold", "t", mitkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0, true);
 
-    parser.setCategory("Signal Modelling");
-    parser.setTitle("Tensor Reconstruction");
-    parser.setDescription("");
-    parser.setContributor("MIC");
+  parser.setCategory("Signal Modelling");
+  parser.setTitle("Tensor Reconstruction");
+  parser.setDescription("");
+  parser.setContributor("MIC");
 
-    std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
-    if (parsedArgs.size()==0)
-        return EXIT_FAILURE;
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  if (parsedArgs.size()==0)
+    return EXIT_FAILURE;
 
-    std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
-    std::string outfilename = us::any_cast<std::string>(parsedArgs["outFile"]);
-    outfilename = itksys::SystemTools::GetFilenamePath(outfilename)+"/"+itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
-    outfilename += ".dti";
+  std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
+  std::string outfilename = us::any_cast<std::string>(parsedArgs["outFile"]);
+  outfilename = itksys::SystemTools::GetFilenamePath(outfilename)+"/"+itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
+  outfilename += ".dti";
 
-    int threshold = 0;
-    if (parsedArgs.count("b0Threshold"))
-        threshold = us::any_cast<int>(parsedArgs["b0Threshold"]);
+  int threshold = 0;
+  if (parsedArgs.count("b0Threshold"))
+    threshold = us::any_cast<int>(parsedArgs["b0Threshold"]);
 
-    try
-    {
-        mitk::Image::Pointer dwi = mitk::IOUtil::Load<mitk::Image>(inFileName);
+  try
+  {
+    mitk::Image::Pointer dwi = mitk::IOUtil::Load<mitk::Image>(inFileName);
 
-        mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
-        mitk::CastToItkImage(dwi, itkVectorImagePointer);
+    mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
+    mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
-        typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, float > TensorReconstructionImageFilterType;
-        TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
-        filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
-        filter->SetBValue( mitk::DiffusionPropertyHelper::GetReferenceBValue( dwi ));
-        filter->SetThreshold(threshold);
-        filter->Update();
+    typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, float > TensorReconstructionImageFilterType;
+    TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
+    filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
+    filter->SetBValue( mitk::DiffusionPropertyHelper::GetReferenceBValue( dwi ));
+    filter->SetThreshold(threshold);
+    filter->Update();
 
-        // Save tensor image
-        itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
-        io->SetFileType( itk::ImageIOBase::Binary );
-        io->UseCompressionOn();
+    // Save tensor image
+    itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+    io->SetFileType( itk::ImageIOBase::Binary );
+    io->UseCompressionOn();
 
-        itk::ImageFileWriter< itk::Image< itk::DiffusionTensor3D< float >, 3 > >::Pointer writer = itk::ImageFileWriter< itk::Image< itk::DiffusionTensor3D< float >, 3 > >::New();
-        writer->SetInput(filter->GetOutput());
-        writer->SetFileName(outfilename);
-        writer->SetImageIO(io);
-        writer->UseCompressionOn();
-        writer->Update();
-    }
-    catch ( itk::ExceptionObject &err)
-    {
-        std::cout << "Exception: " << err;
-    }
-    catch ( std::exception err)
-    {
-        std::cout << "Exception: " << err.what();
-    }
-    catch ( ... )
-    {
-        std::cout << "Exception!";
-    }
-    return EXIT_SUCCESS;
+    mitk::LocaleSwitch localeSwitch("C");
+    itk::ImageFileWriter< itk::Image< itk::DiffusionTensor3D< float >, 3 > >::Pointer writer = itk::ImageFileWriter< itk::Image< itk::DiffusionTensor3D< float >, 3 > >::New();
+    writer->SetInput(filter->GetOutput());
+    writer->SetFileName(outfilename);
+    writer->SetImageIO(io);
+    writer->UseCompressionOn();
+    writer->Update();
+  }
+  catch ( itk::ExceptionObject &err)
+  {
+    std::cout << "Exception: " << err;
+  }
+  catch ( std::exception err)
+  {
+    std::cout << "Exception: " << err.what();
+  }
+  catch ( ... )
+  {
+    std::cout << "Exception!";
+  }
+  return EXIT_SUCCESS;
 
 }

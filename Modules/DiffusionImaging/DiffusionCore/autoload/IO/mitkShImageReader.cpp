@@ -63,6 +63,7 @@ namespace mitk
 
   std::vector<itk::SmartPointer<BaseData> > ShImageReader::Read()
   {
+    mitk::LocaleSwitch localeSwitch("C");
     std::vector<itk::SmartPointer<mitk::BaseData> > result;
     std::string location = GetInputLocation();
 

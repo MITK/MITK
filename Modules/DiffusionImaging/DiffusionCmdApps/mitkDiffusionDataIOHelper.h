@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itksys/SystemTools.hxx>
 #include <itkDirectory.h>
-#include <itkImageFileReader.h>
+#include <mitkLocaleSwitch.h>
 
 typedef itksys::SystemTools ist;
 
@@ -43,6 +43,7 @@ public:
   template< class TYPE >
   static typename TYPE::Pointer load_itk_image(const std::string file)
   {
+    mitk::LocaleSwitch localeSwitch("C");
     if (file.compare("")!=0 && itksys::SystemTools::FileExists(file))
     {
       mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(file);
@@ -60,13 +61,28 @@ public:
   template< class TYPE >
   static std::vector< typename TYPE::Pointer > load_itk_images(const std::vector<std::string> files, std::vector<std::string>* filenames=nullptr)
   {
+    mitk::LocaleSwitch localeSwitch("C");
     std::streambuf *old = cout.rdbuf(); // <-- save
     std::stringstream ss;
     std::cout.rdbuf (ss.rdbuf());       // <-- redirect
     std::vector< typename TYPE::Pointer > out;
     for (auto f : files)
     {
-      if (itksys::SystemTools::PathExists(f))
+      if (itksys::SystemTools::FileExists(f, true))
+      {
+        mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(f);
+
+        typedef mitk::ImageToItk< TYPE > CasterType;
+        typename CasterType::Pointer caster = CasterType::New();
+        caster->SetInput(image);
+        caster->Update();
+        typename TYPE::Pointer itk_image = caster->GetOutput();
+
+        out.push_back(itk_image);
+        if (filenames!=nullptr)
+          filenames->push_back(f);
+      }
+      else if (itksys::SystemTools::PathExists(f))
       {
         if (!f.empty() && f.back() != '/')
           f += "/";
@@ -86,20 +102,6 @@ public:
           if (filenames!=nullptr)
             filenames->push_back(file);
         }
-      }
-      else if (itksys::SystemTools::FileExists(f))
-      {
-        mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(f);
-
-        typedef mitk::ImageToItk< TYPE > CasterType;
-        typename CasterType::Pointer caster = CasterType::New();
-        caster->SetInput(image);
-        caster->Update();
-        typename TYPE::Pointer itk_image = caster->GetOutput();
-
-        out.push_back(itk_image);
-        if (filenames!=nullptr)
-          filenames->push_back(f);
       }
     }
 

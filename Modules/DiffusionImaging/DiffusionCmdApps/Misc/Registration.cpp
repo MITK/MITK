@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageReadAccessor.h>
 #include <mitkITKImageImport.h>
 #include <mitkImageTimeSelector.h>
-#include <itkImageFileWriter.h>
 // ITK
 #include <itksys/SystemTools.hxx>
 #include <itkDirectory.h>

@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTdiToVolumeFractionFilter.h>
 #include <itkImageFileReader.h>
 #include <itkTensorReconstructionWithEigenvalueCorrectionFilter.h>
+#include <mitkLocaleSwitch.h>
 
 using namespace mitk;
 
@@ -606,6 +607,7 @@ int main(int argc, char* argv[])
     possible_proposals.push_back(2);
   }
 
+  mitk::LocaleSwitch localeSwitch("C");
   itk::ImageFileReader< itk::Image< unsigned char, 3 > >::Pointer reader = itk::ImageFileReader< itk::Image< unsigned char, 3 > >::New();
   reader->SetFileName( us::any_cast<std::string>(parsedArgs["mask"]) );
   reader->Update();

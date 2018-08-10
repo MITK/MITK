@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <metaCommand.h>
 #include "mitkCommandLineParser.h"
 #include <usAny.h>
-#include <itkImageFileWriter.h>
 #include <mitkIOUtil.h>
 #include <iostream>
 #include <fstream>

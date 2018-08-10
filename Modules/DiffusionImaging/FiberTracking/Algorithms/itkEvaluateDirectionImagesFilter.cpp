@@ -26,342 +26,363 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk {
 
 template< class PixelType >
-EvaluateDirectionImagesFilter< PixelType >
-::EvaluateDirectionImagesFilter():
-    m_ImageSet(nullptr),
-    m_ReferenceImageSet(nullptr),
-    m_IgnoreMissingDirections(false),
-    m_IgnoreEmptyVoxels(false),
-    m_Eps(0.0001)
+ComparePeakImagesFilter< PixelType >
+::ComparePeakImagesFilter():
+  m_IgnoreMissingDirections(false),
+  m_IgnoreEmptyVoxels(false),
+  m_Eps(0.0001)
 {
-    this->SetNumberOfIndexedOutputs(2);
+  this->SetNumberOfIndexedOutputs(2);
 }
 
 template< class PixelType >
-void EvaluateDirectionImagesFilter< PixelType >::GenerateData()
+void ComparePeakImagesFilter< PixelType >::GenerateData()
 {
-    if (m_ImageSet.IsNull() || m_ReferenceImageSet.IsNull())
-        return;
+  if (m_TestImage.IsNull() || m_ReferenceImage.IsNull())
+    mitkThrow() << "Test or reference image not set!";
+//  if (m_TestImage->GetLargestPossibleRegion().GetSize()!=m_ReferenceImage->GetLargestPossibleRegion().GetSize())
+//    mitkThrow() << "Test and reference image need to have same sizes!";
 
-    DirectionImageContainerType::Pointer set1 = DirectionImageContainerType::New();
-    DirectionImageContainerType::Pointer set2 = DirectionImageContainerType::New();
+  Vector<float, 4> spacing4 = m_TestImage->GetSpacing();
+  Point<float, 4> origin4 = m_TestImage->GetOrigin();
+  Matrix<double, 4, 4> direction4 = m_TestImage->GetDirection();
+  ImageRegion<4> imageRegion4 = m_TestImage->GetLargestPossibleRegion();
 
-    for (unsigned int i=0; i<m_ImageSet->Size(); i++)
+  Vector<double, 3> spacing3;
+  Point<float, 3> origin3;
+  Matrix<double, 3, 3> direction3;
+  ImageRegion<3> imageRegion3;
+
+  spacing3[0] = spacing4[0]; spacing3[1] = spacing4[1]; spacing3[2] = spacing4[2];
+  origin3[0] = origin4[0]; origin3[1] = origin4[1]; origin3[2] = origin4[2];
+  for (int r=0; r<3; r++)
+    for (int c=0; c<3; c++)
+      direction3[r][c] = direction4[r][c];
+  imageRegion3.SetSize(0, imageRegion4.GetSize()[0]);
+  imageRegion3.SetSize(1, imageRegion4.GetSize()[1]);
+  imageRegion3.SetSize(2, imageRegion4.GetSize()[2]);
+
+  // angular error image
+  typename OutputImageType::Pointer outputImage = OutputImageType::New();
+  outputImage->SetOrigin( origin3 );
+  outputImage->SetRegions( imageRegion3 );
+  outputImage->SetSpacing( spacing3 );
+  outputImage->SetDirection( direction3 );
+  outputImage->Allocate();
+  outputImage->FillBuffer(0.0);
+  this->SetNthOutput(0, outputImage);
+
+  // length error image
+  outputImage = OutputImageType::New();
+  outputImage->SetOrigin( origin3 );
+  outputImage->SetRegions( imageRegion3 );
+  outputImage->SetSpacing( spacing3 );
+  outputImage->SetDirection( direction3 );
+  outputImage->Allocate();
+  outputImage->FillBuffer(0.0);
+  this->SetNthOutput(1, outputImage);
+
+  if (m_MaskImage.IsNull())
+  {
+    m_MaskImage = UCharImageType::New();
+    m_MaskImage->SetOrigin( origin3 );
+    m_MaskImage->SetRegions( imageRegion3 );
+    m_MaskImage->SetSpacing( spacing3 );
+    m_MaskImage->SetDirection( direction3 );
+    m_MaskImage->Allocate();
+    m_MaskImage->FillBuffer(1);
+  }
+
+  m_MeanAngularError = 0.0;
+  m_MedianAngularError = 0;
+  m_MaxAngularError = 0.0;
+  m_MinAngularError = itk::NumericTraits<float>::max();
+  m_VarAngularError = 0.0;
+  m_AngularErrorVector.clear();
+
+  m_MeanLengthError = 0.0;
+  m_MedianLengthError = 0;
+  m_MaxLengthError = 0.0;
+  m_MinLengthError = itk::NumericTraits<float>::max();
+  m_VarLengthError = 0.0;
+  m_LengthErrorVector.clear();
+
+  outputImage = static_cast< OutputImageType* >(this->ProcessObject::GetOutput(0));
+  typename OutputImageType::Pointer outputImage2 = static_cast< OutputImageType* >(this->ProcessObject::GetOutput(1));
+
+  ImageRegionIterator< OutputImageType > oit(outputImage, outputImage->GetLargestPossibleRegion());
+  ImageRegionIterator< OutputImageType > oit2(outputImage2, outputImage2->GetLargestPossibleRegion());
+  ImageRegionIterator< UCharImageType > mit(m_MaskImage, m_MaskImage->GetLargestPossibleRegion());
+
+
+  boost::progress_display disp(outputImage->GetLargestPossibleRegion().GetSize()[0]*outputImage->GetLargestPossibleRegion().GetSize()[1]*outputImage->GetLargestPossibleRegion().GetSize()[2]);
+  while( !oit.IsAtEnd() )
+  {
+    ++disp;
+    if( mit.Get()!=1 )
     {
-        typename itk::ImageDuplicator< DirectionImageType >::Pointer duplicator = itk::ImageDuplicator< DirectionImageType >::New();
-        duplicator->SetInputImage( m_ImageSet->GetElement(i) );
-        duplicator->Update();
-        set1->InsertElement(i, dynamic_cast<DirectionImageType*>(duplicator->GetOutput()));
+      ++oit;
+      ++oit2;
+      ++mit;
+      continue;
     }
-    for (unsigned int i=0; i<m_ReferenceImageSet->Size(); i++)
+    typename OutputImageType::IndexType index = oit.GetIndex();
+    itk::Index<4> idx4;
+    idx4[0] = index[0];
+    idx4[1] = index[1];
+    idx4[2] = index[2];
+
+    float maxAngularError = 1.0;
+
+    // get number of valid directions (length > 0)
+    unsigned int numRefPeaks = 0;
+    unsigned int numTestPeaks = 0;
+    std::vector< vnl_vector_fixed< PixelType, 3 > > testPeaks;
+    std::vector< vnl_vector_fixed< PixelType, 3 > > refPeaks;
+    std::vector< PixelType > testPeakMagnitudes;
+    std::vector< PixelType > refPeakMagnitudes;
+
+    for (unsigned int i=0; i<m_ReferenceImage->GetLargestPossibleRegion().GetSize()[3]/3; i++)
     {
-        typename itk::ImageDuplicator< DirectionImageType >::Pointer duplicator = itk::ImageDuplicator< DirectionImageType >::New();
-        duplicator->SetInputImage( m_ReferenceImageSet->GetElement(i) );
-        duplicator->Update();
-        set2->InsertElement(i, dynamic_cast<DirectionImageType*>(duplicator->GetOutput()));
+      vnl_vector_fixed< PixelType, 3 > peak;
+      idx4[3] = i*3;
+      peak[0] = m_ReferenceImage->GetPixel(idx4);
+      idx4[3] = i*3 + 1;
+      peak[1] = m_ReferenceImage->GetPixel(idx4);
+      idx4[3] = i*3 + 2;
+      peak[2] = m_ReferenceImage->GetPixel(idx4);
+
+      PixelType mag = peak.magnitude();
+      refPeakMagnitudes.push_back(mag);
+      if (mag > m_Eps )
+      {
+        peak.normalize();
+        refPeaks.push_back(peak);
+        numRefPeaks++;
+      }
     }
-
-    m_ImageSet = set1;
-    m_ReferenceImageSet = set2;
-
-    // angular error image
-    typename OutputImageType::Pointer outputImage = OutputImageType::New();
-    outputImage->SetOrigin( m_ReferenceImageSet->GetElement(0)->GetOrigin() );
-    outputImage->SetRegions( m_ReferenceImageSet->GetElement(0)->GetLargestPossibleRegion() );
-    outputImage->SetSpacing( m_ReferenceImageSet->GetElement(0)->GetSpacing() );
-    outputImage->SetDirection( m_ReferenceImageSet->GetElement(0)->GetDirection() );
-    outputImage->Allocate();
-    outputImage->FillBuffer(0.0);
-    this->SetNthOutput(0, outputImage);
-
-    // length error image
-    outputImage = OutputImageType::New();
-    outputImage->SetOrigin( m_ReferenceImageSet->GetElement(0)->GetOrigin() );
-    outputImage->SetRegions( m_ReferenceImageSet->GetElement(0)->GetLargestPossibleRegion() );
-    outputImage->SetSpacing( m_ReferenceImageSet->GetElement(0)->GetSpacing() );
-    outputImage->SetDirection( m_ReferenceImageSet->GetElement(0)->GetDirection() );
-    outputImage->Allocate();
-    outputImage->FillBuffer(0.0);
-    this->SetNthOutput(1, outputImage);
-
-    if (m_MaskImage.IsNull())
+    for (unsigned int i=0; i<m_TestImage->GetLargestPossibleRegion().GetSize()[3]/3; i++)
     {
-        m_MaskImage = UCharImageType::New();
-        m_MaskImage->SetOrigin( outputImage->GetOrigin() );
-        m_MaskImage->SetRegions( outputImage->GetLargestPossibleRegion() );
-        m_MaskImage->SetSpacing( outputImage->GetSpacing() );
-        m_MaskImage->SetDirection( outputImage->GetDirection() );
-        m_MaskImage->Allocate();
-        m_MaskImage->FillBuffer(1);
+      vnl_vector_fixed< PixelType, 3 > peak;
+      idx4[3] = i*3;
+      peak[0] = m_TestImage->GetPixel(idx4);
+      idx4[3] = i*3 + 1;
+      peak[1] = m_TestImage->GetPixel(idx4);
+      idx4[3] = i*3 + 2;
+      peak[2] = m_TestImage->GetPixel(idx4);
+
+      PixelType mag = peak.magnitude();
+      testPeakMagnitudes.push_back(mag);
+      if (mag > m_Eps )
+      {
+        peak.normalize();
+        testPeaks.push_back(peak);
+        numTestPeaks++;
+      }
     }
 
-    m_MeanAngularError = 0.0;
-    m_MedianAngularError = 0;
-    m_MaxAngularError = 0.0;
-    m_MinAngularError = itk::NumericTraits<float>::max();
-    m_VarAngularError = 0.0;
-    m_AngularErrorVector.clear();
-
-    m_MeanLengthError = 0.0;
-    m_MedianLengthError = 0;
-    m_MaxLengthError = 0.0;
-    m_MinLengthError = itk::NumericTraits<float>::max();
-    m_VarLengthError = 0.0;
-    m_LengthErrorVector.clear();
-
-    if (m_ImageSet.IsNull() || m_ReferenceImageSet.IsNull())
-        return;
-
-    outputImage = static_cast< OutputImageType* >(this->ProcessObject::GetOutput(0));
-    typename OutputImageType::Pointer outputImage2 = static_cast< OutputImageType* >(this->ProcessObject::GetOutput(1));
-
-    ImageRegionIterator< OutputImageType > oit(outputImage, outputImage->GetLargestPossibleRegion());
-    ImageRegionIterator< OutputImageType > oit2(outputImage2, outputImage2->GetLargestPossibleRegion());
-    ImageRegionIterator< UCharImageType > mit(m_MaskImage, m_MaskImage->GetLargestPossibleRegion());
-
-    int numTestImages = m_ImageSet->Size();
-    int numReferenceImages = m_ReferenceImageSet->Size();
-    int maxNumDirections = std::max(numReferenceImages, numTestImages);
 
     // matrix containing the angular error between the directions
-    vnl_matrix< float > diffM; diffM.set_size(maxNumDirections, maxNumDirections);
+    unsigned int maxNumPeaks = std::max(numTestPeaks, numRefPeaks);
+    vnl_matrix< float > diffM; diffM.set_size(maxNumPeaks, maxNumPeaks);
+    diffM.fill(0.0);
+    diffM.fill(10); // initialize with invalid error value
 
-    boost::progress_display disp(outputImage->GetLargestPossibleRegion().GetSize()[0]*outputImage->GetLargestPossibleRegion().GetSize()[1]*outputImage->GetLargestPossibleRegion().GetSize()[2]);
-    while( !oit.IsAtEnd() )
+    if (m_IgnoreEmptyVoxels && (numRefPeaks==0 || numTestPeaks==0) )
     {
-        ++disp;
-        if( mit.Get()!=1 )
-        {
-            ++oit;
-            ++oit2;
-            ++mit;
-            continue;
-        }
-        typename OutputImageType::IndexType index = oit.GetIndex();
-
-        float maxAngularError = 1.0;
-
-        diffM.fill(10); // initialize with invalid error value
-
-        // get number of valid directions (length > 0)
-        int numRefDirs = 0;
-        int numTestDirs = 0;
-        std::vector< vnl_vector_fixed< PixelType, 3 > > testDirs;
-        std::vector< vnl_vector_fixed< PixelType, 3 > > refDirs;
-        for (int i=0; i<numReferenceImages; i++)
-        {
-            vnl_vector_fixed< PixelType, 3 > refDir = m_ReferenceImageSet->GetElement(i)->GetPixel(index).GetVnlVector();
-            if (refDir.magnitude() > m_Eps )
-            {
-                refDir.normalize();
-                refDirs.push_back(refDir);
-                numRefDirs++;
-            }
-        }
-        for (int i=0; i<numTestImages; i++)
-        {
-            vnl_vector_fixed< PixelType, 3 > testDir = m_ImageSet->GetElement(i)->GetPixel(index).GetVnlVector();
-            if (testDir.magnitude() > m_Eps )
-            {
-                testDir.normalize();
-                testDirs.push_back(testDir);
-                numTestDirs++;
-            }
-        }
-
-        if (m_IgnoreEmptyVoxels && (numRefDirs==0 || numTestDirs==0) )
-        {
-            ++oit;
-            ++oit2;
-            ++mit;
-            continue;
-        }
-
-        // i: index of reference direction
-        // j: index of test direction
-        for (int i=0; i<maxNumDirections; i++)     // for each reference direction
-        {
-            bool missingDir = false;
-            vnl_vector_fixed< PixelType, 3 > refDir;
-
-            if (i<numRefDirs)  // normalize if not null
-                refDir = refDirs.at(i);
-            else if (m_IgnoreMissingDirections)
-                continue;
-            else
-                missingDir = true;
-
-            for (int j=0; j<maxNumDirections; j++)     // and each test direction
-            {
-                vnl_vector_fixed< PixelType, 3 > testDir;
-                if (j<numTestDirs)  // normalize if not null
-                    testDir = testDirs.at(j);
-                else if (m_IgnoreMissingDirections || missingDir)
-                    continue;
-                else
-                    missingDir = true;
-
-                // found missing direction
-                if (missingDir)
-                {
-                    diffM[i][j] = -1;
-                    continue;
-                }
-
-                // calculate angle between directions
-                diffM[i][j] = fabs(dot_product(refDir, testDir));
-
-                if (diffM[i][j] < maxAngularError)
-                    maxAngularError = diffM[i][j];
-
-                if (diffM[i][j]>1.0)
-                    diffM[i][j] = 1.0;
-            }
-        }
-
-        float angularError = 0.0;
-        float lengthError = 0.0;
-        int counter = 0;
-        vnl_matrix< float > diffM_copy = diffM;
-        for (int k=0; k<maxNumDirections; k++)
-        {
-            float error = -1;
-            int a,b; a=-1; b=-1;
-            bool missingDir = false;
-
-            // i: index of reference direction
-            // j: index of test direction
-            // find smalles error between two directions (large value -> small error)
-            for (int i=0; i<maxNumDirections; i++)
-                for (int j=0; j<maxNumDirections; j++)
-                {
-                    if (diffM[i][j]>error && diffM[i][j]<2) // found valid error entry
-                    {
-                        error = diffM[i][j];
-                        a = i;
-                        b = j;
-                        missingDir = false;
-                    }
-                    else if (diffM[i][j]<0 && error<0)    // found missing direction
-                    {
-                        a = i;
-                        b = j;
-                        missingDir = true;
-                    }
-                }
-
-            if (a<0 || b<0 || (m_IgnoreMissingDirections && missingDir))
-                continue; // no more directions found
-
-            if (a>=numRefDirs && b>=numTestDirs)
-            {
-                MITK_INFO << "ERROR: missing test and reference direction. should not be possible. check code.";
-                continue;
-            }
-
-            // remove processed directions from error matrix
-            diffM.set_row(a, 10.0);
-            diffM.set_column(b, 10.0);
-
-            if (a>=numRefDirs) // missing reference direction (find next closest)
-            {
-                for (int i=0; i<numRefDirs; i++)
-                    if (diffM_copy[i][b]>error)
-                    {
-                        error = diffM_copy[i][b];
-                        a = i;
-                    }
-            }
-            else if (b>=numTestDirs) // missing test direction (find next closest)
-            {
-                for (int i=0; i<numTestDirs; i++)
-                    if (diffM_copy[a][i]>error)
-                    {
-                        error = diffM_copy[a][i];
-                        b = i;
-                    }
-            }
-
-            float refLength = 0;
-            float testLength = 1;
-
-            if (a>=numRefDirs || b>=numTestDirs || error<0)
-                error = 0;
-            else
-            {
-                refLength = m_ReferenceImageSet->GetElement(a)->GetPixel(index).GetVnlVector().magnitude();
-                testLength = m_ImageSet->GetElement(b)->GetPixel(index).GetVnlVector().magnitude();
-            }
-
-            m_LengthErrorVector.push_back( fabs(refLength-testLength) );
-            m_AngularErrorVector.push_back( acos(error)*180.0/itk::Math::pi );
-
-            m_MeanAngularError += m_AngularErrorVector.back();
-            m_MeanLengthError += m_LengthErrorVector.back();
-
-            angularError += m_AngularErrorVector.back();
-            lengthError += m_LengthErrorVector.back();
-            counter++;
-        }
-
-        if (counter>0)
-        {
-            lengthError /= counter;
-            angularError /= counter;
-        }
-        oit2.Set(lengthError);
-        oit.Set(angularError);
-
-        ++oit;
-        ++oit2;
-        ++mit;
+      ++oit;
+      ++oit2;
+      ++mit;
+      continue;
     }
 
-    std::sort( m_AngularErrorVector.begin(), m_AngularErrorVector.end() );
-    m_MeanAngularError /= m_AngularErrorVector.size();      // mean
-    for (unsigned int i=0; i<m_AngularErrorVector.size(); i++)
+    // i: index of reference direction
+    // j: index of test direction
+    for (unsigned int i=0; i<maxNumPeaks; i++)     // for each reference direction
     {
-        float temp = m_AngularErrorVector.at(i) - m_MeanAngularError;
-        m_VarAngularError += temp*temp;
+      bool missingDir = false;
+      vnl_vector_fixed< PixelType, 3 > refDir;
 
-        if ( m_AngularErrorVector.at(i)>m_MaxAngularError )
-            m_MaxAngularError = m_AngularErrorVector.at(i);
-        if ( m_AngularErrorVector.at(i)<m_MinAngularError )
-            m_MinAngularError = m_AngularErrorVector.at(i);
-    }
-    if (m_AngularErrorVector.size()>1)
-    {
-        m_VarAngularError /= (m_AngularErrorVector.size()-1);   // variance
+      if (i<numRefPeaks)  // normalize if not null
+        refDir = refPeaks.at(i);
+      else if (m_IgnoreMissingDirections)
+        continue;
+      else
+        missingDir = true;
 
-        // median
-        if (m_AngularErrorVector.size()%2 == 0)
-            m_MedianAngularError = 0.5*( m_AngularErrorVector.at( m_AngularErrorVector.size()/2 ) +  m_AngularErrorVector.at( m_AngularErrorVector.size()/2+1 ) );
+      for (unsigned int j=0; j<maxNumPeaks; j++)     // and each test direction
+      {
+        vnl_vector_fixed< PixelType, 3 > testDir;
+        if (j<numTestPeaks)  // normalize if not null
+          testDir = testPeaks.at(j);
+        else if (m_IgnoreMissingDirections || missingDir)
+          continue;
         else
-            m_MedianAngularError = m_AngularErrorVector.at( (m_AngularErrorVector.size()+1)/2 ) ;
+          missingDir = true;
+
+        // found missing direction
+        if (missingDir)
+        {
+          diffM[i][j] = -1;
+          continue;
+        }
+
+        // calculate angle between directions
+        diffM[i][j] = fabs(dot_product(refDir, testDir));
+
+        if (diffM[i][j] < maxAngularError)
+          maxAngularError = diffM[i][j];
+
+        if (diffM[i][j]>1.0)
+          diffM[i][j] = 1.0;
+      }
     }
 
-    std::sort( m_LengthErrorVector.begin(), m_LengthErrorVector.end() );
-    m_MeanLengthError /= m_LengthErrorVector.size();      // mean
-    for (unsigned int i=0; i<m_LengthErrorVector.size(); i++)
+    float angularError = 0.0;
+    float lengthError = 0.0;
+    int counter = 0;
+    vnl_matrix< float > diffM_copy = diffM;
+    for (unsigned int k=0; k<maxNumPeaks; k++)
     {
-        float temp = m_LengthErrorVector.at(i) - m_MeanLengthError;
-        m_VarLengthError += temp*temp;
+      float error = -1;
+      int a,b; a=-1; b=-1;
+      bool missingDir = false;
 
-        if ( m_LengthErrorVector.at(i)>m_MaxLengthError )
-            m_MaxLengthError = m_LengthErrorVector.at(i);
-        if ( m_LengthErrorVector.at(i)<m_MinLengthError )
-            m_MinLengthError = m_LengthErrorVector.at(i);
+      // i: index of reference direction
+      // j: index of test direction
+      // find smalles error between two directions (large value -> small error)
+      for (unsigned int i=0; i<maxNumPeaks; i++)
+        for (unsigned int j=0; j<maxNumPeaks; j++)
+        {
+          if (diffM[i][j]>error && diffM[i][j]<2) // found valid error entry
+          {
+            error = diffM[i][j];
+            a = (int)i;
+            b = (int)j;
+            missingDir = false;
+          }
+          else if (diffM[i][j]<0 && error<0)    // found missing direction
+          {
+            a = (int)i;
+            b = (int)j;
+            missingDir = true;
+          }
+        }
+
+      if (a<0 || b<0 || (m_IgnoreMissingDirections && missingDir))
+        continue; // no more directions found
+
+      if (a>=(int)numRefPeaks && b>=(int)numTestPeaks)
+      {
+        MITK_INFO << a << " " << numRefPeaks;
+        MITK_INFO << b << " " << numTestPeaks;
+        MITK_INFO << "ERROR: missing test and reference direction. should not be possible. check code.";
+        continue;
+      }
+
+      // remove processed directions from error matrix
+      diffM.set_row(a, 10.0);
+      diffM.set_column(b, 10.0);
+
+      if (a>=(int)numRefPeaks) // missing reference direction (find next closest)
+      {
+        for (unsigned int i=0; i<numRefPeaks; i++)
+          if (diffM_copy[i][b]>error)
+          {
+            error = diffM_copy[i][b];
+            a = i;
+          }
+      }
+      else if (b>=(int)numTestPeaks) // missing test direction (find next closest)
+      {
+        for (unsigned int i=0; i<numTestPeaks; i++)
+          if (diffM_copy[a][i]>error)
+          {
+            error = diffM_copy[a][i];
+            b = i;
+          }
+      }
+
+      float refLength = 0;
+      float testLength = 1;
+
+      if (a>=(int)numRefPeaks || b>=(int)numTestPeaks || error<0)
+        error = 0;
+      else
+      {
+        refLength = refPeakMagnitudes.at(a);
+        testLength = testPeakMagnitudes.at(b);
+      }
+
+      m_LengthErrorVector.push_back( fabs(refLength-testLength) );
+      m_AngularErrorVector.push_back( acos(error)*180.0/itk::Math::pi );
+
+      m_MeanAngularError += m_AngularErrorVector.back();
+      m_MeanLengthError += m_LengthErrorVector.back();
+
+      angularError += m_AngularErrorVector.back();
+      lengthError += m_LengthErrorVector.back();
+      counter++;
     }
-    if (m_LengthErrorVector.size()>1)
+
+    if (counter>0)
     {
-        m_VarLengthError /= (m_LengthErrorVector.size()-1);   // variance
-
-        // median
-        if (m_LengthErrorVector.size()%2 == 0)
-            m_MedianLengthError = 0.5*( m_LengthErrorVector.at( m_LengthErrorVector.size()/2 ) +  m_LengthErrorVector.at( m_LengthErrorVector.size()/2+1 ) );
-        else
-            m_MedianLengthError = m_LengthErrorVector.at( (m_LengthErrorVector.size()+1)/2 ) ;
+      lengthError /= counter;
+      angularError /= counter;
     }
+    oit2.Set(lengthError);
+    oit.Set(angularError);
+
+    ++oit;
+    ++oit2;
+    ++mit;
+  }
+
+  std::sort( m_AngularErrorVector.begin(), m_AngularErrorVector.end() );
+  m_MeanAngularError /= m_AngularErrorVector.size();      // mean
+  for (unsigned int i=0; i<m_AngularErrorVector.size(); i++)
+  {
+    float temp = m_AngularErrorVector.at(i) - m_MeanAngularError;
+    m_VarAngularError += temp*temp;
+
+    if ( m_AngularErrorVector.at(i)>m_MaxAngularError )
+      m_MaxAngularError = m_AngularErrorVector.at(i);
+    if ( m_AngularErrorVector.at(i)<m_MinAngularError )
+      m_MinAngularError = m_AngularErrorVector.at(i);
+  }
+  if (m_AngularErrorVector.size()>1)
+  {
+    m_VarAngularError /= (m_AngularErrorVector.size()-1);   // variance
+
+    // median
+    if (m_AngularErrorVector.size()%2 == 0)
+      m_MedianAngularError = 0.5*( m_AngularErrorVector.at( m_AngularErrorVector.size()/2 ) +  m_AngularErrorVector.at( m_AngularErrorVector.size()/2+1 ) );
+    else
+      m_MedianAngularError = m_AngularErrorVector.at( (m_AngularErrorVector.size()+1)/2 ) ;
+  }
+
+  std::sort( m_LengthErrorVector.begin(), m_LengthErrorVector.end() );
+  m_MeanLengthError /= m_LengthErrorVector.size();      // mean
+  for (unsigned int i=0; i<m_LengthErrorVector.size(); i++)
+  {
+    float temp = m_LengthErrorVector.at(i) - m_MeanLengthError;
+    m_VarLengthError += temp*temp;
+
+    if ( m_LengthErrorVector.at(i)>m_MaxLengthError )
+      m_MaxLengthError = m_LengthErrorVector.at(i);
+    if ( m_LengthErrorVector.at(i)<m_MinLengthError )
+      m_MinLengthError = m_LengthErrorVector.at(i);
+  }
+  if (m_LengthErrorVector.size()>1)
+  {
+    m_VarLengthError /= (m_LengthErrorVector.size()-1);   // variance
+
+    // median
+    if (m_LengthErrorVector.size()%2 == 0)
+      m_MedianLengthError = 0.5*( m_LengthErrorVector.at( m_LengthErrorVector.size()/2 ) +  m_LengthErrorVector.at( m_LengthErrorVector.size()/2+1 ) );
+    else
+      m_MedianLengthError = m_LengthErrorVector.at( (m_LengthErrorVector.size()+1)/2 ) ;
+  }
 }
 
 }

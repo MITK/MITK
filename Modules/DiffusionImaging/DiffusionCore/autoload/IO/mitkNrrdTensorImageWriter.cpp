@@ -54,6 +54,7 @@ void mitk::NrrdTensorImageWriter::Write()
     MITK_ERROR << "Sorry, filename has not been set!" ;
     return ;
   }
+  mitk::LocaleSwitch localeSwitch("C");
 
   itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
   io->SetFileType( itk::ImageIOBase::Binary );

@@ -174,6 +174,7 @@ int main(int argc, char* argv[])
 
     fitter->Update();
 
+    mitk::LocaleSwitch localeSwitch("C");
     if (save_residuals && mitk_peak_image.IsNotNull())
     {
       itk::ImageFileWriter< PeakImgType >::Pointer writer = itk::ImageFileWriter< PeakImgType >::New();

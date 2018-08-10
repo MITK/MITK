@@ -30,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractsToFiberEndingsImageFilter.h>
 #include <itkTractDensityImageFilter.h>
 #include <itkImageRegionConstIterator.h>
-#include <itkImageFileWriter.h>
 #include <mitkDiffusionDataIOHelper.h>
 
 typedef itk::Image<unsigned char, 3>    ItkFloatImgType;

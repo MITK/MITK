@@ -29,7 +29,7 @@
 #include "itkTensorDerivedMeasurementsFilter.h"
 #include "itkDiffusionTensor3DReconstructionImageFilter.h"
 #include "mitkCommandLineParser.h"
-
+#include <mitkLocaleSwitch.h>
 #include <itkImageFileWriter.h>
 #include <itkNrrdImageIO.h>
 #include <itkDiffusionTensor3D.h>
@@ -165,6 +165,7 @@ int main(int argc, char* argv[])
   io->SetFileType( itk::ImageIOBase::Binary );
   io->UseCompressionOn();
 
+  mitk::LocaleSwitch localeSwitch("C");
   itk::ImageFileWriter< itk::Image< itk::DiffusionTensor3D< double >, 3 > >::Pointer writer = itk::ImageFileWriter< itk::Image< itk::DiffusionTensor3D< double >, 3 > >::New();
   writer->SetInput(tensorReconstructionFilter->GetOutput());
   writer->SetFileName(baseFileName + dtiFileName);

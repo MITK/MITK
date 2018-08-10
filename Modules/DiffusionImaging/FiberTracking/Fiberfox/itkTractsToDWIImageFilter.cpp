@@ -468,6 +468,7 @@ void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
                " remaining non-fiber volume, not absolute values.", false);
     m_UseRelativeNonFiberVolumeFractions = true;
 
+//    mitk::LocaleSwitch localeSwitch("C");
     //        itk::ImageFileWriter<ItkDoubleImgType>::Pointer wr = itk::ImageFileWriter<ItkDoubleImgType>::New();
     //        wr->SetInput(m_Parameters.m_NonFiberModelList[1]->GetVolumeFractionImage());
     //        wr->SetFileName("/local/volumefraction.nrrd");

@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 
-#include <itkImageFileWriter.h>
-#include <itkNrrdImageIO.h>
 #include "mitkCommandLineParser.h"
 #include <itksys/SystemTools.hxx>
 #include <itksys/Directory.hxx>

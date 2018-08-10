@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkNrrdImageIO.h>
 #include <mitkITKImageImport.h>
 #include <mitkImageCast.h>
+#include <mitkLocaleSwitch.h>
 
 namespace mitk
 {
@@ -47,6 +48,7 @@ namespace mitk
 
   std::vector<itk::SmartPointer<BaseData> > PeakImageReader::Read()
   {
+    mitk::LocaleSwitch localeSwitch("C");
     std::vector<itk::SmartPointer<mitk::BaseData> > result;
     std::string location = GetInputLocation();
     std::string ext = itksys::SystemTools::GetFilenameExtension(location);
@@ -61,7 +63,7 @@ namespace mitk
       reader->SetImageIO(io);
     }
     reader->Update();
-
+    MITK_INFO << reader->GetOutput()->GetSpacing();
     Image::Pointer resultImage = dynamic_cast<Image*>(PeakImage::New().GetPointer());
     mitk::CastToMitkImage(reader->GetOutput(), resultImage);
     resultImage->SetVolume(reader->GetOutput()->GetBufferPointer());

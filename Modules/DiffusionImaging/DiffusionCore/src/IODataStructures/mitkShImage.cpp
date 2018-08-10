@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageVtkAccessor.h"
 #include <mitkProperties.h>
 #include "itkShToRgbImageFilter.h"
-#include <itkImageFileWriter.h>
 
 mitk::ShImage::ShImage() : Image()
   , m_ShOrder(0)

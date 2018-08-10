@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkConnectomicsNetworkThresholder.h>
 #include <itkConnectomicsNetworkToConnectivityMatrixImageFilter.h>
 #include <mitkIOUtil.h>
+#include <mitkLocaleSwitch.h>
 
 int main(int argc, char* argv[])
 {
@@ -323,6 +324,7 @@ int main(int argc, char* argv[])
 
           typedef itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::OutputImageType connectivityMatrixImageType;
 
+          mitk::LocaleSwitch localeSwitch("C");
           itk::ImageFileWriter< connectivityMatrixImageType >::Pointer connectivityWriter = itk::ImageFileWriter< connectivityMatrixImageType >::New();
 
           connectivityWriter->SetInput( filter->GetOutput() );

@@ -77,6 +77,7 @@ int mitkB0ExtractionToSeparateImagesFilterTest(int  argc , char* argv[])
 
   mitkImage->SetImportChannel( filter->GetOutput()->GetBufferPointer() );
 
+  mitk::LocaleSwitch localeSwitch("C");
   typedef itk::ImageFileWriter< FilterType::OutputImageType > itkImageWriterType;
   typename itkImageWriterType::Pointer itkWriter = itkImageWriterType::New();
 

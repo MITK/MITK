@@ -22,7 +22,6 @@ if(BUILD_DiffusionTractographyEvaluationCmdApps OR MITK_BUILD_ALL_APPS)
     CheckEpsAndOverlap^^
     ReferenceSimilarity^^
     TractDistance^^
-    # LocalDirectionalFiberPlausibility^^MitkFiberTracking # HAS TO USE NEW PEAK IMAGE FORMAT
     )
 
     foreach(diffusionTractographyEvaluationcmdapp ${diffusionTractographyEvaluationcmdapps})

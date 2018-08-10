@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <itksys/SystemTools.hxx>
 #include <itkNrrdImageIO.h>
+#include <mitkLocaleSwitch.h>
 
 MITK_REGISTER_SERIALIZER(PeakImageSerializer)
 
@@ -36,6 +37,7 @@ mitk::PeakImageSerializer::~PeakImageSerializer()
 
 std::string mitk::PeakImageSerializer::Serialize()
 {
+  mitk::LocaleSwitch localeSwitch("C");
   const PeakImage* image = dynamic_cast<const PeakImage*>( m_Data.GetPointer() );
   if (image == nullptr)
   {

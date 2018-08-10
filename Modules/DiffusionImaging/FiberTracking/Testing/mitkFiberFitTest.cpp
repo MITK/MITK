@@ -116,6 +116,7 @@ public:
 
   void CompareImages(mitk::PeakImage::ItkPeakImageType::Pointer testImage, std::string name)
   {
+    mitk::LocaleSwitch localeSwitch("C");
     typedef mitk::ImageToItk< mitk::PeakImage::ItkPeakImageType > CasterType;
     CasterType::Pointer caster = CasterType::New();
     caster->SetInput(mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/FiberFit/out/" + name)));

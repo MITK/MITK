@@ -24,9 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkITKImageImport.h"
 
 #include "mitkIOUtil.h"
-
-#include <itkImageFileWriter.h>
-
 #include <itkComposeImageFilter.h>
 
 

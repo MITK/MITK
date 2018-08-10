@@ -43,6 +43,7 @@ mitk::ShImageWriter::~ShImageWriter()
 template <int shOrder>
 void mitk::ShImageWriter::WriteShImage(InputType::ConstPointer input)
 {
+  mitk::LocaleSwitch localeSwitch("C");
   typename itk::ShCoefficientImageExporter< float, shOrder >::InputImageType::Pointer itk_image = itk::ShCoefficientImageExporter< float, shOrder >::InputImageType::New();
   CastToItkImage(input, itk_image);
 

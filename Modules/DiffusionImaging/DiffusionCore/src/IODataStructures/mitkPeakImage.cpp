@@ -39,6 +39,8 @@ void mitk::PeakImage::ConstructPolydata()
   if (this->GetDimensions()[3]%3!=0)
     mitkThrow() << "Fourth dimension needs to be a multiple of 3";
 
+  MITK_INFO << this->GetGeometry()->GetSpacing();
+
   typedef mitk::ImageToItk< ItkPeakImageType > CasterType;
   CasterType::Pointer caster = CasterType::New();
   caster->SetInput(this);
@@ -49,6 +51,8 @@ void mitk::PeakImage::ConstructPolydata()
   int sz_y = this->GetDimensions()[1];
   int sz_z = this->GetDimensions()[2];
   unsigned int num_dirs = this->GetDimensions()[3]/3;
+
+  MITK_INFO << itkImg->GetSpacing();
 
   double minSpacing = 1;
   ItkPeakImageType::SpacingType spacing = itkImg->GetSpacing();

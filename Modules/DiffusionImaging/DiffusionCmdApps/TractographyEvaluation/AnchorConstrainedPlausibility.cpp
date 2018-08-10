@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionDataIOHelper.h>
 
 typedef itk::Point<float, 4> PointType4;
-typedef itk::Image< float, 4 >  PeakImgType;
+typedef mitk::PeakImage::ItkPeakImageType  PeakImgType;
 typedef itk::Image< unsigned char, 3 >  ItkUcharImageType;
 
 /*!
@@ -178,6 +178,7 @@ int main(int argc, char* argv[])
       peak_image = flipper->GetOutput();
     }
 
+    mitk::LocaleSwitch localeSwitch("C");
     itk::ImageFileWriter< PeakImgType >::Pointer peak_image_writer = itk::ImageFileWriter< PeakImgType >::New();
     ofstream logfile;
     logfile.open (out_folder + "scores.txt");

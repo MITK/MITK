@@ -227,6 +227,9 @@ namespace mitk
       , m_ArtifactModelString("")
       , m_OutputPath("/tmp/")
       , m_OutputPrefix("fiberfox")
+      , m_AfterSimulationMessage("")
+      , m_BvalsFile("")
+      , m_BvecsFile("")
       , m_CheckOutputVolumeFractionsBox(false)
       , m_CheckAdvancedSignalOptionsBox(false)
       , m_DoAddNoise(false)
@@ -249,6 +252,8 @@ namespace mitk
     std::string         m_OutputPath;                       ///< Image is automatically saved to the specified folder after simulation is finished.
     std::string         m_OutputPrefix;  /** Prefix for filename of output files and logfile. */
     std::string         m_AfterSimulationMessage;           ///< Store messages that are displayed after the simulation has finished (e.g. warnings, automatic parameter adjustments etc.)
+    std::string         m_BvalsFile;
+    std::string         m_BvecsFile;
 
     /** member variables that store the check-state of GUI checkboxes */
     // image generation
@@ -305,6 +310,8 @@ namespace mitk
     void SetGradienDirections(mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientList);
     void SetBvalue(double Bvalue);
     void UpdateSignalModels();
+    void ClearFiberParameters();
+    void ClearSignalParameters();
 
     void PrintSelf();                           ///< Print parameters to stdout.
     void SaveParameters(std::string filename);  ///< Save image generation parameters to .ffp file.

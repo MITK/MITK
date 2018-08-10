@@ -8,7 +8,7 @@
     name="Fiberfox"
     category="Simulated data"
     class="QmitkFiberfoxView"
-    icon="resources/phantom.png">
+    icon="resources/models.png">
     <description>Diffusion weighted MRI data simulation tool.</description>
     <keywordReference id="org.mitk.views.fiberfoxview.Keyword"/>
     </view>
@@ -18,6 +18,14 @@
     category="Simulated data"
     class="QmitkFieldmapGeneratorView"
     icon="resources/fieldmap.png">
+    <keywordReference id="org.mitk.views.fiberfoxview.Keyword"/>
+    </view>
+
+    <view id="org.mitk.views.fibergenerationview"
+    name="Fiber Generator"
+    category="Simulated data"
+    class="QmitkFiberGenerationView"
+    icon="resources/phantom.png">
     <keywordReference id="org.mitk.views.fiberfoxview.Keyword"/>
     </view>
 

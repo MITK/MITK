@@ -81,7 +81,7 @@ double OdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
       continue;
 
     double val = odf.GetElement(i);
-    if (val>thr && gfa*val>m_AbsolutePeakThreshold)  // limit to one hemisphere ???
+    if (val>thr*0.9 && gfa*val>m_AbsolutePeakThreshold*0.9)
     {
       flag = true;
       std::vector< int > neighbours = odf.GetNeighbors(i);
@@ -244,7 +244,7 @@ void OdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
     }
 
     std::vector< DirectionType > candidates, final_peaks;
-    double scale = FindCandidatePeaks(odf, max*m_RelativePeakThreshold*0.9, candidates);       // find all local maxima
+    double scale = FindCandidatePeaks(odf, max*m_RelativePeakThreshold, candidates);       // find all local maxima
 
     max = 0;
     for (unsigned int i=0; i<candidates.size(); ++i)

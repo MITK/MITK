@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.h"
 
 #include "src/internal/QmitkFiberfoxView.h"
+#include "src/internal/QmitkFiberGenerationView.h"
 #include "src/internal/QmitkFieldmapGeneratorView.h"
 
 ctkPluginContext* mitk::PluginActivator::m_Context = nullptr;
@@ -34,6 +35,7 @@ void mitk::PluginActivator::start(ctkPluginContext* context)
   
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberfoxView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFieldmapGeneratorView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberGenerationView, context)
   m_Context = context;
 }
 

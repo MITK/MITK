@@ -39,10 +39,10 @@ MITK Diffusion consists of multiple components with their own documentation:
 
 \subsection sub5 Fiberfox dMRI Simulation
 \li \subpage org_mitk_views_fiberfoxview
+\li \subpage org_mitk_views_fibergenerationview
 \li \subpage org_mitk_views_fieldmapgenerator
 
-\subsection sub6 TBSS and Connectomics
-\li \subpage org_mitk_views_tractbasedspatialstatistics
+\subsection sub6 Connectomics
 \li \subpage org_mitk_diffusionimagingapp_perspectives_connectomics
 
 */

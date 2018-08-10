@@ -10,7 +10,7 @@ This view provides tools to derive additional information (such as tract density
 
 \section SecFDI Fiber-derived Images
 
-- Tract density image: Generate a 2D heatmap from a fiber bundle.
+- Tract density image: The voxel values correspond to the sum of all fiber segment lengths in the respective voxel.
 - Normalized TDI: 0-1 normalized version of the TDI.
 - Binary envelope: Generate a binary segmentation from the input tractogram.
 - Fiber bundle image: Generate a 2D rgba image representation of the fiber bundle.

@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <mitkImageCast.h>
 #include <itkImageFileWriter.h>
+#include <mitkLocaleSwitch.h>
 
 class mitkFiberFitTestSuite : public mitk::TestFixture
 {

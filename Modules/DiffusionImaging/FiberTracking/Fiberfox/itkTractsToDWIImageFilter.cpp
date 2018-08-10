@@ -843,7 +843,8 @@ void TractsToDWIImageFilter< PixelType >::InitializeFiberData()
 template< class PixelType >
 bool TractsToDWIImageFilter< PixelType >::PrepareLogFile()
 {
-  assert( ! m_Logfile.is_open() );
+  if(m_Logfile.is_open())
+    m_Logfile.close();
 
   std::string filePath;
   std::string fileName;
@@ -1399,7 +1400,8 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     PrintToLog(m_SpikeLog, false, false);
   }
 
-  if (m_Logfile.is_open()) m_Logfile.close();
+  if (m_Logfile.is_open())
+    m_Logfile.close();
 }
 
 

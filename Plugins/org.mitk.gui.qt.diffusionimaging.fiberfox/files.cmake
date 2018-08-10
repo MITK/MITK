@@ -11,6 +11,7 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   QmitkFiberfoxView.cpp
   QmitkFieldmapGeneratorView.cpp
+  QmitkFiberGenerationView.cpp
   mitkPluginActivator.cpp
   
   Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.cpp
@@ -19,6 +20,7 @@ set(INTERNAL_CPP_FILES
 set(UI_FILES  
   src/internal/QmitkFiberfoxViewControls.ui
   src/internal/QmitkFieldmapGeneratorViewControls.ui
+  src/internal/QmitkFiberGenerationViewControls.ui
   
   src/QmitkTensorModelParametersWidgetControls.ui
   src/QmitkZeppelinModelParametersWidgetControls.ui
@@ -33,6 +35,7 @@ set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   src/internal/QmitkFiberfoxView.h
   src/internal/QmitkFieldmapGeneratorView.h
+  src/internal/QmitkFiberGenerationView.h
   
   src/QmitkTensorModelParametersWidget.h
   src/QmitkZeppelinModelParametersWidget.h
@@ -51,6 +54,7 @@ set(CACHED_RESOURCE_FILES
   resources/phantom.png
   resources/syntheticdata.png
   resources/fieldmap.png
+  resources/models.png
 )
 
 set(QRC_FILES

@@ -28,7 +28,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::FiberfoxParameters::FiberfoxParameters()
   : m_NoiseModel(nullptr)
 {
+  mitk::StickModel<ScalarType>* model_aniso = new mitk::StickModel<ScalarType>();
+  model_aniso->m_CompartmentId = 1;
+  m_FiberModelList.push_back(model_aniso);
 
+  mitk::BallModel<ScalarType>* model_iso = new mitk::BallModel<ScalarType>();
+  model_iso->m_CompartmentId = 3;
+  m_NonFiberModelList.push_back(model_iso);
 }
 
 mitk::FiberfoxParameters::FiberfoxParameters(const mitk::FiberfoxParameters& params)
@@ -76,6 +82,23 @@ mitk::FiberfoxParameters::FiberfoxParameters(const mitk::FiberfoxParameters& par
   }
 }
 
+
+void mitk::FiberfoxParameters::ClearFiberParameters()
+{
+  m_Misc = MiscFiberfoxParameters();
+  m_FiberGen = FiberGenerationParameters();
+}
+
+void mitk::FiberfoxParameters::ClearSignalParameters()
+{
+  m_Misc = MiscFiberfoxParameters();
+  m_SignalGen = SignalGenerationParameters();
+
+  m_FiberModelList.clear();
+  m_NonFiberModelList.clear();
+  m_NoiseModel = nullptr;
+  m_MissingTags = "";
+}
 
 mitk::FiberfoxParameters::~FiberfoxParameters()
 {
@@ -711,7 +734,9 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename)
 
       if (itksys::SystemTools::FileExists(filename+".bvals") && itksys::SystemTools::FileExists(filename+".bvecs"))
       {
-        m_SignalGen.SetGradienDirections( mitk::gradients::ReadBvalsBvecs(filename+".bvals", filename+".bvecs", m_SignalGen.m_Bvalue) );
+        m_Misc.m_BvalsFile = filename+".bvals";
+        m_Misc.m_BvecsFile = filename+".bvecs";
+        m_SignalGen.SetGradienDirections( mitk::gradients::ReadBvalsBvecs(m_Misc.m_BvalsFile, m_Misc.m_BvecsFile, m_SignalGen.m_Bvalue) );
       }
       else
       {

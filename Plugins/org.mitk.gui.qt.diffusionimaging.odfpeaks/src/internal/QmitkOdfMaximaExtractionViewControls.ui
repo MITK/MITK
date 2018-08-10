@@ -302,7 +302,7 @@ QGroupBox {
             <bool>true</bool>
            </property>
            <property name="toolTip">
-            <string>Absolute peak threshold (only used for the finite differences method). The value is additionally scaled by 1/GFA.</string>
+            <string>Absolute threshold on the peak magnitudes.</string>
            </property>
            <property name="decimals">
             <number>3</number>
@@ -350,7 +350,7 @@ QGroupBox {
          <item row="5" column="1">
           <widget class="QSpinBox" name="m_AngularThreshold">
            <property name="toolTip">
-            <string>Discard smaller peaks in the defined angle around the maximum peaks that were too far away to be clustered.</string>
+            <string>Discard peaks that er closer to a larger peak.</string>
            </property>
            <property name="minimum">
             <number>0</number>
@@ -386,6 +386,9 @@ QGroupBox {
          </item>
          <item row="6" column="1">
           <widget class="QCheckBox" name="m_ScaleByGfaBox">
+           <property name="toolTip">
+            <string>Scale ODF values and successively the peaks by the GFA in the respective voxels.</string>
+           </property>
            <property name="text">
             <string/>
            </property>

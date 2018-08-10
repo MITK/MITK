@@ -15,7 +15,7 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag 0c2a619a)
+    set(revision_tag fc06bedc) # Revision currently points to commit in https://github.com/kislinsk/CTK.git
 
     set(ctk_optional_cache_args )
     if(MITK_USE_Python)
@@ -57,7 +57,7 @@ if(MITK_USE_CTK)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 e1f94ba0199eccf335ec2c2b48e155da
+      URL_MD5 c500f54dd6d2ce2803d705cbb663d2f2
       # PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""

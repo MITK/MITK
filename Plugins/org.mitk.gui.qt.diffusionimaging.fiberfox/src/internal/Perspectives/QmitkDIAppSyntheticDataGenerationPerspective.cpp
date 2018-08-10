@@ -45,5 +45,6 @@ void QmitkDIAppSyntheticDataGenerationPerspective::CreateInitialLayout(berry::IP
   /////////////////////////////////////////////
 
   left->AddView("org.mitk.views.fiberfoxview");
+  left->AddView("org.mitk.views.fibergenerationview");
   left->AddView("org.mitk.views.fieldmapgenerator");
 }

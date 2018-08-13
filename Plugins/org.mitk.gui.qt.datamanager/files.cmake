@@ -6,14 +6,12 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  QmitkInfoDialog.cpp
   QmitkDataManagerItemDelegate.cpp
 )
 
 set(MOC_H_FILES
   src/QmitkDataManagerView.h
   src/QmitkDataManagerPreferencePage.h
-  src/internal/QmitkInfoDialog.h
   src/internal/QmitkDataManagerItemDelegate.h
   src/internal/mitkPluginActivator.h
 )

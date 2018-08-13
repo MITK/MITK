@@ -2,12 +2,10 @@ set(SRC_CPP_FILES
   berrySingleNodeSelection.cpp
   QmitkDataManagerView.cpp
   QmitkDataManagerPreferencePage.cpp
-  QmitkDataManagerHotkeysPrefPage.cpp
 )
 
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  QmitkNodeTableViewKeyFilter.cpp
   QmitkInfoDialog.cpp
   QmitkDataManagerItemDelegate.cpp
 )
@@ -15,8 +13,6 @@ set(INTERNAL_CPP_FILES
 set(MOC_H_FILES
   src/QmitkDataManagerView.h
   src/QmitkDataManagerPreferencePage.h
-  src/QmitkDataManagerHotkeysPrefPage.h
-  src/internal/QmitkNodeTableViewKeyFilter.h
   src/internal/QmitkInfoDialog.h
   src/internal/QmitkDataManagerItemDelegate.h
   src/internal/mitkPluginActivator.h

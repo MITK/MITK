@@ -24,6 +24,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QAction>
 
+namespace ToggleVisibilityAction
+{
+  MITK_QT_APP void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, QList<mitk::DataNode::Pointer> selectedNodes = QList<mitk::DataNode::Pointer>());
+}
+
 class MITK_QT_APP QmitkDataNodeToggleVisibilityAction : public QAction, public QmitkAbstractDataNodeAction
 {
   Q_OBJECT

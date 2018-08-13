@@ -131,10 +131,6 @@ protected:
   /// saves the current amount of rows shown in the data manager
   size_t m_CurrentRowCount;
 
-  /// if true, GlobalReinit() is called if a node is deleted
-  bool m_GlobalReinitOnNodeDelete;
-  bool m_GlobalReinitOnNodeVisibilityChanged;
-
   QmitkDataManagerItemDelegate* m_ItemDelegate;
 
 private:

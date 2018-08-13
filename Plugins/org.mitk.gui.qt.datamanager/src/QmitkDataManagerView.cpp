@@ -64,6 +64,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk gui qt application plugin
 #include <QmitkDataNodeGlobalReinitAction.h>
+#include <QmitkDataNodeToggleVisibilityAction.h>
 
 // mitk gui qt common plugin
 #include <QmitkDnDFrameWidget.h>
@@ -83,9 +84,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const QString QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
 
 QmitkDataManagerView::QmitkDataManagerView()
-  : m_GlobalReinitOnNodeDelete(true)
-  , m_GlobalReinitOnNodeVisibilityChanged(false)
-  , m_ItemDelegate(nullptr)
+  : m_ItemDelegate(nullptr)
 {
 }
 
@@ -219,10 +218,6 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
       m_FilterModel->RemoveFilterPredicate(m_NodeWithNoDataFilterPredicate);
     }
   }
-
-  m_GlobalReinitOnNodeDelete = prefs->GetBool("Call global reinit if node is deleted", true);
-  m_GlobalReinitOnNodeVisibilityChanged = prefs->GetBool("Call global reinit if node visibility is changed", false);
-
   m_NodeTreeView->expandAll();
 
   m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
@@ -270,14 +265,7 @@ void QmitkDataManagerView::NodeSelectionChanged(const QItemSelection& /*selected
 
 void QmitkDataManagerView::OnNodeVisibilityChanged()
 {
-  if (m_GlobalReinitOnNodeVisibilityChanged)
-  {
-    GlobalReinitAction::Run(GetSite(), GetDataStorage());
-  }
-  else
-  {
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
+  ToggleVisibilityAction::Run(GetSite(), GetDataStorage());
 }
 
 void QmitkDataManagerView::ShowIn(const QString& editorId)

@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk gui common plugin
 #include <mitkWorkbenchUtil.h>
 
+const QString QmitkDataNodeGlobalReinitAction::ACTION_ID = "org.mitk.gui.qt.application.globalreinitaction";
+
 // namespace that contains the concrete action
 namespace GlobalReinitAction
 {

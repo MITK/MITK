@@ -35,6 +35,8 @@ class MITK_QT_APP QmitkDataNodeGlobalReinitAction : public QAction, public Qmitk
 
 public:
 
+  static const QString ACTION_ID; // = "org.mitk.gui.qt.application.globalreinitaction";
+
   QmitkDataNodeGlobalReinitAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeGlobalReinitAction(QObject* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 

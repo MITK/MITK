@@ -104,36 +104,36 @@ void QmitkDataNodeContextMenu::InitDefaultActions()
 {
   m_GlobalReinitAction = new QmitkDataNodeGlobalReinitAction(m_Parent, m_WorkbenchPartSite.Lock());
   m_GlobalReinitAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"));
-  m_UnknownDataNodeDescriptor->AddAction(m_GlobalReinitAction);
+  m_UnknownDataNodeDescriptor->AddAction(m_GlobalReinitAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_GlobalReinitAction));
 
   m_ReinitAction = new QmitkDataNodeReinitAction(m_Parent, m_WorkbenchPartSite.Lock());
   m_ReinitAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"));
-  m_UnknownDataNodeDescriptor->AddAction(m_ReinitAction);
+  m_UnknownDataNodeDescriptor->AddAction(m_ReinitAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ReinitAction));
 
   QAction* saveAction = new QmitkFileSaveAction(QIcon(":/org.mitk.gui.qt.datamanager/Save_48.png"), m_WorkbenchPartSite.Lock()->GetWorkbenchWindow());
-  m_UnknownDataNodeDescriptor->AddAction(saveAction);
+  m_UnknownDataNodeDescriptor->AddAction(saveAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, saveAction));
 
   m_RemoveAction = new QmitkDataNodeRemoveAction(m_Parent, m_WorkbenchPartSite.Lock());
   m_RemoveAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/Remove_48.png"));
-  m_UnknownDataNodeDescriptor->AddAction(m_RemoveAction);
+  m_UnknownDataNodeDescriptor->AddAction(m_RemoveAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_RemoveAction));
 
   m_ShowSelectedNodesAction = new QmitkDataNodeShowSelectedNodesAction(m_Parent, m_WorkbenchPartSite.Lock());
   m_RemoveAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/ShowSelectedNode_48.png"));
-  m_UnknownDataNodeDescriptor->AddAction(m_ShowSelectedNodesAction);
+  m_UnknownDataNodeDescriptor->AddAction(m_ShowSelectedNodesAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ShowSelectedNodesAction));
 
   m_ToggleVisibilityAction = new QmitkDataNodeToggleVisibilityAction(m_Parent, m_WorkbenchPartSite.Lock());
   m_ToggleVisibilityAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/InvertShowSelectedNode_48.png"));
-  m_UnknownDataNodeDescriptor->AddAction(m_ToggleVisibilityAction);
+  m_UnknownDataNodeDescriptor->AddAction(m_ToggleVisibilityAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ToggleVisibilityAction));
 
   m_ShowDetailsAction = new QmitkDataNodeShowDetailsAction(m_Parent, m_WorkbenchPartSite.Lock());
   m_ShowDetailsAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/ShowDataInfo_48.png"));
-  m_UnknownDataNodeDescriptor->AddAction(m_ShowDetailsAction);
+  m_UnknownDataNodeDescriptor->AddAction(m_ShowDetailsAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ShowDetailsAction));
 
   // default widget actions

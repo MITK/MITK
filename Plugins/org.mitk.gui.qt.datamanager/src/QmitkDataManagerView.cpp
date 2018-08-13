@@ -16,21 +16,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkDataManagerView.h"
 
-//# Own Includes
-//## mitk
-#include "mitkDataStorageEditorInput.h"
-#include "mitkIDataStorageReference.h"
-#include "mitkNodePredicateDataType.h"
-#include "mitkCoreObjectFactory.h"
-#include "mitkColorProperty.h"
-#include "mitkCommon.h"
-#include "mitkNodePredicateData.h"
-#include "mitkNodePredicateNot.h"
-#include "mitkNodePredicateOr.h"
-#include "mitkNodePredicateProperty.h"
-#include "mitkEnumerationProperty.h"
-#include "mitkLookupTableProperty.h"
-#include "mitkProperties.h"
+// mitk gui qt datamanager
+#include "src/internal/QmitkDataManagerItemDelegate.h"
+
+// mitk core
+#include <mitkCommon.h>
+#include <mitkCoreObjectFactory.h>
+#include <mitkEnumerationProperty.h>
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
+#include <mitkLookupTableProperty.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkITKImageImport.h>
 #include <mitkIDataStorageService.h>

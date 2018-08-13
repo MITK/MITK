@@ -14,6 +14,7 @@ set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_application_Activator.cpp
   QmitkEditorsPreferencePage.cpp
   QmitkGeneralPreferencePage.cpp
+  QmitkInfoDialog.cpp
   QmitkShowPreferencePageHandler.cpp
 )
 
@@ -29,6 +30,7 @@ set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_application_Activator.h
   src/internal/QmitkEditorsPreferencePage.h
   src/internal/QmitkGeneralPreferencePage.h
+  src/internal/QmitkInfoDialog.h
   src/internal/QmitkShowPreferencePageHandler.h
 )
 

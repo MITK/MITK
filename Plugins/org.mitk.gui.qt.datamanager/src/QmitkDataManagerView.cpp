@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDataManagerView.h"
 
 // mitk gui qt datamanager
-#include "src/internal/QmitkInfoDialog.h"
 #include "src/internal/QmitkDataManagerItemDelegate.h"
 
 // mitk core

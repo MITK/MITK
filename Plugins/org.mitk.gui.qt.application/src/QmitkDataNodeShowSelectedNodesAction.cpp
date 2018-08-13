@@ -47,18 +47,22 @@ void QmitkDataNodeShowSelectedNodesAction::InitializeAction()
 
 void QmitkDataNodeShowSelectedNodesAction::OnActionTriggered(bool checked)
 {
-  if (!m_DataStorage.IsExpired())
+  if (m_DataStorage.IsExpired())
   {
-    auto selectedNodes = GetSelectedNodes();
-    auto nodeset = m_DataStorage.Lock()->GetAll();
-    for (auto& node : *nodeset)
-    {
-      if (node.IsNotNull())
-      {
-        node->SetVisibility(selectedNodes.contains(node));
-      }
-    }
-
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    return;
   }
+
+  auto dataStorage = m_DataStorage.Lock();
+
+  auto selectedNodes = GetSelectedNodes();
+  auto nodeset = dataStorage->GetAll();
+  for (auto& node : *nodeset)
+  {
+    if (node.IsNotNull())
+    {
+      node->SetVisibility(selectedNodes.contains(node));
+    }
+  }
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

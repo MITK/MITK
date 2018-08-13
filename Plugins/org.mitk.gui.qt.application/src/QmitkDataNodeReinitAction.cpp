@@ -78,11 +78,23 @@ void QmitkDataNodeReinitAction::OnActionTriggered(bool checked)
 
   auto dataStorage = m_DataStorage.Lock();
 
-  auto boundingBoxPredicate = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
-  auto selectedpredicate = mitk::NodePredicateProperty::New("selected", mitk::BoolProperty::New(true));
-  auto selectedNodesIncludedInBoundingBox = mitk::NodePredicateAnd::New(boundingBoxPredicate, selectedpredicate);
+  auto dataNodes = GetSelectedNodes();
+  if (dataNodes.isEmpty())
+  {
+    return;
+  }
 
-  auto nodes = dataStorage->GetSubset(selectedNodesIncludedInBoundingBox);
+  auto boundingBoxPredicate = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
+
+  mitk::DataStorage::SetOfObjects::Pointer nodes = mitk::DataStorage::SetOfObjects::New();
+  for (const auto& dataNode : dataNodes)
+  {
+    if (boundingBoxPredicate->CheckNode(dataNode))
+    {
+      nodes->InsertElement(nodes->Size(), dataNode);
+    }
+  }
+
   if (nodes->empty())
   {
     return;

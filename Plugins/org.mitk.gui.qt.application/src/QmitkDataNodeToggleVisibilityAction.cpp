@@ -20,6 +20,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk core
 #include <mitkRenderingManager.h>
 
+// berry
+#include <berryIPreferences.h>
+#include <berryIPreferencesService.h>
+#include <berryPlatform.h>
+
+// namespace that contains the concrete action
+namespace ToggleVisibilityAction
+{
+  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, QList<mitk::DataNode::Pointer> selectedNodes /* = QList<mitk::DataNode::Pointer>()*/)
+  {
+    bool isVisible;
+    for (auto& node : selectedNodes)
+    {
+      if (node.IsNotNull())
+      {
+        isVisible = false;
+        node->GetBoolProperty("visible", isVisible);
+        node->SetVisibility(!isVisible);
+      }
+    }
+
+    berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+    berry::IPreferences::Pointer preferencesNode = prefService->GetSystemPreferences()->Node(QmitkDataNodeGlobalReinitAction::ACTION_ID);
+
+    bool globalReinit = preferencesNode->GetBool("Call global reinit if node visibility is changed", false);
+    if (globalReinit)
+    {
+      GlobalReinitAction::Run(workbenchPartSite, dataStorage);
+    }
+    else
+    {
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+  }
+}
+
 QmitkDataNodeToggleVisibilityAction::QmitkDataNodeToggleVisibilityAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
   : QAction(parent)
   , QmitkAbstractDataNodeAction(workbenchpartSite)
@@ -48,24 +84,16 @@ void QmitkDataNodeToggleVisibilityAction::InitializeAction()
 
 void QmitkDataNodeToggleVisibilityAction::OnActionTriggered(bool checked)
 {
-  auto selectedNodes = GetSelectedNodes();
-  bool isVisible;
-  for (auto node : selectedNodes)
+  if (m_WorkbenchPartSite.Expired())
   {
-    if (node.IsNotNull())
-    {
-      isVisible = false;
-      node->GetBoolProperty("visible", isVisible);
-      node->SetVisibility(!isVisible);
-    }
+    return;
   }
 
-  if (false)//m_GlobalReinitOnNodeVisibilityChanged)
+  if (m_DataStorage.IsExpired())
   {
-    GlobalReinitAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock());
+    return;
   }
-  else
-  {
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
+
+  auto selectedNodes = GetSelectedNodes();
+  ToggleVisibilityAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock(), selectedNodes);
 }

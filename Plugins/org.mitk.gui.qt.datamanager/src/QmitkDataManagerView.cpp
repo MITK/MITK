@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDataManagerView.h"
 
 // mitk gui qt datamanager
-#include "src/internal/QmitkNodeTableViewKeyFilter.h"
 #include "src/internal/QmitkInfoDialog.h"
 #include "src/internal/QmitkDataManagerItemDelegate.h"
 
@@ -37,10 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 #include <mitkRenderingModeProperty.h>
 
-// mitk core services plugin
-#include <mitkIDataStorageReference.h>
-#include <mitkIDataStorageService.h>
-
 // qt widgets module
 #include <QmitkCustomVariants.h>
 #include <QmitkDataStorageFilterProxyModel.h>
@@ -59,9 +54,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatform.h>
 #include <berryPlatformUI.h>
 
+// mitk core services plugin
+#include <mitkIDataStorageReference.h>
+#include <mitkIDataStorageService.h>
+
+// mitk gui common plugin
+#include <mitkDataNodeObject.h>
+#include <mitkDataStorageEditorInput.h>
+#include <mitkIRenderingManager.h>
 
 // mitk gui qt application plugin
 #include <QmitkDataNodeGlobalReinitAction.h>
+
+// mitk gui qt common plugin
+#include <QmitkDnDFrameWidget.h>
+
 // qt
 #include <QGridLayout>
 #include <QVBoxLayout>
@@ -73,14 +80,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSignalMapper>
-
-// mitk gui common plugin
-#include <mitkDataNodeObject.h>
-#include <mitkDataStorageEditorInput.h>
-#include <mitkIRenderingManager.h>
-
-// mitk gui qt common plugin
-#include <QmitkDnDFrameWidget.h>
 
 const QString QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
 
@@ -134,7 +133,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
   m_NodeTreeView->setModel(m_FilterModel);
   m_NodeTreeView->setTextElideMode(Qt::ElideMiddle);
-  m_NodeTreeView->installEventFilter(new QmitkNodeTableViewKeyFilter(this));
 
   m_ItemDelegate = new QmitkDataManagerItemDelegate(m_NodeTreeView);
   m_NodeTreeView->setItemDelegate(m_ItemDelegate);

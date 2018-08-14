@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 
 #include <mitkColorProperty.h>
+#include <mitkCrosshairManager.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 
@@ -254,17 +255,7 @@ void QmitkStdMultiWidgetEditor::EnableSlicingPlanes(bool enable)
 
 bool QmitkStdMultiWidgetEditor::IsSlicingPlanesEnabled() const
 {
-  mitk::DataNode::Pointer node = this->d->m_StdMultiWidget->GetWidgetPlane1();
-  if (node.IsNotNull())
-  {
-    bool visible = false;
-    node->GetVisibility(visible, 0);
-    return visible;
-  }
-  else
-  {
-    return false;
-  }
+  return this->d->m_StdMultiWidget->crosshairManager->getCrosshairMode() != CrosshairMode::NONE;
 }
 
 void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
@@ -398,11 +389,16 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   d->m_StdMultiWidget->SetDecorationColor(2, colorDecorationWidget3);
   d->m_StdMultiWidget->SetDecorationColor(3, colorDecorationWidget4);
 
-  //The crosshair gap
-  int crosshairgapsize = prefs->GetInt("crosshair gap size", 32);
-  d->m_StdMultiWidget->GetWidgetPlane1()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
-  d->m_StdMultiWidget->GetWidgetPlane2()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
-  d->m_StdMultiWidget->GetWidgetPlane3()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
+  std::vector<mitk::Color> colors;
+  colors.push_back(colorDecorationWidget1);
+  colors.push_back(colorDecorationWidget2);
+  colors.push_back(colorDecorationWidget3);
+  colors.push_back(colorDecorationWidget4);
+
+  d->m_StdMultiWidget->crosshairManager->setWindowsColors(colors);
+
+  // Crosshair gap
+  d->m_StdMultiWidget->crosshairManager->setCrosshairGap(prefs->GetInt("crosshair gap size", 32));
 
   //refresh colors of rectangles
   d->m_StdMultiWidget->EnableColoredRectangles();
@@ -440,6 +436,7 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   d->m_StdMultiWidget->GetMouseModeSwitcher()->SetInteractionScheme( /*newMode ? mitk::MouseModeSwitcher::PACS :*/ mitk::MouseModeSwitcher::MITK);
 
   mitk::DisplayInteractor::SetClockRotationSpeed(prefs->GetInt("Rotation Step", 90));
+  d->m_StdMultiWidget->crosshairManager->updateAllWindows();
 }
 
 mitk::Color QmitkStdMultiWidgetEditor::HexColorToMitkColor(const QString& widgetColorInHex)

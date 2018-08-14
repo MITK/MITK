@@ -41,6 +41,7 @@ namespace mitk {
   * The plane bounds are computed using either ReferenceGeometry if it is present or
   * the plane geometry itself otherwise.
   * The mapper offers the following properties:
+  * \b Crosshair.Render 2D: Render crosshair in 2D
   * \b Crosshair.Line width: The thickness of the crosshair.
   * \b Crosshair.Gap Size: The gap between the lines in pixels.
   * \b Crosshair.Orientation Decoration: Adds a PlaneOrientationProperty, which

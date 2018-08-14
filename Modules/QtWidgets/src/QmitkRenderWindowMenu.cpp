@@ -767,21 +767,6 @@ void QmitkRenderWindowMenu::OnCrosshairRotationModeSelected(QAction* action)
   emit ChangeCrosshairRotationMode( action->data().toInt() );
 }
 
-void QmitkRenderWindowMenu::SetCrossHairVisibility( bool state )
-{
-  if(m_Renderer.IsNotNull())
-  {
-    mitk::DataNode *n;
-    if(this->m_MultiWidget)
-    {
-      n = this->m_MultiWidget->GetWidgetPlane1(); if(n) n->SetVisibility(state);
-      n = this->m_MultiWidget->GetWidgetPlane2(); if(n) n->SetVisibility(state);
-      n = this->m_MultiWidget->GetWidgetPlane3(); if(n) n->SetVisibility(state);
-      m_Renderer->GetRenderingManager()->RequestUpdateAll();
-    }
-  }
-}
-
 void QmitkRenderWindowMenu::OnTSNumChanged(int num)
 {
   MITK_DEBUG << "Thickslices num: " << num << " on renderer " << m_Renderer.GetPointer();
@@ -818,31 +803,6 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
   resetViewAction->setText(tr("Reset view"));
   crosshairModesMenu->addAction( resetViewAction );
   connect( resetViewAction, SIGNAL(triggered()), this, SIGNAL(ResetView()));
-
-  // Show hide crosshairs
-  {
-    bool currentState = true;
-
-    if(m_Renderer.IsNotNull())
-    {
-      mitk::DataStorage *ds=m_Renderer->GetDataStorage();
-      mitk::DataNode *n;
-      if(ds)
-      {
-        n = this->m_MultiWidget->GetWidgetPlane1(); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
-        n = this->m_MultiWidget->GetWidgetPlane2(); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
-        n = this->m_MultiWidget->GetWidgetPlane3(); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
-      }
-    }
-
-
-    QAction* showHideCrosshairVisibilityAction = new QAction(crosshairModesMenu);
-    showHideCrosshairVisibilityAction->setText(tr("Show crosshair"));
-    showHideCrosshairVisibilityAction->setCheckable(true);
-    showHideCrosshairVisibilityAction->setChecked(currentState);
-    crosshairModesMenu->addAction( showHideCrosshairVisibilityAction );
-    connect( showHideCrosshairVisibilityAction, SIGNAL(toggled(bool)), this, SLOT(SetCrossHairVisibility(bool)));
-  }
 
   // Rotation mode
   {

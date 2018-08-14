@@ -216,7 +216,14 @@ namespace mitk
     m_ImageAssembly->GetParts()->RemoveAllItems();
 
     bool visible = true;
+    bool render3d = true;
+
     GetDataNode()->GetVisibility(visible, renderer, "visible");
+    GetDataNode()->GetBoolProperty("Crosshair.Render 3D", render3d, renderer);
+
+    if (!render3d) {
+      return;
+    }
 
     if ( !visible )
     {

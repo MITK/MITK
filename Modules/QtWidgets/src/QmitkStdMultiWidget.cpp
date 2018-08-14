@@ -46,6 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVtkLayerController.h>
 #include <mitkCameraController.h>
 #include <mitkDataNodePickingEventObserver.h>
+#include <mitkStandaloneDataStorage.h>
 
 #include <vtkRendererCollection.h>
 #include <vtkTextProperty.h>
@@ -255,6 +256,17 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
 
 void QmitkStdMultiWidget::InitializeWidget()
 {
+  crosshairManager = new mitkCrosshairManager();
+  crosshairManager->removeAll();
+  crosshairManager->setShowSelectedOnly(false);
+  crosshairManager->setShowSelectedOnly(false);
+  crosshairManager->setShowPlanesIn3d(true);
+  crosshairManager->setShowPlanesIn3dWithoutCursor(false);
+  crosshairManager->setUseWindowsColors(true);
+  crosshairManager->setUseCrosshairGap(true);
+  crosshairManager->setCrosshairGap(32);
+  crosshairManager->setSingleDataStorage(true);
+
   //Make all black and overwrite renderwindow 4
   this->FillGradientBackgroundWithBlack();
   //This is #191919 in hex
@@ -270,28 +282,6 @@ void QmitkStdMultiWidget::InitializeWidget()
 
   // transfer colors in WorldGeometry-Nodes of the associated Renderer
   mitk::IntProperty::Pointer  layer;
-  // of widget 1
-  m_PlaneNode1 = mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
-  m_PlaneNode1->SetColor(GetDecorationColor(0));
-  layer = mitk::IntProperty::New(1000);
-  m_PlaneNode1->SetProperty("layer",layer);
-
-  // ... of widget 2
-  m_PlaneNode2 = mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
-  m_PlaneNode2->SetColor(GetDecorationColor(1));
-  layer = mitk::IntProperty::New(1000);
-  m_PlaneNode2->SetProperty("layer",layer);
-
-  // ... of widget 3
-  m_PlaneNode3 = mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
-  m_PlaneNode3->SetColor(GetDecorationColor(2));
-  layer = mitk::IntProperty::New(1000);
-  m_PlaneNode3->SetProperty("layer",layer);
-
-  //The parent node
-  m_ParentNodeForGeometryPlanes = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->GetCurrentWorldPlaneGeometryNode();
-  layer = mitk::IntProperty::New(1000);
-  m_ParentNodeForGeometryPlanes->SetProperty("layer",layer);
 
   mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();
   mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetOverlayManager(OverlayManager);
@@ -322,6 +312,12 @@ void QmitkStdMultiWidget::InitializeWidget()
   SetDecorationProperties(sagittalCornerAnnotation, GetDecorationColor(1), 1);
   SetDecorationProperties(coronalCornerAnnotation, GetDecorationColor(2), 2);
   SetDecorationProperties(cornerAnnotation3D, GetDecorationColor(3), 3);
+
+  std::vector<mitk::Color> colors;
+  for (int i = 0; i < 4; i++) {
+    colors.push_back(GetDecorationColor(i));
+  }
+  crosshairManager->setWindowsColors(colors);
 
   for(int i = 0; i < 4; i++) {
     cornerText[i] = vtkCornerAnnotation::New();
@@ -366,6 +362,10 @@ void QmitkStdMultiWidget::InitializeWidget()
   mitkWidget1->GetSliceNavigationController()->crosshairPositionEvent.AddListener(mitk::MessageDelegate<QmitkStdMultiWidget>(this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent));
   mitkWidget2->GetSliceNavigationController()->crosshairPositionEvent.AddListener(mitk::MessageDelegate<QmitkStdMultiWidget>(this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent));
   mitkWidget3->GetSliceNavigationController()->crosshairPositionEvent.AddListener(mitk::MessageDelegate<QmitkStdMultiWidget>(this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent));
+
+  for (unsigned int i = 0; i < 4; i++) {
+    crosshairManager->addWindow(GetRenderWindow(i));
+  }
 }
 
 void QmitkStdMultiWidget::FillGradientBackgroundWithBlack()
@@ -396,45 +396,20 @@ mitk::Color QmitkStdMultiWidget::GetDecorationColor(unsigned int widgetNumber)
   //internal member here.
   //Default colors were chosen for decent visibitliy.
   //Feel free to change your preferences in the workbench.
-  float tmp[3] = {0.0f,0.0f,0.0f};
   switch (widgetNumber) {
   case 0:
   {
-    if(m_PlaneNode1.IsNotNull())
-    {
-      if(m_PlaneNode1->GetColor(tmp))
-      {
-        return dynamic_cast<mitk::ColorProperty*>(
-              m_PlaneNode1->GetProperty("color"))->GetColor();
-      }
-    }
-    float red[3] = { 0.753f, 0.0f, 0.0f};//This is #C00000 in hex
+    float red[3] = { .753, 0., 0.};//This is #00B000 in hex
     return mitk::Color(red);
   }
   case 1:
   {
-    if(m_PlaneNode2.IsNotNull())
-    {
-      if(m_PlaneNode2->GetColor(tmp))
-      {
-        return dynamic_cast<mitk::ColorProperty*>(
-              m_PlaneNode2->GetProperty("color"))->GetColor();
-      }
-    }
-    float green[3] = { 0.0f, 0.69f, 0.0f};//This is #00B000 in hex
+    float green[3] = { 0., .69, 0.};//This is #00B000 in hex
     return mitk::Color(green);
   }
   case 2:
   {
-    if(m_PlaneNode3.IsNotNull())
-    {
-      if(m_PlaneNode3->GetColor(tmp))
-      {
-        return dynamic_cast<mitk::ColorProperty*>(
-              m_PlaneNode3->GetProperty("color"))->GetColor();
-      }
-    }
-    float blue[3] = { 0.0, 0.502f, 1.0f};//This is #0080FF in hex
+    float blue[3] = { 0., .502, 1.};//This is #0080FF in hex
     return mitk::Color(blue);
   }
   case 3:
@@ -482,30 +457,10 @@ QmitkStdMultiWidget::~QmitkStdMultiWidget()
 
 void QmitkStdMultiWidget::RemovePlanesFromDataStorage()
 {
-  if (m_PlaneNode1.IsNotNull() && m_PlaneNode2.IsNotNull() && m_PlaneNode3.IsNotNull() && m_ParentNodeForGeometryPlanes.IsNotNull())
-  {
-    if(m_DataStorage.IsNotNull())
-    {
-      m_DataStorage->Remove(m_PlaneNode1);
-      m_DataStorage->Remove(m_PlaneNode2);
-      m_DataStorage->Remove(m_PlaneNode3);
-      m_DataStorage->Remove(m_ParentNodeForGeometryPlanes);
-    }
-  }
 }
 
 void QmitkStdMultiWidget::AddPlanesToDataStorage()
 {
-  if (m_PlaneNode1.IsNotNull() && m_PlaneNode2.IsNotNull() && m_PlaneNode3.IsNotNull() && m_ParentNodeForGeometryPlanes.IsNotNull())
-  {
-    if (m_DataStorage.IsNotNull())
-    {
-      m_DataStorage->Add(m_ParentNodeForGeometryPlanes);
-      m_DataStorage->Add(m_PlaneNode1, m_ParentNodeForGeometryPlanes);
-      m_DataStorage->Add(m_PlaneNode2, m_ParentNodeForGeometryPlanes);
-      m_DataStorage->Add(m_PlaneNode3, m_ParentNodeForGeometryPlanes);
-    }
-  }
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
@@ -1426,6 +1381,8 @@ void QmitkStdMultiWidget::Fit()
   vtkObject::GlobalWarningDisplayOff();
 
   vtkObject::SetGlobalWarningDisplay(w);
+
+  crosshairManager->updateAllWindows();
 }
 
 void QmitkStdMultiWidget::InitPositionTracking()
@@ -1439,44 +1396,6 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree(const std::string& parentWidget
   // @a planesSubTree points ...
 
   mitk::PlaneGeometryDataMapper2D::Pointer mapper;
-
-  // ... of widget 1
-  mitk::BaseRenderer* renderer1 = mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow());
-  m_PlaneNode1 = renderer1->GetCurrentWorldPlaneGeometryNode();
-  m_PlaneNode1->SetProperty("visible", mitk::BoolProperty::New(true));
-  m_PlaneNode1->SetProperty("name", mitk::StringProperty::New(std::string(renderer1->GetName()) + ".plane"));
-  m_PlaneNode1->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
-  m_PlaneNode1->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_PlaneNode1->SetProperty("parentWidget", mitk::StringProperty::New(parentWidget));
-  mapper = mitk::PlaneGeometryDataMapper2D::New();
-  m_PlaneNode1->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
-
-  // ... of widget 2
-  mitk::BaseRenderer* renderer2 = mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow());
-  m_PlaneNode2 = renderer2->GetCurrentWorldPlaneGeometryNode();
-  m_PlaneNode2->SetProperty("visible", mitk::BoolProperty::New(true));
-  m_PlaneNode2->SetProperty("name", mitk::StringProperty::New(std::string(renderer2->GetName()) + ".plane"));
-  m_PlaneNode2->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
-  m_PlaneNode2->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_PlaneNode2->SetProperty("parentWidget", mitk::StringProperty::New(parentWidget));
-  mapper = mitk::PlaneGeometryDataMapper2D::New();
-  m_PlaneNode2->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
-
-  // ... of widget 3
-  mitk::BaseRenderer* renderer3 = mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow());
-  m_PlaneNode3 = renderer3->GetCurrentWorldPlaneGeometryNode();
-  m_PlaneNode3->SetProperty("visible", mitk::BoolProperty::New(true));
-  m_PlaneNode3->SetProperty("name", mitk::StringProperty::New(std::string(renderer3->GetName()) + ".plane"));
-  m_PlaneNode3->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
-  m_PlaneNode3->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_PlaneNode3->SetProperty("parentWidget", mitk::StringProperty::New(parentWidget));
-  mapper = mitk::PlaneGeometryDataMapper2D::New();
-  m_PlaneNode3->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
-
-  m_ParentNodeForGeometryPlanes = mitk::DataNode::New();
-  m_ParentNodeForGeometryPlanes->SetProperty("name", mitk::StringProperty::New("Widgets"));
-  m_ParentNodeForGeometryPlanes->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_ParentNodeForGeometryPlanes->SetProperty("parentWidget", mitk::StringProperty::New(parentWidget));
 }
 
 mitk::SliceNavigationController* QmitkStdMultiWidget::GetTimeNavigationController()
@@ -1761,7 +1680,6 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   }
 
   mitk::Point3D crosshairPos = this->GetCrossPosition();
-  std::string statusText;
   std::stringstream stream;
   itk::Index<3> p;
   mitk::BaseRenderer* baseRenderer = this->mitkWidget1->GetSliceNavigationController()->GetRenderer();
@@ -1992,6 +1910,8 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       this->GetRenderWindow4()->GetRenderer()->RequestUpdate();
     }
   }
+
+  crosshairManager->updateCrosshairsPositions();
 }
 
 void QmitkStdMultiWidget::setDisplayPositionText(bool draw)
@@ -2059,19 +1979,6 @@ void QmitkStdMultiWidget::SetWidgetPlaneVisibility(const char* widgetName, bool 
 
 void QmitkStdMultiWidget::SetWidgetPlanesVisibility(bool visible, mitk::BaseRenderer *renderer)
 {
-  if (m_PlaneNode1.IsNotNull())
-  {
-    m_PlaneNode1->SetVisibility(visible, renderer);
-  }
-  if (m_PlaneNode2.IsNotNull())
-  {
-    m_PlaneNode2->SetVisibility(visible, renderer);
-  }
-  if (m_PlaneNode3.IsNotNull())
-  {
-    m_PlaneNode3->SetVisibility(visible, renderer);
-  }
-  m_RenderingManager->RequestUpdateAll();
 }
 
 void QmitkStdMultiWidget::SetWidgetPlanesLocked(bool locked)
@@ -2108,10 +2015,12 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode( int userMode )
         m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::MITK);
         break;
       case 1:
+        crosshairManager->setCrosshairMode(CrosshairMode::PLANE);
         m_MouseModeSwitcher->SetInteractionScheme( mitk::MouseModeSwitcher::InteractionScheme::ROTATION);
         break;
 
       case 2:
+        crosshairManager->setCrosshairMode(CrosshairMode::PLANE);
         m_MouseModeSwitcher->SetInteractionScheme( mitk::MouseModeSwitcher::InteractionScheme::ROTATIONLINKED);
         break;
 
@@ -2183,6 +2092,9 @@ void QmitkStdMultiWidget::SetWidgetPlaneModeToSwivel( bool activate )
 
 void QmitkStdMultiWidget::OnLayoutDesignChanged( int layoutDesignIndex )
 {
+  crosshairManager->removeAll();
+
+
   switch( layoutDesignIndex )
   {
   case LAYOUT_DEFAULT:
@@ -2256,6 +2168,10 @@ void QmitkStdMultiWidget::OnLayoutDesignChanged( int layoutDesignIndex )
       break;
     }
   };
+  for (unsigned int i = 0; i < 4; i++) {
+    crosshairManager->addWindow(GetRenderWindow(i));
+  }
+  crosshairManager->updateAllWindows();
 }
 
 void QmitkStdMultiWidget::UpdateAllWidgets()
@@ -2298,22 +2214,10 @@ void QmitkStdMultiWidget::SetDecorationColor(unsigned int widgetNumber, mitk::Co
 {
   switch (widgetNumber) {
   case 0:
-    if(m_PlaneNode1.IsNotNull())
-    {
-      m_PlaneNode1->SetColor(color);
-    }
     break;
   case 1:
-    if(m_PlaneNode2.IsNotNull())
-    {
-      m_PlaneNode2->SetColor(color);
-    }
     break;
   case 2:
-    if(m_PlaneNode3.IsNotNull())
-    {
-      m_PlaneNode3->SetColor(color);
-    }
     break;
   case 3:
     m_DecorationColorWidget4 = color;
@@ -2363,35 +2267,6 @@ bool QmitkStdMultiWidget::IsColoredRectanglesEnabled() const
 mitk::MouseModeSwitcher* QmitkStdMultiWidget::GetMouseModeSwitcher()
 {
   return m_MouseModeSwitcher;
-}
-
-mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane1()
-{
-  return this->m_PlaneNode1;
-}
-
-mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane2()
-{
-  return this->m_PlaneNode2;
-}
-
-mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane3()
-{
-  return this->m_PlaneNode3;
-}
-
-mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane(int id)
-{
-  switch(id)
-  {
-  case 1: return this->m_PlaneNode1;
-    break;
-  case 2: return this->m_PlaneNode2;
-    break;
-  case 3: return this->m_PlaneNode3;
-    break;
-  default: return NULL;
-  }
 }
 
 void QmitkStdMultiWidget::setViewDirectionAnnontation(mitk::Image* image, int slice, int i)

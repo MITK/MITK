@@ -120,11 +120,6 @@ protected:
 
   int currentCrosshairRotationMode;
 
-  public slots:
-
-  void SetCrossHairVisibility( bool state ) ;
-
-
 signals:
 
   void ResetView(); // == "global reinit"

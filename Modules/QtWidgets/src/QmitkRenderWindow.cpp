@@ -42,7 +42,8 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
   mitk::VtkPropRenderer* /*renderer*/,
   mitk::RenderingManager* renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode) :
   QVTKWidget(parent), m_ResendQtEvents(true), m_MenuWidget(NULL), m_MenuWidgetActivated(false), m_LayoutIndex(0), 
-  m_FullScreenMode(false)
+  m_FullScreenMode(false),
+  m_WindowPlaneIsSelected(false)
 {
   // Needed if QVTKWidget2 is used instead of QVTKWidget
   //this will be fixed in VTK source if change 18864 is accepted
@@ -573,4 +574,24 @@ int QmitkRenderWindow::GetDelta(QWheelEvent* we) const
 bool QmitkRenderWindow::GetFullSreenMode()
 {
   return m_FullScreenMode;
+}
+
+bool QmitkRenderWindow::isWindow3d()
+{
+  return mitk::BaseRenderer::GetInstance(GetRenderWindow())->GetMapperID() == mitk::BaseRenderer::Standard3D;
+}
+
+bool QmitkRenderWindow::windowPlaneIsSelected()
+{
+  return m_WindowPlaneIsSelected;
+}
+
+void QmitkRenderWindow::setWindowPlaneIsSelected(bool selected)
+{
+  if (m_WindowPlaneIsSelected == selected) {
+    return;
+  }
+
+  m_WindowPlaneIsSelected = selected;
+  emit windowPlaneSelectionChanged();
 }

@@ -38,6 +38,7 @@ QmitkPropertyItem.cpp
 QmitkPropertyItemDelegate.cpp
 QmitkPropertyItemModel.cpp
 QmitkSynchronizeSelectedData.cpp
+mitkCrosshairManager.cpp
 )
 
 set(MOC_H_FILES
@@ -70,6 +71,7 @@ set(MOC_H_FILES
   include/QmitkPropertyItem.h
   include/QmitkPropertyItemDelegate.h
   include/QmitkPropertyItemModel.h
+  include/mitkCrosshairManager.h
 )
 
 set(UI_FILES

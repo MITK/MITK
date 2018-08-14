@@ -241,15 +241,16 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer( mitk::BaseRendere
 void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *renderer)
 {
   bool visible = true;
+  bool render2d = true;
   LocalStorage* ls = m_LSH.GetLocalStorage(renderer);
   ls->m_CrosshairActor->SetVisibility(0);
   ls->m_ArrowActor->SetVisibility(0);
   ls->m_CrosshairHelperLineActor->SetVisibility(0);
 
   GetDataNode()->GetVisibility(visible, renderer, "visible");
+  GetDataNode()->GetBoolProperty("Crosshair.Render 2D", render2d, renderer);
 
-  if(!visible)
-  {
+  if(!visible || !render2d) {
     return;
   }
 

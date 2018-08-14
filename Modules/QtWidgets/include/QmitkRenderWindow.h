@@ -97,6 +97,11 @@ public:
   void FullScreenMode(bool state);
   bool GetFullSreenMode();
 
+  bool isWindow3d();
+
+  bool windowPlaneIsSelected();
+  void setWindowPlaneIsSelected(bool selected);
+
 protected:
   // overloaded move handler
   virtual void moveEvent(QMoveEvent* event) override;
@@ -147,6 +152,8 @@ signals:
   /// \brief Emits a signal to say that this window has had the following nodes dropped on it.
   void NodesDropped(QmitkRenderWindow *thisWindow, std::vector<mitk::DataNode*> nodes);
 
+  void windowPlaneSelectionChanged();
+
 protected slots:
 
   void OnChangeLayoutDesign(int layoutDesignIndex);
@@ -175,6 +182,7 @@ private:
   QmitkRenderWindowMenu* m_MenuWidget;
 
   bool m_MenuWidgetActivated;
+  bool m_WindowPlaneIsSelected;
 
   unsigned int m_LayoutIndex;
   bool m_FullScreenMode;

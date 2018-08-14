@@ -71,6 +71,7 @@ namespace mitk {
   *
   *  Note: The following properties are set for each image individually, and thus, also influence the rendering of this mapper:
   *
+  *   - \b "Crooshair.Render 3D": (BoolProperty) Turn on/off rendering in 3D
   *   - \b "texture interpolation": (BoolProperty) Turn on/off the texture interpolation of each image
   *   - \b "use color": (BoolProperty) Decide whether we want to use the color property or a lookuptable.
   *   - \b "binary": (BoolProperty) Binary image handling: Color the value=1.0 with the color property and make the background (value=0.0) of the image translucent.

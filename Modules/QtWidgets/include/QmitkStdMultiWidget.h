@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qsplitter.h>
 #include <QFrame>
 
+#include <mitkCrosshairManager.h>
 #include <QmitkRenderWindow.h>
 #include <QmitkLevelWindowWidget.h>
 
@@ -99,28 +100,6 @@ public:
   int GetLayout() const;
 
   bool GetGradientBackgroundFlag() const;
-
-  /*!
-  \brief Access node of widget plane 1
-  \return DataNode holding widget plane 1
-  */
-  mitk::DataNode::Pointer GetWidgetPlane1();
-  /*!
-  \brief Access node of widget plane 2
-  \return DataNode holding widget plane 2
-  */
-  mitk::DataNode::Pointer GetWidgetPlane2();
-  /*!
-  \brief Access node of widget plane 3
-  \return DataNode holding widget plane 3
-  */
-  mitk::DataNode::Pointer GetWidgetPlane3();
-  /*!
-  \brief Convenience method to access node of widget planes
-  \param id number of widget plane to be returned
-  \return DataNode holding widget plane 3
-  */
-  mitk::DataNode::Pointer GetWidgetPlane(int id);
 
   bool IsColoredRectanglesEnabled() const;
 
@@ -245,7 +224,7 @@ public slots:
   void mousePressEvent(QMouseEvent * e) override;
 
   void moveEvent( QMoveEvent* e ) override;
-  
+
   void OnWindowResized();
 
   void OnResizeStoped();
@@ -390,6 +369,8 @@ public:
    * @return A pair of colors. First: upper, second: lower.
    */
   std::pair<mitk::Color, mitk::Color> GetGradientColors(unsigned int widgetNumber);
+  mitkCrosshairManager* crosshairManager;
+
 protected:
   void setViewDirectionAnnontation(mitk::Image* image, int slice, int index);
 
@@ -408,18 +389,6 @@ protected:
   mitk::SliceNavigationController* m_TimeNavigationController;
 
   mitk::DataStorage::Pointer m_DataStorage;
-
-  /**
-   * @brief m_PlaneNode1 the 3 helper objects which contain the plane geometry.
-   */
-  mitk::DataNode::Pointer m_PlaneNode1;
-  mitk::DataNode::Pointer m_PlaneNode2;
-  mitk::DataNode::Pointer m_PlaneNode3;
-  /**
-   * @brief m_ParentNodeForGeometryPlanes This helper object is added to the datastorage
-   * and contains the 3 planes for displaying the image geometry (crosshair and 3D planes).
-   */
-  mitk::DataNode::Pointer m_ParentNodeForGeometryPlanes;
 
   /**
    * @brief m_DecorationColorWidget4 color for annotation and rectangle of widget 4.

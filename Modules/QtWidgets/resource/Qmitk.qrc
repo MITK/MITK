@@ -11,5 +11,8 @@
         <file>mm_contrast.png</file>
         <file>mm_pan.png</file>
         <file>LabelSetImage_48.png</file>
+        <file>CrosshairModes/crosshair.png</file>
+        <file>CrosshairModes/no_crosshair.png</file>
+        <file>CrosshairModes/point.png</file>
     </qresource>
 </RCC>

@@ -14,37 +14,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkControlPointDialog.h"
+#include "QmitkLesionTextDialog.h"
 
-#include <QAbstractItemModel>
-#include <QStringListModel>
 #include <QLabel>
 #include <QLayout>
 #include <qpushbutton.h>
 
-QmitkControlPointDialog::QmitkControlPointDialog(QWidget* parent)
+QmitkLesionTextDialog::QmitkLesionTextDialog(QWidget* parent)
   : QDialog(parent)
 {
-  //QDialog::setFixedSize(250, 105);
-
   QBoxLayout* verticalLayout = new QVBoxLayout(this);
   verticalLayout->setMargin(5);
   verticalLayout->setSpacing(5);
 
-  QLabel* dateLabel = new QLabel(tr("Set date"), this);
-  verticalLayout->addWidget(dateLabel);
+  QLabel* dialogLabel = new QLabel(tr("Set lesion information"), this);
+  verticalLayout->addWidget(dialogLabel);
 
-  m_DateEdit = new QDateEdit(this);
-  m_DateEdit->setDisplayFormat("yyyy-MM-dd");
-  m_DateEdit->setFocus();
-  verticalLayout->addWidget(m_DateEdit);
+  m_LineEdit = new QLineEdit(this);
+  m_LineEdit->setFocus();
+  verticalLayout->addWidget(m_LineEdit);
 
   QPushButton* acceptButton = new QPushButton(tr("Ok"), this);
   QPushButton* cancelButton = new QPushButton(tr("Cancel"), this);
   acceptButton->setDefault(true);
 
-  connect(acceptButton, &QPushButton::clicked, this, &QmitkControlPointDialog::accept);
-  connect(cancelButton, &QPushButton::clicked, this, &QmitkControlPointDialog::reject);
+  connect(acceptButton, &QPushButton::clicked, this, &QmitkLesionTextDialog::accept);
+  connect(cancelButton, &QPushButton::clicked, this, &QmitkLesionTextDialog::reject);
 
   QBoxLayout* horizontalLayout = new QHBoxLayout();
   horizontalLayout->setSpacing(5);
@@ -54,16 +49,22 @@ QmitkControlPointDialog::QmitkControlPointDialog(QWidget* parent)
   verticalLayout->addLayout(horizontalLayout);
 }
 
-QmitkControlPointDialog::~QmitkControlPointDialog()
+QmitkLesionTextDialog::~QmitkLesionTextDialog()
 {
+  // nothing here
 }
 
-void QmitkControlPointDialog::SetCurrentDate(mitk::SemanticTypes::Date currentDate)
+void QmitkLesionTextDialog::SetLineEditText(const std::string& lineEditText)
 {
-  m_DateEdit->setDate(QDate(currentDate.year, currentDate.month, currentDate.day));
+  m_LineEdit->setText(QString::fromStdString(lineEditText));
 }
 
-QDate QmitkControlPointDialog::GetCurrentDate() const
+QString QmitkLesionTextDialog::GetLineEditText() const
 {
-  return m_DateEdit->date();
+  return m_LineEdit->text();
+}
+
+QLineEdit* QmitkLesionTextDialog::GetLineEdit() const
+{
+  return m_LineEdit;
 }

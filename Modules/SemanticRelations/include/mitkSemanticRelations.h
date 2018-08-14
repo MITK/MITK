@@ -55,6 +55,7 @@ namespace mitk
     ~SemanticRelations();
 
     typedef std::vector<SemanticTypes::Lesion> LesionVector;
+    typedef std::vector<SemanticTypes::LesionClass> LesionClassVector;
     typedef std::vector<SemanticTypes::ControlPoint> ControlpointVector;
     typedef std::vector<SemanticTypes::InformationType> InformationTypeVector;
     typedef std::vector<DataNode::Pointer> DataNodeVector;
@@ -87,8 +88,14 @@ namespace mitk
     * @return        A vector of lesions.
     */
     LesionVector GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID) const;
+    /**
+    * @brief
+    *
+    *
+    */
+    LesionClassVector GetAllLesionClassesOfCase(const SemanticTypes::CaseID& caseID) const;
     /*
-    * @brief  Returns a vector of all lesions that are valid for the given case, given a specific lesion
+    * @brief  Returns a vector of all lesions that are valid for the given case, given a specific control point.
     *
     * @param caseID         The current case identifier is defined by the given string.
     * @param controlPoint   A specific control point which has to be available at a returned (found) lesion:
@@ -103,7 +110,7 @@ namespace mitk
     *         connected with the image node, no lesions for the specific image will be found and an empty vector is returned.
     *
     * @pre    The given image data node has to be valid (!nullptr).
-    * @throw  mitk::Exception if the given image data node is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the given image data node is invalid (==nullptr).
     * @pre    The image node has to have associated segmentation nodes (child nodes) in order to reference a lesion.
     *
     * @param imageNode    The current case identifier is extracted from the given data node, which contains DICOM information about the case.
@@ -114,7 +121,7 @@ namespace mitk
     * @brief  Returns the lesion that is defined by the given segmentation data.
     *
     * @pre    The given segmentation data node has to be valid (!nullptr).
-    * @throw  mitk::Exception if the given segmentation data node is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the given segmentation data node is invalid (==nullptr).
     * @pre    The segmentation data node has to represent a lesion. If not, the retrieved lesion will be empty, which leads to an exception.
     * @throw  SemanticRelationException, if the segmentation does not represent an existing lesion (this can be checked via 'IsRepresentingALesion').
     *
@@ -136,7 +143,7 @@ namespace mitk
     *         If no segmentations are stored for the current case, an empty vector is returned.
     *
     * @pre    The data storage member has to be valid (!nullptr).
-    * @throw  mitk::Exception if the data storage member is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the data storage member is invalid (==nullptr).
     *
     * @param caseID    The current case identifier is defined by the given string.
     * @return        A vector of data nodes representing segmentations.
@@ -147,7 +154,7 @@ namespace mitk
     *         If the lesion is not referred to by any segmentation, an empty vector is returned.
     *
     * @pre    The data storage member has to be valid (!nullptr).
-    * @throw  mitk::Exception if the data storage member is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the data storage member is invalid (==nullptr).
     * @pre    The UID of the lesion has to exist for a lesion instance.
     * @throw  SemanticRelationException, if UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
     *
@@ -160,7 +167,7 @@ namespace mitk
     * @brief  Return a vector of all images that are currently available for the given case.
     *
     * @pre    The data storage member has to be valid (!nullptr).
-    * @throw  mitk::Exception if the data storage member is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the data storage member is invalid (==nullptr).
     *
     * @param caseID    The current case identifier is defined by the given string.
     * @return        A vector of data nodes representing images.
@@ -221,7 +228,7 @@ namespace mitk
     *         a control point with an empty UID is returned.
     *
     * @pre    The given data node has to be valid (!nullptr).
-    * @throw  mitk::Exception if the given data node is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the given data node is invalid (==nullptr).
     *
     * @param dataNode   The current case identifier is extracted from the given data node, which contains DICOM information about the case.
     * @return         The control point of the given data node.
@@ -271,7 +278,7 @@ namespace mitk
     *         If the image does not contain any information type, an empty information type is returned.
     *
     * @pre    The given image data node has to be valid (!nullptr).
-    * @throw  mitk::Exception if the given image data node is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the given image data node is invalid (==nullptr).
     *
     * @param imageNode    The current case identifier is extracted from the given data node, which contains DICOM information about the case.
     * @return           The information type of the given data node.
@@ -344,7 +351,7 @@ namespace mitk
     *         Finally, the image is linked to the correct control point.
     *
     * @pre    The given image data node has to be valid (!nullptr).
-    * @throw  mitk::Exception if the given image data node is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the given image data node is invalid (==nullptr).
     *
     * @param imageNode   The current case identifier and node identifier is extracted from the given image data node, which contains DICOM information about the case and the node.
     */
@@ -353,7 +360,7 @@ namespace mitk
     * @brief  Remove the given image from the set of already existing images.
     *
     * @pre    The given image data node has to be valid (!nullptr).
-    * @throw  mitk::Exception if the given image data node is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the given image data node is invalid (==nullptr).
     *
     * @param imageNode   The current case identifier and node identifier is extracted from the given image data node, which contains DICOM information about the case and the node.
     */
@@ -384,7 +391,7 @@ namespace mitk
     *         old linkage is overwritten (this can be checked via 'IsRepresentingALesion').
     *
     * @pre    The given segmentation data node has to be valid (!nullptr).
-    * @throw  mitk::Exception if the given segmentation data node is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the given segmentation data node is invalid (==nullptr).
     * @pre    The UID of the lesion must not already exist for a lesion instance.
     * @throw  SemanticRelationException, if the UID of the lesion already exists for a lesion instance (this can be checked via 'InstanceExists').
     *
@@ -416,7 +423,7 @@ namespace mitk
     *         old linkage is overwritten (this can be checked via 'IsRepresentingALesion').
     *
     * @pre    The given segmentation data node has to be valid (!nullptr).
-    * @throw  mitk::Exception if the given segmentation data node is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the given segmentation data node is invalid (==nullptr).
     * @pre    The UID of the lesion has to exist for a lesion instance.
     * @throw  SemanticRelationException, if the UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
     *
@@ -429,7 +436,7 @@ namespace mitk
     *         The lesion may stay unlinked to any segmentation.
     *
     * @pre    The given segmentation data node has to be valid (!nullptr).
-    * @throw  mitk::Exception if the given segmentation data node is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the given segmentation data node is invalid (==nullptr).
     *
     * @param segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
     */
@@ -438,7 +445,7 @@ namespace mitk
     * @brief  Remove the given segmentation from the set of already existing segmentations.
     *
     * @pre    The given segmentation data node has to be valid (!nullptr).
-    * @throw  mitk::Exception if the given segmentation data node is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the given segmentation data node is invalid (==nullptr).
     *
     * @param segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
     */
@@ -448,7 +455,7 @@ namespace mitk
     *         This function combines adding a control point and linking it, since a control point with no associated data is not allowed.
     *
     * @pre    The given data node has to be valid (!nullptr).
-    * @throw  mitk::Exception if the given data node is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the given data node is invalid (==nullptr).
     * @pre    The UID of the control point must not already exist for a control point instance.
     * @throw  SemanticRelationException, if the UID of the control point already exists for a control point instance (this can be checked via 'InstanceExists').
     * @pre    The given control point must not already be contained in an existing control point interval.
@@ -465,7 +472,7 @@ namespace mitk
     * @brief  Link the given data to an already existing control point and overwrite the start or end point of the control point.
     *
     * @pre    The given data node has to be valid (!nullptr).
-    * @throw  mitk::Exception if the given data node is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the given data node is invalid (==nullptr).
     * @pre    The UID of the control point has to exist for a control point instance.
     * @throw  SemanticRelationException, if the UID of the control point does not exists for a control point instance (this can be checked via 'InstanceExists').
     * @pre    The given control point must contain the date of the given data node (if parameter 'checkConsistence = true').
@@ -485,7 +492,7 @@ namespace mitk
     * @brief  Link the given data to an already existing control point.
     *
     * @pre    The given data node has to be valid (!nullptr).
-    * @throw  mitk::Exception if the given data node is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the given data node is invalid (==nullptr).
     * @pre    The UID of the control point has to exist for a control point instance.
     * @throw  SemanticRelationException, if the UID of the control point does not exists for a control point instance (this can be checked via 'InstanceExists').
     * @pre    The given control point must contain the date of the given data node (if parameter 'checkConsistence = true').
@@ -509,7 +516,7 @@ namespace mitk
     * @brief  Set the information type of the given image.
     *
     * @pre    The given image data node has to be valid (!nullptr).
-    * @throw  mitk::Exception if the given image data node is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the given image data node is invalid (==nullptr).
     * @post   If the information type instance did not exist before, it is now added.
     *
     * @param imageNode        The current case identifier is extracted from the given data node, which contains DICOM information about the case.
@@ -523,7 +530,7 @@ namespace mitk
     *           - if so, the information type is just removed from the given image.
     *
     * @pre    The given image data node has to be valid (!nullptr).
-    * @throw  mitk::Exception if the given image data node is invalid (==nullptr).
+    * @throw  SemanticRelationException, if the given image data node is invalid (==nullptr).
     *
     * @param imageNode        The current case identifier is extracted from the given data node, which contains DICOM information about the case.
     */

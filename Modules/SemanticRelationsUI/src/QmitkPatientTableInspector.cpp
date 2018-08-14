@@ -114,11 +114,11 @@ void QmitkPatientTableInspector::OnTableViewContextMenuRequested(const QPoint& p
 
     QAction* setInformationTypeAction = new QAction("Set information type", m_ContextMenu);
     m_ContextMenu->addAction(setInformationTypeAction);
-    connect(setInformationTypeAction, SIGNAL(triggered()), this, SLOT(OnContextMenuSetInformationType()));
+    connect(setInformationTypeAction, &QAction::triggered, this, &QmitkPatientTableInspector::OnContextMenuSetInformationType);
 
     QAction* setControlPointAction = new QAction("Set control point", m_ContextMenu);
     m_ContextMenu->addAction(setControlPointAction);
-    connect(setControlPointAction, SIGNAL(triggered()), this, SLOT(OnContextMenuSetControlPoint()));
+    connect(setControlPointAction, &QAction::triggered, this, &QmitkPatientTableInspector::OnContextMenuSetControlPoint);
 
     m_ContextMenu->popup(QCursor::pos());
   }

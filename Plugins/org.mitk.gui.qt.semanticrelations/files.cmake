@@ -1,15 +1,18 @@
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
+  QmitkLesionInfoWidget.cpp
   QmitkSemanticRelationsNodeSelectionDialog.cpp
   QmitkSemanticRelationsView.cpp
 )
 
 set(UI_FILES
+  src/internal/QmitkLesionInfoWidgetControls.ui
   src/internal/QmitkSemanticRelationsControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
+  src/internal/QmitkLesionInfoWidget.h
   src/internal/QmitkSemanticRelationsNodeSelectionDialog.h
   src/internal/QmitkSemanticRelationsView.h
 )

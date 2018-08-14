@@ -14,14 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// semantic relations UI module
+// semantic relations plugin
 #include "QmitkLesionInfoWidget.h"
+#include "QmitkSemanticRelationsNodeSelectionDialog.h"
 
-#include "QmitkCustomVariants.h"
+// semantic relations UI module
+#include <QmitkLesionTextDialog.h>
 
 // semantic relations module
+#include <mitkLesionManager.h>
 #include <mitkNodePredicates.h>
+#include <mitkSemanticRelationException.h>
 #include <mitkUIDGeneratorBoost.h>
+
+#include "QmitkCustomVariants.h"
 
 // multi label module
 #include <mitkLabelSetImage.h>
@@ -30,12 +36,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 
 // qt
+#include <QCompleter>
 #include <QListWidget>
 #include <QMenu>
 #include <QMessageBox>
 #include <QString>
 
-const QBrush QmitkLesionInfoWidget::DEFAULT_BACKGROUND_COLOR = QBrush(Qt::white);
+const QBrush QmitkLesionInfoWidget::DEFAULT_BACKGROUND_COLOR = QBrush(Qt::transparent);
 const QBrush QmitkLesionInfoWidget::SELECTED_BACKGROUND_COLOR = QBrush(Qt::green);
 const QBrush QmitkLesionInfoWidget::CONNECTED_BACKGROUND_COLOR = QBrush(Qt::darkGreen);
 
@@ -43,8 +50,6 @@ QmitkLesionInfoWidget::QmitkLesionInfoWidget(mitk::DataStorage* dataStorage, QWi
   : QWidget(parent)
   , m_DataStorage(dataStorage)
   , m_SemanticRelations(std::make_unique<mitk::SemanticRelations>(dataStorage))
-  , m_SimpleDatamanagerWidget(new QmitkSimpleDatamanagerWidget(dataStorage))
-  , m_SimpleDatamanagerNodeDialog(new QmitkSelectNodeDialog(this))
 {
   Init();
 }
@@ -63,9 +68,6 @@ void QmitkLesionInfoWidget::Init()
   m_Controls.segmentationListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   m_Controls.imageListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  m_SimpleDatamanagerNodeDialog->setWindowTitle("Select node");
-  m_SimpleDatamanagerNodeDialog->SetSelectionWidget(m_SimpleDatamanagerWidget);
-
   SetUpConnections();
 
   m_SemanticRelations->AddObserver(this);
@@ -73,18 +75,23 @@ void QmitkLesionInfoWidget::Init()
 
 void QmitkLesionInfoWidget::SetUpConnections()
 {
+  // connect buttons to modify semantic relations
+  connect(m_Controls.addLesionPushButton, &QPushButton::clicked, this, &QmitkLesionInfoWidget::OnAddLesionButtonClicked);
+  connect(m_Controls.addSegmentationPushButton, &QPushButton::clicked, this, &QmitkLesionInfoWidget::OnAddSegmentationButtonClicked);
+  connect(m_Controls.addImagePushButton, &QPushButton::clicked, this, &QmitkLesionInfoWidget::OnAddImageButtonClicked);
+
   // connect each list widget with a custom slots
-  connect(m_Controls.lesionListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), SLOT(OnCurrentLesionItemChanged(QListWidgetItem*, QListWidgetItem*)));
-  connect(m_Controls.lesionListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), SLOT(OnLesionItemDoubleClicked(QListWidgetItem*)));
-  connect(m_Controls.segmentationListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), SLOT(OnCurrentSegmentationItemChanged(QListWidgetItem*, QListWidgetItem*)));
-  connect(m_Controls.segmentationListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), SLOT(OnSegmentationItemDoubleClicked(QListWidgetItem*)));
-  connect(m_Controls.imageListWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), SLOT(OnCurrentImageItemChanged(QListWidgetItem*, QListWidgetItem*)));
-  connect(m_Controls.imageListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), SLOT(OnImageItemDoubleClicked(QListWidgetItem*)));
+  connect(m_Controls.lesionListWidget, &QListWidget::currentItemChanged, this, &QmitkLesionInfoWidget::OnCurrentLesionItemChanged);
+  connect(m_Controls.lesionListWidget, &QListWidget::itemDoubleClicked, this, &QmitkLesionInfoWidget::OnLesionItemDoubleClicked);
+  connect(m_Controls.segmentationListWidget, &QListWidget::currentItemChanged, this, &QmitkLesionInfoWidget::OnCurrentSegmentationItemChanged);
+  connect(m_Controls.segmentationListWidget, &QListWidget::itemDoubleClicked, this, &QmitkLesionInfoWidget::OnSegmentationItemDoubleClicked);
+  connect(m_Controls.imageListWidget, &QListWidget::currentItemChanged, this, &QmitkLesionInfoWidget::OnCurrentImageItemChanged);
+  connect(m_Controls.imageListWidget, &QListWidget::itemDoubleClicked, this, &QmitkLesionInfoWidget::OnImageItemDoubleClicked);
 
   // connect context menu entries
-  connect(m_Controls.lesionListWidget, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(OnLesionListContextMenuRequested(const QPoint&)));
-  connect(m_Controls.segmentationListWidget, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(OnSegmentationListContextMenuRequested(const QPoint&)));
-  connect(m_Controls.imageListWidget, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(OnImageListContextMenuRequested(const QPoint&)));
+  connect(m_Controls.lesionListWidget, &QListWidget::customContextMenuRequested, this, &QmitkLesionInfoWidget::OnLesionListContextMenuRequested);
+  connect(m_Controls.segmentationListWidget, &QListWidget::customContextMenuRequested, this, &QmitkLesionInfoWidget::OnSegmentationListContextMenuRequested);
+  connect(m_Controls.imageListWidget, &QListWidget::customContextMenuRequested, this, &QmitkLesionInfoWidget::OnImageListContextMenuRequested);
 }
 
 void QmitkLesionInfoWidget::SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID)
@@ -109,6 +116,155 @@ void QmitkLesionInfoWidget::Update(const mitk::SemanticTypes::CaseID& caseID)
   }
 }
 
+//////////////////////////////////////////////////////////////////////////
+// Implementation of the QT_SLOTS
+//////////////////////////////////////////////////////////////////////////
+void QmitkLesionInfoWidget::OnAddLesionButtonClicked()
+{
+  if (m_CaseID.empty())
+  {
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("No case ID set.");
+    msgBox.setText("In order to add a lesion, please specify the current case / patient.");
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.exec();
+    return;
+  }
+
+  mitk::SemanticTypes::Lesion newLesion = mitk::GenerateNewLesion();
+  try
+  {
+    m_SemanticRelations->AddLesion(m_CaseID, newLesion);
+  }
+  catch (mitk::SemanticRelationException& e)
+  {
+    MITK_INFO << "Could not add a new lesion. " << e;
+  }
+}
+
+void QmitkLesionInfoWidget::OnAddSegmentationButtonClicked()
+{
+  if (m_CaseID.empty())
+  {
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("No case ID set.");
+    msgBox.setText("In order to add a segmentation, please specify the current case / patient.");
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.exec();
+    return;
+  }
+
+  QmitkSemanticRelationsNodeSelectionDialog* dialog = new QmitkSemanticRelationsNodeSelectionDialog(this, "Select segmentations to add to the semantic relations storage", "");
+  dialog->SetDataStorage(m_DataStorage);
+  dialog->setWindowTitle("Select segmentation node");
+  dialog->SetNodePredicate(mitk::NodePredicates::GetSegmentationPredicate());
+  dialog->SetSelectOnlyVisibleNodes(true);
+  dialog->SetSelectionMode(QAbstractItemView::MultiSelection);
+  dialog->SetCaseID(m_CaseID);
+
+  int dialogReturnValue = dialog->exec();
+  if (QDialog::Rejected == dialogReturnValue)
+  {
+    return;
+  }
+
+  auto nodes = dialog->GetSelectedNodes();
+  for (mitk::DataNode* dataNode : nodes)
+  {
+    if (nullptr == dataNode)
+    {
+      continue;
+    }
+
+    mitk::BaseData* baseData = dataNode->GetData();
+    if (nullptr == baseData)
+    {
+      continue;
+    }
+
+    // continue with valid segmentation data
+    // get parent node of the current segmentation node with the node predicate
+    mitk::DataStorage::SetOfObjects::ConstPointer parentNodes = m_DataStorage->GetSources(dataNode, mitk::NodePredicates::GetImagePredicate(), false);
+
+    // check for already existing, identifying base properties
+    mitk::BaseProperty* caseIDProperty = baseData->GetProperty("DICOM.0010.0010");
+    mitk::BaseProperty* nodeIDProperty = baseData->GetProperty("DICOM.0020.000E");
+    if (nullptr == caseIDProperty || nullptr == nodeIDProperty)
+    {
+      MITK_INFO << "No DICOM tags for case and node identification found. Transferring DICOM tags from the parent node to the selected segmentation node.";
+
+      mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(parentNodes->front());
+      mitk::SemanticTypes::ID nodeID = mitk::GetIDFromDataNode(parentNodes->front());
+      // transfer DICOM tags to the segmentation node
+      mitk::StringProperty::Pointer caseIDTag = mitk::StringProperty::New(caseID);
+      baseData->SetProperty("DICOM.0010.0010", caseIDTag); // DICOM tag is "PatientName"
+
+                                                           // add UID to distinguish between different segmentations of the same parent node
+      mitk::StringProperty::Pointer nodeIDTag = mitk::StringProperty::New(nodeID + mitk::UIDGeneratorBoost::GenerateUID());
+      baseData->SetProperty("DICOM.0020.000E", nodeIDTag); // DICOM tag is "SeriesInstanceUID"
+    }
+
+    try
+    {
+      m_SemanticRelations->AddSegmentation(dataNode, parentNodes->front());
+    }
+    catch (const mitk::SemanticRelationException& e)
+    {
+      std::stringstream exceptionMessage; exceptionMessage << e;
+      QMessageBox msgBox;
+      msgBox.setWindowTitle("Could not add the selected segmentation.");
+      msgBox.setText("The program wasn't able to correctly add the selected segmentation.\n"
+        "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
+      msgBox.setIcon(QMessageBox::Warning);
+      msgBox.exec();
+      return;
+    }
+  }
+}
+
+void QmitkLesionInfoWidget::OnAddImageButtonClicked()
+{
+  QmitkSemanticRelationsNodeSelectionDialog* dialog = new QmitkSemanticRelationsNodeSelectionDialog(this, "Select images to add to the semantic relations storage", "");
+  dialog->SetDataStorage(m_DataStorage);
+  dialog->setWindowTitle("Select image node");
+  dialog->SetNodePredicate(mitk::NodePredicates::GetImagePredicate());
+  dialog->SetSelectOnlyVisibleNodes(true);
+  dialog->SetSelectionMode(QAbstractItemView::MultiSelection);
+  dialog->SetCaseID(m_CaseID);
+
+  int dialogReturnValue = dialog->exec();
+  if (QDialog::Rejected == dialogReturnValue)
+  {
+    return;
+  }
+
+  auto nodes = dialog->GetSelectedNodes();
+  for (mitk::DataNode* dataNode : nodes)
+  {
+    if (nullptr != dataNode)
+    {
+      try
+      {
+        // add the image to the semantic relations storage
+        m_SemanticRelations->AddImage(dataNode);
+        mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(dataNode);
+        emit ImageAdded(caseID);
+      }
+      catch (const mitk::SemanticRelationException& e)
+      {
+        std::stringstream exceptionMessage; exceptionMessage << e;
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Could not add the selected image.");
+        msgBox.setText("The program wasn't able to correctly add the selected images.\n"
+          "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
+        return;
+      }
+    }
+  }
+}
+
 void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* current, QListWidgetItem* /*previous*/)
 {
   if (nullptr == m_SemanticRelations
@@ -119,7 +275,7 @@ void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* current,
   }
 
   // only the UID is needed to identify a representing lesion
-  m_CurrentLesion.UID = current->text().toStdString();
+  m_CurrentLesion.UID = current->data(Qt::UserRole).toString().toStdString();
   if (false == m_SemanticRelations->InstanceExists(m_CaseID, m_CurrentLesion))
   {
     // no UID found; cannot create a lesion
@@ -139,7 +295,7 @@ void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* current,
   current->setBackground(SELECTED_BACKGROUND_COLOR);
   try
   {
-    // set background color for all corresponding segmentations of the currently selected lesion
+    // get all corresponding segmentations of the currently selected lesion and set the background color
     mitk::SemanticRelations::DataNodeVector allSegmentationsOfLesion = m_SemanticRelations->GetAllSegmentationsOfLesion(m_CaseID, m_CurrentLesion);
     for (const auto& segmentation : allSegmentationsOfLesion)
     {
@@ -149,8 +305,7 @@ void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* current,
         item->setBackground(SELECTED_BACKGROUND_COLOR);
       }
 
-      // set background color for all corresponding images of the current segmentation
-      // get parent node of the current segmentation node with the node predicate
+      // get parent nodes of the current segmentation node and set the background color
       mitk::DataStorage::SetOfObjects::ConstPointer parentNodes = m_DataStorage->GetSources(segmentation, mitk::NodePredicates::GetImagePredicate(), false);
       for (auto it = parentNodes->Begin(); it != parentNodes->End(); ++it)
       {
@@ -162,7 +317,7 @@ void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* current,
       }
     }
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::SemanticRelationException& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox;
@@ -177,16 +332,15 @@ void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* current,
 
 void QmitkLesionInfoWidget::OnLesionItemDoubleClicked(QListWidgetItem* clickedItem)
 {
-  if (nullptr == m_SemanticRelations)
+  if (nullptr == clickedItem
+   || nullptr == m_SemanticRelations)
   {
     return;
   }
 
-  if (nullptr == clickedItem)
-  {
-    // no item clicked; cannot retrieve the current lesion
-    return;
-  }
+  // only the UID is needed to identify a representing lesion
+  m_CurrentLesion.UID = clickedItem->data(Qt::UserRole).toString().toStdString();
+  m_CurrentLesion.name = clickedItem->text().toStdString();
 }
 
 void QmitkLesionInfoWidget::OnCurrentSegmentationItemChanged(QListWidgetItem* current, QListWidgetItem* /*previous*/)
@@ -216,8 +370,8 @@ void QmitkLesionInfoWidget::OnCurrentSegmentationItemChanged(QListWidgetItem* cu
   }
 
   current->setBackground(SELECTED_BACKGROUND_COLOR);
-  // set background color for all corresponding images of the current segmentation
-  // get parent node of the current segmentation node with the node predicate
+
+  // get parent nodes of the current segmentation node and set the background color
   mitk::DataStorage::SetOfObjects::ConstPointer parentNodes = m_DataStorage->GetSources(m_CurrentSegmentation, mitk::NodePredicates::GetImagePredicate(), false);
   for (auto it = parentNodes->Begin(); it != parentNodes->End(); ++it)
   {
@@ -228,19 +382,23 @@ void QmitkLesionInfoWidget::OnCurrentSegmentationItemChanged(QListWidgetItem* cu
     }
   }
 
+  // get represented lesion of the current segmentation node and set the background color
   if (m_SemanticRelations->IsRepresentingALesion(m_CurrentSegmentation))
   {
     try
     {
-      // set background color for the represented lesion of the currently selected segmentation
       mitk::SemanticTypes::Lesion representedLesion = m_SemanticRelations->GetRepresentedLesion(m_CurrentSegmentation);
-      QList<QListWidgetItem*> items = m_Controls.lesionListWidget->findItems(QString::fromStdString(representedLesion.UID), Qt::MatchExactly);
-      for (auto& item : items)
+      for (int i = 0; i < m_Controls.lesionListWidget->count(); ++i)
       {
-        item->setBackground(SELECTED_BACKGROUND_COLOR);
+        QListWidgetItem* item = m_Controls.lesionListWidget->item(i);
+        std::string currentLesionUID = item->data(Qt::UserRole).toString().toStdString();
+        if (currentLesionUID == representedLesion.UID)
+        {
+          item->setBackground(SELECTED_BACKGROUND_COLOR);
+        }
       }
     }
-    catch (mitk::Exception& e)
+    catch (const mitk::SemanticRelationException& e)
     {
       std::stringstream exceptionMessage; exceptionMessage << e;
       QMessageBox msgBox;
@@ -259,7 +417,6 @@ void QmitkLesionInfoWidget::OnSegmentationItemDoubleClicked(QListWidgetItem* cli
   if (nullptr == clickedItem
    || nullptr == m_DataStorage)
   {
-    // no item clicked; cannot retrieve the current segmentation
     return;
   }
 
@@ -314,8 +471,7 @@ void QmitkLesionInfoWidget::OnCurrentImageItemChanged(QListWidgetItem* current, 
 
   current->setBackground(SELECTED_BACKGROUND_COLOR);
 
-  // set background color for all corresponding segmentations of the current image
-  // get child nodes of the current image node with the segmentation predicate
+  // get child nodes of the current image node and set the background color
   mitk::DataStorage::SetOfObjects::ConstPointer segmentationNodes = m_DataStorage->GetDerivations(m_CurrentImage, mitk::NodePredicates::GetSegmentationPredicate(), false);
   for (auto it = segmentationNodes->Begin(); it != segmentationNodes->End(); ++it)
   {
@@ -327,18 +483,22 @@ void QmitkLesionInfoWidget::OnCurrentImageItemChanged(QListWidgetItem* current, 
 
     try
     {
+      // get represented lesion of the current segmentation node and set the background color
       if (m_SemanticRelations->IsRepresentingALesion(it->Value()))
       {
-        // set background color for the represented lesion of the current segmentation
         mitk::SemanticTypes::Lesion representedLesion = m_SemanticRelations->GetRepresentedLesion(it->Value());
-        QList<QListWidgetItem*> items = m_Controls.lesionListWidget->findItems(QString::fromStdString(representedLesion.UID), Qt::MatchExactly);
-        for (auto& item : items)
+        for (int i = 0; i < m_Controls.lesionListWidget->count(); ++i)
         {
-          item->setBackground(SELECTED_BACKGROUND_COLOR);
+          QListWidgetItem* item = m_Controls.lesionListWidget->item(i);
+          std::string currentLesionUID = item->data(Qt::UserRole).toString().toStdString();
+          if (currentLesionUID == representedLesion.UID)
+          {
+            item->setBackground(SELECTED_BACKGROUND_COLOR);
+          }
         }
       }
     }
-    catch (mitk::Exception& e)
+    catch (const mitk::SemanticRelationException& e)
     {
       std::stringstream exceptionMessage; exceptionMessage << e;
       QMessageBox msgBox;
@@ -354,14 +514,9 @@ void QmitkLesionInfoWidget::OnCurrentImageItemChanged(QListWidgetItem* current, 
 
 void QmitkLesionInfoWidget::OnImageItemDoubleClicked(QListWidgetItem* clickedItem)
 {
-  if (nullptr == m_SemanticRelations)
+  if (nullptr == clickedItem
+    || nullptr == m_SemanticRelations)
   {
-    return;
-  }
-
-  if (nullptr == clickedItem)
-  {
-    // no item clicked; cannot retrieve the current image
     return;
   }
 }
@@ -375,9 +530,9 @@ void QmitkLesionInfoWidget::OnLesionListContextMenuRequested(const QPoint& pos)
     return;
   }
 
-  mitk::SemanticTypes::Lesion selectedLesion;
-  selectedLesion.UID = currentItem->text().toStdString();
-  if (selectedLesion.UID.empty())
+  mitk::SemanticTypes::ID selectedLesionUID;
+  selectedLesionUID = currentItem->data(Qt::UserRole).toString().toStdString();
+  if (selectedLesionUID.empty())
   {
     // no UID found; cannot create a lesion
     return;
@@ -387,17 +542,22 @@ void QmitkLesionInfoWidget::OnLesionListContextMenuRequested(const QPoint& pos)
 
   QAction* linkToSegmentation = new QAction("Link to segmentation", this);
   linkToSegmentation->setEnabled(true);
-  connect(linkToSegmentation, &QAction::triggered, [this, selectedLesion] { OnLinkToSegmentation(selectedLesion); });
+  connect(linkToSegmentation, &QAction::triggered, [this, selectedLesionUID] { OnLinkToSegmentation(selectedLesionUID); });
   menu->addAction(linkToSegmentation);
+
+  QAction* setLesionName = new QAction("Set lesion name", this);
+  setLesionName->setEnabled(true);
+  connect(setLesionName, &QAction::triggered, [this, selectedLesionUID] { OnSetLesionName(selectedLesionUID); });
+  menu->addAction(setLesionName);
 
   QAction* setLesionClass = new QAction("Set lesion class", this);
   setLesionClass->setEnabled(true);
-  connect(setLesionClass, &QAction::triggered, [this, selectedLesion] { OnSetLesionClass(selectedLesion); });
+  connect(setLesionClass, &QAction::triggered, [this, selectedLesionUID] { OnSetLesionClass(selectedLesionUID); });
   menu->addAction(setLesionClass);
 
   QAction* removeLesion = new QAction("Remove lesion", this);
   removeLesion->setEnabled(true);
-  connect(removeLesion, &QAction::triggered, [this, selectedLesion] { OnRemoveLesion(selectedLesion); });
+  connect(removeLesion, &QAction::triggered, [this, selectedLesionUID] { OnRemoveLesion(selectedLesionUID); });
   menu->addAction(removeLesion);
 
   menu->popup(QCursor::pos());
@@ -466,15 +626,48 @@ void QmitkLesionInfoWidget::OnImageListContextMenuRequested(const QPoint& pos)
   menu->popup(QCursor::pos());
 }
 
-void QmitkLesionInfoWidget::OnLinkToSegmentation(const mitk::SemanticTypes::Lesion& selectedLesion)
+void QmitkLesionInfoWidget::OnLinkToSegmentation(const mitk::SemanticTypes::ID& selectedLesionUID)
 {
-  int dialogReturnValue = m_SimpleDatamanagerNodeDialog->exec();
+  if (m_CaseID.empty())
+  {
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("No case ID set.");
+    msgBox.setText("In order to link a lesion to a segmentation, please specify the current case / patient.");
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.exec();
+    return;
+  }
+
+  // retrieve the full lesion with its lesion class using the given lesion UID
+  mitk::SemanticTypes::Lesion selectedLesion = mitk::GetLesionByUID(selectedLesionUID, m_SemanticRelations->GetAllLesionsOfCase(m_CaseID));
+  if (selectedLesion.UID.empty())
+  {
+    // could not find lesion information for the selected lesion
+    return;
+  }
+
+  QmitkSemanticRelationsNodeSelectionDialog* dialog = new QmitkSemanticRelationsNodeSelectionDialog(this, "Select segmentation to link to the selected lesion.", "");
+  dialog->SetDataStorage(m_DataStorage);
+  dialog->setWindowTitle("Select segmentation node");
+  dialog->SetNodePredicate(mitk::NodePredicates::GetSegmentationPredicate());
+  dialog->SetSelectOnlyVisibleNodes(true);
+  dialog->SetSelectionMode(QAbstractItemView::SingleSelection);
+  dialog->SetCaseID(m_CaseID);
+
+  int dialogReturnValue = dialog->exec();
   if (QDialog::Rejected == dialogReturnValue)
   {
     return;
   }
 
-  mitk::DataNode* selectedDataNode = m_SimpleDatamanagerNodeDialog->GetSelectedDataNode();
+  auto nodes = dialog->GetSelectedNodes();
+  mitk::DataNode::Pointer selectedDataNode = nullptr;
+  if (!nodes.isEmpty())
+  {
+    // only single selection allowed
+    selectedDataNode = nodes.front();
+  }
+
   if (nullptr == selectedDataNode)
   {
     QMessageBox msgBox;
@@ -510,7 +703,7 @@ void QmitkLesionInfoWidget::OnLinkToSegmentation(const mitk::SemanticTypes::Lesi
   {
     m_SemanticRelations->LinkSegmentationToLesion(selectedDataNode, selectedLesion);
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::SemanticRelationException& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox;
@@ -522,7 +715,81 @@ void QmitkLesionInfoWidget::OnLinkToSegmentation(const mitk::SemanticTypes::Lesi
   }
 }
 
-void QmitkLesionInfoWidget::OnRemoveLesion(const mitk::SemanticTypes::Lesion& selectedLesion)
+void QmitkLesionInfoWidget::OnSetLesionName(const mitk::SemanticTypes::ID& selectedLesionUID)
+{
+  // retrieve the full lesion with its lesion class using the given lesion UID
+  mitk::SemanticTypes::Lesion selectedLesion = mitk::GetLesionByUID(selectedLesionUID, m_SemanticRelations->GetAllLesionsOfCase(m_CaseID));
+  if (selectedLesion.UID.empty())
+  {
+    // could not find lesion information for the selected lesion
+    return;
+  }
+
+  // use the lesion information to set the input text for the dialog
+  QmitkLesionTextDialog* inputDialog = new QmitkLesionTextDialog(this);
+  inputDialog->setWindowTitle("Set lesion name");
+  inputDialog->SetLineEditText(selectedLesion.name);
+
+  int dialogReturnValue = inputDialog->exec();
+  if (QDialog::Rejected == dialogReturnValue)
+  {
+    return;
+  }
+
+  std::string newLesionName = inputDialog->GetLineEditText().toStdString();
+
+  selectedLesion.name = newLesionName;
+  m_SemanticRelations->OverwriteLesion(m_CaseID, selectedLesion);
+}
+
+void QmitkLesionInfoWidget::OnSetLesionClass(const mitk::SemanticTypes::ID& selectedLesionUID)
+{
+  // retrieve the full lesion with its lesion class using the given lesion UID
+  mitk::SemanticTypes::Lesion selectedLesion = mitk::GetLesionByUID(selectedLesionUID, m_SemanticRelations->GetAllLesionsOfCase(m_CaseID));
+  if (selectedLesion.UID.empty())
+  {
+    // could not find lesion information for the selected lesion
+    return;
+  }
+
+  // use the lesion information to set the input text for the dialog
+  QmitkLesionTextDialog* inputDialog = new QmitkLesionTextDialog(this);
+  inputDialog->setWindowTitle("Set lesion class");
+  inputDialog->SetLineEditText(selectedLesion.lesionClass.classType);
+
+  // prepare the completer for the dialogs input text field
+  mitk::LesionClassVector allLesionClasses = m_SemanticRelations->GetAllLesionClassesOfCase(m_CaseID);
+
+  QStringList wordList;
+  for (const auto& lesionClass : allLesionClasses)
+  {
+    wordList << QString::fromStdString(lesionClass.classType);
+  }
+  QCompleter* completer = new QCompleter(wordList, this);
+  completer->setCaseSensitivity(Qt::CaseInsensitive);
+  inputDialog->GetLineEdit()->setCompleter(completer);
+
+  int dialogReturnValue = inputDialog->exec();
+  if (QDialog::Rejected == dialogReturnValue)
+  {
+    return;
+  }
+
+  // retrieve the new input lesion class type and check for an already existing lesion class types
+  std::string newLesionClassType = inputDialog->GetLineEditText().toStdString();
+  mitk::SemanticTypes::LesionClass existingLesionClass = mitk::FindExistingLesionClass(newLesionClassType, allLesionClasses);
+  if (existingLesionClass.UID.empty())
+  {
+    // could not find lesion class information for the new lesion class type
+    // create a new lesion class for the selected lesion
+    existingLesionClass = mitk::GenerateNewLesionClass(newLesionClassType);
+  }
+
+  selectedLesion.lesionClass = existingLesionClass;
+  m_SemanticRelations->OverwriteLesion(m_CaseID, selectedLesion);
+}
+
+void QmitkLesionInfoWidget::OnRemoveLesion(const mitk::SemanticTypes::ID& selectedLesionUID)
 {
   if (m_CaseID.empty())
   {
@@ -534,11 +801,19 @@ void QmitkLesionInfoWidget::OnRemoveLesion(const mitk::SemanticTypes::Lesion& se
     return;
   }
 
+  // retrieve the full lesion with its lesion class using the given lesion UID
+  mitk::SemanticTypes::Lesion selectedLesion = mitk::GetLesionByUID(selectedLesionUID, m_SemanticRelations->GetAllLesionsOfCase(m_CaseID));
+  if (selectedLesion.UID.empty())
+  {
+    // could not find lesion information for the selected lesion
+    return;
+  }
+
   try
   {
     m_SemanticRelations->RemoveLesion(m_CaseID, selectedLesion);
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::SemanticRelationException& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox;
@@ -550,19 +825,13 @@ void QmitkLesionInfoWidget::OnRemoveLesion(const mitk::SemanticTypes::Lesion& se
   }
 }
 
-void QmitkLesionInfoWidget::OnSetLesionClass(const mitk::SemanticTypes::Lesion& selectedLesion)
-{
-  // get lesion class from user input and generate UID for lesion class
-  //m_SemanticRelations->OverwriteLesion()
-}
-
 void QmitkLesionInfoWidget::OnUnlinkFromLesion(const mitk::DataNode* selectedSegmentation)
 {
   try
   {
     m_SemanticRelations->UnlinkSegmentationFromLesion(selectedSegmentation);
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::SemanticRelationException& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox;
@@ -580,7 +849,7 @@ void QmitkLesionInfoWidget::OnRemoveSegmentation(const mitk::DataNode* selectedS
   {
     m_SemanticRelations->RemoveSegmentation(selectedSegmentation);
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::SemanticRelationException& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox;
@@ -599,7 +868,7 @@ void QmitkLesionInfoWidget::OnRemoveImage(const mitk::DataNode* selectedImage)
     m_SemanticRelations->RemoveImage(selectedImage);
     emit ImageRemoved(selectedImage);
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::SemanticRelationException& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox;
@@ -615,6 +884,7 @@ void QmitkLesionInfoWidget::ResetLesionListWidget()
 {
   m_Controls.lesionListWidget->clear();
   m_CurrentLesion.UID = "";
+  m_CurrentLesion.name = "";
 
   // create lesion list widget entries with the current lesions
   mitk::SemanticRelations::LesionVector allLesionsOfCase = m_SemanticRelations->GetAllLesionsOfCase(m_CaseID);
@@ -624,7 +894,21 @@ void QmitkLesionInfoWidget::ResetLesionListWidget()
   }
   for (const auto& lesion : allLesionsOfCase)
   {
-    m_Controls.lesionListWidget->addItem(QString::fromStdString(lesion.UID));
+    // store the UID as 'UserRole' data in the widget item
+    QListWidgetItem* lesionItem = new QListWidgetItem;
+    lesionItem->setData(Qt::UserRole, QString::fromStdString(lesion.UID));
+
+    // use the lesion UID for the item text, if the lesion name is non-existent
+    if (lesion.name.empty())
+    {
+      lesionItem->setText(QString::fromStdString(lesion.UID));
+    }
+    else
+    {
+      lesionItem->setText(QString::fromStdString(lesion.name));
+    }
+
+    m_Controls.lesionListWidget->addItem(lesionItem);
   }
 }
 
@@ -646,7 +930,7 @@ void QmitkLesionInfoWidget::ResetSegmentationListWidget()
       m_Controls.segmentationListWidget->addItem(QString::fromStdString(segmentation->GetName()));
     }
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::SemanticRelationException& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox;
@@ -677,7 +961,7 @@ void QmitkLesionInfoWidget::ResetImageListWidget()
       m_Controls.imageListWidget->addItem(QString::fromStdString(image->GetName()));
     }
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::SemanticRelationException& e)
   {
     std::stringstream exceptionMessage; exceptionMessage << e;
     QMessageBox msgBox;

@@ -58,33 +58,10 @@ std::vector<mitk::SemanticTypes::Lesion> mitk::RelationStorage::GetAllLesionsOfC
   std::vector<SemanticTypes::Lesion> allLesionsOfCase;
   for (const auto& lesionID : vectorValue)
   {
-    // the lesion class ID is stored under the lesion ID
-    mitk::StringProperty* lesionClassIDProperty = dynamic_cast<mitk::StringProperty*>(propertyList->GetProperty(lesionID));
-    if (nullptr == lesionClassIDProperty)
+    SemanticTypes::Lesion generatedLesion = GenerateLesion(caseID, lesionID);
+    if (!generatedLesion.UID.empty())
     {
-      MITK_INFO << "Incorrect lesion storage. Lesion " << lesionID << " can not be created and retrieved";
-      continue;
-    }
-
-    // the lesion class type is stored under the lesion class ID
-    std::string lesionClassID = lesionClassIDProperty->GetValue();
-    mitk::StringProperty* lesionClassProperty = dynamic_cast<mitk::StringProperty*>(propertyList->GetProperty(lesionClassID));
-
-    if (nullptr != lesionClassProperty)
-    {
-      SemanticTypes::LesionClass generatedLesionClass;
-      generatedLesionClass.UID = lesionClassID;
-      generatedLesionClass.classType = lesionClassProperty->GetValue();
-
-      SemanticTypes::Lesion generatedLesion;
-      generatedLesion.UID = lesionID;
-      generatedLesion.lesionClass = generatedLesionClass;
-
       allLesionsOfCase.push_back(generatedLesion);
-    }
-    else
-    {
-      MITK_INFO << "Incorrect lesion class storage. Lesion " << lesionID << " can not be created and retrieved";
     }
   }
 
@@ -117,25 +94,8 @@ mitk::SemanticTypes::Lesion mitk::RelationStorage::GetRepresentedLesion(const Se
   }
   else
   {
-    SemanticTypes::Lesion representedLesion;
-
     std::string lesionID = segmentationVectorValue[1];
-    // the lesion class ID is stored under the lesion ID
-    std::string lesionClassID;
-    propertyList->GetStringProperty(lesionID.c_str(), lesionClassID);
-    representedLesion.UID = lesionID;
-
-    // the lesion class type is stored under the lesion class ID
-    std::string lesionClass;
-    propertyList->GetStringProperty(lesionClassID.c_str(), lesionClass);
-
-    SemanticTypes::LesionClass representedLesionClass;
-    representedLesionClass.UID = lesionClassID;
-    representedLesionClass.classType = lesionClass;
-
-    representedLesion.lesionClass = representedLesionClass;
-
-    return representedLesion;
+    return GenerateLesion(caseID, lesionID);
   }
 }
 
@@ -750,14 +710,17 @@ void mitk::RelationStorage::AddLesion(const SemanticTypes::CaseID& caseID, const
     lesionsVectorProperty->SetValue(lesionsVectorValue);
     propertyList->SetProperty("lesions", lesionsVectorProperty);
 
-    // add the lesion with the lesion UID as the key and the lesion class UID as value
-    std::string lesionID = lesion.UID;
-    std::string lesionClassID = lesion.lesionClass.UID;
-    propertyList->SetStringProperty(lesionID.c_str(), lesionClassID.c_str());
+    // add the lesion with the lesion UID as the key and the lesion information as value
+    std::vector<std::string> lesionData;
+    lesionData.push_back(lesion.name);
+    lesionData.push_back(lesion.lesionClass.UID);
+    mitk::VectorProperty<std::string>::Pointer newLesionVectorProperty = mitk::VectorProperty<std::string>::New();
+    newLesionVectorProperty->SetValue(lesionData);
+    propertyList->SetProperty(lesion.UID, newLesionVectorProperty);
 
     // add the lesion class with the lesion class UID as key and the class type as value
     std::string lesionClassType = lesion.lesionClass.classType;
-    propertyList->SetStringProperty(lesionClassID.c_str(), lesionClassType.c_str());
+    propertyList->SetStringProperty(lesion.lesionClass.UID.c_str(), lesionClassType.c_str());
   }
 }
 
@@ -781,14 +744,17 @@ void mitk::RelationStorage::OverwriteLesion(const SemanticTypes::CaseID& caseID,
   const auto existingLesion = std::find(lesionVectorValue.begin(), lesionVectorValue.end(), lesion.UID);
   if (existingLesion != lesionVectorValue.end())
   {
-    // overwrite the lesion with the new, given lesion class UID
-    std::string lesionID = *existingLesion;
-    std::string lesionClassID = lesion.lesionClass.UID;
-    propertyList->SetStringProperty(lesionID.c_str(), lesionClassID.c_str());
+    // overwrite the referenced lesion class UID with the new, given lesion class data
+    std::vector<std::string> lesionData;
+    lesionData.push_back(lesion.name);
+    lesionData.push_back(lesion.lesionClass.UID);
+    mitk::VectorProperty<std::string>::Pointer newLesionVectorProperty = mitk::VectorProperty<std::string>::New();
+    newLesionVectorProperty->SetValue(lesionData);
+    propertyList->SetProperty(lesion.UID, newLesionVectorProperty);
 
-    // overwrite the lesion class with the lesion class UID as key and the class type as value
+    // overwrite the lesion class with the lesion class UID as key and the new, given class type as value
     std::string lesionClassType = lesion.lesionClass.classType;
-    propertyList->SetStringProperty(lesionClassID.c_str(), lesionClassType.c_str());
+    propertyList->SetStringProperty(lesion.lesionClass.UID.c_str(), lesionClassType.c_str());
   }
   else
   {
@@ -907,45 +873,82 @@ void mitk::RelationStorage::RemoveLesion(const mitk::SemanticTypes::CaseID& case
   }
 
   // remove the lesion instance itself
-  // the lesion class ID is stored under the lesion ID
-  mitk::StringProperty* lesionClassIDProperty = dynamic_cast<mitk::StringProperty*>(propertyList->GetProperty(lesion.UID));
-  if (nullptr == lesionClassIDProperty)
+  // the lesion data is stored under the lesion ID
+  mitk::VectorProperty<std::string>* lesionDataProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(lesion.UID));
+  if (nullptr == lesionDataProperty)
   {
     MITK_INFO << "Lesion " << lesion.UID << " not found (already removed?). Cannot remove the lesion.";
     return;
   }
 
-  // the lesion class type is stored under the lesion class ID
-  std::string lesionClassID = lesionClassIDProperty->GetValue();
-  mitk::StringProperty* lesionClassProperty = dynamic_cast<mitk::StringProperty*>(propertyList->GetProperty(lesionClassID));
-  if (nullptr == lesionClassProperty)
+  std::vector<std::string> lesionData = lesionDataProperty->GetValue();
+  // a lesion date has to have exactly two values (the name of the lesion and the UID of the lesion class)
+  if (lesionData.size() != 2)
   {
-    MITK_INFO << "No lesion class found for " << lesion.UID << ". Just removing the lesion class ID.";
+    MITK_INFO << "Incorrect lesion data storage. Not two (2) strings of the lesion UID and the lesion name are stored.";
   }
   else
   {
-    // check if the lesion class ID is referenced by any other lesion
-    const auto existingLesionClass = std::find_if(lesionVectorValue.begin(), lesionVectorValue.end(),
-      [&propertyList, &lesionClassID](const std::string& lesionID)
+    std::string lesionClassID = lesionData[1];
+    RemoveLesionClass(caseID, lesionClassID);
+  }
+  propertyList->DeleteProperty(lesion.UID);
+}
+
+void mitk::RelationStorage::RemoveLesionClass(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& lesionClassID)
+{
+  mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
+  if (nullptr == propertyList)
+  {
+    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return;
+  }
+
+  // retrieve a vector property that contains the lesion class
+  mitk::StringProperty* lesionClassProperty = dynamic_cast<mitk::StringProperty*>(propertyList->GetProperty(lesionClassID));
+  if (nullptr == lesionClassProperty)
+  {
+    MITK_INFO << "Lesion class " << lesionClassID << " not found (already removed?). Cannot remove the lesion class.";
+    return;
+  }
+
+  // retrieve a vector property that contains the valid lesions of the current case
+  mitk::VectorProperty<std::string>* lesionVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty("lesions"));
+  if (nullptr == lesionVectorProperty)
+  {
+    return;
+  }
+
+  // check if the lesion class ID is referenced by any other lesion
+  std::vector<std::string> lesionVectorValue = lesionVectorProperty->GetValue();
+  const auto existingLesionClass = std::find_if(lesionVectorValue.begin(), lesionVectorValue.end(),
+    [&propertyList, &lesionClassID](const std::string& lesionID)
+  {
+    mitk::VectorProperty<std::string>* lesionDataProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(lesionID));
+    if (nullptr == lesionDataProperty)
     {
-      mitk::StringProperty* lesionClassIDProperty = dynamic_cast<mitk::StringProperty*>(propertyList->GetProperty(lesionID));
-      if (nullptr == lesionClassIDProperty)
+      return false;
+    }
+    else
+    {
+      std::vector<std::string> lesionData = lesionDataProperty->GetValue();
+      // a lesion date has to have exactly two values (the name of the lesion and the UID of the lesion class)
+      if (lesionData.size() != 2)
       {
         return false;
       }
       else
       {
-        return lesionClassIDProperty->GetValue() == lesionClassID;
+        return lesionData[1] == lesionClassID;
       }
-    });
-
-    if (existingLesionClass == lesionVectorValue.end())
-    {
-      // lesion class ID not referenced; remove lesion class
-      propertyList->DeleteProperty(lesionClassID);
     }
+  });
+
+  if (existingLesionClass == lesionVectorValue.end())
+  {
+    // lesion class ID not referenced; remove lesion class
+    propertyList->DeleteProperty(lesionClassID);
   }
-  propertyList->DeleteProperty(lesion.UID);
 }
 
 void mitk::RelationStorage::AddControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint)
@@ -1348,4 +1351,51 @@ mitk::PropertyList::Pointer mitk::RelationStorage::GetStorageData(const Semantic
   // the property list is valid for a whole case and contains all the properties for the current case
   // the persistence service may create a new property list with the given ID, if no property list is found
   return persistenceService->GetPropertyList(const_cast<SemanticTypes::CaseID&>(caseID));
+}
+
+mitk::SemanticTypes::Lesion mitk::RelationStorage::GenerateLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& lesionID)
+{
+  mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
+  if (nullptr == propertyList)
+  {
+    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return SemanticTypes::Lesion();
+  }
+
+  mitk::VectorProperty<std::string>* lesionDataProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(lesionID));
+  if (nullptr == lesionDataProperty)
+  {
+    MITK_INFO << "Lesion " << lesionID << " not found. Lesion can not be retrieved.";
+    return SemanticTypes::Lesion();
+  }
+
+  std::vector<std::string> lesionData = lesionDataProperty->GetValue();
+  // a lesion date has to have exactly two values (the name of the lesion and the UID of the lesion class)
+  if (lesionData.size() != 2)
+  {
+    MITK_INFO << "Incorrect lesion data storage. Not two (2) strings of the lesion name and the lesion UID are stored.";
+    return SemanticTypes::Lesion();
+  }
+
+  // the lesion class ID is stored as the second property
+  std::string lesionClassID = lesionData[1];
+  mitk::StringProperty* lesionClassProperty = dynamic_cast<mitk::StringProperty*>(propertyList->GetProperty(lesionClassID));
+  if (nullptr != lesionClassProperty)
+  {
+    SemanticTypes::LesionClass generatedLesionClass;
+    generatedLesionClass.UID = lesionClassID;
+    generatedLesionClass.classType = lesionClassProperty->GetValue();
+
+    SemanticTypes::Lesion generatedLesion;
+    generatedLesion.UID = lesionID;
+    generatedLesion.name = lesionData[0];
+    generatedLesion.lesionClass = generatedLesionClass;
+
+    return generatedLesion;
+  }
+  else
+  {
+    MITK_INFO << "Incorrect lesion class storage. Lesion " << lesionID << " can not be retrieved.";
+    return SemanticTypes::Lesion();
+  }
 }

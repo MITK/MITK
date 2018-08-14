@@ -18,10 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITKLESIONINFOWIDGET_H
 
 // semantic relations UI module
-#include "MitkSemanticRelationsUIExports.h"
 #include <ui_QmitkLesionInfoWidgetControls.h>
-#include <QmitkSimpleDatamanagerWidget.h>
-#include <QmitkSelectNodeDialog.h>
 
 // semantic relations module
 #include <mitkSemanticRelations.h>
@@ -34,7 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 
 /*
-* @brief The QmitkLesionInfoWidget is a widget that shows the currently available lesion data of the semantic relations model
+* @brief The QmitkLesionInfoWidget is a widget that shows and modifies the currently available lesion data of the semantic relations model.
+*
+*   The widget provides a dialogs to add nodes from the data storage to the semantic relations model.
+*   It provides functionality to create new lesions and link them with segmentation nodes.
 *
 *   The QmitkLesionInfoWidget provides three QListWidgets, that show the lesion data and the referenced segmentation data, as
 *   well as the connected image data, depending on the selected lesion.
@@ -42,11 +42,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 *   The QmitkLesionInfoWidget implements the 'ISemanticRelationsObserver', so that it is automatically updated, if the
 *   semantic relations model changes. Updating means freshly getting all lesion data and filling the lesion-ListWidget with the lesion data.
 */
-class MITKSEMANTICRELATIONSUI_EXPORT QmitkLesionInfoWidget : public QWidget, public mitk::ISemanticRelationsObserver
+class QmitkLesionInfoWidget : public QWidget, public mitk::ISemanticRelationsObserver
 {
   Q_OBJECT
 
 public:
+
   static const QBrush DEFAULT_BACKGROUND_COLOR;
   static const QBrush SELECTED_BACKGROUND_COLOR;
   static const QBrush CONNECTED_BACKGROUND_COLOR;
@@ -89,24 +90,46 @@ public:
   void DarkenBackgroundColors();
 
 Q_SIGNALS:
+
   void JumpToPosition(const mitk::Point3D&);
+  void ImageAdded(const mitk::SemanticTypes::CaseID&);
   void ImageRemoved(const mitk::DataNode*);
 
 private Q_SLOTS:
 
+  /*
+  * @brief Generates a new, empty lesion to add to the semantic relations model for the current case ID.
+  */
+  void OnAddLesionButtonClicked();
+  void OnAddSegmentationButtonClicked();
+  void OnAddImageButtonClicked();
+
+  // slots for the mouse click events of the list widgets
   void OnCurrentLesionItemChanged(QListWidgetItem*, QListWidgetItem*);
   void OnLesionItemDoubleClicked(QListWidgetItem*);
   void OnCurrentSegmentationItemChanged(QListWidgetItem*, QListWidgetItem*);
   void OnSegmentationItemDoubleClicked(QListWidgetItem*);
   void OnCurrentImageItemChanged(QListWidgetItem*, QListWidgetItem*);
   void OnImageItemDoubleClicked(QListWidgetItem*);
+
   void OnLesionListContextMenuRequested(const QPoint&);
   void OnSegmentationListContextMenuRequested(const QPoint&);
   void OnImageListContextMenuRequested(const QPoint&);
-  void OnLinkToSegmentation(const mitk::SemanticTypes::Lesion&);
-  void OnRemoveLesion(const mitk::SemanticTypes::Lesion&);
-  void OnSetLesionClass(const mitk::SemanticTypes::Lesion&);
+
+  // slots for the context menu actions of the lesion list widget
+  void OnLinkToSegmentation(const mitk::SemanticTypes::ID&);
+  void OnSetLesionName(const mitk::SemanticTypes::ID&);
+  void OnSetLesionClass(const mitk::SemanticTypes::ID&);
+  void OnRemoveLesion(const mitk::SemanticTypes::ID&);
+
+  // slots for the context menu actions of the segmentation list widget
   void OnUnlinkFromLesion(const mitk::DataNode*);
+
+ 
+public Q_SLOTS:
+
+  // slots for the context menu action of the image / segmentation list widget
+  // the slots are also used from the semantic relations view if a node in the data storage is removed
   void OnRemoveSegmentation(const mitk::DataNode*);
   void OnRemoveImage(const mitk::DataNode*);
 
@@ -119,9 +142,6 @@ private:
   mitk::DataStorage* m_DataStorage;
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
   mitk::SemanticTypes::CaseID m_CaseID;
-
-  QmitkSimpleDatamanagerWidget* m_SimpleDatamanagerWidget;
-  QmitkSelectNodeDialog* m_SimpleDatamanagerNodeDialog;
 
   mitk::SemanticTypes::Lesion m_CurrentLesion;
   mitk::DataNode::Pointer m_CurrentSegmentation;

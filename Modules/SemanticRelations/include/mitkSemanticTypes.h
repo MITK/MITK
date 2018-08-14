@@ -92,7 +92,7 @@ namespace mitk
     };
 
     /*
-    * @brief The concept of a lesion.
+    * @brief The concept of a lesion class.
     */
     struct LesionClass
     {
@@ -106,6 +106,7 @@ namespace mitk
     struct Lesion
     {
       ID UID;
+      std::string name = "";
       LesionClass lesionClass;
     };
 

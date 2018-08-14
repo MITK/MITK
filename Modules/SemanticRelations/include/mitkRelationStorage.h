@@ -58,6 +58,7 @@ namespace mitk
     void LinkSegmentationToLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID, const SemanticTypes::Lesion& lesion);
     void UnlinkSegmentationFromLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID);
     void RemoveLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
+    void RemoveLesionClass(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& lesionClassID);
 
     void AddControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
     void OverwriteControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
@@ -73,6 +74,8 @@ namespace mitk
 
     // access the storage and retrieve the case data, stored under the given case ID
     mitk::PropertyList::Pointer GetStorageData(const SemanticTypes::CaseID& caseID);
+
+    mitk::SemanticTypes::Lesion GenerateLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& lesionID);
 
     DataStorage::Pointer m_DataStorage;
 

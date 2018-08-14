@@ -4,29 +4,23 @@ set(CPP_FILES
   mitkModuleActivator.cpp
   QmitkAbstractSemanticRelationsStorageModel.cpp
   QmitkControlPointDialog.cpp
-  QmitkLesionInfoWidget.cpp
+  QmitkLesionTextDialog.cpp
   QmitkPatientTableInspector.cpp
   QmitkPatientTableModel.cpp
-  QmitkSelectionWidget.cpp
-  QmitkSelectNodeDialog.cpp
+  QmitkSemanticRelationsModel.cpp
   QmitkSemanticRelationsUIHelper.cpp
-  QmitkSimpleDatamanagerWidget.cpp
 )
 
 set(MOC_H_FILES
  include/QmitkAbstractSemanticRelationsStorageInspector.h
  include/QmitkAbstractSemanticRelationsStorageModel.h
  include/QmitkControlPointDialog.h
- include/QmitkLesionInfoWidget.h
+ include/QmitkLesionTextDialog.h
  include/QmitkPatientTableInspector.h
  include/QmitkPatientTableModel.h
- include/QmitkSelectionWidget.h
- include/QmitkSelectNodeDialog.h
- include/QmitkSimpleDatamanagerWidget.h
+ include/QmitkSemanticRelationsModel.h
 )
 
 set(UI_FILES
-  src/QmitkLesionInfoWidgetControls.ui
   src/QmitkPatientTableInspector.ui
-  src/QmitkSimpleDatamanagerWidgetControls.ui
 )

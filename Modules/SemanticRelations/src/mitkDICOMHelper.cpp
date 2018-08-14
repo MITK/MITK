@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations module
 #include "mitkDICOMHelper.h"
+#include "mitkSemanticRelationException.h"
 #include "mitkUIDGeneratorBoost.h"
 
 // mitk core
@@ -30,13 +31,13 @@ mitk::SemanticTypes::CaseID mitk::GetCaseIDFromDataNode(const mitk::DataNode* da
 {
   if (nullptr == dataNode)
   {
-    mitkThrow() << "Not a valid data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid data node.";
   }
 
   mitk::BaseData* baseData = dataNode->GetData();
   if (nullptr == baseData)
   {
-    mitkThrow() << "No valid base data.";
+    mitkThrowException(SemanticRelationException) << "No valid base data.";
   }
 
   // extract suitable DICOM tag to use as the case id
@@ -47,7 +48,7 @@ mitk::SemanticTypes::CaseID mitk::GetCaseIDFromDataNode(const mitk::DataNode* da
   mitk::BaseProperty* dicomTag = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0010).c_str());
   if (nullptr == dicomTag)
   {
-    mitkThrow() << "Not a valid DICOM property.";
+    mitkThrowException(SemanticRelationException) << "Not a valid DICOM property.";
   }
 
   std::string dicomTagAsString = dicomTag->GetValueAsString();
@@ -58,13 +59,13 @@ mitk::SemanticTypes::ID mitk::GetIDFromDataNode(const mitk::DataNode* dataNode)
 {
   if (nullptr == dataNode)
   {
-    mitkThrow() << "Not a valid data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid data node.";
   }
 
   mitk::BaseData* baseData = dataNode->GetData();
   if (nullptr == baseData)
   {
-    mitkThrow() << "No valid base data.";
+    mitkThrowException(SemanticRelationException) << "No valid base data.";
   }
 
   // extract suitable DICOM tag to use as the data node id
@@ -72,7 +73,7 @@ mitk::SemanticTypes::ID mitk::GetIDFromDataNode(const mitk::DataNode* dataNode)
   mitk::BaseProperty* dicomTag = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0020, 0x000e).c_str());
   if (nullptr == dicomTag)
   {
-    mitkThrow() << "Not a valid DICOM property.";
+    mitkThrowException(SemanticRelationException) << "Not a valid DICOM property.";
   }
   std::string dicomTagAsString = dicomTag->GetValueAsString();
   return dicomTagAsString;
@@ -82,13 +83,13 @@ mitk::SemanticTypes::Date mitk::GetDICOMDateFromDataNode(const mitk::DataNode* d
 {
   if (nullptr == dataNode)
   {
-    mitkThrow() << "Not a valid data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid data node.";
   }
 
   mitk::BaseData* baseData = dataNode->GetData();
   if (nullptr == baseData)
   {
-    mitkThrow() << "No valid base data.";
+    mitkThrowException(SemanticRelationException) << "No valid base data.";
   }
 
   // extract suitable DICOM tag to use as the data node id
@@ -96,7 +97,7 @@ mitk::SemanticTypes::Date mitk::GetDICOMDateFromDataNode(const mitk::DataNode* d
   mitk::BaseProperty* acquisitionDateProperty = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0022).c_str());
   if (nullptr == acquisitionDateProperty)
   {
-    mitkThrow() << "Not a valid DICOM property.";
+    mitkThrowException(SemanticRelationException) << "Not a valid DICOM property.";
   }
   std::string acquisitionDateAsString = acquisitionDateProperty->GetValueAsString();
   return GetDateFromString(acquisitionDateAsString);
@@ -106,13 +107,13 @@ mitk::SemanticTypes::InformationType mitk::GetDICOMModalityFromDataNode(const mi
 {
   if (nullptr == dataNode)
   {
-    mitkThrow() << "Not a valid data node.";
+    mitkThrowException(SemanticRelationException) << "Not a valid data node.";
   }
 
   mitk::BaseData* baseData = dataNode->GetData();
   if (nullptr == baseData)
   {
-    mitkThrow() << "No valid base data.";
+    mitkThrowException(SemanticRelationException) << "No valid base data.";
   }
 
   // extract suitable DICOM tag to use as the information type
@@ -120,7 +121,7 @@ mitk::SemanticTypes::InformationType mitk::GetDICOMModalityFromDataNode(const mi
   mitk::BaseProperty* dicomTag = baseData->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str());
   if (nullptr == dicomTag)
   {
-    mitkThrow() << "Not a valid DICOM property.";
+    mitkThrowException(SemanticRelationException) << "Not a valid DICOM property.";
   }
   std::string dicomTagAsString = dicomTag->GetValueAsString();
   return dicomTagAsString;

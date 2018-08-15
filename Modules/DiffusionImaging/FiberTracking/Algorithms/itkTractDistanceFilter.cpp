@@ -163,7 +163,7 @@ void TractDistanceFilter::GenerateData()
   m_MinDistances.set_size(T1.size());
 
 #pragma omp parallel for
-  for (unsigned int i=0; i<T1.size(); ++i)
+  for (int i=0; i<(int)T1.size(); ++i)
   {
     auto tracto1 = T1.at(i);
     m_MinDistances[i] = 99999;

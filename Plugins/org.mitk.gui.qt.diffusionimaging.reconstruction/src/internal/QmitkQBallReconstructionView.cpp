@@ -778,17 +778,6 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
   filter->SetLambda(lambda);
   filter->Update();
 
-  if(m_Controls->m_OutputCoeffsImage->isChecked())
-  {
-    mitk::Image::Pointer coeffsImage = mitk::Image::New();
-    coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
-    coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
-    mitk::DataNode::Pointer coeffsNode=mitk::DataNode::New();
-    coeffsNode->SetData( coeffsImage );
-    coeffsNode->SetProperty( "name", mitk::StringProperty::New(
-                               QString(nodename.c_str()).append("_SH-Coefficients").toStdString()) );
-    GetDataStorage()->Add(coeffsNode, dataNodePointer);
-  }
 
   // ODFs TO DATATREE
   mitk::OdfImage::Pointer image = mitk::OdfImage::New();
@@ -799,6 +788,18 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
   node->SetName(nodename+"_SH_MultiShell_Qball");
 
   GetDataStorage()->Add(node, dataNodePointer);
+
+  if(m_Controls->m_OutputCoeffsImage->isChecked())
+  {
+    mitk::Image::Pointer coeffsImage = dynamic_cast<mitk::Image*>(mitk::ShImage::New().GetPointer());
+    coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
+    coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
+
+    mitk::DataNode::Pointer coeffsNode=mitk::DataNode::New();
+    coeffsNode->SetData( coeffsImage );
+    coeffsNode->SetProperty( "name", mitk::StringProperty::New(dataNodePointer->GetName()+"_SH-Coeffs") );
+    GetDataStorage()->Add(coeffsNode, node);
+  }
 }
 
 void QmitkQBallReconstructionView::GenerateShellSelectionUI(mitk::DataNode::Pointer node)

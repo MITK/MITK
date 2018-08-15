@@ -78,7 +78,9 @@ void QmitkOdfMaximaExtractionView::CreateQtPartControl(QWidget *parent)
     m_Controls->m_MaskBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_ImageBox->SetDataStorage(this->GetDataStorage());
 
-    mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+    mitk::TNodePredicateDataType<mitk::ShImage>::Pointer isShImage = mitk::TNodePredicateDataType<mitk::ShImage>::New();
+    mitk::TNodePredicateDataType<mitk::TensorImage>::Pointer isTensorImage = mitk::TNodePredicateDataType<mitk::TensorImage>::New();
+
     mitk::NodePredicateNot::Pointer isDwi = mitk::NodePredicateNot::New(mitk::NodePredicateIsDWI::New());
     mitk::NodePredicateNot::Pointer isOdf = mitk::NodePredicateNot::New(mitk::NodePredicateDataType::New("OdfImage"));
     mitk::NodePredicateAnd::Pointer unwanted = mitk::NodePredicateAnd::New(isOdf, isDwi);
@@ -86,7 +88,7 @@ void QmitkOdfMaximaExtractionView::CreateQtPartControl(QWidget *parent)
     mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
 
     m_Controls->m_MaskBox->SetPredicate(mitk::NodePredicateAnd::New(mitk::NodePredicateAnd::New(unwanted, dim3), isBinaryPredicate));
-    m_Controls->m_ImageBox->SetPredicate(mitk::NodePredicateAnd::New(mitk::NodePredicateAnd::New(unwanted, isMitkImage), mitk::NodePredicateNot::New(isBinaryPredicate)));
+    m_Controls->m_ImageBox->SetPredicate(mitk::NodePredicateOr::New(isTensorImage, isShImage));
     m_Controls->m_MaskBox->SetZeroEntryText("--");
 
     connect( (QObject*)(m_Controls->m_ImageBox), SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnImageSelectionChanged()) );

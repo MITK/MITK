@@ -231,7 +231,7 @@ std::vector< TractClusteringFilter::Cluster > TractClusteringFilter::MergeDuplic
     bool flip = false;
 
 #pragma omp parallel for
-    for (unsigned int k2=0; k2<new_clusters.size(); ++k2)
+    for (int k2=0; k2<(int)new_clusters.size(); ++k2)
     {
       Cluster c2 = new_clusters.at(k2);
       vnl_matrix<float> v = c2.h / c2.n;

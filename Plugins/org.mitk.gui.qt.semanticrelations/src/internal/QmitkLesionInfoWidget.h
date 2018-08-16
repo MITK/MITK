@@ -114,8 +114,6 @@ private:
   mitk::SemanticTypes::CaseID m_CaseID;
 
   mitk::SemanticTypes::Lesion m_CurrentLesion;
-  mitk::DataNode::Pointer m_CurrentSegmentation;
-  mitk::DataNode::Pointer m_CurrentImage;
 };
 
 #endif // QMITKLESIONINFOWIDGET_H

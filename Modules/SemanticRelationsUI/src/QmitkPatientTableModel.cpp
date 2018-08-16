@@ -262,7 +262,12 @@ void QmitkPatientTableModel::SetDataNodes()
     SetPixmapOfNode(dataNode, &pixmapFromImage);
 
     // set the lesion presence for the current node
-    bool lesionPresence = IsLesionPresentOnDataNode(dataNode);
+    bool lesionPresence = true;
+    if (m_SemanticRelations->InstanceExists(m_CaseID, m_Lesion))
+    {
+      lesionPresence = IsLesionPresentOnDataNode(dataNode);
+    }
+
     SetLesionPresence(dataNode, lesionPresence);
   }
 }

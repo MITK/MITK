@@ -54,17 +54,22 @@ public:
   virtual void SetCaseID(const mitk::SemanticTypes::CaseID& caseID) override;
   virtual void SetLesion(const mitk::SemanticTypes::Lesion& lesion) override;
 
-protected:
+Q_SIGNALS:
 
-  virtual void Initialize() override;
+  void DataNodeDoubleClicked(const mitk::DataNode::Pointer);
 
 private Q_SLOTS:
 
   void OnModelUpdated();
-  void OnNodeButtonClicked(const QString& nodeType);
+  void OnNodeButtonClicked(const QString&);
   void OnTableViewContextMenuRequested(const QPoint&);
   void OnContextMenuSetInformationType();
   void OnContextMenuSetControlPoint();
+  void OnItemDoubleClicked(const QModelIndex&);
+
+protected:
+
+  virtual void Initialize() override;
 
 private:
 

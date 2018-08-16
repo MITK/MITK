@@ -18,7 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPatientTableInspector.h"
 #include "QmitkControlPointDialog.h"
 
+// mitk qt widgets module
 #include "QmitkCustomVariants.h"
+#include "QmitkEnums.h"
 
 // semantic relations module
 #include <mitkDICOMHelper.h>
@@ -240,16 +242,31 @@ void QmitkPatientTableInspector::OnContextMenuSetControlPoint()
   }
 }
 
+void QmitkPatientTableInspector::OnItemDoubleClicked(const QModelIndex& itemIndex)
+{
+  if (itemIndex.isValid())
+  {
+    QVariant qvariantDataNode = m_StorageModel->data(itemIndex, QmitkDataNodeRole);
+    if (qvariantDataNode.canConvert<mitk::DataNode::Pointer>())
+    {
+      mitk::DataNode::Pointer dataNode = qvariantDataNode.value<mitk::DataNode::Pointer>();
+      emit DataNodeDoubleClicked(dataNode);
+    }
+  }
+}
+
 void QmitkPatientTableInspector::SetUpConnections()
 {
-  connect(m_StorageModel, SIGNAL(ModelUpdated()), SLOT(OnModelUpdated()));
-  connect(m_Controls.tableView, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(OnTableViewContextMenuRequested(const QPoint&)));
+  connect(m_StorageModel, &QmitkPatientTableModel::ModelUpdated, this, &QmitkPatientTableInspector::OnModelUpdated);
+  connect(m_Controls.tableView, &QTableView::customContextMenuRequested, this, &QmitkPatientTableInspector::OnTableViewContextMenuRequested);
 
   QSignalMapper* nodeButtonSignalMapper = new QSignalMapper(this);
   nodeButtonSignalMapper->setMapping(m_Controls.imageNodeButton, QString("Image"));
   nodeButtonSignalMapper->setMapping(m_Controls.segmentationNodeButton, QString("Segmentation"));
-  connect(nodeButtonSignalMapper, SIGNAL(mapped(const QString&)), this, SLOT(OnNodeButtonClicked(const QString&)));
+  connect(nodeButtonSignalMapper, static_cast<void (QSignalMapper::*)(const QString&)>(&QSignalMapper::mapped), this, &QmitkPatientTableInspector::OnNodeButtonClicked);
   connect(m_Controls.imageNodeButton, SIGNAL(clicked()), nodeButtonSignalMapper, SLOT(map()));
   connect(m_Controls.segmentationNodeButton, SIGNAL(clicked()), nodeButtonSignalMapper, SLOT(map()));
   m_Controls.imageNodeButton->setChecked(true);
+
+  connect(m_Controls.tableView, &QTableView::doubleClicked, this, &QmitkPatientTableInspector::OnItemDoubleClicked);
 }

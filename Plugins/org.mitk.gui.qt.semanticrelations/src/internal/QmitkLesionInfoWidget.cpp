@@ -29,9 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkCustomVariants.h"
 
-// multi label module
-#include <mitkLabelSetImage.h>
-
 // mitk core
 #include <mitkProperties.h>
 

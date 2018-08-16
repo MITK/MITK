@@ -65,17 +65,20 @@ private Q_SLOTS:
   void OnCaseIDSelectionChanged(const QString&);
 
   void AddToComboBox(const mitk::SemanticTypes::CaseID&);
-  void OnJumpToPosition(const mitk::Point3D&);
   void OnLesionChanged(const mitk::SemanticTypes::Lesion&);
+  void OnDataNodeDoubleClicked(const mitk::DataNode::Pointer);
+  void OnNodesAdded(QmitkDnDDataNodeWidget*, std::vector<mitk::DataNode*>);
 
 private:
 
   void SetUpConnections();
 
   virtual void NodeRemoved(const mitk::DataNode* dataNode) override;
-  void NodesAdded(QmitkDnDDataNodeWidget* dnDDataNodeWidget, std::vector<mitk::DataNode*> nodes);
 
   void RemoveFromComboBox(const mitk::SemanticTypes::CaseID& caseID);
+
+  void OpenInEditor(const mitk::DataNode::Pointer dataNode);
+  void JumpToPosition(const mitk::DataNode::Pointer dataNode);
 
   void AddImage(const mitk::DataNode* image);
   void AddSegmentation(const mitk::DataNode* segmentation);

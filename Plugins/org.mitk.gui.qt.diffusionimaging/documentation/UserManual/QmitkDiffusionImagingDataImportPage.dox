@@ -52,8 +52,8 @@ MITK stores ODFs as 252 float values spherically sampled from the continuous ODF
 
 The specific ODF sampling directions can be found <a href="https://phabricator.mitk.org/source/mitk/browse/master/Modules/DiffusionImaging/DiffusionCore/include/Algorithms/Reconstruction/itkPointShell.txx;8cdb084b2eccff7f5caa30ba5a88bf43ccc9ec6f$457">here</a>.
 
-\subsection sh_format Spherical Harmonics
-Many applications in dMRI are using spherical harmonics to store spherical functions such as ODFs. MITK Diffusion stores these files as 3D vector images (NRRD format), where the vector components represent the SH coefficients. While this format is different from e.g. the MRtrix SH file format, MITK Diffusion can convert from MRtrix SH files to MITK Diffusion SH files. For historical reasons, the conversion tool is located in the \ref org_mitk_views_odfmaximaextraction view. Simply load the MRtrix SH image, select it in the data manager, select the "MRtrix" spherical harmonics convention and click "Start SH Coefficient Import".
+\subsection sh_format Spherical Harmonics (.nii, .nii.gz, .nrrd)
+Many applications in dMRI are using spherical harmonics to store spherical functions such as ODFs. MITK Diffusion stores these files as 4D float images this is the same format as MRtrix is using. SH Images connot be used for tractography directly but they must be converted into sampled ODF images. The conversion tool is located in the \ref org_mitk_views_qballreconstruction view.
 
 \subsection peak_format Peak Images (.nii, .nii.gz, .nrrd)
 

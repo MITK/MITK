@@ -162,8 +162,8 @@ index 21ebddb5a6..96daba4032 100644
 +            break;
 +
 +          for (auto& item : platformNameAndIndex) {
-+          auto platform = item.first;
-+          std::transform(platform.begin(), platform.end(), platform.begin(), ::tolower);
++            auto platform = item.first;
++            std::transform(platform.begin(), platform.end(), platform.begin(), ::tolower);
 +            if (std::string::npos != platform.find(platformName)) {
 +              clSelectedPlatformID = clPlatformIDs[item.second];
 +              break;

@@ -34,6 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk qt
 #include <QmitkAbstractView.h>
 
+class QmitkDnDDataNodeWidget;
+
 /*
 * @brief The QmitkSemanticRelationsView is an MITK view to combine and show the widgets of the 'SemanticRelationsUI'-module and this semantic relations plugin.
 *
@@ -71,8 +73,12 @@ private:
   void SetUpConnections();
 
   virtual void NodeRemoved(const mitk::DataNode* dataNode) override;
+  void NodesAdded(QmitkDnDDataNodeWidget* dnDDataNodeWidget, std::vector<mitk::DataNode*> nodes);
 
   void RemoveFromComboBox(const mitk::SemanticTypes::CaseID& caseID);
+
+  void AddImage(const mitk::DataNode* image);
+  void AddSegmentation(const mitk::DataNode* segmentation);
 
   void RemoveImage(const mitk::DataNode* image);
   void RemoveSegmentation(const mitk::DataNode* segmentation);
@@ -80,6 +86,7 @@ private:
   Ui::QmitkSemanticRelationsControls m_Controls;
   QmitkLesionInfoWidget* m_LesionInfoWidget;
   QmitkPatientTableInspector* m_PatientTableInspector;
+  QmitkDnDDataNodeWidget* m_DnDDataNodeWidget;
 
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
 };

@@ -48,28 +48,43 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
   m_LesionInfoWidget = new QmitkLesionInfoWidget(GetDataStorage(), parent);
   m_Controls.gridLayout->addWidget(m_LesionInfoWidget);
 
-  connect(m_Controls.caseIDComboBox, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged), this, &QmitkSemanticRelationsView::OnCaseIDSelectionChanged);
+  m_PatientTableInspector = new QmitkPatientTableInspector(parent);
+  m_PatientTableInspector->SetDataStorage(GetDataStorage());
+  m_Controls.gridLayout->addWidget(m_PatientTableInspector);
 
-  connect(m_LesionInfoWidget, &QmitkLesionInfoWidget::ImageAdded, this, &QmitkSemanticRelationsView::AddToComboBox);
-  connect(m_LesionInfoWidget, &QmitkLesionInfoWidget::JumpToPosition, this, &QmitkSemanticRelationsView::OnJumpToPosition);
-  connect(m_LesionInfoWidget, &QmitkLesionInfoWidget::ImageRemoved, this, &QmitkSemanticRelationsView::OnImageRemoved);
+  SetUpConnections();
 }
 
-void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* node)
+void QmitkSemanticRelationsView::SetUpConnections()
 {
-  if (mitk::NodePredicates::GetImagePredicate()->CheckNode(node))
+  connect(m_Controls.caseIDComboBox, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged), this, &QmitkSemanticRelationsView::OnCaseIDSelectionChanged);
+
+  connect(m_LesionInfoWidget, &QmitkLesionInfoWidget::LesionChanged, this, &QmitkSemanticRelationsView::OnLesionChanged);
+}
+
+void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* dataNode)
+{
+  if (nullptr == dataNode)
   {
-    m_LesionInfoWidget->OnRemoveImage(node);
+    return;
   }
-  else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(node))
+
+  if (mitk::NodePredicates::GetImagePredicate()->CheckNode(dataNode))
   {
-    m_LesionInfoWidget->OnRemoveSegmentation(node);
+    RemoveImage(dataNode);
+  }
+  else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
+  {
+    RemoveSegmentation(dataNode);
+  }
+}
   }
 }
 
 void QmitkSemanticRelationsView::OnCaseIDSelectionChanged(const QString& caseID)
 {
   m_LesionInfoWidget->SetCurrentCaseID(caseID.toStdString());
+  m_PatientTableInspector->SetCaseID(caseID.toStdString());
 }
 
 void QmitkSemanticRelationsView::OnJumpToPosition(const mitk::Point3D& position)
@@ -82,10 +97,9 @@ void QmitkSemanticRelationsView::OnJumpToPosition(const mitk::Point3D& position)
   }
 }
 
-void QmitkSemanticRelationsView::OnImageRemoved(const mitk::DataNode* imageNode)
+void QmitkSemanticRelationsView::OnLesionChanged(const mitk::SemanticTypes::Lesion& lesion)
 {
-  mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(imageNode);
-  RemoveFromComboBox(caseID);
+  m_PatientTableInspector->SetLesion(lesion);
 }
 
 void QmitkSemanticRelationsView::AddToComboBox(const mitk::SemanticTypes::CaseID& caseID)
@@ -108,5 +122,42 @@ void QmitkSemanticRelationsView::RemoveFromComboBox(const mitk::SemanticTypes::C
     // caseID does not contain any control points and therefore no data
     // remove the caseID, if it is still contained
     m_Controls.caseIDComboBox->removeItem(foundIndex);
+  }
+}
+void QmitkSemanticRelationsView::RemoveImage(const mitk::DataNode* image)
+{
+  try
+  {
+    m_SemanticRelations->RemoveImage(image);
+    mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(image);
+    RemoveFromComboBox(caseID);
+  }
+  catch (const mitk::SemanticRelationException& e)
+  {
+    std::stringstream exceptionMessage; exceptionMessage << e;
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Could not remove the selected image.");
+    msgBox.setText("The program wasn't able to correctly remove the selected image from the semantic relations model.\n"
+      "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.exec();
+  }
+}
+
+void QmitkSemanticRelationsView::RemoveSegmentation(const mitk::DataNode* segmentation)
+{
+  try
+  {
+    m_SemanticRelations->RemoveSegmentation(segmentation);
+  }
+  catch (const mitk::SemanticRelationException& e)
+  {
+    std::stringstream exceptionMessage; exceptionMessage << e;
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Could not remove the selected segmentation.");
+    msgBox.setText("The program wasn't able to correctly remove the selected segmentation from the semantic relations model.\n"
+      "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.exec();
   }
 }

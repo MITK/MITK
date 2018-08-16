@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSemanticRelations.h>
 #include <mitkSemanticTypes.h>
 
+// semantic relations UI module
+#include <QmitkPatientTableInspector.h>
+
 // blueberry
 #include <berryISelectionListener.h>
 
@@ -61,16 +64,22 @@ private Q_SLOTS:
 
   void AddToComboBox(const mitk::SemanticTypes::CaseID&);
   void OnJumpToPosition(const mitk::Point3D&);
-  void OnImageRemoved(const mitk::DataNode*);
+  void OnLesionChanged(const mitk::SemanticTypes::Lesion&);
 
 private:
 
-  virtual void NodeRemoved(const mitk::DataNode* node) override;
+  void SetUpConnections();
+
+  virtual void NodeRemoved(const mitk::DataNode* dataNode) override;
 
   void RemoveFromComboBox(const mitk::SemanticTypes::CaseID& caseID);
 
+  void RemoveImage(const mitk::DataNode* image);
+  void RemoveSegmentation(const mitk::DataNode* segmentation);
+
   Ui::QmitkSemanticRelationsControls m_Controls;
   QmitkLesionInfoWidget* m_LesionInfoWidget;
+  QmitkPatientTableInspector* m_PatientTableInspector;
 
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
 };

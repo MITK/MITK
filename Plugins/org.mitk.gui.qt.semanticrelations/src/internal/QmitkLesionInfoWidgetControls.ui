@@ -14,56 +14,34 @@
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-  <item row="0" column="0">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item row="1" column="0" rowspan="2">
+    <widget class="QListWidget" name="lesionListWidget"/>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="addLesionPushButton">
+     <property name="text">
+      <string>Add new lesion</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
     <widget class="QLabel" name="lesionInfoWidgetLabel">
      <property name="text">
       <string>Available lesions:</string>
      </property>
     </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLabel" name="segmentationInfoWidgetLabel">
-     <property name="text">
-      <string>Available segmentations:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QLabel" name="imageInfoWidgetLabel">
-     <property name="text">
-      <string>Available images:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QPushButton" name="addLesionPushButton">
-     <property name="text">
-      <string>Add lesion</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="addSegmentationPushButton">
-     <property name="text">
-      <string>Add segmentation</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="QPushButton" name="addImagePushButton">
-     <property name="text">
-      <string>Add image</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QListWidget" name="lesionListWidget"/>
-   </item>
-   <item row="2" column="1">
-    <widget class="QListWidget" name="segmentationListWidget"/>
-   </item>
-   <item row="2" column="2">
-    <widget class="QListWidget" name="imageListWidget"/>
    </item>
   </layout>
  </widget>

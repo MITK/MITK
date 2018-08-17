@@ -23,67 +23,63 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIPreferencesService.h"
 #include "berryPlatform.h"
 
-QmitkNodeTableViewKeyFilter::QmitkNodeTableViewKeyFilter( QObject* _DataManagerView )
-: QObject(_DataManagerView)
+QmitkNodeTableViewKeyFilter::QmitkNodeTableViewKeyFilter(QObject* dataManagerView)
+  : QObject(dataManagerView)
 {
   m_PreferencesService = berry::Platform::GetPreferencesService();
 }
 
-bool QmitkNodeTableViewKeyFilter::eventFilter( QObject *obj, QEvent *event )
+bool QmitkNodeTableViewKeyFilter::eventFilter(QObject *obj, QEvent *event)
 {
-  QmitkDataManagerView* _DataManagerView = qobject_cast<QmitkDataManagerView*>(this->parent());
-  if (event->type() == QEvent::KeyPress && _DataManagerView)
+  QmitkDataManagerView* dataManagerView = qobject_cast<QmitkDataManagerView*>(this->parent());
+  if (event->type() == QEvent::KeyPress && dataManagerView)
   {
     berry::IPreferences::Pointer nodeTableKeyPrefs = m_PreferencesService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
 
-    QKeySequence _MakeAllInvisible = QKeySequence(nodeTableKeyPrefs->Get("Make all nodes invisible", "Ctrl+, V"));
-    QKeySequence _ToggleVisibility = QKeySequence(nodeTableKeyPrefs->Get("Toggle visibility of selected nodes", "V"));
-    QKeySequence _DeleteSelectedNodes = QKeySequence(nodeTableKeyPrefs->Get("Delete selected nodes", "Del"));
-    QKeySequence _Reinit = QKeySequence(nodeTableKeyPrefs->Get("Reinit selected nodes", "R"));
-    QKeySequence _GlobalReinit = QKeySequence(nodeTableKeyPrefs->Get("Global Reinit", "Ctrl+, R"));
-    QKeySequence _ShowInfo = QKeySequence(nodeTableKeyPrefs->Get("Show Node Information", "Ctrl+, I"));
+    QKeySequence makeAllInvisible = QKeySequence(nodeTableKeyPrefs->Get("Make all nodes invisible", "Ctrl+V"));
+    QKeySequence toggleVisibility = QKeySequence(nodeTableKeyPrefs->Get("Toggle visibility of selected nodes", "V"));
+    QKeySequence deleteSelectedNodes = QKeySequence(nodeTableKeyPrefs->Get("Delete selected nodes", "Del"));
+    QKeySequence reinit = QKeySequence(nodeTableKeyPrefs->Get("Reinit selected nodes", "R"));
+    QKeySequence globalReinit = QKeySequence(nodeTableKeyPrefs->Get("Global reinit", "Ctrl+R"));
+    QKeySequence showInfo = QKeySequence(nodeTableKeyPrefs->Get("Show node information", "Ctrl+I"));
 
-    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+    QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+    QKeySequence keySequence = QKeySequence(keyEvent->modifiers() + keyEvent->key());
 
-    QKeySequence _KeySequence = QKeySequence(keyEvent->modifiers(), keyEvent->key());
-    // if no modifier was pressed the sequence is now empty
-    if(_KeySequence.isEmpty())
-      _KeySequence = QKeySequence(keyEvent->key());
-
-    if(_KeySequence == _MakeAllInvisible)
+    if (keySequence == makeAllInvisible)
     {
       // trigger deletion of selected node(s)
-      _DataManagerView->MakeAllNodesInvisible(true);
+      dataManagerView->MakeAllNodesInvisible(true);
       // return true: this means the delete key event is not send to the table
       return true;
     }
-    else if(_KeySequence == _DeleteSelectedNodes)
+    else if (keySequence == deleteSelectedNodes)
     {
       // trigger deletion of selected node(s)
-      _DataManagerView->RemoveSelectedNodes(true);
+      dataManagerView->RemoveSelectedNodes(true);
       // return true: this means the delete key event is not send to the table
       return true;
     }
-    else if(_KeySequence == _ToggleVisibility)
+    else if (keySequence == toggleVisibility)
     {
       // trigger deletion of selected node(s)
-      _DataManagerView->ToggleVisibilityOfSelectedNodes(true);
+      dataManagerView->ToggleVisibilityOfSelectedNodes(true);
       // return true: this means the delete key event is not send to the table
       return true;
     }
-    else if(_KeySequence == _Reinit)
+    else if (keySequence == reinit)
     {
-      _DataManagerView->ReinitSelectedNodes(true);
+      dataManagerView->ReinitSelectedNodes(true);
       return true;
     }
-    else if(_KeySequence == _GlobalReinit)
+    else if (keySequence == globalReinit)
     {
-      _DataManagerView->GlobalReinit(true);
+      dataManagerView->GlobalReinit(true);
       return true;
     }
-    else if(_KeySequence == _ShowInfo)
+    else if (keySequence == showInfo)
     {
-      _DataManagerView->ShowInfoDialogForSelectedNodes(true);
+      dataManagerView->ShowInfoDialogForSelectedNodes(true);
       return true;
     }
   }

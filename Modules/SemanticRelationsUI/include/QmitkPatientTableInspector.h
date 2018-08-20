@@ -59,13 +59,12 @@ public:
 Q_SIGNALS:
 
   void DataNodeDoubleClicked(const mitk::DataNode::Pointer);
+  void OnContextMenuRequested(const QPoint&);
 
 private Q_SLOTS:
 
   void OnModelUpdated();
   void OnNodeButtonClicked(const QString&);
-  void OnTableViewContextMenuRequested(const QPoint&);
-  void OnContextMenuSetInformationType();
   void OnContextMenuSetControlPoint();
   void OnItemDoubleClicked(const QModelIndex&);
 
@@ -80,7 +79,6 @@ private:
   Ui::QmitkPatientTableInspector m_Controls;
   QmitkPatientTableModel* m_StorageModel;
 
-  QMenu* m_ContextMenu;
   mitk::DataNode* m_SelectedDataNode;
 
 };

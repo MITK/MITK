@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkUIDGeneratorBoost.h>
 
 // qt
-#include <QInputDialog>
 #include <QSignalMapper>
 
 QmitkPatientTableInspector::QmitkPatientTableInspector(QWidget* parent/* =nullptr*/)
@@ -44,8 +43,6 @@ QmitkPatientTableInspector::QmitkPatientTableInspector(QWidget* parent/* =nullpt
   m_StorageModel = new QmitkPatientTableModel(this);
 
   m_Controls.tableView->setModel(m_StorageModel);
-
-  m_ContextMenu = new QMenu(m_Controls.tableView);
 
   SetUpConnections();
 }
@@ -102,45 +99,6 @@ void QmitkPatientTableInspector::OnModelUpdated()
 void QmitkPatientTableInspector::OnNodeButtonClicked(const QString& nodeType)
 {
   m_StorageModel->SetNodeType(nodeType.toStdString());
-}
-
-void QmitkPatientTableInspector::OnTableViewContextMenuRequested(const QPoint& pos)
-{
-  QModelIndex selectedIndex = m_Controls.tableView->indexAt(pos);
-  if (!selectedIndex.isValid())
-  {
-    return;
-  }
-
-  QVariant qvariantDataNode = m_StorageModel->data(selectedIndex, QmitkDataNodeRawPointerRole);
-  if (qvariantDataNode.canConvert<mitk::DataNode*>())
-  {
-    m_SelectedDataNode = qvariantDataNode.value<mitk::DataNode*>();
-
-    m_ContextMenu->clear();
-
-    QAction* setInformationTypeAction = new QAction("Set information type", m_ContextMenu);
-    m_ContextMenu->addAction(setInformationTypeAction);
-    connect(setInformationTypeAction, &QAction::triggered, this, &QmitkPatientTableInspector::OnContextMenuSetInformationType);
-
-    QAction* setControlPointAction = new QAction("Set control point", m_ContextMenu);
-    m_ContextMenu->addAction(setControlPointAction);
-    connect(setControlPointAction, &QAction::triggered, this, &QmitkPatientTableInspector::OnContextMenuSetControlPoint);
-
-    m_ContextMenu->popup(QCursor::pos());
-  }
-}
-
-void QmitkPatientTableInspector::OnContextMenuSetInformationType()
-{
-  bool ok = false;
-  QString text = QInputDialog::getText(m_Controls.tableView, tr("Set information type of selected node"), tr("Information type:"), QLineEdit::Normal, "", &ok);
-  if (ok && !text.isEmpty())
-  {
-    m_StorageModel->GetSemanticRelations()->RemoveInformationTypeFromImage(m_SelectedDataNode);
-    m_StorageModel->GetSemanticRelations()->AddInformationTypeToImage(m_SelectedDataNode, text.toStdString());
-    m_StorageModel->UpdateModelData();
-  }
 }
 
 void QmitkPatientTableInspector::OnContextMenuSetControlPoint()
@@ -263,7 +221,7 @@ void QmitkPatientTableInspector::OnItemDoubleClicked(const QModelIndex& itemInde
 void QmitkPatientTableInspector::SetUpConnections()
 {
   connect(m_StorageModel, &QmitkPatientTableModel::ModelUpdated, this, &QmitkPatientTableInspector::OnModelUpdated);
-  connect(m_Controls.tableView, &QTableView::customContextMenuRequested, this, &QmitkPatientTableInspector::OnTableViewContextMenuRequested);
+  connect(m_Controls.tableView, &QTableView::customContextMenuRequested, this, &QmitkPatientTableInspector::OnContextMenuRequested);
 
   QSignalMapper* nodeButtonSignalMapper = new QSignalMapper(this);
   nodeButtonSignalMapper->setMapping(m_Controls.imageNodeButton, QString("Image"));

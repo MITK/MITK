@@ -133,8 +133,7 @@ void QmitkLesionInfoWidget::OnAddLesionButtonClicked()
 void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* current, QListWidgetItem* /*previous*/)
 {
   if (nullptr == current
-   || nullptr == m_SemanticRelations
-   || nullptr == m_DataStorage)
+   || nullptr == m_SemanticRelations)
   {
     return;
   }
@@ -237,8 +236,15 @@ void QmitkLesionInfoWidget::OnLinkToSegmentation(const mitk::SemanticTypes::ID& 
     return;
   }
 
+  if (m_DataStorage.IsExpired())
+  {
+    return;
+  }
+
+  auto dataStorage = m_DataStorage.Lock();
+
   QmitkSemanticRelationsNodeSelectionDialog* dialog = new QmitkSemanticRelationsNodeSelectionDialog(this, "Select segmentation to link to the selected lesion.", "");
-  dialog->SetDataStorage(m_DataStorage);
+  dialog->SetDataStorage(dataStorage);
   dialog->setWindowTitle("Select segmentation node");
   dialog->SetNodePredicate(mitk::NodePredicates::GetSegmentationPredicate());
   dialog->SetSelectOnlyVisibleNodes(true);

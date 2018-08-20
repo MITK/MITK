@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations plugin
 #include "ui_QmitkSemanticRelationsControls.h"
+#include "QmitkDataNodeInformationTypeAction.h"
+#include "QmitkDataNodeOpenInAction.h"
 #include "QmitkLesionInfoWidget.h"
 
 // semantic relations module
@@ -28,13 +30,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations UI module
 #include <QmitkPatientTableInspector.h>
 
-// blueberry
+// mitk gui common plugin
+#include <mitkIRenderWindowPartListener.h>
+
+// berry
 #include <berryISelectionListener.h>
 
 // mitk qt
 #include <QmitkAbstractView.h>
 
 class QmitkDnDDataNodeWidget;
+class QMenu;
 
 /*
 * @brief The QmitkSemanticRelationsView is an MITK view to combine and show the widgets of the 'SemanticRelationsUI'-module and this semantic relations plugin.
@@ -47,7 +53,7 @@ class QmitkDnDDataNodeWidget;
 *                    This is a leftover from when the widget was not used as a selection widget. Those functionality will be moved
 *                    to this main GUI soon.
 */
-class QmitkSemanticRelationsView : public QmitkAbstractView
+class QmitkSemanticRelationsView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
@@ -60,6 +66,9 @@ protected:
   virtual void SetFocus() override;
   virtual void CreateQtPartControl(QWidget* parent) override;
 
+  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+
 private Q_SLOTS:
 
   void OnCaseIDSelectionChanged(const QString&);
@@ -68,6 +77,8 @@ private Q_SLOTS:
   void OnLesionChanged(const mitk::SemanticTypes::Lesion&);
   void OnDataNodeDoubleClicked(const mitk::DataNode::Pointer);
   void OnNodesAdded(QmitkDnDDataNodeWidget*, std::vector<mitk::DataNode*>);
+
+  void OnContextMenuRequested(const QPoint&);
 
 private:
 
@@ -100,6 +111,10 @@ private:
   QmitkLesionInfoWidget* m_LesionInfoWidget;
   QmitkPatientTableInspector* m_PatientTableInspector;
   QmitkDnDDataNodeWidget* m_DnDDataNodeWidget;
+
+  QMenu* m_ContextMenu;
+  QmitkDataNodeInformationTypeAction* m_InformationTypeAction;
+  QmitkDataNodeOpenInAction* m_OpenInAction;
 
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
 };

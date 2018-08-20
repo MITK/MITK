@@ -25,15 +25,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk qt widgets module
 #include <QmitkDnDDataNodeWidget.h>
+#include <QmitkRenderWindow.h>
 
 // mitk multi label module
 #include <mitkLabelSetImage.h>
 
-// blueberry
+// berry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 
 // qt
+#include <QMenu>
 #include <QMessageBox>
 
 const std::string QmitkSemanticRelationsView::VIEW_ID = "org.mitk.views.semanticrelations";
@@ -67,7 +69,47 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.gridLayout->addWidget(m_DnDDataNodeWidget);
 
+  m_ContextMenu = new QMenu(m_PatientTableInspector);
+
+  m_InformationTypeAction = new QmitkDataNodeInformationTypeAction(m_ContextMenu, GetSite());
+  m_InformationTypeAction->SetDataStorage(GetDataStorage());
+  m_ContextMenu->addAction(m_InformationTypeAction);
+
+  m_OpenInAction = new QmitkDataNodeOpenInAction(m_ContextMenu, GetSite());
+  m_ContextMenu->addAction(m_OpenInAction);
+
+  mitk::IRenderWindowPart* renderWindowPart = GetRenderWindowPart();
+  if (nullptr != renderWindowPart)
+  {
+    RenderWindowPartActivated(renderWindowPart);
+  }
+
   SetUpConnections();
+}
+
+void QmitkSemanticRelationsView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  // connect QmitkRenderWindows - underlying vtkRenderWindow is the same as "mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows()"
+  QHash<QString, QmitkRenderWindow*> windowMap = renderWindowPart->GetQmitkRenderWindows();
+  QHash<QString, QmitkRenderWindow*>::Iterator it;
+
+  mitk::BaseRenderer* baseRenderer = nullptr;
+  RenderWindowLayerUtilities::RendererVector controlledRenderer;
+  for (it = windowMap.begin(); it != windowMap.end(); ++it)
+  {
+    baseRenderer = mitk::BaseRenderer::GetInstance(it.value()->GetVtkRenderWindow());
+    if (nullptr != baseRenderer)
+    {
+      controlledRenderer.push_back(baseRenderer);
+    }
+  }
+
+  m_OpenInAction->SetControlledRenderer(controlledRenderer);
+}
+
+void QmitkSemanticRelationsView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  // nothing here
 }
 
 void QmitkSemanticRelationsView::SetUpConnections()
@@ -76,6 +118,10 @@ void QmitkSemanticRelationsView::SetUpConnections()
   connect(m_LesionInfoWidget, &QmitkLesionInfoWidget::LesionChanged, this, &QmitkSemanticRelationsView::OnLesionChanged);
   connect(m_PatientTableInspector, &QmitkPatientTableInspector::DataNodeDoubleClicked, this, &QmitkSemanticRelationsView::OnDataNodeDoubleClicked);
   connect(m_DnDDataNodeWidget, &QmitkDnDDataNodeWidget::NodesDropped, this, &QmitkSemanticRelationsView::OnNodesAdded);
+
+  connect(m_PatientTableInspector, &QmitkPatientTableInspector::OnContextMenuRequested, this, &QmitkSemanticRelationsView::OnContextMenuRequested);
+}
+
 QItemSelectionModel* QmitkSemanticRelationsView::GetDataNodeSelectionModel() const
 {
   return m_PatientTableInspector->GetSelectionModel();
@@ -154,6 +200,11 @@ void QmitkSemanticRelationsView::OnNodesAdded(QmitkDnDDataNodeWidget* dnDDataNod
       AddSegmentation(dataNode);
     }
   }
+}
+
+void QmitkSemanticRelationsView::OnContextMenuRequested(const QPoint& /*pos*/)
+{
+  m_ContextMenu->popup(QCursor::pos());
 }
 
 void QmitkSemanticRelationsView::RemoveFromComboBox(const mitk::SemanticTypes::CaseID& caseID)

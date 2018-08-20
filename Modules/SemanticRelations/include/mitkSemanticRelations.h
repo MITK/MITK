@@ -512,6 +512,18 @@ namespace mitk
     * @param dataNode       The current case identifier is extracted from the given data node, which contains DICOM information about the case.
     */
     void UnlinkDataFromControlPoint(const DataNode* dataNode);
+    /**
+    * @brief Set (and possibly overwrite) the information type of the given image.
+    *        An already associated information type might be removed if is not referenced by any other image:
+    *
+    * @pre    The given image data node has to be valid (!nullptr).
+    * @throw  SemanticRelationException, if the given image data node is invalid (==nullptr).
+    * @post   If the information type instance did not exist before, it is now added.
+    *
+    * @param imageNode        The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param informationType  An information type that identifies the corresponding information type instance.
+    */
+    void SetInformationType(const DataNode* imageNode, const SemanticTypes::InformationType& informationType);
     /*
     * @brief  Set the information type of the given image.
     *

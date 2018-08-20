@@ -109,7 +109,7 @@ private:
   void SetUpConnections();
 
   Ui::QmitkLesionInfoWidgetControls m_Controls;
-  mitk::DataStorage* m_DataStorage;
+  mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
   mitk::SemanticTypes::CaseID m_CaseID;
 

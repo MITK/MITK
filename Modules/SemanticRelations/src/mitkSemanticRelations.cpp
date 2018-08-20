@@ -847,6 +847,15 @@ void mitk::SemanticRelations::UnlinkDataFromControlPoint(const DataNode* dataNod
   }
 }
 
+void mitk::SemanticRelations::SetInformationType(const DataNode* imageNode, const SemanticTypes::InformationType& informationType)
+{
+  RemoveInformationTypeFromImage(imageNode);
+  AddInformationTypeToImage(imageNode, informationType);
+
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
+  NotifyObserver(caseID);
+}
+
 void mitk::SemanticRelations::AddInformationTypeToImage(const DataNode* imageNode, const SemanticTypes::InformationType& informationType)
 {
   if (nullptr == imageNode)

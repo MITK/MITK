@@ -21,7 +21,7 @@ if(MITK_USE_CTK)
     if(MITK_USE_Python)
       list(APPEND ctk_optional_cache_args
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
-           -DCTK_ENABLE_Python_Wrapping:BOOL=ON
+           -DCTK_ENABLE_Python_Wrapping:BOOL=OFF
            -DCTK_APP_ctkSimplePythonShell:BOOL=ON
            -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
            -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}

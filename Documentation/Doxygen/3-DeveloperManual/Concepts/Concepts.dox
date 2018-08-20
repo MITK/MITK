@@ -3,7 +3,6 @@
 
 The following items describe some issues about MITK on a more abstract level.
 
--# \subpage OverviewPage
 -# \subpage CodingPage "Coding Concepts"
  -# \ref CodingPageGeneral
  -# \ref CodingPageStyle
@@ -28,6 +27,4 @@ The following items describe some issues about MITK on a more abstract level.
 -# \subpage ModularizationPage "Modularization Concept"
  -# \ref ModularizationPageOverview
  -# \ref ModularizationPageHowTo
-
-If you want to start using MITK, you also want to see the chapter \ref Development.
 */

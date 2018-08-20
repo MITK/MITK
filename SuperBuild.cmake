@@ -52,6 +52,7 @@ endif()
 
 get_property(external_projects GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
 
+list(REMOVE_ITEM external_projects Python Numpy)
 if(MITK_CTEST_SCRIPT_MODE)
   # Write a file containing the list of enabled external project targets.
   # This file can be read by a ctest script to separately build projects.
@@ -66,7 +67,7 @@ endif()
 
 # A list of "nice" external projects, playing well together with CMake
 set(nice_external_projects ${external_projects})
-list(REMOVE_ITEM nice_external_projects Boost Python)
+list(REMOVE_ITEM nice_external_projects Boost)
 foreach(proj ${nice_external_projects})
   if(MITK_USE_${proj})
     set(EXTERNAL_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")

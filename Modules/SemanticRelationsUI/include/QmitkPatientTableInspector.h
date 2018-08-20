@@ -54,6 +54,8 @@ public:
   virtual void SetCaseID(const mitk::SemanticTypes::CaseID& caseID) override;
   virtual void SetLesion(const mitk::SemanticTypes::Lesion& lesion) override;
 
+  QItemSelectionModel* GetSelectionModel();
+
 Q_SIGNALS:
 
   void DataNodeDoubleClicked(const mitk::DataNode::Pointer);

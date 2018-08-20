@@ -76,6 +76,9 @@ void QmitkSemanticRelationsView::SetUpConnections()
   connect(m_LesionInfoWidget, &QmitkLesionInfoWidget::LesionChanged, this, &QmitkSemanticRelationsView::OnLesionChanged);
   connect(m_PatientTableInspector, &QmitkPatientTableInspector::DataNodeDoubleClicked, this, &QmitkSemanticRelationsView::OnDataNodeDoubleClicked);
   connect(m_DnDDataNodeWidget, &QmitkDnDDataNodeWidget::NodesDropped, this, &QmitkSemanticRelationsView::OnNodesAdded);
+QItemSelectionModel* QmitkSemanticRelationsView::GetDataNodeSelectionModel() const
+{
+  return m_PatientTableInspector->GetSelectionModel();
 }
 
 void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* dataNode)

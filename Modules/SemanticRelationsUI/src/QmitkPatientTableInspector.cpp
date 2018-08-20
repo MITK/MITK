@@ -80,6 +80,11 @@ void QmitkPatientTableInspector::SetLesion(const mitk::SemanticTypes::Lesion& le
   m_StorageModel->SetLesion(lesion);
 }
 
+QItemSelectionModel* QmitkPatientTableInspector::GetSelectionModel()
+{
+  return m_Controls.tableView->selectionModel();
+}
+
 void QmitkPatientTableInspector::Initialize()
 {
   m_StorageModel->SetDataStorage(m_DataStorage.Lock());

@@ -72,6 +72,16 @@ private Q_SLOTS:
 private:
 
   void SetUpConnections();
+  /**
+  * @brief Provide a QItemSelectionModel, which supports the data role 'QmitkDataNodeRole' (\see QmitkRenderWindowDataModel).
+  *
+  * The provided QItemSelectionModel is used in the QmitkAbstractView-base class as the selection model of
+  * the selection provider (\see QmitkAbstractView::SetSelectionProvider()).
+  * The default selection provider is a QmitkDataNodeSelectionProvider. Each time a selection in the provided
+  * QItemSeletionModel is changed, a selection changed event is fired. All plugins (views), that subclass the
+  * QmitkAbstractView will be informed about the selection changed via the OnSelectionChanged-function.
+  */
+  virtual QItemSelectionModel* GetDataNodeSelectionModel() const override;
 
   virtual void NodeRemoved(const mitk::DataNode* dataNode) override;
 

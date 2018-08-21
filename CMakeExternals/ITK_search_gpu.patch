@@ -1,6 +1,6 @@
-From 6e4568a068d1363e37677d4a140342794c5e685e Mon Sep 17 00:00:00 2001
+From a0f1fb48ab68748711e5f6db55f77f1853cbffe9 Mon Sep 17 00:00:00 2001
 From: sergey-denisov <s.s.denisov@yandex.ru>
-Date: Mon, 20 Aug 2018 14:00:56 +0400
+Date: Tue, 21 Aug 2018 10:22:10 +0400
 Subject: [PATCH] fix for AMD platform name
 
 fix for case insensitive search
@@ -43,7 +43,7 @@ index 7724d69b31..b803313b3e 100644
  
    cl_device_type devType = CL_DEVICE_TYPE_GPU;//CL_DEVICE_TYPE_CPU;//
 diff --git a/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx b/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx
-index 21ebddb5a6..185fba6e17 100644
+index 21ebddb5a6..4176449a28 100644
 --- a/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx
 +++ b/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx
 @@ -185,73 +185,96 @@ void OpenCLPrintDeviceInfo(cl_device_id device, bool verbose)
@@ -53,7 +53,7 @@ index 21ebddb5a6..185fba6e17 100644
 +std::string GetPlatformName(cl_platform_id platformID)
 +{
 +  size_t size = 0;
-+  auto ciErrNum = clGetPlatformInfo(platformID, CL_PLATFORM_NAME, ITK_NULLPTR, ITK_NULLPTR, &size);
++  auto ciErrNum = clGetPlatformInfo(platformID, CL_PLATFORM_NAME, 0, ITK_NULLPTR, &size);
 +  if (CL_SUCCESS != ciErrNum) {
 +    printf(" Error %i in clGetPlatformInfo Call !!!\n\n", ciErrNum);
 +    return std::string();

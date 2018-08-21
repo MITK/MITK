@@ -161,49 +161,30 @@ mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algo
     dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra *>(spectralUnmixingFilter.GetPointer())
       ->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED);
 
-    std::vector<int> weigthVec = {40, 45, 47};
+    /*std::vector<int> weigthVec = {39, 45, 47};
 
     for (int i = 0; i < 3; ++i)
     {
       dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra *>(spectralUnmixingFilter.GetPointer())
         ->AddWeight(weigthVec[i]);
-    }
+    }*/
   }
   return spectralUnmixingFilter;
 }
 
-std::string numberGenerator(int input)
+void add_weight(int weights, mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter)
 {
-  std::string number;
-  int counter = input + 1;
-  if (counter < 10)
-    number = "00" + std::to_string(counter);
-  else if (counter < 100)
-    number = "0" + std::to_string(counter);
-  else if (counter < 1000)
-    number = std::to_string(counter);
-  else
-    number = "NAN";
-  return number;
+  std::vector<int> weigthVec = { 30, 32, 33, 35, 37, 38, 40, 41, 43, 44, 45, 46, 47, 47,
+    47, 47, 47, 46, 46, 45, 44, 44, 43, 42, 42, 41 };
+
+  for (int i = 0; i < weights; ++i)
+  {
+    dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra *>(m_SpectralUnmixingFilter.GetPointer())
+      ->AddWeight(weigthVec[i]);
+  }
 }
 
-std::string smileyGenerator(float input)
-{
-  std::string number;
-  if (input < 10)
-    number = ":'(";
-  else if (input < 40)
-    number = ":(";
-  else if (input < 60)
-    number = ":/";
-  else if (input < 85)
-    number = ":)";
-  else if (input <= 100)
-    number = ":D";
-  else
-    number = "NAN";
-  return number;
-}
+
 
 int main(int argc, char *argv[])
 { 
@@ -253,61 +234,96 @@ int main(int argc, char *argv[])
   files.push_back(file);*/
   
   std::vector<std::string> algorithms = { "QR", "LU", "SVD", "NNLS", "WLS" };
+  int repetition = 6000;
 
-  std::vector<std::string> files;
+  for (unsigned alg = 0; alg < 5; ++alg)
+  {
+    ofstream myerrorfile;
+    myerrorfile.open("E:/NHDATA/time/time_evaluation_" + std::to_string(repetition)+"_" + algorithms[alg] + "_new02.txt");
 
-  for (unsigned file_idx = 0; file_idx < N; ++file_idx)
-  {
-    std::string file = inputDir + "/static-oxy_das_" + numberGenerator(file_idx) + "_merged.nrrd";
-    files.push_back(file);
-  }
-  
-  for (unsigned image_idx = 0; image_idx < N; ++image_idx)
-  {
-    auto m_inputImage = mitk::IOUtil::Load<mitk::Image>(files[image_idx]);
-    for (unsigned alg = 0; alg < 5; ++alg)
+    int ctr = 0;
+    for(int i = 2; i < 27; ++i)
     {
-      float percent = (image_idx*1.0 / N + 1.0 / N * (alg / 5.0))*100.0;
-      MITK_INFO << "IN PROGRESS: " << algorithms[alg] << " " << numberGenerator(image_idx) << " " << percent << "% " << smileyGenerator(percent);
-      mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter = GetFilterInstance(algorithms[alg]);
-      m_SpectralUnmixingFilter->SetInput(m_inputImage);
-      m_SpectralUnmixingFilter->AddOutputs(2);
-      m_SpectralUnmixingFilter->Verbose(false);
-      m_SpectralUnmixingFilter->RelativeError(false);
-      m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
-      m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
+      myerrorfile << std::to_string(i) + "\t";
+      std::string file;
+      if (i < 10)
+        file = "E:/NHDATA/time/input/time_0" + std::to_string(i) + ".nrrd";
+      else
+        file = "E:/NHDATA/time/input/time_" + std::to_string(i) + ".nrrd";
+      
+      auto m_inputImage = mitk::IOUtil::Load<mitk::Image>(file);
+    
+      MITK_INFO << "File: " << i;
+
+      for (int j = 0; j < repetition; ++j)
+        {
+           std::chrono::steady_clock::time_point _start;
+           _start = std::chrono::steady_clock::now(); 
+
+          mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter = GetFilterInstance(algorithms[alg]);
+          m_SpectralUnmixingFilter->SetInput(m_inputImage);
+          m_SpectralUnmixingFilter->AddOutputs(2);
+          m_SpectralUnmixingFilter->Verbose(false);
+          m_SpectralUnmixingFilter->RelativeError(false);
+          m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
+          m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
           
-      m_SpectralUnmixingFilter->AddWavelength(760);
-      m_SpectralUnmixingFilter->AddWavelength(798);
-      m_SpectralUnmixingFilter->AddWavelength(858);
+          for (int wl = 0; wl < i; ++wl)
+          {
+            m_SpectralUnmixingFilter->AddWavelength(700 + wl * 10);
+          }    
+          
+          if (alg == 4)
+          {         
+            add_weight(i, m_SpectralUnmixingFilter);
+          }
 
-      m_SpectralUnmixingFilter->Update();
 
-      auto output1 = m_SpectralUnmixingFilter->GetOutput(0);
-      auto output2 = m_SpectralUnmixingFilter->GetOutput(1);
+          m_SpectralUnmixingFilter->Update();
 
-      std::string unmixingOutputHbO2 = outputDir + "/SUOutput/" + algorithms[alg] + "/static_oxy_" + algorithms[alg] + "_HbO2_SU_" + numberGenerator(image_idx) + ".nrrd";
-      std::string unmixingOutputHb = outputDir + "/SUOutput/" + algorithms[alg] + "/static_oxy_" + algorithms[alg] + "_Hb_SU_" + numberGenerator(image_idx) + ".nrrd";
-      mitk::IOUtil::Save(output1, unmixingOutputHbO2);
-      mitk::IOUtil::Save(output2, unmixingOutputHb);
+          auto output1 = m_SpectralUnmixingFilter->GetOutput(0);
+          auto output2 = m_SpectralUnmixingFilter->GetOutput(1);
 
-      auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
-      m_sO2->Verbose(false);
-   
-      m_sO2->SetInput(0, output1);
-      m_sO2->SetInput(1, output2);
+          m_SpectralUnmixingFilter = nullptr;
 
-      m_sO2->Update();
+          std::chrono::steady_clock::time_point _end(std::chrono::steady_clock::now());
+          myerrorfile << std::chrono::duration_cast<std::chrono::duration<double>>(_end - _start).count() << "\t";
 
-      mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
-      sO2->SetSpacing(output1->GetGeometry()->GetSpacing());
+        /*std::string unmixingOutputHbO2 = "E:/NHDATA/time/output/time_" + std::to_string(i) + ".nrrd";
+        std::string unmixingOutputHb = "E:/NHDATA/time/output/time_" + std::to_string(i) + ".nrrd";
+        mitk::IOUtil::Save(output1, unmixingOutputHbO2);
+        mitk::IOUtil::Save(output2, unmixingOutputHb);/*
+/*
+        //auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
+        //m_sO2->Verbose(false);
+        //auto output1 = m_SpectralUnmixingFilter->GetOutput(0);
+        //auto output2 = m_SpectralUnmixingFilter->GetOutput(1);
 
-      std::string outputSo2 = outputDir + "/sO2/" + algorithms[alg] + "/static_oxy_" + algorithms[alg] + "_sO2_" + numberGenerator(image_idx) + ".nrrd";
-      mitk::IOUtil::Save(sO2, outputSo2);
 
-      m_SpectralUnmixingFilter = nullptr;
-      m_sO2 = nullptr;
+        //std::string unmixingOutputHbO2 ="E:/NHDATA/time/input/time_" + std::to_string(i) + ".nrrd";
+        //std::string unmixingOutputHb = outputDir + "/SUOutput/" + "Hb_" + algorithms[alg] + "_" + str_ctr + ".nrrd";
+        //mitk::IOUtil::Save(output1, unmixingOutputHbO2);
+        //mitk::IOUtil::Save(output2, unmixingOutputHb);
+
+        //m_sO2->SetInput(0, output1);
+        //m_sO2->SetInput(1, output2);
+
+        //m_sO2->Update();
+
+        //mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
+        //sO2->SetSpacing(output1->GetGeometry()->GetSpacing());
+
+        //std::string outputSo2 = outputDir + "/So2/" + algorithms[alg] + "/So2_" + algorithms[alg] + "_" + str_ctr + ".nrrd";
+        //std::string outputSo2 = outputDir + "/" + algorithms[alg] + "_sel_" + str_ctr + ".nrrd";
+        //std::string outputSo2 = outputDir + "/" + algorithms[alg] + "_sel.nrrd";
+        //mitk::IOUtil::Save(sO2, outputSo2);
+
+        //std::string outputSo2 = "E:/NHDATA/time/output/time_" + std::to_string(i) + algorithms[alg] + ".nrrd";
+        //mitk::IOUtil::Save(sO2, outputSo2);*/
+        }
+      myerrorfile << "\n";
     }
+  myerrorfile.close();
   }
   MITK_INFO << "Spectral Unmixing DONE";
 }

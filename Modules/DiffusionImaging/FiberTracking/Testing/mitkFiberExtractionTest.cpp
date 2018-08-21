@@ -104,13 +104,9 @@ int mitkFiberExtractionTest(int argc, char* argv[])
     {
       testFibs = mitk::IOUtil::Load<mitk::FiberBundle>(argv[9]);
       itk::FiberExtractionFilter<unsigned char>::Pointer extractor = itk::FiberExtractionFilter<unsigned char>::New();
-      mitk::FiberBundle::Pointer test = groundTruthFibs->GetDeepCopy();
-      test->ResampleLinear(0.2);
-      extractor->SetInputFiberBundle(test);
+      extractor->SetInputFiberBundle(groundTruthFibs);
       extractor->SetRoiImages({itkRoiImage});
       extractor->SetOverlapFraction(0.0);
-      extractor->SetBothEnds(true);
-      extractor->SetDontResampleFibers(true);
       extractor->SetMode(itk::FiberExtractionFilter<unsigned char>::MODE::OVERLAP);
       extractor->Update();
       mitk::FiberBundle::Pointer passing = extractor->GetPositives().at(0);

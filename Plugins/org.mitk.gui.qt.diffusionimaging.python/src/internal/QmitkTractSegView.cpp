@@ -144,8 +144,8 @@ void QmitkTractSegView::Start()
   itk::FlipPeaksFilter< float >::Pointer flipper = itk::FlipPeaksFilter< float >::New();
   flipper->SetInput(itk_peaks);
   flipper->SetFlipX(false);
-  flipper->SetFlipY(true);
-  flipper->SetFlipZ(false);
+  flipper->SetFlipY(false);
+  flipper->SetFlipZ(true);
   flipper->Update();
 
   itk::FourDToVectorImageFilter< float >::Pointer converter = itk::FourDToVectorImageFilter< float >::New();

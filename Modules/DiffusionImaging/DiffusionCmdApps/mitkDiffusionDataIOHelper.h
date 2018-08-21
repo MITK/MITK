@@ -40,6 +40,8 @@ public:
 
   static std::vector< mitk::FiberBundle::Pointer > load_fibs(const std::vector<std::string> files, std::vector<std::string>* filenames=nullptr);
 
+  static std::vector< mitk::Image::Pointer > load_mitk_images(const std::vector<std::string> files, std::vector<std::string>* filenames=nullptr);
+
   template< class TYPE >
   static typename TYPE::Pointer load_itk_image(const std::string file)
   {

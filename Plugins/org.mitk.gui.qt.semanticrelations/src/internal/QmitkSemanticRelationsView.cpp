@@ -120,6 +120,7 @@ void QmitkSemanticRelationsView::SetUpConnections()
   connect(m_DnDDataNodeWidget, &QmitkDnDDataNodeWidget::NodesDropped, this, &QmitkSemanticRelationsView::OnNodesAdded);
 
   connect(m_PatientTableInspector, &QmitkPatientTableInspector::OnContextMenuRequested, this, &QmitkSemanticRelationsView::OnContextMenuRequested);
+  connect(m_PatientTableInspector, &QmitkPatientTableInspector::OnNodeRemoved, this, &QmitkSemanticRelationsView::OnNodeRemoved);
 }
 
 QItemSelectionModel* QmitkSemanticRelationsView::GetDataNodeSelectionModel() const
@@ -165,7 +166,7 @@ void QmitkSemanticRelationsView::OnLesionChanged(const mitk::SemanticTypes::Lesi
   m_PatientTableInspector->SetLesion(lesion);
 }
 
-void QmitkSemanticRelationsView::OnDataNodeDoubleClicked(const mitk::DataNode::Pointer dataNode)
+void QmitkSemanticRelationsView::OnDataNodeDoubleClicked(const mitk::DataNode* dataNode)
 {
   if (nullptr == dataNode)
   {
@@ -207,6 +208,11 @@ void QmitkSemanticRelationsView::OnContextMenuRequested(const QPoint& /*pos*/)
   m_ContextMenu->popup(QCursor::pos());
 }
 
+void QmitkSemanticRelationsView::OnNodeRemoved(const mitk::DataNode* dataNode)
+{
+  NodeRemoved(dataNode);
+}
+
 void QmitkSemanticRelationsView::RemoveFromComboBox(const mitk::SemanticTypes::CaseID& caseID)
 {
   std::vector<mitk::SemanticTypes::ControlPoint> allControlPoints = m_SemanticRelations->GetAllControlPointsOfCase(caseID);
@@ -220,7 +226,7 @@ void QmitkSemanticRelationsView::RemoveFromComboBox(const mitk::SemanticTypes::C
   }
 }
 
-void QmitkSemanticRelationsView::OpenInEditor(const mitk::DataNode::Pointer dataNode)
+void QmitkSemanticRelationsView::OpenInEditor(const mitk::DataNode* dataNode)
 {
   auto renderWindowPart = GetRenderWindowPart();
   if (nullptr == renderWindowPart)
@@ -240,7 +246,7 @@ void QmitkSemanticRelationsView::OpenInEditor(const mitk::DataNode::Pointer data
   }
 }
 
-void QmitkSemanticRelationsView::JumpToPosition(const mitk::DataNode::Pointer dataNode)
+void QmitkSemanticRelationsView::JumpToPosition(const mitk::DataNode* dataNode)
 {
   if (nullptr == dataNode)
   {

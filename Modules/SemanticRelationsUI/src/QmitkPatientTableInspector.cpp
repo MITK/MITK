@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkUIDGeneratorBoost.h>
 
 // qt
+#include <QKeyEvent>
 #include <QSignalMapper>
 
 QmitkPatientTableInspector::QmitkPatientTableInspector(QWidget* parent/* =nullptr*/)
@@ -209,10 +210,10 @@ void QmitkPatientTableInspector::OnItemDoubleClicked(const QModelIndex& itemInde
 {
   if (itemIndex.isValid())
   {
-    QVariant qvariantDataNode = m_StorageModel->data(itemIndex, QmitkDataNodeRole);
-    if (qvariantDataNode.canConvert<mitk::DataNode::Pointer>())
+    QVariant qvariantDataNode = m_StorageModel->data(itemIndex, QmitkDataNodeRawPointerRole);
+    if (qvariantDataNode.canConvert<mitk::DataNode*>())
     {
-      mitk::DataNode::Pointer dataNode = qvariantDataNode.value<mitk::DataNode::Pointer>();
+      mitk::DataNode* dataNode = qvariantDataNode.value<mitk::DataNode*>();
       emit DataNodeDoubleClicked(dataNode);
     }
   }
@@ -232,4 +233,33 @@ void QmitkPatientTableInspector::SetUpConnections()
   m_Controls.imageNodeButton->setChecked(true);
 
   connect(m_Controls.tableView, &QTableView::doubleClicked, this, &QmitkPatientTableInspector::OnItemDoubleClicked);
+}
+
+void QmitkPatientTableInspector::keyPressEvent(QKeyEvent* e)
+{
+  mitk::DataNode* dataNode = nullptr;
+  QModelIndex selectedIndex = m_Controls.tableView->currentIndex();
+  if (selectedIndex.isValid())
+  {
+    QVariant qvariantDataNode = m_StorageModel->data(selectedIndex, QmitkDataNodeRawPointerRole);
+    if (qvariantDataNode.canConvert<mitk::DataNode*>())
+    {
+      dataNode = qvariantDataNode.value<mitk::DataNode*>();
+    }
+  }
+
+  if (nullptr == dataNode)
+  {
+    return;
+  }
+
+  int key = e->key();
+  switch (key)
+  {
+  case Qt::Key_Delete:
+    emit OnNodeRemoved(dataNode);
+    break;
+  default:
+    break;
+  }
 }

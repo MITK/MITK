@@ -58,8 +58,9 @@ public:
 
 Q_SIGNALS:
 
-  void DataNodeDoubleClicked(const mitk::DataNode::Pointer);
+  void DataNodeDoubleClicked(const mitk::DataNode*);
   void OnContextMenuRequested(const QPoint&);
+  void OnNodeRemoved(const mitk::DataNode*);
 
 private Q_SLOTS:
 
@@ -75,6 +76,8 @@ protected:
 private:
 
   void SetUpConnections();
+
+  virtual void keyPressEvent(QKeyEvent* e) override;
 
   Ui::QmitkPatientTableInspector m_Controls;
   QmitkPatientTableModel* m_StorageModel;

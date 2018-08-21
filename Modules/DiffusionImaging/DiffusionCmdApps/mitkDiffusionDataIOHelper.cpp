@@ -42,6 +42,43 @@ std::vector< std::string > mitk::DiffusionDataIOHelper::get_file_list(const std:
   return file_list;
 }
 
+std::vector< mitk::Image::Pointer > mitk::DiffusionDataIOHelper::load_mitk_images(const std::vector<std::string> files, std::vector<std::string>* filenames)
+{
+  mitk::LocaleSwitch localeSwitch("C");
+  std::streambuf *old = cout.rdbuf(); // <-- save
+  std::stringstream ss;
+  std::cout.rdbuf (ss.rdbuf());       // <-- redirect
+  std::vector< mitk::Image::Pointer > out;
+  for (auto f : files)
+  {
+    if (itksys::SystemTools::FileExists(f, true))
+    {
+      mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(f);
+      out.push_back(image);
+      if (filenames!=nullptr)
+        filenames->push_back(f);
+    }
+    else if (itksys::SystemTools::PathExists(f))
+    {
+      if (!f.empty() && f.back() != '/')
+        f += "/";
+
+      auto list = get_file_list(f, {".nrrd",".nii.gz",".nii"});
+      for (auto file : list)
+      {
+        mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(file);
+        out.push_back(image);
+        if (filenames!=nullptr)
+          filenames->push_back(file);
+      }
+    }
+  }
+
+  std::cout.rdbuf (old);              // <-- restore
+  MITK_INFO << "Loaded " << out.size() << " images";
+  return out;
+}
+
 std::vector< mitk::FiberBundle::Pointer > mitk::DiffusionDataIOHelper::load_fibs(const std::vector<std::string> files, std::vector<std::string>* filenames)
 {
   std::streambuf *old = cout.rdbuf(); // <-- save

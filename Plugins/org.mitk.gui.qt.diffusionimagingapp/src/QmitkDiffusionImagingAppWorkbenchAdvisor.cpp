@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QPoint>
 #include <QRect>
 #include <QDesktopWidget>
+#include <QMainWindow>
 
 const QString QmitkDiffusionImagingAppWorkbenchAdvisor::WELCOME_PERSPECTIVE_ID = "org.mitk.diffusionimagingapp.perspectives.welcome";
 
@@ -48,6 +49,12 @@ public:
     QmitkExtWorkbenchWindowAdvisor::PostWindowOpen();
     berry::IWorkbenchWindowConfigurer::Pointer configurer = GetWindowConfigurer();
     configurer->GetWindow()->GetWorkbench()->GetIntroManager()->ShowIntro(configurer->GetWindow(), false);
+
+    berry::IWorkbenchWindow::Pointer window =
+      this->GetWindowConfigurer()->GetWindow();
+    QMainWindow* mainWindow =
+      qobject_cast<QMainWindow*> (window->GetShell()->GetControl());
+    mainWindow->showMaximized();
   }
 
 };
@@ -74,9 +81,6 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   viewExcludeList.push_back( "org.mitk.views.controlvisualizationpropertiesview" );
   viewExcludeList.push_back( "org.mitk.views.modules" );
 
-  //QRect rec = QApplication::desktop()->screenGeometry();
-  //configurer->SetInitialSize(QPoint(rec.width(),rec.height()));
-
   QmitkDiffusionImagingAppWorkbenchWindowAdvisor* advisor = new QmitkDiffusionImagingAppWorkbenchWindowAdvisor(this, configurer);
   advisor->ShowViewMenuItem(true);
   advisor->ShowNewWindowMenuItem(true);
@@ -89,7 +93,7 @@ QmitkDiffusionImagingAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   advisor->ShowMitkVersionInfo(true);
   advisor->ShowMemoryIndicator(false);
   advisor->SetProductName("MITK Diffusion");
-  advisor->SetWindowIcon(":/org.mitk.gui.qt.diffusionimagingapp/app-icon.png");
+  advisor->SetWindowIcon(":/org.mitk.gui.qt.diffusionimagingapp/MitkDiffusion.ico");
   return advisor;
 }
 

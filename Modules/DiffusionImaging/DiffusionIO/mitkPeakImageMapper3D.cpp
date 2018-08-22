@@ -40,21 +40,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::PeakImageMapper3D::PeakImageMapper3D()
 {
-  MITK_INFO << "PeakImageMapper3D " << "CONSTRUCTOR";
   m_lut = vtkSmartPointer<vtkLookupTable>::New();
   m_lut->Build();
-  MITK_INFO << "PeakImageMapper3D " << "CONSTRUCTOR END";
 }
 
 mitk::PeakImageMapper3D::~PeakImageMapper3D()
 {
-  MITK_INFO << "PeakImageMapper3D " << "DESTRUCTOR";
+
 }
 
 
 mitk::PeakImage* mitk::PeakImageMapper3D::GetInput()
 {
-  MITK_INFO << "PeakImageMapper3D " << "GetInput " << dynamic_cast< mitk::PeakImage * > ( GetDataNode()->GetData() );
   return dynamic_cast< mitk::PeakImage * > ( GetDataNode()->GetData() );
 }
 
@@ -66,17 +63,14 @@ void mitk::PeakImageMapper3D::UpdateVtkTransform(mitk::BaseRenderer *)
 
 void mitk::PeakImageMapper3D::Update(mitk::BaseRenderer * renderer)
 {
-  MITK_INFO << "PeakImageMapper3D " << "Update";
   mitk::DataNode* node = this->GetDataNode();
   if (node == nullptr)
     return;
 
-  MITK_INFO << "PeakImageMapper3D " << "1";
   bool visible = true;
   node->GetVisibility(visible, renderer, "visible");
   if ( !visible )
     return;
-  MITK_INFO << "PeakImageMapper3D " << "2";
 
   this->GenerateDataForRenderer( renderer );
 }
@@ -84,7 +78,6 @@ void mitk::PeakImageMapper3D::Update(mitk::BaseRenderer * renderer)
 // vtkActors and Mappers are feeded here
 void mitk::PeakImageMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
-  MITK_INFO << "PeakImageMapper3D " << "3";
   //the handler of local storage gets feeded in this method with requested data for related renderwindow
   LocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
 
@@ -98,14 +91,11 @@ void mitk::PeakImageMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *render
     localStorage->m_Assembly->AddPart(localStorage->m_Actor);
     return;
   }
-  MITK_INFO << "PeakImageMapper3D " << "4";
 
   mitk::PeakImage* peakImage = this->GetInput();
   vtkSmartPointer<vtkPolyData> polyData = peakImage->GetPolyData();
   if (polyData == nullptr)
     return;
-
-  MITK_INFO << "PeakImageMapper3D " << "5";
   float linewidth = 1.0;
   this->GetDataNode()->GetFloatProperty("shape.linewidth",linewidth);
 
@@ -134,7 +124,6 @@ void mitk::PeakImageMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *render
   clipping_plane_thickness /= 2.0;
 
   mitk::Vector3D plane_normal = prop->GetNormal();
-  MITK_INFO << "PeakImageMapper3D " << plane_normal;
   if (plane_normal.GetNorm()>0.0)
   {
     plane_normal.Normalize();
@@ -195,7 +184,6 @@ void mitk::PeakImageMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::B
   node->AddProperty( "3DClippingPlaneId", mitk::IntProperty::New(-1), renderer, overwrite );
   node->AddProperty( "3DClippingPlaneFlip", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "Enable3DPeaks", mitk::BoolProperty::New( false ), renderer, overwrite );
-  MITK_INFO << "PeakImageMapper3D " << "SetDefaultProperties";
 }
 
 

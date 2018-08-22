@@ -55,7 +55,7 @@ mitk::Mapper::Pointer mitk::FiberTrackingObjectFactory::CreateMapper(mitk::DataN
     }
     else if(node->GetData() && std::string("PeakImage").compare(node->GetData()->GetNameOfClass())==0)
     {
-      MITK_INFO << "FiberTrackingObjectFactory " << "1";
+      MITK_INFO << "FiberTrackingObjectFactory " << "CreateMapper";
       newMapper = mitk::PeakImageMapper3D::New();
       newMapper->SetDataNode(node);
     }

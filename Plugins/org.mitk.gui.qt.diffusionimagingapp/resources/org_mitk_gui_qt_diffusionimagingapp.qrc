@@ -1,3 +1,5 @@
 <RCC>
-    <qresource prefix="/org.mitk.gui.qt.diffusionimagingapp"/>
+    <qresource prefix="/org.mitk.gui.qt.diffusionimagingapp">
+        <file>MitkDiffusion.ico</file>
+    </qresource>
 </RCC>

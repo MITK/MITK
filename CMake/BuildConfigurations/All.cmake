@@ -2,18 +2,8 @@ set(MITK_CONFIG_PACKAGES )
 
 set(_apple_package_excludes)
 
-set(_python_excludes )
-
-if(NOT (CMAKE_SIZEOF_VOID_P EQUAL 8) )
-  set(_python_excludes
-    Python
-    Numpy
-   )
-endif()
-
 set(_package_excludes
   ${_apple_package_excludes}
-  ${_python_excludes}
   OpenCL
   SYSTEM_Boost
   Boost_LIBRARIES

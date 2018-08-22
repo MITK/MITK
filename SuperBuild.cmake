@@ -52,7 +52,7 @@ endif()
 
 get_property(external_projects GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
 
-list(REMOVE_ITEM external_projects Python Numpy)
+list(REMOVE_ITEM external_projects Python)
 if(MITK_CTEST_SCRIPT_MODE)
   # Write a file containing the list of enabled external project targets.
   # This file can be read by a ctest script to separately build projects.

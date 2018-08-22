@@ -159,13 +159,13 @@ int main(int argc, char* argv[])
     vtkSmartPointer<vtkPoints> validPoints = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> validCells = vtkSmartPointer<vtkCellArray>::New();
 
-    boost::progress_display disp(inputTractogram->GetNumFibers());
+    boost::progress_display disp(static_cast<unsigned int>(inputTractogram->GetNumFibers()));
     for (int i=0; i<inputTractogram->GetNumFibers(); i++)
     {
       ++disp;
 
       vtkCell* cell = polyData->GetCell(i);
-      int numPoints = cell->GetNumberOfPoints();
+      auto numPoints = cell->GetNumberOfPoints();
       vtkPoints* points = cell->GetPoints();
 
 

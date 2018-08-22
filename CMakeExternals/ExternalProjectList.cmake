@@ -23,7 +23,6 @@ mitkFunctionAddExternalProject(NAME BetData     OFF ADVANCED)
 
 mitkFunctionAddExternalProject(NAME SWIG      OFF ADVANCED NO_PACKAGE DEPENDS PCRE)
 mitkFunctionAddExternalProject(NAME Python    OFF          NO_PACKAGE DEPENDS SWIG DOC "Use Python wrapping in MITK")
-mitkFunctionAddExternalProject(NAME Numpy     OFF ADVANCED NO_PACKAGE)
 mitkFunctionAddExternalProject(NAME OpenCV    OFF)
 mitkFunctionAddExternalProject(NAME Vigra     OFF          DEPENDS HDF5)
 
@@ -32,7 +31,6 @@ mitkFunctionAddExternalProject(NAME ITK       ON           NO_CACHE DEPENDS HDF5
 mitkFunctionAddExternalProject(NAME VTK       ON           NO_CACHE)
 mitkFunctionAddExternalProject(NAME Boost     ON           NO_CACHE)
 
-mitkFunctionAddExternalProject(NAME SimpleITK OFF          DEPENDS ITK GDCM SWIG)
 mitkFunctionAddExternalProject(NAME ACVD      OFF          DOC "Use Approximated Centroidal Voronoi Diagrams")
 mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS Qt5 DCMTK DOC "Use CTK in MITK")
 mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE ADVANCED)

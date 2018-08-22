@@ -43,10 +43,12 @@ mitk::PeakImageMapper3D::PeakImageMapper3D()
   MITK_INFO << "PeakImageMapper3D " << "CONSTRUCTOR";
   m_lut = vtkSmartPointer<vtkLookupTable>::New();
   m_lut->Build();
+  MITK_INFO << "PeakImageMapper3D " << "CONSTRUCTOR END";
 }
 
 mitk::PeakImageMapper3D::~PeakImageMapper3D()
 {
+  MITK_INFO << "PeakImageMapper3D " << "DESTRUCTOR";
 }
 
 
@@ -64,16 +66,17 @@ void mitk::PeakImageMapper3D::UpdateVtkTransform(mitk::BaseRenderer *)
 
 void mitk::PeakImageMapper3D::Update(mitk::BaseRenderer * renderer)
 {
-  MITK_INFO << "PeakImageMapper3D " << "1";
+  MITK_INFO << "PeakImageMapper3D " << "Update";
   mitk::DataNode* node = this->GetDataNode();
   if (node == nullptr)
     return;
 
-  MITK_INFO << "PeakImageMapper3D " << "2";
+  MITK_INFO << "PeakImageMapper3D " << "1";
   bool visible = true;
   node->GetVisibility(visible, renderer, "visible");
   if ( !visible )
     return;
+  MITK_INFO << "PeakImageMapper3D " << "2";
 
   this->GenerateDataForRenderer( renderer );
 }

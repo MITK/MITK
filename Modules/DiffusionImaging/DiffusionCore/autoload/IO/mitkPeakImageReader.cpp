@@ -63,7 +63,6 @@ namespace mitk
       reader->SetImageIO(io);
     }
     reader->Update();
-    MITK_INFO << reader->GetOutput()->GetSpacing();
     Image::Pointer resultImage = dynamic_cast<Image*>(PeakImage::New().GetPointer());
     mitk::CastToMitkImage(reader->GetOutput(), resultImage);
     resultImage->SetVolume(reader->GetOutput()->GetBufferPointer());

@@ -39,20 +39,16 @@ void mitk::PeakImage::ConstructPolydata()
   if (this->GetDimensions()[3]%3!=0)
     mitkThrow() << "Fourth dimension needs to be a multiple of 3";
 
-  MITK_INFO << this->GetGeometry()->GetSpacing();
-
   typedef mitk::ImageToItk< ItkPeakImageType > CasterType;
   CasterType::Pointer caster = CasterType::New();
   caster->SetInput(this);
   caster->Update();
   ItkPeakImageType::ConstPointer itkImg = caster->GetOutput();
 
-  int sz_x = this->GetDimensions()[0];
-  int sz_y = this->GetDimensions()[1];
-  int sz_z = this->GetDimensions()[2];
+  int sz_x = static_cast<int>(this->GetDimensions()[0]);
+  int sz_y = static_cast<int>(this->GetDimensions()[1]);
+  int sz_z = static_cast<int>(this->GetDimensions()[2]);
   unsigned int num_dirs = this->GetDimensions()[3]/3;
-
-  MITK_INFO << itkImg->GetSpacing();
 
   double minSpacing = 1;
   ItkPeakImageType::SpacingType spacing = itkImg->GetSpacing();
@@ -97,7 +93,7 @@ void mitk::PeakImage::ConstructPolydata()
           idx4[3] += 1;
           dir[2] = itkImg->GetPixel(idx4);
 
-          if (dir.magnitude()<0.001)
+          if (dir.magnitude()<0.001f)
             continue;
 
 #pragma omp critical
@@ -105,15 +101,15 @@ void mitk::PeakImage::ConstructPolydata()
             vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
             // add direction to vector field (with spacing compensation)
             itk::Point<double> worldStart;
-            worldStart[0] = worldCenter[0]-dir[0]/2*minSpacing;
-            worldStart[1] = worldCenter[1]-dir[1]/2*minSpacing;
-            worldStart[2] = worldCenter[2]-dir[2]/2*minSpacing;
+            worldStart[0] = worldCenter[0]-static_cast<double>(dir[0])/2*minSpacing;
+            worldStart[1] = worldCenter[1]-static_cast<double>(dir[1])/2*minSpacing;
+            worldStart[2] = worldCenter[2]-static_cast<double>(dir[2])/2*minSpacing;
             vtkIdType id = m_VtkPoints->InsertNextPoint(worldStart.GetDataPointer());
             container->GetPointIds()->InsertNextId(id);
             itk::Point<double> worldEnd;
-            worldEnd[0] = worldCenter[0]+dir[0]/2*minSpacing;
-            worldEnd[1] = worldCenter[1]+dir[1]/2*minSpacing;
-            worldEnd[2] = worldCenter[2]+dir[2]/2*minSpacing;
+            worldEnd[0] = worldCenter[0]+static_cast<double>(dir[0])/2*minSpacing;
+            worldEnd[1] = worldCenter[1]+static_cast<double>(dir[1])/2*minSpacing;
+            worldEnd[2] = worldCenter[2]+static_cast<double>(dir[2])/2*minSpacing;
             id = m_VtkPoints->InsertNextPoint(worldEnd.GetDataPointer());
             container->GetPointIds()->InsertNextId(id);
             m_VtkCellArray->InsertNextCell(container);
@@ -137,7 +133,7 @@ void mitk::PeakImage::SetCustomColor(float r, float g, float b)
   extrPoints = m_PolyData->GetPoints();
   int numOfPoints = 0;
   if (extrPoints!=nullptr)
-    numOfPoints = extrPoints->GetNumberOfPoints();
+    numOfPoints = static_cast<int>(extrPoints->GetNumberOfPoints());
 
   int componentSize = 4;
 
@@ -149,10 +145,10 @@ void mitk::PeakImage::SetCustomColor(float r, float g, float b)
   unsigned char rgba[4] = {0,0,0,0};
   for(long i=0; i<m_PolyData->GetNumberOfPoints(); ++i)
   {
-    rgba[0] = (unsigned char) r;
-    rgba[1] = (unsigned char) g;
-    rgba[2] = (unsigned char) b;
-    rgba[3] = (unsigned char) 255;
+    rgba[0] = static_cast<unsigned char>(r);
+    rgba[1] = static_cast<unsigned char>(g);
+    rgba[2] = static_cast<unsigned char>(b);
+    rgba[3] = 255;
     colors->InsertTypedTuple(i, rgba);
   }
 
@@ -174,7 +170,7 @@ void mitk::PeakImage::ColorByOrientation()
   extrPoints = m_PolyData->GetPoints();
   int numOfPoints = 0;
   if (extrPoints!=nullptr)
-    numOfPoints = extrPoints->GetNumberOfPoints();
+    numOfPoints = static_cast<int>(extrPoints->GetNumberOfPoints());
 
   //colors and alpha value for each single point, RGBA = 4 components
   unsigned char rgba[4] = {0,0,0,0};
@@ -185,7 +181,7 @@ void mitk::PeakImage::ColorByOrientation()
   colors->SetNumberOfComponents(componentSize);
   colors->SetName("FIBER_COLORS");
 
-  int num_peaks = m_PolyData->GetNumberOfLines();
+  int num_peaks = static_cast<int>(m_PolyData->GetNumberOfLines());
   if (num_peaks < 1)
     return;
 
@@ -206,10 +202,10 @@ void mitk::PeakImage::ColorByOrientation()
       diff1 = currentPntvtk - nextPntvtk;
       diff1.normalize();
 
-      rgba[0] = (unsigned char) (255.0 * std::fabs(diff1[0]));
-      rgba[1] = (unsigned char) (255.0 * std::fabs(diff1[1]));
-      rgba[2] = (unsigned char) (255.0 * std::fabs(diff1[2]));
-      rgba[3] = (unsigned char) (255.0);
+      rgba[0] = static_cast<unsigned char>(255.0 * std::fabs(diff1[0]));
+      rgba[1] = static_cast<unsigned char>(255.0 * std::fabs(diff1[1]));
+      rgba[2] = static_cast<unsigned char>(255.0 * std::fabs(diff1[2]));
+      rgba[3] = 255;
       colors->InsertTypedTuple(idList[0], rgba);
       colors->InsertTypedTuple(idList[1], rgba);
     }

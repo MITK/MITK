@@ -52,6 +52,7 @@ mitk::PeakImageMapper3D::~PeakImageMapper3D()
 
 mitk::PeakImage* mitk::PeakImageMapper3D::GetInput()
 {
+  MITK_INFO << "PeakImageMapper3D " << "GetInput " << dynamic_cast< mitk::PeakImage * > ( GetDataNode()->GetData() );
   return dynamic_cast< mitk::PeakImage * > ( GetDataNode()->GetData() );
 }
 
@@ -191,6 +192,7 @@ void mitk::PeakImageMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::B
   node->AddProperty( "3DClippingPlaneId", mitk::IntProperty::New(-1), renderer, overwrite );
   node->AddProperty( "3DClippingPlaneFlip", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "Enable3DPeaks", mitk::BoolProperty::New( false ), renderer, overwrite );
+  MITK_INFO << "PeakImageMapper3D " << "SetDefaultProperties";
 }
 
 

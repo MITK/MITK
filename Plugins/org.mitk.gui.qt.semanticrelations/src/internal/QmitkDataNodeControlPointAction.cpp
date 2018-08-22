@@ -15,10 +15,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 // semantic relations plugin
-#include "QmitkDataNodeInformationTypeAction.h"
+#include "QmitkDataNodeControlPointAction.h"
 
 // semantic relations module
+#include <mitkDICOMHelper.h>
 #include <mitkSemanticRelationException.h>
+#include <mitkUIDGeneratorBoost.h>
+
+// semantic relations UI module
+#include "QmitkControlPointDialog.h"
 
 // mitk gui common plugin
 #include <mitkDataNodeSelection.h>
@@ -30,30 +35,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QInputDialog>
 
-QmitkDataNodeInformationTypeAction::QmitkDataNodeInformationTypeAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
+QmitkDataNodeControlPointAction::QmitkDataNodeControlPointAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
   : QAction(parent)
   , m_WorkbenchPartSite(workbenchPartSite)
 {
-  setText(tr("Set information type"));
+  setText(tr("Set control point"));
   m_Parent = parent;
   InitializeAction();
 }
 
-QmitkDataNodeInformationTypeAction::QmitkDataNodeInformationTypeAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
+QmitkDataNodeControlPointAction::QmitkDataNodeControlPointAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
   : QAction(parent)
   , m_WorkbenchPartSite(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
 {
-  setText(tr("Set information type"));
+  setText(tr("Set control point"));
   m_Parent = parent;
   InitializeAction();
 }
 
-QmitkDataNodeInformationTypeAction::~QmitkDataNodeInformationTypeAction()
+QmitkDataNodeControlPointAction::~QmitkDataNodeControlPointAction()
 {
   // nothing here
 }
 
-void QmitkDataNodeInformationTypeAction::SetDataStorage(mitk::DataStorage* dataStorage)
+void QmitkDataNodeControlPointAction::SetDataStorage(mitk::DataStorage* dataStorage)
 {
   if (m_DataStorage != dataStorage)
   {
@@ -63,12 +68,12 @@ void QmitkDataNodeInformationTypeAction::SetDataStorage(mitk::DataStorage* dataS
   }
 }
 
-void QmitkDataNodeInformationTypeAction::InitializeAction()
+void QmitkDataNodeControlPointAction::InitializeAction()
 {
-  connect(this, &QAction::triggered, this, &QmitkDataNodeInformationTypeAction::OnActionTriggered);
+  connect(this, &QAction::triggered, this, &QmitkDataNodeControlPointAction::OnActionTriggered);
 }
 
-void QmitkDataNodeInformationTypeAction::OnActionTriggered(bool checked)
+void QmitkDataNodeControlPointAction::OnActionTriggered(bool checked)
 {
   if (nullptr == m_SemanticRelations)
   {
@@ -81,22 +86,34 @@ void QmitkDataNodeInformationTypeAction::OnActionTriggered(bool checked)
     return;
   }
 
-  bool ok = false;
-  QString text = QInputDialog::getText(m_Parent, tr("Set information type of selected node"), tr("Information type:"), QLineEdit::Normal, "", &ok);
-  if (ok && !text.isEmpty())
+  QmitkControlPointDialog* inputDialog = new QmitkControlPointDialog(m_Parent);
+  inputDialog->setWindowTitle("Set control point");
+  inputDialog->SetCurrentDate(mitk::GetDICOMDateFromDataNode(dataNode));
+
+  int dialogReturnValue = inputDialog->exec();
+  if (QDialog::Rejected == dialogReturnValue)
   {
-    try
-    {
-      m_SemanticRelations->SetInformationType(dataNode, text.toStdString());
-    }
-    catch (const mitk::SemanticRelationException&)
-    {
-      return;
-    }
+    return;
+  }
+
+  const QDate& userSelectedDate = inputDialog->GetCurrentDate();
+  mitk::SemanticTypes::Date date;
+  date.UID = mitk::UIDGeneratorBoost::GenerateUID();
+  date.year = userSelectedDate.year();
+  date.month = userSelectedDate.month();
+  date.day = userSelectedDate.day();
+
+  try
+  {
+    m_SemanticRelations->SetControlPointFromDate(dataNode, date);
+  }
+  catch (const mitk::SemanticRelationException&)
+  {
+    return;
   }
 }
 
-QList<mitk::DataNode::Pointer> QmitkDataNodeInformationTypeAction::GetSelectedNodes()
+QList<mitk::DataNode::Pointer> QmitkDataNodeControlPointAction::GetSelectedNodes()
 {
   QList<mitk::DataNode::Pointer> selectedNodes;
   if (m_WorkbenchPartSite.Expired())
@@ -116,7 +133,7 @@ QList<mitk::DataNode::Pointer> QmitkDataNodeInformationTypeAction::GetSelectedNo
   return selectedNodes;
 }
 
-mitk::DataNode::Pointer QmitkDataNodeInformationTypeAction::GetSelectedNode()
+mitk::DataNode::Pointer QmitkDataNodeControlPointAction::GetSelectedNode()
 {
   QList<mitk::DataNode::Pointer> selectedNodes = GetSelectedNodes();
   if (selectedNodes.empty())

@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKDATANODEINFORMATIONTYPEACTION_H
-#define QMITKDATANODEINFORMATIONTYPEACTION_H
+#ifndef QMITKDATANODECONTROLPOINTEACTION_H
+#define QMITKDATANODECONTROLPOINTEACTION_H
 
 // mitk core
 #include <mitkDataNode.h>
@@ -31,16 +31,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QAction.h>
 
-class QmitkDataNodeInformationTypeAction : public QAction
+class QmitkDataNodeControlPointAction : public QAction
 {
   Q_OBJECT
 
 public:
 
-  QmitkDataNodeInformationTypeAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
-  QmitkDataNodeInformationTypeAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
+  QmitkDataNodeControlPointAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
+  QmitkDataNodeControlPointAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkDataNodeInformationTypeAction() override;
+  virtual ~QmitkDataNodeControlPointAction() override;
 
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
@@ -61,4 +61,4 @@ protected:
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
 };
 
-#endif // QMITKDATANODEINFORMATIONTYPEACTION_H
+#endif // QMITKDATANODECONTROLPOINTEACTION_H

@@ -450,6 +450,16 @@ namespace mitk
     * @param segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
     */
     void RemoveSegmentation(const DataNode* segmentationNode);
+    /**
+    * @brief Use the given date to set the control point for the given data node.
+    *        The function tries to find a fitting control point for the given data and link to this control point or extend it.
+    *        If no fitting (or any) control point is found a new control point is generated from the date and added to the semantic relations storage.
+    *
+    * @pre    The given data node has to be valid (!nullptr).
+    * @throw  SemanticRelationException, if the given data node is invalid (==nullptr).
+
+    */
+    void SetControlPointFromDate(const DataNode* dataNode, const SemanticTypes::Date& date);
     /*
     * @brief  Add a newly created control point to the set of already existing control points. A reference to the control point is added to the given data.
     *         This function combines adding a control point and linking it, since a control point with no associated data is not allowed.

@@ -16,16 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations UI module
 #include "QmitkPatientTableInspector.h"
-#include "QmitkControlPointDialog.h"
 
 // mitk qt widgets module
 #include "QmitkCustomVariants.h"
 #include "QmitkEnums.h"
-
-// semantic relations module
-#include <mitkDICOMHelper.h>
-#include <mitkSemanticRelationException.h>
-#include <mitkUIDGeneratorBoost.h>
 
 // qt
 #include <QKeyEvent>
@@ -100,110 +94,6 @@ void QmitkPatientTableInspector::OnModelUpdated()
 void QmitkPatientTableInspector::OnNodeButtonClicked(const QString& nodeType)
 {
   m_StorageModel->SetNodeType(nodeType.toStdString());
-}
-
-void QmitkPatientTableInspector::OnContextMenuSetControlPoint()
-{
-  QmitkControlPointDialog* inputDialog = new QmitkControlPointDialog(m_Controls.tableView);
-  inputDialog->setWindowTitle("Set control point");
-  inputDialog->SetCurrentDate(mitk::GetDICOMDateFromDataNode(m_SelectedDataNode));
-
-  int dialogReturnValue = inputDialog->exec();
-  if (QDialog::Rejected == dialogReturnValue)
-  {
-    return;
-  }
-
-  // store the current control point to relink it, if anything goes wrong
-  mitk::SemanticTypes::ControlPoint originalControlPoint = m_StorageModel->GetSemanticRelations()->GetControlPointOfData(m_SelectedDataNode);
-  // unlink the data, that is about to receive a new date
-  // this is needed in order to not extend a single control point, to which the selected node is currently linked
-  m_StorageModel->GetSemanticRelations()->UnlinkDataFromControlPoint(m_SelectedDataNode);
-
-  const QDate& userSelectedDate = inputDialog->GetCurrentDate();
-  mitk::SemanticTypes::Date date;
-  date.UID = mitk::UIDGeneratorBoost::GenerateUID();
-  date.year = userSelectedDate.year();
-  date.month = userSelectedDate.month();
-  date.day = userSelectedDate.day();
-
-  std::vector<mitk::SemanticTypes::ControlPoint> allControlPoints = m_StorageModel->GetSemanticRelations()->GetAllControlPointsOfCase(m_StorageModel->GetCaseID());
-  if (!allControlPoints.empty())
-  {
-    // need to check if an already existing control point fits/contains the user control point
-    mitk::SemanticTypes::ControlPoint fittingControlPoint = mitk::FindFittingControlPoint(date, allControlPoints);
-    if (!fittingControlPoint.UID.empty())
-    {
-      try
-      {
-        // found a fitting control point
-        m_StorageModel->GetSemanticRelations()->LinkDataToControlPoint(m_SelectedDataNode, fittingControlPoint, false);
-        m_StorageModel->UpdateModelData();
-      }
-      catch (const mitk::SemanticRelationException&)
-      {
-        MITK_INFO << "The data can not be linked to the fitting control point.";
-        try
-        {
-          // link to the original control point
-          m_StorageModel->GetSemanticRelations()->LinkDataToControlPoint(m_SelectedDataNode, originalControlPoint, false);
-        }
-        catch (const mitk::SemanticRelationException&)
-        {
-          MITK_INFO << "The data can not be linked to its original control point. Inconsistency in the semantic relations storage assumed.";
-        }
-      }
-      return;
-    }
-
-    // did not find a fitting control point, although some control points already exist
-    // need to check if a close control point can be found and extended
-    mitk::SemanticTypes::ControlPoint extendedControlPoint = mitk::ExtendClosestControlPoint(date, allControlPoints);
-    if (!extendedControlPoint.UID.empty())
-    {
-      try
-      {
-        // found and extended a close control point
-        m_StorageModel->GetSemanticRelations()->OverwriteControlPointAndLinkData(m_SelectedDataNode, extendedControlPoint, false);
-        m_StorageModel->UpdateModelData();
-      }
-      catch (const mitk::SemanticRelationException&)
-      {
-        MITK_INFO << "The extended control point can not be overwritten and the data can not be linked to this control point.";
-        try
-        {
-          // link to the original control point
-          m_StorageModel->GetSemanticRelations()->LinkDataToControlPoint(m_SelectedDataNode, originalControlPoint, false);
-        }
-        catch (const mitk::SemanticRelationException&)
-        {
-          MITK_INFO << "The data can not be linked to its original control point. Inconsistency in the semantic relations storage assumed.";
-        }
-      }
-      return;
-    }
-  }
-
-  // generate a control point from the user-given date
-  mitk::SemanticTypes::ControlPoint controlPointFromUserDate = mitk::GenerateControlPoint(date);
-  try
-  {
-    m_StorageModel->GetSemanticRelations()->AddControlPointAndLinkData(m_SelectedDataNode, controlPointFromUserDate, false);
-    m_StorageModel->UpdateModelData();
-  }
-  catch (const mitk::SemanticRelationException&)
-  {
-    MITK_INFO << "The control point can not be added and the data can not be linked to this control point.";
-    try
-    {
-      // link to the original control point
-      m_StorageModel->GetSemanticRelations()->LinkDataToControlPoint(m_SelectedDataNode, originalControlPoint, false);
-    }
-    catch (const mitk::SemanticRelationException&)
-    {
-      MITK_INFO << "The data can not be linked to its original control point. Inconsistency in the semantic relations storage assumed.";
-    }
-  }
 }
 
 void QmitkPatientTableInspector::OnItemDoubleClicked(const QModelIndex& itemIndex)

@@ -69,14 +69,8 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.gridLayout->addWidget(m_DnDDataNodeWidget);
 
-  m_ContextMenu = new QMenu(m_PatientTableInspector);
-
-  m_InformationTypeAction = new QmitkDataNodeInformationTypeAction(m_ContextMenu, GetSite());
-  m_InformationTypeAction->SetDataStorage(GetDataStorage());
-  m_ContextMenu->addAction(m_InformationTypeAction);
-
-  m_OpenInAction = new QmitkDataNodeOpenInAction(m_ContextMenu, GetSite());
-  m_ContextMenu->addAction(m_OpenInAction);
+  m_ContextMenu = new QmitkSemanticRelationsContextMenu(GetSite(), m_PatientTableInspector);
+  m_ContextMenu->SetDataStorage(GetDataStorage());
 
   mitk::IRenderWindowPart* renderWindowPart = GetRenderWindowPart();
   if (nullptr != renderWindowPart)
@@ -104,7 +98,7 @@ void QmitkSemanticRelationsView::RenderWindowPartActivated(mitk::IRenderWindowPa
     }
   }
 
-  m_OpenInAction->SetControlledRenderer(controlledRenderer);
+  m_ContextMenu->SetControlledRenderer(controlledRenderer);
 }
 
 void QmitkSemanticRelationsView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
@@ -119,7 +113,7 @@ void QmitkSemanticRelationsView::SetUpConnections()
   connect(m_PatientTableInspector, &QmitkPatientTableInspector::DataNodeDoubleClicked, this, &QmitkSemanticRelationsView::OnDataNodeDoubleClicked);
   connect(m_DnDDataNodeWidget, &QmitkDnDDataNodeWidget::NodesDropped, this, &QmitkSemanticRelationsView::OnNodesAdded);
 
-  connect(m_PatientTableInspector, &QmitkPatientTableInspector::OnContextMenuRequested, this, &QmitkSemanticRelationsView::OnContextMenuRequested);
+  connect(m_PatientTableInspector, &QmitkPatientTableInspector::OnContextMenuRequested, m_ContextMenu, &QmitkSemanticRelationsContextMenu::OnContextMenuRequested);
   connect(m_PatientTableInspector, &QmitkPatientTableInspector::OnNodeRemoved, this, &QmitkSemanticRelationsView::OnNodeRemoved);
 }
 
@@ -201,11 +195,6 @@ void QmitkSemanticRelationsView::OnNodesAdded(QmitkDnDDataNodeWidget* dnDDataNod
       AddSegmentation(dataNode);
     }
   }
-}
-
-void QmitkSemanticRelationsView::OnContextMenuRequested(const QPoint& /*pos*/)
-{
-  m_ContextMenu->popup(QCursor::pos());
 }
 
 void QmitkSemanticRelationsView::OnNodeRemoved(const mitk::DataNode* dataNode)

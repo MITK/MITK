@@ -19,9 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations plugin
 #include "ui_QmitkSemanticRelationsControls.h"
-#include "QmitkDataNodeInformationTypeAction.h"
-#include "QmitkDataNodeOpenInAction.h"
 #include "QmitkLesionInfoWidget.h"
+#include "QmitkSemanticRelationsContextMenu.h"
 
 // semantic relations module
 #include <mitkSemanticRelations.h>
@@ -47,11 +46,6 @@ class QMenu;
 *
 *         It allows the MITK user to see and modify the content of the SemanticRelations-session.
 *         A combo box is used to select and show the current patient.
-*
-*         SIDE NOTE: Modifying the control points and information types of data in the semantic relations model is currently done
-*                    by using the right-click context-menu of the "PatientTableWidget" in the "Select Patient Node"-Dialog.
-*                    This is a leftover from when the widget was not used as a selection widget. Those functionality will be moved
-*                    to this main GUI soon.
 */
 class QmitkSemanticRelationsView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
@@ -78,7 +72,6 @@ private Q_SLOTS:
   void OnDataNodeDoubleClicked(const mitk::DataNode*);
   void OnNodesAdded(QmitkDnDDataNodeWidget*, std::vector<mitk::DataNode*>);
 
-  void OnContextMenuRequested(const QPoint&);
   void OnNodeRemoved(const mitk::DataNode* dataNode);
 
 private:
@@ -113,9 +106,7 @@ private:
   QmitkPatientTableInspector* m_PatientTableInspector;
   QmitkDnDDataNodeWidget* m_DnDDataNodeWidget;
 
-  QMenu* m_ContextMenu;
-  QmitkDataNodeInformationTypeAction* m_InformationTypeAction;
-  QmitkDataNodeOpenInAction* m_OpenInAction;
+  QmitkSemanticRelationsContextMenu* m_ContextMenu;
 
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
 };

@@ -66,7 +66,6 @@ private Q_SLOTS:
 
   void OnModelUpdated();
   void OnNodeButtonClicked(const QString&);
-  void OnContextMenuSetControlPoint();
   void OnItemDoubleClicked(const QModelIndex&);
 
 protected:

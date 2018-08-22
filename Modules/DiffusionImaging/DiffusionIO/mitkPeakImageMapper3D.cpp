@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::PeakImageMapper3D::PeakImageMapper3D()
 {
+  MITK_INFO << "PeakImageMapper3D " << "CONSTRUCTOR";
   m_lut = vtkSmartPointer<vtkLookupTable>::New();
   m_lut->Build();
 }

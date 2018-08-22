@@ -62,10 +62,12 @@ void mitk::PeakImageMapper3D::UpdateVtkTransform(mitk::BaseRenderer *)
 
 void mitk::PeakImageMapper3D::Update(mitk::BaseRenderer * renderer)
 {
+  MITK_INFO << "PeakImageMapper3D " << "1";
   mitk::DataNode* node = this->GetDataNode();
   if (node == nullptr)
     return;
 
+  MITK_INFO << "PeakImageMapper3D " << "2";
   bool visible = true;
   node->GetVisibility(visible, renderer, "visible");
   if ( !visible )
@@ -77,6 +79,7 @@ void mitk::PeakImageMapper3D::Update(mitk::BaseRenderer * renderer)
 // vtkActors and Mappers are feeded here
 void mitk::PeakImageMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
+  MITK_INFO << "PeakImageMapper3D " << "3";
   //the handler of local storage gets feeded in this method with requested data for related renderwindow
   LocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
 
@@ -90,12 +93,14 @@ void mitk::PeakImageMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *render
     localStorage->m_Assembly->AddPart(localStorage->m_Actor);
     return;
   }
+  MITK_INFO << "PeakImageMapper3D " << "4";
 
   mitk::PeakImage* peakImage = this->GetInput();
   vtkSmartPointer<vtkPolyData> polyData = peakImage->GetPolyData();
   if (polyData == nullptr)
     return;
 
+  MITK_INFO << "PeakImageMapper3D " << "5";
   float linewidth = 1.0;
   this->GetDataNode()->GetFloatProperty("shape.linewidth",linewidth);
 
@@ -114,7 +119,7 @@ void mitk::PeakImageMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *render
   mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
   localStorage->m_Mapper->RemoveAllClippingPlanes();
   mitk::Vector3D spacing = image->GetGeometry()->GetSpacing();
-  float clipping_plane_thickness = 1;
+  double clipping_plane_thickness = 1;
   if(spacing[0]<spacing[1] && spacing[0]<spacing[2])
     clipping_plane_thickness = spacing[0];
   else if (spacing[1] < spacing[2])
@@ -124,6 +129,7 @@ void mitk::PeakImageMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *render
   clipping_plane_thickness /= 2.0;
 
   mitk::Vector3D plane_normal = prop->GetNormal();
+  MITK_INFO << "PeakImageMapper3D " << plane_normal;
   if (plane_normal.GetNorm()>0.0)
   {
     plane_normal.Normalize();

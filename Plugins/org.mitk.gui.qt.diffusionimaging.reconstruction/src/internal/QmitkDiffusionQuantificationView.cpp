@@ -74,39 +74,21 @@ void QmitkDiffusionQuantificationView::CreateQtPartControl(QWidget *parent)
     // create GUI widgets
     m_Controls = new Ui::QmitkDiffusionQuantificationViewControls;
     m_Controls->setupUi(parent);
-    this->CreateConnections();
-    GFACheckboxClicked();
-
-#ifndef DIFFUSION_IMAGING_EXTENDED
-    m_Controls->m_StandardGFACheckbox->setVisible(false);
-    m_Controls->frame_3->setVisible(false);
-    m_Controls->m_CurvatureButton->setVisible(false);
-#endif
 
     m_Controls->m_BallStickButton->setVisible(false);
     m_Controls->m_MultiTensorButton->setVisible(false);
-  }
-}
 
-void QmitkDiffusionQuantificationView::CreateConnections()
-{
-  if ( m_Controls )
-  {
-    connect( (QObject*)(m_Controls->m_StandardGFACheckbox), SIGNAL(clicked()), this, SLOT(GFACheckboxClicked()) );
-    connect( (QObject*)(m_Controls->m_GFAButton), SIGNAL(clicked()), this, SLOT(GFA()) );
-    connect( (QObject*)(m_Controls->m_CurvatureButton), SIGNAL(clicked()), this, SLOT(Curvature()) );
-    connect( (QObject*)(m_Controls->m_FAButton), SIGNAL(clicked()), this, SLOT(FA()) );
-    connect( (QObject*)(m_Controls->m_RAButton), SIGNAL(clicked()), this, SLOT(RA()) );
-    connect( (QObject*)(m_Controls->m_ADButton), SIGNAL(clicked()), this, SLOT(AD()) );
-    connect( (QObject*)(m_Controls->m_RDButton), SIGNAL(clicked()), this, SLOT(RD()) );
-    connect( (QObject*)(m_Controls->m_MDButton), SIGNAL(clicked()), this, SLOT(MD()) );
-    connect( (QObject*)(m_Controls->m_MdDwiButton), SIGNAL(clicked()), this, SLOT(MD_DWI()) );
-    connect( (QObject*)(m_Controls->m_AdcDwiButton), SIGNAL(clicked()), this, SLOT(ADC_DWI()) );
-    connect( (QObject*)(m_Controls->m_ClusteringAnisotropy), SIGNAL(clicked()), this, SLOT(ClusterAnisotropy()) );
-    connect( (QObject*)(m_Controls->m_BallStickButton), SIGNAL(clicked()), this, SLOT(DoBallStickCalculation()) );
-    connect( (QObject*)(m_Controls->m_MultiTensorButton), SIGNAL(clicked()), this, SLOT(DoMultiTensorCalculation()) );
-
-//    m_Controls->m_FAButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/go-next.svg")));
+    connect( static_cast<QObject*>(m_Controls->m_GFAButton), SIGNAL(clicked()), this, SLOT(GFA()) );
+    connect( static_cast<QObject*>(m_Controls->m_FAButton), SIGNAL(clicked()), this, SLOT(FA()) );
+    connect( static_cast<QObject*>(m_Controls->m_RAButton), SIGNAL(clicked()), this, SLOT(RA()) );
+    connect( static_cast<QObject*>(m_Controls->m_ADButton), SIGNAL(clicked()), this, SLOT(AD()) );
+    connect( static_cast<QObject*>(m_Controls->m_RDButton), SIGNAL(clicked()), this, SLOT(RD()) );
+    connect( static_cast<QObject*>(m_Controls->m_MDButton), SIGNAL(clicked()), this, SLOT(MD()) );
+    connect( static_cast<QObject*>(m_Controls->m_MdDwiButton), SIGNAL(clicked()), this, SLOT(MD_DWI()) );
+    connect( static_cast<QObject*>(m_Controls->m_AdcDwiButton), SIGNAL(clicked()), this, SLOT(ADC_DWI()) );
+    connect( static_cast<QObject*>(m_Controls->m_ClusteringAnisotropy), SIGNAL(clicked()), this, SLOT(ClusterAnisotropy()) );
+    connect( static_cast<QObject*>(m_Controls->m_BallStickButton), SIGNAL(clicked()), this, SLOT(DoBallStickCalculation()) );
+    connect( static_cast<QObject*>(m_Controls->m_MultiTensorButton), SIGNAL(clicked()), this, SLOT(DoMultiTensorCalculation()) );
 
     m_Controls->m_ImageBox->SetDataStorage(this->GetDataStorage());
     mitk::TNodePredicateDataType<mitk::TensorImage>::Pointer isDti = mitk::TNodePredicateDataType<mitk::TensorImage>::New();
@@ -114,7 +96,7 @@ void QmitkDiffusionQuantificationView::CreateConnections()
     mitk::NodePredicateIsDWI::Pointer isDwi = mitk::NodePredicateIsDWI::New();
     m_Controls->m_ImageBox->SetPredicate( mitk::NodePredicateOr::New(isDti, mitk::NodePredicateOr::New(isOdf, isDwi)) );
 
-    connect( (QObject*)(m_Controls->m_ImageBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
+    connect( static_cast<QObject*>(m_Controls->m_ImageBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
   }
 }
 
@@ -138,8 +120,6 @@ void QmitkDiffusionQuantificationView::UpdateGui()
     foundDwVolume = true;
 
   m_Controls->m_GFAButton->setEnabled(foundOdfVolume);
-  m_Controls->m_CurvatureButton->setEnabled(foundOdfVolume);
-
   m_Controls->m_FAButton->setEnabled(foundTensorVolume);
   m_Controls->m_RAButton->setEnabled(foundTensorVolume);
   m_Controls->m_ADButton->setEnabled(foundTensorVolume);
@@ -311,26 +291,9 @@ void QmitkDiffusionQuantificationView::DoAdcCalculation(bool fit)
   }
 }
 
-void QmitkDiffusionQuantificationView::GFACheckboxClicked()
-{
-  m_Controls->frame_2->setVisible(m_Controls->m_StandardGFACheckbox->isChecked());
-}
-
 void QmitkDiffusionQuantificationView::GFA()
 {
-  if(m_Controls->m_StandardGFACheckbox->isChecked())
-  {
-    OdfQuantify(13);
-  }
-  else
-  {
-    OdfQuantify(0);
-  }
-}
-
-void QmitkDiffusionQuantificationView::Curvature()
-{
-  OdfQuantify(12);
+  OdfQuantify(0);
 }
 
 void QmitkDiffusionQuantificationView::FA()
@@ -389,9 +352,6 @@ void QmitkDiffusionQuantificationView::OdfQuantification(int method)
     mitk::CastToItkImage(vol, itkvol);
 
     std::string nodename = node->GetName();
-
-    float p1 = m_Controls->m_ParamKEdit->text().toFloat();
-    float p2 = m_Controls->m_ParamPEdit->text().toFloat();
 
     mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Computing GFA for %s", nodename.c_str()).toLatin1());
     typedef itk::DiffusionOdfGeneralizedFaImageFilter<TOdfPixelType,TOdfPixelType,ODF_SAMPLING_SIZE> GfaFilterType;
@@ -472,28 +432,6 @@ void QmitkDiffusionQuantificationView::OdfQuantification(int method)
     {
       gfaFilter->SetComputationMethod(GfaFilterType::GFA_STD_BY_MAX);
       newname.append("11");
-      break;
-    }
-    case 12:
-    {
-      p1 = m_Controls->MinAngle->text().toFloat();
-      p2 = m_Controls->MaxAngle->text().toFloat();
-      gfaFilter->SetComputationMethod(GfaFilterType::GFA_PRINCIPLE_CURVATURE);
-      QString paramString;
-      paramString = paramString.append("PC%1-%2").arg(p1).arg(p2);
-      newname.append(paramString.toLatin1());
-      gfaFilter->SetParam1(p1);
-      gfaFilter->SetParam2(p2);
-      break;
-    }
-    case 13:
-    {
-      gfaFilter->SetComputationMethod(GfaFilterType::GFA_GENERALIZED_GFA);
-      QString paramString;
-      paramString = paramString.append("GFAK%1P%2").arg(p1).arg(p2);
-      newname.append(paramString.toLatin1());
-      gfaFilter->SetParam1(p1);
-      gfaFilter->SetParam2(p2);
       break;
     }
     default:

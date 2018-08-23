@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations plugin
 #include "QmitkDataNodeControlPointAction.h"
 #include "QmitkDataNodeInformationTypeAction.h"
+#include "QmitkDataNodeRemoveFromSemanticRelationsAction.h"
 #include "QmitkDataNodeOpenInAction.h"
 
 // mitk core
@@ -62,6 +63,7 @@ private:
 
   QmitkDataNodeControlPointAction* m_ControlPointAction;
   QmitkDataNodeInformationTypeAction* m_InformationTypeAction;
+  QmitkDataNodeRemoveFromSemanticRelationsAction* m_RemoveFromSemanticRelationsAction;
   QmitkDataNodeOpenInAction* m_OpenInAction;
 
 };

@@ -65,14 +65,12 @@ protected:
 
 private Q_SLOTS:
 
-  void OnCaseIDSelectionChanged(const QString&);
-
-  void AddToComboBox(const mitk::SemanticTypes::CaseID&);
   void OnLesionChanged(const mitk::SemanticTypes::Lesion&);
   void OnDataNodeDoubleClicked(const mitk::DataNode*);
-  void OnNodesAdded(QmitkDnDDataNodeWidget*, std::vector<mitk::DataNode*>);
+  void OnCaseIDSelectionChanged(const QString&);
 
-  void OnNodeRemoved(const mitk::DataNode* dataNode);
+  void OnNodesAdded(QmitkDnDDataNodeWidget*, std::vector<mitk::DataNode*>);
+  void OnNodeRemoved(const mitk::DataNode*);
 
 private:
 
@@ -90,16 +88,11 @@ private:
 
   virtual void NodeRemoved(const mitk::DataNode* dataNode) override;
 
+  void AddToComboBox(const mitk::SemanticTypes::CaseID& caseID);
   void RemoveFromComboBox(const mitk::SemanticTypes::CaseID& caseID);
 
   void OpenInEditor(const mitk::DataNode* dataNode);
   void JumpToPosition(const mitk::DataNode* dataNode);
-
-  void AddImage(const mitk::DataNode* image);
-  void AddSegmentation(const mitk::DataNode* segmentation);
-
-  void RemoveImage(const mitk::DataNode* image);
-  void RemoveSegmentation(const mitk::DataNode* segmentation);
 
   Ui::QmitkSemanticRelationsControls m_Controls;
   QmitkLesionInfoWidget* m_LesionInfoWidget;

@@ -39,6 +39,7 @@ void QmitkSemanticRelationsContextMenu::SetDataStorage(mitk::DataStorage* dataSt
     m_DataStorage = dataStorage;
     m_ControlPointAction->SetDataStorage(m_DataStorage.Lock());
     m_InformationTypeAction->SetDataStorage(m_DataStorage.Lock());
+    m_RemoveFromSemanticRelationsAction->SetDataStorage(m_DataStorage.Lock());
   }
 }
 
@@ -64,6 +65,9 @@ void QmitkSemanticRelationsContextMenu::InitDefaultActions()
 
   m_InformationTypeAction = new QmitkDataNodeInformationTypeAction(m_Parent, m_WorkbenchPartSite.Lock());
   addAction(m_InformationTypeAction);
+
+  m_RemoveFromSemanticRelationsAction = new QmitkDataNodeRemoveFromSemanticRelationsAction(m_Parent, m_WorkbenchPartSite.Lock());
+  addAction(m_RemoveFromSemanticRelationsAction);
 
   m_OpenInAction = new QmitkDataNodeOpenInAction(m_Parent, m_WorkbenchPartSite.Lock());
   addAction(m_OpenInAction);

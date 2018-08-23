@@ -108,6 +108,7 @@ protected:
 
   void SliceRotation(const itk::EventObject&);
   void Set3DClippingPlane(bool disable, mitk::DataNode *node, std::string plane);
+  void SetTs(int m_CurrentThickSlicesMode, int num, std::string render_window);
 
   Ui::QmitkControlVisualizationPropertiesViewControls* m_Controls;
 
@@ -130,7 +131,8 @@ protected:
   bool m_GlyIsOn_C;
   bool m_GlyIsOn_S;
 
-  int currentThickSlicesMode;
+  int m_CurrentThickSlicesMode;
+  int m_CurrentThickSlicesNum;
   QLabel* m_TSLabel;
   QMenu* m_MyMenu;
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>QmitkControlVisualizationPropertiesViewControls</class>
  <widget class="QWidget" name="QmitkControlVisualizationPropertiesViewControls">
@@ -101,13 +101,13 @@ QGroupBox {
             <string>Multislice Projection</string>
            </property>
            <property name="statusTip">
-            <string></string>
+            <string/>
            </property>
            <property name="whatsThis">
-            <string></string>
+            <string/>
            </property>
            <property name="text">
-            <string>MIP</string>
+            <string>MIP   </string>
            </property>
            <property name="popupMode">
             <enum>QToolButton::MenuButtonPopup</enum>
@@ -144,19 +144,18 @@ QGroupBox {
                <string>Toggle visibility of ODF glyphs (axial)</string>
               </property>
               <property name="statusTip">
-               <string></string>
+               <string/>
               </property>
               <property name="whatsThis">
-               <string></string>
+               <string/>
               </property>
               <property name="text">
-               <string></string>
+               <string/>
               </property>
               <property name="icon">
                <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
                 <normaloff>:/QmitkDiffusionImaging/glyphsoff_T.png</normaloff>
-                <normalon>:/QmitkDiffusionImaging/glyphson_T.png</normalon>
-:/QmitkDiffusionImaging/glyphsoff_T.png               </iconset>
+                <normalon>:/QmitkDiffusionImaging/glyphson_T.png</normalon>:/QmitkDiffusionImaging/glyphsoff_T.png</iconset>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -172,19 +171,18 @@ QGroupBox {
                <string>Toggle visibility of ODF glyphs (sagittal)</string>
               </property>
               <property name="statusTip">
-               <string></string>
+               <string/>
               </property>
               <property name="whatsThis">
-               <string></string>
+               <string/>
               </property>
               <property name="text">
-               <string></string>
+               <string/>
               </property>
               <property name="icon">
                <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
                 <normaloff>:/QmitkDiffusionImaging/glyphsoff_S.png</normaloff>
-                <normalon>:/QmitkDiffusionImaging/glyphson_S.png</normalon>
-:/QmitkDiffusionImaging/glyphsoff_S.png               </iconset>
+                <normalon>:/QmitkDiffusionImaging/glyphson_S.png</normalon>:/QmitkDiffusionImaging/glyphsoff_S.png</iconset>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -200,19 +198,18 @@ QGroupBox {
                <string>Toggle visibility of ODF glyphs (coronal)</string>
               </property>
               <property name="statusTip">
-               <string></string>
+               <string/>
               </property>
               <property name="whatsThis">
-               <string></string>
+               <string/>
               </property>
               <property name="text">
-               <string></string>
+               <string/>
               </property>
               <property name="icon">
                <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
                 <normaloff>:/QmitkDiffusionImaging/glyphsoff_C.png</normaloff>
-                <normalon>:/QmitkDiffusionImaging/glyphson_C.png</normalon>
-:/QmitkDiffusionImaging/glyphsoff_C.png               </iconset>
+                <normalon>:/QmitkDiffusionImaging/glyphson_C.png</normalon>:/QmitkDiffusionImaging/glyphsoff_C.png</iconset>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -514,12 +511,11 @@ QGroupBox {
             <string>Reset to Default Coloring</string>
            </property>
            <property name="text">
-            <string></string>
+            <string/>
            </property>
            <property name="icon">
             <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/color64.gif</normaloff>
-:/QmitkDiffusionImaging/color64.gif            </iconset>
+             <normaloff>:/QmitkDiffusionImaging/color64.gif</normaloff>:/QmitkDiffusionImaging/color64.gif</iconset>
            </property>
           </widget>
          </item>
@@ -529,12 +525,11 @@ QGroupBox {
             <string>Reset to Default Coloring</string>
            </property>
            <property name="text">
-            <string></string>
+            <string/>
            </property>
            <property name="icon">
             <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/reset.png</normaloff>
-:/QmitkDiffusionImaging/reset.png            </iconset>
+             <normaloff>:/QmitkDiffusionImaging/reset.png</normaloff>:/QmitkDiffusionImaging/reset.png</iconset>
            </property>
           </widget>
          </item>
@@ -544,15 +539,14 @@ QGroupBox {
             <string>Position Crosshair by 3D-Click</string>
            </property>
            <property name="statusTip">
-            <string></string>
+            <string/>
            </property>
            <property name="text">
-            <string></string>
+            <string/>
            </property>
            <property name="icon">
             <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/crosshair.png</normaloff>
-:/QmitkDiffusionImaging/crosshair.png            </iconset>
+             <normaloff>:/QmitkDiffusionImaging/crosshair.png</normaloff>:/QmitkDiffusionImaging/crosshair.png</iconset>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -568,7 +562,7 @@ QGroupBox {
             <string>2D Fiberfading on/off</string>
            </property>
            <property name="text">
-            <string></string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -728,11 +722,11 @@ QGroupBox {
       </font>
      </property>
      <property name="text">
-      <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1" /&gt;&lt;style type="text/css"&gt;
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;"&gt;
-&lt;p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" color:#ff0000;"&gt;One or more slices are rotated.  ODF Visualisation is not possible in rotated planes. Use 'Reinit' on the image node to reset. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;One or more slices are rotated.  ODF Visualisation is not possible in rotated planes. Use 'Reinit' on the image node to reset. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -848,12 +842,11 @@ p, li { white-space: pre-wrap; }
             <string>Reset to Default Coloring</string>
            </property>
            <property name="text">
-            <string></string>
+            <string/>
            </property>
            <property name="icon">
             <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/reset.png</normaloff>
-:/QmitkDiffusionImaging/reset.png            </iconset>
+             <normaloff>:/QmitkDiffusionImaging/reset.png</normaloff>:/QmitkDiffusionImaging/reset.png</iconset>
            </property>
           </widget>
          </item>
@@ -863,12 +856,11 @@ p, li { white-space: pre-wrap; }
             <string>Reset to Default Coloring</string>
            </property>
            <property name="text">
-            <string></string>
+            <string/>
            </property>
            <property name="icon">
             <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/color64.gif</normaloff>
-:/QmitkDiffusionImaging/color64.gif            </iconset>
+             <normaloff>:/QmitkDiffusionImaging/color64.gif</normaloff>:/QmitkDiffusionImaging/color64.gif</iconset>
            </property>
           </widget>
          </item>
@@ -998,12 +990,12 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11"></layoutdefault>
+ <layoutdefault spacing="6" margin="11"/>
  <includes>
   <include location="local">QmitkDataStorageComboBox.h</include>
  </includes>
  <resources>
-  <include location="../../resources/QmitkDiffusionImaging.qrc"></include>
+  <include location="../../resources/QmitkDiffusionImaging.qrc"/>
  </resources>
- <connections></connections>
+ <connections/>
 </ui>

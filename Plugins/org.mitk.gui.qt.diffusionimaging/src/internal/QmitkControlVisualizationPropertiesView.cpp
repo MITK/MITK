@@ -67,7 +67,7 @@ using namespace berry;
 QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView()
   : QmitkAbstractView(),
     m_Controls(nullptr),
-    m_CurrentSelection(0),
+    m_CurrentSelection(nullptr),
     m_IconTexOFF(new QIcon(":/QmitkDiffusionImaging/texIntOFFIcon.png")),
     m_IconTexON(new QIcon(":/QmitkDiffusionImaging/texIntONIcon.png")),
     m_IconGlyOFF_T(new QIcon(":/QmitkDiffusionImaging/glyphsoff_T.png")),
@@ -79,15 +79,14 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
     m_GlyIsOn_T(false),
     m_GlyIsOn_C(false),
     m_GlyIsOn_S(false),
-    m_CurrentPickingNode(0),
+    m_CurrentThickSlicesMode(1),
+    m_CurrentThickSlicesNum(0),
+    m_CurrentPickingNode(nullptr),
     m_ColorPropertyObserverTag(0),
     m_OpacityPropertyObserverTag(0)
 {
-  currentThickSlicesMode = 1;
   m_MyMenu = nullptr;
-  int numThread = itk::MultiThreader::GetGlobalMaximumNumberOfThreads();
-  if (numThread > 12)
-    numThread = 12;
+  auto numThread = itk::MultiThreader::GetGlobalMaximumNumberOfThreads();
   itk::MultiThreader::SetGlobalDefaultNumberOfThreads(numThread);
 }
 
@@ -97,15 +96,36 @@ QmitkControlVisualizationPropertiesView::~QmitkControlVisualizationPropertiesVie
 
 }
 
+void QmitkControlVisualizationPropertiesView::SetTs(int currentThickSlicesMode, int num, std::string render_window)
+{
+  if (auto renderWindowPart = this->GetRenderWindowPart(OPEN))
+  {
+    mitk::BaseRenderer::Pointer renderer = renderWindowPart->GetQmitkRenderWindow(QString(render_window.c_str()))->GetRenderer();
+    renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.num", mitk::IntProperty::New(num));
+    if(num>0)
+    {
+      renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices", mitk::ResliceMethodProperty::New(currentThickSlicesMode));
+      renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.showarea", mitk::BoolProperty::New(true));
+    }
+    else
+    {
+      renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices", mitk::ResliceMethodProperty::New(0));
+      renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.showarea", mitk::BoolProperty::New(false));
+    }
+
+    renderer->SendUpdateSlice();
+    renderer->GetRenderingManager()->RequestUpdateAll();
+  }
+}
 
 void QmitkControlVisualizationPropertiesView::OnThickSlicesModeSelected( QAction* action )
 {
-  currentThickSlicesMode = action->data().toInt();
+  m_CurrentThickSlicesMode = action->data().toInt();
 
-  switch( currentThickSlicesMode )
+  switch( m_CurrentThickSlicesMode )
   {
-  case 0: // toInt() returns 0 'otherwise'.
-    return; // dummy code/todo: implement stuff.
+  case 0:
+    return;
 
   case 1:
     this->m_Controls->m_TSMenu->setText("MIP");
@@ -120,105 +140,22 @@ void QmitkControlVisualizationPropertiesView::OnThickSlicesModeSelected( QAction
     break;
 
   default:
-    return; // dummy code/todo: implement stuff.
+    return;
   }
 
-  if (auto renderWindowPart = this->GetRenderWindowPart(OPEN))
-  {
-    /// TODO There is no way to access the individual crosshair planes through the render window part API.
-    /// There could be a new 'mitk::DataNode* mitk::ILinkedRenderWindowPart::GetSlicingPlane(const std::string& name) const'
-    /// function for this purpose. For the time being, I comment out the lines below, but they are valid
-    /// and they have to be re-enabled after the crosshair planes can be accessed again.
-
-    //    mitk::DataNode* n;
-    //    n = renderWindowPart->GetSlicingPlane("axial");
-    //    if (n) { n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) ); }
-
-    //    n = renderWindowPart->GetSlicingPlane("sagittal");
-    //    if (n) { n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) ); }
-
-    //    n = renderWindowPart->GetSlicingPlane("coronal");
-    //    if (n) { n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) ); }
-
-
-    mitk::BaseRenderer::Pointer renderer;
-    renderer = renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer();
-    if (renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
-
-    renderer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetRenderer();
-    if (renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
-
-    renderer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetRenderer();
-    if (renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
-
-    renderer->GetRenderingManager()->RequestUpdateAll();
-  }
+  SetTs(m_CurrentThickSlicesMode, m_CurrentThickSlicesNum, "axial");
+  SetTs(m_CurrentThickSlicesMode, m_CurrentThickSlicesNum, "sagittal");
+  SetTs(m_CurrentThickSlicesMode, m_CurrentThickSlicesNum, "coronal");
 }
 
 
 void QmitkControlVisualizationPropertiesView::OnTSNumChanged( int num )
 {
-  if (auto renderWindowPart = this->GetRenderWindowPart(OPEN))
-  {
-
-    /// TODO There is no way to access the individual crosshair planes through the render window part API.
-    /// There could be a new 'mitk::DataNode* mitk::ILinkedRenderWindowPart::GetSlicingPlane(const std::string& name) const'
-    /// function for this purpose. For the time being, I comment out the lines below, but they are valid
-    /// and they have to be re-enabled after the crosshair planes can be accessed again.
-
-    //    if(num==0)
-    //    {
-    //      mitk::DataNode* n;
-    //      n = renderWindowPart->GetSlicingPlane("axial");
-    //      if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
-    //      if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-    //      if(n) n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
-    //
-    //      n = renderWindowPart->GetSlicingPlane("sagittal");
-    //      if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
-    //      if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-    //      if(n) n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
-    //
-    //      n = renderWindowPart->GetSlicingPlane("coronal");
-    //      if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
-    //      if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-    //      if(n) n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
-    //    }
-    //    else
-    //    {
-    //      mitk::DataNode* n;
-    //      n = renderWindowPart->GetSlicingPlane("axial");
-    //      if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
-    //      if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-    //      if(n) n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( (num>0) ) );
-    //
-    //      n = renderWindowPart->GetSlicingPlane("sagittal");
-    //      if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
-    //      if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-    //      if(n) n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( (num>0) ) );
-    //
-    //      n = renderWindowPart->GetSlicingPlane("coronal");
-    //      if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
-    //      if(n) n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-    //      if(n) n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( (num>0) ) );
-    //    }
-
-    m_TSLabel->setText(QString::number( num*2 + 1 ));
-
-    mitk::BaseRenderer::Pointer renderer;
-    renderer = renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer();
-    if(renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
-
-    renderer = nullptr;
-    renderer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetRenderer();
-    if(renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
-
-    renderer = nullptr;
-    renderer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetRenderer();
-    if(renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
-
-    renderer->GetRenderingManager()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
-  }
+  m_CurrentThickSlicesNum = num;
+  SetTs(m_CurrentThickSlicesMode, m_CurrentThickSlicesNum, "axial");
+  SetTs(m_CurrentThickSlicesMode, m_CurrentThickSlicesNum, "sagittal");
+  SetTs(m_CurrentThickSlicesMode, m_CurrentThickSlicesNum, "coronal");
+  m_TSLabel->setText(QString::number( num*2 + 1 ));
 }
 
 
@@ -239,17 +176,6 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 
     QIcon iconFiberFade(":/QmitkDiffusionImaging/MapperEfx2D.png");
     m_Controls->m_FiberFading2D->setIcon(iconFiberFade);
-
-#ifndef DIFFUSION_IMAGING_EXTENDED
-    int size = m_Controls->m_AdditionalScaling->count();
-    for(int t=0; t<size; t++)
-    {
-      if(m_Controls->m_AdditionalScaling->itemText(t).toStdString() == "Scale by ASR")
-      {
-        m_Controls->m_AdditionalScaling->removeItem(t);
-      }
-    }
-#endif
 
     m_Controls->m_NormalizationFrame->setVisible(false);
     m_Controls->m_Crosshair->setVisible(false);
@@ -272,9 +198,9 @@ void QmitkControlVisualizationPropertiesView::SetColor()
   {
     QColor c = QColorDialog::getColor();
     float rgb[3];
-    rgb[0] = c.redF();
-    rgb[1] = c.greenF();
-    rgb[2] = c.blueF();
+    rgb[0] = static_cast<float>(c.redF());
+    rgb[1] = static_cast<float>(c.greenF());
+    rgb[2] = static_cast<float>(c.blueF());
     m_SelectedNode->SetColor(rgb);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -315,31 +241,30 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( (QObject*)(m_Controls->m_VisibleOdfsON_T), SIGNAL(clicked()), this, SLOT(VisibleOdfsON_T()) );
-    connect( (QObject*)(m_Controls->m_VisibleOdfsON_S), SIGNAL(clicked()), this, SLOT(VisibleOdfsON_S()) );
-    connect( (QObject*)(m_Controls->m_VisibleOdfsON_C), SIGNAL(clicked()), this, SLOT(VisibleOdfsON_C()) );
-    connect( (QObject*)(m_Controls->m_ShowMaxNumber), SIGNAL(editingFinished()), this, SLOT(ShowMaxNumberChanged()) );
-    connect( (QObject*)(m_Controls->m_NormalizationDropdown), SIGNAL(currentIndexChanged(int)), this, SLOT(NormalizationDropdownChanged(int)) );
-    connect( (QObject*)(m_Controls->m_ScalingFactor), SIGNAL(valueChanged(double)), this, SLOT(ScalingFactorChanged(double)) );
-    connect( (QObject*)(m_Controls->m_AdditionalScaling), SIGNAL(currentIndexChanged(int)), this, SLOT(AdditionalScaling(int)) );
-    connect((QObject*) m_Controls->m_ResetColoring, SIGNAL(clicked()), (QObject*) this, SLOT(ResetColoring()));
-    connect((QObject*) m_Controls->m_ResetColoring2, SIGNAL(clicked()), (QObject*) this, SLOT(ResetColoring()));
-    connect((QObject*) m_Controls->m_FiberFading2D, SIGNAL(clicked()), (QObject*) this, SLOT( Fiber2DfadingEFX() ) );
-    connect((QObject*) m_Controls->m_FiberThicknessSlider, SIGNAL(sliderReleased()), (QObject*) this, SLOT( FiberSlicingThickness2D() ) );
-    connect((QObject*) m_Controls->m_FiberThicknessSlider, SIGNAL(valueChanged(int)), (QObject*) this, SLOT( FiberSlicingUpdateLabel(int) ));
-    connect((QObject*) m_Controls->m_Crosshair, SIGNAL(clicked()), (QObject*) this, SLOT(SetInteractor()));
-    connect((QObject*) m_Controls->m_LineWidth, SIGNAL(editingFinished()), (QObject*) this, SLOT(LineWidthChanged()));
-    connect((QObject*) m_Controls->m_TubeWidth, SIGNAL(editingFinished()), (QObject*) this, SLOT(TubeRadiusChanged()));
-    connect((QObject*) m_Controls->m_RibbonWidth, SIGNAL(editingFinished()), (QObject*) this, SLOT(RibbonWidthChanged()));
-    connect( (QObject*) m_Controls->m_OdfColorBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(OnColourisationModeChanged() ) );
-    connect((QObject*) m_Controls->m_Clip0, SIGNAL(toggled(bool)), (QObject*) this, SLOT(Toggle3DClipping(bool)));
-    connect((QObject*) m_Controls->m_Clip1, SIGNAL(toggled(bool)), (QObject*) this, SLOT(Toggle3DClipping(bool)));
-    connect((QObject*) m_Controls->m_Clip2, SIGNAL(toggled(bool)), (QObject*) this, SLOT(Toggle3DClipping(bool)));
-    connect((QObject*) m_Controls->m_Clip3, SIGNAL(toggled(bool)), (QObject*) this, SLOT(Toggle3DClipping(bool)));
-    connect((QObject*) m_Controls->m_FlipClipBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(Toggle3DClipping()));
-    connect((QObject*) m_Controls->m_Enable3dPeaks, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(Toggle3DPeaks()));
-
-    connect((QObject*) m_Controls->m_FlipPeaksButton, SIGNAL(clicked()), (QObject*) this, SLOT(FlipPeaks()));
+    connect( static_cast<QObject*>(m_Controls->m_VisibleOdfsON_T), SIGNAL(clicked()), this, SLOT(VisibleOdfsON_T()) );
+    connect( static_cast<QObject*>(m_Controls->m_VisibleOdfsON_S), SIGNAL(clicked()), this, SLOT(VisibleOdfsON_S()) );
+    connect( static_cast<QObject*>(m_Controls->m_VisibleOdfsON_C), SIGNAL(clicked()), this, SLOT(VisibleOdfsON_C()) );
+    connect( static_cast<QObject*>(m_Controls->m_ShowMaxNumber), SIGNAL(editingFinished()), this, SLOT(ShowMaxNumberChanged()) );
+    connect( static_cast<QObject*>(m_Controls->m_NormalizationDropdown), SIGNAL(currentIndexChanged(int)), this, SLOT(NormalizationDropdownChanged(int)) );
+    connect( static_cast<QObject*>(m_Controls->m_ScalingFactor), SIGNAL(valueChanged(double)), this, SLOT(ScalingFactorChanged(double)) );
+    connect( static_cast<QObject*>(m_Controls->m_AdditionalScaling), SIGNAL(currentIndexChanged(int)), this, SLOT(AdditionalScaling(int)) );
+    connect(static_cast<QObject*>(m_Controls->m_ResetColoring), SIGNAL(clicked()), static_cast<QObject*>(this), SLOT(ResetColoring()));
+    connect(static_cast<QObject*>(m_Controls->m_ResetColoring2), SIGNAL(clicked()), static_cast<QObject*>(this), SLOT(ResetColoring()));
+    connect(static_cast<QObject*>(m_Controls->m_FiberFading2D), SIGNAL(clicked()), static_cast<QObject*>(this), SLOT( Fiber2DfadingEFX() ) );
+    connect(static_cast<QObject*>(m_Controls->m_FiberThicknessSlider), SIGNAL(sliderReleased()), static_cast<QObject*>(this), SLOT( FiberSlicingThickness2D() ) );
+    connect(static_cast<QObject*>(m_Controls->m_FiberThicknessSlider), SIGNAL(valueChanged(int)), static_cast<QObject*>(this), SLOT( FiberSlicingUpdateLabel(int) ));
+    connect(static_cast<QObject*>(m_Controls->m_Crosshair), SIGNAL(clicked()), static_cast<QObject*>(this), SLOT(SetInteractor()));
+    connect(static_cast<QObject*>(m_Controls->m_LineWidth), SIGNAL(editingFinished()), static_cast<QObject*>(this), SLOT(LineWidthChanged()));
+    connect(static_cast<QObject*>(m_Controls->m_TubeWidth), SIGNAL(editingFinished()), static_cast<QObject*>(this), SLOT(TubeRadiusChanged()));
+    connect(static_cast<QObject*>(m_Controls->m_RibbonWidth), SIGNAL(editingFinished()), static_cast<QObject*>(this), SLOT(RibbonWidthChanged()));
+    connect( static_cast<QObject*>(m_Controls->m_OdfColorBox), SIGNAL(currentIndexChanged(int)), static_cast<QObject*>(this), SLOT(OnColourisationModeChanged() ) );
+    connect(static_cast<QObject*>(m_Controls->m_Clip0), SIGNAL(toggled(bool)), static_cast<QObject*>(this), SLOT(Toggle3DClipping(bool)));
+    connect(static_cast<QObject*>(m_Controls->m_Clip1), SIGNAL(toggled(bool)), static_cast<QObject*>(this), SLOT(Toggle3DClipping(bool)));
+    connect(static_cast<QObject*>(m_Controls->m_Clip2), SIGNAL(toggled(bool)), static_cast<QObject*>(this), SLOT(Toggle3DClipping(bool)));
+    connect(static_cast<QObject*>(m_Controls->m_Clip3), SIGNAL(toggled(bool)), static_cast<QObject*>(this), SLOT(Toggle3DClipping(bool)));
+    connect(static_cast<QObject*>(m_Controls->m_FlipClipBox), SIGNAL(stateChanged(int)), static_cast<QObject*>(this), SLOT(Toggle3DClipping()));
+    connect(static_cast<QObject*>(m_Controls->m_Enable3dPeaks), SIGNAL(stateChanged(int)), static_cast<QObject*>(this), SLOT(Toggle3DPeaks()));
+    connect(static_cast<QObject*>(m_Controls->m_FlipPeaksButton), SIGNAL(clicked()), static_cast<QObject*>(this), SLOT(FlipPeaks()));
 
     m_Controls->m_BundleControlsFrame->setVisible(false);
     m_Controls->m_ImageControlsFrame->setVisible(false);
@@ -636,7 +561,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
   mipThickSlicesAction->setActionGroup(thickSliceModeActionGroup);
   mipThickSlicesAction->setText("MIP (max. intensity proj.)");
   mipThickSlicesAction->setCheckable(true);
-  mipThickSlicesAction->setChecked(currentThickSlicesMode==1);
+  mipThickSlicesAction->setChecked(m_CurrentThickSlicesMode==1);
   mipThickSlicesAction->setData(1);
   myMenu->addAction( mipThickSlicesAction );
 
@@ -644,7 +569,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
   sumThickSlicesAction->setActionGroup(thickSliceModeActionGroup);
   sumThickSlicesAction->setText("SUM (sum intensity proj.)");
   sumThickSlicesAction->setCheckable(true);
-  sumThickSlicesAction->setChecked(currentThickSlicesMode==2);
+  sumThickSlicesAction->setChecked(m_CurrentThickSlicesMode==2);
   sumThickSlicesAction->setData(2);
   myMenu->addAction( sumThickSlicesAction );
 
@@ -652,7 +577,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
   weightedThickSlicesAction->setActionGroup(thickSliceModeActionGroup);
   weightedThickSlicesAction->setText("WEIGHTED (gaussian proj.)");
   weightedThickSlicesAction->setCheckable(true);
-  weightedThickSlicesAction->setChecked(currentThickSlicesMode==3);
+  weightedThickSlicesAction->setChecked(m_CurrentThickSlicesMode==3);
   weightedThickSlicesAction->setData(3);
   myMenu->addAction( weightedThickSlicesAction );
 
@@ -863,7 +788,7 @@ bool QmitkControlVisualizationPropertiesView::IsPlaneRotated()
   {
     mitk::PlaneGeometry::ConstPointer displayPlane
         = dynamic_cast<const mitk::PlaneGeometry*>
-          ( renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer()->GetCurrentWorldPlaneGeometry() );
+        ( renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer()->GetCurrentWorldPlaneGeometry() );
 
     if (displayPlane.IsNull()) { return false; }
 
@@ -881,7 +806,7 @@ bool QmitkControlVisualizationPropertiesView::IsPlaneRotated()
   {
     mitk::PlaneGeometry::ConstPointer displayPlane
         = dynamic_cast<const mitk::PlaneGeometry*>
-          ( renderWindowPart->GetQmitkRenderWindow("sagittal")->GetRenderer()->GetCurrentWorldPlaneGeometry() );
+        ( renderWindowPart->GetQmitkRenderWindow("sagittal")->GetRenderer()->GetCurrentWorldPlaneGeometry() );
 
     if (displayPlane.IsNull()) { return false; }
 
@@ -899,7 +824,7 @@ bool QmitkControlVisualizationPropertiesView::IsPlaneRotated()
   {
     mitk::PlaneGeometry::ConstPointer displayPlane
         = dynamic_cast<const mitk::PlaneGeometry*>
-          ( renderWindowPart->GetQmitkRenderWindow("coronal")->GetRenderer()->GetCurrentWorldPlaneGeometry() );
+        ( renderWindowPart->GetQmitkRenderWindow("coronal")->GetRenderer()->GetCurrentWorldPlaneGeometry() );
 
     if (displayPlane.IsNull()) { return false; }
 
@@ -1004,13 +929,6 @@ void QmitkControlVisualizationPropertiesView::AdditionalScaling(int additionalSc
     scaleBy->SetScaleByGFA();
     //m_Controls->params_frame->setVisible(true);
     break;
-#ifdef DIFFUSION_IMAGING_EXTENDED
-  case 2:
-    scaleBy->SetScaleByPrincipalCurvature();
-    // commented in for SPIE paper, Principle curvature scaling
-    //m_Controls->params_frame->setVisible(true);
-    break;
-#endif
   default:
     scaleBy->SetScaleByNothing();
   }

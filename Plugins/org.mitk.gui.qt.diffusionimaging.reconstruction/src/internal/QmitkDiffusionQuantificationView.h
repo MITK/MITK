@@ -47,21 +47,11 @@ class QmitkDiffusionQuantificationView : public QmitkAbstractView
   typedef itk::VectorImage< short, 3 >                                    ItkDwiType;
 
   virtual void CreateQtPartControl(QWidget *parent) override;
-
-  /// \brief Creation of the connections of main and control widget
-  virtual void CreateConnections();
-
-  ///
-  /// Sets the focus to an internal widget.
-  ///
   virtual void SetFocus() override;
 
 protected slots:
 
-  void GFACheckboxClicked();
-
   void GFA();
-  void Curvature();
   void FA();
   void RA();
   void AD();

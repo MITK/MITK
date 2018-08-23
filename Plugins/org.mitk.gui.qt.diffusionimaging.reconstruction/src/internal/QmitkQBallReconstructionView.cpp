@@ -148,17 +148,15 @@ struct QbrShellSelection
     unsigned int val = 0;
 
     if(inputMap.find(0) == inputMap.end()){
-      MITK_INFO << "QbrShellSelection: return empty BValueMap from GUI Selection";
       return outputMap;
     }else{
       outputMap[val] = inputMap[val];
-      MITK_INFO << val;
     }
 
     foreach(QCheckBox * box, m_CheckBoxes)
     {
       if(box->isChecked()){
-        val = box->text().toDouble();
+        val = box->text().toUInt();
         outputMap[val] = inputMap[val];
         MITK_INFO << val;
       }
@@ -206,11 +204,6 @@ void QmitkQBallReconstructionView::CreateQtPartControl(QWidget *parent)
     m_Controls->m_QBallReconstructionMaxLLevelComboBox->addItems(items);
     m_Controls->m_QBallReconstructionMaxLLevelComboBox->setCurrentIndex(1);
     MethodChoosen(m_Controls->m_QBallReconstructionMethodComboBox->currentIndex());
-
-#ifndef DIFFUSION_IMAGING_EXTENDED
-    m_Controls->m_QBallReconstructionMethodComboBox->removeItem(3);
-#endif
-
   }
 }
 
@@ -222,10 +215,10 @@ void QmitkQBallReconstructionView::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( (QObject*)(m_Controls->m_ButtonStandard), SIGNAL(clicked()), this, SLOT(ReconstructStandard()) );
-    connect( (QObject*)(m_Controls->m_QBallReconstructionMethodComboBox), SIGNAL(currentIndexChanged(int)), this, SLOT(MethodChoosen(int)) );
-    connect( (QObject*)(m_Controls->m_QBallReconstructionThreasholdEdit), SIGNAL(valueChanged(int)), this, SLOT(PreviewThreshold(int)) );
-    connect( (QObject*)(m_Controls->m_ConvertButton), SIGNAL(clicked()), this, SLOT(ConvertShImage()) );
+    connect( static_cast<QObject*>(m_Controls->m_ButtonStandard), SIGNAL(clicked()), this, SLOT(ReconstructStandard()) );
+    connect( static_cast<QObject*>(m_Controls->m_QBallReconstructionMethodComboBox), SIGNAL(currentIndexChanged(int)), this, SLOT(MethodChoosen(int)) );
+    connect( static_cast<QObject*>(m_Controls->m_QBallReconstructionThreasholdEdit), SIGNAL(valueChanged(int)), this, SLOT(PreviewThreshold(int)) );
+    connect( static_cast<QObject*>(m_Controls->m_ConvertButton), SIGNAL(clicked()), this, SLOT(ConvertShImage()) );
 
     m_Controls->m_ImageBox->SetDataStorage(this->GetDataStorage());
     mitk::NodePredicateIsDWI::Pointer isDwi = mitk::NodePredicateIsDWI::New();
@@ -235,8 +228,8 @@ void QmitkQBallReconstructionView::CreateConnections()
     mitk::TNodePredicateDataType<mitk::ShImage>::Pointer isSh = mitk::TNodePredicateDataType<mitk::ShImage>::New();
     m_Controls->m_ShImageBox->SetPredicate( isSh );
 
-    connect( (QObject*)(m_Controls->m_ImageBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
-    connect( (QObject*)(m_Controls->m_ShImageBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
+    connect( static_cast<QObject*>(m_Controls->m_ImageBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
+    connect( static_cast<QObject*>(m_Controls->m_ShImageBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
 
     UpdateGui();
   }
@@ -332,13 +325,6 @@ void QmitkQBallReconstructionView::ReconstructStandard()
 {
   int index = m_Controls->m_QBallReconstructionMethodComboBox->currentIndex();
 
-#ifndef DIFFUSION_IMAGING_EXTENDED
-  if(index>=3)
-  {
-    index = index + 1;
-  }
-#endif
-
   switch(index)
   {
   case 0:
@@ -361,23 +347,17 @@ void QmitkQBallReconstructionView::ReconstructStandard()
   }
   case 3:
   {
-    // Constrained Solid Angle
-    Reconstruct(1,7);
-    break;
-  }
-  case 4:
-  {
     // ADC
     Reconstruct(1,4);
     break;
   }
-  case 5:
+  case 4:
   {
     // Raw Signal
     Reconstruct(1,5);
     break;
   }
-  case 6:
+  case 5:
   {
     // Q-Ball reconstruction
     Reconstruct(2,0);
@@ -388,14 +368,6 @@ void QmitkQBallReconstructionView::ReconstructStandard()
 
 void QmitkQBallReconstructionView::MethodChoosen(int method)
 {
-
-#ifndef DIFFUSION_IMAGING_EXTENDED
-  if(method>=3)
-  {
-    method = method + 1;
-  }
-#endif
-
   m_Controls->m_QBallSelectionBox->setHidden(true);
   m_Controls->m_OutputCoeffsImage->setHidden(true);
 

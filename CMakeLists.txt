@@ -269,8 +269,13 @@ set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of req
 
 if(MITK_USE_Python)
   set(MITK_USE_ZLIB ON)
-  find_package(PythonLibs REQUIRED)
   find_package(PythonInterp REQUIRED)
+  find_package(PythonLibs REQUIRED)
+
+  if ( PYTHONLIBS_VERSION_STRING VERSION_LESS 3 )
+    message(SEND_ERROR "Python 3.X required. Found Python \"${PYTHONLIBS_VERSION_STRING}\"." )
+  endif()
+  find_package(Numpy REQUIRED)
 endif()
 
 if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
@@ -764,12 +769,6 @@ if(MITK_USE_DCMQI)
     # Help our FindDCMQI.cmake script find our super-build DCMQI
   set(DCMQI_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
   find_package(DCMQI REQUIRED)
-endif()
-
-if(MITK_USE_Python)
-  find_package(PythonLibs REQUIRED)
-  find_package(PythonInterp REQUIRED)
-  find_package(Numpy REQUIRED)
 endif()
 
 link_directories(${Boost_LIBRARY_DIRS})

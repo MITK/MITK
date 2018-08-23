@@ -21,13 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::Ellipsoid::Ellipsoid() : BoundingObject()
 {
-  vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
+  auto sphere = vtkSmartPointer<vtkSphereSource>::New();
   sphere->SetRadius(1.0);
   sphere->SetThetaResolution(20);
   sphere->SetPhiResolution(20);
   sphere->Update();
   SetVtkPolyData(sphere->GetOutput());
-  sphere->Delete();
 }
 
 mitk::Ellipsoid::~Ellipsoid()

@@ -107,21 +107,7 @@ std::vector<mitk::DataNode::Pointer> mitk::RelationStorage::GetAllSegmentationsO
     return std::vector<mitk::DataNode::Pointer>();
   }
 
-  mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
-  if (nullptr == propertyList)
-  {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
-    return std::vector<mitk::DataNode::Pointer>();
-  }
-  // retrieve a vector property that contains the valid segmentation-IDs for the current case
-  mitk::VectorProperty<std::string>* segmentationsProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty("segmentations"));
-  if (nullptr == segmentationsProperty)
-  {
-    MITK_INFO << "Could not find any segmentation in the storage.";
-    return std::vector<mitk::DataNode::Pointer>();
-  }
-
-  std::vector<std::string> allSegmentationIDsOfCase = segmentationsProperty->GetValue();
+  std::vector<std::string> allSegmentationIDsOfCase = GetAllSegmentationIDsOfCase(caseID);
   std::vector<DataNode::Pointer> allSegmentationsOfCase;
   // get all segmentation nodes of the current data storage
   // only those nodes are respected, that are currently held in the data storage
@@ -150,6 +136,25 @@ std::vector<mitk::DataNode::Pointer> mitk::RelationStorage::GetAllSegmentationsO
   }
 
   return allSegmentationsOfCase;
+}
+
+std::vector<std::string> mitk::RelationStorage::GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID)
+{
+  mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
+  if (nullptr == propertyList)
+  {
+    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return std::vector<SemanticTypes::InformationType>();
+  }
+  // retrieve a vector property that contains the valid segmentation-IDs for the current case
+  mitk::VectorProperty<std::string>* allSegmentationsVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty("segmentations"));
+  if (nullptr == allSegmentationsVectorProperty)
+  {
+    MITK_INFO << "Could not find any segmentation in the storage.";
+    return std::vector<SemanticTypes::InformationType>();
+  }
+
+  return allSegmentationsVectorProperty->GetValue();
 }
 
 mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GetControlPointOfData(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& dataNodeID)

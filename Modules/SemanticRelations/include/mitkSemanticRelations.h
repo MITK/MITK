@@ -137,6 +137,12 @@ namespace mitk
     * @return                 True, if the segmentation refers to an existing lesion; false otherwise.
     */
     bool IsRepresentingALesion(const DataNode* segmentationNode) const;
+    /**
+    * @brief 
+    *
+    *
+    */
+    bool InstanceExists(const DataNode* dataNode) const;
     /*
     * @brief  Return a vector of all segmentations that are currently available for the given case.
     *         The segmentations may be connected / not connected to a lesion of the case.

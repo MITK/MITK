@@ -169,6 +169,34 @@ bool mitk::SemanticRelations::IsRepresentingALesion(const DataNode* segmentation
   }
 }
 
+bool mitk::SemanticRelations::InstanceExists(const DataNode* dataNode) const
+{
+  try
+  {
+    SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
+    SemanticTypes::ID dataNodeID = GetIDFromDataNode(dataNode);
+
+    if (mitk::NodePredicates::GetImagePredicate()->CheckNode(dataNode))
+    {
+      std::vector<std::string> allImageIDsOfCase = m_RelationStorage->GetAllImageIDsOfCase(caseID);
+      return std::find(allImageIDsOfCase.begin(), allImageIDsOfCase.end(), dataNodeID) != allImageIDsOfCase.end();
+    }
+    else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
+    {
+      std::vector<std::string> allSegmentationIDsOfCase = m_RelationStorage->GetAllSegmentationIDsOfCase(caseID);
+      return std::find(allSegmentationIDsOfCase.begin(), allSegmentationIDsOfCase.end(), dataNodeID) != allSegmentationIDsOfCase.end();
+    }
+    else
+    {
+      return false;
+    }
+  }
+  catch (const SemanticRelationException&)
+  {
+    return false;
+  }
+}
+
 mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllSegmentationsOfCase(const SemanticTypes::CaseID& caseID) const
 {
   if (m_DataStorage.IsNull())

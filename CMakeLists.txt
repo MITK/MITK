@@ -269,15 +269,11 @@ set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of req
 
 if(MITK_USE_Python)
   set(MITK_USE_ZLIB ON)
-  find_package(PythonLibs REQUIRED)
-  find_package(PythonInterp REQUIRED)
+  find_package(PythonLibs 3 REQUIRED)
+  find_package(PythonInterp 3 REQUIRED)
 
   if ( NOT PYTHON_VERSION_STRING VERSION_EQUAL PYTHONLIBS_VERSION_STRING)
     message(SEND_ERROR "Inconsistent python versions found: interpreter ${PYTHON_VERSION_STRING} vs. libs ${PYTHONLIBS_VERSION_STRING}" )
-  endif()
-
-  if ( PYTHON_VERSION_MAJOR VERSION_LESS 3)
-    message(SEND_ERROR "Python 3.X required. Found Python \"${PYTHON_VERSION_STRING}\"." )
   endif()
   find_package(Numpy REQUIRED)
 endif()

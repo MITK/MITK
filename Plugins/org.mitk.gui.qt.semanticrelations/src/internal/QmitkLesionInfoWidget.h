@@ -60,7 +60,7 @@ public:
   * @brief Updates the 'lesionListWidget' of the GUI with the current lesion-data from the semantic relations model.
   *
   *       Overridden from 'ISemanticRelationsObserver'.
-  *       In order for Update-function to be called, this widget has to be added as a observer of SemanticRelation
+  *       In order for the Update-function to be called, this widget has to be added as a observer of SemanticRelation
   *       (e.g. m_SemanticRelations->AddObserver(m_LesionInfoWidget);)
   *
   * @par caseID    The current case ID to identify the currently active patient / case.
@@ -68,20 +68,11 @@ public:
   virtual void Update(const mitk::SemanticTypes::CaseID& caseID) override;
 
   const mitk::SemanticTypes::Lesion& GetSelectedLesion() const { return m_CurrentLesion; }
-  const mitk::DataNode* GetSelectedSegmentation() const { return m_CurrentSegmentation; }
-  const mitk::DataNode* GetSelectedImage() const { return m_CurrentImage; }
+
   /*
   * @brief Resets all items from the lesion list widget.
   */
   void ResetLesionListWidget();
-  /*
-  * @brief Resets all items from the the segmentation list widget.
-  */
-  void ResetSegmentationListWidget();
-  /*
-  * @brief Resets all items from the the segmentation list widget.
-  */
-  void ResetImageListWidget();
   /*
   * @brief Resets the background color of all items in each list widget.
   */
@@ -91,9 +82,7 @@ public:
 
 Q_SIGNALS:
 
-  void JumpToPosition(const mitk::Point3D&);
-  void ImageAdded(const mitk::SemanticTypes::CaseID&);
-  void ImageRemoved(const mitk::DataNode*);
+  void LesionChanged(const mitk::SemanticTypes::Lesion&);
 
 private Q_SLOTS:
 
@@ -101,20 +90,12 @@ private Q_SLOTS:
   * @brief Generates a new, empty lesion to add to the semantic relations model for the current case ID.
   */
   void OnAddLesionButtonClicked();
-  void OnAddSegmentationButtonClicked();
-  void OnAddImageButtonClicked();
 
   // slots for the mouse click events of the list widgets
   void OnCurrentLesionItemChanged(QListWidgetItem*, QListWidgetItem*);
   void OnLesionItemDoubleClicked(QListWidgetItem*);
-  void OnCurrentSegmentationItemChanged(QListWidgetItem*, QListWidgetItem*);
-  void OnSegmentationItemDoubleClicked(QListWidgetItem*);
-  void OnCurrentImageItemChanged(QListWidgetItem*, QListWidgetItem*);
-  void OnImageItemDoubleClicked(QListWidgetItem*);
 
   void OnLesionListContextMenuRequested(const QPoint&);
-  void OnSegmentationListContextMenuRequested(const QPoint&);
-  void OnImageListContextMenuRequested(const QPoint&);
 
   // slots for the context menu actions of the lesion list widget
   void OnLinkToSegmentation(const mitk::SemanticTypes::ID&);
@@ -122,30 +103,17 @@ private Q_SLOTS:
   void OnSetLesionClass(const mitk::SemanticTypes::ID&);
   void OnRemoveLesion(const mitk::SemanticTypes::ID&);
 
-  // slots for the context menu actions of the segmentation list widget
-  void OnUnlinkFromLesion(const mitk::DataNode*);
-
- 
-public Q_SLOTS:
-
-  // slots for the context menu action of the image / segmentation list widget
-  // the slots are also used from the semantic relations view if a node in the data storage is removed
-  void OnRemoveSegmentation(const mitk::DataNode*);
-  void OnRemoveImage(const mitk::DataNode*);
-
 private:
 
   void Init();
   void SetUpConnections();
 
   Ui::QmitkLesionInfoWidgetControls m_Controls;
-  mitk::DataStorage* m_DataStorage;
+  mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
   mitk::SemanticTypes::CaseID m_CaseID;
 
   mitk::SemanticTypes::Lesion m_CurrentLesion;
-  mitk::DataNode::Pointer m_CurrentSegmentation;
-  mitk::DataNode::Pointer m_CurrentImage;
 };
 
 #endif // QMITKLESIONINFOWIDGET_H

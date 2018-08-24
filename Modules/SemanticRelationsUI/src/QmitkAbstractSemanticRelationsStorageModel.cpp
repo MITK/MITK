@@ -28,7 +28,15 @@ QmitkAbstractSemanticRelationsStorageModel::QmitkAbstractSemanticRelationsStorag
 
 QmitkAbstractSemanticRelationsStorageModel::~QmitkAbstractSemanticRelationsStorageModel()
 {
-  // nothing here
+  if (nullptr != m_SemanticRelations)
+  {
+    m_SemanticRelations->RemoveObserver(this);
+  }
+}
+
+void QmitkAbstractSemanticRelationsStorageModel::Update(const mitk::SemanticTypes::CaseID& caseID)
+{
+  UpdateModelData(caseID);
 }
 
 void QmitkAbstractSemanticRelationsStorageModel::SetCaseID(const mitk::SemanticTypes::CaseID& caseID)
@@ -70,6 +78,12 @@ void QmitkAbstractSemanticRelationsStorageModel::UpdateModelData()
 
 void QmitkAbstractSemanticRelationsStorageModel::DataStorageChanged()
 {
+  if (nullptr != m_SemanticRelations)
+  {
+    m_SemanticRelations->RemoveObserver(this);
+  }
+
   m_SemanticRelations = std::make_shared<mitk::SemanticRelations>(m_DataStorage.Lock());
+  m_SemanticRelations->AddObserver(this);
   UpdateModelData();
 }

@@ -10,10 +10,7 @@
     <height>300</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing">
-    <number>0</number>
-   </property>
+  <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -26,17 +23,14 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
-   <item>
-    <widget class="QRadioButton" name="imageNodeButton">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Show image nodes</string>
+      <string>Semantic Relations content:</string>
      </property>
-     <attribute name="buttonGroup">
-      <string notr="true">nodeButtonGroup</string>
-     </attribute>
     </widget>
    </item>
-   <item>
+   <item row="0" column="2">
     <widget class="QRadioButton" name="segmentationNodeButton">
      <property name="text">
       <string>Show segmentation nodes</string>
@@ -46,7 +40,17 @@
      </attribute>
     </widget>
    </item>
-   <item>
+   <item row="0" column="1">
+    <widget class="QRadioButton" name="imageNodeButton">
+     <property name="text">
+      <string>Show image nodes</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">nodeButtonGroup</string>
+     </attribute>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="3">
     <widget class="QTableView" name="tableView"/>
    </item>
   </layout>

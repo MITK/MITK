@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITKABSTRACTSEMANTICRELATIONSSTORAGEMODEL_H
 
 // semantic relations module
+#include <mitkISemanticRelationsObserver.h>
 #include <mitkSemanticRelations.h>
 #include <mitkSemanticTypes.h>
 
@@ -28,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * @brief The QmitkAbstractSemanticRelationsStorageModel is a subclass of 'QmitkAbstractDataStorageModel' and provides additional
 *        functionality to set and store a semantic relations instance, the current case ID and the current lesion.
 */
-class QmitkAbstractSemanticRelationsStorageModel : public QmitkAbstractDataStorageModel
+class QmitkAbstractSemanticRelationsStorageModel : public QmitkAbstractDataStorageModel, public mitk::ISemanticRelationsObserver
 {
   Q_OBJECT
 
@@ -36,6 +37,17 @@ public:
 
   QmitkAbstractSemanticRelationsStorageModel(QObject* parent = nullptr);
   virtual ~QmitkAbstractSemanticRelationsStorageModel();
+
+  /*
+  * @brief Updates this model with the data from the semantic relations.
+  *
+  *       Overridden from 'ISemanticRelationsObserver'.
+  *       In order for the Update-function to be called, this model has to be added as a observer of SemanticRelation
+  *       (e.g. m_SemanticRelations->AddObserver(m_SemanticRelationsStorageModel);)
+  *
+  * @par caseID    The current case ID to identify the currently active patient / case.
+  */
+  virtual void Update(const mitk::SemanticTypes::CaseID& caseID) override;
 
   std::shared_ptr<mitk::SemanticRelations> GetSemanticRelations() const { return m_SemanticRelations; }
   /**

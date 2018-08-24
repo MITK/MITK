@@ -35,7 +35,9 @@ namespace mitk
 
     std::vector<SemanticTypes::Lesion> GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID);
     SemanticTypes::Lesion GetRepresentedLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID);
+
     std::vector<DataNode::Pointer> GetAllSegmentationsOfCase(const SemanticTypes::CaseID& caseID);
+    std::vector<std::string> mitk::RelationStorage::GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID);
 
     SemanticTypes::ControlPoint GetControlPointOfData(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& dataNodeID);
     std::vector<SemanticTypes::ControlPoint> GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID);

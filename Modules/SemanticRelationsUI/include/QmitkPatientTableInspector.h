@@ -54,26 +54,33 @@ public:
   virtual void SetCaseID(const mitk::SemanticTypes::CaseID& caseID) override;
   virtual void SetLesion(const mitk::SemanticTypes::Lesion& lesion) override;
 
-protected:
+  QItemSelectionModel* GetSelectionModel();
 
-  virtual void Initialize() override;
+Q_SIGNALS:
+
+  void DataNodeDoubleClicked(const mitk::DataNode*);
+  void OnContextMenuRequested(const QPoint&);
+  void OnNodeRemoved(const mitk::DataNode*);
 
 private Q_SLOTS:
 
   void OnModelUpdated();
-  void OnNodeButtonClicked(const QString& nodeType);
-  void OnTableViewContextMenuRequested(const QPoint&);
-  void OnContextMenuSetInformationType();
-  void OnContextMenuSetControlPoint();
+  void OnNodeButtonClicked(const QString&);
+  void OnItemDoubleClicked(const QModelIndex&);
+
+protected:
+
+  virtual void Initialize() override;
 
 private:
 
   void SetUpConnections();
 
+  virtual void keyPressEvent(QKeyEvent* e) override;
+
   Ui::QmitkPatientTableInspector m_Controls;
   QmitkPatientTableModel* m_StorageModel;
 
-  QMenu* m_ContextMenu;
   mitk::DataNode* m_SelectedDataNode;
 
 };

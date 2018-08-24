@@ -17,18 +17,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations plugin
 #include "QmitkSemanticRelationsView.h"
 #include "QmitkSemanticRelationsNodeSelectionDialog.h"
+#include "QmitkDataNodeAddToSemanticRelationsAction.h"
+#include "QmitkDataNodeRemoveFromSemanticRelationsAction.h"
 
 // semantic relations module
 #include <mitkNodePredicates.h>
 #include <mitkSemanticRelationException.h>
-#include <mitkUIDGeneratorBoost.h>
 
-// blueberry
+// mitk qt widgets module
+#include <QmitkDnDDataNodeWidget.h>
+#include <QmitkRenderWindow.h>
+
+// mitk multi label module
+#include <mitkLabelSetImage.h>
+
+// berry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 
 // qt
-#include <QMessageBox>
+#include <QMenu>
 
 const std::string QmitkSemanticRelationsView::VIEW_ID = "org.mitk.views.semanticrelations";
 
@@ -48,44 +56,129 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
   m_LesionInfoWidget = new QmitkLesionInfoWidget(GetDataStorage(), parent);
   m_Controls.gridLayout->addWidget(m_LesionInfoWidget);
 
-  connect(m_Controls.caseIDComboBox, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged), this, &QmitkSemanticRelationsView::OnCaseIDSelectionChanged);
+  m_PatientTableInspector = new QmitkPatientTableInspector(parent);
+  m_PatientTableInspector->SetDataStorage(GetDataStorage());
+  m_Controls.gridLayout->addWidget(m_PatientTableInspector);
 
-  connect(m_LesionInfoWidget, &QmitkLesionInfoWidget::ImageAdded, this, &QmitkSemanticRelationsView::AddToComboBox);
-  connect(m_LesionInfoWidget, &QmitkLesionInfoWidget::JumpToPosition, this, &QmitkSemanticRelationsView::OnJumpToPosition);
-  connect(m_LesionInfoWidget, &QmitkLesionInfoWidget::ImageRemoved, this, &QmitkSemanticRelationsView::OnImageRemoved);
+  QGridLayout* dndDataNodeWidgetLayout = new QGridLayout;
+  dndDataNodeWidgetLayout->addWidget(m_PatientTableInspector, 0, 0);
+  dndDataNodeWidgetLayout->setContentsMargins(0, 0, 0, 0);
+
+  m_DnDDataNodeWidget = new QmitkDnDDataNodeWidget(parent);
+  m_DnDDataNodeWidget->setLayout(dndDataNodeWidgetLayout);
+
+  m_Controls.gridLayout->addWidget(m_DnDDataNodeWidget);
+
+  m_ContextMenu = new QmitkSemanticRelationsContextMenu(GetSite(), m_PatientTableInspector);
+  m_ContextMenu->SetDataStorage(GetDataStorage());
+
+  mitk::IRenderWindowPart* renderWindowPart = GetRenderWindowPart();
+  if (nullptr != renderWindowPart)
+  {
+    RenderWindowPartActivated(renderWindowPart);
+  }
+
+  SetUpConnections();
 }
 
-void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* node)
+void QmitkSemanticRelationsView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-  if (mitk::NodePredicates::GetImagePredicate()->CheckNode(node))
+  // connect QmitkRenderWindows - underlying vtkRenderWindow is the same as "mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows()"
+  QHash<QString, QmitkRenderWindow*> windowMap = renderWindowPart->GetQmitkRenderWindows();
+  QHash<QString, QmitkRenderWindow*>::Iterator it;
+
+  mitk::BaseRenderer* baseRenderer = nullptr;
+  RenderWindowLayerUtilities::RendererVector controlledRenderer;
+  for (it = windowMap.begin(); it != windowMap.end(); ++it)
   {
-    m_LesionInfoWidget->OnRemoveImage(node);
+    baseRenderer = mitk::BaseRenderer::GetInstance(it.value()->GetVtkRenderWindow());
+    if (nullptr != baseRenderer)
+    {
+      controlledRenderer.push_back(baseRenderer);
+    }
   }
-  else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(node))
+
+  m_ContextMenu->SetControlledRenderer(controlledRenderer);
+}
+
+void QmitkSemanticRelationsView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  // nothing here
+}
+
+void QmitkSemanticRelationsView::SetUpConnections()
+{
+  connect(m_Controls.caseIDComboBox, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged), this, &QmitkSemanticRelationsView::OnCaseIDSelectionChanged);
+  connect(m_LesionInfoWidget, &QmitkLesionInfoWidget::LesionChanged, this, &QmitkSemanticRelationsView::OnLesionChanged);
+  connect(m_PatientTableInspector, &QmitkPatientTableInspector::DataNodeDoubleClicked, this, &QmitkSemanticRelationsView::OnDataNodeDoubleClicked);
+  connect(m_DnDDataNodeWidget, &QmitkDnDDataNodeWidget::NodesDropped, this, &QmitkSemanticRelationsView::OnNodesAdded);
+
+  connect(m_PatientTableInspector, &QmitkPatientTableInspector::OnContextMenuRequested, m_ContextMenu, &QmitkSemanticRelationsContextMenu::OnContextMenuRequested);
+  connect(m_PatientTableInspector, &QmitkPatientTableInspector::OnNodeRemoved, this, &QmitkSemanticRelationsView::NodeRemoved);
+}
+
+QItemSelectionModel* QmitkSemanticRelationsView::GetDataNodeSelectionModel() const
+{
+  return m_PatientTableInspector->GetSelectionModel();
+}
+
+void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* dataNode)
+{
+  if (nullptr == dataNode)
   {
-    m_LesionInfoWidget->OnRemoveSegmentation(node);
+    return;
+  }
+
+  if (m_SemanticRelations->InstanceExists(dataNode))
+  {
+    RemoveFromSemanticRelationsAction::Run(m_SemanticRelations.get(), GetDataStorage(), dataNode);
+    mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(dataNode);
+    RemoveFromComboBox(caseID);
+  }
+}
+
+void QmitkSemanticRelationsView::OnLesionChanged(const mitk::SemanticTypes::Lesion& lesion)
+{
+  m_PatientTableInspector->SetLesion(lesion);
+}
+
+void QmitkSemanticRelationsView::OnDataNodeDoubleClicked(const mitk::DataNode* dataNode)
+{
+  if (nullptr == dataNode)
+  {
+    return;
+  }
+
+  if (mitk::NodePredicates::GetImagePredicate()->CheckNode(dataNode))
+  {
+    OpenInEditor(dataNode);
+  }
+  else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
+  {
+    JumpToPosition(dataNode);
   }
 }
 
 void QmitkSemanticRelationsView::OnCaseIDSelectionChanged(const QString& caseID)
 {
   m_LesionInfoWidget->SetCurrentCaseID(caseID.toStdString());
+  m_PatientTableInspector->SetCaseID(caseID.toStdString());
 }
 
-void QmitkSemanticRelationsView::OnJumpToPosition(const mitk::Point3D& position)
+void QmitkSemanticRelationsView::OnNodesAdded(QmitkDnDDataNodeWidget* dnDDataNodeWidget, std::vector<mitk::DataNode*> nodes)
 {
-  mitk::IRenderWindowPart* renderWindowPart = GetRenderWindowPart();
-  if (nullptr != renderWindowPart)
+  mitk::SemanticTypes::CaseID caseID = "";
+  for (mitk::DataNode* dataNode : nodes)
   {
-    renderWindowPart->SetSelectedPosition(position);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    AdddToSemanticRelationsAction::Run(m_SemanticRelations.get(), GetDataStorage(), dataNode);
+    caseID = mitk::GetCaseIDFromDataNode(dataNode);
+    AddToComboBox(caseID);
   }
 }
 
-void QmitkSemanticRelationsView::OnImageRemoved(const mitk::DataNode* imageNode)
+void QmitkSemanticRelationsView::OnNodeRemoved(const mitk::DataNode* dataNode)
 {
-  mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(imageNode);
-  RemoveFromComboBox(caseID);
+  NodeRemoved(dataNode);
 }
 
 void QmitkSemanticRelationsView::AddToComboBox(const mitk::SemanticTypes::CaseID& caseID)
@@ -108,5 +201,64 @@ void QmitkSemanticRelationsView::RemoveFromComboBox(const mitk::SemanticTypes::C
     // caseID does not contain any control points and therefore no data
     // remove the caseID, if it is still contained
     m_Controls.caseIDComboBox->removeItem(foundIndex);
+  }
+}
+
+void QmitkSemanticRelationsView::OpenInEditor(const mitk::DataNode* dataNode)
+{
+  auto renderWindowPart = GetRenderWindowPart();
+  if (nullptr == renderWindowPart)
+  {
+    renderWindowPart = GetRenderWindowPart(QmitkAbstractView::BRING_TO_FRONT | QmitkAbstractView::OPEN);
+    if (nullptr == renderWindowPart)
+    {
+      // no render window available
+      return;
+    }
+  }
+
+  auto image = dynamic_cast<mitk::Image*>(dataNode->GetData());
+  if (nullptr != image)
+  {
+    mitk::RenderingManager::GetInstance()->InitializeViews(image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+  }
+}
+
+void QmitkSemanticRelationsView::JumpToPosition(const mitk::DataNode* dataNode)
+{
+  if (nullptr == dataNode)
+  {
+    return;
+  }
+
+  mitk::LabelSetImage* labelSetImage = dynamic_cast<mitk::LabelSetImage*>(dataNode->GetData());
+  if (nullptr == labelSetImage)
+  {
+    return;
+  }
+
+  int activeLayer = labelSetImage->GetActiveLayer();
+  mitk::Label* activeLabel = labelSetImage->GetActiveLabel(activeLayer);
+  labelSetImage->UpdateCenterOfMass(activeLabel->GetValue(), activeLayer);
+  const mitk::Point3D& centerPosition = activeLabel->GetCenterOfMassCoordinates();
+  if (centerPosition.GetVnlVector().max_value() > 0.0)
+  {
+    auto renderWindowPart = GetRenderWindowPart();
+    if (nullptr == renderWindowPart)
+    {
+      renderWindowPart = GetRenderWindowPart(QmitkAbstractView::BRING_TO_FRONT | QmitkAbstractView::OPEN);
+      if (nullptr == renderWindowPart)
+      {
+        // no render window available
+        return;
+      }
+    }
+
+    auto segmentation = dynamic_cast<mitk::LabelSetImage*>(dataNode->GetData());
+    if (nullptr != segmentation)
+    {
+      renderWindowPart->SetSelectedPosition(centerPosition);
+      mitk::RenderingManager::GetInstance()->InitializeViews(segmentation->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+    }
   }
 }

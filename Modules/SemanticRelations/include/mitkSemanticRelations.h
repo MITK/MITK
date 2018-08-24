@@ -137,6 +137,12 @@ namespace mitk
     * @return                 True, if the segmentation refers to an existing lesion; false otherwise.
     */
     bool IsRepresentingALesion(const DataNode* segmentationNode) const;
+    /**
+    * @brief 
+    *
+    *
+    */
+    bool InstanceExists(const DataNode* dataNode) const;
     /*
     * @brief  Return a vector of all segmentations that are currently available for the given case.
     *         The segmentations may be connected / not connected to a lesion of the case.
@@ -450,6 +456,16 @@ namespace mitk
     * @param segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
     */
     void RemoveSegmentation(const DataNode* segmentationNode);
+    /**
+    * @brief Use the given date to set the control point for the given data node.
+    *        The function tries to find a fitting control point for the given data and link to this control point or extend it.
+    *        If no fitting (or any) control point is found a new control point is generated from the date and added to the semantic relations storage.
+    *
+    * @pre    The given data node has to be valid (!nullptr).
+    * @throw  SemanticRelationException, if the given data node is invalid (==nullptr).
+
+    */
+    void SetControlPointFromDate(const DataNode* dataNode, const SemanticTypes::Date& date);
     /*
     * @brief  Add a newly created control point to the set of already existing control points. A reference to the control point is added to the given data.
     *         This function combines adding a control point and linking it, since a control point with no associated data is not allowed.
@@ -512,6 +528,18 @@ namespace mitk
     * @param dataNode       The current case identifier is extracted from the given data node, which contains DICOM information about the case.
     */
     void UnlinkDataFromControlPoint(const DataNode* dataNode);
+    /**
+    * @brief Set (and possibly overwrite) the information type of the given image.
+    *        An already associated information type might be removed if is not referenced by any other image:
+    *
+    * @pre    The given image data node has to be valid (!nullptr).
+    * @throw  SemanticRelationException, if the given image data node is invalid (==nullptr).
+    * @post   If the information type instance did not exist before, it is now added.
+    *
+    * @param imageNode        The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param informationType  An information type that identifies the corresponding information type instance.
+    */
+    void SetInformationType(const DataNode* imageNode, const SemanticTypes::InformationType& informationType);
     /*
     * @brief  Set the information type of the given image.
     *

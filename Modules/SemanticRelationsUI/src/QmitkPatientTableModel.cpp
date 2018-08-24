@@ -22,8 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicates.h>
 #include <mitkSemanticRelationException.h>
 
-#include "QmitkCustomVariants.h"
-#include "QmitkEnums.h"
+#include <QmitkCustomVariants.h>
+#include <QmitkEnums.h>
+
+// qt
+#include <QColor>
 
 QmitkPatientTableModel::QmitkPatientTableModel(QObject* parent /*= nullptr*/)
   : QmitkAbstractSemanticRelationsStorageModel(parent)
@@ -42,7 +45,7 @@ QModelIndex QmitkPatientTableModel::index(int row, int column, const QModelIndex
   bool hasIndex = this->hasIndex(row, column, parent);
   if (hasIndex)
   {
-    return this->createIndex(row, column);
+    return createIndex(row, column);
   }
 
   return QModelIndex();
@@ -100,13 +103,23 @@ QVariant QmitkPatientTableModel::data(const QModelIndex &index, int role/* = Qt:
       return QVariant(it->second);
     }
   }
-  else if (role == QmitkDataNodeRole)
+  else if (QmitkDataNodeRole == role)
   {
     return QVariant::fromValue<mitk::DataNode::Pointer>(mitk::DataNode::Pointer(dataNode));
   }
-  else if (role == QmitkDataNodeRawPointerRole)
+  else if (QmitkDataNodeRawPointerRole == role)
   {
     return QVariant::fromValue<mitk::DataNode *>(dataNode);
+  }
+  else if (Qt::BackgroundColorRole == role)
+  {
+    auto it = m_LesionPresence.find(dataNode);
+    if (it != m_LesionPresence.end())
+    {
+      return it->second ? QVariant(QColor(Qt::green)) : QVariant(QColor(Qt::transparent));
+    }
+
+    return QVariant(QColor(Qt::transparent));
   }
 
   return QVariant();
@@ -139,16 +152,9 @@ Qt::ItemFlags QmitkPatientTableModel::flags(const QModelIndex &index) const
 {
   Qt::ItemFlags flags;
   mitk::DataNode* dataNode = GetCurrentDataNode(index);
-  if (nullptr == dataNode)
+  if (nullptr != dataNode)
   {
-    return flags;
-  }
-
-  flags = Qt::ItemIsSelectable;
-  auto it = m_LesionPresence.find(dataNode);
-  if (it != m_LesionPresence.end())
-  {
-    return it->second ? flags |= Qt::ItemIsEnabled : flags;
+    flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
   }
 
   return flags;
@@ -262,8 +268,15 @@ void QmitkPatientTableModel::SetDataNodes()
     SetPixmapOfNode(dataNode, &pixmapFromImage);
 
     // set the lesion presence for the current node
-    bool lesionPresence = IsLesionPresentOnDataNode(dataNode);
-    SetLesionPresence(dataNode, lesionPresence);
+    if (m_SemanticRelations->InstanceExists(m_CaseID, m_Lesion))
+    {
+      bool lesionPresence = lesionPresence = IsLesionPresentOnDataNode(dataNode);
+      SetLesionPresence(dataNode, lesionPresence);
+    }
+    else
+    {
+      m_LesionPresence.clear();
+    }
   }
 }
 

@@ -56,7 +56,8 @@ void mitk::ShImageWriter::WriteShImage(InputType::ConstPointer input)
 
   typedef itk::ImageFileWriter<ShImage::ShOnDiskType> WriterType;
   WriterType::Pointer writer = WriterType::New();
-  writer->SetInput( exporter->GetOutputImage() );
+  ShImage::ShOnDiskType::Pointer image = exporter->GetOutputImage();
+  writer->SetInput( image );
 
   if (ext==".shi")
   {

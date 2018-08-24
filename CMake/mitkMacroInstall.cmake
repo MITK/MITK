@@ -163,8 +163,10 @@ macro(_fixup_target)
       endforeach()
     endif()
 
+    file(GLOB _match_point_plugins \"\${_bin_path}/mdra-*\")
+
     set(PLUGINS )
-    foreach(_plugin ${_install_PLUGINS} \${GLOBBED_PLUGINS})
+    foreach(_plugin ${_install_PLUGINS} \${GLOBBED_PLUGINS} \${_match_point_plugins})
       get_filename_component(_plugin_realpath \${_plugin} REALPATH)
       list(APPEND PLUGINS \${_plugin_realpath})
     endforeach()

@@ -10,6 +10,7 @@ SET(MODULE_CUSTOM_TESTS
   mitkFiberProcessingTest.cpp
   mitkFiberFitTest.cpp
   mitkFiberMapper3DTest.cpp
+  mitkPeakShImageReaderTest.cpp
 )
 
 

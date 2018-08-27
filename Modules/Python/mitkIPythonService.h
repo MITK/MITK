@@ -136,8 +136,8 @@ namespace mitk
         /// \see CopyCvImageFromPython()
         virtual mitk::Surface::Pointer CopyVtkPolyDataFromPython( const std::string& varName ) = 0;
 
-       /// \return the ctk abstract python manager instance
-       virtual ctkAbstractPythonManager* GetPythonManager() = 0;
+        /// \return the ctk abstract python manager instance
+        virtual ctkAbstractPythonManager* GetPythonManager() = 0;
 
         ///
         /// nothing to do here
@@ -145,6 +145,10 @@ namespace mitk
 
         // force us module loading by linking
         static std::string ForceLoadModule();
+
+        virtual void AddRelativeSearchDirs(std::vector< std::string > dirs) = 0;
+
+        virtual void AddAbsoluteSearchDirs(std::vector< std::string > dirs) = 0;
     };
 }
 

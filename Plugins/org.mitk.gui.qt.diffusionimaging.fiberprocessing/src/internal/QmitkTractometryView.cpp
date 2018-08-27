@@ -110,13 +110,13 @@ void QmitkTractometryView::UpdateGui()
 
 bool QmitkTractometryView::Flip(vtkSmartPointer< vtkPolyData > polydata1, int i, vtkSmartPointer< vtkPolyData > ref_poly)
 {
-  float d_direct = 0;
-  float d_flipped = 0;
+  double d_direct = 0;
+  double d_flipped = 0;
 
   vtkCell* cell1 = polydata1->GetCell(0);
   if (ref_poly!=nullptr)
     cell1 = ref_poly->GetCell(0);
-  int numPoints1 = cell1->GetNumberOfPoints();
+  auto numPoints1 = cell1->GetNumberOfPoints();
   vtkPoints* points1 = cell1->GetPoints();
 
   vtkCell* cell2 = polydata1->GetCell(i);
@@ -140,7 +140,7 @@ bool QmitkTractometryView::Flip(vtkSmartPointer< vtkPolyData > polydata1, int i,
 template <typename TPixel>
 void QmitkTractometryView::ImageValuesAlongTract(const mitk::PixelType, mitk::Image::Pointer image, mitk::FiberBundle::Pointer fib, std::vector<std::vector<double> > &data, std::string& clipboard_string)
 {
-  int num_points = m_Controls->m_SamplingPointsBox->value();
+  unsigned int num_points = m_Controls->m_SamplingPointsBox->value();
   mitk::ImagePixelReadAccessor<TPixel,3> readimage(image, image->GetVolumeData(0));
   mitk::FiberBundle::Pointer working_fib = fib->GetDeepCopy();
   working_fib->ResampleToNumPoints(num_points);
@@ -148,16 +148,16 @@ void QmitkTractometryView::ImageValuesAlongTract(const mitk::PixelType, mitk::Im
 
   std::vector<std::vector<double> > all_values;
   std::vector< double > mean_values;
-  for (int i=0; i<num_points; ++i)
+  for (unsigned int i=0; i<num_points; ++i)
     mean_values.push_back(0);
 
-  double min = 100000;
+  double min = 100000.0;
   double max = 0;
   double mean = 0;
   for (int i=0; i<working_fib->GetNumFibers(); ++i)
   {
     vtkCell* cell = polydata->GetCell(i);
-    int numPoints = cell->GetNumberOfPoints();
+    auto numPoints = cell->GetNumberOfPoints();
     vtkPoints* points = cell->GetPoints();
 
     std::vector< double > fib_vals;
@@ -180,7 +180,7 @@ void QmitkTractometryView::ImageValuesAlongTract(const mitk::PixelType, mitk::Im
       px[0] = p[0];
       px[1] = p[1];
       px[2] = p[2];
-      double pixelValue = readimage.GetPixelByWorldCoordinates(px);
+      double pixelValue = static_cast<double>(readimage.GetPixelByWorldCoordinates(px));
       fib_vals.push_back(pixelValue);
       mean += pixelValue;
       if (pixelValue<min)
@@ -199,7 +199,7 @@ void QmitkTractometryView::ImageValuesAlongTract(const mitk::PixelType, mitk::Im
 
   std::vector< double > std_values1;
   std::vector< double > std_values2;
-  for (int i=0; i<num_points; ++i)
+  for (unsigned int i=0; i<num_points; ++i)
   {
     mean_values.at(i) /= working_fib->GetNumFibers();
     double stdev = 0;

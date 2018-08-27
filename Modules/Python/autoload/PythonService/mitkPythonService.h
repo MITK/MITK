@@ -93,12 +93,15 @@ namespace mitk
       /// \return the ctk abstract python manager instance
       ctkAbstractPythonManager* GetPythonManager();
 
+      void AddRelativeSearchDirs(std::vector< std::string > dirs);
+
+      void AddAbsoluteSearchDirs(std::vector< std::string > dirs);
+
   protected:
-      QString GetTempDataFileName(const std::string &ext) const;
+
   private:
       QList<PythonCommandObserver*> m_Observer;
       ctkAbstractPythonManager m_PythonManager;
-      static const QString m_TmpDataFileName;
       bool m_ItkWrappingAvailable;
       bool m_OpenCVWrappingAvailable;
       bool m_VtkWrappingAvailable;

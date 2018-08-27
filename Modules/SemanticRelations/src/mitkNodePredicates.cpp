@@ -17,39 +17,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicates.h"
 
 // mitk core
+#include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateProperty.h>
-#include <mitkNodePredicateDataType.h>
 
 // multi label module
 #include <mitkLabelSetImage.h>
 
 mitk::NodePredicateAnd::Pointer mitk::NodePredicates::GetImagePredicate()
 {
-  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+  TNodePredicateDataType<Image>::Pointer isImage = TNodePredicateDataType<Image>::New();
 
-  mitk::NodePredicateOr::Pointer validImages = mitk::NodePredicateOr::New();
+  NodePredicateOr::Pointer validImages = NodePredicateOr::New();
   validImages->AddPredicate(isImage);
 
-  mitk::NodePredicateAnd::Pointer imagePredicate = mitk::NodePredicateAnd::New();
+  NodePredicateAnd::Pointer imagePredicate = NodePredicateAnd::New();
   imagePredicate->AddPredicate(validImages);
-  imagePredicate->AddPredicate(mitk::NodePredicateNot::New(GetSegmentationPredicate()));
-  imagePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  imagePredicate->AddPredicate(NodePredicateNot::New(GetSegmentationPredicate()));
+  imagePredicate->AddPredicate(NodePredicateNot::New(NodePredicateProperty::New("helper object")));
 
   return imagePredicate;
 }
 
 mitk::NodePredicateAnd::Pointer mitk::NodePredicates::GetSegmentationPredicate()
 {
-  mitk::NodePredicateAnd::Pointer segmentationPredicate = mitk::NodePredicateAnd::New();
+  NodePredicateAnd::Pointer segmentationPredicate = NodePredicateAnd::New();
 
-  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-  mitk::TNodePredicateDataType<mitk::LabelSetImage>::Pointer isLabelSetImage = mitk::TNodePredicateDataType<mitk::LabelSetImage>::New();
-  mitk::NodePredicateOr::Pointer allSegmentations = mitk::NodePredicateOr::New(isBinary, isLabelSetImage);
+  NodePredicateProperty::Pointer isBinary = NodePredicateProperty::New("binary", BoolProperty::New(true));
+  TNodePredicateDataType<LabelSetImage>::Pointer isLabelSetImage = TNodePredicateDataType<LabelSetImage>::New();
+  NodePredicateOr::Pointer allSegmentations = NodePredicateOr::New(isBinary, isLabelSetImage);
 
   segmentationPredicate->AddPredicate(allSegmentations);
-  segmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  segmentationPredicate->AddPredicate(NodePredicateNot::New(NodePredicateProperty::New("helper object")));
 
   return segmentationPredicate;
 }

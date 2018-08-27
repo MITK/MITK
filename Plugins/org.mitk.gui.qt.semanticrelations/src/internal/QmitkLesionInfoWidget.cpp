@@ -130,24 +130,24 @@ void QmitkLesionInfoWidget::OnAddLesionButtonClicked()
   }
 }
 
-void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* current, QListWidgetItem* /*previous*/)
+void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* currentItem, QListWidgetItem* /*previousItem*/)
 {
-  if (nullptr == current
+  if (nullptr == currentItem
    || nullptr == m_SemanticRelations)
   {
     return;
   }
 
   // only the UID is needed to identify a representing lesion
-  m_CurrentLesion.UID = current->data(Qt::UserRole).toString().toStdString();
+  m_CurrentLesion.UID = currentItem->data(Qt::UserRole).toString().toStdString();
   if (false == m_SemanticRelations->InstanceExists(m_CaseID, m_CurrentLesion))
   {
     // no UID found; cannot create a lesion
     return;
   }
 
-  if (SELECTED_BACKGROUND_COLOR == current->background()
-    || CONNECTED_BACKGROUND_COLOR == current->background())
+  if (SELECTED_BACKGROUND_COLOR == currentItem->background()
+    || CONNECTED_BACKGROUND_COLOR == currentItem->background())
   {
     DarkenBackgroundColors();
   }
@@ -156,7 +156,7 @@ void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* current,
     ResetBackgroundColors();
   }
 
-  current->setBackground(SELECTED_BACKGROUND_COLOR);
+  currentItem->setBackground(SELECTED_BACKGROUND_COLOR);
 
   emit LesionChanged(m_CurrentLesion);
 }

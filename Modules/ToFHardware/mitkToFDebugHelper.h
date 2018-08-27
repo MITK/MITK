@@ -33,7 +33,7 @@ namespace mitk
 
       mitk::ImageToOpenCVImageFilter::Pointer filter = mitk::ImageToOpenCVImageFilter::New();
       filter->SetImage(image);
-      cv::Mat cvImage = cv::Mat(filter->GetOpenCVImage(), true);
+      cv::Mat cvImage = filter->GetOpenCVMat();
       double minVal, maxVal;
       cv::minMaxLoc(cvImage, &minVal, &maxVal);
       cv::Mat uCCImage;

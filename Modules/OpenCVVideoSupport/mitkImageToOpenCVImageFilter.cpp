@@ -58,13 +58,12 @@ namespace mitk{
     return true;
   }
 
-  cv::Mat ImageToOpenCVImageFilter::GetOpenCVImage()
+  cv::Mat ImageToOpenCVImageFilter::GetOpenCVMat()
   {
     auto image = m_Image.Lock();
 
     if(!this->CheckImage(image))
       return cv::Mat();
-
 
     try
     {
@@ -79,21 +78,6 @@ namespace mitk{
       return cv::Mat();
     }
     return m_OpenCVImage;
-  }
-
-  cv::Mat ImageToOpenCVImageFilter::GetOpenCVMat()
-  {
-    cv::Mat mat = this->GetOpenCVImage();
-
-    //cv::Mat mat;
-    //if( img )
-    //{
-    //  // do not copy data, then release just the header
-    //  mat = cv::cvarrToMat(img, false);
-    //  cvReleaseImageHeader( &img );
-    //}
-
-    return mat;
   }
 
   template<typename TPixel, unsigned int VImageDimension>

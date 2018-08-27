@@ -119,12 +119,24 @@ bool QmitkTractometryView::Flip(vtkSmartPointer< vtkPolyData > polydata1, int i,
   auto numPoints1 = cell1->GetNumberOfPoints();
   vtkPoints* points1 = cell1->GetPoints();
 
+  std::vector<itk::Point<double, 3>> ref_points;
+  for (int j=0; j<numPoints1; ++j)
+  {
+    double* p1 = points1->GetPoint(j);
+    itk::Point<double, 3> itk_p;
+    itk_p[0] = p1[0];
+    itk_p[1] = p1[1];
+    itk_p[2] = p1[2];
+    ref_points.push_back(itk_p);
+  }
+
   vtkCell* cell2 = polydata1->GetCell(i);
   vtkPoints* points2 = cell2->GetPoints();
 
   for (int j=0; j<numPoints1; ++j)
   {
-    double* p1 = points1->GetPoint(j);
+    auto p1 = ref_points.at(j);
+
     double* p2 = points2->GetPoint(j);
     d_direct = (p1[0]-p2[0])*(p1[0]-p2[0]) + (p1[1]-p2[1])*(p1[1]-p2[1]) + (p1[2]-p2[2])*(p1[2]-p2[2]);
 

@@ -47,15 +47,12 @@ mitk::PythonService::PythonService()
   , m_ErrorOccured( false )
 {
   bool pythonInitialized = static_cast<bool>( Py_IsInitialized() ); //m_PythonManager.isPythonInitialized() );
-  {
-    MITK_INFO << "pythonInitialized " << pythonInitialized;
-    MITK_INFO << "m_PythonManager.isPythonInitialized() " << m_PythonManager.isPythonInitialized();
-  }
 
   // due to strange static var behaviour on windows Py_IsInitialized() returns correct value while
   // m_PythonManager.isPythonInitialized() does not because it has been constructed and destructed again
-  if( !m_PythonManager.isPythonInitialized() )
+  if( !pythonInitialized )
   {
+    MITK_INFO << "Initializing python service";
     //TODO a better way to do this
 #ifndef WIN32
     dlerror();

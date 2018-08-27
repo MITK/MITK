@@ -12,6 +12,12 @@ set(MODULE_TESTS
 
   ################## DISABLED TESTS #####################################################
 
+  #mitkSimulationBatchGeneratorTest.cpp #T25298
+  #mitkPhotoacousticIOTest.cpp #T25298
+  #mitkMCThreadHandlerTest.cpp #T25298
+  #mitkPhotoacousticVesselTreeTest.cpp #T25298
+  #mitkPhotoacousticVesselMeanderStrategyTest.cpp #T25298
+  #mitkMcxyzXmlTest.cpp #T25298
   ################# RUNNING TESTS #######################################################
 
   mitkSlicedVolumeGeneratorTest.cpp
@@ -20,14 +26,8 @@ set(MODULE_TESTS
   mitkPhotoacoustic3dVolumeTest.cpp
   mitkPhotoacousticVolumeTest.cpp
   mitkPhotoacousticVesselTest.cpp
-  mitkPhotoacousticVesselTreeTest.cpp
-  mitkPhotoacousticVesselMeanderStrategyTest.cpp
-  mitkMcxyzXmlTest.cpp
   mitkPhotoacousticComposedVolumeTest.cpp
   mitkPhotoacousticNoiseGeneratorTest.cpp
-  mitkPhotoacousticIOTest.cpp
-  mitkMCThreadHandlerTest.cpp
-  mitkSimulationBatchGeneratorTest.cpp
   mitkPropertyCalculatorTest.cpp
 )
 

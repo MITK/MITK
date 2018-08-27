@@ -191,9 +191,6 @@ void QmitkDipyReconstructionsView::StartFit()
   mitk::IPythonService* m_PythonService = dynamic_cast<mitk::IPythonService*> ( context->GetService<mitk::IPythonService>(m_PythonServiceRef) );
   mitk::IPythonService::ForceLoadModule();
 
-  m_PythonService->Execute("import SimpleITK as sitk");
-  m_PythonService->Execute("import SimpleITK._SimpleITK as _SimpleITK");
-  m_PythonService->Execute("import numpy");
   m_PythonService->CopyToPythonAsSimpleItkImage( input_image, "in_image");
   m_PythonService->Execute("mask=None");
   if (m_Controls->m_MaskBox->GetSelectedNode().IsNotNull())

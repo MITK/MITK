@@ -65,7 +65,7 @@ const std::string QmitkBrainExtractionView::VIEW_ID = "org.mitk.views.brainextra
 
 QmitkBrainExtractionView::QmitkBrainExtractionView()
   : QmitkAbstractView()
-  , m_Controls( 0 )
+  , m_Controls( nullptr )
   , m_DiffusionImage( nullptr )
 {
 
@@ -182,21 +182,12 @@ void QmitkBrainExtractionView::StartBrainExtraction()
     mitk::IPythonService* m_PythonService = dynamic_cast<mitk::IPythonService*> ( context->GetService<mitk::IPythonService>(m_PythonServiceRef) );
     mitk::IPythonService::ForceLoadModule();
 
-    // load essential modules
-    m_PythonService->Execute("import SimpleITK as sitk");
-    m_PythonService->Execute("import SimpleITK._SimpleITK as _SimpleITK");
-    m_PythonService->Execute("import numpy");
-
     // extend python search path
-    std::string exec_dir = QCoreApplication::applicationDirPath().toStdString();
-    std::string pythonpath = "";
-    for (auto dir : mitk::bet::relative_search_dirs)
-      pythonpath += "','" + ist::GetCurrentWorkingDirectory() + dir;
-    for (auto dir : mitk::bet::relative_search_dirs)
-      pythonpath += "','" + exec_dir + dir;
-    for (auto dir : mitk::bet::absolute_search_dirs)
-      pythonpath += "','" + dir;
-    m_PythonService->Execute("paths=['"+pythonpath+"']");
+    m_PythonService->AddAbsoluteSearchDirs(mitk::bet::absolute_search_dirs);
+    m_PythonService->AddRelativeSearchDirs(mitk::bet::relative_search_dirs);
+
+    // legacy (can be romved when BetData is updated accordingly)
+    m_PythonService->Execute("paths=list()");
 
     // set input files (model and config)
     m_PythonService->Execute("model_file=\""+GetPythonFile("model_final.model")+"\"");

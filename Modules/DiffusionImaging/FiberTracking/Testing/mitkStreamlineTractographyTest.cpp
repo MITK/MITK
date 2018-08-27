@@ -77,9 +77,9 @@ public:
   {
     omp_set_num_threads(1);
 
-    gfa_threshold = 0.2;
-    odf_threshold = 0.1;
-    peak_threshold = 0.1;
+    gfa_threshold = 0.2f;
+    odf_threshold = 0.1f;
+    peak_threshold = 0.1f;
 
     mitk::Image::Pointer odf_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/qball_image.qbi"));
     mitk::Image::Pointer tensor_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/StreamlineTractography/tensor_image.dti"));

@@ -106,6 +106,9 @@ private:
     */
     void RetrieveAndStorePreferenceValues();
 
+    void OnInvalidDeploymentEvent(const ::itk::Object *, const itk::EventObject &event);
+    void OnValidDeploymentEvent(const ::itk::Object *, const itk::EventObject &event);
+
     /**
     * \brief Called to get hold of the actual preferences node.
     */

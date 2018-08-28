@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // qt
 #include <QMenu>
+#include <QTreeView>
 
 const std::string QmitkSemanticRelationsView::VIEW_ID = "org.mitk.views.semanticrelations";
 
@@ -161,7 +162,7 @@ void QmitkSemanticRelationsView::OnDataNodeDoubleClicked(const mitk::DataNode* d
 
 void QmitkSemanticRelationsView::OnCaseIDSelectionChanged(const QString& caseID)
 {
-  m_LesionInfoWidget->SetCurrentCaseID(caseID.toStdString());
+  m_LesionInfoWidget->SetCaseID(caseID.toStdString());
   m_PatientTableInspector->SetCaseID(caseID.toStdString());
 }
 

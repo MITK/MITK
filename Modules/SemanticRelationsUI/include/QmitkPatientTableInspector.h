@@ -19,13 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations UI module
 #include "MitkSemanticRelationsUIExports.h"
-#include <QmitkAbstractSemanticRelationsStorageInspector.h>
-#include <QmitkPatientTableModel.h>
+#include "QmitkAbstractSemanticRelationsStorageInspector.h"
+#include "QmitkPatientTableModel.h"
 
 #include "ui_QmitkPatientTableInspector.h"
 
 // qt widgets module
-#include "QmitkEnums.h"
+#include <QmitkEnums.h>
 
 // qt
 #include <QMenu>

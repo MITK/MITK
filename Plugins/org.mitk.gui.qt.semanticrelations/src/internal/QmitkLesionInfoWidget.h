@@ -17,8 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKLESIONINFOWIDGET_H
 #define QMITKLESIONINFOWIDGET_H
 
-// semantic relations UI module
+// semantic relations plugin
 #include <ui_QmitkLesionInfoWidgetControls.h>
+
+// semantic relations UI module
+#include <QmitkLesionTreeModel.h>
 
 // semantic relations module
 #include <mitkSemanticRelations.h>
@@ -55,7 +58,7 @@ public:
   QmitkLesionInfoWidget::QmitkLesionInfoWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
   ~QmitkLesionInfoWidget();
 
-  void SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID);
+  void SetCaseID(const mitk::SemanticTypes::CaseID& caseID);
   /*
   * @brief Updates the 'lesionListWidget' of the GUI with the current lesion-data from the semantic relations model.
   *
@@ -69,17 +72,6 @@ public:
 
   const mitk::SemanticTypes::Lesion& GetSelectedLesion() const { return m_CurrentLesion; }
 
-  /*
-  * @brief Resets all items from the lesion list widget.
-  */
-  void ResetLesionListWidget();
-  /*
-  * @brief Resets the background color of all items in each list widget.
-  */
-  void ResetBackgroundColors();
-
-  void DarkenBackgroundColors();
-
 Q_SIGNALS:
 
   void LesionChanged(const mitk::SemanticTypes::Lesion&);
@@ -92,8 +84,8 @@ private Q_SLOTS:
   void OnAddLesionButtonClicked();
 
   // slots for the mouse click events of the list widgets
-  void OnCurrentLesionItemChanged(QListWidgetItem*, QListWidgetItem*);
-  void OnLesionItemDoubleClicked(QListWidgetItem*);
+  void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+  //void OnLesionItemDoubleClicked(QListWidgetItem*);
 
   void OnLesionListContextMenuRequested(const QPoint&);
 
@@ -105,10 +97,12 @@ private Q_SLOTS:
 
 private:
 
-  void Init();
+  void Initialize();
   void SetUpConnections();
 
   Ui::QmitkLesionInfoWidgetControls m_Controls;
+  QmitkLesionTreeModel* m_StorageModel;
+
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
   mitk::SemanticTypes::CaseID m_CaseID;

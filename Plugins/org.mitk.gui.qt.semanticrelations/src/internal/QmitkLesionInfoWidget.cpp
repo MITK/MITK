@@ -48,7 +48,7 @@ QmitkLesionInfoWidget::QmitkLesionInfoWidget(mitk::DataStorage* dataStorage, QWi
   , m_DataStorage(dataStorage)
   , m_SemanticRelations(std::make_unique<mitk::SemanticRelations>(dataStorage))
 {
-  Init();
+  Initialize();
 }
 
 QmitkLesionInfoWidget::~QmitkLesionInfoWidget()
@@ -59,12 +59,22 @@ QmitkLesionInfoWidget::~QmitkLesionInfoWidget()
   }
 }
 
-void QmitkLesionInfoWidget::Init()
+void QmitkLesionInfoWidget::Initialize()
 {
-  // create GUI from the Qt Designer's .ui file
   m_Controls.setupUi(this);
 
-  m_Controls.lesionListWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+  m_Controls.lesionTreeView->setAlternatingRowColors(true);
+  m_Controls.lesionTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
+
+  m_StorageModel = new QmitkLesionTreeModel(this);
+  if (m_DataStorage.IsExpired())
+  {
+    return;
+  }
+
+  auto dataStorage = m_DataStorage.Lock();
+  m_StorageModel->SetDataStorage(dataStorage);
+  m_Controls.lesionTreeView->setModel(m_StorageModel);
 
   SetUpConnections();
 
@@ -77,14 +87,14 @@ void QmitkLesionInfoWidget::SetUpConnections()
   connect(m_Controls.addLesionPushButton, &QPushButton::clicked, this, &QmitkLesionInfoWidget::OnAddLesionButtonClicked);
 
   // connect each list widget with a custom slots
-  connect(m_Controls.lesionListWidget, &QListWidget::currentItemChanged, this, &QmitkLesionInfoWidget::OnCurrentLesionItemChanged);
-  connect(m_Controls.lesionListWidget, &QListWidget::itemDoubleClicked, this, &QmitkLesionInfoWidget::OnLesionItemDoubleClicked);
+  //connect(m_Controls.lesionTreeView, &QTreeView::selectionChanged, this, &QmitkLesionInfoWidget::OnSelectionChanged);
+  //connect(m_Controls.lesionTreeView, &QListWidget::itemDoubleClicked, this, &QmitkLesionInfoWidget::OnLesionItemDoubleClicked);
 
   // connect context menu entries
-  connect(m_Controls.lesionListWidget, &QListWidget::customContextMenuRequested, this, &QmitkLesionInfoWidget::OnLesionListContextMenuRequested);
+  connect(m_Controls.lesionTreeView, &QTreeView::customContextMenuRequested, this, &QmitkLesionInfoWidget::OnLesionListContextMenuRequested);
 }
 
-void QmitkLesionInfoWidget::SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID)
+void QmitkLesionInfoWidget::SetCaseID(const mitk::SemanticTypes::CaseID& caseID)
 {
   m_CaseID = caseID;
   Update(m_CaseID);
@@ -100,7 +110,7 @@ void QmitkLesionInfoWidget::Update(const mitk::SemanticTypes::CaseID& caseID)
   // if the case ID of updated instance is equal to the currently active caseID
   if (caseID == m_CaseID)
   {
-    ResetLesionListWidget();
+    m_StorageModel->SetCaseID(caseID);
   }
 }
 
@@ -130,8 +140,9 @@ void QmitkLesionInfoWidget::OnAddLesionButtonClicked()
   }
 }
 
-void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* currentItem, QListWidgetItem* /*previousItem*/)
+void QmitkLesionInfoWidget::OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
+  /*
   if (nullptr == currentItem
    || nullptr == m_SemanticRelations)
   {
@@ -159,8 +170,10 @@ void QmitkLesionInfoWidget::OnCurrentLesionItemChanged(QListWidgetItem* currentI
   currentItem->setBackground(SELECTED_BACKGROUND_COLOR);
 
   emit LesionChanged(m_CurrentLesion);
+  */
 }
 
+/*
 void QmitkLesionInfoWidget::OnLesionItemDoubleClicked(QListWidgetItem* clickedItem)
 {
   if (nullptr == clickedItem
@@ -173,25 +186,25 @@ void QmitkLesionInfoWidget::OnLesionItemDoubleClicked(QListWidgetItem* clickedIt
   m_CurrentLesion.UID = clickedItem->data(Qt::UserRole).toString().toStdString();
   m_CurrentLesion.name = clickedItem->text().toStdString();
 }
+*/
 
 void QmitkLesionInfoWidget::OnLesionListContextMenuRequested(const QPoint& pos)
 {
-  QListWidgetItem* currentItem = m_Controls.lesionListWidget->itemAt(pos);
-  if (nullptr == currentItem)
+  QModelIndex index = m_Controls.lesionTreeView->indexAt(pos);
+  if (!index.isValid())
   {
     // no item clicked; cannot retrieve the current lesion
     return;
   }
 
-  mitk::SemanticTypes::ID selectedLesionUID;
-  selectedLesionUID = currentItem->data(Qt::UserRole).toString().toStdString();
+  mitk::SemanticTypes::ID selectedLesionUID = m_StorageModel->data(m_StorageModel->index(index.row(), 0), Qt::DisplayRole).toString().toStdString();
   if (selectedLesionUID.empty())
   {
     // no UID found; cannot create a lesion
     return;
   }
 
-  QMenu* menu = new QMenu(m_Controls.lesionListWidget);
+  QMenu* menu = new QMenu(m_Controls.lesionTreeView);
 
   QAction* linkToSegmentation = new QAction("Link to segmentation", this);
   linkToSegmentation->setEnabled(true);
@@ -419,60 +432,5 @@ void QmitkLesionInfoWidget::OnRemoveLesion(const mitk::SemanticTypes::ID& select
                    "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
     msgBox.setIcon(QMessageBox::Warning);
     msgBox.exec();
-  }
-}
-
-void QmitkLesionInfoWidget::ResetLesionListWidget()
-{
-  m_Controls.lesionListWidget->clear();
-  m_CurrentLesion.UID = "";
-  m_CurrentLesion.name = "";
-
-  // create lesion list widget entries with the current lesions
-  mitk::SemanticRelations::LesionVector allLesionsOfCase = m_SemanticRelations->GetAllLesionsOfCase(m_CaseID);
-  if (allLesionsOfCase.empty())
-  {
-    m_Controls.lesionListWidget->addItem("No lesions found");
-  }
-  for (const auto& lesion : allLesionsOfCase)
-  {
-    // store the UID as 'UserRole' data in the widget item
-    QListWidgetItem* lesionItem = new QListWidgetItem;
-    lesionItem->setData(Qt::UserRole, QString::fromStdString(lesion.UID));
-
-    // use the lesion UID for the item text, if the lesion name is non-existent
-    if (lesion.name.empty())
-    {
-      lesionItem->setText(QString::fromStdString(lesion.UID));
-    }
-    else
-    {
-      lesionItem->setText(QString::fromStdString(lesion.name));
-    }
-
-    m_Controls.lesionListWidget->addItem(lesionItem);
-  }
-}
-
-void QmitkLesionInfoWidget::ResetBackgroundColors()
-{
-  // reset all lesion list widget items to original background color
-  for (int i = 0; i < m_Controls.lesionListWidget->count(); ++i)
-  {
-    QListWidgetItem* item = m_Controls.lesionListWidget->item(i);
-    item->setBackground(DEFAULT_BACKGROUND_COLOR);
-  }
-}
-
-void QmitkLesionInfoWidget::DarkenBackgroundColors()
-{
-  // reset all lesion list widget items to original background color
-  for (int i = 0; i < m_Controls.lesionListWidget->count(); ++i)
-  {
-    QListWidgetItem* item = m_Controls.lesionListWidget->item(i);
-    if (DEFAULT_BACKGROUND_COLOR != item->background())
-    {
-      item->setBackground(CONNECTED_BACKGROUND_COLOR);
-    }
   }
 }

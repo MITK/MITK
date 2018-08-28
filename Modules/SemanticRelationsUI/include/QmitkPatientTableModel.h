@@ -17,11 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKPATIENTTABLEMODEL_H
 #define QMITKPATIENTTABLEMODEL_H
 
+// semantic relations UI module
+#include "QmitkAbstractSemanticRelationsStorageModel.h"
+
 // semantic relations module
 #include <mitkSemanticTypes.h>
-
-// semantic relations UI module
-#include <QmitkAbstractSemanticRelationsStorageModel.h>
 
 // mitk core
 #include <mitkDataNode.h>

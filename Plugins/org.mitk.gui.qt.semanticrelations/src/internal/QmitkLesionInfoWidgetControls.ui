@@ -26,20 +26,20 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
+   <item row="0" column="0">
+    <widget class="QLabel" name="lesionInfoWidgetLabel">
+     <property name="text">
+      <string>Available lesions:</string>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="0" rowspan="2">
-    <widget class="QListWidget" name="lesionListWidget"/>
+    <widget class="QTreeView" name="lesionTreeView"/>
    </item>
    <item row="1" column="1">
     <widget class="QPushButton" name="addLesionPushButton">
      <property name="text">
       <string>Add new lesion</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="lesionInfoWidgetLabel">
-     <property name="text">
-      <string>Available lesions:</string>
      </property>
     </widget>
    </item>

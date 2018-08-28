@@ -226,6 +226,8 @@ void ComparePeakImagesFilter< PixelType >::GenerateData()
         for (unsigned int j=0; j<test_peaks.size(); ++j)
         {
           auto a = fabs(dot_product(test_peaks[j], ref_peaks[i]));
+          if (a>1.0)
+            a = 1.0;
           if (a>max_a)
           {
             max_a = a;
@@ -247,6 +249,8 @@ void ComparePeakImagesFilter< PixelType >::GenerateData()
         for (unsigned int j=0; j<ref_peaks.size(); ++j)
         {
           auto a = fabs(dot_product(test_peaks[i], ref_peaks[j]));
+          if (a>1.0)
+            a = 1.0;
           if (a>max_a)
           {
             max_a = a;
@@ -275,6 +279,8 @@ void ComparePeakImagesFilter< PixelType >::GenerateData()
 
   std::sort( m_AngularErrorVector.begin(), m_AngularErrorVector.end() );
   m_MeanAngularError /= m_AngularErrorVector.size();      // mean
+
+
   for (unsigned int i=0; i<m_AngularErrorVector.size(); i++)
   {
     float temp = m_AngularErrorVector.at(i) - m_MeanAngularError;

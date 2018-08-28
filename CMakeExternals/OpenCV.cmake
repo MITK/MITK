@@ -62,8 +62,8 @@ if(MITK_USE_OpenCV)
       )
     endif()
 
-    set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/opencv-3.4.1.tar.gz)
-    set(opencv_url_md5 a0b7a47899e67b3490ea31edc4f6e8e6)
+    set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/opencv-3.4.2.tar.gz)
+    set(opencv_url_md5 8aba51c788cac3583bb39a0c24a5888f)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${opencv_url}

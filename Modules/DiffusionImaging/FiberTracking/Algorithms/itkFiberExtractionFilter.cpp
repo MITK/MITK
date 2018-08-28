@@ -93,7 +93,7 @@ bool FiberExtractionFilter< PixelType >::IsPositive(const itk::Point<float, 3>& 
     return mitk::imv::IsInsideMask<PixelType>(itkP, m_Interpolate, m_Interpolator, m_Threshold);
   else if( m_InputType == INPUT::LABEL_MAP )
   {
-    auto val = mitk::imv::GetImageValue<PixelType>(itkP, m_Interpolate, m_Interpolator);
+    auto val = mitk::imv::GetImageValue<PixelType>(itkP, false, m_Interpolator);
     for (auto l : m_Labels)
       if (l==val)
         return true;
@@ -323,12 +323,12 @@ void FiberExtractionFilter< PixelType >::ExtractLabels(mitk::FiberBundle::Pointe
         double* p1 = points->GetPoint(0);
         itk::Point<float, 3> itkP1;
         itkP1[0] = p1[0]; itkP1[1] = p1[1]; itkP1[2] = p1[2];
-        short label1 = mitk::imv::GetImageValue<PixelType>(itkP1, m_Interpolate, m_Interpolator);
+        short label1 = mitk::imv::GetImageValue<PixelType>(itkP1, false, m_Interpolator);
 
         double* p2 = points->GetPoint(numPoints-1);
         itk::Point<float, 3> itkP2;
         itkP2[0] = p2[0]; itkP2[1] = p2[1]; itkP2[2] = p2[2];
-        short label2 = mitk::imv::GetImageValue<PixelType>(itkP2, m_Interpolate, m_Interpolator);
+        short label2 = mitk::imv::GetImageValue<PixelType>(itkP2, false, m_Interpolator);
 
         if (!m_Labels.empty())  // extract fibers from all pairwise label combinations
         {

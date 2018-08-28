@@ -380,6 +380,12 @@ map<string, us::Any> mitkCommandLineParser::parseArguments(const StringContainer
     {
       std::cout << "Processing" << argument;
     }
+    if (!argument.compare("--version"))
+    {
+      std::cout << "Git commit hash: " << MITK_REVISION << std::endl;
+      std::cout << "Git branch name: " << MITK_REVISION_NAME << std::endl;
+    }
+
     if (!argument.compare("--xml") || !argument.compare("-xml") || !argument.compare("--XML") ||
         !argument.compare("-XML"))
     {
@@ -764,6 +770,7 @@ string mitkCommandLineParser::helpText() const
   text += Description + "\n";
   text += Contributor + "\n\n";
   text += "Use --xml to generate an XML description parsable as a CTK Command Line Module Plugin.\n";
+  text += "Use --version to print MITK revision information.\n";
 
   // Loop over grouped argument descriptions
   map<string, vector<CommandLineParserArgumentDescription *>>::iterator it;

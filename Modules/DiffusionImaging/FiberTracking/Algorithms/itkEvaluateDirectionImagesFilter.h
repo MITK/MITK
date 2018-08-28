@@ -55,12 +55,13 @@ public:
     typedef Image< bool, 3 >                                    BoolImageType;
     typedef Image< unsigned char, 3 >                           UCharImageType;
     typedef mitk::PeakImage::ItkPeakImageType                   PeakImageType;
+    typedef vnl_vector_fixed< PixelType, 3 >                    PeakType;
 
     itkSetMacro( TestImage , PeakImageType::Pointer)
     itkSetMacro( ReferenceImage , PeakImageType::Pointer)
     itkSetMacro( MaskImage , UCharImageType::Pointer)                       ///< Calculation is only performed inside of the mask image.
-    itkSetMacro( IgnoreMissingDirections , bool)                            ///< If in one voxel, the number of directions differs between the test container and the reference, the excess directions are ignored. Otherwise, the error to the next closest direction is calculated.
-    itkSetMacro( IgnoreEmptyVoxels , bool)                                  ///< Don't increase error if either reference or test voxel is empty.
+    itkSetMacro( IgnoreMissingTestDirections , bool)
+    itkSetMacro( IgnoreMissingRefDirections , bool)
 
     /** Output statistics of the measured angular errors. */
     itkGetMacro( MeanAngularError, float)
@@ -86,8 +87,8 @@ protected:
     PeakImageType::Pointer                   m_TestImage;
     PeakImageType::Pointer                   m_ReferenceImage;
 
-    bool                                     m_IgnoreMissingDirections;
-    bool                                     m_IgnoreEmptyVoxels;
+    bool                                     m_IgnoreMissingRefDirections;
+    bool                                     m_IgnoreMissingTestDirections;
     double                                   m_MeanAngularError;
     double                                   m_MedianAngularError;
     double                                   m_MaxAngularError;

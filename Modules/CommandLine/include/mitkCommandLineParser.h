@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usAny.h>
 
 #include <MitkCommandLineExports.h>
+#include <mitkVersion.h>
 
 #ifdef _MSC_VER
 #pragma warning(push)

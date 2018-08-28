@@ -73,6 +73,7 @@ int main(int argc, char* argv[])
   parser.addArgument("max_angle", "", mitkCommandLineParser::Float, "Maximum angle:", "Maximum angular STDEV over 1cm (in degree)");
   parser.addArgument("remove", "", mitkCommandLineParser::Bool, "Remove fibers exceeding curvature threshold:", "If false, only the high curvature parts are removed");
   parser.addArgument("subsample", "", mitkCommandLineParser::Float, "Randomly select fraction of streamlines:", "Randomly select the specified fraction of streamlines from the input tractogram");
+  parser.addArgument("random_subsample", "", mitkCommandLineParser::Bool, "Randomly seed subsampling:", "Randomly seed subsampling. Else, use seed 0.");
   parser.endGroup();
 
   parser.beginGroup("4. Transformation:");
@@ -99,6 +100,10 @@ int main(int argc, char* argv[])
   bool remove = false;
   if (parsedArgs.count("remove"))
     remove = us::any_cast<bool>(parsedArgs["remove"]);
+
+  bool random_subsample = false;
+  if (parsedArgs.count("random_subsample"))
+    random_subsample = us::any_cast<bool>(parsedArgs["random_subsample"]);
 
   float spline_resampling = -1;
   if (parsedArgs.count("spline_resampling"))
@@ -181,7 +186,7 @@ int main(int argc, char* argv[])
     mitk::FiberBundle::Pointer fib = LoadFib(inFileName);
 
     if (subsample>0)
-      fib = fib->SubsampleFibers(subsample);
+      fib = fib->SubsampleFibers(subsample, random_subsample);
 
     if (maxAngularDev>0)
     {

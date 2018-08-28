@@ -110,7 +110,7 @@ public:
     float                          GetOverlap(ItkUcharImgType* mask);
     std::tuple<float, float>       GetDirectionalOverlap(ItkUcharImgType* mask, mitk::PeakImage::ItkPeakImageType* peak_image);
     float                          GetNumEpFractionInMask(ItkUcharImgType* mask, bool different_label);
-    mitk::FiberBundle::Pointer     SubsampleFibers(float factor);
+    mitk::FiberBundle::Pointer     SubsampleFibers(float factor, bool random_seed);
 
     // get/set data
     float GetFiberLength(int index) const { return m_FiberLengths.at(index); }

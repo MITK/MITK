@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
 
     std::srand(0);
     if (subsample<1.0)
-      fib = fib->SubsampleFibers(subsample);
+      fib = fib->SubsampleFibers(subsample, true);
 
     mitk::FiberBundle::Pointer resampled_fib = fib->GetDeepCopy();
     resampled_fib->ResampleToNumPoints(12);

@@ -300,13 +300,13 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::FilterByWeights(float weight_thr, 
 }
 
 // Only retain a subsample of the fibers
-mitk::FiberBundle::Pointer mitk::FiberBundle::SubsampleFibers(float factor)
+mitk::FiberBundle::Pointer mitk::FiberBundle::SubsampleFibers(float factor, bool random_seed)
 {
   vtkSmartPointer<vtkPolyData> vNewPolyData = vtkSmartPointer<vtkPolyData>::New();
   vtkSmartPointer<vtkCellArray> vNewLines = vtkSmartPointer<vtkCellArray>::New();
   vtkSmartPointer<vtkPoints> vNewPoints = vtkSmartPointer<vtkPoints>::New();
 
-  int new_num_fibs = this->GetNumFibers()*factor;
+  unsigned int new_num_fibs = static_cast<unsigned int>(std::round(this->GetNumFibers()*factor));
   MITK_INFO << "Subsampling fibers with factor " << factor << "(" << new_num_fibs << "/" << this->GetNumFibers() << ")";
 
   // add current fiber bundle
@@ -316,13 +316,17 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubsampleFibers(float factor)
   std::vector< int > ids;
   for (int i=0; i<this->GetNumFibers(); i++)
     ids.push_back(i);
+  if (random_seed)
+    std::srand(std::time(0));
+  else
+    std::srand(0);
   std::random_shuffle(ids.begin(), ids.end());
 
   unsigned int counter = 0;
-  for (int i=0; i<new_num_fibs; i++)
+  for (unsigned int i=0; i<new_num_fibs; i++)
   {
     vtkCell* cell = m_FiberPolyData->GetCell(ids.at(i));
-    int numPoints = cell->GetNumberOfPoints();
+    auto numPoints = cell->GetNumberOfPoints();
     vtkPoints* points = cell->GetPoints();
 
     vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();

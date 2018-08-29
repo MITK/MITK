@@ -102,6 +102,9 @@ public:
   bool windowPlaneIsSelected();
   void setWindowPlaneIsSelected(bool selected);
 
+  void setDropMode(bool state);
+  bool getDropMode();
+
 protected:
   // overloaded move handler
   virtual void moveEvent(QMoveEvent* event) override;
@@ -188,6 +191,8 @@ private:
   bool m_FullScreenMode;
 
   mitk::Point2D m_CrosshairPosition;
+
+  bool m_DropEnabled;
 };
 
 #endif

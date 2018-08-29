@@ -43,7 +43,8 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
   mitk::RenderingManager* renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode) :
   QVTKWidget(parent), m_ResendQtEvents(true), m_MenuWidget(NULL), m_MenuWidgetActivated(false), m_LayoutIndex(0), 
   m_FullScreenMode(false),
-  m_WindowPlaneIsSelected(false)
+  m_WindowPlaneIsSelected(false),
+  m_DropEnabled(true)
 {
   // Needed if QVTKWidget2 is used instead of QVTKWidget
   //this will be fixed in VTK source if change 18864 is accepted
@@ -364,7 +365,7 @@ void QmitkRenderWindow::dragEnterEvent(QDragEnterEvent *event)
 void QmitkRenderWindow::dropEvent(QDropEvent * event)
 {
   QList<mitk::DataNode*> dataNodeList = QmitkMimeTypes::ToDataNodePtrList(event->mimeData());
-  if (!dataNodeList.empty())
+  if (!dataNodeList.empty() && m_DropEnabled)
   {
     emit NodesDropped(this, dataNodeList.toVector().toStdVector());
   }
@@ -594,4 +595,14 @@ void QmitkRenderWindow::setWindowPlaneIsSelected(bool selected)
 
   m_WindowPlaneIsSelected = selected;
   emit windowPlaneSelectionChanged();
+}
+
+void QmitkRenderWindow::setDropMode(bool state)
+{
+  m_DropEnabled = state;
+}
+
+bool QmitkRenderWindow::getDropMode()
+{
+  return m_DropEnabled;
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.segmentationreworkview"
+          name="SegmentationReworkView"
+          class="SegmentationReworkView"
+          icon="resources/plugin_icon.png" />
+  </extension>
+
+</plugin>

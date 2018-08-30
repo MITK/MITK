@@ -33,9 +33,8 @@ namespace mitk
    * If only one M0 image is present normalization will be done by dividing the voxel value by the corresponding
    * M0 voxel value. If multiple M0 images are present normalization between any two M0 images will be done by
    * dividing by a linear interpolation between the two.
-   * The M0 images themselves will be transferred to the result without any processing.
-   *
-   * The output image will have the same geometry as the input image and a double pixel type.
+   * The M0 images themselves will be removed from the result.
+   * The output image will have the same 3D geometry as the input image, a time geometry only consisting of non M0 images and a double pixel type.
    */
   class MITKCEST_EXPORT CESTImageNormalizationFilter : public ImageToImageFilter
   {
@@ -75,5 +74,15 @@ namespace mitk
     std::vector< unsigned int > m_NonM0Indices;
 
   };
+
+  /** This helper function can be used to check if an image was already normalized.
+  * The function assumes that an image that is not normalized is indicated by the following properties:
+  * - mitk::Image has a property called mitk::CustomTagParser::m_OffsetsPropertyName, whith offsets separated by spaces.
+  * - The number of offsets has to match the number of timesteps.
+  * - At least one of the offsets is a normalization (M0) image. M0 are indicated by offsets greater than 299 or less than -299.
+  */
+  MITKCEST_EXPORT bool IsNotNormalizedCESTImage(const Image* cestImage);
+
 } // END mitk namespace
+
 #endif

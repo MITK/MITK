@@ -6,7 +6,7 @@
           name="MatchPoint Algorithm Browser"
           class="QmitkMatchPointBrowser"
 		  category="Registration"
-          icon="resources/icon.xpm" />
+          icon="resources/icon.svg" />
   </extension>
 
 </plugin>

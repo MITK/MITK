@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/QmitkMatchPointCore">
-        <file>MAPRegData.png</file>
+        <file>MAPRegData.svg</file>
     </qresource>
 </RCC>

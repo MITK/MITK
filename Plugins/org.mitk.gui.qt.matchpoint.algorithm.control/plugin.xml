@@ -6,7 +6,7 @@
           name="MatchPoint Algorithm Control"
           class="QmitkMatchPoint"
 		  category="Registration"
-          icon="resources/icon.png" />
+          icon="resources/icon.svg" />
   </extension>
 
 </plugin>

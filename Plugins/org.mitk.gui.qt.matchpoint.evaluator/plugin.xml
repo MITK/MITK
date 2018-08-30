@@ -6,7 +6,7 @@
           name="MatchPoint Registration Evaluator"
           class="QmitkMatchPointRegistrationEvaluator"
           category="Registration"
-          icon="resources/evaluator.png" />
+          icon="resources/evaluator.svg" />
   </extension>
 
 </plugin>

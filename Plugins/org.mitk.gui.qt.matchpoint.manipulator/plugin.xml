@@ -6,7 +6,7 @@
           name="MatchPoint Registration Manipulator"
           class="QmitkMatchPointRegistrationManipulator"
           category="Registration"
-          icon="resources/manipulator.png" />
+          icon="resources/manipulator.svg" />
   </extension>
 
 </plugin>

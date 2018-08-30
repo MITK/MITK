@@ -6,7 +6,7 @@
           name="MatchPoint Registration Batch Processing"
           class="QmitkMatchPointBatchProcessor"
 		  category="Registration"
-          icon="resources/icon.png" />
+          icon="resources/icon.svg" />
   </extension>
 
 </plugin>

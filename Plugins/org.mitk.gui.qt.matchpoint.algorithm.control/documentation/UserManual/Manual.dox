@@ -1,7 +1,7 @@
 /**
 \page org_mitk_gui_qt_matchpoint_algorithm_control The MatchPoint Algorithm Control Plugin
 
-\imageMacro{map-icon-run.png, "Icon of the MatchPoint Algorithm Control", 3}
+\imageMacro{map-icon-run.svg, "Icon of the MatchPoint Algorithm Control", 3}
 
 \tableofcontents
 

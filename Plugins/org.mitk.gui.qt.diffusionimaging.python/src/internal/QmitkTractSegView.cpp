@@ -153,9 +153,6 @@ void QmitkTractSegView::Start()
   converter->GenerateData();
   mitk::Image::Pointer mitk_vec_img = mitk::GrabItkImageMemory( converter->GetOutputImage().GetPointer() );
 
-  m_PythonService->Execute("import SimpleITK as sitk");
-  m_PythonService->Execute("import SimpleITK._SimpleITK as _SimpleITK");
-  m_PythonService->Execute("import numpy");
   m_PythonService->CopyToPythonAsSimpleItkImage( mitk_vec_img, "in_image");
 
   m_PythonService->Execute("sx=" + boost::lexical_cast<std::string>(itk_peaks->GetLargestPossibleRegion().GetSize()[0]));

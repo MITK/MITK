@@ -157,7 +157,7 @@ std::vector<std::string> mitk::RelationStorage::GetAllSegmentationIDsOfCase(cons
   return allSegmentationsVectorProperty->GetValue();
 }
 
-mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GetControlPointOfData(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& dataNodeID)
+mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GetControlPointOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID)
 {
   mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
@@ -165,11 +165,11 @@ mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GetControlPointOfData(c
     MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return SemanticTypes::ControlPoint();
   }
-  // retrieve a vector property that contains the information type and the referenced ID of a data node (0. information type 1. control point ID)
-  mitk::VectorProperty<std::string>* dataNodeVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(dataNodeID));
+  // retrieve a vector property that contains the information type and the referenced ID of a control point (0. information type 1. control point ID)
+  mitk::VectorProperty<std::string>* dataNodeVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(imageID));
   if (nullptr == dataNodeVectorProperty)
   {
-    MITK_INFO << "Could not find the data node " << dataNodeID << " in the storage.";
+    MITK_INFO << "Could not find the data node " << imageID << " in the storage.";
     return SemanticTypes::ControlPoint();
   }
 

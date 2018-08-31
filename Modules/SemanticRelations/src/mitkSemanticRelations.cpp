@@ -322,16 +322,16 @@ mitk::SemanticRelations::ControlpointVector mitk::SemanticRelations::GetAllContr
   return allControlPoints;
 }
 
-mitk::SemanticTypes::ControlPoint mitk::SemanticRelations::GetControlPointOfData(const DataNode* dataNode) const
+mitk::SemanticTypes::ControlPoint mitk::SemanticRelations::GetControlPointOfImage(const DataNode* imageNode) const
 {
-  if (nullptr == dataNode)
+  if (nullptr == imageNode)
   {
     mitkThrowException(SemanticRelationException) << "Not a valid data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
-  SemanticTypes::ID dataNodeID = GetIDFromDataNode(dataNode);
-  return m_RelationStorage->GetControlPointOfData(caseID, dataNodeID);
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
+  SemanticTypes::ID dataNodeID = GetIDFromDataNode(imageNode);
+  return m_RelationStorage->GetControlPointOfImage(caseID, dataNodeID);
 }
 
 mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllImagesOfControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
@@ -349,7 +349,7 @@ mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllImagesOfC
     // filter all images to remove the ones with a different control point using a lambda function
     auto lambda = [&controlPoint, this](DataNode::Pointer imageNode)
     {
-      return controlPoint.UID != GetControlPointOfData(imageNode).UID;
+      return controlPoint.UID != GetControlPointOfImage(imageNode).UID;
     };
 
     allImagesOfControlPoint.erase(std::remove_if(allImagesOfControlPoint.begin(), allImagesOfControlPoint.end(), lambda), allImagesOfControlPoint.end());
@@ -452,7 +452,7 @@ mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllSpecificI
       // filter all images to remove the ones with a different control point and information type using a lambda function
       auto lambda = [&controlPoint, &informationType, this](DataNode::Pointer imageNode)
       {
-        return (informationType != GetInformationTypeOfImage(imageNode)) || (controlPoint != GetControlPointOfData(imageNode));
+        return (informationType != GetInformationTypeOfImage(imageNode)) || (controlPoint != GetControlPointOfImage(imageNode));
       };
 
       allImagesOfCase.erase(std::remove_if(allImagesOfCase.begin(), allImagesOfCase.end(), lambda), allImagesOfCase.end());
@@ -733,7 +733,7 @@ void mitk::SemanticRelations::SetControlPointFromDate(const DataNode* dataNode, 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
 
   // store the current control point to relink it, if anything goes wrong
-  mitk::SemanticTypes::ControlPoint originalControlPoint = GetControlPointOfData(dataNode);
+  mitk::SemanticTypes::ControlPoint originalControlPoint = GetControlPointOfImage(dataNode);
   // unlink the data, that is about to receive a new date
   // this is needed in order to not extend a single control point, to which the selected node is currently linked
   UnlinkDataFromControlPoint(dataNode);
@@ -941,7 +941,7 @@ void mitk::SemanticRelations::UnlinkDataFromControlPoint(const DataNode* dataNod
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
   SemanticTypes::ID dataID = GetIDFromDataNode(dataNode);
-  SemanticTypes::ControlPoint controlPoint = m_RelationStorage->GetControlPointOfData(caseID, dataID);
+  SemanticTypes::ControlPoint controlPoint = m_RelationStorage->GetControlPointOfImage(caseID, dataID);
   m_RelationStorage->UnlinkDataFromControlPoint(caseID, dataID);
 
   DataNodeVector allImagesOfControlPoint = GetAllImagesOfControlPoint(caseID, controlPoint);

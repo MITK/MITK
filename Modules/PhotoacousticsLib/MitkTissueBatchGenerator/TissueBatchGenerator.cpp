@@ -35,7 +35,7 @@ TissueGeneratorParameters::Pointer CreateMultiHB_13_02_18_Parameters()
   returnParameters->SetMaxBackgroundAbsorption(0.2);
   returnParameters->SetBackgroundAnisotropy(0.9);
   returnParameters->SetBackgroundScattering(15);
-  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateRandomlyDivergingPosition);
+  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateNewRandomlyDivergingDirectionVector);
   returnParameters->SetDoPartialVolume(true);
   returnParameters->SetMinNumberOfVessels(1);
   returnParameters->SetMaxNumberOfVessels(7);
@@ -71,7 +71,7 @@ TissueGeneratorParameters::Pointer CreateBaselineHB_13_02_18_Parameters()
   returnParameters->SetMaxBackgroundAbsorption(0.2);
   returnParameters->SetBackgroundAnisotropy(0.9);
   returnParameters->SetBackgroundScattering(15);
-  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateRandomlyDivergingPosition);
+  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateNewRandomlyDivergingDirectionVector);
   returnParameters->SetDoPartialVolume(true);
   returnParameters->SetMinNumberOfVessels(1);
   returnParameters->SetMaxNumberOfVessels(1);
@@ -107,7 +107,7 @@ TissueGeneratorParameters::Pointer CreateSingleVesselHeterogeneousBackground_08_
   returnParameters->SetMaxBackgroundAbsorption(0.2);
   returnParameters->SetBackgroundAnisotropy(0.9);
   returnParameters->SetBackgroundScattering(15);
-  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateRandomlyDivergingPosition);
+  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateNewRandomlyDivergingDirectionVector);
   returnParameters->SetDoPartialVolume(true);
   returnParameters->SetMinNumberOfVessels(1);
   returnParameters->SetMaxNumberOfVessels(1);
@@ -143,7 +143,7 @@ TissueGeneratorParameters::Pointer CreateMultivessel_19_12_17_Parameters()
   returnParameters->SetMaxBackgroundAbsorption(0.1);
   returnParameters->SetBackgroundAnisotropy(0.9);
   returnParameters->SetBackgroundScattering(15);
-  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateRandomlyDivergingPosition);
+  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateNewRandomlyDivergingDirectionVector);
   returnParameters->SetDoPartialVolume(true);
   returnParameters->SetMinNumberOfVessels(1);
   returnParameters->SetMaxNumberOfVessels(7);
@@ -178,7 +178,7 @@ TissueGeneratorParameters::Pointer CreateMultivessel_19_10_17_Parameters()
   returnParameters->SetMaxBackgroundAbsorption(0.1);
   returnParameters->SetBackgroundAnisotropy(0.9);
   returnParameters->SetBackgroundScattering(15);
-  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateRandomlyDivergingPosition);
+  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateNewRandomlyDivergingDirectionVector);
   returnParameters->SetDoPartialVolume(true);
   returnParameters->SetMinNumberOfVessels(1);
   returnParameters->SetMaxNumberOfVessels(7);
@@ -213,7 +213,7 @@ TissueGeneratorParameters::Pointer CreateSinglevessel_19_10_17_Parameters()
   returnParameters->SetMaxBackgroundAbsorption(0.1);
   returnParameters->SetBackgroundAnisotropy(0.9);
   returnParameters->SetBackgroundScattering(15);
-  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateRandomlyDivergingPosition);
+  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateNewRandomlyDivergingDirectionVector);
   returnParameters->SetDoPartialVolume(true);
   returnParameters->SetMinNumberOfVessels(1);
   returnParameters->SetMaxNumberOfVessels(1);

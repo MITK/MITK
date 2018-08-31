@@ -36,7 +36,7 @@ namespace mitk {
          * Callback function definition of a VesselMeanderStrategy
          */
         typedef void (VesselMeanderStrategy::*CalculateNewVesselPositionCallback)
-        (Vector::Pointer, Vector::Pointer, double, std::mt19937*);
+        (Vector::Pointer, double, std::mt19937*);
 
       itkGetMacro(XDim, int)
         itkGetMacro(YDim, int)

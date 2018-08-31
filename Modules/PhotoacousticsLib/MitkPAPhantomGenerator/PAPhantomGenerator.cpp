@@ -36,7 +36,7 @@ TissueGeneratorParameters::Pointer CreatePhantom_04_04_18_Parameters()
   returnParameters->SetMaxBackgroundAbsorption(0.1);
   returnParameters->SetBackgroundAnisotropy(0.9);
   returnParameters->SetBackgroundScattering(15);
-  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateNewPositionInStraightLine);
+  returnParameters->SetCalculateNewVesselPositionCallback(&VesselMeanderStrategy::CalculateNewDirectionVectorInStraightLine);
   returnParameters->SetDoPartialVolume(true);
   returnParameters->SetMinNumberOfVessels(1);
   returnParameters->SetMaxNumberOfVessels(8);

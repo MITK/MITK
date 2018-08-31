@@ -24,8 +24,7 @@ mitk::pa::VesselMeanderStrategy::~VesselMeanderStrategy()
 {
 }
 
-void mitk::pa::VesselMeanderStrategy::CalculateNewPositionInStraightLine(
-  Vector::Pointer /*position*/, Vector::Pointer direction, double /*bendingFactor*/, std::mt19937* rng)
+void mitk::pa::VesselMeanderStrategy::CalculateNewDirectionVectorInStraightLine(Vector::Pointer direction, double /*bendingFactor*/, std::mt19937* rng)
 {
   if (direction->GetNorm() <= mitk::eps)
   {
@@ -33,8 +32,7 @@ void mitk::pa::VesselMeanderStrategy::CalculateNewPositionInStraightLine(
   }
 }
 
-void mitk::pa::VesselMeanderStrategy::CalculateRandomlyDivergingPosition(
-  Vector::Pointer /*position*/, Vector::Pointer direction, double bendingFactor, std::mt19937* rng)
+void mitk::pa::VesselMeanderStrategy::CalculateNewRandomlyDivergingDirectionVector(Vector::Pointer direction, double bendingFactor, std::mt19937* rng)
 {
   if (direction->GetNorm() <= mitk::eps)
   {

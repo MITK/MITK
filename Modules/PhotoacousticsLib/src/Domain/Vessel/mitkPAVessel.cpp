@@ -41,8 +41,8 @@ mitk::pa::Vessel::~Vessel()
 void mitk::pa::Vessel::ExpandVessel(InSilicoTissueVolume::Pointer volume,
   CalculateNewVesselPositionCallback calculateNewPosition, double bendingFactor, std::mt19937* rng)
 {
-  m_VesselDrawer->DrawVesselInVolume(m_VesselProperties, volume);
-  (m_VesselMeanderStrategy->*calculateNewPosition)(m_VesselProperties->GetPositionVector(), m_VesselProperties->GetDirectionVector(), bendingFactor, rng);
+  m_VesselDrawer->ExpandAndDrawVesselInVolume(m_VesselProperties, volume);
+  (m_VesselMeanderStrategy->*calculateNewPosition)(m_VesselProperties->GetDirectionVector(), bendingFactor, rng);
   m_WalkedDistance += (m_VesselProperties->GetDirectionVector()->GetNorm() / volume->GetSpacing());
 }
 

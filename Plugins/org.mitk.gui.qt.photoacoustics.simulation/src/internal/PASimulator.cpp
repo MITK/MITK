@@ -181,7 +181,7 @@ mitk::pa::TissueGeneratorParameters::Pointer PASimulator::GetParametersFromUIInp
   parameters->SetSkinScattering(m_Controls.spinboxSkinScattering->value());
   parameters->SetSkinAnisotropy(m_Controls.spinboxSkinAnisotropy->value());
 
-  parameters->SetCalculateNewVesselPositionCallback(&mitk::pa::VesselMeanderStrategy::CalculateRandomlyDivergingPosition);
+  parameters->SetCalculateNewVesselPositionCallback(&mitk::pa::VesselMeanderStrategy::CalculateNewRandomlyDivergingDirectionVector);
 
   return parameters;
 }

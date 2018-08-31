@@ -37,7 +37,7 @@ namespace mitk {
       mitkClassMacroItkParent(VesselDrawer, itk::LightObject);
       itkFactorylessNewMacro(Self);
 
-      void DrawVesselInVolume(
+      void ExpandAndDrawVesselInVolume(
         VesselProperties::Pointer properties,
         InSilicoTissueVolume::Pointer volume);
 

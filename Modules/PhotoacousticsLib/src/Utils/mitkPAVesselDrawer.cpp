@@ -25,14 +25,13 @@ mitk::pa::VesselDrawer::~VesselDrawer()
 {
 }
 
-void mitk::pa::VesselDrawer::DrawVesselInVolume(
+void mitk::pa::VesselDrawer::ExpandAndDrawVesselInVolume(
   VesselProperties::Pointer properties,
   InSilicoTissueVolume::Pointer volume)
 {
   Vector::Pointer stepDirection = properties->GetDirectionVector();
   Vector::Pointer fromPosition = properties->GetPositionVector()->Clone();
 
-  Vector::Pointer toPosition = properties->GetPositionVector()->Clone();
   Vector::Pointer totalWalkingDistance = stepDirection->Clone();
   totalWalkingDistance->Scale(1.0 / volume->GetSpacing());
 

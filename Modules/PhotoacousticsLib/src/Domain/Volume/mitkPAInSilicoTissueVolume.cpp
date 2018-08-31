@@ -30,7 +30,7 @@ mitk::pa::InSilicoTissueVolume::InSilicoTissueVolume(TissueGeneratorParameters::
     unsigned int xDim = parameters->GetXDim();
     unsigned int yDim = parameters->GetYDim();
     unsigned int zDim = parameters->GetZDim();
-    m_TDim = 3;
+    m_TDim = 4;
     unsigned int size = xDim * yDim * zDim;
     auto* absorptionArray = new double[size];
     auto* scatteringArray = new double[size];
@@ -115,7 +115,10 @@ void mitk::pa::InSilicoTissueVolume::SetSpacing(double spacing)
   m_AbsorptionVolume->SetSpacing(spacing);
   m_ScatteringVolume->SetSpacing(spacing);
   m_AnisotropyVolume->SetSpacing(spacing);
-  m_SegmentationVolume->SetSpacing(spacing);
+  if (m_SegmentationVolume.IsNotNull())
+  {
+    m_SegmentationVolume->SetSpacing(spacing);
+  }
 }
 
 void mitk::pa::InSilicoTissueVolume::AddDoubleProperty(std::string label, double value)
@@ -151,7 +154,10 @@ mitk::Image::Pointer mitk::pa::InSilicoTissueVolume::ConvertToMitkImage()
   resultImage->SetImportVolume(m_AbsorptionVolume->GetData(), 0, 0, mitk::Image::CopyMemory);
   resultImage->SetImportVolume(m_ScatteringVolume->GetData(), 1, 0, mitk::Image::CopyMemory);
   resultImage->SetImportVolume(m_AnisotropyVolume->GetData(), 2, 0, mitk::Image::CopyMemory);
-  resultImage->SetImportVolume(m_SegmentationVolume->GetData(), 3, 0, mitk::Image::CopyMemory);
+  if (m_TDim > 3)
+  {
+      resultImage->SetImportVolume(m_SegmentationVolume->GetData(), 3, 0, mitk::Image::CopyMemory);
+  }
 
   resultImage->SetPropertyList(m_PropertyList);
 
@@ -200,7 +206,10 @@ void mitk::pa::InSilicoTissueVolume::SetVolumeValues(int x, int y, int z, double
     m_AbsorptionVolume->SetData(absorption, x, y, z);
     m_ScatteringVolume->SetData(scattering, x, y, z);
     m_AnisotropyVolume->SetData(anisotropy, x, y, z);
-    m_SegmentationVolume->SetData(segmentType, x, y, z);
+    if (m_SegmentationVolume.IsNotNull())
+    {
+      m_SegmentationVolume->SetData(segmentType, x, y, z);
+    }
   }
 }
 
@@ -308,7 +317,10 @@ void mitk::pa::InSilicoTissueVolume::FillZLayer(int x, int y, double startIdx, d
         if (endIdx - z > 0.5)
         {
           //Only put the segmentation label if more than half of the partial volume is the wanted tissue type
-          m_SegmentationVolume->SetData(segmentationType, x, y, z);
+          if (m_SegmentationVolume.IsNotNull())
+          {
+            m_SegmentationVolume->SetData(segmentationType, x, y, z);
+          }
         }
       }
       else
@@ -316,7 +328,10 @@ void mitk::pa::InSilicoTissueVolume::FillZLayer(int x, int y, double startIdx, d
         m_AbsorptionVolume->SetData(absorption, x, y, z);
         m_ScatteringVolume->SetData(scattering, x, y, z);
         m_AnisotropyVolume->SetData(anisotropy, x, y, z);
-        m_SegmentationVolume->SetData(segmentationType, x, y, z);
+        if (m_SegmentationVolume.IsNotNull())
+        {
+          m_SegmentationVolume->SetData(segmentationType, x, y, z);
+        }
       }
     }
   }

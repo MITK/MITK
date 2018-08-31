@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSpacerItem>
 #include <QSize>
 #include <QPainter>
+#include <QSlider>
 
 #include<QGroupBox>
 #include<QRadioButton>

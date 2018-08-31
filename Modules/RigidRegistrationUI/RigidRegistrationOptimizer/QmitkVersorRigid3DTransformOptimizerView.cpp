@@ -18,6 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include <itkVersorRigid3DTransformOptimizer.h>
 
+#include <QIntValidator>
+#include <QDoubleValidator>
+
 QmitkVersorRigid3DTransformOptimizerView::QmitkVersorRigid3DTransformOptimizerView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationOptimizerGUIBase (parent, f),
 m_NumberTransformParameters(16)
 {

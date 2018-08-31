@@ -18,6 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include <itkQuaternionRigidTransformGradientDescentOptimizer.h>
 
+#include <QIntValidator>
+#include <QDoubleValidator>
+
 QmitkQuaternionRigidTransformGradientDescentOptimizerView::QmitkQuaternionRigidTransformGradientDescentOptimizerView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationOptimizerGUIBase (parent, f),
 m_NumberTransformParameters(16)
 {

@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMutualInformationImageToImageMetric.h>
 #include "mitkImageAccessByItk.h"
 
+#include <QIntValidator>
+
 QmitkMutualInformationMetricView::QmitkMutualInformationMetricView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationMetricsGUIBase (parent, f)
 {
 

@@ -137,12 +137,10 @@ void QmitkCESTStatisticsView::CreateQtPartControl( QWidget *parent )
   connect(m_Controls.threeDimToFourDimPushButton, SIGNAL(clicked()), this, SLOT(OnThreeDimToFourDimPushButtonClicked()));
   connect((QObject*) this->m_CalculatorThread, SIGNAL(finished()), this, SLOT(OnThreadedStatisticsCalculationEnds()), Qt::QueuedConnection);
   connect((QObject*)(this->m_Controls.m_CopyStatisticsToClipboardPushButton), SIGNAL(clicked()), (QObject*) this, SLOT(OnCopyStatisticsToClipboardPushButtonClicked()));
-  connect((QObject*)(this->m_Controls.normalizeImagePushButton), SIGNAL(clicked()), (QObject*) this, SLOT(OnNormalizeImagePushButtonClicked()));
   connect((QObject*)(this->m_Controls.fixedRangeCheckBox), SIGNAL(toggled(bool)), (QObject*) this, SLOT(OnFixedRangeCheckBoxToggled(bool)));
   connect((QObject*)(this->m_Controls.fixedRangeLowerDoubleSpinBox), SIGNAL(editingFinished()), (QObject*) this, SLOT(OnFixedRangeDoubleSpinBoxChanged()));
   connect((QObject*)(this->m_Controls.fixedRangeUpperDoubleSpinBox), SIGNAL(editingFinished()), (QObject*) this, SLOT(OnFixedRangeDoubleSpinBoxChanged()));
 
-  m_Controls.normalizeImagePushButton->setEnabled(false);
   m_Controls.threeDimToFourDimPushButton->setEnabled(false);
 
   this->m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
@@ -218,12 +216,10 @@ void QmitkCESTStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer
   {
     if (dynamic_cast<mitk::Image*>(nodes.front()->GetData()) )
     {
-      m_Controls.normalizeImagePushButton->setEnabled(atLeastOneWasCESTImage);
       m_Controls.threeDimToFourDimPushButton->setDisabled(atLeastOneWasCESTImage);
     }
     else
     {
-      m_Controls.normalizeImagePushButton->setEnabled(false);
       m_Controls.threeDimToFourDimPushButton->setEnabled(false);
 
       std::stringstream message;
@@ -244,7 +240,6 @@ void QmitkCESTStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer
     return;
   }
 
-  m_Controls.normalizeImagePushButton->setEnabled(false);
   m_Controls.threeDimToFourDimPushButton->setEnabled(false);
 
   if (!atLeastOneWasCESTImage)
@@ -527,61 +522,6 @@ void QmitkCESTStatisticsView::OnFixedRangeCheckBoxToggled(bool state)
 {
   this->m_Controls.fixedRangeLowerDoubleSpinBox->setEnabled(state);
   this->m_Controls.fixedRangeUpperDoubleSpinBox->setEnabled(state);
-}
-
-
-void QmitkCESTStatisticsView::OnNormalizeImagePushButtonClicked()
-{
-  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-  if (nodes.empty()) return;
-
-  mitk::DataNode* node = nodes.front();
-
-  if (!node)
-  {
-    // Nothing selected. Inform the user and return
-    QMessageBox::information(nullptr, "CEST View", "Please load and select an image before starting image processing.");
-    return;
-  }
-
-  // here we have a valid mitk::DataNode
-
-  // a node itself is not very useful, we need its data item (the image)
-  mitk::BaseData* data = node->GetData();
-  if (data)
-  {
-    // test if this data item is an image or not (could also be a surface or something totally different)
-    mitk::Image* image = dynamic_cast<mitk::Image*>(data);
-
-    if (image)
-    {
-      std::string offsets = "";
-      bool hasOffsets = image->GetPropertyList()->GetStringProperty( mitk::CustomTagParser::m_OffsetsPropertyName.c_str() ,offsets);
-      if (!hasOffsets)
-      {
-        QMessageBox::information(nullptr, "CEST View", "Selected image was missing CEST offset information.");
-        return;
-      }
-      if (image->GetDimension() == 4)
-      {
-        auto normalizationFilter = mitk::CESTImageNormalizationFilter::New();
-        normalizationFilter->SetInput(image);
-        normalizationFilter->Update();
-
-        auto resultImage = normalizationFilter->GetOutput();
-
-        mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
-        dataNode->SetData(resultImage);
-
-        std::string normalizedName = node->GetName() + "_normalized";
-        dataNode->SetName(normalizedName);
-
-        this->GetDataStorage()->Add(dataNode);
-      }
-
-      this->Clear();
-    }
-  }
 }
 
 void QmitkCESTStatisticsView::RemoveMZeros(QmitkPlotWidget::DataVector& xValues, QmitkPlotWidget::DataVector& yValues)

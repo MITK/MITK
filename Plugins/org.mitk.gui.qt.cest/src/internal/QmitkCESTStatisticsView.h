@@ -66,9 +66,6 @@ class QmitkCESTStatisticsView : public QmitkAbstractView, public mitk::IRenderWi
     /// \brief copy statistics to clipboard
     void OnCopyStatisticsToClipboardPushButtonClicked();
 
-    /// \brief normalize cest image
-    void OnNormalizeImagePushButtonClicked();
-
     /// \brief Toggle whether or not the plot uses a fixed x range
     void OnFixedRangeCheckBoxToggled(bool state);
 

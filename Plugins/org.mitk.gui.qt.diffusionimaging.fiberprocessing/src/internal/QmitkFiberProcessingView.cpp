@@ -529,8 +529,6 @@ void QmitkFiberProcessingView::ExtractWithMask(bool onlyEnds, bool invert, bool 
     }
 
     auto labels = extractor->GetPositiveLabels();
-    MITK_INFO << labels.size();
-
     for (unsigned int i=0; i<newFibs.size(); ++i)
     {
       DataNode::Pointer newNode = DataNode::New();

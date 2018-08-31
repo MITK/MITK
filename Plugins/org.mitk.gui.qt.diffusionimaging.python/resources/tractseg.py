@@ -1,7 +1,6 @@
 error_string = None
 del error_string
 try:
-    import SimpleITK as sitk
     import nibabel as nib
     import numpy as np
     from tractseg.TractSeg import run_tractseg

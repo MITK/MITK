@@ -839,6 +839,7 @@ void mitk::DisplayInteractor::Rotate(mitk::StateMachineAction *, mitk::Interacti
 
     (*iter)->SendCreatedWorldGeometryUpdate();
     (*iter)->GetRenderer()->RequestUpdate();
+    (*iter)->GetRenderer()->SetConstrainZoomingAndPanning(true);
   }
 
   RenderingManager::GetInstance()->RequestUpdateAll();
@@ -910,6 +911,7 @@ void mitk::DisplayInteractor::Swivel(mitk::StateMachineAction *, mitk::Interacti
   m_PreviousRotationAngle = rotationAngle;
 
   event->GetSender()->RequestUpdate();
+  (*iter)->GetRenderer()->SetConstrainZoomingAndPanning(true);
   RenderingManager::GetInstance()->RequestUpdateAll();
   return;
 }

@@ -44,7 +44,7 @@ public:
   {
     m_VesselProperties = VesselProperties::New();
     m_Tree = VesselTree::New(m_VesselProperties);
-    m_StraightLine = &VesselMeanderStrategy::CalculateNewPositionInStraightLine;
+    m_StraightLine = &VesselMeanderStrategy::CalculateNewDirectionVectorInStraightLine;
     auto rng = std::mt19937();
     m_TestInSilicoVolume = InSilicoTissueVolume::New(createTestVolumeParameters(), &rng);
   }

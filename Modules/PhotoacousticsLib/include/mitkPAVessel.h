@@ -42,7 +42,7 @@ namespace mitk {
          * Callback function definition of a VesselMeanderStrategy
          */
         typedef void (VesselMeanderStrategy::*CalculateNewVesselPositionCallback)
-        (Vector::Pointer, Vector::Pointer, double, std::mt19937*);
+        (Vector::Pointer, double, std::mt19937*);
 
       /**
        * @brief ExpandVessel makes this Vessel expand one step in its current direction.

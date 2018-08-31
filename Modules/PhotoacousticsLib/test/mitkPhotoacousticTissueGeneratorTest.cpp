@@ -50,7 +50,7 @@ public:
     returnParameters->SetMinNumberOfVessels(min);
     returnParameters->SetMaxNumberOfVessels(min + (rand() % 10));
     returnParameters->SetCalculateNewVesselPositionCallback(
-      &mitk::pa::VesselMeanderStrategy::CalculateRandomlyDivergingPosition);
+      &mitk::pa::VesselMeanderStrategy::CalculateNewRandomlyDivergingDirectionVector);
     returnParameters->SetMinVesselZOrigin(rand() % 3 + 1);
     returnParameters->SetMaxVesselZOrigin(rand() % 3 + 1);
     int minRad = rand() % 100;

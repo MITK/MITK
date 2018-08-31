@@ -36,22 +36,20 @@ namespace mitk {
 
         /**
          * @brief CalculateNewPositionInStraightLine calculates the new position by just following the direction vector.
-         * @param position
          * @param direction
          * @param bendingFactor
          */
-        void CalculateNewPositionInStraightLine(Vector::Pointer position, Vector::Pointer direction, double bendingFactor, std::mt19937* rng);
+        void CalculateNewDirectionVectorInStraightLine(Vector::Pointer direction, double bendingFactor, std::mt19937* rng);
 
       /**
        * @brief CalculateRandomlyDivergingPosition calculates the new position by modifying the direction vector randomly,
        * proportional to the selected bendingFactor. This means, that the vessels will bend in each expansion step,
        * if bendingFactor > 0.
        *
-       * @param position
        * @param direction
        * @param bendingFactor
        */
-      void CalculateRandomlyDivergingPosition(Vector::Pointer position, Vector::Pointer direction, double bendingFactor, std::mt19937* rng);
+      void CalculateNewRandomlyDivergingDirectionVector(Vector::Pointer direction, double bendingFactor, std::mt19937* rng);
 
     protected:
       VesselMeanderStrategy();

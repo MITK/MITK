@@ -42,7 +42,7 @@ mitk::pa::TissueGeneratorParameters::TissueGeneratorParameters()
   m_SkinAnisotropy = 0.9;
   m_SkinThicknessInMillimeters = 0;
 
-  m_CalculateNewVesselPositionCallback = &VesselMeanderStrategy::CalculateRandomlyDivergingPosition;
+  m_CalculateNewVesselPositionCallback = &VesselMeanderStrategy::CalculateNewRandomlyDivergingDirectionVector;
   m_MinNumberOfVessels = 0;
   m_MaxNumberOfVessels = 0;
   m_MinVesselBending = 0;

@@ -18,6 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include <itkAmoebaOptimizer.h>
 
+#include <QIntValidator>
+#include <QDoubleValidator>
+
 QmitkAmoebaOptimizerView::QmitkAmoebaOptimizerView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationOptimizerGUIBase (parent, f),
 m_NumberTransformParameters(15)
 {

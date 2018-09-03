@@ -742,7 +742,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
     mitk::FiberBundle::Pointer fib = m_Tractograms.at(t);
     vtkSmartPointer< vtkPolyData > polyData = fib->GetFiberPolyData();
     vnl_vector_fixed<float,3> zero_dir; zero_dir.fill(0.0);
-    for (int i=0; i<fib->GetNumFibers(); i++)
+    for (unsigned int i=0; i<fib->GetNumFibers(); i++)
     {
       vtkCell* cell = polyData->GetCell(i);
       int numPoints = cell->GetNumberOfPoints();

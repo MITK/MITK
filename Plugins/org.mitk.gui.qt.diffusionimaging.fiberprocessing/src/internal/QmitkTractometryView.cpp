@@ -166,7 +166,7 @@ void QmitkTractometryView::ImageValuesAlongTract(const mitk::PixelType, mitk::Im
   double min = 100000.0;
   double max = 0;
   double mean = 0;
-  for (int i=0; i<working_fib->GetNumFibers(); ++i)
+  for (unsigned int i=0; i<working_fib->GetNumFibers(); ++i)
   {
     vtkCell* cell = polydata->GetCell(i);
     auto numPoints = cell->GetNumberOfPoints();

@@ -92,7 +92,7 @@ short TrackVisFiberReader::open( std::string filename )
 short TrackVisFiberReader::append(const mitk::FiberBundle *fib)
 {
   vtkPolyData* poly = fib->GetFiberPolyData();
-  for (int i=0; i<fib->GetNumFibers(); i++)
+  for (unsigned int i=0; i<fib->GetNumFibers(); i++)
   {
     vtkCell* cell = poly->GetCell(i);
     int numPoints = cell->GetNumberOfPoints();

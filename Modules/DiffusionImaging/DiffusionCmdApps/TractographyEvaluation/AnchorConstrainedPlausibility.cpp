@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("greedy_add"))
     greedy_add = us::any_cast<bool>(parsedArgs["greedy_add"]);
 
-  float lambda = 0.1;
+  float lambda = 0.1f;
   if (parsedArgs.count("lambda"))
     lambda = us::any_cast<float>(parsedArgs["lambda"]);
 
@@ -149,23 +149,23 @@ int main(int argc, char* argv[])
     MITK_INFO << "Loading data";
 
     // Load mask file. Fit is only performed inside the mask
+    MITK_INFO << "Loading mask image";
     auto mask = mitk::DiffusionDataIOHelper::load_itk_image<itk::FitFibersToImageFilter::UcharImgType>(mask_file);
 
     // Load masks covering the true positives for evaluation purposes
+    MITK_INFO << "Loading reference peaks and masks";
     std::vector< std::string > anchor_mask_files;
     auto reference_masks = mitk::DiffusionDataIOHelper::load_itk_images<itk::FitFibersToImageFilter::UcharImgType>(reference_mask_files_folders, &anchor_mask_files);
     auto reference_peaks = mitk::DiffusionDataIOHelper::load_itk_images<PeakImgType>(reference_peaks_files_folders);
 
     // Load peak image
+    MITK_INFO << "Loading peak image";
     auto peak_image = mitk::DiffusionDataIOHelper::load_itk_image<PeakImgType>(peak_file_name);
 
     // Load all candidate tracts
+    MITK_INFO << "Loading candidate tracts";
     std::vector< std::string > candidate_tract_files;
     auto input_candidates = mitk::DiffusionDataIOHelper::load_fibs(candidate_tract_folders, &candidate_tract_files);
-
-    MITK_INFO << "Loaded " << candidate_tract_files.size() << " candidate tracts.";
-    MITK_INFO << "Loaded " << reference_masks.size() << " reference masks.";
-    MITK_INFO << "Loaded " << reference_peaks.size() << " reference peaks.";
 
     if (flipx || flipy || flipz)
     {
@@ -197,7 +197,7 @@ int main(int argc, char* argv[])
         MITK_INFO << "Fit anchor tracts";
         itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
         fitter->SetTractograms({anchor_tractogram});
-        fitter->SetLambda(lambda);
+        fitter->SetLambda(static_cast<double>(lambda));
         fitter->SetFilterOutliers(filter_outliers);
         fitter->SetPeakImage(peak_image);
         fitter->SetVerbose(true);
@@ -211,7 +211,7 @@ int main(int argc, char* argv[])
         name = ist::GetFilenameWithoutExtension(anchors_file);
         mitk::FiberBundle::Pointer anchor_tracts = fitter->GetTractograms().at(0);
         anchor_tracts->SetFiberColors(255,255,255);
-        mitk::IOUtil::Save(anchor_tracts, out_folder + boost::lexical_cast<std::string>((int)(100000*rms_diff[0])) + "_" + name + ".fib");
+        mitk::IOUtil::Save(anchor_tracts, out_folder + boost::lexical_cast<std::string>(static_cast<int>(100000*rms_diff[0])) + "_" + name + ".fib");
 
         logfile << name << " " << setprecision(5) << rms_diff[0] << "\n";
 
@@ -225,11 +225,11 @@ int main(int argc, char* argv[])
     if (use_weights || use_num_streamlines)
     {
       MITK_INFO << "Using tract weights as scores";
-      int c = 0;
+      unsigned int c = 0;
       for (auto fib : input_candidates)
       {
         int mod = 1;
-        double score = 0;
+        float score = 0;
         if (use_weights)
         {
           score = fib->GetFiberWeight(0);
@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
         std::streambuf *old = cout.rdbuf(); // <-- save
         std::stringstream ss;
         std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-        mitk::IOUtil::Save(fib, out_folder + boost::lexical_cast<std::string>((int)(mod*score)) + "_" + bundle_name + ".fib");
+        mitk::IOUtil::Save(fib, out_folder + boost::lexical_cast<std::string>(static_cast<int>(mod*score)) + "_" + bundle_name + ".fib");
 
         unsigned int num_voxels = 0;
         {
@@ -257,8 +257,8 @@ int main(int argc, char* argv[])
           num_voxels = masks_filter->GetNumCoveredVoxels();
         }
 
-        double weight_sum = 0;
-        for (int i=0; i<fib->GetNumFibers(); i++)
+        float weight_sum = 0;
+        for (unsigned int i=0; i<fib->GetNumFibers(); i++)
           weight_sum += fib->GetFiberWeight(i);
 
         std::cout.rdbuf (old);              // <-- restore
@@ -271,7 +271,7 @@ int main(int argc, char* argv[])
     {
       MITK_INFO << "Fit candidate tracts";
       itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
-      fitter->SetLambda(lambda);
+      fitter->SetLambda(static_cast<double>(lambda));
       fitter->SetFilterOutliers(filter_outliers);
       fitter->SetVerbose(true);
       fitter->SetPeakImage(peak_image);
@@ -297,7 +297,7 @@ int main(int argc, char* argv[])
       fitter->Update();
       vnl_vector<double> rms_diff = fitter->GetRmsDiffPerBundle();
 
-      int c = 0;
+      unsigned int c = 0;
       for (auto fib : input_candidates)
       {
         std::string bundle_name = ist::GetFilenameWithoutExtension(candidate_tract_files.at(c));
@@ -320,8 +320,8 @@ int main(int argc, char* argv[])
           num_voxels = masks_filter->GetNumCoveredVoxels();
         }
 
-        double weight_sum = 0;
-        for (int i=0; i<fib->GetNumFibers(); i++)
+        float weight_sum = 0;
+        for (unsigned int i=0; i<fib->GetNumFibers(); i++)
           weight_sum += fib->GetFiberWeight(i);
 
         std::cout.rdbuf (old);              // <-- restore
@@ -352,11 +352,11 @@ int main(int argc, char* argv[])
         mitk::FiberBundle::Pointer best_candidate = nullptr;
         PeakImgType::Pointer best_candidate_peak_image = nullptr;
 
-        for (int i=0; i<(int)input_candidates.size(); ++i)
+        for (unsigned int i=0; i<input_candidates.size(); ++i)
         {
           // WHY NECESSARY AGAIN??
           itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
-          fitter->SetLambda(lambda);
+          fitter->SetLambda(static_cast<double>(lambda));
           fitter->SetFilterOutliers(filter_outliers);
           fitter->SetVerbose(false);
           fitter->SetPeakImage(peak_image);
@@ -386,7 +386,7 @@ int main(int argc, char* argv[])
         //      fitter->SetPeakImage(peak_image);
         peak_image = best_candidate_peak_image;
 
-        int i=0;
+        unsigned int i=0;
         std::vector< mitk::FiberBundle::Pointer > remaining_candidates;
         std::vector< std::string > remaining_candidate_files;
         for (auto fib : input_candidates)
@@ -422,9 +422,9 @@ int main(int argc, char* argv[])
     }
 
     clock.Stop();
-    int h = clock.GetTotal()/3600;
-    int m = ((int)clock.GetTotal()%3600)/60;
-    int s = (int)clock.GetTotal()%60;
+    int h = static_cast<int>(clock.GetTotal()/3600);
+    int m = (static_cast<int>(clock.GetTotal())%3600)/60;
+    int s = static_cast<int>(clock.GetTotal())%60;
     MITK_INFO << "Plausibility estimation took " << h << "h, " << m << "m and " << s << "s";
     logfile.close();
   }

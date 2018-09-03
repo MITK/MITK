@@ -320,7 +320,7 @@ int main(int argc, char* argv[])
           num_voxels = masks_filter->GetNumCoveredVoxels();
         }
 
-        double weight_sum = 0;
+        float weight_sum = 0;
         for (unsigned int i=0; i<fib->GetNumFibers(); i++)
           weight_sum += fib->GetFiberWeight(i);
 
@@ -352,11 +352,11 @@ int main(int argc, char* argv[])
         mitk::FiberBundle::Pointer best_candidate = nullptr;
         PeakImgType::Pointer best_candidate_peak_image = nullptr;
 
-        for (int i=0; i<(int)input_candidates.size(); ++i)
+        for (unsigned int i=0; i<input_candidates.size(); ++i)
         {
           // WHY NECESSARY AGAIN??
           itk::FitFibersToImageFilter::Pointer fitter = itk::FitFibersToImageFilter::New();
-          fitter->SetLambda(lambda);
+          fitter->SetLambda(static_cast<double>(lambda));
           fitter->SetFilterOutliers(filter_outliers);
           fitter->SetVerbose(false);
           fitter->SetPeakImage(peak_image);
@@ -386,7 +386,7 @@ int main(int argc, char* argv[])
         //      fitter->SetPeakImage(peak_image);
         peak_image = best_candidate_peak_image;
 
-        int i=0;
+        unsigned int i=0;
         std::vector< mitk::FiberBundle::Pointer > remaining_candidates;
         std::vector< std::string > remaining_candidate_files;
         for (auto fib : input_candidates)
@@ -422,9 +422,9 @@ int main(int argc, char* argv[])
     }
 
     clock.Stop();
-    int h = clock.GetTotal()/3600;
-    int m = ((int)clock.GetTotal()%3600)/60;
-    int s = (int)clock.GetTotal()%60;
+    int h = static_cast<int>(clock.GetTotal()/3600);
+    int m = (static_cast<int>(clock.GetTotal())%3600)/60;
+    int s = static_cast<int>(clock.GetTotal())%60;
     MITK_INFO << "Plausibility estimation took " << h << "h, " << m << "m and " << s << "s";
     logfile.close();
   }

@@ -672,8 +672,12 @@ bool mitk::PlanarFigureInteractor::CheckAnnotationHovering( const InteractionEve
     annotationMoveOffset[0] = point2DPosition[0] - point2DAnnotation[0];
     annotationMoveOffset[1] = point2DPosition[1] - point2DAnnotation[1];
 
+    planarFigure->InvokeEvent(mitk::StartAnnotationHoveringPlanarFigureEvent());
+
     return true;
   } else {
+    planarFigure->InvokeEvent(mitk::EndAnnotationHoveringPlanarFigureEvent());
+
     return false;
   }
 }

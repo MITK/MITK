@@ -198,7 +198,7 @@ namespace mitk
       }
 
       // Create segmentation meta information
-      const std::string &tmpMetaInfoFile = this->CreateMetaDataJsonFile(layer);
+      const std::string tmpMetaInfoFile = this->CreateMetaDataJsonFile(layer);
 
       MITK_INFO << "Writing image: " << path << std::endl;
       try

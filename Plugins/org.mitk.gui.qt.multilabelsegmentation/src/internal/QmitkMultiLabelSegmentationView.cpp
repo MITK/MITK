@@ -30,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanePositionManager.h"
 #include "mitkPluginActivator.h"
 #include "mitkSegTool2D.h"
-#include "mitkDICOMSegmentationPropertyHelper.cpp"
 
 // Qmitk
 #include "QmitkNewSegmentationDialog.h"

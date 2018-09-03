@@ -316,8 +316,8 @@ int main( int argc, char* argv[] )
 
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Show this help text");
-  parser.addArgument("input", "i", mitkCommandLineParser::InputImage, "Input:", "Input file",us::Any(),false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output:", "Output file",us::Any(),false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputImage, "Input:", "Input file",us::Any(),false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output:", "Output file",us::Any(),false);
   parser.addArgument("spacing", "s", mitkCommandLineParser::String, "Spacing:", "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
   parser.addArgument("reference", "r", mitkCommandLineParser::InputImage, "Reference:", "Resample using supplied reference image. Also cuts image to same dimensions",us::Any());
   parser.addArgument("win-sinc", "w", mitkCommandLineParser::Bool, "Windowed-sinc interpolation:", "Use windowed-sinc interpolation (3) instead of linear interpolation ",us::Any());
@@ -350,8 +350,8 @@ int main( int argc, char* argv[] )
     }
   }
 
-  std::string outputFile = us::any_cast<std::string>(parsedArgs["output"]);
-  std::string inputFile = us::any_cast<std::string>(parsedArgs["input"]);
+  std::string outputFile = us::any_cast<std::string>(parsedArgs["i"]);
+  std::string inputFile = us::any_cast<std::string>(parsedArgs["o"]);
 
   std::vector<std::string> spacings;
   float spacing[] = { 0.0f, 0.0f, 0.0f };

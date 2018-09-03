@@ -43,8 +43,8 @@ int main(int argc, char* argv[])
   parser.setDescription("Extract fibers from a tractogram using planar figure ROIs");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "input tractogram (.fib/.trk)", us::Any(), false);
-  parser.addArgument("out", "o", mitkCommandLineParser::String, "Output:", "output tractogram", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "input tractogram (.fib/.trk)", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output tractogram", us::Any(), false);
   parser.addArgument("planfirgure1", "pf1", mitkCommandLineParser::String, "Figure 1:", "first planar figure ROI", us::Any(), false);
   parser.addArgument("planfirgure2", "pf2", mitkCommandLineParser::String, "Figure 2:", "second planar figure ROI", us::Any());
   parser.addArgument("operation", "op", mitkCommandLineParser::String, "Operation:", "logical operation (AND, OR, NOT)", us::Any());
@@ -54,8 +54,8 @@ int main(int argc, char* argv[])
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  std::string inFib = us::any_cast<std::string>(parsedArgs["input"]);
-  std::string outFib = us::any_cast<std::string>(parsedArgs["out"]);
+  std::string inFib = us::any_cast<std::string>(parsedArgs["i"]);
+  std::string outFib = us::any_cast<std::string>(parsedArgs["o"]);
   std::string pf1_path = us::any_cast<std::string>(parsedArgs["planfirgure1"]);
 
   std::string operation("");

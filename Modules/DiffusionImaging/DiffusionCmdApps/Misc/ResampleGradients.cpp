@@ -190,8 +190,8 @@ int main(int argc, char* argv[])
     parser.setContributor("MIC");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "input image", us::Any(), false);
-    parser.addArgument("output", "o", mitkCommandLineParser::String, "Output:", "output image", us::Any(), false);
+    parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "input image", us::Any(), false);
+    parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output image", us::Any(), false);
     parser.addArgument("b_value", "", mitkCommandLineParser::Float, "b-value:", "float", 1000, false);
     parser.addArgument("num_gradients", "", mitkCommandLineParser::Int, "Nr of gradients:", "integer", 32, false);
     parser.addArgument("use_first_n", "", mitkCommandLineParser::Bool, "Use first N:", "no optimization, simply use first n gradients", 0);
@@ -202,8 +202,8 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
 
 
-    std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
-    std::string outFileName = us::any_cast<std::string>(parsedArgs["output"]);
+    std::string inFileName = us::any_cast<std::string>(parsedArgs["i"]);
+    std::string outFileName = us::any_cast<std::string>(parsedArgs["o"]);
     double bValue = us::any_cast<float>(parsedArgs["b_value"]);
     unsigned int nrOfGradients = us::any_cast<int>(parsedArgs["num_gradients"]);
     bool use_first_n = false;

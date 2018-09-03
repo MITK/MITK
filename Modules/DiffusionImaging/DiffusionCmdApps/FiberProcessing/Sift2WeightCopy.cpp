@@ -57,18 +57,18 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "input fiber bundle", us::Any(), false);
-  parser.addArgument("weights", "w", mitkCommandLineParser::String, "Weights:", "input weights file (.txt)", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::String, "Output:", "output fiber bundle (.fib)", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "input fiber bundle", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output fiber bundle (.fib)", us::Any(), false);
+  parser.addArgument("weights", "", mitkCommandLineParser::String, "Weights:", "input weights file (.txt)", us::Any(), false);
 
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
+  std::string inFileName = us::any_cast<std::string>(parsedArgs["i"]);
   std::string weightsFileName = us::any_cast<std::string>(parsedArgs["weights"]);
-  std::string outFileName = us::any_cast<std::string>(parsedArgs["output"]);
+  std::string outFileName = us::any_cast<std::string>(parsedArgs["o"]);
 
   try
   {

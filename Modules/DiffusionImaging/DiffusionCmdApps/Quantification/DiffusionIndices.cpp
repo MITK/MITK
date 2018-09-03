@@ -41,17 +41,17 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input image (tensor, ODF or FSL/MRTrix SH-coefficient image)", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "input image (tensor, ODF or FSL/MRTrix SH-coefficient image)", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output:", "output image", us::Any(), false);
   parser.addArgument("index", "idx", mitkCommandLineParser::String, "Index:", "index (fa, gfa, ra, ad, rd, ca, l2, l3, md)", us::Any(), false);
-  parser.addArgument("outFile", "o", mitkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
+  std::string inFileName = us::any_cast<std::string>(parsedArgs["i"]);
   std::string index = us::any_cast<std::string>(parsedArgs["index"]);
-  std::string outFileName = us::any_cast<std::string>(parsedArgs["outFile"]);
+  std::string outFileName = us::any_cast<std::string>(parsedArgs["o"]);
 
   std::string ext = itksys::SystemTools::GetFilenameLastExtension(outFileName);
   if (ext.empty())

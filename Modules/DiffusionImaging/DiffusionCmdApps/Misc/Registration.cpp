@@ -224,8 +224,8 @@ int main( int argc, char* argv[] )
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help", "Show this help text");
   //parser.addArgument("usemask", "u", QVariant::Bool, "Use segmentations (derived resources) to exclude areas from registration metrics");
-  parser.addArgument("input", "i", mitkCommandLineParser::InputDirectory, "Input:", "Input folder",us::Any(),false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputDirectory, "Output:", "Output folder (ending with /)",us::Any(),false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputDirectory, "Input:", "Input folder",us::Any(),false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "Output folder (ending with /)",us::Any(),false);
   parser.addArgument("fixed", "f", mitkCommandLineParser::String, "Fixed images:", "Suffix for fixed image (if none is supplied first file matching moving pattern is chosen)",us::Any(),true);
   parser.addArgument("moving", "m", mitkCommandLineParser::String, "Moving images:", "Suffix for moving images",us::Any(),false);
   parser.addArgument("derived", "d", mitkCommandLineParser::String, "Derived resources:", "Derived resources suffixes (replaces suffix for moving images); comma separated",us::Any(),true);
@@ -279,9 +279,9 @@ int main( int argc, char* argv[] )
     refPattern = movingImgPattern;
   }
 
-  std::string outputPath = us::any_cast<std::string>(parsedArgs["output"]);
+  std::string outputPath = us::any_cast<std::string>(parsedArgs["o"]);
 
-  std::string inputPath = us::any_cast<std::string>(parsedArgs["input"]);
+  std::string inputPath = us::any_cast<std::string>(parsedArgs["i"]);
   //QString resampleReference = parsedArgs["resample"].toString();
   //bool maskTumor = parsedArgs["usemask"].toBool();
 

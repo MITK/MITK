@@ -56,8 +56,8 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
 
   parser.beginGroup("1. Mandatory arguments:");
-  parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "Input fiber bundle (.fib, .trk, .tck)", us::Any(), false);
-  parser.addArgument("outFile", "o", mitkCommandLineParser::OutputFile, "Output:", "Output fiber bundle (.fib, .trk)", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "Input fiber bundle (.fib, .trk, .tck)", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output:", "Output fiber bundle (.fib, .trk)", us::Any(), false);
   parser.endGroup();
 
   parser.beginGroup("2. Resampling:");
@@ -178,8 +178,8 @@ int main(int argc, char* argv[])
     translateZ = us::any_cast<float>(parsedArgs["translate_z"]);
 
 
-  std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
-  std::string outFileName = us::any_cast<std::string>(parsedArgs["outFile"]);
+  std::string inFileName = us::any_cast<std::string>(parsedArgs["i"]);
+  std::string outFileName = us::any_cast<std::string>(parsedArgs["o"]);
 
   try
   {

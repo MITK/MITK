@@ -43,8 +43,8 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
 
   parser.beginGroup("1. Mandatory arguments:");
-  parser.addArgument("in", "i", mitkCommandLineParser::InputFile, "Input:", "input image", us::Any(), false);
-  parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output:", "output image", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "input image", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output:", "output image", us::Any(), false);
   parser.addArgument("type", "", mitkCommandLineParser::Int, "Type:", "0 (TotalVariation), 1 (Gauss), 2 (NLM)", 0);
   parser.endGroup();
 
@@ -69,8 +69,8 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
 
   // mandatory arguments
-  std::string imageName = us::any_cast<std::string>(parsedArgs["in"]);
-  std::string outImage = us::any_cast<std::string>(parsedArgs["out"]);
+  std::string imageName = us::any_cast<std::string>(parsedArgs["i"]);
+  std::string outImage = us::any_cast<std::string>(parsedArgs["o"]);
 
   int type = 0;
   if (parsedArgs.count("type"))

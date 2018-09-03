@@ -49,8 +49,8 @@ int main(int argc, char* argv[])
 
   parser.setArgumentPrefix("--", "-");
 
-  parser.addArgument("inputNetwork", "i", mitkCommandLineParser::InputFile, "Input network", "input connectomics network (.cnf)", us::Any(), false);
-  parser.addArgument("outputFile", "o", mitkCommandLineParser::OutputFile, "Output file", "name of output file", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input network", "input connectomics network (.cnf)", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output file", "name of output file", us::Any(), false);
 
   parser.addArgument("noGlobalStatistics", "g", mitkCommandLineParser::Bool, "No global statistics", "Do not calculate global statistics");
   parser.addArgument("createConnectivityMatriximage", "I", mitkCommandLineParser::Bool, "Write connectivity matrix image", "Write connectivity matrix image");
@@ -77,8 +77,8 @@ int main(int argc, char* argv[])
 
 
   // parse command line arguments
-  std::string networkName = us::any_cast<std::string>(parsedArgs["inputNetwork"]);
-  std::string outName = us::any_cast<std::string>(parsedArgs["outputFile"]);
+  std::string networkName = us::any_cast<std::string>(parsedArgs["i"]);
+  std::string outName = us::any_cast<std::string>(parsedArgs["o"]);
 
   mitkCommandLineParser::StringContainerType localLabels;
 

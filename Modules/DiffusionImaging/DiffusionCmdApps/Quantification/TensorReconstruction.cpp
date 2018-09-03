@@ -35,8 +35,8 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
-  parser.addArgument("outFile", "o", mitkCommandLineParser::OutputFile, "Output file", "output file", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input image", "input raw dwi", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output image", "output image", us::Any(), false);
   parser.addArgument("b0Threshold", "t", mitkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0, true);
 
   parser.setCategory("Signal Modelling");
@@ -48,8 +48,8 @@ int main(int argc, char* argv[])
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
-  std::string outfilename = us::any_cast<std::string>(parsedArgs["outFile"]);
+  std::string inFileName = us::any_cast<std::string>(parsedArgs["i"]);
+  std::string outfilename = us::any_cast<std::string>(parsedArgs["o"]);
   outfilename = itksys::SystemTools::GetFilenamePath(outfilename)+"/"+itksys::SystemTools::GetFilenameWithoutExtension(outfilename);
   outfilename += ".dti";
 

@@ -487,15 +487,6 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
   return mitk::FiberBundle::New(vNewPolyData);
 }
 
-itk::Point<float, 3> mitk::FiberBundle::GetItkPoint(double point[3])
-{
-  itk::Point<float, 3> itkPoint;
-  itkPoint[0] = point[0];
-  itkPoint[1] = point[1];
-  itkPoint[2] = point[2];
-  return itkPoint;
-}
-
 /*
  * set PolyData (additional flag to recompute fiber geometry, default = true)
  */

@@ -105,8 +105,8 @@ int main(int argc, char* argv[])
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("help", "h", mitkCommandLineParser::String, "Help", "Show this help text");
-  parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input file", "input dwi file", us::Any(),false);
-  parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output folder", "output folder and base name, e.g. /tmp/outPatient1 ", us::Any(),false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input file", "input dwi file", us::Any(),false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output folder", "output folder and base name, e.g. /tmp/outPatient1 ", us::Any(),false);
 
   parser.setTitle("Tensor Derived Maps Extraction");
   parser.setCategory("Diffusion Related Measures");
@@ -121,8 +121,8 @@ int main(int argc, char* argv[])
   }
 
 
-  std::string inputFile = us::any_cast<std::string>(parsedArgs["input"]);
-  std::string baseFileName = us::any_cast<std::string>(parsedArgs["out"]);
+  std::string inputFile = us::any_cast<std::string>(parsedArgs["i"]);
+  std::string baseFileName = us::any_cast<std::string>(parsedArgs["o"]);
 
   std::string dtiFileName = "_dti.dti";
 

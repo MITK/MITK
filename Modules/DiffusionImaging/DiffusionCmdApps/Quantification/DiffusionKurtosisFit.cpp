@@ -178,9 +178,9 @@ int main( int argc, char* argv[] )
   parser.setArgumentPrefix("--","-");
 
   // mandatory arguments
-  parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input: ", "input image (DWI)", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::String, "Output Preifx: ", "Prefix for the output images, will append _f, _K, _D accordingly ", us::Any(), false);
-  parser.addArgument("output_type", "ot", mitkCommandLineParser::String, "Output Type: ", "choose data type of output image, e.g. '.nii' or '.nrrd' ", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input: ", "input image (DWI)", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output Preifx: ", "Prefix for the output images, will append _f, _K, _D accordingly ", us::Any(), false);
+  parser.addArgument("output_type", "", mitkCommandLineParser::String, "Output Type: ", "choose data type of output image, e.g. '.nii' or '.nrrd' ", us::Any(), false);
 
   // optional arguments
   parser.addArgument("mask", "m", mitkCommandLineParser::InputFile, "Masking Image: ", "ROI (segmentation)", us::Any());

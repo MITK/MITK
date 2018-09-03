@@ -53,8 +53,8 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("in", "i", mitkCommandLineParser::InputFile, "Input:", "input file", us::Any(), false);
-  parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "input file", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
   parser.addArgument("adc", "D", mitkCommandLineParser::Bool, "ADC:", "ADC Average", us::Any(), false);
   parser.addArgument("akc", "K", mitkCommandLineParser::Bool, "Kurtosis fit:", "Kurtosis Fit", us::Any(), false);
   parser.addArgument("biexp", "B", mitkCommandLineParser::Bool, "BiExp fit:", "BiExp fit", us::Any(), false);
@@ -65,8 +65,8 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
 
   // mandatory arguments
-  std::string inName = us::any_cast<std::string>(parsedArgs["in"]);
-  std::string outName = us::any_cast<std::string>(parsedArgs["out"]);
+  std::string inName = us::any_cast<std::string>(parsedArgs["i"]);
+  std::string outName = us::any_cast<std::string>(parsedArgs["o"]);
   bool applyADC = us::any_cast<bool>(parsedArgs["adc"]);
   bool applyAKC = us::any_cast<bool>(parsedArgs["akc"]);
   bool applyBiExp = us::any_cast<bool>(parsedArgs["biexp"]);

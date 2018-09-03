@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPadImageFilter.h"
 #include "mitkRenderingManager.h"
 #include "mitkDICOMSegmentationPropertyHelper.h"
+#include "mitkDICOMQIPropertyHelper.h"
 
 #include <vtkCell.h>
 #include <vtkTransform.h>

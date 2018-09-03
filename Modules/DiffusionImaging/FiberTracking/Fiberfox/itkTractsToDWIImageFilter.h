@@ -96,7 +96,6 @@ protected:
 
     TractsToDWIImageFilter();
     ~TractsToDWIImageFilter() override;
-    itk::Point<float, 3> GetItkPoint(double point[3]);
     itk::Vector<double, 3> GetItkVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
     vnl_vector_fixed<double, 3> GetVnlVector(Vector< float, 3 >& vector);

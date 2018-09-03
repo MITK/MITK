@@ -236,8 +236,7 @@ void FiberExtractionFilter< PixelType >::ExtractEndpoints(mitk::FiberBundle::Poi
         // check first fiber point
         {
           double* p = points->GetPoint(0);
-          itk::Point<float, 3> itkP;
-          itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
+          itk::Point<float, 3> itkP = mitk::imv::GetItkPoint(p);
 
           if ( IsPositive(itkP) )
             inside++;
@@ -246,8 +245,7 @@ void FiberExtractionFilter< PixelType >::ExtractEndpoints(mitk::FiberBundle::Poi
         // check second fiber point
         {
           double* p = points->GetPoint(numPoints-1);
-          itk::Point<float, 3> itkP;
-          itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
+          itk::Point<float, 3> itkP = mitk::imv::GetItkPoint(p);
 
           if ( IsPositive(itkP) )
             inside++;
@@ -321,13 +319,11 @@ void FiberExtractionFilter< PixelType >::ExtractLabels(mitk::FiberBundle::Pointe
         int inside = 0;
 
         double* p1 = points->GetPoint(0);
-        itk::Point<float, 3> itkP1;
-        itkP1[0] = p1[0]; itkP1[1] = p1[1]; itkP1[2] = p1[2];
+        itk::Point<float, 3> itkP1 = mitk::imv::GetItkPoint(p1);
         short label1 = mitk::imv::GetImageValue<PixelType>(itkP1, false, m_Interpolator);
 
         double* p2 = points->GetPoint(numPoints-1);
-        itk::Point<float, 3> itkP2;
-        itkP2[0] = p2[0]; itkP2[1] = p2[1]; itkP2[2] = p2[2];
+        itk::Point<float, 3> itkP2 = mitk::imv::GetItkPoint(p2);
         short label2 = mitk::imv::GetImageValue<PixelType>(itkP2, false, m_Interpolator);
 
         if (!m_Labels.empty())  // extract fibers from all pairwise label combinations

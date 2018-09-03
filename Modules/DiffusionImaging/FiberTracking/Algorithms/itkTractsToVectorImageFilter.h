@@ -73,7 +73,6 @@ protected:
   DirectionContainerType::Pointer FastClustering(DirectionContainerType::Pointer inDirs, std::vector< double > lengths);  ///< cluster fiber directions
 
   vnl_vector_fixed<double, 3> GetVnlVector(double point[3]);
-  itk::Point<double, 3> GetItkPoint(double point[3]);
 
 
   TractsToVectorImageFilter();

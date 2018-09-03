@@ -148,9 +148,6 @@ namespace mitk
      */
     std::vector< double > GetCenterOfMass( int label );
 
-    /** Convert point to itk point */
-    itk::Point<float, 3> GetItkPoint(double point[3]);
-
     /** \brief Creates a new node
      *
      * A new node will be created, using the label and either the supplied coordinates

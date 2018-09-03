@@ -1701,16 +1701,6 @@ SimulateExtraAxonalSignal(ItkUcharImgType::IndexType& index, itk::Point<double, 
 }
 
 template< class PixelType >
-itk::Point<float, 3> TractsToDWIImageFilter< PixelType >::GetItkPoint(double point[3])
-{
-  itk::Point<float, 3> itkPoint;
-  itkPoint[0] = point[0];
-  itkPoint[1] = point[1];
-  itkPoint[2] = point[2];
-  return itkPoint;
-}
-
-template< class PixelType >
 itk::Vector<double, 3> TractsToDWIImageFilter< PixelType >::GetItkVector(double point[3])
 {
   itk::Vector<double, 3> itkVector;

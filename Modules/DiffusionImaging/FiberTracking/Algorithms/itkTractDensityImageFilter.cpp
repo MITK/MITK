@@ -47,16 +47,6 @@ TractDensityImageFilter< OutputImageType >::~TractDensityImageFilter()
 }
 
 template< class OutputImageType >
-itk::Point<float, 3> TractDensityImageFilter< OutputImageType >::GetItkPoint(double point[3])
-{
-  itk::Point<float, 3> itkPoint;
-  itkPoint[0] = point[0];
-  itkPoint[1] = point[1];
-  itkPoint[2] = point[2];
-  return itkPoint;
-}
-
-template< class OutputImageType >
 void TractDensityImageFilter< OutputImageType >::GenerateData()
 {
   // generate upsampled image
@@ -137,13 +127,13 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
     // fill output image
     for( int j=0; j<numPoints-1; j++)
     {
-      itk::Point<float, 3> startVertex = GetItkPoint(points->GetPoint(j));
+      itk::Point<float, 3> startVertex = mitk::imv::GetItkPoint(points->GetPoint(j));
       itk::Index<3> startIndex;
       itk::ContinuousIndex<float, 3> startIndexCont;
       outImage->TransformPhysicalPointToIndex(startVertex, startIndex);
       outImage->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
 
-      itk::Point<float, 3> endVertex = GetItkPoint(points->GetPoint(j + 1));
+      itk::Point<float, 3> endVertex = mitk::imv::GetItkPoint(points->GetPoint(j + 1));
       itk::Index<3> endIndex;
       itk::ContinuousIndex<float, 3> endIndexCont;
       outImage->TransformPhysicalPointToIndex(endVertex, endIndex);

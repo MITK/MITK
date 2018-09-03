@@ -172,14 +172,12 @@ int main(int argc, char* argv[])
       if (numPoints>1)
       {
         double* start = points->GetPoint(0);
-        itk::Point<float, 3> itkStart;
-        itkStart[0] = start[0]; itkStart[1] = start[1]; itkStart[2] = start[2];
+        itk::Point<float, 3> itkStart = mitk::imv::GetItkPoint(start);
         itk::Index<3> idxStart;
         labelImage->TransformPhysicalPointToIndex(itkStart, idxStart);
 
         double* end = points->GetPoint(numPoints-1);
-        itk::Point<float, 3> itkEnd;
-        itkEnd[0] = end[0]; itkEnd[1] = end[1]; itkEnd[2] = end[2];
+        itk::Point<float, 3> itkEnd = mitk::imv::GetItkPoint(end);
         itk::Index<3> idxEnd;
         labelImage->TransformPhysicalPointToIndex(itkEnd, idxEnd);
 
@@ -214,9 +212,7 @@ int main(int argc, char* argv[])
               for (int j=0; j<numPoints; j++)
               {
                 double* p = points->GetPoint(j);
-
-                itk::Point<float, 3> itkP;
-                itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
+                itk::Point<float, 3> itkP = mitk::imv::GetItkPoint(p);
                 itk::Index<3> idx;
                 bundle->TransformPhysicalPointToIndex(itkP, idx);
 
@@ -242,8 +238,7 @@ int main(int argc, char* argv[])
                   vtkIdType id = validPoints->InsertNextPoint(p);
                   container->GetPointIds()->InsertNextId(id);
 
-                  itk::Point<float, 3> itkP;
-                  itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
+                  itk::Point<float, 3> itkP = mitk::imv::GetItkPoint(p);
                   itk::Index<3> idx;
                   coverage->TransformPhysicalPointToIndex(itkP, idx);
                   if ( coverage->GetLargestPossibleRegion().IsInside(idx) )

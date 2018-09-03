@@ -112,8 +112,8 @@ namespace mitk
       mitkThrow() << "Cannot write non-image data";
 
     // Get DICOM information from referenced image
-    vector<DcmDataset *> dcmDatasets;
-    DcmFileFormat *readFileFormat = new DcmFileFormat();
+    vector<std::unique_ptr<DcmDataset>> dcmDatasetsSourceImage;
+    std::unique_ptr<DcmFileFormat> readFileFormat(new DcmFileFormat());
     try
     {
       // TODO: Generate dcmdataset witk DICOM tags from property list; ATM the source are the filepaths from the
@@ -134,7 +134,10 @@ namespace mitk
       {
         const char *fileName = (it.second).c_str();
         if (readFileFormat->loadFile(fileName, EXS_Unknown).good())
-          dcmDatasets.push_back(readFileFormat->getAndRemoveDataset());
+        {
+          std::unique_ptr<DcmDataset> readDCMDataset(readFileFormat->getAndRemoveDataset());
+          dcmDatasetsSourceImage.push_back(std::move(readDCMDataset));
+        }
       }
     }
     catch (const std::exception &e)
@@ -158,8 +161,6 @@ namespace mitk
         // Cast mitk layer image to itk
         ImageToItk<itkInputImageType>::Pointer imageToItkFilter = ImageToItk<itkInputImageType>::New();
         imageToItkFilter->SetInput(mitkLayerImage);
-        imageToItkFilter->Update();
-
         // Cast from original itk type to dcmqi input itk image type
         typedef itk::CastImageFilter<itkInputImageType, itkInternalImageType> castItkImageFilterType;
         castItkImageFilterType::Pointer castFilter = castItkImageFilterType::New();
@@ -202,12 +203,17 @@ namespace mitk
       MITK_INFO << "Writing image: " << path << std::endl;
       try
       {
+        //TODO is there a better way? Interface expects a vector of raw pointer.
+        vector<DcmDataset*> rawVecDataset;
+        for (const auto& dcmDataSet : dcmDatasetsSourceImage)
+          rawVecDataset.push_back(dcmDataSet.get());
+
         // Convert itk segmentation images to dicom image
-        dcmqi::ImageSEGConverter *converter = new dcmqi::ImageSEGConverter();
-        DcmDataset *result = converter->itkimage2dcmSegmentation(dcmDatasets, segmentations, tmpMetaInfoFile);
+        std::unique_ptr<dcmqi::ImageSEGConverter> converter = std::make_unique<dcmqi::ImageSEGConverter>();
+        std::unique_ptr<DcmDataset> result(converter->itkimage2dcmSegmentation(rawVecDataset, segmentations, tmpMetaInfoFile));
 
         // Write dicom file
-        DcmFileFormat dcmFileFormat(result);
+        DcmFileFormat dcmFileFormat(result.get());
 
         std::string filePath = path.substr(0, path.find_last_of("."));
         // If there is more than one layer, we have to write more than 1 dicom file
@@ -217,12 +223,6 @@ namespace mitk
           filePath = filePath + ".dcm";
 
         dcmFileFormat.saveFile(filePath.c_str(), EXS_LittleEndianExplicit);
-
-        // Clean up
-        if (converter != nullptr)
-          delete converter;
-        if (result != nullptr)
-          delete result;
       }
       catch (const std::exception &e)
       {
@@ -230,14 +230,6 @@ namespace mitk
         return;
       }
     } // Write a dcm file for the next layer
-
-    // End of image writing; clean up
-    if (readFileFormat)
-      delete readFileFormat;
-
-    for (auto obj : dcmDatasets)
-      delete obj;
-    dcmDatasets.clear();
   }
 
   IFileIO::ConfidenceLevel DICOMSegmentationIO::GetReaderConfidenceLevel() const
@@ -292,7 +284,7 @@ namespace mitk
 
       //=============================== dcmqi part ====================================
       // Read the DICOM SEG images (segItkImages) and DICOM tags (metaInfo)
-      dcmqi::ImageSEGConverter *converter = new dcmqi::ImageSEGConverter();
+      std::unique_ptr<dcmqi::ImageSEGConverter> converter = std::make_unique<dcmqi::ImageSEGConverter>();
       pair<map<unsigned, itkInternalImageType::Pointer>, string> dcmqiOutput =
         converter->dcmSegmentation2itkimage(dataSet);
 
@@ -360,7 +352,7 @@ namespace mitk
             labelName = "Unnamed";
         }
 
-        float tmp[3] = {0.0, 0.0, 0.0};
+        float tmp[3] = { 0.0, 0.0, 0.0 };
         if (segmentAttribute->getRecommendedDisplayRGBValue() != nullptr)
         {
           tmp[0] = segmentAttribute->getRecommendedDisplayRGBValue()[0] / 255.0;
@@ -409,7 +401,7 @@ namespace mitk
       }
 
       mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
-      scanner->SetInputFiles({GetInputLocation()});
+      scanner->SetInputFiles({ GetInputLocation() });
       scanner->AddTagPaths(tagsOfInterestList);
       scanner->Scan();
 
@@ -426,10 +418,6 @@ namespace mitk
       // Set active layer to the first layer of the labelset image
       if (labelSetImage->GetNumberOfLayers() > 1 && labelSetImage->GetActiveLayer() != 0)
         labelSetImage->SetActiveLayer(0);
-
-      // Clean up
-      if (converter != nullptr)
-        delete converter;
     }
     catch (const std::exception &e)
     {
@@ -442,9 +430,7 @@ namespace mitk
       return result;
     }
 
-
     result.push_back(labelSetImage.GetPointer());
-
     return result;
   }
 

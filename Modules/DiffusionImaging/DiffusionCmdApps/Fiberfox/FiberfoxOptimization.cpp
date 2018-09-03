@@ -491,7 +491,7 @@ int main(int argc, char* argv[])
   parser.beginGroup("1. Mandatory Input:");
   parser.addArgument("parameters", "p", mitkCommandLineParser::InputFile, "Parameter File:", "fiberfox parameter file (.ffp)", us::Any(), false);
   parser.addArgument("tracts", "t", mitkCommandLineParser::String, "Input Tractogram:", "Input tractogram.", us::Any(), false);
-  parser.addArgument("out_folder", "o", mitkCommandLineParser::String, "Output Folder:", "", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output Folder:", "", us::Any(), false);
   parser.addArgument("dmri", "d", mitkCommandLineParser::String, "Target image:", "Target dMRI to approximate.", us::Any(), false);
   parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask image:", "Error is only calculated inside the mask image", false);
   parser.endGroup();
@@ -531,7 +531,7 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
 
   std::string paramName = us::any_cast<std::string>(parsedArgs["parameters"]);
-  std::string out_folder = us::any_cast<std::string>(parsedArgs["out_folder"]);
+  std::string out_folder = us::any_cast<std::string>(parsedArgs["o"]);
   std::string tract_file = us::any_cast<std::string>(parsedArgs["tracts"]);
 
   MITK_INFO << "Loading target dMRI and parameters";

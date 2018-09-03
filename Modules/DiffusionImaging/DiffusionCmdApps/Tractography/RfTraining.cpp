@@ -49,9 +49,9 @@ int main(int argc, char* argv[])
     parser.setArgumentPrefix("--", "-");
 
     parser.beginGroup("1. Mandatory arguments:");
-    parser.addArgument("images", "i", mitkCommandLineParser::StringList, "DWIs:", "input diffusion-weighted images", us::Any(), false);
-    parser.addArgument("tractograms", "t", mitkCommandLineParser::StringList, "Tractograms:", "input training tractograms (.fib, vtk ascii file format)", us::Any(), false);
-    parser.addArgument("forest", "f", mitkCommandLineParser::OutputFile, "Forest:", "output random forest (HDF5)", us::Any(), false);
+    parser.addArgument("", "i", mitkCommandLineParser::StringList, "DWIs:", "input diffusion-weighted images", us::Any(), false);
+    parser.addArgument("", "t", mitkCommandLineParser::StringList, "Tractograms:", "input training tractograms", us::Any(), false);
+    parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Forest:", "output random forest (HDF5)", us::Any(), false);
     parser.endGroup();
 
     parser.beginGroup("2. Additional input images:");
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("use_sh_features"))
         shfeatures = us::any_cast<bool>(parsedArgs["use_sh_features"]);
 
-    mitkCommandLineParser::StringContainerType imageFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["images"]);
+    mitkCommandLineParser::StringContainerType imageFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["i"]);
     mitkCommandLineParser::StringContainerType wmMaskFiles;
     if (parsedArgs.count("wm_masks"))
         wmMaskFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["wm_masks"]);
@@ -99,11 +99,11 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("masks"))
         maskFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["masks"]);
 
-    std::string forestFile = us::any_cast<std::string>(parsedArgs["forest"]);
+    std::string forestFile = us::any_cast<std::string>(parsedArgs["o"]);
 
     mitkCommandLineParser::StringContainerType tractogramFiles;
     if (parsedArgs.count("tractograms"))
-        tractogramFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["tractograms"]);
+        tractogramFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["t"]);
 
     int num_trees = 30;
     if (parsedArgs.count("num_trees"))

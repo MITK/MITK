@@ -34,8 +34,8 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("in", "i", mitkCommandLineParser::InputFile, "Input:", "input image", us::Any(), false);
-  parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output:", "output image", us::Any(), false);
+  parser.addArgument("n", "i", mitkCommandLineParser::InputFile, "Input:", "input image", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output:", "output image", us::Any(), false);
   parser.addArgument("to_nearest", "", mitkCommandLineParser::Int, "To nearest:", "integer", 1000);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -43,8 +43,8 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
 
   // mandatory arguments
-  std::string imageName = us::any_cast<std::string>(parsedArgs["in"]);
-  std::string outImage = us::any_cast<std::string>(parsedArgs["out"]);
+  std::string imageName = us::any_cast<std::string>(parsedArgs["i"]);
+  std::string outImage = us::any_cast<std::string>(parsedArgs["o"]);
 
   int to_nearest = 1000;
   if (parsedArgs.count("to_nearest"))

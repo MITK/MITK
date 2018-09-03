@@ -50,15 +50,15 @@ int main(int argc, char* argv[])
   parser.setDescription("Join multiple tractograms");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("input", "i", mitkCommandLineParser::StringList, "Input:", "input tractograms", us::Any(), false);
-  parser.addArgument("out", "o", mitkCommandLineParser::String, "Output:", "output tractogram", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::StringList, "Input:", "input tractograms", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output tractogram", us::Any(), false);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  mitkCommandLineParser::StringContainerType inFibs = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["input"]);
-  std::string outFib = us::any_cast<std::string>(parsedArgs["out"]);
+  mitkCommandLineParser::StringContainerType inFibs = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["i"]);
+  std::string outFib = us::any_cast<std::string>(parsedArgs["o"]);
 
   if (inFibs.size()<=1)
   {

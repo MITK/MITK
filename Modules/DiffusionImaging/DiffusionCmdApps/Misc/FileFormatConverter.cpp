@@ -34,16 +34,16 @@ int main(int argc, char* argv[])
     parser.setContributor("MIC");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("in", "i", mitkCommandLineParser::InputFile, "Input:", "input file", us::Any(), false);
-    parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
+    parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "input file", us::Any(), false);
+    parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
 
     std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
     // mandatory arguments
-    std::string inName = us::any_cast<std::string>(parsedArgs["in"]);
-    std::string outName = us::any_cast<std::string>(parsedArgs["out"]);
+    std::string inName = us::any_cast<std::string>(parsedArgs["i"]);
+    std::string outName = us::any_cast<std::string>(parsedArgs["o"]);
 
     try
     {

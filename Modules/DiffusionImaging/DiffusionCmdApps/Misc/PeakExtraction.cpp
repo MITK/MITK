@@ -38,8 +38,8 @@ int StartPeakExtraction(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("image", "i", mitkCommandLineParser::InputFile, "Input image", "sh coefficient image", us::Any(), false);
-  parser.addArgument("outroot", "o", mitkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input image", "sh coefficient image", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
   parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask", "mask image");
   parser.addArgument("normalization", "", mitkCommandLineParser::Int, "Normalization", "0=no norm, 1=max norm, 2=single vec norm", 1, true);
   parser.addArgument("numpeaks", "", mitkCommandLineParser::Int, "Max. number of peaks", "maximum number of extracted peaks", 2, true);
@@ -50,13 +50,10 @@ int StartPeakExtraction(int argc, char* argv[])
 
   parser.addArgument("shConvention", "", mitkCommandLineParser::String, "Use specified SH-basis", "use specified SH-basis (MRtrix, FSL)", std::string("MRtrix"), true);
 
-
   parser.addArgument("flipX", "", mitkCommandLineParser::Bool, "Flip X", "Flip peaks in x direction");
   parser.addArgument("flipY", "", mitkCommandLineParser::Bool, "Flip Y", "Flip peaks in y direction");
   parser.addArgument("flipZ", "", mitkCommandLineParser::Bool, "Flip Z", "Flip peaks in z direction");
   parser.addArgument("scale_by_gfa", "", mitkCommandLineParser::Bool, "Scale by GFA", "Scale ODF values and peaks by GFA");
-
-
 
   parser.setCategory("Preprocessing Tools");
   parser.setTitle("Peak Extraction");
@@ -68,8 +65,8 @@ int StartPeakExtraction(int argc, char* argv[])
     return EXIT_FAILURE;
 
   // mandatory arguments
-  std::string imageName = us::any_cast<std::string>(parsedArgs["image"]);
-  std::string outRoot = us::any_cast<std::string>(parsedArgs["outroot"]);
+  std::string imageName = us::any_cast<std::string>(parsedArgs["i"]);
+  std::string outRoot = us::any_cast<std::string>(parsedArgs["o"]);
 
   // optional arguments
   std::string maskImageName("");
@@ -255,9 +252,9 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("image", "i", mitkCommandLineParser::InputFile, "Input image", "sh coefficient image", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input image", "sh coefficient image", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
   parser.addArgument("shOrder", "sh", mitkCommandLineParser::Int, "Spherical harmonics order", "spherical harmonics order");
-  parser.addArgument("outroot", "o", mitkCommandLineParser::OutputDirectory, "Output directory", "output root", us::Any(), false);
   parser.addArgument("mask", "m", mitkCommandLineParser::InputFile, "Mask", "mask image");
   parser.addArgument("normalization", "n", mitkCommandLineParser::Int, "Normalization", "0=no norm, 1=max norm, 2=single vec norm", 1, true);
   parser.addArgument("numpeaks", "p", mitkCommandLineParser::Int, "Max. number of peaks", "maximum number of extracted peaks", 2, true);

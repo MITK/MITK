@@ -47,8 +47,8 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input tractogram (.fib, vtk ascii file format)", us::Any(), false);
-  parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "input tractogram", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output root", us::Any(), false);
   parser.addArgument("labels", "l", mitkCommandLineParser::StringList, "Label pairs:", "label pairs", false);
   parser.addArgument("labelimage", "li", mitkCommandLineParser::String, "Label image:", "label image", false);
   parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose:", "output valid, invalid and no connections as fiber bundles");
@@ -60,10 +60,10 @@ int main(int argc, char* argv[])
 
   mitkCommandLineParser::StringContainerType labelpairs = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["labels"]);
 
-  std::string fibFile = us::any_cast<std::string>(parsedArgs["input"]);
+  std::string fibFile = us::any_cast<std::string>(parsedArgs["i"]);
   std::string labelImageFile = us::any_cast<std::string>(parsedArgs["labelimage"]);
 
-  std::string outRoot = us::any_cast<std::string>(parsedArgs["out"]);
+  std::string outRoot = us::any_cast<std::string>(parsedArgs["o"]);
 
   std::string fileID = "";
   if (parsedArgs.count("fileID"))

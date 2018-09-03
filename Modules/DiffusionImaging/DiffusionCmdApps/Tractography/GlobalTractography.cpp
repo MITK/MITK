@@ -59,18 +59,18 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input image (tensor, ODF or SH-coefficient image)", us::Any(), false);
-  parser.addArgument("parameters", "p", mitkCommandLineParser::InputFile, "Parameters:", "parameter file (.gtp)", us::Any(), false);
-  parser.addArgument("mask", "m", mitkCommandLineParser::InputFile, "Mask:", "binary mask image");
-  parser.addArgument("outFile", "o", mitkCommandLineParser::OutputFile, "Output:", "output fiber bundle (.fib)", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "input image (tensor, ODF or SH-coefficient image)", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output:", "output tractogram", us::Any(), false);
+  parser.addArgument("parameters", "", mitkCommandLineParser::InputFile, "Parameters:", "parameter file (.gtp)", us::Any(), false);
+  parser.addArgument("mask", "", mitkCommandLineParser::InputFile, "Mask:", "binary mask image");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
+  std::string inFileName = us::any_cast<std::string>(parsedArgs["i"]);
   std::string paramFileName = us::any_cast<std::string>(parsedArgs["parameters"]);
-  std::string outFileName = us::any_cast<std::string>(parsedArgs["outFile"]);
+  std::string outFileName = us::any_cast<std::string>(parsedArgs["o"]);
 
   try
   {

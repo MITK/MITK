@@ -58,8 +58,8 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
 
   parser.beginGroup("1. Mandatory arguments:");
-  parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "input tractogram (.fib/.trk/.tck/.dcm)", us::Any(), false);
-  parser.addArgument("out", "o", mitkCommandLineParser::String, "Output:", "output root", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "input tractogram (.fib/.trk/.tck/.dcm)", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output root", us::Any(), false);
   parser.addArgument("rois", "", mitkCommandLineParser::StringList, "ROI images:", "ROI images", us::Any(), false);
   parser.endGroup();
 
@@ -89,8 +89,8 @@ int main(int argc, char* argv[])
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  std::string inFib = us::any_cast<std::string>(parsedArgs["input"]);
-  std::string outFib = us::any_cast<std::string>(parsedArgs["out"]);
+  std::string inFib = us::any_cast<std::string>(parsedArgs["i"]);
+  std::string outFib = us::any_cast<std::string>(parsedArgs["o"]);
 
   mitkCommandLineParser::StringContainerType roi_files = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["rois"]);
 

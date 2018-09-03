@@ -57,8 +57,8 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "input fiber bundle (.fib)", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::String, "Output:", "output image", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "input fiber bundle (.fib)", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output image", us::Any(), false);
   parser.addArgument("binary", "", mitkCommandLineParser::Bool, "Binary output:", "calculate binary tract envelope", us::Any());
   parser.addArgument("normalize", "", mitkCommandLineParser::Bool, "Normalized output:", "normalize output to 0-1", us::Any());
   parser.addArgument("endpoints", "", mitkCommandLineParser::Bool, "Output endpoints image:", "calculate image of fiber endpoints instead of mask", us::Any());
@@ -92,8 +92,8 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("reference_image"))
     reference_image = us::any_cast<std::string>(parsedArgs["reference_image"]);
 
-  std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
-  std::string outFileName = us::any_cast<std::string>(parsedArgs["output"]);
+  std::string inFileName = us::any_cast<std::string>(parsedArgs["i"]);
+  std::string outFileName = us::any_cast<std::string>(parsedArgs["o"]);
 
   try
   {

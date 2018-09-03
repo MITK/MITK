@@ -43,9 +43,9 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
   parser.setDescription("Command line interface to Fiberfox." " Simulate a diffusion-weighted image from a tractogram using the specified parameter file.");
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output root:", "output root", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output root:", "output root", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "Input tractogram or diffusion-weighted image.", us::Any(), false);
   parser.addArgument("parameters", "p", mitkCommandLineParser::InputFile, "Parameter file:", "fiberfox parameter file (.ffp)", us::Any(), false);
-  parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "Input tractogram or diffusion-weighted image.", us::Any(), false);
   parser.addArgument("template", "t", mitkCommandLineParser::String, "Template image:", "Use parameters of the template diffusion-weighted image.", us::Any());
   parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Output additional images:", "output volume fraction images etc.", us::Any());
 
@@ -54,14 +54,13 @@ int main(int argc, char* argv[])
   {
     return EXIT_FAILURE;
   }
-  std::string outName = us::any_cast<std::string>(parsedArgs["out"]);
+  std::string outName = us::any_cast<std::string>(parsedArgs["o"]);
   std::string paramName = us::any_cast<std::string>(parsedArgs["parameters"]);
 
   std::string input="";
-  if (parsedArgs.count("input"))
-  {
-    input = us::any_cast<std::string>(parsedArgs["input"]);
-  }
+  if (parsedArgs.count("i"))
+    input = us::any_cast<std::string>(parsedArgs["i"]);
+
   bool verbose = false;
   if (parsedArgs.count("verbose"))
     verbose = us::any_cast<bool>(parsedArgs["verbose"]);

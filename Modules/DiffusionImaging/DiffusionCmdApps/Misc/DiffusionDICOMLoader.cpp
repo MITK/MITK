@@ -201,10 +201,10 @@ int main(int argc, char* argv[])
   parser.setDescription("Loads Diffusion Dicom files.");
   parser.setContributor("MIC");
 
-  parser.addArgument("inputdir", "i", mitkCommandLineParser::InputDirectory, "Input Directory" ,"input directory containing dicom files", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output File Name", "output file", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputDirectory, "Input Directory" ,"input directory containing dicom files", us::Any(), false);
+  parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output File Name", "output file", us::Any(), false);
   parser.addArgument("dwprefix", "p", mitkCommandLineParser::String, "Recursive Scan Prefix", "prefix for subfolders search rootdir is specified by the 'inputdir' argument value", us::Any(), true);
-  parser.addArgument("dryrun", "-s", mitkCommandLineParser::Bool, "Dry run","do not read, only look for input files ", us::Any(), true );
+  parser.addArgument("dryrun", "s", mitkCommandLineParser::Bool, "Dry run","do not read, only look for input files ", us::Any(), true );
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -212,7 +212,7 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  std::string inputDirectory = us::any_cast<std::string>( parsedArgs["inputdir"] );
+  std::string inputDirectory = us::any_cast<std::string>( parsedArgs["i"] );
   MITK_INFO << "Loading data from directory: " << inputDirectory;
 
   // retrieve the prefix flag (if set)
@@ -229,7 +229,7 @@ int main(int argc, char* argv[])
   }
 
   // retrieve the output
-  std::string outputFile = us::any_cast< std::string >( parsedArgs["output"] );
+  std::string outputFile = us::any_cast< std::string >( parsedArgs["o"] );
 
   // if the executable is called with a single directory, just parse the given folder for files and read them into a diffusion image
   if( !search_for_subdirs )

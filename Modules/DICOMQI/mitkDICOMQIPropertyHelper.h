@@ -14,22 +14,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef DICOMSEGMENTATIONPROPERTYHANDLER_H_
-#define DICOMSEGMENTATIONPROPERTYHANDLER_H_
+#ifndef DICOMQIPROPERTYHANDLER_H_
+#define DICOMQIPROPERTYHANDLER_H_
 
 #include <mitkDICOMTag.h>
-#include <mitkLabel.h>
-#include <mitkLabelSetImage.h>
+#include <mitkBaseData.h>
 
-#include <MitkMultilabelExports.h>
+#include <MitkDICOMQIExports.h>
 
 namespace mitk
 {
-  class MITKMULTILABEL_EXPORT DICOMSegmentationPropertyHandler
+  class MITKDICOMQI_EXPORT DICOMQIPropertyHandler
   {
   public:
-    static void DeriveDICOMSegmentationProperties(LabelSetImage* dicomSegImage);
-    static void SetDICOMSegmentProperties(Label *label);
+    static void DeriveDICOMSourceProperties(const BaseData *sourceDICOMImage, BaseData *derivedDICOMImage);
+
+  private:
+    static void AdoptReferenceDICOMProperty(PropertyList *referencedPropertyList,
+      PropertyList *propertyList,
+      const DICOMTag &tag,
+      const std::string &defaultString = "");
+    //-------------
   };
 }
 #endif

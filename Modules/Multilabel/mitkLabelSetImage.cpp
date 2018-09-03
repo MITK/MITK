@@ -128,7 +128,7 @@ void mitk::LabelSetImage::Initialize(const mitk::Image *other)
   }
 
   // Transfer some general DICOM properties from the source image to derived image (e.g. Patient information,...)
-  DICOMSegmentationPropertyHandler::DeriveDICOMSourceProperties(other, this);
+  DICOMQIPropertyHandler::DeriveDICOMSourceProperties(other, this);
 
   // Add a inital LabelSet ans corresponding image data to the stack
   AddLayer();

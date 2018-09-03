@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input Folder:", "input folder", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::StringList, "Input:", "input tracts", us::Any(), false);
   parser.addArgument("", "o", mitkCommandLineParser::OutputDirectory, "Output Folder:", "output folder", us::Any(), false);
   parser.addArgument("overlap", "", mitkCommandLineParser::Float, "Overlap threshold:", "Tracts with overlap larger than this threshold are merged", 0.8, false);
 
@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  std::string input_folder = us::any_cast<std::string>(parsedArgs["i"]);
+  mitkCommandLineParser::StringContainerType input_folder = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["i"]);
   std::string out_folder = us::any_cast<std::string>(parsedArgs["o"]);
 
   float overlap = 0.8;
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
     if (!ist::PathExists(out_folder))
       ist::MakeDirectory(out_folder);
 
-    std::vector< mitk::FiberBundle::Pointer > fibs = mitk::DiffusionDataIOHelper::load_fibs({input_folder});
+    std::vector< mitk::FiberBundle::Pointer > fibs = mitk::DiffusionDataIOHelper::load_fibs(input_folder);
 
 
     std::streambuf *old = cout.rdbuf(); // <-- save

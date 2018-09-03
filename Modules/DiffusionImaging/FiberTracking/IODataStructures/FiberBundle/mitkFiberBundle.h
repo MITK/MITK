@@ -153,7 +153,6 @@ protected:
     ~FiberBundle() override;
 
     void                            GenerateFiberIds();
-    itk::Point<float, 3>            GetItkPoint(double point[3]);
     void                            UpdateFiberGeometry();
     void                    PrintSelf(std::ostream &os, itk::Indent indent) const override;
 

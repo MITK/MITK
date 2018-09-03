@@ -374,8 +374,8 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
     if (points==nullptr || numPoints<=0)
       continue;
 
-    itk::Point<float, 3> start = GetItkPoint(points->GetPoint(0));
-    itk::Point<float, 3> end = GetItkPoint(points->GetPoint(numPoints-1));
+    itk::Point<float, 3> start = mitk::imv::GetItkPoint(points->GetPoint(0));
+    itk::Point<float, 3> end = mitk::imv::GetItkPoint(points->GetPoint(numPoints-1));
 
     points1.push_back( {start, end} );
   }
@@ -390,8 +390,8 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
     if (points==nullptr || numPoints<=0)
       continue;
 
-    itk::Point<float, 3> start = GetItkPoint(points->GetPoint(0));
-    itk::Point<float, 3> end = GetItkPoint(points->GetPoint(numPoints-1));
+    itk::Point<float, 3> start =mitk::imv::GetItkPoint(points->GetPoint(0));
+    itk::Point<float, 3> end =mitk::imv::GetItkPoint(points->GetPoint(numPoints-1));
 
     points2.push_back( {start, end} );
   }
@@ -1031,11 +1031,11 @@ float mitk::FiberBundle::GetNumEpFractionInMask(ItkUcharImgType* mask, bool diff
     int numPoints = cell->GetNumberOfPoints();
     vtkPoints* points = cell->GetPoints();
 
-    itk::Point<float, 3> startVertex = GetItkPoint(points->GetPoint(0));
+    itk::Point<float, 3> startVertex =mitk::imv::GetItkPoint(points->GetPoint(0));
     itk::Index<3> startIndex;
     mask->TransformPhysicalPointToIndex(startVertex, startIndex);
 
-    itk::Point<float, 3> endVertex = GetItkPoint(points->GetPoint(numPoints-1));
+    itk::Point<float, 3> endVertex =mitk::imv::GetItkPoint(points->GetPoint(numPoints-1));
     itk::Index<3> endIndex;
     mask->TransformPhysicalPointToIndex(endVertex, endIndex);
 
@@ -1076,13 +1076,13 @@ std::tuple<float, float> mitk::FiberBundle::GetDirectionalOverlap(ItkUcharImgTyp
 
     for (int j=0; j<numPoints-1; j++)
     {
-      itk::Point<float, 3> startVertex = GetItkPoint(points->GetPoint(j));
+      itk::Point<float, 3> startVertex =mitk::imv::GetItkPoint(points->GetPoint(j));
       itk::Index<3> startIndex;
       itk::ContinuousIndex<float, 3> startIndexCont;
       mask->TransformPhysicalPointToIndex(startVertex, startIndex);
       mask->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
 
-      itk::Point<float, 3> endVertex = GetItkPoint(points->GetPoint(j + 1));
+      itk::Point<float, 3> endVertex =mitk::imv::GetItkPoint(points->GetPoint(j + 1));
       itk::Index<3> endIndex;
       itk::ContinuousIndex<float, 3> endIndexCont;
       mask->TransformPhysicalPointToIndex(endVertex, endIndex);
@@ -1149,13 +1149,13 @@ float mitk::FiberBundle::GetOverlap(ItkUcharImgType* mask)
 
     for (int j=0; j<numPoints-1; j++)
     {
-      itk::Point<float, 3> startVertex = GetItkPoint(points->GetPoint(j));
+      itk::Point<float, 3> startVertex =mitk::imv::GetItkPoint(points->GetPoint(j));
       itk::Index<3> startIndex;
       itk::ContinuousIndex<float, 3> startIndexCont;
       mask->TransformPhysicalPointToIndex(startVertex, startIndex);
       mask->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
 
-      itk::Point<float, 3> endVertex = GetItkPoint(points->GetPoint(j + 1));
+      itk::Point<float, 3> endVertex =mitk::imv::GetItkPoint(points->GetPoint(j + 1));
       itk::Index<3> endIndex;
       itk::ContinuousIndex<float, 3> endIndexCont;
       mask->TransformPhysicalPointToIndex(endVertex, endIndex);
@@ -1202,7 +1202,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
     {
       for (int j=0; j<numPoints; j++)
       {
-        itk::Point<float, 3> itkP = GetItkPoint(points->GetPoint(j));
+        itk::Point<float, 3> itkP =mitk::imv::GetItkPoint(points->GetPoint(j));
         itk::Index<3> idx;
         mask->TransformPhysicalPointToIndex(itkP, idx);
 
@@ -1692,7 +1692,7 @@ void mitk::FiberBundle::TransformFibers(itk::ScalableAffineTransform< mitk::Scal
     vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
     for (int j=0; j<numPoints; j++)
     {
-      itk::Point<float, 3> p = GetItkPoint(points->GetPoint(j));
+      itk::Point<float, 3> p =mitk::imv::GetItkPoint(points->GetPoint(j));
       p = transform->TransformPoint(p);
       vtkIdType id = vtkNewPoints->InsertNextPoint(p.GetDataPointer());
       container->GetPointIds()->InsertNextId(id);

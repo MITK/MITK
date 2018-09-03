@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionIterator.h>
 #include <itkImageDuplicator.h>
 #include <boost/progress.hpp>
+#include <mitkDiffusionFunctionCollection.h>
 
 namespace itk {
 
@@ -64,16 +65,6 @@ vnl_vector_fixed<PixelType, 3> EvaluateTractogramDirectionsFilter< PixelType >::
     vnlVector[1] = vector[1];
     vnlVector[2] = vector[2];
     return vnlVector;
-}
-
-template< class PixelType >
-itk::Point<PixelType, 3> EvaluateTractogramDirectionsFilter< PixelType >::GetItkPoint(double point[3])
-{
-    itk::Point<PixelType, 3> itkPoint;
-    itkPoint[0] = point[0];
-    itkPoint[1] = point[1];
-    itkPoint[2] = point[2];
-    return itkPoint;
 }
 
 template< class PixelType >
@@ -165,7 +156,7 @@ void EvaluateTractogramDirectionsFilter< PixelType >::GenerateData()
         for( int j=0; j<numPoints; j++)
         {
             double* temp = points->GetPoint(j);
-            itk::Point<PixelType, 3> vertex = GetItkPoint(temp);
+            itk::Point<PixelType, 3> vertex = mitk::imv::GetItkPoint<PixelType>(temp);
             itk::Vector<PixelType> v = GetItkVector(temp);
 
             itk::Vector<PixelType, 3> dir(3);

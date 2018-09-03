@@ -42,16 +42,6 @@ TractsToRgbaImageFilter< OutputImageType >::~TractsToRgbaImageFilter()
 }
 
 template< class OutputImageType >
-itk::Point<float, 3> TractsToRgbaImageFilter< OutputImageType >::GetItkPoint(double point[3])
-{
-  itk::Point<float, 3> itkPoint;
-  itkPoint[0] = point[0];
-  itkPoint[1] = point[1];
-  itkPoint[2] = point[2];
-  return itkPoint;
-}
-
-template< class OutputImageType >
 void TractsToRgbaImageFilter< OutputImageType >::GenerateData()
 {
   if(&typeid(OutPixelType) != &typeid(itk::RGBAPixel<unsigned char>))
@@ -126,13 +116,13 @@ void TractsToRgbaImageFilter< OutputImageType >::GenerateData()
 
     for( int j=0; j<numPoints-1; ++j)
     {
-      Point<float, 3> startVertex = GetItkPoint(points->GetPoint(j));
+      Point<float, 3> startVertex = mitk::imv::GetItkPoint(points->GetPoint(j));
       Index<3> startIndex;
       ContinuousIndex<float, 3> startIndexCont;
       double_out->TransformPhysicalPointToIndex(startVertex, startIndex);
       double_out->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
 
-      Point<float, 3> endVertex = GetItkPoint(points->GetPoint(j + 1));
+      Point<float, 3> endVertex = mitk::imv::GetItkPoint(points->GetPoint(j + 1));
       Index<3> endIndex;
       ContinuousIndex<float, 3> endIndexCont;
       double_out->TransformPhysicalPointToIndex(endVertex, endIndex);

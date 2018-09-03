@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 
 #include "itkImageRegionIteratorWithIndex.h"
+#include <mitkDiffusionFunctionCollection.h>
 
 // VTK
 #include <vtkPolyData.h>
@@ -80,18 +81,8 @@ void mitk::ConnectomicsNetworkCreator::SetSegmentation(mitk::Image::Pointer segm
   mitk::CastToItkImage( segmentation, m_SegmentationItk );
 }
 
-itk::Point<float, 3> mitk::ConnectomicsNetworkCreator::GetItkPoint(double point[3])
-{
-  itk::Point<float, 3> itkPoint;
-  itkPoint[0] = point[0];
-  itkPoint[1] = point[1];
-  itkPoint[2] = point[2];
-  return itkPoint;
-}
-
 void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
 {
-
   //empty graph
   m_ConNetwork = mitk::ConnectomicsNetwork::New();
   m_LabelToVertexMap.clear();
@@ -111,7 +102,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
     for( int pointInCellID( 0 ); pointInCellID < numPoints ; pointInCellID++)
     {
       // push back point
-      PointType point = GetItkPoint( points->GetPoint( pointInCellID ) );
+      PointType point = mitk::imv::GetItkPoint( points->GetPoint( pointInCellID ) );
       singleTract->InsertElement( singleTract->Size(), point );
     }
 

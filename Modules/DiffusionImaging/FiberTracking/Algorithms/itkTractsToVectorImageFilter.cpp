@@ -51,17 +51,6 @@ vnl_vector_fixed<double, 3> TractsToVectorImageFilter< PixelType >::GetVnlVector
   return vnlVector;
 }
 
-
-template< class PixelType >
-itk::Point<double, 3> TractsToVectorImageFilter< PixelType >::GetItkPoint(double point[])
-{
-  itk::Point<double, 3> itkPoint;
-  itkPoint[0] = point[0];
-  itkPoint[1] = point[1];
-  itkPoint[2] = point[2];
-  return itkPoint;
-}
-
 template< class PixelType >
 void TractsToVectorImageFilter< PixelType >::GenerateData()
 {
@@ -166,13 +155,13 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
 
     for( int j=0; j<numPoints-1; j++)
     {
-      itk::Point<float, 3> startVertex = GetItkPoint(points->GetPoint(j));
+      itk::Point<float, 3> startVertex = mitk::imv::GetItkPoint(points->GetPoint(j));
       itk::Index<3> startIndex;
       itk::ContinuousIndex<float, 3> startIndexCont;
       m_MaskImage->TransformPhysicalPointToIndex(startVertex, startIndex);
       m_MaskImage->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
 
-      itk::Point<float, 3> endVertex = GetItkPoint(points->GetPoint(j + 1));
+      itk::Point<float, 3> endVertex = mitk::imv::GetItkPoint(points->GetPoint(j + 1));
       itk::Index<3> endIndex;
       itk::ContinuousIndex<float, 3> endIndexCont;
       m_MaskImage->TransformPhysicalPointToIndex(endVertex, endIndex);

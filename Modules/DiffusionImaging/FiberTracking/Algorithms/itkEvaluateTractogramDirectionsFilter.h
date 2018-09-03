@@ -79,7 +79,6 @@ protected:
 
     void GenerateData();
 
-    itk::Point<PixelType, 3> GetItkPoint(double point[3]);
     itk::Vector<PixelType, 3> GetItkVector(double point[3]);
     vnl_vector_fixed<PixelType, 3> GetVnlVector(double point[3]);
     vnl_vector_fixed<PixelType, 3> GetVnlVector(Vector< PixelType, 3 >& vector);

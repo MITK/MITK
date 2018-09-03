@@ -397,7 +397,6 @@ protected:
   FitFibersToImageFilter();
   virtual ~FitFibersToImageFilter();
 
-  itk::Point<float, 3> GetItkPoint(double point[3]);
   void GetClosestPeak(itk::Index<4> idx, PeakImgType::Pointer m_PeakImage , vnl_vector_fixed<float,3> fiber_dir, int& id, double& w, double& peak_mag );
 
   void CreatePeakSystem();

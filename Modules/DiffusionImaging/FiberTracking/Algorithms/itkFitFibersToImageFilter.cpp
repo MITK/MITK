@@ -43,15 +43,6 @@ FitFibersToImageFilter::~FitFibersToImageFilter()
 
 }
 
-itk::Point<float, 3> FitFibersToImageFilter::GetItkPoint(double point[3])
-{
-  itk::Point<float, 3> itkPoint;
-  itkPoint[0] = point[0];
-  itkPoint[1] = point[1];
-  itkPoint[2] = point[2];
-  return itkPoint;
-}
-
 void FitFibersToImageFilter::CreateDiffSystem()
 {
   sz_x = m_DiffImage->GetLargestPossibleRegion().GetSize(0);
@@ -59,6 +50,12 @@ void FitFibersToImageFilter::CreateDiffSystem()
   sz_z = m_DiffImage->GetLargestPossibleRegion().GetSize(2);
   dim_four_size = m_DiffImage->GetVectorLength();
   int num_voxels = sz_x*sz_y*sz_z;
+
+  if (m_MaskImage.IsNotNull() &&
+      (m_MaskImage->GetLargestPossibleRegion().GetSize()[0]!=sz_x ||
+       m_MaskImage->GetLargestPossibleRegion().GetSize()[1]!=sz_y ||
+       m_MaskImage->GetLargestPossibleRegion().GetSize()[2]!=sz_z))
+    mitkThrow() << "Mask and peak image must have same size!";
 
   auto spacing = m_DiffImage->GetSpacing();
 
@@ -77,7 +74,7 @@ void FitFibersToImageFilter::CreateDiffSystem()
   fiber_count = 0;
   vnl_vector<int> voxel_indicator; voxel_indicator.set_size(sz_x*sz_y*sz_z); voxel_indicator.fill(0);
 
-  int numFibers = 0;
+  unsigned int numFibers = 0;
   for (unsigned int bundle=0; bundle<m_Tractograms.size(); bundle++)
     numFibers += m_Tractograms.at(bundle)->GetNumFibers();
   boost::progress_display disp(numFibers);
@@ -86,7 +83,7 @@ void FitFibersToImageFilter::CreateDiffSystem()
   {
     vtkSmartPointer<vtkPolyData> polydata = m_Tractograms.at(bundle)->GetFiberPolyData();
     m_GroupSizes.push_back(m_Tractograms.at(bundle)->GetNumFibers());
-    for (int i=0; i<m_Tractograms.at(bundle)->GetNumFibers(); ++i)
+    for (unsigned int i=0; i<m_Tractograms.at(bundle)->GetNumFibers(); ++i)
     {
       ++disp;
       vtkCell* cell = polydata->GetCell(i);
@@ -98,13 +95,13 @@ void FitFibersToImageFilter::CreateDiffSystem()
 
       for (int j=0; j<numPoints-1; ++j)
       {
-        PointType3 startVertex = GetItkPoint(points->GetPoint(j));
+        PointType3 startVertex = mitk::imv::GetItkPoint(points->GetPoint(j));
         itk::Index<3> startIndex;
         itk::ContinuousIndex<float, 3> startIndexCont;
         m_DiffImage->TransformPhysicalPointToIndex(startVertex, startIndex);
         m_DiffImage->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
 
-        PointType3 endVertex = GetItkPoint(points->GetPoint(j+1));
+        PointType3 endVertex = mitk::imv::GetItkPoint(points->GetPoint(j+1));
         itk::Index<3> endIndex;
         itk::ContinuousIndex<float, 3> endIndexCont;
         m_DiffImage->TransformPhysicalPointToIndex(endVertex, endIndex);
@@ -225,6 +222,11 @@ void FitFibersToImageFilter::CreatePeakSystem()
     m_MaskImage->Allocate();
     m_MaskImage->FillBuffer(1);
   }
+  else if (m_MaskImage->GetLargestPossibleRegion().GetSize()[0]!=sz_x ||
+           m_MaskImage->GetLargestPossibleRegion().GetSize()[1]!=sz_y ||
+           m_MaskImage->GetLargestPossibleRegion().GetSize()[2]!=sz_z)
+    mitkThrow() << "Mask and peak image must have same size!";
+
 
   m_NumResiduals = num_voxels * dim_four_size;
 
@@ -251,7 +253,7 @@ void FitFibersToImageFilter::CreatePeakSystem()
     vtkSmartPointer<vtkPolyData> polydata = m_Tractograms.at(bundle)->GetFiberPolyData();
 
     m_GroupSizes.push_back(m_Tractograms.at(bundle)->GetNumFibers());
-    for (int i=0; i<m_Tractograms.at(bundle)->GetNumFibers(); ++i)
+    for (unsigned int i=0; i<m_Tractograms.at(bundle)->GetNumFibers(); ++i)
     {
       ++disp;
       vtkCell* cell = polydata->GetCell(i);
@@ -263,13 +265,13 @@ void FitFibersToImageFilter::CreatePeakSystem()
 
       for (int j=0; j<numPoints-1; ++j)
       {
-        PointType3 startVertex = GetItkPoint(points->GetPoint(j));
+        PointType3 startVertex = mitk::imv::GetItkPoint(points->GetPoint(j));
         itk::Index<3> startIndex;
         itk::ContinuousIndex<float, 3> startIndexCont;
         m_MaskImage->TransformPhysicalPointToIndex(startVertex, startIndex);
         m_MaskImage->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
 
-        PointType3 endVertex = GetItkPoint(points->GetPoint(j+1));
+        PointType3 endVertex = mitk::imv::GetItkPoint(points->GetPoint(j+1));
         itk::Index<3> endIndex;
         itk::ContinuousIndex<float, 3> endIndexCont;
         m_MaskImage->TransformPhysicalPointToIndex(endVertex, endIndex);
@@ -348,6 +350,12 @@ void FitFibersToImageFilter::CreateScalarSystem()
   sz_z = m_ScalarImage->GetLargestPossibleRegion().GetSize(2);
   int num_voxels = sz_x*sz_y*sz_z;
 
+  if (m_MaskImage.IsNotNull() &&
+      (m_MaskImage->GetLargestPossibleRegion().GetSize()[0]!=sz_x ||
+       m_MaskImage->GetLargestPossibleRegion().GetSize()[1]!=sz_y ||
+       m_MaskImage->GetLargestPossibleRegion().GetSize()[2]!=sz_z))
+    mitkThrow() << "Mask and peak image must have same size!";
+
   auto spacing = m_ScalarImage->GetSpacing();
   m_NumResiduals = num_voxels;
 
@@ -373,7 +381,7 @@ void FitFibersToImageFilter::CreateScalarSystem()
     vtkSmartPointer<vtkPolyData> polydata = m_Tractograms.at(bundle)->GetFiberPolyData();
 
     m_GroupSizes.push_back(m_Tractograms.at(bundle)->GetNumFibers());
-    for (int i=0; i<m_Tractograms.at(bundle)->GetNumFibers(); ++i)
+    for (unsigned int i=0; i<m_Tractograms.at(bundle)->GetNumFibers(); ++i)
     {
       ++disp;
       vtkCell* cell = polydata->GetCell(i);
@@ -382,13 +390,13 @@ void FitFibersToImageFilter::CreateScalarSystem()
 
       for (int j=0; j<numPoints-1; ++j)
       {
-        PointType3 startVertex = GetItkPoint(points->GetPoint(j));
+        PointType3 startVertex = mitk::imv::GetItkPoint(points->GetPoint(j));
         itk::Index<3> startIndex;
         itk::ContinuousIndex<float, 3> startIndexCont;
         m_ScalarImage->TransformPhysicalPointToIndex(startVertex, startIndex);
         m_ScalarImage->TransformPhysicalPointToContinuousIndex(startVertex, startIndexCont);
 
-        PointType3 endVertex = GetItkPoint(points->GetPoint(j+1));
+        PointType3 endVertex = mitk::imv::GetItkPoint(points->GetPoint(j+1));
         itk::Index<3> endIndex;
         itk::ContinuousIndex<float, 3> endIndexCont;
         m_ScalarImage->TransformPhysicalPointToIndex(endVertex, endIndex);
@@ -607,7 +615,7 @@ void FitFibersToImageFilter::GenerateData()
       temp_weights.set_size(m_Weights.size());
       temp_weights.copy_in(m_Weights.data_block());
 
-      for (int i=0; i<m_Tractograms.at(bundle)->GetNumFibers(); i++)
+      for (unsigned int i=0; i<m_Tractograms.at(bundle)->GetNumFibers(); i++)
       {
         m_Tractograms.at(bundle)->SetFiberWeight(i, m_Weights[fiber_count]);
         temp_weights[fiber_count] = 0;

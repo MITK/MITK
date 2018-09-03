@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
     vtkSmartPointer<vtkCellArray> validCells = vtkSmartPointer<vtkCellArray>::New();
 
     boost::progress_display disp(static_cast<unsigned int>(inputTractogram->GetNumFibers()));
-    for (int i=0; i<inputTractogram->GetNumFibers(); i++)
+    for (unsigned int i=0; i<inputTractogram->GetNumFibers(); i++)
     {
       ++disp;
 

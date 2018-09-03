@@ -38,9 +38,19 @@ public:
   static itk::Point<float, 3> GetItkPoint(double point[3])
   {
     itk::Point<float, 3> itkPoint;
-    itkPoint[0] = point[0];
-    itkPoint[1] = point[1];
-    itkPoint[2] = point[2];
+    itkPoint[0] = static_cast<float>(point[0]);
+    itkPoint[1] = static_cast<float>(point[1]);
+    itkPoint[2] = static_cast<float>(point[2]);
+    return itkPoint;
+  }
+
+  template< class TType >
+  static itk::Point<float, 3> GetItkPoint(double point[3])
+  {
+    itk::Point<TType, 3> itkPoint;
+    itkPoint[0] = static_cast<TType>(point[0]);
+    itkPoint[1] = static_cast<TType>(point[1]);
+    itkPoint[2] = static_cast<TType>(point[2]);
     return itkPoint;
   }
 

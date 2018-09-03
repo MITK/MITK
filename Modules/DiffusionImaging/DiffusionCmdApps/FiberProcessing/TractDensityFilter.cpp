@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("overlap"))
     overlap = us::any_cast<float>(parsedArgs["overlap"]);
 
-  float threshold = 0.05;
+  float threshold = 0.05f;
   if (parsedArgs.count("threshold"))
     threshold = us::any_cast<float>(parsedArgs["threshold"]);
 
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
     extractor->SetThreshold(threshold);
     extractor->SetNoNegatives(true);
     extractor->Update();
-    if (extractor->GetPositives().at(0)->GetNumFibers()>=min_fibers)
+    if (extractor->GetPositives().at(0)->GetNumFibers() >= static_cast<unsigned int>(min_fibers))
       mitk::IOUtil::Save(extractor->GetPositives().at(0), outFib);
   }
   catch (itk::ExceptionObject e)

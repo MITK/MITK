@@ -121,7 +121,7 @@ public:
     void SetFiberWeights(vtkSmartPointer<vtkFloatArray> weights);
     void SetFiberPolyData(vtkSmartPointer<vtkPolyData>, bool updateGeometry = true);
     vtkSmartPointer<vtkPolyData> GetFiberPolyData() const;
-    itkGetConstMacro( NumFibers, int)
+    itkGetConstMacro( NumFibers, unsigned int)
     //itkGetMacro( FiberSampling, int)
     itkGetConstMacro( MinFiberLength, float )
     itkGetConstMacro( MaxFiberLength, float )
@@ -165,7 +165,7 @@ private:
     // contains fiber ids
     vtkSmartPointer<vtkDataSet>   m_FiberIdDataSet;
 
-    int   m_NumFibers;
+    unsigned int m_NumFibers;
 
     vtkSmartPointer<vtkUnsignedCharArray> m_FiberColors;
     vtkSmartPointer<vtkFloatArray> m_FiberWeights;

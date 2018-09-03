@@ -266,7 +266,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::FilterByWeights(float weight_thr, 
 
   std::vector<float> weights;
 
-  for (int i=0; i<this->GetNumFibers(); i++)
+  for (unsigned int i=0; i<this->GetNumFibers(); i++)
   {
     if ( (invert && this->GetFiberWeight(i)>weight_thr) || (!invert && this->GetFiberWeight(i)<=weight_thr))
       continue;
@@ -313,8 +313,8 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubsampleFibers(float factor, bool
   vtkSmartPointer<vtkFloatArray> weights = vtkSmartPointer<vtkFloatArray>::New();
   weights->SetNumberOfValues(new_num_fibs);
 
-  std::vector< int > ids;
-  for (int i=0; i<this->GetNumFibers(); i++)
+  std::vector< unsigned int > ids;
+  for (unsigned int i=0; i<this->GetNumFibers(); i++)
     ids.push_back(i);
   if (random_seed)
     std::srand(std::time(0));
@@ -365,7 +365,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
   vtkSmartPointer<vtkPoints> vNewPoints = vtkSmartPointer<vtkPoints>::New();
 
   std::vector< std::vector< itk::Point<float, 3> > > points1;
-  for( int i=0; i<m_NumFibers; i++ )
+  for(unsigned int i=0; i<m_NumFibers; i++ )
   {
     vtkCell* cell = m_FiberPolyData->GetCell(i);
     int numPoints = cell->GetNumberOfPoints();
@@ -381,7 +381,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
   }
 
   std::vector< std::vector< itk::Point<float, 3> > > points2;
-  for( int i=0; i<fib->GetNumFibers(); i++ )
+  for(unsigned int i=0; i<fib->GetNumFibers(); i++ )
   {
     vtkCell* cell = fib->GetFiberPolyData()->GetCell(i);
     int numPoints = cell->GetNumberOfPoints();
@@ -931,9 +931,9 @@ void mitk::FiberBundle::ColorFibersByFiberWeights(bool opacity, bool normalize)
 
   float max = -999999;
   float min = 999999;
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
   {
-    double weight = this->GetFiberWeight(i);
+    float weight = this->GetFiberWeight(i);
     if (weight>max)
       max = weight;
     if (weight<min)
@@ -945,7 +945,7 @@ void mitk::FiberBundle::ColorFibersByFiberWeights(bool opacity, bool normalize)
     min = 0;
   }
 
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
   {
     vtkCell* cell = m_FiberPolyData->GetCell(i);
     int numPoints = cell->GetNumberOfPoints();
@@ -1024,7 +1024,7 @@ float mitk::FiberBundle::GetNumEpFractionInMask(ItkUcharImgType* mask, bool diff
   boost::progress_display disp(m_NumFibers);
   unsigned int in_mask = 0;
 
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
   {
     ++disp;
     vtkCell* cell = PolyData->GetCell(i);
@@ -1067,7 +1067,7 @@ std::tuple<float, float> mitk::FiberBundle::GetDirectionalOverlap(ItkUcharImgTyp
   float length_sum = 0;
   float in_mask_length = 0;
   float aligned_length = 0;
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
   {
     ++disp;
     vtkCell* cell = PolyData->GetCell(i);
@@ -1140,7 +1140,7 @@ float mitk::FiberBundle::GetOverlap(ItkUcharImgType* mask)
   boost::progress_display disp(m_NumFibers);
   double length_sum = 0;
   double in_mask_length = 0;
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
   {
     ++disp;
     vtkCell* cell = PolyData->GetCell(i);
@@ -1188,7 +1188,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
 
   MITK_INFO << "Cutting fibers";
   boost::progress_display disp(m_NumFibers);
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
   {
     ++disp;
 
@@ -1381,7 +1381,7 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(DataNode *roi, DataSto
 
       MITK_INFO << "Extracting with polygon";
       boost::progress_display disp(m_NumFibers);
-      for (int i=0; i<m_NumFibers; i++)
+      for (unsigned int i=0; i<m_NumFibers; i++)
       {
         ++disp ;
         vtkCell* cell = m_FiberPolyData->GetCell(i);
@@ -1427,7 +1427,7 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(DataNode *roi, DataSto
 
       MITK_INFO << "Extracting with circle";
       boost::progress_display disp(m_NumFibers);
-      for (int i=0; i<m_NumFibers; i++)
+      for (unsigned int i=0; i<m_NumFibers; i++)
       {
         ++disp ;
         vtkCell* cell = m_FiberPolyData->GetCell(i);
@@ -1541,7 +1541,7 @@ void mitk::FiberBundle::UpdateFiberGeometry()
 
   std::vector< float > sortedLengths = m_FiberLengths;
   std::sort(sortedLengths.begin(), sortedLengths.end());
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
     m_LengthStDev += (m_MeanFiberLength-sortedLengths.at(i))*(m_MeanFiberLength-sortedLengths.at(i));
   if (m_NumFibers>1)
     m_LengthStDev /= (m_NumFibers-1);
@@ -1683,7 +1683,7 @@ void mitk::FiberBundle::TransformFibers(itk::ScalableAffineTransform< mitk::Scal
   vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
 
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
   {
     vtkCell* cell = m_FiberPolyData->GetCell(i);
     int numPoints = cell->GetNumberOfPoints();
@@ -1738,7 +1738,7 @@ void mitk::FiberBundle::TransformFibers(double rx, double ry, double rz, double 
   vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
 
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
   {
     vtkCell* cell = m_FiberPolyData->GetCell(i);
     int numPoints = cell->GetNumberOfPoints();
@@ -1798,7 +1798,7 @@ void mitk::FiberBundle::RotateAroundAxis(double x, double y, double z)
   vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
 
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
   {
     vtkCell* cell = m_FiberPolyData->GetCell(i);
     int numPoints = cell->GetNumberOfPoints();
@@ -1839,7 +1839,7 @@ void mitk::FiberBundle::ScaleFibers(double x, double y, double z, bool subtractC
   vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
 
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
   {
     ++disp ;
     vtkCell* cell = m_FiberPolyData->GetCell(i);
@@ -1878,7 +1878,7 @@ void mitk::FiberBundle::TranslateFibers(double x, double y, double z)
   vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
 
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
   {
     vtkCell* cell = m_FiberPolyData->GetCell(i);
     int numPoints = cell->GetNumberOfPoints();
@@ -1914,7 +1914,7 @@ void mitk::FiberBundle::MirrorFibers(unsigned int axis)
   vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
 
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
   {
     ++disp;
     vtkCell* cell = m_FiberPolyData->GetCell(i);
@@ -2101,7 +2101,7 @@ bool mitk::FiberBundle::RemoveShortFibers(float lengthInMM)
   float min = m_MaxFiberLength;
 
   boost::progress_display disp(m_NumFibers);
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
   {
     ++disp;
     vtkCell* cell = m_FiberPolyData->GetCell(i);
@@ -2146,7 +2146,7 @@ bool mitk::FiberBundle::RemoveLongFibers(float lengthInMM)
 
   MITK_INFO << "Removing long fibers";
   boost::progress_display disp(m_NumFibers);
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
   {
     ++disp;
     vtkCell* cell = m_FiberPolyData->GetCell(i);
@@ -2196,7 +2196,7 @@ void mitk::FiberBundle::ResampleSpline(float pointDistance, double tension, doub
 
   boost::progress_display disp(m_NumFibers);
 #pragma omp parallel for
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
   {
     vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
     float length = 0;
@@ -2671,7 +2671,7 @@ bool mitk::FiberBundle::Equals(mitk::FiberBundle* fib, double eps)
     return false;
   }
 
-  for (int i=0; i<m_NumFibers; i++)
+  for (unsigned int i=0; i<m_NumFibers; i++)
   {
     vtkCell* cell = m_FiberPolyData->GetCell(i);
     int numPoints = cell->GetNumberOfPoints();

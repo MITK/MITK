@@ -121,7 +121,7 @@ void FiberExtractionFilter< PixelType >::ExtractOverlap(mitk::FiberBundle::Point
   std::vector< long > negative_ids; // fibers not overlapping with ANY mask
 
   boost::progress_display disp(m_InputFiberBundle->GetNumFibers());
-  for (int i=0; i<m_InputFiberBundle->GetNumFibers(); i++)
+  for (unsigned int i=0; i<m_InputFiberBundle->GetNumFibers(); i++)
   {
     ++disp;
     vtkCell* cell = polydata->GetCell(i);
@@ -217,7 +217,7 @@ void FiberExtractionFilter< PixelType >::ExtractEndpoints(mitk::FiberBundle::Poi
   std::vector< long > negative_ids; // fibers not overlapping with ANY mask
 
   boost::progress_display disp(m_InputFiberBundle->GetNumFibers());
-  for (int i=0; i<m_InputFiberBundle->GetNumFibers(); i++)
+  for (unsigned int i=0; i<m_InputFiberBundle->GetNumFibers(); i++)
   {
     ++disp;
     vtkCell* cell = polydata->GetCell(i);
@@ -304,7 +304,7 @@ void FiberExtractionFilter< PixelType >::ExtractLabels(mitk::FiberBundle::Pointe
   std::vector< long > negative_ids; // fibers not overlapping with ANY label
 
   boost::progress_display disp(m_InputFiberBundle->GetNumFibers());
-  for (int i=0; i<m_InputFiberBundle->GetNumFibers(); i++)
+  for (unsigned int i=0; i<m_InputFiberBundle->GetNumFibers(); i++)
   {
     ++disp;
     vtkCell* cell = polydata->GetCell(i);

@@ -454,9 +454,9 @@ protected:
   vnl_sparse_matrix<double>                   A;
   vnl_vector<double>                          b;
   VnlCostFunction                             cost;
-  int                                         sz_x;
-  int                                         sz_y;
-  int                                         sz_z;
+  unsigned int                                sz_x;
+  unsigned int                                sz_y;
+  unsigned int                                sz_z;
   int                                         dim_four_size;
   double                                      m_MeanTractDensity;
   double                                      m_MeanSignal;

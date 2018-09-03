@@ -139,7 +139,7 @@ void mitk::FiberBundleDicomWriter::Write()
     cieLabColor[2] = 0 ; // b
     std::vector< Float32* > tracts;
 
-    for (int i=0; i<fib->GetNumFibers(); i++)
+    for (unsigned int i=0; i<fib->GetNumFibers(); i++)
     {
         vtkCell* cell = poly->GetCell(i);
         int numPoints = cell->GetNumberOfPoints();

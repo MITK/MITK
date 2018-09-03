@@ -875,7 +875,7 @@ void QmitkFiberGenerationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer
       {
         m_SelectedBundles.push_back(node);
         mitk::FiberBundle::Pointer newFib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
-        if (newFib->GetNumFibers()!=m_Controls->m_FiberDensityBox->value())
+        if (newFib->GetNumFibers()!=static_cast<unsigned int>(m_Controls->m_FiberDensityBox->value()))
           GenerateFibers();
       }
       else

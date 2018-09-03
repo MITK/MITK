@@ -171,7 +171,7 @@ public:
         MITK_INFO << "TEST 8: Modify compress";
 
         mitk::FiberBundle::Pointer fib = original->GetDeepCopy();
-        fib->Compress(0.1);
+        fib->Compress(0.1f);
         mitk::FiberBundle::Pointer ref = mitk::IOUtil::Load<mitk::FiberBundle>(GetTestDataFilePath("DiffusionImaging/FiberProcessing/modify_compress.fib"));
         CPPUNIT_ASSERT_MESSAGE("Should be equal", ref->Equals(fib));
     }
@@ -211,7 +211,7 @@ public:
         MITK_INFO << "TEST 12: Weight and join";
 
         mitk::FiberBundle::Pointer fib = original->GetDeepCopy();
-        fib->SetFiberWeights(0.1);
+        fib->SetFiberWeights(0.1f);
 
         mitk::FiberBundle::Pointer fib2 = original->GetDeepCopy();
         fib2->SetFiberWeight(3, 0.5);
@@ -222,7 +222,7 @@ public:
 
         CPPUNIT_ASSERT_MESSAGE("Number of fibers", ref->GetNumFibers() == fib->GetNumFibers());
 
-        for (int i=0; i<ref->GetNumFibers(); i++)
+        for (unsigned int i=0; i<ref->GetNumFibers(); i++)
             CPPUNIT_ASSERT_MESSAGE("Fiber weights", ref->GetFiberWeight(i) == fib->GetFiberWeight(i));
     }
 

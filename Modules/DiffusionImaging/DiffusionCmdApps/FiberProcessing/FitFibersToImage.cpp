@@ -258,7 +258,7 @@ int main(int argc, char* argv[])
         {
           ofstream logfile;
           logfile.open (outRoot + name + "_weights.txt");
-          for (int f=0; f<output_tracts.at(bundle)->GetNumFibers(); ++f)
+          for (unsigned int f=0; f<output_tracts.at(bundle)->GetNumFibers(); ++f)
             logfile << output_tracts.at(bundle)->GetFiberWeight(f) << "\n";
           logfile.close();
         }
@@ -275,7 +275,7 @@ int main(int argc, char* argv[])
       {
         ofstream logfile;
         logfile.open (outRoot + "_weights.txt");
-        for (int f=0; f<out->GetNumFibers(); ++f)
+        for (unsigned int f=0; f<out->GetNumFibers(); ++f)
           logfile << out->GetFiberWeight(f) << "\n";
         logfile.close();
       }

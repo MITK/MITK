@@ -23,11 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  /// Provides the custom mime types for dicom segmentation objects loaded with DCMQI
+  /// Provides the custom mime types for dicom qi objects loaded with DCMQI
   class MitkDICOMQIIOMimeTypes
   {
   public:
-    /** Mime type that parses dicom files to determine whether they are dicom segmentation objects.
+    /** Mime type that parses dicom files to determine whether they are dicom qi objects.
     */
     class MitkDICOMQIMimeType : public CustomMimeType
     {

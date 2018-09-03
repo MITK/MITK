@@ -33,29 +33,31 @@ namespace mitk
 
     // order matters here (descending rank for mime types)
 
-    mimeTypes.push_back(DICOMQI_MIMETYPE().Clone());
+    mimeTypes.push_back(DICOMSEG_MIMETYPE().Clone());
+    //mimeTypes.push_back(DICOMPM_MIMETYPE().Clone());
 
     return mimeTypes;
   }
 
   // Mime Types
 
-  MitkDICOMQIIOMimeTypes::MitkDICOMQIMimeType::MitkDICOMQIMimeType() : CustomMimeType(DICOMQI_MIMETYPE_NAME())
+  //======= Mime Type DICOM SEG =======
+  MitkDICOMQIIOMimeTypes::MitkDICOMSEGMimeType:::MitkDICOMSEGMimeType() : CustomMimeType(DICOMSEG_MIMETYPE_NAME())
   {
     this->AddExtension("dcm");
     this->SetCategory(IOMimeTypes::CATEGORY_IMAGES());
-    this->SetComment("DICOM QI");
+    this->SetComment("DICOM SEG");
   }
 
-  bool MitkDICOMQIIOMimeTypes::MitkDICOMQIMimeType::AppliesTo(const std::string &path) const
+  bool MitkDICOMQIIOMimeTypes::MitkDICOMSEGMimeType::AppliesTo(const std::string &path) const
   {
     std::ifstream myfile;
-    myfile.open (path, std::ios::binary);
-//    myfile.seekg (128);
-    char *buffer = new char [128];
-    myfile.read (buffer,128);
-    myfile.read (buffer,4);
-    if (std::string(buffer).compare("DICM")!=0)
+    myfile.open(path, std::ios::binary);
+    //    myfile.seekg (128);
+    char *buffer = new char[128];
+    myfile.read(buffer, 128);
+    myfile.read(buffer, 4);
+    if (std::string(buffer).compare("DICM") != 0)
     {
       delete[] buffer;
       return false;
@@ -112,21 +114,24 @@ namespace mitk
     return canRead;
   }
 
-  MitkDICOMQIIOMimeTypes::MitkDICOMQIMimeType *MitkDICOMQIIOMimeTypes::MitkDICOMQIMimeType::Clone() const
+  MitkDICOMQIIOMimeTypes::MitkDICOMSEGMimeType *MitkDICOMQIIOMimeTypes::MitkDICOMSEGMimeType::Clone() const
   {
-    return new MitkDICOMQIMimeType(*this);
+    return new MitkDICOMSEGMimeType(*this);
   }
 
-  MitkDICOMQIIOMimeTypes::MitkDICOMQIMimeType MitkDICOMQIIOMimeTypes::DICOMQI_MIMETYPE()
+  MitkDICOMQIIOMimeTypes::MitkDICOMSEGMimeType MitkDICOMQIIOMimeTypes::DICOMSEG_MIMETYPE()
   {
-    return MitkDICOMQIMimeType();
+    return MitkDICOMSEGMimeType();
   }
 
-  // Names
-  std::string MitkDICOMQIIOMimeTypes::DICOMQI_MIMETYPE_NAME()
+  std::string MitkDICOMQIOMimeTypes::DICOMSEG_MIMETYPE_NAME()
   {
     // create a unique and sensible name for this mime type
-    static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".image.dicom.qi";
+    static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".image.dicom.seg";
     return name;
   }
+
+
+  //======= Mime Type DICOM PM =======
+  //...
 }

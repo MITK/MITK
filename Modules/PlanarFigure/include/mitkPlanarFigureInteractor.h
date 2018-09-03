@@ -51,6 +51,8 @@ itkEventMacro( EndInteractionPlanarFigureEvent, PlanarFigureEvent );
 itkEventMacro( StartHoverPlanarFigureEvent, PlanarFigureEvent );
 itkEventMacro( EndHoverPlanarFigureEvent, PlanarFigureEvent );
 itkEventMacro( ContextMenuPlanarFigureEvent, PlanarFigureEvent );
+itkEventMacro( StartAnnotationHoveringPlanarFigureEvent, PlanarFigureEvent );
+itkEventMacro( EndAnnotationHoveringPlanarFigureEvent, PlanarFigureEvent );
 
 #pragma GCC visibility pop
 

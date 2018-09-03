@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
     mitk::FiberBundle::Pointer fib = mitk::IOUtil::Load<mitk::FiberBundle>(in_fib);
 
     std::srand(0);
-    if (subsample<1.0)
+    if (subsample<1.0f)
       fib = fib->SubsampleFibers(subsample, true);
 
     mitk::FiberBundle::Pointer resampled_fib = fib->GetDeepCopy();
@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
 
         // segment tract
         segmenter->SetFilterMask(ref_masks.at(c));
-        segmenter->SetOverlapThreshold(0.8);
+        segmenter->SetOverlapThreshold(0.8f);
         segmenter->SetDistances(distances);
         segmenter->SetTractogram(resampled_fib);
         segmenter->SetMergeDuplicateThreshold(0.0);

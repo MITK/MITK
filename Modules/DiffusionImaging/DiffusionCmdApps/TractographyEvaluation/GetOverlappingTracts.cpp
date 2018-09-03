@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <itksys/SystemTools.hxx>
 #include <itkTractDensityImageFilter.h>
+#include <mitkDiffusionDataIOHelper.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -76,33 +77,28 @@ int main(int argc, char* argv[])
 
   try
   {
+    MITK_INFO << "Loading references";
+    std::vector< std::string > reference_names;
+    auto masks = mitk::DiffusionDataIOHelper::load_itk_images<ItkFloatImgType>(reference, &reference_names);
+    auto reference_fibs = mitk::DiffusionDataIOHelper::load_fibs(reference, &reference_names);
+
+    std::streambuf *old = cout.rdbuf(); // <-- save
+    std::stringstream ss;
+    std::cout.rdbuf (ss.rdbuf());       // <-- redirect
     itk::TractDensityImageFilter< ItkFloatImgType >::Pointer filter = itk::TractDensityImageFilter< ItkFloatImgType >::New();
     filter->SetUpsamplingFactor(0.25);
     filter->SetBinaryOutput(true);
-    MITK_INFO << "Loading references";
-    std::vector< ItkFloatImgType::Pointer > masks;
-    for (auto f : reference)
+    for (auto fib : reference_fibs)
     {
-      MITK_INFO << f;
-      std::streambuf *old = cout.rdbuf(); // <-- save
-      std::stringstream ss;
-      std::cout.rdbuf (ss.rdbuf());       // <-- redirect
-      mitk::FiberBundle::Pointer fib = mitk::IOUtil::Load<mitk::FiberBundle>(f);
-      if (fib.IsNotNull())
-      {
         filter->SetFiberBundle(fib);
         filter->Update();
         masks.push_back(filter->GetOutput());
-      }
-      else
-      {
-        mitk::Image::Pointer m = mitk::IOUtil::Load<mitk::Image>(f);
-        ItkFloatImgType::Pointer itkImage = ItkFloatImgType::New();
-        CastToItkImage(m, itkImage);
-        masks.push_back(itkImage);
-      }
-      std::cout.rdbuf (old);              // <-- restore
     }
+    std::cout.rdbuf (old);              // <-- restore
+
+    MITK_INFO << "Loading input tractograms";
+    std::vector< std::string > input_names;
+    auto input_fibs = mitk::DiffusionDataIOHelper::load_fibs(input, &input_names);
 
     MITK_INFO << "Finding overlaps";
     ofstream logfile;
@@ -112,42 +108,42 @@ int main(int argc, char* argv[])
     logfile2.open (out_folder + "AllOverlaps.txt");
 
     boost::progress_display disp(input.size());
-    for (auto f : input)
+    unsigned int c = 0;
+    for (auto fib : input_fibs)
     {
       ++disp;
       std::streambuf *old = cout.rdbuf(); // <-- save
       std::stringstream ss;
       std::cout.rdbuf (ss.rdbuf());       // <-- redirect
       bool is_overlapping = false;
-      mitk::FiberBundle::Pointer fib = mitk::IOUtil::Load<mitk::FiberBundle>(f);
-
       float overlap = 0;
       float max_overlap = 0;
       std::string max_ref = "-";
       int i = 0;
-      std::string overlap_string = ist::GetFilenameWithoutExtension(f);
+      std::string overlap_string = ist::GetFilenameWithoutExtension(input_names.at(c));
       for (auto m : masks)
       {
         overlap = fib->GetOverlap(m);
         if (overlap>max_overlap)
         {
           max_overlap = overlap;
-          max_ref = ist::GetFilenameWithoutExtension(reference.at(i));
+          max_ref = ist::GetFilenameWithoutExtension(reference_names.at(i));
         }
         if (use_any_overlap && overlap>=overlap_threshold)
           break;
-        overlap_string += " " + ist::GetFilenameWithoutExtension(reference.at(i)) + " " + boost::lexical_cast<std::string>(overlap);
+        overlap_string += " " + ist::GetFilenameWithoutExtension(reference_names.at(i)) + " " + boost::lexical_cast<std::string>(overlap);
         ++i;
       }
       if (overlap>=overlap_threshold)
         is_overlapping = true;
 
-      logfile << ist::GetFilenameWithoutExtension(f) << " - " << max_ref << ": " << boost::lexical_cast<std::string>(max_overlap) << "\n";
+      logfile << ist::GetFilenameWithoutExtension(input_names.at(c)) << " - " << max_ref << ": " << boost::lexical_cast<std::string>(max_overlap) << "\n";
       logfile2 << overlap_string << "\n";
 
       if (!dont_save_tracts && is_overlapping)
-        ist::CopyAFile(f, out_folder + ist::GetFilenameName(f));
+        ist::CopyAFile(input_names.at(c), out_folder + ist::GetFilenameName(input_names.at(c)));
       std::cout.rdbuf (old);              // <-- restore
+      ++c;
     }
     logfile.close();
     logfile2.close();

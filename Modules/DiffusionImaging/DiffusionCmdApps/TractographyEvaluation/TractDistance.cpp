@@ -34,8 +34,8 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i1", mitkCommandLineParser::String, "Input Folder 1:", "input tracts folder 1", us::Any(), false);
-  parser.addArgument("", "i2", mitkCommandLineParser::String, "Input Folder 2:", "input tracts folder 2", us::Any(), false);
+  parser.addArgument("", "i1", mitkCommandLineParser::StringList, "Input tracts 1:", "input tracts 1", us::Any(), false);
+  parser.addArgument("", "i2", mitkCommandLineParser::StringList, "Input tracts 2:", "input tracts 2", us::Any(), false);
   parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output logfile", us::Any(), false);
 
   parser.addArgument("fiber_points", "", mitkCommandLineParser::Int, "Fiber points:", "", 12);
@@ -46,8 +46,8 @@ int main(int argc, char* argv[])
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  std::string t1_folder = us::any_cast<std::string>(parsedArgs["i1"]);
-  std::string t2_folder = us::any_cast<std::string>(parsedArgs["i2"]);
+  mitkCommandLineParser::StringContainerType t1_folder = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["i1"]);
+  mitkCommandLineParser::StringContainerType t2_folder = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["i2"]);
   std::string out_file = us::any_cast<std::string>(parsedArgs["o"]);
 
   int fiber_points = 12;
@@ -71,9 +71,9 @@ int main(int argc, char* argv[])
   try
   {
     std::vector<std::string> t1_files;
-    std::vector< mitk::FiberBundle::Pointer > tractograms1 = mitk::DiffusionDataIOHelper::load_fibs({t1_folder}, &t1_files);
+    std::vector< mitk::FiberBundle::Pointer > tractograms1 = mitk::DiffusionDataIOHelper::load_fibs(t1_folder, &t1_files);
     std::vector<std::string> t2_files;
-    std::vector< mitk::FiberBundle::Pointer > tractograms2 = mitk::DiffusionDataIOHelper::load_fibs({t2_folder}, &t2_files);
+    std::vector< mitk::FiberBundle::Pointer > tractograms2 = mitk::DiffusionDataIOHelper::load_fibs(t2_folder, &t2_files);
 
     MITK_INFO << "Loaded " << tractograms1.size() << " source tractograms.";
     MITK_INFO << "Loaded " << tractograms2.size() << " target tractograms.";

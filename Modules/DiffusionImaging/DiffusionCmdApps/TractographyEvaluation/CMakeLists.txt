@@ -13,7 +13,6 @@ if(BUILD_DiffusionTractographyEvaluationCmdApps OR MITK_BUILD_ALL_APPS)
     # they are added after a "^^" and separated by "_"
     set( diffusionTractographyEvaluationcmdapps
     PeaksAngularError^^
-    TractometerMetrics^^
     MergeOverlappingTracts^^
     GetOverlappingTracts^^
     ExtractSimilarTracts^^

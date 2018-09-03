@@ -54,9 +54,12 @@ std::vector< mitk::Image::Pointer > mitk::DiffusionDataIOHelper::load_mitk_image
     if (itksys::SystemTools::FileExists(f, true))
     {
       mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(f);
-      out.push_back(image);
-      if (filenames!=nullptr)
-        filenames->push_back(f);
+      if (image.IsNotNull())
+      {
+        out.push_back(image);
+        if (filenames!=nullptr)
+          filenames->push_back(f);
+      }
     }
     else if (itksys::SystemTools::PathExists(f))
     {
@@ -67,9 +70,12 @@ std::vector< mitk::Image::Pointer > mitk::DiffusionDataIOHelper::load_mitk_image
       for (auto file : list)
       {
         mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(file);
-        out.push_back(image);
-        if (filenames!=nullptr)
-          filenames->push_back(file);
+        if (image.IsNotNull())
+        {
+          out.push_back(image);
+          if (filenames!=nullptr)
+            filenames->push_back(file);
+        }
       }
     }
   }
@@ -96,17 +102,23 @@ std::vector< mitk::FiberBundle::Pointer > mitk::DiffusionDataIOHelper::load_fibs
       for (auto file : list)
       {
         mitk::FiberBundle::Pointer fib = mitk::IOUtil::Load<mitk::FiberBundle>(file);
-        out.push_back(fib);
-        if (filenames!=nullptr)
-          filenames->push_back(file);
+        if (fib.IsNotNull())
+        {
+          out.push_back(fib);
+          if (filenames!=nullptr)
+            filenames->push_back(file);
+        }
       }
     }
     else if (itksys::SystemTools::FileExists(f))
     {
       mitk::FiberBundle::Pointer fib = mitk::IOUtil::Load<mitk::FiberBundle>(f);
-      out.push_back(fib);
-      if (filenames!=nullptr)
-        filenames->push_back(f);
+      if (fib.IsNotNull())
+      {
+        out.push_back(fib);
+        if (filenames!=nullptr)
+          filenames->push_back(f);
+      }
     }
   }
   std::cout.rdbuf (old);              // <-- restore

@@ -75,6 +75,7 @@ set(MITK_MODULES
   ModelFitUI
   Pharmacokinetics
   PharmacokineticsUI
+  DICOMQI
 )
 
 if(MITK_ENABLE_PIC_READER)

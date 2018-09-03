@@ -44,8 +44,8 @@ namespace mitk
 {
   DICOMSegmentationIO::DICOMSegmentationIO()
     : AbstractFileIO(LabelSetImage::GetStaticNameOfClass(),
-                     mitk::MitkDICOMQIIOMimeTypes::DICOMQI_MIMETYPE_NAME(),
-                     "DICOM Segmentation")
+      mitk::MitkDICOMQIIOMimeTypes::DICOMQI_MIMETYPE_NAME(),
+      "DICOM Segmentation")
   {
     AbstractFileWriter::SetRanking(10);
     AbstractFileReader::SetRanking(10);
@@ -444,25 +444,25 @@ namespace mitk
     // 1. Metadata attributes that will be listed in the resulting DICOM SEG object
     std::string contentCreatorName;
     if (!image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0070, 0x0084).c_str(),
-                                                     contentCreatorName))
+      contentCreatorName))
       contentCreatorName = "MITK";
     handler.setContentCreatorName(contentCreatorName);
 
     std::string clinicalTrailSeriesId;
     if (!image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0071).c_str(),
-                                                     clinicalTrailSeriesId))
+      clinicalTrailSeriesId))
       clinicalTrailSeriesId = "Session 1";
     handler.setClinicalTrialSeriesID(clinicalTrailSeriesId);
 
     std::string clinicalTrialTimePointID;
     if (!image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0050).c_str(),
-                                                     clinicalTrialTimePointID))
+      clinicalTrialTimePointID))
       clinicalTrialTimePointID = "0";
     handler.setClinicalTrialTimePointID(clinicalTrialTimePointID);
 
     std::string clinicalTrialCoordinatingCenterName = "";
     if (!image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0060).c_str(),
-                                                     clinicalTrialCoordinatingCenterName))
+      clinicalTrialCoordinatingCenterName))
       clinicalTrialCoordinatingCenterName = "Unknown";
     handler.setClinicalTrialCoordinatingCenterName(clinicalTrialCoordinatingCenterName);
 
@@ -539,7 +539,7 @@ namespace mitk
           segmentAttribute->setSegmentAlgorithmType(algorithmTypeProp->GetValueAsString());
           segmentAttribute->setSegmentAlgorithmName("MITK Segmentation");
           if (segmentCategoryCodeValueProp != nullptr && segmentCategoryCodeSchemeProp != nullptr &&
-              segmentCategoryCodeMeaningProp != nullptr)
+            segmentCategoryCodeMeaningProp != nullptr)
             segmentAttribute->setSegmentedPropertyCategoryCodeSequence(
               segmentCategoryCodeValueProp->GetValueAsString(),
               segmentCategoryCodeSchemeProp->GetValueAsString(),
@@ -550,11 +550,11 @@ namespace mitk
               "M-01000", "SRT", "Morphologically Altered Structure");
 
           if (segmentTypeCodeValueProp != nullptr && segmentTypeCodeSchemeProp != nullptr &&
-              segmentTypeCodeMeaningProp != nullptr)
+            segmentTypeCodeMeaningProp != nullptr)
           {
             segmentAttribute->setSegmentedPropertyTypeCodeSequence(segmentTypeCodeValueProp->GetValueAsString(),
-                                                                   segmentTypeCodeSchemeProp->GetValueAsString(),
-                                                                   segmentTypeCodeMeaningProp->GetValueAsString());
+              segmentTypeCodeSchemeProp->GetValueAsString(),
+              segmentTypeCodeMeaningProp->GetValueAsString());
             handler.setBodyPartExamined(segmentTypeCodeMeaningProp->GetValueAsString());
           }
           else
@@ -564,7 +564,7 @@ namespace mitk
             handler.setBodyPartExamined("Mass");
           }
           if (segmentModifierCodeValueProp != nullptr && segmentModifierCodeSchemeProp != nullptr &&
-              segmentModifierCodeMeaningProp != nullptr)
+            segmentModifierCodeMeaningProp != nullptr)
             segmentAttribute->setSegmentedPropertyTypeModifierCodeSequence(
               segmentModifierCodeValueProp->GetValueAsString(),
               segmentModifierCodeSchemeProp->GetValueAsString(),
@@ -583,16 +583,16 @@ namespace mitk
     // Segment Number:Identification number of the segment.The value of Segment Number(0062, 0004) shall be unique
     // within the Segmentation instance in which it is created
     label->SetProperty(DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_NUMBER_PATH()).c_str(),
-                       TemporoSpatialStringProperty::New(std::to_string(label->GetValue())));
+      TemporoSpatialStringProperty::New(std::to_string(label->GetValue())));
 
     // Segment Label: User-defined label identifying this segment.
     label->SetProperty(DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_LABEL_PATH()).c_str(),
-                       TemporoSpatialStringProperty::New(label->GetName()));
+      TemporoSpatialStringProperty::New(label->GetName()));
 
     // Segment Algorithm Type: Type of algorithm used to generate the segment.
     if (!segmentAttribute->getSegmentAlgorithmType().empty())
       label->SetProperty(DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_ALGORITHM_TYPE_PATH()).c_str(),
-                         TemporoSpatialStringProperty::New(segmentAttribute->getSegmentAlgorithmType()));
+        TemporoSpatialStringProperty::New(segmentAttribute->getSegmentAlgorithmType()));
 
     // Add Segmented Property Category Code Sequence tags
     auto categoryCodeSequence = segmentAttribute->getSegmentedPropertyCategoryCodeSequence();
@@ -624,7 +624,7 @@ namespace mitk
       OFString codeValue; // (0008,0100) Code Value
       typeCodeSequence->getCodeValue(codeValue);
       label->SetProperty(DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_VALUE_PATH()).c_str(),
-                         TemporoSpatialStringProperty::New(codeValue.c_str()));
+        TemporoSpatialStringProperty::New(codeValue.c_str()));
 
       OFString codeScheme; // (0008,0102) Coding Scheme Designator
       typeCodeSequence->getCodingSchemeDesignator(codeScheme);

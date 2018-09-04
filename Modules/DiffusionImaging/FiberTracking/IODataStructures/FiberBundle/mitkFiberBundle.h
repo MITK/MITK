@@ -113,7 +113,7 @@ public:
     mitk::FiberBundle::Pointer     SubsampleFibers(float factor, bool random_seed);
 
     // get/set data
-    float GetFiberLength(int index) const { return m_FiberLengths.at(index); }
+    float GetFiberLength(unsigned int index) const { return m_FiberLengths.at(index); }
     vtkSmartPointer<vtkFloatArray> GetFiberWeights() const { return m_FiberWeights; }
     float GetFiberWeight(unsigned int fiber) const;
     void SetFiberWeights(float newWeight);
@@ -134,7 +134,7 @@ public:
     void RequestUpdate3D(){ m_UpdateTime3D.Modified(); }
     void RequestUpdate(){ m_UpdateTime2D.Modified(); m_UpdateTime3D.Modified(); }
 
-    unsigned long GetNumberOfPoints() const;
+    unsigned int GetNumberOfPoints() const;
 
     // copy fiber bundle
     mitk::FiberBundle::Pointer GetDeepCopy();

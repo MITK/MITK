@@ -2187,7 +2187,7 @@ void mitk::FiberBundle::ResampleSpline(float pointDistance, double tension, doub
 
   boost::progress_display disp(m_NumFibers);
 #pragma omp parallel for
-  for (unsigned int i=0; i<m_NumFibers; i++)
+  for (int i=0; i<static_cast<int>(m_NumFibers); i++)
   {
     vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
     float length = 0;

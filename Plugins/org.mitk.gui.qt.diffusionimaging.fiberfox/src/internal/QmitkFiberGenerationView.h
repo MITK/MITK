@@ -95,6 +95,7 @@ protected slots:
     void OnVarianceChanged(double value);
     void OnDistributionChanged(int value);
     void OnConstantRadius(int value);
+    void UpdateFiducialPosition();
 
 protected:
 

@@ -46,7 +46,7 @@ public:
     Cluster() : n(0), f_id(-1) {}
 
     vnl_matrix<float> h;
-    std::vector< long > I;
+    std::vector< unsigned int > I;
     int n;
     int f_id;
 
@@ -96,7 +96,7 @@ public:
 
   void SetMetrics(const std::vector<mitk::ClusteringMetric *> &Metrics);
 
-  std::vector<std::vector<long> > GetOutFiberIndices() const;
+  std::vector<std::vector<unsigned int> > GetOutFiberIndices() const;
 
 protected:
 
@@ -104,11 +104,11 @@ protected:
   std::vector< vnl_matrix<float> > ResampleFibers(FiberBundle::Pointer tractogram);
   float CalcOverlap(vnl_matrix<float>& t);
 
-  std::vector< Cluster > ClusterStep(std::vector< long > f_indices, std::vector< float > distances);
+  std::vector< Cluster > ClusterStep(std::vector< unsigned int > f_indices, std::vector< float > distances);
 
   std::vector< TractClusteringFilter::Cluster > MergeDuplicateClusters2(std::vector< TractClusteringFilter::Cluster >& clusters);
   void MergeDuplicateClusters(std::vector< TractClusteringFilter::Cluster >& clusters);
-  std::vector< Cluster > AddToKnownClusters(std::vector< long > f_indices, std::vector<vnl_matrix<float> > &centroids);
+  std::vector< Cluster > AddToKnownClusters(std::vector< unsigned int > f_indices, std::vector<vnl_matrix<float> > &centroids);
   void AppendCluster(std::vector< Cluster >& a, std::vector< Cluster >&b);
 
   TractClusteringFilter();
@@ -129,7 +129,7 @@ protected:
   UcharImageType::Pointer                     m_FilterMask;
   float                                       m_OverlapThreshold;
   std::vector< mitk::ClusteringMetric* >      m_Metrics;
-  std::vector< std::vector< long > >          m_OutFiberIndices;
+  std::vector< std::vector< unsigned int > >          m_OutFiberIndices;
 };
 }
 

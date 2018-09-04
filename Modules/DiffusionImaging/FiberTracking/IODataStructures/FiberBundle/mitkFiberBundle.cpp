@@ -81,7 +81,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::GetDeepCopy()
   return newFib;
 }
 
-vtkSmartPointer<vtkPolyData> mitk::FiberBundle::GeneratePolyDataByIds(std::vector<long> fiberIds, vtkSmartPointer<vtkFloatArray> weights)
+vtkSmartPointer<vtkPolyData> mitk::FiberBundle::GeneratePolyDataByIds(std::vector<unsigned int> fiberIds, vtkSmartPointer<vtkFloatArray> weights)
 {
   vtkSmartPointer<vtkPolyData> newFiberPolyData = vtkSmartPointer<vtkPolyData>::New();
   vtkSmartPointer<vtkCellArray> newLineSet = vtkSmartPointer<vtkCellArray>::New();
@@ -1275,7 +1275,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(DataNode* roi, 
   if (roi==nullptr || !(dynamic_cast<PlanarFigure*>(roi->GetData()) || dynamic_cast<PlanarFigureComposite*>(roi->GetData())) )
     return nullptr;
 
-  std::vector<long> tmp = ExtractFiberIdSubset(roi, storage);
+  std::vector<unsigned int> tmp = ExtractFiberIdSubset(roi, storage);
 
   if (tmp.size()<=0)
     return mitk::FiberBundle::New();
@@ -1286,9 +1286,9 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(DataNode* roi, 
   return fib;
 }
 
-std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(DataNode *roi, DataStorage* storage)
+std::vector<unsigned int> mitk::FiberBundle::ExtractFiberIdSubset(DataNode *roi, DataStorage* storage)
 {
-  std::vector<long> result;
+  std::vector<unsigned int> result;
   if (roi==nullptr || roi->GetData()==nullptr)
     return result;
 
@@ -1305,12 +1305,12 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(DataNode *roi, DataSto
     {
       MITK_INFO << "AND";
       result = this->ExtractFiberIdSubset(children->ElementAt(0), storage);
-      std::vector<long>::iterator it;
+      std::vector<unsigned int>::iterator it;
       for (unsigned int i=1; i<children->Size(); ++i)
       {
-        std::vector<long> inRoi = this->ExtractFiberIdSubset(children->ElementAt(i), storage);
+        std::vector<unsigned int> inRoi = this->ExtractFiberIdSubset(children->ElementAt(i), storage);
 
-        std::vector<long> rest(std::min(result.size(),inRoi.size()));
+        std::vector<unsigned int> rest(std::min(result.size(),inRoi.size()));
         it = std::set_intersection(result.begin(), result.end(), inRoi.begin(), inRoi.end(), rest.begin() );
         rest.resize( it - rest.begin() );
         result = rest;
@@ -1321,11 +1321,11 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(DataNode *roi, DataSto
     {
       MITK_INFO << "OR";
       result = ExtractFiberIdSubset(children->ElementAt(0), storage);
-      std::vector<long>::iterator it;
+      std::vector<unsigned int>::iterator it;
       for (unsigned int i=1; i<children->Size(); ++i)
       {
         it = result.end();
-        std::vector<long> inRoi = ExtractFiberIdSubset(children->ElementAt(i), storage);
+        std::vector<unsigned int> inRoi = ExtractFiberIdSubset(children->ElementAt(i), storage);
         result.insert(it, inRoi.begin(), inRoi.end());
       }
 
@@ -1338,15 +1338,15 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(DataNode *roi, DataSto
     case 2: // NOT
     {
       MITK_INFO << "NOT";
-      for(long i=0; i<this->GetNumFibers(); i++)
+      for(unsigned int i=0; i<this->GetNumFibers(); i++)
         result.push_back(i);
 
-      std::vector<long>::iterator it;
+      std::vector<unsigned int>::iterator it;
       for (unsigned int i=0; i<children->Size(); ++i)
       {
-        std::vector<long> inRoi = ExtractFiberIdSubset(children->ElementAt(i), storage);
+        std::vector<unsigned int> inRoi = ExtractFiberIdSubset(children->ElementAt(i), storage);
 
-        std::vector<long> rest(result.size()-inRoi.size());
+        std::vector<unsigned int> rest(result.size()-inRoi.size());
         it = std::set_difference(result.begin(), result.end(), inRoi.begin(), inRoi.end(), rest.begin() );
         rest.resize( it - rest.begin() );
         result = rest;

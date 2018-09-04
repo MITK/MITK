@@ -41,7 +41,7 @@ TractClusteringFilter::~TractClusteringFilter()
     delete m;
 }
 
-std::vector<std::vector<long> > TractClusteringFilter::GetOutFiberIndices() const
+std::vector<std::vector<unsigned int> > TractClusteringFilter::GetOutFiberIndices() const
 {
   return m_OutFiberIndices;
 }
@@ -131,7 +131,7 @@ std::vector<vnl_matrix<float> > TractClusteringFilter::ResampleFibers(mitk::Fibe
   return out_fib;
 }
 
-std::vector< TractClusteringFilter::Cluster > TractClusteringFilter::ClusterStep(std::vector< long > f_indices, std::vector<float> distances)
+std::vector< TractClusteringFilter::Cluster > TractClusteringFilter::ClusterStep(std::vector< unsigned int > f_indices, std::vector<float> distances)
 {
   float dist_thres = distances.back();
   distances.pop_back();
@@ -346,7 +346,7 @@ void TractClusteringFilter::MergeDuplicateClusters(std::vector< TractClusteringF
   MITK_INFO << "\nNumber of clusters after merging duplicates: " << clusters.size();
 }
 
-std::vector<TractClusteringFilter::Cluster> TractClusteringFilter::AddToKnownClusters(std::vector< long > f_indices, std::vector<vnl_matrix<float> >& centroids)
+std::vector<TractClusteringFilter::Cluster> TractClusteringFilter::AddToKnownClusters(std::vector< unsigned int > f_indices, std::vector<vnl_matrix<float> >& centroids)
 {
   float dist_thres = m_Distances.at(0);
   int N = f_indices.size();
@@ -440,7 +440,7 @@ void TractClusteringFilter::GenerateData()
     return;
   }
 
-  std::vector< long > f_indices;
+  std::vector< unsigned int > f_indices;
   for (unsigned int i=0; i<T.size(); ++i)
     f_indices.push_back(i);
   //  std::random_shuffle(f_indices.begin(), f_indices.end());

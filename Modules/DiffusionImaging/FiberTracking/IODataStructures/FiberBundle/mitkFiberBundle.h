@@ -105,7 +105,7 @@ public:
 
     // fiber subset extraction
     FiberBundle::Pointer           ExtractFiberSubset(DataNode *roi, DataStorage* storage);
-    std::vector<long>              ExtractFiberIdSubset(DataNode* roi, DataStorage* storage);
+    std::vector<unsigned int>      ExtractFiberIdSubset(DataNode* roi, DataStorage* storage);
     FiberBundle::Pointer           RemoveFibersOutside(ItkUcharImgType* mask, bool invert=false);
     float                          GetOverlap(ItkUcharImgType* mask);
     std::tuple<float, float>       GetDirectionalOverlap(ItkUcharImgType* mask, mitk::PeakImage::ItkPeakImageType* peak_image);
@@ -145,7 +145,7 @@ public:
     itkSetMacro( ReferenceGeometry, mitk::BaseGeometry::Pointer )
     itkGetConstMacro( ReferenceGeometry, mitk::BaseGeometry::Pointer )
 
-    vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds(std::vector<long> fiberIds, vtkSmartPointer<vtkFloatArray> weights);
+    vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds(std::vector<unsigned int> fiberIds, vtkSmartPointer<vtkFloatArray> weights);
 
 protected:
 

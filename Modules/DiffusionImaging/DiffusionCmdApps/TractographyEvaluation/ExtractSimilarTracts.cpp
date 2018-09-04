@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
           segmenter->SetMetrics({new mitk::ClusteringMetricEuclideanMax()});
         segmenter->Update();
 
-        std::vector< std::vector< long > > clusters = segmenter->GetOutFiberIndices();
+        std::vector< std::vector< unsigned int > > clusters = segmenter->GetOutFiberIndices();
         if (clusters.size()>0)
         {
           vtkSmartPointer<vtkFloatArray> weights = vtkSmartPointer<vtkFloatArray>::New();

@@ -20,9 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QStringList>
 
-QmitkLesionTreeItem::QmitkLesionTreeItem(mitk::SemanticTypes::ID lesionUID)
+QmitkLesionTreeItem::QmitkLesionTreeItem(mitk::LesionData lesionData/* = mitk::LesionTreeItemData()*/)
 {
-  m_LesionID = lesionUID;
+  m_ItemData = lesionData;
 }
 
 QmitkLesionTreeItem::~QmitkLesionTreeItem()
@@ -30,9 +30,9 @@ QmitkLesionTreeItem::~QmitkLesionTreeItem()
   // nothing here
 }
 
-QmitkLesionTreeItem::ChildPointer QmitkLesionTreeItem::GetChildInRow(int row) const
+void QmitkLesionTreeItem::SetParent(ParentPointer parent)
 {
-  return m_Children.at(row);
+  m_ParentItem = parent;
 }
 
 int QmitkLesionTreeItem::GetRow() const
@@ -42,7 +42,13 @@ int QmitkLesionTreeItem::GetRow() const
     return 0;
   }
 
-  auto it = std::find(m_Children.begin(), m_Children.end(), this->shared_from_this());
+  auto parentItem = m_ParentItem.lock();
+  return parentItem->GetRowOfChild(this->shared_from_this());
+}
+
+int QmitkLesionTreeItem::GetRowOfChild(ChildConstPointer child) const
+{
+  auto it = std::find(m_Children.begin(), m_Children.end(), child);
   if (it == m_Children.end())
   {
     return -1;
@@ -53,11 +59,6 @@ int QmitkLesionTreeItem::GetRow() const
   }
 }
 
-size_t QmitkLesionTreeItem::ChildCount() const
-{
-  return m_Children.size();
-}
-
 void QmitkLesionTreeItem::AddChild(ChildPointer child)
 {
   auto it = std::find(m_Children.begin(), m_Children.end(), child);
@@ -65,7 +66,8 @@ void QmitkLesionTreeItem::AddChild(ChildPointer child)
   {
     // child does not already exist; add to vector of children
     m_Children.push_back(child);
-    m_ParentItem = this->shared_from_this();
+    // add parent item
+    child->SetParent(this->shared_from_this());
   }
 }
 
@@ -78,7 +80,7 @@ void QmitkLesionTreeItem::RemoveChild(ChildPointer child)
   }
 }
 
-void QmitkLesionTreeItem::SetData(const mitk::SemanticTypes::Lesion& value)
+void QmitkLesionTreeItem::SetData(const mitk::LesionData& lesionData)
 {
-  m_ItemData.SetLesion(value);
+  m_ItemData = lesionData;
 }

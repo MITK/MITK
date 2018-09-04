@@ -99,9 +99,9 @@ namespace mitk
     *
     * @param caseID         The current case identifier is defined by the given string.
     * @param controlPoint   A specific control point which has to be available at a returned (found) lesion:
-    *                     Only those lesions are returned for which the image of the associated segmentation is linked to the given control point.
-    *                     If the control point instance does not exist, an empty vector is returned.
-    * @return             A vector of control points.
+    *                       Only those lesions are returned for which the image of the associated segmentation is linked to the given control point.
+    *                       If the control point instance does not exist, an empty vector is returned.
+    * @return               A vector of control points.
     */
     LesionVector GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const;
     /*
@@ -126,9 +126,27 @@ namespace mitk
     * @throw  SemanticRelationException, if the segmentation does not represent an existing lesion (this can be checked via 'IsRepresentingALesion').
     *
     * @param segmentationNode   The segmentation identifier is extracted from the given data node.
-    * @return                 The represented lesion.
+    * @return                   The represented lesion.
     */
     SemanticTypes::Lesion GetRepresentedLesion(const DataNode* segmentationNode) const;
+    /**
+    * @brief Return the lesion presence of a given lesion at a given control point.
+    *
+    * @param caseID         The current case identifier is defined by the given string.
+    * @param lesion         A lesion with a UID that identifies the corresponding lesion instance.
+    * @param controlPoint   A control point with a UID that identifies the corresponding control point instance.
+    * @return               True, if the lesion is present at the given control point; false otherwise.
+    */
+    bool GetLesionPresence(const SemanticTypes::CaseID& caseID, const mitk::SemanticTypes::Lesion& lesion, const mitk::SemanticTypes::ControlPoint& controllPoint) const;
+    /**
+    * @brief Return the lesion volume of a given lesion at a given control point.
+    *
+    * @param caseID         The current case identifier is defined by the given string.
+    * @param lesion         A lesion with a UID that identifies the corresponding lesion instance.
+    * @param controlPoint   A control point with a UID that identifies the corresponding control point instance.
+    * @return               A value indicating the lesion volume.
+    */
+    double GetLesionVolume(const SemanticTypes::CaseID& caseID, const mitk::SemanticTypes::Lesion& lesion, const mitk::SemanticTypes::ControlPoint& controllPoint) const;
     /*
     * @brief  Check if the given segmentation refers to an existing lesion instance.
     *         This function can be used before calling 'GetRepresentedLesion' in order to avoid a possible exception.
@@ -138,9 +156,13 @@ namespace mitk
     */
     bool IsRepresentingALesion(const DataNode* segmentationNode) const;
     /**
-    * @brief 
+    * @brief Check if the given data node exists in the relation storage.
+    *        The function receives the case- and the node-ID from the DICOM tags of the node itself.
+    *        It uses node predicates to decide if the node is an image or a segmentation node and searches
+    *        through the corresponding relations.
     *
-    *
+    * @param dataNode    A data node to check.
+    * @return            True, if the data node exists; false otherwise.
     */
     bool InstanceExists(const DataNode* dataNode) const;
     /*
@@ -151,8 +173,8 @@ namespace mitk
     * @pre    The data storage member has to be valid (!nullptr).
     * @throw  SemanticRelationException, if the data storage member is invalid (==nullptr).
     *
-    * @param caseID    The current case identifier is defined by the given string.
-    * @return        A vector of data nodes representing segmentations.
+    * @param caseID   The current case identifier is defined by the given string.
+    * @return         A vector of data nodes representing segmentations.
     */
     mitk::SemanticRelations::DataNodeVector GetAllSegmentationsOfCase(const SemanticTypes::CaseID& caseID) const;
     /*
@@ -166,7 +188,7 @@ namespace mitk
     *
     * @param caseID   The current case identifier is defined by the given string.
     * @param lesion   A Lesion with a UID that identifies the corresponding lesion instance.
-    * @return       A vector of data nodes representing segmentations that define the given lesion.
+    * @return         A vector of data nodes representing segmentations that define the given lesion.
     */
     DataNodeVector GetAllSegmentationsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const;
     /*
@@ -175,8 +197,8 @@ namespace mitk
     * @pre    The data storage member has to be valid (!nullptr).
     * @throw  SemanticRelationException, if the data storage member is invalid (==nullptr).
     *
-    * @param caseID    The current case identifier is defined by the given string.
-    * @return        A vector of data nodes representing images.
+    * @param caseID   The current case identifier is defined by the given string.
+    * @return         A vector of data nodes representing images.
     */
     DataNodeVector GetAllImagesOfCase(const SemanticTypes::CaseID& caseID) const;
     /*
@@ -188,7 +210,7 @@ namespace mitk
     *
     * @param caseID   The current case identifier is defined by the given string.
     * @param lesion   A Lesion with a UID that identifies the corresponding lesion instance.
-    * @return       A vector of data nodes representing images on which the lesions are visible.
+    * @return         A vector of data nodes representing images on which the lesions are visible.
     */
     DataNodeVector GetAllImagesOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const;
     /*
@@ -198,7 +220,7 @@ namespace mitk
     *
     * @param caseID   The current case identifier is defined by the given string.
     * @param lesion   A Lesion with a UID that identifies the corresponding lesion instance.
-    * @return       True, if the lesion instance exists; false otherwise.
+    * @return         True, if the lesion instance exists; false otherwise.
     */
     bool InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const;
     /*
@@ -249,7 +271,7 @@ namespace mitk
     *
     * @param caseID         The current case identifier is defined by the given string.
     * @param controlPoint   A control point with a UID that identifies the corresponding control point instance.
-    * @return             A vector of image nodes that link to the given control point.
+    * @return               A vector of image nodes that link to the given control point.
     */
     DataNodeVector GetAllImagesOfControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const;
     /*

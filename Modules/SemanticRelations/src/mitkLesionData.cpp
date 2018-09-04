@@ -14,21 +14,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// semantic relations UI
-#include "mitkLesionItemData.h"
+// semantic relations module
+#include "mitkLesionData.h"
 
-mitk::LesionItemData::LesionItemData()
-{
-  // nothing here
-}
-
-
-mitk::LesionItemData::~LesionItemData()
-{
-  // nothing here
-}
-
-void mitk::LesionItemData::SetLesion(const mitk::SemanticTypes::Lesion& lesion)
+mitk::LesionData::LesionData(const SemanticTypes::Lesion& lesion/* = SemanticTypes::Lesion()*/)
 {
   m_Lesion = lesion;
+}
+
+mitk::LesionData::~LesionData()
+{
+  // nothing here
+}
+
+void mitk::LesionData::SetLesion(const SemanticTypes::Lesion& lesion)
+{
+  m_Lesion = lesion;
+}
+
+void mitk::LesionData::SetLesionPresence(const std::vector<bool>& lesionPresence)
+{
+  m_LesionPresence = lesionPresence;
+}
+
+void mitk::LesionData::SetLesionVolume(const std::vector<double>& lesionVolume)
+{
+  m_LesionVolume = lesionVolume;
 }

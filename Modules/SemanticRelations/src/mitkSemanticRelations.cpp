@@ -156,6 +156,50 @@ mitk::SemanticTypes::Lesion mitk::SemanticRelations::GetRepresentedLesion(const 
   }
 }
 
+bool mitk::SemanticRelations::GetLesionPresence(const SemanticTypes::CaseID& caseID, const mitk::SemanticTypes::Lesion& lesion, const mitk::SemanticTypes::ControlPoint& controllPoint) const
+{
+  try
+  {
+    mitk::SemanticRelations::DataNodeVector allImagesOfLesion = GetAllImagesOfLesion(caseID, lesion);
+    for (const auto& image : allImagesOfLesion)
+    {
+      auto imageControlPoint = GetControlPointOfImage(image);
+      if (imageControlPoint == controllPoint)
+      {
+        return true;
+      }
+    }
+  }
+  catch (const mitk::SemanticRelationException&)
+  {
+    return false;
+  }
+
+  return false;
+}
+
+double mitk::SemanticRelations::GetLesionVolume(const SemanticTypes::CaseID& caseID, const mitk::SemanticTypes::Lesion& lesion, const mitk::SemanticTypes::ControlPoint& controllPoint) const
+{
+  try
+  {
+    mitk::SemanticRelations::DataNodeVector allImagesOfLesion = GetAllImagesOfLesion(caseID, lesion);
+    for (const auto& image : allImagesOfLesion)
+    {
+      auto imageControlPoint = GetControlPointOfImage(image);
+      if (imageControlPoint == controllPoint)
+      {
+        return 1.0;
+      }
+    }
+  }
+  catch (const mitk::SemanticRelationException&)
+  {
+    return 0.0;
+  }
+
+  return 0.0;
+}
+
 bool mitk::SemanticRelations::IsRepresentingALesion(const DataNode* segmentationNode) const
 {
   try

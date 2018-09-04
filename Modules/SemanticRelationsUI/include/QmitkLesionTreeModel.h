@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*
 * @brief 
 */
-class MITKSEMANTICRELATIONSUI_EXPORT QmitkLesionTreeModel: public QmitkAbstractSemanticRelationsStorageModel
+class MITKSEMANTICRELATIONSUI_EXPORT QmitkLesionTreeModel : public QmitkAbstractSemanticRelationsStorageModel
 {
   Q_OBJECT 
    
@@ -75,7 +75,7 @@ protected:
 private:
 
   void SetLesionData();
-  void AddLesion(mitk::SemanticTypes::Lesion lesion);
+  void AddLesion(const mitk::SemanticTypes::Lesion& lesion);
 
   QmitkLesionTreeItem* GetItemByIndex(const QModelIndex& index) const;
 

@@ -574,9 +574,10 @@ void mitk::FiberBundle::ColorFibersByOrientation()
   //  + one fiber with 0 points
   //=================================================
 
-  vtkPoints* extrPoints = nullptr;
-  extrPoints = m_FiberPolyData->GetPoints();
-  auto numOfPoints = extrPoints->GetNumberOfPoints();
+  vtkPoints* extrPoints = m_FiberPolyData->GetPoints();
+  vtkIdType numOfPoints = 0;
+  if (extrPoints!=nullptr)
+    numOfPoints = extrPoints->GetNumberOfPoints();
 
   //colors and alpha value for each single point, RGBA = 4 components
   unsigned char rgba[4] = {0,0,0,0};

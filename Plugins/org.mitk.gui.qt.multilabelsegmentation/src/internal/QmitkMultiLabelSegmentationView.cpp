@@ -30,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanePositionManager.h"
 #include "mitkPluginActivator.h"
 #include "mitkSegTool2D.h"
-#include "mitkDICOMSegmentationPropertyHelper.cpp"
 
 // Qmitk
 #include "QmitkNewSegmentationDialog.h"
@@ -358,9 +357,6 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
     segName = "Unnamed";
   }
   workingImage->GetActiveLabelSet()->AddLabel(segName.toStdString(), dialog->GetColor());
-  // Set specific DICOM SEG properties for the label
-  mitk::DICOMSegmentationPropertyHandler::GetDICOMSegmentProperties(
-    workingImage->GetActiveLabel(workingImage->GetActiveLayer()));
 
   UpdateControls();
   m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
@@ -425,10 +421,6 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
 
   workingImage->GetExteriorLabel()->SetProperty("name.parent", mitk::StringProperty::New(referenceNode->GetName().c_str()));
   workingImage->GetExteriorLabel()->SetProperty("name.image", mitk::StringProperty::New(newName.toStdString().c_str()));
-  // Set DICOM SEG properties for segmentation session
-  mitk::PropertyList::Pointer dicomSegPropertyList =
-    mitk::DICOMSegmentationPropertyHandler::GetDICOMSegmentationProperties(referenceImage->GetPropertyList());
-  workingImage->GetPropertyList()->ConcatenatePropertyList(dicomSegPropertyList);
 
   if (!GetDataStorage()->Exists(workingNode))
   {

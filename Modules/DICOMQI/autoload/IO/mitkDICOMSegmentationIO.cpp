@@ -44,8 +44,8 @@ namespace mitk
 {
   DICOMSegmentationIO::DICOMSegmentationIO()
     : AbstractFileIO(LabelSetImage::GetStaticNameOfClass(),
-                     mitk::MitkDICOMQIIOMimeTypes::DICOMQI_MIMETYPE_NAME(),
-                     "DICOM Segmentation")
+      mitk::MitkDICOMQIIOMimeTypes::DICOMQI_MIMETYPE_NAME(),
+      "DICOM Segmentation")
   {
     AbstractFileWriter::SetRanking(10);
     AbstractFileReader::SetRanking(10);
@@ -112,8 +112,8 @@ namespace mitk
       mitkThrow() << "Cannot write non-image data";
 
     // Get DICOM information from referenced image
-    vector<DcmDataset *> dcmDatasets;
-    DcmFileFormat *readFileFormat = new DcmFileFormat();
+    vector<std::unique_ptr<DcmDataset>> dcmDatasetsSourceImage;
+    std::unique_ptr<DcmFileFormat> readFileFormat(new DcmFileFormat());
     try
     {
       // TODO: Generate dcmdataset witk DICOM tags from property list; ATM the source are the filepaths from the
@@ -134,7 +134,10 @@ namespace mitk
       {
         const char *fileName = (it.second).c_str();
         if (readFileFormat->loadFile(fileName, EXS_Unknown).good())
-          dcmDatasets.push_back(readFileFormat->getAndRemoveDataset());
+        {
+          std::unique_ptr<DcmDataset> readDCMDataset(readFileFormat->getAndRemoveDataset());
+          dcmDatasetsSourceImage.push_back(std::move(readDCMDataset));
+        }
       }
     }
     catch (const std::exception &e)
@@ -158,8 +161,6 @@ namespace mitk
         // Cast mitk layer image to itk
         ImageToItk<itkInputImageType>::Pointer imageToItkFilter = ImageToItk<itkInputImageType>::New();
         imageToItkFilter->SetInput(mitkLayerImage);
-        imageToItkFilter->Update();
-
         // Cast from original itk type to dcmqi input itk image type
         typedef itk::CastImageFilter<itkInputImageType, itkInternalImageType> castItkImageFilterType;
         castItkImageFilterType::Pointer castFilter = castItkImageFilterType::New();
@@ -197,17 +198,22 @@ namespace mitk
       }
 
       // Create segmentation meta information
-      const std::string &tmpMetaInfoFile = this->CreateMetaDataJsonFile(layer);
+      const std::string tmpMetaInfoFile = this->CreateMetaDataJsonFile(layer);
 
       MITK_INFO << "Writing image: " << path << std::endl;
       try
       {
+        //TODO is there a better way? Interface expects a vector of raw pointer.
+        vector<DcmDataset*> rawVecDataset;
+        for (const auto& dcmDataSet : dcmDatasetsSourceImage)
+          rawVecDataset.push_back(dcmDataSet.get());
+
         // Convert itk segmentation images to dicom image
-        dcmqi::ImageSEGConverter *converter = new dcmqi::ImageSEGConverter();
-        DcmDataset *result = converter->itkimage2dcmSegmentation(dcmDatasets, segmentations, tmpMetaInfoFile);
+        std::unique_ptr<dcmqi::ImageSEGConverter> converter = std::make_unique<dcmqi::ImageSEGConverter>();
+        std::unique_ptr<DcmDataset> result(converter->itkimage2dcmSegmentation(rawVecDataset, segmentations, tmpMetaInfoFile));
 
         // Write dicom file
-        DcmFileFormat dcmFileFormat(result);
+        DcmFileFormat dcmFileFormat(result.get());
 
         std::string filePath = path.substr(0, path.find_last_of("."));
         // If there is more than one layer, we have to write more than 1 dicom file
@@ -217,12 +223,6 @@ namespace mitk
           filePath = filePath + ".dcm";
 
         dcmFileFormat.saveFile(filePath.c_str(), EXS_LittleEndianExplicit);
-
-        // Clean up
-        if (converter != nullptr)
-          delete converter;
-        if (result != nullptr)
-          delete result;
       }
       catch (const std::exception &e)
       {
@@ -230,14 +230,6 @@ namespace mitk
         return;
       }
     } // Write a dcm file for the next layer
-
-    // End of image writing; clean up
-    if (readFileFormat)
-      delete readFileFormat;
-
-    for (auto obj : dcmDatasets)
-      delete obj;
-    dcmDatasets.clear();
   }
 
   IFileIO::ConfidenceLevel DICOMSegmentationIO::GetReaderConfidenceLevel() const
@@ -292,7 +284,7 @@ namespace mitk
 
       //=============================== dcmqi part ====================================
       // Read the DICOM SEG images (segItkImages) and DICOM tags (metaInfo)
-      dcmqi::ImageSEGConverter *converter = new dcmqi::ImageSEGConverter();
+      std::unique_ptr<dcmqi::ImageSEGConverter> converter = std::make_unique<dcmqi::ImageSEGConverter>();
       pair<map<unsigned, itkInternalImageType::Pointer>, string> dcmqiOutput =
         converter->dcmSegmentation2itkimage(dataSet);
 
@@ -360,7 +352,7 @@ namespace mitk
             labelName = "Unnamed";
         }
 
-        float tmp[3] = {0.0, 0.0, 0.0};
+        float tmp[3] = { 0.0, 0.0, 0.0 };
         if (segmentAttribute->getRecommendedDisplayRGBValue() != nullptr)
         {
           tmp[0] = segmentAttribute->getRecommendedDisplayRGBValue()[0] / 255.0;
@@ -409,7 +401,7 @@ namespace mitk
       }
 
       mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
-      scanner->SetInputFiles({GetInputLocation()});
+      scanner->SetInputFiles({ GetInputLocation() });
       scanner->AddTagPaths(tagsOfInterestList);
       scanner->Scan();
 
@@ -426,10 +418,6 @@ namespace mitk
       // Set active layer to the first layer of the labelset image
       if (labelSetImage->GetNumberOfLayers() > 1 && labelSetImage->GetActiveLayer() != 0)
         labelSetImage->SetActiveLayer(0);
-
-      // Clean up
-      if (converter != nullptr)
-        delete converter;
     }
     catch (const std::exception &e)
     {
@@ -442,9 +430,7 @@ namespace mitk
       return result;
     }
 
-
     result.push_back(labelSetImage.GetPointer());
-
     return result;
   }
 
@@ -458,25 +444,25 @@ namespace mitk
     // 1. Metadata attributes that will be listed in the resulting DICOM SEG object
     std::string contentCreatorName;
     if (!image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0070, 0x0084).c_str(),
-                                                     contentCreatorName))
+      contentCreatorName))
       contentCreatorName = "MITK";
     handler.setContentCreatorName(contentCreatorName);
 
     std::string clinicalTrailSeriesId;
     if (!image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0071).c_str(),
-                                                     clinicalTrailSeriesId))
+      clinicalTrailSeriesId))
       clinicalTrailSeriesId = "Session 1";
     handler.setClinicalTrialSeriesID(clinicalTrailSeriesId);
 
     std::string clinicalTrialTimePointID;
     if (!image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0050).c_str(),
-                                                     clinicalTrialTimePointID))
+      clinicalTrialTimePointID))
       clinicalTrialTimePointID = "0";
     handler.setClinicalTrialTimePointID(clinicalTrialTimePointID);
 
     std::string clinicalTrialCoordinatingCenterName = "";
     if (!image->GetPropertyList()->GetStringProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0060).c_str(),
-                                                     clinicalTrialCoordinatingCenterName))
+      clinicalTrialCoordinatingCenterName))
       clinicalTrialCoordinatingCenterName = "Unknown";
     handler.setClinicalTrialCoordinatingCenterName(clinicalTrialCoordinatingCenterName);
 
@@ -553,7 +539,7 @@ namespace mitk
           segmentAttribute->setSegmentAlgorithmType(algorithmTypeProp->GetValueAsString());
           segmentAttribute->setSegmentAlgorithmName("MITK Segmentation");
           if (segmentCategoryCodeValueProp != nullptr && segmentCategoryCodeSchemeProp != nullptr &&
-              segmentCategoryCodeMeaningProp != nullptr)
+            segmentCategoryCodeMeaningProp != nullptr)
             segmentAttribute->setSegmentedPropertyCategoryCodeSequence(
               segmentCategoryCodeValueProp->GetValueAsString(),
               segmentCategoryCodeSchemeProp->GetValueAsString(),
@@ -564,11 +550,11 @@ namespace mitk
               "M-01000", "SRT", "Morphologically Altered Structure");
 
           if (segmentTypeCodeValueProp != nullptr && segmentTypeCodeSchemeProp != nullptr &&
-              segmentTypeCodeMeaningProp != nullptr)
+            segmentTypeCodeMeaningProp != nullptr)
           {
             segmentAttribute->setSegmentedPropertyTypeCodeSequence(segmentTypeCodeValueProp->GetValueAsString(),
-                                                                   segmentTypeCodeSchemeProp->GetValueAsString(),
-                                                                   segmentTypeCodeMeaningProp->GetValueAsString());
+              segmentTypeCodeSchemeProp->GetValueAsString(),
+              segmentTypeCodeMeaningProp->GetValueAsString());
             handler.setBodyPartExamined(segmentTypeCodeMeaningProp->GetValueAsString());
           }
           else
@@ -578,7 +564,7 @@ namespace mitk
             handler.setBodyPartExamined("Mass");
           }
           if (segmentModifierCodeValueProp != nullptr && segmentModifierCodeSchemeProp != nullptr &&
-              segmentModifierCodeMeaningProp != nullptr)
+            segmentModifierCodeMeaningProp != nullptr)
             segmentAttribute->setSegmentedPropertyTypeModifierCodeSequence(
               segmentModifierCodeValueProp->GetValueAsString(),
               segmentModifierCodeSchemeProp->GetValueAsString(),
@@ -597,16 +583,16 @@ namespace mitk
     // Segment Number:Identification number of the segment.The value of Segment Number(0062, 0004) shall be unique
     // within the Segmentation instance in which it is created
     label->SetProperty(DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_NUMBER_PATH()).c_str(),
-                       TemporoSpatialStringProperty::New(std::to_string(label->GetValue())));
+      TemporoSpatialStringProperty::New(std::to_string(label->GetValue())));
 
     // Segment Label: User-defined label identifying this segment.
     label->SetProperty(DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_LABEL_PATH()).c_str(),
-                       TemporoSpatialStringProperty::New(label->GetName()));
+      TemporoSpatialStringProperty::New(label->GetName()));
 
     // Segment Algorithm Type: Type of algorithm used to generate the segment.
     if (!segmentAttribute->getSegmentAlgorithmType().empty())
       label->SetProperty(DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_ALGORITHM_TYPE_PATH()).c_str(),
-                         TemporoSpatialStringProperty::New(segmentAttribute->getSegmentAlgorithmType()));
+        TemporoSpatialStringProperty::New(segmentAttribute->getSegmentAlgorithmType()));
 
     // Add Segmented Property Category Code Sequence tags
     auto categoryCodeSequence = segmentAttribute->getSegmentedPropertyCategoryCodeSequence();
@@ -638,7 +624,7 @@ namespace mitk
       OFString codeValue; // (0008,0100) Code Value
       typeCodeSequence->getCodeValue(codeValue);
       label->SetProperty(DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_TYPE_CODE_VALUE_PATH()).c_str(),
-                         TemporoSpatialStringProperty::New(codeValue.c_str()));
+        TemporoSpatialStringProperty::New(codeValue.c_str()));
 
       OFString codeScheme; // (0008,0102) Coding Scheme Designator
       typeCodeSequence->getCodingSchemeDesignator(codeScheme);

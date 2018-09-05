@@ -265,11 +265,6 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode(Image *original,
     return nullptr;
   }
 
-  // Add some DICOM Tags as properties to segmentation image
-  PropertyList::Pointer dicomSegPropertyList = mitk::DICOMSegmentationPropertyHandler::GetDICOMSegmentationProperties(original->GetPropertyList());
-  segmentation->GetPropertyList()->ConcatenatePropertyList(dicomSegPropertyList);
-  mitk::DICOMSegmentationPropertyHandler::GetDICOMSegmentProperties(segmentation->GetActiveLabel(segmentation->GetActiveLayer()));
-
   return CreateSegmentationNode(segmentation, organName, color);
 }
 

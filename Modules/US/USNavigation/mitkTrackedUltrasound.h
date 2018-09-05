@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKUSCombinedModality_H_HEADER_INCLUDED_
-#define MITKUSCombinedModality_H_HEADER_INCLUDED_
+#ifndef __mitkTrackedUltrasound_h
+#define __mitkTrackedUltrasound_h
 
 #include <MitkUSNavigationExports.h>
 #include "mitkUSDevice.h"
@@ -23,18 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAbstractUltrasoundTrackerDevice.h"
 #include "mitkNavigationDataSource.h"
 
-// Microservices
-#include <mitkServiceInterface.h>
-#include <usServiceRegistration.h>
-
 namespace itk {
   template<class T> class SmartPointer;
 }
 
 namespace mitk {
-  class USControlInterfaceBMode;
-  class USControlInterfaceProbes;
-  class USControlInterfaceDoppler;
 
   /**
    * \brief Combination of USDevice and NavigationDataSource.
@@ -46,18 +39,21 @@ namespace mitk {
    * The ultrasound images are transformed according to this calibration in the
    * GenerateData() method.
    */
-  class MITKUSNAVIGATION_EXPORT USCombinedModality : public mitk::AbstractUltrasoundTrackerDevice
+  class MITKUSNAVIGATION_EXPORT TrackedUltrasound : public mitk::AbstractUltrasoundTrackerDevice
   {
   public:
 
-    mitkClassMacro(USCombinedModality, mitk::AbstractUltrasoundTrackerDevice);
-    mitkNewMacro3Param(USCombinedModality, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, bool);
+    mitkClassMacro(TrackedUltrasound, mitk::AbstractUltrasoundTrackerDevice);
+    mitkNewMacro3Param(TrackedUltrasound, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, bool);
+
+
+
 
   protected:
-    USCombinedModality( USDevice::Pointer usDevice,
+    TrackedUltrasound(  USDevice::Pointer usDevice,
                         itk::SmartPointer<NavigationDataSource> trackingDevice,
-                        bool trackedUltrasoundActive = false );
-    virtual ~USCombinedModality();
+                        bool trackedUltrasoundActive = true );
+    virtual ~TrackedUltrasound();
 
     /**
     * \brief Grabs the next frame from the input.
@@ -67,5 +63,4 @@ namespace mitk {
 
   };
 } // namespace mitk
-
-#endif // MITKUSCombinedModality_H_HEADER_INCLUDED_
+#endif // __mitkTrackedUltrasound_h

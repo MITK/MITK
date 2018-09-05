@@ -45,10 +45,10 @@ public:
   explicit QmitkUSCombinedModalityEditWidget(QWidget *parent = 0);
   ~QmitkUSCombinedModalityEditWidget();
 
-  void SetCombinedModality(mitk::USCombinedModality::Pointer combinedModality);
+  void SetCombinedModality(mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality);
 
 private:
-  mitk::USCombinedModality::Pointer                m_CombinedModality;
+  mitk::AbstractUltrasoundTrackerDevice::Pointer                m_CombinedModality;
 
   std::string                                      m_LastCalibrations;
 

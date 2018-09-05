@@ -23,7 +23,6 @@ set(INTERNAL_CPP_FILES
   Widgets/QmitkUSCombinedModalityCreationWidget.cpp
   Widgets/QmitkUSCombinedModalityEditWidget.cpp
   Widgets/QmitkUSNavigationFreezeButton.cpp
-  Widgets/QmitkUSNavigationProcessWidget.cpp
   Widgets/QmitkUSNavigationZoneDistancesWidget.cpp
   Widgets/QmitkUSZoneManagementWidget.cpp
   Widgets/QmitkZoneProgressBar.cpp
@@ -56,7 +55,6 @@ set(UI_FILES
 
   src/internal/Widgets/QmitkUSCombinedModalityCreationWidget.ui
   src/internal/Widgets/QmitkUSCombinedModalityEditWidget.ui
-  src/internal/Widgets/QmitkUSNavigationProcessWidget.ui
   src/internal/Widgets/QmitkUSZoneManagementWidget.ui
 
   src/internal/NavigationStepWidgets/QmitkUSAbstractNavigationStep.ui
@@ -72,7 +70,6 @@ set(UI_FILES
 
 set(MOC_H_FILES
   src/internal/org_mbi_gui_qt_usnavigation_Activator.h
-  #src/internal/USNavigation.h //not functional anymore. Delete code?
   src/internal/QmitkUltrasoundCalibration.h
   src/internal/QmitkUSNavigationMarkerPlacement.h
   src/internal/QmitkUSZonesDataModel.h
@@ -86,7 +83,6 @@ set(MOC_H_FILES
   src/internal/Widgets/QmitkUSCombinedModalityCreationWidget.h
   src/internal/Widgets/QmitkUSCombinedModalityEditWidget.h
   src/internal/Widgets/QmitkUSNavigationFreezeButton.h
-  src/internal/Widgets/QmitkUSNavigationProcessWidget.h
   src/internal/Widgets/QmitkUSNavigationZoneDistancesWidget.h
   src/internal/Widgets/QmitkUSZoneManagementWidget.h
   src/internal/Widgets/QmitkZoneProgressBar.h

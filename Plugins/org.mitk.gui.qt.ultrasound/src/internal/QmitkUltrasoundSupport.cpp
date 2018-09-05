@@ -126,6 +126,13 @@ void QmitkUltrasoundSupport::CreateQtPartControl(QWidget *parent)
     connect(m_Controls->m_DeviceManagerWidget, SIGNAL(EditDeviceButtonClicked(mitk::USDevice::Pointer)), this, SLOT(OnClickedEditDevice())); //Change Widget Visibilities
     connect(m_Controls->m_DeviceManagerWidget, SIGNAL(EditDeviceButtonClicked(mitk::USDevice::Pointer)), this->m_Controls->m_NewVideoDeviceWidget, SLOT(EditDevice(mitk::USDevice::Pointer)));
 
+    connect(m_Controls->m_SetXPoint1, SIGNAL(clicked()), this, SLOT(SetXPoint1()));
+    connect(m_Controls->m_SetXPoint2, SIGNAL(clicked()), this, SLOT(SetXPoint2()));
+    connect(m_Controls->m_SetYPoint1, SIGNAL(clicked()), this, SLOT(SetYPoint1()));
+    connect(m_Controls->m_SetYPoint2, SIGNAL(clicked()), this, SLOT(SetYPoint2()));
+    connect(m_Controls->m_SaveSpacing, SIGNAL(clicked()), this, SLOT(WriteSpacingToDevice()));
+
+
     // Initializations
     m_Controls->m_NewVideoDeviceWidget->setVisible(false);
     std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "="
@@ -531,3 +538,43 @@ void QmitkUltrasoundSupport::SetTimerIntervals(int intervalPipeline, int interva
   m_RenderingTimer2d->setInterval(interval2D);
   m_RenderingTimer3d->setInterval(interval3D);
 }
+
+
+/* Spacing methods */
+void QmitkUltrasoundSupport::SetXPoint1()
+{
+  m_Xpoint1 = this->GetRenderWindowPart()->GetSelectedPosition();
+  m_XSpacing = ComputeSpacing(m_Xpoint1, m_Xpoint2, m_Controls->m_XDistance->value());
+  m_Controls->m_XSpacing->setText(QString("X Spacing: ") + QString::number(m_XSpacing) + " mm");
+}
+void QmitkUltrasoundSupport::SetXPoint2()
+{
+  m_Xpoint2 = this->GetRenderWindowPart()->GetSelectedPosition();
+  m_XSpacing = ComputeSpacing(m_Xpoint1, m_Xpoint2, m_Controls->m_XDistance->value());
+  m_Controls->m_XSpacing->setText(QString("X Spacing: ") + QString::number(m_XSpacing) + " mm");
+}
+void QmitkUltrasoundSupport::SetYPoint1()
+{
+  m_Ypoint1 = this->GetRenderWindowPart()->GetSelectedPosition();
+  m_YSpacing = ComputeSpacing(m_Ypoint1, m_Ypoint2, m_Controls->m_YDistance->value());
+  m_Controls->m_YSpacing->setText(QString("Y Spacing: ") + QString::number(m_YSpacing) + " mm");
+}
+void QmitkUltrasoundSupport::SetYPoint2()
+{
+  m_Ypoint2 = this->GetRenderWindowPart()->GetSelectedPosition();
+  m_YSpacing = ComputeSpacing(m_Ypoint1, m_Ypoint2, m_Controls->m_YDistance->value());
+  m_Controls->m_YSpacing->setText(QString("Y Spacing: ") + QString::number(m_YSpacing) + " mm");
+}
+void QmitkUltrasoundSupport::WriteSpacingToDevice()
+{
+  this->m_Device->SetSpacing(m_XSpacing, m_YSpacing);
+  MITK_INFO << "Spacing saved to device object, please save device data to permanently store the spacing.";
+}
+double QmitkUltrasoundSupport::ComputeSpacing(mitk::Point3D p1, mitk::Point3D p2, double distance)
+{
+  double spacing = 0;
+  double pointDistance = p1.EuclideanDistanceTo(p2);
+  spacing = distance / pointDistance;
+  return spacing;
+}
+

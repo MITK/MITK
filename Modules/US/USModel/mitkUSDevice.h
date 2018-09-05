@@ -319,7 +319,6 @@ namespace mitk {
 
     virtual void SetSpacing(double xSpacing, double ySpacing);
 
-
   protected:
 
     // Threading-Related

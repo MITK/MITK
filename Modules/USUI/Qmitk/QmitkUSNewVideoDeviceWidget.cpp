@@ -303,6 +303,7 @@ void QmitkUSNewVideoDeviceWidget::CreateNewDevice()
 
   m_TargetDevice = nullptr;
   m_ConfigProbes.clear();
+  m_ConfigProbes.clear();
   m_Active = true;
 }
 

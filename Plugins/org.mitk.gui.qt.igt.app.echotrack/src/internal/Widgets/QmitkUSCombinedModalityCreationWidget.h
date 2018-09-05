@@ -57,6 +57,8 @@ public:
 
 private:
   Ui::QmitkUSCombinedModalityCreationWidget *ui;
+
+  itk::SmartPointer<mitk::AbstractUltrasoundTrackerDevice> m_CombinedModality;
 };
 
 #endif // QMITKUSCOMBINEDMODALITYCREATIONWIDGET_H

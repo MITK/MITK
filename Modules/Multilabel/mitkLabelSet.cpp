@@ -15,6 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkLabelSet.h"
+#include "mitkDICOMSegmentationPropertyHelper.h"
+
 #include <itkCommand.h>
 
 mitk::LabelSet::LabelSet() : m_ActiveLabelValue(0), m_Layer(0)
@@ -131,6 +133,9 @@ void mitk::LabelSet::AddLabel(mitk::Label *label)
   m_LabelContainer[pixelValue] = newLabel;
   UpdateLookupTable(pixelValue);
 
+  // add DICOM information of the label
+  DICOMSegmentationPropertyHandler::SetDICOMSegmentProperties(newLabel);
+
   itk::SimpleMemberCommand<LabelSet>::Pointer command = itk::SimpleMemberCommand<LabelSet>::New();
   command->SetCallbackFunction(this, &LabelSet::OnLabelModified);
   newLabel->AddObserver(itk::ModifiedEvent(), command);
@@ -157,6 +162,9 @@ void mitk::LabelSet::RenameLabel(PixelType pixelValue, const std::string &name, 
   mitk::Label *label = GetLabel(pixelValue);
   label->SetName(name);
   label->SetColor(color);
+
+  // change DICOM information of the label
+  DICOMSegmentationPropertyHandler::SetDICOMSegmentProperties(label);
 }
 
 void mitk::LabelSet::SetLookupTable(mitk::LookupTable *lut)

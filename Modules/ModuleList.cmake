@@ -14,6 +14,7 @@ set(MITK_MODULES
   MapperExt
   DICOMReader
   DICOMReaderServices
+  DICOMQI
   DICOMTesting
   SceneSerializationBase
   PlanarFigure

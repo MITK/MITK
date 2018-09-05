@@ -23,22 +23,38 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  /// Provides the custom mime types for dicom segmentation objects loaded with DCMQI
+  /// Provides the custom mime types for dicom qi objects loaded with DCMQI
   class MitkDICOMQIIOMimeTypes
   {
   public:
     /** Mime type that parses dicom files to determine whether they are dicom segmentation objects.
     */
-    class MitkDICOMQIMimeType : public CustomMimeType
+    class MitkDICOMSEGMimeType : public CustomMimeType
     {
     public:
-      MitkDICOMQIMimeType();
+      MitkDICOMSEGMimeType();
       bool AppliesTo(const std::string &path) const override;
-      MitkDICOMQIMimeType *Clone() const override;
+      MitkDICOMSEGMimeType *Clone() const override;
     };
 
-    static MitkDICOMQIMimeType DICOMQI_MIMETYPE();
-    static std::string DICOMQI_MIMETYPE_NAME();
+    static MitkDICOMSEGMimeType DICOMSEG_MIMETYPE();
+    static std::string DICOMSEG_MIMETYPE_NAME();
+
+    /** Mime type that parses dicom files to determine whether they are dicom pm objects.
+    */
+    /*
+    class MitkDICOMPMMimeType : public CustomMimeType
+    {
+    public:
+      MitkDICOMPMMimeType();
+      virtual bool AppliesTo(const std::string &path) const override;
+      virtual MitkDICOMPMMimeType *Clone() const override;
+    };
+
+    static MitkDICOMPMMimeType DICOMPM_MIMETYPE();
+    static std::string DICOMPM_MIMETYPE_NAME();
+    */
+
 
     // Get all Mime Types
     static std::vector<CustomMimeType *> Get();

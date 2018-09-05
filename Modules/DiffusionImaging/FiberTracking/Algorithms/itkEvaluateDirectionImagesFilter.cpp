@@ -278,7 +278,8 @@ void ComparePeakImagesFilter< PixelType >::GenerateData()
   }
 
   std::sort( m_AngularErrorVector.begin(), m_AngularErrorVector.end() );
-  m_MeanAngularError /= m_AngularErrorVector.size();      // mean
+  if (!m_AngularErrorVector.empty())
+    m_MeanAngularError /= m_AngularErrorVector.size();      // mean
 
 
   for (unsigned int i=0; i<m_AngularErrorVector.size(); i++)

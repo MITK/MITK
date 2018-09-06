@@ -59,6 +59,17 @@ namespace Utilities
     m_pool.join_all();
   }
 
+  void ThreadPool::Reset()
+  {
+    if (m_work) {
+      m_work = boost::none;
+    }
+    m_service.stop();
+    m_pool.join_all();
+    m_service.reset();
+    m_work = boost::in_place<boost::asio::io_service::work>(boost::ref(m_service));
+  }
+
   void ThreadPool::AddThreads(size_t count)
   {
     const boost::unique_lock<boost::shared_mutex> lock(m_guard);

@@ -516,12 +516,15 @@ void QmitkStreamlineTrackingView::DeleteTrackingHandler()
 {
   if (!m_ThreadIsRunning && m_TrackingHandler != nullptr)
   {
+    if (m_TrackingPriorHandler != nullptr)
+    {
+      delete m_TrackingPriorHandler;
+      m_TrackingPriorHandler = nullptr;
+    }
     delete m_TrackingHandler;
     m_TrackingHandler = nullptr;
     m_DeleteTrackingHandler = false;
     m_LastPrior = "";
-    if (m_TrackingPriorHandler != nullptr)
-      delete m_TrackingPriorHandler;
   }
   else if (m_ThreadIsRunning)
   {

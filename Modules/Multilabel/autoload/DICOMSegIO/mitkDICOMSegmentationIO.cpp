@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLocaleSwitch.h>
 #include <mitkPropertyNameHelper.h>
 
+
 // itk
 #include <itkThresholdImageFilter.h>
 
@@ -44,7 +45,7 @@ namespace mitk
 {
   DICOMSegmentationIO::DICOMSegmentationIO()
     : AbstractFileIO(LabelSetImage::GetStaticNameOfClass(),
-      mitk::MitkDICOMQIIOMimeTypes::DICOMQI_MIMETYPE_NAME(),
+      mitk::MitkDICOMQIIOMimeTypes::DICOMSEG_MIMETYPE_NAME(),
       "DICOM Segmentation")
   {
     AbstractFileWriter::SetRanking(10);
@@ -477,10 +478,8 @@ namespace mitk
 
     const LabelSet *labelSet = image->GetLabelSet(layer);
     auto labelIter = labelSet->IteratorConstBegin();
-    MITK_INFO << labelIter->second->GetValue();
     // Ignore background label
     ++labelIter;
-    MITK_INFO << labelIter->second->GetValue();
 
     for (; labelIter != labelSet->IteratorConstEnd(); ++labelIter)
     {

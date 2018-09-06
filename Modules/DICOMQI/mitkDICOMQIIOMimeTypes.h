@@ -18,18 +18,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKDICOMQIIOMIMETYPES_H
 
 #include "mitkCustomMimeType.h"
+#include <MitkDICOMQIExports.h>
+
 
 #include <string>
 
 namespace mitk
 {
   /// Provides the custom mime types for dicom qi objects loaded with DCMQI
-  class MitkDICOMQIIOMimeTypes
+  class MITKDICOMQI_EXPORT MitkDICOMQIIOMimeTypes
   {
   public:
     /** Mime type that parses dicom files to determine whether they are dicom segmentation objects.
     */
-    class MitkDICOMSEGMimeType : public CustomMimeType
+    class  MitkDICOMSEGMimeType : public CustomMimeType
     {
     public:
       MitkDICOMSEGMimeType();

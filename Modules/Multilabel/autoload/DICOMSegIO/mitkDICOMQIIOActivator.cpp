@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMSegmentationIO.h"
 
-#include "mitkDICOMQIIOMimeTypes.h"
+#include <mitkDICOMQIIOMimeTypes.h>
 
 namespace mitk
 {

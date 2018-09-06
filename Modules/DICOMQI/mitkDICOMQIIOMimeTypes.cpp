@@ -42,7 +42,7 @@ namespace mitk
   // Mime Types
 
   //======= Mime Type DICOM SEG =======
-  MitkDICOMQIIOMimeTypes::MitkDICOMSEGMimeType:::MitkDICOMSEGMimeType() : CustomMimeType(DICOMSEG_MIMETYPE_NAME())
+  MitkDICOMQIIOMimeTypes::MitkDICOMSEGMimeType::MitkDICOMSEGMimeType() : CustomMimeType(DICOMSEG_MIMETYPE_NAME())
   {
     this->AddExtension("dcm");
     this->SetCategory(IOMimeTypes::CATEGORY_IMAGES());
@@ -124,7 +124,7 @@ namespace mitk
     return MitkDICOMSEGMimeType();
   }
 
-  std::string MitkDICOMQIOMimeTypes::DICOMSEG_MIMETYPE_NAME()
+  std::string MitkDICOMQIIOMimeTypes::DICOMSEG_MIMETYPE_NAME()
   {
     // create a unique and sensible name for this mime type
     static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".image.dicom.seg";

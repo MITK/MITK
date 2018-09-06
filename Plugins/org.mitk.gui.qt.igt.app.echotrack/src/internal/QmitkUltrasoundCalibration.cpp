@@ -349,6 +349,7 @@ void QmitkUltrasoundCalibration::OnStartCalibrationProcess()
   this->GetDataStorage()->Add(m_WorldNode);
 
   m_CombinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
+  m_CombinedModality->SetCalibration(mitk::AffineTransform3D::New()); //dummy calibration because without a calibration the comined modality was laggy (maybe a bug?)
   if (m_CombinedModality.IsNull()) { return; }
 
   m_Tracker = m_CombinedModality->GetNavigationDataSource();
@@ -450,6 +451,7 @@ void QmitkUltrasoundCalibration::OnStartPlusCalibration()
     m_Controls.m_SetupStatus->setStyleSheet("QLabel { color : red; }");
     m_Controls.m_SetupStatus->setText("Something went wrong. Please try again");
   }
+
 }
 
 void QmitkUltrasoundCalibration::OnStopPlusCalibration()
@@ -916,24 +918,36 @@ void QmitkUltrasoundCalibration::Update()
   m_Controls.m_EvalTrackingStatus->SetNavigationDatas(datas);
   m_Controls.m_EvalTrackingStatus->Refresh();
 
-  // Update US Image
+  
+  
+  /*
   if (m_Image.IsNotNull() && m_Image->IsInitialized())
   {
     m_Node->SetData(m_Image);
   }
   else
   {
-    mitk::Image::Pointer m_Image = m_CombinedModality->GetUltrasoundDevice()->GetOutput();
-    m_Node->SetData(m_Image); //Workaround because image is not initalized, maybe problem of the Ultrasound view?
-  }
+    m_Image = m_CombinedModality->GetOutput();
+    m_Node->SetData(m_Image);
+  }*/
+  
   m_CombinedModality->Modified();
   m_CombinedModality->Update();
+
+  // Update US Image
+  mitk::Image::Pointer image = m_CombinedModality->GetOutput();
+  // make sure that always the current image is set to the data node
+  if (image.IsNotNull() && m_Node->GetData() != image.GetPointer() && image->IsInitialized())
+  {
+    m_Node->SetData(image);
+  }
 
   // Update Needle Projection
   m_NeedleProjectionFilter->Update();
 
   //only update 2d window because it is faster
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
+  
 }
 
 void QmitkUltrasoundCalibration::SwitchFreeze()
@@ -1098,7 +1112,7 @@ void QmitkUltrasoundCalibration::OnFreezeClicked()
     m_CombinedModality->GetUltrasoundDevice()->SetIsFreezed(true);
     m_Controls.m_SpacingAddPoint->setEnabled(true);
   }
-  //SwitchFreeze();
+  SwitchFreeze();
 }
 
 void QmitkUltrasoundCalibration::OnAddSpacingPoint()

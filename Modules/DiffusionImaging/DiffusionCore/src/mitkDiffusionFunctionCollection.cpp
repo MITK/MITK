@@ -27,6 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMath.h>
 #include <itksys/SystemTools.hxx>
 #include <boost/algorithm/string.hpp>
+#include <itkShToOdfImageFilter.h>
+#include <mitkImageCast.h>
+#include <mitkImageToItk.h>
+#include <itkTensorImageToOdfImageFilter.h>
 
 // Intersect a finite line (with end points p0 and p1) with all of the
 // cells of a vtkImageData
@@ -37,7 +41,7 @@ std::vector< std::pair< itk::Index<3>, double > > mitk::imv::IntersectImage(cons
   {
     double d[3];
     for (int i=0; i<3; ++i)
-      d[i] = (sf[i]-ef[i])*spacing[i];
+      d[i] = static_cast<double>(sf[i]-ef[i])*spacing[i];
     double len = std::sqrt( d[0]*d[0] + d[1]*d[1] + d[2]*d[2] );
     out.push_back(  std::pair< itk::Index<3>, double >(si, len) );
     return out;
@@ -52,29 +56,29 @@ std::vector< std::pair< itk::Index<3>, double > > mitk::imv::IntersectImage(cons
   double endPoint[3];
 
   double t0, t1;
-  for (int i=0; i<3; ++i)
+  for (unsigned int i=0; i<3; ++i)
   {
-    startPoint[i] = sf[i];
-    endPoint[i] = ef[i];
+    startPoint[i] = static_cast<double>(sf[i]);
+    endPoint[i] = static_cast<double>(ef[i]);
 
     if (si[i]>ei[i])
     {
-      int t = si[i];
+      auto t = si[i];
       si[i] = ei[i];
       ei[i] = t;
     }
   }
 
-  for (int x = si[0]; x<=ei[0]; ++x)
-    for (int y = si[1]; y<=ei[1]; ++y)
-      for (int z = si[2]; z<=ei[2]; ++z)
+  for (auto x = si[0]; x<=ei[0]; ++x)
+    for (auto y = si[1]; y<=ei[1]; ++y)
+      for (auto z = si[2]; z<=ei[2]; ++z)
       {
-        bounds[0] = (double)x - 0.5;
-        bounds[1] = (double)x + 0.5;
-        bounds[2] = (double)y - 0.5;
-        bounds[3] = (double)y + 0.5;
-        bounds[4] = (double)z - 0.5;
-        bounds[5] = (double)z + 0.5;
+        bounds[0] = static_cast<double>(x) - 0.5;
+        bounds[1] = static_cast<double>(x) + 0.5;
+        bounds[2] = static_cast<double>(y) - 0.5;
+        bounds[3] = static_cast<double>(y) + 0.5;
+        bounds[4] = static_cast<double>(z) - 0.5;
+        bounds[5] = static_cast<double>(z) + 0.5;
 
         int entryPlane;
         int exitPlane;
@@ -103,7 +107,7 @@ std::vector< std::pair< itk::Index<3>, double > > mitk::imv::IntersectImage(cons
           {
             double d[3];
             for (int i=0; i<3; ++i)
-              d[i] = (ef[i] - entrancePoint[i])*spacing[i];
+              d[i] = (static_cast<double>(ef[i]) - entrancePoint[i])*spacing[i];
             double len = std::sqrt( d[0]*d[0] + d[1]*d[1] + d[2]*d[2] );
 
             itk::Index<3> idx; idx[0] = x; idx[1] = y; idx[2] = z;
@@ -113,7 +117,7 @@ std::vector< std::pair< itk::Index<3>, double > > mitk::imv::IntersectImage(cons
           {
             double d[3];
             for (int i=0; i<3; ++i)
-              d[i] = (exitPoint[i]-sf[i])*spacing[i];
+              d[i] = (exitPoint[i]-static_cast<double>(sf[i]))*spacing[i];
             double len = std::sqrt( d[0]*d[0] + d[1]*d[1] + d[2]*d[2] );
 
             itk::Index<3> idx; idx[0] = x; idx[1] = y; idx[2] = z;
@@ -178,33 +182,169 @@ double mitk::sh::legendre0(int l)
   }
 }
 
-double mitk::sh::Yj(int m, int l, float theta, float phi, bool mrtrix)
+double mitk::sh::Yj(int m, int k, float theta, float phi, bool mrtrix)
 {
   if (!mrtrix)
   {
     if (m<0)
-      return sqrt(2.0)*::boost::math::spherical_harmonic_r(l, -m, theta, phi);
+      return sqrt(2.0)*static_cast<double>(::boost::math::spherical_harmonic_r(static_cast<unsigned int>(k), -m, theta, phi));
     else if (m==0)
-      return ::boost::math::spherical_harmonic_r(l, m, theta, phi);
+      return static_cast<double>(::boost::math::spherical_harmonic_r(static_cast<unsigned int>(k), m, theta, phi));
     else
-      return pow(-1.0,m)*sqrt(2.0)*::boost::math::spherical_harmonic_i(l, m, theta, phi);
+      return pow(-1.0,m)*sqrt(2.0)*static_cast<double>(::boost::math::spherical_harmonic_i(static_cast<unsigned int>(k), m, theta, phi));
   }
   else
   {
-    double plm = ::boost::math::legendre_p<float>(l,abs(m),-cos(theta));
-    double mag = sqrt((double)(2*l+1)/(4.0*itk::Math::pi)*::boost::math::factorial<float>(l-abs(m))/::boost::math::factorial<float>(l+abs(m)))*plm;
+    double plm = static_cast<double>(::boost::math::legendre_p<float>(k,abs(m),-cos(theta)));
+    double mag = sqrt((2.0*k+1.0)/(4.0*itk::Math::pi)*::boost::math::factorial<double>(k-abs(m))/::boost::math::factorial<double>(k+abs(m)))*plm;
     if (m>0)
-      return mag*cos(m*phi);
+      return mag*static_cast<double>(cos(m*phi));
     else if (m==0)
       return mag;
     else
-      return mag*sin(-m*phi);
+      return mag*static_cast<double>(sin(-m*phi));
   }
 
   return 0;
 }
 
-vnl_matrix<float> mitk::sh::CalcShBasisForDirections(int sh_order, vnl_matrix<double> U, bool mrtrix)
+mitk::OdfImage::ItkOdfImageType::Pointer mitk::convert::GetItkOdfFromShImage(mitk::Image::Pointer mitkImage)
+{
+  mitk::ShImage::Pointer mitkShImage = dynamic_cast<mitk::ShImage*>(mitkImage.GetPointer());
+  if (mitkShImage.IsNull())
+    mitkThrow() << "Input image is not a SH image!";
+  mitk::OdfImage::ItkOdfImageType::Pointer output;
+  switch (mitkShImage->ShOrder())
+  {
+  case 2:
+  {
+    typedef itk::ShToOdfImageFilter< float, 2 > ShConverterType;
+    typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
+    mitk::CastToItkImage(mitkImage, itkvol);
+    typename ShConverterType::Pointer converter = ShConverterType::New();
+    converter->SetInput(itkvol);
+    converter->Update();
+    output = converter->GetOutput();
+    break;
+  }
+  case 4:
+  {
+    typedef itk::ShToOdfImageFilter< float, 4 > ShConverterType;
+    typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
+    mitk::CastToItkImage(mitkImage, itkvol);
+    typename ShConverterType::Pointer converter = ShConverterType::New();
+    converter->SetInput(itkvol);
+    converter->Update();
+    output = converter->GetOutput();
+    break;
+  }
+  case 6:
+  {
+    typedef itk::ShToOdfImageFilter< float, 6 > ShConverterType;
+    typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
+    mitk::CastToItkImage(mitkImage, itkvol);
+    typename ShConverterType::Pointer converter = ShConverterType::New();
+    converter->SetInput(itkvol);
+    converter->Update();
+    output = converter->GetOutput();
+    break;
+  }
+  case 8:
+  {
+    typedef itk::ShToOdfImageFilter< float, 8 > ShConverterType;
+    typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
+    mitk::CastToItkImage(mitkImage, itkvol);
+    typename ShConverterType::Pointer converter = ShConverterType::New();
+    converter->SetInput(itkvol);
+    converter->Update();
+    output = converter->GetOutput();
+    break;
+  }
+  case 10:
+  {
+    typedef itk::ShToOdfImageFilter< float, 10 > ShConverterType;
+    typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
+    mitk::CastToItkImage(mitkImage, itkvol);
+    typename ShConverterType::Pointer converter = ShConverterType::New();
+    converter->SetInput(itkvol);
+    converter->Update();
+    output = converter->GetOutput();
+    break;
+  }
+  case 12:
+  {
+    typedef itk::ShToOdfImageFilter< float, 12 > ShConverterType;
+    typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
+    mitk::CastToItkImage(mitkImage, itkvol);
+    typename ShConverterType::Pointer converter = ShConverterType::New();
+    converter->SetInput(itkvol);
+    converter->Update();
+    output = converter->GetOutput();
+    break;
+  }
+  default:
+    mitkThrow() << "SH orders higher than 12 are not supported!";
+  }
+
+  return output;
+}
+
+mitk::OdfImage::Pointer mitk::convert::GetOdfFromShImage(mitk::Image::Pointer mitkImage)
+{
+  mitk::OdfImage::Pointer image = mitk::OdfImage::New();
+  auto img = GetItkOdfFromShImage(mitkImage);
+  image->InitializeByItk( img.GetPointer() );
+  image->SetVolume( img->GetBufferPointer() );
+  return image;
+}
+
+mitk::OdfImage::ItkOdfImageType::Pointer mitk::convert::GetItkOdfFromTensorImage(mitk::Image::Pointer mitkImage)
+{
+  typedef itk::TensorImageToOdfImageFilter< float, float > FilterType;
+  FilterType::Pointer filter = FilterType::New();
+  filter->SetInput( GetItkTensorFromTensorImage(mitkImage) );
+  filter->Update();
+  return filter->GetOutput();
+}
+
+mitk::TensorImage::ItkTensorImageType::Pointer mitk::convert::GetItkTensorFromTensorImage(mitk::Image::Pointer mitkImage)
+{
+  typedef mitk::ImageToItk< mitk::TensorImage::ItkTensorImageType > CasterType;
+  CasterType::Pointer caster = CasterType::New();
+  caster->SetInput(mitkImage);
+  caster->Update();
+  return caster->GetOutput();
+}
+
+mitk::PeakImage::ItkPeakImageType::Pointer mitk::convert::GetItkPeakFromPeakImage(mitk::Image::Pointer mitkImage)
+{
+  typedef mitk::ImageToItk< mitk::PeakImage::ItkPeakImageType > CasterType;
+  CasterType::Pointer caster = CasterType::New();
+  caster->SetInput(mitkImage);
+  caster->SetCopyMemFlag(true);
+  caster->Update();
+  return caster->GetOutput();
+}
+
+mitk::OdfImage::Pointer mitk::convert::GetOdfFromTensorImage(mitk::Image::Pointer mitkImage)
+{
+  mitk::OdfImage::Pointer image = mitk::OdfImage::New();
+  auto img = GetItkOdfFromTensorImage(mitkImage);
+  image->InitializeByItk( img.GetPointer() );
+  image->SetVolume( img->GetBufferPointer() );
+  return image;
+}
+
+mitk::OdfImage::ItkOdfImageType::Pointer mitk::convert::GetItkOdfFromOdfImage(mitk::Image::Pointer mitkImage)
+{
+  typedef mitk::ImageToItk< mitk::OdfImage::ItkOdfImageType > CasterType;
+  CasterType::Pointer caster = CasterType::New();
+  caster->SetInput(mitkImage);
+  caster->Update();
+  return caster->GetOutput();
+}
+
+vnl_matrix<float> mitk::sh::CalcShBasisForDirections(unsigned int sh_order, vnl_matrix<double> U, bool mrtrix)
 {
   vnl_matrix<float> sh_basis  = vnl_matrix<float>(U.cols(), (sh_order*sh_order + sh_order + 2)/2 + sh_order );
   for(unsigned int i=0; i<U.cols(); i++)
@@ -221,7 +361,7 @@ vnl_matrix<float> mitk::sh::CalcShBasisForDirections(int sh_order, vnl_matrix<do
 
   for(unsigned int i=0; i<U.cols(); i++)
   {
-    for(int k=0; k<=sh_order; k+=2)
+    for(int k=0; k<=static_cast<int>(sh_order); k+=2)
     {
       for(int m=-k; m<=k; m++)
       {
@@ -243,7 +383,7 @@ float mitk::sh::GetValue(const vnl_vector<float> &coefficients, const int &sh_or
   {
     for(int m=-k; m<=k; m++)
     {
-      int j = (k*k + k + 2)/2 + m - 1;
+      unsigned int j = static_cast<unsigned int>((k*k + k + 2)/2 + m - 1);
       val += coefficients[j] * mitk::sh::Yj(m, k, theta, phi, mrtrix);
     }
   }
@@ -492,7 +632,7 @@ vnl_matrix<double> mitk::gradients::ComputeSphericalHarmonicsBasis(const vnl_mat
 {
   vnl_matrix<double> SHBasisOutput(QBallReference.cols(), (LOrder+1)*(LOrder+2)*0.5);
   SHBasisOutput.fill(0.0);
-  for(int i=0; i< (int)SHBasisOutput.rows(); i++)
+  for(unsigned int i=0; i<SHBasisOutput.rows(); i++)
     for(int k = 0; k <= (int)LOrder; k += 2)
       for(int m =- k; m <= k; m++)
       {

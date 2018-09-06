@@ -59,6 +59,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/version.hpp>
 #include <itkShToOdfImageFilter.h>
 #include <mitkImageCast.h>
+#include <mitkDiffusionFunctionCollection.h>
 
 const std::string QmitkQBallReconstructionView::VIEW_ID = "org.mitk.views.qballreconstruction";
 
@@ -235,56 +236,16 @@ void QmitkQBallReconstructionView::CreateConnections()
   }
 }
 
-template<int ShOrder>
-void QmitkQBallReconstructionView::TemplatedConvertShImage(mitk::ShImage::Pointer mitkImage)
-{
-  typedef itk::ShToOdfImageFilter< float, ShOrder > ShConverterType;
-
-  typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
-  mitk::CastToItkImage(mitkImage, itkvol);
-
-  typename ShConverterType::Pointer converter = ShConverterType::New();
-  converter->SetInput(itkvol);
-  converter->Update();
-
-  mitk::OdfImage::Pointer image = mitk::OdfImage::New();
-  image->InitializeByItk( converter->GetOutput() );
-  image->SetVolume( converter->GetOutput()->GetBufferPointer() );
-  mitk::DataNode::Pointer node=mitk::DataNode::New();
-  node->SetData( image );
-  node->SetName(m_Controls->m_ShImageBox->GetSelectedNode()->GetName());
-
-  GetDataStorage()->Add(node, m_Controls->m_ShImageBox->GetSelectedNode());
-}
-
 void QmitkQBallReconstructionView::ConvertShImage()
 {
   if (m_Controls->m_ShImageBox->GetSelectedNode().IsNotNull())
   {
-    mitk::ShImage::Pointer mitkImg = dynamic_cast<mitk::ShImage*>(m_Controls->m_ShImageBox->GetSelectedNode()->GetData());
-    switch (mitkImg->ShOrder())
-    {
-    case 2:
-      TemplatedConvertShImage<2>(mitkImg);
-      break;
-    case 4:
-      TemplatedConvertShImage<4>(mitkImg);
-      break;
-    case 6:
-      TemplatedConvertShImage<6>(mitkImg);
-      break;
-    case 8:
-      TemplatedConvertShImage<8>(mitkImg);
-      break;
-    case 10:
-      TemplatedConvertShImage<10>(mitkImg);
-      break;
-    case 12:
-      TemplatedConvertShImage<12>(mitkImg);
-      break;
-    default :
-      QMessageBox::warning(nullptr, "Error", "Only spherical harmonics orders 2-12 are supported.", QMessageBox::Ok);
-    }
+    mitk::Image::Pointer mitkImg = dynamic_cast<mitk::Image*>(m_Controls->m_ShImageBox->GetSelectedNode()->GetData());
+    auto img = mitk::convert::GetOdfFromShImage(mitkImg);
+    mitk::DataNode::Pointer node= mitk::DataNode::New();
+    node->SetData( img );
+    node->SetName(m_Controls->m_ShImageBox->GetSelectedNode()->GetName());
+    GetDataStorage()->Add(node, m_Controls->m_ShImageBox->GetSelectedNode());
   }
 }
 
@@ -446,7 +407,7 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction(mitk::DataNode::
     QballReconstructionImageFilterType::Pointer filter = QballReconstructionImageFilterType::New();
     filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(vols));
     filter->SetGradientImage(mitk::DiffusionPropertyHelper::GetGradientContainer(vols), itkVectorImagePointer);
-    filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
+    filter->SetThreshold( static_cast<short>(m_Controls->m_QBallReconstructionThreasholdEdit->value()) );
 
     std::string nodePostfix;
     switch(normalization)
@@ -500,7 +461,7 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction(mitk::DataNode::
   catch (itk::ExceptionObject &ex)
   {
     MITK_INFO << ex ;
-    QMessageBox::information(0, "Reconstruction not possible:", ex.GetDescription());
+    QMessageBox::information(nullptr, "Reconstruction not possible:", ex.GetDescription());
     return ;
   }
 }
@@ -509,7 +470,7 @@ void QmitkQBallReconstructionView::AnalyticalQBallReconstruction( mitk::DataNode
 {
   try
   {
-    float lambda = m_Controls->m_QBallReconstructionLambdaLineEdit->value();
+    auto lambda = m_Controls->m_QBallReconstructionLambdaLineEdit->value();
     switch(m_Controls->m_QBallReconstructionMaxLLevelComboBox->currentIndex())
     {
     case 0:
@@ -549,13 +510,13 @@ void QmitkQBallReconstructionView::AnalyticalQBallReconstruction( mitk::DataNode
   catch (itk::ExceptionObject &ex)
   {
     MITK_INFO << ex;
-    QMessageBox::information(0, "Reconstruction not possible:", ex.GetDescription());
+    QMessageBox::information(nullptr, "Reconstruction not possible:", ex.GetDescription());
     return;
   }
 }
 
 template<int L>
-void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::DataNode* dataNodePointer, float lambda, int normalization)
+void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::DataNode* dataNodePointer, double lambda, int normalization)
 {
   typedef itk::AnalyticalDiffusionQballReconstructionImageFilter
       <DiffusionPixelType,DiffusionPixelType,TTensorPixelType,L,ODF_SAMPLING_SIZE> FilterType;
@@ -568,7 +529,7 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::
 
   filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(vols));
   filter->SetGradientImage(mitk::DiffusionPropertyHelper::GetGradientContainer(vols), itkVectorImagePointer);
-  filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
+  filter->SetThreshold( static_cast<short>(m_Controls->m_QBallReconstructionThreasholdEdit->value()) );
   filter->SetLambda(lambda);
 
   std::string nodePostfix;
@@ -657,7 +618,7 @@ void QmitkQBallReconstructionView::MultiQBallReconstruction(mitk::DataNode::Poin
 {
   try
   {
-    float lambda  = m_Controls->m_QBallReconstructionLambdaLineEdit->value();
+    auto lambda  = m_Controls->m_QBallReconstructionLambdaLineEdit->value();
     switch(m_Controls->m_QBallReconstructionMaxLLevelComboBox->currentIndex())
     {
     case 0:
@@ -695,13 +656,13 @@ void QmitkQBallReconstructionView::MultiQBallReconstruction(mitk::DataNode::Poin
   catch (itk::ExceptionObject &ex)
   {
     MITK_INFO << ex ;
-    QMessageBox::information(0, "Reconstruction not possible:", ex.GetDescription());
+    QMessageBox::information(nullptr, "Reconstruction not possible:", ex.GetDescription());
     return ;
   }
 }
 
 template<int L>
-void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambda, mitk::DataNode* dataNodePointer)
+void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(double lambda, mitk::DataNode* dataNodePointer)
 {
   typedef itk::DiffusionMultiShellQballReconstructionImageFilter
       <DiffusionPixelType,DiffusionPixelType,TTensorPixelType,L,ODF_SAMPLING_SIZE> FilterType;
@@ -715,7 +676,7 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
 
   if(currSelectionMap.size() != 4)// || currSelectionMap.find(0) != currSelectionMap.end())
   {
-    QMessageBox::information(0, "Reconstruction not possible:" ,QString("Only three equidistant shells are supported. (ImageName: " + QString(nodename.c_str()) + ")"));
+    QMessageBox::information(nullptr, "Reconstruction not possible:" ,QString("Only three equidistant shells are supported. (ImageName: " + QString(nodename.c_str()) + ")"));
     return;
   }
 
@@ -726,7 +687,7 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
   // Get average distance
   int avdistance = 0;
   for(; it2 != currSelectionMap.rend(); ++it1,++it2)
-    avdistance += (int)it1->first - (int)it2->first;
+    avdistance += static_cast<int>(it1->first - it2->first);
   avdistance /= currSelectionMap.size()-1;
 
   // Check if all shells are using the same averae distance
@@ -735,9 +696,9 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
   ++it2;
   for(; it2 != currSelectionMap.rend(); ++it1,++it2)
   {
-    if(avdistance != (int)it1->first - (int)it2->first)
+    if(avdistance != static_cast<int>(it1->first - it2->first))
     {
-      QMessageBox::information(0, "Reconstruction not possible:" ,QString("Selected Shells are not in a equidistant configuration. (ImageName: " + QString(nodename.c_str()) + ")"));
+      QMessageBox::information(nullptr, "Reconstruction not possible:" ,QString("Selected Shells are not in a equidistant configuration. (ImageName: " + QString(nodename.c_str()) + ")"));
       return;
     }
   }
@@ -746,7 +707,7 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
 
   filter->SetBValueMap(m_ShellSelectorMap[dataNodePointer]->GetBValueSelctionMap());
   filter->SetGradientImage(mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer, mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
-  filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
+  filter->SetThreshold( static_cast<short>(m_Controls->m_QBallReconstructionThreasholdEdit->value()) );
   filter->SetLambda(lambda);
   filter->Update();
 
@@ -797,7 +758,7 @@ void QmitkQBallReconstructionView::GenerateShellSelectionUI(mitk::DataNode::Poin
   m_ShellSelectorMap = tempMap;
 }
 
-void QmitkQBallReconstructionView::PreviewThreshold(int threshold)
+void QmitkQBallReconstructionView::PreviewThreshold(short threshold)
 {
   if (m_Controls->m_ImageBox->GetSelectedNode().IsNotNull())
   {

@@ -105,12 +105,9 @@ protected slots:
    * @brief PreviewThreshold Generates a preview of the values that are cut off by the thresholds
    * @param threshold
    */
-  void PreviewThreshold(int threshold);
+  void PreviewThreshold(short threshold);
 
 protected:
-
-  template<int ShOrder>
-  void TemplatedConvertShImage(mitk::ShImage::Pointer mitkImage);
 
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
@@ -118,10 +115,10 @@ protected:
   Ui::QmitkQBallReconstructionViewControls* m_Controls;
 
   template<int L>
-  void TemplatedAnalyticalQBallReconstruction(mitk::DataNode* dataNodePointer, float lambda, int normalization);
+  void TemplatedAnalyticalQBallReconstruction(mitk::DataNode* dataNodePointer, double lambda, int normalization);
 
   template<int L>
-  void TemplatedMultiQBallReconstruction(float lambda, mitk::DataNode*);
+  void TemplatedMultiQBallReconstruction(double lambda, mitk::DataNode*);
 
 private:
 

@@ -63,7 +63,7 @@ void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *rendere
   m_FiberPolyData->GetPointData()->AddArray(m_FiberBundle->GetFiberColors());
   LocalStorage3D *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
 
-  if (m_TubeRadius>0.0)
+  if (m_TubeRadius>0.0f)
   {
     vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
     tubeFilter->SetInputData(m_FiberPolyData);
@@ -72,7 +72,7 @@ void mitk::FiberBundleMapper3D::InternalGenerateData(mitk::BaseRenderer *rendere
     tubeFilter->Update();
     m_FiberPolyData = tubeFilter->GetOutput();
   }
-  else if (m_RibbonWidth>0.0)
+  else if (m_RibbonWidth>0.0f)
   {
     vtkSmartPointer<vtkRibbonFilter> tubeFilter = vtkSmartPointer<vtkRibbonFilter>::New();
     tubeFilter->SetInputData(m_FiberPolyData);

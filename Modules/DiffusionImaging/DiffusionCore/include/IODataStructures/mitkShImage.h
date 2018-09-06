@@ -49,8 +49,8 @@ namespace mitk
 
     virtual void ConstructRgbImage() const;
 
-    int ShOrder();
-    int NumCoefficients();
+    unsigned int ShOrder();
+    unsigned int NumCoefficients();
 
   protected:
     ShImage();
@@ -59,11 +59,11 @@ namespace mitk
     template<int num_components>
     void Construct() const;
 
-    void                    PrintSelf(std::ostream &os, itk::Indent indent) const override;
+    void  PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     mutable mitk::Image::Pointer m_RgbImage;
-    int m_ShOrder;
-    int m_NumCoefficients;
+    unsigned int m_ShOrder;
+    unsigned int m_NumCoefficients;
   };
 
 } // namespace mitk

@@ -783,8 +783,8 @@ if(MITK_USE_OpenCL)
 endif()
 
 if(MITK_USE_CppRestSdk)
-  set(MITK_USE_ZLIB ON)
-  find_package(cpprestsdk REQUIRED)
+  message(WARNING "Be sure to install cpprestsdk via vcpkg and set cpprestsdk_DIR to /vcpkg/installed/[OS_VERSION]/share/cpprestsdk")
+  find_package(cpprestsdk CONFIG REQUIRED)
 endif()
 
 # Qt support

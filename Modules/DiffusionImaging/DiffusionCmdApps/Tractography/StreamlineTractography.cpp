@@ -1,4 +1,4 @@
-/*===================================================================
+﻿/*===================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
@@ -231,7 +231,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("ep_constraint"))
     ep_constraint = us::any_cast<std::string>(parsedArgs["ep_constraint"]);
 
-  float cutoff = 0.1;
+  float cutoff = 0.1f;
   if (parsedArgs.count("cutoff"))
     cutoff = us::any_cast<float>(parsedArgs["cutoff"]);
 
@@ -257,7 +257,7 @@ int main(int argc, char* argv[])
 
   unsigned int trials_per_seed = 10;
   if (parsedArgs.count("trials_per_seed"))
-    trials_per_seed = us::any_cast<int>(parsedArgs["trials_per_seed"]);
+    trials_per_seed = us::any_cast<unsigned int>(parsedArgs["trials_per_seed"]);
 
   float tend_f = 1;
   if (parsedArgs.count("tend_f"))
@@ -271,7 +271,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("angular_threshold"))
     angular_threshold = us::any_cast<float>(parsedArgs["angular_threshold"]);
 
-  unsigned int max_tracts = -1;
+  int max_tracts = -1;
   if (parsedArgs.count("max_tracts"))
     max_tracts = us::any_cast<int>(parsedArgs["max_tracts"]);
 
@@ -289,14 +289,6 @@ int main(int argc, char* argv[])
     addFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["additional_images"]);
 
   typedef itk::Image<float, 3> ItkFloatImgType;
-
-  MITK_INFO << "loading input";
-  std::vector< mitk::Image::Pointer > input_images;
-  for (unsigned int i=0; i<input_files.size(); i++)
-  {
-    mitk::Image::Pointer mitkImage = mitk::IOUtil::Load<mitk::Image>(input_files.at(i));
-    input_images.push_back(mitkImage);
-  }
 
   ItkFloatImgType::Pointer mask = nullptr;
   if (!maskFile.empty())
@@ -355,32 +347,7 @@ int main(int argc, char* argv[])
   }
 
   //    //////////////////////////////////////////////////////////////////
-//      omp_set_num_threads(1);
-
-  if (algorithm == "ProbTensor")
-  {
-    typedef mitk::ImageToItk< mitk::TrackingHandlerTensor::ItkTensorImageType > CasterType;
-    CasterType::Pointer caster = CasterType::New();
-    caster->SetInput(input_images.at(0));
-    caster->Update();
-    mitk::TrackingHandlerTensor::ItkTensorImageType::Pointer itkTensorImg = caster->GetOutput();
-
-    typedef itk::TensorImageToOdfImageFilter< float, float > FilterType;
-    FilterType::Pointer filter = FilterType::New();
-    filter->SetInput( itkTensorImg );
-    filter->Update();
-
-    mitk::Image::Pointer image = mitk::Image::New();
-    FilterType::OutputImageType::Pointer outimg = filter->GetOutput();
-    image->InitializeByItk( outimg.GetPointer() );
-    image->SetVolume( outimg->GetBufferPointer() );
-
-    input_images.clear();
-    input_images.push_back(image);
-
-    sharpen_odfs = true;
-    odf_cutoff = 0;
-  }
+  //      omp_set_num_threads(1);
 
   typedef itk::StreamlineTrackingFilter TrackerType;
   TrackerType::Pointer tracker = TrackerType::New();
@@ -422,18 +389,21 @@ int main(int argc, char* argv[])
     if (forest.IsNull())
       mitkThrow() << "Forest file " << forestFile << " could not be read.";
 
+    mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
+    auto input = mitk::IOUtil::Load<mitk::Image>(input_files.at(0), &functor);
+
     if (use_sh_features)
     {
       handler = new mitk::TrackingHandlerRandomForest<6,28>();
       dynamic_cast<mitk::TrackingHandlerRandomForest<6,28>*>(handler)->SetForest(forest);
-      dynamic_cast<mitk::TrackingHandlerRandomForest<6,28>*>(handler)->AddDwi(input_images.at(0));
+      dynamic_cast<mitk::TrackingHandlerRandomForest<6,28>*>(handler)->AddDwi(input);
       dynamic_cast<mitk::TrackingHandlerRandomForest<6,28>*>(handler)->SetAdditionalFeatureImages(addImages);
     }
     else
     {
       handler = new mitk::TrackingHandlerRandomForest<6,100>();
       dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->SetForest(forest);
-      dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->AddDwi(input_images.at(0));
+      dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->AddDwi(input);
       dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->SetAdditionalFeatureImages(addImages);
     }
 
@@ -444,11 +414,9 @@ int main(int argc, char* argv[])
   {
     handler = new mitk::TrackingHandlerPeaks();
 
-    typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
-    CasterType::Pointer caster = CasterType::New();
-    caster->SetInput(input_images.at(0));
-    caster->Update();
-    mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
+    MITK_INFO << "loading input peak image";
+    mitk::Image::Pointer mitkImage = mitk::IOUtil::Load<mitk::Image>(input_files.at(0));
+    mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = mitk::convert::GetItkPeakFromPeakImage(mitkImage);
 
     dynamic_cast<mitk::TrackingHandlerPeaks*>(handler)->SetPeakImage(itkImg);
     dynamic_cast<mitk::TrackingHandlerPeaks*>(handler)->SetApplyDirectionMatrix(apply_image_rotation);
@@ -458,14 +426,13 @@ int main(int argc, char* argv[])
   {
     handler = new mitk::TrackingHandlerTensor();
 
-    for (auto input_image : input_images)
+    MITK_INFO << "loading input tensor images";
+    std::vector< mitk::Image::Pointer > input_images;
+    for (unsigned int i=0; i<input_files.size(); i++)
     {
-      typedef mitk::ImageToItk< mitk::TrackingHandlerTensor::ItkTensorImageType > CasterType;
-      CasterType::Pointer caster = CasterType::New();
-      caster->SetInput(input_image);
-      caster->Update();
-      mitk::TrackingHandlerTensor::ItkTensorImageType::ConstPointer itkImg = caster->GetOutput();
-      dynamic_cast<mitk::TrackingHandlerTensor*>(handler)->AddTensorImage(itkImg);
+      mitk::Image::Pointer mitkImage = mitk::IOUtil::Load<mitk::Image>(input_files.at(i));
+      mitk::TensorImage::ItkTensorImageType::Pointer itkImg = mitk::convert::GetItkTensorFromTensorImage(mitkImage);
+      dynamic_cast<mitk::TrackingHandlerTensor*>(handler)->AddTensorImage(itkImg.GetPointer());
     }
 
     dynamic_cast<mitk::TrackingHandlerTensor*>(handler)->SetFaThreshold(cutoff);
@@ -479,13 +446,34 @@ int main(int argc, char* argv[])
   {
     handler = new mitk::TrackingHandlerOdf();
 
-    typedef mitk::ImageToItk< mitk::TrackingHandlerOdf::ItkOdfImageType > CasterType;
-    CasterType::Pointer caster = CasterType::New();
-    caster->SetInput(input_images.at(0));
-    caster->Update();
-    mitk::TrackingHandlerOdf::ItkOdfImageType::Pointer itkImg = caster->GetOutput();
-    dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetOdfImage(itkImg);
+    mitk::OdfImage::ItkOdfImageType::Pointer itkImg = nullptr;
 
+    if (algorithm == "ProbTensor")
+    {
+      MITK_INFO << "Converting Tensor to ODF image";
+      auto input = mitk::IOUtil::Load<mitk::Image>(input_files.at(0));
+      itkImg = mitk::convert::GetItkOdfFromTensorImage(input);
+      sharpen_odfs = true;
+      odf_cutoff = 0;
+    }
+    else
+    {
+      mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"SH Image", "ODF Image"}, {});
+      auto input = mitk::IOUtil::Load(input_files.at(0), &functor)[0];
+      if (dynamic_cast<mitk::ShImage*>(input.GetPointer()))
+      {
+        MITK_INFO << "Converting SH to ODF image";
+        mitk::ShImage::Pointer mitkImg = dynamic_cast<mitk::ShImage*>(input.GetPointer());
+        itkImg = mitk::convert::GetItkOdfFromShImage(mitkImg);
+      }
+      else if (dynamic_cast<mitk::OdfImage*>(input.GetPointer()))
+      {
+        mitk::OdfImage::Pointer mitkImg = dynamic_cast<mitk::OdfImage*>(input.GetPointer());
+        itkImg = mitk::convert::GetItkOdfFromOdfImage(mitkImg);
+      }
+    }
+
+    dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetOdfImage(itkImg);
     dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetGfaThreshold(cutoff);
     dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetOdfThreshold(odf_cutoff);
     dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetSharpenOdfs(sharpen_odfs);

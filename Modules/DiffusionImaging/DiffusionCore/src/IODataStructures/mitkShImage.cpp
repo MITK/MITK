@@ -35,41 +35,29 @@ mitk::ShImage::~ShImage()
 
 }
 
-int mitk::ShImage::NumCoefficients()
+unsigned int mitk::ShImage::NumCoefficients()
 {
   if (m_NumCoefficients==0 || m_ShOrder==0)
   {
-    m_NumCoefficients = this->m_ImageDescriptor->GetChannelTypeById(0).GetNumberOfComponents();
-    int c=3, d=2-2*m_NumCoefficients;
-    double D = c*c-4*d;
+    m_NumCoefficients = static_cast<unsigned int>(this->m_ImageDescriptor->GetChannelTypeById(0).GetNumberOfComponents());
+    int c=3, d=2-2*static_cast<int>(m_NumCoefficients);
+    int D = c*c-4*d;
     if (D>0)
     {
-      m_ShOrder = (-c+sqrt(D))/2.0;
-      if (m_ShOrder<0)
-        m_ShOrder = (-c-sqrt(D))/2.0;
+      int s = (-c+static_cast<int>(sqrt(D)))/2;
+      if (s<0)
+        s = (-c-static_cast<int>(sqrt(D)))/2;
+      m_ShOrder = static_cast<unsigned int>(s);
     }
     else if (D==0)
-      m_ShOrder = -c/2.0;
+      m_ShOrder = static_cast<unsigned int>(-c/2);
   }
   return m_NumCoefficients;
 }
 
-int mitk::ShImage::ShOrder()
+unsigned int mitk::ShImage::ShOrder()
 {
-  if (m_NumCoefficients==0 || m_ShOrder==0)
-  {
-    m_NumCoefficients = this->m_ImageDescriptor->GetChannelTypeById(0).GetNumberOfComponents();
-    int c=3, d=2-2*m_NumCoefficients;
-    double D = c*c-4*d;
-    if (D>0)
-    {
-      m_ShOrder = (-c+sqrt(D))/2.0;
-      if (m_ShOrder<0)
-        m_ShOrder = (-c-sqrt(D))/2.0;
-    }
-    else if (D==0)
-      m_ShOrder = -c/2.0;
-  }
+  NumCoefficients();
   return m_ShOrder;
 }
 

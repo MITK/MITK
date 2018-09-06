@@ -30,21 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCoreObjectFactory.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <mitkShImage.h>
-
-template<int shOrder>
-typename itk::ShCoefficientImageImporter< float, shOrder >::OdfImageType::Pointer TemplatedConvertShCoeffs(mitk::Image::Pointer mitkImg)
-{
-  typedef itk::ShToOdfImageFilter< float, shOrder > ShConverterType;
-
-  typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
-  mitk::CastToItkImage(mitkImg, itkvol);
-
-  typename ShConverterType::Pointer converter = ShConverterType::New();
-  converter->SetInput(itkvol);
-  converter->Update();
-
-  return converter->GetOutput();
-}
+#include <mitkDiffusionFunctionCollection.h>
 
 /*!
 \brief Perform global fiber tractography (Gibbs tractography)
@@ -103,30 +89,7 @@ int main(int argc, char* argv[])
     else if ( dynamic_cast<mitk::ShImage*>(mitkImage.GetPointer()) )
     {
       mitk::ShImage::Pointer shImage = dynamic_cast<mitk::ShImage*>(mitkImage.GetPointer());
-
-      switch (shImage->ShOrder())
-      {
-      case 2:
-        gibbsTracker->SetOdfImage(TemplatedConvertShCoeffs<2>(mitkImage));
-        break;
-      case 4:
-        gibbsTracker->SetOdfImage(TemplatedConvertShCoeffs<4>(mitkImage));
-        break;
-      case 6:
-        gibbsTracker->SetOdfImage(TemplatedConvertShCoeffs<6>(mitkImage));
-        break;
-      case 8:
-        gibbsTracker->SetOdfImage(TemplatedConvertShCoeffs<8>(mitkImage));
-        break;
-      case 10:
-        gibbsTracker->SetOdfImage(TemplatedConvertShCoeffs<10>(mitkImage));
-        break;
-      case 12:
-        gibbsTracker->SetOdfImage(TemplatedConvertShCoeffs<12>(mitkImage));
-        break;
-      default:
-        std::cout << "SH-order " << shImage->ShOrder() << " not supported";
-      }
+      gibbsTracker->SetOdfImage(mitk::convert::GetItkOdfFromShImage(shImage));
     }
     else
       return EXIT_FAILURE;

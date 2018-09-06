@@ -59,6 +59,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/version.hpp>
 #include <itkShToOdfImageFilter.h>
 #include <mitkImageCast.h>
+#include <mitkDiffusionFunctionCollection.h>
 
 const std::string QmitkQBallReconstructionView::VIEW_ID = "org.mitk.views.qballreconstruction";
 
@@ -235,56 +236,16 @@ void QmitkQBallReconstructionView::CreateConnections()
   }
 }
 
-template<int ShOrder>
-void QmitkQBallReconstructionView::TemplatedConvertShImage(mitk::ShImage::Pointer mitkImage)
-{
-  typedef itk::ShToOdfImageFilter< float, ShOrder > ShConverterType;
-
-  typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
-  mitk::CastToItkImage(mitkImage, itkvol);
-
-  typename ShConverterType::Pointer converter = ShConverterType::New();
-  converter->SetInput(itkvol);
-  converter->Update();
-
-  mitk::OdfImage::Pointer image = mitk::OdfImage::New();
-  image->InitializeByItk( converter->GetOutput() );
-  image->SetVolume( converter->GetOutput()->GetBufferPointer() );
-  mitk::DataNode::Pointer node=mitk::DataNode::New();
-  node->SetData( image );
-  node->SetName(m_Controls->m_ShImageBox->GetSelectedNode()->GetName());
-
-  GetDataStorage()->Add(node, m_Controls->m_ShImageBox->GetSelectedNode());
-}
-
 void QmitkQBallReconstructionView::ConvertShImage()
 {
   if (m_Controls->m_ShImageBox->GetSelectedNode().IsNotNull())
   {
     mitk::ShImage::Pointer mitkImg = dynamic_cast<mitk::ShImage*>(m_Controls->m_ShImageBox->GetSelectedNode()->GetData());
-    switch (mitkImg->ShOrder())
-    {
-    case 2:
-      TemplatedConvertShImage<2>(mitkImg);
-      break;
-    case 4:
-      TemplatedConvertShImage<4>(mitkImg);
-      break;
-    case 6:
-      TemplatedConvertShImage<6>(mitkImg);
-      break;
-    case 8:
-      TemplatedConvertShImage<8>(mitkImg);
-      break;
-    case 10:
-      TemplatedConvertShImage<10>(mitkImg);
-      break;
-    case 12:
-      TemplatedConvertShImage<12>(mitkImg);
-      break;
-    default :
-      QMessageBox::warning(nullptr, "Error", "Only spherical harmonics orders 2-12 are supported.", QMessageBox::Ok);
-    }
+    auto img = mitk::convert::GetOdfFromShImage(mitkImg);
+    mitk::DataNode::Pointer node= mitk::DataNode::New();
+    node->SetData( img );
+    node->SetName(m_Controls->m_ShImageBox->GetSelectedNode()->GetName());
+    GetDataStorage()->Add(node, m_Controls->m_ShImageBox->GetSelectedNode());
   }
 }
 

@@ -557,19 +557,10 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Poi
 
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
-      if( dynamic_cast<mitk::TensorImage*>(node->GetData()) )
-      {
-        m_InputImageNodes.push_back(node);
-        m_InputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
-        retrack = true;
-      }
-      else if ( dynamic_cast<mitk::OdfImage*>(node->GetData()) )
-      {
-        m_InputImageNodes.push_back(node);
-        m_InputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
-        retrack = true;
-      }
-      else if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData())) )
+      if( dynamic_cast<mitk::TensorImage*>(node->GetData()) ||
+          dynamic_cast<mitk::OdfImage*>(node->GetData()) ||
+          dynamic_cast<mitk::ShImage*>(node->GetData()) ||
+          mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData())))
       {
         m_InputImageNodes.push_back(node);
         m_InputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
@@ -580,7 +571,7 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Poi
         mitk::Image* img = dynamic_cast<mitk::Image*>(node->GetData());
         if (img!=nullptr)
         {
-          int dim = img->GetDimension();
+          auto dim = img->GetDimension();
           unsigned int* dimensions = img->GetDimensions();
           if (dim==4 && dimensions[3]%3==0)
           {
@@ -795,14 +786,20 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler)->SetG((float)m_Controls->m_gBox->value());
     }
   }
-  else if ( dynamic_cast<mitk::OdfImage*>(m_InputImageNodes.at(0)->GetData()) )
+  else if ( dynamic_cast<mitk::OdfImage*>(m_InputImageNodes.at(0)->GetData()) ||
+            dynamic_cast<mitk::ShImage*>(m_InputImageNodes.at(0)->GetData()))
   {
     if (m_TrackingHandler==nullptr)
     {
       m_TrackingHandler = new mitk::TrackingHandlerOdf();
-      mitk::TrackingHandlerOdf::ItkOdfImageType::Pointer itkImg = mitk::TrackingHandlerOdf::ItkOdfImageType::New();
-      mitk::CastToItkImage(m_InputImages.at(0), itkImg);
-      dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetOdfImage(itkImg);
+
+      if (dynamic_cast<mitk::ShImage*>(m_InputImageNodes.at(0)->GetData()))
+        dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetOdfImage(mitk::convert::GetItkOdfFromShImage(dynamic_cast<mitk::ShImage*>(m_InputImageNodes.at(0)->GetData())));
+      else
+      {
+        mitk::TrackingHandlerOdf::ItkOdfImageType::Pointer itkImg = mitk::TrackingHandlerOdf::ItkOdfImageType::New();
+        mitk::CastToItkImage(m_InputImages.at(0), itkImg);
+      }
 
       if (m_Controls->m_FaImageSelectionWidget->GetSelectedNode().IsNotNull())
       {

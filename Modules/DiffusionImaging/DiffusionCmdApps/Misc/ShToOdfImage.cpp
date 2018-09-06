@@ -21,23 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <itkShToOdfImageFilter.h>
 #include <mitkShImage.h>
-
-template<int ShOrder>
-mitk::OdfImage::Pointer TemplatedConvertShImage(mitk::ShImage::Pointer mitkImage)
-{
-  typedef itk::ShToOdfImageFilter< float, ShOrder > ShConverterType;
-  typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
-  mitk::CastToItkImage(mitkImage, itkvol);
-
-  typename ShConverterType::Pointer converter = ShConverterType::New();
-  converter->SetInput(itkvol);
-  converter->Update();
-
-  mitk::OdfImage::Pointer image = mitk::OdfImage::New();
-  image->InitializeByItk( converter->GetOutput() );
-  image->SetVolume( converter->GetOutput()->GetBufferPointer() );
-  return image;
-}
+#include <mitkDiffusionFunctionCollection.h>
 
 int main(int argc, char* argv[])
 {
@@ -65,29 +49,7 @@ int main(int argc, char* argv[])
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"SH Image"}, {});
     mitk::ShImage::Pointer source = mitk::IOUtil::Load<mitk::ShImage>(imageName, &functor);
 
-    mitk::OdfImage::Pointer out_image = nullptr;
-    switch (source->ShOrder())
-    {
-    case 2:
-      out_image = TemplatedConvertShImage<2>(source);
-      break;
-    case 4:
-      out_image = TemplatedConvertShImage<4>(source);
-      break;
-    case 6:
-      out_image = TemplatedConvertShImage<6>(source);
-      break;
-    case 8:
-      out_image = TemplatedConvertShImage<8>(source);
-      break;
-    case 10:
-      out_image = TemplatedConvertShImage<10>(source);
-      break;
-    case 12:
-      out_image = TemplatedConvertShImage<12>(source);
-      break;
-    }
-
+    mitk::OdfImage::Pointer out_image = mitk::convert::GetOdfFromShImage(source);
     if (out_image.IsNotNull())
       mitk::IOUtil::Save(out_image, outImage);
   }

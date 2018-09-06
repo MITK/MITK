@@ -27,6 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMath.h>
 #include <itksys/SystemTools.hxx>
 #include <boost/algorithm/string.hpp>
+#include <itkShToOdfImageFilter.h>
+#include <mitkImageCast.h>
+#include <mitkImageToItk.h>
+#include <itkTensorImageToOdfImageFilter.h>
 
 // Intersect a finite line (with end points p0 and p1) with all of the
 // cells of a vtkImageData
@@ -202,6 +206,138 @@ double mitk::sh::Yj(int m, int l, float theta, float phi, bool mrtrix)
   }
 
   return 0;
+}
+
+mitk::OdfImage::ItkOdfImageType::Pointer mitk::convert::GetItkOdfFromShImage(mitk::ShImage::Pointer mitkImage)
+{
+  mitk::OdfImage::ItkOdfImageType::Pointer output;
+  switch (mitkImage->ShOrder())
+  {
+  case 2:
+  {
+    typedef itk::ShToOdfImageFilter< float, 2 > ShConverterType;
+    typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
+    mitk::CastToItkImage(mitkImage, itkvol);
+    typename ShConverterType::Pointer converter = ShConverterType::New();
+    converter->SetInput(itkvol);
+    converter->Update();
+    output = converter->GetOutput();
+    break;
+  }
+  case 4:
+  {
+    typedef itk::ShToOdfImageFilter< float, 4 > ShConverterType;
+    typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
+    mitk::CastToItkImage(mitkImage, itkvol);
+    typename ShConverterType::Pointer converter = ShConverterType::New();
+    converter->SetInput(itkvol);
+    converter->Update();
+    output = converter->GetOutput();
+    break;
+  }
+  case 6:
+  {
+    typedef itk::ShToOdfImageFilter< float, 6 > ShConverterType;
+    typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
+    mitk::CastToItkImage(mitkImage, itkvol);
+    typename ShConverterType::Pointer converter = ShConverterType::New();
+    converter->SetInput(itkvol);
+    converter->Update();
+    output = converter->GetOutput();
+    break;
+  }
+  case 8:
+  {
+    typedef itk::ShToOdfImageFilter< float, 8 > ShConverterType;
+    typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
+    mitk::CastToItkImage(mitkImage, itkvol);
+    typename ShConverterType::Pointer converter = ShConverterType::New();
+    converter->SetInput(itkvol);
+    converter->Update();
+    output = converter->GetOutput();
+    break;
+  }
+  case 10:
+  {
+    typedef itk::ShToOdfImageFilter< float, 10 > ShConverterType;
+    typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
+    mitk::CastToItkImage(mitkImage, itkvol);
+    typename ShConverterType::Pointer converter = ShConverterType::New();
+    converter->SetInput(itkvol);
+    converter->Update();
+    output = converter->GetOutput();
+    break;
+  }
+  case 12:
+  {
+    typedef itk::ShToOdfImageFilter< float, 12 > ShConverterType;
+    typename ShConverterType::InputImageType::Pointer itkvol = ShConverterType::InputImageType::New();
+    mitk::CastToItkImage(mitkImage, itkvol);
+    typename ShConverterType::Pointer converter = ShConverterType::New();
+    converter->SetInput(itkvol);
+    converter->Update();
+    output = converter->GetOutput();
+    break;
+  }
+  default:
+    mitkThrow() << "SH orders higher than 12 are not supported!";
+  }
+
+  return output;
+}
+
+mitk::OdfImage::Pointer mitk::convert::GetOdfFromShImage(mitk::ShImage::Pointer mitkImage)
+{
+  mitk::OdfImage::Pointer image = mitk::OdfImage::New();
+  auto img = GetItkOdfFromShImage(mitkImage);
+  image->InitializeByItk( img.GetPointer() );
+  image->SetVolume( img->GetBufferPointer() );
+  return image;
+}
+
+mitk::OdfImage::ItkOdfImageType::Pointer mitk::convert::GetItkOdfFromTensorImage(mitk::Image::Pointer mitkImage)
+{
+  typedef itk::TensorImageToOdfImageFilter< float, float > FilterType;
+  FilterType::Pointer filter = FilterType::New();
+  filter->SetInput( GetItkTensorFromTensorImage(mitkImage) );
+  filter->Update();
+  return filter->GetOutput();
+}
+
+mitk::TensorImage::ItkTensorImageType::Pointer mitk::convert::GetItkTensorFromTensorImage(mitk::Image::Pointer mitkImage)
+{
+  typedef mitk::ImageToItk< mitk::TensorImage::ItkTensorImageType > CasterType;
+  CasterType::Pointer caster = CasterType::New();
+  caster->SetInput(mitkImage);
+  caster->Update();
+  return caster->GetOutput();
+}
+
+mitk::PeakImage::ItkPeakImageType::Pointer mitk::convert::GetItkPeakFromPeakImage(mitk::Image::Pointer mitkImage)
+{
+  typedef mitk::ImageToItk< mitk::PeakImage::ItkPeakImageType > CasterType;
+  CasterType::Pointer caster = CasterType::New();
+  caster->SetInput(mitkImage);
+  caster->Update();
+  return caster->GetOutput();
+}
+
+mitk::OdfImage::Pointer mitk::convert::GetOdfFromTensorImage(mitk::Image::Pointer mitkImage)
+{
+  mitk::OdfImage::Pointer image = mitk::OdfImage::New();
+  auto img = GetItkOdfFromTensorImage(mitkImage);
+  image->InitializeByItk( img.GetPointer() );
+  image->SetVolume( img->GetBufferPointer() );
+  return image;
+}
+
+mitk::OdfImage::ItkOdfImageType::Pointer mitk::convert::GetItkOdfFromOdfImage(mitk::OdfImage::Pointer mitkImage)
+{
+  typedef mitk::ImageToItk< mitk::OdfImage::ItkOdfImageType > CasterType;
+  CasterType::Pointer caster = CasterType::New();
+  caster->SetInput(mitkImage);
+  caster->Update();
+  return caster->GetOutput();
 }
 
 vnl_matrix<float> mitk::sh::CalcShBasisForDirections(int sh_order, vnl_matrix<double> U, bool mrtrix)

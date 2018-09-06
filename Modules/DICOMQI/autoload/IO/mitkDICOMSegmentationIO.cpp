@@ -477,8 +477,10 @@ namespace mitk
 
     const LabelSet *labelSet = image->GetLabelSet(layer);
     auto labelIter = labelSet->IteratorConstBegin();
+    MITK_INFO << labelIter->second->GetValue();
     // Ignore background label
     ++labelIter;
+    MITK_INFO << labelIter->second->GetValue();
 
     for (; labelIter != labelSet->IteratorConstEnd(); ++labelIter)
     {

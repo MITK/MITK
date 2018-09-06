@@ -109,9 +109,6 @@ protected slots:
 
 protected:
 
-  template<int ShOrder>
-  void TemplatedConvertShImage(mitk::ShImage::Pointer mitkImage);
-
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 

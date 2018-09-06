@@ -25,7 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <itkLinearInterpolateImageFunction.h>
 #include <mitkImage.h>
+#include <mitkShImage.h>
 #include <mitkDiffusionPropertyHelper.h>
+#include <mitkOdfImage.h>
+#include <mitkTensorImage.h>
+#include <mitkPeakImage.h>
 
 namespace mitk{
 
@@ -89,7 +93,7 @@ public:
 
     if (interpolator->IsInsideBuffer(cIdx))
     {
-      double value = 0.0;
+      float value = 0.0;
       if (interpolate)
         value = interpolator->EvaluateAtContinuousIndex(cIdx);
       else
@@ -105,6 +109,18 @@ public:
     return false;
   }
 
+};
+
+class MITKDIFFUSIONCORE_EXPORT convert
+{
+public:
+  static mitk::OdfImage::ItkOdfImageType::Pointer GetItkOdfFromTensorImage(mitk::Image::Pointer mitkImage);
+  static mitk::OdfImage::Pointer GetOdfFromTensorImage(mitk::Image::Pointer mitkImage);
+  static mitk::OdfImage::ItkOdfImageType::Pointer GetItkOdfFromShImage(mitk::ShImage::Pointer mitkImage);
+  static mitk::OdfImage::Pointer GetOdfFromShImage(mitk::ShImage::Pointer mitkImage);
+  static mitk::OdfImage::ItkOdfImageType::Pointer GetItkOdfFromOdfImage(mitk::OdfImage::Pointer mitkImage);
+  static mitk::TensorImage::ItkTensorImageType::Pointer GetItkTensorFromTensorImage(mitk::Image::Pointer mitkImage);
+  static mitk::PeakImage::ItkPeakImageType::Pointer GetItkPeakFromPeakImage(mitk::Image::Pointer mitkImage);
 };
 
 class MITKDIFFUSIONCORE_EXPORT sh

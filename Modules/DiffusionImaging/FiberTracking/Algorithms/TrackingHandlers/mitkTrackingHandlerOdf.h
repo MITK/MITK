@@ -27,7 +27,7 @@ namespace mitk
 {
 
 /**
-* \brief Enables streamline tracking on tensor images. Supports multi tensor tracking by adding multiple tensor images. */
+* \brief Enables streamline tracking on sampled ODF images. */
 
 class MITKFIBERTRACKING_EXPORT TrackingHandlerOdf : public TrackingDataHandler
 {
@@ -37,7 +37,6 @@ public:
   TrackingHandlerOdf();
   ~TrackingHandlerOdf() override;
 
-  typedef TensorImage::PixelType    TensorType;
   typedef OdfImage::ItkOdfImageType ItkOdfImageType;
   typedef itk::Image< vnl_vector_fixed<float,3>, 3>  ItkPDImgType;
 

@@ -4,6 +4,7 @@ MITK_CREATE_MODULE(
 )
 
 add_subdirectory(autoload/IO)
+add_subdirectory(autoload/DICOMSegIO)
 if(BUILD_TESTING)
  add_subdirectory(Testing)
 endif()

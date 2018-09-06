@@ -4,6 +4,4 @@ if(MITK_USE_CppRestSdk)
     DEPENDS MitkCore
   )
 
-  target_link_libraries(${MODULE_TARGET} PRIVATE cpprestsdk|cpprest)
-
 endif(MITK_USE_CppRestSdk)

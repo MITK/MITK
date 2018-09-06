@@ -81,7 +81,7 @@ public:
   void SetMode( MODE m ) override{ m_Mode = m; }
   void SetForest(mitk::TractographyForest::Pointer forest){ m_Forest = forest; }
   void SetMaxNumWmSamples(int num){ m_MaxNumWmSamples=num; }
-  void SetNumPreviousDirections( int num ){ m_NumPreviousDirections=num; }
+  void SetNumPreviousDirections( unsigned int num ){ m_NumPreviousDirections=num; }
   void SetNumTrees(int num){ m_NumTrees = num; }
   void SetMaxTreeDepth(int depth){ m_MaxTreeDepth = depth; }
   void SetFiberSamplingStep(float step){ m_WmSampleDistance = step; }

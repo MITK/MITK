@@ -247,9 +247,9 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("sampling_distance"))
     sampling_distance = us::any_cast<float>(parsedArgs["sampling_distance"]);
 
-  int num_samples = 0;
+  unsigned int num_samples = 0;
   if (parsedArgs.count("num_samples"))
-    num_samples = us::any_cast<int>(parsedArgs["num_samples"]);
+    num_samples = us::any_cast<unsigned int>(parsedArgs["num_samples"]);
 
   int num_seeds = 1;
   if (parsedArgs.count("seeds"))
@@ -455,6 +455,7 @@ int main(int argc, char* argv[])
       itkImg = mitk::convert::GetItkOdfFromTensorImage(input);
       sharpen_odfs = true;
       odf_cutoff = 0;
+      dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetIsOdfFromTensor(true);
     }
     else
     {
@@ -463,14 +464,16 @@ int main(int argc, char* argv[])
       if (dynamic_cast<mitk::ShImage*>(input.GetPointer()))
       {
         MITK_INFO << "Converting SH to ODF image";
-        mitk::ShImage::Pointer mitkImg = dynamic_cast<mitk::ShImage*>(input.GetPointer());
+        mitk::Image::Pointer mitkImg = dynamic_cast<mitk::Image*>(input.GetPointer());
         itkImg = mitk::convert::GetItkOdfFromShImage(mitkImg);
       }
       else if (dynamic_cast<mitk::OdfImage*>(input.GetPointer()))
       {
-        mitk::OdfImage::Pointer mitkImg = dynamic_cast<mitk::OdfImage*>(input.GetPointer());
+        mitk::Image::Pointer mitkImg = dynamic_cast<mitk::Image*>(input.GetPointer());
         itkImg = mitk::convert::GetItkOdfFromOdfImage(mitkImg);
       }
+      else
+        mitkThrow() << "";
     }
 
     dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetOdfImage(itkImg);
@@ -480,8 +483,6 @@ int main(int argc, char* argv[])
 
     if (algorithm == "ProbODF" || algorithm == "ProbTensor")
       dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetMode(mitk::TrackingHandlerOdf::MODE::PROBABILISTIC);
-    if (algorithm == "ProbTensor")
-      dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetIsOdfFromTensor(true);
 
     if (addImages.at(0).size()>0)
       dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetGfaImage(addImages.at(0).at(0));

@@ -548,7 +548,6 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Poi
 {
   std::vector< mitk::DataNode::Pointer > last_nodes = m_InputImageNodes;
   m_InputImageNodes.clear();
-  m_InputImages.clear();
   m_AdditionalInputImages.clear();
   bool retrack = false;
 
@@ -560,30 +559,17 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( berry::IWorkbenchPart::Poi
       if( dynamic_cast<mitk::TensorImage*>(node->GetData()) ||
           dynamic_cast<mitk::OdfImage*>(node->GetData()) ||
           dynamic_cast<mitk::ShImage*>(node->GetData()) ||
+          dynamic_cast<mitk::PeakImage*>(node->GetData()) ||
           mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData())))
       {
         m_InputImageNodes.push_back(node);
-        m_InputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
         retrack = true;
       }
       else
       {
         mitk::Image* img = dynamic_cast<mitk::Image*>(node->GetData());
-        if (img!=nullptr)
-        {
-          auto dim = img->GetDimension();
-          unsigned int* dimensions = img->GetDimensions();
-          if (dim==4 && dimensions[3]%3==0)
-          {
-            m_InputImageNodes.push_back(node);
-            m_InputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
-            retrack = true;
-          }
-          else if (dim==3)
-          {
-            m_AdditionalInputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
-          }
-        }
+        if (img!=nullptr && img->GetDimension()==3)
+          m_AdditionalInputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
       }
     }
   }
@@ -706,7 +692,7 @@ void QmitkStreamlineTrackingView::StartStopTrackingGui(bool start)
 
 void QmitkStreamlineTrackingView::DoFiberTracking()
 {
-  if (m_InputImages.empty())
+  if (m_InputImageNodes.empty())
   {
     QMessageBox::information(nullptr, "Information", "Please select an input image in the datamaneger (tensor, ODF, peak or dMRI image)!");
     return;
@@ -723,7 +709,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
   {
     if (m_Controls->m_ModeBox->currentIndex()==1)
     {
-      if (m_InputImages.size()>1)
+      if (m_InputImageNodes.size()>1)
       {
         QMessageBox::information(nullptr, "Information", "Probabilistic tensor tractography is only implemented for single-tensor mode!");
         StartStopTrackingGui(false);
@@ -733,12 +719,9 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       if (m_TrackingHandler==nullptr)
       {
         m_TrackingHandler = new mitk::TrackingHandlerOdf();
-        mitk::TensorImage::ItkTensorImageType::Pointer itkImg = mitk::TensorImage::ItkTensorImageType::New();
-        mitk::CastToItkImage(m_InputImages.at(0), itkImg);
-
         typedef itk::TensorImageToOdfImageFilter< float, float > FilterType;
         FilterType::Pointer filter = FilterType::New();
-        filter->SetInput( itkImg );
+        filter->SetInput( mitk::convert::GetItkTensorFromTensorImage(dynamic_cast<mitk::Image*>(m_InputImageNodes.at(0)->GetData())) );
         filter->Update();
         dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetOdfImage(filter->GetOutput());
 
@@ -751,7 +734,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         }
       }
 
-      dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetGfaThreshold(m_Controls->m_ScalarThresholdBox->value());
+      dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetGfaThreshold(static_cast<float>(m_Controls->m_ScalarThresholdBox->value()));
       dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetOdfThreshold(0);
       dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetSharpenOdfs(true);
       dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetIsOdfFromTensor(true);
@@ -761,16 +744,8 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       if (m_TrackingHandler==nullptr)
       {
         m_TrackingHandler = new mitk::TrackingHandlerTensor();
-        for (int i=0; i<(int)m_InputImages.size(); i++)
-        {
-          typedef mitk::ImageToItk< mitk::TrackingHandlerTensor::ItkTensorImageType > CasterType;
-          CasterType::Pointer caster = CasterType::New();
-          caster->SetInput(m_InputImages.at(i));
-          caster->Update();
-          mitk::TrackingHandlerTensor::ItkTensorImageType::ConstPointer itkImg = caster->GetOutput();
-
-          dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler)->AddTensorImage(itkImg);
-        }
+        for (unsigned int i=0; i<m_InputImageNodes.size(); ++i)
+          dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler)->AddTensorImage(mitk::convert::GetItkTensorFromTensorImage(dynamic_cast<mitk::Image*>(m_InputImageNodes.at(i)->GetData())).GetPointer());
 
         if (m_Controls->m_FaImageSelectionWidget->GetSelectedNode().IsNotNull())
         {
@@ -781,9 +756,9 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         }
       }
 
-      dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler)->SetFaThreshold(m_Controls->m_ScalarThresholdBox->value());
-      dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler)->SetF((float)m_Controls->m_fBox->value());
-      dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler)->SetG((float)m_Controls->m_gBox->value());
+      dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler)->SetFaThreshold(static_cast<float>(m_Controls->m_ScalarThresholdBox->value()));
+      dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler)->SetF(static_cast<float>(m_Controls->m_fBox->value()));
+      dynamic_cast<mitk::TrackingHandlerTensor*>(m_TrackingHandler)->SetG(static_cast<float>(m_Controls->m_gBox->value()));
     }
   }
   else if ( dynamic_cast<mitk::OdfImage*>(m_InputImageNodes.at(0)->GetData()) ||
@@ -796,10 +771,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       if (dynamic_cast<mitk::ShImage*>(m_InputImageNodes.at(0)->GetData()))
         dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetOdfImage(mitk::convert::GetItkOdfFromShImage(dynamic_cast<mitk::ShImage*>(m_InputImageNodes.at(0)->GetData())));
       else
-      {
-        mitk::TrackingHandlerOdf::ItkOdfImageType::Pointer itkImg = mitk::TrackingHandlerOdf::ItkOdfImageType::New();
-        mitk::CastToItkImage(m_InputImages.at(0), itkImg);
-      }
+        dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetOdfImage(mitk::convert::GetItkOdfFromOdfImage(dynamic_cast<mitk::OdfImage*>(m_InputImageNodes.at(0)->GetData())));
 
       if (m_Controls->m_FaImageSelectionWidget->GetSelectedNode().IsNotNull())
       {
@@ -809,8 +781,8 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       }
     }
 
-    dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetGfaThreshold(m_Controls->m_ScalarThresholdBox->value());
-    dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetOdfThreshold(m_Controls->m_OdfCutoffBox->value());
+    dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetGfaThreshold(static_cast<float>(m_Controls->m_ScalarThresholdBox->value()));
+    dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetOdfThreshold(static_cast<float>(m_Controls->m_OdfCutoffBox->value()));
     dynamic_cast<mitk::TrackingHandlerOdf*>(m_TrackingHandler)->SetSharpenOdfs(m_Controls->m_SharpenOdfsBox->isChecked());
   }
   else if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image*>(m_InputImageNodes.at(0)->GetData())) )
@@ -839,7 +811,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       bool forest_valid = false;
       if (forest->GetNumFeatures()>=100)
       {
-        int num_previous_directions = (forest->GetNumFeatures() - (100 + additionalFeatureImages.at(0).size()))/3;
+        unsigned int num_previous_directions = static_cast<unsigned int>((forest->GetNumFeatures() - (100 + additionalFeatureImages.at(0).size()))/3);
         m_TrackingHandler = new mitk::TrackingHandlerRandomForest<6, 100>();
         dynamic_cast<mitk::TrackingHandlerRandomForest<6, 100>*>(m_TrackingHandler)->AddDwi(dwi);
         dynamic_cast<mitk::TrackingHandlerRandomForest<6, 100>*>(m_TrackingHandler)->SetAdditionalFeatureImages(additionalFeatureImages);
@@ -849,7 +821,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       }
       else
       {
-        int num_previous_directions = (forest->GetNumFeatures() - (28 + additionalFeatureImages.at(0).size()))/3;
+        unsigned int num_previous_directions = static_cast<unsigned int>((forest->GetNumFeatures() - (28 + additionalFeatureImages.at(0).size()))/3);
         m_TrackingHandler = new mitk::TrackingHandlerRandomForest<6, 28>();
         dynamic_cast<mitk::TrackingHandlerRandomForest<6, 28>*>(m_TrackingHandler)->AddDwi(dwi);
         dynamic_cast<mitk::TrackingHandlerRandomForest<6, 28>*>(m_TrackingHandler)->SetAdditionalFeatureImages(additionalFeatureImages);
@@ -874,28 +846,13 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
       StartStopTrackingGui(false);
       return;
     }
-    try {
-
-      if (m_TrackingHandler==nullptr)
-      {
-        typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
-        CasterType::Pointer caster = CasterType::New();
-        caster->SetInput(m_InputImages.at(0));
-        caster->SetCopyMemFlag(true);
-        caster->Update();
-        mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
-        m_TrackingHandler = new mitk::TrackingHandlerPeaks();
-        dynamic_cast<mitk::TrackingHandlerPeaks*>(m_TrackingHandler)->SetPeakImage(itkImg);
-      }
-
-      dynamic_cast<mitk::TrackingHandlerPeaks*>(m_TrackingHandler)->SetPeakThreshold(m_Controls->m_ScalarThresholdBox->value());
-    }
-    catch(...)
+    if (m_TrackingHandler==nullptr)
     {
-      QMessageBox::information(nullptr, "Error", "Peak tracker could not be initialized. Is your input image in the correct format (4D float image, peaks in the 4th dimension)?");
-      StartStopTrackingGui(false);
-      return;
+      m_TrackingHandler = new mitk::TrackingHandlerPeaks();
+      dynamic_cast<mitk::TrackingHandlerPeaks*>(m_TrackingHandler)->SetPeakImage(mitk::convert::GetItkPeakFromPeakImage(dynamic_cast<mitk::Image*>(m_InputImageNodes.at(0)->GetData())));
     }
+
+    dynamic_cast<mitk::TrackingHandlerPeaks*>(m_TrackingHandler)->SetPeakThreshold(static_cast<float>(m_Controls->m_ScalarThresholdBox->value()));
   }
 
   m_TrackingHandler->SetFlipX(m_Controls->m_FlipXBox->isChecked());

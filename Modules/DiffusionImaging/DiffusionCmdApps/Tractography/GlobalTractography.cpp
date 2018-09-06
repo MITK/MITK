@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
     }
     else if ( dynamic_cast<mitk::ShImage*>(mitkImage.GetPointer()) )
     {
-      mitk::ShImage::Pointer shImage = dynamic_cast<mitk::ShImage*>(mitkImage.GetPointer());
+      mitk::Image::Pointer shImage = dynamic_cast<mitk::Image*>(mitkImage.GetPointer());
       gibbsTracker->SetOdfImage(mitk::convert::GetItkOdfFromShImage(shImage));
     }
     else

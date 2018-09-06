@@ -116,11 +116,12 @@ class MITKDIFFUSIONCORE_EXPORT convert
 public:
   static mitk::OdfImage::ItkOdfImageType::Pointer GetItkOdfFromTensorImage(mitk::Image::Pointer mitkImage);
   static mitk::OdfImage::Pointer GetOdfFromTensorImage(mitk::Image::Pointer mitkImage);
-  static mitk::OdfImage::ItkOdfImageType::Pointer GetItkOdfFromShImage(mitk::ShImage::Pointer mitkImage);
-  static mitk::OdfImage::Pointer GetOdfFromShImage(mitk::ShImage::Pointer mitkImage);
-  static mitk::OdfImage::ItkOdfImageType::Pointer GetItkOdfFromOdfImage(mitk::OdfImage::Pointer mitkImage);
   static mitk::TensorImage::ItkTensorImageType::Pointer GetItkTensorFromTensorImage(mitk::Image::Pointer mitkImage);
   static mitk::PeakImage::ItkPeakImageType::Pointer GetItkPeakFromPeakImage(mitk::Image::Pointer mitkImage);
+
+  static mitk::OdfImage::ItkOdfImageType::Pointer GetItkOdfFromShImage(mitk::Image::Pointer mitkImage);
+  static mitk::OdfImage::Pointer GetOdfFromShImage(mitk::Image::Pointer mitkImage);
+  static mitk::OdfImage::ItkOdfImageType::Pointer GetItkOdfFromOdfImage(mitk::Image::Pointer mitkImage);
 };
 
 class MITKDIFFUSIONCORE_EXPORT sh
@@ -132,7 +133,7 @@ public:
   static double legendre0(int l);
   static double spherical_harmonic(int m,int l,double theta,double phi, bool complexPart);
   static double Yj(int m, int k, float theta, float phi, bool mrtrix=true);
-  static vnl_matrix<float> CalcShBasisForDirections(int sh_order, vnl_matrix<double> U, bool mrtrix=true);
+  static vnl_matrix<float> CalcShBasisForDirections(unsigned int sh_order, vnl_matrix<double> U, bool mrtrix=true);
   static float GetValue(const vnl_vector<float>& coefficients, const int& sh_order, const vnl_vector_fixed<double, 3>& dir, const bool mrtrix);
   static float GetValue(const vnl_vector<float> &coefficients, const int &sh_order, const double theta, const double phi, const bool mrtrix);
 };

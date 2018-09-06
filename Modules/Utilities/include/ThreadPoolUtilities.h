@@ -18,11 +18,11 @@ namespace Utilities
 {
   enum class TaskPriority
   {
-    CRITICAL,
-    HI,
-    NORMAL,
+    LOWEST,
     LOW,
-    LOWEST
+    NORMAL,
+    HI,
+    CRITICAL
   };
 
   typedef std::function<void()> Task;
@@ -36,6 +36,7 @@ namespace Utilities
     ~ThreadPool();
 
     void Stop();
+    void Reset();
 
     void AddThreads(size_t count);
 

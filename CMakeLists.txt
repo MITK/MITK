@@ -239,6 +239,7 @@ endforeach()
 
 env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
+env_option(MITK_USE_CppRestSdk "Use cpp rest sdk library" OFF)
 
 #-----------------------------------------------------------------------------
 # Build configurations
@@ -779,6 +780,11 @@ endif()
 
 if(MITK_USE_OpenCL)
   find_package(OpenCL REQUIRED)
+endif()
+
+if(MITK_USE_CppRestSdk)
+  set(MITK_USE_ZLIB ON)
+  find_package(cpprestsdk REQUIRED)
 endif()
 
 # Qt support

@@ -376,8 +376,6 @@ mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateTractDensityImage(
       mitk::LabelSetImage::Pointer multilabelImage = mitk::LabelSetImage::New();
       multilabelImage->InitializeByLabeledImage(img);
 
-
-
       mitk::Label::Pointer label = multilabelImage->GetActiveLabel();
       label->SetName("Tractogram");
 //      label->SetColor(color);
@@ -385,10 +383,7 @@ mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateTractDensityImage(
 //      multilabelImage->GetActiveLabelSet()->AddLabel(label);
       multilabelImage->GetActiveLabelSet()->SetActiveLabel(1);
 
-      PropertyList::Pointer dicomSegPropertyList = mitk::DICOMSegmentationPropertyHandler::GetDICOMSegmentationProperties(m_SelectedImage->GetPropertyList());
-
-      multilabelImage->GetPropertyList()->ConcatenatePropertyList(dicomSegPropertyList);
-      mitk::DICOMSegmentationPropertyHandler::GetDICOMSegmentProperties(multilabelImage->GetActiveLabel(multilabelImage->GetActiveLayer()));
+      multilabelImage->GetPropertyList()->ConcatenatePropertyList(m_SelectedImage->GetPropertyList());
       // init data node
       node->SetData(multilabelImage);
     }

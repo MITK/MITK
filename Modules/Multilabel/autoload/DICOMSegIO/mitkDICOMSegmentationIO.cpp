@@ -392,6 +392,8 @@ namespace mitk
         ++segmentIter;
       }
 
+      labelSetImage->GetLabelSet()->SetAllLabelsVisible(true);
+
       // Add some general DICOM Segmentation properties
       mitk::IDICOMTagsOfInterest *toiSrv = GetDicomTagsOfInterestService();
       auto tagsOfInterest = toiSrv->GetTagsOfInterest();

@@ -31,7 +31,7 @@ namespace mitk
   public:
     /** Mime type that parses dicom files to determine whether they are dicom segmentation objects.
     */
-    class  MitkDICOMSEGMimeType : public CustomMimeType
+    class  MITKDICOMQI_EXPORT MitkDICOMSEGMimeType : public CustomMimeType
     {
     public:
       MitkDICOMSEGMimeType();

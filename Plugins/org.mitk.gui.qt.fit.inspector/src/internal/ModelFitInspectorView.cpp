@@ -27,9 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QTableWidget>
 #include <qwt_plot_marker.h>
+#include "QmitkPlotWidget.h"
 
-#include "mitkFormulaParser.h"
 #include "mitkScalarListLookupTableProperty.h"
 #include "mitkModelFitConstants.h"
 #include "mitkExtractTimeGrid.h"
@@ -37,9 +38,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkModelFitException.h"
 #include "mitkModelFitParameterValueExtraction.h"
 
+#include "mitkModelFitPlotDataHelper.h"
+
 #include "ModelFitInspectorView.h"
 
 #include <QClipboard>
+
 const std::string ModelFitInspectorView::VIEW_ID = "org.mitk.gui.gt.fit.inspector";
 const unsigned int ModelFitInspectorView::INTERPOLATION_STEPS = 100;
 
@@ -316,13 +320,13 @@ void ModelFitInspectorView::OnScaleToDataYClicked()
   double max = itk::NumericTraits<double>::NonpositiveMin();
   double min = itk::NumericTraits<double>::max();
 
-  CheckYMinMaxFromXYData(this->m_ImagePlotCurve, min, max);
-  CheckYMinMaxFromXYData(this->m_ModelPlotCurve, min, max);
+  CheckYMinMaxFromXYData(this->m_ImagePlotCurve.values, min, max);
+  CheckYMinMaxFromXYData(this->m_ModelPlotCurve.values, min, max);
 
-  for (CurveMapType::const_iterator pos = this->m_InputDataPlotCurves.begin();
+  for (mitk::PlotDataCurveCollection::const_iterator pos = this->m_InputDataPlotCurves.begin();
        pos != this->m_InputDataPlotCurves.end(); ++pos)
   {
-    CheckYMinMaxFromXYData(pos->second, min, max);
+    CheckYMinMaxFromXYData(pos->second.values, min, max);
   }
 
   min -= abs(min) * 0.01;
@@ -338,13 +342,13 @@ void ModelFitInspectorView::OnScaleToDataXClicked()
   double max = itk::NumericTraits<double>::NonpositiveMin();
   double min = itk::NumericTraits<double>::max();
 
-  CheckXMinMaxFromXYData(this->m_ImagePlotCurve, min, max);
-  CheckXMinMaxFromXYData(this->m_ModelPlotCurve, min, max);
+  CheckXMinMaxFromXYData(this->m_ImagePlotCurve.values, min, max);
+  CheckXMinMaxFromXYData(this->m_ModelPlotCurve.values, min, max);
 
-  for (CurveMapType::const_iterator pos = this->m_InputDataPlotCurves.begin();
+  for (mitk::PlotDataCurveCollection::const_iterator pos = this->m_InputDataPlotCurves.begin();
     pos != this->m_InputDataPlotCurves.end(); ++pos)
   {
-    CheckXMinMaxFromXYData(pos->second, min, max);
+    CheckXMinMaxFromXYData(pos->second.values, min, max);
   }
 
   min -= abs(min) * 0.01;
@@ -657,21 +661,21 @@ void ModelFitInspectorView::OnSliceChangedDelayed()
   }
 }
 
+/** Super sample passed time grid with the factor INTERPOLATION_STEPS and interpolates linear in between.*/
 mitk::ModelBase::TimeGridType
-ModelFitInspectorView::GenerateInterpolatedTimeGrid(const mitk::ModelBase::TimeGridType& grid)
-const
+GenerateInterpolatedTimeGrid(const mitk::ModelBase::TimeGridType& grid, const unsigned int interpolation_steps = 100)
 {
   unsigned int origGridSize = grid.size();
 
-  mitk::ModelBase::TimeGridType interpolatedTimeGrid(((origGridSize - 1) * INTERPOLATION_STEPS) + 1);
+  mitk::ModelBase::TimeGridType interpolatedTimeGrid(((origGridSize - 1) * interpolation_steps) + 1);
 
   for (unsigned int t = 0; t < origGridSize - 1; ++t)
   {
-    double delta = (grid[t + 1] - grid[t]) / INTERPOLATION_STEPS;
+    double delta = (grid[t + 1] - grid[t]) / interpolation_steps;
 
-    for (unsigned int i = 0; i < INTERPOLATION_STEPS; ++i)
+    for (unsigned int i = 0; i < interpolation_steps; ++i)
     {
-      interpolatedTimeGrid[(t * INTERPOLATION_STEPS) + i] = grid[t] + i * delta;
+      interpolatedTimeGrid[(t * interpolation_steps) + i] = grid[t] + i * delta;
     }
   }
 
@@ -679,97 +683,6 @@ const
 
   return interpolatedTimeGrid;
 };
-
-
-QmitkPlotWidget::XYDataVector
-ModelFitInspectorView::CalcCurveFromModel(const mitk::Point3D& position)
-{
-  assert(m_currentModelParameterizer.IsNotNull());
-  assert(m_currentFit.IsNotNull());
-
-  mitk::Image::Pointer inputImage = this->GetCurrentInputImage();
-  assert(inputImage.IsNotNull());
-
-  // Calculate index
-  ::itk::Index<3> index;
-  mitk::BaseGeometry::Pointer geometry = inputImage->GetTimeGeometry()->GetGeometryForTimeStep(0);
-
-  geometry->WorldToIndex(position, index);
-
-  //model generation
-  mitk::ModelBase::Pointer model = m_currentModelParameterizer->GenerateParameterizedModel(index);
-
-  mitk::ParameterValueMapType parameterMap = mitk::ExtractParameterValueMapFromModelFit(m_currentFit, position);
-
-  mitk::ModelBase::ParametersType paramArray = mitk::ConvertParameterMapToParameterVector(parameterMap, model);
-
-  mitk::ModelBase::ModelResultType curveDataY = model->GetSignal(paramArray);
-  QmitkPlotWidget::XYDataVector result;
-  mitk::ModelBase::TimeGridType timeGrid = model->GetTimeGrid();
-
-  for (unsigned int t = 0; t < timeGrid.size(); ++t)
-  {
-    double x = timeGrid[t];
-    double y = curveDataY[t];
-    result.push_back(std::make_pair(x, y));
-  }
-
-  return result;
-}
-
-QmitkPlotWidget::XYDataVector
-ModelFitInspectorView::CalcCurveFromFunction(const mitk::Point3D& position,
-    const mitk::ModelBase::TimeGridType& timeGrid)
-{
-  assert(m_currentFit.IsNotNull());
-  assert(m_renderWindowPart != nullptr);
-
-  mitk::Image::Pointer inputImage = this->GetCurrentInputImage();
-  assert(inputImage.IsNotNull());
-
-  QmitkPlotWidget::XYDataVector result;
-
-  // Calculate index
-  ::itk::Index<3> index;;
-  mitk::BaseGeometry::Pointer geometry = inputImage->GetTimeGeometry()->GetGeometryForTimeStep(0);
-
-  geometry->WorldToIndex(position, index);
-
-  mitk::ParameterValueMapType parameterMap = mitk::ExtractParameterValueMapFromModelFit(m_currentFit, position);
-
-  mitk::FormulaParser parser(&parameterMap);
-  unsigned int timestep = m_renderWindowPart->GetTimeNavigationController()->GetTime()->
-                          GetPos();
-
-  for (unsigned int t = 0; t < timeGrid.size(); ++t)
-  {
-    // Set up static parameters
-    foreach (const mitk::modelFit::StaticParameterMap::StaticParameterType& var,
-             m_currentFit->staticParamMap)
-    {
-      const std::string& name = var.first;
-      const mitk::modelFit::StaticParameterMap::ValueType& list = var.second;
-
-      if (list.size() == 1)
-      {
-        parameterMap[name] = list.front();
-      }
-      else
-      {
-        parameterMap[name] = list.at(timestep);
-      }
-    }
-
-    // Calculate curve data
-    double x = timeGrid[t];
-    parameterMap[m_currentFit->x] = x;
-
-    double y = parser.parse(m_currentFit->function);
-    result.push_back(std::make_pair(x, y));
-  }
-
-  return result;
-}
 
 void ModelFitInspectorView::OnFitSelectionChanged(int index)
 {
@@ -820,8 +733,8 @@ bool ModelFitInspectorView::RefreshPlotData()
 
   if (m_currentSelectedNode.IsNull())
   {
-    this->m_ImagePlotCurve.clear();
-    this->m_ModelPlotCurve.clear();
+    this->m_ImagePlotCurve.Reset();
+    this->m_ModelPlotCurve.Reset();
     this->m_InputDataPlotCurves.clear();
 
     changed = m_selectedNodeTime > m_lastRefreshTime;
@@ -838,20 +751,11 @@ bool ModelFitInspectorView::RefreshPlotData()
     if (m_selectedNodeTime > m_lastRefreshTime || m_currentFitTime > m_lastRefreshTime
         || m_currentPositionTime > m_lastRefreshTime)
     {
-      m_ImagePlotCurve.clear();
+      m_ImagePlotCurve.Reset();
 
       if (input && m_validSelectedPosition)
       {
-        QmitkPlotWidget::XYDataVector pointData;
-
-        for (unsigned int t = 0; t < timeGrid.size(); ++t)
-        {
-          double x = timeGrid[t];
-          double y = ReadVoxel(input, m_currentSelectedPosition, t);
-          pointData.push_back(std::make_pair(x, y));
-        }
-
-        m_ImagePlotCurve = pointData;
+         m_ImagePlotCurve = GenerateImageSamplePlotData(m_currentSelectedPosition, input, timeGrid);
       }
 
       changed = true;
@@ -860,35 +764,15 @@ bool ModelFitInspectorView::RefreshPlotData()
     //model curve
     if (m_currentFitTime > m_lastRefreshTime || m_currentPositionTime > m_lastRefreshTime)
     {
-      m_ModelPlotCurve.clear();
+      m_ModelPlotCurve.Reset();
 
       if (m_currentFit.IsNotNull() && m_validSelectedPosition)
       {
-        QmitkPlotWidget::XYDataVector curveData;
 
         // Interpolate time grid (x values) so the curve looks smooth
-        const mitk::ModelBase::TimeGridType interpolatedTimeGrid = GenerateInterpolatedTimeGrid(timeGrid);
+        const mitk::ModelBase::TimeGridType interpolatedTimeGrid = GenerateInterpolatedTimeGrid(timeGrid, INTERPOLATION_STEPS);
 
-        if (m_currentModelParameterizer.IsNotNull())
-        {
-          // Use model instead of formula parser
-          m_currentModelParameterizer->SetDefaultTimeGrid(interpolatedTimeGrid);
-          curveData = CalcCurveFromModel(m_currentSelectedPosition);
-        }
-        else
-        {
-          // Use formula parser to parse function string
-          try
-          {
-            curveData = CalcCurveFromFunction(m_currentSelectedPosition, interpolatedTimeGrid);
-          }
-          catch (const mitk::FormulaParserException& e)
-          {
-            MITK_ERROR << "Error while parsing modelfit function: " << e.what();
-          }
-        }
-
-        m_ModelPlotCurve = curveData;
+        m_ModelPlotCurve = GenerateModelSignalPlotData(m_currentSelectedPosition, m_currentFit, interpolatedTimeGrid, m_currentModelParameterizer);
       }
 
       changed = true;
@@ -901,30 +785,7 @@ bool ModelFitInspectorView::RefreshPlotData()
 
       if (m_currentFit.IsNotNull())
       {
-        for (mitk::ScalarListLookupTable::LookupTableType::const_iterator pos =
-               m_currentFit->inputData.GetLookupTable().begin();
-             pos != m_currentFit->inputData.GetLookupTable().end(); ++pos)
-        {
-          if (pos->second.size() != timeGrid.size())
-          {
-            MITK_ERROR <<
-                       "Error while refreshing input data for visualization. Size of data and input image time grid differ. Invalid data name: "
-                       << pos->first;
-          }
-          else
-          {
-            QmitkPlotWidget::XYDataVector pointData;
-
-            for (unsigned int t = 0; t < timeGrid.size(); ++t)
-            {
-              double x = timeGrid[t];
-              double y = pos->second[t];
-              pointData.push_back(std::make_pair(x, y));
-            }
-
-            m_InputDataPlotCurves.insert(std::make_pair(pos->first, pointData));
-          }
-        }
+        m_InputDataPlotCurves = GenerateAdditionalModelFitPlotData(m_currentSelectedPosition, m_currentFit, timeGrid);
       }
 
       changed = true;
@@ -1061,7 +922,7 @@ void ModelFitInspectorView::RenderFitInfo()
 
 		unsigned int rowIndex = 0;
 
-		for (CurveMapType::const_iterator pos = m_InputDataPlotCurves.begin();
+    for (mitk::PlotDataCurveCollection::const_iterator pos = m_InputDataPlotCurves.begin();
 			pos != m_InputDataPlotCurves.end(); ++pos, ++rowIndex)
 		{
 			QColor dataColor;
@@ -1126,13 +987,13 @@ void ModelFitInspectorView::RenderPlot()
   // Draw input data points
   unsigned int colorIndex = 0;
 
-  for (CurveMapType::const_iterator pos = m_InputDataPlotCurves.begin();
+  for (mitk::PlotDataCurveCollection::const_iterator pos = m_InputDataPlotCurves.begin();
        pos != m_InputDataPlotCurves.end(); ++pos)
   {
     QColor dataColor;
 
     unsigned int curveId = m_Controls.widgetPlot->InsertCurve(pos->first.c_str());
-    m_Controls.widgetPlot->SetCurveData(curveId, pos->second);
+    m_Controls.widgetPlot->SetCurveData(curveId, pos->second.values);
 
     if (pos->first == "ROI")
     {
@@ -1165,10 +1026,10 @@ void ModelFitInspectorView::RenderPlot()
   }
 
   // Draw image points
-  if (!m_ImagePlotCurve.empty())
+  if (!m_ImagePlotCurve.values.empty())
   {
     unsigned int curveId = m_Controls.widgetPlot->InsertCurve("measurement");
-    m_Controls.widgetPlot->SetCurveData(curveId, m_ImagePlotCurve);
+    m_Controls.widgetPlot->SetCurveData(curveId, m_ImagePlotCurve.values);
     m_Controls.widgetPlot->SetCurvePen(curveId, QPen(Qt::NoPen));
 
     // QwtSymbol needs to passed as a real pointer from MITK v2013.09.0 on
@@ -1188,30 +1049,30 @@ void ModelFitInspectorView::RenderPlot()
     unsigned int timestep = m_renderWindowPart->GetTimeNavigationController()->GetTime()->
                             GetPos();
 
-    if (timestep < m_ImagePlotCurve.size())
+    if (timestep < m_ImagePlotCurve.values.size())
     {
       QwtSymbol* blueSymbol = new QwtSymbol(QwtSymbol::Diamond, QColor(Qt::blue),
                                             QColor(Qt::blue), QSize(8, 8));
       QwtPlotMarker* marker = new QwtPlotMarker();
       marker->setSymbol(blueSymbol);
-      marker->setValue(m_ImagePlotCurve[timestep].first, m_ImagePlotCurve[timestep].second);
+      marker->setValue(m_ImagePlotCurve.values[timestep].first, m_ImagePlotCurve.values[timestep].second);
       marker->attach(m_Controls.widgetPlot->GetPlot());
     }
 
-    for (QmitkPlotWidget::XYDataVector::size_type i = 0; i < m_ImagePlotCurve.size(); ++i)
+    for (QmitkPlotWidget::XYDataVector::size_type i = 0; i < m_ImagePlotCurve.values.size(); ++i)
     {
-      m_Controls.tableData->item(i, 1)->setText(QString::number(m_ImagePlotCurve[i].second));
+      m_Controls.tableData->item(i, 1)->setText(QString::number(m_ImagePlotCurve.values[i].second));
     }
   }
 
   //draw model curve
-  if (!m_ModelPlotCurve.empty())
+  if (!m_ModelPlotCurve.values.empty())
   {
     QPen pen;
     pen.setColor(QColor(Qt::black));
     pen.setWidth(2);
     unsigned int curveId = m_Controls.widgetPlot->InsertCurve("fit");
-    m_Controls.widgetPlot->SetCurveData(curveId, m_ModelPlotCurve);
+    m_Controls.widgetPlot->SetCurveData(curveId, m_ModelPlotCurve.values);
     m_Controls.widgetPlot->SetCurvePen(curveId, pen);
 
     // Manually set the legend attribute to use the symbol as the legend icon and alter its
@@ -1223,9 +1084,9 @@ void ModelFitInspectorView::RenderPlot()
                              itemList(QwtPlotItem::Rtti_PlotCurve).back());
     fitCurve->setLegendAttribute(QwtPlotCurve::LegendShowLine);
 
-    for (QmitkPlotWidget::XYDataVector::size_type i = 0; i < m_ImagePlotCurve.size(); ++i)
+    for (QmitkPlotWidget::XYDataVector::size_type i = 0; i < m_ImagePlotCurve.values.size(); ++i)
     {
-      m_Controls.tableData->item(i, 2)->setText(QString::number(m_ModelPlotCurve[i *
+      m_Controls.tableData->item(i, 2)->setText(QString::number(m_ModelPlotCurve.values[i *
           INTERPOLATION_STEPS].second));
     }
   }
@@ -1245,41 +1106,41 @@ void ModelFitInspectorView::InitDataTable()
   headers.push_back(QString("Time"));
   headers.push_back(QString("Input image"));
 
-  if (!this->m_ModelPlotCurve.empty())
+  if (!this->m_ModelPlotCurve.values.empty())
   {
     headers.push_back(QString("Model"));
   }
 
-  for (CurveMapType::const_iterator pos = this->m_InputDataPlotCurves.begin();
+  for (mitk::PlotDataCurveCollection::const_iterator pos = this->m_InputDataPlotCurves.begin();
        pos != this->m_InputDataPlotCurves.end(); ++pos)
   {
     headers.push_back(QString::fromStdString(pos->first));
   }
 
-  m_Controls.tableData->setRowCount(m_ImagePlotCurve.size());
+  m_Controls.tableData->setRowCount(m_ImagePlotCurve.values.size());
   m_Controls.tableData->setColumnCount(headers.size());
 
   m_Controls.tableData->setHorizontalHeaderLabels(headers);
   m_Controls.tableData->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
 
-  for (QmitkPlotWidget::XYDataVector::size_type i = 0; i < m_ImagePlotCurve.size(); ++i)
+  for (QmitkPlotWidget::XYDataVector::size_type i = 0; i < m_ImagePlotCurve.values.size(); ++i)
   {
     int column = 0;
-    QTableWidgetItem* newItem = new QTableWidgetItem(QString::number(m_ImagePlotCurve[i].first));
+    QTableWidgetItem* newItem = new QTableWidgetItem(QString::number(m_ImagePlotCurve.values[i].first));
     m_Controls.tableData->setItem(i, column++, newItem);
-    newItem = new QTableWidgetItem(QString::number(m_ImagePlotCurve[i].second));
+    newItem = new QTableWidgetItem(QString::number(m_ImagePlotCurve.values[i].second));
     m_Controls.tableData->setItem(i, column++, newItem);
 
-    if (!m_ModelPlotCurve.empty())
+    if (!m_ModelPlotCurve.values.empty())
     {
-      newItem = new QTableWidgetItem(QString::number(m_ModelPlotCurve[i * INTERPOLATION_STEPS].second));
+      newItem = new QTableWidgetItem(QString::number(m_ModelPlotCurve.values[i * INTERPOLATION_STEPS].second));
       m_Controls.tableData->setItem(i, column++, newItem);
     }
 
-    for (CurveMapType::const_iterator pos = this->m_InputDataPlotCurves.begin();
+    for (mitk::PlotDataCurveCollection::const_iterator pos = this->m_InputDataPlotCurves.begin();
          pos != this->m_InputDataPlotCurves.end(); ++pos, ++column)
     {
-      newItem = new QTableWidgetItem(QString::number(pos->second[i].second));
+      newItem = new QTableWidgetItem(QString::number(pos->second.values[i].second));
       m_Controls.tableData->setItem(i, column, newItem);
     }
   }

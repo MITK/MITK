@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkModelParameterizerBase.h"
 #include "mitkModelFitInfo.h"
 #include "mitkIModelFitProvider.h"
+#include "mitkModelFitPlotDataHelper.h"
 
 // Qt
 #include "ui_ModelFitInspectorViewControls.h"
@@ -134,10 +135,6 @@ protected:
    */
   mitk::DataNode::ConstPointer GetParentNode(mitk::DataNode::ConstPointer node);
 
-  /** Super sample passed time grid with the factor INTERPOLATION_STEPS and interpolates linear in between.*/
-  mitk::ModelBase::TimeGridType GenerateInterpolatedTimeGrid(const mitk::ModelBase::TimeGridType&
-      grid) const;
-
   /** Sets m_currentSelectedPosition to the current selection and validates if this position is valid
    * for the input image of the currently selected fit. If it is valid, m_validSelectedPosition is set to true.
    * If the fit, his input image or geometry is not specified, it will also handled as invalid.*/
@@ -209,11 +206,9 @@ protected:
   itk::TimeStamp m_currentPositionTime;
   itk::TimeStamp m_lastRefreshTime;
 
-  QmitkPlotWidget::XYDataVector m_ImagePlotCurve;
-  QmitkPlotWidget::XYDataVector m_ModelPlotCurve;
-
-  typedef std::map<std::string, QmitkPlotWidget::XYDataVector> CurveMapType;
-  CurveMapType m_InputDataPlotCurves;
+  mitk::PlotDataCurve m_ImagePlotCurve;
+  mitk::PlotDataCurve m_ModelPlotCurve;
+  mitk::PlotDataCurveCollection m_InputDataPlotCurves;
 
   /** Check and updates the plot data if needed.
   * @return indicates if something was refreshed (true)*/

@@ -40,6 +40,17 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
   connect(m_Controls.buttonPerformImageProcessing, &QPushButton::clicked, this, &SegmentationReworkView::DoImageProcessing);
+
+  MITK_INFO << "in qt part control";
+
+  utility::string_t port = U("2020");
+  utility::string_t address = U("http://127.0.0.1:");
+  address.append(port);
+
+  m_HttpHandler = std::unique_ptr<SegmentationReworkREST>(new SegmentationReworkREST(address));
+  m_HttpHandler->open().wait();
+
+  MITK_INFO << "Listening for requests at: " << utility::conversions::to_utf8string(address);
 }
 
 void SegmentationReworkView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,

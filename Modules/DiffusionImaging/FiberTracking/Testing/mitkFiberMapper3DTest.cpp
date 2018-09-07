@@ -80,7 +80,7 @@ public:
     renderingHelper.SetViewDirection(mitk::SliceNavigationController::Frontal);
     renderingHelper.SetMapperIDToRender2D();
 
-    std::this_thread::sleep_for(std::chrono_literals::operator""s(1));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     renderingHelper.SaveReferenceScreenShot(mitk::IOUtil::GetTempPath()+"fib_2D.png");
     mitk::Image::Pointer test_image = mitk::IOUtil::Load<mitk::Image>(mitk::IOUtil::GetTempPath()+"fib_2D.png");
     mitk::Image::Pointer ref_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Rendering/fib_2D.png"));
@@ -93,7 +93,7 @@ public:
     renderingHelper.AddNodeToStorage(node);
     renderingHelper.SetMapperIDToRender3D();
 
-    std::this_thread::sleep_for(std::chrono_literals::operator""s(1));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     renderingHelper.SaveReferenceScreenShot(mitk::IOUtil::GetTempPath()+"fib_3D.png");
     mitk::Image::Pointer test_image = mitk::IOUtil::Load<mitk::Image>(mitk::IOUtil::GetTempPath()+"fib_3D.png");
     mitk::Image::Pointer ref_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Rendering/fib_3D.png"));
@@ -108,7 +108,7 @@ public:
     renderingHelper.AddNodeToStorage(node);
     renderingHelper.SetMapperIDToRender3D();
 
-    std::this_thread::sleep_for(std::chrono_literals::operator""s(1));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     renderingHelper.SaveReferenceScreenShot(mitk::IOUtil::GetTempPath()+"fib_tubes_3D.png");
     mitk::Image::Pointer test_image = mitk::IOUtil::Load<mitk::Image>(mitk::IOUtil::GetTempPath()+"fib_tubes_3D.png");
     mitk::Image::Pointer ref_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Rendering/fib_tubes_3D.png"));
@@ -123,7 +123,7 @@ public:
     renderingHelper.AddNodeToStorage(node);
     renderingHelper.SetMapperIDToRender3D();
 
-    std::this_thread::sleep_for(std::chrono_literals::operator""s(1));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     renderingHelper.SaveReferenceScreenShot(mitk::IOUtil::GetTempPath()+"fib_ribbon_3D.png");
     mitk::Image::Pointer test_image = mitk::IOUtil::Load<mitk::Image>(mitk::IOUtil::GetTempPath()+"fib_ribbon_3D.png");
     mitk::Image::Pointer ref_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Rendering/fib_ribbon_3D.png"));
@@ -138,7 +138,7 @@ public:
     renderingHelper.AddNodeToStorage(node);
     renderingHelper.SetMapperIDToRender3D();
 
-    std::this_thread::sleep_for(std::chrono_literals::operator""s(1));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     renderingHelper.SaveReferenceScreenShot(mitk::IOUtil::GetTempPath()+"fib_line_3D.png");
     mitk::Image::Pointer test_image = mitk::IOUtil::Load<mitk::Image>(mitk::IOUtil::GetTempPath()+"fib_line_3D.png");
     mitk::Image::Pointer ref_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Rendering/fib_line_3D.png"));
@@ -154,7 +154,7 @@ public:
     renderingHelper.AddNodeToStorage(node);
     renderingHelper.SetMapperIDToRender3D();
 
-    std::this_thread::sleep_for(std::chrono_literals::operator""s(1));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     renderingHelper.SaveReferenceScreenShot(mitk::IOUtil::GetTempPath()+"fib_color_3D.png");
     mitk::Image::Pointer test_image = mitk::IOUtil::Load<mitk::Image>(mitk::IOUtil::GetTempPath()+"fib_color_3D.png");
     mitk::Image::Pointer ref_image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Rendering/fib_color_3D.png"));

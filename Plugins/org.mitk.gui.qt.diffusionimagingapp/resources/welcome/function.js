@@ -11,7 +11,7 @@ var moduleNames = new Array(
                             "Fiber Processing",
                             "Connectomics",
                             "Fiberfox",
-                            "IVIM",
+                            "IVIM & Kurtosis",
                             "Segmentation",
                             "MITK Downloads & News");
 

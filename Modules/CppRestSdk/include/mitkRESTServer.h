@@ -26,15 +26,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "cpprest/containerstream.h"
 #include "cpprest/producerconsumerstream.h"
 
-using namespace std;
-using namespace web;
-using namespace http;
-using namespace utility;
-using namespace http::experimental::listener;
+#include "MitkRESTServerExports.h"
+
+typedef web::http::experimental::listener::http_listener MitkListener;
+typedef web::http::http_request MitkRequest;
+typedef web::http::methods MitkRESTMethods;
+typedef web::http::status_codes MitkRestStatusCodes;
 
 namespace mitk {
 
-  class RESTServer
+  class MITKRESTSERVER_EXPORT RESTServer
   {
   public:
 
@@ -42,17 +43,17 @@ namespace mitk {
     RESTServer(utility::string_t url);
     virtual ~RESTServer();
 
-    void handle_get(http_request message);
-    void handle_put(http_request message);
-    void handle_post(http_request message);
-    void handle_delete(http_request message);
-    void handle_error(pplx::task<void>& t);
+    pplx::task<void> open() { return m_Listener.open(); }
+    pplx::task<void> close() { return m_Listener.close(); }
 
-    pplx::task<void> open() { return m_listener.open(); }
-    pplx::task<void> close() { return m_listener.close(); }
+  protected:
+    virtual void HandleGet(MitkRequest message) { };
+    virtual void HandlePut(MitkRequest message) { };
+    virtual void HandlePost(MitkRequest message) { };
+    virtual void HandleDelete(MitkRequest message) { };
+    void HandleError(pplx::task<void>& t);
 
-  private:
-    http_listener m_listener;
+    MitkListener m_Listener;
   };
 };
 

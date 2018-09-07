@@ -5,6 +5,7 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_segmentation_rework_Activator.cpp
   SegmentationReworkView.cpp
+  SegmentationReworkREST.cpp
 )
 
 set(UI_FILES

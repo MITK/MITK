@@ -821,7 +821,7 @@ endif()
 
 if(MITK_USE_CppRestSdk)
   message(WARNING "Be sure to install cpprestsdk via vcpkg and set cpprestsdk_DIR to /vcpkg/installed/[OS_VERSION]/share/cpprestsdk")
-  find_package(cpprestsdk CONFIG REQUIRED)
+  find_package(cpprestsdk REQUIRED)
 endif()
 
 # Qt support

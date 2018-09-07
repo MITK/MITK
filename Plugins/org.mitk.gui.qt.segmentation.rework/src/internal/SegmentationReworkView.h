@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_SegmentationReworkViewControls.h"
 
+#include "SegmentationReworkRest.h"
+
 /**
   \brief SegmentationReworkView
 
@@ -54,6 +56,9 @@ protected:
   void DoImageProcessing();
 
   Ui::SegmentationReworkViewControls m_Controls;
+
+private:
+  std::unique_ptr<SegmentationReworkREST> m_HttpHandler;
 };
 
 #endif // SegmentationReworkView_h

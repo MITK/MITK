@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef SegmentationReworkView_h
 #define SegmentationReworkView_h
 

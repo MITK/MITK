@@ -17,28 +17,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKRESTSERVER_H
 #define MITKRESTSERVER_H
 
-#include "cpprest/json.h"
-#include "cpprest/http_listener.h"
-#include "cpprest/uri.h"
 #include "cpprest/asyncrt_utils.h"
-#include "cpprest/json.h"
-#include "cpprest/filestream.h"
 #include "cpprest/containerstream.h"
+#include "cpprest/filestream.h"
+#include "cpprest/http_listener.h"
+#include "cpprest/json.h"
 #include "cpprest/producerconsumerstream.h"
+#include "cpprest/uri.h"
 
-#include "MitkRESTServerExports.h"
+// hm.. maybe go after that warning at some time? seems like a nasty hack, but works so far :)
+#pragma warning(disable : 4251)
+
+#include "MitkCppRestSdkExports.h"
 
 typedef web::http::experimental::listener::http_listener MitkListener;
 typedef web::http::http_request MitkRequest;
 typedef web::http::methods MitkRESTMethods;
 typedef web::http::status_codes MitkRestStatusCodes;
+typedef web::json::json_exception MitkJsonException;
 
-namespace mitk {
-
-  class MITKRESTSERVER_EXPORT RESTServer
+namespace mitk
+{
+  class MITKCPPRESTSDK_EXPORT RESTServer
   {
   public:
-
     RESTServer();
     RESTServer(utility::string_t url);
     virtual ~RESTServer();
@@ -46,12 +48,14 @@ namespace mitk {
     pplx::task<void> open() { return m_Listener.open(); }
     pplx::task<void> close() { return m_Listener.close(); }
 
+    static std::string convertToUtf8(utility::string_t stringT) { return utility::conversions::to_utf8string(stringT); }
+
   protected:
-    virtual void HandleGet(MitkRequest message) { };
-    virtual void HandlePut(MitkRequest message) { };
-    virtual void HandlePost(MitkRequest message) { };
-    virtual void HandleDelete(MitkRequest message) { };
-    void HandleError(pplx::task<void>& t);
+    virtual void HandleGet(MitkRequest message){};
+    virtual void HandlePut(MitkRequest message){};
+    virtual void HandlePost(MitkRequest message){};
+    virtual void HandleDelete(MitkRequest message){};
+    void HandleError(pplx::task<void> &t);
 
     MitkListener m_Listener;
   };

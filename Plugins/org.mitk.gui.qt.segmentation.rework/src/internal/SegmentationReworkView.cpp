@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
@@ -39,9 +38,8 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
-  connect(m_Controls.buttonPerformImageProcessing, &QPushButton::clicked, this, &SegmentationReworkView::DoImageProcessing);
-
-  MITK_INFO << "in qt part control";
+  connect(
+    m_Controls.buttonPerformImageProcessing, &QPushButton::clicked, this, &SegmentationReworkView::DoImageProcessing);
 
   utility::string_t port = U("2020");
   utility::string_t address = U("http://127.0.0.1:");

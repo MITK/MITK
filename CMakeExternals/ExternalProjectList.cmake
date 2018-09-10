@@ -15,6 +15,7 @@ mitkFunctionAddExternalProject(NAME ZLIB        OFF ADVANCED NO_PACKAGE NO_CACHE
 
 mitkFunctionAddExternalProject(NAME HDF5        ON ADVANCED)
 mitkFunctionAddExternalProject(NAME BetData     OFF ADVANCED)
+mitkFunctionAddExternalProject(NAME OpenMP      ON)
 
 # -----------------------------------------
 # The following external projects must be
@@ -22,7 +23,7 @@ mitkFunctionAddExternalProject(NAME BetData     OFF ADVANCED)
 # inter-dependencies
 
 mitkFunctionAddExternalProject(NAME SWIG      OFF ADVANCED NO_PACKAGE DEPENDS PCRE)
-mitkFunctionAddExternalProject(NAME Python    OFF          NO_PACKAGE DEPENDS SWIG DOC "Use Python wrapping in MITK")
+mitkFunctionAddExternalProject(NAME Python    OFF)
 mitkFunctionAddExternalProject(NAME OpenCV    OFF)
 mitkFunctionAddExternalProject(NAME Vigra     OFF          DEPENDS HDF5)
 

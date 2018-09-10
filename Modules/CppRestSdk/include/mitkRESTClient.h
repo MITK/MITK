@@ -14,13 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKRESTSERVER_H
-#define MITKRESTSERVER_H
+#ifndef MITKRESTCLIENT_H
+#define MITKRESTCLIENT_H
 
 #include "cpprest/asyncrt_utils.h"
 #include "cpprest/containerstream.h"
 #include "cpprest/filestream.h"
-#include "cpprest/http_listener.h"
+#include "cpprest/http_client.h"
 #include "cpprest/json.h"
 #include "cpprest/producerconsumerstream.h"
 #include "cpprest/uri.h"
@@ -30,36 +30,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkCppRestSdkExports.h"
 
-typedef web::http::experimental::listener::http_listener MitkListener;
+typedef web::http::client::http_client MitkClient;
 typedef web::http::http_request MitkRequest;
 typedef web::http::http_response MitkResponse;
 typedef web::http::methods MitkRESTMethods;
+typedef web::http::uri_builder MitkUriBuilder;
 typedef web::http::status_codes MitkRestStatusCodes;
 typedef web::json::json_exception MitkJsonException;
 
 namespace mitk
 {
-  class MITKCPPRESTSDK_EXPORT RESTServer
+  class MITKCPPRESTSDK_EXPORT RESTClient
   {
-  public:
-    RESTServer();
-    RESTServer(utility::string_t url);
-    virtual ~RESTServer();
+  public:;
+    RESTClient(utility::string_t url);
+    virtual ~RESTClient();
 
-    pplx::task<void> open() { return m_Listener.open(); }
-    pplx::task<void> close() { return m_Listener.close(); }
+    void executeGETRequest(utility::string_t uri);
+    void executeWADOGET(std::string studyUID, std::string seriesUID, std::string instanceUID);
+ 
+  private:
+    MitkClient m_Client;
 
-    static std::string convertToUtf8(utility::string_t stringT) { return utility::conversions::to_utf8string(stringT); }
-
-  protected:
-    virtual void HandleGet(MitkRequest message){};
-    virtual void HandlePut(MitkRequest message){};
-    virtual void HandlePost(MitkRequest message){};
-    virtual void HandleDelete(MitkRequest message){};
-    void HandleError(pplx::task<void> &t);
-
-    MitkListener m_Listener;
   };
 };
 
-#endif // MITKRESTSERVER_H
+#endif // MITKRESTCLIENT_H

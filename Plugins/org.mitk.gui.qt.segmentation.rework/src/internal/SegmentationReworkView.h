@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_SegmentationReworkViewControls.h"
 
 #include "SegmentationReworkRest.h"
+#include <mitkRESTClient.h>
 
 /**
   \brief SegmentationReworkView
@@ -54,10 +55,13 @@ protected:
   /// \brief Called when the user clicks the GUI button
   void DoImageProcessing();
 
+  void UploadNewSegmentation();
+
   Ui::SegmentationReworkViewControls m_Controls;
 
 private:
   std::unique_ptr<SegmentationReworkREST> m_HttpHandler;
+  mitk::RESTClient* m_RestClient;
 };
 
 #endif // SegmentationReworkView_h

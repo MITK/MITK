@@ -52,7 +52,12 @@ void SegmentationReworkREST::HandlePut(MitkRequest message)
   catch (MitkJsonException &e)
   {
     MITK_ERROR << e.what() << ".. oh man, that was not expected";
+    message.reply(MitkRestStatusCodes::BadRequest, "oh man, that was not expected");
+    return;
   }
-  message.reply(MitkRestStatusCodes::OK, "Sure, i got you.. have an awesome day");
+  MitkResponse response(MitkRestStatusCodes::OK);
+  response.headers().add(U("Access-Control-Allow-Origin"), U("localhost:9000/*"));
+  response.set_body("Sure, i got you.. have an awesome day");
+  message.reply(response);
   return;
 }

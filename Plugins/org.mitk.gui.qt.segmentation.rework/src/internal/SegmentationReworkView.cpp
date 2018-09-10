@@ -31,15 +31,29 @@ const std::string SegmentationReworkView::VIEW_ID = "org.mitk.views.segmentation
 
 void SegmentationReworkView::SetFocus()
 {
-  m_Controls.buttonPerformImageProcessing->setFocus();
+
 }
 
 void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
-  connect(
-    m_Controls.buttonPerformImageProcessing, &QPushButton::clicked, this, &SegmentationReworkView::DoImageProcessing);
+
+  connect(m_Controls.buttonUpload, &QPushButton::clicked, this, &SegmentationReworkView::UploadNewSegmentation);
+
+  std::map<double, double> map;
+  map.insert(std::map<double, double>::value_type(0,0.92));
+  map.insert(std::map<double, double>::value_type(1, 0.32));
+  map.insert(std::map<double, double>::value_type(2, 0.52));
+
+  m_Controls.chartWidget->AddData2D(map, "similarity score");
+  m_Controls.chartWidget->SetChartType("similarity score", QmitkChartWidget::ChartType::line);
+  m_Controls.chartWidget->SetXAxisLabel("slice number");
+  m_Controls.chartWidget->SetYAxisLabel("similarity score");
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+  m_Controls.chartWidget->Show();
+#endif
+
 
   utility::string_t port = U("2020");
   utility::string_t address = U("http://127.0.0.1:");
@@ -49,6 +63,16 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   m_HttpHandler->open().wait();
 
   MITK_INFO << "Listening for requests at: " << utility::conversions::to_utf8string(address);
+
+  utility::string_t pacsHost = U("http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE");
+  m_RestClient = new mitk::RESTClient(pacsHost);
+
+
+  auto studyUID = "1.2.840.113654.2.70.1.212389164178151513355109725184839174882";
+  auto seriesUID = "1.2.276.0.7230010.3.1.3.296485376.9.1536581245.922469";
+  auto instanceUID = "1.2.276.0.7230010.3.1.4.296485376.9.1536581245.922470";
+
+  m_RestClient->executeWADOGET(studyUID, seriesUID, instanceUID);
 }
 
 void SegmentationReworkView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
@@ -60,13 +84,16 @@ void SegmentationReworkView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /
     if (node.IsNotNull() && dynamic_cast<mitk::Image *>(node->GetData()))
     {
       m_Controls.labelWarning->setVisible(false);
-      m_Controls.buttonPerformImageProcessing->setEnabled(true);
       return;
     }
   }
 
   m_Controls.labelWarning->setVisible(true);
-  m_Controls.buttonPerformImageProcessing->setEnabled(false);
+}
+
+void SegmentationReworkView::UploadNewSegmentation()
+{
+
 }
 
 void SegmentationReworkView::DoImageProcessing()

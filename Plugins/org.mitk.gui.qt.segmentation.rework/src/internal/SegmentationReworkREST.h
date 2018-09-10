@@ -27,6 +27,4 @@ public:
   void HandlePut(MitkRequest message);
 };
 
-
-
 #endif // SegmentationReworkREST_h

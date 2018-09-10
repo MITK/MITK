@@ -5,6 +5,7 @@ if(MITK_USE_Python)
 project(org_mitk_gui_qt_diffusionimaging_python)
 
 mitk_create_plugin(
+  SUBPROJECTS MITK-DTI
   EXPORT_DIRECTIVE DIFFUSIONIMAGING_PREPROCESSING_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
   MODULE_DEPENDS MitkDiffusionCore MitkPython

@@ -3,6 +3,7 @@
 project(org_mitk_gui_qt_diffusionimaging_tractography)
 
 mitk_create_plugin(
+  SUBPROJECTS MITK-DTI
   EXPORT_DIRECTIVE DIFFUSIONIMAGING_TRACTOGRAPHY_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
   MODULE_DEPENDS MitkFiberTracking

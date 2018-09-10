@@ -64,6 +64,16 @@ QToolBar QToolButton {
   padding: 4px;
 }
 
+QToolButton::menu-indicator {
+  image: none;
+}
+
+QToolButton[popupMode="1"] { /* only for MenuButtonPopup */
+ padding-right: 20px; /* make way for the popup button */
+ border: 1px solid #333;
+ border-radius: 5px;
+}
+
 QToolButton#qt_toolbar_ext_button {
   background-color: transparent;
   border: none;

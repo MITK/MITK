@@ -120,9 +120,9 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::PlanarFigureObjectFactory::GetSa
 void mitk::PlanarFigureObjectFactory::CreateFileExtensionsMap()
 {
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure Files"));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pfa", "Autoplan Planar Figure Files"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pfa", "Violet Planar Figure Files"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure Files"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pfa", "Autoplan Planar Figure Files"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pfa", "Violet Planar Figure Files"));
 }
 
 void mitk::PlanarFigureObjectFactory::RegisterIOFactories()

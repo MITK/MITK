@@ -91,7 +91,7 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
        int argumentsAdded = 0;
        for (int i = 0; i < arguments.size(); ++i)
        {
-         if (arguments[i].right(5) == ".autoplan")
+         if (arguments[i].right(7) == ".violet")
          {
            mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
 
@@ -175,7 +175,7 @@ void QmitkCommonExtPlugin::handleIPCMessage(const QByteArray& msg)
 
   foreach (QString arg, args)
   {
-    if (arg.endsWith(".autoplan"))
+    if (arg.endsWith(".violet"))
     {
       sceneArgs << arg;
     }

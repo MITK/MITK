@@ -1,22 +1,95 @@
 <!DOCTYPE RCC><RCC version="1.0">
- <qresource prefix="/org.blueberry.ui.qt">
-     <file>cursor_bottom.xpm</file>
-     <file>cursor_center.xpm</file>
-     <file>cursor_left.xpm</file>
-     <file>cursor_offscreen.xpm</file>
-     <file>cursor_right.xpm</file>
-     <file>cursor_top.xpm</file>
-     <file>dialog-error.svg</file>
-     <file>icon_missing.png</file>
-     <file>tab_close_icon.png</file>
-     <file>tab_close_icon-active.png</file>
+  <qresource prefix="/org.blueberry.ui.qt">
+    <file>cursor_bottom.xpm</file>
+    <file>cursor_center.xpm</file>
+    <file>cursor_left.xpm</file>
+    <file>cursor_offscreen.xpm</file>
+    <file>cursor_right.xpm</file>
+    <file>cursor_top.xpm</file>
+    <file>dialog-error.svg</file>
+    <file>icon_missing.png</file>
+    <file>tab_close.svg</file>
 
-     <file>darkstyle.qss</file>
-     <file>darkstyle-activetab.qss</file>
-     <file>darkstyle-tab.qss</file>
+    <file>lightstyle.qss</file>
+    <file>lightstyle-activetab.qss</file>
+    <file>lightstyle-tab.qss</file>
 
-     <file>defaultstyle.qss</file>
-     <file>defaultstyle-activetab.qss</file>
-     <file>defaultstyle-tab.qss</file>
- </qresource>
- </RCC>
+    <file>dark/Hmovetoolbar.png</file>
+    <file>dark/stylesheet-branch-end.png</file>
+    <file>dark/branch_closed-on.png</file>
+    <file>dark/stylesheet-vline.png</file>
+    <file>dark/branch_closed.png</file>
+    <file>dark/branch_open-on.png</file>
+    <file>dark/transparent.png</file>
+    <file>dark/right_arrows.svg</file>
+    <file>dark/sizegrip.png</file>
+    <file>dark/tab_close_grey.svg</file>
+    <file>dark/tab_close_grey_active.svg</file>
+    <file>dark/Vmovetoolbar.png</file>
+    <file>dark/stylesheet-branch-more.png</file>
+    <file>dark/Hsepartoolbar.png</file>
+    <file>dark/branch_open.png</file>
+    <file>dark/Vsepartoolbar.png</file>
+    <file>dark/undock.png</file>
+
+    <file>dark/down-arrow.svg</file>
+    <file>dark/down-arrow-disabled.svg</file>
+    <file>dark/down-arrow-hover.svg</file>
+    <file>dark/down-arrow-pressed.svg</file>
+    <file>dark/left-arrow.svg</file>
+    <file>dark/left-arrow-disabled.svg</file>
+    <file>dark/left-arrow-hover.svg</file>
+    <file>dark/left-arrow-pressed.svg</file>
+    <file>dark/right-arrow.svg</file>
+    <file>dark/right-arrow-disabled.svg</file>
+    <file>dark/right-arrow-hover.svg</file>
+    <file>dark/right-arrow-pressed.svg</file>
+    <file>dark/up-arrow.svg</file>
+    <file>dark/up-arrow-disabled.svg</file>
+    <file>dark/up-arrow-hover.svg</file>
+    <file>dark/up-arrow-pressed.svg</file>
+
+    <file>dark/tight-down-arrow.svg</file>
+    <file>dark/tight-down-arrow-disabled.svg</file>
+    <file>dark/tight-down-arrow-hover.svg</file>
+    <file>dark/tight-down-arrow-pressed.svg</file>
+    <file>dark/tight-left-arrow.svg</file>
+    <file>dark/tight-left-arrow-disabled.svg</file>
+    <file>dark/tight-left-arrow-hover.svg</file>
+    <file>dark/tight-left-arrow-pressed.svg</file>
+    <file>dark/tight-right-arrow.svg</file>
+    <file>dark/tight-right-arrow-disabled.svg</file>
+    <file>dark/tight-right-arrow-hover.svg</file>
+    <file>dark/tight-right-arrow-pressed.svg</file>
+    <file>dark/tight-up-arrow.svg</file>
+    <file>dark/tight-up-arrow-disabled.svg</file>
+    <file>dark/tight-up-arrow-hover.svg</file>
+    <file>dark/tight-up-arrow-pressed.svg</file>
+
+    <file>dark/tight-right-arrow-textcolor.svg</file>
+
+    <file>dark/checkbox-unchecked.svg</file>
+    <file>dark/checkbox-unchecked-hover.svg</file>
+    <file>dark/checkbox-unchecked-disabled.svg</file>
+    <file>dark/checkbox-checked.svg</file>
+    <file>dark/checkbox-checked-hover.svg</file>
+    <file>dark/checkbox-checked-disabled.svg</file>
+
+    <file>dark/radiobutton-unchecked.svg</file>
+    <file>dark/radiobutton-unchecked-hover.svg</file>
+    <file>dark/radiobutton-unchecked-disabled.svg</file>
+    <file>dark/radiobutton-checked.svg</file>
+    <file>dark/radiobutton-checked-hover.svg</file>
+    <file>dark/radiobutton-checked-disabled.svg</file>
+
+    <file>darkstyle.qss</file>
+    <file>darkstyle-tab.qss</file>
+    <file>darkstyle-activetab.qss</file>
+
+    <file>fonts/FiraSans/FiraSans.ttf</file>
+    <file>fonts/LightFiraSans/LightFiraSans.ttf</file>
+    <file>fonts/Roboto/Roboto.ttf</file>
+    <file>fonts/OpenSans/OpenSans-Regular.ttf</file>
+    <file>fonts/xkcd/xkcd.ttf</file>
+  </qresource>
+</RCC>

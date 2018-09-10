@@ -34,6 +34,7 @@ mitk::DataNode::Pointer generateModelFitTestNode()
   mitk::EnsureModelFitUID(node);
 
   testImage->SetProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), mitk::StringProperty::New("Fit1"));
+  testImage->SetProperty(mitk::ModelFitConstants::FIT_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New("MyName"));
   testImage->SetProperty(mitk::ModelFitConstants::FIT_TYPE_PROPERTY_NAME().c_str(), mitk::StringProperty::New(mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED().c_str()));
   testImage->SetProperty(mitk::ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME().c_str(), mitk::StringProperty::New("input UID"));
 
@@ -74,6 +75,7 @@ mitk::StandaloneDataStorage::Pointer generateModelFitTestStorage()
   node1->SetName("Param1");
   mitk::EnsureModelFitUID(node1);
   paramImage->SetProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), mitk::StringProperty::New("Fit1"));
+  paramImage->SetProperty(mitk::ModelFitConstants::FIT_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New("MyName1"));
   paramImage->SetProperty(mitk::ModelFitConstants::FIT_TYPE_PROPERTY_NAME().c_str(), mitk::StringProperty::New(mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED().c_str()));
   paramImage->SetProperty(mitk::ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME().c_str(), mitk::StringProperty::New(inputUID.c_str()));
 
@@ -101,6 +103,7 @@ mitk::StandaloneDataStorage::Pointer generateModelFitTestStorage()
   node2->SetData(paramImage2);
   mitk::EnsureModelFitUID(node2);
   paramImage2->SetProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), mitk::StringProperty::New("Fit1"));
+  paramImage2->SetProperty(mitk::ModelFitConstants::FIT_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New("MyName1"));
   paramImage2->SetProperty(mitk::ModelFitConstants::FIT_TYPE_PROPERTY_NAME().c_str(), mitk::StringProperty::New(mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED().c_str()));
   paramImage2->SetProperty(mitk::ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME().c_str(), mitk::StringProperty::New(inputUID.c_str()));
 
@@ -128,6 +131,7 @@ mitk::StandaloneDataStorage::Pointer generateModelFitTestStorage()
   node3->SetData(paramImage3);
   mitk::EnsureModelFitUID(node3);
   paramImage3->SetProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), mitk::StringProperty::New("Fit2"));
+  paramImage3->SetProperty(mitk::ModelFitConstants::FIT_NAME_PROPERTY_NAME().c_str(), mitk::StringProperty::New("MyName2"));
   paramImage3->SetProperty(mitk::ModelFitConstants::FIT_TYPE_PROPERTY_NAME().c_str(), mitk::StringProperty::New(mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED().c_str()));
   paramImage3->SetProperty(mitk::ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME().c_str(), mitk::StringProperty::New(inputUID.c_str()));
 
@@ -205,6 +209,7 @@ int mitkModelFitInfoTest(int  /*argc*/, char*[] /*argv[]*/)
     "Testing if CreateFitInfoFromNode returns a valid model fit info.");
   MITK_TEST_CONDITION_REQUIRED(resultFit->fitType == mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED() &&
     resultFit->uid == "Fit1" &&
+    resultFit->fitName == "MyName1" &&
     resultFit->modelType == "TestModels" &&
     resultFit->modelName == "TestModel_1" &&
     resultFit->function == ""&&

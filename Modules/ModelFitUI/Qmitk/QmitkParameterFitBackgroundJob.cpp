@@ -46,7 +46,7 @@ void ParameterFitBackgroundJob::OnFitEvent(::itk::Object* caller, const itk::Eve
 }
 
 ParameterFitBackgroundJob::
-ParameterFitBackgroundJob(mitk::ParameterFitImageGeneratorBase* generator, const mitk::modelFit::ModelFitInfo* fitInfo, const std::string& fitName, mitk::DataNode* parentNode)
+ParameterFitBackgroundJob(mitk::ParameterFitImageGeneratorBase* generator, const mitk::modelFit::ModelFitInfo* fitInfo, mitk::DataNode* parentNode)
 {
   if (!generator)
   {
@@ -60,7 +60,6 @@ ParameterFitBackgroundJob(mitk::ParameterFitImageGeneratorBase* generator, const
 
   m_Generator = generator;
   m_ModelFitInfo = fitInfo;
-  m_FitName = fitName;
   m_ParentNode = parentNode;
 
   m_spCommand = ::itk::MemberCommand<ParameterFitBackgroundJob>::New();
@@ -93,7 +92,7 @@ run()
 
       emit JobStatusChanged(QString("Generate result nodes."));
 
-      m_Results = mitk::modelFit::CreateResultNodeMap(m_Generator->GetParameterImages(), m_Generator->GetDerivedParameterImages(), m_Generator->GetCriterionImages(), m_Generator->GetEvaluationParameterImages(), m_ModelFitInfo, m_FitName);
+      m_Results = mitk::modelFit::CreateResultNodeMap(m_Generator->GetParameterImages(), m_Generator->GetDerivedParameterImages(), m_Generator->GetCriterionImages(), m_Generator->GetEvaluationParameterImages(), m_ModelFitInfo);
 
       emit ResultsAreAvailable(m_Results, this);
     }

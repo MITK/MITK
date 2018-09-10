@@ -247,6 +247,16 @@ void PETDynamicView::OnModellSet(int index)
   UpdateGUIControls();
 }
 
+std::string PETDynamicView::GetFitName() const
+{
+  std::string fitName = m_Controls.lineFitName->text().toStdString();
+  if (fitName.empty())
+  {
+    fitName = m_Controls.lineFitName->placeholderText().toStdString();
+  }
+  return fitName;
+}
+
 std::string PETDynamicView::GetDefaultFitName() const
 {
     std::string defaultName = "undefined model";
@@ -571,7 +581,7 @@ void PETDynamicView::GenerateModelFit_PixelBased(
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
-    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), roiUID);
+    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), this->GetFitName(), roiUID);
 
   mitk::ScalarListLookupTable::ValueType infoSignal;
 
@@ -637,7 +647,7 @@ void PETDynamicView::GenerateModelFit_ROIBased(
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
-    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_ROIBASED(), roiUID);
+    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_ROIBASED(), this->GetFitName(), roiUID);
 
   mitk::ScalarListLookupTable::ValueType infoSignal;
 
@@ -670,13 +680,7 @@ void PETDynamicView::DoFit(const mitk::modelFit::ModelFitInfo* fitSession,
 
   /////////////////////////
   //create job and put it into the thread pool
-  std::string fitName = m_Controls.lineFitName->text().toStdString();
-  if (fitName.empty())
-  {
-      fitName = m_Controls.lineFitName->placeholderText().toStdString();
-  }
-
-  ParameterFitBackgroundJob* pJob = new ParameterFitBackgroundJob(generator, fitSession, fitName,
+  ParameterFitBackgroundJob* pJob = new ParameterFitBackgroundJob(generator, fitSession,
       this->m_selectedNode);
 
   pJob->setAutoDelete(true);

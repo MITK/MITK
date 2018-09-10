@@ -80,6 +80,7 @@ public:
     registerProperty(mitk::ModelFitConstants::YAXIS_UNIT_PROPERTY_NAME(), "modelfit_yaxis_unit", "Value identifies the model type.");
 
     registerProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME(), "modelfit_fit_uid", "Value identifies the model type.");
+    registerProperty(mitk::ModelFitConstants::FIT_NAME_PROPERTY_NAME(), "modelfit_fit_name", "Human readable name for the fit.");
     registerProperty(mitk::ModelFitConstants::FIT_TYPE_PROPERTY_NAME(), "modelfit_fit_type", "Value identifies the model type.");
     registerProperty(mitk::ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME(), "modelfit_fit_input_imageUID", "Value identifies the model type.");
     registerProperty(mitk::ModelFitConstants::FIT_INPUT_ROIUID_PROPERTY_NAME(), "modelfit_fit_input_roiUID", "Value identifies the model type.");

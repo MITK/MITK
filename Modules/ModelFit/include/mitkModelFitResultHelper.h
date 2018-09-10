@@ -52,9 +52,9 @@ namespace mitk
 
     MITKMODELFIT_EXPORT mitk::ScalarListLookupTableProperty::Pointer ConvertStaticParametersToProperty(const mitk::modelFit::StaticParameterMap& params);
 
-    MITKMODELFIT_EXPORT DataNode::Pointer CreateResultNode(const ModelBase::ParameterNameType& name, modelFit::Parameter::Type nodeType, Image* parameterImage, const ModelFitInfo* modelFitInfo, const std::string& sessionName = "");
+    MITKMODELFIT_EXPORT DataNode::Pointer CreateResultNode(const ModelBase::ParameterNameType& name, modelFit::Parameter::Type nodeType, Image* parameterImage, const ModelFitInfo* modelFitInfo);
 
-    MITKMODELFIT_EXPORT ModelFitResultNodeVectorType CreateResultNodeMap(const ModelFitResultImageMapType& results, const ModelFitResultImageMapType& derivedResults, const ModelFitResultImageMapType& criterionResults, const ModelFitResultImageMapType& evaluationResults, const ModelFitInfo* fitInfo, const std::string& sessionName = "");
+    MITKMODELFIT_EXPORT ModelFitResultNodeVectorType CreateResultNodeMap(const ModelFitResultImageMapType& results, const ModelFitResultImageMapType& derivedResults, const ModelFitResultImageMapType& criterionResults, const ModelFitResultImageMapType& evaluationResults, const ModelFitInfo* fitInfo);
 
     MITKMODELFIT_EXPORT void StoreResultsInDataStorage(DataStorage* storage, const ModelFitResultNodeVectorType& resultNodes, DataNode* parentNode = NULL);
 

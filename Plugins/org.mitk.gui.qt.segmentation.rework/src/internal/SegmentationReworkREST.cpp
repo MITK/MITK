@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "SegmentationReworkREST.h"
-
 #include <mitkCommon.h>
 
 SegmentationReworkREST::SegmentationReworkREST(utility::string_t url) : mitk::RESTServer(url)
@@ -25,13 +24,17 @@ SegmentationReworkREST::SegmentationReworkREST(utility::string_t url) : mitk::RE
 
 SegmentationReworkREST::~SegmentationReworkREST() {}
 
+void SegmentationReworkREST::SetPutCallback(std::function<void(DicomDTO& message)> callback)
+{
+  m_PutCallback = callback;
+}
+
 void SegmentationReworkREST::HandlePut(MitkRequest message)
 {
   auto messageString = message.to_string();
   MITK_INFO << "Message PUT incoming...";
   MITK_INFO << convertToUtf8(messageString);
 
-  std::string imageSeriesUID = "";
   try
   {
     auto jsonMessage = message.extract_json().get();
@@ -40,9 +43,26 @@ void SegmentationReworkREST::HandlePut(MitkRequest message)
     if (messageTypeKey.as_string() == U("downloadData"))
     {
       auto imageSeriesUIDKey = jsonMessage.at(U("imageSeriesUID"));
-      imageSeriesUID = convertToUtf8(imageSeriesUIDKey.as_string());
-      MITK_INFO << "value of imageSeriesUID " << imageSeriesUID;
-      // trigger download function
+      auto imageStudyUIDKey = jsonMessage.at(U("imageStudyUID"));
+      auto imageInstanceUIDKey = jsonMessage.at(U("imageInstanceUID"));
+      auto simScoreKey = jsonMessage.at(U("simScoreArray"));
+      auto minSliceStartKey = jsonMessage.at(U("minSliceStart"));
+
+      DicomDTO dto;
+      dto.instanceUID = convertToUtf8(imageInstanceUIDKey.as_string());
+      dto.seriesUID = convertToUtf8(imageSeriesUIDKey.as_string());
+      dto.studyUID = convertToUtf8(imageStudyUIDKey.as_string());
+      dto.minSliceStart = minSliceStartKey.as_integer();
+
+      std::vector<double> vec;
+      web::json::array simArray = simScoreKey.as_array();
+
+      for (web::json::value score : simArray) {
+        vec.push_back(score.as_double());
+      }
+
+      dto.simScoreArray = vec;
+      m_PutCallback(dto);
     }
     else
     {

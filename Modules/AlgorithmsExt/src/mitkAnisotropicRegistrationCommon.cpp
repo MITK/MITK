@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkAnisotropicRegistrationCommon.h>
 #include <mitkPointSet.h>
 #include <vtkPoints.h>
+#include <omp.h>
 
 mitk::AnisotropicRegistrationCommon::WeightMatrix mitk::AnisotropicRegistrationCommon::CalculateWeightMatrix(
   const CovarianceMatrix &sigma_X, const CovarianceMatrix &sigma_Y)
@@ -49,7 +50,7 @@ void mitk::AnisotropicRegistrationCommon::TransformPoints(vtkPoints *src,
                                                           const Translation &translation)
 {
 #pragma omp parallel for
-  for (vtkIdType i = 0; i < src->GetNumberOfPoints(); ++i)
+  for (int i = 0; i < src->GetNumberOfPoints(); ++i)
   {
     double p_in[3];
     double p_out[3];

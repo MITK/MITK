@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 // STL pair
 #include <utility>
+#include <omp.h>
 
 /** \brief Comperator implementation used to sort the CorrespondenceList in the
   *        trimmed version of the AnisotropicIterativeClosestPointRegistration.
@@ -70,7 +71,7 @@ void mitk::AnisotropicIterativeClosestPointRegistration::ComputeCorrespondences(
   typedef itk::Matrix<double, 3, 3> WeightMatrix;
 
 #pragma omp parallel for
-  for (vtkIdType i = 0; i < X->GetNumberOfPoints(); ++i)
+  for (int i = 0; i < X->GetNumberOfPoints(); ++i)
   {
     vtkIdType bestIdx = 0;
     mitk::Vector3D x;

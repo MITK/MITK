@@ -1,0 +1,8 @@
+berry--QCTabBar::tab:selected {
+  background-color: #1c97ea;
+  border: 1px solid #1c97ea;
+}
+
+#ViewFormContentFrame {
+  border: 1px solid #1c97ea;
+}

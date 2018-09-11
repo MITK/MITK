@@ -591,7 +591,7 @@ void USNavigationMarkerPlacement::OnIntermediateResultProduced(const itk::SmartP
   // save the mitk scene
   std::string scenefile = QString(m_ExperimentResultsSubDirectory + QDir::separator()
     + QString("Scene %1 - ").arg(m_SceneNumber++, 2, 10, QChar('0'))
-    + QString::fromStdString(resultsName).replace(":", "_") + ".autoplan").toStdString();
+    + QString::fromStdString(resultsName).replace(":", "_") + ".violet").toStdString();
   MITK_INFO << "Saving Scene File: " << scenefile;
 
   mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();

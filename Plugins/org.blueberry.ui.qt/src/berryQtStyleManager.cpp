@@ -20,8 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFile>
 #include <QTextStream>
 #include <QFileInfo>
+#include <QRegularExpression>
 #include <QStringList>
 #include <QDirIterator>
+#include <QFont>
+#include <QFontDatabase>
 #include <QIcon>
 
 #include <berryLog.h>
@@ -36,9 +39,55 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
+static QString ParseColor(const QString &subject, const QString &pattern, const QString &fallback)
+{
+  QRegularExpression re(pattern, QRegularExpression::CaseInsensitiveOption);
+  auto match = re.match(subject);
+
+  return match.hasMatch()
+    ? match.captured(1)
+    : fallback;
+}
+
+QIcon QtStyleManager::ThemeIcon(const QByteArray &originalSVG)
+{
+  auto styleSheet = qApp->styleSheet();
+
+  if (styleSheet.isEmpty())
+    return QPixmap::fromImage(QImage::fromData(originalSVG));
+
+  auto iconColor = ParseColor(styleSheet,
+    QStringLiteral("iconColor\\s*[=:]\\s*(#[0-9a-f]{6})"),
+    QStringLiteral("#000000"));
+
+  auto iconAccentColor = ParseColor(styleSheet,
+    QStringLiteral("iconAccentColor\\s*[=:]\\s*(#[0-9a-f]{6})"),
+    QStringLiteral("#ffffff"));
+
+  auto themedSVG = QString(originalSVG).replace(QStringLiteral("#00ff00"), iconColor, Qt::CaseInsensitive);
+  themedSVG = themedSVG.replace(QStringLiteral("#ff00ff"), iconAccentColor, Qt::CaseInsensitive);
+
+  return QPixmap::fromImage(QImage::fromData(themedSVG.toLatin1()));
+}
+
+QIcon QtStyleManager::ThemeIcon(const QString &resourcePath)
+{
+  QFile resourceFile(resourcePath);
+
+  if (resourceFile.open(QIODevice::ReadOnly))
+  {
+    auto originalSVG = resourceFile.readAll();
+    return ThemeIcon(originalSVG);
+  }
+
+  BERRY_WARN << "Could not read " << resourcePath;
+  return QIcon();
+}
+
 QtStyleManager::QtStyleManager()
 {
   AddDefaultStyle();
+  AddDefaultFonts();
   ReadPreferences();
 }
 
@@ -76,9 +125,31 @@ QtStyleManager::~QtStyleManager()
 
 void QtStyleManager::AddDefaultStyle()
 {
-  AddStyle(":/org.blueberry.ui.qt/lightstyle.qss", "Light");
+#ifndef _APPLE_
   AddStyle(":/org.blueberry.ui.qt/darkstyle.qss", "Dark");
-  defaultStyle = styles[":/org.blueberry.ui.qt/lightstyle.qss"];
+  AddStyle(":/org.blueberry.ui.qt/lightstyle.qss", "Light");
+  defaultStyle = styles[":/org.blueberry.ui.qt/darkstyle.qss"];
+#endif
+}
+
+void QtStyleManager::AddDefaultFonts()
+{
+  m_customFontNames.append(QString("<<system>>"));
+
+  m_customFontNames.append(QString("Fira Sans"));
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/FiraSans/FiraSans.ttf");
+
+  m_customFontNames.append(QString("Light Fira Sans"));
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/LightFiraSans/LightFiraSans.ttf");
+
+  m_customFontNames.append(QString("Roboto"));
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/Roboto/Roboto.ttf");
+
+  m_customFontNames.push_back(QString("Open Sans"));
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/OpenSans/OpenSans-Regular.ttf");
+
+  m_customFontNames.push_back(QString("xkcd"));
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/xkcd/xkcd.ttf");
 }
 
 void QtStyleManager::ClearStyles()
@@ -118,7 +189,7 @@ QString QtStyleManager::GetTabStylesheet() const
 void QtStyleManager::AddStyle(const QString& styleFileName,
     const QString& styleName)
 {
-  auto   newStyle = new ExtStyle();
+  auto newStyle = new ExtStyle();
 
   if (styleName.isEmpty())
   {
@@ -133,6 +204,16 @@ void QtStyleManager::AddStyle(const QString& styleFileName,
   newStyle->fileName = styleFileName;
 
   styles.insert(newStyle->fileName, newStyle);
+}
+
+void QtStyleManager::GetFonts(QStringList& fontNames) const
+{
+  fontNames = m_customFontNames;
+}
+
+QString QtStyleManager::GetFont() const
+{
+  return m_currentFont;
 }
 
 void QtStyleManager::AddStyles(const QString& path)
@@ -242,33 +323,6 @@ void QtStyleManager::GetStyles(StyleList& styleNames) const
     styleNames.push_back(Style(i.value()->name, i.value()->fileName));
 }
 
-void QtStyleManager::GetIconThemes(IconThemeList& iconThemes) const
-{
-  iconThemes.clear();
-  iconThemes.push_back(IconTheme(QString( "<<default>>" )));
-
-  QStringList iconSearchPaths = QIcon::themeSearchPaths();
-
-  for(QStringList::Iterator pathIt = iconSearchPaths.begin(); pathIt != iconSearchPaths.end(); ++pathIt)
-  {
-    QDirIterator dirIt(*pathIt);
-    while (dirIt.hasNext())
-    {
-      QString current = dirIt.next();
-      QFileInfo info = dirIt.fileInfo();
-      if (info.isDir() && info.isReadable())
-      {
-        QFileInfo themeFile( info.filePath() + QString("/index.theme") );
-        if( themeFile.exists() && themeFile.isFile() && themeFile.isReadable() )
-        {
-          QString fileName = info.fileName();
-          iconThemes.push_back( IconTheme(fileName) );
-        }
-      }
-    }
-  }
-}
-
 void QtStyleManager::SetStyle(const QString& fileName)
 {
   SetStyle(fileName, true);
@@ -305,21 +359,31 @@ void QtStyleManager::SetStyle(const QString& fileName, bool update)
   }
 }
 
-void QtStyleManager::SetIconTheme(const QString& themeName)
+void QtStyleManager::SetFont(const QString& fontName)
 {
-  if( themeName == QString( "<<default>>" ) )
+  m_currentFont = fontName;
+}
+
+void QtStyleManager::SetFontSize(const int fontSize)
+{
+  m_currentFontSize = fontSize;
+}
+
+void QtStyleManager::UpdateWorkbenchFont()
+{
+  if( m_currentFont == QString( "<<system>>" ) ||  m_currentFont == QString( "" ))
   {
-    SetIconTheme( QString("tango"), true);
+    qApp->setFont(QFontDatabase::systemFont(QFontDatabase::GeneralFont));
   }
   else
   {
-    SetIconTheme(themeName, true);
+    QFont font;
+    font.setFamily(m_currentFont);
+    font.setPointSize(m_currentFontSize);
+    qApp->setFont(font);
   }
-}
-
-void QtStyleManager::SetIconTheme(const QString& themeName, bool /*update*/)
-{
-  QIcon::setThemeName( themeName );
+  qApp->setStyleSheet(currentStyle->stylesheet);
+  PlatformUI::GetWorkbench()->UpdateTheme();
 }
 
 QtStyleManager::Style QtStyleManager::GetDefaultStyle() const

@@ -56,7 +56,7 @@ void QmitkExtFileSaveProjectAction::Init(berry::IWorkbenchWindow* window)
 {
   m_Window = window;
   this->setText("&Save Project...");
-  this->setToolTip("Save content of Data Manager as a .autoplan project file");
+  this->setToolTip("Save content of Data Manager as a .violet project file");
 
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
 }
@@ -97,11 +97,11 @@ void QmitkExtFileSaveProjectAction::Run()
 
     mitk::DataStorage::Pointer storage = dsRef->GetDataStorage();
 
-    QString dialogTitle = "Save Autoplan Scene (%1)";
+    QString dialogTitle = "Save Violet Scene (%1)";
     QString fileName = QFileDialog::getSaveFileName(NULL,
                                                     dialogTitle.arg(dsRef->GetLabel()),
                                                     m_LastPath,
-                                                    "Autoplan scene files (*.autoplan)",
+                                                    "Violet scene files (*.violet)",
                                                     NULL );
 
     if (fileName.isEmpty() )
@@ -110,8 +110,8 @@ void QmitkExtFileSaveProjectAction::Run()
     // remember the location
     m_LastPath = fileName;
 
-    if ( fileName.right(5) != ".autoplan" )
-      fileName += ".autoplan";
+    if ( fileName.right(7) != ".violet" )
+      fileName += ".violet";
 
     mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
 

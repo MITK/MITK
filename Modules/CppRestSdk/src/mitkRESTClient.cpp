@@ -22,14 +22,13 @@ mitk::RESTClient::RESTClient(utility::string_t url) : m_Client(url) {}
 
 mitk::RESTClient::~RESTClient() {}
 
-void mitk::RESTClient::executeGETRequest(utility::string_t uri)
+void mitk::RESTClient::executeGETRequest(utility::string_t filePath, utility::string_t uri)
 {
   MITK_INFO << "Calling GET with " << utility::conversions::to_utf8string(uri) << " on client " << utility::conversions::to_utf8string(m_Client.base_uri().to_string());
 
   auto fileBuffer = std::make_shared<concurrency::streams::streambuf<uint8_t>>();
-  const utility::string_t outputFileName = U("downloadWADO.dcm");
 
-  concurrency::streams::file_buffer<uint8_t>::open(outputFileName, std::ios::out).then([=](concurrency::streams::streambuf<uint8_t> outFile) -> pplx::task<MitkResponse>
+  concurrency::streams::file_buffer<uint8_t>::open(filePath, std::ios::out).then([=](concurrency::streams::streambuf<uint8_t> outFile) -> pplx::task<MitkResponse>
   {
     *fileBuffer = outFile;
 
@@ -50,22 +49,10 @@ void mitk::RESTClient::executeGETRequest(utility::string_t uri)
     // Wait for the entire response body to be written into the file.
     .wait();
 
-  //m_Client.request(MitkRESTMethods::GET, uri).then([=](MitkResponse response)
-  //{
-
-  //  if (response.status_code() == MitkRestStatusCodes::OK) {
-  //    auto fileStream = std::make_shared<concurrency::streams::ostream>();
-  //    MITK_INFO << "Received response status code: " << response.status_code();
-  //    response.body().read_to_end(fileStream->streambuf());
-
-  //    return;
-  //  }
-
-  //});
   return;
 }
 
-void mitk::RESTClient::executeWADOGET(std::string studyUID, std::string seriesUID, std::string instanceUID)
+void mitk::RESTClient::executeWADOGET(utility::string_t filePath, std::string studyUID, std::string seriesUID, std::string instanceUID)
 {
   MitkUriBuilder builder(U("wado"));
   builder.append_query(U("requestType"), U("WADO"));
@@ -73,5 +60,5 @@ void mitk::RESTClient::executeWADOGET(std::string studyUID, std::string seriesUI
   builder.append_query(U("seriesUID"), utility::conversions::to_string_t(seriesUID));
   builder.append_query(U("objectUID"), utility::conversions::to_string_t(instanceUID));
   builder.append_query(U("contentType"), U("application/dicom"));
-  executeGETRequest(builder.to_string());
+  executeGETRequest(filePath, builder.to_string());
 }

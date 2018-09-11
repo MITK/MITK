@@ -46,8 +46,8 @@ namespace mitk
     RESTClient(utility::string_t url);
     virtual ~RESTClient();
 
-    void executeGETRequest(utility::string_t uri);
-    void executeWADOGET(std::string studyUID, std::string seriesUID, std::string instanceUID);
+    void executeGETRequest(const utility::string_t filePath, utility::string_t uri);
+    void executeWADOGET(const utility::string_t filePath, std::string studyUID, std::string seriesUID, std::string instanceUID);
  
   private:
     MitkClient m_Client;

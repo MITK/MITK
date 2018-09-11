@@ -21,10 +21,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class SegmentationReworkREST : public mitk::RESTServer {
 public:
+
+  struct DicomDTO {
+    std::string seriesUID;
+    std::string studyUID;
+    std::string instanceUID;
+    std::vector<double> simScoreArray;
+    int minSliceStart;
+  };
+
+  
   SegmentationReworkREST(utility::string_t url);
   ~SegmentationReworkREST();
 
   void HandlePut(MitkRequest message);
+  void SetPutCallback(std::function<void(DicomDTO& message)> callback);
+
+private:
+  std::function<void(DicomDTO& message)> m_PutCallback;
 };
 
 #endif // SegmentationReworkREST_h

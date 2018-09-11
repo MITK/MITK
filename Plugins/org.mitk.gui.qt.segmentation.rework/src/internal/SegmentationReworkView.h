@@ -43,6 +43,8 @@ class SegmentationReworkView : public QmitkAbstractView
 public:
   static const std::string VIEW_ID;
 
+  void RESTPutCallback(SegmentationReworkREST::DicomDTO& dto);
+
 protected:
   virtual void CreateQtPartControl(QWidget *parent) override;
 
@@ -60,6 +62,9 @@ protected:
   Ui::SegmentationReworkViewControls m_Controls;
 
 private:
+
+  void SetSimilarityGraph(std::vector<double> simScoreArray, int sliceMinStart);
+
   std::unique_ptr<SegmentationReworkREST> m_HttpHandler;
   mitk::RESTClient* m_RestClient;
 };

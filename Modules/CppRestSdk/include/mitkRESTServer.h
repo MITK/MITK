@@ -46,8 +46,8 @@ namespace mitk
     RESTServer(utility::string_t url);
     virtual ~RESTServer();
 
-    pplx::task<void> open() { return m_Listener.open(); }
-    pplx::task<void> close() { return m_Listener.close(); }
+    pplx::task<void> Open() { return m_Listener.open(); }
+    pplx::task<void> Close() { return m_Listener.close(); }
 
     static std::string convertToUtf8(utility::string_t stringT) { return utility::conversions::to_utf8string(stringT); }
 

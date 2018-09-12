@@ -31,8 +31,6 @@ void SegmentationReworkREST::SetPutCallback(std::function<void(DicomDTO& message
   m_PutCallback = callback;
 }
 
-void SegmentationReworkREST::InvokeUpdateChartWidget(){}
-
 void SegmentationReworkREST::HandlePut(MitkRequest message)
 {
   auto messageString = message.to_string();
@@ -67,7 +65,7 @@ void SegmentationReworkREST::HandlePut(MitkRequest message)
 
       dto.simScoreArray = vec;
       m_PutCallback(dto);
-      InvokeUpdateChartWidget();
+      emit InvokeUpdateChartWidget();
     }
     else
     {

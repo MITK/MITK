@@ -24,7 +24,9 @@ mitk::RESTClient::~RESTClient() {}
 
 void mitk::RESTClient::executeGETRequest(utility::string_t filePath, utility::string_t uri)
 {
-  MITK_INFO << "Calling GET with " << utility::conversions::to_utf8string(uri) << " on client " << utility::conversions::to_utf8string(m_Client.base_uri().to_string());
+  MITK_INFO << "Calling GET with " << utility::conversions::to_utf8string(uri) << " on client "
+            << utility::conversions::to_utf8string(m_Client.base_uri().to_string()) << " save into "
+            << utility::conversions::to_utf8string(filePath);
 
   auto fileBuffer = std::make_shared<concurrency::streams::streambuf<uint8_t>>();
 
@@ -37,7 +39,7 @@ void mitk::RESTClient::executeGETRequest(utility::string_t filePath, utility::st
     // Write the response body into the file buffer.
     .then([=](MitkResponse response) -> pplx::task<size_t>
   {
-    printf("Response status code %u returned.\n", response.status_code());
+      MITK_INFO << "Status code: " << response.status_code();
 
     return response.body().read_to_end(*fileBuffer);
   })
@@ -69,25 +71,27 @@ void mitk::RESTClient::executeWADOGET(const utility::string_t folderPath, std::s
   builder.append_query(U("studyUID"), utility::conversions::to_string_t(studyUID));
   builder.append_query(U("seriesUID"), utility::conversions::to_string_t(seriesUID));
 
-  m_Client.request(MitkRESTMethods::GET, builder.to_string()).then([=](MitkResponse response) -> pplx::task<void>
+  m_Client.request(MitkRESTMethods::GET, builder.to_string()).then([=](MitkResponse response)
   {
+    MITK_INFO << "search for instances in series with uid " << seriesUID
+              << " status: " << response.status_code();
+
     auto jsonListResult = response.extract_json().get();
     auto resultArray = jsonListResult.as_array();
 
-    for(unsigned short i = 0; i < resultArray.size(); i++) {
+    for (unsigned short i = 0; i < resultArray.size(); i++)
+    {
       auto firstResult = resultArray[i];
       auto sopInstanceUIDKey = firstResult.at(U("00080018"));
       auto sopInstanceObject = sopInstanceUIDKey.as_object();
       auto valueKey = sopInstanceObject.at(U("Value"));
       auto sopInstanceUID = valueKey.as_string();
-      
-      utility::string_t fileName = U("/" + sopInstanceUID);
-      auto filePath = folderPath.substr().append(fileName);
+
+      auto filePath = utility::string_t(folderPath)
+                        .append(sopInstanceUID)
+                        .append(U(".dcm"));
       executeWADOGET(filePath, studyUID, seriesUID, utility::conversions::to_utf8string(sopInstanceUID));
     }
-  }).then([] {
-
-  })
-    .wait();
+  });
 
 }

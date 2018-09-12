@@ -19,7 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkRestServer.h>
 
-class SegmentationReworkREST : public mitk::RESTServer {
+class SegmentationReworkREST : public mitk::RESTServer
+{
   Q_OBJECT
 
 public:
@@ -39,6 +40,7 @@ public:
   void HandlePut(MitkRequest message);
   void SetPutCallback(std::function<void(DicomDTO& message)> callback);
 
+signals:
   void InvokeUpdateChartWidget();
 
 private:

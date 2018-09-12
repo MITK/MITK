@@ -43,7 +43,10 @@ class SegmentationReworkView : public QmitkAbstractView
 public:
   static const std::string VIEW_ID;
 
-  void RESTPutCallback(SegmentationReworkREST::DicomDTO& dto);
+  void RESTPutCallback(const SegmentationReworkREST::DicomDTO& dto);
+
+public slots:
+  void UpdateChartWidget();
 
 protected:
   virtual void CreateQtPartControl(QWidget *parent) override;

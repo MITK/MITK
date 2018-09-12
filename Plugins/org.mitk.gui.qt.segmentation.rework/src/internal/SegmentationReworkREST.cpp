@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationReworkREST.h"
 #include <mitkCommon.h>
 
+SegmentationReworkREST::SegmentationReworkREST() {}
+
 SegmentationReworkREST::SegmentationReworkREST(utility::string_t url) : mitk::RESTServer(url)
 {
   m_Listener.support(MitkRESTMethods::PUT, std::bind(&SegmentationReworkREST::HandlePut, this, std::placeholders::_1));
@@ -28,6 +30,8 @@ void SegmentationReworkREST::SetPutCallback(std::function<void(DicomDTO& message
 {
   m_PutCallback = callback;
 }
+
+void SegmentationReworkREST::InvokeUpdateChartWidget(){}
 
 void SegmentationReworkREST::HandlePut(MitkRequest message)
 {
@@ -63,6 +67,7 @@ void SegmentationReworkREST::HandlePut(MitkRequest message)
 
       dto.simScoreArray = vec;
       m_PutCallback(dto);
+      InvokeUpdateChartWidget();
     }
     else
     {

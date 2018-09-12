@@ -62,3 +62,32 @@ void mitk::RESTClient::executeWADOGET(utility::string_t filePath, std::string st
   builder.append_query(U("contentType"), U("application/dicom"));
   executeGETRequest(filePath, builder.to_string());
 }
+
+void mitk::RESTClient::executeWADOGET(const utility::string_t folderPath, std::string studyUID, std::string seriesUID)
+{
+  MitkUriBuilder builder(U("instances"));
+  builder.append_query(U("studyUID"), utility::conversions::to_string_t(studyUID));
+  builder.append_query(U("seriesUID"), utility::conversions::to_string_t(seriesUID));
+
+  m_Client.request(MitkRESTMethods::GET, builder.to_string()).then([=](MitkResponse response) -> pplx::task<void>
+  {
+    auto jsonListResult = response.extract_json().get();
+    auto resultArray = jsonListResult.as_array();
+
+    for(unsigned short i = 0; i < resultArray.size(); i++) {
+      auto firstResult = resultArray[i];
+      auto sopInstanceUIDKey = firstResult.at(U("00080018"));
+      auto sopInstanceObject = sopInstanceUIDKey.as_object();
+      auto valueKey = sopInstanceObject.at(U("Value"));
+      auto sopInstanceUID = valueKey.as_string();
+      
+      utility::string_t fileName = U("/" + sopInstanceUID);
+      auto filePath = folderPath.substr().append(fileName);
+      executeWADOGET(filePath, studyUID, seriesUID, utility::conversions::to_utf8string(sopInstanceUID));
+    }
+  }).then([] {
+
+  })
+    .wait();
+
+}

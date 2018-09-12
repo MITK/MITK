@@ -39,7 +39,7 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   m_Controls.setupUi(parent);
 
   connect(m_Controls.buttonUpload, &QPushButton::clicked, this, &SegmentationReworkView::UploadNewSegmentation);
-  //connect(m_HttpHandler.get(), &SegmentationReworkREST::InvokeUpdateChartWidget, this, &SegmentationReworkView::UpdateChartWidget);
+
 
   utility::string_t port = U("2020");
   utility::string_t address = U("http://127.0.0.1:");
@@ -47,15 +47,17 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 
   m_HttpHandler = std::unique_ptr<SegmentationReworkREST>(new SegmentationReworkREST(address));
 
+  connect(m_HttpHandler.get(), &SegmentationReworkREST::InvokeUpdateChartWidget, this, &SegmentationReworkView::UpdateChartWidget);
+
   m_HttpHandler->SetPutCallback(std::bind(&SegmentationReworkView::RESTPutCallback, this, std::placeholders::_1));
   m_HttpHandler->Open().wait();
 
   MITK_INFO << "Listening for requests at: " << utility::conversions::to_utf8string(address);
 
   utility::string_t pacsHost = U("http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE");
-  m_RestClient = new mitk::RESTClient(pacsHost);
+  m_RestClient = new mitk::RESTClient(U("http://www.officesupplyuae.com"));
 
-  m_RestClient->executeWADOGET(U("/temp/downloadSeries/"), "1.2.840.113654.2.70.1.311779127785374989361829772874593461506", "1.2.840.113654.2.70.1.182762555335754050396179618615436313390");
+  m_RestClient->executeWADOGET(U("/tmp/"), "1.2.840.113654.2.70.1.311779127785374989361829772874593461506", "1.2.840.113654.2.70.1.182762555335754050396179618615436313390");
 }
 
 void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::DicomDTO& dto)
@@ -65,10 +67,10 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 
   auto filePath = U("/temp/downloadWADO.dcm");
 
-  m_RestClient->executeWADOGET(filePath, dto.studyUID, dto.seriesUID, dto.instanceUID).wait();
+ // m_RestClient->executeWADOGET(filePath, dto.studyUID, dto.seriesUID, dto.instanceUID);
 
   MITK_INFO << "load file into data storage";
-  mitk::IOUtil::Load(utility::conversions::to_utf8string(filePath), *this->GetDataStorage());
+  //mitk::IOUtil::Load(utility::conversions::to_utf8string(filePath), *this->GetDataStorage());
   this->GetDataStorage()->GetAll()->at(0)->Update();
 }
 

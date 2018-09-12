@@ -45,7 +45,6 @@ public:
 
   void RESTPutCallback(const SegmentationReworkREST::DicomDTO& dto);
 
-public slots:
   void UpdateChartWidget();
 
 protected:

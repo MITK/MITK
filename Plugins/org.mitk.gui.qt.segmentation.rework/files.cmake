@@ -15,6 +15,7 @@ set(UI_FILES
 set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_segmentation_rework_Activator.h
   src/internal/SegmentationReworkView.h
+  src/internal/SegmentationReworkREST.h
 )
 
 # list of resource files which can be used by the plug-in

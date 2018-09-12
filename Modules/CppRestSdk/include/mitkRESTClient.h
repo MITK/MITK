@@ -48,6 +48,7 @@ namespace mitk
 
     void executeGETRequest(const utility::string_t filePath, utility::string_t uri);
     void executeWADOGET(const utility::string_t filePath, std::string studyUID, std::string seriesUID, std::string instanceUID);
+    void executeWADOGET(const utility::string_t filePath, std::string studyUID, std::string seriesUID);
  
   private:
     MitkClient m_Client;

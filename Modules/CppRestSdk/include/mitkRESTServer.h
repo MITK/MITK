@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKRESTSERVER_H
 #define MITKRESTSERVER_H
 
+#include <QObject>
+
 #include "cpprest/asyncrt_utils.h"
 #include "cpprest/containerstream.h"
 #include "cpprest/filestream.h"
@@ -39,8 +41,9 @@ typedef web::json::json_exception MitkJsonException;
 
 namespace mitk
 {
-  class MITKCPPRESTSDK_EXPORT RESTServer
+  class MITKCPPRESTSDK_EXPORT RESTServer : public QObject
   {
+
   public:
     RESTServer();
     RESTServer(utility::string_t url);

@@ -39,6 +39,7 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   m_Controls.setupUi(parent);
 
   connect(m_Controls.buttonUpload, &QPushButton::clicked, this, &SegmentationReworkView::UploadNewSegmentation);
+  //connect(m_HttpHandler.get(), &SegmentationReworkREST::InvokeUpdateChartWidget, this, &SegmentationReworkView::UpdateChartWidget);
 
   utility::string_t port = U("2020");
   utility::string_t address = U("http://127.0.0.1:");
@@ -53,20 +54,26 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 
   utility::string_t pacsHost = U("http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE");
   m_RestClient = new mitk::RESTClient(pacsHost);
+
+  m_RestClient->executeWADOGET(U("/temp/downloadSeries/"), "1.2.840.113654.2.70.1.311779127785374989361829772874593461506", "1.2.840.113654.2.70.1.182762555335754050396179618615436313390");
 }
 
-void SegmentationReworkView::RESTPutCallback(SegmentationReworkREST::DicomDTO& dto)
+void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::DicomDTO& dto)
 {
   MITK_INFO << "callback! " << dto.studyUID << dto.seriesUID << dto.instanceUID;
   SetSimilarityGraph(dto.simScoreArray, dto.minSliceStart);
 
   auto filePath = U("/temp/downloadWADO.dcm");
 
-  m_RestClient->executeWADOGET(filePath, dto.studyUID, dto.seriesUID, dto.instanceUID);
+  m_RestClient->executeWADOGET(filePath, dto.studyUID, dto.seriesUID, dto.instanceUID).wait();
 
   MITK_INFO << "load file into data storage";
   mitk::IOUtil::Load(utility::conversions::to_utf8string(filePath), *this->GetDataStorage());
   this->GetDataStorage()->GetAll()->at(0)->Update();
+}
+
+void SegmentationReworkView::UpdateChartWidget() {
+  m_Controls.chartWidget->Show();
 }
 
 void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArray, int sliceMinStart)
@@ -83,9 +90,6 @@ void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArra
   m_Controls.chartWidget->SetChartType("similarity score", QmitkChartWidget::ChartType::line);
   m_Controls.chartWidget->SetXAxisLabel("slice number");
   m_Controls.chartWidget->SetYAxisLabel("similarity score");
-  MITK_INFO << "before show";
-  //m_Controls.chartWidget->Show();
-  MITK_INFO << "after show";
 }
 
 

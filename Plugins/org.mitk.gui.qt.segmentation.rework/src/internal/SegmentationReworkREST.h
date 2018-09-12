@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRestServer.h>
 
 class SegmentationReworkREST : public mitk::RESTServer {
+  Q_OBJECT
+
 public:
 
   struct DicomDTO {
@@ -30,12 +32,14 @@ public:
     int minSliceStart;
   };
 
-  
+  SegmentationReworkREST();
   SegmentationReworkREST(utility::string_t url);
   ~SegmentationReworkREST();
 
   void HandlePut(MitkRequest message);
   void SetPutCallback(std::function<void(DicomDTO& message)> callback);
+
+  void InvokeUpdateChartWidget();
 
 private:
   std::function<void(DicomDTO& message)> m_PutCallback;

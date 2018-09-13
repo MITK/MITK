@@ -78,7 +78,7 @@ void QtStyleManager::AddDefaultStyle()
 {
   AddStyle(":/org.blueberry.ui.qt/lightstyle.qss", "Light");
   AddStyle(":/org.blueberry.ui.qt/darkstyle.qss", "Dark");
-  defaultStyle = styles[":/org.blueberry.ui.qt/lightstyle.qss"];
+  defaultStyle = styles[":/org.blueberry.ui.qt/darkstyle.qss"];
 }
 
 void QtStyleManager::ClearStyles()

@@ -107,6 +107,7 @@ QWidget* NativeTabItem::GetCloseButton()
 {
   if (!closeButton)
   {
+    closeButton = new QToolButton(parent->GetControl());
     QFile resourceFile(":/org.blueberry.ui.qt/tab_close.svg");
     if (resourceFile.open(QIODevice::ReadOnly))
     {
@@ -132,7 +133,6 @@ QWidget* NativeTabItem::GetCloseButton()
         closeButton->setIcon(iconCloseTab);
       }
     }
-    closeButton = new QToolButton(parent->GetControl());
     closeButton->setObjectName("TabCloseButton");
     closeButton->setContentsMargins(0, 0, 0, 0);
     closeButton->setFixedSize(12,12);

@@ -221,9 +221,9 @@ QGroupBox {
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QCheckBox" name="m_OutputCoeffsImage">
+          <widget class="QCheckBox" name="m_OutputOdfImage">
            <property name="text">
-            <string>Output SH-Coefficient Image</string>
+            <string>Output Sampled ODF Image</string>
            </property>
            <property name="checked">
             <bool>false</bool>

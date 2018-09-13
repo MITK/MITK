@@ -28,8 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <boost/algorithm/string.hpp>
 #include <itkShToOdfImageFilter.h>
-#include <mitkImageCast.h>
-#include <mitkImageToItk.h>
 #include <itkTensorImageToOdfImageFilter.h>
 
 // Intersect a finite line (with end points p0 and p1) with all of the
@@ -374,6 +372,22 @@ vnl_matrix<float> mitk::sh::CalcShBasisForDirections(unsigned int sh_order, vnl_
   }
 
   return sh_basis;
+}
+
+unsigned int mitk::sh::ShOrder(int num_coeffs)
+{
+  int c=3, d=2-2*num_coeffs;
+  int D = c*c-4*d;
+  if (D>0)
+  {
+    int s = (-c+static_cast<int>(sqrt(D)))/2;
+    if (s<0)
+      s = (-c-static_cast<int>(sqrt(D)))/2;
+    return static_cast<unsigned int>(s);
+  }
+  else if (D==0)
+    return static_cast<unsigned int>(-c/2);
+  return 0;
 }
 
 float mitk::sh::GetValue(const vnl_vector<float> &coefficients, const int &sh_order, const double theta, const double phi, const bool mrtrix)

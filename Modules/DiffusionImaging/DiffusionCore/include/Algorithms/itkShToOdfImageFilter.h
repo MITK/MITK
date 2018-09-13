@@ -61,6 +61,7 @@ public:
     itkSetMacro( Toolkit, Toolkit)  ///< define SH coefficient convention (depends on toolkit)
     itkGetMacro( Toolkit, Toolkit)  ///< SH coefficient convention (depends on toolkit)
 
+    void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType);
 
 protected:

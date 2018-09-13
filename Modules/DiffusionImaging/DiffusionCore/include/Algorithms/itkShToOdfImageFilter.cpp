@@ -34,10 +34,14 @@ ShToOdfImageFilter< PixelType, ShOrder >::ShToOdfImageFilter()
 }
 
 template< class PixelType, int ShOrder >
-void ShToOdfImageFilter< PixelType, ShOrder >::ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType)
+void ShToOdfImageFilter< PixelType, ShOrder >::BeforeThreadedGenerateData()
 {
   CalcShBasis();
+}
 
+template< class PixelType, int ShOrder >
+void ShToOdfImageFilter< PixelType, ShOrder >::ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType)
+{
   typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
 
   typename InputImageType::Pointer inputImage = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );

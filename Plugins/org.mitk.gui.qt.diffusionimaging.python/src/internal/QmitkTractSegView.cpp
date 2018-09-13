@@ -333,6 +333,14 @@ void QmitkTractSegView::Start()
         converter->GenerateData();
         mitk::PeakImage::ItkPeakImageType::Pointer itk_peaks = converter->GetOutputImage();
 
+        itk::FlipPeaksFilter< float >::Pointer flipper = itk::FlipPeaksFilter< float >::New();
+        flipper->SetInput(itk_peaks);
+        flipper->SetFlipX(false);
+        flipper->SetFlipY(false);
+        flipper->SetFlipZ(true);
+        flipper->Update();
+        itk_peaks = flipper->GetOutput();
+
         mitk::Image::Pointer mitk_peaks = dynamic_cast<mitk::Image*>(mitk::PeakImage::New().GetPointer());
         mitk::CastToMitkImage(itk_peaks, mitk_peaks);
         mitk_peaks->SetVolume(itk_peaks->GetBufferPointer());

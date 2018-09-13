@@ -60,21 +60,21 @@ mitk::Mapper::Pointer mitk::DiffusionCoreObjectFactory::CreateMapper(mitk::DataN
     {
       newMapper = mitk::CompositeMapper::New();
       newMapper->SetDataNode(node);
-      node->SetMapper(3, ((CompositeMapper*)newMapper.GetPointer())->GetImageMapper());
+      node->SetMapper(3, static_cast<CompositeMapper*>(newMapper.GetPointer())->GetImageMapper());
     }
     classname = "TensorImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::CompositeMapper::New();
       newMapper->SetDataNode(node);
-      node->SetMapper(3, ((CompositeMapper*)newMapper.GetPointer())->GetImageMapper());
+      node->SetMapper(3, static_cast<CompositeMapper*>(newMapper.GetPointer())->GetImageMapper());
     }
     classname = "ShImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::CompositeMapper::New();
       newMapper->SetDataNode(node);
-      node->SetMapper(3, ((CompositeMapper*)newMapper.GetPointer())->GetImageMapper());
+      node->SetMapper(3, static_cast<CompositeMapper*>(newMapper.GetPointer())->GetImageMapper());
     }
 
   }

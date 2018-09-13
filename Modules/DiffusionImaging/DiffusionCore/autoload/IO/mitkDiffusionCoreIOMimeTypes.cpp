@@ -548,49 +548,49 @@ CustomMimeType DiffusionCoreIOMimeTypes::ODF_MIMETYPE()
 // Names
 std::string DiffusionCoreIOMimeTypes::PEAK_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + "_PEAKS";
+  static std::string name ="ODF_PEAKS";
   return name;
 }
 
 std::string DiffusionCoreIOMimeTypes::DWI_NRRD_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".dwi";
+  static std::string name = "DWI_NRRD";
   return name;
 }
 
 std::string DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".nii.gz";
+  static std::string name = "DWI_NIFTI";
   return name;
 }
 
 std::string DiffusionCoreIOMimeTypes::DWI_FSL_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".fslgz";
+  static std::string name = "DWI_FSL";
   return name;
 }
 
 std::string DiffusionCoreIOMimeTypes::DWI_DICOM_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".IMA";
+  static std::string name = "DWI_DICOM";
   return name;
 }
 
 std::string DiffusionCoreIOMimeTypes::DTI_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".dti";
+  static std::string name = "DT_IMAGE";
   return name;
 }
 
 std::string DiffusionCoreIOMimeTypes::ODF_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".odf";
+  static std::string name = "ODF_IMAGE";
   return name;
 }
 
 std::string DiffusionCoreIOMimeTypes::SH_MIMETYPE_NAME()
 {
-  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + "_SH";
+  static std::string name = "SH_IMAGE";
   return name;
 }
 

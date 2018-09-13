@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommandLineParser.h"
 #include <itksys/SystemTools.hxx>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
-
+#include <mitkDiffusionCoreIOMimeTypes.h>
 
 int main(int argc, char* argv[])
 {
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 
     std::string ext = itksys::SystemTools::GetFilenameExtension(outImage);
     if (ext==".nii" || ext==".nii.gz")
-      mitk::IOUtil::Save(source, "application/vnd.mitk.nii.gz", outImage);
+      mitk::IOUtil::Save(source, mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_NAME(), outImage);
     else
       mitk::IOUtil::Save(source, outImage);
   }

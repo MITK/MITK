@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkGaussianRandomSpatialNeighborSubsampler.h>
 #include <mitkITKImageImport.h>
 #include <mitkProperties.h>
+#include <mitkDiffusionCoreIOMimeTypes.h>
 
 int main(int argc, char* argv[])
 {
@@ -211,7 +212,7 @@ int main(int argc, char* argv[])
 
     std::string ext = itksys::SystemTools::GetFilenameExtension(outImage);
     if (ext==".nii" || ext==".nii.gz")
-      mitk::IOUtil::Save(denoised_image, "application/vnd.mitk.nii.gz", outImage);
+      mitk::IOUtil::Save(denoised_image, mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_NAME(), outImage);
     else
       mitk::IOUtil::Save(denoised_image, outImage);
   }

@@ -20,7 +20,6 @@
         <file>reset.png</file>
         <file>MapperEfx2D.png</file>
         <file>refresh.xpm</file>
-        <file>tensor.png</file>
         <file>tractogram.png</file>
         <file>ml_tractogram.png</file>
         <file>ConnectomicsNetwork.png</file>
@@ -29,5 +28,6 @@
         <file>odf_peaks.png</file>
         <file>segmentation.svg</file>
         <file>sh.png</file>
+        <file>tensor.png</file>
     </qresource>
 </RCC>

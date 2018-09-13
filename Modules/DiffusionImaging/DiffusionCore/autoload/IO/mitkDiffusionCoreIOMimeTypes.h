@@ -18,12 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKDiffusionCoreIOMimeTypes_H
 
 #include "mitkCustomMimeType.h"
-
+#include <MitkDiffusionCoreIOExports.h>
 #include <string>
 
 namespace mitk {
 
-class DiffusionCoreIOMimeTypes
+class MITKDIFFUSIONCOREIO_EXPORT DiffusionCoreIOMimeTypes
 {
 public:
 

@@ -29,9 +29,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <itkDiffusionMultiShellQballReconstructionImageFilter.h>
 #include <itkDwiGradientLengthCorrectionFilter.h>
+#include <mitkDiffusionCoreIOMimeTypes.h>
+#include <mitkIOMimeTypes.h>
 
 template<int L>
-void TemplatedMultishellQBallReconstruction(float lambda, mitk::Image::Pointer dwi, bool outCoeffs, int threshold, std::string outfilename)
+void TemplatedMultishellQBallReconstruction(float lambda, mitk::Image::Pointer dwi, bool output_sampled, int threshold, std::string outfilename)
 {
   typedef itk::DiffusionMultiShellQballReconstructionImageFilter<short,short,float,L,ODF_SAMPLING_SIZE> FilterType;
   typename FilterType::Pointer filter = FilterType::New();
@@ -44,7 +46,7 @@ void TemplatedMultishellQBallReconstruction(float lambda, mitk::Image::Pointer d
   // Get average distance
   int avdistance = 0;
   for(; it2 != bMap.rend(); ++it1, ++it2)
-    avdistance += (int)it1->first - (int)it2->first;
+    avdistance += static_cast<int>(it1->first - it2->first);
   avdistance /= bMap.size()-1;
 
   // Check if all shells are using the same averae distance
@@ -53,7 +55,7 @@ void TemplatedMultishellQBallReconstruction(float lambda, mitk::Image::Pointer d
   ++it2;
   for(; it2 != bMap.rend(); ++it1,++it2)
   {
-    if(avdistance != (int)it1->first - (int)it2->first)
+    if(avdistance != static_cast<int>(it1->first - it2->first))
     {
       mitkThrow() << "Shells are not equidistant.";
     }
@@ -62,27 +64,28 @@ void TemplatedMultishellQBallReconstruction(float lambda, mitk::Image::Pointer d
   auto itkVectorImagePointer = mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi);
   filter->SetBValueMap(bMap);
   filter->SetGradientImage(mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer, mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
-  filter->SetThreshold(threshold);
-  filter->SetLambda(lambda);
+  filter->SetThreshold(static_cast<short>(threshold));
+  filter->SetLambda(static_cast<double>(lambda));
   filter->Update();
 
   mitk::OdfImage::Pointer image = mitk::OdfImage::New();
-  mitk::Image::Pointer coeffsImage = mitk::Image::New();
+  mitk::Image::Pointer coeffsImage = dynamic_cast<mitk::Image*>(mitk::ShImage::New().GetPointer());
   image->InitializeByItk( filter->GetOutput() );
   image->SetVolume( filter->GetOutput()->GetBufferPointer() );
   coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
   coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
 
   std::string coeffout = outfilename;
-  coeffout += "_shcoeffs.nrrd";
+  coeffout += ".nii.gz";
+  mitk::IOUtil::Save(coeffsImage, mitk::DiffusionCoreIOMimeTypes::SH_MIMETYPE_NAME(), coeffout);
+
   outfilename += ".odf";
-  mitk::IOUtil::Save(image, outfilename);
-  if (outCoeffs)
-    mitk::IOUtil::Save(coeffsImage, coeffout);
+  if (output_sampled)
+    mitk::IOUtil::Save(image, outfilename);
 }
 
 template<int L>
-void TemplatedCsaQBallReconstruction(float lambda, mitk::Image::Pointer dwi, bool outCoeffs, int threshold, std::string outfilename)
+void TemplatedCsaQBallReconstruction(float lambda, mitk::Image::Pointer dwi, bool output_sampled, int threshold, std::string outfilename)
 {
   typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,4,ODF_SAMPLING_SIZE> FilterType;
   auto itkVectorImagePointer = mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi);
@@ -90,25 +93,26 @@ void TemplatedCsaQBallReconstruction(float lambda, mitk::Image::Pointer dwi, boo
   FilterType::Pointer filter = FilterType::New();
   filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
   filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi), itkVectorImagePointer );
-  filter->SetThreshold(threshold);
-  filter->SetLambda(lambda);
+  filter->SetThreshold(static_cast<short>(threshold));
+  filter->SetLambda(static_cast<double>(lambda));
 //  filter->SetUseMrtrixBasis(mrTrix);
   filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
   filter->Update();
 
   mitk::OdfImage::Pointer image = mitk::OdfImage::New();
-  mitk::Image::Pointer coeffsImage = mitk::Image::New();
+  mitk::Image::Pointer coeffsImage = dynamic_cast<mitk::Image*>(mitk::ShImage::New().GetPointer());
   image->InitializeByItk( filter->GetOutput() );
   image->SetVolume( filter->GetOutput()->GetBufferPointer() );
   coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
   coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
 
   std::string coeffout = outfilename;
-  coeffout += "_shcoeffs.nrrd";
+  coeffout += ".nii.gz";
+  mitk::IOUtil::Save(coeffsImage, mitk::DiffusionCoreIOMimeTypes::SH_MIMETYPE_NAME(), coeffout);
+
   outfilename += ".odf";
-  mitk::IOUtil::Save(image, outfilename);
-  if (outCoeffs)
-    mitk::IOUtil::Save(coeffsImage, coeffout);
+  if (output_sampled)
+    mitk::IOUtil::Save(image, outfilename);
 }
 
 
@@ -125,7 +129,7 @@ int main(int argc, char* argv[])
   parser.addArgument("b0_threshold", "", mitkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0);
   parser.addArgument("round_bvalues", "", mitkCommandLineParser::Int, "Round b-values", "round to specified integer", 0);
   parser.addArgument("lambda", "", mitkCommandLineParser::Float, "Lambda", "ragularization factor lambda", 0.006);
-  parser.addArgument("output_coeffs", "", mitkCommandLineParser::Bool, "Output coefficients", "output file containing the SH coefficients");
+  parser.addArgument("output_sampled", "", mitkCommandLineParser::Bool, "Output sampled ODFs", "output file containing the sampled ODFs");
 
   parser.setCategory("Signal Modelling");
   parser.setTitle("Qball Reconstruction");
@@ -155,7 +159,7 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("sh_order"))
     shOrder = us::any_cast<int>(parsedArgs["sh_order"]);
 
-  float lambda = 0.006;
+  float lambda = 0.006f;
   if (parsedArgs.count("lambda"))
     lambda = us::any_cast<float>(parsedArgs["lambda"]);
 
@@ -180,10 +184,10 @@ int main(int argc, char* argv[])
       typedef itk::DwiGradientLengthCorrectionFilter FilterType;
       FilterType::Pointer filter = FilterType::New();
       filter->SetRoundingValue(round_bvalues);
-      filter->SetReferenceBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
+      filter->SetReferenceBValue(static_cast<double>(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi)));
       filter->SetReferenceGradientDirectionContainer(mitk::DiffusionPropertyHelper::GetGradientContainer(dwi));
       filter->Update();
-      mitk::DiffusionPropertyHelper::SetReferenceBValue(dwi, filter->GetNewBValue());
+      mitk::DiffusionPropertyHelper::SetReferenceBValue(dwi, static_cast<float>(filter->GetNewBValue()));
       mitk::DiffusionPropertyHelper::CopyProperties(dwi, dwi, true);
       mitk::DiffusionPropertyHelper::SetGradientContainer(dwi, filter->GetOutputGradientDirectionContainer());
       mitk::DiffusionPropertyHelper::InitializeImage(dwi);

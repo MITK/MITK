@@ -20,29 +20,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 #include <string>
 #include <istream>
-
 #include <itkMetaDataObject.h>
 #include <itkVectorImage.h>
 #include <mitkImageCast.h>
-
 #include <mitkBaseData.h>
 #include "mitkCommandLineParser.h"
 #include <mitkLexicalCast.h>
 #include <mitkCoreObjectFactory.h>
 #include <mitkIOUtil.h>
-
 #include <mitkBValueMapProperty.h>
 #include <mitkGradientDirectionsProperty.h>
 #include <itkElectrostaticRepulsionDiffusionGradientReductionFilter.h>
-
-
-// itk includes
 #include <itkImage.h>
-
-// mitk includes
 #include <mitkImage.h>
 #include "itkDWIVoxelFunctor.h"
 #include <mitkDiffusionPropertyHelper.h>
+#include <mitkDiffusionCoreIOMimeTypes.h>
 
 typedef short DiffusionPixelType;
 typedef itk::VectorImage< short, 3 > ItkDwiType;
@@ -216,7 +209,7 @@ int main(int argc, char* argv[])
         mitk::Image::Pointer mitkImage = mitk::IOUtil::Load<mitk::Image>(inFileName, &functor);
         mitk::Image::Pointer newImage = DoReduceGradientDirections(mitkImage, bValue, nrOfGradients, use_first_n);
         //mitk::IOUtil::Save(newImage, outFileName); //save as dwi image
-        mitk::IOUtil::Save(newImage, "application/vnd.mitk.nii.gz", outFileName);  //save as nifti image
+        mitk::IOUtil::Save(newImage, mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_NAME(), outFileName);  //save as nifti image
 
     }
     catch (itk::ExceptionObject e)

@@ -16,10 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkDiffusionQuantificationView.h"
 #include "mitkDiffusionImagingConfigure.h"
-
 #include "itkTimeProbe.h"
 #include "itkImage.h"
-
 #include "mitkNodePredicateDataType.h"
 #include "mitkDataNodeObject.h"
 #include "mitkOdfImage.h"
@@ -31,12 +29,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkTensorFractionalAnisotropyImageFilter.h"
 #include "itkTensorRelativeAnisotropyImageFilter.h"
 #include "itkTensorDerivedMeasurementsFilter.h"
-
 #include "QmitkDataStorageComboBox.h"
 #include <QMessageBox>
 #include "berryIWorkbenchWindow.h"
 #include "berryISelectionService.h"
-
 #include <mitkDiffusionPropertyHelper.h>
 #include <itkAdcImageFilter.h>
 #include <itkBallAndSticksImageFilter.h>
@@ -45,12 +41,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLookupTableProperty.h>
 #include <mitkITKImageImport.h>
 #include <mitkLexicalCast.h>
-
 #include <mitkNodePredicateIsDWI.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
 #include <QmitkStyleManager.h>
 #include <mitkLevelWindowProperty.h>
+#include <mitkDiffusionFunctionCollection.h>
 
 const std::string QmitkDiffusionQuantificationView::VIEW_ID = "org.mitk.views.diffusionquantification";
 
@@ -93,8 +89,9 @@ void QmitkDiffusionQuantificationView::CreateQtPartControl(QWidget *parent)
     m_Controls->m_ImageBox->SetDataStorage(this->GetDataStorage());
     mitk::TNodePredicateDataType<mitk::TensorImage>::Pointer isDti = mitk::TNodePredicateDataType<mitk::TensorImage>::New();
     mitk::TNodePredicateDataType<mitk::OdfImage>::Pointer isOdf = mitk::TNodePredicateDataType<mitk::OdfImage>::New();
+    mitk::TNodePredicateDataType<mitk::ShImage>::Pointer isSh = mitk::TNodePredicateDataType<mitk::ShImage>::New();
     mitk::NodePredicateIsDWI::Pointer isDwi = mitk::NodePredicateIsDWI::New();
-    m_Controls->m_ImageBox->SetPredicate( mitk::NodePredicateOr::New(isDti, mitk::NodePredicateOr::New(isOdf, isDwi)) );
+    m_Controls->m_ImageBox->SetPredicate( mitk::NodePredicateOr::New(isSh, mitk::NodePredicateOr::New(isDti, mitk::NodePredicateOr::New(isOdf, isDwi))) );
 
     connect( static_cast<QObject*>(m_Controls->m_ImageBox), SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
   }
@@ -112,7 +109,7 @@ void QmitkDiffusionQuantificationView::UpdateGui()
   bool foundDwVolume = false;
   mitk::DataNode::Pointer  selNode = m_Controls->m_ImageBox->GetSelectedNode();
 
-  if( selNode.IsNotNull() && dynamic_cast<mitk::OdfImage*>(selNode->GetData()) )
+  if( selNode.IsNotNull() && (dynamic_cast<mitk::OdfImage*>(selNode->GetData()) || dynamic_cast<mitk::ShImage*>(selNode->GetData())) )
     foundOdfVolume = true;
   else if( selNode.IsNotNull() && dynamic_cast<mitk::TensorImage*>(selNode->GetData()) )
     foundTensorVolume = true;
@@ -161,7 +158,7 @@ void QmitkDiffusionQuantificationView::DoBallStickCalculation()
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput( itkVectorImagePointer );
     filter->SetGradientDirections(mitk::DiffusionPropertyHelper::GetGradientContainer(image));
-    filter->SetB_value(mitk::DiffusionPropertyHelper::GetReferenceBValue(image));
+    filter->SetB_value(static_cast<double>(mitk::DiffusionPropertyHelper::GetReferenceBValue(image)));
     filter->Update();
 
     mitk::Image::Pointer newImage = mitk::Image::New();
@@ -217,11 +214,11 @@ void QmitkDiffusionQuantificationView::DoMultiTensorCalculation()
     FilterType::Pointer filter = FilterType::New();
     filter->SetInput( itkVectorImagePointer );
     filter->SetGradientDirections(mitk::DiffusionPropertyHelper::GetGradientContainer(image));
-    filter->SetB_value(mitk::DiffusionPropertyHelper::GetReferenceBValue(image));
+    filter->SetB_value(static_cast<double>(mitk::DiffusionPropertyHelper::GetReferenceBValue(image)));
     filter->Update();
 
     typedef mitk::TensorImage::ItkTensorImageType TensorImageType;
-    for (int i=0; i<NUM_TENSORS; i++)
+    for (unsigned int i=0; i<NUM_TENSORS; i++)
     {
       TensorImageType::Pointer tensorImage = filter->GetTensorImages().at(i);
       mitk::TensorImage::Pointer image = mitk::TensorImage::New();
@@ -254,7 +251,7 @@ void QmitkDiffusionQuantificationView::DoAdcCalculation(bool fit)
     filter->SetInput( itkVectorImagePointer );
 
     filter->SetGradientDirections( mitk::DiffusionPropertyHelper::GetGradientContainer(image) );
-    filter->SetB_value( mitk::DiffusionPropertyHelper::GetReferenceBValue(image) );
+    filter->SetB_value( static_cast<double>(mitk::DiffusionPropertyHelper::GetReferenceBValue(image)) );
 
     filter->SetFitSignal(fit);
     filter->Update();
@@ -347,10 +344,13 @@ void QmitkDiffusionQuantificationView::OdfQuantification(int method)
     typedef float TOdfPixelType;
     typedef itk::Vector<TOdfPixelType,ODF_SAMPLING_SIZE> OdfVectorType;
     typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
-    mitk::Image* vol = static_cast<mitk::Image*>(node->GetData());
-    OdfVectorImgType::Pointer itkvol = OdfVectorImgType::New();
-    mitk::CastToItkImage(vol, itkvol);
+    mitk::Image::Pointer vol = dynamic_cast<mitk::Image*>(node->GetData());
 
+    OdfVectorImgType::Pointer itkvol;
+    if (dynamic_cast<mitk::ShImage*>(vol.GetPointer()))
+      itkvol = mitk::convert::GetItkOdfFromShImage(vol);
+    else
+      itkvol = mitk::convert::GetItkOdfFromOdfImage(vol);
     std::string nodename = node->GetName();
 
     mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Computing GFA for %s", nodename.c_str()).toLatin1());

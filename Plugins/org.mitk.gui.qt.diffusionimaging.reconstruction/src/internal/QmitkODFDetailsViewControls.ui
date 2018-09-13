@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>QmitkODFDetailsViewControls</class>
  <widget class="QWidget" name="QmitkODFDetailsViewControls">
@@ -65,14 +65,14 @@ QGroupBox {
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>DTI/ODF:</string>
+         <string>DTI/ODF/SH:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="m_InputImageLabel">
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" color:#ff0000;"&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -239,7 +239,7 @@ QGroupBox {
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11"></layoutdefault>
+ <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
    <class>QmitkODFDetailsWidget</class>
@@ -254,6 +254,6 @@ QGroupBox {
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources></resources>
- <connections></connections>
+ <resources/>
+ <connections/>
 </ui>

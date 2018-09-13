@@ -87,21 +87,7 @@ protected:
 
   Ui::QmitkODFDetailsViewControls*  m_Controls;
 
-  /** ODF related variables like mesh structure, values etc. */
-  vtkPolyData*                      m_TemplateOdf;  ///< spherical base mesh
-  vtkSmartPointer<vtkTransform>     m_OdfTransform;
-  vtkSmartPointer<vtkDoubleArray>   m_OdfVals;
-  vtkSmartPointer<vtkOdfSource>     m_OdfSource;
-
   int                               m_OdfNormalization; ///< normalization method defined in the visualization view
-
-  /** rendering of the ODF */
-  vtkActor*                     m_VtkActor;
-  vtkPolyDataMapper*            m_VtkMapper;
-  vtkRenderer*                  m_Renderer;
-  vtkRenderWindow*              m_VtkRenderWindow;
-  vtkRenderWindowInteractor*    m_RenderWindowInteractor;
-  vtkCamera*                    m_Camera;
   mitk::DataNode::Pointer       m_ImageNode;
   QmitkSliceNavigationListener  m_SliceChangeListener;
 };

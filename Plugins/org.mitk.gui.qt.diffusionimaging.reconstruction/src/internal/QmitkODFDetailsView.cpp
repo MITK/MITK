@@ -14,11 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
-
-// Qmitk
 #include "QmitkODFDetailsView.h"
 #include <QTableWidgetItem>
 #include <vtkFloatArray.h>
@@ -30,26 +27,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTensorImage.h>
 #include <QMessageBox>
 #include <QmitkRenderingManager.h>
-
+#include <mitkShImage.h>
 #include <mitkImageReadAccessor.h>
-
+#include <mitkImagePixelReadAccessor.h>
+#include <mitkDiffusionFunctionCollection.h>
 #include <vtkRenderWindowInteractor.h>
 
 const std::string QmitkODFDetailsView::VIEW_ID = "org.mitk.views.odfdetails";
 
 QmitkODFDetailsView::QmitkODFDetailsView()
   : QmitkAbstractView()
-  , m_Controls( 0 )
+  , m_Controls(nullptr)
   , m_OdfNormalization(0)
   , m_ImageNode(nullptr)
 {
-  m_VtkActor = vtkActor::New();
-  m_VtkMapper = vtkPolyDataMapper::New();
-  m_Renderer = vtkRenderer::New();
-  m_VtkRenderWindow = vtkRenderWindow::New();
-  m_RenderWindowInteractor = vtkRenderWindowInteractor::New();
-  m_Camera = vtkCamera::New();
-  m_VtkRenderWindow->SetSize(300,300);
 
 }
 
@@ -91,7 +82,6 @@ void QmitkODFDetailsView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_OdfBox->setVisible(false);
     m_Controls->m_ODFRenderWidget->setVisible(false);
 
-
     m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
     connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
   }
@@ -107,7 +97,7 @@ void QmitkODFDetailsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*pa
   // iterate selection
   for (mitk::DataNode::Pointer node: nodes)
   {
-    if( node.IsNotNull() && (dynamic_cast<mitk::OdfImage*>(node->GetData()) || dynamic_cast<mitk::TensorImage*>(node->GetData())) )
+    if( node.IsNotNull() && (dynamic_cast<mitk::OdfImage*>(node->GetData()) || dynamic_cast<mitk::TensorImage*>(node->GetData()) || dynamic_cast<mitk::ShImage*>(node->GetData())) )
     {
       m_Controls->m_InputImageLabel->setText(node->GetName().c_str());
       m_ImageNode = node;
@@ -142,18 +132,20 @@ void QmitkODFDetailsView::UpdateOdf()
     if(nmp)
       m_OdfNormalization = nmp->GetNormalization();
 
-    m_TemplateOdf = itk::OrientationDistributionFunction<float,ODF_SAMPLING_SIZE>::GetBaseMesh();
-    m_OdfTransform = vtkSmartPointer<vtkTransform>::New();
-    m_OdfTransform->Identity();
-    m_OdfVals = vtkSmartPointer<vtkDoubleArray>::New();
-    m_OdfSource = vtkSmartPointer<vtkOdfSource>::New();
-    itk::OrientationDistributionFunction<double, ODF_SAMPLING_SIZE> odf;
+    bool dir_color = false;
+    m_ImageNode->GetBoolProperty( "DiffusionCore.Rendering.OdfVtkMapper.ColourisationModeBit", dir_color );
+
+    bool toggle_tensor = false;
+    m_ImageNode->GetBoolProperty( "DiffusionCore.Rendering.OdfVtkMapper.SwitchTensorView", toggle_tensor );
 
     mitk::Point3D world = this->GetRenderWindowPart()->GetSelectedPosition();
-    mitk::Point3D index;
+    mitk::Point3D cont_index;
     mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(m_ImageNode->GetData());
-    unsigned int *img_dimension = img->GetDimensions();
-    img->GetGeometry()->WorldToIndex(world, index);
+    img->GetGeometry()->WorldToIndex(world, cont_index);
+    itk::Index<3> index;
+    index[0] = static_cast<int>(cont_index[0]+0.5);
+    index[1] = static_cast<int>(cont_index[1]+0.5);
+    index[2] = static_cast<int>(cont_index[2]+0.5);
 
     float sum = 0;
     float max = itk::NumericTraits<float>::NonpositiveMin();
@@ -165,6 +157,7 @@ void QmitkODFDetailsView::UpdateOdf()
     // otherwise possible crash for a scenario with multiple nodes
     if (dynamic_cast<mitk::OdfImage*>(m_ImageNode->GetData()) && ( m_ImageNode->GetData()->GetGeometry()->IsInside(world) ) )
     {
+      itk::OrientationDistributionFunction<float, ODF_SAMPLING_SIZE> odf;
       m_Controls->m_ODFRenderWidget->setVisible(true);
       m_Controls->m_OdfBox->setVisible(true);
 
@@ -172,55 +165,46 @@ void QmitkODFDetailsView::UpdateOdf()
       {
         const mitk::OdfImage* Odf_image = dynamic_cast< mitk::OdfImage* >( m_ImageNode->GetData() );
 
-        // get access to the Odf image data with explicitely allowing exceptions if memory locked
-        mitk::ImageReadAccessor readAccess( Odf_image, Odf_image->GetVolumeData(0), mitk::ImageAccessorBase::ExceptionIfLocked );
-        const float* Odf_cPtr = static_cast< const float*>(readAccess.GetData());
+        mitk::ImagePixelReadAccessor<mitk::OdfImage::PixelType, 3> pixel_read(Odf_image, Odf_image->GetVolumeData(0));
+        auto pixel_data = pixel_read.GetPixelByIndex(index);
 
-        OdfVectorImgType::IndexType ind;
-        ind[0] = (int)(index[0]+0.5);
-        ind[1] = (int)(index[1]+0.5);
-        ind[2] = (int)(index[2]+0.5);
-
-        // pixel size = ODF_SAMPLING_SIZE
-        // position offset = standard offset
-        unsigned int offset_to_data = ODF_SAMPLING_SIZE * (ind[2] * img_dimension[1] * img_dimension[0] + ind[1] * img_dimension[0] + ind[0]);
-        const float *pixel_data = Odf_cPtr + offset_to_data;
-
-        for (int i=0; i<ODF_SAMPLING_SIZE; i++)
+        for (unsigned int i=0; i<odf.GetNumberOfComponents(); i++)
         {
-          float val = pixel_data[i];
-          odf.SetNthComponent(i, val);
-          values += QString::number(i)+": "+QString::number(val)+"\n";
+          auto val = pixel_data[i];
+          odf[i] = val;
+          values += QString::number(i)+": "+QString::number(static_cast<double>(val))+"\n";
           sum += val;
           if (val>max)
             max = val;
           if (val<min)
             min = val;
         }
-        float mean = sum/ODF_SAMPLING_SIZE;
+        float mean = sum/odf.GetNumberOfComponents();
 
         float stdev = 0;
-        for (int i=0; i<ODF_SAMPLING_SIZE; i++)
+        for (unsigned int i=0; i<odf.GetNumberOfComponents(); i++)
         {
-          float val = pixel_data[i];
-          float diff = val - mean;
+          float diff = odf[i] - mean;
           stdev += diff*diff;
         }
-        stdev = std::sqrt(stdev/(ODF_SAMPLING_SIZE-1));
+        stdev = std::sqrt(stdev/(odf.GetNumberOfComponents()-1));
 
-        QString pos = QString::number(ind[0])+", "+QString::number(ind[1])+", "+QString::number(ind[2]);
+        QString pos = QString::number(index[0])+", "+QString::number(index[1])+", "+QString::number(index[2]);
         overviewText += "Coordinates: "+pos+"\n";
-        overviewText += "GFA: "+QString::number(odf.GetGeneralizedFractionalAnisotropy())+"\n";
-        overviewText += "Sum: "+QString::number(sum)+"\n";
-        overviewText += "Mean: "+QString::number(mean)+"\n";
-        overviewText += "Stdev: "+QString::number(stdev)+"\n";
-        overviewText += "Min: "+QString::number(min)+"\n";
-        overviewText += "Max: "+QString::number(max)+"\n";
+        overviewText += "GFA: "+QString::number(static_cast<double>(odf.GetGeneralizedFractionalAnisotropy()))+"\n";
+        overviewText += "Sum: "+QString::number(static_cast<double>(sum))+"\n";
+        overviewText += "Mean: "+QString::number(static_cast<double>(mean))+"\n";
+        overviewText += "Stdev: "+QString::number(static_cast<double>(stdev))+"\n";
+        overviewText += "Min: "+QString::number(static_cast<double>(min))+"\n";
+        overviewText += "Max: "+QString::number(static_cast<double>(max))+"\n";
         vnl_vector_fixed<double, 3> pd = odf.GetDirection(odf.GetPrincipalDiffusionDirectionIndex());
         overviewText += "Main Diffusion:\n     "+QString::number(pd[0])+"\n     "+QString::number(pd[1])+"\n     "+QString::number(pd[2])+"\n";
 
         m_Controls->m_OdfValuesTextEdit->setText(values);
         m_Controls->m_OverviewTextEdit->setVisible(true);
+        m_Controls->m_ODFDetailsWidget->SetParameters<ODF_SAMPLING_SIZE>(odf);
+        m_Controls->m_ODFRenderWidget->GenerateODF<ODF_SAMPLING_SIZE>(odf, m_OdfNormalization, dir_color);
+        m_Controls->m_OverviewTextEdit->setText(overviewText.toStdString().c_str());
       }
       catch( mitk::Exception &e )
       {
@@ -235,40 +219,25 @@ void QmitkODFDetailsView::UpdateOdf()
     }
     else if (dynamic_cast<mitk::TensorImage*>(m_ImageNode->GetData()) && ( m_ImageNode->GetData()->GetGeometry()->IsInside(world) ) )
     {
+      itk::OrientationDistributionFunction<float, 5000> odf;
       m_Controls->m_ODFRenderWidget->setVisible(true);
       m_Controls->m_OdfBox->setVisible(false);
-
-
       const mitk::TensorImage* Odf_image = dynamic_cast< mitk::TensorImage*>(m_ImageNode->GetData());
 
       // pixel access block
       try
       {
-        // get access to the Odf image data with explicitely allowing exceptions if memory locked
-        mitk::ImageReadAccessor readAccess( Odf_image, Odf_image->GetVolumeData(0), mitk::ImageAccessorBase::ExceptionIfLocked );
-        const float* Odf_cPtr = static_cast< const float*>(readAccess.GetData());
-
-        TensorImageType::IndexType ind;
-        ind[0] = (int)(index[0]+0.5);
-        ind[1] = (int)(index[1]+0.5);
-        ind[2] = (int)(index[2]+0.5);
-
-        // 6 - tensorsize
-        // remaining computation - standard offset
-        unsigned int offset_to_data = 6 * (ind[2] * img_dimension[1] * img_dimension[0] + ind[1] * img_dimension[0] + ind[0]);
-        const float *pixel_data = Odf_cPtr + offset_to_data;
-
-        float tensorelems[6] = {
-          *(pixel_data    ),
-          *(pixel_data + 1),
-          *(pixel_data + 2),
-          *(pixel_data + 3),
-          *(pixel_data + 4),
-          *(pixel_data + 5),
-        };
+        mitk::ImagePixelReadAccessor<mitk::TensorImage::PixelType, 3> pixel_read(Odf_image, Odf_image->GetVolumeData(0));
+        auto tensorelems = pixel_read.GetPixelByIndex(index);
 
         TensorPixelType tensor(tensorelems);
-        odf.InitFromTensor(tensor);
+        if (!toggle_tensor)
+          odf.InitFromTensor(tensor);
+        else
+        {
+          odf.InitFromEllipsoid(tensor);
+          m_OdfNormalization = 1;
+        }
 
         /** Array of eigen-values. */
         typedef itk::FixedArray<float, 3> EigenValuesArrayType;
@@ -278,16 +247,20 @@ void QmitkODFDetailsView::UpdateOdf()
         EigenValuesArrayType eigenValues;
         EigenVectorsMatrixType eigenvectors;
 
-        QString pos = QString::number(ind[0])+", "+QString::number(ind[1])+", "+QString::number(ind[2]);
+        QString pos = QString::number(index[0])+", "+QString::number(index[1])+", "+QString::number(index[2]);
         overviewText += "Coordinates: "+pos+"\n";
         overviewText += "FA: "+QString::number(tensor.GetFractionalAnisotropy())+"\n";
         overviewText += "RA: "+QString::number(tensor.GetRelativeAnisotropy())+"\n";
         overviewText += "Trace: "+QString::number(tensor.GetTrace())+"\n";
         tensor.ComputeEigenAnalysis(eigenValues,eigenvectors);
-        overviewText += "Eigenvalues:\n     "+QString::number(eigenValues[2])+"\n     "+QString::number(eigenValues[1])+"\n     "+QString::number(eigenValues[0])+"\n";
-        overviewText += "Main Diffusion:\n     "+QString::number(eigenvectors(2, 0))+"\n     "+QString::number(eigenvectors(2, 1))+"\n     "+QString::number(eigenvectors(2, 2))+"\n";
-        overviewText += "Values:\n     "+QString::number(tensorelems[0])+"\n     "+QString::number(tensorelems[1])+"\n     "+QString::number(tensorelems[2])+"\n     "+QString::number(tensorelems[3])+"\n     "+QString::number(tensorelems[4])+"\n     "+QString::number(tensorelems[5])+"\n     "+"\n";
+        overviewText += "Eigenvalues:\n     "+QString::number(static_cast<double>(eigenValues[2]))+"\n     "+QString::number(static_cast<double>(eigenValues[1]))+"\n     "+QString::number(static_cast<double>(eigenValues[0]))+"\n";
+        overviewText += "Main Diffusion:\n     "+QString::number(static_cast<double>(eigenvectors(2, 0)))+"\n     "+QString::number(static_cast<double>(eigenvectors(2, 1)))+"\n     "+QString::number(static_cast<double>(eigenvectors(2, 2)))+"\n";
+        overviewText += "Values:\n     "+QString::number(static_cast<double>(tensorelems[0]))+"\n     "+QString::number(static_cast<double>(tensorelems[1]))+"\n     "+QString::number(static_cast<double>(tensorelems[2]))+"\n     "+QString::number(static_cast<double>(tensorelems[3]))+"\n     "+QString::number(static_cast<double>(tensorelems[4]))+"\n     "+QString::number(static_cast<double>(tensorelems[5]))+"\n     "+"\n";
         m_Controls->m_OverviewTextEdit->setVisible(true);
+
+        m_Controls->m_ODFDetailsWidget->SetParameters<5000>(odf);
+        m_Controls->m_ODFRenderWidget->GenerateODF<5000>(odf, m_OdfNormalization, dir_color);
+        m_Controls->m_OverviewTextEdit->setText(overviewText.toStdString().c_str());
       }
       // end pixel access block
       catch(mitk::Exception &e )
@@ -301,6 +274,116 @@ void QmitkODFDetailsView::UpdateOdf()
         m_Controls->m_InputImageLabel->setText("<font color='green'>Click image to restore rendering!</font>");
       }
     }
+    else if (dynamic_cast<mitk::ShImage*>(m_ImageNode->GetData()) && ( m_ImageNode->GetData()->GetGeometry()->IsInside(world) ) )
+    {
+      itk::OrientationDistributionFunction<float, 5000> odf;
+      m_Controls->m_ODFRenderWidget->setVisible(true);
+      m_Controls->m_OdfBox->setVisible(false);
+
+      mitk::ShImage::Pointer Odf_image = dynamic_cast< mitk::ShImage*>(m_ImageNode->GetData());
+      mitk::Image::Pointer image = dynamic_cast< mitk::ShImage*>(m_ImageNode->GetData());
+      QString coeff_string = "";
+      switch (Odf_image->ShOrder())
+      {
+      case 2:
+      {
+        auto img = mitk::convert::GetItkShFromShImage<6>(image);
+        auto coeffs = img->GetPixel(index);
+        for (unsigned int i=0; i<coeffs.Size(); ++i)
+          coeff_string += QString::number(static_cast<double>(coeffs[i])) + " ";
+        mitk::sh::SampleOdf(coeffs.GetVnlVector(), odf);
+        break;
+      }
+      case 4:
+      {
+        auto img = mitk::convert::GetItkShFromShImage<15>(image);
+        auto coeffs = img->GetPixel(index);
+        for (unsigned int i=0; i<coeffs.Size(); ++i)
+          coeff_string += QString::number(static_cast<double>(coeffs[i])) + " ";
+        mitk::sh::SampleOdf(coeffs.GetVnlVector(), odf);
+        break;
+      }
+      case 6:
+      {
+        auto img = mitk::convert::GetItkShFromShImage<28>(image);
+        auto coeffs = img->GetPixel(index);
+        for (unsigned int i=0; i<coeffs.Size(); ++i)
+          coeff_string += QString::number(static_cast<double>(coeffs[i])) + " ";
+        mitk::sh::SampleOdf(coeffs.GetVnlVector(), odf);
+        break;
+      }
+      case 8:
+      {
+        auto img = mitk::convert::GetItkShFromShImage<45>(image);
+        auto coeffs = img->GetPixel(index);
+        for (unsigned int i=0; i<coeffs.Size(); ++i)
+          coeff_string += QString::number(static_cast<double>(coeffs[i])) + " ";
+        mitk::sh::SampleOdf(coeffs.GetVnlVector(), odf);
+        break;
+      }
+      case 10:
+      {
+        auto img = mitk::convert::GetItkShFromShImage<66>(image);
+        auto coeffs = img->GetPixel(index);
+        for (unsigned int i=0; i<coeffs.Size(); ++i)
+          coeff_string += QString::number(static_cast<double>(coeffs[i])) + " ";
+        mitk::sh::SampleOdf(coeffs.GetVnlVector(), odf);
+        break;
+      }
+      case 12:
+      {
+        auto img = mitk::convert::GetItkShFromShImage<91>(image);
+        auto coeffs = img->GetPixel(index);
+        for (unsigned int i=0; i<coeffs.Size(); ++i)
+          coeff_string += QString::number(static_cast<double>(coeffs[i])) + " ";
+        mitk::sh::SampleOdf(coeffs.GetVnlVector(), odf);
+        break;
+      }
+      default :
+        mitkThrow() << "SH order larger 12 not supported";
+      }
+
+      for (unsigned int i=0; i<odf.GetNumberOfComponents(); i++)
+      {
+        auto val = odf[i];
+            values += QString::number(i)+": "+QString::number(static_cast<double>(val))+"\n";
+        sum += val;
+        if (val>max)
+          max = val;
+        if (val<min)
+          min = val;
+      }
+      float mean = sum/odf.GetNumberOfComponents();
+
+      float stdev = 0;
+      for (unsigned int i=0; i<odf.GetNumberOfComponents(); i++)
+      {
+        float val = odf[i];
+        float diff = val - mean;
+        stdev += diff*diff;
+      }
+      stdev = std::sqrt(stdev/(odf.GetNumberOfComponents()-1));
+
+      QString pos = QString::number(index[0])+", "+QString::number(index[1])+", "+QString::number(index[2]);
+      overviewText += "Coordinates: "+pos+"\n";
+      overviewText += "SH order: "+QString::number(static_cast<double>(Odf_image->ShOrder()))+"\n";
+      overviewText += "Num. Coefficients: "+QString::number(static_cast<double>(Odf_image->NumCoefficients()))+"\n";
+      overviewText += "Coefficients: "+coeff_string+"\n";
+      overviewText += "GFA: "+QString::number(static_cast<double>(odf.GetGeneralizedFractionalAnisotropy()))+"\n";
+      overviewText += "Sum: "+QString::number(static_cast<double>(sum))+"\n";
+      overviewText += "Mean: "+QString::number(static_cast<double>(mean))+"\n";
+      overviewText += "Stdev: "+QString::number(static_cast<double>(stdev))+"\n";
+      overviewText += "Min: "+QString::number(static_cast<double>(min))+"\n";
+      overviewText += "Max: "+QString::number(static_cast<double>(max))+"\n";
+      vnl_vector_fixed<double, 3> pd = odf.GetDirection(odf.GetPrincipalDiffusionDirectionIndex());
+      overviewText += "Main Diffusion:\n     "+QString::number(pd[0])+"\n     "+QString::number(pd[1])+"\n     "+QString::number(pd[2])+"\n";
+
+      m_Controls->m_OdfValuesTextEdit->setText(values);
+      m_Controls->m_OverviewTextEdit->setVisible(true);
+      m_Controls->m_ODFDetailsWidget->SetParameters<5000>(odf);
+      m_Controls->m_ODFRenderWidget->GenerateODF<5000>(odf, m_OdfNormalization, dir_color);
+      m_Controls->m_OverviewTextEdit->setText(overviewText.toStdString().c_str());
+    }
     else
     {
       m_Controls->m_ODFRenderWidget->setVisible(false);
@@ -308,34 +391,11 @@ void QmitkODFDetailsView::UpdateOdf()
       overviewText += "Please reinit image geometry.\n";
     }
 
-    // proceed only if the render widget is visible which indicates that the
-    // predecessing computations were successfull
-    if( m_Controls->m_ODFRenderWidget->isVisible() )
-    {
-      m_Controls->m_ODFDetailsWidget->SetParameters(odf);
 
-      switch(m_OdfNormalization)
-      {
-      case 0:
-        odf = odf.MinMaxNormalize();
-        break;
-      case 1:
-        odf = odf.MaxNormalize();
-        break;
-      case 2:
-        odf = odf.MaxNormalize();
-        break;
-      default:
-        odf = odf.MinMaxNormalize();
-      }
-
-      m_Controls->m_ODFRenderWidget->GenerateODF(odf);
-      m_Controls->m_OverviewTextEdit->setText(overviewText.toStdString().c_str());
-    }
   }
   catch(...)
   {
-    QMessageBox::critical(0, "Error", "Data could not be analyzed. The image might be corrupted.");
+    QMessageBox::critical(nullptr, "Error", "Data could not be analyzed. The image might be corrupted.");
   }
 }
 

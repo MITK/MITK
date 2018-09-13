@@ -30,6 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkOdfImage.h>
 #include <mitkTensorImage.h>
 #include <mitkPeakImage.h>
+#include <itkOrientationDistributionFunction.h>
+#include <mitkImageCast.h>
+#include <mitkImageToItk.h>
 
 namespace mitk{
 
@@ -119,6 +122,19 @@ public:
   static mitk::TensorImage::ItkTensorImageType::Pointer GetItkTensorFromTensorImage(mitk::Image::Pointer mitkImage);
   static mitk::PeakImage::ItkPeakImageType::Pointer GetItkPeakFromPeakImage(mitk::Image::Pointer mitkImage);
 
+  template<unsigned int NUM_COEFFS>
+  static typename itk::Image< itk::Vector<float, NUM_COEFFS>, 3>::Pointer GetItkShFromShImage(mitk::Image::Pointer mitkImage)
+  {
+    mitk::ShImage::Pointer mitkShImage = dynamic_cast<mitk::ShImage*>(mitkImage.GetPointer());
+    if (mitkShImage.IsNull())
+      mitkThrow() << "Input image is not a SH image!";
+
+    typename itk::Image< itk::Vector<float, NUM_COEFFS>, 3>::Pointer itkvol;
+    mitk::CastToItkImage(mitkImage, itkvol);
+
+    return itkvol;
+  }
+
   static mitk::OdfImage::ItkOdfImageType::Pointer GetItkOdfFromShImage(mitk::Image::Pointer mitkImage);
   static mitk::OdfImage::Pointer GetOdfFromShImage(mitk::Image::Pointer mitkImage);
   static mitk::OdfImage::ItkOdfImageType::Pointer GetItkOdfFromOdfImage(mitk::Image::Pointer mitkImage);
@@ -136,6 +152,17 @@ public:
   static vnl_matrix<float> CalcShBasisForDirections(unsigned int sh_order, vnl_matrix<double> U, bool mrtrix=true);
   static float GetValue(const vnl_vector<float>& coefficients, const int& sh_order, const vnl_vector_fixed<double, 3>& dir, const bool mrtrix);
   static float GetValue(const vnl_vector<float> &coefficients, const int &sh_order, const double theta, const double phi, const bool mrtrix);
+  static unsigned int ShOrder(int num_coeffs);
+
+  template <unsigned int N, typename TComponent=float>
+  static void SampleOdf(const vnl_vector<float>& coefficients, itk::OrientationDistributionFunction<TComponent, N>& odf)
+  {
+    auto dirs = odf.GetDirections();
+    auto basis = CalcShBasisForDirections(ShOrder(coefficients.size()), *dirs);
+    auto odf_vals = basis * coefficients;
+    for (unsigned int i=0; i<odf_vals.size(); ++i)
+      odf[i] = odf_vals[i];
+  }
 };
 
 class MITKDIFFUSIONCORE_EXPORT gradients

@@ -37,33 +37,3 @@ QmitkODFDetailsWidget::QmitkODFDetailsWidget( QWidget * parent )
 QmitkODFDetailsWidget::~QmitkODFDetailsWidget()
 {
 }
-
-void QmitkODFDetailsWidget::SetParameters( itk::OrientationDistributionFunction<double, ODF_SAMPLING_SIZE> odf )
-{
-  this->Clear();
-
-  std::vector<double> xVals;
-  std::vector<double> yVals;
-  float max = itk::NumericTraits<float>::NonpositiveMin();
-  float min = itk::NumericTraits<float>::max();
-
-  for (int i=0; i<ODF_SAMPLING_SIZE; i++){
-    xVals.push_back(i);
-    yVals.push_back(odf[i]);
-    if (odf[i]>max)
-      max = odf[i];
-    if (odf[i]<min)
-      min = odf[i];
-  }
-
-  if(min>0)
-    m_Plot->setAxisScale ( 0, 0, max );
-  else
-    m_Plot->setAxisScale ( 0, min, max );
-
-  int curveId = this->InsertCurve( "ODF Values" );
-  this->SetCurveData( curveId, xVals, yVals );
-  this->SetCurvePen( curveId, QPen(Qt::blue, 0.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin) );
-  this->Replot();
-}
-

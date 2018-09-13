@@ -399,6 +399,18 @@ void QmitkChartWidget::RemoveData(const std::string& label)
   m_Impl->RemoveData(label);
 }
 
+std::vector<QmitkChartxyData*> QmitkChartWidget::GetData()
+{
+  if (m_Impl->GetC3xyData() == nullptr)
+  {
+    return std::vector<QmitkChartxyData*>();
+  }
+  else
+  {
+    return *m_Impl->GetC3xyData();
+  }
+}
+
 void QmitkChartWidget::SetColor(const std::string& label, const std::string& colorName)
 {
   m_Impl->SetColor(label, colorName);

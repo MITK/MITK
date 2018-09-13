@@ -819,8 +819,8 @@ QHash<QString, QVariant> BaseApplication::getFrameworkProperties() const
 }
 
 static const int PROGRESS_X_PX = 42;
-static const int PROGRESS_Y_PX = 150;
-static const int PROGRESS_WIDTH_PX = 392;
+static const int PROGRESS_Y_PX = 185;
+static const int PROGRESS_WIDTH_PX = 399;
 static const int PROGRESS_HEIGHT_PX = 2;
 static const int PROGRESS_ELEMENT_WIDTH = 50;
 
@@ -866,8 +866,8 @@ void BaseApplication::initializeSplashScreen(QCoreApplication * application)
         QPainter splashPainter;
         splashPainter.begin(&pixmap);
         auto progressAbsolute = progress * PROGRESS_WIDTH_PX;
-        const auto autoplanGrey = QBrush(QColor(200, 225, 222, 100));
-        const auto autoplanGreen = QBrush(QColor(43, 180, 170, 250));
+        const auto autoplanGrey = QBrush(QColor(255, 255, 255, 219));
+        const auto autoplanGreen = QBrush(QColor(115, 102, 241, 186));
         if (invert)
         {
           auto progressStart = PROGRESS_X_PX + PROGRESS_WIDTH_PX - progressAbsolute - PROGRESS_ELEMENT_WIDTH;

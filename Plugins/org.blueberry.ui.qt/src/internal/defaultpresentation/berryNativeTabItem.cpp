@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryConstants.h>
 
 #include <QToolButton>
+#include <QFile>
+#include <QRegularExpression>
+#include <QApplication>
 
 namespace berry
 {
@@ -90,16 +93,49 @@ void NativeTabItem::SetShowClose(bool close)
   showClose = close;
 }
 
+QString ParseColor(const QString &subject, const QString &pattern, const QString &fallback)
+{
+  QRegularExpression re(pattern, QRegularExpression::CaseInsensitiveOption);
+  auto match = re.match(subject);
+
+  return match.hasMatch()
+    ? match.captured(1)
+    : fallback;
+}
+
 QWidget* NativeTabItem::GetCloseButton()
 {
   if (!closeButton)
   {
-    QIcon iconCloseTab = QtStyleManager::ThemeIcon(QStringLiteral(":/org.blueberry.ui.qt/tab_close.svg"));
+    QFile resourceFile(":/org.blueberry.ui.qt/tab_close.svg");
+    if (resourceFile.open(QIODevice::ReadOnly))
+    {
+      auto originalSVG = resourceFile.readAll();
+      auto styleSheet = qApp->styleSheet();
+
+      if (styleSheet.isEmpty()) {
+        QIcon iconCloseTab(QPixmap::fromImage(QImage::fromData(originalSVG)));
+        closeButton->setIcon(iconCloseTab);
+      } else {
+        auto iconColor = ParseColor(styleSheet,
+          QStringLiteral("iconColor\\s*[=:]\\s*(#[0-9a-f]{6})"),
+          QStringLiteral("#000000"));
+
+        auto iconAccentColor = ParseColor(styleSheet,
+          QStringLiteral("iconAccentColor\\s*[=:]\\s*(#[0-9a-f]{6})"),
+          QStringLiteral("#ffffff"));
+
+        auto themedSVG = QString(originalSVG).replace(QStringLiteral("#00ff00"), iconColor, Qt::CaseInsensitive);
+        themedSVG = themedSVG.replace(QStringLiteral("#ff00ff"), iconAccentColor, Qt::CaseInsensitive);
+
+        QIcon iconCloseTab(QPixmap::fromImage(QImage::fromData(themedSVG.toLatin1())));
+        closeButton->setIcon(iconCloseTab);
+      }
+    }
     closeButton = new QToolButton(parent->GetControl());
     closeButton->setObjectName("TabCloseButton");
     closeButton->setContentsMargins(0, 0, 0, 0);
     closeButton->setFixedSize(12,12);
-    closeButton->setIcon(iconCloseTab);
     closeButton->setAutoRaise(true);
   }
 

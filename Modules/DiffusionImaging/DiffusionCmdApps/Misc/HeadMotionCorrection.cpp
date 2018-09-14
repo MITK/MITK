@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDWIHeadMotionCorrectionFilter.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <itksys/SystemTools.hxx>
-#include <mitkDiffusionCoreIOMimeTypes.h>
 
 int main(int argc, char* argv[])
 {
@@ -56,7 +55,7 @@ int main(int argc, char* argv[])
 
     std::string ext = itksys::SystemTools::GetFilenameExtension(outImage);
     if (ext==".nii" || ext==".nii.gz")
-      mitk::IOUtil::Save(out_image, mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_NAME(), outImage);
+      mitk::IOUtil::Save(out_image, "DWI_NIFTI", outImage);
     else
       mitk::IOUtil::Save(out_image, outImage);
   }

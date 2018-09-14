@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleResourceStream.h>
 #include <BetData.h>
 #include <mitkPreferenceListReaderOptionsFunctor.h>
-#include <mitkDiffusionCoreIOMimeTypes.h>
 #include <boost/algorithm/string.hpp>
 
 typedef mitk::DiffusionPropertyHelper DPH;
@@ -169,7 +168,7 @@ int main(int argc, char* argv[])
       name += outputs.at(i);
 
       if(types.at(i)=="input" && mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(mitk_image))
-        mitk::IOUtil::Save(image, mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_NAME(), name+".nii.gz");
+        mitk::IOUtil::Save(image, "DWI_NIFTI", name+".nii.gz");
       else
         mitk::IOUtil::Save(image, name+".nii.gz");
     }

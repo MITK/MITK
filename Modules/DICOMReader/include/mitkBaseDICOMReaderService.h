@@ -52,6 +52,13 @@ protected:
   virtual mitk::DICOMFileReader::Pointer GetReader(const mitk::StringList& relevantFiles) const = 0;
 };
 
+
+class IPropertyProvider;
+
+/** Helper function that generates a name string (e.g. for DataNode names) from the DICOM properties of the passed
+  provider instance. If the instance is nullptr, or has no dicom properties DataNode::NO_NAME_VALUE() will be returned.*/
+std::string MITKDICOMREADER_EXPORT GenerateNameFromDICOMProperties(const mitk::IPropertyProvider* provider);
+
 }
 
 #endif // MITKBASEDICOMREADERSERVICE_H

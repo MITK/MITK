@@ -296,12 +296,12 @@ namespace mitk
 
     // name already defined?
     mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty *>(node->GetProperty("name"));
-    if (nameProp.IsNull() || (strcmp(nameProp->GetValue(), "No Name!") == 0))
+    if (nameProp.IsNull() || nameProp->GetValue() == DataNode::NO_NAME_VALUE())
     {
       // name already defined in BaseData
       mitk::StringProperty::Pointer baseDataNameProp =
         dynamic_cast<mitk::StringProperty *>(node->GetData()->GetProperty("name").GetPointer());
-      if (baseDataNameProp.IsNull() || (strcmp(baseDataNameProp->GetValue(), "No Name!") == 0))
+      if (baseDataNameProp.IsNull() || baseDataNameProp->GetValue() == DataNode::NO_NAME_VALUE())
       {
         // name neither defined in node, nor in BaseData -> name = filebasename;
         nameProp = mitk::StringProperty::New(this->GetRegisteredMimeType().GetFilenameWithoutExtension(filePath));

@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkProperties.h"
 #include "mitkWeakPointer.h"
+#include "mitkIPropertyProvider.h"
 
 #include "mitkGantryTiltInformation.h"
 
@@ -77,12 +78,12 @@ namespace mitk
      - whether pixel spacing is meant to be in-patient or on-detector (mitk::PixelSpacingInterpretation)
      - details about a possible gantry tilt (intended for use by file readers, may be hidden later)
      */
-  class MITKDICOMREADER_EXPORT DICOMImageBlockDescriptor
+  class MITKDICOMREADER_EXPORT DICOMImageBlockDescriptor: public IPropertyProvider
   {
   public:
 
     DICOMImageBlockDescriptor();
-    ~DICOMImageBlockDescriptor();
+    virtual ~DICOMImageBlockDescriptor();
 
     DICOMImageBlockDescriptor(const DICOMImageBlockDescriptor& other);
     DICOMImageBlockDescriptor& operator=(const DICOMImageBlockDescriptor& other);
@@ -121,6 +122,15 @@ namespace mitk
     void SetIntProperty(const std::string& key, int value);
     /// Convenience function around GetProperty()
     int GetIntProperty(const std::string& key, int defaultValue) const;
+
+    virtual BaseProperty::ConstPointer GetConstProperty(const std::string &propertyKey,
+      const std::string &contextName = "",
+      bool fallBackOnDefaultContext = true) const override;
+
+    virtual std::vector<std::string> GetPropertyKeys(const std::string &contextName = "",
+      bool includeDefaultContext = false) const override;
+
+    virtual std::vector<std::string> GetPropertyContextNames() const override;
 
   private:
 

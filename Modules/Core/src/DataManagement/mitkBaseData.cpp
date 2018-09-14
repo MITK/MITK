@@ -344,15 +344,7 @@ void mitk::BaseData::RemoveProperty(const std::string &propertyKey, const std::s
 
 std::vector<std::string> mitk::BaseData::GetPropertyKeys(const std::string &contextName, bool includeDefaultContext) const
 {
-  std::vector<std::string> propertyKeys;
-
-  if (contextName.empty() || includeDefaultContext)
-  {
-    for (auto property : *m_PropertyList->GetMap())
-      propertyKeys.push_back(property.first);
-  }
-
-  return propertyKeys;
+  return m_PropertyList->GetPropertyKeys();
 }
 
 std::vector<std::string> mitk::BaseData::GetPropertyContextNames() const

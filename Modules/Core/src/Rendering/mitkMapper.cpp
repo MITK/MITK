@@ -148,5 +148,5 @@ void mitk::Mapper::SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer
 {
   node->AddProperty("visible", mitk::BoolProperty::New(true), renderer, overwrite);
   node->AddProperty("layer", mitk::IntProperty::New(0), renderer, overwrite);
-  node->AddProperty("name", mitk::StringProperty::New("No Name!"), renderer, overwrite);
+  node->AddProperty("name", mitk::StringProperty::New(DataNode::NO_NAME_VALUE()), renderer, overwrite);
 }

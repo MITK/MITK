@@ -28,8 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkFiberfoxParameters.h>
-#include <mitkDiffusionCoreIOMimeTypes.h>
-#include <mitkIOMimeTypes.h>
 
 using namespace mitk;
 
@@ -194,9 +192,9 @@ int main(int argc, char* argv[])
   mitk::DiffusionPropertyHelper::InitializeImage(image);
 
   if (file_extension=="")
-    mitk::IOUtil::Save(image, mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_NAME(), outName+".nii.gz");
+    mitk::IOUtil::Save(image, "DWI_NIFTI", outName+".nii.gz");
   else if (file_extension==".nii" || file_extension==".nii.gz")
-    mitk::IOUtil::Save(image, mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_NAME(), outName+file_extension);
+    mitk::IOUtil::Save(image, "DWI_NIFTI", outName+file_extension);
   else
     mitk::IOUtil::Save(image, outName+file_extension);
 

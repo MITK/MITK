@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <itkDwiGradientLengthCorrectionFilter.h>
 #include <mitkDiffusionPropertyHelper.h>
-#include <mitkDiffusionCoreIOMimeTypes.h>
 
 int main(int argc, char* argv[])
 {
@@ -84,7 +83,7 @@ int main(int argc, char* argv[])
 
     std::string ext = itksys::SystemTools::GetFilenameExtension(outImage);
     if (ext==".nii" || ext==".nii.gz")
-      mitk::IOUtil::Save(newImage, mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_NAME(), outImage);
+      mitk::IOUtil::Save(newImage, "DWI_NIFTI", outImage);
     else
       mitk::IOUtil::Save(newImage, outImage);
   }

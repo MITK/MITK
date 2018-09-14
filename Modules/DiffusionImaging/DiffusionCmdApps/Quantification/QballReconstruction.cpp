@@ -29,8 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPreferenceListReaderOptionsFunctor.h>
 #include <itkDiffusionMultiShellQballReconstructionImageFilter.h>
 #include <itkDwiGradientLengthCorrectionFilter.h>
-#include <mitkDiffusionCoreIOMimeTypes.h>
-#include <mitkIOMimeTypes.h>
 
 template<int L>
 void TemplatedMultishellQBallReconstruction(float lambda, mitk::Image::Pointer dwi, bool output_sampled, int threshold, std::string outfilename)
@@ -77,7 +75,7 @@ void TemplatedMultishellQBallReconstruction(float lambda, mitk::Image::Pointer d
 
   std::string coeffout = outfilename;
   coeffout += ".nii.gz";
-  mitk::IOUtil::Save(coeffsImage, mitk::DiffusionCoreIOMimeTypes::SH_MIMETYPE_NAME(), coeffout);
+  mitk::IOUtil::Save(coeffsImage, "SH_IMAGE", coeffout);
 
   outfilename += ".odf";
   if (output_sampled)
@@ -108,7 +106,7 @@ void TemplatedCsaQBallReconstruction(float lambda, mitk::Image::Pointer dwi, boo
 
   std::string coeffout = outfilename;
   coeffout += ".nii.gz";
-  mitk::IOUtil::Save(coeffsImage, mitk::DiffusionCoreIOMimeTypes::SH_MIMETYPE_NAME(), coeffout);
+  mitk::IOUtil::Save(coeffsImage, "SH_IMAGE", coeffout);
 
   outfilename += ".odf";
   if (output_sampled)

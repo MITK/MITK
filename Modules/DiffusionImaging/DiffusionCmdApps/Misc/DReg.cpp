@@ -30,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkDiffusionImageCorrectionFilter.h>
 #include <mitkDiffusionDataIOHelper.h>
-#include <mitkDiffusionCoreIOMimeTypes.h>
 
 typedef mitk::DiffusionPropertyHelper DPH;
 
@@ -175,7 +174,7 @@ int main(int argc, char* argv[])
 
       std::string file_extension = itksys::SystemTools::GetFilenameExtension(o);
       if (file_extension==".nii" || file_extension==".nii.gz")
-        mitk::IOUtil::Save(registered_image, mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_NAME(), o);
+        mitk::IOUtil::Save(registered_image, "DWI_NIFTI", o);
       else
         mitk::IOUtil::Save(registered_image, o);
     }
@@ -196,7 +195,7 @@ int main(int argc, char* argv[])
         mitk::DiffusionPropertyHelper::InitializeImage( registered_image );
 
         if (ext==".nii" || ext==".nii.gz")
-          mitk::IOUtil::Save(registered_image, mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_NAME(), out_name);
+          mitk::IOUtil::Save(registered_image, "DWI_NIFTI", out_name);
         else
           mitk::IOUtil::Save(registered_image, out_name);
       }

@@ -23,45 +23,211 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkFormulaParser.h"
 
-mitk::PlotDataCurve::PlotDataCurve(const PlotDataValues& values) : values(values)
+const std::string mitk::MODEL_FIT_PLOT_SAMPLE_NAME()
 {
-  time.Modified();
+  return "Sample";
 };
 
-mitk::PlotDataCurve::PlotDataCurve(const PlotDataCurve& other) : values(other.values), time(other.time)
+const std::string mitk::MODEL_FIT_PLOT_SIGNAL_NAME()
 {
+  return "Signal";
+}
+
+const std::string mitk::MODEL_FIT_PLOT_INTERPOLATED_SIGNAL_NAME()
+{
+  return "INTERP_Signal";
 };
 
-mitk::PlotDataCurve::PlotDataCurve(PlotDataCurve&& other) : values(std::move(other.values))
+void
+mitk::PlotDataCurve::
+SetValues(const PlotDataValues& _arg)
 {
-  this->time = other.time;
-  other.time = itk::TimeStamp();
-};
+  if (this->m_Values != _arg)
+  {
+    this->m_Values = _arg;
+    this->Modified();
+  }
+}
+
+void
+mitk::PlotDataCurve::
+SetValues(PlotDataValues&& _arg)
+{
+  if (this->m_Values != _arg)
+  {
+    this->m_Values = std::move(_arg);
+    this->Modified();
+  }
+}
 
 mitk::PlotDataCurve & mitk::PlotDataCurve::operator=(const PlotDataCurve& rhs)
 {
-  this->values = rhs.values;
-  this->time = rhs.time;
+  this->m_Values = rhs.m_Values;
+  this->SetTimeStamp(rhs.GetTimeStamp());
   return *this;
 };
 
 mitk::PlotDataCurve& mitk::PlotDataCurve::operator=(PlotDataCurve&& rhs) noexcept
 {
-  this->values = std::move(rhs.values);
-  this->time = rhs.time;
-  rhs.time = itk::TimeStamp();
+  this->m_Values = std::move(rhs.m_Values);
+  this->SetTimeStamp(rhs.GetTimeStamp());
 
   return *this;
 };
 
 void mitk::PlotDataCurve::Reset()
 {
-  this->values.clear();
-  this->time = itk::TimeStamp();
+  this->m_Values.clear();
+  this->Modified();
+}
+
+mitk::PlotDataCurve::PlotDataCurve()
+{
+}
+
+const mitk::PlotDataCurve* GetPlotCurve(const mitk::PlotDataCurveCollection* collection, const std::string& key)
+{
+  if (collection)
+  {
+    auto iter = collection->find(key);
+    if (iter != collection->end())
+    {
+      return iter->second.GetPointer();
+    }
+  }
+  return nullptr;
+};
+
+const mitk::PlotDataCurve* mitk::ModelFitPlotData::GetSamplePlot(const PlotDataCurveCollection* coll)
+{
+  if (coll)
+  {
+    return GetPlotCurve(coll, MODEL_FIT_PLOT_SAMPLE_NAME());
+  }
+  return nullptr;
+};
+
+const mitk::PlotDataCurve* mitk::ModelFitPlotData::GetSignalPlot(const PlotDataCurveCollection* coll)
+{
+  if (coll)
+  {
+    return GetPlotCurve(coll, MODEL_FIT_PLOT_SIGNAL_NAME());
+  }
+  return nullptr;
+};
+
+const mitk::PlotDataCurve* mitk::ModelFitPlotData::GetInterpolatedSignalPlot(const PlotDataCurveCollection* coll)
+{
+  if (coll)
+  {
+    return GetPlotCurve(coll, MODEL_FIT_PLOT_INTERPOLATED_SIGNAL_NAME());
+  }
+  return nullptr;
+};
+
+const mitk::PlotDataCurveCollection* mitk::ModelFitPlotData::GetPositionalPlot(const mitk::Point3D& point) const
+{
+  auto iter = this->positionalPlots.find(point);
+  if (iter != positionalPlots.end())
+  {
+    return iter->second.GetPointer();
+  }
+  return nullptr;
+};
+
+mitk::PlotDataValues::value_type mitk::ModelFitPlotData::GetXMinMax() const
+{
+  double max = itk::NumericTraits<double>::NonpositiveMin();
+  double min = itk::NumericTraits<double>::max();
+
+  //currently we assume that within a model fit, plot data does not exceed
+  //the sample/signale on the x axis.
+  auto sample = this->GetSamplePlot(this->currentPositionPlots);
+  if (sample)
+  {
+    CheckXMinMaxFromPlotDataValues(sample->GetValues(), min, max);
+  }
+  for (const auto& posCollection : this->positionalPlots)
+  {
+    for (const auto& plot : *(posCollection.second))
+    {
+      auto sample = this->GetSamplePlot(posCollection.second);
+      if (sample)
+      {
+        CheckXMinMaxFromPlotDataValues(sample->GetValues(), min, max);
+      }
+    }
+  }
+
+  return std::make_pair(min, max);
+};
+
+mitk::PlotDataValues::value_type mitk::ModelFitPlotData::GetYMinMax() const
+{
+  double max = itk::NumericTraits<double>::NonpositiveMin();
+  double min = itk::NumericTraits<double>::max();
+
+  for (const auto& plot : *(this->currentPositionPlots.GetPointer()))
+  {
+    CheckYMinMaxFromPlotDataValues(plot.second->GetValues(), min, max);
+  }
+
+  for (const auto& posCollection : this->positionalPlots)
+  {
+    for (const auto& plot : *(posCollection.second))
+    {
+      CheckYMinMaxFromPlotDataValues(plot.second->GetValues(), min, max);
+    }
+  }
+
+  for (const auto& plot : *(this->staticPlots))
+  {
+    CheckYMinMaxFromPlotDataValues(plot.second->GetValues(), min, max);
+  }
+
+  return std::make_pair(min, max);
+};
+
+mitk::ModelFitPlotData::ModelFitPlotData()
+{
+  this->currentPositionPlots = PlotDataCurveCollection::New();
+  this->staticPlots = PlotDataCurveCollection::New();
+};
+
+void mitk::CheckYMinMaxFromPlotDataValues(const PlotDataValues& data, double& min, double& max)
+{
+  for (const auto & pos : data)
+  {
+    if (max < pos.second)
+    {
+      max = pos.second;
+    }
+
+    if (min > pos.second)
+    {
+      min = pos.second;
+    }
+  }
+}
+
+void mitk::CheckXMinMaxFromPlotDataValues(const PlotDataValues& data, double& min, double& max)
+{
+  for (const auto & pos : data)
+  {
+    if (max < pos.first)
+    {
+      max = pos.first;
+    }
+
+    if (min > pos.first)
+    {
+      min = pos.first;
+    }
+  }
 }
 
 /** Helper function that generates the curve based on a stored and on the fly parsed function string.*/
-mitk::PlotDataCurve
+mitk::PlotDataCurve::Pointer
 CalcSignalFromFunction(const mitk::Point3D& position, const mitk::modelFit::ModelFitInfo* fitInfo, const mitk::ModelBase::TimeGridType& timeGrid)
 {
   if (!fitInfo)
@@ -72,7 +238,9 @@ CalcSignalFromFunction(const mitk::Point3D& position, const mitk::modelFit::Mode
   mitk::Image::Pointer inputImage = fitInfo->inputImage;
   assert(inputImage.IsNotNull());
 
-  mitk::PlotDataCurve result;
+  mitk::PlotDataCurve::Pointer result = mitk::PlotDataCurve::New();
+  mitk::PlotDataCurve::ValuesType values;
+  values.reserve(timeGrid.size());
 
   // Calculate index
   ::itk::Index<3> index;
@@ -106,15 +274,15 @@ CalcSignalFromFunction(const mitk::Point3D& position, const mitk::modelFit::Mode
     parameterMap[fitInfo->x] = x;
 
     double y = parser.parse(fitInfo->function);
-    result.values.push_back(std::make_pair(x, y));
+    values.emplace_back(std::make_pair(x, y));
   }
 
-  result.time.Modified();
+  result->SetValues(std::move(values));
   return result;
 }
 
 /** Helper function that generates the curve based on the model specified by the fit info.*/
-mitk::PlotDataCurve
+mitk::PlotDataCurve::Pointer
 CalcSignalFromModel(const mitk::Point3D& position, const mitk::modelFit::ModelFitInfo* fitInfo, const mitk::ModelParameterizerBase* parameterizer = nullptr)
 {
   assert(fitInfo);
@@ -141,21 +309,24 @@ CalcSignalFromModel(const mitk::Point3D& position, const mitk::modelFit::ModelFi
   mitk::ModelBase::ParametersType paramArray = mitk::ConvertParameterMapToParameterVector(parameterMap, model);
 
   mitk::ModelBase::ModelResultType curveDataY = model->GetSignal(paramArray);
-  mitk::PlotDataCurve result;
+  mitk::PlotDataCurve::Pointer result = mitk::PlotDataCurve::New();
+
   mitk::ModelBase::TimeGridType timeGrid = model->GetTimeGrid();
+  mitk::PlotDataCurve::ValuesType values;
+  values.reserve(timeGrid.size());
 
   for (unsigned int t = 0; t < timeGrid.size(); ++t)
   {
     double x = timeGrid[t];
     double y = curveDataY[t];
-    result.values.push_back(std::make_pair(x, y));
+    values.emplace_back(std::make_pair(x, y));
   }
 
-  result.time.Modified();
+  result->SetValues(std::move(values));
   return result;
 }
 
-mitk::PlotDataCurve
+mitk::PlotDataCurve::Pointer
 mitk::GenerateModelSignalPlotData(const mitk::Point3D& position, const mitk::modelFit::ModelFitInfo* fitInfo, const mitk::ModelBase::TimeGridType& timeGrid, mitk::ModelParameterizerBase* parameterizer)
 {
   if (!fitInfo)
@@ -163,7 +334,7 @@ mitk::GenerateModelSignalPlotData(const mitk::Point3D& position, const mitk::mod
     mitkThrow() << "Cannot calc model curve from function for given fit. Passed ModelFitInfo instance is nullptr.";
   }
 
-  PlotDataCurve result;
+  mitk::PlotDataCurve::Pointer result;
 
   if (!parameterizer)
   {
@@ -192,7 +363,7 @@ mitk::GenerateModelSignalPlotData(const mitk::Point3D& position, const mitk::mod
   return result;
 }
 
-mitk::PlotDataCurveCollection
+mitk::PlotDataCurveCollection::Pointer
 mitk::GenerateAdditionalModelFitPlotData(const mitk::Point3D& position, const mitk::modelFit::ModelFitInfo* fitInfo, const mitk::ModelBase::TimeGridType& timeGrid)
 {
   if (!fitInfo)
@@ -200,7 +371,7 @@ mitk::GenerateAdditionalModelFitPlotData(const mitk::Point3D& position, const mi
     mitkThrow() << "Cannot calc model curve from function for given fit. Passed ModelFitInfo instance is nullptr.";
   }
 
-  mitk::PlotDataCurveCollection result;
+  mitk::PlotDataCurveCollection::Pointer result = mitk::PlotDataCurveCollection::New();
 
   for (const auto& additionalInput : fitInfo->inputData.GetLookupTable())
   {
@@ -212,23 +383,25 @@ mitk::GenerateAdditionalModelFitPlotData(const mitk::Point3D& position, const mi
     }
     else
     {
-      mitk::PlotDataCurve pointData;
+      mitk::PlotDataCurve::Pointer pointData = mitk::PlotDataCurve::New();;
+      mitk::PlotDataCurve::ValuesType values;
+      values.reserve(timeGrid.size());
 
       for (unsigned int t = 0; t < timeGrid.size(); ++t)
       {
         const double x = timeGrid[t];
         const double y = additionalInput.second[t];
-        pointData.values.push_back(std::make_pair(x, y));
+        values.emplace_back(std::make_pair(x, y));
       }
-      pointData.time.Modified();
-      result.emplace(additionalInput.first, std::move(pointData));
+      pointData->SetValues(std::move(values));
+      result->CastToSTLContainer().emplace(additionalInput.first, std::move(pointData));
     }
   }
 
   return result;
 }
 
-mitk::PlotDataCurve
+mitk::PlotDataCurve::Pointer
 mitk::GenerateImageSamplePlotData(const mitk::Point3D& position, const mitk::Image* image, const mitk::ModelBase::TimeGridType& timeGrid)
 {
   if (!image)
@@ -236,15 +409,17 @@ mitk::GenerateImageSamplePlotData(const mitk::Point3D& position, const mitk::Ima
     mitkThrow() << "Cannot generate sample plot data. Passed image instance is nullptr.";
   }
 
-  mitk::PlotDataCurve result;
+  mitk::PlotDataCurve::Pointer result = mitk::PlotDataCurve::New();
+  mitk::PlotDataCurve::ValuesType values;
+  values.reserve(timeGrid.size());
 
   for (unsigned int t = 0; t < timeGrid.size(); ++t)
   {
     const double x = timeGrid[t];
     const double y = ReadVoxel(image, position, t);
-    result.values.push_back(std::make_pair(x, y));
+    values.emplace_back(std::make_pair(x, y));
   }
 
-  result.time.Modified();
+  result->SetValues(std::move(values));
   return result;
 }

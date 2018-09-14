@@ -21,6 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPoint.h"
 #include "mitkModelBase.h"
+#include "mitkWeakPointer.h"
+#include "mitkCommon.h"
+
+#include "mitkModelFitInfo.h"
+
+#include "itkMapContainer.h"
 
 #include "MitkModelFitExports.h"
 
@@ -30,39 +36,110 @@ namespace mitk
   class ModelParameterizerBase;
   class Image;
 
-  namespace modelFit
-  {
-    class ModelFitInfo;
-
-  }
-
   using PlotDataValues = std::vector<std::pair<double, double>>;
 
   /** Simple helper structure that represents a curve for plots and its generation time*/
-  struct MITKMODELFIT_EXPORT PlotDataCurve
+  class MITKMODELFIT_EXPORT PlotDataCurve : public ::itk::Object
   {
-    /** values of the curve */
-    PlotDataValues values;
+  public:
+    mitkClassMacroItkParent(PlotDataCurve, itk::Object);
+    itkFactorylessNewMacro(Self);
 
-    /** Timestamp indicating the last change of the values.*/
-    itk::TimeStamp time;
+    using ValuesType = PlotDataValues;
 
-    PlotDataCurve() = default;
-    PlotDataCurve(const PlotDataValues& values);
-    PlotDataCurve(const PlotDataCurve& other);
-    PlotDataCurve(PlotDataCurve&& other);
+    virtual void SetValues(const ValuesType& _arg);
+    virtual void SetValues(ValuesType&& _arg);
+
+    itkGetConstReferenceMacro(Values, ValuesType);
+    itkGetMacro(Values, ValuesType);
 
     PlotDataCurve& operator=(const PlotDataCurve& rhs);
     PlotDataCurve& operator=(PlotDataCurve&& rhs) noexcept;
 
     void Reset();
+
+  protected:
+    PlotDataCurve();
+    virtual ~PlotDataCurve() = default;
+
+  private:
+    /** values of the curve */
+    ValuesType m_Values;
+
+    PlotDataCurve(const PlotDataCurve& other) = delete;
   };
 
   /** Collection of plot curves, e.g. every plot curve for a certain world coordinate position*/
-  using PlotDataCurveCollection = std::map<std::string, PlotDataCurve>;
+  using PlotDataCurveCollection = itk::MapContainer<std::string, PlotDataCurve::Pointer>;
 
-  using PlotDataCurveCollectionMap = std::map<std::string, PlotDataCurveCollection>;
+  /** Structure containing all information for one model fit */
+  struct MITKMODELFIT_EXPORT ModelFitPlotData
+  {
+    /** Plots that are related to the world coordinate labeled as current position.*/
+    PlotDataCurveCollection::Pointer currentPositionPlots;
 
+    class PositionalLesser {
+    public:
+      bool operator()(const mitk::Point3D& lhs, const mitk::Point3D& rhs) const
+      {
+        if (lhs[0] < rhs[0])
+        {
+          return true;
+        }
+        else if (lhs[0] > rhs[0])
+        {
+          return false;
+        }
+
+        if (lhs[1] < rhs[1])
+        {
+          return true;
+        }
+        else if (lhs[1] > rhs[1])
+        {
+          return false;
+        }
+
+        if (lhs[2] < rhs[2])
+        {
+          return true;
+        }
+        return false;
+      }
+    };
+
+    using PositionalCollectionMap = std::map<mitk::Point3D, PlotDataCurveCollection::Pointer, PositionalLesser>;
+
+    /** Plot collections that are related to specific world coordinates (inspection position bookmarks).*/
+    PositionalCollectionMap positionalPlots;
+
+    /** Plot collection for static plots of the fit that do not depend on some coordinates. */
+    PlotDataCurveCollection::Pointer staticPlots;
+
+    /** Pointer to the model fit that correspondens with this plot data.*/
+    mitk::modelFit::ModelFitInfo::Pointer fitInfo;
+
+    /** Helper function to get the collection of the current position.
+    Returns nullptr if no current position exists.*/
+    static const PlotDataCurve* GetSamplePlot(const PlotDataCurveCollection* coll);
+    static const PlotDataCurve* GetSignalPlot(const PlotDataCurveCollection* coll);
+    static const PlotDataCurve* GetInterpolatedSignalPlot(const PlotDataCurveCollection* coll);
+
+    const PlotDataCurveCollection* GetPositionalPlot(const mitk::Point3D& point) const;
+
+    /**returns the minimum (first element) and maximum (second element) of x of all plot data*/
+    PlotDataValues::value_type GetXMinMax() const;
+    /**returns the minimum (first element) and maximum (second element) of y of all plot data*/
+    PlotDataValues::value_type GetYMinMax() const;
+
+    ModelFitPlotData();
+  };
+
+  /** Helper function that actualizes min and max by the y values given in data.*/
+  void CheckYMinMaxFromPlotDataValues(const PlotDataValues& data, double& min, double& max);
+
+  /** Helper function that actualizes min and max by the x values given in data.*/
+  void CheckXMinMaxFromPlotDataValues(const PlotDataValues& data, double& min, double& max);
 
   /** Function generates curve data for the signal defined by the passed informations.
    @param position The position in world coordinates the curve should be generated for.
@@ -73,7 +150,7 @@ namespace mitk
    @pre position must be within the model fit input image
    @pre fitInfo must be a valid pointer.
    */
-  MITKMODELFIT_EXPORT PlotDataCurve
+  MITKMODELFIT_EXPORT PlotDataCurve::Pointer
     GenerateModelSignalPlotData(const mitk::Point3D& position, const mitk::modelFit::ModelFitInfo* fitInfo, const mitk::ModelBase::TimeGridType& timeGrid, mitk::ModelParameterizerBase* parameterizer = nullptr);
 
   /** Function generates curve data for all additinal inputs (e.g. ROI signal, AIF)
@@ -84,7 +161,7 @@ namespace mitk
   @pre position must be within the model fit input image
   @pre fitInfo must be a valid pointer.
   */
-  MITKMODELFIT_EXPORT PlotDataCurveCollection
+  MITKMODELFIT_EXPORT PlotDataCurveCollection::Pointer
     GenerateAdditionalModelFitPlotData(const mitk::Point3D& position, const mitk::modelFit::ModelFitInfo* fitInfo, const mitk::ModelBase::TimeGridType& timeGrid);
 
   /** Function generates curve data for a given image instance.
@@ -95,8 +172,23 @@ namespace mitk
   @pre image must be a valid pointer.
   @pre image time steps must equal the timeGrid size.
   */
-  MITKMODELFIT_EXPORT PlotDataCurve
+  MITKMODELFIT_EXPORT PlotDataCurve::Pointer
     GenerateImageSamplePlotData(const mitk::Point3D& position, const mitk::Image* image, const mitk::ModelBase::TimeGridType& timeGrid);
+
+  /**
+  * Keyword used in curve collections as key for the sample (extracted from an image) plot.
+  */
+  MITKMODELFIT_EXPORT const std::string MODEL_FIT_PLOT_SAMPLE_NAME();
+
+  /**
+  * Keyword used in curve collections as key for the signal (generated by a model) plot.
+  */
+  MITKMODELFIT_EXPORT const std::string MODEL_FIT_PLOT_SIGNAL_NAME();
+
+  /**
+  * Keyword used in curve collections as key for the interpolated (hires) signal (generated by a model) plot.
+  */
+  MITKMODELFIT_EXPORT const std::string MODEL_FIT_PLOT_INTERPOLATED_SIGNAL_NAME();
 
 }
 

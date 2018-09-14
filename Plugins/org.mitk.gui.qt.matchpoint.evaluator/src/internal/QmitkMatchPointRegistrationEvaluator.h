@@ -52,7 +52,7 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
-  protected slots:
+protected slots:
 
     /// \brief Called when the user clicks the GUI button
 
@@ -60,7 +60,7 @@ public:
   void OnStopBtnPushed();
   void OnSettingsChanged(mitk::DataNode*);
 
-    void OnSliceChanged();
+  void OnSliceChanged();
 
 protected:
   /// \brief called by QmitkFunctionality when DataManager's selection has changed

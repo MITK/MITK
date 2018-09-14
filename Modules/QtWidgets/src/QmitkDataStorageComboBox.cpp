@@ -389,15 +389,9 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode* _Data
   else if(insertNewNode)
     m_Nodes.insert( m_Nodes.begin()+index, _NonConstDataNode );
 
-  // ... and to the combobox
-  std::string _NonConstDataNodeName = "unnamed node";
-  // _NonConstDataNodeName is "unnamed node" so far, change it if there is a name property in the node
-  if(nameProperty)
-    _NonConstDataNodeName = nameProperty->GetValueAsString();
-
   if(addNewNode)
   {
-    this->addItem(QString::fromStdString(_NonConstDataNodeName));
+    this->addItem(GetDisplayedNodeName(_DataNode));
     // select new node if m_AutoSelectNewNodes is true or if we have just added the first node
     if(m_AutoSelectNewNodes || m_Nodes.size() == 1)
       this->setCurrentIndex(index);
@@ -405,7 +399,7 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode* _Data
   else
   {
     // update text in combobox
-    this->setItemText( index, QString::fromStdString(_NonConstDataNodeName));
+    this->setItemText( index, GetDisplayedNodeName(_DataNode));
   }
 }
 
@@ -445,4 +439,15 @@ void QmitkDataStorageComboBox::Reset()
       this->AddNode( nodeIt.Value().GetPointer() );
     }
   }
+}
+
+QString QmitkDataStorageComboBox::GetDisplayedNodeName(const mitk::DataNode* node)
+{
+  mitk::BaseProperty* nameProperty = node->GetProperty("name");
+  std::string _NonConstDataNodeName = "unnamed node";
+  if (nameProperty) {
+    _NonConstDataNodeName = nameProperty->GetValueAsString();
+  }
+
+  return QString::fromStdString(_NonConstDataNodeName);
 }

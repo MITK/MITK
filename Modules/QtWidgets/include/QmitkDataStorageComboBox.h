@@ -200,6 +200,8 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     virtual void Reset();
 
+    virtual QString GetDisplayedNodeName(const mitk::DataNode* node);
+
   protected:
     //#PROTECTED MEMBER VARS
     ///

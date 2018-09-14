@@ -105,6 +105,10 @@ public:
   void setDropMode(bool state);
   bool getDropMode();
 
+
+  void setTwoDimensionalViewState(bool state);
+  bool isTwoDimensionalViewState();
+
 protected:
   // overloaded move handler
   virtual void moveEvent(QMoveEvent* event) override;
@@ -193,6 +197,7 @@ private:
   mitk::Point2D m_CrosshairPosition;
 
   bool m_DropEnabled;
+  bool m_IsTwoDimensionalView;
 };
 
 #endif

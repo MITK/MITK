@@ -143,7 +143,7 @@ void mitkCrosshairManager::addPointCrosshair(QmitkRenderWindow* window)
   mitk::DataNode::Pointer crosshair;
 
   // Viewer mode
-  if (m_ShowSelected) {
+  if (m_ShowSelected || window->isTwoDimensionalViewState()) {
     if (m_Selected == nullptr || window == m_Selected) {
       return;
     }

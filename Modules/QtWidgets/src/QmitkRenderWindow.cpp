@@ -44,7 +44,8 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
   QVTKWidget(parent), m_ResendQtEvents(true), m_MenuWidget(NULL), m_MenuWidgetActivated(false), m_LayoutIndex(0), 
   m_FullScreenMode(false),
   m_WindowPlaneIsSelected(false),
-  m_DropEnabled(true)
+  m_DropEnabled(true),
+  m_IsTwoDimensionalView(false)
 {
   // Needed if QVTKWidget2 is used instead of QVTKWidget
   //this will be fixed in VTK source if change 18864 is accepted
@@ -605,4 +606,14 @@ void QmitkRenderWindow::setDropMode(bool state)
 bool QmitkRenderWindow::getDropMode()
 {
   return m_DropEnabled;
+}
+
+void QmitkRenderWindow::setTwoDimensionalViewState(bool state)
+{
+  m_IsTwoDimensionalView = state;
+}
+
+bool QmitkRenderWindow::isTwoDimensionalViewState()
+{
+  return m_IsTwoDimensionalView;
 }

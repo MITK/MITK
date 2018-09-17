@@ -38,7 +38,7 @@ private:
 class MITKQTWIDGETS_EXPORT mitkCrosshairManager : public QObject {
   Q_OBJECT
 public:
-  mitkCrosshairManager();
+  mitkCrosshairManager(const QString& parentWidget);
 
   // Changes crosshair mode for selected windows
   void setCrosshairMode(CrosshairMode mode);
@@ -130,4 +130,6 @@ private:
 
   mitk::Color m_SwivelColor;
   mitk::Color m_SwivelSelectedColor;
+
+  QString m_ParentWidget;
 };

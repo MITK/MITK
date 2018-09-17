@@ -5,13 +5,14 @@
 
 CrosshairModeController* CrosshairModeController::instance = nullptr;
 
-mitkCrosshairManager::mitkCrosshairManager() :
+mitkCrosshairManager::mitkCrosshairManager(const QString& parentWidget) :
   m_Selected(nullptr),
   m_ShowSelected(false),
   checkWindowsShareCrosshair(nullptr),
   m_ShowPlanesIn3d(true),
   m_ShowPlanesIn3dWithoutCursor(true),
-  m_SingleDataStorage(false)
+  m_SingleDataStorage(false),
+  m_ParentWidget(parentWidget)
 {
   m_CrosshairPredicate = mitk::NodePredicateProperty::New("crosshair", mitk::BoolProperty::New(true));
 
@@ -96,6 +97,7 @@ void mitkCrosshairManager::setDefaultProperties(mitk::DataNode::Pointer crosshai
   crosshair->SetBoolProperty("crosshair", true);
   crosshair->SetBoolProperty("includeInBoundingBox", false);
   crosshair->SetBoolProperty("helper object", true);
+  crosshair->SetProperty("parentWidget", mitk::StringProperty::New(m_ParentWidget.toStdString()));
 }
 
 void mitkCrosshairManager::addPlaneCrosshair(QmitkRenderWindow* window, bool render2d, bool render3d)

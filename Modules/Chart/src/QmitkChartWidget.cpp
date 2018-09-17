@@ -68,7 +68,11 @@ public:
   void ClearJavaScriptChart();
   void InitializeJavaScriptChart();
   void CallJavaScriptFuntion(const QString& command);
-
+ 
+  //for testing
+  QmitkChartData *GetC3Data();
+  std::vector<std::unique_ptr<QmitkChartxyData>> *GetC3xyData();
+  
 private:
 
   using ChartxyDataVector = std::vector<std::unique_ptr<QmitkChartxyData>>;
@@ -277,6 +281,7 @@ void QmitkChartWidget::Impl::SetLegendPosition(QmitkChartWidget::LegendPosition 
   m_C3Data.SetLegendPosition(QString::fromStdString(legendPositionName));
 }
 
+
 void QmitkChartWidget::Impl::SetShowLegend(bool show)
 {
   m_C3Data.SetShowLegend(show);
@@ -314,6 +319,18 @@ std::string QmitkChartWidget::Impl::ConvertChartTypeToString(QmitkChartWidget::C
 {
   return m_ChartTypeToName.at(chartType);
 }
+
+
+QmitkChartData *QmitkChartWidget::Impl::GetC3Data() 
+{
+  return &m_C3Data;
+}
+
+  std::vector<std::unique_ptr<QmitkChartxyData>> * QmitkChartWidget::Impl::GetC3xyData()
+{
+  return &m_C3xyData;
+}
+
 
 void QmitkChartWidget::Impl::ClearJavaScriptChart()
 {
@@ -384,6 +401,16 @@ QmitkChartWidget::~QmitkChartWidget()
 {
 }
 
+std::vector<std::unique_ptr<QmitkChartxyData>> * QmitkChartWidget::GetData() const
+{
+  return m_Impl->GetC3xyData();
+}
+
+QmitkChartData *QmitkChartWidget::GetC3Data()
+{
+  return m_Impl->GetC3Data();
+}
+
 void QmitkChartWidget::AddData1D(const std::vector<double>& data1D, const std::string& label, ChartType type)
 {
   m_Impl->AddData1D(data1D, label, type);
@@ -397,18 +424,6 @@ void QmitkChartWidget::AddData2D(const std::map<double, double>& data2D, const s
 void QmitkChartWidget::RemoveData(const std::string& label)
 {
   m_Impl->RemoveData(label);
-}
-
-std::vector<QmitkChartxyData*> QmitkChartWidget::GetData()
-{
-  if (m_Impl->GetC3xyData() == nullptr)
-  {
-    return std::vector<QmitkChartxyData*>();
-  }
-  else
-  {
-    return *m_Impl->GetC3xyData();
-  }
 }
 
 void QmitkChartWidget::SetColor(const std::string& label, const std::string& colorName)

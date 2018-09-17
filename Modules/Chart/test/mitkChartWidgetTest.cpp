@@ -24,56 +24,54 @@ See LICENSE.txt or http://www.mitk.org for details.
 // std includes
 #include <string>
 
-
 // MITK includes
 #include "QmitkChartWidget.h"
 #include "QmitkChartxyData.h"
-
-
+#include "QmitkChartData.h"
 
 class mitkChartWidgetTestSuite : public mitk::TestFixture
 {
-	CPPUNIT_TEST_SUITE(mitkChartWidgetTestSuite);
+  CPPUNIT_TEST_SUITE(mitkChartWidgetTestSuite);
 
-	// Test the dicom property parsing
+  // Test the dicom property parsing
   MITK_TEST(AddOnce_Test_Success);
   MITK_TEST(AddSameLabelTwice_Test_Success);
   MITK_TEST(RemoveNonexistingData_Failure);
   MITK_TEST(RemoveData_Success);
+  MITK_TEST(SetandGet_Success);
+  MITK_TEST(SetC3DataAndGet_Success);
+  // MITK_TEST(AddAndGet)
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
-	std::vector<double> data1D;
-	std::string label;
+  std::vector<double> data1D;
+  std::string label;
 
 public:
+  void setUp() override
+  {
+    data1D = {2, 4, 7, 8, 21, 5, 12, 65, 41, 9};
+    label = "testLabel";
 
-	void setUp() override
-	{
-		data1D = { 2, 4, 7, 8, 21, 5, 12, 65, 41, 9 };
-		label = "testLabel";
+    int argc = 1;
+    char *argv[] = {"AppName"};
+    if (QApplication::instance() == nullptr)
+    {
+      new QApplication(argc, argv);
+    }
+  }
 
-		int argc = 1;
-		char* argv[] = { "AppName" };
-		if (QApplication::instance() == nullptr)
-		{
-			new QApplication(argc, argv);
-		}
-	}
+  void tearDown() override {}
 
-	void tearDown() override
-	{
-	}
-
-	void AddOnce_Test_Success()
-	{
+  void AddOnce_Test_Success()
+  {
     QmitkChartWidget widget;
-		CPPUNIT_ASSERT_NO_THROW_MESSAGE("Adding data caused an exception", widget.AddData1D(data1D, label));
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Adding data caused an exception", widget.AddData1D(data1D, label));
 
-    std::vector<QmitkChartxyData*> dataVector = widget.GetData();
-    CPPUNIT_ASSERT_MESSAGE("Adding data failed.", dataVector.size() == 1 && dataVector[0] != nullptr);
-    QmitkChartxyData* dataPtr = dataVector[0];
+    std::vector<std::unique_ptr<QmitkChartxyData>> *dataVector = widget.GetData();
+
+    CPPUNIT_ASSERT_MESSAGE("Adding data failed.", dataVector->size() == 1 && dataVector != nullptr);
+    QmitkChartxyData * dataPtr = dataVector->at(0).get();
 
     CPPUNIT_ASSERT_MESSAGE("Label differs for no obvious reason", dataPtr->GetLabel().toString().toStdString() == label);
 
@@ -84,7 +82,7 @@ public:
     {
       CPPUNIT_ASSERT_MESSAGE("The inserted data differs when checked", data1D[i] == insertedYData[i]);
     }
-	}
+  }
 
   void AddSameLabelTwice_Test_Success()
   {
@@ -92,12 +90,12 @@ public:
     widget.AddData1D(data1D, label);
     widget.AddData1D(data1D, label);
 
-    std:: vector<QmitkChartxyData*>dataVector = widget.GetData();
+    auto dataVector = widget.GetData();
 
-    QmitkChartxyData* xyData1 = dataVector.at(0);
-    QmitkChartxyData* xyData2 = dataVector.at(1);
+    QmitkChartxyData* xyData1 = dataVector->at(0).get();
+    QmitkChartxyData* xyData2 = dataVector->at(1).get();
 
-    QVariant dataLabel1 = xyData1 -> GetLabel();
+    QVariant dataLabel1 = xyData1->GetLabel();
     QVariant dataLabel2 = xyData2->GetLabel();
     CPPUNIT_ASSERT_MESSAGE("The two dataLabel are the same", dataLabel1 != dataLabel2);
 
@@ -111,19 +109,112 @@ public:
   }
 
   void RemoveNonexistingData_Failure()
-	{
-		QmitkChartWidget widget;
+  {
+    QmitkChartWidget widget;
 
-		CPPUNIT_ASSERT_THROW_MESSAGE("Removin nonexistend label did not throw exception", widget.RemoveData(label), std::invalid_argument);
+    CPPUNIT_ASSERT_THROW_MESSAGE(
+      "Removin nonexistend label did not throw exception", widget.RemoveData(label), std::invalid_argument);
+  }
+
+  void RemoveData_Success()
+  {
+    QmitkChartWidget widget;
+    widget.AddData1D(data1D, label);
+
+    CPPUNIT_ASSERT_NO_THROW_MESSAGE("Removin nonexistend label did not throw exception", widget.RemoveData(label));
+  }
+
+  void SetandGet_Success()
+  {
+    QmitkChartWidget widget;
+    widget.AddData1D(data1D, label);
+    std::string colorName = "green";
+
+    auto mitkChartxyData = widget.GetData();
+    QmitkChartxyData *xyData1 = mitkChartxyData->at(0).get();
+    
+	
+	//set color test
+	widget.SetColor(label, colorName);
+	auto qVariantColor = xyData1->GetColor();
+	QString qStringColor = qVariantColor.toString();
+	CPPUNIT_ASSERT_MESSAGE("The color isn't the assigned color", colorName == qStringColor.toStdString());
+
+	//set line style test
+    QVariant defaultLineStyle = xyData1->GetLineStyle();
+
+    widget.SetLineStyle(label, QmitkChartWidget::LineStyle::dashed);
+	QVariant lineStyle = xyData1->GetLineStyle();
+
+	QVariant defaultChartType = xyData1->GetChartType();
+    auto line= std::make_pair("line", QmitkChartWidget::ChartType::line);
+  if (defaultChartType.toString().toStdString() != line.first)
+	{
+		CPPUNIT_ASSERT_MESSAGE("The line style could be changed without ChartType line", 
+			defaultLineStyle == lineStyle);
 	}
 
-	void RemoveData_Success()
-	{
-		QmitkChartWidget widget;
-		widget.AddData1D(data1D, label);
+	//set ChartType
+  widget.SetChartType(label, QmitkChartWidget::ChartType::line);
+  QVariant chartType = xyData1->GetChartType();
 
-		CPPUNIT_ASSERT_NO_THROW_MESSAGE("Removin nonexistend label did not throw exception", widget.RemoveData(label));
-	}
+
+  CPPUNIT_ASSERT_MESSAGE("The chart type could not be changed to line", 
+	  chartType.toString().toStdString() == line.first);
+
+  //set line style with chart type line
+  widget.SetLineStyle(label, QmitkChartWidget::LineStyle::dashed);
+  lineStyle = xyData1->GetLineStyle();
+  CPPUNIT_ASSERT_MESSAGE("The line style could not be changed", "dashed" == lineStyle.toString().toStdString());
+
+  
+  }
+
+  void SetC3DataAndGet_Success()
+   {
+    QmitkChartWidget widget;
+    widget.AddData1D(data1D, label);
+
+	//set YAxisScale
+    widget.SetYAxisScale(QmitkChartWidget::AxisScale::log);
+    QmitkChartData *c3Data = widget.GetC3Data();
+    QVariant yAxisScale = c3Data->GetYAxisScale();
+    CPPUNIT_ASSERT_MESSAGE("The YAxisScale could not be changed", "log" == yAxisScale.toString().toStdString());
+
+	//set Title
+    std::string testTitle = "testTitle";
+    widget.SetTitle(testTitle);
+    QVariant title = c3Data->GetTitle();
+    CPPUNIT_ASSERT_MESSAGE("The title could not be set", testTitle == title.toString().toStdString());
+
+	//set LegendPosition
+    widget.SetLegendPosition(QmitkChartWidget::LegendPosition::right);
+    QVariant legendPosition = c3Data->GetLegendPosition();
+    CPPUNIT_ASSERT_MESSAGE("The LegendPosition could not be changed", "right" == legendPosition.toString().toStdString());
+
+	//show legend
+	QVariant isShowLegend = c3Data->GetShowLegend();
+    widget.SetShowLegend(!isShowLegend.toBool());
+	QVariant isShowLegendInverted = c3Data->GetShowLegend();
+    CPPUNIT_ASSERT_MESSAGE("The ShowLegend could not be changed",
+                         isShowLegend.toBool() != isShowLegendInverted.toBool());
+
+	//show dataPoints
+	QVariant dataPointSize = c3Data->GetDataPointSize();
+    bool showDataPoints = dataPointSize.toInt() > 0;
+	widget.SetShowDataPoints(!showDataPoints);
+    dataPointSize = c3Data->GetDataPointSize();
+	bool showDataPointsInvert = dataPointSize.toInt() > 0;
+    CPPUNIT_ASSERT_MESSAGE("The DataPoints could not be changed",
+                           isShowLegend.toBool() != isShowLegendInverted.toBool());
+
+	//show SubCharts
+    QVariant showSubChart = c3Data->GetShowSubchart();
+    widget.Show(!showSubChart.toBool());
+    QVariant showSubChartInvert = c3Data->GetShowSubchart();
+    CPPUNIT_ASSERT_MESSAGE("The visibility of subCharts could not be changed",
+                           showSubChart.toBool() != showSubChartInvert.toBool());
+   }
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkChartWidget)

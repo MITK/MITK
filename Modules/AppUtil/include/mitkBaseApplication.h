@@ -76,8 +76,8 @@ public:
         m_Progress += .01f;
       }
       m_DrawProgress(m_Progress, m_Invert);
-      std::chrono::seconds fiveSec(5);
-      std::this_thread::sleep_for(fiveSec);
+      std::chrono::milliseconds someTime(30);
+      std::this_thread::sleep_for(someTime);
       m_Working = m_App->property("loading").toBool();
     }
     m_Splashscreen->close();

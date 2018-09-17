@@ -256,7 +256,7 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
 
 void QmitkStdMultiWidget::InitializeWidget()
 {
-  crosshairManager = new mitkCrosshairManager();
+  crosshairManager = new mitkCrosshairManager(m_Name);
   crosshairManager->removeAll();
   crosshairManager->setShowSelectedOnly(false);
   crosshairManager->setShowSelectedOnly(false);

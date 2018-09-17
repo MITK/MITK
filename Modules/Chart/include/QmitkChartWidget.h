@@ -116,7 +116,7 @@ public:
   */
   std::vector<std::unique_ptr<QmitkChartxyData>> * GetData() const;
 
-  QmitkChartData * GetC3Data();
+  QmitkChartData * GetC3Data() const;
 
   /*!
   * \brief Removes data from the widget, works for 1D and 2D Data

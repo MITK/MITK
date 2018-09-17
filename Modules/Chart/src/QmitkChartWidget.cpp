@@ -406,7 +406,7 @@ std::vector<std::unique_ptr<QmitkChartxyData>> * QmitkChartWidget::GetData() con
   return m_Impl->GetC3xyData();
 }
 
-QmitkChartData *QmitkChartWidget::GetC3Data()
+QmitkChartData *QmitkChartWidget::GetC3Data() const
 {
   return m_Impl->GetC3Data();
 }

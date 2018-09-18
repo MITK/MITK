@@ -55,9 +55,13 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   MITK_INFO << "Listening for requests at: " << utility::conversions::to_utf8string(address);
 
   utility::string_t pacsHost = U("http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE");
-  m_RestClient = new mitk::RESTClient(U("http://www.officesupplyuae.com"));
+  m_RestClient = new mitk::RESTClient(pacsHost);
 
-  m_RestClient->executeWADOGET(U("/tmp/"), "1.2.840.113654.2.70.1.311779127785374989361829772874593461506", "1.2.840.113654.2.70.1.182762555335754050396179618615436313390");
+  utility::string_t folderPathSeries = U("/temp/downloadSeries/");
+  m_RestClient->executeWADOGET(folderPathSeries, "1.2.840.113654.2.70.1.311779127785374989361829772874593461506", "1.2.840.113654.2.70.1.182762555335754050396179618615436313390").wait();
+  MITK_INFO << "Loading series";
+  auto firstFilePath = folderPathSeries.append(U("1.2.840.113654.2.70.1.102028037630900004226480999888296698838.dcm"));
+  mitk::IOUtil::Load(utility::conversions::to_utf8string(firstFilePath), *this->GetDataStorage());
 }
 
 void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::DicomDTO& dto)
@@ -70,7 +74,7 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
  // m_RestClient->executeWADOGET(filePath, dto.studyUID, dto.seriesUID, dto.instanceUID);
 
   MITK_INFO << "load file into data storage";
-  //mitk::IOUtil::Load(utility::conversions::to_utf8string(filePath), *this->GetDataStorage());
+  //mitk::IOUtil::Load(utility::conversions::to_utf8string(filePath), *this->GetDataStorage()).wait();
   this->GetDataStorage()->GetAll()->at(0)->Update();
 }
 

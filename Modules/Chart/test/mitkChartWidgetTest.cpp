@@ -40,6 +40,7 @@ class mitkChartWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(RemoveData_Success);
   MITK_TEST(SetandGet_Success);
   MITK_TEST(SetC3DataAndGet_Success);
+  MITK_TEST(AddAndRemoveData_Sucess);
   // MITK_TEST(AddAndGet)
   CPPUNIT_TEST_SUITE_END();
 
@@ -106,6 +107,56 @@ public:
     std::string stdString2 = string2.toStdString();
     CPPUNIT_ASSERT_MESSAGE("The first dataLabel isn't still the same", stdString1 == label);
     CPPUNIT_ASSERT_MESSAGE("The second dataLabel is still the same", stdString2 != label);
+  }
+
+  void AddAndRemoveData_Sucess()
+  {
+    std::vector<double> data1D2 = {2, 2};
+    std::string label2 = "testData2";
+    std::vector<double> data1D3 = {3, 3, 3};
+    std::string label3 = "testData3";
+    QmitkChartWidget widget;
+    widget.AddData1D(data1D, label);
+	widget.AddData1D(data1D2, label2);
+    widget.AddData1D(data1D3, label3);
+	auto dataVector = widget.GetData();
+    // data with {data1D0, data1D2, data1D3}
+	CPPUNIT_ASSERT_MESSAGE("Adding data failed.", dataVector->size() == 3 && dataVector != nullptr);
+	widget.RemoveData(label2);
+  // data with {data1D0, data1D3}
+	CPPUNIT_ASSERT_MESSAGE("Removing data failed.", dataVector->size() == 2 && dataVector != nullptr);
+	    QmitkChartxyData *xyData1 = dataVector->at(0).get();
+    std::vector<QVariant> insertedYData = xyData1->GetYData().toVector().toStdVector();
+    for (int i = 0; i < data1D.size(); ++i)
+    {
+      CPPUNIT_ASSERT_MESSAGE("The inserted data differs when checked", data1D[i] == insertedYData[i]);
+    }
+    QmitkChartxyData *xyData2 = dataVector->at(1).get();
+    insertedYData = xyData2->GetYData().toVector().toStdVector();
+    for (int i = 0; i < data1D3.size(); ++i)
+    {
+      CPPUNIT_ASSERT_MESSAGE("The inserted data differs when checked", data1D3[i] == insertedYData[i]);
+    }
+    widget.RemoveData(label);
+    // data with {data1D3}
+    CPPUNIT_ASSERT_MESSAGE("Removing data failed.", dataVector->size() == 1 && dataVector != nullptr);
+    widget.AddData1D(data1D2, label2);
+    CPPUNIT_ASSERT_MESSAGE("Adding data failed.", dataVector->size() == 2 && dataVector != nullptr);
+	
+	//data with {data1D3, data1D2}
+    xyData1 = dataVector->at(0).get();
+    insertedYData = xyData1->GetYData().toVector().toStdVector();
+    for (int i = 0; i < data1D3.size(); ++i)
+    {
+      CPPUNIT_ASSERT_MESSAGE("The inserted data differs when checked", data1D3[i] == insertedYData[i]);
+    }
+    xyData2 = dataVector->at(1).get();
+    insertedYData = xyData2->GetYData().toVector().toStdVector();
+    for (int i = 0; i < data1D2.size(); ++i)
+    {
+      CPPUNIT_ASSERT_MESSAGE("The inserted data differs when checked", data1D2[i] == insertedYData[i]);
+    }
+
   }
 
   void RemoveNonexistingData_Failure()

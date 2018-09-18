@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkChartExports.h>
 
+class QmitkChartxyData;
+class QmitkChartData;
 
 /*!
 \brief QmitkChartWidget is a widget to display various charts based on the javascript chart library C3js.
@@ -109,6 +111,14 @@ public:
   void AddData2D(const std::map<double, double>& data2D, const std::string& label, ChartType chartType = ChartType::bar);
 
   /*!
+  * \brief Get the data that is stored for displaying.
+  * \note Only needed for testing purposes.
+  */
+  std::vector<std::unique_ptr<QmitkChartxyData>> * GetData() const;
+
+  QmitkChartData * GetC3Data() const;
+
+  /*!
   * \brief Removes data from the widget, works for 1D and 2D Data
   * \param label the name of the data that is also used as identifier.
   * \note All data can be cleared with ClearDiagram()
@@ -144,7 +154,6 @@ public:
   void SetXAxisLabel(const std::string& label);
 
   void SetYAxisLabel(const std::string& label);
-
   /*!
   * \brief Sets a title for the chart.
   */

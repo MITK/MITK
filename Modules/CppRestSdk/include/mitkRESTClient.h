@@ -46,10 +46,12 @@ namespace mitk
     RESTClient(utility::string_t url);
     virtual ~RESTClient();
 
-    pplx::task<void> executeGETRequest(const utility::string_t filePath, utility::string_t uri);
-    pplx::task<void> executeWADOGET(const utility::string_t filePath, std::string studyUID, std::string seriesUID, std::string instanceUID);
-    pplx::task<void> executeWADOGET(const utility::string_t filePath, std::string studyUID, std::string seriesUID);
- 
+	pplx::task<void> Post(utility::string_t uri);
+    pplx::task<void> Get(const utility::string_t filePath, utility::string_t uri);
+    pplx::task<void> WadoRS(const utility::string_t filePath, std::string studyUID, std::string seriesUID, std::string instanceUID);
+    pplx::task<std::string> WadoRS(const utility::string_t filePath, std::string studyUID, std::string seriesUID);
+    pplx::task<void> StowRS(std::string studyUID);
+
   private:
     MitkClient m_Client;
 

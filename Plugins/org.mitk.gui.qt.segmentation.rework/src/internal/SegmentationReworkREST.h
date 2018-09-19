@@ -26,9 +26,12 @@ class SegmentationReworkREST : public mitk::RESTServer
 public:
 
   struct DicomDTO {
-    std::string seriesUID;
-    std::string studyUID;
-    std::string instanceUID;
+    std::string segSeriesUIDA;
+    std::string segSeriesUIDB;
+    std::string imageSeriesUID;
+	std::string studyUID;
+    std::string segInstanceUIDA;
+	std::string segInstanceUIDB;
     std::vector<double> simScoreArray;
     int minSliceStart;
   };

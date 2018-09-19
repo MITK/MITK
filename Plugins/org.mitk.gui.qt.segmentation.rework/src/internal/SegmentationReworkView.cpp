@@ -28,10 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string SegmentationReworkView::VIEW_ID = "org.mitk.views.segmentationreworkview";
 
-void SegmentationReworkView::SetFocus()
-{
-
-}
+void SegmentationReworkView::SetFocus() {}
 
 void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 {
@@ -40,14 +37,16 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 
   connect(m_Controls.buttonUpload, &QPushButton::clicked, this, &SegmentationReworkView::UploadNewSegmentation);
 
-
   utility::string_t port = U("2020");
   utility::string_t address = U("http://127.0.0.1:");
   address.append(port);
 
   m_HttpHandler = std::unique_ptr<SegmentationReworkREST>(new SegmentationReworkREST(address));
 
-  connect(m_HttpHandler.get(), &SegmentationReworkREST::InvokeUpdateChartWidget, this, &SegmentationReworkView::UpdateChartWidget);
+  connect(m_HttpHandler.get(),
+          &SegmentationReworkREST::InvokeUpdateChartWidget,
+          this,
+          &SegmentationReworkView::UpdateChartWidget);
 
   m_HttpHandler->SetPutCallback(std::bind(&SegmentationReworkView::RESTPutCallback, this, std::placeholders::_1));
   m_HttpHandler->Open().wait();
@@ -56,29 +55,38 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 
   utility::string_t pacsHost = U("http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE");
   m_RestClient = new mitk::RESTClient(pacsHost);
-
-  utility::string_t folderPathSeries = U("/temp/downloadSeries/");
-  m_RestClient->executeWADOGET(folderPathSeries, "1.2.840.113654.2.70.1.311779127785374989361829772874593461506", "1.2.840.113654.2.70.1.182762555335754050396179618615436313390").wait();
-  MITK_INFO << "Loading series";
-  auto firstFilePath = folderPathSeries.append(U("1.2.840.113654.2.70.1.102028037630900004226480999888296698838.dcm"));
-  mitk::IOUtil::Load(utility::conversions::to_utf8string(firstFilePath), *this->GetDataStorage());
 }
 
-void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::DicomDTO& dto)
+void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::DicomDTO &dto)
 {
-  MITK_INFO << "callback! " << dto.studyUID << dto.seriesUID << dto.instanceUID;
   SetSimilarityGraph(dto.simScoreArray, dto.minSliceStart);
 
-  auto filePath = U("/temp/downloadWADO.dcm");
+  MITK_INFO << "Loading image series";
+  std::string folderPathSeries = "/temp/downloadSeries/";
+  m_RestClient->WadoRS(utility::conversions::to_string_t(folderPathSeries), dto.studyUID, dto.imageSeriesUID)
+    .then([&](std::string fileName) {
+      MITK_INFO << "Loading image series into data storage";
+      auto folderPath = folderPathSeries;
+      auto firstFilePath = folderPath.append(fileName);
+      mitk::IOUtil::Load(firstFilePath, *this->GetDataStorage());
 
- // m_RestClient->executeWADOGET(filePath, dto.studyUID, dto.seriesUID, dto.instanceUID);
+      MITK_INFO << "Loading segmentations...";
 
-  MITK_INFO << "load file into data storage";
-  //mitk::IOUtil::Load(utility::conversions::to_utf8string(filePath), *this->GetDataStorage()).wait();
-  this->GetDataStorage()->GetAll()->at(0)->Update();
+	  auto filePathSegA = U("/temp/segA.dcm");
+      auto filePathSegB = U("/temp/segB.dcm");
+
+      m_RestClient->WadoRS(filePathSegA, dto.studyUID, dto.segSeriesUIDA, dto.segInstanceUIDA).then([&] {
+       mitk::IOUtil::Load(utility::conversions::to_utf8string(filePathSegA), *this->GetDataStorage());
+      });
+
+      m_RestClient->WadoRS(filePathSegB, dto.studyUID, dto.segSeriesUIDB, dto.segInstanceUIDB).then([&] {
+        mitk::IOUtil::Load(utility::conversions::to_utf8string(filePathSegB), *this->GetDataStorage());
+      });
+    });
 }
 
-void SegmentationReworkView::UpdateChartWidget() {
+void SegmentationReworkView::UpdateChartWidget()
+{
   m_Controls.chartWidget->Show();
 }
 
@@ -88,7 +96,8 @@ void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArra
   MITK_INFO << simScoreArray.size();
 
   double sliceIndex = sliceMinStart;
-  for (double score : simScoreArray) {
+  for (double score : simScoreArray)
+  {
     map.insert(std::map<double, double>::value_type(sliceIndex, score));
     sliceIndex++;
   }
@@ -97,7 +106,6 @@ void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArra
   m_Controls.chartWidget->SetXAxisLabel("slice number");
   m_Controls.chartWidget->SetYAxisLabel("similarity score");
 }
-
 
 void SegmentationReworkView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
                                                 const QList<mitk::DataNode::Pointer> &nodes)
@@ -115,10 +123,7 @@ void SegmentationReworkView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /
   m_Controls.labelWarning->setVisible(true);
 }
 
-void SegmentationReworkView::UploadNewSegmentation()
-{
-
-}
+void SegmentationReworkView::UploadNewSegmentation() {}
 
 void SegmentationReworkView::DoImageProcessing()
 {

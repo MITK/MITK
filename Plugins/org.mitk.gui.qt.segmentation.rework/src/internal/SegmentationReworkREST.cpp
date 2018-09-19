@@ -44,15 +44,24 @@ void SegmentationReworkREST::HandlePut(MitkRequest message)
     auto messageTypeKey = jsonMessage.at(U("messageType"));
     if (messageTypeKey.as_string() == U("downloadData"))
     {
+      auto imageStudyUIDKey = jsonMessage.at(U("studyUID"));
       auto imageSeriesUIDKey = jsonMessage.at(U("imageSeriesUID"));
-      auto imageStudyUIDKey = jsonMessage.at(U("imageStudyUID"));
-      auto imageInstanceUIDKey = jsonMessage.at(U("imageInstanceUID"));
+      auto segSeriesUIDAKey = jsonMessage.at(U("segSeriesUIDA"));
+      auto segSeriesUIDBKey = jsonMessage.at(U("segSeriesUIDB"));
+
+	  auto segInstanceUIDAKey = jsonMessage.at(U("segInstanceUIDA"));
+      auto segInstanceUIDBKey = jsonMessage.at(U("segInstanceUIDB"));
+
       auto simScoreKey = jsonMessage.at(U("simScoreArray"));
       auto minSliceStartKey = jsonMessage.at(U("minSliceStart"));
 
       DicomDTO dto;
-      dto.instanceUID = convertToUtf8(imageInstanceUIDKey.as_string());
-      dto.seriesUID = convertToUtf8(imageSeriesUIDKey.as_string());
+      dto.segSeriesUIDA = convertToUtf8(segSeriesUIDAKey.as_string());
+      dto.segSeriesUIDB = convertToUtf8(segSeriesUIDBKey.as_string());
+      dto.imageSeriesUID = convertToUtf8(imageSeriesUIDKey.as_string());
+      dto.segInstanceUIDA = convertToUtf8(segInstanceUIDAKey.as_string());
+      dto.segInstanceUIDB = convertToUtf8(segInstanceUIDBKey.as_string());
+
       dto.studyUID = convertToUtf8(imageStudyUIDKey.as_string());
       dto.minSliceStart = minSliceStartKey.as_integer();
 

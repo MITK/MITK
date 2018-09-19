@@ -23,7 +23,7 @@ mitk::RESTClient::RESTClient(utility::string_t url) : m_Client(url) {
 
 mitk::RESTClient::~RESTClient() {}
 
-pplx::task<void> mitk::RESTClient::executeGETRequest(utility::string_t filePath, utility::string_t uri)
+pplx::task<void> mitk::RESTClient::Get(utility::string_t filePath, utility::string_t uri)
 {
   MITK_INFO << "Calling GET with " << utility::conversions::to_utf8string(uri) << " on client "
             << utility::conversions::to_utf8string(m_Client.base_uri().to_string()) << " save into "
@@ -49,12 +49,20 @@ pplx::task<void> mitk::RESTClient::executeGETRequest(utility::string_t filePath,
   {
     return fileBuffer->close();
   });
-  //  // Wait for the entire response body to be written into the file.
-  //  .wait();
-
 }
 
-pplx::task<void> mitk::RESTClient::executeWADOGET(utility::string_t filePath, std::string studyUID, std::string seriesUID, std::string instanceUID)
+pplx::task<void> mitk::RESTClient::Post(utility::string_t uri)
+{
+  MITK_INFO << "Calling POST with " << utility::conversions::to_utf8string(uri) << " on client "
+            << utility::conversions::to_utf8string(m_Client.base_uri().to_string());
+
+  return m_Client.request(MitkRESTMethods::POST, uri).then([&](MitkResponse response)
+  {
+      MITK_INFO << "Status code: " << response.status_code(); 
+  });
+}
+
+pplx::task<void> mitk::RESTClient::WadoRS(utility::string_t filePath, std::string studyUID, std::string seriesUID, std::string instanceUID)
 {
   MitkUriBuilder builder(U("wado"));
   builder.append_query(U("requestType"), U("WADO"));
@@ -62,11 +70,13 @@ pplx::task<void> mitk::RESTClient::executeWADOGET(utility::string_t filePath, st
   builder.append_query(U("seriesUID"), utility::conversions::to_string_t(seriesUID));
   builder.append_query(U("objectUID"), utility::conversions::to_string_t(instanceUID));
   builder.append_query(U("contentType"), U("application/dicom"));
-  return executeGETRequest(filePath, builder.to_string());
+  return Get(filePath, builder.to_string());
 }
 
-pplx::task<void> mitk::RESTClient::executeWADOGET(const utility::string_t folderPath, std::string studyUID, std::string seriesUID)
+pplx::task<std::string> mitk::RESTClient::WadoRS(const utility::string_t folderPath, std::string studyUID, std::string seriesUID)
 {
+  // this is actually a quido-rs request, should be packed into a seperate method.. at some time.. 
+   //but there are many possible requests to support: http://dicom.nema.org/medical/dicom/current/output/chtml/part18/sect_6.7.html
   MitkUriBuilder builder(U("rs/instances"));
   builder.append_query(U("StudyInstanceUID"), utility::conversions::to_string_t(studyUID));
   builder.append_query(U("SeriesInstanceUID"), utility::conversions::to_string_t(seriesUID));
@@ -76,13 +86,15 @@ pplx::task<void> mitk::RESTClient::executeWADOGET(const utility::string_t folder
   getSeries.set_request_uri(builder.to_string());
   getSeries.headers().add(U("Accept"), U("application/json"));
 
-  return m_Client.request(getSeries).then([=](MitkResponse response)
+  return m_Client.request(getSeries).then([=](MitkResponse response) -> pplx::task<std::string>
   {
     MITK_INFO << "search for instances in series with uid " << seriesUID
               << " status: " << response.status_code();
 
     auto jsonListResult = response.extract_json().get();
     auto resultArray = jsonListResult.as_array();
+
+	auto firstFileName = std::string();
 
     std::vector<pplx::task<void>> tasks;
 
@@ -97,10 +109,16 @@ pplx::task<void> mitk::RESTClient::executeWADOGET(const utility::string_t folder
         auto valueArray = valueKey.as_array();
         auto sopInstanceUID = valueArray[0].as_string();
 
-        auto filePath = utility::string_t(folderPath)
-          .append(sopInstanceUID)
-          .append(U(".dcm"));
-        auto task = executeWADOGET(filePath, studyUID, seriesUID, utility::conversions::to_utf8string(sopInstanceUID));
+		auto fileName = sopInstanceUID.append(U(".dcm"));
+
+		// save first file name as result to load series
+		if (i == 0)
+		{
+			firstFileName = utility::conversions::to_utf8string(fileName);
+		}
+
+        auto filePath = utility::string_t(folderPath).append(fileName);
+        auto task = WadoRS(filePath, studyUID, seriesUID, utility::conversions::to_utf8string(sopInstanceUID));
         tasks.push_back(task);
       }
       catch (const web::json::json_exception& e) 
@@ -110,6 +128,16 @@ pplx::task<void> mitk::RESTClient::executeWADOGET(const utility::string_t folder
     }
 
     auto joinTask = pplx::when_all(begin(tasks), end(tasks));
-    return joinTask;
+    return joinTask.then([=](void) 
+	{ 
+		return firstFileName;
+	});
   });
+}
+
+pplx::task<void> mitk::RESTClient::StowRS(std::string studyUID) {
+	// TODO: add data
+  MitkUriBuilder builder(U("rs/studies"));
+  builder.append_query(utility::conversions::to_string_t(studyUID));
+  return Post(builder.to_string());
 }

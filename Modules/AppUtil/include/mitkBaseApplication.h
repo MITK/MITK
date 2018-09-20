@@ -80,7 +80,9 @@ public:
       std::this_thread::sleep_for(someTime);
       m_Working = m_App->property("loading").toBool();
     }
-    m_Splashscreen->close();
+    if (m_Splashscreen && m_Splashscreen->isVisible()) {
+      m_Splashscreen->close();
+    }
   }
 
   void run()

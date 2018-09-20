@@ -96,6 +96,13 @@ Q_SIGNALS:
   */
   void ServiceSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
+  /*
+  * @brief A signal that will be emitted by the private 'ServiceSelectionChanged'-function. If sourcePart has send an invalid selection
+  * (selection pointer was Null).
+  * @par	sourcePart		Part that sent the null selection.
+  */
+  void ServiceNullSelection(const berry::IWorkbenchPart::Pointer& sourcePart);
+
 public Q_SLOTS:
   /*
   * @brief  Send new selections to the selection service via the private selection provider member.

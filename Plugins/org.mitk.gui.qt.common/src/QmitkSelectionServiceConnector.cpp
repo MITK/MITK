@@ -109,8 +109,8 @@ void QmitkSelectionServiceConnector::OnServiceSelectionChanged(const berry::IWor
   QList<mitk::DataNode::Pointer> nodes;
   if (selection.IsNull())
   {
-    // propagate an empty list
-    nodes = QList<mitk::DataNode::Pointer>();
+    emit ServiceNullSelection(sourcePart);
+    return;
   }
 
   // transform valid selection to DataNodeSelection, which allows to retrieve the selected nodes

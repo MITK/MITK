@@ -611,14 +611,6 @@ void QmitkImageNavigatorView::OnRefetch()
 
 void QmitkImageNavigatorView::SetVisibilityOfTimeSlider(std::size_t timeSteps)
 {
-  if (timeSteps > 1)
-  {
-    m_Controls.m_SliceNavigatorTime->setVisible(true);
-    m_Controls.m_TimeLabel->setVisible(true);
-  }
-  else
-  {
-    m_Controls.m_SliceNavigatorTime->setVisible(false);
-    m_Controls.m_TimeLabel->setVisible(false);
-  }
+  m_Controls.m_SliceNavigatorTime->setVisible(timeSteps > 1);
+  m_Controls.m_TimeLabel->setVisible(timeSteps > 1);
 }

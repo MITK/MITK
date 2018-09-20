@@ -85,9 +85,11 @@ protected slots:
 
 protected:
 
-  virtual void CreateQtPartControl(QWidget* parent);
+  virtual void CreateQtPartControl(QWidget* parent) override;
 
-  virtual void SetFocus();
+  virtual void SetFocus() override;
+
+  virtual void NodeRemoved(const mitk::DataNode* node) override;
 
   /** Helper that actualizes the fit selection widget and returns the index of the currently selected
    * fit.*/

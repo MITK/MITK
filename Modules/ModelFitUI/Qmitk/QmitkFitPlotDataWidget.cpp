@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkFitPlotDataWidget.h"
 #include "QmitkFitPlotDataModel.h"
+#include "QmitkFitParameterWidget.h"
 
 #include <QClipboard>
 #include <QFileDialog>
@@ -77,7 +78,7 @@ std::string QmitkFitPlotDataWidget::StreamModelToString() const
     {
       stream << ",";
     }
-    stream << m_InternalModel->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString().toStdString();
+    stream << SanatizeString(m_InternalModel->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString().toStdString());
   }
   stream << std::endl;
 
@@ -92,7 +93,7 @@ std::string QmitkFitPlotDataWidget::StreamModelToString() const
       {
         stream << ",";
       }
-      stream << m_InternalModel->data(index, Qt::DisplayRole).toString().toStdString();
+      stream << SanatizeString(m_InternalModel->data(index, Qt::DisplayRole).toString().toStdString());
     }
     stream << std::endl;
   }

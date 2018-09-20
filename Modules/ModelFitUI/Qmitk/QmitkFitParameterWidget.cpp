@@ -78,6 +78,14 @@ QmitkFitParameterWidget::~QmitkFitParameterWidget()
 {
 }
 
+std::string SanatizeString(std::string str)
+{
+  std::replace(std::begin(str), std::end(str), ',', ' ');
+  std::replace(std::begin(str), std::end(str), '\n', ' ');
+  std::replace(std::begin(str), std::end(str), '\r', ' ');
+  return str;
+}
+
 std::string QmitkFitParameterWidget::streamModelToString() const
 {
   std::ostringstream stream;
@@ -91,7 +99,7 @@ std::string QmitkFitParameterWidget::streamModelToString() const
     {
       stream << ",";
     }
-    stream << m_InternalModel->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString().toStdString();
+    stream << SanatizeString(m_InternalModel->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString().toStdString());
   }
   stream << std::endl;
 
@@ -111,7 +119,7 @@ std::string QmitkFitParameterWidget::streamModelToString() const
         {
           stream << ",";
         }
-        stream << m_InternalModel->data(index.siblingAtColumn(col), Qt::DisplayRole).toString().toStdString();
+        stream << SanatizeString(m_InternalModel->data(index.siblingAtColumn(col), Qt::DisplayRole).toString().toStdString());
       }
       stream << std::endl;
     }

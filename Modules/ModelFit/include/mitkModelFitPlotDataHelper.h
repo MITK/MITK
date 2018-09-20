@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vector>
 
 #include "mitkPoint.h"
+#include "mitkPointSet.h"
 #include "mitkModelBase.h"
 #include "mitkWeakPointer.h"
 #include "mitkCommon.h"
@@ -78,37 +79,8 @@ namespace mitk
     /** Plots that are related to the world coordinate labeled as current position.*/
     PlotDataCurveCollection::Pointer currentPositionPlots;
 
-    class PositionalLesser {
-    public:
-      bool operator()(const mitk::Point3D& lhs, const mitk::Point3D& rhs) const
-      {
-        if (lhs[0] < rhs[0])
-        {
-          return true;
-        }
-        else if (lhs[0] > rhs[0])
-        {
-          return false;
-        }
-
-        if (lhs[1] < rhs[1])
-        {
-          return true;
-        }
-        else if (lhs[1] > rhs[1])
-        {
-          return false;
-        }
-
-        if (lhs[2] < rhs[2])
-        {
-          return true;
-        }
-        return false;
-      }
-    };
-
-    using PositionalCollectionMap = std::map<mitk::Point3D, PlotDataCurveCollection::Pointer, PositionalLesser>;
+    using PositionalCurveCollection = std::pair<mitk::Point3D, PlotDataCurveCollection::Pointer>;
+    using PositionalCollectionMap = std::map<mitk::PointSet::PointIdentifier, PositionalCurveCollection>;
 
     /** Plot collections that are related to specific world coordinates (inspection position bookmarks).*/
     PositionalCollectionMap positionalPlots;
@@ -125,7 +97,11 @@ namespace mitk
     static const PlotDataCurve* GetSignalPlot(const PlotDataCurveCollection* coll);
     static const PlotDataCurve* GetInterpolatedSignalPlot(const PlotDataCurveCollection* coll);
 
+    /** Helper function that generates a humand readable name for the passed value of a positional collection map.*/
+    static std::string GetPositionalCollectionName(const PositionalCollectionMap::value_type& mapValue);
+
     const PlotDataCurveCollection* GetPositionalPlot(const mitk::Point3D& point) const;
+    const PlotDataCurveCollection* GetPositionalPlot(mitk::PointSet::PointIdentifier id) const;
 
     /**returns the minimum (first element) and maximum (second element) of x of all plot data*/
     PlotDataValues::value_type GetXMinMax() const;

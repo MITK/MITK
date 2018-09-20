@@ -72,23 +72,19 @@ rowCount(const QModelIndex& parent) const
   return 0;
 }
 
-std::pair<bool, mitk::Point3D> QmitkFitPlotDataModel::GetPositionalCurvePoint(const mitk::PlotDataCurve* curve) const
+std::pair<bool, mitk::ModelFitPlotData::PositionalCollectionMap::value_type> QmitkFitPlotDataModel::GetPositionalCurvePoint(const mitk::PlotDataCurve* curve) const
 {
-  mitk::Point3D result;
-
   for (auto collection : this->m_PlotData.positionalPlots)
   {
-    result = collection.first;
-
-    for (auto aCurve : collection.second->CastToSTLContainer())
+    for (auto aCurve : collection.second.second->CastToSTLContainer())
     {
       if (curve == aCurve.second.GetPointer())
       {
-        return std::make_pair(true, result);
+        return std::make_pair(true, collection);
       }
     }
   }
-  return std::make_pair(false, result);
+  return std::make_pair(false, mitk::ModelFitPlotData::PositionalCollectionMap::value_type());
 }
 
 
@@ -114,8 +110,8 @@ columnCount(const QModelIndex& parent) const
 
     for (const auto& coll : this->m_PlotData.positionalPlots)
     {
-      size += coll.second->size();
-      if (mitk::ModelFitPlotData::GetInterpolatedSignalPlot(coll.second))
+      size += coll.second.second->size();
+      if (mitk::ModelFitPlotData::GetInterpolatedSignalPlot(coll.second.second))
       { //don't take the interpolated signal into account
         size -= 1;
       }
@@ -146,8 +142,12 @@ std::pair<std::string, const mitk::PlotDataCurve*>
 QmitkFitPlotDataModel::
 GetCurveByColumn(int col) const
 {
-  if (col > 1)
-  {
+  if (col == 1)
+  { /*the x axis is needed so just get the first signal.*/
+    col = 0;
+  }
+  else if (col > 1)
+  { /*a normal signal is requested, correct the column index to ignore the timestep and timepoint column*/
     col -= 2;
   }
 
@@ -161,7 +161,7 @@ GetCurveByColumn(int col) const
 
   for (auto collection : this->m_PlotData.positionalPlots)
   {
-    if (GetCurveFromCollection(collection.second.GetPointer(), col, finding, actualCount))
+    if (GetCurveFromCollection(collection.second.second.GetPointer(), col, finding, actualCount))
     {
       return finding;
     }
@@ -265,7 +265,7 @@ headerData(int section, Qt::Orientation orientation, int role) const
 
       if (pointFinding.first)
       {
-        nameStrm << " @ " << std::setprecision(3) << "(" << pointFinding.second[0] << "|" << pointFinding.second[1] << "|" << pointFinding.second[2] << ")";
+        nameStrm << " @ " << mitk::ModelFitPlotData::GetPositionalCollectionName(pointFinding.second);
       }
 
       return QVariant(QString::fromStdString(nameStrm.str()));

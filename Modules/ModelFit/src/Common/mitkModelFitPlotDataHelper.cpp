@@ -125,15 +125,37 @@ const mitk::PlotDataCurve* mitk::ModelFitPlotData::GetInterpolatedSignalPlot(con
   return nullptr;
 };
 
+std::string mitk::ModelFitPlotData::GetPositionalCollectionName(const PositionalCollectionMap::value_type& mapValue)
+{
+  std::ostringstream nameStrm;
+  nameStrm.imbue(std::locale("C"));
+  nameStrm << "Pos " << mapValue.first << std::endl << std::setprecision(3) << "(" << mapValue.second.first[0] << "|" << mapValue.second.first[1] << "|" << mapValue.second.first[2] << ")";
+  return nameStrm.str();
+};
+
+
 const mitk::PlotDataCurveCollection* mitk::ModelFitPlotData::GetPositionalPlot(const mitk::Point3D& point) const
 {
-  auto iter = this->positionalPlots.find(point);
+  auto predicate = [point](const PositionalCollectionMap::value_type& value) {return value.second.first == point; };
+
+  auto iter = std::find_if(std::begin(this->positionalPlots), std::end(this->positionalPlots), predicate);
   if (iter != positionalPlots.end())
   {
-    return iter->second.GetPointer();
+    return iter->second.second.GetPointer();
   }
   return nullptr;
 };
+
+const mitk::PlotDataCurveCollection* mitk::ModelFitPlotData::GetPositionalPlot(mitk::PointSet::PointIdentifier id) const
+{
+  auto iter = this->positionalPlots.find(id);
+  if (iter != positionalPlots.end())
+  {
+    return iter->second.second.GetPointer();
+  }
+  return nullptr;
+};
+
 
 mitk::PlotDataValues::value_type mitk::ModelFitPlotData::GetXMinMax() const
 {
@@ -149,9 +171,9 @@ mitk::PlotDataValues::value_type mitk::ModelFitPlotData::GetXMinMax() const
   }
   for (const auto& posCollection : this->positionalPlots)
   {
-    for (const auto& plot : *(posCollection.second))
+    for (const auto& plot : *(posCollection.second.second))
     {
-      auto sample = this->GetSamplePlot(posCollection.second);
+      auto sample = this->GetSamplePlot(posCollection.second.second);
       if (sample)
       {
         CheckXMinMaxFromPlotDataValues(sample->GetValues(), min, max);
@@ -174,7 +196,7 @@ mitk::PlotDataValues::value_type mitk::ModelFitPlotData::GetYMinMax() const
 
   for (const auto& posCollection : this->positionalPlots)
   {
-    for (const auto& plot : *(posCollection.second))
+    for (const auto& plot : *(posCollection.second.second))
     {
       CheckYMinMaxFromPlotDataValues(plot.second->GetValues(), min, max);
     }

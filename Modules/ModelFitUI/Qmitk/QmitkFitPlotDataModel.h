@@ -53,7 +53,7 @@ public Q_SLOTS:
 
 protected:
   std::pair<std::string, const mitk::PlotDataCurve*> GetCurveByColumn(int col) const;
-  std::pair<bool, mitk::Point3D> GetPositionalCurvePoint(const mitk::PlotDataCurve*) const;
+  std::pair<bool, mitk::ModelFitPlotData::PositionalCollectionMap::value_type> GetPositionalCurvePoint(const mitk::PlotDataCurve*) const;
 
 private:
   mitk::ModelFitPlotData m_PlotData;

@@ -43,7 +43,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ModelFitInspectorView.h"
 
 const std::string ModelFitInspectorView::VIEW_ID = "org.mitk.gui.gt.fit.inspector";
-const unsigned int ModelFitInspectorView::INTERPOLATION_STEPS = 100;
+const unsigned int ModelFitInspectorView::INTERPOLATION_STEPS = 10;
+const std::string DEFAULT_X_AXIS = "Time [s]";
 
 ModelFitInspectorView::ModelFitInspectorView() :
   m_renderWindowPart(nullptr),
@@ -85,7 +86,7 @@ void ModelFitInspectorView::CreateQtPartControl(QWidget* parent)
   m_Controls.setupUi(parent);
 
   m_SelectionServiceConnector = std::make_unique<QmitkSelectionServiceConnector>();
-  //m_SelectionServiceConnector->AddPostSelectionListener(this->GetSite()->GetWorkbenchWindow()->GetSelectionService());
+  m_SelectionServiceConnector->AddPostSelectionListener(this->GetSite()->GetWorkbenchWindow()->GetSelectionService());
 
   m_Controls.inputNodeSelector->SetDataStorage(GetDataStorage());
   m_Controls.inputNodeSelector->SetEmptyInfo(QString("Please select input data to be viewed."));
@@ -165,6 +166,15 @@ void ModelFitInspectorView::CreateQtPartControl(QWidget* parent)
 
 void ModelFitInspectorView::SetFocus()
 {
+}
+
+void ModelFitInspectorView::NodeRemoved(const mitk::DataNode* node)
+{
+  if (node == this->m_currentSelectedNode)
+  {
+    QmitkSingleNodeSelectionWidget::NodeList emptylist;
+    this->m_Controls.inputNodeSelector->SetCurrentSelection(emptylist);
+  }
 }
 
 void ModelFitInspectorView::OnScaleFixedYChecked(bool checked)
@@ -319,6 +329,7 @@ void ModelFitInspectorView::OnInputChanged(const QList<mitk::DataNode::Pointer>&
         m_currentFit = nullptr;
         m_currentFitTime.Modified();
         OnSliceChanged();
+        m_Controls.plotDataWidget->SetXName(DEFAULT_X_AXIS);
       }
       else
       {
@@ -340,6 +351,10 @@ void ModelFitInspectorView::OnInputChanged(const QList<mitk::DataNode::Pointer>&
 
       m_selectedNodeTime.Modified();
       OnFitSelectionChanged(0);
+      RefreshPlotData();
+      m_Controls.plotDataWidget->SetPlotData(&(this->m_PlotCurves));
+      m_Controls.fitParametersWidget->setFits(QmitkFitParameterModel::FitVectorType());
+      RenderPlot();
     }
   }
 
@@ -452,6 +467,7 @@ void ModelFitInspectorView::OnSliceChanged()
     if (RefreshPlotData())
     {
       RenderPlot();
+      m_Controls.plotDataWidget->SetPlotData(&m_PlotCurves);
       RenderFitInfo();
     }
   }
@@ -462,6 +478,7 @@ void ModelFitInspectorView::OnPositionBookmarksChanged()
     if (RefreshPlotData())
     {
       RenderPlot();
+      m_Controls.plotDataWidget->SetPlotData(&m_PlotCurves);
       RenderFitInfo();
     }
 }
@@ -608,7 +625,7 @@ bool ModelFitInspectorView::RefreshPlotData()
         for (auto iter = bookmarks->Begin(); iter != endIter; iter++)
         {
           auto collection = RefreshPlotDataCurveCollection(iter.Value(), input, m_currentFit, timeGrid, m_currentModelParameterizer);
-          m_PlotCurves.positionalPlots.emplace(iter.Value(), collection);
+          m_PlotCurves.positionalPlots.emplace(iter.Index(), std::make_pair(iter.Value(), collection));
         }
 
         changed = true;
@@ -630,11 +647,6 @@ bool ModelFitInspectorView::RefreshPlotData()
       }
 
       changed = true;
-    }
-
-    if (changed)
-    {
-      m_Controls.plotDataWidget->SetPlotData(&m_PlotCurves);
     }
 
     m_lastRefreshTime.Modified();
@@ -780,7 +792,7 @@ void ModelFitInspectorView::RenderPlot()
 {
   m_Controls.widgetPlot->Clear();
 
-  std::string xAxis = "Time [s]";
+  std::string xAxis = DEFAULT_X_AXIS;
   std::string yAxis = "Intensity";
   std::string plotTitle = "Raw data plot: no data";
 
@@ -857,11 +869,8 @@ void ModelFitInspectorView::RenderPlot()
   {
     QColor dataColor;
     dataColor.setHsv((++colorIndex * 85) % 360, 255, 150);
-    std::ostringstream plotPosStrm;
-    plotPosStrm.imbue(std::locale("C"));
-    plotPosStrm << " @ " << std::setprecision(3) << "(" << posIter.first[0] << "|" << posIter.first[1] << "|" << posIter.first[2] << ")";
 
-    this->RenderPlotCurve(posIter.second, dataColor, dataColor, plotPosStrm.str());
+    this->RenderPlotCurve(posIter.second.second, dataColor, dataColor, " @ "+mitk::ModelFitPlotData::GetPositionalCollectionName(posIter));
   }
 
   // Draw current pos curve

@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QmitkChartWidget::Impl final
 {
 public:
-  explicit Impl(QWidget* parent);
+  explicit Impl(QWidget *parent, bool unitTest = false);
   ~Impl();
 
   Impl(const Impl&) = delete;
@@ -91,17 +91,23 @@ private:
   std::map<QmitkChartWidget::AxisScale, std::string> m_AxisScaleToName;
 };
 
-QmitkChartWidget::Impl::Impl(QWidget* parent)
+QmitkChartWidget::Impl::Impl(QWidget* parent, bool unitTest)
   : m_WebChannel(new QWebChannel(parent))
   , m_WebEngineView(new QWebEngineView(parent))
 {
-  //disable context menu for QWebEngineView
-  m_WebEngineView->setContextMenuPolicy(Qt::NoContextMenu);
 
-  //Set the webengineview to an initial empty page. The actual chart will be loaded once the data is calculated.
-  m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
-  m_WebEngineView->page()->setWebChannel(m_WebChannel);
-  m_WebEngineView->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
+  //disable for UnitTests
+  if (!unitTest)
+  {
+    // disable context menu for QWebEngineView
+    m_WebEngineView->setContextMenuPolicy(Qt::NoContextMenu);
+
+    // Set the webengineview to an initial empty page. The actual chart will be loaded once the data is calculated.
+    m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
+    m_WebEngineView->page()->setWebChannel(m_WebChannel);
+    m_WebEngineView->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
+  }
+
 
   connect(m_WebEngineView, SIGNAL(loadFinished(bool)), parent, SLOT(OnLoadFinished(bool)));
 
@@ -394,6 +400,11 @@ QList<QVariant> QmitkChartWidget::Impl::GetDataLabels(const ChartxyDataVector& c
 QmitkChartWidget::QmitkChartWidget(QWidget* parent)
   : QWidget(parent)
   , m_Impl(new Impl(this))
+{
+}
+
+QmitkChartWidget::QmitkChartWidget(QWidget *parent, bool unitTest)
+  : QWidget(parent), m_Impl(new Impl(this, unitTest))
 {
 }
 

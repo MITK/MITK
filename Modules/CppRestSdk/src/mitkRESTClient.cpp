@@ -51,12 +51,19 @@ pplx::task<void> mitk::RESTClient::Get(utility::string_t filePath, utility::stri
   });
 }
 
-pplx::task<void> mitk::RESTClient::Post(utility::string_t uri)
+pplx::task<void> mitk::RESTClient::Post(utility::string_t uri,
+                                        utility::string_t contentType,
+                                        concurrency::streams::streambuf<uint8_t> data)
 {
   MITK_INFO << "Calling POST with " << utility::conversions::to_utf8string(uri) << " on client "
             << utility::conversions::to_utf8string(m_Client.base_uri().to_string());
 
-  return m_Client.request(MitkRESTMethods::POST, uri).then([&](MitkResponse response)
+  MitkRequest postRequest(MitkRESTMethods::POST);
+  postRequest.set_request_uri(uri);
+  postRequest.headers().add(U("Content-Type"), contentType);
+  postRequest.set_body(data);
+
+  return m_Client.request(postRequest).then([&](MitkResponse response)
   {
       MITK_INFO << "Status code: " << response.status_code(); 
   });
@@ -135,9 +142,14 @@ pplx::task<std::string> mitk::RESTClient::WadoRS(const utility::string_t folderP
   });
 }
 
-pplx::task<void> mitk::RESTClient::StowRS(std::string studyUID) {
-	// TODO: add data
+pplx::task<void> mitk::RESTClient::StowRS(utility::string_t filePath, std::string studyUID)
+{
+  // TODO: add data
   MitkUriBuilder builder(U("rs/studies"));
   builder.append_query(utility::conversions::to_string_t(studyUID));
-  return Post(builder.to_string());
+
+  concurrency::streams::file_buffer<uint8_t>::open(filePath, std::ios::in)
+    .then([&](concurrency::streams::streambuf<uint8_t> data) {
+      return Post(builder.to_string(), U("multipart/related; type='application/dicom'; boundary='boundary'"), data);
+    });
 }

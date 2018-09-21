@@ -63,6 +63,9 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 
   MITK_INFO << "Loading image series";
   std::string folderPathSeries = "/temp/downloadSeries/";
+
+  m_CurrentStudyUID = dto.studyUID;
+
   m_RestClient->WadoRS(utility::conversions::to_string_t(folderPathSeries), dto.studyUID, dto.imageSeriesUID)
     .then([&](std::string fileName) {
       MITK_INFO << "Loading image series into data storage";
@@ -123,7 +126,14 @@ void SegmentationReworkView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /
   m_Controls.labelWarning->setVisible(true);
 }
 
-void SegmentationReworkView::UploadNewSegmentation() {}
+void SegmentationReworkView::UploadNewSegmentation() 
+{
+  auto filePath = U("path/to/dicomSeg.dcm");
+  m_RestClient->StowRS(filePath, m_CurrentStudyUID).then([] 
+  {
+	  MITK_INFO << "SEG uploaded";
+  });
+}
 
 void SegmentationReworkView::DoImageProcessing()
 {

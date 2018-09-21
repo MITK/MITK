@@ -322,13 +322,13 @@ BaseApplication::BaseApplication(int argc, char** argv)
 
 BaseApplication::~BaseApplication()
 {
-  if (d->m_Splashscreen != 0)
-  {
-    delete(d->m_Splashscreen);
-  }
   if (d->m_SplashscreenClosingCallback != 0)
   {
     delete(d->m_SplashscreenClosingCallback);
+  }
+  if (d->m_Splashscreen != 0)
+  {
+    delete(d->m_Splashscreen);
   }
 }
 

@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // qt includes
 #include "QApplication"
-#include <qapplication>
 
 // std includes
 #include <string>

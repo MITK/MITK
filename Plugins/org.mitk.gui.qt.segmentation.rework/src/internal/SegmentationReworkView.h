@@ -69,6 +69,8 @@ private:
 
   std::unique_ptr<SegmentationReworkREST> m_HttpHandler;
   mitk::RESTClient* m_RestClient;
+
+  std::string m_CurrentStudyUID;
 };
 
 #endif // SegmentationReworkView_h

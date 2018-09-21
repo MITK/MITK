@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 
 // qt includes
+#include "QApplication"
 #include <qapplication>
 
 // std includes

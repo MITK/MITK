@@ -25,7 +25,7 @@ mitk::RESTClient::~RESTClient() {}
 
 pplx::task<void> mitk::RESTClient::Get(utility::string_t filePath, utility::string_t uri)
 {
-  MITK_INFO << "Calling GET with " << utility::conversions::to_utf8string(uri) << " on client "
+  MITK_DEBUG << "Calling GET with " << utility::conversions::to_utf8string(uri) << " on client "
             << utility::conversions::to_utf8string(m_Client.base_uri().to_string()) << " save into "
             << utility::conversions::to_utf8string(filePath);
 
@@ -40,7 +40,7 @@ pplx::task<void> mitk::RESTClient::Get(utility::string_t filePath, utility::stri
     // Write the response body into the file buffer.
     .then([=](MitkResponse response) -> pplx::task<size_t>
   {
-      MITK_INFO << "Status code: " << response.status_code();
+      MITK_DEBUG << "Status code: " << response.status_code();
 
     return response.body().read_to_end(*fileBuffer);
   })
@@ -63,9 +63,11 @@ pplx::task<void> mitk::RESTClient::Post(utility::string_t uri,
   postRequest.headers().add(U("Content-Type"), contentType);
   postRequest.set_body(data);
 
-  return m_Client.request(postRequest).then([&](MitkResponse response)
+  MITK_INFO << "Request: " << utility::conversions::to_utf8string(postRequest.to_string());
+  
+  return m_Client.request(postRequest).then([=](MitkResponse response)
   {
-      MITK_INFO << "Status code: " << response.status_code(); 
+    MITK_INFO << "Response: " << utility::conversions::to_utf8string(response.to_string());
   });
 }
 
@@ -96,18 +98,18 @@ pplx::task<std::string> mitk::RESTClient::WadoRS(const utility::string_t folderP
   return m_Client.request(getSeries).then([=](MitkResponse response) -> pplx::task<std::string>
   {
     MITK_INFO << "search for instances in series with uid " << seriesUID
-              << " status: " << response.status_code();
+      << " status: " << response.status_code();
 
     auto jsonListResult = response.extract_json().get();
     auto resultArray = jsonListResult.as_array();
 
-	auto firstFileName = std::string();
+    auto firstFileName = std::string();
 
     std::vector<pplx::task<void>> tasks;
 
     for (unsigned short i = 0; i < resultArray.size(); i++)
     {
-      try 
+      try
       {
         auto firstResult = resultArray[i];
         auto sopInstanceUIDKey = firstResult.at(U("00080018"));
@@ -116,29 +118,29 @@ pplx::task<std::string> mitk::RESTClient::WadoRS(const utility::string_t folderP
         auto valueArray = valueKey.as_array();
         auto sopInstanceUID = valueArray[0].as_string();
 
-		auto fileName = sopInstanceUID.append(U(".dcm"));
+        auto fileName = utility::string_t(sopInstanceUID).append(U(".dcm"));
 
-		// save first file name as result to load series
-		if (i == 0)
-		{
-			firstFileName = utility::conversions::to_utf8string(fileName);
-		}
+        // save first file name as result to load series
+        if (i == 0)
+        {
+          firstFileName = utility::conversions::to_utf8string(fileName);
+        }
 
         auto filePath = utility::string_t(folderPath).append(fileName);
         auto task = WadoRS(filePath, studyUID, seriesUID, utility::conversions::to_utf8string(sopInstanceUID));
         tasks.push_back(task);
       }
-      catch (const web::json::json_exception& e) 
+      catch (const web::json::json_exception& e)
       {
         MITK_ERROR << e.what();
       }
     }
 
     auto joinTask = pplx::when_all(begin(tasks), end(tasks));
-    return joinTask.then([=](void) 
-	{ 
-		return firstFileName;
-	});
+    return joinTask.then([=](void)
+    {
+      return utility::conversions::to_utf8string(folderPath).append(firstFileName);
+    });
   });
 }
 
@@ -146,10 +148,10 @@ pplx::task<void> mitk::RESTClient::StowRS(utility::string_t filePath, std::strin
 {
   // TODO: add data
   MitkUriBuilder builder(U("rs/studies"));
-  builder.append_query(utility::conversions::to_string_t(studyUID));
+  builder.append_path(utility::conversions::to_string_t(studyUID));
 
-  concurrency::streams::file_buffer<uint8_t>::open(filePath, std::ios::in)
-    .then([&](concurrency::streams::streambuf<uint8_t> data) {
-      return Post(builder.to_string(), U("multipart/related; type='application/dicom'; boundary='boundary'"), data);
+  return concurrency::streams::file_buffer<uint8_t>::open(filePath, std::ios::in)
+    .then([=](concurrency::streams::streambuf<uint8_t> data) {
+      return Post(builder.to_string(), U("multipart/related; type='application/dicom';"), data);
     });
 }

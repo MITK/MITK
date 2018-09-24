@@ -46,6 +46,10 @@ public:
   void RESTPutCallback(const SegmentationReworkREST::DicomDTO& dto);
 
   void UpdateChartWidget();
+  void LoadData(std::vector<std::string> filePathList);
+
+signals:
+  void InvokeLoadData(std::vector<std::string> filePathList);
 
 protected:
   virtual void CreateQtPartControl(QWidget *parent) override;

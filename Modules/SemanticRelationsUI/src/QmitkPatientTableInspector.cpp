@@ -36,7 +36,6 @@ QmitkPatientTableInspector::QmitkPatientTableInspector(QWidget* parent/* =nullpt
   m_Controls.tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
   m_StorageModel = new QmitkPatientTableModel(this);
-
   m_Controls.tableView->setModel(m_StorageModel);
 
   SetUpConnections();
@@ -79,7 +78,14 @@ QItemSelectionModel* QmitkPatientTableInspector::GetSelectionModel()
 
 void QmitkPatientTableInspector::Initialize()
 {
-  m_StorageModel->SetDataStorage(m_DataStorage.Lock());
+  if (m_DataStorage.IsExpired())
+  {
+    return;
+  }
+
+  auto dataStorage = m_DataStorage.Lock();
+
+  m_StorageModel->SetDataStorage(dataStorage);
   m_StorageModel->SetNodePredicate(m_NodePredicate);
 
   m_Connector->SetView(m_Controls.tableView);

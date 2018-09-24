@@ -40,10 +40,9 @@ QmitkPatientTableModel::~QmitkPatientTableModel()
   // nothing here
 }
 
-QModelIndex QmitkPatientTableModel::index(int row, int column, const QModelIndex &parent/* = QModelIndex()*/) const
+QModelIndex QmitkPatientTableModel::index(int row, int column, const QModelIndex& parent/* = QModelIndex()*/) const
 {
-  bool hasIndex = this->hasIndex(row, column, parent);
-  if (hasIndex)
+  if (hasIndex(row, column, parent))
   {
     return createIndex(row, column);
   }
@@ -51,12 +50,12 @@ QModelIndex QmitkPatientTableModel::index(int row, int column, const QModelIndex
   return QModelIndex();
 }
 
-QModelIndex QmitkPatientTableModel::parent(const QModelIndex &child) const
+QModelIndex QmitkPatientTableModel::parent(const QModelIndex& child) const
 {
   return QModelIndex();
 }
 
-int QmitkPatientTableModel::rowCount(const QModelIndex &parent/* = QModelIndex()*/) const
+int QmitkPatientTableModel::rowCount(const QModelIndex& parent/* = QModelIndex()*/) const
 {
   if (parent.isValid())
   {
@@ -66,7 +65,7 @@ int QmitkPatientTableModel::rowCount(const QModelIndex &parent/* = QModelIndex()
   return m_InformationTypes.size();
 }
 
-int QmitkPatientTableModel::columnCount(const QModelIndex &parent/* = QModelIndex()*/) const
+int QmitkPatientTableModel::columnCount(const QModelIndex& parent/* = QModelIndex()*/) const
 {
   if (parent.isValid())
   {
@@ -76,7 +75,7 @@ int QmitkPatientTableModel::columnCount(const QModelIndex &parent/* = QModelInde
   return m_ControlPoints.size();
 }
 
-QVariant QmitkPatientTableModel::data(const QModelIndex &index, int role/* = Qt::DisplayRole*/) const
+QVariant QmitkPatientTableModel::data(const QModelIndex& index, int role/* = Qt::DisplayRole*/) const
 {
   if (!index.isValid())
   {
@@ -148,7 +147,7 @@ QVariant QmitkPatientTableModel::headerData(int section, Qt::Orientation orienta
   return QVariant();
 }
 
-Qt::ItemFlags QmitkPatientTableModel::flags(const QModelIndex &index) const
+Qt::ItemFlags QmitkPatientTableModel::flags(const QModelIndex& index) const
 {
   Qt::ItemFlags flags;
   mitk::DataNode* dataNode = GetCurrentDataNode(index);

@@ -95,6 +95,18 @@ QToolBox::tab:selected {
   border: 1px solid #1c97ea;
 }
 
+QTableView QTableCornerButton::section {
+  background-color: #2d2d30;
+}
+
+QTableView {
+  selection-background-color: #2d2d30;
+}
+
+QTableView:active {
+  selection-background-color: #1c97ea;
+}
+
 QAbstractItemView {
   alternate-background-color: #1b1b1c;
   background-color: #252526;
@@ -122,7 +134,7 @@ QHeaderView::section:vertical:checked {
 }
 
 QHeaderView::section:vertical:pressed {
-  background-color: #1c97ea;
+  background-color: transparent;
   font-weight: bold;
 }
 
@@ -167,7 +179,7 @@ QGroupBox, QGroupBox:disabled {
 QGroupBox::title {
   padding: 0 4px;
   subcontrol-origin: margin;
-  subcontrol-position: top center;
+  left: 4px;
 }
 
 QComboBox, QLineEdit, QAbstractSpinBox {
@@ -499,6 +511,10 @@ QScrollBar::up-arrow:pressed {
 
 QTabWidget::pane {
   border: 1px solid #434346;
+}
+
+QTabBar {
+  qproperty-drawBase: 0;
 }
 
 QTabBar::tab {

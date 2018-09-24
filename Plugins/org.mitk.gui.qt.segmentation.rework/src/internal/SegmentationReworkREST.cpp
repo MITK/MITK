@@ -49,9 +49,6 @@ void SegmentationReworkREST::HandlePut(MitkRequest message)
       auto segSeriesUIDAKey = jsonMessage.at(U("segSeriesUIDA"));
       auto segSeriesUIDBKey = jsonMessage.at(U("segSeriesUIDB"));
 
-	  auto segInstanceUIDAKey = jsonMessage.at(U("segInstanceUIDA"));
-      auto segInstanceUIDBKey = jsonMessage.at(U("segInstanceUIDB"));
-
       auto simScoreKey = jsonMessage.at(U("simScoreArray"));
       auto minSliceStartKey = jsonMessage.at(U("minSliceStart"));
 
@@ -59,8 +56,6 @@ void SegmentationReworkREST::HandlePut(MitkRequest message)
       dto.segSeriesUIDA = convertToUtf8(segSeriesUIDAKey.as_string());
       dto.segSeriesUIDB = convertToUtf8(segSeriesUIDBKey.as_string());
       dto.imageSeriesUID = convertToUtf8(imageSeriesUIDKey.as_string());
-      dto.segInstanceUIDA = convertToUtf8(segInstanceUIDAKey.as_string());
-      dto.segInstanceUIDB = convertToUtf8(segInstanceUIDBKey.as_string());
 
       dto.studyUID = convertToUtf8(imageStudyUIDKey.as_string());
       dto.minSliceStart = minSliceStartKey.as_integer();

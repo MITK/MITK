@@ -35,6 +35,8 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
 
+  qRegisterMetaType< std::vector<std::string> >("std::vector<std::string>");
+
   connect(m_Controls.buttonUpload, &QPushButton::clicked, this, &SegmentationReworkView::UploadNewSegmentation);
 
   utility::string_t port = U("2020");
@@ -44,9 +46,10 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   m_HttpHandler = std::unique_ptr<SegmentationReworkREST>(new SegmentationReworkREST(address));
 
   connect(m_HttpHandler.get(),
-          &SegmentationReworkREST::InvokeUpdateChartWidget,
-          this,
-          &SegmentationReworkView::UpdateChartWidget);
+    &SegmentationReworkREST::InvokeUpdateChartWidget,
+    this,
+    &SegmentationReworkView::UpdateChartWidget);
+  connect(this, &SegmentationReworkView::InvokeLoadData, this, &SegmentationReworkView::LoadData);
 
   m_HttpHandler->SetPutCallback(std::bind(&SegmentationReworkView::RESTPutCallback, this, std::placeholders::_1));
   m_HttpHandler->Open().wait();
@@ -61,31 +64,31 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 {
   SetSimilarityGraph(dto.simScoreArray, dto.minSliceStart);
 
-  MITK_INFO << "Loading image series";
+  MITK_INFO << "Load related dicom series ...";
   std::string folderPathSeries = "/temp/downloadSeries/";
+  auto folderPathSegA = U("/temp/segA/");
+  auto folderPathSegB = U("/temp/segB/");
 
   m_CurrentStudyUID = dto.studyUID;
 
-  m_RestClient->WadoRS(utility::conversions::to_string_t(folderPathSeries), dto.studyUID, dto.imageSeriesUID)
-    .then([&](std::string fileName) {
-      MITK_INFO << "Loading image series into data storage";
-      auto folderPath = folderPathSeries;
-      auto firstFilePath = folderPath.append(fileName);
-      mitk::IOUtil::Load(firstFilePath, *this->GetDataStorage());
+  std::vector<pplx::task<std::string>> tasks;
+  auto imageSeriesTask = m_RestClient->WadoRS(utility::conversions::to_string_t(folderPathSeries), dto.studyUID, dto.imageSeriesUID);
+  auto segATask = m_RestClient->WadoRS(folderPathSegA, dto.studyUID, dto.segSeriesUIDA);
+  auto segBTask = m_RestClient->WadoRS(folderPathSegB, dto.studyUID, dto.segSeriesUIDB);
+  tasks.push_back(imageSeriesTask);
+  tasks.push_back(segATask);
+  tasks.push_back(segBTask);
 
-      MITK_INFO << "Loading segmentations...";
+  auto joinTask = pplx::when_all(begin(tasks), end(tasks));
+  auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) {
+    InvokeLoadData(filePathList);
+  });
+}
 
-	  auto filePathSegA = U("/temp/segA.dcm");
-      auto filePathSegB = U("/temp/segB.dcm");
-
-      m_RestClient->WadoRS(filePathSegA, dto.studyUID, dto.segSeriesUIDA, dto.segInstanceUIDA).then([&] {
-       mitk::IOUtil::Load(utility::conversions::to_utf8string(filePathSegA), *this->GetDataStorage());
-      });
-
-      m_RestClient->WadoRS(filePathSegB, dto.studyUID, dto.segSeriesUIDB, dto.segInstanceUIDB).then([&] {
-        mitk::IOUtil::Load(utility::conversions::to_utf8string(filePathSegB), *this->GetDataStorage());
-      });
-    });
+void SegmentationReworkView::LoadData(std::vector<std::string> filePathList)
+{
+  MITK_INFO << "Loading finished. Pushing data to data storage ...";
+  mitk::IOUtil::Load(filePathList, *this->GetDataStorage());
 }
 
 void SegmentationReworkView::UpdateChartWidget()
@@ -96,7 +99,6 @@ void SegmentationReworkView::UpdateChartWidget()
 void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArray, int sliceMinStart)
 {
   std::map<double, double> map;
-  MITK_INFO << simScoreArray.size();
 
   double sliceIndex = sliceMinStart;
   for (double score : simScoreArray)
@@ -111,10 +113,10 @@ void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArra
 }
 
 void SegmentationReworkView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
-                                                const QList<mitk::DataNode::Pointer> &nodes)
+  const QList<mitk::DataNode::Pointer> &nodes)
 {
   // iterate all selected objects, adjust warning visibility
-  foreach (mitk::DataNode::Pointer node, nodes)
+  foreach(mitk::DataNode::Pointer node, nodes)
   {
     if (node.IsNotNull() && dynamic_cast<mitk::Image *>(node->GetData()))
     {
@@ -126,13 +128,20 @@ void SegmentationReworkView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /
   m_Controls.labelWarning->setVisible(true);
 }
 
-void SegmentationReworkView::UploadNewSegmentation() 
+void SegmentationReworkView::UploadNewSegmentation()
 {
-  auto filePath = U("path/to/dicomSeg.dcm");
-  m_RestClient->StowRS(filePath, m_CurrentStudyUID).then([] 
+  auto filePath = U("/temp/segA/1.2.276.0.7230010.3.1.4.296485376.8.1533635734.141264.dcm");
+  m_CurrentStudyUID = "1.2.840.113654.2.70.1.159145727925405623564217141386659468090";
+  try {
+    m_RestClient->StowRS(filePath, m_CurrentStudyUID).then([]
+    {
+      MITK_INFO << "SEG uploaded";
+    });
+  }
+  catch (std::exception &exception)
   {
-	  MITK_INFO << "SEG uploaded";
-  });
+    MITK_ERROR << exception.what();
+  }
 }
 
 void SegmentationReworkView::DoImageProcessing()

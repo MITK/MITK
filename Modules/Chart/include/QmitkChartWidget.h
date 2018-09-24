@@ -86,6 +86,8 @@ public:
   };
 
   explicit QmitkChartWidget(QWidget* parent = nullptr);
+  //for UnitTests
+  explicit QmitkChartWidget(QWidget *parent, bool unitTest);
   ~QmitkChartWidget() override;
 
   /*!

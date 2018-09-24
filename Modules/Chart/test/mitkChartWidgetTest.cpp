@@ -41,7 +41,6 @@ class mitkChartWidgetTestSuite : public mitk::TestFixture
   MITK_TEST(SetandGet_Success);
   MITK_TEST(SetC3DataAndGet_Success);
   MITK_TEST(AddAndRemoveData_Sucess);
-  // MITK_TEST(AddAndGet)
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -66,15 +65,17 @@ public:
 
   void AddOnce_Test_Success()
   {
-    QmitkChartWidget widget;
+    //use QmitkChartWidget without QWebEngineView
+    QmitkChartWidget widget(nullptr, true);
     CPPUNIT_ASSERT_NO_THROW_MESSAGE("Adding data caused an exception", widget.AddData1D(data1D, label));
 
     std::vector<std::unique_ptr<QmitkChartxyData>> *dataVector = widget.GetData();
 
     CPPUNIT_ASSERT_MESSAGE("Adding data failed.", dataVector->size() == 1 && dataVector != nullptr);
-    QmitkChartxyData * dataPtr = dataVector->at(0).get();
+    QmitkChartxyData *dataPtr = dataVector->at(0).get();
 
-    CPPUNIT_ASSERT_MESSAGE("Label differs for no obvious reason", dataPtr->GetLabel().toString().toStdString() == label);
+    CPPUNIT_ASSERT_MESSAGE("Label differs for no obvious reason",
+                           dataPtr->GetLabel().toString().toStdString() == label);
 
     std::vector<QVariant> insertedYData = dataPtr->GetYData().toVector().toStdVector();
     CPPUNIT_ASSERT_MESSAGE("Data differs in size", insertedYData.size() == data1D.size());
@@ -87,7 +88,9 @@ public:
 
   void AddSameLabelTwice_Test_Success()
   {
-    QmitkChartWidget widget;
+
+
+    QmitkChartWidget widget(nullptr, true);
     widget.AddData1D(data1D, label);
     widget.AddData1D(data1D, label);
 
@@ -115,7 +118,7 @@ public:
     std::string label2 = "testData2";
     std::vector<double> data1D3 = {3, 3, 3};
     std::string label3 = "testData3";
-    QmitkChartWidget widget;
+    QmitkChartWidget widget(nullptr, true);
     widget.AddData1D(data1D, label);
 	widget.AddData1D(data1D2, label2);
     widget.AddData1D(data1D3, label3);
@@ -161,7 +164,7 @@ public:
 
   void RemoveNonexistingData_Failure()
   {
-    QmitkChartWidget widget;
+    QmitkChartWidget widget(nullptr, true);
 
     CPPUNIT_ASSERT_THROW_MESSAGE(
       "Removin nonexistend label did not throw exception", widget.RemoveData(label), std::invalid_argument);
@@ -169,7 +172,7 @@ public:
 
   void RemoveData_Success()
   {
-    QmitkChartWidget widget;
+    QmitkChartWidget widget(nullptr, true);
     widget.AddData1D(data1D, label);
 
     CPPUNIT_ASSERT_NO_THROW_MESSAGE("Removin nonexistend label did not throw exception", widget.RemoveData(label));
@@ -177,7 +180,7 @@ public:
 
   void SetandGet_Success()
   {
-    QmitkChartWidget widget;
+    QmitkChartWidget widget(nullptr, true);
     widget.AddData1D(data1D, label);
     std::string colorName = "green";
 
@@ -223,34 +226,34 @@ public:
 
   void SetC3DataAndGet_Success()
    {
-    QmitkChartWidget widget;
+    QmitkChartWidget widget(nullptr, true);
     widget.AddData1D(data1D, label);
 
-	//set YAxisScale
+    //set YAxisScale
     widget.SetYAxisScale(QmitkChartWidget::AxisScale::log);
     QmitkChartData *c3Data = widget.GetC3Data();
     QVariant yAxisScale = c3Data->GetYAxisScale();
     CPPUNIT_ASSERT_MESSAGE("The YAxisScale could not be changed", "log" == yAxisScale.toString().toStdString());
 
-	//set Title
+    //set Title
     std::string testTitle = "testTitle";
     widget.SetTitle(testTitle);
     QVariant title = c3Data->GetTitle();
     CPPUNIT_ASSERT_MESSAGE("The title could not be set", testTitle == title.toString().toStdString());
 
-	//set LegendPosition
+    //set LegendPosition
     widget.SetLegendPosition(QmitkChartWidget::LegendPosition::right);
     QVariant legendPosition = c3Data->GetLegendPosition();
     CPPUNIT_ASSERT_MESSAGE("The LegendPosition could not be changed", "right" == legendPosition.toString().toStdString());
 
-	//show legend
-	QVariant isShowLegend = c3Data->GetShowLegend();
+    //show legend
+    QVariant isShowLegend = c3Data->GetShowLegend();
     widget.SetShowLegend(!isShowLegend.toBool());
-	QVariant isShowLegendInverted = c3Data->GetShowLegend();
+    QVariant isShowLegendInverted = c3Data->GetShowLegend();
     CPPUNIT_ASSERT_MESSAGE("The ShowLegend could not be changed",
-                         isShowLegend.toBool() != isShowLegendInverted.toBool());
+                           isShowLegend.toBool() != isShowLegendInverted.toBool());
 
-	//show dataPoints
+    //show dataPoints
 	QVariant dataPointSize = c3Data->GetDataPointSize();
     bool showDataPoints = dataPointSize.toInt() > 0;
 	widget.SetShowDataPoints(!showDataPoints);
@@ -258,13 +261,6 @@ public:
 	bool showDataPointsInvert = dataPointSize.toInt() > 0;
     CPPUNIT_ASSERT_MESSAGE("The DataPoints could not be changed",
                            isShowLegend.toBool() != isShowLegendInverted.toBool());
-
-	//show SubCharts
-    QVariant showSubChart = c3Data->GetShowSubchart();
-    widget.Show(!showSubChart.toBool());
-    QVariant showSubChartInvert = c3Data->GetShowSubchart();
-    CPPUNIT_ASSERT_MESSAGE("The visibility of subCharts could not be changed",
-                           showSubChart.toBool() != showSubChartInvert.toBool());
    }
 };
 

@@ -866,13 +866,13 @@ void mitk::DICOMImageBlockDescriptor::SetTagLookupTableToPropertyFunctor( TagLoo
 }
 
 mitk::BaseProperty::ConstPointer mitk::DICOMImageBlockDescriptor::GetConstProperty(const std::string &propertyKey,
-  const std::string &contextName,  bool fallBackOnDefaultContext) const
+  const std::string &/*contextName*/,  bool /*fallBackOnDefaultContext*/) const
 {
   this->UpdateImageDescribingProperties();
   return m_PropertyList->GetConstProperty(propertyKey);
 };
 
-std::vector<std::string> mitk::DICOMImageBlockDescriptor::GetPropertyKeys(const std::string &contextName,  bool includeDefaultContext) const
+std::vector<std::string> mitk::DICOMImageBlockDescriptor::GetPropertyKeys(const std::string &/*contextName*/,  bool /*includeDefaultContext*/) const
 {
   this->UpdateImageDescribingProperties();
   return m_PropertyList->GetPropertyKeys();

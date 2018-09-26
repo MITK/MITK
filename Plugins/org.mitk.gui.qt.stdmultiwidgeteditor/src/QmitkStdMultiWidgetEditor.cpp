@@ -401,7 +401,7 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   d->m_StdMultiWidget->crosshairManager->setCrosshairGap(prefs->GetInt("crosshair gap size", 32));
 
   //refresh colors of rectangles
-  d->m_StdMultiWidget->EnableColoredRectangles();
+  d->m_StdMultiWidget->DisableColoredRectangles(); //EnableColoredRectangles();
 
   // Set preferences respecting zooming and panning
   bool constrainedZooming = prefs->GetBool("Use constrained zooming and panning", true);

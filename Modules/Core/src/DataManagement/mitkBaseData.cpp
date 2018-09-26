@@ -342,7 +342,7 @@ void mitk::BaseData::RemoveProperty(const std::string &propertyKey, const std::s
   mitkThrow() << "Unknown or unsupported non-default property context.";
 }
 
-std::vector<std::string> mitk::BaseData::GetPropertyKeys(const std::string &contextName, bool includeDefaultContext) const
+std::vector<std::string> mitk::BaseData::GetPropertyKeys(const std::string &/*contextName*/, bool /*includeDefaultContext*/) const
 {
   return m_PropertyList->GetPropertyKeys();
 }

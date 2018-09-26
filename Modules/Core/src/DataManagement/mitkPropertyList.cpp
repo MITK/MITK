@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkStringProperty.h"
 
-mitk::BaseProperty::ConstPointer mitk::PropertyList::GetConstProperty(const std::string &propertyKey, const std::string &contextName, bool fallBackOnDefaultContext) const
+mitk::BaseProperty::ConstPointer mitk::PropertyList::GetConstProperty(const std::string &propertyKey, const std::string &/*contextName*/, bool /*fallBackOnDefaultContext*/) const
 {
   PropertyMap::const_iterator it;
 
@@ -60,12 +60,12 @@ mitk::BaseProperty *mitk::PropertyList::GetProperty(const std::string &propertyK
     return nullptr;
 }
 
-mitk::BaseProperty * mitk::PropertyList::GetNonConstProperty(const std::string &propertyKey, const std::string &contextName, bool fallBackOnDefaultContext)
+mitk::BaseProperty * mitk::PropertyList::GetNonConstProperty(const std::string &propertyKey, const std::string &/*contextName*/, bool /*fallBackOnDefaultContext*/)
 {
   return this->GetProperty(propertyKey);
 }
 
-void mitk::PropertyList::SetProperty(const std::string &propertyKey, BaseProperty *property, const std::string &contextName, bool fallBackOnDefaultContext)
+void mitk::PropertyList::SetProperty(const std::string &propertyKey, BaseProperty *property, const std::string &/*contextName*/, bool /*fallBackOnDefaultContext*/)
 {
   if (propertyKey.empty())
     mitkThrow() << "Property key is empty.";
@@ -130,7 +130,7 @@ void mitk::PropertyList::ReplaceProperty(const std::string &propertyKey, BasePro
   Modified();
 }
 
-void mitk::PropertyList::RemoveProperty(const std::string &propertyKey, const std::string &contextName, bool fallBackOnDefaultContext)
+void mitk::PropertyList::RemoveProperty(const std::string &propertyKey, const std::string &/*contextName*/, bool /*fallBackOnDefaultContext*/)
 {
   auto it(m_Properties.find(propertyKey));
 

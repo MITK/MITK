@@ -33,7 +33,7 @@ void ExtendControlPoint(mitk::SemanticTypes::ControlPoint& controlPoint, mitk::S
 
 double CalculateDistanceInDays(mitk::SemanticTypes::Date leftDate, mitk::SemanticTypes::Date rightDate);
 
-mitk::SemanticTypes::ControlPoint mitk::GenerateControlPoint(const std::vector<mitk::DataNode::Pointer>& dataNodes)
+mitk::SemanticTypes::ControlPoint mitk::GenerateControlPoint(const std::vector<DataNode::Pointer>& dataNodes)
 {
   SemanticTypes::ControlPoint controlPoint;
   SemanticTypes::Date startPoint = GetStartPoint(dataNodes);
@@ -47,7 +47,7 @@ mitk::SemanticTypes::ControlPoint mitk::GenerateControlPoint(const std::vector<m
   return controlPoint;
 }
 
-mitk::SemanticTypes::ControlPoint mitk::GenerateControlPoint(const mitk::DataNode* datanode)
+mitk::SemanticTypes::ControlPoint mitk::GenerateControlPoint(const DataNode* datanode)
 {
   SemanticTypes::ControlPoint controlPoint;
   SemanticTypes::Date date = GetDICOMDateFromDataNode(datanode);
@@ -89,7 +89,7 @@ std::string mitk::GetControlPointAsString(const SemanticTypes::ControlPoint& con
   return dateAsString.str();
 }
 
-bool mitk::InsideControlPoint(const mitk::DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint)
+bool mitk::InsideControlPoint(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint)
 {
   SemanticTypes::Date date = GetDICOMDateFromDataNode(dataNode);
   if (date >= controlPoint.startPoint && date <= controlPoint.endPoint && !controlPoint.UID.empty())
@@ -126,7 +126,7 @@ bool mitk::CheckForOverlap(const SemanticTypes::ControlPoint& controlPoint, cons
   return true;
 }
 
-mitk::SemanticTypes::ControlPoint mitk::FindFittingControlPoint(const mitk::DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
+mitk::SemanticTypes::ControlPoint mitk::FindFittingControlPoint(const DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
 {
   SemanticTypes::Date dateFromDataNode = GetDICOMDateFromDataNode(dataNode);
   if (0 == dateFromDataNode.year)
@@ -153,7 +153,7 @@ mitk::SemanticTypes::ControlPoint mitk::FindFittingControlPoint(const SemanticTy
   return SemanticTypes::ControlPoint();
 }
 
-mitk::SemanticTypes::ControlPoint mitk::ExtendClosestControlPoint(const mitk::DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
+mitk::SemanticTypes::ControlPoint mitk::ExtendClosestControlPoint(const DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
 {
   SemanticTypes::Date dateFromDataNode = GetDICOMDateFromDataNode(dataNode);
   if (0 == dateFromDataNode.year)

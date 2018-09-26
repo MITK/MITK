@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkSemanticRelationsExports.h>
 
 // semantic relations module
-#include "mitkControlPointManager.h"
 #include "mitkDICOMHelper.h"
 #include "mitkISemanticRelationsObservable.h"
 #include "mitkISemanticRelationsObserver.h"
@@ -129,24 +128,6 @@ namespace mitk
     * @return                   The represented lesion.
     */
     SemanticTypes::Lesion GetRepresentedLesion(const DataNode* segmentationNode) const;
-    /**
-    * @brief Return the lesion presence of a given lesion at a given control point.
-    *
-    * @param caseID         The current case identifier is defined by the given string.
-    * @param lesion         A lesion with a UID that identifies the corresponding lesion instance.
-    * @param controlPoint   A control point with a UID that identifies the corresponding control point instance.
-    * @return               True, if the lesion is present at the given control point; false otherwise.
-    */
-    bool GetLesionPresence(const SemanticTypes::CaseID& caseID, const mitk::SemanticTypes::Lesion& lesion, const mitk::SemanticTypes::ControlPoint& controllPoint) const;
-    /**
-    * @brief Return the lesion volume of a given lesion at a given control point.
-    *
-    * @param caseID         The current case identifier is defined by the given string.
-    * @param lesion         A lesion with a UID that identifies the corresponding lesion instance.
-    * @param controlPoint   A control point with a UID that identifies the corresponding control point instance.
-    * @return               A value indicating the lesion volume.
-    */
-    double GetLesionVolume(const SemanticTypes::CaseID& caseID, const mitk::SemanticTypes::Lesion& lesion, const mitk::SemanticTypes::ControlPoint& controllPoint) const;
     /*
     * @brief  Check if the given segmentation refers to an existing lesion instance.
     *         This function can be used before calling 'GetRepresentedLesion' in order to avoid a possible exception.

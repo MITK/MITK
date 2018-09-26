@@ -75,8 +75,7 @@ namespace mitk
   * @param  caseID              The current case ID.
   * @param  semanticRelations   An instance of the semantic relations to retrieve the additional data.
   */
-  MITKSEMANTICRELATIONS_EXPORT void GenerateAdditionalLesionData(mitk::LesionData& lesionData, const SemanticTypes::CaseID& caseID, std::shared_ptr<SemanticRelations> semanticRelations);
-
+  MITKSEMANTICRELATIONS_EXPORT void GenerateAdditionalLesionData(LesionData& lesionData, const SemanticTypes::CaseID& caseID, std::shared_ptr<SemanticRelations> semanticRelations);
 } // namespace mitk
 
 #endif // MITKLESIONMANAGER_H

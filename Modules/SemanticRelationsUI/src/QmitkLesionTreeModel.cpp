@@ -98,35 +98,16 @@ QVariant QmitkLesionTreeModel::data(const QModelIndex& index, int role) const
   }
 
   QmitkLesionTreeItem* currentItem = GetItemByIndex(index);
-  if (currentItem->GetParent().expired())
+  if (Qt::DisplayRole == role)
   {
-    return QVariant();
-  }
-
-  auto parentItem = currentItem->GetParent().lock();
-  // parent exists and is the root item -> 1. item of a lesion entry
-  if (m_RootItem == parentItem)
-  {
-    if (Qt::DisplayRole == role)
+    if (currentItem->GetParent().expired())
     {
-      // display role fills the first columns with the property name "Volume"
-      if (0 == index.column())
-      {
-        return "Volume";
-      }
-      else
-      {
-        // display role fills other columns with the lesion volume info
-        return QVariant(currentItem->GetData().GetLesionVolume().at(index.column() - 1));
-      }
-
-      return "";
+      return QVariant();
     }
-  }
-  // parent is not the root item -> 2. item of a lesion entry
-  else
-  {
-    if (Qt::DisplayRole == role)
+
+    auto parentItem = currentItem->GetParent().lock();
+    // parent exists and is the root item -> 1. item of a lesion entry
+    if (m_RootItem == parentItem)
     {
       // display role fills the first columns with the lesion UID / name
       if (0 == index.column())
@@ -141,10 +122,33 @@ QVariant QmitkLesionTreeModel::data(const QModelIndex& index, int role) const
       else
       {
         // display role fills other columns with the lesion presence info
-        return QVariant(currentItem->GetData().GetLesionPresence().at(index.column() - 1));
-      }
+        const auto lesionPresence = currentItem->GetData().GetLesionPresence();
+        if (index.column() - 1 > static_cast<int>(lesionPresence.size()))
+        {
+          return "";
+        }
 
-      return "";
+        return QVariant(lesionPresence.at(index.column() - 1));
+      }
+    }
+    // parent is not the root item -> 2. item of a lesion entry
+    else
+    {
+      // display role fills the first columns with the property name "Volume"
+      if (0 == index.column())
+      {
+        return "Volume";
+      }
+      else
+      {
+        // display role fills other columns with the lesion volume info
+        const auto lesionVolume= currentItem->GetData().GetLesionVolume();
+        if (index.column() - 1 > static_cast<int>(lesionVolume.size()))
+        {
+          return "";
+        }
+        return QVariant(lesionVolume.at(index.column() - 1));
+      }
     }
   }
 

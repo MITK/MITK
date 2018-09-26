@@ -39,7 +39,7 @@ namespace mitk
   *
   * @par dataNodes   A vector of data node pointers that contain all the dates, that should be included in the newly generated control point.
   */
-  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint GenerateControlPoint(const std::vector<mitk::DataNode::Pointer>& dataNodes);
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint GenerateControlPoint(const std::vector<DataNode::Pointer>& dataNodes);
   /*
   * @brief Generates a control point from a given data node.
   *        The date is extracted from the data node by using the 'DICOMHelper::GetDateFromDataNode'-function. Inside the helper-function
@@ -48,7 +48,7 @@ namespace mitk
   *
   * @par datanode   A data node pointer, whose date should be included in the newly generated control point.
   */
-  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint GenerateControlPoint(const mitk::DataNode* datanode);
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint GenerateControlPoint(const DataNode* datanode);
   /*
   * @brief Generates a control point from a given date.
   *        Providing a single date, this date is assigned to both the start point and the end point of the newly created control point.
@@ -77,7 +77,7 @@ namespace mitk
   *
   * @return             True, if the extracted date lies inside the given control point; false otherwise.
   */
-  MITKSEMANTICRELATIONS_EXPORT bool InsideControlPoint(const mitk::DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint);
+  MITKSEMANTICRELATIONS_EXPORT bool InsideControlPoint(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint);
   /*
   * @brief Checks if the given date lies inside the given control point.
   *        To lie inside the given control point,
@@ -128,7 +128,7 @@ namespace mitk
   * @return                 The return value of the second 'FindFittingControlPoint'-function.
   *                         An empty control point, if no date can be extracted from the data node.
   */
-  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint FindFittingControlPoint(const mitk::DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints);
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint FindFittingControlPoint(const DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints);
   /*
   * @brief Tries to find a control point in all the given control points that contains the given date.
   *        The correct control point may be found by using the 'InsideControlPoint' function with the date, evaluated on each control point.
@@ -150,7 +150,7 @@ namespace mitk
   * @return                 The return value of the second 'ExtendClosestControlPoint'-function.
   *                         An empty control point, if no date can be extracted from the data node.
   */
-  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint ExtendClosestControlPoint(const mitk::DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints);
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint ExtendClosestControlPoint(const DataNode* dataNode, std::vector<SemanticTypes::ControlPoint>& allControlPoints);
   /*
   * @brief Tries to find the closest control point to the given date in all the given control points. This is done by sorting the given vector of all control points and
   *        finding the first control point that is newer than the given date. Then the distances to the neighboring control points (older and newer, if existent) is calculated,

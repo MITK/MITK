@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSemanticRelationsUIHelper.h"
 
 // semantic relations module
+#include <mitkControlPointManager.h>
 #include <mitkNodePredicates.h>
 #include <mitkSemanticRelationException.h>
 

@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations UI module
 #include "QmitkPatientTableInspector.h"
+#include "QmitkPatientTableHeaderView.h"
 
 // mitk qt widgets module
 #include "QmitkCustomVariants.h"
@@ -29,8 +30,12 @@ QmitkPatientTableInspector::QmitkPatientTableInspector(QWidget* parent/* =nullpt
 {
   m_Controls.setupUi(this);
 
+  QmitkPatientTableHeaderView* patientTableHeaderView = new QmitkPatientTableHeaderView(m_Controls.tableView);
+  m_Controls.tableView->setHorizontalHeader(patientTableHeaderView);
   m_Controls.tableView->horizontalHeader()->setHighlightSections(false);
+  m_Controls.tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
   m_Controls.tableView->verticalHeader()->setHighlightSections(false);
+  m_Controls.tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
   m_Controls.tableView->setSelectionMode(QAbstractItemView::SingleSelection);
   m_Controls.tableView->setSelectionBehavior(QAbstractItemView::SelectItems);
   m_Controls.tableView->setContextMenuPolicy(Qt::CustomContextMenu);

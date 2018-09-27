@@ -69,6 +69,7 @@ QmitkUSNavigationMarkerPlacement::QmitkUSNavigationMarkerPlacement()
   m_ImageAndNavigationDataLoggingTimer(new QTimer(this)),
   m_StdMultiWidget(nullptr),
   m_CombinedModality(nullptr),
+  m_ImageStreamNode(nullptr),
   m_ReinitAlreadyDone(false),
   m_IsExperimentRunning(false),
   m_CurrentApplicationName(),

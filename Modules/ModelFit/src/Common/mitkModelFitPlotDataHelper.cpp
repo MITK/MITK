@@ -171,13 +171,10 @@ mitk::PlotDataValues::value_type mitk::ModelFitPlotData::GetXMinMax() const
   }
   for (const auto& posCollection : this->positionalPlots)
   {
-    for (const auto& plot : *(posCollection.second.second))
+    auto sample = this->GetSamplePlot(posCollection.second.second);
+    if (sample)
     {
-      auto sample = this->GetSamplePlot(posCollection.second.second);
-      if (sample)
-      {
-        CheckXMinMaxFromPlotDataValues(sample->GetValues(), min, max);
-      }
+      CheckXMinMaxFromPlotDataValues(sample->GetValues(), min, max);
     }
   }
 
@@ -386,7 +383,7 @@ mitk::GenerateModelSignalPlotData(const mitk::Point3D& position, const mitk::mod
 }
 
 mitk::PlotDataCurveCollection::Pointer
-mitk::GenerateAdditionalModelFitPlotData(const mitk::Point3D& position, const mitk::modelFit::ModelFitInfo* fitInfo, const mitk::ModelBase::TimeGridType& timeGrid)
+mitk::GenerateAdditionalModelFitPlotData(const mitk::Point3D& /*position*/, const mitk::modelFit::ModelFitInfo* fitInfo, const mitk::ModelBase::TimeGridType& timeGrid)
 {
   if (!fitInfo)
   {

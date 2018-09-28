@@ -108,7 +108,7 @@ void QmitkCESTNormalizeView::OnNormalizeButtonClicked()
 QmitkCESTNormalizeView::QmitkCESTNormalizeView()
 {
   auto isImage = mitk::NodePredicateDataType::New("Image");
-  auto isCESTImage = mitk::NodePredicateDataProperty::New("CEST.TotalScanTime");
+  auto isCESTImage = mitk::NodePredicateDataProperty::New(mitk::CEST_PROPERTY_NAME_TOTALSCANTIME().c_str());
 
   this->m_IsCESTImagePredicate = mitk::NodePredicateAnd::New(isImage, isCESTImage).GetPointer();
 }

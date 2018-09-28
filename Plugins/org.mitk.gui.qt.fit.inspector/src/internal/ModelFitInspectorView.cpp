@@ -259,9 +259,18 @@ int ModelFitInspectorView::ActualizeFitSelectionWidget()
     if (info.IsNotNull())
     {
       this->m_modelfitList.insert(std::make_pair(info->uid, info));
-
+      std::ostringstream nameStrm;
+      if (info->fitName.empty())
+      {
+        nameStrm << info->uid;
+      }
+      else
+      {
+        nameStrm << info->fitName;
+      }
+      nameStrm << " (" << info->modelName << ")";
       QVariant data(info->uid.c_str());
-      m_Controls.cmbFit->addItem(QString::fromStdString(info->modelName), data);
+      m_Controls.cmbFit->addItem(QString::fromStdString(nameStrm.str()), data);
     }
     else
     {

@@ -75,6 +75,8 @@ private:
   mitk::RESTClient* m_RestClient;
 
   std::string m_CurrentStudyUID;
+ // use filesystem::path later...
+  std::string m_downloadBaseDir = "/temp/";
 };
 
 #endif // SegmentationReworkView_h

@@ -47,8 +47,8 @@ namespace mitk
     virtual ~RESTClient();
 
 	pplx::task<void> Post(utility::string_t uri,
-                          utility::string_t contentType,
-                          concurrency::streams::streambuf<uint8_t> data);
+                       utility::string_t contentType,
+                       concurrency::streams::basic_istream<unsigned char> fileStream);
     pplx::task<void> Get(const utility::string_t filePath, utility::string_t uri);
     pplx::task<void> WadoRS(const utility::string_t filePath, std::string studyUID, std::string seriesUID, std::string instanceUID);
     pplx::task<std::string> WadoRS(const utility::string_t filePath, std::string studyUID, std::string seriesUID);

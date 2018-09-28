@@ -193,6 +193,9 @@ protected:
   /// React to node changes. Overridden from QmitkAbstractView.
   ///
   void NodeChanged(const mitk::DataNode* /*node*/) override;
+
+  void UseAllGrayValuesFromImage(mitk::DataNode* node);
+
 protected:
 
   QWidget* m_Parent;

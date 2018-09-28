@@ -795,7 +795,36 @@ void QmitkRenderWindowMenu::OnTSNumChanged(int num)
 
   if (m_Renderer.IsNotNull())
   {
-    if (num == 0)
+    static unsigned int defaultThickMode = 1;
+    unsigned int thickSlicesMode = 0;
+    // determine the state of the thick-slice mode
+    mitk::ResliceMethodProperty *resliceMethodEnumProperty = nullptr;
+
+    if(m_Renderer->GetCurrentWorldPlaneGeometryNode()->GetProperty(resliceMethodEnumProperty, "reslice.thickslices") && resliceMethodEnumProperty)
+    {
+      thickSlicesMode = resliceMethodEnumProperty->GetValueAsId();
+      if(thickSlicesMode!=0)
+        defaultThickMode = thickSlicesMode;
+    }
+
+    if(thickSlicesMode==0 && num>0) //default mode only for single slices
+    {
+      thickSlicesMode = defaultThickMode; //mip default
+      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.showarea",
+                                                                  mitk::BoolProperty::New(true));
+    }
+    if(num<1)
+    {
+      thickSlicesMode = 0;
+      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.showarea",
+                                                                  mitk::BoolProperty::New(false));
+    }
+
+    m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices",
+                                                                mitk::ResliceMethodProperty::New(thickSlicesMode));
+    m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.num",
+                                                                mitk::IntProperty::New(num));
+    /*if (num == 0)
     {
       m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices",
                                                                   mitk::ResliceMethodProperty::New(0));
@@ -812,7 +841,7 @@ void QmitkRenderWindowMenu::OnTSNumChanged(int num)
                                                                   mitk::IntProperty::New(num));
       m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.showarea",
                                                                   mitk::BoolProperty::New(true));
-    }
+    }*/
     m_TSLabel->setText(QString::number(num * 2 + 1));
     m_Renderer->SendUpdateSlice();
     m_Renderer->GetRenderingManager()->RequestUpdateAll();
@@ -959,8 +988,8 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
         currentNum = m->GetValue();
         if (currentNum < 1)
           currentNum = 1;
-        if (currentNum > 10)
-          currentNum = 10;
+        //if (currentNum > 10)
+        //  currentNum = 10;
       }
     }
 
@@ -969,7 +998,7 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
 
     QSlider *m_TSSlider = new QSlider(crosshairModesMenu);
     m_TSSlider->setMinimum(0);
-    m_TSSlider->setMaximum(9);
+    m_TSSlider->setMaximum(50);
     m_TSSlider->setValue(currentNum);
 
     m_TSSlider->setOrientation(Qt::Horizontal);

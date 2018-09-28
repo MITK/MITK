@@ -26,6 +26,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIOUtil.h>
 
+#include <boost/uuid/uuid.hpp>            // uuid class
+#include <boost/uuid/uuid_generators.hpp> // generators
+#include <boost/uuid/uuid_io.hpp> 
+#include <boost/lexical_cast.hpp>
+#include <filesystem>
+
 const std::string SegmentationReworkView::VIEW_ID = "org.mitk.views.segmentationreworkview";
 
 void SegmentationReworkView::SetFocus() {}
@@ -65,9 +71,19 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
   SetSimilarityGraph(dto.simScoreArray, dto.minSliceStart);
 
   MITK_INFO << "Load related dicom series ...";
-  std::string folderPathSeries = "/temp/downloadSeries/";
-  auto folderPathSegA = U("/temp/segA/");
-  auto folderPathSegB = U("/temp/segB/");
+  boost::uuids::random_generator generator;
+    
+  std::string folderPathSeries = m_downloadBaseDir + boost::uuids::to_string(generator()) + "/";
+  std::experimental::filesystem::create_directory(folderPathSeries);
+
+  std::string pathSegA = m_downloadBaseDir + boost::uuids::to_string(generator()) + "/";
+  std::string pathSegB = m_downloadBaseDir + boost::uuids::to_string(generator()) + "/";
+
+  auto folderPathSegA = utility::conversions::to_string_t(pathSegA);
+  auto folderPathSegB = utility::conversions::to_string_t(pathSegB);
+
+  std::experimental::filesystem::create_directory(pathSegA);
+  std::experimental::filesystem::create_directory(pathSegB);
 
   m_CurrentStudyUID = dto.studyUID;
 
@@ -88,7 +104,10 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 void SegmentationReworkView::LoadData(std::vector<std::string> filePathList)
 {
   MITK_INFO << "Loading finished. Pushing data to data storage ...";
-  mitk::IOUtil::Load(filePathList, *this->GetDataStorage());
+  auto ds = GetDataStorage();
+  mitk::IOUtil::Load(filePathList, *ds);
+  // reinit view
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(ds);
 }
 
 void SegmentationReworkView::UpdateChartWidget()
@@ -130,17 +149,14 @@ void SegmentationReworkView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /
 
 void SegmentationReworkView::UploadNewSegmentation()
 {
-  auto filePath = U("/temp/segA/1.2.276.0.7230010.3.1.4.296485376.8.1533635734.141264.dcm");
+  auto filePath = U("1.2.276.0.7230010.3.1.4.296485376.8.1533635734.141264.dcm");
   m_CurrentStudyUID = "1.2.840.113654.2.70.1.159145727925405623564217141386659468090";
   try {
-    m_RestClient->StowRS(filePath, m_CurrentStudyUID).then([]
-    {
-      MITK_INFO << "SEG uploaded";
-    });
+    m_RestClient->StowRS(filePath, m_CurrentStudyUID).wait();
   }
-  catch (std::exception &exception)
+  catch (const std::exception &exception)
   {
-    MITK_ERROR << exception.what();
+    std::cout << exception.what() << std::endl;
   }
 }
 

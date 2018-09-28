@@ -824,24 +824,7 @@ void QmitkRenderWindowMenu::OnTSNumChanged(int num)
                                                                 mitk::ResliceMethodProperty::New(thickSlicesMode));
     m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.num",
                                                                 mitk::IntProperty::New(num));
-    /*if (num == 0)
-    {
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices",
-                                                                  mitk::ResliceMethodProperty::New(0));
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.num",
-                                                                  mitk::IntProperty::New(num));
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.showarea",
-                                                                  mitk::BoolProperty::New(false));
-    }
-    else
-    {
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices",
-                                                                  mitk::ResliceMethodProperty::New(1));
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.num",
-                                                                  mitk::IntProperty::New(num));
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.showarea",
-                                                                  mitk::BoolProperty::New(true));
-    }*/
+
     m_TSLabel->setText(QString::number(num * 2 + 1));
     m_Renderer->SendUpdateSlice();
     m_Renderer->GetRenderingManager()->RequestUpdateAll();
@@ -986,10 +969,6 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
       if (m.IsNotNull())
       {
         currentNum = m->GetValue();
-        if (currentNum < 1)
-          currentNum = 1;
-        //if (currentNum > 10)
-        //  currentNum = 10;
       }
     }
 

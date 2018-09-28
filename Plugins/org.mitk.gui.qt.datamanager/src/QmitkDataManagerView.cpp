@@ -552,7 +552,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_ColormapAction->setMenu(new QMenu);
   QObject::connect( m_ColormapAction->menu(), SIGNAL( aboutToShow() )
     , this, SLOT( ColormapMenuAboutToShow() ) );
-  imageDataNodeDescriptor->AddAction(m_ColormapAction, false);
+  imageDataNodeDescriptor->AddAction(m_ColormapAction);
   m_DescriptorActionList.push_back(std::make_pair(imageDataNodeDescriptor, m_ColormapAction));
   if (diffusionImageDataNodeDescriptor!=nullptr)
   {
@@ -866,30 +866,38 @@ void QmitkDataManagerView::TextureInterpolationToggled( bool checked )
 
 void QmitkDataManagerView::ColormapActionToggled( bool /*checked*/ )
 {
-  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
-  if(!node)
-    return;
+  auto selected_indices = m_NodeTreeView->selectionModel()->selectedIndexes();
+  for (auto& selected_index : selected_indices)
+  {
+    auto node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(selected_index));
+    if (!node)
+      return;
 
-  mitk::LookupTableProperty::Pointer lookupTableProperty =
-    dynamic_cast<mitk::LookupTableProperty*>(node->GetProperty("LookupTable"));
-  if (!lookupTableProperty)
-    return;
+    mitk::LookupTableProperty::Pointer lookupTableProperty =
+      dynamic_cast<mitk::LookupTableProperty*>(node->GetProperty("LookupTable"));
+    if (!lookupTableProperty)
+      return;
 
-  QAction* senderAction = qobject_cast<QAction*>(QObject::sender());
-  if(!senderAction)
-    return;
+    QAction* senderAction = qobject_cast<QAction*>(QObject::sender());
+    if (!senderAction)
+      return;
 
-  std::string activatedItem = senderAction->text().toStdString();
+    std::string activatedItem = senderAction->text().toStdString();
 
-  mitk::LookupTable::Pointer lookupTable = lookupTableProperty->GetValue();
-  if (!lookupTable)
-    return;
+    mitk::LookupTable::Pointer lookupTable = lookupTableProperty->GetValue();
+    if (!lookupTable)
+      return;
 
-  lookupTable->SetType(activatedItem);
-  lookupTableProperty->SetValue(lookupTable);
-  mitk::RenderingModeProperty::Pointer renderingMode =
-    dynamic_cast<mitk::RenderingModeProperty*>(node->GetProperty("Image Rendering.Mode"));
-  renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
+    lookupTable->SetType(activatedItem);
+    lookupTableProperty->SetValue(lookupTable);
+    mitk::RenderingModeProperty::Pointer renderingMode =
+      dynamic_cast<mitk::RenderingModeProperty*>(node->GetProperty("Image Rendering.Mode"));
+    renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
+
+    // set the level window to include all gray values so that the color map values use the whole pixel range
+    UseAllGrayValuesFromImage(node);
+  }
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -1137,6 +1145,17 @@ void QmitkDataManagerView::NodeChanged(const mitk::DataNode* /*node*/)
   // m_FilterModel->invalidate();
   // fix as proposed by R. Khlebnikov in the mitk-users mail from 02.09.2014
   QMetaObject::invokeMethod( m_FilterModel, "invalidate", Qt::QueuedConnection );
+}
+
+void QmitkDataManagerView::UseAllGrayValuesFromImage(mitk::DataNode* node)
+{
+  auto image = dynamic_cast<mitk::Image*>(node->GetData());
+  if (nullptr != image)
+  {
+    mitk::LevelWindow levelWindow;
+    levelWindow.SetToImageRange(image);
+    node->SetLevelWindow(levelWindow);
+  }
 }
 
 QItemSelectionModel *QmitkDataManagerView::GetDataNodeSelectionModel() const

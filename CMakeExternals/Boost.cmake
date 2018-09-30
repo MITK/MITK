@@ -146,7 +146,7 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
       COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>/boost" "<INSTALL_DIR>/${_boost_install_include_dir}")
   endif()
 
-  set(_boost_patch_cmd PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Boost.patch)
+  set(_boost_patch_cmd PATCH_COMMAND ${PATCH_COMMAND} --binary -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Boost.patch)
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}

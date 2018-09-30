@@ -63,6 +63,7 @@
 #!
 #! Multi-value Parameters (all optional):
 #!
+
 #! \param SUBPROJECTS List of CDash labels
 #! \param INCLUDE_DIRS Include directories for this module:
 #!        \verbatim
@@ -343,6 +344,7 @@ function(mitk_create_module)
     if(NOT MODULE_WARNINGS_NO_ERRORS)
       if(MSVC_VERSION)
         mitkFunctionCheckCAndCXXCompilerFlags("/WX" module_c_flags module_cxx_flags)
+        mitkFunctionCheckCAndCXXCompilerFlags("/w34100" module_c_flags module_cxx_flags)
       else()
         mitkFunctionCheckCAndCXXCompilerFlags(-Werror module_c_flags module_cxx_flags)
 

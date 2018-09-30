@@ -1,14 +1,34 @@
---- original/tools/build/src/engine/config_toolset.bat	Sat Sep 02 12:56:19 2017
-+++ modified/tools/build/src/engine/config_toolset.bat	Thu Oct 19 13:04:51 2017
-@@ -170,7 +170,10 @@
- if "_%BOOST_JAM_ARCH%_" == "__" set BOOST_JAM_ARCH=x86
- set BOOST_JAM_ARGS=%BOOST_JAM_ARGS% %BOOST_JAM_ARCH%
-
--if "_%VSINSTALLDIR%_" == "__" call :Call_If_Exists "%BOOST_JAM_TOOLSET_ROOT%Auxiliary\Build\vcvarsall.bat" %BOOST_JAM_ARGS%
-+if "_%VSINSTALLDIR%_" == "__" (
-+    set VSCMD_START_DIR=%CD%
-+    call :Call_If_Exists "%BOOST_JAM_TOOLSET_ROOT%Auxiliary\Build\vcvarsall.bat" %BOOST_JAM_ARGS%
-+)
- set "BOOST_JAM_CC=cl /nologo /RTC1 /Zi /MTd /Fobootstrap/ /Fdbootstrap/ -DNT -DYYDEBUG -wd4996 kernel32.lib advapi32.lib user32.lib"
- set "BOOST_JAM_OPT_JAM=/Febootstrap\jam0"
- set "BOOST_JAM_OPT_MKJAMBASE=/Febootstrap\mkjambase0"
+--- a/include/boost/iostreams/detail/config/fpos.hpp
++++ b/include/boost/iostreams/detail/config/fpos.hpp
+@@ -1,7 +1,7 @@
+ /*
+- * Distributed under the Boost Software License, Version 1.0.(See accompanying 
++ * Distributed under the Boost Software License, Version 1.0.(See accompanying
+  * file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt.)
+- * 
++ *
+  * See http://www.boost.org/libs/iostreams for documentation.
+ 
+  * File:        boost/iostreams/detail/execute.hpp
+@@ -11,7 +11,7 @@
+  * Contact:     turkanis at coderage dot com
+  *
+  * Defines the preprocessor symbol BOOST_IOSTREAMS_HAS_DINKUMWARE_FPOS for
+- * platforms that use the implementation of std::fpos from the Dinkumware 
++ * platforms that use the implementation of std::fpos from the Dinkumware
+  * Standard Library.
+  */
+ 
+@@ -25,9 +25,10 @@
+ #include <boost/config.hpp>
+ 
+ # if (defined(_YVALS) || defined(_CPPLIB_VER)) && !defined(__SGI_STL_PORT) && \
+-     !defined(_STLPORT_VERSION) && !defined(__QNX__) && !defined(_VX_CPU) && !defined(__VXWORKS__)
++     !defined(_STLPORT_VERSION) && !defined(__QNX__) && !defined(_VX_CPU) && !defined(__VXWORKS__) \
++     && !(defined(BOOST_MSVC) && _MSVC_STL_VERSION >= 141)
+      /**/
+-     
++
+ #include <boost/iostreams/detail/ios.hpp>
+ 
+ #  define BOOST_IOSTREAMS_HAS_DINKUMWARE_FPOS

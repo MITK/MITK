@@ -238,7 +238,7 @@ boost::posix_time::ptime ConvertOFDateTimeToPTime( const OFDateTime& time )
   const boost::posix_time::time_duration boostTime =
     boost::posix_time::hours( time.getTime().getHour() )
     + boost::posix_time::minutes( time.getTime().getMinute() )
-    + boost::posix_time::seconds( time.getTime().getSecond() )
+    + boost::posix_time::seconds( static_cast<int>(time.getTime().getSecond()) )
     + boost::posix_time::milliseconds( time.getTime().getMilliSecond() );
 
   boost::posix_time::ptime result( boostDate, boostTime );

@@ -15,7 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkRESTClient.h"
+#include "mitkRESTUtil.h"
 
+#include <filesystem>
 #include <mitkCommon.h>
 
 mitk::RESTClient::RESTClient(utility::string_t url) : m_Client(url) {
@@ -58,23 +60,56 @@ pplx::task<void> mitk::RESTClient::Post(utility::string_t uri,
   MITK_INFO << "Calling POST with " << utility::conversions::to_utf8string(uri) << " on client "
             << utility::conversions::to_utf8string(m_Client.base_uri().to_string());
 
+
+  concurrency::streams::container_buffer<std::string> inStringBuffer;
+  return fileStream.read(inStringBuffer, fileStream.streambuf().size()).then([=](size_t bytesRead) -> pplx::task<void>
+  {
+    const std::string &text = inStringBuffer.collection();
+
+    std::string body = "";
+    body += "\r\n--boundary";
+    body += "\r\nContentType: " + utility::conversions::to_utf8string("application/dicom") + "\r\n\r\n";
+    body += text;
+    body += "\r\n--boundary--";
+
+    auto utf8String = utility::conversions::to_utf8string(body);
+
+    auto binaryVector = std::vector<unsigned char>(utf8String.begin(), utf8String.end());
+
+    MitkRequest postRequest(MitkRESTMethods::POST);
+    postRequest.set_request_uri(uri);
+    postRequest.headers().add(U("Content-Type"), contentType);
+    postRequest.set_body(binaryVector);
+ 
+    MITK_INFO << "Request: " << utility::conversions::to_utf8string(postRequest.to_string());
+
+    return m_Client.request(postRequest).then([fileStream](MitkResponse response)
+    {
+      fileStream.close();
+      MITK_INFO << "Response: " << utility::conversions::to_utf8string(response.to_string());
+    });
+  });
+}
+
+pplx::task<void> mitk::RESTClient::Post(utility::string_t uri, utility::string_t contentType, utility::string_t filePath)
+{
+  mitk::RESTUtil util;
+  util.AddParameter("dicomObject", std::experimental::filesystem::path(utility::conversions::to_utf8string(filePath)).filename().string());
+  util.AddFile("file", utility::conversions::to_utf8string(filePath));
+  std::string boundary = util.boundary();
+  std::string body = util.GenBodyContent();
+
   MitkRequest postRequest(MitkRESTMethods::POST);
   postRequest.set_request_uri(uri);
-  postRequest.headers().add(U("Content-Type"), contentType);
-  postRequest.set_body(fileStream);
-
-  MITK_INFO << fileStream.is_open();
-  MITK_INFO << fileStream.is_valid();
-  MITK_INFO << fileStream.streambuf().size();
-  MITK_INFO << fileStream.streambuf().can_read();
+  postRequest.set_body(body, utility::conversions::to_utf8string(contentType));
 
   MITK_INFO << "Request: " << utility::conversions::to_utf8string(postRequest.to_string());
-  
-  return m_Client.request(postRequest).then([fileStream](MitkResponse response)
+
+  return m_Client.request(postRequest).then([](MitkResponse response)
   {
-    fileStream.close();
     MITK_INFO << "Response: " << utility::conversions::to_utf8string(response.to_string());
   });
+
 }
 
 pplx::task<void> mitk::RESTClient::WadoRS(utility::string_t filePath, std::string studyUID, std::string seriesUID, std::string instanceUID)
@@ -157,6 +192,6 @@ pplx::task<void> mitk::RESTClient::StowRS(utility::string_t filePath, std::strin
   builder.append_path(utility::conversions::to_string_t(studyUID));
 
   return concurrency::streams::file_stream<unsigned char>::open_istream(filePath).then([=](concurrency::streams::basic_istream<unsigned char> fileStream) {
-    return Post(builder.to_string(), U("multipart/related; type='application/dicom';"), fileStream);
+    return Post(builder.to_string(), U("multipart/related; type='application/dicom'; boundary='boundary'"), fileStream);
   });
 }

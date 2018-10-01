@@ -3,4 +3,5 @@ file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURREN
 set(CPP_FILES
   mitkRESTServer.cpp
   mitkRESTClient.cpp
+  mitkRESTUtil.cpp
 )

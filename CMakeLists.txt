@@ -215,9 +215,24 @@ if(MITK_USE_Qt5)
   set(MITK_QT5_MINIMUM_VERSION 5.11.1)
   set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets Xml XmlPatterns WebEngineWidgets UiTools Help LinguistTools)
   if(APPLE)
-    set(MITK_QT5_COMPONENTS ${MITK_QT5_COMPONENTS} DBus)
+    list(APPEND MITK_QT5_COMPONENTS DBus)
   endif()
-  find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED)
+
+  # Hint at default install locations of Qt
+  if(NOT Qt5_DIR)
+    if(MSVC)
+      if(EXISTS C:/Qt AND CMAKE_GENERATOR MATCHES "^Visual Studio [0-9]+ ([0-9]+)")
+        set(_glob_expression "C:/Qt/5.*/msvc${CMAKE_MATCH_1}")
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+          set(_glob_expression "${_glob_expression}_64")
+        endif()
+        FILE(GLOB MITK_QT5_HINTS ${_glob_expression})
+        list(SORT MITK_QT5_HINTS)
+      endif()
+    endif() # TODO: Linux and macOS
+  endif()
+
+  find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED HINTS ${MITK_QT5_HINTS})
 endif()
 
 set_property(GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS "")

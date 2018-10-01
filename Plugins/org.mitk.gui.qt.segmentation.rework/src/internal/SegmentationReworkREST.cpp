@@ -22,13 +22,35 @@ SegmentationReworkREST::SegmentationReworkREST() {}
 SegmentationReworkREST::SegmentationReworkREST(utility::string_t url) : mitk::RESTServer(url)
 {
   m_Listener.support(MitkRESTMethods::PUT, std::bind(&SegmentationReworkREST::HandlePut, this, std::placeholders::_1));
+  m_Listener.support(MitkRESTMethods::GET, std::bind(&SegmentationReworkREST::HandleGet, this, std::placeholders::_1));
 }
 
 SegmentationReworkREST::~SegmentationReworkREST() {}
 
-void SegmentationReworkREST::SetPutCallback(std::function<void(DicomDTO& message)> callback)
+void SegmentationReworkREST::HandleGet(MitkRequest message) 
 {
-  m_PutCallback = callback;
+  auto messageString = message.to_string();
+  MITK_INFO << "Message GET incoming...";
+  MITK_INFO << convertToUtf8(messageString);
+
+  auto http_get_vars = web::uri::split_query(message.request_uri().query());
+
+  // IHE Invoke Image Display style
+  auto requestType = http_get_vars.at(L"requestType");
+
+  if (requestType == L"IMAGE_SEG")
+  {
+    auto studyUID = http_get_vars.at(L"studyUID");
+    auto imageSeriesUID = http_get_vars.at(L"imageSeriesUID");
+    auto segSeriesUID = http_get_vars.at(L"segSeriesUID");
+
+    DicomDTO dto;
+    dto.imageSeriesUID = convertToUtf8(imageSeriesUID);
+    dto.studyUID = convertToUtf8(studyUID);
+    dto.segSeriesUIDA = convertToUtf8(segSeriesUID);
+
+    m_GetCallback(dto);
+  }
 }
 
 void SegmentationReworkREST::HandlePut(MitkRequest message)
@@ -63,7 +85,8 @@ void SegmentationReworkREST::HandlePut(MitkRequest message)
       std::vector<double> vec;
       web::json::array simArray = simScoreKey.as_array();
 
-      for (web::json::value score : simArray) {
+      for (web::json::value score : simArray)
+      {
         vec.push_back(score.as_double());
       }
 

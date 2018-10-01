@@ -58,6 +58,7 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   connect(this, &SegmentationReworkView::InvokeLoadData, this, &SegmentationReworkView::LoadData);
 
   m_HttpHandler->SetPutCallback(std::bind(&SegmentationReworkView::RESTPutCallback, this, std::placeholders::_1));
+  m_HttpHandler->SetGetCallback(std::bind(&SegmentationReworkView::RESTGetCallback, this, std::placeholders::_1));
   m_HttpHandler->Open().wait();
 
   MITK_INFO << "Listening for requests at: " << utility::conversions::to_utf8string(address);
@@ -99,6 +100,27 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
   auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) {
     InvokeLoadData(filePathList);
   });
+}
+
+void SegmentationReworkView::RESTGetCallback(const SegmentationReworkREST::DicomDTO &dto) 
+{
+  boost::uuids::random_generator generator;
+
+  std::string folderPathSeries = m_downloadBaseDir + boost::uuids::to_string(generator()) + "/";
+  std::experimental::filesystem::create_directory(folderPathSeries);
+
+  std::string pathSeg = m_downloadBaseDir + boost::uuids::to_string(generator()) + "/";
+  auto folderPathSeg = utility::conversions::to_string_t(pathSeg);
+  std::experimental::filesystem::create_directory(pathSeg);
+
+  std::vector<pplx::task<std::string>> tasks;
+  auto imageSeriesTask = m_RestClient->WadoRS(utility::conversions::to_string_t(folderPathSeries), dto.studyUID, dto.imageSeriesUID);
+  auto segATask = m_RestClient->WadoRS(folderPathSeg, dto.studyUID, dto.segSeriesUIDA);
+  tasks.push_back(imageSeriesTask);
+  tasks.push_back(segATask);
+
+  auto joinTask = pplx::when_all(begin(tasks), end(tasks));
+  auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) { InvokeLoadData(filePathList); });
 }
 
 void SegmentationReworkView::LoadData(std::vector<std::string> filePathList)

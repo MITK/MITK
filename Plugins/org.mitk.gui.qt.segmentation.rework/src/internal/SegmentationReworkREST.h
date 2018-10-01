@@ -24,14 +24,14 @@ class SegmentationReworkREST : public mitk::RESTServer
   Q_OBJECT
 
 public:
-
-  struct DicomDTO {
+  struct DicomDTO
+  {
     std::string segSeriesUIDA;
     std::string segSeriesUIDB;
     std::string imageSeriesUID;
-	std::string studyUID;
+    std::string studyUID;
     std::string segInstanceUIDA;
-	std::string segInstanceUIDB;
+    std::string segInstanceUIDB;
     std::vector<double> simScoreArray;
     int minSliceStart;
   };
@@ -41,13 +41,23 @@ public:
   ~SegmentationReworkREST();
 
   void HandlePut(MitkRequest message);
-  void SetPutCallback(std::function<void(DicomDTO& message)> callback);
+  void HandleGet(MitkRequest message);
+
+  void SetPutCallback(std::function<void(DicomDTO &message)> callback)
+  { 
+	  m_PutCallback = callback;
+  }
+  void SetGetCallback(std::function<void(DicomDTO &message)> callback) 
+  {
+	  m_GetCallback = callback;
+  }
 
 signals:
   void InvokeUpdateChartWidget();
 
 private:
-  std::function<void(DicomDTO& message)> m_PutCallback;
+  std::function<void(DicomDTO &message)> m_PutCallback;
+  std::function<void(DicomDTO &message)> m_GetCallback;
 };
 
 #endif // SegmentationReworkREST_h

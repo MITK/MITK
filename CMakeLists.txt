@@ -657,6 +657,10 @@ if(WIN32)
   mitkFunctionCheckCompilerFlags("/wd4180" MITK_CXX_FLAGS) # warning C4180: qualifier applied to function type has no meaning
 endif()
 
+if(APPLE)
+  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -DGL_SILENCE_DEPRECATION") # Apple deprecated OpenGL in macOS 10.14
+endif()
+
 if(NOT MSVC_VERSION)
   foreach(_flag
     -Wall

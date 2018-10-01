@@ -86,15 +86,15 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 #-----------------------------------------------------------------------------
-# Check miminum Mac OS X version
+# Check miminum macOS version
 #-----------------------------------------------------------------------------
-# The minimum supported Mac OS X version is 10.9. If you use a version less than 10.9, there is no guarantee that the build still works.
+# The minimum supported macOS version is 10.13. If you use a version less than 10.13, there is no guarantee that the build still works.
 if(APPLE)
-  exec_program(sw_vers ARGS -productVersion OUTPUT_VARIABLE osx_version)
-  if (osx_version VERSION_LESS "10.13")
-    message(WARNING "Detected macOS version \"${osx_version}\" is not supported anymore. Minimum required macOS version is at least 10.13.")
+  exec_program(sw_vers ARGS -productVersion OUTPUT_VARIABLE macos_version)
+  if (macos_version VERSION_LESS "10.13")
+    message(WARNING "Detected macOS version \"${macos_version}\" is not supported anymore. Minimum required macOS version is at least 10.13.")
   endif()
-  if (CMAKE_OSX_DEPLOYMENT_TARGET AND CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.9)
+  if (CMAKE_OSX_DEPLOYMENT_TARGET AND CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.13)
     message(WARNING "Detected macOS deployment target \"${CMAKE_OSX_DEPLOYMENT_TARGET}\" is not supported anymore. Minimum required macOS version is at least 10.13.")
   endif()
 endif()
@@ -595,7 +595,7 @@ endif()
 # These should be set before any MITK install macros are used
 #-----------------------------------------------------------------------------
 
-# on Mac OSX all BlueBerry plugins get copied into every
+# on macOS all BlueBerry plugins get copied into every
 # application bundle (.app directory) specified here
 if(MITK_USE_BLUEBERRY AND APPLE)
 

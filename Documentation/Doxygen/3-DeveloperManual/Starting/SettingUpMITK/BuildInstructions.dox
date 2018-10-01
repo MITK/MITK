@@ -24,10 +24,10 @@ You need:
      clients available). We recomment using Git, but see below for a way how to
      get the current source code without using it.
   -# <a href="http://www.cmake.org">CMake</a> (version \minimumCMakeVersion or higher)
-  -# <a href="http://qt.io">Qt</a> 5.10.1 if you plan to develop Qt-based
+  -# <a href="http://qt.io">Qt</a> 5.11.1 if you plan to develop Qt-based
      applications
-  -# If you are using <b>macOS</b> you need an XCode installation as it
-     provides the neccessary compilers and SDKs
+  -# If you are using <b>macOS</b> you need an XCode installation and the
+     Command Line Tools as it provides the neccessary compilers and SDKs
 
 \section BuildInstructions_Qt A note about Qt
 
@@ -69,7 +69,7 @@ and configure the project.
 
 CMake will present you a couple of options, these are the most important ones:
 
- - <tt><b>CMAKE_PREFIX_PATH</b></tt> The path to your Qt installation, e.g., <i>C:/Qt/5.6/msvc2013_64</i> or <i>/home/user/Qt/5.6/gcc_64</i>
+ - <tt><b>CMAKE_PREFIX_PATH</b></tt> The path to your Qt installation, e.g., <i>C:/Qt/5.11.1/msvc2017_64</i> or <i>/home/user/Qt/5.11.1/gcc_64</i>
  - <tt><b>MITK_USE_ACVD</b></tt> Build MITK code which depends on ACVD (this
    will download and build ACVD)
  - <tt><b>MITK_USE_BLUEBERRY</b></tt> Build the BlueBerry application framework
@@ -84,7 +84,7 @@ CMake will present you a couple of options, these are the most important ones:
 If you are satisfied with the configuration of your MITK superbuild, generate
 the project files with CMake by pressing "Generate".
 
-<b>Linux</b> and <b>Mac OS X</b> users usually just enter "make" (optionally
+<b>Linux</b> and <b>macOS</b> users usually just enter "make" (optionally
 supplying the number threads to be used for a parallel build):
 \code
 make -j6
@@ -114,7 +114,7 @@ MITK-superbuild
 To change the configuration of the MITK build itself, choose the MITK-build directory
 as the binary directory in the CMake GUI (not the MITK-superbuild directory).
 After generating the project files, build the MITK project by either issuing "make"
-in the MITK-build directory (Linux, Mac OS X), or by opening MITK-build/MITK.sln (Windows).
+in the MITK-build directory (Linux, macOS), or by opening MITK-build/MITK.sln (Windows).
 
 You may also change the configuration of any project configured via the
 superbuild process. Make sure to also build the changed project and also the

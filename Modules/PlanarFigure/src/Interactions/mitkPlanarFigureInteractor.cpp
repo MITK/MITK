@@ -274,7 +274,7 @@ void mitk::PlanarFigureInteractor::AddPoint(StateMachineAction *, InteractionEve
   * In the second case we need to determine the proper insertion index. In the first case the index always has
   * to be -1 so that the point is appended to the end.
   *
-  * These changes are necessary because of a mac os x specific issue: If a users draws a PlanarPolygon then the
+  * These changes are necessary because of a macOS specific issue: If a users draws a PlanarPolygon then the
   * next point to be added moves according to the mouse position. If then the user left clicks in order to add
   * a point one would assume the last move position is identical to the left click position. This is actually the
   * case for windows and linux but somehow NOT for mac. Because of the insertion logic of a new point in the

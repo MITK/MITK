@@ -44,6 +44,7 @@ public:
   static const std::string VIEW_ID;
 
   void RESTPutCallback(const SegmentationReworkREST::DicomDTO& dto);
+  void RESTGetCallback(const SegmentationReworkREST::DicomDTO& dto);
 
   void UpdateChartWidget();
   void LoadData(std::vector<std::string> filePathList);

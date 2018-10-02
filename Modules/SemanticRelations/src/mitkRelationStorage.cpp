@@ -185,77 +185,28 @@ mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GetControlPointOfData(c
   {
     // the second value of the data node vector is the ID of the referenced control point
     std::string controlPointID = dataNodeVectorValue[1];
-    // retrieve a vector property that contains the referenced ID of the dates of a control point (0. startPoint ID 1. endPoint ID)
-    mitk::VectorProperty<std::string>* controlPointVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(controlPointID));
+    // retrieve a vector property that contains the integer values of the date of a control point (0. year 1. month 2. day)
+    mitk::VectorProperty<int>* controlPointVectorProperty = dynamic_cast<mitk::VectorProperty<int>*>(propertyList->GetProperty(controlPointID));
     if (nullptr == controlPointVectorProperty)
     {
       MITK_INFO << "Could not find the control point " << controlPointID << " in the storage.";
       return SemanticTypes::ControlPoint();
     }
 
-    std::vector<std::string> controlPointVectorValue = controlPointVectorProperty->GetValue();
-    // a control point has to have exactly two values (the ID of two dates)
-    if (controlPointVectorValue.size() != 2)
+    std::vector<int> controlPointVectorValue = controlPointVectorProperty->GetValue();
+    // a control point has to have exactly three integer values (year, month and day)
+    if (controlPointVectorValue.size() != 3)
     {
-      MITK_INFO << "Incorrect control point storage. Not two (2) IDs of the start point and the end point are stored.";
+      MITK_INFO << "Incorrect control point storage. Not three (3) values of the date are stored.";
       return SemanticTypes::ControlPoint();
     }
     else
     {
-      // retrieve the start date
-      std::string startPointID = controlPointVectorValue[0];
-      mitk::VectorProperty<int>* startPointVectorProperty = dynamic_cast<mitk::VectorProperty<int>*>(propertyList->GetProperty(startPointID));
-      if (nullptr == startPointVectorProperty)
-      {
-        MITK_INFO << "Could not find the start date " << startPointID << " of the control point " << controlPointID << " in the storage.";
-        return SemanticTypes::ControlPoint();
-      }
-
-      std::vector<int> startPointValue = startPointVectorProperty->GetValue();
-      SemanticTypes::Date startPoint;
-      // a date has to have exactly three integer values
-      if (startPointValue.size() != 3)
-      {
-        MITK_INFO << "Incorrect start point storage. Not three (3) values of the date are stored.";
-        return SemanticTypes::ControlPoint();
-      }
-      else
-      {
-        startPoint.UID = startPointID;
-        startPoint.year = startPointValue[0];
-        startPoint.month = startPointValue[1];
-        startPoint.day = startPointValue[2];
-      }
-
-      // retrieve the end date
-      std::string endPointID = controlPointVectorValue[1];
-      mitk::VectorProperty<int>* endPointVectorProperty = dynamic_cast<mitk::VectorProperty<int>*>(propertyList->GetProperty(endPointID));
-      if (nullptr == endPointVectorProperty)
-      {
-        MITK_INFO << "Could not find the end date " << endPointID << " of the control point " << controlPointID << " in the storage.";
-        return SemanticTypes::ControlPoint();
-      }
-
-      std::vector<int> endPointValue = endPointVectorProperty->GetValue();
-      SemanticTypes::Date endPoint;
-      // a date has to have exactly three integer values
-      if (endPointValue.size() != 3)
-      {
-        MITK_INFO << "Incorrect end point storage. Not three (3) values of the date are stored.";
-        return SemanticTypes::ControlPoint();
-      }
-      else
-      {
-        endPoint.UID = endPointID;
-        endPoint.year = endPointValue[0];
-        endPoint.month = endPointValue[1];
-        endPoint.day = endPointValue[2];
-      }
-
       // set the values of the control point
       controlPoint.UID = controlPointID;
-      controlPoint.startPoint = startPoint;
-      controlPoint.endPoint = endPoint;
+      controlPoint.year = controlPointVectorValue[0];
+      controlPoint.month = controlPointVectorValue[1];
+      controlPoint.day = controlPointVectorValue[2];
     }
   }
 
@@ -283,77 +234,29 @@ std::vector<mitk::SemanticTypes::ControlPoint> mitk::RelationStorage::GetAllCont
   std::vector<SemanticTypes::ControlPoint> allControlPoints;
   for (const auto& controlPointID : vectorValue)
   {
-    // retrieve a vector property that contains the referenced ID of the dates of a control point (0. startPoint ID 1. endPoint ID)
-    mitk::VectorProperty<std::string>* controlPointVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(controlPointID));
+    // retrieve a vector property that contains the integer values of the date of a control point (0. year 1. month 2. day)
+    mitk::VectorProperty<int>* controlPointVectorProperty = dynamic_cast<mitk::VectorProperty<int>*>(propertyList->GetProperty(controlPointID));
     if (nullptr == controlPointVectorProperty)
     {
       MITK_INFO << "Could not find the control point " << controlPointID << " in the storage.";
       continue;
     }
 
-    std::vector<std::string> controlPointVectorValue = controlPointVectorProperty->GetValue();
-    // a control point has to have exactly two values (the ID of two dates)
-    if (controlPointVectorValue.size() != 2)
+    std::vector<int> controlPointVectorValue = controlPointVectorProperty->GetValue();
+    // a control point has to have exactly three integer values (year, month and day)
+    if (controlPointVectorValue.size() != 3)
     {
-      MITK_INFO << "Incorrect control point storage. Not two (2) IDs of the start point and the end point are stored.";
+      MITK_INFO << "Incorrect control point storage. Not three (3) values of the date are stored.";
       continue;
     }
     else
     {
-      // retrieve the start date
-      std::string startPointID = controlPointVectorValue[0];
-      mitk::VectorProperty<int>* startPointVectorProperty = dynamic_cast<mitk::VectorProperty<int>*>(propertyList->GetProperty(startPointID));
-      if (nullptr == startPointVectorProperty)
-      {
-        MITK_INFO << "Could not find the start date " << startPointID << " of the control point " << controlPointID << " in the storage.";
-        continue;
-      }
-
-      std::vector<int> startPointValue = startPointVectorProperty->GetValue();
-      SemanticTypes::Date startPoint;
-      // a date has to have exactly three integer values
-      if (startPointValue.size() != 3)
-      {
-        MITK_INFO << "Incorrect start point storage. Not three (3) values of the date are stored.";
-        continue;
-      }
-      else
-      {
-        startPoint.UID = startPointID;
-        startPoint.year = startPointValue[0];
-        startPoint.month = startPointValue[1];
-        startPoint.day = startPointValue[2];
-      }
-
-      // retrieve the end date
-      std::string endPointID = controlPointVectorValue[1];
-      mitk::VectorProperty<int>* endPointVectorProperty = dynamic_cast<mitk::VectorProperty<int>*>(propertyList->GetProperty(endPointID));
-      if (nullptr == endPointVectorProperty)
-      {
-        MITK_INFO << "Could not find the end date " << endPointID << " of the control point " << controlPointID << " in the storage.";
-        continue;
-      }
-
-      std::vector<int> endPointValue = endPointVectorProperty->GetValue();
-      SemanticTypes::Date endPoint;
-      // a date has to have exactly three integer values
-      if (endPointValue.size() != 3)
-      {
-        MITK_INFO << "Incorrect end point storage. Not three (3) values of the date are stored.";
-        continue;
-      }
-      else
-      {
-        endPoint.UID = endPointID;
-        endPoint.year = endPointValue[0];
-        endPoint.month = endPointValue[1];
-        endPoint.day = endPointValue[2];
-      }
-
+      // set the values of the control point
       SemanticTypes::ControlPoint generatedControlPoint;
       generatedControlPoint.UID = controlPointID;
-      generatedControlPoint.startPoint = startPoint;
-      generatedControlPoint.endPoint = endPoint;
+      generatedControlPoint.year = controlPointVectorValue[0];
+      generatedControlPoint.month = controlPointVectorValue[1];
+      generatedControlPoint.day = controlPointVectorValue[2];
 
       allControlPoints.push_back(generatedControlPoint);
     }
@@ -989,110 +892,15 @@ void mitk::RelationStorage::AddControlPoint(const SemanticTypes::CaseID& caseID,
     controlPointVectorProperty->SetValue(controlPointVectorValue);
     propertyList->SetProperty("controlpoints", controlPointVectorProperty);
 
-    // set the year, month and day of the start point
-    std::vector<int> startPointValue;
-    startPointValue.push_back(controlPoint.startPoint.year);
-    startPointValue.push_back(controlPoint.startPoint.month);
-    startPointValue.push_back(controlPoint.startPoint.day);
+    // store the control point values (the three integer values of a date)
+    std::vector<int> controlPointDate;
+    controlPointDate.push_back(controlPoint.year);
+    controlPointDate.push_back(controlPoint.month);
+    controlPointDate.push_back(controlPoint.day);
 
-    // store the start point
-    mitk::VectorProperty<int>::Pointer startPointVectorProperty = mitk::VectorProperty<int>::New();
-    startPointVectorProperty->SetValue(startPointValue);
-    propertyList->SetProperty(controlPoint.startPoint.UID, startPointVectorProperty);
-    
-    // set the year, month and day of the end point
-    std::vector<int> endPointValue;
-    endPointValue.push_back(controlPoint.endPoint.year);
-    endPointValue.push_back(controlPoint.endPoint.month);
-    endPointValue.push_back(controlPoint.endPoint.day);
-
-    // store the end point
-    mitk::VectorProperty<int>::Pointer endPointVectorProperty = mitk::VectorProperty<int>::New();
-    endPointVectorProperty->SetValue(endPointValue);
-    propertyList->SetProperty(controlPoint.endPoint.UID, endPointVectorProperty);
-    
-    // store the start point UID and the end point UID
-    std::vector<std::string> controlPointDateReferences;
-    controlPointDateReferences.push_back(controlPoint.startPoint.UID);
-    controlPointDateReferences.push_back(controlPoint.endPoint.UID);
-    // store the control point references (the start point UID and the end point UID)
-    mitk::VectorProperty<std::string>::Pointer newControlPointVectorProperty = mitk::VectorProperty<std::string>::New();
-    newControlPointVectorProperty->SetValue(controlPointDateReferences);
+    mitk::VectorProperty<int>::Pointer newControlPointVectorProperty = mitk::VectorProperty<int>::New();
+    newControlPointVectorProperty->SetValue(controlPointDate);
     propertyList->SetProperty(controlPoint.UID, newControlPointVectorProperty);
-  }
-}
-
-void mitk::RelationStorage::OverwriteControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint)
-{
-  mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
-  if (nullptr == propertyList)
-  {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
-    return;
-  }
-  // retrieve a vector property that contains the valid controlPoint UIDs for the current case
-  mitk::VectorProperty<std::string>* controlPointVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty("controlpoints"));
-  if (nullptr == controlPointVectorProperty)
-  {
-    MITK_INFO << "Could not find any control point property in the storage.";
-    return;
-  }
-
-  std::vector<std::string> controlPointVectorValue = controlPointVectorProperty->GetValue();
-  const auto existingControlPoint = std::find(controlPointVectorValue.begin(), controlPointVectorValue.end(), controlPoint.UID);
-  if (existingControlPoint != controlPointVectorValue.end())
-  {
-    // retrieve the start date
-    mitk::VectorProperty<int>* startPointVectorProperty = dynamic_cast<mitk::VectorProperty<int>*>(propertyList->GetProperty(controlPoint.startPoint.UID));
-    if (nullptr == startPointVectorProperty)
-    {
-      MITK_INFO << "Could not find the start date " << controlPoint.startPoint.UID << " of the control point " << controlPoint.UID << " in the storage.";
-      return;
-    }
-    std::vector<int> startPointValue = startPointVectorProperty->GetValue();
-    // a date has to have exactly three integer values
-    if (startPointValue.size() != 3)
-    {
-      MITK_INFO << "Incorrect start point storage. Not three (3) values of the date are stored.";
-      return;
-    }
-    else
-    {
-      // set the year, month and day of the start point
-      startPointValue[0] = controlPoint.startPoint.year;
-      startPointValue[1] = controlPoint.startPoint.month;
-      startPointValue[2] = controlPoint.startPoint.day;
-      // overwrite the start point
-      startPointVectorProperty->SetValue(startPointValue);
-    }
-
-    // retrieve the end date
-    mitk::VectorProperty<int>* endPointVectorProperty = dynamic_cast<mitk::VectorProperty<int>*>(propertyList->GetProperty(controlPoint.endPoint.UID));
-    if (nullptr == endPointVectorProperty)
-    {
-      MITK_INFO << "Could not find the end date " << controlPoint.endPoint.UID << " of the control point " << controlPoint.UID << " in the storage.";
-      return;
-    }
-    std::vector<int> endPointValue = endPointVectorProperty->GetValue();
-    // a date has to have exactly three integer values
-    if (endPointValue.size() != 3)
-    {
-      MITK_INFO << "Incorrect end point storage. Not three (3) values of the date are stored.";
-      return;
-    }
-    else
-    {
-      // set the year, month and day of the end point
-      endPointValue[0] = controlPoint.endPoint.year;
-      endPointValue[1] = controlPoint.endPoint.month;
-      endPointValue[2] = controlPoint.endPoint.day;
-      // overwrite the end point
-      endPointVectorProperty->SetValue(endPointValue);
-    }
-  }
-  else
-  {
-    MITK_INFO << "Could not find control point " << controlPoint.UID << " in the storage. Cannot overwrite the control point.";
   }
 }
 
@@ -1199,32 +1007,6 @@ void mitk::RelationStorage::RemoveControlPointFromCase(const SemanticTypes::Case
   allControlPointsVectorProperty->SetValue(currentControlPointVectorValue);
 
   // remove the control point instance itself
-  // the start and end point is stored under the control point ID
-  // retrieve a vector property that contains the referenced ID of the dates of a control point (0. startPoint ID 1. endPoint ID)
-  mitk::VectorProperty<std::string>* controlPointVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(controlPoint.UID));
-  if (nullptr == controlPointVectorProperty)
-  {
-    MITK_INFO << "Control point " << controlPoint.UID << " not found (already removed?). Cannot remove the control point.";
-    return;
-  }
-
-  std::vector<std::string> controlPointVectorValue = controlPointVectorProperty->GetValue();
-  // a control point has to have exactly two values (the ID of two dates)
-  if (controlPointVectorValue.size() != 2)
-  {
-    MITK_INFO << "Incorrect control point storage. Not two (2) IDs of the start point and the end point are stored.";
-  }
-  else
-  {
-    // retrieve the start date
-    std::string startPointID = controlPointVectorValue[0];
-    // delete the start date property
-    propertyList->DeleteProperty(startPointID);
-    // retrieve the end date
-    std::string endPointID = controlPointVectorValue[1];
-    // delete the end date property
-    propertyList->DeleteProperty(endPointID);
-  }
   propertyList->DeleteProperty(controlPoint.UID);
 }
 

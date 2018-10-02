@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITKSEMANTICRELATIONSCONTEXTMENU_H
 
 // semantic relations plugin
-#include "QmitkDataNodeControlPointAction.h"
+#include "QmitkDataNodeSetControlPointAction.h"
 #include "QmitkDataNodeInformationTypeAction.h"
 #include "QmitkDataNodeRemoveFromSemanticRelationsAction.h"
 #include "QmitkDataNodeOpenInAction.h"
@@ -61,7 +61,7 @@ private:
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;
 
-  QmitkDataNodeControlPointAction* m_ControlPointAction;
+  QmitkDataNodeSetControlPointAction* m_ControlPointAction;
   QmitkDataNodeInformationTypeAction* m_InformationTypeAction;
   QmitkDataNodeRemoveFromSemanticRelationsAction* m_RemoveFromSemanticRelationsAction;
   QmitkDataNodeOpenInAction* m_OpenInAction;

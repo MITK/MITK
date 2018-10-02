@@ -54,11 +54,12 @@ namespace mitk
     SemanticRelations(mitk::DataStorage::Pointer dataStorage);
     ~SemanticRelations();
 
-    typedef std::vector<SemanticTypes::Lesion> LesionVector;
-    typedef std::vector<SemanticTypes::LesionClass> LesionClassVector;
-    typedef std::vector<SemanticTypes::ControlPoint> ControlpointVector;
-    typedef std::vector<SemanticTypes::InformationType> InformationTypeVector;
-    typedef std::vector<DataNode::Pointer> DataNodeVector;
+    using LesionVector = std::vector<SemanticTypes::Lesion>;
+    using LesionClassVector = std::vector<SemanticTypes::LesionClass>;
+    using ControlPointVector = std::vector<SemanticTypes::ControlPoint>;
+    using InformationTypeVector = std::vector<SemanticTypes::InformationType>;
+    using DataNodeVector = std::vector<DataNode::Pointer> ;
+
     /************************************************************************/
     /* functions to implement the observer pattern                          */
     /************************************************************************/
@@ -207,7 +208,7 @@ namespace mitk
     * @param caseID           The current case identifier is defined by the given string.
     * @return               A vector of control points.
     */
-    ControlpointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID) const;
+    ControlPointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID) const;
     /*
     * @brief Return a vector of all control points that are valid for the given case, given a specific lesion
     *
@@ -217,7 +218,7 @@ namespace mitk
     *                       If the lesion does not exists, an empty vector is returned.
     * @return               A vector of control points.
     */
-    ControlpointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const;
+    ControlPointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const;
     /*
     * @brief Return a vector of all control points that are valid for the given case, given a specific information type.
     *
@@ -227,7 +228,7 @@ namespace mitk
     *                       If the information type instance does not exists, an empty vector is returned.
     * @return               A vector of control points.
     */
-    ControlpointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const;
+    ControlPointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const;
     /*
     * @brief  Return the control point of a data node.
     *         If the data node is not linked to a control point or the data node refers to a non-existing control point,
@@ -457,15 +458,12 @@ namespace mitk
     */
     void RemoveSegmentation(const DataNode* segmentationNode);
     /**
-    * @brief Use the given date to set the control point for the given data node.
-    *        The function tries to find a fitting control point for the given data and link to this control point or extend it.
-    *        If no fitting (or any) control point is found a new control point is generated from the date and added to the semantic relations storage.
+    * @brief Set the control point for the given data node.
     *
     * @pre    The given data node has to be valid (!nullptr).
     * @throw  SemanticRelationException, if the given data node is invalid (==nullptr).
-
     */
-    void SetControlPointFromDate(const DataNode* dataNode, const SemanticTypes::Date& date);
+    void SetControlPointOfData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint);
     /*
     * @brief  Add a newly created control point to the set of already existing control points. A reference to the control point is added to the given data.
     *         This function combines adding a control point and linking it, since a control point with no associated data is not allowed.
@@ -484,26 +482,6 @@ namespace mitk
     * @param checkConsistence If true, the function checks, whether the date of the data node actually lies inside the control point to link.
     */
     void AddControlPointAndLinkData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence = true);
-    /*
-    * @brief  Link the given data to an already existing control point and overwrite the start or end point of the control point.
-    *
-    * @pre    The given data node has to be valid (!nullptr).
-    * @throw  SemanticRelationException, if the given data node is invalid (==nullptr).
-    * @pre    The UID of the control point has to exist for a control point instance.
-    * @throw  SemanticRelationException, if the UID of the control point does not exists for a control point instance (this can be checked via 'InstanceExists').
-    * @pre    The given control point must contain the date of the given data node (if parameter 'checkConsistence = true').
-    * @throw  SemanticRelationException, if the given control point does not contain the date of the given data node and 'checkConsistence = true' (this can be checked via 'ControlPointManager::InsideControlPoint').
-    * @pre    The given control point must differ from the overwritten control point, but only either in the start point or in the end point.
-    *         It is not possible to overwrite a single control point from a single date and simultaneously changing both ends of the time period.
-    * @throw  SemanticRelationException, if the given control point does not differ from the overwritten control point or if the given control point differs in the start date and the end date from the overwritten control point.
-    * @pre    The given control point must not overlap with an already existing control point.
-    * @throw  SemanticRelationException, if the given control point overlaps with an already existing control point interval (this can be checked via 'CheckOverlappingControlPoint').
-    *
-    * @param dataNode         The current case identifier is extracted from the given data node, which contains DICOM information about the case.
-    * @param controlPoint     The control point instance that overwrites an existing control point.
-    * @param checkConsistence If true, the function checks, whether the date of the data node actually lies inside the control point to link.
-    */
-    void OverwriteControlPointAndLinkData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence = true);
     /*
     * @brief  Link the given data to an already existing control point.
     *
@@ -603,29 +581,14 @@ namespace mitk
     * @return               True, if the given control point contains data that is related to the given information type; false otherwise.
     */
     bool ControlPointContainsInformationType(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType, const SemanticTypes::ControlPoint& controlPoint) const;
-    /*
-    * @brief  Check if the given control point overlaps with an already existing control point.
-    *         If the UID already exists, then the given control point may overlap with the previous or next control point,
-    *         because the start point or the end point of the given control point might be modified (different to the same control point
-    *         that is stored at the moment).
-    *         If the UID does not already exists, the previous and next control point are found by comparing the dates of the already
-    *         existing control points and the given control point.
+    /**
+    * @brief Remove all control points from the storage that are not referenced by any image anymore.
+    *        This might happen if an image has been removed (and unlinked from the corresponding control point)
+    *        or if the user sets a new control point for an image manually in the GUI.
     *
-    * @param caseID         The current case identifier is defined by the given string.
-    * @param controlPoint   A control point with a UID that identifies the corresponding control point instance.
+    * @param caseID   The current case identifier is defined by the given string.
     */
-    bool CheckOverlappingControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
-    /*
-    * @brief  Check if the given control point is contained within an already existing control point.
-    *         If the UID already exists, then the given control point is contained in this same control point.
-    *         However, the function does not check if the given control point is really contained (just compares UID) in this case.
-    *         If the UID does not already exist, the already existing control points are tested to see if they contain the
-    *         given control point.
-    *
-    * @param caseID         The current case identifier is defined by the given string.
-    * @param controlPoint   A control point with a UID that identifies the corresponding control point instance.
-    */
-    bool CheckContainingControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
+    void ClearControlPoints(const SemanticTypes::CaseID& caseID);
   };
 } // namespace mitk
 

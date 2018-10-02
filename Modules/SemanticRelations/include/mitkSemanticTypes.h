@@ -18,76 +18,50 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKSEMANTICTYPES_H
 
 // c++
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-#include <string>
+#include <set>
 #include <tuple>
 
 namespace mitk
 {
   namespace SemanticTypes
   {
-    typedef std::string ID;
-    typedef std::string CaseID; // an ID of the current case (e.g. the DICOM PatientID)
-    typedef std::string InformationType;
+    using ID = std::string;
+    using CaseID = std::string; // an ID of the current case (e.g. the DICOM PatientID)
+    using InformationType = std::string;
 
     /*
-    * @brief The date type to be used for control points.
+    * @brief The concept of a control point.
     */
-    struct Date
+    struct ControlPoint
     {
       ID UID;
       int year = 0;
       int month = 0;
       int day = 0;
 
-      bool operator<(const Date& other) const
+      bool operator<(const ControlPoint& other) const
       {
         return std::tie(year, month, day) < std::tie(other.year, other.month, other.day);
       }
-      bool operator>(const Date& other) const
+      bool operator>(const ControlPoint& other) const
       {
         return std::tie(year, month, day) > std::tie(other.year, other.month, other.day);
       }
-      bool operator==(const Date& other) const
+      bool operator==(const ControlPoint& other) const
       {
         return (!operator<(other) && !operator>(other));
       }
-      bool operator!=(const Date& other) const
+      bool operator!=(const ControlPoint& other) const
       {
         return (operator<(other) || operator>(other));
       }
-      bool operator<=(const Date& other) const
+      bool operator<=(const ControlPoint& other) const
       {
         return (operator<(other) || operator==(other));
       }
-      bool operator>=(const Date& other) const
+      bool operator>=(const ControlPoint& other) const
       {
         return (operator>(other) || operator==(other));
-      }
-    };
-
-    /*
-    * @brief The concept of a control point.
-    */
-    struct ControlPoint // alternatively: ExaminationPoint
-    {
-      ID UID;
-      Date startPoint;
-      Date endPoint;
-
-      bool operator<(const ControlPoint& other) const
-      {
-        return startPoint < other.startPoint;
-      }
-      bool operator!=(const ControlPoint& other) const
-      {
-        return (startPoint != other.startPoint) || (endPoint != other.endPoint);
-      }
-      bool operator==(const ControlPoint& other) const
-      {
-        return (startPoint == other.startPoint) && (endPoint == other.endPoint);
       }
     };
 
@@ -97,7 +71,7 @@ namespace mitk
     struct LesionClass
     {
       ID UID;
-      std::string classType = ""; // could be a "focal lesion" or "diffuse lesion" in the BlackSwan context
+      std::string classType = "";
     };
 
     /*

@@ -17,7 +17,7 @@ set(Boost_DEPENDS ${proj})
 
 if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
-  set(_boost_version 1_65_1)
+  set(_boost_version 1_68_0)
   set(_boost_install_include_dir include/boost)
   if(WIN32)
     set(_boost_install_include_dir include/boost-${_boost_version}/boost)
@@ -146,20 +146,12 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
       COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>/boost" "<INSTALL_DIR>/${_boost_install_include_dir}")
   endif()
 
-  set(_boost_patch_cmd )
-
-  if(WIN32)
-    if(MSVC)
-      if(NOT (VISUAL_STUDIO_VERSION_MAJOR LESS 14))
-        set(_boost_patch_cmd PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Boost.patch)
-      endif()
-    endif()
-  endif()
+  set(_boost_patch_cmd PATCH_COMMAND ${PATCH_COMMAND} --binary -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Boost.patch)
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}.7z
-    URL_MD5 72ab92cb936f93d33b8b313aee2dd47a
+    URL_MD5 ae25f29cdb82cf07e8e26187ddf7d330
     BINARY_DIR "${ep_prefix}/src/${proj}"
     ${_boost_patch_cmd}
     CONFIGURE_COMMAND "<SOURCE_DIR>/bootstrap${_shell_extension}"

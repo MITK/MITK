@@ -127,7 +127,7 @@ int mitkPointSetLocaleTest(int, char *[])
   alllocales.push_back("de_DE@euro");
   alllocales.push_back("German_Germany");
 
-// QuickFix for MAC OS X
+// QuickFix for macOS
 // See for more the Bug #3894 comments
 #if defined(__APPLE__) || defined(MACOSX)
   alllocales.push_back("C");

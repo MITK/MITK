@@ -44,7 +44,7 @@ if(TARGET ${CMAKE_PROJECT_NAME}-autoload)
   add_dependencies(MitkWorkbench ${CMAKE_PROJECT_NAME}-autoload)
 endif()
 
-#Setting application icon for mac os x systems
+#Setting application icon for macOS systems
 set_target_properties(MitkWorkbench PROPERTIES MACOSX_BUNDLE_ICON_FILE "icon.icns")
 
 if(APPLE)

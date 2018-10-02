@@ -79,10 +79,10 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
   this->setMaximumWidth(61);
   this->setAutoFillBackground(true);
 
-// Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
-// for Mac OS see bug 3192
+// Else part fixes the render window menu issue on Linux bug but caused bugs on macOS and Windows
+// for macOS see bug 3192
 // for Windows see bug 12130
-//... so Mac OS and Windows must be treated differently:
+//... so macOS and Windows must be treated differently:
 #if defined(Q_OS_MAC)
   this->show();
   this->setWindowOpacity(0.0f);
@@ -272,10 +272,10 @@ void QmitkRenderWindowMenu::enterEvent(QEvent * /*e*/)
 void QmitkRenderWindowMenu::DeferredHideMenu()
 {
   MITK_DEBUG << "menu deferredhidemenu";
-// Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
-// for Mac OS see bug 3192
+// Else part fixes the render window menu issue on Linux bug but caused bugs on macOS and Windows
+// for macOS see bug 3192
 // for Windows see bug 12130
-//... so Mac OS and Windows must be treated differently:
+//... so macOS and Windows must be treated differently:
 #if defined(Q_OS_MAC)
   this->setWindowOpacity(0.0f);
 #else
@@ -411,10 +411,10 @@ void QmitkRenderWindowMenu::DeferredShowMenu()
   MITK_DEBUG << "deferred show menu";
   m_HideTimer.stop();
 
-// Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
-// for Mac OS see bug 3192
+// Else part fixes the render window menu issue on Linux bug but caused bugs on macOS and Windows
+// for macOS see bug 3192
 // for Windows see bug 12130
-//... so Mac OS and Windows must be treated differently:
+//... so macOS and Windows must be treated differently:
 #if defined(Q_OS_MAC)
   this->setWindowOpacity(1.0f);
 #else

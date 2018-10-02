@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStringProperty.h"
 #include "mitkLevelWindowProperty.h"
 #include <gdcmUIDs.h>
+#include <vector>
 
 mitk::DICOMImageBlockDescriptor::DICOMImageBlockDescriptor()
 : m_ReaderImplementationLevel( SOPClassUnknown )
@@ -863,3 +864,21 @@ void mitk::DICOMImageBlockDescriptor::SetTagLookupTableToPropertyFunctor( TagLoo
     m_PropertyFunctor = functor;
   }
 }
+
+mitk::BaseProperty::ConstPointer mitk::DICOMImageBlockDescriptor::GetConstProperty(const std::string &propertyKey,
+  const std::string &/*contextName*/,  bool /*fallBackOnDefaultContext*/) const
+{
+  this->UpdateImageDescribingProperties();
+  return m_PropertyList->GetConstProperty(propertyKey);
+};
+
+std::vector<std::string> mitk::DICOMImageBlockDescriptor::GetPropertyKeys(const std::string &/*contextName*/,  bool /*includeDefaultContext*/) const
+{
+  this->UpdateImageDescribingProperties();
+  return m_PropertyList->GetPropertyKeys();
+};
+
+std::vector<std::string> mitk::DICOMImageBlockDescriptor::GetPropertyContextNames() const
+{
+  return std::vector<std::string>();
+};

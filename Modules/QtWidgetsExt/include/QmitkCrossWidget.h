@@ -38,7 +38,7 @@ signals:
   void SignalDeltaMove(int, int);
 
 protected:
-// fix for bug 3378 - setPos() causes an app crash on MAC OS X
+// fix for bug 3378 - setPos() causes an app crash on macOS
 #ifdef __APPLE__
   void ResetMousePosition(int, int){};
 #else

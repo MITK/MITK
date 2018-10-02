@@ -401,6 +401,12 @@ namespace mitk
       return sp->GetValue();
     }
 
+    /** Value constant that is used indicate that node names are not set so far.*/
+    static std::string NO_NAME_VALUE()
+    {
+      return "No Name!";
+    }
+
     /**
      * \brief Extra convenience access method to set the name of an object.
      *

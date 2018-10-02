@@ -178,7 +178,7 @@ mitkFunctionGetVersion(${PROJECT_SOURCE_DIR} ${PROJECT_NAME})
 # These should be set before any MITK install macros are used
 #-----------------------------------------------------------------------------
 
-# on Mac OSX all CTK plugins get copied into every
+# on macOS all CTK plugins get copied into every
 # application bundle (.app directory) specified here
 set(MACOSX_BUNDLE_NAMES)
 if(APPLE)

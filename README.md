@@ -22,8 +22,8 @@ Supported Platforms
 MITK is a cross-platform C++ toolkit and officially supports:
 
  - Windows
- - macOS
  - Linux
+ - macOS
 
 For details, please read the [Supported Platforms][platforms] page.
 

@@ -60,7 +60,7 @@ pplx::task<void> mitk::RESTClient::Post(utility::string_t uri,
   MITK_INFO << "Calling POST with " << utility::conversions::to_utf8string(uri) << " on client "
             << utility::conversions::to_utf8string(m_Client.base_uri().to_string());
 
-
+  // currently not working, but stream approach may be useful for later.. don't use string streams for dcm files...
   concurrency::streams::container_buffer<std::string> inStringBuffer;
   return fileStream.read(inStringBuffer, fileStream.streambuf().size()).then([=](size_t bytesRead) -> pplx::task<void>
   {
@@ -75,7 +75,7 @@ pplx::task<void> mitk::RESTClient::Post(utility::string_t uri,
     auto utf8String = utility::conversions::to_utf8string(body);
 
     auto binaryVector = std::vector<unsigned char>(utf8String.begin(), utf8String.end());
-
+  
     MitkRequest postRequest(MitkRESTMethods::POST);
     postRequest.set_request_uri(uri);
     postRequest.headers().add(U("Content-Type"), contentType);
@@ -93,23 +93,31 @@ pplx::task<void> mitk::RESTClient::Post(utility::string_t uri,
 
 pplx::task<void> mitk::RESTClient::Post(utility::string_t uri, utility::string_t contentType, utility::string_t filePath)
 {
-  mitk::RESTUtil util;
-  util.AddParameter("dicomObject", std::experimental::filesystem::path(utility::conversions::to_utf8string(filePath)).filename().string());
-  util.AddFile("file", utility::conversions::to_utf8string(filePath));
-  std::string boundary = util.boundary();
-  std::string body = util.GenBodyContent();
+  // this is the working stow-rs request which supports just one dicom file packed into a multipart message
+  std::basic_ifstream<unsigned char> input(filePath, std::ios::binary);
 
-  auto utf8String = utility::conversions::to_utf8string(body);
+  std::vector<unsigned char> result;
+  std::vector<unsigned char> buffer((std::istreambuf_iterator<unsigned char>(input)),(std::istreambuf_iterator<unsigned char>()));
 
-  auto binaryVector = std::vector<unsigned char>(utf8String.begin(), utf8String.end());
+  std::string head = "";
+  head += "\r\n--boundary";
+  head += "\r\nContent-Type: " + utility::conversions::to_utf8string("application/dicom") + "\r\n\r\n";
+
+  std::vector<unsigned char> bodyVector(head.begin(), head.end());
+
+  std::string tail = "";
+  tail += "\r\n--boundary--";
+
+  result.insert(result.end(), bodyVector.begin(), bodyVector.end());
+  result.insert(result.end(), buffer.begin(), buffer.end());
+  result.insert(result.end(), tail.begin(), tail.end());
 
   MitkRequest postRequest(MitkRESTMethods::POST);
   postRequest.set_request_uri(uri);
-  postRequest.headers().add(U("Content-Type"), contentType);
-  postRequest.set_body(binaryVector);
+  postRequest.headers().add(U("Content-Type"), "multipart/related; type=\"application/dicom\"; boundary=boundary");
+  postRequest.set_body(result);
 
   MITK_INFO << "Request: " << utility::conversions::to_utf8string(postRequest.to_string());
-
   return m_Client.request(postRequest).then([](MitkResponse response)
   {
     MITK_INFO << "Response: " << utility::conversions::to_utf8string(response.to_string());

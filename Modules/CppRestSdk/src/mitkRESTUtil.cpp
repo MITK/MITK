@@ -56,10 +56,9 @@ std::string& mitk::RESTUtil::GenBodyContent()
   {
     m_BodyContent += "\r\n--";
     m_BodyContent += m_Boundary;
-    m_BodyContent += "\r\nContent-Disposition: form-data; name=\"";
-    m_BodyContent += param.first;
-    m_BodyContent += "\"\r\n\r\n";
+    m_BodyContent += "\r\nContent-Type: ";
     m_BodyContent += param.second;
+    m_BodyContent += "\r\n\r\n";
   }
 
   for (size_t i = 0; i < m_Files.size(); ++i)
@@ -68,19 +67,10 @@ std::string& mitk::RESTUtil::GenBodyContent()
     
     auto filename = std::experimental::filesystem::path(m_Files[i].second).filename();
 
-    m_BodyContent += "\r\n--";
-    m_BodyContent += m_Boundary;
-    m_BodyContent += "\r\nContent-Disposition: form-data; name=\"";
-    m_BodyContent += m_Files[i].first;
-    m_BodyContent += "\"; filename=\"";
-    m_BodyContent += filename.string();
-    m_BodyContent += "\"\r\nContent-Type: ";
-    m_BodyContent += m_ContentType;
-    m_BodyContent += "\r\n\r\n";
     m_BodyContent += fileContent;
   }
   m_BodyContent += "\r\n--";
   m_BodyContent += m_Boundary;
-  m_BodyContent += "--\r\n";
+  m_BodyContent += "--";
   return m_BodyContent;
 }

@@ -184,6 +184,7 @@ mitk::modelFit::CreateFitInfoFromNode(const ModelFitInfo::UIDType& uid,
     }
   }
 
+  node->GetData()->GetPropertyList()->GetStringProperty(mitk::ModelFitConstants::FIT_NAME_PROPERTY_NAME().c_str(), fit->fitName);
   node->GetData()->GetPropertyList()->GetStringProperty(mitk::ModelFitConstants::MODEL_X_PROPERTY_NAME().c_str(), fit->x);
   node->GetData()->GetPropertyList()->GetStringProperty(mitk::ModelFitConstants::XAXIS_NAME_PROPERTY_NAME().c_str(), fit->xAxisName);
   node->GetData()->GetPropertyList()->GetStringProperty(mitk::ModelFitConstants::XAXIS_UNIT_PROPERTY_NAME().c_str(), fit->xAxisUnit);

@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkModelGenerator.h"
 #include "mitkModelFitException.h"
 #include "mitkModelFitParameterValueExtraction.h"
+#include "mitkTimeGridHelper.h"
 
 #include "mitkModelFitPlotDataHelper.h"
 
@@ -492,29 +493,6 @@ void ModelFitInspectorView::OnPositionBookmarksChanged()
     }
 }
 
-/** Super sample passed time grid with the factor INTERPOLATION_STEPS and interpolates linear in between.*/
-mitk::ModelBase::TimeGridType
-GenerateInterpolatedTimeGrid(const mitk::ModelBase::TimeGridType& grid, const unsigned int interpolation_steps = 100)
-{
-  unsigned int origGridSize = grid.size();
-
-  mitk::ModelBase::TimeGridType interpolatedTimeGrid(((origGridSize - 1) * interpolation_steps) + 1);
-
-  for (unsigned int t = 0; t < origGridSize - 1; ++t)
-  {
-    double delta = (grid[t + 1] - grid[t]) / interpolation_steps;
-
-    for (unsigned int i = 0; i < interpolation_steps; ++i)
-    {
-      interpolatedTimeGrid[(t * interpolation_steps) + i] = grid[t] + i * delta;
-    }
-  }
-
-  interpolatedTimeGrid[interpolatedTimeGrid.size() - 1] = grid[grid.size() - 1];
-
-  return interpolatedTimeGrid;
-};
-
 void ModelFitInspectorView::OnFitSelectionChanged(int index)
 {
   if (!m_internalUpdateFlag)
@@ -581,7 +559,7 @@ mitk::PlotDataCurveCollection::Pointer ModelFitInspectorView::RefreshPlotDataCur
   if (fitInfo)
   {
     // Interpolate time grid (x values) so the curve looks smooth
-    const mitk::ModelBase::TimeGridType interpolatedTimeGrid = GenerateInterpolatedTimeGrid(timeGrid, INTERPOLATION_STEPS);
+    const mitk::ModelBase::TimeGridType interpolatedTimeGrid = mitk::GenerateSupersampledTimeGrid(timeGrid, INTERPOLATION_STEPS);
     auto hires_curve = mitk::GenerateModelSignalPlotData(position, fitInfo, interpolatedTimeGrid, parameterizer);
     result->InsertElement(mitk::MODEL_FIT_PLOT_INTERPOLATED_SIGNAL_NAME(), hires_curve);
     auto curve = mitk::GenerateModelSignalPlotData(position, fitInfo, timeGrid, parameterizer);

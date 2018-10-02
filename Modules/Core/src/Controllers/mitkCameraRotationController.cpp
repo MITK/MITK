@@ -148,6 +148,7 @@ void mitk::CameraRotationController::Mirror(bool horizontal)
     if (horizontal) {
       m_RollMirror = fmod(m_RollMirror + 180, 360);
     }
+    RotateCameraToTransformationAngles();
   }
   //roll and azimuth are set in mitk::CameraRotationController::RotateCameraToTransformationAngles()
   //when calling mitk::BaseRenderer::RequestUpdate()

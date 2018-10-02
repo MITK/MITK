@@ -54,7 +54,7 @@ public:
     label = "testLabel";
 
     int argc = 1;
-    char *argv[] = {"AppName"};
+    char *argv[] = {(char *)"AppName"};
     if (QApplication::instance() == nullptr)
     {
       new QApplication(argc, argv);
@@ -80,7 +80,7 @@ public:
     std::vector<QVariant> insertedYData = dataPtr->GetYData().toVector().toStdVector();
     CPPUNIT_ASSERT_MESSAGE("Data differs in size", insertedYData.size() == data1D.size());
 
-    for (int i = 0; i < data1D.size(); ++i)
+    for (size_t i = 0; i < data1D.size(); ++i)
     {
       CPPUNIT_ASSERT_MESSAGE("The inserted data differs when checked", data1D[i] == insertedYData[i]);
     }
@@ -130,13 +130,13 @@ public:
 	CPPUNIT_ASSERT_MESSAGE("Removing data failed.", dataVector->size() == 2 && dataVector != nullptr);
 	    QmitkChartxyData *xyData1 = dataVector->at(0).get();
     std::vector<QVariant> insertedYData = xyData1->GetYData().toVector().toStdVector();
-    for (int i = 0; i < data1D.size(); ++i)
+      for (size_t i = 0; i < data1D.size(); ++i)
     {
       CPPUNIT_ASSERT_MESSAGE("The inserted data differs when checked", data1D[i] == insertedYData[i]);
     }
     QmitkChartxyData *xyData2 = dataVector->at(1).get();
     insertedYData = xyData2->GetYData().toVector().toStdVector();
-    for (int i = 0; i < data1D3.size(); ++i)
+    for (size_t i = 0; i < data1D3.size(); ++i)
     {
       CPPUNIT_ASSERT_MESSAGE("The inserted data differs when checked", data1D3[i] == insertedYData[i]);
     }
@@ -149,13 +149,13 @@ public:
 	//data with {data1D3, data1D2}
     xyData1 = dataVector->at(0).get();
     insertedYData = xyData1->GetYData().toVector().toStdVector();
-    for (int i = 0; i < data1D3.size(); ++i)
+    for (size_t i = 0; i < data1D3.size(); ++i)
     {
       CPPUNIT_ASSERT_MESSAGE("The inserted data differs when checked", data1D3[i] == insertedYData[i]);
     }
     xyData2 = dataVector->at(1).get();
     insertedYData = xyData2->GetYData().toVector().toStdVector();
-    for (int i = 0; i < data1D2.size(); ++i)
+    for (size_t i = 0; i < data1D2.size(); ++i)
     {
       CPPUNIT_ASSERT_MESSAGE("The inserted data differs when checked", data1D2[i] == insertedYData[i]);
     }

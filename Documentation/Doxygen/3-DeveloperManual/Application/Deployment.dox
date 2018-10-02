@@ -40,10 +40,10 @@ A CMake variable "CMAKE_(Your Visual Studio Version)_REDISTRIBUTABLE" will be cr
 In the case of the NSIS installer it will be automatically run if no appropriate redistributable is present on the target system.\n
 Please note that it is <b>not</b> possible to automatically check the provided redistributable matches the Visual Studio version used to build the installer.
 
-\subsection DeploymentPagePlatformMacOS MacOS
+\subsection DeploymentPagePlatformMacOS macOS
 
-You can create a drag'n drop disk image (.dmg) file for MacOS. The procedure is pretty much the same as for Linux.
+You can create a drag'n drop disk image (.dmg) file for macOS. The procedure is pretty much the same as for Linux.
 
-\note On MacOS, libraries in system locations as pointed out in the Linux section \b and libraries located in /System/Library will not be copied. If you want to distribute any libraries from these locations, you have to install them somewhere else prior to configuring your MITK build.
+\note On macOS, libraries in system locations as pointed out in the Linux section \b and libraries located in /System/Library will not be copied. If you want to distribute any libraries from these locations, you have to install them somewhere else prior to configuring your MITK build.
 
 */

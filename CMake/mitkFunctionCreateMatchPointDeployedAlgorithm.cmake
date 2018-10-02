@@ -102,6 +102,6 @@ function(mitkFunctionCreateMatchPointDeployedAlgorithm)
     endif()
   endif()
 
-  install(TARGETS ${ALG_TARGET} RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
+  MITK_INSTALL(TARGETS ${ALG_TARGET})
 
 endfunction()

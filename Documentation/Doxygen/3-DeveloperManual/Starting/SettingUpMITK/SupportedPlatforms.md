@@ -5,8 +5,8 @@ Supported Platforms  {#SupportedPlatformsPage}
 MITK is a cross-platform framework that is available for the following platforms:
 
 - Windows
-- Linux/X11
-- Mac OS X
+- Linux
+- macOS
 
 Supported Platforms Details
 ---------------------------
@@ -26,9 +26,9 @@ Errors or bugs discovered in these platforms are prioritized and corrected as so
 
 | Platform                            | Compilers
 | ----------------------------------- | --------------------------------------------------
-| Ubuntu Linux 14.04  (x64)           | GNU 4.9 as provided by ppa:ubuntu-toolchain-r/test
-| Ubuntu Linux 16.04  (x64)           | GNU 4.9
-| Microsoft Windows 7 (x64)           | MSVC 2015 (latest update)
+| Microsoft Windows 10 (x64)          | Visual Studio 2017 (latest update)
+| Linux Ubuntu 18.04 (x64)            | GCC 7.3
+| Linux Ubuntu 16.04 (x64)            | GCC 5.4
 
 Tier 2 Platforms
 ----------------
@@ -38,12 +38,11 @@ members of the MITK development team on a daily basis and some only receive occa
 strive to support these platforms, MITK users should note that errors may be present in released versions
 as well as in the current master branch.
 
-| Platform                           | Compilers
-| ---------------------------------- | --------------------------------------------------
-| Microsoft Windows 10 (x64)         | MSVC 2015 (latest update)
-| Microsoft Windows 10 (x64)         | MSVC 2017 (latest update)
-| Apple OS X 10.10 "Yosemite"        | Clang 6.0
-| Apple OS X 10.9 "Mavericks"        | Clang 5.0
+| Platform                            | Compilers
+| ----------------------------------- | --------------------------------------------------
+| Microsoft Windows 7 (x64)           | Visual Studio 2017 (latest update)
+| Apple macOS 10.14 "Mojave"          | Apple LLVM 10.0
+| Apple macOS 10.13 "High Sierra"     | Apple LLVM 10.0
 
 All platforms not listed above are not officially supported by the MITK team. However, we will happily accept
 contributions to improve support for other platforms.

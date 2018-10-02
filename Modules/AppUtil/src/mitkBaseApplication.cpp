@@ -162,7 +162,7 @@ namespace mitk
 #ifdef Q_OS_MAC
       /*
        * This is a workaround for bug 19080:
-       * On Mac OS X the prosess serial number is passed as an commandline argument (-psn_<NUMBER>)
+       * On macOS the prosess serial number is passed as an commandline argument (-psn_<NUMBER>)
        * if the application is started via the.app bundle.
        * This option is unknown, which causes a Poco exception.
        * Since this is done by the system we have to manually remove the argument here.

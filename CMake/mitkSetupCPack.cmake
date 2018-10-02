@@ -30,7 +30,35 @@ if(${CMAKE_SYSTEM_NAME} MATCHES Windows)
   set(CPACK_VISUAL_STUDIO_VERSION_MAJOR "${VISUAL_STUDIO_VERSION_MAJOR}")
   set(CPACK_VISUAL_STUDIO_PRODUCT_NAME "${VISUAL_STUDIO_PRODUCT_NAME}")
   set(CPACK_LIBRARY_ARCHITECTURE "${CMAKE_LIBRARY_ARCHITECTURE}")
-  set(CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE "" CACHE FILEPATH "Path to the appropriate Microsoft Visual Studio Redistributable")
+
+  # Visual Studio 2017 already comes with redistributable installers.
+  # Try to find the right one.
+
+  set(vswhere "$ENV{PROGRAMFILES\(X86\)}\\Microsoft Visual Studio\\Installer\\vswhere.exe")
+
+  if(EXISTS ${vswhere})
+    execute_process(COMMAND ${vswhere} -latest -property installationPath
+      OUTPUT_VARIABLE installationPath
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
+    file(TO_CMAKE_PATH ${installationPath} installationPath)
+    set(redistPath "${installationPath}/VC/Redist/MSVC")
+    file(GLOB redistPath "${installationPath}/VC/Redist/MSVC/*")
+    list(LENGTH redistPath length)
+    if(length EQUAL 1)
+      if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(redistPath "${redistPath}/vc_redist.x64.exe")
+      else()
+        set(redistPath "${redistPath}/vc_redist.x86.exe")
+      endif()
+      if(EXISTS ${redistPath})
+        set(CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE ${redistPath} CACHE FILEPATH "Path to the appropriate Microsoft Visual Studio Redistributable")
+      endif()
+    endif()
+  endif()
+
+  if(NOT DEFINED CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE)
+    set(CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE "" CACHE FILEPATH "Path to the appropriate Microsoft Visual Studio Redistributable")
+  endif()
 endif()
 
 if(EXISTS ${CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE} )

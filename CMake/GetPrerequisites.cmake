@@ -24,7 +24,7 @@ message("Using MITK version of GetPrerequisites.cmake")
 #
 #    dumpbin (Windows)
 #    ldd (Linux/Unix)
-#    otool (Mac OSX)
+#    otool (macOS)
 #
 # The following functions are provided by this module:
 #

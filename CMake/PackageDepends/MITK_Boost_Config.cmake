@@ -1,7 +1,7 @@
 if(MITK_USE_Boost_LIBRARIES)
-  find_package(Boost 1.65.1 REQUIRED COMPONENTS ${MITK_USE_Boost_LIBRARIES} QUIET)
+  find_package(Boost 1.68.0 REQUIRED COMPONENTS ${MITK_USE_Boost_LIBRARIES} QUIET)
 else()
-  find_package(Boost 1.65.1 REQUIRED QUIET)
+  find_package(Boost 1.68.0 REQUIRED QUIET)
 endif()
 
 list(APPEND ALL_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})

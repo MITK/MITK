@@ -53,9 +53,11 @@ bool mitk::LimitedLinearUndo::SetOperationEvent(UndoStackItem *stackItem)
     InvokeEvent(RedoEmptyEvent());
   }
 
-  if (m_UndoLimit > 0 && m_UndoList.size() == m_UndoLimit)
+  if (0 != m_UndoLimit && m_UndoList.size() == m_UndoLimit)
   {
+    auto item = m_UndoList.front();
     m_UndoList.pop_front();
+    delete item;
   }
   m_UndoList.push_back(operationEvent);
 

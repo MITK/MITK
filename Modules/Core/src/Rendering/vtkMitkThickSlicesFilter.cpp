@@ -319,14 +319,14 @@ r[2] = -0.5 / r[2];
       {
         for (idxX = 0; idxX <= maxX; idxX++)
         {
-          T sum = 0;
+          long double sum = 0;
           for (int z = _minZ; z <= _maxZ; z++)
           {
             T value = inPtr[z * inIncs[2]];
             sum += value;
           }
 
-          T mip = sum / size;
+          T mip = static_cast<T>(sum / size);
 
           // do X axis
           *outPtr = mip;

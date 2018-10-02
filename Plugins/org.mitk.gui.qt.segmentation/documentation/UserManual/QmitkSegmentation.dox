@@ -28,7 +28,7 @@ The following preferences can be set:
   <li> <b>Slim view:</b> Allows you to show or hide the tool button description of the Segmentation View
   <li> <b>2D display:</b> Specify whether the segmentation is drawn as outline or as a transparent overlay
   <li> <b>3D display:</b> Activate 3D volume rendering for your segmentation
-  <li> <b>Data node selection mode:</b> If activated the segmentation image combo box is always sychronized with the data manager selection. 
+  <li> <b>Data node selection mode:</b> If activated the segmentation image combo box is always sychronized with the data manager selection.
   <li> <b>Smoothed surface creation:</b> Set certain smoothing parameters for surface creation
 </ul>
 
@@ -103,7 +103,7 @@ This item is automatically selected for you, allowing you to %start editing the 
 
 As you might want to have segmentations of multiple structures in a single patient image, the application needs to know which of them to use for editing.
 You select a segmenation by clicking it in the tree view of Data Manager. Note that segmentations are usually displayed as sub-items of "their" patient image.
-In the rare case, where you need to edit a segmentation that is not displayed as a a sub-item, you can click both the original image AND the segmentation while holding down CTRL or for Mac OS X the CMD on the keyboard.
+In the rare case, where you need to edit a segmentation that is not displayed as a a sub-item, you can click both the original image AND the segmentation while holding down CTRL or for macOS the CMD on the keyboard.
 
 When a selection is made, the Segmentation View will hide all but the selected segmentation and the corresponding original image.
 When there are multiple segmentations, the unselected ones will remain in the Data Manager, you can make them visible at any time by selecting them.

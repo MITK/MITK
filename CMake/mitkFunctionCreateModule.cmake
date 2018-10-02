@@ -63,6 +63,7 @@
 #!
 #! Multi-value Parameters (all optional):
 #!
+
 #! \param SUBPROJECTS List of CDash labels
 #! \param INCLUDE_DIRS Include directories for this module:
 #!        \verbatim
@@ -343,6 +344,11 @@ function(mitk_create_module)
     if(NOT MODULE_WARNINGS_NO_ERRORS)
       if(MSVC_VERSION)
         mitkFunctionCheckCAndCXXCompilerFlags("/WX" module_c_flags module_cxx_flags)
+	# this would turn on unused parameter warnings, but unfortunately MSVC cannot
+	# distinguish yet between internal and external headers so this would be triggered
+	# a lot by external code. There is support for it on the way so this line could be
+	# reactivated after https://gitlab.kitware.com/cmake/cmake/issues/17904 has been fixed.
+        # mitkFunctionCheckCAndCXXCompilerFlags("/w34100" module_c_flags module_cxx_flags)
       else()
         mitkFunctionCheckCAndCXXCompilerFlags(-Werror module_c_flags module_cxx_flags)
 

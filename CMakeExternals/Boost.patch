@@ -1,14 +1,12 @@
---- original/tools/build/src/engine/config_toolset.bat	Sat Sep 02 12:56:19 2017
-+++ modified/tools/build/src/engine/config_toolset.bat	Thu Oct 19 13:04:51 2017
-@@ -170,7 +170,10 @@
- if "_%BOOST_JAM_ARCH%_" == "__" set BOOST_JAM_ARCH=x86
- set BOOST_JAM_ARGS=%BOOST_JAM_ARGS% %BOOST_JAM_ARCH%
-
--if "_%VSINSTALLDIR%_" == "__" call :Call_If_Exists "%BOOST_JAM_TOOLSET_ROOT%Auxiliary\Build\vcvarsall.bat" %BOOST_JAM_ARGS%
-+if "_%VSINSTALLDIR%_" == "__" (
-+    set VSCMD_START_DIR=%CD%
-+    call :Call_If_Exists "%BOOST_JAM_TOOLSET_ROOT%Auxiliary\Build\vcvarsall.bat" %BOOST_JAM_ARGS%
-+)
- set "BOOST_JAM_CC=cl /nologo /RTC1 /Zi /MTd /Fobootstrap/ /Fdbootstrap/ -DNT -DYYDEBUG -wd4996 kernel32.lib advapi32.lib user32.lib"
- set "BOOST_JAM_OPT_JAM=/Febootstrap\jam0"
- set "BOOST_JAM_OPT_MKJAMBASE=/Febootstrap\mkjambase0"
+--- boost_1_68_0.orig/boost/iostreams/detail/config/fpos.hpp	2018-08-01 22:50:55.000000000 +0200
++++ boost_1_68_0/boost/iostreams/detail/config/fpos.hpp	2018-09-30 13:48:02.395309975 +0200
+@@ -25,7 +25,8 @@
+ #include <boost/config.hpp>
+ 
+ # if (defined(_YVALS) || defined(_CPPLIB_VER)) && !defined(__SGI_STL_PORT) && \
+-     !defined(_STLPORT_VERSION) && !defined(__QNX__) && !defined(_VX_CPU) && !defined(__VXWORKS__)
++     !defined(_STLPORT_VERSION) && !defined(__QNX__) && !defined(_VX_CPU) && !defined(__VXWORKS__) \
++     && !(defined(BOOST_MSVC) && _MSVC_STL_VERSION >= 141)
+      /**/
+      
+ #include <boost/iostreams/detail/ios.hpp>

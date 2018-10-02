@@ -26,9 +26,9 @@ set(CTEST_DASHBOARD_ROOT "/opt/dartclients")
 #set(CTEST_DASHBOARD_ROOT "C:/dartclients")
 
 # The directory containing the Qt binaries
-set(QT5_INSTALL_PREFIX "/home/user/Qt/5.10.1/gcc_64")
+set(QT5_INSTALL_PREFIX "/home/user/Qt/5.11.1/gcc_64")
 # For Windows, e.g.
-#set(QT5_INSTALL_PREFIX "C:/Qt/5.10.1/msvc2013_64")
+#set(QT5_INSTALL_PREFIX "C:/Qt/5.11.1/msvc2013_64")
 
 set(QT_BINARY_DIR "${QT5_INSTALL_PREFIX}/bin")
 

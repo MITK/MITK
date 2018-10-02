@@ -86,16 +86,16 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 #-----------------------------------------------------------------------------
-# Check miminum Mac OS X version
+# Check miminum macOS version
 #-----------------------------------------------------------------------------
-# The minimum supported Mac OS X version is 10.9. If you use a version less than 10.9, there is no guarantee that the build still works.
+# The minimum supported macOS version is 10.13. If you use a version less than 10.13, there is no guarantee that the build still works.
 if(APPLE)
-  exec_program(sw_vers ARGS -productVersion OUTPUT_VARIABLE osx_version)
-  if (osx_version VERSION_LESS "10.9")
-    message(WARNING "Detected OS X version \"${osx_version}\" is not supported anymore. Minimum required OS X version is 10.9 or greater.")
+  exec_program(sw_vers ARGS -productVersion OUTPUT_VARIABLE macos_version)
+  if (macos_version VERSION_LESS "10.13")
+    message(WARNING "Detected macOS version \"${macos_version}\" is not supported anymore. Minimum required macOS version is at least 10.13.")
   endif()
-  if (CMAKE_OSX_DEPLOYMENT_TARGET AND CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.9)
-    message(WARNING "Detected OS X deployment target \"${CMAKE_OSX_DEPLOYMENT_TARGET}\" is not supported anymore. Minimum required OS X version is 10.9 or greater.")
+  if (CMAKE_OSX_DEPLOYMENT_TARGET AND CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.13)
+    message(WARNING "Detected macOS deployment target \"${CMAKE_OSX_DEPLOYMENT_TARGET}\" is not supported anymore. Minimum required macOS version is at least 10.13.")
   endif()
 endif()
 
@@ -128,8 +128,8 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
   endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   # require at least Visual Studio 2015
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19)
-    message(FATAL_ERROR "Microsoft Visual Studio 2015 Update 3 or newer required")
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.10)
+    message(FATAL_ERROR "Microsoft Visual Studio 2017 or newer required")
   endif()
 else()
   message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang (Linux or Apple), GCC and MSVC.")
@@ -212,12 +212,45 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 env_option(MITK_USE_Qt5 "Use Qt 5 library" ON)
 
 if(MITK_USE_Qt5)
-  set(MITK_QT5_MINIMUM_VERSION 5.10.1)
+  set(MITK_QT5_MINIMUM_VERSION 5.11.1)
   set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets Xml XmlPatterns WebEngineWidgets UiTools Help LinguistTools)
   if(APPLE)
-    set(MITK_QT5_COMPONENTS ${MITK_QT5_COMPONENTS} DBus)
+    list(APPEND MITK_QT5_COMPONENTS DBus)
   endif()
-  find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED)
+
+  # Hint at default install locations of Qt
+  if(NOT Qt5_DIR)
+    if(MSVC)
+      set(_dir_candidates "C:/Qt")
+
+      if(CMAKE_GENERATOR MATCHES "^Visual Studio [0-9]+ ([0-9]+)")
+        set(_compiler "msvc${CMAKE_MATCH_1}")
+      endif()
+    else()
+      set(_dir_candidates ~/Qt)
+
+      if(APPLE)
+        set(_compiler clang)
+      else()
+        list(APPEND _dir_candidates /opt/Qt)
+        set(_compiler gcc)
+      endif()
+    endif()
+
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(_compiler "${_compiler}_64")
+    endif()
+
+    foreach(_dir_candidate ${_dir_candidates})
+      get_filename_component(_dir_candidate ${_dir_candidate} REALPATH)
+      set(_glob_expression "${_dir_candidate}/5.*/${_compiler}")
+      file(GLOB _hints ${_glob_expression})
+      list(SORT _hints)
+      list(APPEND MITK_QT5_HINTS ${_hints})
+    endforeach()
+  endif()
+
+  find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED HINTS ${MITK_QT5_HINTS})
 endif()
 
 set_property(GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS "")
@@ -582,7 +615,7 @@ endif()
 # These should be set before any MITK install macros are used
 #-----------------------------------------------------------------------------
 
-# on Mac OSX all BlueBerry plugins get copied into every
+# on macOS all BlueBerry plugins get copied into every
 # application bundle (.app directory) specified here
 if(MITK_USE_BLUEBERRY AND APPLE)
 
@@ -642,6 +675,10 @@ if(WIN32)
   # the following line should be removed after fixing bug 17637
   mitkFunctionCheckCompilerFlags("/wd4316" MITK_CXX_FLAGS) # warning C4316: object alignment on heap
   mitkFunctionCheckCompilerFlags("/wd4180" MITK_CXX_FLAGS) # warning C4180: qualifier applied to function type has no meaning
+endif()
+
+if(APPLE)
+  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -DGL_SILENCE_DEPRECATION") # Apple deprecated OpenGL in macOS 10.14
 endif()
 
 if(NOT MSVC_VERSION)
@@ -704,7 +741,7 @@ endif()
 set(Boost_USE_MULTITHREADED 1)
 set(Boost_USE_STATIC_LIBS 0)
 set(Boost_USE_STATIC_RUNTIME 0)
-set(Boost_ADDITIONAL_VERSIONS "1.65" "1.65.1")
+set(Boost_ADDITIONAL_VERSIONS "1.65" "1.65.1" "1.66" "1.67" "1.68" "1.68.0")
 
 # We need this later for a DCMTK workaround
 set(_dcmtk_dir_orig ${DCMTK_DIR})

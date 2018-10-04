@@ -260,7 +260,7 @@ public:
     dataPointSize = c3Data->GetDataPointSize();
 	bool showDataPointsInvert = dataPointSize.toInt() > 0;
     CPPUNIT_ASSERT_MESSAGE("The DataPoints could not be changed",
-                           isShowLegend.toBool() != isShowLegendInverted.toBool());
+                         showDataPoints != showDataPointsInvert);
    }
 };
 

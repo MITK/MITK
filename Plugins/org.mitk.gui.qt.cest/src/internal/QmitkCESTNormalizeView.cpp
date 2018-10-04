@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include "mitkCESTImageNormalizationFilter.h"
 #include "mitkCustomTagParser.h"
+#include "mitkCESTImageDetectionHelper.h"
 
 const std::string QmitkCESTNormalizeView::VIEW_ID = "org.mitk.gui.qt.cest.normalize";
 
@@ -108,7 +109,6 @@ void QmitkCESTNormalizeView::OnNormalizeButtonClicked()
 QmitkCESTNormalizeView::QmitkCESTNormalizeView()
 {
   auto isImage = mitk::NodePredicateDataType::New("Image");
-  auto isCESTImage = mitk::NodePredicateDataProperty::New(mitk::CEST_PROPERTY_NAME_TOTALSCANTIME().c_str());
 
-  this->m_IsCESTImagePredicate = mitk::NodePredicateAnd::New(isImage, isCESTImage).GetPointer();
+  this->m_IsCESTImagePredicate = mitk::NodePredicateAnd::New(isImage, mitk::CreateAnyCESTImageNodePredicate()).GetPointer();
 }

@@ -339,7 +339,7 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   std::string offset = "";
   std::string measurements = "";
   bool hasSamplingInformation = results->GetStringProperty("CEST.SamplingType", sampling);
-  results->GetStringProperty(CEST_PROPERTY_NAME_OFFSETS().c_str(), offset);
+  results->GetStringProperty("CEST.Offset", offset);
   results->GetStringProperty("CEST.measurements", measurements);
 
   if ("" == measurements)

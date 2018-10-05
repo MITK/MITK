@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMSegmentationPropertyHelper.h"
 
+#include <vtkSmartPointer.h>
+
 namespace mitk
 {
   void DICOMSegmentationPropertyHandler::DeriveDICOMSegmentationProperties(LabelSetImage* dicomSegImage)
@@ -72,10 +74,10 @@ namespace mitk
 
     AnatomicalStructureColorPresets::Category category;
     AnatomicalStructureColorPresets::Type type;
-    auto anatomicalStructureColorPresets = AnatomicalStructureColorPresets::New();
-    anatomicalStructureColorPresets->LoadPreset();
+    vtkSmartPointer<AnatomicalStructureColorPresets> presets = AnatomicalStructureColorPresets::New();
+    presets->LoadPreset();
 
-    for (const auto &preset : anatomicalStructureColorPresets->GetCategoryPresets())
+    for (const auto &preset : presets->GetCategoryPresets())
     {
       auto presetOrganName = preset.first;
       if (label->GetName().compare(presetOrganName) == 0)
@@ -85,7 +87,7 @@ namespace mitk
       }
     }
 
-    for (const auto &preset : anatomicalStructureColorPresets->GetTypePresets())
+    for (const auto &preset : presets->GetTypePresets())
     {
       auto presetOrganName = preset.first;
       if (label->GetName().compare(presetOrganName) == 0)

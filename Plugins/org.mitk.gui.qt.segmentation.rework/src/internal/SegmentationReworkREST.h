@@ -34,6 +34,7 @@ public:
     std::string segInstanceUIDB;
     std::vector<double> simScoreArray;
     int minSliceStart;
+    std::string groundTruth;
   };
 
   SegmentationReworkREST();

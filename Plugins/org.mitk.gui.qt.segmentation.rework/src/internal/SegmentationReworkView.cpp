@@ -25,12 +25,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 #include <mitkIOUtil.h>
+#include "QmitkNewSegmentationDialog.h"
+#include "mitkSegTool2D.h"
+#include "mitkToolManagerProvider.h"
 
 #include <boost/uuid/uuid.hpp>            // uuid class
 #include <boost/uuid/uuid_generators.hpp> // generators
 #include <boost/uuid/uuid_io.hpp> 
 #include <boost/lexical_cast.hpp>
-#include <filesystem>
 
 const std::string SegmentationReworkView::VIEW_ID = "org.mitk.views.segmentationreworkview";
 
@@ -44,6 +46,16 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   qRegisterMetaType< std::vector<std::string> >("std::vector<std::string>");
 
   connect(m_Controls.buttonUpload, &QPushButton::clicked, this, &SegmentationReworkView::UploadNewSegmentation);
+  connect(m_Controls.buttonNewSeg, &QPushButton::clicked, this, &SegmentationReworkView::CreateNewSegmentationC);
+  connect(m_Controls.cleanDicomBtn, &QPushButton::clicked, this, &SegmentationReworkView::CleanDicomFolder);
+
+  m_downloadBaseDir = std::experimental::filesystem::path("/temp/");
+
+  if (!std::experimental::filesystem::exists(m_downloadBaseDir))
+  {
+    std::experimental::filesystem::create_directory(m_downloadBaseDir);
+  }
+
 
   utility::string_t port = U("2020");
   utility::string_t address = U("http://127.0.0.1:");
@@ -74,11 +86,11 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
   MITK_INFO << "Load related dicom series ...";
   boost::uuids::random_generator generator;
     
-  std::string folderPathSeries = m_downloadBaseDir + boost::uuids::to_string(generator()) + "/";
+  std::string folderPathSeries = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
   std::experimental::filesystem::create_directory(folderPathSeries);
 
-  std::string pathSegA = m_downloadBaseDir + boost::uuids::to_string(generator()) + "/";
-  std::string pathSegB = m_downloadBaseDir + boost::uuids::to_string(generator()) + "/";
+  std::string pathSegA = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
+  std::string pathSegB = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
 
   auto folderPathSegA = utility::conversions::to_string_t(pathSegA);
   auto folderPathSegB = utility::conversions::to_string_t(pathSegB);
@@ -98,6 +110,10 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 
   auto joinTask = pplx::when_all(begin(tasks), end(tasks));
   auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) {
+    auto fileNameA = std::experimental::filesystem::path(filePathList[1]).filename();
+    auto fileNameB = std::experimental::filesystem::path(filePathList[2]).filename();
+    m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + " " + QString::fromUtf8(fileNameA.string().c_str()));
+    m_Controls.labelSegB->setText(m_Controls.labelSegB->text() + " " + QString::fromUtf8(fileNameB.string().c_str()));
     InvokeLoadData(filePathList);
   });
 }
@@ -106,10 +122,10 @@ void SegmentationReworkView::RESTGetCallback(const SegmentationReworkREST::Dicom
 {
   boost::uuids::random_generator generator;
 
-  std::string folderPathSeries = m_downloadBaseDir + boost::uuids::to_string(generator()) + "/";
+  std::string folderPathSeries = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
   std::experimental::filesystem::create_directory(folderPathSeries);
 
-  std::string pathSeg = m_downloadBaseDir + boost::uuids::to_string(generator()) + "/";
+  std::string pathSeg = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
   auto folderPathSeg = utility::conversions::to_string_t(pathSeg);
   std::experimental::filesystem::create_directory(pathSeg);
 
@@ -130,6 +146,10 @@ void SegmentationReworkView::LoadData(std::vector<std::string> filePathList)
   mitk::IOUtil::Load(filePathList, *ds);
   // reinit view
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(ds);
+
+  // find data nodes
+  //auto allNodes = ds->GetAll();
+
 }
 
 void SegmentationReworkView::UpdateChartWidget()
@@ -180,6 +200,19 @@ void SegmentationReworkView::UploadNewSegmentation()
   {
     std::cout << exception.what() << std::endl;
   }
+}
+
+void SegmentationReworkView::CreateNewSegmentationC() 
+{
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  //toolManager->SetReferenceData(const_cast<mitk::DataNode*>(referenceData));
+  //toolManager->SetWorkingData(const_cast<mitk::DataNode*>(workingData));
+}
+
+void SegmentationReworkView::CleanDicomFolder() 
+{
+  std::experimental::filesystem::remove_all(m_downloadBaseDir);
+  std::experimental::filesystem::create_directory(m_downloadBaseDir);
 }
 
 void SegmentationReworkView::DoImageProcessing()

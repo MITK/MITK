@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "SegmentationReworkRest.h"
 #include <mitkRESTClient.h>
+#include <filesystem>
 
 /**
   \brief SegmentationReworkView
@@ -63,7 +64,9 @@ protected:
 
   /// \brief Called when the user clicks the GUI button
   void DoImageProcessing();
+  void CreateNewSegmentationC();
 
+  void CleanDicomFolder();
   void UploadNewSegmentation();
 
   Ui::SegmentationReworkViewControls m_Controls;
@@ -77,7 +80,7 @@ private:
 
   std::string m_CurrentStudyUID;
  // use filesystem::path later...
-  std::string m_downloadBaseDir = "/temp/";
+  std::experimental::filesystem::path m_downloadBaseDir;
 };
 
 #endif // SegmentationReworkView_h

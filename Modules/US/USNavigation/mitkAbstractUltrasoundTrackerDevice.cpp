@@ -16,54 +16,57 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAbstractUltrasoundTrackerDevice.h"
 #include "mitkImageReadAccessor.h"
-#include "mitkNavigationDataSmoothingFilter.h"
 #include "mitkNavigationDataDelayFilter.h"
 #include "mitkNavigationDataDisplacementFilter.h"
+#include "mitkNavigationDataSmoothingFilter.h"
 #include "mitkTrackingDeviceSource.h"
 
 // US Control Interfaces
-#include "mitkUSControlInterfaceProbes.h"
 #include "mitkUSControlInterfaceBMode.h"
 #include "mitkUSControlInterfaceDoppler.h"
+#include "mitkUSControlInterfaceProbes.h"
 
-//Microservices
+// Microservices
 #include <usGetModuleContext.h>
 #include <usModule.h>
-#include <usServiceProperties.h>
 #include <usModuleContext.h>
+#include <usServiceProperties.h>
 
 #include <algorithm>
 
-//TempIncludes
+// TempIncludes
 #include <tinyxml.h>
 
-const std::string mitk::AbstractUltrasoundTrackerDevice::DeviceClassIdentifier = "org.mitk.modules.us.AbstractUltrasoundTrackerDevice";
-const char* mitk::AbstractUltrasoundTrackerDevice::DefaultProbeIdentifier = "default";
-const char* mitk::AbstractUltrasoundTrackerDevice::ProbeAndDepthSeperator = "_";
+const std::string mitk::AbstractUltrasoundTrackerDevice::DeviceClassIdentifier =
+  "org.mitk.modules.us.AbstractUltrasoundTrackerDevice";
+const char *mitk::AbstractUltrasoundTrackerDevice::DefaultProbeIdentifier = "default";
+const char *mitk::AbstractUltrasoundTrackerDevice::ProbeAndDepthSeperator = "_";
 
-const std::string mitk::AbstractUltrasoundTrackerDevice::US_INTERFACE_NAME = "org.mitk.services.AbstractUltrasoundTrackerDevice";
+const std::string mitk::AbstractUltrasoundTrackerDevice::US_INTERFACE_NAME =
+  "org.mitk.services.AbstractUltrasoundTrackerDevice";
 const std::string mitk::AbstractUltrasoundTrackerDevice::US_PROPKEY_DEVICENAME = US_INTERFACE_NAME + ".devicename";
 const std::string mitk::AbstractUltrasoundTrackerDevice::US_PROPKEY_CLASS = US_INTERFACE_NAME + ".class";
 const std::string mitk::AbstractUltrasoundTrackerDevice::US_PROPKEY_ID = US_INTERFACE_NAME + ".id";
 //____
 
-
-mitk::AbstractUltrasoundTrackerDevice::AbstractUltrasoundTrackerDevice(
-  USDevice::Pointer usDevice, NavigationDataSource::Pointer trackingDevice,
-  bool trackedUltrasoundActive ) :
-    m_UltrasoundDevice(usDevice), m_TrackingDeviceDataSource(trackingDevice),
+mitk::AbstractUltrasoundTrackerDevice::AbstractUltrasoundTrackerDevice(USDevice::Pointer usDevice,
+                                                                       NavigationDataSource::Pointer trackingDevice,
+                                                                       bool trackedUltrasoundActive)
+  : m_UltrasoundDevice(usDevice),
+    m_TrackingDeviceDataSource(trackingDevice),
     m_SmoothingFilter(mitk::NavigationDataSmoothingFilter::New()),
     m_DelayFilter(mitk::NavigationDataDelayFilter::New(0)),
     m_DisplacementFilter(mitk::NavigationDataDisplacementFilter::New()),
     m_LastFilterOfIGTPipeline(nullptr),
-    m_NumberOfSmoothingValues(0), m_DelayCount(0),
-    m_IsTrackedUltrasoundActive( trackedUltrasoundActive )
+    m_NumberOfSmoothingValues(0),
+    m_DelayCount(0),
+    m_IsTrackedUltrasoundActive(trackedUltrasoundActive)
 {
   m_DisplacementFilter->SetTransform6DOF(true);
 
   this->RebuildFilterPipeline();
 
-  //create a new output (for the image data)
+  // create a new output (for the image data)
   //___ mitk::Image::Pointer newOutput = mitk::Image::New();
   //___ this->SetNthOutput(0, newOutput);
 
@@ -72,6 +75,10 @@ mitk::AbstractUltrasoundTrackerDevice::AbstractUltrasoundTrackerDevice(
   //___ m_UltrasoundDevice->SetSpawnAcquireThread(false);
 }
 
+mitk::AffineTransform3D::Pointer mitk::AbstractUltrasoundTrackerDevice::GetUSPlaneTransform()
+{
+  return mitk::AffineTransform3D::New();
+}
 
 mitk::AbstractUltrasoundTrackerDevice::~AbstractUltrasoundTrackerDevice()
 {
@@ -82,52 +89,47 @@ mitk::AbstractUltrasoundTrackerDevice::~AbstractUltrasoundTrackerDevice()
   m_ServiceRegistration = 0;
 }
 
-mitk::AffineTransform3D::Pointer
-  mitk::AbstractUltrasoundTrackerDevice::GetCalibration()
+mitk::AffineTransform3D::Pointer mitk::AbstractUltrasoundTrackerDevice::GetCalibration()
 {
-  return this->GetCalibration( this->GetCurrentDepthValue(),
-                               this->GetIdentifierForCurrentProbe() );
+  return this->GetCalibration(this->GetCurrentDepthValue(), this->GetIdentifierForCurrentProbe());
 }
 
-mitk::AffineTransform3D::Pointer
-  mitk::AbstractUltrasoundTrackerDevice::GetCalibration(std::string depth)
+mitk::AffineTransform3D::Pointer mitk::AbstractUltrasoundTrackerDevice::GetCalibration(std::string depth)
 {
   return this->GetCalibration(depth, this->GetIdentifierForCurrentProbe());
 }
 
-mitk::AffineTransform3D::Pointer
-  mitk::AbstractUltrasoundTrackerDevice::GetCalibration( std::string depth,
-                                                         std::string probe )
+mitk::AffineTransform3D::Pointer mitk::AbstractUltrasoundTrackerDevice::GetCalibration(std::string depth,
+                                                                                       std::string probe)
 {
   // make sure that there is no '/' which would cause problems for TinyXML
   std::replace(probe.begin(), probe.end(), '/', '-');
 
   // create identifier for calibration from probe and depth
-  std::string calibrationKey =
-    probe +
-    mitk::AbstractUltrasoundTrackerDevice::ProbeAndDepthSeperator +
-    depth;
+  std::string calibrationKey = probe + mitk::AbstractUltrasoundTrackerDevice::ProbeAndDepthSeperator + depth;
 
   // find calibration for combination of probe identifier and depth
-  std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator calibrationIterator
-    = m_Calibrations.find(calibrationKey);
+  std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator calibrationIterator =
+    m_Calibrations.find(calibrationKey);
 
-  if (calibrationIterator == m_Calibrations.end()) { return 0; }
+  if (calibrationIterator == m_Calibrations.end())
+  {
+    return 0;
+  }
 
   return calibrationIterator->second;
 }
 
-void mitk::AbstractUltrasoundTrackerDevice::SetCalibration(
-     mitk::AffineTransform3D::Pointer calibration )
+void mitk::AbstractUltrasoundTrackerDevice::SetCalibration(mitk::AffineTransform3D::Pointer calibration)
 {
-  if( calibration.IsNull() )
+  if (calibration.IsNull())
   {
     MITK_WARN << "Null pointer passed to SetCalibration of mitk::USDevice. Ignoring call.";
     return;
   }
 
   std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
-  if( calibrationKey.empty() )
+  if (calibrationKey.empty())
   {
     MITK_WARN << "Could not get a key for the calibration -> Calibration cannot be set.";
     return;
@@ -138,27 +140,21 @@ void mitk::AbstractUltrasoundTrackerDevice::SetCalibration(
 
 bool mitk::AbstractUltrasoundTrackerDevice::RemoveCalibration()
 {
-  return this->RemoveCalibration( this->GetCurrentDepthValue(),
-                                  this->GetIdentifierForCurrentProbe() );
+  return this->RemoveCalibration(this->GetCurrentDepthValue(), this->GetIdentifierForCurrentProbe());
 }
 
 bool mitk::AbstractUltrasoundTrackerDevice::RemoveCalibration(std::string depth)
 {
-  return this->RemoveCalibration( depth,
-                                  this->GetIdentifierForCurrentProbe() );
+  return this->RemoveCalibration(depth, this->GetIdentifierForCurrentProbe());
 }
 
-bool mitk::AbstractUltrasoundTrackerDevice::RemoveCalibration( std::string depth,
-                                                               std::string probe )
+bool mitk::AbstractUltrasoundTrackerDevice::RemoveCalibration(std::string depth, std::string probe)
 {
   // make sure that there is no '/' which would cause problems for TinyXML
   std::replace(probe.begin(), probe.end(), '/', '-');
 
   // create identifier for calibration from probe and depth
-  std::string calibrationKey =
-    probe +
-    mitk::AbstractUltrasoundTrackerDevice::ProbeAndDepthSeperator +
-    depth;
+  std::string calibrationKey = probe + mitk::AbstractUltrasoundTrackerDevice::ProbeAndDepthSeperator + depth;
 
   return m_Calibrations.erase(calibrationKey) > 0;
 }
@@ -181,7 +177,7 @@ mitk::USImageSource::Pointer mitk::AbstractUltrasoundTrackerDevice::GetUSImageSo
 
 mitk::NavigationDataSource::Pointer mitk::AbstractUltrasoundTrackerDevice::GetNavigationDataSource()
 {
-  if( m_LastFilterOfIGTPipeline.IsNull() )
+  if (m_LastFilterOfIGTPipeline.IsNull())
   {
     this->RebuildFilterPipeline();
   }
@@ -204,9 +200,9 @@ std::string mitk::AbstractUltrasoundTrackerDevice::SerializeCalibration()
   std::stringstream result;
   result << "<calibrations>" << std::endl;
   // For each calibration in the set
-  for( std::map<std::string,
-       mitk::AffineTransform3D::Pointer>::iterator it = m_Calibrations.begin();
-       it != m_Calibrations.end(); it++ )
+  for (std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator it = m_Calibrations.begin();
+       it != m_Calibrations.end();
+       it++)
   {
     mitk::AffineTransform3D::MatrixType matrix = it->second->GetMatrix();
     mitk::AffineTransform3D::TranslationType translation = it->second->GetTranslation();
@@ -233,9 +229,8 @@ std::string mitk::AbstractUltrasoundTrackerDevice::SerializeCalibration()
   return result.str();
 }
 
-void mitk::AbstractUltrasoundTrackerDevice::DeserializeCalibration(
-                                              const std::string& xmlString,
-                                              bool clearPreviousCalibrations )
+void mitk::AbstractUltrasoundTrackerDevice::DeserializeCalibration(const std::string &xmlString,
+                                                                   bool clearPreviousCalibrations)
 {
   // Sanitize Input
   if (xmlString == "")
@@ -245,7 +240,8 @@ void mitk::AbstractUltrasoundTrackerDevice::DeserializeCalibration(
     return;
   }
   // Clear previous calibrations if necessary
-  if (clearPreviousCalibrations) m_Calibrations.clear();
+  if (clearPreviousCalibrations)
+    m_Calibrations.clear();
 
   // Parse Input
   TiXmlDocument doc;
@@ -255,7 +251,7 @@ void mitk::AbstractUltrasoundTrackerDevice::DeserializeCalibration(
     mitkThrow() << "Unable to deserialize calibrations in CombinedModality. Error was: " << doc.ErrorDesc();
     return;
   }
-  TiXmlElement* root = doc.FirstChildElement();
+  TiXmlElement *root = doc.FirstChildElement();
   if (root == nullptr)
   {
     MITK_ERROR << "Unable to deserialize calibrations in CombinedModality. String contained no root element.";
@@ -263,7 +259,7 @@ void mitk::AbstractUltrasoundTrackerDevice::DeserializeCalibration(
     return;
   }
   // Read Calibrations
-  for (TiXmlElement* elem = root->FirstChildElement(); elem != nullptr; elem = elem->NextSiblingElement())
+  for (TiXmlElement *elem = root->FirstChildElement(); elem != nullptr; elem = elem->NextSiblingElement())
   {
     mitk::AffineTransform3D::MatrixType matrix;
     mitk::AffineTransform3D::OffsetType translation;
@@ -293,52 +289,46 @@ void mitk::AbstractUltrasoundTrackerDevice::DeserializeCalibration(
   }
 }
 
-void mitk::AbstractUltrasoundTrackerDevice::SetNumberOfSmoothingValues(
-                                      unsigned int numberOfSmoothingValues )
+void mitk::AbstractUltrasoundTrackerDevice::SetNumberOfSmoothingValues(unsigned int numberOfSmoothingValues)
 {
   unsigned int oldNumber = m_NumberOfSmoothingValues;
   m_NumberOfSmoothingValues = numberOfSmoothingValues;
 
   // if filter should be activated or deactivated
-  if ((oldNumber == 0 && numberOfSmoothingValues != 0) ||
-    (oldNumber != 0 && numberOfSmoothingValues == 0))
+  if ((oldNumber == 0 && numberOfSmoothingValues != 0) || (oldNumber != 0 && numberOfSmoothingValues == 0))
   {
     this->RebuildFilterPipeline();
   }
   m_SmoothingFilter->SetNumerOfValues(numberOfSmoothingValues);
 }
 
-void mitk::AbstractUltrasoundTrackerDevice::SetDelayCount( unsigned int delayCount )
+void mitk::AbstractUltrasoundTrackerDevice::SetDelayCount(unsigned int delayCount)
 {
   unsigned int oldCount = m_DelayCount;
   m_DelayCount = delayCount;
 
   // if filter should be activated or deactivated
-  if ((oldCount == 0 && delayCount != 0) ||
-    (oldCount != 0 && delayCount == 0))
+  if ((oldCount == 0 && delayCount != 0) || (oldCount != 0 && delayCount == 0))
   {
     this->RebuildFilterPipeline();
   }
   m_DelayFilter->SetDelay(delayCount);
 }
 
-void mitk::AbstractUltrasoundTrackerDevice::GenerateData()
-{
-}
+void mitk::AbstractUltrasoundTrackerDevice::GenerateData() {}
 
 std::string mitk::AbstractUltrasoundTrackerDevice::GetIdentifierForCurrentCalibration()
 {
-  return this->GetIdentifierForCurrentProbe()
-    + mitk::AbstractUltrasoundTrackerDevice::ProbeAndDepthSeperator
-    + this->GetCurrentDepthValue();
+  return this->GetIdentifierForCurrentProbe() + mitk::AbstractUltrasoundTrackerDevice::ProbeAndDepthSeperator +
+         this->GetCurrentDepthValue();
 }
 
 std::string mitk::AbstractUltrasoundTrackerDevice::GetIdentifierForCurrentProbe()
 {
   us::ServiceProperties usdeviceProperties = m_UltrasoundDevice->GetServiceProperties();
 
-  us::ServiceProperties::const_iterator probeIt = usdeviceProperties.find(
-    mitk::USDevice::GetPropertyKeys().US_PROPKEY_PROBES_SELECTED);
+  us::ServiceProperties::const_iterator probeIt =
+    usdeviceProperties.find(mitk::USDevice::GetPropertyKeys().US_PROPKEY_PROBES_SELECTED);
 
   // get probe identifier from control interface for probes
   std::string probeName = mitk::AbstractUltrasoundTrackerDevice::DefaultProbeIdentifier;
@@ -359,8 +349,8 @@ std::string mitk::AbstractUltrasoundTrackerDevice::GetCurrentDepthValue()
 
   // get string for depth value from the micro service properties
   std::string depth;
-  us::ServiceProperties::iterator depthIterator = usdeviceProperties.find(
-    mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH);
+  us::ServiceProperties::iterator depthIterator =
+    usdeviceProperties.find(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH);
 
   if (depthIterator != usdeviceProperties.end())
   {
@@ -378,19 +368,19 @@ void mitk::AbstractUltrasoundTrackerDevice::RebuildFilterPipeline()
 {
   m_LastFilterOfIGTPipeline = m_TrackingDeviceDataSource;
 
-  if( m_NumberOfSmoothingValues > 0 )
+  if (m_NumberOfSmoothingValues > 0)
   {
     m_SmoothingFilter->ConnectTo(m_LastFilterOfIGTPipeline.GetPointer());
     m_LastFilterOfIGTPipeline = m_SmoothingFilter;
   }
 
-  if( m_DelayCount > 0 )
+  if (m_DelayCount > 0)
   {
     m_DelayFilter->ConnectTo(m_LastFilterOfIGTPipeline.GetPointer());
     m_LastFilterOfIGTPipeline = m_DelayFilter;
   }
 
-  if( m_IsTrackedUltrasoundActive )
+  if (m_IsTrackedUltrasoundActive)
   {
     m_DisplacementFilter->ConnectTo(m_LastFilterOfIGTPipeline.GetPointer());
     m_LastFilterOfIGTPipeline = m_DisplacementFilter;
@@ -415,13 +405,12 @@ void mitk::AbstractUltrasoundTrackerDevice::UnregisterOnService()
 
 void mitk::AbstractUltrasoundTrackerDevice::RegisterAsMicroservice()
 {
-  //Get Context
-  us::ModuleContext* context = us::GetModuleContext();
+  // Get Context
+  us::ModuleContext *context = us::GetModuleContext();
 
-  //Define ServiceProps
-  //us::ServiceProperties props;
-  mitk::UIDGenerator uidGen =
-    mitk::UIDGenerator("org.mitk.services.AbstractUltrasoundTrackerDevice", 16);
+  // Define ServiceProps
+  // us::ServiceProperties props;
+  mitk::UIDGenerator uidGen = mitk::UIDGenerator("org.mitk.services.AbstractUltrasoundTrackerDevice", 16);
   m_ServiceProperties[US_PROPKEY_ID] = uidGen.GetUID();
   m_ServiceProperties[US_PROPKEY_DEVICENAME] = m_UltrasoundDevice->GetName();
   m_ServiceProperties[US_PROPKEY_CLASS] = mitk::AbstractUltrasoundTrackerDevice::DeviceClassIdentifier;

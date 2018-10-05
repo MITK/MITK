@@ -45,6 +45,7 @@ namespace mitk {
 
     mitkClassMacro(TrackedUltrasound, mitk::AbstractUltrasoundTrackerDevice);
     mitkNewMacro3Param(TrackedUltrasound, USDevice::Pointer, itk::SmartPointer<NavigationDataSource>, bool);
+    virtual AffineTransform3D::Pointer GetUSPlaneTransform();
 
 
 

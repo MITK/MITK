@@ -93,7 +93,7 @@ bool QmitkUSNavigationStepPunctuationIntervention::OnStartStep()
       ("Needle Path", QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
   node->SetData(m_NeedleProjectionFilter->GetProjection());
   node->SetBoolProperty("show contour", true);
-  m_NeedleProjectionFilter->SetToolAxisForFilter(m_NeedleNavigationTool->GetToolAxis());
+  //m_NeedleProjectionFilter->SetToolAxisForFilter(m_NeedleNavigationTool->GetToolAxis());
   return true;
 }
 
@@ -205,10 +205,10 @@ void QmitkUSNavigationStepPunctuationIntervention::OnSetCombinedModality()
     m_NeedleProjectionFilter->ConnectTo(combinedModality->GetNavigationDataSource());
 
     // set calibration of the combined modality to the needle projection filter
-    mitk::AffineTransform3D::Pointer calibration = combinedModality->GetCalibration();
-    if ( calibration.IsNotNull() )
+    mitk::AffineTransform3D::Pointer usPlaneTransform = combinedModality->GetUSPlaneTransform();
+    if (usPlaneTransform.IsNotNull())
     {
-      m_NeedleProjectionFilter->SetTargetPlane(calibration);
+      m_NeedleProjectionFilter->SetTargetPlane(usPlaneTransform);
     }
   }
   else

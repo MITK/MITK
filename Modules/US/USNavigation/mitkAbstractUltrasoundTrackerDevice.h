@@ -98,6 +98,9 @@ namespace mitk {
     */
     AffineTransform3D::Pointer GetCalibration(std::string depth, std::string probe);
 
+    /** Returns the index to world transform of the US plane. */
+    virtual AffineTransform3D::Pointer GetUSPlaneTransform();
+
     /**
     * \brief Sets a transformation as calibration data.
     * Calibration data is set for the currently activated probe and their current

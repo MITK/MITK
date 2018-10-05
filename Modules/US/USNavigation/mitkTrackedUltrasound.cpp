@@ -35,6 +35,11 @@ mitk::TrackedUltrasound::~TrackedUltrasound()
 {
 }
 
+mitk::AffineTransform3D::Pointer mitk::TrackedUltrasound::GetUSPlaneTransform()
+{
+  return m_UltrasoundDevice->GetOutput(0)->GetGeometry()->GetIndexToWorldTransform();
+}
+
 void mitk::TrackedUltrasound::GenerateData()
 {
   //Call Update auf US-Device + evtl. auf Tracker (???)

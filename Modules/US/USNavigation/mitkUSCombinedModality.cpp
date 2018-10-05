@@ -14,59 +14,66 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkUSCombinedModality.h"
 #include "mitkImageReadAccessor.h"
-#include <mitkNavigationDataSmoothingFilter.h>
-#include <mitkNavigationDataDelayFilter.h>
 #include "mitkTrackingDeviceSource.h"
+#include "mitkUSCombinedModality.h"
+#include <mitkNavigationDataDelayFilter.h>
+#include <mitkNavigationDataSmoothingFilter.h>
 
 // US Control Interfaces
-#include "mitkUSControlInterfaceProbes.h"
 #include "mitkUSControlInterfaceBMode.h"
 #include "mitkUSControlInterfaceDoppler.h"
+#include "mitkUSControlInterfaceProbes.h"
 
-mitk::USCombinedModality::USCombinedModality( USDevice::Pointer usDevice,
-                                              NavigationDataSource::Pointer trackingDevice,
-                                              bool trackedUltrasoundActive )
-  : AbstractUltrasoundTrackerDevice( usDevice, trackingDevice, trackedUltrasoundActive )
+mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice,
+                                             NavigationDataSource::Pointer trackingDevice,
+                                             bool trackedUltrasoundActive)
+  : AbstractUltrasoundTrackerDevice(usDevice, trackingDevice, trackedUltrasoundActive)
 {
 }
-
-mitk::USCombinedModality::~USCombinedModality()
+mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetUSPlaneTransform()
 {
+  return this->GetCalibration();
 }
 
+mitk::USCombinedModality::~USCombinedModality() {}
 
 void mitk::USCombinedModality::GenerateData()
 {
-  if (m_UltrasoundDevice->GetIsFreezed()) { return; } //if the image is freezed: do nothing
-  
-  //get next image from ultrasound image source
-  //FOR LATER: Be aware if the for loop behaves correct, if the UltrasoundDevice has more than 1 output.
+  if (m_UltrasoundDevice->GetIsFreezed())
+  {
+    return;
+  } // if the image is freezed: do nothing
+
+  // get next image from ultrasound image source
+  // FOR LATER: Be aware if the for loop behaves correct, if the UltrasoundDevice has more than 1 output.
   int i = 0;
   m_UltrasoundDevice->Update();
   mitk::Image::Pointer image = m_UltrasoundDevice->GetOutput(0);
-  if (image.IsNull() || !image->IsInitialized()) //check the image
+  if (image.IsNull() || !image->IsInitialized()) // check the image
   {
     MITK_WARN << "Invalid image in USCombinedModality, aborting!";
     return;
   }
 
-  //get output and initialize it if it wasn't initialized before
+  // get output and initialize it if it wasn't initialized before
   mitk::Image::Pointer output = this->GetOutput();
-  if (!output->IsInitialized()) { output->Initialize(image); }
+  if (!output->IsInitialized())
+  {
+    output->Initialize(image);
+  }
 
-  //now update image data
+  // now update image data
   mitk::ImageReadAccessor inputReadAccessor(image, image->GetSliceData(0, 0, 0));
-  output->SetSlice(inputReadAccessor.GetData()); //copy image data
-  output->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing()); //copy spacing because this might also change
+  output->SetSlice(inputReadAccessor.GetData());                         // copy image data
+  output->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing()); // copy spacing because this might also change
 
-  //and update calibration (= transformation of the image)
+  // and update calibration (= transformation of the image)
   std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
   if (!calibrationKey.empty())
   {
-    std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator calibrationIterator
-      = m_Calibrations.find(calibrationKey);
+    std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator calibrationIterator =
+      m_Calibrations.find(calibrationKey);
     if (calibrationIterator != m_Calibrations.end())
     {
       // transform image according to callibration if one is set

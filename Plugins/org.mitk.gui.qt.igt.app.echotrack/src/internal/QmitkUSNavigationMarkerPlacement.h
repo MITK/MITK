@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTextAnnotation2D.h>
 #include <mitkAbstractUltrasoundTrackerDevice.h>
 #include <mitkNavigationToolStorage.h>
+#include <mitkNavigationDataObjectVisualizationFilter.h>
 
 namespace itk
 {
@@ -184,6 +185,8 @@ protected:
   mitk::NavigationDataRecorder::Pointer m_NavigationDataRecorder; // records navigation data files
   mitk::NodeDisplacementFilter::Pointer m_TargetNodeDisplacementFilter;
   mitk::NodeDisplacementFilter::Pointer m_AblationZonesDisplacementFilter;
+  mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter;
+  mitk::DataNode::Pointer m_InstrumentNode;
   std::vector<mitk::DataNode::Pointer> m_AblationZonesVector;
 
   int m_NeedleIndex;

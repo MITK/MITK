@@ -185,6 +185,7 @@ mitk::NavigationDataSource::Pointer mitk::AbstractUltrasoundTrackerDevice::GetNa
   {
     this->RebuildFilterPipeline();
   }
+  m_LastFilterOfIGTPipeline->SetToolMetaDataCollection(this->m_TrackingDeviceDataSource->GetToolMetaDataCollection());
   return m_LastFilterOfIGTPipeline;
 }
 

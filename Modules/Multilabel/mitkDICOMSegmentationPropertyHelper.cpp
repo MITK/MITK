@@ -74,7 +74,7 @@ namespace mitk
 
     AnatomicalStructureColorPresets::Category category;
     AnatomicalStructureColorPresets::Type type;
-    vtkSmartPointer<AnatomicalStructureColorPresets> presets = AnatomicalStructureColorPresets::New();
+    auto presets = vtkSmartPointer<AnatomicalStructureColorPresets>::New();
     presets->LoadPreset();
 
     for (const auto &preset : presets->GetCategoryPresets())

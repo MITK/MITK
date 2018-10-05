@@ -26,7 +26,7 @@ namespace mitk
     {
       QStringList organColors;
 
-      vtkSmartPointer<AnatomicalStructureColorPresets> presets = AnatomicalStructureColorPresets::New();
+      auto presets = vtkSmartPointer<AnatomicalStructureColorPresets>::New();
       presets->LoadPreset();
 
       for (const auto& preset : presets->GetColorPresets())

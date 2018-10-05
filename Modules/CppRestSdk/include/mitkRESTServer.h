@@ -27,9 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "cpprest/producerconsumerstream.h"
 #include "cpprest/uri.h"
 
-// hm.. maybe go after that warning at some time? seems like a nasty hack, but works so far :)
-#pragma warning(disable : 4251)
-
 #include "MitkCppRestSdkExports.h"
 
 typedef web::http::experimental::listener::http_listener MitkListener;
@@ -51,8 +48,6 @@ namespace mitk
 
     pplx::task<void> Open() { return m_Listener.open(); }
     pplx::task<void> Close() { return m_Listener.close(); }
-
-    static std::string convertToUtf8(utility::string_t stringT) { return utility::conversions::to_utf8string(stringT); }
 
   protected:
     virtual void HandleGet(MitkRequest message){};

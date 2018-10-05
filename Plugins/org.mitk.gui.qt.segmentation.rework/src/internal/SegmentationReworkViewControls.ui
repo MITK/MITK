@@ -85,12 +85,19 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="buttonNewSeg">
+     <property name="text">
+      <string>Create new Segmentation C</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="buttonUpload">
      <property name="toolTip">
       <string>Do image processing</string>
      </property>
      <property name="text">
-      <string>Upload new Segmentation C</string>
+      <string>Upload Segmentation C</string>
      </property>
     </widget>
    </item>
@@ -109,6 +116,13 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item>
+    <widget class="QPushButton" name="cleanDicomBtn">
+     <property name="text">
+      <string>clean dicom download folder</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

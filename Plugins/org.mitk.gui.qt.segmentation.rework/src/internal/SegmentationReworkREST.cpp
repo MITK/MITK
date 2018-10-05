@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "SegmentationReworkREST.h"
 #include <mitkCommon.h>
+#include <mitkRESTUtil.h>
 
 SegmentationReworkREST::SegmentationReworkREST() {}
 
@@ -31,7 +32,7 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
 {
   auto messageString = message.to_string();
   MITK_INFO << "Message GET incoming...";
-  MITK_INFO << convertToUtf8(messageString);
+  MITK_INFO << mitk::RESTUtil::convertToUtf8(messageString);
 
   auto httpParams = web::uri::split_query(message.request_uri().query());
 
@@ -47,9 +48,9 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
       auto segSeriesUID = httpParams.at(L"segSeriesUID");
 
       DicomDTO dto;
-      dto.imageSeriesUID = convertToUtf8(imageSeriesUID);
-      dto.studyUID = convertToUtf8(studyUID);
-      dto.segSeriesUIDA = convertToUtf8(segSeriesUID);
+      dto.imageSeriesUID = mitk::RESTUtil::convertToUtf8(imageSeriesUID);
+      dto.studyUID = mitk::RESTUtil::convertToUtf8(studyUID);
+      dto.segSeriesUIDA = mitk::RESTUtil::convertToUtf8(segSeriesUID);
 
       m_GetCallback(dto);
 
@@ -70,7 +71,7 @@ void SegmentationReworkREST::HandlePut(MitkRequest message)
 {
   auto messageString = message.to_string();
   MITK_INFO << "Message PUT incoming...";
-  MITK_INFO << convertToUtf8(messageString);
+  MITK_INFO << mitk::RESTUtil::convertToUtf8(messageString);
 
   try
   {
@@ -83,16 +84,18 @@ void SegmentationReworkREST::HandlePut(MitkRequest message)
       auto imageSeriesUIDKey = jsonMessage.at(U("imageSeriesUID"));
       auto segSeriesUIDAKey = jsonMessage.at(U("segSeriesUIDA"));
       auto segSeriesUIDBKey = jsonMessage.at(U("segSeriesUIDB"));
+      auto groundTruthKey = jsonMessage.at(U("groundTruth"));
 
       auto simScoreKey = jsonMessage.at(U("simScoreArray"));
       auto minSliceStartKey = jsonMessage.at(U("minSliceStart"));
 
       DicomDTO dto;
-      dto.segSeriesUIDA = convertToUtf8(segSeriesUIDAKey.as_string());
-      dto.segSeriesUIDB = convertToUtf8(segSeriesUIDBKey.as_string());
-      dto.imageSeriesUID = convertToUtf8(imageSeriesUIDKey.as_string());
+      dto.segSeriesUIDA = mitk::RESTUtil::convertToUtf8(segSeriesUIDAKey.as_string());
+      dto.segSeriesUIDB = mitk::RESTUtil::convertToUtf8(segSeriesUIDBKey.as_string());
+      dto.imageSeriesUID = mitk::RESTUtil::convertToUtf8(imageSeriesUIDKey.as_string());
+      dto.groundTruth = mitk::RESTUtil::convertToUtf8(groundTruthKey.as_string());
 
-      dto.studyUID = convertToUtf8(imageStudyUIDKey.as_string());
+      dto.studyUID = mitk::RESTUtil::convertToUtf8(imageStudyUIDKey.as_string());
       dto.minSliceStart = minSliceStartKey.as_integer();
 
       std::vector<double> vec;

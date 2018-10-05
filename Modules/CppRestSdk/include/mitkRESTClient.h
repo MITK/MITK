@@ -25,9 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "cpprest/producerconsumerstream.h"
 #include "cpprest/uri.h"
 
-// hm.. maybe go after that warning at some time? seems like a nasty hack, but works so far :)
-#pragma warning(disable : 4251)
-
 #include "MitkCppRestSdkExports.h"
 
 typedef web::http::client::http_client MitkClient;
@@ -57,7 +54,7 @@ namespace mitk
     pplx::task<void> StowRS(utility::string_t filePath, std::string studyUID);
 
   private:
-    MitkClient m_Client;
+    MitkClient* m_Client;
 
   };
 };

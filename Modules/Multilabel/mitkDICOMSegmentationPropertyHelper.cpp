@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 
+#include <vtkSmartPointer.h>
+
 namespace mitk
 {
   struct MITKMULTILABEL_EXPORT DICOMSegmentationPropertyHandler
@@ -110,10 +112,10 @@ namespace mitk
 
       AnatomicalStructureColorPresets::Category category;
       AnatomicalStructureColorPresets::Type type;
-      AnatomicalStructureColorPresets *anatomicalStructureColorPresets = AnatomicalStructureColorPresets::New();
-      anatomicalStructureColorPresets->LoadPreset();
+      auto presets = vtkSmartPointer<AnatomicalStructureColorPresets>::New();
+      presets->LoadPreset();
 
-      for (const auto &preset : anatomicalStructureColorPresets->GetCategoryPresets())
+      for (const auto &preset : presets->GetCategoryPresets())
       {
         auto presetOrganName = preset.first;
         if (label->GetName().compare(presetOrganName) == 0)
@@ -123,7 +125,7 @@ namespace mitk
         }
       }
 
-      for (const auto &preset : anatomicalStructureColorPresets->GetTypePresets())
+      for (const auto &preset : presets->GetTypePresets())
       {
         auto presetOrganName = preset.first;
         if (label->GetName().compare(presetOrganName) == 0)

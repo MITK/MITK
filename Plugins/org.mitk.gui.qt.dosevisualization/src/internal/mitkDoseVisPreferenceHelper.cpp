@@ -155,7 +155,7 @@ mitk::PresetMapType mitk::GenerateDefaultPresetsMap()
 {
   mitk::PresetMapType result;
 
-  result.insert(std::make_pair(std::string("Virtuos"), mitk::GeneratIsoLevels_Virtuos()));
+  result.insert(std::make_pair(std::string("Virtuos"), mitk::GenerateIsoLevels_Virtuos()));
   return result;
 }
 

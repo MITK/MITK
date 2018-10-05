@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIsoLevelsGenerator.h"
 
-mitk::IsoDoseLevelSet::Pointer mitk::GeneratIsoLevels_Virtuos()
+mitk::IsoDoseLevelSet::Pointer mitk::GenerateIsoLevels_Virtuos()
 {
   mitk::IsoDoseLevelSet::Pointer levelSet = mitk::IsoDoseLevelSet::New();
 

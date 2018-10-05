@@ -316,7 +316,7 @@ void DoseVisualizationPreferencePage::OnAddPresetClicked(bool)
     done = uniqueName && validName;
   }
 
-  mitk::IsoDoseLevelSet::Pointer newSet = mitk::GeneratIsoLevels_Virtuos();
+  mitk::IsoDoseLevelSet::Pointer newSet = mitk::GenerateIsoLevels_Virtuos();
   m_Presets.insert(std::make_pair(name.toStdString(),newSet));
 
   m_presetMapChanged = true;
@@ -352,7 +352,7 @@ void DoseVisualizationPreferencePage::OnResetPresetClicked(bool)
 
   if (ret == QMessageBox::Yes)
   {
-    mitk::IsoDoseLevelSet::Pointer newSet = mitk::GeneratIsoLevels_Virtuos();
+    mitk::IsoDoseLevelSet::Pointer newSet = mitk::GenerateIsoLevels_Virtuos();
     m_Presets.clear();
     m_Presets.insert(std::make_pair("Virtuos",newSet));
 

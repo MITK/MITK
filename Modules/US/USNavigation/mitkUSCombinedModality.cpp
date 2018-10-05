@@ -40,6 +40,7 @@ mitk::USCombinedModality::~USCombinedModality()
 void mitk::USCombinedModality::GenerateData()
 {
   if (m_UltrasoundDevice->GetIsFreezed()) { return; } //if the image is freezed: do nothing
+  
   //get next image from ultrasound image source
   //FOR LATER: Be aware if the for loop behaves correct, if the UltrasoundDevice has more than 1 output.
   int i = 0;

@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QStringList>
 #include <mitkAnatomicalStructureColorPresets.h>
+#include <vtkSmartPointer.h>
 
 namespace mitk
 {
@@ -25,10 +26,10 @@ namespace mitk
     {
       QStringList organColors;
 
-      auto anatomicalStructureColorPresets = mitk::AnatomicalStructureColorPresets::New();
-      anatomicalStructureColorPresets->LoadPreset();
+      vtkSmartPointer<AnatomicalStructureColorPresets> presets = AnatomicalStructureColorPresets::New();
+      presets->LoadPreset();
 
-      for (const auto& preset : anatomicalStructureColorPresets->GetColorPresets())
+      for (const auto& preset : presets->GetColorPresets())
       {
         auto organName = preset.first.c_str();
         auto color = QColor(preset.second.GetRed(), preset.second.GetGreen(), preset.second.GetBlue());

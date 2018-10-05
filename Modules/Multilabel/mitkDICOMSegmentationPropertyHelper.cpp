@@ -72,7 +72,7 @@ namespace mitk
 
     AnatomicalStructureColorPresets::Category category;
     AnatomicalStructureColorPresets::Type type;
-    AnatomicalStructureColorPresets *anatomicalStructureColorPresets = AnatomicalStructureColorPresets::New();
+    auto anatomicalStructureColorPresets = AnatomicalStructureColorPresets::New();
     anatomicalStructureColorPresets->LoadPreset();
 
     for (const auto &preset : anatomicalStructureColorPresets->GetCategoryPresets())

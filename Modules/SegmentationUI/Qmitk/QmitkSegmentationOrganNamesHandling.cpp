@@ -25,7 +25,7 @@ namespace mitk
     {
       QStringList organColors;
 
-      mitk::AnatomicalStructureColorPresets* anatomicalStructureColorPresets = mitk::AnatomicalStructureColorPresets::New();
+      auto anatomicalStructureColorPresets = mitk::AnatomicalStructureColorPresets::New();
       anatomicalStructureColorPresets->LoadPreset();
 
       for (const auto& preset : anatomicalStructureColorPresets->GetColorPresets())

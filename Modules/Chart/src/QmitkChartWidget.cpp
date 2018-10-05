@@ -106,17 +106,13 @@ QmitkChartWidget::Impl::Impl(QWidget* parent, bool unitTest)
     m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
     m_WebEngineView->page()->setWebChannel(m_WebChannel);
     m_WebEngineView->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
+
+    connect(m_WebEngineView, SIGNAL(loadFinished(bool)), parent, SLOT(OnLoadFinished(bool)));
+    auto layout = new QGridLayout(parent);
+    layout->setMargin(0);
+    layout->addWidget(m_WebEngineView);
+    parent->setLayout(layout);
   }
-
-
-  connect(m_WebEngineView, SIGNAL(loadFinished(bool)), parent, SLOT(OnLoadFinished(bool)));
-
-  auto layout = new QGridLayout(parent);
-  layout->setMargin(0);
-  layout->addWidget(m_WebEngineView);
-
-  parent->setLayout(layout);
-
   m_ChartTypeToName.emplace(ChartType::bar, "bar");
   m_ChartTypeToName.emplace(ChartType::line, "line");
   m_ChartTypeToName.emplace(ChartType::spline, "spline");

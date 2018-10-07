@@ -143,13 +143,14 @@ void SegmentationReworkView::LoadData(std::vector<std::string> filePathList)
 {
   MITK_INFO << "Loading finished. Pushing data to data storage ...";
   auto ds = GetDataStorage();
-  mitk::IOUtil::Load(filePathList, *ds);
+  auto dataNodes = mitk::IOUtil::Load(filePathList, *ds);
   // reinit view
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(ds);
 
   // find data nodes
-  //auto allNodes = ds->GetAll();
-
+  m_Image = dataNodes->at(0);
+  m_SegA = dataNodes->at(1);
+  m_SegB = dataNodes->at(2);
 }
 
 void SegmentationReworkView::UpdateChartWidget()
@@ -205,8 +206,8 @@ void SegmentationReworkView::UploadNewSegmentation()
 void SegmentationReworkView::CreateNewSegmentationC() 
 {
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  //toolManager->SetReferenceData(const_cast<mitk::DataNode*>(referenceData));
-  //toolManager->SetWorkingData(const_cast<mitk::DataNode*>(workingData));
+  toolManager->SetReferenceData(m_Image);
+  toolManager->SetWorkingData(m_SegC);
 }
 
 void SegmentationReworkView::CleanDicomFolder() 

@@ -81,6 +81,11 @@ private:
   std::string m_CurrentStudyUID;
  // use filesystem::path later...
   std::experimental::filesystem::path m_downloadBaseDir;
+
+  mitk::DataNode::Pointer m_Image;
+  mitk::DataNode::Pointer m_SegA;
+  mitk::DataNode::Pointer m_SegB;
+  mitk::DataNode::Pointer m_SegC;
 };
 
 #endif // SegmentationReworkView_h

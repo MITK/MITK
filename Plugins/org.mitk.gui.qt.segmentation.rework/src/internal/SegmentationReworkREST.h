@@ -32,6 +32,7 @@ public:
     std::string studyUID;
     std::string segInstanceUIDA;
     std::string segInstanceUIDB;
+    std::string srSeriesUID;
     std::vector<double> simScoreArray;
     int minSliceStart;
     std::string groundTruth;

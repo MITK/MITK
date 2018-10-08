@@ -131,6 +131,28 @@ pplx::task<void> mitk::RESTClient::Post(utility::string_t uri, utility::string_t
 
 }
 
+pplx::task<web::json::value> mitk::RESTClient::QuidoRSInstances(std::map<std::string, std::string> params)
+{
+  MitkUriBuilder queryBuilder(U("rs/instances"));
+
+  for (auto const& element : params)
+  {
+    queryBuilder.append_query(mitk::RESTUtil::convertToTString(element.first), mitk::RESTUtil::convertToTString(element.second));
+  }
+
+  MITK_INFO << utility::conversions::to_utf8string(queryBuilder.to_string());
+  MitkRequest instances(MitkRESTMethods::GET);
+  instances.set_request_uri(queryBuilder.to_string());
+  instances.headers().add(U("Accept"), U("application/json"));
+
+  return m_Client->request(instances).then([=](MitkResponse response)
+  {
+    MITK_INFO << " status: " << response.status_code();
+
+    return response.extract_json().get();
+  });
+}
+
 pplx::task<void> mitk::RESTClient::WadoRS(utility::string_t filePath, std::string studyUID, std::string seriesUID, std::string instanceUID)
 {
   MitkUriBuilder builder(U("wado"));
@@ -144,23 +166,15 @@ pplx::task<void> mitk::RESTClient::WadoRS(utility::string_t filePath, std::strin
 
 pplx::task<std::string> mitk::RESTClient::WadoRS(const utility::string_t folderPath, std::string studyUID, std::string seriesUID)
 {
-  // this is actually a quido-rs request, should be packed into a seperate method.. at some time.. 
-   //but there are many possible requests to support: http://dicom.nema.org/medical/dicom/current/output/chtml/part18/sect_6.7.html
-  MitkUriBuilder builder(U("rs/instances"));
-  builder.append_query(U("StudyInstanceUID"), mitk::RESTUtil::convertToTString(studyUID));
-  builder.append_query(U("SeriesInstanceUID"), mitk::RESTUtil::convertToTString(seriesUID));
+  typedef std::map<std::string, std::string> ParamMap;
+  ParamMap seriesInstancesParams;
 
-  MITK_INFO << utility::conversions::to_utf8string(builder.to_string());
-  MitkRequest getSeries(MitkRESTMethods::GET);
-  getSeries.set_request_uri(builder.to_string());
-  getSeries.headers().add(U("Accept"), U("application/json"));
+  seriesInstancesParams.insert(ParamMap::value_type({"StudyInstanceUID"}, studyUID));
+  seriesInstancesParams.insert(ParamMap::value_type({"SeriesInstanceUID"}, seriesUID));
 
-  return m_Client->request(getSeries).then([=](MitkResponse response) -> pplx::task<std::string>
+  return QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) -> pplx::task<std::string>
   {
-    MITK_INFO << "search for instances in series with uid " << seriesUID
-      << " status: " << response.status_code();
-
-    auto jsonListResult = response.extract_json().get();
+    auto jsonListResult = jsonResult;
     auto resultArray = jsonListResult.as_array();
 
     auto firstFileName = std::string();

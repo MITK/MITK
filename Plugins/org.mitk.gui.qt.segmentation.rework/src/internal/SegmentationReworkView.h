@@ -74,18 +74,21 @@ protected:
 private:
 
   void SetSimilarityGraph(std::vector<double> simScoreArray, int sliceMinStart);
-
   std::unique_ptr<SegmentationReworkREST> m_HttpHandler;
   mitk::RESTClient* m_RestClient;
 
   std::string m_CurrentStudyUID;
- // use filesystem::path later...
+
   std::experimental::filesystem::path m_downloadBaseDir;
+  std::experimental::filesystem::path m_tempSegDir;
 
   mitk::DataNode::Pointer m_Image;
   mitk::DataNode::Pointer m_SegA;
   mitk::DataNode::Pointer m_SegB;
   mitk::DataNode::Pointer m_SegC;
+  std::string m_GroundTruth;
+
+  QWidget* m_Parent;
 };
 
 #endif // SegmentationReworkView_h

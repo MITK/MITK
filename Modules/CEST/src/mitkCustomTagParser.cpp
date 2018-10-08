@@ -335,10 +335,8 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
     }
   }
 
-  std::string sampling = "";
   std::string offset = "";
   std::string measurements = "";
-  bool hasSamplingInformation = results->GetStringProperty("CEST.SamplingType", sampling);
   results->GetStringProperty("CEST.Offset", offset);
   results->GetStringProperty("CEST.measurements", measurements);
 
@@ -399,17 +397,19 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   else
   {
     MITK_INFO << "Parsed as CEST or WASABI image";
+    std::string sampling = "";
+    bool hasSamplingInformation = results->GetStringProperty("CEST.SamplingType", sampling);
+    if (hasSamplingInformation)
+    {
+      std::string offsets = GetOffsetString(sampling, offset, measurements);
+      results->SetStringProperty(m_OffsetsPropertyName.c_str(), offsets.c_str());
+    }
+    else
+    {
+      MITK_WARN << "Could not determine sampling type.";
+    }
   }
 
-  if (hasSamplingInformation)
-  {
-    std::string offsets = GetOffsetString(sampling, offset, measurements);
-    results->SetStringProperty(m_OffsetsPropertyName.c_str(), offsets.c_str());
-  }
-  else
-  {
-    MITK_WARN << "Could not determine sampling type.";
-  }
 
   //persist all properties
   mitk::IPropertyPersistence *persSrv = GetPersistenceService();

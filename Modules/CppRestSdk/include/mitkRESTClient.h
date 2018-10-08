@@ -52,6 +52,7 @@ namespace mitk
     pplx::task<void> WadoRS(const utility::string_t filePath, std::string studyUID, std::string seriesUID, std::string instanceUID);
     pplx::task<std::string> WadoRS(const utility::string_t filePath, std::string studyUID, std::string seriesUID);
     pplx::task<void> StowRS(utility::string_t filePath, std::string studyUID);
+    pplx::task<web::json::value> QuidoRSInstances(std::map<std::string, std::string> params);
 
   private:
     MitkClient* m_Client;

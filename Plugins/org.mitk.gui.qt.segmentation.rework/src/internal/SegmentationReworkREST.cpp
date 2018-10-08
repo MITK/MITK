@@ -62,7 +62,11 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
       message.reply(MitkRestStatusCodes::BadRequest, "oh man, that was not expected: " + std::string(e.what()));
     }
   }
-  else {
+  else if (requestType != httpParams.end() && requestType->second == L"SEG_EVALUATION") 
+  {
+    // TODO: implement PUT handling as GET
+  } else
+  {
     message.reply(MitkRestStatusCodes::BadRequest, "Oh man, i can only deal with 'requestType' = 'IMAGE+SEG'...");
   }
 }
@@ -81,18 +85,16 @@ void SegmentationReworkREST::HandlePut(MitkRequest message)
     if (messageTypeKey.as_string() == U("downloadData"))
     {
       auto imageStudyUIDKey = jsonMessage.at(U("studyUID"));
-      auto imageSeriesUIDKey = jsonMessage.at(U("imageSeriesUID"));
-      auto segSeriesUIDAKey = jsonMessage.at(U("segSeriesUIDA"));
-      auto segSeriesUIDBKey = jsonMessage.at(U("segSeriesUIDB"));
+      auto srSeriesUIDKey = jsonMessage.at(U("srSeriesUID"));
+
       auto groundTruthKey = jsonMessage.at(U("groundTruth"));
 
       auto simScoreKey = jsonMessage.at(U("simScoreArray"));
       auto minSliceStartKey = jsonMessage.at(U("minSliceStart"));
 
       DicomDTO dto;
-      dto.segSeriesUIDA = mitk::RESTUtil::convertToUtf8(segSeriesUIDAKey.as_string());
-      dto.segSeriesUIDB = mitk::RESTUtil::convertToUtf8(segSeriesUIDBKey.as_string());
-      dto.imageSeriesUID = mitk::RESTUtil::convertToUtf8(imageSeriesUIDKey.as_string());
+      dto.srSeriesUID = mitk::RESTUtil::convertToUtf8(srSeriesUIDKey.as_string());
+
       dto.groundTruth = mitk::RESTUtil::convertToUtf8(groundTruthKey.as_string());
 
       dto.studyUID = mitk::RESTUtil::convertToUtf8(imageStudyUIDKey.as_string());

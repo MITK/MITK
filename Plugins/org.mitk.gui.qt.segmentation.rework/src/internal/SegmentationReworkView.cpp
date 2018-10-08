@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegTool2D.h"
 #include "mitkToolManagerProvider.h"
 
+#include "mitkIOMimeTypes.h"
+
 #include <boost/uuid/uuid.hpp>            // uuid class
 #include <boost/uuid/uuid_generators.hpp> // generators
 #include <boost/uuid/uuid_io.hpp> 
@@ -42,6 +44,7 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
+  m_Parent = parent;
 
   qRegisterMetaType< std::vector<std::string> >("std::vector<std::string>");
 
@@ -50,12 +53,17 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.cleanDicomBtn, &QPushButton::clicked, this, &SegmentationReworkView::CleanDicomFolder);
 
   m_downloadBaseDir = std::experimental::filesystem::path("/temp/");
+  m_tempSegDir = std::experimental::filesystem::path("/tempSeg/");
 
   if (!std::experimental::filesystem::exists(m_downloadBaseDir))
   {
     std::experimental::filesystem::create_directory(m_downloadBaseDir);
   }
 
+  if (!std::experimental::filesystem::exists(m_tempSegDir))
+  {
+    std::experimental::filesystem::create_directory(m_tempSegDir);
+  }
 
   utility::string_t port = U("2020");
   utility::string_t address = U("http://127.0.0.1:");
@@ -83,39 +91,87 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 {
   SetSimilarityGraph(dto.simScoreArray, dto.minSliceStart);
 
-  MITK_INFO << "Load related dicom series ...";
-  boost::uuids::random_generator generator;
-    
-  std::string folderPathSeries = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
-  std::experimental::filesystem::create_directory(folderPathSeries);
+  typedef std::map<std::string, std::string> ParamMap;
+  ParamMap seriesInstancesParams;
 
-  std::string pathSegA = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
-  std::string pathSegB = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
+  seriesInstancesParams.insert((ParamMap::value_type({"StudyInstanceUID"}, dto.studyUID)));
+  seriesInstancesParams.insert((ParamMap::value_type({"SeriesInstanceUID"}, dto.srSeriesUID)));
+  seriesInstancesParams.insert((ParamMap::value_type({"includefield"}, {"0040A375"}))); // Current Requested Procedure Evidence Sequence
 
-  auto folderPathSegA = utility::conversions::to_string_t(pathSegA);
-  auto folderPathSegB = utility::conversions::to_string_t(pathSegB);
+  m_RestClient->QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) {
 
-  std::experimental::filesystem::create_directory(pathSegA);
-  std::experimental::filesystem::create_directory(pathSegB);
+    auto firstResult = jsonResult[0];
+    auto actualListKey = firstResult.at(U("0040A375")).as_object().at(U("Value")).as_array()[0].as_object().at(U("00081115")).as_object().at(U("Value")).as_array();
 
-  m_CurrentStudyUID = dto.studyUID;
+    std::string segSeriesUIDA = "";
+    std::string segSeriesUIDB = "";
+    std::string imageSeriesUID = "";
 
-  std::vector<pplx::task<std::string>> tasks;
-  auto imageSeriesTask = m_RestClient->WadoRS(utility::conversions::to_string_t(folderPathSeries), dto.studyUID, dto.imageSeriesUID);
-  auto segATask = m_RestClient->WadoRS(folderPathSegA, dto.studyUID, dto.segSeriesUIDA);
-  auto segBTask = m_RestClient->WadoRS(folderPathSegB, dto.studyUID, dto.segSeriesUIDB);
-  tasks.push_back(imageSeriesTask);
-  tasks.push_back(segATask);
-  tasks.push_back(segBTask);
+    for (unsigned int index = 0; index < actualListKey.size(); index++) {
+      auto element = actualListKey[index].as_object();
+      // get SOP class UID
+      auto innerElement = element.at(U("00081199")).as_object().at(U("Value")).as_array()[0];
+      auto sopClassUID = innerElement.at(U("00081150")).as_object().at(U("Value")).as_array()[0].as_string();
 
-  auto joinTask = pplx::when_all(begin(tasks), end(tasks));
-  auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) {
-    auto fileNameA = std::experimental::filesystem::path(filePathList[1]).filename();
-    auto fileNameB = std::experimental::filesystem::path(filePathList[2]).filename();
-    m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + " " + QString::fromUtf8(fileNameA.string().c_str()));
-    m_Controls.labelSegB->setText(m_Controls.labelSegB->text() + " " + QString::fromUtf8(fileNameB.string().c_str()));
-    InvokeLoadData(filePathList);
+      auto seriesUID = utility::conversions::to_utf8string(element.at(U("0020000E")).as_object().at(U("Value")).as_array()[0].as_string());
+
+      if (sopClassUID == L"1.2.840.10008.5.1.4.1.1.66.4") // SEG
+      {
+        if (segSeriesUIDA.length() == 0)
+        {
+          segSeriesUIDA = seriesUID;
+        }
+        else
+        {
+          segSeriesUIDB = seriesUID;
+        }
+      }
+      else if (sopClassUID == L"1.2.840.10008.5.1.4.1.1.2")  // CT
+      {
+        imageSeriesUID = seriesUID;
+      }
+    }
+
+    MITK_INFO << "image series UID " << imageSeriesUID;
+    MITK_INFO << "seg A series UID " << segSeriesUIDA;
+    MITK_INFO << "seg B series UID " << segSeriesUIDB;
+
+    MITK_INFO << "Load related dicom series ...";
+    boost::uuids::random_generator generator;
+
+    std::string folderPathSeries = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
+    std::experimental::filesystem::create_directory(folderPathSeries);
+
+    std::string pathSegA = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
+    std::string pathSegB = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
+
+    auto folderPathSegA = utility::conversions::to_string_t(pathSegA);
+    auto folderPathSegB = utility::conversions::to_string_t(pathSegB);
+
+    std::experimental::filesystem::create_directory(pathSegA);
+    std::experimental::filesystem::create_directory(pathSegB);
+
+    m_CurrentStudyUID = dto.studyUID;
+
+    std::vector<pplx::task<std::string>> tasks;
+    auto imageSeriesTask = m_RestClient->WadoRS(utility::conversions::to_string_t(folderPathSeries), dto.studyUID, imageSeriesUID);
+    auto segATask = m_RestClient->WadoRS(folderPathSegA, dto.studyUID, segSeriesUIDA);
+    auto segBTask = m_RestClient->WadoRS(folderPathSegB, dto.studyUID, segSeriesUIDB);
+    tasks.push_back(imageSeriesTask);
+    tasks.push_back(segATask);
+    tasks.push_back(segBTask);
+
+    auto joinTask = pplx::when_all(begin(tasks), end(tasks));
+    auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) {
+      auto fileNameA = std::experimental::filesystem::path(filePathList[1]).filename();
+      auto fileNameB = std::experimental::filesystem::path(filePathList[2]).filename();
+      m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + " " + QString::fromUtf8(fileNameA.string().c_str()));
+      m_Controls.labelSegB->setText(m_Controls.labelSegB->text() + " " + QString::fromUtf8(fileNameB.string().c_str()));
+      InvokeLoadData(filePathList);
+    });
+
   });
+
 }
 
 void SegmentationReworkView::RESTGetCallback(const SegmentationReworkREST::DicomDTO &dto) 
@@ -148,9 +204,11 @@ void SegmentationReworkView::LoadData(std::vector<std::string> filePathList)
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(ds);
 
   // find data nodes
+
   m_Image = dataNodes->at(0);
   m_SegA = dataNodes->at(1);
   m_SegB = dataNodes->at(2);
+
 }
 
 void SegmentationReworkView::UpdateChartWidget()
@@ -192,8 +250,16 @@ void SegmentationReworkView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /
 
 void SegmentationReworkView::UploadNewSegmentation()
 {
-  auto filePath = U("1.2.276.0.7230010.3.1.4.296485376.8.1533635734.141264.dcm");
-  m_CurrentStudyUID = "1.2.840.113654.2.70.1.159145727925405623564217141386659468090";
+  boost::uuids::random_generator generator;
+
+  std::string folderPathSeg = std::experimental::filesystem::path(m_tempSegDir).append(boost::uuids::to_string(generator())).string() + "/";
+  std::experimental::filesystem::create_directory(folderPathSeg);
+
+  const std::string savePath = folderPathSeg + m_SegC->GetName() + ".dcm";
+  const std::string mimeType = mitk::IOMimeTypes::DICOM_MIMETYPE_NAME();
+  mitk::IOUtil::Save(m_SegC->GetData(), mimeType, savePath);
+
+  auto filePath = utility::conversions::to_string_t(savePath);
   try {
     m_RestClient->StowRS(filePath, m_CurrentStudyUID).wait();
   }
@@ -206,8 +272,60 @@ void SegmentationReworkView::UploadNewSegmentation()
 void SegmentationReworkView::CreateNewSegmentationC() 
 {
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  toolManager->InitializeTools();
   toolManager->SetReferenceData(m_Image);
-  toolManager->SetWorkingData(m_SegC);
+  //toolManager->SetWorkingData(m_SegC);
+
+  // using seg A as new base image
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_SegA->GetData());
+
+  QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog(m_Parent); // needs a QWidget as parent, "this" is not QWidget
+
+  int dialogReturnValue = dialog->exec();
+  if (dialogReturnValue == QDialog::Rejected)
+  {
+    // user clicked cancel or pressed Esc or something similar
+    return;
+  }
+
+  // ask the user about an organ type and name, add this information to the image's (!) propertylist
+  // create a new image of the same dimensions and smallest possible pixel type
+  mitk::Tool* firstTool = toolManager->GetToolById(0);
+  if (firstTool)
+  {
+    try
+    {
+      std::string newNodeName = dialog->GetSegmentationName().toStdString();
+      if (newNodeName.empty())
+      {
+        newNodeName = "no_name";
+      }
+
+      mitk::DataNode::Pointer newSegmentation = firstTool->CreateSegmentationNode(image, newNodeName, dialog->GetColor());
+      // initialize showVolume to false to prevent recalculating the volume while working on the segmentation
+      newSegmentation->SetProperty("showVolume", mitk::BoolProperty::New(false));
+      if (!newSegmentation)
+      {
+        return; // could be aborted by user
+      }
+
+      if (mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0))
+      {
+        mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0)->SetSelected(false);
+      }
+      newSegmentation->SetSelected(true);
+      this->GetDataStorage()->Add(newSegmentation, toolManager->GetReferenceData(0)); // add as a child, because the segmentation "derives" from the original
+     
+      m_SegC = newSegmentation;
+    }
+    catch (std::bad_alloc)
+    {
+      QMessageBox::warning(nullptr, tr("Create new segmentation"), tr("Could not allocate memory for new segmentation"));
+    }
+  }
+  else {
+    MITK_INFO << "no tools...";
+  }
 }
 
 void SegmentationReworkView::CleanDicomFolder() 

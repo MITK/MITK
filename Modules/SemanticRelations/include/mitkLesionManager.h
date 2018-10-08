@@ -46,7 +46,6 @@ namespace mitk
   * @param  lesionClassType   The lesion class type as string. Default parameter is "".
   */
   MITKSEMANTICRELATIONS_EXPORT SemanticTypes::LesionClass GenerateNewLesionClass(const std::string& lesionClassType = "");
-
   /**
   * @brief Find and return a whole lesion including its lesion class given a specific lesion UID.
   *

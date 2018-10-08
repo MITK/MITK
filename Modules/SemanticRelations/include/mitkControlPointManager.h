@@ -26,13 +26,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  /*
+  /**
   * @brief Provides helper functions that are needed to work with control points.
   *
   *   These functions help to generate new control points, check for overlapping / containing control points or provide functionality
   *   to find a fitting control point or even extend an already existing control point.
   */
-  /*
+  /**
   * @brief Generates a control point from a given data node.
   *        The date is extracted from the data node by using the 'DICOMHelper::GetDICOMDateFromDataNode'-function.
   *        'GenerateControlPoint(const SemanticTypes::TimePoint&)' is used to generate a new control point from this extracted date.
@@ -40,7 +40,16 @@ namespace mitk
   * @par datanode   A data node pointer, whose date should be included in the newly generated control point.
   */
   MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint GenerateControlPoint(const mitk::DataNode* datanode);
-  /*
+  /**
+  * @brief Find and return a whole control point including its date given a specific control point UID.
+  *
+  * @param  controlPointUID     The control point UID as string.
+  * @param  allControlPoints    All currently known control points of a specific case.
+  *
+  * @return   The control point with its UID and the date.
+  */
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint GetControlPointByUID(const SemanticTypes::ID& controlPointUID, const std::vector<SemanticTypes::ControlPoint>& allControlPoints);
+  /**
   * @brief Returns a string that displays the given control point in the format "YYYY-MM-DD".
   *        This function is used in the GUI to display the control point as header in the "information-type - control-point"-matrix.
   *
@@ -55,7 +64,7 @@ namespace mitk
   * @par controlPoint       The control point to check for existence.
   * @par allControlPoints   The vector of already existing control points.
   */
-  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint FindExistingControlPoint(const SemanticTypes::ControlPoint& controlPoint, std::vector<SemanticTypes::ControlPoint>& allControlPoints);
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint FindExistingControlPoint(const SemanticTypes::ControlPoint& controlPoint, const std::vector<SemanticTypes::ControlPoint>& allControlPoints);
   /**
   * @brief Returns an already existing close control point from the given vector of control points. This closest control point has a date
   *        date that is within a certain distance-in-days to the given control point.
@@ -73,7 +82,7 @@ namespace mitk
   *        - the examination periods do not contain any control point UIDs
   *        - the UID of the given control point is not contained in any examination period
   */
-  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ExaminationPeriod FindExaminationPeriod(const SemanticTypes::ControlPoint& controlPoint, std::vector<SemanticTypes::ExaminationPeriod>& allExaminationPeriods);
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ExaminationPeriod FindExaminationPeriod(const SemanticTypes::ControlPoint& controlPoint, const std::vector<SemanticTypes::ExaminationPeriod>& allExaminationPeriods);
 
 } // namespace mitk
 

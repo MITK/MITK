@@ -32,6 +32,24 @@ mitk::SemanticTypes::ControlPoint mitk::GenerateControlPoint(const mitk::DataNod
   return controlPoint;
 }
 
+mitk::SemanticTypes::ControlPoint mitk::GetControlPointByUID(const SemanticTypes::ID& controlPointUID, const std::vector<SemanticTypes::ControlPoint>& allControlPoints)
+{
+  auto lambda = [&controlPointUID](const SemanticTypes::ControlPoint& currentControlPoint)
+  {
+    return currentControlPoint.UID == controlPointUID;
+  };
+
+  const auto existingControlPoint = std::find_if(allControlPoints.begin(), allControlPoints.end(), lambda);
+
+  mitk::SemanticTypes::ControlPoint controlPoint;
+  if (existingControlPoint != allControlPoints.end())
+  {
+    controlPoint = *existingControlPoint;
+  }
+
+  return controlPoint;
+}
+
 std::string mitk::GetControlPointAsString(const SemanticTypes::ControlPoint& controlPoint)
 {
   std::stringstream controlPointAsString;
@@ -42,7 +60,7 @@ std::string mitk::GetControlPointAsString(const SemanticTypes::ControlPoint& con
   return controlPointAsString.str();
 }
 
-mitk::SemanticTypes::ControlPoint mitk::FindExistingControlPoint(const SemanticTypes::ControlPoint& controlPoint, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
+mitk::SemanticTypes::ControlPoint mitk::FindExistingControlPoint(const SemanticTypes::ControlPoint& controlPoint, const std::vector<SemanticTypes::ControlPoint>& allControlPoints)
 {
   for (const auto& currentControlPoint : allControlPoints)
   {
@@ -123,7 +141,7 @@ mitk::SemanticTypes::ControlPoint mitk::FindClosestControlPoint(const SemanticTy
   return SemanticTypes::ControlPoint();
 }
 
-mitk::SemanticTypes::ExaminationPeriod mitk::FindExaminationPeriod(const SemanticTypes::ControlPoint& controlPoint, std::vector<SemanticTypes::ExaminationPeriod>& allExaminationPeriods)
+mitk::SemanticTypes::ExaminationPeriod mitk::FindExaminationPeriod(const SemanticTypes::ControlPoint& controlPoint, const std::vector<SemanticTypes::ExaminationPeriod>& allExaminationPeriods)
 {
   for (const auto& examinationPeriod : allExaminationPeriods)
   {

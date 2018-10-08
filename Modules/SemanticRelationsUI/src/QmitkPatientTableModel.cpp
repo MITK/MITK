@@ -231,6 +231,7 @@ void QmitkPatientTableModel::SetData()
   m_ControlPoints = m_SemanticRelations->GetAllControlPointsOfCase(m_CaseID);
   // sort the vector of control points for the timeline
   std::sort(m_ControlPoints.begin(), m_ControlPoints.end());
+
   // get all information types points of current case
   m_InformationTypes = m_SemanticRelations->GetAllInformationTypesOfCase(m_CaseID);
 
@@ -276,31 +277,14 @@ void QmitkPatientTableModel::SetHeaderModel()
 {
   m_HeaderModel->clear();
   QStandardItem* rootItem = new QStandardItem("Timeline");
-  QStandardItem* baseline = new QStandardItem("Baseline");
-  QStandardItem* followup = new QStandardItem("Follow-up");
   QList<QStandardItem*> standardItems;
-
-  standardItems.push_back(baseline);
-  rootItem->appendColumn(standardItems);
-  standardItems.clear();
-
-  standardItems.push_back(followup);
-  rootItem->appendColumn(standardItems);
-  standardItems.clear();
 
   for (const auto& controlPoint : m_ControlPoints)
   {
     std::string controlPointAsString = mitk::GetControlPointAsString(controlPoint);
     QStandardItem* standardItem = new QStandardItem(QString::fromStdString(controlPointAsString));
     standardItems.push_back(standardItem);
-    if (controlPointAsString.find("to") != std::string::npos)
-    {
-      followup->appendColumn(standardItems);
-    }
-    else
-    {
-      baseline->appendColumn(standardItems);
-    }
+    rootItem->appendColumn(standardItems);
     standardItems.clear();
   }
 

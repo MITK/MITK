@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations UI module
 #include "QmitkPatientTableModel.h"
+#include "QmitkPatientTableHeaderView.h"
 #include "QmitkSemanticRelationsUIHelper.h"
 
 // semantic relations module
@@ -32,7 +33,7 @@ QmitkPatientTableModel::QmitkPatientTableModel(QObject* parent /*= nullptr*/)
   : QmitkAbstractSemanticRelationsStorageModel(parent)
   , m_SelectedNodeType("Image")
 {
-  // nothing here
+  m_HeaderModel = new QStandardItemModel(this);
 }
 
 QmitkPatientTableModel::~QmitkPatientTableModel()
@@ -68,16 +69,15 @@ int QmitkPatientTableModel::rowCount(const QModelIndex &parent/* = QModelIndex()
 
 int QmitkPatientTableModel::columnCount(const QModelIndex &parent/* = QModelIndex()*/) const
 {
-  if (parent.isValid())
-  {
-    return 0;
-  }
-
   return m_ControlPoints.size();
 }
 
 QVariant QmitkPatientTableModel::data(const QModelIndex &index, int role/* = Qt::DisplayRole*/) const
 {
+  if (QmitkPatientTableHeaderView::HorizontalHeaderDataRole == role)
+  {
+    return QVariant::fromValue<QStandardItemModel*>(m_HeaderModel);
+  }
   if (!index.isValid())
   {
     return QVariant();
@@ -109,7 +109,7 @@ QVariant QmitkPatientTableModel::data(const QModelIndex &index, int role/* = Qt:
   }
   else if (QmitkDataNodeRawPointerRole == role)
   {
-    return QVariant::fromValue<mitk::DataNode *>(dataNode);
+    return QVariant::fromValue<mitk::DataNode*>(dataNode);
   }
   else if (Qt::BackgroundColorRole == role)
   {
@@ -127,16 +127,6 @@ QVariant QmitkPatientTableModel::data(const QModelIndex &index, int role/* = Qt:
 
 QVariant QmitkPatientTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-  if (Qt::Horizontal == orientation && Qt::DisplayRole == role)
-  {
-    if (m_ControlPoints.size() > section)
-    {
-      mitk::SemanticTypes::ControlPoint currentControlPoint = m_ControlPoints.at(section);
-      // generate a string from the control point
-      std::string currentControlPointAsString = mitk::GetControlPointAsString(currentControlPoint);
-      return QVariant(QString::fromStdString(currentControlPointAsString));
-    }
-  }
   if (Qt::Vertical == orientation && Qt::DisplayRole == role)
   {
     if (m_InformationTypes.size() > section)
@@ -145,6 +135,7 @@ QVariant QmitkPatientTableModel::headerData(int section, Qt::Orientation orienta
       return QVariant(QString::fromStdString(currentInformationType));
     }
   }
+
   return QVariant();
 }
 
@@ -247,6 +238,7 @@ void QmitkPatientTableModel::SetData()
   m_LesionPresence.clear();
 
   SetDataNodes();
+  SetHeaderModel();
 }
 
 void QmitkPatientTableModel::SetDataNodes()
@@ -278,6 +270,41 @@ void QmitkPatientTableModel::SetDataNodes()
       m_LesionPresence.clear();
     }
   }
+}
+
+void QmitkPatientTableModel::SetHeaderModel()
+{
+  m_HeaderModel->clear();
+  QStandardItem* rootItem = new QStandardItem("Timeline");
+  QStandardItem* baseline = new QStandardItem("Baseline");
+  QStandardItem* followup = new QStandardItem("Follow-up");
+  QList<QStandardItem*> standardItems;
+
+  standardItems.push_back(baseline);
+  rootItem->appendColumn(standardItems);
+  standardItems.clear();
+
+  standardItems.push_back(followup);
+  rootItem->appendColumn(standardItems);
+  standardItems.clear();
+
+  for (const auto& controlPoint : m_ControlPoints)
+  {
+    std::string controlPointAsString = mitk::GetControlPointAsString(controlPoint);
+    QStandardItem* standardItem = new QStandardItem(QString::fromStdString(controlPointAsString));
+    standardItems.push_back(standardItem);
+    if (controlPointAsString.find("to") != std::string::npos)
+    {
+      followup->appendColumn(standardItems);
+    }
+    else
+    {
+      baseline->appendColumn(standardItems);
+    }
+    standardItems.clear();
+  }
+
+  m_HeaderModel->setItem(0, 0, rootItem);
 }
 
 bool QmitkPatientTableModel::IsLesionPresentOnDataNode(const mitk::DataNode* dataNode) const

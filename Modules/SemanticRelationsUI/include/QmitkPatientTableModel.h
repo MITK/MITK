@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // qt
 #include <QPixmap>
+#include <QStandardItemModel>
 
 /*
 * @brief The QmitkPatientTableModel is a subclass of the QmitkAbstractSemanticRelationsStorageModel and holds the semantic relations data of the currently selected case.
@@ -84,6 +85,8 @@ protected:
 
 private:
 
+  void SetHeaderModel();
+
   /**
   * @brief The function uses the ID of the node to see if a pixmap was already set. If not, the given pixmap
   *        is used and stored inside a member variable. If the pixmap was already set, it will be overwritten.
@@ -116,6 +119,7 @@ private:
   std::vector<mitk::SemanticTypes::ControlPoint> m_ControlPoints;
   std::string m_SelectedNodeType;
 
+  QStandardItemModel* m_HeaderModel;
 };
 
 #endif // QMITKPATIENTTABLEMODEL_H

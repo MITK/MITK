@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // c++
 #include <set>
 #include <tuple>
+#include <vector>
 
 namespace mitk
 {
@@ -63,6 +64,15 @@ namespace mitk
       {
         return (operator>(other) || operator==(other));
       }
+    };
+
+    /**
+    * @brief The concept of an examination period.
+    */
+    struct ExaminationPeriod
+    {
+      ID UID;
+      std::vector<ID> controlPointIDs;
     };
 
     /*

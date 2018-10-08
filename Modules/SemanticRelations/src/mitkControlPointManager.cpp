@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk core
 #include <mitkPropertyNameHelper.h>
 
-double CalculateDistanceInDays(mitk::SemanticTypes::ControlPoint leftControlPoint, mitk::SemanticTypes::ControlPoint rightControlPoint);
+double CalculateDistanceInDays(const mitk::SemanticTypes::ControlPoint& leftControlPoint, const mitk::SemanticTypes::ControlPoint& rightControlPoint);
 
 mitk::SemanticTypes::ControlPoint mitk::GenerateControlPoint(const mitk::DataNode* datanode)
 {
@@ -55,7 +55,91 @@ mitk::SemanticTypes::ControlPoint mitk::FindExistingControlPoint(const SemanticT
   return SemanticTypes::ControlPoint();
 }
 
-double CalculateDistanceInDays(mitk::SemanticTypes::ControlPoint leftControlPoint, mitk::SemanticTypes::ControlPoint rightControlPoint)
+mitk::SemanticTypes::ControlPoint mitk::FindClosestControlPoint(const SemanticTypes::ControlPoint& controlPoint, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
+{
+  if (allControlPoints.empty())
+  {
+    return SemanticTypes::ControlPoint();
+  }
+
+  // sort the vector of control points for easier lookup
+  std::sort(allControlPoints.begin(), allControlPoints.end());
+  // new control point does not match an existing control point
+  // check if the control point is close to an already existing control point
+  std::vector<SemanticTypes::ControlPoint>::const_iterator it;
+  for (it = allControlPoints.begin(); it != allControlPoints.end(); ++it)
+  {
+    if (controlPoint < *it)
+    {
+      break;
+    }
+  }
+
+  SemanticTypes::ControlPoint nextControlPoint;
+  SemanticTypes::ControlPoint previousControlPoint;
+  if (it == allControlPoints.begin())
+  {
+    // new date is smaller ("older") than the smallest already existing control point
+    nextControlPoint = *it;
+  }
+  else if (it != allControlPoints.end())
+  {
+    // new date is greater ("newer") than an already existing control point,
+    // but smaller ("older") than another already existing control point
+    nextControlPoint = *it;
+    previousControlPoint = *(--it);
+  }
+  else
+  {
+    // new date is greater ("newer") than the greatest already existing control point
+    previousControlPoint = *(--it);
+  }
+
+  // test distance to next and previous time period
+  double distanceToNextExaminationPeriod = CalculateDistanceInDays(nextControlPoint, controlPoint);
+  double distanceToPreviousExaminationPeriod = CalculateDistanceInDays(previousControlPoint, controlPoint);
+
+  SemanticTypes::ControlPoint closestControlPoint;
+  double closestDistanceInDays = 0.0;
+  if (distanceToNextExaminationPeriod < distanceToPreviousExaminationPeriod)
+  {
+    // control point is closer to the next control point
+    closestControlPoint = nextControlPoint;
+    closestDistanceInDays = distanceToNextExaminationPeriod;
+  }
+  else
+  {
+    // control point is closer to the previous control point
+    closestControlPoint = previousControlPoint;
+    closestDistanceInDays = distanceToPreviousExaminationPeriod;
+  }
+
+  double THRESHOLD_DISTANCE_IN_DAYS = 30.0;
+  if (std::abs(closestDistanceInDays) < THRESHOLD_DISTANCE_IN_DAYS)
+  {
+    return closestControlPoint;
+  }
+
+  return SemanticTypes::ControlPoint();
+}
+
+mitk::SemanticTypes::ExaminationPeriod mitk::FindExaminationPeriod(const SemanticTypes::ControlPoint& controlPoint, std::vector<SemanticTypes::ExaminationPeriod>& allExaminationPeriods)
+{
+  for (const auto& examinationPeriod : allExaminationPeriods)
+  {
+    for (const auto& UID : examinationPeriod.controlPointIDs)
+    {
+      if (controlPoint.UID == UID)
+      {
+        return examinationPeriod;
+      }
+    }
+  }
+
+  return SemanticTypes::ExaminationPeriod();
+}
+
+double CalculateDistanceInDays(const mitk::SemanticTypes::ControlPoint& leftControlPoint, const mitk::SemanticTypes::ControlPoint& rightControlPoint)
 {
   std::tm leftTimeStructure = { 0, 0, 0, leftControlPoint.day,  leftControlPoint.month - 1,   leftControlPoint.year - 1900 };
   std::tm rightTimeStructure = { 0, 0, 0, rightControlPoint.day, rightControlPoint.month - 1,  rightControlPoint.year - 1900 };

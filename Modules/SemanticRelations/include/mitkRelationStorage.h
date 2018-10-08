@@ -42,6 +42,8 @@ namespace mitk
     SemanticTypes::ControlPoint GetControlPointOfData(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& dataNodeID);
     std::vector<SemanticTypes::ControlPoint> GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID);
 
+    std::vector<SemanticTypes::ExaminationPeriod> GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID);
+
     SemanticTypes::InformationType GetInformationTypeOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
     std::vector<SemanticTypes::InformationType> GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID);
 
@@ -66,6 +68,11 @@ namespace mitk
     void LinkDataToControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& dataNodeID, const SemanticTypes::ControlPoint& controlPoint);
     void UnlinkDataFromControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& dataNodeID);
     void RemoveControlPointFromCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
+
+    void AddExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod& examinationPeriod);
+    void AddControlPointToExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ExaminationPeriod examinationPeriod);
+    void RemoveControlPointFromExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ExaminationPeriod examinationPeriod);
+    void RemoveExaminationPeriodFromCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod examinationPeriod);
 
     void AddInformationTypeToImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID, const SemanticTypes::InformationType informationType);
     void RemoveInformationTypeFromImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);

@@ -381,6 +381,29 @@ bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID
   }
 }
 
+mitk::SemanticRelations::ExaminationPeriodVector mitk::SemanticRelations::GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID) const
+{
+  return m_RelationStorage->GetAllExaminationPeriodsOfCase(caseID);
+}
+
+bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod& examinationPeriod) const
+{
+  ExaminationPeriodVector allExaminationPeriods = GetAllExaminationPeriodsOfCase(caseID);
+
+  // filter all examination periods: check for equality with the given examination period using a lambda function
+  auto lambda = [&examinationPeriod](const SemanticTypes::ExaminationPeriod& currentExaminationPeriod) { return currentExaminationPeriod.UID == examinationPeriod.UID; };
+  const auto existingExaminationPeriod = std::find_if(allExaminationPeriods.begin(), allExaminationPeriods.end(), lambda);
+
+  if (existingExaminationPeriod != allExaminationPeriods.end())
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
 mitk::SemanticRelations::InformationTypeVector mitk::SemanticRelations::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID) const
 {
   return m_RelationStorage->GetAllInformationTypesOfCase(caseID);
@@ -703,7 +726,7 @@ void mitk::SemanticRelations::SetControlPointOfData(const DataNode* dataNode, co
   {
     try
     {
-      // found a fitting control point
+      // found an already existing control point
       LinkDataToControlPoint(dataNode, existingControlPoint, false);
     }
     catch (const SemanticRelationException&)
@@ -716,6 +739,21 @@ void mitk::SemanticRelations::SetControlPointOfData(const DataNode* dataNode, co
     try
     {
       AddControlPointAndLinkData(dataNode, controlPoint, false);
+      // added a new control point
+      // find closest control point to add the new control point to the correct examination period
+      SemanticTypes::ControlPoint closestControlPoint = FindClosestControlPoint(controlPoint, allControlPoints);
+      ExaminationPeriodVector allExaminationPeriods = GetAllExaminationPeriodsOfCase(caseID);
+      SemanticTypes::ExaminationPeriod examinationPeriod = FindExaminationPeriod(closestControlPoint, allExaminationPeriods);
+      if (examinationPeriod.UID.empty())
+      {
+        // no closest control point (exceed threshold) or no examination period found
+        // create a new examination period for this control point and add it to the storage
+        examinationPeriod.UID = UIDGeneratorBoost::GenerateUID();
+        AddExaminationPeriod(caseID, examinationPeriod);
+      }
+
+      // add the control point to the (newly created or found / close) examination period
+      AddControlPointToExaminationPeriod(caseID, controlPoint, examinationPeriod);
     }
     catch (const SemanticRelationException&)
     {
@@ -775,6 +813,33 @@ void mitk::SemanticRelations::UnlinkDataFromControlPoint(const DataNode* dataNod
   SemanticTypes::ControlPoint controlPoint = m_RelationStorage->GetControlPointOfData(caseID, dataID);
   m_RelationStorage->UnlinkDataFromControlPoint(caseID, dataID);
   ClearControlPoints(caseID);
+}
+
+void mitk::SemanticRelations::AddExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod& examinationPeriod)
+{
+  if (InstanceExists(caseID, examinationPeriod))
+  {
+    mitkThrowException(SemanticRelationException) << "The examination period " << examinationPeriod.UID << " to add already exists for the given case.";
+  }
+  else
+  {
+    m_RelationStorage->AddExaminationPeriod(caseID, examinationPeriod);
+  }
+}
+
+void mitk::SemanticRelations::AddControlPointToExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ExaminationPeriod& examinationPeriod)
+{
+  if (!InstanceExists(caseID, controlPoint))
+  {
+    mitkThrowException(SemanticRelationException) << "The control point " << controlPoint.UID << " to add does not exist for the given case.";
+  }
+
+  if (!InstanceExists(caseID, examinationPeriod))
+  {
+    mitkThrowException(SemanticRelationException) << "The examination period " << examinationPeriod.UID << " does not exist for the given case. \n Use 'AddExaminationPeriod' before.";
+  }
+
+  m_RelationStorage->AddControlPointToExaminationPeriod(caseID, controlPoint, examinationPeriod);
 }
 
 void mitk::SemanticRelations::SetInformationType(const DataNode* imageNode, const SemanticTypes::InformationType& informationType)
@@ -927,8 +992,11 @@ void mitk::SemanticRelations::ClearControlPoints(const SemanticTypes::CaseID& ca
                       allControlPoints.begin(), allControlPoints.end(),
                       std::inserter(allControlPointsDifference, allControlPointsDifference.begin()));
 
+  auto allExaminationPeriods = GetAllExaminationPeriodsOfCase(caseID);
   for (const auto& controlPoint : allControlPointsDifference)
   {
+    const auto& examinationPeriod = FindExaminationPeriod(controlPoint, allExaminationPeriods);
+    m_RelationStorage->RemoveControlPointFromExaminationPeriod(caseID, controlPoint, examinationPeriod);
     m_RelationStorage->RemoveControlPointFromCase(caseID, controlPoint);
   }
 }

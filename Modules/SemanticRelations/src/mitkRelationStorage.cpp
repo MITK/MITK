@@ -264,6 +264,60 @@ std::vector<mitk::SemanticTypes::ControlPoint> mitk::RelationStorage::GetAllCont
   return allControlPoints;
 }
 
+std::vector<mitk::SemanticTypes::ExaminationPeriod> mitk::RelationStorage::GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID)
+{
+  mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
+  if (nullptr == propertyList)
+  {
+    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return std::vector<SemanticTypes::ExaminationPeriod>();
+  }
+
+  // retrieve a vector property that contains the valid examination period UIDs for the current case
+  mitk::VectorProperty<std::string>::Pointer vectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty("examinationperiods"));
+  if (nullptr == vectorProperty)
+  {
+    MITK_INFO << "Could not find any examination periods in the storage.";
+    return std::vector<SemanticTypes::ExaminationPeriod>();
+  }
+
+  std::vector<std::string> vectorValue = vectorProperty->GetValue();
+  std::vector<SemanticTypes::ExaminationPeriod> allExaminationPeriods;
+  for (const auto& examinationPeriodID : vectorValue)
+  {
+    // retrieve a vector property that contains the represented control point-IDs
+    mitk::VectorProperty<std::string>::Pointer examinationPeriodVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(examinationPeriodID));
+    if (nullptr == examinationPeriodVectorProperty)
+    {
+      MITK_INFO << "Could not find the examination period " << examinationPeriodID << " in the storage.";
+      continue;
+    }
+
+    std::vector<std::string> examinationPeriodVectorValue = examinationPeriodVectorProperty->GetValue();
+    /*
+    // an examination period has an arbitrary number of control points (at least one)
+    if (examinationPeriodVectorValue.size() < 1)
+    {
+      MITK_INFO << "Incorrect examination period storage. At least one (1) control point ID has to be stored.";
+      continue;
+    }
+    else
+    {
+    */
+      // set the values of the control point
+      SemanticTypes::ExaminationPeriod generatedExaminationPeriod;
+      generatedExaminationPeriod.UID = examinationPeriodID;
+      for (const auto& controlpointID : examinationPeriodVectorValue)
+      {
+        generatedExaminationPeriod.controlPointIDs.push_back(controlpointID);
+      }
+
+      allExaminationPeriods.push_back(generatedExaminationPeriod);
+    //}
+  }
+  return allExaminationPeriods;
+}
+
 mitk::SemanticTypes::InformationType mitk::RelationStorage::GetInformationTypeOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID)
 {
   mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
@@ -1008,6 +1062,123 @@ void mitk::RelationStorage::RemoveControlPointFromCase(const SemanticTypes::Case
 
   // remove the control point instance itself
   propertyList->DeleteProperty(controlPoint.UID);
+}
+
+void mitk::RelationStorage::AddExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod& examinationPeriod)
+{
+  mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
+  if (nullptr == propertyList)
+  {
+    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return;
+  }
+  // retrieve a vector property that contains the valid examination period UIDs for the current case
+  mitk::VectorProperty<std::string>::Pointer vectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty("examinationperiods"));
+  std::vector<std::string> examinationPeriodsVectorValue;
+  if (nullptr == vectorProperty)
+  {
+    vectorProperty = mitk::VectorProperty<std::string>::New();
+  }
+  else
+  {
+    examinationPeriodsVectorValue = vectorProperty->GetValue();
+  }
+
+  const auto& existingIndex = std::find(examinationPeriodsVectorValue.begin(), examinationPeriodsVectorValue.end(), examinationPeriod.UID);
+  if (existingIndex != examinationPeriodsVectorValue.end())
+  {
+    return;
+  }
+  else
+  {
+    // add the new examination period id from the given examination period to the vector of all current examination period IDs
+    examinationPeriodsVectorValue.push_back(examinationPeriod.UID);
+    // overwrite the current vector property with the new, extended string vector
+    vectorProperty->SetValue(examinationPeriodsVectorValue);
+    propertyList->SetProperty("examinationperiods", vectorProperty);
+
+    // add the examination period with the UID as the key and an empty control point UIDs vector as value
+    std::vector<std::string> controlPointUIDs;
+    mitk::VectorProperty<std::string>::Pointer newExaminationPeriodVectorProperty = mitk::VectorProperty<std::string>::New();
+    newExaminationPeriodVectorProperty->SetValue(controlPointUIDs);
+    propertyList->SetProperty(examinationPeriod.UID, newExaminationPeriodVectorProperty);
+  }
+}
+
+void mitk::RelationStorage::AddControlPointToExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ExaminationPeriod examinationPeriod)
+{
+  mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
+  if (nullptr == propertyList)
+  {
+    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return;
+  }
+
+  // retrieve a vector property that contains the represented control point UIDs of the given examination period
+  mitk::VectorProperty<std::string>* controlPointUIDsVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(examinationPeriod.UID));
+  if (nullptr == controlPointUIDsVectorProperty)
+  {
+    MITK_INFO << "Could not find examination period " << examinationPeriod.UID << " in the storage. Cannot add the control point to the examination period.";
+    return;
+  }
+
+  std::vector<std::string> controlPointUIDsVectorValue = controlPointUIDsVectorProperty->GetValue();
+  // store the control point UID
+  controlPointUIDsVectorValue.push_back(controlPoint.UID);
+  controlPointUIDsVectorProperty->SetValue(controlPointUIDsVectorValue);
+}
+
+void mitk::RelationStorage::RemoveControlPointFromExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ExaminationPeriod examinationPeriod)
+{
+  mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
+  if (nullptr == propertyList)
+  {
+    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return;
+  }
+
+  // retrieve a vector property that contains the represented control point UIDs of the given examination period
+  mitk::VectorProperty<std::string>* controlPointUIDsVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(examinationPeriod.UID));
+  if (nullptr == controlPointUIDsVectorProperty)
+  {
+    MITK_INFO << "Could not find examination period " << examinationPeriod.UID << " in the storage. Cannot add the control point to the examination period.";
+    return;
+  }
+
+  std::vector<std::string> controlPointUIDsVectorValue = controlPointUIDsVectorProperty->GetValue();
+  controlPointUIDsVectorValue.erase(std::remove(controlPointUIDsVectorValue.begin(), controlPointUIDsVectorValue.end(), controlPoint.UID), controlPointUIDsVectorValue.end());
+  // store the modified vector value
+  controlPointUIDsVectorProperty->SetValue(controlPointUIDsVectorValue);
+}
+
+void mitk::RelationStorage::RemoveExaminationPeriodFromCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod examinationPeriod)
+{
+  mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
+  if (nullptr == propertyList)
+  {
+    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return;
+  }
+  // retrieve a vector property that contains the valid examination period UIDs for the current case
+  mitk::VectorProperty<std::string>::Pointer vectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty("examinationperiods"));
+  if (nullptr == vectorProperty)
+  {
+    MITK_INFO << "Could not find any examination periods in the storage.";
+    return;
+  }
+
+  std::vector<std::string> examinationPeriodVectorValue = vectorProperty->GetValue();
+  examinationPeriodVectorValue.erase(std::remove(examinationPeriodVectorValue.begin(), examinationPeriodVectorValue.end(), examinationPeriod.UID), examinationPeriodVectorValue.end());
+  if (examinationPeriodVectorValue.size() == 0)
+  {
+    // no more examination periods stored -> remove the examination period property list
+    propertyList->DeleteProperty("examinationperiods");
+  }
+  else
+  {
+    // or store the modified vector value
+    vectorProperty->SetValue(examinationPeriodVectorValue);
+  }
 }
 
 void mitk::RelationStorage::AddInformationTypeToImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID, const SemanticTypes::InformationType informationType)

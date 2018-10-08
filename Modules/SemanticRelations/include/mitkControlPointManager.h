@@ -56,6 +56,25 @@ namespace mitk
   * @par allControlPoints   The vector of already existing control points.
   */
   MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint FindExistingControlPoint(const SemanticTypes::ControlPoint& controlPoint, std::vector<SemanticTypes::ControlPoint>& allControlPoints);
+  /**
+  * @brief Returns an already existing close control point from the given vector of control points. This closest control point has a date
+  *        date that is within a certain distance-in-days to the given control point.
+  *        If no closest control point can be found within the distance threshold an empty control point is returned.
+  *
+  * @par controlPoint       The control point to check for distance.
+  * @par allControlPoints   The vector of already existing control points.
+  */
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint FindClosestControlPoint(const SemanticTypes::ControlPoint& controlPoint, std::vector<SemanticTypes::ControlPoint>& allControlPoints);
+  /**
+  * @brief Returns the examination period to which the given control point belongs.
+  *        Each examination point holds a vector of control point UIDs so that the UID of the given control point can be compared against the UIDs of the vector.
+  *        An empty examination period is returned if,
+  *        - the given vector of examination periods is empty
+  *        - the examination periods do not contain any control point UIDs
+  *        - the UID of the given control point is not contained in any examination period
+  */
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ExaminationPeriod FindExaminationPeriod(const SemanticTypes::ControlPoint& controlPoint, std::vector<SemanticTypes::ExaminationPeriod>& allExaminationPeriods);
+
 } // namespace mitk
 
 #endif // MITKCONTROLPOINTMANAGER_H

@@ -31,16 +31,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QAction.h>
 
-class QmitkDataNodeControlPointAction : public QAction
+class QmitkDataNodeSetControlPointAction : public QAction
 {
   Q_OBJECT
 
 public:
 
-  QmitkDataNodeControlPointAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
-  QmitkDataNodeControlPointAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
+  QmitkDataNodeSetControlPointAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
+  QmitkDataNodeSetControlPointAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkDataNodeControlPointAction() override;
+  virtual ~QmitkDataNodeSetControlPointAction() override;
 
   void SetDataStorage(mitk::DataStorage* dataStorage);
 

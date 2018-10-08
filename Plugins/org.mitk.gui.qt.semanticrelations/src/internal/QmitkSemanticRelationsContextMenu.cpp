@@ -60,7 +60,7 @@ void QmitkSemanticRelationsContextMenu::OnContextMenuRequested(const QPoint& /*p
 
 void QmitkSemanticRelationsContextMenu::InitDefaultActions()
 {
-  m_ControlPointAction = new QmitkDataNodeControlPointAction(m_Parent, m_WorkbenchPartSite.Lock());
+  m_ControlPointAction = new QmitkDataNodeSetControlPointAction(m_Parent, m_WorkbenchPartSite.Lock());
   addAction(m_ControlPointAction);
 
   m_InformationTypeAction = new QmitkDataNodeInformationTypeAction(m_Parent, m_WorkbenchPartSite.Lock());

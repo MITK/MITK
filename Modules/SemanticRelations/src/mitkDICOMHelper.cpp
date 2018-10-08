@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // c++
 #include <algorithm>
 
-mitk::SemanticTypes::Date GetDateFromString(const std::string& dateAsString);
+mitk::SemanticTypes::ControlPoint GetControlPointFromString(const std::string& dateAsString);
 
 mitk::SemanticTypes::CaseID mitk::GetCaseIDFromDataNode(const mitk::DataNode* dataNode)
 {
@@ -79,7 +79,7 @@ mitk::SemanticTypes::ID mitk::GetIDFromDataNode(const mitk::DataNode* dataNode)
   return dicomTagAsString;
 }
 
-mitk::SemanticTypes::Date mitk::GetDICOMDateFromDataNode(const mitk::DataNode* dataNode)
+mitk::SemanticTypes::ControlPoint mitk::GetDICOMDateFromDataNode(const mitk::DataNode* dataNode)
 {
   if (nullptr == dataNode)
   {
@@ -100,7 +100,7 @@ mitk::SemanticTypes::Date mitk::GetDICOMDateFromDataNode(const mitk::DataNode* d
     mitkThrowException(SemanticRelationException) << "Not a valid DICOM property.";
   }
   std::string acquisitionDateAsString = acquisitionDateProperty->GetValueAsString();
-  return GetDateFromString(acquisitionDateAsString);
+  return GetControlPointFromString(acquisitionDateAsString);
 }
 
 mitk::SemanticTypes::InformationType mitk::GetDICOMModalityFromDataNode(const mitk::DataNode* dataNode)
@@ -145,19 +145,19 @@ std::string mitk::TrimDICOM(const std::string& identifier)
   return identifier.substr(first, last - first + 1);
 }
 
-mitk::SemanticTypes::Date GetDateFromString(const std::string& dateAsString)
+mitk::SemanticTypes::ControlPoint GetControlPointFromString(const std::string& dateAsString)
 {
   if (dateAsString.size() != 8) // string does not represent a DICOM date
   {
-    return mitk::SemanticTypes::Date();
+    return mitk::SemanticTypes::ControlPoint();
   }
 
-  mitk::SemanticTypes::Date date;
-  date.UID = mitk::UIDGeneratorBoost::GenerateUID();
-  // date expected to be YYYYMMDD (8 characters)
-  date.year = std::strtoul(dateAsString.substr(0, 4).c_str(), nullptr, 10);
-  date.month = std::strtoul(dateAsString.substr(4, 2).c_str(), nullptr, 10);
-  date.day = std::strtoul(dateAsString.substr(6, 2).c_str(), nullptr, 10);
+  mitk::SemanticTypes::ControlPoint controlPoint;
 
-  return date;
+  // date expected to be YYYYMMDD (8 characters)
+  controlPoint.year = std::strtoul(dateAsString.substr(0, 4).c_str(), nullptr, 10);
+  controlPoint.month = std::strtoul(dateAsString.substr(4, 2).c_str(), nullptr, 10);
+  controlPoint.day = std::strtoul(dateAsString.substr(6, 2).c_str(), nullptr, 10);
+
+  return controlPoint;
 }

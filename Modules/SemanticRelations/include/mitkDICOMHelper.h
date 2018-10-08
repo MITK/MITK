@@ -70,7 +70,7 @@ namespace mitk
   MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ID GetIDFromDataNode(const mitk::DataNode* dataNode);
   /*
   * @brief Extracts a specific DICOM tag (currently "0x0008, 0x0022": AcquisitionDate) from the node's base data
-  *        and returns the tag as a string. This tag string is used as the date of the image data.
+  *        and returns the tag as a control point.
   *
   * @pre    The given data node or the node's base data has to be valid (!nullptr).
   * @pre    The node's base data has to have the "0x0008, 0x0022" DICOM Tag property set.
@@ -78,14 +78,13 @@ namespace mitk
   *
   * @par dataNode   The data node, of which the DICOM tag should be extracted.
   *
-  * @return         The extracted DICOM tag as string.
-  *                 An empty string, if the DICOM tag can not be extracted (i.e. the data node or
+  * @return         The extracted DICOM tag as control point.
+  *                 An empty control point, if the DICOM tag can not be extracted (i.e. the data node or
   *                 the underlying base data is invalid or the DICOM tag does not exist for the given data node).
   */
-  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::Date GetDICOMDateFromDataNode(const mitk::DataNode* dataNode);
+  MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint GetDICOMDateFromDataNode(const mitk::DataNode* dataNode);
   /**
-  * @brief Extracts a specific DICOM tag from the node's base data and returns the tag as a string.
-  *        This tag string is used as the modality of the image data.
+  * @brief Extracts a specific DICOM tag from the node's base data and returns the tag as a information type (a string).
   *
   * @pre    The given data node or the node's base data has to be valid (!nullptr).
   * @pre    The node's base data has to have the "0x0008, 0x0060" DICOM Tag property set.
@@ -93,8 +92,8 @@ namespace mitk
   *
   * @par dataNode   The data node, of which the DICOM tag should be extracted.
   *
-  * @return         The extracted DICOM tag as string.
-  *                 An empty string, if the DICOM tag can not be extracted (i.e. the data node or
+  * @return         The extracted DICOM tag as information type (a string).
+  *                 An empty information type, if the DICOM tag can not be extracted (i.e. the data node or
   *                 the underlying base data is invalid or the DICOM tag does not exist for the given data node).
   */
   MITKSEMANTICRELATIONS_EXPORT SemanticTypes::InformationType GetDICOMModalityFromDataNode(const mitk::DataNode* dataNode);
@@ -103,7 +102,7 @@ namespace mitk
   *
   * @par identifier   The value of a DICOM tag.
   *
-  * @return       The trimmed DICOM tag
+  * @return           The trimmed DICOM tag
   */
   MITKSEMANTICRELATIONS_EXPORT std::string TrimDICOM(const std::string& identifier);
 } // namespace mitk

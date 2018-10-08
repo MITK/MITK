@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 // semantic relations plugin
-#include "QmitkDataNodeControlPointAction.h"
+#include "QmitkDataNodeSetControlPointAction.h"
 
 // semantic relations module
 #include <mitkDICOMHelper.h>
@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QInputDialog>
 
-QmitkDataNodeControlPointAction::QmitkDataNodeControlPointAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
+QmitkDataNodeSetControlPointAction::QmitkDataNodeSetControlPointAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
   : QAction(parent)
   , m_WorkbenchPartSite(workbenchPartSite)
 {
@@ -44,7 +44,7 @@ QmitkDataNodeControlPointAction::QmitkDataNodeControlPointAction(QWidget* parent
   InitializeAction();
 }
 
-QmitkDataNodeControlPointAction::QmitkDataNodeControlPointAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
+QmitkDataNodeSetControlPointAction::QmitkDataNodeSetControlPointAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
   : QAction(parent)
   , m_WorkbenchPartSite(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
 {
@@ -53,12 +53,12 @@ QmitkDataNodeControlPointAction::QmitkDataNodeControlPointAction(QWidget* parent
   InitializeAction();
 }
 
-QmitkDataNodeControlPointAction::~QmitkDataNodeControlPointAction()
+QmitkDataNodeSetControlPointAction::~QmitkDataNodeSetControlPointAction()
 {
   // nothing here
 }
 
-void QmitkDataNodeControlPointAction::SetDataStorage(mitk::DataStorage* dataStorage)
+void QmitkDataNodeSetControlPointAction::SetDataStorage(mitk::DataStorage* dataStorage)
 {
   if (m_DataStorage != dataStorage)
   {
@@ -68,12 +68,12 @@ void QmitkDataNodeControlPointAction::SetDataStorage(mitk::DataStorage* dataStor
   }
 }
 
-void QmitkDataNodeControlPointAction::InitializeAction()
+void QmitkDataNodeSetControlPointAction::InitializeAction()
 {
-  connect(this, &QAction::triggered, this, &QmitkDataNodeControlPointAction::OnActionTriggered);
+  connect(this, &QAction::triggered, this, &QmitkDataNodeSetControlPointAction::OnActionTriggered);
 }
 
-void QmitkDataNodeControlPointAction::OnActionTriggered(bool checked)
+void QmitkDataNodeSetControlPointAction::OnActionTriggered(bool checked)
 {
   if (nullptr == m_SemanticRelations)
   {
@@ -97,15 +97,15 @@ void QmitkDataNodeControlPointAction::OnActionTriggered(bool checked)
   }
 
   const QDate& userSelectedDate = inputDialog->GetCurrentDate();
-  mitk::SemanticTypes::Date date;
-  date.UID = mitk::UIDGeneratorBoost::GenerateUID();
-  date.year = userSelectedDate.year();
-  date.month = userSelectedDate.month();
-  date.day = userSelectedDate.day();
+  mitk::SemanticTypes::ControlPoint controlPoint;
+  controlPoint.UID = mitk::UIDGeneratorBoost::GenerateUID();
+  controlPoint.year = userSelectedDate.year();
+  controlPoint.month = userSelectedDate.month();
+  controlPoint.day = userSelectedDate.day();
 
   try
   {
-    m_SemanticRelations->SetControlPointFromDate(dataNode, date);
+    m_SemanticRelations->SetControlPointOfData(dataNode, controlPoint);
   }
   catch (const mitk::SemanticRelationException&)
   {
@@ -113,7 +113,7 @@ void QmitkDataNodeControlPointAction::OnActionTriggered(bool checked)
   }
 }
 
-QList<mitk::DataNode::Pointer> QmitkDataNodeControlPointAction::GetSelectedNodes()
+QList<mitk::DataNode::Pointer> QmitkDataNodeSetControlPointAction::GetSelectedNodes()
 {
   QList<mitk::DataNode::Pointer> selectedNodes;
   if (m_WorkbenchPartSite.Expired())
@@ -133,7 +133,7 @@ QList<mitk::DataNode::Pointer> QmitkDataNodeControlPointAction::GetSelectedNodes
   return selectedNodes;
 }
 
-mitk::DataNode::Pointer QmitkDataNodeControlPointAction::GetSelectedNode()
+mitk::DataNode::Pointer QmitkDataNodeSetControlPointAction::GetSelectedNode()
 {
   QList<mitk::DataNode::Pointer> selectedNodes = GetSelectedNodes();
   if (selectedNodes.empty())

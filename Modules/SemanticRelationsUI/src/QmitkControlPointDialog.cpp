@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkControlPointDialog::QmitkControlPointDialog(QWidget* parent)
   : QDialog(parent)
 {
-  //QDialog::setFixedSize(250, 105);
-
   QBoxLayout* verticalLayout = new QVBoxLayout(this);
   verticalLayout->setMargin(5);
   verticalLayout->setSpacing(5);
@@ -58,9 +56,9 @@ QmitkControlPointDialog::~QmitkControlPointDialog()
 {
 }
 
-void QmitkControlPointDialog::SetCurrentDate(mitk::SemanticTypes::Date currentDate)
+void QmitkControlPointDialog::SetCurrentDate(mitk::SemanticTypes::ControlPoint currentControlPoint)
 {
-  m_DateEdit->setDate(QDate(currentDate.year, currentDate.month, currentDate.day));
+  m_DateEdit->setDate(QDate(currentControlPoint.year, currentControlPoint.month, currentControlPoint.day));
 }
 
 QDate QmitkControlPointDialog::GetCurrentDate() const

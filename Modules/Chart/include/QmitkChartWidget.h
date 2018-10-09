@@ -22,9 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkChartExports.h>
 
-class QmitkChartxyData;
-class QmitkChartData;
-
 /*!
 \brief QmitkChartWidget is a widget to display various charts based on the javascript chart library C3js.
 * \details Data is added via AddData1D() or AddData2D().\n
@@ -111,14 +108,6 @@ public:
   * \warning Pie chart is significantly different than the other chart types. Here, the data given by AddData1D is summed. Each entry represents a different category.
   */
   void AddData2D(const std::map<double, double>& data2D, const std::string& label, ChartType chartType = ChartType::bar);
-
-  /*!
-  * \brief Get the data that is stored for displaying.
-  * \note Only needed for testing purposes.
-  */
-  std::vector<std::unique_ptr<QmitkChartxyData>> * GetData() const;
-
-  QmitkChartData * GetC3Data() const;
 
   /*!
   * \brief Removes data from the widget, works for 1D and 2D Data

@@ -132,7 +132,7 @@ void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* dataNode)
 
   if (m_SemanticRelations->InstanceExists(dataNode))
   {
-    RemoveFromSemanticRelationsAction::Run(m_SemanticRelations.get(), GetDataStorage(), dataNode);
+    RemoveFromSemanticRelationsAction::Run(m_SemanticRelations.get(), dataNode);
     mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(dataNode);
     RemoveFromComboBox(caseID);
   }

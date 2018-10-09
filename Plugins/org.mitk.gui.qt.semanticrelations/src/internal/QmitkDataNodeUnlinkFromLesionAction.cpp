@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 // semantic relations plugin
-#include "QmitkDataNodeRemoveFromSemanticRelationsAction.h"
+#include "QmitkDataNodeUnlinkFromLesionAction.h"
 
 // semantic relations module
 #include <mitkNodePredicates.h>
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 // namespace that contains the concrete action
-namespace RemoveFromSemanticRelationsAction
+namespace UnlinkFromLesionAction
 {
   void Run(mitk::SemanticRelations* semanticRelations, const mitk::DataNode* dataNode)
   {
@@ -42,42 +42,22 @@ namespace RemoveFromSemanticRelationsAction
       return;
     }
 
-    if (mitk::NodePredicates::GetImagePredicate()->CheckNode(dataNode))
+    if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
     {
-      RemoveImage(semanticRelations, dataNode);
+      UnlinkSegmentation(semanticRelations, dataNode);
     }
-    else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
+    else
     {
-      RemoveSegmentation(semanticRelations, dataNode);
-    }
-  }
-
-  void RemoveImage(mitk::SemanticRelations* semanticRelations, const mitk::DataNode* image)
-  {
-    if (nullptr == image)
-    {
-      return;
-    }
-
-    try
-    {
-      // remove the image from the semantic relations storage
-      semanticRelations->RemoveImage(image);
-    }
-    catch (const mitk::SemanticRelationException& e)
-    {
-      std::stringstream exceptionMessage; exceptionMessage << e;
       QMessageBox msgBox;
-      msgBox.setWindowTitle("Could not remove the selected image.");
-      msgBox.setText("The program wasn't able to correctly remove the selected image.\n"
-        "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
+      msgBox.setWindowTitle("Could not unlink the selected data node.");
+      msgBox.setText("Please chose a valid segmentation to unlink from its represented lesion!");
       msgBox.setIcon(QMessageBox::Warning);
       msgBox.exec();
       return;
     }
   }
 
-  void RemoveSegmentation(mitk::SemanticRelations* semanticRelations, const mitk::DataNode* segmentation)
+  void UnlinkSegmentation(mitk::SemanticRelations* semanticRelations, const mitk::DataNode* segmentation)
   {
     if (nullptr == segmentation)
     {
@@ -86,14 +66,14 @@ namespace RemoveFromSemanticRelationsAction
 
     try
     {
-      semanticRelations->RemoveSegmentation(segmentation);
+      semanticRelations->UnlinkSegmentationFromLesion(segmentation);
     }
     catch (const mitk::SemanticRelationException& e)
     {
       std::stringstream exceptionMessage; exceptionMessage << e;
       QMessageBox msgBox;
-      msgBox.setWindowTitle("Could not remove the selected segmentation.");
-      msgBox.setText("The program wasn't able to correctly remove the selected segmentation.\n"
+      msgBox.setWindowTitle("Could not unlink the selected segmentation.");
+      msgBox.setText("The program wasn't able to correctly unlink the selected segmentation.\n"
         "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
       msgBox.setIcon(QMessageBox::Warning);
       msgBox.exec();
@@ -102,28 +82,28 @@ namespace RemoveFromSemanticRelationsAction
   }
 }
 
-QmitkDataNodeRemoveFromSemanticRelationsAction::QmitkDataNodeRemoveFromSemanticRelationsAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
+QmitkDataNodeUnlinkFromLesionAction::QmitkDataNodeUnlinkFromLesionAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
   : QAction(parent)
   , m_WorkbenchPartSite(workbenchPartSite)
 {
-  setText(tr("Remove from semantic relations"));
+  setText(tr("Unlink from lesion"));
   InitializeAction();
 }
 
-QmitkDataNodeRemoveFromSemanticRelationsAction::QmitkDataNodeRemoveFromSemanticRelationsAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
+QmitkDataNodeUnlinkFromLesionAction::QmitkDataNodeUnlinkFromLesionAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
   : QAction(parent)
   , m_WorkbenchPartSite(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
 {
-  setText(tr("Remove from semantic relations"));
+  setText(tr("Unlink from lesion"));
   InitializeAction();
 }
 
-QmitkDataNodeRemoveFromSemanticRelationsAction::~QmitkDataNodeRemoveFromSemanticRelationsAction()
+QmitkDataNodeUnlinkFromLesionAction::~QmitkDataNodeUnlinkFromLesionAction()
 {
   // nothing here
 }
 
-void QmitkDataNodeRemoveFromSemanticRelationsAction::SetDataStorage(mitk::DataStorage* dataStorage)
+void QmitkDataNodeUnlinkFromLesionAction::SetDataStorage(mitk::DataStorage* dataStorage)
 {
   if (m_DataStorage != dataStorage)
   {
@@ -133,12 +113,12 @@ void QmitkDataNodeRemoveFromSemanticRelationsAction::SetDataStorage(mitk::DataSt
   }
 }
 
-void QmitkDataNodeRemoveFromSemanticRelationsAction::InitializeAction()
+void QmitkDataNodeUnlinkFromLesionAction::InitializeAction()
 {
-  connect(this, &QAction::triggered, this, &QmitkDataNodeRemoveFromSemanticRelationsAction::OnActionTriggered);
+  connect(this, &QAction::triggered, this, &QmitkDataNodeUnlinkFromLesionAction::OnActionTriggered);
 }
 
-void QmitkDataNodeRemoveFromSemanticRelationsAction::OnActionTriggered(bool checked)
+void QmitkDataNodeUnlinkFromLesionAction::OnActionTriggered(bool checked)
 {
   if (nullptr == m_SemanticRelations)
   {
@@ -146,10 +126,10 @@ void QmitkDataNodeRemoveFromSemanticRelationsAction::OnActionTriggered(bool chec
   }
 
   auto dataNode = GetSelectedNode();
-  RemoveFromSemanticRelationsAction::Run(m_SemanticRelations.get(), dataNode);
+  UnlinkFromLesionAction::Run(m_SemanticRelations.get(), dataNode);
 }
 
-QList<mitk::DataNode::Pointer> QmitkDataNodeRemoveFromSemanticRelationsAction::GetSelectedNodes()
+QList<mitk::DataNode::Pointer> QmitkDataNodeUnlinkFromLesionAction::GetSelectedNodes()
 {
   QList<mitk::DataNode::Pointer> selectedNodes;
   if (m_WorkbenchPartSite.Expired())
@@ -169,7 +149,7 @@ QList<mitk::DataNode::Pointer> QmitkDataNodeRemoveFromSemanticRelationsAction::G
   return selectedNodes;
 }
 
-mitk::DataNode::Pointer QmitkDataNodeRemoveFromSemanticRelationsAction::GetSelectedNode()
+mitk::DataNode::Pointer QmitkDataNodeUnlinkFromLesionAction::GetSelectedNode()
 {
   QList<mitk::DataNode::Pointer> selectedNodes = GetSelectedNodes();
   if (selectedNodes.empty())

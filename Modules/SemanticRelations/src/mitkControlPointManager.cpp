@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 double CalculateDistanceInDays(const mitk::SemanticTypes::ControlPoint& leftControlPoint, const mitk::SemanticTypes::ControlPoint& rightControlPoint);
 
-mitk::SemanticTypes::ControlPoint mitk::GenerateControlPoint(const mitk::DataNode* datanode)
+mitk::SemanticTypes::ControlPoint mitk::GenerateControlPoint(const DataNode* datanode)
 {
   SemanticTypes::ControlPoint controlPoint = GetDICOMDateFromDataNode(datanode);
   controlPoint.UID = UIDGeneratorBoost::GenerateUID();
@@ -72,6 +72,7 @@ mitk::SemanticTypes::ControlPoint mitk::FindExistingControlPoint(const SemanticT
 
   return SemanticTypes::ControlPoint();
 }
+
 
 mitk::SemanticTypes::ControlPoint mitk::FindClosestControlPoint(const SemanticTypes::ControlPoint& controlPoint, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
 {

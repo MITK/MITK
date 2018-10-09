@@ -17,9 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKLESIONMANAGER_H
 #define MITKLESIONMANAGER_H
 
-// semantic relations module
-#include "mitkSemanticTypes.h"
 #include <MitkSemanticRelationsExports.h>
+
+// semantic relations module
+#include "mitkSemanticRelations.h"
+#include "mitkSemanticTypes.h"
+#include "mitkLesionData.h"
 
 // mitk core
 #include <mitkDataNode.h>
@@ -64,7 +67,14 @@ namespace mitk
   * @return   The lesion class with its UID and the class type.
   */
   MITKSEMANTICRELATIONS_EXPORT SemanticTypes::LesionClass FindExistingLesionClass(const std::string& lesionClassType, const std::vector<SemanticTypes::LesionClass>& allLesionClasses);
-
+  /**
+  * @brief Generate and store additional lesion data such as lesion presence and lesion volume for each control point.
+  *
+  * @param  lesionData          The lesion data that holds the lesion and will hold the additional lesion data.
+  * @param  caseID              The current case ID.
+  * @param  semanticRelations   An instance of the semantic relations to retrieve the additional data.
+  */
+  MITKSEMANTICRELATIONS_EXPORT void GenerateAdditionalLesionData(LesionData& lesionData, const SemanticTypes::CaseID& caseID, std::shared_ptr<SemanticRelations> semanticRelations);
 } // namespace mitk
 
 #endif // MITKLESIONMANAGER_H

@@ -17,12 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKLESIONINFOWIDGET_H
 #define QMITKLESIONINFOWIDGET_H
 
-// semantic relations UI module
+// semantic relations plugin
 #include <ui_QmitkLesionInfoWidgetControls.h>
+
+// semantic relations UI module
+#include <QmitkLesionTreeModel.h>
 
 // semantic relations module
 #include <mitkSemanticRelations.h>
-#include <mitkISemanticRelationsObserver.h>
 
 // mitk
 #include <mitkDataStorage.h>
@@ -38,11 +40,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 *   The QmitkLesionInfoWidget provides three QListWidgets, that show the lesion data and the referenced segmentation data, as
 *   well as the connected image data, depending on the selected lesion.
-*
-*   The QmitkLesionInfoWidget implements the 'ISemanticRelationsObserver', so that it is automatically updated, if the
-*   semantic relations model changes. Updating means freshly getting all lesion data and filling the lesion-ListWidget with the lesion data.
 */
-class QmitkLesionInfoWidget : public QWidget, public mitk::ISemanticRelationsObserver
+class QmitkLesionInfoWidget : public QWidget
 {
   Q_OBJECT
 
@@ -55,30 +54,9 @@ public:
   QmitkLesionInfoWidget::QmitkLesionInfoWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
   ~QmitkLesionInfoWidget();
 
-  void SetCurrentCaseID(const mitk::SemanticTypes::CaseID& caseID);
-  /*
-  * @brief Updates the 'lesionListWidget' of the GUI with the current lesion-data from the semantic relations model.
-  *
-  *       Overridden from 'ISemanticRelationsObserver'.
-  *       In order for the Update-function to be called, this widget has to be added as a observer of SemanticRelation
-  *       (e.g. m_SemanticRelations->AddObserver(m_LesionInfoWidget);)
-  *
-  * @par caseID    The current case ID to identify the currently active patient / case.
-  */
-  virtual void Update(const mitk::SemanticTypes::CaseID& caseID) override;
+  void SetCaseID(const mitk::SemanticTypes::CaseID& caseID);
 
   const mitk::SemanticTypes::Lesion& GetSelectedLesion() const { return m_CurrentLesion; }
-
-  /*
-  * @brief Resets all items from the lesion list widget.
-  */
-  void ResetLesionListWidget();
-  /*
-  * @brief Resets the background color of all items in each list widget.
-  */
-  void ResetBackgroundColors();
-
-  void DarkenBackgroundColors();
 
 Q_SIGNALS:
 
@@ -86,29 +64,31 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 
+  void OnModelUpdated();
   /*
   * @brief Generates a new, empty lesion to add to the semantic relations model for the current case ID.
   */
   void OnAddLesionButtonClicked();
 
-  // slots for the mouse click events of the list widgets
-  void OnCurrentLesionItemChanged(QListWidgetItem*, QListWidgetItem*);
-  void OnLesionItemDoubleClicked(QListWidgetItem*);
+  // slots for the mouse click events of tree view's selection model
+  void OnSelectionChanged(const QModelIndex& current, const QModelIndex& previous);
 
   void OnLesionListContextMenuRequested(const QPoint&);
 
   // slots for the context menu actions of the lesion list widget
-  void OnLinkToSegmentation(const mitk::SemanticTypes::ID&);
-  void OnSetLesionName(const mitk::SemanticTypes::ID&);
-  void OnSetLesionClass(const mitk::SemanticTypes::ID&);
-  void OnRemoveLesion(const mitk::SemanticTypes::ID&);
+  void OnLinkToSegmentation(mitk::SemanticTypes::Lesion);
+  void OnSetLesionName(mitk::SemanticTypes::Lesion);
+  void OnSetLesionClass(mitk::SemanticTypes::Lesion);
+  void OnRemoveLesion(mitk::SemanticTypes::Lesion);
 
 private:
 
-  void Init();
+  void Initialize();
   void SetUpConnections();
 
   Ui::QmitkLesionInfoWidgetControls m_Controls;
+  QmitkLesionTreeModel* m_StorageModel;
+
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
   mitk::SemanticTypes::CaseID m_CaseID;

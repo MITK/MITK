@@ -35,7 +35,6 @@ namespace mitk
   /**
   * @brief Generates a control point from a given data node.
   *        The date is extracted from the data node by using the 'DICOMHelper::GetDICOMDateFromDataNode'-function.
-  *        'GenerateControlPoint(const SemanticTypes::TimePoint&)' is used to generate a new control point from this extracted date.
   *
   * @par datanode   A data node pointer, whose date should be included in the newly generated control point.
   */
@@ -83,7 +82,6 @@ namespace mitk
   *        - the UID of the given control point is not contained in any examination period
   */
   MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ExaminationPeriod FindExaminationPeriod(const SemanticTypes::ControlPoint& controlPoint, const std::vector<SemanticTypes::ExaminationPeriod>& allExaminationPeriods);
-
 } // namespace mitk
 
 #endif // MITKCONTROLPOINTMANAGER_H

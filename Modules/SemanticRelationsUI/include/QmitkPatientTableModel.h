@@ -17,11 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKPATIENTTABLEMODEL_H
 #define QMITKPATIENTTABLEMODEL_H
 
+// semantic relations UI module
+#include "QmitkAbstractSemanticRelationsStorageModel.h"
+
 // semantic relations module
 #include <mitkSemanticTypes.h>
-
-// semantic relations UI module
-#include <QmitkAbstractSemanticRelationsStorageModel.h>
 
 // mitk core
 #include <mitkDataNode.h>
@@ -51,16 +51,16 @@ public:
   //////////////////////////////////////////////////////////////////////////
   // overridden functions from QAbstractItemModel
   //////////////////////////////////////////////////////////////////////////
-  virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
-  virtual QModelIndex parent(const QModelIndex &child) const override;
+  virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
+  virtual QModelIndex parent(const QModelIndex& child) const override;
 
-  virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-  virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
-  virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+  virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
   virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-  virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
+  virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
   //////////////////////////////////////////////////////////////////////////
   /// end override
   /////////////////////////////////////////////////////////////////////////
@@ -81,10 +81,9 @@ protected:
   */
   virtual void SetData() override;
 
-  void SetDataNodes();
-
 private:
 
+  void SetDataNodes();
   void SetHeaderModel();
 
   /**

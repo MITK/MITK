@@ -39,7 +39,7 @@ namespace mitk
     std::vector<DataNode::Pointer> GetAllSegmentationsOfCase(const SemanticTypes::CaseID& caseID);
     std::vector<std::string> mitk::RelationStorage::GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID);
 
-    SemanticTypes::ControlPoint GetControlPointOfData(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& dataNodeID);
+    SemanticTypes::ControlPoint GetControlPointOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
     std::vector<SemanticTypes::ControlPoint> GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID);
 
     std::vector<SemanticTypes::ExaminationPeriod> GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID);

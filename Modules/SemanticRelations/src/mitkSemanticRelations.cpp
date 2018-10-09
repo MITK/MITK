@@ -15,9 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 // semantic relations module
+#include "mitkControlPointManager.h"
+#include "mitkNodePredicates.h"
 #include "mitkSemanticRelations.h"
 #include "mitkSemanticRelationException.h"
-#include "mitkNodePredicates.h"
 #include "mitkUIDGeneratorBoost.h"
 
 // multi label module
@@ -323,16 +324,16 @@ mitk::SemanticRelations::ControlPointVector mitk::SemanticRelations::GetAllContr
   return allControlPoints;
 }
 
-mitk::SemanticTypes::ControlPoint mitk::SemanticRelations::GetControlPointOfData(const DataNode* dataNode) const
+mitk::SemanticTypes::ControlPoint mitk::SemanticRelations::GetControlPointOfData(const DataNode* imageNode) const
 {
-  if (nullptr == dataNode)
+  if (nullptr == imageNode)
   {
     mitkThrowException(SemanticRelationException) << "Not a valid data node.";
   }
 
-  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
-  SemanticTypes::ID dataNodeID = GetIDFromDataNode(dataNode);
-  return m_RelationStorage->GetControlPointOfData(caseID, dataNodeID);
+  SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
+  SemanticTypes::ID dataNodeID = GetIDFromDataNode(imageNode);
+  return m_RelationStorage->GetControlPointOfImage(caseID, dataNodeID);
 }
 
 mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllImagesOfControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
@@ -810,7 +811,7 @@ void mitk::SemanticRelations::UnlinkDataFromControlPoint(const DataNode* dataNod
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
   SemanticTypes::ID dataID = GetIDFromDataNode(dataNode);
-  SemanticTypes::ControlPoint controlPoint = m_RelationStorage->GetControlPointOfData(caseID, dataID);
+  SemanticTypes::ControlPoint controlPoint = m_RelationStorage->GetControlPointOfImage(caseID, dataID);
   m_RelationStorage->UnlinkDataFromControlPoint(caseID, dataID);
   ClearControlPoints(caseID);
 }

@@ -5,6 +5,8 @@ set(CPP_FILES
   QmitkAbstractSemanticRelationsStorageModel.cpp
   QmitkControlPointDialog.cpp
   QmitkLesionTextDialog.cpp
+  QmitkLesionTreeItem.cpp
+  QmitkLesionTreeModel.cpp
   QmitkPatientTableHeaderView.cpp
   QmitkPatientTableInspector.cpp
   QmitkPatientTableModel.cpp
@@ -16,6 +18,7 @@ set(MOC_H_FILES
  include/QmitkAbstractSemanticRelationsStorageModel.h
  include/QmitkControlPointDialog.h
  include/QmitkLesionTextDialog.h
+ include/QmitkLesionTreeModel.h
  include/QmitkPatientTableHeaderView.h
  include/QmitkPatientTableInspector.h
  include/QmitkPatientTableModel.h

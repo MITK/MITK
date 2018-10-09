@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDataNodeSetControlPointAction.h"
 #include "QmitkDataNodeInformationTypeAction.h"
 #include "QmitkDataNodeRemoveFromSemanticRelationsAction.h"
+#include "QmitkDataNodeUnlinkFromLesionAction.h"
 #include "QmitkDataNodeOpenInAction.h"
 
 // mitk core
@@ -64,6 +65,7 @@ private:
   QmitkDataNodeSetControlPointAction* m_ControlPointAction;
   QmitkDataNodeInformationTypeAction* m_InformationTypeAction;
   QmitkDataNodeRemoveFromSemanticRelationsAction* m_RemoveFromSemanticRelationsAction;
+  QmitkDataNodeUnlinkFromLesionAction* m_UnlinkFromLesionAction;
   QmitkDataNodeOpenInAction* m_OpenInAction;
 
 };

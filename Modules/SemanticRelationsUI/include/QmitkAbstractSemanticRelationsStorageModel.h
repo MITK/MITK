@@ -17,6 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKABSTRACTSEMANTICRELATIONSSTORAGEMODEL_H
 #define QMITKABSTRACTSEMANTICRELATIONSSTORAGEMODEL_H
 
+// mitk semantic relations UI
+#include "MitkSemanticRelationsUIExports.h"
+
 // semantic relations module
 #include <mitkISemanticRelationsObserver.h>
 #include <mitkSemanticRelations.h>
@@ -29,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * @brief The QmitkAbstractSemanticRelationsStorageModel is a subclass of 'QmitkAbstractDataStorageModel' and provides additional
 *        functionality to set and store a semantic relations instance, the current case ID and the current lesion.
 */
-class QmitkAbstractSemanticRelationsStorageModel : public QmitkAbstractDataStorageModel, public mitk::ISemanticRelationsObserver
+class MITKSEMANTICRELATIONSUI_EXPORT QmitkAbstractSemanticRelationsStorageModel : public QmitkAbstractDataStorageModel, public mitk::ISemanticRelationsObserver
 {
   Q_OBJECT
 

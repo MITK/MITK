@@ -29,7 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QmitkChartWidget::Impl final
 {
 public:
-  explicit Impl(QWidget *parent, bool unitTest);
   explicit Impl(QWidget *parent);
   ~Impl();
 
@@ -72,10 +71,6 @@ public:
   void InitializeJavaScriptChart();
   void CallJavaScriptFuntion(const QString &command);
 
-  // for testing
-  QmitkChartData *GetC3Data();
-  std::vector<std::unique_ptr<QmitkChartxyData>> *GetC3xyData();
-
 private:
   using ChartxyDataVector = std::vector<std::unique_ptr<QmitkChartxyData>>;
   std::string GetUniqueLabelName(const QList<QVariant> &labelList, const std::string &label) const;
@@ -95,7 +90,8 @@ private:
 };
 
 QmitkChartWidget::Impl::Impl(QWidget *parent)
-  : m_WebChannel(new QWebChannel(parent)), m_WebEngineView(new QWebEngineView(parent))
+  : m_WebChannel(new QWebChannel(parent)),
+    m_WebEngineView(new QWebEngineView(parent))
 {
   // disable context menu for QWebEngineView
   m_WebEngineView->setContextMenuPolicy(Qt::NoContextMenu);
@@ -111,16 +107,6 @@ QmitkChartWidget::Impl::Impl(QWidget *parent)
   layout->addWidget(m_WebEngineView);
   parent->setLayout(layout);
 
-  MapTypes();
-}
-
-QmitkChartWidget::Impl::Impl(QWidget *parent, bool unitTest)
-{
-  MapTypes();
-}
-
-void QmitkChartWidget::Impl::MapTypes()
-{
   m_ChartTypeToName.emplace(ChartType::bar, "bar");
   m_ChartTypeToName.emplace(ChartType::line, "line");
   m_ChartTypeToName.emplace(ChartType::spline, "spline");
@@ -332,16 +318,6 @@ std::string QmitkChartWidget::Impl::ConvertChartTypeToString(QmitkChartWidget::C
   return m_ChartTypeToName.at(chartType);
 }
 
-QmitkChartData *QmitkChartWidget::Impl::GetC3Data()
-{
-  return &m_C3Data;
-}
-
-std::vector<std::unique_ptr<QmitkChartxyData>> *QmitkChartWidget::Impl::GetC3xyData()
-{
-  return &m_C3xyData;
-}
-
 void QmitkChartWidget::Impl::ClearJavaScriptChart()
 {
   m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
@@ -403,21 +379,7 @@ QList<QVariant> QmitkChartWidget::Impl::GetDataLabels(const ChartxyDataVector &c
 
 QmitkChartWidget::QmitkChartWidget(QWidget *parent) : QWidget(parent), m_Impl(new Impl(this)) {}
 
-QmitkChartWidget::QmitkChartWidget(QWidget *parent, bool unitTest) : QWidget(parent), m_Impl(new Impl(this, unitTest))
-{
-}
-
 QmitkChartWidget::~QmitkChartWidget() {}
-
-std::vector<std::unique_ptr<QmitkChartxyData>> *QmitkChartWidget::GetData() const
-{
-  return m_Impl->GetC3xyData();
-}
-
-QmitkChartData *QmitkChartWidget::GetC3Data() const
-{
-  return m_Impl->GetC3Data();
-}
 
 void QmitkChartWidget::AddData1D(const std::vector<double> &data1D, const std::string &label, ChartType type)
 {

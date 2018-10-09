@@ -33,10 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QString>
 
-const QBrush QmitkLesionInfoWidget::DEFAULT_BACKGROUND_COLOR = QBrush(Qt::transparent);
-const QBrush QmitkLesionInfoWidget::SELECTED_BACKGROUND_COLOR = QBrush(Qt::green);
-const QBrush QmitkLesionInfoWidget::CONNECTED_BACKGROUND_COLOR = QBrush(Qt::darkGreen);
-
 QmitkLesionInfoWidget::QmitkLesionInfoWidget(mitk::DataStorage* dataStorage, QWidget* parent /*= nullptr*/)
   : QWidget(parent)
   , m_DataStorage(dataStorage)
@@ -56,7 +52,7 @@ void QmitkLesionInfoWidget::Initialize()
 
   m_Controls.lesionTreeView->setAlternatingRowColors(true);
   m_Controls.lesionTreeView->setSelectionMode(QAbstractItemView::SingleSelection);
-  m_Controls.lesionTreeView->setSelectionBehavior(QAbstractItemView::SelectItems);
+  m_Controls.lesionTreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_Controls.lesionTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
   m_StorageModel = new QmitkLesionTreeModel(this);
@@ -80,7 +76,7 @@ void QmitkLesionInfoWidget::SetUpConnections()
   connect(m_Controls.addLesionPushButton, &QPushButton::clicked, this, &QmitkLesionInfoWidget::OnAddLesionButtonClicked);
 
   // connect each list widget with a custom slots
-  connect(m_Controls.lesionTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QmitkLesionInfoWidget::OnSelectionChanged);
+  connect(m_Controls.lesionTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this, &QmitkLesionInfoWidget::OnSelectionChanged);
 
   // connect context menu entries
   connect(m_Controls.lesionTreeView, &QTreeView::customContextMenuRequested, this, &QmitkLesionInfoWidget::OnLesionListContextMenuRequested);
@@ -128,34 +124,31 @@ void QmitkLesionInfoWidget::OnAddLesionButtonClicked()
   }
 }
 
-void QmitkLesionInfoWidget::OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+void QmitkLesionInfoWidget::OnSelectionChanged(const QModelIndex& current, const QModelIndex& previous)
 {
-  if (nullptr == m_SemanticRelations)
+  if (nullptr == m_SemanticRelations && current.isValid())
   {
     return;
   }
 
-  for (const auto& index : selected.indexes())
+  // only the UID is needed to identify a representing lesion
+  QVariant data = m_StorageModel->data(current, Qt::UserRole);
+  if (data.canConvert<QmitkLesionTreeItem*>())
   {
-    // only the UID is needed to identify a representing lesion
-    QVariant data = m_StorageModel->data(index, Qt::UserRole);
-    if (data.canConvert<QmitkLesionTreeItem*>())
-    {
-      m_CurrentLesion = data.value<QmitkLesionTreeItem*>()->GetData().GetLesion();
-    }
-    else
-    {
-      return;
-    }
-
-    if (false == m_SemanticRelations->InstanceExists(m_CaseID, m_CurrentLesion))
-    {
-      // no UID found; cannot create a lesion
-      continue;
-    }
-
-    emit LesionChanged(m_CurrentLesion);
+    m_CurrentLesion = data.value<QmitkLesionTreeItem*>()->GetData().GetLesion();
   }
+  else
+  {
+    return;
+  }
+
+  if (false == m_SemanticRelations->InstanceExists(m_CaseID, m_CurrentLesion))
+  {
+    // no UID of a existing lesion found; cannot create a lesion
+    return;
+  }
+
+  emit LesionChanged(m_CurrentLesion);
 }
 
 void QmitkLesionInfoWidget::OnLesionListContextMenuRequested(const QPoint& pos)

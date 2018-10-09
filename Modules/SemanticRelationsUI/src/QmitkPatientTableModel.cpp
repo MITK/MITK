@@ -103,15 +103,18 @@ QVariant QmitkPatientTableModel::data(const QModelIndex& index, int role/* = Qt:
       return QVariant(it->second);
     }
   }
-  else if (QmitkDataNodeRole == role)
+
+  if (QmitkDataNodeRole == role)
   {
     return QVariant::fromValue<mitk::DataNode::Pointer>(mitk::DataNode::Pointer(dataNode));
   }
-  else if (QmitkDataNodeRawPointerRole == role)
+
+  if (QmitkDataNodeRawPointerRole == role)
   {
     return QVariant::fromValue<mitk::DataNode *>(dataNode);
   }
-  else if (Qt::BackgroundColorRole == role)
+
+  if (Qt::BackgroundColorRole == role)
   {
     auto it = m_LesionPresence.find(dataNode);
     if (it != m_LesionPresence.end())

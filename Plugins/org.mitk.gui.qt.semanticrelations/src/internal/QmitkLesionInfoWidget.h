@@ -70,9 +70,8 @@ private Q_SLOTS:
   */
   void OnAddLesionButtonClicked();
 
-  // slots for the mouse click events of the list widgets
-  void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
-  //void OnLesionItemDoubleClicked(QListWidgetItem*);
+  // slots for the mouse click events of tree view's selection model
+  void OnSelectionChanged(const QModelIndex& current, const QModelIndex& previous);
 
   void OnLesionListContextMenuRequested(const QPoint&);
 

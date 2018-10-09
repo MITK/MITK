@@ -50,10 +50,10 @@ namespace mitk
     pplx::task<void> Close() { return m_Listener.close(); }
 
   protected:
-    virtual void HandleGet(MitkRequest message){};
-    virtual void HandlePut(MitkRequest message){};
-    virtual void HandlePost(MitkRequest message){};
-    virtual void HandleDelete(MitkRequest message){};
+    virtual void HandleGet(MitkRequest){};
+    virtual void HandlePut(MitkRequest){};
+    virtual void HandlePost(MitkRequest){};
+    virtual void HandleDelete(MitkRequest){};
     void HandleError(pplx::task<void> &t);
 
     MitkListener m_Listener;

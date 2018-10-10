@@ -20,10 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 bool mitk::TimeGridIsMonotonIncreasing(const mitk::ModelBase::TimeGridType timeGrid)
 {
-    mitk::ModelBase::TimeGridType::ValueType lastTime = itk::NumericTraits<mitk::ModelBase::TimeGridType::ValueType>::NonpositiveMin();
-
     const auto beginPos = timeGrid.begin();
-    for(mitk::ModelBase::TimeGridType::const_iterator posTime = beginPos; posTime != timeGrid.end(); ++posTime)
+    const auto endPos = timeGrid.end();
+    for(mitk::ModelBase::TimeGridType::const_iterator posTime = beginPos; posTime != endPos; ++posTime)
     {
       if (posTime != beginPos && *(posTime-1)<*posTime) return false;
     }

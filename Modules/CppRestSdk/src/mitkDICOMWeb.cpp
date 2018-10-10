@@ -111,10 +111,13 @@ pplx::task<std::string> mitk::DICOMWeb::WadoRS(const utility::string_t folderPat
     }
 
     auto joinTask = pplx::when_all(begin(tasks), end(tasks));
-    return joinTask.then([=](void)
+
+    auto returnTask = joinTask.then([=](void) -> std::string
     {
       return utility::conversions::to_utf8string(folderPath).append(firstFileName);
     });
+
+    return returnTask;
   });
 }
 

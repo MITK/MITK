@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include "mitkPropertyList.h"
 #include "mitkStringProperty.h"
+#include "mitkExceptionMacro.h"
+
 #include <iostream>
 
 int mitkPropertyListTest(int /*argc*/, char * /*argv*/ [])
@@ -255,6 +257,34 @@ int mitkPropertyListTest(int /*argc*/, char * /*argv*/ [])
       return EXIT_FAILURE;
     }
     std::cout << "[PASSED]" << std::endl;
+  }
+
+  std::cout << "Testing SetProperty() with no property (nullptr): ";
+  tBefore = propList->GetMTime();
+  propList->SetProperty("nullprop", nullptr);
+  tAfter = propList->GetMTime();
+  if (!(tAfter == tBefore))
+  {
+    std::cout << "[FAILED]" << std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout << "[PASSED]" << std::endl;
+
+  std::cout << "Testing SetProperty() with invalid (empty) name: ";
+  try
+  {
+    propList->SetProperty("", boolProp);
+    std::cout << "[FAILED]" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (const mitk::Exception& /*e*/)
+  {
+    std::cout << "[PASSED]" << std::endl;
+  }
+  catch (...)
+  {
+    std::cout << "[FAILED]" << std::endl;
+    return EXIT_FAILURE;
   }
 
   std::cout << "[TEST DONE]" << std::endl;

@@ -63,46 +63,6 @@ pplx::task<void> mitk::RESTClient::Get(utility::string_t filePath, utility::stri
   });
 }
 
-pplx::task<void> mitk::RESTClient::Post(utility::string_t uri,
-  utility::string_t contentType,
-  concurrency::streams::basic_istream<unsigned char> fileStream)
-{
-  MITK_INFO << "Calling POST with " << mitk::RESTUtil::convertToUtf8(uri) << " on client "
-    << mitk::RESTUtil::convertToUtf8(m_Client->base_uri().to_string());
-
-  // currently not working, but stream approach may be useful for later.. don't use string streams for dcm files...
-  concurrency::streams::container_buffer<std::string> inStringBuffer;
-  return fileStream.read(inStringBuffer, fileStream.streambuf().size()).then([=](size_t bytesRead) -> pplx::task<void>
-  {
-    const std::string &text = inStringBuffer.collection();
-
-    std::string body = "";
-    body += "\r\n--boundary";
-    body += "\r\nContentType: " + mitk::RESTUtil::convertToUtf8(L"application/dicom") + "\r\n\r\n";
-    body += text;
-    body += "\r\n--boundary--";
-
-    auto utf8String = utility::conversions::to_utf8string(body);
-
-    auto binaryVector = std::vector<unsigned char>(utf8String.begin(), utf8String.end());
-
-    MitkRequest postRequest(MitkRESTMethods::POST);
-    postRequest.set_request_uri(uri);
-    postRequest.headers().add(U("Content-Type"), contentType);
-    postRequest.set_body(binaryVector);
-
-    MITK_INFO << "Request: " << mitk::RESTUtil::convertToUtf8(postRequest.to_string());
-
-    return m_Client->request(postRequest).then([fileStream](MitkResponse response)
-    {
-      fileStream.close();
-      auto status = response.status_code();
-      if (status != web::http::status_codes::OK) {
-        mitkThrow() << "POST ended up with response " << mitk::RESTUtil::convertToUtf8(response.to_string());
-      }
-    });
-  });
-}
 
 pplx::task<void> mitk::RESTClient::Post(utility::string_t uri, utility::string_t contentType, utility::string_t filePath)
 {
@@ -115,7 +75,7 @@ pplx::task<void> mitk::RESTClient::Post(utility::string_t uri, utility::string_t
   // reuse 'content-type' variable or struct to be more flexible, in future more than one file should also be supported..
   std::string head = "";
   head += "\r\n--boundary";
-  head += "\r\nContent-Type: " + mitk::RESTUtil::convertToUtf8(L"application/dicom") + "\r\n\r\n";
+  head += "\r\nContent-Type: " + mitk::RESTUtil::convertToUtf8(U("application/dicom")) + "\r\n\r\n";
 
   std::vector<unsigned char> bodyVector(head.begin(), head.end());
 

@@ -37,15 +37,15 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
   auto httpParams = web::uri::split_query(message.request_uri().query());
 
   // IHE Invoke Image Display style
-  auto requestType = httpParams.find(L"requestType");
+  auto requestType = httpParams.find(U("requestType"));
 
   if (requestType != httpParams.end() && requestType->second == L"IMAGE_SEG")
   {
     try
     {
-      auto studyUID = httpParams.at(L"studyUID");
-      auto imageSeriesUID = httpParams.at(L"imageSeriesUID");
-      auto segSeriesUID = httpParams.at(L"segSeriesUID");
+      auto studyUID = httpParams.at(U("studyUID"));
+      auto imageSeriesUID = httpParams.at(U("imageSeriesUID"));
+      auto segSeriesUID = httpParams.at(U("segSeriesUID"));
 
       DicomDTO dto;
       dto.imageSeriesUID = mitk::RESTUtil::convertToUtf8(imageSeriesUID);

@@ -116,7 +116,7 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 
         auto seriesUID = utility::conversions::to_utf8string(element.at(U("0020000E")).as_object().at(U("Value")).as_array()[0].as_string());
 
-        if (sopClassUID == L"1.2.840.10008.5.1.4.1.1.66.4") // SEG
+        if (sopClassUID == U("1.2.840.10008.5.1.4.1.1.66.4")) // SEG
         {
           if (segSeriesUIDA.length() == 0)
           {
@@ -127,7 +127,7 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
             segSeriesUIDB = seriesUID;
           }
         }
-        else if (sopClassUID == L"1.2.840.10008.5.1.4.1.1.2")  // CT
+        else if (sopClassUID == U("1.2.840.10008.5.1.4.1.1.2"))  // CT
         {
           imageSeriesUID = seriesUID;
         }

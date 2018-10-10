@@ -293,9 +293,7 @@ void QmitkPatientTableModel::SetHeaderModel()
 
   for (const auto& examinationPeriod : m_ExaminationPeriods)
   {
-    auto& shortenedUID = QString::fromStdString(examinationPeriod.UID);
-    shortenedUID.resize(4);
-    QStandardItem* examinationPeriodItem = new QStandardItem(shortenedUID);
+    QStandardItem* examinationPeriodItem = new QStandardItem(QString::fromStdString(examinationPeriod.name));
     standardItems.push_back(examinationPeriodItem);
     rootItem->appendColumn(standardItems);
     standardItems.clear();

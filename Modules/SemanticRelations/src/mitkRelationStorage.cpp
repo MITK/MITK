@@ -274,16 +274,25 @@ std::vector<mitk::SemanticTypes::ExaminationPeriod> mitk::RelationStorage::GetAl
     }
 
     std::vector<std::string> examinationPeriodVectorValue = examinationPeriodVectorProperty->GetValue();
-    // an examination period has an arbitrary number of control points
-    // set the values of the control point
-    SemanticTypes::ExaminationPeriod generatedExaminationPeriod;
-    generatedExaminationPeriod.UID = examinationPeriodID;
-    for (const auto& controlpointID : examinationPeriodVectorValue)
+    // an examination period has an arbitrary number of vector values (name and control point UIDs) (at least one for the name)
+    if (examinationPeriodVectorValue.empty())
     {
-      generatedExaminationPeriod.controlPointUIDs.push_back(controlpointID);
+      MITK_INFO << "Incorrect examination period storage. At least one (1) value for the examination period name has to be stored.";
+      continue;
     }
+    else
+    {
+      // set the values of the name and the control points
+      SemanticTypes::ExaminationPeriod generatedExaminationPeriod;
+      generatedExaminationPeriod.UID = examinationPeriodID;
+      generatedExaminationPeriod.name = examinationPeriodVectorValue[0];
+      for (int i = 1; i < examinationPeriodVectorValue.size(); ++i)
+      {
+        generatedExaminationPeriod.controlPointUIDs.push_back(examinationPeriodVectorValue[i]);
+      }
 
-    allExaminationPeriods.push_back(generatedExaminationPeriod);
+      allExaminationPeriods.push_back(generatedExaminationPeriod);
+    }
   }
   return allExaminationPeriods;
 }
@@ -1067,10 +1076,11 @@ void mitk::RelationStorage::AddExaminationPeriod(const SemanticTypes::CaseID& ca
     vectorProperty->SetValue(examinationPeriodsVectorValue);
     propertyList->SetProperty("examinationperiods", vectorProperty);
 
-    // add the examination period with the UID as the key and an empty control point UIDs vector as value
-    std::vector<std::string> controlPointUIDs;
+    // add the examination period with the UID as the key and the name as as the vector value
+    std::vector<std::string> examinationPeriodData;
+    examinationPeriodData.push_back(examinationPeriod.name);
     mitk::VectorProperty<std::string>::Pointer newExaminationPeriodVectorProperty = mitk::VectorProperty<std::string>::New();
-    newExaminationPeriodVectorProperty->SetValue(controlPointUIDs);
+    newExaminationPeriodVectorProperty->SetValue(examinationPeriodData);
     propertyList->SetProperty(examinationPeriod.UID, newExaminationPeriodVectorProperty);
   }
 }
@@ -1101,7 +1111,7 @@ void mitk::RelationStorage::AddControlPointToExaminationPeriod(const SemanticTyp
     const auto& leftControlPoint = GenerateControlpoint(caseID, leftControlPointUID);
     const auto& rightControlPoint = GenerateControlpoint(caseID, rightControlPointUID);
 
-    return leftControlPoint < rightControlPoint;
+    return leftControlPoint <= rightControlPoint;
   };
 
   std::sort(controlPointUIDsVectorValue.begin(), controlPointUIDsVectorValue.end(), lambda);
@@ -1127,8 +1137,8 @@ void mitk::RelationStorage::RemoveControlPointFromExaminationPeriod(const Semant
   }
 
   std::vector<std::string> controlPointUIDsVectorValue = controlPointUIDsVectorProperty->GetValue();
-  // an examination period has an arbitrary number of control points (at least one)
-  if (controlPointUIDsVectorValue.size() < 1)
+  // an examination period has an arbitrary number of vector values (name and control point UIDs) (at least one for the name)
+  if (controlPointUIDsVectorValue.size() < 2)
   {
     MITK_INFO << "Incorrect examination period storage. At least one (1) control point ID has to be stored.";
     return;
@@ -1136,7 +1146,7 @@ void mitk::RelationStorage::RemoveControlPointFromExaminationPeriod(const Semant
   else
   {
     controlPointUIDsVectorValue.erase(std::remove(controlPointUIDsVectorValue.begin(), controlPointUIDsVectorValue.end(), controlPoint.UID), controlPointUIDsVectorValue.end());
-    if (controlPointUIDsVectorValue.empty())
+    if (controlPointUIDsVectorValue.size() < 2)
     {
       RemoveExaminationPeriodFromCase(caseID, examinationPeriod);
     }

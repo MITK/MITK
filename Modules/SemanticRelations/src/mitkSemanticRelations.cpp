@@ -750,6 +750,7 @@ void mitk::SemanticRelations::SetControlPointOfData(const DataNode* dataNode, co
         // no closest control point (exceed threshold) or no examination period found
         // create a new examination period for this control point and add it to the storage
         examinationPeriod.UID = UIDGeneratorBoost::GenerateUID();
+        examinationPeriod.name = "New examination period " + std::to_string(allExaminationPeriods.size());
         AddExaminationPeriod(caseID, examinationPeriod);
       }
 

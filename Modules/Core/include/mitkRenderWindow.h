@@ -85,11 +85,9 @@ public:
 protected:
   RenderWindow(vtkRenderWindow * existingRenderWindow = NULL , const char* name = "unnamed renderer", mitk::RenderingManager* rm = NULL, mitk::BaseRenderer::RenderingMode::Type rmtype = mitk::BaseRenderer::RenderingMode::Standard );
 
-    void ResetView();
-    vtkRenderWindow *               m_vtkRenderWindow;
-    vtkRenderWindowInteractor *     m_vtkRenderWindowInteractor;
-
-    vtkEventProvider *              m_vtkMitkEventProvider;
+  vtkRenderWindow *               m_vtkRenderWindow;
+  vtkRenderWindowInteractor *     m_vtkRenderWindowInteractor;
+  vtkEventProvider *              m_vtkMitkEventProvider;
 
 private:
 };

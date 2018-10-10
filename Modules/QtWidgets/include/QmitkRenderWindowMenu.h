@@ -121,9 +121,6 @@ protected:
   int currentCrosshairRotationMode;
 
 signals:
-
-  void ResetView(); // == "global reinit"
-
   // \brief int parameters are enum from QmitkStdMultiWidget
   void ChangeCrosshairRotationMode(int);
 

@@ -146,7 +146,6 @@ protected:
 
 signals:
 
-  void ResetView();
   // \brief int parameters are enum from QmitkStdMultiWidget
   void ChangeCrosshairRotationMode(int);
 

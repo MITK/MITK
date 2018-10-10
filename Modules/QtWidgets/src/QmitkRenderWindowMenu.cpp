@@ -800,11 +800,6 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
 
   crosshairModesMenu->clear();
 
-  QAction* resetViewAction = new QAction(crosshairModesMenu);
-  resetViewAction->setText(tr("Reset view"));
-  crosshairModesMenu->addAction( resetViewAction );
-  connect( resetViewAction, SIGNAL(triggered()), this, SIGNAL(ResetView()));
-
   // Rotation mode
   {
     QAction* rotationGroupSeparator = new QAction(crosshairModesMenu);

@@ -35,9 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNumericTwoTissueCompartmentModelFactory.h"
 
 //general models
-#include "mitkGenericParamModelFactory.h"
-#include "mitkLinearModelFactory.h"
-#include "mitkT2DecayModelFactory.h"
 #include "mitkThreeStepLinearModelFactory.h"
 
 namespace mitk
@@ -72,9 +69,6 @@ public:
     RegisterProvider<mitk::ModelFitProviderBase<mitk::TwoTissueCompartmentFDGModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::TwoTissueCompartmentModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::NumericTwoTissueCompartmentModelFactory> >(context);
-    RegisterProvider<mitk::ModelFitProviderBase<mitk::GenericParamModelFactory> >(context);
-    RegisterProvider<mitk::ModelFitProviderBase<mitk::LinearModelFactory> >(context);
-    RegisterProvider<mitk::ModelFitProviderBase<mitk::T2DecayModelFactory> >(context);
   }
 
   virtual void Unload(us::ModuleContext* ) override

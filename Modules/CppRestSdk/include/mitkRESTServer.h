@@ -27,9 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "cpprest/producerconsumerstream.h"
 #include "cpprest/uri.h"
 
-#include <map>
-#include <functional>
-
 #include "MitkCppRestSdkExports.h"
 
 typedef web::http::experimental::listener::http_listener MitkListener;

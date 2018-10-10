@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkRESTClient.h"
-#include "mitkRestUtil.h"
+#include "mitkRESTUtil.h"
 
 #include <filesystem>
 #include <mitkCommon.h>

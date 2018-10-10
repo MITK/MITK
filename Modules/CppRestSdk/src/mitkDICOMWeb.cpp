@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkDICOMWeb.h"
-#include "mitkRestUtil.h"
+#include "mitkRESTUtil.h"
 #include <mitkCommon.h>
 
 mitk::DICOMWeb::DICOMWeb(utility::string_t url) : mitk::RESTClient(url)

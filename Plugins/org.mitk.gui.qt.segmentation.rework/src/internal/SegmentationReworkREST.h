@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef SegmentationReworkREST_h
 #define SegmentationReworkREST_h
 
-#include <mitkRestServer.h>
+#include <mitkRESTServer.h>
 
 class SegmentationReworkREST : public mitk::RESTServer
 {

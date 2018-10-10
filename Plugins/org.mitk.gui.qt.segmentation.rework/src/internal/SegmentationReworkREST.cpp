@@ -105,7 +105,7 @@ void SegmentationReworkREST::HandlePut(MitkRequest message)
 
       for (web::json::value score : simArray)
       {
-        vec.push_back(score.as_double());
+        vec.push_back(score.as_double() * 100);
       }
 
       dto.simScoreArray = vec;

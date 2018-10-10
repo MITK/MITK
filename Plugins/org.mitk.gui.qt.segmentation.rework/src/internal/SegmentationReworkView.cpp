@@ -232,10 +232,10 @@ void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArra
     map.insert(std::map<double, double>::value_type(sliceIndex, score));
     sliceIndex++;
   }
-  m_Controls.chartWidget->AddData2D(map, "similarity score");
-  m_Controls.chartWidget->SetChartType("similarity score", QmitkChartWidget::ChartType::line);
+  m_Controls.chartWidget->AddData2D(map, "similarity graph");
+  m_Controls.chartWidget->SetChartType("similarity graph", QmitkChartWidget::ChartType::line);
   m_Controls.chartWidget->SetXAxisLabel("slice number");
-  m_Controls.chartWidget->SetYAxisLabel("similarity score");
+  m_Controls.chartWidget->SetYAxisLabel("similarity in percent");
 }
 
 void SegmentationReworkView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
@@ -340,6 +340,11 @@ void SegmentationReworkView::CreateNewSegmentationC()
 
 void SegmentationReworkView::CleanDicomFolder() 
 {
+  if (m_SegA || m_SegB || m_SegC) {
+    QMessageBox::warning(nullptr, tr("Clean dicom folder"), tr("Please remove the data in data storage before cleaning the download folder"));
+    return;
+  }
+
   std::experimental::filesystem::remove_all(m_downloadBaseDir);
   std::experimental::filesystem::create_directory(m_downloadBaseDir);
 }

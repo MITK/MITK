@@ -212,8 +212,9 @@ void SegmentationReworkView::LoadData(std::vector<std::string> filePathList)
 
   m_Image = dataNodes->at(0);
   m_SegA = dataNodes->at(1);
-  m_SegB = dataNodes->at(2);
-
+  if (dataNodes->size() == 3) {
+    m_SegB = dataNodes->at(2);
+  }
 }
 
 void SegmentationReworkView::UpdateChartWidget()

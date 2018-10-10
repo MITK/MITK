@@ -25,33 +25,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QMessageBox>
-#include <QMessageBox>
 #include <QFileDialog>
+#include <QTableWidget>
 #include <qwt_plot_marker.h>
+#include "QmitkPlotWidget.h"
 
-#include "mitkFormulaParser.h"
+#include "mitkNodePredicateFunction.h"
 #include "mitkScalarListLookupTableProperty.h"
 #include "mitkModelFitConstants.h"
 #include "mitkExtractTimeGrid.h"
 #include "mitkModelGenerator.h"
 #include "mitkModelFitException.h"
 #include "mitkModelFitParameterValueExtraction.h"
+#include "mitkTimeGridHelper.h"
+
+#include "mitkModelFitPlotDataHelper.h"
 
 #include "ModelFitInspectorView.h"
 
-#include <QClipboard>
 const std::string ModelFitInspectorView::VIEW_ID = "org.mitk.gui.gt.fit.inspector";
-const unsigned int ModelFitInspectorView::INTERPOLATION_STEPS = 100;
-
-ModelFitInspectorView::ObserverInfo::ObserverInfo(mitk::SliceNavigationController* controller,
-  int observerTag, const std::string& renderWindowName, mitk::IRenderWindowPart* part) : controller(controller), observerTag(observerTag),
-  renderWindowName(renderWindowName), renderWindowPart(part)
-{
-}
+const unsigned int ModelFitInspectorView::INTERPOLATION_STEPS = 10;
+const std::string DEFAULT_X_AXIS = "Time [s]";
 
 ModelFitInspectorView::ModelFitInspectorView() :
   m_renderWindowPart(nullptr),
-  m_PendingSliceChangedEvent(false),
   m_internalUpdateFlag(false),
   m_currentFit(nullptr),
   m_currentModelParameterizer(nullptr),
@@ -66,102 +63,6 @@ ModelFitInspectorView::ModelFitInspectorView() :
 
 ModelFitInspectorView::~ModelFitInspectorView()
 {
-  this->RemoveAllObservers();
-}
-
-
-bool ModelFitInspectorView::InitObservers()
-{
-
-  bool result = true;
-
-  typedef QHash<QString, QmitkRenderWindow*> WindowMapType;
-  WindowMapType windowMap = m_renderWindowPart->GetQmitkRenderWindows();
-
-  auto i = windowMap.begin();
-
-  while (i != windowMap.end())
-  {
-    mitk::SliceNavigationController* sliceNavController =
-      i.value()->GetSliceNavigationController();
-
-    if (sliceNavController)
-    {
-      itk::ReceptorMemberCommand<ModelFitInspectorView>::Pointer cmdSliceEvent =
-        itk::ReceptorMemberCommand<ModelFitInspectorView>::New();
-      cmdSliceEvent->SetCallbackFunction(this, &ModelFitInspectorView::OnSliceChanged);
-      int tag = sliceNavController->AddObserver(
-                  mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0),
-                  cmdSliceEvent);
-
-      m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
-        i.key().toStdString(), m_renderWindowPart)));
-
-      itk::ReceptorMemberCommand<ModelFitInspectorView>::Pointer cmdTimeEvent =
-        itk::ReceptorMemberCommand<ModelFitInspectorView>::New();
-      cmdTimeEvent->SetCallbackFunction(this, &ModelFitInspectorView::OnSliceChanged);
-      tag = sliceNavController->AddObserver(
-              mitk::SliceNavigationController::GeometryTimeEvent(nullptr, 0),
-              cmdTimeEvent);
-
-      m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
-        i.key().toStdString(), m_renderWindowPart)));
-
-      itk::MemberCommand<ModelFitInspectorView>::Pointer cmdDelEvent =
-        itk::MemberCommand<ModelFitInspectorView>::New();
-      cmdDelEvent->SetCallbackFunction(this,
-                                       &ModelFitInspectorView::OnSliceNavigationControllerDeleted);
-      tag = sliceNavController->AddObserver(
-              itk::DeleteEvent(), cmdDelEvent);
-
-      m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
-        i.key().toStdString(), m_renderWindowPart)));
-    }
-
-    ++i;
-
-    result = result && sliceNavController;
-  }
-
-  return result;
-}
-
-void ModelFitInspectorView::RemoveObservers(const mitk::SliceNavigationController*
-    deletedSlicer)
-{
-
-  std::pair < ObserverMapType::const_iterator, ObserverMapType::const_iterator> obsRange =
-    m_ObserverMap.equal_range(deletedSlicer);
-
-  for (ObserverMapType::const_iterator pos = obsRange.first; pos != obsRange.second; ++pos)
-  {
-    pos->second.controller->RemoveObserver(pos->second.observerTag);
-  }
-
-  m_ObserverMap.erase(deletedSlicer);
-}
-
-void ModelFitInspectorView::RemoveAllObservers(mitk::IRenderWindowPart* deletedPart)
-{
-  for (ObserverMapType::const_iterator pos = m_ObserverMap.begin(); pos != m_ObserverMap.end(); )
-  {
-    ObserverMapType::const_iterator delPos = pos++;
-
-    if (deletedPart == nullptr || deletedPart == delPos->second.renderWindowPart)
-    {
-      delPos->second.controller->RemoveObserver(delPos->second.observerTag);
-      m_ObserverMap.erase(delPos);
-    }
-  }
-}
-
-void ModelFitInspectorView::OnSliceNavigationControllerDeleted(const itk::Object* sender,
-    const itk::EventObject& /*e*/)
-{
-  const mitk::SliceNavigationController* sendingSlicer =
-    dynamic_cast<const mitk::SliceNavigationController*>(sender);
-
-  this->RemoveObservers(sendingSlicer);
 }
 
 void ModelFitInspectorView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
@@ -169,27 +70,43 @@ void ModelFitInspectorView::RenderWindowPartActivated(mitk::IRenderWindowPart* r
   if (m_renderWindowPart != renderWindowPart)
   {
     m_renderWindowPart = renderWindowPart;
-
-    if (!InitObservers())
-    {
-      QMessageBox::information(nullptr, "Error", "Unable to set up the event observers. The " \
-                               "plot will not be triggered on changing the crosshair, " \
-                               "position or time step.");
-    }
   }
+
+  this->m_SliceChangeListener.RenderWindowPartActivated(renderWindowPart);
 }
 
 void ModelFitInspectorView::RenderWindowPartDeactivated(
   mitk::IRenderWindowPart* renderWindowPart)
 {
   m_renderWindowPart = nullptr;
-  this->RemoveAllObservers(renderWindowPart);
+  this->m_SliceChangeListener.RenderWindowPartDeactivated(renderWindowPart);
 }
 
 void ModelFitInspectorView::CreateQtPartControl(QWidget* parent)
 {
-  // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
+
+  m_SelectionServiceConnector = std::make_unique<QmitkSelectionServiceConnector>();
+  m_SelectionServiceConnector->AddPostSelectionListener(this->GetSite()->GetWorkbenchWindow()->GetSelectionService());
+
+  m_Controls.inputNodeSelector->SetDataStorage(GetDataStorage());
+  m_Controls.inputNodeSelector->SetEmptyInfo(QString("Please select input data to be viewed."));
+  m_Controls.inputNodeSelector->SetInvalidInfo(QString("<b><font color=\"red\">No input data is selected</font></b>"));
+  m_Controls.inputNodeSelector->SetPopUpTitel(QString("Choose 3D+t input data that should be viewed!"));
+  m_Controls.inputNodeSelector->SetSelectionIsOptional(false);
+  m_Controls.inputNodeSelector->SetSelectOnlyVisibleNodes(true);
+
+  auto predicate = mitk::NodePredicateFunction::New(
+    [](const mitk::DataNode *node) {
+    return node && node->GetData() && node->GetData()->GetTimeSteps() > 1;});
+  m_Controls.inputNodeSelector->SetNodePredicate(predicate);
+
+  connect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls.inputNodeSelector, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
+  connect(m_Controls.inputNodeSelector, SIGNAL(CurrentSelectionChanged(QList<mitk::DataNode::Pointer>)), this, SLOT(OnInputChanged(const QList<mitk::DataNode::Pointer>&)));
+
+  this->m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
+  connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
+
   connect(m_Controls.cmbFit, SIGNAL(currentIndexChanged(int)), this,
           SLOT(OnFitSelectionChanged(int)));
 
@@ -231,13 +148,10 @@ void ModelFitInspectorView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.sbFixMin_x, SIGNAL(valueChanged(double)), this,
     SLOT(OnFixedScalingXChanged(double)));
 
+  this->EnsureBookmarkPointSet();
+  m_Controls.inspectionPositionWidget->SetPositionBookmarkNode(m_PositionBookmarksNode.Lock());
 
-  connect(m_Controls.btnExport, SIGNAL(clicked()), this, SLOT(OnExportClicked()));
-
-  // Add SIGNAL and SLOT for "Copy to clipboard" functionality
-
-  connect(m_Controls.btnCopyResultsToClipboard, SIGNAL(clicked()), this, SLOT(OnClipboardResultsButtonClicked()));
-
+  connect(m_Controls.inspectionPositionWidget, SIGNAL(PositionBookmarksChanged()), this, SLOT(OnPositionBookmarksChanged()));
 
   // For some reason this needs to be called to set the plot widget's minimum width to an
   // acceptable level (since Qwt 6).
@@ -253,6 +167,15 @@ void ModelFitInspectorView::CreateQtPartControl(QWidget* parent)
 
 void ModelFitInspectorView::SetFocus()
 {
+}
+
+void ModelFitInspectorView::NodeRemoved(const mitk::DataNode* node)
+{
+  if (node == this->m_currentSelectedNode)
+  {
+    QmitkSingleNodeSelectionWidget::NodeList emptylist;
+    this->m_Controls.inputNodeSelector->SetCurrentSelection(emptylist);
+  }
 }
 
 void ModelFitInspectorView::OnScaleFixedYChecked(bool checked)
@@ -279,80 +202,26 @@ void ModelFitInspectorView::OnScaleFixedXChecked(bool checked)
   m_Controls.widgetPlot->GetPlot()->replot();
 };
 
-void CheckYMinMaxFromXYData(const QmitkPlotWidget::XYDataVector& data, double& min, double& max)
-{
-  for (const auto & pos : data)
-  {
-    if (max < pos.second)
-    {
-      max = pos.second;
-    }
-
-    if (min > pos.second)
-    {
-      min = pos.second;
-    }
-  }
-}
-
-void CheckXMinMaxFromXYData(const QmitkPlotWidget::XYDataVector& data, double& min, double& max)
-{
-  for (const auto & pos : data)
-  {
-    if (max < pos.first)
-    {
-      max = pos.first;
-    }
-
-    if (min > pos.first)
-    {
-      min = pos.first;
-    }
-  }
-}
-
 void ModelFitInspectorView::OnScaleToDataYClicked()
 {
-  double max = itk::NumericTraits<double>::NonpositiveMin();
-  double min = itk::NumericTraits<double>::max();
+  auto minmax = this->m_PlotCurves.GetYMinMax();
 
-  CheckYMinMaxFromXYData(this->m_ImagePlotCurve, min, max);
-  CheckYMinMaxFromXYData(this->m_ModelPlotCurve, min, max);
+  auto min = minmax.first - abs(minmax.first) * 0.01;
+  auto max = minmax.second + abs(minmax.second) * 0.01;
 
-  for (CurveMapType::const_iterator pos = this->m_InputDataPlotCurves.begin();
-       pos != this->m_InputDataPlotCurves.end(); ++pos)
-  {
-    CheckYMinMaxFromXYData(pos->second, min, max);
-  }
-
-  min -= abs(min) * 0.01;
-  max += abs(max) * 0.01;
-
-  m_Controls.sbFixMax->setValue(max);
   m_Controls.sbFixMin->setValue(min);
-
+  m_Controls.sbFixMax->setValue(max);
 };
 
 void ModelFitInspectorView::OnScaleToDataXClicked()
 {
-  double max = itk::NumericTraits<double>::NonpositiveMin();
-  double min = itk::NumericTraits<double>::max();
+  auto minmax = this->m_PlotCurves.GetXMinMax();
 
-  CheckXMinMaxFromXYData(this->m_ImagePlotCurve, min, max);
-  CheckXMinMaxFromXYData(this->m_ModelPlotCurve, min, max);
+  auto min = minmax.first - abs(minmax.first) * 0.01;
+  auto max = minmax.second + abs(minmax.second) * 0.01;
 
-  for (CurveMapType::const_iterator pos = this->m_InputDataPlotCurves.begin();
-    pos != this->m_InputDataPlotCurves.end(); ++pos)
-  {
-    CheckXMinMaxFromXYData(pos->second, min, max);
-  }
-
-  min -= abs(min) * 0.01;
-  max += abs(max) * 0.01;
-
-  m_Controls.sbFixMax_x->setValue(max);
   m_Controls.sbFixMin_x->setValue(min);
-
+  m_Controls.sbFixMax_x->setValue(max);
 };
 
 void ModelFitInspectorView::OnFixedScalingYChanged(double /*value*/)
@@ -369,63 +238,76 @@ void ModelFitInspectorView::OnFixedScalingXChanged(double /*value*/)
   m_Controls.widgetPlot->GetPlot()->replot();
 };
 
-void ModelFitInspectorView::OnExportClicked()
+int ModelFitInspectorView::ActualizeFitSelectionWidget()
 {
-  QString fileName = QFileDialog::getSaveFileName(nullptr, tr("Save File"));
+  mitk::NodeUIDType selectedFitUD = "";
+  bool isModelFitNode = this->m_currentSelectedNode->GetData()->GetPropertyList()->GetStringProperty(
+    mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), selectedFitUD);
 
-  if (fileName.isEmpty())
+  mitk::DataStorage::Pointer storage = this->GetDataStorage();
+
+  mitk::modelFit::NodeUIDSetType fitUIDs = mitk::modelFit::GetFitUIDsOfNode(
+    this->m_currentSelectedNode, storage);
+
+  this->m_modelfitList.clear();
+  this->m_Controls.cmbFit->clear();
+
+  for (const auto & fitUID : fitUIDs)
   {
-    QMessageBox::critical(nullptr, tr("No file selected!"),
-                          tr("Cannot export pixel dump. Please selected a file."));
+    mitk::modelFit::ModelFitInfo::ConstPointer info = mitk::modelFit::CreateFitInfoFromNode(fitUID,
+      storage).GetPointer();
+
+    if (info.IsNotNull())
+    {
+      this->m_modelfitList.insert(std::make_pair(info->uid, info));
+      std::ostringstream nameStrm;
+      if (info->fitName.empty())
+      {
+        nameStrm << info->uid;
+      }
+      else
+      {
+        nameStrm << info->fitName;
+      }
+      nameStrm << " (" << info->modelName << ")";
+      QVariant data(info->uid.c_str());
+      m_Controls.cmbFit->addItem(QString::fromStdString(nameStrm.str()), data);
+    }
+    else
+    {
+      MITK_ERROR <<
+        "Was not able to extract model fit information from storage. Node properties in storage may be invalid. Failed fit UID:"
+        << fitUID;
+    }
   }
-  else
+
+  int cmbIndex = 0;
+
+  if (m_modelfitList.empty())
   {
-    std::ofstream file;
+    cmbIndex = -1;
+  };
 
-    std::ios_base::openmode iOpenFlag = std::ios_base::out | std::ios_base::trunc;
-    file.open(fileName.toStdString().c_str(), iOpenFlag);
+  if (isModelFitNode)
+  {
+    //model was selected, thus select this one in combobox
+    QVariant data(selectedFitUD.c_str());
+    cmbIndex = m_Controls.cmbFit->findData(data);
 
-    if (!file.is_open())
+    if (cmbIndex == -1)
     {
-      QMessageBox::critical(nullptr, tr("Cannot create/open selected file!"),
-                            tr("Cannot open or create the selected file. Export will be aborted. Selected file name: ") +
-                            fileName);
-      return;
+      MITK_WARN <<
+        "Model fit Inspector in invalid state. Selected fit seems to be not avaible in plugin selection. Failed fit UID:"
+        << selectedFitUD;
     }
+  };
 
-    for (int i = 0; i < m_Controls.tableData->columnCount(); ++i)
-    {
-      file << m_Controls.tableData->horizontalHeaderItem(i)->text().toStdString();
+  m_Controls.cmbFit->setCurrentIndex(cmbIndex);
 
-      if (i < m_Controls.tableData->columnCount() - 1)
-      {
-        file << ",";
-      }
-    }
-
-    file << std::endl;
-
-    for (int row = 0; row < m_Controls.tableData->rowCount(); ++row)
-    {
-      for (int i = 0; i < m_Controls.tableData->columnCount(); ++i)
-      {
-        file << m_Controls.tableData->item(row, i)->text().toStdString();
-
-        if (i < m_Controls.tableData->columnCount() - 1)
-        {
-          file << ",";
-        }
-      }
-
-      file << std::endl;
-    }
-
-    file.close();
-  }
+  return cmbIndex;
 }
 
-void ModelFitInspectorView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
-    const QList<mitk::DataNode::Pointer>& nodes)
+void ModelFitInspectorView::OnInputChanged(const QList<mitk::DataNode::Pointer>& nodes)
 {
   if (nodes.size() > 0)
   {
@@ -436,8 +318,6 @@ void ModelFitInspectorView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
 
       this->m_currentSelectedNode = nodes.front();
 
-      mitk::DataStorage::Pointer storage = this->GetDataStorage();
-
       mitk::NodeUIDType selectedFitUD = "";
       bool isModelFitNode = this->m_currentSelectedNode->GetData()->GetPropertyList()->GetStringProperty(
                               mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), selectedFitUD);
@@ -447,54 +327,7 @@ void ModelFitInspectorView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
         this->m_currentSelectedNode = this->GetParentNode(this->m_currentSelectedNode);
       }
 
-      mitk::modelFit::NodeUIDSetType fitUIDs = mitk::modelFit::GetFitUIDsOfNode(
-            this->m_currentSelectedNode, storage);
-
-      this->m_modelfitList.clear();
-      this->m_Controls.cmbFit->clear();
-
-      for (const auto & fitUID : fitUIDs)
-      {
-        mitk::modelFit::ModelFitInfo::ConstPointer info = mitk::modelFit::CreateFitInfoFromNode(fitUID,
-            storage).GetPointer();
-
-        if (info.IsNotNull())
-        {
-          this->m_modelfitList.insert(std::make_pair(info->uid, info));
-
-          QVariant data(info->uid.c_str());
-          m_Controls.cmbFit->addItem(QString::fromStdString(info->modelName), data);
-        }
-        else
-        {
-          MITK_ERROR <<
-                     "Was not able to extract model fit information from storage. Node properties in storage may be invalid. Failed fit UID:"
-                     << fitUID;
-        }
-      }
-
-      int cmbIndex = 0;
-
-      if (m_modelfitList.empty())
-      {
-        cmbIndex = -1;
-      };
-
-      if (isModelFitNode)
-      {
-        //model was selected, thus select this one in combobox
-        QVariant data(selectedFitUD.c_str());
-        cmbIndex = m_Controls.cmbFit->findData(data);
-
-        if (cmbIndex == -1)
-        {
-          MITK_WARN <<
-                    "Model fit Inspector in invalid state. Selected fit seems to be not avaible in plugin selection. Failed fit UID:"
-                    << selectedFitUD;
-        }
-      };
-
-      m_Controls.cmbFit->setCurrentIndex(cmbIndex);
+      auto cmbIndex = ActualizeFitSelectionWidget();
 
       m_internalUpdateFlag = false;
 
@@ -505,7 +338,8 @@ void ModelFitInspectorView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
         //only raw 4D data selected. Just update plots for current position
         m_currentFit = nullptr;
         m_currentFitTime.Modified();
-        OnSliceChangedDelayed();
+        OnSliceChanged();
+        m_Controls.plotDataWidget->SetXName(DEFAULT_X_AXIS);
       }
       else
       {
@@ -527,6 +361,10 @@ void ModelFitInspectorView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
 
       m_selectedNodeTime.Modified();
       OnFitSelectionChanged(0);
+      RefreshPlotData();
+      m_Controls.plotDataWidget->SetPlotData(&(this->m_PlotCurves));
+      m_Controls.fitParametersWidget->setFits(QmitkFitParameterModel::FitVectorType());
+      RenderPlot();
     }
   }
 
@@ -626,149 +464,33 @@ const mitk::ModelBase::TimeGridType ModelFitInspectorView::GetCurrentTimeGrid() 
   }
 };
 
-void ModelFitInspectorView::OnSliceChanged(const itk::EventObject&)
+void ModelFitInspectorView::OnSliceChanged()
 {
-  // Taken from QmitkStdMultiWidget::HandleCrosshairPositionEvent().
-  // Since there are always 3 events arriving (one for each render window) every time the slice
-  // or time changes, the slot OnSliceChangedDelayed is triggered - and only if it hasn't been
-  // triggered yet - so it is only executed once for every slice/time change.
-  if (!m_PendingSliceChangedEvent)
-  {
-    m_PendingSliceChangedEvent = true;
-    QTimer::singleShot(0, this, SLOT(OnSliceChangedDelayed()));
-  }
-}
-
-void ModelFitInspectorView::OnSliceChangedDelayed()
-{
-  m_PendingSliceChangedEvent = false;
-
   ValidateAndSetCurrentPosition();
 
   m_Controls.widgetPlot->setEnabled(m_validSelectedPosition);
 
   if (m_currentSelectedNode.IsNotNull())
   {
+    m_Controls.inspectionPositionWidget->SetCurrentPosition(m_currentSelectedPosition);
+
     if (RefreshPlotData())
     {
       RenderPlot();
+      m_Controls.plotDataWidget->SetPlotData(&m_PlotCurves);
       RenderFitInfo();
     }
   }
 }
 
-mitk::ModelBase::TimeGridType
-ModelFitInspectorView::GenerateInterpolatedTimeGrid(const mitk::ModelBase::TimeGridType& grid)
-const
+void ModelFitInspectorView::OnPositionBookmarksChanged()
 {
-  unsigned int origGridSize = grid.size();
-
-  mitk::ModelBase::TimeGridType interpolatedTimeGrid(((origGridSize - 1) * INTERPOLATION_STEPS) + 1);
-
-  for (unsigned int t = 0; t < origGridSize - 1; ++t)
-  {
-    double delta = (grid[t + 1] - grid[t]) / INTERPOLATION_STEPS;
-
-    for (unsigned int i = 0; i < INTERPOLATION_STEPS; ++i)
+    if (RefreshPlotData())
     {
-      interpolatedTimeGrid[(t * INTERPOLATION_STEPS) + i] = grid[t] + i * delta;
+      RenderPlot();
+      m_Controls.plotDataWidget->SetPlotData(&m_PlotCurves);
+      RenderFitInfo();
     }
-  }
-
-  interpolatedTimeGrid[interpolatedTimeGrid.size() - 1] = grid[grid.size() - 1];
-
-  return interpolatedTimeGrid;
-};
-
-
-QmitkPlotWidget::XYDataVector
-ModelFitInspectorView::CalcCurveFromModel(const mitk::Point3D& position)
-{
-  assert(m_currentModelParameterizer.IsNotNull());
-  assert(m_currentFit.IsNotNull());
-
-  mitk::Image::Pointer inputImage = this->GetCurrentInputImage();
-  assert(inputImage.IsNotNull());
-
-  // Calculate index
-  ::itk::Index<3> index;
-  mitk::BaseGeometry::Pointer geometry = inputImage->GetTimeGeometry()->GetGeometryForTimeStep(0);
-
-  geometry->WorldToIndex(position, index);
-
-  //model generation
-  mitk::ModelBase::Pointer model = m_currentModelParameterizer->GenerateParameterizedModel(index);
-
-  mitk::ParameterValueMapType parameterMap = mitk::ExtractParameterValueMapFromModelFit(m_currentFit, position);
-
-  mitk::ModelBase::ParametersType paramArray = mitk::ConvertParameterMapToParameterVector(parameterMap, model);
-
-  mitk::ModelBase::ModelResultType curveDataY = model->GetSignal(paramArray);
-  QmitkPlotWidget::XYDataVector result;
-  mitk::ModelBase::TimeGridType timeGrid = model->GetTimeGrid();
-
-  for (unsigned int t = 0; t < timeGrid.size(); ++t)
-  {
-    double x = timeGrid[t];
-    double y = curveDataY[t];
-    result.push_back(std::make_pair(x, y));
-  }
-
-  return result;
-}
-
-QmitkPlotWidget::XYDataVector
-ModelFitInspectorView::CalcCurveFromFunction(const mitk::Point3D& position,
-    const mitk::ModelBase::TimeGridType& timeGrid)
-{
-  assert(m_currentFit.IsNotNull());
-  assert(m_renderWindowPart != nullptr);
-
-  mitk::Image::Pointer inputImage = this->GetCurrentInputImage();
-  assert(inputImage.IsNotNull());
-
-  QmitkPlotWidget::XYDataVector result;
-
-  // Calculate index
-  ::itk::Index<3> index;;
-  mitk::BaseGeometry::Pointer geometry = inputImage->GetTimeGeometry()->GetGeometryForTimeStep(0);
-
-  geometry->WorldToIndex(position, index);
-
-  mitk::ParameterValueMapType parameterMap = mitk::ExtractParameterValueMapFromModelFit(m_currentFit, position);
-
-  mitk::FormulaParser parser(&parameterMap);
-  unsigned int timestep = m_renderWindowPart->GetTimeNavigationController()->GetTime()->
-                          GetPos();
-
-  for (unsigned int t = 0; t < timeGrid.size(); ++t)
-  {
-    // Set up static parameters
-    foreach (const mitk::modelFit::StaticParameterMap::StaticParameterType& var,
-             m_currentFit->staticParamMap)
-    {
-      const std::string& name = var.first;
-      const mitk::modelFit::StaticParameterMap::ValueType& list = var.second;
-
-      if (list.size() == 1)
-      {
-        parameterMap[name] = list.front();
-      }
-      else
-      {
-        parameterMap[name] = list.at(timestep);
-      }
-    }
-
-    // Calculate curve data
-    double x = timeGrid[t];
-    parameterMap[m_currentFit->x] = x;
-
-    double y = parser.parse(m_currentFit->function);
-    result.push_back(std::make_pair(x, y));
-  }
-
-  return result;
 }
 
 void ModelFitInspectorView::OnFitSelectionChanged(int index)
@@ -809,10 +531,43 @@ void ModelFitInspectorView::OnFitSelectionChanged(int index)
 
       m_currentFitTime.Modified();
 
-      OnSliceChangedDelayed();
+      auto name = m_currentFit->xAxisName;
+      if (!m_currentFit->xAxisUnit.empty())
+      {
+        name += " [" + m_currentFit->xAxisUnit + "]";
+      }
+      m_Controls.plotDataWidget->SetXName(name);
+
+      OnSliceChanged();
     }
   }
 }
+
+mitk::PlotDataCurveCollection::Pointer ModelFitInspectorView::RefreshPlotDataCurveCollection(const mitk::Point3D& position,
+  const mitk::Image* input, const mitk::modelFit::ModelFitInfo* fitInfo,
+  const mitk::ModelBase::TimeGridType& timeGrid, mitk::ModelParameterizerBase* parameterizer)
+{
+  mitk::PlotDataCurveCollection::Pointer result = mitk::PlotDataCurveCollection::New();
+
+  //sample curve
+  if (input)
+  {
+    result->InsertElement(mitk::MODEL_FIT_PLOT_SAMPLE_NAME(), GenerateImageSamplePlotData(position, input, timeGrid));
+  }
+
+  //model signal curve
+  if (fitInfo)
+  {
+    // Interpolate time grid (x values) so the curve looks smooth
+    const mitk::ModelBase::TimeGridType interpolatedTimeGrid = mitk::GenerateSupersampledTimeGrid(timeGrid, INTERPOLATION_STEPS);
+    auto hires_curve = mitk::GenerateModelSignalPlotData(position, fitInfo, interpolatedTimeGrid, parameterizer);
+    result->InsertElement(mitk::MODEL_FIT_PLOT_INTERPOLATED_SIGNAL_NAME(), hires_curve);
+    auto curve = mitk::GenerateModelSignalPlotData(position, fitInfo, timeGrid, parameterizer);
+    result->InsertElement(mitk::MODEL_FIT_PLOT_SIGNAL_NAME(), curve);
+  }
+
+  return result;
+};
 
 bool ModelFitInspectorView::RefreshPlotData()
 {
@@ -820,9 +575,7 @@ bool ModelFitInspectorView::RefreshPlotData()
 
   if (m_currentSelectedNode.IsNull())
   {
-    this->m_ImagePlotCurve.clear();
-    this->m_ModelPlotCurve.clear();
-    this->m_InputDataPlotCurves.clear();
+    this->m_PlotCurves = mitk::ModelFitPlotData();
 
     changed = m_selectedNodeTime > m_lastRefreshTime;
     m_lastRefreshTime.Modified();
@@ -834,106 +587,53 @@ bool ModelFitInspectorView::RefreshPlotData()
     const mitk::Image* input = GetCurrentInputImage();
     const mitk::ModelBase::TimeGridType timeGrid = GetCurrentTimeGrid();
 
-    //image data curve
-    if (m_selectedNodeTime > m_lastRefreshTime || m_currentFitTime > m_lastRefreshTime
-        || m_currentPositionTime > m_lastRefreshTime)
+    if (m_currentFitTime > m_lastRefreshTime || m_currentPositionTime > m_lastRefreshTime)
     {
-      m_ImagePlotCurve.clear();
-
-      if (input && m_validSelectedPosition)
+      if (m_validSelectedPosition)
       {
-        QmitkPlotWidget::XYDataVector pointData;
-
-        for (unsigned int t = 0; t < timeGrid.size(); ++t)
-        {
-          double x = timeGrid[t];
-          double y = ReadVoxel(input, m_currentSelectedPosition, t);
-          pointData.push_back(std::make_pair(x, y));
-        }
-
-        m_ImagePlotCurve = pointData;
+        m_PlotCurves.currentPositionPlots = RefreshPlotDataCurveCollection(m_currentSelectedPosition,input,m_currentFit, timeGrid, m_currentModelParameterizer);
+      }
+      else
+      {
+        m_PlotCurves.currentPositionPlots = mitk::PlotDataCurveCollection::New();
       }
 
       changed = true;
     }
 
-    //model curve
-    if (m_currentFitTime > m_lastRefreshTime || m_currentPositionTime > m_lastRefreshTime)
+    auto bookmarks = m_PositionBookmarks.Lock();
+    if (bookmarks.IsNotNull())
     {
-      m_ModelPlotCurve.clear();
-
-      if (m_currentFit.IsNotNull() && m_validSelectedPosition)
+      if (m_currentFitTime > m_lastRefreshTime || bookmarks->GetMTime() > m_lastRefreshTime)
       {
-        QmitkPlotWidget::XYDataVector curveData;
+        m_PlotCurves.positionalPlots.clear();
 
-        // Interpolate time grid (x values) so the curve looks smooth
-        const mitk::ModelBase::TimeGridType interpolatedTimeGrid = GenerateInterpolatedTimeGrid(timeGrid);
-
-        if (m_currentModelParameterizer.IsNotNull())
+        auto endIter = bookmarks->End();
+        for (auto iter = bookmarks->Begin(); iter != endIter; iter++)
         {
-          // Use model instead of formula parser
-          m_currentModelParameterizer->SetDefaultTimeGrid(interpolatedTimeGrid);
-          curveData = CalcCurveFromModel(m_currentSelectedPosition);
-        }
-        else
-        {
-          // Use formula parser to parse function string
-          try
-          {
-            curveData = CalcCurveFromFunction(m_currentSelectedPosition, interpolatedTimeGrid);
-          }
-          catch (const mitk::FormulaParserException& e)
-          {
-            MITK_ERROR << "Error while parsing modelfit function: " << e.what();
-          }
+          auto collection = RefreshPlotDataCurveCollection(iter.Value(), input, m_currentFit, timeGrid, m_currentModelParameterizer);
+          m_PlotCurves.positionalPlots.emplace(iter.Index(), std::make_pair(iter.Value(), collection));
         }
 
-        m_ModelPlotCurve = curveData;
+        changed = true;
       }
-
-      changed = true;
+    }
+    else
+    {
+      m_PlotCurves.positionalPlots.clear();
     }
 
     // input data curve
     if (m_currentFitTime > m_lastRefreshTime)
     {
-      m_InputDataPlotCurves.clear();
+      m_PlotCurves.staticPlots->clear();
 
       if (m_currentFit.IsNotNull())
       {
-        for (mitk::ScalarListLookupTable::LookupTableType::const_iterator pos =
-               m_currentFit->inputData.GetLookupTable().begin();
-             pos != m_currentFit->inputData.GetLookupTable().end(); ++pos)
-        {
-          if (pos->second.size() != timeGrid.size())
-          {
-            MITK_ERROR <<
-                       "Error while refreshing input data for visualization. Size of data and input image time grid differ. Invalid data name: "
-                       << pos->first;
-          }
-          else
-          {
-            QmitkPlotWidget::XYDataVector pointData;
-
-            for (unsigned int t = 0; t < timeGrid.size(); ++t)
-            {
-              double x = timeGrid[t];
-              double y = pos->second[t];
-              pointData.push_back(std::make_pair(x, y));
-            }
-
-            m_InputDataPlotCurves.insert(std::make_pair(pos->first, pointData));
-          }
-        }
+        m_PlotCurves.staticPlots = GenerateAdditionalModelFitPlotData(m_currentSelectedPosition, m_currentFit, timeGrid);
       }
 
       changed = true;
-    }
-
-    if (m_selectedNodeTime > m_lastRefreshTime || m_currentFitTime > m_lastRefreshTime
-        || m_currentPositionTime > m_lastRefreshTime)
-    {
-      InitDataTable();
     }
 
     m_lastRefreshTime.Modified();
@@ -944,155 +644,142 @@ bool ModelFitInspectorView::RefreshPlotData()
 
 void ModelFitInspectorView::RenderFitInfo()
 {
-	assert(m_renderWindowPart != nullptr);
+    assert(m_renderWindowPart != nullptr);
 
-	// configure fit information
+    // configure fit information
 
-	if (m_currentFit.IsNull())
-	{
-		m_Controls.lFitType->setText("");
-		m_Controls.lFitUID->setText("");
-		m_Controls.lModelName->setText("");
-		m_Controls.lModelType->setText("");
-	}
-	else
-	{
-		m_Controls.lFitType->setText(QString::fromStdString(m_currentFit->fitType));
-		m_Controls.lFitUID->setText(QString::fromStdString(m_currentFit->uid));
-		m_Controls.lModelName->setText(QString::fromStdString(m_currentFit->modelName));
-		m_Controls.lModelType->setText(QString::fromStdString(m_currentFit->modelType));
-	}
+    if (m_currentFit.IsNull())
+    {
+        m_Controls.lFitType->setText("");
+        m_Controls.lFitUID->setText("");
+        m_Controls.lModelName->setText("");
+        m_Controls.lModelType->setText("");
+    }
+    else
+    {
+        m_Controls.lFitType->setText(QString::fromStdString(m_currentFit->fitType));
+        m_Controls.lFitUID->setText(QString::fromStdString(m_currentFit->uid));
+        m_Controls.lModelName->setText(QString::fromStdString(m_currentFit->modelName));
+        m_Controls.lModelType->setText(QString::fromStdString(m_currentFit->modelType));
+    }
 
-	// print results
-	std::stringstream infoOutput;
+    // print results
+    std::stringstream infoOutput;
 
-	m_Controls.grpParams->setVisible(false);
-	m_Controls.groupSettings->setVisible(false);
-	m_Controls.tableResults->clearContents();
+  m_Controls.fitParametersWidget->setVisible(false);
+    m_Controls.groupSettings->setVisible(false);
 
-	if (m_currentFit.IsNull())
-	{
-		infoOutput << "No fit selected. Only raw image data is plotted.";
-	}
-	else if (!m_validSelectedPosition)
-	{
-		infoOutput <<
+    if (m_currentFit.IsNull())
+    {
+        infoOutput << "No fit selected. Only raw image data is plotted.";
+    }
+    else if (!m_validSelectedPosition)
+    {
+        infoOutput <<
                "Current position is outside of the input image of the selected fit.\nInspector is deactivated.";
-	}
-	else
-	{
-		m_Controls.grpParams->setVisible(true);
-		//  Set sorting to false. Wait with sorting until all parameters are set in the table.
-		
-		m_Controls.tableResults->setSortingEnabled(false);
-		m_Controls.tableResults->setRowCount(m_currentFit->GetParameters().size() +
-			m_currentFit->staticParamMap.Size());
+    }
+    else
+    {
+        m_Controls.fitParametersWidget->setVisible(true);
+    m_Controls.fitParametersWidget->setFits({ m_currentFit });
 
-		unsigned int timestep = m_renderWindowPart->GetTimeNavigationController()->GetTime()->GetPos();
-		unsigned int rowIndex = 0;
+    m_Controls.fitParametersWidget->setPositionBookmarks(m_PositionBookmarks.Lock());
+    m_Controls.fitParametersWidget->setCurrentPosition(m_currentSelectedPosition);
+    }
 
-    assert(GetRenderWindowPart() != NULL);
+    // configure data table
+    m_Controls.tableInputData->clearContents();
 
-		for (mitk::modelFit::ModelFitInfo::ConstIterType paramIter = m_currentFit->GetParameters().begin();
-			paramIter != m_currentFit->GetParameters().end();
-			++paramIter, ++rowIndex)
-		{
-			mitk::modelFit::Parameter::ConstPointer p =
-				static_cast<mitk::modelFit::Parameter::ConstPointer>(*paramIter);
-			double value = ReadVoxel(p->image, m_currentSelectedPosition, timestep);
+    if (m_currentFit.IsNull())
+    {
+        infoOutput << "No fit selected. Only raw image data is plotted.";
+    }
+    else
+    {
+        m_Controls.groupSettings->setVisible(true);
+        m_Controls.tableInputData->setRowCount(m_PlotCurves.staticPlots->size());
 
-			std::string paramType = mitk::ModelFitConstants::PARAMETER_TYPE_VALUE_PARAMETER();
+        unsigned int rowIndex = 0;
 
-			if (p->type == mitk::modelFit::Parameter::DerivedType)
-			{
-				paramType = mitk::ModelFitConstants::PARAMETER_TYPE_VALUE_DERIVED_PARAMETER();
-			}
-			else if (p->type == mitk::modelFit::Parameter::CriterionType)
-			{
-				paramType = mitk::ModelFitConstants::PARAMETER_TYPE_VALUE_CRITERION();
-			}
-			else if (p->type == mitk::modelFit::Parameter::EvaluationType)
-			{
-				paramType = mitk::ModelFitConstants::PARAMETER_TYPE_VALUE_EVALUATION_PARAMETER();
-			}
+    for (mitk::PlotDataCurveCollection::const_iterator pos = m_PlotCurves.staticPlots->begin();
+            pos != m_PlotCurves.staticPlots->end(); ++pos, ++rowIndex)
+        {
+            QColor dataColor;
 
-			QTableWidgetItem* newItem = new QTableWidgetItem(QString::fromStdString(p->name));
-			m_Controls.tableResults->setItem(rowIndex, 0, newItem);
-			newItem = new QTableWidgetItem(QString::number(value));
-			m_Controls.tableResults->setItem(rowIndex, 1, newItem);
-			newItem = new QTableWidgetItem(QString::fromStdString(paramType));
-			m_Controls.tableResults->setItem(rowIndex, 2, newItem);
-		}
+            if (pos->first == "ROI")
+            {
+                dataColor = QColor(0, 190, 0);
+            }
+            else
+            {
+                //Use HSV schema of QColor to calculate a different color depending on the
+                //number of already existing free iso lines.
+                dataColor.setHsv(((rowIndex + 1) * 85) % 360, 255, 255);
+            }
 
-		foreach(const mitk::modelFit::StaticParameterMap::StaticParameterType& var,
-			m_currentFit->staticParamMap)
-		{
-			const std::string& name = var.first;
-			const mitk::modelFit::StaticParameterMap::ValueType& list = var.second;
+            QTableWidgetItem* newItem = new QTableWidgetItem(QString::fromStdString(pos->first));
+            m_Controls.tableInputData->setItem(rowIndex, 0, newItem);
+            newItem = new QTableWidgetItem();
+            newItem->setBackgroundColor(dataColor);
+            m_Controls.tableInputData->setItem(rowIndex, 1, newItem);
+        }
+    }
 
-			QTableWidgetItem* newItem = new QTableWidgetItem(QString::fromStdString(name));
-			m_Controls.tableResults->setItem(rowIndex, 0, newItem);
-			newItem = new QTableWidgetItem(QString::number(list.front()));
-			m_Controls.tableResults->setItem(rowIndex, 1, newItem);
-			newItem = new QTableWidgetItem(tr("static"));
-			m_Controls.tableResults->setItem(rowIndex, 2, newItem);
-			++rowIndex;
-		}
-		//  Here the sorting function is enabled and the table entries are sorted alphabetically in descending order.
-		// This way the parameters are always displayed in the same order.
-		
-		m_Controls.tableResults->setSortingEnabled(true);
-		m_Controls.tableResults->sortItems(0, Qt::DescendingOrder);
+    m_Controls.lInfo->setText(QString::fromStdString(infoOutput.str()));
+}
 
+void ModelFitInspectorView::RenderPlotCurve(const mitk::PlotDataCurveCollection* curveCollection, const QColor& sampleColor, const QColor& signalColor, const std::string& posString)
+{
+  auto sampleCurve = mitk::ModelFitPlotData::GetSamplePlot(curveCollection);
+  if (sampleCurve)
+  {
+    std::string name = mitk::MODEL_FIT_PLOT_SAMPLE_NAME() + posString;
+    unsigned int curveId = m_Controls.widgetPlot->InsertCurve(name.c_str());
+    m_Controls.widgetPlot->SetCurveData(curveId, sampleCurve->GetValues());
+    m_Controls.widgetPlot->SetCurvePen(curveId, QPen(Qt::NoPen));
 
-	}
+    // QwtSymbol needs to passed as a real pointer from MITK v2013.09.0 on
+    // (QwtPlotCurve deletes it on destruction and assignment).
+    QwtSymbol* dataSymbol = new QwtSymbol(QwtSymbol::Diamond, sampleColor, sampleColor, QSize(8, 8));
+    m_Controls.widgetPlot->SetCurveSymbol(curveId, dataSymbol);
 
-	// configure data table
-	m_Controls.tableInputData->clearContents();
+    // Again, there is no way to set a curve's legend attributes via QmitkPlotWidget so this
+    // gets unnecessarily complicated.
+    QwtPlotCurve* measurementCurve = dynamic_cast<QwtPlotCurve*>(m_Controls.widgetPlot->
+      GetPlot()->itemList(QwtPlotItem::Rtti_PlotCurve).back());
+    measurementCurve->setLegendAttribute(QwtPlotCurve::LegendShowSymbol);
+    measurementCurve->setLegendIconSize(QSize(8, 8));
+  }
 
-	if (m_currentFit.IsNull())
-	{
-		infoOutput << "No fit selected. Only raw image data is plotted.";
-	}
-	else
-	{
-		m_Controls.groupSettings->setVisible(true);
-		m_Controls.tableInputData->setRowCount(m_InputDataPlotCurves.size());
+  //draw model curve
+  auto signalCurve = mitk::ModelFitPlotData::GetInterpolatedSignalPlot(curveCollection);
+  if (signalCurve)
+  {
+    std::string name = mitk::MODEL_FIT_PLOT_SIGNAL_NAME() + posString;
+    QPen pen;
+    pen.setColor(signalColor);
+    pen.setWidth(2);
+    unsigned int curveId = m_Controls.widgetPlot->InsertCurve(name.c_str());
+    m_Controls.widgetPlot->SetCurveData(curveId, signalCurve->GetValues());
+    m_Controls.widgetPlot->SetCurvePen(curveId, pen);
 
-		unsigned int rowIndex = 0;
+    // Manually set the legend attribute to use the symbol as the legend icon and alter its
+    // size. Otherwise it would revert to default which is drawing a square which is the color
+    // of the curve's pen, so in this case none which defaults to black.
+    // Unfortunately, QmitkPlotWidget offers no way to set the legend attribute and icon size so
+    // this looks a bit hacky.
+    QwtPlotCurve* fitCurve = dynamic_cast<QwtPlotCurve*>(m_Controls.widgetPlot->GetPlot()->
+      itemList(QwtPlotItem::Rtti_PlotCurve).back());
+    fitCurve->setLegendAttribute(QwtPlotCurve::LegendShowLine);
+  }
 
-		for (CurveMapType::const_iterator pos = m_InputDataPlotCurves.begin();
-			pos != m_InputDataPlotCurves.end(); ++pos, ++rowIndex)
-		{
-			QColor dataColor;
-
-			if (pos->first == "ROI")
-			{
-				dataColor = QColor(0, 190, 0);
-			}
-			else
-			{
-				//Use HSV schema of QColor to calculate a different color depending on the
-				//number of already existing free iso lines.
-				dataColor.setHsv(((rowIndex + 1) * 85) % 360, 255, 255);
-			}
-
-			QTableWidgetItem* newItem = new QTableWidgetItem(QString::fromStdString(pos->first));
-			m_Controls.tableInputData->setItem(rowIndex, 0, newItem);
-			newItem = new QTableWidgetItem();
-			newItem->setBackgroundColor(dataColor);
-			m_Controls.tableInputData->setItem(rowIndex, 1, newItem);
-		}
-	}
-
-	m_Controls.lInfo->setText(QString::fromStdString(infoOutput.str()));
 }
 
 void ModelFitInspectorView::RenderPlot()
 {
   m_Controls.widgetPlot->Clear();
 
-  std::string xAxis = "Time [s]";
+  std::string xAxis = DEFAULT_X_AXIS;
   std::string yAxis = "Intensity";
   std::string plotTitle = "Raw data plot: no data";
 
@@ -1123,16 +810,16 @@ void ModelFitInspectorView::RenderPlot()
   m_Controls.widgetPlot->SetAxisTitle(QwtPlot::yLeft, yAxis.c_str());
   m_Controls.widgetPlot->SetPlotTitle(plotTitle.c_str());
 
-  // Draw input data points
+  // Draw static curves
   unsigned int colorIndex = 0;
 
-  for (CurveMapType::const_iterator pos = m_InputDataPlotCurves.begin();
-       pos != m_InputDataPlotCurves.end(); ++pos)
+  for (mitk::PlotDataCurveCollection::const_iterator pos = m_PlotCurves.staticPlots->begin();
+       pos != m_PlotCurves.staticPlots->end(); ++pos)
   {
     QColor dataColor;
 
     unsigned int curveId = m_Controls.widgetPlot->InsertCurve(pos->first.c_str());
-    m_Controls.widgetPlot->SetCurveData(curveId, pos->second);
+    m_Controls.widgetPlot->SetCurveData(curveId, pos->second->GetValues());
 
     if (pos->first == "ROI")
     {
@@ -1145,7 +832,7 @@ void ModelFitInspectorView::RenderPlot()
     else
     {
       //Use HSV schema of QColor to calculate a different color depending on the
-      //number of already existing free iso lines.
+      //number of already existing curves.
       dataColor.setHsv((++colorIndex * 85) % 360, 255, 150);
       m_Controls.widgetPlot->SetCurvePen(curveId, QPen(Qt::NoPen));
     }
@@ -1164,71 +851,17 @@ void ModelFitInspectorView::RenderPlot()
     measurementCurve->setLegendIconSize(QSize(8, 8));
   }
 
-  // Draw image points
-  if (!m_ImagePlotCurve.empty())
+  // Draw positional curves
+  for (const auto& posIter : this->m_PlotCurves.positionalPlots)
   {
-    unsigned int curveId = m_Controls.widgetPlot->InsertCurve("measurement");
-    m_Controls.widgetPlot->SetCurveData(curveId, m_ImagePlotCurve);
-    m_Controls.widgetPlot->SetCurvePen(curveId, QPen(Qt::NoPen));
+    QColor dataColor;
+    dataColor.setHsv((++colorIndex * 85) % 360, 255, 150);
 
-    // QwtSymbol needs to passed as a real pointer from MITK v2013.09.0 on
-    // (QwtPlotCurve deletes it on destruction and assignment).
-    QwtSymbol* redSymbol = new QwtSymbol(QwtSymbol::Diamond, QColor(Qt::red), QColor(Qt::red),
-                                         QSize(8, 8));
-    m_Controls.widgetPlot->SetCurveSymbol(curveId, redSymbol);
-
-    // Again, there is no way to set a curve's legend attributes via QmitkPlotWidget so this
-    // gets unnecessarily complicated.
-    QwtPlotCurve* measurementCurve = dynamic_cast<QwtPlotCurve*>(m_Controls.widgetPlot->
-                                     GetPlot()->itemList(QwtPlotItem::Rtti_PlotCurve).back());
-    measurementCurve->setLegendAttribute(QwtPlotCurve::LegendShowSymbol);
-    measurementCurve->setLegendIconSize(QSize(8, 8));
-
-    // Highlight the current time step
-    unsigned int timestep = m_renderWindowPart->GetTimeNavigationController()->GetTime()->
-                            GetPos();
-
-    if (timestep < m_ImagePlotCurve.size())
-    {
-      QwtSymbol* blueSymbol = new QwtSymbol(QwtSymbol::Diamond, QColor(Qt::blue),
-                                            QColor(Qt::blue), QSize(8, 8));
-      QwtPlotMarker* marker = new QwtPlotMarker();
-      marker->setSymbol(blueSymbol);
-      marker->setValue(m_ImagePlotCurve[timestep].first, m_ImagePlotCurve[timestep].second);
-      marker->attach(m_Controls.widgetPlot->GetPlot());
-    }
-
-    for (QmitkPlotWidget::XYDataVector::size_type i = 0; i < m_ImagePlotCurve.size(); ++i)
-    {
-      m_Controls.tableData->item(i, 1)->setText(QString::number(m_ImagePlotCurve[i].second));
-    }
+    this->RenderPlotCurve(posIter.second.second, dataColor, dataColor, " @ "+mitk::ModelFitPlotData::GetPositionalCollectionName(posIter));
   }
 
-  //draw model curve
-  if (!m_ModelPlotCurve.empty())
-  {
-    QPen pen;
-    pen.setColor(QColor(Qt::black));
-    pen.setWidth(2);
-    unsigned int curveId = m_Controls.widgetPlot->InsertCurve("fit");
-    m_Controls.widgetPlot->SetCurveData(curveId, m_ModelPlotCurve);
-    m_Controls.widgetPlot->SetCurvePen(curveId, pen);
-
-    // Manually set the legend attribute to use the symbol as the legend icon and alter its
-    // size. Otherwise it would revert to default which is drawing a square which is the color
-    // of the curve's pen, so in this case none which defaults to black.
-    // Unfortunately, QmitkPlotWidget offers no way to set the legend attribute and icon size so
-    // this looks a bit hacky.
-    QwtPlotCurve* fitCurve = dynamic_cast<QwtPlotCurve*>(m_Controls.widgetPlot->GetPlot()->
-                             itemList(QwtPlotItem::Rtti_PlotCurve).back());
-    fitCurve->setLegendAttribute(QwtPlotCurve::LegendShowLine);
-
-    for (QmitkPlotWidget::XYDataVector::size_type i = 0; i < m_ImagePlotCurve.size(); ++i)
-    {
-      m_Controls.tableData->item(i, 2)->setText(QString::number(m_ModelPlotCurve[i *
-          INTERPOLATION_STEPS].second));
-    }
-  }
+  // Draw current pos curve
+  this->RenderPlotCurve(m_PlotCurves.currentPositionPlots, QColor(Qt::red), QColor(Qt::black), "");
 
   QwtLegend* legend = new QwtLegend();
   legend->setFrameShape(QFrame::Box);
@@ -1239,104 +872,29 @@ void ModelFitInspectorView::RenderPlot()
   m_Controls.widgetPlot->Replot();
 }
 
-void ModelFitInspectorView::InitDataTable()
+void ModelFitInspectorView::EnsureBookmarkPointSet()
 {
-  QStringList headers;
-  headers.push_back(QString("Time"));
-  headers.push_back(QString("Input image"));
-
-  if (!this->m_ModelPlotCurve.empty())
+  if (m_PositionBookmarks.IsExpired() || m_PositionBookmarksNode.IsExpired())
   {
-    headers.push_back(QString("Model"));
-  }
+    const char* nodeName = "org.mitk.gui.qt.fit.inspector.positions";
+    mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode(nodeName);
 
-  for (CurveMapType::const_iterator pos = this->m_InputDataPlotCurves.begin();
-       pos != this->m_InputDataPlotCurves.end(); ++pos)
-  {
-    headers.push_back(QString::fromStdString(pos->first));
-  }
-
-  m_Controls.tableData->setRowCount(m_ImagePlotCurve.size());
-  m_Controls.tableData->setColumnCount(headers.size());
-
-  m_Controls.tableData->setHorizontalHeaderLabels(headers);
-  m_Controls.tableData->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
-
-  for (QmitkPlotWidget::XYDataVector::size_type i = 0; i < m_ImagePlotCurve.size(); ++i)
-  {
-    int column = 0;
-    QTableWidgetItem* newItem = new QTableWidgetItem(QString::number(m_ImagePlotCurve[i].first));
-    m_Controls.tableData->setItem(i, column++, newItem);
-    newItem = new QTableWidgetItem(QString::number(m_ImagePlotCurve[i].second));
-    m_Controls.tableData->setItem(i, column++, newItem);
-
-    if (!m_ModelPlotCurve.empty())
+    if (!node)
     {
-      newItem = new QTableWidgetItem(QString::number(m_ModelPlotCurve[i * INTERPOLATION_STEPS].second));
-      m_Controls.tableData->setItem(i, column++, newItem);
+      node = mitk::DataNode::New();
+      node->SetName(nodeName);
+      node->SetBoolProperty("helper object", true);
+      this->GetDataStorage()->Add(node);
+    }
+    m_PositionBookmarksNode = node;
+
+    mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(node->GetData());
+    if (pointSet.IsNull())
+    {
+      pointSet = mitk::PointSet::New();
+      node->SetData(pointSet);
     }
 
-    for (CurveMapType::const_iterator pos = this->m_InputDataPlotCurves.begin();
-         pos != this->m_InputDataPlotCurves.end(); ++pos, ++column)
-    {
-      newItem = new QTableWidgetItem(QString::number(pos->second[i].second));
-      m_Controls.tableData->setItem(i, column, newItem);
-    }
+    m_PositionBookmarks = pointSet;
   }
-}
-
-
-void ModelFitInspectorView::OnClipboardResultsButtonClicked()
-{
-	QLocale tempLocal;
-	QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
-	std::stringstream infoOutput;
-	QString clipboard;
-	QVector< QVector<QString> > resultsTable;
-	if (m_currentFit.IsNotNull())
-	{
-		int rowNumber = m_currentFit->GetParameters().size() + m_currentFit->staticParamMap.Size();
-
-		// set headline as in results table: "Name", "Value", "Type"
-		QStringList headlineText;
-		QVector <QString> headline;
-		// Create Headline
-		headlineText << "Name" << "Value" << "Type";
-
-		for (int i = 0; i < headlineText.size(); i++)
-		{
-			headline.append(headlineText.at(i));
-		}
-		resultsTable.append(headline);
-
-		// fill table with values from the displayed results table
-		for (int i = 0; i < rowNumber; i++)
-		{
-			QVector <QString> rowValues;
-			for (int j = 0; j < 3; j++)
-			{
-				rowValues.append((m_Controls.tableResults->item(i, j)->text()));
-
-			}
-			resultsTable.append(rowValues);
-			
-		}
-
-		// Create output string for clipboard
-		for (int i = 0; i < resultsTable.size(); i++)
-		{
-			for (int t = 0; t < resultsTable.at(i).size(); t++)
-			{
-				clipboard.append(resultsTable.at(i).at(t));
-				clipboard.append("\t");
-			}
-			clipboard.append("\n");
-		}
-		QApplication::clipboard()->setText(clipboard, QClipboard::Clipboard);
-	}
-	else
-	{
-		infoOutput << "Results table is empty.";
-	}
-	QLocale::setDefault(tempLocal);
 }

@@ -40,7 +40,8 @@ const std::string mitk::ModelFitConstants::XAXIS_UNIT_PROPERTY_NAME() { return "
 const std::string mitk::ModelFitConstants::YAXIS_NAME_PROPERTY_NAME() { return "modelfit.yaxis.name";}
 const std::string mitk::ModelFitConstants::YAXIS_NAME_VALUE_DEFAULT() { return "Intensity";}
 const std::string mitk::ModelFitConstants::YAXIS_UNIT_PROPERTY_NAME() { return "modelfit.yaxis.unit";}
-const std::string mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME() { return "modelfit.fit.uid";}
+const std::string mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME() { return "modelfit.fit.uid"; }
+const std::string mitk::ModelFitConstants::FIT_NAME_PROPERTY_NAME() { return "modelfit.fit.name"; }
 const std::string mitk::ModelFitConstants::FIT_TYPE_PROPERTY_NAME() { return "modelfit.fit.type";}
 const std::string mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED() { return "pixelbased";}
 const std::string mitk::ModelFitConstants::FIT_TYPE_VALUE_ROIBASED() { return "ROIbased";}

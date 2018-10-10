@@ -72,7 +72,7 @@ std::vector<double> ExtractOffsets(const mitk::Image* image)
   {
     std::string offsets = "";
     std::vector<std::string> parts;
-    if (image->GetPropertyList()->GetStringProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str(), offsets))
+    if (image->GetPropertyList()->GetStringProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str(), offsets) && !offsets.empty())
     {
       boost::algorithm::trim(offsets);
       boost::split(parts, offsets, boost::is_any_of(" "));

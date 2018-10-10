@@ -192,6 +192,8 @@ private:
 
   /**Returns the default fit name, derived from the current GUI settings.*/
   std::string GetDefaultFitName() const;
+  /**Returns the current set name of the fit (either default name or use defined name).*/
+  std::string GetFitName() const;
 
   std::vector<double> AIFinputGrid;
   std::vector<double> AIFinputFunction;

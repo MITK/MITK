@@ -335,10 +335,8 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
     }
   }
 
-  std::string sampling = "";
   std::string offset = "";
   std::string measurements = "";
-  bool hasSamplingInformation = results->GetStringProperty("CEST.SamplingType", sampling);
   results->GetStringProperty("CEST.Offset", offset);
   results->GetStringProperty("CEST.measurements", measurements);
 
@@ -366,9 +364,9 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   std::string preparationType = "";
   std::string recoveryMode = "";
   std::string spoilingType = "";
-  results->GetStringProperty("CEST.PreparationType", preparationType);
-  results->GetStringProperty("CEST.RecoveryMode", recoveryMode);
-  results->GetStringProperty("CEST.SpoilingType", spoilingType);
+  results->GetStringProperty(CEST_PROPERTY_NAME_PREPERATIONTYPE().c_str(), preparationType);
+  results->GetStringProperty(CEST_PROPERTY_NAME_RECOVERYMODE().c_str(), recoveryMode);
+  results->GetStringProperty(CEST_PROPERTY_NAME_SPOILINGTYPE().c_str(), spoilingType);
 
   if (this->IsT1Sequence(preparationType, recoveryMode, spoilingType, revisionString))
   {
@@ -394,22 +392,24 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
       MITK_WARN << "Assumed T1, but could not load TREC at " << trecPath;
     }
 
-    results->SetStringProperty("CEST.TREC", trecStream.str().c_str());
+    results->SetStringProperty(CEST_PROPERTY_NAME_TREC().c_str(), trecStream.str().c_str());
   }
   else
   {
     MITK_INFO << "Parsed as CEST or WASABI image";
+    std::string sampling = "";
+    bool hasSamplingInformation = results->GetStringProperty("CEST.SamplingType", sampling);
+    if (hasSamplingInformation)
+    {
+      std::string offsets = GetOffsetString(sampling, offset, measurements);
+      results->SetStringProperty(m_OffsetsPropertyName.c_str(), offsets.c_str());
+    }
+    else
+    {
+      MITK_WARN << "Could not determine sampling type.";
+    }
   }
 
-  if (hasSamplingInformation)
-  {
-    std::string offsets = GetOffsetString(sampling, offset, measurements);
-    results->SetStringProperty(m_OffsetsPropertyName.c_str(), offsets.c_str());
-  }
-  else
-  {
-    MITK_WARN << "Could not determine sampling type.";
-  }
 
   //persist all properties
   mitk::IPropertyPersistence *persSrv = GetPersistenceService();
@@ -794,4 +794,34 @@ std::string mitk::CustomTagParser::GetExternalJSONDirectory()
   jsonDirectory << stringToModule << "/CESTRevisionMapping";
 
   return jsonDirectory.str();
+}
+
+const std::string mitk::CEST_PROPERTY_NAME_TOTALSCANTIME()
+{
+  return "CEST.TotalScanTime";
+};
+
+const std::string mitk::CEST_PROPERTY_NAME_PREPERATIONTYPE()
+{
+  return "CEST.PreparationType";
+};
+
+const std::string mitk::CEST_PROPERTY_NAME_RECOVERYMODE()
+{
+  return "CEST.RecoveryMode";
+};
+
+const std::string mitk::CEST_PROPERTY_NAME_SPOILINGTYPE()
+{
+  return "CEST.SpoilingType";
+};
+
+const std::string mitk::CEST_PROPERTY_NAME_OFFSETS()
+{
+  return "CEST.Offsets";
+};
+
+const std::string mitk::CEST_PROPERTY_NAME_TREC()
+{
+  return std::string("CEST.TREC");
 }

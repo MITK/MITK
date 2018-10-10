@@ -102,8 +102,6 @@ mitk::TwoTissueCompartmentModel::GetParameterUnits() const
 mitk::TwoTissueCompartmentModel::ModelResultType
 mitk::TwoTissueCompartmentModel::ComputeModelfunction(const ParametersType& parameters) const
 {
-  typedef itk::Array<double> ResidueFunctionType;
-
   if (this->m_TimeGrid.GetSize() == 0)
   {
     itkExceptionMacro("No Time Grid Set! Cannot Calculate Signal");

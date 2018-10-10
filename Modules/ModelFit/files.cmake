@@ -23,6 +23,7 @@ set(CPP_FILES
   Common/mitkBinaryImageToLabelSetImageFilter.cpp
   Common/mitkFormulaParser.cpp
   Common/mitkFresnel.cpp
+  Common/mitkModelFitPlotDataHelper.cpp
   Functors/mitkSimpleFunctorBase.cpp
   Functors/mitkSimpleFunctorPolicy.cpp
   Functors/mitkChiSquareFitCostFunction.cpp

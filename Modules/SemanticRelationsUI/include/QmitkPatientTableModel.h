@@ -114,8 +114,8 @@ private:
   std::map<mitk::DataNode::ConstPointer, QPixmap> m_PixmapMap;
   std::map<mitk::DataNode::ConstPointer, bool> m_LesionPresence;
 
-  std::vector<mitk::SemanticTypes::InformationType> m_InformationTypes;
-  std::vector<mitk::SemanticTypes::ControlPoint> m_ControlPoints;
+  mitk::SemanticTypes::InformationTypeVector m_InformationTypes;
+  mitk::SemanticTypes::ControlPointVector m_ControlPoints;
   std::string m_SelectedNodeType;
 
   QStandardItemModel* m_HeaderModel;

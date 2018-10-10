@@ -63,14 +63,14 @@ void mitk::SemanticRelations::RemoveObserver(ISemanticRelationsObserver* observe
 /* functions to get instances / attributes                              */
 /************************************************************************/
 
-mitk::SemanticRelations::LesionVector mitk::SemanticRelations::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID) const
+mitk::SemanticTypes::LesionVector mitk::SemanticRelations::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID) const
 {
   return m_RelationStorage->GetAllLesionsOfCase(caseID);
 }
 
-mitk::SemanticRelations::LesionVector mitk::SemanticRelations::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
+mitk::SemanticTypes::LesionVector mitk::SemanticRelations::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
 {
-  LesionVector allLesions = GetAllLesionsOfCase(caseID);
+  SemanticTypes::LesionVector allLesions = GetAllLesionsOfCase(caseID);
 
   // filter the lesions: use only those, where the associated data is connected to image data that refers to the given control point using a lambda function
   auto lambda = [&caseID, &controlPoint, this](const SemanticTypes::Lesion& lesion) { return !ControlPointContainsLesion(caseID, lesion, controlPoint); };
@@ -79,10 +79,10 @@ mitk::SemanticRelations::LesionVector mitk::SemanticRelations::GetAllLesionsOfCa
   return allLesions;
 }
 
-mitk::SemanticRelations::LesionClassVector mitk::SemanticRelations::GetAllLesionClassesOfCase(const SemanticTypes::CaseID& caseID) const
+mitk::SemanticTypes::LesionClassVector mitk::SemanticRelations::GetAllLesionClassesOfCase(const SemanticTypes::CaseID& caseID) const
 {
-  LesionVector allLesionsOfCase = GetAllLesionsOfCase(caseID);
-  LesionClassVector allLesionClassesOfCase;
+  SemanticTypes::LesionVector allLesionsOfCase = GetAllLesionsOfCase(caseID);
+  SemanticTypes::LesionClassVector allLesionClassesOfCase;
 
   for (const auto& lesion : allLesionsOfCase)
   {
@@ -106,7 +106,7 @@ mitk::SemanticRelations::LesionClassVector mitk::SemanticRelations::GetAllLesion
   return allLesionClassesOfCase;
 }
 
-mitk::SemanticRelations::LesionVector mitk::SemanticRelations::GetAllLesionsInImage(const DataNode* imageNode) const
+mitk::SemanticTypes::LesionVector mitk::SemanticRelations::GetAllLesionsInImage(const DataNode* imageNode) const
 {
   if (nullptr == imageNode)
   {
@@ -118,7 +118,7 @@ mitk::SemanticRelations::LesionVector mitk::SemanticRelations::GetAllLesionsInIm
     mitkThrowException(SemanticRelationException) << "Not a valid data storage.";
   }
 
-  LesionVector allLesionsInImage;
+  SemanticTypes::LesionVector allLesionsInImage;
   // get child nodes of the current node with the segmentation predicate
   DataStorage::SetOfObjects::ConstPointer segmentationNodes = m_DataStorage->GetDerivations(imageNode, NodePredicates::GetSegmentationPredicate(), false);
   for (auto it = segmentationNodes->Begin(); it != segmentationNodes->End(); ++it)
@@ -281,7 +281,7 @@ mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllImagesOfL
 
 bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
 {
-  LesionVector allLesions = GetAllLesionsOfCase(caseID);
+  mitk::SemanticTypes::LesionVector allLesions = GetAllLesionsOfCase(caseID);
 
   // filter all lesions: check for equality with the given lesion using a lambda function
   auto lambda = [&lesion](const SemanticTypes::Lesion& currentLesion) { return currentLesion.UID == lesion.UID; };
@@ -297,14 +297,14 @@ bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID
   }
 }
 
-mitk::SemanticRelations::ControlPointVector mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID) const
+mitk::SemanticTypes::ControlPointVector mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID) const
 {
   return m_RelationStorage->GetAllControlPointsOfCase(caseID);
 }
 
-mitk::SemanticRelations::ControlPointVector mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
+mitk::SemanticTypes::ControlPointVector mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
 {
-  ControlPointVector allControlPoints = GetAllControlPointsOfCase(caseID);
+  SemanticTypes::ControlPointVector allControlPoints = GetAllControlPointsOfCase(caseID);
 
   // filter the control points: use only those, where the associated image data has a segmentation that refers to the given lesion using a lambda function
   auto lambda = [&caseID, &lesion, this](const SemanticTypes::ControlPoint& controlPoint) { return !ControlPointContainsLesion(caseID, lesion, controlPoint); };
@@ -313,9 +313,9 @@ mitk::SemanticRelations::ControlPointVector mitk::SemanticRelations::GetAllContr
   return allControlPoints;
 }
 
-mitk::SemanticRelations::ControlPointVector mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const
+mitk::SemanticTypes::ControlPointVector mitk::SemanticRelations::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const
 {
-  ControlPointVector allControlPoints = GetAllControlPointsOfCase(caseID);
+  SemanticTypes::ControlPointVector allControlPoints = GetAllControlPointsOfCase(caseID);
 
   // filter the control points: use only those, where the associated image data refers to the given information type using a lambda function
   auto lambda = [&caseID, &informationType, this](const SemanticTypes::ControlPoint& controlPoint) { return !ControlPointContainsInformationType(caseID, informationType, controlPoint); };
@@ -366,7 +366,7 @@ mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllImagesOfC
 
 bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
 {
-  ControlPointVector allControlPoints = GetAllControlPointsOfCase(caseID);
+  SemanticTypes::ControlPointVector allControlPoints = GetAllControlPointsOfCase(caseID);
 
   // filter all control points: check for equality with the given control point using a lambda function
   auto lambda = [&controlPoint](const SemanticTypes::ControlPoint& currentControlPoint) { return currentControlPoint.UID == controlPoint.UID; };
@@ -382,14 +382,14 @@ bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID
   }
 }
 
-mitk::SemanticRelations::ExaminationPeriodVector mitk::SemanticRelations::GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID) const
+mitk::SemanticTypes::ExaminationPeriodVector mitk::SemanticRelations::GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID) const
 {
   return m_RelationStorage->GetAllExaminationPeriodsOfCase(caseID);
 }
 
 bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod& examinationPeriod) const
 {
-  ExaminationPeriodVector allExaminationPeriods = GetAllExaminationPeriodsOfCase(caseID);
+  SemanticTypes::ExaminationPeriodVector allExaminationPeriods = GetAllExaminationPeriodsOfCase(caseID);
 
   // filter all examination periods: check for equality with the given examination period using a lambda function
   auto lambda = [&examinationPeriod](const SemanticTypes::ExaminationPeriod& currentExaminationPeriod) { return currentExaminationPeriod.UID == examinationPeriod.UID; };
@@ -405,14 +405,14 @@ bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID
   }
 }
 
-mitk::SemanticRelations::InformationTypeVector mitk::SemanticRelations::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID) const
+mitk::SemanticTypes::InformationTypeVector mitk::SemanticRelations::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID) const
 {
   return m_RelationStorage->GetAllInformationTypesOfCase(caseID);
 }
 
-mitk::SemanticRelations::InformationTypeVector mitk::SemanticRelations::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
+mitk::SemanticTypes::InformationTypeVector mitk::SemanticRelations::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const
 {
-  InformationTypeVector allInformationTypes = GetAllInformationTypesOfCase(caseID);
+  SemanticTypes::InformationTypeVector allInformationTypes = GetAllInformationTypesOfCase(caseID);
 
   // filter the information types: use only those, where the associated data refers to the given control point using a lambda function
   auto lambda = [&caseID, &controlPoint, this](const SemanticTypes::InformationType& informationType) { return !ControlPointContainsInformationType(caseID, informationType, controlPoint); };
@@ -518,7 +518,7 @@ mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllSpecificS
 
 bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const
 {
-  InformationTypeVector allInformationTypes = GetAllInformationTypesOfCase(caseID);
+  SemanticTypes::InformationTypeVector allInformationTypes = GetAllInformationTypesOfCase(caseID);
 
   // filter all information types: check for equality with the given information type using a lambda function
   auto lambda = [&informationType](const SemanticTypes::InformationType& currentInformationType) { return currentInformationType == informationType; };
@@ -720,7 +720,7 @@ void mitk::SemanticRelations::SetControlPointOfData(const DataNode* dataNode, co
   }
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
-  ControlPointVector allControlPoints = GetAllControlPointsOfCase(caseID);
+  SemanticTypes::ControlPointVector allControlPoints = GetAllControlPointsOfCase(caseID);
   // need to check if an already existing control point fits/contains the user control point
   SemanticTypes::ControlPoint existingControlPoint = FindExistingControlPoint(controlPoint, allControlPoints);
   if (!existingControlPoint.UID.empty())
@@ -743,7 +743,7 @@ void mitk::SemanticRelations::SetControlPointOfData(const DataNode* dataNode, co
       // added a new control point
       // find closest control point to add the new control point to the correct examination period
       SemanticTypes::ControlPoint closestControlPoint = FindClosestControlPoint(controlPoint, allControlPoints);
-      ExaminationPeriodVector allExaminationPeriods = GetAllExaminationPeriodsOfCase(caseID);
+      SemanticTypes::ExaminationPeriodVector allExaminationPeriods = GetAllExaminationPeriodsOfCase(caseID);
       SemanticTypes::ExaminationPeriod examinationPeriod = FindExaminationPeriod(closestControlPoint, allExaminationPeriods);
       if (examinationPeriod.UID.empty())
       {
@@ -947,7 +947,7 @@ bool mitk::SemanticRelations::ControlPointContainsInformationType(const Semantic
 
 void mitk::SemanticRelations::ClearControlPoints(const SemanticTypes::CaseID& caseID)
 {
-  ControlPointVector allControlPointsOfCase;
+  SemanticTypes::ControlPointVector allControlPointsOfCase;
   try
   {
     allControlPointsOfCase = GetAllControlPointsOfCase(caseID);
@@ -970,7 +970,7 @@ void mitk::SemanticRelations::ClearControlPoints(const SemanticTypes::CaseID& ca
     return;
   }
 
-  ControlPointVector allControlPoints;
+  SemanticTypes::ControlPointVector allControlPoints;
   for (const auto& image : allImagesOfCase)
   {
     try
@@ -987,7 +987,7 @@ void mitk::SemanticRelations::ClearControlPoints(const SemanticTypes::CaseID& ca
 
   std::sort(allControlPointsOfCase.begin(), allControlPointsOfCase.end());
   std::sort(allControlPoints.begin(), allControlPoints.end());
-  ControlPointVector allControlPointsDifference;
+  SemanticTypes::ControlPointVector allControlPointsDifference;
 
   std::set_difference(allControlPointsOfCase.begin(), allControlPointsOfCase.end(),
                       allControlPoints.begin(), allControlPoints.end(),

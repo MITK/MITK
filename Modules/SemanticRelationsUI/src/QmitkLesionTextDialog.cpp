@@ -47,6 +47,8 @@ QmitkLesionTextDialog::QmitkLesionTextDialog(QWidget* parent)
   horizontalLayout->addWidget(acceptButton);
   horizontalLayout->addWidget(cancelButton);
   verticalLayout->addLayout(horizontalLayout);
+
+  setMinimumSize(250, 100);
 }
 
 QmitkLesionTextDialog::~QmitkLesionTextDialog()

@@ -88,7 +88,7 @@ void QmitkDataNodeSetControlPointAction::OnActionTriggered(bool checked)
 
   QmitkControlPointDialog* inputDialog = new QmitkControlPointDialog(m_Parent);
   inputDialog->setWindowTitle("Set control point");
-  inputDialog->SetCurrentDate(mitk::GetDICOMDateFromDataNode(dataNode));
+  inputDialog->SetCurrentDate(m_SemanticRelations->GetControlPointOfData(dataNode));
 
   int dialogReturnValue = inputDialog->exec();
   if (QDialog::Rejected == dialogReturnValue)

@@ -50,6 +50,8 @@ QmitkControlPointDialog::QmitkControlPointDialog(QWidget* parent)
   horizontalLayout->addWidget(acceptButton);
   horizontalLayout->addWidget(cancelButton);
   verticalLayout->addLayout(horizontalLayout);
+
+  setMinimumSize(250, 100);
 }
 
 QmitkControlPointDialog::~QmitkControlPointDialog()

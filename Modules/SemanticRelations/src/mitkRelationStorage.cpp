@@ -309,7 +309,7 @@ std::vector<mitk::SemanticTypes::ExaminationPeriod> mitk::RelationStorage::GetAl
       generatedExaminationPeriod.UID = examinationPeriodID;
       for (const auto& controlpointID : examinationPeriodVectorValue)
       {
-        generatedExaminationPeriod.controlPointIDs.push_back(controlpointID);
+        generatedExaminationPeriod.controlPointUIDs.push_back(controlpointID);
       }
 
       allExaminationPeriods.push_back(generatedExaminationPeriod);

@@ -72,7 +72,8 @@ namespace mitk
     struct ExaminationPeriod
     {
       ID UID;
-      std::vector<ID> controlPointIDs;
+      std::string name = "";
+      std::vector<ID> controlPointUIDs;
     };
 
     /*
@@ -93,6 +94,12 @@ namespace mitk
       std::string name = "";
       LesionClass lesionClass;
     };
+
+    using LesionVector = std::vector<Lesion>;
+    using LesionClassVector = std::vector<LesionClass>;
+    using ControlPointVector = std::vector<ControlPoint>;
+    using ExaminationPeriodVector = std::vector<ExaminationPeriod>;
+    using InformationTypeVector = std::vector<InformationType>;
 
   } // namespace SemanticTypes
 } // namespace mitk

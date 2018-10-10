@@ -53,11 +53,6 @@ namespace mitk
     SemanticRelations(mitk::DataStorage::Pointer dataStorage);
     ~SemanticRelations();
 
-    using LesionVector = std::vector<SemanticTypes::Lesion>;
-    using LesionClassVector = std::vector<SemanticTypes::LesionClass>;
-    using ControlPointVector = std::vector<SemanticTypes::ControlPoint>;
-    using ExaminationPeriodVector = std::vector<SemanticTypes::ExaminationPeriod>;
-    using InformationTypeVector = std::vector<SemanticTypes::InformationType>;
     using DataNodeVector = std::vector<DataNode::Pointer> ;
 
     /************************************************************************/
@@ -88,13 +83,13 @@ namespace mitk
     * @param caseID    The current case identifier is defined by the given string.
     * @return        A vector of lesions.
     */
-    LesionVector GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID) const;
+    SemanticTypes::LesionVector GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID) const;
     /**
     * @brief
     *
     *
     */
-    LesionClassVector GetAllLesionClassesOfCase(const SemanticTypes::CaseID& caseID) const;
+    SemanticTypes::LesionClassVector GetAllLesionClassesOfCase(const SemanticTypes::CaseID& caseID) const;
     /**
     * @brief  Returns a vector of all lesions that are valid for the given case, given a specific control point.
     *
@@ -104,7 +99,7 @@ namespace mitk
     *                       If the control point instance does not exist, an empty vector is returned.
     * @return               A vector of control points.
     */
-    LesionVector GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const;
+    SemanticTypes::LesionVector GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const;
     /**
     * @brief  Returns a vector of all lesions that are currently available for the current case and are connected to the given image (via a segmentation).
     *         If no lesions are stored for the current case, an empty vector is returned. If no segmentation nodes are
@@ -117,7 +112,7 @@ namespace mitk
     * @param imageNode    The current case identifier is extracted from the given data node, which contains DICOM information about the case.
     * @return           A vector of lesions.
     */
-    LesionVector GetAllLesionsInImage(const DataNode* imageNode) const;
+    SemanticTypes::LesionVector GetAllLesionsInImage(const DataNode* imageNode) const;
     /**
     * @brief  Returns the lesion that is defined by the given segmentation data.
     *
@@ -212,7 +207,7 @@ namespace mitk
     * @param caseID           The current case identifier is defined by the given string.
     * @return               A vector of control points.
     */
-    ControlPointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID) const;
+    SemanticTypes::ControlPointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID) const;
     /**
     * @brief Return a vector of all control points that are valid for the given case, given a specific lesion
     *
@@ -222,7 +217,7 @@ namespace mitk
     *                       If the lesion does not exists, an empty vector is returned.
     * @return               A vector of control points.
     */
-    ControlPointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const;
+    SemanticTypes::ControlPointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const;
     /**
     * @brief Return a vector of all control points that are valid for the given case, given a specific information type.
     *
@@ -232,7 +227,7 @@ namespace mitk
     *                       If the information type instance does not exists, an empty vector is returned.
     * @return               A vector of control points.
     */
-    ControlPointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const;
+    SemanticTypes::ControlPointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType) const;
     /**
     * @brief  Return the control point of a data node.
     *         If the data node is not linked to a control point or the data node refers to a non-existing control point,
@@ -273,7 +268,7 @@ namespace mitk
     * @param caseID         The current case identifier is defined by the given string.
     * @return               A vector of examination periods.
     */
-    ExaminationPeriodVector GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID) const;
+    SemanticTypes::ExaminationPeriodVector GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID) const;
     /**
     * @brief  Check if the given examination period instance exists.
     *         This function can be used before calling 'AddExaminationPeriod' in order to avoid a possible exception.
@@ -289,7 +284,7 @@ namespace mitk
     * @param caseID     The current case identifier is defined by the given string.
     * @return           A vector of information types.
     */
-    InformationTypeVector GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID) const;
+    SemanticTypes::InformationTypeVector GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID) const;
     /**
     * @brief  Return a vector of all information types that are valid for the given case, given a specific control point.
     *
@@ -299,7 +294,7 @@ namespace mitk
     *                     If the control point instance does not exist, an empty vector is returned.
     * @return             A vector of information types.
     */
-    InformationTypeVector GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const;
+    SemanticTypes::InformationTypeVector GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint) const;
     /**
     * @brief  Return the information type of the given image.
     *         If the image does not contain any information type, an empty information type is returned.

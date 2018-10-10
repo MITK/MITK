@@ -33,19 +33,19 @@ namespace mitk
 
     void SetDataStorage(DataStorage::Pointer dataStorage);
 
-    std::vector<SemanticTypes::Lesion> GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID);
+    SemanticTypes::LesionVector GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID);
     SemanticTypes::Lesion GetRepresentedLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID);
 
     std::vector<DataNode::Pointer> GetAllSegmentationsOfCase(const SemanticTypes::CaseID& caseID);
     std::vector<std::string> mitk::RelationStorage::GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID);
 
     SemanticTypes::ControlPoint GetControlPointOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
-    std::vector<SemanticTypes::ControlPoint> GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID);
+    SemanticTypes::ControlPointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID);
 
-    std::vector<SemanticTypes::ExaminationPeriod> GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID);
+    SemanticTypes::ExaminationPeriodVector GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID);
 
     SemanticTypes::InformationType GetInformationTypeOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
-    std::vector<SemanticTypes::InformationType> GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID);
+    SemanticTypes::InformationTypeVector GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID);
 
     std::vector<mitk::DataNode::Pointer> GetAllImagesOfCase(const SemanticTypes::CaseID& caseID);
     std::vector<std::string> GetAllImageIDsOfCase(const SemanticTypes::CaseID& caseID);

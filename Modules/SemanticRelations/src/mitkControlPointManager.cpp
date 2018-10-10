@@ -60,7 +60,7 @@ std::string mitk::GetControlPointAsString(const SemanticTypes::ControlPoint& con
   return controlPointAsString.str();
 }
 
-mitk::SemanticTypes::ControlPoint mitk::FindExistingControlPoint(const SemanticTypes::ControlPoint& controlPoint, const std::vector<SemanticTypes::ControlPoint>& allControlPoints)
+mitk::SemanticTypes::ControlPoint mitk::FindExistingControlPoint(const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ControlPointVector& allControlPoints)
 {
   for (const auto& currentControlPoint : allControlPoints)
   {
@@ -73,8 +73,7 @@ mitk::SemanticTypes::ControlPoint mitk::FindExistingControlPoint(const SemanticT
   return SemanticTypes::ControlPoint();
 }
 
-
-mitk::SemanticTypes::ControlPoint mitk::FindClosestControlPoint(const SemanticTypes::ControlPoint& controlPoint, std::vector<SemanticTypes::ControlPoint>& allControlPoints)
+mitk::SemanticTypes::ControlPoint mitk::FindClosestControlPoint(const SemanticTypes::ControlPoint& controlPoint, SemanticTypes::ControlPointVector& allControlPoints)
 {
   if (allControlPoints.empty())
   {
@@ -142,11 +141,11 @@ mitk::SemanticTypes::ControlPoint mitk::FindClosestControlPoint(const SemanticTy
   return SemanticTypes::ControlPoint();
 }
 
-mitk::SemanticTypes::ExaminationPeriod mitk::FindExaminationPeriod(const SemanticTypes::ControlPoint& controlPoint, const std::vector<SemanticTypes::ExaminationPeriod>& allExaminationPeriods)
+mitk::SemanticTypes::ExaminationPeriod mitk::FindExaminationPeriod(const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ExaminationPeriodVector& allExaminationPeriods)
 {
   for (const auto& examinationPeriod : allExaminationPeriods)
   {
-    for (const auto& UID : examinationPeriod.controlPointIDs)
+    for (const auto& UID : examinationPeriod.controlPointUIDs)
     {
       if (controlPoint.UID == UID)
       {

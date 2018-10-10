@@ -81,18 +81,25 @@ void QmitkDataNodeInformationTypeAction::OnActionTriggered(bool checked)
     return;
   }
 
-  bool ok = false;
-  QString text = QInputDialog::getText(m_Parent, tr("Set information type of selected node"), tr("Information type:"), QLineEdit::Normal, "", &ok);
-  if (ok && !text.isEmpty())
+  QInputDialog* inputDialog = new QInputDialog(m_Parent);
+  inputDialog->setWindowTitle(tr("Set information type of selected node"));
+  inputDialog->setLabelText(tr("Information type:"));
+  inputDialog->setTextValue(QString::fromStdString(m_SemanticRelations->GetInformationTypeOfImage(dataNode)));
+  inputDialog->setMinimumSize(250, 100);
+
+  int dialogReturnValue = inputDialog->exec();
+  if (QDialog::Rejected == dialogReturnValue)
   {
-    try
-    {
-      m_SemanticRelations->SetInformationType(dataNode, text.toStdString());
-    }
-    catch (const mitk::SemanticRelationException&)
-    {
-      return;
-    }
+    return;
+  }
+
+  try
+  {
+    m_SemanticRelations->SetInformationType(dataNode, inputDialog->textValue().toStdString());
+  }
+  catch (const mitk::SemanticRelationException&)
+  {
+    return;
   }
 }
 

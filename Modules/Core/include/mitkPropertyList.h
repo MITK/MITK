@@ -60,6 +60,9 @@ namespace mitk
    * method will try to change the value of an existing property and will
    * not allow you to replace e.g. a ColorProperty with an IntProperty.
    *
+   * Please also regard, that the key of a property must be a none empty string.
+   * This is a precondition. Setting properties with empty keys will raise an exception.
+   *
    * @ingroup DataManagement
    */
   class MITKCORE_EXPORT PropertyList : public itk::Object, public IPropertyOwner

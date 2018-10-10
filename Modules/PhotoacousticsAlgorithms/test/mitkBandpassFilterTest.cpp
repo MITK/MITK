@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkImage.h>
 #include <mitkImageReadAccessor.h>
-#include <mitkBandpassFilter.h>
+#include <mitkPhotoacousticFilterService.h>
 #include <random>
 #include <mitkIOUtil.h>
 
@@ -38,23 +38,23 @@ class mitkBandpassFilterTestSuite : public mitk::TestFixture
 
 private:
 
-  mitk::BandpassFilter::Pointer m_BandpassFilter;
-  const unsigned int NUM_ITERATIONS = 15;
+  mitk::PhotoacousticFilterService::Pointer m_FilterService;
+  const unsigned int NUM_ITERATIONS = 10;
   const unsigned int DATA_XY_DIM = 512;
   const unsigned int DATA_Z_DIM = 8;
   const float TIME_SPACING = 0.00625; // [us]
-  const float FREQUENCY_RESOLUTION = 2 * M_PI / (TIME_SPACING * DATA_XY_DIM); // [MHz]
-  const float MAX_FREQUENCY = FREQUENCY_RESOLUTION * DATA_XY_DIM / 2.f; // [MHz]
-  const float HIGHPASS_FREQENCY = MAX_FREQUENCY * 0.8f; // [MHz]
-  const float LOWPASS_FREQENCY = MAX_FREQUENCY * 0.1f; // [MHz]
-  const float ALPHA = 0; // 0 = box, 1 = von Hann; changing this may make the test invalid
-  const float EPSILON_FFT = 0.00001f;
+  float FREQUENCY_RESOLUTION = 1 / (TIME_SPACING / 1e6 * DATA_XY_DIM); // [Hz]
+  const float MAX_FREQUENCY = FREQUENCY_RESOLUTION * DATA_XY_DIM / 2.f; // [Hz]
+  const float HIGHPASS_FREQENCY = MAX_FREQUENCY * 0.8f; // [Hz]
+  const float LOWPASS_FREQENCY = MAX_FREQUENCY * 0.1f; // [Hz]
+  const float ALPHA = 0.01; // 0 = box, 1 = von Hann; changing this may make the test invalid
+  const float EPSILON_FFT = 0.0001f;
 
 public:
 
   void setUp() override
   {
-    m_BandpassFilter = mitk::BandpassFilter::New();
+    m_FilterService = mitk::PhotoacousticFilterService::New();
   }
 
   void test(float HighPass, float LowPass, float HighPassAlpha, float LowPassAlpha, bool useLow, bool useHigh)
@@ -90,21 +90,13 @@ public:
 
       inputImage->SetImportVolume(data, 0, 0, mitk::Image::ImportMemoryManagementType::CopyMemory);
 
-      m_BandpassFilter->SetInput(inputImage);
-
       if (!useHigh)
         HighPass = 0;
-      m_BandpassFilter->SetHighPass(HighPass);
 
-      if(!useLow)
+      if (!useLow)
         LowPass = MAX_FREQUENCY;
-      m_BandpassFilter->SetLowPass(LowPass);
 
-      m_BandpassFilter->SetHighPassAlpha(HighPassAlpha);
-      m_BandpassFilter->SetLowPassAlpha(LowPassAlpha);
-
-      m_BandpassFilter->Update();
-      mitk::Image::Pointer outputImage = m_BandpassFilter->GetOutput();
+      mitk::Image::Pointer outputImage = m_FilterService->ApplyBandpassFilter(inputImage, HighPass, LowPass, HighPassAlpha, LowPassAlpha, TIME_SPACING / 1e6, 0, false);
 
       // do a fourier transform, and check whether the part of the image that has been filtered is zero
       typedef itk::Image< float, 3 > RealImageType;
@@ -122,18 +114,24 @@ public:
 
       auto fftResult = forwardFFTFilter->GetOutput();
 
+      /*
+      std::string img = "D:/img" + std::to_string(iteration) + ".nrrd";
+      mitk::IOUtil::Save(inputImage, img);
+      std::string res = "D:/res" + std::to_string(iteration) + ".nrrd";
+      mitk::IOUtil::Save(outputImage, res);*/
+
       // the resulting image should consist only of zeros, as we filtered the frequencies out
       for (unsigned int z = 0; z < DATA_Z_DIM; ++z)
       {
         for (unsigned int y = 0; y < DATA_XY_DIM / 2; ++y)
         {
-          if (y < (unsigned int)std::floor(HighPass / FREQUENCY_RESOLUTION) || y > (unsigned int)std::ceil(LowPass / FREQUENCY_RESOLUTION))
+          if (y < (unsigned int)std::floor(0.95 * HighPass / FREQUENCY_RESOLUTION) || y >(unsigned int)std::ceil(1.05 * LowPass / FREQUENCY_RESOLUTION))
           {
             for (unsigned int x = 0; x < DATA_XY_DIM; ++x)
             {
               // unsigned int outPos = x + y * DATA_XY_DIM + z * DATA_XY_DIM * DATA_XY_DIM;
               std::complex<float> value = fftResult->GetPixel({ x,y,z });
-              CPPUNIT_ASSERT_MESSAGE(std::string("Expected 0, got (" + std::to_string(value.real()) + " + " + std::to_string(value.imag()) + "i) at " + std::to_string(x)+"-"+std::to_string(y)+"-"+std::to_string(z)),
+              CPPUNIT_ASSERT_MESSAGE(std::string("Expected 0, got (" + std::to_string(value.real()) + " + " + std::to_string(value.imag()) + "i) at " + std::to_string(x) + "-" + std::to_string(y) + "-" + std::to_string(z)),
                 (value.real() < EPSILON_FFT) && (value.imag() < EPSILON_FFT));
             }
           }
@@ -167,7 +165,7 @@ public:
       {
         for (unsigned int x = 0; x < dim[0]; ++x)
         {
-          data[x + y*dim[0] + z*dim[0] * dim[1]] += std::sin(freq * timeSpacing * y);
+          data[x + y * dim[0] + z * dim[0] * dim[1]] += std::sin(freq * timeSpacing * y);
         }
       }
     }
@@ -187,7 +185,7 @@ public:
 
   void tearDown() override
   {
-    m_BandpassFilter = nullptr;
+    m_FilterService = nullptr;
   }
 };
 

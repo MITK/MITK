@@ -1,6 +1,7 @@
 MITK_CREATE_MODULE(
   DEPENDS MitkCore
   PACKAGE_DEPENDS PUBLIC Qt5|WebEngineWidgets
+  WARNINGS_NO_ERRORS
 )
 
 add_subdirectory(test)

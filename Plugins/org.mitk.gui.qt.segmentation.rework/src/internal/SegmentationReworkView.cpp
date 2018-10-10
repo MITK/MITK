@@ -78,7 +78,7 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   connect(this, &SegmentationReworkView::InvokeLoadData, this, &SegmentationReworkView::LoadData);
 
   m_HttpHandler->SetPutCallback(std::bind(&SegmentationReworkView::RESTPutCallback, this, std::placeholders::_1));
-  m_HttpHandler->SetGetCallback(std::bind(&SegmentationReworkView::RESTGetCallback, this, std::placeholders::_1));
+  m_HttpHandler->SetGetImageSegCallback(std::bind(&SegmentationReworkView::RESTGetCallback, this, std::placeholders::_1));
   m_HttpHandler->Open().wait();
 
   MITK_INFO << "Listening for requests at: " << utility::conversions::to_utf8string(address);

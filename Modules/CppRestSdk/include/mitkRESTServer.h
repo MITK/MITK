@@ -45,22 +45,12 @@ namespace mitk
   {
   public:
     
-    struct CallbackDTO {
-    };
-
-    typedef std::function<void()> CallbackType();
-    typedef std::map<std::string, CallbackType> CallbackMapType;
-
     RESTServer();
     RESTServer(utility::string_t url);
     virtual ~RESTServer();
 
     pplx::task<void> Open() { return m_Listener.open(); }
     pplx::task<void> Close() { return m_Listener.close(); }
-
-    void addGETPathHandler(std::string uri, CallbackType callback) {
-      
-    }
 
   protected:
     virtual void HandleGet(MitkRequest){};
@@ -70,7 +60,6 @@ namespace mitk
     void HandleError(pplx::task<void> &t);
 
     MitkListener m_Listener;
-    //CallbackMapType uriResolverGET;
   };
 };
 

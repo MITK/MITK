@@ -52,7 +52,7 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
       dto.studyUID = mitk::RESTUtil::convertToUtf8(studyUID);
       dto.segSeriesUIDA = mitk::RESTUtil::convertToUtf8(segSeriesUID);
 
-      m_GetCallback(dto);
+      m_GetImageSegCallback(dto);
 
       MitkResponse response(MitkRestStatusCodes::OK);
       response.set_body("Sure, i got you.. have an awesome day");

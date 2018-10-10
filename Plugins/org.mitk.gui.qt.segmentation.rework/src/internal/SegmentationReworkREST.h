@@ -49,9 +49,15 @@ public:
   { 
 	  m_PutCallback = callback;
   }
-  void SetGetCallback(std::function<void(DicomDTO &message)> callback) 
+
+  void SetGetImageSegCallback(std::function<void(DicomDTO &message)> callback) 
   {
-	  m_GetCallback = callback;
+	  m_GetImageSegCallback = callback;
+  }
+
+  void SetGetEvalCallback(std::function<void(DicomDTO &message)> callback)
+  {
+    m_GetEvalCallback = callback;
   }
 
 signals:
@@ -59,7 +65,8 @@ signals:
 
 private:
   std::function<void(DicomDTO &message)> m_PutCallback;
-  std::function<void(DicomDTO &message)> m_GetCallback;
+  std::function<void(DicomDTO &message)> m_GetImageSegCallback;
+  std::function<void(DicomDTO &message)> m_GetEvalCallback;
 };
 
 #endif // SegmentationReworkREST_h

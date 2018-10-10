@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_SegmentationReworkViewControls.h"
 
 #include "SegmentationReworkRest.h"
-#include <mitkRESTClient.h>
+#include <mitkDICOMWeb.h>
 #include <filesystem>
 
 /**
@@ -75,7 +75,7 @@ private:
 
   void SetSimilarityGraph(std::vector<double> simScoreArray, int sliceMinStart);
   std::unique_ptr<SegmentationReworkREST> m_HttpHandler;
-  mitk::RESTClient* m_RestClient;
+  mitk::DICOMWeb* m_DICOMWeb;
 
   std::string m_CurrentStudyUID;
 

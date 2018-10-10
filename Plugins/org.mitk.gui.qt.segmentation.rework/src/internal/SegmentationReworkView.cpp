@@ -84,7 +84,7 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   MITK_INFO << "Listening for requests at: " << utility::conversions::to_utf8string(address);
 
   utility::string_t pacsHost = U("http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE");
-  m_RestClient = new mitk::RESTClient(pacsHost);
+  m_DICOMWeb = new mitk::DICOMWeb(pacsHost);
 }
 
 void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::DicomDTO &dto)
@@ -98,80 +98,85 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
   seriesInstancesParams.insert((ParamMap::value_type({"SeriesInstanceUID"}, dto.srSeriesUID)));
   seriesInstancesParams.insert((ParamMap::value_type({"includefield"}, {"0040A375"}))); // Current Requested Procedure Evidence Sequence
 
-  m_RestClient->QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) {
+  try {
+    m_DICOMWeb->QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) {
 
-    auto firstResult = jsonResult[0];
-    auto actualListKey = firstResult.at(U("0040A375")).as_object().at(U("Value")).as_array()[0].as_object().at(U("00081115")).as_object().at(U("Value")).as_array();
+      auto firstResult = jsonResult[0];
+      auto actualListKey = firstResult.at(U("0040A375")).as_object().at(U("Value")).as_array()[0].as_object().at(U("00081115")).as_object().at(U("Value")).as_array();
 
-    std::string segSeriesUIDA = "";
-    std::string segSeriesUIDB = "";
-    std::string imageSeriesUID = "";
+      std::string segSeriesUIDA = "";
+      std::string segSeriesUIDB = "";
+      std::string imageSeriesUID = "";
 
-    for (unsigned int index = 0; index < actualListKey.size(); index++) {
-      auto element = actualListKey[index].as_object();
-      // get SOP class UID
-      auto innerElement = element.at(U("00081199")).as_object().at(U("Value")).as_array()[0];
-      auto sopClassUID = innerElement.at(U("00081150")).as_object().at(U("Value")).as_array()[0].as_string();
+      for (unsigned int index = 0; index < actualListKey.size(); index++) {
+        auto element = actualListKey[index].as_object();
+        // get SOP class UID
+        auto innerElement = element.at(U("00081199")).as_object().at(U("Value")).as_array()[0];
+        auto sopClassUID = innerElement.at(U("00081150")).as_object().at(U("Value")).as_array()[0].as_string();
 
-      auto seriesUID = utility::conversions::to_utf8string(element.at(U("0020000E")).as_object().at(U("Value")).as_array()[0].as_string());
+        auto seriesUID = utility::conversions::to_utf8string(element.at(U("0020000E")).as_object().at(U("Value")).as_array()[0].as_string());
 
-      if (sopClassUID == L"1.2.840.10008.5.1.4.1.1.66.4") // SEG
-      {
-        if (segSeriesUIDA.length() == 0)
+        if (sopClassUID == L"1.2.840.10008.5.1.4.1.1.66.4") // SEG
         {
-          segSeriesUIDA = seriesUID;
+          if (segSeriesUIDA.length() == 0)
+          {
+            segSeriesUIDA = seriesUID;
+          }
+          else
+          {
+            segSeriesUIDB = seriesUID;
+          }
         }
-        else
+        else if (sopClassUID == L"1.2.840.10008.5.1.4.1.1.2")  // CT
         {
-          segSeriesUIDB = seriesUID;
+          imageSeriesUID = seriesUID;
         }
       }
-      else if (sopClassUID == L"1.2.840.10008.5.1.4.1.1.2")  // CT
-      {
-        imageSeriesUID = seriesUID;
-      }
-    }
 
-    MITK_INFO << "image series UID " << imageSeriesUID;
-    MITK_INFO << "seg A series UID " << segSeriesUIDA;
-    MITK_INFO << "seg B series UID " << segSeriesUIDB;
+      MITK_INFO << "image series UID " << imageSeriesUID;
+      MITK_INFO << "seg A series UID " << segSeriesUIDA;
+      MITK_INFO << "seg B series UID " << segSeriesUIDB;
 
-    MITK_INFO << "Load related dicom series ...";
-    boost::uuids::random_generator generator;
+      MITK_INFO << "Load related dicom series ...";
+      boost::uuids::random_generator generator;
 
-    std::string folderPathSeries = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
-    std::experimental::filesystem::create_directory(folderPathSeries);
+      std::string folderPathSeries = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
+      std::experimental::filesystem::create_directory(folderPathSeries);
 
-    std::string pathSegA = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
-    std::string pathSegB = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
+      std::string pathSegA = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
+      std::string pathSegB = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
 
-    auto folderPathSegA = utility::conversions::to_string_t(pathSegA);
-    auto folderPathSegB = utility::conversions::to_string_t(pathSegB);
+      auto folderPathSegA = utility::conversions::to_string_t(pathSegA);
+      auto folderPathSegB = utility::conversions::to_string_t(pathSegB);
 
-    std::experimental::filesystem::create_directory(pathSegA);
-    std::experimental::filesystem::create_directory(pathSegB);
+      std::experimental::filesystem::create_directory(pathSegA);
+      std::experimental::filesystem::create_directory(pathSegB);
 
-    m_CurrentStudyUID = dto.studyUID;
+      m_CurrentStudyUID = dto.studyUID;
 
-    std::vector<pplx::task<std::string>> tasks;
-    auto imageSeriesTask = m_RestClient->WadoRS(utility::conversions::to_string_t(folderPathSeries), dto.studyUID, imageSeriesUID);
-    auto segATask = m_RestClient->WadoRS(folderPathSegA, dto.studyUID, segSeriesUIDA);
-    auto segBTask = m_RestClient->WadoRS(folderPathSegB, dto.studyUID, segSeriesUIDB);
-    tasks.push_back(imageSeriesTask);
-    tasks.push_back(segATask);
-    tasks.push_back(segBTask);
+      std::vector<pplx::task<std::string>> tasks;
+      auto imageSeriesTask = m_DICOMWeb->WadoRS(utility::conversions::to_string_t(folderPathSeries), dto.studyUID, imageSeriesUID);
+      auto segATask = m_DICOMWeb->WadoRS(folderPathSegA, dto.studyUID, segSeriesUIDA);
+      auto segBTask = m_DICOMWeb->WadoRS(folderPathSegB, dto.studyUID, segSeriesUIDB);
+      tasks.push_back(imageSeriesTask);
+      tasks.push_back(segATask);
+      tasks.push_back(segBTask);
 
-    auto joinTask = pplx::when_all(begin(tasks), end(tasks));
-    auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) {
-      auto fileNameA = std::experimental::filesystem::path(filePathList[1]).filename();
-      auto fileNameB = std::experimental::filesystem::path(filePathList[2]).filename();
-      m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + " " + QString::fromUtf8(fileNameA.string().c_str()));
-      m_Controls.labelSegB->setText(m_Controls.labelSegB->text() + " " + QString::fromUtf8(fileNameB.string().c_str()));
-      InvokeLoadData(filePathList);
+      auto joinTask = pplx::when_all(begin(tasks), end(tasks));
+      auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) {
+        auto fileNameA = std::experimental::filesystem::path(filePathList[1]).filename();
+        auto fileNameB = std::experimental::filesystem::path(filePathList[2]).filename();
+        m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + " " + QString::fromUtf8(fileNameA.string().c_str()));
+        m_Controls.labelSegB->setText(m_Controls.labelSegB->text() + " " + QString::fromUtf8(fileNameB.string().c_str()));
+        InvokeLoadData(filePathList);
+      });
+
     });
 
-  });
-
+  }
+  catch (mitk::Exception&  e) {
+    MITK_ERROR << e.what();
+  }
 }
 
 void SegmentationReworkView::RESTGetCallback(const SegmentationReworkREST::DicomDTO &dto) 
@@ -186,8 +191,8 @@ void SegmentationReworkView::RESTGetCallback(const SegmentationReworkREST::Dicom
   std::experimental::filesystem::create_directory(pathSeg);
 
   std::vector<pplx::task<std::string>> tasks;
-  auto imageSeriesTask = m_RestClient->WadoRS(utility::conversions::to_string_t(folderPathSeries), dto.studyUID, dto.imageSeriesUID);
-  auto segATask = m_RestClient->WadoRS(folderPathSeg, dto.studyUID, dto.segSeriesUIDA);
+  auto imageSeriesTask = m_DICOMWeb->WadoRS(utility::conversions::to_string_t(folderPathSeries), dto.studyUID, dto.imageSeriesUID);
+  auto segATask = m_DICOMWeb->WadoRS(folderPathSeg, dto.studyUID, dto.segSeriesUIDA);
   tasks.push_back(imageSeriesTask);
   tasks.push_back(segATask);
 
@@ -261,7 +266,7 @@ void SegmentationReworkView::UploadNewSegmentation()
 
   auto filePath = utility::conversions::to_string_t(savePath);
   try {
-    m_RestClient->StowRS(filePath, m_CurrentStudyUID).wait();
+    m_DICOMWeb->StowRS(filePath, m_CurrentStudyUID).wait();
   }
   catch (const std::exception &exception)
   {
@@ -274,10 +279,14 @@ void SegmentationReworkView::CreateNewSegmentationC()
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   toolManager->InitializeTools();
   toolManager->SetReferenceData(m_Image);
-  //toolManager->SetWorkingData(m_SegC);
-
-  // using seg A as new base image
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_SegA->GetData());
+  
+  mitk::Image::Pointer baseImage;
+  if (m_Controls.radioA->isChecked()) {
+    baseImage = dynamic_cast<mitk::Image*>(m_SegA->GetData());
+  }
+  else if (m_Controls.radioB->isChecked()) {
+    baseImage = dynamic_cast<mitk::Image*>(m_SegB->GetData());
+  }
 
   QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog(m_Parent); // needs a QWidget as parent, "this" is not QWidget
 
@@ -301,7 +310,7 @@ void SegmentationReworkView::CreateNewSegmentationC()
         newNodeName = "no_name";
       }
 
-      mitk::DataNode::Pointer newSegmentation = firstTool->CreateSegmentationNode(image, newNodeName, dialog->GetColor());
+      mitk::DataNode::Pointer newSegmentation = firstTool->CreateSegmentationNode(baseImage, newNodeName, dialog->GetColor());
       // initialize showVolume to false to prevent recalculating the volume while working on the segmentation
       newSegmentation->SetProperty("showVolume", mitk::BoolProperty::New(false));
       if (!newSegmentation)
@@ -332,45 +341,4 @@ void SegmentationReworkView::CleanDicomFolder()
 {
   std::experimental::filesystem::remove_all(m_downloadBaseDir);
   std::experimental::filesystem::create_directory(m_downloadBaseDir);
-}
-
-void SegmentationReworkView::DoImageProcessing()
-{
-  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-  if (nodes.empty())
-    return;
-
-  mitk::DataNode *node = nodes.front();
-
-  if (!node)
-  {
-    // Nothing selected. Inform the user and return
-    QMessageBox::information(nullptr, "Template", "Please load and select an image before starting image processing.");
-    return;
-  }
-
-  // here we have a valid mitk::DataNode
-
-  // a node itself is not very useful, we need its data item (the image)
-  mitk::BaseData *data = node->GetData();
-  if (data)
-  {
-    // test if this data item is an image or not (could also be a surface or something totally different)
-    mitk::Image *image = dynamic_cast<mitk::Image *>(data);
-    if (image)
-    {
-      std::stringstream message;
-      std::string name;
-      message << "Performing image processing for image ";
-      if (node->GetName(name))
-      {
-        // a property called "name" was found for this DataNode
-        message << "'" << name << "'";
-      }
-      message << ".";
-      MITK_INFO << message.str();
-
-      // actually do something here...
-    }
-  }
 }

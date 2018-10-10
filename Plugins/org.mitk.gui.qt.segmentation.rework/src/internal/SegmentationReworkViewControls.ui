@@ -85,10 +85,67 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="buttonNewSeg">
-     <property name="text">
-      <string>Create new Segmentation C</string>
+    <widget class="QGroupBox" name="verticalGroupBox">
+     <property name="flat">
+      <bool>false</bool>
      </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="title">
+         <string>Select segmentation basis</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+         <item>
+          <widget class="QRadioButton" name="radioA">
+           <property name="text">
+            <string>A</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radioB">
+           <property name="text">
+            <string>B</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkIndiv">
+           <property name="text">
+            <string>Individual</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="buttonNewSeg">
+        <property name="text">
+         <string>Create new Segmentation</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -97,7 +154,7 @@
       <string>Do image processing</string>
      </property>
      <property name="text">
-      <string>Upload Segmentation C</string>
+      <string>Upload Segmentation</string>
      </property>
     </widget>
    </item>

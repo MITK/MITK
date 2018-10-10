@@ -27,6 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "cpprest/producerconsumerstream.h"
 #include "cpprest/uri.h"
 
+#include <map>
+#include <functional>
+
 #include "MitkCppRestSdkExports.h"
 
 typedef web::http::experimental::listener::http_listener MitkListener;
@@ -40,14 +43,24 @@ namespace mitk
 {
   class MITKCPPRESTSDK_EXPORT RESTServer : public QObject
   {
-
   public:
+    
+    struct CallbackDTO {
+    };
+
+    typedef std::function<void()> CallbackType();
+    typedef std::map<std::string, CallbackType> CallbackMapType;
+
     RESTServer();
     RESTServer(utility::string_t url);
     virtual ~RESTServer();
 
     pplx::task<void> Open() { return m_Listener.open(); }
     pplx::task<void> Close() { return m_Listener.close(); }
+
+    void addGETPathHandler(std::string uri, CallbackType callback) {
+      
+    }
 
   protected:
     virtual void HandleGet(MitkRequest){};
@@ -57,6 +70,7 @@ namespace mitk
     void HandleError(pplx::task<void> &t);
 
     MitkListener m_Listener;
+    //CallbackMapType uriResolverGET;
   };
 };
 

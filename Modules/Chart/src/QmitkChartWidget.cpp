@@ -116,6 +116,10 @@ QmitkChartWidget::Impl::Impl(QWidget *parent)
 
 QmitkChartWidget::Impl::Impl(QWidget *parent, bool unitTest)
 {
+  if (unitTest) {
+    parent->actions();
+  }
+  parent->actions();
   MapTypes();
 }
 

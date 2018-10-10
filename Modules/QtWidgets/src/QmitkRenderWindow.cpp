@@ -288,7 +288,6 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state, QmitkStdMultiWidget* stdM
   {
     //disconnect Signal/Slot Connection
     disconnect(m_MenuWidget, SIGNAL( SignalChangeLayoutDesign(int) ), this, SLOT(OnChangeLayoutDesign(int)));
-    disconnect(m_MenuWidget, SIGNAL( ResetView() ), this, SIGNAL( ResetView()));
     disconnect(m_MenuWidget, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SIGNAL( ChangeCrosshairRotationMode(int)));
     disconnect(m_MenuWidget, &QmitkRenderWindowMenu::fullScreenModeChanged, this, &QmitkRenderWindow::OnFullScreenModeChanged);
 
@@ -303,7 +302,6 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state, QmitkStdMultiWidget* stdM
 
     //create Signal/Slot Connection
     connect(m_MenuWidget, SIGNAL( SignalChangeLayoutDesign(int) ), this, SLOT(OnChangeLayoutDesign(int)));
-    connect(m_MenuWidget, SIGNAL( ResetView() ), this, SIGNAL( ResetView()));
     connect(m_MenuWidget, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SIGNAL( ChangeCrosshairRotationMode(int)));
     connect(m_MenuWidget, &QmitkRenderWindowMenu::fullScreenModeChanged, this, &QmitkRenderWindow::OnFullScreenModeChanged);
   }

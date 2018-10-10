@@ -947,17 +947,7 @@ bool mitk::SemanticRelations::ControlPointContainsInformationType(const Semantic
 
 void mitk::SemanticRelations::ClearControlPoints(const SemanticTypes::CaseID& caseID)
 {
-  SemanticTypes::ControlPointVector allControlPointsOfCase;
-  try
-  {
-    allControlPointsOfCase = GetAllControlPointsOfCase(caseID);
-
-  }
-  catch (const SemanticRelationException&)
-  {
-    // error retrieving control point data
-    return;
-  }
+  SemanticTypes::ControlPointVector allControlPointsOfCase = GetAllControlPointsOfCase(caseID);
 
   DataNodeVector allImagesOfCase;
   try
@@ -970,13 +960,12 @@ void mitk::SemanticRelations::ClearControlPoints(const SemanticTypes::CaseID& ca
     return;
   }
 
-  SemanticTypes::ControlPointVector allControlPoints;
+  SemanticTypes::ControlPointVector referencedControlPoints;
   for (const auto& image : allImagesOfCase)
   {
     try
     {
-      allControlPoints.push_back(GetControlPointOfData(image));
-
+      referencedControlPoints.push_back(GetControlPointOfData(image));
     }
     catch (const SemanticRelationException&)
     {
@@ -986,15 +975,15 @@ void mitk::SemanticRelations::ClearControlPoints(const SemanticTypes::CaseID& ca
   }
 
   std::sort(allControlPointsOfCase.begin(), allControlPointsOfCase.end());
-  std::sort(allControlPoints.begin(), allControlPoints.end());
-  SemanticTypes::ControlPointVector allControlPointsDifference;
+  std::sort(referencedControlPoints.begin(), referencedControlPoints.end());
 
+  SemanticTypes::ControlPointVector nonReferencedControlPoints;
   std::set_difference(allControlPointsOfCase.begin(), allControlPointsOfCase.end(),
-                      allControlPoints.begin(), allControlPoints.end(),
-                      std::inserter(allControlPointsDifference, allControlPointsDifference.begin()));
+                      referencedControlPoints.begin(), referencedControlPoints.end(),
+                      std::inserter(nonReferencedControlPoints, nonReferencedControlPoints.begin()));
 
   auto allExaminationPeriods = GetAllExaminationPeriodsOfCase(caseID);
-  for (const auto& controlPoint : allControlPointsDifference)
+  for (const auto& controlPoint : nonReferencedControlPoints)
   {
     const auto& examinationPeriod = FindExaminationPeriod(controlPoint, allExaminationPeriods);
     m_RelationStorage->RemoveControlPointFromExaminationPeriod(caseID, controlPoint, examinationPeriod);

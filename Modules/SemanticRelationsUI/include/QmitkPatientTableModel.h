@@ -116,6 +116,7 @@ private:
 
   mitk::SemanticTypes::InformationTypeVector m_InformationTypes;
   mitk::SemanticTypes::ControlPointVector m_ControlPoints;
+  mitk::SemanticTypes::ExaminationPeriodVector m_ExaminationPeriods;
   std::string m_SelectedNodeType;
 
   QStandardItemModel* m_HeaderModel;

@@ -68,6 +68,9 @@ namespace mitk
 
     /**
     * @brief The concept of an examination period.
+    *     An examination period holds a vector of control point UIDs.
+    *     The semantic relation storage stores the UIDs such that
+    *     the represented control points are in chronological order.
     */
     struct ExaminationPeriod
     {

@@ -30,6 +30,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QColor>
 
+// c++
+#include <iostream>
+#include <string>
+
 QmitkPatientTableModel::QmitkPatientTableModel(QObject* parent /*= nullptr*/)
   : QmitkAbstractSemanticRelationsStorageModel(parent)
   , m_SelectedNodeType("Image")
@@ -235,6 +239,11 @@ void QmitkPatientTableModel::SetData()
   // sort the vector of control points for the timeline
   std::sort(m_ControlPoints.begin(), m_ControlPoints.end());
 
+  // get all examination periods of current case
+  m_ExaminationPeriods = m_SemanticRelations->GetAllExaminationPeriodsOfCase(m_CaseID);
+  // sort the vector of examination periods for the timeline
+  mitk::SortExaminationPeriods(m_ExaminationPeriods, m_ControlPoints);
+
   // get all information types points of current case
   m_InformationTypes = m_SemanticRelations->GetAllInformationTypesOfCase(m_CaseID);
 
@@ -282,13 +291,25 @@ void QmitkPatientTableModel::SetHeaderModel()
   QStandardItem* rootItem = new QStandardItem("Timeline");
   QList<QStandardItem*> standardItems;
 
-  for (const auto& controlPoint : m_ControlPoints)
+  for (const auto& examinationPeriod : m_ExaminationPeriods)
   {
-    std::string controlPointAsString = mitk::GetControlPointAsString(controlPoint);
-    QStandardItem* standardItem = new QStandardItem(QString::fromStdString(controlPointAsString));
-    standardItems.push_back(standardItem);
+    auto& shortenedUID = QString::fromStdString(examinationPeriod.UID);
+    shortenedUID.resize(4);
+    QStandardItem* examinationPeriodItem = new QStandardItem(shortenedUID);
+    standardItems.push_back(examinationPeriodItem);
     rootItem->appendColumn(standardItems);
     standardItems.clear();
+
+    const auto& currentControlPoints = examinationPeriod.controlPointUIDs;
+    for (const auto& controlPointUID : currentControlPoints)
+    {
+      const auto& controlPoint = mitk::GetControlPointByUID(controlPointUID, m_ControlPoints);
+      std::string controlPointAsString = mitk::GetControlPointAsString(controlPoint);
+      QStandardItem* controlPointItem = new QStandardItem(QString::fromStdString(controlPointAsString));
+      standardItems.push_back(controlPointItem);
+      examinationPeriodItem->appendColumn(standardItems);
+      standardItems.clear();
+    }
   }
 
   m_HeaderModel->setItem(0, 0, rootItem);

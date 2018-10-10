@@ -157,6 +157,30 @@ mitk::SemanticTypes::ExaminationPeriod mitk::FindExaminationPeriod(const Semanti
   return SemanticTypes::ExaminationPeriod();
 }
 
+void mitk::SortExaminationPeriods(SemanticTypes::ExaminationPeriodVector& allExaminationPeriods, const SemanticTypes::ControlPointVector& allControlPoints)
+{
+  auto lambda = [allControlPoints](const SemanticTypes::ExaminationPeriod& leftExaminationPeriod, const SemanticTypes::ExaminationPeriod& rightExaminationPeriod)
+  {
+    if (leftExaminationPeriod.controlPointUIDs.empty())
+    {
+      return true;
+    }
+
+    if (rightExaminationPeriod.controlPointUIDs.empty())
+    {
+      return false;
+    }
+    const auto leftUID = leftExaminationPeriod.controlPointUIDs.front();
+    const auto rightUID = rightExaminationPeriod.controlPointUIDs.front();
+    const auto& leftControlPoint = GetControlPointByUID(leftUID, allControlPoints);
+    const auto& rightControlPoint = GetControlPointByUID(rightUID, allControlPoints);
+
+    return leftControlPoint < rightControlPoint;
+  };
+
+  std::sort(allExaminationPeriods.begin(), allExaminationPeriods.end(), lambda);
+}
+
 double CalculateDistanceInDays(const mitk::SemanticTypes::ControlPoint& leftControlPoint, const mitk::SemanticTypes::ControlPoint& rightControlPoint)
 {
   std::tm leftTimeStructure = { 0, 0, 0, leftControlPoint.day,  leftControlPoint.month - 1,   leftControlPoint.year - 1900 };

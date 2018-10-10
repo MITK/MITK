@@ -231,37 +231,17 @@ std::vector<mitk::SemanticTypes::ControlPoint> mitk::RelationStorage::GetAllCont
   }
 
   std::vector<std::string> vectorValue = vectorProperty->GetValue();
-  std::vector<SemanticTypes::ControlPoint> allControlPoints;
-  for (const auto& controlPointID : vectorValue)
+  std::vector<SemanticTypes::ControlPoint> allControlPointsOfCase;
+  for (const auto& controlPointUID : vectorValue)
   {
-    // retrieve a vector property that contains the integer values of the date of a control point (0. year 1. month 2. day)
-    mitk::VectorProperty<int>* controlPointVectorProperty = dynamic_cast<mitk::VectorProperty<int>*>(propertyList->GetProperty(controlPointID));
-    if (nullptr == controlPointVectorProperty)
+    SemanticTypes::ControlPoint generatedControlPoint = GenerateControlpoint(caseID, controlPointUID);
+    if (!generatedControlPoint.UID.empty())
     {
-      MITK_INFO << "Could not find the control point " << controlPointID << " in the storage.";
-      continue;
-    }
-
-    std::vector<int> controlPointVectorValue = controlPointVectorProperty->GetValue();
-    // a control point has to have exactly three integer values (year, month and day)
-    if (controlPointVectorValue.size() != 3)
-    {
-      MITK_INFO << "Incorrect control point storage. Not three (3) values of the date are stored.";
-      continue;
-    }
-    else
-    {
-      // set the values of the control point
-      SemanticTypes::ControlPoint generatedControlPoint;
-      generatedControlPoint.UID = controlPointID;
-      generatedControlPoint.year = controlPointVectorValue[0];
-      generatedControlPoint.month = controlPointVectorValue[1];
-      generatedControlPoint.day = controlPointVectorValue[2];
-
-      allControlPoints.push_back(generatedControlPoint);
+      allControlPointsOfCase.push_back(generatedControlPoint);
     }
   }
-  return allControlPoints;
+
+  return allControlPointsOfCase;
 }
 
 std::vector<mitk::SemanticTypes::ExaminationPeriod> mitk::RelationStorage::GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID)
@@ -294,26 +274,16 @@ std::vector<mitk::SemanticTypes::ExaminationPeriod> mitk::RelationStorage::GetAl
     }
 
     std::vector<std::string> examinationPeriodVectorValue = examinationPeriodVectorProperty->GetValue();
-    /*
-    // an examination period has an arbitrary number of control points (at least one)
-    if (examinationPeriodVectorValue.size() < 1)
+    // an examination period has an arbitrary number of control points
+    // set the values of the control point
+    SemanticTypes::ExaminationPeriod generatedExaminationPeriod;
+    generatedExaminationPeriod.UID = examinationPeriodID;
+    for (const auto& controlpointID : examinationPeriodVectorValue)
     {
-      MITK_INFO << "Incorrect examination period storage. At least one (1) control point ID has to be stored.";
-      continue;
+      generatedExaminationPeriod.controlPointUIDs.push_back(controlpointID);
     }
-    else
-    {
-    */
-      // set the values of the control point
-      SemanticTypes::ExaminationPeriod generatedExaminationPeriod;
-      generatedExaminationPeriod.UID = examinationPeriodID;
-      for (const auto& controlpointID : examinationPeriodVectorValue)
-      {
-        generatedExaminationPeriod.controlPointUIDs.push_back(controlpointID);
-      }
 
-      allExaminationPeriods.push_back(generatedExaminationPeriod);
-    //}
+    allExaminationPeriods.push_back(generatedExaminationPeriod);
   }
   return allExaminationPeriods;
 }
@@ -546,7 +516,7 @@ void mitk::RelationStorage::RemoveImage(const SemanticTypes::CaseID& caseID, con
   // remove the image reference from the list of all images of the current case
   std::vector<std::string> allImagesIDs = allImagesVectorProperty->GetValue();
   allImagesIDs.erase(std::remove(allImagesIDs.begin(), allImagesIDs.end(), imageNodeID), allImagesIDs.end());
-  if (allImagesIDs.size() == 0)
+  if (allImagesIDs.empty())
   {
     // no more images stored -> remove the images property list
     propertyList->DeleteProperty("images");
@@ -624,7 +594,7 @@ void mitk::RelationStorage::RemoveSegmentation(const SemanticTypes::CaseID& case
   // remove the lesion reference from the list of all lesions of the current case
   std::vector<std::string> allSegmentationsIDs = allSegmentationsVectorProperty->GetValue();
   allSegmentationsIDs.erase(std::remove(allSegmentationsIDs.begin(), allSegmentationsIDs.end(), segmentationNodeID), allSegmentationsIDs.end());
-  if (allSegmentationsIDs.size() == 0)
+  if (allSegmentationsIDs.empty())
   {
     // no more segmentations stored -> remove the segmentations property list
     propertyList->DeleteProperty("segmentations");
@@ -823,7 +793,7 @@ void mitk::RelationStorage::RemoveLesion(const mitk::SemanticTypes::CaseID& case
   // remove the lesion reference from the list of all lesions of the current case
   std::vector<std::string> lesionVectorValue = lesionVectorProperty->GetValue();
   lesionVectorValue.erase(std::remove(lesionVectorValue.begin(), lesionVectorValue.end(), lesion.UID), lesionVectorValue.end());
-  if (lesionVectorValue.size() == 0)
+  if (lesionVectorValue.empty())
   {
     // no more lesions stored -> remove the lesions property list
     propertyList->DeleteProperty("lesions");
@@ -1091,7 +1061,7 @@ void mitk::RelationStorage::AddExaminationPeriod(const SemanticTypes::CaseID& ca
   }
   else
   {
-    // add the new examination period id from the given examination period to the vector of all current examination period IDs
+    // add the new examination period id from the given examination period to the vector of all current examination period UIDs
     examinationPeriodsVectorValue.push_back(examinationPeriod.UID);
     // overwrite the current vector property with the new, extended string vector
     vectorProperty->SetValue(examinationPeriodsVectorValue);
@@ -1118,13 +1088,24 @@ void mitk::RelationStorage::AddControlPointToExaminationPeriod(const SemanticTyp
   mitk::VectorProperty<std::string>* controlPointUIDsVectorProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(examinationPeriod.UID));
   if (nullptr == controlPointUIDsVectorProperty)
   {
-    MITK_INFO << "Could not find examination period " << examinationPeriod.UID << " in the storage. Cannot add the control point to the examination period.";
+    MITK_INFO << "Could not find the examination period " << examinationPeriod.UID << " in the storage. Cannot add the control point to the examination period.";
     return;
   }
 
   std::vector<std::string> controlPointUIDsVectorValue = controlPointUIDsVectorProperty->GetValue();
   // store the control point UID
   controlPointUIDsVectorValue.push_back(controlPoint.UID);
+  // sort the vector according to the date of the control points referenced by the UIDs
+  auto lambda = [&caseID, this](const SemanticTypes::ID& leftControlPointUID, const SemanticTypes::ID& rightControlPointUID)
+  {
+    const auto& leftControlPoint = GenerateControlpoint(caseID, leftControlPointUID);
+    const auto& rightControlPoint = GenerateControlpoint(caseID, rightControlPointUID);
+
+    return leftControlPoint < rightControlPoint;
+  };
+
+  std::sort(controlPointUIDsVectorValue.begin(), controlPointUIDsVectorValue.end(), lambda);
+  // store the modified and sorted control point UID vector of this examination period
   controlPointUIDsVectorProperty->SetValue(controlPointUIDsVectorValue);
 }
 
@@ -1146,9 +1127,25 @@ void mitk::RelationStorage::RemoveControlPointFromExaminationPeriod(const Semant
   }
 
   std::vector<std::string> controlPointUIDsVectorValue = controlPointUIDsVectorProperty->GetValue();
-  controlPointUIDsVectorValue.erase(std::remove(controlPointUIDsVectorValue.begin(), controlPointUIDsVectorValue.end(), controlPoint.UID), controlPointUIDsVectorValue.end());
-  // store the modified vector value
-  controlPointUIDsVectorProperty->SetValue(controlPointUIDsVectorValue);
+  // an examination period has an arbitrary number of control points (at least one)
+  if (controlPointUIDsVectorValue.size() < 1)
+  {
+    MITK_INFO << "Incorrect examination period storage. At least one (1) control point ID has to be stored.";
+    return;
+  }
+  else
+  {
+    controlPointUIDsVectorValue.erase(std::remove(controlPointUIDsVectorValue.begin(), controlPointUIDsVectorValue.end(), controlPoint.UID), controlPointUIDsVectorValue.end());
+    if (controlPointUIDsVectorValue.empty())
+    {
+      RemoveExaminationPeriodFromCase(caseID, examinationPeriod);
+    }
+    else
+    {
+      // store the modified vector value
+      controlPointUIDsVectorProperty->SetValue(controlPointUIDsVectorValue);
+    }
+  }
 }
 
 void mitk::RelationStorage::RemoveExaminationPeriodFromCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod examinationPeriod)
@@ -1169,7 +1166,7 @@ void mitk::RelationStorage::RemoveExaminationPeriodFromCase(const SemanticTypes:
 
   std::vector<std::string> examinationPeriodVectorValue = vectorProperty->GetValue();
   examinationPeriodVectorValue.erase(std::remove(examinationPeriodVectorValue.begin(), examinationPeriodVectorValue.end(), examinationPeriod.UID), examinationPeriodVectorValue.end());
-  if (examinationPeriodVectorValue.size() == 0)
+  if (examinationPeriodVectorValue.empty())
   {
     // no more examination periods stored -> remove the examination period property list
     propertyList->DeleteProperty("examinationperiods");
@@ -1284,7 +1281,7 @@ void mitk::RelationStorage::RemoveInformationTypeFromCase(const SemanticTypes::C
 
   std::vector<std::string> informationTypeVectorValue = informationTypeVectorProperty->GetValue();
   informationTypeVectorValue.erase(std::remove(informationTypeVectorValue.begin(), informationTypeVectorValue.end(), informationType), informationTypeVectorValue.end());
-  if (informationTypeVectorValue.size() == 0)
+  if (informationTypeVectorValue.empty())
   {
     // no more information types stored -> remove the information types property list
     propertyList->DeleteProperty("informationtypes");
@@ -1356,4 +1353,39 @@ mitk::SemanticTypes::Lesion mitk::RelationStorage::GenerateLesion(const Semantic
     MITK_INFO << "Incorrect lesion class storage. Lesion " << lesionID << " can not be retrieved.";
     return SemanticTypes::Lesion();
   }
+}
+
+mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GenerateControlpoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& controlPointUID)
+{
+  mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
+  if (nullptr == propertyList)
+  {
+    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return SemanticTypes::ControlPoint();
+  }
+
+  // retrieve a vector property that contains the integer values of the date of a control point (0. year 1. month 2. day)
+  mitk::VectorProperty<int>* controlPointVectorProperty = dynamic_cast<mitk::VectorProperty<int>*>(propertyList->GetProperty(controlPointUID));
+  if (nullptr == controlPointVectorProperty)
+  {
+    MITK_INFO << "Could not find the control point " << controlPointUID << " in the storage.";
+    return SemanticTypes::ControlPoint();
+  }
+
+  std::vector<int> controlPointVectorValue = controlPointVectorProperty->GetValue();
+  // a control point has to have exactly three integer values (year, month and day)
+  if (controlPointVectorValue.size() != 3)
+  {
+    MITK_INFO << "Incorrect control point storage. Not three (3) values of the date are stored.";
+    return SemanticTypes::ControlPoint();
+  }
+
+  // set the values of the control point
+  SemanticTypes::ControlPoint generatedControlPoint;
+  generatedControlPoint.UID = controlPointUID;
+  generatedControlPoint.year = controlPointVectorValue[0];
+  generatedControlPoint.month = controlPointVectorValue[1];
+  generatedControlPoint.day = controlPointVectorValue[2];
+
+  return generatedControlPoint;
 }

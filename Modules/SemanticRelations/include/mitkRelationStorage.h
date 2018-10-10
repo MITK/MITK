@@ -85,6 +85,8 @@ namespace mitk
 
     mitk::SemanticTypes::Lesion GenerateLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& lesionID);
 
+    mitk::SemanticTypes::ControlPoint GenerateControlpoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& controlPointUID);
+
     DataStorage::Pointer m_DataStorage;
 
   };

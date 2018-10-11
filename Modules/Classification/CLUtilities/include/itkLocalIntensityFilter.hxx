@@ -200,8 +200,7 @@ namespace itk
         localPeakValue = m_ThreadLocalPeakValue[i];
       }
     }
-
-    // Set the outputs
+        // Set the outputs
     this->GetLocalPeakOutput()->Set(localPeakValue);
     this->GetGlobalPeakOutput()->Set(globalPeakValue);
     this->GetLocalMaximumOutput()->Set(localMaximum);
@@ -227,7 +226,6 @@ namespace itk
       offset = std::ceil(range / minimumSpacing);
       regionSize[i] = offset;
     }
-
 
     itk::ConstNeighborhoodIterator<TInputImage> iter(regionSize, itkImage, outputRegionForThread);
     itk::ConstNeighborhoodIterator<MaskImageType> iterMask(regionSize, itkMask, outputRegionForThread);
@@ -256,6 +254,9 @@ namespace itk
     iter.NeedToUseBoundaryConditionOff();
     iterMask.NeedToUseBoundaryConditionOff();
 
+    auto imageSize = itkImage->GetLargestPossibleRegion().GetSize();
+    unsigned int imageDimension = itkImage->GetImageDimension();
+
     while (!iter.IsAtEnd())
     {
       if (iterMask.GetCenterPixel() > 0)
@@ -266,7 +267,14 @@ namespace itk
         {
           if (vectorIsInRange[i])
           {
-            if (iter.IndexInBounds(i))
+            auto localIndex = iter.GetIndex(i);
+            bool calculatePoint = true;
+            for (unsigned int dimension = 0; dimension < imageDimension; ++dimension)
+            {
+              calculatePoint &= (localIndex[dimension] < static_cast<signed int>(imageSize[dimension]));
+              calculatePoint &= (0 <= localIndex[dimension]);
+            }
+            if (calculatePoint)
             {
               tmpPeakValue += iter.GetPixel(i);
               ++count;
@@ -289,6 +297,7 @@ namespace itk
       ++iterMask;
       ++iter;
     }
+
     m_ThreadLocalMaximum[threadId] = localMaximum;
     m_ThreadLocalPeakValue[threadId] = localPeakValue;
     m_ThreadGlobalPeakValue[threadId] = globalPeakValue;

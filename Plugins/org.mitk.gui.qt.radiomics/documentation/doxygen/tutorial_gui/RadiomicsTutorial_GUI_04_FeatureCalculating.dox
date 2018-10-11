@@ -1,0 +1,44 @@
+/**
+\page org_mitk_views_radiomicstutorial_gui_04_featurecalulation GUI based Radiomics Tutorial - Calculating the Radiomics Features
+
+\subsection Calculating the Radiomics Features
+The most important step of a radiomic study is the calculating of the features. With MITK Phenotyping this is done using the "Radiomics Statistic" View. Open it using the View Navigator. Within this view, we select the resampled image and the resampled and cleaned mask. In a first step, we select the features we aim to calculate. For this tutorial we chose four features:
+\li Volumetric Features
+\li First Order Numerics
+\li Intensity Volume Histogram
+\li Co-occurence Based Features
+
+After selecting the features, we need to configure the features. We start with the "Intenstiy Volume Histogram" Features. Because this Feature class makes an uncommon use of the internal histogram, it makes sense to set the histogram parameter for this feature individually. To do so, click on the "+" next to the feature class name. You should see a list of feature specific parameter. Activate the following parameter and set them to the given parameter: 
+\li ivoh::minimum 159.5
+\li ivoh::maximum 900.5
+\li ivoh::binsize 1.0
+This configures a histogram that starts from 160 and ranges to 900 with a binsize of 1. Since the minimum and maximum parameter specify the borders of the histogram, we added /subtracted the half of the binsize, so that the middle of the bins will be on a integer. 
+
+After this step switch to the "Configuration Parameter" panel. Select the default parameters for the histogram: 
+\li Minimum Intensity 160
+\li Maximum Intensity 900
+\li Number of Bins 32
+You will recognize that we chose a quite different setting for the histogram this time. Instead of the histogram binsize, we selected the number of bins. Don't forget to activate the features. 
+
+As we will calculate multiple features, also activate the "Encode Parameter in Name" option. After this, you can enable the feature calculation by pressing "Execute". You should see the results of the feature calculation process in the table below the configuration list. 
+
+We will now calculate the Co-occurence based feature with a different number of bins. For this, change the "Number of Bins" to 64, and deselect all features except the "Co-occurence based Features". In order to keep the previous results, execute the algorithm this time using the button "Execute & Append". The results will be appended to the results shown at the table in the bottom. 
+
+Now select a different image and repeat the calculation of the Co-occurence feature with a bin number of 64. Then reselect the "First Order Numberics" and "Intensity Volume Histogram" again and set the number of Bins back to 32. You don't need to recalculate "Volumetric Features" as these features are based on the shape and therefore won't change if only the image is changed. 
+
+You will now have a long list of features. To further process these features, press the "Table to Clipboard" button. You can now paste the results in your favourit editor or statistic program and perfom the analysis of the radiomic study. 
+
+To give you some ideas how the results look like, here are some results from our experiment. If you used the same image and made a similar mask, you should obtain similar results, although small differences might be based on variations of the segmentation:
+\li Pic3D__Resampled;Bone__Resampled__MaskRange;Co-occurenced Based Features::Min-160_Max-900_Bins-64_Range-1::Mean Sum Average;52.5338
+\li Pic3D__Resampled;Bone__Resampled__MaskRange;Co-occurenced Based Features::Min-160_Max-900_Bins-32_Range-1::Mean Sum Average;26.7659
+\li Pic3D__Resampled__LoG__Sigma-1;Bone__Resampled__MaskRange;Co-occurenced Based Features::Min-160_Max-900_Bins-64_Range-1::Overall Sum Average;2
+\li Pic3D__Resampled__LoG__Sigma-1;Bone__Resampled__MaskRange;Co-occurenced Based Features::Min-160_Max-900_Bins-32_Range-1::Overall Sum Average;2
+\li Pic3D__Resampled;Bone__Resampled__MaskRange;First Order Numeric::Min-160_Max-900_Bins-32::Mean;420.761
+\li Pic3D__Resampled__LoG__Sigma-1;Bone__Resampled__MaskRange;First Order Numeric::Min-160_Max-900_Bins-32::Mean;-137.746
+
+You can see that the parameters used as well as image used have a clear impact on the final features. You can also see how the name of the image, the mask, and the parameters are encoded so that you are able to reproduce how the results were obtained.
+
+
+
+
+*/

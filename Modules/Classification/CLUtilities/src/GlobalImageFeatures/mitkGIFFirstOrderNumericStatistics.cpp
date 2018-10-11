@@ -166,8 +166,10 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
     passedValues += actualValues;
   }
   double p10 = percentiles[1];
-  double p25idx = params.quantifier->IntensityToIndex(percentiles[4]);
-  double p75idx = params.quantifier->IntensityToIndex(percentiles[14]);
+  //double p25idx = params.quantifier->IntensityToIndex(percentiles[4]);
+  //double p75idx = params.quantifier->IntensityToIndex(percentiles[14]);
+  double p25idx = percentiles[4];
+  double p75idx = percentiles[14];
   double p90 = percentiles[17];
 
   double mean = sum / (numberOfVoxels);
@@ -240,7 +242,7 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   double kurtosis = sumValueMinusMeanFour / numberOfVoxels / variance / variance;
   double interquantileRange = p75idx - p25idx;
   double coefficientOfVariation = std::sqrt(variance) / mean;
-  double quantileCoefficientOfDispersion = (p75idx - p25idx) / (p75idx + p25idx + 2);
+  double quantileCoefficientOfDispersion = (p75idx - p25idx) / (p75idx + p25idx);
   double coveredImageRange = (maximum - minimum)/ (absoluteMaximum - absoluteMinimum) ;
 
   featureList.push_back(std::make_pair(params.prefix + "Mean", mean));

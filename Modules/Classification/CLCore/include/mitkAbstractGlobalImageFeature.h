@@ -147,6 +147,11 @@ public:
   /**
   * \brief Calculates the feature of this abstact interface. Does not necessarily considers the parameter settings.
   */
+  virtual void CalculateFeaturesSliceWiseUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, int sliceID, FeatureListType &featureList);
+
+  /**
+  * \brief Calculates the feature of this abstact interface. Does not necessarily considers the parameter settings.
+  */
   virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList) = 0;
 
   /**
@@ -279,6 +284,7 @@ private:
   int m_Direction = 0;
 
   bool m_IgnoreMask = false;
+  bool m_CalculateWithParameter = false;
 
   mitk::Image::Pointer m_MorphMask = nullptr;
 //#endif // Skip Doxygen

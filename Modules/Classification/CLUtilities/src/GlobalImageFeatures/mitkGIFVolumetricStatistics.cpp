@@ -260,17 +260,22 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
   //This is the definition used by Aertz. However, due to 2/3 this feature is not demensionless. Use compactness3 instead.
 
   double compactness2 = 36 * pi*pixelVolume*pixelVolume / meshSurf / meshSurf / meshSurf;
+  double compactness2MeshMesh = 36 * pi*meshVolume*meshVolume / meshSurf / meshSurf / meshSurf;
   double compactness2Pixel = 36 * pi*pixelVolume*pixelVolume / pixelSurface / pixelSurface / pixelSurface;
   double compactness3 = pixelVolume / (std::sqrt(pi) * std::pow(meshSurf, 3.0 / 2.0));
+  double compactness3MeshMesh = meshVolume / (std::sqrt(pi) * std::pow(meshSurf, 3.0 / 2.0));
   double compactness3Pixel = pixelVolume / (std::sqrt(pi) * std::pow(pixelSurface, 3.0 / 2.0));
 
   double sphericity = std::pow(pi, 1 / 3.0) *std::pow(6 * pixelVolume, 2.0 / 3.0) / meshSurf;
+  double sphericityMesh = std::pow(pi, 1 / 3.0) *std::pow(6 * meshVolume, 2.0 / 3.0) / meshSurf;
   double sphericityPixel = std::pow(pi, 1 / 3.0) *std::pow(6 * pixelVolume, 2.0 / 3.0) / pixelSurface;
   double surfaceToVolume = meshSurf / meshVolume;
   double surfaceToVolumePixel = pixelSurface / pixelVolume;
   double sphericalDisproportion = meshSurf / 4 / pi / std::pow(3.0 / 4.0 / pi * pixelVolume, 2.0 / 3.0);
+  double sphericalDisproportionMesh = meshSurf / 4 / pi / std::pow(3.0 / 4.0 / pi * meshVolume, 2.0 / 3.0);
   double sphericalDisproportionPixel = pixelSurface / 4 / pi / std::pow(3.0 / 4.0 / pi * pixelVolume, 2.0 / 3.0);
   double asphericity = std::pow(1.0/compactness2, (1.0 / 3.0)) - 1;
+  double asphericityMesh = std::pow(1.0 / compactness2MeshMesh, (1.0 / 3.0)) - 1;
   double asphericityPixel = std::pow(1.0/compactness2Pixel, (1.0 / 3.0)) - 1;
 
   //Calculate center of mass shift
@@ -405,11 +410,16 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
   featureList.push_back(std::make_pair(prefix + "Surface (mesh based)",meshSurf));
   featureList.push_back(std::make_pair(prefix + "Surface to volume ratio (mesh based)",surfaceToVolume));
   featureList.push_back(std::make_pair(prefix + "Sphericity (mesh based)",sphericity));
+  featureList.push_back(std::make_pair(prefix + "Sphericity (mesh, mesh based)", sphericityMesh));
   featureList.push_back(std::make_pair(prefix + "Asphericity (mesh based)", asphericity));
+  featureList.push_back(std::make_pair(prefix + "Asphericity (mesh, mesh based)", asphericityMesh));
   featureList.push_back(std::make_pair(prefix + "Compactness 1 (mesh based)", compactness3));
   featureList.push_back(std::make_pair(prefix + "Compactness 1 old (mesh based)" ,compactness1));
   featureList.push_back(std::make_pair(prefix + "Compactness 2 (mesh based)",compactness2));
+  featureList.push_back(std::make_pair(prefix + "Compactness 1 (mesh, mesh based)", compactness3MeshMesh));
+  featureList.push_back(std::make_pair(prefix + "Compactness 2 (mesh, mesh based)", compactness2MeshMesh));
   featureList.push_back(std::make_pair(prefix + "Spherical disproportion (mesh based)", sphericalDisproportion));
+  featureList.push_back(std::make_pair(prefix + "Spherical disproportion (mesh, mesh based)", sphericalDisproportionMesh));
   featureList.push_back(std::make_pair(prefix + "Surface to volume ratio (voxel based)", surfaceToVolumePixel));
   featureList.push_back(std::make_pair(prefix + "Sphericity (voxel based)", sphericityPixel));
   featureList.push_back(std::make_pair(prefix + "Asphericity (voxel based)", asphericityPixel));

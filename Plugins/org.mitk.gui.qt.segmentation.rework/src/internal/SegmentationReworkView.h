@@ -60,12 +60,8 @@ protected:
 
   virtual void SetFocus() override;
 
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-                                  const QList<mitk::DataNode::Pointer> &nodes) override;
 
   /// \brief Called when the user clicks the GUI button
-  void DoImageProcessing();
   void CreateNewSegmentationC();
 
   void CleanDicomFolder();

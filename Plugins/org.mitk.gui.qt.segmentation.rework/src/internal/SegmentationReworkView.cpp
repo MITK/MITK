@@ -251,22 +251,6 @@ void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArra
   m_Controls.chartWidget->SetYAxisLabel("similarity in percent");
 }
 
-void SegmentationReworkView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
-  const QList<mitk::DataNode::Pointer> &nodes)
-{
-  // iterate all selected objects, adjust warning visibility
-  foreach(mitk::DataNode::Pointer node, nodes)
-  {
-    if (node.IsNotNull() && dynamic_cast<mitk::Image *>(node->GetData()))
-    {
-      m_Controls.labelWarning->setVisible(false);
-      return;
-    }
-  }
-
-  m_Controls.labelWarning->setVisible(true);
-}
-
 void SegmentationReworkView::UploadNewSegmentation()
 {
   boost::uuids::random_generator generator;

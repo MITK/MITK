@@ -64,7 +64,7 @@ pplx::task<void> mitk::RESTClient::Get(utility::string_t filePath, utility::stri
 }
 
 
-pplx::task<void> mitk::RESTClient::Post(utility::string_t uri, utility::string_t contentType, utility::string_t filePath)
+pplx::task<void> mitk::RESTClient::Post(utility::string_t uri, utility::string_t filePath)
 {
   // this is the working stow-rs request which supports just one dicom file packed into a multipart message
   std::basic_ifstream<unsigned char> input(filePath, std::ios::binary);

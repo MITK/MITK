@@ -130,5 +130,5 @@ pplx::task<void> mitk::DICOMWeb::StowRS(utility::string_t filePath, std::string 
   MitkUriBuilder builder(U("rs/studies"));
   builder.append_path(mitk::RESTUtil::convertToTString(studyUID));
 
-  return Post(builder.to_string(), U("multipart/related; type='application/dicom'; boundary='boundary'"), filePath);
+  return Post(builder.to_string(), filePath);
 }

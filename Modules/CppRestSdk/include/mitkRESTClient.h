@@ -47,7 +47,7 @@ namespace mitk
                        utility::string_t contentType,
                        concurrency::streams::basic_istream<unsigned char> fileStream);
 
-    pplx::task<void> Post(utility::string_t uri, utility::string_t contentType, utility::string_t filePath);
+    pplx::task<void> Post(utility::string_t uri, utility::string_t filePath);
     pplx::task<void> Get(const utility::string_t filePath, utility::string_t uri);
 
   protected:

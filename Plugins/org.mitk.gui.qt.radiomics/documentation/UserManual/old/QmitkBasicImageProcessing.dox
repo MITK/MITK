@@ -1,0 +1,126 @@
+/**
+\page org_mitk_views_basicimageprocessing The Basic Image Processing Plugin
+
+\imageMacro{QmitkBasicImageProcessing_ImageProcessing_48.png,"Icon of the Basic Image Processing Plugin",2.00}
+
+\tableofcontents
+
+\section QmitkBasicImageProcessingUserManualSummary Summary
+
+This view provides an easy interface to fundamental image preprocessing and enhancement filters.
+It offers filter operations on 3D and 4D images in the areas of noise suppression, morphological operations, edge detection and image arithmetics, 
+as well as image inversion and downsampling.
+
+Please see \ref QmitkBasicImageProcessingUserManualOverview for more detailed information on usage and supported filters.
+If you encounter problems using the view, please have a look at the \ref QmitkBasicImageProcessingUserManualTrouble page.
+
+\section QmitkBasicImageProcessingUserManualOverview Overview
+
+This view provides an easy interface to fundamental image preprocessing and image enhancement filters.
+It offers a variety of filter operations in the areas of noise suppression, morphological operations, edge detection and image arithmetics.
+Currently the view can be used with all 3D and 4D image types loadable by MITK.
+2D image support will be added in the future.
+All filters are encapsulated from the Insight Segmentation and Registration Toolkit (ITK, www.itk.org). 
+
+\imageMacro{QmitkBasicImageProcessing_BIP_Overview.png,"MITK with the Basic Image Processing view",16.00}
+
+This document will tell you how to use this view, but it is assumed that you already know how to use MITK in general.
+
+\section QmitkBasicImageProcessingUserManualFilters Filters
+
+This section will not describe the fundamental functioning of the single filters in detail, though.
+If you want to know more about a single filter, please have a look at http://www.itk.org/Doxygen316/html/classes.html 
+or in any good digital image processing book. For total denoising filter, please see Tony F. Chan et al., "The digital TV filter and nonlinear denoising".
+
+Available filters are:
+
+<H2>\a Single image operations</H2>
+
+<ul>
+<li><b>Noise Suppression</b></li>
+  <ul>
+  <li> Gaussian Denoising</li>
+  <li> Median Filtering</li>
+  <li> Total Variation Denoising</li>
+  </ul>
+  
+<li><b>Morphological Operations</b></li>
+  <ul>
+  <li> Dilation</li>
+  <li> Erosion</li>
+  <li> Opening</li>
+  <li> Closing</li>
+  </ul>
+  
+<li><b>%Edge Detection</b></li>
+  <ul>
+  <li> Gradient Image</li>
+  <li> Laplacian Operator (Second Derivative)</li>
+  <li> Sobel Operator</li>
+  </ul>
+  
+<li><b>Misc</b></li>
+  <ul>
+  <li> Threshold </li>
+  <li> Image Inversion</li>
+  <li> Downsampling (isotropic)</li>  
+  </ul>
+</ul>
+  
+<H2>\a Dual image operations</H2>
+
+<ul>  
+<li><b>Image Arithmetics</b></li>
+  <ul>
+  <li> Add two images</li>
+  <li> Subtract two images</li>
+  <li> Multiply two images</li>
+  <li> Divide two images</li>
+  </ul>
+  
+  <li><b>Binary Operations</b></li>
+  <ul>
+  <li> Logical AND</li>
+  <li> Logical OR</li>
+  <li> Logical XOR</li>
+  </ul>
+</ul> 
+
+\section QmitkBasicImageProcessingUserManualUsage Usage
+
+All you have to do to use a filter is to:
+<ul>
+<li> Load an image into MITK</li>
+<li> Select it in data manager
+<li> Select which filter you want to use via the drop down list</li>
+<li> Press the execute button</li>
+</ul>
+A busy cursor appeares; when it vanishes, the operation is completed. Your filtered image is displayed and selected for further processing.
+(If the  checkbox "Hide original image" is not selected, you will maybe not see the filter result imideately, 
+because your filtered image is possibly hidden by the original.)
+
+For two image operations, please make sure that the correct second image is selected in the drop down menu, and the image order is correct.
+For sure, image order only plays a role for image subtraction and division. These are conducted (Image1 - Image2) or (Image1 / Image2), respectively.
+
+Please Note: When you select a 4D image, you can select the time step for the filter to work on via the time slider at the top of the GUI.
+The 3D image at this time step is extracted and processed. The result will also be a 3D image.
+This means, a true 4D filtering is not yet supported.
+
+\section QmitkBasicImageProcessingUserManualTrouble Troubleshooting
+
+<B>I get an error when using a filter on a 2D image.</B><BR>
+2D images are not yet supported...
+
+<B>I use a filter on a 4D image, and the output is 3D.</B><BR>
+When you select a 4D image, you can select the time step for the filter to work on via the time slider at the top of the GUI.
+The 3D image at this time step is extracted and processed. The result will also be a 3D image.
+This means, a true 4D filtering is not supported by now.
+
+<B>A filter crashes during execution.</B><BR>
+Maybe your image is too large. Some filter operations, like derivatives, take a lot of memory.
+Try downsampling your image first. 
+
+<B>All other problems.</B><BR>
+Please report to the MITK mailing list.
+See http://www.mitk.org/wiki/Mailinglist on how to do this.
+*/

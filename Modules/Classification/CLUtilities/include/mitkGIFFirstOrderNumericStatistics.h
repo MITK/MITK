@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkGIFFirstOrderStatistics_h
-#define mitkGIFFirstOrderStatistics_h
+#ifndef mitkGIFFirstNumericOrderStatistics_h
+#define mitkGIFFirstNumericOrderStatistics_h
 
 #include <mitkAbstractGlobalImageFeature.h>
 #include <mitkBaseData.h>
@@ -153,4 +153,4 @@ namespace mitk
 
   };
 }
-#endif //mitkGIFFirstOrderStatistics_h
+#endif //mitkGIFFirstNumericOrderStatistics_h

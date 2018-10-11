@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.radiomicsstatistic"
+          name="Radiomics Statistic"
+          class="QmitkRadiomicsStatistic"
+          category="Radiomics"
+          icon="resources/bar-chart-radiomics.svg" >
+      <description>Calculate Radiomics Features from Images</description>
+      <keywordReference id="org.mitk.views.radiomicsstatistic.ViewKeyword"/>
+    </view>
+    <view id="org.mitk.views.radiomicstransform"
+          name="Radiomics Transformation"
+          class="QmitkRadiomicsTransformation"
+          category="Radiomics"
+          icon="resources/transformation-radiomics.svg" >
+      <description>Calculate Tranformations like LoG and Wavelet from Images</description>
+      <keywordReference id="org.mitk.views.radiomicstransform.ViewKeyword"/>
+    </view>
+    <view id="org.mitk.views.radiomicsarithmetric"
+          name="Radiomics Arithmetric"
+          class="QmitkRadiomicsArithmetric"
+          category="Radiomics"
+          icon="resources/arithmetric-radiomics.svg" >
+      <description>Calculate Arithmetic Operations for Images</description>
+      <keywordReference id="org.mitk.views.radiomicsarithmetric.ViewKeyword"/>
+    </view>
+    <view id="org.mitk.views.radiomicsmaskprocessing"
+          name="Radiomics Mask Processing"
+          class="QmitkRadiomicsMaskProcessing"
+          category="Radiomics"
+          icon="resources/maskcleaning-radiomics.svg" >
+      <description>Processing Masks for Radiomics</description>
+      <keywordReference id="org.mitk.views.radiomicsmaskprocessing.ViewKeyword"/>
+    </view>
+  </extension>
+
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.views.radiomicsstatistic.ViewKeyword"  label="Radiomics" />
+    <keyword id="org.mitk.views.radiomicsstatistic.ViewKeyword"  label="Statistic" />
+    <keyword id="org.mitk.views.radiomicsstatistic.ViewKeyword"  label="Personalized Medicine" />
+    <keyword id="org.mitk.views.radiomicsstatistic.ViewKeyword"  label="Radiogenomic" />
+    
+    <keyword id="org.mitk.views.radiomicstransform.ViewKeyword"  label="Radiomics" />
+    <keyword id="org.mitk.views.radiomicstransform.ViewKeyword"  label="Transformation" />
+    <keyword id="org.mitk.views.radiomicstransform.ViewKeyword"  label="Personalized Medicine" />
+    <keyword id="org.mitk.views.radiomicstransform.ViewKeyword"  label="Radiogenomic" />
+    <keyword id="org.mitk.views.radiomicstransform.ViewKeyword"  label="Laplacian of Gaussian" />
+    <keyword id="org.mitk.views.radiomicstransform.ViewKeyword"  label="LoG" />
+    <keyword id="org.mitk.views.radiomicstransform.ViewKeyword"  label="Wavelet" />
+    <keyword id="org.mitk.views.radiomicstransform.ViewKeyword"  label="Multiresolution" />
+    
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Add" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Addition" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Sub" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Subtract" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Arithmetric" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Radiomics" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Multiply" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Multiplication" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Divide" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Division" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Absolute" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Trigometric Functions" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Sinus" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Cosinus" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Tangents" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Square" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Sqrt" />
+    <keyword id="org.mitk.views.radiomicsarithmetric.ViewKeyword"  label="Square-Root" />
+    
+    <keyword id="org.mitk.views.radiomicsmaskprocessing.ViewKeyword"  label="Mask" />
+    <keyword id="org.mitk.views.radiomicsmaskprocessing.ViewKeyword"  label="Segmentation" />
+    <keyword id="org.mitk.views.radiomicsmaskprocessing.ViewKeyword"  label="Radiomics" />
+    <keyword id="org.mitk.views.radiomicsmaskprocessing.ViewKeyword"  label="Preprocessing" />
+    <keyword id="org.mitk.views.radiomicsmaskprocessing.ViewKeyword"  label="Outlier Detection" />
+    <keyword id="org.mitk.views.radiomicsmaskprocessing.ViewKeyword"  label="Mask Cleaning" />
+    <keyword id="org.mitk.views.radiomicsmaskprocessing.ViewKeyword"  label="Personalized Medicine" />
+  </extension>
+</plugin>

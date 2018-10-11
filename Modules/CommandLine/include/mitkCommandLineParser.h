@@ -240,6 +240,13 @@ public:
                              const std::string &argLabel,
                              const std::string &argHelp);
 
+
+  /**
+  * Returns the vector of current Command line Parameter
+  *
+  */
+  std::vector < std::map<std::string, us::Any> > getArgumentList();
+
   /**
  * Sets a custom regular expression for validating argument parameters. The method
  * <code>errorString()</code> can be used the get the last error description.
@@ -379,5 +386,7 @@ private:
   std::string ParameterGroupName;
   std::string ParameterGroupDescription;
 };
+
+
 
 #endif

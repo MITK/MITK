@@ -48,6 +48,8 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 
   qRegisterMetaType< std::vector<std::string> >("std::vector<std::string>");
 
+  m_Controls.chartWidget->setVisible(false);
+
   connect(m_Controls.buttonUpload, &QPushButton::clicked, this, &SegmentationReworkView::UploadNewSegmentation);
   connect(m_Controls.buttonNewSeg, &QPushButton::clicked, this, &SegmentationReworkView::CreateNewSegmentationC);
   connect(m_Controls.cleanDicomBtn, &QPushButton::clicked, this, &SegmentationReworkView::CleanDicomFolder);
@@ -192,9 +194,21 @@ void SegmentationReworkView::RESTGetCallback(const SegmentationReworkREST::Dicom
 
   std::vector<pplx::task<std::string>> tasks;
   auto imageSeriesTask = m_DICOMWeb->WadoRS(utility::conversions::to_string_t(folderPathSeries), dto.studyUID, dto.imageSeriesUID);
-  auto segATask = m_DICOMWeb->WadoRS(folderPathSeg, dto.studyUID, dto.segSeriesUIDA);
+  
   tasks.push_back(imageSeriesTask);
-  tasks.push_back(segATask);
+
+  if (dto.segSeriesUIDList.size() > 0) {
+    for (std::string segSeriesUID : dto.segSeriesUIDList)
+    {
+      auto segTask = m_DICOMWeb->WadoRS(folderPathSeg, dto.studyUID, segSeriesUID);
+      tasks.push_back(segTask);
+    }
+  }
+  else {
+    auto segATask = m_DICOMWeb->WadoRS(folderPathSeg, dto.studyUID, dto.segSeriesUIDA);
+    tasks.push_back(segATask);
+  }
+
 
   auto joinTask = pplx::when_all(begin(tasks), end(tasks));
   auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) { InvokeLoadData(filePathList); });
@@ -209,10 +223,9 @@ void SegmentationReworkView::LoadData(std::vector<std::string> filePathList)
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(ds);
 
   // find data nodes
-
   m_Image = dataNodes->at(0);
   m_SegA = dataNodes->at(1);
-  if (dataNodes->size() == 3) {
+  if (dataNodes->size() > 2) {
     m_SegB = dataNodes->at(2);
   }
 }

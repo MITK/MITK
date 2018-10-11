@@ -33,6 +33,7 @@ public:
     std::string segInstanceUIDA;
     std::string segInstanceUIDB;
     std::string srSeriesUID;
+    std::vector<std::string> segSeriesUIDList;
     std::vector<double> simScoreArray;
     int minSliceStart;
     std::string groundTruth;

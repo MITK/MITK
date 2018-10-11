@@ -47,6 +47,8 @@ public:
   void RESTPutCallback(const SegmentationReworkREST::DicomDTO& dto);
   void RESTGetCallback(const SegmentationReworkREST::DicomDTO& dto);
 
+  void RESTGetMultipleSegCallback(const SegmentationReworkREST::DicomDTO& dto);
+
   void UpdateChartWidget();
   void LoadData(std::vector<std::string> filePathList);
 

@@ -14,6 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <sstream>
+#include <iostream>
+
 #include "SegmentationReworkREST.h"
 #include <mitkCommon.h>
 #include <mitkRESTUtil.h>
@@ -39,7 +42,7 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
   // IHE Invoke Image Display style
   auto requestType = httpParams.find(U("requestType"));
 
-  if (requestType != httpParams.end() && requestType->second == L"IMAGE_SEG")
+  if (requestType != httpParams.end() && requestType->second == U("IMAGE_SEG"))
   {
     try
     {
@@ -61,10 +64,32 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
     catch (std::out_of_range& e) {
       message.reply(MitkRestStatusCodes::BadRequest, "oh man, that was not expected: " + std::string(e.what()));
     }
-  }
-  else if (requestType != httpParams.end() && requestType->second == L"SEG_EVALUATION") 
+  } else if (requestType != httpParams.end() && requestType->second == U("SEG_EVALUATION")) 
   {
     // TODO: implement PUT handling as GET
+  } else if (requestType != httpParams.end() && requestType->second == U("IMAGE_SEG_LIST"))
+  {
+    auto studyUID = httpParams.at(U("studyUID"));
+    auto imageSeriesUID = httpParams.at(U("imageSeriesUID"));
+    auto segSeriesUIDList = httpParams.at(U("segSeriesUIDList"));
+
+    DicomDTO dto;
+    dto.imageSeriesUID = mitk::RESTUtil::convertToUtf8(imageSeriesUID);
+    dto.studyUID = mitk::RESTUtil::convertToUtf8(studyUID);
+
+    auto segSeriesUIDListUtf8 = mitk::RESTUtil::convertToUtf8(segSeriesUIDList);
+  
+    std::istringstream f(segSeriesUIDListUtf8);
+    std::string s;
+    while (getline(f, s, ',')) {
+      dto.segSeriesUIDList.push_back(s);
+    }
+
+    m_GetImageSegCallback(dto);
+
+    MitkResponse response(MitkRestStatusCodes::OK);
+    response.set_body("Sure, i got you.. have an awesome day");
+    message.reply(response);
   } else
   {
     message.reply(MitkRestStatusCodes::BadRequest, "Oh man, i can only deal with 'requestType' = 'IMAGE+SEG'...");

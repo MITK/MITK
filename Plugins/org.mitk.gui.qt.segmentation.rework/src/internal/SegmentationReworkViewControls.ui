@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>465</width>
-    <height>673</height>
+    <height>691</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -20,19 +20,6 @@
    <string>QmitkTemplate</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QLabel" name="labelWarning">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
-     </property>
-     <property name="text">
-      <string>Please select an image!</string>
-     </property>
-    </widget>
-   </item>
    <item>
     <widget class="QLabel" name="labelSegA">
      <property name="text">

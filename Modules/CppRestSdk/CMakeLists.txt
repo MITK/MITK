@@ -6,4 +6,6 @@ if(MITK_USE_CppRestSdk)
     WARNINGS_NO_ERRORS 
   )
 
+  target_link_libraries(${MODULE_TARGET} PRIVATE cpprestsdk::cpprest)
+
 endif(MITK_USE_CppRestSdk)

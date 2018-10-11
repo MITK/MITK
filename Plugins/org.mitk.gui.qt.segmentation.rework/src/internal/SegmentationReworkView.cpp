@@ -53,6 +53,7 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.buttonUpload, &QPushButton::clicked, this, &SegmentationReworkView::UploadNewSegmentation);
   connect(m_Controls.buttonNewSeg, &QPushButton::clicked, this, &SegmentationReworkView::CreateNewSegmentationC);
   connect(m_Controls.cleanDicomBtn, &QPushButton::clicked, this, &SegmentationReworkView::CleanDicomFolder);
+  connect(m_Controls.restartConnection, &QPushButton::clicked, this, &SegmentationReworkView::RestartConnection);
 
   m_downloadBaseDir = std::experimental::filesystem::path("/temp/");
   m_tempSegDir = std::experimental::filesystem::path("/tempSeg/");
@@ -87,6 +88,15 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 
   utility::string_t pacsHost = U("http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE");
   m_DICOMWeb = new mitk::DICOMWeb(pacsHost);
+}
+
+void SegmentationReworkView::RestartConnection() 
+{
+  auto host = m_Controls.dcm4cheeHostValue->text();
+  std::string url = host.toStdString() + "/dcm4chee-arc/aets/DCM4CHEE";
+
+  m_DICOMWeb = new mitk::DICOMWeb(utility::conversions::to_string_t(url));
+  MITK_INFO << "Listening for requests at: " << url;
 }
 
 void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::DicomDTO &dto)

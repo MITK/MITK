@@ -133,7 +133,7 @@ mitk::SemanticTypes::ControlPoint mitk::FindClosestControlPoint(const SemanticTy
   }
 
   double THRESHOLD_DISTANCE_IN_DAYS = 30.0;
-  if (std::abs(closestDistanceInDays) < THRESHOLD_DISTANCE_IN_DAYS)
+  if (closestDistanceInDays < THRESHOLD_DISTANCE_IN_DAYS)
   {
     return closestControlPoint;
   }
@@ -199,5 +199,5 @@ double CalculateDistanceInDays(const mitk::SemanticTypes::ControlPoint& leftCont
   double secondsPerDay = 60 * 60 * 24;
   double timeDifferenceInDays = std::difftime(leftTime, rightTime) / secondsPerDay;
 
-  return timeDifferenceInDays;
+  return std::abs(timeDifferenceInDays);
 }

@@ -69,6 +69,8 @@ protected:
 
 private:
 
+  std::string getNextFolderName();
+
   void SetSimilarityGraph(std::vector<double> simScoreArray, int sliceMinStart);
   std::unique_ptr<SegmentationReworkREST> m_HttpHandler;
   mitk::DICOMWeb* m_DICOMWeb;
@@ -85,6 +87,7 @@ private:
   std::string m_GroundTruth;
 
   QWidget* m_Parent;
+  int counter;
 };
 
 #endif // SegmentationReworkView_h

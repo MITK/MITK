@@ -29,11 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegTool2D.h"
 #include "mitkToolManagerProvider.h"
 
-#include <boost/uuid/uuid.hpp>            // uuid class
-#include <boost/uuid/uuid_generators.hpp> // generators
-#include <boost/uuid/uuid_io.hpp> 
-#include <boost/lexical_cast.hpp>
-
 const std::string SegmentationReworkView::VIEW_ID = "org.mitk.views.segmentationreworkview";
 
 void SegmentationReworkView::SetFocus() {}
@@ -43,6 +38,7 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
   m_Parent = parent;
+  counter = 0;
 
   qRegisterMetaType< std::vector<std::string> >("std::vector<std::string>");
 
@@ -88,6 +84,13 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   utility::string_t pacsHost = U("http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE");
   m_DICOMWeb = new mitk::DICOMWeb(pacsHost);
   MITK_INFO << "requests to pacs are sent to: " << utility::conversions::to_utf8string(pacsHost);
+}
+
+std::string SegmentationReworkView::getNextFolderName() {
+  counter++;
+  std::string name = std::string("foldername") + std::to_string(counter);
+  MITK_INFO << name;
+  return name;
 }
 
 void SegmentationReworkView::RestartConnection()
@@ -150,13 +153,12 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
       MITK_INFO << "seg B series UID " << segSeriesUIDB;
 
       MITK_INFO << "Load related dicom series ...";
-      boost::uuids::random_generator generator;
 
-      std::string folderPathSeries = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
+      std::string folderPathSeries = std::experimental::filesystem::path(m_downloadBaseDir).append(getNextFolderName()).string() + "/";
       std::experimental::filesystem::create_directory(folderPathSeries);
 
-      std::string pathSegA = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
-      std::string pathSegB = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
+      std::string pathSegA = std::experimental::filesystem::path(m_downloadBaseDir).append(getNextFolderName()).string() + "/";
+      std::string pathSegB = std::experimental::filesystem::path(m_downloadBaseDir).append(getNextFolderName()).string() + "/";
 
       auto folderPathSegA = utility::conversions::to_string_t(pathSegA);
       auto folderPathSegB = utility::conversions::to_string_t(pathSegB);
@@ -193,14 +195,16 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 
 void SegmentationReworkView::RESTGetCallback(const SegmentationReworkREST::DicomDTO &dto) 
 {
-  boost::uuids::random_generator generator;
-
-  std::string folderPathSeries = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
+  std::string folderPathSeries = std::experimental::filesystem::path(m_downloadBaseDir).append(getNextFolderName()).string() + "/";
   std::experimental::filesystem::create_directory(folderPathSeries);
 
-  std::string pathSeg = std::experimental::filesystem::path(m_downloadBaseDir).append(boost::uuids::to_string(generator())).string() + "/";
+  MITK_INFO << folderPathSeries;
+
+  std::string pathSeg = std::experimental::filesystem::path(m_downloadBaseDir).append(getNextFolderName()).string() + "/";
   auto folderPathSeg = utility::conversions::to_string_t(pathSeg);
   std::experimental::filesystem::create_directory(pathSeg);
+
+  MITK_INFO << pathSeg;
 
   std::vector<pplx::task<std::string>> tasks;
   auto imageSeriesTask = m_DICOMWeb->WadoRS(utility::conversions::to_string_t(folderPathSeries), dto.studyUID, dto.imageSeriesUID);
@@ -263,9 +267,7 @@ void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArra
 
 void SegmentationReworkView::UploadNewSegmentation()
 {
-  boost::uuids::random_generator generator;
-
-  std::string folderPathSeg = std::experimental::filesystem::path(m_tempSegDir).append(boost::uuids::to_string(generator())).string() + "/";
+  std::string folderPathSeg = std::experimental::filesystem::path(m_tempSegDir).append(getNextFolderName()).string() + "/";
   std::experimental::filesystem::create_directory(folderPathSeg);
 
   const std::string savePath = folderPathSeg + m_SegC->GetName() + ".dcm";

@@ -92,6 +92,16 @@ namespace mitk
     virtual void SetCrosshair(StateMachineAction *, InteractionEvent *);
 
     /**
+     * \brief Increases the time step in 3d+t data
+     */
+    virtual void IncreaseTimeStep(StateMachineAction *, InteractionEvent *);
+
+    /**
+     * \brief Decreases the time step in 3d+t data
+     */
+    virtual void DecreaseTimeStep(StateMachineAction *, InteractionEvent *);
+
+    /**
      * \brief Performs zooming relative to mouse/pointer movement.
      *
      * Behavior is determined by \see m_ZoomDirection and \see m_ZoomFactor.

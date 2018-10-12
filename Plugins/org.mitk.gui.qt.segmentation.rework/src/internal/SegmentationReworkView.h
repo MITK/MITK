@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "SegmentationReworkREST.h"
 #include <mitkDICOMWeb.h>
-#include <experimental/filesystem>
 
 /**
   \brief SegmentationReworkView
@@ -77,8 +76,8 @@ private:
 
   std::string m_CurrentStudyUID;
 
-  std::experimental::filesystem::path m_downloadBaseDir;
-  std::experimental::filesystem::path m_tempSegDir;
+  std::string m_downloadBaseDir;
+  std::string m_tempSegDir;
 
   mitk::DataNode::Pointer m_Image;
   mitk::DataNode::Pointer m_SegA;

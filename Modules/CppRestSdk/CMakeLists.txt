@@ -5,7 +5,9 @@ if(MITK_USE_CppRestSdk)
     PACKAGE_DEPENDS Qt5|Core
     WARNINGS_NO_ERRORS 
   )
+  find_package(OpenSSL REQUIRED)
 
   target_link_libraries(${MODULE_TARGET} PRIVATE cpprestsdk::cpprest)
+  target_link_libraries(${MODULE_TARGET} PUBLIC OpenSSL::SSL)
 
 endif(MITK_USE_CppRestSdk)

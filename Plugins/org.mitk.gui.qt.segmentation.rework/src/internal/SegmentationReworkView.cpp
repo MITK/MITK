@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qmitk
 #include "SegmentationReworkView.h"
 
+#include <itkFileTools.h>
+
 // Qt
 #include <QMessageBox>
 
@@ -44,24 +46,25 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 
   m_Controls.chartWidget->setVisible(false);
   m_Controls.verticalWidget->setVisible(false);
+  m_Controls.cleanDicomBtn->setVisible(false);
 
   connect(m_Controls.buttonUpload, &QPushButton::clicked, this, &SegmentationReworkView::UploadNewSegmentation);
   connect(m_Controls.buttonNewSeg, &QPushButton::clicked, this, &SegmentationReworkView::CreateNewSegmentationC);
   connect(m_Controls.cleanDicomBtn, &QPushButton::clicked, this, &SegmentationReworkView::CleanDicomFolder);
   connect(m_Controls.restartConnection, &QPushButton::clicked, this, &SegmentationReworkView::RestartConnection);
 
-  m_downloadBaseDir = std::experimental::filesystem::path("/temp/");
-  m_tempSegDir = std::experimental::filesystem::path("/tempSeg/");
+  m_downloadBaseDir = mitk::IOUtil::GetTempPath();
+  m_tempSegDir = "/tempSeg/";
 
-  if (!std::experimental::filesystem::exists(m_downloadBaseDir))
+  if (!itksys::SystemTools::FileExists(m_downloadBaseDir))
   {
-    std::experimental::filesystem::create_directory(m_downloadBaseDir);
+    itk::FileTools::CreateDirectory(m_downloadBaseDir.c_str());
   }
 
-  if (!std::experimental::filesystem::exists(m_tempSegDir))
-  {
-    std::experimental::filesystem::create_directory(m_tempSegDir);
-  }
+  //if (!std::experimental::filesystem::exists(m_tempSegDir))
+  //{
+  //  std::experimental::filesystem::create_directory(m_tempSegDir);
+  //}
 
   utility::string_t port = U("2020");
   utility::string_t address = U("http://127.0.0.1:");
@@ -154,17 +157,17 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 
       MITK_INFO << "Load related dicom series ...";
 
-      std::string folderPathSeries = std::experimental::filesystem::path(m_downloadBaseDir).append(getNextFolderName()).string() + "/";
-      std::experimental::filesystem::create_directory(folderPathSeries);
+      std::string folderPathSeries = m_downloadBaseDir + getNextFolderName() + "/";
+      itk::FileTools::CreateDirectory(folderPathSeries);
 
-      std::string pathSegA = std::experimental::filesystem::path(m_downloadBaseDir).append(getNextFolderName()).string() + "/";
-      std::string pathSegB = std::experimental::filesystem::path(m_downloadBaseDir).append(getNextFolderName()).string() + "/";
+      std::string pathSegA = m_downloadBaseDir + getNextFolderName() + "/";
+      std::string pathSegB = m_downloadBaseDir + getNextFolderName() + "/";
 
       auto folderPathSegA = utility::conversions::to_string_t(pathSegA);
       auto folderPathSegB = utility::conversions::to_string_t(pathSegB);
 
-      std::experimental::filesystem::create_directory(pathSegA);
-      std::experimental::filesystem::create_directory(pathSegB);
+      itk::FileTools::CreateDirectory(pathSegA);
+      itk::FileTools::CreateDirectory(pathSegB);
 
       m_CurrentStudyUID = dto.studyUID;
 
@@ -178,10 +181,10 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 
       auto joinTask = pplx::when_all(begin(tasks), end(tasks));
       auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) {
-        auto fileNameA = std::experimental::filesystem::path(filePathList[1]).filename();
-        auto fileNameB = std::experimental::filesystem::path(filePathList[2]).filename();
-        m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + " " + QString::fromUtf8(fileNameA.string().c_str()));
-        m_Controls.labelSegB->setText(m_Controls.labelSegB->text() + " " + QString::fromUtf8(fileNameB.string().c_str()));
+        //auto fileNameA = std::experimental::filesystem::path(filePathList[1]).filename();
+        //auto fileNameB = std::experimental::filesystem::path(filePathList[2]).filename();
+        //m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + " " + QString::fromUtf8(fileNameA.string().c_str()));
+        //m_Controls.labelSegB->setText(m_Controls.labelSegB->text() + " " + QString::fromUtf8(fileNameB.string().c_str()));
         InvokeLoadData(filePathList);
       });
 
@@ -195,14 +198,14 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 
 void SegmentationReworkView::RESTGetCallback(const SegmentationReworkREST::DicomDTO &dto) 
 {
-  std::string folderPathSeries = std::experimental::filesystem::path(m_downloadBaseDir).append(getNextFolderName()).string() + "/";
-  std::experimental::filesystem::create_directory(folderPathSeries);
+  std::string folderPathSeries = m_downloadBaseDir + getNextFolderName() + "/";
+  itk::FileTools::CreateDirectory(folderPathSeries);
 
   MITK_INFO << folderPathSeries;
 
-  std::string pathSeg = std::experimental::filesystem::path(m_downloadBaseDir).append(getNextFolderName()).string() + "/";
+  std::string pathSeg = m_downloadBaseDir + getNextFolderName() + "/";
   auto folderPathSeg = utility::conversions::to_string_t(pathSeg);
-  std::experimental::filesystem::create_directory(pathSeg);
+  itk::FileTools::CreateDirectory(pathSeg);
 
   MITK_INFO << pathSeg;
 
@@ -267,8 +270,8 @@ void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArra
 
 void SegmentationReworkView::UploadNewSegmentation()
 {
-  std::string folderPathSeg = std::experimental::filesystem::path(m_tempSegDir).append(getNextFolderName()).string() + "/";
-  std::experimental::filesystem::create_directory(folderPathSeg);
+  std::string folderPathSeg = m_tempSegDir + getNextFolderName() + "/";
+  itk::FileTools::CreateDirectory(folderPathSeg);
 
   const std::string savePath = folderPathSeg + m_SegC->GetName() + ".dcm";
   //const std::string mimeType = mitk::IOMimeTypes::DICOM_MIMETYPE_NAME();
@@ -354,6 +357,6 @@ void SegmentationReworkView::CleanDicomFolder()
     return;
   }
 
-  std::experimental::filesystem::remove_all(m_downloadBaseDir);
-  std::experimental::filesystem::create_directory(m_downloadBaseDir);
+  //std::experimental::filesystem::remove_all(m_downloadBaseDir);
+  itk::FileTools::CreateDirectory(m_downloadBaseDir);
 }

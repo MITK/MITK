@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRESTClient.h"
 #include "mitkRESTUtil.h"
 
-#include <experimental/filesystem>
 #include <mitkCommon.h>
 
 mitk::RESTClient::RESTClient(utility::string_t url)

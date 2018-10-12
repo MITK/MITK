@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "SegmentationReworkREST.h"
 #include <mitkDICOMWeb.h>
-#include <filesystem>
+#include <experimental/filesystem>
 
 /**
   \brief SegmentationReworkView
@@ -57,9 +57,6 @@ protected:
   virtual void CreateQtPartControl(QWidget *parent) override;
 
   virtual void SetFocus() override;
-
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source, const QList<mitk::DataNode::Pointer> &nodes) override;
-
 
   /// \brief Called when the user clicks the GUI button
   void CreateNewSegmentationC();

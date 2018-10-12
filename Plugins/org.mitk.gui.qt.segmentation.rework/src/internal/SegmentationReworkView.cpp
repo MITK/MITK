@@ -98,10 +98,6 @@ void SegmentationReworkView::RestartConnection()
   MITK_INFO << "requests to pacs are sent to: " << url;
 }
 
-void SegmentationReworkView::OnSelectionChanged(berry::IWorkbenchPart::Pointer source, const QList<mitk::DataNode::Pointer> &nodes) {
-
-}
-
 void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::DicomDTO &dto)
 {
   SetSimilarityGraph(dto.simScoreArray, dto.minSliceStart);

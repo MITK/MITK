@@ -29,8 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegTool2D.h"
 #include "mitkToolManagerProvider.h"
 
-#include "mitkIOMimeTypes.h"
-
 #include <boost/uuid/uuid.hpp>            // uuid class
 #include <boost/uuid/uuid_generators.hpp> // generators
 #include <boost/uuid/uuid_io.hpp> 
@@ -88,15 +86,20 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 
   utility::string_t pacsHost = U("http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE");
   m_DICOMWeb = new mitk::DICOMWeb(pacsHost);
+  MITK_INFO << "requests to pacs are sent to: " << utility::conversions::to_utf8string(pacsHost);
 }
 
-void SegmentationReworkView::RestartConnection() 
+void SegmentationReworkView::RestartConnection()
 {
   auto host = m_Controls.dcm4cheeHostValue->text();
   std::string url = host.toStdString() + "/dcm4chee-arc/aets/DCM4CHEE";
 
   m_DICOMWeb = new mitk::DICOMWeb(utility::conversions::to_string_t(url));
-  MITK_INFO << "Listening for requests at: " << url;
+  MITK_INFO << "requests to pacs are sent to: " << url;
+}
+
+void SegmentationReworkView::OnSelectionChanged(berry::IWorkbenchPart::Pointer source, const QList<mitk::DataNode::Pointer> &nodes) {
+
 }
 
 void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::DicomDTO &dto)
@@ -269,8 +272,8 @@ void SegmentationReworkView::UploadNewSegmentation()
   std::experimental::filesystem::create_directory(folderPathSeg);
 
   const std::string savePath = folderPathSeg + m_SegC->GetName() + ".dcm";
-  const std::string mimeType = mitk::IOMimeTypes::DICOM_MIMETYPE_NAME();
-  mitk::IOUtil::Save(m_SegC->GetData(), mimeType, savePath);
+  //const std::string mimeType = mitk::IOMimeTypes::DICOM_MIMETYPE_NAME();
+  //mitk::IOUtil::Save(m_SegC->GetData(), mimeType, savePath);
 
   auto filePath = utility::conversions::to_string_t(savePath);
   try {

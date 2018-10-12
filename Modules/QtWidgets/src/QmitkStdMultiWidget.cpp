@@ -449,6 +449,8 @@ QmitkStdMultiWidget::~QmitkStdMultiWidget()
     textProp[i]->Delete();
     ren[i]->Delete();
   }
+
+  delete crosshairManager;
 }
 
 void QmitkStdMultiWidget::RemovePlanesFromDataStorage()

@@ -1,209 +1,208 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-  <class>SegmentationReworkViewControls</class>
-  <widget class="QWidget" name="SegmentationReworkViewControls">
-    <property name="geometry">
-      <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>465</width>
-        <height>691</height>
-      </rect>
-    </property>
-    <property name="minimumSize">
-      <size>
-        <width>0</width>
-        <height>0</height>
-      </size>
-    </property>
-    <property name="windowTitle">
-      <string>QmitkTemplate</string>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-        <layout class="QFormLayout" name="formLayout">
-          <item row="0" column="0">
-            <widget class="QLabel" name="dcm4cheeHostLabel">
-              <property name="text">
-                <string>dcm4chee host</string>
-              </property>
-            </widget>
-          </item>
-          <item row="0" column="1">
-            <widget class="QLineEdit" name="dcm4cheeHostValue">
-              <property name="placeholderText">
-                <string>example input: http://193.174.48.78:8090</string>
-              </property>
-            </widget>
-          </item>
-          <item row="1" column="1">
-            <widget class="QPushButton" name="restartConnection">
-              <property name="text">
-                <string>restart dcm4chee connection</string>
-              </property>
-            </widget>
-          </item>
-        </layout>
-      </item>
-      <item>
-        <widget class="QLabel" name="labelSegA">
-          <property name="text">
-            <string>Segmentation A:</string>
-          </property>
-        </widget>
-      </item>
-      <item>
-        <widget class="QLabel" name="labelSegB">
-          <property name="text">
-            <string>Segmentation B:</string>
-          </property>
-        </widget>
-      </item>
-      <item>
-        <widget class="QLabel" name="label">
-          <property name="text">
-            <string>ground truth:</string>
-          </property>
-        </widget>
-      </item>
-      <item>
-        <widget class="Line" name="line">
-          <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-          </property>
-        </widget>
-      </item>
-      <item>
-        <widget class="QmitkChartWidget" name="chartWidget" native="true">
-          <property name="minimumSize">
-            <size>
-              <width>0</width>
-              <height>400</height>
-            </size>
-          </property>
-          <property name="maximumSize">
-            <size>
-              <width>16777215</width>
-              <height>400</height>
-            </size>
-          </property>
-        </widget>
-      </item>
-      <item>
-        <widget class="Line" name="line_2">
-          <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-          </property>
-        </widget>
-      </item>
-      <item>
-        <widget class="QGroupBox" name="verticalGroupBox">
-          <property name="flat">
-            <bool>false</bool>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
-            <item>
-              <widget class="QGroupBox" name="groupBox">
-                <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                  </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                  <size>
-                    <width>0</width>
-                    <height>60</height>
-                  </size>
-                </property>
-                <property name="title">
-                  <string>Select segmentation basis</string>
-                </property>
-                <property name="flat">
-                  <bool>true</bool>
-                </property>
-                <layout class="QHBoxLayout" name="horizontalLayout">
-                  <property name="sizeConstraint">
-                    <enum>QLayout::SetDefaultConstraint</enum>
-                  </property>
-                  <item>
-                    <widget class="QRadioButton" name="radioA">
-                      <property name="text">
-                        <string>A</string>
-                      </property>
-                    </widget>
-                  </item>
-                  <item>
-                    <widget class="QRadioButton" name="radioB">
-                      <property name="text">
-                        <string>B</string>
-                      </property>
-                    </widget>
-                  </item>
-                  <item>
-                    <widget class="QCheckBox" name="checkIndiv">
-                      <property name="text">
-                        <string>Individual</string>
-                      </property>
-                    </widget>
-                  </item>
-                </layout>
-              </widget>
-            </item>
-            <item>
-              <widget class="QPushButton" name="buttonNewSeg">
-                <property name="text">
-                  <string>Create new Segmentation</string>
-                </property>
-              </widget>
-            </item>
-          </layout>
-        </widget>
-      </item>
-      <item>
-        <widget class="QPushButton" name="buttonUpload">
-          <property name="toolTip">
-            <string>Do image processing</string>
-          </property>
-          <property name="text">
-            <string>Upload Segmentation</string>
-          </property>
-        </widget>
-      </item>
-      <item>
-        <spacer name="spacer1">
-          <property name="orientation">
-            <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeType">
-            <enum>QSizePolicy::Expanding</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-            <size>
-              <width>20</width>
-              <height>220</height>
-            </size>
-          </property>
-        </spacer>
-      </item>
-      <item>
-        <widget class="QPushButton" name="cleanDicomBtn">
-          <property name="text">
-            <string>clean dicom download folder</string>
-          </property>
-        </widget>
-      </item>
+ <class>SegmentationReworkViewControls</class>
+ <widget class="QWidget" name="SegmentationReworkViewControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>465</width>
+    <height>729</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkTemplate</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="dcm4cheeHostLabel">
+       <property name="text">
+        <string>dcm4chee host</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="dcm4cheeHostValue">
+       <property name="placeholderText">
+        <string>example input: http://193.174.48.78:8090</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="restartConnection">
+       <property name="text">
+        <string>restart dcm4chee connection</string>
+       </property>
+      </widget>
+     </item>
     </layout>
-  </widget>
-  <layoutdefault spacing="6" margin="11"/>
-  <customwidgets>
-    <customwidget>
-      <class>QmitkChartWidget</class>
-      <extends>QWidget</extends>
-      <header location="global">QmitkChartWidget.h</header>
-      <container>1</container>
-    </customwidget>
-  </customwidgets>
-  <resources/>
-  <connections/>
+   </item>
+   <item>
+    <widget class="QWidget" name="verticalWidget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QLabel" name="labelSegA">
+        <property name="text">
+         <string>Segmentation A:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelSegB">
+        <property name="text">
+         <string>Segmentation B:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>ground truth:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QmitkChartWidget" name="chartWidget" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>400</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>400</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="verticalGroupBox">
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QGroupBox" name="groupBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>Select segmentation basis</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetDefaultConstraint</enum>
+            </property>
+            <item>
+             <widget class="QRadioButton" name="radioA">
+              <property name="text">
+               <string>A</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="radioB">
+              <property name="text">
+               <string>B</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkIndiv">
+              <property name="text">
+               <string>Individual</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="buttonNewSeg">
+           <property name="text">
+            <string>Create new Segmentation</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Line" name="line">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="buttonUpload">
+           <property name="toolTip">
+            <string>Do image processing</string>
+           </property>
+           <property name="text">
+            <string>Upload Segmentation</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="spacer1">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>220</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QPushButton" name="cleanDicomBtn">
+     <property name="text">
+      <string>clean dicom download folder</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkChartWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkChartWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
 </ui>

@@ -47,6 +47,7 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   qRegisterMetaType< std::vector<std::string> >("std::vector<std::string>");
 
   m_Controls.chartWidget->setVisible(false);
+  m_Controls.verticalWidget->setVisible(false);
 
   connect(m_Controls.buttonUpload, &QPushButton::clicked, this, &SegmentationReworkView::UploadNewSegmentation);
   connect(m_Controls.buttonNewSeg, &QPushButton::clicked, this, &SegmentationReworkView::CreateNewSegmentationC);

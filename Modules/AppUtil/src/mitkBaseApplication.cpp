@@ -820,7 +820,7 @@ QHash<QString, QVariant> BaseApplication::getFrameworkProperties() const
 
 static const int PROGRESS_X_PX = 42;
 static const int PROGRESS_Y_PX = 150;
-static const int PROGRESS_WIDTH_PX = 192;
+static const int PROGRESS_WIDTH_PX = 392;
 static const int PROGRESS_HEIGHT_PX = 2;
 static const int PROGRESS_ELEMENT_WIDTH = 50;
 

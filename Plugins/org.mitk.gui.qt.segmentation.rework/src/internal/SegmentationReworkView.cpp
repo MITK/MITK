@@ -53,13 +53,18 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.cleanDicomBtn, &QPushButton::clicked, this, &SegmentationReworkView::CleanDicomFolder);
   connect(m_Controls.restartConnection, &QPushButton::clicked, this, &SegmentationReworkView::RestartConnection);
 
-  m_downloadBaseDir = mitk::IOUtil::GetTempPath();
+  m_DownloadBaseDir = mitk::IOUtil::GetTempPathA() + "segrework";
+  MITK_INFO << m_DownloadBaseDir;
   m_tempSegDir = "/tempSeg/";
 
-  if (!itksys::SystemTools::FileExists(m_downloadBaseDir))
+  if (!itksys::SystemTools::FileIsDirectory(m_DownloadBaseDir))
   {
-    itk::FileTools::CreateDirectory(m_downloadBaseDir.c_str());
+    itk::FileTools::CreateDirectory(m_DownloadBaseDir);
   }
+
+  std::string folderPathSeries = mitk::IOUtil::CreateTemporaryDirectory("XXXXXX", m_DownloadBaseDir) + "/";
+
+  MITK_INFO << folderPathSeries;
 
   //if (!std::experimental::filesystem::exists(m_tempSegDir))
   //{
@@ -157,17 +162,13 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 
       MITK_INFO << "Load related dicom series ...";
 
-      std::string folderPathSeries = m_downloadBaseDir + getNextFolderName() + "/";
-      itk::FileTools::CreateDirectory(folderPathSeries);
+      std::string folderPathSeries = mitk::IOUtil::CreateTemporaryDirectory("XXXXXX", m_DownloadBaseDir) +"/";
 
-      std::string pathSegA = m_downloadBaseDir + getNextFolderName() + "/";
-      std::string pathSegB = m_downloadBaseDir + getNextFolderName() + "/";
+      std::string pathSegA = mitk::IOUtil::CreateTemporaryDirectory("XXXXXX", m_DownloadBaseDir) + "/";
+      std::string pathSegB = mitk::IOUtil::CreateTemporaryDirectory("XXXXXX", m_DownloadBaseDir) + "/";
 
       auto folderPathSegA = utility::conversions::to_string_t(pathSegA);
       auto folderPathSegB = utility::conversions::to_string_t(pathSegB);
-
-      itk::FileTools::CreateDirectory(pathSegA);
-      itk::FileTools::CreateDirectory(pathSegB);
 
       m_CurrentStudyUID = dto.studyUID;
 
@@ -198,14 +199,12 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 
 void SegmentationReworkView::RESTGetCallback(const SegmentationReworkREST::DicomDTO &dto) 
 {
-  std::string folderPathSeries = m_downloadBaseDir + getNextFolderName() + "/";
-  itk::FileTools::CreateDirectory(folderPathSeries);
+  std::string folderPathSeries = mitk::IOUtil::CreateTemporaryDirectory("XXXXXX", m_DownloadBaseDir) + "/";
 
   MITK_INFO << folderPathSeries;
 
-  std::string pathSeg = m_downloadBaseDir + getNextFolderName() + "/";
+  std::string pathSeg = mitk::IOUtil::CreateTemporaryDirectory("XXXXXX", m_DownloadBaseDir) + "/";
   auto folderPathSeg = utility::conversions::to_string_t(pathSeg);
-  itk::FileTools::CreateDirectory(pathSeg);
 
   MITK_INFO << pathSeg;
 
@@ -270,8 +269,7 @@ void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArra
 
 void SegmentationReworkView::UploadNewSegmentation()
 {
-  std::string folderPathSeg = m_tempSegDir + getNextFolderName() + "/";
-  itk::FileTools::CreateDirectory(folderPathSeg);
+  std::string folderPathSeg = mitk::IOUtil::CreateTemporaryDirectory("XXXXXX", m_DownloadBaseDir) + "/";
 
   const std::string savePath = folderPathSeg + m_SegC->GetName() + ".dcm";
   //const std::string mimeType = mitk::IOMimeTypes::DICOM_MIMETYPE_NAME();
@@ -357,6 +355,7 @@ void SegmentationReworkView::CleanDicomFolder()
     return;
   }
 
-  //std::experimental::filesystem::remove_all(m_downloadBaseDir);
-  itk::FileTools::CreateDirectory(m_downloadBaseDir);
+  //std::experimental::filesystem::remove_all(m_DownloadBaseDir);
+  // TODO : use POCO
+  //itk::FileTools::CreateDirectory(m_DownloadBaseDir);
 }

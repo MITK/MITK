@@ -76,7 +76,7 @@ private:
 
   std::string m_CurrentStudyUID;
 
-  std::string m_downloadBaseDir;
+  std::string m_DownloadBaseDir;
   std::string m_tempSegDir;
 
   mitk::DataNode::Pointer m_Image;

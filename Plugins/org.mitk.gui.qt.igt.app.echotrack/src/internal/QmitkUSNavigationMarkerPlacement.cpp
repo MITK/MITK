@@ -197,6 +197,7 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
     this->GetDataStorage()->Add(m_BaseNode);
   }
 
+  connect(ui->m_initializeCtToUsRegistration, SIGNAL(clicked()), this, SLOT(OnInitializeCtToUsRegistration()));
   connect(ui->m_initializeTargetMarking, SIGNAL(clicked()), this, SLOT(OnInitializeTargetMarking()));
   connect(ui->m_initializeCritStructureMarking, SIGNAL(clicked()), this, SLOT(OnInitializeCriticalStructureMarking()));
   connect(ui->m_initializeNavigation, SIGNAL(clicked()), this, SLOT(OnInitializeNavigation()));
@@ -216,6 +217,16 @@ void QmitkUSNavigationMarkerPlacement::ReInitializeSettingsNodesAndImageStream()
   ui->m_settingsWidget->OnSetSettingsNode(m_SettingsNode, true);
   InitImageStream();
   m_CombinedModality = ui->m_CombinedModalityCreationWidget->GetSelectedCombinedModality();
+}
+
+void QmitkUSNavigationMarkerPlacement::OnInitializeCtToUsRegistration()
+{
+  ui->m_CtToUsRegistrationWidget->SetCombinedModality(m_CombinedModality);
+  ui->m_CtToUsRegistrationWidget->SetDataStorage(this->GetDataStorage());
+  ui->m_CtToUsRegistrationWidget->OnSettingsChanged(m_SettingsNode);
+  ui->m_CtToUsRegistrationWidget->OnActivateStep();
+  ui->m_CtToUsRegistrationWidget->OnStartStep();
+  ui->m_CtToUsRegistrationWidget->Update();
 }
 
 void QmitkUSNavigationMarkerPlacement::OnInitializeTargetMarking()

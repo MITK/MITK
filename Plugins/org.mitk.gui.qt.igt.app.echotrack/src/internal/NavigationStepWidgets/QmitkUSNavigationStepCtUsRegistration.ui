@@ -13,8 +13,49 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout"/>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="selectedFloatingImageLabel">
+     <property name="text">
+      <string>Selected Floating Image:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkDataStorageComboBox" name="floatingImageComboBox"/>
+   </item>
+   <item>
+    <widget class="QLabel" name="selectedFiducialMarkerModelPointSetLabel">
+     <property name="text">
+      <string>Selected Fiducial Marker Model Point Set</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkDataStorageComboBox" name="fiducialMarkerModelPointSetComboBox"/>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">QmitkDataStorageComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../../resources/USNavigation.qrc"/>
  </resources>

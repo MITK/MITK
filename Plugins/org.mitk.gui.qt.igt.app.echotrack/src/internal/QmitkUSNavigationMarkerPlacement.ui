@@ -56,6 +56,13 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
+            <widget class="QPushButton" name="m_initializeCtToUsRegistration">
+             <property name="text">
+              <string>Initialize</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QmitkUSNavigationStepCtUsRegistration" name="m_CtToUsRegistrationWidget" native="true"/>
            </item>
           </layout>
@@ -65,8 +72,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>520</width>
-            <height>257</height>
+            <width>98</width>
+            <height>57</height>
            </rect>
           </property>
           <attribute name="label">

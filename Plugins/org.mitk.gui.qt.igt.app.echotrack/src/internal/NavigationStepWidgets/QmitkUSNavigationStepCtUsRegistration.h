@@ -19,6 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkUSAbstractNavigationStep.h"
 
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateOr.h>
+
+#include <mitkPointSet.h>
+#include <mitkImage.h>
+
 namespace itk {
 template<class T> class SmartPointer;
 }
@@ -27,6 +34,7 @@ namespace mitk {
 class NodeDisplacementFilter;
 class NavigationDataSource;
 }
+
 
 namespace Ui {
 class QmitkUSNavigationStepCtUsRegistration;
@@ -46,7 +54,7 @@ class QmitkUSNavigationStepCtUsRegistration : public QmitkUSAbstractNavigationSt
 {
   Q_OBJECT
 
-protected slots:
+
 
 public:
   explicit QmitkUSNavigationStepCtUsRegistration(QWidget *parent = 0);
@@ -99,11 +107,32 @@ public:
 protected:
   virtual void OnSetCombinedModality();
 
-  itk::SmartPointer<mitk::NavigationDataSource>   m_NavigationDataSource;
+  void UnsetFloatingImageGeometry();
+  void SetFloatingImageGeometryInformation(mitk::Image* image);
 
+  void DefineDataStorageImageFilter();
+  void CreateQtPartControl(QWidget *parent);
+  
+protected slots:
+  void OnFloatingImageComboBoxSelectionChanged(const mitk::DataNode* node);
 
 private:
   Ui::QmitkUSNavigationStepCtUsRegistration *ui;
+
+  mitk::NodePredicateAnd::Pointer m_IsOfTypeImagePredicate;
+  mitk::NodePredicateOr::Pointer m_IsASegmentationImagePredicate;
+  mitk::NodePredicateAnd::Pointer m_IsAPatientImagePredicate;
+  mitk::TNodePredicateDataType<mitk::PointSet>::Pointer m_IsAPointSetPredicate;
+
+  itk::SmartPointer<mitk::NavigationDataSource>   m_NavigationDataSource;
+  mitk::Image::Pointer m_FloatingImage;
+
+  /*!
+  \brief The 3D dimension of the CT image given in index size.
+  */
+  mitk::Vector3D m_ImageDimension;
+  mitk::Vector3D m_ImageSpacing;
+
 };
 
 #endif // QMITKUSNAVIGATIONSTEPCTUSREGISTRATION_H

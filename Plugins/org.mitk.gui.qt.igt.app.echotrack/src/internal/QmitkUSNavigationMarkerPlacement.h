@@ -66,6 +66,7 @@ class QmitkUSNavigationMarkerPlacement : public QmitkAbstractView
 
     protected slots:
 
+  void OnInitializeCtToUsRegistration();
   void OnInitializeTargetMarking();
   void OnInitializeCriticalStructureMarking();
   void OnInitializeNavigation();

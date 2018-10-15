@@ -37,6 +37,11 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
   MITK_INFO << "Message GET incoming...";
   MITK_INFO << mitk::RESTUtil::convertToUtf8(messageString);
 
+  if (messageString == U("/robots.txt") || messageString == U("/favicon.ico")) 
+  {
+    return;
+  }
+
   MITK_INFO << mitk::RESTUtil::convertToUtf8(message.request_uri().to_string());
   auto uri = web::uri::decode(message.request_uri().to_string());
 

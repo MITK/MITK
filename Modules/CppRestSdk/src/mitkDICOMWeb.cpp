@@ -46,7 +46,8 @@ pplx::task<web::json::value> mitk::DICOMWeb::QuidoRSInstances(std::map<std::stri
     MITK_INFO << " status: " << status;
 
     if (status != web::http::status_codes::OK) {
-      mitkThrow() << "QUIDO-RS found no result ";
+      MITK_ERROR << "no dicom series found for query " << utility::conversions::to_utf8string(queryBuilder.to_string());
+      mitkThrow() << "no dicom series found for query " << utility::conversions::to_utf8string(queryBuilder.to_string());
     }
 
     return response.extract_json().get();

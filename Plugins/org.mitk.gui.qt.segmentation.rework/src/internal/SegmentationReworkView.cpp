@@ -86,9 +86,11 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 
   MITK_INFO << "Listening for requests at: " << utility::conversions::to_utf8string(address);
 
-  utility::string_t pacsHost = U("http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE");
-  m_DICOMWeb = new mitk::DICOMWeb(pacsHost);
-  MITK_INFO << "requests to pacs are sent to: " << utility::conversions::to_utf8string(pacsHost);
+  utility::string_t pacsURL = U("http://jip-dktk/dcm4chee-arc/aets/DCM4CHEE");
+  //utility::string_t pacsURL = U("http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE");
+  m_DICOMWeb = new mitk::DICOMWeb(pacsURL);
+  MITK_INFO << "requests to pacs are sent to: " << utility::conversions::to_utf8string(pacsURL);
+  m_Controls.dcm4cheeURL->setText({ (utility::conversions::to_utf8string(pacsURL).c_str()) });
 }
 
 std::string SegmentationReworkView::getNextFolderName() {
@@ -105,6 +107,7 @@ void SegmentationReworkView::RestartConnection()
 
   m_DICOMWeb = new mitk::DICOMWeb(utility::conversions::to_string_t(url));
   MITK_INFO << "requests to pacs are sent to: " << url;
+  m_Controls.dcm4cheeURL->setText({ (utility::conversions::to_utf8string(url).c_str()) });
 }
 
 void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::DicomDTO &dto)
@@ -196,23 +199,32 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 
 void SegmentationReworkView::RESTGetCallbackGeneric(const SegmentationReworkREST::DicomDTO &dto)
 {
-  try {
-    std::vector<pplx::task<std::string>> tasks;
+  std::vector<pplx::task<std::string>> tasks;
 
-    if (dto.seriesUIDList.size() > 0) {
-      for (std::string segSeriesUID : dto.seriesUIDList)
-      {
-        std::string folderPathSeries = mitk::IOUtil::CreateTemporaryDirectory("XXXXXX", m_DownloadBaseDir) + "/";
+  if (dto.seriesUIDList.size() > 0) {
+    for (std::string segSeriesUID : dto.seriesUIDList)
+    {
+      std::string folderPathSeries = mitk::IOUtil::CreateTemporaryDirectory("XXXXXX", m_DownloadBaseDir) + "/";
+      try {
         auto seriesTask = m_DICOMWeb->WadoRS(utility::conversions::to_string_t(folderPathSeries), dto.studyUID, segSeriesUID);
         tasks.push_back(seriesTask);
+      } catch (const mitk::Exception &exception) 
+      {
+        MITK_INFO << exception.what();
+        return;
       }
     }
+  }
 
+  try 
+  {
     auto joinTask = pplx::when_all(begin(tasks), end(tasks));
     auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) { InvokeLoadData(filePathList); });
   }
-  catch (const std::exception &exception) {
+  catch (const mitk::Exception& exception) 
+  {
     MITK_INFO << exception.what();
+    return;
   }
 }
 

@@ -54,17 +54,13 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.restartConnection, &QPushButton::clicked, this, &SegmentationReworkView::RestartConnection);
 
   m_DownloadBaseDir = mitk::IOUtil::GetTempPathA() + "segrework";
-  MITK_INFO << m_DownloadBaseDir;
+  MITK_INFO << "using download base dir: " << m_DownloadBaseDir;
   m_tempSegDir = "/tempSeg/";
 
   if (!itksys::SystemTools::FileIsDirectory(m_DownloadBaseDir))
   {
     itk::FileTools::CreateDirectory(m_DownloadBaseDir);
   }
-
-  std::string folderPathSeries = mitk::IOUtil::CreateTemporaryDirectory("XXXXXX", m_DownloadBaseDir) + "/";
-
-  MITK_INFO << folderPathSeries;
 
   //if (!std::experimental::filesystem::exists(m_tempSegDir))
   //{
@@ -208,26 +204,31 @@ void SegmentationReworkView::RESTGetCallback(const SegmentationReworkREST::Dicom
 
   MITK_INFO << pathSeg;
 
-  std::vector<pplx::task<std::string>> tasks;
-  auto imageSeriesTask = m_DICOMWeb->WadoRS(utility::conversions::to_string_t(folderPathSeries), dto.studyUID, dto.imageSeriesUID);
-  
-  tasks.push_back(imageSeriesTask);
+  try {
+    std::vector<pplx::task<std::string>> tasks;
+    auto imageSeriesTask = m_DICOMWeb->WadoRS(utility::conversions::to_string_t(folderPathSeries), dto.studyUID, dto.imageSeriesUID);
 
-  if (dto.segSeriesUIDList.size() > 0) {
-    for (std::string segSeriesUID : dto.segSeriesUIDList)
-    {
-      auto segTask = m_DICOMWeb->WadoRS(folderPathSeg, dto.studyUID, segSeriesUID);
-      tasks.push_back(segTask);
+    tasks.push_back(imageSeriesTask);
+
+    if (dto.segSeriesUIDList.size() > 0) {
+      for (std::string segSeriesUID : dto.segSeriesUIDList)
+      {
+        auto segTask = m_DICOMWeb->WadoRS(folderPathSeg, dto.studyUID, segSeriesUID);
+        tasks.push_back(segTask);
+      }
     }
-  }
-  else {
-    auto segATask = m_DICOMWeb->WadoRS(folderPathSeg, dto.studyUID, dto.segSeriesUIDA);
-    tasks.push_back(segATask);
-  }
+    else {
+      auto segATask = m_DICOMWeb->WadoRS(folderPathSeg, dto.studyUID, dto.segSeriesUIDA);
+      tasks.push_back(segATask);
+    }
 
 
-  auto joinTask = pplx::when_all(begin(tasks), end(tasks));
-  auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) { InvokeLoadData(filePathList); });
+    auto joinTask = pplx::when_all(begin(tasks), end(tasks));
+    auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) { InvokeLoadData(filePathList); });
+  }
+  catch (const std::exception &exception) {
+    MITK_INFO << exception.what();
+  }
 }
 
 void SegmentationReworkView::LoadData(std::vector<std::string> filePathList)

@@ -37,10 +37,15 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
   MITK_INFO << "Message GET incoming...";
   MITK_INFO << mitk::RESTUtil::convertToUtf8(messageString);
 
-  auto httpParams = web::uri::split_query(message.request_uri().query());
+  MITK_INFO << mitk::RESTUtil::convertToUtf8(message.request_uri().to_string());
+  auto uri = web::uri::decode(message.request_uri().to_string());
+
+  auto query = web::uri(uri).query();
+  auto httpParams = web::uri::split_query(query);
 
   // IHE Invoke Image Display style
   auto requestType = httpParams.find(U("requestType"));
+  MITK_INFO << "parameters found: " << httpParams.size();
 
   if (requestType != httpParams.end() && requestType->second == U("IMAGE_SEG"))
   {
@@ -54,6 +59,10 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
       dto.imageSeriesUID = mitk::RESTUtil::convertToUtf8(imageSeriesUID);
       dto.studyUID = mitk::RESTUtil::convertToUtf8(studyUID);
       dto.segSeriesUIDA = mitk::RESTUtil::convertToUtf8(segSeriesUID);
+
+      MITK_INFO << "studyUID: " << dto.studyUID;
+      MITK_INFO << "imageSeriesUID: " << dto.imageSeriesUID;
+      MITK_INFO << "segSeriesUID: " << dto.segSeriesUIDA;
 
       m_GetImageSegCallback(dto);
 
@@ -85,6 +94,10 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
       dto.segSeriesUIDList.push_back(s);
     }
 
+    MITK_INFO << "studyUID: " << dto.studyUID;
+    MITK_INFO << "imageSeriesUID: " << dto.imageSeriesUID;
+    MITK_INFO << "segSeriesUIDList: " << segSeriesUIDListUtf8;
+
     m_GetImageSegCallback(dto);
 
     MitkResponse response(MitkRestStatusCodes::OK);
@@ -92,7 +105,7 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
     message.reply(response);
   } else
   {
-    message.reply(MitkRestStatusCodes::BadRequest, "Oh man, i can only deal with 'requestType' = 'IMAGE+SEG'...");
+    message.reply(MitkRestStatusCodes::BadRequest, "Oh man, i can only deal with 'requestType' = 'IMAGE_SEG'...");
   }
 }
 

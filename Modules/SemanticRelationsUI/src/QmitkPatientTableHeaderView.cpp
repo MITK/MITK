@@ -68,15 +68,21 @@ QSize QmitkPatientTableHeaderView::sectionSizeFromContents(int logicalIndex) con
 {
   if (nullptr != m_HeaderModel)
   {
-    QModelIndex leafIndex = HeaderIndex(logicalIndex);
-    if (leafIndex.isValid())
+    QModelIndex headerIndex = HeaderIndex(logicalIndex);
+    if (headerIndex.isValid())
     {
-      QSize headerSize = HeaderSize(leafIndex);
-      leafIndex = leafIndex.parent();
-      while (leafIndex.isValid())
+      QSize headerSize = HeaderSize(headerIndex);
+      headerIndex = headerIndex.parent();
+      while (headerIndex.isValid())
       {
-        headerSize.rheight() += HeaderSize(leafIndex).height();
-        leafIndex = leafIndex.parent();
+        QSize currentHeaderSize = HeaderSize(headerIndex);
+        headerSize.rheight() += currentHeaderSize.height();
+        if (currentHeaderSize.width() > headerSize.width())
+        {
+          headerSize.rwidth() = currentHeaderSize.width();
+        }
+
+        headerIndex = headerIndex.parent();
       }
       return headerSize;
     }
@@ -113,6 +119,7 @@ int QmitkPatientTableHeaderView::PaintHeader(QPainter* painter, const QModelInde
 QSize QmitkPatientTableHeaderView::HeaderSize(const QModelIndex& index) const
 {
   QFont font = this->font();
+  font.setBold(true);
   QFontMetrics fontMetrics(font);
   QSize fontSize = fontMetrics.size(0, index.data(Qt::DisplayRole).toString());
   QSize emptyFontSize = fontMetrics.size(0, "");

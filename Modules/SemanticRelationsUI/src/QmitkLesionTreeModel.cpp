@@ -82,6 +82,12 @@ int QmitkLesionTreeModel::rowCount(const QModelIndex& itemIndex/* = QModelIndex(
 
 int QmitkLesionTreeModel::columnCount(const QModelIndex&/* itemIndex = QModelIndex() */) const
 {
+  if (0 == m_RootItem->ChildCount())
+  {
+    // no lesion items stored, no need to display columns
+    return 0;
+  }
+
   return m_ControlPoints.size() + 1;
 }
 
@@ -162,6 +168,12 @@ QVariant QmitkLesionTreeModel::data(const QModelIndex& index, int role) const
 
 QVariant QmitkLesionTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
+  if (0 == m_RootItem->ChildCount())
+  {
+    // no lesion items stored, no need to display the header
+    return QVariant();
+  }
+
   if (Qt::Horizontal == orientation && Qt::DisplayRole == role)
   {
     if (0 == section)

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkSemanticRelationsUIExports.h"
 #include "QmitkAbstractSemanticRelationsStorageInspector.h"
 #include "QmitkPatientTableModel.h"
+#include "QmitkTableItemThumbnailDelegate.h"
 
 #include "ui_QmitkPatientTableInspector.h"
 
@@ -80,6 +81,7 @@ private:
 
   Ui::QmitkPatientTableInspector m_Controls;
   QmitkPatientTableModel* m_StorageModel;
+  QmitkTableItemThumbnailDelegate* m_ItemDelegate;
 
   mitk::DataNode* m_SelectedDataNode;
 

@@ -40,8 +40,10 @@ QmitkPatientTableInspector::QmitkPatientTableInspector(QWidget* parent/* =nullpt
   m_Controls.tableView->setSelectionBehavior(QAbstractItemView::SelectItems);
   m_Controls.tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  m_StorageModel = new QmitkPatientTableModel(this);
+  m_StorageModel = new QmitkPatientTableModel(m_Controls.tableView);
   m_Controls.tableView->setModel(m_StorageModel);
+  m_ItemDelegate = new QmitkTableItemThumbnailDelegate(m_Controls.tableView);
+  //m_Controls.tableView->setItemDelegate(m_ItemDelegate);
 
   SetUpConnections();
 }

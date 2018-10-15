@@ -34,6 +34,7 @@ set(INTERNAL_CPP_FILES
   NavigationStepWidgets/QmitkUSNavigationStepPlacementPlanning.cpp
   NavigationStepWidgets/QmitkUSNavigationStepMarkerIntervention.cpp
   NavigationStepWidgets/QmitkUSNavigationStepPunctuationIntervention.cpp
+  NavigationStepWidgets/QmitkUSNavigationStepCtUsRegistration.cpp
 
   SettingsWidgets/QmitkUSNavigationCombinedSettingsWidget.cpp
   SettingsWidgets/QmitkUSNavigationAbstractSettingsWidget.cpp
@@ -64,6 +65,7 @@ set(UI_FILES
   src/internal/NavigationStepWidgets/QmitkUSNavigationStepPlacementPlanning.ui
   src/internal/NavigationStepWidgets/QmitkUSNavigationStepMarkerIntervention.ui
   src/internal/NavigationStepWidgets/QmitkUSNavigationStepPunctuationIntervention.ui
+  src/internal/NavigationStepWidgets/QmitkUSNavigationStepCtUsRegistration.ui
 
   src/internal/SettingsWidgets/QmitkUSNavigationCombinedSettingsWidget.ui
 )
@@ -94,6 +96,7 @@ set(MOC_H_FILES
   src/internal/NavigationStepWidgets/QmitkUSNavigationStepPlacementPlanning.h
   src/internal/NavigationStepWidgets/QmitkUSNavigationStepMarkerIntervention.h
   src/internal/NavigationStepWidgets/QmitkUSNavigationStepPunctuationIntervention.h
+  src/internal/NavigationStepWidgets/QmitkUSNavigationStepCtUsRegistration.h
 
   src/internal/SettingsWidgets/QmitkUSNavigationCombinedSettingsWidget.h
   src/internal/SettingsWidgets/QmitkUSNavigationAbstractSettingsWidget.h

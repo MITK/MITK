@@ -116,56 +116,6 @@ QAbstractItemView::item {
   color: #f1f1f1;
 }
 
-QHeaderView::section {
-  background-color: #2d2d30;
-  border: 1px solid transparent;
-}
-
-QHeaderView::section:horizontal {
-  border-right: 1px solid #3f3f46;
-}
-
-QHeaderView::section:vertical {
-  border-bottom: 1px solid #3f3f46;
-}
-
-QHeaderView::section:vertical:checked {
-  background-color: #1c97ea;
-}
-
-QHeaderView::section:vertical:pressed {
-  background-color: transparent;
-  font-weight: bold;
-}
-
-QHeaderView::down-arrow {
-  image: url(:/org.blueberry.ui.qt/dark/down-arrow.svg);
-  height: 16px;
-  width: 16px;
-}
-
-QHeaderView::down-arrow:hover {
-  image: url(:/org.blueberry.ui.qt/dark/down-arrow-hover.svg);
-}
-
-QHeaderView::down-arrow:pressed {
-  image: url(:/org.blueberry.ui.qt/dark/down-arrow-pressed.svg);
-}
-
-QHeaderView::up-arrow {
-  image: url(:/org.blueberry.ui.qt/dark/up-arrow.svg);
-  height: 16px;
-  width: 16px;
-}
-
-QHeaderView::up-arrow:hover {
-  image: url(:/org.blueberry.ui.qt/dark/up-arrow-hover.svg);
-}
-
-QHeaderView::up-arrow:pressed {
-  image: url(:/org.blueberry.ui.qt/dark/up-arrow-pressed.svg);
-}
-
 QGroupBox {
   border: 1px solid #434346;
   margin-top: 8px;

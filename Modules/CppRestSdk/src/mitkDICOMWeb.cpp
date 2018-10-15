@@ -46,7 +46,7 @@ pplx::task<web::json::value> mitk::DICOMWeb::QuidoRSInstances(std::map<std::stri
     MITK_INFO << " status: " << status;
 
     if (status != web::http::status_codes::OK) {
-      mitkThrow() << "QUIDO-RS ended up with response " << mitk::RESTUtil::convertToUtf8(response.to_string());
+      mitkThrow() << "QUIDO-RS found no result ";
     }
 
     return response.extract_json().get();

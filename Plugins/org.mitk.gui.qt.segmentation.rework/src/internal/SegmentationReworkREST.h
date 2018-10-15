@@ -33,7 +33,7 @@ public:
     std::string segInstanceUIDA;
     std::string segInstanceUIDB;
     std::string srSeriesUID;
-    std::vector<std::string> segSeriesUIDList;
+    std::vector<std::string> seriesUIDList;
     std::vector<double> simScoreArray;
     int minSliceStart;
     std::string groundTruth;
@@ -61,6 +61,11 @@ public:
     m_GetEvalCallback = callback;
   }
 
+  void SetGetAddSeriesCallback(std::function<void(DicomDTO &message)> callback)
+  {
+    m_GetAddSeriesCallback = callback;
+  }
+
 signals:
   void InvokeUpdateChartWidget();
 
@@ -68,6 +73,7 @@ private:
   std::function<void(DicomDTO &message)> m_PutCallback;
   std::function<void(DicomDTO &message)> m_GetImageSegCallback;
   std::function<void(DicomDTO &message)> m_GetEvalCallback;
+  std::function<void(DicomDTO &message)> m_GetAddSeriesCallback;
 };
 
 #endif // SegmentationReworkREST_h

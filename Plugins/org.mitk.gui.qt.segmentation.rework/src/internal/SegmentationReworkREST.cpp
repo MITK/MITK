@@ -47,6 +47,9 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
   auto requestType = httpParams.find(U("requestType"));
   MITK_INFO << "parameters found: " << httpParams.size();
 
+  MitkResponse responsePositive(MitkRestStatusCodes::OK);
+  responsePositive.set_body("call to mitk was successfully!");
+
   if (requestType != httpParams.end() && requestType->second == U("IMAGE_SEG"))
   {
     try
@@ -67,8 +70,7 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
       m_GetImageSegCallback(dto);
 
       MitkResponse response(MitkRestStatusCodes::OK);
-      response.set_body("Sure, i got you.. have an awesome day");
-      message.reply(response);
+      message.reply(responsePositive);
     }
     catch (std::out_of_range& e) {
       message.reply(MitkRestStatusCodes::BadRequest, "oh man, that was not expected: " + std::string(e.what()));
@@ -91,7 +93,7 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
     std::istringstream f(segSeriesUIDListUtf8);
     std::string s;
     while (getline(f, s, ',')) {
-      dto.segSeriesUIDList.push_back(s);
+      dto.seriesUIDList.push_back(s);
     }
 
     MITK_INFO << "studyUID: " << dto.studyUID;
@@ -100,12 +102,31 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
 
     m_GetImageSegCallback(dto);
 
-    MitkResponse response(MitkRestStatusCodes::OK);
-    response.set_body("Sure, i got you.. have an awesome day");
-    message.reply(response);
+    message.reply(responsePositive);
+  } else if (requestType != httpParams.end() && requestType->second == U("ADD_SERIES"))
+  {
+    auto studyUID = httpParams.at(U("studyUID"));
+    auto segSeriesUIDList = httpParams.at(U("seriesUIDList"));
+
+    DicomDTO dto;
+    dto.studyUID = mitk::RESTUtil::convertToUtf8(studyUID);
+
+    auto seriesUIDListUtf8 = mitk::RESTUtil::convertToUtf8(segSeriesUIDList);
+
+    std::istringstream f(seriesUIDListUtf8);
+    std::string s;
+    while (getline(f, s, ',')) {
+      dto.seriesUIDList.push_back(s);
+    }
+
+    MITK_INFO << "studyUID: " << dto.studyUID;
+    MITK_INFO << "seriesUIDList: " << seriesUIDListUtf8;
+
+    m_GetAddSeriesCallback(dto);
+    message.reply(responsePositive);
   } else
   {
-    message.reply(MitkRestStatusCodes::BadRequest, "Oh man, i can only deal with 'requestType' = 'IMAGE_SEG'...");
+    message.reply(MitkRestStatusCodes::BadRequest, "unknown request type " + mitk::RESTUtil::convertToUtf8(requestType->second));
   }
 }
 

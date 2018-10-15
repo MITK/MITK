@@ -27,9 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 #include <mitkIOUtil.h>
-#include "QmitkNewSegmentationDialog.h"
-#include "mitkSegTool2D.h"
-#include "mitkToolManagerProvider.h"
+#include <QmitkNewSegmentationDialog.h>
+#include <mitkSegTool2D.h>
+#include <mitkToolManagerProvider.h>
+#include <mitkOverwriteSliceImageFilter.h>
 
 const std::string SegmentationReworkView::VIEW_ID = "org.mitk.views.segmentationreworkview";
 
@@ -289,15 +290,13 @@ void SegmentationReworkView::UpdateChartWidget()
 
 void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArray, int sliceMinStart)
 {
-  std::map<double, double> map;
-
   double sliceIndex = sliceMinStart;
   for (double score : simScoreArray)
   {
-    map.insert(std::map<double, double>::value_type(sliceIndex, score));
+    m_ScoreMap.insert(std::map<double, double>::value_type(sliceIndex, score));
     sliceIndex++;
   }
-  m_Controls.chartWidget->AddData2D(map, "similarity graph");
+  m_Controls.chartWidget->AddData2D(m_ScoreMap, "similarity graph");
   m_Controls.chartWidget->SetChartType("similarity graph", QmitkChartWidget::ChartType::line);
   m_Controls.chartWidget->SetXAxisLabel("slice number");
   m_Controls.chartWidget->SetYAxisLabel("similarity in percent");
@@ -321,6 +320,27 @@ void SegmentationReworkView::UploadNewSegmentation()
   }
 }
 
+void SegmentationReworkView::HandleIndividualSegmentationCreation(mitk::Image::Pointer baseSegmentation, double threshold) 
+{
+  std::map<double, double>::iterator it;
+  mitk::OverwriteSliceImageFilter::Pointer overwriteFilter = mitk::OverwriteSliceImageFilter::New();
+  overwriteFilter->SetInput(baseSegmentation);
+
+  for (it = m_ScoreMap.begin(); it != m_ScoreMap.end(); it++)
+  {
+    if (it->second < threshold)
+    {
+      overwriteFilter->SetSliceIndex(it->first);
+      auto emptySlice = mitk::Image::New();
+      unsigned int *dimensions = new unsigned int[2]{baseSegmentation->GetDimensions()[0], baseSegmentation->GetDimensions()[1]}; 
+	  emptySlice->Initialize(baseSegmentation->GetPixelType(), 2, dimensions);
+      overwriteFilter->SetSliceImage(emptySlice);
+	  overwriteFilter->Update();
+	}
+
+  }
+}
+
 void SegmentationReworkView::CreateNewSegmentationC() 
 {
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
@@ -333,6 +353,11 @@ void SegmentationReworkView::CreateNewSegmentationC()
   }
   else if (m_Controls.radioB->isChecked()) {
     baseImage = dynamic_cast<mitk::Image*>(m_SegB->GetData());
+  }
+
+  if (m_Controls.checkIndiv->isChecked())
+  {
+    //HandleIndividualSegmentationCreation(baseImage, m_Controls.sliderWidget->value());
   }
 
   QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog(m_Parent); // needs a QWidget as parent, "this" is not QWidget

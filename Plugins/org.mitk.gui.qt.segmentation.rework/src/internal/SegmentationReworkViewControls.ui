@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>465</width>
-    <height>738</height>
+    <height>757</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -145,6 +145,13 @@
             </item>
            </layout>
           </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QWidget" name="sliderWidget" native="true"/>
+           </item>
+          </layout>
          </item>
          <item>
           <widget class="QPushButton" name="buttonNewSeg">

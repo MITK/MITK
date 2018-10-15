@@ -184,9 +184,7 @@ QVariant QmitkLesionTreeModel::headerData(int section, Qt::Orientation orientati
     if (m_ControlPoints.size() >= section)
     {
       mitk::SemanticTypes::ControlPoint currentControlPoint = m_ControlPoints.at(section-1);
-      // generate a string from the control point
-      std::string currentControlPointAsString = mitk::GetControlPointAsString(currentControlPoint);
-      return QVariant(QString::fromStdString(currentControlPointAsString));
+      return QVariant(QString::fromStdString(currentControlPoint.ToString()));
     }
   }
 

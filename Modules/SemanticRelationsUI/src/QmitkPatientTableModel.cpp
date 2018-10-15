@@ -302,8 +302,7 @@ void QmitkPatientTableModel::SetHeaderModel()
     for (const auto& controlPointUID : currentControlPoints)
     {
       const auto& controlPoint = mitk::GetControlPointByUID(controlPointUID, m_ControlPoints);
-      std::string controlPointAsString = mitk::GetControlPointAsString(controlPoint);
-      QStandardItem* controlPointItem = new QStandardItem(QString::fromStdString(controlPointAsString));
+      QStandardItem* controlPointItem = new QStandardItem(QString::fromStdString(controlPoint.ToString()));
       standardItems.push_back(controlPointItem);
       examinationPeriodItem->appendColumn(standardItems);
       standardItems.clear();

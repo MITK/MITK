@@ -90,14 +90,14 @@ mitk::SemanticTypes::LesionClassVector mitk::SemanticRelations::GetAllLesionClas
   }
 
   // remove duplicate entries
-  auto lessThan = [](const SemanticTypes::LesionClass& lesionClassL, const SemanticTypes::LesionClass& lesionClassR)
+  auto lessThan = [](const SemanticTypes::LesionClass& lesionClassLeft, const SemanticTypes::LesionClass& lesionClassRight)
   {
-    return lesionClassL.UID < lesionClassR.UID;
+    return lesionClassLeft.UID < lesionClassRight.UID;
   };
 
-  auto equal = [](const SemanticTypes::LesionClass& lesionClassL, const SemanticTypes::LesionClass& lesionClassR)
+  auto equal = [](const SemanticTypes::LesionClass& lesionClassLeft, const SemanticTypes::LesionClass& lesionClassRight)
   {
-    return lesionClassL.UID == lesionClassR.UID;
+    return lesionClassLeft.UID == lesionClassRight.UID;
   };
 
   std::sort(allLesionClassesOfCase.begin(), allLesionClassesOfCase.end(), lessThan);
@@ -477,7 +477,7 @@ mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllSpecificI
       // filter all images to remove the ones with a different control point and information type using a lambda function
       auto lambda = [&controlPoint, &informationType, this](DataNode::Pointer imageNode)
       {
-        return (informationType != GetInformationTypeOfImage(imageNode)) || (controlPoint != GetControlPointOfData(imageNode));
+        return (informationType != GetInformationTypeOfImage(imageNode)) || (controlPoint.date != GetControlPointOfData(imageNode).date);
       };
 
       allImagesOfCase.erase(std::remove_if(allImagesOfCase.begin(), allImagesOfCase.end(), lambda), allImagesOfCase.end());

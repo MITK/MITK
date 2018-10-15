@@ -50,13 +50,6 @@ namespace mitk
   */
   MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint GetControlPointByUID(const SemanticTypes::ID& controlPointUID, const SemanticTypes::ControlPointVector& allControlPoints);
   /**
-  * @brief Returns a string that displays the given control point in the format "YYYY-MM-DD".
-  *        This function is used in the GUI to display the control point as header in the "information-type - control-point"-matrix.
-  *
-  * @param controlPoint   The control point to convert into a string.
-  */
-  MITKSEMANTICRELATIONS_EXPORT std::string GetControlPointAsString(const SemanticTypes::ControlPoint& controlPoint);
-  /**
   * @brief Returns an already existing control point from the given vector of control points. This existing control point has the
   *        the same date (year, month, day) as the given single control point.
   *        If no existing control point can be found an empty control point is returned.

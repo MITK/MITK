@@ -204,9 +204,9 @@ mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GetControlPointOfImage(
     {
       // set the values of the control point
       controlPoint.UID = controlPointID;
-      controlPoint.year = controlPointVectorValue[0];
-      controlPoint.month = controlPointVectorValue[1];
-      controlPoint.day = controlPointVectorValue[2];
+      controlPoint.date = boost::gregorian::date(controlPointVectorValue[0],
+                        controlPointVectorValue[1],
+                        controlPointVectorValue[2]);
     }
   }
 
@@ -927,9 +927,9 @@ void mitk::RelationStorage::AddControlPoint(const SemanticTypes::CaseID& caseID,
 
     // store the control point values (the three integer values of a date)
     std::vector<int> controlPointDate;
-    controlPointDate.push_back(controlPoint.year);
-    controlPointDate.push_back(controlPoint.month);
-    controlPointDate.push_back(controlPoint.day);
+    controlPointDate.push_back(controlPoint.date.year());
+    controlPointDate.push_back(controlPoint.date.month());
+    controlPointDate.push_back(controlPoint.date.day());
 
     mitk::VectorProperty<int>::Pointer newControlPointVectorProperty = mitk::VectorProperty<int>::New();
     newControlPointVectorProperty->SetValue(controlPointDate);
@@ -1111,7 +1111,7 @@ void mitk::RelationStorage::AddControlPointToExaminationPeriod(const SemanticTyp
     const auto& leftControlPoint = GenerateControlpoint(caseID, leftControlPointUID);
     const auto& rightControlPoint = GenerateControlpoint(caseID, rightControlPointUID);
 
-    return leftControlPoint <= rightControlPoint;
+    return leftControlPoint.date <= rightControlPoint.date;
   };
 
   std::sort(controlPointUIDsVectorValue.begin(), controlPointUIDsVectorValue.end(), lambda);
@@ -1393,9 +1393,9 @@ mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GenerateControlpoint(co
   // set the values of the control point
   SemanticTypes::ControlPoint generatedControlPoint;
   generatedControlPoint.UID = controlPointUID;
-  generatedControlPoint.year = controlPointVectorValue[0];
-  generatedControlPoint.month = controlPointVectorValue[1];
-  generatedControlPoint.day = controlPointVectorValue[2];
+  generatedControlPoint.date = boost::gregorian::date(controlPointVectorValue[0],
+                                                      controlPointVectorValue[1],
+                                                      controlPointVectorValue[2]);
 
   return generatedControlPoint;
 }

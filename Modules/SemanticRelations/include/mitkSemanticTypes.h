@@ -17,6 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKSEMANTICTYPES_H
 #define MITKSEMANTICTYPES_H
 
+#define BOOST_DATE_TIME_NO_LIB
+#if defined(BOOST_ALL_DYN_LINK)
+#undef BOOST_ALL_DYN_LINK
+#endif
+
+// boost
+#include <boost/date_time/gregorian/gregorian.hpp>
+
 // c++
 #include <set>
 #include <tuple>
@@ -36,33 +44,43 @@ namespace mitk
     struct ControlPoint
     {
       ID UID;
-      int year = 0;
-      int month = 0;
-      int day = 0;
+      boost::gregorian::date date;
 
+      ControlPoint()
+      {
+        date = boost::gregorian::date(boost::gregorian::min_date_time);
+      }
+
+      // less comparison to sort containers of control points
       bool operator<(const ControlPoint& other) const
       {
-        return std::tie(year, month, day) < std::tie(other.year, other.month, other.day);
+        return date < other.date;
       }
-      bool operator>(const ControlPoint& other) const
+
+      std::string ToString() const
       {
-        return std::tie(year, month, day) > std::tie(other.year, other.month, other.day);
+        std::stringstream controlPointAsString;
+        if (date.is_not_a_date())
+        {
+          return "";
+        }
+
+        controlPointAsString << std::to_string(date.year()) << "-"
+          << std::setfill('0') << std::setw(2) << std::to_string(date.month()) << "-"
+          << std::setfill('0') << std::setw(2) << std::to_string(date.day());
+
+        return controlPointAsString.str();
       }
-      bool operator==(const ControlPoint& other) const
+
+      void SetDateFromString(const std::string& dateAsString)
       {
-        return (!operator<(other) && !operator>(other));
+        date = boost::gregorian::from_undelimited_string(dateAsString);
       }
-      bool operator!=(const ControlPoint& other) const
+
+      int DistanceInDays(const ControlPoint& other) const
       {
-        return (operator<(other) || operator>(other));
-      }
-      bool operator<=(const ControlPoint& other) const
-      {
-        return (operator<(other) || operator==(other));
-      }
-      bool operator>=(const ControlPoint& other) const
-      {
-        return (operator>(other) || operator==(other));
+        boost::gregorian::date_duration duration = date - other.date;
+        return std::abs(duration.days());
       }
     };
 

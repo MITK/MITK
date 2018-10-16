@@ -19,6 +19,17 @@ See LICENSE.txt or http://www.mitk.org for details.
   iconAccentColor = #d4821e <- This line is parsed by MITK
 */
 
+* {
+  gridline-color: #2d2d30;
+  selection-background-color: rgba(16,180,248,96);
+  selection-color: #f1f1f1;
+}
+
+*:active {
+  selection-background-color: rgba(16,180,248,148);
+  selection-color: #f8f8f8;
+}
+
 QWidget {
   background-color: #2d2d30;
   border: none;
@@ -53,7 +64,7 @@ QPushButton:pressed {
 }
 
 QPushButton:checked, QToolButton:checked {
-  border: 1px solid #007acc;
+  border: 1px solid #0078a0;
 }
 
 QToolButton {
@@ -91,8 +102,8 @@ QToolBox::tab:hover {
 }
 
 QToolBox::tab:selected {
-  background-color: #1c97ea;
-  border: 1px solid #1c97ea;
+  background-color: #1e7296;
+  border: 1px solid #1e7296;
 }
 
 QTableView QTableCornerButton::section {
@@ -100,11 +111,11 @@ QTableView QTableCornerButton::section {
 }
 
 QTableView {
-  selection-background-color: #2d2d30;
+  selection-background-color: rgba(16,180,248,48);
 }
 
 QTableView:active {
-  selection-background-color: #1c97ea;
+  selection-background-color: rgba(16,180,248,74);
 }
 
 QAbstractItemView {
@@ -142,16 +153,16 @@ QComboBox QAbstractItemView {
   selection-background-color: #3f3f46;
 }
 
-QComboBox::drop-down {
+*::drop-down {
   image: url(:/org.blueberry.ui.qt/dark/down-arrow.svg);
   subcontrol-origin: margin;
   subcontrol-position: right;
   width: 12px;
 }
 
-QComboBox::drop-down:hover {
+*::drop-down:hover {
   background-color: #1f1f20;
-  border-left: 1px solid #007acc;
+  border-left: 1px solid #0078a0;
   image: url(:/org.blueberry.ui.qt/dark/down-arrow-pressed.svg);
 }
 
@@ -206,27 +217,27 @@ QCheckBox::indicator, QRadioButton::indicator, QGroupBox::indicator, QListWidget
   width: 13px;
 }
 
-QCheckBox::indicator:unchecked, QGroupBox::indicator:unchecked, QListWidget::indicator:unchecked {
+QCheckBox::indicator:unchecked, QGroupBox::indicator:unchecked, QListWidget::indicator:unchecked, QAbstractItemView::indicator:unchecked {
   image: url(:/org.blueberry.ui.qt/dark/checkbox-unchecked.svg);
 }
 
-QCheckBox::indicator:unchecked:hover, QGroupBox::indicator:hover, QListWidget::indicator:hover {
+QCheckBox::indicator:unchecked:hover, QGroupBox::indicator:hover, QListWidget::indicator:hover, QAbstractItemView::indicator:hover {
   image: url(:/org.blueberry.ui.qt/dark/checkbox-unchecked-hover.svg);
 }
 
-QCheckBox::indicator:unchecked:disabled, QGroupBox::indicator:disabled, QListWidget::indicator:disabled {
+QCheckBox::indicator:unchecked:disabled, QGroupBox::indicator:disabled, QListWidget::indicator:disabled, QAbstractItemView::indicator:disabled {
   image: url(:/org.blueberry.ui.qt/dark/checkbox-unchecked-disabled.svg);
 }
 
-QCheckBox::indicator:checked, QGroupBox::indicator:checked, QListWidget::indicator:checked {
+QCheckBox::indicator:checked, QGroupBox::indicator:checked, QListWidget::indicator:checked, QAbstractItemView::indicator:checked {
   image: url(:/org.blueberry.ui.qt/dark/checkbox-checked.svg);
 }
 
-QCheckBox::indicator:checked:hover, QGroupBox::indicator:checked:hover, QListWidget::indicator:checked:hover {
+QCheckBox::indicator:checked:hover, QGroupBox::indicator:checked:hover, QListWidget::indicator:checked:hover, QAbstractItemView::indicator:checked:hover {
   image: url(:/org.blueberry.ui.qt/dark/checkbox-checked-hover.svg);
 }
 
-QCheckBox::indicator:checked:disabled, QGroupBox::indicator:checked:disabled, QListWidget::indicator:checked:disabled {
+QCheckBox::indicator:checked:disabled, QGroupBox::indicator:checked:disabled, QListWidget::indicator:checked:disabled, QAbstractItemView::indicator:checked:disabled {
   image: url(:/org.blueberry.ui.qt/dark/checkbox-checked-disabled.svg);
 }
 
@@ -275,11 +286,11 @@ QSlider::handle {
 }
 
 QSlider::handle:hover {
-  background-color: #1c97ea;
+  background-color: #dc10b4f8;
 }
 
 QSlider::handle:pressed {
-  background-color: #007acc;
+  background-color: #0078a0;
 }
 
 QSlider::handle:horizontal {
@@ -344,11 +355,11 @@ QScrollBar::handle {
 }
 
 QScrollBar::handle:hover {
-  background-color: #9e9e9e;
+  background-color: #dc10b4f8;
 }
 
 QScrollBar::handle:pressed {
-  background-color: #efebef;
+  background-color: #0078a0;
 }
 
 QScrollBar::handle:horizontal {

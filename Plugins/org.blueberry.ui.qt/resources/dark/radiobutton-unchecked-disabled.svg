@@ -9,12 +9,12 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="13"
-   height="13"
+   width="13.866667"
+   height="13.866667"
    viewBox="0 0 13 13"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r13725"
+   inkscape:version="0.92.1 r15371"
    sodipodi:docname="radiobutton-unchecked-disabled.svg">
   <defs
      id="defs4" />
@@ -26,7 +26,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="32"
-     inkscape:cx="5.3660997"
+     inkscape:cx="5.2802086"
      inkscape:cy="1.9319291"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -34,9 +34,9 @@
      units="px"
      inkscape:showpageshadow="false"
      inkscape:window-width="1264"
-     inkscape:window-height="1361"
-     inkscape:window-x="1280"
-     inkscape:window-y="0"
+     inkscape:window-height="1027"
+     inkscape:window-x="654"
+     inkscape:window-y="24"
      inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
@@ -56,10 +56,10 @@
      id="layer1"
      transform="translate(0,-1039.3622)">
     <circle
-       style="fill:#2d2d30;fill-opacity:1;stroke:#434346;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#414141;fill-opacity:1;stroke:#696969;stroke-width:0.94218749;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path4134"
        cx="6.5"
        cy="1045.8622"
-       r="6" />
+       r="6.0278969" />
   </g>
 </svg>

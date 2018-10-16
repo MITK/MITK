@@ -94,6 +94,10 @@ QAbstractItemView::item {
   color: #f1f1f1;
 }
 
+QAbstractItemView::item:selected {
+  background-color: #1c97ea;
+}
+
 QHeaderView::section {
   background-color: #2d2d30;
   border: 1px solid transparent;
@@ -584,7 +588,7 @@ QTreeView::indicator:unchecked {
 }
 
 QTreeView::indicator:unchecked:selected {
-  image: url(:/org.blueberry.ui.qt/dark/checkbox-unchecked-hover.svg);
+  image: url(:/org.blueberry.ui.qt/dark/checkbox-unchecked-selected.svg);
 }
 
 QTreeView::indicator:checked, QTreeView::indicator:indeterminate {
@@ -592,5 +596,5 @@ QTreeView::indicator:checked, QTreeView::indicator:indeterminate {
 }
 
 QTreeView::indicator:checked:selected, QTreeView::indicator:indeterminate:selected {
-  image: url(:/org.blueberry.ui.qt/dark/checkbox-checked-hover.svg);
+  image: url(:/org.blueberry.ui.qt/dark/checkbox-checked-selected.svg);
 }

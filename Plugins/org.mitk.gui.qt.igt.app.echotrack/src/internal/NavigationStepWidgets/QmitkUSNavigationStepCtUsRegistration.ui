@@ -35,6 +35,23 @@
     <widget class="QmitkDataStorageComboBox" name="fiducialMarkerModelPointSetComboBox"/>
    </item>
    <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>For development purposes: künstliche Marker-PointSet in FloatingImage  CS</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkDataStorageComboBox" name="devMarkerComboBox"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="doRegistrationMarkerToImagePushButton">
+     <property name="text">
+      <string>Do Registration Marker CS -&gt; Floating Image CS</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

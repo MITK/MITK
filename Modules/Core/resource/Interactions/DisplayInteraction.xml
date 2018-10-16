@@ -60,6 +60,13 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <transition event_class="InteractionPositionEvent"  event_variant="StartSwivel" target="crosshair">
             <condition name="check_can_swivel" inverted="true"/>
         </transition>
+         <!-- Change TimeSteps by clicking left or right Arrow-->
+        <transition event_class="InteractionEvent" event_variant="IncreaseTimeStep" target="start">
+          <action name="IncreaseTimeStep"/>
+        </transition>
+        <transition event_class="InteractionEvent" event_variant="DecreaseTimeStep" target="start">
+          <action name="DecreaseTimeStep"/>
+        </transition>
     </state>
     <state name="crosshair">
       <transition event_class="InteractionPositionEvent"  event_variant="MoveCrosshair" target="crosshair">

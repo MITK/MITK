@@ -75,6 +75,9 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("rotate", Rotate);
 
   CONNECT_FUNCTION("swivel", Swivel);
+
+  CONNECT_FUNCTION("IncreaseTimeStep", IncreaseTimeStep);
+  CONNECT_FUNCTION("DecreaseTimeStep", DecreaseTimeStep);
 }
 
 mitk::DisplayInteractor::DisplayInteractor()
@@ -388,6 +391,22 @@ void mitk::DisplayInteractor::SetCrosshair(mitk::StateMachineAction *, mitk::Int
         renWin != sender->GetRenderWindow())
       BaseRenderer::GetInstance(renWin)->GetSliceNavigationController()->SelectSliceByPoint(pos);
   }
+}
+
+void mitk::DisplayInteractor::IncreaseTimeStep(StateMachineAction *, InteractionEvent *interactionEvent)
+{
+  auto sliceNaviController = interactionEvent->GetSender()->GetRenderingManager()->GetTimeNavigationController();
+  auto stepper = sliceNaviController->GetTime();
+  stepper->SetAutoRepeat(true);
+  stepper->Next();
+}
+
+void mitk::DisplayInteractor::DecreaseTimeStep(StateMachineAction *, InteractionEvent *interactionEvent)
+{
+  auto sliceNaviController = interactionEvent->GetSender()->GetRenderingManager()->GetTimeNavigationController();
+  auto stepper = sliceNaviController->GetTime();
+  stepper->SetAutoRepeat(true);
+  stepper->Previous();
 }
 
 void mitk::DisplayInteractor::Zoom(StateMachineAction *, InteractionEvent *interactionEvent)

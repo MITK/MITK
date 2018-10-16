@@ -65,6 +65,7 @@ protected:
   void CleanDicomFolder();
   void UploadNewSegmentation();
   void RestartConnection();
+  void OnIndividualCheckChange(int state);
 
   Ui::SegmentationReworkViewControls m_Controls;
 

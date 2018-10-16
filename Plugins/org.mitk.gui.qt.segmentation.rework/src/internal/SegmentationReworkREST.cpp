@@ -37,13 +37,14 @@ void SegmentationReworkREST::HandleGet(MitkRequest message)
   MITK_INFO << "Message GET incoming...";
   MITK_INFO << mitk::RESTUtil::convertToUtf8(messageString);
 
-  if (messageString == U("/robots.txt") || messageString == U("/favicon.ico")) 
-  {
-    return;
-  }
-
   MITK_INFO << mitk::RESTUtil::convertToUtf8(message.request_uri().to_string());
   auto uri = web::uri::decode(message.request_uri().to_string());
+
+  if (uri.find(U("/robots.txt")) != std::string::npos || uri.find(U("/favicon.ico")) != std::string::npos || uri == U("/-") || uri.length() == 0)
+  {
+    MITK_INFO << "ignore GET request.";
+    return;
+  }
 
   auto query = web::uri(uri).query();
   auto httpParams = web::uri::split_query(query);

@@ -45,14 +45,19 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 
   qRegisterMetaType< std::vector<std::string> >("std::vector<std::string>");
 
-  m_Controls.chartWidget->setVisible(false);
   m_Controls.verticalWidget->setVisible(false);
   m_Controls.cleanDicomBtn->setVisible(false);
+  m_Controls.individualWidget_2->setVisible(false);
+
+  m_Controls.sliderWidget->setMinimum(0);
+  m_Controls.sliderWidget->setMaximum(1);
+  m_Controls.sliderWidget->setTickInterval(0.01);
 
   connect(m_Controls.buttonUpload, &QPushButton::clicked, this, &SegmentationReworkView::UploadNewSegmentation);
   connect(m_Controls.buttonNewSeg, &QPushButton::clicked, this, &SegmentationReworkView::CreateNewSegmentationC);
   connect(m_Controls.cleanDicomBtn, &QPushButton::clicked, this, &SegmentationReworkView::CleanDicomFolder);
   connect(m_Controls.restartConnection, &QPushButton::clicked, this, &SegmentationReworkView::RestartConnection);
+  connect(m_Controls.checkIndiv, &QCheckBox::stateChanged, this, &SegmentationReworkView::OnIndividualCheckChange);
 
   m_DownloadBaseDir = mitk::IOUtil::GetTempPathA() + "segrework";
   MITK_INFO << "using download base dir: " << m_DownloadBaseDir;
@@ -109,6 +114,18 @@ void SegmentationReworkView::RestartConnection()
   m_DICOMWeb = new mitk::DICOMWeb(utility::conversions::to_string_t(url));
   MITK_INFO << "requests to pacs are sent to: " << url;
   m_Controls.dcm4cheeURL->setText({ (utility::conversions::to_utf8string(url).c_str()) });
+}
+
+void SegmentationReworkView::OnIndividualCheckChange(int state)
+{
+  if(state == Qt::Unchecked)
+  {
+    m_Controls.individualWidget_2->setVisible(false);
+  }
+  else if (state == Qt::Checked)
+  {
+    m_Controls.individualWidget_2->setVisible(true);
+  }
 }
 
 void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::DicomDTO &dto)
@@ -279,7 +296,7 @@ void SegmentationReworkView::LoadData(std::vector<std::string> filePathList)
   //m_Image = dataNodes->at(0);
   //m_SegA = dataNodes->at(1);
   if (dataNodes->size() > 2) {
-    m_SegB = dataNodes->at(2);
+    //m_SegB = dataNodes->at(2);
   }
 }
 
@@ -333,11 +350,10 @@ void SegmentationReworkView::HandleIndividualSegmentationCreation(mitk::Image::P
       overwriteFilter->SetSliceIndex(it->first);
       auto emptySlice = mitk::Image::New();
       unsigned int *dimensions = new unsigned int[2]{baseSegmentation->GetDimensions()[0], baseSegmentation->GetDimensions()[1]}; 
-	  emptySlice->Initialize(baseSegmentation->GetPixelType(), 2, dimensions);
+	     emptySlice->Initialize(baseSegmentation->GetPixelType(), 2, dimensions);
       overwriteFilter->SetSliceImage(emptySlice);
-	  overwriteFilter->Update();
-	}
-
+	     overwriteFilter->Update();
+	   }
   }
 }
 
@@ -357,7 +373,7 @@ void SegmentationReworkView::CreateNewSegmentationC()
 
   if (m_Controls.checkIndiv->isChecked())
   {
-    //HandleIndividualSegmentationCreation(baseImage, m_Controls.sliderWidget->value());
+    HandleIndividualSegmentationCreation(baseImage, m_Controls.sliderWidget->value());
   }
 
   QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog(m_Parent); // needs a QWidget as parent, "this" is not QWidget

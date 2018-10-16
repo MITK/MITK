@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QPixmap>
 #include <QStandardItemModel>
 
-/*
+/**
 * @brief The QmitkPatientTableModel is a subclass of the QmitkAbstractSemanticRelationsStorageModel and holds the semantic relations data of the currently selected case.
 *
 *   The QmitkPatientTableModel uses the 'data' function to return either the data node of a table cell or the thumbnail of the underlying image.
@@ -83,8 +83,9 @@ protected:
 
 private:
 
-  void SetDataNodes();
   void SetHeaderModel();
+  void SetPixmaps();
+  void SetLesionPresences();
 
   /**
   * @brief The function uses the ID of the node to see if a pixmap was already set. If not, the given pixmap
@@ -92,15 +93,30 @@ private:
   *        Using 'nullptr' as a pixmap will erase the entry for the given data node.
   *
   * @param dataNode           The data node whose pixmap should be set
-  * @param  pixmapFromImage   The pixmap that shows an image of the content of the data node
+  * @param pixmapFromImage    The pixmap that shows an image of the content of the data node
   */
   void SetPixmapOfNode(const mitk::DataNode* dataNode, QPixmap* pixmapFromImage);
-
-  void SetLesionPresence(const mitk::DataNode* dataNode, bool lesionPresence);
-
+  /**
+  * @brief Check if the member lesion is present on the given data node.
+  *        For this the given data node is checked against the image / segmentation predicate. If the node is a
+  *        segmentation, the represented lesion of the segmentation is simply compared against the member lesion.
+  *        If the node is an image its derived segmentations are retrieved. For each derived segmentation
+  *        the represented lesion is compared against the member lesion.
+  *        The function is used by the 'SetLesionPresences' function.
+  *
+  */
   bool IsLesionPresentOnDataNode(const mitk::DataNode* dataNode) const;
-
-  /*
+  /**
+  * @brief The function uses the ID of the node to see if a lesion presence was already set. If not, the given
+  *        bool value is used and stored inside a member variable. If the lesion presence was already set, it
+  *        will be overwritten.
+  *        The function is used by the 'SetLesionPresences' function.
+  *
+  * @param dataNode           The data node whose lesion presence should be set
+  * @param lesionPresence     The bool value that defines the lesion presence of the given data node
+  */
+  void SetLesionPresenceOfNode(const mitk::DataNode* dataNode, bool lesionPresence);
+  /**
   * @brief Returns the data node that is associated with the given table entry (index).
   *
   *         The function uses the SemanticRelations-class and the current control point data and information type data to
@@ -117,6 +133,7 @@ private:
   mitk::SemanticTypes::InformationTypeVector m_InformationTypes;
   mitk::SemanticTypes::ControlPointVector m_ControlPoints;
   mitk::SemanticTypes::ExaminationPeriodVector m_ExaminationPeriods;
+  mitk::SemanticRelations::DataNodeVector m_CurrentDataNodes;
   std::string m_SelectedNodeType;
 
   QStandardItemModel* m_HeaderModel;

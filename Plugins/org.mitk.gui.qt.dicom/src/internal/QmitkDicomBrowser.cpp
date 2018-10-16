@@ -188,7 +188,7 @@ void QmitkDicomBrowser::CreateTemporaryDirectory()
   tmp.mkdir(QDir::toNativeSeparators( m_TempDirectory ));
 }
 
-void QmitkDicomBrowser::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
+void QmitkDicomBrowser::OnPreferencesChanged(const berry::IBerryPreferences*)
 {
   SetPluginDirectory();
   berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();

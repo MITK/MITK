@@ -116,7 +116,7 @@ bool GetLesionPresence(const mitk::SemanticTypes::CaseID& caseID, std::shared_pt
     for (const auto& image : allImagesOfLesion)
     {
       auto imageControlPoint = semanticRelations->GetControlPointOfData(image);
-      if (imageControlPoint == controllPoint)
+      if (imageControlPoint.date == controllPoint.date)
       {
         return true;
       }

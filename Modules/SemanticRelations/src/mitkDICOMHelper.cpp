@@ -147,17 +147,15 @@ std::string mitk::TrimDICOM(const std::string& identifier)
 
 mitk::SemanticTypes::ControlPoint GetControlPointFromString(const std::string& dateAsString)
 {
-  if (dateAsString.size() != 8) // string does not represent a DICOM date
+  // date expected to be YYYYMMDD (8 characters)
+  if (dateAsString.size() != 8)
   {
+    // string does not represent a DICOM date
     return mitk::SemanticTypes::ControlPoint();
   }
 
   mitk::SemanticTypes::ControlPoint controlPoint;
-
-  // date expected to be YYYYMMDD (8 characters)
-  controlPoint.year = std::strtoul(dateAsString.substr(0, 4).c_str(), nullptr, 10);
-  controlPoint.month = std::strtoul(dateAsString.substr(4, 2).c_str(), nullptr, 10);
-  controlPoint.day = std::strtoul(dateAsString.substr(6, 2).c_str(), nullptr, 10);
+  controlPoint.SetDateFromString(dateAsString);
 
   return controlPoint;
 }

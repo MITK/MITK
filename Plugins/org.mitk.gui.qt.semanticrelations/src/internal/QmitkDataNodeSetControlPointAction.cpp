@@ -99,12 +99,13 @@ void QmitkDataNodeSetControlPointAction::OnActionTriggered(bool checked)
   const QDate& userSelectedDate = inputDialog->GetCurrentDate();
   mitk::SemanticTypes::ControlPoint controlPoint;
   controlPoint.UID = mitk::UIDGeneratorBoost::GenerateUID();
-  controlPoint.year = userSelectedDate.year();
-  controlPoint.month = userSelectedDate.month();
-  controlPoint.day = userSelectedDate.day();
+  controlPoint.date = boost::gregorian::date(userSelectedDate.year(),
+                                             userSelectedDate.month(),
+                                             userSelectedDate.day());
 
   try
   {
+    m_SemanticRelations->UnlinkDataFromControlPoint(dataNode);
     m_SemanticRelations->SetControlPointOfData(dataNode, controlPoint);
   }
   catch (const mitk::SemanticRelationException&)

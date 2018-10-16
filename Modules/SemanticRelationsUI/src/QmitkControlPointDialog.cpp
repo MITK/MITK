@@ -60,7 +60,7 @@ QmitkControlPointDialog::~QmitkControlPointDialog()
 
 void QmitkControlPointDialog::SetCurrentDate(mitk::SemanticTypes::ControlPoint currentControlPoint)
 {
-  m_DateEdit->setDate(QDate(currentControlPoint.year, currentControlPoint.month, currentControlPoint.day));
+  m_DateEdit->setDate(QDate(currentControlPoint.date.year(), currentControlPoint.date.month(), currentControlPoint.date.day()));
 }
 
 QDate QmitkControlPointDialog::GetCurrentDate() const

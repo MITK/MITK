@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk core
 #include <mitkPropertyNameHelper.h>
 
-double CalculateDistanceInDays(const mitk::SemanticTypes::ControlPoint& leftControlPoint, const mitk::SemanticTypes::ControlPoint& rightControlPoint);
-
 mitk::SemanticTypes::ControlPoint mitk::GenerateControlPoint(const DataNode* datanode)
 {
   SemanticTypes::ControlPoint controlPoint = GetDICOMDateFromDataNode(datanode);
@@ -50,21 +48,11 @@ mitk::SemanticTypes::ControlPoint mitk::GetControlPointByUID(const SemanticTypes
   return controlPoint;
 }
 
-std::string mitk::GetControlPointAsString(const SemanticTypes::ControlPoint& controlPoint)
-{
-  std::stringstream controlPointAsString;
-  controlPointAsString << std::to_string(controlPoint.year) << "-"
-    << std::setfill('0') << std::setw(2) << std::to_string(controlPoint.month) << "-"
-    << std::setfill('0') << std::setw(2) << std::to_string(controlPoint.day);
-
-  return controlPointAsString.str();
-}
-
 mitk::SemanticTypes::ControlPoint mitk::FindExistingControlPoint(const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ControlPointVector& allControlPoints)
 {
   for (const auto& currentControlPoint : allControlPoints)
   {
-    if (controlPoint == currentControlPoint)
+    if (controlPoint.date == currentControlPoint.date)
     {
       return currentControlPoint;
     }
@@ -87,7 +75,7 @@ mitk::SemanticTypes::ControlPoint mitk::FindClosestControlPoint(const SemanticTy
   std::vector<SemanticTypes::ControlPoint>::const_iterator it;
   for (it = allControlPoints.begin(); it != allControlPoints.end(); ++it)
   {
-    if (controlPoint < *it)
+    if (controlPoint.date < it->date)
     {
       break;
     }
@@ -114,11 +102,11 @@ mitk::SemanticTypes::ControlPoint mitk::FindClosestControlPoint(const SemanticTy
   }
 
   // test distance to next and previous time period
-  double distanceToNextExaminationPeriod = CalculateDistanceInDays(nextControlPoint, controlPoint);
-  double distanceToPreviousExaminationPeriod = CalculateDistanceInDays(previousControlPoint, controlPoint);
+  double distanceToNextExaminationPeriod = nextControlPoint.DistanceInDays(controlPoint);
+  double distanceToPreviousExaminationPeriod = previousControlPoint.DistanceInDays(controlPoint);
 
   SemanticTypes::ControlPoint closestControlPoint;
-  double closestDistanceInDays = 0.0;
+  int closestDistanceInDays = 0;
   if (distanceToNextExaminationPeriod < distanceToPreviousExaminationPeriod)
   {
     // control point is closer to the next control point
@@ -132,7 +120,7 @@ mitk::SemanticTypes::ControlPoint mitk::FindClosestControlPoint(const SemanticTy
     closestDistanceInDays = distanceToPreviousExaminationPeriod;
   }
 
-  double THRESHOLD_DISTANCE_IN_DAYS = 30.0;
+  int THRESHOLD_DISTANCE_IN_DAYS = 30;
   if (closestDistanceInDays < THRESHOLD_DISTANCE_IN_DAYS)
   {
     return closestControlPoint;
@@ -175,29 +163,8 @@ void mitk::SortExaminationPeriods(SemanticTypes::ExaminationPeriodVector& allExa
     const auto& leftControlPoint = GetControlPointByUID(leftUID, allControlPoints);
     const auto& rightControlPoint = GetControlPointByUID(rightUID, allControlPoints);
 
-    return leftControlPoint < rightControlPoint;
+    return leftControlPoint.date < rightControlPoint.date;
   };
 
   std::sort(allExaminationPeriods.begin(), allExaminationPeriods.end(), lambda);
-}
-
-double CalculateDistanceInDays(const mitk::SemanticTypes::ControlPoint& leftControlPoint, const mitk::SemanticTypes::ControlPoint& rightControlPoint)
-{
-  std::tm leftTimeStructure = { 0, 0, 0, leftControlPoint.day,  leftControlPoint.month - 1,   leftControlPoint.year - 1900 };
-  std::tm rightTimeStructure = { 0, 0, 0, rightControlPoint.day, rightControlPoint.month - 1,  rightControlPoint.year - 1900 };
-
-  time_t leftTime = mktime(&leftTimeStructure);
-  time_t rightTime = mktime(&rightTimeStructure);
-
-  if (leftTime == -1 || rightTime == -1)
-  {
-    // date is not initialized, no difference can be computed
-    return std::numeric_limits<double>::max();
-  }
-
-  // compute distance here
-  double secondsPerDay = 60 * 60 * 24;
-  double timeDifferenceInDays = std::difftime(leftTime, rightTime) / secondsPerDay;
-
-  return std::abs(timeDifferenceInDays);
 }

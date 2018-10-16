@@ -72,7 +72,8 @@ protected:
 private:
 
   std::string getNextFolderName();
-  void HandleIndividualSegmentationCreation(mitk::Image::Pointer baseSegmentation, double threshold);
+  std::vector<unsigned int> CreateSegmentation(mitk::Image::Pointer baseSegmentation, double threshold);
+  void InterpolateSegmentation(mitk::Image::Pointer baseSegmentatio, std::vector<unsigned int> sliceIndices);
 
   void SetSimilarityGraph(std::vector<double> simScoreArray, int sliceMinStart);
   std::unique_ptr<SegmentationReworkREST> m_HttpHandler;

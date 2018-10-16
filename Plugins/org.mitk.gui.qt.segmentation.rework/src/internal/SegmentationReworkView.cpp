@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSegTool2D.h>
 #include <mitkToolManagerProvider.h>
 #include <mitkOverwriteSliceImageFilter.h>
+#include <mitkSegmentationInterpolationController.h>
 
 const std::string SegmentationReworkView::VIEW_ID = "org.mitk.views.segmentationreworkview";
 
@@ -45,13 +46,15 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 
   qRegisterMetaType< std::vector<std::string> >("std::vector<std::string>");
 
-  m_Controls.verticalWidget->setVisible(false);
+  //m_Controls.verticalWidget->setVisible(false);
   m_Controls.cleanDicomBtn->setVisible(false);
   m_Controls.individualWidget_2->setVisible(false);
 
-  m_Controls.sliderWidget->setMinimum(0);
-  m_Controls.sliderWidget->setMaximum(1);
-  m_Controls.sliderWidget->setTickInterval(0.01);
+  m_Controls.sliderWidget->setMinimum(1);
+  m_Controls.sliderWidget->setMaximum(100);
+  m_Controls.sliderWidget->setTickInterval(1);
+  m_Controls.sliderWidget->setSingleStep(1);
+  m_Controls.radioA->setChecked(true);
 
   connect(m_Controls.buttonUpload, &QPushButton::clicked, this, &SegmentationReworkView::UploadNewSegmentation);
   connect(m_Controls.buttonNewSeg, &QPushButton::clicked, this, &SegmentationReworkView::CreateNewSegmentationC);
@@ -92,8 +95,8 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 
   MITK_INFO << "Listening for requests at: " << utility::conversions::to_utf8string(address);
 
-  utility::string_t pacsURL = U("http://jip-dktk/dcm4chee-arc/aets/DCM4CHEE");
-  //utility::string_t pacsURL = U("http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE");
+  //utility::string_t pacsURL = U("http://jip-dktk/dcm4chee-arc/aets/DCM4CHEE");
+  utility::string_t pacsURL = U("http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE");
   m_DICOMWeb = new mitk::DICOMWeb(pacsURL);
   MITK_INFO << "requests to pacs are sent to: " << utility::conversions::to_utf8string(pacsURL);
   m_Controls.dcm4cheeURL->setText({ (utility::conversions::to_utf8string(pacsURL).c_str()) });
@@ -293,11 +296,9 @@ void SegmentationReworkView::LoadData(std::vector<std::string> filePathList)
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(ds);
 
   // find data nodes
-  //m_Image = dataNodes->at(0);
-  //m_SegA = dataNodes->at(1);
-  if (dataNodes->size() > 2) {
-    //m_SegB = dataNodes->at(2);
-  }
+  m_Image = dataNodes->at(0);
+  m_SegA = dataNodes->at(1);
+  m_SegB = dataNodes->at(2);
 }
 
 void SegmentationReworkView::UpdateChartWidget()
@@ -307,6 +308,11 @@ void SegmentationReworkView::UpdateChartWidget()
 
 void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArray, int sliceMinStart)
 {
+  if (m_Controls.chartWidget->GetData()->size() > 0)
+  {
+    m_Controls.chartWidget->RemoveData("similarity graph");
+  }
+
   double sliceIndex = sliceMinStart;
   for (double score : simScoreArray)
   {
@@ -337,24 +343,66 @@ void SegmentationReworkView::UploadNewSegmentation()
   }
 }
 
-void SegmentationReworkView::HandleIndividualSegmentationCreation(mitk::Image::Pointer baseSegmentation, double threshold) 
+std::vector<unsigned int> SegmentationReworkView::CreateSegmentation(mitk::Image::Pointer baseSegmentation, double threshold)
 {
+  MITK_INFO << "handle individual segmentation creation";
   std::map<double, double>::iterator it;
   mitk::OverwriteSliceImageFilter::Pointer overwriteFilter = mitk::OverwriteSliceImageFilter::New();
   overwriteFilter->SetInput(baseSegmentation);
 
+  std::vector<unsigned int> sliceIndices;
+
+  unsigned int count = 0;
   for (it = m_ScoreMap.begin(); it != m_ScoreMap.end(); it++)
   {
     if (it->second < threshold)
     {
-      overwriteFilter->SetSliceIndex(it->first);
+      overwriteFilter->SetSliceIndex(int(it->first));
       auto emptySlice = mitk::Image::New();
-      unsigned int *dimensions = new unsigned int[2]{baseSegmentation->GetDimensions()[0], baseSegmentation->GetDimensions()[1]}; 
+      unsigned int *dimensions = new unsigned int[2]{baseSegmentation->GetDimension(0), baseSegmentation->GetDimension(1)}; 
 	     emptySlice->Initialize(baseSegmentation->GetPixelType(), 2, dimensions);
       overwriteFilter->SetSliceImage(emptySlice);
+      overwriteFilter->SetSliceDimension(2);
 	     overwriteFilter->Update();
+      count++;
+      sliceIndices.push_back(it->first);
 	   }
   }
+  MITK_INFO << "slices deleted " << count;
+
+  return sliceIndices;
+}
+
+void SegmentationReworkView::InterpolateSegmentation(mitk::Image::Pointer baseSegmentation, std::vector<unsigned int> sliceIndices)
+{
+  mitk::SegmentationInterpolationController::Pointer interpolator = mitk::SegmentationInterpolationController::New();
+  mitk::OverwriteSliceImageFilter::Pointer overwriteFilter = mitk::OverwriteSliceImageFilter::New();
+  mitk::SliceNavigationController::Pointer navigationController = mitk::SliceNavigationController::New();
+  navigationController->SetInputWorldTimeGeometry(baseSegmentation->GetTimeGeometry());
+  navigationController->Update(mitk::SliceNavigationController::Axial);
+
+  interpolator->SetSegmentationVolume(baseSegmentation);
+  overwriteFilter->SetInput(baseSegmentation);
+
+  MITK_INFO << "start with interpolation ";
+  
+  for (auto index : sliceIndices)
+  {
+    // look for the center within a slide
+    itk::Index<3> centerPoint = { { baseSegmentation->GetDimension(0)/2, baseSegmentation->GetDimension(1)/2, index } };
+    mitk::Point3D pointMM;
+    baseSegmentation->GetTimeGeometry()->GetGeometryForTimeStep(0)->IndexToWorld(centerPoint, pointMM);
+    navigationController->SelectSliceByPoint(pointMM);
+    auto plane = navigationController->GetCurrentPlaneGeometry();
+    mitk::Image::Pointer interpolatedSlice = interpolator->Interpolate(2, index, plane, 0);
+
+    overwriteFilter->SetSliceIndex(index);
+    overwriteFilter->SetSliceImage(interpolatedSlice);
+    overwriteFilter->SetSliceDimension(2);
+    overwriteFilter->Update();
+  }
+
+  MITK_INFO << "finished with interpolation ";
 }
 
 void SegmentationReworkView::CreateNewSegmentationC() 
@@ -373,7 +421,8 @@ void SegmentationReworkView::CreateNewSegmentationC()
 
   if (m_Controls.checkIndiv->isChecked())
   {
-    HandleIndividualSegmentationCreation(baseImage, m_Controls.sliderWidget->value());
+    auto sliceIndices = CreateSegmentation(baseImage, m_Controls.sliderWidget->value());
+    InterpolateSegmentation(baseImage, sliceIndices);
   }
 
   QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog(m_Parent); // needs a QWidget as parent, "this" is not QWidget

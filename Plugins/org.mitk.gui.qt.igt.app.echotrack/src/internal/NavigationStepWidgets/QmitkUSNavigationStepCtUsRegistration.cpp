@@ -26,12 +26,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateProperty.h>
 #include <mitkLabelSetImage.h>
 #include "mitkProperties.h"
+#include <mitkImage.h>
+#include <mitkImageCast.h>
 
 #include <mitkRenderingManager.h>
 #include <mitkStaticIGTHelperFunctions.h>
 
 #include <vtkLandmarkTransform.h>
 #include <vtkPoints.h>
+
+#include <itkThresholdImageFilter.h>
+#include <itkImage.h>
+#include <mitkImagePixelReadAccessor.h>
 
 
 QmitkUSNavigationStepCtUsRegistration::QmitkUSNavigationStepCtUsRegistration(QWidget *parent) :
@@ -176,6 +182,8 @@ void QmitkUSNavigationStepCtUsRegistration::CreateQtPartControl(QWidget *parent)
     this, SLOT(OnDevComboBoxChanged(const mitk::DataNode*)));
   connect(ui->doRegistrationMarkerToImagePushButton, SIGNAL(clicked()),
     this, SLOT(OnRegisterMarkerToFloatingImageCS()));
+  connect(ui->filterTestsPushButton, SIGNAL(clicked()),
+    this, SLOT(OnFilterFloatingImage()));
 }
 
 void QmitkUSNavigationStepCtUsRegistration::OnFloatingImageComboBoxSelectionChanged(const mitk::DataNode* node)
@@ -325,7 +333,6 @@ void QmitkUSNavigationStepCtUsRegistration::OnRegisterMarkerToFloatingImageCS()
 
   double FRE = mitk::StaticIGTHelperFunctions::ComputeFRE(m_MarkerModelCoordinateSystemPointSet, m_MarkerFloatingImageCoordinateSystemPointSet, transform);
   MITK_INFO << "FRE: " << FRE << " mm";
-
   //#############################################################################################
 
   //############### conversion back to itk/mitk data types ##########################
@@ -347,19 +354,17 @@ void QmitkUSNavigationStepCtUsRegistration::OnRegisterMarkerToFloatingImageCS()
     translationFloat[k] = m->GetElement(k, 3);
     translationDouble[k] = m->GetElement(k, 3);
   }
-  //create affine transform 3D surface
-  mitk::AffineTransform3D::Pointer mitkTransform = mitk::AffineTransform3D::New();
-  mitkTransform->SetMatrix(rotationDouble);
-  mitkTransform->SetOffset(translationDouble);
+  //create mitk affine transform 3D and save it to the class member
+  m_TransformMarkerCSToFloatingImageCS = mitk::AffineTransform3D::New();
+  m_TransformMarkerCSToFloatingImageCS->SetMatrix(rotationDouble);
+  m_TransformMarkerCSToFloatingImageCS->SetOffset(translationDouble);
+  MITK_INFO << m_TransformMarkerCSToFloatingImageCS;
   //################################################################
 
   //############### object is transformed ##########################
-  //save transform
-  //this is stored in a member because it is needed for permanent registration later on
-  m_TransformMarkerCSToFloatingImageCS = mitk::NavigationData::New(mitkTransform); 
-  MITK_INFO << mitkTransform;
-                                                            //transform surface/image
-                                                            //only move image if we have one. Sometimes, this widget is used just to register point sets without images.
+  //transform surface/image
+  //only move image if we have one. Sometimes, this widget is used just to register point sets without images.
+  
   /*if (m_ImageNode.IsNotNull())
   {
     //first we have to store the original ct image transform to compose it with the new transform later
@@ -392,6 +397,28 @@ void QmitkUSNavigationStepCtUsRegistration::OnRegisterMarkerToFloatingImageCS()
   //Do a global reinit
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 
+}
+
+void QmitkUSNavigationStepCtUsRegistration::OnFilterFloatingImage()
+{
+  if (m_FloatingImage.IsNull())
+  {
+    return;
+  }
+  //Initialize threshold filter
+  itk::ThresholdImageFilter<itk::Image<int,3>>::Pointer thresholdFilter = itk::ThresholdImageFilter<itk::Image<int, 3>>::New();
+  thresholdFilter->SetOutsideValue(0.0);
+  thresholdFilter->SetLower(150);
+  thresholdFilter->SetUpper(2000);
+
+  itk::Image<int,3>::Pointer itkImage = itk::Image<int, 3>::New();
+  mitk::CastToItkImage(m_FloatingImage, itkImage);
+
+  thresholdFilter->SetInput(itkImage);
+  itk::Image<int, 3>::Pointer filteredImage = thresholdFilter->GetOutput();
+  filteredImage->Update();
+  mitk::CastToMitkImage(filteredImage, m_FloatingImage);
+  //m_FloatingImage->Update();
 }
 
 

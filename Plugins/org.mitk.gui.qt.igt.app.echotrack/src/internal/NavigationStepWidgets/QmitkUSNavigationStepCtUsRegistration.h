@@ -118,6 +118,7 @@ protected slots:
   void OnFiducialMarkerModelComboBoxSelectionChanged(const mitk::DataNode* node);
   void OnDevComboBoxChanged(const mitk::DataNode* node);
   void OnRegisterMarkerToFloatingImageCS();
+  void OnFilterFloatingImage();
 
 private:
   Ui::QmitkUSNavigationStepCtUsRegistration *ui;
@@ -127,13 +128,13 @@ private:
   mitk::NodePredicateAnd::Pointer m_IsAPatientImagePredicate;
   mitk::TNodePredicateDataType<mitk::PointSet>::Pointer m_IsAPointSetPredicate;
 
-  itk::SmartPointer<mitk::NavigationDataSource>   m_NavigationDataSource;
+  itk::SmartPointer<mitk::NavigationDataSource> m_NavigationDataSource;
   mitk::Image::Pointer m_FloatingImage;
   mitk::PointSet::Pointer m_MarkerModelCoordinateSystemPointSet;
   mitk::PointSet::Pointer m_MarkerFloatingImageCoordinateSystemPointSet;
 
 
-  mitk::NavigationData::Pointer m_TransformMarkerCSToFloatingImageCS;
+  mitk::AffineTransform3D::Pointer m_TransformMarkerCSToFloatingImageCS;
   /*!
   \brief The 3D dimension of the CT image given in index size.
   */

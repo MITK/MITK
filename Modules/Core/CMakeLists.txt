@@ -17,7 +17,7 @@ MITK_CREATE_MODULE(
     # factories from ITK which are registered "automatically" via a factory manager.
     PRIVATE ITK
     PUBLIC  VTK|vtkFiltersTexture+vtkFiltersParallel+vtkImagingStencil+vtkImagingMath+vtkInteractionStyle+vtkRenderingOpenGL2+vtkRenderingContextOpenGL2+vtkRenderingVolumeOpenGL2+vtkRenderingFreeType+vtkRenderingLabel+vtkInteractionWidgets+vtkIOGeometry+vtkIOXML
-    PUBLIC  Boost
+    PUBLIC  Boost|boost
   SUBPROJECTS MITK-Core
   # Do not automatically create CppMicroServices initialization code.
   # Because the VTK 6 "auto-init" functionality injects file-local static

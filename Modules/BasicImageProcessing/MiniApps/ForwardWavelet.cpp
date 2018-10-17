@@ -89,8 +89,8 @@ int main(int argc, char* argv[])
     return 0;
   }
 
-  int levels = us::any_cast<float>(parsedArgs["number-of-levels"]);
-  int bands = us::any_cast<float>(parsedArgs["number-of-bands"]);
+  int levels = us::any_cast<int>(parsedArgs["number-of-levels"]);
+  int bands = us::any_cast<int>(parsedArgs["number-of-bands"]);
 
   mitk::BorderCondition condition = mitk::BorderCondition::Constant;
   mitk::WaveletType waveletType = mitk::WaveletType::Held;
@@ -133,6 +133,7 @@ int main(int argc, char* argv[])
   for (auto image : results)
   {
     std::string name = outputFilename + us::Any(level).ToString() + outputExtension;
+    MITK_INFO << "Saving to " << name;
     mitk::IOUtil::Save(image, name);
     ++level;
   }

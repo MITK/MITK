@@ -33,4 +33,9 @@ This section contains views that are included within MITK Phenotyping, but were 
 \li \subpage org_mitk_views_segmentation : Create simple segmentations
 \li \subpage org_mitk_views_segmentationutilities : Utilities for the processing of simple segmentations. 
 
+\section radiomics_miniapps MiniApps (Command line Tools)
+\li \subpage MiniAppExplainPage Explanation of the Command Line App concept in MITK
+\li \subpage mitkBasicImageProcessingMiniAppsPortalPage : List of common preprocessing MiniApps
+\li \subpage mitkClassificationMiniAppsPortalPage : (Incomplete) list of MITK Classification MiniApps
+
 */

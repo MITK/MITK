@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationReworkREST.h"
 #include <mitkDICOMWeb.h>
 #include <mitkImage.h>
+#include <mitkLabelSetImage.h>
 
 /**
   \brief SegmentationReworkView
@@ -73,7 +74,7 @@ private:
 
   std::string getNextFolderName();
   std::vector<unsigned int> CreateSegmentation(mitk::Image::Pointer baseSegmentation, double threshold);
-  void InterpolateSegmentation(mitk::Image::Pointer baseSegmentatio, std::vector<unsigned int> sliceIndices);
+  void InterpolateSegmentation(mitk::Image::Pointer baseSegmentation, std::vector<unsigned int> sliceIndices);
 
   void SetSimilarityGraph(std::vector<double> simScoreArray, int sliceMinStart);
   std::unique_ptr<SegmentationReworkREST> m_HttpHandler;

@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToolManagerProvider.h>
 #include <mitkOverwriteSliceImageFilter.h>
 #include <mitkSegmentationInterpolationController.h>
+#include <mitkImagePixelWriteAccessor.h>
 
 const std::string SegmentationReworkView::VIEW_ID = "org.mitk.views.segmentationreworkview";
 
@@ -347,8 +348,6 @@ std::vector<unsigned int> SegmentationReworkView::CreateSegmentation(mitk::Image
 {
   MITK_INFO << "handle individual segmentation creation";
   std::map<double, double>::iterator it;
-  mitk::OverwriteSliceImageFilter::Pointer overwriteFilter = mitk::OverwriteSliceImageFilter::New();
-  overwriteFilter->SetInput(baseSegmentation);
 
   std::vector<unsigned int> sliceIndices;
 
@@ -357,19 +356,36 @@ std::vector<unsigned int> SegmentationReworkView::CreateSegmentation(mitk::Image
   {
     if (it->second < threshold)
     {
-      overwriteFilter->SetSliceIndex(int(it->first));
-      auto emptySlice = mitk::Image::New();
-      unsigned int *dimensions = new unsigned int[2]{baseSegmentation->GetDimension(0), baseSegmentation->GetDimension(1)}; 
-	     emptySlice->Initialize(baseSegmentation->GetPixelType(), 2, dimensions);
-      overwriteFilter->SetSliceImage(emptySlice);
-      overwriteFilter->SetSliceDimension(2);
-	     overwriteFilter->Update();
+      auto index = it->first;
+      //overwriteFilter->SetSliceIndex(int(it->first));
+      //auto emptySlice = mitk::LabelSetImage::New();
+      //unsigned int *dimensions = new unsigned int[2]{baseSegmentation->GetDimension(0), baseSegmentation->GetDimension(1)}; 
+	     //emptySlice->Initialize(baseSegmentation->GetPixelType(), 2, dimensions);
+      //overwriteFilter->SetSliceImage(emptySlice);
+      //overwriteFilter->SetSliceDimension(2);
+	     //overwriteFilter->Update();
+
+      try 
+      {
+        mitk::ImagePixelWriteAccessor<unsigned short, 3> imageAccessor(baseSegmentation);
+        for (unsigned int x = 0; x < baseSegmentation->GetDimension(0); x++)
+        {
+          for (unsigned int y = 0; y < baseSegmentation->GetDimension(1); y++)
+          {
+            imageAccessor.SetPixelByIndex({ { x, y, int(index) } }, 0);
+          }
+        }
+      }
+      catch (mitk::Exception& e) {
+        MITK_ERROR << e.what();
+      }
+
       count++;
-      sliceIndices.push_back(it->first);
+      sliceIndices.push_back(index);
+      MITK_INFO << "slice " << it->first <<  " removed ";
 	   }
   }
   MITK_INFO << "slices deleted " << count;
-
   return sliceIndices;
 }
 
@@ -382,6 +398,7 @@ void SegmentationReworkView::InterpolateSegmentation(mitk::Image::Pointer baseSe
   navigationController->Update(mitk::SliceNavigationController::Axial);
 
   interpolator->SetSegmentationVolume(baseSegmentation);
+  interpolator->SetReferenceVolume(dynamic_cast<mitk::Image*>(m_Image->GetData()));
   overwriteFilter->SetInput(baseSegmentation);
 
   MITK_INFO << "start with interpolation ";
@@ -394,12 +411,18 @@ void SegmentationReworkView::InterpolateSegmentation(mitk::Image::Pointer baseSe
     baseSegmentation->GetTimeGeometry()->GetGeometryForTimeStep(0)->IndexToWorld(centerPoint, pointMM);
     navigationController->SelectSliceByPoint(pointMM);
     auto plane = navigationController->GetCurrentPlaneGeometry();
-    mitk::Image::Pointer interpolatedSlice = interpolator->Interpolate(2, index, plane, 0);
+    unsigned int sliceDimension = 2;
+    mitk::Image::Pointer interpolatedSlice = interpolator->Interpolate(sliceDimension, index, plane, 0);
 
-    overwriteFilter->SetSliceIndex(index);
-    overwriteFilter->SetSliceImage(interpolatedSlice);
-    overwriteFilter->SetSliceDimension(2);
-    overwriteFilter->Update();
+    if (interpolatedSlice) {
+      overwriteFilter->SetSliceIndex(index);
+      overwriteFilter->SetSliceImage(interpolatedSlice);
+      overwriteFilter->SetSliceDimension(sliceDimension);
+      overwriteFilter->Update();
+    }
+    else {
+      MITK_INFO << "requested interpolation was null";
+    }
   }
 
   MITK_INFO << "finished with interpolation ";

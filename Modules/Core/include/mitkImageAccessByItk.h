@@ -19,15 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkCastImageFilter.h>
 #include <mitkImageToItk.h>
-
 #include <mitkPPArgCount.h>
-#include <mitkPPCat.h>
-#include <mitkPPExpand.h>
-#include <mitkPPSeqForEach.h>
-#include <mitkPPSeqForEachProduct.h>
-#include <mitkPPSeqToTuple.h>
-#include <mitkPPStringize.h>
-#include <mitkPPTupleRem.h>
+#include <boost/preprocessor/expand.hpp>
+#include <boost/preprocessor/seq/for_each.hpp>
+#include <boost/preprocessor/seq/for_each_product.hpp>
+#include <boost/preprocessor/seq/to_tuple.hpp>
+#include <boost/preprocessor/stringize.hpp>
+#include <boost/preprocessor/tuple/rem.hpp>
 
 #include <sstream>
 
@@ -55,7 +53,7 @@ namespace mitk
   {                                                                                                                    \
     std::string msg("Pixel type ");                                                                                    \
     msg.append(pixelType.GetPixelTypeAsString());                                                                      \
-    msg.append(" is not in " MITK_PP_STRINGIZE(pixelTypeSeq));                                                         \
+    msg.append(" is not in " BOOST_PP_STRINGIZE(pixelTypeSeq));                                                         \
     throw mitk::AccessByItkException(msg);                                                                             \
   }
 
@@ -72,52 +70,52 @@ namespace mitk
   else
 
 #define _checkSpecificDimension(mitkImage, dimSeq)                                                                     \
-  MITK_PP_SEQ_FOR_EACH(_checkSpecificDimensionIter, mitkImage, dimSeq)                                                 \
-  _accessByItkDimensionException(mitkImage->GetDimension(), MITK_PP_STRINGIZE(dimSeq))
+  BOOST_PP_SEQ_FOR_EACH(_checkSpecificDimensionIter, mitkImage, dimSeq)                                                 \
+  _accessByItkDimensionException(mitkImage->GetDimension(), BOOST_PP_STRINGIZE(dimSeq))
 
-#define _msvc_expand_bug(macro, arg) MITK_PP_EXPAND(macro arg)
+#define _msvc_expand_bug(macro, arg) BOOST_PP_EXPAND(macro arg)
 
 //-------------------------------- 0-Arg Versions --------------------------------------
 
 #define _accessByItk(itkImageTypeFunctionAndImageSeq, pixeltype, dimension)                                            \
   if (pixelType == mitk::MakePixelType<pixeltype, dimension>(pixelType.GetNumberOfComponents()) &&                     \
-      MITK_PP_SEQ_TAIL(itkImageTypeFunctionAndImageSeq)->GetDimension() == dimension)                                  \
+      BOOST_PP_SEQ_TAIL(itkImageTypeFunctionAndImageSeq)->GetDimension() == dimension)                                  \
   {                                                                                                                    \
-    MITK_PP_SEQ_HEAD(itkImageTypeFunctionAndImageSeq)                                                                  \
-    (mitk::ImageToItkImage<pixeltype, dimension>(MITK_PP_SEQ_TAIL(itkImageTypeFunctionAndImageSeq)).GetPointer());     \
+    BOOST_PP_SEQ_HEAD(itkImageTypeFunctionAndImageSeq)                                                                  \
+    (mitk::ImageToItkImage<pixeltype, dimension>(BOOST_PP_SEQ_TAIL(itkImageTypeFunctionAndImageSeq)).GetPointer());     \
   }                                                                                                                    \
   else
 
-#define _accessByItkArgs(itkImageTypeFunction, type) (itkImageTypeFunction, MITK_PP_TUPLE_REM(2) type)
+#define _accessByItkArgs(itkImageTypeFunction, type) (itkImageTypeFunction, BOOST_PP_TUPLE_REM(2) type)
 
 // product will be of the form ((itkImageTypeFunction)(mitkImage))(short)(2) for pixel type short and dimension 2
 #ifdef _MSC_VER
 #define _accessByItkProductIter(r, product)                                                                            \
   _msvc_expand_bug(                                                                                                    \
     _accessByItk,                                                                                                      \
-    _msvc_expand_bug(_accessByItkArgs, (MITK_PP_SEQ_HEAD(product), MITK_PP_SEQ_TO_TUPLE(MITK_PP_SEQ_TAIL(product)))))
+    _msvc_expand_bug(_accessByItkArgs, (BOOST_PP_SEQ_HEAD(product), BOOST_PP_SEQ_TO_TUPLE(BOOST_PP_SEQ_TAIL(product)))))
 #else
 #define _accessByItkProductIter(r, product)                                                                            \
-  MITK_PP_EXPAND(                                                                                                      \
-    _accessByItk _accessByItkArgs(MITK_PP_SEQ_HEAD(product), MITK_PP_SEQ_TO_TUPLE(MITK_PP_SEQ_TAIL(product))))
+  BOOST_PP_EXPAND(                                                                                                      \
+    _accessByItk _accessByItkArgs(BOOST_PP_SEQ_HEAD(product), BOOST_PP_SEQ_TO_TUPLE(BOOST_PP_SEQ_TAIL(product))))
 #endif
 
 #define _accessFixedTypeByItk(itkImageTypeFunction, mitkImage, pixelTypeSeq, dimSeq)                                   \
-  MITK_PP_SEQ_FOR_EACH_PRODUCT(_accessByItkProductIter, (((itkImageTypeFunction)(mitkImage)))(pixelTypeSeq)(dimSeq))
+  BOOST_PP_SEQ_FOR_EACH_PRODUCT(_accessByItkProductIter, (((itkImageTypeFunction)(mitkImage)))(pixelTypeSeq)(dimSeq))
 
 //-------------------------------- n-Arg Versions --------------------------------------
 
 #define _accessByItk_n(itkImageTypeFunctionAndImageSeq, pixeltype, dimension, args)                                    \
   if (pixelType == mitk::MakePixelType<pixeltype, dimension>(pixelType.GetNumberOfComponents()) &&                     \
-      MITK_PP_SEQ_TAIL(itkImageTypeFunctionAndImageSeq)->GetDimension() == dimension)                                  \
+      BOOST_PP_SEQ_TAIL(itkImageTypeFunctionAndImageSeq)->GetDimension() == dimension)                                  \
   {                                                                                                                    \
-    MITK_PP_SEQ_HEAD(itkImageTypeFunctionAndImageSeq)                                                                  \
-    (mitk::ImageToItkImage<pixeltype, dimension>(MITK_PP_SEQ_TAIL(itkImageTypeFunctionAndImageSeq)).GetPointer(),      \
-     MITK_PP_TUPLE_REM(MITK_PP_SEQ_HEAD(args)) MITK_PP_SEQ_TAIL(args));                                                \
+    BOOST_PP_SEQ_HEAD(itkImageTypeFunctionAndImageSeq)                                                                  \
+    (mitk::ImageToItkImage<pixeltype, dimension>(BOOST_PP_SEQ_TAIL(itkImageTypeFunctionAndImageSeq)).GetPointer(),      \
+     BOOST_PP_TUPLE_REM(BOOST_PP_SEQ_HEAD(args)) BOOST_PP_SEQ_TAIL(args));                                                \
   }                                                                                                                    \
   else
 
-#define _accessByItkArgs_n(itkImageTypeFunction, type, args) (itkImageTypeFunction, MITK_PP_TUPLE_REM(2) type, args)
+#define _accessByItkArgs_n(itkImageTypeFunction, type, args) (itkImageTypeFunction, BOOST_PP_TUPLE_REM(2) type, args)
 
 // product will be of the form (((itkImageTypeFunction)(mitkImage))(3)(a,b,c))(short)(2)
 // for the variable argument list a,b,c and for pixel type short and dimension 2
@@ -125,18 +123,18 @@ namespace mitk
 #define _accessByItkProductIter_n(r, product)                                                                          \
   _msvc_expand_bug(_accessByItk_n,                                                                                     \
                    _msvc_expand_bug(_accessByItkArgs_n,                                                                \
-                                    (MITK_PP_SEQ_HEAD(MITK_PP_SEQ_HEAD(product)),                                      \
-                                     MITK_PP_SEQ_TO_TUPLE(MITK_PP_SEQ_TAIL(product)),                                  \
-                                     MITK_PP_SEQ_TAIL(MITK_PP_SEQ_HEAD(product)))))
+                                    (BOOST_PP_SEQ_HEAD(BOOST_PP_SEQ_HEAD(product)),                                      \
+                                     BOOST_PP_SEQ_TO_TUPLE(BOOST_PP_SEQ_TAIL(product)),                                  \
+                                     BOOST_PP_SEQ_TAIL(BOOST_PP_SEQ_HEAD(product)))))
 #else
 #define _accessByItkProductIter_n(r, product)                                                                          \
-  MITK_PP_EXPAND(_accessByItk_n _accessByItkArgs_n(MITK_PP_SEQ_HEAD(MITK_PP_SEQ_HEAD(product)),                        \
-                                                   MITK_PP_SEQ_TO_TUPLE(MITK_PP_SEQ_TAIL(product)),                    \
-                                                   MITK_PP_SEQ_TAIL(MITK_PP_SEQ_HEAD(product))))
+  BOOST_PP_EXPAND(_accessByItk_n _accessByItkArgs_n(BOOST_PP_SEQ_HEAD(BOOST_PP_SEQ_HEAD(product)),                        \
+                                                   BOOST_PP_SEQ_TO_TUPLE(BOOST_PP_SEQ_TAIL(product)),                    \
+                                                   BOOST_PP_SEQ_TAIL(BOOST_PP_SEQ_HEAD(product))))
 #endif
 
 #define _accessFixedTypeByItk_n(itkImageTypeFunction, mitkImage, pixelTypeSeq, dimSeq, va_tuple)                       \
-  MITK_PP_SEQ_FOR_EACH_PRODUCT(                                                                                        \
+  BOOST_PP_SEQ_FOR_EACH_PRODUCT(                                                                                        \
     _accessByItkProductIter_n,                                                                                         \
     ((((itkImageTypeFunction)(mitkImage))(MITK_PP_ARG_COUNT va_tuple)va_tuple))(pixelTypeSeq)(dimSeq))
 
@@ -618,25 +616,25 @@ namespace mitk
   else
 
 #define _accessTwoImagesByItkArgs2(itkImageTypeFunction, type1, type2)                                                 \
-  (itkImageTypeFunction, MITK_PP_TUPLE_REM(2) type1, MITK_PP_TUPLE_REM(2) type2)
+  (itkImageTypeFunction, BOOST_PP_TUPLE_REM(2) type1, BOOST_PP_TUPLE_REM(2) type2)
 
 #define _accessTwoImagesByItkArgs(product)                                                                             \
-  MITK_PP_EXPAND(_accessTwoImagesByItkArgs2 MITK_PP_EXPAND(                                                            \
-    (MITK_PP_SEQ_HEAD(product), MITK_PP_TUPLE_REM(2) MITK_PP_SEQ_TO_TUPLE(MITK_PP_SEQ_TAIL(product)))))
+  BOOST_PP_EXPAND(_accessTwoImagesByItkArgs2 BOOST_PP_EXPAND(                                                            \
+    (BOOST_PP_SEQ_HEAD(product), BOOST_PP_TUPLE_REM(2) BOOST_PP_SEQ_TO_TUPLE(BOOST_PP_SEQ_TAIL(product)))))
 
 // product is of the form (itkImageTypeFunction)((short,2))((char,2))
 #ifdef _MSC_VER
 #define _accessTwoImagesByItkIter(r, product)                                                                          \
-  MITK_PP_EXPAND(_accessTwoImagesByItk _msvc_expand_bug(                                                               \
+  BOOST_PP_EXPAND(_accessTwoImagesByItk _msvc_expand_bug(                                                               \
     _accessTwoImagesByItkArgs2,                                                                                        \
-    (MITK_PP_SEQ_HEAD(product),                                                                                        \
-     _msvc_expand_bug(MITK_PP_TUPLE_REM(2), MITK_PP_EXPAND(MITK_PP_SEQ_TO_TUPLE(MITK_PP_SEQ_TAIL(product)))))))
+    (BOOST_PP_SEQ_HEAD(product),                                                                                        \
+     _msvc_expand_bug(BOOST_PP_TUPLE_REM(2), BOOST_PP_EXPAND(BOOST_PP_SEQ_TO_TUPLE(BOOST_PP_SEQ_TAIL(product)))))))
 #else
-#define _accessTwoImagesByItkIter(r, product) MITK_PP_EXPAND(_accessTwoImagesByItk _accessTwoImagesByItkArgs(product))
+#define _accessTwoImagesByItkIter(r, product) BOOST_PP_EXPAND(_accessTwoImagesByItk _accessTwoImagesByItkArgs(product))
 #endif
 
 #define _accessTwoImagesByItkForEach(itkImageTypeFunction, tseq1, tseq2)                                               \
-  MITK_PP_SEQ_FOR_EACH_PRODUCT(_accessTwoImagesByItkIter, ((itkImageTypeFunction))(tseq1)(tseq2))
+  BOOST_PP_SEQ_FOR_EACH_PRODUCT(_accessTwoImagesByItkIter, ((itkImageTypeFunction))(tseq1)(tseq2))
 
 #endif // DOXYGEN_SKIP
 
@@ -704,7 +702,7 @@ namespace mitk
       msg.append(pixelType1.GetComponentTypeAsString());                                                               \
       msg.append(" or pixel type ");                                                                                   \
       msg.append(pixelType2.GetComponentTypeAsString());                                                               \
-      msg.append(" is not in " MITK_PP_STRINGIZE(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension)));                         \
+      msg.append(" is not in " BOOST_PP_STRINGIZE(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension)));                         \
       throw mitk::AccessByItkException(msg);                                                                           \
     }                                                                                                                  \
   }

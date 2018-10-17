@@ -48,15 +48,15 @@ void mitk::ImageCaster::CastBaseData(mitk::BaseData *const mitkBaseData,
 
 #define DefineMitkImageCasterMethods(r, data, type)                                                                    \
   void mitk::ImageCaster::CastToItkImage(const mitk::Image *mitkImage,                                                 \
-                                         itk::SmartPointer<itk::Image<MITK_PP_TUPLE_REM(2) type>> &itkOutputImage)     \
+                                         itk::SmartPointer<itk::Image<BOOST_PP_TUPLE_REM(2) type>> &itkOutputImage)     \
   {                                                                                                                    \
     mitk::CastToItkImage(mitkImage, itkOutputImage);                                                                   \
   }                                                                                                                    \
-  void mitk::ImageCaster::CastToMitkImage(const itk::Image<MITK_PP_TUPLE_REM(2) type> *itkImage,                       \
+  void mitk::ImageCaster::CastToMitkImage(const itk::Image<BOOST_PP_TUPLE_REM(2) type> *itkImage,                       \
                                           itk::SmartPointer<mitk::Image> &mitkOutputImage)                             \
   {                                                                                                                    \
-    mitk::CastToMitkImage<itk::Image<MITK_PP_TUPLE_REM(2) type>>(itkImage, mitkOutputImage);                           \
+    mitk::CastToMitkImage<itk::Image<BOOST_PP_TUPLE_REM(2) type>>(itkImage, mitkOutputImage);                           \
   }
 
-MITK_PP_SEQ_FOR_EACH(DefineMitkImageCasterMethods, _, MITK_ACCESSBYITK_TYPES_DIMN_SEQ(2))
-MITK_PP_SEQ_FOR_EACH(DefineMitkImageCasterMethods, _, MITK_ACCESSBYITK_TYPES_DIMN_SEQ(3))
+BOOST_PP_SEQ_FOR_EACH(DefineMitkImageCasterMethods, _, MITK_ACCESSBYITK_TYPES_DIMN_SEQ(2))
+BOOST_PP_SEQ_FOR_EACH(DefineMitkImageCasterMethods, _, MITK_ACCESSBYITK_TYPES_DIMN_SEQ(3))

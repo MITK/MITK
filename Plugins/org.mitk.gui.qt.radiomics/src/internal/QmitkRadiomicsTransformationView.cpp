@@ -65,7 +65,6 @@ void QmitkRadiomicsTransformation::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi(parent);
 
     QLabel * label1 = new QLabel("Image: ");
-    QLabel * label2 = new QLabel("Mask: ");
     QmitkDataStorageComboBox * cb_inputimage = new QmitkDataStorageComboBox(this->GetDataStorage(), mitk::TNodePredicateDataType<mitk::Image>::New());
     m_Controls->m_InputImageGroup->layout()->addWidget(label1);
     m_Controls->m_InputImageGroup->layout()->addWidget(cb_inputimage);

@@ -20,21 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTransformationOperation.h>
 
-static bool ConvertToBool(std::map<std::string, us::Any> &data, std::string name)
-{
-  if (!data.count(name))
-  {
-    return false;
-  }
-  try {
-    return us::any_cast<bool>(data[name]);
-  }
-  catch (us::BadAnyCastException &)
-  {
-    return false;
-  }
-}
-
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;

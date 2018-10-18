@@ -20,21 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTransformationOperation.h>
 
-static bool ConvertToBool(std::map<std::string, us::Any> &data, std::string name)
-{
-  if (!data.count(name))
-  {
-    return false;
-  }
-  try {
-    return us::any_cast<bool>(data[name]);
-  }
-  catch (us::BadAnyCastException &)
-  {
-    return false;
-  }
-}
-
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
@@ -56,8 +41,6 @@ int main(int argc, char* argv[])
 
   parser.addArgument("wavelet", "w", mitkCommandLineParser::Int, "0: Shannon, 1: Simocelli, 2: Vow, 3: Held", "0: Shannon, 1: Simocelli, 2: Vow, 3: Held", us::Any(), false);
   parser.addArgument("border-condition", "border", mitkCommandLineParser::Int, "0: Constant, 1: Periodic, 2: Zero Flux Neumann", "0: Constant, 1: Periodic, 2: Zero Flux Neumann", us::Any(), false);
-
-
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 

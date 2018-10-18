@@ -297,7 +297,7 @@ void QmitkRadiomicsStatistic::executeAndAppendButtonPressed()
 void QmitkRadiomicsStatistic::copyToClipboardButtonPressed()
 {
   QString selectedText;
-  for (std::size_t i = 0; i < m_Controls->m_ResultTable->rowCount(); ++i)
+  for (int i = 0; i < m_Controls->m_ResultTable->rowCount(); ++i)
   {
     auto itemImage = m_Controls->m_ResultTable->item(i, 0);
     auto itemMask = m_Controls->m_ResultTable->item(i, 1);

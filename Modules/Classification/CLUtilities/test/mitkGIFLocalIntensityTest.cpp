@@ -63,8 +63,8 @@ public:
 
     // These values are obtained in cooperation with IBSI
     // Reported with an accuracy of 0.1
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Local Intensity::Local Intensity Peak with Large IBSI Phantom Image", 2.6, results["Local Intensity::Local Intensity Peak"], 0.1);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Local Intensity::Global Intensity Peak with Large IBSI Phantom Image", 3.1, results["Local Intensity::Global Intensity Peak"], 0.1);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Local Intensity::Local Intensity Peak with Large IBSI Phantom Image", 2.6, results["Local Intensity::2. Local Intensity Peak"], 0.1);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Local Intensity::Global Intensity Peak with Large IBSI Phantom Image", 3.1, results["Local Intensity::2. Global Intensity Peak"], 0.1);
   }
 
   void ImageDescription_PhantomTest_Large()
@@ -83,8 +83,8 @@ public:
 
     // These values are obtained by running the tool
     // They  might be wrong
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Local Intensity::Local Intensity Peak with Large IBSI Phantom Image", 1.43, results["Local Intensity::Local Intensity Peak"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Local Intensity::Global Intensity Peak with Large IBSI Phantom Image", 1.43, results["Local Intensity::Global Intensity Peak"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Local Intensity::Local Intensity Peak with Large IBSI Phantom Image", 1.43, results["Local Intensity::2. Local Intensity Peak"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Local Intensity::Global Intensity Peak with Large IBSI Phantom Image", 1.43, results["Local Intensity::2. Global Intensity Peak"], 0.01);
   }
 
   void ImageDescription_PhantomTest_Large_RangeChanged()
@@ -105,8 +105,8 @@ public:
 
     // These values are obtained by running the tool
     // They  might be wrong
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Local Intensity::Local Intensity Peak with Large IBSI Phantom Image", 2.81, results["Local Intensity::Local Intensity Peak"], 0.01);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Local Intensity::Global Intensity Peak with Large IBSI Phantom Image", 3.15, results["Local Intensity::Global Intensity Peak"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Local Intensity::Local Intensity Peak with Large IBSI Phantom Image", 6, results["Local Intensity::2. Local Intensity Peak"], 0.01);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("Local Intensity::Global Intensity Peak with Large IBSI Phantom Image", 6, results["Local Intensity::2. Global Intensity Peak"], 0.01);
   }
 
 };

@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSemanticTypes.h>
 
 // semantic relations UI module
-#include <QmitkLesionTreeModel.h>
 #include <QmitkPatientTableInspector.h>
 
 // mitk gui common plugin
@@ -99,7 +98,6 @@ private:
   QmitkLesionInfoWidget* m_LesionInfoWidget;
   QmitkPatientTableInspector* m_PatientTableInspector;
   QmitkDnDDataNodeWidget* m_DnDDataNodeWidget;
-  QmitkLesionTreeModel* m_LesionTreeModel;
 
   QmitkSemanticRelationsContextMenu* m_ContextMenu;
 

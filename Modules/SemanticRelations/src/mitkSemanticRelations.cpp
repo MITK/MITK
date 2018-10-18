@@ -178,12 +178,12 @@ bool mitk::SemanticRelations::InstanceExists(const DataNode* dataNode) const
     SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
     SemanticTypes::ID dataNodeID = GetIDFromDataNode(dataNode);
 
-    if (mitk::NodePredicates::GetImagePredicate()->CheckNode(dataNode))
+    if (NodePredicates::GetImagePredicate()->CheckNode(dataNode))
     {
       std::vector<std::string> allImageIDsOfCase = m_RelationStorage->GetAllImageIDsOfCase(caseID);
       return std::find(allImageIDsOfCase.begin(), allImageIDsOfCase.end(), dataNodeID) != allImageIDsOfCase.end();
     }
-    else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
+    else if (NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
     {
       std::vector<std::string> allSegmentationIDsOfCase = m_RelationStorage->GetAllSegmentationIDsOfCase(caseID);
       return std::find(allSegmentationIDsOfCase.begin(), allSegmentationIDsOfCase.end(), dataNodeID) != allSegmentationIDsOfCase.end();
@@ -281,7 +281,7 @@ mitk::SemanticRelations::DataNodeVector mitk::SemanticRelations::GetAllImagesOfL
 
 bool mitk::SemanticRelations::InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
 {
-  mitk::SemanticTypes::LesionVector allLesions = GetAllLesionsOfCase(caseID);
+  SemanticTypes::LesionVector allLesions = GetAllLesionsOfCase(caseID);
 
   // filter all lesions: check for equality with the given lesion using a lambda function
   auto lambda = [&lesion](const SemanticTypes::Lesion& currentLesion) { return currentLesion.UID == lesion.UID; };

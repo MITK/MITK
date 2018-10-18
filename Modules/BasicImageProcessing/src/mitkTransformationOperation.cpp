@@ -347,13 +347,10 @@ static void ExecuteImageTypeToDouble(itk::Image<TPixel, VImageDimension>* image,
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-static void ExecuteRoundImage(itk::Image<TPixel, VImageDimension>* image, mitk::Image::Pointer resampledImage,  mitk::Image::Pointer &outputImage)
+static void ExecuteRoundImage(itk::Image<TPixel, VImageDimension>* /*image*/, mitk::Image::Pointer resampledImage,  mitk::Image::Pointer &outputImage)
 {
   typedef itk::Image< TPixel, VImageDimension >        ImageType;
   typedef itk::Image< double, VImageDimension >        DoubleImageType;
-  typedef itk::CastImageFilter< ImageType, DoubleImageType >    CastFilterType;
-  typedef itk::ImageDuplicator< DoubleImageType >    DuplicatorType;
-
   typedef itk::UnaryFunctorImageFilter< DoubleImageType, ImageType, mitk::Functor::RoundValue<double, TPixel> > DefaultFilterType;
 
   typename DoubleImageType::Pointer itkImage = DoubleImageType::New();

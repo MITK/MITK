@@ -124,7 +124,7 @@ mitkUI::GIFConfigurationPanel::GIFConfigurationPanel(QWidget * parent, mitk::Abs
 }
 
 void
-mitkUI::GIFConfigurationPanel::OnSButtonShowAdditionalConfigurationPressed(bool status)
+mitkUI::GIFConfigurationPanel::OnSButtonShowAdditionalConfigurationPressed(bool /*status*/)
 {
   if (m_ButtonShowAdditionalConfiguration->isChecked())
   {

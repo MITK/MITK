@@ -268,7 +268,7 @@ void QmitkRadiomicsStatistic::executeAndAppendButtonPressed()
   std::vector<QTableWidgetItem *> elementText;
   std::vector<QTableWidgetItem *> elementValue;
 
-  for (std::size_t i = 0; i < m_Controls->m_ResultTable->rowCount(); ++i)
+  for (int i = 0; i < m_Controls->m_ResultTable->rowCount(); ++i)
   {
     auto itemImage = m_Controls->m_ResultTable->item(i, 0)->clone();
     auto itemMask = m_Controls->m_ResultTable->item(i, 1)->clone();

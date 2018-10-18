@@ -50,6 +50,7 @@ public:
   void RESTGetCallbackGeneric(const SegmentationReworkREST::DicomDTO& dto);
 
   void UpdateChartWidget();
+  void ClearChartWidget();
   void LoadData(std::vector<std::string> filePathList);
 
 signals:
@@ -72,7 +73,6 @@ protected:
 
 private:
 
-  std::string getNextFolderName();
   std::vector<unsigned int> CreateSegmentation(mitk::Image::Pointer baseSegmentation, double threshold);
   void InterpolateSegmentation(mitk::Image::Pointer baseSegmentation, std::vector<unsigned int> sliceIndices);
 
@@ -83,7 +83,7 @@ private:
   std::string m_CurrentStudyUID;
 
   std::string m_DownloadBaseDir;
-  std::string m_tempSegDir;
+  std::string m_UploadBaseDir;
 
   mitk::DataNode::Pointer m_Image;
   mitk::DataNode::Pointer m_SegA;

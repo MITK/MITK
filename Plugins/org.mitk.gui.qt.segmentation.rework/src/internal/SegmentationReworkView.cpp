@@ -33,6 +33,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkOverwriteSliceImageFilter.h>
 #include <mitkSegmentationInterpolationController.h>
 #include <mitkImagePixelWriteAccessor.h>
+#include <mitkExtractSliceFilter.h>
+#include <mitkVtkImageOverwrite.h>
+
+#include <mitkDICOMQIIOMimeTypes.h>
 
 const std::string SegmentationReworkView::VIEW_ID = "org.mitk.views.segmentationreworkview";
 
@@ -65,17 +69,17 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 
   m_DownloadBaseDir = mitk::IOUtil::GetTempPathA() + "segrework";
   MITK_INFO << "using download base dir: " << m_DownloadBaseDir;
-  m_tempSegDir = "/tempSeg/";
+  m_UploadBaseDir = mitk::IOUtil::GetTempPathA() + "uploadSeg";
 
   if (!itksys::SystemTools::FileIsDirectory(m_DownloadBaseDir))
   {
     itk::FileTools::CreateDirectory(m_DownloadBaseDir);
   }
 
-  //if (!std::experimental::filesystem::exists(m_tempSegDir))
-  //{
-  //  std::experimental::filesystem::create_directory(m_tempSegDir);
-  //}
+  if (!itksys::SystemTools::FileIsDirectory(m_UploadBaseDir))
+  {
+    itk::FileTools::CreateDirectory(m_UploadBaseDir);
+  }
 
   utility::string_t port = U("2020");
   utility::string_t address = U("http://127.0.0.1:");
@@ -101,13 +105,6 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   m_DICOMWeb = new mitk::DICOMWeb(pacsURL);
   MITK_INFO << "requests to pacs are sent to: " << utility::conversions::to_utf8string(pacsURL);
   m_Controls.dcm4cheeURL->setText({ (utility::conversions::to_utf8string(pacsURL).c_str()) });
-}
-
-std::string SegmentationReworkView::getNextFolderName() {
-  counter++;
-  std::string name = std::string("foldername") + std::to_string(counter);
-  MITK_INFO << name;
-  return name;
 }
 
 void SegmentationReworkView::RestartConnection()
@@ -144,7 +141,8 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
   seriesInstancesParams.insert((ParamMap::value_type({"includefield"}, {"0040A375"}))); // Current Requested Procedure Evidence Sequence
 
   try {
-    m_DICOMWeb->QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) {
+    m_DICOMWeb->QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) 
+    {
 
       auto firstResult = jsonResult[0];
       auto actualListKey = firstResult.at(U("0040A375")).as_object().at(U("Value")).as_array()[0].as_object().at(U("00081115")).as_object().at(U("Value")).as_array();
@@ -204,12 +202,25 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 
       auto joinTask = pplx::when_all(begin(tasks), end(tasks));
       auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) {
-        //auto fileNameA = std::experimental::filesystem::path(filePathList[1]).filename();
-        //auto fileNameB = std::experimental::filesystem::path(filePathList[2]).filename();
-        //m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + " " + QString::fromUtf8(fileNameA.string().c_str()));
-        //m_Controls.labelSegB->setText(m_Controls.labelSegB->text() + " " + QString::fromUtf8(fileNameB.string().c_str()));
         InvokeLoadData(filePathList);
       });
+
+      ParamMap seriesInstancesParams;
+
+      seriesInstancesParams.insert((ParamMap::value_type({ "StudyInstanceUID" }, dto.studyUID)));
+      seriesInstancesParams.insert((ParamMap::value_type({ "SeriesInstanceUID" }, segSeriesUIDA)));
+
+      m_DICOMWeb->QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) {
+        auto seriesDescription = QString(utility::conversions::to_utf8string(jsonResult[0][U("0008103E")][U("Value")][0].as_string()).c_str());
+        m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + seriesDescription.append(" A"));
+      });
+
+      seriesInstancesParams["SeriesInstanceUID"] = segSeriesUIDB;
+      m_DICOMWeb->QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) {
+        auto seriesDescription = QString(utility::conversions::to_utf8string(jsonResult[0][U("0008103E")][U("Value")][0].as_string()).c_str());
+        m_Controls.labelSegB->setText(m_Controls.labelSegB->text() + seriesDescription.append(" B"));
+      });
+
 
     });
 
@@ -309,9 +320,10 @@ void SegmentationReworkView::UpdateChartWidget()
 
 void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArray, int sliceMinStart)
 {
+  std::string label = "similarity graph";
   if (m_Controls.chartWidget->GetData()->size() > 0)
   {
-    m_Controls.chartWidget->RemoveData("similarity graph");
+    m_Controls.chartWidget->Clear();
   }
 
   double sliceIndex = sliceMinStart;
@@ -320,19 +332,20 @@ void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArra
     m_ScoreMap.insert(std::map<double, double>::value_type(sliceIndex, score));
     sliceIndex++;
   }
-  m_Controls.chartWidget->AddData2D(m_ScoreMap, "similarity graph");
-  m_Controls.chartWidget->SetChartType("similarity graph", QmitkChartWidget::ChartType::line);
+
+  m_Controls.chartWidget->AddData2D(m_ScoreMap, label);
+  m_Controls.chartWidget->SetChartType(label, QmitkChartWidget::ChartType::line);
   m_Controls.chartWidget->SetXAxisLabel("slice number");
   m_Controls.chartWidget->SetYAxisLabel("similarity in percent");
 }
 
 void SegmentationReworkView::UploadNewSegmentation()
 {
-  std::string folderPathSeg = mitk::IOUtil::CreateTemporaryDirectory("XXXXXX", m_DownloadBaseDir) + "/";
+  std::string folderPathSeg = mitk::IOUtil::CreateTemporaryDirectory("XXXXXX", m_UploadBaseDir) + "/";
 
   const std::string savePath = folderPathSeg + m_SegC->GetName() + ".dcm";
-  //const std::string mimeType = mitk::IOMimeTypes::DICOM_MIMETYPE_NAME();
-  //mitk::IOUtil::Save(m_SegC->GetData(), mimeType, savePath);
+  const std::string mimeType = mitk::MitkDICOMQIIOMimeTypes::DICOMSEG_MIMETYPE_NAME();
+  mitk::IOUtil::Save(m_SegC->GetData(), mimeType, savePath);
 
   auto filePath = utility::conversions::to_string_t(savePath);
   try {
@@ -357,14 +370,6 @@ std::vector<unsigned int> SegmentationReworkView::CreateSegmentation(mitk::Image
     if (it->second < threshold)
     {
       auto index = it->first;
-      //overwriteFilter->SetSliceIndex(int(it->first));
-      //auto emptySlice = mitk::LabelSetImage::New();
-      //unsigned int *dimensions = new unsigned int[2]{baseSegmentation->GetDimension(0), baseSegmentation->GetDimension(1)}; 
-	     //emptySlice->Initialize(baseSegmentation->GetPixelType(), 2, dimensions);
-      //overwriteFilter->SetSliceImage(emptySlice);
-      //overwriteFilter->SetSliceDimension(2);
-	     //overwriteFilter->Update();
-
       try 
       {
         mitk::ImagePixelWriteAccessor<unsigned short, 3> imageAccessor(baseSegmentation);
@@ -415,10 +420,19 @@ void SegmentationReworkView::InterpolateSegmentation(mitk::Image::Pointer baseSe
     mitk::Image::Pointer interpolatedSlice = interpolator->Interpolate(sliceDimension, index, plane, 0);
 
     if (interpolatedSlice) {
-      overwriteFilter->SetSliceIndex(index);
-      overwriteFilter->SetSliceImage(interpolatedSlice);
-      overwriteFilter->SetSliceDimension(sliceDimension);
-      overwriteFilter->Update();
+      MITK_INFO << "add interpolated slice " << index;
+      vtkSmartPointer<mitkVtkImageOverwrite> reslicer = vtkSmartPointer<mitkVtkImageOverwrite>::New();
+      reslicer->SetInputSlice(interpolatedSlice->GetSliceData()->GetVtkImageAccessor(interpolatedSlice)->GetVtkImageData());
+      reslicer->SetOverwriteMode(true);
+      reslicer->Modified();
+      mitk::ExtractSliceFilter::Pointer extractor = mitk::ExtractSliceFilter::New(reslicer);
+      extractor->SetInput(baseSegmentation);
+      extractor->SetTimeStep(0);
+      extractor->SetWorldGeometry(plane);
+      extractor->SetVtkOutputRequest(true);
+      extractor->SetResliceTransformByGeometry(baseSegmentation->GetTimeGeometry()->GetGeometryForTimeStep(0));
+      extractor->Modified();
+      extractor->Update();
     }
     else {
       MITK_INFO << "requested interpolation was null";
@@ -436,10 +450,10 @@ void SegmentationReworkView::CreateNewSegmentationC()
   
   mitk::Image::Pointer baseImage;
   if (m_Controls.radioA->isChecked()) {
-    baseImage = dynamic_cast<mitk::Image*>(m_SegA->GetData());
+    baseImage = dynamic_cast<mitk::Image*>(m_SegA->GetData())->Clone();
   }
   else if (m_Controls.radioB->isChecked()) {
-    baseImage = dynamic_cast<mitk::Image*>(m_SegB->GetData());
+    baseImage = dynamic_cast<mitk::Image*>(m_SegB->GetData())->Clone();
   }
 
   if (m_Controls.checkIndiv->isChecked())

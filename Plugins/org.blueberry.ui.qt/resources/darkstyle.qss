@@ -262,7 +262,7 @@ QCheckBox, QCheckBox:hover, QCheckBox:disabled, QCheckBox:checked, QRadioButton,
   background-color: none;
 }
 
-QCheckBox::indicator, QRadioButton::indicator, QGroupBox::indicator, QListWidget::indicator {
+QCheckBox::indicator, QRadioButton::indicator, QGroupBox::indicator, QListWidget::indicator, QAbstractItemView::indicator {
   height: 13px;
   width: 13px;
 }

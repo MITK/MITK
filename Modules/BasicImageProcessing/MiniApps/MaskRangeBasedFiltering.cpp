@@ -93,12 +93,12 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("lower-limit"))
   {
     useLowerLimit = true;
-    double lowerLimit = us::any_cast<float>(parsedArgs["lower-limit"]);
+    lowerLimit = us::any_cast<float>(parsedArgs["lower-limit"]);
   }
   if (parsedArgs.count("upper-limit"))
   {
     useUpperLimit = true;
-    double upperLimit = us::any_cast<float>(parsedArgs["upper-limit"]);
+    upperLimit = us::any_cast<float>(parsedArgs["upper-limit"]);
   }
 
   if (useLowerLimit || useUpperLimit)

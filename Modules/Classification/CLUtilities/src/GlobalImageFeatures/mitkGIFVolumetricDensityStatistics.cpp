@@ -127,6 +127,8 @@ CalculateVolumeDensityStatistic(itk::Image<TPixel, VImageDimension>* itkImage, m
     ++maskA;
   }
 
+  MITK_INFO << "Volume: " << volume;
+  MITK_INFO << " Mean: " << mean;
   featureList.push_back(std::make_pair(prefix + "Volume integrated intensity", volume* mean));
   featureList.push_back(std::make_pair(prefix + "Volume Moran's I index", Nv / w_ij * moranA / moranB));
   featureList.push_back(std::make_pair(prefix + "Volume Geary's C measure", ( Nv -1 ) / 2 / w_ij * geary/ moranB));

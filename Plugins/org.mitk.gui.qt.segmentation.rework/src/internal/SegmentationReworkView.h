@@ -52,6 +52,7 @@ public:
   void UpdateChartWidget();
   void ClearChartWidget();
   void LoadData(std::vector<std::string> filePathList);
+  void OnSliderWidgetChanged(double value);
 
 signals:
   void InvokeLoadData(std::vector<std::string> filePathList);

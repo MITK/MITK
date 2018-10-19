@@ -66,6 +66,7 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.cleanDicomBtn, &QPushButton::clicked, this, &SegmentationReworkView::CleanDicomFolder);
   connect(m_Controls.restartConnection, &QPushButton::clicked, this, &SegmentationReworkView::RestartConnection);
   connect(m_Controls.checkIndiv, &QCheckBox::stateChanged, this, &SegmentationReworkView::OnIndividualCheckChange);
+  connect(m_Controls.sliderWidget, &ctkSliderWidget::valueChanged, this, &SegmentationReworkView::OnSliderWidgetChanged);
 
   m_DownloadBaseDir = mitk::IOUtil::GetTempPathA() + "segrework";
   MITK_INFO << "using download base dir: " << m_DownloadBaseDir;
@@ -106,6 +107,23 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
   MITK_INFO << "requests to pacs are sent to: " << utility::conversions::to_utf8string(pacsURL);
   m_Controls.dcm4cheeURL->setText({ (utility::conversions::to_utf8string(pacsURL).c_str()) });
 }
+
+void SegmentationReworkView::OnSliderWidgetChanged(double value)
+{
+  std::map<double, double>::iterator it;
+  unsigned int count = 0;
+  for (it = m_ScoreMap.begin(); it != m_ScoreMap.end(); it++)
+  {
+    if (it->second < value)
+    {
+      count++;
+    }
+  }
+  QString labelsToDelete = "slices to delete: " + QString::number(count);
+  m_Controls.slicesToDeleteLabel->setText(labelsToDelete);
+}
+
+
 
 void SegmentationReworkView::RestartConnection()
 {
@@ -459,7 +477,7 @@ void SegmentationReworkView::CreateNewSegmentationC()
   if (m_Controls.checkIndiv->isChecked())
   {
     auto sliceIndices = CreateSegmentation(baseImage, m_Controls.sliderWidget->value());
-    InterpolateSegmentation(baseImage, sliceIndices);
+    //InterpolateSegmentation(baseImage, sliceIndices);
   }
 
   QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog(m_Parent); // needs a QWidget as parent, "this" is not QWidget

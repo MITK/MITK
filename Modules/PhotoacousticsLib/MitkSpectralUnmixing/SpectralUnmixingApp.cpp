@@ -14,34 +14,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-//#include <boost>
 #include <chrono>
 #include <mitkCommon.h>
-
 #include "mitkPALinearSpectralUnmixingFilter.h"
 #include "mitkPASpectralUnmixingFilterBase.h"
 #include "mitkPASpectralUnmixingFilterVigra.h"
 #include "mitkPASpectralUnmixingSO2.h"
-
 #include <mitkCommandLineParser.h>
 #include <mitkException.h>
 #include <mitkIOUtil.h>
 #include <mitkUIDGenerator.h>
-
 #include <itksys/SystemTools.hxx>
-
-
 #include "mitkPreferenceListReaderOptionsFunctor.h"
 
 
 struct InputParameters
 {
-  std::string inputPath;
-  std::string outputPath;
-  std::string inputWavelengths;
+  std::string inputFilename;
+  std::string outputFileStruct;
   std::string inputAlg;
-  std::string inputWeights;
-  mitkCommandLineParser::StringContainerType test;
+  mitkCommandLineParser::StringContainerType inputWavelengths;
+  mitkCommandLineParser::StringContainerType inputWeights;
 };
 
 
@@ -58,24 +51,24 @@ InputParameters parseInput(int argc, char *argv[])
   parser.setArgumentPrefix("--", "-");
 
   parser.beginGroup("Required parameters");
-  parser.addArgument("inputPath",
+  parser.addArgument("inputFilename",
                      "i",
                      mitkCommandLineParser::InputDirectory,
-                     "Input folder (directory)",
-                     "input folder",
+                     "Input Filename (NAME.nrrd)",
+                     "input filename",
                      us::Any(),
                      false);
-  parser.addArgument("outputPath",
+  parser.addArgument("outputFileStruct",
                      "o",
                      mitkCommandLineParser::OutputDirectory,
-                     "Input save folder (directory)",
-                     "input save folder",
+                     "Input save name (name without ending!)",
+                     "input save name",
                      us::Any(),
                      false);
   parser.addArgument("inputWavelengths",
                      "l",
-                     mitkCommandLineParser::String,
-                     "Input wavelengths (string)",
+                     mitkCommandLineParser::StringList,
+                     "Input wavelengths (123 124 125 ... int blank int blank)",
                      "input wavelengths",
                      us::Any(),
                      false);
@@ -89,22 +82,13 @@ InputParameters parseInput(int argc, char *argv[])
   parser.addArgument("inputWeights",
                      "w",
                      mitkCommandLineParser::String,
-                     "Input weights (string)",
+                     "Input weights (123 124 125 ... int in % blank int in % blank)",
                      "input weights",
-                     us::Any(),
-                     true);
-  parser.addArgument("test",
-                     "t",
-                     mitkCommandLineParser::StringList,
-                     "Input tes (string)",
-                     "input tes",
                      us::Any(),
                      true);
   parser.endGroup();
 
-
   InputParameters input;
-
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (argc == 0)
@@ -115,29 +99,29 @@ InputParameters parseInput(int argc, char *argv[])
     MITK_INFO << argv[i];
   }
 
-  if (parsedArgs.count("inputPath"))
+  if (parsedArgs.count("inputFilename"))
   { 
-    input.inputPath = us::any_cast<std::string>(parsedArgs["inputPath"]);
+    input.inputFilename = us::any_cast<std::string>(parsedArgs["inputFilename"]);
   }
   else
   {
-    MITK_ERROR << "Error: No inputPath";
-    mitkThrow() << "Error: No inputPath";
+    MITK_ERROR << "Error: No input";
+    mitkThrow() << "Error: No input";
   }
 
-  if (parsedArgs.count("outputPath"))
+  if (parsedArgs.count("outputFileStruct"))
   { 
-    input.outputPath = us::any_cast<std::string>(parsedArgs["outputPath"]);
+    input.outputFileStruct = us::any_cast<std::string>(parsedArgs["outputFileStruct"]);
   }
   else
   {
-    MITK_ERROR << "Error: No outputPath";
-    mitkThrow() << "Error: No outputPath";
+    MITK_ERROR << "Error: No output";
+    mitkThrow() << "Error: No output";
   }
 
   if (parsedArgs.count("inputWavelengths"))
   {
-    input.inputWavelengths = us::any_cast<std::string>(parsedArgs["inputWavelengths"]);
+    input.inputWavelengths = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["inputWavelengths"]);
   }
   else
   {
@@ -156,12 +140,7 @@ InputParameters parseInput(int argc, char *argv[])
 
   if (parsedArgs.count("inputWeights"))
   {
-    input.inputWeights = us::any_cast<std::string>(parsedArgs["inputWeights"]);
-  }
-
-  if (parsedArgs.count("test"))
-  {
-    input.test = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["test"]);
+    input.inputWeights = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["inputWeights"]);
   }
 
   MITK_INFO << "Parsing arguments...[Done]";
@@ -218,110 +197,87 @@ mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algo
   return spectralUnmixingFilter;
 }
 
-std::vector<int> inputWavelengthGenerator(std::string input)
-{
-  std::vector<int> output;
-
-  
-  for (int i = 0; i < input.size(); ++i)
-  {
-    if (input[i] == ',')
-    {
-      std::string foo;
-      foo.push_back(input[i-3]);
-      foo.push_back(input[i-2]);
-      foo.push_back(input[i-1]);
-      output.push_back(std::stoi(foo));
-    }
-  }
-  std::string foo;
-  foo.push_back(input[input.size() - 3]);
-  foo.push_back(input[input.size() - 2]);
-  foo.push_back(input[input.size()-1]);
-  output.push_back(std::stoi(foo));
-  
-  return output;
-}
-
 int main(int argc, char *argv[])
 { 
   auto input = parseInput(argc, argv);
 
+  std::string algo = input.inputAlg;
+  std::string inputImage = input.inputFilename;
+  std::string outputDir = input.outputFileStruct;
+  auto inputWls = input.inputWavelengths;
 
-  auto tst = input.test;
-
-  for (int s = 0; s < tst.size(); ++s)
+  std::vector<int> wavelengths;
+  for (int s = 0; s < inputWls.size(); ++s)
   {
-    MITK_INFO << " s:" << s <<  "trs: " << tst[s] << "\n";
-    int sdh = std::stoi(tst[s]);
-    MITK_INFO << "int: " << sdh << "\n";
+    int wl = std::stoi(inputWls[s]);
+    wavelengths.push_back(wl);
+    MITK_INFO << "Wavelength: " << wl << "\n";
   }
 
+  auto m_inputImage = mitk::IOUtil::Load<mitk::Image>(inputImage);
+  mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter;
 
-  std::string inputImage = input.inputPath;
-  std::string outputDir = input.outputPath;
-  std::string inputWls = input.inputWavelengths;
-  std::vector<int> wavelengths = inputWavelengthGenerator(inputWls);
-  std::string algo = input.inputAlg;
+  if (algo == "WLS")
+  {
+    auto inputW = input.inputWeights;
 
- 
-   
- auto m_inputImage = mitk::IOUtil::Load<mitk::Image>(inputImage);
+    std::vector<int> Weights;
+    for (int s = 0; s < inputW.size(); ++s)
+    {
+      int w = std::stoi(inputW[s]);
+      Weights.push_back(w);
+      MITK_INFO << "Weights: " << w << "\n";
+    }
 
- mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter;
+    m_SpectralUnmixingFilter = GetFilterInstance(algo, Weights);
+  }
+  else
+  {
+    m_SpectralUnmixingFilter = GetFilterInstance(algo);
+  }
 
- if (algo == "WLS")
- {
-   std::vector<int> Weights = inputWavelengthGenerator(input.inputWeights);
-   m_SpectralUnmixingFilter = GetFilterInstance(algo, Weights);
- }
- else
- {
-   m_SpectralUnmixingFilter = GetFilterInstance(algo);
- }
-
- m_SpectralUnmixingFilter->SetInput(m_inputImage);
+  m_SpectralUnmixingFilter->SetInput(m_inputImage);
       
- m_SpectralUnmixingFilter->Verbose(false);
- m_SpectralUnmixingFilter->RelativeError(false);
- m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
- m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
- m_SpectralUnmixingFilter->AddOutputs(2);
+  m_SpectralUnmixingFilter->Verbose(false);
+  m_SpectralUnmixingFilter->RelativeError(false);
+  m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
+  m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
+  m_SpectralUnmixingFilter->AddOutputs(2);
  
- for (int wIdx = 0; wIdx < wavelengths.size(); ++wIdx)
- {
-   m_SpectralUnmixingFilter->AddWavelength(wavelengths[wIdx]);
-   MITK_INFO << wavelengths[wIdx];
- }
+  for (int wIdx = 0; wIdx < wavelengths.size(); ++wIdx)
+  {
+    m_SpectralUnmixingFilter->AddWavelength(wavelengths[wIdx]);
+    MITK_INFO << wavelengths[wIdx];
+  }
  
- m_SpectralUnmixingFilter->Update();
+  m_SpectralUnmixingFilter->Update();
  
- auto output1 = m_SpectralUnmixingFilter->GetOutput(0);
- auto output2 = m_SpectralUnmixingFilter->GetOutput(1);
- output1->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
- output2->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
+  auto output1 = m_SpectralUnmixingFilter->GetOutput(0);
+  auto output2 = m_SpectralUnmixingFilter->GetOutput(1);
+  output1->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
+  output2->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
 
- std::string unmixingOutputHbO2 = outputDir + "_HbO2_SU_.nrrd";
- std::string unmixingOutputHb = outputDir + "_Hb_SU_.nrrd";
- mitk::IOUtil::Save(output1, unmixingOutputHbO2);
- mitk::IOUtil::Save(output2, unmixingOutputHb);
+  std::string unmixingOutputHbO2 = outputDir + "_HbO2_SU_.nrrd";
+  std::string unmixingOutputHb = outputDir + "_Hb_SU_.nrrd";
+  mitk::IOUtil::Save(output1, unmixingOutputHbO2);
+  mitk::IOUtil::Save(output2, unmixingOutputHb);
 
- auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
- m_sO2->Verbose(false);
+  auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
+  m_sO2->Verbose(false);
    
- m_sO2->SetInput(0, output1);
- m_sO2->SetInput(1, output2);
+  m_sO2->SetInput(0, output1);
+  m_sO2->SetInput(1, output2);
 
- m_sO2->Update();
+  m_sO2->Update();
 
- mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
- sO2->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
+  mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
+  sO2->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
 
- std::string outputSo2 = outputDir + "_sO2_.nrrd";
- mitk::IOUtil::Save(sO2, outputSo2);
+  std::string outputSo2 = outputDir + "_sO2_.nrrd";
+  mitk::IOUtil::Save(sO2, outputSo2);
 
- m_sO2 = nullptr;
- m_SpectralUnmixingFilter = nullptr;
+  m_sO2 = nullptr;
+  m_SpectralUnmixingFilter = nullptr;
 
- MITK_INFO << "Spectral Unmixing DONE";
+  MITK_INFO << "Spectral Unmixing DONE";
 }

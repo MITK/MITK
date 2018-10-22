@@ -53,6 +53,10 @@ class MITKQTWIDGETS_EXPORT QmitkCustomMultiWidget : public QWidget
 
 public:
 
+  using RenderWindowWidgetPointer = std::shared_ptr<QmitkRenderWindowWidget>;
+  using RenderWindowWidgetMap = std::map<QString, std::shared_ptr<QmitkRenderWindowWidget>>;
+  using RenderWindowHash = QHash<QString, QmitkRenderWindow*>;
+
   QmitkCustomMultiWidget(QWidget* parent = 0,
                          Qt::WindowFlags f = 0,
                          mitk::RenderingManager* renderingManager = nullptr,
@@ -69,10 +73,8 @@ public:
   void ResetLayout(int row, int column);
   void Synchronize(bool synchronized);
 
-  using RenderWindowWidgetMap = std::map<QString, std::shared_ptr<QmitkRenderWindowWidget>>;
-  using RenderWindowHash = QHash<QString, QmitkRenderWindow*>;
   RenderWindowWidgetMap GetRenderWindowWidgets() const;
-  std::shared_ptr<QmitkRenderWindowWidget> GetRenderWindowWidget(const QString& widgetID) const;
+  RenderWindowWidgetPointer GetRenderWindowWidget(const QString& widgetID) const;
 
   QString CreateRenderWindowWidget(const std::string& cornerAnnotation = "");
   void AddToMultiWidgetLayout(int row, int column, const QString& widgetID);
@@ -80,9 +82,10 @@ public:
 
   QmitkRenderWindow* GetRenderWindow(const QString& widgetID) const;
 
-  std::shared_ptr<QmitkRenderWindowWidget> GetActiveRenderWindowWidget() const;
-  std::shared_ptr<QmitkRenderWindowWidget> GetFirstRenderWindowWidget() const;
-  std::shared_ptr<QmitkRenderWindowWidget> GetLastRenderWindowWidget() const;
+  void SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget);
+  RenderWindowWidgetPointer GetActiveRenderWindowWidget() const;
+  RenderWindowWidgetPointer GetFirstRenderWindowWidget() const;
+  RenderWindowWidgetPointer GetLastRenderWindowWidget() const;
   
   unsigned int GetNumberOfRenderWindowWidgets() const;
 
@@ -150,7 +153,7 @@ private:
   QGridLayout* m_CustomMultiWidgetLayout;
   RenderWindowWidgetMap m_RenderWindowWidgets;
 
-  QmitkRenderWindowWidget* m_ActiveRenderWindowWidget;
+  RenderWindowWidgetPointer m_ActiveRenderWindowWidget;
 
   int m_PlaneMode;
 

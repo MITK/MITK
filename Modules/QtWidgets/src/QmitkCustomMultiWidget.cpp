@@ -178,7 +178,7 @@ QmitkCustomMultiWidget::RenderWindowWidgetMap QmitkCustomMultiWidget::GetRenderW
   return m_RenderWindowWidgets;
 }
 
-std::shared_ptr<QmitkRenderWindowWidget> QmitkCustomMultiWidget::GetRenderWindowWidget(const QString& widgetID) const
+QmitkCustomMultiWidget::RenderWindowWidgetPointer QmitkCustomMultiWidget::GetRenderWindowWidget(const QString& widgetID) const
 {
   RenderWindowWidgetMap::const_iterator it = m_RenderWindowWidgets.find(widgetID);
   if (it == m_RenderWindowWidgets.end())
@@ -195,7 +195,7 @@ QString QmitkCustomMultiWidget::CreateRenderWindowWidget(const std::string& corn
   mitk::UIDGenerator generator;
   std::string renderWindowUID = generator.GetUID();
   QString UID = m_MultiWidgetName + "_" + QString::fromStdString(renderWindowUID);
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, UID, m_DataStorage);
+  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, UID, m_DataStorage);
   renderWindowWidget->SetCornerAnnotationText(cornerAnnotation);
 
   // store the newly created render window widget with the UID
@@ -206,10 +206,11 @@ QString QmitkCustomMultiWidget::CreateRenderWindowWidget(const std::string& corn
 
 void QmitkCustomMultiWidget::AddToMultiWidgetLayout(int row, int column, const QString& widgetID)
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = GetRenderWindowWidget(widgetID);
+  RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     m_CustomMultiWidgetLayout->addWidget(renderWindowWidget.get(), row, column);
+    SetActiveRenderWindowWidget(renderWindowWidget);
   }
 }
 
@@ -221,7 +222,7 @@ void QmitkCustomMultiWidget::RemoveRenderWindowWidget(const QString& widgetID)
     return;
   }
 
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidgetToRemove = iterator->second;
+  RenderWindowWidgetPointer renderWindowWidgetToRemove = iterator->second;
   disconnect(renderWindowWidgetToRemove.get(), 0, 0, 0);
 
   // erase the render window from the map
@@ -233,7 +234,7 @@ void QmitkCustomMultiWidget::RemoveRenderWindowWidget(const QString& widgetID)
 
 QmitkRenderWindow* QmitkCustomMultiWidget::GetRenderWindow(const QString& widgetID) const
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = GetRenderWindowWidget(widgetID);
+  RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     return renderWindowWidget->GetRenderWindow();
@@ -242,13 +243,17 @@ QmitkRenderWindow* QmitkCustomMultiWidget::GetRenderWindow(const QString& widget
   return nullptr;
 }
 
-std::shared_ptr<QmitkRenderWindowWidget> QmitkCustomMultiWidget::GetActiveRenderWindowWidget() const
+void QmitkCustomMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget)
 {
-  //return m_ActiveRenderWindowWidget;
-  return m_RenderWindowWidgets.begin()->second;
+  m_ActiveRenderWindowWidget = activeRenderWindowWidget;
 }
 
-std::shared_ptr<QmitkRenderWindowWidget> QmitkCustomMultiWidget::GetFirstRenderWindowWidget() const
+QmitkCustomMultiWidget::RenderWindowWidgetPointer QmitkCustomMultiWidget::GetActiveRenderWindowWidget() const
+{
+  return m_ActiveRenderWindowWidget;
+}
+
+QmitkCustomMultiWidget::RenderWindowWidgetPointer QmitkCustomMultiWidget::GetFirstRenderWindowWidget() const
 {
   if (!m_RenderWindowWidgets.empty())
   {
@@ -260,7 +265,7 @@ std::shared_ptr<QmitkRenderWindowWidget> QmitkCustomMultiWidget::GetFirstRenderW
   }
 }
 
-std::shared_ptr<QmitkRenderWindowWidget> QmitkCustomMultiWidget::GetLastRenderWindowWidget() const
+QmitkCustomMultiWidget::RenderWindowWidgetPointer QmitkCustomMultiWidget::GetLastRenderWindowWidget() const
 {
   if (!m_RenderWindowWidgets.empty())
   {
@@ -279,7 +284,7 @@ unsigned int QmitkCustomMultiWidget::GetNumberOfRenderWindowWidgets() const
 
 void QmitkCustomMultiWidget::RequestUpdate(const QString& widgetID)
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = GetRenderWindowWidget(widgetID);
+  RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     return renderWindowWidget->RequestUpdate();
@@ -296,7 +301,7 @@ void QmitkCustomMultiWidget::RequestUpdateAll()
 
 void QmitkCustomMultiWidget::ForceImmediateUpdate(const QString& widgetID)
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = GetRenderWindowWidget(widgetID);
+  RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     renderWindowWidget->ForceImmediateUpdate();
@@ -340,7 +345,7 @@ const mitk::Point3D QmitkCustomMultiWidget::GetCrossPosition(const QString& widg
 //////////////////////////////////////////////////////////////////////////
 void QmitkCustomMultiWidget::ShowLevelWindowWidget(const QString& widgetID, bool show)
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = GetRenderWindowWidget(widgetID);
+  RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     renderWindowWidget->ShowLevelWindowWidget(show);
@@ -458,7 +463,7 @@ void QmitkCustomMultiWidget::HandleCrosshairPositionEventDelayed()
 
 void QmitkCustomMultiWidget::MoveCrossToPosition(const QString& widgetID, const mitk::Point3D& newPosition)
 {
-  std::shared_ptr<QmitkRenderWindowWidget> renderWindowWidget = GetRenderWindowWidget(widgetID);
+  RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(widgetID);
   if (nullptr != renderWindowWidget)
   {
     renderWindowWidget->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
@@ -519,7 +524,7 @@ void QmitkCustomMultiWidget::InitializeGUI()
 void QmitkCustomMultiWidget::InitializeWidget()
 {
   // #TODO: some things have to be handled globally (hold for all render window (widgets)
-  // analyse those things and design a controlling mechanism
+  // analyze those things and design a controlling mechanism
 }
 
 void QmitkCustomMultiWidget::InitializeDisplayActionEventHandling()

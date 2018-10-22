@@ -66,7 +66,11 @@ QmitkRenderWindow* QmitkCustomMultiWidgetEditor::GetActiveQmitkRenderWindow() co
 {
   if (nullptr != m_CustomMultiWidget)
   {
-    return m_CustomMultiWidget->GetActiveRenderWindowWidget()->GetRenderWindow();
+    auto activeRenderWindowWidget = m_CustomMultiWidget->GetActiveRenderWindowWidget();
+    if (nullptr != activeRenderWindowWidget)
+    {
+      return activeRenderWindowWidget->GetRenderWindow();
+    }
   }
 
   return nullptr;

@@ -38,8 +38,12 @@ struct InputParameters
 {
   std::string inputPath;
   std::string outputPath;
-  int numberOfInputs;
+  std::string inputWavelengths;
+  std::string inputAlg;
+  std::string inputWeights;
+  mitkCommandLineParser::StringContainerType test;
 };
+
 
 InputParameters parseInput(int argc, char *argv[])
 {
@@ -68,13 +72,34 @@ InputParameters parseInput(int argc, char *argv[])
                      "input save folder",
                      us::Any(),
                      false);
-  parser.addArgument("numberOfInputs",
-                     "n",
-                     mitkCommandLineParser::Int,
-                     "Number of Input files",
-                     "number of inputs",
+  parser.addArgument("inputWavelengths",
+                     "l",
+                     mitkCommandLineParser::String,
+                     "Input wavelengths (string)",
+                     "input wavelengths",
                      us::Any(),
                      false);
+  parser.addArgument("inputAlg",
+                     "a",
+                     mitkCommandLineParser::String,
+                     "Input algorithm (string)",
+                     "input algorithm",
+                     us::Any(),
+                     false);
+  parser.addArgument("inputWeights",
+                     "w",
+                     mitkCommandLineParser::String,
+                     "Input weights (string)",
+                     "input weights",
+                     us::Any(),
+                     true);
+  parser.addArgument("test",
+                     "t",
+                     mitkCommandLineParser::StringList,
+                     "Input tes (string)",
+                     "input tes",
+                     us::Any(),
+                     true);
   parser.endGroup();
 
 
@@ -109,21 +134,42 @@ InputParameters parseInput(int argc, char *argv[])
     MITK_ERROR << "Error: No outputPath";
     mitkThrow() << "Error: No outputPath";
   }
-  if (parsedArgs.count("numberOfInputs"))
+
+  if (parsedArgs.count("inputWavelengths"))
   {
-    input.numberOfInputs = us::any_cast<int>(parsedArgs["numberOfInputs"]);
+    input.inputWavelengths = us::any_cast<std::string>(parsedArgs["inputWavelengths"]);
   }
   else
   {
-    MITK_ERROR << "Error: No number of Inputs";
-    mitkThrow() << "Error: No number of Inputs";
+    MITK_ERROR << "Error: No wavelengths";
+    mitkThrow() << "Error: No wavelengths";
   }
+  if (parsedArgs.count("inputAlg"))
+  {
+    input.inputAlg = us::any_cast<std::string>(parsedArgs["inputAlg"]);
+  }
+  else
+  {
+    MITK_ERROR << "Error: No algorithm";
+    mitkThrow() << "Error: No algorithm";
+  }
+
+  if (parsedArgs.count("inputWeights"))
+  {
+    input.inputWeights = us::any_cast<std::string>(parsedArgs["inputWeights"]);
+  }
+
+  if (parsedArgs.count("test"))
+  {
+    input.test = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["test"]);
+  }
+
   MITK_INFO << "Parsing arguments...[Done]";
   return input;
 }
 
 
-mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algorithm)
+mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algorithm, std::vector<int> weights = std::vector<int>())
 {
   mitk::pa::SpectralUnmixingFilterBase::Pointer spectralUnmixingFilter;
 
@@ -161,153 +207,121 @@ mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algo
     dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra *>(spectralUnmixingFilter.GetPointer())
       ->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED);
 
-    std::vector<int> weigthVec = {40, 45, 47};
+    std::vector<int> weigthVec = weights;
 
     for (int i = 0; i < 3; ++i)
     {
       dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra *>(spectralUnmixingFilter.GetPointer())
-        ->AddWeight(weigthVec[i]);
+        ->AddWeight(weigthVec[i]/100);
     }
   }
   return spectralUnmixingFilter;
 }
 
-std::string numberGenerator(int input)
+std::vector<int> inputWavelengthGenerator(std::string input)
 {
-  std::string number;
-  int counter = input + 1;
-  if (counter < 10)
-    number = "00" + std::to_string(counter);
-  else if (counter < 100)
-    number = "0" + std::to_string(counter);
-  else if (counter < 1000)
-    number = std::to_string(counter);
-  else
-    number = "NAN";
-  return number;
-}
+  std::vector<int> output;
 
-std::string smileyGenerator(float input)
-{
-  std::string number;
-  if (input < 10)
-    number = ":'(";
-  else if (input < 40)
-    number = ":(";
-  else if (input < 60)
-    number = ":/";
-  else if (input < 85)
-    number = ":)";
-  else if (input <= 100)
-    number = ":D";
-  else
-    number = "NAN";
-  return number;
+  
+  for (int i = 0; i < input.size(); ++i)
+  {
+    if (input[i] == ',')
+    {
+      std::string foo;
+      foo.push_back(input[i-3]);
+      foo.push_back(input[i-2]);
+      foo.push_back(input[i-1]);
+      output.push_back(std::stoi(foo));
+    }
+  }
+  std::string foo;
+  foo.push_back(input[input.size() - 3]);
+  foo.push_back(input[input.size() - 2]);
+  foo.push_back(input[input.size()-1]);
+  output.push_back(std::stoi(foo));
+  
+  return output;
 }
 
 int main(int argc, char *argv[])
 { 
   auto input = parseInput(argc, argv);
 
-  std::string inputDir = input.inputPath;
+
+  auto tst = input.test;
+
+  for (int s = 0; s < tst.size(); ++s)
+  {
+    MITK_INFO << " s:" << s <<  "trs: " << tst[s] << "\n";
+    int sdh = std::stoi(tst[s]);
+    MITK_INFO << "int: " << sdh << "\n";
+  }
+
+
+  std::string inputImage = input.inputPath;
   std::string outputDir = input.outputPath;
-  unsigned int N = input.numberOfInputs;
+  std::string inputWls = input.inputWavelengths;
+  std::vector<int> wavelengths = inputWavelengthGenerator(inputWls);
+  std::string algo = input.inputAlg;
 
-/*
-  //maybee try with "itk system tools"
-
-  //auto test = itksys::SystemTools::GetFilenameName(argv[0]).c_str();
-  
-  //MITK_INFO << "test: " << test;
-  
-
-  /  +++ temporary solution BEGIN +++
-  std::vector<std::string> files;
-  std::string file;
-  for (int i = 1; i < 34; ++i)
-  {
-
-    if (i < 10)
-    {
-      file = "E:/NHDATA/sdmas_beamformed/merged/static-oxy_sdmas_00" + std::to_string(i) + "_merged.nrrd";
-    }
-    else
-    {
-      file = "E:/NHDATA/sdmas_beamformed/merged/static-oxy_sdmas_0" + std::to_string(i) + "_merged.nrrd";
-    }
-    files.push_back(file);
-  }
-  /  +++ temporary solution END +++
-
-  std::vector<std::string> files;
-  std::string file;
-  for (int i = 0; i < 7; ++i)
-  {
-    file = "E:/NHCAMI/cami-experimental/PAI/spectralUnmixing/inSilico/paImages/selection/noiselevel1_rep1000_wavelength_selction_data_" +
-      std::to_string(i) + ".nrrd";
-    files.push_back(file);
-  }
-  std::vector<std::string> files;
-  std::string file;
-  file = "E:/NHCAMI/cami-experimental/PAI/spectralUnmixing/inSilico/paImages/selection/noiselevel1_rep1000_wavelength_selction_data.nrrd";
-  files.push_back(file);*/
-  
-  std::vector<std::string> algorithms = { "QR", "LU", "SVD", "NNLS", "WLS" };
-
-  std::vector<std::string> files;
-
-  for (unsigned file_idx = 0; file_idx < N; ++file_idx)
-  {
-    std::string file = inputDir + "/static-oxy_das_" + numberGenerator(file_idx) + "_merged.nrrd";
-    files.push_back(file);
-  }
-  
-  for (unsigned image_idx = 0; image_idx < N; ++image_idx)
-  {
-    auto m_inputImage = mitk::IOUtil::Load<mitk::Image>(files[image_idx]);
-    for (unsigned alg = 0; alg < 5; ++alg)
-    {
-      float percent = (image_idx*1.0 / N + 1.0 / N * (alg / 5.0))*100.0;
-      MITK_INFO << "IN PROGRESS: " << algorithms[alg] << " " << numberGenerator(image_idx) << " " << percent << "% " << smileyGenerator(percent);
-      mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter = GetFilterInstance(algorithms[alg]);
-      m_SpectralUnmixingFilter->SetInput(m_inputImage);
-      m_SpectralUnmixingFilter->AddOutputs(2);
-      m_SpectralUnmixingFilter->Verbose(false);
-      m_SpectralUnmixingFilter->RelativeError(false);
-      m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
-      m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
-          
-      m_SpectralUnmixingFilter->AddWavelength(760);
-      m_SpectralUnmixingFilter->AddWavelength(798);
-      m_SpectralUnmixingFilter->AddWavelength(858);
-
-      m_SpectralUnmixingFilter->Update();
-
-      auto output1 = m_SpectralUnmixingFilter->GetOutput(0);
-      auto output2 = m_SpectralUnmixingFilter->GetOutput(1);
-
-      std::string unmixingOutputHbO2 = outputDir + "/SUOutput/" + algorithms[alg] + "/static_oxy_" + algorithms[alg] + "_HbO2_SU_" + numberGenerator(image_idx) + ".nrrd";
-      std::string unmixingOutputHb = outputDir + "/SUOutput/" + algorithms[alg] + "/static_oxy_" + algorithms[alg] + "_Hb_SU_" + numberGenerator(image_idx) + ".nrrd";
-      mitk::IOUtil::Save(output1, unmixingOutputHbO2);
-      mitk::IOUtil::Save(output2, unmixingOutputHb);
-
-      auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
-      m_sO2->Verbose(false);
+ 
    
-      m_sO2->SetInput(0, output1);
-      m_sO2->SetInput(1, output2);
+ auto m_inputImage = mitk::IOUtil::Load<mitk::Image>(inputImage);
 
-      m_sO2->Update();
+ mitk::pa::SpectralUnmixingFilterBase::Pointer m_SpectralUnmixingFilter;
 
-      mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
-      sO2->SetSpacing(output1->GetGeometry()->GetSpacing());
+ if (algo == "WLS")
+ {
+   std::vector<int> Weights = inputWavelengthGenerator(input.inputWeights);
+   m_SpectralUnmixingFilter = GetFilterInstance(algo, Weights);
+ }
+ else
+ {
+   m_SpectralUnmixingFilter = GetFilterInstance(algo);
+ }
 
-      std::string outputSo2 = outputDir + "/sO2/" + algorithms[alg] + "/static_oxy_" + algorithms[alg] + "_sO2_" + numberGenerator(image_idx) + ".nrrd";
-      mitk::IOUtil::Save(sO2, outputSo2);
+ m_SpectralUnmixingFilter->SetInput(m_inputImage);
+      
+ m_SpectralUnmixingFilter->Verbose(false);
+ m_SpectralUnmixingFilter->RelativeError(false);
+ m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::OXYGENATED);
+ m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
+ m_SpectralUnmixingFilter->AddOutputs(2);
+ 
+ for (int wIdx = 0; wIdx < wavelengths.size(); ++wIdx)
+ {
+   m_SpectralUnmixingFilter->AddWavelength(wavelengths[wIdx]);
+   MITK_INFO << wavelengths[wIdx];
+ }
+ 
+ m_SpectralUnmixingFilter->Update();
+ 
+ auto output1 = m_SpectralUnmixingFilter->GetOutput(0);
+ auto output2 = m_SpectralUnmixingFilter->GetOutput(1);
+ output1->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
+ output2->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
 
-      m_SpectralUnmixingFilter = nullptr;
-      m_sO2 = nullptr;
-    }
-  }
-  MITK_INFO << "Spectral Unmixing DONE";
+ std::string unmixingOutputHbO2 = outputDir + "_HbO2_SU_.nrrd";
+ std::string unmixingOutputHb = outputDir + "_Hb_SU_.nrrd";
+ mitk::IOUtil::Save(output1, unmixingOutputHbO2);
+ mitk::IOUtil::Save(output2, unmixingOutputHb);
+
+ auto m_sO2 = mitk::pa::SpectralUnmixingSO2::New();
+ m_sO2->Verbose(false);
+   
+ m_sO2->SetInput(0, output1);
+ m_sO2->SetInput(1, output2);
+
+ m_sO2->Update();
+
+ mitk::Image::Pointer sO2 = m_sO2->GetOutput(0);
+ sO2->SetSpacing(m_inputImage->GetGeometry()->GetSpacing());
+
+ std::string outputSo2 = outputDir + "_sO2_.nrrd";
+ mitk::IOUtil::Save(sO2, outputSo2);
+
+ m_sO2 = nullptr;
+ m_SpectralUnmixingFilter = nullptr;
+
+ MITK_INFO << "Spectral Unmixing DONE";
 }

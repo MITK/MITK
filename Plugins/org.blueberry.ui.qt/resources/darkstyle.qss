@@ -130,6 +130,7 @@ QAbstractItemView::item {
 QHeaderView::section {
   background-color: #2d2d30;
   border: 1px solid transparent;
+  padding-top: 4px;
 }
 
 QHeaderView::section:horizontal {
@@ -150,6 +151,9 @@ QHeaderView::section:vertical:pressed {
 }
 
 QHeaderView::down-arrow {
+  margin-top: -5px;
+  margin-bottom: 5px;
+  subcontrol-position: top center;
   image: url(:/org.blueberry.ui.qt/dark/down-arrow.svg);
   height: 16px;
   width: 16px;
@@ -164,6 +168,8 @@ QHeaderView::down-arrow:pressed {
 }
 
 QHeaderView::up-arrow {
+  margin-top: -5px;
+  margin-bottom: 5px;
   image: url(:/org.blueberry.ui.qt/dark/up-arrow.svg);
   height: 16px;
   width: 16px;

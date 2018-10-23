@@ -630,3 +630,13 @@ QTreeView::indicator:checked:selected, QTreeView::indicator:indeterminate:select
 QProgressBar {
   text-align: center;
 }
+
+QWidget#widgetForModalities QToolButton {
+  border: 1px solid #434346;
+  margin: 1px;
+}
+
+QWidget#widgetForModalities QToolButton:checked {
+  border: 1px solid #007acc;
+  margin: 1px;
+}

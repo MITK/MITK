@@ -518,6 +518,10 @@ void SegmentationReworkView::CreateNewSegmentationC()
       this->GetDataStorage()->Add(newSegmentation, toolManager->GetReferenceData(0)); // add as a child, because the segmentation "derives" from the original
      
       m_SegC = newSegmentation;
+
+      auto referencedImages = m_Image->GetData()->GetProperty("files");
+      m_SegC->GetData()->SetProperty("referenceFiles", referencedImages);
+
     }
     catch (std::bad_alloc)
     {

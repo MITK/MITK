@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt widgets module
 #include "MitkQtWidgetsExports.h"
 #include "QmitkRenderWindow.h"
-#include "QmitkLevelWindowWidget.h"
 
 // mitk core
 #include <mitkDataStorage.h>
@@ -57,7 +56,6 @@ public:
 
   const QString& GetUID() const { return m_UID; };
   QmitkRenderWindow* GetRenderWindow() const { return m_RenderWindow; };
-  QmitkLevelWindowWidget* GetlevelWindowWidget() const { return m_LevelWindowWidget; };
 
   mitk::SliceNavigationController* GetSliceNavigationController() const;
 
@@ -68,8 +66,6 @@ public:
   void ShowGradientBackground(bool enable);
   std::pair<mitk::Color, mitk::Color> GetGradientBackgroundColors() const { return m_GradientBackgroundColors; };
   bool IsGradientBackgroundOn() const;
-
-  void ShowLevelWindowWidget(bool enable);
 
   void SetDecorationColor(const mitk::Color& color);
   mitk::Color GetDecorationColor() const { return m_DecorationColor; };
@@ -104,7 +100,6 @@ private:
 
   mitk::DataStorage* m_DataStorage;
   QmitkRenderWindow* m_RenderWindow;
-  QmitkLevelWindowWidget* m_LevelWindowWidget;
 
   mitk::DataNode::Pointer m_PointSetNode;
   mitk::PointSet::Pointer m_PointSet;

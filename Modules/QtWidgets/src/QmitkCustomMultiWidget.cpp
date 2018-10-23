@@ -343,26 +343,6 @@ const mitk::Point3D QmitkCustomMultiWidget::GetCrossPosition(const QString& widg
 //////////////////////////////////////////////////////////////////////////
 // PUBLIC SLOTS
 //////////////////////////////////////////////////////////////////////////
-void QmitkCustomMultiWidget::ShowLevelWindowWidget(const QString& widgetID, bool show)
-{
-  RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(widgetID);
-  if (nullptr != renderWindowWidget)
-  {
-    renderWindowWidget->ShowLevelWindowWidget(show);
-    return;
-  }
-
-  MITK_ERROR << "Level window widget can not be shown for an unknown widget.";
-}
-
-void QmitkCustomMultiWidget::ShowAllLevelWindowWidgets(bool show)
-{
-  for (const auto& renderWindowWidget : m_RenderWindowWidgets)
-  {
-    renderWindowWidget.second->ShowLevelWindowWidget(show);
-  }
-}
-
 void QmitkCustomMultiWidget::HandleCrosshairPositionEvent()
 {
   /*

@@ -31,7 +31,6 @@ QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
   , m_DataStorage(dataStorage)
   , m_RenderingMode(renderingMode)
   , m_RenderWindow(nullptr)
-  , m_LevelWindowWidget(nullptr)
   , m_PointSetNode(nullptr)
   , m_PointSet(nullptr)
 {
@@ -40,8 +39,15 @@ QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
 
 QmitkRenderWindowWidget::~QmitkRenderWindowWidget()
 {
-  m_RenderWindow->GetSliceNavigationController()->SetCrosshairEvent.RemoveListener(mitk::MessageDelegate1<QmitkRenderWindowWidget, mitk::Point3D>(this, &QmitkRenderWindowWidget::SetCrosshair));
-  m_DataStorage->Remove(m_PointSetNode);
+  auto sliceNavigationController = m_RenderWindow->GetSliceNavigationController();
+  if (nullptr != sliceNavigationController)
+  {
+    sliceNavigationController->SetCrosshairEvent.RemoveListener(mitk::MessageDelegate1<QmitkRenderWindowWidget, mitk::Point3D>(this, &QmitkRenderWindowWidget::SetCrosshair));
+  }
+  if (nullptr != m_DataStorage)
+  {
+    m_DataStorage->Remove(m_PointSetNode);
+  }
 }
 
 void QmitkRenderWindowWidget::SetDataStorage(mitk::DataStorage* dataStorage)
@@ -60,11 +66,6 @@ void QmitkRenderWindowWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 
 mitk::SliceNavigationController* QmitkRenderWindowWidget::GetSliceNavigationController() const
 {
-  if (nullptr == m_RenderWindow)
-  {
-    return nullptr;
-  }
-
   return m_RenderWindow->GetSliceNavigationController();
 }
 
@@ -102,23 +103,6 @@ void QmitkRenderWindowWidget::ShowGradientBackground(bool show)
 bool QmitkRenderWindowWidget::IsGradientBackgroundOn() const
 {
   return m_RenderWindow->GetRenderer()->GetVtkRenderer()->GetGradientBackground();
-}
-
-void QmitkRenderWindowWidget::ShowLevelWindowWidget(bool show)
-{
-  /* #TODO: level window will currently be managed by the PACS mode
-  m_LevelWindowWidget->disconnect(this);
-  if (show)
-  {
-    m_LevelWindowWidget->SetDataStorage(m_DataStorage);
-    m_LevelWindowWidget->show();
-  }
-  else
-  {
-    m_LevelWindowWidget->disconnect(this);
-    m_LevelWindowWidget->hide();
-  }
-  */
 }
 
 void QmitkRenderWindowWidget::SetDecorationColor(const mitk::Color& color)
@@ -183,18 +167,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
 
   mitk::TimeGeometry::Pointer timeGeometry = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
   m_RenderingManager->InitializeViews(timeGeometry);
-
-  // create level window widget for this render window widget
-  m_LevelWindowWidget = new QmitkLevelWindowWidget(this);
-  QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-  sizePolicy.setHorizontalStretch(0);
-  sizePolicy.setVerticalStretch(0);
-  sizePolicy.setHeightForWidth(m_LevelWindowWidget->sizePolicy().hasHeightForWidth());
-  m_LevelWindowWidget->setSizePolicy(sizePolicy);
-  m_LevelWindowWidget->setMaximumWidth(50);
-
   m_Layout->addWidget(m_RenderWindow);
-  //m_Layout->addWidget(m_LevelWindowWidget);
 
   // add point set as a crosshair
   m_PointSetNode = mitk::DataNode::New();

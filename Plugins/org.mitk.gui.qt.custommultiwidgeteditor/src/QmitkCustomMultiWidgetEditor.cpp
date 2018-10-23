@@ -239,10 +239,6 @@ void QmitkCustomMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPrefe
   bool constrainedZooming = preferences->GetBool("Use constrained zooming and panning", true);
   mitk::RenderingManager::GetInstance()->SetConstrainedPanningZooming(constrainedZooming);
 
-  // level window preferences
-  bool showLevelWindowWidget = preferences->GetBool("Show level-window widget", true);
-  m_CustomMultiWidget->ShowAllLevelWindowWidgets(showLevelWindowWidget);
-
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(GetDataStorage());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

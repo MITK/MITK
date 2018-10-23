@@ -34,7 +34,6 @@ class QHBoxLayout;
 class QVBoxLayout;
 class QGridLayout;
 class QSpacerItem;
-class QmitkLevelWindowWidget;
 class QmitkRenderWindow;
 
 namespace mitk
@@ -97,9 +96,6 @@ public:
   const mitk::Point3D GetCrossPosition(const QString& widgetID) const;
 
 public slots:
-
-  void ShowLevelWindowWidget(const QString& widgetID, bool show);
-  void ShowAllLevelWindowWidgets(bool show);
 
   /**
   * @brief Listener to the CrosshairPositionEvent

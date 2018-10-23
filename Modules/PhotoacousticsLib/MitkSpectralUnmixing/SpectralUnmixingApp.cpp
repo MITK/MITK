@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
   auto inputWls = input.inputWavelengths;
 
   std::vector<int> wavelengths;
-  for (int s = 0; s < inputWls.size(); ++s)
+  for (unsigned int s = 0; s < inputWls.size(); ++s)
   {
     int wl = std::stoi(inputWls[s]);
     wavelengths.push_back(wl);
@@ -224,7 +224,7 @@ int main(int argc, char *argv[])
     auto inputW = input.inputWeights;
 
     std::vector<int> Weights;
-    for (int s = 0; s < inputW.size(); ++s)
+    for (unsigned int s = 0; s < inputW.size(); ++s)
     {
       int w = std::stoi(inputW[s]);
       Weights.push_back(w);
@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
   m_SpectralUnmixingFilter->AddChromophore(mitk::pa::PropertyCalculator::ChromophoreType::DEOXYGENATED);
   m_SpectralUnmixingFilter->AddOutputs(2);
  
-  for (int wIdx = 0; wIdx < wavelengths.size(); ++wIdx)
+  for (unsigned int wIdx = 0; wIdx < wavelengths.size(); ++wIdx)
   {
     m_SpectralUnmixingFilter->AddWavelength(wavelengths[wIdx]);
     MITK_INFO << wavelengths[wIdx];

@@ -36,8 +36,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 
 #include <itkThresholdImageFilter.h>
+#include <itkBinaryThresholdImageFilter.h>
+#include <itkBinaryMorphologicalOpeningImageFilter.h>
+#include <itkFlatStructuringElement.h>
+#include <itkBinaryBallStructuringElement.h>
+#include <itkXorImageFilter.h>
+#include <itkWhiteTopHatImageFilter.h>
+#include <itkGradientMagnitudeImageFilter.h>
+#include <itkLaplacianRecursiveGaussianImageFilter.h>
+#include "itkVotingBinaryIterativeHoleFillingImageFilter.h"
+#include <itkImageRegionIterator.h>
+#include <itkBinaryImageToLabelMapFilter.h>
+#include <itkGeometryUtilities.h>
+#include <itkBinaryImageToShapeLabelMapFilter.h>
 #include <itkImage.h>
 #include <mitkImagePixelReadAccessor.h>
+
+// Declare typedefs:
+typedef itk::Image<int, 3>  ImageType;
+typedef itk::BinaryThresholdImageFilter <ImageType, ImageType> BinaryThresholdImageFilterType;
+typedef itk::BinaryBallStructuringElement<ImageType::PixelType, ImageType::ImageDimension> StructuringElementType;
+typedef itk::BinaryMorphologicalOpeningImageFilter <ImageType, ImageType, StructuringElementType> BinaryMorphologicalOpeningImageFilterType;
+typedef itk::XorImageFilter <ImageType> XorImageFilterType;
+typedef itk::WhiteTopHatImageFilter<ImageType, ImageType, StructuringElementType> WhiteTopHatImageFilterType;
+typedef itk::GradientMagnitudeImageFilter<ImageType, ImageType> GradientMagnitudeImageFilterType;
+typedef itk::LaplacianRecursiveGaussianImageFilter<ImageType, ImageType> LaplacianRecursiveGaussianImageFilterType;
+typedef itk::VotingBinaryIterativeHoleFillingImageFilter<ImageType> VotingBinaryIterativeHoleFillingImageFilterType;
+typedef itk::BinaryImageToShapeLabelMapFilter<ImageType> BinaryImageToShapeLabelMapFilterType;
+
 
 
 QmitkUSNavigationStepCtUsRegistration::QmitkUSNavigationStepCtUsRegistration(QWidget *parent) :
@@ -140,6 +166,21 @@ void QmitkUSNavigationStepCtUsRegistration::SetFloatingImageGeometryInformation(
   m_ImageSpacing[0] = image->GetGeometry()->GetSpacing()[0];
   m_ImageSpacing[1] = image->GetGeometry()->GetSpacing()[1];
   m_ImageSpacing[2] = image->GetGeometry()->GetSpacing()[2];
+}
+
+double QmitkUSNavigationStepCtUsRegistration::GetVoxelVolume()
+{
+  if (m_FloatingImage.IsNull())
+  {
+    return 0.0;
+  }
+
+  return m_ImageSpacing[0] * m_ImageSpacing[1] * m_ImageSpacing[2];
+}
+
+double QmitkUSNavigationStepCtUsRegistration::GetFiducialVolume(double radius)
+{
+  return 1.333333333 * 3.141592 * (radius * radius * radius);
 }
 
 void QmitkUSNavigationStepCtUsRegistration::DefineDataStorageImageFilter()
@@ -405,20 +446,186 @@ void QmitkUSNavigationStepCtUsRegistration::OnFilterFloatingImage()
   {
     return;
   }
-  //Initialize threshold filter
+  
+  /* Evtl. für später (da FlatStructuringElement genauer ist als BinaryBallStructuringElement:
+  typedef itk::FlatStructuringElement<3> FlatStructuringElementType;
+  FlatStructuringElementType::RadiusType radiusType;
+  radiusType.Fill(10);
+  FlatStructuringElementType ballType = FlatStructuringElementType::Ball(radiusType, true);
+  */
+  
+  //Initialize threshold filters
   itk::ThresholdImageFilter<itk::Image<int,3>>::Pointer thresholdFilter = itk::ThresholdImageFilter<itk::Image<int, 3>>::New();
-  thresholdFilter->SetOutsideValue(0.0);
-  thresholdFilter->SetLower(150);
-  thresholdFilter->SetUpper(2000);
+  thresholdFilter->SetOutsideValue(0);
+  thresholdFilter->SetLower(500);
+  thresholdFilter->SetUpper(3200);
 
-  itk::Image<int,3>::Pointer itkImage = itk::Image<int, 3>::New();
-  mitk::CastToItkImage(m_FloatingImage, itkImage);
+  /*
+  itk::ThresholdImageFilter<itk::Image<int, 3>>::Pointer thresholdFilter2 = itk::ThresholdImageFilter<itk::Image<int, 3>>::New();
+  thresholdFilter2->SetOutsideValue(0);
+  thresholdFilter2->SetLower(350);
+  thresholdFilter2->SetUpper(10000);*/
 
-  thresholdFilter->SetInput(itkImage);
-  itk::Image<int, 3>::Pointer filteredImage = thresholdFilter->GetOutput();
-  filteredImage->Update();
-  mitk::CastToMitkImage(filteredImage, m_FloatingImage);
-  //m_FloatingImage->Update();
+  
+  //Initialize binary threshold filter 1
+  BinaryThresholdImageFilterType::Pointer binaryThresholdFilter1 = BinaryThresholdImageFilterType::New();
+  binaryThresholdFilter1->SetOutsideValue(0);
+  binaryThresholdFilter1->SetInsideValue(1);
+  binaryThresholdFilter1->SetLowerThreshold(350);
+  binaryThresholdFilter1->SetUpperThreshold(10000);
+
+  /*
+  BinaryThresholdImageFilterType::Pointer binaryThresholdFilter2 = BinaryThresholdImageFilterType::New();
+  binaryThresholdFilter2->SetOutsideValue(0);
+  binaryThresholdFilter2->SetInsideValue(1);
+  binaryThresholdFilter2->SetLowerThreshold(500);
+  binaryThresholdFilter2->SetUpperThreshold(3200);*/
+
+  
+  //Initialize structuring element, which is in this case a ball of radius X
+  StructuringElementType structuringElement;
+  //radius is in pixel|voxel size as direct neighbourhood members
+  structuringElement.SetRadius(1); 
+  structuringElement.CreateStructuringElement();
+  
+  
+  //Initialize binary morphological opening filter
+  BinaryMorphologicalOpeningImageFilterType::Pointer binaryOpeningFilter = BinaryMorphologicalOpeningImageFilterType::New();
+  binaryOpeningFilter->SetKernel(structuringElement);
+  binaryOpeningFilter->SetForegroundValue(1);
+  binaryOpeningFilter->SetBackgroundValue(0);
+
+  /*
+  //Initialize white top hat image filter
+  WhiteTopHatImageFilterType::Pointer whiteTopHatFilter = WhiteTopHatImageFilterType::New();
+  whiteTopHatFilter->SetKernel(structuringElement);*/
+
+  /*
+  //Initialize Xor image filter
+  XorImageFilterType::Pointer xorFilter = XorImageFilterType::New();*/
+
+  //Initialize GradientMagnitudeImageFilterType
+  GradientMagnitudeImageFilterType::Pointer gradientFilter = GradientMagnitudeImageFilterType::New();
+  GradientMagnitudeImageFilterType::Pointer gradientFilter2 = GradientMagnitudeImageFilterType::New();
+  LaplacianRecursiveGaussianImageFilterType::Pointer laplacianFilter = LaplacianRecursiveGaussianImageFilterType::New();
+  LaplacianRecursiveGaussianImageFilterType::Pointer laplacianFilter2 = LaplacianRecursiveGaussianImageFilterType::New();
+
+  //Initialize binary hole filling filter 
+  VotingBinaryIterativeHoleFillingImageFilterType::Pointer holeFillingFilter = VotingBinaryIterativeHoleFillingImageFilterType::New();
+  VotingBinaryIterativeHoleFillingImageFilterType::InputSizeType radius;
+  radius.Fill(1);
+  holeFillingFilter->SetRadius(radius);
+  holeFillingFilter->SetBackgroundValue(0);
+  holeFillingFilter->SetForegroundValue(1);
+  holeFillingFilter->SetMaximumNumberOfIterations(5);
+
+
+  //Initialize binary image to shape label map filter
+  BinaryImageToShapeLabelMapFilterType::Pointer binaryImageToShapeLabelMapFilter = BinaryImageToShapeLabelMapFilterType::New();
+  binaryImageToShapeLabelMapFilter->SetInputForegroundValue(1);
+
+  itk::Image<int,3>::Pointer itkImage1 = itk::Image<int, 3>::New();
+  mitk::CastToItkImage(m_FloatingImage, itkImage1);
+  itk::Image<int, 3>::Pointer itkImage2 = itk::Image<int, 3>::New();
+  mitk::CastToItkImage(m_FloatingImage, itkImage2);
+
+  thresholdFilter->SetInput(itkImage1);
+  //thresholdFilter->Update();
+  //binaryOpeningFilter->SetInput(thresholdFilter->GetOutput());
+  //binaryOpeningFilter->Update();
+  
+  //binaryThresholdFilter1->SetInput(itkImage1);
+  //binaryOpeningFilter->SetInput(binaryThresholdFilter1->GetOutput());
+  //binaryOpeningFilter->Update();
+  
+  //whiteTopHatFilter->SetInput(binaryThresholdFilter1->GetOutput());
+  //whiteTopHatFilter->Update();
+
+  /*
+  //itkImage2 is filtered only by the binary threshold filter
+  binaryThresholdFilter2->SetInput(itkImage2);
+  binaryThresholdFilter2->Update();
+
+  //Set binary threshold filtered image and binary opening filtered image as inputs to Xor-filter
+  xorFilter->SetInput1(binaryThresholdFilter2->GetOutput());
+  xorFilter->SetInput2(binaryOpeningFilter->GetOutput());
+  xorFilter->Update();*/
+
+  laplacianFilter->SetInput(thresholdFilter->GetOutput());
+  laplacianFilter2->SetInput(laplacianFilter->GetOutput());
+  binaryThresholdFilter1->SetInput(laplacianFilter2->GetOutput());
+  holeFillingFilter->SetInput(binaryThresholdFilter1->GetOutput());
+  binaryImageToShapeLabelMapFilter->SetInput(holeFillingFilter->GetOutput());
+  binaryImageToShapeLabelMapFilter->Update();
+
+  BinaryImageToShapeLabelMapFilterType::OutputImageType::Pointer labelMap = binaryImageToShapeLabelMapFilter->GetOutput();
+  // The output of this filter is an itk::LabelMap, which contains itk::LabelObject's
+  MITK_INFO << "There are " << labelMap->GetNumberOfLabelObjects() << " objects.";
+
+  double voxelVolume = this->GetVoxelVolume();
+  double fiducialVolume5mm = this->GetFiducialVolume(2.5);
+  double fiducialVolume3mm = this->GetFiducialVolume(1.5);
+  MITK_INFO << "Voxel Volume = " << voxelVolume << "; Fiducial Volume 5mm = " << fiducialVolume5mm << "; Fiducial Volume 3mm = " << fiducialVolume3mm;
+  unsigned int numberOfPixels5mm = ceil(fiducialVolume5mm / voxelVolume);
+  unsigned int numberOfPixels3mm = ceil(fiducialVolume3mm / voxelVolume);
+
+  MITK_INFO << "Number of pixels 5mm Fiducial = " << numberOfPixels5mm;
+  MITK_INFO << "Number of pixels 3mm Fiducial = " << numberOfPixels3mm;
+
+  itk::Image<int, 3>::Pointer binaryImage = itk::Image<int, 3>::New();
+  binaryImage = holeFillingFilter->GetOutput();
+
+
+  // Loop over each region
+  for (int i = labelMap->GetNumberOfLabelObjects() - 1; i >= 0; --i)
+  {
+    MITK_INFO << "Number " << i;
+    // Get the ith region
+    BinaryImageToShapeLabelMapFilterType::OutputImageType::LabelObjectType* labelObject = labelMap->GetNthLabelObject(i);
+    MITK_INFO << "Object " << i << " contains " << labelObject->Size() << " pixel";
+
+    //TODO: Threshold-Wert evtl. experimentell besser abstimmen,
+    //      um zu verhindern, dass durch Threshold wahre Fiducial-Kandidaten elimiert werden.
+    if (labelObject->Size() < numberOfPixels3mm * 0.8)
+    {
+      for (unsigned int pixelId = 0; pixelId < labelObject->Size(); pixelId++)
+      {
+        binaryImage->SetPixel(labelObject->GetIndex(pixelId), 0);
+      }
+      labelMap->RemoveLabelObject(labelObject);
+    }
+      
+  }
+
+  MITK_INFO << "After Removing Objects:";
+
+  for (int i = labelMap->GetNumberOfLabelObjects() - 1; i >= 0; --i)
+  {
+    // Get the ith region
+    BinaryImageToShapeLabelMapFilterType::OutputImageType::LabelObjectType* labelObject = labelMap->GetNthLabelObject(i);
+    MITK_INFO << "Object " << i << " contains " << labelObject->Size() << " pixel";
+
+    mitk::Point3D centroid;
+    centroid.CastFrom(labelObject->GetCentroid());
+    m_CentroidsOfFiducialCandidates.push_back(centroid);
+  }
+  //evtl. for later: itk::LabelMapOverlayImageFilter
+
+  mitk::CastToMitkImage(binaryImage, m_FloatingImage);
+
+  for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
+  {
+    mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+    pointSet->SetPoint(counter, m_CentroidsOfFiducialCandidates.at(counter)); //Alternativ:  InsertPoint()
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData(pointSet);
+    node->SetName("PointSet");
+    node->SetFloatProperty("pointsize", 5.0);
+    this->GetDataStorage()->Add(node);
+  }
+
+
+
 }
 
 

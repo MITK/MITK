@@ -4,7 +4,7 @@ mitk_create_plugin(
   EXPORT_DIRECTIVE IGTAPPECHOTRACK_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
   PACKAGE_DEPENDS CTK Poco
-  MODULE_DEPENDS MitkUSUI MitkUSNavigation MitkIGTUI MitkSceneSerialization MitkContourModel
+  MODULE_DEPENDS MitkUSUI MitkUSNavigation MitkIGTUI MitkSceneSerialization MitkContourModel ITKLabelMap
 )
 
 #usFunctionAddResources(TARGET ${PLUGIN_TARGET}

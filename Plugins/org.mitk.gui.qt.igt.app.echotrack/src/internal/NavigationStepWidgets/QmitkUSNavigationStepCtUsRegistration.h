@@ -109,6 +109,8 @@ protected:
 
   void UnsetFloatingImageGeometry();
   void SetFloatingImageGeometryInformation(mitk::Image* image);
+  double GetVoxelVolume();
+  double GetFiducialVolume(double radius);
 
   void DefineDataStorageImageFilter();
   void CreateQtPartControl(QWidget *parent);
@@ -132,7 +134,8 @@ private:
   mitk::Image::Pointer m_FloatingImage;
   mitk::PointSet::Pointer m_MarkerModelCoordinateSystemPointSet;
   mitk::PointSet::Pointer m_MarkerFloatingImageCoordinateSystemPointSet;
-
+  
+  std::vector<mitk::Point3D> m_CentroidsOfFiducialCandidates;
 
   mitk::AffineTransform3D::Pointer m_TransformMarkerCSToFloatingImageCS;
   /*!

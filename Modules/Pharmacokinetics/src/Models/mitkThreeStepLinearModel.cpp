@@ -117,8 +117,6 @@ mitk::ThreeStepLinearModel::ParamterUnitMapType mitk::ThreeStepLinearModel::GetD
 mitk::ThreeStepLinearModel::ModelResultType
 mitk::ThreeStepLinearModel::ComputeModelfunction(const ParametersType& parameters) const
 {
-  unsigned int timeSteps = m_TimeGrid.GetSize();
-
   //Model Parameters
   double     S0 = (double) parameters[POSITION_PARAMETER_S0];
   double     t1 = (double) parameters[POSITION_PARAMETER_t1] ;
@@ -166,14 +164,14 @@ mitk::ThreeStepLinearModel::ParametersSizeType  mitk::ThreeStepLinearModel::GetN
   return 0;
 }
 
-void mitk::ThreeStepLinearModel::SetStaticParameter(const ParameterNameType& name,
-    const StaticParameterValuesType& values)
+void mitk::ThreeStepLinearModel::SetStaticParameter(const ParameterNameType&,
+    const StaticParameterValuesType&)
 {
   //do nothing
 };
 
 mitk::ThreeStepLinearModel::StaticParameterValuesType mitk::ThreeStepLinearModel::GetStaticParameterValue(
-  const ParameterNameType& name) const
+  const ParameterNameType&) const
 {
   StaticParameterValuesType result;
 

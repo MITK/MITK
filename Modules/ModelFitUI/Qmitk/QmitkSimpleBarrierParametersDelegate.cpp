@@ -57,7 +57,7 @@ void QmitkSimpleBarrierParametersDelegate::paint(QPainter* painter,
 }
 
 QWidget* QmitkSimpleBarrierParametersDelegate::createEditor(QWidget* parent,
-    const QStyleOptionViewItem& option
+    const QStyleOptionViewItem&
     , const QModelIndex& index) const
 {
   QVariant data = index.data(Qt::EditRole);

@@ -59,7 +59,7 @@ SetXName(const std::string& xName)
 
 int
 QmitkFitPlotDataModel::
-rowCount(const QModelIndex& parent) const
+rowCount(const QModelIndex&) const
 {
   //we assume that all plots have the same nr of values (except the interpolated signal which will be ignored).
   //Thus we have only to check one plot. Reason: One fit is always derived from one input data and therefore
@@ -200,7 +200,7 @@ data(const QModelIndex& index, int role) const
     auto finding = GetCurveByColumn(index.column());
     if (role == Qt::DisplayRole || role == Qt::EditRole)
     {
-      if (finding.second && index.row() < finding.second->GetValues().size())
+      if (finding.second && index.row() < static_cast<int>(finding.second->GetValues().size()))
       {
         result = QVariant(QString::number(finding.second->GetValues()[index.row()].first));
       }
@@ -215,7 +215,7 @@ data(const QModelIndex& index, int role) const
     auto finding = GetCurveByColumn(index.column());
     if (role == Qt::DisplayRole || role == Qt::EditRole)
     {
-      if (finding.second && index.row() < finding.second->GetValues().size())
+      if (finding.second && index.row() < static_cast<int>(finding.second->GetValues().size()))
       {
         result = QVariant(QString::number(finding.second->GetValues()[index.row()].second));
       }
@@ -278,7 +278,7 @@ headerData(int section, Qt::Orientation orientation, int role) const
 
 bool
 QmitkFitPlotDataModel::
-setData(const QModelIndex& index, const QVariant& value, int role)
+setData(const QModelIndex&, const QVariant&, int)
 {
   return false;
 };

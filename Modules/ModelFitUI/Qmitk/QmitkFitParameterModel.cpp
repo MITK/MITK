@@ -124,7 +124,7 @@ getBookmarksCount() const
 
 int
 QmitkFitParameterModel::
-columnCount(const QModelIndex& parent) const
+columnCount(const QModelIndex&) const
 {
   return 3 + this->getBookmarksCount();
 }
@@ -134,8 +134,7 @@ columnCount(const QModelIndex& parent) const
  If the index does not indicate a static parameter an empty string will be returned.*/
 std::string GetStaticParameterName(const mitk::modelFit::ModelFitInfo* currentFit, const QModelIndex& index)
 {
-  const auto paramSize = currentFit->GetParameters().size();
-  const auto staticParamSize = currentFit->staticParamMap.Size();
+  const auto paramSize = static_cast<int>(currentFit->GetParameters().size());
 
   std::string staticParamName;
 
@@ -168,7 +167,7 @@ data(const QModelIndex& index, int role) const
   QVariant result;
   if (!index.parent().isValid() && !this->hasSingleFit())
   { //we need the fit names
-    if (index.row() < m_Fits.size() && index.column() == 0)
+    if (index.row() < static_cast<int>(m_Fits.size()) && index.column() == 0)
     {
       if (role == Qt::DisplayRole || role == Qt::EditRole)
       {
@@ -188,15 +187,15 @@ data(const QModelIndex& index, int role) const
     {
       currentFit = m_Fits.front();
     }
-    else if (index.parent().isValid() && index.parent().row() < m_Fits.size())
+    else if (index.parent().isValid() && index.parent().row() < static_cast<int>(m_Fits.size()))
     {
       currentFit = m_Fits[index.parent().row()];
     }
 
     if (currentFit)
     {
-      const auto paramSize = currentFit->GetParameters().size();
-      const auto staticParamSize = currentFit->staticParamMap.Size();
+      const auto paramSize = static_cast<int>(currentFit->GetParameters().size());
+      const auto staticParamSize = static_cast<int>(currentFit->staticParamMap.Size());
 
       if (index.row() < paramSize + staticParamSize)
       {
@@ -258,7 +257,7 @@ data(const QModelIndex& index, int role) const
           break;
 
         default:
-          if (index.column() - 2 < this->getBookmarksCount()+1)
+          if (index.column() - 2 < static_cast<int>(this->getBookmarksCount()+1))
           {
             mitk::Point3D pos = m_CurrentPos;
             if (index.column() > 2)
@@ -321,7 +320,7 @@ headerData(int section, Qt::Orientation orientation, int role) const
     {
       return QVariant("Value");
     }
-    else if (section - 3 < this->getBookmarksCount())
+    else if (section - 3 < static_cast<int>(this->getBookmarksCount()))
     {
       const auto & pos = m_Bookmarks->GetPoint(section - 3);
       std::ostringstream strm;
@@ -336,7 +335,7 @@ headerData(int section, Qt::Orientation orientation, int role) const
 
 bool
 QmitkFitParameterModel::
-setData(const QModelIndex& index, const QVariant& value, int role)
+setData(const QModelIndex&, const QVariant&, int)
 {
   return false;
 };

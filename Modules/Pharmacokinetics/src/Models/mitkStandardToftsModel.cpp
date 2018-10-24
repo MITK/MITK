@@ -104,9 +104,6 @@ mitk::StandardToftsModel::ParamterUnitMapType mitk::StandardToftsModel::GetDeriv
 mitk::StandardToftsModel::ModelResultType mitk::StandardToftsModel::ComputeModelfunction(
   const ParametersType& parameters) const
 {
-  typedef itk::Array<double> ResidueFunctionType;
-
-
   if (this->m_TimeGrid.GetSize() == 0)
   {
     itkExceptionMacro("No Time Grid Set! Cannot Calculate Signal");

@@ -126,10 +126,11 @@ See LICENSE.txt or http://www.mitk.org for details.
     timeGeometry->ClearAllGeometries();
 
 
-    for (int i = 0; i<timeSteps; ++i)
+    for (unsigned int i = 0; i<timeSteps; ++i)
     {
       mitk::Image::Pointer frameImage = GenerateTestFrame(i);
-      dynamicImage->SetVolume(frameImage->GetVolumeData()->GetData(),i);
+      mitk::ImageReadAccessor readAccess(frameImage, frameImage->GetVolumeData(0));
+      dynamicImage->SetVolume(readAccess.GetData(),i);
 
       timeGeometry->AppendNewTimeStepClone(frameImage->GetGeometry(),this->m_Grid(i),this->m_Grid(i+1));
     }

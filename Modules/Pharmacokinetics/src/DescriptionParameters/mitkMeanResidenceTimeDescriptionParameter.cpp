@@ -23,7 +23,7 @@ mitk::CurveDescriptionParameterBase::DescriptionParameterResultsType mitk::MeanR
   CurveDescriptionParameterResultType auc = 0;
   CurveDescriptionParameterResultType mrt = 0;
 
-  int steps = grid.GetSize();
+  auto steps = grid.GetSize();
 
   for (CurveGridType::size_type i = 0; i < steps - 1; ++i)
   {

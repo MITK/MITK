@@ -117,7 +117,7 @@ inline    itk::Array<double> wrap1d(itk::Array<double> kernel)
       convolution.fill(0.0);
 
       convolution(0) = 0;
-      for(int i = 0; i< (timeGrid.GetSize()-1); ++i)
+      for(unsigned int i = 0; i< (timeGrid.GetSize()-1); ++i)
       {
           double dt = timeGrid(i+1) - timeGrid(i);
           double m = (aif(i+1) - aif(i))/dt;
@@ -141,7 +141,7 @@ inline    itk::Array<double> wrap1d(itk::Array<double> kernel)
       convolution.fill(0.0);
 
       convolution(0) = 0;
-      for(int i = 0; i< (timeGrid.GetSize()-1); ++i)
+      for(unsigned int i = 0; i< (timeGrid.GetSize()-1); ++i)
       {
           double dt = timeGrid(i+1) - timeGrid(i);
           double m = (aif(i+1) - aif(i))/dt;

@@ -32,7 +32,7 @@ mitk::ThreeStepLinearModelFactory::GetDefaultInitialParameterization() const
 };
 
 mitk::ModelParameterizerBase::Pointer mitk::ThreeStepLinearModelFactory::DoCreateParameterizer(
-  const modelFit::ModelFitInfo* fit) const
+  const modelFit::ModelFitInfo*) const
 {
   return ConcreteModelParameterizerBase<ThreeStepLinearModel>::New().GetPointer();
 };

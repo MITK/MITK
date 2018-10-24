@@ -230,8 +230,8 @@ void mitk::PerfusionDataGenerator::Generate()
     for (unsigned int i = 0; i<nrOfOutputs; ++i)
     {
       mitk::Image::Pointer frame = mitk::ImportItkImage(filter->GetOutput(i))->Clone();
-
-      dynamicImage->SetVolume(frame->GetVolumeData()->GetData(),i);
+      mitk::ImageReadAccessor readAccess(frame, frame->GetVolumeData(0));
+      dynamicImage->SetVolume(readAccess.GetData(),i);
 
       double tmax = 0;
       if (i<(nrOfOutputs - 1))

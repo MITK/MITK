@@ -159,7 +159,6 @@ const
     itkExceptionMacro("Injection time is 0! Cannot Calculate Signal");
   }
 
-  unsigned int timeSteps = m_TimeGrid.GetSize();
   ModelResultType signal(m_TimeGrid.GetSize());
 
   double tx        = 0;

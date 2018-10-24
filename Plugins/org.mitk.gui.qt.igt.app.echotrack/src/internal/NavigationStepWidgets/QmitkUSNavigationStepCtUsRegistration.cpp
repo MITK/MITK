@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkUSNavigationStepCtUsRegistration.h"
 #include "ui_QmitkUSNavigationStepCtUsRegistration.h"
 
+#include <QMessageBox>
+
 #include "mitkNodeDisplacementFilter.h"
 #include "../QmitkUSNavigationMarkerPlacement.h"
 
@@ -104,7 +106,6 @@ bool QmitkUSNavigationStepCtUsRegistration::OnActivateStep()
   MITK_INFO << "OnActivateStep()";
   ui->floatingImageComboBox->SetDataStorage(this->GetDataStorage());
   ui->fiducialMarkerModelPointSetComboBox->SetDataStorage(this->GetDataStorage());
-  ui->devMarkerComboBox->SetDataStorage(this->GetDataStorage());
   return true;
 }
 
@@ -273,15 +274,46 @@ void QmitkUSNavigationStepCtUsRegistration::CalculatePCA()
 
 void QmitkUSNavigationStepCtUsRegistration::NumerateFiducialMarks()
 {
+  bool successFiducialNo1;
+  bool successFiducialNo4;
+  bool successFiducialNo2And3;
+  bool successFiducialNo5;
+  bool successFiducialNo8;
+  bool successFiducialNo6;
+  bool successFiducialNo7;
+
   std::vector<std::vector<double>> distanceVectorsFiducials;
   this->CalculateDistancesBetweenFiducials(distanceVectorsFiducials);
-  this->FindFiducialNo1(distanceVectorsFiducials);
-  this->FindFiducialNo4(distanceVectorsFiducials);
-  this->FindFiducialNo2And3();
-  this->FindFiducialNo5();
-  this->FindFiducialNo8();
-  this->FindFiducialNo6();
-  this->FindFiducialNo7();
+  successFiducialNo1 = this->FindFiducialNo1(distanceVectorsFiducials);
+  successFiducialNo4 = this->FindFiducialNo4(distanceVectorsFiducials);
+  successFiducialNo2And3 = this->FindFiducialNo2And3();
+  successFiducialNo5 = this->FindFiducialNo5();
+  successFiducialNo8 = this->FindFiducialNo8();
+  successFiducialNo6 = this->FindFiducialNo6();
+  successFiducialNo7 = this->FindFiducialNo7();
+
+  if (!successFiducialNo1 || !successFiducialNo4 || !successFiducialNo2And3 ||
+    !successFiducialNo5 || !successFiducialNo8 || !successFiducialNo6 || !successFiducialNo7)
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Cannot numerate/localize all fiducials successfully.");
+    msgBox.exec();
+    return;
+  }
+  
+  if (m_MarkerFloatingImageCoordinateSystemPointSet.IsNull())
+  {
+    m_MarkerFloatingImageCoordinateSystemPointSet = mitk::PointSet::New();
+  }
+  for (int counter = 1; counter <= m_FiducialMarkerCentroids.size(); ++counter)
+  {
+    m_MarkerFloatingImageCoordinateSystemPointSet->InsertPoint(counter - 1, m_FiducialMarkerCentroids.at(counter));
+  }
+  mitk::DataNode::Pointer node = mitk::DataNode::New();
+  node->SetData(m_MarkerFloatingImageCoordinateSystemPointSet);
+  node->SetName("MarkerFloatingImageCSPointSet");
+  //node->SetFloatProperty("pointsize", 5.0);
+  this->GetDataStorage()->Add(node);
 }
 
 void QmitkUSNavigationStepCtUsRegistration::CalculateDistancesBetweenFiducials(std::vector<std::vector<double>>& distanceVectorsFiducials)
@@ -586,15 +618,12 @@ void QmitkUSNavigationStepCtUsRegistration::CreateQtPartControl(QWidget *parent)
   ui->setupUi(parent);
   ui->floatingImageComboBox->SetPredicate(m_IsAPatientImagePredicate);
   ui->fiducialMarkerModelPointSetComboBox->SetPredicate(m_IsAPointSetPredicate);
-  ui->devMarkerComboBox->SetPredicate(m_IsAPointSetPredicate);
 
   // create signal/slot connections
   connect(ui->floatingImageComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
     this, SLOT(OnFloatingImageComboBoxSelectionChanged(const mitk::DataNode*)));
   connect(ui->fiducialMarkerModelPointSetComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
     this, SLOT(OnFiducialMarkerModelComboBoxSelectionChanged(const mitk::DataNode*)));
-  connect(ui->devMarkerComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
-    this, SLOT(OnDevComboBoxChanged(const mitk::DataNode*)));
   connect(ui->doRegistrationMarkerToImagePushButton, SIGNAL(clicked()),
     this, SLOT(OnRegisterMarkerToFloatingImageCS()));
   connect(ui->filterTestsPushButton, SIGNAL(clicked()),
@@ -669,32 +698,6 @@ void QmitkUSNavigationStepCtUsRegistration::OnFiducialMarkerModelComboBoxSelecti
   }
 
   m_MarkerModelCoordinateSystemPointSet = pointSet;
-}
-
-void QmitkUSNavigationStepCtUsRegistration::OnDevComboBoxChanged(const mitk::DataNode * node)
-{
-  if (node == nullptr)
-  {
-    m_MarkerFloatingImageCoordinateSystemPointSet = nullptr;
-    return;
-  }
-
-  mitk::DataNode* selectedPointSet = ui->devMarkerComboBox->GetSelectedNode();
-  if (selectedPointSet == nullptr)
-  {
-    m_MarkerFloatingImageCoordinateSystemPointSet = nullptr;
-    return;
-  }
-
-  mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(selectedPointSet->GetData());
-  if (pointSet.IsNull())
-  {
-    MITK_WARN << "Failed to cast selected pointset node to mitk::PointSet*";
-    m_MarkerFloatingImageCoordinateSystemPointSet = nullptr;
-    return;
-  }
-
-  m_MarkerFloatingImageCoordinateSystemPointSet = pointSet;
 }
 
 void QmitkUSNavigationStepCtUsRegistration::OnRegisterMarkerToFloatingImageCS()
@@ -795,19 +798,19 @@ void QmitkUSNavigationStepCtUsRegistration::OnRegisterMarkerToFloatingImageCS()
 
   //If this option is set, each point will be transformed and the acutal coordinates of the points change.
   /*if (this->m_Controls->m_MoveImagePoints->isChecked())
-  {
-    mitk::PointSet* pointSet_orig = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsNode->GetData());
+  {*/
+    mitk::PointSet* pointSet_orig = m_MarkerModelCoordinateSystemPointSet;
     mitk::PointSet::Pointer pointSet_moved = mitk::PointSet::New();
 
     for (int i = 0; i < pointSet_orig->GetSize(); i++)
     {
-      pointSet_moved->InsertPoint(mitkTransform->TransformPoint(pointSet_orig->GetPoint(i)));
+      pointSet_moved->InsertPoint(m_TransformMarkerCSToFloatingImageCS->TransformPoint(pointSet_orig->GetPoint(i)));
     }
 
     pointSet_orig->Clear();
     for (int i = 0; i < pointSet_moved->GetSize(); i++)
       pointSet_orig->InsertPoint(pointSet_moved->GetPoint(i));
-  }*/
+  /*}*/
 
   //Do a global reinit
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
@@ -988,7 +991,8 @@ void QmitkUSNavigationStepCtUsRegistration::OnFilterFloatingImage()
   //evtl. for later: itk::LabelMapOverlayImageFilter
 
   mitk::CastToMitkImage(binaryImage, m_FloatingImage);
-  mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+  
+  /*mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
   for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
   {
     pointSet->InsertPoint(counter, m_CentroidsOfFiducialCandidates.at(counter)); //Alternativ:  InsertPoint()
@@ -997,9 +1001,9 @@ void QmitkUSNavigationStepCtUsRegistration::OnFilterFloatingImage()
   node->SetData(pointSet);
   node->SetName("PointSet");
   node->SetFloatProperty("pointsize", 5.0);
-  this->GetDataStorage()->Add(node);
+  this->GetDataStorage()->Add(node);*/
 
-  this->CalculatePCA();
+  //this->CalculatePCA();
   this->NumerateFiducialMarks();
 
 }

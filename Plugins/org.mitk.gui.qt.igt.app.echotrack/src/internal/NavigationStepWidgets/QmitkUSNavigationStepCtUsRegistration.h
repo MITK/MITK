@@ -129,7 +129,6 @@ protected:
 protected slots:
   void OnFloatingImageComboBoxSelectionChanged(const mitk::DataNode* node);
   void OnFiducialMarkerModelComboBoxSelectionChanged(const mitk::DataNode* node);
-  void OnDevComboBoxChanged(const mitk::DataNode* node);
   void OnRegisterMarkerToFloatingImageCS();
   void OnFilterFloatingImage();
 

@@ -16,10 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkCustomMultiWidgetEditor.h"
 
-#include <berryUIException.h>
-#include <berryIWorkbenchPage.h>
 #include <berryIPreferencesService.h>
 #include <berryIPreferences.h>
+#include <berryUIException.h>
+#include <berryIWorkbenchPage.h>
+#include <berryIWorkbenchPartConstants.h>
 
 #include <QWidget>
 
@@ -156,6 +157,7 @@ void QmitkCustomMultiWidgetEditor::OnLayoutSet(int row, int column)
 {
   m_CustomMultiWidget->ResetLayout(row, column);
   SetControlledRenderer();
+  FirePropertyChange(berry::IWorkbenchPartConstants::PROP_INPUT);
 }
 
 void QmitkCustomMultiWidgetEditor::OnSynchronize(bool synchronized)

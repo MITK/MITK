@@ -95,6 +95,11 @@ public:
   virtual void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override;
 
   /**
+  * \see IPartListener::PartInputChanged()
+  */
+  virtual void PartInputChanged(const berry::IWorkbenchPartReference::Pointer& partRef) override;
+
+  /**
    * Notifies this listener that the given window has been closed.
    */
   virtual void WindowClosed(const berry::IWorkbenchWindow::Pointer& window) override;
@@ -102,12 +107,13 @@ public:
   /**
    * Notifies this listener that the given window has been opened.
    */
-  virtual void WindowOpened(const berry::IWorkbenchWindow::Pointer& /*window*/) override;
+  virtual void WindowOpened(const berry::IWorkbenchWindow::Pointer& window) override;
 
 private:
 
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderPart);
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderPart);
+  void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderPart);
 
 private:
 

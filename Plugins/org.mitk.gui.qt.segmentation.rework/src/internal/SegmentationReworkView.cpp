@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QMessageBox>
+#include <QProgressBar>
 
 #include <mitkIOUtil.h>
 #include <QmitkNewSegmentationDialog.h>
@@ -94,6 +95,8 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
     &SegmentationReworkView::UpdateChartWidget);
   connect(this, &SegmentationReworkView::InvokeLoadData, this, &SegmentationReworkView::LoadData);
 
+  connect(this, &SegmentationReworkView::InvokeProgress, this, &SegmentationReworkView::AddProgress);
+
   m_HttpHandler->SetPutCallback(std::bind(&SegmentationReworkView::RESTPutCallback, this, std::placeholders::_1));
   m_HttpHandler->SetGetImageSegCallback(std::bind(&SegmentationReworkView::RESTGetCallback, this, std::placeholders::_1));
   m_HttpHandler->SetGetAddSeriesCallback(std::bind(&SegmentationReworkView::RESTGetCallbackGeneric, this, std::placeholders::_1));
@@ -123,7 +126,17 @@ void SegmentationReworkView::OnSliderWidgetChanged(double value)
   m_Controls.slicesToDeleteLabel->setText(labelsToDelete);
 }
 
-
+void SegmentationReworkView::AddProgress(int progress)
+{
+  auto futureValue = m_Controls.progressBar->value() + progress;
+  if (futureValue >= 100) 
+  {
+    m_Controls.progressBar->setValue(100);
+  } else 
+  {
+    m_Controls.progressBar->setValue(futureValue);
+  }
+}
 
 void SegmentationReworkView::RestartConnection()
 {
@@ -149,6 +162,7 @@ void SegmentationReworkView::OnIndividualCheckChange(int state)
 
 void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::DicomDTO &dto)
 {
+  emit InvokeProgress(20);
   SetSimilarityGraph(dto.simScoreArray, dto.minSliceStart);
 
   typedef std::map<std::string, std::string> ParamMap;
@@ -194,6 +208,7 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
         }
       }
 
+      emit InvokeProgress(10);
       MITK_INFO << "image series UID " << imageSeriesUID;
       MITK_INFO << "seg A series UID " << segSeriesUIDA;
       MITK_INFO << "seg B series UID " << segSeriesUIDB;
@@ -220,6 +235,7 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 
       auto joinTask = pplx::when_all(begin(tasks), end(tasks));
       auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) {
+        emit InvokeProgress(50);
         InvokeLoadData(filePathList);
       });
 
@@ -231,12 +247,14 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
       m_DICOMWeb->QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) {
         auto seriesDescription = QString(utility::conversions::to_utf8string(jsonResult[0][U("0008103E")][U("Value")][0].as_string()).c_str());
         m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + seriesDescription.append(" A"));
+        emit InvokeProgress(10);
       });
 
       seriesInstancesParams["SeriesInstanceUID"] = segSeriesUIDB;
       m_DICOMWeb->QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) {
         auto seriesDescription = QString(utility::conversions::to_utf8string(jsonResult[0][U("0008103E")][U("Value")][0].as_string()).c_str());
         m_Controls.labelSegB->setText(m_Controls.labelSegB->text() + seriesDescription.append(" B"));
+        emit InvokeProgress(10);
       });
 
 

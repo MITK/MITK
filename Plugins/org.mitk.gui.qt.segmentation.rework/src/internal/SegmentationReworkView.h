@@ -53,9 +53,11 @@ public:
   void ClearChartWidget();
   void LoadData(std::vector<std::string> filePathList);
   void OnSliderWidgetChanged(double value);
+  void AddProgress(int);
 
 signals:
   void InvokeLoadData(std::vector<std::string> filePathList);
+  void InvokeProgress(int);
 
 protected:
   virtual void CreateQtPartControl(QWidget *parent) override;

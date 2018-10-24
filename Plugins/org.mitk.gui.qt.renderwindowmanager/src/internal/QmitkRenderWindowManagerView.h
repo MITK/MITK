@@ -43,8 +43,8 @@ public:
   static const std::string VIEW_ID;
 
   virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
-
   virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  virtual void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
 
 protected:
 

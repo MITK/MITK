@@ -42,6 +42,14 @@ void QmitkRenderWindowManagerView::RenderWindowPartDeactivated(mitk::IRenderWind
   m_RenderWindowPart = nullptr;
 }
 
+void QmitkRenderWindowManagerView::RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart)
+{
+  if (m_RenderWindowPart == renderWindowPart)
+  {
+    SetControlledRenderer();
+  }
+}
+
 void QmitkRenderWindowManagerView::SetFocus()
 {
   // nothing here

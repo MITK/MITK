@@ -64,7 +64,7 @@ typedef itk::LaplacianRecursiveGaussianImageFilter<ImageType, ImageType> Laplaci
 typedef itk::VotingBinaryIterativeHoleFillingImageFilter<ImageType> VotingBinaryIterativeHoleFillingImageFilterType;
 typedef itk::BinaryImageToShapeLabelMapFilter<ImageType> BinaryImageToShapeLabelMapFilterType;
 
-
+static const int NUMBER_FIDUCIALS_NEEDED = 8; 
 
 QmitkUSNavigationStepCtUsRegistration::QmitkUSNavigationStepCtUsRegistration(QWidget *parent) :
   QmitkUSAbstractNavigationStep(parent),
@@ -181,6 +181,380 @@ double QmitkUSNavigationStepCtUsRegistration::GetVoxelVolume()
 double QmitkUSNavigationStepCtUsRegistration::GetFiducialVolume(double radius)
 {
   return 1.333333333 * 3.141592 * (radius * radius * radius);
+}
+
+void QmitkUSNavigationStepCtUsRegistration::CalculatePCA()
+{
+  //Step 1: Construct data matrix
+  int columnSize = m_CentroidsOfFiducialCandidates.size();
+  if (columnSize == 0)
+  {
+    MITK_INFO << "Cannot calculate PCA. There are no fiducial candidates.";
+    return;
+  }
+
+  vnl_matrix<double> pointSetMatrix(3, columnSize, 0.0);
+  for (int counter = 0; counter < columnSize; ++counter)
+  {
+    pointSetMatrix[0][counter] = m_CentroidsOfFiducialCandidates.at(counter)[0];
+    pointSetMatrix[1][counter] = m_CentroidsOfFiducialCandidates.at(counter)[1];
+    pointSetMatrix[2][counter] = m_CentroidsOfFiducialCandidates.at(counter)[2];
+  }
+
+  //Step 2: Remove average for each row (Mittelwertbefreiung)
+  for (int counter = 0; counter < columnSize; ++counter)
+  {
+    m_MeanCentroidFiducialCandidates += mitk::Vector3D(pointSetMatrix.get_column(counter));
+  }
+  //TODO: für später überprüfen, ob Division durch integer nicht zu Rechenproblemen führt.
+  m_MeanCentroidFiducialCandidates /= columnSize;
+  for (int counter = 0; counter < columnSize; ++counter)
+  {
+    pointSetMatrix.get_column(counter) -= m_MeanCentroidFiducialCandidates;
+  }
+
+  //Step 3: Compute covariance matrix
+  vnl_matrix<double> covarianceMatrix = (1.0 / (columnSize - 1.0)) * pointSetMatrix * pointSetMatrix.transpose();
+
+  //Step 4: Singular value composition
+  vnl_svd<double> svd(covarianceMatrix);
+
+  //Storing results:
+  for (int counter = 0; counter < 3; ++counter)
+  {
+    mitk::Vector3D eigenVector = svd.U().get_column(counter);
+    double eigenValue = sqrt(svd.W(counter));
+    m_EigenVectorsFiducialCandidates[eigenValue] = eigenVector;
+    m_EigenValuesFiducialCandidates.push_back(eigenValue);
+  }
+  std::sort( m_EigenValuesFiducialCandidates.begin(), m_EigenValuesFiducialCandidates.end() );
+
+  mitk::DataNode::Pointer axis1Node = mitk::DataNode::New();
+  axis1Node->SetName("Eigenvector 1");
+  mitk::PointSet::Pointer axis1 = mitk::PointSet::New();
+  axis1->InsertPoint(0, m_MeanCentroidFiducialCandidates);
+  axis1->InsertPoint(1, (m_MeanCentroidFiducialCandidates + m_EigenVectorsFiducialCandidates.at(m_EigenValuesFiducialCandidates.at(2))*m_EigenValuesFiducialCandidates.at(2)));
+  axis1Node->SetData(axis1);
+  axis1Node->SetBoolProperty("show contour", true);
+  axis1Node->SetColor(1, 0, 0);
+  this->GetDataStorage()->Add(axis1Node);
+
+  mitk::DataNode::Pointer axis2Node = mitk::DataNode::New();
+  axis2Node->SetName("Eigenvector 2");
+  mitk::PointSet::Pointer axis2 = mitk::PointSet::New();
+  axis2->InsertPoint(0, m_MeanCentroidFiducialCandidates);
+  axis2->InsertPoint(1, (m_MeanCentroidFiducialCandidates + m_EigenVectorsFiducialCandidates.at(m_EigenValuesFiducialCandidates.at(1))*m_EigenValuesFiducialCandidates.at(1)));
+  axis2Node->SetData(axis2);
+  axis2Node->SetBoolProperty("show contour", true);
+  axis2Node->SetColor(2, 0, 0);
+  this->GetDataStorage()->Add(axis2Node);
+
+  mitk::DataNode::Pointer axis3Node = mitk::DataNode::New();
+  axis3Node->SetName("Eigenvector 3");
+  mitk::PointSet::Pointer axis3 = mitk::PointSet::New();
+  axis3->InsertPoint(0, m_MeanCentroidFiducialCandidates);
+  axis3->InsertPoint(1, (m_MeanCentroidFiducialCandidates + m_EigenVectorsFiducialCandidates.at(m_EigenValuesFiducialCandidates.at(0))*m_EigenValuesFiducialCandidates.at(0)));
+  axis3Node->SetData(axis3);
+  axis3Node->SetBoolProperty("show contour", true);
+  axis3Node->SetColor(3, 0, 0);
+  this->GetDataStorage()->Add(axis3Node);
+
+  MITK_INFO << "Mean: " << m_MeanCentroidFiducialCandidates;
+
+  MITK_INFO << "Eigenvektor 1: " << m_EigenVectorsFiducialCandidates.at(m_EigenValuesFiducialCandidates.at(2));
+  MITK_INFO << "Eigenvektor 2: " << m_EigenVectorsFiducialCandidates.at(m_EigenValuesFiducialCandidates.at(1));
+  MITK_INFO << "Eigenvektor 3: " << m_EigenVectorsFiducialCandidates.at(m_EigenValuesFiducialCandidates.at(0));
+
+  MITK_INFO << "Eigenwert 1: " << m_EigenValuesFiducialCandidates.at(2);
+  MITK_INFO << "Eigenwert 2: " << m_EigenValuesFiducialCandidates.at(1);
+  MITK_INFO << "Eigenwert 3: " << m_EigenValuesFiducialCandidates.at(0);
+
+}
+
+void QmitkUSNavigationStepCtUsRegistration::NumerateFiducialMarks()
+{
+  std::vector<std::vector<double>> distanceVectorsFiducials;
+  this->CalculateDistancesBetweenFiducials(distanceVectorsFiducials);
+  this->FindFiducialNo1(distanceVectorsFiducials);
+  this->FindFiducialNo4(distanceVectorsFiducials);
+  this->FindFiducialNo2And3();
+  this->FindFiducialNo5();
+  this->FindFiducialNo8();
+  this->FindFiducialNo6();
+  this->FindFiducialNo7();
+}
+
+void QmitkUSNavigationStepCtUsRegistration::CalculateDistancesBetweenFiducials(std::vector<std::vector<double>>& distanceVectorsFiducials)
+{
+  std::vector<double> distancesBetweenFiducials;
+
+  for (int i = 0; i < m_CentroidsOfFiducialCandidates.size(); ++i)
+  {
+    distancesBetweenFiducials.clear();
+    mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(i));
+    for (int n = 0; n < m_CentroidsOfFiducialCandidates.size(); ++n)
+    {
+      mitk::Point3D otherCentroid(m_CentroidsOfFiducialCandidates.at(n));
+      distancesBetweenFiducials.push_back(fiducialCentroid.EuclideanDistanceTo(otherCentroid));
+    }
+    //Sort the distances from low to big numbers
+    std::sort(distancesBetweenFiducials.begin(), distancesBetweenFiducials.end());
+    //First entry of the distance vector must be 0, so erase it
+    if (distancesBetweenFiducials.at(0) == 0.0)
+    {
+      distancesBetweenFiducials.erase(distancesBetweenFiducials.begin());
+    }
+    //Add the distance vector to the collecting distances vector
+    distanceVectorsFiducials.push_back(distancesBetweenFiducials);
+  }
+
+  for (int i = 0; i < distanceVectorsFiducials.size(); ++i)
+  {
+    MITK_INFO << "Vector " << i << ":";
+    for (int k = 0; k < distanceVectorsFiducials.at(i).size(); ++k)
+    {
+      MITK_INFO << distanceVectorsFiducials.at(i).at(k);
+    }
+  }
+}
+
+bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo1(std::vector<std::vector<double>>& distanceVectorsFiducials)
+{
+  for (int i = 0; i < distanceVectorsFiducials.size(); ++i)
+  {
+    std::vector<double> &distances = distanceVectorsFiducials.at(i);
+    if (distances.size() < NUMBER_FIDUCIALS_NEEDED - 1 )
+    {
+      MITK_WARN << "Cannot find fiducial, there aren't found enough fiducial candidates.";
+      return false;
+    }
+
+    if (distances.at(0) <= 12.07 && distances.at(1) <= 12.07)
+    {
+      MITK_INFO << "Found Fiducial 1 (PointSet number " << i << ")";
+      m_FiducialMarkerCentroids.insert( std::pair<int,mitk::Vector3D>(1, m_CentroidsOfFiducialCandidates.at(i)));
+      distanceVectorsFiducials.erase(distanceVectorsFiducials.begin() + i);
+      m_CentroidsOfFiducialCandidates.erase(m_CentroidsOfFiducialCandidates.begin() + i);
+      return true;
+    }
+  }
+  return false;
+}
+
+bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo2And3()
+{
+  mitk::Point3D fiducialNo1(m_FiducialMarkerCentroids.at(1));
+  mitk::Vector3D fiducialVectorA;
+  mitk::Vector3D fiducialVectorB;
+  mitk::Point3D fiducialPointA;
+  mitk::Point3D fiducialPointB;
+  bool foundFiducialA = false;
+  bool foundFiducialB = false;
+  mitk::Vector3D vectorFiducial1ToFiducialA;
+  mitk::Vector3D vectorFiducial1ToFiducialB;
+
+
+  for (int i = 0; i < m_CentroidsOfFiducialCandidates.size(); ++i)
+  {
+    mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(i));
+    double distance = fiducialNo1.EuclideanDistanceTo(fiducialCentroid);
+    if (distance <= 12.07)
+    {
+      fiducialVectorA = m_CentroidsOfFiducialCandidates.at(i);
+      fiducialPointA = fiducialCentroid;
+      m_CentroidsOfFiducialCandidates.erase(m_CentroidsOfFiducialCandidates.begin() + i);
+      foundFiducialA = true;
+      break;
+    }
+  }
+
+  for (int i = 0; i < m_CentroidsOfFiducialCandidates.size(); ++i)
+  {
+    mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(i));
+    double distance = fiducialNo1.EuclideanDistanceTo(fiducialCentroid);
+    if (distance <= 12.07)
+    {
+      fiducialVectorB = m_CentroidsOfFiducialCandidates.at(i);
+      fiducialPointB = fiducialCentroid;
+      m_CentroidsOfFiducialCandidates.erase(m_CentroidsOfFiducialCandidates.begin() + i);
+      foundFiducialB = true;
+      break;
+    }
+  }
+
+  if (!foundFiducialA || !foundFiducialB)
+  {
+    MITK_WARN << "Cannot identify fiducial candidates 2 and 3";
+    return false;
+  }
+  else if (m_CentroidsOfFiducialCandidates.size() == 0)
+  {
+    MITK_WARN << "Too less fiducials detected. Cannot identify fiducial candidates 2 and 3";
+    return false;
+  }
+
+  vectorFiducial1ToFiducialA = fiducialVectorA - m_FiducialMarkerCentroids.at(1);
+  vectorFiducial1ToFiducialB = fiducialVectorB - m_FiducialMarkerCentroids.at(1);
+
+  vnl_vector<double> crossProductVnl = vnl_cross_3d(vectorFiducial1ToFiducialA.GetVnlVector(), vectorFiducial1ToFiducialB.GetVnlVector());
+  mitk::Vector3D crossProduct;
+  crossProduct.SetVnlVector(crossProductVnl);
+
+  mitk::Vector3D vectorFiducial1ToRandomLeftFiducial = m_CentroidsOfFiducialCandidates.at(0) - m_FiducialMarkerCentroids.at(1);
+  
+  double scalarProduct = (crossProduct * vectorFiducial1ToRandomLeftFiducial) /
+                         (crossProduct.GetNorm() * vectorFiducial1ToRandomLeftFiducial.GetNorm());
+
+  double alpha = acos(scalarProduct) * 57.29578; //Transform into degree
+  MITK_INFO << "Scalar Product = " << alpha;
+
+  if (alpha <= 90)
+  {
+    m_FiducialMarkerCentroids[3] = fiducialVectorA;
+    m_FiducialMarkerCentroids[2] = fiducialVectorB;
+  }
+  else
+  {
+    m_FiducialMarkerCentroids[2] = fiducialVectorA;
+    m_FiducialMarkerCentroids[3] = fiducialVectorB;
+  }
+
+  MITK_INFO << "Found Fiducial 2, PointSet: " << m_FiducialMarkerCentroids.at(2);
+  MITK_INFO << "Found Fiducial 3, PointSet: " << m_FiducialMarkerCentroids.at(3);
+
+  return true;
+}
+
+bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo4(std::vector<std::vector<double>>& distanceVectorsFiducials)
+{
+  for (int i = 0; i < distanceVectorsFiducials.size(); ++i)
+  {
+    std::vector<double> &distances = distanceVectorsFiducials.at(i);
+    if (distances.size() < NUMBER_FIDUCIALS_NEEDED - 1)
+    {
+      MITK_WARN << "Cannot find fiducial, there aren't found enough fiducial candidates.";
+      return false;
+    }
+
+    if (distances.at(0) > 12.07 && distances.at(0) <= 15.73 &&
+        distances.at(1) > 12.07 && distances.at(1) <= 15.73)
+    {
+      MITK_INFO << "Found Fiducial 4 (PointSet number " << i << ")";
+      m_FiducialMarkerCentroids.insert(std::pair<int, mitk::Vector3D>(4, m_CentroidsOfFiducialCandidates.at(i)));
+      distanceVectorsFiducials.erase(distanceVectorsFiducials.begin() + i);
+      m_CentroidsOfFiducialCandidates.erase(m_CentroidsOfFiducialCandidates.begin() + i);
+      return true;
+    }
+  }
+  return false;
+}
+
+bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo5()
+{
+  if (m_FiducialMarkerCentroids.find(2) == m_FiducialMarkerCentroids.end())
+  {
+    MITK_WARN << "To find fiducial No 5, fiducial No 2 has to be found before.";
+    return false;
+  }
+
+  mitk::Point3D fiducialNo2(m_FiducialMarkerCentroids.at(2));
+
+  for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
+  {
+    mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(counter));
+    double distance = fiducialNo2.EuclideanDistanceTo(fiducialCentroid);
+    if (distance <= 15.73)
+    {
+      m_FiducialMarkerCentroids[5] = m_CentroidsOfFiducialCandidates.at(counter);
+      m_CentroidsOfFiducialCandidates.erase(m_CentroidsOfFiducialCandidates.begin() + counter);
+      MITK_INFO << "Found Fiducial No 5, PointSet: " << m_FiducialMarkerCentroids[5];
+      return true;
+    }
+  }
+
+  MITK_WARN << "Cannot find fiducial No 5.";
+  return false;
+}
+
+bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo6()
+{
+  if (m_FiducialMarkerCentroids.find(5) == m_FiducialMarkerCentroids.end())
+  {
+    MITK_WARN << "To find fiducial No 6, fiducial No 5 has to be found before.";
+    return false;
+  }
+
+  mitk::Point3D fiducialNo5(m_FiducialMarkerCentroids.at(5));
+
+  for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
+  {
+    mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(counter));
+    double distance = fiducialNo5.EuclideanDistanceTo(fiducialCentroid);
+    if (distance <= 12.07)
+    {
+      m_FiducialMarkerCentroids[6] = m_CentroidsOfFiducialCandidates.at(counter);
+      m_CentroidsOfFiducialCandidates.erase(m_CentroidsOfFiducialCandidates.begin() + counter);
+      MITK_INFO << "Found Fiducial No 6, PointSet: " << m_FiducialMarkerCentroids[6];
+      return true;
+    }
+  }
+
+  MITK_WARN << "Cannot find fiducial No 6.";
+  return false;
+}
+
+bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo7()
+{
+  if (m_FiducialMarkerCentroids.find(8) == m_FiducialMarkerCentroids.end())
+  {
+    MITK_WARN << "To find fiducial No 7, fiducial No 8 has to be found before.";
+    return false;
+  }
+
+  mitk::Point3D fiducialNo8(m_FiducialMarkerCentroids.at(8));
+
+  for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
+  {
+    mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(counter));
+    double distance = fiducialNo8.EuclideanDistanceTo(fiducialCentroid);
+    if (distance <= 12.07)
+    {
+      m_FiducialMarkerCentroids[7] = m_CentroidsOfFiducialCandidates.at(counter);
+      m_CentroidsOfFiducialCandidates.erase(m_CentroidsOfFiducialCandidates.begin() + counter);
+      MITK_INFO << "Found Fiducial No 7, PointSet: " << m_FiducialMarkerCentroids[7];
+      return true;
+    }
+  }
+
+  MITK_WARN << "Cannot find fiducial No 7.";
+  return false;
+}
+
+bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo8()
+{
+  if (m_FiducialMarkerCentroids.find(3) == m_FiducialMarkerCentroids.end())
+  {
+    MITK_WARN << "To find fiducial No 8, fiducial No 3 has to be found before.";
+    return false;
+  }
+
+  mitk::Point3D fiducialNo3(m_FiducialMarkerCentroids.at(3));
+
+  for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
+  {
+    mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(counter));
+    double distance = fiducialNo3.EuclideanDistanceTo(fiducialCentroid);
+    if (distance <= 15.73)
+    {
+      m_FiducialMarkerCentroids[8] = m_CentroidsOfFiducialCandidates.at(counter);
+      m_CentroidsOfFiducialCandidates.erase(m_CentroidsOfFiducialCandidates.begin() + counter);
+      MITK_INFO << "Found Fiducial No 8, PointSet: " << m_FiducialMarkerCentroids[8];
+      return true;
+    }
+  }
+
+  MITK_WARN << "Cannot find fiducial No 8.";
+  return false;
 }
 
 void QmitkUSNavigationStepCtUsRegistration::DefineDataStorageImageFilter()
@@ -605,26 +979,28 @@ void QmitkUSNavigationStepCtUsRegistration::OnFilterFloatingImage()
     BinaryImageToShapeLabelMapFilterType::OutputImageType::LabelObjectType* labelObject = labelMap->GetNthLabelObject(i);
     MITK_INFO << "Object " << i << " contains " << labelObject->Size() << " pixel";
 
-    mitk::Point3D centroid;
-    centroid.CastFrom(labelObject->GetCentroid());
+    mitk::Vector3D centroid;
+    centroid[0] = labelObject->GetCentroid()[0];
+    centroid[1] = labelObject->GetCentroid()[1];
+    centroid[2] = labelObject->GetCentroid()[2];
     m_CentroidsOfFiducialCandidates.push_back(centroid);
   }
   //evtl. for later: itk::LabelMapOverlayImageFilter
 
   mitk::CastToMitkImage(binaryImage, m_FloatingImage);
-
+  mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
   for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
   {
-    mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
-    pointSet->SetPoint(counter, m_CentroidsOfFiducialCandidates.at(counter)); //Alternativ:  InsertPoint()
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(pointSet);
-    node->SetName("PointSet");
-    node->SetFloatProperty("pointsize", 5.0);
-    this->GetDataStorage()->Add(node);
+    pointSet->InsertPoint(counter, m_CentroidsOfFiducialCandidates.at(counter)); //Alternativ:  InsertPoint()
   }
+  mitk::DataNode::Pointer node = mitk::DataNode::New();
+  node->SetData(pointSet);
+  node->SetName("PointSet");
+  node->SetFloatProperty("pointsize", 5.0);
+  this->GetDataStorage()->Add(node);
 
-
+  this->CalculatePCA();
+  this->NumerateFiducialMarks();
 
 }
 

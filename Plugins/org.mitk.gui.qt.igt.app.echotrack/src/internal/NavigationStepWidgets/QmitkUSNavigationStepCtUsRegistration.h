@@ -112,6 +112,17 @@ protected:
   double GetVoxelVolume();
   double GetFiducialVolume(double radius);
 
+  void CalculatePCA();
+  void NumerateFiducialMarks();
+  void CalculateDistancesBetweenFiducials(std::vector<std::vector<double>> &distanceVectorsFiducials);
+  bool FindFiducialNo1(std::vector<std::vector<double>> &distanceVectorsFiducials);
+  bool FindFiducialNo2And3();
+  bool FindFiducialNo4(std::vector<std::vector<double>> &distanceVectorsFiducials);
+  bool FindFiducialNo5();
+  bool FindFiducialNo6();
+  bool FindFiducialNo7();
+  bool FindFiducialNo8();
+
   void DefineDataStorageImageFilter();
   void CreateQtPartControl(QWidget *parent);
   
@@ -135,7 +146,11 @@ private:
   mitk::PointSet::Pointer m_MarkerModelCoordinateSystemPointSet;
   mitk::PointSet::Pointer m_MarkerFloatingImageCoordinateSystemPointSet;
   
-  std::vector<mitk::Point3D> m_CentroidsOfFiducialCandidates;
+  std::vector<mitk::Vector3D> m_CentroidsOfFiducialCandidates;
+  std::map<double, mitk::Vector3D> m_EigenVectorsFiducialCandidates;
+  std::vector<double> m_EigenValuesFiducialCandidates;
+  mitk::Vector3D m_MeanCentroidFiducialCandidates;
+  std::map<int, mitk::Vector3D> m_FiducialMarkerCentroids;
 
   mitk::AffineTransform3D::Pointer m_TransformMarkerCSToFloatingImageCS;
   /*!

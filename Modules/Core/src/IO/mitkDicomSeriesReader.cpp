@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <boost/tokenizer.hpp>
 #include <boost/format.hpp>
+#include <boost/locale.hpp>
 
 #include <itkGDCMSeriesFileNames.h>
 
@@ -1369,6 +1370,134 @@ void DicomSeriesReader::FixSpacingInformation( mitk::Image* image, const ImageBl
   image->GetGeometry()->SetSpacing( imageSpacing );
 }
 
+void DicomSeriesReader::FixMetaDataCharset( Image* image )
+{
+  auto charsetPtr = image->GetProperty("dicom.SpecificCharacterSet");
+  if (charsetPtr == nullptr) {
+    return;
+  }
+
+  std::string charset = charsetPtr->GetValueAsString();
+  if (charset == "") {
+    return;
+  }
+
+  // Trim Charset
+  charset.erase(charset.begin(), std::find_if(charset.begin(), charset.end(), [](int ch) {
+    return !std::isspace(ch);
+  }));
+  charset.erase(std::find_if(charset.rbegin(), charset.rend(), [](int ch) {
+    return !std::isspace(ch);
+  }).base(), charset.end());
+
+  charset = GetStandardCharSet(charset);
+
+  std::string locString = boost::locale::util::get_system_locale();
+  boost::locale::generator gen;
+  std::locale loc = gen(locString);
+
+  for (const auto& prop : propertiesToLocalize) {
+    auto propToLocalizePtr = image->GetProperty(prop.c_str());
+    if (propToLocalizePtr == nullptr) {
+      continue;
+    }
+
+    try {
+      std::string utf8String = boost::locale::conv::to_utf<char>(propToLocalizePtr->GetValueAsString(), charset);
+      std::string locString = boost::locale::conv::from_utf<char>(utf8String, loc);
+      image->SetProperty(prop.c_str(), StringProperty::New(locString));
+    }
+    catch (boost::locale::conv::invalid_charset_error& e) {
+      MITK_WARN << "Error while localizing dicom properties: " << e.what() << '\n';
+      return;
+    }
+  }
+}
+
+std::string DicomSeriesReader::GetStandardCharSet(std::string dicomCharset)
+{
+  if (dicomCharset == "ISO 2022 IR 6")             // ASCII
+    return "ASCII";
+  else if (dicomCharset == "ISO 2022 IR 100")      // Latin alphabet No. 1
+    return "ISO-8859-1";
+  else if (dicomCharset == "ISO 2022 IR 101")      // Latin alphabet No. 2
+    return "ISO-8859-2";
+  else if (dicomCharset == "ISO 2022 IR 109")      // Latin alphabet No. 3
+    return "ISO-8859-3";
+  else if (dicomCharset == "ISO 2022 IR 110")      // Latin alphabet No. 4
+    return "ISO-8859-4";
+  else if (dicomCharset == "ISO 2022 IR 144")      // Cyrillic
+    return "ISO-8859-5";
+  else if (dicomCharset == "ISO 2022 IR 127")      // Arabic
+    return "ISO-8859-6";
+  else if (dicomCharset == "ISO 2022 IR 126")      // Greek
+    return "ISO-8859-7";
+  else if (dicomCharset == "ISO 2022 IR 138")      // Hebrew
+    return "ISO-8859-8";
+  else if (dicomCharset == "ISO 2022 IR 148")      // Latin alphabet No. 5
+    return "ISO-8859-9";
+  else if (dicomCharset == "ISO 2022 IR 13")       // Japanese
+#if DCMTK_ENABLE_CHARSET_CONVERSION == DCMTK_CHARSET_CONVERSION_ICONV
+    return "JIS_X0201";                 // - the name "ISO-IR-13" is not supported by libiconv
+#else
+    return "Shift_JIS";                 // - ICU and stdlibc iconv only know "Shift_JIS" (is this mapping correct?)
+#endif
+  else if (dicomCharset == "ISO 2022 IR 166")      // Thai
+#if DCMTK_ENABLE_CHARSET_CONVERSION == DCMTK_CHARSET_CONVERSION_ICU
+    return "TIS-620";                   // - "ISO-IR-166" is not supported by ICU
+#else
+    return "ISO-IR-166";
+#endif
+  else if (dicomCharset == "ISO 2022 IR 87")       // Japanese (multi-byte)
+    return "ISO-IR-87";                 // - this might generate an error since "ISO-IR-87" is not supported by ICU and stdlibc iconv
+  else if (dicomCharset == "ISO 2022 IR 159")      // Japanese (multi-byte)
+    return "ISO-IR-159";                // - this might generate an error since "ISO-IR-159" is not supported by ICU and stdlibc iconv
+  else if (dicomCharset == "ISO 2022 IR 149")      // Korean (multi-byte)
+    return "EUC-KR";                    // - is this mapping really correct?
+  else if (dicomCharset == "ISO 2022 IR 58")       // Simplified Chinese (multi-byte)
+    return "GB2312";                    // - should work, but not tested yet!
+  else if (dicomCharset == "ISO_IR 6")           // ASCII
+    return "ASCII";
+  else if (dicomCharset == "ISO_IR 100")    // Latin alphabet No. 1
+    return "ISO-8859-1";
+  else if (dicomCharset == "ISO_IR 101")    // Latin alphabet No. 2
+    return "ISO-8859-2";
+  else if (dicomCharset == "ISO_IR 109")    // Latin alphabet No. 3
+    return "ISO-8859-3";
+  else if (dicomCharset == "ISO_IR 110")    // Latin alphabet No. 4
+    return "ISO-8859-4";
+  else if (dicomCharset == "ISO_IR 144")    // Cyrillic
+    return "ISO-8859-5";
+  else if (dicomCharset == "ISO_IR 127")    // Arabic
+    return "ISO-8859-6";
+  else if (dicomCharset == "ISO_IR 126")    // Greek
+    return "ISO-8859-7";
+  else if (dicomCharset == "ISO_IR 138")    // Hebrew
+    return "ISO-8859-8";
+  else if (dicomCharset == "ISO_IR 148")    // Latin alphabet No. 5
+    return "ISO-8859-9";
+  else if (dicomCharset == "ISO_IR 13")     // Japanese
+#if DCMTK_ENABLE_CHARSET_CONVERSION == DCMTK_CHARSET_CONVERSION_ICONV
+    return "JIS_X0201";                 // - the name "ISO-IR-13" is not supported by libiconv
+#else
+    return "Shift_JIS";                 // - ICU and stdlibc iconv only know "Shift_JIS" (is this mapping correct?)
+#endif
+  else if (dicomCharset == "ISO_IR 166")    // Thai
+#if DCMTK_ENABLE_CHARSET_CONVERSION == DCMTK_CHARSET_CONVERSION_ICU
+    return "TIS-620";                   // - the name "ISO-IR-166" is not supported by ICU
+#else
+    return "ISO-IR-166";
+#endif
+  else if (dicomCharset == "ISO_IR 192")    // Unicode in UTF-8 (multi-byte)
+    return "UTF-8";
+  else if (dicomCharset == "GB18030")       // Chinese (multi-byte)
+    return "GB18030";
+  else if (dicomCharset == "GBK")           // Chinese (multi-byte, subset of "GB 18030")
+    return "GBK";
+
+  return dicomCharset;
+}
+
 void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool, bool load4D, bool correctTilt, UpdateCallBackMethod callback, void *source, Image::Pointer preLoadedImageBlock)
 {
   mitk::LocaleSwitch localeSwitch("C");
@@ -1468,6 +1597,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
         FixSpacingInformation( image, imageBlockDescriptor );
         CopyMetaDataToImageProperties( imageBlocks.front(), scanner.GetMappings(), io, imageBlockDescriptor, image);
+        FixMetaDataCharset( image );
 
         initialize_node = true;
       }

@@ -26,8 +26,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <mitkImage.h>
 
+#include <itkImage.h>
+#include <itkThresholdImageFilter.h>
+#include <itkBinaryThresholdImageFilter.h>
+#include <itkGradientMagnitudeImageFilter.h>
+#include <itkLaplacianRecursiveGaussianImageFilter.h>
+#include "itkVotingBinaryIterativeHoleFillingImageFilter.h"
+#include <itkBinaryImageToShapeLabelMapFilter.h>
+
 namespace itk {
 template<class T> class SmartPointer;
+
 }
 
 namespace mitk {
@@ -35,10 +44,17 @@ class NodeDisplacementFilter;
 class NavigationDataSource;
 }
 
-
 namespace Ui {
 class QmitkUSNavigationStepCtUsRegistration;
 }
+
+// Declare typedefs:
+typedef itk::Image<int, 3>  ImageType;
+typedef itk::ThresholdImageFilter<ImageType> ThresholdImageFilterType;
+typedef itk::BinaryThresholdImageFilter <ImageType, ImageType> BinaryThresholdImageFilterType;
+typedef itk::LaplacianRecursiveGaussianImageFilter<ImageType, ImageType> LaplacianRecursiveGaussianImageFilterType;
+typedef itk::VotingBinaryIterativeHoleFillingImageFilter<ImageType> VotingBinaryIterativeHoleFillingImageFilterType;
+typedef itk::BinaryImageToShapeLabelMapFilter<ImageType> BinaryImageToShapeLabelMapFilterType;
 
 /**
  * \brief Navigation step for marking risk structures.
@@ -53,8 +69,6 @@ class QmitkUSNavigationStepCtUsRegistration;
 class QmitkUSNavigationStepCtUsRegistration : public QmitkUSAbstractNavigationStep
 {
   Q_OBJECT
-
-
 
 public:
   explicit QmitkUSNavigationStepCtUsRegistration(QWidget *parent = 0);
@@ -112,6 +126,10 @@ protected:
   double GetVoxelVolume();
   double GetFiducialVolume(double radius);
 
+  void InitializeImageFilters();
+  void EliminateTooSmallLabeledObjects( BinaryImageToShapeLabelMapFilterType::OutputImageType::Pointer labelMap, 
+                                        ImageType::Pointer binaryImage);
+  void GetCentroidsOfLabeledObjects(BinaryImageToShapeLabelMapFilterType::OutputImageType::Pointer labelMap);
   void CalculatePCA();
   void NumerateFiducialMarks();
   void CalculateDistancesBetweenFiducials(std::vector<std::vector<double>> &distanceVectorsFiducials);
@@ -145,6 +163,13 @@ private:
   mitk::PointSet::Pointer m_MarkerModelCoordinateSystemPointSet;
   mitk::PointSet::Pointer m_MarkerFloatingImageCoordinateSystemPointSet;
   
+  ThresholdImageFilterType::Pointer m_ThresholdFilter;
+  BinaryThresholdImageFilterType::Pointer m_BinaryThresholdFilter;
+  LaplacianRecursiveGaussianImageFilterType::Pointer m_LaplacianFilter1;
+  LaplacianRecursiveGaussianImageFilterType::Pointer m_LaplacianFilter2;
+  VotingBinaryIterativeHoleFillingImageFilterType::Pointer m_HoleFillingFilter;
+  BinaryImageToShapeLabelMapFilterType::Pointer m_BinaryImageToShapeLabelMapFilter;
+
   std::vector<mitk::Vector3D> m_CentroidsOfFiducialCandidates;
   std::map<double, mitk::Vector3D> m_EigenVectorsFiducialCandidates;
   std::vector<double> m_EigenValuesFiducialCandidates;

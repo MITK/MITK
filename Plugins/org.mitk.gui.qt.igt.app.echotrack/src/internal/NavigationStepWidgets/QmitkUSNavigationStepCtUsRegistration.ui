@@ -35,9 +35,39 @@
     <widget class="QmitkDataStorageComboBox" name="fiducialMarkerModelPointSetComboBox"/>
    </item>
    <item>
-    <widget class="QPushButton" name="doRegistrationMarkerToImagePushButton">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="topMargin">
+      <number>10</number>
+     </property>
+     <property name="bottomMargin">
+      <number>10</number>
+     </property>
+     <item>
+      <widget class="QRadioButton" name="fiducialDiameter5mmRadioButton">
+       <property name="text">
+        <string>5mm Fiducial Diameter</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="fiducialDiameter3mmRadioButton">
+       <property name="text">
+        <string>3mm Fiducial Diameter</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="imageFilteringPushButton">
      <property name="text">
-      <string>Do Registration Marker CS -&gt; Floating Image CS</string>
+      <string>Perform Image Filtering</string>
      </property>
     </widget>
    </item>
@@ -55,9 +85,9 @@
     </spacer>
    </item>
    <item>
-    <widget class="QPushButton" name="filterTestsPushButton">
+    <widget class="QPushButton" name="doRegistrationMarkerToImagePushButton">
      <property name="text">
-      <string>Image-Filter Tests</string>
+      <string>Do Registration Marker CS -&gt; Floating Image CS</string>
      </property>
     </widget>
    </item>

@@ -788,4 +788,25 @@ namespace mitk {
     std::make_pair("0018|0060", "dicom.Kvp"),
     std::make_pair("0020|0032", "dicom.ImagePosition")
   };
+
+  static const std::vector<std::string> propertiesToLocalize = {
+    // Patient module
+    "dicom.patient.PatientsName",
+    "dicom.patient.PatientsBirthDate",
+    "dicom.patient.PatientsSex",
+    "dicom.patient.PatientsBirthTime",
+    "dicom.patient.OtherPatientNames",
+    "dicom.patient.EthnicGroup",
+    "dicom.patient.PatientComments",
+    "dicom.patient.PatientIdentityRemoved",
+    "dicom.patient.DeIdentificationMethod",
+
+    // General Study module
+    "dicom.study.InstitutionName",
+    "dicom.study.StudyDescription",
+
+    // General Series module
+    "dicom.series.SeriesDescription",
+    "dicom.series.BodyPartExamined"
+  };
 }

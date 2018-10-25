@@ -898,6 +898,11 @@ protected:
   };
 
   static void FixSpacingInformation( Image* image, const ImageBlockDescriptor& imageBlockDescriptor );
+  
+  static void FixMetaDataCharset( Image* image );
+
+  // Taken from dcmktk/dcmdata/dcspchrs
+  static std::string GetStandardCharSet(std::string dicomCharset);
 
   /**
    \brief Performs actual loading of a series and creates an image having the specified pixel type.

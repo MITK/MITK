@@ -27,16 +27,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "internal/QmitkCommonExtPlugin.h"
 #include <mitkIDataStorageService.h>
+
 class ctkPluginContext;
 
 QmitkOpenCustomMultiWidgetEditorAction::QmitkOpenCustomMultiWidgetEditorAction(berry::IWorkbenchWindow::Pointer window)
-  : QAction(0)
+  : QAction(nullptr)
 {
   this->init(window);
 }
 
-QmitkOpenCustomMultiWidgetEditorAction::QmitkOpenCustomMultiWidgetEditorAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
-  : QAction(0)
+QmitkOpenCustomMultiWidgetEditorAction::QmitkOpenCustomMultiWidgetEditorAction(const QIcon& icon, berry::IWorkbenchWindow::Pointer window)
+  : QAction(nullptr)
 {
   this->setIcon(icon);
 
@@ -70,12 +71,12 @@ void QmitkOpenCustomMultiWidgetEditorAction::Run()
   ctkServiceReference serviceRef = context->getServiceReference<mitk::IDataStorageService>();
   if (serviceRef)
   {
-    mitk::IDataStorageService *dsService = context->getService<mitk::IDataStorageService>(serviceRef);
+    mitk::IDataStorageService* dsService = context->getService<mitk::IDataStorageService>(serviceRef);
     if (dsService)
     {
       mitk::IDataStorageReference::Pointer dsRef = dsService->GetDataStorage();
       berry::IEditorInput::Pointer editorInput(new mitk::DataStorageEditorInput(dsRef));
-      m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.custommultiwidget");
+      m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.custommultiwidget", true, berry::IWorkbenchPage::MATCH_ID);
     }
   }
 }

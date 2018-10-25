@@ -754,11 +754,11 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   }
   if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.stdmultiwidget"))
   {
-    openStdMultiWidgetEditorAction = new QmitkOpenStdMultiWidgetEditorAction(QIcon(":/org.mitk.gui.qt.ext/dcm-icon.png"), window);
+    openStdMultiWidgetEditorAction = new QmitkOpenStdMultiWidgetEditorAction(QIcon(":/org.mitk.gui.qt.ext/Editor.png"), window);
   }
   if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.custommultiwidget"))
   {
-    openCustomMultiWidgetEditorAction = new QmitkOpenCustomMultiWidgetEditorAction(QIcon(":/org.mitk.gui.qt.ext/dcm-icon.png"), window);
+    openCustomMultiWidgetEditorAction = new QmitkOpenCustomMultiWidgetEditorAction(QIcon(":/org.mitk.gui.qt.ext/Editor.png"), window);
   }
 
   if (imageNavigatorViewFound)

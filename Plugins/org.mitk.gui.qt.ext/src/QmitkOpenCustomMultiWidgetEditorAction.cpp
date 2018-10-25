@@ -48,7 +48,7 @@ void QmitkOpenCustomMultiWidgetEditorAction::init(berry::IWorkbenchWindow::Point
 {
   m_Window = window;
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
-  this->setText("&CUSTOMEDITOR");
+  this->setText("Custom Display");
   this->setToolTip("Open the custom multi widget editor");
 
   berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();

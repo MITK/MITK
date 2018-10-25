@@ -48,7 +48,7 @@ void QmitkOpenStdMultiWidgetEditorAction::init(berry::IWorkbenchWindow::Pointer 
 {
   m_Window = window;
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
-  this->setText("&STDEDITOR");
+  this->setText("Standard Display");
   this->setToolTip("Open the standard multi widget editor");
 
   berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();

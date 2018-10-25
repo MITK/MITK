@@ -541,6 +541,10 @@ QTabBar::tab {
   padding: 4px;
 }
 
+AutoplanArrowTabBar::tab {
+  padding: 0px;
+}
+
 QTabBar::tab:middle {
   border-left: none;
 }

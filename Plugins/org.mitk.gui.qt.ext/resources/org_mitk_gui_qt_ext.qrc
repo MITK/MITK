@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/org.mitk.gui.qt.ext">
         <file>dcm-icon.png</file>
+        <file>Editor.png</file>
         <file>Slider.png</file>
         <file>index.html</file>
         <file>xnat-icon.png</file>

@@ -2,8 +2,9 @@
 <plugin>
   <extension point="org.blueberry.ui.editors">
     <editor id="org.mitk.editors.custommultiwidget"
-			name="Custom Multi Widget Editor"
+			name="Custom Display"
 			class="QmitkCustomMultiWidgetEditor"
+			extensions="mitk"
 			icon="resources/CustomMultiWidgetEditor.svg"/>
   </extension>
 

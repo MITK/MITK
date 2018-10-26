@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkOpenCustomMultiWidgetEditorAction.h"
+#include "QmitkOpenStdMultiWidgetEditorAction.h"
 
 #include "mitkCoreObjectFactory.h"
 
@@ -30,13 +30,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class ctkPluginContext;
 
-QmitkOpenCustomMultiWidgetEditorAction::QmitkOpenCustomMultiWidgetEditorAction(berry::IWorkbenchWindow::Pointer window)
+QmitkOpenStdMultiWidgetEditorAction::QmitkOpenStdMultiWidgetEditorAction(berry::IWorkbenchWindow::Pointer window)
   : QAction(nullptr)
 {
   this->init(window);
 }
 
-QmitkOpenCustomMultiWidgetEditorAction::QmitkOpenCustomMultiWidgetEditorAction(const QIcon& icon, berry::IWorkbenchWindow::Pointer window)
+QmitkOpenStdMultiWidgetEditorAction::QmitkOpenStdMultiWidgetEditorAction(const QIcon& icon, berry::IWorkbenchWindow::Pointer window)
   : QAction(nullptr)
 {
   this->setIcon(icon);
@@ -44,12 +44,12 @@ QmitkOpenCustomMultiWidgetEditorAction::QmitkOpenCustomMultiWidgetEditorAction(c
   this->init(window);
 }
 
-void QmitkOpenCustomMultiWidgetEditorAction::init(berry::IWorkbenchWindow::Pointer window)
+void QmitkOpenStdMultiWidgetEditorAction::init(berry::IWorkbenchWindow::Pointer window)
 {
   m_Window = window;
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
-  this->setText("Custom Display");
-  this->setToolTip("Open the custom multi widget editor");
+  this->setText("Standard Display");
+  this->setToolTip("Open the standard multi widget editor");
 
   berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
 
@@ -58,7 +58,7 @@ void QmitkOpenCustomMultiWidgetEditorAction::init(berry::IWorkbenchWindow::Point
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
 }
 
-void QmitkOpenCustomMultiWidgetEditorAction::Run()
+void QmitkOpenStdMultiWidgetEditorAction::Run()
 {
   // check if there is an open perspective, if not open the default perspective
   if (m_Window->GetActivePage().IsNull())
@@ -76,7 +76,7 @@ void QmitkOpenCustomMultiWidgetEditorAction::Run()
     {
       mitk::IDataStorageReference::Pointer dsRef = dsService->GetDataStorage();
       berry::IEditorInput::Pointer editorInput(new mitk::DataStorageEditorInput(dsRef));
-      m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.custommultiwidget", true, berry::IWorkbenchPage::MATCH_ID);
+      m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.stdmultiwidget", true, berry::IWorkbenchPage::MATCH_ID);
     }
   }
 }

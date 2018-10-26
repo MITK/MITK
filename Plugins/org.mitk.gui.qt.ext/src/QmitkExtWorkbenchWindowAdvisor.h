@@ -174,6 +174,7 @@ private:
   QAction* resetPerspAction;
   QAction* closePerspAction;
   QAction* openDicomEditorAction;
+  QAction* openStdMultiWidgetEditorAction;
   QAction* openCustomMultiWidgetEditorAction;
 };
 

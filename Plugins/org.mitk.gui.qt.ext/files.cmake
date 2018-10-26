@@ -4,6 +4,7 @@ set(SRC_CPP_FILES
   QmitkExtFileSaveProjectAction.cpp
   QmitkOpenDicomEditorAction.cpp
   QmitkOpenCustomMultiWidgetEditorAction.cpp
+  QmitkOpenStdMultiWidgetEditorAction.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -33,6 +34,7 @@ set(MOC_H_FILES
   src/internal/QmitkModuleView.h
   src/QmitkOpenDicomEditorAction.h
   src/QmitkOpenCustomMultiWidgetEditorAction.h
+  src/QmitkOpenStdMultiWidgetEditorAction.h
 )
 
 set(CACHED_RESOURCE_FILES

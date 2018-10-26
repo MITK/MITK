@@ -4,9 +4,10 @@
   <extension point="org.blueberry.ui.editors">
     <editor
       id="org.mitk.editors.stdmultiwidget"
-      name="Display"
+      name="Standard Display"
       icon="resources/StdMultiWidgetEditor.svg"
       extensions="mitk"
+	  default="true"
       class="QmitkStdMultiWidgetEditor">
     </editor>
   </extension>

@@ -30,4 +30,7 @@
 \page deprecatedSince2016_11 Deprecated as of 2016.11
 \ingroup MITKDeprecatedAPI
 
+\page deprecatedSince2018_04 Deprecated as of 2018.04
+\ingroup MITKDeprecatedAPI
+
 */

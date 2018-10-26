@@ -21,26 +21,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkConfig.h>
 #include <mitkImageToItk.h>
 
-#include <mitkPPCat.h>
-#include <mitkPPExpand.h>
-#include <mitkPPSeqForEach.h>
-#include <mitkPPSeqForEachProduct.h>
-#include <mitkPPSeqToTuple.h>
-#include <mitkPPTupleRem.h>
+#include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/expand.hpp>
+#include <boost/preprocessor/seq/for_each.hpp>
+#include <boost/preprocessor/seq/for_each_product.hpp>
+#include <boost/preprocessor/seq/to_tuple.hpp>
 
 #ifndef DOXYGEN_SKIP
 
-#define InstantiateAccessFunctionImpl(r, itkImgFunc, type) MITK_PP_CAT(InstantiateAccessFunction_, itkImgFunc) type
+#define InstantiateAccessFunctionImpl(r, itkImgFunc, type) BOOST_PP_CAT(InstantiateAccessFunction_, itkImgFunc) type
 
 // product is of the form (itkImgFunc)(short)(2)
 #ifdef _MSC_VER
 #define InstantiateAccessFunctionProductImpl(r, product)                                                               \
-  MITK_PP_CAT(InstantiateAccessFunction_, MITK_PP_SEQ_HEAD(product))                                                   \
-  MITK_PP_EXPAND(MITK_PP_SEQ_TO_TUPLE(MITK_PP_SEQ_TAIL(product)))
+  BOOST_PP_CAT(InstantiateAccessFunction_, BOOST_PP_SEQ_HEAD(product))                                                   \
+  BOOST_PP_EXPAND(BOOST_PP_SEQ_TO_TUPLE(BOOST_PP_SEQ_TAIL(product)))
 #else
 #define InstantiateAccessFunctionProductImpl(r, product)                                                               \
-  MITK_PP_EXPAND(MITK_PP_CAT(InstantiateAccessFunction_, MITK_PP_SEQ_HEAD(product))                                    \
-                   MITK_PP_SEQ_TO_TUPLE(MITK_PP_SEQ_TAIL(product)))
+  BOOST_PP_EXPAND(BOOST_PP_CAT(InstantiateAccessFunction_, BOOST_PP_SEQ_HEAD(product))                                    \
+                   BOOST_PP_SEQ_TO_TUPLE(BOOST_PP_SEQ_TAIL(product)))
 #endif
 
 #endif // DOXYGEN_SKIP
@@ -88,7 +87,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \ingroup Adaptor
  */
 #define InstantiateAccessFunctionForFixedType(itkImgFunc, pixelTypeSeq, dimSeq)                                        \
-  MITK_PP_SEQ_FOR_EACH_PRODUCT(InstantiateAccessFunctionProductImpl, ((itkImgFunc))(pixelTypeSeq)(dimSeq))
+  BOOST_PP_SEQ_FOR_EACH_PRODUCT(InstantiateAccessFunctionProductImpl, ((itkImgFunc))(pixelTypeSeq)(dimSeq))
 
 /**
  * \brief Instantiate access function for all datatypes and dimensions.

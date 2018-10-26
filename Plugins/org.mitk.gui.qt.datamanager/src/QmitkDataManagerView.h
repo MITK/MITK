@@ -194,7 +194,7 @@ protected:
   ///
   void NodeChanged(const mitk::DataNode* /*node*/) override;
 
-  void UseAllGrayValuesFromImage(mitk::DataNode* node);
+  void UseWholePixelRange(mitk::DataNode* node);
 
 protected:
 

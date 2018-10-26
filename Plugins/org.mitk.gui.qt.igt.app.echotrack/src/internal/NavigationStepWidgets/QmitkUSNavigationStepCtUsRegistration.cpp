@@ -931,6 +931,9 @@ void QmitkUSNavigationStepCtUsRegistration::OnFilterFloatingImage()
 
   mitk::CastToMitkImage(binaryImage, m_FloatingImage);
 
+
+  //Before calling NumerateFiducialMarks it must be sure, 
+  // that there rested only 8 fiducial candidates.
   this->NumerateFiducialMarks();
 }
 

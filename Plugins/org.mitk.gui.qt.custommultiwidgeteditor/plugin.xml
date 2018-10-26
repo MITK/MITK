@@ -4,6 +4,7 @@
     <editor id="org.mitk.editors.custommultiwidget"
 			name="Custom Display"
 			class="QmitkCustomMultiWidgetEditor"
+			extensions="mitk"
 			icon="resources/CustomMultiWidgetEditor.svg"/>
   </extension>
 

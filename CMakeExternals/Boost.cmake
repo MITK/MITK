@@ -66,7 +66,7 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
         return value to be 0 (success). We need this because we reuse the
         extracted source files and patching an already patched file returns
         an error code that we can ignore. ]]
-    set(patch_cmd PATCH_COMMAND ${PATCH_COMMAND} --binary -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Boost.patch || cd .)
+    set(patch_cmd ${PATCH_COMMAND} --binary -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Boost.patch || cd .)
   endif()
 
 
@@ -224,6 +224,10 @@ g"
 
   endif()
 
+  if(NOT patch_cmd)
+    set(patch_cmd cd .) #[[ Do nothing ]]
+  endif()
+
   if(NOT configure_cmd)
     set(configure_cmd cd .) #[[ Do nothing ]]
   endif()
@@ -247,7 +251,7 @@ g"
   ExternalProject_Add(${proj}
     URL ${url}
     URL_MD5 ${md5}
-    ${patch_cmd}
+    PATCH_COMMAND ${patch_cmd}
     CONFIGURE_COMMAND ${configure_cmd}
     BUILD_COMMAND ${build_cmd}
     INSTALL_COMMAND ${install_cmd}

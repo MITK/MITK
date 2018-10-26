@@ -232,8 +232,13 @@ namespace mitk
     virtual void SetType(const std::string &typeName);
 
     /*!
-       *  \brief Return the current look-up table type as a string.
-       */
+    *  \brief Return the current look-up table type.
+    */
+    virtual const LookupTableType GetActiveType();
+
+    /*!
+    *  \brief Return the current look-up table type as a string.
+    */
     virtual const std::string GetActiveTypeAsString();
 
   protected:

@@ -148,6 +148,11 @@ void mitk::LookupTable::SetType(const std::string &typeName)
   }
 }
 
+const mitk::LookupTable::LookupTableType mitk::LookupTable::GetActiveType()
+{
+  return m_type;
+}
+
 const std::string mitk::LookupTable::GetActiveTypeAsString()
 {
   return std::string(typenameList[(int)m_type]);
@@ -214,7 +219,7 @@ mitk::LookupTable::RawLookupTableType *mitk::LookupTable::GetRawLookupTable() co
 }
 
 /*!
-* \brief equality operator inplementation
+* \brief equality operator implementation
 */
 bool mitk::LookupTable::operator==(const mitk::LookupTable &other) const
 {
@@ -253,7 +258,7 @@ bool mitk::LookupTable::operator==(const mitk::LookupTable &other) const
 }
 
 /*!
-* \brief un-equality operator implementation
+* \brief inequality operator implementation
 */
 bool mitk::LookupTable::operator!=(const mitk::LookupTable &other) const
 {

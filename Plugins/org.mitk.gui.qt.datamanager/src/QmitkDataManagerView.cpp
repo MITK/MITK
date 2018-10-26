@@ -882,20 +882,23 @@ void QmitkDataManagerView::ColormapActionToggled( bool /*checked*/ )
     if (!senderAction)
       return;
 
-    std::string activatedItem = senderAction->text().toStdString();
-
     mitk::LookupTable::Pointer lookupTable = lookupTableProperty->GetValue();
     if (!lookupTable)
       return;
 
+    std::string activatedItem = senderAction->text().toStdString();
     lookupTable->SetType(activatedItem);
     lookupTableProperty->SetValue(lookupTable);
+
+    if (lookupTable->GetActiveType() == mitk::LookupTable::LookupTableType::MULTILABEL)
+    {
+      // special case: multilabel => set the level window to include the whole pixel range
+      UseWholePixelRange(node);
+    }
+
     mitk::RenderingModeProperty::Pointer renderingMode =
       dynamic_cast<mitk::RenderingModeProperty*>(node->GetProperty("Image Rendering.Mode"));
     renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
-
-    // set the level window to include all gray values so that the color map values use the whole pixel range
-    UseAllGrayValuesFromImage(node);
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -1147,7 +1150,7 @@ void QmitkDataManagerView::NodeChanged(const mitk::DataNode* /*node*/)
   QMetaObject::invokeMethod( m_FilterModel, "invalidate", Qt::QueuedConnection );
 }
 
-void QmitkDataManagerView::UseAllGrayValuesFromImage(mitk::DataNode* node)
+void QmitkDataManagerView::UseWholePixelRange(mitk::DataNode* node)
 {
   auto image = dynamic_cast<mitk::Image*>(node->GetData());
   if (nullptr != image)

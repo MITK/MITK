@@ -44,6 +44,7 @@ namespace mitk
       *@param xDim
       *@param yDim
       *@param zDim
+      *@param spacing
       *@return smartpointer reference to a new instance of this object
       */
       static Volume::Pointer New(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim, double spacing);

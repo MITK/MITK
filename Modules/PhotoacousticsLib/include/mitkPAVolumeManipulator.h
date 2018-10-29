@@ -31,15 +31,22 @@ namespace mitk {
       /**
       * @brief ThresholdImage applies a binary threshold filter to this image.
       * @param threshold
+      * @param image
       */
       static void ThresholdImage(Volume::Pointer image, double threshold);
 
       /**
       * @brief Multiplies the image with a given factor
       * @param factor
+      * @param image
       */
       static void MultiplyImage(Volume::Pointer image, double factor);
 
+      /**
+      * @brief applies a Gaussian blur to an image
+      * @param sigma
+      * @param paVolume
+      */
       static void GaussianBlur3D(Volume::Pointer paVolume, double sigma);
 
       static void Log10Image(Volume::Pointer image);

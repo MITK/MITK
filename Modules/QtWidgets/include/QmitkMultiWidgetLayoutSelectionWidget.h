@@ -37,11 +37,11 @@ public:
 
   QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent = 0);
 
-signals:
+Q_SIGNALS:
 
   void LayoutSet(int row, int column);
 
-private slots:
+private Q_SLOTS:
 
   void OnTableItemSelectionChanged();
   void OnSetLayoutButtonClicked();

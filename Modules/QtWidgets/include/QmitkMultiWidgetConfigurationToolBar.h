@@ -41,13 +41,13 @@ public:
   QmitkMultiWidgetConfigurationToolBar(QmitkCustomMultiWidget* customMultiWidget);
   ~QmitkMultiWidgetConfigurationToolBar() override;
 
-signals:
+Q_SIGNALS:
 
   void LayoutSet(int row, int column);
   void Synchronized(bool synchronized);
   void ViewDirectionChanged(mitk::SliceNavigationController::ViewDirection);
 
-protected slots:
+protected Q_SLOTS:
 
   void OnSetLayout();
   void OnSynchronize();

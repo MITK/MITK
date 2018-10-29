@@ -39,34 +39,34 @@ void QmitkMultiWidgetConfigurationToolBar::InitializeToolBar()
 
   AddButtons();
 
-  connect(m_LayoutSelectionPopup, SIGNAL(LayoutSet(int, int)), SIGNAL(LayoutSet(int, int)));
+  connect(m_LayoutSelectionPopup, &QmitkMultiWidgetLayoutSelectionWidget::LayoutSet, this, &QmitkMultiWidgetConfigurationToolBar::LayoutSet);
 }
 
 void QmitkMultiWidgetConfigurationToolBar::AddButtons()
 {
   QAction* setLayoutAction = new QAction(QIcon(":/Qmitk/cmwLayout.png"), tr("Set multi widget layout"), this);
-  connect(setLayoutAction, SIGNAL(triggered()), SLOT(OnSetLayout()));
+  connect(setLayoutAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnSetLayout);
 
   QToolBar::addAction(setLayoutAction);
 
   m_SynchronizeAction = new QAction(QIcon(":/Qmitk/cmwSynchronized.png"), tr("Desynchronize render windows"), this);
   m_SynchronizeAction->setCheckable(true);
   m_SynchronizeAction->setChecked(true);
-  connect(m_SynchronizeAction, SIGNAL(triggered()), SLOT(OnSynchronize()));
+  connect(m_SynchronizeAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnSynchronize);
 
   QToolBar::addAction(m_SynchronizeAction);
 
   QAction* setAxialViewDirectionAction = new QAction(tr("Set axial view direction"), this);
   setAxialViewDirectionAction->setData(ViewDirection::Axial);
-  connect(setAxialViewDirectionAction, SIGNAL(triggered()), SLOT(OnViewDirectionChanged()));
+  connect(setAxialViewDirectionAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnViewDirectionChanged);
 
   QAction* setSagittalViewDirectionAction = new QAction(tr("Set sagittal view direction"), this);
   setSagittalViewDirectionAction->setData(ViewDirection::Sagittal);
-  connect(setSagittalViewDirectionAction, SIGNAL(triggered()), SLOT(OnViewDirectionChanged()));
+  connect(setSagittalViewDirectionAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnViewDirectionChanged);
 
   QAction* setCoronalViewDirectionAction = new QAction(tr("Set coronal view direction"), this);
   setCoronalViewDirectionAction->setData(ViewDirection::Frontal);
-  connect(setCoronalViewDirectionAction, SIGNAL(triggered()), SLOT(OnViewDirectionChanged()));
+  connect(setCoronalViewDirectionAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnViewDirectionChanged);
 
   QToolButton* setViewDirectionToolButton = new QToolButton(this);
   setViewDirectionToolButton->setIcon(QIcon(":/Qmitk/cmwViewDirection.png"));

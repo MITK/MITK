@@ -25,8 +25,8 @@ QmitkMultiWidgetLayoutSelectionWidget::QmitkMultiWidgetLayoutSelectionWidget(QWi
 void QmitkMultiWidgetLayoutSelectionWidget::Init()
 {
   ui.setupUi(this);
-  connect(ui.tableWidget, SIGNAL(itemSelectionChanged()), SLOT(OnTableItemSelectionChanged()));
-  connect(ui.setLayoutPushButton, SIGNAL(clicked()), SLOT(OnSetLayoutButtonClicked()));
+  connect(ui.tableWidget, &QTableWidget::itemSelectionChanged, this, &QmitkMultiWidgetLayoutSelectionWidget::OnTableItemSelectionChanged);
+  connect(ui.setLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked);
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::OnTableItemSelectionChanged()
@@ -70,6 +70,7 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked()
       }
     }
 
+    close();
     emit LayoutSet(row, column);
   }
 }

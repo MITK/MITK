@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /* \brief The spectral unmixing mini app (SUMA) is designed to enable batch processing
   for spectral unmixing. For detailed documentation look into the header files of the 
-  included spectral unmixing filers.*/
+  included spectral unmixing filters.*/
 
 struct InputParameters
 {
@@ -151,7 +151,7 @@ InputParameters parseInput(int argc, char *argv[])
   return input;
 }
 
-
+// Class takes string and sets algorithm for spectral unmixing in the corresponding filter class
 mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algorithm, std::vector<int> weights = std::vector<int>())
 {
   mitk::pa::SpectralUnmixingFilterBase::Pointer spectralUnmixingFilter;
@@ -190,12 +190,12 @@ mitk::pa::SpectralUnmixingFilterBase::Pointer GetFilterInstance(std::string algo
     dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra *>(spectralUnmixingFilter.GetPointer())
       ->SetAlgorithm(mitk::pa::SpectralUnmixingFilterVigra::VigraAlgortihmType::WEIGHTED);
 
-    std::vector<int> weigthVec = weights;
+    std::vector<int> weightVec = weights;
 
-    for (int i = 0; i < 3; ++i)
+    for (unsigned int i = 0; i < weightVec.size(); ++i)
     {
       dynamic_cast<mitk::pa::SpectralUnmixingFilterVigra *>(spectralUnmixingFilter.GetPointer())
-        ->AddWeight(weigthVec[i]);
+        ->AddWeight(weightVec[i]);
     }
   }
   return spectralUnmixingFilter;

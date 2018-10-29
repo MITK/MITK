@@ -1,4 +1,4 @@
-OPTION(BUILD_PhotoacousticSpectralUnmixing "Build MiniApp for batch generating of photoacoustic spectral unmixing" ON)
+OPTION(BUILD_PhotoacousticSpectralUnmixing "Build MiniApp for batch generating of photoacoustic spectral unmixing" OFF)
 
 IF(BUILD_PhotoacousticSpectralUnmixing)
   PROJECT( MitkSpectralUnmxing )

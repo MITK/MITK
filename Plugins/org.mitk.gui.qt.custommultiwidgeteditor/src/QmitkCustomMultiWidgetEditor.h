@@ -18,30 +18,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITKCUSTOMMULTIWIDGETEDITOR_H
 
 #include <QmitkAbstractRenderEditor.h>
-#include <mitkILifecycleAwarePart.h>
 #include <mitkILinkedRenderWindowPart.h>
 
 // custom multi widget editor
 #include <org_mitk_gui_qt_custommultiwidgeteditor_Export.h>
-#include "QmitkMultiWidgetDecorationManager.h"
-
-// mitk qt widgets module
-#include <QmitkCustomMultiWidget.h>
-#include <QmitkInteractionSchemeToolBar.h>
-#include <QmitkMultiWidgetConfigurationToolBar.h>
 
 // mitk render window manager
 #include <mitkRenderWindowViewDirectionController.h>
 
 #include <memory>
 
-class QmitkMouseModeSwitcher;
+class QmitkCustomMultiWidget;
 
-class CUSTOMMULTIWIDGETEDITOR_EXPORT QmitkCustomMultiWidgetEditor final : public QmitkAbstractRenderEditor, public mitk::ILifecycleAwarePart, public mitk::ILinkedRenderWindowPart
+class CUSTOMMULTIWIDGETEDITOR_EXPORT QmitkCustomMultiWidgetEditor final : public QmitkAbstractRenderEditor, public mitk::ILinkedRenderWindowPart
 {
   Q_OBJECT
 
 public:
+
+  using ViewDirection = mitk::SliceNavigationController::ViewDirection;
 
   berryObjectMacro(QmitkCustomMultiWidgetEditor)
 
@@ -49,23 +44,6 @@ public:
 
   QmitkCustomMultiWidgetEditor();
   ~QmitkCustomMultiWidgetEditor();
-
-  /**
-  * @brief Overridden from mitk::ILifecycleAwarePart
-  */
-  virtual void Activated() override;
-  /**
-  * @brief Overridden from mitk::ILifecycleAwarePart
-  */
-  virtual void Deactivated() override;
-  /**
-  * @brief Overridden from mitk::ILifecycleAwarePart
-  */
-  virtual void Visible() override;
-  /**
-  * @brief Overridden from mitk::ILifecycleAwarePart
-  */
-  virtual void Hidden() override;
 
   /**
   * @brief Overridden from mitk::ILinkedRenderWindowPart : IRenderWindowPart
@@ -107,14 +85,16 @@ public:
   * @brief Overridden from mitk::ILinkedRenderWindowPart
   */
   virtual bool IsSlicingPlanesEnabled() const override;
-
+  /**
+  * @brief Return the current custom multi widget of this editor.
+  */
   QmitkCustomMultiWidget* GetCustomMultiWidget();
 
-private slots:
+private Q_SLOTS:
 
   void OnLayoutSet(int row, int column);
   void OnSynchronize(bool synchronized);
-  void OnViewDirectionChanged(mitk::SliceNavigationController::ViewDirection viewDirection);
+  void OnViewDirectionChanged(ViewDirection viewDirection);
 
 private:
   /**
@@ -130,21 +110,8 @@ private:
   */
   virtual void OnPreferencesChanged(const berry::IBerryPreferences* preferences) override;
 
-  void SetControlledRenderer();
-  /**
-  * @brief
-  *
-  *
-  */
-  void RequestActivateMenuWidget(bool on);
-
-  QmitkCustomMultiWidget* m_CustomMultiWidget;
-  QmitkInteractionSchemeToolBar* m_InteractionSchemeToolBar;
-  QmitkMultiWidgetConfigurationToolBar* m_ConfigurationToolBar;
-  std::unique_ptr<QmitkMultiWidgetDecorationManager> m_MultiWidgetDecorationManager;
-
-  std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
-
+  class Impl;
+  const std::unique_ptr<Impl> m_Impl;
 };
 
 #endif // QMITKCUSTOMMULTIWIDGETEDITOR_H

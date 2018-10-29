@@ -4,7 +4,7 @@
 	\brief The SUMA is designed to enable batch processing for spectral unmixing. To use the SUMA one has to build the MitkSpectralUnmixingApp located in the PAlib. Afterwards a .bat script is available int the suberbuild/MITK-build/bin. This script takes 4 required and one optional parameter:
 
 Required parameters
-  -i, --inputFilename, input filename 		// "E:/mydata/awesome_exp/first_image.nrrd"
+  -i, --inputFilename, input filename 		// "E:/mydata/awesome_exp/first_image.nrrd" image has to be an integer multiple of the number of wavelengths
   -o, --outputFileStruct, input save name 	// "E:/mydata/awesome_exp_unmixed/first_image_ctr" will be saved as "_HbO2_SU_.nrrd", "_Hb_SU_.nrrd" and "_sO2_.nrrd"; it is recommended to add an counter (ctr) to the savenames otherwise they will be overwritten.
   -l, --inputWavelengths, input wavelengths	// (int) 299 < wavelength < 1001 with format: int blank int blank int blank ... 
   -a, --inputAlg, input algorithm		// insert alg: "QR", "NNLS", "WLS", "SVD", "LU"

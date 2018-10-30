@@ -1,19 +1,15 @@
 /**
 \page org_mitk_gui_qt_matchpoint_manipulator The MatchPoint Registration Manipulator View
 
-\imageMacro{manipulator.svg, "Icon of the MatchPoint Registration Manipulator", 3}
+\imageMacro{map_manipulator_icon_doc.svg, "Icon of the MatchPoint Registration Manipulator", 3}
 
-\li \ref MAP_REGMANIP_Introduction
-\li \ref MAP_REGMANIP_Contact
-\li \ref MAP_REGMANIP_Usage
-\li \ref MAP_REGMANIP_TransSettings
-\li \ref MAP_REGMANIP_EvalSettings
+\tableofcontents
 
 \section MAP_REGMANIP_Introduction Introduction
 This view offers the possibility to manually manipulate a registration to establish a good mapping between data.
 The effect of manipulation is visualized with to user defined images to allow visual inspection.\n
 It is one of several MatchPoint registration plug-ins.\n
-\imageMacro{view_example.png, "Example screenshot showing the plug-in in use", 10}
+\imageMacro{map_view_example.png, "Example screenshot showing the plug-in in use", 10}
 
 \section MAP_REGMANIP_Contact Contact information
 This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
@@ -21,7 +17,7 @@ and Therapy) at the DKFZ (German Cancer Research Center). If you have any questi
 find a bug or have a feature request, feel free to contact us at www.mitk.org.
 
 \section MAP_REGMANIP_Usage Usage
-\imageMacro{view_steps.png, "Illustration of the workflow steps.", 7}
+\imageMacro{map_view_steps.png, "Illustration of the workflow steps.", 7}
 The typical workflow with the manipulator has following steps/sections:
 1. <b>Source selection</b>: You can choose between starting a new registration and using a selected registration. For later option,
 the registration must be selected in the data manager.
@@ -40,7 +36,6 @@ switch to the visual inspection mode. The views will be reinitialized to the fie
 
 4. <b>Generation settings</b>: You may choose to give the resulting registration a special name. Additionally you can choose the convenience
 option to map the moving image with the confirmed registration automatically.
-\remark For more advanced mapping options please see the MatchPoint Mapper (\ref org_mitk_gui_qt_matchpoint_mapper).
 
 5. <b>Settings</b>: You can alter the settings of the transform (\ref MAP_REGMANIP_TransSettings) and the rendering settings (\ref MAP_REGMANIP_EvalSettings)
 for the visual inspection.
@@ -60,16 +55,15 @@ The reason is the relation between center, rotation, and translation.\n
 A transformation is defined as x' = R (x - C) + C + T\n
 where x': transformed point; x: point to transform; R: rotation matrix; C: center point; T: translation vector.\n
 The offset of a transform is defined as O = -RC + C + T\n
-The offset as well as the rotation matrix stay constant if the center point changes, those the translation has to be altered.
+The offset as well as the rotation matrix stay constant if the center point changes, therefore the translation has to be altered.
 
 \note To ease the orientation, the edit fields have background colours which resemble the colours of the plane the changes will
 "happen".\n
 For translation, the translation vector will be perpendicular to the indicated plane (The image moves "through" the plane).
 For rotation, the rotation axis will be perpendicular to the indicated plane.
 
-
 \section MAP_REGMANIP_EvalSettings Evaluation settings
 The settings you can choose are equal to the settings of the evaluation view (\ref org_mitk_gui_qt_matchpoint_evaluator).
-Please see the documentation of the evaluator for more details.
+Please see the documentation of the MatchPoint Registration Evaluator view for more details.
 
 */

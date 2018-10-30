@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkPointSet.h>
 #include <mitkImage.h>
+#include <mitkPlaneFit.h>
 
 #include <itkImage.h>
 #include <itkThresholdImageFilter.h>
@@ -42,6 +43,7 @@ template<class T> class SmartPointer;
 namespace mitk {
 class NodeDisplacementFilter;
 class NavigationDataSource;
+class PlaneFit;
 }
 
 namespace Ui {
@@ -142,7 +144,11 @@ protected:
   bool FindFiducialNo6();
   bool FindFiducialNo7();
   bool FindFiducialNo8();
-
+  void OptimizeFiducialPositions();
+  void MakePlanesParallel(mitk::PlaneFit::Pointer planeA, mitk::PlaneFit::Pointer planeB,
+                          mitk::PointSet::Pointer pointSetA, mitk::PointSet::Pointer pointSetB,
+                          mitk::PlaneGeometry::Pointer planeGeometryA, mitk::PlaneGeometry::Pointer planeGeometryB);
+  void MovePoint(mitk::PlaneGeometry::Pointer planeGeometry, int fiducialNo);
   void DefineDataStorageImageFilter();
   void CreateQtPartControl(QWidget *parent);
   

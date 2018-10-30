@@ -160,6 +160,41 @@ double QmitkUSNavigationStepCtUsRegistration::GetFiducialVolume(double radius)
   return 1.333333333 * 3.141592 * (radius * radius * radius);
 }
 
+bool QmitkUSNavigationStepCtUsRegistration::FilterFloatingImage()
+{
+  if (m_FloatingImage.IsNull())
+  {
+    return false;
+  }
+
+  m_FiducialMarkerCentroids.clear();
+  m_CentroidsOfFiducialCandidates.clear();
+  if (m_MarkerFloatingImageCoordinateSystemPointSet.IsNotNull())
+  {
+    m_MarkerFloatingImageCoordinateSystemPointSet->Clear();
+  }
+
+  ImageType::Pointer itkImage1 = ImageType::New();
+  mitk::CastToItkImage(m_FloatingImage, itkImage1);
+
+  this->InitializeImageFilters();
+
+  m_ThresholdFilter->SetInput(itkImage1);
+  m_LaplacianFilter1->SetInput(m_ThresholdFilter->GetOutput());
+  m_LaplacianFilter2->SetInput(m_LaplacianFilter1->GetOutput());
+  m_BinaryThresholdFilter->SetInput(m_LaplacianFilter2->GetOutput());
+  m_HoleFillingFilter->SetInput(m_BinaryThresholdFilter->GetOutput());
+  m_BinaryImageToShapeLabelMapFilter->SetInput(m_HoleFillingFilter->GetOutput());
+  m_BinaryImageToShapeLabelMapFilter->Update();
+
+  ImageType::Pointer binaryImage = ImageType::New();
+  binaryImage = m_HoleFillingFilter->GetOutput();
+  
+  this->EliminateTooSmallLabeledObjects(binaryImage);
+  mitk::CastToMitkImage(binaryImage, m_FloatingImage);
+  return true;
+}
+
 void QmitkUSNavigationStepCtUsRegistration::InitializeImageFilters()
 {
   //Initialize threshold filters
@@ -194,9 +229,10 @@ void QmitkUSNavigationStepCtUsRegistration::InitializeImageFilters()
 }
 
 void QmitkUSNavigationStepCtUsRegistration::EliminateTooSmallLabeledObjects(
-  BinaryImageToShapeLabelMapFilterType::OutputImageType::Pointer labelMap,
   ImageType::Pointer binaryImage)
 {
+  BinaryImageToShapeLabelMapFilterType::OutputImageType::Pointer labelMap =
+    m_BinaryImageToShapeLabelMapFilter->GetOutput();
   double voxelVolume = this->GetVoxelVolume();
   double fiducialVolume;
   unsigned int numberOfPixels;
@@ -239,9 +275,128 @@ void QmitkUSNavigationStepCtUsRegistration::EliminateTooSmallLabeledObjects(
   }
 }
 
-void QmitkUSNavigationStepCtUsRegistration::GetCentroidsOfLabeledObjects(
-  BinaryImageToShapeLabelMapFilterType::OutputImageType::Pointer labelMap)
+bool QmitkUSNavigationStepCtUsRegistration::EliminateFiducialCandidatesByEuclideanDistances()
 {
+  if (m_CentroidsOfFiducialCandidates.size() < NUMBER_FIDUCIALS_NEEDED)
+  {
+    return false;
+  }
+  
+  for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
+  {
+    int amountOfAcceptedFiducials = 0;
+    mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(counter));
+    //Loop through all fiducial candidates and calculate the distance between the chosen fiducial
+    // candidate and the other candidates. For each candidate with a right distance between
+    // 7.93mm and 31.0mm increase the amountOfAcceptedFiducials.
+    for (int position = 0; position < m_CentroidsOfFiducialCandidates.size(); ++position)
+    {
+      if (position == counter)
+      {
+        continue;
+      }
+      mitk::Point3D otherCentroid(m_CentroidsOfFiducialCandidates.at(position));
+      double distance = fiducialCentroid.EuclideanDistanceTo(otherCentroid);
+      
+      if (distance > 7.93 && distance < 31.0)
+      {
+        ++amountOfAcceptedFiducials;
+      }
+    }
+    //The amountOfAcceptedFiducials must be at least 7. Otherwise delete the fiducial candidate
+    // from the list of candidates.
+    if (amountOfAcceptedFiducials < NUMBER_FIDUCIALS_NEEDED - 1)
+    {
+      MITK_INFO << "Deleting fiducial candidate at position: " <<
+        m_CentroidsOfFiducialCandidates.at(counter);
+      m_CentroidsOfFiducialCandidates.erase(m_CentroidsOfFiducialCandidates.begin() + counter);
+      if (m_CentroidsOfFiducialCandidates.size() < NUMBER_FIDUCIALS_NEEDED )
+      {
+        return false;
+      }
+      counter = -1;
+    }
+  }
+
+  //Classify the rested fiducial candidates by its characteristic Euclidean distances
+  // between the canidates and remove all candidates with a false distance configuration:
+  this->ClassifyFiducialCandidates();
+  return true;
+}
+
+void QmitkUSNavigationStepCtUsRegistration::ClassifyFiducialCandidates()
+{
+  MITK_INFO << "ClassifyFiducialCandidates()";
+  std::vector<int> fiducialCandidatesToBeRemoved;
+  std::vector<std::vector<double>> distanceVectorsFiducials;
+  this->CalculateDistancesBetweenFiducials(distanceVectorsFiducials);
+
+  for (int counter = 0; counter < distanceVectorsFiducials.size(); ++counter)
+  {
+    int distanceA = 0;      // => 10,00mm distance
+    int distanceB = 0;      // => 14,14mm distance
+    int distanceC = 0;      // => 17,32mm distance
+    int distanceD = 0;      // => 22,36mm distance
+    int distanceE = 0;      // => 24,49mm distance
+    int distanceF = 0;      // => 28,28mm distance
+
+    std::vector<double> &distances = distanceVectorsFiducials.at(counter);
+    for (int number = 0; number < distances.size(); ++number)
+    {
+      double &distance = distances.at(number);
+      if (distance > 7.93 && distance <= 12.07)
+      {
+        ++distanceA;
+      }
+      else if (distance > 12.07 && distance <= 15.73)
+      {
+        ++distanceB;
+      }
+      else if (distance > 15.73 && distance <= 19.84)
+      {
+        ++distanceC;
+      }
+      else if (distance > 19.84 && distance <= 23.425)
+      {
+        ++distanceD;
+      }
+      else if (distance > 23.425 && distance <= 26.385)
+      {
+        ++distanceE;
+      }
+      else if (distance > 26.385 && distance <= 31.00)
+      {
+        ++distanceF;
+      }
+    }// End for-loop distances-vector
+
+    //Now, having looped through all distances of one fiducial candidate, check
+    // if the combination of different distances is known. The >= is due to the 
+    // possible occurrence of other fiducial candidates that have an distance equal to
+    // one of the distances A - E. However, false fiducial candidates outside the 
+    // the fiducial marker does not have the right distance configuration:
+    if ((distanceA >= 2 && distanceD >= 2 && distanceE >= 2 && distanceF >= 1 ||
+      distanceA >= 1 && distanceB >= 2 && distanceC >= 1 && distanceD >= 2 && distanceE >= 1 ||
+      distanceB >= 2 && distanceD >= 4 && distanceF >= 1 ||
+      distanceA >= 1 && distanceB >= 1 && distanceD >= 3 && distanceE >= 1 && distanceF >= 1) == false)
+    {
+      MITK_INFO << "Detected fiducial candidate with unknown distance configuration.";
+      fiducialCandidatesToBeRemoved.push_back(counter);
+    }
+  }
+  for (int count = fiducialCandidatesToBeRemoved.size() - 1; count >= 0; --count)
+  {
+    MITK_INFO << "Removing fiducial candidate " << fiducialCandidatesToBeRemoved.at(count);
+    m_CentroidsOfFiducialCandidates.erase(m_CentroidsOfFiducialCandidates.begin() 
+                                          + fiducialCandidatesToBeRemoved.at(count));
+  }
+}
+
+void QmitkUSNavigationStepCtUsRegistration::GetCentroidsOfLabeledObjects()
+{
+  MITK_INFO << "GetCentroidsOfLabeledObjects()";
+  BinaryImageToShapeLabelMapFilterType::OutputImageType::Pointer labelMap =
+    m_BinaryImageToShapeLabelMapFilter->GetOutput();
   for (int i = labelMap->GetNumberOfLabelObjects() - 1; i >= 0; --i)
   {
     // Get the ith region
@@ -706,8 +861,8 @@ void QmitkUSNavigationStepCtUsRegistration::CreateQtPartControl(QWidget *parent)
     this, SLOT(OnFiducialMarkerModelComboBoxSelectionChanged(const mitk::DataNode*)));
   connect(ui->doRegistrationMarkerToImagePushButton, SIGNAL(clicked()),
     this, SLOT(OnRegisterMarkerToFloatingImageCS()));
-  connect(ui->imageFilteringPushButton, SIGNAL(clicked()),
-    this, SLOT(OnFilterFloatingImage()));
+  connect(ui->localizeFiducialMarkerPushButton, SIGNAL(clicked()),
+    this, SLOT(OnLocalizeFiducials()));
 }
 
 void QmitkUSNavigationStepCtUsRegistration::OnFloatingImageComboBoxSelectionChanged(const mitk::DataNode* node)
@@ -897,9 +1052,9 @@ void QmitkUSNavigationStepCtUsRegistration::OnRegisterMarkerToFloatingImageCS()
 
 }
 
-void QmitkUSNavigationStepCtUsRegistration::OnFilterFloatingImage()
+void QmitkUSNavigationStepCtUsRegistration::OnLocalizeFiducials()
 {
-  if (m_FloatingImage.IsNull())
+  if (!this->FilterFloatingImage())
   {
     QMessageBox msgBox;
     msgBox.setText("Cannot perform filtering of the image. The floating image = nullptr.");
@@ -907,30 +1062,18 @@ void QmitkUSNavigationStepCtUsRegistration::OnFilterFloatingImage()
     return;
   }
   
-  ImageType::Pointer itkImage1 = ImageType::New();
-  mitk::CastToItkImage(m_FloatingImage, itkImage1);
-
-  this->InitializeImageFilters();
-
-  m_ThresholdFilter->SetInput(itkImage1);
-  m_LaplacianFilter1->SetInput(m_ThresholdFilter->GetOutput());
-  m_LaplacianFilter2->SetInput(m_LaplacianFilter1->GetOutput());
-  m_BinaryThresholdFilter->SetInput(m_LaplacianFilter2->GetOutput());
-  m_HoleFillingFilter->SetInput(m_BinaryThresholdFilter->GetOutput());
-  m_BinaryImageToShapeLabelMapFilter->SetInput(m_HoleFillingFilter->GetOutput());
-  m_BinaryImageToShapeLabelMapFilter->Update();
-
-  ImageType::Pointer binaryImage = ImageType::New();
-  binaryImage = m_HoleFillingFilter->GetOutput();
-  BinaryImageToShapeLabelMapFilterType::OutputImageType::Pointer labelMap 
-    = m_BinaryImageToShapeLabelMapFilter->GetOutput();
+  this->GetCentroidsOfLabeledObjects();
   
-  this->EliminateTooSmallLabeledObjects(labelMap, binaryImage);
-  MITK_INFO << "After Removing Objects:";
-  this->GetCentroidsOfLabeledObjects(labelMap);
-
-  mitk::CastToMitkImage(binaryImage, m_FloatingImage);
-
+  if (!this->EliminateFiducialCandidatesByEuclideanDistances() ||
+      m_CentroidsOfFiducialCandidates.size() != NUMBER_FIDUCIALS_NEEDED)
+  {
+    QMessageBox msgBox;
+    QString text = QString("Have found %1 instead of 8 fiducial candidates.\
+      Cannot perform fiducial localization procedure.").arg(m_CentroidsOfFiducialCandidates.size());
+    msgBox.setText(text);
+    msgBox.exec();
+    return;
+  }
 
   //Before calling NumerateFiducialMarks it must be sure, 
   // that there rested only 8 fiducial candidates.

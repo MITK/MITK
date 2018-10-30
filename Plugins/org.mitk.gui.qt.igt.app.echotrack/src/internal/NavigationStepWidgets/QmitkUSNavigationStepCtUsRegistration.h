@@ -126,10 +126,12 @@ protected:
   double GetVoxelVolume();
   double GetFiducialVolume(double radius);
 
+  bool FilterFloatingImage();
   void InitializeImageFilters();
-  void EliminateTooSmallLabeledObjects( BinaryImageToShapeLabelMapFilterType::OutputImageType::Pointer labelMap, 
-                                        ImageType::Pointer binaryImage);
-  void GetCentroidsOfLabeledObjects(BinaryImageToShapeLabelMapFilterType::OutputImageType::Pointer labelMap);
+  void EliminateTooSmallLabeledObjects( ImageType::Pointer binaryImage);
+  bool EliminateFiducialCandidatesByEuclideanDistances();
+  void ClassifyFiducialCandidates();
+  void GetCentroidsOfLabeledObjects();
   void CalculatePCA();
   void NumerateFiducialMarks();
   void CalculateDistancesBetweenFiducials(std::vector<std::vector<double>> &distanceVectorsFiducials);
@@ -148,7 +150,7 @@ protected slots:
   void OnFloatingImageComboBoxSelectionChanged(const mitk::DataNode* node);
   void OnFiducialMarkerModelComboBoxSelectionChanged(const mitk::DataNode* node);
   void OnRegisterMarkerToFloatingImageCS();
-  void OnFilterFloatingImage();
+  void OnLocalizeFiducials();
 
 private:
   Ui::QmitkUSNavigationStepCtUsRegistration *ui;

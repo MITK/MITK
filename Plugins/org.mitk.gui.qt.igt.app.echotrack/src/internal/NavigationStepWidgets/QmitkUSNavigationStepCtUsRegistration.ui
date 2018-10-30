@@ -65,9 +65,9 @@
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="imageFilteringPushButton">
+    <widget class="QPushButton" name="localizeFiducialMarkerPushButton">
      <property name="text">
-      <string>Perform Image Filtering</string>
+      <string>Localize Fiducial Marker</string>
      </property>
     </widget>
    </item>

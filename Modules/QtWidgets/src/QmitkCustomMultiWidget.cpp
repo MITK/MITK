@@ -54,14 +54,17 @@ QmitkCustomMultiWidget::QmitkCustomMultiWidget(QWidget* parent,
                                                const QString& multiWidgetName/* = "custommulti"*/)
   : QWidget(parent, f)
   , m_CustomMultiWidgetLayout(nullptr)
+  , m_MultiWidgetRows(0)
+  , m_MultiWidgetColumns(0)
+  , m_PlaneMode(0)
   , m_RenderingManager(renderingManager)
   , m_RenderingMode(renderingMode)
   , m_MultiWidgetName(multiWidgetName)
-  , m_PendingCrosshairPositionEvent(false)
-  , m_CrosshairNavigationEnabled(false)
   , m_DisplayActionEventBroadcast(nullptr)
   , m_DisplayActionEventHandler(nullptr)
   , m_DataStorage(nullptr)
+  , m_PendingCrosshairPositionEvent(false)
+  , m_CrosshairNavigationEnabled(false)
 {
   // create widget manually
   // create and set layout
@@ -93,24 +96,22 @@ void QmitkCustomMultiWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 
 void QmitkCustomMultiWidget::InitializeRenderWindowWidgets()
 {
-  // create render window (widgets) initially
-  //QString UID = CreateRenderWindowWidget("2015-01-14 - CT");
-  //AddToMultiWidgetLayout(0, 0, UID);
-  /*
-  AddRenderWindowWidget(0, 1, "2015-08-19 - CT");
-  AddRenderWindowWidget(0, 2, "2016-06-29 - CT");
-  AddRenderWindowWidget(1, 0, "2015-01-14 - MR");
-  AddRenderWindowWidget(1, 1, "2015-08-19 - MR");
-  AddRenderWindowWidget(1, 2, "2016-06-29 - MR");
-  */
+  // create render window widget initially
+  m_MultiWidgetRows = 1;
+  m_MultiWidgetColumns = 1;
+  CreateRenderWindowWidget("2015-01-14 - CT");
+  InitializeGUI();
 }
 
 void QmitkCustomMultiWidget::ResetLayout(int row, int column)
 {
-  int neededRenderWindowWidgets = (row + 1) * (column + 1);
+  m_MultiWidgetRows = row + 1;
+  m_MultiWidgetColumns = column + 1;
+
+  int requiredRenderWindowWidgets = m_MultiWidgetRows * m_MultiWidgetColumns;
   int existingRenderWindowWidgets = m_RenderWindowWidgets.size();
 
-  int difference = neededRenderWindowWidgets - existingRenderWindowWidgets;
+  int difference = requiredRenderWindowWidgets - existingRenderWindowWidgets;
   while(0 < difference)
   {
     // more render window widgets needed
@@ -120,15 +121,11 @@ void QmitkCustomMultiWidget::ResetLayout(int row, int column)
   while(0 > difference)
   {
     // less render window widgets needed
-    RemoveRenderWindowWidget(m_RenderWindowWidgets.rbegin()->first);
+    DestroyRenderWindowWidget();
     ++difference;
   }
 
   InitializeGUI();
-  if (0 == difference)
-  {
-    FillLayout(row, column);
-  }
 }
 
 void QmitkCustomMultiWidget::Synchronize(bool synchronized)
@@ -178,63 +175,43 @@ QmitkCustomMultiWidget::RenderWindowWidgetMap QmitkCustomMultiWidget::GetRenderW
   return m_RenderWindowWidgets;
 }
 
-QmitkCustomMultiWidget::RenderWindowWidgetPointer QmitkCustomMultiWidget::GetRenderWindowWidget(const QString& widgetID) const
+QmitkCustomMultiWidget::RenderWindowWidgetPointer QmitkCustomMultiWidget::GetRenderWindowWidget(int row, int column) const
 {
-  RenderWindowWidgetMap::const_iterator it = m_RenderWindowWidgets.find(widgetID);
-  if (it == m_RenderWindowWidgets.end())
+  return GetRenderWindowWidget(GetNameFromIndex(row, column));
+}
+
+QmitkCustomMultiWidget::RenderWindowWidgetPointer QmitkCustomMultiWidget::GetRenderWindowWidget(const QString& widgetName) const
+{
+  RenderWindowWidgetMap::const_iterator it = m_RenderWindowWidgets.find(widgetName);
+  if (it != m_RenderWindowWidgets.end())
   {
-    return nullptr;
+    return it->second;
   }
 
-  return it->second;
+  return nullptr;
 }
 
-QString QmitkCustomMultiWidget::CreateRenderWindowWidget(const std::string& cornerAnnotation/* = ""*/)
+QmitkCustomMultiWidget::RenderWindowHash QmitkCustomMultiWidget::GetRenderWindows() const
 {
-  // create the render window widget and connect signals / slots
-  mitk::UIDGenerator generator;
-  std::string renderWindowUID = generator.GetUID();
-  QString UID = m_MultiWidgetName + "_" + QString::fromStdString(renderWindowUID);
-  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, UID, m_DataStorage);
-  renderWindowWidget->SetCornerAnnotationText(cornerAnnotation);
-
-  // store the newly created render window widget with the UID
-  m_RenderWindowWidgets.insert(std::make_pair(UID, renderWindowWidget));
-
-  return UID;
-}
-
-void QmitkCustomMultiWidget::AddToMultiWidgetLayout(int row, int column, const QString& widgetID)
-{
-  RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(widgetID);
-  if (nullptr != renderWindowWidget)
+  RenderWindowHash result;
+  // create QHash on demand
+  auto renderWindowWidgets = GetRenderWindowWidgets();
+  for (const auto& renderWindowWidget : renderWindowWidgets)
   {
-    m_CustomMultiWidgetLayout->addWidget(renderWindowWidget.get(), row, column);
-    SetActiveRenderWindowWidget(renderWindowWidget);
-  }
-}
-
-void QmitkCustomMultiWidget::RemoveRenderWindowWidget(const QString& widgetID)
-{
-  auto iterator = m_RenderWindowWidgets.find(widgetID);
-  if (iterator == m_RenderWindowWidgets.end())
-  {
-    return;
+    result.insert(renderWindowWidget.first, renderWindowWidget.second->GetRenderWindow());
   }
 
-  RenderWindowWidgetPointer renderWindowWidgetToRemove = iterator->second;
-  disconnect(renderWindowWidgetToRemove.get(), 0, 0, 0);
-
-  // erase the render window from the map
-  m_RenderWindowWidgets.erase(iterator);
-
-  // remove from layout
-  // #TODO
+  return result;
 }
 
-QmitkRenderWindow* QmitkCustomMultiWidget::GetRenderWindow(const QString& widgetID) const
+QmitkRenderWindow* QmitkCustomMultiWidget::GetRenderWindow(int row, int column) const
 {
-  RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(widgetID);
+  return GetRenderWindow(GetNameFromIndex(row, column));
+}
+
+QmitkRenderWindow* QmitkCustomMultiWidget::GetRenderWindow(const QString& widgetName) const
+{
+  RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(widgetName);
   if (nullptr != renderWindowWidget)
   {
     return renderWindowWidget->GetRenderWindow();
@@ -282,9 +259,9 @@ unsigned int QmitkCustomMultiWidget::GetNumberOfRenderWindowWidgets() const
   return m_RenderWindowWidgets.size();
 }
 
-void QmitkCustomMultiWidget::RequestUpdate(const QString& widgetID)
+void QmitkCustomMultiWidget::RequestUpdate(const QString& widgetName)
 {
-  RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(widgetID);
+  RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(widgetName);
   if (nullptr != renderWindowWidget)
   {
     return renderWindowWidget->RequestUpdate();
@@ -299,9 +276,9 @@ void QmitkCustomMultiWidget::RequestUpdateAll()
   }
 }
 
-void QmitkCustomMultiWidget::ForceImmediateUpdate(const QString& widgetID)
+void QmitkCustomMultiWidget::ForceImmediateUpdate(const QString& widgetName)
 {
-  RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(widgetID);
+  RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(widgetName);
   if (nullptr != renderWindowWidget)
   {
     renderWindowWidget->ForceImmediateUpdate();
@@ -316,7 +293,7 @@ void QmitkCustomMultiWidget::ForceImmediateUpdateAll()
   }
 }
 
-const mitk::Point3D QmitkCustomMultiWidget::GetCrossPosition(const QString& widgetID) const
+const mitk::Point3D QmitkCustomMultiWidget::GetSelectedPosition(const QString& widgetName) const
 {
   /*
   const mitk::PlaneGeometry *plane1 = mitkWidget1->GetSliceNavigationController()->GetCurrentPlaneGeometry();
@@ -441,9 +418,18 @@ void QmitkCustomMultiWidget::HandleCrosshairPositionEventDelayed()
   */
 }
 
-void QmitkCustomMultiWidget::MoveCrossToPosition(const QString& widgetID, const mitk::Point3D& newPosition)
+void QmitkCustomMultiWidget::SetSelectedPosition(const QString& widgetName, const mitk::Point3D& newPosition)
 {
-  RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(widgetID);
+  RenderWindowWidgetPointer renderWindowWidget;
+  if (widgetName.isNull())
+  {
+    renderWindowWidget = GetActiveRenderWindowWidget();
+  }
+  else
+  {
+    renderWindowWidget = GetRenderWindowWidget(widgetName);
+  }
+
   if (nullptr != renderWindowWidget)
   {
     renderWindowWidget->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
@@ -451,7 +437,7 @@ void QmitkCustomMultiWidget::MoveCrossToPosition(const QString& widgetID, const 
     return;
   }
 
-  MITK_ERROR << "Geometry plane can not be shown for an unknown widget.";
+  MITK_ERROR << "Position can not be set for an unknown render window widget.";
 }
 
 void QmitkCustomMultiWidget::ResetCrosshair()
@@ -499,6 +485,8 @@ void QmitkCustomMultiWidget::InitializeGUI()
   m_CustomMultiWidgetLayout = new QGridLayout(this);
   m_CustomMultiWidgetLayout->setContentsMargins(0, 0, 0, 0);
   setLayout(m_CustomMultiWidgetLayout);
+
+  FillMultiWidgetLayout();
 }
 
 void QmitkCustomMultiWidget::InitializeWidget()
@@ -519,27 +507,67 @@ void QmitkCustomMultiWidget::InitializeDisplayActionEventHandling()
   Synchronize(true);
 }
 
-void QmitkCustomMultiWidget::FillLayout(int row, int column)
+void QmitkCustomMultiWidget::CreateRenderWindowWidget(const std::string& cornerAnnotation/* = ""*/)
 {
-  int r = 0;
-  int c = 0;
-  for (const auto& renderWindowWidget : m_RenderWindowWidgets)
-  {
-    AddToMultiWidgetLayout(r, c, renderWindowWidget.first);
+  // create the render window widget and connect signals / slots
+  QString renderWindowWidgetName = GetNameFromIndex(m_RenderWindowWidgets.size());
+  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, m_DataStorage);
+  renderWindowWidget->SetCornerAnnotationText(renderWindowWidgetName.toStdString()/*cornerAnnotation*/);
 
-    c += 1;
-    if (c > column)
+  // store the newly created render window widget with the UID
+  m_RenderWindowWidgets.insert(std::make_pair(renderWindowWidgetName, renderWindowWidget));
+}
+
+void QmitkCustomMultiWidget::DestroyRenderWindowWidget()
+{
+  auto iterator = m_RenderWindowWidgets.find(GetNameFromIndex(m_RenderWindowWidgets.size() - 1));
+  if (iterator == m_RenderWindowWidgets.end())
+  {
+    return;
+  }
+
+  // disconnect each signal of this render window widget
+  RenderWindowWidgetPointer renderWindowWidgetToRemove = iterator->second;
+  disconnect(renderWindowWidgetToRemove.get(), 0, 0, 0);
+
+  // erase the render window from the map
+  m_RenderWindowWidgets.erase(iterator);
+}
+
+void QmitkCustomMultiWidget::FillMultiWidgetLayout()
+{
+  for (int row = 0; row < m_MultiWidgetRows; ++row)
+  {
+    for (int column = 0; column < m_MultiWidgetColumns; ++column)
     {
-      // first column
-      c = 0;
-      // next row
-      r += 1;
-      if (r > row)
+      RenderWindowWidgetPointer renderWindowWidget = GetRenderWindowWidget(row, column);
+      if (nullptr != renderWindowWidget)
       {
-        return;
+        m_CustomMultiWidgetLayout->addWidget(renderWindowWidget.get(), row, column);
+        SetActiveRenderWindowWidget(renderWindowWidget);
       }
     }
   }
+}
+
+QString QmitkCustomMultiWidget::GetNameFromIndex(int row, int column) const
+{
+  if (0 <= row && m_MultiWidgetRows > row && 0 <= column && m_MultiWidgetColumns > column)
+  {
+    return GetNameFromIndex(row * m_MultiWidgetColumns + column);
+  }
+
+  return QString();
+}
+
+QString QmitkCustomMultiWidget::GetNameFromIndex(size_t index) const
+{
+  if (index <= m_RenderWindowWidgets.size())
+  {
+    return m_MultiWidgetName + ".widget" + QString::number(index);
+  }
+
+  return QString();
 }
 
 mitk::DataNode::Pointer QmitkCustomMultiWidget::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes)

@@ -45,7 +45,7 @@ public:
 
   QmitkRenderWindowWidget(
     QWidget* parent = nullptr,
-    const QString& UID = "",
+    const QString& widgetName = "",
     mitk::DataStorage* dataStorage = nullptr,
     mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard
   );
@@ -54,7 +54,7 @@ public:
 
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
-  const QString& GetUID() const { return m_UID; };
+  const QString& GetWidgetName() const { return m_WidgetName; };
   QmitkRenderWindow* GetRenderWindow() const { return m_RenderWindow; };
 
   mitk::SliceNavigationController* GetSliceNavigationController() const;
@@ -95,7 +95,7 @@ private:
 
   void SetCrosshair(mitk::Point3D selectedPoint);
 
-  QString m_UID;
+  QString m_WidgetName;
   QHBoxLayout* m_Layout;
 
   mitk::DataStorage* m_DataStorage;

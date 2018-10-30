@@ -73,13 +73,11 @@ public:
   void Synchronize(bool synchronized);
 
   RenderWindowWidgetMap GetRenderWindowWidgets() const;
-  RenderWindowWidgetPointer GetRenderWindowWidget(const QString& widgetID) const;
-
-  QString CreateRenderWindowWidget(const std::string& cornerAnnotation = "");
-  void AddToMultiWidgetLayout(int row, int column, const QString& widgetID);
-  void RemoveRenderWindowWidget(const QString& widgetID);
-
-  QmitkRenderWindow* GetRenderWindow(const QString& widgetID) const;
+  RenderWindowWidgetPointer GetRenderWindowWidget(int row, int column) const;
+  RenderWindowWidgetPointer GetRenderWindowWidget(const QString& widgetName) const;
+  RenderWindowHash GetRenderWindows() const;
+  QmitkRenderWindow* GetRenderWindow(int row, int column) const;
+  QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const;
 
   void SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget);
   RenderWindowWidgetPointer GetActiveRenderWindowWidget() const;
@@ -88,14 +86,14 @@ public:
   
   unsigned int GetNumberOfRenderWindowWidgets() const;
 
-  void RequestUpdate(const QString& widgetID);
+  void RequestUpdate(const QString& widgetName);
   void RequestUpdateAll();
-  void ForceImmediateUpdate(const QString& widgetID);
+  void ForceImmediateUpdate(const QString& widgetName);
   void ForceImmediateUpdateAll();
 
-  const mitk::Point3D GetCrossPosition(const QString& widgetID) const;
+  const mitk::Point3D GetSelectedPosition(const QString& widgetName) const;
 
-public slots:
+public Q_SLOTS:
 
   /**
   * @brief Listener to the CrosshairPositionEvent
@@ -109,7 +107,7 @@ public slots:
   */
   void HandleCrosshairPositionEventDelayed();
 
-  void MoveCrossToPosition(const QString& widgetID, const mitk::Point3D& newPosition);
+  void SetSelectedPosition(const QString& widgetName, const mitk::Point3D& newPosition);
 
   void ResetCrosshair();
 
@@ -120,7 +118,7 @@ public slots:
 
   void moveEvent(QMoveEvent* e) override;
 
-signals:
+Q_SIGNALS:
 
   void WheelMoved(QWheelEvent *);
   void Moved();
@@ -141,8 +139,13 @@ private:
   void InitializeWidget();
   void InitializeDisplayActionEventHandling();
 
-  void FillLayout(int row, int column);
-  
+  void CreateRenderWindowWidget(const std::string& cornerAnnotation = "");
+  void DestroyRenderWindowWidget();
+  void FillMultiWidgetLayout();
+
+  QString GetNameFromIndex(int row, int column) const;
+  QString GetNameFromIndex(size_t index) const;
+
   // #TODO: see T24173
   mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
 
@@ -150,6 +153,9 @@ private:
   RenderWindowWidgetMap m_RenderWindowWidgets;
 
   RenderWindowWidgetPointer m_ActiveRenderWindowWidget;
+
+  int m_MultiWidgetRows;
+  int m_MultiWidgetColumns;
 
   int m_PlaneMode;
 

@@ -123,12 +123,7 @@ QHash<QString, QmitkRenderWindow*> QmitkCustomMultiWidgetEditor::GetQmitkRenderW
     return result;
   }
 
-  // create QHash on demand
-  QmitkCustomMultiWidget::RenderWindowWidgetMap renderWindowWidgets = m_Impl->m_CustomMultiWidget->GetRenderWindowWidgets();
-  for (const auto& renderWindowWidget : renderWindowWidgets)
-  {
-    result.insert(renderWindowWidget.first, renderWindowWidget.second->GetRenderWindow());
-  }
+  result = m_Impl->m_CustomMultiWidget->GetRenderWindows();
   return result;
 }
 
@@ -149,14 +144,14 @@ mitk::Point3D QmitkCustomMultiWidgetEditor::GetSelectedPosition(const QString& i
     return mitk::Point3D();
   }
 
-  return m_Impl->m_CustomMultiWidget->GetCrossPosition(id);
+  return m_Impl->m_CustomMultiWidget->GetSelectedPosition(id);
 }
 
 void QmitkCustomMultiWidgetEditor::SetSelectedPosition(const mitk::Point3D& pos, const QString& id)
 {
   if (nullptr != m_Impl->m_CustomMultiWidget)
   {
-    m_Impl->m_CustomMultiWidget->MoveCrossToPosition(id, pos);
+    m_Impl->m_CustomMultiWidget->SetSelectedPosition(id, pos);
   }
 }
 
@@ -175,7 +170,7 @@ QStringList QmitkCustomMultiWidgetEditor::GetDecorations() const
   return m_Impl->m_MultiWidgetDecorationManager->GetDecorations();
 }
 
-void QmitkCustomMultiWidgetEditor::EnableSlicingPlanes(bool enable)
+void QmitkCustomMultiWidgetEditor::EnableSlicingPlanes(bool /*enable*/)
 {
   // nothing here
 }

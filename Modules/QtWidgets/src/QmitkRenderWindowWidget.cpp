@@ -23,11 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTextProperty.h>
 
 QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
-                                                 const QString& UID/* = ""*/,
+                                                 const QString& widgetName/* = ""*/,
                                                  mitk::DataStorage* dataStorage/* = nullptr*/,
                                                  mitk::BaseRenderer::RenderingMode::Type renderingMode/* = mitk::BaseRenderer::RenderingMode::Standard*/)
   : QWidget(parent)
-  , m_UID(UID)
+  , m_WidgetName(widgetName)
   , m_DataStorage(dataStorage)
   , m_RenderingMode(renderingMode)
   , m_RenderWindow(nullptr)
@@ -159,7 +159,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
   //m_RenderingManager = mitk::RenderingManager::New();
   m_RenderingManager->SetDataStorage(m_DataStorage);
 
-  m_RenderWindow = new QmitkRenderWindow(this, m_UID, nullptr, m_RenderingManager, m_RenderingMode);
+  m_RenderWindow = new QmitkRenderWindow(this, m_WidgetName, nullptr, m_RenderingManager, m_RenderingMode);
   m_RenderWindow->SetLayoutIndex(QmitkCustomMultiWidget::SAGITTAL); // TODO: allow to change layout type later
   m_RenderWindow->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
   m_RenderWindow->GetSliceNavigationController()->SetRenderingManager(m_RenderingManager);
@@ -171,7 +171,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
 
   // add point set as a crosshair
   m_PointSetNode = mitk::DataNode::New();
-  m_PointSetNode->SetProperty("name", mitk::StringProperty::New("Crosshair of render window " + m_UID.toStdString()));
+  m_PointSetNode->SetProperty("name", mitk::StringProperty::New("Crosshair of render window " + m_WidgetName.toStdString()));
   m_PointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true)); // crosshair-node should typically be invisible
 
   // set the crosshair only visible for this specific renderer
@@ -181,7 +181,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
 
   m_PointSet = mitk::PointSet::New();
   m_PointSetNode->SetData(m_PointSet);
-  m_DataStorage->Add(m_PointSetNode);
+  //m_DataStorage->Add(m_PointSetNode);
 
   // set colors and corner annotation
   InitializeDecorations();

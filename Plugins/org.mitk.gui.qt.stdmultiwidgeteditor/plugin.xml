@@ -7,7 +7,7 @@
       name="Standard Display"
       icon="resources/StdMultiWidgetEditor.svg"
       extensions="mitk"
-	  default="true"
+	  default="false"
       class="QmitkStdMultiWidgetEditor">
     </editor>
   </extension>

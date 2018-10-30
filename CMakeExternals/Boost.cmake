@@ -224,16 +224,22 @@ g"
 
   endif()
 
+  if(WIN32)
+    set(dummy_cmd cd .)
+  else()
+    set(dummy_cmd true) #[[ "cd ." does not work reliably ]]
+  endif()
+
   if(NOT patch_cmd)
-    set(patch_cmd cd .) #[[ Do nothing ]]
+    set(patch_cmd ${dummy_cmd}) #[[ Do nothing ]]
   endif()
 
   if(NOT configure_cmd)
-    set(configure_cmd cd .) #[[ Do nothing ]]
+    set(configure_cmd ${dummy_cmd}) #[[ Do nothing ]]
   endif()
 
   if(NOT build_cmd)
-    set(build_cmd cd .) #[[ Do nothing ]]
+    set(build_cmd ${dummy_cmd}) #[[ Do nothing ]]
   endif()
 
   if(WIN32)

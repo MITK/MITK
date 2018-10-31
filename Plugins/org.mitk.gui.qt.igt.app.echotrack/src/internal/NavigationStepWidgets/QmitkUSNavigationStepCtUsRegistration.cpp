@@ -531,7 +531,6 @@ void QmitkUSNavigationStepCtUsRegistration::NumerateFiducialMarks()
   }
   
   this->OptimizeFiducialPositions();
-  this->OptimizeFiducialPositions();
 
   if (m_MarkerFloatingImageCoordinateSystemPointSet.IsNull())
   {
@@ -846,9 +845,11 @@ void QmitkUSNavigationStepCtUsRegistration::OptimizeFiducialPositions()
   }
 
   //Make planes parallel
-  this->MakePlanesParallel(planeFit1234, planeFit5678,
-                           pointSet1234, pointSet5678,
-                           planeGeometry1234, planeGeometry5678);
+  this->CreateParallelPlanes(planeFit1234, planeFit5678,
+                             pointSet1234, pointSet5678,
+                             planeGeometry1234, planeGeometry5678);
+
+  this->MovePlanes(planeGeometry1234, planeGeometry5678, 10.0);
 
   //Move the points into the parallel planes
   for (int counter = 1; counter <= 4; ++counter)
@@ -862,7 +863,8 @@ void QmitkUSNavigationStepCtUsRegistration::OptimizeFiducialPositions()
   MITK_INFO << "NormalVector plane 1234 = " << planeGeometry1234->GetNormal();
   MITK_INFO << "NormalVector plane 5678 = " << planeGeometry5678->GetNormal();
   MITK_INFO << "Are parallel: " << planeGeometry1234->IsParallel(planeGeometry5678);
-
+  
+  
   //Optimize now the positions of Fiducials 1 - 2 - 5 and 4 - 7 - 8
   //Initialization for planes 1 - 2 - 5 and 4 - 7 - 8
   mitk::PlaneFit::Pointer planeFit125 = mitk::PlaneFit::New();
@@ -875,14 +877,29 @@ void QmitkUSNavigationStepCtUsRegistration::OptimizeFiducialPositions()
   pointSet125->InsertPoint(0, m_FiducialMarkerCentroids.at(1));
   pointSet125->InsertPoint(1, m_FiducialMarkerCentroids.at(2));
   pointSet125->InsertPoint(2, m_FiducialMarkerCentroids.at(5));
+  //Add the points projected onto the opposite (parallel) plane to the pointset
+  // By means of these projected points the calculated plane 
+  // is orthogonal  to the plane 1234 and 5678.
+  pointSet125->InsertPoint(3, planeGeometry5678->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(1)));
+  pointSet125->InsertPoint(4, planeGeometry5678->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(2)));
+  pointSet125->InsertPoint(5, planeGeometry1234->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(5)));
+
   pointSet478->InsertPoint(0, m_FiducialMarkerCentroids.at(4));
   pointSet478->InsertPoint(1, m_FiducialMarkerCentroids.at(7));
   pointSet478->InsertPoint(2, m_FiducialMarkerCentroids.at(8));
+  //Add the points projected onto the opposite (parallel) plane to the pointset
+  // By means of these projected points the calculated plane 
+  // is orthogonal  to the plane 1234 and 5678.
+  pointSet478->InsertPoint(3, planeGeometry5678->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(4)));
+  pointSet478->InsertPoint(4, planeGeometry1234->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(7)));
+  pointSet478->InsertPoint(5, planeGeometry1234->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(8)));
 
   //Make planes parallel
-  this->MakePlanesParallel(planeFit125, planeFit478,
-                           pointSet125, pointSet478,
-                           planeGeometry125, planeGeometry478);
+  this->CreateParallelPlanes(planeFit125, planeFit478,
+                             pointSet125, pointSet478,
+                             planeGeometry125, planeGeometry478);
+
+  this->MovePlanes(planeGeometry125, planeGeometry478, 20.0);
 
   //Move the points into the parallel planes
   this->MovePoint(planeGeometry125, 1);
@@ -894,6 +911,7 @@ void QmitkUSNavigationStepCtUsRegistration::OptimizeFiducialPositions()
   MITK_INFO << "NormalVector plane 125 = " << planeGeometry125->GetNormal();
   MITK_INFO << "NormalVector plane 478 = " << planeGeometry478->GetNormal();
   MITK_INFO << "Are parallel: " << planeGeometry125->IsParallel(planeGeometry478);
+
 
   //Optimize now the positions of Fiducials 1 - 3 - 8 and 4 - 5 - 6
   //Initialization for planes 1 - 3 - 8 and 4 - 5 - 6
@@ -907,14 +925,29 @@ void QmitkUSNavigationStepCtUsRegistration::OptimizeFiducialPositions()
   pointSet138->InsertPoint(0, m_FiducialMarkerCentroids.at(1));
   pointSet138->InsertPoint(1, m_FiducialMarkerCentroids.at(3));
   pointSet138->InsertPoint(2, m_FiducialMarkerCentroids.at(8));
+  //Add the points projected onto the opposite (parallel) plane to the pointset
+  // By means of these projected points the calculated plane 
+  // is orthogonal  to the plane 1234 and 5678.
+  pointSet138->InsertPoint(3, planeGeometry5678->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(1)));
+  pointSet138->InsertPoint(4, planeGeometry5678->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(3)));
+  pointSet138->InsertPoint(5, planeGeometry1234->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(8)));
+
   pointSet456->InsertPoint(0, m_FiducialMarkerCentroids.at(4));
   pointSet456->InsertPoint(1, m_FiducialMarkerCentroids.at(5));
   pointSet456->InsertPoint(2, m_FiducialMarkerCentroids.at(6));
+  //Add the points projected onto the opposite (parallel) plane to the pointset
+  // By means of these projected points the calculated plane 
+  // is orthogonal  to the plane 1234 and 5678.
+  pointSet456->InsertPoint(3, planeGeometry5678->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(4)));
+  pointSet456->InsertPoint(4, planeGeometry1234->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(5)));
+  pointSet456->InsertPoint(5, planeGeometry1234->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(6)));
 
   //Make planes parallel
-  this->MakePlanesParallel(planeFit138, planeFit456,
-                           pointSet138, pointSet456,
-                           planeGeometry138, planeGeometry456);
+  this->CreateParallelPlanes(planeFit138, planeFit456,
+                             pointSet138, pointSet456,
+                             planeGeometry138, planeGeometry456);
+
+  this->MovePlanes(planeGeometry138, planeGeometry456, 20.0);
 
   //Move the points into the parallel planes
   this->MovePoint(planeGeometry138, 1);
@@ -926,46 +959,10 @@ void QmitkUSNavigationStepCtUsRegistration::OptimizeFiducialPositions()
   MITK_INFO << "NormalVector plane 138 = " << planeGeometry138->GetNormal();
   MITK_INFO << "NormalVector plane 456 = " << planeGeometry456->GetNormal();
   MITK_INFO << "Are parallel: " << planeGeometry138->IsParallel(planeGeometry456);
-  
 
-  //Finally again first two planes:
-  //Initialization for planes 1 - 2 - 3 - 4 and 5 - 6 - 7 - 8
-  mitk::PlaneFit::Pointer planeFit1234_ = mitk::PlaneFit::New();
-  mitk::PlaneFit::Pointer planeFit5678_ = mitk::PlaneFit::New();
-  mitk::PointSet::Pointer pointSet1234_ = mitk::PointSet::New();
-  mitk::PointSet::Pointer pointSet5678_ = mitk::PointSet::New();
-  mitk::PlaneGeometry::Pointer planeGeometry1234_ = mitk::PlaneGeometry::New();
-  mitk::PlaneGeometry::Pointer planeGeometry5678_ = mitk::PlaneGeometry::New();
-  for (int counter = 1; counter <= 4; ++counter)
-  {
-    pointSet1234_->InsertPoint(counter - 1, m_FiducialMarkerCentroids.at(counter));
-  }
-  for (int counter = 5; counter <= 8; ++counter)
-  {
-    pointSet5678_->InsertPoint(counter - 5, m_FiducialMarkerCentroids.at(counter));
-  }
-
-  //Make planes parallel
-  this->MakePlanesParallel(planeFit1234_, planeFit5678_,
-                           pointSet1234_, pointSet5678_,
-                           planeGeometry1234_, planeGeometry5678_);
-
-  //Move the points into the parallel planes
-  for (int counter = 1; counter <= 4; ++counter)
-  {
-    this->MovePoint(planeGeometry1234_, counter);
-  }
-  for (int counter = 5; counter <= 8; ++counter)
-  {
-    this->MovePoint(planeGeometry5678_, counter);
-  }
-  MITK_INFO << "NormalVector plane 1234_ = " << planeGeometry1234_->GetNormal();
-  MITK_INFO << "NormalVector plane 5678_ = " << planeGeometry5678_->GetNormal();
-  MITK_INFO << "Are parallel: " << planeGeometry1234_->IsParallel(planeGeometry5678_);
-  
 }
 
-void QmitkUSNavigationStepCtUsRegistration::MakePlanesParallel(
+void QmitkUSNavigationStepCtUsRegistration::CreateParallelPlanes(
   mitk::PlaneFit::Pointer planeA, mitk::PlaneFit::Pointer planeB, 
   mitk::PointSet::Pointer pointSetA, mitk::PointSet::Pointer pointSetB, 
   mitk::PlaneGeometry::Pointer planeGeometryA, mitk::PlaneGeometry::Pointer planeGeometryB)
@@ -976,8 +973,6 @@ void QmitkUSNavigationStepCtUsRegistration::MakePlanesParallel(
   planeB->SetInput(pointSetB);
   planeB->Update();
   mitk::PlaneGeometry::Pointer geometryB = dynamic_cast<mitk::PlaneGeometry *>(planeB->GetOutput()->GetGeometry());
-  
-  
 
   mitk::Point3D originPlaneA = geometryA->GetOrigin();
   mitk::Point3D originPlaneB = geometryB->GetOrigin();
@@ -997,6 +992,36 @@ void QmitkUSNavigationStepCtUsRegistration::MakePlanesParallel(
 
   planeGeometryA->InitializePlane(originPlaneA, combinedNormalPlaneA_B);
   planeGeometryB->InitializePlane(originPlaneB, combinedNormalPlaneA_B);
+}
+
+void QmitkUSNavigationStepCtUsRegistration::MovePlanes(mitk::PlaneGeometry::Pointer planeA, mitk::PlaneGeometry::Pointer planeB, double referenceDistance)
+{
+  const mitk::PlaneGeometry *constPlaneB = planeB;
+  double distanceBetweenPlanes = planeA->DistanceFromPlane(constPlaneB);
+  MITK_INFO << "Distance between planes before moving = " << distanceBetweenPlanes;
+
+  //If distanceBetweenPlanes is > referenceDistance, the result will be negative,
+  // otherwise it will be positive:
+  double distanceToMove = 0.5 * (referenceDistance - distanceBetweenPlanes);
+  const mitk::Vector3D movingVectorPositive = distanceToMove * planeA->GetNormal();
+  const mitk::Vector3D movingVectorNegative = distanceToMove * planeA->GetNormal() * -1;
+
+  //Check, whether the planeB is above planeA
+  if (planeA->IsAbove(planeB->GetOrigin()))
+  {
+    //planeB is above planeA
+    planeA->Translate(movingVectorNegative);
+    planeB->Translate(movingVectorPositive);
+  }
+  else
+  {
+    //planeB is below planeA
+    planeA->Translate(movingVectorPositive);
+    planeB->Translate(movingVectorNegative);
+  }
+
+  const mitk::PlaneGeometry *constPlaneBMoved = planeB;
+  MITK_INFO << "Distance between planes after moving = " << planeA->DistanceFromPlane(constPlaneBMoved);
 }
 
 void QmitkUSNavigationStepCtUsRegistration::MovePoint(

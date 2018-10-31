@@ -145,9 +145,11 @@ protected:
   bool FindFiducialNo7();
   bool FindFiducialNo8();
   void OptimizeFiducialPositions();
-  void MakePlanesParallel(mitk::PlaneFit::Pointer planeA, mitk::PlaneFit::Pointer planeB,
+  void CreateParallelPlanes(mitk::PlaneFit::Pointer planeA, mitk::PlaneFit::Pointer planeB,
                           mitk::PointSet::Pointer pointSetA, mitk::PointSet::Pointer pointSetB,
                           mitk::PlaneGeometry::Pointer planeGeometryA, mitk::PlaneGeometry::Pointer planeGeometryB);
+  void MovePlanes(mitk::PlaneGeometry::Pointer planeA, mitk::PlaneGeometry::Pointer planeB,
+                  double referenceDistance);
   void MovePoint(mitk::PlaneGeometry::Pointer planeGeometry, int fiducialNo);
   void DefineDataStorageImageFilter();
   void CreateQtPartControl(QWidget *parent);

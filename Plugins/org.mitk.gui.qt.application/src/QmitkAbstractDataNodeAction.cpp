@@ -48,11 +48,6 @@ void QmitkAbstractDataNodeAction::SetDataStorage(mitk::DataStorage* dataStorage)
   }
 }
 
-void QmitkAbstractDataNodeAction::InitializeWithDataNode(const mitk::DataNode* dataNode)
-{
-  // can be overwritten in sub classes
-}
-
 QList<mitk::DataNode::Pointer> QmitkAbstractDataNodeAction::GetSelectedNodes()
 {
   QList<mitk::DataNode::Pointer> selectedNodes;

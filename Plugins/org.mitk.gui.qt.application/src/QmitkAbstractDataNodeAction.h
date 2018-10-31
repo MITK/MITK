@@ -39,9 +39,9 @@ public:
 
   virtual ~QmitkAbstractDataNodeAction();
 
-  virtual void SetDataStorage(mitk::DataStorage* dataStorage);
+  void SetDataStorage(mitk::DataStorage* dataStorage);
 
-  virtual void InitializeWithDataNode(const mitk::DataNode* dataNode);
+  virtual void InitializeWithDataNode(const mitk::DataNode* dataNode) { }
 
 protected:
 

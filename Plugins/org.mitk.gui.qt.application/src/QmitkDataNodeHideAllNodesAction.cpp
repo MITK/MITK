@@ -47,17 +47,19 @@ void QmitkDataNodeHideAllNodesAction::InitializeAction()
 
 void QmitkDataNodeHideAllNodesAction::OnActionTriggered(bool checked)
 {
-  if (!m_DataStorage.IsExpired())
+  if (m_DataStorage.IsExpired())
   {
-    auto nodeset = m_DataStorage.Lock()->GetAll();
-    for (auto& node : *nodeset)
-    {
-      if (node.IsNotNull())
-      {
-        node->SetVisibility(false);
-      }
-    }
-
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    return;
   }
+
+  auto nodeset = m_DataStorage.Lock()->GetAll();
+  for (auto& node : *nodeset)
+  {
+    if (node.IsNotNull())
+    {
+      node->SetVisibility(false);
+    }
+  }
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

@@ -172,7 +172,7 @@ private:
   mitk::Image::Pointer m_FloatingImage;
   mitk::PointSet::Pointer m_MarkerModelCoordinateSystemPointSet;
   mitk::PointSet::Pointer m_MarkerFloatingImageCoordinateSystemPointSet;
-  
+
   ThresholdImageFilterType::Pointer m_ThresholdFilter;
   BinaryThresholdImageFilterType::Pointer m_BinaryThresholdFilter;
   LaplacianRecursiveGaussianImageFilterType::Pointer m_LaplacianFilter1;

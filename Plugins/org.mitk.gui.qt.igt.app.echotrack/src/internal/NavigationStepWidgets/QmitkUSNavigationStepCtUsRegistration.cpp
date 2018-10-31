@@ -1176,13 +1176,13 @@ void QmitkUSNavigationStepCtUsRegistration::OnRegisterMarkerToFloatingImageCS()
   vtkSmartPointer<vtkPoints> targetPoints = vtkSmartPointer<vtkPoints>::New();
   for (int i = 0; i<m_MarkerModelCoordinateSystemPointSet->GetSize(); i++)
   {
-    double point[3] = { m_MarkerModelCoordinateSystemPointSet->GetPoint(i)[0], 
-                        m_MarkerModelCoordinateSystemPointSet->GetPoint(i)[1], 
+    double point[3] = { m_MarkerModelCoordinateSystemPointSet->GetPoint(i)[0],
+                        m_MarkerModelCoordinateSystemPointSet->GetPoint(i)[1],
                         m_MarkerModelCoordinateSystemPointSet->GetPoint(i)[2] };
     sourcePoints->InsertNextPoint(point);
 
-    double point_targets[3] = { m_MarkerFloatingImageCoordinateSystemPointSet->GetPoint(i)[0], 
-                                m_MarkerFloatingImageCoordinateSystemPointSet->GetPoint(i)[1], 
+    double point_targets[3] = { m_MarkerFloatingImageCoordinateSystemPointSet->GetPoint(i)[0],
+                                m_MarkerFloatingImageCoordinateSystemPointSet->GetPoint(i)[1],
                                 m_MarkerFloatingImageCoordinateSystemPointSet->GetPoint(i)[2] };
     targetPoints->InsertNextPoint(point_targets);
   }

@@ -153,7 +153,7 @@ protected:
   void MovePoint(mitk::PlaneGeometry::Pointer planeGeometry, int fiducialNo);
   void DefineDataStorageImageFilter();
   void CreateQtPartControl(QWidget *parent);
-  
+
 protected slots:
   void OnFloatingImageComboBoxSelectionChanged(const mitk::DataNode* node);
   void OnFiducialMarkerModelComboBoxSelectionChanged(const mitk::DataNode* node);

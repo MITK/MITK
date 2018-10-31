@@ -1292,5 +1292,3 @@ void QmitkUSNavigationStepCtUsRegistration::OnLocalizeFiducials()
   // that there rested only 8 fiducial candidates.
   this->NumerateFiducialMarks();
 }
-
-

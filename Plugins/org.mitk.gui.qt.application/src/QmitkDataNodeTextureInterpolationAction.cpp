@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk core
 #include <mitkRenderingManager.h>
 
-QmitkDataNodeTextureInterpolationAction::QmitkDataNodeTextureInterpolationAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
+QmitkDataNodeTextureInterpolationAction::QmitkDataNodeTextureInterpolationAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
   : QAction(parent)
   , QmitkAbstractDataNodeAction(workbenchpartSite)
 {
@@ -27,7 +27,7 @@ QmitkDataNodeTextureInterpolationAction::QmitkDataNodeTextureInterpolationAction
   InitializeAction();
 }
 
-QmitkDataNodeTextureInterpolationAction::QmitkDataNodeTextureInterpolationAction(QObject* parent, berry::IWorkbenchPartSite* workbenchpartSite)
+QmitkDataNodeTextureInterpolationAction::QmitkDataNodeTextureInterpolationAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchpartSite)
   : QAction(parent)
   , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchpartSite))
 {

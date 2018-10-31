@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk gui common plugin
 #include <mitkWorkbenchUtil.h>
 
-QmitkDataNodeReinitAction::QmitkDataNodeReinitAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
+QmitkDataNodeReinitAction::QmitkDataNodeReinitAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
   : QAction(parent)
   , QmitkAbstractDataNodeAction(workbenchpartSite)
 {
@@ -34,7 +34,7 @@ QmitkDataNodeReinitAction::QmitkDataNodeReinitAction(QObject* parent, berry::IWo
   InitializeAction();
 }
 
-QmitkDataNodeReinitAction::QmitkDataNodeReinitAction(QObject* parent, berry::IWorkbenchPartSite* workbenchpartSite)
+QmitkDataNodeReinitAction::QmitkDataNodeReinitAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchpartSite)
   : QAction(parent)
   , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchpartSite))
 {

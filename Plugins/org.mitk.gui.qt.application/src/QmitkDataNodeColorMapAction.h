@@ -30,8 +30,8 @@ class MITK_QT_APP QmitkDataNodeColorMapAction : public QAction, public QmitkAbst
 
 public:
 
-  QmitkDataNodeColorMapAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
-  QmitkDataNodeColorMapAction(QObject* parent, berry::IWorkbenchPartSite* workbenchPartSite);
+  QmitkDataNodeColorMapAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
+  QmitkDataNodeColorMapAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
   virtual ~QmitkDataNodeColorMapAction() override;
 

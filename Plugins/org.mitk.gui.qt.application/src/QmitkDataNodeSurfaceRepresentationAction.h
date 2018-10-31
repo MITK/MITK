@@ -30,8 +30,8 @@ class MITK_QT_APP QmitkDataNodeSurfaceRepresentationAction : public QAction, pub
 
 public:
 
-  QmitkDataNodeSurfaceRepresentationAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
-  QmitkDataNodeSurfaceRepresentationAction(QObject* parent, berry::IWorkbenchPartSite* workbenchPartSite);
+  QmitkDataNodeSurfaceRepresentationAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
+  QmitkDataNodeSurfaceRepresentationAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
   virtual ~QmitkDataNodeSurfaceRepresentationAction() override;
 

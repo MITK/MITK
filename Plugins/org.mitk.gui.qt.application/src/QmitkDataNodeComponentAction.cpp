@@ -31,14 +31,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QHBoxLayout>
 #include <QLabel>
 
-QmitkDataNodeComponentAction::QmitkDataNodeComponentAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
+QmitkDataNodeComponentAction::QmitkDataNodeComponentAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
   : QWidgetAction(parent)
   , QmitkAbstractDataNodeAction(workbenchpartSite)
 {
   InitializeAction();
 }
 
-QmitkDataNodeComponentAction::QmitkDataNodeComponentAction(QObject* parent, berry::IWorkbenchPartSite* workbenchpartSite)
+QmitkDataNodeComponentAction::QmitkDataNodeComponentAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchpartSite)
   : QWidgetAction(parent)
   , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchpartSite))
 {

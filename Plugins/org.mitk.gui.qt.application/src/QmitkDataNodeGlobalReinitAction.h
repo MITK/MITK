@@ -37,8 +37,8 @@ public:
 
   static const QString ACTION_ID; // = "org.mitk.gui.qt.application.globalreinitaction";
 
-  QmitkDataNodeGlobalReinitAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
-  QmitkDataNodeGlobalReinitAction(QObject* parent, berry::IWorkbenchPartSite* workbenchPartSite);
+  QmitkDataNodeGlobalReinitAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
+  QmitkDataNodeGlobalReinitAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
   virtual ~QmitkDataNodeGlobalReinitAction() override;
 

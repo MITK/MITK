@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QMenu>
 
-QmitkDataNodeColorMapAction::QmitkDataNodeColorMapAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
+QmitkDataNodeColorMapAction::QmitkDataNodeColorMapAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
   : QAction(parent)
   , QmitkAbstractDataNodeAction(workbenchpartSite)
 {
@@ -40,7 +40,7 @@ QmitkDataNodeColorMapAction::QmitkDataNodeColorMapAction(QObject* parent, berry:
   InitializeAction();
 }
 
-QmitkDataNodeColorMapAction::QmitkDataNodeColorMapAction(QObject* parent, berry::IWorkbenchPartSite* workbenchpartSite)
+QmitkDataNodeColorMapAction::QmitkDataNodeColorMapAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchpartSite)
   : QAction(parent)
   , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchpartSite))
 {

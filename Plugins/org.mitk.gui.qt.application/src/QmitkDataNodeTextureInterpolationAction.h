@@ -30,8 +30,8 @@ class MITK_QT_APP QmitkDataNodeTextureInterpolationAction : public QAction, publ
 
 public:
 
-  QmitkDataNodeTextureInterpolationAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
-  QmitkDataNodeTextureInterpolationAction(QObject* parent, berry::IWorkbenchPartSite* workbenchPartSite);
+  QmitkDataNodeTextureInterpolationAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
+  QmitkDataNodeTextureInterpolationAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
   virtual ~QmitkDataNodeTextureInterpolationAction() override;
 

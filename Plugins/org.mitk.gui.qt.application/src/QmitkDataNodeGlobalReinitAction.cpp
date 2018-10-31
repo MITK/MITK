@@ -45,7 +45,7 @@ namespace GlobalReinitAction
   }
 }
 
-QmitkDataNodeGlobalReinitAction::QmitkDataNodeGlobalReinitAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
+QmitkDataNodeGlobalReinitAction::QmitkDataNodeGlobalReinitAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
   : QAction(parent)
   , QmitkAbstractDataNodeAction(workbenchPartSite)
 {
@@ -53,7 +53,7 @@ QmitkDataNodeGlobalReinitAction::QmitkDataNodeGlobalReinitAction(QObject* parent
   InitializeAction();
 }
 
-QmitkDataNodeGlobalReinitAction::QmitkDataNodeGlobalReinitAction(QObject* parent, berry::IWorkbenchPartSite* workbenchPartSite)
+QmitkDataNodeGlobalReinitAction::QmitkDataNodeGlobalReinitAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
   : QAction(parent)
   , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
 {

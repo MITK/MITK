@@ -30,8 +30,8 @@ class MITK_QT_APP QmitkDataNodeReinitAction : public QAction, public QmitkAbstra
 
 public:
 
-  QmitkDataNodeReinitAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
-  QmitkDataNodeReinitAction(QObject* parent, berry::IWorkbenchPartSite* workbenchPartSite);
+  QmitkDataNodeReinitAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
+  QmitkDataNodeReinitAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
   virtual ~QmitkDataNodeReinitAction() override;
 

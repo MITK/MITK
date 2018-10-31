@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QMenu>
 
-QmitkDataNodeSurfaceRepresentationAction::QmitkDataNodeSurfaceRepresentationAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
+QmitkDataNodeSurfaceRepresentationAction::QmitkDataNodeSurfaceRepresentationAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
   : QAction(parent)
   , QmitkAbstractDataNodeAction(workbenchpartSite)
 {
@@ -31,7 +31,7 @@ QmitkDataNodeSurfaceRepresentationAction::QmitkDataNodeSurfaceRepresentationActi
   InitializeAction();
 }
 
-QmitkDataNodeSurfaceRepresentationAction::QmitkDataNodeSurfaceRepresentationAction(QObject* parent, berry::IWorkbenchPartSite* workbenchpartSite)
+QmitkDataNodeSurfaceRepresentationAction::QmitkDataNodeSurfaceRepresentationAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchpartSite)
   : QAction(parent)
   , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchpartSite))
 {

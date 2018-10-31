@@ -24,14 +24,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QHBoxLayout>
 #include <QLabel>
 
-QmitkDataNodeColorAction::QmitkDataNodeColorAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
+QmitkDataNodeColorAction::QmitkDataNodeColorAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
   : QWidgetAction(parent)
   , QmitkAbstractDataNodeAction(workbenchPartSite)
 {
   InitializeAction();
 }
 
-QmitkDataNodeColorAction::QmitkDataNodeColorAction(QObject* parent, berry::IWorkbenchPartSite* workbenchPartSite)
+QmitkDataNodeColorAction::QmitkDataNodeColorAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
   : QWidgetAction(parent)
   , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
 {

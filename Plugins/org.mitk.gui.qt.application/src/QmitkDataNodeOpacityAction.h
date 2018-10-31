@@ -31,8 +31,8 @@ class MITK_QT_APP QmitkDataNodeOpacityAction : public QWidgetAction, public Qmit
 
 public:
 
-  QmitkDataNodeOpacityAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
-  QmitkDataNodeOpacityAction(QObject* parent, berry::IWorkbenchPartSite* workbenchPartSite);
+  QmitkDataNodeOpacityAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
+  QmitkDataNodeOpacityAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
   virtual ~QmitkDataNodeOpacityAction() override;
 

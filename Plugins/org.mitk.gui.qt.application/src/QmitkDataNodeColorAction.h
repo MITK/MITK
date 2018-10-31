@@ -31,8 +31,8 @@ class MITK_QT_APP QmitkDataNodeColorAction : public QWidgetAction, public QmitkA
 
 public:
 
-  QmitkDataNodeColorAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
-  QmitkDataNodeColorAction(QObject* parent, berry::IWorkbenchPartSite* workbenchPartSite);
+  QmitkDataNodeColorAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
+  QmitkDataNodeColorAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
   virtual ~QmitkDataNodeColorAction() override;
 

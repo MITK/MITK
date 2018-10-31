@@ -23,14 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QHBoxLayout>
 #include <QLabel>
 
-QmitkDataNodeOpacityAction::QmitkDataNodeOpacityAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
+QmitkDataNodeOpacityAction::QmitkDataNodeOpacityAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
   : QWidgetAction(parent)
   , QmitkAbstractDataNodeAction(workbenchPartSite)
 {
   InitializeAction();
 }
 
-QmitkDataNodeOpacityAction::QmitkDataNodeOpacityAction(QObject* parent, berry::IWorkbenchPartSite* workbenchPartSite)
+QmitkDataNodeOpacityAction::QmitkDataNodeOpacityAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
   : QWidgetAction(parent)
   , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
 {

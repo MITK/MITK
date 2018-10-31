@@ -33,8 +33,8 @@ class MITK_QT_APP QmitkDataNodeComponentAction : public QWidgetAction, public Qm
 
 public:
 
-  QmitkDataNodeComponentAction(QObject* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
-  QmitkDataNodeComponentAction(QObject* parent, berry::IWorkbenchPartSite* workbenchPartSite);
+  QmitkDataNodeComponentAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
+  QmitkDataNodeComponentAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
   virtual ~QmitkDataNodeComponentAction() override;
 

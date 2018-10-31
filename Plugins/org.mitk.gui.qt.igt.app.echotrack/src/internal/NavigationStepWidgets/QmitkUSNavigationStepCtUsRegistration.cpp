@@ -189,7 +189,7 @@ bool QmitkUSNavigationStepCtUsRegistration::FilterFloatingImage()
 
   ImageType::Pointer binaryImage = ImageType::New();
   binaryImage = m_HoleFillingFilter->GetOutput();
-  
+
   this->EliminateTooSmallLabeledObjects(binaryImage);
   mitk::CastToMitkImage(binaryImage, m_FloatingImage);
   return true;
@@ -281,7 +281,7 @@ bool QmitkUSNavigationStepCtUsRegistration::EliminateFiducialCandidatesByEuclide
   {
     return false;
   }
-  
+
   for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
   {
     int amountOfAcceptedFiducials = 0;
@@ -297,7 +297,7 @@ bool QmitkUSNavigationStepCtUsRegistration::EliminateFiducialCandidatesByEuclide
       }
       mitk::Point3D otherCentroid(m_CentroidsOfFiducialCandidates.at(position));
       double distance = fiducialCentroid.EuclideanDistanceTo(otherCentroid);
-      
+
       if (distance > 7.93 && distance < 31.0)
       {
         ++amountOfAcceptedFiducials;
@@ -371,7 +371,7 @@ void QmitkUSNavigationStepCtUsRegistration::ClassifyFiducialCandidates()
     }// End for-loop distances-vector
 
     //Now, having looped through all distances of one fiducial candidate, check
-    // if the combination of different distances is known. The >= is due to the 
+    // if the combination of different distances is known. The >= is due to the
     // possible occurrence of other fiducial candidates that have an distance equal to
     // one of the distances A - E. However, false fiducial candidates outside the 
     // the fiducial marker does not have the right distance configuration:
@@ -387,7 +387,7 @@ void QmitkUSNavigationStepCtUsRegistration::ClassifyFiducialCandidates()
   for (int count = fiducialCandidatesToBeRemoved.size() - 1; count >= 0; --count)
   {
     MITK_INFO << "Removing fiducial candidate " << fiducialCandidatesToBeRemoved.at(count);
-    m_CentroidsOfFiducialCandidates.erase(m_CentroidsOfFiducialCandidates.begin() 
+    m_CentroidsOfFiducialCandidates.erase(m_CentroidsOfFiducialCandidates.begin()
                                           + fiducialCandidatesToBeRemoved.at(count));
   }
 }
@@ -529,7 +529,7 @@ void QmitkUSNavigationStepCtUsRegistration::NumerateFiducialMarks()
     msgBox.exec();
     return;
   }
-  
+
   this->OptimizeFiducialPositions();
 
   if (m_MarkerFloatingImageCoordinateSystemPointSet.IsNull())
@@ -670,7 +670,7 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo2And3()
   crossProduct.SetVnlVector(crossProductVnl);
 
   mitk::Vector3D vectorFiducial1ToRandomLeftFiducial = m_CentroidsOfFiducialCandidates.at(0) - m_FiducialMarkerCentroids.at(1);
-  
+
   double scalarProduct = (crossProduct * vectorFiducial1ToRandomLeftFiducial) /
                          (crossProduct.GetNorm() * vectorFiducial1ToRandomLeftFiducial.GetNorm());
 
@@ -863,8 +863,8 @@ void QmitkUSNavigationStepCtUsRegistration::OptimizeFiducialPositions()
   MITK_INFO << "NormalVector plane 1234 = " << planeGeometry1234->GetNormal();
   MITK_INFO << "NormalVector plane 5678 = " << planeGeometry5678->GetNormal();
   MITK_INFO << "Are parallel: " << planeGeometry1234->IsParallel(planeGeometry5678);
-  
-  
+
+
   //Optimize now the positions of Fiducials 1 - 2 - 5 and 4 - 7 - 8
   //Initialization for planes 1 - 2 - 5 and 4 - 7 - 8
   mitk::PlaneFit::Pointer planeFit125 = mitk::PlaneFit::New();
@@ -1230,7 +1230,7 @@ void QmitkUSNavigationStepCtUsRegistration::OnRegisterMarkerToFloatingImageCS()
   //############### object is transformed ##########################
   //transform surface/image
   //only move image if we have one. Sometimes, this widget is used just to register point sets without images.
-  
+
   /*if (m_ImageNode.IsNotNull())
   {
     //first we have to store the original ct image transform to compose it with the new transform later
@@ -1274,9 +1274,9 @@ void QmitkUSNavigationStepCtUsRegistration::OnLocalizeFiducials()
     msgBox.exec();
     return;
   }
-  
+
   this->GetCentroidsOfLabeledObjects();
-  
+
   if (!this->EliminateFiducialCandidatesByEuclideanDistances() ||
       m_CentroidsOfFiducialCandidates.size() != NUMBER_FIDUCIALS_NEEDED)
   {
@@ -1288,7 +1288,7 @@ void QmitkUSNavigationStepCtUsRegistration::OnLocalizeFiducials()
     return;
   }
 
-  //Before calling NumerateFiducialMarks it must be sure, 
+  //Before calling NumerateFiducialMarks it must be sure,
   // that there rested only 8 fiducial candidates.
   this->NumerateFiducialMarks();
 }

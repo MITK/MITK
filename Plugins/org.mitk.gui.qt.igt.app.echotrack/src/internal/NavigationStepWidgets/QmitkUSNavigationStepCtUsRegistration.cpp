@@ -81,6 +81,7 @@ bool QmitkUSNavigationStepCtUsRegistration::OnActivateStep()
   MITK_INFO << "OnActivateStep()";
   ui->floatingImageComboBox->SetDataStorage(this->GetDataStorage());
   ui->fiducialMarkerModelPointSetComboBox->SetDataStorage(this->GetDataStorage());
+  ui->groundTruthImageComboBox->SetDataStorage(this->GetDataStorage());
   return true;
 }
 
@@ -530,7 +531,10 @@ void QmitkUSNavigationStepCtUsRegistration::NumerateFiducialMarks()
     return;
   }
 
-  this->OptimizeFiducialPositions();
+  if( ui->optimizeFiducialPositionsCheckBox->isChecked())
+  {
+    this->OptimizeFiducialPositions();
+  }
 
   if (m_MarkerFloatingImageCoordinateSystemPointSet.IsNull())
   {
@@ -545,6 +549,92 @@ void QmitkUSNavigationStepCtUsRegistration::NumerateFiducialMarks()
   node->SetName("MarkerFloatingImageCSPointSet");
   //node->SetFloatProperty("pointsize", 5.0);
   this->GetDataStorage()->Add(node);
+}
+
+void QmitkUSNavigationStepCtUsRegistration::ShowGroundTruthMarkerEdges()
+{
+  mitk::Point3D edge1;
+  mitk::Point3D edge2;
+  mitk::Point3D edge3;
+  mitk::Point3D edge4;
+  mitk::Point3D edge5;
+  mitk::Point3D edge6;
+  mitk::Point3D edge7;
+  mitk::Point3D edge8;
+
+  edge1[0] = -5;
+  edge1[1] = -5;
+  edge1[2] = -7.5;
+
+  edge2[0] = -5;
+  edge2[1] = 25;
+  edge2[2] = -7.5;
+
+  edge3[0] = 25;
+  edge3[1] = 25;
+  edge3[2] = -7.5;
+
+  edge4[0] = 25;
+  edge4[1] = -5;
+  edge4[2] = -7.5;
+
+  edge5[0] = -5;
+  edge5[1] = -5;
+  edge5[2] = 15;
+
+  edge6[0] = -5;
+  edge6[1] = 25;
+  edge6[2] = 15;
+
+  edge7[0] = 25;
+  edge7[1] = 25;
+  edge7[2] = 15;
+
+  edge8[0] = 25;
+  edge8[1] = -5;
+  edge8[2] = 15;
+
+  mitk::PointSet::Pointer edgePointSet = mitk::PointSet::New();
+  edgePointSet->InsertPoint(0, edge1);
+  edgePointSet->InsertPoint(1, edge2);
+  edgePointSet->InsertPoint(2, edge3);
+  edgePointSet->InsertPoint(3, edge4);
+  edgePointSet->InsertPoint(4, edge1);
+  edgePointSet->InsertPoint(5, edge5);
+  edgePointSet->InsertPoint(6, edge6);
+  edgePointSet->InsertPoint(7, edge7);
+  edgePointSet->InsertPoint(8, edge8);
+  edgePointSet->InsertPoint(9, edge5);
+  edgePointSet->InsertPoint(10, edge6);
+  edgePointSet->InsertPoint(11, edge2);
+  edgePointSet->InsertPoint(12, edge6);
+  edgePointSet->InsertPoint(13, edge7);
+  edgePointSet->InsertPoint(14, edge3);
+  edgePointSet->InsertPoint(15, edge7);
+  edgePointSet->InsertPoint(16, edge8);
+  edgePointSet->InsertPoint(17, edge4);
+
+  mitk::DataNode::Pointer node = mitk::DataNode::New();
+  node->SetData(edgePointSet);
+  node->SetName("Marker Edges PointSet");
+  node->SetBoolProperty("show contour", true);
+  node->SetFloatProperty("pointsize", 0.25);
+  this->GetDataStorage()->Add(node);
+
+  mitk::PointSet* pointSet_orig = edgePointSet;
+  mitk::PointSet::Pointer pointSet_moved = mitk::PointSet::New();
+
+  for (int i = 0; i < pointSet_orig->GetSize(); i++)
+  {
+    pointSet_moved->InsertPoint(m_TransformMarkerCSToFloatingImageCS->TransformPoint(pointSet_orig->GetPoint(i)));
+  }
+
+  pointSet_orig->Clear();
+  for (int i = 0; i < pointSet_moved->GetSize(); i++)
+    pointSet_orig->InsertPoint(pointSet_moved->GetPoint(i));
+
+  //Do a global reinit
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 }
 
 void QmitkUSNavigationStepCtUsRegistration::CalculateDistancesBetweenFiducials(std::vector<std::vector<double>>& distanceVectorsFiducials)
@@ -828,6 +918,7 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo8()
 
 void QmitkUSNavigationStepCtUsRegistration::OptimizeFiducialPositions()
 {
+  MITK_INFO << "OptimizeFiducialPositions()";
   //Initialization for planes 1 - 2 - 3 - 4 and 5 - 6 - 7 - 8
   mitk::PlaneFit::Pointer planeFit1234 = mitk::PlaneFit::New();
   mitk::PlaneFit::Pointer planeFit5678 = mitk::PlaneFit::New();
@@ -863,7 +954,6 @@ void QmitkUSNavigationStepCtUsRegistration::OptimizeFiducialPositions()
   MITK_INFO << "NormalVector plane 1234 = " << planeGeometry1234->GetNormal();
   MITK_INFO << "NormalVector plane 5678 = " << planeGeometry5678->GetNormal();
   MITK_INFO << "Are parallel: " << planeGeometry1234->IsParallel(planeGeometry5678);
-
 
   //Optimize now the positions of Fiducials 1 - 2 - 5 and 4 - 7 - 8
   //Initialization for planes 1 - 2 - 5 and 4 - 7 - 8
@@ -1066,16 +1156,21 @@ void QmitkUSNavigationStepCtUsRegistration::CreateQtPartControl(QWidget *parent)
   ui->setupUi(parent);
   ui->floatingImageComboBox->SetPredicate(m_IsAPatientImagePredicate);
   ui->fiducialMarkerModelPointSetComboBox->SetPredicate(m_IsAPointSetPredicate);
+  ui->groundTruthImageComboBox->SetPredicate(m_IsAPatientImagePredicate);
 
   // create signal/slot connections
   connect(ui->floatingImageComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
     this, SLOT(OnFloatingImageComboBoxSelectionChanged(const mitk::DataNode*)));
   connect(ui->fiducialMarkerModelPointSetComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
     this, SLOT(OnFiducialMarkerModelComboBoxSelectionChanged(const mitk::DataNode*)));
+  connect(ui->groundTruthImageComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
+    this, SLOT(OnGroundTruthImageComboBoxSelectionChanged(const mitk::DataNode*)));
   connect(ui->doRegistrationMarkerToImagePushButton, SIGNAL(clicked()),
     this, SLOT(OnRegisterMarkerToFloatingImageCS()));
   connect(ui->localizeFiducialMarkerPushButton, SIGNAL(clicked()),
     this, SLOT(OnLocalizeFiducials()));
+  connect(ui->filterImageGroundTruthEvaluationPushButton, SIGNAL(clicked()),
+    this, SLOT(OnFilterGroundTruthImage()));
 }
 
 void QmitkUSNavigationStepCtUsRegistration::OnFloatingImageComboBoxSelectionChanged(const mitk::DataNode* node)
@@ -1146,6 +1241,39 @@ void QmitkUSNavigationStepCtUsRegistration::OnFiducialMarkerModelComboBoxSelecti
   }
 
   m_MarkerModelCoordinateSystemPointSet = pointSet;
+}
+
+void QmitkUSNavigationStepCtUsRegistration::OnGroundTruthImageComboBoxSelectionChanged(const mitk::DataNode* node)
+{
+  MITK_INFO << "OnGroundTruthImageComboBoxSelectionChanged()";
+
+  if (m_GroundTruthImage.IsNotNull())
+  {
+    //TODO: Define, what will happen if the imageCT is not null...
+  }
+
+  if (node == nullptr)
+  {
+    m_GroundTruthImage = nullptr;
+    return;
+  }
+
+  mitk::DataNode* selectedGroundTruthImage = ui->groundTruthImageComboBox->GetSelectedNode();
+  if (selectedGroundTruthImage == nullptr)
+  {
+    m_GroundTruthImage = nullptr;
+    return;
+  }
+
+  mitk::Image::Pointer groundTruthImage = dynamic_cast<mitk::Image*>(selectedGroundTruthImage->GetData());
+  if (groundTruthImage.IsNull())
+  {
+    MITK_WARN << "Failed to cast selected groundTruth image node to mitk::Image*";
+    m_GroundTruthImage = nullptr;
+    return;
+  }
+
+  m_GroundTruthImage = groundTruthImage;
 }
 
 void QmitkUSNavigationStepCtUsRegistration::OnRegisterMarkerToFloatingImageCS()
@@ -1291,4 +1419,14 @@ void QmitkUSNavigationStepCtUsRegistration::OnLocalizeFiducials()
   //Before calling NumerateFiducialMarks it must be sure,
   // that there rested only 8 fiducial candidates.
   this->NumerateFiducialMarks();
+}
+
+void QmitkUSNavigationStepCtUsRegistration::OnFilterGroundTruthImage()
+{
+  /*if (m_GroundTruthImage.IsNull())
+  {
+    return;
+  }*/
+
+  this->ShowGroundTruthMarkerEdges();
 }

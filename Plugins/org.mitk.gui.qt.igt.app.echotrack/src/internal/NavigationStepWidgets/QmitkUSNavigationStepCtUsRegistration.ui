@@ -35,14 +35,24 @@
     <widget class="QmitkDataStorageComboBox" name="fiducialMarkerModelPointSetComboBox"/>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QGridLayout" name="gridLayout">
      <property name="topMargin">
       <number>10</number>
      </property>
      <property name="bottomMargin">
       <number>10</number>
      </property>
-     <item>
+     <item row="0" column="1">
+      <widget class="QRadioButton" name="fiducialDiameter3mmRadioButton">
+       <property name="text">
+        <string>3mm Fiducial Diameter</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
       <widget class="QRadioButton" name="fiducialDiameter5mmRadioButton">
        <property name="text">
         <string>5mm Fiducial Diameter</string>
@@ -52,13 +62,13 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QRadioButton" name="fiducialDiameter3mmRadioButton">
+     <item row="1" column="0">
+      <widget class="QCheckBox" name="optimizeFiducialPositionsCheckBox">
        <property name="text">
-        <string>3mm Fiducial Diameter</string>
+        <string>Optimize Fiducial Positions</string>
        </property>
        <property name="checked">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -88,6 +98,29 @@
     <widget class="QPushButton" name="doRegistrationMarkerToImagePushButton">
      <property name="text">
       <string>Do Registration Marker CS -&gt; Floating Image CS</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QmitkDataStorageComboBox" name="groundTruthImageComboBox"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="filterImageGroundTruthEvaluationPushButton">
+     <property name="text">
+      <string>Filter Image For Ground Truth Evaluation</string>
      </property>
     </widget>
    </item>

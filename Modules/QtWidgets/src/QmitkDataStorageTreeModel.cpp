@@ -250,6 +250,8 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
 
       int dragIndex = 0;
 
+      this->beginResetModel();
+
       // Iterate through the list of TreeItem (which may be at non-consecutive indexes).
       QList<TreeItem*>::iterator diIter;
       for (diIter  = listOfItemsToDrop.begin();
@@ -266,9 +268,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
         }
 
         // Here we assume that as you remove items, one at a time, that GetIndex() will be valid.
-        this->beginRemoveRows(this->IndexFromTreeItem(itemToDrop->GetParent()), itemToDrop->GetIndex(), itemToDrop->GetIndex());
         itemToDrop->GetParent()->RemoveChild(itemToDrop);
-        this->endRemoveRows();
       }
 
       // row = -1 dropped on an item, row != -1 dropped  in between two items
@@ -291,16 +291,6 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
         dropIndex = parentItem->GetChildCount() - 1;
 
       // Now insert items again at the drop item position
-
-      if (m_AllowHierarchyChange)
-      {
-        this->beginInsertRows(dropItemModelIndex, dropIndex, dropIndex + listOfItemsToDrop.size() - 1);
-      }
-      else
-      {
-        this->beginInsertRows(parentModelIndex, dropIndex, dropIndex + listOfItemsToDrop.size() - 1);
-      }
-
       for (diIter  = listOfItemsToDrop.begin();
            diIter != listOfItemsToDrop.end();
            diIter++)
@@ -331,10 +321,11 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
 
         dropIndex++;
       }
-      this->endInsertRows();
 
       // Change Layers to match.
       this->AdjustLayerProperty();
+
+      this->endResetModel();
     }
   }
   else if(data->hasFormat("application/x-mitk-datanodes"))

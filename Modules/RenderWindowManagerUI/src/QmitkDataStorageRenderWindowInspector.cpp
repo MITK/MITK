@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 // render window manager UI module
-#include "QmitkRenderWindowManipulatorWidget.h"
+#include "QmitkDataStorageRenderWindowInspector.h"
 
 #include "QmitkCustomVariants.h"
 
@@ -25,39 +25,61 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QSignalMapper>
 
-QmitkRenderWindowManipulatorWidget::QmitkRenderWindowManipulatorWidget(mitk::DataStorage::Pointer dataStorage, QWidget* parent /*=nullptr*/)
-  : QWidget(parent)
-  , m_DataStorage(dataStorage)
+QmitkDataStorageRenderWindowInspector::QmitkDataStorageRenderWindowInspector(QWidget* parent /*=nullptr*/)
+  : QmitkAbstractDataStorageInspector(parent)
 {
-  Init();
-}
-
-void QmitkRenderWindowManipulatorWidget::Init()
-{
-  // create GUI from the Qt Designer's .ui file
   m_Controls.setupUi(this);
 
   // initialize the render window layer controller and the render window view direction controller
   // and set the controller renderer (in constructor) and the data storage
   m_RenderWindowLayerController = std::make_unique<mitk::RenderWindowLayerController>();
   m_RenderWindowViewDirectionController = std::make_unique<mitk::RenderWindowViewDirectionController>();
-  m_RenderWindowLayerController->SetDataStorage(m_DataStorage);
-  m_RenderWindowViewDirectionController->SetDataStorage(m_DataStorage);
+
 
   // create a new model
-  m_RenderWindowDataModel = std::make_unique<QmitkRenderWindowDataModel>(this);
-  m_RenderWindowDataModel->SetDataStorage(m_DataStorage);
+  m_StorageModel = std::make_unique<QmitkDataStorageRenderWindowListModel>(this);
 
-  m_Controls.renderWindowTableView->setModel(m_RenderWindowDataModel.get());
-  m_Controls.renderWindowTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-  m_Controls.renderWindowTableView->horizontalHeader()->setStretchLastSection(true);
-  m_Controls.renderWindowTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_Controls.renderWindowTableView->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_Controls.renderWindowListView->setModel(m_StorageModel.get());
+  m_Controls.renderWindowListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  m_Controls.renderWindowListView->setSelectionBehavior(QAbstractItemView::SelectRows);
+  m_Controls.renderWindowListView->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_Controls.renderWindowListView->setAlternatingRowColors(true);
 
   SetUpConnections();
 }
 
-void QmitkRenderWindowManipulatorWidget::SetUpConnections()
+QAbstractItemView* QmitkDataStorageRenderWindowInspector::GetView()
+{
+  return m_Controls.renderWindowListView;
+};
+
+const QAbstractItemView* QmitkDataStorageRenderWindowInspector::GetView() const
+{
+  return m_Controls.renderWindowListView;
+};
+
+void QmitkDataStorageRenderWindowInspector::SetSelectionMode(SelectionMode mode)
+{
+  m_Controls.renderWindowListView->setSelectionMode(mode);
+}
+
+QmitkDataStorageRenderWindowInspector::SelectionMode QmitkDataStorageRenderWindowInspector::GetSelectionMode() const
+{
+  return m_Controls.renderWindowListView->selectionMode();
+}
+
+void QmitkDataStorageRenderWindowInspector::Initialize()
+{
+  m_StorageModel->SetDataStorage(m_DataStorage.Lock());
+  m_StorageModel->SetNodePredicate(m_NodePredicate);
+
+  m_RenderWindowLayerController->SetDataStorage(m_DataStorage.Lock());
+  m_RenderWindowViewDirectionController->SetDataStorage(m_DataStorage.Lock());
+
+  m_Connector->SetView(m_Controls.renderWindowListView);
+}
+
+void QmitkDataStorageRenderWindowInspector::SetUpConnections()
 {
   // signal to signal connection
   connect(m_Controls.pushButtonAddLayer, SIGNAL(clicked()), this, SIGNAL(AddLayerButtonClicked()));
@@ -84,23 +106,21 @@ void QmitkRenderWindowManipulatorWidget::SetUpConnections()
   connect(m_Controls.radioButtonSagittal, SIGNAL(clicked()), changeViewDirectionSignalMapper, SLOT(map()));
 }
 
-void QmitkRenderWindowManipulatorWidget::SetControlledRenderer(RenderWindowLayerUtilities::RendererVector controlledRenderer)
+void QmitkDataStorageRenderWindowInspector::SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer)
 {
   m_RenderWindowLayerController->SetControlledRenderer(controlledRenderer);
   m_RenderWindowViewDirectionController->SetControlledRenderer(controlledRenderer);
 }
 
-void QmitkRenderWindowManipulatorWidget::SetActiveRenderWindow(const QString &renderWindowId)
+void QmitkDataStorageRenderWindowInspector::SetActiveRenderWindow(const QString& renderWindowId)
 {
-  std::string currentRendererName = renderWindowId.toStdString();
-  m_RenderWindowDataModel->SetCurrentRenderer(currentRendererName);
-
-  mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(currentRendererName);
+  mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(renderWindowId.toStdString());
   if (nullptr == selectedRenderer)
   {
     return;
   }
 
+  m_StorageModel->SetCurrentRenderer(selectedRenderer);
   mitk::SliceNavigationController::ViewDirection viewDirection = selectedRenderer->GetSliceNavigationController()->GetDefaultViewDirection();
   switch (viewDirection)
   {
@@ -118,55 +138,56 @@ void QmitkRenderWindowManipulatorWidget::SetActiveRenderWindow(const QString &re
   }
 }
 
-void QmitkRenderWindowManipulatorWidget::AddLayer(mitk::DataNode* dataNode)
+void QmitkDataStorageRenderWindowInspector::AddLayer(mitk::DataNode* dataNode)
 {
-  m_RenderWindowLayerController->InsertLayerNode(dataNode, -1, m_RenderWindowDataModel->GetCurrentRenderer());
+  m_RenderWindowLayerController->InsertLayerNode(dataNode, -1, m_StorageModel->GetCurrentRenderer());
 }
 
-void QmitkRenderWindowManipulatorWidget::AddLayerToAllRenderer(mitk::DataNode* dataNode)
+void QmitkDataStorageRenderWindowInspector::AddLayerToAllRenderer(mitk::DataNode* dataNode)
 {
   m_RenderWindowLayerController->InsertLayerNode(dataNode, -1, nullptr);
 }
 
-void QmitkRenderWindowManipulatorWidget::HideDataNodeInAllRenderer(const mitk::DataNode* dataNode)
+void QmitkDataStorageRenderWindowInspector::HideDataNodeInAllRenderer(const mitk::DataNode* dataNode)
 {
   m_RenderWindowLayerController->HideDataNodeInAllRenderer(dataNode);
 }
 
-void QmitkRenderWindowManipulatorWidget::RemoveLayer()
+void QmitkDataStorageRenderWindowInspector::RemoveLayer()
 {
-  QModelIndex selectedIndex = m_Controls.renderWindowTableView->currentIndex();
+  QModelIndex selectedIndex = m_Controls.renderWindowListView->currentIndex();
   if (selectedIndex.isValid())
   {
 
-    QVariant qvariantDataNode = m_RenderWindowDataModel->data(selectedIndex, Qt::UserRole);
+    QVariant qvariantDataNode = m_StorageModel->data(selectedIndex, Qt::UserRole);
     if (qvariantDataNode.canConvert<mitk::DataNode*>())
     {
       mitk::DataNode* dataNode = qvariantDataNode.value<mitk::DataNode*>();
-      m_RenderWindowLayerController->RemoveLayerNode(dataNode, m_RenderWindowDataModel->GetCurrentRenderer());
-      m_Controls.renderWindowTableView->clearSelection();
+      m_RenderWindowLayerController->RemoveLayerNode(dataNode, m_StorageModel->GetCurrentRenderer());
+      m_Controls.renderWindowListView->clearSelection();
     }
   }
 }
 
-void QmitkRenderWindowManipulatorWidget::SetAsBaseLayer()
+void QmitkDataStorageRenderWindowInspector::SetAsBaseLayer()
 {
-  QModelIndex selectedIndex = m_Controls.renderWindowTableView->currentIndex();
+  QModelIndex selectedIndex = m_Controls.renderWindowListView->currentIndex();
   if (selectedIndex.isValid())
   {
-    QVariant qvariantDataNode = m_RenderWindowDataModel->data(selectedIndex, Qt::UserRole);
+    QVariant qvariantDataNode = m_StorageModel->data(selectedIndex, Qt::UserRole);
     if (qvariantDataNode.canConvert<mitk::DataNode*>())
     {
       mitk::DataNode* dataNode = qvariantDataNode.value<mitk::DataNode*>();
-      m_RenderWindowLayerController->SetBaseDataNode(dataNode, m_RenderWindowDataModel->GetCurrentRenderer());
-      m_Controls.renderWindowTableView->clearSelection();
+      m_RenderWindowLayerController->SetBaseDataNode(dataNode, m_StorageModel->GetCurrentRenderer());
+      m_Controls.renderWindowListView->clearSelection();
     }
   }
 }
 
-void QmitkRenderWindowManipulatorWidget::MoveLayer(const QString &direction)
+void QmitkDataStorageRenderWindowInspector::MoveLayer(const QString& direction)
 {
-  QModelIndex selectedIndex = m_Controls.renderWindowTableView->currentIndex();
+  /*
+  QModelIndex selectedIndex = m_Controls.renderWindowListView->currentIndex();
   if (selectedIndex.isValid())
   {
     QVariant qvariantDataNode = m_RenderWindowDataModel->data(selectedIndex, Qt::UserRole);
@@ -182,7 +203,7 @@ void QmitkRenderWindowManipulatorWidget::MoveLayer(const QString &direction)
         if (success)
         {
           // node has been successfully moved up
-          m_Controls.renderWindowTableView->selectRow(selectedIndex.row() - 1);
+          m_Controls.renderWindowListView->selectRow(selectedIndex.row() - 1);
         }
       }
       else
@@ -191,26 +212,27 @@ void QmitkRenderWindowManipulatorWidget::MoveLayer(const QString &direction)
         if (success)
         {
           // node has been successfully moved down
-          m_Controls.renderWindowTableView->selectRow(selectedIndex.row() + 1);
+          m_Controls.renderWindowListView->selectRow(selectedIndex.row() + 1);
         }
       }
     }
   }
+  */
 }
 
-void QmitkRenderWindowManipulatorWidget::ResetRenderer()
+void QmitkDataStorageRenderWindowInspector::ResetRenderer()
 {
-  m_RenderWindowLayerController->ResetRenderer(true, m_RenderWindowDataModel->GetCurrentRenderer());
-  m_Controls.renderWindowTableView->clearSelection();
+  m_RenderWindowLayerController->ResetRenderer(true, m_StorageModel->GetCurrentRenderer());
+  m_Controls.renderWindowListView->clearSelection();
 }
 
-void QmitkRenderWindowManipulatorWidget::ClearRenderer()
+void QmitkDataStorageRenderWindowInspector::ClearRenderer()
 {
-  m_RenderWindowLayerController->ResetRenderer(false, m_RenderWindowDataModel->GetCurrentRenderer());
-  m_Controls.renderWindowTableView->clearSelection();
+  m_RenderWindowLayerController->ResetRenderer(false, m_StorageModel->GetCurrentRenderer());
+  m_Controls.renderWindowListView->clearSelection();
 }
 
-void QmitkRenderWindowManipulatorWidget::ChangeViewDirection(const QString &viewDirection)
+void QmitkDataStorageRenderWindowInspector::ChangeViewDirection(const QString& viewDirection)
 {
-  m_RenderWindowViewDirectionController->SetViewDirectionOfRenderer(viewDirection.toStdString(), m_RenderWindowDataModel->GetCurrentRenderer());
+  m_RenderWindowViewDirectionController->SetViewDirectionOfRenderer(viewDirection.toStdString(), m_StorageModel->GetCurrentRenderer());
 }

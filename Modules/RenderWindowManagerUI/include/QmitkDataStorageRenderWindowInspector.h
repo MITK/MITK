@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKRENDERWINDOWMANIPULATORWIDGET_H
-#define QMITKRENDERWINDOWMANIPULATORWIDGET_H
+#ifndef QMITKDATASTORAGERENDERWINDOWINSPECTOR_H
+#define QMITKDATASTORAGERENDERWINDOWINSPECTOR_H
 
 // render window manager UI module
 #include "MitkRenderWindowManagerUIExports.h"
@@ -24,13 +24,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 // render window manager module
 #include <mitkRenderWindowLayerController.h>
 #include <mitkRenderWindowViewDirectionController.h>
-#include <QmitkRenderWindowDataModel.h>
+#include <QmitkDataStorageRenderWindowListModel.h>
 
-// qt
-#include <QWidget>
+// qt widgets module
+#include <QmitkAbstractDataStorageInspector.h>
 
 /**
-* The QmitkRenderWindowManipulatorWidget offers a GUI to manipulate the base renderer / render windows of the MITK workbench.
+* The 'QmitkDataStorageRenderWindowInspector' offers a GUI to manipulate the base renderer / render windows of the MITK workbench.
 * The widgets supports adding a layer to an active render window, moving layers up and down, removing layers,
 * resetting layers (hiding them) or removing all layers at once.
 *
@@ -39,23 +39,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 * The plugin also has to provide a Q_SLOT that is connected to the 'AddLayerButtonClicked'-Q_SIGNAL of this widget.
 * This allows for a customized add-layer functionality.
 */
-class MITKRENDERWINDOWMANAGERUI_EXPORT QmitkRenderWindowManipulatorWidget : public QWidget
+class MITKRENDERWINDOWMANAGERUI_EXPORT QmitkDataStorageRenderWindowInspector : public QmitkAbstractDataStorageInspector
 {
   Q_OBJECT
 
 public:
 
-  QmitkRenderWindowManipulatorWidget(mitk::DataStorage::Pointer dataStorage, QWidget* parent = nullptr);
+  QmitkDataStorageRenderWindowInspector(QWidget* parent = nullptr);
+
+  // override from 'QmitkAbstractDataStorageInspector'
+  /*
+  * @brief See 'QmitkAbstractDataStorageInspector'
+  */
+  virtual QAbstractItemView* GetView() override;
+  /*
+  * @brief See 'QmitkAbstractDataStorageInspector'
+  */
+  virtual const QAbstractItemView* GetView() const override;
+  /*
+  * @brief See 'QmitkAbstractDataStorageInspector'
+  */
+  virtual void SetSelectionMode(SelectionMode mode) override;
+  /*
+  * @brief See 'QmitkAbstractDataStorageInspector'
+  */
+  virtual SelectionMode GetSelectionMode() const override;
+
   /**
   * @brief Set the controlled base renderer.
   */
-  void SetControlledRenderer(RenderWindowLayerUtilities::RendererVector controlledRenderer);
+  void SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer);
   /**
   * @brief Set the currently selected render window
   *
   * @param renderWindowId   the text inside the combo box
   */
-  void SetActiveRenderWindow(const QString &renderWindowId);
+  void SetActiveRenderWindow(const QString& renderWindowId);
   /**
   * @brief Use the RenderWindowLayerController to insert the given data node into the currently active render window.
   *       The new node is placed on top of all existing layer nodes in that render window.
@@ -85,24 +104,23 @@ private Q_SLOTS:
   void RemoveLayer();
   void SetAsBaseLayer();
 
-  void MoveLayer(const QString &direction);
+  void MoveLayer(const QString& direction);
 
   void ResetRenderer();
   void ClearRenderer();
 
-  void ChangeViewDirection(const QString &viewDirection);
+  void ChangeViewDirection(const QString& viewDirection);
 
 private:
 
-  void Init();
+  virtual void Initialize() override;
   void SetUpConnections();
 
   Ui::QmitkRenderWindowManipulatorWidget m_Controls;
 
-  mitk::DataStorage::Pointer m_DataStorage;
-  std::unique_ptr<QmitkRenderWindowDataModel> m_RenderWindowDataModel;
+  std::unique_ptr<QmitkDataStorageRenderWindowListModel> m_StorageModel;
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
   std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
 };
 
-#endif // QMITKRENDERWINDOWMANIPULATORWIDGET_H
+#endif // QMITKDATASTORAGERENDERWINDOWINSPECTOR_H

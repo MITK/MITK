@@ -49,6 +49,8 @@ namespace mitk
 
     pplx::task<void> Post(utility::string_t uri, utility::string_t filePath);
     pplx::task<void> Get(const utility::string_t filePath, utility::string_t uri);
+   	pplx::task<web::json::value> Get(utility::string_t uri);
+    pplx::task<web::json::value> PUT(utility::string_t uri, web::json::value content);
 
   protected:
     MitkClient* m_Client;

@@ -53,11 +53,11 @@ public:
   void ClearChartWidget();
   void LoadData(std::vector<std::string> filePathList);
   void OnSliderWidgetChanged(double value);
-  void AddProgress(int);
+  void AddProgress(int, QString status);
 
 signals:
   void InvokeLoadData(std::vector<std::string> filePathList);
-  void InvokeProgress(int);
+  void InvokeProgress(int, QString status);
 
 protected:
   virtual void CreateQtPartControl(QWidget *parent) override;
@@ -79,9 +79,12 @@ private:
   std::vector<unsigned int> CreateSegmentation(mitk::Image::Pointer baseSegmentation, double threshold);
   void InterpolateSegmentation(mitk::Image::Pointer baseSegmentation, std::vector<unsigned int> sliceIndices);
 
+  std::string GetAlgorithmOfSegByPath(std::string path);
+
   void SetSimilarityGraph(std::vector<double> simScoreArray, int sliceMinStart);
   std::unique_ptr<SegmentationReworkREST> m_HttpHandler;
   mitk::DICOMWeb* m_DICOMWeb;
+  mitk::RESTClient* m_RestService;
 
   std::string m_CurrentStudyUID;
 

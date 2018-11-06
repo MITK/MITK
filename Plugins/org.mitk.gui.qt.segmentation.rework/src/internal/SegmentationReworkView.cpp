@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVtkImageOverwrite.h>
 
 #include <mitkDICOMQIIOMimeTypes.h>
+#include <mitkDICOMDCMTKTagScanner.h>
 
 const std::string SegmentationReworkView::VIEW_ID = "org.mitk.views.segmentationreworkview";
 
@@ -106,9 +107,13 @@ void SegmentationReworkView::CreateQtPartControl(QWidget *parent)
 
   //utility::string_t pacsURL = U("http://jip-dktk/dcm4chee-arc/aets/DCM4CHEE");
   utility::string_t pacsURL = U("http://193.174.48.78:8090/dcm4chee-arc/aets/DCM4CHEE");
+  utility::string_t restURL = U("http://localhost:8000");
+
   m_DICOMWeb = new mitk::DICOMWeb(pacsURL);
   MITK_INFO << "requests to pacs are sent to: " << utility::conversions::to_utf8string(pacsURL);
   m_Controls.dcm4cheeURL->setText({ (utility::conversions::to_utf8string(pacsURL).c_str()) });
+
+  m_RestService = new mitk::RESTClient(restURL);
 }
 
 void SegmentationReworkView::OnSliderWidgetChanged(double value)
@@ -126,14 +131,16 @@ void SegmentationReworkView::OnSliderWidgetChanged(double value)
   m_Controls.slicesToDeleteLabel->setText(labelsToDelete);
 }
 
-void SegmentationReworkView::AddProgress(int progress)
+void SegmentationReworkView::AddProgress(int progress, QString status)
 {
   auto futureValue = m_Controls.progressBar->value() + progress;
   if (futureValue >= 100) 
   {
     m_Controls.progressBar->setValue(100);
+    m_Controls.progressBar->setFormat("Finished %p%");
   } else 
   {
+    m_Controls.progressBar->setFormat(status.append(" %p%"));
     m_Controls.progressBar->setValue(futureValue);
   }
 }
@@ -162,7 +169,7 @@ void SegmentationReworkView::OnIndividualCheckChange(int state)
 
 void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::DicomDTO &dto)
 {
-  emit InvokeProgress(20);
+  emit InvokeProgress(20, { "display graph and query structured report" });
   SetSimilarityGraph(dto.simScoreArray, dto.minSliceStart);
 
   typedef std::map<std::string, std::string> ParamMap;
@@ -208,7 +215,7 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
         }
       }
 
-      emit InvokeProgress(10);
+      emit InvokeProgress(10, {"load composite context of structured report"});
       MITK_INFO << "image series UID " << imageSeriesUID;
       MITK_INFO << "seg A series UID " << segSeriesUIDA;
       MITK_INFO << "seg B series UID " << segSeriesUIDB;
@@ -235,29 +242,32 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 
       auto joinTask = pplx::when_all(begin(tasks), end(tasks));
       auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) {
-        emit InvokeProgress(50);
+        emit InvokeProgress(50, {"load dicom files from disk"});
         InvokeLoadData(filePathList);
+        auto algorithmNameA = GetAlgorithmOfSegByPath(filePathList[0]);
+        auto algorithmNameB = GetAlgorithmOfSegByPath(filePathList[1]);
+        emit InvokeProgress(20, { "load meta data from disk" });
+        m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + " " + algorithmNameA.c_str());
+        m_Controls.labelSegA->setText(m_Controls.labelSegB->text() + " " + algorithmNameB.c_str());
       });
 
-      ParamMap seriesInstancesParams;
+      //ParamMap seriesInstancesParams;
 
-      seriesInstancesParams.insert((ParamMap::value_type({ "StudyInstanceUID" }, dto.studyUID)));
-      seriesInstancesParams.insert((ParamMap::value_type({ "SeriesInstanceUID" }, segSeriesUIDA)));
+      //seriesInstancesParams.insert((ParamMap::value_type({ "StudyInstanceUID" }, dto.studyUID)));
+      //seriesInstancesParams.insert((ParamMap::value_type({ "SeriesInstanceUID" }, segSeriesUIDA)));
 
-      m_DICOMWeb->QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) {
-        auto seriesDescription = QString(utility::conversions::to_utf8string(jsonResult[0][U("0008103E")][U("Value")][0].as_string()).c_str());
-        m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + seriesDescription.append(" A"));
-        emit InvokeProgress(10);
-      });
+      //m_DICOMWeb->QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) {
+      //  emit InvokeProgress(10, {"display SEG A data"});
+      //  auto seriesDescription = QString(utility::conversions::to_utf8string(jsonResult[0][U("0008103E")][U("Value")][0].as_string()).c_str());
+      //  m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + " " + seriesDescription);
+      //});
 
-      seriesInstancesParams["SeriesInstanceUID"] = segSeriesUIDB;
-      m_DICOMWeb->QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) {
-        auto seriesDescription = QString(utility::conversions::to_utf8string(jsonResult[0][U("0008103E")][U("Value")][0].as_string()).c_str());
-        m_Controls.labelSegB->setText(m_Controls.labelSegB->text() + seriesDescription.append(" B"));
-        emit InvokeProgress(10);
-      });
-
-
+      //seriesInstancesParams["SeriesInstanceUID"] = segSeriesUIDB;
+      //m_DICOMWeb->QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) {
+      //  emit InvokeProgress(10, { "display SEG B data" });
+      //  auto seriesDescription = QString(utility::conversions::to_utf8string(jsonResult[0][U("0008103E")][U("Value")][0].as_string()).c_str());
+      //  m_Controls.labelSegB->setText(m_Controls.labelSegB->text() + " " + seriesDescription );
+      //});
     });
 
   }
@@ -335,6 +345,26 @@ void SegmentationReworkView::RESTGetCallback(const SegmentationReworkREST::Dicom
   }
 }
 
+std::string SegmentationReworkView::GetAlgorithmOfSegByPath(std::string path)
+{
+  auto scanner = mitk::DICOMDCMTKTagScanner::New();
+
+  mitk::DICOMTagPath algorithmName;
+  algorithmName.AddSelection(0x0062, 0x0002, 0).AddSelection(0xfffe, 0xe000, 0).AddElement(0x0062, 0x0009);
+
+  mitk::StringList files;
+  files.push_back(path);
+  scanner->SetInputFiles(files);
+  scanner->AddTagPath(algorithmName);
+
+  scanner->Scan();
+
+  mitk::DICOMDatasetAccessingImageFrameList frames = scanner->GetFrameInfoList();
+  auto findings = frames.front()->GetTagValueAsString(algorithmName);
+  MITK_INFO << findings.front().value;
+  return findings.front().value;
+}
+
 void SegmentationReworkView::LoadData(std::vector<std::string> filePathList)
 {
   MITK_INFO << "Loading finished. Pushing data to data storage ...";
@@ -345,6 +375,7 @@ void SegmentationReworkView::LoadData(std::vector<std::string> filePathList)
 
   // find data nodes
   m_Image = dataNodes->at(0);
+  m_Image->SetName("image data");
   m_SegA = dataNodes->at(1);
   m_SegB = dataNodes->at(2);
 }
@@ -377,15 +408,48 @@ void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArra
 
 void SegmentationReworkView::UploadNewSegmentation()
 {
+  AddProgress(10, { "save SEG to temp folder" });
   std::string folderPathSeg = mitk::IOUtil::CreateTemporaryDirectory("XXXXXX", m_UploadBaseDir) + "/";
 
   const std::string savePath = folderPathSeg + m_SegC->GetName() + ".dcm";
   const std::string mimeType = mitk::MitkDICOMQIIOMimeTypes::DICOMSEG_MIMETYPE_NAME();
   mitk::IOUtil::Save(m_SegC->GetData(), mimeType, savePath);
 
+  // get Series Instance UID from new SEG
+  auto scanner = mitk::DICOMDCMTKTagScanner::New();
+  mitk::DICOMTagPath seriesUID(0x0020, 0x000E);
+
+  mitk::StringList files;
+  files.push_back(savePath);
+  scanner->SetInputFiles(files);
+  scanner->AddTagPath(seriesUID);
+
+  scanner->Scan();
+
+  mitk::DICOMDatasetAccessingImageFrameList frames = scanner->GetFrameInfoList();
+  auto findings = frames.front()->GetTagValueAsString(seriesUID);
+  auto segSeriesUID = findings.front().value;
+
+  AddProgress(20, {"push SEG to PACS"});
   auto filePath = utility::conversions::to_string_t(savePath);
   try {
-    m_DICOMWeb->StowRS(filePath, m_CurrentStudyUID).wait();
+    m_DICOMWeb->StowRS(filePath, m_CurrentStudyUID).then([=] {
+      emit AddProgress(40, {"persist reworked SEG to evaluation database"});
+
+      MitkUriBuilder queryBuilder(U("tasks/evaluations"));
+      queryBuilder.append_path(U("3/")); // replace with evaluation UID
+      m_RestService->Get(queryBuilder.to_string()).then([=](web::json::value result) {
+        auto updatedContent = result;
+        updatedContent[U("reworkedSegmentationUID")] = web::json::value::string(utility::conversions::to_string_t(segSeriesUID));
+        m_RestService->PUT(queryBuilder.to_string(), updatedContent).then([=](web::json::value result) {
+          MITK_INFO << utility::conversions::to_utf8string(result.to_string());
+          MITK_INFO << "successfully stored";
+          emit AddProgress(30, { "" });
+        });
+
+      });
+
+    });
   }
   catch (const std::exception &exception)
   {
@@ -430,54 +494,6 @@ std::vector<unsigned int> SegmentationReworkView::CreateSegmentation(mitk::Image
   return sliceIndices;
 }
 
-void SegmentationReworkView::InterpolateSegmentation(mitk::Image::Pointer baseSegmentation, std::vector<unsigned int> sliceIndices)
-{
-  mitk::SegmentationInterpolationController::Pointer interpolator = mitk::SegmentationInterpolationController::New();
-  mitk::OverwriteSliceImageFilter::Pointer overwriteFilter = mitk::OverwriteSliceImageFilter::New();
-  mitk::SliceNavigationController::Pointer navigationController = mitk::SliceNavigationController::New();
-  navigationController->SetInputWorldTimeGeometry(baseSegmentation->GetTimeGeometry());
-  navigationController->Update(mitk::SliceNavigationController::Axial);
-
-  interpolator->SetSegmentationVolume(baseSegmentation);
-  interpolator->SetReferenceVolume(dynamic_cast<mitk::Image*>(m_Image->GetData()));
-  overwriteFilter->SetInput(baseSegmentation);
-
-  MITK_INFO << "start with interpolation ";
-  
-  for (auto index : sliceIndices)
-  {
-    // look for the center within a slide
-    itk::Index<3> centerPoint = { { baseSegmentation->GetDimension(0)/2, baseSegmentation->GetDimension(1)/2, index } };
-    mitk::Point3D pointMM;
-    baseSegmentation->GetTimeGeometry()->GetGeometryForTimeStep(0)->IndexToWorld(centerPoint, pointMM);
-    navigationController->SelectSliceByPoint(pointMM);
-    auto plane = navigationController->GetCurrentPlaneGeometry();
-    unsigned int sliceDimension = 2;
-    mitk::Image::Pointer interpolatedSlice = interpolator->Interpolate(sliceDimension, index, plane, 0);
-
-    if (interpolatedSlice) {
-      MITK_INFO << "add interpolated slice " << index;
-      vtkSmartPointer<mitkVtkImageOverwrite> reslicer = vtkSmartPointer<mitkVtkImageOverwrite>::New();
-      reslicer->SetInputSlice(interpolatedSlice->GetSliceData()->GetVtkImageAccessor(interpolatedSlice)->GetVtkImageData());
-      reslicer->SetOverwriteMode(true);
-      reslicer->Modified();
-      mitk::ExtractSliceFilter::Pointer extractor = mitk::ExtractSliceFilter::New(reslicer);
-      extractor->SetInput(baseSegmentation);
-      extractor->SetTimeStep(0);
-      extractor->SetWorldGeometry(plane);
-      extractor->SetVtkOutputRequest(true);
-      extractor->SetResliceTransformByGeometry(baseSegmentation->GetTimeGeometry()->GetGeometryForTimeStep(0));
-      extractor->Modified();
-      extractor->Update();
-    }
-    else {
-      MITK_INFO << "requested interpolation was null";
-    }
-  }
-
-  MITK_INFO << "finished with interpolation ";
-}
-
 void SegmentationReworkView::CreateNewSegmentationC() 
 {
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
@@ -495,7 +511,6 @@ void SegmentationReworkView::CreateNewSegmentationC()
   if (m_Controls.checkIndiv->isChecked())
   {
     auto sliceIndices = CreateSegmentation(baseImage, m_Controls.sliderWidget->value());
-    //InterpolateSegmentation(baseImage, sliceIndices);
   }
 
   QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog(m_Parent); // needs a QWidget as parent, "this" is not QWidget

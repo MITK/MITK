@@ -29,6 +29,49 @@ mitk::RESTClient::~RESTClient()
   delete m_Client;
 }
 
+pplx::task<web::json::value> mitk::RESTClient::PUT(utility::string_t uri, web::json::value content)
+{
+  MITK_DEBUG << "Calling PUT with " << utility::conversions::to_utf8string(uri) << " on client "
+    << mitk::RESTUtil::convertToUtf8(m_Client->base_uri().to_string());
+
+  MitkRequest putRequest(MitkRESTMethods::PUT);
+  putRequest.set_request_uri(uri);
+  putRequest.set_body(content);
+
+  return m_Client->request(putRequest).then([=](MitkResponse response)
+  {
+    auto status = response.status_code();
+    MITK_INFO << " status: " << status;
+
+    if (status != web::http::status_codes::OK) {
+      mitkThrow() << "response was not OK";
+    }
+
+    return response.extract_json().get();
+  });
+}
+
+pplx::task<web::json::value> mitk::RESTClient::Get(utility::string_t uri)
+{
+  MITK_DEBUG << "Calling GET with " << utility::conversions::to_utf8string(uri) << " on client "
+    << mitk::RESTUtil::convertToUtf8(m_Client->base_uri().to_string());
+	
+  MitkRequest getRequest(MitkRESTMethods::GET);
+  getRequest.set_request_uri(uri);
+
+  return m_Client->request(getRequest).then([=](MitkResponse response)
+  {
+    auto status = response.status_code();
+    MITK_INFO << " status: " << status;
+
+    if (status != web::http::status_codes::OK) {
+      mitkThrow() << "response was not OK";
+    }
+
+    return response.extract_json().get();
+  });
+}
+
 pplx::task<void> mitk::RESTClient::Get(utility::string_t filePath, utility::string_t uri)
 {
   MITK_DEBUG << "Calling GET with " << utility::conversions::to_utf8string(uri) << " on client "

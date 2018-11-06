@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>465</width>
-    <height>794</height>
+    <height>821</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -47,6 +47,12 @@
       <widget class="QProgressBar" name="progressBar">
        <property name="value">
         <number>0</number>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="textVisible">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkRenderWindowManipulatorWidget.h"
 
 // render window manager module
-#include <mitkRenderWindowLayerController.h>
 #include <mitkRenderWindowViewDirectionController.h>
 #include <QmitkDataStorageRenderWindowListModel.h>
 
@@ -35,9 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * resetting layers (hiding them) or removing all layers at once.
 *
 * In order to use this widget, a (e.g.) plugin has to set the controlled renderer, which will be forwarded to
-* a render window layer controller and a render window view direction controller.
-* The plugin also has to provide a Q_SLOT that is connected to the 'AddLayerButtonClicked'-Q_SIGNAL of this widget.
-* This allows for a customized add-layer functionality.
+* a render window view direction controller.
 */
 class MITKRENDERWINDOWMANAGERUI_EXPORT QmitkDataStorageRenderWindowInspector : public QmitkAbstractDataStorageInspector
 {
@@ -48,63 +45,36 @@ public:
   QmitkDataStorageRenderWindowInspector(QWidget* parent = nullptr);
 
   // override from 'QmitkAbstractDataStorageInspector'
-  /*
+  /**
   * @brief See 'QmitkAbstractDataStorageInspector'
   */
   virtual QAbstractItemView* GetView() override;
-  /*
+  /**
   * @brief See 'QmitkAbstractDataStorageInspector'
   */
   virtual const QAbstractItemView* GetView() const override;
-  /*
+  /**
   * @brief See 'QmitkAbstractDataStorageInspector'
   */
   virtual void SetSelectionMode(SelectionMode mode) override;
-  /*
+  /**
   * @brief See 'QmitkAbstractDataStorageInspector'
   */
   virtual SelectionMode GetSelectionMode() const override;
-
   /**
   * @brief Set the controlled base renderer.
   */
   void SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer);
   /**
-  * @brief Set the currently selected render window
+  * @brief Set the currently selected render window.
   *
   * @param renderWindowId   the text inside the combo box
   */
   void SetActiveRenderWindow(const QString& renderWindowId);
-  /**
-  * @brief Use the RenderWindowLayerController to insert the given data node into the currently active render window.
-  *       The new node is placed on top of all existing layer nodes in that render window.
-  *
-  * @param dataNode   The data node that should be inserted.
-  */
-  void AddLayer(mitk::DataNode* dataNode);
-  /**
-  * @brief Use the RenderWindowLayerController to insert the given data node into all controlled render windows.
-  *       The new node is placed on top of all existing layer nodes in the render window.
-  *
-  * @param dataNode   The data node that should be inserted.
-  */
-  void AddLayerToAllRenderer(mitk::DataNode* dataNode);
-  /**
-  * @brief  Use the RenderWindowLayerController to hide the given data node in the currently active render window.
-  *
-  * @param dataNode   The data node that should be hid.
-  */
-  void HideDataNodeInAllRenderer(const mitk::DataNode* dataNode);
-
-Q_SIGNALS:
-  void AddLayerButtonClicked();
 
 private Q_SLOTS:
 
-  void RemoveLayer();
   void SetAsBaseLayer();
-
-  void MoveLayer(const QString& direction);
 
   void ResetRenderer();
   void ClearRenderer();
@@ -119,7 +89,6 @@ private:
   Ui::QmitkRenderWindowManipulatorWidget m_Controls;
 
   std::unique_ptr<QmitkDataStorageRenderWindowListModel> m_StorageModel;
-  std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
   std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
 };
 

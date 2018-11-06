@@ -51,16 +51,11 @@ private Q_SLOTS:
   * @param renderWindowId   The text inside the combo box.
   */
   void OnRenderWindowSelectionChanged(const QString &renderWindowId);
-  /**
-  * @brief Called when the 'AddLayer'-button of he render window manipulator widget has been pushed.
-  */
-  void OnAddLayerButtonClicked();
 
 private:
 
   void SetControlledRenderer();
 
-  // the Qt parent of our GUI
   QWidget* m_Parent;
   Ui::QmitkRenderWindowManagerControls m_Controls;
 

@@ -48,7 +48,6 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
   OnRenderWindowSelectionChanged(m_Controls.comboBoxRenderWindowSelection->itemText(0));
 
   connect(m_Controls.comboBoxRenderWindowSelection, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(OnRenderWindowSelectionChanged(const QString&)));
-  connect(m_RenderWindowInspector, SIGNAL(AddLayerButtonClicked()), this, SLOT(OnAddLayerButtonClicked()));
 }
 
 void QmitkRenderWindowManagerView::SetControlledRenderer()
@@ -70,23 +69,4 @@ void QmitkRenderWindowManagerView::SetControlledRenderer()
 void QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged(const QString &renderWindowId)
 {
   m_RenderWindowInspector->SetActiveRenderWindow(renderWindowId);
-}
-
-void QmitkRenderWindowManagerView::OnAddLayerButtonClicked()
-{
-  QList<mitk::DataNode::Pointer> nodes = GetDataManagerSelection();
-  for (mitk::DataNode* dataNode : nodes)
-  {
-    if (nullptr != dataNode)
-    {
-      m_RenderWindowInspector->AddLayer(dataNode);
-
-      // get child nodes of the current node
-      mitk::DataStorage::SetOfObjects::ConstPointer derivedNodes = GetDataStorage()->GetDerivations(dataNode, nullptr, false);
-      for (mitk::DataStorage::SetOfObjects::ConstIterator it = derivedNodes->Begin(); it != derivedNodes->End(); ++it)
-      {
-        m_RenderWindowInspector->AddLayer(it->Value());
-      }
-    }
-  }
 }

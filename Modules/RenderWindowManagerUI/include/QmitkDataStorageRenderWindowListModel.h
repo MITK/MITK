@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkRenderWindowManagerUIExports.h"
 
 // render window manager module
+#include "mitkRenderWindowLayerController.h"
 #include "mitkRenderWindowLayerUtilities.h"
 
 //mitk core
@@ -42,23 +43,23 @@ public:
   ~QmitkDataStorageRenderWindowListModel() override;
 
   // override from 'QmitkAbstractDataStorageModel'
-  /*
+  /**
   * @brief See 'QmitkAbstractDataStorageModel'
   */
   void DataStorageChanged() override;
-  /*
+  /**
   * @brief See 'QmitkAbstractDataStorageModel'
   */
   void NodePredicateChanged() override;
-  /*
+  /**
   * @brief See 'QmitkAbstractDataStorageModel'
   */
   void NodeAdded(const mitk::DataNode* node) override;
-  /*
+  /**
   * @brief See 'QmitkAbstractDataStorageModel'
   */
   void NodeChanged(const mitk::DataNode* node) override;
-  /*
+  /**
   * @brief See 'QmitkAbstractDataStorageModel'
   */
   void NodeRemoved(const mitk::DataNode* node) override;
@@ -75,13 +76,24 @@ public:
 
   Qt::ItemFlags flags(const QModelIndex& index) const override;
 
+  void SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer);
+
   void SetCurrentRenderer(mitk::BaseRenderer* baseRenderer);
   mitk::BaseRenderer* GetCurrentRenderer() const { return m_BaseRenderer.GetPointer(); }
+
+  /**
+  * @brief Use the RenderWindowLayerController to insert the given data node into all controlled render windows.
+  *        The new node is placed on top of all existing layer nodes in the render window.
+  *
+  * @param dataNode   The data node that should be inserted.
+  */
+  void AddDataNodeToAllRenderer(mitk::DataNode* dataNode);
 
 private:
 
   void UpdateModelData();
 
+  std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
   mitk::BaseRenderer::Pointer m_BaseRenderer;
   mitk::RenderWindowLayerUtilities::LayerStack m_TempLayerStack;
 

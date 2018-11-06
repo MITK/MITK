@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkDataStorageRenderWindowListModel::QmitkDataStorageRenderWindowListModel(QObject* parent /*= nullptr*/)
   : QmitkAbstractDataStorageModel(parent)
 {
-  // nothing here
+  m_RenderWindowLayerController = std::make_unique<mitk::RenderWindowLayerController>();
 }
 
 QmitkDataStorageRenderWindowListModel::~QmitkDataStorageRenderWindowListModel()
@@ -34,6 +34,7 @@ QmitkDataStorageRenderWindowListModel::~QmitkDataStorageRenderWindowListModel()
 
 void QmitkDataStorageRenderWindowListModel::DataStorageChanged()
 {
+  m_RenderWindowLayerController->SetDataStorage(m_DataStorage.Lock());
   UpdateModelData();
 }
 
@@ -42,10 +43,10 @@ void QmitkDataStorageRenderWindowListModel::NodePredicateChanged()
   UpdateModelData();
 }
 
-void QmitkDataStorageRenderWindowListModel::NodeAdded(const mitk::DataNode* /*node*/)
+void QmitkDataStorageRenderWindowListModel::NodeAdded(const mitk::DataNode* node)
 {
-  // #TODO
   // add a node to each render window specific list (or to a global list initially)
+  AddDataNodeToAllRenderer(const_cast<mitk::DataNode*>(node));
   UpdateModelData();
 }
 
@@ -186,6 +187,11 @@ Qt::ItemFlags QmitkDataStorageRenderWindowListModel::flags(const QModelIndex &in
   return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
 }
 
+void QmitkDataStorageRenderWindowListModel::SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer)
+{
+  m_RenderWindowLayerController->SetControlledRenderer(controlledRenderer);
+}
+
 void QmitkDataStorageRenderWindowListModel::SetCurrentRenderer(mitk::BaseRenderer* baseRenderer)
 {
   if (m_BaseRenderer != baseRenderer)
@@ -193,6 +199,11 @@ void QmitkDataStorageRenderWindowListModel::SetCurrentRenderer(mitk::BaseRendere
     m_BaseRenderer = baseRenderer;
     SetNodePredicate(mitk::RenderWindowLayerUtilities::GetRenderWindowPredicate(m_BaseRenderer));
   }
+}
+
+void QmitkDataStorageRenderWindowListModel::AddDataNodeToAllRenderer(mitk::DataNode* dataNode)
+{
+  m_RenderWindowLayerController->InsertLayerNode(dataNode);
 }
 
 void QmitkDataStorageRenderWindowListModel::UpdateModelData()

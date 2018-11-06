@@ -58,14 +58,10 @@ namespace mitk
     * @param withBaseNode   Boolean to decide whether the base node should be included in or excluded from the layer stack.
     */
     MITKRENDERWINDOWMANAGER_EXPORT LayerStack GetLayerStack(const DataStorage* dataStorage, const BaseRenderer* renderer, bool withBaseNode);
-    /*
+    /**
     * @brief Helper function to get a node predicate that can be used to filter render window specific data nodes.
     *
-    *        The data nodes are of type ...
-
-
-             'mitk::Image' but must not be 'helper objects' or 'segmentation nodes'.
-    *        For the definition of 'segmentation nodes' see 'GetSegmentationPredicate'.
+    *        The data nodes must not be 'helper objects'. The must have set a 'fixed layer' property for the given renderer.
     */
     MITKRENDERWINDOWMANAGER_EXPORT NodePredicateAnd::Pointer GetRenderWindowPredicate(const BaseRenderer* renderer);
 

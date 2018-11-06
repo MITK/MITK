@@ -882,9 +882,13 @@ void BaseApplication::initializeSplashScreen(QCoreApplication * application)
           splashPainter.fillRect( PROGRESS_X_PX, PROGRESS_Y_PX, PROGRESS_WIDTH_PX, PROGRESS_HEIGHT_PX, autoplanGrey );
           splashPainter.fillRect( progressStart, PROGRESS_Y_PX, PROGRESS_ELEMENT_WIDTH, PROGRESS_HEIGHT_PX, autoplanGreen );
         }
-        d->m_Splashscreen->setPixmap(d->m_Splashscreen->pixmap());
+        Utilities::execInMainThreadAsync([this] {
+          d->m_Splashscreen->setPixmap(d->m_Splashscreen->pixmap());
+        });
         splashPainter.end();
-        d->m_Splashscreen->setPixmap(pixmap);
+        Utilities::execInMainThreadAsync([this, &pixmap] {
+          d->m_Splashscreen->setPixmap(pixmap);
+        });
         application->processEvents();
       };
       d->m_Splashscreen->show();

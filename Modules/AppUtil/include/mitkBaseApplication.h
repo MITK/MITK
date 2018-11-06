@@ -35,6 +35,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSplashScreen>
 #include <QCoreApplication>
 
+#include <ThreadUtilities.h>
+
 class ctkPluginContext;
 class ctkPluginFramework;
 
@@ -81,7 +83,9 @@ public:
       m_Working = m_App->property("loading").toBool();
     }
     if (m_Splashscreen && m_Splashscreen->isVisible()) {
-      m_Splashscreen->close();
+      Utilities::execInMainThreadAsync([this]{
+        m_Splashscreen->close();
+      });
     }
   }
 

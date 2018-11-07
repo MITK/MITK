@@ -890,7 +890,7 @@ void QmitkDataManagerView::ColormapActionToggled( bool /*checked*/ )
     lookupTable->SetType(activatedItem);
     lookupTableProperty->SetValue(lookupTable);
 
-    if (lookupTable->GetActiveType() == mitk::LookupTable::LookupTableType::MULTILABEL)
+    if (mitk::LookupTable::LookupTableType::MULTILABEL == lookupTable->GetActiveType())
     {
       // special case: multilabel => set the level window to include the whole pixel range
       UseWholePixelRange(node);

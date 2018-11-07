@@ -235,11 +235,13 @@ namespace mitk
     *  \brief Return the current look-up table type.
     */
     virtual const LookupTableType GetActiveType();
+    virtual LookupTableType GetActiveType() const;
 
     /*!
     *  \brief Return the current look-up table type as a string.
     */
     virtual const std::string GetActiveTypeAsString();
+    virtual std::string GetActiveTypeAsString() const;
 
   protected:
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;

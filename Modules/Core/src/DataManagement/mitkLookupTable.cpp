@@ -149,12 +149,12 @@ void mitk::LookupTable::SetType(const std::string &typeName)
   }
 }
 
-const mitk::LookupTable::LookupTableType mitk::LookupTable::GetActiveType()
+mitk::LookupTable::LookupTableType mitk::LookupTable::GetActiveType() const
 {
   return m_type;
 }
 
-const std::string mitk::LookupTable::GetActiveTypeAsString()
+std::string mitk::LookupTable::GetActiveTypeAsString() const
 {
   return std::string(typenameList[(int)m_type]);
 }

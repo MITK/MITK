@@ -219,9 +219,6 @@ mitk::LookupTable::RawLookupTableType *mitk::LookupTable::GetRawLookupTable() co
   return m_LookupTable->GetPointer(0);
 }
 
-/*!
-* \brief equality operator implementation
-*/
 bool mitk::LookupTable::operator==(const mitk::LookupTable &other) const
 {
   if (m_LookupTable == other.GetVtkLookupTable())
@@ -258,17 +255,11 @@ bool mitk::LookupTable::operator==(const mitk::LookupTable &other) const
   return true;
 }
 
-/*!
-* \brief inequality operator implementation
-*/
 bool mitk::LookupTable::operator!=(const mitk::LookupTable &other) const
 {
   return !(*this == other);
 }
 
-/*!
-* \brief assignment operator implementation
-*/
 mitk::LookupTable &mitk::LookupTable::operator=(const mitk::LookupTable &LookupTable)
 {
   if (this == &LookupTable)

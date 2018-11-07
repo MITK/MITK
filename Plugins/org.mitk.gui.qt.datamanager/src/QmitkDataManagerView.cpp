@@ -356,16 +356,16 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QObject::connect( m_OpacitySlider, SIGNAL( valueChanged(int) )
     , this, SLOT( OpacityChanged(int) ) );
 
-  QLabel* _OpacityLabel = new QLabel(tr("Opacity: "));
-  QHBoxLayout* _OpacityWidgetLayout = new QHBoxLayout;
-  _OpacityWidgetLayout->setContentsMargins(4,4,4,4);
-  _OpacityWidgetLayout->addWidget(_OpacityLabel);
-  _OpacityWidgetLayout->addWidget(m_OpacitySlider);
-  QWidget* _OpacityWidget = new QWidget;
-  _OpacityWidget->setLayout(_OpacityWidgetLayout);
+  QLabel* opacityLabel = new QLabel(tr("Opacity: "));
+  QHBoxLayout* opacityWidgetLayout = new QHBoxLayout;
+  opacityWidgetLayout->setContentsMargins(4,4,4,4);
+  opacityWidgetLayout->addWidget(opacityLabel);
+  opacityWidgetLayout->addWidget(m_OpacitySlider);
+  QWidget* opacityWidget = new QWidget;
+  opacityWidget->setLayout(opacityWidgetLayout);
 
   QWidgetAction* opacityAction = new QWidgetAction(this);
-  opacityAction ->setDefaultWidget(_OpacityWidget);
+  opacityAction->setDefaultWidget(opacityWidget);
   QObject::connect( opacityAction , SIGNAL( changed() )
     , this, SLOT( OpacityActionChanged() ) );
   unknownDataNodeDescriptor->AddAction(opacityAction , false);
@@ -377,17 +377,17 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QObject::connect( m_ColorButton, SIGNAL( clicked() )
     , this, SLOT( ColorChanged() ) );
 
-  QLabel* _ColorLabel = new QLabel(tr("Color: "));
-  _ColorLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-  QHBoxLayout* _ColorWidgetLayout = new QHBoxLayout;
-  _ColorWidgetLayout->setContentsMargins(4,4,4,4);
-  _ColorWidgetLayout->addWidget(_ColorLabel);
-  _ColorWidgetLayout->addWidget(m_ColorButton);
-  QWidget* _ColorWidget = new QWidget;
-  _ColorWidget->setLayout(_ColorWidgetLayout);
+  QLabel* colorLabel = new QLabel(tr("Color: "));
+  colorLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+  QHBoxLayout* colorWidgetLayout = new QHBoxLayout;
+  colorWidgetLayout->setContentsMargins(4,4,4,4);
+  colorWidgetLayout->addWidget(colorLabel);
+  colorWidgetLayout->addWidget(m_ColorButton);
+  QWidget* colorWidget = new QWidget;
+  colorWidget->setLayout(colorWidgetLayout);
 
   QWidgetAction* colorAction = new QWidgetAction(this);
-  colorAction->setDefaultWidget(_ColorWidget);
+  colorAction->setDefaultWidget(colorWidget);
   QObject::connect( colorAction, SIGNAL( changed() )
     , this, SLOT( ColorActionChanged() ) );
 
@@ -506,19 +506,19 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   //QObject::connect( m_OpacitySlider, SIGNAL( valueChanged(int) )
   //  , this, SLOT( OpacityChanged(int) ) );
 
-  QLabel* _ComponentLabel = new QLabel(tr("Component: "));
-  QHBoxLayout* _ComponentWidgetLayout = new QHBoxLayout;
-  _ComponentWidgetLayout->setContentsMargins(4,4,4,4);
-  _ComponentWidgetLayout->addWidget(_ComponentLabel);
-  _ComponentWidgetLayout->addWidget(m_ComponentSlider);
-  QLabel* _ComponentValueLabel = new QLabel();
-  _ComponentWidgetLayout->addWidget(_ComponentValueLabel);
-  connect(m_ComponentSlider, SIGNAL(valueChanged(int)), _ComponentValueLabel, SLOT(setNum(int)));
-  QWidget* _ComponentWidget = new QWidget;
-  _ComponentWidget->setLayout(_ComponentWidgetLayout);
+  QLabel* componentLabel = new QLabel(tr("Component: "));
+  QHBoxLayout* componentWidgetLayout = new QHBoxLayout;
+  componentWidgetLayout->setContentsMargins(4,4,4,4);
+  componentWidgetLayout->addWidget(componentLabel);
+  componentWidgetLayout->addWidget(m_ComponentSlider);
+  QLabel* componentValueLabel = new QLabel();
+  componentWidgetLayout->addWidget(componentValueLabel);
+  connect(m_ComponentSlider, SIGNAL(valueChanged(int)), componentValueLabel, SLOT(setNum(int)));
+  QWidget* componentWidget = new QWidget;
+  componentWidget->setLayout(componentWidgetLayout);
 
   QWidgetAction* componentAction = new QWidgetAction(this);
-  componentAction->setDefaultWidget(_ComponentWidget);
+  componentAction->setDefaultWidget(componentWidget);
   QObject::connect( componentAction , SIGNAL( changed() )
     , this, SLOT( ComponentActionChanged() ) );
   multiComponentImageDataNodeDescriptor->AddAction(componentAction, false);
@@ -591,12 +591,12 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   unknownDataNodeDescriptor->AddAction(actionShowInfoDialog);
   m_DescriptorActionList.push_back(std::make_pair(unknownDataNodeDescriptor,actionShowInfoDialog));
 
-  QGridLayout* _DndFrameWidgetLayout = new QGridLayout;
-  _DndFrameWidgetLayout->addWidget(m_NodeTreeView, 0, 0);
-  _DndFrameWidgetLayout->setContentsMargins(0,0,0,0);
+  QGridLayout* dndFrameWidgetLayout = new QGridLayout;
+  dndFrameWidgetLayout->addWidget(m_NodeTreeView, 0, 0);
+  dndFrameWidgetLayout->setContentsMargins(0,0,0,0);
 
   m_DndFrameWidget = new QmitkDnDFrameWidget(m_Parent);
-  m_DndFrameWidget->setLayout(_DndFrameWidgetLayout);
+  m_DndFrameWidget->setLayout(dndFrameWidgetLayout);
 
   QVBoxLayout* layout = new QVBoxLayout(parent);
   layout->addWidget(m_DndFrameWidget);
@@ -782,26 +782,26 @@ void QmitkDataManagerView::ComponentActionChanged()
 
 void QmitkDataManagerView::ColorChanged()
 {
-  bool color_selected = false;
+  bool colorSelected = false;
   QColor newColor;
 
-  auto selected_indices = m_NodeTreeView->selectionModel()->selectedIndexes();
-  for (auto& selected_index : selected_indices)
+  auto selectedIndices = m_NodeTreeView->selectionModel()->selectedIndexes();
+  for (auto& selectedIndex : selectedIndices)
   {
-    auto node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(selected_index));
+    auto node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(selectedIndex));
     if(node)
     {
       float rgb[3];
       if (node->GetColor(rgb))
       {
-        if (!color_selected)
+        if (!colorSelected)
         {
           QColor initial(rgb[0] * 255, rgb[1] * 255, rgb[2] * 255);
           newColor = QColorDialog::getColor(initial, nullptr, QString(tr("Change color")));
 
           if ( newColor.isValid() )
           {
-            color_selected = true;
+            colorSelected = true;
           }
           else
           {
@@ -824,11 +824,11 @@ void QmitkDataManagerView::ColorChanged()
 void QmitkDataManagerView::ColorActionChanged()
 {
   // Adapts color displayed in context menu item
-  auto selected_indices = m_NodeTreeView->selectionModel()->selectedIndexes();
-  if (selected_indices.isEmpty())
+  auto selectedIndices = m_NodeTreeView->selectionModel()->selectedIndexes();
+  if (selectedIndices.isEmpty())
     return;
 
-  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(selected_indices.front()));
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(selectedIndices.front()));
   if(node)
   {
     float rgb[3];
@@ -866,10 +866,10 @@ void QmitkDataManagerView::TextureInterpolationToggled( bool checked )
 
 void QmitkDataManagerView::ColormapActionToggled( bool /*checked*/ )
 {
-  auto selected_indices = m_NodeTreeView->selectionModel()->selectedIndexes();
-  for (auto& selected_index : selected_indices)
+  auto selectedIndices = m_NodeTreeView->selectionModel()->selectedIndexes();
+  for (auto& selectedIndex : selectedIndices)
   {
-    auto node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(selected_index));
+    auto node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(selectedIndex));
     if (!node)
       return;
 
@@ -1139,8 +1139,8 @@ void QmitkDataManagerView::ShowInfoDialogForSelectedNodes( bool )
 {
   QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();
 
-  QmitkInfoDialog _QmitkInfoDialog(selectedNodes, this->m_Parent);
-  _QmitkInfoDialog.exec();
+  QmitkInfoDialog qmitkInfoDialog(selectedNodes, this->m_Parent);
+  qmitkInfoDialog.exec();
 }
 
 void QmitkDataManagerView::NodeChanged(const mitk::DataNode* /*node*/)

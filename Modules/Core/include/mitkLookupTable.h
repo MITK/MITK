@@ -55,10 +55,10 @@ namespace mitk
 
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      /**
-       * @brief GetVtkLookupTable Getter for the internally wrapped vtkLookupTable.
-       */
-      virtual vtkSmartPointer<vtkLookupTable> GetVtkLookupTable() const;
+    /**
+     * @brief GetVtkLookupTable Getter for the internally wrapped vtkLookupTable.
+     */
+    virtual vtkSmartPointer<vtkLookupTable> GetVtkLookupTable() const;
 
     /**
      * @brief GetRawLookupTable Getter for the raw lookuptable array.
@@ -111,64 +111,64 @@ namespace mitk
     itkSetMacro(Level, float);
     itkSetMacro(Opacity, float);
 
-    /*!
-      * \brief equality operator implementation
-      */
+    /**
+     * @brief equality operator implementation
+     */
     virtual bool operator==(const mitk::LookupTable &LookupTable) const;
 
-    /*!
-      * \brief non equality operator implementation
-      */
+    /**
+     * @brief non equality operator implementation
+     */
     virtual bool operator!=(const LookupTable &LookupTable) const;
 
-    /*!
-      * \brief implementation necessary because operator made
-      * private in itk::Object
-      */
+    /**
+     * @brief implementation necessary because operator made
+     * private in itk::Object
+     */
     virtual LookupTable &operator=(const LookupTable &LookupTable);
 
     /**
-       * Updates the output information of the current object by calling
-       * updateOutputInformation of the data objects source object.
-       */
+     * @brief Updates the output information of the current object by calling
+     * updateOutputInformation of the data objects source object.
+     */
     void UpdateOutputInformation() override;
 
     /**
-       * Sets the requested Region to the largest possible region.
-       * This method is not implemented, since this is the default
-       * behaviour of the itk pipeline and we do not support the
-       * requested-region mechanism for lookup-tables
-       */
+     * @brief Sets the requested Region to the largest possible region.
+     * This method is not implemented, since this is the default
+     * behavior of the itk pipeline and we do not support the
+     * requested-region mechanism for lookup-tables
+     */
     void SetRequestedRegionToLargestPossibleRegion() override;
 
     /**
-       * Checks, if the requested region lies outside of the buffered region by
-       * calling verifyRequestedRegion().
-       */
+     * @brief Checks, if the requested region lies outside of the buffered region by
+     * calling verifyRequestedRegion().
+     */
     bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
     /**
-       * Checks if the requested region is completely contained in
-       * the buffered region. Since we always want to process the lookup
-       * table as a whole, this method always returns true
-       */
+     * @brief Checks if the requested region is completely contained in
+     * the buffered region. Since we always want to process the lookup
+     * table as a whole, this method always returns true
+     */
     bool VerifyRequestedRegion() override;
 
     /**
-       * This method has no effect for lookup tables, since we do
-       * not support the region-mechanism
-       */
+     * @brief This method has no effect for lookup tables, since we do
+     * not support the region-mechanism
+     */
     void SetRequestedRegion(const itk::DataObject *data) override;
 
     LookupTable();
     ~LookupTable() override;
     /**
-       * \deprecatedSince{2014_03} Please use CreateColorTransferFunction() instead
-       */
+     * \deprecatedSince{2014_03} Please use CreateColorTransferFunction() instead
+     */
     DEPRECATED(void CreateColorTransferFunction(vtkColorTransferFunction *&colorFunction));
     /**
-      * \deprecatedSince{2014_03} Please use CreateOpacityTransferFunction() instead
-      */
+    * \deprecatedSince{2014_03} Please use CreateOpacityTransferFunction() instead
+    */
     DEPRECATED(void CreateOpacityTransferFunction(vtkPiecewiseFunction *&opacityFunction));
     /**
      * \deprecatedSince{2014_03} Please use CreateGradientTransferFunction() instead
@@ -217,24 +217,29 @@ namespace mitk
 
     static const char *const typenameList[];
 
-    /*!
-       *  \brief Set the look-up table type by enum (or integer).
-       *  \details Returns if the given type doesn't exist. Only changes the type if it is different
-       *           from the current one.
-       */
+    /**
+     *  @brief Set the look-up table type by enum (or integer).
+     *  @details Returns if the given type doesn't exist. Only changes the type if it is different
+     *           from the current one.
+     */
     virtual void SetType(const LookupTableType type);
 
-    /*!
-       *  \brief Set the look-up table type by string.
-       *  \details Returns if the given type doesn't exist. Only changes the type if it is different
-       *           from the current one.
-       */
+    /**
+     *  @brief Set the look-up table type by string.
+     *  @details Returns if the given type doesn't exist. Only changes the type if it is different
+     *           from the current one.
+     */
     virtual void SetType(const std::string &typeName);
 
-    /*!
-       *  \brief Return the current look-up table type as a string.
-       */
-    virtual const std::string GetActiveTypeAsString();
+    /**
+     *  @brief Return the current look-up table type.
+     */
+    virtual LookupTableType GetActiveType() const;
+
+    /**
+     *  @brief Return the current look-up table type as a string.
+     */
+    virtual std::string GetActiveTypeAsString() const;
 
   protected:
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;

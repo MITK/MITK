@@ -13,14 +13,15 @@
    id="Ebene_1"
    x="0px"
    y="0px"
-   viewBox="0 0 128 128"
-   style="enable-background:new 0 0 128 128;"
+   viewBox="0 0 129 129"
    xml:space="preserve"
-   sodipodi:docname="icon.svg"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"><metadata
+   sodipodi:docname="map_framereg_icon_doc.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   width="129"
+   height="129"><metadata
    id="metadata47"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
    id="defs45" /><sodipodi:namedview
    pagecolor="#ffffff"
    bordercolor="#666666"
@@ -35,7 +36,7 @@
    id="namedview43"
    showgrid="false"
    inkscape:zoom="3.9373992"
-   inkscape:cx="64"
+   inkscape:cx="20.824292"
    inkscape:cy="64"
    inkscape:window-x="0"
    inkscape:window-y="125"
@@ -100,7 +101,8 @@
 </style>
 <g
    id="g40"
-   style="display:inline">
+   style="display:inline"
+   transform="translate(0,1)">
 	<path
    class="st52"
    d="M 70.7,48.4 69.8,59 c 0.9,-0.1 1.7,-0.1 2.6,-0.2 L 73.3,48 c -0.8,0.1 -1.7,0.2 -2.6,0.4 z"
@@ -178,12 +180,12 @@
    style="fill:#000000" />
 	<polygon
    class="st50"
-   points="41.4,80.4 40.8,76.6 28.8,78.4 "
+   points="28.8,78.4 41.4,80.4 40.8,76.6 "
    id="polygon30"
    style="fill:#000000" />
 	<polygon
    class="st50"
-   points="6.2,81.8 11.4,116.4 13,116.2 13.4,114.1 18.7,79.9 "
+   points="18.7,79.9 6.2,81.8 11.4,116.4 13,116.2 13.4,114.1 "
    id="polygon32"
    style="fill:#000000" />
 	

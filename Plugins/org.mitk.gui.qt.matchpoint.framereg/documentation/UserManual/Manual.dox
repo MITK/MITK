@@ -40,7 +40,7 @@ In this tab you can specify a name for the correction job (this will determine t
 "Start" will trigger the correction process.
 
 \subsection MAP_FRAME_Usage_settings Settings tab
-\imageMacro{step3_settings.png, "Details of the settings tab.", 8}
+\imageMacro{step3_settings.PNG, "Details of the settings tab.", 8}
 In this tab, you can (1) define the mapping settings \ref MAP_FRAME_Mapper_Settings "(See details)", used for the corrected frames, or (2) parametrize the loaded algorithm (before it starts), if it offers any possibility to do so.
 */
 

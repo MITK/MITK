@@ -32,6 +32,6 @@ Additionally you can choose "Generate + store mapped result". This is a convenie
 "Start" will trigger the registration process. Some algorithms can be stopped while processing takes place. In those cases, there is a "Stop" button enabled, as soon as the registration process starts.
 
 \subsection MAP_RUN_Usage_settings Settings tab
-\imageMacro{step3_settings.png, "Details of the settings tab.", 8}
+\imageMacro{step3_settings.PNG, "Details of the settings tab.", 8}
 In this tab, you can change the parametrization of the loaded algorithm (before it starts), if it offers any possibility to do so.
 */

@@ -18,14 +18,14 @@ and Therapy) at the DKFZ (German Cancer Research Center). If you have any questi
 find a bug or have a feature request, feel free to contact us at www.mitk.org.
 
 \section MAP_REGEVAL_Usage Usage
-\imageMacro{view_example.png, "Example screenshot showing the plug-in in use.", 14}
+\imageMacro{view_example.PNG, "Example screenshot showing the plug-in in use.", 14}
 To use the evaluation view you must have selected at least the moving and the target image you want to use to evaluate.
 If you select a registration with referenced target and moving image (the normal state if you generate registrations with the matchpoint plugins)
 these images will be auto selected by just clicking on the registration.
 If you select no registration the view will assume that an identity transform should be used.\n
 As long as no valid set of data is selected the "Start evaluation" button will be disabled. If its enabled you may start the evaluation mode with it.
 
-\imageMacro{no_data_selected.png, "Example screenshot showing the state if no data is selected", 5}
+\imageMacro{no_data_selected.PNG, "Example screenshot showing the state if no data is selected", 5}
 
 If the evaluation view is active you can choose between differnt modes of visualization. For more details see \ref MAP_REGEVAL_Styles.\n
 To stop the evaluation mode, you may use the "Stop evaluation" button or just close the evaluation view.
@@ -36,7 +36,7 @@ level windowing of the respective images.
 \section MAP_REGEVAL_Styles Visualization styles
 You can choose from the following visualization styles to evaluate the registration/mapping quality:\n
 \li "Blend": Blends the images with a user defined weight. Default is 50:50.
-\imageMacro{style_blend.png, "Example for mode: Blend", 5}
+\imageMacro{style_blend.PNG, "Example for mode: Blend", 5}
 \li "Checkerboard": Checkerboard style that composes both images. You may define the resolution of the checkerboard.
 \imageMacro{style_checkerboard.png, "Example for mode: Checkerboard", 5}
 \li "Color blend": Color blend of the images (blue: target image; yellow: moving). Areas where you see no color implies good intensity matchings.
@@ -45,8 +45,8 @@ You can choose from the following visualization styles to evaluate the registrat
 \imageMacro{style_contour.png, "Example for mode: Contour", 5}
 \li "Difference": Displays the absolute difference of both images.
 \li "Wipe": Blend mode that makes a rectilinear combination of the images. You can choose the mode how the images are splitted. The split is synchronized with the current selection. So you may interact with the split border to position it on interesting areas.
-\imageMacro{style_wipe_cross.png, "Example for mode: Wipe cross", 5}
-\imageMacro{style_wipe_horizontal.png, "Example for mode: Wipe horizontal", 5}
+\imageMacro{style_wipe_cross.PNG, "Example for mode: Wipe cross", 5}
+\imageMacro{style_wipe_horizontal.PNG, "Example for mode: Wipe horizontal", 5}
 
 */
 

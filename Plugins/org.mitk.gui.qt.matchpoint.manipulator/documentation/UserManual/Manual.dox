@@ -13,7 +13,7 @@
 This view offers the possibility to manually manipulate a registration to establish a good mapping between data.
 The effect of manipulation is visualized with to user defined images to allow visual inspection.\n
 It is one of several MatchPoint registration plug-ins.\n
-\imageMacro{view_example.png, "Example screenshot showing the plug-in in use", 10}
+\imageMacro{view_example.PNG, "Example screenshot showing the plug-in in use", 10}
 
 \section MAP_REGMANIP_Contact Contact information
 This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
@@ -21,7 +21,7 @@ and Therapy) at the DKFZ (German Cancer Research Center). If you have any questi
 find a bug or have a feature request, feel free to contact us at www.mitk.org.
 
 \section MAP_REGMANIP_Usage Usage
-\imageMacro{view_steps.png, "Illustration of the workflow steps.", 7}
+\imageMacro{view_steps.PNG, "Illustration of the workflow steps.", 7}
 The typical workflow with the manipulator has following steps/sections:
 1. <b>Source selection</b>: You can choose between starting a new registration and using a selected registration. For later option,
 the registration must be selected in the data manager.

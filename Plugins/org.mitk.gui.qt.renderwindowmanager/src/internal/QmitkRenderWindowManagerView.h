@@ -21,12 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkRenderWindowManagerControls.h"
 
 // render window manager UI module
-#include <QmitkRenderWindowManipulatorWidget.h>
+#include <QmitkDataStorageRenderWindowInspector.h>
 
-// blueberry
-#include <berryISelectionListener.h>
-
-// qt
+// mitk gui qt common plugin
 #include <QmitkAbstractView.h>
 
 /**
@@ -54,29 +51,16 @@ private Q_SLOTS:
   * @param renderWindowId   The text inside the combo box.
   */
   void OnRenderWindowSelectionChanged(const QString &renderWindowId);
-  /**
-  * @brief Called when the 'AddLayer'-button of he render window manipulator widget has been pushed.
-  */
-  void OnAddLayerButtonClicked();
 
 private:
 
   void SetControlledRenderer();
 
-  /**
-  * @brief Reacts to a node that has been added to the data storage.
-  *     1. Insert new node into the node list of all render windows, if it is an "globalObject_RWM"-node.
-  *  or else
-  *     2. Set data node invisible in all render windows, as soon as the node is added to the data storage.
-  */
-  void NodeAdded(const mitk::DataNode* node) override;
-
-  // the Qt parent of our GUI
   QWidget* m_Parent;
   Ui::QmitkRenderWindowManagerControls m_Controls;
 
-  QmitkRenderWindowManipulatorWidget* m_RenderWindowManipulatorWidget;
-  RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;
+  QmitkDataStorageRenderWindowInspector* m_RenderWindowInspector;
+  mitk::RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;
 };
 
 #endif // QMITKRENDERWINDOWMANAGERVIEW_H

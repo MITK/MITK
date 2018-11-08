@@ -1,15 +1,19 @@
 set(H_FILES
-  include/QmitkRenderWindowManipulatorWidget.h
+  include/QmitkDataStorageRenderWindowInspector.h
+  include/QmitkDataStorageRenderWindowListModel.h
 )
 
 set(CPP_FILES
-  QmitkRenderWindowManipulatorWidget.cpp
+  QmitkDataStorageRenderWindowInspector.cpp
+  QmitkDataStorageRenderWindowListModel.cpp
+
 )
 
 set(MOC_H_FILES
-  include/QmitkRenderWindowManipulatorWidget.h
+  include/QmitkDataStorageRenderWindowInspector.h.
+  include/QmitkDataStorageRenderWindowListModel.h
 )
 
 set(UI_FILES
-  src/QmitkRenderWindowManipulatorWidget.ui
+  src/QmitkDataStorageRenderWindowInspector.ui
 )

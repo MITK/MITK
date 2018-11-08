@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // render window manager UI module
 #include "MitkRenderWindowManagerUIExports.h"
-#include "ui_QmitkRenderWindowManipulatorWidget.h"
+#include "ui_QmitkDataStorageRenderWindowInspector.h"
 
 // render window manager module
 #include <mitkRenderWindowViewDirectionController.h>
@@ -86,7 +86,7 @@ private:
   virtual void Initialize() override;
   void SetUpConnections();
 
-  Ui::QmitkRenderWindowManipulatorWidget m_Controls;
+  Ui::QmitkDataStorageRenderWindowInspector m_Controls;
 
   std::unique_ptr<QmitkDataStorageRenderWindowListModel> m_StorageModel;
   std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;

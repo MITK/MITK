@@ -59,15 +59,18 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="dcm4cheeURL">
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QWidget" name="verticalWidget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QLabel" name="dcm4cheeURL">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QLabel" name="labelSegA">
         <property name="text">

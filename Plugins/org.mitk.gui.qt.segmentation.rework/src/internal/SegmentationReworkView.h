@@ -87,6 +87,7 @@ private:
   mitk::RESTClient* m_RestService;
 
   std::string m_CurrentStudyUID;
+  std::string m_SRUID;
 
   std::string m_DownloadBaseDir;
   std::string m_UploadBaseDir;

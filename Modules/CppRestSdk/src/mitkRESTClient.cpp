@@ -53,7 +53,7 @@ pplx::task<web::json::value> mitk::RESTClient::PUT(utility::string_t uri, web::j
 
 pplx::task<web::json::value> mitk::RESTClient::Get(utility::string_t uri)
 {
-  MITK_DEBUG << "Calling GET with " << utility::conversions::to_utf8string(uri) << " on client "
+  MITK_INFO << "Calling GET with " << utility::conversions::to_utf8string(uri) << " on client "
     << mitk::RESTUtil::convertToUtf8(m_Client->base_uri().to_string());
 	
   MitkRequest getRequest(MitkRESTMethods::GET);

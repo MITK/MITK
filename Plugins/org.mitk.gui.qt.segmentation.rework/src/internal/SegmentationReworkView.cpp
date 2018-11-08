@@ -136,7 +136,7 @@ void SegmentationReworkView::AddProgress(int progress, QString status)
   auto futureValue = m_Controls.progressBar->value() + progress;
   if (futureValue >= 100) 
   {
-    m_Controls.progressBar->setValue(100);
+    m_Controls.progressBar->setValue(0);
     m_Controls.progressBar->setFormat("Finished %p%");
   } else 
   {
@@ -171,6 +171,8 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
 {
   emit InvokeProgress(20, { "display graph and query structured report" });
   SetSimilarityGraph(dto.simScoreArray, dto.minSliceStart);
+
+  m_SRUID = dto.srSeriesUID;
 
   typedef std::map<std::string, std::string> ParamMap;
   ParamMap seriesInstancesParams;
@@ -244,11 +246,6 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
       auto filePathList = joinTask.then([&](std::vector<std::string> filePathList) {
         emit InvokeProgress(50, {"load dicom files from disk"});
         InvokeLoadData(filePathList);
-        auto algorithmNameA = GetAlgorithmOfSegByPath(filePathList[0]);
-        auto algorithmNameB = GetAlgorithmOfSegByPath(filePathList[1]);
-        emit InvokeProgress(20, { "load meta data from disk" });
-        m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + " " + algorithmNameA.c_str());
-        m_Controls.labelSegA->setText(m_Controls.labelSegB->text() + " " + algorithmNameB.c_str());
       });
 
       //ParamMap seriesInstancesParams;
@@ -350,7 +347,7 @@ std::string SegmentationReworkView::GetAlgorithmOfSegByPath(std::string path)
   auto scanner = mitk::DICOMDCMTKTagScanner::New();
 
   mitk::DICOMTagPath algorithmName;
-  algorithmName.AddSelection(0x0062, 0x0002, 0).AddSelection(0xfffe, 0xe000, 0).AddElement(0x0062, 0x0009);
+  algorithmName.AddAnySelection(0x0062, 0x0002).AddElement(0x0062, 0x0009);
 
   mitk::StringList files;
   files.push_back(path);
@@ -361,7 +358,8 @@ std::string SegmentationReworkView::GetAlgorithmOfSegByPath(std::string path)
 
   mitk::DICOMDatasetAccessingImageFrameList frames = scanner->GetFrameInfoList();
   auto findings = frames.front()->GetTagValueAsString(algorithmName);
-  MITK_INFO << findings.front().value;
+  if (findings.size() != 0)
+    MITK_INFO << findings.front().value;
   return findings.front().value;
 }
 
@@ -378,6 +376,14 @@ void SegmentationReworkView::LoadData(std::vector<std::string> filePathList)
   m_Image->SetName("image data");
   m_SegA = dataNodes->at(1);
   m_SegB = dataNodes->at(2);
+
+  auto algorithmNameA = GetAlgorithmOfSegByPath(filePathList[1]);
+  auto algorithmNameB = GetAlgorithmOfSegByPath(filePathList[2]);
+  m_SegA->SetName(algorithmNameA);
+  m_SegB->SetName(algorithmNameB);
+  m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + " " + algorithmNameA.c_str());
+  m_Controls.labelSegB->setText(m_Controls.labelSegB->text() + " " + algorithmNameB.c_str());
+  emit InvokeProgress(20, { "" });
 }
 
 void SegmentationReworkView::UpdateChartWidget()
@@ -434,21 +440,29 @@ void SegmentationReworkView::UploadNewSegmentation()
   auto filePath = utility::conversions::to_string_t(savePath);
   try {
     m_DICOMWeb->StowRS(filePath, m_CurrentStudyUID).then([=] {
-      emit AddProgress(40, {"persist reworked SEG to evaluation database"});
+      emit InvokeProgress(40, {"persist reworked SEG to evaluation database"}); 
 
-      MitkUriBuilder queryBuilder(U("tasks/evaluations"));
-      queryBuilder.append_path(U("3/")); // replace with evaluation UID
+      MitkUriBuilder queryBuilder(U("tasks/evaluations/"));
+      queryBuilder.append_query(U("srUID"), utility::conversions::to_string_t(m_SRUID));
+      //queryBuilder.append_path(U("71/"));
       m_RestService->Get(queryBuilder.to_string()).then([=](web::json::value result) {
-        auto updatedContent = result;
+        MITK_INFO << "after GET";
+        MITK_INFO << utility::conversions::to_utf8string(result.to_string());
+        auto updatedContent = result.as_array()[0];
         updatedContent[U("reworkedSegmentationUID")] = web::json::value::string(utility::conversions::to_string_t(segSeriesUID));
+     
+        auto id = updatedContent.at(U("id")).as_integer();
+        MITK_INFO << id;
+        auto idParam = std::to_string(id).append("/");
+
+        MitkUriBuilder queryBuilder(U("tasks/evaluations"));
+        queryBuilder.append_path(utility::conversions::to_string_t(idParam));
+
         m_RestService->PUT(queryBuilder.to_string(), updatedContent).then([=](web::json::value result) {
-          MITK_INFO << utility::conversions::to_utf8string(result.to_string());
           MITK_INFO << "successfully stored";
-          emit AddProgress(30, { "" });
+          emit InvokeProgress(30, { "successfully stored" });
         });
-
       });
-
     });
   }
   catch (const std::exception &exception)

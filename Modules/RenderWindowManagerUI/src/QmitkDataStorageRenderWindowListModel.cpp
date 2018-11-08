@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt widgets module
 #include "QmitkCustomVariants.h"
 #include "QmitkEnums.h"
+#include "QmitkMimeTypes.h"
 #include "QmitkNodeDescriptorManager.h"
 
 QmitkDataStorageRenderWindowListModel::QmitkDataStorageRenderWindowListModel(QObject* parent /*= nullptr*/)
@@ -185,12 +186,93 @@ bool QmitkDataStorageRenderWindowListModel::setData(const QModelIndex& index, co
 
 Qt::ItemFlags QmitkDataStorageRenderWindowListModel::flags(const QModelIndex &index) const
 {
-  if (!index.isValid() || this != index.model())
+  if (this != index.model())
   {
     return Qt::NoItemFlags;
   }
 
-  return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+  if (!index.isValid())
+  {
+    return Qt::ItemIsDropEnabled;
+  }
+
+  return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+}
+
+Qt::DropActions QmitkDataStorageRenderWindowListModel::supportedDropActions() const
+{
+  return Qt::CopyAction | Qt::MoveAction;
+}
+
+Qt::DropActions QmitkDataStorageRenderWindowListModel::supportedDragActions() const
+{
+  return Qt::CopyAction | Qt::MoveAction;
+}
+
+QStringList QmitkDataStorageRenderWindowListModel::mimeTypes() const
+{
+  QStringList types = QAbstractItemModel::mimeTypes();
+  types << QmitkMimeTypes::DataNodePtrs;
+  return types;
+}
+
+QMimeData* QmitkDataStorageRenderWindowListModel::mimeData(const QModelIndexList& indexes) const
+{
+  QMimeData* mimeData = new QMimeData();
+  QByteArray encodedData;
+
+  QDataStream stream(&encodedData, QIODevice::WriteOnly);
+
+  for (const auto& index : indexes)
+  {
+    if (index.isValid())
+    {
+      auto dataNode = data(index, QmitkDataNodeRawPointerRole).value<mitk::DataNode*>();
+      stream << reinterpret_cast<quintptr>(dataNode);
+    }
+  }
+
+  mimeData->setData(QmitkMimeTypes::DataNodePtrs, encodedData);
+  return mimeData;
+}
+
+bool QmitkDataStorageRenderWindowListModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent)
+{
+  if (action == Qt::IgnoreAction)
+  {
+    return true;
+  }
+
+  if (!data->hasFormat(QmitkMimeTypes::DataNodePtrs))
+  {
+    return false;
+  }
+
+  if (column > 0)
+  {
+    return false;
+  }
+
+  if (parent.isValid())
+  {
+    int layer = -1;
+    auto dataNode = this->data(parent, QmitkDataNodeRawPointerRole).value<mitk::DataNode*>();
+    if (nullptr != dataNode)
+    {
+      dataNode->GetIntProperty("layer", layer, m_BaseRenderer);
+    }
+
+    auto dataNodeList = QmitkMimeTypes::ToDataNodePtrList(data);
+    for (const auto& dataNode : dataNodeList)
+    {
+      m_RenderWindowLayerController->MoveNodeToPosition(dataNode, layer, m_BaseRenderer);
+    }
+
+    UpdateModelData();
+    return true;
+  }
+
+  return false;
 }
 
 void QmitkDataStorageRenderWindowListModel::SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer)

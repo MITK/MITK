@@ -40,8 +40,11 @@ QmitkDataStorageRenderWindowInspector::QmitkDataStorageRenderWindowInspector(QWi
   m_Controls.renderWindowListView->setModel(m_StorageModel.get());
   m_Controls.renderWindowListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
   m_Controls.renderWindowListView->setSelectionBehavior(QAbstractItemView::SelectRows);
-  m_Controls.renderWindowListView->setSelectionMode(QAbstractItemView::SingleSelection);
+  m_Controls.renderWindowListView->setSelectionMode(QAbstractItemView::ExtendedSelection);
   m_Controls.renderWindowListView->setAlternatingRowColors(true);
+  m_Controls.renderWindowListView->setDragEnabled(true);
+  m_Controls.renderWindowListView->setDropIndicatorShown(true);
+  m_Controls.renderWindowListView->setAcceptDrops(true);
 
   SetUpConnections();
 }

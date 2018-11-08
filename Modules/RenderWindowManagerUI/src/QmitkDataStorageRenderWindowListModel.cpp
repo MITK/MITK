@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt widgets module
 #include "QmitkCustomVariants.h"
 #include "QmitkEnums.h"
+#include "QmitkNodeDescriptorManager.h"
 
 QmitkDataStorageRenderWindowListModel::QmitkDataStorageRenderWindowListModel(QObject* parent /*= nullptr*/)
   : QmitkAbstractDataStorageModel(parent)
@@ -85,7 +86,7 @@ int QmitkDataStorageRenderWindowListModel::rowCount(const QModelIndex& parent /*
     return 0;
   }
 
-  return static_cast<int>(m_TempLayerStack.size());
+  return static_cast<int>(m_LayerStack.size());
 }
 
 int QmitkDataStorageRenderWindowListModel::columnCount(const QModelIndex& parent /*= QModelIndex()*/) const
@@ -105,12 +106,12 @@ QVariant QmitkDataStorageRenderWindowListModel::data(const QModelIndex& index, i
     return QVariant();
   }
 
-  if (index.row() < 0 || index.row() >= static_cast<int>(m_TempLayerStack.size()))
+  if (index.row() < 0 || index.row() >= static_cast<int>(m_LayerStack.size()))
   {
     return QVariant();
   }
 
-  mitk::RenderWindowLayerUtilities::LayerStack::const_iterator layerStackIt = m_TempLayerStack.begin();
+  mitk::RenderWindowLayerUtilities::LayerStack::const_iterator layerStackIt = m_LayerStack.begin();
   std::advance(layerStackIt, index.row());
   mitk::DataNode* dataNode = layerStackIt->second;
 
@@ -135,6 +136,11 @@ QVariant QmitkDataStorageRenderWindowListModel::data(const QModelIndex& index, i
   {
     return QVariant("Name of the data node.");
   }
+  else if (Qt::DecorationRole == role)
+  {
+    QmitkNodeDescriptor* nodeDescriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(dataNode);
+    return nodeDescriptor->GetIcon(dataNode);
+  }
   else if (Qt::UserRole == role || QmitkDataNodeRawPointerRole == role)
   {
     // user role always returns a reference to the data node,
@@ -156,12 +162,12 @@ bool QmitkDataStorageRenderWindowListModel::setData(const QModelIndex& index, co
     return false;
   }
 
-  if (index.row() < 0 || index.row() >= static_cast<int>(m_TempLayerStack.size()))
+  if (index.row() < 0 || index.row() >= static_cast<int>(m_LayerStack.size()))
   {
     return false;
   }
 
-  mitk::RenderWindowLayerUtilities::LayerStack::const_iterator layerStackIt = m_TempLayerStack.begin();
+  mitk::RenderWindowLayerUtilities::LayerStack::const_iterator layerStackIt = m_LayerStack.begin();
   std::advance(layerStackIt, index.row());
   mitk::DataNode* dataNode = layerStackIt->second;
   if (Qt::CheckStateRole == role)
@@ -197,7 +203,7 @@ void QmitkDataStorageRenderWindowListModel::SetCurrentRenderer(mitk::BaseRendere
   if (m_BaseRenderer != baseRenderer)
   {
     m_BaseRenderer = baseRenderer;
-    SetNodePredicate(mitk::RenderWindowLayerUtilities::GetRenderWindowPredicate(m_BaseRenderer));
+    UpdateModelData();
   }
 }
 
@@ -216,7 +222,7 @@ void QmitkDataStorageRenderWindowListModel::UpdateModelData()
     // update the model, so that it will be filled with the nodes of the new data storage
       beginResetModel();
       // get the current layer stack of the given base renderer
-      m_TempLayerStack = mitk::RenderWindowLayerUtilities::GetLayerStack(dataStorage, m_BaseRenderer, true);
+      m_LayerStack = mitk::RenderWindowLayerUtilities::GetLayerStack(dataStorage, m_BaseRenderer, true);
       endResetModel();
     }
   }

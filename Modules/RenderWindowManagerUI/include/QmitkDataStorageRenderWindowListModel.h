@@ -95,7 +95,7 @@ private:
 
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
   mitk::BaseRenderer::Pointer m_BaseRenderer;
-  mitk::RenderWindowLayerUtilities::LayerStack m_TempLayerStack;
+  mitk::RenderWindowLayerUtilities::LayerStack m_LayerStack;
 
 };
 

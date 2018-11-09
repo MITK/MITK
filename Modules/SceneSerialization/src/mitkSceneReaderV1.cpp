@@ -99,6 +99,8 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
         }
 
         bool localError =false;
+        static std::recursive_mutex mutex;
+        std::lock_guard<std::recursive_mutex> lock(mutex);
         auto result = LoadBaseDataFromDataTag(dataElement, workingDirectory, localError);
         if (localError) {
           error = true;

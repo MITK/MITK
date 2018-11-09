@@ -1,32 +1,20 @@
 /**
 \page org_mitk_gui_qt_matchpoint_algorithm_browser The MatchPoint Algorithm Browser View
 
-\imageMacro{map-icon-browser.svg, "Icon of the MatchPoint Algorithm Browser", 3}
+\imageMacro{map_icon_browser_doc.svg, "Icon of the MatchPoint Algorithm Browser", 3}
 
-\li \ref MAP_BROWSER_Introduction
-\li \ref MAP_BROWSER_Contact
-\li \ref MAP_BROWSER_Usage
-\li \ref MAP_BROWSER_Profile
+\tableofcontents
 
 \section MAP_BROWSER_Introduction Introduction
 This view offers the user a way to search for available registration algorithms and select them for
 further usage by other views (e.g. MatchPoint Algorithm Control \ref org_mitk_gui_qt_algorithm_control).
 
-\section MAP_BROWSER_Contact Contact information
-This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
-and Therapy) at the DKFZ (German Cancer Research Center). If you have any questions, need support,
-find a bug or have a feature request, feel free to contact us at dipp@dkfz.de.
-
 \section MAP_BROWSER_Usage Usage
 \remark If you see no algorithms available by the browser, please check the search paths which can be configured at the MatchPoint preference page (Ctrl+P).
-<b>DIPP-User</b>: You should activate at least "scan installation directory" to see the algorithms delivered with the DIPP installer.
 
 The basic idea of the browser is that you can use this view as central place to search for suitable algorithms. If you select an algorithm you can see its profile in the lower part of the view.
-If a algorithm is selected all other views (e.g. \ref org_mitk_gui_qt_algorithm_control or \ref de_dkfz_dwi_gui_qt_crex) which use registration algorithms will be notified and allow to choose the selected algorithm for usage.
-\imageMacro{browser.png, "View of the browser with the list of available algorithm and the profile area",14}
-
-\remark You haven't found a fitting registration algorithm? Please have a look at the registration repository at our SBR share point (http://intracoop/sites/sbr/Lists/RegRepository/default.aspx)
-or contact us (dipp@dkfz.de).
+If a algorithm is selected all other views (e.g. \ref org_mitk_gui_qt_algorithm_control) which use registration algorithms will be notified and allow to choose the selected algorithm for usage.
+\imageMacro{map_browser.png, "View of the browser with the list of available algorithm and the profile area",14}
 
 \section MAP_BROWSER_Profile Profile info
 In the following a short information about the different properties classified in the profile.\n

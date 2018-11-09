@@ -223,7 +223,7 @@ void calculateMEE(vtkPointSet *pointset, double &vol, double &surf, double toler
     Q(0, i) = p[0];
     Q(1, i) = p[1];
     Q(2, i) = p[2];
-    Q(3, i) = p[3];
+    Q(3, i) = 1.0;
   }
 
   int count = 1;

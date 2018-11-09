@@ -36,7 +36,7 @@ namespace mitk
 }
 
 mitk::FastMarchingTool::FastMarchingTool()
-  : FeedbackContourTool("PressMoveReleaseAndPointSetting"),
+  : FeedbackContourTool("FastMarchingTool"),
     m_NeedUpdate(true),
     m_CurrentTimeStep(0),
     m_PositionEvent(nullptr),

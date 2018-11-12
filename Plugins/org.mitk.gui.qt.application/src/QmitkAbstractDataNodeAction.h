@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <org_mitk_gui_qt_application_Export.h>
 
 // mitk core
+#include <mitkBaseRenderer.h>
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 
@@ -40,6 +41,7 @@ public:
   virtual ~QmitkAbstractDataNodeAction();
 
   void SetDataStorage(mitk::DataStorage* dataStorage);
+  void SetBaseRenderer(mitk::BaseRenderer* baseRenderer);
 
   virtual void InitializeWithDataNode(const mitk::DataNode* dataNode) { }
 
@@ -51,6 +53,7 @@ protected:
 
   berry::IWorkbenchPartSite::WeakPtr m_WorkbenchPartSite;
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+  mitk::WeakPointer<mitk::BaseRenderer> m_BaseRenderer;
 
 };
 

@@ -48,6 +48,15 @@ void QmitkAbstractDataNodeAction::SetDataStorage(mitk::DataStorage* dataStorage)
   }
 }
 
+void QmitkAbstractDataNodeAction::SetBaseRenderer(mitk::BaseRenderer* baseRenderer)
+{
+  if (m_BaseRenderer != baseRenderer)
+  {
+    // set the new base renderer
+    m_BaseRenderer = baseRenderer;
+  }
+}
+
 QList<mitk::DataNode::Pointer> QmitkAbstractDataNodeAction::GetSelectedNodes()
 {
   QList<mitk::DataNode::Pointer> selectedNodes;

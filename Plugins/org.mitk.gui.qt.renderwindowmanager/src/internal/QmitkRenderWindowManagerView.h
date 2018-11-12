@@ -53,7 +53,7 @@ private Q_SLOTS:
   *
   * @param renderWindowId   The text inside the combo box.
   */
-  void OnRenderWindowSelectionChanged(const QString &renderWindowId);
+  void OnRenderWindowSelectionChanged(const QString& renderWindowId);
 
 private:
 

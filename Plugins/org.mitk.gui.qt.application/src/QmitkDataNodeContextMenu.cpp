@@ -284,11 +284,12 @@ void QmitkDataNodeContextMenu::OnContextMenuRequested(const QPoint& pos)
     if (m_SelectedNodes.size() == 1)
     {
       // no batch action; should only contain a single node
-      actions = QmitkNodeDescriptorManager::GetInstance()->GetActions(m_SelectedNodes.front());
+      actions = GetActions(m_SelectedNodes.front());
     }
     else
     {
-      actions = QmitkNodeDescriptorManager::GetInstance()->GetActions(m_SelectedNodes);
+      // batch action
+      actions = GetActions(m_SelectedNodes);
     }
 
     // initialize abstract data node actions
@@ -494,4 +495,44 @@ void QmitkDataNodeContextMenu::AddDescriptorActionList(DescriptorActionListType&
     // mark new action into list of descriptors to remove in destructor
     m_DescriptorActionList.push_back(descriptorActionPair);
   }
+}
+
+QList<QAction*> QmitkDataNodeContextMenu::GetActions(const mitk::DataNode* node)
+{
+  QList<QAction*> actions;
+  for (DescriptorActionListType::const_iterator it = m_DescriptorActionList.begin(); it != m_DescriptorActionList.end(); ++it)
+  {
+    if ((it->first)->CheckNode(node) ||
+         it->first->GetNameOfClass() == "Unknown")
+    {
+      actions.append(it->second);
+    }
+  }
+
+  return actions;
+}
+
+QList<QAction*> QmitkDataNodeContextMenu::GetActions(const QList<mitk::DataNode::Pointer>& nodes)
+{
+  QList<QAction*> actions;
+
+  for (DescriptorActionListType::const_iterator it = m_DescriptorActionList.begin(); it != m_DescriptorActionList.end(); ++it)
+  {
+    for (const auto& node : nodes)
+    {
+      if ((it->first)->CheckNode(node) ||
+           it->first->GetNameOfClass() == "Unknown")
+      {
+        const auto& batchActions = (it->first)->GetBatchActions();
+        if (std::find(batchActions.begin(), batchActions.end(), it->second) != batchActions.end())
+        {
+          // current descriptor action is a batch action
+          actions.append(it->second);
+        }
+        break; // only add action once; goto next descriptor action
+      }
+    }
+  }
+
+  return actions;
 }

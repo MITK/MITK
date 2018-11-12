@@ -76,6 +76,9 @@ private:
   void AddColorAction(QWidgetAction* colorAction);
   void AddDescriptorActionList(DescriptorActionListType& descriptorActionList);
 
+  QList<QAction*> GetActions(const mitk::DataNode* node);
+  QList<QAction*> GetActions(const QList<mitk::DataNode::Pointer>& nodes);
+
   QWidget* m_Parent;
   berry::IWorkbenchPartSite::WeakPtr m_WorkbenchPartSite;
 

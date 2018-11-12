@@ -48,7 +48,7 @@ QmitkDataNodeContextMenu::QmitkDataNodeContextMenu(berry::IWorkbenchPartSite::Po
 QmitkDataNodeContextMenu::~QmitkDataNodeContextMenu()
 {
   // remove the registered actions from each descriptor
-  for (std::vector<std::pair<QmitkNodeDescriptor*, QAction*>>::iterator it = m_DescriptorActionList.begin(); it != m_DescriptorActionList.end(); ++it)
+  for (DescriptorActionListType::const_iterator it = m_DescriptorActionList.begin(); it != m_DescriptorActionList.end(); ++it)
   {
     (it->first)->RemoveAction(it->second);
   }
@@ -60,7 +60,7 @@ void QmitkDataNodeContextMenu::SetDataStorage(mitk::DataStorage* dataStorage)
   {
     // set the new data storage - also for all actions
     m_DataStorage = dataStorage;
-    for (std::vector<std::pair<QmitkNodeDescriptor*, QAction*>>::iterator it = m_DescriptorActionList.begin(); it != m_DescriptorActionList.end(); ++it)
+    for (DescriptorActionListType::const_iterator it = m_DescriptorActionList.begin(); it != m_DescriptorActionList.end(); ++it)
     {
       QmitkAbstractDataNodeAction* abstractDataNodeAction = dynamic_cast<QmitkAbstractDataNodeAction*>(it->second);
       if(nullptr != abstractDataNodeAction)
@@ -201,7 +201,7 @@ void QmitkDataNodeContextMenu::InitExtensionPointActions()
   QList<berry::IConfigurationElement::Pointer> customMenuConfigs = extensionPointService->GetConfigurationElementsFor("org.mitk.gui.qt.datamanager.contextMenuActions");
 
   // prepare all custom QActions
-  m_ConfElements.clear();
+  m_ConfigElements.clear();
   DescriptorActionListType descriptorActionList;
   for (const auto& customMenuConfig : customMenuConfigs)
   {
@@ -248,7 +248,7 @@ void QmitkDataNodeContextMenu::InitExtensionPointActions()
     connect(contextMenuAction, static_cast<void(QAction::*)(bool)>(&QAction::triggered), this, &QmitkDataNodeContextMenu::OnExtensionPointActionTriggered);
 
     // mark configuration element into lookup list for context menu handler
-    m_ConfElements[contextMenuAction] = customMenuConfig;
+    m_ConfigElements[contextMenuAction] = customMenuConfig;
     // mark new action in sortable list for addition to descriptor
     descriptorActionList.emplace_back(nodeDescriptor, contextMenuAction);
   }
@@ -291,6 +291,7 @@ void QmitkDataNodeContextMenu::OnContextMenuRequested(const QPoint& pos)
       actions = QmitkNodeDescriptorManager::GetInstance()->GetActions(m_SelectedNodes);
     }
 
+    // initialize abstract data node actions
     for (auto& action : actions)
     {
       QmitkAbstractDataNodeAction* abstractDataNodeAction = dynamic_cast<QmitkAbstractDataNodeAction*>(action);
@@ -317,8 +318,8 @@ void QmitkDataNodeContextMenu::OnContextMenuRequested(const QPoint& pos)
 void QmitkDataNodeContextMenu::OnExtensionPointActionTriggered(bool)
 {
   QAction* action = qobject_cast<QAction*>(sender());
-  std::map<QAction*, berry::IConfigurationElement::Pointer>::iterator it = m_ConfElements.find(action);
-  if (it == m_ConfElements.end())
+  ConfigurationElementsType::const_iterator it = m_ConfigElements.find(action);
+  if (it == m_ConfigElements.end())
   {
     MITK_WARN << "Associated configuration element for action " << action->text().toStdString() << " not found.";
     return;

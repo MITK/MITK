@@ -66,6 +66,7 @@ public Q_SLOTS:
 private:
 
   using DescriptorActionListType = std::vector<std::pair<QmitkNodeDescriptor*, QAction*>>;
+  using ConfigurationElementsType = std::map<QAction*, berry::IConfigurationElement::Pointer>;
 
   void InitNodeDescriptors();
   void InitDefaultActions();
@@ -85,7 +86,7 @@ private:
   DescriptorActionListType m_DescriptorActionList;
 
   // stores the configuration elements for the context menu actions from extension points
-  std::map<QAction*, berry::IConfigurationElement::Pointer> m_ConfElements;
+  ConfigurationElementsType m_ConfigElements;
 
   QmitkNodeDescriptor* m_UnknownDataNodeDescriptor;
   QmitkNodeDescriptor* m_ImageDataNodeDescriptor;

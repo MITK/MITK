@@ -45,6 +45,7 @@ QmitkDataStorageRenderWindowInspector::QmitkDataStorageRenderWindowInspector(QWi
   m_Controls.renderWindowListView->setDragEnabled(true);
   m_Controls.renderWindowListView->setDropIndicatorShown(true);
   m_Controls.renderWindowListView->setAcceptDrops(true);
+  m_Controls.renderWindowListView->setContextMenuPolicy(Qt::CustomContextMenu);
 
   SetUpConnections();
 }

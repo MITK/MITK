@@ -35,10 +35,10 @@ namespace mitk
   struct IContextMenuAction
   {
 
-      /**
-      * @brief Executes the action, that linked to the context menu entry.
-      */
-      virtual void Run( const QList<mitk::DataNode::Pointer>& selectedNodes ) = 0;
+    /**
+    * @brief Executes the action, that linked to the context menu entry.
+    */
+    virtual void Run(const QList<mitk::DataNode::Pointer>& selectedNodes) = 0;
 
     // Setters
     virtual void SetDataStorage(mitk::DataStorage* dataStorage) = 0;

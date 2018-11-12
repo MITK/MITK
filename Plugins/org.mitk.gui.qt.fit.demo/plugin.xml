@@ -6,7 +6,7 @@
           name="Fit Generator Demo"
 		  category="Fitting"
           class="FitGeneratorDemoView"
-          icon="resources/demo.png" />
+          icon="resources/icon.svg" />
   </extension>
 
 </plugin>

@@ -6,7 +6,7 @@
           name="Modelfit Generic Data Fitting"
 		  category="Fitting"
           class="GenericDataFittingView"
-          icon="resources/gdf.png" />
+          icon="resources/icon.svg" />
   </extension>
 
 </plugin>

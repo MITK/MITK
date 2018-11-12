@@ -1,9 +1,17 @@
 /**
-\page org_mitk_gui_qt_fit_demo The Fit Demo View
+\page org_mitk_gui_qt_fit_demo The Model Fit Demo View
 
-\li \ref FDEMO_Introduction
+\imageMacro{fit_demo_doc.svg,"Icon of the Fit Demo View",3.0}
 
-\section FDEMO_Introduction Introduction
-This is a very simple view that demonstrates how a fit generator can be implemented using the module ModelFit.
-In addition the view can be used to generate a demo fit to explore other components like the fit explorer.
+\tableofcontents
+
+\section FIT_DEMO_Introduction Introduction
+This plugin is a very simple demo plugin that allows 1) to generate a demo 3D+t image (with linear increasing values) and 2) to perform a linear fit on a selected node.
+It was/is use to demonstrate basic principle and to generate example fit sessions for demo and testing purposes (e.g. functionality of the fit inspector).
+
+\section FIT_DEMO_Contact Contact information
+This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
+and Therapy) at the DKFZ (German Cancer Research Center). If you have any questions, need support,
+find a bug or have a feature request, feel free to contact us at www.mitk.org.
+
 */

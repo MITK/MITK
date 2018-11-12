@@ -6,7 +6,7 @@
           name="ModelFit Inspector View"
 		  category="Fitting"
           class="ModelFitInspectorView"
-          icon="resources/mf.png" />
+          icon="resources/icon.svg" />
   </extension>
 
 </plugin>

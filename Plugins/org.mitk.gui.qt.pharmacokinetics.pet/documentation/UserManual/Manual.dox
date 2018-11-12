@@ -1,7 +1,46 @@
 /**
 \page org_mitk_gui_qt_pharmacokinetics_pet The Dynamic PET DataFit View
 
-\section org_mitk_gui_qt_pharmacokinetics_pet_Overview Overview
-This plug-in allows to fit dynamic PET images to different given models.
+\imageMacro{pharmacokinetics_pet_doc.svg,"Icon of the DCE MR Perfusion View",3.0}
+
+\tableofcontents
+
+\section FIT_PET_Overview Overview
+Pharmacokinetic analysis of concentration time curves is also of interest in the context of dynamic PET acquisition over the accumulation of a radioactive tracer in tissue.
+
+\section FIT_PET_Contact Contact information
+This plug-in is being developed by Charlotte Debus and the SIDT group (Software development for Integrated Diagnostics
+and Therapy) at the DKFZ (German Cancer Research Center).
+If you have any questions, need support, find a bug or have a feature request, feel free to contact us at www.mitk.org.
+
+\subsection FIT_DCE_Cite Citation information
+If you use the view for your research please cite our work as reference:\n\n
+Debus C and Floca R, Ingrisch M, Kompan I, Maier-Hein K, Abdollahi A, Nolden M, MITK-ModelFit: generic open-source framework for model fits and their exploration in medical imaging – design, implementation and application on the example of DCE-MRI (arXiv:1807.07353)
+
+\section FIT_PET_General General information
+All models require definition of the arterial tracer concentration, i.e. the AIF. For AIF definition see section 3. Instead of the hematocrit level, the whole blood to plasma correction value needs to be specified. The literature value commonly used is 0.1
+Since PET images are already in concentration units of activity per volume ([Bq/ml], translates to number of nuclei per volume), no conversion of signal intensities to concentration is offered in the plugin. If, however, conversion of the 4D images to standard uptake values (SUV) is desired, this can be performed with the separate PET SUV calculation plugin.
+Start parameters and parameter constraints can be defined in the same manner as for the DCE tool.
+
+\subsection FIT_PET_General_models Supported models
+The PET dynamic plugin works in analogy to the DCE MRI perfusion plugin. It currently supports the following compartmental models:
+-	One tissue compartment model (without blood volume VB)
+-	Extended one tissue compartment model (with blood volume VB)
+-	Two tissue compartment model (with blood volume)
+-	Two tissue compartment model for FDG (without back exchange k4)
+
+\section FIT_PET_Settings Model Settings
+
+\subsection FIT_PET_Settings_start Start parameter
+In cases of noisy data it can be useful to define the initial starting values of the parameter estimates, at which optimization starts, in order to prevent optimization results in local optima.
+Each model has default scalar values (applied to every voxel) for initial values of each parameter, however these can be adjusted.
+Moreover, initial values can also be defined locally for each individual voxel via starting value images.
+
+\subsection FIT_PET_Settings_constraint Constraint settings
+To limit the fitting search space and to exclude unphysical/illogical results for model parameter estimates, constraints to individual parameters as well as combinations can be imposed.
+Each model has default constraints, however, new ones can be defined or removed by the + and – buttons in the table.
+The first column specifies the parameter(s) involved in the constraint (if multiple selected, their sum will be used) by selection in the drop down menu.
+The second column defines whether the constraints defines an upper or lower boundary.
+Value and Width define the actual constraint value, that should not be crossed, and a certain tolerance width.
 
 */

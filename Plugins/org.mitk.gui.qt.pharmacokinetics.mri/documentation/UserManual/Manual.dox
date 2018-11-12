@@ -1,8 +1,88 @@
 /**
 \page org_mitk_gui_qt_pharmacokinetics_mri The DCE MR Perfusion Datafit View
 
-\section org_mitk_gui_qt_pharmacokinetics_mri_Overview Overview
+\imageMacro{pharmacokinetics_mri_doc.svg,"Icon of the DCE MR Perfusion View",3.0}
 
-This plug-in offers the possibilities to fit several pharmacokinetic modells onto DCE MR perfusion images.
+\tableofcontents
+
+\section FIT_DCE_Introduction Introduction
+For pharmacokinetic analysis of DCE MRI/CT data using compartment models in non-linear least square fitting the DCE MR Perfusion Datafit plugin can be used. 
+
+\section FIT_DCE_Contact Contact information
+This plug-in is being developed by Charlotte Debus and the SIDT group (Software development for Integrated Diagnostics
+and Therapy) at the DKFZ (German Cancer Research Center).
+If you have any questions, need support, find a bug or have a feature request, feel free to contact us at www.mitk.org.
+\subsection FIT_DCE_Cite Citation information
+If you use the view for your research please cite our work as reference:\n\n
+Debus C and Floca R, Ingrisch M, Kompan I, Maier-Hein K, Abdollahi A, Nolden M, MITK-ModelFit: generic open-source framework for model fits and their exploration in medical imaging – design, implementation and application on the example of DCE-MRI (arXiv:1807.07353)
+
+\section FIT_DCE_General General information
+\imageMacro{dce_mri_init.png, "Example screen shot showing the view at first start.", 10}
+For pharmacokinetic analysis of DCE MRI/CT data using compartment models in non-linear least square fitting the DCE MR Perfusion Datafit view can be used. 
+In principle, every model can be fitted on the entire image. However, for model configuration reasons (e.g. AIF required) and computational time cost, this is often not advisable.
+Therefore, apart from the image to be fitted (Selected Time Series), a ROI segmentation can be defined (Selected Mask), within which model fitting is performed.
+The view currently offers voxel wise and/or ROI averaged fits of intensity-time curves with different quantitative and semi-quantitative models.
+If a mask is selected, ROI-based fitting (fit average curve within ROI) is enabled (radio button Fitting Strategy – Pixel based / ROI based).
+
+\subsection FIT_DCE_General_models Supported models
+Currently the following pharmacokinetic models for gadolinium-based contrast agent are available:
+-	The Descriptive Brix model \ref FIT_DCE_lit_ref1 "[1]"
+-	A semi-quantitative three segment linear model (3SL)
+-	The standard tofts model \ref FIT_DCE_lit_ref2 "[2]"
+-	The extended Tofts model \ref FIT_DCE_lit_ref3 "[3]"
+-	The two compartment exchange model (2CXM) \ref FIT_DCE_lit_ref4 "[4, 5]"
+
+\section FIT_DCE_Settings Model Settings
+\imageMacro{dce_mri_config.png, "Example screenshot showing the config settings of the view.", 10}
+
+\subsection FIT_DCE_Settings_model Model specific settings
+Selecting one of the \ref FIT_DCE_General_models "supported models" will open below tabs for further configuration of the model.
+- The descriptive Brix model requires only definition of the duration of the bolus, i.e. the overall time of the injection (Injection Time [min])
+- The 3SL is a semi-quantitative descriptive model that distinguishes three different segments of the signal: A constant baseline, the initial fast rise (wash-in) and the final slow rise / signal decrease (washout). Each of these segments is approximated by a linear curve, with change points in-between. It requires no further configuration
+- The standard Tofts model, the extended Tofts model and the 2CXM are all three compartment models that require the input of the concentration time curve in the tissue feeding artery, the AIF. In the DCE MRI Model fitting plugin, the arterial input function can be defined in several ways. For patient individual image derived AIFs, select the radio button "Select AIF from Image". In that case, a segmentation ROI for the artery has to be given to the tool (Drop-down menu AIF Mask from Data Manager). In cases, where the respective artery does not lie in the same image as the investigated tissue (e.g. in animal experiments, where a slice through the heart is used for AIF extraction), a dedicated AIF image can be selected from the Data Manager.
+The other option is to define the AIF via an external file (e.g. for population derived AIFs or AIFs from blood sampling). By clicking the Browse button, one can select a csv file that holds the arterial intensity values and corresponding timepoints (in tuple format (Time, Value)). Caution: the file may not contain a header line, but the first line must start with Time and Intensity values.
+Furthermore, the hematocrit level has to be set (from 0 to 1) for conversion from whole blood to plasma concentration. It is set to the literature default value of 0.45.
+
+\subsection FIT_DCE_Settings_start Start parameter
+\imageMacro{dce_mri_start.png, "Example screen shot for start parameter settings.", 10}
+In cases of noisy data it can be useful to define the initial starting values of the parameter estimates, at which optimization starts, in order to prevent optimization results in local optima.
+Each model has default scalar values (applied to every voxel) for initial values of each parameter, however these can be adjusted.
+Moreover, initial values can also be defined locally for each individual voxel via starting value images.
+
+\subsection FIT_DCE_Settings_constraint Constraint settings
+\imageMacro{dce_mri_constraint.png, "Example screen shot for constraint settings.", 10}
+To limit the fitting search space and to exclude unphysical/illogical results for model parameter estimates, constraints to individual parameters as well as combinations can be imposed.
+Each model has default constraints, however, new ones can be defined or removed by the + and – buttons in the table.
+The first column specifies the parameter(s) involved in the constraint (if multiple selected, their sum will be used) by selection in the drop down menu.
+The second column defines whether the constraints defines an upper or lower boundary.
+Value and Width define the actual constraint value, that should not be crossed, and a certain tolerance width.
+
+\subsection FIT_DCE_Settings_concentration Signal to concentration conversion settings
+\imageMacro{dce_mri_concentration.png, "Example screen shot for concentration conversion settings.", 10}
+Most models require concentration values as input rather than raw signal intensities (i.e. all compartment models).
+The DCE MR Perfusion view offers conversion to concentration by means of relative and absolute signal enhancement as well as a special conversion for turbo flash sequences.
+
+\section FIT_DCE_Fitting Executing a fit
+After configuration of the entire fit routine, the respective time series to be fitted and eventually the ROI mask have to be selected.
+If only an image is needed, selection of the respective time series in the data manager is sufficient.
+If a mask is to be selected as well, image and mask have to be selected by holding the shift key and selecting them in this order from the Data manager.\n\n
+
+In order to distinguish results from different model fits to the data, a Fitting name can be defined in the bottom field.
+As default, the name of the model and the fitting strategy (pixel/ROI) are given. This name will then be appended by the respective parameter name.\n\n
+
+For development purposes and evaluation of the fits, the option "Generate debug parameter images" is available.
+Enabling this option will result in additional parameter maps displaying the status of the optimizer at fit termination, like needed optimization time, number of iterations, constraint violations and reasons for fit termination (criterion reached, maximum number of iterations, etc.).\n\n
+
+After all necessary configurations are set, the button "Start Modelling" is enabled, which starts the fitting routine. Progress can be seen in the message box on the bottom. Resulting parameter maps will afterwards be added to the data manager as sub-nodes to the analyzed 4D image. 
+
+\section FIT_DCE_lit References/Literature
+- \anchor FIT_DCE_lit_ref1 [1] Brix G, Semmler W, Port R, Schad LR, Layer G, Lorenz WJ. Pharmacokinetic parameters in CNS Gd-DTPA enhanced MR imaging. J Comput Assist Tomogr. 1991;15:621–8.
+- \anchor FIT_DCE_lit_ref2 [2] Tofts PS, Kermode AG. Measurement of the blood-brain barrier permeability and leakage space using dynamic MR imaging. 1. Fundamental concepts. Magn Reson Med. 1991;17:357–67.
+- \anchor FIT_DCE_lit_ref3 [3] Sourbron SP, Buckley DL. On the scope and interpretation of the Tofts models for DCE-MRI. Magn Reson Med. 2011;66:735–45.
+- \anchor FIT_DCE_lit_ref4 [4] Brix G, Kiessling F, Lucht R, Darai S, Wasser K, Delorme S, et al. Microcirculation and microvasculature in breast tumors: Pharmacokinetic analysis of dynamic MR image series. Magn Reson Med. 2004;52:420–9.
+- \anchor FIT_DCE_lit_ref5 [5] Sourbron, Buckley. Tracer kinetic modelling in MRI: estimating perfusion and capillary permeability - pdf. Phys Med Biol. 2012. http://iopscience.iop.org/article/10.1088/0031-9155/57/2/R1/pdf. Accessed 1 May 2016.
+
+
 
 */
+

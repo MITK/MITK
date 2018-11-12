@@ -1,10 +1,16 @@
 /**
 \page org_mitk_gui_qt_pharmacokinetics_concentration_mri The Concentration Curve Converter View
 
-\li \ref org_mitk_gui_qt_pharmacokinetics_concentration_mri_Introduction
+\imageMacro{pharmacokinetics_concentration_doc.svg,"Icon of the Concentration Curve Converter View",3.0}
 
-\section org_mitk_gui_qt_pharmacokinetics_concentration_mri_Introduction Introduction
-This view offers the to posibility to convert MRI image signals into concentration images.
-Theses concentration images can e.g. be used for perfusion model fitting.
+\tableofcontents
+
+\section org_mitk_gui_qt_pharmacokinetics_concentration_mri_overview Overview
+Stand-alone conversion of image signal intensities to contrast agent concentration units can be performed with a dedicated plugin. The plugin distinguishes between T1 weighted and T2 weighted sequences. T1 conversion can be performed in terms of absolute and relative signal enhancement as well as turbo flash sequences for both 3D images (baseline images S0 without contrast enhancement (pre-contrast) input required) and 4D sequences (baseline selected as first frame of time series).
+
+\section org_mitk_gui_qt_pharmacokinetics_concentration_mri_Contact Contact information
+This plug-in is being developed by Charlotte Debus and the SIDT group (Software development for Integrated Diagnostics
+and Therapy) at the DKFZ (German Cancer Research Center).
+If you have any questions, need support, find a bug or have a feature request, feel free to contact us at www.mitk.org.
 
 */

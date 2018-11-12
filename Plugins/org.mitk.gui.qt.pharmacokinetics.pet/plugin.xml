@@ -6,7 +6,7 @@
           name="Dynamic PET DataFit View"
 		  category="PET"
           class="PETDynamicView"
-          icon="resources/PETDynamic.png" />
+          icon="resources/icon.svg" />
   </extension>
 
 </plugin>

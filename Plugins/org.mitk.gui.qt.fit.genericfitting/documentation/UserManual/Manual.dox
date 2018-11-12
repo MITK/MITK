@@ -1,8 +1,16 @@
 /**
-\page org_mitk_gui_qt_fit_genericfitting The Generic Fitting View
+\page org_mitk_gui_qt_fit_genericfitting The Model Fit Generic Fitting View
 
-\section org_mitk_gui_qt_fit_genericfitting_Overview Overview
+\imageMacro{fit_generic_doc.svg,"Icon of the  Generic Fitting View",3.0}
+
+\tableofcontents
+
+\section FIT_GENERIC_Introduction Introduction
 This plug-in offers a generic fitting component for time resolved image data. 
 
+\section FIT_GENERIC_Contact Contact information
+This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
+and Therapy) at the DKFZ (German Cancer Research Center). If you have any questions, need support,
+find a bug or have a feature request, feel free to contact us at www.mitk.org.
 
 */

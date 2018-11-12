@@ -6,7 +6,7 @@
           name="DCE MR Perfusion Datafit View"
 		  category="Perfusion"
           class="MRPerfusionView"
-          icon="resources/DCEMRI.png" />
+          icon="resources/icon.svg" />
   </extension>
 
 </plugin>

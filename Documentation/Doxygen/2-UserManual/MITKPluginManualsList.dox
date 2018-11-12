@@ -46,6 +46,12 @@ The distinction between developer and end user use is for convenience only and m
   \li \subpage org_mitk_gui_qt_matchpoint_mapper
   \li \subpage org_mitk_gui_qt_matchpoint_visualizer
   \li \subpage org_mitk_gui_qt_cest
+  \li \subpage org_mitk_gui_qt_fit_genericfitting
+  \li \subpage org_mitk_gui_qt_fit_inspector
+  \li \subpage org_mitk_gui_qt_pharmacokinetics_mri
+  \li \subpage org_mitk_gui_qt_pharmacokinetics_pet
+  \li \subpage org_mitk_gui_qt_pharmacokinetics_concentration_mri
+  \li \subpage org_mitk_gui_qt_pharmacokinetics_curvedescriptor
   
 \section PluginListPageDevPluginList List of Plugins for Developer Use and Examples
 
@@ -65,4 +71,7 @@ The distinction between developer and end user use is for convenience only and m
   \li \subpage org_mitk_gui_qt_photoacoustics_imageprocessing
   \li \subpage org_mitk_gui_qt_lasercontrol
   \li \subpage org_mitk_gui_qt_igttrackingsemiautomaticmeasurement
+  \li \subpage org_mitk_gui_qt_fit_demo
+  \li \subpage org_mitk_gui_qt_pharmacokinetics_simulation
+
 */

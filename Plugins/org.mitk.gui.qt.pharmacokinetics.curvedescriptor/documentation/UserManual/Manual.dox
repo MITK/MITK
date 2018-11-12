@@ -1,4 +1,26 @@
 /**
 \page org_mitk_gui_qt_pharmacokinetics_curvedescriptor The Perfusion Curve Description Parameters View
 
+\imageMacro{pharmacokinetics_curve_desc_doc.svg,"Icon of the Perfusion Curve Description Parameters View",3.0}
+
+\tableofcontents
+
+\section org_mitk_gui_qt_pharmacokinetics_concentration_mri_overview Overview
+In cases where data quality is not sufficient for dedicated pharmacokinetic analysis, or if global scouting of the overall image should be performed to identify regions of interest, it is often advisable to use semi-quantitative measures that describe the general shape and type of the curve. The Perfusion Curve Description Parameters plugin   can be used to voxelwise calculate these parameters.
+Currently the following parameters are offered by the tool:
+- area-under-the-curve (AUC)
+- area-under the first moment curve (AUMC),
+- mean-residence-time (MRT; AUMC/AUC)
+- time to peak and maximum signal
+
+These parameters are calculated directly from the sampled data.
+AUC and AUMC are calculated by step-wise integration with linear interpolation between sampling points. Maximum and time to peak are derived from the highest intensity value (overall maximum) of all data points. 
+Note: If semi-quantitative parameters should be calculated from concentration time curves rather than raw data signal intensities, use the concentration n curve converter view (See 5)
+Parameters of interest can be selected from the list. Selecting a 4D image in the Data manager enables the Calculate Parameters button. Resulting parameter maps will afterwards be added to the data manager as subnodes to the analyzed 4D image.
+
+\section org_mitk_gui_qt_pharmacokinetics_concentration_mri_Contact Contact information
+This plug-in is being developed by Charlotte Debus and the SIDT group (Software development for Integrated Diagnostics
+and Therapy) at the DKFZ (German Cancer Research Center).
+If you have any questions, need support, find a bug or have a feature request, feel free to contact us at www.mitk.org.
+
 */

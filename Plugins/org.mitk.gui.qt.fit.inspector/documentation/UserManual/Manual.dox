@@ -1,14 +1,78 @@
 /**
-\page org_mitk_gui_qt_fit_inspector Model Fit Inspector
+\page org_mitk_gui_qt_fit_inspector The Model Fit Inspector View
 
-\image html mf.png "Icon of Model Fit Inspector"
+\imageMacro{fit_inspector_doc.svg,"Icon of the  Model Fit Inspector View",3.0}
 
-Available sections:
-  - \ref org_mitk_gui_qt_fit_inspectorOverview
+\tableofcontents
 
-\section org_mitk_gui_qt_fit_inspectorOverview Overview
-The view can be used to inspect the following things:
-#1 raw data if it has multiple time steps
-#2 Fits and the fitted data
+\section FIT_INSPECTOR_Introduction Introduction
+This view (Model Fit Inspector; MFI) offers the possibility to display the time course of the signal within an individual
+voxel (with or without fit). 
 
+\section FIT_INSPECTOR_Contact Contact information
+This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
+and Therapy) at the DKFZ (German Cancer Research Center). If you have any questions, need support,
+find a bug or have a feature request, feel free to contact us at www.mitk.org.
+
+\section FIT_INSPECTOR_Raw Viewing without a model fit
+\imageMacro{fit_inspect_raw.png, "Example screen shot showing the inspection of raw dynamic data without a fit.", 10}
+Open the view and select the dynamic image in the data manager.
+The graph plot will show the time course of image intensities (signal) in the selected voxel (cross hair) as red data points.
+The blue point indicates the frame currently displayed in the 4-window view. 
+
+\section FIT_INSPECTOR_Fit Viewing without a model fit
+\imageMacro{fit_inspect_fit.png, "Example screen shot showing the inspection of dynamic data and an associated fit.", 10}
+Selecting a parameter map of the fit of interest in the Data Manager will display the raw data curve in red dots with
+corresponding fit as black line in the selected cross-hair position. If an AIF-based model was used,
+the utilized AIF (averaged over AIF mask) is also displayed (default in green). The color of the AIF display can be adjusted.
+For ROI based fits, the MFI will display both the current data curve in the selected voxel (in red)
+and the ROI-averaged fitted curve (in dark green, can be adjusted). Scrolling through the individual voxels will change
+the current data curve, but the ROI-based curve remains the same. If voxels outside the fitted area defined by the mask
+are selected, the raw data voxel values will be displayed, however no black fit line is visualized. 
+
+Below the data plot, several options for data visualization can be selected: 
+\subsection FIT_INSPECTOR_Fit_info Fit info tab
+\imageMacro{fit_inspect_info.png, "Details of the fit info tab.", 5}
+The Fit info tab displays meta-data for selected fits performed on the displayed data set. If no fit was performed and only raw data is visualized, the fields are empty. 
+
+\subsection FIT_INSPECTOR_Fit_Parameter Fit parameter tab
+\imageMacro{fit_inspect_results.png, "Details of the fit parameter tab.", 5}
+The "fit parameter" tab shows fit related parameter estimate values, derived parameters, fit criterion values and (optional) debug parameter maps
+in the selected voxel (and all inspection positions; see also \ref FIT_INSPECTOR_Inspect "inspection positions") listed as a table.
+If no fit was performed and only raw data is visualized, the table is empty.
+The content of the table may by copied to clipboard or exported as csv file, by clicking the respective button below the table.
+
+\subsection FIT_INSPECTOR_Fit_Inspection Inspection positions tab
+\imageMacro{fit_inspect_positions.png, "Details of the inspection position tab.", 5}
+The tab allows to manage inspection positions (see here for more about \ref FIT_INSPECTOR_Inspect "inspection positions").
+- (1) Shows the coordinates of the current selected position in the workbench.
+- (2) Press to make the current position a inspected position. It will be added at the bottom of the list (3).
+- (3) List of all inspection positions
+- (4) Toggle adding mode on/off. If on, you can add new positions by clicking into render windows with "SHIFT + left mouse button".
+- (5) Manually adding inspection positions by entering the coordinates.
+- (6) Remove the selected inspection positions. (Hot key: Del)
+- (7) Move the selected inspection position up in the list (3).
+- (8) Move the selected inspection position down in the list (3).
+- (9) Save inspection points to a file.
+- (10) Load inspection points from a file.
+
+\subsection FIT_INSPECTOR_Fit_Settings Settings tab
+\imageMacro{fit_inspect_settings.png, "Details of the settings tab.", 5}
+The View settings tab is used to adjust the plot display, namely, x and y axis scales and colors of displayed data plots (i.e. AIF).
+
+\subsection FIT_INSPECTOR_Fit_Export Plot data export tab
+\imageMacro{fit_inspect_export.png, "Details of the plot data export tab.", 5}
+Displays voxel data (input image) and corresponding time grid together with model fit values and additional curves (like AIF values) for each time point.
+The table will contain the position depended values of the current selected position as well as of all inspection positions (see also \ref FIT_INSPECTOR_Inspect "inspection positions").
+The data in the table can also be copied to clipboard or exported to csv files, by clicking the respective button below the table.
+
+\section FIT_INSPECTOR_Inspect Inspection positions
+\imageMacro{fit_inspect_positions_example.png, "Example of the usage of inspection positions.", 5}
+The fit inspector allows to define positions in the world coordinate system that will be constantly displayed in addition to the current selected position.
+These inspected position will be shown in the following parts of the view:
+- The plot windows. See example image above; the plot shows the current position (raw data: red dots, fit: black line) and an additional inspection position (green).
+- The fit parameter tab (see example image above)
+- The plot data export tab.
+
+It will work with dynamic data with and without an model fit. See the \ref FIT_INSPECTOR_Fit_Inspection "inspection positions tab section" for more details on how to manage inspection positions.
 */

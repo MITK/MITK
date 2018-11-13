@@ -24,11 +24,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void mitk::StdDisplayActionEventHandler::InitStdActions()
 {
-  // #TODO: change function call for new mitk::WeakPointer
-  if (m_ObservableBroadcast.IsNull())
+  if (m_ObservableBroadcast.IsExpired())
   {
     mitkThrow() << "No display action event broadcast class set to observe. Use 'SetObservableBroadcast' before initializing actions.";
   }
+
+  auto observableBroadcast = m_ObservableBroadcast.Lock();
 
   StdFunctionCommand::ActionFunction actionFunction = DisplayActionEventFunctions::MoveSenderCameraAction();
   ConnectDisplayActionEvent(DisplayMoveEvent(nullptr, Vector2D()), actionFunction);

@@ -24,17 +24,19 @@ void mitk::DisplayActionEventHandler::SetObservableBroadcast(mitk::DisplayAction
     return;
   }
 
-  if (m_ObservableBroadcast.IsNotNull())
+  if (!m_ObservableBroadcast.IsExpired())
   {
+    auto observableBroadcastPtr = m_ObservableBroadcast.Lock();
+
     // remove current observer
     for (const auto& tag : m_ObserverTags)
     {
-      m_ObservableBroadcast->RemoveObserver(tag);
+      observableBroadcastPtr->RemoveObserver(tag);
     }
     m_ObserverTags.clear();
   }
 
-  // set new broadcast class (possibly nullptr)
+  // set new broadcast class
   m_ObservableBroadcast = observableBroadcast;
 }
 
@@ -42,16 +44,16 @@ mitk::DisplayActionEventHandler::OberserverTagType mitk::DisplayActionEventHandl
   const mitk::StdFunctionCommand::ActionFunction& actionFunction,
   const mitk::StdFunctionCommand::FilterFunction& filterFunction)
 {
-  // #TODO: change function call for new mitk::WeakPointer
-  if (m_ObservableBroadcast.IsNull())
+  if (m_ObservableBroadcast.IsExpired())
   {
     mitkThrow() << "No display action event broadcast class set to observe. Use 'SetObservableBroadcast' before connecting events.";
   }
 
+  auto observableBroadcast = m_ObservableBroadcast.Lock();
   auto command = mitk::StdFunctionCommand::New();
   command->SetCommandAction(actionFunction);
   command->SetCommandFilter(filterFunction);
-  OberserverTagType tag = m_ObservableBroadcast->AddObserver(displayActionEvent, command);
+  OberserverTagType tag = observableBroadcast->AddObserver(displayActionEvent, command);
   m_ObserverTags.push_back(tag);
   return tag;
 }
@@ -59,15 +61,16 @@ mitk::DisplayActionEventHandler::OberserverTagType mitk::DisplayActionEventHandl
 void mitk::DisplayActionEventHandler::DisconnectObserver(OberserverTagType observerTag)
 {
   // #TODO: change function call for new mitk::WeakPointer
-  if (m_ObservableBroadcast.IsNull())
+  if (m_ObservableBroadcast.IsExpired())
   {
     mitkThrow() << "No display action event broadcast class set to observe. Use 'SetObservableBroadcast' before disconnecting observer.";
   }
 
+  auto observableBroadcast = m_ObservableBroadcast.Lock();
   std::vector<OberserverTagType>::iterator observerTagPosition = std::find(m_ObserverTags.begin(), m_ObserverTags.end(), observerTag);
   if (observerTagPosition != m_ObserverTags.end())
   {
-    m_ObservableBroadcast->RemoveObserver(observerTag);
+    observableBroadcast->RemoveObserver(observerTag);
     m_ObserverTags.erase(observerTagPosition);
   }
 }

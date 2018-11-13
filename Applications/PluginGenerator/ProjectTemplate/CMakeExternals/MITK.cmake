@@ -111,7 +111,7 @@ if(NOT MITK_DIR)
 
   set(MITK_SOURCE_DIR "" CACHE PATH "MITK source code location. If empty, MITK will be cloned from MITK_GIT_REPOSITORY")
   set(MITK_GIT_REPOSITORY "https://phabricator.mitk.org/diffusion/MITK/mitk.git" CACHE STRING "The git repository for cloning MITK")
-  set(MITK_GIT_TAG "origin/release/2016-11" CACHE STRING "The git tag/hash to be used when cloning from MITK_GIT_REPOSITORY")
+  set(MITK_GIT_TAG "origin/master" CACHE STRING "The git tag/hash to be used when cloning from MITK_GIT_REPOSITORY")
   mark_as_advanced(MITK_SOURCE_DIR MITK_GIT_REPOSITORY MITK_GIT_TAG)
 
   #-----------------------------------------------------------------------------

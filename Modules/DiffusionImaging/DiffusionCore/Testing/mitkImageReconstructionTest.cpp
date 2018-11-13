@@ -137,7 +137,7 @@ int mitkImageReconstructionTest(int argc, char* argv[])
   }
   catch (const itk::ExceptionObject& e)
   {
-    MITK_INFO << e;
+    MITK_INFO << e.what();
     return EXIT_FAILURE;
   }
   catch (const std::exception& e)

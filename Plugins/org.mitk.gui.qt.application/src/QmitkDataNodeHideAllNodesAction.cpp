@@ -52,14 +52,31 @@ void QmitkDataNodeHideAllNodesAction::OnActionTriggered(bool checked)
     return;
   }
 
+  mitk::BaseRenderer* baseRenderer;
+  if (m_BaseRenderer.IsExpired())
+  {
+    baseRenderer = nullptr;
+  }
+  else
+  {
+    baseRenderer = m_BaseRenderer.Lock();
+  }
+
   auto nodeset = m_DataStorage.Lock()->GetAll();
   for (auto& node : *nodeset)
   {
     if (node.IsNotNull())
     {
-      node->SetVisibility(false);
+      node->SetVisibility(false, baseRenderer);
     }
   }
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  if (nullptr == baseRenderer)
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  else
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
+  }
 }

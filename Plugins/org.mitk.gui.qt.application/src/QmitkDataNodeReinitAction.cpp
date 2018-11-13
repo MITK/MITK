@@ -84,7 +84,17 @@ void QmitkDataNodeReinitAction::OnActionTriggered(bool checked)
     return;
   }
 
-  auto boundingBoxPredicate = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
+  mitk::BaseRenderer* baseRenderer;
+  if (m_BaseRenderer.IsExpired())
+  {
+    baseRenderer = nullptr;
+  }
+  else
+  {
+    baseRenderer = m_BaseRenderer.Lock();
+  }
+
+  auto boundingBoxPredicate = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false), baseRenderer));
 
   mitk::DataStorage::SetOfObjects::Pointer nodes = mitk::DataStorage::SetOfObjects::New();
   for (const auto& dataNode : dataNodes)
@@ -106,11 +116,25 @@ void QmitkDataNodeReinitAction::OnActionTriggered(bool checked)
 
     if (nullptr != image) // ... image is selected, reinit is expected to rectify askew images.
     {
-      mitk::RenderingManager::GetInstance()->InitializeViews(image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+      if (nullptr == baseRenderer)
+      {
+        mitk::RenderingManager::GetInstance()->InitializeViews(image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+      }
+      else
+      {
+        mitk::RenderingManager::GetInstance()->InitializeView(baseRenderer->GetRenderWindow(), image->GetTimeGeometry(), true);
+      }
       return;
     }
   }
 
-  auto boundingGeometry = dataStorage->ComputeBoundingGeometry3D(nodes, "visible");
-  mitk::RenderingManager::GetInstance()->InitializeViews(boundingGeometry);
+  auto boundingGeometry = dataStorage->ComputeBoundingGeometry3D(nodes, "visible", baseRenderer);
+  if (nullptr == baseRenderer)
+  {
+    mitk::RenderingManager::GetInstance()->InitializeViews(boundingGeometry);
+  }
+  else
+  {
+    mitk::RenderingManager::GetInstance()->InitializeView(baseRenderer->GetRenderWindow(), boundingGeometry);
+  }
 }

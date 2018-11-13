@@ -52,17 +52,32 @@ void QmitkDataNodeShowSelectedNodesAction::OnActionTriggered(bool checked)
     return;
   }
 
-  auto dataStorage = m_DataStorage.Lock();
+  mitk::BaseRenderer* baseRenderer;
+  if (m_BaseRenderer.IsExpired())
+  {
+    baseRenderer = nullptr;
+  }
+  else
+  {
+    baseRenderer = m_BaseRenderer.Lock();
+  }
 
-  auto selectedNodes = GetSelectedNodes();
-  auto nodeset = dataStorage->GetAll();
+  auto dataNodes = GetSelectedNodes();
+  auto nodeset = m_DataStorage.Lock()->GetAll();
   for (auto& node : *nodeset)
   {
     if (node.IsNotNull())
     {
-      node->SetVisibility(selectedNodes.contains(node));
+      node->SetVisibility(dataNodes.contains(node), baseRenderer);
     }
   }
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  if (nullptr == baseRenderer)
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  else
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
+  }
 }

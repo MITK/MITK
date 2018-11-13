@@ -89,9 +89,19 @@ void QmitkDataNodeComponentAction::InitializeWithDataNode(const mitk::DataNode* 
     return;
   }
 
+  mitk::BaseRenderer* baseRenderer;
+  if (m_BaseRenderer.IsExpired())
+  {
+    baseRenderer = nullptr;
+  }
+  else
+  {
+    baseRenderer = m_BaseRenderer.Lock();
+  }
+
   int numComponents = 0;
   numComponents = img->GetPixelType().GetNumberOfComponents();
-  mitk::IntProperty* componentProperty = dynamic_cast<mitk::IntProperty*>(dataNode->GetProperty("Image.Displayed Component"));
+  mitk::IntProperty* componentProperty = dynamic_cast<mitk::IntProperty*>(dataNode->GetProperty("Image.Displayed Component", baseRenderer));
   if (numComponents <= 1 || nullptr == componentProperty)
   {
     m_ComponentSlider->SetProperty(static_cast<mitk::IntProperty*>(nullptr));

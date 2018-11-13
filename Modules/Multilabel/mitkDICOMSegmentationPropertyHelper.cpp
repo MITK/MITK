@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkSmartPointer.h>
 
+#include <vtkSmartPointer.h>
+
 namespace mitk
 {
   void DICOMSegmentationPropertyHandler::DeriveDICOMSegmentationProperties(LabelSetImage* dicomSegImage)

@@ -71,9 +71,11 @@
     <file>dark/checkbox-unchecked.svg</file>
     <file>dark/checkbox-unchecked-hover.svg</file>
     <file>dark/checkbox-unchecked-disabled.svg</file>
+    <file>dark/checkbox-unchecked-selected.svg</file>
     <file>dark/checkbox-checked.svg</file>
     <file>dark/checkbox-checked-hover.svg</file>
     <file>dark/checkbox-checked-disabled.svg</file>
+    <file>dark/checkbox-checked-selected.svg</file>
 
     <file>dark/radiobutton-unchecked.svg</file>
     <file>dark/radiobutton-unchecked-hover.svg</file>

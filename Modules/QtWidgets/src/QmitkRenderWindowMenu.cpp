@@ -45,6 +45,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <cmath>
 
+unsigned int QmitkRenderWindowMenu::m_DefaultThickMode(1);
+
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
                                              Qt::WindowFlags,
@@ -795,7 +797,6 @@ void QmitkRenderWindowMenu::OnTSNumChanged(int num)
 
   if (m_Renderer.IsNotNull())
   {
-    static unsigned int defaultThickMode = 1;
     unsigned int thickSlicesMode = 0;
     // determine the state of the thick-slice mode
     mitk::ResliceMethodProperty *resliceMethodEnumProperty = nullptr;
@@ -804,12 +805,12 @@ void QmitkRenderWindowMenu::OnTSNumChanged(int num)
     {
       thickSlicesMode = resliceMethodEnumProperty->GetValueAsId();
       if(thickSlicesMode!=0)
-        defaultThickMode = thickSlicesMode;
+        m_DefaultThickMode = thickSlicesMode;
     }
 
     if(thickSlicesMode==0 && num>0) //default mode only for single slices
     {
-      thickSlicesMode = defaultThickMode; //mip default
+      thickSlicesMode = m_DefaultThickMode; //mip default
       m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.showarea",
                                                                   mitk::BoolProperty::New(true));
     }

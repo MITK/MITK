@@ -62,7 +62,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     msg.append(pixelType1.GetComponentTypeAsString() );                                             \
     msg.append(" or pixel type ");                                                                  \
     msg.append(pixelType2.GetComponentTypeAsString() );                                             \
-    msg.append(" is not in " MITK_PP_STRINGIZE(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension)));        \
+    msg.append(" is not in " BOOST_PP_STRINGIZE(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension)));        \
     throw mitk::AccessByItkException(msg);                                                          \
   }                                                                                                 \
 }

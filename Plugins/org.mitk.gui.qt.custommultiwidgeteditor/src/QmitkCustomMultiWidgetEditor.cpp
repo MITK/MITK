@@ -71,7 +71,7 @@ void QmitkCustomMultiWidgetEditor::Impl::SetControlledRenderer()
     return;
   }
 
-  RenderWindowLayerUtilities::RendererVector controlledRenderer;
+  mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer;
   auto renderWindowWidgets = m_CustomMultiWidget->GetRenderWindowWidgets();
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {

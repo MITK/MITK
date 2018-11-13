@@ -782,7 +782,7 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
   const mitk::BaseRenderer::Pointer baseRenderer = posEvent->GetSender();
   TNodePredicateDataType<mitk::Image>::Pointer isImageData = TNodePredicateDataType<mitk::Image>::New();
   auto globalCurrentTimePoint = baseRenderer->GetTime();
-  mitk::DataStorage::SetOfObjects::ConstPointer nodes = renderer->GetDataStorage()->GetSubset(isImageData).GetPointer();
+  mitk::DataStorage::SetOfObjects::ConstPointer nodes = baseRenderer->GetDataStorage()->GetSubset(isImageData).GetPointer();
   if (nodes.IsNull())
   {
     return;

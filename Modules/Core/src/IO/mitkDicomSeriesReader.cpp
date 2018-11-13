@@ -469,7 +469,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
       fileFitsIntoPattern = false;
       continue; // no files anymore
 
-    } 
+    }
     else if (!lastOriginInitialized && !result.GetBlockFilenames().empty())
     {
       // We have a file with position but result already contains files without it
@@ -747,7 +747,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool)
     if (!seriesInstanceUid) {
       continue;
     }
-    
+
 
     // we const_cast here, because I could not use a map.at() function in CreateMoreUniqueSeriesIdentifier.
     // doing the same thing with find would make the code less readable. Since we forget the Scanner results
@@ -765,7 +765,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool)
     try
     {
       auto sortedFilenames = SortSeriesSlices(groupIter->second.GetFilenames(), scanner.GetMappings()); // sort each slice group spatially
-      result[groupIter->first] = ImageBlockDescriptor(sortedFilenames); 
+      result[groupIter->first] = ImageBlockDescriptor(sortedFilenames);
     } catch(...)
     {
        MITK_ERROR << "Caught something.";
@@ -1201,7 +1201,7 @@ DicomSeriesReader::GdcmSortFunction(
         if (temporalIndex1 != temporalIndex2)
         {
           return temporalIndex1 < temporalIndex2;
-        } 
+        }
       }
     }
   }
@@ -1392,16 +1392,19 @@ void DicomSeriesReader::FixMetaDataCharset( Image* image )
 
   charset = GetStandardCharSet(charset);
 
+#ifdef _WIN32
   std::string locString = boost::locale::util::get_system_locale();
   boost::locale::generator gen;
   std::locale loc = gen(locString);
+#else
+  std::locale loc = "CP1251";
+#endif
 
   for (const auto& prop : propertiesToLocalize) {
     auto propToLocalizePtr = image->GetProperty(prop.c_str());
     if (propToLocalizePtr == nullptr) {
       continue;
     }
-
     try {
       std::string utf8String = boost::locale::conv::to_utf<char>(propToLocalizePtr->GetValueAsString(), charset);
       std::string locString = boost::locale::conv::from_utf<char>(utf8String, loc);
@@ -1622,7 +1625,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       if(node.GetProperty("dicom.patient.PatientsName"))
         patientName = node.GetProperty("dicom.patient.PatientsName")->GetValueAsString();
 
-      node.SetData( image );
+      node.SetData(image);
       node.SetName(patientName);
       std::cin.imbue(previousCppLocale);
     }

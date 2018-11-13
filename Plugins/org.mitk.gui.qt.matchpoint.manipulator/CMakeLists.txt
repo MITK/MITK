@@ -4,5 +4,4 @@ mitk_create_plugin(
   EXPORT_DIRECTIVE MITK_GUI_QT_MATCHPOINT_MANIPULATOR_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
   MODULE_DEPENDS MitkQtWidgetsExt MitkMatchPointRegistration MitkMatchPointRegistrationUI
-  PACKAGE_DEPENDS Boost
 )

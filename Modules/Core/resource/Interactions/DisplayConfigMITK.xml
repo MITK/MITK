@@ -49,4 +49,11 @@
   <event_variant class="MouseWheelEvent" name="PlaneDown">
     <attribute name="ScrollDirection" value="down"/>
   </event_variant>
+   <!-- Change TimeSteps -->
+  <event_variant class="InteractionKeyEvent" name="IncreaseTimeStep">
+    <attribute name="Key" value="ArrowRight"/>
+  </event_variant>
+  <event_variant class="InteractionKeyEvent" name="DecreaseTimeStep">
+    <attribute name="Key" value="ArrowLeft"/>
+  </event_variant>
 </config>

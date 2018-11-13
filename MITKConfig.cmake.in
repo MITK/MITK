@@ -153,7 +153,7 @@ set(MITK_USE_Boost_LIBRARIES @MITK_USE_Boost_LIBRARIES@)
 set(MITK_USE_SYSTEM_Boost @MITK_USE_SYSTEM_Boost@)
 set(BOOST_ROOT "@BOOST_ROOT@" CACHE PATH "")
 set(BOOST_LIBRARYDIR "@BOOST_LIBRARYDIR@" CACHE PATH "")
-set(Boost_ADDITIONAL_VERSIONS "1.65" "1.65.1")
+set(Boost_ADDITIONAL_VERSIONS 1.68 1.68.0)
 
 # We need this later for a DCMTK workaround
 set(_dcmtk_dir_orig "@DCMTK_DIR@")

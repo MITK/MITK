@@ -1,0 +1,19 @@
+<statemachine name="FastMarchingTool">
+
+  <state name="neutral" ID="1" startstate="TRUE">
+  
+    <transition event_class="MousePressEvent" event_variant="ShiftPrimaryButtonPressed" name="Shift+press" target="neutral" EVENT_ID="3">
+      <action name="ShiftPrimaryButtonPressed" ID="10" />
+    </transition>
+    
+    <transition event_class="MousePressEvent" event_variant="ShiftSecondaryButtonPressed" name="Shift+pressRMB" target="neutral" EVENT_ID="2000">
+      <action name="ShiftSecondaryButtonPressed" ID="6000" />
+    </transition>
+    
+    <transition event_class="InteractionKeyEvent" event_variant="KeyDelete" name="ENTF" target="neutral" EVENT_ID="12">
+      <action name="DeletePoint" ID="100" />
+    </transition>
+    
+  </state>
+  
+</statemachine>

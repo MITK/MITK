@@ -74,9 +74,9 @@ void mitk::ShImageWriter::WriteShImage(InputType::ConstPointer input)
   {
     writer->Update();
   }
-  catch (itk::ExceptionObject e)
+  catch (const itk::ExceptionObject& e)
   {
-    std::cout << e << std::endl;
+    MITK_INFO << e.what();
   }
 }
 

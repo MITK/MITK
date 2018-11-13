@@ -55,10 +55,10 @@ namespace mitk
 
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      /**
-       * @brief GetVtkLookupTable Getter for the internally wrapped vtkLookupTable.
-       */
-      virtual vtkSmartPointer<vtkLookupTable> GetVtkLookupTable() const;
+    /**
+     * @brief GetVtkLookupTable Getter for the internally wrapped vtkLookupTable.
+     */
+    virtual vtkSmartPointer<vtkLookupTable> GetVtkLookupTable() const;
 
     /**
      * @brief GetRawLookupTable Getter for the raw lookuptable array.
@@ -215,7 +215,7 @@ namespace mitk
       PET_20
     };
 
-    static const char *const typenameList[];
+    static std::vector<std::string> typenameList;
 
     /*!
        *  \brief Set the look-up table type by enum (or integer).
@@ -263,7 +263,7 @@ namespace mitk
 
     float m_Opacity;
 
-    LookupTableType m_type;
+    LookupTableType m_Type;
 
   private:
     itk::LightObject::Pointer InternalClone() const override;

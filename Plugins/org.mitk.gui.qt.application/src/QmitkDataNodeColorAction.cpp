@@ -66,8 +66,18 @@ void QmitkDataNodeColorAction::InitializeAction()
 
 void QmitkDataNodeColorAction::InitializeWithDataNode(const mitk::DataNode* dataNode)
 {
+  mitk::BaseRenderer* baseRenderer;
+  if (m_BaseRenderer.IsExpired())
+  {
+    baseRenderer = nullptr;
+  }
+  else
+  {
+    baseRenderer = m_BaseRenderer.Lock();
+  }
+
   float rgb[3];
-  if (dataNode->GetColor(rgb))
+  if (dataNode->GetColor(rgb, baseRenderer))
   {
     QColor color(rgb[0] * 255, rgb[1] * 255, rgb[2] * 255);
     QString styleSheet = QString("background-color: ") + color.name(QColor::HexRgb);
@@ -78,11 +88,26 @@ void QmitkDataNodeColorAction::InitializeWithDataNode(const mitk::DataNode* data
 
 void QmitkDataNodeColorAction::OnColorChanged()
 {
+  auto dataNodes = GetSelectedNodes();
+  if (dataNodes.isEmpty())
+  {
+    return;
+  }
+
+  mitk::BaseRenderer* baseRenderer;
+  if (m_BaseRenderer.IsExpired())
+  {
+    baseRenderer = nullptr;
+  }
+  else
+  {
+    baseRenderer = m_BaseRenderer.Lock();
+  }
+
   bool selectedColor = false;
   QColor newColor;
 
-  auto selectedNodes = GetSelectedNodes();
-  for (auto& dataNode : selectedNodes)
+  for (auto& dataNode : dataNodes)
   {
     if (dataNode.IsNull())
     {
@@ -90,7 +115,7 @@ void QmitkDataNodeColorAction::OnColorChanged()
     }
 
     float rgb[3];
-    if (dataNode->GetColor(rgb))
+    if (dataNode->GetColor(rgb, baseRenderer))
     {
       if (!selectedColor)
       {
@@ -107,15 +132,22 @@ void QmitkDataNodeColorAction::OnColorChanged()
         }
       }
 
-      dataNode->SetProperty("color", mitk::ColorProperty::New(newColor.redF(), newColor.greenF(), newColor.blueF()));
-      if (dataNode->GetProperty("binaryimage.selectedcolor"))
+      dataNode->SetProperty("color", mitk::ColorProperty::New(newColor.redF(), newColor.greenF(), newColor.blueF()), baseRenderer);
+      if (dataNode->GetProperty("binaryimage.selectedcolor", baseRenderer))
       {
-        dataNode->SetProperty("binaryimage.selectedcolor", mitk::ColorProperty::New(newColor.redF(), newColor.greenF(), newColor.blueF()));
+        dataNode->SetProperty("binaryimage.selectedcolor", mitk::ColorProperty::New(newColor.redF(), newColor.greenF(), newColor.blueF()), baseRenderer);
       }
     }
   }
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  if (nullptr == baseRenderer)
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  else
+  {
+    mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
+  }
 }
 
 void QmitkDataNodeColorAction::OnActionChanged()

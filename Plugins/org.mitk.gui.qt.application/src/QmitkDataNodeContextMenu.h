@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkNodeDescriptor.h"
 
 // mitk core
+#include <mitkBaseRenderer.h>
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 
@@ -56,6 +57,7 @@ public:
   virtual ~QmitkDataNodeContextMenu() override;
 
   void SetDataStorage(mitk::DataStorage* dataStorage);
+  void SetBaseRenderer(mitk::BaseRenderer* baseRenderer);
   void SetSurfaceDecimation(bool surfaceDecimation);
 
 public Q_SLOTS:
@@ -83,6 +85,7 @@ private:
   berry::IWorkbenchPartSite::WeakPtr m_WorkbenchPartSite;
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+  mitk::WeakPointer<mitk::BaseRenderer> m_BaseRenderer;
   QList<mitk::DataNode::Pointer> m_SelectedNodes;
 
   // store a list of all actions to remove them on menu destruction

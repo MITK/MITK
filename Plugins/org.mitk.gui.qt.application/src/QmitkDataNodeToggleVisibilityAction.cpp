@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // namespace that contains the concrete action
 namespace ToggleVisibilityAction
 {
-  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, QList<mitk::DataNode::Pointer> selectedNodes /* = QList<mitk::DataNode::Pointer>()*/)
+  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, QList<mitk::DataNode::Pointer> selectedNodes /*= QList<mitk::DataNode::Pointer>()*/, mitk::BaseRenderer* baseRenderer /*= nullptr*/)
   {
     bool isVisible;
     for (auto& node : selectedNodes)
@@ -36,8 +36,8 @@ namespace ToggleVisibilityAction
       if (node.IsNotNull())
       {
         isVisible = false;
-        node->GetBoolProperty("visible", isVisible);
-        node->SetVisibility(!isVisible);
+        node->GetBoolProperty("visible", isVisible, baseRenderer);
+        node->SetVisibility(!isVisible, baseRenderer);
       }
     }
 
@@ -51,7 +51,14 @@ namespace ToggleVisibilityAction
     }
     else
     {
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      if (nullptr == baseRenderer)
+      {
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      }
+      else
+      {
+        mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
+      }
     }
   }
 }
@@ -94,6 +101,16 @@ void QmitkDataNodeToggleVisibilityAction::OnActionTriggered(bool checked)
     return;
   }
 
-  auto selectedNodes = GetSelectedNodes();
-  ToggleVisibilityAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock(), selectedNodes);
+  mitk::BaseRenderer* baseRenderer;
+  if (m_BaseRenderer.IsExpired())
+  {
+    baseRenderer = nullptr;
+  }
+  else
+  {
+    baseRenderer = m_BaseRenderer.Lock();
+  }
+
+  auto dataNodes = GetSelectedNodes();
+  ToggleVisibilityAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock(), dataNodes, baseRenderer);
 }

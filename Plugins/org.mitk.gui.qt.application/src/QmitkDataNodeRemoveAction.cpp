@@ -62,9 +62,14 @@ void QmitkDataNodeRemoveAction::OnActionTriggered(bool checked)
 
   auto dataStorage = m_DataStorage.Lock();
 
+  auto dataNodes = GetSelectedNodes();
+  if (dataNodes.isEmpty())
+  {
+    return;
+  }
+
   QString question = tr("Do you really want to remove ");
-  auto selectedNodes = GetSelectedNodes();
-  for (auto& dataNode : selectedNodes)
+  for (auto& dataNode : dataNodes)
   {
     if (nullptr == dataNode)
     {
@@ -84,7 +89,7 @@ void QmitkDataNodeRemoveAction::OnActionTriggered(bool checked)
 
   if (answerButton == QMessageBox::Yes)
   {
-    for (auto& dataNode : selectedNodes)
+    for (auto& dataNode : dataNodes)
     {
       if (nullptr == dataNode)
       {

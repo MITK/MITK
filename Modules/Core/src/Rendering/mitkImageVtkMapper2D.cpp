@@ -603,7 +603,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable(mitk::BaseRenderer *renderer)
 
   // If lookup table or transferfunction use is requested...
   mitk::LookupTableProperty::Pointer lookupTableProp =
-    dynamic_cast<mitk::LookupTableProperty *>(this->GetDataNode()->GetProperty("LookupTable"));
+    dynamic_cast<mitk::LookupTableProperty *>(this->GetDataNode()->GetProperty("LookupTable", renderer));
 
   if (lookupTableProp.IsNotNull()) // is a lookuptable set?
   {
@@ -712,7 +712,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::Ba
   mitkLut->SetType(mitk::LookupTable::GRAYSCALE);
   mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
   mitkLutProp->SetLookupTable(mitkLut);
-  node->SetProperty("LookupTable", mitkLutProp);
+  node->SetProperty("LookupTable", mitkLutProp, renderer);
 
   std::string photometricInterpretation; // DICOM tag telling us how pixel values should be displayed
   if (node->GetStringProperty("dicom.pixel.PhotometricInterpretation", photometricInterpretation))
@@ -723,7 +723,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::Ba
       // Set inverse grayscale look-up table
       mitkLut->SetType(mitk::LookupTable::INVERSE_GRAYSCALE);
       mitkLutProp->SetLookupTable(mitkLut);
-      node->SetProperty("LookupTable", mitkLutProp);
+      node->SetProperty("LookupTable", mitkLutProp, renderer);
       renderingModeProperty->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR); // USE lookuptable
     }
     // Otherwise do nothing - the default grayscale look-up table has already been set

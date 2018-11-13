@@ -71,6 +71,23 @@ void QmitkDataNodeContextMenu::SetDataStorage(mitk::DataStorage* dataStorage)
   }
 }
 
+void QmitkDataNodeContextMenu::SetBaseRenderer(mitk::BaseRenderer* baseRenderer)
+{
+  if (m_BaseRenderer != baseRenderer)
+  {
+    // set the new base renderer - also for all actions
+    m_BaseRenderer = baseRenderer;
+    for (DescriptorActionListType::const_iterator it = m_DescriptorActionList.begin(); it != m_DescriptorActionList.end(); ++it)
+    {
+      QmitkAbstractDataNodeAction* abstractDataNodeAction = dynamic_cast<QmitkAbstractDataNodeAction*>(it->second);
+      if (nullptr != abstractDataNodeAction)
+      {
+        abstractDataNodeAction->SetBaseRenderer(m_BaseRenderer.Lock());
+      }
+    }
+  }
+}
+
 void QmitkDataNodeContextMenu::SetSurfaceDecimation(bool surfaceDecimation)
 {
   m_SurfaceDecimation = surfaceDecimation;

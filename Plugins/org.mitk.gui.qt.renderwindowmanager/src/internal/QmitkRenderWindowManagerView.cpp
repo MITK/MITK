@@ -44,8 +44,6 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
   {
     m_Controls.comboBoxRenderWindowSelection->addItem(renderer->GetName());
   }
-
-  OnRenderWindowSelectionChanged(m_Controls.comboBoxRenderWindowSelection->itemText(0));
   connect(m_Controls.comboBoxRenderWindowSelection, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(OnRenderWindowSelectionChanged(const QString&)));
 
   // data node context menu and menu actions
@@ -54,6 +52,8 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
   m_DataNodeContextMenu->SetDataStorage(GetDataStorage());
   //m_DataNodeContextMenu->SetSurfaceDecimation(m_SurfaceDecimation);
   connect(m_InspectorView, SIGNAL(customContextMenuRequested(const QPoint&)), m_DataNodeContextMenu, SLOT(OnContextMenuRequested(const QPoint&)));
+
+  OnRenderWindowSelectionChanged(m_Controls.comboBoxRenderWindowSelection->itemText(0));
 }
 
 void QmitkRenderWindowManagerView::SetControlledRenderer()
@@ -72,9 +72,14 @@ void QmitkRenderWindowManagerView::SetControlledRenderer()
   m_RenderWindowInspector->SetControlledRenderer(m_ControlledRenderer);
 }
 
-void QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged(const QString &renderWindowId)
+void QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged(const QString& renderWindowId)
 {
   m_RenderWindowInspector->SetActiveRenderWindow(renderWindowId);
+  mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(renderWindowId.toStdString());
+  if (nullptr != selectedRenderer)
+  {
+    m_DataNodeContextMenu->SetBaseRenderer(selectedRenderer);
+  }
 }
 
 QItemSelectionModel* QmitkRenderWindowManagerView::GetDataNodeSelectionModel() const

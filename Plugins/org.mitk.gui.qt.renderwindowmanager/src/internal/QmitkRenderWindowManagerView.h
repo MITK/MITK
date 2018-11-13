@@ -26,19 +26,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk gui qt application
 #include <QmitkDataNodeContextMenu.h>
 
+// mitk gui common plugin
+#include <mitkIRenderWindowPartListener.h>
+
 // mitk gui qt common plugin
 #include <QmitkAbstractView.h>
 
 /**
 * @brief RenderWindowManager
 */
-class QmitkRenderWindowManagerView : public QmitkAbstractView
+class QmitkRenderWindowManagerView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
 public:
 
   static const std::string VIEW_ID;
+
+  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  virtual void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
 
 protected:
 
@@ -62,6 +69,8 @@ private:
   QWidget* m_Parent;
   Ui::QmitkRenderWindowManagerControls m_Controls;
 
+  mitk::IRenderWindowPart* m_RenderWindowPart;
+	
   QmitkDataStorageRenderWindowInspector* m_RenderWindowInspector;
   QmitkDataNodeContextMenu* m_DataNodeContextMenu;
   QAbstractItemView* m_InspectorView;
@@ -69,7 +78,6 @@ private:
   mitk::RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;
 
   virtual QItemSelectionModel* GetDataNodeSelectionModel() const override;
-
 };
 
 #endif // QMITKRENDERWINDOWMANAGERVIEW_H

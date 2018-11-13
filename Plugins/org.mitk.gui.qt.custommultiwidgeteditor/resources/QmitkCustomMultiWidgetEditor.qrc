@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC version="1.0">
+  <qresource prefix="/org.mitk.gui.qt.custommultiwidgeteditor">
+    <file>defaultWatermark.png</file>
+  </qresource>
+</RCC>

@@ -2,6 +2,8 @@
     <qresource prefix="/org.mitk.gui.qt.ext">
         <file>dicom.svg</file>
         <file>image_navigator.svg</file>
+        <file>Editor.png</file>
+        <file>Slider.png</file>
         <file>index.html</file>
         <file>xnat-icon.png</file>
         <file>view-manager.svg</file>

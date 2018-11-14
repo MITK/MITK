@@ -1408,7 +1408,7 @@ void DicomSeriesReader::FixMetaDataCharset( Image* image )
 #ifdef _WIN32
       std::string locString = boost::locale::conv::from_utf<char>(utf8String, loc);
 #else
-      std::string locString = boost::locale::conv::from_utf<char>(utf8String, "");
+      std::string locString = boost::locale::conv::from_utf<char>(utf8String, "CP1251");
 #endif
       image->SetProperty(prop.c_str(), StringProperty::New(locString));
     }

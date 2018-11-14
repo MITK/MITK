@@ -1396,8 +1396,6 @@ void DicomSeriesReader::FixMetaDataCharset( Image* image )
   std::string locString = boost::locale::util::get_system_locale();
   boost::locale::generator gen;
   std::locale loc = gen(locString);
-#else
-  std::locale loc = "CP1251";
 #endif
 
   for (const auto& prop : propertiesToLocalize) {
@@ -1407,7 +1405,11 @@ void DicomSeriesReader::FixMetaDataCharset( Image* image )
     }
     try {
       std::string utf8String = boost::locale::conv::to_utf<char>(propToLocalizePtr->GetValueAsString(), charset);
+#ifdef _WIN32
       std::string locString = boost::locale::conv::from_utf<char>(utf8String, loc);
+#else
+      std::string locString = boost::locale::conv::from_utf<char>(utf8String, "");
+#endif
       image->SetProperty(prop.c_str(), StringProperty::New(locString));
     }
     catch (boost::locale::conv::invalid_charset_error& e) {

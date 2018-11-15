@@ -62,6 +62,65 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSubset(const
   return result;
 }
 
+mitk::DataNode::Pointer mitk::DataStorage::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes, const mitk::Point3D worldPosition, const mitk::BaseRenderer* renderer)
+{
+  if (nodes.IsNull())
+  {
+    return nullptr;
+  }
+
+  mitk::DataNode::Pointer topLayerNode = nullptr;
+  int maxLayer = std::numeric_limits<int>::min();
+
+  for (auto node : *nodes)
+  {
+    if (node.IsNull())
+    {
+      continue;
+    }
+
+    bool isHelperObject = false;
+    node->GetBoolProperty("helper object", isHelperObject);
+    if (isHelperObject)
+    {
+      continue;
+    }
+
+    auto data = node->GetData();
+    if (nullptr == data)
+    {
+      continue;
+    }
+
+    auto geometry = data->GetGeometry();
+    if (nullptr == geometry || !geometry->IsInside(worldPosition))
+    {
+      continue;
+    }
+
+    int layer = 0;
+    if (!node->GetIntProperty("layer", layer, renderer))
+    {
+      continue;
+    }
+
+    if (layer <= maxLayer)
+    {
+      continue;
+    }
+
+    if (!node->IsVisible(renderer))
+    {
+      continue;
+    }
+
+    topLayerNode = node;
+    maxLayer = layer;
+  }
+
+  return topLayerNode;
+}
+
 mitk::DataNode *mitk::DataStorage::GetNamedNode(const char *name) const
 
 {

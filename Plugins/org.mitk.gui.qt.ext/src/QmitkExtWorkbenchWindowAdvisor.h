@@ -174,6 +174,8 @@ private:
   QAction* resetPerspAction;
   QAction* closePerspAction;
   QAction* openDicomEditorAction;
+  QAction* openStdMultiWidgetEditorAction;
+  QAction* openCustomMultiWidgetEditorAction;
 };
 
 #endif /*QMITKEXTWORKBENCHWINDOWADVISOR_H_*/

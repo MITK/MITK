@@ -105,6 +105,14 @@ namespace mitk
     SetOfObjects::ConstPointer GetSubset(const NodePredicateBase *condition) const;
 
     //##Documentation
+    //## @brief returns the topmost node of the set of nodes, meeting special property conditions
+    //##
+    //## GetTopLayerNode returns a node that is visible and has the highest layer of a set of given nodes.
+    //## The property list, which is used to find the visibility- and layer-property is is specified by the
+    //## given base renderer.
+    mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes, const mitk::Point3D worldPosition, const mitk::BaseRenderer* renderer);
+
+    //##Documentation
     //## @brief returns a set of source objects for a given node that meet the given condition(s).
     //##
     virtual SetOfObjects::ConstPointer GetSources(const DataNode *node,

@@ -75,6 +75,7 @@ void QmitkRenderWindowManipulatorWidget::SetUpConnections()
 
   connect(m_Controls.pushButtonResetRenderer, SIGNAL(clicked()), this, SLOT(ResetRenderer()));
   connect(m_Controls.pushButtonClearRenderer, SIGNAL(clicked()), this, SLOT(ClearRenderer()));
+  connect(m_Controls.pushButtonReinitRenderer, SIGNAL(clicked()), this, SLOT(ReinitRenderer()));
 
   QSignalMapper* changeViewDirectionSignalMapper = new QSignalMapper(this);
   changeViewDirectionSignalMapper->setMapping(m_Controls.radioButtonAxial, QString("axial"));
@@ -258,6 +259,17 @@ void QmitkRenderWindowManipulatorWidget::ClearRenderer()
 
   m_RenderWindowLayerController->ResetRenderer(false, m_StorageModel->GetCurrentRenderer());
   m_Controls.layerStackTableView->clearSelection();
+}
+
+void QmitkRenderWindowManipulatorWidget::ReinitRenderer()
+{
+  if (nullptr == m_StorageModel)
+  {
+    return;
+
+  }
+
+  m_RenderWindowViewDirectionController->InitializeViewByBoundingObjects(m_StorageModel->GetCurrentRenderer());
 }
 
 void QmitkRenderWindowManipulatorWidget::ChangeViewDirection(const QString &viewDirection)

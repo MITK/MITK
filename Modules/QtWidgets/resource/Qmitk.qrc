@@ -11,5 +11,8 @@
         <file>mm_contrast.png</file>
         <file>mm_pan.png</file>
         <file>LabelSetImage_48.png</file>
+		<file>cmwLayout.png</file>
+		<file>cmwSynchronized.png</file>
+		<file>cmwDesynchronized.png</file>
     </qresource>
 </RCC>

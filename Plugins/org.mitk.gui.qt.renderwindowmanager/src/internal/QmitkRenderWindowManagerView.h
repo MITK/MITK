@@ -27,6 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 // mitk gui qt common plugin
+#include <mitkIRenderWindowPartListener.h>
+
+// qt
 #include <QmitkAbstractView.h>
 #include "QmitkModelViewSelectionConnector.h"
 #include "QmitkSelectionServiceConnector.h"
@@ -34,13 +37,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
 * @brief RenderWindowManager
 */
-class QmitkRenderWindowManagerView : public QmitkAbstractView
+class QmitkRenderWindowManagerView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
 public:
 
   static const std::string VIEW_ID;
+
+  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  virtual void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
 
 protected:
 
@@ -81,6 +88,8 @@ private:
   // the Qt parent of our GUI
   QWidget* m_Parent;
   Ui::QmitkRenderWindowManagerControls m_Controls;
+
+  mitk::IRenderWindowPart* m_RenderWindowPart;
 
   QmitkRenderWindowManipulatorWidget* m_RenderWindowManipulatorWidget;
   std::unique_ptr<QmitkModelViewSelectionConnector> m_ModelViewSelectionConnector;

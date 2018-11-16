@@ -30,6 +30,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkRenderWindowManagerView::VIEW_ID = "org.mitk.views.renderwindowmanager";
 
+void QmitkRenderWindowManagerView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  if (m_RenderWindowPart != renderWindowPart)
+  {
+    m_RenderWindowPart = renderWindowPart;
+  }
+
+  SetControlledRenderer();
+}
+
+void QmitkRenderWindowManagerView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  if (m_RenderWindowPart == renderWindowPart)
+  {
+    m_RenderWindowPart = nullptr;
+  }
+
+  SetControlledRenderer();
+}
+
+void QmitkRenderWindowManagerView::RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart)
+{
+  if (m_RenderWindowPart == renderWindowPart)
+  {
+    SetControlledRenderer();
+  }
+}
+
 void QmitkRenderWindowManagerView::SetFocus()
 {
   // nothing here
@@ -47,18 +75,6 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
 
   SetControlledRenderer();
 
-  for (const auto& renderer : m_ControlledRenderer)
-  {
-    m_Controls.comboBoxRenderWindowSelection->addItem(renderer->GetName());
-  }
-
-  SetUpConnections();
-
-  OnRenderWindowSelectionChanged(m_Controls.comboBoxRenderWindowSelection->itemText(0));
-}
-
-void QmitkRenderWindowManagerView::SetUpConnections()
-{
   connect(m_Controls.comboBoxRenderWindowSelection, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(OnRenderWindowSelectionChanged(const QString&)));
   connect(m_RenderWindowManipulatorWidget, SIGNAL(AddLayerButtonClicked()), this, SLOT(OnAddLayerButtonClicked()));
 
@@ -76,6 +92,8 @@ void QmitkRenderWindowManagerView::SetUpConnections()
 
 void QmitkRenderWindowManagerView::SetControlledRenderer()
 {
+  m_Controls.comboBoxRenderWindowSelection->clear();
+
   const mitk::RenderingManager::RenderWindowVector allRegisteredRenderWindows = mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
   mitk::BaseRenderer* baseRenderer = nullptr;
   for (const auto &renderWindow : allRegisteredRenderWindows)
@@ -84,10 +102,13 @@ void QmitkRenderWindowManagerView::SetControlledRenderer()
     if (nullptr != baseRenderer)
     {
       m_ControlledRenderer.push_back(baseRenderer);
+      m_Controls.comboBoxRenderWindowSelection->addItem(baseRenderer->GetName());
     }
   }
 
   m_RenderWindowManipulatorWidget->SetControlledRenderer(m_ControlledRenderer);
+
+  OnRenderWindowSelectionChanged(m_Controls.comboBoxRenderWindowSelection->itemText(0));
 }
 
 void QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged(const QString &renderWindowId)

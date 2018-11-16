@@ -13,6 +13,7 @@ set(CPP_FILES
   QmitkFileReaderOptionsDialog.cpp
   QmitkFileReaderWriterOptionsWidget.cpp
   QmitkFileWriterOptionsDialog.cpp
+  QmitkInteractionSchemeToolBar.cpp
   QmitkIOUtil.cpp
   QmitkLevelWindowPresetDefinitionDialog.cpp
   QmitkLevelWindowRangeChangeDialog.cpp
@@ -21,10 +22,12 @@ set(CPP_FILES
   QmitkLineEditLevelWindowWidget.cpp
   QmitkMemoryUsageIndicatorView.cpp
   QmitkMimeTypes.cpp
+  QmitkMouseModeSwitcher.cpp
+  QmitkMultiWidgetConfigurationToolBar.cpp
+  QmitkMultiWidgetLayoutSelectionWidget.cpp
   QmitkNodeDescriptor.cpp
   QmitkColoredNodeDescriptor.cpp
   QmitkNodeDescriptorManager.cpp
-  QmitkRenderWindowMenu.cpp
   QmitkProgressBar.cpp
   QmitkPropertiesTableEditor.cpp
   QmitkPropertiesTableModel.cpp
@@ -33,10 +36,12 @@ set(CPP_FILES
   QmitkRenderingManager.cpp
   QmitkRenderingManagerFactory.cpp
   QmitkRenderWindow.cpp
+  QmitkRenderWindowMenu.cpp
+  QmitkRenderWindowWidget.cpp
   QmitkServiceListWidget.cpp
   QmitkSliderLevelWindowWidget.cpp
   QmitkStdMultiWidget.cpp
-  QmitkMouseModeSwitcher.cpp
+  QmitkCustomMultiWidget.cpp
   QmitkDataStorageFilterProxyModel.cpp
   QmitkDataStorageComboBoxWithSelectNone.cpp
   QmitkPropertyItem.cpp
@@ -62,16 +67,21 @@ set(MOC_H_FILES
   include/QmitkFileReaderOptionsDialog.h
   include/QmitkFileReaderWriterOptionsWidget.h
   include/QmitkFileWriterOptionsDialog.h
+  include/QmitkInteractionSchemeToolBar.h
   include/QmitkLevelWindowPresetDefinitionDialog.h
   include/QmitkLevelWindowRangeChangeDialog.h
   include/QmitkLevelWindowWidgetContextMenu.h
   include/QmitkLevelWindowWidget.h
   include/QmitkLineEditLevelWindowWidget.h
   include/QmitkMemoryUsageIndicatorView.h
+  include/QmitkMouseModeSwitcher.h
+  include/QmitkMultiWidgetConfigurationToolBar.h
+  include/QmitkMultiWidgetLayoutSelectionWidget.h
   include/QmitkNodeDescriptor.h
   include/QmitkColoredNodeDescriptor.h
   include/QmitkNodeDescriptorManager.h
   include/QmitkRenderWindowMenu.h
+  include/QmitkRenderWindowWidget.h
   include/QmitkProgressBar.h
   include/QmitkPropertiesTableEditor.h
   include/QmitkPropertyDelegate.h
@@ -80,7 +90,7 @@ set(MOC_H_FILES
   include/QmitkServiceListWidget.h
   include/QmitkSliderLevelWindowWidget.h
   include/QmitkStdMultiWidget.h
-  include/QmitkMouseModeSwitcher.h
+  include/QmitkCustomMultiWidget.h
   include/QmitkDataStorageComboBoxWithSelectNone.h
   include/QmitkPropertyItemDelegate.h
   include/QmitkPropertyItemModel.h
@@ -97,6 +107,7 @@ set(UI_FILES
   src/QmitkLevelWindowWidget.ui
   src/QmitkLevelWindowRangeChange.ui
   src/QmitkMemoryUsageIndicator.ui
+  src/QmitkMultiWidgetLayoutSelectionWidget.ui
   src/QmitkServiceListWidgetControls.ui
   src/QmitkDataStorageListInspector.ui
   src/QmitkDataStorageTreeInspector.ui

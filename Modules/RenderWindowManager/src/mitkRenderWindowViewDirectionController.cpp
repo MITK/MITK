@@ -45,17 +45,16 @@ void mitk::RenderWindowViewDirectionController::SetControlledRenderer(RenderWind
   }
 }
 
-void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(const std::string &viewDirection, BaseRenderer* renderer /*=nullptr*/)
+void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(const std::string &viewDirection, BaseRenderer* renderer/* =nullptr*/)
 {
   if (nullptr == renderer)
   {
-
     // set visibility of data node in all controlled renderer
     for (auto& renderer : m_ControlledRenderer)
     {
       if (renderer.IsNotNull())
       {
-        //SetViewDirectionOfRenderer(viewDirection, renderer);
+        SetViewDirectionOfRenderer(viewDirection, renderer);
       }
     }
   }
@@ -64,16 +63,39 @@ void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(const
     mitk::SliceNavigationController* sliceNavigationController = renderer->GetSliceNavigationController();
     if ("axial" == viewDirection)
     {
-      sliceNavigationController->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
+      sliceNavigationController->SetDefaultViewDirection(ViewDirection::Axial);
     }
     else if ("coronal" == viewDirection)
     {
-      sliceNavigationController->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
+      sliceNavigationController->SetDefaultViewDirection(ViewDirection::Frontal);
     }
     else if ("sagittal" == viewDirection)
     {
-      sliceNavigationController->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
+      sliceNavigationController->SetDefaultViewDirection(ViewDirection::Sagittal);
     }
+
+    // initialize the views to the bounding geometry
+    InitializeViewByBoundingObjects(renderer);
+  }
+}
+
+void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(ViewDirection viewDirection , BaseRenderer* renderer/* =nullptr*/)
+{
+  if (nullptr == renderer)
+  {
+    // set visibility of data node in all controlled renderer
+    for (auto& renderer : m_ControlledRenderer)
+    {
+      if (renderer.IsNotNull())
+      {
+        SetViewDirectionOfRenderer(viewDirection, renderer);
+      }
+    }
+  }
+  else
+  {
+    mitk::SliceNavigationController* sliceNavigationController = renderer->GetSliceNavigationController();
+    sliceNavigationController->SetDefaultViewDirection(viewDirection);
 
     // initialize the views to the bounding geometry
     InitializeViewByBoundingObjects(renderer);

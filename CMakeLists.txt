@@ -69,6 +69,7 @@ include(mitkFunctionGenerateProjectXml)
 include(mitkFunctionEnableBuildConfiguration)
 include(mitkFunctionWhitelists)
 include(mitkFunctionAddExternalProject)
+include(mitkFunctionAddLibrarySearchPaths)
 
 SUPPRESS_VC_DEPRECATED_WARNINGS()
 

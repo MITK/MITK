@@ -7,6 +7,7 @@ set(CPP_FILES
   internal/Invoker.cpp
   PathUtilities.cpp
   TranslationUtilities.cpp
+  RuEnTransliterator.cpp
 )
 
 set(MOC_H_FILES

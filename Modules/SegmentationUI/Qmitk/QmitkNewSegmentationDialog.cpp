@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOrganTypeProperty.h"
 
+#include <RuEnTransliterator.h>
+
 #include <itkRGBPixel.h>
 
 #include <qlineedit.h>
@@ -71,9 +73,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
   horizontalLayout2->addWidget( btnColor );
   horizontalLayout2->addWidget( edtName );
 
-
-
-  //buttons for closing the dialog
+  // Buttons for closing the dialog
   btnOk = new QPushButton(TR_OK, this );
   btnOk->setDefault(true);
   connect( btnOk, SIGNAL(clicked()), this, SLOT(onAcceptClicked()) );
@@ -97,11 +97,16 @@ QmitkNewSegmentationDialog::~QmitkNewSegmentationDialog()
 
 void QmitkNewSegmentationDialog::onAcceptClicked()
 {
-  m_SegmentationName = edtName->text();
+  m_SegmentationName = edtName->text().trimmed();
   this->accept();
 }
 
 const QString QmitkNewSegmentationDialog::GetSegmentationName()
+{
+  return RuEnTransliterator()(m_SegmentationName);
+}
+
+const QString QmitkNewSegmentationDialog::GetSegmentationCaption()
 {
   return m_SegmentationName;
 }

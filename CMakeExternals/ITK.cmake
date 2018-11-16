@@ -95,13 +95,22 @@ if(NOT DEFINED ITK_DIR)
     )
   endif()
 
+  if(MITK_PDB)
+    list(APPEND additional_cmake_args
+      "-DCMAKE_CXX_FLAGS_RELEASE:STRING=/MD /Zi /O2 /Ob1 /DNDEBUG"
+      "-DCMAKE_SHARED_LINKER_FLAGS_RELEASE:STRING=/DEBUG /INCREMENTAL /OPT:REF /OPT:ICF"
+      "-DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING=/DEBUG /INCREMENTAL /OPT:REF /OPT:ICF"
+      "-DCMAKE_MODULE_LINKER_FLAGS_RELEASE:STRING=/DEBUG /INCREMENTAL /OPT:REF /OPT:ICF"
+    )
+  endif()
+
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.9.0.tar.xz
      URL_MD5 0ce83c0f3c08f8ee992675fca4401572
      # work with external GDCM
-     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.9.0.patch 
-       COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK_search_gpu.patch 
+     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.9.0.patch
+       COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK_search_gpu.patch
        COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK_fixed_4D_progress.patch
        COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK_rescaling_fix.patch
        COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.9-accurate-spacingZ.patch
@@ -121,6 +130,20 @@ if(NOT DEFINED ITK_DIR)
 
   set(ITK_DIR ${ep_prefix})
   mitkFunctionInstallExternalCMakeProject(${proj})
+
+  # Install pdb files
+  if (WIN32 AND MITK_PDB)
+    message("TESTTESTTEST")
+    ExternalProject_Get_Property(${proj} binary_dir)
+    message("${binary_dir}/bin/${CMAKE_BUILD_TYPE}")
+    message("${ep_prefix}/bin")
+    INSTALL(DIRECTORY ${binary_dir}/bin/${CMAKE_BUILD_TYPE}
+      DESTINATION ${ep_prefix}/bin
+      CONFIGURATIONS Release
+      FILES_MATCHING
+      PATTERN *.pdb
+    )
+  endif()
 
 else()
 

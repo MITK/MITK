@@ -71,6 +71,16 @@ function initWidth() {
   console.log(chart.style.height);
 }
 
+function getPlotlyChartType(inputType){
+  let plotlyType = "";
+  if (inputType == "line"){
+    plotlyType = "scatter";
+  } else if (inputType == "bar"){
+    plotlyType = "bar";
+  }
+  return plotlyType;
+}
+
 //Here, the chart magic takes place. Plot.ly is called
 function GenerateChart(chartData)
 {
@@ -94,11 +104,14 @@ function GenerateChart(chartData)
   xValues[0] = xValues[0].slice(1);
   yValues[0] = yValues[0].slice(1);
 
+  let inputType = chartTypes[dataLabels[0]];
+  console.log(inputType);
+  let chartType = getPlotlyChartType(inputType);
 
   let trace1 = {
     x: xValues[0],
     y: yValues[0],
-    type: 'bar',
+    type: chartType,
     name: dataLabels[0]
   };
 
@@ -149,13 +162,7 @@ function transformView(TransformTo) {
   console.log("transform view");
   console.log(TransformTo);
 
-  let plotlyType = "";
-  if (TransformTo == "line"){
-    plotlyType = "scatter";
-  } else if (TransformTo == "bar"){
-    plotlyType = "bar";
-  }
-
+  let plotlyType = getPlotlyChartType(TransformTo);
   let chart = document.getElementById("chart");
   let update = {type : plotlyType}
   Plotly.restyle(chart, update, 0); // updates the given plotly trace at index 0 with an update object built of a standard trace object

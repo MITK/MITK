@@ -134,6 +134,10 @@ function GenerateChart(chartData)
     },
   };
 
+  if (chartData.m_ShowSubchart){
+    layout.xaxis.rangeslider = {}; // adds range slider below x axis
+  }
+
   let data = [trace1];
 
   Plotly.newPlot('chart', data, layout, {displayModeBar: false, responsive: true});
@@ -154,7 +158,7 @@ function ReloadChart(showSubchart, stackDataString)
 {
     chartData.m_ShowSubchart = showSubchart;
     chartData.m_StackedData = stackDataString;
-
+    console.log(chartData.m_StackedData);
     GenerateChart(chartData);
 }
 

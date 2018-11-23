@@ -12,9 +12,11 @@ var dataColors = {};
 var chartTypes = {};
 var lineStyle = {};
 
+// Important loading function. This will be executed at first in this whole script.
+// Fetching data from QWebChannel and storing them for display purposes.
 window.onload = function()
 {
-  initWidth();
+  initHeight();
 
   new QWebChannel(qt.webChannelTransport, function(channel) {
     chartData = channel.objects.chartData;
@@ -28,7 +30,9 @@ window.onload = function()
   			let dataLabel = channel.objects[propertyName].m_Label
   			dataLabels.push(dataLabel)
 
-  			//add label to x array
+        console.log("loading datalabel: "+dataLabel);
+
+        //add label to x array
   			xDataTemp.unshift('x'+count.toString())
   			xs[dataLabel] = 'x' + count.toString()
 
@@ -39,8 +43,6 @@ window.onload = function()
   			yValues[count] = yDataTemp
   			dataColors[dataLabel] = channel.objects[propertyName].m_Color
   			chartTypes[dataLabel] = channel.objects[propertyName].m_ChartType
-
-		    console.log(chartTypes[dataLabel]);
 
   			if (channel.objects[propertyName].m_LineStyleName == "solid")
   			{
@@ -55,20 +57,18 @@ window.onload = function()
   		}
   	}
 
-    GenerateChart(chartData);
+    generateChart(chartData);
 
   });
 }
 
-function initWidth() {
+/**
+ * Inits the height of the chart element to 90% of the full window height.
+ */
+function initHeight() {
   var size = window.innerHeight-(window.innerHeight/100*10); //subtract 10% of height to hide vertical scrool bar
-
-  console.log("minHeight:");
-  console.log(size);
-
   let chart = document.getElementById("chart");
   chart.style.height = `${size}px`;
-  console.log(chart.style.height);
 }
 
 function getPlotlyChartType(inputType){
@@ -81,8 +81,14 @@ function getPlotlyChartType(inputType){
   return plotlyType;
 }
 
-//Here, the chart magic takes place. Plot.ly is called
-function GenerateChart(chartData)
+
+
+/**
+ * Here, the chart magic takes place. Plot.ly is called.
+ *
+ * @param {object} chartData - containing the options for plotting, not the actual values
+ */
+function generateChart(chartData)
 {
   console.log("generate chart");
 	if (chartData == undefined)
@@ -95,27 +101,29 @@ function GenerateChart(chartData)
     dataLabels = []
 	}
 
-	var groupLabels = [];
-	if (chartData.m_StackedData == true)
-	{
-    groupLabels = dataLabels
+  //=============================== DATA ========================
+  let data = [];
+
+  for (let index = 0; index < dataLabels.length; index++){
+
+    let inputType = chartTypes[dataLabels[index]];
+    let chartType = getPlotlyChartType(inputType);
+
+    let trace = {
+      x: xValues[index].slice(1),
+      y: yValues[index].slice(1),
+      type: chartType,
+      name: dataLabels[index],
+    };
+
+    if (lineStyle[dataLabels[index]]["style"] == "dashed"){
+      trace["line"]["dash"] = "dot"
+    }
+
+    data.push(trace)
   }
 
-  xValues[0] = xValues[0].slice(1);
-  yValues[0] = yValues[0].slice(1);
-
-  let inputType = chartTypes[dataLabels[0]];
-  console.log(inputType);
-  let chartType = getPlotlyChartType(inputType);
-
-  let trace1 = {
-    x: xValues[0],
-    y: yValues[0],
-    type: chartType,
-    name: dataLabels[0]
-  };
-
-  //===============================
+  //=============================== STYLE ========================
   let marginTop = chartData.m_diagramTitle == undefined ? 10 : 50;
   var layout = {
     title: chartData.m_diagramTitle,
@@ -134,15 +142,22 @@ function GenerateChart(chartData)
     },
   };
 
+  if (chartData.m_YAxisScale){
+      layout.yaxis["type"] = "log"
+  }
+
   if (chartData.m_ShowSubchart){
     layout.xaxis.rangeslider = {}; // adds range slider below x axis
   }
 
-  let data = [trace1];
-
   Plotly.newPlot('chart', data, layout, {displayModeBar: false, responsive: true});
 }
 
+/**
+ * Change theme of chart.
+ *
+ * @param {string} color - dark or not dark
+ */
 function changeTheme(color) {
 link = document.getElementsByTagName("link")[0];
   if (color == 'dark') {
@@ -154,19 +169,29 @@ link = document.getElementsByTagName("link")[0];
   }
 };
 
-function ReloadChart(showSubchart, stackDataString)
+/**
+ * Reload the chart with the given arguments.
+ *
+ * @param {boolean} showSubchart
+ * @param {string} stackDataString
+ */
+function reloadChart(showSubchart, stackDataString)
 {
     chartData.m_ShowSubchart = showSubchart;
     chartData.m_StackedData = stackDataString;
-    console.log(chartData.m_StackedData);
-    GenerateChart(chartData);
+    generateChart(chartData);
 }
 
-function transformView(TransformTo) {
+/**
+ * Transforms the view to another chart type.
+ *
+ * @param {string} transformTo - 'line' or 'bar'
+ */
+function transformView(transformTo) {
   console.log("transform view");
-  console.log(TransformTo);
+  console.log(transformTo);
 
-  let plotlyType = getPlotlyChartType(TransformTo);
+  let plotlyType = getPlotlyChartType(transformTo);
   let chart = document.getElementById("chart");
   let update = {type : plotlyType}
   Plotly.restyle(chart, update, 0); // updates the given plotly trace at index 0 with an update object built of a standard trace object

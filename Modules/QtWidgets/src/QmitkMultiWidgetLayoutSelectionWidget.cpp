@@ -71,6 +71,6 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked()
     }
 
     close();
-    emit LayoutSet(row, column);
+    emit LayoutSet(row+1, column+1);
   }
 }

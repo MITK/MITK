@@ -19,11 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkQtWidgetsExports.h"
 
+// mitk core
+#include <mitkSliceNavigationController.h>
+
+// qt
 #include <QToolBar>
 
-// mitk qtwidgets
-#include "QmitkCustomMultiWidget.h"
-#include "QmitkMultiWidgetLayoutSelectionWidget.h"
+class QmitkAbstractMultiWidget;
+class QmitkMultiWidgetLayoutSelectionWidget;
 
 /**
 * @brief 
@@ -38,7 +41,7 @@ public:
 
   using ViewDirection = mitk::SliceNavigationController::ViewDirection;
 
-  QmitkMultiWidgetConfigurationToolBar(QmitkCustomMultiWidget* customMultiWidget);
+  QmitkMultiWidgetConfigurationToolBar(QmitkAbstractMultiWidget* multiWidget);
   ~QmitkMultiWidgetConfigurationToolBar() override;
 
 Q_SIGNALS:
@@ -58,7 +61,7 @@ private:
   void InitializeToolBar();;
   void AddButtons();
 
-  QmitkCustomMultiWidget* m_CustomMultiWidget;
+  QmitkAbstractMultiWidget* m_MultiWidget;
 
   QAction* m_SynchronizeAction;
 

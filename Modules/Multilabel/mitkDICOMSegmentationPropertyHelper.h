@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef DICOMSEGMENTATIONPROPERTYHANDLER_H_
-#define DICOMSEGMENTATIONPROPERTYHANDLER_H_
+#ifndef DICOMPMPROPERTYHANDLER_H_
+#define DICOMPMPROPERTYHANDLER_H_
 
 #include <mitkDICOMTag.h>
 #include <mitkLabel.h>

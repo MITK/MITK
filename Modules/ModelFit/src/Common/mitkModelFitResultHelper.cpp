@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkModelFitConstants.h"
 #include "mitkModelFitInfo.h"
 
+
 namespace mitk
 {
   namespace modelFit
@@ -270,5 +271,8 @@ MITKMODELFIT_EXPORT void mitk::modelFit::StoreResultsInDataStorage(DataStorage* 
   {
     storage->Add(*pos,parentNode);
   }
+
+
+
 };
 

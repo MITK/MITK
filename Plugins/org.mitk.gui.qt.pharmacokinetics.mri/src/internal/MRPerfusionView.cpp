@@ -69,6 +69,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>
 
+#include <mitkDICOMPMPropertyHandler.h>
+
 
 const std::string MRPerfusionView::VIEW_ID = "org.mitk.gui.qt.pharmacokinetics.mri";
 
@@ -1053,7 +1055,7 @@ MRPerfusionView::MRPerfusionView() : m_FittingInProgress(false)
 
 void MRPerfusionView::OnJobFinished()
 {
-  this->m_Controls.infoBox->append(QString("Fitting finished"));
+  this->m_Controls.infoBox->append(QString("Fitting finished."));
   this->m_FittingInProgress = false;
   this->UpdateGUIControls();
 };
@@ -1068,12 +1070,29 @@ void MRPerfusionView::OnJobError(QString err)
 void MRPerfusionView::OnJobResultsAreAvailable(mitk::modelFit::ModelFitResultNodeVectorType results,
     const ParameterFitBackgroundJob* pJob)
 {
+  MITK_INFO << "IKO: OnJobResultsAvailable";
   //Store the resulting parameter fit image via convenience helper function in data storage
   //(handles the correct generation of the nodes and their properties)
   mitk::modelFit::StoreResultsInDataStorage(this->GetDataStorage(), results, pJob->GetParentNode());
+  
+	mitk::PropertyList::Pointer dicomPMPropertyList =
+		mitk::DICOMPMPropertyHandler::GetDICOMPMProperties(pJob->GetParentNode()->GetData()->GetPropertyList());
+  
+  mitk::modelFit::ModelFitResultNodeVectorType::const_iterator pos;
 
-  m_Controls.errorMessageLabel->setText("");
-  m_Controls.errorMessageLabel->hide();
+  for (pos = results.begin(); pos != results.end(); pos++)
+  {
+    pos->GetPointer()->GetData()->GetPropertyList()->ConcatenatePropertyList(dicomPMPropertyList);
+  }
+ 
+  
+    m_Controls.errorMessageLabel->setText("");
+	m_Controls.errorMessageLabel->hide();
+
+
+
+
+
 };
 
 void MRPerfusionView::OnJobProgress(double progress)

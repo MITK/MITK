@@ -4,7 +4,7 @@ MITK_CREATE_MODULE(Pharmacokinetics
     PRIVATE src/Common src/Functors src/Models src/DescriptionParameters src/SimulationFramework
   DEPENDS
     PUBLIC MitkCore MitkModelFit
-	PRIVATE MitkMultilabel
+	PRIVATE MitkMultilabel MitkDICOMQI
   PACKAGE_DEPENDS
     PUBLIC ITK|ITKOptimizers
     PRIVATE Boost
@@ -15,4 +15,5 @@ if(BUILD_TESTING)
 endif(BUILD_TESTING)
 
 ADD_SUBDIRECTORY(autoload/Models)
+ADD_SUBDIRECTORY(autoload/DICOMPMIO)
 ADD_SUBDIRECTORY(cmdapps)

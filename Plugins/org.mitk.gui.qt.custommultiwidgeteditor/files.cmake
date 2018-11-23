@@ -1,4 +1,5 @@
 set(SRC_CPP_FILES
+  QmitkCustomMultiWidget.cpp
   QmitkCustomMultiWidgetEditor.cpp
   QmitkMultiWidgetDecorationManager.cpp
 )
@@ -13,6 +14,7 @@ set(UI_FILES
 )
 
 set(MOC_H_FILES
+  src/QmitkCustomMultiWidget.h
   src/QmitkCustomMultiWidgetEditor.h
   
   src/internal/mitkPluginActivator.h

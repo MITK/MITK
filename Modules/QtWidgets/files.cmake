@@ -42,7 +42,6 @@ set(CPP_FILES
   QmitkServiceListWidget.cpp
   QmitkSliderLevelWindowWidget.cpp
   QmitkStdMultiWidget.cpp
-  QmitkCustomMultiWidget.cpp
   QmitkDataStorageFilterProxyModel.cpp
   QmitkDataStorageComboBoxWithSelectNone.cpp
   QmitkPropertyItem.cpp
@@ -92,7 +91,6 @@ set(MOC_H_FILES
   include/QmitkServiceListWidget.h
   include/QmitkSliderLevelWindowWidget.h
   include/QmitkStdMultiWidget.h
-  include/QmitkCustomMultiWidget.h
   include/QmitkDataStorageComboBoxWithSelectNone.h
   include/QmitkPropertyItemDelegate.h
   include/QmitkPropertyItemModel.h

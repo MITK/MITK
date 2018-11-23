@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRenderWindowWidget.h"
 
 // mitk qt widgets
-#include <QmitkCustomMultiWidget.h>
+#include <QmitkAbstractMultiWidget.h>
 
 // vtk
 #include <vtkTextProperty.h>
@@ -160,7 +160,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
   m_RenderingManager->SetDataStorage(m_DataStorage);
 
   m_RenderWindow = new QmitkRenderWindow(this, m_WidgetName, nullptr, m_RenderingManager, m_RenderingMode);
-  m_RenderWindow->SetLayoutIndex(QmitkCustomMultiWidget::SAGITTAL); // TODO: allow to change layout type later
+  m_RenderWindow->SetLayoutIndex(QmitkAbstractMultiWidget::SAGITTAL); // TODO: allow to change layout type later
   m_RenderWindow->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
   m_RenderWindow->GetSliceNavigationController()->SetRenderingManager(m_RenderingManager);
   m_RenderWindow->GetSliceNavigationController()->SetCrosshairEvent.AddListener(mitk::MessageDelegate1<QmitkRenderWindowWidget, mitk::Point3D>(this, &QmitkRenderWindowWidget::SetCrosshair));

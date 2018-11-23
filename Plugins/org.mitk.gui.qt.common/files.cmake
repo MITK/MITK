@@ -10,6 +10,7 @@ set(SRC_CPP_FILES
   QmitkNodeSelectionDialog.cpp
   QmitkAbstractNodeSelectionWidget.cpp
   QmitkMultiNodeSelectionWidget.cpp
+  QmitkMultiWidgetDecorationManager.cpp
   QmitkNodeSelectionPreferenceHelper.cpp
   QmitkNodeSelectionButton.cpp
 )

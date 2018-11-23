@@ -17,8 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKMULTIWIDGETDECORATIONMANAGER_H
 #define QMITKMULTIWIDGETDECORATIONMANAGER_H
 
-// custom multi widget editor
-#include <org_mitk_gui_qt_custommultiwidgeteditor_Export.h>
+#include <org_mitk_gui_qt_common_Export.h>
 
 // mitk core
 #include <mitkColorProperty.h>
@@ -26,8 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk annotation
 #include <mitkLogoAnnotation.h>
 
-// mitk qtwidgets
-#include <QmitkCustomMultiWidget.h>
+// mitk qt widgets
+#include <QmitkAbstractMultiWidget.h>
 
 // berry
 #include <berryIBerryPreferences.h>
@@ -45,12 +44,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 *
 */
-class CUSTOMMULTIWIDGETEDITOR_EXPORT QmitkMultiWidgetDecorationManager
+class MITK_QT_COMMON QmitkMultiWidgetDecorationManager
 {
 
 public:
 
-  QmitkMultiWidgetDecorationManager(QmitkCustomMultiWidget* customMultiWidget);
+  QmitkMultiWidgetDecorationManager(QmitkAbstractMultiWidget* multiWidget);
 
   enum class Colormap
   {
@@ -136,7 +135,7 @@ private:
   bool IsCornerAnnotationVisible(const QString& widgetID) const;
   bool AreAllCornerAnnotationsVisible() const;
 
-  QmitkCustomMultiWidget* m_CustomMultiWidget;
+  QmitkAbstractMultiWidget* m_MultiWidget;
   mitk::LogoAnnotation::Pointer m_LogoAnnotation;
 
 };

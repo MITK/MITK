@@ -1,15 +1,11 @@
 <RCC>
     <qresource prefix="/C3js">
-        <file>c3.min.css</file>
         <file>Chart.css</file>
         <file>Chart_dark.css</file>
-        <file>c3.min.js</file>
-        <file>d3.min.js</file>
         <file>plotly-1.42.5.min.js</file>
         <file>empty.html</file>
         <file>empty.js</file>
         <file>QmitkChartWidget.html</file>
         <file>Chart.js</file>
-        <file>NewChart.js</file>
     </qresource>
 </RCC>

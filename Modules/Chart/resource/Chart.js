@@ -1,11 +1,7 @@
-//Based on C3.js (http://c3js.org). See Website for examples!
-
 document.body.style.backgroundColor = 'rgb(240, 240, 240)';
 
-var minHeight = 255;
-
+const minHeight = 255;
 var chart;
-GenerateChart()
 
 var chartData;
 var xValues=[];
@@ -16,104 +12,152 @@ var dataColors = {};
 var chartTypes = {};
 var lineStyle = {};
 
-//Is executed when js is loaded first.
-//Extracts relevant information from chartData in variables
-window.onload = function() 
+// Important loading function. This will be executed at first in this whole script.
+// Fetching data from QWebChannel and storing them for display purposes.
+window.onload = function()
 {
+  initHeight();
+
   new QWebChannel(qt.webChannelTransport, function(channel) {
     chartData = channel.objects.chartData;
 
-  var count = 0;
-	for(var propertyName in channel.objects) {
-	  if (propertyName != 'chartData')
-	  {
-			var xDataTemp = channel.objects[propertyName].m_XData
-			var yDataTemp = channel.objects[propertyName].m_YData
-			var dataLabel = channel.objects[propertyName].m_Label
-			dataLabels.push(dataLabel)
+    let count = 0;
+  	for(let propertyName in channel.objects) {
+  	  if (propertyName != 'chartData')
+  	  {
+  			let xDataTemp = channel.objects[propertyName].m_XData
+  			let yDataTemp = channel.objects[propertyName].m_YData
+  			let dataLabel = channel.objects[propertyName].m_Label
+  			dataLabels.push(dataLabel)
 
-			//add label to x array
-			xDataTemp.unshift('x'+count.toString())
-			xs[dataLabel] = 'x' + count.toString()
-			
-			xDataTemp.push(null); //append null value, to make sure the last tick on x-axis is displayed correctly
-			yDataTemp.unshift(dataLabel)
-			yDataTemp.push(null); //append null value, to make sure the last tick on y-axis is displayed correctly
-			xValues[count] = xDataTemp
-			yValues[count] = yDataTemp
-			dataColors[dataLabel] = channel.objects[propertyName].m_Color
-			chartTypes[dataLabel] = channel.objects[propertyName].m_ChartType
+        console.log("loading datalabel: "+dataLabel);
 
-			if (channel.objects[propertyName].m_LineStyleName == "solid")
-			{
-			  lineStyle[dataLabel] = ''
-			}
-			else
-			{
-			  lineStyle[dataLabel] = [{ 'style': 'dashed' }]
-			}
+        //add label to x array
+  			xDataTemp.unshift('x'+count.toString())
+  			xs[dataLabel] = 'x' + count.toString()
 
-			count++;
-		}
+  			xDataTemp.push(null); //append null value, to make sure the last tick on x-axis is displayed correctly
+  			yDataTemp.unshift(dataLabel)
+  			yDataTemp.push(null); //append null value, to make sure the last tick on y-axis is displayed correctly
+  			xValues[count] = xDataTemp
+  			yValues[count] = yDataTemp
+  			dataColors[dataLabel] = channel.objects[propertyName].m_Color
+  			chartTypes[dataLabel] = channel.objects[propertyName].m_ChartType
+
+  			if (channel.objects[propertyName].m_LineStyleName == "solid")
+  			{
+  			  lineStyle[dataLabel] = ''
+  			}
+  			else
+  			{
+  			  lineStyle[dataLabel] = [{ 'style': 'dashed' }]
+  			}
+
+  			count++;
+  		}
+  	}
+
+    generateChart(chartData);
+
+  });
+}
+
+/**
+ * Inits the height of the chart element to 90% of the full window height.
+ */
+function initHeight() {
+  var size = window.innerHeight-(window.innerHeight/100*10); //subtract 10% of height to hide vertical scrool bar
+  let chart = document.getElementById("chart");
+  chart.style.height = `${size}px`;
+}
+
+function getPlotlyChartType(inputType){
+  let plotlyType = "";
+  if (inputType == "line"){
+    plotlyType = "scatter";
+  } else if (inputType == "bar"){
+    plotlyType = "bar";
+  }
+  return plotlyType;
+}
+
+
+
+/**
+ * Here, the chart magic takes place. Plot.ly is called.
+ *
+ * @param {object} chartData - containing the options for plotting, not the actual values
+ */
+function generateChart(chartData)
+{
+  console.log("generate chart");
+	if (chartData == undefined)
+	{
+		chartData = {}
 	}
 
-  setupChart(chartData)
+	if (dataLabels == undefined)
+	{
+    dataLabels = []
+	}
 
-  });
-}
+  //=============================== DATA ========================
+  let data = [];
 
-//This is necessary to resize the chart, after the size of the parent changed
-window.onresize = function () {
-  var size = window.innerHeight-(window.innerHeight/100*10); //subtract 5% of height to hide vertical scrool bar
-  
-  if (size < minHeight)
-  {
-    size = minHeight;
+  for (let index = 0; index < dataLabels.length; index++){
+
+    let inputType = chartTypes[dataLabels[index]];
+    let chartType = getPlotlyChartType(inputType);
+
+    let trace = {
+      x: xValues[index].slice(1),
+      y: yValues[index].slice(1),
+      type: chartType,
+      name: dataLabels[index],
+    };
+
+    if (lineStyle[dataLabels[index]]["style"] == "dashed"){
+      trace["line"]["dash"] = "dot"
+    }
+
+    data.push(trace)
   }
 
-  chart.resize({
-    height: size,
-  });
-}
+  //=============================== STYLE ========================
+  let marginTop = chartData.m_diagramTitle == undefined ? 10 : 50;
+  var layout = {
+    title: chartData.m_diagramTitle,
+    xaxis: {
+      title: chartData.m_xAxisLabel
+    },
+    yaxis: {
+      title: chartData.m_yAxisLabel
+    },
+    margin: {
+      l: 50,
+      r: 10,
+      b: 50,
+      t: marginTop,
+      pad: 4
+    },
+  };
 
-function ReloadChart(showSubchart, stackDataString)
-{ 
-    chartData.m_ShowSubchart = showSubchart;
-    chartData.m_StackedData = stackDataString;
-    
-    setupChart(chartData);
-}
-
-function setupChart(chartData)
-{
-  window.onresize();
-
-  GenerateChart(chartData)
-    
-  chart.unload(); //unload data before loading new data
-  
-  //for multiple xy line chart, see http://c3js.org/samples/simple_xy_multiple.html
-  var columns = [];
-  for (var i in xValues){
-	columns.push(xValues[i])
-  }  
-  for (var i in yValues){
-	columns.push(yValues[i])
+  if (chartData.m_YAxisScale){
+      layout.yaxis["type"] = "log"
   }
 
-  chart.load({
-	  xs: xs,
-	  columns: columns
-  });
+  if (chartData.m_ShowSubchart){
+    layout.xaxis.rangeslider = {}; // adds range slider below x axis
+  }
+
+  Plotly.newPlot('chart', data, layout, {displayModeBar: false, responsive: true});
 }
 
-//Transformation between different chart types
-//takes the name of the chart type as a parameter
-//called by QmitkC3jsWidget
-function transformView(TransformTo) {
-  chart.transform(TransformTo);
-};
-
+/**
+ * Change theme of chart.
+ *
+ * @param {string} color - dark or not dark
+ */
 function changeTheme(color) {
 link = document.getElementsByTagName("link")[0];
   if (color == 'dark') {
@@ -125,136 +169,32 @@ link = document.getElementsByTagName("link")[0];
   }
 };
 
-//Here, the chart magic takes place. C3js is called
-function GenerateChart(chartData)
+/**
+ * Reload the chart with the given arguments.
+ *
+ * This method is called by C++. Changes on signature with caution.
+ * @param {boolean} showSubchart
+ * @param {string} stackDataString
+ */
+function ReloadChart(showSubchart, stackDataString)
 {
-	if (chartData == undefined)
-	{
-		chartData = {}
-	}
-
-	if (dataLabels == undefined)
-	{
-    dataLabels = []
-	}
-
-	var groupLabels = [];
-	if (chartData.m_StackedData == true)
-	{
-    groupLabels = dataLabels
-  }
-
-	//adaption for bar ratio independent of amount of data points
-	//otherwise, bars could be covered.
-	var barRatio;
-  try
-  {
-		barRatio = 0.8*Math.exp(-0.015*xValues[0].length);
-	}
-  catch (err)
-  {
-		barRatio=0.42
-	}
-	var formatCharacter;
-	if (chartData.m_UsePercentageInPieChart == true)
-	{
-		formatCharacter = '%'
-	}
-	else
-	{
-		formatCharacter = '.1f'
-	}
-
-  chart = c3.generate({
-	title:{
-		text: chartData.m_diagramTitle,
-		position: 'top-center'
-	},
-    data: {
-        xs: {}, //use first "column" as x axis values
-        columns: [],  //initialize empty. Data will be loaded in function setupChart(chartData)
-        types: chartTypes,
-        selection: {
-          enabled: false,
-          multiple: false,
-        },
-		colors: dataColors,
-		regions: lineStyle,
-		groups: [groupLabels]
-    },
-    legend: {
-        position: chartData.m_LegendPosition,
-		show: chartData.m_ShowLegend
-    },
-    grid: {
-      y: {
-        lines: [{value:0}] //Draws a horizontal line at y=0
-      }
-    },
-    bar: {
-        width: {
-            ratio: barRatio
-        }
-    },
-	pie:{
-		label: {
-		   format: function (value, ratio, id) {
-				if (chartData.m_UsePercentageInPieChart==true){
-					return d3.format('%') (ratio);
-				}
-				else{
-					return value;
-				}
-			}
-		}
-	},
-    zoom: {
-        enabled: true,
-    },
-    subchart: {
-        show: chartData.m_ShowSubchart  //Shows a subchart that shows the region the primary chart is zoomed in to by overlay.
-    }, 
-    axis: {
-        x: {
-          tick: {
-            multiline: false,
-            fit: false, //to make more x labels appear on zoom
-            centered: true,
-			format: d3.format(".1f"),
-          },
-		  label: {
-			text: chartData.m_xAxisLabel,
-			position: 'outer-center'
-		  }
-        },
-        y: {
-          tick: {
-            format: d3.format(formatCharacter)
-          },
-		  label: {
-			text: chartData.m_yAxisLabel,
-			position: 'outer-middle'
-		  },
-		  scale: {
-            name: chartData.m_YAxisScale
-          }
-        }
-    },
-	tooltip: {
-		format: {
-			title: function (x) { return chartData.m_xAxisLabel +  ': ' +  d3.format(".2f")(x)}
-		},
-	},
-    //Style data points in linegraph
-    point: {
-        r: chartData.m_DataPointSize,
-        focus: 
-        {
-          expand: {
-            r: chartData.m_DataPointSize + 2
-          }
-        }
-    },
-
-  });
+    chartData.m_ShowSubchart = showSubchart;
+    chartData.m_StackedData = stackDataString;
+    generateChart(chartData);
 }
+
+/**
+ * Transforms the view to another chart type.
+ *
+ * This method is called by C++. Changes on signature with caution.
+ * @param {string} transformTo - 'line' or 'bar'
+ */
+function transformView(transformTo) {
+  console.log("transform view");
+  console.log(transformTo);
+
+  let plotlyType = getPlotlyChartType(transformTo);
+  let chart = document.getElementById("chart");
+  let update = {type : plotlyType}
+  Plotly.restyle(chart, update, 0); // updates the given plotly trace at index 0 with an update object built of a standard trace object
+};

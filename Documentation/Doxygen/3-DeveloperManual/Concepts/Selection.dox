@@ -4,71 +4,71 @@
 \tableofcontents
 
 Selecting data nodes is frequently done when working with the MITK workbench.
-Most of the plugins (plugin views) in MITK require one or more selected data nodes that will be somehow processed by the underlying algorithms, such as image segmentation, image registration, basic image processing, image statistics computation etc..
-In order to overcome some disadvantages of the current data node seletion concept, a new selection concept is proposed. The following document introduces the concept and the corresponding implementation.
+Most of the views in MITK require one or more selected data nodes that will be somehow processed by the underlying algorithms, such as image segmentation, image registration, basic image processing, image statistics computation etc..
+In order to overcome some disadvantages of the current data node seletion concept, the following new selection concept is proposed. This introduces the concept and the corresponding implementation.
 The document starts with a brief explanation of the disadvantages of the current concepts and justifies a need for the new concept.
 
 \section Migration Migration idea / background
-	The previous data node selection concept was a mixture of a \a global and a \a local selection concept:
+	The current data node selection concept is a mixture of a \a global and a \a local selection concept:
 	\subsection GlobalSelection Global selection
-		The global selection was realized by the data manager plugin view: Selecting one or more data nodes in the data manager view led to a propagation of the selected nodes via the blueberry framework.
-		Other plugin views that derive from QmitkAbstractView could receive the new selection and process it individually. All activated plugins were able to receive the new selection successively, thus it is called \a global.
+		The global selection is realized by the data manager view: Selecting one or more data nodes in the data manager view leads to a propagation of the selected nodes via the blueberry framework.
+		Other views that derive from QmitkAbstractView can receive the new selection and process it individually. All activated views are able to receive the new selection successively, thus it is called \a global.
 	\subsection LocalSelection Local selection
-		The local selection was realized by Qt elements inside a plugin view. An example of such an element is the QmitkDataStorageComboBox. This combo box contains the nodes from the data storage and allows to select one of it.
-		A combo box can be included in a plugin view multiple times. Additionally a node predicate can be set for a combo box so that only a filtered subset of all nodes in the data storage is contained in the combo box.
-		A selection inside a combo box did not affect the selection of another combo box (in the same or another plugin view), thus it is called \a local.
-
+		The local selection is realized by Qt elements inside a view. An example of such an element is the QmitkDataStorageComboBox. This combo box contains the nodes from the data storage and allows to select one of it.
+		A combo box can be included in a view multiple times. Additionally a node predicate can be set for a combo box so that only a filtered subset of all nodes in the data storage is contained in the combo box.
+		A selection inside a combo box does not affect the selection of another combo box (in the same or another view), thus it is called \a local.
 	<br>
 	Both concepts have reached their functional limit:
 	-# the global selection does not offer the functionality to filter data nodes
-	-# the global selection does not allow to select different data nodes in different plugin views
+	-# the global selection does not allow to select different data nodes in different views
 	-# the selection order for multi-node selection might be important, which can be cumbersome to achieve via the data manager
 	-# the local selection does not offer enough flexibility:
 		-# it does not allow to propagate data node selections
 		-# it does not allow multi node selection (multiple combo boxes are needed)
 		-# it does not show the visibility / hierarchy of the data nodes
 	
-	The latest trend was to change the design of the plugin view of the MITK workbench so that the local concept (using the QmitkDataStorageComboBox) was used wherever possible.
+	The latest trend was to change the design of the view of the MITK workbench so that the local concept (using the QmitkDataStorageComboBox) was used wherever possible.
 	This was done since the problems of the global selection concept where severe. In cases where the local concept was used positive feedback was received.
 	
 \section NewSelectionConcept New selection concept
-	The new selection concept is based on the idea of a local selection concept. This accounts for some fundamental requirements, such as individual data node selection for each plugin view and data node filtering.
-	Furthermore it clearly defines the responsibility of the data manager plugin: the data manager is only used to manage the data to render, e.g. defining the node hierarchy (rendering order) or setting the color or transparency of the pixel data.
+	The new selection concept is based on the idea of a local selection concept. This accounts for some fundamental requirements, such as individual data node selection for each view and data node filtering.
+	Furthermore it clearly defines the responsibility of the data manager view: the data manager is only used to manage the data to render, e.g. defining the node hierarchy (rendering order) or setting the color or transparency of the pixel data.
 	
 	Additionally the new local selection concept is also able to overcome the problems of the previous local concept: It allows data node selection propagation, multi node selection and is able to show additional information such as data node hierarchy or node visibility.
 	How this is achieved will be explained in the following sections.
 
 	\subsection BasicIdea Basic idea
-		The basic idea is to provide a set of classes that define the basic functionality of the new selection concept. These classes allow the use of existing and the development of new <em>data storage inspector widgets</em> or <em>selection widgets</em>.
+		The basic idea is to provide a set of classes that define the basic functionality of the new selection concept. These classes allow the use of existing and the development of new <em>data storage inspectors</em> or <em>node selection widgets</em>.
 		<br>
 		\imageMacro{selection_concept_class_diagram.png, "", 16}
 		<br>
-		Included in this concept is a set of basic data storage inspectors and selection widgets that are frequently needed. A developer can extend these classes to create own data storage inspectors or node selection widgets to customize a plugins behavior and design.
+		Included in this concept is a set of basic data storage inspectors and node selection widgets that are frequently needed. A developer can extend these classes to create own data storage inspectors or node selection widgets to customize a plugins behavior and design.
 
 		The following paragraphs further describe the most important classes:
 
 		\b QmitkAbstractDataStorageModel
 		
-		The QmitkAbstractDataStorageModel extends the QAbstractItemModel to provide a custom item model for the data storage. This custom item model extends the Qt-model functionality in order to accept a mitk::DataStorage and a mitk::NodePredicateBase.
-		The data storage is used to define on which data storage the model operates.
-					 
-		In order to update the data storage model if the data storage changes, the QmitkAbstractDataStorageModel provides four pure virtual functions, QAbstractItemModel::DataStorageChanged, QAbstractItemModel::NodeAdded, QAbstractItemModel::NodeChanged and QAbstractItemModel::NodeRemoved.
+		The QmitkAbstractDataStorageModel extends the QAbstractItemModel to provide a custom item model for the data storage. This custom item model extends the Qt-model functionality in order to accept an mitk::DataStorage and an mitk::NodePredicateBase.
+
+		The data storage is used to define on which data storage the model operates. In order to update the data storage model if the data storage changes, the QmitkAbstractDataStorageModel provides four pure virtual functions,
+		QAbstractItemModel::DataStorageChanged, QAbstractItemModel::NodeAdded, QAbstractItemModel::NodeChanged and QAbstractItemModel::NodeRemoved.
 		This abstract model calls the first function if the data storage has been reset using the SetDataStorage-function (i.e. to a new data storage or to a nullptr).
 		The last three functions are connected to the corresponding events of the data storage (AddNodeEvent, ChangedNodeEvent and RemoveNodeEvent).
 			 
 		The node predicate can be set and later be used to filter the data storage, so that only a subset of the contained data nodes is represented by the data storage model.
-		In order to update the data storage model if the node predicate changes, the QmitkAbstractDataStorageModel provides a pure virtual functions, NodePredicateChanged.
-		This abstract model call this function if the node predicate has been reset using the SetNodePredicate-function (i.e. to a new node predicate or to a nullptr).
+		In order to update the data storage model if the node predicate changes, the QmitkAbstractDataStorageModel provides a pure virtual function, QAbstractItemModel::NodePredicateChanged.
+		This abstract model calls this function if the node predicate has been reset using the SetNodePredicate-function (i.e. to a new node predicate or to a nullptr).
 
-		Any subclass of this abstract data storage model can now define its own functionality for these events by overriding the corresponding functions.
+		Any subclass of this abstract data storage model can define its own functionality by overriding the corresponding functions.
+		The abstract data storage model does not implement any Qt model functionality.
 						 
 		\b QmitkAbstractDataStorageInspector
 		
-		The QmitkAbstractDataStorageInspector extends the QWidget to provide a custom view onto the data storage using a QmitkAbstractDataStorageModel. This custom widget extends the Qt-widget functionality in order to accept a mitk::DataStorage and a mitk::NodePredicateBase.
+		The QmitkAbstractDataStorageInspector extends the QWidget to provide a custom view onto the data storage using a QmitkAbstractDataStorageModel. This custom widget extends the QWidget functionality in order to accept an mitk::DataStorage and an mitk::NodePredicateBase.
 		The data storage is used to define which data storage the widget should inspect. The node predicate can be set and later be used to filter the data storage, so that only a subset of the contained data nodes is inspected by the data storage inspector.
 		The data storage and the node predicate can be set by the corresponding setter, which in turn calls the pure virtual function Initialize.
 		Any subclass of this abstract data storage inspector can now define its own functionality inside the Initialize-function to define what happens if the data storage or the node predicate is (re-)set.
-		Typically an inspector will forward the dta storage and the node predicate to the data storage model to make it aware of the data it should hold.
+		Typically an inspector will forward the data storage and the node predicate to the data storage model to make it aware of the data it should hold.
 
 		Additionally a data storage inspector holds a QmitkModelViewSelectionConnector and initializes it with a QAbstractItemView (e.g. a QListView) and the data storage model. The idea behind this connector-class will be explained in the next section.
 		
@@ -80,19 +80,20 @@ The document starts with a brief explanation of the disadvantages of the current
 		The QmitkModelViewSelectionConnector is used to transform a model selection into a list of selected data nodes and vice versa. The class accepts a QAbstractItemView with a corresponding QmitkAbstractDataStorageModel that operates on a data storage.
 				
 		The connector class provides a QSlot, QmitkModelViewSelectionConnector::ChangeModelSelection(const QItemSelection\&, const QItemSelection\&), that is called if the selectionChanged-signal of the selection model of the given item view is emitted. This indicates a change in the model selection.
-		The slot will also emit a QSignal, QmitkModelViewSelectionConnector::CurrentSelectionChanged(QList<mitk::DataNode::Pointer>), where the selection of the item view has been transformed to a list of selected data nodes.
+		The slot itself will emit a QSignal, QmitkModelViewSelectionConnector::CurrentSelectionChanged(QList<mitk::DataNode::Pointer>), where the selection of the item view has been transformed to a list of selected data nodes.
 		The transformation is done by using the member functions QmitkModelViewSelectionConnector::GetSelectedNodes and QmitkModelViewSelectionConnector::GetInternalSelectedNodes: The selected indices of the item view's selection model are used to receive the corresponding data node from the data storage model.
 				
 		Additionally the connector class provides a function, QmitkModelViewSelectionConnector::SetCurrentSelection(QList<mitk::DataNode::Pointer>), which can be used to change the selection of the item view from outside of this class.
 		The nodes of the list are compared to the nodes that are valid for the data storage model. If the given nodes are valid the corresponding indices are selected in the view. If the given list is equal to the current selection, nothing happens.
 				
-		<b>TODO: Node filtering / only visible nodes</b>
+		Using the QmitkModelViewSelectionConnector::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) function it is possible to set a variable that defines if only those nodes should be de-/selectable that are included in the list of filtered data nodes.
+		This means that a new selection ca be received, which might change the current selection of the view. However, those nodes that are not visible, as defined by the node predicate of the data storage model, will not be de-/selectable.
 			
 		\b QmitkSelectionServiceConnector
 		
 		The QmitkSelectionServiceConnector is used to interact with the global selection bus:
 		It provides a QSlot, QmitkSelectionServiceConnector::OnServiceSelectionChanged(const berry::IWorkbenchPart::Pointer&, const berry::ISelection::ConstPointer&) that is called if the selection of the selection bus has been changed.
-		It then transforms the berry selection into a list of selected data nodes and emits the QSignal, QmitkSelectionServiceConnector::ServiceSelectionChanged(QList<mitk::DataNode::Pointer>).
+		Calling this slot transforms the berry selection into a list of selected data nodes and emits the QSignal QmitkSelectionServiceConnector::ServiceSelectionChanged(QList<mitk::DataNode::Pointer>).
 		Typically this signal is used to receive the list of selected nodes from the selection bus and propagate it to QmitkModelViewSelectionConnector to change the selection of an item view via the selection bus.
 
 		Additionally the connector class provides a function, QmitkSelectionServiceConnector::SetAsSelectionProvider(QmitkDataNodeSelectionProvider*), which can be used to set the connector as a provider for data node selections that will be sent via the global selection bus.
@@ -114,6 +115,7 @@ The document starts with a brief explanation of the disadvantages of the current
 			}
 		\endcode
 
+		<br>
 		\code
 			void QmitkDataStorageViewerTestView::SetAsSelectionListener(bool enable)
 			{
@@ -131,11 +133,11 @@ The document starts with a brief explanation of the disadvantages of the current
 		\endcode
 
 	\subsection DataSotrageInspectors The data storage inspectors
-		The QmitkNodeSelectionDialog
+		QmitkNodeSelectionDialog
 		
 		The QmitkNodeSelectionDialog is the main widget to be used in order to select data nodes from the data storage. It is a pop-up-dialog that can be included in any other widget, such as the QmitkMultiNodeSelectionWidget or the QmitkSingleNodeSelectionWidget.
 		
-		The node selection dialog serves as a container for different QmitkAbstractDataStorageInspector: It uses a Qt tab widget that holds the different data storage inspectors. These inspectors are received by using the mit::DataStorageInspectorGenerator class.
+		The node selection dialog serves as a container for different QmitkAbstractDataStorageInspector: It uses a QTabWidget that holds the different data storage inspectors. These inspectors are received by using the mitk::DataStorageInspectorGenerator class.
 		Each data storage inspector is then added to the tab widget and its \a CurrentSelectionChanged-signal is connected to the dialog's \a OnSelectionChanged-slot.
 		If the selection inside a data storage inspector changes, the slot sets the selected nodes of the dialog and propagates this selection to all its known data storage inspectors. This way all inspectors that are currently held in the tab widget show the same selection.
 		Furthermore, the dialog's \a CurrentSelectionChanged-signal is emitted, so that other parts of the workbench will also receive the changed selection.
@@ -143,19 +145,19 @@ The document starts with a brief explanation of the disadvantages of the current
 		In order to dynamically add and receive new data storage inspectors the microservice approach is used: Each concrete implementation of a data storage inspector provider registers itself as an mitk::IDataStorageInspectorProvider via the service registry.
 		Any class can then use the mitk::DataStorageInspectorGenerator to receive all registered data storage inspectors providers. Each provider in turn represents a data storage inspector, which can than be displayed to provide a view onto the data storage and it's data nodes.
 				
-		The mitk::IDataStorageInspectorProvider
+		mitk::IDataStorageInspectorProvider
 		
 		The mitk::IDataStorageInspectorProvider declares the service interface for all data storage inspector providers. It must be implemented to override the mitk::IDataStorageInspectorProvider::CreateInspector-function.
 		This function should return the concrete data storage inspector represented by the provider. In order to simplify the use of this interface and to add some basic functionality, the QmitkDataStorageInspectorProviderBase class should be used.
 				
-		The QmitkDataStorageInspectorProviderBase
+		QmitkDataStorageInspectorProviderBase
 		
 		The QmitkDataStorageInspectorProviderBase implements the mitk::IDataStorageInspectorProvider-interface and is a template implementation: It can be used with a concrete implementation of the QmitkAbstractDataStorageInspector; the data storage inspector that the provider base should represent.
 		When the provider base is initialized it registers itself as a mitk::IDataStorageInspectorProvider service reference.
 		The provider base overrides the mitk::IDataStorageInspectorProvider::CreateInspector-function of the interface to create and return a concrete instance of the represented data storage inspector.
 		This way each concrete data storage inspector can be created by receiving the corresponding data storage inspector provider as a service and using the mitk::IDataStorageInspectorProvider::CreateInspector-function.
 				
-		The mitk::DataStorageInspectorGenerator
+		mitk::DataStorageInspectorGenerator
 		
 		The mitk::DataStorageInspectorGenerator simply provides two static functions to receive all or a specific data storage provider. These providers have been registered before as a mitk::IDataStorageInspectorProvider service.
 		Using the microservice approach the provider can be received without any further knowledge about the concrete provider.
@@ -184,10 +186,10 @@ The document starts with a brief explanation of the disadvantages of the current
 		In the code snippets the QmitkDataStorageListInspector class was used. This is an example of a concrete data storage inspector which is provided by the presented selection concept. It is a frequently used basic inspector and already registered via a corresponding provider base.
 		This is done inside the mitk::QtWidgetsActivator class; a class that is used during module activation.
 		
-		The QmitkDataStorageListInspector
+		QmitkDataStorageListInspector
 		
 		The QmitkDataStorageListInspector is an example of a concrete data storage inspector, subclassing the QmitkAbstractDataStorageInspector. Its only purpose is to provide a custom model-view pair that represents a list view onto the data storage. The view is a simple QListView.
-		The model is a custom model derived from the above mentioned QmitkAbstractDataStorageModel. The QmitkDataStorageDefaultListModel overrides the five pure virtual functions to react on changes of the data storage or the node predicate:
+		The model is a custom model derived from the above mentioned QmitkAbstractDataStorageModel: The QmitkDataStorageDefaultListModel overrides the five pure virtual functions to react on changes of the data storage or the node predicate:
 		each function calls the private UpdateModelData-function, which will simply retrieve the currently available (possibly filtered) data nodes of the data storage.
 		
 		Additionally the list model needs to override some functions of the QAbstractItemModel in order to represent a list model. One important function to override is the data(const QModelIndex\& index, int role = Qt::DisplayRole)}-function:

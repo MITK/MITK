@@ -173,6 +173,7 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
   SetSimilarityGraph(dto.simScoreArray, dto.minSliceStart);
 
   m_SRUID = dto.srSeriesUID;
+  m_GroundTruth = dto.groundTruth;
 
   typedef std::map<std::string, std::string> ParamMap;
   ParamMap seriesInstancesParams;
@@ -247,24 +248,6 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
         emit InvokeProgress(50, {"load dicom files from disk"});
         InvokeLoadData(filePathList);
       });
-
-      //ParamMap seriesInstancesParams;
-
-      //seriesInstancesParams.insert((ParamMap::value_type({ "StudyInstanceUID" }, dto.studyUID)));
-      //seriesInstancesParams.insert((ParamMap::value_type({ "SeriesInstanceUID" }, segSeriesUIDA)));
-
-      //m_DICOMWeb->QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) {
-      //  emit InvokeProgress(10, {"display SEG A data"});
-      //  auto seriesDescription = QString(utility::conversions::to_utf8string(jsonResult[0][U("0008103E")][U("Value")][0].as_string()).c_str());
-      //  m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + " " + seriesDescription);
-      //});
-
-      //seriesInstancesParams["SeriesInstanceUID"] = segSeriesUIDB;
-      //m_DICOMWeb->QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) {
-      //  emit InvokeProgress(10, { "display SEG B data" });
-      //  auto seriesDescription = QString(utility::conversions::to_utf8string(jsonResult[0][U("0008103E")][U("Value")][0].as_string()).c_str());
-      //  m_Controls.labelSegB->setText(m_Controls.labelSegB->text() + " " + seriesDescription );
-      //});
     });
 
   }
@@ -381,8 +364,9 @@ void SegmentationReworkView::LoadData(std::vector<std::string> filePathList)
   auto algorithmNameB = GetAlgorithmOfSegByPath(filePathList[2]);
   m_SegA->SetName(algorithmNameA);
   m_SegB->SetName(algorithmNameB);
-  m_Controls.labelSegA->setText(m_Controls.labelSegA->text() + " " + algorithmNameA.c_str());
-  m_Controls.labelSegB->setText(m_Controls.labelSegB->text() + " " + algorithmNameB.c_str());
+  m_Controls.labelSegAValue->setText(algorithmNameA.c_str());
+  m_Controls.labelSegBValue->setText(algorithmNameB.c_str());
+  m_Controls.labelGroundTruthValue->setText(m_GroundTruth.c_str());
   emit InvokeProgress(20, { "" });
 }
 
@@ -410,6 +394,7 @@ void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArra
   m_Controls.chartWidget->SetChartType(label, QmitkChartWidget::ChartType::line);
   m_Controls.chartWidget->SetXAxisLabel("slice number");
   m_Controls.chartWidget->SetYAxisLabel("similarity in percent");
+  m_Controls.chartWidget->SetTitle("Similartiy Score for Segmentation Comparison");
 }
 
 void SegmentationReworkView::UploadNewSegmentation()

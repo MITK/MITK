@@ -72,25 +72,50 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="labelSegA">
-        <property name="text">
-         <string>Segmentation A:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="labelSegB">
-        <property name="text">
-         <string>Segmentation B:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>ground truth:</string>
-        </property>
-       </widget>
+       <layout class="QFormLayout" name="formLayout_2">
+        <item row="1" column="0">
+         <widget class="QLabel" name="labelSegB">
+          <property name="text">
+           <string>Segmentation B:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="labelGroundTruthValue">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="labelSegA">
+          <property name="text">
+           <string>Segmentation A:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="labelSegAValue">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="labelGroundTruth">
+          <property name="text">
+           <string>Ground Truth:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="labelSegBValue">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QmitkChartWidget" name="chartWidget" native="true">

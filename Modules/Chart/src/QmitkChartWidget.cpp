@@ -26,6 +26,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkChartData.h>
 #include <QmitkChartxyData.h>
 
+class CustomPage : public QWebEnginePage
+{
+public:
+  CustomPage(QObject* parent = 0) : QWebEnginePage(parent) {}
+  virtual void javaScriptConsoleMessage(JavaScriptConsoleMessageLevel level, const QString &message, int lineNumber, const QString &sourceID)
+  {
+    MITK_INFO << "JS > " << lineNumber << ": " << message.toStdString();
+  }
+};
+
+
 class QmitkChartWidget::Impl final
 {
 public:
@@ -95,6 +106,8 @@ QmitkChartWidget::Impl::Impl(QWidget *parent)
 {
   // disable context menu for QWebEngineView
   m_WebEngineView->setContextMenuPolicy(Qt::NoContextMenu);
+
+  m_WebEngineView->setPage(new CustomPage());
 
   // Set the webengineview to an initial empty page. The actual chart will be loaded once the data is calculated.
   m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));

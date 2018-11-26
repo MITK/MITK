@@ -1,0 +1,19 @@
+/**
+\page mitkClassificationMiniAppsPortalPage MITK Classification Mini Apps
+
+\tableofcontents
+
+The Classification Mini Apps bundle the functionality that is commonly neeeded for the processing and learning with medical images. As all other MiniApps, they follow the <a href="http://www.slicer.org/slicerWiki/index.php/Slicer3:Execution_Model_Documentation">Slicer Execution Model</a> in describing themselves via xml. You can simply obtain a description by calling the MiniApp without any parameter. If the MiniApp is calles with the option "--xml" a XML description of all possible parameter is added.
+
+\section mcmasec1 Description of Mini Apps
+
+\subsection mcmasub1 mitkCLGLobalImageFeatures
+Allows to calculate features that describe the masked area. Can be used to obtain radiomics features.
+
+\subsection mcmasub2 mitkCLN4
+Allows to calculate a bias normalization.
+
+\subsection mcmasub3 mitkCLStaple
+Allows to combine multiple segmentations into a single segmentation using the STAPLE algorithm
+
+*/

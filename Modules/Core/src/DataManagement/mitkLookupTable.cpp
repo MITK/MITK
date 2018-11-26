@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Colortables/Viridis.h>
 #include <Colortables/Plasma.h>
 #include <Colortables/Magma.h>
+#include <Colortables/Multilabel.h>
 #include <Colortables/PET20.h>
 #include <Colortables/PETColor.h>
 #include <mitkLookupTableProperty.h>
@@ -148,7 +149,12 @@ void mitk::LookupTable::SetType(const std::string &typeName)
   }
 }
 
-const std::string mitk::LookupTable::GetActiveTypeAsString()
+mitk::LookupTable::LookupTableType mitk::LookupTable::GetActiveType() const
+{
+  return m_type;
+}
+
+std::string mitk::LookupTable::GetActiveTypeAsString() const
 {
   return std::string(typenameList[(int)m_type]);
 }
@@ -213,9 +219,6 @@ mitk::LookupTable::RawLookupTableType *mitk::LookupTable::GetRawLookupTable() co
   return m_LookupTable->GetPointer(0);
 }
 
-/*!
-* \brief equality operator inplementation
-*/
 bool mitk::LookupTable::operator==(const mitk::LookupTable &other) const
 {
   if (m_LookupTable == other.GetVtkLookupTable())
@@ -252,17 +255,11 @@ bool mitk::LookupTable::operator==(const mitk::LookupTable &other) const
   return true;
 }
 
-/*!
-* \brief un-equality operator implementation
-*/
 bool mitk::LookupTable::operator!=(const mitk::LookupTable &other) const
 {
   return !(*this == other);
 }
 
-/*!
-* \brief assignment operator implementation
-*/
 mitk::LookupTable &mitk::LookupTable::operator=(const mitk::LookupTable &LookupTable)
 {
   if (this == &LookupTable)
@@ -528,34 +525,14 @@ void mitk::LookupTable::BuildMultiLabelLookupTable()
   vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
   lut->SetNumberOfTableValues(65536);
   lut->SetTableRange(0, 65536);
+  lut->Build();
+
   lut->SetTableValue(0, 0.0, 0.0, 0.0, 0.0); // background
 
-  lut->SetTableValue(1, 1.0, 1.0, 0.0, 0.4);
-  lut->SetTableValue(2, 0.0, 1.0, 0.0, 0.4);
-  lut->SetTableValue(3, 0.0, 0.0, 1.0, 0.4);
-  lut->SetTableValue(4, 1.0, 1.0, 0.4, 0.4);
-  lut->SetTableValue(5, 0.0, 0.4, 0.7, 0.4);
-  lut->SetTableValue(6, 1.0, 0.0, 1.0, 0.4);
-
-  lut->SetTableValue(7, 1.0, 0.5, 0.0, 0.4);
-  lut->SetTableValue(8, 0.0, 1.0, 0.5, 0.4);
-  lut->SetTableValue(9, 0.5, 0.0, 1.0, 0.4);
-  lut->SetTableValue(10, 1.0, 1.0, 0.5, 0.4);
-  lut->SetTableValue(11, 0.5, 1.0, 1.0, 0.4);
-  lut->SetTableValue(12, 1.0, 0.5, 0.6, 0.4);
-  lut->SetTableValue(13, 1.0, 0.3, 0.3, 0.4);
-  lut->SetTableValue(14, 0.4, 0.7, 1.0, 0.4);
-  lut->SetTableValue(15, 0.4, 0.5, 1.0, 0.4);
-  lut->SetTableValue(16, 0.8, 0.5, 1.0, 0.4);
-  lut->SetTableValue(17, 1.0, 0.3, 1.0, 0.4);
-  lut->SetTableValue(18, 1.0, 0.5, 0.6, 0.4);
-  lut->SetTableValue(19, 1.0, 0.5, 0.4, 0.4);
-  lut->SetTableValue(20, 0.4, 0.5, 0.4, 0.4);
-  lut->SetTableValue(21, 1.0, 0.5, 0.76, 0.4);
-  lut->SetTableValue(22, 0.76, 0.4, 0.4, 0.4);
-  lut->SetTableValue(23, 1.0, 0.5, 0.4, 0.4);
-  lut->SetTableValue(24, 0.76, 0.3, 0.4, 0.4);
-  lut->SetTableValue(25, 1.0, 0.3, 0.4, 0.4);
+  for (int i = 0; i < 25; i++)
+  {
+    lut->SetTableValue(i+1, Multilabel[i][0], Multilabel[i][1], Multilabel[i][2], 0.4);
+  }
 
   for (int i = 26; i < 65536; i++)
   {

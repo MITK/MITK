@@ -26,7 +26,7 @@ QmitkSimpleBarrierTypeDelegate::QmitkSimpleBarrierTypeDelegate(QObject* /*parent
 }
 
 QWidget* QmitkSimpleBarrierTypeDelegate::createEditor(QWidget* parent,
-    const QStyleOptionViewItem& option
+    const QStyleOptionViewItem&
     , const QModelIndex& index) const
 {
   QVariant displayData = index.data(Qt::DisplayRole);

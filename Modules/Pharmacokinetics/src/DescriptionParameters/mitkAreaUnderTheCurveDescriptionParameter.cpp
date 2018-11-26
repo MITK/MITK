@@ -37,7 +37,7 @@ mitk::CurveDescriptionParameterBase::DescriptionParameterResultsType mitk::AreaU
 {
   DescriptionParameterResultsType results;
   CurveDescriptionParameterResultType auc = 0;
-  int steps = grid.GetSize();
+  auto steps = grid.GetSize();
 
   for (CurveGridType::size_type i = 0; i < steps - 1; ++i)
   {

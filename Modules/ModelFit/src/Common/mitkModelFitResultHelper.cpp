@@ -131,6 +131,7 @@ namespace mitk
 
       //fit section
       data->GetPropertyList()->SetStringProperty(ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str(), fitInfo->uid.c_str());
+      data->GetPropertyList()->SetStringProperty(ModelFitConstants::FIT_NAME_PROPERTY_NAME().c_str(), fitInfo->fitName.c_str());
       data->GetPropertyList()->SetStringProperty(ModelFitConstants::FIT_TYPE_PROPERTY_NAME().c_str(), fitInfo->fitType.c_str());
       data->GetPropertyList()->SetStringProperty(ModelFitConstants::FIT_INPUT_IMAGEUID_PROPERTY_NAME().c_str(), fitInfo->inputUID.c_str());
 
@@ -150,7 +151,7 @@ namespace mitk
       data->SetProperty(ModelFitConstants::FIT_STATIC_PARAMETERS_PROPERTY_NAME().c_str(), ConvertStaticParametersToProperty(fitInfo->staticParamMap));
     };
 
-    mitk::DataNode::Pointer CreateNode(const ModelBase::ParameterNameType& name, Image* parameterImage, const ModelFitInfo* fitInfo, const std::string& sessionName)
+    mitk::DataNode::Pointer CreateNode(const ModelBase::ParameterNameType& name, Image* parameterImage, const ModelFitInfo* fitInfo)
     {
       if (!parameterImage)
       {
@@ -168,9 +169,9 @@ namespace mitk
 
       std::string nodeName = name;
 
-      if (!sessionName.empty())
+      if (!fitInfo->fitName.empty())
       {
-        nodeName = sessionName+"_"+nodeName;
+        nodeName = fitInfo->fitName + "_" + nodeName;
       }
 
       result->SetName(nodeName);
@@ -204,7 +205,7 @@ MITKMODELFIT_EXPORT void mitk::modelFit::SetModelFitDataProperties(mitk::BaseDat
   AdaptDataPropertyToParameter(data, name, dataType, fitInfo);
 };
 
-MITKMODELFIT_EXPORT mitk::DataNode::Pointer mitk::modelFit::CreateResultNode( const ModelBase::ParameterNameType& name, modelFit::Parameter::Type nodeType, Image* parameterImage, const ModelFitInfo* modelFitInfo, const std::string& sessionName )
+MITKMODELFIT_EXPORT mitk::DataNode::Pointer mitk::modelFit::CreateResultNode( const ModelBase::ParameterNameType& name, modelFit::Parameter::Type nodeType, Image* parameterImage, const ModelFitInfo* modelFitInfo)
 {
   if (!parameterImage)
   {
@@ -216,13 +217,13 @@ MITKMODELFIT_EXPORT mitk::DataNode::Pointer mitk::modelFit::CreateResultNode( co
     mitkThrow() << "Cannot generate model fit result node. Passed model fit info instance is null. parameter name: "<<name;
   }
 
-  DataNode::Pointer result = CreateNode(name, parameterImage, modelFitInfo, sessionName);
+  DataNode::Pointer result = CreateNode(name, parameterImage, modelFitInfo);
   SetModelFitDataProperties(parameterImage, name, nodeType, modelFitInfo);
 
   return result;
 };
 
-MITKMODELFIT_EXPORT mitk::modelFit::ModelFitResultNodeVectorType mitk::modelFit::CreateResultNodeMap( const ModelFitResultImageMapType& results, const ModelFitResultImageMapType& derivedResults, const ModelFitResultImageMapType& criterionResults, const ModelFitResultImageMapType& evaluationResults, const ModelFitInfo* fitInfo, const std::string& sessionName )
+MITKMODELFIT_EXPORT mitk::modelFit::ModelFitResultNodeVectorType mitk::modelFit::CreateResultNodeMap( const ModelFitResultImageMapType& results, const ModelFitResultImageMapType& derivedResults, const ModelFitResultImageMapType& criterionResults, const ModelFitResultImageMapType& evaluationResults, const ModelFitInfo* fitInfo)
 {
   if (!fitInfo)
   {
@@ -233,25 +234,25 @@ MITKMODELFIT_EXPORT mitk::modelFit::ModelFitResultNodeVectorType mitk::modelFit:
 
   for (ModelFitResultImageMapType::const_iterator pos = results.begin(); pos!=results.end(); ++pos)
   {
-    DataNode::Pointer newNode = CreateResultNode(pos->first, modelFit::Parameter::ParameterType, pos->second, fitInfo, sessionName);
+    DataNode::Pointer newNode = CreateResultNode(pos->first, modelFit::Parameter::ParameterType, pos->second, fitInfo);
     nodes.push_back(newNode);
   }
 
   for (ModelFitResultImageMapType::const_iterator pos = derivedResults.begin(); pos!=derivedResults.end(); ++pos)
   {
-    DataNode::Pointer newNode = CreateResultNode(pos->first, modelFit::Parameter::DerivedType, pos->second, fitInfo, sessionName);
+    DataNode::Pointer newNode = CreateResultNode(pos->first, modelFit::Parameter::DerivedType, pos->second, fitInfo);
     nodes.push_back(newNode);
   }
 
   for (ModelFitResultImageMapType::const_iterator pos = criterionResults.begin(); pos!=criterionResults.end(); ++pos)
   {
-    DataNode::Pointer newNode = CreateResultNode(pos->first, modelFit::Parameter::CriterionType, pos->second, fitInfo, sessionName);
+    DataNode::Pointer newNode = CreateResultNode(pos->first, modelFit::Parameter::CriterionType, pos->second, fitInfo);
     nodes.push_back(newNode);
   }
 
   for (ModelFitResultImageMapType::const_iterator pos = evaluationResults.begin(); pos!=evaluationResults.end(); ++pos)
   {
-    DataNode::Pointer newNode = CreateResultNode(pos->first, modelFit::Parameter::EvaluationType, pos->second, fitInfo, sessionName);
+    DataNode::Pointer newNode = CreateResultNode(pos->first, modelFit::Parameter::EvaluationType, pos->second, fitInfo);
     nodes.push_back(newNode);
   }
 

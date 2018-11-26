@@ -14,6 +14,16 @@ if(BUILD_BasicImageProcessingMiniApps OR MITK_BUILD_ALL_APPS)
     set( basicImageProcessingMiniApps
         FileConverter^^MitkCore
         ImageTypeConverter^^MitkCore
+        SingleImageArithmetic^^MitkCore_MitkBasicImageProcessing
+        TwoImageArithmetic^^MitkCore_MitkBasicImageProcessing
+        ImageAndValueArithmetic^^MitkCore_MitkBasicImageProcessing
+        MaskRangeBasedFiltering^^MitkCore_MitkBasicImageProcessing
+        MaskOutlierFiltering^^MitkCore_MitkBasicImageProcessing
+        ResampleImage^^MitkCore_MitkBasicImageProcessing
+        ResampleMask^^MitkCore_MitkBasicImageProcessing
+        LaplacianOfGaussian^^MitkCore_MitkBasicImageProcessing
+        MultiResolutionPyramid^^MitkCore_MitkBasicImageProcessing
+        ForwardWavelet^^MitkCore_MitkBasicImageProcessing
     )
 
     foreach(basicImageProcessingMiniApp ${basicImageProcessingMiniApps})

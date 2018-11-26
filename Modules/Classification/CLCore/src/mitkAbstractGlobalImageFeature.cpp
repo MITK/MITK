@@ -231,8 +231,6 @@ void  mitk::AbstractGlobalImageFeature::InitializeQuantifierFromParameters(const
 
 void  mitk::AbstractGlobalImageFeature::InitializeQuantifier(const Image::Pointer & feature, const Image::Pointer &mask, unsigned int defaultBins)
 {
-  MITK_INFO << GetUseMinimumIntensity() << " " << GetUseMaximumIntensity() << " " << GetUseBins() << " " << GetUseBinsize();
-
   m_Quantifier = IntensityQuantifier::New();
   if (GetUseMinimumIntensity() && GetUseMaximumIntensity() && GetUseBinsize())
     m_Quantifier->InitializeByBinsizeAndMaximum(GetMinimumIntensity(), GetMaximumIntensity(), GetBinsize());
@@ -336,19 +334,35 @@ std::string mitk::AbstractGlobalImageFeature::QuantifierParameterString()
   return ss.str();
 }
 
+
+void mitk::AbstractGlobalImageFeature::CalculateFeaturesSliceWiseUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, int sliceID, FeatureListType &featureList)
+{
+  m_CalculateWithParameter = true;
+  auto result = CalculateFeaturesSlicewise(feature, mask, sliceID);
+  featureList.insert(featureList.end(), result.begin(), result.end());
+}
+
 mitk::AbstractGlobalImageFeature::FeatureListType mitk::AbstractGlobalImageFeature::CalculateFeaturesSlicewise(const Image::Pointer & feature, const Image::Pointer &mask, int sliceID)
 {
   std::vector<mitk::Image::Pointer> imageVector;
   std::vector<mitk::Image::Pointer> maskVector;
 
   ExtractSlicesFromImages(feature, mask,sliceID, imageVector, maskVector);
-
   std::vector<mitk::AbstractGlobalImageFeature::FeatureListType> statVector;
 
   for (std::size_t index = 0; index < imageVector.size(); ++index)
   {
-    auto stat = this->CalculateFeatures(imageVector[index], maskVector[index]);
-    statVector.push_back(stat);
+    if (m_CalculateWithParameter)
+    {
+      FeatureListType stat;
+      this->CalculateFeaturesUsingParameters(imageVector[index], maskVector[index], maskVector[index], stat);
+      statVector.push_back(stat);
+    }
+    else
+    {
+      auto stat = this->CalculateFeatures(imageVector[index], maskVector[index]);
+      statVector.push_back(stat);
+    }
   }
 
   if (statVector.size() < 1)
@@ -366,7 +380,6 @@ mitk::AbstractGlobalImageFeature::FeatureListType mitk::AbstractGlobalImageFeatu
     statMean.push_back(cElement1);
     statStd.push_back(cElement2);
   }
-
   for (auto cStat : statVector)
   {
     for (std::size_t i = 0; i < cStat.size(); ++i)

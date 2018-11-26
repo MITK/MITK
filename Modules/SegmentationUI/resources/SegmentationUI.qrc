@@ -24,10 +24,10 @@
     <file>Stop.png</file>
     <file>Help_48x48.png</file>
     <file>AdvancedTools.png</file>
-    <file>visible.png</file>
-    <file>invisible.png</file>
-    <file>lock.png</file>
-    <file>unlock.png</file>
+    <file>visible.svg</file>
+    <file>invisible.svg</file>
+    <file>lock.svg</file>
+    <file>unlock.svg</file>
     <file>MergeLabels.png</file>
     <file>RemoveLabel.png</file>
     <file>EraseLabel.png</file>

@@ -112,6 +112,7 @@ set(RESOURCE_FILES
 
   Interactions/dummy.xml
   Interactions/LiveWireTool.xml
+  Interactions/FastMarchingTool.xml
   Interactions/PressMoveRelease.xml
   Interactions/PressMoveReleaseAndPointSetting.xml
   Interactions/PressMoveReleaseWithCTRLInversion.xml

@@ -168,7 +168,7 @@ data(const QModelIndex& index, int role) const
 
   QVariant result;
 
-  if (index.row() < m_Values.size())
+  if (index.row() < static_cast<int>(m_Values.size()))
   {
     switch (index.column())
     {
@@ -248,7 +248,7 @@ flags(const QModelIndex& index) const
 {
   Qt::ItemFlags flags = QAbstractItemModel::flags(index);
 
-  if (index.row() < m_Values.size())
+  if (index.row() < static_cast<int>(m_Values.size()))
   {
     if (index.column() > 0)
     {
@@ -291,7 +291,7 @@ bool
 QmitkInitialValuesModel::
 setData(const QModelIndex& index, const QVariant& value, int role)
 {
-  if (!index.isValid() || index.row() >= m_Values.size() || (index.column() == 0))
+  if (!index.isValid() || index.row() >= static_cast<int>(m_Values.size()) || (index.column() == 0))
   {
     return false;
   }

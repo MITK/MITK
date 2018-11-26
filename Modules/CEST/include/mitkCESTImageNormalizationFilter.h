@@ -77,7 +77,7 @@ namespace mitk
 
   /** This helper function can be used to check if an image was already normalized.
   * The function assumes that an image that is not normalized is indicated by the following properties:
-  * - mitk::Image has a property called mitk::CustomTagParser::m_OffsetsPropertyName, whith offsets separated by spaces.
+  * - mitk::Image has a property called mitk::CEST_PROPERTY_NAME_OFFSETS, with offsets separated by spaces.
   * - The number of offsets has to match the number of timesteps.
   * - At least one of the offsets is a normalization (M0) image. M0 are indicated by offsets greater than 299 or less than -299.
   */

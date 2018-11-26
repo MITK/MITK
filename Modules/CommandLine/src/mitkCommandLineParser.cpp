@@ -743,6 +743,36 @@ void mitkCommandLineParser::addDeprecatedArgument(const string &longarg,
 }
 
 // --------------------------------------------------------------------------
+std::vector < std::map<std::string, us::Any> > mitkCommandLineParser::getArgumentList()
+{
+  std::vector < std::map<std::string, us::Any> > parameterList;
+  //for (CommandLineParserArgumentDescription* argument : this->Internal->ArgumentDescriptionList)
+  for (std::size_t i = 0; i< this->Internal->ArgumentDescriptionList.size(); ++i)
+  {
+    CommandLineParserArgumentDescription* argument = this->Internal->ArgumentDescriptionList[i];
+    std::map<std::string, us::Any> tmpMap;
+    //tmpMap["helptext"] = us::Any(argument->helpText);
+    tmpMap["longarg"] = us::Any(argument->LongArg);
+    tmpMap["longargprefix"] = us::Any(argument->LongArgPrefix);
+    tmpMap["shortarg"] = us::Any(argument->ShortArg);
+    tmpMap["shortargprefix"] = us::Any(argument->ShortArgPrefix);
+    tmpMap["arghelp"] = us::Any(argument->ArgHelp);
+    tmpMap["arglabel"] = us::Any(argument->ArgLabel);
+    tmpMap["arggroup"] = us::Any(argument->ArgGroup);
+    tmpMap["arggroupdescription"] = us::Any(argument->ArgGroupDescription);
+    tmpMap["ignorerest"] = us::Any(argument->IgnoreRest);
+    tmpMap["numberofparameterstoprocess"] = us::Any(argument->NumberOfParametersToProcess);
+    tmpMap["deprecated"] = us::Any(argument->Deprecated);
+    tmpMap["optional"] = us::Any(argument->Optional);
+    tmpMap["defaultvalue"] = argument->DefaultValue;
+    tmpMap["value"] = argument->Value;
+    tmpMap["valuetype"] = us::Any(argument->ValueType);
+    parameterList.push_back(tmpMap);
+  }
+  return parameterList;
+}
+
+// --------------------------------------------------------------------------
 std::string::size_type mitkCommandLineParser::fieldWidth() const
 {
   return this->Internal->FieldWidth;
@@ -839,6 +869,7 @@ void mitkCommandLineParser::setStrictModeEnabled(bool strictMode)
 {
   this->Internal->StrictMode = strictMode;
 }
+
 
 void mitkCommandLineParser::generateXmlOutput()
 {

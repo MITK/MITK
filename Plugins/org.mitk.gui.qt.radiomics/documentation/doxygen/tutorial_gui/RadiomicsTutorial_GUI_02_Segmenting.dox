@@ -1,0 +1,19 @@
+/**
+\page org_mitk_views_radiomicstutorial_gui_02_Segmentation GUI based Radiomics Tutorial - Creating a basic Segmentation
+
+
+\subsection Creating a basic Segmentation
+The first step is to create a new segmentation that can be used to calculate radiomics features. You might skip this step if you already have an segmentation at hand. Ti For this, we load the image we want to process and open the segmentation view. The easiest way to do this is to open the "View Navigator" and search for segmentation. The Segmentation view can then be opened by simply double-clicking on the view in the "View Navigator". 
+
+With this view, we will create an One-Level segmentation. It would also be possible to create a multi-label segmentation where more than one structure can be segmented using the MultiLabel segmentation. Howerver, MITK Phenotyping is currently only supporting one Label per mask, so there would be no benefit in doing so. In addition, the created segmentation could be extended further if needed. 
+
+\imageMacro{RadiomicsTutorial_GUI_Step2_01_Preparation.png,"MITK Workbench with open Segmentation View and loaded image. If you want to have the same view, you can go to the position indicated by the 'Image Navigator'",1}
+
+To now create a segmentation, we press the "New"-Button in the Data Selection part of the "Segmentation"-View. After giving the segmentation a name and probably selecting a new color if red isn't what we want, we can see a new image in the "Data Manager", the segmentation image. The segmentation can now be edited using the segmentation tools, either slice-by-slice wise or the whole 3D volume using one of the 3D tools. A good description of the different tools and their implication can be found a \ref org_mitk_views_segmentation . The different modes and options are also described there. 
+
+We create a simple segmentation of a rib in a few slices, as indiciated by the following picture. At this point, we suggest that you play around to get used to the segmentation tool and then try to roughly reproduce our results. It is not necessary to obtain a one-to-one solution of our segmentation. 
+
+\imageMacro{RadiomicsTutorial_GUI_Step2_02_StartSegmentation.png,"Basic segmentation of a rib we created in 6 slices. The color of the segmentation is changed to orange for bone.",1}
+
+
+*/

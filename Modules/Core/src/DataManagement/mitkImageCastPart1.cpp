@@ -22,16 +22,16 @@ namespace mitk
 {
 #define InstantiateAccessFunction__CastToItkImage2Access(type1, type2)                                                 \
   template MITKCORE_EXPORT void _CastToItkImage2Access(                                                                \
-    const ImageTypeTrait<MITK_PP_TUPLE_REM(2) type1>::ImageType *,                                                     \
-    itk::SmartPointer<ImageTypeTrait<MITK_PP_TUPLE_REM(2) type2>::ImageType> &);
+    const ImageTypeTrait<BOOST_PP_TUPLE_REM(2) type1>::ImageType *,                                                     \
+    itk::SmartPointer<ImageTypeTrait<BOOST_PP_TUPLE_REM(2) type2>::ImageType> &);
 
 #define InstantiateCastToItkImage2Access(r, data, dim)                                                                 \
-  MITK_PP_SEQ_FOR_EACH_PRODUCT(                                                                                        \
+  BOOST_PP_SEQ_FOR_EACH_PRODUCT(                                                                                        \
     InstantiateAccessFunctionProductImpl,                                                                              \
     ((_CastToItkImage2Access))(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dim))(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dim)))            \
-  MITK_PP_SEQ_FOR_EACH_PRODUCT(InstantiateAccessFunctionProductImpl,                                                   \
+  BOOST_PP_SEQ_FOR_EACH_PRODUCT(InstantiateAccessFunctionProductImpl,                                                   \
                                ((_CastToItkImage2Access))(MITK_ACCESSBYITK_VECTOR_TYPES_DIMN_SEQ(dim))(                \
                                  MITK_ACCESSBYITK_VECTOR_TYPES_DIMN_SEQ(dim)))
 
-  MITK_PP_SEQ_FOR_EACH(InstantiateCastToItkImage2Access, _, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
+  BOOST_PP_SEQ_FOR_EACH(InstantiateCastToItkImage2Access, _, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 }

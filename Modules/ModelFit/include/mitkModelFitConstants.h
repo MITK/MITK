@@ -159,6 +159,12 @@ namespace mitk
         static const std::string FIT_UID_PROPERTY_NAME();
 
         /**
+        * modelfit.fit.name is the human readable name of the fit. Use UID, if you want a unique identifier. This is just
+        * used for visualization purposes.
+        */
+        static const std::string FIT_NAME_PROPERTY_NAME();
+
+        /**
         * modelfit.fit.type defines the type of model fitting; e.g. pixel based or ROI based. Thus it determines the meaning of other fit specific informations.
         */
         static const std::string FIT_TYPE_PROPERTY_NAME();

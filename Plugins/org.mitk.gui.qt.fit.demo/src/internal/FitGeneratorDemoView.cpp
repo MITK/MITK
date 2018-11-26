@@ -197,12 +197,11 @@ void FitGeneratorDemoView::Generate()
 
   mitk::modelFit::ModelFitInfo::Pointer fitSession =
     mitk::modelFit::CreateFitInfoFromModelParameterizer(parameterizer, m_selectedNode->GetData(),
-        mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED());
+        mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), m_Controls.leFitName->text().toStdString());
 
   /////////////////////////
   //create job and put it into the thread pool
-  ParameterFitBackgroundJob* pJob = new ParameterFitBackgroundJob(fitGenerator, fitSession,
-      m_Controls.leFitName->text().toStdString(), m_selectedNode);
+  ParameterFitBackgroundJob* pJob = new ParameterFitBackgroundJob(fitGenerator, fitSession, m_selectedNode);
   pJob->setAutoDelete(true);
 
   connect(pJob, SIGNAL(Error(QString)), this, SLOT(OnJobError(QString)));

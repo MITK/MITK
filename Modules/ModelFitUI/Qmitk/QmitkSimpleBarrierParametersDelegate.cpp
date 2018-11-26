@@ -30,7 +30,7 @@ void QmitkSimpleBarrierParametersDelegate::paint(QPainter* painter,
     const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
   QVariant data = index.data(Qt::DisplayRole);
-  QStyleOptionViewItemV4 opt = option;
+  QStyleOptionViewItem opt = option;
   initStyleOption(&opt, index);
   QStyle* style = QApplication::style();
 
@@ -57,7 +57,7 @@ void QmitkSimpleBarrierParametersDelegate::paint(QPainter* painter,
 }
 
 QWidget* QmitkSimpleBarrierParametersDelegate::createEditor(QWidget* parent,
-    const QStyleOptionViewItem& option
+    const QStyleOptionViewItem&
     , const QModelIndex& index) const
 {
   QVariant data = index.data(Qt::EditRole);

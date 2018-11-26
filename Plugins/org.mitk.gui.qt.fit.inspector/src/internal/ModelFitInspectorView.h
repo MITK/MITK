@@ -25,11 +25,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
+#include "QmitkSliceNavigationListener.h"
 
 #include "mitkModelFitStaticParameterMap.h"
 #include "mitkModelParameterizerBase.h"
 #include "mitkModelFitInfo.h"
 #include "mitkIModelFitProvider.h"
+#include "mitkModelFitPlotDataHelper.h"
+#include "QmitkSelectionServiceConnector.h"
+#include "QmitkFitParameterModel.h"
 
 // Qt
 #include "ui_ModelFitInspectorViewControls.h"
@@ -55,6 +59,8 @@ public:
 
 protected slots:
 
+  void OnSliceChanged();
+
   /**
    *	@brief			Triggered when the selection of the "Modelfit" combo box changes.
    *					Sets the selected fit as the current one.
@@ -62,11 +68,9 @@ protected slots:
    */
   void OnFitSelectionChanged(int index);
 
-  /**
-   *	@brief	Triggered when the voxel or time step selection changes.
-   *			Calculates the curve and points for the current fit if the visualization is running.
-   */
-  void OnSliceChangedDelayed();
+  void OnInputChanged(const QList<mitk::DataNode::Pointer>& nodes);
+
+  void OnPositionBookmarksChanged();
 
   /** Triggered when the selection of "fixed" y axis scaling changes*/
   void OnScaleFixedYChecked(bool checked);
@@ -79,37 +83,20 @@ protected slots:
   void OnScaleToDataXClicked();
   void OnFixedScalingXChanged(double value);
 
-  void OnExportClicked();
-
-
-  /** @brief Saves the results table to clipboard */
-  void OnClipboardResultsButtonClicked();
-
-
 protected:
 
-  virtual void CreateQtPartControl(QWidget* parent);
+  virtual void CreateQtPartControl(QWidget* parent) override;
 
-  virtual void SetFocus();
+  virtual void SetFocus() override;
 
-  /** @brief called by QmitkFunctionality when DataManager's selection has changed */
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-                                  const QList<mitk::DataNode::Pointer>& nodes);
+  virtual void NodeRemoved(const mitk::DataNode* node) override;
 
-  /**	@brief Calls OnSliceChangedDelayed so the event isn't triggered multiple times. */
-  void OnSliceChanged(const itk::EventObject& e);
-
-  void OnSliceNavigationControllerDeleted(const itk::Object* sender, const itk::EventObject& /*e*/);
+  /** Helper that actualizes the fit selection widget and returns the index of the currently selected
+   * fit.*/
+  int ActualizeFitSelectionWidget();
 
   virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
   virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
-
-  /** Initializes and sets the observers that are used to monitor changes in the selected position
-   or time point in order to actualize the view.h*/
-  bool InitObservers();
-  void RemoveObservers(const mitk::SliceNavigationController* deletedSlicer);
-  /** Removes all observers of the deletedPart. If null pointer is passed all observers will be removed.*/
-  void RemoveAllObservers(mitk::IRenderWindowPart* deletedPart = NULL);
 
   /**
    *	@brief			Calculates the curve data using the current fit's model and parameterizer.
@@ -134,10 +121,6 @@ protected:
    */
   mitk::DataNode::ConstPointer GetParentNode(mitk::DataNode::ConstPointer node);
 
-  /** Super sample passed time grid with the factor INTERPOLATION_STEPS and interpolates linear in between.*/
-  mitk::ModelBase::TimeGridType GenerateInterpolatedTimeGrid(const mitk::ModelBase::TimeGridType&
-      grid) const;
-
   /** Sets m_currentSelectedPosition to the current selection and validates if this position is valid
    * for the input image of the currently selected fit. If it is valid, m_validSelectedPosition is set to true.
    * If the fit, his input image or geometry is not specified, it will also handled as invalid.*/
@@ -154,24 +137,6 @@ protected:
 
   Ui::ModelFitInspectorViewControls m_Controls;
   mitk::IRenderWindowPart* m_renderWindowPart;
-
-  // Needed for observing the events for when a slice or time step is changed.
-  bool m_PendingSliceChangedEvent;
-
-  /**Helper structure to manage the registered observer events.*/
-  struct ObserverInfo
-  {
-    mitk::SliceNavigationController* controller;
-    int observerTag;
-    std::string renderWindowName;
-    mitk::IRenderWindowPart* renderWindowPart;
-
-    ObserverInfo(mitk::SliceNavigationController* controller, int observerTag,
-      const std::string& renderWindowName, mitk::IRenderWindowPart* part);
-  };
-
-  typedef std::multimap<const mitk::SliceNavigationController*, ObserverInfo> ObserverMapType;
-  ObserverMapType m_ObserverMap;
 
   /**	@brief	Is a visualization currently running? */
   bool m_internalUpdateFlag;
@@ -198,6 +163,9 @@ protected:
   /** @brief currently selected node for the visualization logic*/
   mitk::DataNode::ConstPointer m_currentSelectedNode;
 
+  mitk::WeakPointer<mitk::DataNode> m_PositionBookmarksNode;
+  mitk::WeakPointer<mitk::PointSet> m_PositionBookmarks;
+
   /** @brief	Number of interpolation steps between two x values */
   static const unsigned int INTERPOLATION_STEPS;
 
@@ -209,24 +177,27 @@ protected:
   itk::TimeStamp m_currentPositionTime;
   itk::TimeStamp m_lastRefreshTime;
 
-  QmitkPlotWidget::XYDataVector m_ImagePlotCurve;
-  QmitkPlotWidget::XYDataVector m_ModelPlotCurve;
+  mitk::ModelFitPlotData m_PlotCurves;
 
-  typedef std::map<std::string, QmitkPlotWidget::XYDataVector> CurveMapType;
-  CurveMapType m_InputDataPlotCurves;
+  std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
+  QmitkFitParameterModel* m_FitParameterModel;
+
+  QmitkSliceNavigationListener m_SliceChangeListener;
 
   /** Check and updates the plot data if needed.
   * @return indicates if something was refreshed (true)*/
   bool RefreshPlotData();
 
-
   void RenderPlot();
+  void RenderPlotCurve(const mitk::PlotDataCurveCollection* curveCollection, const QColor& sampleColor, const QColor& signalColor, const std::string& posString);
+
   void RenderFitInfo();
 
-  /** (re)initializes the headers of the data table*/
-  void InitDataTable();
+  void EnsureBookmarkPointSet();
 
-
+  static mitk::PlotDataCurveCollection::Pointer RefreshPlotDataCurveCollection(const mitk::Point3D& position,
+    const mitk::Image* input, const mitk::modelFit::ModelFitInfo* fitInfo,
+    const mitk::ModelBase::TimeGridType& timeGrid, mitk::ModelParameterizerBase* parameterizer);
 };
 
 #endif // ModelFitInspectorView_h

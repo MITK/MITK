@@ -277,6 +277,16 @@ void MRPerfusionView::OnModellSet(int index)
   UpdateGUIControls();
 }
 
+std::string MRPerfusionView::GetFitName() const
+{
+  std::string fitName = m_Controls.lineFitName->text().toStdString();
+  if (fitName.empty())
+  {
+    fitName = m_Controls.lineFitName->placeholderText().toStdString();
+  }
+  return fitName;
+}
+
 std::string MRPerfusionView::GetDefaultFitName() const
 {
     std::string defaultName = "undefined model";
@@ -680,7 +690,7 @@ void MRPerfusionView::GenerateDescriptiveBrixModel_PixelBased(mitk::modelFit::Mo
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
-    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), roiUID);
+    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), this->GetFitName(), roiUID);
 }
 
 void MRPerfusionView::GenerateDescriptiveBrixModel_ROIBased(mitk::modelFit::ModelFitInfo::Pointer&
@@ -727,7 +737,7 @@ void MRPerfusionView::GenerateDescriptiveBrixModel_ROIBased(mitk::modelFit::Mode
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
-    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_ROIBASED(), roiUID);
+    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_ROIBASED(), this->GetFitName(), roiUID);
   mitk::ScalarListLookupTable::ValueType infoSignal;
 
   for (mitk::MaskedDynamicImageStatisticsGenerator::ResultType::const_iterator pos =
@@ -770,7 +780,7 @@ void MRPerfusionView::Generate3StepLinearModelFit_PixelBased(mitk::modelFit::Mod
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
-    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), roiUID);
+    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), this->GetFitName(), roiUID);
 }
 
 void MRPerfusionView::Generate3StepLinearModelFit_ROIBased(mitk::modelFit::ModelFitInfo::Pointer&
@@ -815,7 +825,7 @@ void MRPerfusionView::Generate3StepLinearModelFit_ROIBased(mitk::modelFit::Model
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
-    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_ROIBASED(), roiUID);
+    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_ROIBASED(), this->GetFitName(), roiUID);
   mitk::ScalarListLookupTable::ValueType infoSignal;
 
   for (mitk::MaskedDynamicImageStatisticsGenerator::ResultType::const_iterator pos =
@@ -879,7 +889,7 @@ void MRPerfusionView::GenerateAIFbasedModelFit_PixelBased(mitk::modelFit::ModelF
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
-    concentrationNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(),
+    concentrationNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), this->GetFitName(),
                  roiUID);
 
   mitk::ScalarListLookupTable::ValueType infoSignal;
@@ -956,7 +966,7 @@ void MRPerfusionView::GenerateAIFbasedModelFit_ROIBased(
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
-    concentrationNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_ROIBASED(),
+    concentrationNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_ROIBASED(), this->GetFitName(),
                  roiUID);
 
   mitk::ScalarListLookupTable::ValueType infoSignal;
@@ -991,13 +1001,7 @@ void MRPerfusionView::DoFit(const mitk::modelFit::ModelFitInfo* fitSession,
 
   /////////////////////////
   //create job and put it into the thread pool
-  std::string fitName = m_Controls.lineFitName->text().toStdString();
-  if (fitName.empty())
-  {
-      fitName = m_Controls.lineFitName->placeholderText().toStdString();
-  }
-
-  ParameterFitBackgroundJob* pJob = new ParameterFitBackgroundJob(generator, fitSession, fitName,
+  ParameterFitBackgroundJob* pJob = new ParameterFitBackgroundJob(generator, fitSession,
       this->m_selectedNode);
   pJob->setAutoDelete(true);
 

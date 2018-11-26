@@ -410,7 +410,6 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::SpecialProperties(
   mitk::DataNode::Pointer node = DataNode::New();
   node->SetName("Camion");
 
-  node->SetProperty("", StringProperty::New("Colis"));           // no name!
   node->SetProperty("Livre", StringProperty::New(VeryLongText)); // defined at the top of this file
   node->SetProperty(VeryLongText.c_str(), StringProperty::New("Shorty"));
 

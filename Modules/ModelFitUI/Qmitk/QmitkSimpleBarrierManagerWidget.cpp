@@ -81,12 +81,12 @@ void QmitkSimpleBarrierManagerWidget::OnShowContextMenuIsoSet(const QPoint& pos)
   }
 }
 
-void QmitkSimpleBarrierManagerWidget::OnAddConstraint(bool checked)
+void QmitkSimpleBarrierManagerWidget::OnAddConstraint(bool)
 {
   this->m_InternalModel->addConstraint();
 }
 
-void QmitkSimpleBarrierManagerWidget::OnDelConstraint(bool checked)
+void QmitkSimpleBarrierManagerWidget::OnDelConstraint(bool)
 {
   QModelIndex selectedIndex = m_Controls.constraintsView->currentIndex();
 

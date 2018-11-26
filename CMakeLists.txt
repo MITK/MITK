@@ -30,7 +30,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2016.11.99)
+  project(MITK VERSION 2018.04.99)
   include_directories(SYSTEM ${MITK_SUPERBUILD_BINARY_DIR})
 endif()
 
@@ -69,6 +69,7 @@ include(mitkFunctionGenerateProjectXml)
 include(mitkFunctionEnableBuildConfiguration)
 include(mitkFunctionWhitelists)
 include(mitkFunctionAddExternalProject)
+include(mitkFunctionAddLibrarySearchPaths)
 
 SUPPRESS_VC_DEPRECATED_WARNINGS()
 
@@ -742,7 +743,7 @@ endif()
 set(Boost_USE_MULTITHREADED 1)
 set(Boost_USE_STATIC_LIBS 0)
 set(Boost_USE_STATIC_RUNTIME 0)
-set(Boost_ADDITIONAL_VERSIONS "1.65" "1.65.1" "1.66" "1.67" "1.68" "1.68.0")
+set(Boost_ADDITIONAL_VERSIONS 1.68 1.68.0)
 
 # We need this later for a DCMTK workaround
 set(_dcmtk_dir_orig ${DCMTK_DIR})

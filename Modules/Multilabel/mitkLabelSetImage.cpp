@@ -497,7 +497,14 @@ mitk::LabelSet *mitk::LabelSetImage::GetActiveLabelSet()
 
 void mitk::LabelSetImage::UpdateCenterOfMass(PixelType pixelValue, unsigned int layer)
 {
-  AccessByItk_2(this, CalculateCenterOfMassProcessing, pixelValue, layer);
+  if (4 == this->GetDimension())
+  {
+    AccessFixedDimensionByItk_2(this, CalculateCenterOfMassProcessing, 4, pixelValue, layer);
+  }
+  else
+  {
+    AccessByItk_2(this, CalculateCenterOfMassProcessing, pixelValue, layer);
+  }
 }
 
 unsigned int mitk::LabelSetImage::GetNumberOfLabels(unsigned int layer) const

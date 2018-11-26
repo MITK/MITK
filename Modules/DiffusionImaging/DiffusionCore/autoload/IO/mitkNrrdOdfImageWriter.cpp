@@ -104,9 +104,9 @@ void mitk::NrrdOdfImageWriter::Write()
     {
       nrrdWriter->Update();
     }
-    catch (itk::ExceptionObject e)
+    catch (const itk::ExceptionObject& e)
     {
-      std::cout << e << std::endl;
+      MITK_INFO << e.what();
     }
 }
 

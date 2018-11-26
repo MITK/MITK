@@ -6,7 +6,7 @@
           name="Perfusion Curve Description Parameters View"
 		  category="Perfusion"
           class="PerfusionCurveDescriptionParameterView"
-          icon="resources/icon.png" />
+          icon="resources/icon.svg" />
   </extension>
 
 </plugin>

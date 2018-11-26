@@ -340,6 +340,13 @@ if(Eigen_INCLUDE_DIR)
     )
 endif()
 
+# Optional pass through of Doxygen
+if(DOXYGEN_EXECUTABLE)
+  list(APPEND mitk_optional_cache_args
+       -DDOXYGEN_EXECUTABLE:FILEPATH=${DOXYGEN_EXECUTABLE}
+  )
+endif()
+
 set(proj MITK-Configure)
 
 ExternalProject_Add(${proj}

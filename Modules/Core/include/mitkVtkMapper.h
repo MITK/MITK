@@ -114,7 +114,7 @@ namespace mitk
     }
 
     /**
-    * \deprecatedSince{2017_08}
+    * \deprecatedSince{2018_04}
     */
     DEPRECATED(void ApplyShaderProperties(mitk::BaseRenderer *)){}
 

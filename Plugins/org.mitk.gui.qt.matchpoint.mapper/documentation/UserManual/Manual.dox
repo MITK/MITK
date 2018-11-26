@@ -1,11 +1,9 @@
 /**
 \page org_mitk_gui_qt_matchpoint_mapper The MatchPoint Image Mapper View
 
-\imageMacro{icon.svg, "Icon of the MatchPoint Image Mapper",3}
+\imageMacro{map_mapper_icon_doc.svg, "Icon of the MatchPoint Image Mapper",3}
 
-\li \ref MAP_MAPPER_Introduction
-\li \ref MAP_MAPPER_Contact
-\li \ref MAP_MAPPER_Usage
+\tableofcontents
 
 \section MAP_MAPPER_Introduction Introduction
 This view offers the possibility to map any image or point set in the data manager using a user selected registration object.
@@ -21,10 +19,10 @@ It is one of several MatchPoint registration plugins.\n
 \section MAP_MAPPER_Contact Contact information
 This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
 and Therapy) at the DKFZ (German Cancer Research Center). If you have any questions, need support,
-find a bug or have a feature request, feel free to contact us at dipp@dkfz.de.
+find a bug or have a feature request, feel free to contact us at www.mitk.org.
 
 \section MAP_MAPPER_Usage Usage
-\imageMacro{mapper-examplescreen.png, "Example screenshot showing the Mapper plugin in use.", 14}
+\imageMacro{map_mapper-examplescreen.png, "Example screenshot showing the Mapper plugin in use.", 14}
 To use the mapper at least an input data (image or point set) must be selected. Additionally you may select a registration object and a reference image.
 Registration objects are marked with a small blue icon (e.g. the data "Registration" in the data manager of the screen shot above).
 The Reference image defines the geometry (field of view, orientation, spacing) that should be used for the result image.
@@ -32,14 +30,14 @@ By default the view will try to automatically determine the reference image (by 
 If auto selection cannot determine the reference it will choose the input image as reference.
 The reference image can be also defined by the user explicitly by activating manual selection.\n
 REMARK: If you map point sets you can ignore the reference image slot. It has no affect.\n
-You can multiselect registration and data (press the CTRL-key while selecting the nodes in the data manager).
+You can multi select registration and data (press the CTRL-key while selecting the nodes in the data manager).
 The Mapper will automatically sort the selections in the correct "slots" of the view.\n
 REMARK: The mapping results will be added as child nodes to the used input node.\n
-REMARK: If you do not select an registration the view will assume that you make an identity transform. This is a convinient way if you
+REMARK: If you do not select an registration the view will assume that you make an identity transform. This is a convenient way if you
 just want to resample an image into the geometry of an other image (when no registration is needed). Also in this use case you can take
-adventage of the different interpolation and sub/super sampling strategies.
+advantage of the different interpolation and sub/super sampling strategies.
 
-\imageMacro{mapper.png, "Details of the mapper view.", 8}
+\imageMacro{map_mapper.png, "Details of the mapper view.", 8}
 (1) The currently selected registration, that will be used for mapping.\n
 (2) The currently selected input data, that will be mapped.\n
 (3) The currently (automatically or by user) selected reference image, that defines the geometry of the result.\n
@@ -50,8 +48,8 @@ adventage of the different interpolation and sub/super sampling strategies.
 Every "slot" has the ability to be locked. If locked the last selection will be kept, regardless the current selection in the data manager.
 You can use this for example to lock the registration, if you want to map multiple images. Doing so it is enough to just select the next image
 in the data manager. To lock a slot, click at the "lock" button at the right side (see example images below).
-\imageMacro{node-unlocked.png, "Unlocked slot/node (default state). Changes with the selections in the data manager.",6}
-\imageMacro{ node-locked.png, "Locked slot/node. Stays, regardless the selections in the data manager.",6}
+\imageMacro{map_node-unlocked.png, "Unlocked slot/node (default state). Changes with the selections in the data manager.",6}
+\imageMacro{map_node-locked.png, "Locked slot/node. Stays, regardless the selections in the data manager.",6}
 
 \section MAP_MAPPER_Refine Mapping or geometry refinement
 The mapper view offers two options to map images:\n
@@ -73,7 +71,7 @@ If you map the image (and not just refine the geometry), you have several settin
 
 \section MAP_MAPPER_Interpolation Interpolation
 You can choose from the following interpolation strategies:\n
-\li "nearest neighbour": Use the value of the nearest pixel. Fastest, but high interpolation errors for gray value images. Right choice for label images or masks.
+\li "nearest neighbor": Use the value of the nearest pixel. Fastest, but high interpolation errors for gray value images. Right choice for label images or masks.
 \li "Linear": Fast linear interpolation with often sufficient quality. Tends to blur edges.
 \li "BSpline (3rd order)": Good trade off between time and quality.
 \li "Windowed Sinc (Hamming)": Good interpolation quality but very time consuming.
@@ -81,7 +79,7 @@ You can choose from the following interpolation strategies:\n
 
 \section MAP_MAPPER_Masks Handling of masks/segmentations
 If you select an mask as input image, the plugin will be automatically reconfigured to settings that are suitable for the task of mapping masks.
-Most importantly the interpolator will be set to "nearest neighbour".
+Most importantly the interpolator will be set to "nearest neighbor".
 
 */
 

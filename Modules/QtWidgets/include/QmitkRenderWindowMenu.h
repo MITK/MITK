@@ -334,6 +334,9 @@ private:
   QTimer m_HideTimer;
 
   QWidget *m_Parent;
+
+  //memory because mode is set to default for slice num = 1
+  static unsigned int m_DefaultThickMode;
 };
 
 #endif // QmitkRenderWindowMenu_H

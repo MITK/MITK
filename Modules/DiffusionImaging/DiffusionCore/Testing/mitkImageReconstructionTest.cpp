@@ -135,12 +135,12 @@ int mitkImageReconstructionTest(int argc, char* argv[])
       MITK_TEST_CONDITION_REQUIRED(mitk::Equal(*testImage, *odfImage, 0.1, true), "Raw signal modeling test.");
     }
   }
-  catch (itk::ExceptionObject e)
+  catch (const itk::ExceptionObject& e)
   {
-    MITK_INFO << e;
+    MITK_INFO << e.what();
     return EXIT_FAILURE;
   }
-  catch (std::exception e)
+  catch (const std::exception& e)
   {
     MITK_INFO << e.what();
     return EXIT_FAILURE;

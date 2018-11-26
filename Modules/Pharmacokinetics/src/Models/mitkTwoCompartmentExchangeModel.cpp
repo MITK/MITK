@@ -100,7 +100,6 @@ mitk::TwoCompartmentExchangeModel::GetParameterUnits() const
 mitk::TwoCompartmentExchangeModel::ModelResultType
 mitk::TwoCompartmentExchangeModel::ComputeModelfunction(const ParametersType& parameters) const
 {
-    typedef itk::Array<double> ResidueFunctionType;
     typedef mitk::ModelBase::ModelResultType ConvolutionResultType;
 
     if (this->m_TimeGrid.GetSize() == 0)

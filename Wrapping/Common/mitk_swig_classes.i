@@ -30,6 +30,7 @@
 %include <mitkChannelDescriptor.h>
 %include <mitkIOUtil.h>
 
+
 #define DEPRECATED(func) func
 #undef ITK_DISALLOW_COPY_AND_ASSIGN
 #define ITK_DISALLOW_COPY_AND_ASSIGN(TypeName)
@@ -38,6 +39,8 @@
  convertion_list = {}
 %}
 
+SWIG_ADD_NONOBJECT_CLASS(Indent, itkIndent.h, itk)
+SWIG_ADD_MITK_CLASS(LightObject, itkLightObject.h, itk)
 SWIG_ADD_MITK_CLASS(Object, itkObject.h, itk)
 SWIG_ADD_MITK_CLASS(DataObject, itkDataObject.h, itk)
 
@@ -107,33 +110,43 @@ SWIG_ADD_NONOBJECT_NOVECTOR_CLASS(MorphologicalOperations, mitkMorphologicalOper
 //
 // MatchPoint Related Classes
 //
+%ignore DLLHandle::LibraryHandleType;
+
+%{
+#include <mapDeploymentDLLHandle.h>
+namespace core
+{
+  typedef std::string String;
+}
+typedef map::deployment::DLLHandle::LibraryHandleType LibraryHandleType;
+typedef map::deployment::DLLHandle DLLHandle;
+%}
+namespace core
+{
+  typedef std::string String;
+}
+
+%nodefaultctor LibraryHandleType;
+struct LibraryHandleType {};
+
+%include <mapUID.h>
+SWIG_ADD_MITK_CLASS(UID,mapUID.h, map::algorithm)
+SWIG_ADD_MITK_CLASS(DLLInfo, mapDeploymentDLLInfo.h, map::deployment)
+//SWIG_ADD_MITK_CLASS_VECTORFREE(DLLHandle, mapDeploymentDLLHandle.h, map::deployment)
+
+SWIG_ADD_MITK_CLASS_VECTORFREE(DLLDirectoryBrowser, mapDeploymentDLLDirectoryBrowser.h, ::map::deployment)
+MITKSWIG_ADD_HEADERFILE(mapDeploymentDLLAccess.h)
+%{
+ DLLHandle const *  ConvertDLLHandleSmartPointerToPointer(itk::SmartPointer<map::deployment::DLLHandle> p)
+ {
+   return p.GetPointer();
+ }
+%}
+DLLHandle const * ConvertDLLHandleSmartPointerToPointer(DLLHandle::Pointer p);
+
 MITKSWIG_ADD_CLASS(MITKAlgorithmHelper, mitkAlgorithmHelper.h, mitk)
 MITKSWIG_ADD_CLASS(RegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
 MITKSWIG_ADD_CLASS(MITKRegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
-
-
-%ignore map::deployment::DLLHandle::New(const LibraryHandleType& libraryHandle, const map::algorithm::UID* pUID, const core::String& libraryFile, const core::String& profileStr);
-%ignore map::deployment::DLLHandle::New(const map::algorithm::UID* pUID,const core::String& libraryFilePath,const core::String& profileStr);
-%ignore map::deployment::DLLInfo::New(const map::algorithm::UID* pUID,const core::String& libraryFilePath,const core::String& profileStr);
-%ignore map::deployment::DLLHandle::New;
-
-SWIG_ADD_MITK_CLASS_VECTORFREE(DLLDirectoryBrowser, mapDeploymentDLLDirectoryBrowser.h, ::map::deployment)
-SWIG_ADD_MITK_CLASS_VECTORFREE(DLLInfo, mapDeploymentDLLInfo.h, ::map::deployment)
-SWIG_ADD_MITK_CLASS_VECTORFREE(DLLHandle, mapDeploymentDLLHandle.h, ::map::deployment)
-SWIG_ADD_MITK_CLASS_VECTORFREE(UID, mapUID.h, ::map::algorithm)
-%{
- namespace algorithm
- {
-   typedef map::algorithm::UID UID;
- }
- namespace core
- {
-   typedef map::core::String String;
- }
-%}
-
-MITKSWIG_ADD_HEADERFILE(mapDeploymentDLLAccess.h)
-SWIG_ADD_MITK_CLASS_VECTORFREE(DLLHandle, mapDeploymentDLLHandle.h, ::map::deployment)
 
 // SWIG_ADD_MITK_CLASS(FastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm, mitkFastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm.h, mitk)
 // SWIG_ADD_MITK_CLASS(LevelSetMotionMultiResDefaultRegistrationAlgorithm, mitkLevelSetMotionMultiResDefaultRegistrationAlgorithm.h, mitk)

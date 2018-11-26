@@ -135,6 +135,16 @@ void GenericDataFittingView::UpdateGUIControls()
                                       && m_selectedModelFactory.IsNotNull() && !m_FittingInProgress && CheckModelSettings());
 }
 
+std::string GenericDataFittingView::GetFitName() const
+{
+  std::string fitName = m_Controls.lineFitName->text().toStdString();
+  if (fitName.empty())
+  {
+    fitName = m_Controls.lineFitName->placeholderText().toStdString();
+  }
+  return fitName;
+}
+
 std::string GenericDataFittingView::GetDefaultFitName() const
 {
     std::string defaultName = "undefined model";
@@ -446,7 +456,7 @@ void GenericDataFittingView::GenerateModelFit_PixelBased(mitk::modelFit::ModelFi
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
-    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(),
+    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_PIXELBASED(), this->GetFitName(),
                  roiUID);
 }
 
@@ -495,7 +505,7 @@ void GenericDataFittingView::GenerateModelFit_ROIBased(
 
   //Create model info
   modelFitInfo = mitk::modelFit::CreateFitInfoFromModelParameterizer(modelParameterizer,
-    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_ROIBASED(),
+    m_selectedNode->GetData(), mitk::ModelFitConstants::FIT_TYPE_VALUE_ROIBASED(), this->GetFitName(),
                  roiUID);
 
   mitk::ScalarListLookupTable::ValueType infoSignal;
@@ -509,7 +519,6 @@ void GenericDataFittingView::GenerateModelFit_ROIBased(
   modelFitInfo->inputData.SetTableValue("ROI", infoSignal);
 }
 
-
 void GenericDataFittingView::DoFit(const mitk::modelFit::ModelFitInfo* fitSession,
                                    mitk::ParameterFitImageGeneratorBase* generator)
 {
@@ -518,13 +527,7 @@ void GenericDataFittingView::DoFit(const mitk::modelFit::ModelFitInfo* fitSessio
 
   /////////////////////////
   //create job and put it into the thread pool
-  std::string fitName = m_Controls.lineFitName->text().toStdString();
-  if (fitName.empty())
-  {
-      fitName = m_Controls.lineFitName->placeholderText().toStdString();
-  }
-
-  ParameterFitBackgroundJob* pJob = new ParameterFitBackgroundJob(generator, fitSession, fitName, this->m_selectedNode);
+  ParameterFitBackgroundJob* pJob = new ParameterFitBackgroundJob(generator, fitSession, this->m_selectedNode);
   pJob->setAutoDelete(true);
 
   connect(pJob, SIGNAL(Error(QString)), this, SLOT(OnJobError(QString)));

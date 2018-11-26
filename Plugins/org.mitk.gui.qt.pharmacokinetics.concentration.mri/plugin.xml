@@ -6,7 +6,7 @@
           name="Concentration Curve Converter View"
 		  category="Perfusion"
           class="ConcentrationCurveConverterView"
-          icon="resources/Convert.png" />
+          icon="resources/icon.svg" />
   </extension>
 
 </plugin>

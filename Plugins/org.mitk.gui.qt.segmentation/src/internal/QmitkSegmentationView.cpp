@@ -267,7 +267,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
              m_Controls->segImageSelector->SetSelectedNode(emptySegmentation);
              mitk::RenderingManager::GetInstance()->InitializeViews(emptySegmentation->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
            }
-           catch (std::bad_alloc)
+           catch (const std::bad_alloc&)
            {
              QMessageBox::warning(nullptr, tr("Create new segmentation"), tr("Could not allocate memory for new segmentation"));
            }

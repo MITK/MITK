@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkSurface.h>
 #include <mitkVtkRepresentationProperty.h>
@@ -46,7 +47,9 @@ void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
   m_Controls.surfaceComboBox->SetDataStorage(this->GetDataStorage());
   m_Controls.surfaceComboBox->SetPredicate(mitk::NodePredicateAnd::New(
     mitk::TNodePredicateDataType<mitk::Surface>::New(),
-    mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
+    mitk::NodePredicateNot::New(mitk::NodePredicateOr::New(
+      mitk::NodePredicateProperty::New("helper object"),
+      mitk::NodePredicateProperty::New("hidden object")))));
 
   connect(m_Controls.surfaceComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnSelectedSurfaceChanged(const mitk::DataNode *)));
   connect(m_Controls.densitySlider, SIGNAL(valueChanged(int)), this, SLOT(OnDensityChanged(int)));

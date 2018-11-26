@@ -31,7 +31,7 @@ mitk::DescriptivePharmacokineticBrixModelValueBasedParameterizer::GetGlobalStati
 
 mitk::DescriptivePharmacokineticBrixModelValueBasedParameterizer::StaticParameterMapType
 mitk::DescriptivePharmacokineticBrixModelValueBasedParameterizer::GetLocalStaticParameters(
-  const IndexType& currentPosition) const
+  const IndexType&) const
 {
   StaticParameterMapType result;
 

@@ -138,6 +138,14 @@ namespace mitk
     /// How to handle parameter mapping based on absent revision jsons
     std::string m_RevisionMappingStrategy;
   };
+
+  const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_TOTALSCANTIME();
+  const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_PREPERATIONTYPE();
+  const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_RECOVERYMODE();
+  const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_SPOILINGTYPE();
+  const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_OFFSETS();
+  const std::string MITKCEST_EXPORT CEST_PROPERTY_NAME_TREC();
+
 }
 
 #endif // MITKCUSTOMTAGPARSER_H

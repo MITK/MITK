@@ -53,12 +53,12 @@ QmitkDataStorageRenderWindowInspector::QmitkDataStorageRenderWindowInspector(QWi
 QAbstractItemView* QmitkDataStorageRenderWindowInspector::GetView()
 {
   return m_Controls.renderWindowListView;
-};
+}
 
 const QAbstractItemView* QmitkDataStorageRenderWindowInspector::GetView() const
 {
   return m_Controls.renderWindowListView;
-};
+}
 
 void QmitkDataStorageRenderWindowInspector::SetSelectionMode(SelectionMode mode)
 {
@@ -83,7 +83,6 @@ void QmitkDataStorageRenderWindowInspector::Initialize()
 void QmitkDataStorageRenderWindowInspector::SetUpConnections()
 {
   connect(m_Controls.pushButtonSetAsBaseLayer, SIGNAL(clicked()), this, SLOT(SetAsBaseLayer()));
-
   connect(m_Controls.pushButtonResetRenderer, SIGNAL(clicked()), this, SLOT(ResetRenderer()));
   connect(m_Controls.pushButtonClearRenderer, SIGNAL(clicked()), this, SLOT(ClearRenderer()));
 

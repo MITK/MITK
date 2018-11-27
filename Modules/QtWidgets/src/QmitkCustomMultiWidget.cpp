@@ -69,7 +69,6 @@ QmitkCustomMultiWidget::QmitkCustomMultiWidget(QWidget* parent,
   // create widget manually
   // create and set layout
   InitializeGUI();
-  InitializeWidget();
   InitializeDisplayActionEventHandling();
   resize(QSize(364, 477).expandedTo(minimumSizeHint()));
 }
@@ -105,8 +104,8 @@ void QmitkCustomMultiWidget::InitializeRenderWindowWidgets()
 
 void QmitkCustomMultiWidget::ResetLayout(int row, int column)
 {
-  m_MultiWidgetRows = row + 1;
-  m_MultiWidgetColumns = column + 1;
+  m_MultiWidgetRows = row;
+  m_MultiWidgetColumns = column;
 
   int requiredRenderWindowWidgets = m_MultiWidgetRows * m_MultiWidgetColumns;
   int existingRenderWindowWidgets = m_RenderWindowWidgets.size();
@@ -487,12 +486,6 @@ void QmitkCustomMultiWidget::InitializeGUI()
   setLayout(m_CustomMultiWidgetLayout);
 
   FillMultiWidgetLayout();
-}
-
-void QmitkCustomMultiWidget::InitializeWidget()
-{
-  // #TODO: some things have to be handled globally (hold for all render window (widgets)
-  // analyze those things and design a controlling mechanism
 }
 
 void QmitkCustomMultiWidget::InitializeDisplayActionEventHandling()

@@ -70,12 +70,10 @@ private:
   Ui::QmitkRenderWindowManagerControls m_Controls;
 
   mitk::IRenderWindowPart* m_RenderWindowPart;
-	
-  QmitkDataStorageRenderWindowInspector* m_RenderWindowInspector;
-  QmitkDataNodeContextMenu* m_DataNodeContextMenu;
-  QAbstractItemView* m_InspectorView;
 
-  mitk::RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;
+  QmitkDataStorageRenderWindowInspector* m_RenderWindowInspector;
+  QAbstractItemView* m_InspectorView;
+  QmitkDataNodeContextMenu* m_DataNodeContextMenu;
 
   virtual QItemSelectionModel* GetDataNodeSelectionModel() const override;
 };

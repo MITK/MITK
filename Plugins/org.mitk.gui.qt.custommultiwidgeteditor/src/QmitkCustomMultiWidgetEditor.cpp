@@ -170,17 +170,6 @@ QStringList QmitkCustomMultiWidgetEditor::GetDecorations() const
   return m_Impl->m_MultiWidgetDecorationManager->GetDecorations();
 }
 
-void QmitkCustomMultiWidgetEditor::EnableSlicingPlanes(bool /*enable*/)
-{
-  // nothing here
-}
-
-bool QmitkCustomMultiWidgetEditor::IsSlicingPlanesEnabled() const
-{
-  // nothing here
-  return false;
-}
-
 QmitkCustomMultiWidget* QmitkCustomMultiWidgetEditor::GetCustomMultiWidget()
 {
   return m_Impl->m_CustomMultiWidget;
@@ -267,6 +256,7 @@ void QmitkCustomMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPrefe
   {
     return;
   }
+
   // update decoration preferences
   m_Impl->m_MultiWidgetDecorationManager->DecorationPreferencesChanged(preferences);
 

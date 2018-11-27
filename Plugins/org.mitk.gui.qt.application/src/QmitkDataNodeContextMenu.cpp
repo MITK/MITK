@@ -56,34 +56,28 @@ QmitkDataNodeContextMenu::~QmitkDataNodeContextMenu()
 
 void QmitkDataNodeContextMenu::SetDataStorage(mitk::DataStorage* dataStorage)
 {
-  if (m_DataStorage != dataStorage)
+  // set the new data storage - also for all actions
+  m_DataStorage = dataStorage;
+  for (DescriptorActionListType::const_iterator it = m_DescriptorActionList.begin(); it != m_DescriptorActionList.end(); ++it)
   {
-    // set the new data storage - also for all actions
-    m_DataStorage = dataStorage;
-    for (DescriptorActionListType::const_iterator it = m_DescriptorActionList.begin(); it != m_DescriptorActionList.end(); ++it)
+    QmitkAbstractDataNodeAction *abstractDataNodeAction = dynamic_cast<QmitkAbstractDataNodeAction *>(it->second);
+    if (nullptr != abstractDataNodeAction)
     {
-      QmitkAbstractDataNodeAction* abstractDataNodeAction = dynamic_cast<QmitkAbstractDataNodeAction*>(it->second);
-      if(nullptr != abstractDataNodeAction)
-      {
-        abstractDataNodeAction->SetDataStorage(m_DataStorage.Lock());
-      }
+      abstractDataNodeAction->SetDataStorage(m_DataStorage.Lock());
     }
   }
 }
 
-void QmitkDataNodeContextMenu::SetBaseRenderer(mitk::BaseRenderer* baseRenderer)
+void QmitkDataNodeContextMenu::SetBaseRenderer(mitk::BaseRenderer *baseRenderer)
 {
-  if (m_BaseRenderer != baseRenderer)
+  // set the new base renderer - also for all actions
+  m_BaseRenderer = baseRenderer;
+  for (DescriptorActionListType::const_iterator it = m_DescriptorActionList.begin(); it != m_DescriptorActionList.end(); ++it)
   {
-    // set the new base renderer - also for all actions
-    m_BaseRenderer = baseRenderer;
-    for (DescriptorActionListType::const_iterator it = m_DescriptorActionList.begin(); it != m_DescriptorActionList.end(); ++it)
+    QmitkAbstractDataNodeAction *abstractDataNodeAction = dynamic_cast<QmitkAbstractDataNodeAction *>(it->second);
+    if (nullptr != abstractDataNodeAction)
     {
-      QmitkAbstractDataNodeAction* abstractDataNodeAction = dynamic_cast<QmitkAbstractDataNodeAction*>(it->second);
-      if (nullptr != abstractDataNodeAction)
-      {
-        abstractDataNodeAction->SetBaseRenderer(m_BaseRenderer.Lock());
-      }
+      abstractDataNodeAction->SetBaseRenderer(m_BaseRenderer.Lock());
     }
   }
 }

@@ -136,7 +136,6 @@ public:
 private:
 
   void InitializeGUI();
-  void InitializeWidget();
   void InitializeDisplayActionEventHandling();
 
   void CreateRenderWindowWidget(const std::string& cornerAnnotation = "");

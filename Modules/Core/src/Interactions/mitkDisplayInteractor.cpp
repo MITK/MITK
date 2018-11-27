@@ -803,7 +803,7 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
   int component = 0;
 
   node = FindTopmostVisibleNode(nodes, worldposition, globalCurrentTimePoint, baseRenderer);
-  if (node.IsNotNull())
+  if (node.IsNull())
   {
     return;
   }

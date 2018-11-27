@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkRenderWindowViewDirectionController.h"
 
-// mitk
+// mitk core
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateAnd.h>

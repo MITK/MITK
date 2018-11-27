@@ -60,7 +60,6 @@ mitk::DisplayActionEventHandler::OberserverTagType mitk::DisplayActionEventHandl
 
 void mitk::DisplayActionEventHandler::DisconnectObserver(OberserverTagType observerTag)
 {
-  // #TODO: change function call for new mitk::WeakPointer
   if (m_ObservableBroadcast.IsExpired())
   {
     mitkThrow() << "No display action event broadcast class set to observe. Use 'SetObservableBroadcast' before disconnecting observer.";

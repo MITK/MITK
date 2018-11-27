@@ -34,7 +34,7 @@ namespace mitk
   * or 'mitk::SliceNavigationController::Sagittal'.
   *
   * Functions with 'mitk::BaseRenderer* renderer' have 'nullptr' as their default argument. Using the nullptr
-  * these functions operate on all base renderer. Giving a specific base renderer will modify the node only for the given renderer.
+  * these functions operate on all base renderer. Giving a specific base renderer will modify the view direction only for the given renderer.
   */
   class MITKRENDERWINDOWMANAGER_EXPORT RenderWindowViewDirectionController
   {
@@ -58,7 +58,7 @@ namespace mitk
     * @param viewDirection  The view direction that should be used for this renderer as a string.
     *                       Currently "axial", "coronal" and "sagittal" is supported.
     * @param renderer       Pointer to the renderer instance for which the view direction should be changed.
-    *                       If it is a nullptr (default) nothing happens.
+    *                       If it is a nullptr (default) all controlled renderer will be affected.
     */
     void SetViewDirectionOfRenderer(const std::string &viewDirection, BaseRenderer* renderer = nullptr);
     /**
@@ -71,7 +71,7 @@ namespace mitk
     /**
     * @brief Reinitialize the given renderer with the currently visible nodes.
     * @param renderer       Pointer to the renderer instance for which the view direction should be changed.
-    *                       If it is a nullptr (default) nothing happens.
+    *                       If it is a nullptr (default) all controlled renderer will be affected.
     */
     void InitializeViewByBoundingObjects(const BaseRenderer* renderer);
 

@@ -132,6 +132,12 @@ protected:
 
   bool FilterFloatingImage();
   void InitializeImageFilters();
+
+  double GetCharacteristicDistanceAWithUpperMargin();
+  double GetCharacteristicDistanceBWithLowerMargin();
+  double GetCharacteristicDistanceBWithUpperMargin();
+  double GetMinimalFiducialConfigurationDistance();
+
   void EliminateTooSmallLabeledObjects( ImageType::Pointer binaryImage);
   bool EliminateFiducialCandidatesByEuclideanDistances();
   void ClassifyFiducialCandidates();
@@ -150,7 +156,8 @@ protected:
   void OptimizeFiducialPositions();
   void CreateParallelPlanes(mitk::PlaneFit::Pointer planeA, mitk::PlaneFit::Pointer planeB,
                           mitk::PointSet::Pointer pointSetA, mitk::PointSet::Pointer pointSetB,
-                          mitk::PlaneGeometry::Pointer planeGeometryA, mitk::PlaneGeometry::Pointer planeGeometryB);
+                          mitk::PlaneGeometry::Pointer planeGeometryA, mitk::PlaneGeometry::Pointer planeGeometryB,
+                          bool minimizeInfluenceOutliers);
   void MovePlanes(mitk::PlaneGeometry::Pointer planeA, mitk::PlaneGeometry::Pointer planeB,
                   double referenceDistance);
   void MovePoint(mitk::PlaneGeometry::Pointer planeGeometry, int fiducialNo);

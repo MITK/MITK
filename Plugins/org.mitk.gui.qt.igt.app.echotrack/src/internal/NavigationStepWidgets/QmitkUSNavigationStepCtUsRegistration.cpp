@@ -41,6 +41,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkGeometryUtilities.h>
 #include <mitkImagePixelReadAccessor.h>
 
+#include <itkZeroCrossingImageFilter.h>
+#include <itkSimpleContourExtractorImageFilter.h>
+#include <itkCannyEdgeDetectionImageFilter.h>
+
 static const int NUMBER_FIDUCIALS_NEEDED = 8; 
 
 QmitkUSNavigationStepCtUsRegistration::QmitkUSNavigationStepCtUsRegistration(QWidget *parent) :
@@ -229,6 +233,82 @@ void QmitkUSNavigationStepCtUsRegistration::InitializeImageFilters()
   m_BinaryImageToShapeLabelMapFilter->SetInputForegroundValue(1);
 }
 
+double QmitkUSNavigationStepCtUsRegistration::GetCharacteristicDistanceAWithUpperMargin()
+{
+  switch (ui->fiducialMarkerConfigurationComboBox->currentIndex())
+  {
+    // case 0 is equal to fiducial marker configuration A (10mm distance)
+    case 0:
+      return 12.07;
+
+    // case 1 is equal to fiducial marker configuration B (15mm distance)
+    case 1:
+      return 18.105;
+
+    // case 2 is equal to fiducial marker configuration C (20mm distance)
+    case 2:
+      return 24.14;
+  }
+  return 0.0;
+}
+
+double QmitkUSNavigationStepCtUsRegistration::GetCharacteristicDistanceBWithLowerMargin()
+{
+  switch (ui->fiducialMarkerConfigurationComboBox->currentIndex())
+  {
+    // case 0 is equal to fiducial marker configuration A (10mm distance)
+  case 0:
+    return 12.07;
+
+    // case 1 is equal to fiducial marker configuration B (15mm distance)
+  case 1:
+    return 18.105;
+
+    // case 2 is equal to fiducial marker configuration C (20mm distance)
+  case 2:
+    return 24.14;
+  }
+  return 0.0;
+}
+
+double QmitkUSNavigationStepCtUsRegistration::GetCharacteristicDistanceBWithUpperMargin()
+{
+  switch (ui->fiducialMarkerConfigurationComboBox->currentIndex())
+  {
+    // case 0 is equal to fiducial marker configuration A (10mm distance)
+  case 0:
+    return 15.73;
+
+    // case 1 is equal to fiducial marker configuration B (15mm distance)
+  case 1:
+    return 23.595;
+
+    // case 2 is equal to fiducial marker configuration C (20mm distance)
+  case 2:
+    return 31.46;
+  }
+  return 0.0;
+}
+
+double QmitkUSNavigationStepCtUsRegistration::GetMinimalFiducialConfigurationDistance()
+{
+  switch (ui->fiducialMarkerConfigurationComboBox->currentIndex())
+  {
+    // case 0 is equal to fiducial marker configuration A (10mm distance)
+  case 0:
+    return 10.0;
+
+    // case 1 is equal to fiducial marker configuration B (15mm distance)
+  case 1:
+    return 15.0;
+
+    // case 2 is equal to fiducial marker configuration C (20mm distance)
+  case 2:
+    return 20.0;
+  }
+  return 0.0;
+}
+
 void QmitkUSNavigationStepCtUsRegistration::EliminateTooSmallLabeledObjects(
   ImageType::Pointer binaryImage)
 {
@@ -289,7 +369,11 @@ bool QmitkUSNavigationStepCtUsRegistration::EliminateFiducialCandidatesByEuclide
     mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(counter));
     //Loop through all fiducial candidates and calculate the distance between the chosen fiducial
     // candidate and the other candidates. For each candidate with a right distance between
-    // 7.93mm and 31.0mm increase the amountOfAcceptedFiducials.
+    // Configuration A: 7.93mm and 31.0mm (10 mm distance between fiducial centers) or
+    // Configuration B: 11.895mm and 45.0mm (15 mm distance between fiducial centers) or
+    // Configuration C: 15.86mm and 59.0mm (20 mm distance between fiducial centers)
+    //
+    // increase the amountOfAcceptedFiducials.
     for (int position = 0; position < m_CentroidsOfFiducialCandidates.size(); ++position)
     {
       if (position == counter)
@@ -299,9 +383,29 @@ bool QmitkUSNavigationStepCtUsRegistration::EliminateFiducialCandidatesByEuclide
       mitk::Point3D otherCentroid(m_CentroidsOfFiducialCandidates.at(position));
       double distance = fiducialCentroid.EuclideanDistanceTo(otherCentroid);
 
-      if (distance > 7.93 && distance < 31.0)
+      switch (ui->fiducialMarkerConfigurationComboBox->currentIndex())
       {
-        ++amountOfAcceptedFiducials;
+        // case 0 is equal to fiducial marker configuration A (10mm distance)
+        case 0:
+          if (distance > 7.93 && distance < 31.0)
+          {
+            ++amountOfAcceptedFiducials;
+          }
+          break;
+        // case 1 is equal to fiducial marker configuration B (15mm distance)
+        case 1:
+          if (distance > 11.895 && distance < 45.0)
+          {
+            ++amountOfAcceptedFiducials;
+          }
+          break;
+        // case 2 is equal to fiducial marker configuration C (20mm distance)
+        case 2:
+          if (distance > 15.86 && distance < 59.0)
+          {
+            ++amountOfAcceptedFiducials;
+          }
+          break;
       }
     }
     //The amountOfAcceptedFiducials must be at least 7. Otherwise delete the fiducial candidate
@@ -345,36 +449,98 @@ void QmitkUSNavigationStepCtUsRegistration::ClassifyFiducialCandidates()
     for (int number = 0; number < distances.size(); ++number)
     {
       double &distance = distances.at(number);
-      if (distance > 7.93 && distance <= 12.07)
+      switch (ui->fiducialMarkerConfigurationComboBox->currentIndex())
       {
-        ++distanceA;
-      }
-      else if (distance > 12.07 && distance <= 15.73)
-      {
-        ++distanceB;
-      }
-      else if (distance > 15.73 && distance <= 19.84)
-      {
-        ++distanceC;
-      }
-      else if (distance > 19.84 && distance <= 23.425)
-      {
-        ++distanceD;
-      }
-      else if (distance > 23.425 && distance <= 26.385)
-      {
-        ++distanceE;
-      }
-      else if (distance > 26.385 && distance <= 31.00)
-      {
-        ++distanceF;
+        // case 0 is equal to fiducial marker configuration A (10mm distance)
+        case 0:
+          if (distance > 7.93 && distance <= 12.07)
+          {
+            ++distanceA;
+          }
+          else if (distance > 12.07 && distance <= 15.73)
+          {
+            ++distanceB;
+          }
+          else if (distance > 15.73 && distance <= 19.84)
+          {
+            ++distanceC;
+          }
+          else if (distance > 19.84 && distance <= 23.425)
+          {
+            ++distanceD;
+          }
+          else if (distance > 23.425 && distance <= 26.385)
+          {
+            ++distanceE;
+          }
+          else if (distance > 26.385 && distance <= 31.00)
+          {
+            ++distanceF;
+          }
+        break;
+
+        // case 1 is equal to fiducial marker configuration B (15mm distance)
+        case 1:
+          if (distance > 11.895 && distance <= 18.105)
+          {
+            ++distanceA;
+          }
+          else if (distance > 18.105 && distance <= 23.595)
+          {
+            ++distanceB;
+          }
+          else if (distance > 23.595 && distance <= 29.76)
+          {
+            ++distanceC;
+          }
+          else if (distance > 29.76 && distance <= 35.1375)
+          {
+            ++distanceD;
+          }
+          else if (distance > 35.1375 && distance <= 39.5775)
+          {
+            ++distanceE;
+          }
+          else if (distance > 39.5775 && distance <= 45.00)
+          {
+            ++distanceF;
+          }
+        break;
+
+        // case 2 is equal to fiducial marker configuration C (20mm distance)
+        case 2:
+          if (distance > 15.86 && distance <= 24.14)
+          {
+            ++distanceA;
+          }
+          else if (distance > 24.14 && distance <= 31.46)
+          {
+            ++distanceB;
+          }
+          else if (distance > 31.46 && distance <= 39.68)
+          {
+            ++distanceC;
+          }
+          else if (distance > 39.68 && distance <= 46.85)
+          {
+            ++distanceD;
+          }
+          else if (distance > 46.85 && distance <= 52.77)
+          {
+            ++distanceE;
+          }
+          else if (distance > 52.77 && distance <= 59.00)
+          {
+            ++distanceF;
+          }
+        break;
       }
     }// End for-loop distances-vector
 
     //Now, having looped through all distances of one fiducial candidate, check
     // if the combination of different distances is known. The >= is due to the
     // possible occurrence of other fiducial candidates that have an distance equal to
-    // one of the distances A - E. However, false fiducial candidates outside the 
+    // one of the distances A - E. However, false fiducial candidates outside
     // the fiducial marker does not have the right distance configuration:
     if ((distanceA >= 2 && distanceD >= 2 && distanceE >= 2 && distanceF >= 1 ||
       distanceA >= 1 && distanceB >= 2 && distanceC >= 1 && distanceD >= 2 && distanceE >= 1 ||
@@ -681,8 +847,10 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo1(std::vector<std::vec
       MITK_WARN << "Cannot find fiducial 1, there aren't found enough fiducial candidates.";
       return false;
     }
+    double characteristicDistanceAWithUpperMargin = this->GetCharacteristicDistanceAWithUpperMargin();
 
-    if (distances.at(0) <= 12.07 && distances.at(1) <= 12.07)
+    if (distances.at(0) <= characteristicDistanceAWithUpperMargin &&
+        distances.at(1) <= characteristicDistanceAWithUpperMargin)
     {
       MITK_INFO << "Found Fiducial 1 (PointSet number " << i << ")";
       m_FiducialMarkerCentroids.insert( std::pair<int,mitk::Vector3D>(1, m_CentroidsOfFiducialCandidates.at(i)));
@@ -712,12 +880,11 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo2And3()
   mitk::Vector3D vectorFiducial1ToFiducialA;
   mitk::Vector3D vectorFiducial1ToFiducialB;
 
-
   for (int i = 0; i < m_CentroidsOfFiducialCandidates.size(); ++i)
   {
     mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(i));
     double distance = fiducialNo1.EuclideanDistanceTo(fiducialCentroid);
-    if (distance <= 12.07)
+    if (distance <= this->GetCharacteristicDistanceAWithUpperMargin())
     {
       fiducialVectorA = m_CentroidsOfFiducialCandidates.at(i);
       fiducialPointA = fiducialCentroid;
@@ -731,7 +898,7 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo2And3()
   {
     mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(i));
     double distance = fiducialNo1.EuclideanDistanceTo(fiducialCentroid);
-    if (distance <= 12.07)
+    if (distance <= this->GetCharacteristicDistanceAWithUpperMargin())
     {
       fiducialVectorB = m_CentroidsOfFiducialCandidates.at(i);
       fiducialPointB = fiducialCentroid;
@@ -786,6 +953,9 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo2And3()
 
 bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo4(std::vector<std::vector<double>>& distanceVectorsFiducials)
 {
+  double characteristicDistanceBWithLowerMargin = this->GetCharacteristicDistanceBWithLowerMargin();
+  double characteristicDistanceBWithUpperMargin = this->GetCharacteristicDistanceBWithUpperMargin();
+
   for (int i = 0; i < distanceVectorsFiducials.size(); ++i)
   {
     std::vector<double> &distances = distanceVectorsFiducials.at(i);
@@ -795,8 +965,10 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo4(std::vector<std::vec
       return false;
     }
 
-    if (distances.at(0) > 12.07 && distances.at(0) <= 15.73 &&
-        distances.at(1) > 12.07 && distances.at(1) <= 15.73)
+    if (distances.at(0) > characteristicDistanceBWithLowerMargin &&
+        distances.at(0) <= characteristicDistanceBWithUpperMargin &&
+        distances.at(1) > characteristicDistanceBWithLowerMargin &&
+        distances.at(1) <= characteristicDistanceBWithUpperMargin)
     {
       MITK_INFO << "Found Fiducial 4 (PointSet number " << i << ")";
       m_FiducialMarkerCentroids.insert(std::pair<int, mitk::Vector3D>(4, m_CentroidsOfFiducialCandidates.at(i)));
@@ -816,13 +988,15 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo5()
     return false;
   }
 
+  double characteristicDistanceBWithUpperMargin = this->GetCharacteristicDistanceBWithUpperMargin();
+
   mitk::Point3D fiducialNo2(m_FiducialMarkerCentroids.at(2));
 
   for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
   {
     mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(counter));
     double distance = fiducialNo2.EuclideanDistanceTo(fiducialCentroid);
-    if (distance <= 15.73)
+    if (distance <= characteristicDistanceBWithUpperMargin)
     {
       m_FiducialMarkerCentroids[5] = m_CentroidsOfFiducialCandidates.at(counter);
       m_CentroidsOfFiducialCandidates.erase(m_CentroidsOfFiducialCandidates.begin() + counter);
@@ -843,13 +1017,15 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo6()
     return false;
   }
 
+  double characteristicDistanceAWithUpperMargin = this->GetCharacteristicDistanceAWithUpperMargin();
+
   mitk::Point3D fiducialNo5(m_FiducialMarkerCentroids.at(5));
 
   for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
   {
     mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(counter));
     double distance = fiducialNo5.EuclideanDistanceTo(fiducialCentroid);
-    if (distance <= 12.07)
+    if (distance <= characteristicDistanceAWithUpperMargin)
     {
       m_FiducialMarkerCentroids[6] = m_CentroidsOfFiducialCandidates.at(counter);
       m_CentroidsOfFiducialCandidates.erase(m_CentroidsOfFiducialCandidates.begin() + counter);
@@ -870,13 +1046,15 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo7()
     return false;
   }
 
+  double characteristicDistanceAWithUpperMargin = this->GetCharacteristicDistanceAWithUpperMargin();
+
   mitk::Point3D fiducialNo8(m_FiducialMarkerCentroids.at(8));
 
   for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
   {
     mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(counter));
     double distance = fiducialNo8.EuclideanDistanceTo(fiducialCentroid);
-    if (distance <= 12.07)
+    if (distance <= characteristicDistanceAWithUpperMargin)
     {
       m_FiducialMarkerCentroids[7] = m_CentroidsOfFiducialCandidates.at(counter);
       m_CentroidsOfFiducialCandidates.erase(m_CentroidsOfFiducialCandidates.begin() + counter);
@@ -897,13 +1075,15 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo8()
     return false;
   }
 
+  double characteristicDistanceBWithUpperMargin = this->GetCharacteristicDistanceBWithUpperMargin();
+
   mitk::Point3D fiducialNo3(m_FiducialMarkerCentroids.at(3));
 
   for (int counter = 0; counter < m_CentroidsOfFiducialCandidates.size(); ++counter)
   {
     mitk::Point3D fiducialCentroid(m_CentroidsOfFiducialCandidates.at(counter));
     double distance = fiducialNo3.EuclideanDistanceTo(fiducialCentroid);
-    if (distance <= 15.73)
+    if (distance <= characteristicDistanceBWithUpperMargin)
     {
       m_FiducialMarkerCentroids[8] = m_CentroidsOfFiducialCandidates.at(counter);
       m_CentroidsOfFiducialCandidates.erase(m_CentroidsOfFiducialCandidates.begin() + counter);
@@ -938,9 +1118,11 @@ void QmitkUSNavigationStepCtUsRegistration::OptimizeFiducialPositions()
   //Make planes parallel
   this->CreateParallelPlanes(planeFit1234, planeFit5678,
                              pointSet1234, pointSet5678,
-                             planeGeometry1234, planeGeometry5678);
+                             planeGeometry1234, planeGeometry5678,
+                             true);
 
-  this->MovePlanes(planeGeometry1234, planeGeometry5678, 10.0);
+
+  this->MovePlanes(planeGeometry1234, planeGeometry5678, this->GetMinimalFiducialConfigurationDistance());
 
   //Move the points into the parallel planes
   for (int counter = 1; counter <= 4; ++counter)
@@ -987,9 +1169,10 @@ void QmitkUSNavigationStepCtUsRegistration::OptimizeFiducialPositions()
   //Make planes parallel
   this->CreateParallelPlanes(planeFit125, planeFit478,
                              pointSet125, pointSet478,
-                             planeGeometry125, planeGeometry478);
+                             planeGeometry125, planeGeometry478,
+                             false);
 
-  this->MovePlanes(planeGeometry125, planeGeometry478, 20.0);
+  this->MovePlanes(planeGeometry125, planeGeometry478, (2 * this->GetMinimalFiducialConfigurationDistance()));
 
   //Move the points into the parallel planes
   this->MovePoint(planeGeometry125, 1);
@@ -1035,9 +1218,10 @@ void QmitkUSNavigationStepCtUsRegistration::OptimizeFiducialPositions()
   //Make planes parallel
   this->CreateParallelPlanes(planeFit138, planeFit456,
                              pointSet138, pointSet456,
-                             planeGeometry138, planeGeometry456);
+                             planeGeometry138, planeGeometry456,
+                             false);
 
-  this->MovePlanes(planeGeometry138, planeGeometry456, 20.0);
+  this->MovePlanes(planeGeometry138, planeGeometry456, (2 * this->GetMinimalFiducialConfigurationDistance()));
 
   //Move the points into the parallel planes
   this->MovePoint(planeGeometry138, 1);
@@ -1055,7 +1239,8 @@ void QmitkUSNavigationStepCtUsRegistration::OptimizeFiducialPositions()
 void QmitkUSNavigationStepCtUsRegistration::CreateParallelPlanes(
   mitk::PlaneFit::Pointer planeA, mitk::PlaneFit::Pointer planeB, 
   mitk::PointSet::Pointer pointSetA, mitk::PointSet::Pointer pointSetB, 
-  mitk::PlaneGeometry::Pointer planeGeometryA, mitk::PlaneGeometry::Pointer planeGeometryB)
+  mitk::PlaneGeometry::Pointer planeGeometryA, mitk::PlaneGeometry::Pointer planeGeometryB,
+  bool minimizeInfluenceOutliers )
 {
   planeA->SetInput(pointSetA);
   planeA->Update();
@@ -1063,6 +1248,87 @@ void QmitkUSNavigationStepCtUsRegistration::CreateParallelPlanes(
   planeB->SetInput(pointSetB);
   planeB->Update();
   mitk::PlaneGeometry::Pointer geometryB = dynamic_cast<mitk::PlaneGeometry *>(planeB->GetOutput()->GetGeometry());
+  mitk::DataNode::Pointer node1 = mitk::DataNode::New();
+
+
+  MITK_INFO << "Angle before = " << geometryA->Angle(geometryB) * 57.29578; //Transform into degree
+  //Minimize influence of outliers concerning the inclination angle of the plane:
+  if (minimizeInfluenceOutliers)
+  {
+    bool minimizeA = true;
+    bool minimizeB = true;
+    while(minimizeA)
+    {
+      MITK_INFO << "Minimize A";
+      std::vector<std::pair<double, int>> distancesA;
+      distancesA.push_back(std::pair<double, int>(geometryA->Distance(m_FiducialMarkerCentroids.at(1)), 1));
+      distancesA.push_back(std::pair<double, int>(geometryA->Distance(m_FiducialMarkerCentroids.at(2)), 2));
+      distancesA.push_back(std::pair<double, int>(geometryA->Distance(m_FiducialMarkerCentroids.at(3)), 3));
+      distancesA.push_back(std::pair<double, int>(geometryA->Distance(m_FiducialMarkerCentroids.at(4)), 4));
+      std::sort(distancesA.begin(), distancesA.end());
+      for (std::vector<std::pair<double, int>>::iterator it = distancesA.begin(); it != distancesA.end(); ++it)
+      {
+        MITK_INFO << "First = " << (*it).first << " Second = " << (*it).second;
+      }
+      if ((*distancesA.rbegin()).first < 0.005)
+      {
+        minimizeA = false;
+        break;
+      }
+      std::vector<std::pair<double, int>>::reverse_iterator it = distancesA.rbegin();
+      int fiducialNoToBeMovedToPlane1 = (*it).second;
+      ++it;
+      int fiducialNoToBeMovedToPlane2 = (*it).second;
+      this->MovePoint(geometryA, fiducialNoToBeMovedToPlane1);
+      this->MovePoint(geometryA, fiducialNoToBeMovedToPlane2);
+      pointSetA->Clear();
+      for (int counter = 1; counter <= 4; ++counter)
+      {
+        pointSetA->InsertPoint(counter - 1, m_FiducialMarkerCentroids.at(counter));
+      }
+      planeA = mitk::PlaneFit::New();
+      planeA->SetInput(pointSetA);
+      planeA->Update();
+      geometryA = dynamic_cast<mitk::PlaneGeometry *>(planeA->GetOutput()->GetGeometry());
+
+    }
+    while (minimizeB)
+    {
+      MITK_INFO << "Minimize B";
+      std::vector<std::pair<double, int>> distancesB;
+      distancesB.push_back(std::pair<double, int>(geometryB->Distance(m_FiducialMarkerCentroids.at(5)), 5));
+      distancesB.push_back(std::pair<double, int>(geometryB->Distance(m_FiducialMarkerCentroids.at(6)), 6));
+      distancesB.push_back(std::pair<double, int>(geometryB->Distance(m_FiducialMarkerCentroids.at(7)), 7));
+      distancesB.push_back(std::pair<double, int>(geometryB->Distance(m_FiducialMarkerCentroids.at(8)), 8));
+      std::sort(distancesB.begin(), distancesB.end());
+      for (std::vector<std::pair<double, int>>::iterator it = distancesB.begin(); it != distancesB.end(); ++it)
+      {
+        MITK_INFO << "First = " << (*it).first << " Second = " << (*it).second;
+      }
+      if ((*distancesB.rbegin()).first < 0.005)
+      {
+        minimizeB = false;
+        break;
+      }
+      std::vector<std::pair<double, int>>::reverse_iterator it = distancesB.rbegin();
+      int fiducialNoToBeMovedToPlane1 = (*it).second;
+      ++it;
+      int fiducialNoToBeMovedToPlane2 = (*it).second;
+      this->MovePoint(geometryB, fiducialNoToBeMovedToPlane1);
+      this->MovePoint(geometryB, fiducialNoToBeMovedToPlane2);
+      pointSetB->Clear();
+      for (int counter = 5; counter <= 8; ++counter)
+      {
+        pointSetB->InsertPoint(counter - 5, m_FiducialMarkerCentroids.at(counter));
+      }
+      planeB = mitk::PlaneFit::New();
+      planeB->SetInput(pointSetB);
+      planeB->Update();
+      geometryB = dynamic_cast<mitk::PlaneGeometry *>(planeB->GetOutput()->GetGeometry());
+    }
+    MITK_INFO << "Angle after = " << geometryA->Angle(geometryB) * 57.29578; //Transform into degree
+  }
+  // End outliers minimization
 
   mitk::Point3D originPlaneA = geometryA->GetOrigin();
   mitk::Point3D originPlaneB = geometryB->GetOrigin();
@@ -1276,6 +1542,8 @@ void QmitkUSNavigationStepCtUsRegistration::OnGroundTruthImageComboBoxSelectionC
   m_GroundTruthImage = groundTruthImage;
 }
 
+
+
 void QmitkUSNavigationStepCtUsRegistration::OnRegisterMarkerToFloatingImageCS()
 {
   //Check for initialization
@@ -1429,4 +1697,5 @@ void QmitkUSNavigationStepCtUsRegistration::OnFilterGroundTruthImage()
   }*/
 
   this->ShowGroundTruthMarkerEdges();
+
 }

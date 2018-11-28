@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 // STL pair
 #include <utility>
-#include <omp.h>
 
 /** \brief Comperator implementation used to sort the CorrespondenceList in the
   *        trimmed version of the AnisotropicIterativeClosestPointRegistration.

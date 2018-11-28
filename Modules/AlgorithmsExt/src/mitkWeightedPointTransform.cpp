@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkLandmarkTransform.h>
 #include <vtkMatrix4x4.h>
 #include <vtkPoints.h>
-#include <omp.h>
 
 typedef itk::Matrix<double, 3, 3> Matrix3x3;
 typedef std::vector<Matrix3x3> Matrix3x3List;

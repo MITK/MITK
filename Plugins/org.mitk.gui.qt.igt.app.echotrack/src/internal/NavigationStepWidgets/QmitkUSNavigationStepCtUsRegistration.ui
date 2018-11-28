@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>395</height>
+    <height>625</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,137 +15,265 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="selectedFloatingImageLabel">
-     <property name="text">
-      <string>Selected Floating Image:</string>
+    <widget class="QGroupBox" name="optionsGroupBox">
+     <property name="title">
+      <string>Options</string>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QmitkDataStorageComboBox" name="floatingImageComboBox"/>
-   </item>
-   <item>
-    <widget class="QLabel" name="selectedFiducialMarkerModelPointSetLabel">
-     <property name="text">
-      <string>Selected Fiducial Marker Model Point Set</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QmitkDataStorageComboBox" name="fiducialMarkerModelPointSetComboBox"/>
-   </item>
-   <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <property name="topMargin">
-      <number>10</number>
-     </property>
-     <property name="bottomMargin">
-      <number>10</number>
-     </property>
-     <item row="0" column="1">
-      <widget class="QRadioButton" name="fiducialDiameter3mmRadioButton">
-       <property name="text">
-        <string>3mm Fiducial Diameter</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QRadioButton" name="fiducialDiameter5mmRadioButton">
-       <property name="text">
-        <string>5mm Fiducial Diameter</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QCheckBox" name="optimizeFiducialPositionsCheckBox">
-       <property name="text">
-        <string>Optimize Fiducial Positions</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <property name="topMargin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="selectFiducialMarkerConfigurationLabel">
-       <property name="text">
-        <string>Select Fiducial Marker Configuration</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="fiducialMarkerConfigurationComboBox">
-       <item>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="fiducialDiameter5mmRadioButton">
         <property name="text">
-         <string>10mm Minimal Distance</string>
+         <string>5mm Fiducial Diameter</string>
         </property>
-       </item>
-       <item>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QRadioButton" name="fiducialDiameter3mmRadioButton">
         <property name="text">
-         <string>15mm Minimal Distance</string>
+         <string>3mm Fiducial Diameter</string>
         </property>
-       </item>
-       <item>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="optimizeFiducialPositionsCheckBox">
         <property name="text">
-         <string>20mm Minimal Distance</string>
+         <string>Optimize Fiducial Positions</string>
         </property>
-       </item>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QPushButton" name="localizeFiducialMarkerPushButton">
-     <property name="text">
-      <string>Localize Fiducial Marker</string>
-     </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="selectFiducialMarkerConfigurationLabel">
+        <property name="text">
+         <string>Select Fiducial Marker Configuration</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="fiducialMarkerConfigurationComboBox">
+        <item>
+         <property name="text">
+          <string>10mm Minimal Distance</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>15mm Minimal Distance</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>20mm Minimal Distance</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+    <widget class="QGroupBox" name="classicWayRegisteringCtImageGroupBox">
+     <property name="title">
+      <string>Classic Way Of Registering CT image</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <widget class="QPushButton" name="doRegistrationMarkerToImagePushButton">
-     <property name="text">
-      <string>Do Registration Marker CS -&gt; Floating Image CS</string>
-     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QLabel" name="selectedFloatingImageLabel">
+        <property name="text">
+         <string>Selected Floating Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QmitkDataStorageComboBox" name="floatingImageComboBox"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="selectedFiducialMarkerModelPointSetLabel">
+        <property name="text">
+         <string>Selected Fiducial Marker Model Point Set</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QmitkDataStorageComboBox" name="fiducialMarkerModelPointSetComboBox"/>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="localizeFiducialMarkerPushButton">
+        <property name="text">
+         <string>Localize Fiducial Marker</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="doRegistrationMarkerToImagePushButton">
+        <property name="text">
+         <string>Do Registration Marker CS -&gt; Floating Image CS</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
-    <spacer name="verticalSpacer_3">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+    <widget class="QGroupBox" name="groundTruthFiducialLocalizationProtocolGroupBox">
+     <property name="title">
+      <string>Ground-Truth-Fiducial-Localization-Protocol</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QLabel" name="chosenCtImagesLabel">
+        <property name="text">
+         <string>Chosen CT images:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QListWidget" name="chosenCtImagesListWidget"/>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="addCtImagePushButton">
+            <property name="text">
+             <string>Add</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="removeCtImagePushButton">
+            <property name="text">
+             <string>Remove</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Select Protocol-Evaluation-Type:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox">
+          <item>
+           <property name="text">
+            <string>PLANE</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>ANGLE</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QPushButton" name="evaluateProtocolPushButton">
+        <property name="text">
+         <string>Evaluate</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QFormLayout" name="formLayout_2">
+        <property name="fieldGrowthPolicy">
+         <enum>QFormLayout::ExpandingFieldsGrow</enum>
+        </property>
+        <property name="horizontalSpacing">
+         <number>20</number>
+        </property>
+        <property name="verticalSpacing">
+         <number>10</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="meanFRELabel">
+          <property name="text">
+           <string>Mean FRE (in mm):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="meanFREValue">
+          <property name="text">
+           <string>0</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="sdFRELabel">
+          <property name="text">
+           <string>Sd FRE (in mm):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="sdFREValua">
+          <property name="text">
+           <string>0</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="TRELabel">
+          <property name="text">
+           <string>TRE (in mm):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="TREValue">
+          <property name="text">
+           <string>0</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <widget class="QmitkDataStorageComboBox" name="groundTruthImageComboBox"/>

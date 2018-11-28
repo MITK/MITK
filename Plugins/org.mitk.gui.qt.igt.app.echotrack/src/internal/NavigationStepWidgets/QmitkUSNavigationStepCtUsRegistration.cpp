@@ -49,7 +49,8 @@ static const int NUMBER_FIDUCIALS_NEEDED = 8;
 
 QmitkUSNavigationStepCtUsRegistration::QmitkUSNavigationStepCtUsRegistration(QWidget *parent) :
   QmitkUSAbstractNavigationStep(parent),
-  ui(new Ui::QmitkUSNavigationStepCtUsRegistration)
+  ui(new Ui::QmitkUSNavigationStepCtUsRegistration),
+  m_PerformingGroundTruthProtocolEvaluation(false)
 {
   this->UnsetFloatingImageGeometry();
   this->DefineDataStorageImageFilter();
@@ -84,8 +85,8 @@ bool QmitkUSNavigationStepCtUsRegistration::OnActivateStep()
 {
   MITK_INFO << "OnActivateStep()";
   ui->floatingImageComboBox->SetDataStorage(this->GetDataStorage());
-  ui->fiducialMarkerModelPointSetComboBox->SetDataStorage(this->GetDataStorage());
   ui->groundTruthImageComboBox->SetDataStorage(this->GetDataStorage());
+  ui->ctImagesToChooseComboBox->SetDataStorage(this->GetDataStorage());
   return true;
 }
 
@@ -170,13 +171,6 @@ bool QmitkUSNavigationStepCtUsRegistration::FilterFloatingImage()
   if (m_FloatingImage.IsNull())
   {
     return false;
-  }
-
-  m_FiducialMarkerCentroids.clear();
-  m_CentroidsOfFiducialCandidates.clear();
-  if (m_MarkerFloatingImageCoordinateSystemPointSet.IsNotNull())
-  {
-    m_MarkerFloatingImageCoordinateSystemPointSet->Clear();
   }
 
   ImageType::Pointer itkImage1 = ImageType::New();
@@ -307,6 +301,158 @@ double QmitkUSNavigationStepCtUsRegistration::GetMinimalFiducialConfigurationDis
     return 20.0;
   }
   return 0.0;
+}
+
+void QmitkUSNavigationStepCtUsRegistration::CreateMarkerModelCoordinateSystemPointSet()
+{
+  if (m_MarkerModelCoordinateSystemPointSet.IsNull())
+  {
+    m_MarkerModelCoordinateSystemPointSet = mitk::PointSet::New();
+  }
+  else
+  {
+    m_MarkerModelCoordinateSystemPointSet->Clear();
+  }
+
+  mitk::Point3D fiducial1;
+  mitk::Point3D fiducial2;
+  mitk::Point3D fiducial3;
+  mitk::Point3D fiducial4;
+  mitk::Point3D fiducial5;
+  mitk::Point3D fiducial6;
+  mitk::Point3D fiducial7;
+  mitk::Point3D fiducial8;
+
+
+
+  switch (ui->fiducialMarkerConfigurationComboBox->currentIndex())
+  {
+    // case 0 is equal to fiducial marker configuration A (10mm distance)
+  case 0:
+    fiducial1[0] = 0;
+    fiducial1[1] = 0;
+    fiducial1[2] = 0;
+
+    fiducial2[0] = 0;
+    fiducial2[1] = 10;
+    fiducial2[2] = 0;
+
+    fiducial3[0] = 10;
+    fiducial3[1] = 0;
+    fiducial3[2] = 0;
+
+    fiducial4[0] = 20;
+    fiducial4[1] = 20;
+    fiducial4[2] = 0;
+
+    fiducial5[0] = 0;
+    fiducial5[1] = 20;
+    fiducial5[2] = 10;
+
+    fiducial6[0] = 10;
+    fiducial6[1] = 20;
+    fiducial6[2] = 10;
+
+    fiducial7[0] = 20;
+    fiducial7[1] = 10;
+    fiducial7[2] = 10;
+
+    fiducial8[0] = 20;
+    fiducial8[1] = 0;
+    fiducial8[2] = 10;
+    break;
+    // case 1 is equal to fiducial marker configuration B (15mm distance)
+  case 1:
+    fiducial1[0] = 0;
+    fiducial1[1] = 0;
+    fiducial1[2] = 0;
+
+    fiducial2[0] = 0;
+    fiducial2[1] = 15;
+    fiducial2[2] = 0;
+
+    fiducial3[0] = 15;
+    fiducial3[1] = 0;
+    fiducial3[2] = 0;
+
+    fiducial4[0] = 30;
+    fiducial4[1] = 30;
+    fiducial4[2] = 0;
+
+    fiducial5[0] = 0;
+    fiducial5[1] = 30;
+    fiducial5[2] = 15;
+
+    fiducial6[0] = 15;
+    fiducial6[1] = 30;
+    fiducial6[2] = 15;
+
+    fiducial7[0] = 30;
+    fiducial7[1] = 15;
+    fiducial7[2] = 15;
+
+    fiducial8[0] = 30;
+    fiducial8[1] = 0;
+    fiducial8[2] = 15;
+    break;
+    // case 2 is equal to fiducial marker configuration C (20mm distance)
+  case 2:
+    fiducial1[0] = 0;
+    fiducial1[1] = 0;
+    fiducial1[2] = 0;
+
+    fiducial2[0] = 0;
+    fiducial2[1] = 20;
+    fiducial2[2] = 0;
+
+    fiducial3[0] = 20;
+    fiducial3[1] = 0;
+    fiducial3[2] = 0;
+
+    fiducial4[0] = 40;
+    fiducial4[1] = 40;
+    fiducial4[2] = 0;
+
+    fiducial5[0] = 0;
+    fiducial5[1] = 40;
+    fiducial5[2] = 20;
+
+    fiducial6[0] = 20;
+    fiducial6[1] = 40;
+    fiducial6[2] = 20;
+
+    fiducial7[0] = 40;
+    fiducial7[1] = 20;
+    fiducial7[2] = 20;
+
+    fiducial8[0] = 40;
+    fiducial8[1] = 0;
+    fiducial8[2] = 20;
+    break;
+  }
+
+  m_MarkerModelCoordinateSystemPointSet->InsertPoint(0, fiducial1);
+  m_MarkerModelCoordinateSystemPointSet->InsertPoint(1, fiducial2);
+  m_MarkerModelCoordinateSystemPointSet->InsertPoint(2, fiducial3);
+  m_MarkerModelCoordinateSystemPointSet->InsertPoint(3, fiducial4);
+  m_MarkerModelCoordinateSystemPointSet->InsertPoint(4, fiducial5);
+  m_MarkerModelCoordinateSystemPointSet->InsertPoint(5, fiducial6);
+  m_MarkerModelCoordinateSystemPointSet->InsertPoint(6, fiducial7);
+  m_MarkerModelCoordinateSystemPointSet->InsertPoint(7, fiducial8);
+
+  mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode("Marker Model Coordinate System Point Set");
+  if (node == nullptr)
+  {
+    node = mitk::DataNode::New();
+    node->SetName("Marker Model Coordinate System Point Set");
+    node->SetData(m_MarkerModelCoordinateSystemPointSet);
+    this->GetDataStorage()->Add(node);
+  }
+  else
+  {
+    node->SetData(m_MarkerModelCoordinateSystemPointSet);
+    this->GetDataStorage()->Modified();
+  }
 }
 
 void QmitkUSNavigationStepCtUsRegistration::EliminateTooSmallLabeledObjects(
@@ -706,15 +852,23 @@ void QmitkUSNavigationStepCtUsRegistration::NumerateFiducialMarks()
   {
     m_MarkerFloatingImageCoordinateSystemPointSet = mitk::PointSet::New();
   }
+  else if (m_MarkerFloatingImageCoordinateSystemPointSet->GetSize() != 0)
+  {
+    m_MarkerFloatingImageCoordinateSystemPointSet->Clear();
+  }
+
   for (int counter = 1; counter <= m_FiducialMarkerCentroids.size(); ++counter)
   {
     m_MarkerFloatingImageCoordinateSystemPointSet->InsertPoint(counter - 1, m_FiducialMarkerCentroids.at(counter));
   }
-  mitk::DataNode::Pointer node = mitk::DataNode::New();
-  node->SetData(m_MarkerFloatingImageCoordinateSystemPointSet);
-  node->SetName("MarkerFloatingImageCSPointSet");
-  //node->SetFloatProperty("pointsize", 5.0);
-  this->GetDataStorage()->Add(node);
+  if( !m_PerformingGroundTruthProtocolEvaluation )
+  {
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData(m_MarkerFloatingImageCoordinateSystemPointSet);
+    node->SetName("MarkerFloatingImageCSPointSet");
+    //node->SetFloatProperty("pointsize", 5.0);
+    this->GetDataStorage()->Add(node);
+  }
 }
 
 void QmitkUSNavigationStepCtUsRegistration::ShowGroundTruthMarkerEdges()
@@ -1421,14 +1575,12 @@ void QmitkUSNavigationStepCtUsRegistration::CreateQtPartControl(QWidget *parent)
 {
   ui->setupUi(parent);
   ui->floatingImageComboBox->SetPredicate(m_IsAPatientImagePredicate);
-  ui->fiducialMarkerModelPointSetComboBox->SetPredicate(m_IsAPointSetPredicate);
   ui->groundTruthImageComboBox->SetPredicate(m_IsAPatientImagePredicate);
+  ui->ctImagesToChooseComboBox->SetPredicate(m_IsAPatientImagePredicate);
 
   // create signal/slot connections
   connect(ui->floatingImageComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
     this, SLOT(OnFloatingImageComboBoxSelectionChanged(const mitk::DataNode*)));
-  connect(ui->fiducialMarkerModelPointSetComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
-    this, SLOT(OnFiducialMarkerModelComboBoxSelectionChanged(const mitk::DataNode*)));
   connect(ui->groundTruthImageComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
     this, SLOT(OnGroundTruthImageComboBoxSelectionChanged(const mitk::DataNode*)));
   connect(ui->doRegistrationMarkerToImagePushButton, SIGNAL(clicked()),
@@ -1437,6 +1589,12 @@ void QmitkUSNavigationStepCtUsRegistration::CreateQtPartControl(QWidget *parent)
     this, SLOT(OnLocalizeFiducials()));
   connect(ui->filterImageGroundTruthEvaluationPushButton, SIGNAL(clicked()),
     this, SLOT(OnFilterGroundTruthImage()));
+  connect(ui->addCtImagePushButton, SIGNAL(clicked()),
+    this, SLOT(OnAddCtImageClicked()));
+  connect(ui->removeCtImagePushButton, SIGNAL(clicked()),
+    this, SLOT(OnRemoveCtImageClicked()));
+  connect(ui->evaluateProtocolPushButton, SIGNAL(clicked()),
+    this, SLOT(OnEvaluateGroundTruthFiducialLocalizationProtocol()));
 }
 
 void QmitkUSNavigationStepCtUsRegistration::OnFloatingImageComboBoxSelectionChanged(const mitk::DataNode* node)
@@ -1476,39 +1634,6 @@ void QmitkUSNavigationStepCtUsRegistration::OnFloatingImageComboBoxSelectionChan
   this->SetFloatingImageGeometryInformation(floatingImage.GetPointer());
 }
 
-void QmitkUSNavigationStepCtUsRegistration::OnFiducialMarkerModelComboBoxSelectionChanged(const mitk::DataNode * node)
-{
-  MITK_INFO << "OnFiducialMarkerModelComboBoxSelectionChanged()";
-
-  if (m_MarkerModelCoordinateSystemPointSet.IsNotNull())
-  {
-    //TODO: Define, what will happen if the pointSet is not null...
-  }
-
-  if (node == nullptr)
-  {
-    m_MarkerModelCoordinateSystemPointSet = nullptr;
-    return;
-  }
-
-  mitk::DataNode* selectedPointSet = ui->fiducialMarkerModelPointSetComboBox->GetSelectedNode();
-  if (selectedPointSet == nullptr)
-  {
-    m_MarkerModelCoordinateSystemPointSet = nullptr;
-    return;
-  }
-
-  mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(selectedPointSet->GetData());
-  if (pointSet.IsNull())
-  {
-    MITK_WARN << "Failed to cast selected pointset node to mitk::PointSet*";
-    m_MarkerModelCoordinateSystemPointSet = nullptr;
-    return;
-  }
-
-  m_MarkerModelCoordinateSystemPointSet = pointSet;
-}
-
 void QmitkUSNavigationStepCtUsRegistration::OnGroundTruthImageComboBoxSelectionChanged(const mitk::DataNode* node)
 {
   MITK_INFO << "OnGroundTruthImageComboBoxSelectionChanged()";
@@ -1546,6 +1671,8 @@ void QmitkUSNavigationStepCtUsRegistration::OnGroundTruthImageComboBoxSelectionC
 
 void QmitkUSNavigationStepCtUsRegistration::OnRegisterMarkerToFloatingImageCS()
 {
+  this->CreateMarkerModelCoordinateSystemPointSet();
+
   //Check for initialization
   if( m_MarkerModelCoordinateSystemPointSet.IsNull() ||
       m_MarkerFloatingImageCoordinateSystemPointSet.IsNull() )
@@ -1595,6 +1722,10 @@ void QmitkUSNavigationStepCtUsRegistration::OnRegisterMarkerToFloatingImageCS()
 
   double FRE = mitk::StaticIGTHelperFunctions::ComputeFRE(m_MarkerModelCoordinateSystemPointSet, m_MarkerFloatingImageCoordinateSystemPointSet, transform);
   MITK_INFO << "FRE: " << FRE << " mm";
+  if (m_PerformingGroundTruthProtocolEvaluation)
+  {
+    m_GroundTruthProtocolFRE.push_back(FRE);
+  }
   //#############################################################################################
 
   //############### conversion back to itk/mitk data types ##########################
@@ -1641,8 +1772,9 @@ void QmitkUSNavigationStepCtUsRegistration::OnRegisterMarkerToFloatingImageCS()
   }*/
 
   //If this option is set, each point will be transformed and the acutal coordinates of the points change.
-  /*if (this->m_Controls->m_MoveImagePoints->isChecked())
-  {*/
+
+  if( !m_PerformingGroundTruthProtocolEvaluation )
+  {
     mitk::PointSet* pointSet_orig = m_MarkerModelCoordinateSystemPointSet;
     mitk::PointSet::Pointer pointSet_moved = mitk::PointSet::New();
 
@@ -1654,15 +1786,22 @@ void QmitkUSNavigationStepCtUsRegistration::OnRegisterMarkerToFloatingImageCS()
     pointSet_orig->Clear();
     for (int i = 0; i < pointSet_moved->GetSize(); i++)
       pointSet_orig->InsertPoint(pointSet_moved->GetPoint(i));
-  /*}*/
 
-  //Do a global reinit
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+    //Do a global reinit
+    mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+  }
 
 }
 
 void QmitkUSNavigationStepCtUsRegistration::OnLocalizeFiducials()
 {
+  m_FiducialMarkerCentroids.clear();
+  m_CentroidsOfFiducialCandidates.clear();
+  if (m_MarkerFloatingImageCoordinateSystemPointSet.IsNotNull())
+  {
+    m_MarkerFloatingImageCoordinateSystemPointSet->Clear();
+  }
+
   if (!this->FilterFloatingImage())
   {
     QMessageBox msgBox;
@@ -1698,4 +1837,73 @@ void QmitkUSNavigationStepCtUsRegistration::OnFilterGroundTruthImage()
 
   this->ShowGroundTruthMarkerEdges();
 
+}
+
+void QmitkUSNavigationStepCtUsRegistration::OnAddCtImageClicked()
+{
+  mitk::DataNode* selectedCtImage = ui->ctImagesToChooseComboBox->GetSelectedNode();
+  if (selectedCtImage == nullptr)
+  {
+    return;
+  }
+
+  mitk::Image::Pointer ctImage = dynamic_cast<mitk::Image*>(selectedCtImage->GetData());
+  if (ctImage.IsNull())
+  {
+    MITK_WARN << "Failed to cast selected segmentation node to mitk::Image*";
+    return;
+  }
+  QString name = QString::fromStdString(selectedCtImage->GetName());
+
+  for( int counter = 0; counter < ui->chosenCtImagesListWidget->count(); ++counter)
+  {
+    MITK_INFO << ui->chosenCtImagesListWidget->item(counter)->text() << " - " << counter;
+    MITK_INFO << m_ImagesGroundTruthProtocol.at(counter).GetPointer();
+    if (ui->chosenCtImagesListWidget->item(counter)->text().compare(name) == 0)
+    {
+      MITK_INFO << "CT image already exist in list of chosen CT images. Do not add the image.";
+      return;
+    }
+  }
+
+  ui->chosenCtImagesListWidget->addItem(name);
+  m_ImagesGroundTruthProtocol.push_back(ctImage);
+}
+
+void QmitkUSNavigationStepCtUsRegistration::OnRemoveCtImageClicked()
+{
+  int position = ui->chosenCtImagesListWidget->currentRow();
+  if (ui->chosenCtImagesListWidget->count() == 0 || position < 0)
+  {
+    return;
+  }
+
+  m_ImagesGroundTruthProtocol.erase(m_ImagesGroundTruthProtocol.begin() + position);
+  QListWidgetItem *item = ui->chosenCtImagesListWidget->currentItem();
+  ui->chosenCtImagesListWidget->removeItemWidget(item);
+  delete item;
+}
+
+void QmitkUSNavigationStepCtUsRegistration::OnEvaluateGroundTruthFiducialLocalizationProtocol()
+{
+  m_GroundTruthProtocolFRE.clear();
+  if (m_ImagesGroundTruthProtocol.size() != 6)
+  {
+    QMessageBox msgBox;
+    msgBox.setText("For evaluating the Ground-Truth-Fiducial-Localization-Protocol there must be loaded 6 different CT images.");
+    msgBox.exec();
+    return;
+  }
+
+  m_PerformingGroundTruthProtocolEvaluation = true;
+  for (int cycleNo = 0; cycleNo < m_ImagesGroundTruthProtocol.size(); ++cycleNo)
+  {
+    m_FloatingImage = m_ImagesGroundTruthProtocol.at(cycleNo);
+    this->SetFloatingImageGeometryInformation(m_FloatingImage.GetPointer());
+
+    this->OnLocalizeFiducials();
+    this->OnRegisterMarkerToFloatingImageCS();
+  }
+
+  m_PerformingGroundTruthProtocolEvaluation = false;
 }

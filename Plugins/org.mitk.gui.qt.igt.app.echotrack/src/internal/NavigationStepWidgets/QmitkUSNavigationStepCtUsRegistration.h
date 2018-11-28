@@ -137,6 +137,7 @@ protected:
   double GetCharacteristicDistanceBWithLowerMargin();
   double GetCharacteristicDistanceBWithUpperMargin();
   double GetMinimalFiducialConfigurationDistance();
+  void CreateMarkerModelCoordinateSystemPointSet();
 
   void EliminateTooSmallLabeledObjects( ImageType::Pointer binaryImage);
   bool EliminateFiducialCandidatesByEuclideanDistances();
@@ -166,11 +167,15 @@ protected:
 
 protected slots:
   void OnFloatingImageComboBoxSelectionChanged(const mitk::DataNode* node);
-  void OnFiducialMarkerModelComboBoxSelectionChanged(const mitk::DataNode* node);
   void OnGroundTruthImageComboBoxSelectionChanged(const mitk::DataNode* node);
   void OnRegisterMarkerToFloatingImageCS();
   void OnLocalizeFiducials();
   void OnFilterGroundTruthImage();
+
+  //Methods for Ground-Truth-Fiducial-Localization-Protocol-Evaluation
+  void OnAddCtImageClicked();
+  void OnRemoveCtImageClicked();
+  void OnEvaluateGroundTruthFiducialLocalizationProtocol();
 
 private:
   Ui::QmitkUSNavigationStepCtUsRegistration *ui;
@@ -185,6 +190,10 @@ private:
   mitk::Image::Pointer m_GroundTruthImage;
   mitk::PointSet::Pointer m_MarkerModelCoordinateSystemPointSet;
   mitk::PointSet::Pointer m_MarkerFloatingImageCoordinateSystemPointSet;
+
+  std::vector<mitk::Image::Pointer> m_ImagesGroundTruthProtocol;
+  bool m_PerformingGroundTruthProtocolEvaluation;
+  std::vector<double> m_GroundTruthProtocolFRE;
 
   ThresholdImageFilterType::Pointer m_ThresholdFilter;
   BinaryThresholdImageFilterType::Pointer m_BinaryThresholdFilter;

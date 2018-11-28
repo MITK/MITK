@@ -96,16 +96,6 @@
        <widget class="QmitkDataStorageComboBox" name="floatingImageComboBox"/>
       </item>
       <item>
-       <widget class="QLabel" name="selectedFiducialMarkerModelPointSetLabel">
-        <property name="text">
-         <string>Selected Fiducial Marker Model Point Set</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QmitkDataStorageComboBox" name="fiducialMarkerModelPointSetComboBox"/>
-      </item>
-      <item>
        <spacer name="verticalSpacer_2">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -141,6 +131,9 @@
       <string>Ground-Truth-Fiducial-Localization-Protocol</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QmitkDataStorageComboBox" name="ctImagesToChooseComboBox"/>
+      </item>
       <item>
        <widget class="QLabel" name="chosenCtImagesLabel">
         <property name="text">

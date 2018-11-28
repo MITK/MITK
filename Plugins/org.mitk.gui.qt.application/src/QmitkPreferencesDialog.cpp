@@ -59,6 +59,7 @@ namespace {
     , {"Segmentation Manager",  QObject::tr("Segmentation Manager")}
     , {"Series Tags",           QObject::tr("Series Tags")} 
     , {"Standard Multi Widget", QObject::tr("Standard Multi Widget") }  
+    , {"Navigation",            QObject::tr("Navigation") }
     , {"User Data",             QObject::tr("User Data") } });
   const QList<QString> mandatorySettings = QList<QString>(
     { "org.mitk.gui.qt.application.EnvironmentPreferencePage"
@@ -238,8 +239,8 @@ void QmitkPreferencesDialog::SetSelectedPage(const QString& id)
 
 void QmitkPreferencesDialog::OnImportButtonClicked()
 {
-  int answer = QMessageBox::question(this, "Importing Preferences"
-    , "All existing preferences will be overwritten!\nAre you sure that you want to import other preferences?", QMessageBox::Yes | QMessageBox::No );
+  int answer = QMessageBox::question(this, tr("Importing Preferences")
+    , tr("All existing preferences will be overwritten!\nAre you sure that you want to import other preferences?"), QMessageBox::Yes | QMessageBox::No );
   if(answer == QMessageBox::No)
     return;
 

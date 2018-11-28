@@ -63,6 +63,7 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
 {
   // create GUI widgets
   m_Controls.setupUi(parent);
+
   // add custom render window manager UI widget to the 'renderWindowManagerTab'
   m_RenderWindowInspector = new QmitkDataStorageRenderWindowInspector(parent);
   m_RenderWindowInspector->SetDataStorage(GetDataStorage());
@@ -80,31 +81,31 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
   connect(m_InspectorView, &QAbstractItemView::customContextMenuRequested, m_DataNodeContextMenu, &QmitkDataNodeContextMenu::OnContextMenuRequested);
 
   m_RenderWindowPart = GetRenderWindowPart();
-  if (nullptr == m_RenderWindowPart)
-  {
-    // also sets the controlled renderer
-    RenderWindowPartActivated(m_RenderWindowPart);
-  }
+  // also sets the controlled renderer
+  RenderWindowPartActivated(m_RenderWindowPart);
 }
 
 void QmitkRenderWindowManagerView::SetControlledRenderer()
 {
-  m_Controls.comboBoxRenderWindowSelection->clear();
-
   const mitk::RenderingManager::RenderWindowVector allRegisteredRenderWindows = mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
   mitk::BaseRenderer* baseRenderer = nullptr;
   mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer;
-  for (const auto &renderWindow : allRegisteredRenderWindows)
+  QStringList rendererNames;
+  for (const auto& renderWindow : allRegisteredRenderWindows)
   {
     baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow);
     if (nullptr != baseRenderer)
     {
       controlledRenderer.push_back(baseRenderer);
-      m_Controls.comboBoxRenderWindowSelection->addItem(baseRenderer->GetName());
+      rendererNames.append(baseRenderer->GetName());
     }
   }
 
   m_RenderWindowInspector->SetControlledRenderer(controlledRenderer);
+
+  m_Controls.comboBoxRenderWindowSelection->clear();
+  rendererNames.sort();
+  m_Controls.comboBoxRenderWindowSelection->addItems(rendererNames);
 }
 
 void QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged(const QString& renderWindowId)

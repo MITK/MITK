@@ -23,9 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // custom multi widget editor
 #include <org_mitk_gui_qt_custommultiwidgeteditor_Export.h>
 
-// mitk render window manager
-#include <mitkRenderWindowViewDirectionController.h>
-
 #include <memory>
 
 class QmitkCustomMultiWidget;
@@ -35,8 +32,6 @@ class CUSTOMMULTIWIDGETEDITOR_EXPORT QmitkCustomMultiWidgetEditor final : public
   Q_OBJECT
 
 public:
-
-  using ViewDirection = mitk::SliceNavigationController::ViewDirection;
 
   berryObjectMacro(QmitkCustomMultiWidgetEditor)
 
@@ -86,7 +81,6 @@ private Q_SLOTS:
 
   void OnLayoutSet(int row, int column);
   void OnSynchronize(bool synchronized);
-  void OnViewDirectionChanged(ViewDirection viewDirection);
 
 private:
   /**

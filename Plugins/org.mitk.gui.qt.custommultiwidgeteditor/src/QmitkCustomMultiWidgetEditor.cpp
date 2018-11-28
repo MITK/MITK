@@ -40,15 +40,11 @@ public:
   Impl();
   ~Impl();
 
-  void SetControlledRenderer();
-
   QmitkCustomMultiWidget* m_CustomMultiWidget;
   QmitkInteractionSchemeToolBar* m_InteractionSchemeToolBar;
   QmitkMultiWidgetConfigurationToolBar* m_ConfigurationToolBar;
 
   std::unique_ptr<QmitkMultiWidgetDecorationManager> m_MultiWidgetDecorationManager;
-
-  std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
 };
 
 QmitkCustomMultiWidgetEditor::Impl::Impl()
@@ -62,29 +58,6 @@ QmitkCustomMultiWidgetEditor::Impl::Impl()
 QmitkCustomMultiWidgetEditor::Impl::~Impl()
 {
   // nothing here
-}
-
-void QmitkCustomMultiWidgetEditor::Impl::SetControlledRenderer()
-{
-  if (nullptr == m_RenderWindowViewDirectionController || nullptr == m_CustomMultiWidget)
-  {
-    return;
-  }
-
-  mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer;
-  auto renderWindowWidgets = m_CustomMultiWidget->GetRenderWindowWidgets();
-  for (const auto& renderWindowWidget : renderWindowWidgets)
-  {
-    auto renderWindow = renderWindowWidget.second->GetRenderWindow();
-    auto vtkRenderWindow = renderWindow->GetRenderWindow();
-    mitk::BaseRenderer* baseRenderer = mitk::BaseRenderer::GetInstance(vtkRenderWindow);
-    if (nullptr != baseRenderer)
-    {
-      controlledRenderer.push_back(baseRenderer);
-    }
-  }
-
-  m_RenderWindowViewDirectionController->SetControlledRenderer(controlledRenderer);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -178,18 +151,12 @@ QmitkCustomMultiWidget* QmitkCustomMultiWidgetEditor::GetCustomMultiWidget()
 void QmitkCustomMultiWidgetEditor::OnLayoutSet(int row, int column)
 {
   m_Impl->m_CustomMultiWidget->ResetLayout(row, column);
-  m_Impl->SetControlledRenderer();
   FirePropertyChange(berry::IWorkbenchPartConstants::PROP_INPUT);
 }
 
 void QmitkCustomMultiWidgetEditor::OnSynchronize(bool synchronized)
 {
   m_Impl->m_CustomMultiWidget->Synchronize(synchronized);
-}
-
-void QmitkCustomMultiWidgetEditor::OnViewDirectionChanged(ViewDirection viewDirection)
-{
-  m_Impl->m_RenderWindowViewDirectionController->SetViewDirectionOfRenderer(viewDirection);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -238,13 +205,8 @@ void QmitkCustomMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::LayoutSet, this, &QmitkCustomMultiWidgetEditor::OnLayoutSet);
     connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::Synchronized, this, &QmitkCustomMultiWidgetEditor::OnSynchronize);
-    connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::ViewDirectionChanged, this, &QmitkCustomMultiWidgetEditor::OnViewDirectionChanged);
 
     m_Impl->m_MultiWidgetDecorationManager = std::make_unique<QmitkMultiWidgetDecorationManager>(m_Impl->m_CustomMultiWidget);
-
-    m_Impl->m_RenderWindowViewDirectionController = std::make_unique<mitk::RenderWindowViewDirectionController>();
-    m_Impl->m_RenderWindowViewDirectionController->SetDataStorage(GetDataStorage());
-    m_Impl->SetControlledRenderer();
 
     OnPreferencesChanged(preferences);
   }

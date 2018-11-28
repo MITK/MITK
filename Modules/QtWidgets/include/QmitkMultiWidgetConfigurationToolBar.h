@@ -36,8 +36,6 @@ class MITKQTWIDGETS_EXPORT QmitkMultiWidgetConfigurationToolBar : public QToolBa
 
 public:
 
-  using ViewDirection = mitk::SliceNavigationController::ViewDirection;
-
   QmitkMultiWidgetConfigurationToolBar(QmitkCustomMultiWidget* customMultiWidget);
   ~QmitkMultiWidgetConfigurationToolBar() override;
 
@@ -45,13 +43,11 @@ Q_SIGNALS:
 
   void LayoutSet(int row, int column);
   void Synchronized(bool synchronized);
-  void ViewDirectionChanged(mitk::SliceNavigationController::ViewDirection);
 
 protected Q_SLOTS:
 
   void OnSetLayout();
   void OnSynchronize();
-  void OnViewDirectionChanged();
 
 private:
 

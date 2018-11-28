@@ -55,31 +55,6 @@ void QmitkMultiWidgetConfigurationToolBar::AddButtons()
   connect(m_SynchronizeAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnSynchronize);
 
   QToolBar::addAction(m_SynchronizeAction);
-
-  QAction* setAxialViewDirectionAction = new QAction(tr("Set axial view direction"), this);
-  setAxialViewDirectionAction->setData(ViewDirection::Axial);
-  connect(setAxialViewDirectionAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnViewDirectionChanged);
-
-  QAction* setSagittalViewDirectionAction = new QAction(tr("Set sagittal view direction"), this);
-  setSagittalViewDirectionAction->setData(ViewDirection::Sagittal);
-  connect(setSagittalViewDirectionAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnViewDirectionChanged);
-
-  QAction* setCoronalViewDirectionAction = new QAction(tr("Set coronal view direction"), this);
-  setCoronalViewDirectionAction->setData(ViewDirection::Frontal);
-  connect(setCoronalViewDirectionAction, &QAction::triggered, this, &QmitkMultiWidgetConfigurationToolBar::OnViewDirectionChanged);
-
-  QToolButton* setViewDirectionToolButton = new QToolButton(this);
-  setViewDirectionToolButton->setIcon(QIcon(":/Qmitk/cmwViewDirection.png"));
-  setViewDirectionToolButton->setText(tr("Set synchronized render window view direction"));
-
-  QMenu* menu = new QMenu();
-  menu->addAction(setAxialViewDirectionAction);
-  menu->addAction(setSagittalViewDirectionAction);
-  menu->addAction(setCoronalViewDirectionAction);
-  setViewDirectionToolButton->setMenu(menu);
-  setViewDirectionToolButton->setPopupMode(QToolButton::InstantPopup);
-
-  this->addWidget(setViewDirectionToolButton);
 }
 
 void QmitkMultiWidgetConfigurationToolBar::OnSetLayout()
@@ -109,14 +84,4 @@ void QmitkMultiWidgetConfigurationToolBar::OnSynchronize()
 
   m_SynchronizeAction->setChecked(synchronized);
   emit Synchronized(synchronized);
-}
-
-void QmitkMultiWidgetConfigurationToolBar::OnViewDirectionChanged()
-{
-  QAction* action = dynamic_cast<QAction*>(sender());
-  if (action)
-  {
-    ViewDirection viewDirection = static_cast<ViewDirection>(action->data().toInt());
-    emit ViewDirectionChanged(viewDirection);
-  }
 }

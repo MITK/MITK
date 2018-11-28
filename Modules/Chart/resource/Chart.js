@@ -66,7 +66,7 @@ window.onload = function()
  * Inits the height of the chart element to 90% of the full window height.
  */
 function initHeight() {
-  var size = window.innerHeight-(window.innerHeight/100*10); //subtract 10% of height to hide vertical scrool bar
+  var size = window.innerHeight-(window.innerHeight/100*5); //subtract 10% of height to hide vertical scrool bar
   let chart = document.getElementById("chart");
   chart.style.height = `${size}px`;
 }
@@ -136,10 +136,15 @@ function generateChart(chartData)
     margin: {
       l: 50,
       r: 10,
-      b: 50,
+      b: 20,
       t: marginTop,
       pad: 4
     },
+    showlegend: true,
+	  legend: {
+      x: 0,
+      y: -0.4
+    }
   };
 
   if (chartData.m_YAxisScale){

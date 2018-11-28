@@ -129,6 +129,18 @@ void SegmentationReworkView::OnSliderWidgetChanged(double value)
   }
   QString labelsToDelete = "slices to delete: " + QString::number(count);
   m_Controls.slicesToDeleteLabel->setText(labelsToDelete);
+
+  std::map<double, double> thresholdMap;
+
+  for (it = m_ScoreMap.begin(); it != m_ScoreMap.end(); it++)
+  {
+    thresholdMap.insert(std::map<double, double>::value_type(it->first, value));
+  }
+
+  m_Controls.chartWidget->RemoveData(m_thresholdLabel);
+  m_Controls.chartWidget->AddData2D(thresholdMap, m_thresholdLabel);
+  m_Controls.chartWidget->SetChartType(m_thresholdLabel, QmitkChartWidget::ChartType::line);
+  m_Controls.chartWidget->Show();
 }
 
 void SegmentationReworkView::AddProgress(int progress, QString status)
@@ -137,7 +149,7 @@ void SegmentationReworkView::AddProgress(int progress, QString status)
   if (futureValue >= 100) 
   {
     m_Controls.progressBar->setValue(0);
-    m_Controls.progressBar->setFormat("Finished %p%");
+    m_Controls.progressBar->setFormat("");
   } else 
   {
     m_Controls.progressBar->setFormat(status.append(" %p%"));
@@ -378,10 +390,8 @@ void SegmentationReworkView::UpdateChartWidget()
 void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArray, int sliceMinStart)
 {
   std::string label = "similarity graph";
-  if (m_Controls.chartWidget->GetData()->size() > 0)
-  {
-    m_Controls.chartWidget->Clear();
-  }
+  m_thresholdLabel = "threshold";
+  //m_Controls.chartWidget->Clear();
 
   double sliceIndex = sliceMinStart;
   for (double score : simScoreArray)
@@ -390,8 +400,12 @@ void SegmentationReworkView::SetSimilarityGraph(std::vector<double> simScoreArra
     sliceIndex++;
   }
 
+  std::map<double, double> thresholdMap;
+
   m_Controls.chartWidget->AddData2D(m_ScoreMap, label);
+  m_Controls.chartWidget->AddData2D(thresholdMap, m_thresholdLabel);
   m_Controls.chartWidget->SetChartType(label, QmitkChartWidget::ChartType::line);
+  m_Controls.chartWidget->SetChartType(m_thresholdLabel, QmitkChartWidget::ChartType::line);
   m_Controls.chartWidget->SetXAxisLabel("slice number");
   m_Controls.chartWidget->SetYAxisLabel("similarity in percent");
   m_Controls.chartWidget->SetTitle("Similartiy Score for Segmentation Comparison");

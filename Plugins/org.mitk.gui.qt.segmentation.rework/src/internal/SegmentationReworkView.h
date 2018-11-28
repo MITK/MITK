@@ -98,6 +98,7 @@ private:
   mitk::DataNode::Pointer m_SegC;
   std::map<double, double> m_ScoreMap;
   std::string m_GroundTruth;
+  std::string m_thresholdLabel;
 
   QWidget* m_Parent;
   int counter;

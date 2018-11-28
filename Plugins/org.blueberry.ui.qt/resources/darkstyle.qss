@@ -67,11 +67,9 @@ QPushButton:checked, QToolButton:checked {
   border: 1px solid #0078a0;
 }
 
-/*
 QToolButton {
   padding: 2px;
 }
-*/
 
 QToolBar QToolButton {
   padding: 4px;

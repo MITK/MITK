@@ -110,7 +110,7 @@ double ComputeWeightedFRE(vtkPoints *X,
   // compute weighting matrices
   calculateWeightMatrices(CovarianceMatricesMoving, CovarianceMatricesFixed, WeightMatrices, rotation);
 
-#pragma omp parallel for reduction(+ : FRE)
+#pragma omp parallel for
   for (int i = 0; i < static_cast<int>(WeightMatrices.size()); ++i)
   {
     // convert to itk data types (nessecary since itk 4 migration)
@@ -131,6 +131,7 @@ double ComputeWeightedFRE(vtkPoints *X,
 
     // do calculation
     const itk::Vector<double, 3> D = WeightMatrices.at(i) * p;
+#pragma omp critical
     FRE += (D[0] * D[0] + D[1] * D[1] + D[2] * D[2]);
   }
 
@@ -169,7 +170,7 @@ void mitk::WeightedPointTransform::C_maker(vtkPoints *X,
                                            itk::VariableSizeMatrix<double> &returnValue)
 {
 #pragma omp parallel for
-  for (vtkIdType i = 0; i < X->GetNumberOfPoints(); ++i)
+  for (int i = 0; i < X->GetNumberOfPoints(); ++i)
   {
     unsigned int index = 3u * i;
     double point[3];
@@ -194,7 +195,7 @@ void mitk::WeightedPointTransform::E_maker(vtkPoints *X,
                                            vnl_vector<double> &returnValue)
 {
 #pragma omp parallel for
-  for (vtkIdType i = 0; i < X->GetNumberOfPoints(); ++i)
+  for (int i = 0; i < X->GetNumberOfPoints(); ++i)
   {
     unsigned int index = 3u * i;
     double pX[3];

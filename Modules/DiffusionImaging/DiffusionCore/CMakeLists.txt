@@ -9,7 +9,7 @@ MITK_CREATE_MODULE(
   DEPENDS MitkMapperExt MitkPlanarFigure MitkImageExtraction MitkSceneSerializationBase MitkDICOMReader MitkMatchPointRegistration
   PACKAGE_DEPENDS
     PUBLIC ITK|ITKTestKernel+ITKRegistrationCommon+ITKMetricsv4+ITKRegistrationMethodsv4+ITKDistanceMap+ITKLabelVoting+ITKVTK
-    PUBLIC VTK|vtkFiltersProgrammable
+    PUBLIC VTK|vtkFiltersProgrammable  OpenMP|OpenMP_CXX
 )
 
 if(MSVC)

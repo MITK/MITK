@@ -210,8 +210,7 @@ $<$<CONFIG:RelWithDebInfo>:variant=release>")
           contains slashes. ]]
 
       if(toolset)
-        set(configure_cmd COMMAND
-          sed -i.backup "\
+        set(configure_cmd sed -i.backup "\
 s|\
 using[[:space:]][[:space:]]*${toolset}[[:space:]]*$<SEMICOLON>|\
 using ${toolset} : : ${CMAKE_CXX_COMPILER} $<SEMICOLON>|\

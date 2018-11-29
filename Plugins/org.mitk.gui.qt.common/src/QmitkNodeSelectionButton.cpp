@@ -17,12 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkNodeSelectionButton.h"
 
+// berry includes
+#include <berryWorkbenchPlugin.h>
+#include <berryQtStyleManager.h>
+
 #include "QPainter"
 #include "QTextDocument"
 
 #include <mitkDataNode.h>
 #include <QmitkNodeDescriptorManager.h>
-
 
 // mitk core
 #include <mitkBaseRenderer.h>
@@ -121,10 +124,6 @@ void QmitkNodeSelectionButton::SetNodeInfo(QString info)
   this->update();
 };
 
-// berry includes
-#include <berryWorkbenchPlugin.h>
-#include <berryIQtStyleManager.h>
-
 void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
 {
   QString stylesheet;
@@ -136,11 +135,11 @@ void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
     auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
     stylesheet = styleManager->GetStylesheet();
   }
-
+  
   QPushButton::paintEvent(p);
 
   QPainter painter(this);
-  QTextDocument td;
+  QTextDocument td(this);
   td.setDefaultStyleSheet(stylesheet);
 
   auto widgetSize = this->size();

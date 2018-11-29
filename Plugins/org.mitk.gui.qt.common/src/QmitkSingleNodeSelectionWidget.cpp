@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkSingleNodeSelectionWidget.h"
 
+#include <berryQtStyleManager.h>
+
 #include <QmitkNodeSelectionDialog.h>
 
 QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent) : QmitkAbstractNodeSelectionWidget(parent)
@@ -26,6 +28,8 @@ QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent) 
   m_Controls.btnSelect->installEventFilter(this);
   m_Controls.btnSelect->setVisible(true);
   m_Controls.btnClear->setVisible(false);
+
+  m_Controls.btnClear->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org.mitk.gui.qt.common/times.svg")));
 
   this->UpdateInfo();
 

@@ -23,56 +23,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkHotkeyLineEdit::TOOLTIP = "Press any key (combination)";
 
-QmitkHotkeyLineEdit::QmitkHotkeyLineEdit(QWidget *parent) : QLineEdit(parent)
+QmitkHotkeyLineEdit::QmitkHotkeyLineEdit(QWidget* parent /*= nullptr*/)
+  : QLineEdit(parent)
 {
-  this->Init();
+  Init();
 }
 
-QmitkHotkeyLineEdit::QmitkHotkeyLineEdit(const QKeySequence &_QKeySequence, QWidget *parent) : QLineEdit(parent)
+QmitkHotkeyLineEdit::QmitkHotkeyLineEdit(const QKeySequence& qKeySequence, QWidget* parent /*= nullptr*/)
+  : QLineEdit(parent)
 {
-  this->Init();
-  this->SetKeySequence(_QKeySequence);
+  Init();
+  SetKeySequence(qKeySequence);
 }
 
-QmitkHotkeyLineEdit::QmitkHotkeyLineEdit(const QString &_QKeySequenceAsString, QWidget *parent) : QLineEdit(parent)
+QmitkHotkeyLineEdit::QmitkHotkeyLineEdit(const QString& qKeySequenceAsString, QWidget* parent /*= nullptr*/)
+  : QLineEdit(parent)
 {
-  this->Init();
-  this->SetKeySequence(_QKeySequenceAsString);
+  Init();
+  SetKeySequence(qKeySequenceAsString);
 }
 
 void QmitkHotkeyLineEdit::Init()
 {
-  this->setToolTip(QString::fromStdString(QmitkHotkeyLineEdit::TOOLTIP));
-  this->setReadOnly(true);
-  connect(this, SIGNAL(textChanged(const QString &)), this, SLOT(LineEditTextChanged(const QString &)));
+  setToolTip(QString::fromStdString(QmitkHotkeyLineEdit::TOOLTIP));
+  setReadOnly(true);
+  connect(this, &QLineEdit::textChanged, this, &QmitkHotkeyLineEdit::LineEditTextChanged);
 }
 
-void QmitkHotkeyLineEdit::keyPressEvent(QKeyEvent *event)
+void QmitkHotkeyLineEdit::keyPressEvent(QKeyEvent* event)
 {
   if (event->key() == Qt::Key_unknown)
+  {
     return;
+  }
   else if (event->key() == Qt::Key_Escape)
+  {
     m_KeySequence = QKeySequence();
-
+  }
   else
   {
-    m_KeySequence = QKeySequence(event->modifiers(), event->key());
-    // if no modifier was pressed the sequence is now empty
-    if (event->modifiers() == Qt::NoModifier)
-      m_KeySequence = QKeySequence(event->key());
+    m_KeySequence = QKeySequence(event->modifiers() + event->key());
   }
 
-  this->SetKeySequence(m_KeySequence);
+  SetKeySequence(m_KeySequence);
 }
 
-void QmitkHotkeyLineEdit::SetKeySequence(const QKeySequence &_QKeySequence)
+void QmitkHotkeyLineEdit::SetKeySequence(const QKeySequence& qKeySequence)
 {
-  this->setText(_QKeySequence.toString());
+  setText(qKeySequence.toString());
 }
 
-void QmitkHotkeyLineEdit::SetKeySequence(const QString &_QKeySequenceAsString)
+void QmitkHotkeyLineEdit::SetKeySequence(const QString& qKeySequenceAsString)
 {
-  this->SetKeySequence(QKeySequence(_QKeySequenceAsString));
+  SetKeySequence(QKeySequence(qKeySequenceAsString));
 }
 
 QKeySequence QmitkHotkeyLineEdit::GetKeySequence()
@@ -85,17 +88,14 @@ QString QmitkHotkeyLineEdit::GetKeySequenceAsString()
   return m_KeySequence.toString();
 }
 
-bool QmitkHotkeyLineEdit::Matches(QKeyEvent *event)
+bool QmitkHotkeyLineEdit::Matches(QKeyEvent* event)
 {
-  QKeySequence _KeySequence = QKeySequence(event->modifiers(), event->key());
-  // if no modifier was pressed the sequence is now empty
-  if (event->modifiers() == Qt::NoModifier)
-    _KeySequence = QKeySequence(event->key());
+  QKeySequence keySequence = QKeySequence(event->modifiers() + event->key());
 
-  return _KeySequence == m_KeySequence;
+  return keySequence == m_KeySequence;
 }
 
-void QmitkHotkeyLineEdit::LineEditTextChanged(const QString &text)
+void QmitkHotkeyLineEdit::LineEditTextChanged(const QString& text)
 {
   m_KeySequence = QKeySequence(text.toUpper());
 }

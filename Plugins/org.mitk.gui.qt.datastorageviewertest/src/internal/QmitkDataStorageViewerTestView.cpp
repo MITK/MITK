@@ -53,13 +53,13 @@ void QmitkDataStorageViewerTestView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.singleSlot->SetDataStorage(GetDataStorage());
   m_Controls.singleSlot->SetEmptyInfo(QString("EmptyInfo: Set this to display info in empty state"));
-  m_Controls.singleSlot->SetInvalidInfo(QString("<b><font color=\"red\">InvalidInfo: is displayed for invalid states</font></b>"));
+  m_Controls.singleSlot->SetInvalidInfo(QString("InvalidInfo: is displayed for invalid states"));
   m_Controls.singleSlot->SetPopUpTitel(QString("This is the definable caption. Choose your data now!"));
   m_Controls.singleSlot->SetPopUpHint(QString("I am an optional hint, that can be set by the developer<p/>If not set the widget is invisible."));
 
   m_Controls.multiSlot->SetDataStorage(GetDataStorage());
   m_Controls.multiSlot->SetEmptyInfo(QString("EmptyInfo: Set this to display info in empty state"));
-  m_Controls.multiSlot->SetInvalidInfo(QString("<b><font color=\"red\">InvalidInfo: is displayed for invalid states</font></b>"));
+  m_Controls.multiSlot->SetInvalidInfo(QString("InvalidInfo: is displayed for invalid states"));
   m_Controls.multiSlot->SetPopUpTitel(QString("This is the definable caption. Choose your data now!"));
   m_Controls.multiSlot->SetPopUpHint(QString("I am an optional hint, that can be set by the developer<p/>If not set the widget is invisible."));
 

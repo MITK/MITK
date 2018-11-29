@@ -86,13 +86,13 @@ void QmitkAbstractNodeSelectionWidget::SetSelectOnlyVisibleNodes(bool selectOnly
 
 void QmitkAbstractNodeSelectionWidget::SetInvalidInfo(QString info)
 {
-  m_InvalidInfo = info;
+  m_InvalidInfo = QString("<font class=\"warning\">")+info+QString("</font>");
   this->UpdateInfo();
 };
 
 void QmitkAbstractNodeSelectionWidget::SetEmptyInfo(QString info)
 {
-  m_EmptyInfo = info;
+  m_EmptyInfo = QString("<font class=\"normal\">")+info+QString("</font>");
   this->UpdateInfo();
 };
 

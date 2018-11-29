@@ -108,7 +108,7 @@ void QmitkNodeSelectionButton::SetSelectedNode(mitk::DataNode* node)
 {
   if (m_SelectedNode != node)
   {
-    this->m_SelectedNode = node; //mitk::WeakPointer<mitk::DataNode>(node);
+    this->m_SelectedNode = node;
     this->m_OutDatedThumpNail = true;
   }
 
@@ -121,13 +121,27 @@ void QmitkNodeSelectionButton::SetNodeInfo(QString info)
   this->update();
 };
 
+// berry includes
+#include <berryWorkbenchPlugin.h>
+#include <berryIQtStyleManager.h>
+
 void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
 {
+  QString stylesheet;
+
+  ctkPluginContext* context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
+  ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
+  if (styleManagerRef)
+  {
+    auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
+    stylesheet = styleManager->GetStylesheet();
+  }
+
   QPushButton::paintEvent(p);
 
   QPainter painter(this);
-
   QTextDocument td;
+  td.setDefaultStyleSheet(stylesheet);
 
   auto widgetSize = this->size();
   QPoint origin = QPoint(5, 5);
@@ -135,7 +149,7 @@ void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
   if (this->m_SelectedNode)
   {
     auto iconLength = widgetSize.height() - 10;
-    auto node = this->m_SelectedNode; // .Lock();
+    auto node = this->m_SelectedNode;
 
     if (this->m_OutDatedThumpNail)
     {
@@ -146,7 +160,7 @@ void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
     painter.drawPixmap(origin, m_ThumpNail);
     origin.setX(origin.x() + iconLength + 5);
 
-    td.setHtml(QString::fromStdString(node->GetName()));
+    td.setHtml(QString::fromStdString("<font class=\"normal\">"+node->GetName()+"</font>"));
   }
   else
   {

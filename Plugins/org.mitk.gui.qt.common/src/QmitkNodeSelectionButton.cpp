@@ -107,6 +107,11 @@ QmitkNodeSelectionButton::~QmitkNodeSelectionButton()
   this->m_SelectedNode = nullptr;
 }
 
+mitk::DataNode::Pointer QmitkNodeSelectionButton::GetSelectedNode() const
+{
+  return m_SelectedNode;
+}
+
 void QmitkNodeSelectionButton::SetSelectedNode(mitk::DataNode* node)
 {
   if (m_SelectedNode != node)

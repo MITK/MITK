@@ -17,8 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkMultiNodeSelectionWidget.h"
 
-#include <QmitkNodeSelectionDialog.h>
-#include <QmitkCustomVariants.h>
+#include <algorithm>
+
+#include "QmitkNodeSelectionDialog.h"
+#include "QmitkCustomVariants.h"
+#include "internal/QmitkNodeSelectionListItemWidget.h"
 
 QmitkMultiNodeSelectionWidget::QmitkMultiNodeSelectionWidget(QWidget* parent) : QmitkAbstractNodeSelectionWidget(parent)
 {
@@ -120,6 +123,13 @@ void QmitkMultiNodeSelectionWidget::UpdateInfo()
       m_Controls.infoLabel->setText(m_InvalidInfo);
     }
   }
+
+  for (auto i = 0; i < m_Controls.list->count(); ++i)
+  {
+    auto item = m_Controls.list->item(i);
+    auto widget = qobject_cast<QmitkNodeSelectionListItemWidget*>(m_Controls.list->itemWidget(item));
+    widget->SetClearAllowed(m_IsOptional || m_CurrentSelection.size() > 1);
+  }
 };
 
 void QmitkMultiNodeSelectionWidget::UpdateList()
@@ -131,10 +141,18 @@ void QmitkMultiNodeSelectionWidget::UpdateList()
     if (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(node))
     {
       QListWidgetItem *newItem = new QListWidgetItem;
-      newItem->setText(QString::fromStdString(node->GetName()));
+
+      newItem->setSizeHint(QSize(0, 40));
+      QmitkNodeSelectionListItemWidget* widget = new QmitkNodeSelectionListItemWidget;
+
+      widget->SetSelectedNode(node);
+      widget->SetClearAllowed(m_IsOptional || m_CurrentSelection.size() > 1);
+
+      connect(widget, SIGNAL(ClearSelection(mitk::DataNode*)), this, SLOT(OnClearSelection(mitk::DataNode*)));
       newItem->setData(Qt::UserRole, QVariant::fromValue<mitk::DataNode::Pointer>(node));
 
       m_Controls.list->addItem(newItem);
+      m_Controls.list->setItemWidget(newItem, widget);
     }
   }
 };
@@ -169,4 +187,15 @@ void QmitkMultiNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)
     emit CurrentSelectionChanged(newEmission);
     this->UpdateInfo();
   }
+};
+
+void QmitkMultiNodeSelectionWidget::OnClearSelection(mitk::DataNode* node)
+{
+  auto finding = std::find(std::begin(m_CurrentSelection), std::end(m_CurrentSelection), node);
+  m_CurrentSelection.erase(finding);
+
+  this->UpdateList();
+  this->UpdateInfo();
+  auto newEmission = this->CompileEmitSelection();
+  emit CurrentSelectionChanged(newEmission);
 };

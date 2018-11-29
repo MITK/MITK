@@ -39,6 +39,8 @@ public:
   explicit QmitkNodeSelectionButton(QWidget *parent = nullptr);
   ~QmitkNodeSelectionButton();
 
+  mitk::DataNode::Pointer GetSelectedNode() const;
+
 public Q_SLOTS :
   virtual void SetSelectedNode(mitk::DataNode* node);
   virtual void SetNodeInfo(QString info);

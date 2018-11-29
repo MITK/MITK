@@ -51,6 +51,9 @@ public Q_SLOTS:
   virtual void SetCurrentSelection(NodeList selectedNodes) override;
   void OnEditSelection();
 
+protected Q_SLOTS:
+  void OnClearSelection(mitk::DataNode* node);
+
 protected:
   NodeList CompileEmitSelection() const;
 

@@ -14,40 +14,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKFILESAVEACTION_H_
-#define QMITKFILESAVEACTION_H_
+#ifndef QMITKDATANODEREINITACTION_H
+#define QMITKDATANODEREINITACTION_H
 
 #include <org_mitk_gui_qt_application_Export.h>
 
-#include <berryIWorkbenchWindow.h>
+#include "QmitkAbstractDataNodeAction.h"
 
 // qt
 #include <QAction>
-#include <QIcon>
 
-class QmitkFileSaveActionPrivate;
-
-class MITK_QT_APP QmitkFileSaveAction : public QAction
+class MITK_QT_APP QmitkDataNodeReinitAction : public QAction, public QmitkAbstractDataNodeAction
 {
   Q_OBJECT
 
 public:
 
-  QmitkFileSaveAction(berry::IWorkbenchWindow::Pointer window);
-  QmitkFileSaveAction(const QIcon& icon, berry::IWorkbenchWindow::Pointer window);
-  QmitkFileSaveAction(const QIcon& icon, berry::IWorkbenchWindow* window);
+  QmitkDataNodeReinitAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
+  QmitkDataNodeReinitAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkFileSaveAction() override;
+  virtual ~QmitkDataNodeReinitAction() override;
 
-protected slots:
+private Q_SLOTS:
 
-  virtual void Run();
+  void OnActionTriggered(bool);
 
-private:
+protected:
 
-  const QScopedPointer<QmitkFileSaveActionPrivate> d;
+  virtual void InitializeAction() override;
 
 };
 
-
-#endif /*QMITKFILESAVEACTION_H_*/
+#endif // QMITKDATANODEREINITACTION_H

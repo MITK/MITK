@@ -14,14 +14,10 @@
     <page id="org.mitk.gui.qt.application.DataManagerPreferencePage" name="Data Manager" class="QmitkDataManagerPreferencePage">
       <keywordreference id="org.mitk.gui.qt.application.DataManagerPreferencePageKeywords"></keywordreference>
     </page>
-    <page id="org.mitk.gui.qt.application.DataManagerHotkeysPrefPage" name="Hotkeys" class="QmitkDataManagerHotkeysPrefPage" category="org.mitk.gui.qt.application.DataManagerPreferencePage">
-      <keywordreference id="org.mitk.gui.qt.application.DataManagerHotkeysPrefPageKeywords"></keywordreference>
-    </page>
   </extension>
 
   <extension point="org.blueberry.ui.keywords">
     <keyword id="org.mitk.gui.qt.application.DataManagerPreferencePageKeywords" label="data manager global reinit surface decimation parent helper objects single click property editing nodes top show containing data deleted added call"></keyword>
-    <keyword id="org.mitk.gui.qt.application.DataManagerHotkeysPrefPageKeywords" label="data manager hotkeys delete selected nodes global reinit invisible show information toggle visibility selected"></keyword>
   </extension>
 
   <extension-point id="contextMenuActions" name="Context menu actions"/>

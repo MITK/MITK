@@ -28,28 +28,26 @@ namespace berry
   struct IPreferencesService;
 }
 
-///
-/// A small class which "eats" all Del-Key-pressed events on the node table.
-/// When the Del Key is pressed selected nodes should be removed.
-///
+/**
+* @brief A small class which receives key-pressed events on the node table.
+*/
 class QmitkNodeTableViewKeyFilter : public QObject
 {
   Q_OBJECT
 
 public:
 
-	QmitkNodeTableViewKeyFilter(QObject* dataManagerView, mitk::DataStorage* dataStorage);
+  QmitkNodeTableViewKeyFilter(QObject *dataManagerView, mitk::DataStorage *dataStorage);
 
 protected:
 
-  bool eventFilter(QObject *obj, QEvent *event) override;
+  virtual bool eventFilter(QObject *obj, QEvent *event) override;
+  /**
+   * @brief The Preferences Service to retrieve and store preferences.
+   */
+  berry::IPreferencesService *m_PreferencesService;
 
-  ///
-  /// The Preferences Service to retrieve and store preferences.
-  ///
-  berry::IPreferencesService* m_PreferencesService;
-
-	mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+  mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 };
 
 #endif // QMITKNODETABLEVIEWKEYFILTER_H

@@ -14,15 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef QMITKDATAMANAGERHOTKEYSPREFPAGE_H
+#define QMITKDATAMANAGERHOTKEYSPREFPAGE_H
 
-#ifndef QMITKDATAMANAGERHOTKEYSPREFPAGE_H_
-#define QMITKDATAMANAGERHOTKEYSPREFPAGE_H_
-
-#include "berryIQtPreferencePage.h"
 #include <org_mitk_gui_qt_datamanager_Export.h>
 
-#include <map>
+// blueberry ui qt plugin
+#include <berryIQtPreferencePage.h>
+
+// qt
 #include <QWidget>
+
+// c++
+#include <map>
 
 class QmitkHotkeyLineEdit;
 
@@ -34,39 +38,40 @@ struct MITK_QT_DATAMANAGER QmitkDataManagerHotkeysPrefPage : public QObject, pub
 public:
   QmitkDataManagerHotkeysPrefPage();
 
-  void Init(berry::IWorkbench::Pointer workbench) override;
+  virtual void Init(berry::IWorkbench::Pointer workbench) override;
 
-  void CreateQtControl(QWidget* parent) override;
+  virtual void CreateQtControl(QWidget* parent) override;
 
-  QWidget* GetQtControl() const override;
+  virtual QWidget* GetQtControl() const override;
 
-  ///
-  /// \see IPreferencePage::PerformOk()
-  ///
-  bool PerformOk() override;
-
-  ///
-  /// \see IPreferencePage::PerformCancel()
-  ///
-  void PerformCancel() override;
-
-  ///
-  /// \see IPreferencePage::Update()
-  ///
-  void Update() override;
+  /**
+  * @brief \see IPreferencePage::PerformOk()
+  */
+  virtual bool PerformOk() override;
+  /**
+  * @brief \see IPreferencePage::PerformCancel()
+  */
+  virtual void PerformCancel() override;
+  /**
+  * @brief \see IPreferencePage::Update()
+  */
+  virtual void Update() override;
 
 protected:
-  ///
-  /// The node from which the properties are taken (will be catched from the preferences service in ctor)
-  ///
+  /**
+  * @brief The node from which the properties are taken (will be catched from the preferences service in ctor)
+  *
+  *
+  */
   berry::IPreferences::WeakPtr m_DataManagerHotkeysPreferencesNode;
-
-  ///
-  /// Maps a label to hotkey lineedit, e.g. "Toggle Visibility of selected nodes" => QmitkHotkeyLineEdit
-  ///
+  /**
+  * @brief Maps a label to hotkey lineedit, e.g. "Toggle Visibility of selected nodes" => QmitkHotkeyLineEdit
+  *
+  *
+  */
   std::map<QString, QmitkHotkeyLineEdit*> m_HotkeyEditors;
 
   QWidget* m_MainControl;
 };
 
-#endif /* QMITKDATAMANAGERHOTKEYSPREFPAGE_H_ */
+#endif // QMITKDATAMANAGERHOTKEYSPREFPAGE_H

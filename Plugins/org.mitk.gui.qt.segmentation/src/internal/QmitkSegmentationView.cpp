@@ -47,6 +47,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //micro service to get the ToolManager instance
 #include "mitkToolManagerProvider.h"
 
+#include <mitkWorkbenchUtil.h>
+
 const std::string QmitkSegmentationView::VIEW_ID = "org.mitk.views.segmentation";
 
 QmitkSegmentationView::QmitkSegmentationView()
@@ -679,14 +681,10 @@ void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
 void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
 {
    QmitkRenderWindow* selectedRenderWindow = 0;
-   QmitkRenderWindow* axialRenderWindow =
-      this->GetRenderWindowPart(OPEN)->GetQmitkRenderWindow("axial");
-   QmitkRenderWindow* sagittalRenderWindow =
-      this->GetRenderWindowPart(OPEN)->GetQmitkRenderWindow("sagittal");
-   QmitkRenderWindow* coronalRenderWindow =
-      this->GetRenderWindowPart(OPEN)->GetQmitkRenderWindow("coronal");
-   QmitkRenderWindow* _3DRenderWindow =
-      this->GetRenderWindowPart(OPEN)->GetQmitkRenderWindow("3d");
+   QmitkRenderWindow* axialRenderWindow = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("axial");
+   QmitkRenderWindow* sagittalRenderWindow = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("sagittal");
+   QmitkRenderWindow* coronalRenderWindow = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("coronal");
+   QmitkRenderWindow* _3DRenderWindow = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("3d");
    bool PlanarFigureInitializedWindow = false;
 
    // find initialized renderwindow

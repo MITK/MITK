@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLogMacros.h>
 #include <mitkIDataStorageService.h>
 #include <mitkDataStorageEditorInput.h>
-#include <mitkWorkbenchUtil.h>
 #include <mitkDataNodeObject.h>
 #include <mitkIRenderingManager.h>
 
@@ -322,85 +321,10 @@ void QmitkAbstractView::DataStorageChanged(mitk::IDataStorageReference::Pointer 
 {
 }
 
-mitk::IRenderWindowPart* QmitkAbstractView::GetRenderWindowPart( IRenderWindowPartStrategies strategies ) const
+mitk::IRenderWindowPart* QmitkAbstractView::GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategies strategies) const
 {
-  berry::IWorkbenchPage::Pointer page = this->GetSite()->GetPage();
-
-  // Return the active editor if it implements mitk::IRenderWindowPart
-  mitk::IRenderWindowPart* renderPart =
-      dynamic_cast<mitk::IRenderWindowPart*>(page->GetActiveEditor().GetPointer());
-  if (renderPart) return renderPart;
-
-  // No suitable active editor found, check visible editors
-  QList<berry::IEditorReference::Pointer> editors = page->GetEditorReferences();
-  for (QList<berry::IEditorReference::Pointer>::iterator i = editors.begin();
-       i != editors.end(); ++i)
-  {
-    berry::IWorkbenchPart::Pointer part = (*i)->GetPart(false);
-    if (page->IsPartVisible(part))
-    {
-      renderPart = dynamic_cast<mitk::IRenderWindowPart*>(part.GetPointer());
-      if (renderPart) return renderPart;
-    }
-  }
-
-  // No suitable visible editor found, check visible views
-  QList<berry::IViewReference::Pointer> views = page->GetViewReferences();
-  for(QList<berry::IViewReference::Pointer>::iterator i = views.begin();
-      i != views.end(); ++i)
-  {
-    berry::IWorkbenchPart::Pointer part = (*i)->GetPart(false);
-    if (page->IsPartVisible(part))
-    {
-      renderPart = dynamic_cast<mitk::IRenderWindowPart*>(part.GetPointer());
-      if (renderPart) return renderPart;
-    }
-  }
-
-  // No strategies given
-  if (strategies == NONE) return nullptr;
-
-  mitk::DataStorageEditorInput::Pointer input(new mitk::DataStorageEditorInput(GetDataStorageReference()));
-
-  bool activate = false;
-  if(strategies & ACTIVATE)
-  {
-    activate = true;
-  }
-
-  berry::IEditorPart::Pointer editorPart;
-
-  if(strategies & OPEN)
-  {
-    // This will create a default editor for the given input. If an editor
-    // with that input is already open, the editor is brought to the front.
-    try
-    {
-      editorPart = mitk::WorkbenchUtil::OpenEditor(page, input, activate);
-    }
-    catch (const berry::PartInitException&)
-    {
-      // There is no editor registered which can handle the given input.
-    }
-  }
-  else if (activate || (strategies & BRING_TO_FRONT))
-  {
-    // check if a suitable editor is already opened
-    editorPart = page->FindEditor(input);
-    if (editorPart)
-    {
-      if (activate)
-      {
-        page->Activate(editorPart);
-      }
-      else
-      {
-        page->BringToTop(editorPart);
-      }
-    }
-  }
-
-  return dynamic_cast<mitk::IRenderWindowPart*>(editorPart.GetPointer());
+  berry::IWorkbenchPage::Pointer page = GetSite()->GetPage();
+  return mitk::WorkbenchUtil::GetRenderWindowPart(page, strategies);
 }
 
 void QmitkAbstractView::RequestRenderWindowUpdate(mitk::RenderingManager::RequestType requestType)

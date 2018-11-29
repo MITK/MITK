@@ -14,9 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkPluginActivator.h"
-#include "../QmitkDataManagerView.h"
-#include "../QmitkDataManagerPreferencePage.h"
 #include "../QmitkDataManagerHotkeysPrefPage.h"
+#include "../QmitkDataManagerPreferencePage.h"
+#include "../QmitkDataManagerView.h"
 
 namespace mitk {
 

@@ -17,30 +17,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKFILESAVEACTION_H_
 #define QMITKFILESAVEACTION_H_
 
-#include <QAction>
-#include <QIcon>
+#include <org_mitk_gui_qt_application_Export.h>
 
 #include <berryIWorkbenchWindow.h>
 
-#include <org_mitk_gui_qt_application_Export.h>
-
-#include <mitkIDataStorageReference.h>
+// qt
+#include <QAction>
+#include <QIcon>
 
 class QmitkFileSaveActionPrivate;
 
-/**
- * \ingroup org_mitk_gui_qt_application
- */
 class MITK_QT_APP QmitkFileSaveAction : public QAction
 {
   Q_OBJECT
 
 public:
-  QmitkFileSaveAction(berry::IWorkbenchWindow::Pointer window);
-  QmitkFileSaveAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window);
-  QmitkFileSaveAction(const QIcon & icon, berry::IWorkbenchWindow* window);
 
-  ~QmitkFileSaveAction() override;
+  QmitkFileSaveAction(berry::IWorkbenchWindow::Pointer window);
+  QmitkFileSaveAction(const QIcon& icon, berry::IWorkbenchWindow::Pointer window);
+  QmitkFileSaveAction(const QIcon& icon, berry::IWorkbenchWindow* window);
+
+  virtual ~QmitkFileSaveAction() override;
 
 protected slots:
 

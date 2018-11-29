@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKDATANODEHIDEALLNODESACTION_H
-#define QMITKDATANODEHIDEALLNODESACTION_H
+#ifndef QMITKDATANODEHIDEALLACTION_H
+#define QMITKDATANODEHIDEALLACTION_H
 
 #include <org_mitk_gui_qt_application_Export.h>
 
@@ -24,16 +24,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QAction>
 
-class MITK_QT_APP QmitkDataNodeHideAllNodesAction : public QAction, public QmitkAbstractDataNodeAction
+namespace HideAllAction
+{
+	MITK_QT_APP void Run(mitk::DataStorage::Pointer dataStorage);
+}
+
+class MITK_QT_APP QmitkDataNodeHideAllAction : public QAction, public QmitkAbstractDataNodeAction
 {
   Q_OBJECT
 
 public:
 
-  QmitkDataNodeHideAllNodesAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
-  QmitkDataNodeHideAllNodesAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
+  QmitkDataNodeHideAllAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
+  QmitkDataNodeHideAllAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkDataNodeHideAllNodesAction() override;
+  virtual ~QmitkDataNodeHideAllAction() override;
 
 private Q_SLOTS:
 
@@ -45,4 +50,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODEHIDEALLNODESACTION_H
+#endif // QMITKDATANODEHIDEALLACTION_H

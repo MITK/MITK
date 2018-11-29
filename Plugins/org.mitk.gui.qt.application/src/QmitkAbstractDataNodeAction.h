@@ -29,6 +29,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QList>
 
+namespace AbstractDataNodeAction
+{
+  QList<mitk::DataNode::Pointer> GetSelectedNodes(berry::IWorkbenchPartSite::Pointer workbenchPartSite);
+}
+
 class MITK_QT_APP QmitkAbstractDataNodeAction
 {
 
@@ -46,8 +51,8 @@ public:
 protected:
 
   virtual void InitializeAction() = 0;
-  mitk::DataNode::Pointer GetSelectedNode();
-  QList<mitk::DataNode::Pointer> GetSelectedNodes();
+  mitk::DataNode::Pointer GetSelectedNode() const;
+  QList<mitk::DataNode::Pointer> GetSelectedNodes() const;
 
   berry::IWorkbenchPartSite::WeakPtr m_WorkbenchPartSite;
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;

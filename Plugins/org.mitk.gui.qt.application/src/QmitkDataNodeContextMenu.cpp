@@ -146,8 +146,8 @@ void QmitkDataNodeContextMenu::InitDefaultActions()
   AddColorAction(m_ColorAction);
 
   m_ColormapAction = new QmitkDataNodeColorMapAction(m_Parent, m_WorkbenchPartSite.Lock());
-  // not used for batch actions (no multi-selection action)
-  m_ImageDataNodeDescriptor->AddAction(m_ColormapAction, false);
+  // used for batch actions
+  m_ImageDataNodeDescriptor->AddAction(m_ColormapAction);
   m_DescriptorActionList.push_back(std::make_pair(m_ImageDataNodeDescriptor, m_ColormapAction));
 
   if (m_DiffusionImageDataNodeDescriptor != nullptr)

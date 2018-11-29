@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkAbstractDataNodeAction.h"
 
+// mitk core
+#include <mitkDataNode.h>
+
 // qt
 #include <QAction>
 
@@ -44,6 +47,7 @@ protected:
 
   virtual void InitializeAction() override;
 
+  void UseWholePixelRange(mitk::DataNode* node);
 };
 
 #endif // QMITKDATANODECOLORMAPACTION_H

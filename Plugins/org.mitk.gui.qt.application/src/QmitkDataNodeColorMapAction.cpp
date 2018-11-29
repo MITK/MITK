@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkDataNodeColorMapAction.h>
 
 // mitk core
-#include <mitkDataNode.h>
+#include <mitkImage.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkLookupTable.h>
 #include <mitkRenderingManager.h>
@@ -108,34 +108,54 @@ void QmitkDataNodeColorMapAction::OnMenuAboutShow()
 
 void QmitkDataNodeColorMapAction::OnActionTriggered(bool checked)
 {
-  auto dataNode = GetSelectedNode();
-  if (dataNode.IsNull())
+  auto selectedNodes = GetSelectedNodes();
+  for (auto &dataNode : selectedNodes)
   {
-    return;
-  }
+    if (dataNode.IsNull())
+    {
+      continue;
+    }
+    mitk::LookupTableProperty::Pointer lookupTableProperty = dynamic_cast<mitk::LookupTableProperty*>(dataNode->GetProperty("LookupTable"));
+    if (lookupTableProperty.IsNull())
+    {
+      continue;
+    }
 
-  mitk::LookupTableProperty::Pointer lookupTableProperty = dynamic_cast<mitk::LookupTableProperty*>(dataNode->GetProperty("LookupTable"));
-  if (lookupTableProperty.IsNull())
+    mitk::LookupTable::Pointer lookupTable = lookupTableProperty->GetValue();
+    if (lookupTable.IsNull())
+    {
+      continue;
+    }
+
+    QAction* senderAction = qobject_cast<QAction*>(QObject::sender());
+    if (nullptr == senderAction)
+    {
+      continue;
+    }
+
+    std::string activatedItem = senderAction->text().toStdString();
+    lookupTable->SetType(activatedItem);
+    lookupTableProperty->SetValue(lookupTable);
+
+    if (mitk::LookupTable::LookupTableType::MULTILABEL == lookupTable->GetActiveType())
+    {
+      // special case: multilabel => set the level window to include the whole pixel range
+      UseWholePixelRange(dataNode);
+    }
+
+    mitk::RenderingModeProperty::Pointer renderingMode = dynamic_cast<mitk::RenderingModeProperty*>(dataNode->GetProperty("Image Rendering.Mode"));
+    renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+}
+
+void QmitkDataNodeColorMapAction::UseWholePixelRange(mitk::DataNode* node)
+{
+  auto image = dynamic_cast<mitk::Image*>(node->GetData());
+  if (nullptr != image)
   {
-    return;
+    mitk::LevelWindow levelWindow;
+    levelWindow.SetToImageRange(image);
+    node->SetLevelWindow(levelWindow);
   }
-
-  mitk::LookupTable::Pointer lookupTable = lookupTableProperty->GetValue();
-  if (lookupTable.IsNull())
-  {
-    return;
-  }
-
-  QAction* senderAction = qobject_cast<QAction*>(QObject::sender());
-  if (nullptr == senderAction)
-  {
-    return;
-  }
-
-  std::string activatedItem = senderAction->text().toStdString();
-  lookupTable->SetType(activatedItem);
-  lookupTableProperty->SetValue(lookupTable);
-  mitk::RenderingModeProperty::Pointer renderingMode = dynamic_cast<mitk::RenderingModeProperty*>(dataNode->GetProperty("Image Rendering.Mode"));
-  renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

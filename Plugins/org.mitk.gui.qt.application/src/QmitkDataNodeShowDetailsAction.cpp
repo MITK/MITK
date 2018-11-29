@@ -19,6 +19,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk gui qt application
 #include "src/internal/QmitkInfoDialog.h"
 
+namespace ShowDetailsAction
+{
+  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, QWidget* parent /* = nullptr*/)
+  {
+    auto selectedNodes = AbstractDataNodeAction::GetSelectedNodes(workbenchPartSite);
+
+    QmitkInfoDialog infoDialog(selectedNodes, parent);
+    infoDialog.exec();
+  }
+}
+
 QmitkDataNodeShowDetailsAction::QmitkDataNodeShowDetailsAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
   : QAction(parent)
   , QmitkAbstractDataNodeAction(workbenchpartSite)
@@ -49,8 +60,10 @@ void QmitkDataNodeShowDetailsAction::InitializeAction()
 
 void QmitkDataNodeShowDetailsAction::OnActionTriggered(bool checked)
 {
-  auto selectedNodes = GetSelectedNodes();
+  if (m_WorkbenchPartSite.Expired())
+  {
+    return;
+  }
 
-  QmitkInfoDialog infoDialog(selectedNodes, m_Parent);
-  infoDialog.exec();
+  ShowDetailsAction::Run(m_WorkbenchPartSite.Lock(), m_Parent);
 }

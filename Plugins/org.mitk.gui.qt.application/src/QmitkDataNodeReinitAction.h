@@ -24,6 +24,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QAction>
 
+namespace ReinitAction
+{
+  MITK_QT_APP void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage);
+}
+
 class MITK_QT_APP QmitkDataNodeReinitAction : public QAction, public QmitkAbstractDataNodeAction
 {
   Q_OBJECT

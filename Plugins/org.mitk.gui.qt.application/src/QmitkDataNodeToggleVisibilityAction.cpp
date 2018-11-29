@@ -30,6 +30,11 @@ namespace ToggleVisibilityAction
 {
   void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, QList<mitk::DataNode::Pointer> selectedNodes /* = QList<mitk::DataNode::Pointer>()*/)
   {
+    if (selectedNodes.empty())
+    {
+      selectedNodes = AbstractDataNodeAction::GetSelectedNodes(workbenchPartSite);
+    }
+
     bool isVisible;
     for (auto& node : selectedNodes)
     {
@@ -94,6 +99,5 @@ void QmitkDataNodeToggleVisibilityAction::OnActionTriggered(bool checked)
     return;
   }
 
-  auto selectedNodes = GetSelectedNodes();
-  ToggleVisibilityAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock(), selectedNodes);
+  ToggleVisibilityAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock());
 }

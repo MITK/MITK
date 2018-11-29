@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk gui qt datamanager
 #include "internal/QmitkDataManagerItemDelegate.h"
+#include "internal/QmitkNodeTableViewKeyFilter.h"
 
 // mitk core
 #include <mitkCommon.h>
@@ -125,6 +126,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
   m_NodeTreeView->setModel(m_FilterModel);
   m_NodeTreeView->setTextElideMode(Qt::ElideMiddle);
+  m_NodeTreeView->installEventFilter(new QmitkNodeTableViewKeyFilter(this, GetDataStorage()));
 
   m_ItemDelegate = new QmitkDataManagerItemDelegate(m_NodeTreeView);
   m_NodeTreeView->setItemDelegate(m_ItemDelegate);

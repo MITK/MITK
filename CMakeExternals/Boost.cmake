@@ -17,6 +17,12 @@ set(Boost_DEPENDS ${proj})
 
 if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
+  #[[ Reset variables. ]]
+  set(patch_cmd "")
+  set(configure_cmd "")
+  set(build_cmd "")
+  set(install_cmd "")
+
   set(BOOST_ROOT ${ep_prefix})
 
   if(WIN32)

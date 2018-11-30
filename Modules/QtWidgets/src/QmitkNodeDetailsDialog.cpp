@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkInfoDialog.h"
+#include "QmitkNodeDetailsDialog.h"
 
 #include "QmitkDataStorageComboBox.h"
 
@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QEvent>
 #include <QKeyEvent>
 
-QmitkInfoDialog::QmitkInfoDialog(const QList<mitk::DataNode::Pointer>& nodes, QWidget* parent /*= nullptr*/, Qt::WindowFlags flags /*= nullptr */)
+QmitkNodeDetailsDialog::QmitkNodeDetailsDialog(const QList<mitk::DataNode::Pointer>& nodes, QWidget* parent /*= nullptr*/, Qt::WindowFlags flags /*= nullptr */)
   : QDialog(parent, flags)
 {
   auto parentLayout = new QGridLayout;
@@ -50,21 +50,21 @@ QmitkInfoDialog::QmitkInfoDialog(const QList<mitk::DataNode::Pointer>& nodes, QW
   parentLayout->addWidget(m_TextBrowser, 2, 0, 1, 2);
   parentLayout->addWidget(cancelButton, 3, 0, 1, 2);
 
-  connect(dataStorageComboBox, &QmitkDataStorageComboBox::OnSelectionChanged, this, &QmitkInfoDialog::OnSelectionChanged);
+  connect(dataStorageComboBox, &QmitkDataStorageComboBox::OnSelectionChanged, this, &QmitkNodeDetailsDialog::OnSelectionChanged);
 
   for(auto& node : nodes)
   {
     dataStorageComboBox->AddNode(node);
   }
 
-  connect(m_KeyWord, &QLineEdit::textChanged, this, &QmitkInfoDialog::KeyWordTextChanged);
-  connect(m_SearchButton, &QPushButton::clicked, this, &QmitkInfoDialog::OnSearchButtonClicked);
-  connect(cancelButton, &QPushButton::clicked, this, &QmitkInfoDialog::OnCancelButtonClicked);
+  connect(m_KeyWord, &QLineEdit::textChanged, this, &QmitkNodeDetailsDialog::KeyWordTextChanged);
+  connect(m_SearchButton, &QPushButton::clicked, this, &QmitkNodeDetailsDialog::OnSearchButtonClicked);
+  connect(cancelButton, &QPushButton::clicked, this, &QmitkNodeDetailsDialog::OnCancelButtonClicked);
 
   cancelButton->setDefault(true);
 }
 
-void QmitkInfoDialog::OnSelectionChanged(const mitk::DataNode* node)
+void QmitkNodeDetailsDialog::OnSelectionChanged(const mitk::DataNode* node)
 {
   if (nullptr == node)
   {
@@ -82,7 +82,7 @@ void QmitkInfoDialog::OnSelectionChanged(const mitk::DataNode* node)
   m_TextBrowser->setPlainText(QString::fromStdString(s.str()));
 }
 
-void QmitkInfoDialog::OnSearchButtonClicked(bool /*checked*/ /*= false */)
+void QmitkNodeDetailsDialog::OnSearchButtonClicked(bool /*checked*/ /*= false */)
 {
   QString keyWord = m_KeyWord->text();
   QString text = m_TextBrowser->toPlainText();
@@ -96,12 +96,12 @@ void QmitkInfoDialog::OnSearchButtonClicked(bool /*checked*/ /*= false */)
   m_SearchButton->setText("Search Next(F3)");
 }
 
-void QmitkInfoDialog::OnCancelButtonClicked(bool /*checked*/ /*= false */)
+void QmitkNodeDetailsDialog::OnCancelButtonClicked(bool /*checked*/ /*= false */)
 {
   done(0);
 }
 
-bool QmitkInfoDialog::eventFilter(QObject* obj, QEvent* event)
+bool QmitkNodeDetailsDialog::eventFilter(QObject* obj, QEvent* event)
 {
   if (event->type() == QEvent::KeyPress)
   {
@@ -118,7 +118,7 @@ bool QmitkInfoDialog::eventFilter(QObject* obj, QEvent* event)
   return QObject::eventFilter(obj, event);
 }
 
-void QmitkInfoDialog::KeyWordTextChanged(const QString& /*text*/)
+void QmitkNodeDetailsDialog::KeyWordTextChanged(const QString& /*text*/)
 {
   QTextCursor textCursor = m_TextBrowser->textCursor();
   textCursor.setPosition(0);

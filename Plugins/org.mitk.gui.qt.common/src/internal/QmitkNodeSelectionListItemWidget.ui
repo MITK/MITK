@@ -61,11 +61,14 @@
        <height>25</height>
       </size>
      </property>
+     <property name="toolTip">
+      <string>Right click to show details about selected node.</string>
+     </property>
      <property name="text">
       <string/>
      </property>
      <property name="checkable">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
    </item>

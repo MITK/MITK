@@ -43,6 +43,9 @@
      <property name="defaultDropAction">
       <enum>Qt::MoveAction</enum>
      </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
      <item>
       <property name="text">
        <string>1</string>

@@ -47,6 +47,8 @@ protected Q_SLOTS:
   void OnClearSelection();
 
 protected:
+  virtual bool eventFilter(QObject *obj, QEvent *ev) override;
+
   Ui_QmitkNodeSelectionListItemWidget m_Controls;
 };
 

@@ -17,14 +17,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkNodeSelectionListItemWidget.h"
 
-// berry includes
 #include <berryQtStyleManager.h>
+
+#include <QMouseEvent>
+
+#include "QmitkNodeDetailsDialog.h"
 
 QmitkNodeSelectionListItemWidget::QmitkNodeSelectionListItemWidget(QWidget *parent)
   : QWidget(parent)
 {
   m_Controls.setupUi(this);
 
+  m_Controls.btnSelect->installEventFilter(this);
   m_Controls.btnSelect->setVisible(true);
   m_Controls.btnSelect->SetNodeInfo("No valid selection");
   m_Controls.btnClear->setVisible(false);
@@ -58,3 +62,33 @@ void QmitkNodeSelectionListItemWidget::OnClearSelection()
 {
   emit ClearSelection(this->GetSelectedNode());
 };
+
+bool QmitkNodeSelectionListItemWidget::eventFilter(QObject *obj, QEvent *ev)
+{
+  if (obj == m_Controls.btnSelect)
+  {
+    if (ev->type() == QEvent::MouseButtonRelease)
+    {
+      auto mouseEv = dynamic_cast<QMouseEvent*>(ev);
+      if (!mouseEv)
+      {
+        return false;
+      }
+
+      if (mouseEv->button() == Qt::RightButton)
+      {
+        auto selection = this->GetSelectedNode();
+
+        if (selection.IsNotNull())
+        {
+          QList<mitk::DataNode::Pointer> selectionList({ this->GetSelectedNode() });
+          QmitkNodeDetailsDialog infoDialog(selectionList, this);
+          infoDialog.exec();
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}

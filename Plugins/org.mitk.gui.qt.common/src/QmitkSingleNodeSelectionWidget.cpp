@@ -18,8 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSingleNodeSelectionWidget.h"
 
 #include <berryQtStyleManager.h>
+#include <QMouseEvent>
 
-#include <QmitkNodeSelectionDialog.h>
+#include "QmitkNodeSelectionDialog.h"
+#include "QmitkNodeDetailsDialog.h"
 
 QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent) : QmitkAbstractNodeSelectionWidget(parent)
 {
@@ -109,8 +111,27 @@ bool QmitkSingleNodeSelectionWidget::eventFilter(QObject *obj, QEvent *ev)
   {
     if (ev->type() == QEvent::MouseButtonRelease)
     {
-      this->EditSelection();
-      return true;
+      auto mouseEv = dynamic_cast<QMouseEvent*>(ev);
+      if (!mouseEv)
+      {
+        return false;
+      }
+
+      if (mouseEv->button() == Qt::LeftButton)
+      {
+        this->EditSelection();
+        return true;
+      }
+      else
+      {
+        auto selection = this->CompileEmitSelection();
+        if (!selection.empty())
+        {
+          QmitkNodeDetailsDialog infoDialog(selection, this);
+          infoDialog.exec();
+          return true;
+        }
+      }
     }
   }
 

@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkDataNode.h>
 
-#include "Ui_QmitkNodeSelectionListItemWidget.h"
+#include "ui_QmitkNodeSelectionListItemWidget.h"
 
 #include "org_mitk_gui_qt_common_Export.h"
 

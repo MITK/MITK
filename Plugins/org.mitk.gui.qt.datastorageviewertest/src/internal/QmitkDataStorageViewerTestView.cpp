@@ -268,7 +268,7 @@ void QmitkDataStorageViewerTestView::OnOnlyUneven(bool checked)
   }
   else
   {
-    auto checkFunction = [](const QmitkMultiNodeSelectionWidget::NodeList & nodes)
+    auto checkFunction = [](const QmitkMultiNodeSelectionWidget::NodeList & /*nodes*/)
     {
       return std::string();
     };

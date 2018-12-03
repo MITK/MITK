@@ -261,7 +261,7 @@ void QmitkDataNodeContextMenu::InitServiceActions()
 
 }
 
-void QmitkDataNodeContextMenu::OnContextMenuRequested(const QPoint& pos)
+void QmitkDataNodeContextMenu::OnContextMenuRequested(const QPoint& /*pos*/)
 {
   if (m_WorkbenchPartSite.Expired())
   {

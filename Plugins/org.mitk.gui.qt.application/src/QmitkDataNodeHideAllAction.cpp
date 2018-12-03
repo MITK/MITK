@@ -62,7 +62,7 @@ void QmitkDataNodeHideAllAction::InitializeAction()
   connect(this, &QmitkDataNodeHideAllAction::triggered, this, &QmitkDataNodeHideAllAction::OnActionTriggered);
 }
 
-void QmitkDataNodeHideAllAction::OnActionTriggered(bool checked)
+void QmitkDataNodeHideAllAction::OnActionTriggered(bool /*checked*/)
 {
   if (m_DataStorage.IsExpired())
   {

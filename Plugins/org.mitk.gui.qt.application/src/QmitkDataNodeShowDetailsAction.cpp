@@ -58,7 +58,7 @@ void QmitkDataNodeShowDetailsAction::InitializeAction()
   connect(this, &QmitkDataNodeShowDetailsAction::triggered, this, &QmitkDataNodeShowDetailsAction::OnActionTriggered);
 }
 
-void QmitkDataNodeShowDetailsAction::OnActionTriggered(bool checked)
+void QmitkDataNodeShowDetailsAction::OnActionTriggered(bool /*checked*/)
 {
   if (m_WorkbenchPartSite.Expired())
   {

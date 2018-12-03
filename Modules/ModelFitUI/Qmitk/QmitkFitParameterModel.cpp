@@ -101,8 +101,9 @@ rowCount(const QModelIndex& parent) const
   {
     if (parent.isValid())
     {
-      assert(parent.row() < this->m_Fits.size());
-      return this->m_Fits[parent.row()]->GetParameters().size() + this->m_Fits[parent.row()]->staticParamMap.Size();
+      auto row = static_cast<std::size_t>(parent.row());
+      assert(row < this->m_Fits.size());
+      return this->m_Fits[row]->GetParameters().size() + this->m_Fits[row]->staticParamMap.Size();
     }
     else
     {

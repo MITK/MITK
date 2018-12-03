@@ -87,7 +87,7 @@ void QmitkDataNodeToggleVisibilityAction::InitializeAction()
   connect(this, &QmitkDataNodeToggleVisibilityAction::triggered, this, &QmitkDataNodeToggleVisibilityAction::OnActionTriggered);
 }
 
-void QmitkDataNodeToggleVisibilityAction::OnActionTriggered(bool checked)
+void QmitkDataNodeToggleVisibilityAction::OnActionTriggered(bool /*checked*/)
 {
   if (m_WorkbenchPartSite.Expired())
   {

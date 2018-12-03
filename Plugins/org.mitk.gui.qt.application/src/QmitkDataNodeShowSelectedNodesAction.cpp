@@ -45,7 +45,7 @@ void QmitkDataNodeShowSelectedNodesAction::InitializeAction()
   connect(this, &QmitkDataNodeShowSelectedNodesAction::triggered, this, &QmitkDataNodeShowSelectedNodesAction::OnActionTriggered);
 }
 
-void QmitkDataNodeShowSelectedNodesAction::OnActionTriggered(bool checked)
+void QmitkDataNodeShowSelectedNodesAction::OnActionTriggered(bool /*checked*/)
 {
   if (m_DataStorage.IsExpired())
   {

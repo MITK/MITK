@@ -58,6 +58,7 @@ private Q_SLOTS:
 
   void OnOnlyImages(bool checked);
   void OnOnlyImages2(bool checked);
+  void OnOnlyUneven(bool checked);
 
 private:
 

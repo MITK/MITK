@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkSingleNodeSelectionWidget</class>
- <widget class="QWidget" name="QmitkSingleNodeSelectionWidget">
+ <class>QmitkNodeSelectionListItemWidget</class>
+ <widget class="QWidget" name="QmitkNodeSelectionListItemWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -62,13 +62,13 @@
       </size>
      </property>
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Press to change the selection.&lt;/p&gt;&lt;p&gt;Right click to show details about selected node.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Right click to show details about selected node.</string>
      </property>
      <property name="text">
       <string/>
      </property>
      <property name="checkable">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
    </item>

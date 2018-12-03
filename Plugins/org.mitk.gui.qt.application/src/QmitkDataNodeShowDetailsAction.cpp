@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkDataNodeShowDetailsAction.h>
 
 // mitk gui qt application
-#include "src/internal/QmitkInfoDialog.h"
+#include "QmitkNodeDetailsDialog.h"
 
 namespace ShowDetailsAction
 {
@@ -25,7 +25,7 @@ namespace ShowDetailsAction
   {
     auto selectedNodes = AbstractDataNodeAction::GetSelectedNodes(workbenchPartSite);
 
-    QmitkInfoDialog infoDialog(selectedNodes, parent);
+    QmitkNodeDetailsDialog infoDialog(selectedNodes, parent);
     infoDialog.exec();
   }
 }
@@ -58,7 +58,7 @@ void QmitkDataNodeShowDetailsAction::InitializeAction()
   connect(this, &QmitkDataNodeShowDetailsAction::triggered, this, &QmitkDataNodeShowDetailsAction::OnActionTriggered);
 }
 
-void QmitkDataNodeShowDetailsAction::OnActionTriggered(bool checked)
+void QmitkDataNodeShowDetailsAction::OnActionTriggered(bool /*checked*/)
 {
   if (m_WorkbenchPartSite.Expired())
   {

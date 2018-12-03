@@ -14,23 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKINFODIALOG_H
-#define QMITKINFODIALOG_H
+#ifndef QMITKNODEDETAILSDIALOG_H
+#define QMITKNODEDETAILSDIALOG_H
 
 #include <mitkDataNode.h>
 
 #include <QDialog>
 
+#include <MitkQtWidgetsExports.h>
+
 class QLineEdit;
 class QTextBrowser;
 
-class QmitkInfoDialog : public QDialog
+class MITKQTWIDGETS_EXPORT QmitkNodeDetailsDialog : public QDialog
 {
   Q_OBJECT
 
 public:
 
-  QmitkInfoDialog(const QList<mitk::DataNode::Pointer>& nodes, QWidget* parent = nullptr, Qt::WindowFlags flags = nullptr);
+  QmitkNodeDetailsDialog(const QList<mitk::DataNode::Pointer>& nodes, QWidget* parent = nullptr, Qt::WindowFlags flags = nullptr);
 
 public Q_SLOTS:
 
@@ -51,4 +53,4 @@ protected:
 
 };
 
-#endif // QMITKINFODIALOG_H
+#endif // QMITKNODEDETAILSDIALOG_H

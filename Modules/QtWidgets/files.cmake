@@ -50,6 +50,8 @@ set(CPP_FILES
   mitkIDataStorageInspectorProvider.cpp
   mitkQtWidgetsActivator.cpp
   mitkDataStorageInspectorGenerator.cpp
+  QmitkOverlayWidget.cpp
+  QmitkNodeDetailsDialog.cpp
 )
 
 set(MOC_H_FILES
@@ -88,6 +90,8 @@ set(MOC_H_FILES
   include/QmitkAbstractDataStorageInspector.h
   include/QmitkDataStorageTreeInspector.h
   include/QmitkModelViewSelectionConnector.h
+  include/QmitkOverlayWidget.h
+  include/QmitkNodeDetailsDialog.h
 )
 
 set(UI_FILES

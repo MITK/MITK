@@ -83,7 +83,7 @@ void QmitkDataNodeSurfaceRepresentationAction::OnMenuAboutShow()
   }
 }
 
-void QmitkDataNodeSurfaceRepresentationAction::OnActionTriggered(bool checked)
+void QmitkDataNodeSurfaceRepresentationAction::OnActionTriggered(bool /*checked*/)
 {
   auto dataNode = GetSelectedNode();
   if (dataNode.IsNull())

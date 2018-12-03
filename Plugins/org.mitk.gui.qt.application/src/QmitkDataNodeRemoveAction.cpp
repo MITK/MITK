@@ -102,7 +102,7 @@ void QmitkDataNodeRemoveAction::InitializeAction()
   connect(this, &QmitkDataNodeRemoveAction::triggered, this, &QmitkDataNodeRemoveAction::OnActionTriggered);
 }
 
-void QmitkDataNodeRemoveAction::OnActionTriggered(bool checked)
+void QmitkDataNodeRemoveAction::OnActionTriggered(bool /*checked*/)
 {
   if (m_WorkbenchPartSite.Expired())
   {

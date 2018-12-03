@@ -101,10 +101,6 @@ namespace itk
   void AdaptiveThresholdIterator<TImage, TFunction>
     ::IncrementRegionGrowingState()
   {
-    //make the progressbar go one step further
-    if(!m_FineDetectionMode)
-      mitk::ProgressBar::GetInstance()->Progress();
-
     //updating the thresholds
     if (m_UpwardsExpansion)
     {
@@ -269,8 +265,6 @@ namespace itk
     this->CheckSeedPointValue();
 
     m_InitializeValue = (this->CalculateMaxRGS() +1);
-    if(!m_FineDetectionMode)
-      mitk::ProgressBar::GetInstance()->AddStepsToDo(m_InitializeValue-1);
 
     //only initialize with zeros for the first segmention (raw segmentation mode)
     if(!m_FineDetectionMode)
@@ -354,7 +348,7 @@ namespace itk
     //first check if the key-specific queue already exists
     if (m_QueueMap.count(key) == 0)
     {
-      //if queue doesn´t exist, create it, push the IndexType onto it
+      //if queue doesn\B4t exist, create it, push the IndexType onto it
       //and insert it into the map
 
       IndexQueueType newQueue;
@@ -428,7 +422,7 @@ namespace itk
           // then test it.
           if( m_ImageRegion.IsInside( tempIndex ) )
           {
-            //check if voxel hasn´t already been processed
+            //check if voxel hasn\B4t already been processed
             if( this->m_OutputImage->GetPixel( tempIndex ) == 0 )
             {
               // if it is inside, push it into the queue
@@ -440,7 +434,7 @@ namespace itk
               }
               else  // If the pixel is not inside the current threshold
               {
-                int distance = this->EstimateDistance(tempIndex); // [!] sollte nicht estimateDistance sondern calculateDistance() heißen!
+                int distance = this->EstimateDistance(tempIndex); // [!] sollte nicht estimateDistance sondern calculateDistance() hei\DFen!
                 if (distance != 0)
                 {
                   //hier wird Voxel in entsprechenden Stack und ins OutputImage geschrieben

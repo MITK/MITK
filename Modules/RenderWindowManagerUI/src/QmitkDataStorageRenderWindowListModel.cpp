@@ -102,6 +102,13 @@ int QmitkDataStorageRenderWindowListModel::columnCount(const QModelIndex& parent
 
 QVariant QmitkDataStorageRenderWindowListModel::data(const QModelIndex& index, int role) const
 {
+  if (m_BaseRenderer.IsExpired())
+  {
+    return QVariant();
+  }
+
+  auto baseRenderer = m_BaseRenderer.Lock();
+
   if (!index.isValid() || this != index.model())
   {
     return QVariant();
@@ -119,7 +126,7 @@ QVariant QmitkDataStorageRenderWindowListModel::data(const QModelIndex& index, i
   if (Qt::CheckStateRole == role)
   {
     bool visibility = false;
-    dataNode->GetVisibility(visibility, m_BaseRenderer);
+    dataNode->GetVisibility(visibility, baseRenderer);
     if (visibility)
     {
       return Qt::Checked;
@@ -158,6 +165,13 @@ QVariant QmitkDataStorageRenderWindowListModel::data(const QModelIndex& index, i
 
 bool QmitkDataStorageRenderWindowListModel::setData(const QModelIndex& index, const QVariant& value, int role /*= Qt::EditRole*/)
 {
+  if (m_BaseRenderer.IsExpired())
+  {
+    return false;
+  }
+
+  auto baseRenderer = m_BaseRenderer.Lock();
+
   if (!index.isValid() || this != index.model())
   {
     return false;
@@ -175,10 +189,10 @@ bool QmitkDataStorageRenderWindowListModel::setData(const QModelIndex& index, co
   {
     Qt::CheckState newCheckState = static_cast<Qt::CheckState>(value.toInt());
     bool isVisible = newCheckState;
-    dataNode->SetVisibility(isVisible, m_BaseRenderer);
+    dataNode->SetVisibility(isVisible, baseRenderer);
 
     emit dataChanged(index, index);
-    mitk::RenderingManager::GetInstance()->RequestUpdate(m_BaseRenderer->GetRenderWindow());
+    mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
     return true;
   }
   return false;
@@ -238,6 +252,13 @@ QMimeData* QmitkDataStorageRenderWindowListModel::mimeData(const QModelIndexList
 
 bool QmitkDataStorageRenderWindowListModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent)
 {
+  if (m_BaseRenderer.IsExpired())
+  {
+    return false;
+  }
+
+  auto baseRenderer = m_BaseRenderer.Lock();
+
   if (action == Qt::IgnoreAction)
   {
     return true;
@@ -259,13 +280,13 @@ bool QmitkDataStorageRenderWindowListModel::dropMimeData(const QMimeData* data, 
     auto dataNode = this->data(parent, QmitkDataNodeRawPointerRole).value<mitk::DataNode*>();
     if (nullptr != dataNode)
     {
-      dataNode->GetIntProperty("layer", layer, m_BaseRenderer);
+      dataNode->GetIntProperty("layer", layer, baseRenderer);
     }
 
     auto dataNodeList = QmitkMimeTypes::ToDataNodePtrList(data);
     for (const auto& dataNode : dataNodeList)
     {
-      m_RenderWindowLayerController->MoveNodeToPosition(dataNode, layer, m_BaseRenderer);
+      m_RenderWindowLayerController->MoveNodeToPosition(dataNode, layer, baseRenderer);
     }
 
     UpdateModelData();
@@ -298,11 +319,26 @@ void QmitkDataStorageRenderWindowListModel::SetControlledRenderer(mitk::RenderWi
 
 void QmitkDataStorageRenderWindowListModel::SetCurrentRenderer(mitk::BaseRenderer* baseRenderer)
 {
-  if (m_BaseRenderer != baseRenderer)
+  if (m_BaseRenderer == baseRenderer)
   {
-    m_BaseRenderer = baseRenderer;
+    return;
+  }
+
+  m_BaseRenderer = baseRenderer;
+  if (!m_BaseRenderer.IsExpired())
+  {
     UpdateModelData();
   }
+}
+
+mitk::BaseRenderer* QmitkDataStorageRenderWindowListModel::GetCurrentRenderer() const
+{
+  if (m_BaseRenderer.IsExpired())
+  {
+    return nullptr;
+  }
+
+  return m_BaseRenderer.Lock().GetPointer();
 }
 
 void QmitkDataStorageRenderWindowListModel::AddDataNodeToAllRenderer(mitk::DataNode* dataNode)
@@ -315,12 +351,13 @@ void QmitkDataStorageRenderWindowListModel::UpdateModelData()
   if (!m_DataStorage.IsExpired())
   {
     auto dataStorage = m_DataStorage.Lock();
-    if (m_BaseRenderer.IsNotNull())
+    if (!m_BaseRenderer.IsExpired())
     {
+      auto baseRenderer = m_BaseRenderer.Lock();
       // update the model, so that it will be filled with the nodes of the new data storage
       beginResetModel();
       // get the current layer stack of the given base renderer
-      m_LayerStack = mitk::RenderWindowLayerUtilities::GetLayerStack(dataStorage, m_BaseRenderer, true);
+      m_LayerStack = mitk::RenderWindowLayerUtilities::GetLayerStack(dataStorage, baseRenderer, true);
       endResetModel();
     }
   }

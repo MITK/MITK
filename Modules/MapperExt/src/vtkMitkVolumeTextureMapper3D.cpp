@@ -121,15 +121,16 @@ void vtkMitkVolumeTextureMapper3D::ComputePolygons( vtkRenderer *ren,
   //GPU_INFO << "ComputePolygons";
 
   // Get the camera position and focal point
-  double focalPoint[4], position[4];
-  double plane[4];
+  double focalPoint[4];
+  double position[4];
+  double viewDir[3];
   vtkCamera *camera = ren->GetActiveCamera();
 
-  camera->GetPosition( position );
-  camera->GetFocalPoint( focalPoint );
+  camera->GetPosition(position);
+  camera->GetFocalPoint(focalPoint);
 
-  position[3]   = 1.0;
-  focalPoint[3] = 1.0;
+  position[3]   = 1.;
+  focalPoint[3] = 1.;
 
   // Pass the focal point and position through the inverse of the
   // volume's matrix to map back into the data coordinates. We
@@ -145,29 +146,24 @@ void vtkMitkVolumeTextureMapper3D::ComputePolygons( vtkRenderer *ren,
   matrix->MultiplyPoint( focalPoint, focalPoint );
   matrix->Delete();
 
-  if ( position[3] )
-    {
+  if (position[3]) {
     position[0] /= position[3];
     position[1] /= position[3];
     position[2] /= position[3];
-    }
+  }
 
-  if ( focalPoint[3] )
-    {
+  if (focalPoint[3]) {
     focalPoint[0] /= focalPoint[3];
     focalPoint[1] /= focalPoint[3];
     focalPoint[2] /= focalPoint[3];
-    }
+  }
 
   // Create a plane equation using the direction and position of the camera
-  plane[0] = focalPoint[0] - position[0];
-  plane[1] = focalPoint[1] - position[1];
-  plane[2] = focalPoint[2] - position[2];
+  viewDir[0] = focalPoint[0] - position[0];
+  viewDir[1] = focalPoint[1] - position[1];
+  viewDir[2] = focalPoint[2] - position[2];
 
-  vtkMath::Normalize( plane );
-
-  plane[3] = -(plane[0] * position[0] + plane[1] * position[1] +
-               plane[2] * position[2]);
+  vtkMath::Normalize(viewDir);
 
   // Find the min and max distances of the boundary points of the volume
   double minDistance = VTK_DOUBLE_MAX;
@@ -177,15 +173,15 @@ void vtkMitkVolumeTextureMapper3D::ComputePolygons( vtkRenderer *ren,
   // texture planes against. First we need to clip these against the bounds
   // of the volume to make sure they don't exceed it.
   double volBounds[6];
-  this->GetInput()->GetBounds( volBounds );
+  this->GetInput()->GetBounds(volBounds);
 
   double bounds[6];
-  bounds[0] = (inBounds[0]>volBounds[0])?(inBounds[0]):(volBounds[0]);
-  bounds[1] = (inBounds[1]<volBounds[1])?(inBounds[1]):(volBounds[1]);
-  bounds[2] = (inBounds[2]>volBounds[2])?(inBounds[2]):(volBounds[2]);
-  bounds[3] = (inBounds[3]<volBounds[3])?(inBounds[3]):(volBounds[3]);
-  bounds[4] = (inBounds[4]>volBounds[4])?(inBounds[4]):(volBounds[4]);
-  bounds[5] = (inBounds[5]<volBounds[5])?(inBounds[5]):(volBounds[5]);
+  bounds[0] = inBounds[0] > volBounds[0] ? inBounds[0] : volBounds[0];
+  bounds[1] = inBounds[1] < volBounds[1] ? inBounds[1] : volBounds[1];
+  bounds[2] = inBounds[2] > volBounds[2] ? inBounds[2] : volBounds[2];
+  bounds[3] = inBounds[3] < volBounds[3] ? inBounds[3] : volBounds[3];
+  bounds[4] = inBounds[4] > volBounds[4] ? inBounds[4] : volBounds[4];
+  bounds[5] = inBounds[5] < volBounds[5] ? inBounds[5] : volBounds[5];
 
   // Create 8 vertices for the bounding box we are rendering
   int i, j, k;
@@ -193,31 +189,23 @@ void vtkMitkVolumeTextureMapper3D::ComputePolygons( vtkRenderer *ren,
 
   int idx = 0;
 
-  for ( k = 0; k < 2; k++ )
-    {
-    for ( j = 0; j < 2; j++ )
-      {
-      for ( i = 0; i < 2; i++ )
-        {
+  for (k = 0; k < 2; k++) {
+    for (j = 0; j < 2; j++) {
+      for (i = 0; i < 2; i++) {
         vertices[idx][2] = bounds[4+k];
         vertices[idx][1] = bounds[2+j];
         vertices[idx][0] = bounds[i];
 
-        double d =
-          plane[0] * vertices[idx][0] +
-          plane[1] * vertices[idx][1] +
-          plane[2] * vertices[idx][2] +
-          plane[3];
+        double d = vtkMath::Dot(viewDir, vertices[idx]);
 
         idx++;
 
         // Keep track of closest and farthest point
-        minDistance = (d<minDistance)?(d):(minDistance);
-        maxDistance = (d>maxDistance)?(d):(maxDistance);
-
-        }
+        minDistance = d < minDistance ? d : minDistance;
+        maxDistance = d > maxDistance ? d : maxDistance;
       }
     }
+  }
 
   int dim[6];
   this->GetVolumeDimensions(dim);
@@ -235,13 +223,10 @@ void vtkMitkVolumeTextureMapper3D::ComputePolygons( vtkRenderer *ren,
   float spacing[3];
   this->GetVolumeSpacing( spacing );
 
-  double offset =
-    0.333 * 0.5 * (spacing[0] + spacing[1] + spacing[2]);
-
-  minDistance += 0.1*offset;
-  maxDistance -= 0.1*offset;
-
-  minDistance = (minDistance < offset)?(offset):(minDistance);
+  // Prevents float number errors
+  const double epsillon = 0.00001; 
+  minDistance += epsillon;
+  maxDistance -= epsillon;
 
   double stepSize = this->ActualSampleDistance;
 
@@ -250,8 +235,7 @@ void vtkMitkVolumeTextureMapper3D::ComputePolygons( vtkRenderer *ren,
     (maxDistance - minDistance)/static_cast<double>(stepSize));
 
   // Check if we have space, free old space only if it is too small
-  if ( this->BufferSize < numPolys )
-    {
+  if (this->BufferSize < numPolys) {
     delete [] this->PolygonBuffer;
     delete [] this->IntersectionBuffer;
 
@@ -259,7 +243,7 @@ void vtkMitkVolumeTextureMapper3D::ComputePolygons( vtkRenderer *ren,
 
     this->PolygonBuffer = new float [36*this->BufferSize];
     this->IntersectionBuffer = new float [12*this->BufferSize];
-    }
+  }
 
   this->NumberOfPolygons = numPolys;
 
@@ -270,8 +254,7 @@ void vtkMitkVolumeTextureMapper3D::ComputePolygons( vtkRenderer *ren,
 
   float *iptr, *pptr;
 
-  for ( i = 0; i < 12; i++ )
-    {
+  for (i = 0; i < 12; i++) {
     double line[3];
 
     line[0] = vertices[lines[i][1]][0] - vertices[lines[i][0]][0];
@@ -282,30 +265,24 @@ void vtkMitkVolumeTextureMapper3D::ComputePolygons( vtkRenderer *ren,
 
     iptr = this->IntersectionBuffer + i;
 
-    double planeDotLineOrigin = vtkMath::Dot( plane, vertices[lines[i][0]] );
-    double planeDotLine       = vtkMath::Dot( plane, line );
+    double planeDotLineOrigin = vtkMath::Dot( viewDir, vertices[lines[i][0]] );
+    double planeDotLine       = vtkMath::Dot( viewDir, line );
 
-    double t, increment;
+    double t = -1.;
+    double increment = 0.;
 
-    if ( planeDotLine != 0.0 )
-      {
-      t = (d - planeDotLineOrigin - plane[3] ) / planeDotLine;
+    if ( planeDotLine != 0.0 ) {
+      t = (d - planeDotLineOrigin) / planeDotLine;
       increment = -stepSize / planeDotLine;
-      }
-    else
-      {
-      t         = -1.0;
-      increment =  0.0;
-      }
+    }
 
-    for ( j = 0; j < numPolys; j++ )
-      {
-      *iptr = (t > 0.0 && t < 1.0)?(t):(-1.0);
+    for ( j = 0; j < numPolys; j++ ) {
+      *iptr = (t > 0. && t < 1.) ? t : -1.;
 
       t += increment;
       iptr += 12;
-      }
     }
+  }
 
   // Compute the polygons by determining which edges were intersected
   int neighborLines[12][6] =
@@ -331,40 +308,33 @@ void vtkMitkVolumeTextureMapper3D::ComputePolygons( vtkRenderer *ren,
   low[2]  = (bounds[4] - volBounds[4]) / (volBounds[5] - volBounds[4]);
   high[2] = (bounds[5] - volBounds[4]) / (volBounds[5] - volBounds[4]);
 
-  for ( i = 0; i < 12; i++ )
-    {
+  for (i = 0; i < 12; i++) {
     tCoord[i][0] = (tCoord[i][0])?(high[0]):(low[0]);
     tCoord[i][1] = (tCoord[i][1])?(high[1]):(low[1]);
     tCoord[i][2] = (tCoord[i][2])?(high[2]):(low[2]);
-    }
+  }
 
   iptr = this->IntersectionBuffer;
   pptr = this->PolygonBuffer;
 
-  for ( i = 0; i < numPolys; i++ )
-    {
+  for (i = 0; i < numPolys; i++) {
     // Look for a starting point
     int start = 0;
 
-    while ( start < 12 && iptr[start] == -1.0 )
-      {
+    while ( start < 12 && iptr[start] == -1.0 ) {
       start++;
-      }
+    }
 
-    if ( start == 12 )
-      {
+    if (start == 12) {
       pptr[0] = -1.0;
-      }
-    else
-      {
-      int current = start;
+    } else {
+      int current  = start;
       int previous = -1;
-      int errFlag = 0;
+      int errFlag  = 0;
 
-      idx   = 0;
+      idx = 0;
 
-      while ( idx < 6 && !errFlag && ( idx == 0 || current != start) )
-        {
+      while (idx < 6 && !errFlag && ( idx == 0 || current != start)) {
         double t = iptr[current];
 
         *(pptr + idx*6)     =
@@ -397,31 +367,26 @@ void vtkMitkVolumeTextureMapper3D::ComputePolygons( vtkRenderer *ren,
         while ( j < 6 &&
                 (*(this->IntersectionBuffer + i*12 +
                    neighborLines[current][j]) < 0 ||
-                 neighborLines[current][j] == previous) )
-          {
+                 neighborLines[current][j] == previous) ) {
           j++;
-          }
-
-        if ( j >= 6 )
-          {
-          errFlag = 1;
-          }
-        else
-          {
-          previous = current;
-          current = neighborLines[current][j];
-          }
         }
 
-      if ( idx < 6 )
-        {
-        *(pptr + idx*6) = -1;
+        if ( j >= 6 ) {
+          errFlag = 1;
+        } else {
+          previous = current;
+          current = neighborLines[current][j];
         }
       }
 
+      if (idx < 6) {
+        *(pptr + idx*6) = -1;
+      }
+    }
+
     iptr += 12;
     pptr += 36;
-    }
+  }
 }
 
 void vtkMitkVolumeTextureMapper3D::UpdateMTime()

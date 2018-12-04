@@ -86,7 +86,7 @@ public:
   void SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer);
 
   void SetCurrentRenderer(mitk::BaseRenderer* baseRenderer);
-  mitk::BaseRenderer* GetCurrentRenderer() const { return m_BaseRenderer.GetPointer(); }
+  mitk::BaseRenderer* GetCurrentRenderer() const;
 
   /**
   * @brief Use the RenderWindowLayerController to insert the given data node into all controlled render windows.
@@ -101,7 +101,7 @@ private:
   void UpdateModelData();
 
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
-  mitk::BaseRenderer::Pointer m_BaseRenderer;
+  mitk::WeakPointer<mitk::BaseRenderer> m_BaseRenderer;
   mitk::RenderWindowLayerUtilities::LayerStack m_LayerStack;
 
 };

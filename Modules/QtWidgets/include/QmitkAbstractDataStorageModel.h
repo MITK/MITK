@@ -55,7 +55,7 @@ public:
   */
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
-  mitk::DataStorage* GetDataStorage() { return m_DataStorage.Lock().GetPointer(); }
+  mitk::DataStorage* GetDataStorage() const;
   /*
   * @brief Sets the node predicate and updates the model data, according to the node predicate.
   *
@@ -63,7 +63,7 @@ public:
   */
   void SetNodePredicate(mitk::NodePredicateBase* nodePredicate);
 
-  mitk::NodePredicateBase* GetNodePredicate() { return m_NodePredicate; }
+  mitk::NodePredicateBase* GetNodePredicate() const { return m_NodePredicate; }
 
 protected:
 

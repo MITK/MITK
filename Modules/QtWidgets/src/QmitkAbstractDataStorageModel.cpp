@@ -97,6 +97,16 @@ void QmitkAbstractDataStorageModel::SetDataStorage(mitk::DataStorage* dataStorag
   DataStorageChanged();
 }
 
+mitk::DataStorage* QmitkAbstractDataStorageModel::GetDataStorage() const
+{
+  if (m_DataStorage.IsExpired())
+  {
+    return nullptr;
+  }
+
+  return m_DataStorage.Lock().GetPointer();
+}
+
 void QmitkAbstractDataStorageModel::SetDataStorageDeleted()
 {
   this->SetDataStorage(nullptr);

@@ -45,14 +45,14 @@ void mitk::RenderWindowViewDirectionController::SetControlledRenderer(RenderWind
   }
 }
 
-void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(const std::string &viewDirection, BaseRenderer* renderer/* =nullptr*/)
+void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(const std::string& viewDirection, BaseRenderer* renderer/* =nullptr*/)
 {
   if (nullptr == renderer)
   {
     // set visibility of data node in all controlled renderer
     for (auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         SetViewDirectionOfRenderer(viewDirection, renderer);
       }
@@ -86,7 +86,7 @@ void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(ViewD
     // set visibility of data node in all controlled renderer
     for (auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         SetViewDirectionOfRenderer(viewDirection, renderer);
       }

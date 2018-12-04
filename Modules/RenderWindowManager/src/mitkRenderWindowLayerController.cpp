@@ -53,7 +53,7 @@ void mitk::RenderWindowLayerController::SetBaseDataNode(DataNode* dataNode, cons
     // set the data node as base data node in all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         SetBaseDataNode(dataNode, renderer);
       }
@@ -97,7 +97,7 @@ void mitk::RenderWindowLayerController::InsertLayerNode(DataNode* dataNode, int 
     // insert data node in all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         InsertLayerNode(dataNode, layer, renderer);
       }
@@ -174,7 +174,7 @@ void mitk::RenderWindowLayerController::RemoveLayerNode(DataNode* dataNode, cons
     // remove data node from all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         RemoveLayerNode(dataNode, renderer);
       }
@@ -203,7 +203,7 @@ bool mitk::RenderWindowLayerController::MoveNodeToPosition(DataNode* dataNode, i
     // move data node to position in all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         MoveNodeToPosition(dataNode, newLayer, renderer);
         // we don't store/need the returned boolean value
@@ -276,7 +276,7 @@ bool mitk::RenderWindowLayerController::MoveNodeToFront(DataNode* dataNode, cons
     // move data node to front in all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         MoveNodeToFront(dataNode, renderer);
         // we don't store/need the returned boolean value
@@ -322,7 +322,7 @@ bool mitk::RenderWindowLayerController::MoveNodeToBack(DataNode* dataNode, const
     // move data node to back in all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         MoveNodeToBack(dataNode, renderer);
         // we don't store/need the returned boolean value
@@ -379,7 +379,7 @@ bool mitk::RenderWindowLayerController::MoveNodeUp(DataNode* dataNode, const Bas
     // move data node down in all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         MoveNodeUp(dataNode, renderer);
         // we don't store/need the returned boolean value
@@ -434,7 +434,7 @@ bool mitk::RenderWindowLayerController::MoveNodeDown(DataNode* dataNode, const B
     // move data node up in all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         MoveNodeDown(dataNode, renderer);
         // we don't store/need the returned boolean value
@@ -493,7 +493,7 @@ void mitk::RenderWindowLayerController::SetVisibilityOfDataNode(bool visibility,
     // set visibility of data node in all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         SetVisibilityOfDataNode(visibility, dataNode, renderer);
       }
@@ -516,7 +516,7 @@ void mitk::RenderWindowLayerController::HideDataNodeInAllRenderer(const DataNode
 
   for (const auto& renderer : m_ControlledRenderer)
   {
-    if (renderer.IsNotNull())
+    if (nullptr != renderer)
     {
       dataNode->GetPropertyList(renderer)->SetBoolProperty("visible", false);
     }
@@ -532,7 +532,7 @@ void mitk::RenderWindowLayerController::ResetRenderer(bool onlyVisibility /*= tr
     // reset all controlled renderer
     for (const auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
         ResetRenderer(onlyVisibility, renderer);
       }

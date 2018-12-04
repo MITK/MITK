@@ -60,7 +60,7 @@ namespace mitk
     * @param renderer       Pointer to the renderer instance for which the view direction should be changed.
     *                       If it is a nullptr (default) all controlled renderer will be affected.
     */
-    void SetViewDirectionOfRenderer(const std::string &viewDirection, BaseRenderer* renderer = nullptr);
+    void SetViewDirectionOfRenderer(const std::string& viewDirection, BaseRenderer* renderer = nullptr);
     /**
     * @brief Set the view direction for the given renderer (nullptr = all renderer)
     * @param viewDirection  The view direction that should be used for this renderer.

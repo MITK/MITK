@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk core
 #include <mitkBaseRenderer.h>
 #include <mitkDataNode.h>
+#include <QmitkRenderWindow.h>
 
 // qt
 #include <QGlobal.h>
@@ -31,9 +32,8 @@ void QmitkRenderWindowManagerView::RenderWindowPartActivated(mitk::IRenderWindow
   if (m_RenderWindowPart != renderWindowPart)
   {
     m_RenderWindowPart = renderWindowPart;
+    SetControlledRenderer();
   }
-
-  SetControlledRenderer();
 }
 
 void QmitkRenderWindowManagerView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
@@ -41,9 +41,8 @@ void QmitkRenderWindowManagerView::RenderWindowPartDeactivated(mitk::IRenderWind
   if (m_RenderWindowPart == renderWindowPart)
   {
     m_RenderWindowPart = nullptr;
+    SetControlledRenderer();
   }
-
-  SetControlledRenderer();
 }
 
 void QmitkRenderWindowManagerView::RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart)
@@ -82,18 +81,24 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
 
   m_RenderWindowPart = GetRenderWindowPart();
   // also sets the controlled renderer
-  RenderWindowPartActivated(m_RenderWindowPart);
+  SetControlledRenderer();
 }
 
 void QmitkRenderWindowManagerView::SetControlledRenderer()
 {
-  const mitk::RenderingManager::RenderWindowVector allRegisteredRenderWindows = mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
-  mitk::BaseRenderer* baseRenderer = nullptr;
+  QHash<QString, QmitkRenderWindow*> renderWindows;
+  if (m_RenderWindowPart != nullptr)
+  {
+    renderWindows = m_RenderWindowPart->GetQmitkRenderWindows();
+  }
+
   mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer;
   QStringList rendererNames;
-  for (const auto& renderWindow : allRegisteredRenderWindows)
+  m_Controls.comboBoxRenderWindowSelection->clear();
+  mitk::BaseRenderer* baseRenderer = nullptr;
+  for (const auto& renderWindow : renderWindows.values())
   {
-    baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow);
+    baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow->GetVtkRenderWindow());
     if (nullptr != baseRenderer)
     {
       controlledRenderer.push_back(baseRenderer);
@@ -102,8 +107,6 @@ void QmitkRenderWindowManagerView::SetControlledRenderer()
   }
 
   m_RenderWindowInspector->SetControlledRenderer(controlledRenderer);
-
-  m_Controls.comboBoxRenderWindowSelection->clear();
   rendererNames.sort();
   m_Controls.comboBoxRenderWindowSelection->addItems(rendererNames);
 }

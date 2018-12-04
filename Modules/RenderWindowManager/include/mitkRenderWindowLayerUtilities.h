@@ -33,7 +33,7 @@ namespace mitk
 {
   namespace RenderWindowLayerUtilities
   {
-    typedef std::vector<BaseRenderer::Pointer> RendererVector;
+    typedef std::vector<BaseRenderer*> RendererVector;
     typedef std::map<int, DataNode::Pointer, std::greater<int>> LayerStack;
 
     /**

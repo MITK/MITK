@@ -138,6 +138,7 @@ protected:
   double GetCharacteristicDistanceBWithUpperMargin();
   double GetMinimalFiducialConfigurationDistance();
   void CreateMarkerModelCoordinateSystemPointSet();
+  void InitializeTransformationSensorCSToMarkerCS();
 
   //Methods for Ground-Truth-Fiducial-Localization-Protocol-Evaluation
   void InitializePointsToTransformForGroundTruthProtocol();
@@ -147,6 +148,7 @@ protected:
   double CalculateMeanFRE();
   double CalculateStandardDeviationOfFRE(double meanFRE);
   void CalculateGroundTruthProtocolTRE();
+  // End methods Ground-Truth-Protocol
 
   void EliminateTooSmallLabeledObjects( ImageType::Pointer binaryImage);
   bool EliminateFiducialCandidatesByEuclideanDistances();
@@ -223,6 +225,8 @@ private:
   std::map<int, mitk::Vector3D> m_FiducialMarkerCentroids;
 
   mitk::AffineTransform3D::Pointer m_TransformMarkerCSToFloatingImageCS;
+  mitk::AffineTransform3D::Pointer m_TransformSensorCSToMarkerCS;
+
   /*!
   \brief The 3D dimension of the CT image given in index size.
   */

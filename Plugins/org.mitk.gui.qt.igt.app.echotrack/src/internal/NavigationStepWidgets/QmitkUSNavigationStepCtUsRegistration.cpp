@@ -455,6 +455,12 @@ void QmitkUSNavigationStepCtUsRegistration::CreateMarkerModelCoordinateSystemPoi
   }*/
 }
 
+void QmitkUSNavigationStepCtUsRegistration::InitializeTransformationSensorCSToMarkerCS()
+{
+  //At first calculate the inverse transformation (marker-CS to sensor-CS)
+  mitk::Vector3D translation;
+}
+
 void QmitkUSNavigationStepCtUsRegistration::InitializePointsToTransformForGroundTruthProtocol()
 {
 

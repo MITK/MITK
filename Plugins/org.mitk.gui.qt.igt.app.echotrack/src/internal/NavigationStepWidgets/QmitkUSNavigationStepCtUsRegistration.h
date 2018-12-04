@@ -139,6 +139,15 @@ protected:
   double GetMinimalFiducialConfigurationDistance();
   void CreateMarkerModelCoordinateSystemPointSet();
 
+  //Methods for Ground-Truth-Fiducial-Localization-Protocol-Evaluation
+  void InitializePointsToTransformForGroundTruthProtocol();
+  void CreatePointsToTransformForGroundTruthProtocol();
+  void TransformPointsGroundTruthProtocol();
+  void AddTransformedPointsToDataStorage();
+  double CalculateMeanFRE();
+  double CalculateStandardDeviationOfFRE(double meanFRE);
+  void CalculateGroundTruthProtocolTRE();
+
   void EliminateTooSmallLabeledObjects( ImageType::Pointer binaryImage);
   bool EliminateFiducialCandidatesByEuclideanDistances();
   void ClassifyFiducialCandidates();
@@ -194,6 +203,9 @@ private:
   std::vector<mitk::Image::Pointer> m_ImagesGroundTruthProtocol;
   bool m_PerformingGroundTruthProtocolEvaluation;
   std::vector<double> m_GroundTruthProtocolFRE;
+  std::map<int, double> m_GroundTruthProtocolTRE;
+  std::map<int, mitk::Point3D> m_PointsToTransformGroundTruthProtocol;
+  std::map<int, mitk::PointSet::Pointer> m_GroundTruthProtocolTransformedPoints;
 
   ThresholdImageFilterType::Pointer m_ThresholdFilter;
   BinaryThresholdImageFilterType::Pointer m_BinaryThresholdFilter;

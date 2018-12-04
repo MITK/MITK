@@ -190,7 +190,7 @@ bool QmitkUSNavigationStepCtUsRegistration::FilterFloatingImage()
   binaryImage = m_HoleFillingFilter->GetOutput();
 
   this->EliminateTooSmallLabeledObjects(binaryImage);
-  mitk::CastToMitkImage(binaryImage, m_FloatingImage);
+  //mitk::CastToMitkImage(binaryImage, m_FloatingImage);
   return true;
 }
 
@@ -440,7 +440,7 @@ void QmitkUSNavigationStepCtUsRegistration::CreateMarkerModelCoordinateSystemPoi
   m_MarkerModelCoordinateSystemPointSet->InsertPoint(6, fiducial7);
   m_MarkerModelCoordinateSystemPointSet->InsertPoint(7, fiducial8);
 
-  mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode("Marker Model Coordinate System Point Set");
+  /*mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode("Marker Model Coordinate System Point Set");
   if (node == nullptr)
   {
     node = mitk::DataNode::New();
@@ -452,7 +452,386 @@ void QmitkUSNavigationStepCtUsRegistration::CreateMarkerModelCoordinateSystemPoi
   {
     node->SetData(m_MarkerModelCoordinateSystemPointSet);
     this->GetDataStorage()->Modified();
+  }*/
+}
+
+void QmitkUSNavigationStepCtUsRegistration::InitializePointsToTransformForGroundTruthProtocol()
+{
+
+  m_PointsToTransformGroundTruthProtocol.clear();
+
+  mitk::Point3D point0mm;
+  mitk::Point3D point20mm;
+  mitk::Point3D point40mm;
+  mitk::Point3D point60mm;
+  mitk::Point3D point80mm;
+  mitk::Point3D point100mm;
+
+  point0mm[0] = 0.0;
+  point0mm[1] = 0.0;
+  point0mm[2] = 0.0;
+
+  point20mm[0] = 0.0;
+  point20mm[1] = 0.0;
+  point20mm[2] = 0.0;
+
+  point40mm[0] = 0.0;
+  point40mm[1] = 0.0;
+  point40mm[2] = 0.0;
+
+  point60mm[0] = 0.0;
+  point60mm[1] = 0.0;
+  point60mm[2] = 0.0;
+
+  point80mm[0] = 0.0;
+  point80mm[1] = 0.0;
+  point80mm[2] = 0.0;
+
+  point100mm[0] = 0.0;
+  point100mm[1] = 0.0;
+  point100mm[2] = 0.0;
+
+  m_PointsToTransformGroundTruthProtocol.insert(std::pair<int, mitk::Point3D>(0, point0mm));
+  m_PointsToTransformGroundTruthProtocol.insert(std::pair<int, mitk::Point3D>(20, point20mm));
+  m_PointsToTransformGroundTruthProtocol.insert(std::pair<int, mitk::Point3D>(40, point40mm));
+  m_PointsToTransformGroundTruthProtocol.insert(std::pair<int, mitk::Point3D>(60, point60mm));
+  m_PointsToTransformGroundTruthProtocol.insert(std::pair<int, mitk::Point3D>(80, point80mm));
+  m_PointsToTransformGroundTruthProtocol.insert(std::pair<int, mitk::Point3D>(100, point100mm));
+}
+
+void QmitkUSNavigationStepCtUsRegistration::CreatePointsToTransformForGroundTruthProtocol()
+{
+  this->InitializePointsToTransformForGroundTruthProtocol();
+
+  switch (ui->fiducialMarkerConfigurationComboBox->currentIndex())
+  {
+    // case 0 is equal to fiducial marker configuration A (10mm distance)
+  case 0:
+    MITK_WARN << "For this marker configuration (10mm) there does not exist a point to transform.";
+    break;
+    // case 1 is equal to fiducial marker configuration B (15mm distance)
+  case 1:
+    m_PointsToTransformGroundTruthProtocol.at(0)[0] = 130;  // = 30mm to end of clipping plate + 100 mm to middle axis of measurement plate
+    m_PointsToTransformGroundTruthProtocol.at(0)[1] = 15;
+    m_PointsToTransformGroundTruthProtocol.at(0)[2] = -7;  // = 5mm distance to clipping plate + 2mm to base
+
+    m_PointsToTransformGroundTruthProtocol.at(20)[0] = 130;
+    m_PointsToTransformGroundTruthProtocol.at(20)[1] = 15;
+    m_PointsToTransformGroundTruthProtocol.at(20)[2] = -27;  // = 5mm distance to clipping plate + 2mm to base + 20mm depth
+
+    m_PointsToTransformGroundTruthProtocol.at(40)[0] = 130;
+    m_PointsToTransformGroundTruthProtocol.at(40)[1] = 15;
+    m_PointsToTransformGroundTruthProtocol.at(40)[2] = -47;  // = 5mm distance to clipping plate + 2mm to base + 40mm depth
+
+    m_PointsToTransformGroundTruthProtocol.at(60)[0] = 130;
+    m_PointsToTransformGroundTruthProtocol.at(60)[1] = 15;
+    m_PointsToTransformGroundTruthProtocol.at(60)[2] = -67;  // = 5mm distance to clipping plate + 2mm to base + 60mm depth
+
+    m_PointsToTransformGroundTruthProtocol.at(80)[0] = 130;
+    m_PointsToTransformGroundTruthProtocol.at(80)[1] = 15;
+    m_PointsToTransformGroundTruthProtocol.at(80)[2] = -87;  // = 5mm distance to clipping plate + 2mm to base + 80mm depth
+
+    m_PointsToTransformGroundTruthProtocol.at(100)[0] = 130;
+    m_PointsToTransformGroundTruthProtocol.at(100)[1] = 15;
+    m_PointsToTransformGroundTruthProtocol.at(100)[2] = -107;  // = 5mm distance to clipping plate + 2mm to base + 100mm depth
+
+    break;
+    // case 2 is equal to fiducial marker configuration C (20mm distance)
+  case 2:
+    m_PointsToTransformGroundTruthProtocol.at(0)[0] = 135;  // = 20 + 15mm to end of clipping plate + 100 mm to middle axis of measurement plate
+    m_PointsToTransformGroundTruthProtocol.at(0)[1] = 20;
+    m_PointsToTransformGroundTruthProtocol.at(0)[2] = -9;  // = 7mm distance to clipping plate + 2mm to base
+
+    m_PointsToTransformGroundTruthProtocol.at(20)[0] = 135;
+    m_PointsToTransformGroundTruthProtocol.at(20)[1] = 20;
+    m_PointsToTransformGroundTruthProtocol.at(20)[2] = -29;  // = 7mm distance to clipping plate + 2mm to base + 20mm depth
+
+    m_PointsToTransformGroundTruthProtocol.at(40)[0] = 135;
+    m_PointsToTransformGroundTruthProtocol.at(40)[1] = 20;
+    m_PointsToTransformGroundTruthProtocol.at(40)[2] = -49;  // = 7mm distance to clipping plate + 2mm to base + 40mm depth
+
+    m_PointsToTransformGroundTruthProtocol.at(60)[0] = 135;
+    m_PointsToTransformGroundTruthProtocol.at(60)[1] = 20;
+    m_PointsToTransformGroundTruthProtocol.at(60)[2] = -69;  // = 7mm distance to clipping plate + 2mm to base + 60mm depth
+
+    m_PointsToTransformGroundTruthProtocol.at(80)[0] = 135;
+    m_PointsToTransformGroundTruthProtocol.at(80)[1] = 20;
+    m_PointsToTransformGroundTruthProtocol.at(80)[2] = -89;  // = 7mm distance to clipping plate + 2mm to base + 80mm depth
+
+    m_PointsToTransformGroundTruthProtocol.at(100)[0] = 135;
+    m_PointsToTransformGroundTruthProtocol.at(100)[1] = 20;
+    m_PointsToTransformGroundTruthProtocol.at(100)[2] = -109;  // = 7mm distance to clipping plate + 2mm to base + 100mm depth
+    break;
   }
+}
+
+void QmitkUSNavigationStepCtUsRegistration::TransformPointsGroundTruthProtocol()
+{
+  if (m_GroundTruthProtocolTransformedPoints.find(0) == m_GroundTruthProtocolTransformedPoints.end())
+  {
+    mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+    pointSet->InsertPoint(m_TransformMarkerCSToFloatingImageCS->TransformPoint(m_PointsToTransformGroundTruthProtocol.at(0)));
+    m_GroundTruthProtocolTransformedPoints.insert(std::pair<int, mitk::PointSet::Pointer>(0, pointSet));
+  }
+  else
+  {
+    m_GroundTruthProtocolTransformedPoints.at(0)->InsertPoint(m_TransformMarkerCSToFloatingImageCS->TransformPoint(m_PointsToTransformGroundTruthProtocol.at(0)));
+  }
+
+  if (m_GroundTruthProtocolTransformedPoints.find(20) == m_GroundTruthProtocolTransformedPoints.end())
+  {
+    mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+    pointSet->InsertPoint(m_TransformMarkerCSToFloatingImageCS->TransformPoint(m_PointsToTransformGroundTruthProtocol.at(20)));
+    m_GroundTruthProtocolTransformedPoints.insert(std::pair<int, mitk::PointSet::Pointer>(20, pointSet));
+  }
+  else
+  {
+    m_GroundTruthProtocolTransformedPoints.at(20)->InsertPoint(m_TransformMarkerCSToFloatingImageCS->TransformPoint(m_PointsToTransformGroundTruthProtocol.at(20)));
+  }
+
+  if (m_GroundTruthProtocolTransformedPoints.find(40) == m_GroundTruthProtocolTransformedPoints.end())
+  {
+    mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+    pointSet->InsertPoint(m_TransformMarkerCSToFloatingImageCS->TransformPoint(m_PointsToTransformGroundTruthProtocol.at(40)));
+    m_GroundTruthProtocolTransformedPoints.insert(std::pair<int, mitk::PointSet::Pointer>(40, pointSet));
+  }
+  else
+  {
+    m_GroundTruthProtocolTransformedPoints.at(40)->InsertPoint(m_TransformMarkerCSToFloatingImageCS->TransformPoint(m_PointsToTransformGroundTruthProtocol.at(40)));
+  }
+
+  if (m_GroundTruthProtocolTransformedPoints.find(60) == m_GroundTruthProtocolTransformedPoints.end())
+  {
+    mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+    pointSet->InsertPoint(m_TransformMarkerCSToFloatingImageCS->TransformPoint(m_PointsToTransformGroundTruthProtocol.at(60)));
+    m_GroundTruthProtocolTransformedPoints.insert(std::pair<int, mitk::PointSet::Pointer>(60, pointSet));
+  }
+  else
+  {
+    m_GroundTruthProtocolTransformedPoints.at(60)->InsertPoint(m_TransformMarkerCSToFloatingImageCS->TransformPoint(m_PointsToTransformGroundTruthProtocol.at(60)));
+  }
+
+  if (m_GroundTruthProtocolTransformedPoints.find(80) == m_GroundTruthProtocolTransformedPoints.end())
+  {
+    mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+    pointSet->InsertPoint(m_TransformMarkerCSToFloatingImageCS->TransformPoint(m_PointsToTransformGroundTruthProtocol.at(80)));
+    m_GroundTruthProtocolTransformedPoints.insert(std::pair<int, mitk::PointSet::Pointer>(80, pointSet));
+  }
+  else
+  {
+    m_GroundTruthProtocolTransformedPoints.at(80)->InsertPoint(m_TransformMarkerCSToFloatingImageCS->TransformPoint(m_PointsToTransformGroundTruthProtocol.at(80)));
+  }
+
+  if (m_GroundTruthProtocolTransformedPoints.find(100) == m_GroundTruthProtocolTransformedPoints.end())
+  {
+    mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+    pointSet->InsertPoint(m_TransformMarkerCSToFloatingImageCS->TransformPoint(m_PointsToTransformGroundTruthProtocol.at(100)));
+    m_GroundTruthProtocolTransformedPoints.insert(std::pair<int, mitk::PointSet::Pointer>(100, pointSet));
+  }
+  else
+  {
+    m_GroundTruthProtocolTransformedPoints.at(100)->InsertPoint(m_TransformMarkerCSToFloatingImageCS->TransformPoint(m_PointsToTransformGroundTruthProtocol.at(100)));
+  }
+
+}
+
+void QmitkUSNavigationStepCtUsRegistration::AddTransformedPointsToDataStorage()
+{
+  if (m_GroundTruthProtocolTransformedPoints.find(0) == m_GroundTruthProtocolTransformedPoints.end() ||
+      m_GroundTruthProtocolTransformedPoints.find(20) == m_GroundTruthProtocolTransformedPoints.end() ||
+      m_GroundTruthProtocolTransformedPoints.find(40) == m_GroundTruthProtocolTransformedPoints.end() ||
+      m_GroundTruthProtocolTransformedPoints.find(60) == m_GroundTruthProtocolTransformedPoints.end() ||
+      m_GroundTruthProtocolTransformedPoints.find(80) == m_GroundTruthProtocolTransformedPoints.end() ||
+      m_GroundTruthProtocolTransformedPoints.find(100) == m_GroundTruthProtocolTransformedPoints.end())
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Cannot add transformed Points to DataStorage because they do not exist.\
+      Stopping evaluation the protocol.");
+    msgBox.exec();
+    return;
+  }
+
+  std::string nameNode0mm = "GroundTruthProt-Depth0mm";
+  std::string nameNode20mm = "GroundTruthProt-Depth20mm";
+  std::string nameNode40mm = "GroundTruthProt-Depth40mm";
+  std::string nameNode60mm = "GroundTruthProt-Depth60mm";
+  std::string nameNode80mm = "GroundTruthProt-Depth80mm";
+  std::string nameNode100mm = "GroundTruthProt-Depth100mm";
+
+  //Add transformed points of depth 0mm to the data storage
+  mitk::DataNode::Pointer node0mm = this->GetDataStorage()->GetNamedNode(nameNode0mm);
+  if (node0mm.IsNull())
+  {
+    node0mm = mitk::DataNode::New();
+    node0mm->SetName(nameNode0mm);
+    node0mm->SetData(m_GroundTruthProtocolTransformedPoints.at(0));
+    this->GetDataStorage()->Add(node0mm);
+  }
+  else
+  {
+    node0mm->SetData(m_GroundTruthProtocolTransformedPoints.at(0));
+    this->GetDataStorage()->Modified();
+  }
+
+  if(ui->protocolEvaluationTypeComboBox->currentText().compare("PLANE") == 0 )
+  {
+    //Add transformed points of depth 20mm to the data storage
+    mitk::DataNode::Pointer node20mm = this->GetDataStorage()->GetNamedNode(nameNode20mm);
+    if (node20mm.IsNull())
+    {
+      node20mm = mitk::DataNode::New();
+      node20mm->SetName(nameNode20mm);
+      node20mm->SetData(m_GroundTruthProtocolTransformedPoints.at(20));
+      this->GetDataStorage()->Add(node20mm);
+    }
+    else
+    {
+      node20mm->SetData(m_GroundTruthProtocolTransformedPoints.at(20));
+      this->GetDataStorage()->Modified();
+    }
+
+    //Add transformed points of depth 40mm to the data storage
+    mitk::DataNode::Pointer node40mm = this->GetDataStorage()->GetNamedNode(nameNode40mm);
+    if (node40mm.IsNull())
+    {
+      node40mm = mitk::DataNode::New();
+      node40mm->SetName(nameNode40mm);
+      node40mm->SetData(m_GroundTruthProtocolTransformedPoints.at(40));
+      this->GetDataStorage()->Add(node40mm);
+    }
+    else
+    {
+      node40mm->SetData(m_GroundTruthProtocolTransformedPoints.at(40));
+      this->GetDataStorage()->Modified();
+    }
+
+    //Add transformed points of depth 60mm to the data storage
+    mitk::DataNode::Pointer node60mm = this->GetDataStorage()->GetNamedNode(nameNode60mm);
+    if (node60mm.IsNull())
+    {
+      node60mm = mitk::DataNode::New();
+      node60mm->SetName(nameNode60mm);
+      node60mm->SetData(m_GroundTruthProtocolTransformedPoints.at(60));
+      this->GetDataStorage()->Add(node60mm);
+    }
+    else
+    {
+      node60mm->SetData(m_GroundTruthProtocolTransformedPoints.at(60));
+      this->GetDataStorage()->Modified();
+    }
+
+    //Add transformed points of depth 80mm to the data storage
+    mitk::DataNode::Pointer node80mm = this->GetDataStorage()->GetNamedNode(nameNode80mm);
+    if (node80mm.IsNull())
+    {
+      node80mm = mitk::DataNode::New();
+      node80mm->SetName(nameNode80mm);
+      node80mm->SetData(m_GroundTruthProtocolTransformedPoints.at(80));
+      this->GetDataStorage()->Add(node80mm);
+    }
+    else
+    {
+      node80mm->SetData(m_GroundTruthProtocolTransformedPoints.at(80));
+      this->GetDataStorage()->Modified();
+    }
+
+    //Add transformed points of depth 100mm to the data storage
+    mitk::DataNode::Pointer node100mm = this->GetDataStorage()->GetNamedNode(nameNode100mm);
+    if (node100mm.IsNull())
+    {
+      node100mm = mitk::DataNode::New();
+      node100mm->SetName(nameNode100mm);
+      node100mm->SetData(m_GroundTruthProtocolTransformedPoints.at(100));
+      this->GetDataStorage()->Add(node100mm);
+    }
+    else
+    {
+      node100mm->SetData(m_GroundTruthProtocolTransformedPoints.at(100));
+      this->GetDataStorage()->Modified();
+    }
+  }
+  //Do a global reinit
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+}
+
+double QmitkUSNavigationStepCtUsRegistration::CalculateMeanFRE()
+{
+  double meanFRE = 0.0;
+  for (int counter = 0; counter < m_GroundTruthProtocolFRE.size(); ++counter)
+  {
+    meanFRE += m_GroundTruthProtocolFRE[counter];
+  }
+
+  return meanFRE / m_GroundTruthProtocolFRE.size();
+}
+
+double QmitkUSNavigationStepCtUsRegistration::CalculateStandardDeviationOfFRE(double meanFRE)
+{
+  double variance = 0.0;
+
+  for (int counter = 0; counter < m_GroundTruthProtocolFRE.size(); ++counter)
+  {
+    variance += ((meanFRE - m_GroundTruthProtocolFRE[counter]) * (meanFRE - m_GroundTruthProtocolFRE[counter]));
+  }
+  variance /= m_GroundTruthProtocolFRE.size(); // calculate the empirical variance (n) and not the sampling variance (n-1)
+
+  return sqrt(variance);
+}
+
+void QmitkUSNavigationStepCtUsRegistration::CalculateGroundTruthProtocolTRE()
+{
+  if (m_GroundTruthProtocolTransformedPoints.find(0) == m_GroundTruthProtocolTransformedPoints.end() ||
+    m_GroundTruthProtocolTransformedPoints.find(20) == m_GroundTruthProtocolTransformedPoints.end() ||
+    m_GroundTruthProtocolTransformedPoints.find(40) == m_GroundTruthProtocolTransformedPoints.end() ||
+    m_GroundTruthProtocolTransformedPoints.find(60) == m_GroundTruthProtocolTransformedPoints.end() ||
+    m_GroundTruthProtocolTransformedPoints.find(80) == m_GroundTruthProtocolTransformedPoints.end() ||
+    m_GroundTruthProtocolTransformedPoints.find(100) == m_GroundTruthProtocolTransformedPoints.end())
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Cannot calculate TRE of Ground-Truth-Protocol because points were not transformed.");
+    msgBox.exec();
+    return;
+  }
+
+  // clear the std::map containing possibly data of earlier TRE calculations
+  m_GroundTruthProtocolTRE.clear();
+  // loop through all existing point sets containing the transformed points
+  for (int counter = 0;
+       m_GroundTruthProtocolTransformedPoints.find(counter) != m_GroundTruthProtocolTransformedPoints.end();
+       counter += 20)
+  {
+    //calculate the middle point of  the point set
+    mitk::PointSet::Pointer pointSet = m_GroundTruthProtocolTransformedPoints.at(counter);
+    mitk::Point3D middlePoint;
+    middlePoint[0] = 0.0;
+    middlePoint[1] = 0.0;
+    middlePoint[2] = 0.0;
+
+    for (int position = 0; position < pointSet->GetSize(); ++position)
+    {
+      middlePoint[0] += pointSet->GetPoint(position)[0];
+      middlePoint[1] += pointSet->GetPoint(position)[1];
+      middlePoint[2] += pointSet->GetPoint(position)[2];
+    }
+    middlePoint[0] /= pointSet->GetSize();
+    middlePoint[1] /= pointSet->GetSize();
+    middlePoint[2] /= pointSet->GetSize();
+    MITK_INFO << "Calculated MiddlePoint: " << middlePoint;
+
+    //sum up the euclidean distances between the middle point and each transformed point
+    double meanDistance = 0.0;
+    for (int position = 0; position < pointSet->GetSize(); ++position)
+    {
+      meanDistance += middlePoint.SquaredEuclideanDistanceTo(pointSet->GetPoint(position));
+      MITK_INFO << "SquaredEuclideanDistance: " << middlePoint.SquaredEuclideanDistanceTo(pointSet->GetPoint(position));
+    }
+
+    meanDistance /= pointSet->GetSize(); // this can be interpreted as empirical variance
+    // the root of the empirical variance can be interpreted as the protocols registration TRE
+    m_GroundTruthProtocolTRE.insert(std::pair<int, double>(counter, sqrt(meanDistance)));
+    MITK_INFO << "Ground-Truth-Protocol TRE: " << sqrt(meanDistance);
+  }
+
 }
 
 void QmitkUSNavigationStepCtUsRegistration::EliminateTooSmallLabeledObjects(
@@ -1896,6 +2275,9 @@ void QmitkUSNavigationStepCtUsRegistration::OnEvaluateGroundTruthFiducialLocaliz
   }
 
   m_PerformingGroundTruthProtocolEvaluation = true;
+  this->CreatePointsToTransformForGroundTruthProtocol();
+  m_GroundTruthProtocolTransformedPoints.clear();
+
   for (int cycleNo = 0; cycleNo < m_ImagesGroundTruthProtocol.size(); ++cycleNo)
   {
     m_FloatingImage = m_ImagesGroundTruthProtocol.at(cycleNo);
@@ -1903,6 +2285,40 @@ void QmitkUSNavigationStepCtUsRegistration::OnEvaluateGroundTruthFiducialLocaliz
 
     this->OnLocalizeFiducials();
     this->OnRegisterMarkerToFloatingImageCS();
+    this->TransformPointsGroundTruthProtocol();
+  }
+  this->AddTransformedPointsToDataStorage();
+  double meanFRE = this->CalculateMeanFRE();
+  double sdOfFRE = this->CalculateStandardDeviationOfFRE(meanFRE);
+  this->CalculateGroundTruthProtocolTRE();
+
+  ui->meanFREValue->setText(QString("%1").arg(meanFRE));
+  ui->sdFREValue->setText(QString("%1").arg(sdOfFRE));
+  if (ui->protocolEvaluationTypeComboBox->currentText().compare("ANGLE") == 0)
+  {
+    if (m_GroundTruthProtocolTRE.find(0) != m_GroundTruthProtocolTRE.end())
+    {
+      ui->TREValue->setText(QString("%1").arg(m_GroundTruthProtocolTRE.at(0)));
+    }
+  }
+  else if (ui->protocolEvaluationTypeComboBox->currentText().compare("PLANE") == 0)
+  {
+    if (m_GroundTruthProtocolTRE.find(0) != m_GroundTruthProtocolTRE.end() &&
+      m_GroundTruthProtocolTRE.find(20) != m_GroundTruthProtocolTRE.end() &&
+      m_GroundTruthProtocolTRE.find(40) != m_GroundTruthProtocolTRE.end() &&
+      m_GroundTruthProtocolTRE.find(60) != m_GroundTruthProtocolTRE.end() &&
+      m_GroundTruthProtocolTRE.find(80) != m_GroundTruthProtocolTRE.end() &&
+      m_GroundTruthProtocolTRE.find(100) != m_GroundTruthProtocolTRE.end())
+    {
+      ui->TREValue->setText(QString("Depth 0mm: %1\nDepth 20mm: %2\nDepth 40mm: %3\
+                                    \nDepth 60mm: %4\nDepth 80mm: %5\nDepth 100mm: %6")
+                                    .arg(m_GroundTruthProtocolTRE.at(0))
+                                    .arg(m_GroundTruthProtocolTRE.at(20))
+                                    .arg(m_GroundTruthProtocolTRE.at(40))
+                                    .arg(m_GroundTruthProtocolTRE.at(60))
+                                    .arg(m_GroundTruthProtocolTRE.at(80))
+                                    .arg(m_GroundTruthProtocolTRE.at(100)));
+    }
   }
 
   m_PerformingGroundTruthProtocolEvaluation = false;

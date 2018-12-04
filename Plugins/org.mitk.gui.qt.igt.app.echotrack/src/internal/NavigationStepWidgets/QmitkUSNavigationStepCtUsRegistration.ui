@@ -185,7 +185,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox">
+         <widget class="QComboBox" name="protocolEvaluationTypeComboBox">
           <item>
            <property name="text">
             <string>PLANE</string>
@@ -243,7 +243,7 @@
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QLabel" name="sdFREValua">
+         <widget class="QLabel" name="sdFREValue">
           <property name="text">
            <string>0</string>
           </property>

@@ -290,6 +290,14 @@ void QmitkCustomMultiWidget::ForceImmediateUpdateAll()
   }
 }
 
+void QmitkCustomMultiWidget::ActivateAllCrosshairs(bool activate)
+{
+  for (const auto& renderWindowWidget : m_RenderWindowWidgets)
+  {
+    renderWindowWidget.second->ActivateCrosshair(activate);
+  }
+}
+
 const mitk::Point3D QmitkCustomMultiWidget::GetSelectedPosition(const QString& widgetName) const
 {
   /*

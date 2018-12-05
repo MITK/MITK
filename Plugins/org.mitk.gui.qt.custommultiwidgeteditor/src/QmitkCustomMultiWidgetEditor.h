@@ -23,11 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 // custom multi widget editor
 #include <org_mitk_gui_qt_custommultiwidgeteditor_Export.h>
 
+// berry
+#include <berryIPartListener.h>
+
 #include <memory>
 
 class QmitkCustomMultiWidget;
 
-class CUSTOMMULTIWIDGETEDITOR_EXPORT QmitkCustomMultiWidgetEditor final : public QmitkAbstractRenderEditor
+class CUSTOMMULTIWIDGETEDITOR_EXPORT QmitkCustomMultiWidgetEditor final : public QmitkAbstractRenderEditor, public berry::IPartListener
 {
   Q_OBJECT
 
@@ -72,6 +75,19 @@ public:
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
   virtual QStringList GetDecorations() const override;
+  /**
+  * @brief Overridden from berry::IPartListener
+  */
+  berry::IPartListener::Events::Types QmitkCustomMultiWidgetEditor::GetPartEventTypes() const override;
+  /**
+  * @brief Overridden from berry::IPartListener
+  */
+  void PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef) override;
+  /**
+  * @brief Overridden from berry::IPartListener
+  */
+  void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override;
+
   /**
   * @brief Return the current custom multi widget of this editor.
   */

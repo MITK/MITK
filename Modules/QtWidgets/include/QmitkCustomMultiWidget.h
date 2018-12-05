@@ -91,6 +91,7 @@ public:
   void ForceImmediateUpdate(const QString& widgetName);
   void ForceImmediateUpdateAll();
 
+  void ActivateAllCrosshairs(bool activate);
   const mitk::Point3D GetSelectedPosition(const QString& widgetName) const;
 
 public Q_SLOTS:

@@ -44,7 +44,7 @@ void mitk::TrackedUltrasound::GenerateData()
 {
   //Call Update auf US-Device + evtl. auf Tracker (???)
 
-  if (m_UltrasoundDevice->GetIsFreezed()) { return; } //if the image is freezed: do nothing
+  if (this->GetIsFreezed()) { return; } //if the image is freezed: do nothing
 
   //get next image from ultrasound image source
   //FOR LATER: Be aware if the for loop behaves correct, if the UltrasoundDevice has more than 1 output.
@@ -81,4 +81,25 @@ void mitk::TrackedUltrasound::GenerateData()
       //Setze Update auf Displacementfilter ????
     }
   }
+}
+
+void mitk::TrackedUltrasound::OnFreeze(bool freeze)
+{
+  mitk::TrackingDeviceSource::Pointer trackingDeviceSource = dynamic_cast<mitk::TrackingDeviceSource*>(m_TrackingDeviceDataSource.GetPointer());
+  if (trackingDeviceSource.IsNull())
+  {
+    MITK_WARN("TrackedUltrasound")("USDevice") << "Cannot freeze tracking.";
+  }
+  else
+  {
+    if (freeze) { trackingDeviceSource->Freeze(); }
+    else { trackingDeviceSource->UnFreeze(); }
+  }
+
+  if (m_UltrasoundDevice.IsNull())
+  {
+    MITK_ERROR("TrackedUltrasound")("USDevice") << "UltrasoundDevice must not be null.";
+    mitkThrow() << "UltrasoundDevice must not be null.";
+  }
+  m_UltrasoundDevice->SetIsFreezed(freeze);
 }

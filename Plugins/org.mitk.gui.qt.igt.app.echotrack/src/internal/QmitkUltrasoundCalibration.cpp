@@ -1084,7 +1084,7 @@ void QmitkUltrasoundCalibration::ApplyTransformToPointSet(mitk::PointSet::Pointe
 
 void QmitkUltrasoundCalibration::OnFreezeClicked()
 {
-  if (m_CombinedModality->GetUltrasoundDevice()->GetIsFreezed())
+  if (m_CombinedModality->GetIsFreezed())
   {
     if (!m_Timer->isActive()) // Activate Imaging
     {

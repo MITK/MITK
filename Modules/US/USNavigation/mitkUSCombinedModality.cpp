@@ -40,7 +40,7 @@ mitk::USCombinedModality::~USCombinedModality() {}
 
 void mitk::USCombinedModality::GenerateData()
 {
-  if (m_UltrasoundDevice->GetIsFreezed())
+  if (this->GetIsFreezed())
   {
     return;
   } // if the image is freezed: do nothing

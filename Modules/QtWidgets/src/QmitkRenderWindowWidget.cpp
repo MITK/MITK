@@ -147,6 +147,31 @@ bool QmitkRenderWindowWidget::IsRenderWindowMenuActivated() const
   return m_RenderWindow->GetActivateMenuWidgetFlag();
 }
 
+void QmitkRenderWindowWidget::ActivateCrosshair(bool activate)
+{
+  if (nullptr == m_DataStorage)
+  {
+    return;
+  }
+
+  if (activate)
+  {
+    try
+    {
+      m_DataStorage->Add(m_PointSetNode);
+    }
+    catch(std::invalid_argument& /*e*/)
+    {
+      // crosshair already existing
+      return;
+    }
+  }
+  else
+  {
+    m_DataStorage->Remove(m_PointSetNode);
+  }
+}
+
 void QmitkRenderWindowWidget::InitializeGUI()
 {
   m_Layout = new QHBoxLayout(this);

@@ -88,6 +88,8 @@ public:
 
   bool IsRenderWindowMenuActivated() const;
 
+  void ActivateCrosshair(bool activate);
+
 private:
 
   void InitializeGUI();

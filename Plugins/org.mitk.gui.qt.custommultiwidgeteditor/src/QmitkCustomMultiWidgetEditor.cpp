@@ -71,7 +71,7 @@ QmitkCustomMultiWidgetEditor::QmitkCustomMultiWidgetEditor()
 
 QmitkCustomMultiWidgetEditor::~QmitkCustomMultiWidgetEditor()
 {
-  // nothing here
+  GetSite()->GetPage()->RemovePartListener(this);
 }
 
 QmitkRenderWindow* QmitkCustomMultiWidgetEditor::GetActiveQmitkRenderWindow() const
@@ -143,6 +143,27 @@ QStringList QmitkCustomMultiWidgetEditor::GetDecorations() const
   return m_Impl->m_MultiWidgetDecorationManager->GetDecorations();
 }
 
+berry::IPartListener::Events::Types QmitkCustomMultiWidgetEditor::GetPartEventTypes() const
+{
+  return Events::CLOSED | Events::OPENED;
+}
+
+void QmitkCustomMultiWidgetEditor::PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef)
+{
+  if (partRef->GetId() == QmitkCustomMultiWidgetEditor::EDITOR_ID)
+  {
+    m_Impl->m_CustomMultiWidget->ActivateAllCrosshairs(true);
+  }
+}
+
+void QmitkCustomMultiWidgetEditor::PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef)
+{
+  if (partRef->GetId() == QmitkCustomMultiWidgetEditor::EDITOR_ID)
+  {
+    m_Impl->m_CustomMultiWidget->ActivateAllCrosshairs(false);
+  }
+}
+
 QmitkCustomMultiWidget* QmitkCustomMultiWidgetEditor::GetCustomMultiWidget()
 {
   return m_Impl->m_CustomMultiWidget;
@@ -151,6 +172,7 @@ QmitkCustomMultiWidget* QmitkCustomMultiWidgetEditor::GetCustomMultiWidget()
 void QmitkCustomMultiWidgetEditor::OnLayoutSet(int row, int column)
 {
   m_Impl->m_CustomMultiWidget->ResetLayout(row, column);
+  m_Impl->m_CustomMultiWidget->ActivateAllCrosshairs(true);
   FirePropertyChange(berry::IWorkbenchPartConstants::PROP_INPUT);
 }
 
@@ -207,6 +229,8 @@ void QmitkCustomMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::Synchronized, this, &QmitkCustomMultiWidgetEditor::OnSynchronize);
 
     m_Impl->m_MultiWidgetDecorationManager = std::make_unique<QmitkMultiWidgetDecorationManager>(m_Impl->m_CustomMultiWidget);
+
+    GetSite()->GetPage()->AddPartListener(this);
 
     OnPreferencesChanged(preferences);
   }

@@ -1084,32 +1084,18 @@ void QmitkUltrasoundCalibration::ApplyTransformToPointSet(mitk::PointSet::Pointe
 
 void QmitkUltrasoundCalibration::OnFreezeClicked()
 {
+  MITK_INFO << "OnFreezeClicked()";
   if (m_CombinedModality->GetIsFreezed())
   {
-    if (!m_Timer->isActive()) // Activate Imaging
-    {
-      // if (m_Node) m_Node->ReleaseData();
-      if (m_CombinedModality.IsNull()) {
-        m_Timer->stop();
-        return;
-      }
-      m_Timer->start();
-    }  
-    
     //device was already frozen so we need to delete all Spacing points because they need to be collected all at once
     // no need to check if all four points are already collected, because if thats the case you can no longer click the Freeze Button
     m_SpacingPoints->Clear();
     m_Controls.m_SpacingPointsList->clear();
     m_SpacingPointsCount = 0;
     m_Controls.m_SpacingAddPoint->setEnabled(false);
-    m_CombinedModality->SetIsFreezed(false);
-
   }
   else
   {
-    //deactivate Imaging
-    m_Timer->stop();
-    m_CombinedModality->SetIsFreezed(true);
     m_Controls.m_SpacingAddPoint->setEnabled(true);
   }
   SwitchFreeze();

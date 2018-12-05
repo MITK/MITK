@@ -158,7 +158,7 @@ QmitkUSAbstractNavigationStep::FilterVector QmitkUSNavigationStepZoneMarking::Ge
 
 void QmitkUSNavigationStepZoneMarking::OnFreeze(bool freezed)
 {
-  if (freezed) this->GetCombinedModality()->GetUltrasoundDevice()->SetIsFreezed(true);
+  if (freezed) this->GetCombinedModality()->SetIsFreezed(true);
 
   ui->zoneAddingExplanationLabel->setEnabled(freezed);
 
@@ -175,7 +175,7 @@ void QmitkUSNavigationStepZoneMarking::OnFreeze(bool freezed)
     ui->zonesWidget->OnAbortAddingZone();
   }
 
-  if (!freezed) this->GetCombinedModality()->GetUltrasoundDevice()->SetIsFreezed(false);
+  if (!freezed) this->GetCombinedModality()->SetIsFreezed(false);
 }
 
 void QmitkUSNavigationStepZoneMarking::OnZoneAdded()

@@ -80,6 +80,38 @@ mitk::AffineTransform3D::Pointer mitk::AbstractUltrasoundTrackerDevice::GetUSPla
   return mitk::AffineTransform3D::New();
 }
 
+void mitk::AbstractUltrasoundTrackerDevice::SetIsFreezed(bool freeze)
+{
+  if (m_UltrasoundDevice.IsNull() || m_TrackingDeviceDataSource.IsNull())
+  {
+    MITK_WARN << "Combined modality not correctly initialized, aborting!";
+    return;
+  }
+
+  if (!m_UltrasoundDevice->GetIsActive())
+  {
+    MITK_WARN("mitkUSDevice")
+      << "Cannot freeze or unfreeze if device is not active.";
+    return;
+  }
+
+  this->OnFreeze(freeze);
+
+  if (freeze)
+  {
+    m_IsFreezed = true;
+  }
+  else
+  {
+    m_IsFreezed = false;
+  }
+}
+
+bool mitk::AbstractUltrasoundTrackerDevice::GetIsFreezed()
+{
+  return m_IsFreezed;
+}
+
 mitk::AbstractUltrasoundTrackerDevice::~AbstractUltrasoundTrackerDevice()
 {
   if (m_ServiceRegistration != nullptr)

@@ -82,3 +82,24 @@ void mitk::USCombinedModality::GenerateData()
     }
   }
 }
+
+void mitk::USCombinedModality::OnFreeze(bool freeze)
+{
+  mitk::TrackingDeviceSource::Pointer trackingDeviceSource = dynamic_cast<mitk::TrackingDeviceSource*>(m_TrackingDeviceDataSource.GetPointer());
+  if (trackingDeviceSource.IsNull())
+  {
+    MITK_WARN("USCombinedModality")("USDevice") << "Cannot freeze tracking.";
+  }
+  else
+  {
+    if (freeze) { trackingDeviceSource->Freeze(); }
+    else { trackingDeviceSource->UnFreeze(); }
+  }
+
+  if (m_UltrasoundDevice.IsNull())
+  {
+    MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
+    mitkThrow() << "UltrasoundDevice must not be null.";
+  }
+  m_UltrasoundDevice->SetIsFreezed(freeze);
+}

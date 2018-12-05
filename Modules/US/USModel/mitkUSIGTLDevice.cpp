@@ -52,6 +52,13 @@ mitk::USImageSource::Pointer mitk::USIGTLDevice::GetUSImageSource()
   return m_Filter.GetPointer();
 }
 
+void mitk::USIGTLDevice::UnregisterOnService()
+{
+  m_DeviceSource->UnRegisterMicroservice();
+  m_TransformDeviceSource->UnRegisterMicroservice();
+  mitk::USDevice::UnregisterOnService();
+}
+
 bool mitk::USIGTLDevice::OnInitialization() { return true; }
 
 bool mitk::USIGTLDevice::OnConnection() { return m_Device->OpenConnection(); }

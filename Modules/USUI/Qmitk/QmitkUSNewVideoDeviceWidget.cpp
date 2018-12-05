@@ -292,6 +292,9 @@ void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
 
 void QmitkUSNewVideoDeviceWidget::CreateNewDevice()
 {
+
+  //Prevent multiple calls of OnClickedDone()
+  disconnect(m_Controls->m_BtnDone, SIGNAL(clicked()), this, SLOT(OnClickedDone()));
   //Toggle functionality of Btn_Done
   connect(m_Controls->m_BtnDone, SIGNAL(clicked()), this, SLOT(OnClickedDone()));
   m_Controls->m_BtnDone->setText("Add Video Device");

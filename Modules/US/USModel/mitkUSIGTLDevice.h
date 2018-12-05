@@ -49,6 +49,12 @@ namespace mitk
     USIGTLDevice(std::string manufacturer, std::string model, std::string host,
       int port, bool server);
 
+    /**
+    * \brief Remove the IGTLDevice from the micro service.
+    */
+    void UnregisterOnService();
+
+
   protected:
     bool OnInitialization() override;
     bool OnConnection() override;

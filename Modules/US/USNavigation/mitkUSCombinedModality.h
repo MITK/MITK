@@ -66,6 +66,11 @@ namespace mitk {
     */
     void GenerateData() override;
 
+    /**
+    * \brief Freezes or unfreezes the CombinedModality.
+    */
+    void OnFreeze(bool) override;
+
   };
 } // namespace mitk
 

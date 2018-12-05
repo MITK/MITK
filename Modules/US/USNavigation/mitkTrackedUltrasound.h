@@ -62,6 +62,11 @@ namespace mitk {
     */
     void GenerateData() override;
 
+    /**
+    * \brief Freezes or unfreezes the TrackedUltrasound device.
+    */
+    void OnFreeze(bool) override;
+
   };
 } // namespace mitk
 #endif // __mitkTrackedUltrasound_h

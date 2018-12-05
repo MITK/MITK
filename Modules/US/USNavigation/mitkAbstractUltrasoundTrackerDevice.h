@@ -205,6 +205,25 @@ namespace mitk {
     */
     virtual itk::SmartPointer<USControlInterfaceDoppler> GetControlInterfaceDoppler();
 
+    /**
+    * \brief Can toggle if the combined modality is currently updated or freezed.
+    *
+    * \param freeze true to stop updating the ultrasound image and the tracking data, false to start updating again
+    */
+    virtual void SetIsFreezed(bool freeze);
+
+    /**
+    * \return true if device is currently freezed (no image/tracking data update is done), false otherwise
+    */
+    virtual bool GetIsFreezed();
+
+    /**
+    * \brief Called when mitk::AbstractUltrasoundTrackerDevice::SetIsFreezed() is called.
+    * Subclasses can overwrite this method to do additional actions. Default
+    * implementation does noting.
+    */
+    virtual void OnFreeze(bool) { }
+
   protected:
     AbstractUltrasoundTrackerDevice( USDevice::Pointer usDevice,
                                      itk::SmartPointer<NavigationDataSource> trackingDevice,
@@ -249,7 +268,7 @@ namespace mitk {
 
   private:
 
-
+    bool m_IsFreezed;
     bool m_IsTrackedUltrasoundActive;
   };
 

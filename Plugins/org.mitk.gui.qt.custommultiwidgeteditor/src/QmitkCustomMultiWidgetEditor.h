@@ -41,35 +41,35 @@ public:
   ~QmitkCustomMultiWidgetEditor();
 
   /**
-  * @brief Overridden from QmitkAbstractRenderEditor  : IRenderWindowPart
+  * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
   virtual QmitkRenderWindow* GetActiveQmitkRenderWindow() const override;
   /**
-  * @brief Overridden from QmitkAbstractRenderEditor  : IRenderWindowPart
+  * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
   virtual QHash<QString, QmitkRenderWindow*> GetQmitkRenderWindows() const override;
   /**
-  * @brief Overridden from QmitkAbstractRenderEditor  : IRenderWindowPart
+  * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
   virtual QmitkRenderWindow* GetQmitkRenderWindow(const QString& id) const override;
   /**
-  * @brief Overridden from QmitkAbstractRenderEditor  : IRenderWindowPart
+  * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
   virtual mitk::Point3D GetSelectedPosition(const QString& id = QString()) const override;
   /**
-  * @brief Overridden from QmitkAbstractRenderEditor  : IRenderWindowPart
+  * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
   virtual void SetSelectedPosition(const mitk::Point3D& pos, const QString& id = QString()) override;
   /**
-  * @brief Overridden from QmitkAbstractRenderEditor  : IRenderWindowPart
+  * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
   virtual void EnableDecorations(bool enable, const QStringList& decorations = QStringList()) override;
   /**
-  * @brief Overridden from QmitkAbstractRenderEditor  : IRenderWindowPart
+  * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
   virtual bool IsDecorationEnabled(const QString& decoration) const override;
   /**
-  * @brief Overridden from QmitkAbstractRenderEditor  : IRenderWindowPart
+  * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
   virtual QStringList GetDecorations() const override;
   /**

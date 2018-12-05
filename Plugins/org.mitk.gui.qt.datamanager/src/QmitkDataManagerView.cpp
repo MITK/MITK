@@ -44,10 +44,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // beery plugins
 #include <berryAbstractUICTKPlugin.h>
-#include <berryIContributor.h>
-#include <berryIEditorPart.h>
-#include <berryIEditorRegistry.h>
-#include <berryIExtensionRegistry.h>
 #include <berryIPreferencesService.h>
 #include <berryIWorkbenchPage.h>
 #include <berryPlatform.h>
@@ -59,7 +55,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk gui common plugin
 #include <mitkDataNodeObject.h>
-#include <mitkDataStorageEditorInput.h>
 #include <mitkIRenderingManager.h>
 
 // mitk gui qt application plugin
@@ -79,7 +74,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTreeView>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QSignalMapper>
 
 const QString QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
 
@@ -145,21 +139,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_DataNodeContextMenu->SetDataStorage(GetDataStorage());
   m_DataNodeContextMenu->SetSurfaceDecimation(m_SurfaceDecimation);
   connect(m_NodeTreeView, SIGNAL(customContextMenuRequested(const QPoint&)), m_DataNodeContextMenu, SLOT(OnContextMenuRequested(const QPoint&)));
-
-  berry::IEditorRegistry* editorRegistry = berry::PlatformUI::GetWorkbench()->GetEditorRegistry();
-  QList<berry::IEditorDescriptor::Pointer> editors = editorRegistry->GetEditors("*.mitk");
-  if (editors.size() > 1)
-  {
-    m_ShowInMapper = new QSignalMapper(this);
-    foreach(berry::IEditorDescriptor::Pointer descriptor, editors)
-    {
-      QAction* action = new QAction(descriptor->GetLabel(), this);
-      m_ShowInActions << action;
-      m_ShowInMapper->connect(action, SIGNAL(triggered()), m_ShowInMapper, SLOT(map()));
-      m_ShowInMapper->setMapping(action, descriptor->GetId());
-    }
-    connect(m_ShowInMapper, SIGNAL(mapped(QString)), this, SLOT(ShowIn(QString)));
-  }
 
   QGridLayout* dndFrameWidgetLayout = new QGridLayout;
   dndFrameWidgetLayout->addWidget(m_NodeTreeView, 0, 0);
@@ -266,13 +245,6 @@ void QmitkDataManagerView::NodeSelectionChanged(const QItemSelection& /*selected
 void QmitkDataManagerView::OnNodeVisibilityChanged()
 {
   ToggleVisibilityAction::Run(GetSite(), GetDataStorage());
-}
-
-void QmitkDataManagerView::ShowIn(const QString& editorId)
-{
-  berry::IWorkbenchPage::Pointer page = GetSite()->GetPage();
-  berry::IEditorInput::Pointer input(new mitk::DataStorageEditorInput(GetDataStorageReference()));
-  page->OpenEditor(input, editorId, false, berry::IWorkbenchPage::MATCH_ID);
 }
 
 QItemSelectionModel* QmitkDataManagerView::GetDataNodeSelectionModel() const

@@ -38,7 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QAction;
 class QModelIndex;
 class QTreeView;
-class QSignalMapper;
 
 class QmitkDnDFrameWidget;
 class QmitkDataStorageTreeModel;
@@ -80,9 +79,6 @@ public Q_SLOTS:
 
   void OnNodeVisibilityChanged();
 
-  /// Opens the editor with the given id using the current data storage
-  void ShowIn(const QString& editorId);
-
 protected:
 
   void CreateQtPartControl(QWidget* parent) override;
@@ -121,12 +117,6 @@ protected:
   /// \brief flag indicating whether a surface created from a selected decimation is decimated with vtkQuadricDecimation or not
   ///
   bool m_SurfaceDecimation;
-
-  /// Maps "Show in" actions to editor ids
-  QSignalMapper* m_ShowInMapper;
-
-  /// A list of "Show in" actions
-  QList<QAction*> m_ShowInActions;
 
   /// saves the current amount of rows shown in the data manager
   size_t m_CurrentRowCount;

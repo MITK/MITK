@@ -314,14 +314,6 @@ void QmitkDataNodeContextMenu::OnContextMenuRequested(const QPoint& pos)
       }
     }
 
-    /*
-    if (!m_ShowInActions.isEmpty())
-    {
-      QMenu* showInMenu = m_NodeMenu->addMenu(tr("Show In"));
-      showInMenu->addActions(m_ShowInActions);
-    }
-    */
-
     addActions(actions);
     popup(QCursor::pos());
   }

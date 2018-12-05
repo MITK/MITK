@@ -181,7 +181,6 @@ void QmitkRenderWindowWidget::InitializeGUI()
 
   m_PointSet = mitk::PointSet::New();
   m_PointSetNode->SetData(m_PointSet);
-  //m_DataStorage->Add(m_PointSetNode);
 
   // set colors and corner annotation
   InitializeDecorations();

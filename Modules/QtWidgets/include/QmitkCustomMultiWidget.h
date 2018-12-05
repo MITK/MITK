@@ -95,21 +95,7 @@ public:
 
 public Q_SLOTS:
 
-  /**
-  * @brief Listener to the CrosshairPositionEvent
-  *
-  *   Ensures the CrosshairPositionEvent is handled only once and at the end of the Qt-Event loop
-  */
-  void HandleCrosshairPositionEvent();
-  /**
-  * @brief Receives the signal from HandleCrosshairPositionEvent, executes the StatusBar update
-  *
-  */
-  void HandleCrosshairPositionEventDelayed();
-
   void SetSelectedPosition(const QString& widgetName, const mitk::Point3D& newPosition);
-
-  void ResetCrosshair();
 
   // mouse events
   void wheelEvent(QWheelEvent* e) override;
@@ -166,10 +152,6 @@ private:
   std::unique_ptr<mitk::DisplayActionEventHandler> m_DisplayActionEventHandler;
 
   mitk::DataStorage::Pointer m_DataStorage;
-
-  bool m_PendingCrosshairPositionEvent;
-  bool m_CrosshairNavigationEnabled;
-
 };
 
 #endif // QMITKCUSTOMMULTIWIDGET_H

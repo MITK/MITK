@@ -44,8 +44,6 @@
 
 #include <mitkCompositePixelValueToString.h>
 
-#include "mitkDisplayActionEvents.h"
-
 void mitk::DisplayInteractor::Notify(InteractionEvent *interactionEvent, bool isHandled)
 {
   // to use the state machine pattern,
@@ -380,19 +378,6 @@ void mitk::DisplayInteractor::Move(StateMachineAction *, InteractionEvent *inter
 
   sender->GetCameraController()->MoveBy(moveVector);
   sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
-  /*
-  auto renWindows = sender->GetRenderingManager()->GetAllRegisteredRenderWindows();
-
-  for (auto renWin : renWindows)
-  {
-    if (BaseRenderer::GetInstance(renWin)->GetMapperID() == BaseRenderer::Standard2D)
-    {
-      BaseRenderer::GetInstance(renWin)->GetCameraController()->MoveBy(moveVector);
-      BaseRenderer::GetInstance(renWin)->GetRenderingManager()->RequestUpdate(renWin);
-    }
-  }
-  */
-
   m_LastDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
 }
 
@@ -405,8 +390,7 @@ void mitk::DisplayInteractor::SetCrosshair(mitk::StateMachineAction *, mitk::Int
   auto renWindows = sender->GetRenderingManager()->GetAllRegisteredRenderWindows();
   for (auto renWin : renWindows)
   {
-    if (BaseRenderer::GetInstance(renWin)->GetMapperID() == BaseRenderer::Standard2D &&
-      renWin != sender->GetRenderWindow())
+    if (BaseRenderer::GetInstance(renWin)->GetMapperID() == BaseRenderer::Standard2D && renWin != sender->GetRenderWindow())
     {
       BaseRenderer::GetInstance(renWin)->GetSliceNavigationController()->SelectSliceByPoint(pos);
     }
@@ -467,20 +451,6 @@ void mitk::DisplayInteractor::Zoom(StateMachineAction *, InteractionEvent *inter
     const BaseRenderer::Pointer sender = interactionEvent->GetSender();
     sender->GetCameraController()->Zoom(factor, m_StartCoordinateInMM);
     sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
-
-    //InvokeEvent(DisplayZoomEvent(interactionEvent, factor, m_StartCoordinateInMM));
-    /*
-    auto renWindows = sender->GetRenderingManager()->GetAllRegisteredRenderWindows();
-      for (auto renWin : renWindows)
-      {
-        if (BaseRenderer::GetInstance(renWin)->GetMapperID() == BaseRenderer::Standard2D &&
-          renWin != sender->GetRenderWindow())
-        {
-          BaseRenderer::GetInstance(renWin)->GetCameraController()->Zoom(factor, m_StartCoordinateInMM);
-          BaseRenderer::GetInstance(renWin)->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
-        }
-      }
-    */
   }
 }
 
@@ -550,18 +520,6 @@ void mitk::DisplayInteractor::Scroll(StateMachineAction *, InteractionEvent *int
 
     // set the new position
     sliceNaviController->GetSlice()->SetPos(newPos);
-    /*
-    const BaseRenderer::Pointer sender = interactionEvent->GetSender();
-    auto renWindows = sender->GetRenderingManager()->GetAllRegisteredRenderWindows();
-    for (auto renWin : renWindows)
-    {
-      if (BaseRenderer::GetInstance(renWin)->GetMapperID() == BaseRenderer::Standard2D &&
-        renWin != sender->GetRenderWindow())
-      {
-        BaseRenderer::GetInstance(renWin)->GetSliceNavigationController()->GetSlice()->SetPos(newPos);
-      }
-    }
-    */
   }
 }
 

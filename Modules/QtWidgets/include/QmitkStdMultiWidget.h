@@ -81,6 +81,16 @@ public:
 
   QmitkRenderWindow* GetRenderWindow4() const;
 
+  void setShadowWidget1Visible(bool visible) const;
+  void setShadowWidget2Visible(bool visible) const;
+  void setShadowWidget3Visible(bool visible) const;
+  void setShadowWidget4Visible(bool visible) const;
+
+  QWidget* getShadowWidget1() const;
+  QWidget* getShadowWidget2() const;
+  QWidget* getShadowWidget3() const;
+  QWidget* getShadowWidget4() const;
+  
   void setDisplayPositionText(bool draw = true);
 
   /**
@@ -413,6 +423,9 @@ protected:
   QWidget *mitkWidget2Container;
   QWidget *mitkWidget3Container;
   QWidget *mitkWidget4Container;
+
+  QWidget *m_ShadowWidgets[4];
+  mutable bool m_ShadowWidgetVisible[4];
 
   vtkSmartPointer<vtkCornerAnnotation> m_CornerAnnotations[4];
   vtkSmartPointer<vtkMitkRectangleProp> m_RectangleProps[4];

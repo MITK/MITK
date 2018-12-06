@@ -94,7 +94,9 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
   m_displayPatientInfo(true),
   m_displayPatientInfoEx(true),
   m_displayPositionInfo(true),
-  m_Name(name)
+  m_Name(name),
+  m_ShadowWidgets{ nullptr, nullptr, nullptr, nullptr },
+  m_ShadowWidgetVisible{ false, false, false, false }
 {
   /******************************************************
   * Use the global RenderingManager if none was specified
@@ -178,6 +180,23 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
 
   m_SubSplit2->addWidget( mitkWidget3Container );
   m_SubSplit2->addWidget( mitkWidget4Container );
+
+  // Create shadow widgets
+  m_ShadowWidgets[0] = new QWidget(mitkWidget1Container);
+  mitkWidgetLayout1->addWidget(m_ShadowWidgets[0]);
+  m_ShadowWidgets[0]->hide();
+
+  m_ShadowWidgets[1] = new QWidget(mitkWidget2Container);
+  mitkWidgetLayout2->addWidget(m_ShadowWidgets[1]);
+  m_ShadowWidgets[1]->hide();
+
+  m_ShadowWidgets[2] = new QWidget(mitkWidget3Container);
+  mitkWidgetLayout3->addWidget(m_ShadowWidgets[2]);
+  m_ShadowWidgets[2]->hide();
+
+  m_ShadowWidgets[3] = new QWidget(mitkWidget4Container);
+  mitkWidgetLayout4->addWidget(m_ShadowWidgets[3]);
+  m_ShadowWidgets[3]->hide();
 
   //Create RenderWindows 1
   mitkWidget1 = new QmitkRenderWindow(mitkWidget1Container, name + ".widget1", NULL, m_RenderingManager, renderingMode);
@@ -516,10 +535,10 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
   m_MainSplit->show();
 
   //show Widget if hidden
-  if ( mitkWidget1->isHidden() ) mitkWidget1->show();
-  if ( mitkWidget2->isHidden() ) mitkWidget2->show();
-  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
-  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
+  m_ShadowWidgetVisible[0] ? m_ShadowWidgets[0]->show() : mitkWidget1->show();
+  m_ShadowWidgetVisible[1] ? m_ShadowWidgets[1]->show() : mitkWidget2->show();
+  m_ShadowWidgetVisible[2] ? m_ShadowWidgets[2]->show() : mitkWidget3->show();
+  m_ShadowWidgetVisible[3] ? m_ShadowWidgets[3]->show() : mitkWidget4->show();
 
   //Change Layout Name
   m_Layout = LAYOUT_2D_IMAGES_UP;
@@ -585,10 +604,10 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesLeft()
   m_MainSplit->show();
 
   //show Widget if hidden
-  if ( mitkWidget1->isHidden() ) mitkWidget1->show();
-  if ( mitkWidget2->isHidden() ) mitkWidget2->show();
-  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
-  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
+  m_ShadowWidgetVisible[0] ? m_ShadowWidgets[0]->show() : mitkWidget1->show();
+  m_ShadowWidgetVisible[1] ? m_ShadowWidgets[1]->show() : mitkWidget2->show();
+  m_ShadowWidgetVisible[2] ? m_ShadowWidgets[2]->show() : mitkWidget3->show();
+  m_ShadowWidgetVisible[3] ? m_ShadowWidgets[3]->show() : mitkWidget4->show();
 
   //update Layout Name
   m_Layout = LAYOUT_2D_IMAGES_LEFT;
@@ -733,10 +752,10 @@ void QmitkStdMultiWidget::changeLayoutToDefault()
   m_MainSplit->show();
 
   //show Widget if hidden
-  if ( mitkWidget1->isHidden() ) mitkWidget1->show();
-  if ( mitkWidget2->isHidden() ) mitkWidget2->show();
-  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
-  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
+  m_ShadowWidgetVisible[0] ? m_ShadowWidgets[0]->show() : mitkWidget1->show();
+  m_ShadowWidgetVisible[1] ? m_ShadowWidgets[1]->show() : mitkWidget2->show();
+  m_ShadowWidgetVisible[2] ? m_ShadowWidgets[2]->show() : mitkWidget3->show();
+  m_ShadowWidgetVisible[3] ? m_ShadowWidgets[3]->show() : mitkWidget4->show();
 
   m_Layout = LAYOUT_DEFAULT;
 
@@ -779,7 +798,10 @@ void QmitkStdMultiWidget::changeLayoutToBig3D()
   mitkWidget1->hide();
   mitkWidget2->hide();
   mitkWidget3->hide();
-  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
+  m_ShadowWidgets[0]->hide();
+  m_ShadowWidgets[1]->hide();
+  m_ShadowWidgets[2]->hide();
+  m_ShadowWidgetVisible[3] ? m_ShadowWidgets[3]->show() : mitkWidget4->show();
 
   m_Layout = LAYOUT_BIG_3D;
 
@@ -819,10 +841,13 @@ void QmitkStdMultiWidget::changeLayoutToWidget1()
   m_MainSplit->show();
 
   //show/hide Widgets
-  if ( mitkWidget1->isHidden() ) mitkWidget1->show();
+  m_ShadowWidgetVisible[0] ? m_ShadowWidgets[0]->show() : mitkWidget1->show();
   mitkWidget2->hide();
   mitkWidget3->hide();
   mitkWidget4->hide();
+  m_ShadowWidgets[1]->hide();
+  m_ShadowWidgets[2]->hide();
+  m_ShadowWidgets[3]->hide();
 
   m_Layout = LAYOUT_WIDGET1;
 
@@ -862,8 +887,11 @@ void QmitkStdMultiWidget::changeLayoutToWidget2()
   m_MainSplit->show();
 
   //show/hide Widgets
+  m_ShadowWidgetVisible[1] ? m_ShadowWidgets[1]->show() : mitkWidget2->show();
+  m_ShadowWidgets[0]->hide();
+  m_ShadowWidgets[2]->hide();
+  m_ShadowWidgets[3]->hide();
   mitkWidget1->hide();
-  if ( mitkWidget2->isHidden() ) mitkWidget2->show();
   mitkWidget3->hide();
   mitkWidget4->hide();
 
@@ -905,9 +933,12 @@ void QmitkStdMultiWidget::changeLayoutToWidget3()
   m_MainSplit->show();
 
   //show/hide Widgets
+  m_ShadowWidgetVisible[2] ? m_ShadowWidgets[2]->show() : mitkWidget3->show();
+  m_ShadowWidgets[0]->hide();
+  m_ShadowWidgets[1]->hide();
+  m_ShadowWidgets[3]->hide();
   mitkWidget1->hide();
   mitkWidget2->hide();
-  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
   mitkWidget4->hide();
 
   m_Layout = LAYOUT_WIDGET3;
@@ -959,10 +990,12 @@ void QmitkStdMultiWidget::changeLayoutToRowWidget3And4()
   m_MainSplit->show();
 
   //show/hide Widgets
+  m_ShadowWidgetVisible[2] ? m_ShadowWidgets[2]->show() : mitkWidget3->show();
+  m_ShadowWidgetVisible[3] ? m_ShadowWidgets[3]->show() : mitkWidget4->show();
+  m_ShadowWidgets[0]->hide();
+  m_ShadowWidgets[1]->hide();
   mitkWidget1->hide();
   mitkWidget2->hide();
-  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
-  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
 
   m_Layout = LAYOUT_ROW_WIDGET_3_AND_4;
 
@@ -1013,10 +1046,12 @@ void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()
   m_MainSplit->show();
 
   //show/hide Widgets
+  m_ShadowWidgetVisible[2] ? m_ShadowWidgets[2]->show() : mitkWidget3->show();
+  m_ShadowWidgetVisible[3] ? m_ShadowWidgets[3]->show() : mitkWidget4->show();
+  m_ShadowWidgets[0]->hide();
+  m_ShadowWidgets[1]->hide();
   mitkWidget1->hide();
   mitkWidget2->hide();
-  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
-  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
 
   m_Layout = LAYOUT_COLUMN_WIDGET_3_AND_4;
 
@@ -1086,10 +1121,11 @@ void QmitkStdMultiWidget::changeLayoutToSmallUpperWidget2Big3and4()
   m_MainSplit->show();
 
   //show Widget if hidden
+  m_ShadowWidgetVisible[1] ? m_ShadowWidgets[1]->show() : mitkWidget2->show();
+  m_ShadowWidgetVisible[2] ? m_ShadowWidgets[2]->show() : mitkWidget3->show();
+  m_ShadowWidgetVisible[3] ? m_ShadowWidgets[3]->show() : mitkWidget4->show();
+  m_ShadowWidgets[0]->hide();
   mitkWidget1->hide();
-  if ( mitkWidget2->isHidden() ) mitkWidget2->show();
-  if ( mitkWidget3->isHidden() ) mitkWidget3->show();
-  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
 
   m_Layout = LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4;
 
@@ -1146,10 +1182,11 @@ void QmitkStdMultiWidget::changeLayoutTo2x2Dand3DWidget()
   m_MainSplit->show();
 
   //show/hide Widgets
-  if ( mitkWidget1->isHidden() ) mitkWidget1->show();
-  if ( mitkWidget2->isHidden() ) mitkWidget2->show();
+  m_ShadowWidgetVisible[0] ? m_ShadowWidgets[0]->show() : mitkWidget1->show();
+  m_ShadowWidgetVisible[1] ? m_ShadowWidgets[1]->show() : mitkWidget2->show();
+  m_ShadowWidgetVisible[3] ? m_ShadowWidgets[3]->show() : mitkWidget4->show();
+  m_ShadowWidgets[2]->hide();
   mitkWidget3->hide();
-  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
 
   m_Layout = LAYOUT_2X_2D_AND_3D_WIDGET;
 
@@ -1206,10 +1243,11 @@ void QmitkStdMultiWidget::changeLayoutToLeft2Dand3DRight2D()
   m_MainSplit->show();
 
   //show/hide Widgets
-  if ( mitkWidget1->isHidden() ) mitkWidget1->show();
-  if ( mitkWidget2->isHidden() ) mitkWidget2->show();
+  m_ShadowWidgetVisible[0] ? m_ShadowWidgets[0]->show() : mitkWidget1->show();
+  m_ShadowWidgetVisible[1] ? m_ShadowWidgets[1]->show() : mitkWidget2->show();
+  m_ShadowWidgetVisible[3] ? m_ShadowWidgets[3]->show() : mitkWidget4->show();
+  m_ShadowWidgets[2]->hide();
   mitkWidget3->hide();
-  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
 
   m_Layout = LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET;
 
@@ -1271,10 +1309,12 @@ void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
   m_MainSplit->show();
 
   //show/hide Widgets
-  if ( mitkWidget1->isHidden() ) mitkWidget1->show();
+  m_ShadowWidgetVisible[0] ? m_ShadowWidgets[0]->show() : mitkWidget1->show();
+  m_ShadowWidgetVisible[3] ? m_ShadowWidgets[3]->show() : mitkWidget4->show();
+  m_ShadowWidgets[1]->hide();
+  m_ShadowWidgets[2]->hide();
   mitkWidget2->hide();
   mitkWidget3->hide();
-  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
 
   m_Layout = LAYOUT_2D_UP_AND_3D_DOWN;
 
@@ -1325,8 +1365,10 @@ void QmitkStdMultiWidget::changeLayoutToColumnWidget1And2()
   m_MainSplit->show();
 
   //show/hide Widgets
-  if (mitkWidget1->isHidden()) mitkWidget1->show();
-  if (mitkWidget2->isHidden()) mitkWidget2->show();
+  m_ShadowWidgetVisible[2] ? m_ShadowWidgets[2]->show() : mitkWidget3->show();
+  m_ShadowWidgetVisible[3] ? m_ShadowWidgets[3]->show() : mitkWidget4->show();
+  m_ShadowWidgets[0]->hide();
+  m_ShadowWidgets[1]->hide();
   mitkWidget3->hide();
   mitkWidget4->hide();
 
@@ -2410,3 +2452,55 @@ void QmitkStdMultiWidget::UpdateFullSreenMode()
 
   m_RenderingManager->RequestUpdateAll();
 }
+
+void QmitkStdMultiWidget::setShadowWidget1Visible(bool visible) const
+{
+  m_ShadowWidgets[0]->setVisible(visible);
+  mitkWidget1->setVisible(!visible);
+  m_ShadowWidgetVisible[0] = visible;
+}
+
+void QmitkStdMultiWidget::setShadowWidget2Visible(bool visible) const
+{
+  m_ShadowWidgets[1]->setVisible(visible);
+  mitkWidget2->setVisible(!visible);
+  m_ShadowWidgetVisible[1] = visible;
+}
+
+void QmitkStdMultiWidget::setShadowWidget3Visible(bool visible) const
+{
+  m_ShadowWidgets[2]->setVisible(visible);
+  mitkWidget3->setVisible(!visible);
+  m_ShadowWidgetVisible[2] = visible;
+}
+
+void QmitkStdMultiWidget::setShadowWidget4Visible(bool visible) const
+{
+  m_ShadowWidgets[3]->setVisible(visible);
+  mitkWidget4->setVisible(!visible);
+  m_ShadowWidgetVisible[3] = visible;
+}
+
+QWidget* QmitkStdMultiWidget::getShadowWidget1() const
+{
+  return m_ShadowWidgets[0];
+}
+
+QWidget* QmitkStdMultiWidget::getShadowWidget2() const
+{
+  return m_ShadowWidgets[1];
+}
+
+QWidget* QmitkStdMultiWidget::getShadowWidget3() const
+{
+  return m_ShadowWidgets[2];
+}
+
+QWidget* QmitkStdMultiWidget::getShadowWidget4() const
+{
+  return m_ShadowWidgets[3];
+}
+
+
+
+

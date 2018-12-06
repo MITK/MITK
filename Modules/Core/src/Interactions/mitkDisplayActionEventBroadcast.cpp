@@ -444,7 +444,7 @@ bool mitk::DisplayActionEventBroadcast::CheckSwivelPossible(const InteractionEve
   return false;
 }
 
-void mitk::DisplayActionEventBroadcast::Init(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+void mitk::DisplayActionEventBroadcast::Init(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
 {
   const auto* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (nullptr == positionEvent)
@@ -458,7 +458,7 @@ void mitk::DisplayActionEventBroadcast::Init(StateMachineAction* stateMachineAct
   m_LastCoordinateInMM = m_StartCoordinateInMM;
 }
 
-void mitk::DisplayActionEventBroadcast::Move(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+void mitk::DisplayActionEventBroadcast::Move(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
 {
   const auto* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (nullptr == positionEvent)
@@ -483,7 +483,7 @@ void mitk::DisplayActionEventBroadcast::Move(StateMachineAction* stateMachineAct
   InvokeEvent(DisplayMoveEvent(interactionEvent, moveVector));
 }
 
-void mitk::DisplayActionEventBroadcast::SetCrosshair(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+void mitk::DisplayActionEventBroadcast::SetCrosshair(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
 {
   const auto* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (nullptr == positionEvent)
@@ -497,7 +497,7 @@ void mitk::DisplayActionEventBroadcast::SetCrosshair(StateMachineAction* stateMa
   InvokeEvent(DisplaySetCrosshairEvent(interactionEvent, position));
 }
 
-void mitk::DisplayActionEventBroadcast::Zoom(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+void mitk::DisplayActionEventBroadcast::Zoom(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
 {
   const auto* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (nullptr == positionEvent)
@@ -540,7 +540,7 @@ void mitk::DisplayActionEventBroadcast::Zoom(StateMachineAction* stateMachineAct
   InvokeEvent(DisplayZoomEvent(interactionEvent, factor, m_StartCoordinateInMM));
 }
 
-void mitk::DisplayActionEventBroadcast::Scroll(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+void mitk::DisplayActionEventBroadcast::Scroll(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
 {
   const auto* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (nullptr == positionEvent)
@@ -585,7 +585,7 @@ void mitk::DisplayActionEventBroadcast::Scroll(StateMachineAction* stateMachineA
   InvokeEvent(DisplayScrollEvent(interactionEvent, sliceDelta));
 }
 
-void mitk::DisplayActionEventBroadcast::ScrollOneUp(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+void mitk::DisplayActionEventBroadcast::ScrollOneUp(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
 {
   int sliceDelta = 1;
   if (m_InvertScrollDirection)
@@ -597,7 +597,7 @@ void mitk::DisplayActionEventBroadcast::ScrollOneUp(StateMachineAction* stateMac
   InvokeEvent(DisplayScrollEvent(interactionEvent, sliceDelta));
 }
 
-void mitk::DisplayActionEventBroadcast::ScrollOneDown(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+void mitk::DisplayActionEventBroadcast::ScrollOneDown(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
 {
   int sliceDelta = -1;
   if (m_InvertScrollDirection)
@@ -609,7 +609,7 @@ void mitk::DisplayActionEventBroadcast::ScrollOneDown(StateMachineAction* stateM
   InvokeEvent(DisplayScrollEvent(interactionEvent, sliceDelta));
 }
 
-void mitk::DisplayActionEventBroadcast::AdjustLevelWindow(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+void mitk::DisplayActionEventBroadcast::AdjustLevelWindow(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
 {
   const auto* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (nullptr == positionEvent)
@@ -648,27 +648,27 @@ void mitk::DisplayActionEventBroadcast::AdjustLevelWindow(StateMachineAction* st
   InvokeEvent(DisplaySetLevelWindowEvent(interactionEvent, level, window));
 }
 
-void mitk::DisplayActionEventBroadcast::StartRotation(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+void mitk::DisplayActionEventBroadcast::StartRotation(StateMachineAction* /*stateMachineAction*/, InteractionEvent* /*interactionEvent*/)
 {
   // nothing here; no event sent
 }
 
-void mitk::DisplayActionEventBroadcast::EndRotation(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+void mitk::DisplayActionEventBroadcast::EndRotation(StateMachineAction* /*stateMachineAction*/, InteractionEvent* /*interactionEvent*/)
 {
   // nothing here; no event sent
 }
 
-void mitk::DisplayActionEventBroadcast::Rotate(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+void mitk::DisplayActionEventBroadcast::Rotate(StateMachineAction* /*stateMachineAction*/, InteractionEvent* /*interactionEvent*/)
 {  
   // nothing here; no event sent
 }
 
-void mitk::DisplayActionEventBroadcast::Swivel(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+void mitk::DisplayActionEventBroadcast::Swivel(StateMachineAction* /*stateMachineAction*/, InteractionEvent* /*interactionEvent*/)
 {  
   // nothing here; no event sent
 }
 
-void mitk::DisplayActionEventBroadcast::UpdateStatusbar(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+void mitk::DisplayActionEventBroadcast::UpdateStatusbar(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
 {
   const auto* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (nullptr == positionEvent)

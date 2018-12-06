@@ -10,7 +10,7 @@ set(CPP_FILES
 )
 
 set(MOC_H_FILES
-  include/QmitkDataStorageRenderWindowInspector.h.
+  include/QmitkDataStorageRenderWindowInspector.h
   include/QmitkDataStorageRenderWindowListModel.h
 )
 

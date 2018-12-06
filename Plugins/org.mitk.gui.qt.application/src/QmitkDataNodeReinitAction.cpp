@@ -52,7 +52,7 @@ void QmitkDataNodeReinitAction::InitializeAction()
   connect(this, &QmitkDataNodeReinitAction::triggered, this, &QmitkDataNodeReinitAction::OnActionTriggered);
 }
 
-void QmitkDataNodeReinitAction::OnActionTriggered(bool checked)
+void QmitkDataNodeReinitAction::OnActionTriggered(bool /*checked*/)
 {
   if (m_WorkbenchPartSite.Expired())
   {

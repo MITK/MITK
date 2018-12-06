@@ -63,7 +63,7 @@ namespace mitk
     */
     OberserverTagType ConnectDisplayActionEvent(const mitk::DisplayActionEvent& displayActionEvent,
       const mitk::StdFunctionCommand::ActionFunction& actionFunction,
-      const mitk::StdFunctionCommand::FilterFunction& filterFunction = [](const itk::EventObject& eventObject) { return true; });
+      const mitk::StdFunctionCommand::FilterFunction& filterFunction = [](const itk::EventObject&) { return true; });
 
     /**
     * @brief Uses the given observer tag to remove the corresponding custom command as an observer of the observed

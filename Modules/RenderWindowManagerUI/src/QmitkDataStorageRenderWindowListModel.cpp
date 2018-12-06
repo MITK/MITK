@@ -250,7 +250,7 @@ QMimeData* QmitkDataStorageRenderWindowListModel::mimeData(const QModelIndexList
   return mimeData;
 }
 
-bool QmitkDataStorageRenderWindowListModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent)
+bool QmitkDataStorageRenderWindowListModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int /*row*/, int column, const QModelIndex& parent)
 {
   if (m_BaseRenderer.IsExpired())
   {

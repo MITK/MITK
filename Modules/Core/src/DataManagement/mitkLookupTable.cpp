@@ -133,7 +133,7 @@ void mitk::LookupTable::SetType(const mitk::LookupTable::LookupTableType type)
 
 void mitk::LookupTable::SetType(const std::string &typeName)
 {
-  for (int i = 0; i < typenameList.size(); ++i)
+  for (size_t i = 0; i < typenameList.size(); ++i)
   {
     if (typenameList.at(i) == typeName)
     {

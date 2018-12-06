@@ -101,12 +101,12 @@ private:
   mitk::DataStorage* m_DataStorage;
   QmitkRenderWindow* m_RenderWindow;
 
-  mitk::DataNode::Pointer m_PointSetNode;
-  mitk::PointSet::Pointer m_PointSet;
-
   mitk::RenderingManager::Pointer m_RenderingManager;
   mitk::BaseRenderer::RenderingMode::Type m_RenderingMode;
-  mitk::SliceNavigationController *m_TimeNavigationController;
+  mitk::SliceNavigationController* m_TimeNavigationController;
+
+  mitk::DataNode::Pointer m_PointSetNode;
+  mitk::PointSet::Pointer m_PointSet;
 
   std::pair<mitk::Color, mitk::Color> m_GradientBackgroundColors;
   mitk::Color m_DecorationColor;

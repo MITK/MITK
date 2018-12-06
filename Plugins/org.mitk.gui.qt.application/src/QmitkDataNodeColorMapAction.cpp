@@ -111,7 +111,7 @@ void QmitkDataNodeColorMapAction::OnMenuAboutShow()
   }
 }
 
-void QmitkDataNodeColorMapAction::OnActionTriggered(bool checked)
+void QmitkDataNodeColorMapAction::OnActionTriggered(bool /*checked*/)
 {
   auto dataNode = GetSelectedNode();
   if (dataNode.IsNull())

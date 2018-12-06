@@ -292,7 +292,7 @@ void QmitkCustomMultiWidget::ForceImmediateUpdateAll()
   }
 }
 
-const mitk::Point3D QmitkCustomMultiWidget::GetSelectedPosition(const QString& widgetName) const
+const mitk::Point3D QmitkCustomMultiWidget::GetSelectedPosition(const QString& /*widgetName*/) const
 {
   /*
   const mitk::PlaneGeometry *plane1 = mitkWidget1->GetSliceNavigationController()->GetCurrentPlaneGeometry();
@@ -462,7 +462,7 @@ void QmitkCustomMultiWidget::wheelEvent(QWheelEvent* e)
   emit WheelMoved(e);
 }
 
-void QmitkCustomMultiWidget::mousePressEvent(QMouseEvent* e)
+void QmitkCustomMultiWidget::mousePressEvent(QMouseEvent* /*e*/)
 {
 }
 
@@ -500,7 +500,7 @@ void QmitkCustomMultiWidget::InitializeDisplayActionEventHandling()
   Synchronize(true);
 }
 
-void QmitkCustomMultiWidget::CreateRenderWindowWidget(const std::string& cornerAnnotation/* = ""*/)
+void QmitkCustomMultiWidget::CreateRenderWindowWidget(const std::string& /*cornerAnnotation = ""*/)
 {
   // create the render window widget and connect signals / slots
   QString renderWindowWidgetName = GetNameFromIndex(m_RenderWindowWidgets.size());

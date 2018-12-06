@@ -22,9 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNode.h>
 #include <QmitkRenderWindow.h>
 
-// qt
-#include <QGlobal.h>
-
 const std::string QmitkRenderWindowManagerView::VIEW_ID = "org.mitk.views.renderwindowmanager";
 
 void QmitkRenderWindowManagerView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
@@ -76,7 +73,7 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
   //m_DataNodeContextMenu->SetSurfaceDecimation(m_SurfaceDecimation);
 
   // connect objects
-  connect(m_Controls.comboBoxRenderWindowSelection, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged);
+  connect(m_Controls.comboBoxRenderWindowSelection, static_cast<void(QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged), this, &QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged);
   connect(m_InspectorView, &QAbstractItemView::customContextMenuRequested, m_DataNodeContextMenu, &QmitkDataNodeContextMenu::OnContextMenuRequested);
 
   m_RenderWindowPart = GetRenderWindowPart();

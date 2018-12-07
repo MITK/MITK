@@ -94,35 +94,35 @@ namespace mitk {
     * Returns a std::vector of all probes that exist for this USVideoDevice if there were probes set while creating or modifying this USVideoDevice.
     * Otherwise it returns an empty vector. Therefore always check if vector is filled, before using it!
     */
-    std::vector<mitk::USProbe::Pointer> GetAllProbes();
+    virtual std::vector<mitk::USProbe::Pointer> GetAllProbes() override;
 
     /**
     * \brief Cleans the std::vector containing all configured probes.
     */
-    void DeleteAllProbes();
+    virtual void DeleteAllProbes() override;
 
     /**
     * \brief Return current active probe for this USVideoDevice
     * Returns a pointer to the probe that is currently in use. If there were probes set while creating or modifying this USVideoDevice.
     * Returns null otherwise
     */
-    mitk::USProbe::Pointer GetCurrentProbe();
+    virtual mitk::USProbe::Pointer GetCurrentProbe() override;
 
     /**
     \brief adds a new probe to the device
     */
-    void AddNewProbe(mitk::USProbe::Pointer probe);
+    virtual void AddNewProbe(mitk::USProbe::Pointer probe) override;
 
     /**
     * \brief get the probe by its name
     * Returns a  pointer to the probe identified by the given name. If no probe of given name exists for this Device 0 is returned.
     */
-    mitk::USProbe::Pointer GetProbeByName(std::string name);
+    virtual mitk::USProbe::Pointer GetProbeByName(std::string name) override;
 
     /**
     * \brief Removes the Probe with the given name
     */
-    void RemoveProbeByName(std::string name);
+    virtual void RemoveProbeByName(std::string name) override;
 
     /**
     \brief True, if this Device plays back a file, false if it recieves data from a device
@@ -133,12 +133,12 @@ namespace mitk {
     * \brief Sets the first existing probe or the default probe of the video device
     * as the current probe of it.
     */
-    void SetDefaultProbeAsCurrentProbe();
+    virtual  void SetDefaultProbeAsCurrentProbe() override;
 
     /**
     * \brief Sets the probe with the given name as current probe if the named probe exists.
     */
-    void SetCurrentProbe( std::string probename );
+    virtual void SetCurrentProbe( std::string probename ) override;
 
     /**
     * \brief Sets the given spacing of the current depth of the current probe.

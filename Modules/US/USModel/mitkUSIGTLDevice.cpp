@@ -59,6 +59,99 @@ void mitk::USIGTLDevice::UnregisterOnService()
   mitk::USDevice::UnregisterOnService();
 }
 
+std::vector<mitk::USProbe::Pointer> mitk::USIGTLDevice::GetAllProbes()
+{
+  if (m_Probes.empty())
+  {
+    MITK_INFO << "No probes exist for this USVideDevice. Empty vector is returned";
+  }
+  return m_Probes;
+}
+
+void mitk::USIGTLDevice::DeleteAllProbes()
+{
+  m_Probes.clear();
+}
+
+mitk::USProbe::Pointer mitk::USIGTLDevice::GetCurrentProbe()
+{
+  if (m_CurrentProbe.IsNotNull())
+  {
+    return m_CurrentProbe;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+void mitk::USIGTLDevice::AddNewProbe(mitk::USProbe::Pointer probe)
+{
+  m_Probes.push_back(probe);
+}
+
+mitk::USProbe::Pointer mitk::USIGTLDevice::GetProbeByName(std::string name)
+{
+  for (std::vector<mitk::USProbe::Pointer>::iterator it = m_Probes.begin(); it != m_Probes.end(); it++)
+  {
+    if (name.compare((*it)->GetName()) == 0)
+      return (*it);
+  }
+  MITK_INFO << "No probe with given name " << name << " was found.";
+  return nullptr; //no matching probe was found so 0 is returned
+}
+
+void mitk::USIGTLDevice::RemoveProbeByName(std::string name)
+{
+  for (std::vector<mitk::USProbe::Pointer>::iterator it = m_Probes.begin(); it != m_Probes.end(); it++)
+  {
+    if (name.compare((*it)->GetName()) == 0)
+    {
+      m_Probes.erase(it);
+      return;
+    }
+  }
+  MITK_INFO << "No Probe with given name " << name << " was found";
+}
+
+void mitk::USIGTLDevice::SetDefaultProbeAsCurrentProbe()
+{
+  if (m_Probes.size() == 0)
+  {
+    std::string name = "default";
+    mitk::USProbe::Pointer defaultProbe = mitk::USProbe::New(name);
+    m_Probes.push_back(defaultProbe);
+  }
+
+  m_CurrentProbe = m_Probes.at(0);
+  MITK_INFO << "SetDefaultProbeAsCurrentProbe()";
+  this->ProbeChanged(m_CurrentProbe->GetName());
+}
+
+void mitk::USIGTLDevice::SetCurrentProbe(std::string probename)
+{
+  m_CurrentProbe = this->GetProbeByName(probename);
+  MITK_INFO << "SetCurrentProbe() " << probename;
+}
+
+void mitk::USIGTLDevice::SetSpacing(double xSpacing, double ySpacing)
+{
+  mitk::Vector3D spacing;
+  spacing[0] = xSpacing;
+  spacing[1] = ySpacing;
+  spacing[2] = 1;
+  MITK_INFO << "Spacing: " << spacing;
+
+  if (m_CurrentProbe.IsNotNull())
+  {
+    m_CurrentProbe->SetSpacingForGivenDepth(m_CurrentProbe->GetCurrentDepth(), spacing);
+  }
+  else
+  {
+    MITK_WARN << "Cannot set spacing. Current ultrasound probe not set.";
+  }
+}
+
 bool mitk::USIGTLDevice::OnInitialization() { return true; }
 
 bool mitk::USIGTLDevice::OnConnection() { return m_Device->OpenConnection(); }

@@ -102,7 +102,7 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
   m_Active = false;
 
   // Create Device
-  mitk::USVideoDevice::Pointer newDevice;
+  mitk::USDevice::Pointer newDevice;
   if (m_Controls->m_RadioDeviceSource->isChecked())
   {
     newDevice = mitk::USVideoDevice::New(
@@ -125,14 +125,10 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
     int port = m_Controls->m_OIGTLClientPort->value();
 
     // Create a new USIGTLDevice. The last parameter tells the device that it should be a client.
-    mitk::USIGTLDevice::Pointer device =
-      mitk::USIGTLDevice::New(m_Controls->m_Manufacturer->text().toStdString(),
-      m_Controls->m_Model->text().toStdString(), host, port, false);
-    device->Initialize();
-    emit Finished();
-    // The rest of this method does stuff that is specific to USVideoDevices,
-    // which we don't need. So we return directly.
-    return;
+    newDevice = mitk::USIGTLDevice::New(m_Controls->m_Manufacturer->text().toStdString(),
+                m_Controls->m_Model->text().toStdString(), host, port, false);
+    //New behavior at this position: do not return immediately as it was done in earlier MITK-versions
+    // The IGTL Device can have different probe configurations,  as well.
   }
   else
   {
@@ -140,37 +136,33 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
     int port = m_Controls->m_OIGTLServerPort->value();
 
     // Create a new USIGTLDevice. The last parameter tells the device that it should be a server.
-    mitk::USIGTLDevice::Pointer device =
-      mitk::USIGTLDevice::New(m_Controls->m_Manufacturer->text().toStdString(),
-      m_Controls->m_Model->text().toStdString(), host, port, true);
-    device->Initialize();
-    emit Finished();
-    // The rest of this method does stuff that is specific to USVideoDevices,
-    // which we don't need. So we return directly.
-    return;
+    newDevice = mitk::USIGTLDevice::New(m_Controls->m_Manufacturer->text().toStdString(),
+                m_Controls->m_Model->text().toStdString(), host, port, true);
+    //New behavior at this position: do not return immediately as it was done in earlier MITK-versions
+    // The IGTL Device can have different probe configurations,  as well.
   }
 
-  // get USImageVideoSource from new device
+  //At first: only ckeck, whether it is a USImageVideoSource or not (--> if it a IGTL Client)
+  // Later: perhaps it would be helpful, if the IGTLMessageToUSImageFilter have a region of interest, as well.
   mitk::USImageVideoSource::Pointer imageSource =
     dynamic_cast<mitk::USImageVideoSource*>(
-    newDevice->GetUSImageSource().GetPointer());
-  if (!imageSource)
+      newDevice->GetUSImageSource().GetPointer());
+  if (imageSource.IsNotNull())
   {
-    MITK_ERROR << "There is no USImageVideoSource at the current device.";
-    mitkThrow() << "There is no USImageVideoSource at the current device.";
+
+    // Set Video Options
+    imageSource->SetColorOutput(!m_Controls->m_CheckGreyscale->isChecked());
+
+    // If Resolution override is activated, apply it
+    if (m_Controls->m_CheckResolutionOverride->isChecked())
+    {
+      int width = m_Controls->m_ResolutionWidth->value();
+      int height = m_Controls->m_ResolutionHeight->value();
+      imageSource->OverrideResolution(width, height);
+      imageSource->SetResolutionOverride(true);
+    }
   }
 
-  // Set Video Options
-  imageSource->SetColorOutput(!m_Controls->m_CheckGreyscale->isChecked());
-
-  // If Resolution override is activated, apply it
-  if (m_Controls->m_CheckResolutionOverride->isChecked())
-  {
-    int width = m_Controls->m_ResolutionWidth->value();
-    int height = m_Controls->m_ResolutionHeight->value();
-    imageSource->OverrideResolution(width, height);
-    imageSource->SetResolutionOverride(true);
-  }
   if (m_Controls->m_Probes->count() != 0 ) //there are informations about the probes of the device, so create the probes
   {
     this->AddProbesToDevice(newDevice);
@@ -207,25 +199,24 @@ void QmitkUSNewVideoDeviceWidget::OnClickedFinishedEditing()
     m_TargetDevice->AddNewProbe(probe);
   }
 
+  //At first: only ckeck, whether it is a USImageVideoSource or not (--> if it a IGTL Client)
+  // Later: perhaps it would be helpful, if the IGTLMessageToUSImageFilter have a region of interest, as well.
   mitk::USImageVideoSource::Pointer imageSource =
     dynamic_cast<mitk::USImageVideoSource*>(
     m_TargetDevice->GetUSImageSource().GetPointer());
-  if (!imageSource)
+  if (imageSource.IsNotNull())
   {
-    MITK_ERROR << "There is no USImageVideoSource at the current device.";
-    mitkThrow() << "There is no USImageVideoSource at the current device.";
-  }
+    // Set Video Options
+    imageSource->SetColorOutput(!m_Controls->m_CheckGreyscale->isChecked());
 
-  // Set Video Options
-  imageSource->SetColorOutput(!m_Controls->m_CheckGreyscale->isChecked());
-
-  // If Resolution override is activated, apply it
-  if (m_Controls->m_CheckResolutionOverride->isChecked())
-  {
-    int width = m_Controls->m_ResolutionWidth->value();
-    int height = m_Controls->m_ResolutionHeight->value();
-    imageSource->OverrideResolution(width, height);
-    imageSource->SetResolutionOverride(true);
+    // If Resolution override is activated, apply it
+    if (m_Controls->m_CheckResolutionOverride->isChecked())
+    {
+      int width = m_Controls->m_ResolutionWidth->value();
+      int height = m_Controls->m_ResolutionHeight->value();
+      imageSource->OverrideResolution(width, height);
+      imageSource->SetResolutionOverride(true);
+    }
   }
   CleanUpAfterEditingOfDevice();
   MITK_INFO << "Finished Editing";
@@ -275,15 +266,17 @@ void QmitkUSNewVideoDeviceWidget::OnOpenFileButtonClicked()
 
 void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
 {
+  MITK_WARN << "EditDevice() called()";
   // If no VideoDevice is given, throw an exception
-  if (device->GetDeviceClass().compare("org.mitk.modules.us.USVideoDevice") !=
-    0)
+  if (device->GetDeviceClass().compare("org.mitk.modules.us.USVideoDevice") != 0 &&
+      device->GetDeviceClass().compare("IGTL Client") != 0)
   {
     // TODO Alert if bad path
     mitkThrow() << "NewVideoDeviceWidget recieved an incompatible device type "
       "to edit. Type was: " << device->GetDeviceClass();
   }
-  m_TargetDevice = static_cast<mitk::USVideoDevice*>(device.GetPointer());
+
+  m_TargetDevice = device;
   m_Active = true;
   m_ConfigProbes.clear();
   m_ConfigProbes = m_TargetDevice->GetAllProbes();
@@ -745,7 +738,7 @@ void QmitkUSNewVideoDeviceWidget::CleanUpAfterEditingOfDevice()
   m_ConfigProbes.clear();
 }
 
-void QmitkUSNewVideoDeviceWidget::AddProbesToDevice(mitk::USVideoDevice::Pointer device)
+void QmitkUSNewVideoDeviceWidget::AddProbesToDevice(mitk::USDevice::Pointer device)
 {
   device->DeleteAllProbes();
   for( std::vector<mitk::USProbe::Pointer>::iterator it = m_ConfigProbes.begin();

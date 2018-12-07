@@ -154,7 +154,16 @@ void mitk::USIGTLDevice::SetSpacing(double xSpacing, double ySpacing)
 
 bool mitk::USIGTLDevice::OnInitialization() { return true; }
 
-bool mitk::USIGTLDevice::OnConnection() { return m_Device->OpenConnection(); }
+bool mitk::USIGTLDevice::OnConnection()
+{
+  if (m_Device->GetState() == mitk::IGTLDevice::IGTLDeviceState::Running ||
+      m_Device->GetState() == mitk::IGTLDevice::IGTLDeviceState::Ready)
+  {
+    MITK_INFO << "Device is ready or running. So return true";
+    return true;
+  }
+  return m_Device->OpenConnection();
+}
 
 bool mitk::USIGTLDevice::OnDisconnection()
 {
@@ -163,6 +172,11 @@ bool mitk::USIGTLDevice::OnDisconnection()
 
 bool mitk::USIGTLDevice::OnActivation()
 {
+  if (m_Device->GetState() == mitk::IGTLDevice::IGTLDeviceState::Running )
+  {
+    MITK_INFO << "Device is running. So return true";
+    return true;
+  }
   return m_Device->StartCommunication();
 }
 

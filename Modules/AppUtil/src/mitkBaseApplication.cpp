@@ -793,12 +793,17 @@ void BaseApplication::defineOptions(Poco::Util::OptionSet& options)
   splashScreenOption.argument("<filename>").binding(ARG_SPLASH_IMAGE.toStdString());
   options.addOption(splashScreenOption);
 
+  options.addOption(Poco::Util::Option("exit", "exiting after some time"));
+
+  options.addOption(Poco::Util::Option("upgrade", "running Autoplan upgrade"));
+
+  options.addOption(Poco::Util::Option("new-instance", "creating new Autoplan instance"));
+
   Poco::Util::Option xargsOption(ARG_XARGS.toStdString(), "", "Extended argument list");
   xargsOption.argument("<args>").binding(ARG_XARGS.toStdString());
   options.addOption(xargsOption);
 
   Poco::Util::Application::defineOptions(options);
-
 }
 
 QSharedPointer<ctkPluginFramework> BaseApplication::getFramework() const

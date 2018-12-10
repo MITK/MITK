@@ -69,24 +69,25 @@ bool QmitkNodeTableViewKeyFilter::eventFilter(QObject *obj, QEvent *event)
       keySequence = QKeySequence(keyEvent->key());
     }
 
+    const auto& selectedNodes = AbstractDataNodeAction::GetSelectedNodes(dataManagerView->GetSite());
     if (keySequence == makeAllInvisible)
     {
-      HideAllAction::Run(dataStorage);
+      HideAllAction::Run(dataStorage, selectedNodes);
       return true;
     }
     else if (keySequence == deleteSelectedNodes)
     {
-      RemoveAction::Run(dataManagerView->GetSite(), dataStorage);
+      RemoveAction::Run(dataManagerView->GetSite(), dataStorage, selectedNodes);
       return true;
     }
     else if (keySequence == toggleVisibility)
     {
-      ToggleVisibilityAction::Run(dataManagerView->GetSite(), dataStorage);
+      ToggleVisibilityAction::Run(dataManagerView->GetSite(), dataStorage, selectedNodes);
       return true;
     }
     else if (keySequence == reinit)
     {
-      ReinitAction::Run(dataManagerView->GetSite(), dataStorage);
+      ReinitAction::Run(dataManagerView->GetSite(), dataStorage, selectedNodes);
       return true;
     }
     else if (keySequence == globalReinit)
@@ -96,7 +97,7 @@ bool QmitkNodeTableViewKeyFilter::eventFilter(QObject *obj, QEvent *event)
     }
     else if (keySequence == showInfo)
     {
-      ShowDetailsAction::Run(dataManagerView->GetSite());
+      ShowDetailsAction::Run(dataManagerView->GetSite(), selectedNodes);
       return true;
     }
   }

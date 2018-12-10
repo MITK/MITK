@@ -208,11 +208,12 @@ void QmitkDataManagerView::NodeSelectionChanged(const QItemSelection& /*selected
       node->SetSelected(selectedNodes.contains(node));
     }
   }
+  m_DataNodeContextMenu->SetSelectedNodes(selectedNodes);
 }
 
 void QmitkDataManagerView::OnNodeVisibilityChanged()
 {
-  ToggleVisibilityAction::Run(GetSite(), GetDataStorage());
+  ToggleVisibilityAction::Run(GetSite(), GetDataStorage(), GetCurrentSelection());
 }
 
 void QmitkDataManagerView::ShowIn(const QString& editorId)

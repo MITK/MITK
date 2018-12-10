@@ -76,6 +76,11 @@ void QmitkDataNodeContextMenu::SetSurfaceDecimation(bool surfaceDecimation)
   m_SurfaceDecimation = surfaceDecimation;
 }
 
+void QmitkDataNodeContextMenu::SetSelectedNodes(const QList<mitk::DataNode::Pointer>& selectedNodes)
+{
+  m_SelectedNodes = selectedNodes;
+}
+
 void QmitkDataNodeContextMenu::InitNodeDescriptors()
 {
   m_UnknownDataNodeDescriptor = QmitkNodeDescriptorManager::GetInstance()->GetUnknownDataNodeDescriptor();
@@ -268,15 +273,13 @@ void QmitkDataNodeContextMenu::OnContextMenuRequested(const QPoint& /*pos*/)
     return;
   }
 
-  berry::ISelection::ConstPointer selection = m_WorkbenchPartSite.Lock()->GetWorkbenchWindow()->GetSelectionService()->GetSelection();
-  mitk::DataNodeSelection::ConstPointer currentSelection = selection.Cast<const mitk::DataNodeSelection>();
-
-  if (currentSelection.IsNull() || currentSelection->IsEmpty())
+  if (m_SelectedNodes.isEmpty())
   {
-    return;
+    // no selection set - retrieve selection from the workbench selection service
+    m_SelectedNodes = AbstractDataNodeAction::GetSelectedNodes(m_WorkbenchPartSite.Lock());
   }
 
-  m_SelectedNodes = QList<mitk::DataNode::Pointer>::fromStdList(currentSelection->GetSelectedDataNodes());
+  // if either a selection was set or a selection could be retrieved from the workbench selection service
   if (!m_SelectedNodes.isEmpty())
   {
     clear();
@@ -298,8 +301,7 @@ void QmitkDataNodeContextMenu::OnContextMenuRequested(const QPoint& /*pos*/)
       QmitkAbstractDataNodeAction* abstractDataNodeAction = dynamic_cast<QmitkAbstractDataNodeAction*>(action);
       if (nullptr != abstractDataNodeAction)
       {
-        // use the first selected node to initialize the data node actions
-        abstractDataNodeAction->InitializeWithDataNode(m_SelectedNodes.front());
+        abstractDataNodeAction->SetSelectedNodes(m_SelectedNodes);
       }
     }
 

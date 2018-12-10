@@ -28,11 +28,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 // namespace that contains the concrete action
 namespace ToggleVisibilityAction
 {
-  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, QList<mitk::DataNode::Pointer> selectedNodes /* = QList<mitk::DataNode::Pointer>()*/)
+  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, QList<mitk::DataNode::Pointer> selectedNodes)
   {
     if (selectedNodes.empty())
     {
-      selectedNodes = AbstractDataNodeAction::GetSelectedNodes(workbenchPartSite);
+      return;
     }
 
     bool isVisible;
@@ -99,5 +99,6 @@ void QmitkDataNodeToggleVisibilityAction::OnActionTriggered(bool /*checked*/)
     return;
   }
 
-  ToggleVisibilityAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock());
+  auto selectedNodes = GetSelectedNodes();
+  ToggleVisibilityAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock(), selectedNodes);
 }

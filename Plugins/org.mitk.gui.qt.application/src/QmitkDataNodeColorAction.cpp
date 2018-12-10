@@ -82,6 +82,11 @@ void QmitkDataNodeColorAction::OnColorChanged()
   QColor newColor;
 
   auto selectedNodes = GetSelectedNodes();
+  if (selectedNodes.isEmpty())
+  {
+    return;
+  }
+
   for (auto& dataNode : selectedNodes)
   {
     if (dataNode.IsNull())

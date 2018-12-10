@@ -27,14 +27,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 QList<mitk::DataNode::Pointer> AbstractDataNodeAction::GetSelectedNodes(berry::IWorkbenchPartSite::Pointer workbenchPartSite)
 {
   QList<mitk::DataNode::Pointer> selectedNodes;
-  if (nullptr == workbenchPartSite)
+  if (workbenchPartSite.IsNull())
   {
     return selectedNodes;
   }
 
   berry::ISelection::ConstPointer selection = workbenchPartSite->GetWorkbenchWindow()->GetSelectionService()->GetSelection();
   mitk::DataNodeSelection::ConstPointer currentSelection = selection.Cast<const mitk::DataNodeSelection>();
-
   if (currentSelection.IsNull() || currentSelection->IsEmpty())
   {
     return selectedNodes;
@@ -68,14 +67,27 @@ void QmitkAbstractDataNodeAction::SetDataStorage(mitk::DataStorage* dataStorage)
   }
 }
 
+void QmitkAbstractDataNodeAction::SetSelectedNodes(const QList<mitk::DataNode::Pointer>& selectedNodes)
+{
+  m_SelectedNodes = selectedNodes;
+  // use the first selected node to initialize the data node actions
+  InitializeWithDataNode(m_SelectedNodes.front());
+}
+
 QList<mitk::DataNode::Pointer> QmitkAbstractDataNodeAction::GetSelectedNodes() const
 {
-  QList<mitk::DataNode::Pointer> selectedNodes;
-  if (m_WorkbenchPartSite.Expired())
+  if (!m_SelectedNodes.isEmpty())
   {
-    return selectedNodes;
+    return m_SelectedNodes;
   }
 
+  if (m_WorkbenchPartSite.Expired())
+  {
+    // return empty list of selected nodes
+    return m_SelectedNodes;
+  }
+
+  // retrieve selection from the workbench selection service
   return AbstractDataNodeAction::GetSelectedNodes(m_WorkbenchPartSite.Lock());
 }
 

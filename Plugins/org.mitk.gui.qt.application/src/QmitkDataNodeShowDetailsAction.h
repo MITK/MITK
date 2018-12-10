@@ -26,7 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace ShowDetailsAction
 {
-  MITK_QT_APP void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, QWidget* parent = nullptr);
+  MITK_QT_APP void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite,
+                       QList<mitk::DataNode::Pointer> selectedNodes,
+                       QWidget* parent = nullptr);
 }
 
 class MITK_QT_APP QmitkDataNodeShowDetailsAction : public QAction, public QmitkAbstractDataNodeAction

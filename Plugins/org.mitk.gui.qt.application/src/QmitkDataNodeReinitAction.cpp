@@ -29,10 +29,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 // namespace that contains the concrete action
 namespace ReinitAction
 {
-  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage)
+  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, QList<mitk::DataNode::Pointer> selectedNodes)
   {
-    auto renderWindow =
-      mitk::WorkbenchUtil::GetRenderWindowPart(workbenchPartSite->GetPage(), mitk::WorkbenchUtil::NONE);
+    if (selectedNodes.empty())
+    {
+      return;
+    }
+
+    auto renderWindow = mitk::WorkbenchUtil::GetRenderWindowPart(workbenchPartSite->GetPage(), mitk::WorkbenchUtil::NONE);
     if (nullptr == renderWindow)
     {
       renderWindow = mitk::WorkbenchUtil::OpenRenderWindowPart(workbenchPartSite->GetPage(), false);
@@ -43,16 +47,11 @@ namespace ReinitAction
       }
     }
 
-    auto dataNodes = AbstractDataNodeAction::GetSelectedNodes(workbenchPartSite);
-    if (dataNodes.isEmpty())
-    {
-      return;
-    }
 
     auto boundingBoxPredicate = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
 
     mitk::DataStorage::SetOfObjects::Pointer nodes = mitk::DataStorage::SetOfObjects::New();
-    for (const auto &dataNode : dataNodes)
+    for (const auto& dataNode : selectedNodes)
     {
       if (boundingBoxPredicate->CheckNode(dataNode))
       {
@@ -119,5 +118,6 @@ void QmitkDataNodeReinitAction::OnActionTriggered(bool /*checked*/)
     return;
   }
 
-  ReinitAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock());
+  auto selectedNodes = GetSelectedNodes();
+  ReinitAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock(), selectedNodes);
 }

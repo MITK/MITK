@@ -109,7 +109,7 @@ void QmitkDataNodeColorMapAction::OnMenuAboutShow()
 void QmitkDataNodeColorMapAction::OnActionTriggered(bool /*checked*/)
 {
   auto selectedNodes = GetSelectedNodes();
-  for (auto &dataNode : selectedNodes)
+  for (auto& dataNode : selectedNodes)
   {
     if (dataNode.IsNull())
     {

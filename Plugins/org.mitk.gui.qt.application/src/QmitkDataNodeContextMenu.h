@@ -58,6 +58,8 @@ public:
   void SetDataStorage(mitk::DataStorage* dataStorage);
   void SetSurfaceDecimation(bool surfaceDecimation);
 
+  void SetSelectedNodes(const QList<mitk::DataNode::Pointer>& selectedNodes);
+
 public Q_SLOTS:
 
   void OnContextMenuRequested(const QPoint& pos);
@@ -77,7 +79,7 @@ private:
   void AddDescriptorActionList(DescriptorActionListType& descriptorActionList);
 
   QList<QAction*> GetActions(const mitk::DataNode* node);
-  QList<QAction*> GetActions(const QList<mitk::DataNode::Pointer>& nodes);
+  QList<QAction*> GetActions(const QList<mitk::DataNode::Pointer>& selectedNodes);
 
   QWidget* m_Parent;
   berry::IWorkbenchPartSite::WeakPtr m_WorkbenchPartSite;

@@ -21,19 +21,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace HideAllAction
 {
-	void Run(mitk::DataStorage::Pointer dataStorage)
-	{
-		auto nodeset = dataStorage->GetAll();
-		for (auto& node : *nodeset)
-		{
-			if (node.IsNotNull())
-			{
-				node->SetVisibility(false);
-			}
-		}
+  void Run(mitk::DataStorage::Pointer dataStorage, QList<mitk::DataNode::Pointer> selectedNodes)
+  {
+    if (selectedNodes.empty())
+    {
+      return;
+    }
 
-		mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-	}
+    for (auto& node : selectedNodes)
+    {
+      if (node.IsNotNull())
+      {
+        node->SetVisibility(false);
+      }
+    }
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
 QmitkDataNodeHideAllAction::QmitkDataNodeHideAllAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchpartSite)
@@ -69,5 +73,6 @@ void QmitkDataNodeHideAllAction::OnActionTriggered(bool /*checked*/)
     return;
   }
 
-	HideAllAction::Run(m_DataStorage.Lock());
+  auto selectedNodes = GetSelectedNodes();
+  HideAllAction::Run(m_DataStorage.Lock(), selectedNodes);
 }

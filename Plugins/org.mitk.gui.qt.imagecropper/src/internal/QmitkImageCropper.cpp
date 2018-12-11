@@ -221,7 +221,7 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
     m_Controls.groupImageSettings->setEnabled(true);
 
     // get current timestep to support 3d+t images
-    auto renderWindowPart = this->GetRenderWindowPart(OPEN);
+    auto renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN);
     int timeStep = renderWindowPart->GetTimeNavigationController()->GetTime()->GetPos();
     mitk::BaseGeometry::Pointer imageGeometry = static_cast<mitk::BaseGeometry*>(imageNode->GetData()->GetGeometry(timeStep));
 
@@ -421,7 +421,7 @@ void QmitkImageCropper::ProcessImage(bool mask)
   // cropping only possible if valid bounding shape as well as a valid image are loaded
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
 
-  auto renderWindowPart = this->GetRenderWindowPart(OPEN);
+  auto renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN);
   int timeStep = renderWindowPart->GetTimeNavigationController()->GetTime()->GetPos();
 
   if (nodes.empty()) return;

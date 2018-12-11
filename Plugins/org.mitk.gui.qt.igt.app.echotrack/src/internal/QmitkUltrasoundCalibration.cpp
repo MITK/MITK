@@ -367,6 +367,10 @@ void QmitkUltrasoundCalibration::OnStartCalibrationProcess()
 
   this->SwitchFreeze();
 
+  //Trigger the ProbeChanged method for initializing/updating the spacing of the ultrasound image correctly
+  std::string probeName = m_CombinedModality->GetUltrasoundDevice()->GetCurrentProbe()->GetName();
+  m_CombinedModality->GetUltrasoundDevice()->ProbeChanged(probeName);
+
   // Todo: Maybe display this elsewhere
   this->ShowNeedlePath();
 

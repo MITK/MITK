@@ -82,18 +82,20 @@ void QmitkDataStorageRenderWindowInspector::Initialize()
 
 void QmitkDataStorageRenderWindowInspector::SetUpConnections()
 {
-  connect(m_Controls.pushButtonSetAsBaseLayer, SIGNAL(clicked()), this, SLOT(SetAsBaseLayer()));
-  connect(m_Controls.pushButtonResetRenderer, SIGNAL(clicked()), this, SLOT(ResetRenderer()));
-  connect(m_Controls.pushButtonClearRenderer, SIGNAL(clicked()), this, SLOT(ClearRenderer()));
+  connect(m_Controls.pushButtonSetAsBaseLayer, &QPushButton::clicked, this, &QmitkDataStorageRenderWindowInspector::SetAsBaseLayer);
+  connect(m_Controls.pushButtonResetRenderer, &QPushButton::clicked, this, &QmitkDataStorageRenderWindowInspector::ResetRenderer);
 
   QSignalMapper* changeViewDirectionSignalMapper = new QSignalMapper(this);
   changeViewDirectionSignalMapper->setMapping(m_Controls.radioButtonAxial, QString("axial"));
   changeViewDirectionSignalMapper->setMapping(m_Controls.radioButtonCoronal, QString("coronal"));
   changeViewDirectionSignalMapper->setMapping(m_Controls.radioButtonSagittal, QString("sagittal"));
-  connect(changeViewDirectionSignalMapper, SIGNAL(mapped(const QString&)), this, SLOT(ChangeViewDirection(const QString&)));
-  connect(m_Controls.radioButtonAxial, SIGNAL(clicked()), changeViewDirectionSignalMapper, SLOT(map()));
-  connect(m_Controls.radioButtonCoronal, SIGNAL(clicked()), changeViewDirectionSignalMapper, SLOT(map()));
-  connect(m_Controls.radioButtonSagittal, SIGNAL(clicked()), changeViewDirectionSignalMapper, SLOT(map()));
+  changeViewDirectionSignalMapper->setMapping(m_Controls.radioButton3D, QString("3D"));
+  connect(changeViewDirectionSignalMapper, static_cast<void(QSignalMapper::*)(const QString&)>(&QSignalMapper::mapped), this, &QmitkDataStorageRenderWindowInspector::ChangeViewDirection);
+
+  connect(m_Controls.radioButtonAxial, &QPushButton::clicked, changeViewDirectionSignalMapper, static_cast<void(QSignalMapper::*)()>(&QSignalMapper::map));
+  connect(m_Controls.radioButtonCoronal, &QPushButton::clicked, changeViewDirectionSignalMapper, static_cast<void(QSignalMapper::*)()>(&QSignalMapper::map));
+  connect(m_Controls.radioButtonSagittal, &QPushButton::clicked, changeViewDirectionSignalMapper, static_cast<void(QSignalMapper::*)()>(&QSignalMapper::map));
+  connect(m_Controls.radioButton3D, &QPushButton::clicked, changeViewDirectionSignalMapper, static_cast<void(QSignalMapper::*)()>(&QSignalMapper::map));
 }
 
 void QmitkDataStorageRenderWindowInspector::SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer)
@@ -148,12 +150,6 @@ void QmitkDataStorageRenderWindowInspector::SetAsBaseLayer()
 void QmitkDataStorageRenderWindowInspector::ResetRenderer()
 {
   //m_RenderWindowLayerController->ResetRenderer(true, m_StorageModel->GetCurrentRenderer());
-  m_Controls.renderWindowListView->clearSelection();
-}
-
-void QmitkDataStorageRenderWindowInspector::ClearRenderer()
-{
-  //m_RenderWindowLayerController->ResetRenderer(false, m_StorageModel->GetCurrentRenderer());
   m_Controls.renderWindowListView->clearSelection();
 }
 

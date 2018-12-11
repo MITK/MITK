@@ -74,6 +74,15 @@ void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(const
       sliceNavigationController->SetDefaultViewDirection(ViewDirection::Sagittal);
     }
 
+    if ("3D" == viewDirection)
+    {
+      renderer->SetMapperID(mitk::BaseRenderer::Standard3D);
+    }
+    else
+    {
+      renderer->SetMapperID(mitk::BaseRenderer::Standard2D);
+
+    }
     // initialize the views to the bounding geometry
     InitializeViewByBoundingObjects(renderer);
   }

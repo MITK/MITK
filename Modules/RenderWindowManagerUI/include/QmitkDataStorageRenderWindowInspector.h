@@ -77,7 +77,6 @@ private Q_SLOTS:
   void SetAsBaseLayer();
 
   void ResetRenderer();
-  void ClearRenderer();
 
   void ChangeViewDirection(const QString& viewDirection);
 

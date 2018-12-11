@@ -45,7 +45,7 @@ namespace mitk {
     * \brief Writes the configuration settings of an ultrasound device to a xml-file.
     * \param config The struct containing all information of the ultrasound device.
     */
-    bool WriteUltrasoundVideoDeviceConfiguration(mitk::USDeviceReaderXML::USDeviceConfigData &config);
+    bool WriteUltrasoundDeviceConfiguration(mitk::USDeviceReaderXML::USDeviceConfigData &config);
 
   protected:
     USDeviceWriterXML(const USDeviceWriterXML& other);

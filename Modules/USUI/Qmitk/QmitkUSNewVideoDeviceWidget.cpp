@@ -483,9 +483,9 @@ void QmitkUSNewVideoDeviceWidget::OnSaveButtonClicked()
   deviceWriter.SetFilename(fileName.toStdString());
 
   mitk::USDeviceReaderXML::USDeviceConfigData config;
-  this->CollectUltrasoundVideoDeviceConfigInformation(config);
+  this->CollectUltrasoundDeviceConfigInformation(config);
 
-  if (!deviceWriter.WriteUltrasoundVideoDeviceConfiguration(config))
+  if (!deviceWriter.WriteUltrasoundDeviceConfiguration(config))
   {
     QMessageBox msgBox;
     msgBox.setText("Error when writing the configuration to the selected file. Could not write device information.");
@@ -808,20 +808,38 @@ mitk::USProbe::Pointer QmitkUSNewVideoDeviceWidget::CheckIfProbeExistsAlready(co
   return nullptr; //no matching probe was found so nullptr is returned
 }
 
-void QmitkUSNewVideoDeviceWidget::CollectUltrasoundVideoDeviceConfigInformation(mitk::USDeviceReaderXML::USDeviceConfigData &config)
+void QmitkUSNewVideoDeviceWidget::CollectUltrasoundDeviceConfigInformation(mitk::USDeviceReaderXML::USDeviceConfigData &config)
 {
   config.fileversion = 1.0;
-  config.deviceType = "video";
+  if (m_Controls->m_RadioDeviceSource->isChecked() || m_Controls->m_RadioFileSource->isChecked())
+  {
+    //Fill info about video source:
+    config.deviceType = "video";
+    config.sourceID = m_Controls->m_DeviceSelector->value();
+    config.filepathVideoSource = m_Controls->m_FilePathSelector->text().toStdString();
+  }
+  else
+  {
+    config.deviceType = "oigtl";
+    if (m_Controls->m_RadioOIGTLServerSource->isChecked())
+    {
+      config.server = true;
+      config.host = m_Controls->m_OIGTLServerHost->text().toStdString();
+      config.port = m_Controls->m_OIGTLServerPort->value();
+    }
+    else
+    {
+      config.server = false;
+      config.host = m_Controls->m_OIGTLClientHost->text().toStdString();
+      config.port = m_Controls->m_OIGTLClientPort->value();
+    }
+  }
 
   //Fill info in metadata groupbox:
   config.deviceName = m_Controls->m_DeviceName->text().toStdString();
   config.manufacturer = m_Controls->m_Manufacturer->text().toStdString();
   config.model = m_Controls->m_Model->text().toStdString();
   config.comment = m_Controls->m_Comment->text().toStdString();
-
-  //Fill info about video source:
-  config.sourceID = m_Controls->m_DeviceSelector->value();
-  config.filepathVideoSource = m_Controls->m_FilePathSelector->text().toStdString();
 
   //Fill video options:
   config.useGreyscale = m_Controls->m_CheckGreyscale->isChecked();

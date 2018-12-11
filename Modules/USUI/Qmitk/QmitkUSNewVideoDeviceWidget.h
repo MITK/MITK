@@ -137,7 +137,7 @@ protected:
 
   mitk::USProbe::Pointer CheckIfProbeExistsAlready(const std::string &probe);
 
-  void CollectUltrasoundVideoDeviceConfigInformation(mitk::USDeviceReaderXML::USDeviceConfigData &config);
+  void CollectUltrasoundDeviceConfigInformation(mitk::USDeviceReaderXML::USDeviceConfigData &config);
 
   /**
   * \brief Enables or disables the GUI elements of the spacing and cropping options.

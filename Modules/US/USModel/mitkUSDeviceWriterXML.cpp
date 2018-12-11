@@ -61,7 +61,7 @@ void mitk::USDeviceWriterXML::SetFilename(std::string filename)
   m_Filename = filename;
 }
 
-bool mitk::USDeviceWriterXML::WriteUltrasoundVideoDeviceConfiguration(mitk::USDeviceReaderXML::USDeviceConfigData & config)
+bool mitk::USDeviceWriterXML::WriteUltrasoundDeviceConfiguration(mitk::USDeviceReaderXML::USDeviceConfigData & config)
 {
   TiXmlDocument document;
   TiXmlDeclaration* xmlDeclaration = new TiXmlDeclaration("1.0", "", "");
@@ -94,6 +94,14 @@ void mitk::USDeviceWriterXML::CreateXmlInformationOfUltrasoundDeviceTag(
   ultrasoundDeviceTag->SetAttribute(ATTR_MODEL, config.model);
   ultrasoundDeviceTag->SetAttribute(ATTR_COMMENT, config.comment);
   ultrasoundDeviceTag->SetAttribute(ATTR_IMAGESTREAMS, config.numberOfImageStreams);
+
+  if (config.deviceType.compare("oigtl") == 0)
+  {
+    ultrasoundDeviceTag->SetAttribute(ATTR_HOST, config.host);
+    ultrasoundDeviceTag->SetAttribute(ATTR_PORT, config.port);
+    std::string value = config.server ? "true" : "false";
+    ultrasoundDeviceTag->SetAttribute(ATTR_SERVER, value);
+  }
 
   document.LinkEndChild(ultrasoundDeviceTag);
 }

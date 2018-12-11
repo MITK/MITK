@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace ShowDetailsAction
 {
-  void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, QList<mitk::DataNode::Pointer> selectedNodes, QWidget* parent /* = nullptr*/)
+  void Run(QList<mitk::DataNode::Pointer> selectedNodes, QWidget* parent /* = nullptr*/)
   {
     if (selectedNodes.empty())
     {
@@ -63,11 +63,6 @@ void QmitkDataNodeShowDetailsAction::InitializeAction()
 
 void QmitkDataNodeShowDetailsAction::OnActionTriggered(bool /*checked*/)
 {
-  if (m_WorkbenchPartSite.Expired())
-  {
-    return;
-  }
-
   auto selectedNodes = GetSelectedNodes();
-  ShowDetailsAction::Run(m_WorkbenchPartSite.Lock(), selectedNodes, m_Parent);
+  ShowDetailsAction::Run(selectedNodes, m_Parent);
 }

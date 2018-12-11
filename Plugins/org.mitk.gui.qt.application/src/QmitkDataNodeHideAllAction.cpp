@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace HideAllAction
 {
-  void Run(mitk::DataStorage::Pointer dataStorage, QList<mitk::DataNode::Pointer> selectedNodes)
+  void Run(QList<mitk::DataNode::Pointer> selectedNodes)
   {
     if (selectedNodes.empty())
     {
@@ -68,11 +68,6 @@ void QmitkDataNodeHideAllAction::InitializeAction()
 
 void QmitkDataNodeHideAllAction::OnActionTriggered(bool /*checked*/)
 {
-  if (m_DataStorage.IsExpired())
-  {
-    return;
-  }
-
   auto selectedNodes = GetSelectedNodes();
-  HideAllAction::Run(m_DataStorage.Lock(), selectedNodes);
+  HideAllAction::Run(selectedNodes);
 }

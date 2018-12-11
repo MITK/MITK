@@ -482,7 +482,7 @@ void QmitkUSNewVideoDeviceWidget::OnSaveButtonClicked()
   mitk::USDeviceWriterXML deviceWriter;
   deviceWriter.SetFilename(fileName.toStdString());
 
-  mitk::USDeviceReaderXML::USVideoDeviceConfigData config;
+  mitk::USDeviceReaderXML::USDeviceConfigData config;
   this->CollectUltrasoundVideoDeviceConfigInformation(config);
 
   if (!deviceWriter.WriteUltrasoundVideoDeviceConfiguration(config))
@@ -512,7 +512,7 @@ void QmitkUSNewVideoDeviceWidget::OnLoadConfigurationButtonClicked()
     msgBox.exec();
     return;
   }
-  mitk::USDeviceReaderXML::USVideoDeviceConfigData config = deviceReader.GetUSVideoDeviceConfigData();
+  mitk::USDeviceReaderXML::USDeviceConfigData config = deviceReader.GetUSDeviceConfigData();
 
   if( config.fileversion == 1.0 )
   {
@@ -551,6 +551,52 @@ void QmitkUSNewVideoDeviceWidget::OnLoadConfigurationButtonClicked()
       }
       this->OnProbeChanged(m_Controls->m_Probes->currentText());
 
+    }
+    else if (config.deviceType.compare("oigtl") == 0)
+    {
+      //Fill info in metadata groupbox:
+      m_Controls->m_DeviceName->setText(QString::fromStdString(config.deviceName));
+      m_Controls->m_Manufacturer->setText(QString::fromStdString(config.manufacturer));
+      m_Controls->m_Model->setText(QString::fromStdString(config.model));
+      m_Controls->m_Comment->setText(QString::fromStdString(config.comment));
+
+      //Fill info about OpenIGTLink video source:
+      if (config.server)
+      {
+        m_Controls->m_RadioOIGTLServerSource->setChecked(true);
+        m_Controls->m_OIGTLServerHost->setText(QString::fromStdString(config.host));
+        m_Controls->m_OIGTLServerPort->setValue(config.port);
+      }
+      else
+      {
+        m_Controls->m_RadioOIGTLClientSource->setChecked(true);
+        m_Controls->m_OIGTLClientHost->setText(QString::fromStdString(config.host));
+        m_Controls->m_OIGTLClientPort->setValue(config.port);
+      }
+      this->OnDeviceTypeSelection();
+
+      //Fill video options:
+      m_Controls->m_CheckGreyscale->setChecked(config.useGreyscale);
+
+      //Fill override options:
+      m_Controls->m_CheckResolutionOverride->setChecked(config.useResolutionOverride);
+      m_Controls->m_ResolutionWidth->setValue(config.resolutionWidth);
+      m_Controls->m_ResolutionHeight->setValue(config.resolutionHeight);
+
+      //Fill information about probes:
+      m_ConfigProbes.clear();
+      m_ConfigProbes = config.probes;
+
+      m_Controls->m_Probes->clear();
+      m_Controls->m_ProbeNameLineEdit->clear();
+      m_Controls->m_AddDepths->clear();
+      m_Controls->m_Depths->clear();
+
+      for (size_t index = 0; index < m_ConfigProbes.size(); ++index)
+      {
+        m_Controls->m_Probes->addItem(QString::fromStdString(config.probes.at(index)->GetName()));
+      }
+      this->OnProbeChanged(m_Controls->m_Probes->currentText());
     }
     else
     {
@@ -762,7 +808,7 @@ mitk::USProbe::Pointer QmitkUSNewVideoDeviceWidget::CheckIfProbeExistsAlready(co
   return nullptr; //no matching probe was found so nullptr is returned
 }
 
-void QmitkUSNewVideoDeviceWidget::CollectUltrasoundVideoDeviceConfigInformation(mitk::USDeviceReaderXML::USVideoDeviceConfigData &config)
+void QmitkUSNewVideoDeviceWidget::CollectUltrasoundVideoDeviceConfigInformation(mitk::USDeviceReaderXML::USDeviceConfigData &config)
 {
   config.fileversion = 1.0;
   config.deviceType = "video";

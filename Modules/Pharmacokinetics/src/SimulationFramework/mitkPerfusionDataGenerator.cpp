@@ -39,7 +39,7 @@ void
 }
 
 template <typename TPixel, unsigned int VDim>
-void  mitk::PerfusionDataGenerator::DoGenerateData(itk::Image<TPixel, VDim>* image)
+void  mitk::PerfusionDataGenerator::DoGenerateData(itk::Image<TPixel, VDim>*)
 {
     typedef itk::Image<TPixel, VDim> InputFrameImageType;
     typedef itk::Image<ScalarType, VDim> OutputImageType;
@@ -82,7 +82,9 @@ void  mitk::PerfusionDataGenerator::DoGenerateData(itk::Image<TPixel, VDim>* ima
     {
       mitk::Image::Pointer frameImage = mitk::ImportItkImage(filter->GetOutput(i))->Clone();
 
-      dynamicImage->SetVolume(frameImage->GetVolumeData()->GetData(),i);
+      
+      mitk::ImageReadAccessor readAccess(frameImage, frameImage->GetVolumeData());
+      dynamicImage->SetVolume(readAccess.GetData(),i);
 
       auto currentTimePoint =  m_Grid[i];
       auto nextTimePoint =  m_Grid[i];

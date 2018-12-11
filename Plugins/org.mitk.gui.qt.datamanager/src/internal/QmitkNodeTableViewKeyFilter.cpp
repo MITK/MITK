@@ -72,7 +72,7 @@ bool QmitkNodeTableViewKeyFilter::eventFilter(QObject *obj, QEvent *event)
     const auto& selectedNodes = AbstractDataNodeAction::GetSelectedNodes(dataManagerView->GetSite());
     if (keySequence == makeAllInvisible)
     {
-      HideAllAction::Run(dataStorage, selectedNodes);
+      HideAllAction::Run(selectedNodes);
       return true;
     }
     else if (keySequence == deleteSelectedNodes)
@@ -97,7 +97,7 @@ bool QmitkNodeTableViewKeyFilter::eventFilter(QObject *obj, QEvent *event)
     }
     else if (keySequence == showInfo)
     {
-      ShowDetailsAction::Run(dataManagerView->GetSite(), selectedNodes);
+      ShowDetailsAction::Run(selectedNodes);
       return true;
     }
   }

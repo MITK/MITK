@@ -26,8 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace HideAllAction
 {
-  MITK_QT_APP void Run(mitk::DataStorage::Pointer dataStorage,
-                       QList<mitk::DataNode::Pointer> selectedNodes);
+  MITK_QT_APP void Run(QList<mitk::DataNode::Pointer> selectedNodes);
 }
 
 class MITK_QT_APP QmitkDataNodeHideAllAction : public QAction, public QmitkAbstractDataNodeAction

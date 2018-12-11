@@ -56,6 +56,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSliceNavigationController.h"
 #include "mitkPlanarFigure.h"
+#include <mitkWorkbenchUtil.h>
 
 QmitkScreenshotMaker::QmitkScreenshotMaker(QObject *parent, const char * /*name*/)
   : QmitkAbstractView(),
@@ -96,7 +97,7 @@ void QmitkScreenshotMaker::GenerateScreenshot()
     if (fileName.size()>0)
         m_LastFile = fileName;
 
-    auto renderWindowPart = this->GetRenderWindowPart(OPEN);
+    auto renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN);
 
     mitk::BaseRenderer* renderer = renderWindowPart->GetActiveQmitkRenderWindow()->GetRenderer();
     renderer = nullptr; // WORKAROUND FOR T23702
@@ -124,7 +125,7 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
     }
 
     //emit StartBlockControls();
-    auto renderWindowPart = this->GetRenderWindowPart(OPEN);
+    auto renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN);
     renderWindowPart->EnableDecorations(false, QStringList{mitk::IRenderWindowPart::DECORATION_CORNER_ANNOTATION});
 
     QString fileName = "/axial.png";
@@ -278,7 +279,7 @@ void QmitkScreenshotMaker::GenerateHR3DAtlasScreenshots(QString fileName, QStrin
 
 vtkCamera* QmitkScreenshotMaker::GetCam()
 {
-    mitk::BaseRenderer* renderer = this->GetRenderWindowPart(OPEN)->GetQmitkRenderWindow("3d")->GetRenderer();
+    mitk::BaseRenderer* renderer = this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN)->GetQmitkRenderWindow("3d")->GetRenderer();
     vtkCamera* cam = 0;
     const mitk::VtkPropRenderer *propRenderer = dynamic_cast<const mitk::VtkPropRenderer * >( renderer );
     if (propRenderer)

@@ -389,6 +389,19 @@ void QmitkUltrasoundSupport::CreateControlWidgets()
   if (pluginContext)
   {
     std::string filter = "(org.mitk.services.UltrasoundCustomWidget.deviceClass=" + m_Device->GetDeviceClass() + ")";
+    //Hint: The following three lines are a workaround. Till now the only US video device was an USVideoDevice.
+    // And everything worked fine. However, the ultrasound image source can be an USIGTLDevice (IGTL Client), as well.
+    // This second option wasn't considered yet. So, the custom control widget will work correctly only, if
+    // the filter declares the device class as org.mitk.modules.us.USVideoDevice. Another option, how to deal with
+    // the two possible ultrasound image devices would be to change the returned string of the method
+    // std::string QmitkUSControlsCustomVideoDeviceWidget::GetDeviceClass(), which always returns the string
+    // org.mitk.modules.us.USVideoDevice of the USVideoDevice class. If there is a possility to change the
+    // returned string dynamically between "IGTL Client" and "org.mitk.modules.us.USVideoDevice" the following
+    // three lines will not be needed.
+    if (m_Device->GetDeviceClass().compare("IGTL Client") == 0)
+    {
+      filter = "(org.mitk.services.UltrasoundCustomWidget.deviceClass=" + mitk::USVideoDevice::GetDeviceClassStatic() + ")";
+    }
 
     QString interfaceName = QString::fromStdString(us_service_interface_iid<QmitkUSAbstractCustomWidget>());
     m_CustomWidgetServiceReference = pluginContext->getServiceReferences(interfaceName, QString::fromStdString(filter));

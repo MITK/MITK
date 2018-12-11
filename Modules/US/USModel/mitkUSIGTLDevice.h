@@ -26,9 +26,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIGTL2DImageDeviceSource.h>
 #include <mitkIGTLTrackingDataDeviceSource.h>
 #include <mitkIGTLMessageToUSImageFilter.h>
+#include <mitkUSVideoDeviceCustomControls.h>
+
+
+namespace itk {
+  template<class T> class SmartPointer;
+}
 
 namespace mitk
 {
+  class USVideoDeviceCustomControls;
+  class USAbstractControlInterface;
   /**
   * \brief A mitk::USIGTLDevice is a USDevice to receive images over an OpenIGTLink
   * connection. It registers an OIGTL device as a Microservice to receive image messages
@@ -49,6 +57,14 @@ namespace mitk
 
     USIGTLDevice(std::string manufacturer, std::string model, std::string host,
       int port, bool server);
+
+    /**
+    * Getter for the custom control interface which was created during the
+    * construction process of mitk::USIGTLDevice.
+    *
+    * \return custom control interface of the video device
+    */
+    itk::SmartPointer<USAbstractControlInterface> GetControlInterfaceCustom() override;
 
     /**
     * \brief Remove the IGTLDevice from the micro service.
@@ -115,6 +131,12 @@ namespace mitk
     bool OnActivation() override;
     bool OnDeactivation() override;
 
+    /**
+    * \brief Grabs the next frame from the Video input.
+    * This method is called internally, whenever Update() is invoked by an Output.
+    */
+    virtual void GenerateData() override;
+
   private:
     std::string m_Host;
     int m_Port;
@@ -122,6 +144,11 @@ namespace mitk
     mitk::IGTL2DImageDeviceSource::Pointer m_DeviceSource;
     mitk::IGTLTrackingDataDeviceSource::Pointer m_TransformDeviceSource;
     mitk::IGTLMessageToUSImageFilter::Pointer m_Filter;
+
+    /**
+    * \brief custom control interface for us video device
+    */
+    itk::SmartPointer<USVideoDeviceCustomControls> m_ControlInterfaceCustom;
 
     /**
     * \brief probes for this USVideoDevice

@@ -20,6 +20,7 @@ mitk::USIGTLDevice::USIGTLDevice(std::string manufacturer, std::string model,
   std::string host, int port, bool server)
   : mitk::USDevice(manufacturer, model), m_Host(host), m_Port(port)
 {
+  m_ControlInterfaceCustom = mitk::USVideoDeviceCustomControls::New(this);
   if (server)
   {
     m_Device = mitk::IGTLServer::New(true);
@@ -50,6 +51,11 @@ std::string mitk::USIGTLDevice::GetDeviceClass() { return "IGTL Client"; }
 mitk::USImageSource::Pointer mitk::USIGTLDevice::GetUSImageSource()
 {
   return m_Filter.GetPointer();
+}
+
+mitk::USAbstractControlInterface::Pointer mitk::USIGTLDevice::GetControlInterfaceCustom()
+{
+  return m_ControlInterfaceCustom.GetPointer();
 }
 
 void mitk::USIGTLDevice::UnregisterOnService()
@@ -154,7 +160,16 @@ void mitk::USIGTLDevice::SetSpacing(double xSpacing, double ySpacing)
 
 bool mitk::USIGTLDevice::OnInitialization() { return true; }
 
-bool mitk::USIGTLDevice::OnConnection() { return m_Device->OpenConnection(); }
+bool mitk::USIGTLDevice::OnConnection()
+{
+  if (m_Device->GetState() == mitk::IGTLDevice::IGTLDeviceState::Running ||
+      m_Device->GetState() == mitk::IGTLDevice::IGTLDeviceState::Ready)
+  {
+    MITK_INFO << "Device is ready or running. So return true";
+    return true;
+  }
+  return m_Device->OpenConnection();
+}
 
 bool mitk::USIGTLDevice::OnDisconnection()
 {
@@ -163,10 +178,34 @@ bool mitk::USIGTLDevice::OnDisconnection()
 
 bool mitk::USIGTLDevice::OnActivation()
 {
+  if (m_Device->GetState() == mitk::IGTLDevice::IGTLDeviceState::Running )
+  {
+    MITK_INFO << "Device is running. So return true";
+    return true;
+  }
   return m_Device->StartCommunication();
 }
 
 bool mitk::USIGTLDevice::OnDeactivation()
 {
   return m_Device->StopCommunication();
+}
+
+void mitk::USIGTLDevice::GenerateData()
+{
+  Superclass::GenerateData();
+  if (m_ImageVector.size() == 0 || this->GetNumberOfIndexedOutputs() == 0)
+  {
+    return;
+  }
+
+  m_ImageMutex->Lock();
+  auto& image = m_ImageVector[0];
+  if (image.IsNotNull() && image->IsInitialized() && m_CurrentProbe.IsNotNull())
+  {
+    //MITK_INFO << "Spacing CurrentProbe: " << m_CurrentProbe->GetSpacingForGivenDepth(m_CurrentProbe->GetCurrentDepth());
+    image->GetGeometry()->SetSpacing(m_CurrentProbe->GetSpacingForGivenDepth(m_CurrentProbe->GetCurrentDepth()));
+    this->GetOutput(0)->SetGeometry(image->GetGeometry());
+  }
+  m_ImageMutex->Unlock();
 }

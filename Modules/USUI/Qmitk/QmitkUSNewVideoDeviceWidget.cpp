@@ -266,7 +266,6 @@ void QmitkUSNewVideoDeviceWidget::OnOpenFileButtonClicked()
 
 void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
 {
-  MITK_WARN << "EditDevice() called()";
   // If no VideoDevice is given, throw an exception
   if (device->GetDeviceClass().compare("org.mitk.modules.us.USVideoDevice") != 0 &&
       device->GetDeviceClass().compare("IGTL Client") != 0)

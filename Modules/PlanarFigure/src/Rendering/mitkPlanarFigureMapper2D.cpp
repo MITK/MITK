@@ -863,9 +863,6 @@ void mitk::PlanarFigureMapper2D::RenderLines(const PlanarFigureDisplayMode lineD
     const float *color = m_OutlineColor[lineDisplayMode];
     const float opacity = m_OutlineOpacity[lineDisplayMode];
 
-    // convert to a float array that also contains opacity, faster GL
-    std::array<float, 4> colorVector = {{ color[0], color[1], color[2], opacity }};
-
     // set the color and opacity here as it is common for all outlines
 
     this->m_Context->GetPen()->SetColorF((double)color[0], (double)color[1], (double)color[2], opacity);
@@ -898,9 +895,6 @@ void mitk::PlanarFigureMapper2D::RenderLines(const PlanarFigureDisplayMode lineD
     float shadowOpacity = 0.0f;
     if (opacity > 0.2f)
       shadowOpacity = opacity - 0.2f;
-
-    // convert to a float array that also contains opacity, faster GL
-    std::array<float, 4> shadow = {{ 0.0f, 0.0f, 0.0f, shadowOpacity }};
 
     // set the color and opacity here as it is common for all shadows
     this->m_Context->GetPen()->SetColorF(0, 0, 0, shadowOpacity);

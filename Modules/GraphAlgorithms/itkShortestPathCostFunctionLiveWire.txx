@@ -33,13 +33,8 @@ namespace itk
 {
   // Constructor
   template <class TInputImageType>
-  ShortestPathCostFunctionLiveWire<TInputImageType>::ShortestPathCostFunctionLiveWire()
+  ShortestPathCostFunctionLiveWire<TInputImageType>::ShortestPathCostFunctionLiveWire(): m_MinCosts(0.0), m_UseRepulsivePoints(false), m_GradientMax(0.0), m_Initialized(false),  m_UseCostMap(false), m_MaxMapCosts(-1.0)
   {
-    m_UseRepulsivePoints = false;
-    m_GradientMax = 0.0;
-    m_Initialized = false;
-    m_UseCostMap = false;
-    m_MaxMapCosts = -1.0;
   }
 
   template <class TInputImageType>

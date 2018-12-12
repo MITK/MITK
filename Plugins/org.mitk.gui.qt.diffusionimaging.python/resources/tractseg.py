@@ -3,7 +3,7 @@ del error_string
 try:
     import nibabel as nib
     import numpy as np
-    from tractseg.TractSeg import run_tractseg
+    from tractseg.python_api import run_tractseg
 
     data = sitk.GetArrayFromImage(in_image)
     data = np.nan_to_num(data)
@@ -17,7 +17,7 @@ try:
     print('get_probs', get_probs)
     print('dropout_sampling', dropout_sampling)
     print('threshold', threshold)
-    seg = run_tractseg(data=data, output_type=output_type, input_type="peaks", verbose=verbose, get_probs=get_probs, dropout_sampling=dropout_sampling, threshold=threshold)
+    seg = run_tractseg(data=data, output_type=output_type, input_type="peaks", verbose=verbose, get_probs=get_probs, dropout_sampling=dropout_sampling, threshold=threshold, postprocess=True)
 
     if swapaxes:
         seg = np.swapaxes(seg, 0, 2)

@@ -134,7 +134,7 @@ namespace itk
     UnsignedCharImageType::Pointer m_MaskImage;
     VectorOutputImageType::Pointer m_GradientImage;
 
-    double minCosts;
+    double m_MinCosts;
 
     bool m_UseRepulsivePoints;
 

@@ -297,7 +297,7 @@ namespace itk
   template <class TInputImageType>
   double ShortestPathCostFunctionLiveWire<TInputImageType>::GetMinCost()
   {
-    return minCosts;
+    return m_MinCosts;
   }
 
   template <class TInputImageType>
@@ -373,7 +373,7 @@ namespace itk
       m_EdgeImage = cannyEdgeDetectionfilter->GetOutput();
 
       // set minCosts
-      minCosts = 0.0; // The lower, the more thouroughly! 0 = dijkstra. If estimate costs are lower than actual costs
+      m_MinCosts = 0.0; // The lower, the more thouroughly! 0 = dijkstra. If estimate costs are lower than actual costs
                       // everything is fine. If estimation is higher than actual costs, you might not get the shortest
                       // but a different path.
 

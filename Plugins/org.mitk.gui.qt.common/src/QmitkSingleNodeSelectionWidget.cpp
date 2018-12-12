@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "QmitkSingleNodeSelectionWidget.h"
 
 #include <berryQtStyleManager.h>
@@ -23,7 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkNodeSelectionDialog.h"
 #include "QmitkNodeDetailsDialog.h"
 
-QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent) : QmitkAbstractNodeSelectionWidget(parent)
+QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent)
+  : QmitkAbstractNodeSelectionWidget(parent)
 {
   m_Controls.setupUi(this);
 
@@ -80,14 +80,14 @@ QmitkSingleNodeSelectionWidget::NodeList QmitkSingleNodeSelectionWidget::Compile
   return result;
 }
 
-void QmitkSingleNodeSelectionWidget::OnNodePredicateChanged(mitk::NodePredicateBase* /*newPredicate*/)
+void QmitkSingleNodeSelectionWidget::OnNodePredicateChanged()
 {
   m_SelectedNode = this->ExtractCurrentValidSelection(m_ExternalSelection);
-};
+}
 
 void QmitkSingleNodeSelectionWidget::OnDataStorageChanged()
 {
-};
+}
 
 void QmitkSingleNodeSelectionWidget::OnClearSelection()
 {
@@ -103,7 +103,7 @@ void QmitkSingleNodeSelectionWidget::OnClearSelection()
 mitk::DataNode::Pointer QmitkSingleNodeSelectionWidget::GetSelectedNode() const
 {
   return m_SelectedNode;
-};
+}
 
 bool QmitkSingleNodeSelectionWidget::eventFilter(QObject *obj, QEvent *ev)
 {
@@ -181,7 +181,7 @@ void QmitkSingleNodeSelectionWidget::EditSelection()
   m_Controls.btnSelect->setChecked(false);
 
   delete dialog;
-};
+}
 
 void QmitkSingleNodeSelectionWidget::UpdateInfo()
 {
@@ -203,7 +203,7 @@ void QmitkSingleNodeSelectionWidget::UpdateInfo()
   }
 
   m_Controls.btnSelect->SetSelectedNode(m_SelectedNode);
-};
+}
 
 void QmitkSingleNodeSelectionWidget::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes)
 {
@@ -218,7 +218,7 @@ void QmitkSingleNodeSelectionWidget::SetSelectOnlyVisibleNodes(bool selectOnlyVi
     emit CurrentSelectionChanged(newEmission);
     this->UpdateInfo();
   }
-};
+}
 
 void QmitkSingleNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)
 {
@@ -234,4 +234,4 @@ void QmitkSingleNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)
     emit CurrentSelectionChanged(newEmission);
     this->UpdateInfo();
   }
-};
+}

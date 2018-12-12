@@ -14,23 +14,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QMITK_NODE_SELECTION_BUTTON_H
 #define QMITK_NODE_SELECTION_BUTTON_H
 
-#include <mitkWeakPointer.h>
-#include <mitkDataNode.h>
-
 #include "org_mitk_gui_qt_common_Export.h"
 
-#include "QPushButton"
-#include "QPixmap"
+// mitk core
+#include <mitkDataNode.h>
 
+// qt
+#include <QPushButton>
+#include <QPixmap>
 
-/** Button class that can be used to display informations about a passed node.
- * If the passed node is a null ptr the node info text will be shown.
- * In difference to the normal push button text property. The node info can
- * be formated text (e.g. HTML code; like the tooltip text).*/
+/**
+* @class QmitkNodeSelectionButton
+* @brief Button class that can be used to display informations about a given node.
+*        If the given node is a nullptr the node info text will be shown.
+*        The node info can be formated text (e.g. HTML code; like the tooltip text).
+*/
 class MITK_QT_COMMON QmitkNodeSelectionButton : public QPushButton
 {
   Q_OBJECT
@@ -41,7 +42,7 @@ public:
 
   mitk::DataNode::Pointer GetSelectedNode() const;
 
-public Q_SLOTS :
+public Q_SLOTS:
   virtual void SetSelectedNode(mitk::DataNode* node);
   virtual void SetNodeInfo(QString info);
 
@@ -50,9 +51,8 @@ protected:
 
   mitk::DataNode::Pointer m_SelectedNode;
   QString m_Info;
-  bool m_OutDatedThumpNail;
-  QPixmap m_ThumpNail;
+  bool m_OutdatedThumbnail;
+  QPixmap m_Thumbnail;
 };
 
-
-#endif // QmitkSingleNodeSelectionWidget_H
+#endif // QMITK_NODE_SELECTION_BUTTON_H

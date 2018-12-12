@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QMITK_SINGLE_NODE_SELECTION_WIDGET_H
 #define QMITK_SINGLE_NODE_SELECTION_WIDGET_H
 
@@ -32,9 +31,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QmitkAbstractDataStorageModel;
 
 /**
-* \class QmitkSingleNodeSelectionWidget
-* \brief Widget that represents a node selection. It acts like a button. Clicking on it
-* allows to change the selection.
+* @class QmitkSingleNodeSelectionWidget
+* @brief Widget that represents a node selection. It acts like a button. Clicking on it
+*        allows to change the selection.
 */
 class MITK_QT_COMMON QmitkSingleNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget
 {
@@ -63,7 +62,7 @@ protected:
   void EditSelection();
   virtual void UpdateInfo() override;
 
-  virtual void OnNodePredicateChanged(mitk::NodePredicateBase* newPredicate) override;
+  virtual void OnNodePredicateChanged() override;
   virtual void OnDataStorageChanged() override;
 
 
@@ -73,4 +72,4 @@ protected:
   Ui_QmitkSingleNodeSelectionWidget m_Controls;
 };
 
-#endif // QmitkSingleNodeSelectionWidget_H
+#endif // QMITK_SINGLE_NODE_SELECTION_WIDGET_H

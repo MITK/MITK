@@ -27,7 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkDataStorageListModel::QmitkDataStorageListModel(mitk::DataStorage *dataStorage,
                                                      mitk::NodePredicateBase::Pointer pred,
                                                      QObject *parent)
-  : QAbstractListModel(parent), m_NodePredicate(nullptr), m_DataStorage(nullptr), m_BlockEvents(false)
+  : QAbstractListModel(parent)
+  , m_NodePredicate(nullptr)
+  , m_DataStorage(nullptr)
+  , m_BlockEvents(false)
 {
   this->SetPredicate(pred);
   this->SetDataStorage(dataStorage);

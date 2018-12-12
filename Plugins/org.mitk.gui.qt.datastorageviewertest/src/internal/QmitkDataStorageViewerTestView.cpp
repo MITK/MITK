@@ -233,7 +233,7 @@ void QmitkDataStorageViewerTestView::OnOnlyImages(bool checked)
   {
     m_Controls.singleSlot->SetNodePredicate(nullptr);
   }
-};
+}
 
 void QmitkDataStorageViewerTestView::OnOnlyImages2(bool checked)
 {
@@ -275,4 +275,4 @@ void QmitkDataStorageViewerTestView::OnOnlyUneven(bool checked)
 
     m_Controls.multiSlot->SetSelectionCheckFunction(checkFunction);
   }
-};
+}

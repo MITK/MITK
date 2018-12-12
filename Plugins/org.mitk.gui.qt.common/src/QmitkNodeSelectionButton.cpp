@@ -14,29 +14,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "QmitkNodeSelectionButton.h"
-
-// berry includes
-#include <berryWorkbenchPlugin.h>
-#include <berryQtStyleManager.h>
-
-#include "QPainter"
-#include "QTextDocument"
-
-#include <mitkDataNode.h>
-#include <QmitkNodeDescriptorManager.h>
 
 // mitk core
 #include <mitkBaseRenderer.h>
-#include <mitkDataNode.h>
 #include <mitkExtractSliceFilter.h>
 #include <vtkMitkLevelWindowFilter.h>
 #include <mitkPlanarFigure.h>
 #include <mitkPropertyNameHelper.h>
 
+// mitk qt widgets module
+#include <QmitkNodeDescriptorManager.h>
+
+// berry includes
+#include <berryWorkbenchPlugin.h>
+#include <berryQtStyleManager.h>
+
 // vtk
 #include <vtkLookupTable.h>
+
+// qt
+#include <QPainter>
+#include <QTextDocument>
 
 QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
 {
@@ -99,8 +98,10 @@ QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
 }
 
 QmitkNodeSelectionButton::QmitkNodeSelectionButton(QWidget *parent)
-  : QPushButton(parent), m_OutDatedThumpNail(true)
-{ }
+  : QPushButton(parent)
+  , m_OutdatedThumbnail(true)
+{
+}
 
 QmitkNodeSelectionButton::~QmitkNodeSelectionButton()
 {
@@ -117,17 +118,17 @@ void QmitkNodeSelectionButton::SetSelectedNode(mitk::DataNode* node)
   if (m_SelectedNode != node)
   {
     this->m_SelectedNode = node;
-    this->m_OutDatedThumpNail = true;
+    this->m_OutdatedThumbnail = true;
   }
 
   this->update();
-};
+}
 
 void QmitkNodeSelectionButton::SetNodeInfo(QString info)
 {
   this->m_Info = info;
   this->update();
-};
+}
 
 void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
 {
@@ -155,13 +156,13 @@ void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
     auto iconLength = widgetSize.height() - 10;
     auto node = this->m_SelectedNode;
 
-    if (this->m_OutDatedThumpNail)
+    if (this->m_OutdatedThumbnail)
     {
-      this->m_ThumpNail = GetPixmapFromImageNode(node, iconLength);
-      this->m_OutDatedThumpNail = false;
+      this->m_Thumbnail = GetPixmapFromImageNode(node, iconLength);
+      this->m_OutdatedThumbnail = false;
     }
 
-    painter.drawPixmap(origin, m_ThumpNail);
+    painter.drawPixmap(origin, m_Thumbnail);
     origin.setX(origin.x() + iconLength + 5);
 
     td.setHtml(QString::fromStdString("<font class=\"normal\">"+node->GetName()+"</font>"));
@@ -177,5 +178,4 @@ void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
 
   painter.translate(origin);
   td.drawContents(&painter);
-
 }

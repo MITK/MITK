@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "QmitkMultiNodeSelectionWidget.h"
 
 #include <algorithm>
@@ -23,7 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkCustomVariants.h"
 #include "internal/QmitkNodeSelectionListItemWidget.h"
 
-QmitkMultiNodeSelectionWidget::QmitkMultiNodeSelectionWidget(QWidget* parent) : QmitkAbstractNodeSelectionWidget(parent)
+QmitkMultiNodeSelectionWidget::QmitkMultiNodeSelectionWidget(QWidget* parent)
+  : QmitkAbstractNodeSelectionWidget(parent)
 {
   m_Controls.setupUi(this);
   m_Overlay = new QmitkSimpleTextOverlayWidget(m_Controls.list);
@@ -63,22 +63,20 @@ QmitkMultiNodeSelectionWidget::NodeList QmitkMultiNodeSelectionWidget::CompileEm
   return result;
 }
 
-void QmitkMultiNodeSelectionWidget::OnNodePredicateChanged(mitk::NodePredicateBase* /*newPredicate*/)
+void QmitkMultiNodeSelectionWidget::OnNodePredicateChanged()
 {
-  this->UpdateInfo();
   this->UpdateList();
-};
+}
 
 void QmitkMultiNodeSelectionWidget::OnDataStorageChanged()
 {
-  this->UpdateInfo();
   this->UpdateList();
-};
+}
 
 QmitkMultiNodeSelectionWidget::NodeList QmitkMultiNodeSelectionWidget::GetSelectedNodes() const
 {
   return m_CurrentSelection;
-};
+}
 
 void QmitkMultiNodeSelectionWidget::SetSelectionCheckFunction(const SelectionCheckFunctionType &checkFunction)
 {
@@ -93,7 +91,7 @@ void QmitkMultiNodeSelectionWidget::SetSelectionCheckFunction(const SelectionChe
   }
   m_CheckResponse = newCheckResponse;
   this->UpdateInfo();
-};
+}
 
 void QmitkMultiNodeSelectionWidget::OnEditSelection()
 {
@@ -129,7 +127,7 @@ void QmitkMultiNodeSelectionWidget::OnEditSelection()
   m_Controls.btnChange->setChecked(false);
 
   delete dialog;
-};
+}
 
 void QmitkMultiNodeSelectionWidget::UpdateInfo()
 {
@@ -160,7 +158,7 @@ void QmitkMultiNodeSelectionWidget::UpdateInfo()
     auto widget = qobject_cast<QmitkNodeSelectionListItemWidget*>(m_Controls.list->itemWidget(item));
     widget->SetClearAllowed(m_IsOptional || m_CurrentSelection.size() > 1);
   }
-};
+}
 
 void QmitkMultiNodeSelectionWidget::UpdateList()
 {
@@ -185,7 +183,7 @@ void QmitkMultiNodeSelectionWidget::UpdateList()
       m_Controls.list->setItemWidget(newItem, widget);
     }
   }
-};
+}
 
 void QmitkMultiNodeSelectionWidget::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes)
 {
@@ -205,7 +203,7 @@ void QmitkMultiNodeSelectionWidget::SetSelectOnlyVisibleNodes(bool selectOnlyVis
     this->UpdateList();
     this->UpdateInfo();
   }
-};
+}
 
 void QmitkMultiNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)
 {
@@ -225,7 +223,7 @@ void QmitkMultiNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)
     }
     this->UpdateInfo();
   }
-};
+}
 
 void QmitkMultiNodeSelectionWidget::OnClearSelection(mitk::DataNode* node)
 {
@@ -241,4 +239,4 @@ void QmitkMultiNodeSelectionWidget::OnClearSelection(mitk::DataNode* node)
     emit CurrentSelectionChanged(newEmission);
   }
   this->UpdateInfo();
-};
+}

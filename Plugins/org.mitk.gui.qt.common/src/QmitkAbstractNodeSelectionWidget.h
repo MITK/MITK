@@ -14,16 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QMITK_ABSTRACT_NODE_SELECTION_WIDGET_H
 #define QMITK_ABSTRACT_NODE_SELECTION_WIDGET_H
 
+#include "org_mitk_gui_qt_common_Export.h"
+
+// mitk core
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
 
-#include "org_mitk_gui_qt_common_Export.h"
-
+// qt
 #include <QWidget>
 
 class QmitkAbstractDataStorageModel;
@@ -41,7 +42,7 @@ public:
   explicit QmitkAbstractNodeSelectionWidget(QWidget* parent = nullptr);
 
   /**
-  * @brief Sets the data storage that will be used /monitored by widget.
+  * @brief Sets the data storage that will be used / monitored by widget.
   *
   * @par dataStorage      A pointer to the data storage to set.
   */
@@ -69,72 +70,67 @@ public:
   using NodeList = QList<mitk::DataNode::Pointer>;
 
 Q_SIGNALS:
-  /*
+  /**
   * @brief A signal that will be emitted if the selected node has changed.
   *
   * @par	nodes		A list of data nodes that are newly selected.
   */
-  void CurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+  void CurrentSelectionChanged(NodeList nodes);
 
 public Q_SLOTS:
-  /*
-  * @brief Change the selection modus of the item view's selection model.
-  *
-  *   If true, an incoming selection will be filtered (reduced) to only those nodes that are visible by the current view.
-  *   An outgoing selection can then at most contain the filtered nodes.
-  *   If false, the incoming non-visible selection will be stored and later added to the outgoing selection,
-  *   to include the original selection that could not be modified.
-  *   The part of the original selection, that is non-visible are the nodes that are not
+  /**
+  * @brief Set the selection modus to (not) include invisible nodes in the selection.
+  *        In order to customize a widget's behavior this virtual function can be overridden.
+  *        After a widget has set its selection modus the CurrentSelectionChanged(NodeList nodes)-signal should be emitted.
   *
   * @par selectOnlyVisibleNodes   The bool value to define the selection modus.
   */
   virtual void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes);
 
-  /*
-  * @brief Transform a list of data nodes into a model selection and set this as a new selection of the
-  *        selection model of the private member item view.
-  *
-  *   The function filters the given list of nodes according to the 'm_SelectOnlyVisibleNodes' member variable. If
-  *   necessary, the non-visible nodes are stored. This is done if 'm_SelectOnlyVisibleNodes' is false: In this case
-  *   the selection may be filtered and only a subset of the selected nodes may be visible and therefore (de-)selectable
-  *   in the data storage viewer. By storing the non-visible nodes it is possible to send the new, modified selection
-  *   but also include the selected nodes from the original selection that could not be modified (see 'SetSelectOnlyVisibleNodes').
+  /**
+  * @brief Transform a given list of data nodes (a selection) into a new selection of a concrete node selection widget.
+  *        In order to customize a widget's behavior this function needs to be overridden.
+  *        After a widget has set its current selection the CurrentSelectionChanged(NodeList nodes)-signal should be emitted.
   *
   * @par	nodes		A list of data nodes that should be newly selected.
   */
   virtual void SetCurrentSelection(NodeList selectedNodes) = 0;
 
   /** Set the info text that should be displayed if no (valid) node is selected,
-   * but a selection is mandatory.
-   * The string can contain HTML code. if wanted*/
+  *   but a selection is mandatory.
+  *   The string can contain HTML code, if desired.
+  */
   void SetInvalidInfo(QString info);
 
   /** Set the info text that should be displayed if no (valid) node is selected,
-  * but a selection is optional.
-  * The string can contain HTML code. if wanted*/
+  *   but a selection is optional.
+  *   The string can contain HTML code, if desired.
+  */
   void SetEmptyInfo(QString info);
 
   /** Set the caption of the popup that is displayed to alter the selection.
-  * The string can contain HTML code. if wanted*/
+  *   The string can contain HTML code, if desired.
+  */
   void SetPopUpTitel(QString info);
 
   /** Set the hint text of the popup that is displayed to alter the selection.
-  * The string can contain HTML code. if wanted*/
+  *   The string can contain HTML code, if desired.
+  */
   void SetPopUpHint(QString info);
 
   /** Set the widget into an optional mode. Optional means that the selection of no valid
-   node does not mean an invalid state. Thus no node is a valid "node" selection too.*/
+  *   node does not mean an invalid state. Thus no node is a valid "node" selection, too.
+  */
   void SetSelectionIsOptional(bool isOptional);
 
 protected:
-  /**Member is called if the display of the selected nodes should be updated.*/
+  /** Member is called if the display of the selected nodes should be updated. */
   virtual void UpdateInfo() = 0;
 
-  /**Member is called if the predicate has changed. Thus the selection might change to. The new (changed) predicate
-  is passed with the function call. It is the same like this->GetNodePredicate() called in the function call.*/
-  virtual void OnNodePredicateChanged(mitk::NodePredicateBase* newPredicate) = 0;
+  /** Member is called if the predicate has changed. Thus the selection might change, too. */
+  virtual void OnNodePredicateChanged() = 0;
 
-  /**Member is called if the data storage has changed. Thus the selection might change to.*/
+  /** Member is called if the data storage has changed. Thus the selection might change, too. */
   virtual void OnDataStorageChanged() = 0;
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
@@ -148,4 +144,5 @@ protected:
   bool m_IsOptional;
   bool m_SelectOnlyVisibleNodes;
 };
-#endif // QmitkAbstractNodeSelectionWidget_H
+
+#endif // QMITK_ABSTRACT_NODE_SELECTION_WIDGET_H

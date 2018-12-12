@@ -14,15 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "QmitkNodeSelectionDialog.h"
 
 #include <mitkDataStorageInspectorGenerator.h>
 #include <QmitkDataStorageTreeInspector.h>
 #include <QmitkNodeSelectionPreferenceHelper.h>
 
-QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint) : QDialog(parent),
-  m_NodePredicate(nullptr), m_SelectOnlyVisibleNodes(false), m_SelectedNodes(NodeList()), m_SelectionMode(QAbstractItemView::SingleSelection)
+QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint)
+  : QDialog(parent)
+  , m_NodePredicate(nullptr)
+  , m_SelectOnlyVisibleNodes(false)
+  , m_SelectedNodes(NodeList())
+  , m_SelectionMode(QAbstractItemView::SingleSelection)
 {
   m_Controls.setupUi(this);
 
@@ -89,7 +92,7 @@ void QmitkNodeSelectionDialog::SetDataStorage(mitk::DataStorage* dataStorage)
       }
     }
   }
-};
+}
 
 void QmitkNodeSelectionDialog::SetNodePredicate(mitk::NodePredicateBase* nodePredicate)
 {
@@ -102,7 +105,7 @@ void QmitkNodeSelectionDialog::SetNodePredicate(mitk::NodePredicateBase* nodePre
       panel->SetNodePredicate(m_NodePredicate);
     }
   }
-};
+}
 
 mitk::NodePredicateBase* QmitkNodeSelectionDialog::GetNodePredicate() const
 {
@@ -112,7 +115,7 @@ mitk::NodePredicateBase* QmitkNodeSelectionDialog::GetNodePredicate() const
 QmitkNodeSelectionDialog::NodeList QmitkNodeSelectionDialog::GetSelectedNodes() const
 {
   return m_SelectedNodes;
-};
+}
 
 void QmitkNodeSelectionDialog::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes)
 {
@@ -125,7 +128,7 @@ void QmitkNodeSelectionDialog::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleN
       panel->SetSelectOnlyVisibleNodes(m_SelectOnlyVisibleNodes);
     }
   }
-};
+}
 
 void QmitkNodeSelectionDialog::SetCurrentSelection(NodeList selectedNodes)
 {
@@ -134,13 +137,13 @@ void QmitkNodeSelectionDialog::SetCurrentSelection(NodeList selectedNodes)
   {
     panel->SetCurrentSelection(selectedNodes);
   }
-};
+}
 
 void QmitkNodeSelectionDialog::OnSelectionChanged(NodeList selectedNodes)
 {
   SetCurrentSelection(selectedNodes);
   emit CurrentSelectionChanged(selectedNodes);
-};
+}
 
 void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageInspector* view, QString name, QString desc)
 {
@@ -159,17 +162,17 @@ void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageInspector* view,
 
   m_Panels.push_back(view);
   connect(view, &QmitkAbstractDataStorageInspector::CurrentSelectionChanged, this, &QmitkNodeSelectionDialog::OnSelectionChanged);
-};
+}
 
 void QmitkNodeSelectionDialog::OnOK()
 {
   this->accept();
-};
+}
 
 void QmitkNodeSelectionDialog::OnCancel()
 {
   this->reject();
-};
+}
 
 void QmitkNodeSelectionDialog::SetSelectionMode(SelectionMode mode)
 {
@@ -178,7 +181,7 @@ void QmitkNodeSelectionDialog::SetSelectionMode(SelectionMode mode)
   {
     panel->SetSelectionMode(mode);
   }
-};
+}
 
 QmitkNodeSelectionDialog::SelectionMode QmitkNodeSelectionDialog::GetSelectionMode() const
 {

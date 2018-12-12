@@ -236,10 +236,7 @@ void QmitkTractSegView::Start()
         {
           mitk::DataNode::Pointer seg = mitk::DataNode::New();
           seg->SetData( mitk::GrabItkImageMemory(itk_seg) );
-          if (m_Controls->m_ModeBox->currentIndex()==0)
-            seg->SetName(large_name_list.at(c));
-          else
-            seg->SetName(small_name_list.at(c));
+          seg->SetName(large_name_list.at(c));
 
           mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
           lut->SetType( mitk::LookupTable::JET_TRANSPARENT );
@@ -280,7 +277,7 @@ void QmitkTractSegView::Start()
             mitk::LevelWindow lw; lw.SetRangeMinMax(0,2);
             seg->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( lw ) );
 
-            seg->SetName(small_name_list.at(c));
+            seg->SetName(large_name_list.at(c));
           }
           GetDataStorage()->Add(seg, node);
           ++c;
@@ -301,7 +298,7 @@ void QmitkTractSegView::Start()
       else
       {
         seg->SetName("TractEndpointRegionLabels");
-        lw.SetRangeMinMax(0, 40);
+        lw.SetRangeMinMax(0, 144);
       }
 
       if (m_Controls->m_OutputBox->currentIndex()==0)

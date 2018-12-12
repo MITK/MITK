@@ -98,7 +98,9 @@ void ModelFitInspectorView::CreateQtPartControl(QWidget* parent)
 
   auto predicate = mitk::NodePredicateFunction::New(
     [](const mitk::DataNode *node) {
-    return node && node->GetData() && node->GetData()->GetTimeSteps() > 1;});
+      bool isModelFitNode = node->GetData() && node->GetData()->GetProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str()).IsNotNull();
+      return isModelFitNode || node && node->GetData() && node->GetData()->GetTimeSteps() > 1;
+      });
   m_Controls.inputNodeSelector->SetNodePredicate(predicate);
 
   connect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls.inputNodeSelector, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);
@@ -147,6 +149,8 @@ void ModelFitInspectorView::CreateQtPartControl(QWidget* parent)
     SLOT(OnFixedScalingXChanged(double)));
   connect(m_Controls.sbFixMin_x, SIGNAL(valueChanged(double)), this,
     SLOT(OnFixedScalingXChanged(double)));
+
+  connect(m_Controls.btnFullPlot, SIGNAL(clicked(bool)), this, SLOT(OnFullPlotClicked(bool)));
 
   this->EnsureBookmarkPointSet();
   m_Controls.inspectionPositionWidget->SetPositionBookmarkNode(m_PositionBookmarksNode.Lock());
@@ -236,6 +240,11 @@ void ModelFitInspectorView::OnFixedScalingXChanged(double /*value*/)
   m_Controls.widgetPlot->GetPlot()->setAxisScale(QwtPlot::xBottom, m_Controls.sbFixMin_x->value(),
     m_Controls.sbFixMax_x->value());
   m_Controls.widgetPlot->GetPlot()->replot();
+};
+
+void ModelFitInspectorView::OnFullPlotClicked(bool checked)
+{
+  m_Controls.tabWidget->setVisible(!checked);
 };
 
 int ModelFitInspectorView::ActualizeFitSelectionWidget()

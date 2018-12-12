@@ -83,6 +83,8 @@ protected slots:
   void OnScaleToDataXClicked();
   void OnFixedScalingXChanged(double value);
 
+  void OnFullPlotClicked(bool checked);
+
 protected:
 
   virtual void CreateQtPartControl(QWidget* parent) override;

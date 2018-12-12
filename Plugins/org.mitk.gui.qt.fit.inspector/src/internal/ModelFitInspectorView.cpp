@@ -98,7 +98,9 @@ void ModelFitInspectorView::CreateQtPartControl(QWidget* parent)
 
   auto predicate = mitk::NodePredicateFunction::New(
     [](const mitk::DataNode *node) {
-    return node && node->GetData() && node->GetData()->GetTimeSteps() > 1;});
+      bool isModelFitNode = node->GetData() && node->GetData()->GetProperty(mitk::ModelFitConstants::FIT_UID_PROPERTY_NAME().c_str()).IsNotNull();
+      return isModelFitNode || node && node->GetData() && node->GetData()->GetTimeSteps() > 1;
+      });
   m_Controls.inputNodeSelector->SetNodePredicate(predicate);
 
   connect(m_SelectionServiceConnector.get(), &QmitkSelectionServiceConnector::ServiceSelectionChanged, m_Controls.inputNodeSelector, &QmitkSingleNodeSelectionWidget::SetCurrentSelection);

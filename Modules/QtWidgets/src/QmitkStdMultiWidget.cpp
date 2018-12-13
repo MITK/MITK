@@ -2455,29 +2455,42 @@ void QmitkStdMultiWidget::UpdateFullSreenMode()
 
 void QmitkStdMultiWidget::setShadowWidget1Visible(bool visible) const
 {
-  m_ShadowWidgets[0]->setVisible(visible);
-  mitkWidget1->setVisible(!visible);
+  if ((visible && mitkWidget1->isVisible()) ||
+      (!visible && m_ShadowWidgets[0]->isVisible())) {
+    m_ShadowWidgets[0]->setVisible(visible);
+    mitkWidget1->setVisible(!visible);
+  } 
+
   m_ShadowWidgetVisible[0] = visible;
 }
 
 void QmitkStdMultiWidget::setShadowWidget2Visible(bool visible) const
 {
-  m_ShadowWidgets[1]->setVisible(visible);
-  mitkWidget2->setVisible(!visible);
+  if ((visible && mitkWidget2->isVisible()) ||
+    (!visible && m_ShadowWidgets[1]->isVisible())) {
+    m_ShadowWidgets[1]->setVisible(visible);
+    mitkWidget2->setVisible(!visible);
+  }
   m_ShadowWidgetVisible[1] = visible;
 }
 
 void QmitkStdMultiWidget::setShadowWidget3Visible(bool visible) const
 {
-  m_ShadowWidgets[2]->setVisible(visible);
-  mitkWidget3->setVisible(!visible);
+  if ((visible && mitkWidget3->isVisible()) ||
+    (!visible && m_ShadowWidgets[2]->isVisible())) {
+    m_ShadowWidgets[2]->setVisible(visible);
+    mitkWidget3->setVisible(!visible);
+  }
   m_ShadowWidgetVisible[2] = visible;
 }
 
 void QmitkStdMultiWidget::setShadowWidget4Visible(bool visible) const
 {
-  m_ShadowWidgets[3]->setVisible(visible);
-  mitkWidget4->setVisible(!visible);
+  if ((visible && mitkWidget4->isVisible()) ||
+      (!visible && m_ShadowWidgets[3]->isVisible())) {
+    m_ShadowWidgets[3]->setVisible(visible);
+    mitkWidget4->setVisible(!visible);
+  }
   m_ShadowWidgetVisible[3] = visible;
 }
 

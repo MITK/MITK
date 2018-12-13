@@ -27,7 +27,7 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, LiveWireTool2D, "LiveWire tool");
 }
 
-mitk::LiveWireTool2D::LiveWireTool2D() : SegTool2D("LiveWireTool"), m_PlaneGeometry(nullptr)
+mitk::LiveWireTool2D::LiveWireTool2D() : SegTool2D("LiveWireTool")
 {
 }
 
@@ -301,7 +301,7 @@ void mitk::LiveWireTool2D::OnAddPoint(StateMachineAction *, InteractionEvent *in
   if (nullptr == positionEvent)
     return;
 
-  if (nullptr != m_PlaneGeometry)
+  if (m_PlaneGeometry.IsNotNull())
   {
     // Check if the point is in the correct slice
     if (m_PlaneGeometry->DistanceFromPlane(positionEvent->GetPositionInWorld()) > mitk::sqrteps)

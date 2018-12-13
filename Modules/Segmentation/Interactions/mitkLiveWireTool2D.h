@@ -122,7 +122,7 @@ namespace mitk
     std::vector<std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer>> m_EditingContours;
     std::vector<mitk::ContourModelLiveWireInteractor::Pointer> m_LiveWireInteractors;
 
-    const PlaneGeometry *m_PlaneGeometry;
+    PlaneGeometry::ConstPointer m_PlaneGeometry;
   };
 }
 

@@ -800,6 +800,17 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
 
   crosshairModesMenu->clear();
 
+  // Show/hide crosshair
+  {
+    QAction* showHideCrosshairAction = crosshairModesMenu->addAction(tr("Show Crosshair"));
+    showHideCrosshairAction->setCheckable(true);
+    showHideCrosshairAction->setChecked(m_MultiWidget->crosshairManager->getShowPlanesIn3D());
+    connect(showHideCrosshairAction, &QAction::triggered, this, [this] (bool state) {
+      m_MultiWidget->crosshairManager->setShowPlanesIn3d(state);
+      updateWindows();
+    });
+  }
+
   // Rotation mode
   {
     QAction* rotationGroupSeparator = new QAction(crosshairModesMenu);
@@ -949,4 +960,11 @@ void QmitkRenderWindowMenu::SetFullScreenMode(bool state)
   //change icon
   this->ChangeFullScreenIcon();
   DeferredShowMenu();
+}
+
+void QmitkRenderWindowMenu::updateWindows()
+{
+  if (m_MultiWidget && m_MultiWidget->crosshairManager) {
+    m_MultiWidget->crosshairManager->updateAllWindows();
+  }
 }

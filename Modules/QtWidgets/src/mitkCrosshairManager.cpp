@@ -24,6 +24,11 @@ mitkCrosshairManager::mitkCrosshairManager(const QString& parentWidget) :
   m_CrosshairMode = crosshairModeController->getMode();
 }
 
+mitkCrosshairManager::~mitkCrosshairManager()
+{
+  emit savePlaneVisibilityIn3D(m_ShowPlanesIn3d);
+}
+
 void mitkCrosshairManager::setCrosshairMode(CrosshairMode mode)
 {
   if (mode == m_CrosshairMode) {
@@ -92,12 +97,14 @@ void mitkCrosshairManager::updateAllWindows()
   }
 }
 
-void mitkCrosshairManager::setDefaultProperties(mitk::DataNode::Pointer crosshair) {
+void mitkCrosshairManager::setDefaultProperties(mitk::DataNode::Pointer crosshair)
+{
   crosshair->SetIntProperty("layer", 1000);
   crosshair->SetBoolProperty("crosshair", true);
   crosshair->SetBoolProperty("includeInBoundingBox", false);
   crosshair->SetBoolProperty("helper object", true);
   crosshair->SetProperty("parentWidget", mitk::StringProperty::New(m_ParentWidget.toStdString()));
+  crosshair->SetBoolProperty("draw edges", true);
 }
 
 void mitkCrosshairManager::addPlaneCrosshair(QmitkRenderWindow* window, bool render2d, bool render3d)
@@ -114,6 +121,7 @@ void mitkCrosshairManager::addPlaneCrosshair(QmitkRenderWindow* window, bool ren
     crosshair->SetIntProperty("Crosshair.Gap Size", m_UseCrosshairGap ? m_CrosshairGap : 0);
     crosshair->SetBoolProperty("Crosshair.Render 2D", render2d);
     crosshair->SetBoolProperty("Crosshair.Render 3D", render3d);
+    crosshair->SetBoolProperty("draw edges", render3d);
     dataStorage->Add(crosshair);
   } else {
     // Display all planes from other windows
@@ -134,6 +142,7 @@ void mitkCrosshairManager::addPlaneCrosshair(QmitkRenderWindow* window, bool ren
       crosshair->SetIntProperty("Crosshair.Gap Size", m_UseCrosshairGap ? m_CrosshairGap : 0);
       crosshair->SetBoolProperty("Crosshair.Render 2D", render2d);
       crosshair->SetBoolProperty("Crosshair.Render 3D", render3d);
+      crosshair->SetBoolProperty("draw edges", render3d);
       dataStorage->Add(crosshair);
     }
   }
@@ -234,10 +243,13 @@ void mitkCrosshairManager::addCrosshair(QmitkRenderWindow* window)
     case CrosshairMode::POINT:
       addPointCrosshair(window);
       if (m_ShowPlanesIn3d) {
-        addPlaneCrosshair(window, false, true);
+        addPlaneCrosshair(window, false, m_ShowPlanesIn3d);
       }
       break;
     case CrosshairMode::NONE:
+      if (m_ShowPlanesIn3d) {
+        addPlaneCrosshair(window, false, m_ShowPlanesIn3d);
+      }
     default:
       if (m_ShowPlanesIn3dWithoutCursor) {
         addPlaneCrosshair(window, false, true);
@@ -394,4 +406,9 @@ void mitkCrosshairManager::updateSwivelColors(QmitkRenderWindow* updatedWindow)
     }
     window->GetRenderer()->RequestUpdate();
   }
+}
+
+bool mitkCrosshairManager::getShowPlanesIn3D()
+{
+  return m_ShowPlanesIn3d;
 }

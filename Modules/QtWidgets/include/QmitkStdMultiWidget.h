@@ -60,7 +60,7 @@ private:
   void UpdateAnnotationFonts();
 
 public:
-  QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager* renderingManager = 0, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard, const QString& name = "stdmulti");
+  QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager* renderingManager = 0, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard, const QString& name = "stdmulti", bool crosshairVisibility3D = true);
   virtual ~QmitkStdMultiWidget();
 
   mitk::SliceNavigationController*
@@ -105,7 +105,7 @@ public:
 
   bool IsDepartmentLogoEnabled() const;
 
-  void InitializeWidget();
+  void InitializeWidget(bool showPlanesIn3d);
 
   /// called when the StdMultiWidget is closed to remove the 3 widget planes and the helper node from the DataStorage
   void RemovePlanesFromDataStorage();
@@ -288,6 +288,8 @@ signals:
   void WidgetPlaneModeChange(int);
   void WidgetNotifyNewCrossHairMode(int);
   void Moved();
+
+  void savePlaneVisibility3D(bool visibility);
 
 public:
 

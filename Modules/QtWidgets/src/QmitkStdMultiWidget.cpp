@@ -64,7 +64,7 @@ void QmitkStdMultiWidget::UpdateAnnotationFonts()
   }
 }
 
-QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mitk::RenderingManager* renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode, const QString& name)
+QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mitk::RenderingManager* renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode, const QString& name, bool crosshairVisibility3D)
   : QWidget(parent, f),
   mitkWidget1(NULL),
   mitkWidget2(NULL),
@@ -237,7 +237,7 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
   this->resize( QSize(364, 477).expandedTo(minimumSizeHint()) );
 
   //Initialize the widgets.
-  this->InitializeWidget();
+  this->InitializeWidget(crosshairVisibility3D);
 
   //Activate Widget Menu
   this->ActivateMenuWidget( true );
@@ -250,13 +250,12 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
   connect(mitkWidget4, &QmitkRenderWindow::resized, this, &QmitkStdMultiWidget::OnWindowResized);
 }
 
-void QmitkStdMultiWidget::InitializeWidget()
+void QmitkStdMultiWidget::InitializeWidget(bool showPlanesIn3d)
 {
   crosshairManager = new mitkCrosshairManager(m_Name);
   crosshairManager->removeAll();
   crosshairManager->setShowSelectedOnly(false);
-  crosshairManager->setShowSelectedOnly(false);
-  crosshairManager->setShowPlanesIn3d(true);
+  crosshairManager->setShowPlanesIn3d(showPlanesIn3d);
   crosshairManager->setShowPlanesIn3dWithoutCursor(false);
   crosshairManager->setUseWindowsColors(true);
   crosshairManager->setUseCrosshairGap(true);
@@ -362,6 +361,8 @@ void QmitkStdMultiWidget::InitializeWidget()
   for (unsigned int i = 0; i < 4; i++) {
     crosshairManager->addWindow(GetRenderWindow(i));
   }
+
+  connect(crosshairManager, &mitkCrosshairManager::savePlaneVisibilityIn3D, this, &QmitkStdMultiWidget::savePlaneVisibility3D);
 }
 
 void QmitkStdMultiWidget::FillGradientBackgroundWithBlack()

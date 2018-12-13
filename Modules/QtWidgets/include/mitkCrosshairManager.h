@@ -39,6 +39,7 @@ class MITKQTWIDGETS_EXPORT mitkCrosshairManager : public QObject {
   Q_OBJECT
 public:
   mitkCrosshairManager(const QString& parentWidget);
+  ~mitkCrosshairManager();
 
   // Changes crosshair mode for selected windows
   void setCrosshairMode(CrosshairMode mode);
@@ -95,8 +96,11 @@ public:
 
   std::function<bool(QmitkRenderWindow*, QmitkRenderWindow*)>* checkWindowsShareCrosshair;
 
+  bool getShowPlanesIn3D();
+
 signals:
   void crosshairModeChanged(CrosshairMode mode);
+  void savePlaneVisibilityIn3D(bool visibility);
 
 private:
   bool hasWindow(QmitkRenderWindow* window);

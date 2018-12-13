@@ -267,15 +267,19 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     if (d->m_MouseModeToolbar == NULL)
     {
-      d->m_MouseModeToolbar = new QmitkMouseModeSwitcher(parent); // delete by Qt via parent
+      d->m_MouseModeToolbar = new QmitkMouseModeSwitcher(); // delete by Qt via parent
       layout->addWidget(d->m_MouseModeToolbar);
+      d->m_MouseModeToolbar->setParent(d->m_StdMultiWidget);
     }
 
     berry::IPreferences::Pointer prefs = this->GetPreferences();
 
     mitk::BaseRenderer::RenderingMode::Type renderingMode = static_cast<mitk::BaseRenderer::RenderingMode::Type>(prefs->GetInt( "Rendering Mode" , 0 ));
 
-    d->m_StdMultiWidget = new QmitkStdMultiWidget(parent,0,0,renderingMode);
+    QString planeProperty("Plane Visibility 3D");
+    bool planeVisibility3D = prefs->GetBool(planeProperty, true);
+
+    d->m_StdMultiWidget = new QmitkStdMultiWidget(parent, 0, 0, renderingMode, "stdmulti", planeVisibility3D);
     d->m_RenderWindows.insert("axial", d->m_StdMultiWidget->GetRenderWindow1());
     d->m_RenderWindows.insert("sagittal", d->m_StdMultiWidget->GetRenderWindow2());
     d->m_RenderWindows.insert("coronal", d->m_StdMultiWidget->GetRenderWindow3());
@@ -318,6 +322,12 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     this->OnPreferencesChanged(berryprefs);
 
     this->RequestUpdate();
+
+    d->m_StdMultiWidget->GetRenderWindow4()->updateAllWindows();
+
+    connect(d->m_StdMultiWidget, &QmitkStdMultiWidget::savePlaneVisibility3D, this, [berryprefs, planeProperty] (bool state) {
+      berryprefs->PutBool(planeProperty, state);
+    });
   }
 }
 

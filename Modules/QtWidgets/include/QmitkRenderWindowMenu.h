@@ -96,6 +96,8 @@ public:
 
   void NotifyNewWidgetPlanesMode( int mode );
 
+  void updateWindows();
+
 protected:
 
   /*! Create menu widget. The menu contains five QPushButtons (hori-split, verti-split, full-screen, settings and close button)

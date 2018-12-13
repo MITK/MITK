@@ -436,10 +436,10 @@ namespace itk
       CleanUp();
 
       // Calc Number of nodes
-      m_ImageDimensions = TInputImageType::ImageDimension;
+      auto imageDimensions = TInputImageType::ImageDimension;
       const InputImageSizeType &size = this->GetInput()->GetRequestedRegion().GetSize();
       m_Graph_NumberOfNodes = 1;
-      for (NodeNumType i = 0; i < m_ImageDimensions; ++i)
+      for (NodeNumType i = 0; i < imageDimensions; ++i)
         m_Graph_NumberOfNodes = m_Graph_NumberOfNodes * size[i];
 
       // Initialize mainNodeList with that number

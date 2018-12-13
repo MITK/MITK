@@ -615,3 +615,10 @@ bool QmitkRenderWindow::isTwoDimensionalViewState()
 {
   return m_IsTwoDimensionalView;
 }
+
+void QmitkRenderWindow::updateAllWindows()
+{
+  if (m_MenuWidget) {
+    m_MenuWidget->updateWindows();
+  }
+}

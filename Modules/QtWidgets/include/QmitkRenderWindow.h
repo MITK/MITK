@@ -109,6 +109,8 @@ public:
   void setTwoDimensionalViewState(bool state);
   bool isTwoDimensionalViewState();
 
+  void updateAllWindows();
+
 protected:
   // overloaded move handler
   virtual void moveEvent(QMoveEvent* event) override;

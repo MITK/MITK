@@ -219,12 +219,6 @@ namespace mitk
     bool render3d = true;
 
     GetDataNode()->GetVisibility(visible, renderer, "visible");
-    GetDataNode()->GetBoolProperty("Crosshair.Render 3D", render3d, renderer);
-
-    if (!render3d) {
-      return;
-    }
-
     if ( !visible )
     {
       // visibility has explicitly to be set in the single actors
@@ -248,6 +242,11 @@ namespace mitk
     bool drawEdges = true;
     this->GetDataNode()->GetBoolProperty("draw edges", drawEdges, renderer);
     m_EdgeActor->SetVisibility(drawEdges);
+
+    GetDataNode()->GetBoolProperty("Crosshair.Render 3D", render3d, renderer);
+    if (!render3d) {
+      return;
+    }
 
     PlaneGeometryData::Pointer input = const_cast< PlaneGeometryData * >(this->GetInput());
 

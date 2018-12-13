@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkLevelWindowManager_h
-#define mitkLevelWindowManager_h
+#ifndef MITKLEVELWINDOWMANAGER_H
+#define MITKLEVELWINDOWMANAGER_H
 
 #include "mitkBaseProperty.h"
 #include "mitkDataStorage.h"
@@ -51,22 +51,31 @@ namespace mitk
   class MITKCORE_EXPORT LevelWindowManager : public itk::Object
   {
   public:
-    mitkClassMacroItkParent(LevelWindowManager, itk::Object) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacroItkParent(LevelWindowManager, itk::Object)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      void SetDataStorage(DataStorage *ds);
-    DataStorage *GetDataStorage(); ///< returns the datastorage
+    void SetDataStorage(DataStorage *ds);
+    DataStorage *GetDataStorage();
 
     /** @brief (Re-)Initializes the LevelWindowManager by setting the topmost image.
-     *         Use the removedNode parameter if a node was removed...
-     *  @param autoTopMost true: sets the topmost layer image to be affected by changes
-     *  @param removedNode != nullptr a node was removed from DataStorage */
+     *         Use the removedNode parameter if a node was removed.
+     *  @param autoTopMost    Sets the topmost layer image to be affected by changes, if true.
+     *  @param removedNode    A node was removed from the data storage if != nullptr.
+     */
     void SetAutoTopMostImage(bool autoTopMost, const DataNode *removedNode = nullptr);
+    /** @brief (Re-)Initializes the LevelWindowManager by setting the selected images.
+    *          Use the removedNode parameter if a node was removed.
+    *  @param selectedImages  Sets the selected images to be affected by changes, if true.
+    *  @param removedNode     A node was removed from the data storage if != nullptr.
+    */
+    void SetSelectedImages(bool selectedImages, const DataNode *removedNode = nullptr);
 
-    void RecaluclateLevelWindowForSelectedComponent(const itk::EventObject &);
+    void RecalculateLevelWindowForSelectedComponent(const itk::EventObject &);
 
     void Update(const itk::EventObject &e); ///< gets called if a visible property changes
 
-    /** @brief Sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
+    /** @brief Set a specific LevelWindowProperty; all changes will affect the image belonging to this property.
      *  @throw mitk::Exception Throws an exception if the there is no image in the data storage which belongs to this
      * property.*/
     void SetLevelWindowProperty(LevelWindowProperty::Pointer levelWindowProperty);
@@ -80,8 +89,11 @@ namespace mitk
     /** @return Returns the current mitkLevelWindowProperty object from the image that is affected by changes.*/
     LevelWindowProperty::Pointer GetLevelWindowProperty();
 
-    /** @return true if changes on slider or line-edits will affect always the topmost layer image. */
-    bool isAutoTopMost();
+    /** @return true if changes on slider or line-edits will affect the topmost layer image. */
+    bool IsAutoTopMost();
+
+    /** @return true if changes on slider or line-edits will affect the currently selected images. */
+    bool IsSelectedImages();
 
     /** @brief This method is called when a node is added to the data storage.
       *        A listener on the data storage is used to call this method automatically after a node was added.
@@ -125,29 +137,32 @@ namespace mitk
     ~LevelWindowManager() override;
 
     DataStorage::Pointer m_DataStorage;
-    LevelWindowProperty::Pointer m_LevelWindowProperty; ///< pointer to the LevelWindowProperty of the current image
+    /// Pointer to the LevelWindowProperty of the current image.
+    LevelWindowProperty::Pointer m_LevelWindowProperty;
+
     typedef std::pair<unsigned long, DataNode::Pointer> PropDataPair;
-    typedef std::map<PropDataPair, BaseProperty::Pointer> ObserverToPropertyMap;
+    typedef std::map<PropDataPair, BaseProperty::Pointer> ObserverToPropertyValueMap;
+    /// Map to hold observer IDs to every "visible" property of DataNode's BaseProperty.
+    ObserverToPropertyValueMap m_ObserverToVisibleProperty;
+    /// Map to hold observer IDs to every "layer" property of DataNode's BaseProperty.
+    ObserverToPropertyValueMap m_ObserverToLayerProperty;
+    /// Map to hold observer IDs to every "Image Rendering.Mode" property of DataNode's BaseProperty.
+    ObserverToPropertyValueMap m_ObserverToRenderingModeProperty;
+    /// Map to hold observer IDs to every "Image.Displayed Component" property of DataNode's BaseProperty.
+    ObserverToPropertyValueMap m_ObserverToDisplayedComponentProperty;
+    /// Map to hold observer IDs to every "imageForLevelWindow" property of DataNode's BaseProperty.
+    ObserverToPropertyValueMap m_ObserverToLevelWindowImageProperty;
 
-    ObserverToPropertyMap
-      m_PropObserverToNode; ///< map to hold observer IDs to every visible property of DataNode�s BaseProperty
-    ObserverToPropertyMap
-      m_PropObserverToNode2; ///< map to hold observer IDs to every layer property of DataNode�s BaseProperty
-    ObserverToPropertyMap m_PropObserverToNode3; ///< map to hold observer IDs to every Image Rendering.Mode property of
-                                                 /// DataNode�s BaseProperty
-    ObserverToPropertyMap
-      m_PropObserverToNode4; ///< map to hold observer IDs to every Image.Displayed Component property
-                             /// of DataNode�s BaseProperty
-    ObserverToPropertyMap
-      m_PropObserverToNode5; ///< map to hold observer IDs to every image for level window property of
-                             /// DataNode�s BaseProperty
-
-    void UpdateObservers(); ///< updates the internal observer list. Ignores nodes which are marked to be deleted in the
-                            /// variable m_NodeMarkedToDelete
-    void ClearPropObserverLists();              ///< internal help method to clear both lists/maps.
-    void CreatePropObserverLists();             ///< internal help method to create both lists/maps.
-    const mitk::DataNode *m_NodeMarkedToDelete; ///< this variable holds a data node which will be deleted from the
-                                                /// datastorage immedeately (if there is one, nullptr otherways)
+    /// Updates the internal observer list.
+    /// Ignores nodes which are marked to be deleted in the variable m_NodeMarkedToDelete.
+    void UpdateObservers();
+    /// Internal help method to clear both lists/maps.
+    void ClearPropObserverLists();
+    /// Internal help method to create both lists/maps.
+    void CreatePropObserverLists();
+    /// This variable holds a data node which will be deleted from the datastorage immediately
+    /// Nullptr, if there is no data node to be deleted.
+    const DataNode *m_NodeMarkedToDelete;
 
     bool m_AutoTopMost;
     unsigned long m_ObserverTag;
@@ -155,7 +170,8 @@ namespace mitk
     unsigned long m_PropertyModifiedTag;
     Image *m_CurrentImage;
     bool m_IsPropertyModifiedTagSet;
-    bool m_SettingImgForLvlWinProp;
+    bool m_LevelWindowMutex;
   };
 }
-#endif
+
+#endif // MITKLEVELWINDOWMANAGER_H

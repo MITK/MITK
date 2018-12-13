@@ -71,9 +71,15 @@ namespace mitk
     */
     void SetSelectedImages(bool selectedImages, const DataNode *removedNode = nullptr);
 
-    void RecalculateLevelWindowForSelectedComponent(const itk::EventObject &);
+    void RecalculateLevelWindowForSelectedComponent(const itk::EventObject&);
 
-    void Update(const itk::EventObject &e); ///< gets called if a visible property changes
+    /**
+    * @brief Updates the level window.
+    *        This function is called if a property of a data node is changed.
+    *        Relevant properties are defined in the protected 'ObserverToPropertyValueMap'-members.
+    */
+    void Update(const itk::EventObject&);
+    void UpdateSelected(const itk::EventObject&);
 
     /** @brief Set a specific LevelWindowProperty; all changes will affect the image belonging to this property.
      *  @throw mitk::Exception Throws an exception if the there is no image in the data storage which belongs to this
@@ -152,6 +158,8 @@ namespace mitk
     ObserverToPropertyValueMap m_ObserverToDisplayedComponentProperty;
     /// Map to hold observer IDs to every "imageForLevelWindow" property of DataNode's BaseProperty.
     ObserverToPropertyValueMap m_ObserverToLevelWindowImageProperty;
+    /// Map to hold observer IDs to every "selected" property of DataNode's BaseProperty.
+    ObserverToPropertyValueMap m_ObserverToSelectedProperty;
 
     /// Updates the internal observer list.
     /// Ignores nodes which are marked to be deleted in the variable m_NodeMarkedToDelete.
@@ -165,6 +173,7 @@ namespace mitk
     const DataNode *m_NodeMarkedToDelete;
 
     bool m_AutoTopMost;
+    bool m_SelectedImages;
     unsigned long m_ObserverTag;
     bool m_IsObserverTagSet;
     unsigned long m_PropertyModifiedTag;

@@ -82,6 +82,7 @@ protected:
 
   QAction *m_PresetAction;
   QAction *m_AutoTopmostAction;
+  QAction *m_SelectedImagesAction;
 
 protected Q_SLOTS:
 

@@ -30,11 +30,6 @@ namespace ToggleVisibilityAction
 {
   void Run(berry::IWorkbenchPartSite::Pointer workbenchPartSite, mitk::DataStorage::Pointer dataStorage, QList<mitk::DataNode::Pointer> selectedNodes)
   {
-    if (selectedNodes.empty())
-    {
-      return;
-    }
-
     bool isVisible;
     for (auto& node : selectedNodes)
     {
@@ -47,9 +42,8 @@ namespace ToggleVisibilityAction
     }
 
     berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-    berry::IPreferences::Pointer preferencesNode = prefService->GetSystemPreferences()->Node(QmitkDataNodeGlobalReinitAction::ACTION_ID);
-
-    bool globalReinit = preferencesNode->GetBool("Call global reinit if node visibility is changed", false);
+    berry::IPreferences::Pointer preferences = prefService->GetSystemPreferences()->Node(QmitkDataNodeGlobalReinitAction::ACTION_ID);
+    bool globalReinit = preferences->GetBool("Call global reinit if node visibility is changed", false);
     if (globalReinit)
     {
       GlobalReinitAction::Run(workbenchPartSite, dataStorage);

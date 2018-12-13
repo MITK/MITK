@@ -166,12 +166,12 @@ namespace mitk
 
     void WriteBackSegmentationResult(const PlaneGeometry *planeGeometry, Image *, unsigned int timeStep);
 
-    void WriteBackSegmentationResult(std::vector<SliceInformation> sliceList, bool writeSliceToVolume = true);
+    void WriteBackSegmentationResult(const std::vector<SliceInformation> &sliceList, bool writeSliceToVolume = true);
 
     void WritePreviewOnWorkingImage(
       Image *targetSlice, Image *sourceSlice, Image *workingImage, int paintingPixelValue, int timestep);
 
-    void WriteSliceToVolume(SliceInformation sliceInfo);
+    void WriteSliceToVolume(const SliceInformation &sliceInfo);
     /**
       \brief Adds a new node called Contourmarker to the datastorage which holds a mitk::PlanarFigure.
              By selecting this node the slicestack will be reoriented according to the PlanarFigure's Geometry

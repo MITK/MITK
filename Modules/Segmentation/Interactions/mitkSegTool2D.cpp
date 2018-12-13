@@ -330,7 +330,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult(const PlaneGeometry *planeGeom
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::SegTool2D::WriteBackSegmentationResult(std::vector<mitk::SegTool2D::SliceInformation> sliceList,
+void mitk::SegTool2D::WriteBackSegmentationResult(const std::vector<SegTool2D::SliceInformation> &sliceList,
                                                   bool writeSliceToVolume)
 {
   std::vector<mitk::Surface::Pointer> contourList;
@@ -367,7 +367,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult(std::vector<mitk::SegTool2D::S
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::SegTool2D::WriteSliceToVolume(mitk::SegTool2D::SliceInformation sliceInfo)
+void mitk::SegTool2D::WriteSliceToVolume(const mitk::SegTool2D::SliceInformation &sliceInfo)
 {
   DataNode *workingNode(m_ToolManager->GetWorkingData(0));
   auto *image = dynamic_cast<Image *>(workingNode->GetData());

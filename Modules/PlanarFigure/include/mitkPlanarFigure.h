@@ -251,13 +251,13 @@ namespace mitk
     */
     virtual bool Equals(const mitk::PlanarFigure &other) const;
 
+    /** \brief Set the initial number of control points of the planar figure */
+    void ResetNumberOfControlPoints(int numberOfControlPoints);
+
   protected:
     PlanarFigure();
 
     PlanarFigure(const Self &other);
-
-    /** \brief Set the initial number of control points of the planar figure */
-    void ResetNumberOfControlPoints(int numberOfControlPoints);
 
     /** Adds feature (e.g., circumference, radius, angle, ...) to feature vector
      * of a planar figure object and returns integer ID for the feature element.

@@ -83,6 +83,7 @@ protected slots:
     void CopyBundles();             ///< add copy of the selected bundle to the datamanager
     void ApplyTransform();          ///< rotate and shift selected bundles
     void AlignOnGrid();             ///< shift selected fiducials to nearest voxel center
+    void RandomPhantom();
 
     void ShowAdvancedOptions(int state);
 

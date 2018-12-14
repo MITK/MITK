@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
     int c = 1;
     for (auto fib : fibs)
     {
-      mitk::IOUtil::Save(fib, out_folder + "Bundle_" + boost::lexical_cast<std::string>(c));
+      mitk::IOUtil::Save(fib, out_folder + "Bundle_" + boost::lexical_cast<std::string>(c) + ".fib");
       ++c;
     }
   }

@@ -14,6 +14,7 @@ if(BUILD_DiffusionFiberfoxCmdApps OR MITK_BUILD_ALL_APPS)
     set( diffusionFiberfoxcmdapps
     Fiberfox^^
     FiberfoxOptimization^^
+    RandomFiberPhantom^^
     )
 
     foreach(diffusionFiberfoxcmdapp ${diffusionFiberfoxcmdapps})

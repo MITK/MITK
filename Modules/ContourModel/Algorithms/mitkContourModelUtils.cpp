@@ -203,3 +203,18 @@ void mitk::ContourModelUtils::FillSliceInSlice(
     }
   }
 }
+
+mitk::ContourModel::Pointer mitk::ContourModelUtils::MoveZerothContourTimeStep(const ContourModel *contour, unsigned int t)
+{
+  if (nullptr == contour)
+    return nullptr;
+
+  auto resultContour = ContourModel::New();
+  resultContour->Expand(t + 1);
+
+  std::for_each(contour->Begin(), contour->End(), [&resultContour, t](ContourElement::VertexType *vertex) {
+    resultContour->AddVertex(vertex, t);
+  });
+
+  return resultContour;
+}

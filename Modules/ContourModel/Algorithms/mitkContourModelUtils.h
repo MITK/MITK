@@ -81,6 +81,11 @@ namespace mitk
                                  mitk::Image::Pointer image,
                                  int paintingPixelValue);
 
+    /**
+    \brief Move the contour in time step 0 to to a new contour model at the given time step.
+    */
+    static ContourModel::Pointer MoveZerothContourTimeStep(const ContourModel *contour, unsigned int timeStep);
+
   protected:
     ContourModelUtils();
     ~ContourModelUtils() override;

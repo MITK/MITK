@@ -49,6 +49,7 @@ int main(int argc, char* argv[])
   parser.addArgument("max_radius", "", mitkCommandLineParser::Int, "", "", 25);
   parser.addArgument("min_twist", "", mitkCommandLineParser::Int, "", "", 15);
   parser.addArgument("max_twist", "", mitkCommandLineParser::Int, "", "", 30);
+  parser.addArgument("compress", "", mitkCommandLineParser::Float, "Compress:", "Compress fiber using the given error threshold (in mm)", 0.1);
   parser.addArgument("", "o", mitkCommandLineParser::String, "Output folder:", "output folder", us::Any(), false);
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -56,6 +57,10 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
 
   std::string out_folder = us::any_cast<std::string>(parsedArgs["o"]);
+
+  float compress=0.1;
+  if (parsedArgs.count("compress"))
+    compress = us::any_cast<float>(parsedArgs["compress"]);
 
   int num_bundles=50;
   if (parsedArgs.count("num_bundles"))
@@ -139,6 +144,8 @@ int main(int argc, char* argv[])
     int c = 1;
     for (auto fib : fibs)
     {
+      if (compress>0)
+        fib->Compress(compress);
       mitk::IOUtil::Save(fib, out_folder + "Bundle_" + boost::lexical_cast<std::string>(c) + ".fib");
       ++c;
     }

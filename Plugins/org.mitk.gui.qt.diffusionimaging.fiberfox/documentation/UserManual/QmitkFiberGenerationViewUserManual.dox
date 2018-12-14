@@ -3,14 +3,14 @@
 
 This view provides the user interface for defining artificial white matter fibers.
 Arbitrary fiber configurations like bent, crossing, kissing, twisting, and fanning bundles can be intuitively defined by positioning only a few 3D waypoints to trigger the automated generation of synthetic fibers.
-From these fibers a diffusion-weighted signal can be simulated using the Fiberfox View.
+From these fibers a diffusion-weighted signal can be simulated using the Fiberfox View. The view also enables the automatic generation of random fiber configurations (Fig. 3).
 
 <b>Available sections:</b>
   - \ref QmitkFiberGenerationViewUserManualFiberDefinition
   - \ref QmitkFiberGenerationViewUserManualKnownIssues
   - \ref QmitkFiberGenerationViewUserManualReferences
 
-\section QmitkFiberGenerationViewUserManualFiberDefinition Fiber Definition
+\section QmitkFiberGenerationViewUserManualFiberDefinition Manual Fiber Definition
 
 Fiber strands are defined simply by placing markers in a 3D image volume. The fibers are then interpolated between these fiducials.
 
@@ -46,6 +46,8 @@ Fiber strands are defined simply by placing markers in a 3D image volume. The fi
 \li <b>Include Fiducials</b>: If checked, the specified transformation is also applied to the fiducials belonging to the selected fiber bundle and the fiducials are also copied.
 
 \imageMacro{FiberfoxExamples.png, "Fig. 2: Examples of artificial crossing (a\,b)\, fanning (c\,d)\, highly curved (e\,f)\, kissing (g\,h) and twisting (i\,j) fibers as well as of the corresponding tensor images generated with Fiberfox.",4}
+
+\imageMacro{random_phantom.png, "Fig. 3: Example of a random fiber phantom containing all kinds of configurations.",4}
 
 \section QmitkFiberGenerationViewUserManualKnownIssues Known Issues
 

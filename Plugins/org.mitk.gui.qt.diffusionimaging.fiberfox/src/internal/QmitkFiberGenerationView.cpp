@@ -125,7 +125,7 @@ void QmitkFiberGenerationView::CreateQtPartControl( QWidget *parent )
 
     connect(static_cast<QObject*>(m_Controls->m_SaveParametersButton), SIGNAL(clicked()), static_cast<QObject*>(this), SLOT(SaveParameters()));
     connect(static_cast<QObject*>(m_Controls->m_LoadParametersButton), SIGNAL(clicked()), static_cast<QObject*>(this), SLOT(LoadParameters()));
-
+    OnDistributionChanged(0);
   }
   UpdateGui();
 }

@@ -417,9 +417,20 @@ void RandomPhantomFilter::GenerateData()
     fiber_params.m_Fiducials.push_back(bundle_waypoints);
     auto density = randGen->GetUniformVariate(m_MinStreamlineDensity, m_MaxStreamlineDensity);
     MITK_INFO << "Density: " << density;
-    fiber_params.m_Density = static_cast<unsigned int>(std::ceil(c_area*density));
-
     MITK_INFO << "Num. fibers: " << fiber_params.m_Density;
+
+    fiber_params.m_Density = static_cast<unsigned int>(std::ceil(c_area*density));
+    if (randGen->GetIntegerVariate(1)==0)
+    {
+      fiber_params.m_Distribution = FiberGenerationParameters::DISTRIBUTE_UNIFORM;
+      MITK_INFO << "Distribution: uniform";
+    }
+    else
+    {
+      fiber_params.m_Distribution = FiberGenerationParameters::DISTRIBUTE_GAUSSIAN;
+      MITK_INFO << "Distribution: Gaussian";
+    }
+
     MITK_INFO << "Num. fiducials: " << c;
     MITK_INFO << "------------\n";
 

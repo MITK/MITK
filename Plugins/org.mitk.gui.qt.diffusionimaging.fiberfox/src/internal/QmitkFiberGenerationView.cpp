@@ -151,13 +151,21 @@ void QmitkFiberGenerationView::RandomPhantom()
   filter->setMaxTwist(m_Controls->m_MaxTwistBox->value());
   filter->Update();
   auto fibs = filter->GetFiberBundles();
+
+  std::vector< mitk::DataNode::Pointer > fiber_nodes;
+  int c = 1;
   for (auto fib : fibs)
   {
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( fib );
+    node->SetName("Bundle_" + boost::lexical_cast<std::string>(c));
     GetDataStorage()->Add(node);
+    fiber_nodes.push_back(node);
+    ++c;
   }
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+//  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->InitializeViews(GetDataStorage()->ComputeVisibleBoundingGeometry3D());
 }
 
 void QmitkFiberGenerationView::UpdateParametersFromGui()
@@ -891,20 +899,23 @@ void QmitkFiberGenerationView::JoinBundles()
     return;
   }
 
+  std::vector< mitk::FiberBundle::Pointer > to_add;
   std::vector<mitk::DataNode::Pointer>::const_iterator it = m_SelectedBundles.begin();
+  (*it)->SetVisibility(false);
   mitk::FiberBundle::Pointer newBundle = dynamic_cast<mitk::FiberBundle*>((*it)->GetData());
   QString name("");
   name += QString((*it)->GetName().c_str());
   ++it;
   for (; it!=m_SelectedBundles.end(); ++it)
   {
-    newBundle = newBundle->AddBundle(dynamic_cast<mitk::FiberBundle*>((*it)->GetData()));
-    name += "+"+QString((*it)->GetName().c_str());
+    (*it)->SetVisibility(false);
+    to_add.push_back(dynamic_cast<mitk::FiberBundle*>((*it)->GetData()));
   }
 
+  newBundle = newBundle->AddBundles(to_add);
   mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
   fbNode->SetData(newBundle);
-  fbNode->SetName(name.toStdString());
+  fbNode->SetName("Joined");
   fbNode->SetVisibility(true);
   GetDataStorage()->Add(fbNode);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

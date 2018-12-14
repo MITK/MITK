@@ -14,15 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkContourModelUtilshIncludett
-#define mitkContourModelUtilshIncludett
+#ifndef mitkContourModelUtils_h
+#define mitkContourModelUtils_h
 
-#include "mitkContourModel.h"
-#include "mitkImage.h"
-#include <MitkContourModelExports.h>
-
-#include <itkImage.h>
+#include <mitkContourModel.h>
+#include <mitkImage.h>
 #include <vtkSmartPointer.h>
+
+#include <MitkContourModelExports.h>
 
 namespace mitk
 {
@@ -34,7 +33,7 @@ namespace mitk
   class MITKCONTOURMODEL_EXPORT ContourModelUtils : public itk::Object
   {
   public:
-    mitkClassMacroItkParent(ContourModelUtils, itk::Object);
+    mitkClassMacroItkParent(ContourModelUtils, itk::Object)
 
     /**
       \brief Projects a contour onto an image point by point. Converts from world to index coordinates.
@@ -81,6 +80,11 @@ namespace mitk
                                  vtkSmartPointer<vtkImageData> resultImage,
                                  mitk::Image::Pointer image,
                                  int paintingPixelValue);
+
+    /**
+    \brief Move the contour in time step 0 to to a new contour model at the given time step.
+    */
+    static ContourModel::Pointer MoveZerothContourTimeStep(const ContourModel *contour, unsigned int timeStep);
 
   protected:
     ContourModelUtils();

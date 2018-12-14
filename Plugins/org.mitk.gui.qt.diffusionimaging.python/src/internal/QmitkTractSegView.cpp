@@ -318,7 +318,7 @@ void QmitkTractSegView::Start()
   }
   else
   {
-    for (int i=0; i<20; ++i)
+    for (int i=0; i<72; ++i)
       if (m_PythonService->DoesVariableExist("tom" + boost::lexical_cast<std::string>(i)))
       {
         mitk::Image::Pointer out_image = m_PythonService->CopySimpleItkImageFromPython("tom" + boost::lexical_cast<std::string>(i));
@@ -345,7 +345,7 @@ void QmitkTractSegView::Start()
         mitk::DataNode::Pointer seg = mitk::DataNode::New();
         seg->SetData( mitk_peaks );
         if (!m_Controls->m_CollapseBox->isChecked())
-          seg->SetName(small_name_list.at(i) + "_TOM");
+          seg->SetName(large_name_list.at(i) + "_TOM");
         else
           seg->SetName("Collapsed_TOM");
         GetDataStorage()->Add(seg, node);

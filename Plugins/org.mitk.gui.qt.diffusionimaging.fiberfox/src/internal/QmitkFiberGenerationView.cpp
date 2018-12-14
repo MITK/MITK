@@ -59,6 +59,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkAdcImageFilter.h>
 #include <itkShiftScaleImageFilter.h>
 #include <mitkITKImageImport.h>
+#include <itkRandomPhantomFilter.h>
 
 #include "mitkNodePredicateDataType.h"
 #include <mitkNodePredicateProperty.h>
@@ -95,6 +96,8 @@ void QmitkFiberGenerationView::CreateQtPartControl( QWidget *parent )
     m_Controls->setupUi( parent );
 
     m_ParameterFile = QDir::currentPath()+"/param.ffp";
+
+    connect(static_cast<QObject*>(m_Controls->m_RandomPhantomButton), SIGNAL(clicked()), static_cast<QObject*>(this), SLOT(RandomPhantom()));
     connect(static_cast<QObject*>(m_Controls->m_GenerateFibersButton), SIGNAL(clicked()), static_cast<QObject*>(this), SLOT(GenerateFibers()));
     connect(static_cast<QObject*>(m_Controls->m_CircleButton), SIGNAL(clicked()), static_cast<QObject*>(this), SLOT(OnDrawROI()));
     connect(static_cast<QObject*>(m_Controls->m_FlipButton), SIGNAL(clicked()), static_cast<QObject*>(this), SLOT(OnFlipButton()));
@@ -125,6 +128,44 @@ void QmitkFiberGenerationView::CreateQtPartControl( QWidget *parent )
 
   }
   UpdateGui();
+}
+
+void QmitkFiberGenerationView::RandomPhantom()
+{
+  itk::RandomPhantomFilter::Pointer filter = itk::RandomPhantomFilter::New();
+  filter->SetNumTracts(m_Controls->m_NumBundlesBox->value());
+  filter->setMinStreamlineDensity(m_Controls->m_MinDensityBox->value());
+  filter->setMaxStreamlineDensity(m_Controls->m_MaxDensityBox->value());
+  mitk::Vector3D vol;
+  vol[0] = m_Controls->m_VolumeSizeX->value();
+  vol[1] = m_Controls->m_VolumeSizeY->value();
+  vol[2] = m_Controls->m_VolumeSizeZ->value();
+  filter->setVolumeSize(vol);
+  filter->setStepSizeMin(m_Controls->m_StepSizeMinBox->value());
+  filter->setStepSizeMax(m_Controls->m_StepSizeMaxBox->value());
+  filter->setCurvynessMin(m_Controls->m_CurvyMinBox->value());
+  filter->setCurvynessMax(m_Controls->m_CurvyMaxBox->value());
+  filter->setStartRadiusMin(m_Controls->m_SizeMinBox->value());
+  filter->setStartRadiusMax(m_Controls->m_SizeMaxBox->value());
+  filter->setMinTwist(m_Controls->m_MinTwistBox->value());
+  filter->setMaxTwist(m_Controls->m_MaxTwistBox->value());
+  filter->Update();
+  auto fibs = filter->GetFiberBundles();
+
+  std::vector< mitk::DataNode::Pointer > fiber_nodes;
+  int c = 1;
+  for (auto fib : fibs)
+  {
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData( fib );
+    node->SetName("Bundle_" + boost::lexical_cast<std::string>(c));
+    GetDataStorage()->Add(node);
+    fiber_nodes.push_back(node);
+    ++c;
+  }
+
+//  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->InitializeViews(GetDataStorage()->ComputeVisibleBoundingGeometry3D());
 }
 
 void QmitkFiberGenerationView::UpdateParametersFromGui()
@@ -858,20 +899,23 @@ void QmitkFiberGenerationView::JoinBundles()
     return;
   }
 
+  std::vector< mitk::FiberBundle::Pointer > to_add;
   std::vector<mitk::DataNode::Pointer>::const_iterator it = m_SelectedBundles.begin();
+  (*it)->SetVisibility(false);
   mitk::FiberBundle::Pointer newBundle = dynamic_cast<mitk::FiberBundle*>((*it)->GetData());
   QString name("");
   name += QString((*it)->GetName().c_str());
   ++it;
   for (; it!=m_SelectedBundles.end(); ++it)
   {
-    newBundle = newBundle->AddBundle(dynamic_cast<mitk::FiberBundle*>((*it)->GetData()));
-    name += "+"+QString((*it)->GetName().c_str());
+    (*it)->SetVisibility(false);
+    to_add.push_back(dynamic_cast<mitk::FiberBundle*>((*it)->GetData()));
   }
 
+  newBundle = newBundle->AddBundles(to_add);
   mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
   fbNode->SetData(newBundle);
-  fbNode->SetName(name.toStdString());
+  fbNode->SetName("Joined");
   fbNode->SetVisibility(true);
   GetDataStorage()->Add(fbNode);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

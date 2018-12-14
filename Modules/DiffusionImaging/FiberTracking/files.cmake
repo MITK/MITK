@@ -83,6 +83,7 @@ set(H_FILES
   Fiberfox/itkKspaceImageFilter.h
   Fiberfox/itkDftImageFilter.h
   Fiberfox/itkFieldmapGeneratorFilter.h
+  Fiberfox/itkRandomPhantomFilter.h
 
   Fiberfox/SignalModels/mitkDiffusionSignalModel.h
   Fiberfox/SignalModels/mitkTensorModel.h

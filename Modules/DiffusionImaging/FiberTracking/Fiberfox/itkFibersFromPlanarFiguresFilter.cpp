@@ -173,6 +173,8 @@ void FibersFromPlanarFiguresFilter::GenerateData()
 
         // apply twist
         tRot[0][0] = tDir[0]*tDir2[0] + tDir[1]*tDir2[1];
+        if (tRot[0][0]>1.0)
+          tRot[0][0] = 1.0;
         tRot[1][1] = tRot[0][0];
         tRot[1][0] = sin(acos(tRot[0][0]));
         tRot[0][1] = -tRot[1][0];
@@ -215,7 +217,6 @@ void FibersFromPlanarFiguresFilter::GenerateData()
 
         mitk::Point3D w;
         planeGeo->Map(p0, w);
-
 
         vtkIdType id = m_VtkPoints->InsertNextPoint(w.GetDataPointer());
         container->GetPointIds()->InsertNextId(id);

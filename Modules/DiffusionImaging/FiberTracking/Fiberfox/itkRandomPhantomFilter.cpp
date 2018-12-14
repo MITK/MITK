@@ -298,10 +298,13 @@ void RandomPhantomFilter::GenerateData()
 
   for (unsigned int i=0; i<m_NumTracts; ++i)
   {
+    MITK_INFO << "Generating Bundle_" << i+1;
     FiberGenerationParameters       fiber_params;
     std::vector< mitk::PlanarEllipse::Pointer > bundle_waypoints;
 
-    std::vector< mitk::PlanarEllipse::Pointer > bundle;
+    double curvyness = randGen->GetUniformVariate(m_CurvynessMin, m_CurvynessMax);
+    int twistdir = static_cast<int>(randGen->GetIntegerVariate(2)) - 1;
+    double dtwist = randGen->GetUniformVariate(m_MinTwist, m_MaxTwist);
 
     mitk::Vector3D pos; pos.Fill(0.0);
     mitk::Vector3D rot; rot.Fill(0.0);
@@ -310,17 +313,17 @@ void RandomPhantomFilter::GenerateData()
     double radius2 = randGen->GetUniformVariate(m_StartRadiusMin, m_StartRadiusMax);
 
     GetPfOnBoundingPlane(pos, rot);
+    rot[0] += randGen->GetUniformVariate(-curvyness, curvyness);
+    rot[1] += randGen->GetUniformVariate(-curvyness, curvyness);
+    rot[2] += randGen->GetUniformVariate(-curvyness, curvyness);
 
     mitk::PlanarEllipse::Pointer start = CreatePlanarFigure();
     TransformPlanarFigure(start, pos, rot, twist, radius1, radius2);
     bundle_waypoints.push_back(start);
 
-    double curvyness = randGen->GetUniformVariate(m_CurvynessMin, m_CurvynessMax);
-    int twistdir = randGen->GetIntegerVariate(2) - 1;
-    int dtwist = randGen->GetUniformVariate(m_MinTwist, m_MaxTwist);
     double c_area = M_PI*radius1*radius2;
 
-    int sizestrategy = randGen->GetIntegerVariate(2) - 1;
+    int sizestrategy = static_cast<int>(randGen->GetIntegerVariate(2)) - 1;
 
     MITK_INFO << "Twist: " << dtwist;
     MITK_INFO << "Twist direction: " << twistdir;
@@ -338,7 +341,7 @@ void RandomPhantomFilter::GenerateData()
       twist += dtwist * twistdir;
       if (randGen->GetUniformVariate(0.0, 1.0) < 0.25)
       {
-        int temp = randGen->GetIntegerVariate(2) - 1;
+        int temp = static_cast<int>(randGen->GetIntegerVariate(2)) - 1;
         if (temp!=twistdir)
         {
           twistdir = temp;
@@ -348,7 +351,7 @@ void RandomPhantomFilter::GenerateData()
 
       if (randGen->GetUniformVariate(0.0, 1.0) < 0.25)
       {
-        int temp = randGen->GetIntegerVariate(2) - 1;
+        int temp = static_cast<int>(randGen->GetIntegerVariate(2)) - 1;
         if (temp!=sizestrategy)
         {
           sizestrategy = temp;
@@ -375,12 +378,12 @@ void RandomPhantomFilter::GenerateData()
         if (radius1 > maxradius)
         {
           radius1 = maxradius;
-          sizestrategy = randGen->GetIntegerVariate(1) - 1;
+          sizestrategy = static_cast<int>(randGen->GetIntegerVariate(1)) - 1;
         }
         if (radius2 > maxradius)
         {
           radius2 = maxradius;
-          sizestrategy = randGen->GetIntegerVariate(1) - 1;
+          sizestrategy = static_cast<int>(randGen->GetIntegerVariate(1)) - 1;
         }
       }
       else if (sizestrategy==-1)
@@ -390,12 +393,12 @@ void RandomPhantomFilter::GenerateData()
         if (radius1 < minradius)
         {
           radius1 = minradius;
-          sizestrategy = randGen->GetIntegerVariate(1);
+          sizestrategy = static_cast<int>(randGen->GetIntegerVariate(1));
         }
         if (radius2 < minradius)
         {
           radius2 = minradius;
-          sizestrategy = randGen->GetIntegerVariate(1);
+          sizestrategy = static_cast<int>(randGen->GetIntegerVariate(1));
         }
       }
 
@@ -403,6 +406,7 @@ void RandomPhantomFilter::GenerateData()
 
       mitk::PlanarEllipse::Pointer pf = CreatePlanarFigure();
       TransformPlanarFigure(pf, pos, rot, twist, radius1, radius2);
+
       bundle_waypoints.push_back(pf);
       ++c;
     }
@@ -413,7 +417,7 @@ void RandomPhantomFilter::GenerateData()
     fiber_params.m_Fiducials.push_back(bundle_waypoints);
     auto density = randGen->GetUniformVariate(m_MinStreamlineDensity, m_MaxStreamlineDensity);
     MITK_INFO << "Density: " << density;
-    fiber_params.m_Density = c_area*density;
+    fiber_params.m_Density = static_cast<unsigned int>(std::ceil(c_area*density));
 
     MITK_INFO << "Num. fibers: " << fiber_params.m_Density;
     MITK_INFO << "Num. fiducials: " << c;

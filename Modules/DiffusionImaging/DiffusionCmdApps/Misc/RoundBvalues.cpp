@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("n", "i", mitkCommandLineParser::InputFile, "Input:", "input image", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::InputFile, "Input:", "input image", us::Any(), false);
   parser.addArgument("", "o", mitkCommandLineParser::OutputFile, "Output:", "output image", us::Any(), false);
   parser.addArgument("to_nearest", "", mitkCommandLineParser::Int, "To nearest:", "integer", 1000);
 

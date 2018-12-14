@@ -121,29 +121,29 @@ vnl_matrix<float> mitk::OdfVtkMapper2D<T, N>::m_Sh12Basis =  mitk::sh::CalcShBas
 template<class T, int N>
 mitk::OdfVtkMapper2D<T,N>::LocalStorage::LocalStorage()
 {
-  m_PropAssemblies.push_back(vtkPropAssembly::New());
-  m_PropAssemblies.push_back(vtkPropAssembly::New());
-  m_PropAssemblies.push_back(vtkPropAssembly::New());
+  m_PropAssemblies.push_back(vtkSmartPointer<vtkPropAssembly>::New());
+  m_PropAssemblies.push_back(vtkSmartPointer<vtkPropAssembly>::New());
+  m_PropAssemblies.push_back(vtkSmartPointer<vtkPropAssembly>::New());
 
-  m_OdfsPlanes.push_back(vtkAppendPolyData::New());
-  m_OdfsPlanes.push_back(vtkAppendPolyData::New());
-  m_OdfsPlanes.push_back(vtkAppendPolyData::New());
+  m_OdfsPlanes.push_back(vtkSmartPointer<vtkAppendPolyData>::New());
+  m_OdfsPlanes.push_back(vtkSmartPointer<vtkAppendPolyData>::New());
+  m_OdfsPlanes.push_back(vtkSmartPointer<vtkAppendPolyData>::New());
 
-  m_OdfsPlanes[0]->AddInputData(vtkPolyData::New());
-  m_OdfsPlanes[1]->AddInputData(vtkPolyData::New());
-  m_OdfsPlanes[2]->AddInputData(vtkPolyData::New());
+  m_OdfsPlanes[0]->AddInputData(vtkSmartPointer<vtkPolyData>::New());
+  m_OdfsPlanes[1]->AddInputData(vtkSmartPointer<vtkPolyData>::New());
+  m_OdfsPlanes[2]->AddInputData(vtkSmartPointer<vtkPolyData>::New());
 
-  m_OdfsActors.push_back(vtkActor::New());
-  m_OdfsActors.push_back(vtkActor::New());
-  m_OdfsActors.push_back(vtkActor::New());
+  m_OdfsActors.push_back(vtkSmartPointer<vtkActor>::New());
+  m_OdfsActors.push_back(vtkSmartPointer<vtkActor>::New());
+  m_OdfsActors.push_back(vtkSmartPointer<vtkActor>::New());
 
   m_OdfsActors[0]->GetProperty()->SetInterpolationToGouraud();
   m_OdfsActors[1]->GetProperty()->SetInterpolationToGouraud();
   m_OdfsActors[2]->GetProperty()->SetInterpolationToGouraud();
 
-  m_OdfsMappers.push_back(vtkPolyDataMapper::New());
-  m_OdfsMappers.push_back(vtkPolyDataMapper::New());
-  m_OdfsMappers.push_back(vtkPolyDataMapper::New());
+  m_OdfsMappers.push_back(vtkSmartPointer<vtkPolyDataMapper>::New());
+  m_OdfsMappers.push_back(vtkSmartPointer<vtkPolyDataMapper>::New());
+  m_OdfsMappers.push_back(vtkSmartPointer<vtkPolyDataMapper>::New());
 
   vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
 
@@ -164,13 +164,13 @@ mitk::OdfVtkMapper2D<T,N>
   m_LastDisplayGeometry.push_back(OdfDisplayGeometry());
   m_LastDisplayGeometry.push_back(OdfDisplayGeometry());
 
-  m_Planes.push_back(vtkPlane::New());
-  m_Planes.push_back(vtkPlane::New());
-  m_Planes.push_back(vtkPlane::New());
+  m_Planes.push_back(vtkSmartPointer<vtkPlane>::New());
+  m_Planes.push_back(vtkSmartPointer<vtkPlane>::New());
+  m_Planes.push_back(vtkSmartPointer<vtkPlane>::New());
 
-  m_Cutters.push_back(vtkCutter::New());
-  m_Cutters.push_back(vtkCutter::New());
-  m_Cutters.push_back(vtkCutter::New());
+  m_Cutters.push_back(vtkSmartPointer<vtkCutter>::New());
+  m_Cutters.push_back(vtkSmartPointer<vtkCutter>::New());
+  m_Cutters.push_back(vtkSmartPointer<vtkCutter>::New());
 
   m_Cutters[0]->SetCutFunction( m_Planes[0] );
   m_Cutters[0]->GenerateValues( 1, 0, 1 );
@@ -182,26 +182,26 @@ mitk::OdfVtkMapper2D<T,N>
   m_Cutters[2]->GenerateValues( 1, 0, 1 );
 
   // Windowing the cutted planes in direction 1
-  m_ThickPlanes1.push_back(vtkThickPlane::New());
-  m_ThickPlanes1.push_back(vtkThickPlane::New());
-  m_ThickPlanes1.push_back(vtkThickPlane::New());
+  m_ThickPlanes1.push_back(vtkSmartPointer<vtkThickPlane>::New());
+  m_ThickPlanes1.push_back(vtkSmartPointer<vtkThickPlane>::New());
+  m_ThickPlanes1.push_back(vtkSmartPointer<vtkThickPlane>::New());
 
-  m_Clippers1.push_back(vtkClipPolyData::New());
-  m_Clippers1.push_back(vtkClipPolyData::New());
-  m_Clippers1.push_back(vtkClipPolyData::New());
+  m_Clippers1.push_back(vtkSmartPointer<vtkClipPolyData>::New());
+  m_Clippers1.push_back(vtkSmartPointer<vtkClipPolyData>::New());
+  m_Clippers1.push_back(vtkSmartPointer<vtkClipPolyData>::New());
 
   m_Clippers1[0]->SetClipFunction( m_ThickPlanes1[0] );
   m_Clippers1[1]->SetClipFunction( m_ThickPlanes1[1] );
   m_Clippers1[2]->SetClipFunction( m_ThickPlanes1[2] );
 
   // Windowing the cutted planes in direction 2
-  m_ThickPlanes2.push_back(vtkThickPlane::New());
-  m_ThickPlanes2.push_back(vtkThickPlane::New());
-  m_ThickPlanes2.push_back(vtkThickPlane::New());
+  m_ThickPlanes2.push_back(vtkSmartPointer<vtkThickPlane>::New());
+  m_ThickPlanes2.push_back(vtkSmartPointer<vtkThickPlane>::New());
+  m_ThickPlanes2.push_back(vtkSmartPointer<vtkThickPlane>::New());
 
-  m_Clippers2.push_back(vtkClipPolyData::New());
-  m_Clippers2.push_back(vtkClipPolyData::New());
-  m_Clippers2.push_back(vtkClipPolyData::New());
+  m_Clippers2.push_back(vtkSmartPointer<vtkClipPolyData>::New());
+  m_Clippers2.push_back(vtkSmartPointer<vtkClipPolyData>::New());
+  m_Clippers2.push_back(vtkSmartPointer<vtkClipPolyData>::New());
 
   m_Clippers2[0]->SetClipFunction( m_ThickPlanes2[0] );
   m_Clippers2[1]->SetClipFunction( m_ThickPlanes2[1] );
@@ -572,8 +572,8 @@ void  mitk::OdfVtkMapper2D<T,N>
   {
     // cutting of a 2D-Volume does not work,
     // so we have to build up our own polydata object
-    cuttedPlane = vtkPolyData::New();
-    points = vtkPoints::New();
+    cuttedPlane = vtkSmartPointer<vtkPolyData>::New();
+    points = vtkSmartPointer<vtkPoints>::New();
     points->SetNumberOfPoints(m_VtkImage->GetNumberOfPoints());
     for(int i=0; i<m_VtkImage->GetNumberOfPoints(); i++)
     {
@@ -595,16 +595,16 @@ void  mitk::OdfVtkMapper2D<T,N>
       nZero1 = 0; nZero2 = 1;
     }
 
-    tmppoints = vtkPoints::New();
+    tmppoints = vtkSmartPointer<vtkPoints>::New();
     for(int j=0; j<m_VtkImage->GetNumberOfPoints(); j++){
       double pt[3];
       m_VtkImage->GetPoint(j,pt);
       tmppoints->InsertNextPoint(pt[nZero1],pt[nZero2],0);
     }
 
-    polydata = vtkPolyData::New();
+    polydata = vtkSmartPointer<vtkPolyData>::New();
     polydata->SetPoints( tmppoints );
-    delaunay = vtkDelaunay2D::New();
+    delaunay = vtkSmartPointer<vtkDelaunay2D>::New();
     delaunay->SetInputData( polydata );
     delaunay->Update();
     vtkCellArray* polys = delaunay->GetOutput()->GetPolys();

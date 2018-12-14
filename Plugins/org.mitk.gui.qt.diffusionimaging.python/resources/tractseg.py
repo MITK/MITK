@@ -74,7 +74,7 @@ try:
     elif output_type == "TOM":
 
         if not collapse:
-            for x in range(0, 20):
+            for x in range(0, 72):
                 tom = sitk.GetImageFromArray(seg[:, :, :, x * 3:x * 3 + 3])
                 tom.SetOrigin(in_image.GetOrigin())
                 tom.SetSpacing(in_image.GetSpacing())

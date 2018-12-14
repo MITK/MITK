@@ -863,7 +863,7 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
     // node is actually a multi label segmentation,
     // but its outline property can be set in the 'single label' segmentation preference page as well
     node->SetProperty("labelset.contour.active", drawOutline);
-    node->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
+    //node->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
     node->SetProperty("volumerendering", volumeRendering);
     // force render window update to show outline
     node->GetData()->Modified();
@@ -877,7 +877,7 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
     {
       node->SetProperty("outline binary", drawOutline);
       node->SetProperty("outline width", mitk::FloatProperty::New(2.0));
-      node->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
+      //node->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
       node->SetProperty("volumerendering", volumeRendering);
       // force render window update to show outline
       node->GetData()->Modified();

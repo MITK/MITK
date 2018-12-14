@@ -321,7 +321,7 @@ void RandomPhantomFilter::GenerateData()
     TransformPlanarFigure(start, pos, rot, twist, radius1, radius2);
     bundle_waypoints.push_back(start);
 
-    double c_area = M_PI*radius1*radius2;
+    double c_area = itk::Math::pi*radius1*radius2;
 
     int sizestrategy = static_cast<int>(randGen->GetIntegerVariate(2)) - 1;
 
@@ -402,7 +402,7 @@ void RandomPhantomFilter::GenerateData()
         }
       }
 
-      c_area += M_PI*radius1*radius2;
+      c_area += itk::Math::pi*radius1*radius2;
 
       mitk::PlanarEllipse::Pointer pf = CreatePlanarFigure();
       TransformPlanarFigure(pf, pos, rot, twist, radius1, radius2);

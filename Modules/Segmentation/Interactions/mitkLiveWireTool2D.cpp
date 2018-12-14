@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usModuleResource.h>
 
+#include <type_traits>
+
 namespace mitk
 {
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, LiveWireTool2D, "LiveWire tool");
@@ -158,14 +160,17 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
     if (nullptr == contour)
       continue;
 
-    const auto numberOfTimeSteps = contour->GetTimeGeometry()->CountTimeSteps();
+    const auto numberOfTimeSteps = contour->GetTimeSteps();
 
-    for (TimeStepType t = 0; t < numberOfTimeSteps; ++t)
+    for (std::remove_const_t<decltype(numberOfTimeSteps)> t = 0; t < numberOfTimeSteps; ++t)
     {
+      if (contour->IsEmptyTimeStep(t))
+        continue;
+
       auto workingSlice = this->GetAffectedImageSliceAs2DImage(workingContour.second, workingImage, t);
       auto projectedContour = ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contour, true, false);
 
-      ContourModelUtils::FillContourInSlice(projectedContour, workingSlice, workingImage, 1);
+      ContourModelUtils::FillContourInSlice(projectedContour, t, workingSlice, workingImage, 1);
 
       sliceInfos.emplace_back(workingSlice, workingContour.second, t);
       this->WriteSliceToVolume(sliceInfos.back());

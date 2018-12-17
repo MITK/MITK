@@ -51,6 +51,12 @@ void QmitkAbstractSemanticRelationsStorageModel::SetLesion(const mitk::SemanticT
   UpdateModelData();
 }
 
+void QmitkAbstractSemanticRelationsStorageModel::SetDataNodeSelection(const QList<mitk::DataNode::Pointer>& dataNodeSelection)
+{
+  m_SelectedDataNodes = dataNodeSelection;
+  UpdateModelData();
+}
+
 void QmitkAbstractSemanticRelationsStorageModel::UpdateModelData(const mitk::SemanticTypes::CaseID& caseID)
 {
   // if the case ID of updated instance is equal to the currently active caseID

@@ -97,16 +97,6 @@ private:
   */
   void SetPixmapOfNode(const mitk::DataNode* dataNode, QPixmap* pixmapFromImage);
   /**
-  * @brief Check if the member lesion is present on the given data node.
-  *        For this the given data node is checked against the image / segmentation predicate. If the node is a
-  *        segmentation, the represented lesion of the segmentation is simply compared against the member lesion.
-  *        If the node is an image its derived segmentations are retrieved. For each derived segmentation
-  *        the represented lesion is compared against the member lesion.
-  *        The function is used by the 'SetLesionPresences' function.
-  *
-  */
-  bool IsLesionPresentOnDataNode(const mitk::DataNode* dataNode) const;
-  /**
   * @brief The function uses the ID of the node to see if a lesion presence was already set. If not, the given
   *        bool value is used and stored inside a member variable. If the lesion presence was already set, it
   *        will be overwritten.

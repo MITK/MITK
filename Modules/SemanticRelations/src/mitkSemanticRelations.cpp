@@ -158,6 +158,44 @@ mitk::SemanticTypes::Lesion mitk::SemanticRelations::GetRepresentedLesion(const 
   }
 }
 
+bool mitk::SemanticRelations::IsLesionPresentOnDataNode(const SemanticTypes::Lesion& lesion, const mitk::DataNode* dataNode) const
+{
+  if (nullptr == dataNode)
+  {
+    mitkThrowException(SemanticRelationException) << "Not a valid data node.";
+  }
+
+  if (m_DataStorage.IsNull())
+  {
+    mitkThrowException(SemanticRelationException) << "Not a valid data storage.";
+  }
+
+  try
+  {
+    if (mitk::NodePredicates::GetImagePredicate()->CheckNode(dataNode))
+    {
+      // get segmentations of the image node with the segmentation predicate
+      mitk::DataStorage::SetOfObjects::ConstPointer segmentations = m_DataStorage->GetDerivations(dataNode, mitk::NodePredicates::GetSegmentationPredicate(), false);
+      for (auto it = segmentations->Begin(); it != segmentations->End(); ++it)
+      {
+        const auto representedLesion = GetRepresentedLesion(it.Value());
+        return lesion.UID == representedLesion.UID;
+      }
+    }
+    else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
+    {
+      const auto representedLesion = GetRepresentedLesion(dataNode);
+      return lesion.UID == representedLesion.UID;
+    }
+  }
+  catch (const mitk::SemanticRelationException&)
+  {
+    return false;
+  }
+
+  return false;
+}
+
 bool mitk::SemanticRelations::IsRepresentingALesion(const DataNode* segmentationNode) const
 {
   try

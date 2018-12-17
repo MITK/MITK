@@ -123,7 +123,7 @@ QVariant QmitkPatientTableModel::data(const QModelIndex& index, int role/* = Qt:
     auto it = m_LesionPresence.find(dataNode);
     if (it != m_LesionPresence.end())
     {
-      return it->second ? QVariant(QColor(Qt::green)) : QVariant(QColor(Qt::transparent));
+      return it->second ? QVariant(QColor(Qt::darkGreen)) : QVariant(QColor(Qt::transparent));
     }
 
     return QVariant(QColor(Qt::transparent));
@@ -290,53 +290,26 @@ void QmitkPatientTableModel::SetLesionPresences()
 
   for (const auto& dataNode : m_CurrentDataNodes)
   {
-    // set the lesion presence for the current node
-    bool lesionPresence = lesionPresence = IsLesionPresentOnDataNode(dataNode);
-    SetLesionPresenceOfNode(dataNode, lesionPresence);
-  }
-}
-
-bool QmitkPatientTableModel::IsLesionPresentOnDataNode(const mitk::DataNode* dataNode) const
-{
-  if (m_DataStorage.IsExpired())
-  {
-    return false;
-  }
-
-  auto dataStorage = m_DataStorage.Lock();
-  try
-  {
-    if (mitk::NodePredicates::GetImagePredicate()->CheckNode(dataNode))
+    if (!m_SemanticRelations->InstanceExists(dataNode))
     {
-      // get segmentations of the image node with the segmentation predicate
-      mitk::DataStorage::SetOfObjects::ConstPointer segmentations = dataStorage->GetDerivations(dataNode, mitk::NodePredicates::GetSegmentationPredicate(), false);
-      for (auto it = segmentations->Begin(); it != segmentations->End(); ++it)
-      {
-        const auto representedLesion = m_SemanticRelations->GetRepresentedLesion(it.Value());
-        return m_Lesion.UID == representedLesion.UID;
-      }
+      continue;
     }
-    else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
+
+    try
     {
-      const auto representedLesion = m_SemanticRelations->GetRepresentedLesion(dataNode);
-      return m_Lesion.UID == representedLesion.UID;
+      // set the lesion presence for the current node
+      bool lesionPresence = m_SemanticRelations->IsLesionPresentOnDataNode(m_Lesion, dataNode);
+      SetLesionPresenceOfNode(dataNode, lesionPresence);
+    }
+    catch (const mitk::SemanticRelationException&)
+    {
+      continue;
     }
   }
-  catch (const mitk::SemanticRelationException&)
-  {
-    return false;
-  }
-
-  return false;
 }
 
 void QmitkPatientTableModel::SetLesionPresenceOfNode(const mitk::DataNode* dataNode, bool lesionPresence)
 {
-  if (nullptr == dataNode)
-  {
-    return;
-  }
-
   std::map<mitk::DataNode::ConstPointer, bool>::iterator iter = m_LesionPresence.find(dataNode);
   if (iter != m_LesionPresence.end())
   {
@@ -351,6 +324,11 @@ void QmitkPatientTableModel::SetLesionPresenceOfNode(const mitk::DataNode* dataN
 
 mitk::DataNode* QmitkPatientTableModel::GetCurrentDataNode(const QModelIndex& index) const
 {
+  if (!index.isValid())
+  {
+    return nullptr;
+  }
+
   mitk::SemanticTypes::ControlPoint currentControlPoint = m_ControlPoints.at(index.column());
   mitk::SemanticTypes::InformationType currentInformationType = m_InformationTypes.at(index.row());
   try

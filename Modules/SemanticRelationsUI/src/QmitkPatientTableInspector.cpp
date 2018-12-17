@@ -109,6 +109,19 @@ void QmitkPatientTableInspector::OnNodeButtonClicked(const QString& nodeType)
   m_StorageModel->SetNodeType(nodeType.toStdString());
 }
 
+void QmitkPatientTableInspector::OnDataNodeSelectionChanged(const QList<mitk::DataNode::Pointer>& dataNodeSelection)
+{
+  if (m_StorageModel->GetLesion().UID.empty())
+  {
+    return;
+  }
+
+  // if lesion is set, reset to empty lesion to hide the "lesion presence background highlighting" in the model
+  m_StorageModel->SetLesion(mitk::SemanticTypes::Lesion());
+  // need to explicitly set the data node selection
+  SetCurrentSelection(dataNodeSelection);
+}
+
 void QmitkPatientTableInspector::OnItemDoubleClicked(const QModelIndex& itemIndex)
 {
   if (itemIndex.isValid())
@@ -135,6 +148,7 @@ void QmitkPatientTableInspector::SetUpConnections()
   connect(m_Controls.segmentationNodeButton, SIGNAL(clicked()), nodeButtonSignalMapper, SLOT(map()));
   m_Controls.imageNodeButton->setChecked(true);
 
+  connect(this, &QmitkPatientTableInspector::CurrentSelectionChanged, this, &QmitkPatientTableInspector::OnDataNodeSelectionChanged);
   connect(m_Controls.tableView, &QTableView::doubleClicked, this, &QmitkPatientTableInspector::OnItemDoubleClicked);
 }
 

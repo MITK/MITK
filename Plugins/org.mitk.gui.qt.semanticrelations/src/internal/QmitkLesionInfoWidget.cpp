@@ -88,6 +88,11 @@ void QmitkLesionInfoWidget::SetCaseID(const mitk::SemanticTypes::CaseID& caseID)
   m_StorageModel->SetCaseID(caseID);
 }
 
+void QmitkLesionInfoWidget::SetDataNodeSelection(const QList<mitk::DataNode::Pointer>& dataNodeSelection)
+{
+  m_StorageModel->SetDataNodeSelection(dataNodeSelection);
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Implementation of the QT_SLOTS
 //////////////////////////////////////////////////////////////////////////
@@ -148,7 +153,14 @@ void QmitkLesionInfoWidget::OnSelectionChanged(const QModelIndex& current, const
     return;
   }
 
-  emit LesionChanged(m_CurrentLesion);
+  // if selected data nodes are set, reset to empty list to
+  // the "selected data nodes presence background highlighting" in the model
+  if (!m_StorageModel->GetSelectedDataNodes().isEmpty())
+  {
+    m_StorageModel->SetDataNodeSelection(QList<mitk::DataNode::Pointer>());
+  }
+
+  emit LesionSelectionChanged(m_CurrentLesion);
 }
 
 void QmitkLesionInfoWidget::OnLesionListContextMenuRequested(const QPoint& pos)

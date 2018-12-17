@@ -110,7 +110,8 @@ void QmitkSemanticRelationsView::RenderWindowPartDeactivated(mitk::IRenderWindow
 void QmitkSemanticRelationsView::SetUpConnections()
 {
   connect(m_Controls.caseIDComboBox, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged), this, &QmitkSemanticRelationsView::OnCaseIDSelectionChanged);
-  connect(m_LesionInfoWidget, &QmitkLesionInfoWidget::LesionChanged, this, &QmitkSemanticRelationsView::OnLesionChanged);
+  connect(m_LesionInfoWidget, &QmitkLesionInfoWidget::LesionSelectionChanged, this, &QmitkSemanticRelationsView::OnLesionSelectionChanged);
+  connect(m_PatientTableInspector, &QmitkPatientTableInspector::CurrentSelectionChanged, this, &QmitkSemanticRelationsView::OnDataNodeSelectionChanged);
   connect(m_PatientTableInspector, &QmitkPatientTableInspector::DataNodeDoubleClicked, this, &QmitkSemanticRelationsView::OnDataNodeDoubleClicked);
   connect(m_DnDDataNodeWidget, &QmitkDnDDataNodeWidget::NodesDropped, this, &QmitkSemanticRelationsView::OnNodesAdded);
 
@@ -138,9 +139,14 @@ void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* dataNode)
   }
 }
 
-void QmitkSemanticRelationsView::OnLesionChanged(const mitk::SemanticTypes::Lesion& lesion)
+void QmitkSemanticRelationsView::OnLesionSelectionChanged(const mitk::SemanticTypes::Lesion& lesion)
 {
   m_PatientTableInspector->SetLesion(lesion);
+}
+
+void QmitkSemanticRelationsView::OnDataNodeSelectionChanged(const QList<mitk::DataNode::Pointer>& dataNodeSelection)
+{
+  m_LesionInfoWidget->SetDataNodeSelection(dataNodeSelection);
 }
 
 void QmitkSemanticRelationsView::OnDataNodeDoubleClicked(const mitk::DataNode* dataNode)

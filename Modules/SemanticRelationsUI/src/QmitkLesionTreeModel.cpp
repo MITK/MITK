@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLesionManager.h>
 #include <mitkSemanticRelationException.h>
 
+// qt
+#include <QColor>
+
 QmitkLesionTreeModel::QmitkLesionTreeModel(QObject* parent/* = nullptr*/)
   : QmitkAbstractSemanticRelationsStorageModel(parent)
   , m_RootItem(std::make_shared<QmitkLesionTreeItem>(mitk::LesionData()))
@@ -158,6 +161,17 @@ QVariant QmitkLesionTreeModel::data(const QModelIndex& index, int role) const
     }
   }
 
+  if (Qt::BackgroundColorRole == role)
+  {
+    auto it = m_DataNodePresence.find(currentItem->GetData().GetLesion().UID);
+    if (it != m_DataNodePresence.end())
+    {
+      return it->second ? QVariant(QColor(Qt::darkGreen)) : QVariant(QColor(Qt::transparent));
+    }
+
+    return QVariant(QColor(Qt::transparent));
+  }
+
   if (Qt::UserRole == role)
   {
     return QVariant::fromValue(currentItem);
@@ -221,13 +235,13 @@ void QmitkLesionTreeModel::SetData()
   std::sort(m_ControlPoints.begin(), m_ControlPoints.end());
   
   SetLesionData();
+  SetSelectedDataNodesPresence();
 }
 
 void QmitkLesionTreeModel::SetLesionData()
 {
-  std::vector<mitk::SemanticTypes::Lesion> allLesions = m_SemanticRelations->GetAllLesionsOfCase(m_CaseID);
-
-  for (auto& lesion : allLesions)
+  m_CurrentLesions = m_SemanticRelations->GetAllLesionsOfCase(m_CaseID);
+  for (auto& lesion : m_CurrentLesions)
   {
     AddLesion(lesion);
   }
@@ -251,6 +265,50 @@ void QmitkLesionTreeModel::AddLesion(const mitk::SemanticTypes::Lesion& lesion)
   // add the 2. level lesion item to the 1. level lesion item
   std::shared_ptr<QmitkLesionTreeItem> newChildItem = std::make_shared<QmitkLesionTreeItem>(lesionData);
   newLesionTreeItem->AddChild(newChildItem);
+}
+
+void QmitkLesionTreeModel::SetSelectedDataNodesPresence()
+{
+  m_DataNodePresence.clear();
+  for (const auto& dataNode : m_SelectedDataNodes)
+  {
+    if (!m_SemanticRelations->InstanceExists(dataNode))
+    {
+      continue;
+    }
+
+    for (const auto& lesion : m_CurrentLesions)
+    {
+      if (!m_SemanticRelations->InstanceExists(m_CaseID, lesion))
+      {
+        continue;
+      }
+      try
+      {
+        // set the lesion presence for the current node
+        bool dataNodePresence = m_SemanticRelations->IsLesionPresentOnDataNode(lesion, dataNode);
+        SetDataNodePresenceOfLesion(&lesion, dataNodePresence);
+      }
+      catch (const mitk::SemanticRelationException&)
+      {
+        continue;
+      }
+    }
+  }
+}
+
+void QmitkLesionTreeModel::SetDataNodePresenceOfLesion(const mitk::SemanticTypes::Lesion* lesion, bool dataNodePresence)
+{
+  std::map<mitk::SemanticTypes::ID, bool>::iterator iter = m_DataNodePresence.find(lesion->UID);
+  if (iter != m_DataNodePresence.end())
+  {
+    // key already existing, overwrite already stored bool value
+    iter->second = dataNodePresence;
+  }
+  else
+  {
+    m_DataNodePresence.insert(std::make_pair(lesion->UID, dataNodePresence));
+  }
 }
 
 QmitkLesionTreeItem* QmitkLesionTreeModel::GetItemByIndex(const QModelIndex& index) const

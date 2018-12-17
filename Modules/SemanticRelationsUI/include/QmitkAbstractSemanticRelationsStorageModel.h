@@ -69,7 +69,15 @@ public:
   void SetLesion(const mitk::SemanticTypes::Lesion& lesion);
 
   const mitk::SemanticTypes::Lesion& GetLesion() const { return m_Lesion; }
+  /**
+  * @brief Sets the current data node selection which can be used to show which lesions
+  *        are visible on the node selection.
+  *
+  * @param dataNodeSelection    The selected data nodes
+  */
+  void SetDataNodeSelection(const QList<mitk::DataNode::Pointer>& dataNodeSelection);
 
+  const QList<mitk::DataNode::Pointer>& GetSelectedDataNodes() const { return m_SelectedDataNodes; };
   /*
   * @brief Updates the semantic relations storage model with the current data from the semantic relations model,
   *        if the case ID is equal to the currently selected case ID of the table model.
@@ -101,6 +109,7 @@ protected:
 
   std::shared_ptr<mitk::SemanticRelations> m_SemanticRelations;
   mitk::SemanticTypes::CaseID m_CaseID;
+  QList<mitk::DataNode::Pointer> m_SelectedDataNodes;
   mitk::SemanticTypes::Lesion m_Lesion;
 };
 

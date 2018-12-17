@@ -65,7 +65,8 @@ protected:
 
 private Q_SLOTS:
 
-  void OnLesionChanged(const mitk::SemanticTypes::Lesion&);
+  void OnLesionSelectionChanged(const mitk::SemanticTypes::Lesion&);
+  void OnDataNodeSelectionChanged(const QList<mitk::DataNode::Pointer>&);
   void OnDataNodeDoubleClicked(const mitk::DataNode*);
   void OnCaseIDSelectionChanged(const QString&);
 

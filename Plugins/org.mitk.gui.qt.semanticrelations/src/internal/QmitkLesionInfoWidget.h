@@ -56,11 +56,13 @@ public:
 
   void SetCaseID(const mitk::SemanticTypes::CaseID& caseID);
 
+  void SetDataNodeSelection(const QList<mitk::DataNode::Pointer>& dataNodeSelection);
+
   const mitk::SemanticTypes::Lesion& GetSelectedLesion() const { return m_CurrentLesion; }
 
 Q_SIGNALS:
 
-  void LesionChanged(const mitk::SemanticTypes::Lesion&);
+  void LesionSelectionChanged(const mitk::SemanticTypes::Lesion&);
 
 private Q_SLOTS:
 

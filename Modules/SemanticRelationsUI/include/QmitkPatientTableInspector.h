@@ -67,6 +67,7 @@ private Q_SLOTS:
 
   void OnModelUpdated();
   void OnNodeButtonClicked(const QString&);
+  void OnDataNodeSelectionChanged(const QList<mitk::DataNode::Pointer>&);
   void OnItemDoubleClicked(const QModelIndex&);
 
 protected:

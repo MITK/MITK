@@ -126,11 +126,26 @@ namespace mitk
     */
     SemanticTypes::Lesion GetRepresentedLesion(const DataNode* segmentationNode) const;
     /**
+    * @brief Check if the given lesion is present on the given data node.
+    *        For this the given data node is checked against the image / segmentation predicate. If the node is a
+    *        segmentation, the represented lesion of the segmentation is simply compared against the member lesion.
+    *        If the node is an image its derived segmentations are retrieved. For each derived segmentation
+    *        the represented lesion is compared against the member lesion.
+    *
+    * @pre    The given data node has to be valid (!nullptr).
+    * @throw  SemanticRelationException, if the given data node is invalid (==nullptr).
+    *
+    * @param dataNode      The data node identifier is extracted from the given data node.
+    *                      The data node or it's derivations are used for a function call to 'GetRepresentedLesion'.
+    * @return              True, if the lesion is present on the given data node; false otherwise.
+    */
+    bool IsLesionPresentOnDataNode(const SemanticTypes::Lesion& lesion, const mitk::DataNode* dataNode) const;
+    /**
     * @brief  Check if the given segmentation refers to an existing lesion instance.
     *         This function can be used before calling 'GetRepresentedLesion' in order to avoid a possible exception.
     *
     * @param segmentationNode   The segmentation identifier is extracted from the given data node.
-    * @return                 True, if the segmentation refers to an existing lesion; false otherwise.
+    * @return                   True, if the segmentation refers to an existing lesion; false otherwise.
     */
     bool IsRepresentingALesion(const DataNode* segmentationNode) const;
     /**

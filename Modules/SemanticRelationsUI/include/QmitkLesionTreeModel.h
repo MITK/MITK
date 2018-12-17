@@ -74,12 +74,25 @@ private:
 
   void SetLesionData();
   void AddLesion(const mitk::SemanticTypes::Lesion& lesion);
+  void SetSelectedDataNodesPresence();
+  /**
+  * @brief The function uses the ID of the lesion to see if a data node presence was already set.
+  *        If not, the given bool value is used and stored inside a member variable. If the lesion presence
+  *        was already set, it will be overwritten.
+  *        The function is used by the 'SetSelectedDataNodesPresence' function.
+  *
+  * @param lesion             The lesion whose data node presence should be set
+  * @param dataNodePresence   The bool value that defines the data node presence of the given lesion
+  */
+  void SetDataNodePresenceOfLesion(const mitk::SemanticTypes::Lesion* lesion, bool dataNodePresence);
 
   QmitkLesionTreeItem* GetItemByIndex(const QModelIndex& index) const;
 
-  std::shared_ptr<QmitkLesionTreeItem> m_RootItem;
-  std::vector<mitk::SemanticTypes::ControlPoint> m_ControlPoints;
+  std::map<mitk::SemanticTypes::ID, bool> m_DataNodePresence;
 
+  std::shared_ptr<QmitkLesionTreeItem> m_RootItem;
+  mitk::SemanticTypes::ControlPointVector m_ControlPoints;
+  mitk::SemanticTypes::LesionVector m_CurrentLesions;
 };
 
 #endif // QMITKLESIONTREEMODEL_H

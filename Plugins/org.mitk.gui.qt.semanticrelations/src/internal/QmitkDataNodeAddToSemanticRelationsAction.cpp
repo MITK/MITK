@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 // namespace that contains the concrete action
-namespace AdddToSemanticRelationsAction
+namespace AddToSemanticRelationsAction
 {
   void Run(mitk::SemanticRelations* semanticRelations, const mitk::DataStorage* dataStorage, const mitk::DataNode* dataNode)
   {
@@ -179,7 +179,7 @@ void QmitkDataNodeAddToSemanticRelationsAction::OnActionTriggered(bool checked)
   }
 
   auto dataNode = GetSelectedNode();
-  AdddToSemanticRelationsAction::Run(m_SemanticRelations.get(), m_DataStorage.Lock(), dataNode);
+  AddToSemanticRelationsAction::Run(m_SemanticRelations.get(), m_DataStorage.Lock(), dataNode);
 }
 
 QList<mitk::DataNode::Pointer> QmitkDataNodeAddToSemanticRelationsAction::GetSelectedNodes()

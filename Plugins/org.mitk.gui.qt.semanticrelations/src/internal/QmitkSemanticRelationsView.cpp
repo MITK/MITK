@@ -177,7 +177,7 @@ void QmitkSemanticRelationsView::OnNodesAdded(QmitkDnDDataNodeWidget* dnDDataNod
   mitk::SemanticTypes::CaseID caseID = "";
   for (mitk::DataNode* dataNode : nodes)
   {
-    AdddToSemanticRelationsAction::Run(m_SemanticRelations.get(), GetDataStorage(), dataNode);
+    AddToSemanticRelationsAction::Run(m_SemanticRelations.get(), GetDataStorage(), dataNode);
     caseID = mitk::GetCaseIDFromDataNode(dataNode);
     AddToComboBox(caseID);
   }

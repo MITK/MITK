@@ -144,8 +144,8 @@ void QmitkPatientTableInspector::SetUpConnections()
   nodeButtonSignalMapper->setMapping(m_Controls.imageNodeButton, QString("Image"));
   nodeButtonSignalMapper->setMapping(m_Controls.segmentationNodeButton, QString("Segmentation"));
   connect(nodeButtonSignalMapper, static_cast<void (QSignalMapper::*)(const QString&)>(&QSignalMapper::mapped), this, &QmitkPatientTableInspector::OnNodeButtonClicked);
-  connect(m_Controls.imageNodeButton, SIGNAL(clicked()), nodeButtonSignalMapper, SLOT(map()));
-  connect(m_Controls.segmentationNodeButton, SIGNAL(clicked()), nodeButtonSignalMapper, SLOT(map()));
+  connect(m_Controls.imageNodeButton, &QRadioButton::clicked, nodeButtonSignalMapper, static_cast<void(QSignalMapper::*)()>(&QSignalMapper::map));
+  connect(m_Controls.segmentationNodeButton, &QRadioButton::clicked, nodeButtonSignalMapper, static_cast<void(QSignalMapper::*)()>(&QSignalMapper::map));
   m_Controls.imageNodeButton->setChecked(true);
 
   connect(this, &QmitkPatientTableInspector::CurrentSelectionChanged, this, &QmitkPatientTableInspector::OnDataNodeSelectionChanged);

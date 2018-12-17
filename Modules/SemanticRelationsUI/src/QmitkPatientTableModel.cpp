@@ -78,10 +78,12 @@ int QmitkPatientTableModel::columnCount(const QModelIndex& parent/* = QModelInde
 
 QVariant QmitkPatientTableModel::data(const QModelIndex& index, int role/* = Qt::DisplayRole*/) const
 {
+  // special role for returning the horizontal header
   if (QmitkPatientTableHeaderView::HorizontalHeaderDataRole == role)
   {
     return QVariant::fromValue<QStandardItemModel*>(m_HeaderModel);
   }
+
   if (!index.isValid())
   {
     return QVariant();

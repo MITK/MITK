@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QAction.h>
 
-namespace AdddToSemanticRelationsAction
+namespace AddToSemanticRelationsAction
 {
   MITK_GUI_SEMANTICRELATIONS_EXPORT void Run(mitk::SemanticRelations* semanticRelations, const mitk::DataStorage* dataStorage, const mitk::DataNode* image);
   

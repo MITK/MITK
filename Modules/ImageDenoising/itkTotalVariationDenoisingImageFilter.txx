@@ -40,8 +40,8 @@ namespace itk
 {
   template <class TInputImage, class TOutputImage>
   TotalVariationDenoisingImageFilter<TInputImage, TOutputImage>::TotalVariationDenoisingImageFilter()
+    : m_Lambda(1.0), m_NumberIterations(0)
   {
-    m_Lambda = 1.0;
   }
 
   template <class TInputImage, class TOutputImage>

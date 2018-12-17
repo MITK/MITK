@@ -38,4 +38,5 @@ set(BLUEBERRY_USE_QT_HELP ON CACHE BOOL "Enable support for integrating bundle d
 # Enable console window
 set(MITK_SHOW_CONSOLE_WINDOW ON CACHE BOOL "Use this to enable or disable the console window when starting MITK GUI Applications" FORCE)
 
+set(MITK_VTK_DEBUG_LEAKS OFF CACHE BOOL "" FORCE)
 set(CMAKE_BUILD_TYPE Release CACHE STRING "" FORCE)

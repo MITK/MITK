@@ -92,11 +92,15 @@ mitk::SemanticTypes::Lesion mitk::RelationStorage::GetRepresentedLesion(const Se
     MITK_INFO << "Incorrect segmentation storage. Not two (2) IDs stored.";
     return SemanticTypes::Lesion();
   }
-  else
+
+  std::string lesionID = segmentationVectorValue[1];
+  if (lesionID.empty())
   {
-    std::string lesionID = segmentationVectorValue[1];
-    return GenerateLesion(caseID, lesionID);
+    // segmentation does not refer to any lesion; return empty lesion
+    return SemanticTypes::Lesion();
   }
+
+  return GenerateLesion(caseID, lesionID);
 }
 
 std::vector<mitk::DataNode::Pointer> mitk::RelationStorage::GetAllSegmentationsOfCase(const SemanticTypes::CaseID& caseID)
@@ -181,34 +185,30 @@ mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GetControlPointOfImage(
     MITK_INFO << "Incorrect data storage. Not two (2) values stored.";
     return SemanticTypes::ControlPoint();
   }
-  else
-  {
-    // the second value of the data node vector is the ID of the referenced control point
-    std::string controlPointID = dataNodeVectorValue[1];
-    // retrieve a vector property that contains the integer values of the date of a control point (0. year 1. month 2. day)
-    mitk::VectorProperty<int>* controlPointVectorProperty = dynamic_cast<mitk::VectorProperty<int>*>(propertyList->GetProperty(controlPointID));
-    if (nullptr == controlPointVectorProperty)
-    {
-      MITK_INFO << "Could not find the control point " << controlPointID << " in the storage.";
-      return SemanticTypes::ControlPoint();
-    }
 
-    std::vector<int> controlPointVectorValue = controlPointVectorProperty->GetValue();
-    // a control point has to have exactly three integer values (year, month and day)
-    if (controlPointVectorValue.size() != 3)
-    {
-      MITK_INFO << "Incorrect control point storage. Not three (3) values of the date are stored.";
-      return SemanticTypes::ControlPoint();
-    }
-    else
-    {
-      // set the values of the control point
-      controlPoint.UID = controlPointID;
-      controlPoint.date = boost::gregorian::date(controlPointVectorValue[0],
-                        controlPointVectorValue[1],
-                        controlPointVectorValue[2]);
-    }
+  // the second value of the data node vector is the ID of the referenced control point
+  std::string controlPointID = dataNodeVectorValue[1];
+  // retrieve a vector property that contains the integer values of the date of a control point (0. year 1. month 2. day)
+  mitk::VectorProperty<int>* controlPointVectorProperty = dynamic_cast<mitk::VectorProperty<int>*>(propertyList->GetProperty(controlPointID));
+  if (nullptr == controlPointVectorProperty)
+  {
+    MITK_INFO << "Could not find the control point " << controlPointID << " in the storage.";
+    return SemanticTypes::ControlPoint();
   }
+
+  std::vector<int> controlPointVectorValue = controlPointVectorProperty->GetValue();
+  // a control point has to have exactly three integer values (year, month and day)
+  if (controlPointVectorValue.size() != 3)
+  {
+    MITK_INFO << "Incorrect control point storage. Not three (3) values of the date are stored.";
+    return SemanticTypes::ControlPoint();
+  }
+
+  // set the values of the control point
+  controlPoint.UID = controlPointID;
+  controlPoint.date = boost::gregorian::date(controlPointVectorValue[0],
+                                             controlPointVectorValue[1],
+                                             controlPointVectorValue[2]);
 
   return controlPoint;
 }
@@ -320,11 +320,9 @@ mitk::SemanticTypes::InformationType mitk::RelationStorage::GetInformationTypeOf
     MITK_INFO << "Incorrect data storage. Not two (2) values stored.";
     return SemanticTypes::InformationType();
   }
-  else
-  {
-    // the first value of the data node vector is the information type
-    return dataNodeVectorValue[0];
-  }
+
+  // the first value of the data node vector is the information type
+  return dataNodeVectorValue[0];
 }
 
 std::vector<mitk::SemanticTypes::InformationType> mitk::RelationStorage::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID)
@@ -454,13 +452,11 @@ void mitk::RelationStorage::AddCase(const SemanticTypes::CaseID& caseID)
   {
     return;
   }
-  else
-  {
-    // add case to the "caseIDs" property list
-    caseIDsVectorValue.push_back(caseID);
-    caseIDsVectorProperty->SetValue(caseIDsVectorValue);
-    propertyList->SetProperty(listIdentifier, caseIDsVectorProperty);
-  }
+
+  // add case to the "caseIDs" property list
+  caseIDsVectorValue.push_back(caseID);
+  caseIDsVectorProperty->SetValue(caseIDsVectorValue);
+  propertyList->SetProperty(listIdentifier, caseIDsVectorProperty);
 }
 
 void mitk::RelationStorage::AddImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageNodeID)
@@ -489,20 +485,18 @@ void mitk::RelationStorage::AddImage(const SemanticTypes::CaseID& caseID, const 
   {
     return;
   }
-  else
-  {
-    // add image to the "images" property list
-    allImagesIDs.push_back(imageNodeID);
-    allImagesVectorProperty->SetValue(allImagesIDs);
-    propertyList->SetProperty("images", allImagesVectorProperty);
 
-    // add the image itself
-    mitk::VectorProperty<std::string>::Pointer imageNodeVectorProperty = mitk::VectorProperty<std::string>::New();
-    // an image node has to have exactly two values (the information type and the ID of the control point)
-    std::vector<std::string> imageNodeVectorValue(2);
-    imageNodeVectorProperty->SetValue(imageNodeVectorValue);
-    propertyList->SetProperty(imageNodeID, imageNodeVectorProperty);
-  }
+  // add image to the "images" property list
+  allImagesIDs.push_back(imageNodeID);
+  allImagesVectorProperty->SetValue(allImagesIDs);
+  propertyList->SetProperty("images", allImagesVectorProperty);
+
+  // add the image itself
+  mitk::VectorProperty<std::string>::Pointer imageNodeVectorProperty = mitk::VectorProperty<std::string>::New();
+  // an image node has to have exactly two values (the information type and the ID of the control point)
+  std::vector<std::string> imageNodeVectorValue(2);
+  imageNodeVectorProperty->SetValue(imageNodeVectorValue);
+  propertyList->SetProperty(imageNodeID, imageNodeVectorProperty);
 }
 
 void mitk::RelationStorage::RemoveImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageNodeID)
@@ -566,21 +560,19 @@ void mitk::RelationStorage::AddSegmentation(const SemanticTypes::CaseID& caseID,
   {
     return;
   }
-  else
-  {
-    // add segmentation to the "segmentations" property list
-    allSegmentationsIDs.push_back(segmentationNodeID);
-    allSegmentationsVectorProperty->SetValue(allSegmentationsIDs);
-    propertyList->SetProperty("segmentations", allSegmentationsVectorProperty);
 
-    // add the segmentation itself
-    mitk::VectorProperty<std::string>::Pointer segmentationNodeVectorProperty = mitk::VectorProperty<std::string>::New();
-    // a segmentation node has to have exactly two values (the ID of the referenced image and the ID of the referenced lesion)
-    std::vector<std::string> segmentationNodeVectorValue(2);
-    segmentationNodeVectorValue[0] = parentNodeID;
-    segmentationNodeVectorProperty->SetValue(segmentationNodeVectorValue);
-    propertyList->SetProperty(segmentationNodeID, segmentationNodeVectorProperty);
-  }
+  // add segmentation to the "segmentations" property list
+  allSegmentationsIDs.push_back(segmentationNodeID);
+  allSegmentationsVectorProperty->SetValue(allSegmentationsIDs);
+  propertyList->SetProperty("segmentations", allSegmentationsVectorProperty);
+
+  // add the segmentation itself
+  mitk::VectorProperty<std::string>::Pointer segmentationNodeVectorProperty = mitk::VectorProperty<std::string>::New();
+  // a segmentation node has to have exactly two values (the ID of the referenced image and the ID of the referenced lesion)
+  std::vector<std::string> segmentationNodeVectorValue(2);
+  segmentationNodeVectorValue[0] = parentNodeID;
+  segmentationNodeVectorProperty->SetValue(segmentationNodeVectorValue);
+  propertyList->SetProperty(segmentationNodeID, segmentationNodeVectorProperty);
 }
 
 void mitk::RelationStorage::RemoveSegmentation(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationNodeID)
@@ -643,26 +635,24 @@ void mitk::RelationStorage::AddLesion(const SemanticTypes::CaseID& caseID, const
   {
     return;
   }
-  else
-  {
-    // add the new lesion id from the given lesion to the vector of all current lesion IDs
-    lesionsVectorValue.push_back(lesion.UID);
-    // overwrite the current vector property with the new, extended string vector
-    lesionsVectorProperty->SetValue(lesionsVectorValue);
-    propertyList->SetProperty("lesions", lesionsVectorProperty);
 
-    // add the lesion with the lesion UID as the key and the lesion information as value
-    std::vector<std::string> lesionData;
-    lesionData.push_back(lesion.name);
-    lesionData.push_back(lesion.lesionClass.UID);
-    mitk::VectorProperty<std::string>::Pointer newLesionVectorProperty = mitk::VectorProperty<std::string>::New();
-    newLesionVectorProperty->SetValue(lesionData);
-    propertyList->SetProperty(lesion.UID, newLesionVectorProperty);
+  // add the new lesion id from the given lesion to the vector of all current lesion IDs
+  lesionsVectorValue.push_back(lesion.UID);
+  // overwrite the current vector property with the new, extended string vector
+  lesionsVectorProperty->SetValue(lesionsVectorValue);
+  propertyList->SetProperty("lesions", lesionsVectorProperty);
 
-    // add the lesion class with the lesion class UID as key and the class type as value
-    std::string lesionClassType = lesion.lesionClass.classType;
-    propertyList->SetStringProperty(lesion.lesionClass.UID.c_str(), lesionClassType.c_str());
-  }
+  // add the lesion with the lesion UID as the key and the lesion information as value
+  std::vector<std::string> lesionData;
+  lesionData.push_back(lesion.name);
+  lesionData.push_back(lesion.lesionClass.UID);
+  mitk::VectorProperty<std::string>::Pointer newLesionVectorProperty = mitk::VectorProperty<std::string>::New();
+  newLesionVectorProperty->SetValue(lesionData);
+  propertyList->SetProperty(lesion.UID, newLesionVectorProperty);
+
+  // add the lesion class with the lesion class UID as key and the class type as value
+  std::string lesionClassType = lesion.lesionClass.classType;
+  propertyList->SetStringProperty(lesion.lesionClass.UID.c_str(), lesionClassType.c_str());
 }
 
 void mitk::RelationStorage::OverwriteLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion)
@@ -738,17 +728,14 @@ void mitk::RelationStorage::LinkSegmentationToLesion(const SemanticTypes::CaseID
       MITK_INFO << "Incorrect segmentation storage. Not two (2) IDs stored.";
       return;
     }
-    else
-    {
-      // the lesion ID of a segmentation is the second value in the vector
-      segmentationVectorValue[1] = lesion.UID;
-      segmentationVectorProperty->SetValue(segmentationVectorValue);
-    }
+
+    // the lesion ID of a segmentation is the second value in the vector
+    segmentationVectorValue[1] = lesion.UID;
+    segmentationVectorProperty->SetValue(segmentationVectorValue);
+    return;
   }
-  else
-  {
-    MITK_INFO << "Could not find lesion " << lesion.UID << " in the storage. Cannot link segmentation to lesion.";
-  }
+
+  MITK_INFO << "Could not find lesion " << lesion.UID << " in the storage. Cannot link segmentation to lesion.";
 }
 
 void mitk::RelationStorage::UnlinkSegmentationFromLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID)
@@ -774,13 +761,11 @@ void mitk::RelationStorage::UnlinkSegmentationFromLesion(const SemanticTypes::Ca
     MITK_INFO << "Incorrect data storage. Not two (2) values stored.";
     return;
   }
-  else
-  {
-    // the second value of the data node vector is the ID of the referenced lesion
-    // set the lesion reference to an empty string for removal
-    segmentationVectorValue[1] = "";
-    segmentationVectorProperty->SetValue(segmentationVectorValue);
-  }
+
+  // the second value of the data node vector is the ID of the referenced lesion
+  // set the lesion reference to an empty string for removal
+  segmentationVectorValue[1] = "";
+  segmentationVectorProperty->SetValue(segmentationVectorValue);
 }
 
 void mitk::RelationStorage::RemoveLesion(const mitk::SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion)
@@ -870,19 +855,15 @@ void mitk::RelationStorage::RemoveLesionClass(const SemanticTypes::CaseID& caseI
     {
       return false;
     }
-    else
+
+    std::vector<std::string> lesionData = lesionDataProperty->GetValue();
+    // a lesion date has to have exactly two values (the name of the lesion and the UID of the lesion class)
+    if (lesionData.size() != 2)
     {
-      std::vector<std::string> lesionData = lesionDataProperty->GetValue();
-      // a lesion date has to have exactly two values (the name of the lesion and the UID of the lesion class)
-      if (lesionData.size() != 2)
-      {
-        return false;
-      }
-      else
-      {
-        return lesionData[1] == lesionClassID;
-      }
+      return false;
     }
+
+    return lesionData[1] == lesionClassID;
   });
 
   if (existingLesionClass == lesionVectorValue.end())
@@ -917,24 +898,22 @@ void mitk::RelationStorage::AddControlPoint(const SemanticTypes::CaseID& caseID,
   {
     return;
   }
-  else
-  {
-    // add the new control point UID from the given control point to the vector of all current control point UIDs
-    controlPointVectorValue.push_back(controlPoint.UID);
-    // overwrite the current vector property with the new, extended string vector
-    controlPointVectorProperty->SetValue(controlPointVectorValue);
-    propertyList->SetProperty("controlpoints", controlPointVectorProperty);
 
-    // store the control point values (the three integer values of a date)
-    std::vector<int> controlPointDate;
-    controlPointDate.push_back(controlPoint.date.year());
-    controlPointDate.push_back(controlPoint.date.month());
-    controlPointDate.push_back(controlPoint.date.day());
+  // add the new control point UID from the given control point to the vector of all current control point UIDs
+  controlPointVectorValue.push_back(controlPoint.UID);
+  // overwrite the current vector property with the new, extended string vector
+  controlPointVectorProperty->SetValue(controlPointVectorValue);
+  propertyList->SetProperty("controlpoints", controlPointVectorProperty);
 
-    mitk::VectorProperty<int>::Pointer newControlPointVectorProperty = mitk::VectorProperty<int>::New();
-    newControlPointVectorProperty->SetValue(controlPointDate);
-    propertyList->SetProperty(controlPoint.UID, newControlPointVectorProperty);
-  }
+  // store the control point values (the three integer values of a date)
+  std::vector<int> controlPointDate;
+  controlPointDate.push_back(controlPoint.date.year());
+  controlPointDate.push_back(controlPoint.date.month());
+  controlPointDate.push_back(controlPoint.date.day());
+
+  mitk::VectorProperty<int>::Pointer newControlPointVectorProperty = mitk::VectorProperty<int>::New();
+  newControlPointVectorProperty->SetValue(controlPointDate);
+  propertyList->SetProperty(controlPoint.UID, newControlPointVectorProperty);
 }
 
 void mitk::RelationStorage::LinkDataToControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& dataNodeID, const SemanticTypes::ControlPoint& controlPoint)
@@ -973,17 +952,14 @@ void mitk::RelationStorage::LinkDataToControlPoint(const SemanticTypes::CaseID& 
       MITK_INFO << "Incorrect data storage. Not two (2) values stored.";
       return;
     }
-    else
-    {
-      // the second value of the data node vector is the ID of the referenced control point
-      dataNodeVectorValue[1] = controlPoint.UID;
-      dataNodeVectorProperty->SetValue(dataNodeVectorValue);
-    }
+
+    // the second value of the data node vector is the ID of the referenced control point
+    dataNodeVectorValue[1] = controlPoint.UID;
+    dataNodeVectorProperty->SetValue(dataNodeVectorValue);
+    return;
   }
-  else
-  {
-    MITK_INFO << "Could not find control point " << controlPoint.UID << " in the storage. Cannot link data to control point.";
-  }
+
+  MITK_INFO << "Could not find control point " << controlPoint.UID << " in the storage. Cannot link data to control point.";
 }
 
 void mitk::RelationStorage::UnlinkDataFromControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& dataNodeID)
@@ -1009,13 +985,11 @@ void mitk::RelationStorage::UnlinkDataFromControlPoint(const SemanticTypes::Case
     MITK_INFO << "Incorrect data storage. Not two (2) values stored.";
     return;
   }
-  else
-  {
-    // the second value of the data node vector is the ID of the referenced control point
-    // set the control point reference to an empty string for removal
-    dataNodeVectorValue[1] = "";
-    dataNodeVectorProperty->SetValue(dataNodeVectorValue);
-  }
+
+  // the second value of the data node vector is the ID of the referenced control point
+  // set the control point reference to an empty string for removal
+  dataNodeVectorValue[1] = "";
+  dataNodeVectorProperty->SetValue(dataNodeVectorValue);
 }
 
 void mitk::RelationStorage::RemoveControlPointFromCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint)
@@ -1068,21 +1042,19 @@ void mitk::RelationStorage::AddExaminationPeriod(const SemanticTypes::CaseID& ca
   {
     return;
   }
-  else
-  {
-    // add the new examination period id from the given examination period to the vector of all current examination period UIDs
-    examinationPeriodsVectorValue.push_back(examinationPeriod.UID);
-    // overwrite the current vector property with the new, extended string vector
-    vectorProperty->SetValue(examinationPeriodsVectorValue);
-    propertyList->SetProperty("examinationperiods", vectorProperty);
 
-    // add the examination period with the UID as the key and the name as as the vector value
-    std::vector<std::string> examinationPeriodData;
-    examinationPeriodData.push_back(examinationPeriod.name);
-    mitk::VectorProperty<std::string>::Pointer newExaminationPeriodVectorProperty = mitk::VectorProperty<std::string>::New();
-    newExaminationPeriodVectorProperty->SetValue(examinationPeriodData);
-    propertyList->SetProperty(examinationPeriod.UID, newExaminationPeriodVectorProperty);
-  }
+  // add the new examination period id from the given examination period to the vector of all current examination period UIDs
+  examinationPeriodsVectorValue.push_back(examinationPeriod.UID);
+  // overwrite the current vector property with the new, extended string vector
+  vectorProperty->SetValue(examinationPeriodsVectorValue);
+  propertyList->SetProperty("examinationperiods", vectorProperty);
+
+  // add the examination period with the UID as the key and the name as as the vector value
+  std::vector<std::string> examinationPeriodData;
+  examinationPeriodData.push_back(examinationPeriod.name);
+  mitk::VectorProperty<std::string>::Pointer newExaminationPeriodVectorProperty = mitk::VectorProperty<std::string>::New();
+  newExaminationPeriodVectorProperty->SetValue(examinationPeriodData);
+  propertyList->SetProperty(examinationPeriod.UID, newExaminationPeriodVectorProperty);
 }
 
 void mitk::RelationStorage::AddControlPointToExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ExaminationPeriod examinationPeriod)
@@ -1233,12 +1205,10 @@ void mitk::RelationStorage::AddInformationTypeToImage(const SemanticTypes::CaseI
     MITK_INFO << "Incorrect data storage. Not two (2) values stored.";
     return;
   }
-  else
-  {
-    // the first value of the data node vector is the information type
-    imageNodeVectorValue[0] = informationType;
-    imageNodeVectorProperty->SetValue(imageNodeVectorValue);
-  }
+
+  // the first value of the data node vector is the information type
+  imageNodeVectorValue[0] = informationType;
+  imageNodeVectorProperty->SetValue(imageNodeVectorValue);
 }
 
 void mitk::RelationStorage::RemoveInformationTypeFromImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID)
@@ -1264,13 +1234,11 @@ void mitk::RelationStorage::RemoveInformationTypeFromImage(const SemanticTypes::
     MITK_INFO << "Incorrect data storage. Not two (2) values stored.";
     return;
   }
-  else
-  {
-    // the first value of the data node vector is the information type
-    // set the information type to an empty string for removal
-    imageNodeVectorValue[0] = "";
-    imageNodeVectorProperty->SetValue(imageNodeVectorValue);
-  }
+
+  // the first value of the data node vector is the information type
+  // set the information type to an empty string for removal
+  imageNodeVectorValue[0] = "";
+  imageNodeVectorProperty->SetValue(imageNodeVectorValue);
 }
 
 void mitk::RelationStorage::RemoveInformationTypeFromCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType informationType)
@@ -1358,11 +1326,9 @@ mitk::SemanticTypes::Lesion mitk::RelationStorage::GenerateLesion(const Semantic
 
     return generatedLesion;
   }
-  else
-  {
-    MITK_INFO << "Incorrect lesion class storage. Lesion " << lesionID << " can not be retrieved.";
-    return SemanticTypes::Lesion();
-  }
+
+  MITK_INFO << "Incorrect lesion class storage. Lesion " << lesionID << " can not be retrieved.";
+  return SemanticTypes::Lesion();
 }
 
 mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GenerateControlpoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& controlPointUID)

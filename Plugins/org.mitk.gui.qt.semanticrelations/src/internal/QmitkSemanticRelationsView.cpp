@@ -80,6 +80,12 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
   }
 
   SetUpConnections();
+
+  const auto& allCaseIDs = m_SemanticRelations->GetAllCaseIDs();
+  for (const auto& caseID : allCaseIDs)
+  {
+    AddToComboBox(caseID);
+  }
 }
 
 void QmitkSemanticRelationsView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)

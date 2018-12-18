@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // itk
 #include <itkObjectFactory.h>
 
-mitk::Tool::Tool(const char *type)
+mitk::Tool::Tool(const char *type, const us::Module *interactorModule)
   : m_EventConfig("DisplayConfigMITK.xml"),
     m_ToolManager(nullptr),
     m_PredicateImages(NodePredicateDataType::New("Image")), // for reference images
@@ -53,7 +53,8 @@ mitk::Tool::Tool(const char *type)
     m_IsSegmentationPredicate(
       NodePredicateAnd::New(NodePredicateOr::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper)),
     m_InteractorType(type),
-    m_DisplayInteractorConfigs()
+    m_DisplayInteractorConfigs(),
+    m_InteractorModule(interactorModule)
 {
 }
 
@@ -71,16 +72,20 @@ void mitk::Tool::InitializeStateMachine()
   if (m_InteractorType.empty())
     return;
 
-  m_InteractorType += ".xml";
-
   try
   {
-    LoadStateMachine(m_InteractorType, us::GetModuleContext()->GetModule());
-    SetEventConfig("SegmentationToolsConfig.xml", us::GetModuleContext()->GetModule());
+    auto isThisModule = nullptr == m_InteractorModule;
+
+    auto module = isThisModule
+      ? us::GetModuleContext()->GetModule()
+      : m_InteractorModule;
+
+    LoadStateMachine(m_InteractorType + ".xml", module);
+    SetEventConfig(isThisModule ? "SegmentationToolsConfig.xml" : m_InteractorType + "Config.xml", module);
   }
   catch (const std::exception &e)
   {
-    MITK_ERROR << "Could not load statemachine pattern " << m_InteractorType << " with exception: " << e.what();
+    MITK_ERROR << "Could not load statemachine pattern " << m_InteractorType << ".xml with exception: " << e.what();
   }
 }
 

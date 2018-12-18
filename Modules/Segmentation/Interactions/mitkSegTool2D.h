@@ -97,7 +97,7 @@ namespace mitk
 
   protected:
     SegTool2D();             // purposely hidden
-    SegTool2D(const char *); // purposely hidden
+    SegTool2D(const char *, const us::Module *interactorModule = nullptr); // purposely hidden
     ~SegTool2D() override;
 
     struct SliceInformation

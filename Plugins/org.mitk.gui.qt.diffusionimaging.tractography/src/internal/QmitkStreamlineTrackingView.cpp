@@ -661,7 +661,8 @@ void QmitkStreamlineTrackingView::UpdateGui()
       m_Controls->m_gBox->setEnabled(true);
       m_Controls->m_gLabel->setEnabled(true);
     }
-    else if ( dynamic_cast<mitk::OdfImage*>(m_InputImageNodes.at(0)->GetData()) )
+    else if ( dynamic_cast<mitk::OdfImage*>(m_InputImageNodes.at(0)->GetData()) ||
+              dynamic_cast<mitk::ShImage*>(m_InputImageNodes.at(0)->GetData()))
     {
       m_Controls->m_OdfCutoffBox->setEnabled(true);
       m_Controls->m_OdfCutoffLabel->setEnabled(true);

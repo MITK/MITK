@@ -33,7 +33,7 @@ mitk::ContourModelUtils::~ContourModelUtils()
 }
 
 mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(
-  Image *slice, ContourModel *contourIn3D, bool, bool constrainToInside)
+  Image *slice, ContourModel *contourIn3D, bool, bool)
 {
   if (nullptr == slice || nullptr == contourIn3D)
     return nullptr;

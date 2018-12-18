@@ -8,13 +8,14 @@ set(MODULE_TESTS
   # mark it as critical.
   ################## DISABLED TESTS #####################################################
 
+  #mitkBandpassFilterTest.cpp #This test is disabled because of T25780
+  #mitkBeamformingFilterTest.cpp #This test is disabled because of T25780
+
   ################# RUNNING TESTS #######################################################
 
   mitkPhotoacousticMotionCorrectionFilterTest.cpp
   mitkPAFilterServiceTest.cpp
   mitkCastToFloatImageFilterTest.cpp
-  mitkBandpassFilterTest.cpp
-  mitkBeamformingFilterTest.cpp
   mitkCropImageFilterTest.cpp
   )
 set(RESOURCE_FILES)

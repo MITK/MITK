@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
   parser.setContributor("MIC");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "input fiber bundle (.fib)", us::Any(), false);
+  parser.addArgument("", "i", mitkCommandLineParser::String, "Input:", "input fiber bundle", us::Any(), false);
   parser.addArgument("", "o", mitkCommandLineParser::String, "Output:", "output image", us::Any(), false);
   parser.addArgument("binary", "", mitkCommandLineParser::Bool, "Binary output:", "calculate binary tract envelope", us::Any());
   parser.addArgument("normalize", "", mitkCommandLineParser::Bool, "Normalized output:", "normalize output to 0-1", us::Any());

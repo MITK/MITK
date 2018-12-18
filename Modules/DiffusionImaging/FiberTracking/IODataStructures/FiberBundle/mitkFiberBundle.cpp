@@ -1093,6 +1093,8 @@ std::tuple<float, float> mitk::FiberBundle::GetDirectionalOverlap(ItkUcharImgTyp
           peak[1] = peak_image->GetPixel(idx4);
           idx4[3] = 2;
           peak[2] = peak_image->GetPixel(idx4);
+          if (std::isnan(peak[0]) || std::isnan(peak[1]) || std::isnan(peak[2]) || peak.magnitude()<0.0001f)
+            continue;
           peak.normalize();
           
           double f = 1.0 - std::acos(std::fabs(static_cast<double>(dot_product(fdir, peak)))) * 2.0/itk::Math::pi;

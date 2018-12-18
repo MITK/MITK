@@ -124,8 +124,11 @@ int main(int argc, char* argv[])
         }
 
         // segment tract
-        segmenter->SetFilterMask(ref_masks.at(c));
-        segmenter->SetOverlapThreshold(0.8f);
+        if (c<ref_masks.size())
+        {
+          segmenter->SetFilterMask(ref_masks.at(c));
+          segmenter->SetOverlapThreshold(0.8f);
+        }
         segmenter->SetDistances(distances);
         segmenter->SetTractogram(resampled_fib);
         segmenter->SetMergeDuplicateThreshold(0.0);

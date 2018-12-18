@@ -218,6 +218,8 @@ std::vector< TractClusteringFilter::Cluster > TractClusteringFilter::MergeDuplic
 {
   if (m_MergeDuplicateThreshold<0)
     m_MergeDuplicateThreshold = m_Distances.at(0)/2;
+  else if (m_MergeDuplicateThreshold==0)
+    return clusters;
 
   MITK_INFO << "Merging duplicate clusters with distance threshold " << m_MergeDuplicateThreshold;
 

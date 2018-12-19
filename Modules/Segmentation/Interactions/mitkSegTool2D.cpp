@@ -60,8 +60,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 bool mitk::SegTool2D::m_SurfaceInterpolationEnabled = true;
 
-mitk::SegTool2D::SegTool2D(const char *type)
-  : Tool(type), m_LastEventSender(nullptr), m_LastEventSlice(0), m_Contourmarkername("Position"), m_ShowMarkerNodes(false)
+mitk::SegTool2D::SegTool2D(const char *type, const us::Module *interactorModule)
+  : Tool(type, interactorModule), m_LastEventSender(nullptr), m_LastEventSlice(0), m_Contourmarkername("Position"), m_ShowMarkerNodes(false)
 {
   Tool::m_EventConfig = "DisplayConfigMITKNoCrosshair.xml";
 }

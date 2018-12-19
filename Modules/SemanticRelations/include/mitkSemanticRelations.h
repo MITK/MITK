@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk core
 #include <mitkDataNode.h>
 #include <mitkDataStorage.h>
+#include <mitkWeakPointer.h>
 
 namespace mitk
 {
@@ -50,7 +51,7 @@ namespace mitk
   {
   public:
 
-    SemanticRelations(mitk::DataStorage::Pointer dataStorage);
+    SemanticRelations(DataStorage* dataStorage);
     ~SemanticRelations();
 
     using DataNodeVector = std::vector<DataNode::Pointer> ;
@@ -599,7 +600,8 @@ namespace mitk
 
     // the relation storage serves as a storage accessor and can be sub-classed for custom demands
     std::shared_ptr<RelationStorage> m_RelationStorage;
-    DataStorage::Pointer m_DataStorage;
+    WeakPointer<DataStorage> m_DataStorage;
+
     /**
     * @brief A vector that stores the currently registered observer of this observable subject.
     */

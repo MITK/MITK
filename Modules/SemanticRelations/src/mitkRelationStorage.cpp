@@ -29,15 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 #include <iostream>
 
-void mitk::RelationStorage::SetDataStorage(DataStorage::Pointer dataStorage)
-{
-  if (m_DataStorage != dataStorage)
-  {
-    // set the new data storage
-    m_DataStorage = dataStorage;
-  }
-}
-
 std::vector<mitk::SemanticTypes::Lesion> mitk::RelationStorage::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID)
 {
   mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
@@ -101,45 +92,6 @@ mitk::SemanticTypes::Lesion mitk::RelationStorage::GetRepresentedLesion(const Se
   }
 
   return GenerateLesion(caseID, lesionID);
-}
-
-std::vector<mitk::DataNode::Pointer> mitk::RelationStorage::GetAllSegmentationsOfCase(const SemanticTypes::CaseID& caseID)
-{
-  if (m_DataStorage.IsNull())
-  {
-    MITK_INFO << "No valid data storage found in the mitkPersistenceService-class. Segmentations of the current case can not be retrieved.";
-    return std::vector<mitk::DataNode::Pointer>();
-  }
-
-  std::vector<std::string> allSegmentationIDsOfCase = GetAllSegmentationIDsOfCase(caseID);
-  std::vector<DataNode::Pointer> allSegmentationsOfCase;
-  // get all segmentation nodes of the current data storage
-  // only those nodes are respected, that are currently held in the data storage
-  DataStorage::SetOfObjects::ConstPointer segmentationNodes = m_DataStorage->GetSubset(NodePredicates::GetSegmentationPredicate());
-  for (auto it = segmentationNodes->Begin(); it != segmentationNodes->End(); ++it)
-  {
-    DataNode* segmentationNode = it->Value();
-    try
-    {
-      // find the corresponding segmentation node for the given segmentation ID
-      std::string nodeCaseID = GetCaseIDFromDataNode(segmentationNode);
-      std::string nodeSegmentationID = GetIDFromDataNode(segmentationNode);
-      if (nodeCaseID == caseID && (std::find(allSegmentationIDsOfCase.begin(), allSegmentationIDsOfCase.end(), nodeSegmentationID) != allSegmentationIDsOfCase.end()))
-      {
-        // found current image node in the storage, add it to the return vector
-        allSegmentationsOfCase.push_back(segmentationNode);
-      }
-    }
-    catch (const std::exception&)
-    {
-      // found a segmentation node that is not stored in the semantic relations
-      // this segmentation node does not have any DICOM information --> exception thrown
-      // continue with the next segmentation to compare IDs
-      continue;
-    }
-  }
-
-  return allSegmentationsOfCase;
 }
 
 std::vector<std::string> mitk::RelationStorage::GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID)
@@ -342,35 +294,6 @@ std::vector<mitk::SemanticTypes::InformationType> mitk::RelationStorage::GetAllI
   }
 
   return informationTypeVectorProperty->GetValue();
-}
-
-std::vector<mitk::DataNode::Pointer> mitk::RelationStorage::GetAllImagesOfCase(const SemanticTypes::CaseID& caseID)
-{
-  if (m_DataStorage.IsNull())
-  {
-    MITK_INFO << "No valid data storage found in the mitkPersistenceService-class. Images of the current case can not be retrieved.";
-    return std::vector<mitk::DataNode::Pointer>();
-  }
-
-  std::vector<std::string> allImageIDsOfCase = GetAllImageIDsOfCase(caseID);
-  std::vector<DataNode::Pointer> allImagesOfCase;
-  // get all image nodes of the current data storage
-  // only those nodes are respected, that are currently held in the data storage
-  DataStorage::SetOfObjects::ConstPointer imageNodes = m_DataStorage->GetSubset(NodePredicates::GetImagePredicate());
-  for (auto it = imageNodes->Begin(); it != imageNodes->End(); ++it)
-  {
-    DataNode* imageNode = it->Value();
-    // find the corresponding image node for the given segmentation ID
-    std::string nodeCaseID = GetCaseIDFromDataNode(imageNode);
-    std::string nodeImageID = GetIDFromDataNode(imageNode);
-    if (nodeCaseID == caseID && (std::find(allImageIDsOfCase.begin(), allImageIDsOfCase.end(), nodeImageID) != allImageIDsOfCase.end()))
-    {
-      // found current image node in the storage, add it to the return vector
-      allImagesOfCase.push_back(imageNode);
-    }
-  }
-
-  return allImagesOfCase;
 }
 
 std::vector<std::string> mitk::RelationStorage::GetAllImageIDsOfCase(const SemanticTypes::CaseID& caseID)

@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <mitkDiffusionPropertyHelper.h>
 #include <mitkOdfImage.h>
+#include <mitkShImage.h>
 #include <mitkImageCast.h>
 #include <itkVectorImageToFourDImageFilter.h>
 #include <mitkPeakImage.h>
@@ -38,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDimension.h>
+#include <itkShCoefficientImageImporter.h>
 
 const std::string QmitkDipyReconstructionsView::VIEW_ID = "org.mitk.views.dipyreconstruction";
 
@@ -208,6 +210,7 @@ void QmitkDipyReconstructionsView::StartFit()
     m_PythonService->Execute("normalize_peaks=True");
 
   std::string model = "3D-SHORE";
+  int sh_order = 0;
   switch(m_Controls->m_ModelBox->currentIndex())
   {
   case 0:
@@ -228,21 +231,24 @@ void QmitkDipyReconstructionsView::StartFit()
   case 2:
   {
     model = "CSD";
-    m_PythonService->Execute("sh_order=" + boost::lexical_cast<std::string>(m_Controls->m_ShOrderCsd->value()));
+    sh_order = m_Controls->m_ShOrderCsd->value();
+    m_PythonService->Execute("sh_order=" + boost::lexical_cast<std::string>(sh_order));
     m_PythonService->Execute("fa_thr=" + boost::lexical_cast<std::string>(m_Controls->m_FaThresholdCsd->value()));
     break;
   }
   case 3:
   {
     model = "CSA-QBALL";
-    m_PythonService->Execute("sh_order=" + boost::lexical_cast<std::string>(m_Controls->m_ShOrderCsa->value()));
+    sh_order = m_Controls->m_ShOrderCsa->value();
+    m_PythonService->Execute("sh_order=" + boost::lexical_cast<std::string>(sh_order));
     m_PythonService->Execute("smooth=" + boost::lexical_cast<std::string>(m_Controls->m_LambdaCsa->value()));
     break;
   }
   case 4:
   {
     model = "Opdt";
-    m_PythonService->Execute("sh_order=" + boost::lexical_cast<std::string>(m_Controls->m_ShOrderOpdt->value()));
+    sh_order = m_Controls->m_ShOrderOpdt->value();
+    m_PythonService->Execute("sh_order=" + boost::lexical_cast<std::string>(sh_order));
     m_PythonService->Execute("smooth=" + boost::lexical_cast<std::string>(m_Controls->m_LambdaOpdt->value()));
     break;
   }
@@ -290,6 +296,93 @@ void QmitkDipyReconstructionsView::StartFit()
     odfs->SetName(name.toStdString() + "_" + model);
     GetDataStorage()->Add(odfs, node);
     m_PythonService->Execute("del odf_image");
+  }
+  else if (m_PythonService->DoesVariableExist("sh_image"))
+  {
+    mitk::Image::Pointer out_image = m_PythonService->CopySimpleItkImageFromPython("sh_image");
+    itk::VectorImage<float>::Pointer vectorImage = itk::VectorImage<float>::New();
+    mitk::CastToItkImage(out_image, vectorImage);
+
+    itk::VectorImageToFourDImageFilter< float >::Pointer converter = itk::VectorImageToFourDImageFilter< float >::New();
+    converter->SetInputImage(vectorImage);
+    converter->GenerateData();
+    mitk::ShImage::ShOnDiskType::Pointer itkImg = converter->GetOutputImage();
+
+    mitk::ShImage::Pointer shImage = mitk::ShImage::New();
+    mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(shImage.GetPointer());
+
+    switch(sh_order)
+    {
+    case 2:
+    {
+      typedef itk::ShCoefficientImageImporter< float, 2 > ImporterType;
+      typename ImporterType::Pointer importer = ImporterType::New();
+      importer->SetInputImage(itkImg);
+      importer->GenerateData();
+      mitk::CastToMitkImage(importer->GetCoefficientImage(), mitkImage);
+      mitkImage->SetVolume(importer->GetCoefficientImage()->GetBufferPointer());
+      break;
+    }
+    case 4:
+    {
+      typedef itk::ShCoefficientImageImporter< float, 4 > ImporterType;
+      typename ImporterType::Pointer importer = ImporterType::New();
+      importer->SetInputImage(itkImg);
+      importer->GenerateData();
+      mitk::CastToMitkImage(importer->GetCoefficientImage(), mitkImage);
+      mitkImage->SetVolume(importer->GetCoefficientImage()->GetBufferPointer());
+      break;
+    }
+    case 6:
+    {
+      typedef itk::ShCoefficientImageImporter< float, 6 > ImporterType;
+      typename ImporterType::Pointer importer = ImporterType::New();
+      importer->SetInputImage(itkImg);
+      importer->GenerateData();
+      mitk::CastToMitkImage(importer->GetCoefficientImage(), mitkImage);
+      mitkImage->SetVolume(importer->GetCoefficientImage()->GetBufferPointer());
+      break;
+    }
+    case 8:
+    {
+      typedef itk::ShCoefficientImageImporter< float, 8 > ImporterType;
+      typename ImporterType::Pointer importer = ImporterType::New();
+      importer->SetInputImage(itkImg);
+      importer->GenerateData();
+      mitk::CastToMitkImage(importer->GetCoefficientImage(), mitkImage);
+      mitkImage->SetVolume(importer->GetCoefficientImage()->GetBufferPointer());
+      break;
+    }
+    case 10:
+    {
+      typedef itk::ShCoefficientImageImporter< float, 10 > ImporterType;
+      typename ImporterType::Pointer importer = ImporterType::New();
+      importer->SetInputImage(itkImg);
+      importer->GenerateData();
+      mitk::CastToMitkImage(importer->GetCoefficientImage(), mitkImage);
+      mitkImage->SetVolume(importer->GetCoefficientImage()->GetBufferPointer());
+      break;
+    }
+    case 12:
+    {
+      typedef itk::ShCoefficientImageImporter< float, 12 > ImporterType;
+      typename ImporterType::Pointer importer = ImporterType::New();
+      importer->SetInputImage(itkImg);
+      importer->GenerateData();
+      mitk::CastToMitkImage(importer->GetCoefficientImage(), mitkImage);
+      mitkImage->SetVolume(importer->GetCoefficientImage()->GetBufferPointer());
+      break;
+    }
+    default:
+      mitkThrow() << "SH order not supported";
+    }
+
+    mitk::DataNode::Pointer shNode = mitk::DataNode::New();
+    shNode->SetData( mitkImage );
+    QString name(node->GetName().c_str());
+    shNode->SetName(name.toStdString() + "_" + model);
+    GetDataStorage()->Add(shNode, node);
+    m_PythonService->Execute("del sh_image");
   }
 
   if (m_Controls->m_DoCalculatePeaks->isChecked() && m_PythonService->DoesVariableExist("peak_image"))

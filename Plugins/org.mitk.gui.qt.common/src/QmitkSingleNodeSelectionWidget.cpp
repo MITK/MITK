@@ -231,7 +231,7 @@ void QmitkSingleNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)
 
   if (!EqualNodeSelections(lastEmission, newEmission))
   {
-    emit CurrentSelectionChanged(newEmission);
     this->UpdateInfo();
+    emit CurrentSelectionChanged(newEmission);
   }
 };

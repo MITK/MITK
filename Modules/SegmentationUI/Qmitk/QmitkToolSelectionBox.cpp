@@ -246,6 +246,10 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
     {
       // create and reparent new GUI (if any)
       itk::Object::Pointer possibleGUI = tool->GetGUI("Qmitk", "GUI").GetPointer(); // prefix and postfix
+
+      if (possibleGUI.IsNull())
+        possibleGUI = tool->GetGUI("", "GUI").GetPointer();
+
       QmitkToolGUI *gui = dynamic_cast<QmitkToolGUI *>(possibleGUI.GetPointer());
 
       //!

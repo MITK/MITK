@@ -17,7 +17,6 @@ endforeach()
 #-----------------------------------------------------------------------------
 
 set(MITK_EXTENSION_DIRS "" CACHE STRING "")
-mark_as_advanced(MITK_EXTENSION_DIRS)
 
 #-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default

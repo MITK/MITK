@@ -33,7 +33,7 @@ namespace mitk
     SemanticTypes::LesionVector GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID);
     SemanticTypes::Lesion GetRepresentedLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID);
 
-    std::vector<std::string> mitk::RelationStorage::GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID);
+    std::vector<std::string> GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID);
 
     SemanticTypes::ControlPoint GetControlPointOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
     SemanticTypes::ControlPointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID);
@@ -76,14 +76,11 @@ namespace mitk
   private:
 
     // access the storage and retrieve the case data, stored under the given case ID
-    mitk::PropertyList::Pointer GetStorageData(const SemanticTypes::CaseID& caseID);
+    PropertyList::Pointer GetStorageData(const SemanticTypes::CaseID& caseID);
 
-    mitk::SemanticTypes::Lesion GenerateLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& lesionID);
+    SemanticTypes::Lesion GenerateLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& lesionID);
 
-    mitk::SemanticTypes::ControlPoint GenerateControlpoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& controlPointUID);
-
-    DataStorage::Pointer m_DataStorage;
-
+    SemanticTypes::ControlPoint GenerateControlpoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& controlPointUID);
   };
 
 } // namespace mitk

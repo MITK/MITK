@@ -308,6 +308,8 @@ try:
 
 
     # fit selected model
+    sh_coeffs = None
+    odf = None
     if model_type == '3D-SHORE':
         print('Fitting 3D-SHORE')
         print("radial_order: ", radial_order)
@@ -322,8 +324,7 @@ try:
         print("sh_order: ", sh_order)
         print("smooth: ", smooth)
         model = CsaOdfModel(gtab=gtab, sh_order=sh_order, smooth=smooth)
-        odf = model.fit(data, mask=mask).odf(sphere)
-        odf = np.clip(odf, 0, np.max(odf, -1)[..., None])
+        sh_coeffs = model.fit(data, mask=mask).shm_coeff
     elif model_type == 'SFM':
         print('Fitting SFM')
         print("fa_thr: ", fa_thr)
@@ -338,25 +339,42 @@ try:
         print("fa_thr: ", fa_thr)
         response, ratio = auto_response(gtab, data, roi_radius=10, fa_thr=fa_thr)
         model = ConstrainedSphericalDeconvModel(gtab, response, sh_order=sh_order)
-        odf = model.fit(data).odf(sphere)
+        sh_coeffs = model.fit(data).shm_coeff
     elif model_type == 'Opdt':
         print('Orientation Probability Density Transform')
         print("sh_order: ", sh_order)
         print("smooth: ", smooth)
         model = OpdtModel(gtab=gtab, sh_order=sh_order, smooth=smooth)
-        odf = model.fit(data, mask=mask).odf(sphere)
+        sh_coeffs = model.fit(data, mask=mask).shm_coeff
     else:
         raise ValueError('Model type not supported. Available models: 3D-SHORE, CSA-QBALL, SFM, CSD, Opdt')
 
-    odf = np.nan_to_num(odf)
-    print('Preparing ODF image')
-    odf_image = sitk.Image([data.shape[2], data.shape[1], data.shape[0]], sitk.sitkVectorFloat32, len(sphere.vertices))
-    for x in range(data.shape[2]):
-        for y in range(data.shape[1]):
-            for z in range(data.shape[0]):
-                if mask is not None and mask[z, y, x] == 0:
-                    continue
-                odf_image.SetPixel(x, y, z, odf[z, y, x, :])
+    if odf is not None:
+        odf = np.nan_to_num(odf)
+        print('Preparing ODF image')
+        odf_image = sitk.Image([data.shape[2], data.shape[1], data.shape[0]], sitk.sitkVectorFloat32, len(sphere.vertices))
+        for x in range(data.shape[2]):
+            for y in range(data.shape[1]):
+                for z in range(data.shape[0]):
+                    if mask is not None and mask[z, y, x] == 0:
+                        continue
+                    odf_image.SetPixel(x, y, z, odf[z, y, x, :])
+        odf_image.SetOrigin(in_image.GetOrigin())
+        odf_image.SetSpacing(in_image.GetSpacing())
+        odf_image.SetDirection(in_image.GetDirection())
+    elif sh_coeffs is not None:
+        sh_coeffs = np.nan_to_num(sh_coeffs)
+        print('Preparing SH image')
+        sh_image = sitk.Image([sh_coeffs.shape[2], sh_coeffs.shape[1], sh_coeffs.shape[0]], sitk.sitkVectorFloat32, sh_coeffs.shape[3])
+        for x in range(sh_coeffs.shape[2]):
+            for y in range(sh_coeffs.shape[1]):
+                for z in range(sh_coeffs.shape[0]):
+                    if mask is not None and mask[z, y, x] == 0:
+                        continue
+                    sh_image.SetPixel(x, y, z, sh_coeffs[z, y, x, :])
+        sh_image.SetOrigin(in_image.GetOrigin())
+        sh_image.SetSpacing(in_image.GetSpacing())
+        sh_image.SetDirection(in_image.GetDirection())
 
     if num_peaks > 0:
 
@@ -397,10 +415,6 @@ try:
         peak_image.SetOrigin(in_image.GetOrigin())
         peak_image.SetSpacing(in_image.GetSpacing())
         peak_image.SetDirection(in_image.GetDirection())
-
-    odf_image.SetOrigin(in_image.GetOrigin())
-    odf_image.SetSpacing(in_image.GetSpacing())
-    odf_image.SetDirection(in_image.GetDirection())
 
 
 except Exception as e:

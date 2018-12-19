@@ -246,7 +246,7 @@ QGroupBox {
          <number>2</number>
         </property>
         <property name="maximum">
-         <number>100</number>
+         <number>12</number>
         </property>
         <property name="singleStep">
          <number>2</number>
@@ -410,7 +410,7 @@ QGroupBox {
          <number>2</number>
         </property>
         <property name="maximum">
-         <number>100</number>
+         <number>12</number>
         </property>
         <property name="singleStep">
          <number>2</number>
@@ -511,7 +511,7 @@ QGroupBox {
          <number>2</number>
         </property>
         <property name="maximum">
-         <number>100</number>
+         <number>12</number>
         </property>
         <property name="singleStep">
          <number>2</number>

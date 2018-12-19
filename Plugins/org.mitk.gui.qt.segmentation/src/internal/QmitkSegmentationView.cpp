@@ -1123,17 +1123,16 @@ void QmitkSegmentationView::ResetMouseCursor()
 
 void QmitkSegmentationView::SetMouseCursor( const us::ModuleResource& resource, int hotspotX, int hotspotY )
 {
-   if (!resource) return;
-
    // Remove previously set mouse cursor
-   if ( m_MouseCursorSet )
-   {
-      mitk::ApplicationCursor::GetInstance()->PopCursor();
-   }
+   if (m_MouseCursorSet)
+      this->ResetMouseCursor();
 
-   us::ModuleResourceStream cursor(resource, std::ios::binary);
-   mitk::ApplicationCursor::GetInstance()->PushCursor( cursor, hotspotX, hotspotY );
-   m_MouseCursorSet = true;
+   if (resource)
+   {
+     us::ModuleResourceStream cursor(resource, std::ios::binary);
+     mitk::ApplicationCursor::GetInstance()->PushCursor(cursor, hotspotX, hotspotY);
+     m_MouseCursorSet = true;
+   }
 }
 
 void QmitkSegmentationView::SetToolSelectionBoxesEnabled(bool status)

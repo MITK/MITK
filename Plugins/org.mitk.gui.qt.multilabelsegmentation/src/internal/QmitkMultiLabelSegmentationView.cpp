@@ -337,8 +337,7 @@ void QmitkMultiLabelSegmentationView::OnManualTool2DSelected(int id)
     mitk::StatusBar::GetInstance()->DisplayText(text.c_str());
 
     us::ModuleResource resource = m_ToolManager->GetToolById(id)->GetCursorIconResource();
-    if (resource.IsValid())
-      this->SetMouseCursor(resource, 0, 0);
+    this->SetMouseCursor(resource, 0, 0);
   }
 }
 
@@ -1081,13 +1080,14 @@ void QmitkMultiLabelSegmentationView::SetMouseCursor(const us::ModuleResource re
 {
   // Remove previously set mouse cursor
   if (m_MouseCursorSet)
-  {
-    mitk::ApplicationCursor::GetInstance()->PopCursor();
-  }
+    this->ResetMouseCursor();
 
-  us::ModuleResourceStream cursor(resource, std::ios::binary);
-  mitk::ApplicationCursor::GetInstance()->PushCursor(cursor, hotspotX, hotspotY);
-  m_MouseCursorSet = true;
+  if (resource)
+  {
+    us::ModuleResourceStream cursor(resource, std::ios::binary);
+    mitk::ApplicationCursor::GetInstance()->PushCursor(cursor, hotspotX, hotspotY);
+    m_MouseCursorSet = true;
+  }
 }
 
 void QmitkMultiLabelSegmentationView::InitializeListeners()

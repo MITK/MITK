@@ -344,7 +344,7 @@ namespace mitk
      * @throws mitk::Exception if no writer for \c data is available or the writer
      *         is not able to write the image.
      */
-    static void Save(const mitk::BaseData *data, const std::string &path);
+    static void Save(const mitk::BaseData *data, const std::string &path, bool setPathProperty = false);
 
     /**
      * @brief Save a mitk::BaseData instance.
@@ -356,7 +356,7 @@ namespace mitk
      * @throws mitk::Exception if no writer for \c data is available or the writer
      *         is not able to write the image.
      */
-    static void Save(const mitk::BaseData *data, const std::string &path, const IFileWriter::Options &options);
+    static void Save(const mitk::BaseData *data, const std::string &path, const IFileWriter::Options &options, bool setPathProperty = false);
 
     /**
      * @brief Save a mitk::BaseData instance.
@@ -373,7 +373,8 @@ namespace mitk
     static void Save(const mitk::BaseData *data,
                      const std::string &mimeType,
                      const std::string &path,
-                     bool addExtension = true);
+                     bool addExtension = true,
+                     bool setPathProperty = false);
 
     /**
      * @brief Save a mitk::BaseData instance.
@@ -392,7 +393,8 @@ namespace mitk
                      const std::string &mimeType,
                      const std::string &path,
                      const mitk::IFileWriter::Options &options,
-                     bool addExtension = true);
+                     bool addExtension = true,
+                     bool setPathProperty = false);
 
     /**
      * @brief Use SaveInfo objects to save BaseData instances.
@@ -404,7 +406,7 @@ namespace mitk
      *
      * @see Save(const mitk::BaseData*, const std::string&)
      */
-    static void Save(std::vector<SaveInfo> &saveInfos);
+    static void Save(std::vector<SaveInfo> &saveInfos, bool setPathProperty = false);
 
   protected:
     static std::string Load(std::vector<LoadInfo> &loadInfos,
@@ -416,9 +418,12 @@ namespace mitk
                             const std::string &mimeType,
                             const std::string &path,
                             WriterOptionsFunctorBase *optionsCallback,
-                            bool addExtension);
+                            bool addExtension,
+                            bool setPathProperty);
 
-    static std::string Save(std::vector<SaveInfo> &saveInfos, WriterOptionsFunctorBase *optionsCallback);
+    static std::string Save(std::vector<SaveInfo> &saveInfos,
+                            WriterOptionsFunctorBase *optionsCallback,
+                            bool setPathProperty);
 
   private:
     struct Impl;

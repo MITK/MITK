@@ -262,12 +262,11 @@ void QmitkFileSaveAction::Run()
 
   try
   {
-    QStringList fileNames = QmitkIOUtil::Save(data, names, path,
-                                              d->m_Action->parentWidget());
+    auto setPathProperty = true;
+    auto fileNames = QmitkIOUtil::Save(data, names, path, d->m_Action->parentWidget(), setPathProperty);
+
     if (!fileNames.empty())
-    {
       d->setLastFileSavePath(QFileInfo(fileNames.back()).absolutePath());
-    }
   }
   catch (const mitk::Exception& e)
   {

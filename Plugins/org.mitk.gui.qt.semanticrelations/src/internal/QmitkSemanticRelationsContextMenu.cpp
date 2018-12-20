@@ -67,11 +67,11 @@ void QmitkSemanticRelationsContextMenu::InitDefaultActions()
   m_InformationTypeAction = new QmitkDataNodeInformationTypeAction(m_Parent, m_WorkbenchPartSite.Lock());
   addAction(m_InformationTypeAction);
 
-  m_RemoveFromSemanticRelationsAction = new QmitkDataNodeRemoveFromSemanticRelationsAction(m_Parent, m_WorkbenchPartSite.Lock());
-  addAction(m_RemoveFromSemanticRelationsAction);
-
   m_UnlinkFromLesionAction = new QmitkDataNodeUnlinkFromLesionAction(m_Parent, m_WorkbenchPartSite.Lock());
   addAction(m_UnlinkFromLesionAction);
+
+  m_RemoveFromSemanticRelationsAction = new QmitkDataNodeRemoveFromSemanticRelationsAction(m_Parent, m_WorkbenchPartSite.Lock());
+  addAction(m_RemoveFromSemanticRelationsAction);
 
   m_OpenInAction = new QmitkDataNodeOpenInAction(m_Parent, m_WorkbenchPartSite.Lock());
   addAction(m_OpenInAction);

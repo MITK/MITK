@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations plugin
 #include "QmitkSemanticRelationsView.h"
-#include "QmitkSemanticRelationsNodeSelectionDialog.h"
 #include "QmitkDataNodeAddToSemanticRelationsAction.h"
 #include "QmitkDataNodeRemoveFromSemanticRelationsAction.h"
 

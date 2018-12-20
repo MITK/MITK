@@ -803,7 +803,7 @@ mitk::RegEvaluationMapper2D::LocalStorage::LocalStorage()
   m_TargetExtractFilter = vtkSmartPointer<vtkImageExtractComponents>::New();
   m_MappedExtractFilter = vtkSmartPointer<vtkImageExtractComponents>::New();
 
-
+  m_mmPerPixel = nullptr;
 
   //Do as much actions as possible in here to avoid double executions.
   m_Plane = vtkSmartPointer<vtkPlaneSource>::New();

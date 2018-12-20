@@ -81,6 +81,7 @@ private Q_SLOTS:
   void OnLinkToSegmentation(mitk::SemanticTypes::Lesion);
   void OnSetLesionName(mitk::SemanticTypes::Lesion);
   void OnSetLesionClass(mitk::SemanticTypes::Lesion);
+  void OnPropagateLesion(mitk::SemanticTypes::Lesion);
   void OnRemoveLesion(mitk::SemanticTypes::Lesion);
 
 private:

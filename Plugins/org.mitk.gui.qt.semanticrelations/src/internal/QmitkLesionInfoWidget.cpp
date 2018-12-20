@@ -200,6 +200,11 @@ void QmitkLesionInfoWidget::OnLesionListContextMenuRequested(const QPoint& pos)
   connect(setLesionClass, &QAction::triggered, [this, selectedLesion] { OnSetLesionClass(selectedLesion); });
   menu->addAction(setLesionClass);
 
+  QAction* propageLesionToImage = new QAction("Propagate lesion to image", this);
+  propageLesionToImage->setEnabled(true);
+  connect(propageLesionToImage, &QAction::triggered, [this, selectedLesion] { OnPropagateLesion(selectedLesion); });
+  menu->addAction(propageLesionToImage);
+
   QAction* removeLesion = new QAction("Remove lesion", this);
   removeLesion->setEnabled(true);
   connect(removeLesion, &QAction::triggered, [this, selectedLesion] { OnRemoveLesion(selectedLesion); });
@@ -249,20 +254,11 @@ void QmitkLesionInfoWidget::OnLinkToSegmentation(mitk::SemanticTypes::Lesion sel
     selectedDataNode = nodes.front();
   }
 
-  if (nullptr == selectedDataNode)
+  if (nullptr == selectedDataNode
+    || false == mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(selectedDataNode))
   {
     QMessageBox msgBox;
     msgBox.setWindowTitle("No valid segmentation node selected.");
-    msgBox.setText("In order to link the selected lesion to a segmentation, please specify a valid segmentation node.");
-    msgBox.setIcon(QMessageBox::Warning);
-    msgBox.exec();
-    return;
-  }
-
-  if (false == mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(selectedDataNode))
-  {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("No segmentation selected");
     msgBox.setText("In order to link the selected lesion to a segmentation, please specify a valid segmentation node.");
     msgBox.setIcon(QMessageBox::Warning);
     msgBox.exec();
@@ -372,6 +368,86 @@ void QmitkLesionInfoWidget::OnSetLesionClass(mitk::SemanticTypes::Lesion selecte
 
   selectedLesion.lesionClass = existingLesionClass;
   m_SemanticRelations->OverwriteLesion(m_CaseID, selectedLesion);
+}
+
+void QmitkLesionInfoWidget::OnPropagateLesion(mitk::SemanticTypes::Lesion selectedLesion)
+{
+  if (m_CaseID.empty())
+  {
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("No case ID set.");
+    msgBox.setText("In order to propagate a lesion to an image, please specify the current case / patient.");
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.exec();
+    return;
+  }
+
+  if (m_DataStorage.IsExpired())
+  {
+    return;
+  }
+
+  auto dataStorage = m_DataStorage.Lock();
+
+  QmitkSemanticRelationsNodeSelectionDialog* dialog = new QmitkSemanticRelationsNodeSelectionDialog(this, "Select data node to propagate the selected lesion.", "");
+  dialog->SetDataStorage(dataStorage);
+  dialog->setWindowTitle("Select image node");
+  dialog->SetNodePredicate(mitk::NodePredicates::GetImagePredicate());
+  dialog->SetSelectOnlyVisibleNodes(true);
+  dialog->SetSelectionMode(QAbstractItemView::SingleSelection);
+  dialog->SetCaseID(m_CaseID);
+  dialog->SetLesion(selectedLesion);
+
+  int dialogReturnValue = dialog->exec();
+  if (QDialog::Rejected == dialogReturnValue)
+  {
+    return;
+  }
+
+  auto nodes = dialog->GetSelectedNodes();
+  mitk::DataNode::Pointer selectedDataNode = nullptr;
+  if (!nodes.isEmpty())
+  {
+    // only single selection allowed
+    selectedDataNode = nodes.front();
+  }
+
+  if (nullptr == selectedDataNode
+    || false == mitk::NodePredicates::GetImagePredicate()->CheckNode(selectedDataNode))
+  {
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("No valid image node selected.");
+    msgBox.setText("In order to propagate the selected lesion to an image, please specify a valid image node.");
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.exec();
+    return;
+  }
+
+  mitk::BaseData* baseData = selectedDataNode->GetData();
+  if (nullptr == baseData)
+  {
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("No valid base data.");
+    msgBox.setText("In order to propagate the selected lesion to an image, please specify a valid image node.");
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.exec();
+    return;
+  }
+
+  try
+  {
+    auto allSegmentationsOfLesion = m_SemanticRelations->GetAllSegmentationsOfLesion(m_CaseID, selectedLesion);
+  }
+  catch (const mitk::SemanticRelationException& e)
+  {
+    std::stringstream exceptionMessage; exceptionMessage << e;
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Could not propagate the selected lesion.");
+    msgBox.setText("The program wasn't able to correctly propagate the selected lesion to the selected image.\n"
+      "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.exec();
+  }
 }
 
 void QmitkLesionInfoWidget::OnRemoveLesion(mitk::SemanticTypes::Lesion selectedLesion)

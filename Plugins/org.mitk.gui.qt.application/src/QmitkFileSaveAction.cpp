@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkWorkbenchUtil.h>
 #include <mitkDataNodeSelection.h>
+#include <mitkIDataStorageService.h>
 
 #include <berryISelectionService.h>
 #include <berryINullSelectionListener.h>
@@ -29,6 +30,67 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QFileDialog>
 #include <QMessageBox>
+
+namespace
+{
+  mitk::DataStorage::Pointer GetDataStorage()
+  {
+    auto context = mitk::org_mitk_gui_qt_application_Activator::GetContext();
+
+    if (nullptr == context)
+      return nullptr;
+
+    auto dataStorageServiceReference = context->getServiceReference<mitk::IDataStorageService>();
+
+    if (!dataStorageServiceReference)
+      return nullptr;
+
+    auto dataStorageService = context->getService<mitk::IDataStorageService>(dataStorageServiceReference);
+
+    if (nullptr == dataStorageService)
+      return nullptr;
+
+    auto dataStorageReference = dataStorageService->GetDataStorage();
+
+    if (dataStorageReference.IsNull())
+      return nullptr;
+
+    return dataStorageReference->GetDataStorage();
+  }
+
+  QString GetParentPath(mitk::DataNode::Pointer dataNode)
+  {
+    if (dataNode.IsNull())
+      return "";
+
+    auto dataStorage = GetDataStorage();
+
+    if (dataStorage.IsNull())
+      return "";
+
+    auto sources = dataStorage->GetSources(dataNode);
+
+    if (sources.IsNull() || sources->empty())
+      return "";
+
+    const auto &parentNode = sources->front();
+
+    if (parentNode.IsNull())
+      return "";
+
+    auto data = parentNode->GetData();
+
+    if (nullptr != data)
+    {
+      auto pathProperty = data->GetConstProperty("path");
+
+      if (pathProperty.IsNotNull())
+        return QFileInfo(QString::fromStdString(pathProperty->GetValueAsString())).canonicalPath();
+    }
+
+    return GetParentPath(parentNode);
+  }
+}
 
 class QmitkFileSaveActionPrivate
 {
@@ -183,10 +245,16 @@ void QmitkFileSaveAction::Run()
 
   if (1 == data.size())
   {
-    auto pathProperty = data[0]->GetConstProperty("path");
+    if (nullptr != data[0])
+    {
+      auto pathProperty = data[0]->GetConstProperty("path");
 
-    if (pathProperty.IsNotNull())
-      path = QFileInfo(QString::fromStdString(pathProperty->GetValueAsString())).canonicalPath();
+      if (pathProperty.IsNotNull())
+        path = QFileInfo(QString::fromStdString(pathProperty->GetValueAsString())).canonicalPath();
+    }
+
+    if (path.isEmpty())
+      path = GetParentPath(dataNodes.front());
   }
 
   if (path.isEmpty())

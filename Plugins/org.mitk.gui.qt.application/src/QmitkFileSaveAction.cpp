@@ -179,9 +179,22 @@ void QmitkFileSaveAction::Run()
     names.push_back(QString::fromStdString(name));
   }
 
+  QString path;
+
+  if (1 == data.size())
+  {
+    auto pathProperty = data[0]->GetConstProperty("path");
+
+    if (pathProperty.IsNotNull())
+      path = QFileInfo(QString::fromStdString(pathProperty->GetValueAsString())).canonicalPath();
+  }
+
+  if (path.isEmpty())
+    path = d->getLastFileSavePath();
+
   try
   {
-    QStringList fileNames = QmitkIOUtil::Save(data, names, d->getLastFileSavePath(),
+    QStringList fileNames = QmitkIOUtil::Save(data, names, path,
                                               d->m_Action->parentWidget());
     if (!fileNames.empty())
     {

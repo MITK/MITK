@@ -915,7 +915,6 @@ void QmitkMultiLabelSegmentationView::NodeRemoved(const mitk::DataNode *node)
 
 void QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection()
 {
-  MITK_INFO << "Connection Established";
   if (m_WorkingNode.IsNull())
   {
     return;
@@ -940,7 +939,6 @@ void QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection()
 
 void QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection()
 {
-  MITK_INFO << "Connection Lost";
   if (m_WorkingNode.IsNull())
   {
     return;

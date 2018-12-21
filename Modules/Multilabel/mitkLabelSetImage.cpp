@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImagePixelReadAccessor.h"
 #include "mitkImagePixelWriteAccessor.h"
 #include "mitkInteractionConst.h"
-#include "mitkIOUtil.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkPadImageFilter.h"
 #include "mitkRenderingManager.h"

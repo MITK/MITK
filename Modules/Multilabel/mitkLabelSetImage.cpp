@@ -564,6 +564,7 @@ void mitk::LabelSetImage::MaskStamp(mitk::Image *mask, bool forceOverwrite)
 
 mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index, bool useActiveLayer, unsigned int layer)
 {
+  auto previousActiveLayer = this->GetActiveLayer();
   auto mask = mitk::Image::New();
 
   try
@@ -579,23 +580,16 @@ mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index, bool 
       memset(accessor.GetData(), 0, byteSize);
     }
 
-    auto layerImage = this->GetLayerImage(useActiveLayer
-      ? this->GetActiveLayer()
-      : layer);
+    if (!useActiveLayer)
+      this->SetActiveLayer(layer);
 
-    /*std::ostringstream str;
-    str << "D:/layerImage_" << layer << "_" << index << ".nrrd";
-    IOUtil::Save(layerImage, str.str());*/
-
-    if (4 == layerImage->GetDimension())
+    if (4 == this->GetDimension())
     {
-      // Works with "this" but not with "layerImage".
-      // TODO: Find out why all pixels of "layerImage" are 0 in case of 4 dimensions!
-      ::CreateLabelMaskProcessing<4>(layerImage, mask, index);
+      ::CreateLabelMaskProcessing<4>(this, mask, index);
     }
-    else if (3 == layerImage->GetDimension())
+    else if (3 == this->GetDimension())
     {
-      ::CreateLabelMaskProcessing(layerImage, mask, index);
+      ::CreateLabelMaskProcessing(this, mask, index);
     }
     else
     {
@@ -604,8 +598,14 @@ mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index, bool 
   }
   catch (...)
   {
+    if (!useActiveLayer)
+      this->SetActiveLayer(previousActiveLayer);
+
     mitkThrow() << "Could not create a mask out of the selected label.";
   }
+
+  if (!useActiveLayer)
+    this->SetActiveLayer(previousActiveLayer);
 
   return mask;
 }

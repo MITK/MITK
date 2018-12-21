@@ -542,30 +542,26 @@ void mitk::LabelSetImage::MaskStamp(mitk::Image *mask, bool forceOverwrite)
 
 mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index, bool useActiveLayer, unsigned int layer)
 {
-  mitk::Image::Pointer mask = mitk::Image::New();
+  auto mask = mitk::Image::New();
+
   try
   {
     mask->Initialize(this);
 
-    unsigned int byteSize = sizeof(LabelSetImage::PixelType);
+    auto byteSize = sizeof(LabelSetImage::PixelType);
     for (unsigned int dim = 0; dim < mask->GetDimension(); ++dim)
-    {
       byteSize *= mask->GetDimension(dim);
+
+    {
+      ImageWriteAccessor accessor(mask);
+      memset(accessor.GetData(), 0, byteSize);
     }
-
-    mitk::ImageWriteAccessor *accessor = new mitk::ImageWriteAccessor(static_cast<mitk::Image *>(mask));
-    memset(accessor->GetData(), 0, byteSize);
-    delete accessor;
-
-    auto geometry = this->GetTimeGeometry()->Clone();
-    mask->SetTimeGeometry(geometry);
 
     auto layerImage = this->GetLayerImage(useActiveLayer
       ? this->GetActiveLayer()
       : layer);
 
-    //AccessByItk_2(layerImage, CreateLabelMaskProcessing, mask, index);
-    AccessByItk_2(this, CreateLabelMaskProcessing, mask, index); // TODO: Understand why this works but the line above does not work
+    AccessByItk_2(layerImage, CreateLabelMaskProcessing, mask, index);
   }
   catch (...)
   {

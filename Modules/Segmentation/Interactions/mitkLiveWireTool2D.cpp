@@ -52,7 +52,7 @@ private:
 };
 
 mitk::LiveWireTool2D::LiveWireTool2D()
-  : SegTool2D("LiveWireTool"), m_PlaneGeometry(nullptr), m_CreateAndUseDynamicCosts(false)
+  : SegTool2D("LiveWireTool"), m_CreateAndUseDynamicCosts(false), m_PlaneGeometry(nullptr)
 {
 }
 

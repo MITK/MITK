@@ -57,9 +57,9 @@ mitk::RegionGrowingTool::RegionGrowingTool()
     m_ScreenYDifference(0),
     m_ScreenXDifference(0),
     m_MouseDistanceScaleFactor(0.5),
+    m_PaintingPixelValue(0),
     m_FillFeedbackContour(true),
-    m_ConnectedComponentValue(1),
-    m_PaintingPixelValue(0)
+    m_ConnectedComponentValue(1)
 {
 }
 

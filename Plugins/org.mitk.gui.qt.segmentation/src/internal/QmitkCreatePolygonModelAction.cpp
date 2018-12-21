@@ -90,7 +90,7 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
     surfaceFilter->SetParameter("Sync visibility", false);
     surfaceFilter->SetParameter("Median kernel size", 3u);
     surfaceFilter->SetParameter("Decimate mesh", m_IsDecimated);
-    surfaceFilter->SetParameter("Decimation rate", (float) decimation);
+    surfaceFilter->SetParameter("Decimation rate", decimation);
 
     if (m_IsSmoothed)
     {

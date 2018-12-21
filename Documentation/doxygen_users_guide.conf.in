@@ -235,7 +235,7 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "embmainpage{1}=\page \1" \
                          "github{2}=<a href=\"https://github.com/MITK/MITK/blob/master/\1\">\2</a>" \
                          "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\" " \
-                         "minimumCMakeVersion=@CMAKE_MINIMUM_REQUIRED_VERSION@" \
+                         "minimumCMakeVersion=@MITK_CMAKE_MINIMUM_REQUIRED_VERSION@" \
                          "minimumQt5Version=@MITK_QT5_MINIMUM_VERSION@" \
                          "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm" \
                          "developersguidemainpage{1}=\page \1 " \

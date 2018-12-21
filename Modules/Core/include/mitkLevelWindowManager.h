@@ -79,6 +79,13 @@ namespace mitk
     *        Relevant properties are defined in the protected 'ObserverToPropertyValueMap'-members.
     */
     void Update(const itk::EventObject&);
+    /**
+    * @brief Updates the level window.
+    *        This function is only called if the 'selected' property of a data node is changed.
+    *        This is done in order to avoid finding the correct image each time a node is selected but
+    *        the 'm_SelectedImages' bool value is set to false (as the normal 'Update'-function would do).
+    *        Changes of the 'selected' property happen quite a lot so this should not slow down the application.
+    */
     void UpdateSelected(const itk::EventObject&);
 
     /** @brief Set a specific LevelWindowProperty; all changes will affect the image belonging to this property.
@@ -178,6 +185,7 @@ namespace mitk
     bool m_IsObserverTagSet;
     unsigned long m_PropertyModifiedTag;
     Image *m_CurrentImage;
+    std::vector<DataNode::Pointer> m_RelevantDataNodes;
     bool m_IsPropertyModifiedTagSet;
     bool m_LevelWindowMutex;
   };

@@ -256,6 +256,7 @@ void mitk::LevelWindowManager::SetSelectedImages(bool selectedImages, const Data
     }
 
     m_LevelWindowProperty = levelWindowProperty;
+    m_RelevantDataNodes.push_back(node);
     lastSelectedNode = node;
   }
 
@@ -347,6 +348,16 @@ void mitk::LevelWindowManager::SetLevelWindow(const LevelWindow &levelWindow)
   if (m_LevelWindowProperty.IsNotNull())
   {
     m_LevelWindowProperty->SetLevelWindow(levelWindow);
+    for (const auto& dataNode : m_RelevantDataNodes)
+    {
+      auto levelWindowProperty = dynamic_cast<LevelWindowProperty *>(dataNode->GetProperty("levelwindow"));
+      if (nullptr == levelWindowProperty)
+      {
+        continue;
+      }
+
+      levelWindowProperty->SetLevelWindow(levelWindow);
+    }
   }
   this->Modified();
 }
@@ -485,6 +496,7 @@ void mitk::LevelWindowManager::Update(const itk::EventObject &)
     return;
   }
 
+  m_RelevantDataNodes.clear();
   if (m_AutoTopMost)
   {
     SetAutoTopMostImage(true);
@@ -501,7 +513,7 @@ void mitk::LevelWindowManager::Update(const itk::EventObject &)
   DataNode::Pointer topLevelNode = nullptr;
   std::vector<DataNode::Pointer> nodesForLevelWindow;
 
-  DataStorage::SetOfObjects::ConstPointer all = this->GetRelevantNodes();
+  DataStorage::SetOfObjects::ConstPointer all = GetRelevantNodes();
   for (DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
     DataNode::Pointer node = it->Value();
@@ -576,6 +588,7 @@ void mitk::LevelWindowManager::UpdateSelected(const itk::EventObject &)
     return;
   }
 
+  m_RelevantDataNodes.clear();
   if (m_SelectedImages)
   {
     SetSelectedImages(true);

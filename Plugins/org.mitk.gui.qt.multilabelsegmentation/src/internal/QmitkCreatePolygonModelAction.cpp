@@ -72,9 +72,9 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
       surfaceFilter->SetParameter("Smooth", false);
       surfaceFilter->SetParameter("Apply median", false);
       surfaceFilter->SetParameter("Median kernel size", 3u);
-      surfaceFilter->SetParameter("Gaussian SD", 1.5f);
+      surfaceFilter->SetParameter("Gaussian SD", 1.5);
       surfaceFilter->SetParameter("Decimate mesh", m_IsDecimated);
-      surfaceFilter->SetParameter("Decimation rate", 0.8f);
+      surfaceFilter->SetParameter("Decimation rate", 0.8);
 
       StatusBar::GetInstance()->DisplayText("Surface creation started in background...");
 
@@ -111,10 +111,10 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
       IPreferencesService* prefService = berry::Platform::GetPreferencesService();
       IPreferences::Pointer segPref = prefService->GetSystemPreferences()->Node("/org.mitk.views.multilabelsegmentation");
 
-      bool smoothingHint = segPref->GetBool("smoothing hint", true);
-      ScalarType smoothing = segPref->GetDouble("smoothing value", 1.0);
-      ScalarType decimation = segPref->GetDouble("decimation rate", 0.5);
-      ScalarType closing = segPref->GetDouble("closing ratio", 0.0);
+      auto smoothingHint = segPref->GetBool("smoothing hint", true);
+      auto smoothing = segPref->GetDouble("smoothing value", 1.0);
+      auto decimation = segPref->GetDouble("decimation rate", 0.5);
+      auto closing = segPref->GetDouble("closing ratio", 0.0);
 
       if (smoothingHint)
       {

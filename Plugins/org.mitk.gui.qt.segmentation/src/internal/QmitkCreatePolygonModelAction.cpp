@@ -96,7 +96,7 @@ void QmitkCreatePolygonModelAction::Run(const QList<DataNode::Pointer> &selected
     {
       surfaceFilter->SetParameter("Apply median", true);
       surfaceFilter->SetParameter("Smooth", true);
-      surfaceFilter->SetParameter("Gaussian SD", sqrtf(smoothing)); // use sqrt to account for setting of variance in preferences
+      surfaceFilter->SetParameter("Gaussian SD", sqrt(smoothing)); // use sqrt to account for setting of variance in preferences
       StatusBar::GetInstance()->DisplayText("Smoothed surface creation started in background...");
     }
     else

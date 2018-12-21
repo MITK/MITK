@@ -18,8 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
-#include "mitkImageReadAccessor.h"
+#include "mitkImagePixelReadAccessor.h"
+#include "mitkImagePixelWriteAccessor.h"
 #include "mitkInteractionConst.h"
+#include "mitkIOUtil.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkPadImageFilter.h"
 #include "mitkRenderingManager.h"
@@ -39,6 +41,26 @@ template <typename TPixel, unsigned int VDimensions>
 void SetToZero(itk::Image<TPixel, VDimensions> *source)
 {
   source->FillBuffer(0);
+}
+
+template <unsigned int VImageDimension = 3>
+void CreateLabelMaskProcessing(mitk::Image *layerImage, mitk::Image *mask, mitk::LabelSet::PixelType index)
+{
+  mitk::ImagePixelReadAccessor<mitk::LabelSet::PixelType, VImageDimension> readAccessor(layerImage);
+  mitk::ImagePixelWriteAccessor<mitk::LabelSet::PixelType, VImageDimension> writeAccessor(mask);
+
+  std::size_t numberOfPixels = 1;
+  for (int dim = 0; dim < static_cast<int>(VImageDimension); ++dim)
+    numberOfPixels *= static_cast<std::size_t>(readAccessor.GetDimension(dim));
+
+  auto src = readAccessor.GetData();
+  auto dest = writeAccessor.GetData();
+
+  for (std::size_t i = 0; i < numberOfPixels; ++i)
+  {
+    if (index == *(src + i))
+      *(dest + i) = 1;
+  }
 }
 
 mitk::LabelSetImage::LabelSetImage()
@@ -561,7 +583,24 @@ mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index, bool 
       ? this->GetActiveLayer()
       : layer);
 
-    AccessByItk_2(layerImage, CreateLabelMaskProcessing, mask, index);
+    /*std::ostringstream str;
+    str << "D:/layerImage_" << layer << "_" << index << ".nrrd";
+    IOUtil::Save(layerImage, str.str());*/
+
+    if (4 == layerImage->GetDimension())
+    {
+      // Works with "this" but not with "layerImage".
+      // TODO: Find out why all pixels of "layerImage" are 0 in case of 4 dimensions!
+      ::CreateLabelMaskProcessing<4>(layerImage, mask, index);
+    }
+    else if (3 == layerImage->GetDimension())
+    {
+      ::CreateLabelMaskProcessing(layerImage, mask, index);
+    }
+    else
+    {
+      mitkThrow();
+    }
   }
   catch (...)
   {
@@ -693,33 +732,6 @@ void mitk::LabelSetImage::MaskStampProcessing(ImageType *itkImage, mitk::Image *
   }
 
   this->Modified();
-}
-
-template <typename ImageType>
-void mitk::LabelSetImage::CreateLabelMaskProcessing(ImageType *itkImage, mitk::Image *mask, PixelType index)
-{
-  typename ImageType::Pointer itkMask;
-  mitk::CastToItkImage(mask, itkMask);
-
-  typedef itk::ImageRegionConstIterator<ImageType> SourceIteratorType;
-  typedef itk::ImageRegionIterator<ImageType> TargetIteratorType;
-
-  SourceIteratorType sourceIter(itkImage, itkImage->GetLargestPossibleRegion());
-  sourceIter.GoToBegin();
-
-  TargetIteratorType targetIter(itkMask, itkMask->GetLargestPossibleRegion());
-  targetIter.GoToBegin();
-
-  while (!sourceIter.IsAtEnd())
-  {
-    PixelType sourceValue = sourceIter.Get();
-    if (sourceValue == index)
-    {
-      targetIter.Set(1);
-    }
-    ++sourceIter;
-    ++targetIter;
-  }
 }
 
 template <typename ImageType>

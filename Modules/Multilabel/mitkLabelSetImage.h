@@ -303,9 +303,6 @@ namespace mitk
     template <typename ImageType>
     void MaskStampProcessing(ImageType *input, mitk::Image *mask, bool forceOverwrite);
 
-    template <typename ImageType>
-    void CreateLabelMaskProcessing(ImageType *input, mitk::Image *mask, PixelType index);
-
     template <typename LabelSetImageType, typename ImageType>
     void InitializeByLabeledImageProcessing(LabelSetImageType *input, ImageType *other);
 

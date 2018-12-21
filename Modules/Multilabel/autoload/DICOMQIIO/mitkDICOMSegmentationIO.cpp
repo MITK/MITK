@@ -89,16 +89,23 @@ namespace mitk
 
   IFileIO::ConfidenceLevel DICOMSegmentationIO::GetWriterConfidenceLevel() const
   {
-    return Unsupported; // T25798: Writer does not work!
-
     if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
       return Unsupported;
 
+    // Check if the input file is a segmentation
     const LabelSetImage *input = static_cast<const LabelSetImage *>(this->GetInput());
+
     if (input)
-      return Supported;
-    else
-      return Unsupported;
+    {
+      // Check if input file has dicom information for the referenced image (original DICOM image, e.g. CT) Still necessary, see write() 
+      mitk::StringLookupTableProperty::Pointer dicomFilesProp =
+      dynamic_cast<mitk::StringLookupTableProperty *>(input->GetProperty("referenceFiles").GetPointer());
+
+      if (dicomFilesProp.IsNotNull())
+        return Supported;
+    }
+
+    return Unsupported;
   }
 
   void DICOMSegmentationIO::Write()

@@ -186,7 +186,7 @@ namespace mitk
 
     /**
       * \brief  */
-    mitk::Image::Pointer CreateLabelMask(PixelType index);
+    mitk::Image::Pointer CreateLabelMask(PixelType index, bool useActiveLayer = true, unsigned int layer = 0);
 
     /**
      * @brief Initialize a new mitk::LabelSetImage by an given image.

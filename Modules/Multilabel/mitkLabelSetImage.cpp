@@ -540,7 +540,7 @@ void mitk::LabelSetImage::MaskStamp(mitk::Image *mask, bool forceOverwrite)
   }
 }
 
-mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index)
+mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index, bool useActiveLayer, unsigned int layer)
 {
   mitk::Image::Pointer mask = mitk::Image::New();
   try
@@ -560,7 +560,12 @@ mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index)
     auto geometry = this->GetTimeGeometry()->Clone();
     mask->SetTimeGeometry(geometry);
 
-    AccessByItk_2(this, CreateLabelMaskProcessing, mask, index);
+    auto layerImage = this->GetLayerImage(useActiveLayer
+      ? this->GetActiveLayer()
+      : layer);
+
+    //AccessByItk_2(layerImage, CreateLabelMaskProcessing, mask, index);
+    AccessByItk_2(this, CreateLabelMaskProcessing, mask, index); // TODO: Understand why this works but the line above does not work
   }
   catch (...)
   {

@@ -43,9 +43,8 @@ namespace mitk
   private:
     UIDGenerator m_UIDGeneratorSurfaces;
 
-    Surface::Pointer m_Surface;
-    DataNode::Pointer m_Node;
-
+    std::vector<Surface::Pointer> m_Surfaces;
+    std::vector<Image::Pointer> m_DeleteMe;
   };
 
 } // namespace

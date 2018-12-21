@@ -187,8 +187,8 @@ namespace mitk
 
       for (unsigned int layerIdx = 0; layerIdx < input->GetNumberOfLayers(); layerIdx++)
       {
-        sprintf(keybuffer, "layer_%03d", layerIdx);                    // layer idx
-        sprintf(valbuffer, "%1d", input->GetNumberOfLabels(layerIdx)); // number of labels for the layer
+        sprintf(keybuffer, "layer_%03u", layerIdx);                    // layer idx
+        sprintf(valbuffer, "%1u", input->GetNumberOfLabels(layerIdx)); // number of labels for the layer
         itk::EncapsulateMetaData<std::string>(
           nrrdImageIo->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
 
@@ -385,7 +385,7 @@ namespace mitk
 
     for (unsigned int layerIdx = 0; layerIdx < numberOfLayers; layerIdx++)
     {
-      sprintf(keybuffer, "layer_%03d", layerIdx);
+      sprintf(keybuffer, "layer_%03u", layerIdx);
       int numberOfLabels = GetIntByKey(dictionary, keybuffer);
 
       mitk::LabelSet::Pointer labelSet = mitk::LabelSet::New();
@@ -393,7 +393,7 @@ namespace mitk
       for (int labelIdx = 0; labelIdx < numberOfLabels; labelIdx++)
       {
         TiXmlDocument doc;
-        sprintf(keybuffer, "label_%03d_%05d", layerIdx, labelIdx);
+        sprintf(keybuffer, "label_%03u_%05d", layerIdx, labelIdx);
         _xmlStr = GetStringByKey(dictionary, keybuffer);
         doc.Parse(_xmlStr.c_str());
 

@@ -33,8 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  MITKAlgorithmHelper::MITKAlgorithmHelper(map::algorithm::RegistrationAlgorithmBase* algorithm) :
-    m_AlgorithmBase(algorithm)
+  MITKAlgorithmHelper::MITKAlgorithmHelper(map::algorithm::RegistrationAlgorithmBase *algorithm)
+    : m_AlgorithmBase(algorithm), m_Error(CheckError::none)
   {
     m_AllowImageCasting = true;
   }

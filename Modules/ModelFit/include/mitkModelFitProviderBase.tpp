@@ -30,7 +30,7 @@ namespace mitk
   class ModelFitProviderBase<TModelFactory>::Impl
   {
   public:
-    Impl() : m_ReferenceFactory(TModelFactory::New())
+    Impl() : m_Ranking(0), m_ReferenceFactory(TModelFactory::New())
     {
     };
 

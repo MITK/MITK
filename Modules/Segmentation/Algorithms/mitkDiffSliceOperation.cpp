@@ -28,6 +28,7 @@ mitk::DiffSliceOperation::DiffSliceOperation() : Operation(1)
   m_WorldGeometry = nullptr;
   m_SliceGeometry = nullptr;
   m_ImageIsValid = false;
+  m_DeleteObserverTag = 0;
 }
 
 mitk::DiffSliceOperation::DiffSliceOperation(mitk::Image *imageVolume,
@@ -55,6 +56,7 @@ mitk::DiffSliceOperation::DiffSliceOperation(mitk::Image *imageVolume,
   m_zlibSliceContainer->SetImage(slice);
 
   m_Image = imageVolume;
+  m_DeleteObserverTag = 0;
 
   if (m_Image)
   {

@@ -51,7 +51,8 @@ private:
   mitk::DataStorage::Pointer m_DataStorage;
 };
 
-mitk::LiveWireTool2D::LiveWireTool2D() : SegTool2D("LiveWireTool"), m_PlaneGeometry(nullptr)
+mitk::LiveWireTool2D::LiveWireTool2D()
+  : SegTool2D("LiveWireTool"), m_PlaneGeometry(nullptr), m_CreateAndUseDynamicCosts(false)
 {
 }
 

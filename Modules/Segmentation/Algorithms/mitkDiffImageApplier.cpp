@@ -29,6 +29,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <type_traits>
 
 mitk::DiffImageApplier::DiffImageApplier()
+  : m_Image(nullptr),
+    m_SliceDifferenceImage(nullptr),
+    m_SliceIndex(0),
+    m_SliceDimension(0),
+    m_TimeStep(0),
+    m_Dimension0(0),
+    m_Dimension1(0),
+    m_Factor(1.0)
 {
 }
 

@@ -30,7 +30,16 @@ namespace itk
   */
   template <class TInputImage, class TOutputImage>
   ConnectedAdaptiveThresholdImageFilter<TInputImage, TOutputImage>::ConnectedAdaptiveThresholdImageFilter()
-    : m_FineDetectionMode(false)
+    : m_OutoutImageMaskFineSegmentation(nullptr),
+      m_GrowingDirectionIsUpwards(true),
+      m_SeedpointValue(0),
+      m_DetectedLeakagePoint(0),
+      m_InitValue(0),
+      m_AdjLowerTh(0),
+      m_AdjUpperTh(0),
+      m_FineDetectionMode(false),
+      m_DiscardLastPreview(false),
+      m_SegmentationCancelled(false)
   {
   }
 

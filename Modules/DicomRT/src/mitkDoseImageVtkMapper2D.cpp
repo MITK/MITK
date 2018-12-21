@@ -928,6 +928,10 @@ void mitk::DoseImageVtkMapper2D::CreateLevelOutline(mitk::BaseRenderer *renderer
   // We take the pointer to the first pixel of the image
   currentPixel = static_cast<float *>(localStorage->m_ReslicedImage->GetScalarPointer());
 
+  if (!currentPixel){
+    mitkThrow() << "currentPixel invalid";
+  }
+
   while (y <= yMax)
   {
     // if the current pixel value is set to something

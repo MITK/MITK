@@ -100,8 +100,6 @@ namespace itk
 
     void GenerateData() override;
 
-    TOutputImage *m_IteratorMaskForFineSegmentation;
-
   private:
     OutputImagePointer m_OutoutImageMaskFineSegmentation;
     bool m_GrowingDirectionIsUpwards;

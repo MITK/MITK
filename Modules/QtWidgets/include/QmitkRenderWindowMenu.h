@@ -202,6 +202,8 @@ protected slots:
   /*! Slot for changing layout design to Axial n 3D left, Sagittal right layout. The slot is connected to the triggered() signal of m_Left2Dand3DRight2DLayoutAction. */
   void OnChangeLayoutToLeft2Dand3DRight2D(bool);
 
+  void OnChangeLayoutToAxialLeft2DRight(bool);
+
   void OnCrossHairMenuAboutToShow();
 
 public:
@@ -230,7 +232,8 @@ public:
     LAYOUT_COLUMNWIDGET3AND4,
     LAYOUT_ROWWIDGETSMALL3ANDBIG4, //not in use in this class, but we need it here to synchronize with the SdtMultiWidget.
     LAYOUT_SMALLUPPERWIDGET2BIGAND4,
-    LAYOUT_LEFT2DAND3DRIGHT2D
+    LAYOUT_LEFT2DAND3DRIGHT2D,
+    LAYOUT_LEFTAXIAL2DRIGHT = 15 //because it's 15 in enum inside QmitkStdMultiWidget!
   };
 
   void ShowMenu();
@@ -283,6 +286,8 @@ protected:
 
   /*! QAction for axial n 3D left, sagittal right layout design*/
   QAction*            m_Left2Dand3DRight2DLayoutAction;
+
+  QAction*            m_LeftAxialRight2DLayoutAction;
 
   QLabel *m_TSLabel;
 

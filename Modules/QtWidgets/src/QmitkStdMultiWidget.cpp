@@ -1385,6 +1385,67 @@ void QmitkStdMultiWidget::changeLayoutToColumnWidget1And2()
   this->UpdateAllWidgets();
 }
 
+void QmitkStdMultiWidget::changeLayoutToAxialLeft2DRight()
+{
+  SMW_INFO << "changing layout to Axisal left, other 2D right" << std::endl;
+
+  //Hide all Menu Widgets
+  this->HideAllWidgetToolbars();
+
+  delete QmitkStdMultiWidgetLayout ;
+
+  //create Main Layout
+  QmitkStdMultiWidgetLayout =  new QHBoxLayout( this );
+
+  //create main splitter
+  m_MainSplit = new QSplitter( this );
+  QmitkStdMultiWidgetLayout->addWidget( m_MainSplit );
+
+  //create m_LayoutSplit  and add to the mainSplit
+  m_LayoutSplit = new QSplitter( m_MainSplit );
+  m_MainSplit->addWidget( m_LayoutSplit );
+
+  //add LevelWindow Widget to mainSplitter
+  m_MainSplit->addWidget( levelWindowWidget );
+
+  //create m_SubSplit1 and m_SubSplit2
+  m_SubSplit1 = new QSplitter( m_LayoutSplit );
+  m_SubSplit2 = new QSplitter( Qt::Vertical, m_LayoutSplit );
+
+  //add Widgets to splitter
+  m_SubSplit1->addWidget( mitkWidget1Container );
+  m_SubSplit2->addWidget( mitkWidget2Container );
+  m_SubSplit2->addWidget( mitkWidget3Container );
+
+  //set Splitter Size
+  QList<int> splitterSize;
+  splitterSize.push_back(1000);
+  splitterSize.push_back(1000);
+  m_SubSplit1->setSizes( splitterSize );
+  m_LayoutSplit->setSizes( splitterSize );
+
+  //show mainSplitt and add to Layout
+  m_MainSplit->show();
+
+  //show/hide Widgets
+  m_ShadowWidgetVisible[0] ? m_ShadowWidgets[0]->show() : mitkWidget1->show();
+  m_ShadowWidgetVisible[1] ? m_ShadowWidgets[1]->show() : mitkWidget2->show();
+  m_ShadowWidgetVisible[2] ? m_ShadowWidgets[2]->show() : mitkWidget3->show();
+  m_ShadowWidgets[3]->hide();
+  mitkWidget4->hide();
+
+  m_Layout = LAYOUT_AXIAL_LEFT_2D_RIGHT;
+
+  //update Layout Design List
+  mitkWidget1->LayoutDesignListChanged( LAYOUT_AXIAL_LEFT_2D_RIGHT );
+  mitkWidget2->LayoutDesignListChanged( LAYOUT_AXIAL_LEFT_2D_RIGHT );
+  mitkWidget3->LayoutDesignListChanged( LAYOUT_AXIAL_LEFT_2D_RIGHT );
+  mitkWidget4->LayoutDesignListChanged( LAYOUT_AXIAL_LEFT_2D_RIGHT );
+
+  //update Alle Widgets
+  this->UpdateAllWidgets();
+}
+
 void QmitkStdMultiWidget::SetDataStorage( mitk::DataStorage* ds )
 {
   mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetDataStorage(ds);
@@ -2206,6 +2267,11 @@ void QmitkStdMultiWidget::OnLayoutDesignChanged( int layoutDesignIndex )
   case LAYOUT_COLUMN_WIDGET_1_AND_2:
     {
       this->changeLayoutToColumnWidget1And2();
+      break;
+    }
+  case LAYOUT_AXIAL_LEFT_2D_RIGHT:
+    {
+      this->changeLayoutToAxialLeft2DRight();
       break;
     }
   };

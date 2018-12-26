@@ -1415,14 +1415,14 @@ void QmitkStdMultiWidget::changeLayoutToAxialLeft2DRight(int state)
   //add Widgets to splitter
   switch (state) {
     case 1:
-      m_SubSplit1->addWidget( mitkWidget3Container );
-      m_SubSplit2->addWidget( mitkWidget1Container );
-      m_SubSplit2->addWidget( mitkWidget2Container );
-      break;
-    case 2:
       m_SubSplit1->addWidget( mitkWidget2Container );
       m_SubSplit2->addWidget( mitkWidget3Container );
       m_SubSplit2->addWidget( mitkWidget1Container );
+      break;
+    case 2:
+      m_SubSplit1->addWidget( mitkWidget3Container );
+      m_SubSplit2->addWidget( mitkWidget1Container );
+      m_SubSplit2->addWidget( mitkWidget2Container );
       break;
     default:
       m_SubSplit1->addWidget( mitkWidget1Container );

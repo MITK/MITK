@@ -1385,7 +1385,7 @@ void QmitkStdMultiWidget::changeLayoutToColumnWidget1And2()
   this->UpdateAllWidgets();
 }
 
-void QmitkStdMultiWidget::changeLayoutToAxialLeft2DRight()
+void QmitkStdMultiWidget::changeLayoutToAxialLeft2DRight(int state)
 {
   SMW_INFO << "changing layout to Axisal left, other 2D right" << std::endl;
 
@@ -1395,7 +1395,7 @@ void QmitkStdMultiWidget::changeLayoutToAxialLeft2DRight()
   delete QmitkStdMultiWidgetLayout ;
 
   //create Main Layout
-  QmitkStdMultiWidgetLayout =  new QHBoxLayout( this );
+  QmitkStdMultiWidgetLayout = new QHBoxLayout( this );
 
   //create main splitter
   m_MainSplit = new QSplitter( this );
@@ -1413,9 +1413,23 @@ void QmitkStdMultiWidget::changeLayoutToAxialLeft2DRight()
   m_SubSplit2 = new QSplitter( Qt::Vertical, m_LayoutSplit );
 
   //add Widgets to splitter
-  m_SubSplit1->addWidget( mitkWidget1Container );
-  m_SubSplit2->addWidget( mitkWidget2Container );
-  m_SubSplit2->addWidget( mitkWidget3Container );
+  switch (state) {
+    case 1:
+      m_SubSplit1->addWidget( mitkWidget2Container );
+      m_SubSplit2->addWidget( mitkWidget3Container );
+      m_SubSplit2->addWidget( mitkWidget1Container );
+      break;
+    case 2:
+      m_SubSplit1->addWidget( mitkWidget3Container );
+      m_SubSplit2->addWidget( mitkWidget1Container );
+      m_SubSplit2->addWidget( mitkWidget2Container );
+      break;
+    default:
+      m_SubSplit1->addWidget( mitkWidget1Container );
+      m_SubSplit2->addWidget( mitkWidget2Container );
+      m_SubSplit2->addWidget( mitkWidget3Container );
+      break;
+  }
 
   //set Splitter Size
   QList<int> splitterSize;
@@ -2192,10 +2206,9 @@ void QmitkStdMultiWidget::SetWidgetPlaneModeToSwivel( bool activate )
   }
 }
 
-void QmitkStdMultiWidget::OnLayoutDesignChanged( int layoutDesignIndex )
+void QmitkStdMultiWidget::OnLayoutDesignChanged( int layoutDesignIndex, int activeProjection )
 {
   crosshairManager->removeAll();
-
 
   switch( layoutDesignIndex )
   {
@@ -2271,7 +2284,7 @@ void QmitkStdMultiWidget::OnLayoutDesignChanged( int layoutDesignIndex )
     }
   case LAYOUT_AXIAL_LEFT_2D_RIGHT:
     {
-      this->changeLayoutToAxialLeft2DRight();
+      this->changeLayoutToAxialLeft2DRight(activeProjection);
       break;
     }
   };

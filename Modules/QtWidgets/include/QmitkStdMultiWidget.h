@@ -217,7 +217,7 @@ public slots:
 
   void changeLayoutToColumnWidget1And2();
 
-  void changeLayoutToAxialLeft2DRight();
+  void changeLayoutToAxialLeft2DRight(int state = 0);
 
   void Fit();
 
@@ -283,7 +283,7 @@ public slots:
 
   void SetWidgetPlaneModeToSwivel( bool activate );
 
-  void OnLayoutDesignChanged( int layoutDesignIndex );
+  void OnLayoutDesignChanged( int layoutDesignIndex, int activeProjection = 0 );
 
   void ResetCrosshair();
 

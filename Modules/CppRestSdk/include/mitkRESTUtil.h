@@ -19,19 +19,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkCppRestSdkExports.h"
 
-#include <iostream>
 #include "cpprest/asyncrt_utils.h"
+#include <iostream>
 
 namespace mitk
 {
   class MITKCPPRESTSDK_EXPORT RESTUtil
   {
-
   public:
 
+    /**
+     * @brief Converts the given std::wstring into a std::string representation
+     */
     static std::string convertToUtf8(utility::string_t stringT) { return utility::conversions::to_utf8string(stringT); }
-	   static utility::string_t convertToTString(std::string string) { return utility::conversions::to_string_t(string); }
 
+	/**
+	 * @brief Converts the given std::string into a std::wstring representation
+	 */
+    static utility::string_t convertToTString(std::string string) { return utility::conversions::to_string_t(string); }
   };
 };
 

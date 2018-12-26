@@ -26,7 +26,7 @@ mitk::DICOMWeb::~DICOMWeb()
 {
 }
 
-pplx::task<web::json::value> mitk::DICOMWeb::QuidoRSInstances(std::map<std::string, std::string> params)
+pplx::task<web::json::value> mitk::DICOMWeb::QidoRSInstances(std::map<std::string, std::string> params)
 {
   MitkUriBuilder queryBuilder(U("rs/instances"));
 
@@ -73,7 +73,7 @@ pplx::task<std::string> mitk::DICOMWeb::WadoRS(const utility::string_t folderPat
   seriesInstancesParams.insert(ParamMap::value_type({"StudyInstanceUID"}, studyUID));
   seriesInstancesParams.insert(ParamMap::value_type({"SeriesInstanceUID"}, seriesUID));
 
-  return QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) -> pplx::task<std::string>
+  return QidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) -> pplx::task<std::string>
   {
     auto jsonListResult = jsonResult;
     auto resultArray = jsonListResult.as_array();

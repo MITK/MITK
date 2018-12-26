@@ -41,20 +41,59 @@ namespace mitk
   class MITKCPPRESTSDK_EXPORT RESTServer : public QObject
   {
   public:
-    
     RESTServer();
+
+    /**
+     * @brief Creates an server listening to the given URL
+     *
+     * @param url the URL at which the server is listening for requests
+     */
     RESTServer(utility::string_t url);
     virtual ~RESTServer();
 
+    /**
+     * @brief Opens the server connection and starts the listening process
+	 * 
+	 * @return a task to wait for
+     */
     pplx::task<void> Open() { return m_Listener.open(); }
+
+	/**
+	 * @brief Closes the server connection and closes the listening process
+	 *
+	 * @return a task to wait for
+	 */
     pplx::task<void> Close() { return m_Listener.close(); }
 
   protected:
+
+	/**
+	 * @brief Handle for incoming GET requests
+	 *
+	 * @param MitkRequest incoming request object
+	 */
     virtual void HandleGet(MitkRequest){};
+
+	/**
+     * @brief Handle for incoming PUT requests
+     *
+     * @param MitkRequest incoming request object
+     */
     virtual void HandlePut(MitkRequest){};
+
+	/**
+     * @brief Handle for incoming POST requests
+     *
+     * @param MitkRequest incoming request object
+     */
     virtual void HandlePost(MitkRequest){};
+
+	/**
+     * @brief Handle for incoming DELETE requests
+     *
+     * @param MitkRequest incoming request object
+     */
     virtual void HandleDelete(MitkRequest){};
-    void HandleError(pplx::task<void> &t);
 
     MitkListener m_Listener;
   };

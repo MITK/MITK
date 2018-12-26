@@ -39,22 +39,53 @@ namespace mitk
 {
   class MITKCPPRESTSDK_EXPORT RESTClient
   {
-  public:;
+  public:
+    ;
+
+    /**
+	 * @brief Creates a new client object containing the given base url which is extended by the uri of the member methods
+	 * 
+	 * @param url represents the base URL which is extended by the member methods and used as target for HTTP requests
+	 */
     RESTClient(utility::string_t url);
     virtual ~RESTClient();
 
-	pplx::task<void> Post(utility::string_t uri,
-                       utility::string_t contentType,
-                       concurrency::streams::basic_istream<unsigned char> fileStream);
-
+    /**
+     * @brief Executes a HTTP POST request with given uri and the file given by the filePath
+     *
+     * @param uri defines the URI which extends the base URL of this object resulting the target of the HTTP request
+     * @param filePath the path to the file which shall be included in the message body as multipart
+     * @return task to wait for
+     */
     pplx::task<void> Post(utility::string_t uri, utility::string_t filePath);
+
+    /**
+     * @brief Executes a HTTP GET request with the given uri and stores the byte stream in a file given by the filePath
+     *
+     * @param filePath the file path at which the received byte stream is stored
+     * @param uri the URI which extends the base URL of this object resulting the target of the HTTP request
+     * @return task to wait for
+     */
     pplx::task<void> Get(const utility::string_t filePath, utility::string_t uri);
-   	pplx::task<web::json::value> Get(utility::string_t uri);
+
+    /**
+     * @brief Executes a HTTP GET request with the given uri and returns a json object
+     *
+     * @param uri the URI which extends the base URL of this object resulting the target of the HTTP request
+     * @return task with to wait for with resulting json object
+     */
+    pplx::task<web::json::value> Get(utility::string_t uri);
+
+    /**
+     * @brief Executes a HTTP PUT request to the given uri containing the given content json object
+	 * 
+	 * @param uri the URI which extends the base URL of this object resulting the target of the HTTP request
+	 * @param content the json body for the PUT request
+     */
     pplx::task<web::json::value> PUT(utility::string_t uri, web::json::value content);
 
   protected:
-    MitkClient* m_Client;
-
+    MitkClient *m_Client;
   };
 };
 

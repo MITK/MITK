@@ -195,7 +195,7 @@ void SegmentationReworkView::RESTPutCallback(const SegmentationReworkREST::Dicom
   seriesInstancesParams.insert((ParamMap::value_type({"includefield"}, {"0040A375"}))); // Current Requested Procedure Evidence Sequence
 
   try {
-    m_DICOMWeb->QuidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) 
+    m_DICOMWeb->QidoRSInstances(seriesInstancesParams).then([=](web::json::value jsonResult) 
     {
 
       auto firstResult = jsonResult[0];

@@ -40,71 +40,6 @@ void
   }
 }
 
-template <typename TPixel, unsigned int VDim>
-void  mitk::ModelSignalImageGenerator::DoGenerateData(itk::Image<TPixel, VDim>* image)
-{
-    typedef itk::Image<TPixel, VDim> InputFrameImageType;
-    typedef itk::Image<ScalarType, VDim> OutputImageType;
-
-    typedef itk::MultiOutputNaryFunctorImageFilter<InputFrameImageType, OutputImageType, SimpleFunctorPolicy, InternalMaskType> FilterType;
-    typename FilterType::Pointer filter;
-
-
-    for(unsigned int i=0; i<this->m_ParameterInputMap.size(); ++i)
-    {
-        typename InputFrameImageType::Pointer frameImage;
-        Image::Pointer parameterImage = m_InputParameterImages.at(i);
-
-        mitk::CastToItkImage(parameterImage, frameImage);
-        filter->SetInput(i,frameImage);
-
-    }
-
-    SimpleFunctorPolicy functor;
-    functor.SetFunctor(this->m_Functor);
-    filter->SetFunctor(functor);
-    if (this->m_InternalMask.IsNotNull())
-    {
-     filter->SetMask(this->m_InternalMask);
-    }
-    filter->Update();
-
-
-    ArbitraryTimeGeometry::Pointer timeGeometry = ArbitraryTimeGeometry::New();
-    timeGeometry->ClearAllGeometries();
-    Image::Pointer dynamicImage= Image::New();
-
-    if(filter->GetNumberOfOutputs() != this->m_Functor->GetGrid().GetSize())
-    {
-        itkExceptionMacro("Error. Number of computed output Images does not match Grid size!");
-    }
-
-    auto m_Grid = this->m_Functor->GetGrid();
-    for (GridType::size_type i = 0; i<m_Grid.GetSize(); ++i)
-    {
-      mitk::Image::Pointer frameImage = mitk::ImportItkImage(filter->GetOutput(i))->Clone();
-
-      
-      mitk::ImageReadAccessor readAccess(frameImage, frameImage->GetVolumeData());
-      dynamicImage->SetVolume(readAccess.GetData(),i);
-
-      auto currentTimePoint =  m_Grid[i];
-      auto nextTimePoint =  m_Grid[i];
-      if (i+1<m_Grid.GetSize())
-      {
-          nextTimePoint =  m_Grid[i+1];
-      }
-
-      timeGeometry->AppendNewTimeStepClone(frameImage->GetGeometry(), currentTimePoint, nextTimePoint);
-    }
-
-    dynamicImage->SetTimeGeometry(timeGeometry);
-
-    this->m_ResultImage = dynamicImage;
-}
-
-
-
 void mitk::ModelSignalImageGenerator::SortParameterImages()
 {
     ParameterVectorType inputImages(this->m_ParameterInputMap.size());
@@ -146,21 +81,15 @@ void mitk::ModelSignalImageGenerator::Generate()
     typedef itk::Image<double, 3> OutputImageType;
 
     typedef itk::MultiOutputNaryFunctorImageFilter<InputFrameImageType, OutputImageType, SimpleFunctorPolicy, InternalMaskType> FilterType;
-    /** @todo #3 The ParameterFitImageGenerator uses a typename instead of new. But this did not work somehow
-     */
      FilterType::Pointer filter = FilterType::New();
-
 
     for(unsigned int i=0; i<this->m_ParameterInputMap.size(); ++i)
     {
-        /** @todo #3 The ParameterFitImageGenerator uses a typename instead of new. But this did not work somehow
-         */
         InputFrameImageType::Pointer frameImage = InputFrameImageType::New();
         Image::Pointer parameterImage = m_InputParameterImages.at(i);
 
         mitk::CastToItkImage(parameterImage, frameImage);
         filter->SetInput(i,frameImage);
-
     }
 
     ModelDataGenerationFunctor::Pointer generationFunctor = ModelDataGenerationFunctor::New();

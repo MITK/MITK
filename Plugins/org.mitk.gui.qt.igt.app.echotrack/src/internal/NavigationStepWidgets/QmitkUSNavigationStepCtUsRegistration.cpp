@@ -55,6 +55,7 @@ QmitkUSNavigationStepCtUsRegistration::QmitkUSNavigationStepCtUsRegistration(QWi
   this->UnsetFloatingImageGeometry();
   this->DefineDataStorageImageFilter();
   this->CreateQtPartControl(this);
+  this->InitializeTransformationSensorCSToMarkerCS();
 }
 
 
@@ -457,8 +458,37 @@ void QmitkUSNavigationStepCtUsRegistration::CreateMarkerModelCoordinateSystemPoi
 
 void QmitkUSNavigationStepCtUsRegistration::InitializeTransformationSensorCSToMarkerCS()
 {
-  //At first calculate the inverse transformation (marker-CS to sensor-CS)
+  //The following calculations are related to the 3mm | 15mm fiducial configuration
+  m_TransformSensorCSToMarkerCS = mitk::AffineTransform3D::New();
+
   mitk::Vector3D translation;
+  translation[0] = -18.175;
+  translation[1] = 15.000;
+  translation[2] = 8.001; // considering a distance from the base plate of 0.315 inch and not 0.313 inch
+
+  m_TransformSensorCSToMarkerCS->SetOffset(translation);
+
+  // Quaternion (x, y, z, r) --> n = (1,0,0) --> q(sin(90°),0,0,cos(90°))
+  mitk::Quaternion q1(1, 0, 0, 0); // corresponding to a rotation of 180° around the normal x-axis.
+  // .transpose() is needed for changing the rows and the columns of the returned rotation_matrix_transpose
+  vnl_matrix_fixed<double, 3, 3> vnl_rotation = q1.rotation_matrix_transpose().transpose(); // :-)
+  mitk::Matrix3D rotationMatrix;
+
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      rotationMatrix[i][j] = vnl_rotation[i][j];
+    }
+  }
+
+  m_TransformSensorCSToMarkerCS->SetMatrix(rotationMatrix);
+  //The transformation from the sensor-CS to the marker-CS is calculated now.
+  MITK_INFO << "TransformSensorCSToMarkerCS = " << m_TransformSensorCSToMarkerCS;
+
+  /*mitk::NavigationData::Pointer navData = mitk::NavigationData::New();
+  navData->SetOrientation(q1);
+  navData->SetPosition(translation);
+  navData->SetHasOrientation(true);
+  navData->SetHasPosition(true);*/
 }
 
 void QmitkUSNavigationStepCtUsRegistration::InitializePointsToTransformForGroundTruthProtocol()
@@ -1027,10 +1057,18 @@ void QmitkUSNavigationStepCtUsRegistration::ClassifyFiducialCandidates()
           else if (distance > 29.76 && distance <= 35.1375)
           {
             ++distanceD;
+            if (distance > 33.54)
+            {
+              ++distanceE;
+            }
           }
           else if (distance > 35.1375 && distance <= 39.5775)
           {
             ++distanceE;
+            if (distance < 36.735)
+            {
+              ++distanceD;
+            }
           }
           else if (distance > 39.5775 && distance <= 45.00)
           {

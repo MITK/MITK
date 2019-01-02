@@ -371,6 +371,12 @@ void QmitkUltrasoundCalibration::OnStartCalibrationProcess()
   std::string probeName = m_CombinedModality->GetUltrasoundDevice()->GetCurrentProbe()->GetName();
   m_CombinedModality->GetUltrasoundDevice()->ProbeChanged(probeName);
 
+  mitk::DataNode::Pointer usNode = this->GetDataStorage()->GetNamedNode("US Viewing Stream - Image 0");
+  if (usNode.IsNotNull())
+  {
+  this->GetDataStorage()->Remove(usNode);
+  }
+
   // Todo: Maybe display this elsewhere
   this->ShowNeedlePath();
 

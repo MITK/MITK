@@ -37,6 +37,7 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
     for (auto proIter : providers)
     {
       visibleProviders.insert(std::make_pair(order, proIter.first));
+      ++order;
     }
   }
 

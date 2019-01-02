@@ -1,21 +1,23 @@
-#ifndef PERFUSIONDATAGENERATOR_H
-#define PERFUSIONDATAGENERATOR_H
+#ifndef MODELSIGNALIMAGEGENERATOR_H
+#define MODELSIGNALIMAGEGENERATOR_H
 
 
-#include "MitkPharmacokineticsExports.h"
-#include "mitkModelBase.h"
-#include "mitkModelDataGenerationFunctor.h"
-#include "mitkSimpleFunctorPolicy.h"
+#include "mitkModelParameterizerBase.h"
 #include "mitkImage.h"
 
+#include "MitkModelFitExports.h"
 
-namespace mitk {
-
-    class MITKPHARMACOKINETICS_EXPORT PerfusionDataGenerator: public ::itk::Object
+namespace mitk
+{
+    /** Generator class that takes a model parameterizer instance, given parameter images and generates
+     the corresponding signal image. Thus the generator simulates the signals of the model specified by
+     parameterizer given the passed parameter images. The time grid of the signal is also defined by the
+     parameterizer.*/
+    class MITKMODELFIT_EXPORT ModelSignalImageGenerator: public ::itk::Object
     {
     public:
 
-        mitkClassMacroItkParent(PerfusionDataGenerator, itk::Object);
+        mitkClassMacroItkParent(ModelSignalImageGenerator, itk::Object);
         itkFactorylessNewMacro(Self);
 
         typedef mitk::Image::Pointer ParameterImageType;
@@ -25,26 +27,23 @@ namespace mitk {
         typedef std::map<ParametersIndexType, ParameterImageType> ParameterMapType;
 
 
-        typedef ModelDataGenerationFunctor FunctorType;
         typedef mitk::Image::Pointer ResultImageType;
         typedef mitk::Image::Pointer MaskType;
 
         typedef mitk::ModelBase::TimeGridType GridType;
 
-        itkSetObjectMacro(Functor, FunctorType);
-        itkGetObjectMacro(Functor, FunctorType);
+        itkSetObjectMacro(Parameterizer, ModelParameterizerBase);
+        itkGetObjectMacro(Parameterizer, ModelParameterizerBase);
 
         void SetParameterInputImage(const ParametersIndexType index, ParameterImageType inputParameterImage);
 
         ResultImageType GetGeneratedImage();
         void Generate();
 
-
-
     protected:
-        PerfusionDataGenerator()
+        ModelSignalImageGenerator()
         {};
-        ~PerfusionDataGenerator()
+        ~ModelSignalImageGenerator()
         {};
 
         template <typename TPixel, unsigned int VDim>
@@ -59,17 +58,15 @@ namespace mitk {
 
         void SortParameterImages();
 
-
         MaskType m_Mask;
 
         typedef itk::Image<unsigned char, 3> InternalMaskType;
         InternalMaskType::Pointer m_InternalMask;
 
         ResultImageType m_ResultImage;
-          FunctorType::Pointer m_Functor;
-
+        ModelParameterizerBase::Pointer m_Parameterizer;
     };
 }
 
 
-#endif // MITKPHARMACOKINETICSDATAGENERATOR_H
+#endif // MODELSIGNALIMAGEGENERATOR_H

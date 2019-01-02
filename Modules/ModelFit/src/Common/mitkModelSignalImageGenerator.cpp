@@ -1,18 +1,20 @@
-#include "mitkPerfusionDataGenerator.h"
+#include "mitkModelSignalImageGenerator.h"
 #include "itkMultiOutputNaryFunctorImageFilter.h"
 #include "mitkArbitraryTimeGeometry.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkITKImageImport.h"
+#include "mitkModelDataGenerationFunctor.h"
+#include "mitkSimpleFunctorPolicy.h"
 
 
-void mitk::PerfusionDataGenerator::SetParameterInputImage(const ParametersIndexType parameterIndex, ParameterImageType parameterImage)
+void mitk::ModelSignalImageGenerator::SetParameterInputImage(const ParametersIndexType parameterIndex, ParameterImageType parameterImage)
 {
     m_ParameterInputMap.insert(std::make_pair(parameterIndex,parameterImage));
 
 }
 
-mitk::PerfusionDataGenerator::ResultImageType mitk::PerfusionDataGenerator::GetGeneratedImage()
+mitk::ModelSignalImageGenerator::ResultImageType mitk::ModelSignalImageGenerator::GetGeneratedImage()
 {
     Generate();
     return m_ResultImage;
@@ -20,7 +22,7 @@ mitk::PerfusionDataGenerator::ResultImageType mitk::PerfusionDataGenerator::GetG
 
 template <typename TPixel, unsigned int VDim>
 void
-  mitk::PerfusionDataGenerator::DoPrepareMask(itk::Image<TPixel, VDim>* image)
+  mitk::ModelSignalImageGenerator::DoPrepareMask(itk::Image<TPixel, VDim>* image)
 {
   m_InternalMask = dynamic_cast<InternalMaskType*>(image);
 
@@ -39,7 +41,7 @@ void
 }
 
 template <typename TPixel, unsigned int VDim>
-void  mitk::PerfusionDataGenerator::DoGenerateData(itk::Image<TPixel, VDim>*)
+void  mitk::ModelSignalImageGenerator::DoGenerateData(itk::Image<TPixel, VDim>* image)
 {
     typedef itk::Image<TPixel, VDim> InputFrameImageType;
     typedef itk::Image<ScalarType, VDim> OutputImageType;
@@ -103,7 +105,7 @@ void  mitk::PerfusionDataGenerator::DoGenerateData(itk::Image<TPixel, VDim>*)
 
 
 
-void mitk::PerfusionDataGenerator::SortParameterImages()
+void mitk::ModelSignalImageGenerator::SortParameterImages()
 {
     ParameterVectorType inputImages(this->m_ParameterInputMap.size());
 
@@ -120,13 +122,13 @@ void mitk::PerfusionDataGenerator::SortParameterImages()
 
 }
 
-void mitk::PerfusionDataGenerator::Generate()
+void mitk::ModelSignalImageGenerator::Generate()
 {
      SortParameterImages();
 
     if(this->m_Mask.IsNotNull())
     {
-      AccessFixedDimensionByItk(m_Mask, mitk::PerfusionDataGenerator::DoPrepareMask, 3);
+      AccessFixedDimensionByItk(m_Mask, mitk::ModelSignalImageGenerator::DoPrepareMask, 3);
     }
     else
     {
@@ -137,7 +139,7 @@ void mitk::PerfusionDataGenerator::Generate()
      * Thats why the code for Generation the Data was pasted below
      */
 //    mitk::Image::Pointer firstParameterImage = this->m_InputParameterImages[0];
-//    AccessFixedDimensionByItk(firstParameterImage, mitk::PerfusionDataGenerator::DoGenerateData, 3);
+//    AccessFixedDimensionByItk(firstParameterImage, mitk::ModelSignalImageGenerator::DoGenerateData, 3);
 
 
     typedef itk::Image<double, 3> InputFrameImageType;
@@ -161,8 +163,11 @@ void mitk::PerfusionDataGenerator::Generate()
 
     }
 
+    ModelDataGenerationFunctor::Pointer generationFunctor = ModelDataGenerationFunctor::New();
+    generationFunctor->SetModelParameterizer(m_Parameterizer);
+
     SimpleFunctorPolicy functor;
-    functor.SetFunctor(this->m_Functor);
+    functor.SetFunctor(generationFunctor);
     filter->SetFunctor(functor);
     if (this->m_InternalMask.IsNotNull())
     {
@@ -170,7 +175,7 @@ void mitk::PerfusionDataGenerator::Generate()
     }
     filter->Update();
 
-    if (filter->GetNumberOfOutputs() != this->m_Functor->GetGrid().GetSize())
+    if (filter->GetNumberOfOutputs() != generationFunctor->GetGrid().GetSize())
     {
       itkExceptionMacro("Error. Number of computed output Images does not match Grid size!");
     }
@@ -228,12 +233,12 @@ void mitk::PerfusionDataGenerator::Generate()
     timeGeometry->ClearAllGeometries();
 
     auto nrOfOutputs = filter->GetNumberOfOutputs();
-    auto grid = this->m_Functor->GetGrid();
+    auto grid = generationFunctor->GetGrid();
     for (unsigned int i = 0; i<nrOfOutputs; ++i)
     {
       mitk::Image::Pointer frame = mitk::ImportItkImage(filter->GetOutput(i))->Clone();
-      mitk::ImageReadAccessor readAccess(frame, frame->GetVolumeData(0));
-      dynamicImage->SetVolume(readAccess.GetData(),i);
+      mitk::ImageReadAccessor accessor(frame);
+      dynamicImage->SetVolume(accessor.GetData(), i);
 
       double tmax = 0;
       if (i<(nrOfOutputs - 1))

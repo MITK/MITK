@@ -145,7 +145,7 @@ void QmitkFiberfoxView::AfterThread()
   parameters = m_TractsToDwiFilter->GetParameters();
 
   mitkImage = mitk::GrabItkImageMemory( m_TractsToDwiFilter->GetOutput() );
-  mitk::DiffusionPropertyHelper::SetGradientContainer(mitkImage, parameters.m_SignalGen.GetItkGradientContainer());
+  mitk::DiffusionPropertyHelper::SetOriginalGradientContainer(mitkImage, parameters.m_SignalGen.GetItkGradientContainer());
   mitk::DiffusionPropertyHelper::SetReferenceBValue(mitkImage, parameters.m_SignalGen.GetBvalue());
   mitk::DiffusionPropertyHelper::InitializeImage( mitkImage );
   parameters.m_Misc.m_ResultNode->SetData( mitkImage );
@@ -481,7 +481,7 @@ void QmitkFiberfoxView::UpdateParametersFromGui()
     m_Parameters.m_SignalGen.m_ImageOrigin = itkVectorImagePointer->GetOrigin();
     m_Parameters.m_SignalGen.m_ImageDirection = itkVectorImagePointer->GetDirection();
     m_Parameters.SetBvalue(mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi));
-    m_Parameters.SetGradienDirections(mitk::DiffusionPropertyHelper::GetGradientContainer(dwi));
+    m_Parameters.SetGradienDirections(mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(dwi));
   }
   else if (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull())   // use geometry of selected image
   {

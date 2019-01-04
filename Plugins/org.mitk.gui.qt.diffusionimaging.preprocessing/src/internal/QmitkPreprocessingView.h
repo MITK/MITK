@@ -136,6 +136,7 @@ protected:
   void DoExtractBOWithoutAveraging();
 
   void UpdateBValueTableWidget(int);
+  void UpdateGradientDetails();
 
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;

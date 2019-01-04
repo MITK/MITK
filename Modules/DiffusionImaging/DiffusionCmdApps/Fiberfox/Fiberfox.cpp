@@ -187,7 +187,7 @@ int main(int argc, char* argv[])
   tractsToDwiFilter->Update();
 
   mitk::Image::Pointer image = mitk::GrabItkImageMemory(tractsToDwiFilter->GetOutput());
-  mitk::DiffusionPropertyHelper::SetGradientContainer(image, parameters.m_SignalGen.GetItkGradientContainer());
+  mitk::DiffusionPropertyHelper::SetOriginalGradientContainer(image, parameters.m_SignalGen.GetItkGradientContainer());
   mitk::DiffusionPropertyHelper::SetReferenceBValue(image, parameters.m_SignalGen.GetBvalue());
   mitk::DiffusionPropertyHelper::InitializeImage(image);
 

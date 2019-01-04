@@ -731,7 +731,7 @@ int main(int argc, char* argv[])
   ItkDwiType::Pointer sim = tractsToDwiFilter->GetOutput();
   {
     mitk::Image::Pointer image = mitk::GrabItkImageMemory( tractsToDwiFilter->GetOutput() );
-    mitk::DiffusionPropertyHelper::SetGradientContainer(image, parameters.m_SignalGen.GetItkGradientContainer());
+    mitk::DiffusionPropertyHelper::SetOriginalGradientContainer(image, parameters.m_SignalGen.GetItkGradientContainer());
     mitk::DiffusionPropertyHelper::SetReferenceBValue(image, parameters.m_SignalGen.GetBvalue());
     mitk::DiffusionPropertyHelper::InitializeImage( image );
     mitk::IOUtil::Save(image, out_folder + "/initial.dwi");
@@ -824,7 +824,7 @@ int main(int argc, char* argv[])
       std::stringstream ss;
       std::cout.rdbuf (ss.rdbuf());
       mitk::Image::Pointer image = mitk::GrabItkImageMemory( tractsToDwiFilter->GetOutput() );
-      mitk::DiffusionPropertyHelper::SetGradientContainer(image, parameters.m_SignalGen.GetItkGradientContainer());
+      mitk::DiffusionPropertyHelper::SetOriginalGradientContainer(image, parameters.m_SignalGen.GetItkGradientContainer());
       mitk::DiffusionPropertyHelper::SetReferenceBValue(image, parameters.m_SignalGen.GetBvalue());
       mitk::DiffusionPropertyHelper::InitializeImage( image );
       mitk::IOUtil::Save(image, out_folder + "/optimized.dwi");

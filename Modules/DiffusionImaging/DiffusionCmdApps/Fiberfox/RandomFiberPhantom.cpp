@@ -22,9 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionDataIOHelper.h>
 #include <itkRandomPhantomFilter.h>
 
-/*!
-\brief Join multiple tractograms
-*/
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;

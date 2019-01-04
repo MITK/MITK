@@ -29,10 +29,10 @@ int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
 
-  parser.setTitle("Fiber Join");
-  parser.setCategory("Fiber Tracking and Processing Methods");
+  parser.setTitle("Random Fiber Phantom");
+  parser.setCategory("Diffusion Simulation Tools");
   parser.setContributor("MIC");
-  parser.setDescription("Join multiple tractograms");
+  parser.setDescription("Create Random Fiber Configurations");
 
   parser.setArgumentPrefix("--", "-");
   parser.addArgument("num_bundles", "", mitkCommandLineParser::Int, "", "", 50);

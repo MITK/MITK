@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>625</height>
+    <height>677</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -119,6 +119,33 @@
        <widget class="QPushButton" name="doRegistrationMarkerToImagePushButton">
         <property name="text">
          <string>Do Registration Marker CS -&gt; Floating Image CS</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="selectedSegmentationsLabel">
+        <property name="text">
+         <string>Selected Segmentation(s):</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QmitkDataStorageComboBox" name="segmentationComboBox"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="selectedSurfaceLabel">
+        <property name="text">
+         <string>Selected Surface:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QmitkDataStorageComboBox" name="selectedSurfaceComboBox"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="visualizeCTtoUSregistrationPushButton">
+        <property name="text">
+         <string>Visualize CT-to-US-registration</string>
         </property>
        </widget>
       </item>

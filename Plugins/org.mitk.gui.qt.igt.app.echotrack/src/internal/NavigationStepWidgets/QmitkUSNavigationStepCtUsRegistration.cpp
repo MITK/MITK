@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 #include "mitkNodeDisplacementFilter.h"
+#include "../Filter/mitkFloatingImageToUltrasoundRegistrationFilter.h"
 #include "../QmitkUSNavigationMarkerPlacement.h"
 
 
@@ -50,12 +51,12 @@ static const int NUMBER_FIDUCIALS_NEEDED = 8;
 QmitkUSNavigationStepCtUsRegistration::QmitkUSNavigationStepCtUsRegistration(QWidget *parent) :
   QmitkUSAbstractNavigationStep(parent),
   ui(new Ui::QmitkUSNavigationStepCtUsRegistration),
-  m_PerformingGroundTruthProtocolEvaluation(false)
+  m_PerformingGroundTruthProtocolEvaluation(false),
+  m_FloatingImageToUltrasoundRegistrationFilter(nullptr)
 {
   this->UnsetFloatingImageGeometry();
   this->DefineDataStorageImageFilter();
   this->CreateQtPartControl(this);
-  this->InitializeTransformationSensorCSToMarkerCS();
 }
 
 
@@ -88,6 +89,10 @@ bool QmitkUSNavigationStepCtUsRegistration::OnActivateStep()
   ui->floatingImageComboBox->SetDataStorage(this->GetDataStorage());
   ui->groundTruthImageComboBox->SetDataStorage(this->GetDataStorage());
   ui->ctImagesToChooseComboBox->SetDataStorage(this->GetDataStorage());
+  ui->segmentationComboBox->SetDataStorage(this->GetDataStorage());
+  ui->selectedSurfaceComboBox->SetDataStorage(this->GetDataStorage());
+  m_FloatingImageToUltrasoundRegistrationFilter =
+    mitk::FloatingImageToUltrasoundRegistrationFilter::New();
   return true;
 }
 
@@ -102,6 +107,7 @@ void QmitkUSNavigationStepCtUsRegistration::OnUpdate()
   if (m_NavigationDataSource.IsNull()) { return; }
 
   m_NavigationDataSource->Update();
+  m_FloatingImageToUltrasoundRegistrationFilter->Update();
 }
 
 void QmitkUSNavigationStepCtUsRegistration::OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode)
@@ -454,41 +460,6 @@ void QmitkUSNavigationStepCtUsRegistration::CreateMarkerModelCoordinateSystemPoi
     node->SetData(m_MarkerModelCoordinateSystemPointSet);
     this->GetDataStorage()->Modified();
   }*/
-}
-
-void QmitkUSNavigationStepCtUsRegistration::InitializeTransformationSensorCSToMarkerCS()
-{
-  //The following calculations are related to the 3mm | 15mm fiducial configuration
-  m_TransformSensorCSToMarkerCS = mitk::AffineTransform3D::New();
-
-  mitk::Vector3D translation;
-  translation[0] = -18.175;
-  translation[1] = 15.000;
-  translation[2] = 8.001; // considering a distance from the base plate of 0.315 inch and not 0.313 inch
-
-  m_TransformSensorCSToMarkerCS->SetOffset(translation);
-
-  // Quaternion (x, y, z, r) --> n = (1,0,0) --> q(sin(90°),0,0,cos(90°))
-  mitk::Quaternion q1(1, 0, 0, 0); // corresponding to a rotation of 180° around the normal x-axis.
-  // .transpose() is needed for changing the rows and the columns of the returned rotation_matrix_transpose
-  vnl_matrix_fixed<double, 3, 3> vnl_rotation = q1.rotation_matrix_transpose().transpose(); // :-)
-  mitk::Matrix3D rotationMatrix;
-
-  for (int i = 0; i < 3; ++i) {
-    for (int j = 0; j < 3; ++j) {
-      rotationMatrix[i][j] = vnl_rotation[i][j];
-    }
-  }
-
-  m_TransformSensorCSToMarkerCS->SetMatrix(rotationMatrix);
-  //The transformation from the sensor-CS to the marker-CS is calculated now.
-  MITK_INFO << "TransformSensorCSToMarkerCS = " << m_TransformSensorCSToMarkerCS;
-
-  /*mitk::NavigationData::Pointer navData = mitk::NavigationData::New();
-  navData->SetOrientation(q1);
-  navData->SetPosition(translation);
-  navData->SetHasOrientation(true);
-  navData->SetHasPosition(true);*/
 }
 
 void QmitkUSNavigationStepCtUsRegistration::InitializePointsToTransformForGroundTruthProtocol()
@@ -1976,6 +1947,7 @@ void QmitkUSNavigationStepCtUsRegistration::DefineDataStorageImageFilter()
   mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
 
   auto isSegmentation = mitk::NodePredicateDataType::New("Segment");
+  m_IsASurfacePredicate = mitk::NodePredicateDataType::New("Surface");
 
   mitk::NodePredicateOr::Pointer validImages = mitk::NodePredicateOr::New();
   validImages->AddPredicate(mitk::NodePredicateAnd::New(isImage, mitk::NodePredicateNot::New(isSegmentation)));
@@ -2000,6 +1972,8 @@ void QmitkUSNavigationStepCtUsRegistration::CreateQtPartControl(QWidget *parent)
   ui->floatingImageComboBox->SetPredicate(m_IsAPatientImagePredicate);
   ui->groundTruthImageComboBox->SetPredicate(m_IsAPatientImagePredicate);
   ui->ctImagesToChooseComboBox->SetPredicate(m_IsAPatientImagePredicate);
+  ui->segmentationComboBox->SetPredicate(m_IsASegmentationImagePredicate);
+  ui->selectedSurfaceComboBox->SetPredicate(m_IsASurfacePredicate);
 
   // create signal/slot connections
   connect(ui->floatingImageComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
@@ -2010,6 +1984,8 @@ void QmitkUSNavigationStepCtUsRegistration::CreateQtPartControl(QWidget *parent)
     this, SLOT(OnRegisterMarkerToFloatingImageCS()));
   connect(ui->localizeFiducialMarkerPushButton, SIGNAL(clicked()),
     this, SLOT(OnLocalizeFiducials()));
+  connect(ui->visualizeCTtoUSregistrationPushButton, SIGNAL(clicked()),
+    this, SLOT(OnVisualizeCTtoUSregistration()));
   connect(ui->filterImageGroundTruthEvaluationPushButton, SIGNAL(clicked()),
     this, SLOT(OnFilterGroundTruthImage()));
   connect(ui->addCtImagePushButton, SIGNAL(clicked()),
@@ -2232,6 +2208,8 @@ void QmitkUSNavigationStepCtUsRegistration::OnLocalizeFiducials()
     msgBox.exec();
     return;
   }
+  mitk::AffineTransform3D::Pointer transform = m_FloatingImage->GetGeometry()->GetIndexToWorldTransform();
+  MITK_WARN << "IndexToWorldTransform_CTimage = " << transform;
 
   this->GetCentroidsOfLabeledObjects();
 
@@ -2249,6 +2227,56 @@ void QmitkUSNavigationStepCtUsRegistration::OnLocalizeFiducials()
   //Before calling NumerateFiducialMarks it must be sure,
   // that there rested only 8 fiducial candidates.
   this->NumerateFiducialMarks();
+}
+
+void QmitkUSNavigationStepCtUsRegistration::OnVisualizeCTtoUSregistration()
+{
+  emit this->ActualizeCtToUsRegistrationWidget();
+
+  mitk::DataNode* segmentationNode = ui->segmentationComboBox->GetSelectedNode();
+  if (segmentationNode == nullptr)
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Cannot visualize CT-to-US registration. There is no segmentation selected.");
+    msgBox.exec();
+    return;
+  }
+  mitk::AffineTransform3D::Pointer transform = segmentationNode->GetData()->GetGeometry()->GetIndexToWorldTransform();
+  MITK_WARN << "IndexToWorldTransform_segmentation = " << transform;
+
+  mitk::DataNode* surfaceNode = ui->selectedSurfaceComboBox->GetSelectedNode();
+  if (surfaceNode == nullptr)
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Cannot visualize CT-to-US registration. There is no surface selected.");
+    msgBox.exec();
+    return;
+  }
+
+  if (this->GetCombinedModality(false).IsNull())
+  {
+    QMessageBox msgBox;
+    msgBox.setText("CombinedModality not yet set.\nPlease try again and click on the button.");
+    msgBox.exec();
+    return;
+  }
+
+  if (m_FloatingImageToUltrasoundRegistrationFilter.IsNull())
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Cannot visualize CT-to-US registration.\
+                    The FloatingImageToUltrasoundRegistrationFilter is not initialized.");
+    msgBox.exec();
+    return;
+  }
+  m_FloatingImageToUltrasoundRegistrationFilter->SetSegmentation(segmentationNode);
+  m_FloatingImageToUltrasoundRegistrationFilter->SetSurface(surfaceNode);
+  m_FloatingImageToUltrasoundRegistrationFilter
+    ->SetTransformMarkerCSToFloatingImageCS(m_TransformMarkerCSToFloatingImageCS);
+  m_FloatingImageToUltrasoundRegistrationFilter
+    ->SetTransformUSimageCSToTrackingCS(this->GetCombinedModality()->GetCalibration());
+  m_FloatingImageToUltrasoundRegistrationFilter
+    ->ConnectTo(this->GetCombinedModality()->GetNavigationDataSource());
 }
 
 void QmitkUSNavigationStepCtUsRegistration::OnFilterGroundTruthImage()

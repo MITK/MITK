@@ -46,6 +46,7 @@ namespace mitk {
 class NodeDisplacementFilter;
 class NavigationDataSource;
 class PlaneFit;
+class FloatingImageToUltrasoundRegistrationFilter;
 }
 
 namespace Ui {
@@ -106,7 +107,7 @@ public:
   virtual bool OnDeactivateStep();
 
   /**
-   * \brief Updates just the tracking validity status.
+   * \brief Updates the tracking validity status and the combined modality.
    */
   virtual void OnUpdate();
 
@@ -121,6 +122,9 @@ public:
    * @return a node displacement filter for the zone surfaces
    */
   virtual FilterVector GetFilter();
+
+signals:
+  void ActualizeCtToUsRegistrationWidget();
 
 protected:
   virtual void OnSetCombinedModality();
@@ -138,7 +142,7 @@ protected:
   double GetCharacteristicDistanceBWithUpperMargin();
   double GetMinimalFiducialConfigurationDistance();
   void CreateMarkerModelCoordinateSystemPointSet();
-  void InitializeTransformationSensorCSToMarkerCS();
+
 
   //Methods for Ground-Truth-Fiducial-Localization-Protocol-Evaluation
   void InitializePointsToTransformForGroundTruthProtocol();
@@ -181,6 +185,7 @@ protected slots:
   void OnGroundTruthImageComboBoxSelectionChanged(const mitk::DataNode* node);
   void OnRegisterMarkerToFloatingImageCS();
   void OnLocalizeFiducials();
+  void OnVisualizeCTtoUSregistration();
   void OnFilterGroundTruthImage();
 
   //Methods for Ground-Truth-Fiducial-Localization-Protocol-Evaluation
@@ -195,6 +200,7 @@ private:
   mitk::NodePredicateOr::Pointer m_IsASegmentationImagePredicate;
   mitk::NodePredicateAnd::Pointer m_IsAPatientImagePredicate;
   mitk::TNodePredicateDataType<mitk::PointSet>::Pointer m_IsAPointSetPredicate;
+  mitk::NodePredicateDataType::Pointer m_IsASurfacePredicate;
 
   itk::SmartPointer<mitk::NavigationDataSource> m_NavigationDataSource;
   mitk::Image::Pointer m_FloatingImage;
@@ -216,6 +222,8 @@ private:
   VotingBinaryIterativeHoleFillingImageFilterType::Pointer m_HoleFillingFilter;
   BinaryImageToShapeLabelMapFilterType::Pointer m_BinaryImageToShapeLabelMapFilter;
 
+  itk::SmartPointer<mitk::FloatingImageToUltrasoundRegistrationFilter> m_FloatingImageToUltrasoundRegistrationFilter;
+
   SobelEdgeDetectionImageFilterType::Pointer m_SobelEdgeDetectionFilter;
 
   std::vector<mitk::Vector3D> m_CentroidsOfFiducialCandidates;
@@ -225,7 +233,6 @@ private:
   std::map<int, mitk::Vector3D> m_FiducialMarkerCentroids;
 
   mitk::AffineTransform3D::Pointer m_TransformMarkerCSToFloatingImageCS;
-  mitk::AffineTransform3D::Pointer m_TransformSensorCSToMarkerCS;
 
   /*!
   \brief The 3D dimension of the CT image given in index size.

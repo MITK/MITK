@@ -42,6 +42,7 @@ set(INTERNAL_CPP_FILES
   Filter/mitkUSNavigationTargetOcclusionFilter.cpp
   Filter/mitkUSNavigationTargetUpdateFilter.cpp
   Filter/mitkUSNavigationTargetIntersectionFilter.cpp
+  Filter/mitkFloatingImageToUltrasoundRegistrationFilter.cpp
 
   IO/mitkUSNavigationCombinedModalityPersistence.cpp
   IO/mitkUSNavigationLoggingBackend.cpp

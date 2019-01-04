@@ -339,13 +339,13 @@ void QmitkUltrasoundCalibration::OnStartCalibrationProcess()
   // data node for calibration point set
   m_CalibNode = mitk::DataNode::New();
   m_CalibNode->SetName("Tool Calibration Points");
-  m_CalibNode->SetData(this->m_CalibPointsImage);
+  m_CalibNode->SetData(this->m_CalibPointsTool);
   this->GetDataStorage()->Add(m_CalibNode);
 
   // data node for world point set
   m_WorldNode = mitk::DataNode::New();
   m_WorldNode->SetName("Image Calibration Points");
-  m_WorldNode->SetData(this->m_CalibPointsTool);
+  m_WorldNode->SetData(this->m_CalibPointsImage);
   this->GetDataStorage()->Add(m_WorldNode);
 
   m_CombinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();

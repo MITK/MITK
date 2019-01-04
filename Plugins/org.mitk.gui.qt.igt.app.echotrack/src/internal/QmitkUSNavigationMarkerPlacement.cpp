@@ -104,7 +104,7 @@ QmitkUSNavigationMarkerPlacement::QmitkUSNavigationMarkerPlacement()
   m_IconRunning = m_IconRunning.scaledToHeight(20, Qt::SmoothTransformation);
   m_IconNotRunning = m_IconNotRunning.scaledToHeight(20, Qt::SmoothTransformation);
 
-  m_UpdateTimer->start(50); // every 50 Milliseconds = 20 Frames/Second
+
 }
 
 QmitkUSNavigationMarkerPlacement::~QmitkUSNavigationMarkerPlacement()
@@ -197,6 +197,7 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
     this->GetDataStorage()->Add(m_BaseNode);
   }
 
+  connect(ui->m_CtToUsRegistrationWidget, SIGNAL(ActualizeCtToUsRegistrationWidget()), this, SLOT(OnActualizeCtToUsRegistrationWidget()));
   connect(ui->m_initializeCtToUsRegistration, SIGNAL(clicked()), this, SLOT(OnInitializeCtToUsRegistration()));
   connect(ui->m_initializeTargetMarking, SIGNAL(clicked()), this, SLOT(OnInitializeTargetMarking()));
   connect(ui->m_initializeCritStructureMarking, SIGNAL(clicked()), this, SLOT(OnInitializeCriticalStructureMarking()));
@@ -213,21 +214,66 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
 
 void QmitkUSNavigationMarkerPlacement::ReInitializeSettingsNodesAndImageStream()
 {
+  //If update timer is not stopped (signals stopped), setting the m_CombinedModality
+  // will cause a crash of the workbench in some times.
+  m_UpdateTimer->blockSignals(true);
+  m_UpdateTimer->stop();
   m_SettingsNode = mitk::DataNode::New();
   ui->m_settingsWidget->OnSetSettingsNode(m_SettingsNode, true);
   InitImageStream();
   m_CombinedModality = ui->m_CombinedModalityCreationWidget->GetSelectedCombinedModality();
+  // Having set the m_CombinedModality reactivate the update timer again
+  m_UpdateTimer->start(50); // every 50 Milliseconds = 20 Frames/Second
+  m_UpdateTimer->blockSignals(false);
+}
+
+void QmitkUSNavigationMarkerPlacement::OnActualizeCtToUsRegistrationWidget()
+{
+  m_SettingsNode = mitk::DataNode::New();
+  ui->m_settingsWidget->OnSetSettingsNode(m_SettingsNode, true);
+  this->InitImageStream();
+
+  if (ui->m_CombinedModalityCreationWidget->GetSelectedCombinedModality().IsNull())
+  {
+    return;
+  }
+  ui->m_CtToUsRegistrationWidget->SetCombinedModality(
+    ui->m_CombinedModalityCreationWidget->GetSelectedCombinedModality());
+
+  m_CombinedModality = ui->m_CombinedModalityCreationWidget->GetSelectedCombinedModality();
+
+  if (!m_StdMultiWidget)
+  {
+    // try to get the standard multi widget if it couldn't be got before
+    mitk::IRenderWindowPart *renderWindow = this->GetRenderWindowPart();
+
+    QmitkStdMultiWidgetEditor *multiWidgetEditor = dynamic_cast<QmitkStdMultiWidgetEditor *>(renderWindow);
+
+    // if there is a standard multi widget now, disable the level window and
+    // change the layout to 2D up and 3d down
+    if (multiWidgetEditor)
+    {
+      m_StdMultiWidget = multiWidgetEditor->GetStdMultiWidget();
+      SetTwoWindowView();
+    }
+  }
+  else
+  {
+    this->OnRefreshView();
+  }
+  m_UpdateTimer->start(50); // every 50 Milliseconds = 20 Frames/Second
 }
 
 void QmitkUSNavigationMarkerPlacement::OnInitializeCtToUsRegistration()
 {
-  ui->m_CtToUsRegistrationWidget->SetCombinedModality(m_CombinedModality);
   ui->m_CtToUsRegistrationWidget->SetDataStorage(this->GetDataStorage());
   ui->m_CtToUsRegistrationWidget->OnSettingsChanged(m_SettingsNode);
   ui->m_CtToUsRegistrationWidget->OnActivateStep();
   ui->m_CtToUsRegistrationWidget->OnStartStep();
   ui->m_CtToUsRegistrationWidget->Update();
 }
+
+
 
 void QmitkUSNavigationMarkerPlacement::OnInitializeTargetMarking()
 {
@@ -320,6 +366,8 @@ void QmitkUSNavigationMarkerPlacement::OnTimeout()
   {
     m_ToolVisualizationFilter->Update();
   }
+
+  ui->m_CtToUsRegistrationWidget->Update();
   ui->m_TargetMarkingWidget->Update();
   ui->m_CriticalStructuresWidget->Update();
   ui->m_NavigationWidget->Update();
@@ -395,7 +443,7 @@ void QmitkUSNavigationMarkerPlacement::OnRefreshView()
       mitk::RenderingManager::GetInstance()->InitializeViews( // Reinit
         this
           ->GetDataStorage() // GetDataStorage
-          ->GetNamedNode("US Support Viewing Stream")
+          ->GetNamedNode("US Viewing Stream - Image 0")
           ->GetData()
           ->GetTimeGeometry()); // GetNode
     }
@@ -411,6 +459,7 @@ void QmitkUSNavigationMarkerPlacement::SetTwoWindowView()
 {
   if (m_StdMultiWidget)
   {
+    MITK_INFO << "m_StdMultiWidget exists and not null";
     m_StdMultiWidget->DisableStandardLevelWindow();
     int i, j, k;
     switch (this->ui->m_RenderWindowSelection->value())

@@ -160,6 +160,7 @@ namespace mitk
     GradientType GetGradientDirection(unsigned int i);
     std::vector< int > GetBvalues();                         ///< Returns a vector with all unique b-values (determined by the gradient magnitudes)
     double GetBvalue();
+    void ApplyDirectionMatrix();
 
   protected:
 
@@ -312,6 +313,7 @@ namespace mitk
     void UpdateSignalModels();
     void ClearFiberParameters();
     void ClearSignalParameters();
+    void ApplyDirectionMatrix();
 
     void PrintSelf();                           ///< Print parameters to stdout.
     void SaveParameters(std::string filename);  ///< Save image generation parameters to .ffp file.

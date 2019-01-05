@@ -275,6 +275,30 @@ void mitk::SignalGenerationParameters::SetGradienDirections(mitk::DiffusionPrope
   }
 }
 
+void mitk::SignalGenerationParameters::ApplyDirectionMatrix()
+{
+  auto imageRotationMatrix = m_ImageDirection.GetVnlMatrix();
+  
+  GradientListType rotated_gradients;
+  for(auto g : m_GradientDirections)
+  {
+    vnl_vector<double> vec = g.GetVnlVector();
+    vec = vec.pre_multiply(imageRotationMatrix);
+
+    GradientType g2;
+    g2[0] = vec[0];
+    g2[1] = vec[1];
+    g2[2] = vec[2];
+    rotated_gradients.push_back(g2);
+  }
+  m_GradientDirections = rotated_gradients;
+}
+
+void mitk::FiberfoxParameters::ApplyDirectionMatrix()
+{
+  m_SignalGen.ApplyDirectionMatrix();
+  UpdateSignalModels();
+}
 
 void mitk::FiberfoxParameters::SaveParameters(std::string filename)
 {

@@ -145,7 +145,7 @@ void QmitkFiberfoxView::AfterThread()
   parameters = m_TractsToDwiFilter->GetParameters();
 
   mitkImage = mitk::GrabItkImageMemory( m_TractsToDwiFilter->GetOutput() );
-  mitk::DiffusionPropertyHelper::SetOriginalGradientContainer(mitkImage, parameters.m_SignalGen.GetItkGradientContainer());
+  mitk::DiffusionPropertyHelper::SetGradientContainer(mitkImage, parameters.m_SignalGen.GetItkGradientContainer());
   mitk::DiffusionPropertyHelper::SetReferenceBValue(mitkImage, parameters.m_SignalGen.GetBvalue());
   mitk::DiffusionPropertyHelper::InitializeImage( mitkImage );
   parameters.m_Misc.m_ResultNode->SetData( mitkImage );
@@ -1948,6 +1948,7 @@ void QmitkFiberfoxView::SimulateForExistingDwi(mitk::DataNode* imageNode)
       +"_"+m_Parameters.m_Misc.m_SignalModelString
       +m_Parameters.m_Misc.m_ArtifactModelString);
 
+  m_Parameters.ApplyDirectionMatrix();
   m_TractsToDwiFilter->SetParameters(m_Parameters);
   m_TractsToDwiFilter->SetInputImage(itkVectorImagePointer);
   m_Thread.start(QThread::LowestPriority);
@@ -2047,6 +2048,7 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
     return;
   }
 
+  m_Parameters.ApplyDirectionMatrix();
   m_TractsToDwiFilter->SetParameters(m_Parameters);
   m_TractsToDwiFilter->SetFiberBundle(fiberBundle);
   m_Thread.start(QThread::LowestPriority);

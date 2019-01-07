@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKFLOATINGIMAGETOULTRASOUNDREGISTRATIONFILTER_H_HEADER_INCLUDED_
 
 #include <mitkNavigationDataPassThroughFilter.h>
+#include <mitkImage.h>
 
 namespace mitk
 {
@@ -37,7 +38,7 @@ namespace mitk
 
     void InitializeTransformationSensorCSToMarkerCS();
 
-    void SetSegmentation(mitk::DataNode::Pointer segmentationNode);
+    void SetSegmentation(mitk::DataNode::Pointer segmentationNode, mitk::Image::Pointer ctimage);
     void SetSurface(mitk::DataNode::Pointer surfaceNode);
     void SetTransformMarkerCSToFloatingImageCS( mitk::AffineTransform3D::Pointer transform );
     void SetTransformUSimageCSToTrackingCS(mitk::AffineTransform3D::Pointer transform);
@@ -58,11 +59,12 @@ namespace mitk
   private:
     mitk::DataNode::Pointer m_Segmentation;
     mitk::DataNode::Pointer m_Surface;
+    mitk::Image::Pointer m_CTimage;
     mitk::AffineTransform3D::Pointer m_TransformSensorCSToMarkerCS;
     mitk::AffineTransform3D::Pointer m_TransformMarkerCSToFloatingImageCS;
     mitk::AffineTransform3D::Pointer m_TransformUSimageCSToTrackingCS;
     mitk::AffineTransform3D::Pointer m_TransformCTimageIndexToWorld;
-
+    mitk::BaseGeometry::Pointer m_SurfaceGeometry;
     bool m_TrackedUltrasoundActive;
 
   };

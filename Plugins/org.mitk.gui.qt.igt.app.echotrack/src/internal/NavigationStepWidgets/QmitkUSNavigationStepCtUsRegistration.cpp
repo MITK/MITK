@@ -2269,7 +2269,7 @@ void QmitkUSNavigationStepCtUsRegistration::OnVisualizeCTtoUSregistration()
     msgBox.exec();
     return;
   }
-  m_FloatingImageToUltrasoundRegistrationFilter->SetSegmentation(segmentationNode);
+  m_FloatingImageToUltrasoundRegistrationFilter->SetSegmentation(segmentationNode, m_FloatingImage);
   m_FloatingImageToUltrasoundRegistrationFilter->SetSurface(surfaceNode);
   m_FloatingImageToUltrasoundRegistrationFilter
     ->SetTransformMarkerCSToFloatingImageCS(m_TransformMarkerCSToFloatingImageCS);

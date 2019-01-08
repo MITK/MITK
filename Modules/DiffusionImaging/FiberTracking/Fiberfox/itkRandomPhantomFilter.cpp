@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkRandomPhantomFilter.h"
 
-#include <itkMersenneTwisterRandomVariateGenerator.h>
 #include <itkFibersFromPlanarFiguresFilter.h>
 #include <cmath>
 
@@ -150,11 +149,6 @@ void RandomPhantomFilter::SetNumTracts(unsigned int NumTracts)
 
 void RandomPhantomFilter::GetPfOnBoundingPlane(mitk::Vector3D& pos, mitk::Vector3D& rot)
 {
-  Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
-  if (m_FixSeed)
-    randGen->SetSeed(13);
-  else
-    randGen->SetSeed();
   auto plane = randGen->GetIntegerVariate(5) + 1;
   MITK_INFO << "Plane: " << plane;
   switch(plane)
@@ -302,7 +296,7 @@ void RandomPhantomFilter::SetStartRadiusMin(unsigned int StartRadiusMin)
 
 void RandomPhantomFilter::GenerateData()
 {
-  Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
+  randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
   if (m_FixSeed)
     randGen->SetSeed(42);
   else

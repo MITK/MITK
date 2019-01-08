@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // ITK
 #include <itkProcessObject.h>
+#include <itkMersenneTwisterRandomVariateGenerator.h>
 
 namespace itk{
 
@@ -102,6 +103,7 @@ protected:
   unsigned int        m_MaxTwist;
   mitk::Vector3D      m_VolumeSize;
   bool                m_FixSeed;
+  Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen;
 };
 }
 

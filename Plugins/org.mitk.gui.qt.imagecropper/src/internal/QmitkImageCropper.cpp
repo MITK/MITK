@@ -130,6 +130,7 @@ void QmitkImageCropper::OnDataSelectionChanged(const mitk::DataNode*)
   if (m_CroppingObjectNode.IsNotNull() && dynamic_cast<mitk::GeometryData*>(this->m_CroppingObjectNode->GetData()))
   {
     m_Controls.buttonAdvancedSettings->setEnabled(true);
+    m_Controls.groupImageSettings->setEnabled(true);
     m_Controls.labelWarningBB->setVisible(false);
     m_CroppingObject = dynamic_cast<mitk::GeometryData*>(m_CroppingObjectNode->GetData());
     m_Advanced = true;

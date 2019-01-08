@@ -1,5 +1,3 @@
-if(MITK_USE_Python)
-
 project(MitkDiffusion)
 
 set(DIFFUSIONAPP_NAME MitkDiffusion)
@@ -63,6 +61,13 @@ set(_plugins
   org.mitk.gui.qt.viewnavigator
 )
 
+if(NOT MITK_USE_Python)
+  list(REMOVE_ITEM _plugins org.mitk.gui.qt.diffusionimaging.python)
+  list(REMOVE_ITEM _plugins org.mitk.gui.qt.python)
+endif()
+
+
+
 # Plug-ins listed below will not be
 #  - added as a build-time dependency to the executable
 #  - listed in the provisioning file for the executable
@@ -102,4 +107,3 @@ if(MITK_MODULES_ENABLED_PLUGINS)
   add_dependencies(${DIFFUSIONAPP_NAME} ${MITK_MODULES_ENABLED_PLUGINS})
 endif()
 
-endif() # MITK_USE_PYTHON

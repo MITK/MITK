@@ -37,6 +37,7 @@ RandomPhantomFilter::RandomPhantomFilter()
   , m_StepSizeMax(30)
   , m_MinTwist(10)
   , m_MaxTwist(30)
+  , m_FixSeed(false)
 {
   m_VolumeSize[0] = 500;
   m_VolumeSize[1] = 500;
@@ -150,8 +151,11 @@ void RandomPhantomFilter::SetNumTracts(unsigned int NumTracts)
 void RandomPhantomFilter::GetPfOnBoundingPlane(mitk::Vector3D& pos, mitk::Vector3D& rot)
 {
   Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
-  randGen->SetSeed();
-  int plane = randGen->GetIntegerVariate(5) + 1;
+  if (m_FixSeed)
+    randGen->SetSeed(13);
+  else
+    randGen->SetSeed();
+  auto plane = randGen->GetIntegerVariate(5) + 1;
   MITK_INFO << "Plane: " << plane;
   switch(plane)
   {
@@ -236,57 +240,62 @@ bool RandomPhantomFilter::IsInVolume(mitk::Vector3D pos)
   return false;
 }
 
-void RandomPhantomFilter::setMinTwist(unsigned int MinTwist)
+void RandomPhantomFilter::SetFixSeed(bool FixSeed)
+{
+  m_FixSeed = FixSeed;
+}
+
+void RandomPhantomFilter::SetMinTwist(unsigned int MinTwist)
 {
   m_MinTwist = MinTwist;
 }
 
-void RandomPhantomFilter::setMaxStreamlineDensity(unsigned int MaxStreamlineDensity)
+void RandomPhantomFilter::SetMaxStreamlineDensity(unsigned int MaxStreamlineDensity)
 {
   m_MaxStreamlineDensity = MaxStreamlineDensity;
 }
 
-void RandomPhantomFilter::setMinStreamlineDensity(unsigned int MinStreamlinDensity)
+void RandomPhantomFilter::SetMinStreamlineDensity(unsigned int MinStreamlinDensity)
 {
   m_MinStreamlineDensity = MinStreamlinDensity;
 }
 
-void RandomPhantomFilter::setMaxTwist(unsigned int MaxTwist)
+void RandomPhantomFilter::SetMaxTwist(unsigned int MaxTwist)
 {
   m_MaxTwist = MaxTwist;
 }
 
-void RandomPhantomFilter::setVolumeSize(const mitk::Vector3D &VolumeSize)
+void RandomPhantomFilter::SetVolumeSize(const mitk::Vector3D &VolumeSize)
 {
   m_VolumeSize = VolumeSize;
 }
 
-void RandomPhantomFilter::setStepSizeMax(unsigned int StepSizeMax)
+void RandomPhantomFilter::SetStepSizeMax(unsigned int StepSizeMax)
 {
   m_StepSizeMax = StepSizeMax;
 }
 
-void RandomPhantomFilter::setStepSizeMin(unsigned int StepSizeMin)
+void RandomPhantomFilter::SetStepSizeMin(unsigned int StepSizeMin)
 {
   m_StepSizeMin = StepSizeMin;
 }
 
-void RandomPhantomFilter::setCurvynessMax(unsigned int CurvynessMax)
+void RandomPhantomFilter::SetCurvynessMax(unsigned int CurvynessMax)
 {
   m_CurvynessMax = CurvynessMax;
 }
 
-void RandomPhantomFilter::setCurvynessMin(unsigned int CurvynessMin)
+void RandomPhantomFilter::SetCurvynessMin(unsigned int CurvynessMin)
 {
   m_CurvynessMin = CurvynessMin;
 }
 
-void RandomPhantomFilter::setStartRadiusMax(unsigned int StartRadiusMax)
+void RandomPhantomFilter::SetStartRadiusMax(unsigned int StartRadiusMax)
 {
   m_StartRadiusMax = StartRadiusMax;
 }
 
-void RandomPhantomFilter::setStartRadiusMin(unsigned int StartRadiusMin)
+void RandomPhantomFilter::SetStartRadiusMin(unsigned int StartRadiusMin)
 {
   m_StartRadiusMin = StartRadiusMin;
 }
@@ -294,7 +303,10 @@ void RandomPhantomFilter::setStartRadiusMin(unsigned int StartRadiusMin)
 void RandomPhantomFilter::GenerateData()
 {
   Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
-  randGen->SetSeed();
+  if (m_FixSeed)
+    randGen->SetSeed(42);
+  else
+    randGen->SetSeed();
 
   for (unsigned int i=0; i<m_NumTracts; ++i)
   {
@@ -439,6 +451,7 @@ void RandomPhantomFilter::GenerateData()
     std::cout.rdbuf (ss.rdbuf());       // <-- redirect
     itk::FibersFromPlanarFiguresFilter::Pointer filter = itk::FibersFromPlanarFiguresFilter::New();
     filter->SetParameters(fiber_params);
+    filter->SetFixSeed(m_FixSeed);
     filter->Update();
     m_FiberBundles.push_back(filter->GetFiberBundles().at(0));
     std::cout.rdbuf (old);              // <-- restore

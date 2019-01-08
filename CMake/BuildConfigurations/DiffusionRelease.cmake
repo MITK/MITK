@@ -7,7 +7,11 @@ set(MITK_USE_MatchPoint ON CACHE BOOL "" FORCE)
 set(MITK_USE_DCMTK ON CACHE BOOL "" FORCE)
 set(MITK_USE_DCMQI ON CACHE BOOL "" FORCE)
 set(MITK_USE_OpenMP ON CACHE BOOL "" FORCE)
-set(MITK_USE_Python ON CACHE BOOL "" FORCE)
+if(UNIX AND NOT APPLE)
+  set(MITK_USE_Python ON CACHE BOOL "" FORCE)
+else()
+  set(MITK_USE_Python OFF CACHE BOOL "" FORCE)
+endif()
 set(MITK_USE_BetData ON CACHE BOOL "" FORCE)
 
 # Disable all apps but MITK Diffusion

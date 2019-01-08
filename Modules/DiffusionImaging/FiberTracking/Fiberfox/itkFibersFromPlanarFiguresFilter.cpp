@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk{
 
 FibersFromPlanarFiguresFilter::FibersFromPlanarFiguresFilter()
+  : m_FixSeed(false)
 {
 
 }
@@ -52,7 +53,10 @@ FibersFromPlanarFiguresFilter::~FibersFromPlanarFiguresFilter()
 void FibersFromPlanarFiguresFilter::GeneratePoints()
 {
   Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
-  randGen->SetSeed((unsigned int)0);
+  if (m_FixSeed)
+    randGen->SetSeed(0);
+  else
+    randGen->SetSeed();
   m_2DPoints.clear();
   unsigned int count = 0;
 
@@ -75,6 +79,11 @@ void FibersFromPlanarFiguresFilter::GeneratePoints()
       count++;
     }
   }
+}
+
+void FibersFromPlanarFiguresFilter::SetFixSeed(bool FixSeed)
+{
+  m_FixSeed = FixSeed;
 }
 
 void FibersFromPlanarFiguresFilter::GenerateData()

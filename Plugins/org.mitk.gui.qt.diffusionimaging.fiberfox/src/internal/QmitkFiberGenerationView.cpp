@@ -134,21 +134,21 @@ void QmitkFiberGenerationView::RandomPhantom()
 {
   itk::RandomPhantomFilter::Pointer filter = itk::RandomPhantomFilter::New();
   filter->SetNumTracts(m_Controls->m_NumBundlesBox->value());
-  filter->setMinStreamlineDensity(m_Controls->m_MinDensityBox->value());
-  filter->setMaxStreamlineDensity(m_Controls->m_MaxDensityBox->value());
+  filter->SetMinStreamlineDensity(m_Controls->m_MinDensityBox->value());
+  filter->SetMaxStreamlineDensity(m_Controls->m_MaxDensityBox->value());
   mitk::Vector3D vol;
   vol[0] = m_Controls->m_VolumeSizeX->value();
   vol[1] = m_Controls->m_VolumeSizeY->value();
   vol[2] = m_Controls->m_VolumeSizeZ->value();
-  filter->setVolumeSize(vol);
-  filter->setStepSizeMin(m_Controls->m_StepSizeMinBox->value());
-  filter->setStepSizeMax(m_Controls->m_StepSizeMaxBox->value());
-  filter->setCurvynessMin(m_Controls->m_CurvyMinBox->value());
-  filter->setCurvynessMax(m_Controls->m_CurvyMaxBox->value());
-  filter->setStartRadiusMin(m_Controls->m_SizeMinBox->value());
-  filter->setStartRadiusMax(m_Controls->m_SizeMaxBox->value());
-  filter->setMinTwist(m_Controls->m_MinTwistBox->value());
-  filter->setMaxTwist(m_Controls->m_MaxTwistBox->value());
+  filter->SetVolumeSize(vol);
+  filter->SetStepSizeMin(m_Controls->m_StepSizeMinBox->value());
+  filter->SetStepSizeMax(m_Controls->m_StepSizeMaxBox->value());
+  filter->SetCurvynessMin(m_Controls->m_CurvyMinBox->value());
+  filter->SetCurvynessMax(m_Controls->m_CurvyMaxBox->value());
+  filter->SetStartRadiusMin(m_Controls->m_SizeMinBox->value());
+  filter->SetStartRadiusMax(m_Controls->m_SizeMaxBox->value());
+  filter->SetMinTwist(m_Controls->m_MinTwistBox->value());
+  filter->SetMaxTwist(m_Controls->m_MaxTwistBox->value());
   filter->Update();
   auto fibs = filter->GetFiberBundles();
 

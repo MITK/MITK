@@ -48,6 +48,7 @@ int main(int argc, char* argv[])
   parser.addArgument("max_twist", "", mitkCommandLineParser::Int, "", "", 30);
   parser.addArgument("compress", "", mitkCommandLineParser::Float, "Compress:", "Compress fiber using the given error threshold (in mm)", 0.1);
   parser.addArgument("", "o", mitkCommandLineParser::String, "Output folder:", "output folder", us::Any(), false);
+  parser.addArgument("fix_seed", "", mitkCommandLineParser::Bool, "Fix random seed:", "Produce same random values on each run.", us::Any());
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -115,25 +116,30 @@ int main(int argc, char* argv[])
   if (parsedArgs.count("max_twist"))
     max_twist = us::any_cast<int>(parsedArgs["max_twist"]);
 
+  bool fix_seed = false;
+  if (parsedArgs.count("fix_seed"))
+    fix_seed = us::any_cast<bool>(parsedArgs["fix_seed"]);
+
   try
   {
     itk::RandomPhantomFilter::Pointer filter = itk::RandomPhantomFilter::New();
-    filter->SetNumTracts(num_bundles);
-    filter->setMinStreamlineDensity(min_density);
-    filter->setMaxStreamlineDensity(max_density);
+    filter->SetNumTracts(static_cast<unsigned int>(num_bundles));
+    filter->SetMinStreamlineDensity(static_cast<unsigned int>(min_density));
+    filter->SetMaxStreamlineDensity(static_cast<unsigned int>(max_density));
     mitk::Vector3D vol;
     vol[0] = size_x;
     vol[1] = size_y;
     vol[2] = size_z;
-    filter->setVolumeSize(vol);
-    filter->setStepSizeMin(min_stepsize);
-    filter->setStepSizeMax(max_stepsize);
-    filter->setCurvynessMin(min_curve);
-    filter->setCurvynessMax(max_curve);
-    filter->setStartRadiusMin(min_radius);
-    filter->setStartRadiusMax(max_radius);
-    filter->setMinTwist(min_twist);
-    filter->setMaxTwist(max_twist);
+    filter->SetVolumeSize(vol);
+    filter->SetStepSizeMin(static_cast<unsigned int>(min_stepsize));
+    filter->SetStepSizeMax(static_cast<unsigned int>(max_stepsize));
+    filter->SetCurvynessMin(static_cast<unsigned int>(min_curve));
+    filter->SetCurvynessMax(static_cast<unsigned int>(max_curve));
+    filter->SetStartRadiusMin(static_cast<unsigned int>(min_radius));
+    filter->SetStartRadiusMax(static_cast<unsigned int>(max_radius));
+    filter->SetMinTwist(static_cast<unsigned int>(min_twist));
+    filter->SetMaxTwist(static_cast<unsigned int>(max_twist));
+    filter->SetFixSeed(fix_seed);
     filter->Update();
     auto fibs = filter->GetFiberBundles();
 

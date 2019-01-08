@@ -53,27 +53,29 @@ public:
 
   void SetNumTracts(unsigned int NumTracts);
 
-  void setStartRadiusMin(unsigned int StartRadiusMin);
+  void SetStartRadiusMin(unsigned int StartRadiusMin);
 
-  void setStartRadiusMax(unsigned int StartRadiusMax);
+  void SetStartRadiusMax(unsigned int StartRadiusMax);
 
-  void setCurvynessMin(unsigned int CurvynessMin);
+  void SetCurvynessMin(unsigned int CurvynessMin);
 
-  void setCurvynessMax(unsigned int CurvynessMax);
+  void SetCurvynessMax(unsigned int CurvynessMax);
 
-  void setStepSizeMin(unsigned int StepSizeMin);
+  void SetStepSizeMin(unsigned int StepSizeMin);
 
-  void setStepSizeMax(unsigned int StepSizeMax);
+  void SetStepSizeMax(unsigned int StepSizeMax);
 
-  void setVolumeSize(const mitk::Vector3D &VolumeSize);
+  void SetVolumeSize(const mitk::Vector3D &VolumeSize);
 
-  void setMaxTwist(unsigned int MaxTwist);
+  void SetMaxTwist(unsigned int MaxTwist);
 
-  void setMinStreamlineDensity(unsigned int MinStreamlinDensity);
+  void SetMinStreamlineDensity(unsigned int MinStreamlinDensity);
 
-  void setMaxStreamlineDensity(unsigned int MaxStreamlineDensity);
+  void SetMaxStreamlineDensity(unsigned int MaxStreamlineDensity);
 
-  void setMinTwist(unsigned int MinTwist);
+  void SetMinTwist(unsigned int MinTwist);
+
+  void SetFixSeed(bool FixSeed);
 
 protected:
 
@@ -99,6 +101,7 @@ protected:
   unsigned int        m_MinTwist;
   unsigned int        m_MaxTwist;
   mitk::Vector3D      m_VolumeSize;
+  bool                m_FixSeed;
 };
 }
 

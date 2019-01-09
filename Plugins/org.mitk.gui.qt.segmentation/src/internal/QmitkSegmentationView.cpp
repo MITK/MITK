@@ -462,7 +462,7 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
    }
    else
    {
-      this->UpdateWarningLabel(tr("Please load an image!"));
+      this->UpdateWarningLabel(tr("Please select an image!"));
       this->SetToolSelectionBoxesEnabled( false );
    }
 }
@@ -513,7 +513,7 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
       }
       else if (!refNode || !this->CheckForSameGeometry(node, refNode))
       {
-         this->UpdateWarningLabel(tr("Please select or load the according patient image!"));
+         this->UpdateWarningLabel(tr("Please select the matching patient image!"));
       }
    }
 
@@ -964,7 +964,7 @@ void QmitkSegmentationView::UpdateWarningLabel(QString text)
       m_Controls->lblSegmentationWarnings->hide();
    else
       m_Controls->lblSegmentationWarnings->show();
-   m_Controls->lblSegmentationWarnings->setText(text);
+   m_Controls->lblSegmentationWarnings->setText("<font color=\"red\">" + text + "</font>");
 }
 
 void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
@@ -978,7 +978,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->patImageSelector->SetDataStorage(GetDataStorage());
    m_Controls->patImageSelector->SetPredicate(m_IsAPatientImagePredicate);
 
-   UpdateWarningLabel(tr("Please load an image"));
+   UpdateWarningLabel(tr("Please select an image"));
 
    if (m_Controls->patImageSelector->GetSelectedNode().IsNotNull())
    {

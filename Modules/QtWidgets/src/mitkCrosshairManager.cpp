@@ -143,6 +143,7 @@ void mitkCrosshairManager::addPlaneCrosshair(QmitkRenderWindow* window, bool ren
       crosshair->SetBoolProperty("Crosshair.Render 2D", render2d);
       crosshair->SetBoolProperty("Crosshair.Render 3D", render3d);
       crosshair->SetBoolProperty("draw edges", render3d);
+      crosshair->SetName(otherWindow->GetSliceNavigationController()->GetViewDirectionAsString());
       dataStorage->Add(crosshair);
     }
   }

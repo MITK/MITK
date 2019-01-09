@@ -52,6 +52,7 @@ set(MITK_MODULES
   US
   USUI
   DicomUI
+  RegistrationOntology
   Remeshing
   Python
   QtPython

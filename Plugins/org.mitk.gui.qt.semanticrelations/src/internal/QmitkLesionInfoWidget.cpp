@@ -26,6 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicates.h>
 #include <mitkSemanticRelationException.h>
 
+// registration ontology module
+#include <mitkLesionPropagation.h>
+
 // qt
 #include <QCompleter>
 #include <QListWidget>
@@ -437,6 +440,7 @@ void QmitkLesionInfoWidget::OnPropagateLesion(mitk::SemanticTypes::Lesion select
   try
   {
     auto allSegmentationsOfLesion = m_SemanticRelations->GetAllSegmentationsOfLesion(m_CaseID, selectedLesion);
+    mitk::FindClosestSegmentationMask();
   }
   catch (const mitk::SemanticRelationException& e)
   {

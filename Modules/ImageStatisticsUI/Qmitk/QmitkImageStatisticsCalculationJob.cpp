@@ -14,16 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkImageStatisticsCalculationThread.h"
+#include "QmitkImageStatisticsCalculationJob.h"
 
-//QT headers
-#include <QMessageBox>
-#include <QApplication>
+#include "mitkImageStatisticsCalculator.h"
 #include <mitkImageMaskGenerator.h>
 #include <mitkPlanarFigureMaskGenerator.h>
 #include <mitkIgnorePixelMaskGenerator.h>
 
-QmitkImageStatisticsCalculationThread::QmitkImageStatisticsCalculationThread()
+QmitkImageStatisticsCalculationJob::QmitkImageStatisticsCalculationJob()
   : QThread()
   , m_StatisticsImage(nullptr)
   , m_BinaryMask(nullptr)
@@ -36,78 +34,87 @@ QmitkImageStatisticsCalculationThread::QmitkImageStatisticsCalculationThread()
 {
 }
 
-QmitkImageStatisticsCalculationThread::~QmitkImageStatisticsCalculationThread()
+QmitkImageStatisticsCalculationJob::~QmitkImageStatisticsCalculationJob()
 {
 }
 
-void QmitkImageStatisticsCalculationThread::Initialize( mitk::Image::Pointer image, mitk::Image::Pointer binaryImage, mitk::PlanarFigure::Pointer planarFig )
+void QmitkImageStatisticsCalculationJob::Initialize( mitk::Image::ConstPointer image, mitk::Image::ConstPointer binaryImage, mitk::PlanarFigure::ConstPointer planarFig )
 {
   // reset old values
   if( this->m_StatisticsImage.IsNotNull() )
     this->m_StatisticsImage = nullptr;
-
   if( this->m_BinaryMask.IsNotNull() )
     this->m_BinaryMask = nullptr;
-
   if( this->m_PlanarFigureMask.IsNotNull())
     this->m_PlanarFigureMask = nullptr;
 
   // set new values if passed in
   if(image.IsNotNull())
-    this->m_StatisticsImage = image->Clone();
+    this->m_StatisticsImage = image;
   if(binaryImage.IsNotNull())
-    this->m_BinaryMask = binaryImage->Clone();
+    this->m_BinaryMask = binaryImage;
   if(planarFig.IsNotNull())
-    this->m_PlanarFigureMask = planarFig->Clone();
+    this->m_PlanarFigureMask = planarFig;
 }
 
-void QmitkImageStatisticsCalculationThread::SetTimeStep( int times )
+void QmitkImageStatisticsCalculationJob::SetTimeStep( int times )
 {
   this->m_TimeStep = times;
 }
 
-int QmitkImageStatisticsCalculationThread::GetTimeStep()
+int QmitkImageStatisticsCalculationJob::GetTimeStep() const
 {
   return this->m_TimeStep;
 }
 
-std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> QmitkImageStatisticsCalculationThread::GetStatisticsData()
+mitk::ImageStatisticsContainer::ConstPointer QmitkImageStatisticsCalculationJob::GetStatisticsData() const
 {
-  return this->m_StatisticsVector;
+  mitk::ImageStatisticsContainer::ConstPointer constContainer = this->m_StatisticsContainer.GetPointer();
+  return constContainer;
 }
 
-mitk::Image::Pointer QmitkImageStatisticsCalculationThread::GetStatisticsImage()
+mitk::Image::ConstPointer QmitkImageStatisticsCalculationJob::GetStatisticsImage() const
 {
   return this->m_StatisticsImage;
 }
 
-void QmitkImageStatisticsCalculationThread::SetIgnoreZeroValueVoxel(bool _arg)
+mitk::Image::ConstPointer QmitkImageStatisticsCalculationJob::GetMaskImage() const
+{
+  return this->m_BinaryMask;
+}
+
+mitk::PlanarFigure::ConstPointer QmitkImageStatisticsCalculationJob::GetPlanarFigure() const
+{
+  return this->m_PlanarFigureMask;
+}
+
+void QmitkImageStatisticsCalculationJob::SetIgnoreZeroValueVoxel(bool _arg)
 {
   this->m_IgnoreZeros = _arg;
 }
 
-bool QmitkImageStatisticsCalculationThread::GetIgnoreZeroValueVoxel()
+bool QmitkImageStatisticsCalculationJob::GetIgnoreZeroValueVoxel() const
 {
   return this->m_IgnoreZeros;
 }
 
-void QmitkImageStatisticsCalculationThread::SetHistogramNBins(unsigned int nbins)
+void QmitkImageStatisticsCalculationJob::SetHistogramNBins(unsigned int nbins)
 {
   this->m_HistogramNBins = nbins;
 }
 
-unsigned int QmitkImageStatisticsCalculationThread::GetHistogramNBins() const
+unsigned int QmitkImageStatisticsCalculationJob::GetHistogramNBins() const
 {
   return this->m_HistogramNBins;
 }
 
-std::string QmitkImageStatisticsCalculationThread::GetLastErrorMessage()
+std::string QmitkImageStatisticsCalculationJob::GetLastErrorMessage() const
 {
   return m_message;
 }
 
-QmitkImageStatisticsCalculationThread::HistogramType::Pointer
-QmitkImageStatisticsCalculationThread::GetTimeStepHistogram(unsigned int t)
+QmitkImageStatisticsCalculationJob::HistogramType::ConstPointer
+QmitkImageStatisticsCalculationJob::GetTimeStepHistogram(unsigned int t) const
 {
   if (t >= this->m_HistogramVector.size())
     return nullptr;
@@ -115,17 +122,17 @@ QmitkImageStatisticsCalculationThread::GetTimeStepHistogram(unsigned int t)
   return this->m_HistogramVector[t];
 }
 
-bool QmitkImageStatisticsCalculationThread::GetStatisticsChangedFlag()
+bool QmitkImageStatisticsCalculationJob::GetStatisticsChangedFlag() const
 {
   return m_StatisticChanged;
 }
 
-bool QmitkImageStatisticsCalculationThread::GetStatisticsUpdateSuccessFlag()
+bool QmitkImageStatisticsCalculationJob::GetStatisticsUpdateSuccessFlag() const
 {
   return m_CalculationSuccessful;
 }
 
-void QmitkImageStatisticsCalculationThread::run()
+void QmitkImageStatisticsCalculationJob::run()
 {
   bool statisticCalculationSuccessful = true;
   mitk::ImageStatisticsCalculator::Pointer calculator = mitk::ImageStatisticsCalculator::New();
@@ -147,14 +154,14 @@ void QmitkImageStatisticsCalculationThread::run()
     if(this->m_BinaryMask.IsNotNull())
     {
       mitk::ImageMaskGenerator::Pointer imgMask = mitk::ImageMaskGenerator::New();
-      imgMask->SetImageMask(m_BinaryMask);
+      imgMask->SetImageMask(m_BinaryMask->Clone());
       calculator->SetMask(imgMask.GetPointer());
     }
     if(this->m_PlanarFigureMask.IsNotNull())
     {
       mitk::PlanarFigureMaskGenerator::Pointer pfMaskGen = mitk::PlanarFigureMaskGenerator::New();
       pfMaskGen->SetInputImage(m_StatisticsImage);
-      pfMaskGen->SetPlanarFigure(m_PlanarFigureMask);
+      pfMaskGen->SetPlanarFigure(m_PlanarFigureMask->Clone());
       calculator->SetMask(pfMaskGen.GetPointer());
     }
   }
@@ -199,11 +206,9 @@ void QmitkImageStatisticsCalculationThread::run()
 
   calculator->SetNBinsForHistogramStatistics(m_HistogramNBins);
 
-  for (unsigned int i = 0; i < m_StatisticsImage->GetTimeSteps(); i++)
-  {
     try
     {
-      calculator->GetStatistics(i);
+      calculator->GetStatistics();
     }
     catch ( mitk::Exception& e)
     {
@@ -223,20 +228,19 @@ void QmitkImageStatisticsCalculationThread::run()
       MITK_ERROR<< "Standard Exception: " << e.what();
       statisticCalculationSuccessful = false;
     }
-  }
 
   this->m_StatisticChanged = statisticChanged;
   this->m_CalculationSuccessful = statisticCalculationSuccessful;
 
   if(statisticCalculationSuccessful)
   {
-    this->m_StatisticsVector.clear();
+    m_StatisticsContainer = calculator->GetStatistics();
     this->m_HistogramVector.clear();
 
     for (unsigned int i = 0; i < m_StatisticsImage->GetTimeSteps(); i++)
     {
-      this->m_StatisticsVector.push_back(calculator->GetStatistics(i));
-      this->m_HistogramVector.push_back((HistogramType*)this->m_StatisticsVector[i]->GetHistogram());
+      this->m_HistogramVector.push_back(calculator->GetStatistics()->GetStatisticsForTimeStep(i).m_Histogram);
     }
+
   }
 }

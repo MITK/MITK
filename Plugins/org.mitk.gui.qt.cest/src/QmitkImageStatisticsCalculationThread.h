@@ -59,7 +59,7 @@ public:
   void Initialize( mitk::Image::Pointer image, mitk::Image::Pointer binaryImage, mitk::PlanarFigure::Pointer planarFig );
   /*!
   /brief returns the calculated image statistics. */
-  std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> GetStatisticsData();
+  std::vector<mitk::ImageStatisticsContainer::Pointer> GetStatisticsData();
   /*!
   /brief */
   mitk::Image::Pointer GetStatisticsImage();
@@ -108,7 +108,7 @@ private:
   mitk::Image::Pointer m_StatisticsImage;                         ///< member variable holds the input image for which the statistics need to be calculated.
   mitk::Image::Pointer m_BinaryMask;                              ///< member variable holds the binary mask image for segmentation image statistics calculation.
   mitk::PlanarFigure::Pointer m_PlanarFigureMask;                 ///< member variable holds the planar figure for segmentation image statistics calculation.
-  std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> m_StatisticsVector; ///< member variable holds the result structs.
+  std::vector<mitk::ImageStatisticsContainer::Pointer> m_StatisticsVector; ///< member variable holds the result structs.
   int m_TimeStep;                                                 ///< member variable holds the time step for statistics calculation
   bool m_IgnoreZeros;                                             ///< member variable holds flag to indicate if zero valued voxel should be suppressed
   bool m_CalculationSuccessful;                                   ///< flag set if statistics calculation was successful

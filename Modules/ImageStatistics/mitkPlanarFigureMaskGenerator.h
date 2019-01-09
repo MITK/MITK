@@ -41,7 +41,7 @@ namespace mitk
 
     void SetPlanarFigure(mitk::PlanarFigure::Pointer planarFigure);
 
-    mitk::Image::Pointer GetReferenceImage() override;
+    mitk::Image::ConstPointer GetReferenceImage() override;
 
     /**
      * @brief SetTimeStep is used to set the time step for which the mask is to be generated
@@ -72,7 +72,7 @@ namespace mitk
     template <typename TPixel, unsigned int VImageDimension>
     void InternalCalculateMaskFromOpenPlanarFigure(const itk::Image<TPixel, VImageDimension> *image, unsigned int axis);
 
-    mitk::Image::Pointer extract2DImageSlice(unsigned int axis, unsigned int slice);
+    mitk::Image::ConstPointer extract2DImageSlice(unsigned int axis, unsigned int slice);
 
     bool GetPrincipalAxis(const BaseGeometry *geometry, Vector3D vector, unsigned int &axis);
 
@@ -122,8 +122,8 @@ namespace mitk
 
     mitk::PlanarFigure::Pointer m_PlanarFigure;
     itk::Image<unsigned short, 2>::Pointer m_InternalITKImageMask2D;
-    mitk::Image::Pointer m_InternalTimeSliceImage;
-    mitk::Image::Pointer m_ReferenceImage;
+    mitk::Image::ConstPointer m_InternalTimeSliceImage;
+    mitk::Image::ConstPointer m_ReferenceImage;
     unsigned int m_PlanarFigureAxis;
     unsigned long m_InternalMaskUpdateTime;
     unsigned int m_PlanarFigureSlice;

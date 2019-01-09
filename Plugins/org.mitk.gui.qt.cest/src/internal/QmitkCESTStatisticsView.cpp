@@ -339,7 +339,7 @@ void QmitkCESTStatisticsView::OnThreadedStatisticsCalculationEnds()
   this->m_Controls.m_DataViewWidget->SetAxisTitle(QwtPlot::Axis::xBottom, "delta w");
   this->m_Controls.m_DataViewWidget->SetAxisTitle(QwtPlot::Axis::yLeft, "z");
 
-  const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &statistics =
+  const std::vector<mitk::ImageStatisticsContainer::Pointer> &statistics =
     this->m_CalculatorThread->GetStatisticsData();
 
   QmitkPlotWidget::DataVector::size_type numberOfSpectra = this->m_zSpectrum.size();
@@ -658,7 +658,7 @@ bool QmitkCESTStatisticsView::SetZSpectrum(mitk::StringProperty* zSpectrumProper
 }
 
 void QmitkCESTStatisticsView::FillStatisticsTableView(
-  const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &s,
+  const std::vector<mitk::ImageStatisticsContainer::Pointer> &s,
   const mitk::Image *image)
 {
   this->m_Controls.m_StatisticsTable->setColumnCount(image->GetTimeSteps());
@@ -814,7 +814,7 @@ void QmitkCESTStatisticsView::OnCopyStatisticsToClipboardPushButtonClicked()
   QLocale tempLocal;
   QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
 
-  const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &statistics =
+  const std::vector<mitk::ImageStatisticsContainer::Pointer> &statistics =
     this->m_CalculatorThread->GetStatisticsData();
 
   QmitkPlotWidget::DataVector::size_type size = m_zSpectrum.size();

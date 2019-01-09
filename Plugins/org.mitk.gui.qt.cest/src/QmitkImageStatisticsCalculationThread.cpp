@@ -69,7 +69,7 @@ int QmitkImageStatisticsCalculationThread::GetTimeStep()
   return this->m_TimeStep;
 }
 
-std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> QmitkImageStatisticsCalculationThread::GetStatisticsData()
+std::vector<mitk::ImageStatisticsContainer::Pointer> QmitkImageStatisticsCalculationThread::GetStatisticsData()
 {
   return this->m_StatisticsVector;
 }

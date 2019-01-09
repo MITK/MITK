@@ -89,7 +89,7 @@ class QmitkCESTStatisticsView : public QmitkAbstractView, public mitk::IRenderWi
                                      const QList<mitk::DataNode::Pointer>& nodes ) override;
 
     /** \brief  Writes the calculated statistics to the GUI */
-    void FillStatisticsTableView(const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &s,
+    void FillStatisticsTableView(const std::vector<mitk::ImageStatisticsContainer::Pointer> &s,
       const mitk::Image *image);
 
 

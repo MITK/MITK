@@ -54,7 +54,7 @@ void PlanarFigureMaskGenerator::SetPlanarFigure(mitk::PlanarFigure::Pointer plan
 
 }
 
-mitk::Image::Pointer PlanarFigureMaskGenerator::GetReferenceImage()
+mitk::Image::ConstPointer PlanarFigureMaskGenerator::GetReferenceImage()
 {
     if (IsUpdateRequired())
     {
@@ -422,7 +422,7 @@ void PlanarFigureMaskGenerator::CalculateMask()
     m_PlanarFigureSlice = slice;
 
     // extract image slice which corresponds to the planarFigure and store it in m_InternalImageSlice
-    mitk::Image::Pointer inputImageSlice = extract2DImageSlice(axis, slice);
+    mitk::Image::ConstPointer inputImageSlice = extract2DImageSlice(axis, slice);
     //mitk::IOUtil::Save(inputImageSlice, "/home/fabian/inputSliceImage.nrrd");
     // Compute mask from PlanarFigure
     // rastering for open planar figure:
@@ -474,11 +474,11 @@ mitk::Image::Pointer PlanarFigureMaskGenerator::GetMask()
     return m_InternalMask;
 }
 
-mitk::Image::Pointer PlanarFigureMaskGenerator::extract2DImageSlice(unsigned int axis, unsigned int slice)
+mitk::Image::ConstPointer PlanarFigureMaskGenerator::extract2DImageSlice(unsigned int axis, unsigned int slice)
 {
     // Extract slice with given position and direction from image
     unsigned int dimension = m_InternalTimeSliceImage->GetDimension();
-    mitk::Image::Pointer imageSlice = mitk::Image::New();
+    mitk::Image::ConstPointer imageSlice = mitk::Image::New();
 
     if (dimension == 3)
     {

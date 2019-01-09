@@ -4,23 +4,21 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   QmitkMeasurementView.cpp
-  QmitkPlanarFiguresTableModel.cpp
   QmitkImageStatisticsView.cpp
-  QmitkImageStatisticsCalculationThread.cpp
+  QmitkImageStatisticsReloadedView.cpp
   mitkPluginActivator.cpp
 )
 
 set(UI_FILES
+  src/internal/QmitkImageStatisticsReloadedViewControls.ui
   src/internal/QmitkImageStatisticsViewControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/QmitkMeasurementView.h
-  src/internal/QmitkPlanarFiguresTableModel.h
   src/internal/QmitkImageStatisticsView.h
-  src/internal/QmitkImageStatisticsCalculationThread.h
+  src/internal/QmitkImageStatisticsReloadedView.h
   src/internal/mitkPluginActivator.h
-
 )
 
 set(CACHED_RESOURCE_FILES
@@ -37,6 +35,7 @@ set(CACHED_RESOURCE_FILES
   resources/stats.png
   resources/text.png
   resources/bar-chart.svg
+  resources/bar-chart2.svg
   plugin.xml
 )
 

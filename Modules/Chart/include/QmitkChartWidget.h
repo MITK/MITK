@@ -206,6 +206,8 @@ public:
   */
   void Reload(bool showSubChart);
 
+  QSize sizeHint() const override;
+
 public slots:
   void OnLoadFinished(bool isLoadSuccessful);
 

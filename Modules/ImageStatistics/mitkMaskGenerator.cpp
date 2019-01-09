@@ -11,8 +11,9 @@ MaskGenerator::MaskGenerator():
 
 mitk::Image::Pointer MaskGenerator::GetMask()
 {
-    return mitk::Image::New();
+  return mitk::Image::New();
 }
+
 
 //typename itk::Region<3>::Pointer MaskGenerator::GetImageRegionOfMask(Image::Pointer image)
 //{
@@ -35,7 +36,7 @@ void MaskGenerator::SetTimeStep(unsigned int timeStep)
     }
 }
 
-void MaskGenerator::SetInputImage(mitk::Image::Pointer inputImg)
+void MaskGenerator::SetInputImage(mitk::Image::ConstPointer inputImg)
 {
     if (inputImg != m_inputImage)
     {
@@ -44,7 +45,7 @@ void MaskGenerator::SetInputImage(mitk::Image::Pointer inputImg)
     }
 }
 
-mitk::Image::Pointer MaskGenerator::GetReferenceImage()
+mitk::Image::ConstPointer MaskGenerator::GetReferenceImage()
 {
     return m_inputImage;
 }

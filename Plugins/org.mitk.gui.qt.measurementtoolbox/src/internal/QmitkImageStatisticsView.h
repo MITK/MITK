@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qmitk includes
 #include <QmitkAbstractView.h>
 #include <QmitkStepperAdapter.h>
-#include "QmitkImageStatisticsCalculationThread.h"
+#include <QmitkImageStatisticsCalculationJob.h>
 #include <berryIPartListener.h>
 
 // mitk includes
@@ -52,7 +52,7 @@ private:
 
   std::map<double, double> ConvertHistogramToMap(itk::Statistics::Histogram<double>::ConstPointer histogram) const;
   std::vector<double> ConvertIntensityProfileToVector(mitk::IntensityProfile::ConstPointer intensityProfile) const;
-  std::vector<QString> AssembleStatisticsIntoVector(mitk::ImageStatisticsCalculator::StatisticsContainer::ConstPointer statistics, mitk::Image::ConstPointer image, bool noVolumeDefined=false) const;
+  std::vector<QString> AssembleStatisticsIntoVector(mitk::ImageStatisticsContainer::ConstPointer statistics, mitk::Image::ConstPointer image, bool noVolumeDefined=false) const;
 
   QString GetFormattedIndex(const vnl_vector<int>& vector) const;
   QString GetFormattedString(double value, unsigned int decimals) const;
@@ -112,10 +112,10 @@ signals:
 
 protected:
   /** \brief  Writes the calculated statistics to the GUI */
-  void FillStatisticsTableView(const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &statistics,
+  void FillStatisticsTableView(mitk::ImageStatisticsContainer::ConstPointer statistics,
     const mitk::Image *image);
 
-  void FillLinearProfileStatisticsTableView(mitk::ImageStatisticsCalculator::StatisticsContainer::ConstPointer statistics, const mitk::Image *image);
+  void FillLinearProfileStatisticsTableView(mitk::ImageStatisticsContainer::ConstPointer statistics, const mitk::Image *image);
 
   /** \brief  Removes statistics from the GUI */
   void InvalidateStatisticsTableView();
@@ -160,7 +160,7 @@ protected:
   Ui::QmitkImageStatisticsViewControls *m_Controls;
   // if you have a planar figure selected, the statistics values will be saved in this one.
   std::vector<QString> m_PlanarFigureStatistics;
-  QmitkImageStatisticsCalculationThread* m_CalculationThread;
+  QmitkImageStatisticsCalculationJob* m_CalculationThread;
 
   // Image and mask data
   mitk::Image* m_SelectedImage;

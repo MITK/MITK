@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPluginActivator.h"
 #include "QmitkMeasurementView.h"
 #include "QmitkImageStatisticsView.h"
+#include "QmitkImageStatisticsReloadedView.h"
 
 ctkPluginContext* mitk::PluginActivator::m_Context = nullptr;
 
@@ -29,6 +30,7 @@ void mitk::PluginActivator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMeasurementView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkImageStatisticsView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkImageStatisticsReloadedView, context)
   m_Context = context;
 }
 

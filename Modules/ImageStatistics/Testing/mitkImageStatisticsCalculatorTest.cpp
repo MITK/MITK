@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarFigureMaskGenerator.h>
 #include <mitkIgnorePixelMaskGenerator.h>
 #include <mitkImageMaskGenerator.h>
+#include <mitkImageStatisticsConstants.h>
 
 /**
  * \brief Test class for mitkImageStatisticsCalculator
@@ -124,16 +125,16 @@ public:
 
 private:
 
-  mitk::Image::Pointer m_TestImage;
+  mitk::Image::ConstPointer m_TestImage;
 
-  mitk::Image::Pointer m_Pic3DImage;
+  mitk::Image::ConstPointer m_Pic3DImage;
   mitk::Image::Pointer m_Pic3DImageMask;
   mitk::Image::Pointer m_Pic3DImageMask2;
   mitk::PlanarFigure::Pointer m_Pic3DPlanarFigureAxial;
   mitk::PlanarFigure::Pointer m_Pic3DPlanarFigureSagittal;
   mitk::PlanarFigure::Pointer m_Pic3DPlanarFigureCoronal;
 
-  mitk::Image::Pointer m_US4DImage;
+  mitk::Image::ConstPointer m_US4DImage;
   mitk::Image::Pointer m_US4DImageMask;
   mitk::Image::Pointer m_US4DImageMask2;
   mitk::PlanarFigure::Pointer m_US4DPlanarFigureAxial;
@@ -143,25 +144,24 @@ private:
   mitk::PlaneGeometry::Pointer m_Geometry;
 
   // calculate statistics for the given image and planarpolygon
-  const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer ComputeStatistics( mitk::Image::Pointer image,
+  const mitk::ImageStatisticsContainer::Pointer ComputeStatistics( mitk::Image::ConstPointer image,
                                                                        mitk::PlanarFigure::Pointer polygon );
 
   // calculate statistics for the given image and mask
-  const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer ComputeStatistics( mitk::Image::Pointer image,
+  const mitk::ImageStatisticsContainer::Pointer ComputeStatistics(mitk::Image::ConstPointer image,
                                                                        mitk::Image::Pointer image_mask );
 
   // universal function to calculate statistics
-  const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer ComputeStatisticsNew(mitk::Image::Pointer image,
-                                                                                           int timeStep=0,
+  const mitk::ImageStatisticsContainer::Pointer ComputeStatisticsNew(mitk::Image::ConstPointer image,
                                                                                            mitk::MaskGenerator::Pointer maskGen=nullptr,
                                                                                            mitk::MaskGenerator::Pointer secondardMaskGen=nullptr,
                                                                                            unsigned short label=1);
 
-  void VerifyStatistics(mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer stats,
+  void VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
                         double testMean, double testSD, double testMedian=0);
 
-  void VerifyStatistics(mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer stats,
-                        long N,
+  void VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
+                        unsigned long N,
                         double mean,
                         double MPP,
                         double median,
@@ -283,7 +283,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase1()
   figure1->SetControlPoint( 3, pnt4, true );
   figure1->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_TestImage, figure1.GetPointer()), 255.0, 0.0, 255.0);
+  auto statisticsContainer = ComputeStatistics(m_TestImage, figure1.GetPointer());
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+
+  this->VerifyStatistics(statisticsObjectTimestep0, 255.0, 0.0, 255.0);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase2()
@@ -307,7 +310,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase2()
   figure1->SetControlPoint( 3, pnt4, true );
   figure1->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_TestImage, figure1.GetPointer()), 255.0, 0.0, 255.0);
+    auto statisticsContainer = ComputeStatistics(m_TestImage, figure1.GetPointer());
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+
+  this->VerifyStatistics(statisticsObjectTimestep0, 255.0, 0.0, 255.0);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase3()
@@ -328,7 +334,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase3()
   figure1->SetControlPoint( 2, pnt3, true );
   figure1->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_TestImage, figure1.GetPointer()), 255.0, 0.0, 255.0);
+      auto statisticsContainer = ComputeStatistics(m_TestImage, figure1.GetPointer());
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+
+  this->VerifyStatistics(statisticsObjectTimestep0, 255.0, 0.0, 255.0);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase4()
@@ -351,7 +360,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase4()
   figure1->SetControlPoint( 3, pnt4, true );
   figure1->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_TestImage, figure1.GetPointer()), 191.25, 110.41, 242.250);
+  auto statisticsContainer = ComputeStatistics(m_TestImage, figure1.GetPointer());
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+
+  this->VerifyStatistics(statisticsObjectTimestep0, 191.25, 110.41, 242.250);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase5()
@@ -374,7 +386,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase5()
   figure1->SetControlPoint( 3, pnt4, true );
   figure1->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_TestImage, figure1.GetPointer()), 191.50, 63.50, 134.340);
+  auto statisticsContainer = ComputeStatistics(m_TestImage, figure1.GetPointer());
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+
+  this->VerifyStatistics(statisticsObjectTimestep0, 191.50, 63.50, 134.340);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase6()
@@ -397,7 +412,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase6()
   figure1->SetControlPoint( 3, pnt4, true );
   figure1->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_TestImage, figure1.GetPointer()), 191.5, 63.50, 134.340);
+  auto statisticsContainer = ComputeStatistics(m_TestImage, figure1.GetPointer());
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+
+  this->VerifyStatistics(statisticsObjectTimestep0, 191.5, 63.50, 134.340);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase7()
@@ -421,7 +439,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase7()
   figure1->SetControlPoint( 3, pnt4, true );
   figure1->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_TestImage, figure1.GetPointer()), 127.66, 104.1, 140.250);
+  auto statisticsContainer = ComputeStatistics(m_TestImage, figure1.GetPointer());
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+
+  this->VerifyStatistics(statisticsObjectTimestep0, 127.66, 104.1, 140.250);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase8()
@@ -445,7 +466,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase8()
   figure2->SetControlPoint( 3, pnt4, true );
   figure2->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_TestImage, figure2.GetPointer()), 128.0, 0.0, 128.0);
+  auto statisticsContainer = ComputeStatistics(m_TestImage, figure2.GetPointer());
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+
+  this->VerifyStatistics(statisticsObjectTimestep0, 128.0, 0.0, 128.0);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase9()
@@ -469,7 +493,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase9()
   figure2->SetControlPoint( 3, pnt4, true );
   figure2->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_TestImage, figure2.GetPointer()), 191.5, 63.50, 134.340);
+  auto statisticsContainer = ComputeStatistics(m_TestImage, figure2.GetPointer());
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+
+  this->VerifyStatistics(statisticsObjectTimestep0, 191.5, 63.50, 134.340);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase10()
@@ -493,7 +520,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase10()
   figure2->SetControlPoint( 3, pnt4, true );
   figure2->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_TestImage, figure2.GetPointer()), 127.66, 104.1, 140.250);
+  auto statisticsContainer = ComputeStatistics(m_TestImage, figure2.GetPointer());
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+
+  this->VerifyStatistics(statisticsObjectTimestep0, 127.66, 104.1, 140.250);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase11()
@@ -518,7 +548,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase11()
   figure2->SetControlPoint( 3, pnt4, true );
   figure2->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_TestImage, figure2.GetPointer()), 204.0, 102.00, 242.250);
+  auto statisticsContainer = ComputeStatistics(m_TestImage, figure2.GetPointer());
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+
+  this->VerifyStatistics(statisticsObjectTimestep0, 204.0, 102.00, 242.250);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase12()
@@ -540,23 +573,29 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase12()
   figure2->SetControlPoint( 2, pnt3, true );
   figure2->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_TestImage, figure2.GetPointer()), 212.66, 59.860, 248.640);
+  auto statisticsContainer = ComputeStatistics(m_TestImage, figure2.GetPointer());
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+
+  this->VerifyStatistics(statisticsObjectTimestep0, 212.66, 59.860, 248.640);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingEmpty()
 {
   MITK_INFO << std::endl << "TestImageMaskingEmpty:-----------------------------------------------------------------------------------";
 
-  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageFromReference<unsigned char>( m_TestImage, 0 );
+  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageFromReference<unsigned char>( m_TestImage->Clone(), 0 );
 
-  this->VerifyStatistics( ComputeStatistics( m_TestImage, mask_image ), -21474836.480, -21474836.480, -21474836.480); // empty statisticsContainer (default values)
+  auto statisticsContainer = ComputeStatistics( m_TestImage, mask_image );
+  // test if no statisticsContainer for timestep 0 exists
+  MITK_TEST_CONDITION(!statisticsContainer->TimeStepExists(0), "No statistics for TimeStep 0 does exist.");
+  MITK_TEST_FOR_EXCEPTION(mitk::Exception, statisticsContainer->GetStatisticsForTimeStep(0));
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingNonEmpty()
 {
   MITK_INFO << std::endl << "TestImageMaskingNonEmpty:-----------------------------------------------------------------------------------";
 
-  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageFromReference<unsigned char>( m_TestImage, 0 );
+  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageFromReference<unsigned char>( m_TestImage->Clone(), 0 );
 
   // activate voxel in the mask image
   if (mask_image->GetDimension() == 3)
@@ -606,13 +645,16 @@ void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingNonEmpty()
     }
   }
 
-  this->VerifyStatistics( ComputeStatistics( m_TestImage, mask_image ), 127.5, 127.5, 12.750);
+  auto statisticsContainer = ComputeStatistics(m_TestImage, mask_image);
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
+
+  this->VerifyStatistics(statisticsObjectTimestep0, 127.5, 127.5, 12.750);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestRecomputeOnModifiedMask()
 {
   MITK_INFO << std::endl << "TestRecomputeOnModifiedMask:-----------------------------------------------------------------------------------";
-  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageFromReference<unsigned char>( m_TestImage, 0 );
+  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageFromReference<unsigned char>( m_TestImage->Clone(), 0 );
 
   mitk::ImageStatisticsCalculator::Pointer statisticsCalculator = mitk::ImageStatisticsCalculator::New();
   statisticsCalculator->SetInputImage( m_TestImage );
@@ -622,7 +664,11 @@ void mitkImageStatisticsCalculatorTestSuite::TestRecomputeOnModifiedMask()
 
   statisticsCalculator->SetMask(imgMaskGen.GetPointer());
 
-  this->VerifyStatistics( statisticsCalculator->GetStatistics(), -21474836.480, -21474836.480, -21474836.480);
+  auto statisticsContainer = statisticsCalculator->GetStatistics();
+
+  // test if no statisticsContainer for timestep 0 exists
+  MITK_TEST_CONDITION(!statisticsContainer->TimeStepExists(0), "No statistics for TimeStep 0 does exist.");
+  MITK_TEST_FOR_EXCEPTION(mitk::Exception, statisticsContainer->GetStatisticsForTimeStep(0));
 
   // activate voxel in the mask image
   if (mask_image->GetDimension() == 3)
@@ -638,20 +684,24 @@ void mitkImageStatisticsCalculatorTestSuite::TestRecomputeOnModifiedMask()
     writeAccess.SetPixelByIndex(test_index, 1);
   }
 
+  //Delete if T25625 has been resolved
+  imgMaskGen->Modified();
 
-  mask_image->Modified();
+  statisticsContainer = statisticsCalculator->GetStatistics();
 
-  mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer stat = statisticsCalculator->GetStatistics();
+  MITK_TEST_CONDITION(statisticsContainer->TimeStepExists(0), "Statistics for TimeStep 0 does exist.");
+  auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
-  this->VerifyStatistics( stat, 128.0, 0.0, 128.0);
-  MITK_TEST_CONDITION( stat->GetN() == 1, "Calculated mask voxel count '" << stat->GetN() << "'  is equal to the desired value '" << 1 << "'" );
-
+  this->VerifyStatistics(statisticsObjectTimestep0, 128.0, 0.0, 128.0);
+  auto numberOfVoxels = statisticsObjectTimestep0.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(
+    mitk::ImageStatisticsConstants::NUMBEROFVOXELS());
+  MITK_TEST_CONDITION(numberOfVoxels == 1, "Calculated mask voxel count '" << numberOfVoxels << "'  is equal to the desired value '" << 1 << "'" );
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestPic3DStatistics()
 {
     MITK_INFO << std::endl << "Test plain Pic3D:-----------------------------------------------------------------------------------";
-    long expected_N = 3211264;
+    unsigned long expected_N = 3211264;
     double expected_mean = -365.80015345982144;
     double expected_MPP = 111.80226129535752;
     double expected_median = -105.16000366210938;
@@ -677,10 +727,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DStatistics()
     expected_maxIndex[1] = 182;
     expected_maxIndex[2] = 43;
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_Pic3DImage, 0);
-    //std::cout << result->GetAsString();
+    auto statisticsContainer = ComputeStatisticsNew(m_Pic3DImage);
+    auto statisticsObject = statisticsContainer->GetStatisticsForTimeStep(0);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObject,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -710,7 +760,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DAxialPlanarFigureMaskStati
     double expected_mean = 182.30282131661443;
     double expected_median = 95.970001220703125;
     double expected_min = -156;
-    long expected_N = 3190;
+    unsigned long expected_N = 3190;
     double expected_RMS = 301.93844376702253;
     double expected_skewness = 1.6400489794326298;
     double expected_standarddev = 240.69172225993557;
@@ -733,10 +783,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DAxialPlanarFigureMaskStati
     pfMaskGen->SetInputImage(m_Pic3DImage);
     pfMaskGen->SetPlanarFigure(m_Pic3DPlanarFigureAxial);
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_Pic3DImage, 0, pfMaskGen.GetPointer());
-    //std::cout << result->GetAsString();
+    auto statisticsContainer = ComputeStatisticsNew(m_Pic3DImage, pfMaskGen.GetPointer());
+    auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObjectTimestep0,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -766,7 +816,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DSagittalPlanarFigureMaskSt
     double expected_mean = 233.93602693602693;
     double expected_median = 174.9849853515625;
     double expected_min = -83;
-    long expected_N = 1188;
+    unsigned long expected_N = 1188;
     double expected_RMS = 332.03230188484594;
     double expected_skewness = 1.7489809015501814;
     double expected_standarddev = 235.62551813489128;
@@ -789,10 +839,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DSagittalPlanarFigureMaskSt
     pfMaskGen->SetInputImage(m_Pic3DImage);
     pfMaskGen->SetPlanarFigure(m_Pic3DPlanarFigureSagittal);
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_Pic3DImage, 0, pfMaskGen.GetPointer());
-    //std::cout << result->GetAsString();
+    auto statisticsContainer = ComputeStatisticsNew(m_Pic3DImage, pfMaskGen.GetPointer());
+    auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObjectTimestep0,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -822,7 +872,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCoronalPlanarFigureMaskSta
     double expected_mean = -482.14807692307693;
     double expected_median = -660.07501220703125;
     double expected_min = -897;
-    long expected_N = 520;
+    unsigned long expected_N = 520;
     double expected_RMS = 595.09446729069839;
     double expected_skewness = 0.51691492278851858;
     double expected_standarddev = 348.81321207686312;
@@ -845,10 +895,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCoronalPlanarFigureMaskSta
     pfMaskGen->SetInputImage(m_Pic3DImage);
     pfMaskGen->SetPlanarFigure(m_Pic3DPlanarFigureCoronal);
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_Pic3DImage, 0, pfMaskGen.GetPointer());
-    //std::cout << result->GetAsString();
+    auto statisticsContainer = ComputeStatisticsNew(m_Pic3DImage, pfMaskGen.GetPointer());
+    auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObjectTimestep0,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -878,7 +928,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DImageMaskStatistics_label1
     double expected_mean = 413.52408256880733;
     double expected_median = 324;
     double expected_min = 6;
-    long expected_N = 872;
+    unsigned long expected_N = 872;
     double expected_RMS = 472.02024695145235;
     double expected_skewness = 1.3396074364415382;
     double expected_standarddev = 227.59821323493802;
@@ -902,10 +952,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DImageMaskStatistics_label1
     imgMaskGen->SetInputImage(m_Pic3DImage);
     imgMaskGen->SetTimeStep(0);
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_Pic3DImage, 0, imgMaskGen.GetPointer(), nullptr, 1);
-    //std::cout << result->GetAsString();
+    auto statisticsContainer = ComputeStatisticsNew(m_Pic3DImage, imgMaskGen.GetPointer(), nullptr, 1);
+    auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObjectTimestep0,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -936,7 +986,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DImageMaskStatistics_label2
     double expected_mean = -897.92833876221493;
     double expected_median = -969.16499900817871;
     double expected_min = -1008;
-    long expected_N = 307;
+    unsigned long expected_N = 307;
     double expected_RMS = 913.01496468179471;
     double expected_skewness = 2.6658524648889736;
     double expected_standarddev = 165.29072623903585;
@@ -960,10 +1010,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DImageMaskStatistics_label2
     imgMaskGen->SetInputImage(m_Pic3DImage);
     imgMaskGen->SetTimeStep(0);
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_Pic3DImage, 0, imgMaskGen.GetPointer(), nullptr, 2);
-    //std::cout << result->GetAsString();
+    auto statisticsContainer = ComputeStatisticsNew(m_Pic3DImage, imgMaskGen.GetPointer(), nullptr, 2);
+    auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObjectTimestep0,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -994,7 +1044,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DIgnorePixelValueMaskStatis
     double expected_mean = -366.48547402877585;
     double expected_median = -105.16000366210938;
     double expected_min = -1023;
-    long expected_N = 3205259;
+    unsigned long expected_N = 3205259;
     double expected_RMS = 598.76286909522139;
     double expected_skewness = -0.26648854845130782;
     double expected_standarddev = 473.50329537717545;
@@ -1018,10 +1068,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DIgnorePixelValueMaskStatis
     ignPixelValMask->SetIgnoredPixelValue(0);
     ignPixelValMask->SetTimeStep(0);
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_Pic3DImage, 0, ignPixelValMask.GetPointer());
-    //std::cout << result->GetAsString();
+    auto statisticsContainer = ComputeStatisticsNew(m_Pic3DImage, ignPixelValMask.GetPointer());
+    auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObjectTimestep0,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -1052,7 +1102,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DSecondaryMaskStatistics()
     double expected_mean = 320.63333333333333;
     double expected_median = 265.06500244140625;
     double expected_min = -57;
-    long expected_N = 720;
+    unsigned long expected_N = 720;
     double expected_RMS = 433.57749531594055;
     double expected_skewness = 1.1047775627624981;
     double expected_standarddev = 291.86248474238687;
@@ -1081,10 +1131,11 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DSecondaryMaskStatistics()
     imgMaskGen2->SetInputImage(m_Pic3DImage);
     imgMaskGen2->SetTimeStep(0);
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_Pic3DImage, 0, imgMaskGen2.GetPointer(), ignPixelValMask.GetPointer());
-    //std::cout << result->GetAsString();
+    auto statisticsContainer =
+      ComputeStatisticsNew(m_Pic3DImage, imgMaskGen2.GetPointer(), ignPixelValMask.GetPointer());
+    auto statisticsObjectTimestep0 = statisticsContainer->GetStatisticsForTimeStep(0);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObjectTimestep0,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -1115,7 +1166,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylStatistics_time1()
     double expected_mean = 35.771298153622375;
     double expected_median = 20.894999504089355;
     double expected_min = 0;
-    long expected_N = 3409920;
+    unsigned long expected_N = 3409920;
     double expected_RMS = 59.244523377028408;
     double expected_skewness = 1.8734292240015058;
     double expected_standarddev = 47.226346233600559;
@@ -1134,10 +1185,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylStatistics_time1()
     expected_maxIndex[1] = 101;
     expected_maxIndex[2] = 0;
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_US4DImage, 1);
-    //std::cout << result->GetAsString();
+    auto statisticsContainer = ComputeStatisticsNew(m_US4DImage);
+    auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObjectTimestep1,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -1168,7 +1219,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylAxialPlanarFigureMaskSta
     double expected_mean = 121.11663807890223;
     double expected_median = 120.14999771118164;
     double expected_min = 9;
-    long expected_N = 2332;
+    unsigned long expected_N = 2332;
     double expected_RMS = 134.41895158590751;
     double expected_skewness = -0.1454808104597369;
     double expected_standarddev = 58.30278317472294;
@@ -1191,10 +1242,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylAxialPlanarFigureMaskSta
     pfMaskGen->SetInputImage(m_US4DImage);
     pfMaskGen->SetPlanarFigure(m_US4DPlanarFigureAxial);
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_US4DImage, 1, pfMaskGen.GetPointer());
-    //std::cout << result->GetAsString();
+    auto statisticsContainer = ComputeStatisticsNew(m_US4DImage, pfMaskGen.GetPointer());
+    auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObjectTimestep1,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -1225,7 +1276,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylSagittalPlanarFigureMask
     double expected_mean = 26.176870748299319;
     double expected_median = 26.254999160766602;
     double expected_min = 0;
-    long expected_N = 735;
+    unsigned long expected_N = 735;
     double expected_RMS = 28.084905283121476;
     double expected_skewness = 0.18245181360752327;
     double expected_standarddev = 10.175133541567705;
@@ -1248,10 +1299,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylSagittalPlanarFigureMask
     pfMaskGen->SetInputImage(m_US4DImage);
     pfMaskGen->SetPlanarFigure(m_US4DPlanarFigureSagittal);
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_US4DImage, 1, pfMaskGen.GetPointer());
-    //std::cout << result->GetAsString();
+    auto statisticsContainer = ComputeStatisticsNew(m_US4DImage, pfMaskGen.GetPointer());
+    auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObjectTimestep1,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -1282,7 +1333,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylCoronalPlanarFigureMaskS
     double expected_mean = 55.118479221927501;
     double expected_median = 36.815000534057617;
     double expected_min = 0;
-    long expected_N = 2262;
+    unsigned long expected_N = 2262;
     double expected_RMS = 71.98149752438627;
     double expected_skewness = 1.4988288344523237;
     double expected_standarddev = 46.29567187238105;
@@ -1305,10 +1356,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylCoronalPlanarFigureMaskS
     pfMaskGen->SetInputImage(m_US4DImage);
     pfMaskGen->SetPlanarFigure(m_US4DPlanarFigureCoronal);
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_US4DImage, 1, pfMaskGen.GetPointer());
-    //std::cout << result->GetAsString();
+    auto statisticsContainer = ComputeStatisticsNew(m_US4DImage, pfMaskGen.GetPointer());
+    auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObjectTimestep1,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -1339,7 +1390,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylImageMaskStatistics_time
     double expected_mean = 169.58938547486034;
     double expected_median = 187.44000244140625;
     double expected_min = 63;
-    long expected_N = 716;
+    unsigned long expected_N = 716;
     double expected_RMS = 173.09843164831432;
     double expected_skewness = -1.2248969838579555;
     double expected_standarddev = 34.677188083311712;
@@ -1362,10 +1413,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylImageMaskStatistics_time
     imgMask1->SetInputImage(m_US4DImage);
     imgMask1->SetImageMask(m_US4DImageMask);
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_US4DImage, 1, imgMask1.GetPointer(), nullptr, 1);
-    //std::cout << result->GetAsString();
+    auto statisticsContainer = ComputeStatisticsNew(m_US4DImage, imgMask1.GetPointer(), nullptr, 1);
+    auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObjectTimestep1,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -1396,7 +1447,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylImageMaskStatistics_time
     double expected_mean = 167.97194163860831;
     double expected_median = 184.39499664306641;
     double expected_min = 72;
-    long expected_N = 891;
+    unsigned long expected_N = 891;
     double expected_RMS = 171.67986611998634;
     double expected_skewness = -1.1221651136259736;
     double expected_standarddev = 35.488071983870803;
@@ -1419,10 +1470,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylImageMaskStatistics_time
     imgMask1->SetInputImage(m_US4DImage);
     imgMask1->SetImageMask(m_US4DImageMask);
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_US4DImage, 2, imgMask1.GetPointer(), nullptr, 1);
-    //std::cout << result->GetAsString();
+    auto statisticsContainer = ComputeStatisticsNew(m_US4DImage, imgMask1.GetPointer(), nullptr, 1);
+    auto statisticsObjectTimestep2 = statisticsContainer->GetStatisticsForTimeStep(2);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObjectTimestep2,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -1453,7 +1504,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylImageMaskStatistics_time
     double expected_mean = 20.624836029733274;
     double expected_median = 20.010000228881836;
     double expected_min = 0;
-    long expected_N = 2287;
+    unsigned long expected_N = 2287;
     double expected_RMS = 22.508347574573804;
     double expected_skewness = 0.13837218490626488;
     double expected_standarddev = 9.0134260569684965;
@@ -1476,10 +1527,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylImageMaskStatistics_time
     imgMask1->SetInputImage(m_US4DImage);
     imgMask1->SetImageMask(m_US4DImageMask);
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_US4DImage, 1, imgMask1.GetPointer(), nullptr, 2);
-    //std::cout << result->GetAsString();
+    auto statisticsContainer = ComputeStatisticsNew(m_US4DImage, imgMask1.GetPointer(), nullptr, 2);
+    auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObjectTimestep1,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -1510,7 +1561,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylIgnorePixelValueMaskStat
     double expected_mean = 53.395358640738536;
     double expected_median = 35.649999618530273;
     double expected_min = 1;
-    long expected_N = 2284417;
+    unsigned long expected_N = 2284417;
     double expected_RMS = 72.382339046507084;
     double expected_skewness = 1.588289859859108;
     double expected_standarddev = 48.868585834566694;
@@ -1534,10 +1585,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylIgnorePixelValueMaskStat
     ignPixelValMask->SetIgnoredPixelValue(0);
     ignPixelValMask->SetTimeStep(1);
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_US4DImage, 1, ignPixelValMask.GetPointer());
-    //std::cout << result->GetAsString();
+    auto statisticsContainer = ComputeStatisticsNew(m_US4DImage, ignPixelValMask.GetPointer());
+    auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObjectTimestep1,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -1568,7 +1619,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylSecondaryMaskStatistics_
     double expected_mean = 32.791403286978507;
     double expected_median = 25.75;
     double expected_min = 1;
-    long expected_N = 17402;
+    unsigned long expected_N = 17402;
     double expected_RMS = 42.776697859745241;
     double expected_skewness = 3.3991813038552596;
     double expected_standarddev = 27.469433016621732;
@@ -1595,10 +1646,11 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylSecondaryMaskStatistics_
     imgMaskGen2->SetImageMask(m_US4DImageMask2);
     imgMaskGen2->SetInputImage(m_US4DImage);
 
-    const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result = ComputeStatisticsNew(m_US4DImage, 1, imgMaskGen2.GetPointer(), ignPixelValMask.GetPointer());
-    //std::cout << result->GetAsString();
+    auto statisticsContainer =
+      ComputeStatisticsNew(m_US4DImage, imgMaskGen2.GetPointer(), ignPixelValMask.GetPointer());
+    auto statisticsObjectTimestep1 = statisticsContainer->GetStatisticsForTimeStep(1);
 
-    VerifyStatistics(result,
+    VerifyStatistics(statisticsObjectTimestep1,
                      expected_N,
                      expected_mean,
                      expected_MPP,
@@ -1618,8 +1670,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylSecondaryMaskStatistics_
 }
 
 
-const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer
-mitkImageStatisticsCalculatorTestSuite::ComputeStatistics( mitk::Image::Pointer image, mitk::PlanarFigure::Pointer polygon )
+const mitk::ImageStatisticsContainer::Pointer mitkImageStatisticsCalculatorTestSuite::ComputeStatistics( mitk::Image::ConstPointer image, mitk::PlanarFigure::Pointer polygon )
 {
   mitk::ImageStatisticsCalculator::Pointer statisticsCalculator = mitk::ImageStatisticsCalculator::New();
   statisticsCalculator->SetInputImage( image );
@@ -1638,13 +1689,12 @@ mitkImageStatisticsCalculatorTestSuite::ComputeStatistics( mitk::Image::Pointer 
   }
   catch( ... )
   {
+    return nullptr;
   }
-
-  return mitk::ImageStatisticsCalculator::StatisticsContainer::New();
 }
 
-const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer
-mitkImageStatisticsCalculatorTestSuite::ComputeStatistics(mitk::Image::Pointer image, mitk::Image::Pointer image_mask )
+const mitk::ImageStatisticsContainer::Pointer
+mitkImageStatisticsCalculatorTestSuite::ComputeStatistics(mitk::Image::ConstPointer image, mitk::Image::Pointer image_mask )
 {
   mitk::ImageStatisticsCalculator::Pointer statisticsCalculator = mitk::ImageStatisticsCalculator::New();
   statisticsCalculator->SetInputImage(image);
@@ -1658,9 +1708,8 @@ mitkImageStatisticsCalculatorTestSuite::ComputeStatistics(mitk::Image::Pointer i
   return statisticsCalculator->GetStatistics();
 }
 
-const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer
-mitkImageStatisticsCalculatorTestSuite::ComputeStatisticsNew(mitk::Image::Pointer image,
-                                                             int timeStep,
+const mitk::ImageStatisticsContainer::Pointer
+mitkImageStatisticsCalculatorTestSuite::ComputeStatisticsNew(mitk::Image::ConstPointer image,
                                                              mitk::MaskGenerator::Pointer maskGen,
                                                              mitk::MaskGenerator::Pointer secondardMaskGen,
                                                              unsigned short label)
@@ -1677,33 +1726,36 @@ mitkImageStatisticsCalculatorTestSuite::ComputeStatisticsNew(mitk::Image::Pointe
         }
     }
 
-    return imgStatCalc->GetStatistics(timeStep, label);
+    return imgStatCalc->GetStatistics(label);
 }
 
-void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer stats,
+void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
                                                               double testMean, double testSD, double testMedian)
 {
-  int tmpMean = stats->GetMean() * 100;
+  auto mean = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::MEAN());
+  int tmpMean = mean * 100;
   double calculatedMean = tmpMean / 100.0;
   MITK_TEST_CONDITION( calculatedMean == testMean,
                        "Calculated mean grayvalue '" << calculatedMean <<
                        "'  is equal to the desired value '" << testMean << "'" );
 
-  int tmpSD = stats->GetStd() * 100;
+  auto standardDeviation = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::STANDARDDEVIATION());
+  int tmpSD = standardDeviation * 100;
   double calculatedSD = tmpSD / 100.0;
   MITK_TEST_CONDITION( calculatedSD == testSD,
                        "Calculated grayvalue sd '" << calculatedSD <<
                        "'  is equal to the desired value '" << testSD <<"'" );
 
-  int tmpMedian = stats->GetMedian() * 100;
+  auto median = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::MEDIAN());
+  int tmpMedian = median * 100;
   double calculatedMedian = tmpMedian / 100.0;
   MITK_TEST_CONDITION( testMedian == calculatedMedian,
                        "Calculated median grayvalue '" << calculatedMedian <<
                        "' is equal to the desired value '" << testMedian << "'");
 }
 
-void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer stats,
-                                                              long N,
+void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
+                                                              unsigned long N,
                                                               double mean,
                                                               double MPP,
                                                               double median,
@@ -1720,31 +1772,48 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
                                                               vnl_vector<int> minIndex,
                                                               vnl_vector<int> maxIndex)
 {
-    MITK_TEST_CONDITION(std::abs(stats->GetN() - N) < mitk::eps, "calculated N: " << stats->GetN() << " expected N: " << N);
-    MITK_TEST_CONDITION(std::abs(stats->GetMean() - mean) < mitk::eps, "calculated mean: " << stats->GetMean() << " expected mean: " << mean);
+  auto numberOfVoxelsObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::VoxelCountType>(mitk::ImageStatisticsConstants::NUMBEROFVOXELS());
+  auto meanObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEAN());
+  auto mppObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MPP());
+  auto medianObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEDIAN());
+  auto skewnessObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::SKEWNESS());
+  auto kurtosisObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::KURTOSIS());
+  auto uniformityObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::UNIFORMITY());
+  auto uppObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::UPP());
+  auto varianceObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::VARIANCE());
+  auto standardDeviationObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::STANDARDDEVIATION());
+  auto minObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MINIMUM());
+  auto maxObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MAXIMUM());
+  auto rmsObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::RMS());
+  auto entropyObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::ENTROPY());
+  auto minIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MINIMUMPOSITION());
+  auto maxIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MAXIMUMPOSITION());
+
+    MITK_TEST_CONDITION(numberOfVoxelsObject - N == 0, "calculated N: " << numberOfVoxelsObject << " expected N: " << N);
+    MITK_TEST_CONDITION(std::abs(meanObject - mean) < mitk::eps, "calculated mean: " << meanObject << " expected mean: " << mean);
     // in one test case MPP is None because the roi has no positive pixels
-    if (!std::isnan(stats->GetMPP()))
+    if (!std::isnan(mppObject))
     {
-        MITK_TEST_CONDITION(std::abs(stats->GetMPP() - MPP) < mitk::eps, "calculated MPP: " << stats->GetMPP() << " expected MPP: " << MPP);
+        MITK_TEST_CONDITION(std::abs(mppObject - MPP) < mitk::eps, "calculated MPP: " << mppObject << " expected MPP: " << MPP);
     }
-    MITK_TEST_CONDITION(std::abs(stats->GetMedian() - median) < mitk::eps, "calculated median: " << stats->GetMedian() << " expected median: " << median);
-    MITK_TEST_CONDITION(std::abs(stats->GetSkewness() - skewness) < mitk::eps, "calculated skewness: " << stats->GetSkewness() << " expected skewness: " << skewness);
-    MITK_TEST_CONDITION(std::abs(stats->GetKurtosis() - kurtosis) < mitk::eps, "calculated kurtosis: " << stats->GetKurtosis() << " expected kurtosis: " << kurtosis);
-    MITK_TEST_CONDITION(std::abs(stats->GetUniformity() - uniformity) < mitk::eps, "calculated uniformity: " << stats->GetUniformity() << " expected uniformity: " << uniformity);
-    MITK_TEST_CONDITION(std::abs(stats->GetUPP() - UPP) < mitk::eps, "calculated UPP: " << stats->GetUPP() << " expected UPP: " << UPP);
-    MITK_TEST_CONDITION(std::abs(stats->GetVariance() - variance) < mitk::eps, "calculated variance: " << stats->GetVariance() << " expected variance: " << variance);
-    MITK_TEST_CONDITION(std::abs(stats->GetStd() - stdev) < mitk::eps, "calculated stdev: " << stats->GetStd() << " expected stdev: " << stdev);
-    MITK_TEST_CONDITION(std::abs(stats->GetMin() - min) < mitk::eps, "calculated min: " << stats->GetMin() << " expected min: " << min);
-    MITK_TEST_CONDITION(std::abs(stats->GetMax() - max) < mitk::eps, "calculated max: " << stats->GetMax() << " expected max: " << max);
-    MITK_TEST_CONDITION(std::abs(stats->GetRMS() - RMS) < mitk::eps, "calculated RMS: " << stats->GetRMS() << " expected RMS: " << RMS);
-    MITK_TEST_CONDITION(std::abs(stats->GetEntropy() - entropy) < mitk::eps, "calculated entropy: " << stats->GetEntropy() << " expected entropy: " << entropy);
+    MITK_TEST_CONDITION(std::abs(medianObject - median) < mitk::eps, "calculated median: " << medianObject << " expected median: " << median);
+    MITK_TEST_CONDITION(std::abs(skewnessObject - skewness) < mitk::eps, "calculated skewness: " << skewnessObject << " expected skewness: " << skewness);
+    MITK_TEST_CONDITION(std::abs(kurtosisObject - kurtosis) < mitk::eps, "calculated kurtosis: " << kurtosisObject << " expected kurtosis: " << kurtosis);
+    MITK_TEST_CONDITION(std::abs(uniformityObject - uniformity) < mitk::eps, "calculated uniformity: " << uniformityObject << " expected uniformity: " << uniformity);
+    MITK_TEST_CONDITION(std::abs(uppObject - UPP) < mitk::eps, "calculated UPP: " << uppObject << " expected UPP: " << UPP);
+    MITK_TEST_CONDITION(std::abs(varianceObject - variance) < mitk::eps, "calculated variance: " << varianceObject << " expected variance: " << variance);
+    MITK_TEST_CONDITION(std::abs(standardDeviationObject - stdev) < mitk::eps, "calculated stdev: " << standardDeviationObject << " expected stdev: " << stdev);
+    MITK_TEST_CONDITION(std::abs(minObject - min) < mitk::eps, "calculated min: " << minObject << " expected min: " << min);
+    MITK_TEST_CONDITION(std::abs(maxObject - max) < mitk::eps, "calculated max: " << maxObject << " expected max: " << max);
+    MITK_TEST_CONDITION(std::abs(rmsObject - RMS) < mitk::eps, "calculated RMS: " << rmsObject << " expected RMS: " << RMS);
+    MITK_TEST_CONDITION(std::abs(entropyObject - entropy) < mitk::eps, "calculated entropy: " << entropyObject << " expected entropy: " << entropy);
     for (unsigned int i = 0; i < minIndex.size(); ++i)
     {
-        MITK_TEST_CONDITION(std::abs(stats->GetMinIndex()[i] - minIndex[i]) < mitk::eps, "minIndex [" << i << "] = " << stats->GetMinIndex()[i] << " expected: " << minIndex[i]);
+        MITK_TEST_CONDITION(std::abs(minIndexObject[i] - minIndex[i]) < mitk::eps, "minIndex [" << i << "] = " << minIndexObject[i] << " expected: " << minIndex[i]);
     }
     for (unsigned int i = 0; i < maxIndex.size(); ++i)
     {
-        MITK_TEST_CONDITION(std::abs(stats->GetMaxIndex()[i] - maxIndex[i]) < mitk::eps, "maxIndex [" << i << "] = " << stats->GetMaxIndex()[i] << " expected: " << maxIndex[i]);
+        MITK_TEST_CONDITION(std::abs(maxIndexObject[i] - maxIndex[i]) < mitk::eps, "maxIndex [" << i << "] = " << maxIndexObject[i] << " expected: " << maxIndex[i]);
     }
 }
 

@@ -52,7 +52,22 @@ bool mitk::PropertyRelationRuleBase::IsSource(const IPropertyProvider *owner) co
     mitkThrow() << "Error. Passed owner pointer is NULL";
   }
 
-  auto keys = owner->GetPropertyKeys();
+  std::vector<std::string> keys;
+  //workaround until T24729 is done. Please remove if T24728 is done
+  auto sourceCasted = dynamic_cast<const mitk::DataNode*>(owner);
+  if (sourceCasted) {
+    auto sourceData = sourceCasted->GetData();
+    if (sourceData) {
+      keys = sourceData->GetPropertyKeys();
+    }
+    else {
+      keys = sourceCasted->GetPropertyKeys();
+    }
+  }
+  else {
+    keys = owner->GetPropertyKeys();
+  }
+  //end workaround for T24729
 
   auto rootkey = PropertyKeyPathToPropertyName(this->GetRuleRootKeyPath());
 
@@ -275,7 +290,22 @@ mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::G
 
     auto destUID = identifiable->GetUID();
 
-    auto keys = source->GetPropertyKeys();
+    std::vector<std::string> keys;
+    //workaround until T24729 is done. Please remove if T24728 is done
+    auto sourceCasted = dynamic_cast<const mitk::DataNode*>(source);
+    if (sourceCasted) {
+      auto sourceData = sourceCasted->GetData();
+      if (sourceData) {
+        keys = sourceData->GetPropertyKeys();
+      }
+      else {
+        keys = sourceCasted->GetPropertyKeys();
+      }
+    }
+    else {
+      keys = source->GetPropertyKeys();
+    }
+    //end workaround for T24729
 
     for (const auto &key : keys)
     {

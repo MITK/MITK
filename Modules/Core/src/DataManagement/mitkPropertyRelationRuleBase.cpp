@@ -253,6 +253,16 @@ mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::G
 
   auto identifiable = dynamic_cast<const Identifiable *>(destination);
 
+  if (!identifiable)
+  { //This check and pass through to data is needed due to solve T25711. See Task for more information.
+    //This could be removed at the point we can get rid of DataNodes or they get realy transparent.
+    auto node = dynamic_cast<const DataNode*>(destination);
+    if (node && node->GetData())
+    {
+      identifiable = dynamic_cast<const Identifiable *>(node->GetData());
+    }
+  }
+
   std::string result;
 
   if (identifiable)
@@ -338,6 +348,16 @@ void mitk::PropertyRelationRuleBase::Connect(IPropertyOwner *source, const IProp
   if (!hasIDlayer)
   {
     auto identifiable = dynamic_cast<const Identifiable *>(destination);
+
+    if (!identifiable)
+    { //This check and pass through to data is needed due to solve T25711. See Task for more information.
+      //This could be removed at the point we can get rid of DataNodes or they get realy transparent.
+      auto node = dynamic_cast<const DataNode*>(destination);
+      if (node && node->GetData())
+      {
+        identifiable = dynamic_cast<const Identifiable *>(node->GetData());
+      }
+    }
 
     if (identifiable)
     {

@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPropertyRelationRuleBase.h"
 
 #include "mitkDataNode.h"
+#include "mitkPointSet.h"
 #include "mitkStringProperty.h"
 
 #include "mitkTestFixture.h"
@@ -142,6 +143,8 @@ private:
   mitk::TestRule::Pointer rule;
 
   mitk::DataNode::Pointer unRelated;
+  mitk::PointSet::Pointer unRelated_1_data;
+
   mitk::DataNode::Pointer source_implicit_1;
   mitk::DataNode::Pointer source_data_1;
   mitk::DataNode::Pointer source_idOnly_1;
@@ -152,7 +155,9 @@ private:
   mitk::DataNode::Pointer source_otherRule;
 
   mitk::DataNode::Pointer dest_1;
+  mitk::PointSet::Pointer dest_1_data;
   mitk::DataNode::Pointer dest_2;
+  mitk::PointSet::Pointer dest_2_data;
 
   bool hasRelationProperties(mitk::IPropertyProvider *provider, std::string instance = "") const
   {
@@ -183,12 +188,18 @@ public:
 
     unRelated = mitk::DataNode::New();
     unRelated->SetName("unRelated");
+    unRelated_1_data = mitk::PointSet::New();
+    unRelated->SetData(unRelated_1_data);
 
     dest_1 = mitk::DataNode::New();
     dest_1->SetName("dest_1");
+    dest_1_data = mitk::PointSet::New();
+    dest_1->SetData(dest_1_data);
 
     dest_2 = mitk::DataNode::New();
     dest_2->SetName("dest_2");
+    dest_2_data = mitk::PointSet::New();
+    dest_2->SetData(dest_2_data);
 
     source_implicit_1 = mitk::DataNode::New();
     source_implicit_1->AddProperty("referencedName", mitk::StringProperty::New(dest_1->GetName()));
@@ -197,7 +208,7 @@ public:
     std::string name = "MITK.Relations." + rule->GetRuleID() + ".1.relationUID";
     source_idOnly_1->AddProperty(name.c_str(), mitk::StringProperty::New("uid1"));
     name = "MITK.Relations." + rule->GetRuleID() + ".1.destinationUID";
-    source_idOnly_1->AddProperty(name.c_str(), mitk::StringProperty::New(dest_1->GetUID()));
+    source_idOnly_1->AddProperty(name.c_str(), mitk::StringProperty::New(dest_1_data->GetUID()));
 
     source_data_1 = source_implicit_1->Clone();
     name = "MITK.Relations." + rule->GetRuleID() + ".1.relationUID";
@@ -209,17 +220,17 @@ public:
     name = "MITK.Relations." + rule->GetRuleID() + ".1.relationUID";
     source_1->AddProperty(name.c_str(), mitk::StringProperty::New("uid3"), nullptr, true);
     name = "MITK.Relations." + rule->GetRuleID() + ".1.destinationUID";
-    source_1->AddProperty(name.c_str(), mitk::StringProperty::New(dest_1->GetUID()));
+    source_1->AddProperty(name.c_str(), mitk::StringProperty::New(dest_1_data->GetUID()));
 
     source_multi = source_1->Clone();
     name = "MITK.Relations." + rule->GetRuleID() + ".1.relationUID";
     source_multi->AddProperty(name.c_str(), mitk::StringProperty::New("uid4"), nullptr, true);
     name = "MITK.Relations." + rule->GetRuleID() + ".1.destinationUID";
-    source_multi->AddProperty(name.c_str(), mitk::StringProperty::New(dest_1->GetUID()));
+    source_multi->AddProperty(name.c_str(), mitk::StringProperty::New(dest_1_data->GetUID()));
     name = "MITK.Relations." + rule->GetRuleID() + ".4.relationUID";
     source_multi->AddProperty(name.c_str(), mitk::StringProperty::New("uid5"));
     name = "MITK.Relations." + rule->GetRuleID() + ".4.destinationUID";
-    source_multi->AddProperty(name.c_str(), mitk::StringProperty::New(dest_2->GetUID()));
+    source_multi->AddProperty(name.c_str(), mitk::StringProperty::New(dest_2_data->GetUID()));
     name = "MITK.Relations." + rule->GetRuleID() + ".2.relationUID";
     source_multi->AddProperty(name.c_str(), mitk::StringProperty::New("uid6"));
     name = "MITK.Relations." + rule->GetRuleID() + ".2.destinationUID";
@@ -229,7 +240,7 @@ public:
     name = "MITK.Relations.otherRuleID.1.relationUID";
     source_otherRule->AddProperty(name.c_str(), mitk::StringProperty::New("uid7"));
     name = "MITK.Relations.otherRuleID.1.destinationUID";
-    source_otherRule->AddProperty(name.c_str(), mitk::StringProperty::New(dest_1->GetUID()));
+    source_otherRule->AddProperty(name.c_str(), mitk::StringProperty::New(dest_1_data->GetUID()));
   }
 
   void tearDown() override {}
@@ -542,7 +553,7 @@ public:
     auto prop = source_data_1->GetProperty(name.c_str());
     CPPUNIT_ASSERT_MESSAGE(
       "Destination uid was not stored with the correct key. Already existing session should be used.", prop);
-    CPPUNIT_ASSERT_MESSAGE("Incorrect destination uid was not stored.", prop->GetValueAsString() == dest_1->GetUID());
+    CPPUNIT_ASSERT_MESSAGE("Incorrect destination uid was not stored.", prop->GetValueAsString() == dest_1_data->GetUID());
 
     // check actualization of an id only connection
     rule->Connect(source_idOnly_1, dest_1);
@@ -587,7 +598,7 @@ public:
     prop = source_multi->GetProperty(name.c_str());
     CPPUNIT_ASSERT_MESSAGE(
       "Destination uid was not stored with the correct key. Already existing session should be used.", prop);
-    CPPUNIT_ASSERT_MESSAGE("Incorrect destination uid was not stored.", prop->GetValueAsString() == unRelated->GetUID());
+    CPPUNIT_ASSERT_MESSAGE("Incorrect destination uid was not stored.", prop->GetValueAsString() == unRelated_1_data->GetUID());
   }
 
   void Disconnect()

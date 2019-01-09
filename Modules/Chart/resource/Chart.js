@@ -176,7 +176,7 @@ link = document.getElementsByTagName("link")[0];
  * @param {boolean} showSubchart
  * @param {string} stackDataString
  */
-function ReloadChart(showSubchart, stackDataString)
+function ReloadChart(showSubchart, stackDataString = false)
 {
     chartData.m_ShowSubchart = showSubchart;
     chartData.m_StackedData = stackDataString;
@@ -193,6 +193,7 @@ function transformView(transformTo) {
   console.log("transform view");
   console.log(transformTo);
 
+  chartTypes[dataLabels[0]] = transformTo; // preserve chartType for later updates
   let plotlyType = getPlotlyChartType(transformTo);
   let chart = document.getElementById("chart");
   let update = {type : plotlyType}

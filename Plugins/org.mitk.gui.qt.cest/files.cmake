@@ -1,5 +1,4 @@
 set(SRC_CPP_FILES
-  QmitkImageStatisticsCalculationThread.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -17,7 +16,6 @@ set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_cest_Activator.h
   src/internal/QmitkCESTStatisticsView.h
   src/internal/QmitkCESTNormalizeView.h
-  src/QmitkImageStatisticsCalculationThread.h
 )
 
 # list of resource files which can be used by the plug-in

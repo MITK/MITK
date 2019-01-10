@@ -478,7 +478,6 @@ mitk::Image::ConstPointer PlanarFigureMaskGenerator::extract2DImageSlice(unsigne
 {
     // Extract slice with given position and direction from image
     unsigned int dimension = m_InternalTimeSliceImage->GetDimension();
-    mitk::Image::ConstPointer imageSlice = mitk::Image::New();
 
     if (dimension == 3)
     {
@@ -487,18 +486,17 @@ mitk::Image::ConstPointer PlanarFigureMaskGenerator::extract2DImageSlice(unsigne
       imageExtractor->SetSliceDimension( axis );
       imageExtractor->SetSliceIndex( slice );
       imageExtractor->Update();
-      imageSlice = imageExtractor->GetOutput();
+      return imageExtractor->GetOutput();
     }
     else if(dimension == 2)
     {
-      imageSlice = m_InternalTimeSliceImage;
+      return m_InternalTimeSliceImage;
     }
     else
     {
-        MITK_ERROR << "Unsupported image dimension. Dimension is: " << dimension << ". Only 2D and 3D images are supported.";
+      MITK_ERROR << "Unsupported image dimension. Dimension is: " << dimension << ". Only 2D and 3D images are supported.";
+      return nullptr;
     }
-
-    return imageSlice;
 }
 
 bool PlanarFigureMaskGenerator::IsUpdateRequired() const

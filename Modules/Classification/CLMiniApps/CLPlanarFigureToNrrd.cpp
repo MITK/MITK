@@ -114,10 +114,9 @@ int main(int argc, char* argv[])
     mitk::PlanarFigureMaskGenerator::Pointer pfMaskGen = mitk::PlanarFigureMaskGenerator::New();
     pfMaskGen->SetPlanarFigure(planar);
     pfMaskGen->SetTimeStep(0);
-    pfMaskGen->SetInputImage(image);
+    pfMaskGen->SetInputImage(image.GetPointer());
 
     mitk::Image::Pointer mask = pfMaskGen->GetMask();
-    mitk::Image::Pointer refImage = pfMaskGen->GetReferenceImage();
     unsigned int axis = pfMaskGen->GetPlanarFigureAxis();
     unsigned int slice = pfMaskGen->GetPlanarFigureSlice();
 

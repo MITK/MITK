@@ -468,7 +468,8 @@ void mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* intera
   // perform translation
   Vector2D moveVector = (positionEvent->GetPointerPositionOnScreen() - m_LastDisplayCoordinate) * invertModifier;
 
-  if (s_PanZoomSynchronization)
+  auto senderSliceNavigationController = sender->GetSliceNavigationController();
+  if (s_PanZoomSynchronization && senderSliceNavigationController->isInSync())
   {
     auto allRenderWindows = mitk::RenderingManager::GetGenerallyAllRegisteredRenderWindows();
     std::string sourceStudy(sender->GetStudyUID());
@@ -479,18 +480,22 @@ void mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* intera
       {
         continue;
       }
-      bool sameDirection = (ren->GetSliceNavigationController()->GetDefaultViewDirection() == sender->GetSliceNavigationController()->GetDefaultViewDirection());
-      if (sameDirection)
+      auto sliceNavigationController = ren->GetSliceNavigationController();
+      if (sliceNavigationController->isInSync())
       {
-        if (mitk::DisplayInteractor::s_PanZoomSynchronizationStudy)
+        bool sameDirection = (sliceNavigationController->GetDefaultViewDirection() == senderSliceNavigationController->GetDefaultViewDirection());
+        if (sameDirection)
         {
-          if (sourceStudy != ren->GetStudyUID())
+          if (mitk::DisplayInteractor::s_PanZoomSynchronizationStudy)
           {
-            continue;
+            if (sourceStudy != ren->GetStudyUID())
+            {
+              continue;
+            }
           }
+          ren->GetCameraController()->MoveBy(moveVector);
+          ren->GetRenderingManager()->RequestUpdate(renderWindow);
         }
-        ren->GetCameraController()->MoveBy(moveVector);
-        ren->GetRenderingManager()->RequestUpdate(renderWindow);
       }
     }
   }
@@ -551,7 +556,8 @@ void mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
 
   if (factor != 1.0)
   {
-    if (s_PanZoomSynchronization)
+    auto senderSliceNavigationController = sender->GetSliceNavigationController();
+    if (s_PanZoomSynchronization && senderSliceNavigationController->isInSync())
     {
       std::string sourceStudy(sender->GetStudyUID());
       auto allRenderWindows = mitk::RenderingManager::GetGenerallyAllRegisteredRenderWindows();
@@ -562,18 +568,21 @@ void mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
         {
           continue;
         }
-        bool sameDirection = (ren->GetSliceNavigationController()->GetDefaultViewDirection() == sender->GetSliceNavigationController()->GetDefaultViewDirection());
-        if (sameDirection)
-        {
-          if (mitk::DisplayInteractor::s_PanZoomSynchronizationStudy)
+        auto sliceNavigationController = ren->GetSliceNavigationController();
+        if (sliceNavigationController->isInSync()) {
+          bool sameDirection = (sliceNavigationController->GetDefaultViewDirection() == senderSliceNavigationController->GetDefaultViewDirection());
+          if (sameDirection)
           {
-            if (sourceStudy != ren->GetStudyUID())
+            if (mitk::DisplayInteractor::s_PanZoomSynchronizationStudy)
             {
-              continue;
+              if (sourceStudy != ren->GetStudyUID())
+              {
+                continue;
+              }
             }
+            ren->GetCameraController()->Zoom(factor, m_StartCoordinateInMM);
+            ren->GetRenderingManager()->RequestUpdate(renderWindow);
           }
-          ren->GetCameraController()->Zoom(factor, m_StartCoordinateInMM);
-          ren->GetRenderingManager()->RequestUpdate(renderWindow);
         }
       }
     }

@@ -62,6 +62,7 @@ SliceNavigationController::SliceNavigationController( )
   m_BlockUpdate( false ),
   m_SliceLocked( false ),
   m_SliceRotationLocked( false ),
+  m_InGlobalSync( true ),
   m_OldPos(0)
 {
   typedef itk::SimpleMemberCommand< SliceNavigationController > SNCCommandType;
@@ -92,6 +93,15 @@ SliceNavigationController::~SliceNavigationController()
 {
 }
 
+void SliceNavigationController::setGlobalSync(bool sync)
+{
+  m_InGlobalSync = sync;
+}
+
+bool SliceNavigationController::isInSync()
+{
+  return m_InGlobalSync;
+}
 
 void SliceNavigationController::setPositionTop(bool top)
 {

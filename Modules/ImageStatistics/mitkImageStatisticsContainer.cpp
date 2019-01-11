@@ -75,7 +75,7 @@ namespace mitk
       StatisticNameVector names = GetDefaultStatisticNames();
       names.insert(std::end(names),std::cbegin(m_CustomNames), std::cend(m_CustomNames));
 
-      return std::move(names);
+      return names;
     }
 
     bool ImageStatisticsContainer::StatisticsObject::HasStatistic(const std::string& name) const
@@ -184,7 +184,7 @@ namespace mitk
         names.insert(std::end(names), std::begin(customKeys), std::end(customKeys));
       }
 
-      return std::move(names);
+      return names;
     };
 
     ImageStatisticsContainer::StatisticsObject::StatisticNameVector
@@ -204,7 +204,7 @@ namespace mitk
 
       names.insert(std::end(names), std::begin(customKeys), std::end(customKeys));
 
-      return std::move(names);
+      return names;
     };
 
 }

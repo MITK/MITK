@@ -43,7 +43,6 @@ mitk::ImageStatisticsContainer::ConstPointer mitk::ImageStatisticsContainerManag
 
     statisticContainerCandidateNodesFiltered = mitk::DataStorage::SetOfObjects::New();
     for (const auto& node : *statisticContainerCandidateNodes) {
-      auto nodeData = node->GetData();
       statisticContainerCandidateNodesFiltered->push_back(node);
     }
     

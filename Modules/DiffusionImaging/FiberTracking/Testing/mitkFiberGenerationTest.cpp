@@ -55,6 +55,7 @@ int mitkFiberGenerationTest(int argc, char* argv[])
             itk::FibersFromPlanarFiguresFilter::Pointer filter = itk::FibersFromPlanarFiguresFilter::New();
             parameters.m_Distribution = FiberGenerationParameters::DISTRIBUTE_UNIFORM;
             filter->SetParameters(parameters);
+            filter->SetFixSeed(true);
             filter->Update();
             std::vector< mitk::FiberBundle::Pointer > fiberBundles = filter->GetFiberBundles();
             MITK_TEST_CONDITION_REQUIRED(uniform->Equals(fiberBundles.at(0)),"check uniform bundle")

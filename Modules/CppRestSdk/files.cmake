@@ -4,4 +4,9 @@ set(CPP_FILES
   mitkRESTServer.cpp
   mitkRESTClient.cpp
   mitkDICOMWeb.cpp
+  mitkRESTClientMicroService.cpp
+  mitkRESTServerMicroService.cpp
+  mitkCppRestSdkActivator.cpp
+  mitkIRESTClient.cpp
+  mitkIRESTServer.cpp
 )

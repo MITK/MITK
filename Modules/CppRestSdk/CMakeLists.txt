@@ -4,6 +4,7 @@ if(MITK_USE_CppRestSdk)
     DEPENDS MitkCore MitkQtWidgetsExt
     PACKAGE_DEPENDS Qt5|Core
     WARNINGS_NO_ERRORS 
+    AUTOLOAD_WITH MitkCore
   )
   find_package(OpenSSL REQUIRED)
 

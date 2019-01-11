@@ -236,8 +236,8 @@ void QmitkImageStatisticsReloadedView::CalculateOrGetStatistics()
 
     bool imageStatisticsOlderThanInputs = false;
     if (imageStatistics && (imageStatistics->GetMTime() < image->GetMTime() ||
-      mask && imageStatistics->GetMTime() < mask->GetMTime() ||
-      maskPlanarFigure && imageStatistics->GetMTime() < maskPlanarFigure->GetMTime())) {
+      (mask && imageStatistics->GetMTime() < mask->GetMTime()) ||
+      (maskPlanarFigure && imageStatistics->GetMTime() < maskPlanarFigure->GetMTime()))) {
       imageStatisticsOlderThanInputs = true;
     }
 

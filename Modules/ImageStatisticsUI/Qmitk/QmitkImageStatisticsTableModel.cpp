@@ -301,21 +301,21 @@ void QmitkImageStatisticsTableModel::UpdateByDataStorage()
   m_StatisticNames = mitk::GetAllStatisticNames(m_Statistics);
 }
 
-void QmitkImageStatisticsTableModel::NodeRemoved(const mitk::DataNode *node)
+void QmitkImageStatisticsTableModel::NodeRemoved(const mitk::DataNode *)
 {
   emit beginResetModel();
   UpdateByDataStorage();
   emit endResetModel();
 }
 
-void QmitkImageStatisticsTableModel::NodeAdded(const mitk::DataNode *node)
+void QmitkImageStatisticsTableModel::NodeAdded(const mitk::DataNode *)
 {
   emit beginResetModel();
   UpdateByDataStorage();
   emit endResetModel();
 }
 
-void QmitkImageStatisticsTableModel::NodeChanged(const mitk::DataNode *node)
+void QmitkImageStatisticsTableModel::NodeChanged(const mitk::DataNode *)
 {
   emit beginResetModel();
   UpdateByDataStorage();

@@ -88,11 +88,11 @@ void mitk::ImageToPointCloudFilter::StdDeviations(itk::Image<TPixel, VImageDimen
 
   lapFilter->SetInput(fImage);
   lapFilter->UpdateLargestPossibleRegion();
-  mitk::Image::ConstPointer edgeImage = mitk::ImportItkImage(lapFilter->GetOutput());
+  auto edgeImage = mitk::ImportItkImage(lapFilter->GetOutput());
 
   mitk::ImageStatisticsCalculator::Pointer statCalc =
                                          mitk::ImageStatisticsCalculator::New();
-  statCalc->SetInputImage(edgeImage);
+  statCalc->SetInputImage(edgeImage.GetPointer());
   auto stats = statCalc->GetStatistics()->GetStatisticsForTimeStep(0);
   auto mean = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::MEAN());
   auto stdDev = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::STANDARDDEVIATION());

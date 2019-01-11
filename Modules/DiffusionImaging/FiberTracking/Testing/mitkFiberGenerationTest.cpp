@@ -65,7 +65,7 @@ int mitkFiberGenerationTest(int argc, char* argv[])
             itk::FibersFromPlanarFiguresFilter::Pointer filter = itk::FibersFromPlanarFiguresFilter::New();
             parameters.m_Distribution = FiberGenerationParameters::DISTRIBUTE_GAUSSIAN;
             filter->SetParameters(parameters);
-            filter->SetParameters(parameters);
+            filter->SetFixSeed(true);
             filter->Update();
             std::vector< mitk::FiberBundle::Pointer > fiberBundles = filter->GetFiberBundles();
             MITK_TEST_CONDITION_REQUIRED(gaussian->Equals(fiberBundles.at(0)),"check gaussian bundle")

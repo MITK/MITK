@@ -98,13 +98,13 @@ public:
 
   bool getShowPlanesIn3D();
 
+  bool hasWindow(QmitkRenderWindow* window);
+
 signals:
   void crosshairModeChanged(CrosshairMode mode);
   void savePlaneVisibilityIn3D(bool visibility);
 
 private:
-  bool hasWindow(QmitkRenderWindow* window);
-
   void addCrosshair(QmitkRenderWindow* window);
   void removeCrosshair(QmitkRenderWindow* window);
   void recreateCrosshair(QmitkRenderWindow* window);

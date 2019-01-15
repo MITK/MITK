@@ -1575,18 +1575,21 @@ void QmitkStdMultiWidget::moveEvent( QMoveEvent* e )
 
 void QmitkStdMultiWidget::OnWindowResized()
 {
-  m_ResizeTimer.start(100);
+  if (this->isEnabled()) {
+    m_ResizeTimer.start(100);
+  }
 }
 
 void QmitkStdMultiWidget::OnResizeStoped()
 {
-  UpdateAnnotationFonts();
-  for (int i = 0; i < 4; i++) {
-    m_CornerAnnotations[i]->Modified();
+  if (this->isEnabled()) {
+    UpdateAnnotationFonts();
+    for (int i = 0; i < 4; i++) {
+      m_CornerAnnotations[i]->Modified();
+    }
+    RequestUpdate();
   }
-  RequestUpdate();
 }
-
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow1() const
 {

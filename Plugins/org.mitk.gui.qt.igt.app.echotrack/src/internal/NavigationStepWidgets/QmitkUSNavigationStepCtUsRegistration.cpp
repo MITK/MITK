@@ -52,7 +52,8 @@ QmitkUSNavigationStepCtUsRegistration::QmitkUSNavigationStepCtUsRegistration(QWi
   QmitkUSAbstractNavigationStep(parent),
   ui(new Ui::QmitkUSNavigationStepCtUsRegistration),
   m_PerformingGroundTruthProtocolEvaluation(false),
-  m_FloatingImageToUltrasoundRegistrationFilter(nullptr)
+  m_FloatingImageToUltrasoundRegistrationFilter(nullptr),
+  m_FreezeCombinedModality(false)
 {
   this->UnsetFloatingImageGeometry();
   this->DefineDataStorageImageFilter();
@@ -1988,6 +1989,8 @@ void QmitkUSNavigationStepCtUsRegistration::CreateQtPartControl(QWidget *parent)
     this, SLOT(OnLocalizeFiducials()));
   connect(ui->visualizeCTtoUSregistrationPushButton, SIGNAL(clicked()),
     this, SLOT(OnVisualizeCTtoUSregistration()));
+  connect(ui->freezeUnfreezePushButton, SIGNAL(clicked()),
+    this, SLOT(OnFreeze()));
   connect(ui->filterImageGroundTruthEvaluationPushButton, SIGNAL(clicked()),
     this, SLOT(OnFilterGroundTruthImage()));
   connect(ui->addCtImagePushButton, SIGNAL(clicked()),
@@ -2292,6 +2295,27 @@ void QmitkUSNavigationStepCtUsRegistration::OnVisualizeCTtoUSregistration()
     ->SetTransformUSimageCSToTrackingCS(this->GetCombinedModality()->GetCalibration());
   m_FloatingImageToUltrasoundRegistrationFilter
     ->ConnectTo(this->GetCombinedModality()->GetNavigationDataSource());
+}
+
+void QmitkUSNavigationStepCtUsRegistration::OnFreeze()
+{
+  if (this->GetCombinedModality(false).IsNull())
+  {
+    return;
+  }
+
+  if (!m_FreezeCombinedModality)
+  {
+    m_FreezeCombinedModality = true;
+    ui->freezeUnfreezePushButton->setText("Unfreeze");
+    this->GetCombinedModality()->SetIsFreezed(true);
+  }
+  else
+  {
+    m_FreezeCombinedModality = false;
+    ui->freezeUnfreezePushButton->setText("Freeze");
+    this->GetCombinedModality()->SetIsFreezed(false);
+  }
 }
 
 void QmitkUSNavigationStepCtUsRegistration::OnFilterGroundTruthImage()

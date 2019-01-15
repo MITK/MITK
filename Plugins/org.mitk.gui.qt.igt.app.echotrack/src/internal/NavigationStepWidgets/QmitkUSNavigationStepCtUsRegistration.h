@@ -186,6 +186,7 @@ protected slots:
   void OnRegisterMarkerToFloatingImageCS();
   void OnLocalizeFiducials();
   void OnVisualizeCTtoUSregistration();
+  void OnFreeze();
   void OnFilterGroundTruthImage();
 
   //Methods for Ground-Truth-Fiducial-Localization-Protocol-Evaluation
@@ -239,6 +240,8 @@ private:
   */
   mitk::Vector3D m_ImageDimension;
   mitk::Vector3D m_ImageSpacing;
+
+  bool m_FreezeCombinedModality;
 
 };
 

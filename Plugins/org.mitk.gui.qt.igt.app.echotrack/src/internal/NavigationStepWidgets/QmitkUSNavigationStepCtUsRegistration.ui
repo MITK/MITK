@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>767</height>
+    <height>808</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -166,6 +166,13 @@
        <widget class="QPushButton" name="visualizeCTtoUSregistrationPushButton">
         <property name="text">
          <string>Visualize CT-to-US-registration</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="freezeUnfreezePushButton">
+        <property name="text">
+         <string>Freeze</string>
         </property>
        </widget>
       </item>

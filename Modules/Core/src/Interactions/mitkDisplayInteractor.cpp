@@ -20,7 +20,6 @@
 #include "mitkCameraController.h"
 #include "mitkPropertyList.h"
 #include <mitkAbstractTransformGeometry.h>
-#include <mitkRotationOperation.h>
 #include <string.h>
 // level window
 #include "mitkStandaloneDataStorage.h"
@@ -28,6 +27,8 @@
 #include "mitkLevelWindowProperty.h"
 #include "mitkLevelWindow.h"
 #include "vtkRenderWindowInteractor.h"
+// location of rotation handles
+#include "mitkPlaneGeometryDataMapper2D.h"
 
 #include <vtkInteractorObserver.h>
 #include <vtkCamera.h>
@@ -44,7 +45,6 @@
 #include "mitkStatusBar.h"
 #include "mitkImage.h"
 #include "mitkPixelTypeMultiplex.h"
-#include "mitkImagePixelReadAccessor.h"
 #include <mitkCompositePixelValueToString.h>
 
 void mitk::DisplayInteractor::Notify(InteractionEvent* interactionEvent, bool isHandled)
@@ -225,7 +225,7 @@ bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent
   - calculate the line intersection of this SliceNavigationController's plane with our rendering plane
   - if there is NO interesection, ignore and continue
   - IF there is an intersection
-  - check the mouse cursor's distance from that line.
+  - check the mouse cursor's distance from handle centers.
   0. if the line is NOT near the cursor, remember the plane as "one of the other planes" (which can be rotated in "locked" mode)
   1. on first line near the cursor,  just remember this intersection line as THE other plane that we want to rotate
   2. on every consecutive line near the cursor, check if the line is geometrically identical to the line that we want to rotate
@@ -236,19 +236,21 @@ bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent
   if (posEvent == nullptr) return false;
 
   BaseRenderer* clickedRenderer = posEvent->GetSender();
-  const PlaneGeometry* ourViewportGeometry = (clickedRenderer->GetCurrentWorldPlaneGeometry());
+
+  mitk::DataNode* geometryDataNode = clickedRenderer->GetCurrentWorldPlaneGeometryNode();
+  const PlaneGeometryData* rendererWorldPlaneGeometryData = dynamic_cast< PlaneGeometryData * >(geometryDataNode->GetData());
+  const PlaneGeometry* ourViewportGeometry = dynamic_cast< const PlaneGeometry* >( rendererWorldPlaneGeometryData->GetPlaneGeometry() );
 
   if (!ourViewportGeometry) return false;
 
-  Point3D cursorPosition = posEvent->GetPositionInWorld();
+  Point3D cursorPosition = posEvent->GetPlanePositionInWorld();
   const PlaneGeometry* geometryToBeRotated = NULL;  // this one is under the mouse cursor
   const PlaneGeometry* anyOtherGeometry = NULL;    // this is also visible (for calculation of intersection ONLY)
   Line3D intersectionLineWithGeometryToBeRotated;
 
-  bool hitMultipleLines(false);
   m_SNCsToBeRotated.clear();
 
-  const double threshholdDistancePixels = 12.0;
+  double threshholdDistancePixels = 12.0;
 
   auto renWindows = interactionEvent->GetSender()->GetRenderingManager()->GetAllRegisteredRenderWindows();
 
@@ -260,20 +262,27 @@ bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent
     if ( BaseRenderer::GetInstance(renWin)->GetMapperID() == BaseRenderer::Standard3D)
       continue;
 
-    const PlaneGeometry* otherRenderersRenderPlane = snc->GetCurrentPlaneGeometry();
-    if (otherRenderersRenderPlane == NULL) continue; // ignore, we don't see a plane
-
     // check if there is an intersection
+    const PlaneGeometry* otherRenderersRenderPlane = nullptr;
+    const BaseGeometry* referenceGeometry = nullptr;
     Line3D intersectionLine; // between rendered/clicked geometry and the one being analyzed
-    if (!ourViewportGeometry->IntersectionLine(otherRenderersRenderPlane, intersectionLine))
+    std::vector<double> intersections;
+    std::vector<double> handles;
+
+    if ( !PlaneGeometryDataMapper2D::getIntersections( clickedRenderer, BaseRenderer::GetInstance(renWin)->GetCurrentWorldPlaneGeometryNode(), ourViewportGeometry,
+      otherRenderersRenderPlane, referenceGeometry, intersectionLine, intersections, handles ) || handles.empty() )
     {
-      continue; // we ignore this plane, it's parallel to our plane
+      continue; // we ignore this plane, it hasn't intersection with our plane or handles are absent
     }
 
-    // check distance from intersection line
-    double distanceFromIntersectionLine = intersectionLine.Distance(cursorPosition);
+    // check distance from one of handles
+    double distanceFromIntersectionLine = cursorPosition.EuclideanDistanceTo(intersectionLine.GetPoint(handles[0]));
+    if (handles.size() > 1) {
+      double d = cursorPosition.EuclideanDistanceTo(intersectionLine.GetPoint(handles[1]));
+      if (d < distanceFromIntersectionLine) distanceFromIntersectionLine = d;
+    }
 
-    // far away line, only remember for linked rotation if necessary
+    // far away, only remember for linked rotation if necessary
     if (distanceFromIntersectionLine > threshholdDistancePixels)
     {
       anyOtherGeometry = otherRenderersRenderPlane; // we just take the last one, so overwrite each iteration (we just need some crossing point)
@@ -285,32 +294,20 @@ bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent
     }
     else // close to cursor
     {
-      if (geometryToBeRotated == NULL) // first one close to the cursor
-      {
-        geometryToBeRotated = otherRenderersRenderPlane;
-        intersectionLineWithGeometryToBeRotated = intersectionLine;
-        m_SNCsToBeRotated.push_back(snc);
+      if (!anyOtherGeometry) {
+        anyOtherGeometry = geometryToBeRotated;
       }
-      else
-      {
-        // compare to the line defined by geometryToBeRotated: if identical, just rotate this otherRenderersRenderPlane together with the primary one
-        //                                                     if different, DON'T rotate
-        if (intersectionLine.IsParallel(intersectionLineWithGeometryToBeRotated)
-            && intersectionLine.Distance(intersectionLineWithGeometryToBeRotated.GetPoint1()) < mitk::eps)
-        {
-          m_SNCsToBeRotated.push_back(snc);
-        }
-        else
-        {
-          hitMultipleLines = true;
-        }
-      }
+      geometryToBeRotated = otherRenderersRenderPlane;
+      intersectionLineWithGeometryToBeRotated = intersectionLine;
+      if (!m_LinkPlanes) m_SNCsToBeRotated.clear();
+      m_SNCsToBeRotated.push_back(snc);
+      threshholdDistancePixels = distanceFromIntersectionLine;
     }
   }
 
   bool moveSlices(true);
 
-  if (geometryToBeRotated && anyOtherGeometry && ourViewportGeometry && !hitMultipleLines)
+  if (geometryToBeRotated && anyOtherGeometry && ourViewportGeometry)
   {
     // assure all three are valid, so calculation of center of rotation can be done
     moveSlices = false;

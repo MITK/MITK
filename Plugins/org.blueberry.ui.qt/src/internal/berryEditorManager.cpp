@@ -615,18 +615,16 @@ EditorSite::Pointer EditorManager::CreateSite(IEditorReference::Pointer ref,
 }
 
 IEditorReference::Pointer EditorManager::ReuseInternalEditor(
-    EditorDescriptor::Pointer  /*desc*/, IEditorInput::Pointer  /*input*/)
+    EditorDescriptor::Pointer desc, IEditorInput::Pointer  /*input*/)
 {
-
-//  poco_assert(desc.IsNotNull()); // "descriptor must not be null"); //$NON-NLS-1$
-//  poco_assert(input.IsNotNull()); // "input must not be null"); //$NON-NLS-1$
-//
-//  IEditorReference::Pointer reusableEditorRef = this->FindReusableEditor(desc);
-//  if (reusableEditorRef.IsNotNull())
-//  {
-//    return this->ReuseInternalEditor(page, this, editorPresentation, desc, input,
-//        reusableEditorRef);
-//  }
+  if (desc.IsNotNull())
+  {
+    IEditorReference::Pointer reusableEditorRef = this->FindReusableEditor(desc);
+    if (reusableEditorRef.IsNotNull())
+    {
+      return reusableEditorRef;
+    }
+  }
   return IEditorReference::Pointer(nullptr);
 }
 

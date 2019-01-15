@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>677</height>
+    <height>767</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,24 +40,14 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="optimizeFiducialPositionsCheckBox">
-        <property name="text">
-         <string>Optimize Fiducial Positions</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
+      <item row="4" column="0">
        <widget class="QLabel" name="selectFiducialMarkerConfigurationLabel">
         <property name="text">
          <string>Select Fiducial Marker Configuration</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="4" column="1">
        <widget class="QComboBox" name="fiducialMarkerConfigurationComboBox">
         <item>
          <property name="text">
@@ -74,6 +64,26 @@
           <string>20mm Minimal Distance</string>
          </property>
         </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="useNdiTrackerCheckBox">
+        <property name="text">
+         <string>Use NDI-Tracker</string>
+        </property>
+        <property name="autoExclusive">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="optimizeFiducialPositionsCheckBox">
+        <property name="text">
+         <string>Optimize Fiducial Positions</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
        </widget>
       </item>
      </layout>
@@ -141,6 +151,16 @@
       </item>
       <item>
        <widget class="QmitkDataStorageComboBox" name="selectedSurfaceComboBox"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="pointSetComboBoxLabel">
+        <property name="text">
+         <string>Selected PointSet:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QmitkDataStorageComboBox" name="pointSetComboBox"/>
       </item>
       <item>
        <widget class="QPushButton" name="visualizeCTtoUSregistrationPushButton">

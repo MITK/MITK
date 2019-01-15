@@ -36,10 +36,11 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    void InitializeTransformationSensorCSToMarkerCS();
+    void InitializeTransformationMarkerCSToSensorCS( bool useNdiTracker = false );
 
     void SetSegmentation(mitk::DataNode::Pointer segmentationNode, mitk::Image::Pointer ctimage);
     void SetSurface(mitk::DataNode::Pointer surfaceNode);
+    void SetPointSet(mitk::DataNode::Pointer pointSetNode);
     void SetTransformMarkerCSToFloatingImageCS( mitk::AffineTransform3D::Pointer transform );
     void SetTransformUSimageCSToTrackingCS(mitk::AffineTransform3D::Pointer transform);
 
@@ -59,8 +60,9 @@ namespace mitk
   private:
     mitk::DataNode::Pointer m_Segmentation;
     mitk::DataNode::Pointer m_Surface;
+    mitk::DataNode::Pointer m_PointSet;
     mitk::Image::Pointer m_CTimage;
-    mitk::AffineTransform3D::Pointer m_TransformSensorCSToMarkerCS;
+    mitk::AffineTransform3D::Pointer m_TransformMarkerCSToSensorCS;
     mitk::AffineTransform3D::Pointer m_TransformMarkerCSToFloatingImageCS;
     mitk::AffineTransform3D::Pointer m_TransformUSimageCSToTrackingCS;
     mitk::AffineTransform3D::Pointer m_TransformCTimageIndexToWorld;

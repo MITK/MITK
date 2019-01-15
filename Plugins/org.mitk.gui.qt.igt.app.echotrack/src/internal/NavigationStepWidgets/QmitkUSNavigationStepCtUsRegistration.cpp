@@ -91,6 +91,7 @@ bool QmitkUSNavigationStepCtUsRegistration::OnActivateStep()
   ui->ctImagesToChooseComboBox->SetDataStorage(this->GetDataStorage());
   ui->segmentationComboBox->SetDataStorage(this->GetDataStorage());
   ui->selectedSurfaceComboBox->SetDataStorage(this->GetDataStorage());
+  ui->pointSetComboBox->SetDataStorage(this->GetDataStorage());
   m_FloatingImageToUltrasoundRegistrationFilter =
     mitk::FloatingImageToUltrasoundRegistrationFilter::New();
   return true;
@@ -1974,6 +1975,7 @@ void QmitkUSNavigationStepCtUsRegistration::CreateQtPartControl(QWidget *parent)
   ui->ctImagesToChooseComboBox->SetPredicate(m_IsAPatientImagePredicate);
   ui->segmentationComboBox->SetPredicate(m_IsASegmentationImagePredicate);
   ui->selectedSurfaceComboBox->SetPredicate(m_IsASurfacePredicate);
+  ui->pointSetComboBox->SetPredicate(m_IsAPointSetPredicate);
 
   // create signal/slot connections
   connect(ui->floatingImageComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
@@ -2253,6 +2255,15 @@ void QmitkUSNavigationStepCtUsRegistration::OnVisualizeCTtoUSregistration()
     return;
   }
 
+  mitk::DataNode* pointSetNode = ui->pointSetComboBox->GetSelectedNode();
+  if (pointSetNode == nullptr)
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Cannot visualize CT-to-US registration. There is no pointSet selected.");
+    msgBox.exec();
+    return;
+  }
+
   if (this->GetCombinedModality(false).IsNull())
   {
     QMessageBox msgBox;
@@ -2269,6 +2280,10 @@ void QmitkUSNavigationStepCtUsRegistration::OnVisualizeCTtoUSregistration()
     msgBox.exec();
     return;
   }
+  //Set the transformation from  marker-CS to the sensor-CS accordingly to the chosen user-option
+  m_FloatingImageToUltrasoundRegistrationFilter
+    ->InitializeTransformationMarkerCSToSensorCS(ui->useNdiTrackerCheckBox->isChecked());
+  m_FloatingImageToUltrasoundRegistrationFilter->SetPointSet(pointSetNode);
   m_FloatingImageToUltrasoundRegistrationFilter->SetSegmentation(segmentationNode, m_FloatingImage);
   m_FloatingImageToUltrasoundRegistrationFilter->SetSurface(surfaceNode);
   m_FloatingImageToUltrasoundRegistrationFilter

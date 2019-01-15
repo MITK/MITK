@@ -22,51 +22,78 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::FloatingImageToUltrasoundRegistrationFilter::FloatingImageToUltrasoundRegistrationFilter()
 : mitk::NavigationDataPassThroughFilter(),
   m_Segmentation(nullptr),
-  m_TransformSensorCSToMarkerCS(mitk::AffineTransform3D::New()),
+  m_TransformMarkerCSToSensorCS(mitk::AffineTransform3D::New()),
   m_TransformMarkerCSToFloatingImageCS(mitk::AffineTransform3D::New()),
   m_TransformUSimageCSToTrackingCS(mitk::AffineTransform3D::New()),
   m_TransformCTimageIndexToWorld(mitk::AffineTransform3D::New()),
   m_TrackedUltrasoundActive(false)
 {
-  this->InitializeTransformationSensorCSToMarkerCS();
   m_SurfaceGeometry = mitk::Geometry3D::New();
+  m_PointSet = nullptr;
   m_CTimage = mitk::Image::New();
 }
-
 
 mitk::FloatingImageToUltrasoundRegistrationFilter::~FloatingImageToUltrasoundRegistrationFilter()
 {
 }
 
-void mitk::FloatingImageToUltrasoundRegistrationFilter::InitializeTransformationSensorCSToMarkerCS()
+void mitk::FloatingImageToUltrasoundRegistrationFilter::InitializeTransformationMarkerCSToSensorCS( bool useNdiTracker)
 {
   //The following calculations are related to the 3mm | 15mm fiducial configuration
 
-  if (m_TransformSensorCSToMarkerCS.IsNull())
+  m_TransformMarkerCSToSensorCS = mitk::AffineTransform3D::New();
+
+  if (useNdiTracker) // Use the NDI disc tracker for performing the CT-to-US registration:
   {
-    m_TransformSensorCSToMarkerCS = mitk::AffineTransform3D::New();
-  }
+    MITK_INFO << "Use NDI disc tracker for performing the CT-to-US-registration";
+    mitk::Vector3D translationNDI;
+    translationNDI[0] = 15.000;
+    translationNDI[1] = 8.000;
+    translationNDI[2] = -2.500; // use -2.500 instead of 0.000 for the z translation if working with v2 of the
+                                // sensor adapter.
 
-  mitk::Vector3D translation;
-  translation[0] = -18.175;
-  translation[1] = 15.000;
-  translation[2] = 8.001; // considering a distance from the base plate of 0.315 inch and not 0.313 inch
+    m_TransformMarkerCSToSensorCS->SetOffset(translationNDI);
 
-  m_TransformSensorCSToMarkerCS->SetOffset(translation);
+    // Quaternion (x, y, z, r) --> n = (0,0,1) --> q(0,0,sin(90°),cos(90°))
+    mitk::Quaternion qNDI(0, 0, 1, 0); // corresponding to a rotation of 180° around the normal z-axis.
+                                     // .transpose() is needed for changing the rows and the columns of the returned rotation_matrix_transpose
+    vnl_matrix_fixed<double, 3, 3> vnl_rotation = qNDI.rotation_matrix_transpose().transpose(); // :-)
+    mitk::Matrix3D rotationMatrix;
 
-  // Quaternion (x, y, z, r) --> n = (1,0,0) --> q(sin(90°),0,0,cos(90°))
-  mitk::Quaternion q1(1, 0, 0, 0); // corresponding to a rotation of 180° around the normal x-axis.
-  // .transpose() is needed for changing the rows and the columns of the returned rotation_matrix_transpose
-  vnl_matrix_fixed<double, 3, 3> vnl_rotation = q1.rotation_matrix_transpose().transpose(); // :-)
-  mitk::Matrix3D rotationMatrix;
-
-  for (int i = 0; i < 3; ++i) {
-    for (int j = 0; j < 3; ++j) {
-      rotationMatrix[i][j] = vnl_rotation[i][j];
+    for (int i = 0; i < 3; ++i) {
+      for (int j = 0; j < 3; ++j) {
+        rotationMatrix[i][j] = vnl_rotation[i][j];
+      }
     }
-  }
 
-  m_TransformSensorCSToMarkerCS->SetMatrix(rotationMatrix);
+    m_TransformMarkerCSToSensorCS->SetMatrix(rotationMatrix);
+  }
+  else // Use the polhemus RX2 tracker for performing the CT-to-US registration:
+  {
+    MITK_INFO << "Use Polhemus RX2 tracker for performing the CT-to-US-registration";
+    mitk::Vector3D translationPolhemus;
+    translationPolhemus[0] = -18.175;
+    translationPolhemus[1] = 15.000;
+    translationPolhemus[2] = 10.501; // considering a distance from the base plate of 0.315 inch and not 0.313 inch
+                             // use 10.501 instead of 8.001 for the z translation if working with v2 of the
+                             // sensor adapter.
+
+    m_TransformMarkerCSToSensorCS->SetOffset(translationPolhemus);
+
+    // Quaternion (x, y, z, r) --> n = (1,0,0) --> q(sin(90°),0,0,cos(90°))
+    mitk::Quaternion q1(1, 0, 0, 0); // corresponding to a rotation of 180° around the normal x-axis.
+    // .transpose() is needed for changing the rows and the columns of the returned rotation_matrix_transpose
+    vnl_matrix_fixed<double, 3, 3> vnl_rotation = q1.rotation_matrix_transpose().transpose(); // :-)
+    mitk::Matrix3D rotationMatrix;
+
+    for (int i = 0; i < 3; ++i) {
+      for (int j = 0; j < 3; ++j) {
+        rotationMatrix[i][j] = vnl_rotation[i][j];
+      }
+    }
+
+    m_TransformMarkerCSToSensorCS->SetMatrix(rotationMatrix);
+  }
   //The transformation from the sensor-CS to the marker-CS is calculated now.
 }
 
@@ -81,6 +108,11 @@ void mitk::FloatingImageToUltrasoundRegistrationFilter::SetSurface(mitk::DataNod
 {
   m_Surface = surfaceNode;
   m_SurfaceGeometry = m_Surface->GetData()->GetGeometry();
+}
+
+void mitk::FloatingImageToUltrasoundRegistrationFilter::SetPointSet(mitk::DataNode::Pointer pointSetNode)
+{
+  m_PointSet = pointSetNode;
 }
 
 void mitk::FloatingImageToUltrasoundRegistrationFilter::SetTransformMarkerCSToFloatingImageCS(mitk::AffineTransform3D::Pointer transform)
@@ -118,7 +150,7 @@ void mitk::FloatingImageToUltrasoundRegistrationFilter::GenerateData()
   //Compose it with the inverse transform of marker-CS to floating image-CS:
   totalTransformation->Compose(this->GetInverseTransform(m_TransformMarkerCSToFloatingImageCS));
   //Compose this with the inverse transform of EM-sensor-CS to marker-CS:
-  totalTransformation->Compose(m_TransformSensorCSToMarkerCS);
+  totalTransformation->Compose(m_TransformMarkerCSToSensorCS);
   //Compose this with the transform of the sensor-CS to Tracking-CS:
   totalTransformation->Compose(transformSensorCSToTracking->GetAffineTransform3D());
   //Compose this with the inverse transform  of USimage-CS to tracking-CS:
@@ -130,11 +162,14 @@ void mitk::FloatingImageToUltrasoundRegistrationFilter::GenerateData()
   //m_Segmentation->GetData()->GetGeometry()->SetIndexToWorldTransform(totalTransformation);
   //m_Segmentation->Modified();
 
-  m_CTimage->GetGeometry()->SetIndexToWorldTransform(totalTransformation);
-  m_CTimage->Modified();
+  //m_CTimage->GetGeometry()->SetIndexToWorldTransform(totalTransformation);
+  //m_CTimage->Modified();
 
   m_Surface->GetData()->GetGeometry()->SetIndexToWorldTransform(totalTransformation);
   m_Surface->Modified();
+
+  m_PointSet->GetData()->GetGeometry()->SetIndexToWorldTransform(totalTransformation);
+  m_PointSet->Modified();
 }
 
 mitk::AffineTransform3D::Pointer mitk::FloatingImageToUltrasoundRegistrationFilter::GetInverseTransform(mitk::AffineTransform3D::Pointer transform)

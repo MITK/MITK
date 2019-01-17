@@ -200,18 +200,40 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer( mitk::BaseRendere
 
   ls->UpdateGenerateDataTime();
 
-  // Collect all other PlaneGeometryDatas that are being mapped by this mapper
-  m_OtherPlaneGeometries.clear();
+  CreateVtkCrosshair(renderer);
 
-  for (AllInstancesContainer::iterator it = s_AllInstances.begin(); it != s_AllInstances.end(); ++it)
+  ApplyAllProperties(renderer);
+}
+
+bool mitk::PlaneGeometryDataMapper2D::getIntersections( mitk::BaseRenderer* renderer, mitk::DataNode* currentNode, const PlaneGeometry* worldPlaneGeometry,
+  const PlaneGeometry*& inputPlaneGeometry, const BaseGeometry*& referenceGeometry, Line3D& crossLine, std::vector<double>& intersections, std::vector<double>& handles )
+{
+
+  if (!worldPlaneGeometry || dynamic_cast<const AbstractTransformGeometry*>(worldPlaneGeometry)) return false;
+
+  auto input = dynamic_cast<PlaneGeometryData*>(currentNode->GetData());
+  if (!input || input == static_cast<PlaneGeometryData*>(renderer->GetCurrentWorldPlaneGeometryNode()->GetData())) return false;
+
+  inputPlaneGeometry = input->GetPlaneGeometry();
+  if (!inputPlaneGeometry || dynamic_cast<const AbstractTransformGeometry*>(inputPlaneGeometry)) return false;
+
+  // Calculate the intersection line of the input plane with the world plane
+  if ( !worldPlaneGeometry->IntersectionLine( inputPlaneGeometry, crossLine ) ) return false; // no intersection
+
+  referenceGeometry = inputPlaneGeometry->GetReferenceGeometry();
+
+  // calculate intersection of the plane data with the border of the world geometry rectangle
+  if ( referenceGeometry ? !CutCrossLineWithReferenceGeometry(referenceGeometry, crossLine)
+                         : !CutCrossLineWithPlaneGeometry(inputPlaneGeometry, crossLine) ) return false; // no intersection with border
+
+  double intersectionParam = 0.5;
+
+  // Enumerate all other PlaneGeometryDatas that are being mapped by this mapper
+
+  for (Self* otherInstance: s_AllInstances)
   {
-    Self *otherInstance = *it;
-
-    // Skip ourself
-    if (otherInstance == this) continue;
-
     mitk::DataNode *otherNode = otherInstance->GetDataNode();
-    if (!otherNode) continue;
+    if (!otherNode || otherNode == currentNode) continue;
 
     // Skip other PlaneGeometryData nodes that are not visible on this renderer
     if (!otherNode->IsVisible(renderer)) continue;
@@ -226,16 +248,59 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer( mitk::BaseRendere
       continue;
     }
 
+    bool ignorePlane = false;
+    otherNode->GetPropertyValue("Crosshair.Ignore", ignorePlane);
     PlaneGeometry* otherGeometry = dynamic_cast<PlaneGeometry*>(otherData->GetPlaneGeometry());
-    if ( otherGeometry && !dynamic_cast<AbstractTransformGeometry*>(otherData->GetPlaneGeometry()) )
+
+    if ( !ignorePlane && otherGeometry && !dynamic_cast<AbstractTransformGeometry*>(otherData->GetPlaneGeometry())
+      && otherGeometry != worldPlaneGeometry && otherGeometry != inputPlaneGeometry
+      && otherGeometry->IntersectionPointParam(crossLine, intersectionParam) && intersectionParam >= 0 && intersectionParam <= 1 )
     {
-      m_OtherPlaneGeometries.push_back(otherNode);
+      Point3D point = crossLine.GetPoint() + intersectionParam * crossLine.GetDirection();
+
+      bool intersectionPointInsideOtherPlane =
+        otherGeometry->HasReferenceGeometry() ?
+          TestPointInReferenceGeometry(otherGeometry->GetReferenceGeometry(), point) :
+          TestPointInPlaneGeometry(otherGeometry, point);
+
+      if (intersectionPointInsideOtherPlane)
+      {
+        intersections.push_back(intersectionParam);
+      }
     }
   }
 
-  CreateVtkCrosshair(renderer);
+  mitk::Point2D p1, p2;
+  renderer->WorldToDisplay(crossLine.GetPoint1(), p1);
+  renderer->WorldToDisplay(crossLine.GetPoint2(), p2);
+  double t0 = 0, t1 = 1;
+  auto size = renderer->GetSize();
+  auto d = p2 - p1;
+  auto scale = p1.EuclideanDistanceTo(p2) / renderer->GetScaleFactorMMPerDisplayUnit();
+  for (int i=0; i<2; i++)
+  {
+     if (p1[i] < size[i] && size[i] < p2[i]) {
+       t1 = std::min(t1, 1 + (size[i]-p2[i]) / d[i]);
+     } else if (p2[i] < size[i] && size[i] < p1[i]) {
+       t0 = std::max(t0, (size[i]-p1[i]) / d[i]);
+     }
+     if (p1[i] < 0 && 0 < p2[i]) {
+       t0 = std::max(t0, -p1[i] / d[i]);
+     } else if (p2[i] < 0 && 0 < p1[i]) {
+       t1 = std::min(t1, 1 - p2[i] / d[i]);
+     }
+  }
+  for (int i = -1; scale>0 && i<2 ; i += 2)
+  {
+     float t = t0 + (0.5 + i*0.4) * (t1 - t0);
+     if ((t - intersectionParam)*scale*i < 64) {
+       t = intersectionParam + i*64/scale;
+     }
+     if ((t-t0)*scale < 3 || (t1-t)*scale < 3) continue;
+     handles.push_back(t);
+  }
 
-  ApplyAllProperties(renderer);
+  return true;
 }
 
 void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *renderer)
@@ -254,43 +319,19 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
     return;
   }
 
-  PlaneGeometryData::Pointer input = const_cast< PlaneGeometryData * >(this->GetInput());
   mitk::DataNode* geometryDataNode = renderer->GetCurrentWorldPlaneGeometryNode();
   const PlaneGeometryData* rendererWorldPlaneGeometryData = dynamic_cast< PlaneGeometryData * >(geometryDataNode->GetData());
+  const PlaneGeometry* worldPlaneGeometry = dynamic_cast< const PlaneGeometry* >(rendererWorldPlaneGeometryData->GetPlaneGeometry() );
 
-  // intersecting with ourself?
-  if ( input.IsNull() || input.GetPointer() == rendererWorldPlaneGeometryData)
+  const PlaneGeometry *inputPlaneGeometry = nullptr;
+  const BaseGeometry* referenceGeometry;
+  Line3D crossLine;
+  std::vector<double> intersections;
+  std::vector<double> handles;
+
+  if (getIntersections(renderer, GetDataNode(), worldPlaneGeometry, inputPlaneGeometry, referenceGeometry, crossLine, intersections, handles))
   {
-    return; //nothing to do in this case
-  }
-
-  const PlaneGeometry *inputPlaneGeometry = dynamic_cast< const PlaneGeometry * >( input->GetPlaneGeometry() );
-
-  const PlaneGeometry* worldPlaneGeometry = dynamic_cast< const PlaneGeometry* >(
-        rendererWorldPlaneGeometryData->GetPlaneGeometry() );
-
-  if ( worldPlaneGeometry && dynamic_cast<const AbstractTransformGeometry*>(worldPlaneGeometry)==NULL
-       && inputPlaneGeometry && dynamic_cast<const AbstractTransformGeometry*>(input->GetPlaneGeometry() )==NULL)
-  {
-    const BaseGeometry *referenceGeometry = inputPlaneGeometry->GetReferenceGeometry();
-
-    // calculate intersection of the plane data with the border of the
-    // world geometry rectangle
-    Point3D point1, point2;
-
-    Line3D crossLine;
-
-    // Calculate the intersection line of the input plane with the world plane
-    if ( worldPlaneGeometry->IntersectionLine( inputPlaneGeometry, crossLine ) )
-    {
-      bool hasIntersection = referenceGeometry ? CutCrossLineWithReferenceGeometry(referenceGeometry, crossLine) :
-                                                 CutCrossLineWithPlaneGeometry(inputPlaneGeometry, crossLine);
-
-      if (!hasIntersection)
-      {
-        return;
-      }
-
+      Point3D point1, point2;
       point1 = crossLine.GetPoint1();
       point2 = crossLine.GetPoint2();
 
@@ -298,17 +339,13 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
       vtkSmartPointer<vtkPolyData> linesPolyData = vtkSmartPointer<vtkPolyData>::New();
 
-
       // Now iterate through all other lines displayed in this window and
       // calculate the positions of intersection with the line to be
       // rendered; these positions will be stored in lineParams to form a
       // gap afterwards.
-      NodesVectorType::iterator otherPlanesIt = m_OtherPlaneGeometries.begin();
-      NodesVectorType::iterator otherPlanesEnd = m_OtherPlaneGeometries.end();
 
       int gapSize = 32;
       this->GetDataNode()->GetPropertyValue("Crosshair.Gap Size", gapSize, NULL);
-
 
       auto intervals = IntervalSet<double>( SimpleInterval<double>(0, 1));
 
@@ -316,41 +353,35 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       ScalarType gapInMM = gapSize * renderer->GetScaleFactorMMPerDisplayUnit();
       float gapSizeParam = gapInMM / lineLength;
 
-      if( gapSize != 0 )
+      if (gapSize != 0)
       {
-        while ( otherPlanesIt != otherPlanesEnd )
+        for (auto intersectionParam: intersections)
         {
-          bool ignorePlane = false;
-          (*otherPlanesIt)->GetPropertyValue("Crosshair.Ignore", ignorePlane);
-          if (ignorePlane)
-          {
-              ++otherPlanesIt;
-              continue;
-          }
+          intervals -= SimpleInterval<double>(intersectionParam - gapSizeParam, intersectionParam + gapSizeParam);
+        }
+      }
 
-          PlaneGeometry *otherPlaneGeometry = static_cast< PlaneGeometry * >(
-                static_cast< PlaneGeometryData * >((*otherPlanesIt)->GetData() )->GetPlaneGeometry() );
+      Vector3D orthogonalVector;
+      orthogonalVector = inputPlaneGeometry->GetNormal();
+      worldPlaneGeometry->Project(orthogonalVector,orthogonalVector);
+      orthogonalVector.Normalize();
 
-          if (otherPlaneGeometry != inputPlaneGeometry && otherPlaneGeometry != worldPlaneGeometry)
-          {
-              double intersectionParam;
-              if (otherPlaneGeometry->IntersectionPointParam(crossLine, intersectionParam) && intersectionParam > 0 &&
-                  intersectionParam < 1)
-              {
-                Point3D point = crossLine.GetPoint() + intersectionParam * crossLine.GetDirection();
+      // Moving areas
+      {
+        auto m= renderer->GetScaleFactorMMPerDisplayUnit();
+        auto x = crossLine.GetDirection();
+        x.Normalize();
+        x *= 3*m;
+        auto y = 3*m*orthogonalVector;
 
-                bool intersectionPointInsideOtherPlane =
-                  otherPlaneGeometry->HasReferenceGeometry() ?
-                    TestPointInReferenceGeometry(otherPlaneGeometry->GetReferenceGeometry(), point) :
-                    TestPointInPlaneGeometry(otherPlaneGeometry, point);
-
-                if (intersectionPointInsideOtherPlane)
-                {
-                  intervals -= SimpleInterval<double>(intersectionParam - gapSizeParam, intersectionParam + gapSizeParam);
-                }
-              }
-          }
-          ++otherPlanesIt;
+        for (auto t: handles)
+        {
+          auto p = crossLine.GetPoint(t);
+          this->DrawLine(p - x - y, p - y*2, lines, points);
+          this->DrawLine(p - y*2, p + x - y, lines, points);
+          this->DrawLine(p - y*2, p + y*2, lines, points);
+          this->DrawLine(p + x + y, p + y*2, lines, points);
+          this->DrawLine(p + y*2, p - x + y, lines, points);
         }
       }
 
@@ -362,11 +393,6 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       linesPolyData->SetPoints(points);
       // Add the lines to the dataset
       linesPolyData->SetLines(lines);
-
-      Vector3D orthogonalVector;
-      orthogonalVector = inputPlaneGeometry->GetNormal();
-      worldPlaneGeometry->Project(orthogonalVector,orthogonalVector);
-      orthogonalVector.Normalize();
 
       // Visualize
       ls->m_Mapper->SetInputData(linesPolyData);
@@ -437,7 +463,6 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
         ls->m_CrosshairActor->GetProperty()->SetLineStipplePattern(0xffff);
         ls->m_CrosshairHelperLineActor->SetVisibility(0);
       }
-    }
   }
 }
 

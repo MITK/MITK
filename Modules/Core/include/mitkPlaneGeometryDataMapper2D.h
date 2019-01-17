@@ -70,6 +70,10 @@ public:
   /** \brief set the default properties for this mapper */
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
+  // member variables holding the current value of the properties used in this mapper
+  static bool getIntersections( mitk::BaseRenderer* renderer, mitk::DataNode* currentNode, const PlaneGeometry* worldPlaneGeometry,
+    const PlaneGeometry*& inputPlaneGeometry, const BaseGeometry*& referenceGeometry, Line3D& crossLine, std::vector<double>& intersections, std::vector<double>& handles );
+
   /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
   class LocalStorage : public mitk::Mapper::BaseLocalStorage
   {
@@ -130,10 +134,6 @@ protected:
   void DrawLine(Point3D p0, Point3D p1,
                 vtkCellArray *lines,
                 vtkPoints *points);
-
-  // member variables holding the current value of the properties used in this mapper
-  typedef std::vector<DataNode*> NodesVectorType;
-  NodesVectorType m_OtherPlaneGeometries;
 
   typedef std::set<Self*> AllInstancesContainer;
   static AllInstancesContainer s_AllInstances;

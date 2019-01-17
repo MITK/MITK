@@ -208,6 +208,10 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer( mitk::BaseRendere
 bool mitk::PlaneGeometryDataMapper2D::getIntersections( mitk::BaseRenderer* renderer, mitk::DataNode* currentNode, const PlaneGeometry* worldPlaneGeometry,
   const PlaneGeometry*& inputPlaneGeometry, const BaseGeometry*& referenceGeometry, Line3D& crossLine, std::vector<double>& intersections, std::vector<double>& handles )
 {
+  bool visible = false;
+  bool render2d = true;
+  if ( !currentNode->GetVisibility(visible, renderer, "visible") || !visible
+    || currentNode->GetBoolProperty("Crosshair.Render 2D", render2d, renderer) && !render2d) return false;
 
   if (!worldPlaneGeometry || dynamic_cast<const AbstractTransformGeometry*>(worldPlaneGeometry)) return false;
 
@@ -270,13 +274,16 @@ bool mitk::PlaneGeometryDataMapper2D::getIntersections( mitk::BaseRenderer* rend
     }
   }
 
+  int gapSize = 0;
+  if ( !currentNode->GetPropertyValue("Crosshair.Gap Size", gapSize) || gapSize == 0 ) return true;
+
   mitk::Point2D p1, p2;
   renderer->WorldToDisplay(crossLine.GetPoint1(), p1);
   renderer->WorldToDisplay(crossLine.GetPoint2(), p2);
   double t0 = 0, t1 = 1;
   auto size = renderer->GetSize();
   auto d = p2 - p1;
-  auto scale = p1.EuclideanDistanceTo(p2) / renderer->GetScaleFactorMMPerDisplayUnit();
+  auto scale = p1.EuclideanDistanceTo(p2);
   for (int i=0; i<2; i++)
   {
      if (p1[i] < size[i] && size[i] < p2[i]) {
@@ -305,19 +312,10 @@ bool mitk::PlaneGeometryDataMapper2D::getIntersections( mitk::BaseRenderer* rend
 
 void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *renderer)
 {
-  bool visible = true;
-  bool render2d = true;
   LocalStorage* ls = m_LSH.GetLocalStorage(renderer);
   ls->m_CrosshairActor->SetVisibility(0);
   ls->m_ArrowActor->SetVisibility(0);
   ls->m_CrosshairHelperLineActor->SetVisibility(0);
-
-  GetDataNode()->GetVisibility(visible, renderer, "visible");
-  GetDataNode()->GetBoolProperty("Crosshair.Render 2D", render2d, renderer);
-
-  if(!visible || !render2d) {
-    return;
-  }
 
   mitk::DataNode* geometryDataNode = renderer->GetCurrentWorldPlaneGeometryNode();
   const PlaneGeometryData* rendererWorldPlaneGeometryData = dynamic_cast< PlaneGeometryData * >(geometryDataNode->GetData());

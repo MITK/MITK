@@ -60,6 +60,8 @@ public:
   QmitkRenderWindowMenu( QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::BaseRenderer * b = 0, QmitkStdMultiWidget* mw = 0, bool fullScreenMode = false);
   virtual ~QmitkRenderWindowMenu();
 
+  static unsigned int m_DefaultThickMode;
+
   /*! Return visibility of settings menu. The menu is connected with m_SettingsButton and includes
   layout direction (axial, coronal .. ) and layout design (standard layout, 2D images top,
   3D bottom ... ). */

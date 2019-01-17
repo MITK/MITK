@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSize>
 #include <QPainter>
 #include <QSlider>
+#include <QComboBox>
 
 #include<QGroupBox>
 #include<QRadioButton>
@@ -45,6 +46,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include"iconLeaveFullScreen.xpm"
 
 #include <math.h>
+
+unsigned int QmitkRenderWindowMenu::m_DefaultThickMode(1);
 
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b, QmitkStdMultiWidget* mw, bool fullScreenMode)
@@ -817,21 +820,38 @@ void QmitkRenderWindowMenu::OnTSNumChanged(int num)
 {
   MITK_DEBUG << "Thickslices num: " << num << " on renderer " << m_Renderer.GetPointer();
 
-  if(m_Renderer.IsNotNull())
+  if (m_Renderer.IsNotNull())
   {
-    if(num==0)
+    unsigned int thickSlicesMode = 0;
+    // determine the state of the thick-slice mode
+    mitk::ResliceMethodProperty *resliceMethodEnumProperty = nullptr;
+
+    if(m_Renderer->GetCurrentWorldPlaneGeometryNode()->GetProperty(resliceMethodEnumProperty, "reslice.thickslices") && resliceMethodEnumProperty)
     {
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
+      thickSlicesMode = resliceMethodEnumProperty->GetValueAsId();
+      if(thickSlicesMode!=0)
+        m_DefaultThickMode = thickSlicesMode;
     }
-    else
+
+    if(thickSlicesMode==0 && num>0) //default mode only for single slices
     {
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 1 ) );
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( true ) );
+      thickSlicesMode = m_DefaultThickMode; //mip default
+      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.showarea",
+                                                                  mitk::BoolProperty::New(true));
     }
-    m_TSLabel->setText(QString::number(num*2+1));
+    if(num<1)
+    {
+      thickSlicesMode = 0;
+      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.showarea",
+                                                                  mitk::BoolProperty::New(false));
+    }
+
+    m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices",
+                                                                mitk::ResliceMethodProperty::New(thickSlicesMode));
+    m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.num",
+                                                                mitk::IntProperty::New(num));
+
+    m_TSLabel->setText(QString::number(num * 2 + 1));
     m_Renderer->SendUpdateSlice();
     m_Renderer->GetRenderingManager()->RequestUpdateAll();
   }
@@ -915,58 +935,104 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
   }
 
   // Thickslices support
-  if( m_Renderer.IsNotNull() && m_Renderer->GetMapperID() == mitk::BaseRenderer::Standard2D )
+  if (m_Renderer.IsNotNull() && m_Renderer->GetMapperID() == mitk::BaseRenderer::Standard2D)
   {
-    QAction* thickSlicesGroupSeparator = new QAction(crosshairModesMenu);
+    QAction *thickSlicesGroupSeparator = new QAction(crosshairModesMenu);
     thickSlicesGroupSeparator->setSeparator(true);
-    thickSlicesGroupSeparator->setText("ThickSlices mode");
-    crosshairModesMenu->addAction( thickSlicesGroupSeparator );
+    crosshairModesMenu->addAction(thickSlicesGroupSeparator);
 
-    QActionGroup* thickSlicesActionGroup = new QActionGroup(crosshairModesMenu);
-    thickSlicesActionGroup->setExclusive(true);
+    QLabel* tSlabel = new QLabel(tr("Thick slice mode:"), crosshairModesMenu);
+    tSlabel->setAlignment(Qt::AlignCenter);
+
+    QWidgetAction* tsla = new QWidgetAction(crosshairModesMenu);
+    tsla->setDefaultWidget(tSlabel);
+
+    crosshairModesMenu->addAction(tsla);
 
     int currentMode = 0;
     {
-      mitk::ResliceMethodProperty::Pointer m = dynamic_cast<mitk::ResliceMethodProperty*>(m_Renderer->GetCurrentWorldPlaneGeometryNode()->GetProperty( "reslice.thickslices" ));
-      if( m.IsNotNull() )
+      mitk::ResliceMethodProperty::Pointer m = dynamic_cast<mitk::ResliceMethodProperty *>(
+        m_Renderer->GetCurrentWorldPlaneGeometryNode()->GetProperty("reslice.thickslices"));
+      if (m.IsNotNull())
         currentMode = m->GetValueAsId();
     }
 
+    QComboBox* thickSliceComboBox = new QComboBox(crosshairModesMenu);
+    thickSliceComboBox->setToolTip(tr("Set up thick slice mode"));
+
+    QString modeNames[] = {
+      tr("Maximum"),
+      tr("Sum"),
+      tr("Weighted"),
+      tr("Minimum"),
+      tr("Mean")
+    };
+    for (auto mode : modeNames) {
+      thickSliceComboBox->addItem(mode);
+    }
+
+    QWidgetAction *m_TSComboBoxAction = new QWidgetAction(crosshairModesMenu);
+    m_TSComboBoxAction->setDefaultWidget(thickSliceComboBox);
+
+    crosshairModesMenu->addAction(m_TSComboBoxAction);
+
     int currentNum = 1;
     {
-      mitk::IntProperty::Pointer m = dynamic_cast<mitk::IntProperty*>(m_Renderer->GetCurrentWorldPlaneGeometryNode()->GetProperty( "reslice.thickslices.num" ));
-      if( m.IsNotNull() )
+      mitk::IntProperty::Pointer m = dynamic_cast<mitk::IntProperty *>(
+        m_Renderer->GetCurrentWorldPlaneGeometryNode()->GetProperty("reslice.thickslices.num"));
+      if (m.IsNotNull())
       {
         currentNum = m->GetValue();
-        if(currentNum < 1) currentNum = 1;
-        if(currentNum > 10) currentNum = 10;
       }
     }
 
-    if(currentMode==0)
-      currentNum=0;
+    if (currentMode == 0)
+    {
+      thickSliceComboBox->setCurrentIndex(0);
+      currentNum = 0;
+    }
+    else
+    {
+      thickSliceComboBox->setCurrentIndex(currentMode - 1);
+    }
 
     QSlider *m_TSSlider = new QSlider(crosshairModesMenu);
     m_TSSlider->setMinimum(0);
-    m_TSSlider->setMaximum(9);
+    m_TSSlider->setMaximum(50);
     m_TSSlider->setValue(currentNum);
 
     m_TSSlider->setOrientation(Qt::Horizontal);
 
-    connect( m_TSSlider, SIGNAL( valueChanged(int) ), this, SLOT( OnTSNumChanged(int) ) );
+    connect(m_TSSlider, SIGNAL(valueChanged(int)), this, SLOT(OnTSNumChanged(int)));
 
-    QHBoxLayout* _TSLayout = new QHBoxLayout;
-    _TSLayout->setContentsMargins(4,4,4,4);
+    QHBoxLayout *_TSLayout = new QHBoxLayout;
+    _TSLayout->setContentsMargins(4, 4, 4, 4);
     _TSLayout->addWidget(new QLabel("TS: "));
     _TSLayout->addWidget(m_TSSlider);
-    _TSLayout->addWidget(m_TSLabel=new QLabel(QString::number(currentNum*2+1),this));
+    _TSLayout->addWidget(m_TSLabel = new QLabel(QString::number(currentNum * 2 + 1), this));
 
-    QWidget* _TSWidget = new QWidget;
+    QWidget *_TSWidget = new QWidget;
     _TSWidget->setLayout(_TSLayout);
 
     QWidgetAction *m_TSSliderAction = new QWidgetAction(crosshairModesMenu);
     m_TSSliderAction->setDefaultWidget(_TSWidget);
     crosshairModesMenu->addAction(m_TSSliderAction);
+
+    connect(thickSliceComboBox
+      , static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged)
+      , this
+      , [this, currentNum] (int index) {
+        int num = currentNum;
+        mitk::IntProperty::Pointer m = dynamic_cast<mitk::IntProperty *>(
+          m_Renderer->GetCurrentWorldPlaneGeometryNode()->GetProperty("reslice.thickslices.num"));
+        if (m.IsNotNull())
+        {
+          num = m->GetValue();
+        }
+        m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices",
+                                                                    mitk::ResliceMethodProperty::New(index + 1));
+        OnTSNumChanged(num);
+    });
   }
 }
 

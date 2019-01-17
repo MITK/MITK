@@ -250,7 +250,7 @@ bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent
 
   m_SNCsToBeRotated.clear();
 
-  double threshholdDistancePixels = 12.0;
+  double threshholdDistancePixels = 12.0 * clickedRenderer->GetScaleFactorMMPerDisplayUnit();
 
   auto renWindows = interactionEvent->GetSender()->GetRenderingManager()->GetAllRegisteredRenderWindows();
 

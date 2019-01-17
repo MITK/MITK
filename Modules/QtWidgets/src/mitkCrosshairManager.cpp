@@ -264,6 +264,7 @@ void mitkCrosshairManager::removeCrosshair(QmitkRenderWindow* window)
   auto dataStorage = window->GetRenderer()->GetDataStorage();
   auto crosshairsToRemove = dataStorage->GetSubset(m_CrosshairPredicate);
   for (auto node : *crosshairsToRemove) {
+    node->SetBoolProperty("Crosshair.Render 2D", false);
     dataStorage->Remove(node);
   }
 }

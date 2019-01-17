@@ -8,6 +8,7 @@
 <config>
   <!-- Zoom sensitivity -->
   <param name="zoomFactor" value="5"/>
+  <param name="coupled" value="false"/>
   <!-- Zoom either by moving mouse leftright or updown -->
   <param name="zoomDirection" value="updown"/>
   <!-- react to an event, even tough is was already processed by a DataInteractor-->
@@ -26,8 +27,7 @@
   </event_variant>
 
   <!-- Moving -->
-  <event_variant name="MovePointer" class="MouseMoveEvent" >
-  </event_variant>
+  <event_variant name="Move" class="MouseMoveEvent"/>
   <event_variant class="MousePressEvent" name="StartMove">
     <attribute name="EventButton" value="MiddleMouseButton"/>
   </event_variant>

@@ -54,6 +54,7 @@ void QmitkImageStatisticsWidget::SetMaskNodes(const std::vector<mitk::DataNode::
 void QmitkImageStatisticsWidget::Reset()
 {
   m_imageStatisticsModel->Clear();
+  m_Controls.buttonCopyImageStatisticsToClipboard->setEnabled(false);
 }
 
 void QmitkImageStatisticsWidget::CreateConnections()

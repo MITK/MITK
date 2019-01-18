@@ -161,6 +161,7 @@ void QmitkImageStatisticsReloadedView::OnImageSelectorChanged()
     else
     {
       m_Controls.widget_statistics->SetImageNodes({});
+      m_Controls.widget_statistics->Reset();
     }
   }
 }

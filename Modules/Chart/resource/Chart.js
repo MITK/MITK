@@ -125,6 +125,27 @@ function generateChart(chartData)
 
   //=============================== STYLE ========================
   let marginTop = chartData.m_diagramTitle == undefined ? 10 : 50;
+
+  if (chartData.m_LegendPosition == "bottomMiddle"){
+	  var legendX = 0.5;
+	  var legendY = -0.75;
+  }
+  else if (chartData.m_LegendPosition == "bottomRight"){
+	  var legendX = 1;
+	  var legendY = 0;
+  }
+  else if (chartData.m_LegendPosition == "topRight"){
+	  var legendX = 1;
+	  var legendY = 1;
+  }
+  else if (chartData.m_LegendPosition == "topLeft"){
+	  var legendX = 0;
+	  var legendY = 1;
+  }
+  else if (chartData.m_LegendPosition == "middleRight"){
+	  var legendX = 1;
+	  var legendY = 0.5;
+  }
   var layout = {
     title: chartData.m_diagramTitle,
     xaxis: {
@@ -140,7 +161,11 @@ function generateChart(chartData)
       t: marginTop,
       pad: 4
     },
-	showlegend: chartData.m_ShowLegend
+	showlegend: chartData.m_ShowLegend,
+	legend: {
+		x: legendX,
+		y: legendY
+	}
   };
 
   if (chartData.m_YAxisScale){

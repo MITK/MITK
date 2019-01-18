@@ -66,7 +66,7 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
   m_LineNameToLineType.emplace("dashed", QmitkChartWidget::LineStyle::dashed);
 
   m_AxisScaleNameToAxisScaleType.emplace("linear", QmitkChartWidget::AxisScale::linear);
-  m_AxisScaleNameToAxisScaleType.emplace("log", QmitkChartWidget::AxisScale::log);
+  m_AxisScaleNameToAxisScaleType.emplace("logarithmic", QmitkChartWidget::AxisScale::log);
 }
 
 void ChartExample::FillRandomDataValues()

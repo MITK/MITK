@@ -177,6 +177,7 @@ void QmitkMatchPoint::OnLoadAlgorithmButtonPushed()
   this->ConfigureRegistrationControls();
   this->ConfigureProgressInfos();
   this->m_Controls.m_tabs->setCurrentIndex(1);
+  this->m_Controls.m_teLog->clear();
 }
 
 void QmitkMatchPoint::Error(QString msg)

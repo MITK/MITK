@@ -103,14 +103,7 @@ void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
     eventConfig = "DisplayConfigMITK.xml";
   }
     break;
-  // deleted mouse mode "PACS"
-  /*
-  case PACS:
-  {
-    eventConfig = "DisplayConfigPACS.xml";
-  }
-    break;
-  */
+
   case ROTATION:
   {
     eventConfig = "DisplayConfigMITKRotationUnCoupled.xml";

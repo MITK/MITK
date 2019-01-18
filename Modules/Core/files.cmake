@@ -296,7 +296,6 @@ set(RESOURCE_FILES
 Interactions/globalConfig.xml
 Interactions/DisplayInteraction.xml
 Interactions/DisplayConfig.xml
-Interactions/DisplayConfigPACS.xml
 Interactions/DisplayConfigPanLeft.xml
 Interactions/DisplayConfigPanRight.xml
 Interactions/DisplayConfigPanMiddle.xml

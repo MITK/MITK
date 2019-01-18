@@ -140,6 +140,7 @@ function generateChart(chartData)
       t: marginTop,
       pad: 4
     },
+	showlegend: chartData.m_ShowLegend
   };
 
   if (chartData.m_YAxisScale){

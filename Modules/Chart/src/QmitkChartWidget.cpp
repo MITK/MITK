@@ -130,9 +130,11 @@ QmitkChartWidget::Impl::Impl(QWidget *parent)
   m_ChartTypeToName.emplace(ChartType::area_spline, "area-spline");
   m_ChartTypeToName.emplace(ChartType::scatter, "scatter");
 
-  m_LegendPositionToName.emplace(LegendPosition::bottom, "bottom");
-  m_LegendPositionToName.emplace(LegendPosition::right, "right");
-  m_LegendPositionToName.emplace(LegendPosition::inset, "inset");
+  m_LegendPositionToName.emplace(LegendPosition::bottomMiddle, "bottomMiddle");
+  m_LegendPositionToName.emplace(LegendPosition::bottomRight, "bottomRight");
+  m_LegendPositionToName.emplace(LegendPosition::topRight, "topRight");
+  m_LegendPositionToName.emplace(LegendPosition::topLeft, "topLeft");
+  m_LegendPositionToName.emplace(LegendPosition::middleRight, "middleRight");
 
   m_LineStyleToName.emplace(LineStyle::solid, "solid");
   m_LineStyleToName.emplace(LineStyle::dashed, "dashed");

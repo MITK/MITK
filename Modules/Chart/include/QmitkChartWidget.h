@@ -77,9 +77,11 @@ public:
   * See http://c3js.org/reference.html#legend-position
   */
   enum class LegendPosition {
-    bottom,
-    right,
-    inset
+    bottomMiddle,
+    bottomRight,
+    topRight,
+    topLeft,
+    middleRight
   };
 
   explicit QmitkChartWidget(QWidget* parent = nullptr);

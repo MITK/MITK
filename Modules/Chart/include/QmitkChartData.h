@@ -92,7 +92,7 @@ private:
   QVariant m_chartTitle;
 
   QVariant m_ShowLegend = true;
-  QVariant m_LegendPosition;
+  QVariant m_LegendPosition = "topRight";
   QVariant m_ShowSubchart;
   QVariant m_YAxisScale;
   QVariant m_UsePercentageInPieChart;

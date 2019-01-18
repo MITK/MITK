@@ -25,8 +25,6 @@ QmitkImageStatisticsWidget::QmitkImageStatisticsWidget(QWidget* parent) : QWidge
 {
   m_Controls.setupUi(this);
   m_imageStatisticsModel = new QmitkImageStatisticsTableModel(parent);
-  //temporarily disabled because 4D clipboard functionality is not implemented yet
-  m_Controls.checkBox4dCompleteTable->setVisible(false);
   CreateConnections();
   m_ProxyModel = new QSortFilterProxyModel(this);
   m_Controls.tableViewStatistics->setModel(m_ProxyModel);

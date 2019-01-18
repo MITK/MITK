@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK
 #include <MitkImageStatisticsUIExports.h>
 #include "mitkImageStatisticsContainer.h"
-#include "mitkDataNode.h"
-#include "mitkDataStorage.h"
 
 /*!
 \class QmitkImageStatisticsTableModel
@@ -58,6 +56,9 @@ public:
 
   QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
   QModelIndex parent(const QModelIndex &child) const override;
+
+signals:
+  void dataAvailable();
 
 protected:
   /*

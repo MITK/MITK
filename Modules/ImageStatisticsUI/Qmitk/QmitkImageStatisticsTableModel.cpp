@@ -15,11 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkImageStatisticsTableModel.h"
+
 #include "mitkProportionalTimeGeometry.h"
 #include "mitkStatisticsToImageRelationRule.h"
 #include "mitkImageStatisticsContainerManager.h"
 #include "itkMutexLockHolder.h"
-#include "itkSimpleFastMutexLock.h"
 
 
 QmitkImageStatisticsTableModel::QmitkImageStatisticsTableModel(QObject *parent) :
@@ -290,6 +290,10 @@ void QmitkImageStatisticsTableModel::UpdateByDataStorage()
           }
         }
       }
+    }
+    if (!newStatistics.empty())
+    {
+      emit dataAvailable();
     }
   }
 

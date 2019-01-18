@@ -16,43 +16,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkImageStatisticsWidget_H__INCLUDED
 #define QmitkImageStatisticsWidget_H__INCLUDED
 
-#include <mitkImageStatisticsContainer.h>
-
 #include <MitkImageStatisticsUIExports.h>
 #include <ui_QmitkImageStatisticsWidget.h>
-#include <QmitkImageStatisticsTableModel.h>
+
+#include <mitkDataStorage.h>
+#include <mitkDataNode.h>
 
 class QSortFilterProxyModel;
-
-//Qt
-#include <QWidget>
+class QmitkImageStatisticsTableModel;
 
 class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsWidget : public QWidget
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-  QmitkImageStatisticsWidget(QWidget* parent = nullptr);
+  QmitkImageStatisticsWidget(QWidget *parent = nullptr);
 
   /**Documentation
   Set the data storage the model should fetch its statistic objects from.
   @pre data storage must be valid
   */
-  void SetDataStorage(mitk::DataStorage* newDataStorage);
+  void SetDataStorage(mitk::DataStorage *newDataStorage);
 
-  void SetImageNodes(const std::vector<mitk::DataNode::ConstPointer>& nodes);
-  void SetMaskNodes(const std::vector<mitk::DataNode::ConstPointer>& nodes);
+  void SetImageNodes(const std::vector<mitk::DataNode::ConstPointer> &nodes);
+  void SetMaskNodes(const std::vector<mitk::DataNode::ConstPointer> &nodes);
   void Reset();
 
 private:
-	void CreateConnections();
+  void CreateConnections();
+  void OnDataAvailable();
 
-	/** \brief  Saves the image statistics to the clipboard */
-	void OnClipboardButtonClicked();
+  /** \brief  Saves the image statistics to the clipboard */
+  void OnClipboardButtonClicked();
 
 private:
-	Ui::QmitkImageStatisticsControls m_Controls;
-  QmitkImageStatisticsTableModel* m_imageStatisticsModel;
-  QSortFilterProxyModel* m_ProxyModel;
+  Ui::QmitkImageStatisticsControls m_Controls;
+  QmitkImageStatisticsTableModel *m_imageStatisticsModel;
+  QSortFilterProxyModel *m_ProxyModel;
 };
 #endif // QmitkImageStatisticsWidget_H__INCLUDED

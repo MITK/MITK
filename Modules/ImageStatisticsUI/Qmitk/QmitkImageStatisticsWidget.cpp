@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkImageStatisticsWidget.h"
 
 #include "QmitkTableModelToStringConverter.h"
+#include "QmitkImageStatisticsTableModel.h"
 
 #include <QSortFilterProxyModel>
 #include <QClipboard>
@@ -25,12 +26,11 @@ QmitkImageStatisticsWidget::QmitkImageStatisticsWidget(QWidget* parent) : QWidge
 {
   m_Controls.setupUi(this);
   m_imageStatisticsModel = new QmitkImageStatisticsTableModel(parent);
-  //temporarily disabled because 4D clipboard functionality is not implemented yet
-  m_Controls.checkBox4dCompleteTable->setVisible(false);
   CreateConnections();
   m_ProxyModel = new QSortFilterProxyModel(this);
   m_Controls.tableViewStatistics->setModel(m_ProxyModel);
   m_ProxyModel->setSourceModel(m_imageStatisticsModel);
+  connect(m_imageStatisticsModel, &QmitkImageStatisticsTableModel::dataAvailable, this, &QmitkImageStatisticsWidget::OnDataAvailable);
 }
 
 void QmitkImageStatisticsWidget::SetDataStorage(mitk::DataStorage* newDataStorage)
@@ -53,11 +53,17 @@ void QmitkImageStatisticsWidget::SetMaskNodes(const std::vector<mitk::DataNode::
 void QmitkImageStatisticsWidget::Reset()
 {
   m_imageStatisticsModel->Clear();
+  m_Controls.buttonCopyImageStatisticsToClipboard->setEnabled(false);
 }
 
 void QmitkImageStatisticsWidget::CreateConnections()
 {
 	connect(m_Controls.buttonCopyImageStatisticsToClipboard, &QPushButton::clicked, this, &QmitkImageStatisticsWidget::OnClipboardButtonClicked);
+}
+
+void QmitkImageStatisticsWidget::OnDataAvailable()
+{
+  m_Controls.buttonCopyImageStatisticsToClipboard->setEnabled(true);
 }
 
 void QmitkImageStatisticsWidget::OnClipboardButtonClicked()

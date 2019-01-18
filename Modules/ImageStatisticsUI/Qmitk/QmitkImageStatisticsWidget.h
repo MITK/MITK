@@ -46,6 +46,7 @@ public:
 
 private:
 	void CreateConnections();
+  void OnDataAvailable();
 
 	/** \brief  Saves the image statistics to the clipboard */
 	void OnClipboardButtonClicked();

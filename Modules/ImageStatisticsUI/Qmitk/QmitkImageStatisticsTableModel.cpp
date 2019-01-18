@@ -291,6 +291,10 @@ void QmitkImageStatisticsTableModel::UpdateByDataStorage()
         }
       }
     }
+    if (!newStatistics.empty())
+    {
+      emit dataAvailable();
+    }
   }
 
   {

@@ -59,6 +59,9 @@ public:
   QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
   QModelIndex parent(const QModelIndex &child) const override;
 
+signals:
+  void dataAvailable();
+
 protected:
   /*
   * @brief See 'QmitkAbstractDataStorageModel'

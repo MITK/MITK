@@ -31,6 +31,7 @@ QmitkImageStatisticsWidget::QmitkImageStatisticsWidget(QWidget* parent) : QWidge
   m_ProxyModel = new QSortFilterProxyModel(this);
   m_Controls.tableViewStatistics->setModel(m_ProxyModel);
   m_ProxyModel->setSourceModel(m_imageStatisticsModel);
+  connect(m_imageStatisticsModel, &QmitkImageStatisticsTableModel::dataAvailable, this, &QmitkImageStatisticsWidget::OnDataAvailable);
 }
 
 void QmitkImageStatisticsWidget::SetDataStorage(mitk::DataStorage* newDataStorage)
@@ -58,6 +59,11 @@ void QmitkImageStatisticsWidget::Reset()
 void QmitkImageStatisticsWidget::CreateConnections()
 {
 	connect(m_Controls.buttonCopyImageStatisticsToClipboard, &QPushButton::clicked, this, &QmitkImageStatisticsWidget::OnClipboardButtonClicked);
+}
+
+void QmitkImageStatisticsWidget::OnDataAvailable()
+{
+  m_Controls.buttonCopyImageStatisticsToClipboard->setEnabled(true);
 }
 
 void QmitkImageStatisticsWidget::OnClipboardButtonClicked()

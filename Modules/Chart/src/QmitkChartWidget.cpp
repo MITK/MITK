@@ -475,6 +475,7 @@ void QmitkChartWidget::SetShowLegend(bool show)
 }
 
 void QmitkChartWidget::SetStackedData(bool stacked) {
+  Q_UNUSED(stacked)  //this is a temporary solution and will be changed as soon as this method is implemented
   MITK_WARN << "not yet implemented";
 }
 

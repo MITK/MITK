@@ -474,6 +474,10 @@ void QmitkChartWidget::SetShowLegend(bool show)
   m_Impl->SetShowLegend(show);
 }
 
+void QmitkChartWidget::SetStackedData(bool stacked) {
+  MITK_WARN << "not yet implemented";
+}
+
 void QmitkChartWidget::Show(bool showSubChart)
 {
   m_Impl->Show(showSubChart);

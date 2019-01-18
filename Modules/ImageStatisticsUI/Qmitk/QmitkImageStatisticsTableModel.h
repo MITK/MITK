@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK
 #include <MitkImageStatisticsUIExports.h>
 #include "mitkImageStatisticsContainer.h"
-#include "mitkDataNode.h"
-#include "mitkDataStorage.h"
 
 /*!
 \class QmitkImageStatisticsTableModel

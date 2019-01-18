@@ -16,16 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkImageStatisticsWidget_H__INCLUDED
 #define QmitkImageStatisticsWidget_H__INCLUDED
 
-#include <mitkImageStatisticsContainer.h>
-
 #include <MitkImageStatisticsUIExports.h>
 #include <ui_QmitkImageStatisticsWidget.h>
-#include <QmitkImageStatisticsTableModel.h>
+
+#include <mitkDataStorage.h>
+#include <mitkDataNode.h>
 
 class QSortFilterProxyModel;
-
-//Qt
-#include <QWidget>
+class QmitkImageStatisticsTableModel;
 
 class MITKIMAGESTATISTICSUI_EXPORT QmitkImageStatisticsWidget : public QWidget
 {

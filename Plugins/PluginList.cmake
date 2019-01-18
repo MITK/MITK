@@ -31,6 +31,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.stdmultiwidgeteditor:ON
   org.mitk.gui.qt.common.legacy:OFF
   org.mitk.gui.qt.cmdlinemodules:OFF
+  org.mitk.gui.qt.chartExample:OFF
   org.mitk.gui.qt.diffusionimagingapp:OFF
   org.mitk.gui.qt.datamanager:ON
   org.mitk.gui.qt.datamanagerlight:OFF

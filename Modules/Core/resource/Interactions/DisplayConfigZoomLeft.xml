@@ -2,10 +2,4 @@
    <event_variant class="MousePressEvent" name="StartZoomL">
     <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>
-  <event_variant class="MouseReleaseEvent" name="EndZooming">
-    <attribute name="EventButton" value="LeftMouseButton"/>
-  </event_variant>
-  <event_variant class="MouseMoveEvent" name="Zooming">
-    <attribute name="ButtonState" value="LeftMouseButton"/>
-  </event_variant>
 </config>

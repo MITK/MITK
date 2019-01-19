@@ -270,13 +270,13 @@ bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent
     std::vector<double> handles;
 
     if ( !PlaneGeometryDataMapper2D::getIntersections( clickedRenderer, BaseRenderer::GetInstance(renWin)->GetCurrentWorldPlaneGeometryNode(), ourViewportGeometry,
-      otherRenderersRenderPlane, referenceGeometry, intersectionLine, intersections, handles ) || handles.empty() )
+      otherRenderersRenderPlane, referenceGeometry, intersectionLine, intersections, handles ) )
     {
-      continue; // we ignore this plane, it hasn't intersection with our plane or handles are absent
+      continue; // we ignore this plane, it hasn't intersection with our plane
     }
 
     // check distance from one of handles
-    double distanceFromIntersectionLine = cursorPosition.EuclideanDistanceTo(intersectionLine.GetPoint(handles[0]));
+    double distanceFromIntersectionLine = handles.empty()? threshholdDistancePixels : cursorPosition.EuclideanDistanceTo(intersectionLine.GetPoint(handles[0]));
     if (handles.size() > 1) {
       double d = cursorPosition.EuclideanDistanceTo(intersectionLine.GetPoint(handles[1]));
       if (d < distanceFromIntersectionLine) distanceFromIntersectionLine = d;

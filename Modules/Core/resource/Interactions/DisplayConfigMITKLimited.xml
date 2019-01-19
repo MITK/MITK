@@ -14,20 +14,20 @@
   <event_variant class="MousePressEvent" name="StartMove">
     <attribute name="EventButton" value="MiddleMouseButton"/>
   </event_variant>
-  <event_variant class="MouseReleaseEvent" name="EndMoving">
+  <event_variant class="MouseReleaseEvent" name="EndDrag">
     <attribute name="EventButton" value="MiddleMouseButton"/>
   </event_variant>
-  <event_variant class="MouseMoveEvent" name="Moving">
+  <event_variant class="MouseMoveEvent" name="Dragging">
     <attribute name="ButtonState" value="MiddleMouseButton"/>
   </event_variant>
   <!-- Zooming -->
   <event_variant class="MousePressEvent" name="StartZoom">
     <attribute name="EventButton" value="RightMouseButton"/>
   </event_variant>
-   <event_variant class="MouseMoveEvent" name="Zooming">
+  <event_variant class="MouseMoveEvent" name="Dragging">
     <attribute name="ButtonState" value="RightMouseButton"/>
   </event_variant>
-  <event_variant class="MouseReleaseEvent" name="EndZooming">
+  <event_variant class="MouseReleaseEvent" name="EndDrag">
     <attribute name="EventButton" value="RightMouseButton"/>
   </event_variant>
 </config>

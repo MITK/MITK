@@ -4,10 +4,4 @@
    <event_variant class="MousePressEvent" name="StartScroll">
     <attribute name="EventButton" value="MiddleMouseButton"/>
   </event_variant>
-  <event_variant class="MouseReleaseEvent" name="EndScrolling">
-    <attribute name="EventButton" value="MiddleMouseButton"/>
-  </event_variant>
-  <event_variant class="MouseMoveEvent" name="Scrolling">
-    <attribute name="ButtonState" value="MiddleMouseButton"/>
-  </event_variant>
 </config>

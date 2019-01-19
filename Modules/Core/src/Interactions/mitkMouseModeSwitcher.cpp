@@ -103,14 +103,7 @@ void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
     eventConfig = "DisplayConfigMITK.xml";
   }
     break;
-  // deleted mouse mode "PACS"
-  /*
-  case PACS:
-  {
-    eventConfig = "DisplayConfigPACS.xml";
-  }
-    break;
-  */
+
   case ROTATION:
   {
     eventConfig = "DisplayConfigMITKRotationUnCoupled.xml";
@@ -136,6 +129,13 @@ void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
     }
   }
   m_ActiveInteractionScheme = scheme;
+  for (auto mode: m_ActiveMouseModes) { // restore mouse modes
+    for (auto button: mode.second) {
+      if (scheme == MITK || button != 1) {
+        SelectMouseMode(mode.first, button);
+      }
+    }
+  }
   this->InvokeEvent(MouseModeChangedEvent());
 }
 
@@ -148,9 +148,6 @@ void mitk::MouseModeSwitcher::SetSelectionMode(bool selection)
 
 void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode, const unsigned int& button)
 {
-  if (m_ActiveInteractionScheme != MITK)
-    return;
-
   std::string eventConfig;
   switch (mode)
   {

@@ -4,13 +4,17 @@ const minHeight = 255;
 var chart;
 
 var chartData;
+var errorValues=[];
 var xValues=[];
 var yValues=[];
 var dataLabels=[];
 var xs = {};
+
 var dataColors = {};
 var chartTypes = {};
 var lineStyle = {};
+
+var dataProperties = {};
 
 // Important loading function. This will be executed at first in this whole script.
 // Fetching data from QWebChannel and storing them for display purposes.
@@ -22,36 +26,45 @@ window.onload = function()
     chartData = channel.objects.chartData;
 
     let count = 0;
-  	for(let propertyName in channel.objects) {
-  	  if (propertyName != 'chartData')
-  	  {
-  			let xDataTemp = channel.objects[propertyName].m_XData
-  			let yDataTemp = channel.objects[propertyName].m_YData
-  			let dataLabel = channel.objects[propertyName].m_Label
-  			dataLabels.push(dataLabel)
+    for(let propertyName in channel.objects) {
+    if (propertyName != 'chartData')
+    {
+        let xDataTemp = channel.objects[propertyName].m_XData;
+        let yDataTemp = channel.objects[propertyName].m_YData;
+	      let errorsTemp = channel.objects[propertyName].m_ErrorData;
+        let dataLabel = channel.objects[propertyName].m_Label;
+        dataLabels.push(dataLabel);
 
         console.log("loading datalabel: "+dataLabel);
 
         //add label to x array
-  			xDataTemp.unshift('x'+count.toString())
-  			xs[dataLabel] = 'x' + count.toString()
+        xDataTemp.unshift('x'+count.toString())
+        xs[dataLabel] = 'x' + count.toString()
 
-  			xDataTemp.push(null); //append null value, to make sure the last tick on x-axis is displayed correctly
-  			yDataTemp.unshift(dataLabel)
-  			yDataTemp.push(null); //append null value, to make sure the last tick on y-axis is displayed correctly
-  			xValues[count] = xDataTemp
-  			yValues[count] = yDataTemp
-  			dataColors[dataLabel] = channel.objects[propertyName].m_Color
-  			chartTypes[dataLabel] = channel.objects[propertyName].m_ChartType
+        xDataTemp.push(null); //append null value, to make sure the last tick on x-axis is displayed correctly
+        yDataTemp.unshift(dataLabel)
+        yDataTemp.push(null); //append null value, to make sure the last tick on y-axis is displayed correctly
 
-  			if (channel.objects[propertyName].m_LineStyleName == "solid")
+        xValues[count] = xDataTemp
+        yValues[count] = yDataTemp
+        errorValues[count] = errorsTemp;
+
+        let tempLineStyle = '';
+
+        if (channel.objects[propertyName].m_LineStyleName == "solid")
   			{
-  			  lineStyle[dataLabel] = ''
+  			  tempLineStyle = ''
   			}
   			else
   			{
-  			  lineStyle[dataLabel] = [{ 'style': 'dashed' }]
+  			  tempLineStyle = { 'style': 'dashed' }
   			}
+
+        dataProperties[dataLabel] = {
+            "color" : channel.objects[propertyName].m_Color,
+            "chartType": channel.objects[propertyName].m_ChartType,
+            "style": tempLineStyle
+        }
 
   			count++;
   		}
@@ -81,7 +94,27 @@ function getPlotlyChartType(inputType){
   return plotlyType;
 }
 
+/**
+ * Generate error bars object
+ *
+ * @param {array} errors - contains error bar values
+ * @return error bar object
+ */
+function generateErrorBars(errors, visible){
+	let errorObject = {
+	  type: 'data',
+	  array: errors,
+	  visible: visible
+	}
 
+	return errorObject;
+}
+
+function generateLineOptions(options){
+  return {
+    color : options.color
+  }
+}
 
 /**
  * Here, the chart magic takes place. Plot.ly is called.
@@ -106,18 +139,27 @@ function generateChart(chartData)
 
   for (let index = 0; index < dataLabels.length; index++){
 
-    let inputType = chartTypes[dataLabels[index]];
+    let inputType = dataProperties[dataLabels[index]]["chartType"];
     let chartType = getPlotlyChartType(inputType);
 
     let trace = {
       x: xValues[index].slice(1),
       y: yValues[index].slice(1),
       type: chartType,
-      name: dataLabels[index],
+      name: dataLabels[index]
     };
 
-    if (lineStyle[dataLabels[index]]["style"] == "dashed"){
+	  if(typeof errorValues[index] !== 'undefined'){
+		  trace["error_y"] = generateErrorBars(errorValues[index], chartData.m_ShowErrorBars);
+	  }
+
+    if (dataProperties[dataLabels[index]]["style"] == "dashed"){
       trace["line"]["dash"] = "dot"
+    }
+
+    // ===================== CHART TYPE OPTIONS HANDLING ===========
+    if (chartType == "scatter"){
+      trace["line"] = generateLineOptions(dataProperties[dataLabels][index]["color"])
     }
 
     data.push(trace)
@@ -169,20 +211,25 @@ link = document.getElementsByTagName("link")[0];
   }
 };
 
-/**
- * Reload the chart with the given arguments.
- *
- * This method is called by C++. Changes on signature with caution.
- * @param {boolean} showSubchart
- * @param {string} stackDataString
- */
-function ReloadChart(showSubchart, stackDataString = false)
-{
-    chartData.m_ShowSubchart = showSubchart;
-    chartData.m_StackedData = stackDataString;
-    generateChart(chartData);
+function Reload(){
+  console.log("Reload chart");
+  generateChart(chartData);
 }
 
+function SetShowSubchart(showSubchart)
+{
+  chartData.m_ShowSubchart = showSubchart;
+}
+
+function SetStackDataString(stackDataString)
+{
+  chartData.m_StackedData = stackDataString;
+}
+
+function SetShowErrorBars(showErrorBars)
+{
+  chartData.m_ShowErrorBars = showErrorBars;
+}
 /**
  * Transforms the view to another chart type.
  *
@@ -193,7 +240,7 @@ function transformView(transformTo) {
   console.log("transform view");
   console.log(transformTo);
 
-  chartTypes[dataLabels[0]] = transformTo; // preserve chartType for later updates
+  dataProperties[dataLabels[0]]["chartType"] = transformTo; // preserve chartType for later updates
   let plotlyType = getPlotlyChartType(transformTo);
   let chart = document.getElementById("chart");
   let update = {type : plotlyType}

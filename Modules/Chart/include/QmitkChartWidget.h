@@ -107,7 +107,9 @@ public:
   * \note If the label name already exists, the name is replaced with a unique one by concatenating numbers to it.
   * \warning Pie chart is significantly different than the other chart types. Here, the data given by AddData1D is summed. Each entry represents a different category.
   */
-  void AddData2D(const std::map<double, double>& data2D, const std::string& label, ChartType chartType = ChartType::bar);
+  void AddData2D(const std::map<double, double> &data2D,
+                 const std::string &label,
+                 ChartType chartType = ChartType::bar);
 
   /*!
   * \brief Removes data from the widget, works for 1D and 2D Data
@@ -163,6 +165,8 @@ public:
   */
   void SetChartType(const std::string& label, ChartType type);
 
+  void SetErrorBars(const std::string &label, const std::vector<double> &error);
+
   /*!
   * \brief Sets the legend position.
   * \details Default position is bottom.
@@ -200,11 +204,24 @@ public:
   void SetTheme(ChartStyle themeEnabled);
 
   /*!
-  * \brief Reloads the chart in the widget
-  * \details reloading may be needed to display added data in an existing chart
+  * \brief Sets whether the subchart shall be shown.
+  * \details Changes the state of the current chart object. Needs to be reloaded with Reload() to display changes.
   * \param showSubChart if a subchart is displayed inside the widget or not.
   */
-  void Reload(bool showSubChart);
+  void SetShowSubchart(bool showSubChart);
+
+  /*!
+   * \brief Sets whether the error bars shall be shown.
+   * \details Changes the state of the current chart object. Needs to be reloaded with Reload() to display changes.
+   * \param showErrorBars if error bars are displayed or not.
+   */
+  void SetShowErrorBars(bool showErrorBars);
+
+  /*!
+   * \brief Reloads the chart in the widget
+   * \details reloading may be needed to display added data in an existing chart
+   */
+  void Reload();
 
   QSize sizeHint() const override;
 
@@ -215,6 +232,18 @@ signals:
   void PageSuccessfullyLoaded();
 
 private:
+
+  QString convertBooleanValue(bool value) {
+    if (value)
+    {
+      return "true";
+    }
+    else
+    {
+      return "false";
+    }
+  }
+
   class Impl;
   std::unique_ptr<Impl> m_Impl;
 };

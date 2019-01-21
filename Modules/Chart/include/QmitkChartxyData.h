@@ -29,6 +29,7 @@ class QmitkChartxyData : public QObject
 
   Q_PROPERTY(QList<QVariant> m_YData READ GetYData WRITE SetYData NOTIFY SignalYDataChanged);
   Q_PROPERTY(QList<QVariant> m_XData READ GetXData WRITE SetXData NOTIFY SignalXDataChanged);
+  Q_PROPERTY(QList<QVariant> m_ErrorData READ GetErrorData WRITE SetErrorData NOTIFY SignalErrorDataChanged);
   Q_PROPERTY(QVariant m_ChartType READ GetChartType WRITE SetChartType NOTIFY SignalDiagramTypeChanged);
   Q_PROPERTY(QVariant m_Color READ GetColor WRITE SetColor NOTIFY SignalColorChanged);
   Q_PROPERTY(QVariant m_Label READ GetLabel WRITE SetLabel NOTIFY SignalLabelChanged);
@@ -44,6 +45,9 @@ public:
 
   Q_INVOKABLE QList<QVariant> GetXData() const { return m_XData; };
   Q_INVOKABLE void SetXData(const QList<QVariant>& xData) { m_XData =xData; };
+
+  Q_INVOKABLE QList<QVariant> GetErrorData() const { return m_ErrorData; };
+  Q_INVOKABLE void SetErrorData(const QList<QVariant> &errorData) { m_ErrorData = errorData; };
 
   Q_INVOKABLE QVariant GetChartType() const { return m_ChartType; };
   Q_INVOKABLE void SetChartType(const QVariant& chartType) { m_ChartType = chartType; };
@@ -68,6 +72,7 @@ public:
 signals:
   void SignalYDataChanged(const QList<QVariant> yData);
   void SignalXDataChanged(const QList<QVariant> xData);
+  void SignalErrorDataChanged(const QList<QVariant> errorData);
   void SignalDiagramTypeChanged(const QVariant diagramType);
   void SignalColorChanged(const QVariant color);
   void SignalLabelChanged(const QVariant label);
@@ -76,6 +81,7 @@ signals:
 private:
   QList<QVariant>  m_YData;
   QList<QVariant>  m_XData;
+  QList<QVariant>  m_ErrorData;
   QVariant         m_Label;
   QVariant         m_ChartType;
   QVariant         m_Color;

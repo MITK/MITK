@@ -73,6 +73,8 @@ void QmitkOverlayManagerView::SetFocus()
 
 void QmitkOverlayManagerView::CreateQtPartControl( QWidget *parent )
 {
+  SetPartName(QAction::tr("Overlay Manager"));
+
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
   m_Controls.propertyListComboBox->addItem("common");

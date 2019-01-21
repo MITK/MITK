@@ -46,9 +46,9 @@ QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
   m_GradientOpacityCanvas->SetQLineEdits(m_XEditGradientOpacity, m_YEditGradientOpacity);
   m_ColorTransferFunctionCanvas->SetQLineEdits(m_XEditColor, nullptr);
 
-  m_ScalarOpacityFunctionCanvas->SetTitle("Grayvalue -> Opacity");
-  m_GradientOpacityCanvas->SetTitle("Grayvalue/Gradient -> Opacity");
-  m_ColorTransferFunctionCanvas->SetTitle("Grayvalue -> Color");
+  m_ScalarOpacityFunctionCanvas->SetTitle(tr("Grayvalue -> Opacity"));
+  m_GradientOpacityCanvas->SetTitle(tr("Grayvalue/Gradient -> Opacity"));
+  m_ColorTransferFunctionCanvas->SetTitle(tr("Grayvalue -> Color"));
 
 }
 
@@ -62,9 +62,9 @@ void QmitkTransferFunctionWidget::SetScalarLabel(const QString& scalarLabel)
   m_textLabelX_2->setText(scalarLabel);
   m_textLabelX_3->setText(scalarLabel);
 
-  m_ScalarOpacityFunctionCanvas->SetTitle(scalarLabel + " -> Opacity");
-  m_GradientOpacityCanvas->SetTitle(scalarLabel + "/Gradient -> Opacity");
-  m_ColorTransferFunctionCanvas->SetTitle(scalarLabel + " -> Color");
+  m_ScalarOpacityFunctionCanvas->SetTitle(scalarLabel + tr(" -> Opacity"));
+  m_GradientOpacityCanvas->SetTitle(scalarLabel + tr("/Gradient -> Opacity"));
+  m_ColorTransferFunctionCanvas->SetTitle(scalarLabel + tr(" -> Color"));
 }
 
 void QmitkTransferFunctionWidget::ShowScalarOpacityFunction(bool show)

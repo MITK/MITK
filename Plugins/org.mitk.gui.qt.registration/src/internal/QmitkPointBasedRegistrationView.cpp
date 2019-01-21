@@ -262,6 +262,8 @@ QmitkPointBasedRegistrationView::~QmitkPointBasedRegistrationView()
 
 void QmitkPointBasedRegistrationView::CreateQtPartControl(QWidget* parent)
 {
+  SetPartName(QAction::tr("PointBasedRegistration"));
+
   m_Controls.setupUi(parent);
   m_Parent->setEnabled(false);
   m_Controls.m_MeanErrorLCD->hide();

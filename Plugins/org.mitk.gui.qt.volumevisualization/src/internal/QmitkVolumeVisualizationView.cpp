@@ -176,14 +176,14 @@ void QmitkVolumeVisualizationView::OnSelectionChanged(berry::IWorkbenchPart::Poi
     m_Controls->m_ErrorImageLabel->hide();
     m_Controls->m_SelectedImageLabel->show();
 
-    std::string  infoText;
+    QString infoText = tr("Selected Image: ");
 
     if (node->GetName().empty())
-      infoText = std::string("Selected Image: [currently selected image has no name]");
+      infoText += tr("[currently selected image has no name]");
     else
-      infoText = std::string("Selected Image: ") + node->GetName();
+      infoText += QString::fromStdString(node->GetName());
 
-    m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
+    m_Controls->m_SelectedImageLabel->setText(infoText);
 
     if (m_SelectedNode.IsNotNull() && m_ListeningNode) {
       mitk::BaseProperty::Pointer property = m_SelectedNode->GetProperty("volumerendering");

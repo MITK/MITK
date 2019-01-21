@@ -325,7 +325,7 @@ void QmitkPropertyTreeView::OnPropertyNameChanged(const itk::EventObject&)
 
     if (nameProperty != NULL)
     {
-      QString partName = "Properties (";
+      QString partName = QAction::tr("Properties") + " (";
       partName.append(QString::fromStdString(nameProperty->GetValueAsString())).append(')');
       this->SetPartName(partName);
     }
@@ -350,7 +350,7 @@ void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, c
   {
     m_SelectedNode = NULL;
 
-    this->SetPartName("Properties");
+    this->SetPartName(QAction::tr("Properties"));
     m_Model->SetPropertyList(NULL);
     m_Delegate->SetPropertyList(NULL);
 

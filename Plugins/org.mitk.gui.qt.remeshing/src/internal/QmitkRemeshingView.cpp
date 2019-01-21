@@ -46,6 +46,8 @@ QmitkRemeshingView::~QmitkRemeshingView()
 
 void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
 {
+  SetPartName(QAction::tr("Remeshing"));
+
   m_Controls.setupUi(parent);
 
   m_Controls.surfaceComboBox->SetDataStorage(this->GetDataStorage());

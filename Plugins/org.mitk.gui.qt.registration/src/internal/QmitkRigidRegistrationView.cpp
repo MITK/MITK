@@ -220,6 +220,8 @@ QmitkRigidRegistrationView::~QmitkRigidRegistrationView()
 
 void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
 {
+  SetPartName(QAction::tr("RigidRegistration"));
+
   m_Controls.setupUi(parent);
   m_Controls.m_ManualFrame->hide();
   m_Controls.timeSlider->hide();
@@ -273,7 +275,7 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
 
 void QmitkRigidRegistrationView::FillPresetComboBox( const std::list< std::string>& presets)
 {
-  this->m_Controls.m_RigidRegistrationPresetBox->addItem( QString("== select a registration configuration ==") );
+  this->m_Controls.m_RigidRegistrationPresetBox->addItem( tr("== select a registration configuration ==") );
   for( const std::string &preset : presets )
   {
     this->m_Controls.m_RigidRegistrationPresetBox->addItem( QString(preset.c_str()) );

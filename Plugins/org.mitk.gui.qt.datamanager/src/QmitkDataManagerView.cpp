@@ -885,7 +885,7 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
   }
   // remove the last two characters = ", "
   question = question.remove(question.size()-2, 2);
-  question.append(" from data storage?");
+  question.append(tr(" from data storage?"));
 
   QMessageBox::StandardButton answerButton = QMessageBox::question( m_Parent
     , tr("DataManager")

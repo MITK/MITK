@@ -354,6 +354,31 @@ void QmitkToolSelectionBox::setEnabled( bool /*enable*/ )
 
 void QmitkToolSelectionBox::RecreateButtons()
 {
+  // Used only to add translations to QtLinguist
+  static const char* toolCaptions[] = {
+    // 2D Tools
+    QT_TRANSLATE_NOOP("SegmentationTool", "Add"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "Subtract"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "Correction"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "Paint"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "Wipe"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "Region Growing"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "Fill"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "Erase"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "Live Wire"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "2D Fast Marching"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "Classic Region Growing"),
+
+    // 3D Tools
+    QT_TRANSLATE_NOOP("SegmentationTool", "Threshold"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "UL Threshold"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "Otsu"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "Fast Marching 3D"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "Region Growing 3D"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "Watershed"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "Picking"),
+  };
+
   if (m_ToolManager.IsNull()) return;
 
   /*
@@ -502,13 +527,14 @@ void QmitkToolSelectionBox::RecreateButtons()
     if(currentToolID == m_ToolManager->GetActiveToolID())
       button->setChecked(true);
 
+    QString caption = qApp->translate("SegmentationTool", tool->GetCaption());
     QString label;
-    if (m_GenerateAccelerators)
-    {
+    // Removed cause doesn't support translation well
+    /*if (m_GenerateAccelerators) {
       label += "&";
-    }
-    label += tool->GetCaption();
-    QString tooltip = tool->GetCaption();
+    }*/
+    label += caption;
+    QString tooltip = caption;
     MITK_DEBUG << tool->GetName() << ", " << label.toLocal8Bit().constData() << ", '" << tooltip.toLocal8Bit().constData();
 
     if ( m_ShowNames )

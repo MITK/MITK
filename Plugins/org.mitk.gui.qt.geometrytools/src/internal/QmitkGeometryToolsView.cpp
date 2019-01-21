@@ -39,6 +39,8 @@ void QmitkGeometryToolsView::SetFocus()
 
 void QmitkGeometryToolsView::CreateQtPartControl( QWidget *parent )
 {
+  SetPartName(QAction::tr("Geometry Tools"));
+
   m_Controls.setupUi( parent );
   connect( m_Controls.m_AddInteractor, SIGNAL(clicked()), this, SLOT(AddInteractor()) );
   connect( m_Controls.m_RemoveInteractor, SIGNAL(clicked()), this, SLOT(RemoveInteractor()) );

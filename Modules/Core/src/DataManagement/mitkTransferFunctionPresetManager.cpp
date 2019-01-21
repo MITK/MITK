@@ -169,7 +169,6 @@ namespace mitk
 TransferFunctionPresetManagerHolder tfpmHolder;
 
 TransferFunctionPresetManagerHolder::TransferFunctionPresetManagerHolder()
-  : m_tfpm(TransferFunctionPresetManager::New().GetPointer())
 {
 
 }
@@ -182,6 +181,9 @@ TransferFunctionPresetManagerHolder::~TransferFunctionPresetManagerHolder()
 
 TransferFunctionPresetManager& TransferFunctionPresetManager::GetInstance()
 {
+  if (tfpmHolder.m_tfpm == nullptr) {
+    tfpmHolder.m_tfpm = TransferFunctionPresetManager::New().GetPointer();
+  }
   return *tfpmHolder.m_tfpm;
 }
 

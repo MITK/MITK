@@ -251,6 +251,7 @@ void mitkCrosshairManager::addCrosshair(QmitkRenderWindow* window)
       if (m_ShowPlanesIn3d) {
         addPlaneCrosshair(window, false, m_ShowPlanesIn3d);
       }
+      break;
     default:
       if (m_ShowPlanesIn3dWithoutCursor) {
         addPlaneCrosshair(window, false, true);

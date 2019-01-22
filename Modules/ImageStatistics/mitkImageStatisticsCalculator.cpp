@@ -2159,11 +2159,6 @@ namespace mitk
       mitkThrow() << "Figure has a zero area and cannot be used for masking.";
     }
 
-    if ( outOfBounds )
-    {
-      throw std::runtime_error( "Figure at least partially outside of image bounds!" );
-    }
-
     // create a vtkLassoStencilSource and set the points of the Polygon
     vtkSmartPointer<vtkLassoStencilSource> lassoStencil = vtkSmartPointer<vtkLassoStencilSource>::New();
     lassoStencil->SetShapeToPolygon();

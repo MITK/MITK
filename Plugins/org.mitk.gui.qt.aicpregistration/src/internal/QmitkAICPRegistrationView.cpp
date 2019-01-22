@@ -117,7 +117,7 @@ void QmitkAICPRegistrationView::SetFocus(){}
 
 void QmitkAICPRegistrationView::CreateQtPartControl( QWidget *parent )
 {
-  SetPartName(QAction::tr("AICP-Registration"));
+  SetPartName(QObject::tr("AICP-Registration"));
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
 

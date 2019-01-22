@@ -46,7 +46,7 @@ QmitkRemeshingView::~QmitkRemeshingView()
 
 void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
 {
-  SetPartName(QAction::tr("Remeshing"));
+  SetPartName(QObject::tr("Remeshing"));
 
   m_Controls.setupUi(parent);
 

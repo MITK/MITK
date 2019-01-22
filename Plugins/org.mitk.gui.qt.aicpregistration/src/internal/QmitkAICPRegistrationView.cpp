@@ -132,18 +132,18 @@ void QmitkAICPRegistrationView::CreateQtPartControl( QWidget *parent )
   d->m_Worker->moveToThread(d->m_RegistrationThread);
 
   // setup tooltips
-  m_Controls.m_MovingSurfaceComboBox->setToolTip("Set the moving surface of the A-ICP algorithm");
-  m_Controls.m_FixedSurfaceComboBox->setToolTip("Set the fixed surface of the A-ICP algorithm");
-  m_Controls.m_EnableTreCalculation->setToolTip("Enable the trimmed version of the algorithm.");
-  m_Controls.m_TrimmFactorSpinbox->setToolTip("Set the trimmfactor. The algorithm will use a percentage of the Moving pointset for the registration. Valid number are between 0 and 1.");
-  m_Controls.m_ThresholdSpinbox->setToolTip("Set the threshold to wich the algorithm will converge.");
-  m_Controls.m_MaxIterationsSpinbox->setToolTip("The maximum number of iterations used by the algorithm.");
-  m_Controls.m_SearchRadius->setToolTip("Set the search radius in mm for the calculation of the correspondences.");
-  m_Controls.m_RegisterSurfaceButton->setToolTip("Start the registration.");
-  m_Controls.m_EnableTrimming->setToolTip("Enables the trimmed version of the algorithm.");
-  m_Controls.m_TrimmFactorSpinbox->setToolTip("Set teh overlapping part of the surface in %. The valid range is between 0 and 1.");
-  m_Controls.m_MovingTargets->setToolTip("Select the targets for the moving surface.");
-  m_Controls.m_FixedTargets->setToolTip("Select the targets for the fixed surface.");
+  m_Controls.m_MovingSurfaceComboBox->setToolTip(tr("Set the moving surface of the A-ICP algorithm"));
+  m_Controls.m_FixedSurfaceComboBox->setToolTip(tr("Set the fixed surface of the A-ICP algorithm"));
+  m_Controls.m_EnableTreCalculation->setToolTip(tr("Enable the trimmed version of the algorithm."));
+  m_Controls.m_TrimmFactorSpinbox->setToolTip(tr("Set the trimmfactor. The algorithm will use a percentage of the Moving pointset for the registration. Valid number are between 0 and 1."));
+  m_Controls.m_ThresholdSpinbox->setToolTip(tr("Set the threshold to wich the algorithm will converge."));
+  m_Controls.m_MaxIterationsSpinbox->setToolTip(tr("The maximum number of iterations used by the algorithm."));
+  m_Controls.m_SearchRadius->setToolTip(tr("Set the search radius in mm for the calculation of the correspondences."));
+  m_Controls.m_RegisterSurfaceButton->setToolTip(tr("Start the registration."));
+  m_Controls.m_EnableTrimming->setToolTip(tr("Enables the trimmed version of the algorithm."));
+  m_Controls.m_TrimmFactorSpinbox->setToolTip(tr("Set the overlapping part of the surface in %. The valid range is between 0 and 1."));
+  m_Controls.m_MovingTargets->setToolTip(tr("Select the targets for the moving surface."));
+  m_Controls.m_FixedTargets->setToolTip(tr("Select the targets for the fixed surface."));
 
   // init combo boxes
   m_Controls.m_FixedSurfaceComboBox->SetDataStorage(this->GetDataStorage());
@@ -175,7 +175,7 @@ bool QmitkAICPRegistrationView::CheckInput()
   if ( m_Controls.m_MovingSurfaceComboBox->GetSelectedNode().IsNull() ||
         m_Controls.m_FixedSurfaceComboBox->GetSelectedNode().IsNull() )
   {
-    const char* message = "No Surfaces selected.";
+    QString message = tr("No Surfaces selected.");
     MITK_ERROR << message;
     msg.setText(message);
     msg.exec();
@@ -187,7 +187,7 @@ bool QmitkAICPRegistrationView::CheckInput()
     if ( m_Controls.m_FixedTargets->GetSelectedNode().IsNull() ||
            m_Controls.m_MovingTargets->GetSelectedNode().IsNull() )
     {
-      const char* message = "TRE calculation is enabled, but no target points are selected.";
+      QString message = tr("TRE calculation is enabled, but no target points are selected.");
       msg.setText(message);
       msg.exec();
       return false;
@@ -220,7 +220,7 @@ void QmitkAICPRegistrationView::OnStartRegistration()
   // sanity check
   if ( d->m_FixedSurface.IsNull() || d->m_MovingSurface.IsNull() )
   {
-    const char* message = "Input surfaces are NULL.";
+    QString message = tr("Input surfaces are NULL.");
     QMessageBox msg;
     msg.setIcon(QMessageBox::Critical);
     msg.setText(message);
@@ -316,31 +316,23 @@ void QmitkAICPRegistrationView::OnRegistrationFinished()
       }
     }
   }
-  // display result in textbox ( the inverse transform )
-  QString text("");
-  std::ostringstream oss;
-
-  oss << "<b>Iterations:</b> "<< d->m_AICP->GetNumberOfIterations()
-      << "<br><b>FRE:</b> " << d->m_AICP->GetFRE()
-      << "<br><b>TRE:</b> ";
-
-   if ( tre != -1.0)
-    oss << tre;
-   else
-    oss << "N/A";
-
-  oss << "<br><br><b>Rotation:</b><br>";
-
-  for ( int i = 0; i < 3; ++i ) {
-    for ( int j = 0; j < 3; ++j )
-      oss << rotation[i][j] << " ";
-    oss << "<br>";
+  // Display result in textbox ( the inverse transform )
+  QString text = tr("<b>Iterations:</b> %1<br><b>FRE:</b> %2<br><b>TRE:</b> %3")
+    .arg(QString::number(d->m_AICP->GetNumberOfIterations()), QString::number(d->m_AICP->GetFRE()), (tre != -1.0 ? QString::number(tre) : "N/A"));
+  
+  text += tr("<br><br><b>Rotation:</b><br>");
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      text += QString::number(rotation[i][j]) + " ";
+    }
+    text += "<br>";
   }
 
-  oss << "<br><b>Translation:</b><br>" << translation << "<br>";
+  std::ostringstream oss;
+  oss << translation;
+  std::string translationString(oss.str());
 
-  std::string s(oss.str());
-  text.append(s.c_str());
+  text += tr("<br><b>Translation:</b><br>%1<br>").arg(QString::fromStdString(translationString));
 
   m_Controls.m_TextEdit->clear();
   m_Controls.m_TextEdit->append(text);

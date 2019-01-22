@@ -48,17 +48,17 @@ void QmitkDataManagerHotkeysPrefPage::CreateQtControl(QWidget* parent)
   berry::IPreferences::Pointer _DataManagerHotkeysPreferencesNode = prefService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
   m_DataManagerHotkeysPreferencesNode = _DataManagerHotkeysPreferencesNode;
 
-  m_HotkeyEditors["Make all nodes invisible"] = new QmitkHotkeyLineEdit("Ctrl+, V");
+  m_HotkeyEditors[tr("Make all nodes invisible")] = new QmitkHotkeyLineEdit("Ctrl+, V");
 
-  m_HotkeyEditors["Toggle visibility of selected nodes"] = new QmitkHotkeyLineEdit("V");
+  m_HotkeyEditors[tr("Toggle visibility of selected nodes")] = new QmitkHotkeyLineEdit("V");
 
-  m_HotkeyEditors["Delete selected nodes"] = new QmitkHotkeyLineEdit("Del");
+  m_HotkeyEditors[tr("Delete selected nodes")] = new QmitkHotkeyLineEdit("Del");
 
-  m_HotkeyEditors["Reinit selected nodes"] = new QmitkHotkeyLineEdit("R");
+  m_HotkeyEditors[tr("Reinit selected nodes")] = new QmitkHotkeyLineEdit("R");
 
-  m_HotkeyEditors["Global Reinit"] = new QmitkHotkeyLineEdit("Ctrl+, R");
+  m_HotkeyEditors[tr("Global Reinit")] = new QmitkHotkeyLineEdit("Ctrl+, R");
 
-  m_HotkeyEditors["Show Node Information"] = new QmitkHotkeyLineEdit("Ctrl+, I");
+  m_HotkeyEditors[tr("Show Node Information")] = new QmitkHotkeyLineEdit("Ctrl+, I");
 
   m_MainControl = new QWidget(parent);
 
@@ -97,7 +97,7 @@ bool QmitkDataManagerHotkeysPrefPage::PerformOk()
       keyString = it->second->GetKeySequenceAsString();
 
       if(keyString.isEmpty())
-        errString = QString("No valid key sequence for \"%1\"").arg(it->first);
+        errString = tr("No valid key sequence for \"%1\"").arg(it->first);
 
       if(errString.isEmpty())
       {
@@ -112,12 +112,12 @@ bool QmitkDataManagerHotkeysPrefPage::PerformOk()
            }
         }
         if(duplicate == true)
-          errString = QString("Duplicate hot key for \"%1\" and \"%2\"").arg(it->first).arg(it2->first);
+          errString = tr("Duplicate hot key for \"%1\" and \"%2\"").arg(it->first).arg(it2->first);
       }
 
       if(!errString.isEmpty())
       {
-        QMessageBox::critical(QApplication::activeWindow(), "Error", errString);
+        QMessageBox::critical(QApplication::activeWindow(), tr("Error"), errString);
         return false;
       }
     }

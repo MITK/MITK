@@ -46,7 +46,7 @@ m_TimeIsConnected(false)
   fntHelp.setBold(true);
 
   QLabel *lblHelp = new QLabel(this);
-  lblHelp->setText("Press shift-click to add seeds repeatedly.");
+  lblHelp->setText(tr("Press shift-click to add seeds repeatedly."));
   lblHelp->setFont(fntHelp);
 
   widgetLayout->addWidget(lblHelp);
@@ -57,7 +57,7 @@ m_TimeIsConnected(false)
    hlayout->setSpacing(2);
 
    QLabel *lbl = new QLabel(this);
-   lbl->setText("Sigma: ");
+   lbl->setText(tr("Sigma: "));
    hlayout->addWidget(lbl);
 
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -73,7 +73,7 @@ m_TimeIsConnected(false)
   m_slSigma->setSingleStep(0.01);
   m_slSigma->setValue(1.0);
   m_slSigma->setTracking(false);
-  m_slSigma->setToolTip("The \"sigma\" parameter in the Gradient Magnitude filter.");
+  m_slSigma->setToolTip(tr("The \"sigma\" parameter in the Gradient Magnitude filter."));
   connect( m_slSigma, SIGNAL(valueChanged(double)), this, SLOT(OnSigmaChanged(double)));
   widgetLayout->addWidget( m_slSigma );
 
@@ -83,7 +83,7 @@ m_TimeIsConnected(false)
    hlayout->setSpacing(2);
 
    QLabel *lbl = new QLabel(this);
-   lbl->setText("Alpha: ");
+   lbl->setText(tr("Alpha: "));
    hlayout->addWidget(lbl);
 
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -109,7 +109,7 @@ m_TimeIsConnected(false)
    hlayout->setSpacing(2);
 
    QLabel *lbl = new QLabel(this);
-   lbl->setText("Beta: ");
+   lbl->setText(tr("Beta: "));
    hlayout->addWidget(lbl);
 
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -125,7 +125,7 @@ m_TimeIsConnected(false)
   m_slBeta->setSingleStep(0.01);
   m_slBeta->setValue(3.5);
   m_slBeta->setTracking(false);
-  m_slBeta->setToolTip("The \"beta\" parameter in the Sigmoid mapping filter.");
+  m_slBeta->setToolTip(tr("The \"beta\" parameter in the Sigmoid mapping filter."));
   connect( m_slBeta, SIGNAL(valueChanged(double)), this, SLOT(OnBetaChanged(double)));
   widgetLayout->addWidget( m_slBeta );
 
@@ -135,7 +135,7 @@ m_TimeIsConnected(false)
    hlayout->setSpacing(2);
 
    QLabel *lbl = new QLabel(this);
-   lbl->setText("Stopping value: ");
+   lbl->setText(tr("Stopping value: "));
    hlayout->addWidget(lbl);
 
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -152,7 +152,7 @@ m_TimeIsConnected(false)
   m_slStoppingValue->setValue(2000);
   m_slStoppingValue->setDecimals(0);
   m_slStoppingValue->setTracking(false);
-  m_slStoppingValue->setToolTip("The \"stopping value\" parameter in the fast marching 3D algorithm");
+  m_slStoppingValue->setToolTip(tr("The \"stopping value\" parameter in the fast marching 3D algorithm"));
   connect( m_slStoppingValue, SIGNAL(valueChanged(double)), this, SLOT(OnStoppingValueChanged(double)));
   widgetLayout->addWidget( m_slStoppingValue );
 
@@ -162,7 +162,7 @@ m_TimeIsConnected(false)
    hlayout->setSpacing(2);
 
    QLabel *lbl = new QLabel(this);
-   lbl->setText("Threshold: ");
+   lbl->setText(tr("Threshold: "));
    hlayout->addWidget(lbl);
 
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -178,17 +178,17 @@ m_TimeIsConnected(false)
   m_slwThreshold->setMaximumValue(2000);
   m_slwThreshold->setDecimals(0);
   m_slwThreshold->setTracking(false);
-  m_slwThreshold->setToolTip("The lower and upper thresholds for the final thresholding");
+  m_slwThreshold->setToolTip(tr("The lower and upper thresholds for the final thresholding"));
   connect( m_slwThreshold, SIGNAL(valuesChanged(double, double)), this, SLOT(OnThresholdChanged(double, double)));
   widgetLayout->addWidget( m_slwThreshold );
 
-  m_btClearSeeds = new QPushButton("Clear");
-  m_btClearSeeds->setToolTip("Clear current result and start over again");
+  m_btClearSeeds = new QPushButton(tr("Clear"));
+  m_btClearSeeds->setToolTip(tr("Clear current result and start over again"));
   widgetLayout->addWidget(m_btClearSeeds);
   connect( m_btClearSeeds, SIGNAL(clicked()), this, SLOT(OnClearSeeds()) );
 
-  m_btConfirm = new QPushButton("Confirm Segmentation");
-  m_btConfirm->setToolTip("Incorporate current result in your working session.");
+  m_btConfirm = new QPushButton(tr("Confirm Segmentation"));
+  m_btConfirm->setToolTip(tr("Incorporate current result in your working session."));
   m_btConfirm->setEnabled(false);
   widgetLayout->addWidget(m_btConfirm);
   connect( m_btConfirm, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()) );

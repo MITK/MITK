@@ -189,7 +189,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
       if (pointSet.IsNull())
       {
-          QMessageBox::critical(NULL, "QmitkAdaptiveRegionGrowingToolGUI", "PointSetNode does not contain a pointset");
+          QMessageBox::critical(NULL, "QmitkAdaptiveRegionGrowingToolGUI", tr("PointSetNode does not contain a pointset"));
           return;
       }
 

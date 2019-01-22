@@ -25,8 +25,8 @@ MITK_TOOL_GUI_MACRO (, QmitkPixelManipulationToolGUI, "");
 QmitkPixelManipulationToolGUI::QmitkPixelManipulationToolGUI() : QmitkToolGUI()
 {
   QBoxLayout* mainLayout = new QVBoxLayout(this);
-  QRadioButton* radio1 = new QRadioButton("change the masked pixels by value: ", this);
-  QRadioButton* radio2 = new QRadioButton("set the masked pixels to value: ", this);
+  QRadioButton* radio1 = new QRadioButton(tr("change the masked pixels by value: "), this);
+  QRadioButton* radio2 = new QRadioButton(tr("set the masked pixels to value: "), this);
 
   radio1->setChecked(true);
 

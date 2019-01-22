@@ -35,10 +35,10 @@ QmitkInfoDialog::QmitkInfoDialog( const QList<mitk::DataNode::Pointer> &_Nodes, 
   auto   _QmitkDataStorageComboBox = new QmitkDataStorageComboBox(this, true);
   m_KeyWord = new QLineEdit;
   m_KeyWord->installEventFilter(this);
-  m_SearchButton = new QPushButton("Search (F3)", this);
+  m_SearchButton = new QPushButton(tr("Search (F3)"), this);
   m_SearchButton->installEventFilter(this);
   m_TextBrowser = new QTextBrowser(this);
-  QPushButton* _CancelButton = new QPushButton("Cancel", this);
+  QPushButton* _CancelButton = new QPushButton(tr("Cancel"), this);
 
   // SET
   this->setMinimumSize(512, 512);
@@ -92,7 +92,7 @@ void QmitkInfoDialog::OnSearchButtonClicked( bool  /*checked*/ /*= false */ )
     return;
 
   m_TextBrowser->find(keyWord);
-  m_SearchButton->setText("Search Next(F3)");
+  m_SearchButton->setText(tr("Search Next(F3)"));
 }
 
 void QmitkInfoDialog::OnCancelButtonClicked( bool  /*checked*/ /*= false */ )
@@ -122,5 +122,5 @@ void QmitkInfoDialog::KeyWordTextChanged(const QString &  /*text*/)
   QTextCursor textCursor = m_TextBrowser->textCursor();
   textCursor.setPosition(0);
   m_TextBrowser->setTextCursor(textCursor);
-  m_SearchButton->setText("Search (F3)");
+  m_SearchButton->setText(tr("Search (F3)"));
 }

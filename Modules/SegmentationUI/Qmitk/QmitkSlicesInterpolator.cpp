@@ -82,7 +82,7 @@ const std::map<QAction*, mitk::SliceNavigationController*> QmitkSlicesInterpolat
   std::map<QAction*, mitk::SliceNavigationController*> actionToSliceDimension;
   foreach(mitk::SliceNavigationController* slicer, m_ControllerToDeleteObserverTag.keys())
   {
-    actionToSliceDimension[new QAction(QString::fromStdString(slicer->GetViewDirectionAsString()),0)] = slicer;
+    actionToSliceDimension[new QAction(qApp->translate("QmitkStdMultiWidget", slicer->GetViewDirectionAsString()),0)] = slicer;
   }
 
   return actionToSliceDimension;
@@ -128,7 +128,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   m_BtnApply3D = new QPushButton(TR_CONFIRM, m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApply3D);
 
-  m_BtnSuggestPlane = new QPushButton("Suggest a plane", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnSuggestPlane = new QPushButton(tr("Suggest a plane"), m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnSuggestPlane);
 
   m_BtnReinit3DInterpolation = new QPushButton(TR_INTERPOLATION_REINIT, m_GroupBoxEnableExclusiveInterpolationMode);
@@ -980,9 +980,9 @@ void QmitkSlicesInterpolator::OnReinit3DInterpolation()
   else
   {
     QMessageBox errorInfo;
-    errorInfo.setWindowTitle("Reinitialize surface interpolation");
+    errorInfo.setWindowTitle(tr("Reinitialize surface interpolation"));
     errorInfo.setIcon(QMessageBox::Information);
-    errorInfo.setText("No contours available for the selected segmentation!");
+    errorInfo.setText(tr("No contours available for the selected segmentation!"));
     errorInfo.exec();
   }
   mitk::Surface::Pointer contours = dynamic_cast<mitk::Surface*>(m_3DContourNode->GetData());

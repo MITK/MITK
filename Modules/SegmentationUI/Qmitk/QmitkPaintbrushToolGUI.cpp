@@ -32,7 +32,7 @@ QmitkPaintbrushToolGUI::QmitkPaintbrushToolGUI()
   QBoxLayout* layout = new QHBoxLayout( this );
   this->setContentsMargins( 0, 0, 0, 0 );
 
-  QLabel* label = new QLabel( "Size ", this );
+  QLabel* label = new QLabel( tr("Size "), this );
   QFont f = label->font();
   f.setBold(false);
   label->setFont( f );

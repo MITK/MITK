@@ -787,9 +787,16 @@ void QmitkDataManagerView::SurfaceRepresentationMenuAboutToShow()
   // clear menu
   m_SurfaceRepresentation->menu()->clear();
 
+  // Only for QtLinguist
+  static const char* representationTranslations[] = {
+    QT_TRANSLATE_NOOP("PropRepresentation", "Points"),
+    QT_TRANSLATE_NOOP("PropRepresentation", "Wireframe"),
+    QT_TRANSLATE_NOOP("PropRepresentation", "Surface"),
+  };
   // create menu entries
   representationProp->EnumerateIdsContainer([this, representationProp](mitk::EnumerationProperty::IdType id, const std::string& value) {
-    QAction* tmp = m_SurfaceRepresentation->menu()->addAction(QString::fromStdString(value));
+    QAction* tmp = m_SurfaceRepresentation->menu()->addAction(qApp->translate("PropRepresentation", value.c_str()));
+    tmp->setData(QString::fromStdString(value));
     tmp->setCheckable(true);
 
     if (value == representationProp->GetValueAsString()) {
@@ -817,7 +824,7 @@ void QmitkDataManagerView::SurfaceRepresentationActionToggled( bool /*checked*/ 
   if(!senderAction)
     return;
 
-  std::string activatedItem = senderAction->text().toStdString();
+  std::string activatedItem = senderAction->data().toString().toStdString();
 
   if ( activatedItem != representationProp->GetValueAsString() )
   {
@@ -869,7 +876,8 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
   std::vector<mitk::DataNode::Pointer> selectedNodes;
 
   mitk::DataNode::Pointer node = 0;
-  QString question = tr("Do you really want to remove ");
+  QString question = tr("Do you really want to remove %1 from data storage?");
+  QString nodeList = "";
 
   for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
     ; it != indexesOfSelectedRows.end(); it++)
@@ -879,17 +887,16 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
     if ( node.IsNotNull() /*& strcmp(node->GetData()->GetNameOfClass(), "PlaneGeometryData") != 0*/ )
     {
       selectedNodes.push_back(node);
-      question.append(QString::fromStdString(node->GetName()));
-      question.append(", ");
+      nodeList.append(QString::fromStdString(node->GetName()));
+      nodeList.append(", ");
     }
   }
   // remove the last two characters = ", "
-  question = question.remove(question.size()-2, 2);
-  question.append(tr(" from data storage?"));
+  nodeList = nodeList.remove(nodeList.size()-2, 2);
 
   QMessageBox::StandardButton answerButton = QMessageBox::question( m_Parent
     , tr("DataManager")
-    , question
+    , question.arg(nodeList)
     , QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 
   if(answerButton == QMessageBox::Yes)

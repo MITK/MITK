@@ -202,45 +202,45 @@ void QmitkBasicImageProcessing::CreateQtPartControl(QWidget *parent)
   // Setup Controls
 
   this->m_Controls->cbWhat1->clear();
-  this->m_Controls->cbWhat1->insertItem(NOACTIONSELECTED, "Please select operation");
-  this->m_Controls->cbWhat1->insertItem(CATEGORY_DENOISING, "--- Denoising ---");
-  this->m_Controls->cbWhat1->insertItem(GAUSSIAN, "Gaussian");
-  this->m_Controls->cbWhat1->insertItem(MEDIAN, "Median");
-  this->m_Controls->cbWhat1->insertItem(TOTALVARIATION, "Total Variation");
-  this->m_Controls->cbWhat1->insertItem(CATEGORY_MORPHOLOGICAL, "--- Morphological ---");
-  this->m_Controls->cbWhat1->insertItem(DILATION, "Dilation");
-  this->m_Controls->cbWhat1->insertItem(EROSION, "Erosion");
-  this->m_Controls->cbWhat1->insertItem(OPENING, "Opening");
-  this->m_Controls->cbWhat1->insertItem(CLOSING, "Closing");
-  this->m_Controls->cbWhat1->insertItem(CATEGORY_EDGE_DETECTION, "--- Edge Detection ---");
-  this->m_Controls->cbWhat1->insertItem(GRADIENT, "Gradient");
-  this->m_Controls->cbWhat1->insertItem(LAPLACIAN, "Laplacian (2nd Derivative)");
-  this->m_Controls->cbWhat1->insertItem(SOBEL, "Sobel Operator");
-  this->m_Controls->cbWhat1->insertItem(CATEGORY_MISC, "--- Misc ---");
-  this->m_Controls->cbWhat1->insertItem(THRESHOLD, "Threshold");
-  this->m_Controls->cbWhat1->insertItem(INVERSION, "Image Inversion");
-  this->m_Controls->cbWhat1->insertItem(DOWNSAMPLING, "Downsampling");
-  this->m_Controls->cbWhat1->insertItem(FLIPPING, "Flipping");
-  this->m_Controls->cbWhat1->insertItem(RESAMPLING, "Resample to");
-  this->m_Controls->cbWhat1->insertItem(RESCALE, "Rescale values to interval");
-  this->m_Controls->cbWhat1->insertItem(RESCALE2, "Rescale values by scalar");
+  this->m_Controls->cbWhat1->insertItem(NOACTIONSELECTED, tr("Please select operation"));
+  this->m_Controls->cbWhat1->insertItem(CATEGORY_DENOISING, tr("--- Denoising ---"));
+  this->m_Controls->cbWhat1->insertItem(GAUSSIAN, tr("Gaussian"));
+  this->m_Controls->cbWhat1->insertItem(MEDIAN, tr("Median"));
+  this->m_Controls->cbWhat1->insertItem(TOTALVARIATION, tr("Total Variation"));
+  this->m_Controls->cbWhat1->insertItem(CATEGORY_MORPHOLOGICAL, tr("--- Morphological ---"));
+  this->m_Controls->cbWhat1->insertItem(DILATION, tr("Dilation"));
+  this->m_Controls->cbWhat1->insertItem(EROSION, tr("Erosion"));
+  this->m_Controls->cbWhat1->insertItem(OPENING, tr("Opening"));
+  this->m_Controls->cbWhat1->insertItem(CLOSING, tr("Closing"));
+  this->m_Controls->cbWhat1->insertItem(CATEGORY_EDGE_DETECTION, tr("--- Edge Detection ---"));
+  this->m_Controls->cbWhat1->insertItem(GRADIENT, tr("Gradient"));
+  this->m_Controls->cbWhat1->insertItem(LAPLACIAN, tr("Laplacian (2nd Derivative)"));
+  this->m_Controls->cbWhat1->insertItem(SOBEL, tr("Sobel Operator"));
+  this->m_Controls->cbWhat1->insertItem(CATEGORY_MISC, tr("--- Misc ---"));
+  this->m_Controls->cbWhat1->insertItem(THRESHOLD, tr("Threshold"));
+  this->m_Controls->cbWhat1->insertItem(INVERSION, tr("Image Inversion"));
+  this->m_Controls->cbWhat1->insertItem(DOWNSAMPLING, tr("Downsampling"));
+  this->m_Controls->cbWhat1->insertItem(FLIPPING, tr("Flipping"));
+  this->m_Controls->cbWhat1->insertItem(RESAMPLING, tr("Resample to"));
+  this->m_Controls->cbWhat1->insertItem(RESCALE, tr("Rescale values to interval"));
+  this->m_Controls->cbWhat1->insertItem(RESCALE2, tr("Rescale values by scalar"));
 
   this->m_Controls->cbWhat2->clear();
-  this->m_Controls->cbWhat2->insertItem(TWOIMAGESNOACTIONSELECTED, "Please select on operation");
-  this->m_Controls->cbWhat2->insertItem(CATEGORY_ARITHMETIC, "--- Arithmetric operations ---");
-  this->m_Controls->cbWhat2->insertItem(ADD, "Add to Image 1:");
-  this->m_Controls->cbWhat2->insertItem(SUBTRACT, "Subtract from Image 1:");
-  this->m_Controls->cbWhat2->insertItem(MULTIPLY, "Multiply with Image 1:");
-  this->m_Controls->cbWhat2->insertItem(RESAMPLE_TO, "Resample Image 1 to fit geometry:");
-  this->m_Controls->cbWhat2->insertItem(DIVIDE, "Divide Image 1 by:");
-  this->m_Controls->cbWhat2->insertItem(CATEGORY_BOOLEAN, "--- Boolean operations ---");
-  this->m_Controls->cbWhat2->insertItem(AND, "AND");
-  this->m_Controls->cbWhat2->insertItem(OR, "OR");
-  this->m_Controls->cbWhat2->insertItem(XOR, "XOR");
+  this->m_Controls->cbWhat2->insertItem(TWOIMAGESNOACTIONSELECTED, tr("Please select on operation"));
+  this->m_Controls->cbWhat2->insertItem(CATEGORY_ARITHMETIC, tr("--- Arithmetric operations ---"));
+  this->m_Controls->cbWhat2->insertItem(ADD, tr("Add to Image 1:"));
+  this->m_Controls->cbWhat2->insertItem(SUBTRACT, tr("Subtract from Image 1:"));
+  this->m_Controls->cbWhat2->insertItem(MULTIPLY, tr("Multiply with Image 1:"));
+  this->m_Controls->cbWhat2->insertItem(RESAMPLE_TO, tr("Resample Image 1 to fit geometry:"));
+  this->m_Controls->cbWhat2->insertItem(DIVIDE, tr("Divide Image 1 by:"));
+  this->m_Controls->cbWhat2->insertItem(CATEGORY_BOOLEAN, tr("--- Boolean operations ---"));
+  this->m_Controls->cbWhat2->insertItem(AND, tr("AND"));
+  this->m_Controls->cbWhat2->insertItem(OR, tr("OR"));
+  this->m_Controls->cbWhat2->insertItem(XOR, tr("XOR"));
 
   this->m_Controls->cbParam4->clear();
-  this->m_Controls->cbParam4->insertItem(LINEAR, "Linear");
-  this->m_Controls->cbParam4->insertItem(NEAREST, "Nearest neighbor");
+  this->m_Controls->cbParam4->insertItem(LINEAR, tr("Linear"));
+  this->m_Controls->cbParam4->insertItem(NEAREST, tr("Nearest neighbor"));
 
   m_Controls->dsbParam1->hide();
   m_Controls->dsbParam2->hide();
@@ -440,7 +440,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->sbParam1->hide();
       m_Controls->dsbParam1->show();
       m_Controls->dsbParam1->setEnabled(true);
-      text1 = "&Variance:";
+      text1 = tr("Variance:");
       m_Controls->tlParam2->hide();
       m_Controls->sbParam2->hide();
 
@@ -536,7 +536,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->sbParam1->hide();
       m_Controls->dsbParam1->show();
       m_Controls->dsbParam1->setEnabled(true);
-      text1 = "Sigma of Gaussian Kernel:\n(in Image Spacing Units)";
+      text1 = tr("Sigma of Gaussian Kernel:\n(in Image Spacing Units)");
       m_Controls->tlParam2->hide();
       m_Controls->sbParam2->hide();
 
@@ -660,8 +660,8 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->tlParam2->show();
       m_Controls->dsbParam2->setEnabled(true);
       m_Controls->tlParam2->setEnabled(true);
-      text1 = "Output minimum:";
-      text2 = "Output maximum:";
+      text1 = tr("Output minimum:");
+      text2 = tr("Output maximum:");
       break;
     }
   case 21:
@@ -671,7 +671,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->tlParam1->show();
       m_Controls->dsbParam1->setEnabled(true);
       m_Controls->tlParam1->setEnabled(true);
-      text1 = "Scaling value:";
+      text1 = tr("Scaling value:");
       break;
   }
 

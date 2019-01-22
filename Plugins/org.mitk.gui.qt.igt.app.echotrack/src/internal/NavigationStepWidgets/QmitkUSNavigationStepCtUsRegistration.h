@@ -123,8 +123,11 @@ public:
    */
   virtual FilterVector GetFilter();
 
+  void OnCalculateTRE(mitk::Point3D centroidOfTargetInUSImage);
+
 signals:
   void ActualizeCtToUsRegistrationWidget();
+  void GetCursorPosition();
 
 protected:
   virtual void OnSetCombinedModality();
@@ -142,7 +145,6 @@ protected:
   double GetCharacteristicDistanceBWithUpperMargin();
   double GetMinimalFiducialConfigurationDistance();
   void CreateMarkerModelCoordinateSystemPointSet();
-
 
   //Methods for Ground-Truth-Fiducial-Localization-Protocol-Evaluation
   void InitializePointsToTransformForGroundTruthProtocol();
@@ -188,6 +190,10 @@ protected slots:
   void OnVisualizeCTtoUSregistration();
   void OnFreeze();
   void OnFilterGroundTruthImage();
+  void OnActualizeSegmentationSurfacePointSetData();
+  void OnGetCursorPosition();
+
+  void OnCalculateCenter();
 
   //Methods for Ground-Truth-Fiducial-Localization-Protocol-Evaluation
   void OnAddCtImageClicked();
@@ -242,6 +248,7 @@ private:
   mitk::Vector3D m_ImageSpacing;
 
   bool m_FreezeCombinedModality;
+  mitk::Point3D m_CentroidOfTargetInUSImage;
 
 };
 

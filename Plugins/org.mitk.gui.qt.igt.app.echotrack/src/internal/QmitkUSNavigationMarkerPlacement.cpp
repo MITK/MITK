@@ -197,6 +197,7 @@ void QmitkUSNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
     this->GetDataStorage()->Add(m_BaseNode);
   }
 
+  connect(ui->m_CtToUsRegistrationWidget, SIGNAL(GetCursorPosition()), this, SLOT(OnGetCursorPosition()));
   connect(ui->m_CtToUsRegistrationWidget, SIGNAL(ActualizeCtToUsRegistrationWidget()), this, SLOT(OnActualizeCtToUsRegistrationWidget()));
   connect(ui->m_initializeCtToUsRegistration, SIGNAL(clicked()), this, SLOT(OnInitializeCtToUsRegistration()));
   connect(ui->m_initializeTargetMarking, SIGNAL(clicked()), this, SLOT(OnInitializeTargetMarking()));
@@ -225,6 +226,12 @@ void QmitkUSNavigationMarkerPlacement::ReInitializeSettingsNodesAndImageStream()
   // Having set the m_CombinedModality reactivate the update timer again
   m_UpdateTimer->start(50); // every 50 Milliseconds = 20 Frames/Second
   m_UpdateTimer->blockSignals(false);
+}
+
+void QmitkUSNavigationMarkerPlacement::OnGetCursorPosition()
+{
+  mitk::Point3D centroid = this->GetRenderWindowPart()->GetSelectedPosition();
+  ui->m_CtToUsRegistrationWidget->OnCalculateTRE(centroid);
 }
 
 void QmitkUSNavigationMarkerPlacement::OnActualizeCtToUsRegistrationWidget()

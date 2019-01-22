@@ -1999,6 +1999,12 @@ void QmitkUSNavigationStepCtUsRegistration::CreateQtPartControl(QWidget *parent)
     this, SLOT(OnRemoveCtImageClicked()));
   connect(ui->evaluateProtocolPushButton, SIGNAL(clicked()),
     this, SLOT(OnEvaluateGroundTruthFiducialLocalizationProtocol()));
+  connect(ui->actualizeSegmentationSurfacePSetDataPushButton, SIGNAL(clicked()),
+    this, SLOT(OnActualizeSegmentationSurfacePointSetData()));
+  connect(ui->calculateTREPushButton, SIGNAL(clicked()),
+    this, SLOT(OnGetCursorPosition()));
+  connect(ui->calculateCenterPushButton, SIGNAL(clicked()),
+    this, SLOT(OnCalculateCenter()));
 }
 
 void QmitkUSNavigationStepCtUsRegistration::OnFloatingImageComboBoxSelectionChanged(const mitk::DataNode* node)
@@ -2327,6 +2333,93 @@ void QmitkUSNavigationStepCtUsRegistration::OnFilterGroundTruthImage()
 
   this->ShowGroundTruthMarkerEdges();
 
+}
+
+void QmitkUSNavigationStepCtUsRegistration::OnActualizeSegmentationSurfacePointSetData()
+{
+  mitk::DataNode* segmentationNode = ui->segmentationComboBox->GetSelectedNode();
+  if (segmentationNode == nullptr)
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Cannot actualize segmentation + surface + pointset data. There is no segmentation selected.");
+    msgBox.exec();
+    return;
+  }
+
+  mitk::DataNode* surfaceNode = ui->selectedSurfaceComboBox->GetSelectedNode();
+  if (surfaceNode == nullptr)
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Cannot actualize segmentation + surface + pointset data. There is no surface selected.");
+    msgBox.exec();
+    return;
+  }
+
+  mitk::DataNode* pointSetNode = ui->pointSetComboBox->GetSelectedNode();
+  if (pointSetNode == nullptr)
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Cannot actualize segmentation + surface + pointset data. There is no pointSet selected.");
+    msgBox.exec();
+    return;
+  }
+
+  m_FloatingImageToUltrasoundRegistrationFilter->SetPointSet(pointSetNode);
+  m_FloatingImageToUltrasoundRegistrationFilter->SetSegmentation(segmentationNode, m_FloatingImage);
+  m_FloatingImageToUltrasoundRegistrationFilter->SetSurface(surfaceNode);
+}
+
+void QmitkUSNavigationStepCtUsRegistration::OnGetCursorPosition()
+{
+  emit GetCursorPosition();
+}
+
+void QmitkUSNavigationStepCtUsRegistration::OnCalculateTRE(mitk::Point3D centroidOfTargetInUSImage)
+{
+  mitk::DataNode::Pointer pointSetNode = ui->pointSetComboBox->GetSelectedNode();
+  mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(pointSetNode->GetData());
+  if (pointSet.IsNull())
+  {
+    ui->distanceTREValue->setText(QString("Unknown"));
+    return;
+  }
+  double distance = pointSet->GetPoint(0).EuclideanDistanceTo(centroidOfTargetInUSImage);
+  ui->distanceTREValue->setText(QString("%1").arg(distance));
+}
+
+void QmitkUSNavigationStepCtUsRegistration::OnCalculateCenter()
+{
+  mitk::DataNode::Pointer node = ui->segmentationComboBox->GetSelectedNode();
+  mitk::LabelSetImage::Pointer image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+  if (image.IsNull())
+  {
+    MITK_WARN << "Cannot CalculateCenter - the segmentation cannot be converted to mitk::Image";
+    return;
+  }
+
+  ImageType::Pointer itkImage = ImageType::New();
+  mitk::CastToItkImage(image, itkImage);
+
+  //Initialize binary image to shape label map filter
+  BinaryImageToShapeLabelMapFilterType::Pointer shapeLabelMapFilter = BinaryImageToShapeLabelMapFilterType::New();
+  shapeLabelMapFilter->SetInputForegroundValue(1);
+
+  shapeLabelMapFilter->SetInput(itkImage);
+  shapeLabelMapFilter->Update();
+
+  BinaryImageToShapeLabelMapFilterType::OutputImageType::Pointer labelMap =
+    shapeLabelMapFilter->GetOutput();
+  for (int i = labelMap->GetNumberOfLabelObjects() - 1; i >= 0; --i)
+  {
+    // Get the ith region
+    BinaryImageToShapeLabelMapFilterType::OutputImageType::LabelObjectType* labelObject = labelMap->GetNthLabelObject(i);
+
+    mitk::Vector3D centroid;
+    centroid[0] = labelObject->GetCentroid()[0];
+    centroid[1] = labelObject->GetCentroid()[1];
+    centroid[2] = labelObject->GetCentroid()[2];
+    MITK_INFO << "Centroid of segmentation = " << centroid;
+  }
 }
 
 void QmitkUSNavigationStepCtUsRegistration::OnAddCtImageClicked()

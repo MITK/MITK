@@ -66,6 +66,7 @@ class QmitkUSNavigationMarkerPlacement : public QmitkAbstractView
 
     protected slots:
 
+  void OnGetCursorPosition();
   void OnActualizeCtToUsRegistrationWidget();
   void OnInitializeCtToUsRegistration();
   void OnInitializeTargetMarking();

@@ -24,8 +24,8 @@ if(MITK_USE_Poco)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/poco-1.6.1-all.tar.gz
-      URL_MD5 05961d10195d0f760b707752e88938e9
+      URL https://github.com/pocoproject/poco/archive/poco-1.9.0-release.tar.gz
+      URL_MD5 e6b30ba5471957dd6cdfe50ce5d09969
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
@@ -36,7 +36,7 @@ if(MITK_USE_Poco)
         -DENABLE_PDF:BOOL=OFF
         -DENABLE_UTIL:BOOL=ON
         -DENABLE_NET:BOOL=ON
-        -DENABLE_NETSSL:BOOL=OFF
+        -DENABLE_NETSSL:BOOL=ON
         -DENABLE_NETSSL_WIN:BOOL=OFF
         -DENABLE_CRYPTO:BOOL=ON
         -DENABLE_DATA:BOOL=OFF

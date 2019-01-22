@@ -19,16 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_mitk_gui_qt_semanticrelations_Export.h>
 
-// mitk core
-#include <mitkDataNode.h>
-#include <mitkDataStorage.h>
-#include <mitkWeakPointer.h>
-
 // semantic relations module
 #include <mitkSemanticRelations.h>
 
-// berry
-#include <berryIWorkbenchPartSite.h>
+// mitk gui qt application plugin
+#include <QmitkAbstractDataNodeAction.h>
 
 // qt
 #include <QAction.h>
@@ -41,7 +36,7 @@ namespace AddToSemanticRelationsAction
   void AddSegmentation(mitk::SemanticRelations* semanticRelations, const mitk::DataStorage* dataStorage, const mitk::DataNode* segmentation);
 }
 
-class MITK_GUI_SEMANTICRELATIONS_EXPORT QmitkDataNodeAddToSemanticRelationsAction : public QAction
+class MITK_GUI_SEMANTICRELATIONS_EXPORT QmitkDataNodeAddToSemanticRelationsAction : public QAction, public QmitkAbstractDataNodeAction
 {
   Q_OBJECT
 
@@ -60,14 +55,10 @@ private Q_SLOTS:
 
 protected:
 
-  void InitializeAction();
+  virtual void InitializeAction() override;
 
-  QList<mitk::DataNode::Pointer> GetSelectedNodes();
-  mitk::DataNode::Pointer GetSelectedNode();
-
-  berry::IWorkbenchPartSite::WeakPtr m_WorkbenchPartSite;
-  mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
+
 };
 
 #endif // QMITKDATANODEADDTOSEMANTICRELATIONSACTION_H

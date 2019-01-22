@@ -25,10 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk gui common plugin
 #include <mitkDataNodeSelection.h>
 
-// berry
-#include <berryISelectionService.h>
-#include <berryIWorkbenchPage.h>
-
 // qt
 #include <QMessageBox>
 
@@ -84,7 +80,7 @@ namespace UnlinkFromLesionAction
 
 QmitkDataNodeUnlinkFromLesionAction::QmitkDataNodeUnlinkFromLesionAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
   : QAction(parent)
-  , m_WorkbenchPartSite(workbenchPartSite)
+  , QmitkAbstractDataNodeAction(workbenchPartSite)
 {
   setText(tr("Unlink from lesion"));
   InitializeAction();
@@ -92,7 +88,7 @@ QmitkDataNodeUnlinkFromLesionAction::QmitkDataNodeUnlinkFromLesionAction(QWidget
 
 QmitkDataNodeUnlinkFromLesionAction::QmitkDataNodeUnlinkFromLesionAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
   : QAction(parent)
-  , m_WorkbenchPartSite(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
+  , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
 {
   setText(tr("Unlink from lesion"));
   InitializeAction();
@@ -127,42 +123,4 @@ void QmitkDataNodeUnlinkFromLesionAction::OnActionTriggered(bool checked)
 
   auto dataNode = GetSelectedNode();
   UnlinkFromLesionAction::Run(m_SemanticRelations.get(), dataNode);
-}
-
-QList<mitk::DataNode::Pointer> QmitkDataNodeUnlinkFromLesionAction::GetSelectedNodes()
-{
-  QList<mitk::DataNode::Pointer> selectedNodes;
-  if (m_WorkbenchPartSite.Expired())
-  {
-    return selectedNodes;
-  }
-
-  berry::ISelection::ConstPointer selection = m_WorkbenchPartSite.Lock()->GetWorkbenchWindow()->GetSelectionService()->GetSelection();
-  mitk::DataNodeSelection::ConstPointer currentSelection = selection.Cast<const mitk::DataNodeSelection>();
-
-  if (currentSelection.IsNull() || currentSelection->IsEmpty())
-  {
-    return selectedNodes;
-  }
-
-  selectedNodes = QList<mitk::DataNode::Pointer>::fromStdList(currentSelection->GetSelectedDataNodes());
-  return selectedNodes;
-}
-
-mitk::DataNode::Pointer QmitkDataNodeUnlinkFromLesionAction::GetSelectedNode()
-{
-  QList<mitk::DataNode::Pointer> selectedNodes = GetSelectedNodes();
-  if (selectedNodes.empty())
-  {
-    return nullptr;
-  }
-
-  // no batch action; should only be called with a single node
-  mitk::DataNode::Pointer dataNode = selectedNodes.front();
-  if (nullptr == dataNode)
-  {
-    return nullptr;
-  }
-
-  return dataNode;
 }

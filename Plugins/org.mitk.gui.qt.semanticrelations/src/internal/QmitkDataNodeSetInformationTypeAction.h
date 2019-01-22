@@ -14,10 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKDATANODEUNLINKFROMLESIONACTION_H
-#define QMITKDATANODEUNLINKFROMLESIONACTION_H
-
-#include <org_mitk_gui_qt_semanticrelations_Export.h>
+#ifndef QMITKDATANODESETINFORMATIONTYPEACTION_H
+#define QMITKDATANODESETINFORMATIONTYPEACTION_H
 
 // semantic relations module
 #include <mitkSemanticRelations.h>
@@ -28,23 +26,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QAction.h>
 
-namespace UnlinkFromLesionAction
-{
-  MITK_GUI_SEMANTICRELATIONS_EXPORT void Run(mitk::SemanticRelations* semanticRelations, const mitk::DataStorage* dataStorage, const mitk::DataNode* dataNode);
-
-  void UnlinkSegmentation(mitk::SemanticRelations* semanticRelations, const mitk::DataNode* segmentation);
-}
-
-class MITK_GUI_SEMANTICRELATIONS_EXPORT QmitkDataNodeUnlinkFromLesionAction : public QAction, public QmitkAbstractDataNodeAction
+class QmitkDataNodeSetInformationTypeAction : public QAction, public QmitkAbstractDataNodeAction
 {
   Q_OBJECT
 
 public:
 
-  QmitkDataNodeUnlinkFromLesionAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
-  QmitkDataNodeUnlinkFromLesionAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
+  QmitkDataNodeSetInformationTypeAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
+  QmitkDataNodeSetInformationTypeAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
-  virtual ~QmitkDataNodeUnlinkFromLesionAction() override;
+  virtual ~QmitkDataNodeSetInformationTypeAction() override;
 
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
@@ -56,8 +47,9 @@ protected:
 
   virtual void InitializeAction() override;
 
+  QWidget* m_Parent;
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
 
 };
 
-#endif // QMITKDATANODEUNLINKFROMLESIONACTION_H
+#endif // QMITKDATANODESETINFORMATIONTYPEACTION_H

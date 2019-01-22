@@ -14,24 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKDATANODECONTROLPOINTEACTION_H
-#define QMITKDATANODECONTROLPOINTEACTION_H
-
-// mitk core
-#include <mitkDataNode.h>
-#include <mitkDataStorage.h>
-#include <mitkWeakPointer.h>
+#ifndef QMITKDATANODESETCONTROLPOINTEACTION_H
+#define QMITKDATANODESETCONTROLPOINTEACTION_H
 
 // semantic relations module
 #include <mitkSemanticRelations.h>
 
-// berry
-#include <berryIWorkbenchPartSite.h>
+// mitk gui qt application plugin
+#include <QmitkAbstractDataNodeAction.h>
 
 // qt
 #include <QAction.h>
 
-class QmitkDataNodeSetControlPointAction : public QAction
+class QmitkDataNodeSetControlPointAction : public QAction, public QmitkAbstractDataNodeAction
 {
   Q_OBJECT
 
@@ -50,15 +45,11 @@ private Q_SLOTS:
 
 protected:
 
-  void InitializeAction();
+  virtual void InitializeAction() override;
 
-  QList<mitk::DataNode::Pointer> GetSelectedNodes();
-  mitk::DataNode::Pointer GetSelectedNode();
-
-  QWidget* m_Parent;
-  berry::IWorkbenchPartSite::WeakPtr m_WorkbenchPartSite;
-  mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+  QWidget *m_Parent;
   std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
+
 };
 
-#endif // QMITKDATANODECONTROLPOINTEACTION_H
+#endif // QMITKDATANODESETCONTROLPOINTEACTION_H

@@ -8,6 +8,7 @@ set(SRC_CPP_FILES
   QmitkDataNodeGlobalReinitAction.cpp
   QmitkDataNodeHideAllAction.cpp
   QmitkDataNodeOpacityAction.cpp
+  QmitkDataNodeOpenInAction.cpp
   QmitkDataNodeReinitAction.cpp
   QmitkDataNodeRemoveAction.cpp
   QmitkDataNodeShowDetailsAction.cpp
@@ -43,6 +44,7 @@ set(MOC_H_FILES
   src/QmitkDataNodeContextMenu.h
   src/QmitkDataNodeHideAllAction.h
   src/QmitkDataNodeOpacityAction.h
+  src/QmitkDataNodeOpenInAction.h
   src/QmitkDataNodeReinitAction.h
   src/QmitkDataNodeRemoveAction.h
   src/QmitkDataNodeShowDetailsAction.h

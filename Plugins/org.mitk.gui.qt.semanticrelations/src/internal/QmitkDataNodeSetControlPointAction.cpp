@@ -28,16 +28,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk gui common plugin
 #include <mitkDataNodeSelection.h>
 
-// berry
-#include <berryISelectionService.h>
-#include <berryIWorkbenchPage.h>
-
 // qt
 #include <QInputDialog>
 
 QmitkDataNodeSetControlPointAction::QmitkDataNodeSetControlPointAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
   : QAction(parent)
-  , m_WorkbenchPartSite(workbenchPartSite)
+  , QmitkAbstractDataNodeAction(workbenchPartSite)
 {
   setText(tr("Set control point"));
   m_Parent = parent;
@@ -46,7 +42,7 @@ QmitkDataNodeSetControlPointAction::QmitkDataNodeSetControlPointAction(QWidget* 
 
 QmitkDataNodeSetControlPointAction::QmitkDataNodeSetControlPointAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
   : QAction(parent)
-  , m_WorkbenchPartSite(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
+  , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
 {
   setText(tr("Set control point"));
   m_Parent = parent;
@@ -112,42 +108,4 @@ void QmitkDataNodeSetControlPointAction::OnActionTriggered(bool checked)
   {
     return;
   }
-}
-
-QList<mitk::DataNode::Pointer> QmitkDataNodeSetControlPointAction::GetSelectedNodes()
-{
-  QList<mitk::DataNode::Pointer> selectedNodes;
-  if (m_WorkbenchPartSite.Expired())
-  {
-    return selectedNodes;
-  }
-
-  berry::ISelection::ConstPointer selection = m_WorkbenchPartSite.Lock()->GetWorkbenchWindow()->GetSelectionService()->GetSelection();
-  mitk::DataNodeSelection::ConstPointer currentSelection = selection.Cast<const mitk::DataNodeSelection>();
-
-  if (currentSelection.IsNull() || currentSelection->IsEmpty())
-  {
-    return selectedNodes;
-  }
-
-  selectedNodes = QList<mitk::DataNode::Pointer>::fromStdList(currentSelection->GetSelectedDataNodes());
-  return selectedNodes;
-}
-
-mitk::DataNode::Pointer QmitkDataNodeSetControlPointAction::GetSelectedNode()
-{
-  QList<mitk::DataNode::Pointer> selectedNodes = GetSelectedNodes();
-  if (selectedNodes.empty())
-  {
-    return nullptr;
-  }
-
-  // no batch action; should only be called with a single node
-  mitk::DataNode::Pointer dataNode = selectedNodes.front();
-  if (nullptr == dataNode)
-  {
-    return nullptr;
-  }
-
-  return dataNode;
 }

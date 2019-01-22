@@ -19,10 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations plugin
 #include "QmitkDataNodeSetControlPointAction.h"
-#include "QmitkDataNodeInformationTypeAction.h"
+#include "QmitkDataNodeSetInformationTypeAction.h"
 #include "QmitkDataNodeUnlinkFromLesionAction.h"
 #include "QmitkDataNodeRemoveFromSemanticRelationsAction.h"
-#include "QmitkDataNodeOpenInAction.h"
 
 // mitk core
 #include <mitkDataStorage.h>
@@ -30,6 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk render window manager module
 #include <mitkRenderWindowLayerUtilities.h>
+
+// mitk gui qt application plugin
+#include <QmitkDataNodeOpenInAction.h>
 
 // blueberry ui qt plugin
 #include <berryIWorkbenchPartSite.h>
@@ -63,7 +65,7 @@ private:
   RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;
 
   QmitkDataNodeSetControlPointAction* m_ControlPointAction;
-  QmitkDataNodeInformationTypeAction* m_InformationTypeAction;
+  QmitkDataNodeSetInformationTypeAction* m_InformationTypeAction;
   QmitkDataNodeUnlinkFromLesionAction* m_UnlinkFromLesionAction;
   QmitkDataNodeRemoveFromSemanticRelationsAction* m_RemoveFromSemanticRelationsAction;
   QmitkDataNodeOpenInAction* m_OpenInAction;

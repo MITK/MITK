@@ -19,10 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkSemanticRelationsContextMenu::QmitkSemanticRelationsContextMenu(berry::IWorkbenchPartSite::Pointer workbenchPartSite, QWidget* parent)
   : QMenu(parent)
+  , m_Parent(parent)
+  , m_WorkbenchPartSite(workbenchPartSite)
 {
-  m_WorkbenchPartSite = workbenchPartSite;
-  m_Parent = parent;
-
   InitDefaultActions();
 }
 
@@ -64,7 +63,7 @@ void QmitkSemanticRelationsContextMenu::InitDefaultActions()
   m_ControlPointAction = new QmitkDataNodeSetControlPointAction(m_Parent, m_WorkbenchPartSite.Lock());
   addAction(m_ControlPointAction);
 
-  m_InformationTypeAction = new QmitkDataNodeInformationTypeAction(m_Parent, m_WorkbenchPartSite.Lock());
+  m_InformationTypeAction = new QmitkDataNodeSetInformationTypeAction(m_Parent, m_WorkbenchPartSite.Lock());
   addAction(m_InformationTypeAction);
 
   m_UnlinkFromLesionAction = new QmitkDataNodeUnlinkFromLesionAction(m_Parent, m_WorkbenchPartSite.Lock());

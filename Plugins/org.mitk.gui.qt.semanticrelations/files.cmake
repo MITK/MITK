@@ -1,11 +1,10 @@
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkDataNodeAddToSemanticRelationsAction.cpp
-  QmitkDataNodeInformationTypeAction.cpp
   QmitkDataNodeRemoveFromSemanticRelationsAction.cpp
   QmitkDataNodeUnlinkFromLesionAction.cpp
-  QmitkDataNodeOpenInAction.cpp
   QmitkDataNodeSetControlPointAction.cpp
+  QmitkDataNodeSetInformationTypeAction.cpp
   QmitkLesionInfoWidget.cpp
   QmitkSemanticRelationsContextMenu.cpp
   QmitkSemanticRelationsNodeSelectionDialog.cpp
@@ -20,11 +19,10 @@ set(UI_FILES
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   src/internal/QmitkDataNodeAddToSemanticRelationsAction.h
-  src/internal/QmitkDataNodeInformationTypeAction.h
   src/internal/QmitkDataNodeRemoveFromSemanticRelationsAction.h
   src/internal/QmitkDataNodeUnlinkFromLesionAction.h
-  src/internal/QmitkDataNodeOpenInAction.h
   src/internal/QmitkDataNodeSetControlPointAction.h
+  src/internal/QmitkDataNodeSetInformationTypeAction.h
   src/internal/QmitkLesionInfoWidget.h
   src/internal/QmitkSemanticRelationsContextMenu.h
   src/internal/QmitkSemanticRelationsNodeSelectionDialog.h

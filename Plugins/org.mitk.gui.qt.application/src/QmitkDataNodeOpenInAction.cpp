@@ -27,16 +27,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qt
 #include <QMessageBox>
 
-// berry
-#include <berryISelectionService.h>
-#include <berryIWorkbenchPage.h>
-
 // qt
 #include <QMenu>
 
 QmitkDataNodeOpenInAction::QmitkDataNodeOpenInAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
   : QAction(parent)
-  , m_WorkbenchPartSite(workbenchPartSite)
+  , QmitkAbstractDataNodeAction(workbenchPartSite)
 {
   setText(tr("Open in"));
   InitializeAction();
@@ -44,7 +40,7 @@ QmitkDataNodeOpenInAction::QmitkDataNodeOpenInAction(QWidget* parent, berry::IWo
 
 QmitkDataNodeOpenInAction::QmitkDataNodeOpenInAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
   : QAction(parent)
-  , m_WorkbenchPartSite(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
+  , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
 {
   setText(tr("Open in"));
   InitializeAction();
@@ -55,7 +51,7 @@ QmitkDataNodeOpenInAction::~QmitkDataNodeOpenInAction()
   // nothing here
 }
 
-void QmitkDataNodeOpenInAction::SetControlledRenderer(RenderWindowLayerUtilities::RendererVector controlledRenderer)
+void QmitkDataNodeOpenInAction::SetControlledRenderer(RendererVector controlledRenderer)
 {
   if (m_ControlledRenderer != controlledRenderer)
   {
@@ -72,21 +68,6 @@ void QmitkDataNodeOpenInAction::InitializeAction()
   connect(menu(), &QMenu::aboutToShow, this, &QmitkDataNodeOpenInAction::OnMenuAboutToShow);
 
   SetControlledRenderer();
-}
-
-void QmitkDataNodeOpenInAction::SetControlledRenderer()
-{
-  const mitk::RenderingManager::RenderWindowVector allRegisteredRenderWindows = mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
-  mitk::BaseRenderer* baseRenderer = nullptr;
-  m_ControlledRenderer.clear();
-  for (const auto &renderWindow : allRegisteredRenderWindows)
-  {
-    baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow);
-    if (nullptr != baseRenderer)
-    {
-      m_ControlledRenderer.push_back(baseRenderer);
-    }
-  }
 }
 
 void QmitkDataNodeOpenInAction::OnMenuAboutToShow()
@@ -131,40 +112,18 @@ void QmitkDataNodeOpenInAction::OnActionTriggered(bool checked)
   mitk::RenderingManager::GetInstance()->InitializeView(renderer->GetRenderWindow(), image->GetTimeGeometry());
 }
 
-QList<mitk::DataNode::Pointer> QmitkDataNodeOpenInAction::GetSelectedNodes()
+void QmitkDataNodeOpenInAction::SetControlledRenderer()
 {
-  QList<mitk::DataNode::Pointer> selectedNodes;
-  if (m_WorkbenchPartSite.Expired())
+  const mitk::RenderingManager::RenderWindowVector allRegisteredRenderWindows =
+    mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
+  mitk::BaseRenderer *baseRenderer = nullptr;
+  m_ControlledRenderer.clear();
+  for (const auto &renderWindow : allRegisteredRenderWindows)
   {
-    return selectedNodes;
+    baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow);
+    if (nullptr != baseRenderer)
+    {
+      m_ControlledRenderer.push_back(baseRenderer);
+    }
   }
-
-  berry::ISelection::ConstPointer selection = m_WorkbenchPartSite.Lock()->GetWorkbenchWindow()->GetSelectionService()->GetSelection();
-  mitk::DataNodeSelection::ConstPointer currentSelection = selection.Cast<const mitk::DataNodeSelection>();
-
-  if (currentSelection.IsNull() || currentSelection->IsEmpty())
-  {
-    return selectedNodes;
-  }
-
-  selectedNodes = QList<mitk::DataNode::Pointer>::fromStdList(currentSelection->GetSelectedDataNodes());
-  return selectedNodes;
-}
-
-mitk::DataNode::Pointer QmitkDataNodeOpenInAction::GetSelectedNode()
-{
-  QList<mitk::DataNode::Pointer> selectedNodes = GetSelectedNodes();
-  if (selectedNodes.empty())
-  {
-    return nullptr;
-  }
-
-  // no batch action; should only be called with a single node
-  mitk::DataNode::Pointer dataNode = selectedNodes.front();
-  if (nullptr == dataNode)
-  {
-    return nullptr;
-  }
-
-  return dataNode;
 }

@@ -17,31 +17,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKDATANODEOPENINACTION_H
 #define QMITKDATANODEOPENINACTION_H
 
+#include <org_mitk_gui_qt_application_Export.h>
+
+#include "QmitkAbstractDataNodeAction.h"
+
 // mitk core
-#include <mitkDataNode.h>
-#include <mitkWeakPointer.h>
-
-// mitk render window manager module
-#include <mitkRenderWindowLayerUtilities.h>
-
-// berry
-#include <berryIWorkbenchPartSite.h>
+#include <mitkBaseRenderer.h>
 
 // qt
-#include <QAction.h>
+#include <QAction>
 
-class QmitkDataNodeOpenInAction : public QAction
+class MITK_QT_APP QmitkDataNodeOpenInAction : public QAction, public QmitkAbstractDataNodeAction
 {
   Q_OBJECT
 
 public:
+
+  typedef std::vector<mitk::BaseRenderer::ConstPointer> RendererVector;
 
   QmitkDataNodeOpenInAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite);
   QmitkDataNodeOpenInAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite);
 
   virtual ~QmitkDataNodeOpenInAction() override;
 
-  void SetControlledRenderer(RenderWindowLayerUtilities::RendererVector controlledRenderer);
+  void SetControlledRenderer(RendererVector controlledRenderer);
 
 private Q_SLOTS:
 
@@ -50,15 +49,11 @@ private Q_SLOTS:
 
 protected:
 
-  void InitializeAction();
+  virtual void InitializeAction() override;
+
   void SetControlledRenderer();
 
-  QList<mitk::DataNode::Pointer> GetSelectedNodes();
-  mitk::DataNode::Pointer GetSelectedNode();
-
-  berry::IWorkbenchPartSite::WeakPtr m_WorkbenchPartSite;
-
-  RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;
+  RendererVector m_ControlledRenderer;
 
 };
 

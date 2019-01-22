@@ -14,34 +14,18 @@
 
 void MitkCppRestSdkActivator::Load(us::ModuleContext *context)
 {
-  m_RESTClientMicroService.reset(new mitk::RESTClientMicroService);
-  context->RegisterService<mitk::IRESTClient>(m_RESTClientMicroService.get());
+  m_RESTManager.reset(new mitk::RESTManager);
+  context->RegisterService<mitk::IRESTManager>(m_RESTManager.get());
 
-  m_RESTServerMicroService.reset(new mitk::RESTServerMicroService);
-  context->RegisterService<mitk::IRESTServer>(m_RESTServerMicroService.get());
-
-
-  us::ServiceReference<mitk::IRESTClient> refClient = context->GetServiceReference<mitk::IRESTClient>();
-  if (refClient)
+  us::ServiceReference<mitk::IRESTManager> refManager = context->GetServiceReference<mitk::IRESTManager>();
+  if (refManager)
   {
-    auto serviceClient = context->GetService(refClient);
+    auto serviceClient = context->GetService(refManager);
     if (serviceClient)
     {
-      serviceClient->TestFunctionClient();
+      serviceClient->TestFunctionManager();
     }
   }
-
-
-  us::ServiceReference<mitk::IRESTServer> refServer = context->GetServiceReference<mitk::IRESTServer>();
-  if (refServer)
-  {
-    auto serviceServer = context->GetService(refServer);
-    if (serviceServer)
-    {
-      serviceServer->TestFunctionServer();
-    }
-  }
-
 }
 
 void MitkCppRestSdkActivator::Unload(us::ModuleContext *) 

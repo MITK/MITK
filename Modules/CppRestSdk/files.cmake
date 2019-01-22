@@ -9,4 +9,6 @@ set(CPP_FILES
   mitkCppRestSdkActivator.cpp
   mitkIRESTClient.cpp
   mitkIRESTServer.cpp
+  mitkIRESTManager.cpp
+  mitkRESTManager.cpp
 )

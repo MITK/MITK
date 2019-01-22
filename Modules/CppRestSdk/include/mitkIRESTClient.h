@@ -15,7 +15,6 @@ namespace mitk
   };
 }
 
-MITK_DECLARE_SERVICE_INTERFACE(mitk::IRESTClient, "org.mitk.IRESTClient")
 #endif
 
 

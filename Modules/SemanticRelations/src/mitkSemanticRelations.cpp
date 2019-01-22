@@ -171,23 +171,23 @@ bool mitk::SemanticRelations::IsLesionPresentOnDataNode(const SemanticTypes::Les
 
   try
   {
-    if (mitk::NodePredicates::GetImagePredicate()->CheckNode(dataNode))
+    if (NodePredicates::GetImagePredicate()->CheckNode(dataNode))
     {
       // get segmentations of the image node with the segmentation predicate
-      mitk::DataStorage::SetOfObjects::ConstPointer segmentations = m_DataStorage.Lock()->GetDerivations(dataNode, mitk::NodePredicates::GetSegmentationPredicate(), false);
+      DataStorage::SetOfObjects::ConstPointer segmentations = m_DataStorage.Lock()->GetDerivations(dataNode, mitk::NodePredicates::GetSegmentationPredicate(), false);
       for (auto it = segmentations->Begin(); it != segmentations->End(); ++it)
       {
         const auto representedLesion = GetRepresentedLesion(it.Value());
         return lesion.UID == representedLesion.UID;
       }
     }
-    else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
+    else if (NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
     {
       const auto representedLesion = GetRepresentedLesion(dataNode);
       return lesion.UID == representedLesion.UID;
     }
   }
-  catch (const mitk::SemanticRelationException&)
+  catch (const SemanticRelationException&)
   {
     return false;
   }

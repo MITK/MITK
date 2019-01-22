@@ -1,0 +1,70 @@
+diff --git a/CTK-0/Libs/PluginFramework/ctkDefaultApplicationLauncher.cpp b/CTK/Libs/PluginFramework/ctkDefaultApplicationLauncher.cpp
+index fe37939..48a6fa1 100644
+--- a/Libs/PluginFramework/ctkDefaultApplicationLauncher.cpp
++++ b/Libs/PluginFramework/ctkDefaultApplicationLauncher.cpp
+@@ -80,10 +80,13 @@ QVariant ctkDefaultApplicationLauncher::start(const QVariant& defaultContext)
+   bool doRelaunch = false;
+   do
+   {
++#ifdef NDEBUG
+     try
++#endif
+     {
+       result = runApplication(defaultContext);
+     }
++#ifdef NDEBUG
+     catch (const std::exception& e)
+     {
+       if (!relaunch || (context->getPlugin()->getState() != ctkPlugin::ACTIVE))
+@@ -92,6 +95,7 @@ QVariant ctkDefaultApplicationLauncher::start(const QVariant& defaultContext)
+       }
+       qWarning() << "Application error:" << e.what();
+     }
++#endif
+     doRelaunch = (relaunch && context->getPlugin()->getState() == ctkPlugin::ACTIVE) ||
+                   ctkPluginFrameworkProperties::getProperty(ctkPluginFrameworkLauncher::PROP_OSGI_RELAUNCH).toBool();
+   }
+diff --git a/CTK-0/Libs/PluginFramework/ctkPluginFrameworkLauncher.cpp b/CTK/Libs/PluginFramework/ctkPluginFrameworkLauncher.cpp
+index 9597088..7992ed1 100644
+--- a/Libs/PluginFramework/ctkPluginFrameworkLauncher.cpp
++++ b/Libs/PluginFramework/ctkPluginFrameworkLauncher.cpp
+@@ -492,11 +492,13 @@ QVariant ctkPluginFrameworkLauncher::run(const QVariant& argument)
+     qWarning() << "Application launch failed:" << e.printStackTrace();
+     throw;
+   }
++#ifdef NDEBUG
+   catch (const std::exception& e)
+   {
+     qWarning() << "Application launch failed:" << e.what();
+     throw;
+   }
++#endif
+ }
+ 
+ //----------------------------------------------------------------------------
+@@ -417,7 +417,9 @@ QVariant ctkPluginFrameworkLauncher::run(QRunnable* endSplashHandler, const QVar
+     };
+     Finalize finalizer;
+     Q_UNUSED(finalizer)
++#ifdef NDEBUG
+     try
++#endif
+     {
+       startup(endSplashHandler);
+       if (ctkPluginFrameworkProperties::getProperty(PROP_IGNOREAPP).toBool() || d->isForcedRestart())
+@@ -426,6 +428,7 @@ QVariant ctkPluginFrameworkLauncher::run(QRunnable* endSplashHandler, const QVar
+       }
+       return run(argument);
+     }
++#ifdef NDEBUG
+     catch (const std::exception& e)
+     {
+       // ensure the splash screen is down
+@@ -443,6 +446,7 @@ QVariant ctkPluginFrameworkLauncher::run(QRunnable* endSplashHandler, const QVar
+         qWarning() << "Startup error:" << e.what();
+       }
+     }
++#endif
+   }
+ 
+   // we only get here if an error happened

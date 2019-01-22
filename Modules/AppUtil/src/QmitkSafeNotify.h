@@ -26,10 +26,13 @@ template<class A>
 bool QmitkSafeNotify(A* app, QObject* receiver, QEvent* event)
 {
   QString msg;
+#ifdef NDEBUG
   try
+#endif
   {
     return app->A::notify(receiver, event);
   }
+#ifdef NDEBUG
   catch (mitk::Exception& e)
   {
     msg = QString("MITK Exception:\n\n")
@@ -71,6 +74,7 @@ bool QmitkSafeNotify(A* app, QObject* receiver, QEvent* event)
   }
 
   return false;
+#endif /*NDEBUG*/
 }
 
 #endif // QMITKSAFENOTIFY_H

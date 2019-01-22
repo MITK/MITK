@@ -34,6 +34,6 @@ void QmitkConfirmSegmentationDialog::OnCancelSegmentation()
 
 void QmitkConfirmSegmentationDialog::SetSegmentationName(QString name)
 {
-  QString text ("Do you really want to overwrite "+name+"?");
+  QString text = (tr("Do you really want to overwrite %1?")).arg(name);
   m_Controls->m_lblDialogText->setText(text);
 }

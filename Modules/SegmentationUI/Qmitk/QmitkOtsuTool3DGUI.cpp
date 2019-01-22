@@ -137,7 +137,7 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
     try
     {
       int proceed;
-      QMessageBox* messageBox = new QMessageBox(QMessageBox::Question, NULL, "The otsu segmentation computation may take several minutes depending on the number of Regions you selected. Proceed anyway?", QMessageBox::Ok | QMessageBox::Cancel);
+      QMessageBox* messageBox = new QMessageBox(QMessageBox::Question, NULL, tr("The otsu segmentation computation may take several minutes depending on the number of Regions you selected. Proceed anyway?"), QMessageBox::Ok | QMessageBox::Cancel);
       if (m_Controls.m_Spinbox->value() >= 5)
       {
         proceed = messageBox->exec();
@@ -155,7 +155,7 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
     catch( ... )
     {
       this->setCursor(Qt::ArrowCursor);
-      QMessageBox* messageBox = new QMessageBox(QMessageBox::Critical, NULL, "itkOtsuFilter error: image dimension must be in {2, 3} and no RGB images can be handled.");
+      QMessageBox* messageBox = new QMessageBox(QMessageBox::Critical, NULL, tr("itkOtsuFilter error: image dimension must be in {2, 3} and no RGB images can be handled."));
       messageBox->exec();
       delete messageBox;
       return;

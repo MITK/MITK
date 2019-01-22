@@ -30,7 +30,7 @@ QmitkBinaryThresholdULToolGUI::QmitkBinaryThresholdULToolGUI()
   // create the visible widgets
   QBoxLayout* mainLayout = new QVBoxLayout(this);
 
-  QLabel* label = new QLabel( "Threshold :", this );
+  QLabel* label = new QLabel( tr("Threshold :"), this );
   QFont f = label->font();
   f.setBold(false);
   label->setFont( f );
@@ -44,7 +44,7 @@ QmitkBinaryThresholdULToolGUI::QmitkBinaryThresholdULToolGUI()
   mainLayout->addLayout(layout);
   m_DoubleThresholdSlider->setSingleStep(0.01);
 
-  QPushButton* okButton = new QPushButton("Confirm Segmentation", this);
+  QPushButton* okButton = new QPushButton(tr("Confirm Segmentation"), this);
   connect( okButton, SIGNAL(clicked()), this, SLOT(OnAcceptThresholdPreview()));
   okButton->setFont( f );
   mainLayout->addWidget( okButton );

@@ -38,13 +38,13 @@ QmitkWatershedToolGUI::QmitkWatershedToolGUI()
   QGridLayout* layout = new QGridLayout( this );
   this->setContentsMargins( 0, 0, 0, 0 );
 
-  QLabel* label = new QLabel( "Threshold ", this );
+  QLabel* label = new QLabel( tr("Threshold "), this );
   QFont f = label->font();
   f.setBold(false);
   label->setFont( f );
   layout->addWidget(label,0,0);
 
-  QLabel* label2 = new QLabel( "Level ", this );
+  QLabel* label2 = new QLabel( tr("Level "), this );
   f = label2->font();
   f.setBold(false);
   label2->setFont( f );
@@ -78,7 +78,7 @@ QmitkWatershedToolGUI::QmitkWatershedToolGUI()
   connect( m_SliderLevel, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueLevelChanged(int)));
   layout->addWidget( m_SliderLevel, 3, 0, 1, 2 );
 
-  QPushButton* okButton = new QPushButton("Run Segmentation", this);
+  QPushButton* okButton = new QPushButton(tr("Run Segmentation"), this);
   connect( okButton, SIGNAL(clicked()), this, SLOT(OnCreateSegmentation()));
   okButton->setFont( f );
   layout->addWidget( okButton, 4, 0, 1, 2 );
@@ -141,7 +141,7 @@ void QmitkWatershedToolGUI::OnSliderValueLevelChanged(int value)
 void QmitkWatershedToolGUI::OnCreateSegmentation()
 {
   QApplication::setOverrideCursor(Qt::BusyCursor);
-  m_InformationLabel->setText(QString("Please wait some time for computation..."));
+  m_InformationLabel->setText(tr("Please wait..."));
   m_InformationLabel->repaint();
   QApplication::processEvents();
 

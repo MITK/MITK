@@ -28,7 +28,7 @@ m_lastSelectedName(tr("none"))
 
   QBoxLayout* mainLayout = new QVBoxLayout(this);
   m_segmentationComboBox = new QComboBox(this);
-  QLabel* label = new QLabel("region of interest:", this);
+  QLabel* label = new QLabel(tr("region of interest:"), this);
   m_boundingObjectWidget = new QmitkBoundingObjectWidget();
 
   mainLayout->addWidget(label);

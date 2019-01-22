@@ -27,6 +27,7 @@ if(MITK_USE_Poco)
       URL https://github.com/pocoproject/poco/archive/poco-1.9.0-release.tar.gz
       URL_MD5 e6b30ba5471957dd6cdfe50ce5d09969
       CMAKE_GENERATOR ${gen}
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Poco.patch
       CMAKE_ARGS
         ${ep_common_args}
         ${additional_cmake_args}

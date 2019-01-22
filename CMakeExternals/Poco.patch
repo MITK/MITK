@@ -1,0 +1,20 @@
+diff --git a/Poco0/Util/src/Application.cpp b/Poco/Util/src/Application.cpp
+index 6f60ff9..107ec11 100644
+--- a/Util/src/Application.cpp
++++ b/Util/src/Application.cpp
+@@ -336,6 +336,7 @@ int Application::run()
+ 	{
+ 		logger().log(exc);
+ 	}
++#ifdef NDEBUG
+ 	catch (std::exception& exc)
+ 	{
+ 		logger().error(exc.what());
+@@ -344,6 +345,7 @@ int Application::run()
+ 	{
+ 		logger().fatal("system exception");
+ 	}
++#endif
+ 
+ 	uninitialize();
+ 	return rc;

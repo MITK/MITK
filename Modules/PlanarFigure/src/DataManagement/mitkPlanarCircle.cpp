@@ -68,12 +68,6 @@ mitk::Point2D mitk::PlanarCircle::ApplyControlPointConstraints(unsigned int inde
   Point2D indexPoint;
   this->GetPlaneGeometry()->WorldToIndex( point, indexPoint );
 
-  const BoundingBox::BoundsArrayType bounds = this->GetPlaneGeometry()->GetBounds();
-  if ( indexPoint[0] < bounds[0] ) { indexPoint[0] = bounds[0]; }
-  if ( indexPoint[0] > bounds[1] ) { indexPoint[0] = bounds[1]; }
-  if ( indexPoint[1] < bounds[2] ) { indexPoint[1] = bounds[2]; }
-  if ( indexPoint[1] > bounds[3] ) { indexPoint[1] = bounds[3]; }
-
   Point2D constrainedPoint;
   this->GetPlaneGeometry()->IndexToWorld( indexPoint, constrainedPoint );
 

@@ -25,6 +25,11 @@ pplx::task<void> mitk::RESTServerMicroService::closeListener()
 void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
 {
   int port = m_Listener.uri().port();
+  web::json::value content;
+  content[L"key 1"] = web::json::value::string(U("this is a first test"));
+  request.set_body(content);
+  auto answer = request.extract_json().get();
   MITK_INFO << "Test for Server at port "<<port;
-  request.reply(MitkRestStatusCodes::OK);
+
+  request.reply(MitkRestStatusCodes::OK, answer);
 }

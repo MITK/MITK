@@ -179,9 +179,7 @@ QVariant ApplicationHandle::run(const QVariant& context_)
   }
 
   QVariant tempResult;
-#ifdef NDEBUG
   try
-#endif
   {
     {
       QMutexLocker l(&mutex);
@@ -198,13 +196,11 @@ QVariant ApplicationHandle::run(const QVariant& context_)
 
     tempResult = SetInternalResult(tempResult, nullptr);
   }
-#ifdef NDEBUG
   catch (...)
   {
     tempResult = SetInternalResult(tempResult, nullptr);
     throw;
   }
-#endif
 
   if (org_blueberry_core_runtime_Activator::DEBUG)
   {

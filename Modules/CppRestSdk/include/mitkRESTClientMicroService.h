@@ -1,17 +1,21 @@
 #ifndef mitkRESTClientMicroService_h
 #define mitkRESTClientMicroService_h
 
-#include <mitkIRESTClient.h>
+#include "cpprest/http_client.h"
+
+
+typedef web::http::client::http_client MitkClient;
 
 namespace mitk
 {
-  class RESTClientMicroService : public IRESTClient
+  class RESTClientMicroService
   {
   public:
-    RESTClientMicroService();
-    ~RESTClientMicroService() override;
+    RESTClientMicroService(utility::string_t url);
+    ~RESTClientMicroService();
 
-    void TestFunctionClient() override;
+    void TestFunctionClient();
+
   };
 } // namespace mitk
 #endif // !mitkRESTClientMicroService_h

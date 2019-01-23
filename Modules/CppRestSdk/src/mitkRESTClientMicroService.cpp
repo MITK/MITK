@@ -1,7 +1,9 @@
 #include "mitkRESTClientMicroService.h"
 #include <mitkCommon.h>
-mitk::RESTClientMicroService::RESTClientMicroService()
+
+mitk::RESTClientMicroService::RESTClientMicroService(utility::string_t url)
 {
+
 }
 
 mitk::RESTClientMicroService::~RESTClientMicroService() 

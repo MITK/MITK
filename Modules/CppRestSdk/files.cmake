@@ -7,8 +7,6 @@ set(CPP_FILES
   mitkRESTClientMicroService.cpp
   mitkRESTServerMicroService.cpp
   mitkCppRestSdkActivator.cpp
-  mitkIRESTClient.cpp
-  mitkIRESTServer.cpp
   mitkIRESTManager.cpp
   mitkRESTManager.cpp
 )

@@ -39,7 +39,7 @@ void QmitkGeometryToolsView::SetFocus()
 
 void QmitkGeometryToolsView::CreateQtPartControl( QWidget *parent )
 {
-  SetPartName(QAction::tr("Geometry Tools"));
+  SetPartName(QObject::tr("Geometry Tools"));
 
   m_Controls.setupUi( parent );
   connect( m_Controls.m_AddInteractor, SIGNAL(clicked()), this, SLOT(AddInteractor()) );
@@ -57,11 +57,8 @@ void QmitkGeometryToolsView::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_OriginPointRadioButton, SIGNAL(clicked(bool)), this, SLOT(OnOriginPointRadioButton(bool)) );
   connect( m_Controls.m_CenterPointRadioButton, SIGNAL(clicked(bool)), this, SLOT(OnCenterPointRadioButton(bool)) );
 
-
-
   m_Controls.m_UsageInfo->hide();
   m_Controls.m_CustomAnchorPoint->hide();
-
 }
 
 void QmitkGeometryToolsView::OnUsageInfoBoxChanged(bool flag)

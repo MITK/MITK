@@ -5,13 +5,6 @@ mitk::RESTManager::RESTManager() {}
 
 mitk::RESTManager::~RESTManager() {}
 
-void mitk::RESTManager::TestFunctionManager() 
-{
-  MITK_INFO << "Test for Manager";
-  
-  MITK_INFO << "Here";
-}
-
 void mitk::RESTManager::sendRequest(RequestType type) 
 {
   switch (type)
@@ -30,6 +23,7 @@ void mitk::RESTManager::sendRequest(RequestType type)
 
 void mitk::RESTManager::receiveRequest(web::uri uri) 
 {
+  //New instance of RESTServerMicroservice in m_ServerMap, key is port of the request
   int port = uri.port();
   RESTServerMicroService* server = new RESTServerMicroService(uri);
   m_ServerMap[port] = server;

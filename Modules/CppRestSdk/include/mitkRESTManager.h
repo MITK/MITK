@@ -13,14 +13,13 @@ namespace mitk
     RESTManager();
     ~RESTManager() override;
 
-    void TestFunctionManager() override;
     //calls RESTClient
     void sendRequest(RequestType type) override;
     //calls RESTServer
     void receiveRequest(web::uri uri) override;
 
   private:
-    std::map<int, RESTClientMicroService> m_ClientMap; // Map with port client pairs
+    std::map<int, RESTClientMicroService*> m_ClientMap; // Map with port client pairs
     std::map<int, RESTServerMicroService*> m_ServerMap; // Map with port server pairs
   };
 } // namespace mitk

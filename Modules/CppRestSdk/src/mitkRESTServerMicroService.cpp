@@ -7,17 +7,24 @@ mitk::RESTServerMicroService::RESTServerMicroService(web::uri uri) : m_Listener(
   openListener();  
 }
 
+mitk::RESTServerMicroService::~RESTServerMicroService()
+{
+  closeListener();
+}
+
 pplx::task<void> mitk::RESTServerMicroService::openListener()
 {
   return m_Listener.open();
 }
 
-mitk::RESTServerMicroService::~RESTServerMicroService() 
+pplx::task<void> mitk::RESTServerMicroService::closeListener()
 {
+  return m_Listener.close();
 }
 
 void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
 {
-  MITK_INFO << "Test for Server";
+  int port = m_Listener.uri().port();
+  MITK_INFO << "Test for Server at port "<<port;
   request.reply(MitkRestStatusCodes::OK);
 }

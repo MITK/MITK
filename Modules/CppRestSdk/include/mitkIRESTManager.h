@@ -12,9 +12,6 @@ namespace mitk
   public:
     virtual ~IRESTManager();
 
-    virtual void TestFunctionManager() = 0;
-    //Functions for sendData() and receiveData() (sendRequest(), receiveRequest()?)
-
     enum RequestType
     {
       get,

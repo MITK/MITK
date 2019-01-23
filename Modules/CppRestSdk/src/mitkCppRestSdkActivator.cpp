@@ -14,9 +14,11 @@
 
 void MitkCppRestSdkActivator::Load(us::ModuleContext *context)
 {
+  //Registration of the RESTManagerMicroservice
   m_RESTManager.reset(new mitk::RESTManager);
   context->RegisterService<mitk::IRESTManager>(m_RESTManager.get());
 
+  //Test use of the RESTManagerMicroservice, later done in Module
   us::ServiceReference<mitk::IRESTManager> refManager = context->GetServiceReference<mitk::IRESTManager>();
   if (refManager)
   {
@@ -24,6 +26,7 @@ void MitkCppRestSdkActivator::Load(us::ModuleContext *context)
     if (serviceClient)
     {
       serviceClient->receiveRequest(L"http://localhost:8080");
+      serviceClient->receiveRequest(L"http://localhost:8090");
     }
   }
 }

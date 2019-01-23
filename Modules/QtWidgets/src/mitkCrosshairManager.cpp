@@ -410,3 +410,8 @@ void mitkCrosshairManager::updateSwivelColors(QmitkRenderWindow* updatedWindow)
     window->GetRenderer()->RequestUpdate();
   }
 }
+
+bool mitkCrosshairManager::getShowPlanesIn3D()
+{
+  return m_ShowPlanesIn3d;
+}

@@ -42,7 +42,7 @@ namespace mitk
   {
   public:
 
-    MaskedAlgorithmHelper(map::algorithm::RegistrationAlgorithmBase* algorithm = nullptr);
+    MaskedAlgorithmHelper(map::algorithm::RegistrationAlgorithmBase* algorithm);
 
     /** Set one or both masks to an algorithm.
      * If the algorithm does not support masks it will be ignored.
@@ -52,6 +52,8 @@ namespace mitk
 
     /** Checks if the algorithm supports masks of the passed type.*/
     bool CheckSupport(const mitk::Image* movingMask, const mitk::Image* targetMask) const;
+
+    static bool HasMaskedRegistrationAlgorithmInterface(const map::algorithm::RegistrationAlgorithmBase* algorithm);
 
     ~MaskedAlgorithmHelper() {}
 

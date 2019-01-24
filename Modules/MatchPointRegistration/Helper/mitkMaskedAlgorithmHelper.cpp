@@ -32,6 +32,14 @@ namespace mitk
   {
   }
 
+  bool MaskedAlgorithmHelper::HasMaskedRegistrationAlgorithmInterface(const map::algorithm::RegistrationAlgorithmBase* algorithm)
+  {
+    using MaskedInterface2D = const ::map::algorithm::facet::MaskedRegistrationAlgorithmInterface<2, 2>;
+    using MaskedInterface3D = const ::map::algorithm::facet::MaskedRegistrationAlgorithmInterface<3, 3>;
+
+    return dynamic_cast<MaskedInterface2D*>(algorithm) != nullptr && dynamic_cast<MaskedInterface3D*>(algorithm) != nullptr;
+  };
+
   bool
     MaskedAlgorithmHelper::
     CheckSupport(const mitk::Image* movingMask, const mitk::Image* targetMask) const

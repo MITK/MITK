@@ -477,7 +477,7 @@ void QmitkMatchPoint::ConfigureNodeSelectors()
   mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
   mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
   mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
-  mitk::NodePredicateBase::Pointer dimensionPredicate = mitk::NodePredicateOr::New(mitk::NodePredicateDimension::New(3), mitk::NodePredicateDimension::New(4));
+  mitk::NodePredicateBase::Pointer dimensionPredicate = mitk::NodePredicateOr::New(mitk::NodePredicateDimension::New(3), mitk::NodePredicateDimension::New(4)).GetPointer();
 
   mitk::NodePredicateAnd::Pointer maskPredicate = mitk::NodePredicateAnd::New(mitk::NodePredicateOr::New(isLegacyMask, isLabelSet), dimensionPredicate);
 
@@ -600,7 +600,7 @@ void QmitkMatchPoint::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
 {
 }
 
-void QmitkMatchPoint::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+void QmitkMatchPoint::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/)
 {
   if (!m_Working)
   {

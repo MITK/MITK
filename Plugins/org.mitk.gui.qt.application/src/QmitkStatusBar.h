@@ -65,6 +65,9 @@ public:
     void DisplayLicenseText(const char *t);
     void HideLicenseWarning();
     virtual void DisplayGreyValueText(const char *t) override;
+    virtual void DisplayImageInfo(mitk::Point3D point, itk::Index<3> index, mitk::ScalarType time, mitk::ScalarType pixelValue) override;
+    virtual void DisplayImageInfo(mitk::Point3D point, itk::Index<3> index, mitk::ScalarType time, const char* pixelValue) override;
+    virtual void DisplayImageInfoInvalid() override;
 
     //##Documentation
     //## @brief removes any temporary message being shown.

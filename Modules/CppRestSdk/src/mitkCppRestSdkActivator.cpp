@@ -25,7 +25,8 @@ void MitkCppRestSdkActivator::Load(us::ModuleContext *context)
     auto serviceClient = context->GetService(refManager);
     if (serviceClient)
     {
-      serviceClient->receiveRequest(L"http://localhost:8080");
+      serviceClient->receiveRequest(L"http://localhost:8080/test");
+      serviceClient->receiveRequest(L"http://localhost:8080/example");
       serviceClient->receiveRequest(L"http://localhost:8090");
     }
   }

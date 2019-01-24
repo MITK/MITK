@@ -26,12 +26,14 @@ namespace mitk
   public:
     RESTServerMicroService(web::uri uri);
     ~RESTServerMicroService();
+    web::uri GetUri();
 
   private:
-    MitkListener m_Listener;
     pplx::task<void> openListener();
     pplx::task<void> closeListener();
     void HandleGet(MitkRequest request);
+    MitkListener m_Listener;
+    web::uri m_Uri;
   };
 } // namespace mitk
 #endif 

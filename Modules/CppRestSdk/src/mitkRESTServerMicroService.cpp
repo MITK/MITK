@@ -3,8 +3,9 @@
 
 mitk::RESTServerMicroService::RESTServerMicroService(web::uri uri) : m_Listener(uri)
 {
+  m_Uri = uri;
   m_Listener.support(MitkRESTMethods::GET, std::bind(&RESTServerMicroService::HandleGet, this, std::placeholders::_1));
-  openListener();  
+  openListener();
 }
 
 mitk::RESTServerMicroService::~RESTServerMicroService()
@@ -22,14 +23,21 @@ pplx::task<void> mitk::RESTServerMicroService::closeListener()
   return m_Listener.close();
 }
 
+web::uri mitk::RESTServerMicroService::GetUri() 
+{
+  return m_Uri;
+}
+
 void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
 {
   int port = m_Listener.uri().port();
+  utility::string_t uri = request.absolute_uri().to_string();
+  std::string uriString(uri.begin(), uri.end());
   web::json::value content;
   content[L"key 1"] = web::json::value::string(U("this is a first test"));
   request.set_body(content);
   auto answer = request.extract_json().get();
-  MITK_INFO << "Test for Server at port "<<port;
+  MITK_INFO << "Test for Server at port " << port << " Exact request uri: " << uriString;
 
   request.reply(MitkRestStatusCodes::OK, answer);
 }

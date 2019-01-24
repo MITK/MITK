@@ -25,8 +25,26 @@ void mitk::RESTManager::receiveRequest(web::uri uri)
 {
   //New instance of RESTServerMicroservice in m_ServerMap, key is port of the request
   int port = uri.port();
-  RESTServerMicroService* server = new RESTServerMicroService(uri);
-  m_ServerMap[port] = server;
   
-  MITK_INFO <<port<<":"<< m_ServerMap.count(port);
+  if (m_ServerMap.count(port) == 0)
+  {
+    //new observer has to be added
+    RESTServerMicroService *server = new RESTServerMicroService(uri.authority());
+    m_ServerMap[port] = server;
+    utility::string_t host = uri.authority().to_string();
+    std::string hoststring(host.begin(), host.end());
+    MITK_INFO << "new server" << hoststring<<" at port" << port;
+  }
+  else
+  {
+    if (m_ServerMap[port]->GetUri() == uri.authority())
+    {
+      //new observer has to be added
+      MITK_INFO << "started listening";
+    }
+    else
+    {
+      MITK_ERROR << "there is already another server listening under this port";
+    }
+  }
 }

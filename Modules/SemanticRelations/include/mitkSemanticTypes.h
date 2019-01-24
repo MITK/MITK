@@ -116,6 +116,7 @@ namespace mitk
       LesionClass lesionClass;
     };
 
+    using IDVector = std::vector<ID>;
     using LesionVector = std::vector<Lesion>;
     using LesionClassVector = std::vector<LesionClass>;
     using ControlPointVector = std::vector<ControlPoint>;

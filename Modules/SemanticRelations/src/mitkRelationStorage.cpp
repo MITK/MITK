@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations module
 #include "mitkDICOMHelper.h"
-#include "mitkNodePredicates.h"
 
 // multi label module
 #include <mitkLabelSetImage.h>
@@ -129,24 +128,24 @@ namespace
   }
 }
 
-std::vector<mitk::SemanticTypes::Lesion> mitk::RelationStorage::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID)
+mitk::SemanticTypes::LesionVector mitk::RelationStorage::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID)
 {
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
     MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
-    return std::vector<SemanticTypes::Lesion>();
+    return SemanticTypes::LesionVector();
   }
   // retrieve a vector property that contains the valid lesion-IDs for the current case
   VectorProperty<std::string>* vectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("lesions"));
   if (nullptr == vectorProperty)
   {
     MITK_INFO << "Could not find any lesion in the storage.";
-    return std::vector<SemanticTypes::Lesion>();
+    return SemanticTypes::LesionVector();
   }
 
   std::vector<std::string> vectorValue = vectorProperty->GetValue();
-  std::vector<SemanticTypes::Lesion> allLesionsOfCase;
+  SemanticTypes::LesionVector allLesionsOfCase;
   for (const auto& lesionID : vectorValue)
   {
     SemanticTypes::Lesion generatedLesion = GenerateLesion(caseID, lesionID);
@@ -194,20 +193,20 @@ mitk::SemanticTypes::Lesion mitk::RelationStorage::GetRepresentedLesion(const Se
   return GenerateLesion(caseID, lesionID);
 }
 
-std::vector<std::string> mitk::RelationStorage::GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID)
+mitk::SemanticTypes::IDVector mitk::RelationStorage::GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID)
 {
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
     MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
-    return std::vector<SemanticTypes::InformationType>();
+    return SemanticTypes::IDVector();
   }
   // retrieve a vector property that contains the valid segmentation-IDs for the current case
   VectorProperty<std::string>* allSegmentationsVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("segmentations"));
   if (nullptr == allSegmentationsVectorProperty)
   {
     MITK_INFO << "Could not find any segmentation in the storage.";
-    return std::vector<SemanticTypes::InformationType>();
+    return SemanticTypes::IDVector();
   }
 
   return allSegmentationsVectorProperty->GetValue();
@@ -265,13 +264,13 @@ mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GetControlPointOfImage(
   return controlPoint;
 }
 
-std::vector<mitk::SemanticTypes::ControlPoint> mitk::RelationStorage::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID)
+mitk::SemanticTypes::ControlPointVector mitk::RelationStorage::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID)
 {
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
     MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
-    return std::vector<SemanticTypes::ControlPoint>();
+    return SemanticTypes::ControlPointVector();
   }
 
   // retrieve a vector property that contains the valid control point-IDs for the current case
@@ -279,11 +278,11 @@ std::vector<mitk::SemanticTypes::ControlPoint> mitk::RelationStorage::GetAllCont
   if (nullptr == vectorProperty)
   {
     MITK_INFO << "Could not find any control points in the storage.";
-    return std::vector<SemanticTypes::ControlPoint>();
+    return SemanticTypes::ControlPointVector();
   }
 
   std::vector<std::string> vectorValue = vectorProperty->GetValue();
-  std::vector<SemanticTypes::ControlPoint> allControlPointsOfCase;
+  SemanticTypes::ControlPointVector allControlPointsOfCase;
   for (const auto& controlPointUID : vectorValue)
   {
     SemanticTypes::ControlPoint generatedControlPoint = GenerateControlpoint(caseID, controlPointUID);
@@ -296,13 +295,13 @@ std::vector<mitk::SemanticTypes::ControlPoint> mitk::RelationStorage::GetAllCont
   return allControlPointsOfCase;
 }
 
-std::vector<mitk::SemanticTypes::ExaminationPeriod> mitk::RelationStorage::GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID)
+mitk::SemanticTypes::ExaminationPeriodVector mitk::RelationStorage::GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID)
 {
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
     MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
-    return std::vector<SemanticTypes::ExaminationPeriod>();
+    return SemanticTypes::ExaminationPeriodVector();
   }
 
   // retrieve a vector property that contains the valid examination period UIDs for the current case
@@ -310,11 +309,11 @@ std::vector<mitk::SemanticTypes::ExaminationPeriod> mitk::RelationStorage::GetAl
   if (nullptr == vectorProperty)
   {
     MITK_INFO << "Could not find any examination periods in the storage.";
-    return std::vector<SemanticTypes::ExaminationPeriod>();
+    return SemanticTypes::ExaminationPeriodVector();
   }
 
   std::vector<std::string> vectorValue = vectorProperty->GetValue();
-  std::vector<SemanticTypes::ExaminationPeriod> allExaminationPeriods;
+  SemanticTypes::ExaminationPeriodVector allExaminationPeriods;
   for (const auto& examinationPeriodID : vectorValue)
   {
     // retrieve a vector property that contains the represented control point-IDs
@@ -377,39 +376,39 @@ mitk::SemanticTypes::InformationType mitk::RelationStorage::GetInformationTypeOf
   return dataNodeVectorValue[0];
 }
 
-std::vector<mitk::SemanticTypes::InformationType> mitk::RelationStorage::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID)
+mitk::SemanticTypes::InformationTypeVector mitk::RelationStorage::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID)
 {
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
     MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
-    return std::vector<SemanticTypes::InformationType>();
+    return SemanticTypes::InformationTypeVector();
   }
   // retrieve a vector property that contains the valid information types of the current case
   VectorProperty<std::string>* informationTypeVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("informationtypes"));
   if (nullptr == informationTypeVectorProperty)
   {
     MITK_INFO << "Could not find any information types in the storage.";
-    return std::vector<SemanticTypes::InformationType>();
+    return SemanticTypes::InformationTypeVector();
   }
 
   return informationTypeVectorProperty->GetValue();
 }
 
-std::vector<std::string> mitk::RelationStorage::GetAllImageIDsOfCase(const SemanticTypes::CaseID& caseID)
+mitk::SemanticTypes::IDVector mitk::RelationStorage::GetAllImageIDsOfCase(const SemanticTypes::CaseID& caseID)
 {
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
     MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
-    return std::vector<SemanticTypes::InformationType>();
+    return SemanticTypes::InformationTypeVector();
   }
   // retrieve a vector property that contains the valid image-IDs of the current case
   VectorProperty<std::string>* allImagesVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("images"));
   if (nullptr == allImagesVectorProperty)
   {
     MITK_INFO << "Could not find any image in the storage.";
-    return std::vector<SemanticTypes::InformationType>();
+    return SemanticTypes::InformationTypeVector();
   }
 
   return allImagesVectorProperty->GetValue();

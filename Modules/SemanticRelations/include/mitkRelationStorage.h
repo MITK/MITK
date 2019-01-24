@@ -20,9 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations module
 #include "mitkSemanticTypes.h"
 
-// mitk core
-#include <mitkDataNode.h>
-
 namespace mitk
 {
   namespace RelationStorage
@@ -30,7 +27,7 @@ namespace mitk
     SemanticTypes::LesionVector GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID);
     SemanticTypes::Lesion GetRepresentedLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID);
 
-    std::vector<std::string> GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID);
+    SemanticTypes::IDVector GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID);
 
     SemanticTypes::ControlPoint GetControlPointOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
     SemanticTypes::ControlPointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID);
@@ -40,7 +37,7 @@ namespace mitk
     SemanticTypes::InformationType GetInformationTypeOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
     SemanticTypes::InformationTypeVector GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID);
 
-    std::vector<std::string> GetAllImageIDsOfCase(const SemanticTypes::CaseID& caseID);
+    SemanticTypes::IDVector GetAllImageIDsOfCase(const SemanticTypes::CaseID& caseID);
     std::vector<SemanticTypes::CaseID> GetAllCaseIDs();
 
     void AddCase(const SemanticTypes::CaseID& caseID);

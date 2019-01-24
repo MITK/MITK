@@ -414,8 +414,8 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
   }
 
   //reset the feature image and image mask field
-  m_Controls->m_SelectedFeatureImageLabel->setText("None");
-  m_Controls->m_SelectedMaskLabel->setText("None");
+  m_Controls->m_SelectedFeatureImageLabel->setText(tr("None"));
+  m_Controls->m_SelectedMaskLabel->setText(tr("None"));
 
   this->ReinitData();
   if (selectedNodes.isEmpty())
@@ -579,16 +579,14 @@ void QmitkImageStatisticsView::UpdateStatistics()
     }
     else
     {
-      std::stringstream message;
-      message << "<font color='red'>" << "Invalid data node type!" << "</font>";
-      m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+      m_Controls->m_ErrorMessageLabel->setText(tr("<font color='red'>Invalid data node type!</font>"));
       m_Controls->m_ErrorMessageLabel->show();
     }
   }
 
   if(maskName == "")
   {
-    maskName = "None";
+    maskName = tr("None").toStdString();
     maskType = "";
     maskDimension = 0;
   }
@@ -630,9 +628,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
     // cannot be calculated currently.
     if ( m_SelectedImage->GetPixelType().GetNumberOfComponents() > 1 )
     {
-      std::stringstream message;
-      message << "<font color='red'>Multi-component images not supported.</font>";
-      m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+      m_Controls->m_ErrorMessageLabel->setText(tr("<font color='red'>Multi-component images not supported.</font>"));
       m_Controls->m_ErrorMessageLabel->show();
 
       this->InvalidateStatisticsTableView();
@@ -687,9 +683,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
     this->m_CalculationThread->Initialize( m_SelectedImage, m_SelectedImageMask, m_SelectedPlanarFigure );
     this->m_CalculationThread->SetTimeStep( timeStep );
     this->m_CalculationThread->SetHistogramBinSize(m_Controls->m_HistogramBinSizeSpinbox->value());
-    std::stringstream message;
-    message << "<font color='red'>Calculating statistics...</font>";
-    m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+    m_Controls->m_ErrorMessageLabel->setText(tr("<font color='red'>Calculating statistics...</font>"));
     m_Controls->m_ErrorMessageLabel->show();
 
     try
@@ -720,9 +714,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
       MITK_ERROR << "Caught exception: " << e.what();
 
       // In case of exception, print error message on GUI
-      std::stringstream message;
-      message << "<font color='red'>Error! Unequal Dimensions of Image and Segmentation. No recompute possible </font>";
-      m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+      m_Controls->m_ErrorMessageLabel->setText(tr("<font color='red'>Error! Unequal Dimensions of Image and Segmentation. No recompute possible </font>"));
       m_Controls->m_ErrorMessageLabel->show();
       this->m_StatisticsUpdatePending = false;
     }
@@ -812,7 +804,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
   }
   else
   {
-    m_Controls->m_SelectedMaskLabel->setText( "None" );
+    m_Controls->m_SelectedMaskLabel->setText( tr("None") );
     m_Controls->m_ErrorMessageLabel->setText( m_CalculationThread->GetLastErrorMessage().c_str() );
     m_Controls->m_ErrorMessageLabel->show();
     // Clear statistics and histogram
@@ -829,9 +821,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       if ( m_SelectedPlanarFigure->IsClosed() && m_SelectedImageMask == NULL)
       {
         outOfBounds = true;
-        std::stringstream message;
-        message << "<font color='red'>Planar figure is on a rotated image plane or outside the image bounds.</font>";
-        m_Controls->m_InfoLabel->setText(message.str().c_str());
+        m_Controls->m_InfoLabel->setText(tr("<font color='red'>Planar figure is on a rotated image plane or outside the image bounds.</font>"));
       }
 
       // check whether PlanarFigure is initialized
@@ -851,9 +841,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
 
         this->FillLinearProfileStatisticsTableView( this->m_CalculationThread->GetStatisticsImage() );
 
-        std::stringstream message;
-        message << "<font color='red'>Only linegraph available for an intensity profile!</font>";
-        m_Controls->m_InfoLabel->setText(message.str().c_str());
+        m_Controls->m_InfoLabel->setText(tr("<font color='red'>Only linegraph available for an intensity profile!</font>"));
         m_CurrentStatisticsValid = true;
       }
       else
@@ -864,7 +852,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         m_Controls->m_JSHistogram->ClearHistogram();
         m_CurrentStatisticsValid = false;
         m_Controls->m_ErrorMessageLabel->hide();
-        m_Controls->m_SelectedMaskLabel->setText( "None" );
+        m_Controls->m_SelectedMaskLabel->setText(tr("None"));
         this->m_StatisticsUpdatePending = false;
         m_Controls->m_lineRadioButton->setEnabled(true);
         m_Controls->m_barRadioButton->setEnabled(true);

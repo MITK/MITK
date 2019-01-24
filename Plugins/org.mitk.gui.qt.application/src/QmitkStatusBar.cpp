@@ -79,6 +79,60 @@ void QmitkStatusBar::DisplayGreyValueText(const char* t)
   QString text(t);
   m_GreyValueLabel->setText(text);
 }
+
+void QmitkStatusBar::DisplayImageInfo(mitk::Point3D point, itk::Index<3> index, mitk::ScalarType time, mitk::ScalarType pixelValue)
+{
+  QString text = "";
+  text += qApp->translate("StatusBar", "Position: <%1, %2, %3> mm; ");
+  for (int i = 0; i < 3; i++) {
+    text = text.arg(point[i], 0, 'f', 2);
+  }
+
+  text += qApp->translate("StatusBar", "Index: <%1, %2, %3>; ");
+  for (int i = 0; i < 3; i++) {
+    text = text.arg(QString::number(index[i] + 1));
+  }
+
+  text += qApp->translate("StatusBar", "Time: %1 ms; ");
+  text = text.arg(time);
+
+  text += qApp->translate("StatusBar", "Pixel value: %1");
+  if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01) {
+    text = text.arg(pixelValue, 0, 'g', 2);
+  } else {
+    text = text.arg(pixelValue);
+  }
+
+  m_GreyValueLabel->setText(text);
+}
+
+void QmitkStatusBar::DisplayImageInfo(mitk::Point3D point, itk::Index<3> index, mitk::ScalarType time, const char* pixelValue)
+{
+  QString text = "";
+  text += qApp->translate("StatusBar", "Position: <%1, %2, %3> mm; ");
+  for (int i = 0; i < 3; i++) {
+    text = text.arg(point[i], 0, 'f', 2);
+  }
+
+  text += qApp->translate("StatusBar", "Index: <%1, %2, %3>; ");
+  for (int i = 0; i < 3; i++) {
+    text = text.arg(QString::number(index[i] + 1));
+  }
+
+  text += qApp->translate("StatusBar", "Time: %1 ms; ");
+  text = text.arg(time);
+
+  text += qApp->translate("StatusBar", "Pixel value: %1");
+  text = text.arg(pixelValue);
+
+  m_GreyValueLabel->setText(text);
+}
+
+void QmitkStatusBar::DisplayImageInfoInvalid() 
+{
+  m_GreyValueLabel->setText(qApp->translate("StatusBar", "No image information at this position!"));
+}
+
 /**
  * Clear the text in the StatusBar
  */

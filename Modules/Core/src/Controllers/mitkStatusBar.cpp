@@ -24,7 +24,7 @@ namespace mitk
   StatusBar *StatusBar::m_Instance = nullptr;
 
   /**
-   * Display the text in the statusbar of the applikation
+   * Display the text in the statusbar of the application
    */
   void StatusBar::DisplayText(const char *t)
   {
@@ -33,7 +33,7 @@ namespace mitk
   }
 
   /**
-   * Display the text in the statusbar of the applikation for ms seconds
+   * Display the text in the statusbar of the application for ms seconds
    */
   void StatusBar::DisplayText(const char *t, int ms)
   {
@@ -72,60 +72,28 @@ namespace mitk
       m_Implementation->DisplayGreyValueText(t);
   }
 
-  static void WriteCommonImageInfo(
-    std::ostringstream &stream, Point3D point, itk::Index<3> index, ScalarType time)
-  {
-    stream << "Position: <" << std::fixed << point[0] << ", "
-                            << std::fixed << point[1] << ", "
-                            << std::fixed << point[2] << "> mm; ";
-
-    stream << "Index: <" << index[0] + 1 << ", "
-                         << index[1] + 1 << ", "
-                         << index[2] + 1 << "> ; ";
-
-    stream << "Time: " << time << " ms";
-  }
-
   void StatusBar::DisplayImageInfo(Point3D point, itk::Index<3> index, ScalarType time, ScalarType pixelValue)
   {
-    if (m_Implementation == nullptr)
+    if (m_Implementation == nullptr) {
       return;
-
-    std::ostringstream stream;
-    stream.imbue(std::locale::classic());
-    stream.precision(2);
-
-    WriteCommonImageInfo(stream, point, index, time);
-    stream << "; Pixel value: ";
-
-    if ((fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01) && pixelValue != 0.0) {
-      stream << std::scientific;
     }
 
-    stream << pixelValue;
-
-    m_Implementation->DisplayGreyValueText(stream.str().c_str());
+    m_Implementation->DisplayImageInfo(point, index, time, pixelValue);
   }
 
   void StatusBar::DisplayImageInfo(Point3D point, itk::Index<3> index, ScalarType time, const char *pixelValue)
   {
-    if (m_Implementation == nullptr)
+    if (m_Implementation == nullptr) {
       return;
+    }
 
-    std::ostringstream stream;
-    stream.imbue(std::locale::classic());
-    stream.precision(2);
-
-    WriteCommonImageInfo(stream, point, index, time);
-    stream << "; " << pixelValue;
-
-    m_Implementation->DisplayGreyValueText(stream.str().c_str());
+    m_Implementation->DisplayImageInfo(point, index, time, pixelValue);
   }
 
   void StatusBar::DisplayImageInfoInvalid()
   {
     if (m_Implementation != nullptr)
-      m_Implementation->DisplayGreyValueText("No image information at this position!");
+      m_Implementation->DisplayImageInfoInvalid();
   }
   void StatusBar::Clear()
   {

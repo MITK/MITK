@@ -20,6 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
 
+#include <mitkPoint.h>
+#include <mitkNumericConstants.h>
+#include <itkIndex.h>
+
 namespace mitk {
 //##Documentation
 //## @brief GUI indepentent Interface for all Gui depentent implementations of a StatusBar.
@@ -48,6 +52,9 @@ public:
   virtual void DisplayGenericOutputText(const char *t) = 0;
   virtual void DisplayDebugText(const char *t) = 0;
   virtual void DisplayGreyValueText(const char *t) = 0;
+  virtual void DisplayImageInfo(mitk::Point3D point, itk::Index<3> index, mitk::ScalarType time, mitk::ScalarType pixelValue) = 0;
+  virtual void DisplayImageInfo(mitk::Point3D point, itk::Index<3> index, mitk::ScalarType time, const char* pixelValue) = 0;
+  virtual void DisplayImageInfoInvalid() = 0;
 
 
   //##Documentation

@@ -307,7 +307,7 @@ void mitk::SemanticRelationsIntegration::LinkDataToControlPoint(const DataNode* 
   if (SemanticRelationsInference::InstanceExists(caseID, controlPoint))
   {
     SemanticTypes::ID dataID = GetIDFromDataNode(dataNode);
-    RelationStorage::LinkDataToControlPoint(caseID, dataID, controlPoint);
+    RelationStorage::LinkImageToControlPoint(caseID, dataID, controlPoint);
   }
   else
   {
@@ -325,7 +325,7 @@ void mitk::SemanticRelationsIntegration::UnlinkImageFromControlPoint(const DataN
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(dataNode);
   SemanticTypes::ID dataID = GetIDFromDataNode(dataNode);
   SemanticTypes::ControlPoint controlPoint = RelationStorage::GetControlPointOfImage(caseID, dataID);
-  RelationStorage::UnlinkDataFromControlPoint(caseID, dataID);
+  RelationStorage::UnlinkImageFromControlPoint(caseID, dataID);
   ClearControlPoints(caseID);
 }
 

@@ -46,15 +46,6 @@ namespace mitk
     /* functions to get instances / attributes                              */
     /************************************************************************/
     /**
-    * @brief  Return a vector of all lesions that are currently available for the given case.
-    *         The lesions may be marked by a segmentation or may be empty - with no connection to a specific image / segmentation of the case data.
-    *         If no lesions are stored for the current case, an empty vector is returned.
-    *
-    * @param caseID   The current case identifier is defined by the given string.
-    * @return         A vector of lesions.
-    */
-    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::LesionVector GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID);
-    /**
     * @brief Return a vector of lesion classes that are currently available for the given case.
     *
     * @param caseID   The current case identifier is defined by the given string.
@@ -73,16 +64,6 @@ namespace mitk
     * @return                   The represented lesion.
     */
     MITKSEMANTICRELATIONS_EXPORT SemanticTypes::Lesion GetRepresentedLesion(const DataNode* segmentationNode);
-    /**
-    * @brief  Returns the lesion that is defined by the segmentation identified by the segmentation ID.
-    *
-    * @throw  SemanticRelationException, if the segmentation does not represent an existing lesion (this can be checked via 'IsRepresentingALesion').
-    *
-    * @param caseID             The current case identifier is defined by the given string.
-    * @param segmentationID     The segmentation node identifier is defined by the given string.
-    * @return                   The represented lesion.
-    */
-    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::Lesion GetRepresentedLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID);
     /**
     * @brief  Check if the given segmentation refers to an existing lesion instance.
     *         This function can be used before calling 'GetRepresentedLesion' in order to avoid a possible exception.
@@ -143,13 +124,6 @@ namespace mitk
     */
     MITKSEMANTICRELATIONS_EXPORT SemanticTypes::IDVector GetAllSegmentationIDsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
     /**
-    * @brief Return a vector of all control points that are valid for the given case.
-    *
-    * @param caseID         The current case identifier is defined by the given string.
-    * @return               A vector of control points.
-    */
-    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID);
-    /**
     * @brief  Return the control point of a data node.
     *         If the data node is not linked to a control point or the data node refers to a non-existing control point,
     *         a control point with an empty UID is returned.
@@ -161,28 +135,6 @@ namespace mitk
     * @return           The control point of the given data node.
     */
     MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint GetControlPointOfImage(const DataNode* dataNode);
-    /**
-    * @brief  Return the control point of a data node identified by the image ID.
-    *         If the data node is not linked to a control point or the data node refers to a non-existing control point,
-    *         a control point with an empty UID is returned.
-    *
-    * @param caseID     The current case identifier is defined by the given string.
-    * @param imageID    The image node identifier is defined by the given string.
-    * @return           The control point of the image node, defined by the image node ID.
-    */
-    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPoint GetControlPointOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
-    /**
-    * @brief  Return a vector of all image IDs that identify images that link to the given control point.
-    *         If the control point is not referred to by any image, an empty vector is returned.
-    *
-    * @pre    The UID of the control point has to exist for a control point instance.
-    * @throw  SemanticRelationException, if the UID of the control point does not exist for a control point instance (this can be checked via 'InstanceExists').
-    *
-    * @param caseID         The current case identifier is defined by the given string.
-    * @param controlPoint   A control point with a UID that identifies the corresponding control point instance.
-    * @return               A vector of IDs identifying images that link to the given control point.
-    */
-    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::IDVector GetAllImageIDsOfControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
     /**
     * @brief  Check if the given control point instance exists.
     *         This function can be used before calling 'GetAllDataOfControlPoint' in order to avoid a possible exception.

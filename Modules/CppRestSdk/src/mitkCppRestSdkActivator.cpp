@@ -11,6 +11,8 @@
 #include<usModuleSettings.h> 
 #include<usServiceTracker.h>
 
+#include <mitkRESTTest.h>
+
 
 void MitkCppRestSdkActivator::Load(us::ModuleContext *context)
 {
@@ -19,17 +21,8 @@ void MitkCppRestSdkActivator::Load(us::ModuleContext *context)
   context->RegisterService<mitk::IRESTManager>(m_RESTManager.get());
 
   //Test use of the RESTManagerMicroservice, later done in Module
-  us::ServiceReference<mitk::IRESTManager> refManager = context->GetServiceReference<mitk::IRESTManager>();
-  if (refManager)
-  {
-    auto serviceClient = context->GetService(refManager);
-    if (serviceClient)
-    {
-      serviceClient->receiveRequest(L"http://localhost:8080/test");
-      serviceClient->receiveRequest(L"http://localhost:8080/example");
-      serviceClient->receiveRequest(L"http://localhost:8090");
-    }
-  }
+  mitk::RestTest test;
+  test.TestRESTServer();
 }
 
 void MitkCppRestSdkActivator::Unload(us::ModuleContext *) 

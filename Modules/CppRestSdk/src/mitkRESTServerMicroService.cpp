@@ -31,9 +31,14 @@ web::uri mitk::RESTServerMicroService::GetUri()
 void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
 {
   int port = m_Listener.uri().port();
-  utility::string_t uri = request.absolute_uri().to_string();
+
+  web::uri_builder build(m_Listener.uri());
+  build.append(request.absolute_uri());
+  utility::string_t uri = build.to_uri().to_string();
+
   std::string uriString(uri.begin(), uri.end());
   web::json::value content;
+
   content[L"key 1"] = web::json::value::string(U("this is a first test"));
   request.set_body(content);
   auto answer = request.extract_json().get();

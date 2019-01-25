@@ -1,9 +1,10 @@
 #ifndef mitkIRESTManager_h
 #define mitkIRESTManager_h
 
+#include "cpprest/uri.h"
 #include <MitkCoreExports.h>
 #include <mitkServiceInterface.h>
-#include "cpprest/uri.h"
+#include <mitkIRESTObserver.h>
 
 namespace mitk
 {
@@ -19,10 +20,7 @@ namespace mitk
       put
     };
     virtual void sendRequest(RequestType type) = 0;
-    virtual void receiveRequest(web::uri uri) = 0;
-
-
-
+    virtual void receiveRequest(web::uri uri, IRESTObserver *observer) = 0;
   };
 } // namespace mitk
 

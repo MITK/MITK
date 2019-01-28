@@ -21,6 +21,7 @@ namespace mitk
     };
     virtual void sendRequest(RequestType type) = 0;
     virtual void receiveRequest(web::uri uri, IRESTObserver *observer) = 0;
+    virtual bool handle(web::uri) = 0;
   };
 } // namespace mitk
 

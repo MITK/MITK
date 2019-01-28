@@ -19,6 +19,8 @@ namespace mitk
     //calls RESTServer
     void receiveRequest(web::uri uri, IRESTObserver *observer) override;
 
+    bool handle(web::uri) override;
+
   private:
     std::map<int, RESTClientMicroService*> m_ClientMap; // Map with port client pairs
     std::map<int, RESTServerMicroService*> m_ServerMap; // Map with port server pairs

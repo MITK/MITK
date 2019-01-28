@@ -11,7 +11,7 @@
 #include<usModuleSettings.h> 
 #include<usServiceTracker.h>
 
-#include <mitkRESTTest.h>
+
 
 
 void MitkCppRestSdkActivator::Load(us::ModuleContext *context)
@@ -21,8 +21,8 @@ void MitkCppRestSdkActivator::Load(us::ModuleContext *context)
   context->RegisterService<mitk::IRESTManager>(m_RESTManager.get());
 
   //Test use of the RESTManagerMicroservice, later done in Module
-  mitk::RestTest test;
-  test.TestRESTServer();
+ 
+  m_Test.TestRESTServer();
 }
 
 void MitkCppRestSdkActivator::Unload(us::ModuleContext *) 

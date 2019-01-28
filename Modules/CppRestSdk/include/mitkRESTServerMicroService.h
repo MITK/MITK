@@ -10,14 +10,16 @@
 #include "cpprest/uri.h"
 
 #include "MitkCppRestSdkExports.h"
-
+#include <mitkIRESTManager.h>
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usServiceTracker.h>
 typedef web::http::experimental::listener::http_listener MitkListener;
 typedef web::http::http_request MitkRequest;
 typedef web::http::http_response MitkResponse;
 typedef web::http::methods MitkRESTMethods;
 typedef web::http::status_codes MitkRestStatusCodes;
 typedef web::json::json_exception MitkJsonException;
-
 
 namespace mitk
 {
@@ -36,4 +38,4 @@ namespace mitk
     web::uri m_Uri;
   };
 } // namespace mitk
-#endif 
+#endif

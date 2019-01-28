@@ -7,6 +7,7 @@
 #include <usModuleEvent.h> 
 #include <usServiceRegistration.h> 
 #include <usServiceTracker.h>
+#include <mitkRESTTest.h>
 
 class MitkCppRestSdkActivator : public us::ModuleActivator
 {
@@ -16,6 +17,7 @@ public:
 
 private:
   std::unique_ptr<mitk::RESTManager> m_RESTManager;
+  mitk::RestTest m_Test;
 
 };
 #endif

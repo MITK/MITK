@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkControlPointManager.h>
 #include <mitkLesionManager.h>
 #include <mitkSemanticRelationException.h>
+#include <mitkSemanticRelationsInference.h>
+#include <mitkRelationStorage.h>
 
 // qt
 #include <QColor>
@@ -205,32 +207,12 @@ QVariant QmitkLesionTreeModel::headerData(int section, Qt::Orientation orientati
   return QVariant();
 }
 
-void QmitkLesionTreeModel::NodePredicateChanged()
-{
-  // does not react to node predicate changes
-}
-
-void QmitkLesionTreeModel::NodeAdded(const mitk::DataNode* node)
-{
-  // does not react to data storage changes
-}
-
-void QmitkLesionTreeModel::NodeChanged(const mitk::DataNode* node)
-{
-  // does not react to data storage changes
-}
-
-void QmitkLesionTreeModel::NodeRemoved(const mitk::DataNode* node)
-{
-  // does not react to data storage changes
-}
-
 void QmitkLesionTreeModel::SetData()
 {
   m_RootItem = std::make_shared<QmitkLesionTreeItem>(mitk::LesionData());
 
   // get all control points of current case
-  m_ControlPoints = m_SemanticRelations->GetAllControlPointsOfCase(m_CaseID);
+  m_ControlPoints = mitk::RelationStorage::GetAllControlPointsOfCase(m_CaseID);
   // sort the vector of control points for the timeline
   std::sort(m_ControlPoints.begin(), m_ControlPoints.end());
   
@@ -240,7 +222,7 @@ void QmitkLesionTreeModel::SetData()
 
 void QmitkLesionTreeModel::SetLesionData()
 {
-  m_CurrentLesions = m_SemanticRelations->GetAllLesionsOfCase(m_CaseID);
+  m_CurrentLesions = mitk::RelationStorage::GetAllLesionsOfCase(m_CaseID);
   for (auto& lesion : m_CurrentLesions)
   {
     AddLesion(lesion);
@@ -249,14 +231,9 @@ void QmitkLesionTreeModel::SetLesionData()
 
 void QmitkLesionTreeModel::AddLesion(const mitk::SemanticTypes::Lesion& lesion)
 {
-  if (nullptr == m_SemanticRelations)
-  {
-    return;
-  }
-
   // create new lesion tree item data and modify it according to the control point data
   mitk::LesionData lesionData(lesion);
-  mitk::GenerateAdditionalLesionData(lesionData, m_CaseID, m_SemanticRelations);
+  mitk::GenerateAdditionalLesionData(lesionData, m_CaseID);
 
   // add the 1. level lesion item to the root item
   std::shared_ptr<QmitkLesionTreeItem> newLesionTreeItem = std::make_shared<QmitkLesionTreeItem>(lesionData);
@@ -272,21 +249,21 @@ void QmitkLesionTreeModel::SetSelectedDataNodesPresence()
   m_DataNodePresence.clear();
   for (const auto& dataNode : m_SelectedDataNodes)
   {
-    if (!m_SemanticRelations->InstanceExists(dataNode))
+    if (!mitk::SemanticRelationsInference::InstanceExists(dataNode))
     {
       continue;
     }
 
     for (const auto& lesion : m_CurrentLesions)
     {
-      if (!m_SemanticRelations->InstanceExists(m_CaseID, lesion))
+      if (!mitk::SemanticRelationsInference::InstanceExists(m_CaseID, lesion))
       {
         continue;
       }
       try
       {
         // set the lesion presence for the current node
-        bool dataNodePresence = m_SemanticRelations->IsLesionPresentOnDataNode(lesion, dataNode);
+        bool dataNodePresence = mitk::SemanticRelationsInference::IsLesionPresent(lesion, dataNode);
         SetDataNodePresenceOfLesion(&lesion, dataNodePresence);
       }
       catch (const mitk::SemanticRelationException&)

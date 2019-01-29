@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkControlPointManager.h>
 #include <mitkNodePredicates.h>
 #include <mitkSemanticRelationException.h>
+#include <mitkSemanticRelationsInference.h>
+#include <mitkRelationStorage.h>
 
 #include <QmitkCustomVariants.h>
 #include <QmitkEnums.h>
@@ -171,44 +173,28 @@ void QmitkPatientTableModel::NodePredicateChanged()
   UpdateModelData();
 }
 
-void QmitkPatientTableModel::NodeAdded(const mitk::DataNode* node)
-{
-  // does not react to data storage changes
-}
-
-void QmitkPatientTableModel::NodeChanged(const mitk::DataNode* node)
-{
-  // nothing here, since the "'NodeChanged'-event is currently sent far too often
-  //UpdateModelData();
-}
-
-void QmitkPatientTableModel::NodeRemoved(const mitk::DataNode* node)
-{
-  // does not react to data storage changes
-}
-
 void QmitkPatientTableModel::SetData()
 {
   // get all control points of current case
-  m_ControlPoints = m_SemanticRelations->GetAllControlPointsOfCase(m_CaseID);
+  m_ControlPoints = mitk::RelationStorage::GetAllControlPointsOfCase(m_CaseID);
   // sort the vector of control points for the timeline
   std::sort(m_ControlPoints.begin(), m_ControlPoints.end());
 
   // get all examination periods of current case
-  m_ExaminationPeriods = m_SemanticRelations->GetAllExaminationPeriodsOfCase(m_CaseID);
+  m_ExaminationPeriods = mitk::RelationStorage::GetAllExaminationPeriodsOfCase(m_CaseID);
   // sort the vector of examination periods for the timeline
   mitk::SortExaminationPeriods(m_ExaminationPeriods, m_ControlPoints);
 
   // get all information types points of current case
-  m_InformationTypes = m_SemanticRelations->GetAllInformationTypesOfCase(m_CaseID);
+  m_InformationTypes = mitk::RelationStorage::GetAllInformationTypesOfCase(m_CaseID);
 
   if ("Image" == m_SelectedNodeType)
   {
-    m_CurrentDataNodes = m_SemanticRelations->GetAllImagesOfCase(m_CaseID);
+    m_CurrentDataNodes = m_SemanticRelationsDataStorageAccess->GetAllImagesOfCase(m_CaseID);
   }
   else if ("Segmentation" == m_SelectedNodeType)
   {
-    m_CurrentDataNodes = m_SemanticRelations->GetAllSegmentationsOfCase(m_CaseID);
+    m_CurrentDataNodes = m_SemanticRelationsDataStorageAccess->GetAllSegmentationsOfCase(m_CaseID);
   }
 
   SetHeaderModel();
@@ -285,14 +271,14 @@ void QmitkPatientTableModel::SetPixmapOfNode(const mitk::DataNode* dataNode, QPi
 void QmitkPatientTableModel::SetLesionPresences()
 {
   m_LesionPresence.clear();
-  if (!m_SemanticRelations->InstanceExists(m_CaseID, m_Lesion))
+  if (!mitk::SemanticRelationsInference::InstanceExists(m_CaseID, m_Lesion))
   {
     return;
   }
 
   for (const auto& dataNode : m_CurrentDataNodes)
   {
-    if (!m_SemanticRelations->InstanceExists(dataNode))
+    if (!mitk::SemanticRelationsInference::InstanceExists(dataNode))
     {
       continue;
     }
@@ -300,7 +286,7 @@ void QmitkPatientTableModel::SetLesionPresences()
     try
     {
       // set the lesion presence for the current node
-      bool lesionPresence = m_SemanticRelations->IsLesionPresentOnDataNode(m_Lesion, dataNode);
+      bool lesionPresence = mitk::SemanticRelationsInference::IsLesionPresent(m_Lesion, dataNode);
       SetLesionPresenceOfNode(dataNode, lesionPresence);
     }
     catch (const mitk::SemanticRelationException&)
@@ -338,11 +324,11 @@ mitk::DataNode* QmitkPatientTableModel::GetCurrentDataNode(const QModelIndex& in
     std::vector<mitk::DataNode::Pointer> filteredDataNodes;
     if ("Image" == m_SelectedNodeType)
     {
-      filteredDataNodes = m_SemanticRelations->GetAllSpecificImages(m_CaseID, currentControlPoint, currentInformationType);
+      filteredDataNodes = m_SemanticRelationsDataStorageAccess->GetAllSpecificImages(m_CaseID, currentControlPoint, currentInformationType);
     }
     else if ("Segmentation" == m_SelectedNodeType)
     {
-      filteredDataNodes = m_SemanticRelations->GetAllSpecificSegmentations(m_CaseID, currentControlPoint, currentInformationType);
+      filteredDataNodes = m_SemanticRelationsDataStorageAccess->GetAllSpecificSegmentations(m_CaseID, currentControlPoint, currentInformationType);
     }
 
     if (filteredDataNodes.empty())

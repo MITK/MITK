@@ -23,6 +23,7 @@ void MitkCppRestSdkActivator::Load(us::ModuleContext *context)
   //Test use of the RESTManagerMicroservice, later done in Module
  
   m_Test.TestRESTServer();
+  m_Test2.TestRESTServer();
 }
 
 void MitkCppRestSdkActivator::Unload(us::ModuleContext *) 

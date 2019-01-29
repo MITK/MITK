@@ -39,14 +39,9 @@ void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
   utility::string_t uri = build.to_uri().to_string();
 
   std::string uriString(uri.begin(), uri.end());
-  web::json::value content;
-  //example content, has to be replace by getting actual modified data by handle
-  content[L"key 1"] = web::json::value::string(U("this is a first test"));
-  request.set_body(content);
-  auto answer = request.extract_json().get();
   MITK_INFO << "Test for Server at port " << port << " Exact request uri: " << uriString;
   
-  web::json::value worked;
+  web::json::value content;
   us::ModuleContext *context = us::GetModuleContext();
   auto managerRef = context->GetServiceReference<IRESTManager>();
   if (managerRef)
@@ -57,13 +52,13 @@ void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
       //TODO extract actual json from request body
       web::json::value v;
       MITK_INFO << "Server: Data send to manager";
-      worked = managerService->handle(build.to_uri(), v);
+      content = managerService->handle(build.to_uri(), v);
       MITK_INFO << "server: Data received from manager";
     }
   }
-  if (worked!=NULL)
+  if (content!=NULL)
   {
-    request.reply(MitkRestStatusCodes::OK, worked);
+    request.reply(MitkRestStatusCodes::OK, content);
   }
   else
   {

@@ -10,5 +10,6 @@ set(CPP_FILES
   mitkIRESTManager.cpp
   mitkRESTManager.cpp
   mitkRESTTest.cpp
+  mitkRESTTest2.cpp
   mitkIRESTObserver.cpp
 )

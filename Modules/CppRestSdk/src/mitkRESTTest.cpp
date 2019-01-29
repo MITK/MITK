@@ -17,8 +17,6 @@ void mitk::RestTest::TestRESTServer()
     if (managerService)
     {
       managerService->receiveRequest(L"http://localhost:8080/test", this);
-      managerService->receiveRequest(L"http://localhost:8080/example", this);
-      managerService->receiveRequest(L"http://localhost:8090", this);
     }
   }
 }
@@ -27,6 +25,6 @@ void mitk::RestTest::TestRESTServer()
 web::json::value mitk::RestTest::notify(web::json::value data) 
 {
   MITK_INFO << "Observer: Data in observer";
-  data[L"key 1"] = web::json::value::string(U("Data modified"));
+  data[L"key 1"] = web::json::value::string(U("Data modified by /test Observer"));
   return data;
 }

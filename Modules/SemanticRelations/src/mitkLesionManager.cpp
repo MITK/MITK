@@ -17,11 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations module
 #include "mitkLesionManager.h"
 #include "mitkSemanticRelationException.h"
+#include "mitkSemanticRelationsInference.h"
+#include "mitkRelationStorage.h"
 #include "mitkUIDGeneratorBoost.h"
 
-bool GetLesionPresence(const mitk::SemanticTypes::CaseID& caseID, std::shared_ptr<mitk::SemanticRelations> semanticRelations, const mitk::SemanticTypes::Lesion& lesion, const mitk::SemanticTypes::ControlPoint& controlPoint);
-
-double GetLesionVolume(const mitk::SemanticTypes::CaseID& caseID, std::shared_ptr<mitk::SemanticRelations> semanticRelations, const mitk::SemanticTypes::Lesion& lesion, const mitk::SemanticTypes::ControlPoint& controlPoint);
+double GetLesionVolume(const mitk::SemanticTypes::CaseID& caseID, const mitk::SemanticTypes::Lesion& lesion, const mitk::SemanticTypes::ControlPoint& controlPoint);
 
 mitk::SemanticTypes::Lesion mitk::GenerateNewLesion(const std::string& lesionClassType/* = ""*/)
 {
@@ -80,7 +80,7 @@ mitk::SemanticTypes::LesionClass mitk::FindExistingLesionClass(const std::string
   return lesionClass;
 }
 
-void mitk::GenerateAdditionalLesionData(LesionData& lesionData, const SemanticTypes::CaseID& caseID, std::shared_ptr<SemanticRelations> semanticRelations)
+void mitk::GenerateAdditionalLesionData(LesionData& lesionData, const SemanticTypes::CaseID& caseID)
 {
   std::vector<bool> lesionPresence;
   std::vector<double> lesionVolume;
@@ -89,13 +89,13 @@ void mitk::GenerateAdditionalLesionData(LesionData& lesionData, const SemanticTy
   double volume = 0.0;
   try
   {
-    std::vector<SemanticTypes::ControlPoint> controlPoints = semanticRelations->GetAllControlPointsOfCase(caseID);
+    SemanticTypes::ControlPointVector controlPoints = mitk::RelationStorage::GetAllControlPointsOfCase(caseID);
     for (const auto& controlPoint : controlPoints)
     {
-      presence = GetLesionPresence(caseID, semanticRelations, lesion, controlPoint);
+      presence = mitk::SemanticRelationsInference::IsLesionPresentAtControlPoint(caseID, lesion, controlPoint);
       lesionPresence.push_back(presence);
 
-      volume = GetLesionVolume(caseID, semanticRelations, lesion, controlPoint);
+      volume = GetLesionVolume(caseID, lesion, controlPoint);
       lesionVolume.push_back(volume);
     }
   }
@@ -108,31 +108,9 @@ void mitk::GenerateAdditionalLesionData(LesionData& lesionData, const SemanticTy
   lesionData.SetLesionVolume(lesionVolume);
 }
 
-bool GetLesionPresence(const mitk::SemanticTypes::CaseID& caseID, std::shared_ptr<mitk::SemanticRelations> semanticRelations, const mitk::SemanticTypes::Lesion& lesion, const mitk::SemanticTypes::ControlPoint& controllPoint)
+double GetLesionVolume(const mitk::SemanticTypes::CaseID& caseID, const mitk::SemanticTypes::Lesion& lesion, const mitk::SemanticTypes::ControlPoint& controlPoint)
 {
-  try
-  {
-    mitk::SemanticRelations::DataNodeVector allImagesOfLesion = semanticRelations->GetAllImagesOfLesion(caseID, lesion);
-    for (const auto& image : allImagesOfLesion)
-    {
-      auto imageControlPoint = semanticRelations->GetControlPointOfData(image);
-      if (imageControlPoint.date == controllPoint.date)
-      {
-        return true;
-      }
-    }
-  }
-  catch (const mitk::SemanticRelationException&)
-  {
-    return false;
-  }
-
-  return false;
-}
-
-double GetLesionVolume(const mitk::SemanticTypes::CaseID& caseID, std::shared_ptr<mitk::SemanticRelations> semanticRelations, const mitk::SemanticTypes::Lesion& lesion, const mitk::SemanticTypes::ControlPoint& controlPoint)
-{
-  bool presence = GetLesionPresence(caseID, semanticRelations, lesion, controlPoint);
+  bool presence = mitk::SemanticRelationsInference::IsLesionPresentAtControlPoint(caseID, lesion, controlPoint);
   if (presence)
   {
     return 1.0;

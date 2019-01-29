@@ -7,6 +7,8 @@ set(CPP_FILES
   mitkLesionManager.cpp
   mitkNodePredicates.cpp
   mitkRelationStorage.cpp
-  mitkSemanticRelations.cpp
+  mitkSemanticRelationsDataStorageAccess.cpp
+  mitkSemanticRelationsInference.cpp
+  mitkSemanticRelationsIntegration.cpp
   mitkUIDGeneratorBoost.cpp
 )

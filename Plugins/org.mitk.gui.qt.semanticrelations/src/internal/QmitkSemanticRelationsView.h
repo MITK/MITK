@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSemanticRelationsContextMenu.h"
 
 // semantic relations module
-#include <mitkSemanticRelations.h>
 #include <mitkSemanticTypes.h>
 
 // semantic relations UI module
@@ -101,8 +100,6 @@ private:
   QmitkDnDDataNodeWidget* m_DnDDataNodeWidget;
 
   QmitkSemanticRelationsContextMenu* m_ContextMenu;
-
-  std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
 };
 
 #endif // QMITKSEMANTICRELATIONSVIEW_H

@@ -283,7 +283,7 @@ bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent
     }
 
     // far away, only remember for linked rotation if necessary
-    if (distanceFromIntersectionLine > threshholdDistancePixels)
+    if (distanceFromIntersectionLine >= threshholdDistancePixels)
     {
       anyOtherGeometry = otherRenderersRenderPlane; // we just take the last one, so overwrite each iteration (we just need some crossing point)
       // TODO what about multiple crossings? NOW we have undefined behavior / random crossing point is used

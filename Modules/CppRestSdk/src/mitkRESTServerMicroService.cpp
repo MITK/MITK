@@ -46,8 +46,7 @@ void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
   auto answer = request.extract_json().get();
   MITK_INFO << "Test for Server at port " << port << " Exact request uri: " << uriString;
   
-  //TODO replace worked by data object
-  bool worked = false;
+  web::json::value worked;
   us::ModuleContext *context = us::GetModuleContext();
   auto managerRef = context->GetServiceReference<IRESTManager>();
   if (managerRef)
@@ -55,14 +54,19 @@ void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
     auto managerService = context->GetService(managerRef);
     if (managerService)
     {
-      worked = managerService->handle(build.to_uri());
+      //TODO extract actual json from request body
+      web::json::value v;
+      MITK_INFO << "Server: Data send to manager";
+      worked = managerService->handle(build.to_uri(), v);
+      MITK_INFO << "server: Data received from manager";
     }
   }
-  if (worked)
+  if (worked!=NULL)
   {
-    //TODO return modified data
-    MITK_INFO << "Pipeline worked";
+    request.reply(MitkRestStatusCodes::OK, worked);
   }
-
-  request.reply(MitkRestStatusCodes::OK, answer);
+  else
+  {
+    request.reply(MitkRestStatusCodes::NotFound);
+  }
 }

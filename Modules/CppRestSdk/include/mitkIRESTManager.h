@@ -2,6 +2,7 @@
 #define mitkIRESTManager_h
 
 #include "cpprest/uri.h"
+#include "cpprest/json.h"
 #include <MitkCoreExports.h>
 #include <mitkServiceInterface.h>
 #include <mitkIRESTObserver.h>
@@ -21,7 +22,7 @@ namespace mitk
     };
     virtual void sendRequest(RequestType type) = 0;
     virtual void receiveRequest(web::uri uri, IRESTObserver *observer) = 0;
-    virtual bool handle(web::uri) = 0;
+    virtual web::json::value handle(web::uri, web::json::value) = 0;
   };
 } // namespace mitk
 

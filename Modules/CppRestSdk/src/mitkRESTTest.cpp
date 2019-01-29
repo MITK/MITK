@@ -24,7 +24,9 @@ void mitk::RestTest::TestRESTServer()
 }
 
 //TODO get Data, return modified Data
-bool mitk::RestTest::notify() 
+web::json::value mitk::RestTest::notify(web::json::value data) 
 {
-  return true;
+  MITK_INFO << "Observer: Data in observer";
+  data[L"key 1"] = web::json::value::string(U("Data modified"));
+  return data;
 }

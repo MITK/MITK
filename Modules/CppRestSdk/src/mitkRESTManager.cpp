@@ -74,20 +74,20 @@ void mitk::RESTManager::receiveRequest(web::uri uri, mitk::IRESTObserver *observ
   }
 }
 
-// TODO replace boolean as return value by actual data
-bool mitk::RESTManager::handle(web::uri uri)
+
+web::json::value mitk::RESTManager::handle(web::uri uri, web::json::value data)
 {
   // Checking if is there is a observer for the port and path
   std::pair<int, utility::string_t> key(uri.port(), uri.path());
   if (m_Observer.count(key) != 0)
   {
-      // TODO replace by data
-      return m_Observer[key]->notify();
+    MITK_INFO << "Manager: Data send to observer";
+    return m_Observer[key]->notify(data);
   }
   //No map under this port, delete Server Object to release port for other servers
   else
   {
     MITK_WARN << "No Observer can handle the data";
-    return false;
+    return NULL;
   }
 }

@@ -5,6 +5,7 @@
 #include <usModule.h>
 #include <usServiceTracker.h>
 #include "mitkIRESTObserver.h"
+#include "cpprest/json.h"
 
 namespace mitk
 {
@@ -14,7 +15,7 @@ namespace mitk
     RestTest();
     ~RestTest();
     void TestRESTServer();
-    bool notify() override;
+    web::json::value notify(web::json::value data) override;
 
   private:
   };

@@ -19,7 +19,7 @@ namespace mitk
     //calls RESTServer
     void receiveRequest(web::uri uri, IRESTObserver *observer) override;
 
-    bool handle(web::uri) override;
+    web::json::value handle(web::uri, web::json::value) override;
 
   private:
     std::map<int, RESTClientMicroService*> m_ClientMap; // Map with port client pairs

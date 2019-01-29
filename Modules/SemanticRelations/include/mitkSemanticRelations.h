@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMHelper.h"
 #include "mitkISemanticRelationsObservable.h"
 #include "mitkISemanticRelationsObserver.h"
-#include "mitkRelationStorage.h"
 #include "mitkSemanticTypes.h"
 
 // mitk core
@@ -598,8 +597,6 @@ namespace mitk
 
   private:
 
-    // the relation storage serves as a storage accessor and can be sub-classed for custom demands
-    std::shared_ptr<RelationStorage> m_RelationStorage;
     WeakPointer<DataStorage> m_DataStorage;
 
     /**

@@ -14,9 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// semantic relations module
 #include "mitkRelationStorage.h"
-#include "mitkNodePredicates.h"
+
+// semantic relations module
+#include "mitkDICOMHelper.h"
 
 // multi label module
 #include <mitkLabelSetImage.h>
@@ -29,24 +30,122 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 #include <iostream>
 
-std::vector<mitk::SemanticTypes::Lesion> mitk::RelationStorage::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID)
+namespace
+{
+  mitk::PropertyList::Pointer GetStorageData(const mitk::SemanticTypes::CaseID& caseID)
+  {
+    // access the storage
+    PERSISTENCE_GET_SERVICE_MACRO
+      if (nullptr == persistenceService)
+      {
+        MITK_DEBUG << "Persistence service could not be loaded";
+        return nullptr;
+      }
+
+    // the property list is valid for a whole case and contains all the properties for the current case
+    // the persistence service may create a new property list with the given ID, if no property list is found
+    return persistenceService->GetPropertyList(const_cast<mitk::SemanticTypes::CaseID&>(caseID));
+  }
+
+  mitk::SemanticTypes::Lesion GenerateLesion(const mitk::SemanticTypes::CaseID& caseID, const mitk::SemanticTypes::ID& lesionID)
+  {
+    mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
+    if (nullptr == propertyList)
+    {
+      MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+      return mitk::SemanticTypes::Lesion();
+    }
+
+    mitk::VectorProperty<std::string>* lesionDataProperty = dynamic_cast<mitk::VectorProperty<std::string>*>(propertyList->GetProperty(lesionID));
+    if (nullptr == lesionDataProperty)
+    {
+      MITK_DEBUG << "Lesion " << lesionID << " not found. Lesion can not be retrieved.";
+      return mitk::SemanticTypes::Lesion();
+    }
+
+    std::vector<std::string> lesionData = lesionDataProperty->GetValue();
+    // a lesion date has to have exactly two values (the name of the lesion and the UID of the lesion class)
+    if (lesionData.size() != 2)
+    {
+      MITK_DEBUG << "Incorrect lesion data storage. Not two (2) strings of the lesion name and the lesion UID are stored.";
+      return mitk::SemanticTypes::Lesion();
+    }
+
+    // the lesion class ID is stored as the second property
+    std::string lesionClassID = lesionData[1];
+    mitk::StringProperty* lesionClassProperty = dynamic_cast<mitk::StringProperty*>(propertyList->GetProperty(lesionClassID));
+    if (nullptr != lesionClassProperty)
+    {
+      mitk::SemanticTypes::LesionClass generatedLesionClass;
+      generatedLesionClass.UID = lesionClassID;
+      generatedLesionClass.classType = lesionClassProperty->GetValue();
+
+      mitk::SemanticTypes::Lesion generatedLesion;
+      generatedLesion.UID = lesionID;
+      generatedLesion.name = lesionData[0];
+      generatedLesion.lesionClass = generatedLesionClass;
+
+      return generatedLesion;
+    }
+
+    MITK_DEBUG << "Incorrect lesion class storage. Lesion " << lesionID << " can not be retrieved.";
+    return mitk::SemanticTypes::Lesion();
+  }
+
+  mitk::SemanticTypes::ControlPoint GenerateControlpoint(const mitk::SemanticTypes::CaseID& caseID, const mitk::SemanticTypes::ID& controlPointUID)
+  {
+    mitk::PropertyList::Pointer propertyList = GetStorageData(caseID);
+    if (nullptr == propertyList)
+    {
+      MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+      return mitk::SemanticTypes::ControlPoint();
+    }
+
+    // retrieve a vector property that contains the integer values of the date of a control point (0. year 1. month 2. day)
+    mitk::VectorProperty<int>* controlPointVectorProperty = dynamic_cast<mitk::VectorProperty<int>*>(propertyList->GetProperty(controlPointUID));
+    if (nullptr == controlPointVectorProperty)
+    {
+      MITK_DEBUG << "Could not find the control point " << controlPointUID << " in the storage.";
+      return mitk::SemanticTypes::ControlPoint();
+    }
+
+    std::vector<int> controlPointVectorValue = controlPointVectorProperty->GetValue();
+    // a control point has to have exactly three integer values (year, month and day)
+    if (controlPointVectorValue.size() != 3)
+    {
+      MITK_DEBUG << "Incorrect control point storage. Not three (3) values of the date are stored.";
+      return mitk::SemanticTypes::ControlPoint();
+    }
+
+    // set the values of the control point
+    mitk::SemanticTypes::ControlPoint generatedControlPoint;
+    generatedControlPoint.UID = controlPointUID;
+    generatedControlPoint.date = boost::gregorian::date(controlPointVectorValue[0],
+      controlPointVectorValue[1],
+      controlPointVectorValue[2]);
+
+    return generatedControlPoint;
+  }
+}
+
+mitk::SemanticTypes::LesionVector mitk::RelationStorage::GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID)
 {
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
-    return std::vector<SemanticTypes::Lesion>();
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return SemanticTypes::LesionVector();
   }
   // retrieve a vector property that contains the valid lesion-IDs for the current case
   VectorProperty<std::string>* vectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("lesions"));
   if (nullptr == vectorProperty)
   {
-    MITK_INFO << "Could not find any lesion in the storage.";
-    return std::vector<SemanticTypes::Lesion>();
+    MITK_DEBUG << "Could not find any lesion in the storage.";
+    return SemanticTypes::LesionVector();
   }
 
   std::vector<std::string> vectorValue = vectorProperty->GetValue();
-  std::vector<SemanticTypes::Lesion> allLesionsOfCase;
+  SemanticTypes::LesionVector allLesionsOfCase;
   for (const auto& lesionID : vectorValue)
   {
     SemanticTypes::Lesion generatedLesion = GenerateLesion(caseID, lesionID);
@@ -64,7 +163,7 @@ mitk::SemanticTypes::Lesion mitk::RelationStorage::GetRepresentedLesion(const Se
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return SemanticTypes::Lesion();
   }
 
@@ -72,7 +171,7 @@ mitk::SemanticTypes::Lesion mitk::RelationStorage::GetRepresentedLesion(const Se
   VectorProperty<std::string>* segmentationVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty(segmentationID));
   if (nullptr == segmentationVectorProperty)
   {
-    MITK_INFO << "Could not find the segmentation node " << segmentationID << " in the storage.";
+    MITK_DEBUG << "Could not find the segmentation node " << segmentationID << " in the storage.";
     return SemanticTypes::Lesion();
   }
 
@@ -80,7 +179,7 @@ mitk::SemanticTypes::Lesion mitk::RelationStorage::GetRepresentedLesion(const Se
   // the lesion ID of a segmentation is the second value in the vector
   if (segmentationVectorValue.size() != 2)
   {
-    MITK_INFO << "Incorrect segmentation storage. Not two (2) IDs stored.";
+    MITK_DEBUG << "Incorrect segmentation storage. Not two (2) IDs stored.";
     return SemanticTypes::Lesion();
   }
 
@@ -94,20 +193,20 @@ mitk::SemanticTypes::Lesion mitk::RelationStorage::GetRepresentedLesion(const Se
   return GenerateLesion(caseID, lesionID);
 }
 
-std::vector<std::string> mitk::RelationStorage::GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID)
+mitk::SemanticTypes::IDVector mitk::RelationStorage::GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID)
 {
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
-    return std::vector<SemanticTypes::InformationType>();
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return SemanticTypes::IDVector();
   }
   // retrieve a vector property that contains the valid segmentation-IDs for the current case
   VectorProperty<std::string>* allSegmentationsVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("segmentations"));
   if (nullptr == allSegmentationsVectorProperty)
   {
-    MITK_INFO << "Could not find any segmentation in the storage.";
-    return std::vector<SemanticTypes::InformationType>();
+    MITK_DEBUG << "Could not find any segmentation in the storage.";
+    return SemanticTypes::IDVector();
   }
 
   return allSegmentationsVectorProperty->GetValue();
@@ -118,14 +217,14 @@ mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GetControlPointOfImage(
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return SemanticTypes::ControlPoint();
   }
   // retrieve a vector property that contains the information type and the referenced ID of a control point (0. information type 1. control point ID)
   VectorProperty<std::string>* dataNodeVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty(imageID));
   if (nullptr == dataNodeVectorProperty)
   {
-    MITK_INFO << "Could not find the data node " << imageID << " in the storage.";
+    MITK_DEBUG << "Could not find the data node " << imageID << " in the storage.";
     return SemanticTypes::ControlPoint();
   }
 
@@ -134,7 +233,7 @@ mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GetControlPointOfImage(
   // an image node has to have exactly two values (the information type and the ID of the control point)
   if (dataNodeVectorValue.size() != 2)
   {
-    MITK_INFO << "Incorrect data storage. Not two (2) values stored.";
+    MITK_DEBUG << "Incorrect data storage. Not two (2) values stored.";
     return SemanticTypes::ControlPoint();
   }
 
@@ -144,7 +243,7 @@ mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GetControlPointOfImage(
   VectorProperty<int>* controlPointVectorProperty = dynamic_cast<VectorProperty<int>*>(propertyList->GetProperty(controlPointID));
   if (nullptr == controlPointVectorProperty)
   {
-    MITK_INFO << "Could not find the control point " << controlPointID << " in the storage.";
+    MITK_DEBUG << "Could not find the control point " << controlPointID << " in the storage.";
     return SemanticTypes::ControlPoint();
   }
 
@@ -152,7 +251,7 @@ mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GetControlPointOfImage(
   // a control point has to have exactly three integer values (year, month and day)
   if (controlPointVectorValue.size() != 3)
   {
-    MITK_INFO << "Incorrect control point storage. Not three (3) values of the date are stored.";
+    MITK_DEBUG << "Incorrect control point storage. Not three (3) values of the date are stored.";
     return SemanticTypes::ControlPoint();
   }
 
@@ -165,25 +264,25 @@ mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GetControlPointOfImage(
   return controlPoint;
 }
 
-std::vector<mitk::SemanticTypes::ControlPoint> mitk::RelationStorage::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID)
+mitk::SemanticTypes::ControlPointVector mitk::RelationStorage::GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID)
 {
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
-    return std::vector<SemanticTypes::ControlPoint>();
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return SemanticTypes::ControlPointVector();
   }
 
   // retrieve a vector property that contains the valid control point-IDs for the current case
   VectorProperty<std::string>* vectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("controlpoints"));
   if (nullptr == vectorProperty)
   {
-    MITK_INFO << "Could not find any control points in the storage.";
-    return std::vector<SemanticTypes::ControlPoint>();
+    MITK_DEBUG << "Could not find any control points in the storage.";
+    return SemanticTypes::ControlPointVector();
   }
 
   std::vector<std::string> vectorValue = vectorProperty->GetValue();
-  std::vector<SemanticTypes::ControlPoint> allControlPointsOfCase;
+  SemanticTypes::ControlPointVector allControlPointsOfCase;
   for (const auto& controlPointUID : vectorValue)
   {
     SemanticTypes::ControlPoint generatedControlPoint = GenerateControlpoint(caseID, controlPointUID);
@@ -196,32 +295,32 @@ std::vector<mitk::SemanticTypes::ControlPoint> mitk::RelationStorage::GetAllCont
   return allControlPointsOfCase;
 }
 
-std::vector<mitk::SemanticTypes::ExaminationPeriod> mitk::RelationStorage::GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID)
+mitk::SemanticTypes::ExaminationPeriodVector mitk::RelationStorage::GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID)
 {
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
-    return std::vector<SemanticTypes::ExaminationPeriod>();
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return SemanticTypes::ExaminationPeriodVector();
   }
 
   // retrieve a vector property that contains the valid examination period UIDs for the current case
   VectorProperty<std::string>::Pointer vectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("examinationperiods"));
   if (nullptr == vectorProperty)
   {
-    MITK_INFO << "Could not find any examination periods in the storage.";
-    return std::vector<SemanticTypes::ExaminationPeriod>();
+    MITK_DEBUG << "Could not find any examination periods in the storage.";
+    return SemanticTypes::ExaminationPeriodVector();
   }
 
   std::vector<std::string> vectorValue = vectorProperty->GetValue();
-  std::vector<SemanticTypes::ExaminationPeriod> allExaminationPeriods;
+  SemanticTypes::ExaminationPeriodVector allExaminationPeriods;
   for (const auto& examinationPeriodID : vectorValue)
   {
     // retrieve a vector property that contains the represented control point-IDs
     VectorProperty<std::string>::Pointer examinationPeriodVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty(examinationPeriodID));
     if (nullptr == examinationPeriodVectorProperty)
     {
-      MITK_INFO << "Could not find the examination period " << examinationPeriodID << " in the storage.";
+      MITK_DEBUG << "Could not find the examination period " << examinationPeriodID << " in the storage.";
       continue;
     }
 
@@ -229,7 +328,7 @@ std::vector<mitk::SemanticTypes::ExaminationPeriod> mitk::RelationStorage::GetAl
     // an examination period has an arbitrary number of vector values (name and control point UIDs) (at least one for the name)
     if (examinationPeriodVectorValue.empty())
     {
-      MITK_INFO << "Incorrect examination period storage. At least one (1) value for the examination period name has to be stored.";
+      MITK_DEBUG << "Incorrect examination period storage. At least one (1) value for the examination period name has to be stored.";
       continue;
     }
     else
@@ -254,14 +353,14 @@ mitk::SemanticTypes::InformationType mitk::RelationStorage::GetInformationTypeOf
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return SemanticTypes::InformationType();
   }
   // retrieve a vector property that contains the information type and the referenced ID of an image data node (0. information type 1. control point ID)
   VectorProperty<std::string>* dataNodeVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty(imageID));
   if (nullptr == dataNodeVectorProperty)
   {
-    MITK_INFO << "Could not find the image " << imageID << " in the storage.";
+    MITK_DEBUG << "Could not find the image " << imageID << " in the storage.";
     return SemanticTypes::InformationType();
   }
 
@@ -269,7 +368,7 @@ mitk::SemanticTypes::InformationType mitk::RelationStorage::GetInformationTypeOf
   // an image node has to have exactly two values (the information type and the ID of the control point)
   if (dataNodeVectorValue.size() != 2)
   {
-    MITK_INFO << "Incorrect data storage. Not two (2) values stored.";
+    MITK_DEBUG << "Incorrect data storage. Not two (2) values stored.";
     return SemanticTypes::InformationType();
   }
 
@@ -277,39 +376,39 @@ mitk::SemanticTypes::InformationType mitk::RelationStorage::GetInformationTypeOf
   return dataNodeVectorValue[0];
 }
 
-std::vector<mitk::SemanticTypes::InformationType> mitk::RelationStorage::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID)
+mitk::SemanticTypes::InformationTypeVector mitk::RelationStorage::GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID)
 {
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
-    return std::vector<SemanticTypes::InformationType>();
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return SemanticTypes::InformationTypeVector();
   }
   // retrieve a vector property that contains the valid information types of the current case
   VectorProperty<std::string>* informationTypeVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("informationtypes"));
   if (nullptr == informationTypeVectorProperty)
   {
-    MITK_INFO << "Could not find any information types in the storage.";
-    return std::vector<SemanticTypes::InformationType>();
+    MITK_DEBUG << "Could not find any information types in the storage.";
+    return SemanticTypes::InformationTypeVector();
   }
 
   return informationTypeVectorProperty->GetValue();
 }
 
-std::vector<std::string> mitk::RelationStorage::GetAllImageIDsOfCase(const SemanticTypes::CaseID& caseID)
+mitk::SemanticTypes::IDVector mitk::RelationStorage::GetAllImageIDsOfCase(const SemanticTypes::CaseID& caseID)
 {
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
-    return std::vector<SemanticTypes::InformationType>();
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    return SemanticTypes::InformationTypeVector();
   }
   // retrieve a vector property that contains the valid image-IDs of the current case
   VectorProperty<std::string>* allImagesVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("images"));
   if (nullptr == allImagesVectorProperty)
   {
-    MITK_INFO << "Could not find any image in the storage.";
-    return std::vector<SemanticTypes::InformationType>();
+    MITK_DEBUG << "Could not find any image in the storage.";
+    return SemanticTypes::InformationTypeVector();
   }
 
   return allImagesVectorProperty->GetValue();
@@ -320,7 +419,7 @@ std::vector<mitk::SemanticTypes::CaseID> mitk::RelationStorage::GetAllCaseIDs()
   PERSISTENCE_GET_SERVICE_MACRO
   if (nullptr == persistenceService)
   {
-    MITK_INFO << "Persistence service could not be loaded";
+    MITK_DEBUG << "Persistence service could not be loaded";
     return std::vector<SemanticTypes::CaseID>();
   }
   // the property list is valid for a certain scenario and contains all the case IDs of the radiological user's MITK session
@@ -328,14 +427,14 @@ std::vector<mitk::SemanticTypes::CaseID> mitk::RelationStorage::GetAllCaseIDs()
   PropertyList::Pointer propertyList = persistenceService->GetPropertyList(listIdentifier);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << listIdentifier << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << listIdentifier << " for the current MITK workbench / session.";
     return std::vector<SemanticTypes::CaseID>();
   }
   // retrieve a vector property that contains all case IDs
   VectorProperty<std::string>* caseIDsVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty(listIdentifier));
   if (nullptr == caseIDsVectorProperty)
   {
-    MITK_INFO << "Could not find the property " << listIdentifier << " for the " << listIdentifier << " property list.";
+    MITK_DEBUG << "Could not find the property " << listIdentifier << " for the " << listIdentifier << " property list.";
     return std::vector<SemanticTypes::CaseID>();
   }
 
@@ -347,7 +446,7 @@ void mitk::RelationStorage::AddCase(const SemanticTypes::CaseID& caseID)
   PERSISTENCE_GET_SERVICE_MACRO
   if (nullptr == persistenceService)
   {
-    MITK_INFO << "Persistence service could not be loaded";
+    MITK_DEBUG << "Persistence service could not be loaded";
     return;
   }
   // the property list is valid for a certain scenario and contains all the case IDs of the radiological user's MITK session
@@ -355,7 +454,7 @@ void mitk::RelationStorage::AddCase(const SemanticTypes::CaseID& caseID)
   PropertyList::Pointer propertyList = persistenceService->GetPropertyList(listIdentifier);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << listIdentifier << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << listIdentifier << " for the current MITK workbench / session.";
     return;
   }
   // retrieve a vector property that contains all case IDs
@@ -387,7 +486,7 @@ void mitk::RelationStorage::AddImage(const SemanticTypes::CaseID& caseID, const 
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
 
@@ -427,7 +526,7 @@ void mitk::RelationStorage::RemoveImage(const SemanticTypes::CaseID& caseID, con
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
 
@@ -435,7 +534,7 @@ void mitk::RelationStorage::RemoveImage(const SemanticTypes::CaseID& caseID, con
   VectorProperty<std::string>::Pointer allImagesVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("images"));
   if (nullptr == allImagesVectorProperty)
   {
-    MITK_INFO << "Could not find any images in the storage.";
+    MITK_DEBUG << "Could not find any images in the storage.";
     return;
   }
 
@@ -462,7 +561,7 @@ void mitk::RelationStorage::AddSegmentation(const SemanticTypes::CaseID& caseID,
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
 
@@ -503,7 +602,7 @@ void mitk::RelationStorage::RemoveSegmentation(const SemanticTypes::CaseID& case
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
 
@@ -511,7 +610,7 @@ void mitk::RelationStorage::RemoveSegmentation(const SemanticTypes::CaseID& case
   VectorProperty<std::string>::Pointer allSegmentationsVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("segmentations"));
   if (nullptr == allSegmentationsVectorProperty)
   {
-    MITK_INFO << "Could not find any segmentation in the storage.";
+    MITK_DEBUG << "Could not find any segmentation in the storage.";
     return;
   }
 
@@ -538,7 +637,7 @@ void mitk::RelationStorage::AddLesion(const SemanticTypes::CaseID& caseID, const
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
   // retrieve a vector property that contains the valid lesion-IDs for the current case
@@ -583,14 +682,14 @@ void mitk::RelationStorage::OverwriteLesion(const SemanticTypes::CaseID& caseID,
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
   // retrieve a vector property that contains the valid lesion-IDs for the current case
   VectorProperty<std::string>* lesionVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("lesions"));
   if (nullptr == lesionVectorProperty)
   {
-    MITK_INFO << "Could not find any lesion in the storage.";
+    MITK_DEBUG << "Could not find any lesion in the storage.";
     return;
   }
 
@@ -612,7 +711,7 @@ void mitk::RelationStorage::OverwriteLesion(const SemanticTypes::CaseID& caseID,
   }
   else
   {
-    MITK_INFO << "Could not find lesion " << lesion.UID << " in the storage. Cannot overwrite the lesion.";    
+    MITK_DEBUG << "Could not find lesion " << lesion.UID << " in the storage. Cannot overwrite the lesion.";
   }
 }
 
@@ -621,14 +720,14 @@ void mitk::RelationStorage::LinkSegmentationToLesion(const SemanticTypes::CaseID
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
   // retrieve a vector property that contains the valid lesion-IDs for the current case
   VectorProperty<std::string>* lesionVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("lesions"));
   if (nullptr == lesionVectorProperty)
   {
-    MITK_INFO << "Could not find any lesion property in the storage.";
+    MITK_DEBUG << "Could not find any lesion property in the storage.";
     return;
   }
 
@@ -641,14 +740,14 @@ void mitk::RelationStorage::LinkSegmentationToLesion(const SemanticTypes::CaseID
     VectorProperty<std::string>* segmentationVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty(segmentationID));
     if (nullptr == segmentationVectorProperty)
     {
-      MITK_INFO << "Could not find the segmentation node " << segmentationID << " in the storage. Cannot link segmentation to lesion.";
+      MITK_DEBUG << "Could not find the segmentation node " << segmentationID << " in the storage. Cannot link segmentation to lesion.";
       return;
     }
 
     std::vector<std::string> segmentationVectorValue = segmentationVectorProperty->GetValue();
     if (segmentationVectorValue.size() != 2)
     {
-      MITK_INFO << "Incorrect segmentation storage. Not two (2) IDs stored.";
+      MITK_DEBUG << "Incorrect segmentation storage. Not two (2) IDs stored.";
       return;
     }
 
@@ -658,7 +757,7 @@ void mitk::RelationStorage::LinkSegmentationToLesion(const SemanticTypes::CaseID
     return;
   }
 
-  MITK_INFO << "Could not find lesion " << lesion.UID << " in the storage. Cannot link segmentation to lesion.";
+  MITK_DEBUG << "Could not find lesion " << lesion.UID << " in the storage. Cannot link segmentation to lesion.";
 }
 
 void mitk::RelationStorage::UnlinkSegmentationFromLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID)
@@ -666,14 +765,14 @@ void mitk::RelationStorage::UnlinkSegmentationFromLesion(const SemanticTypes::Ca
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
   // retrieve a vector property that contains the referenced ID of a segmentation (0. image ID 1. lesion ID)
   VectorProperty<std::string>* segmentationVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty(segmentationID));
   if (nullptr == segmentationVectorProperty)
   {
-    MITK_INFO << "Could not find the segmentation node " << segmentationID << " in the storage. Cannot unlink lesion from segmentation.";
+    MITK_DEBUG << "Could not find the segmentation node " << segmentationID << " in the storage. Cannot unlink lesion from segmentation.";
     return;
   }
 
@@ -681,7 +780,7 @@ void mitk::RelationStorage::UnlinkSegmentationFromLesion(const SemanticTypes::Ca
   // a segmentation has to have exactly two values (the ID of the linked image and the ID of the lesion)
   if (segmentationVectorValue.size() != 2)
   {
-    MITK_INFO << "Incorrect data storage. Not two (2) values stored.";
+    MITK_DEBUG << "Incorrect data storage. Not two (2) values stored.";
     return;
   }
 
@@ -696,14 +795,14 @@ void mitk::RelationStorage::RemoveLesion(const SemanticTypes::CaseID& caseID, co
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
   // retrieve a vector property that contains the valid lesions of the current case
   VectorProperty<std::string>* lesionVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("lesions"));
   if (nullptr == lesionVectorProperty)
   {
-    MITK_INFO << "Could not find any lesion property in the storage.";
+    MITK_DEBUG << "Could not find any lesion property in the storage.";
     return;
   }
 
@@ -726,7 +825,7 @@ void mitk::RelationStorage::RemoveLesion(const SemanticTypes::CaseID& caseID, co
   VectorProperty<std::string>* lesionDataProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty(lesion.UID));
   if (nullptr == lesionDataProperty)
   {
-    MITK_INFO << "Lesion " << lesion.UID << " not found (already removed?). Cannot remove the lesion.";
+    MITK_DEBUG << "Lesion " << lesion.UID << " not found (already removed?). Cannot remove the lesion.";
     return;
   }
 
@@ -734,7 +833,7 @@ void mitk::RelationStorage::RemoveLesion(const SemanticTypes::CaseID& caseID, co
   // a lesion date has to have exactly two values (the name of the lesion and the UID of the lesion class)
   if (lesionData.size() != 2)
   {
-    MITK_INFO << "Incorrect lesion data storage. Not two (2) strings of the lesion UID and the lesion name are stored.";
+    MITK_DEBUG << "Incorrect lesion data storage. Not two (2) strings of the lesion UID and the lesion name are stored.";
   }
   else
   {
@@ -749,7 +848,7 @@ void mitk::RelationStorage::RemoveLesionClass(const SemanticTypes::CaseID& caseI
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
 
@@ -757,7 +856,7 @@ void mitk::RelationStorage::RemoveLesionClass(const SemanticTypes::CaseID& caseI
   StringProperty* lesionClassProperty = dynamic_cast<StringProperty*>(propertyList->GetProperty(lesionClassID));
   if (nullptr == lesionClassProperty)
   {
-    MITK_INFO << "Lesion class " << lesionClassID << " not found (already removed?). Cannot remove the lesion class.";
+    MITK_DEBUG << "Lesion class " << lesionClassID << " not found (already removed?). Cannot remove the lesion class.";
     return;
   }
 
@@ -801,7 +900,7 @@ void mitk::RelationStorage::AddControlPoint(const SemanticTypes::CaseID& caseID,
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
   // retrieve a vector property that contains the valid controlPoint UIDs for the current case
@@ -844,14 +943,14 @@ void mitk::RelationStorage::LinkDataToControlPoint(const SemanticTypes::CaseID& 
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
   // retrieve a vector property that contains the valid controlPoint UIDs for the current case
   VectorProperty<std::string>* controlPointVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("controlpoints"));
   if (nullptr == controlPointVectorProperty)
   {
-    MITK_INFO << "Could not find any control point property in the storage.";
+    MITK_DEBUG << "Could not find any control point property in the storage.";
     return;
   }
 
@@ -864,7 +963,7 @@ void mitk::RelationStorage::LinkDataToControlPoint(const SemanticTypes::CaseID& 
     VectorProperty<std::string>* dataNodeVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty(dataNodeID));
     if (nullptr == dataNodeVectorProperty)
     {
-      MITK_INFO << "Could not find the data node " << dataNodeID << " in the storage. Cannot link data to control point.";
+      MITK_DEBUG << "Could not find the data node " << dataNodeID << " in the storage. Cannot link data to control point.";
       return;
     }
 
@@ -872,7 +971,7 @@ void mitk::RelationStorage::LinkDataToControlPoint(const SemanticTypes::CaseID& 
     // an image node has to have exactly two values (the information type and the ID of the control point)
     if (dataNodeVectorValue.size() != 2)
     {
-      MITK_INFO << "Incorrect data storage. Not two (2) values stored.";
+      MITK_DEBUG << "Incorrect data storage. Not two (2) values stored.";
       return;
     }
 
@@ -882,7 +981,7 @@ void mitk::RelationStorage::LinkDataToControlPoint(const SemanticTypes::CaseID& 
     return;
   }
 
-  MITK_INFO << "Could not find control point " << controlPoint.UID << " in the storage. Cannot link data to control point.";
+  MITK_DEBUG << "Could not find control point " << controlPoint.UID << " in the storage. Cannot link data to control point.";
 }
 
 void mitk::RelationStorage::UnlinkDataFromControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& dataNodeID)
@@ -890,14 +989,14 @@ void mitk::RelationStorage::UnlinkDataFromControlPoint(const SemanticTypes::Case
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
   // retrieve a vector property that contains the referenced ID of a date (0. information type 1. control point ID)
   VectorProperty<std::string>* dataNodeVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty(dataNodeID));
   if (nullptr == dataNodeVectorProperty)
   {
-    MITK_INFO << "Could not find the date " << dataNodeID << " in the storage. Cannot unlink control point from date.";
+    MITK_DEBUG << "Could not find the date " << dataNodeID << " in the storage. Cannot unlink control point from date.";
     return;
   }
 
@@ -905,7 +1004,7 @@ void mitk::RelationStorage::UnlinkDataFromControlPoint(const SemanticTypes::Case
   // a data node has to have exactly two values (the information type and the ID of the control point)
   if (dataNodeVectorValue.size() != 2)
   {
-    MITK_INFO << "Incorrect data storage. Not two (2) values stored.";
+    MITK_DEBUG << "Incorrect data storage. Not two (2) values stored.";
     return;
   }
 
@@ -920,14 +1019,14 @@ void mitk::RelationStorage::RemoveControlPointFromCase(const SemanticTypes::Case
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
   // retrieve a vector property that contains the valid controlPoint UIDs for the current case
   VectorProperty<std::string>* allControlPointsVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("controlpoints"));
   if (nullptr == allControlPointsVectorProperty)
   {
-    MITK_INFO << "Could not find any control point property in the storage.";
+    MITK_DEBUG << "Could not find any control point property in the storage.";
     return;
   }
 
@@ -945,7 +1044,7 @@ void mitk::RelationStorage::AddExaminationPeriod(const SemanticTypes::CaseID& ca
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
   // retrieve a vector property that contains the valid examination period UIDs for the current case
@@ -985,7 +1084,7 @@ void mitk::RelationStorage::AddControlPointToExaminationPeriod(const SemanticTyp
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
 
@@ -993,7 +1092,7 @@ void mitk::RelationStorage::AddControlPointToExaminationPeriod(const SemanticTyp
   VectorProperty<std::string>* controlPointUIDsVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty(examinationPeriod.UID));
   if (nullptr == controlPointUIDsVectorProperty)
   {
-    MITK_INFO << "Could not find the examination period " << examinationPeriod.UID << " in the storage. Cannot add the control point to the examination period.";
+    MITK_DEBUG << "Could not find the examination period " << examinationPeriod.UID << " in the storage. Cannot add the control point to the examination period.";
     return;
   }
 
@@ -1001,7 +1100,7 @@ void mitk::RelationStorage::AddControlPointToExaminationPeriod(const SemanticTyp
   // store the control point UID
   controlPointUIDsVectorValue.push_back(controlPoint.UID);
   // sort the vector according to the date of the control points referenced by the UIDs
-  auto lambda = [&caseID, this](const SemanticTypes::ID& leftControlPointUID, const SemanticTypes::ID& rightControlPointUID)
+  auto lambda = [&caseID](const SemanticTypes::ID& leftControlPointUID, const SemanticTypes::ID& rightControlPointUID)
   {
     const auto& leftControlPoint = GenerateControlpoint(caseID, leftControlPointUID);
     const auto& rightControlPoint = GenerateControlpoint(caseID, rightControlPointUID);
@@ -1019,7 +1118,7 @@ void mitk::RelationStorage::RemoveControlPointFromExaminationPeriod(const Semant
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
 
@@ -1027,7 +1126,7 @@ void mitk::RelationStorage::RemoveControlPointFromExaminationPeriod(const Semant
   VectorProperty<std::string>* controlPointUIDsVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty(examinationPeriod.UID));
   if (nullptr == controlPointUIDsVectorProperty)
   {
-    MITK_INFO << "Could not find examination period " << examinationPeriod.UID << " in the storage. Cannot add the control point to the examination period.";
+    MITK_DEBUG << "Could not find examination period " << examinationPeriod.UID << " in the storage. Cannot add the control point to the examination period.";
     return;
   }
 
@@ -1035,7 +1134,7 @@ void mitk::RelationStorage::RemoveControlPointFromExaminationPeriod(const Semant
   // an examination period has an arbitrary number of vector values (name and control point UIDs) (at least one for the name)
   if (controlPointUIDsVectorValue.size() < 2)
   {
-    MITK_INFO << "Incorrect examination period storage. At least one (1) control point ID has to be stored.";
+    MITK_DEBUG << "Incorrect examination period storage. At least one (1) control point ID has to be stored.";
     return;
   }
   else
@@ -1058,14 +1157,14 @@ void mitk::RelationStorage::RemoveExaminationPeriodFromCase(const SemanticTypes:
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
   // retrieve a vector property that contains the valid examination period UIDs for the current case
   VectorProperty<std::string>::Pointer vectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("examinationperiods"));
   if (nullptr == vectorProperty)
   {
-    MITK_INFO << "Could not find any examination periods in the storage.";
+    MITK_DEBUG << "Could not find any examination periods in the storage.";
     return;
   }
 
@@ -1088,7 +1187,7 @@ void mitk::RelationStorage::AddInformationTypeToImage(const SemanticTypes::CaseI
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
   // retrieve a vector property that contains the valid information types of the current case
@@ -1117,7 +1216,7 @@ void mitk::RelationStorage::AddInformationTypeToImage(const SemanticTypes::CaseI
   VectorProperty<std::string>* imageNodeVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty(imageID));
   if (nullptr == imageNodeVectorProperty)
   {
-    MITK_INFO << "Could not find the image " << imageID << " in the storage. Cannot add information type to image.";
+    MITK_DEBUG << "Could not find the image " << imageID << " in the storage. Cannot add information type to image.";
     return;
   }
 
@@ -1125,7 +1224,7 @@ void mitk::RelationStorage::AddInformationTypeToImage(const SemanticTypes::CaseI
   // an image node has to have exactly two values (the information type and the ID of the control point)
   if (imageNodeVectorValue.size() != 2)
   {
-    MITK_INFO << "Incorrect data storage. Not two (2) values stored.";
+    MITK_DEBUG << "Incorrect data storage. Not two (2) values stored.";
     return;
   }
 
@@ -1139,14 +1238,14 @@ void mitk::RelationStorage::RemoveInformationTypeFromImage(const SemanticTypes::
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
   // retrieve a vector property that contains the referenced ID of an image (0. information type 1. control point ID)
   VectorProperty<std::string>* imageNodeVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty(imageID));
   if (nullptr == imageNodeVectorProperty)
   {
-    MITK_INFO << "Could not find the image " << imageID << " in the storage. Cannot remove information type from image.";
+    MITK_DEBUG << "Could not find the image " << imageID << " in the storage. Cannot remove information type from image.";
     return;
   }
 
@@ -1154,7 +1253,7 @@ void mitk::RelationStorage::RemoveInformationTypeFromImage(const SemanticTypes::
   // an image node has to have exactly two values (the information type and the ID of the control point)
   if (imageNodeVectorValue.size() != 2)
   {
-    MITK_INFO << "Incorrect data storage. Not two (2) values stored.";
+    MITK_DEBUG << "Incorrect data storage. Not two (2) values stored.";
     return;
   }
 
@@ -1169,14 +1268,14 @@ void mitk::RelationStorage::RemoveInformationTypeFromCase(const SemanticTypes::C
   PropertyList::Pointer propertyList = GetStorageData(caseID);
   if (nullptr == propertyList)
   {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
+    MITK_DEBUG << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
     return;
   }
   // retrieve a vector property that contains the valid information types of the current case
   VectorProperty<std::string>* informationTypeVectorProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty("informationtypes"));
   if (nullptr == informationTypeVectorProperty)
   {
-    MITK_INFO << "Could not find any information type property in the storage.";
+    MITK_DEBUG << "Could not find any information type property in the storage.";
     return;
   }
 
@@ -1192,99 +1291,4 @@ void mitk::RelationStorage::RemoveInformationTypeFromCase(const SemanticTypes::C
     // or store the modified vector value
     informationTypeVectorProperty->SetValue(informationTypeVectorValue);
   }
-}
-
-mitk::PropertyList::Pointer mitk::RelationStorage::GetStorageData(const SemanticTypes::CaseID& caseID)
-{
-  // access the storage
-  PERSISTENCE_GET_SERVICE_MACRO
-  if (nullptr == persistenceService)
-  {
-    MITK_INFO << "Persistence service could not be loaded";
-    return nullptr;
-  }
-
-  // the property list is valid for a whole case and contains all the properties for the current case
-  // the persistence service may create a new property list with the given ID, if no property list is found
-  return persistenceService->GetPropertyList(const_cast<SemanticTypes::CaseID&>(caseID));
-}
-
-mitk::SemanticTypes::Lesion mitk::RelationStorage::GenerateLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& lesionID)
-{
-  PropertyList::Pointer propertyList = GetStorageData(caseID);
-  if (nullptr == propertyList)
-  {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
-    return SemanticTypes::Lesion();
-  }
-
-  VectorProperty<std::string>* lesionDataProperty = dynamic_cast<VectorProperty<std::string>*>(propertyList->GetProperty(lesionID));
-  if (nullptr == lesionDataProperty)
-  {
-    MITK_INFO << "Lesion " << lesionID << " not found. Lesion can not be retrieved.";
-    return SemanticTypes::Lesion();
-  }
-
-  std::vector<std::string> lesionData = lesionDataProperty->GetValue();
-  // a lesion date has to have exactly two values (the name of the lesion and the UID of the lesion class)
-  if (lesionData.size() != 2)
-  {
-    MITK_INFO << "Incorrect lesion data storage. Not two (2) strings of the lesion name and the lesion UID are stored.";
-    return SemanticTypes::Lesion();
-  }
-
-  // the lesion class ID is stored as the second property
-  std::string lesionClassID = lesionData[1];
-  StringProperty* lesionClassProperty = dynamic_cast<StringProperty*>(propertyList->GetProperty(lesionClassID));
-  if (nullptr != lesionClassProperty)
-  {
-    SemanticTypes::LesionClass generatedLesionClass;
-    generatedLesionClass.UID = lesionClassID;
-    generatedLesionClass.classType = lesionClassProperty->GetValue();
-
-    SemanticTypes::Lesion generatedLesion;
-    generatedLesion.UID = lesionID;
-    generatedLesion.name = lesionData[0];
-    generatedLesion.lesionClass = generatedLesionClass;
-
-    return generatedLesion;
-  }
-
-  MITK_INFO << "Incorrect lesion class storage. Lesion " << lesionID << " can not be retrieved.";
-  return SemanticTypes::Lesion();
-}
-
-mitk::SemanticTypes::ControlPoint mitk::RelationStorage::GenerateControlpoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& controlPointUID)
-{
-  PropertyList::Pointer propertyList = GetStorageData(caseID);
-  if (nullptr == propertyList)
-  {
-    MITK_INFO << "Could not find the property list " << caseID << " for the current MITK workbench / session.";
-    return SemanticTypes::ControlPoint();
-  }
-
-  // retrieve a vector property that contains the integer values of the date of a control point (0. year 1. month 2. day)
-  VectorProperty<int>* controlPointVectorProperty = dynamic_cast<VectorProperty<int>*>(propertyList->GetProperty(controlPointUID));
-  if (nullptr == controlPointVectorProperty)
-  {
-    MITK_INFO << "Could not find the control point " << controlPointUID << " in the storage.";
-    return SemanticTypes::ControlPoint();
-  }
-
-  std::vector<int> controlPointVectorValue = controlPointVectorProperty->GetValue();
-  // a control point has to have exactly three integer values (year, month and day)
-  if (controlPointVectorValue.size() != 3)
-  {
-    MITK_INFO << "Incorrect control point storage. Not three (3) values of the date are stored.";
-    return SemanticTypes::ControlPoint();
-  }
-
-  // set the values of the control point
-  SemanticTypes::ControlPoint generatedControlPoint;
-  generatedControlPoint.UID = controlPointUID;
-  generatedControlPoint.date = boost::gregorian::date(controlPointVectorValue[0],
-                                                      controlPointVectorValue[1],
-                                                      controlPointVectorValue[2]);
-
-  return generatedControlPoint;
 }

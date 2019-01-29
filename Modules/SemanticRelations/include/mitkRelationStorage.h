@@ -18,22 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKRELATIONSTORAGE_H
 
 // semantic relations module
-#include "mitkDICOMHelper.h"
 #include "mitkSemanticTypes.h"
-
-// mitk core
-#include <mitkDataNode.h>
 
 namespace mitk
 {
-  class RelationStorage
+  namespace RelationStorage
   {
-  public:
-
     SemanticTypes::LesionVector GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID);
     SemanticTypes::Lesion GetRepresentedLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID);
 
-    std::vector<std::string> GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID);
+    SemanticTypes::IDVector GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID);
 
     SemanticTypes::ControlPoint GetControlPointOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
     SemanticTypes::ControlPointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID);
@@ -43,7 +37,7 @@ namespace mitk
     SemanticTypes::InformationType GetInformationTypeOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
     SemanticTypes::InformationTypeVector GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID);
 
-    std::vector<std::string> GetAllImageIDsOfCase(const SemanticTypes::CaseID& caseID);
+    SemanticTypes::IDVector GetAllImageIDsOfCase(const SemanticTypes::CaseID& caseID);
     std::vector<SemanticTypes::CaseID> GetAllCaseIDs();
 
     void AddCase(const SemanticTypes::CaseID& caseID);
@@ -73,16 +67,7 @@ namespace mitk
     void RemoveInformationTypeFromImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
     void RemoveInformationTypeFromCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType informationType);
 
-  private:
-
-    // access the storage and retrieve the case data, stored under the given case ID
-    PropertyList::Pointer GetStorageData(const SemanticTypes::CaseID& caseID);
-
-    SemanticTypes::Lesion GenerateLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& lesionID);
-
-    SemanticTypes::ControlPoint GenerateControlpoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& controlPointUID);
-  };
-
+  } // namespace RelationStorage
 } // namespace mitk
 
 #endif // MITKRELATIONSTORAGE_H

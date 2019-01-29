@@ -47,7 +47,7 @@ void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
   MITK_INFO << "Test for Server at port " << port << " Exact request uri: " << uriString;
   
   //TODO replace worked by data object
-  bool worked;
+  bool worked = false;
   us::ModuleContext *context = us::GetModuleContext();
   auto managerRef = context->GetServiceReference<IRESTManager>();
   if (managerRef)

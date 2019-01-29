@@ -24,7 +24,7 @@ namespace mitk
   private:
     std::map<int, RESTClientMicroService*> m_ClientMap; // Map with port client pairs
     std::map<int, RESTServerMicroService*> m_ServerMap; // Map with port server pairs
-    std::map<web::uri, IRESTObserver *> m_Observer; //Map with all observers
+    std::map<std::pair<int, utility::string_t>, IRESTObserver*> m_Observer; //Map with all observers
   };
 } // namespace mitk
 #endif // !mitkRESTManager_h

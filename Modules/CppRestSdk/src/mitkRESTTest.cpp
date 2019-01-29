@@ -16,7 +16,7 @@ void mitk::RestTest::TestRESTServer()
     auto managerService = context->GetService(managerRef);
     if (managerService)
     {
-      managerService->receiveRequest(L"http://localhost:8080/test/", this);
+      managerService->receiveRequest(L"http://localhost:8080/test", this);
       managerService->receiveRequest(L"http://localhost:8080/example", this);
       managerService->receiveRequest(L"http://localhost:8090", this);
     }

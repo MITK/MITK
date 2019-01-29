@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations module
 #include <mitkNodePredicates.h>
 #include <mitkSemanticRelationException.h>
-#include <mitkUIDGeneratorBoost.h>
 
 // mitk gui common plugin
 #include <mitkDataNodeSelection.h>
@@ -31,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // namespace that contains the concrete action
 namespace RemoveFromSemanticRelationsAction
 {
-  void Run(mitk::SemanticRelations* semanticRelations, const mitk::DataNode* dataNode)
+  void Run(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataNode* dataNode)
   {
     if (nullptr == dataNode)
     {
@@ -40,15 +39,15 @@ namespace RemoveFromSemanticRelationsAction
 
     if (mitk::NodePredicates::GetImagePredicate()->CheckNode(dataNode))
     {
-      RemoveImage(semanticRelations, dataNode);
+      RemoveImage(semanticRelationsIntegration, dataNode);
     }
     else if (mitk::NodePredicates::GetSegmentationPredicate()->CheckNode(dataNode))
     {
-      RemoveSegmentation(semanticRelations, dataNode);
+      RemoveSegmentation(semanticRelationsIntegration, dataNode);
     }
   }
 
-  void RemoveImage(mitk::SemanticRelations* semanticRelations, const mitk::DataNode* image)
+  void RemoveImage(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataNode* image)
   {
     if (nullptr == image)
     {
@@ -58,7 +57,7 @@ namespace RemoveFromSemanticRelationsAction
     try
     {
       // remove the image from the semantic relations storage
-      semanticRelations->RemoveImage(image);
+      semanticRelationsIntegration->RemoveImage(image);
     }
     catch (const mitk::SemanticRelationException& e)
     {
@@ -73,7 +72,7 @@ namespace RemoveFromSemanticRelationsAction
     }
   }
 
-  void RemoveSegmentation(mitk::SemanticRelations* semanticRelations, const mitk::DataNode* segmentation)
+  void RemoveSegmentation(mitk::SemanticRelationsIntegration* semanticRelationsIntegration, const mitk::DataNode* segmentation)
   {
     if (nullptr == segmentation)
     {
@@ -82,7 +81,8 @@ namespace RemoveFromSemanticRelationsAction
 
     try
     {
-      semanticRelations->RemoveSegmentation(segmentation);
+      // remove the segmentation from the semantic relations storage
+      semanticRelationsIntegration->RemoveSegmentation(segmentation);
     }
     catch (const mitk::SemanticRelationException& e)
     {
@@ -100,7 +100,7 @@ namespace RemoveFromSemanticRelationsAction
 
 QmitkDataNodeRemoveFromSemanticRelationsAction::QmitkDataNodeRemoveFromSemanticRelationsAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
   : QAction(parent)
-  , QmitkAbstractDataNodeAction(workbenchPartSite)
+  , QmitkAbstractSemanticRelationsAction(workbenchPartSite)
 {
   setText(tr("Remove from semantic relations"));
   InitializeAction();
@@ -108,7 +108,7 @@ QmitkDataNodeRemoveFromSemanticRelationsAction::QmitkDataNodeRemoveFromSemanticR
 
 QmitkDataNodeRemoveFromSemanticRelationsAction::QmitkDataNodeRemoveFromSemanticRelationsAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
   : QAction(parent)
-  , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
+  , QmitkAbstractSemanticRelationsAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
 {
   setText(tr("Remove from semantic relations"));
   InitializeAction();
@@ -119,16 +119,6 @@ QmitkDataNodeRemoveFromSemanticRelationsAction::~QmitkDataNodeRemoveFromSemantic
   // nothing here
 }
 
-void QmitkDataNodeRemoveFromSemanticRelationsAction::SetDataStorage(mitk::DataStorage* dataStorage)
-{
-  if (m_DataStorage != dataStorage)
-  {
-    // set the new data storage
-    m_DataStorage = dataStorage;
-    m_SemanticRelations = std::make_unique<mitk::SemanticRelations>(m_DataStorage.Lock());
-  }
-}
-
 void QmitkDataNodeRemoveFromSemanticRelationsAction::InitializeAction()
 {
   connect(this, &QAction::triggered, this, &QmitkDataNodeRemoveFromSemanticRelationsAction::OnActionTriggered);
@@ -136,11 +126,6 @@ void QmitkDataNodeRemoveFromSemanticRelationsAction::InitializeAction()
 
 void QmitkDataNodeRemoveFromSemanticRelationsAction::OnActionTriggered(bool checked)
 {
-  if (nullptr == m_SemanticRelations)
-  {
-    return;
-  }
-
   auto dataNode = GetSelectedNode();
-  RemoveFromSemanticRelationsAction::Run(m_SemanticRelations.get(), dataNode);
+  RemoveFromSemanticRelationsAction::Run(m_SemanticRelationsIntegration.get(), dataNode);
 }

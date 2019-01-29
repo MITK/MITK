@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations module
 #include <mitkSemanticRelationException.h>
+#include <mitkSemanticRelationsInference.h>
 
 // mitk gui common plugin
 #include <mitkDataNodeSelection.h>
@@ -28,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkDataNodeSetInformationTypeAction::QmitkDataNodeSetInformationTypeAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
   : QAction(parent)
-  , QmitkAbstractDataNodeAction(workbenchPartSite)
+  , QmitkAbstractSemanticRelationsAction(workbenchPartSite)
 {
   setText(tr("Set information type"));
   m_Parent = parent;
@@ -37,7 +38,7 @@ QmitkDataNodeSetInformationTypeAction::QmitkDataNodeSetInformationTypeAction(QWi
 
 QmitkDataNodeSetInformationTypeAction::QmitkDataNodeSetInformationTypeAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
   : QAction(parent)
-  , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
+  , QmitkAbstractSemanticRelationsAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
 {
   setText(tr("Set information type"));
   m_Parent = parent;
@@ -49,16 +50,6 @@ QmitkDataNodeSetInformationTypeAction::~QmitkDataNodeSetInformationTypeAction()
   // nothing here
 }
 
-void QmitkDataNodeSetInformationTypeAction::SetDataStorage(mitk::DataStorage* dataStorage)
-{
-  if (m_DataStorage != dataStorage)
-  {
-    // set the new data storage
-    m_DataStorage = dataStorage;
-    m_SemanticRelations = std::make_unique<mitk::SemanticRelations>(m_DataStorage.Lock());
-  }
-}
-
 void QmitkDataNodeSetInformationTypeAction::InitializeAction()
 {
   connect(this, &QAction::triggered, this, &QmitkDataNodeSetInformationTypeAction::OnActionTriggered);
@@ -66,7 +57,7 @@ void QmitkDataNodeSetInformationTypeAction::InitializeAction()
 
 void QmitkDataNodeSetInformationTypeAction::OnActionTriggered(bool checked)
 {
-  if (nullptr == m_SemanticRelations)
+  if (nullptr == m_SemanticRelationsIntegration)
   {
     return;
   }
@@ -80,7 +71,7 @@ void QmitkDataNodeSetInformationTypeAction::OnActionTriggered(bool checked)
   QInputDialog* inputDialog = new QInputDialog(m_Parent);
   inputDialog->setWindowTitle(tr("Set information type of selected node"));
   inputDialog->setLabelText(tr("Information type:"));
-  inputDialog->setTextValue(QString::fromStdString(m_SemanticRelations->GetInformationTypeOfImage(dataNode)));
+  inputDialog->setTextValue(QString::fromStdString(mitk::SemanticRelationsInference::GetInformationTypeOfImage(dataNode)));
   inputDialog->setMinimumSize(250, 100);
 
   int dialogReturnValue = inputDialog->exec();
@@ -91,7 +82,7 @@ void QmitkDataNodeSetInformationTypeAction::OnActionTriggered(bool checked)
 
   try
   {
-    m_SemanticRelations->SetInformationType(dataNode, inputDialog->textValue().toStdString());
+    m_SemanticRelationsIntegration->SetInformationType(dataNode, inputDialog->textValue().toStdString());
   }
   catch (const mitk::SemanticRelationException&)
   {

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations module
 #include <mitkDICOMHelper.h>
 #include <mitkSemanticRelationException.h>
+#include <mitkSemanticRelationsInference.h>
 #include <mitkUIDGeneratorBoost.h>
 
 // semantic relations UI module
@@ -33,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkDataNodeSetControlPointAction::QmitkDataNodeSetControlPointAction(QWidget* parent, berry::IWorkbenchPartSite::Pointer workbenchPartSite)
   : QAction(parent)
-  , QmitkAbstractDataNodeAction(workbenchPartSite)
+  , QmitkAbstractSemanticRelationsAction(workbenchPartSite)
 {
   setText(tr("Set control point"));
   m_Parent = parent;
@@ -42,7 +43,7 @@ QmitkDataNodeSetControlPointAction::QmitkDataNodeSetControlPointAction(QWidget* 
 
 QmitkDataNodeSetControlPointAction::QmitkDataNodeSetControlPointAction(QWidget* parent, berry::IWorkbenchPartSite* workbenchPartSite)
   : QAction(parent)
-  , QmitkAbstractDataNodeAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
+  , QmitkAbstractSemanticRelationsAction(berry::IWorkbenchPartSite::Pointer(workbenchPartSite))
 {
   setText(tr("Set control point"));
   m_Parent = parent;
@@ -54,16 +55,6 @@ QmitkDataNodeSetControlPointAction::~QmitkDataNodeSetControlPointAction()
   // nothing here
 }
 
-void QmitkDataNodeSetControlPointAction::SetDataStorage(mitk::DataStorage* dataStorage)
-{
-  if (m_DataStorage != dataStorage)
-  {
-    // set the new data storage
-    m_DataStorage = dataStorage;
-    m_SemanticRelations = std::make_unique<mitk::SemanticRelations>(m_DataStorage.Lock());
-  }
-}
-
 void QmitkDataNodeSetControlPointAction::InitializeAction()
 {
   connect(this, &QAction::triggered, this, &QmitkDataNodeSetControlPointAction::OnActionTriggered);
@@ -71,7 +62,7 @@ void QmitkDataNodeSetControlPointAction::InitializeAction()
 
 void QmitkDataNodeSetControlPointAction::OnActionTriggered(bool checked)
 {
-  if (nullptr == m_SemanticRelations)
+  if (nullptr == m_SemanticRelationsIntegration)
   {
     return;
   }
@@ -84,7 +75,7 @@ void QmitkDataNodeSetControlPointAction::OnActionTriggered(bool checked)
 
   QmitkControlPointDialog* inputDialog = new QmitkControlPointDialog(m_Parent);
   inputDialog->setWindowTitle("Set control point");
-  inputDialog->SetCurrentDate(m_SemanticRelations->GetControlPointOfData(dataNode));
+  inputDialog->SetCurrentDate(mitk::SemanticRelationsInference::GetControlPointOfImage(dataNode));
 
   int dialogReturnValue = inputDialog->exec();
   if (QDialog::Rejected == dialogReturnValue)
@@ -101,8 +92,8 @@ void QmitkDataNodeSetControlPointAction::OnActionTriggered(bool checked)
 
   try
   {
-    m_SemanticRelations->UnlinkDataFromControlPoint(dataNode);
-    m_SemanticRelations->SetControlPointOfData(dataNode, controlPoint);
+    m_SemanticRelationsIntegration->UnlinkImageFromControlPoint(dataNode);
+    m_SemanticRelationsIntegration->SetControlPointOfData(dataNode, controlPoint);
   }
   catch (const mitk::SemanticRelationException&)
   {

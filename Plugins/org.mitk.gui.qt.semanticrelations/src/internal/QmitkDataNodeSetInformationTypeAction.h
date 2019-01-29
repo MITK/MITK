@@ -17,16 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKDATANODESETINFORMATIONTYPEACTION_H
 #define QMITKDATANODESETINFORMATIONTYPEACTION_H
 
-// semantic relations module
-#include <mitkSemanticRelations.h>
-
 // mitk gui qt application plugin
-#include <QmitkAbstractDataNodeAction.h>
+#include "QmitkAbstractSemanticRelationsAction.h"
 
 // qt
 #include <QAction.h>
 
-class QmitkDataNodeSetInformationTypeAction : public QAction, public QmitkAbstractDataNodeAction
+class QmitkDataNodeSetInformationTypeAction : public QAction, public QmitkAbstractSemanticRelationsAction
 {
   Q_OBJECT
 
@@ -37,8 +34,6 @@ public:
 
   virtual ~QmitkDataNodeSetInformationTypeAction() override;
 
-  void SetDataStorage(mitk::DataStorage* dataStorage);
-
 private Q_SLOTS:
 
   void OnActionTriggered(bool);
@@ -48,7 +43,6 @@ protected:
   virtual void InitializeAction() override;
 
   QWidget* m_Parent;
-  std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
 
 };
 

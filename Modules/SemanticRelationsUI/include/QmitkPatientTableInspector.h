@@ -84,8 +84,6 @@ private:
   QmitkPatientTableModel* m_StorageModel;
   QmitkTableItemThumbnailDelegate* m_ItemDelegate;
 
-  mitk::DataNode* m_SelectedDataNode;
-
 };
 
 #endif // QMITKPATIENTTABLEINSPECTOR_H

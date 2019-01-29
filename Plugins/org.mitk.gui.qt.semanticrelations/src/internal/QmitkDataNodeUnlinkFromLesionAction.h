@@ -19,23 +19,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_mitk_gui_qt_semanticrelations_Export.h>
 
-// semantic relations module
-#include <mitkSemanticRelations.h>
-
-// mitk gui qt application plugin
-#include <QmitkAbstractDataNodeAction.h>
+// mitk gui qt semanticrelations plugin
+#include "QmitkAbstractSemanticRelationsAction.h"
 
 // qt
 #include <QAction.h>
 
 namespace UnlinkFromLesionAction
 {
-  MITK_GUI_SEMANTICRELATIONS_EXPORT void Run(mitk::SemanticRelations* semanticRelations, const mitk::DataStorage* dataStorage, const mitk::DataNode* dataNode);
-
-  void UnlinkSegmentation(mitk::SemanticRelations* semanticRelations, const mitk::DataNode* segmentation);
+  MITK_GUI_SEMANTICRELATIONS_EXPORT void Run(const mitk::DataNode* dataNode, mitk::SemanticRelationsIntegration* semanticRelationsIntegration);
 }
 
-class MITK_GUI_SEMANTICRELATIONS_EXPORT QmitkDataNodeUnlinkFromLesionAction : public QAction, public QmitkAbstractDataNodeAction
+class MITK_GUI_SEMANTICRELATIONS_EXPORT QmitkDataNodeUnlinkFromLesionAction : public QAction, public QmitkAbstractSemanticRelationsAction
 {
   Q_OBJECT
 
@@ -46,8 +41,6 @@ public:
 
   virtual ~QmitkDataNodeUnlinkFromLesionAction() override;
 
-  void SetDataStorage(mitk::DataStorage* dataStorage);
-
 private Q_SLOTS:
 
   void OnActionTriggered(bool);
@@ -55,8 +48,6 @@ private Q_SLOTS:
 protected:
 
   virtual void InitializeAction() override;
-
-  std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
 
 };
 

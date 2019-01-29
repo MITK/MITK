@@ -20,8 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDataNodeRemoveFromSemanticRelationsAction.h"
 
 // semantic relations module
+#include <mitkDICOMHelper.h>
 #include <mitkNodePredicates.h>
 #include <mitkSemanticRelationException.h>
+#include <mitkSemanticRelationsInference.h>
+#include <mitkRelationStorage.h>
 
 // mitk qt widgets module
 #include <QmitkDnDDataNodeWidget.h>
@@ -50,9 +53,6 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
   // create GUI widgets
   m_Controls.setupUi(parent);
 
-  // initialize the semantic relations
-  m_SemanticRelations = std::make_unique<mitk::SemanticRelations>(GetDataStorage());
-
   m_LesionInfoWidget = new QmitkLesionInfoWidget(GetDataStorage(), parent);
   m_Controls.gridLayout->addWidget(m_LesionInfoWidget);
 
@@ -80,7 +80,7 @@ void QmitkSemanticRelationsView::CreateQtPartControl(QWidget* parent)
 
   SetUpConnections();
 
-  const auto& allCaseIDs = m_SemanticRelations->GetAllCaseIDs();
+  const auto& allCaseIDs = mitk::RelationStorage::GetAllCaseIDs();
   for (const auto& caseID : allCaseIDs)
   {
     AddToComboBox(caseID);
@@ -136,9 +136,11 @@ void QmitkSemanticRelationsView::NodeRemoved(const mitk::DataNode* dataNode)
     return;
   }
 
-  if (m_SemanticRelations->InstanceExists(dataNode))
+  if (mitk::SemanticRelationsInference::InstanceExists(dataNode))
   {
-    RemoveFromSemanticRelationsAction::Run(m_SemanticRelations.get(), dataNode);
+    // no observer needed for the integration; simply use a temporary instance for removing
+    mitk::SemanticRelationsIntegration semanticRelationsIntegration;
+    RemoveFromSemanticRelationsAction::Run(&semanticRelationsIntegration, dataNode);
     mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(dataNode);
     RemoveFromComboBox(caseID);
   }
@@ -182,7 +184,9 @@ void QmitkSemanticRelationsView::OnNodesAdded(QmitkDnDDataNodeWidget* dnDDataNod
   mitk::SemanticTypes::CaseID caseID = "";
   for (mitk::DataNode* dataNode : nodes)
   {
-    AddToSemanticRelationsAction::Run(m_SemanticRelations.get(), GetDataStorage(), dataNode);
+    // no observer needed for the integration; simply use a temporary instance for adding
+    mitk::SemanticRelationsIntegration semanticRelationsIntegration;
+    AddToSemanticRelationsAction::Run(&semanticRelationsIntegration, GetDataStorage(), dataNode);
     caseID = mitk::GetCaseIDFromDataNode(dataNode);
     AddToComboBox(caseID);
   }
@@ -205,7 +209,7 @@ void QmitkSemanticRelationsView::AddToComboBox(const mitk::SemanticTypes::CaseID
 
 void QmitkSemanticRelationsView::RemoveFromComboBox(const mitk::SemanticTypes::CaseID& caseID)
 {
-  std::vector<mitk::SemanticTypes::ControlPoint> allControlPoints = m_SemanticRelations->GetAllControlPointsOfCase(caseID);
+  std::vector<mitk::SemanticTypes::ControlPoint> allControlPoints = mitk::RelationStorage::GetAllControlPointsOfCase(caseID);
   int foundIndex = m_Controls.caseIDComboBox->findText(QString::fromStdString(caseID));
   if (allControlPoints.empty() && -1 != foundIndex)
   {

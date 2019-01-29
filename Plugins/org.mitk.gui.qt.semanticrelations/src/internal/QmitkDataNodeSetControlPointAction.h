@@ -14,19 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKDATANODESETCONTROLPOINTEACTION_H
-#define QMITKDATANODESETCONTROLPOINTEACTION_H
+#ifndef QMITKDATANODESETCONTROLPOINTACTION_H
+#define QMITKDATANODESETCONTROLPOINTACTION_H
 
-// semantic relations module
-#include <mitkSemanticRelations.h>
-
-// mitk gui qt application plugin
-#include <QmitkAbstractDataNodeAction.h>
+// mitk gui qt semanticrelations plugin
+#include "QmitkAbstractSemanticRelationsAction.h"
 
 // qt
 #include <QAction.h>
 
-class QmitkDataNodeSetControlPointAction : public QAction, public QmitkAbstractDataNodeAction
+class QmitkDataNodeSetControlPointAction : public QAction, public QmitkAbstractSemanticRelationsAction
 {
   Q_OBJECT
 
@@ -37,8 +34,6 @@ public:
 
   virtual ~QmitkDataNodeSetControlPointAction() override;
 
-  void SetDataStorage(mitk::DataStorage* dataStorage);
-
 private Q_SLOTS:
 
   void OnActionTriggered(bool);
@@ -47,9 +42,8 @@ protected:
 
   virtual void InitializeAction() override;
 
-  QWidget *m_Parent;
-  std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
+  QWidget* m_Parent;
 
 };
 
-#endif // QMITKDATANODESETCONTROLPOINTEACTION_H
+#endif // QMITKDATANODESETCONTROLPOINTACTION_H

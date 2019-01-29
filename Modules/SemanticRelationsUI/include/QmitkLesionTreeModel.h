@@ -59,10 +59,10 @@ public:
 protected:
   
   // the following functions have to be overridden but are not implemented in this model
-  virtual void NodePredicateChanged() override;
-  virtual void NodeAdded(const mitk::DataNode* node) override;
-  virtual void NodeChanged(const mitk::DataNode* node) override;
-  virtual void NodeRemoved(const mitk::DataNode* node) override;
+  virtual void NodePredicateChanged() override { }
+  virtual void NodeAdded(const mitk::DataNode* node) override { }
+  virtual void NodeChanged(const mitk::DataNode* node) override { }
+  virtual void NodeRemoved(const mitk::DataNode* node) override { }
   /**
   * @brief Overridden from 'QmitkAbstractSemanticRelationsStorageModel': This function retrieves all control points
   *        of the current case and stores them to define the header of the tree.

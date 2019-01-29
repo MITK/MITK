@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkSemanticRelationsExports.h>
 
 // semantic relations module
-#include "mitkSemanticRelations.h"
 #include "mitkSemanticTypes.h"
 #include "mitkLesionData.h"
 
@@ -72,9 +71,8 @@ namespace mitk
   *
   * @param  lesionData          The lesion data that holds the lesion and will hold the additional lesion data.
   * @param  caseID              The current case ID.
-  * @param  semanticRelations   An instance of the semantic relations to retrieve the additional data.
   */
-  MITKSEMANTICRELATIONS_EXPORT void GenerateAdditionalLesionData(LesionData& lesionData, const SemanticTypes::CaseID& caseID, std::shared_ptr<SemanticRelations> semanticRelations);
+  MITKSEMANTICRELATIONS_EXPORT void GenerateAdditionalLesionData(LesionData& lesionData, const SemanticTypes::CaseID& caseID);
 } // namespace mitk
 
 #endif // MITKLESIONMANAGER_H

@@ -24,7 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkLesionTreeModel.h>
 
 // semantic relations module
-#include <mitkSemanticRelations.h>
+#include <mitkSemanticRelationsDataStorageAccess.h>
+#include <mitkSemanticRelationsIntegration.h>
 
 // mitk
 #include <mitkDataStorage.h>
@@ -58,8 +59,6 @@ public:
 
   void SetDataNodeSelection(const QList<mitk::DataNode::Pointer>& dataNodeSelection);
 
-  const mitk::SemanticTypes::Lesion& GetSelectedLesion() const { return m_CurrentLesion; }
-
 Q_SIGNALS:
 
   void LesionSelectionChanged(const mitk::SemanticTypes::Lesion&);
@@ -92,11 +91,12 @@ private:
   Ui::QmitkLesionInfoWidgetControls m_Controls;
   QmitkLesionTreeModel* m_StorageModel;
 
-  mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
-  std::unique_ptr<mitk::SemanticRelations> m_SemanticRelations;
   mitk::SemanticTypes::CaseID m_CaseID;
 
-  mitk::SemanticTypes::Lesion m_CurrentLesion;
+  mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
+  std::unique_ptr<mitk::SemanticRelationsDataStorageAccess> m_SemanticRelationsDataStorageAccess;
+  std::unique_ptr<mitk::SemanticRelationsIntegration> m_SemanticRelationsIntegration;
+
 };
 
 #endif // QMITKLESIONINFOWIDGET_H

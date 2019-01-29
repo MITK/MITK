@@ -21,16 +21,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkAbstractSemanticRelationsStorageModel::QmitkAbstractSemanticRelationsStorageModel(QObject* parent /*= nullptr*/)
   : QmitkAbstractDataStorageModel(parent)
-  , m_SemanticRelations(nullptr)
+  , m_SemanticRelationsDataStorageAccess(nullptr)
 {
-  // nothing here
+  m_SemanticRelationsIntegration = std::make_unique<mitk::SemanticRelationsIntegration>();
+  m_SemanticRelationsIntegration->AddObserver(this);
 }
 
 QmitkAbstractSemanticRelationsStorageModel::~QmitkAbstractSemanticRelationsStorageModel()
 {
-  if (nullptr != m_SemanticRelations)
+  if (nullptr != m_SemanticRelationsIntegration)
   {
-    m_SemanticRelations->RemoveObserver(this);
+    m_SemanticRelationsIntegration->RemoveObserver(this);
   }
 }
 
@@ -68,7 +69,7 @@ void QmitkAbstractSemanticRelationsStorageModel::UpdateModelData(const mitk::Sem
 
 void QmitkAbstractSemanticRelationsStorageModel::UpdateModelData()
 {
-  if (nullptr == m_SemanticRelations)
+  if (nullptr == m_SemanticRelationsDataStorageAccess)
   {
     return;
   }
@@ -84,12 +85,6 @@ void QmitkAbstractSemanticRelationsStorageModel::UpdateModelData()
 
 void QmitkAbstractSemanticRelationsStorageModel::DataStorageChanged()
 {
-  if (nullptr != m_SemanticRelations)
-  {
-    m_SemanticRelations->RemoveObserver(this);
-  }
-
-  m_SemanticRelations = std::make_shared<mitk::SemanticRelations>(m_DataStorage.Lock());
-  m_SemanticRelations->AddObserver(this);
+  m_SemanticRelationsDataStorageAccess = std::make_unique<mitk::SemanticRelationsDataStorageAccess>(m_DataStorage.Lock());
   UpdateModelData();
 }

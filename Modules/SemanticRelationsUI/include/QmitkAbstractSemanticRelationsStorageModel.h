@@ -22,7 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations module
 #include <mitkISemanticRelationsObserver.h>
-#include <mitkSemanticRelations.h>
+#include <mitkSemanticRelationsDataStorageAccess.h>
+#include <mitkSemanticRelationsIntegration.h>
 #include <mitkSemanticTypes.h>
 
 // qt widgets module
@@ -42,7 +43,7 @@ public:
   virtual ~QmitkAbstractSemanticRelationsStorageModel();
 
   /*
-  * @brief Updates this model with the data from the semantic relations.
+  * @brief Update this model with the data from the semantic relations.
   *
   *       Overridden from 'ISemanticRelationsObserver'.
   *       In order for the Update-function to be called, this model has to be added as a observer of SemanticRelation
@@ -52,9 +53,8 @@ public:
   */
   virtual void Update(const mitk::SemanticTypes::CaseID& caseID) override;
 
-  std::shared_ptr<mitk::SemanticRelations> GetSemanticRelations() const { return m_SemanticRelations; }
   /**
-  * @brief Sets the current case ID which is needed to access the semantic relations storage.
+  * @brief Set the current case ID which is needed to access the semantic relations storage.
   *
   * @param caseID    A case ID as string
   */
@@ -62,7 +62,7 @@ public:
 
   const mitk::SemanticTypes::CaseID& GetCaseID() const { return m_CaseID; }
   /**
-  * @brief Sets the current lesion which can be used to show on which images the lesion is visible.
+  * @brief Set the current lesion which can be used to show on which images the lesion is visible.
   *
   * @param lesion   The selected lesion
   */
@@ -70,7 +70,7 @@ public:
 
   const mitk::SemanticTypes::Lesion& GetLesion() const { return m_Lesion; }
   /**
-  * @brief Sets the current data node selection which can be used to show which lesions
+  * @brief Set the current data node selection which can be used to show which lesions
   *        are visible on the node selection.
   *
   * @param dataNodeSelection    The selected data nodes
@@ -79,12 +79,12 @@ public:
 
   const QList<mitk::DataNode::Pointer>& GetSelectedDataNodes() const { return m_SelectedDataNodes; };
   /*
-  * @brief Updates the semantic relations storage model with the current data from the semantic relations model,
+  * @brief Update the semantic relations storage model with the current data from the semantic relations model,
   *        if the case ID is equal to the currently selected case ID of the table model.
   */
   void UpdateModelData(const mitk::SemanticTypes::CaseID& caseID);
   /*
-  * @brief Updates the semantic relations storage model with the current data from the semantic relations model
+  * @brief Update the semantic relations storage model with the current data from the semantic relations model
   *        and the current case ID.
   */
   void UpdateModelData();
@@ -95,7 +95,8 @@ Q_SIGNALS:
 protected:
 
   /**
-  * @brief Creates a new 'SemanticRelations' instance with the new data storage and updates the model data.
+  * @brief Create a new 'SemanticRelationsDataStorageAccess' instance with the new data storage and
+  *   update the model data.
   *   This functions is called inside the 'SetDataStorage'-function from the parent class.
   */
   virtual void DataStorageChanged() override;
@@ -107,7 +108,9 @@ protected:
   */
   virtual void SetData() = 0;
 
-  std::shared_ptr<mitk::SemanticRelations> m_SemanticRelations;
+  std::unique_ptr<mitk::SemanticRelationsDataStorageAccess> m_SemanticRelationsDataStorageAccess;
+  std::unique_ptr<mitk::SemanticRelationsIntegration> m_SemanticRelationsIntegration;
+
   mitk::SemanticTypes::CaseID m_CaseID;
   QList<mitk::DataNode::Pointer> m_SelectedDataNodes;
   mitk::SemanticTypes::Lesion m_Lesion;

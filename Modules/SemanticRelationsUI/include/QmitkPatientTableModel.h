@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // semantic relations module
 #include <mitkSemanticTypes.h>
+#include <mitkSemanticRelationsDataStorageAccess.h>
 
 // mitk core
 #include <mitkDataNode.h>
@@ -69,11 +70,12 @@ public:
 
 protected:
 
-  // the following functions have to be overridden but are not implemented in this model
+  // the following functions have to be overridden...
   virtual void NodePredicateChanged() override;
-  virtual void NodeAdded(const mitk::DataNode* node) override;
-  virtual void NodeChanged(const mitk::DataNode* node) override;
-  virtual void NodeRemoved(const mitk::DataNode* node) override;
+  // but are not implemented in this model
+  virtual void NodeAdded(const mitk::DataNode* node) override { }
+  virtual void NodeChanged(const mitk::DataNode* node) override { }
+  virtual void NodeRemoved(const mitk::DataNode* node) override { }
   /**
   * @brief Overridden from 'QmitkAbstractSemanticRelationsStorageModel': This function retrieves all control points
   *        and information types of the current case and stores them to define the header of the table.
@@ -123,7 +125,7 @@ private:
   mitk::SemanticTypes::InformationTypeVector m_InformationTypes;
   mitk::SemanticTypes::ControlPointVector m_ControlPoints;
   mitk::SemanticTypes::ExaminationPeriodVector m_ExaminationPeriods;
-  mitk::SemanticRelations::DataNodeVector m_CurrentDataNodes;
+  mitk::SemanticRelationsDataStorageAccess::DataNodeVector m_CurrentDataNodes;
   std::string m_SelectedNodeType;
 
   QStandardItemModel* m_HeaderModel;

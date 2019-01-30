@@ -322,11 +322,14 @@ void QmitkChartWidget::Impl::Show(bool showSubChart)
 {
   if (m_C3xyData.empty())
   {
-    mitkThrow() << "no data available for display in chart";
+    MITK_WARN << "no data available for display in chart";
+  }
+  else
+  {
+    m_C3Data.SetAppearance(showSubChart, m_C3xyData.front()->GetChartType() == QVariant("pie"));
   }
 
-  m_C3Data.SetAppearance(showSubChart, m_C3xyData.front()->GetChartType() == QVariant("pie"));
-  InitializeJavaScriptChart();
+    InitializeJavaScriptChart();
 }
 
 void QmitkChartWidget::Impl::SetShowLegend(bool show)

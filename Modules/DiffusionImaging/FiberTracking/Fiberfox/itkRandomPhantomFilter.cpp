@@ -365,9 +365,9 @@ void RandomPhantomFilter::GenerateData()
         }
       }
 
-      double dsize = 3.0;
-      double minradius = 5.0;
-      double maxradius = 2.0*m_StartRadiusMax;
+      double minradius = 0.5*static_cast<double>(m_StartRadiusMin);
+      double dsize = 0.5*minradius;
+      double maxradius = 2.0*static_cast<double>(m_StartRadiusMax);
       if (sizestrategy==0)
       {
         radius1 += randGen->GetUniformVariate(-dsize, dsize);

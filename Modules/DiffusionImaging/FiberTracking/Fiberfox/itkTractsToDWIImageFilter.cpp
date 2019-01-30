@@ -54,6 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkResampleDwiImageFilter.h>
 #include <boost/algorithm/string/replace.hpp>
 #include <omp.h>
+#include <cmath>
 
 namespace itk
 {
@@ -157,21 +158,27 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
     pos.SetVnlVector(rotZ*pos.GetVnlVector());
   }
 
+  auto max_threads = omp_get_max_threads();
+  int out_threads = Math::ceil(std::sqrt(max_threads));
+  int in_threads = Math::floor(std::sqrt(max_threads));
+  PrintToLog("Parallel volumes: " + boost::lexical_cast<std::string>(out_threads), false, true, false);
+  PrintToLog("Threads per slice: " + boost::lexical_cast<std::string>(in_threads), false, true, false);
+
   PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false, true, false);
   PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false, false);
   unsigned long lastTick = 0;
 
   boost::progress_display disp(compartment_images.at(0)->GetVectorLength()*compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2));
 
-#pragma omp parallel for
-  for (int g=0; g<(int)compartment_images.at(0)->GetVectorLength(); g++)
+#pragma omp parallel for num_threads(out_threads)
+  for (int g=0; g<static_cast<int>(compartment_images.at(0)->GetVectorLength()); g++)
   {
     if (this->GetAbortGenerateData())
       continue;
 
     std::vector< unsigned int > spikeSlice;
 #pragma omp critical
-    while (!spikeVolume.empty() && (int)spikeVolume.back()==g)
+    while (!spikeVolume.empty() && static_cast<int>(spikeVolume.back())==g)
     {
       spikeSlice.push_back(m_RandGen->GetIntegerVariate()%compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2));
       spikeVolume.pop_back();
@@ -246,6 +253,7 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
         idft->SetDiffusionGradientDirection(m_Parameters.m_SignalGen.GetGradientDirection(g));
         if (c==spikeCoil)
           idft->SetSpikesPerSlice(numSpikes);
+        idft->SetNumberOfThreads(in_threads);
         idft->Update();
 
 #pragma omp critical
@@ -263,6 +271,7 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
         auto dft = itk::DftImageFilter< Float2DImageType::PixelType >::New();
         dft->SetInput(fSlice);
         dft->SetParameters(m_Parameters);
+        dft->SetNumberOfThreads(in_threads);
         dft->Update();
         newSlice = dft->GetOutput();
 
@@ -1540,6 +1549,8 @@ void TractsToDWIImageFilter< PixelType >::SimulateMotion(int g)
         + "," + boost::lexical_cast<std::string>(m_Translation[1])
         + "," + boost::lexical_cast<std::string>(m_Translation[2]) + "\n";
   }
+  m_RotationMatrix = mitk::imv::GetRotationMatrixItk(m_Rotation[0], m_Rotation[1], m_Rotation[2]);
+  m_RotationMatrixInv = mitk::imv::GetRotationMatrixItk(-m_Rotation[0], -m_Rotation[1], -m_Rotation[2]);
 }
 
 template< class PixelType >
@@ -1551,14 +1562,11 @@ itk::Point<double, 3> TractsToDWIImageFilter< PixelType >::GetMovedPoint(itk::In
     m_UpsampledMaskImage->TransformIndexToPhysicalPoint(index, transformed_point);
     if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
     {
-      transformed_point = m_FiberBundle->TransformPoint(transformed_point.GetVnlVector(),
-                                                        m_Rotation[0],m_Rotation[1],m_Rotation[2],
-          m_Translation[0],m_Translation[1],m_Translation[2]);
+      m_FiberBundle->TransformPoint<double>(transformed_point, m_RotationMatrix, m_Translation[0], m_Translation[1], m_Translation[2]);
     }
     else
     {
-      transformed_point = m_FiberBundle->TransformPoint(transformed_point.GetVnlVector(),
-                                                        m_Rotation[0]*m_MotionCounter,m_Rotation[1]*m_MotionCounter,m_Rotation[2]*m_MotionCounter,
+      m_FiberBundle->TransformPoint<double>(transformed_point, m_Rotation[0]*m_MotionCounter,m_Rotation[1]*m_MotionCounter,m_Rotation[2]*m_MotionCounter,
           m_Translation[0]*m_MotionCounter,m_Translation[1]*m_MotionCounter,m_Translation[2]*m_MotionCounter);
     }
   }
@@ -1567,14 +1575,14 @@ itk::Point<double, 3> TractsToDWIImageFilter< PixelType >::GetMovedPoint(itk::In
     m_TransformedMaskImage->TransformIndexToPhysicalPoint(index, transformed_point);
     if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
     {
-      transformed_point = m_FiberBundle->TransformPoint( transformed_point.GetVnlVector(),
-                                                         -m_Rotation[0], -m_Rotation[1], -m_Rotation[2],
-          -m_Translation[0], -m_Translation[1], -m_Translation[2] );
+      double tx = -m_Translation[0];
+      double ty = -m_Translation[1];
+      double tz = -m_Translation[2];
+      m_FiberBundle->TransformPoint<double>( transformed_point, m_RotationMatrixInv, tx, ty, tz );
     }
     else
     {
-      transformed_point = m_FiberBundle->TransformPoint( transformed_point.GetVnlVector(),
-                                                         -m_Rotation[0]*m_MotionCounter, -m_Rotation[1]*m_MotionCounter, -m_Rotation[2]*m_MotionCounter,
+      m_FiberBundle->TransformPoint<double>( transformed_point, -m_Rotation[0]*m_MotionCounter, -m_Rotation[1]*m_MotionCounter, -m_Rotation[2]*m_MotionCounter,
           -m_Translation[0]*m_MotionCounter, -m_Translation[1]*m_MotionCounter, -m_Translation[2]*m_MotionCounter );
     }
   }

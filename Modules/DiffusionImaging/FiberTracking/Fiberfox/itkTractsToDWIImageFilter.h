@@ -153,6 +153,8 @@ protected:
     ItkUcharImgType::Pointer                    m_TransformedMaskImage;     ///< copy of mask image (changes for each motion step)
     ItkUcharImgType::Pointer                    m_UpsampledMaskImage;       ///< helper image for motion simulation
     DoubleVectorType                            m_Rotation;
+    itk::Matrix<double, 3, 3>                   m_RotationMatrix;
+    itk::Matrix<double, 3, 3>                   m_RotationMatrixInv;
     DoubleVectorType                            m_Translation;
     std::vector< DoubleVectorType >             m_Rotations;                ///<stores the individual rotation of each volume (needed for k-space simulation to obtain correct frequency map position)
     std::vector< DoubleVectorType >             m_Translations;             ///<stores the individual translation of each volume (needed for k-space simulation to obtain correct frequency map position)

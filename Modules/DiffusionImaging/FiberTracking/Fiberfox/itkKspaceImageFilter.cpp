@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #ifndef __itkKspaceImageFilter_txx
 #define __itkKspaceImageFilter_txx
+//#endif
 
 #include <ctime>
 #include <cstdio>
@@ -49,6 +50,10 @@ namespace itk {
   {
     m_Spike = vcl_complex<ScalarType>(0,0);
     m_SpikeLog = "";
+    m_RotationMatrix = mitk::imv::GetRotationMatrixItk<float>(-m_Rotation[0], -m_Rotation[1], -m_Rotation[2]);
+    m_TransX = -m_Translation[0];
+    m_TransY = -m_Translation[1];
+    m_TransZ = -m_Translation[2];
 
     typename OutputImageType::Pointer outputImage = OutputImageType::New();
     itk::ImageRegion<2> region;
@@ -79,7 +84,7 @@ namespace itk {
 
     for (int i=0; i<3; i++)
       for (int j=0; j<3; j++)
-        m_Transform[i][j] = m_Parameters->m_SignalGen.m_ImageDirection[i][j] * m_Parameters->m_SignalGen.m_ImageSpacing[j];
+        m_Transform[i][j] = m_Parameters->m_SignalGen.m_ImageDirection[i][j] * m_Parameters->m_SignalGen.m_ImageSpacing[j]/1000;
 
     float a = m_Parameters->m_SignalGen.m_ImageRegion.GetSize(0)*m_Parameters->m_SignalGen.m_ImageSpacing[0];
     float b = m_Parameters->m_SignalGen.m_ImageRegion.GetSize(1)*m_Parameters->m_SignalGen.m_ImageSpacing[1];
@@ -144,7 +149,7 @@ namespace itk {
       case SignalGenerationParameters::COIL_EXPONENTIAL:
       {
         VectorType diff = pos-m_CoilPosition;
-        float dist = diff.GetNorm();
+        float dist = static_cast<float>(diff.GetNorm());
         return std::exp(-dist*m_CoilSensitivityFactor);
       }
       default:
@@ -190,7 +195,7 @@ namespace itk {
       typename OutputImageType::IndexType out_idx = oit.GetIndex();
 
       // time from maximum echo
-      float t= m_ReadoutScheme->GetTimeFromMaxEcho(out_idx);
+      float t = m_ReadoutScheme->GetTimeFromMaxEcho(out_idx);
 
       // time passed since k-space readout started
       float tRead = m_ReadoutScheme->GetRedoutTime(out_idx);
@@ -244,6 +249,10 @@ namespace itk {
             kx += m_Parameters->m_SignalGen.m_KspaceLineOffset;
         }
 
+        t /= 1000;
+        kx /= xMax;
+        ky /= yMaxFov;
+        auto yMaxFov_half = yMaxFov/2;
         vcl_complex<ScalarType> s(0,0);
         InputIteratorType it(m_CompartmentImages.at(0), m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
         while( !it.IsAtEnd() )
@@ -251,57 +260,57 @@ namespace itk {
           typename InputImageType::IndexType input_idx = it.GetIndex();
           float x = input_idx[0];
           float y = input_idx[1];
-          if ((int)xMax%2==1){ x -= (xMax-1)/2; }
-          else{ x -= xMax/2; }
-          if ((int)yMax%2==1){ y -= (yMax-1)/2; }
-          else{ y -= yMax/2; }
+          if (static_cast<int>(xMax)%2==1)
+            x -= (xMax-1)/2;
+          else
+            x -= xMax/2;
+          if (static_cast<int>(yMax)%2==1)
+            y -= (yMax-1)/2;
+          else
+            y -= yMax/2;
 
           VectorType pos; pos[0] = x; pos[1] = y; pos[2] = m_Z;
-          pos = m_Transform*pos/1000;   // vector from image center to current position (in meter)
-
-          vcl_complex<ScalarType> f(0, 0);
+          pos = m_Transform*pos;   // vector from image center to current position (in meter)
 
           // sum compartment signals and simulate relaxation
+          ScalarType f_real = 0;
           for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
             if ( m_Parameters->m_SignalGen.m_DoSimulateRelaxation)
-              f += std::complex<ScalarType>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) * relaxFactor.at(i) *  m_Parameters->m_SignalGen.m_SignalScale, 0);
+              f_real += m_CompartmentImages[i]->GetPixel(input_idx) * relaxFactor[i] *  m_Parameters->m_SignalGen.m_SignalScale;
             else
-              f += std::complex<ScalarType>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) * m_Parameters->m_SignalGen.m_SignalScale, 0);
+              f_real += m_CompartmentImages[i]->GetPixel(input_idx) * m_Parameters->m_SignalGen.m_SignalScale;
 
           if (m_Parameters->m_SignalGen.m_CoilSensitivityProfile!=SignalGenerationParameters::COIL_CONSTANT)
-            f *= CoilSensitivity(pos);
+            f_real *= CoilSensitivity(pos);
 
           // simulate eddy currents and other distortions
           float omega = 0;   // frequency offset
           if (  m_Parameters->m_SignalGen.m_EddyStrength>0 && m_Parameters->m_Misc.m_DoAddEddyCurrents && !m_IsBaseline)
-          {
             omega += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2]) * eddyDecay;
-          }
 
           if (m_Parameters->m_Misc.m_DoAddDistortions && m_Parameters->m_SignalGen.m_FrequencyMap.IsNotNull()) // simulate distortions
           {
-            itk::Point<double, 3> point3D;
+            itk::Point<float, 3> point3D;
             itk::Image<float, 3>::IndexType index; index[0] = input_idx[0]; index[1] = input_idx[1]; index[2] = m_Zidx;
             if (m_Parameters->m_SignalGen.m_DoAddMotion)    // we have to account for the head motion since this also moves our frequency map
             {
               m_Parameters->m_SignalGen.m_FrequencyMap->TransformIndexToPhysicalPoint(index, point3D);
-              point3D = m_FiberBundle->TransformPoint( point3D.GetVnlVector(), -m_Rotation[0], -m_Rotation[1], -m_Rotation[2], -m_Translation[0], -m_Translation[1], -m_Translation[2] );
+              m_FiberBundle->TransformPoint<float>( point3D, m_RotationMatrix, m_TransX, m_TransY, m_TransZ );
               omega += mitk::imv::GetImageValue<float>(point3D, true, m_FmapInterpolator);
             }
             else
-            {
               omega += m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(index);
-            }
           }
 
           // if signal comes from outside FOV, mirror it back (wrap-around artifact - aliasing)
-          if (y<-yMaxFov/2)
+          if (y<-yMaxFov_half)
             y += yMaxFov;
-          else if (y>=yMaxFov/2)
+          else if (y>=yMaxFov_half)
             y -= yMaxFov;
 
           // actual DFT term
-          s += f * std::exp( std::complex<ScalarType>(0, 2 * itk::Math::pi * (kx*x/xMax + ky*y/yMaxFov + omega*t/1000 )) );
+          vcl_complex<ScalarType> f(f_real, 0);
+          s += f * std::exp( std::complex<ScalarType>(0, itk::Math::twopi * (kx*x + ky*y + omega*t )) );
 
           ++it;
         }

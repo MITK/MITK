@@ -115,6 +115,10 @@ namespace itk{
     float                                   m_Gamma;
     VectorType                              m_Rotation;     ///< used to find correct point in frequency map (head motion)
     VectorType                              m_Translation;  ///< used to find correct point in frequency map (head motion)
+    itk::Matrix<float, 3, 3>                m_RotationMatrix;
+    float                                   m_TransX;
+    float                                   m_TransY;
+    float                                   m_TransZ;
 
     bool                                    m_IsBaseline;
     vcl_complex<ScalarType>                 m_Spike;

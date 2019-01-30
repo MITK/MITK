@@ -49,6 +49,7 @@ int main(int argc, char* argv[])
   parser.addArgument("template", "t", mitkCommandLineParser::String, "Template image:", "Use parameters of the template diffusion-weighted image.", us::Any());
   parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Output additional images:", "output volume fraction images etc.", us::Any());
   parser.addArgument("dont_apply_direction_matrix", "", mitkCommandLineParser::Bool, "Don't apply direction matrix:", "Don't rotate gradients by image direction matrix.", us::Any());
+  parser.addArgument("fix_seed", "", mitkCommandLineParser::Bool, "Use fix random seed:", "Always use same sequence of random numbers.", us::Any());
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -61,6 +62,10 @@ int main(int argc, char* argv[])
   std::string input="";
   if (parsedArgs.count("i"))
     input = us::any_cast<std::string>(parsedArgs["i"]);
+
+  bool fix_seed = false;
+  if (parsedArgs.count("fix_seed"))
+    fix_seed = us::any_cast<bool>(parsedArgs["fix_seed"]);
 
   bool verbose = false;
   if (parsedArgs.count("verbose"))
@@ -195,6 +200,7 @@ int main(int argc, char* argv[])
     parameters.ApplyDirectionMatrix();
   }
   tractsToDwiFilter->SetParameters(parameters);
+  tractsToDwiFilter->SetUseConstantRandSeed(fix_seed);
   tractsToDwiFilter->Update();
 
   mitk::Image::Pointer image = mitk::GrabItkImageMemory(tractsToDwiFilter->GetOutput());

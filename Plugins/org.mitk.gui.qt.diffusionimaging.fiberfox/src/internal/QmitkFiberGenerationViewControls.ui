@@ -69,7 +69,7 @@
         <x>0</x>
         <y>0</y>
         <width>381</width>
-        <height>741</height>
+        <height>731</height>
        </rect>
       </property>
       <attribute name="label">
@@ -965,7 +965,7 @@
         <x>0</x>
         <y>0</y>
         <width>403</width>
-        <height>282</height>
+        <height>277</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1542,7 +1542,7 @@
         <x>0</x>
         <y>0</y>
         <width>395</width>
-        <height>298</height>
+        <height>283</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1967,7 +1967,21 @@
   <tabstop>m_BiasBox</tabstop>
   <tabstop>m_GenerateFibersButton</tabstop>
   <tabstop>m_ConstantRadiusBox</tabstop>
-  <tabstop>m_AlignOnGrid</tabstop>
+  <tabstop>m_NumBundlesBox</tabstop>
+  <tabstop>m_MinDensityBox</tabstop>
+  <tabstop>m_MaxDensityBox</tabstop>
+  <tabstop>m_MinTwistBox</tabstop>
+  <tabstop>m_MaxTwistBox</tabstop>
+  <tabstop>m_CurvyMinBox</tabstop>
+  <tabstop>m_CurvyMaxBox</tabstop>
+  <tabstop>m_SizeMinBox</tabstop>
+  <tabstop>m_SizeMaxBox</tabstop>
+  <tabstop>m_StepSizeMinBox</tabstop>
+  <tabstop>m_StepSizeMaxBox</tabstop>
+  <tabstop>m_VolumeSizeX</tabstop>
+  <tabstop>m_VolumeSizeY</tabstop>
+  <tabstop>m_VolumeSizeZ</tabstop>
+  <tabstop>m_RandomPhantomButton</tabstop>
   <tabstop>m_XrotBox</tabstop>
   <tabstop>m_YrotBox</tabstop>
   <tabstop>m_ZrotBox</tabstop>
@@ -1977,8 +1991,19 @@
   <tabstop>m_XscaleBox</tabstop>
   <tabstop>m_YscaleBox</tabstop>
   <tabstop>m_ZscaleBox</tabstop>
+  <tabstop>m_TransformBundlesButton</tabstop>
+  <tabstop>m_CopyBundlesButton</tabstop>
+  <tabstop>m_JoinBundlesButton</tabstop>
+  <tabstop>m_IncludeFiducials</tabstop>
   <tabstop>m_SaveParametersButton</tabstop>
   <tabstop>m_LoadParametersButton</tabstop>
+  <tabstop>m_FidAxis1</tabstop>
+  <tabstop>m_FidPosY</tabstop>
+  <tabstop>m_FidPosZ</tabstop>
+  <tabstop>m_FidAxis2</tabstop>
+  <tabstop>m_FidTwist</tabstop>
+  <tabstop>m_AlignOnGrid</tabstop>
+  <tabstop>m_FidPosX</tabstop>
  </tabstops>
  <resources>
   <include location="../../resources/QmitkDiffusionImaging.qrc"/>

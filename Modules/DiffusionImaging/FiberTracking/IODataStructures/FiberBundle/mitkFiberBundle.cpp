@@ -44,7 +44,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLookupTable.h>
 #include <vtkCardinalSpline.h>
 #include <vtkAppendPolyData.h>
-#include <mitkDiffusionFunctionCollection.h>
 
 const char* mitk::FiberBundle::FIBER_ID_ARRAY = "Fiber_IDs";
 
@@ -1044,9 +1043,9 @@ std::tuple<float, float> mitk::FiberBundle::GetDirectionalOverlap(ItkUcharImgTyp
   MITK_INFO << "Calculating overlap";
   auto spacing = mask->GetSpacing();
   boost::progress_display disp(m_NumFibers);
-  float length_sum = 0;
-  float in_mask_length = 0;
-  float aligned_length = 0;
+  double length_sum = 0;
+  double in_mask_length = 0;
+  double aligned_length = 0;
   for (unsigned int i=0; i<m_NumFibers; i++)
   {
     ++disp;
@@ -1105,7 +1104,7 @@ std::tuple<float, float> mitk::FiberBundle::GetDirectionalOverlap(ItkUcharImgTyp
     }
   }
 
-  if (length_sum<=0.0001f)
+  if (length_sum<=0.0001)
   {
     MITK_INFO << "Fiber length sum is zero!";
     return std::make_tuple(0,0);
@@ -1502,7 +1501,7 @@ void mitk::FiberBundle::UpdateFiberGeometry()
       points->GetPoint(j+1, p2);
 
       double dist = std::sqrt((p1[0]-p2[0])*(p1[0]-p2[0])+(p1[1]-p2[1])*(p1[1]-p2[1])+(p1[2]-p2[2])*(p1[2]-p2[2]));
-      length += dist;
+      length += static_cast<float>(dist);
     }
     m_FiberLengths.push_back(length);
     m_MeanFiberLength += length;
@@ -1619,47 +1618,6 @@ itk::Matrix< double, 3, 3 > mitk::FiberBundle::TransformMatrix(itk::Matrix< doub
   return m;
 }
 
-itk::Point<float, 3> mitk::FiberBundle::TransformPoint(vnl_vector_fixed< double, 3 > point, double rx, double ry, double rz, double tx, double ty, double tz)
-{
-  rx = rx*itk::Math::pi/180;
-  ry = ry*itk::Math::pi/180;
-  rz = rz*itk::Math::pi/180;
-
-  vnl_matrix_fixed< double, 3, 3 > rotX; rotX.set_identity();
-  rotX[1][1] = cos(rx);
-  rotX[2][2] = rotX[1][1];
-  rotX[1][2] = -sin(rx);
-  rotX[2][1] = -rotX[1][2];
-
-  vnl_matrix_fixed< double, 3, 3 > rotY; rotY.set_identity();
-  rotY[0][0] = cos(ry);
-  rotY[2][2] = rotY[0][0];
-  rotY[0][2] = sin(ry);
-  rotY[2][0] = -rotY[0][2];
-
-  vnl_matrix_fixed< double, 3, 3 > rotZ; rotZ.set_identity();
-  rotZ[0][0] = cos(rz);
-  rotZ[1][1] = rotZ[0][0];
-  rotZ[0][1] = -sin(rz);
-  rotZ[1][0] = -rotZ[0][1];
-
-  vnl_matrix_fixed< double, 3, 3 > rot = rotZ*rotY*rotX;
-
-  mitk::BaseGeometry::Pointer geom = this->GetGeometry();
-  mitk::Point3D center = geom->GetCenter();
-
-  point[0] -= center[0];
-  point[1] -= center[1];
-  point[2] -= center[2];
-  point = rot*point;
-  point[0] += center[0]+tx;
-  point[1] += center[1]+ty;
-  point[2] += center[2]+tz;
-  itk::Point<float, 3> out = mitk::imv::GetItkPoint(point.data_block());
-  return out;
-}
-
-
 void mitk::FiberBundle::TransformFibers(itk::ScalableAffineTransform< mitk::ScalarType >::Pointer transform)
 {
   vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
@@ -1690,29 +1648,7 @@ void mitk::FiberBundle::TransformFibers(itk::ScalableAffineTransform< mitk::Scal
 
 void mitk::FiberBundle::TransformFibers(double rx, double ry, double rz, double tx, double ty, double tz)
 {
-  rx = rx*itk::Math::pi/180;
-  ry = ry*itk::Math::pi/180;
-  rz = rz*itk::Math::pi/180;
-
-  vnl_matrix_fixed< double, 3, 3 > rotX; rotX.set_identity();
-  rotX[1][1] = cos(rx);
-  rotX[2][2] = rotX[1][1];
-  rotX[1][2] = -sin(rx);
-  rotX[2][1] = -rotX[1][2];
-
-  vnl_matrix_fixed< double, 3, 3 > rotY; rotY.set_identity();
-  rotY[0][0] = cos(ry);
-  rotY[2][2] = rotY[0][0];
-  rotY[0][2] = sin(ry);
-  rotY[2][0] = -rotY[0][2];
-
-  vnl_matrix_fixed< double, 3, 3 > rotZ; rotZ.set_identity();
-  rotZ[0][0] = cos(rz);
-  rotZ[1][1] = rotZ[0][0];
-  rotZ[0][1] = -sin(rz);
-  rotZ[1][0] = -rotZ[0][1];
-
-  vnl_matrix_fixed< double, 3, 3 > rot = rotZ*rotY*rotX;
+  vnl_matrix_fixed< double, 3, 3 > rot = mitk::imv::GetRotationMatrixVnl(rx, ry, rz);
 
   mitk::BaseGeometry::Pointer geom = this->GetGeometry();
   mitk::Point3D center = geom->GetCenter();
@@ -2272,7 +2208,7 @@ void mitk::FiberBundle::Compress(float error)
   newFiberWeights->SetNumberOfValues(m_NumFibers);
 
 #pragma omp parallel for
-  for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
+  for (int i=0; i<static_cast<int>(m_FiberPolyData->GetNumberOfCells()); i++)
   {
 
     std::vector< vnl_vector_fixed< double, 3 > > vertices;
@@ -2410,15 +2346,13 @@ void mitk::FiberBundle::ResampleToNumPoints(unsigned int targetPoints)
     newFiberWeights->SetNumberOfValues(m_NumFibers);
 
     unequal_fibs = false;
-//#pragma omp parallel for
-    for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
+    for (unsigned int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
     {
 
       std::vector< vnl_vector_fixed< double, 3 > > vertices;
       float weight = 1;
       double seg_len = 0;
 
-//#pragma omp critical
       {
         weight = m_FiberWeights->GetValue(i);
         vtkCell* cell = m_FiberPolyData->GetCell(i);
@@ -2440,7 +2374,6 @@ void mitk::FiberBundle::ResampleToNumPoints(unsigned int targetPoints)
       vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
       vnl_vector_fixed< double, 3 > lastV = vertices.at(0);
 
-//#pragma omp critical
       {
         vtkIdType id = vtkNewPoints->InsertNextPoint(lastV.data_block());
         container->GetPointIds()->InsertNextId(id);
@@ -2533,7 +2466,7 @@ void mitk::FiberBundle::ResampleLinear(double pointDistance)
   resampled_streamlines.resize(static_cast<unsigned long>(m_FiberPolyData->GetNumberOfCells()));
 
 #pragma omp parallel for
-  for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
+  for (int i=0; i<static_cast<int>(m_FiberPolyData->GetNumberOfCells()); i++)
   {
 
     std::vector< vnl_vector_fixed< double, 3 > > vertices;

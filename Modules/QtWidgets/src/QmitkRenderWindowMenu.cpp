@@ -382,9 +382,6 @@ void QmitkRenderWindowMenu::OnChangeLayoutTo2DImagesUp(bool)
 
   m_LayoutDesign = LAYOUT_2DIMAGEUP;
   emit SignalChangeLayoutDesign( LAYOUT_2DIMAGEUP );
-
-  DeferredShowMenu( );
-
 }
 void QmitkRenderWindowMenu::OnChangeLayoutTo2DImagesLeft(bool)
 {
@@ -394,8 +391,6 @@ void QmitkRenderWindowMenu::OnChangeLayoutTo2DImagesLeft(bool)
 
   m_LayoutDesign = LAYOUT_2DIMAGELEFT;
   emit SignalChangeLayoutDesign( LAYOUT_2DIMAGELEFT );
-
-  DeferredShowMenu( );
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToDefault(bool)
 {
@@ -405,9 +400,6 @@ void QmitkRenderWindowMenu::OnChangeLayoutToDefault(bool)
 
   m_LayoutDesign = LAYOUT_DEFAULT;
   emit SignalChangeLayoutDesign( LAYOUT_DEFAULT );
-
-  DeferredShowMenu( );
-
 }
 
 void QmitkRenderWindowMenu::DeferredShowMenu()
@@ -438,9 +430,6 @@ void QmitkRenderWindowMenu::OnChangeLayoutToBig3D(bool)
 
   m_LayoutDesign = LAYOUT_BIG3D;
   emit SignalChangeLayoutDesign( LAYOUT_BIG3D );
-
-  DeferredShowMenu( );
-
 }
 
 void QmitkRenderWindowMenu::OnChangeLayoutToWidget1(bool)
@@ -451,8 +440,6 @@ void QmitkRenderWindowMenu::OnChangeLayoutToWidget1(bool)
 
   m_LayoutDesign = LAYOUT_AXIAL;
   emit SignalChangeLayoutDesign( LAYOUT_AXIAL );
-
-  DeferredShowMenu( );
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToWidget2(bool)
 {
@@ -462,8 +449,6 @@ void QmitkRenderWindowMenu::OnChangeLayoutToWidget2(bool)
 
   m_LayoutDesign = LAYOUT_SAGITTAL;
   emit SignalChangeLayoutDesign( LAYOUT_SAGITTAL );
-
-  DeferredShowMenu( );
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToWidget3(bool)
 {
@@ -473,8 +458,6 @@ void QmitkRenderWindowMenu::OnChangeLayoutToWidget3(bool)
 
   m_LayoutDesign = LAYOUT_CORONAL;
   emit SignalChangeLayoutDesign( LAYOUT_CORONAL );
-
-  DeferredShowMenu( );
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToRowWidget3And4(bool)
 {
@@ -484,8 +467,6 @@ void QmitkRenderWindowMenu::OnChangeLayoutToRowWidget3And4(bool)
 
   m_LayoutDesign = LAYOUT_ROWWIDGET3AND4;
   emit SignalChangeLayoutDesign( LAYOUT_ROWWIDGET3AND4 );
-
-  DeferredShowMenu( );
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToColumnWidget3And4(bool)
 {
@@ -495,8 +476,6 @@ void QmitkRenderWindowMenu::OnChangeLayoutToColumnWidget3And4(bool)
 
   m_LayoutDesign = LAYOUT_COLUMNWIDGET3AND4;
   emit SignalChangeLayoutDesign( LAYOUT_COLUMNWIDGET3AND4 );
-
-  DeferredShowMenu( );
 }
 
 void QmitkRenderWindowMenu::OnChangeLayoutToSmallUpperWidget2Big3and4(bool)
@@ -507,8 +486,6 @@ void QmitkRenderWindowMenu::OnChangeLayoutToSmallUpperWidget2Big3and4(bool)
 
   m_LayoutDesign = LAYOUT_SMALLUPPERWIDGET2BIGAND4;
   emit SignalChangeLayoutDesign( LAYOUT_SMALLUPPERWIDGET2BIGAND4 );
-
-  DeferredShowMenu( );
 }
 void QmitkRenderWindowMenu::OnChangeLayoutTo2x2Dand3DWidget(bool)
 {
@@ -518,8 +495,6 @@ void QmitkRenderWindowMenu::OnChangeLayoutTo2x2Dand3DWidget(bool)
 
   m_LayoutDesign = LAYOUT_2X2DAND3DWIDGET;
   emit SignalChangeLayoutDesign( LAYOUT_2X2DAND3DWIDGET );
-
-  DeferredShowMenu( );
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToLeft2Dand3DRight2D(bool)
 {
@@ -529,8 +504,6 @@ void QmitkRenderWindowMenu::OnChangeLayoutToLeft2Dand3DRight2D(bool)
 
   m_LayoutDesign = LAYOUT_LEFT2DAND3DRIGHT2D;
   emit SignalChangeLayoutDesign( LAYOUT_LEFT2DAND3DRIGHT2D );
-
-  DeferredShowMenu( );
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToAxialLeft2DRight(bool)
 {
@@ -540,8 +513,6 @@ void QmitkRenderWindowMenu::OnChangeLayoutToAxialLeft2DRight(bool)
 
   m_LayoutDesign = LAYOUT_LEFTAXIAL2DRIGHT;
   emit SignalChangeLayoutDesign( LAYOUT_LEFTAXIAL2DRIGHT );
-
-  DeferredShowMenu( );
 }
 
 void QmitkRenderWindowMenu::UpdateLayoutDesignList( int layoutDesignIndex )

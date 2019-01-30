@@ -322,8 +322,8 @@ void QmitkRenderWindow::AdjustRenderWindowMenuVisibility(const QPoint& /*pos*/)
 {
   if (m_MenuWidget)
   {
-    m_MenuWidget->ShowMenu();
     m_MenuWidget->MoveWidgetToCorrectPos(1.0f);
+    m_MenuWidget->ShowMenu();
   }
 }
 

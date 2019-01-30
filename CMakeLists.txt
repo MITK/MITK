@@ -376,6 +376,11 @@ if(_result LESS 0)
   message("> Adding 'log' to MITK_USE_Boost_LIBRARIES.")
   list(APPEND MITK_USE_Boost_LIBRARIES log)
 endif()
+list(FIND MITK_USE_Boost_LIBRARIES locale _result)
+if(_result LESS 0)
+  message("> Adding 'locale' to MITK_USE_Boost_LIBRARIES.")
+  list(APPEND MITK_USE_Boost_LIBRARIES locale)
+endif()
 
 # sanity check for supported Qt version. Only >= 5.3 is supported by CTK/PythonQt
 if(MITK_USE_QT AND MITK_USE_Python)

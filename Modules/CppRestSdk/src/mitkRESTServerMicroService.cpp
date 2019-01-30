@@ -36,13 +36,14 @@ void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
  //getting exact request uri has to be a parameter in handle function
   web::uri_builder build(m_Listener.uri());
   build.append(request.absolute_uri());
-  utility::string_t uri = build.to_uri().to_string();
+  utility::string_t uriStringT = build.to_uri().to_string();
 
-  std::string uriString(uri.begin(), uri.end());
+  std::string uriString(uriStringT.begin(), uriStringT.end());
   MITK_INFO << "Test for Server at port " << port << " Exact request uri: " << uriString;
   
   web::json::value content;
   us::ModuleContext *context = us::GetModuleContext();
+
   auto managerRef = context->GetServiceReference<IRESTManager>();
   if (managerRef)
   {
@@ -50,9 +51,9 @@ void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
     if (managerService)
     {
       //TODO extract actual json from request body
-      web::json::value v;
+      web::json::value data = request.extract_json().get();
       MITK_INFO << "Server: Data send to manager";
-      content = managerService->handle(build.to_uri(), v);
+      content = managerService->handle(build.to_uri(), data);
       MITK_INFO << "server: Data received from manager";
     }
   }

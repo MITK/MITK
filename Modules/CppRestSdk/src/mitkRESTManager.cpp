@@ -92,8 +92,34 @@ web::json::value mitk::RESTManager::handle(web::uri uri, web::json::value data)
   }
 }
 
-void mitk::RESTManager::handleDeleteClient()
+void mitk::RESTManager::handleDeleteClient(mitk::IRESTObserver *observer)
 {
+  for (auto it = m_Observer.begin(); it != m_Observer.end();)
+  {
+    mitk::IRESTObserver *obsMap = it->second;
+    //Check weather observer is at this place in map
+    if (obsMap == observer)
+    {
+
+      int port = it->first.first;
+      utility::string_t path = it->first.second;
+      std::pair<int, utility::string_t> key(port, path);
+      MITK_INFO << "Number of elements at key [ " << port << ", " << std::string(key.second.begin(), key.second.end())
+                << "]: " << m_Observer.count(key);
+      it = m_Observer.erase(it);
+      MITK_INFO << "Number of elements at key [ " << port << ", " << std::string(key.second.begin(), key.second.end())
+                << "]: " << m_Observer.count(key);
+      //if yes
+      // 1. store port in a temporary variable
+      // 2. delete map entry
+      // 3. check, if there is another observer under this port in observer map (with bool flag)
+      //  3.1. if no, delete m_ServerMap entry for this port
+    }
+    else
+    {
+      ++it;
+    }
+  }
   MITK_INFO << "Handle delete client";
   //TODO implement
 }

@@ -13,7 +13,7 @@ mitk::IRESTObserver::~IRESTObserver()
     auto managerService = context->GetService(managerRef);
     if (managerService)
     {
-      managerService->handleDeleteClient();
+      managerService->handleDeleteClient(this);
     }
   }
   MITK_INFO << "virtual destructor was called";

@@ -91,3 +91,10 @@ web::json::value mitk::RESTManager::handle(web::uri uri, web::json::value data)
     return NULL;
   }
 }
+
+void mitk::RESTManager::handleDeleteClient()
+{
+  MITK_INFO << "Handle delete client";
+  //TODO implement
+}
+

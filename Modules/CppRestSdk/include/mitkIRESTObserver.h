@@ -8,6 +8,7 @@ namespace mitk
   class IRESTObserver
   {
   public:
+    virtual ~IRESTObserver();
     virtual web::json::value notify(web::json::value data) = 0;
 
 

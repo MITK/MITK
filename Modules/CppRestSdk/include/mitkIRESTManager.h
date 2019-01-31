@@ -23,6 +23,7 @@ namespace mitk
     virtual void sendRequest(RequestType type) = 0;
     virtual void receiveRequest(web::uri uri, IRESTObserver *observer) = 0;
     virtual web::json::value handle(web::uri, web::json::value) = 0;
+    virtual void handleDeleteClient() = 0;
   };
 } // namespace mitk
 

@@ -50,7 +50,6 @@ void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
     auto managerService = context->GetService(managerRef);
     if (managerService)
     {
-      //TODO extract actual json from request body
       web::json::value data = request.extract_json().get();
       MITK_INFO << "Server: Data send to manager";
       content = managerService->handle(build.to_uri(), data);
@@ -59,10 +58,12 @@ void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
   }
   if (content!=NULL)
   {
+    //content handled by observer
     request.reply(MitkRestStatusCodes::OK, content);
   }
   else
   {
+    //no observer to handle data
     request.reply(MitkRestStatusCodes::NotFound);
   }
 }

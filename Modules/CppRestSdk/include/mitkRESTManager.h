@@ -21,6 +21,8 @@ namespace mitk
 
     web::json::value handle(web::uri, web::json::value) override;
 
+    virtual void handleDeleteClient() override;
+
   private:
     std::map<int, RESTClientMicroService*> m_ClientMap; // Map with port client pairs
     std::map<int, RESTServerMicroService*> m_ServerMap; // Map with port server pairs

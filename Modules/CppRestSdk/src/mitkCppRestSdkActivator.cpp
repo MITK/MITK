@@ -24,6 +24,8 @@ void MitkCppRestSdkActivator::Load(us::ModuleContext *context)
  
   m_Test.TestRESTServer();
   m_Test2.TestRESTServer();
+
+  m_Test.~RestTest();
 }
 
 void MitkCppRestSdkActivator::Unload(us::ModuleContext *) 

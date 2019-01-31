@@ -153,7 +153,6 @@ namespace mitk
     MITKSEMANTICRELATIONS_EXPORT bool InstanceExists(const DataNode* dataNode);
     /**
     * @brief  Check if the given lesion instance exists.
-    *         This function can be used before calling 'GetAllSegmentationsOfLesion' in order to avoid a possible exception.
     *         This function can be used before calling 'AddLesionInstance' in order to avoid a possible exception.
     *
     * @param caseID   The current case identifier is defined by the given string.
@@ -174,19 +173,6 @@ namespace mitk
     * @return         A vector of IDs identifying images that identify images that are related to the given lesion.
     */
     MITKSEMANTICRELATIONS_EXPORT SemanticTypes::IDVector GetAllImageIDsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
-    /**
-    * @brief  Return a vector of all segmentation IDs that identify segmentations that define the given lesion.
-    *         These segmentations don't have to be linked to the same image.
-    *         If the lesion is not referred to by any segmentation, an empty vector is returned.
-    *
-    * @pre    The UID of the lesion has to exist for a lesion instance.
-    * @throw  SemanticRelationException, if UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
-    *
-    * @param caseID   The current case identifier is defined by the given string.
-    * @param lesion   A lesion with a UID that identifies the corresponding lesion instance.
-    * @return         A vector of IDs identifying segmentations that define the given lesion.
-    */
-    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::IDVector GetAllSegmentationIDsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
     /**
     * @brief  Return the control point of a data node.
     *         If the data node is not linked to a control point or the data node refers to a non-existing control point,
@@ -221,7 +207,6 @@ namespace mitk
     MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPointVector GetAllControlPointsOfInformationType(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType);
     /**
     * @brief  Check if the given control point instance exists.
-    *         This function can be used before calling 'GetAllDataOfControlPoint' in order to avoid a possible exception.
     *         This function can be used before adding, linking and unlinking control points to avoid a possible exception.
     *
     * @param caseID         The current case identifier is defined by the given string.
@@ -229,13 +214,6 @@ namespace mitk
     * @return               True, if the control point instance exists; false otherwise.
     */
     MITKSEMANTICRELATIONS_EXPORT bool InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
-    /**
-    * @brief  Return a vector of all examination periods nodes that are valid for the given case.
-    *
-    * @param caseID         The current case identifier is defined by the given string.
-    * @return               A vector of examination periods.
-    */
-    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ExaminationPeriodVector GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID);
     /**
     * @brief  Check if the given examination period instance exists.
     *         This function can be used before calling 'AddExaminationPeriod' in order to avoid a possible exception.
@@ -257,15 +235,6 @@ namespace mitk
     */
     MITKSEMANTICRELATIONS_EXPORT SemanticTypes::InformationType GetInformationTypeOfImage(const DataNode* imageNode);
     /**
-    * @brief  Return the information type of the given image.
-    *         If the image does not contain any information type, an empty information type is returned.
-    *
-    * @param caseID     The current case identifier is defined by the given string.
-    * @param imageID    The image node identifier is defined by the given string.
-    * @return           The information type of the image node, defined by the image node ID.
-    */
-    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::InformationType GetInformationTypeOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
-    /**
     * @brief  Return a vector of all information types that are valid for the given case, given a specific control point.
     *
     * @param caseID         The current case identifier is defined by the given string.
@@ -276,20 +245,7 @@ namespace mitk
     */
     MITKSEMANTICRELATIONS_EXPORT SemanticTypes::InformationTypeVector GetAllInformationTypesOfControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
     /**
-    * @brief  Return a vector of all image IDs that identify images that are of the given information type.
-    *         If the information type is not used by any image, an empty vector is returned.
-    *
-    * @pre    The information type has to exist.
-    * @throw  SemanticRelationException, if the information type does not exist (this can be checked via 'InstanceExists').
-    *
-    * @param caseID             The current case identifier is defined by the given string.
-    * @param informationType    An information type.
-    * @return                   A vector of IDs identifying images that are of the given information type.
-    */
-    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::IDVector GetAllImageIDsOfInformationType(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType);
-    /**
     * @brief  Check if the given information type exists.
-    *         This function can be used before calling 'GetAllDataOfInformationType' in order to avoid a possible exception.
     *
     * @param caseID             The current case identifier is defined by the given string.
     * @param informationType    An information type.

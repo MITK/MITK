@@ -137,7 +137,7 @@ void mitk::SemanticRelationsIntegration::RemoveLesion(const SemanticTypes::CaseI
 {
   if (SemanticRelationsInference::InstanceExists(caseID, lesion))
   {
-    SemanticTypes::IDVector allSegmentationIDsOfLesion = SemanticRelationsInference::GetAllSegmentationIDsOfLesion(caseID, lesion);
+    SemanticTypes::IDVector allSegmentationIDsOfLesion = RelationStorage::GetAllSegmentationIDsOfLesion(caseID, lesion);
     if (allSegmentationIDsOfLesion.empty())
     {
       // no more segmentations are linked to the specific lesion

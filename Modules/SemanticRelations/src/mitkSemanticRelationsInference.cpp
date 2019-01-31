@@ -269,7 +269,7 @@ mitk::SemanticTypes::IDVector mitk::SemanticRelationsInference::GetAllImageIDsOf
   // 1. get all segmentations that define the lesion
   // 2. get the parentID (imageID) of each segmentation
   // 3. guarantee uniqueness of image IDs
-  SemanticTypes::IDVector allSegmentationIDsOfLesion = GetAllSegmentationIDsOfLesion(caseID, lesion);
+  SemanticTypes::IDVector allSegmentationIDsOfLesion = RelationStorage::GetAllSegmentationIDsOfLesion(caseID, lesion);
   for (const auto& segmentationID : allSegmentationIDsOfLesion)
   {
     // get parent ID of the current segmentation ID
@@ -284,28 +284,6 @@ mitk::SemanticTypes::IDVector mitk::SemanticRelationsInference::GetAllImageIDsOf
   allImageIDsOfLesion.erase(std::unique(allImageIDsOfLesion.begin(), allImageIDsOfLesion.end()), allImageIDsOfLesion.end());
 
   return allImageIDsOfLesion;
-}
-
-mitk::SemanticTypes::IDVector mitk::SemanticRelationsInference::GetAllSegmentationIDsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion)
-{
-  if (!InstanceExists(caseID, lesion))
-  {
-    mitkThrowException(SemanticRelationException) << "Could not find an existing lesion instance for the given caseID " << caseID << " and lesion " << lesion.UID << ".";
-  }
-
-  // lesion exists, retrieve all case segmentations from the storage
-  SemanticTypes::IDVector allSegmentationIDs = RelationStorage::GetAllSegmentationIDsOfCase(caseID);
-
-  // filter all segmentationIDs: check for semantic relation with the given lesion using a lambda function
-  auto lambda = [&lesion, caseID](const SemanticTypes::ID& segmentationID)
-  {
-    SemanticTypes::Lesion representedLesion = RelationStorage::GetLesionOfSegmentation(caseID, segmentationID);
-    return lesion.UID != representedLesion.UID;
-  };
-
-  allSegmentationIDs.erase(std::remove_if(allSegmentationIDs.begin(), allSegmentationIDs.end(), lambda), allSegmentationIDs.end());
-
-  return allSegmentationIDs;
 }
 
 mitk::SemanticTypes::ControlPoint mitk::SemanticRelationsInference::GetControlPointOfImage(const DataNode* imageNode)
@@ -368,14 +346,9 @@ bool mitk::SemanticRelationsInference::InstanceExists(const SemanticTypes::CaseI
   }
 }
 
-mitk::SemanticTypes::ExaminationPeriodVector mitk::SemanticRelationsInference::GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID)
-{
-  return RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
-}
-
 bool mitk::SemanticRelationsInference::InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod& examinationPeriod)
 {
-  SemanticTypes::ExaminationPeriodVector allExaminationPeriods = GetAllExaminationPeriodsOfCase(caseID);
+  SemanticTypes::ExaminationPeriodVector allExaminationPeriods = RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
 
   // filter all examination periods: check for equality with the given examination period using a lambda function
   auto lambda = [&examinationPeriod](const SemanticTypes::ExaminationPeriod& currentExaminationPeriod) { return currentExaminationPeriod.UID == examinationPeriod.UID; };
@@ -400,11 +373,6 @@ mitk::SemanticTypes::InformationType mitk::SemanticRelationsInference::GetInform
 
   SemanticTypes::CaseID caseID = GetCaseIDFromDataNode(imageNode);
   SemanticTypes::ID imageID = GetIDFromDataNode(imageNode);
-  return GetInformationTypeOfImage(caseID, imageID);
-}
-
-mitk::SemanticTypes::InformationType mitk::SemanticRelationsInference::GetInformationTypeOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID)
-{
   return RelationStorage::GetInformationTypeOfImage(caseID, imageID);
 }
 
@@ -421,27 +389,6 @@ mitk::SemanticTypes::InformationTypeVector mitk::SemanticRelationsInference::Get
   allInformationTypes.erase(std::remove_if(allInformationTypes.begin(), allInformationTypes.end(), lambda), allInformationTypes.end());
 
   return allInformationTypes;
-}
-
-mitk::SemanticTypes::IDVector mitk::SemanticRelationsInference::GetAllImageIDsOfInformationType(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType)
-{
-  if (InstanceExists(caseID, informationType))
-  {
-    mitkThrowException(SemanticRelationException) << "Could not find an existing information type for the given caseID " << caseID << " and information type " << informationType;
-  }
-
-  // information type exists, retrieve all imageIDs from the storage
-  SemanticTypes::IDVector allImageIDs = RelationStorage::GetAllImageIDsOfCase(caseID);
-
-  // filter all images to remove the ones with a different information type using a lambda function
-  auto lambda = [&informationType, caseID](const SemanticTypes::ID& imageID)
-  {
-    return informationType != RelationStorage::GetInformationTypeOfImage(caseID, imageID);
-  };
-
-  allImageIDs.erase(std::remove_if(allImageIDs.begin(), allImageIDs.end(), lambda), allImageIDs.end());
-
-  return allImageIDs;
 }
 
 bool mitk::SemanticRelationsInference::InstanceExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType)
@@ -551,7 +498,7 @@ void mitk::SemanticRelationsInference::ClearControlPoints(const SemanticTypes::C
                       referencedControlPoints.begin(), referencedControlPoints.end(),
                       std::inserter(nonReferencedControlPoints, nonReferencedControlPoints.begin()));
 
-  auto allExaminationPeriods = GetAllExaminationPeriodsOfCase(caseID);
+  auto allExaminationPeriods = RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
   for (const auto& controlPoint : nonReferencedControlPoints)
   {
     const auto& examinationPeriod = FindExaminationPeriod(controlPoint, allExaminationPeriods);

@@ -131,7 +131,7 @@ namespace itk{
     typename InputImageType::Pointer        m_ReadoutTimeImage;
     AcquisitionType*                        m_ReadoutScheme;
 
-    itk::LinearInterpolateImageFunction< itk::Image< float, 3 >, float >::Pointer   m_FmapInterpolator;
+    typename itk::Image< ScalarType, 2 >::Pointer m_MovedFmap;
 
   private:
 

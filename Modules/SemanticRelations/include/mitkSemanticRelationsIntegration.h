@@ -112,7 +112,7 @@ namespace mitk
     void OverwriteLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
     /**
     * @brief  Add a newly created lesion to the set of already existing lesions. The lesion is added and a reference to
-    *         the lesion is added to the segmentation data. If the segmentation is already linked to a lesion, the
+    *         the lesion is added to the segmentation. If the segmentation is already linked to a lesion, the
     *         old linkage is overwritten (this can be checked via 'IsRepresentingALesion').
     *
     * @pre    The given segmentation data node has to be valid (!nullptr).
@@ -120,7 +120,7 @@ namespace mitk
     * @pre    The UID of the lesion must not already exist for a lesion instance.
     * @throw  SemanticRelationException, if the UID of the lesion already exists for a lesion instance (this can be checked via 'InstanceExists').
     *
-    * @param segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
+    * @param segmentationNode   The segmentation identifier is extracted from the given segmentation data node. The segmentation node has DICOM information from its parent node.
     * @param lesion             The lesion instance to add and link.
     */
     void AddLesionAndLinkSegmentation(const DataNode* segmentationNode, const SemanticTypes::Lesion& lesion);
@@ -139,7 +139,7 @@ namespace mitk
     /**
     * @brief  Add a segmentation instance to the set of already existing segmentations - with no connection to a specific lesion.
     *
-    * @param segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
+    * @param segmentationNode   The segmentation identifier is extracted from the given segmentation data node. The segmentation node has DICOM information from its parent node.
     * @param parentNode         The node identifier of the parent node is extracted from the given parent data node.
     */
     void AddSegmentation(const DataNode* segmentationNode, const DataNode* parentNode);
@@ -152,7 +152,7 @@ namespace mitk
     * @pre    The UID of the lesion has to exist for a lesion instance.
     * @throw  SemanticRelationException, if the UID of the lesion does not exist for a lesion instance (this can be checked via 'InstanceExists').
     *
-    * @param segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
+    * @param segmentationNode   The segmentation identifier is extracted from the given segmentation data node. The segmentation node has DICOM information from its parent node.
     * @param lesion             The lesion instance to link.
     */
     void LinkSegmentationToLesion(const DataNode* segmentationNode, const SemanticTypes::Lesion& lesion);
@@ -163,7 +163,7 @@ namespace mitk
     * @pre    The given segmentation data node has to be valid (!nullptr).
     * @throw  SemanticRelationException, if the given segmentation data node is invalid (==nullptr).
     *
-    * @param segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
+    * @param segmentationNode   The segmentation identifier is extracted from the given segmentation data node. The segmentation node has DICOM information from its parent node.
     */
     void UnlinkSegmentationFromLesion(const DataNode* segmentationNode);
     /**
@@ -172,58 +172,61 @@ namespace mitk
     * @pre    The given segmentation data node has to be valid (!nullptr).
     * @throw  SemanticRelationException, if the given segmentation data node is invalid (==nullptr).
     *
-    * @param segmentationNode   The segmentation identifier is extracted from the given data node. The segmentation node has DICOM information from its parent node.
+    * @param segmentationNode   The segmentation identifier is extracted from the given segmentation data node. The segmentation node has DICOM information from its parent node.
     */
     void RemoveSegmentation(const DataNode* segmentationNode);
     /**
-    * @brief Set the control point for the given data node.
+    * @brief Set the control point for the given image.
     *
-    * @pre    The given data node has to be valid (!nullptr).
-    * @throw  SemanticRelationException, if the given data node is invalid (==nullptr).
+    * @pre    The given image data node has to be valid (!nullptr).
+    * @throw  SemanticRelationException, if the given image data node is invalid (==nullptr).
+    *
+    * @param imageNode      The current case identifier and node identifier is extracted from the given image data node, which contains DICOM information about the case and the node.
+    * @param controlPoint   The control point instance which is used for the given image.
     */
-    void SetControlPointOfData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint);
+    void SetControlPointOfImage(const DataNode* imageNode, const SemanticTypes::ControlPoint& controlPoint);
     /**
-    * @brief  Add a newly created control point to the set of already existing control points. A reference to the control point is added to the given data.
+    * @brief  Add a newly created control point to the set of already existing control points. A reference to the control point is added to the given image.
     *         This function combines adding a control point and linking it, since a control point with no associated data is not allowed.
     *
-    * @pre    The given data node has to be valid (!nullptr).
-    * @throw  SemanticRelationException, if the given data node is invalid (==nullptr).
+    * @pre    The given image data node has to be valid (!nullptr).
+    * @throw  SemanticRelationException, if the given image data node is invalid (==nullptr).
     * @pre    The UID of the control point must not already exist for a control point instance.
     * @throw  SemanticRelationException, if the UID of the control point already exists for a control point instance (this can be checked via 'InstanceExists').
     * @pre    The given control point must not already be contained in an existing control point interval.
     * @throw  SemanticRelationException, if the given control point is already contained in an existing control point interval (this can be checked via 'CheckContainingControlPoint').
-    * @pre    The given control point must contain the date of the given data node (if parameter 'checkConsistence = true').
-    * @throw  SemanticRelationException, if the given control point does not contain the date of the given data node and 'checkConsistence = true' (this can be checked via 'ControlPointManager::InsideControlPoint').
+    * @pre    The given control point must contain the date of the given image data node (if parameter 'checkConsistence = true').
+    * @throw  SemanticRelationException, if the given control point does not contain the date of the given image data node and 'checkConsistence = true' (this can be checked via 'ControlPointManager::InsideControlPoint').
     *
-    * @param dataNode         The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param imageNode        The current case identifier and node identifier is extracted from the given image data node, which contains DICOM information about the case and the node.
     * @param controlPoint     The control point instance to add. For a newly added control point always has "startDate = endDate".
-    * @param checkConsistence If true, the function checks, whether the date of the data node actually lies inside the control point to link.
+    * @param checkConsistence If true, the function checks, whether the date of the image data node actually lies inside the control point to link.
     */
-    void AddControlPointAndLinkData(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence = true);
+    void AddControlPointAndLinkImage(const DataNode* imageNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence = true);
     /**
-    * @brief  Link the given data to an already existing control point.
+    * @brief  Link the given image to an already existing control point.
     *
-    * @pre    The given data node has to be valid (!nullptr).
-    * @throw  SemanticRelationException, if the given data node is invalid (==nullptr).
+    * @pre    The given image data node has to be valid (!nullptr).
+    * @throw  SemanticRelationException, if the given image data node is invalid (==nullptr).
     * @pre    The UID of the control point has to exist for a control point instance.
     * @throw  SemanticRelationException, if the UID of the control point does not exists for a control point instance (this can be checked via 'InstanceExists').
-    * @pre    The given control point must contain the date of the given data node (if parameter 'checkConsistence = true').
-    * @throw  SemanticRelationException, if the given control point does not contain the date of the given data node and 'checkConsistence = true' (this can be checked via 'ControlPointManager::InsideControlPoint').
+    * @pre    The given control point must contain the date of the given image data node (if parameter 'checkConsistence = true').
+    * @throw  SemanticRelationException, if the given control point does not contain the date of the given image data node and 'checkConsistence = true' (this can be checked via 'ControlPointManager::InsideControlPoint').
     *
-    * @param dataNode         The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param imageNode        The current case identifier and node identifier is extracted from the given image data node, which contains DICOM information about the case and the node.
     * @param controlPoint     The control point instance to link.
-    * @param checkConsistence If true, the function checks, whether the date of the data node actually lies inside the control point to link.
+    * @param checkConsistence If true, the function checks, whether the date of the image data node actually lies inside the control point to link.
     */
-    void LinkDataToControlPoint(const DataNode* dataNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence = true);
+    void LinkImageToControlPoint(const DataNode* imageNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence = true);
     /**
     * @brief  Unlink the given image from the linked control point.
-    *         If data is unlinked from a control point, the function needs to check whether the control point is still linked to any other data:
-    *           - if not, the control point instance will be removed (has to be removed since a control point with no associated data is not allowed).
+    *         If an image is unlinked from a control point, the function needs to check whether the control point is still linked to any other image:
+    *           - if not, the control point instance will be removed (has to be removed since a control point with no associated image is not allowed).
     *           - if so, the function has to make sure that the control point instance is shortened to its minimum time period (e.g. moving the end point to an earlier date).
     *
-    * @param dataNode       The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param imageNode        The current case identifier and node identifier is extracted from the given image data node, which contains DICOM information about the case and the node.
     */
-    void UnlinkImageFromControlPoint(const DataNode* dataNode);
+    void UnlinkImageFromControlPoint(const DataNode* imageNode);
     /**
     * @brief  Add an examination period instance to the set of already existing examination periods - with no connection to a specific control point.
     *
@@ -255,7 +258,7 @@ namespace mitk
     * @throw  SemanticRelationException, if the given image data node is invalid (==nullptr).
     * @post   If the information type instance did not exist before, it is now added.
     *
-    * @param imageNode        The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param imageNode        The current case identifier is extracted from the given image data node, which contains DICOM information about the case.
     * @param informationType  An information type that identifies the corresponding information type instance.
     */
     void SetInformationType(const DataNode* imageNode, const SemanticTypes::InformationType& informationType);
@@ -266,7 +269,7 @@ namespace mitk
     * @throw  SemanticRelationException, if the given image data node is invalid (==nullptr).
     * @post   If the information type instance did not exist before, it is now added.
     *
-    * @param imageNode        The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param imageNode        The current case identifier is extracted from the given image data node, which contains DICOM information about the case.
     * @param informationType  An information type that identifies the corresponding information type instance.
     */
     void AddInformationTypeToImage(const DataNode* imageNode, const SemanticTypes::InformationType& informationType);
@@ -279,7 +282,7 @@ namespace mitk
     * @pre    The given image data node has to be valid (!nullptr).
     * @throw  SemanticRelationException, if the given image data node is invalid (==nullptr).
     *
-    * @param imageNode        The current case identifier is extracted from the given data node, which contains DICOM information about the case.
+    * @param imageNode        The current case identifier is extracted from the given image data node, which contains DICOM information about the case.
     */
     void RemoveInformationTypeFromImage(const DataNode* imageNode);
 

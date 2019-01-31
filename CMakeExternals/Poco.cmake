@@ -24,8 +24,8 @@ if(MITK_USE_Poco)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/poco-1.6.1-all.tar.gz
-      URL_MD5 05961d10195d0f760b707752e88938e9
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/poco-1.9.0.tar.gz
+      URL_MD5 1011839033f72de138f0c523c2caa121
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}

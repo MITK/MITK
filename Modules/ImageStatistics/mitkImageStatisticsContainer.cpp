@@ -63,7 +63,7 @@ namespace mitk
     const ImageStatisticsContainer::StatisticsObject::StatisticNameVector& ImageStatisticsContainer::StatisticsObject::GetDefaultStatisticNames()
     {
       return m_DefaultNames;
-    };
+    }
 
     const ImageStatisticsContainer::StatisticsObject::StatisticNameVector& ImageStatisticsContainer::StatisticsObject::GetCustomStatisticNames() const
     {
@@ -185,7 +185,7 @@ namespace mitk
       }
 
       return names;
-    };
+    }
 
     ImageStatisticsContainer::StatisticsObject::StatisticNameVector
       GetAllStatisticNames(std::vector<ImageStatisticsContainer::ConstPointer> containers)
@@ -205,6 +205,6 @@ namespace mitk
       names.insert(names.cend(), customKeys.cbegin(), customKeys.cend());
 
       return names;
-    };
+    }
 
 }

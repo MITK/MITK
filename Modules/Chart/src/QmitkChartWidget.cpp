@@ -68,7 +68,7 @@ public:
 
   void SetTitle(const std::string &title);
 
-  void SetErrorBars(const std::string &label, const std::vector<double> &error);
+  void SetErrorBars(const std::string &label, const std::vector<double> &errorPlus, const std::vector<double>& errorMinus = std::vector<double>());
   void SetChartType(QmitkChartWidget::ChartType chartType);
   void SetLegendPosition(LegendPosition position);
   void SetChartTypeByLabel(const std::string &label, QmitkChartWidget::ChartType chartType);
@@ -347,8 +347,6 @@ void QmitkChartWidget::Impl::SetShowErrorBars(bool show)
   m_C3Data.SetShowErrorBars(show);
 }
 
-void QmitkChartWidget::SetStackedData(bool stacked) {}
-
 void QmitkChartWidget::Impl::SetShowDataPoints(bool showDataPoints)
 {
   if (showDataPoints == true)
@@ -376,18 +374,25 @@ void QmitkChartWidget::Impl::SetChartType(const std::string &label, QmitkChartWi
   }
 }
 
-void QmitkChartWidget::Impl::SetErrorBars(const std::string &label, const std::vector<double> &error)
+void QmitkChartWidget::Impl::SetErrorBars(const std::string &label, const std::vector<double> &errorPlus, const std::vector<double>& errorMinus)
 {
   auto element = GetDataElementByLabel(label);
   if (element)
   {
-    QList<QVariant> errorConverted;
-    for (const auto &aValue : error)
+    QList<QVariant> errorConvertedPlus;
+    for (const auto &aValue : errorPlus)
     {
-      errorConverted.append(aValue);
+      errorConvertedPlus.append(aValue);
     }
 
-    element->SetErrorData(errorConverted);
+    QList<QVariant> errorConvertedMinus;
+    for (const auto &aValue : errorMinus)
+    {
+      errorConvertedMinus.append(aValue);
+    }
+
+    element->SetErrorDataPlus(errorConvertedPlus);
+    element->SetErrorDataMinus(errorConvertedMinus);
   }
 }
 
@@ -496,9 +501,9 @@ void QmitkChartWidget::SetChartType(const std::string &label, ChartType type)
   m_Impl->SetChartType(label, type);
 }
 
-void QmitkChartWidget::SetErrorBars(const std::string &label, const std::vector<double> &error) 
+void QmitkChartWidget::SetErrorBars(const std::string &label, const std::vector<double> &errorPlus, const std::vector<double>& errorMinus) 
 {
-  m_Impl->SetErrorBars(label, error);
+  m_Impl->SetErrorBars(label, errorPlus, errorMinus);
 }
 
 void QmitkChartWidget::SetLegendPosition(LegendPosition position)

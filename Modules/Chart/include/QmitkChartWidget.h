@@ -167,7 +167,7 @@ public:
   */
   void SetChartType(const std::string& label, ChartType type);
 
-  void SetErrorBars(const std::string &label, const std::vector<double> &error);
+  void SetErrorBars(const std::string &label, const std::vector<double> &errorPlus, const std::vector<double>& errorMinus = std::vector<double>());
 
   /*!
   * \brief Sets the legend position.

@@ -29,7 +29,8 @@ class QmitkChartxyData : public QObject
 
   Q_PROPERTY(QList<QVariant> m_YData READ GetYData WRITE SetYData NOTIFY SignalYDataChanged);
   Q_PROPERTY(QList<QVariant> m_XData READ GetXData WRITE SetXData NOTIFY SignalXDataChanged);
-  Q_PROPERTY(QList<QVariant> m_ErrorData READ GetErrorData WRITE SetErrorData NOTIFY SignalErrorDataChanged);
+  Q_PROPERTY(QList<QVariant> m_ErrorDataPlus READ GetErrorDataPlus WRITE SetErrorDataPlus NOTIFY SignalErrorDataChanged);
+  Q_PROPERTY(QList<QVariant> m_ErrorDataMinus READ GetErrorDataMinus WRITE SetErrorDataMinus NOTIFY SignalErrorDataChanged);
   Q_PROPERTY(QVariant m_ChartType READ GetChartType WRITE SetChartType NOTIFY SignalDiagramTypeChanged);
   Q_PROPERTY(QVariant m_Color READ GetColor WRITE SetColor NOTIFY SignalColorChanged);
   Q_PROPERTY(QVariant m_Label READ GetLabel WRITE SetLabel NOTIFY SignalLabelChanged);
@@ -46,8 +47,11 @@ public:
   Q_INVOKABLE QList<QVariant> GetXData() const { return m_XData; };
   Q_INVOKABLE void SetXData(const QList<QVariant>& xData) { m_XData =xData; };
 
-  Q_INVOKABLE QList<QVariant> GetErrorData() const { return m_ErrorData; };
-  Q_INVOKABLE void SetErrorData(const QList<QVariant> &errorData) { m_ErrorData = errorData; };
+  Q_INVOKABLE QList<QVariant> GetErrorDataPlus() const { return m_ErrorDataPlus; };
+  Q_INVOKABLE void SetErrorDataPlus(const QList<QVariant> &errorData) { m_ErrorDataPlus = errorData; };
+
+  Q_INVOKABLE QList<QVariant> GetErrorDataMinus() const { return m_ErrorDataMinus; };
+  Q_INVOKABLE void SetErrorDataMinus(const QList<QVariant> &errorData) { m_ErrorDataMinus = errorData; };
 
   Q_INVOKABLE QVariant GetChartType() const { return m_ChartType; };
   Q_INVOKABLE void SetChartType(const QVariant& chartType) { m_ChartType = chartType; };
@@ -81,7 +85,8 @@ signals:
 private:
   QList<QVariant>  m_YData;
   QList<QVariant>  m_XData;
-  QList<QVariant>  m_ErrorData;
+  QList<QVariant>  m_ErrorDataPlus;
+  QList<QVariant>  m_ErrorDataMinus;
   QVariant         m_Label;
   QVariant         m_ChartType;
   QVariant         m_Color;

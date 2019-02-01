@@ -4,7 +4,8 @@ const minHeight = 255;
 var chart;
 
 var chartData;
-var errorValues=[];
+var errorValuesPlus=[];
+var errorValuesMinus=[];
 var xValues=[];
 var yValues=[];
 var dataLabels=[];
@@ -31,7 +32,8 @@ window.onload = function()
     {
         let xDataTemp = channel.objects[propertyName].m_XData;
         let yDataTemp = channel.objects[propertyName].m_YData;
-	      let errorsTemp = channel.objects[propertyName].m_ErrorData;
+	      let errorsTempPlus = channel.objects[propertyName].m_ErrorDataPlus;
+		  let errorsTempMinus = channel.objects[propertyName].m_ErrorDataMinus;
         let dataLabel = channel.objects[propertyName].m_Label;
         dataLabels.push(dataLabel);
 
@@ -47,7 +49,9 @@ window.onload = function()
 
         xValues[count] = xDataTemp
         yValues[count] = yDataTemp
-        errorValues[count] = errorsTemp;
+        errorValuesPlus[count] = errorsTempPlus;
+		errorValuesMinus[count] = errorsTempMinus;
+		
 
         let tempLineStyle = '';
 
@@ -110,6 +114,14 @@ function generateErrorBars(errors, visible){
 	return errorObject;
 }
 
+function generateErrorBarsAsymmetric(errorsPlus, errorsMinus, visible){
+	let errorObject = generateErrorBars(errorsPlus, visible);
+	errorObject["arrayminus"] = errorsMinus;
+	errorObject["symmetric"] = false;
+	
+	return errorObject;
+}
+
 function generateLineOptions(options){
   return {
     color : options.color
@@ -149,8 +161,13 @@ function generateChart(chartData)
       name: dataLabels[index]
     };
 
-	  if(typeof errorValues[index] !== 'undefined'){
-		  trace["error_y"] = generateErrorBars(errorValues[index], chartData.m_ShowErrorBars);
+	  if(typeof errorValuesPlus[index] !== 'undefined'){
+		  if(typeof errorValuesMinus[index] !== 'undefined' && errorValuesMinus[index].length > 0)
+		  {
+			trace["error_y"] = generateErrorBarsAsymmetric(errorValuesPlus[index], errorValuesMinus[index], chartData.m_ShowErrorBars);
+		  }else{
+			trace["error_y"] = generateErrorBars(errorValuesPlus[index], chartData.m_ShowErrorBars);
+		  }
 	  }
 
     if (dataProperties[dataLabels[index]]["style"] == "dashed"){

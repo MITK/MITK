@@ -51,9 +51,9 @@ namespace mitk
     {
       m_Statistics.emplace(key, value);
 
-      if (std::find(std::cbegin(m_DefaultNames), std::cend(m_DefaultNames), key)==std::cend(m_DefaultNames))
+      if (std::find(m_DefaultNames.cbegin(), m_DefaultNames.cend(), key) == m_DefaultNames.cend())
       {
-        if (std::find(std::cbegin(m_CustomNames), std::cend(m_CustomNames), key) == std::cend(m_CustomNames))
+        if (std::find(m_CustomNames.cbegin(), m_CustomNames.cend(), key) == m_CustomNames.cend())
         {
           m_CustomNames.emplace_back(key);
         }
@@ -73,14 +73,14 @@ namespace mitk
     ImageStatisticsContainer::StatisticsObject::StatisticNameVector ImageStatisticsContainer::StatisticsObject::GetAllStatisticNames() const
     {
       StatisticNameVector names = GetDefaultStatisticNames();
-      names.insert(std::end(names),std::cbegin(m_CustomNames), std::cend(m_CustomNames));
+      names.insert(names.cend(), m_CustomNames.cbegin(), m_CustomNames.cend());
 
       return names;
     }
 
     bool ImageStatisticsContainer::StatisticsObject::HasStatistic(const std::string& name) const
     {
-      return m_Statistics.find(name)!=std::cend(m_Statistics);
+      return m_Statistics.find(name) != m_Statistics.cend();
     }
 
     ImageStatisticsContainer::StatisticsVariantType ImageStatisticsContainer::StatisticsObject::GetValueNonConverted(const std::string& name) const
@@ -100,12 +100,12 @@ namespace mitk
     }
 
     bool ImageStatisticsContainer::TimeStepExists(TimeStepType timeStep) const {
-      return m_TimeStepMap.find(timeStep) != m_TimeStepMap.end();
+      return m_TimeStepMap.find(timeStep) != m_TimeStepMap.cend();
     }
 
     const ImageStatisticsContainer::StatisticsObject& ImageStatisticsContainer::GetStatisticsForTimeStep(TimeStepType timeStep) const {
       auto it = m_TimeStepMap.find(timeStep);
-      if (it != m_TimeStepMap.end()) {
+      if (it != m_TimeStepMap.cend()) {
         return it->second;
       }
       mitkThrow() << "StatisticsObject for timeStep " << timeStep << " not found!";
@@ -178,10 +178,10 @@ namespace mitk
 
         for (unsigned int i = 0; i < container->GetTimeSteps(); i++) {
           auto statisticKeys = container->GetStatisticsForTimeStep(i).GetCustomStatisticNames();
-          customKeys.insert(std::cbegin(statisticKeys), std::cend(statisticKeys));
+          customKeys.insert(statisticKeys.cbegin(), statisticKeys.cend());
         }
 
-        names.insert(std::end(names), std::begin(customKeys), std::end(customKeys));
+        names.insert(names.cend(), customKeys.cbegin(), customKeys.cend());
       }
 
       return names;
@@ -198,11 +198,11 @@ namespace mitk
       {
         for (unsigned int i = 0; i < container->GetTimeSteps(); i++) {
           auto statisticKeys = container->GetStatisticsForTimeStep(i).GetCustomStatisticNames();
-          customKeys.insert(std::cbegin(statisticKeys), std::cend(statisticKeys));
+          customKeys.insert(statisticKeys.cbegin(), statisticKeys.cend());
         }
       }
 
-      names.insert(std::end(names), std::begin(customKeys), std::end(customKeys));
+      names.insert(names.cend(), customKeys.cbegin(), customKeys.cend());
 
       return names;
     };

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef ChartExample_h
 #define ChartExample_h
 
@@ -48,9 +47,15 @@ protected:
 
   void CreateChart();
   void ClearChart();
+  std::vector<double> ConvertToVector(const QString &lineEditData);
   void AddData();
 
+  void ShowErrorOptions(bool show);
+  void ShowXErrorOptions(bool show);
+  void ShowYErrorOptions(bool show);
+
   Ui::ChartExampleControls m_Controls;
+
 private:
   void FillRandomDataValues();
   std::vector<double> generateRandomNumbers(unsigned int amount, double max) const;
@@ -61,7 +66,7 @@ private:
   std::map<std::string, QmitkChartWidget::LineStyle> m_LineNameToLineType;
   std::map<std::string, QmitkChartWidget::AxisScale> m_AxisScaleNameToAxisScaleType;
 
-  unsigned int countForUID=0;
+  unsigned int countForUID = 0;
 };
 
 #endif // ChartExample_h

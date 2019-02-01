@@ -575,6 +575,12 @@ void QmitkChartWidget::OnPageSuccessfullyLoaded() {
   m_Impl->CallJavaScriptFuntion(command);
 }
 
+std::string QmitkChartWidget::convertBooleanValue(bool value) const {
+  std::stringstream converter;
+  converter << std::boolalpha << value;
+  return converter.str();
+}
+
 void QmitkChartWidget::SetChartTypeForAllDataAndReload(ChartType type)
 {
   m_Impl->SetChartType(type);

@@ -235,17 +235,8 @@ signals:
   void PageSuccessfullyLoaded();
 
 private:
-
-  QString convertBooleanValue(bool value) {
-    if (value)
-    {
-      return "true";
-    }
-    else
-    {
-      return "false";
-    }
-  }
+  /*! source: https://stackoverflow.com/questions/29383/converting-bool-to-text-in-c*/
+  std::string convertBooleanValue(bool value) const;
 
   class Impl;
   std::unique_ptr<Impl> m_Impl;

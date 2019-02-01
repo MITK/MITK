@@ -601,10 +601,6 @@ void QmitkChartWidget::SetShowSubchart(bool showSubChart)
 void QmitkChartWidget::SetShowErrorBars(bool showErrorBars) 
 {
   m_Impl->SetShowErrorBars(showErrorBars);
-
-  //QString showErrorBarsString = convertBooleanValue(showErrorBars);
-  //const QString command = QString("SetShowErrorBars(" + showErrorBarsString + ")");
-  //m_Impl->CallJavaScriptFuntion(command);
 }
 
 void QmitkChartWidget::Reload()

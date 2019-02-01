@@ -197,7 +197,7 @@ public:
   void Clear();
 
   /*!
-  * \brief Changes the theme of the widget.
+  * \brief Sets the theme of the widget.
   */
   void SetTheme(ChartStyle themeEnabled);
 
@@ -212,6 +212,7 @@ public:
 
 public slots:
   void OnLoadFinished(bool isLoadSuccessful);
+  void OnPageSuccessfullyLoaded();
 
 signals:
   void PageSuccessfullyLoaded();

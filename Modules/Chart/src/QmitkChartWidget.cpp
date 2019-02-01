@@ -121,8 +121,10 @@ QmitkChartWidget::Impl::Impl(QWidget *parent)
   m_WebEngineView->setPage(new CustomPage());
 
   // Set the webengineview to an initial empty page. The actual chart will be loaded once the data is calculated.
-  m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
+
+  m_WebEngineView->load(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
   m_WebEngineView->page()->setWebChannel(m_WebChannel);
+
   m_WebEngineView->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
 
   connect(m_WebEngineView, SIGNAL(loadFinished(bool)), parent, SLOT(OnLoadFinished(bool)));
@@ -345,7 +347,7 @@ void QmitkChartWidget::Impl::Show(bool showSubChart)
     m_C3Data.SetAppearance(showSubChart, m_C3xyData.front()->GetChartType() == QVariant("pie"));
   }
 
-    InitializeJavaScriptChart();
+  InitializeJavaScriptChart();
 }
 
 void QmitkChartWidget::Impl::SetShowLegend(bool show)
@@ -397,7 +399,7 @@ void QmitkChartWidget::Impl::CallJavaScriptFuntion(const QString& command)
 
 void QmitkChartWidget::Impl::ClearJavaScriptChart()
 {
-  m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
+  m_WebEngineView->load(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
 }
 
 void QmitkChartWidget::Impl::InitializeJavaScriptChart()
@@ -426,7 +428,9 @@ std::string QmitkChartWidget::Impl::GetUniqueLabelName(const QList<QVariant> &la
   return currentLabel.toStdString();
 }
 
-QmitkChartWidget::QmitkChartWidget(QWidget *parent) : QWidget(parent), m_Impl(new Impl(this)) {}
+QmitkChartWidget::QmitkChartWidget(QWidget *parent) : QWidget(parent), m_Impl(new Impl(this)) {
+  connect(this, &QmitkChartWidget::PageSuccessfullyLoaded, this, &QmitkChartWidget::OnPageSuccessfullyLoaded);
+}
 
 QmitkChartWidget::~QmitkChartWidget() {}
 
@@ -519,15 +523,10 @@ void QmitkChartWidget::OnLoadFinished(bool isLoadSuccessfull)
   }
 }
 
-void QmitkChartWidget::SetChartTypeForAllDataAndReload(ChartType type)
-{
-  m_Impl->SetChartType(type);
-}
-
-void QmitkChartWidget::SetTheme(ChartStyle themeEnabled)
-{
+void QmitkChartWidget::OnPageSuccessfullyLoaded() {
+  auto themeName = m_Impl->GetThemeName();
   QString command;
-  if (themeEnabled == ChartStyle::darkstyle)
+  if (themeName == "dark")
   {
     command = QString("changeTheme('dark')");
   }
@@ -537,6 +536,17 @@ void QmitkChartWidget::SetTheme(ChartStyle themeEnabled)
   }
 
   m_Impl->CallJavaScriptFuntion(command);
+}
+
+void QmitkChartWidget::SetChartTypeForAllDataAndReload(ChartType type)
+{
+  m_Impl->SetChartType(type);
+}
+
+void QmitkChartWidget::SetTheme(ChartStyle themeEnabled)
+{
+  m_Impl->SetThemeName(themeEnabled);
+
 }
 
 void QmitkChartWidget::Reload(bool showSubChart)

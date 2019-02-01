@@ -45,8 +45,8 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.m_buttonAddData, &QPushButton::clicked, this, &ChartExample::AddData);
 
   FillRandomDataValues();
-
-  m_Controls.m_Chart->SetTheme(GetColorTheme());
+  auto chartStyle = GetColorTheme();
+  m_Controls.m_Chart->SetTheme(chartStyle);
 
   m_Controls.m_lineEditXAxisLabel->setText("xLabel");
   m_Controls.m_lineEditYAxisLabel->setText("yLabel");
@@ -182,4 +182,3 @@ QmitkChartWidget::ChartStyle ChartExample::GetColorTheme() const
   }
   return QmitkChartWidget::ChartStyle::darkstyle;
 }
-

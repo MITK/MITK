@@ -60,7 +60,6 @@ private:
 	void OnNBinsSpinBoxValueChanged();
 	/** \brief Shows / Hides the subchart. */
 	void OnShowSubchartCheckBoxChanged();
-  void OnPageSuccessfullyLoaded();
 
 private:
 	Ui::QmitkHistogramVisualizationControls m_Controls;
@@ -69,7 +68,6 @@ private:
   const unsigned int m_MaxNBins = 10000;
 
 	itk::Statistics::Histogram<double>::ConstPointer m_Histogram;
-  QmitkChartWidget::ChartStyle m_ChartStyle = QmitkChartWidget::ChartStyle::darkstyle;
 };
 
 #endif //QmitkHistogramVisualizationWidget_H__INCLUDED

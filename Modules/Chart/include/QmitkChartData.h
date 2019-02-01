@@ -31,6 +31,7 @@ class QmitkChartData : public QObject
   Q_PROPERTY(QVariant m_xAxisLabel READ GetXAxisLabel WRITE SetXAxisLabel NOTIFY SignalXAxisLabelChanged);
   Q_PROPERTY(QVariant m_yAxisLabel READ GetYAxisLabel WRITE SetYAxisLabel NOTIFY SignalYAxisLabelChanged);
   Q_PROPERTY(QVariant m_chartTitle READ GetTitle WRITE SetTitle NOTIFY SignalTitleChanged);
+  Q_PROPERTY(QVariant m_themeName READ GetThemeName WRITE SetThemeName NOTIFY SignalThemeNameChanged);
   Q_PROPERTY(QVariant m_LegendPosition READ GetLegendPosition WRITE SetLegendPosition NOTIFY SignalLegendPositionChanged);
   Q_PROPERTY(QVariant m_ShowLegend READ GetShowLegend WRITE SetShowLegend NOTIFY SignalShowLegendChanged);
   Q_PROPERTY(QVariant m_YAxisScale READ GetYAxisScale WRITE SetYAxisScale NOTIFY SignalYAxisScaleChanged);
@@ -52,6 +53,13 @@ public:
 
   Q_INVOKABLE QVariant GetTitle() const { return m_chartTitle; };
   Q_INVOKABLE void SetTitle(const QVariant& title) { m_chartTitle = title; emit SignalTitleChanged(title); };
+
+  Q_INVOKABLE QVariant GetThemeName() const { return m_themeName; };
+  Q_INVOKABLE void SetThemeName(const QVariant &themeName)
+  {
+    m_themeName = themeName;
+    emit SignalThemeNameChanged(themeName);
+  };
 
   Q_INVOKABLE QVariant GetLegendPosition() const { return m_LegendPosition; };
   Q_INVOKABLE void SetLegendPosition(const QVariant& legendPosition) { m_LegendPosition = legendPosition; emit SignalLegendPositionChanged(legendPosition); };
@@ -81,6 +89,7 @@ signals:
   void SignalShowLegendChanged(const QVariant show);
   void SignalYAxisScaleChanged(const QVariant YAxisScale);
   void SignalTitleChanged(const QVariant title);
+  void SignalThemeNameChanged(const QVariant themeName);
   void SignalShowSubchartChanged(const QVariant showSubchart);
   void SignalUsePercentageInPieChartChanged(const QVariant usePercentageInPieChart);
   void SignalDataPointSizeChanged(const QVariant showDataPoints);
@@ -90,6 +99,7 @@ private:
   QVariant m_xAxisLabel;
   QVariant m_yAxisLabel;
   QVariant m_chartTitle;
+  QVariant m_themeName = "dark";
 
   QVariant m_ShowLegend = true;
   QVariant m_LegendPosition = "topRight";

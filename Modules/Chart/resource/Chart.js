@@ -11,6 +11,8 @@ var xs = {};
 var dataColors = {};
 var chartTypes = {};
 var lineStyle = {};
+var backgroundColor = '#f0f0f0';
+var foregroundColor = 'black';
 
 // Important loading function. This will be executed at first in this whole script.
 // Fetching data from QWebChannel and storing them for display purposes.
@@ -56,9 +58,9 @@ window.onload = function()
   			count++;
   		}
   	}
-
-    generateChart(chartData);
-
+	var theme = chartData.m_themeName;
+	setThemeColors(theme);
+    generateChart(chartData, theme);
   });
 }
 
@@ -88,7 +90,7 @@ function getPlotlyChartType(inputType){
  *
  * @param {object} chartData - containing the options for plotting, not the actual values
  */
-function generateChart(chartData)
+function generateChart(chartData, theme='dark')
 {
   console.log("generate chart");
 	if (chartData == undefined)
@@ -147,12 +149,19 @@ function generateChart(chartData)
 	  var legendY = 0.5;
   }
   var layout = {
+	  paper_bgcolor : backgroundColor,
+	  plot_bgcolor : backgroundColor,
     title:chartData.m_chartTitle,
+	titlefont: {
+		color:foregroundColor
+	},
     xaxis: {
-      title: chartData.m_xAxisLabel
+      title: chartData.m_xAxisLabel,
+	  color: foregroundColor
     },
     yaxis: {
-      title: chartData.m_yAxisLabel
+      title: chartData.m_yAxisLabel,
+	  color: foregroundColor
     },
     margin: {
       l: 50,
@@ -164,7 +173,10 @@ function generateChart(chartData)
 	showlegend: chartData.m_ShowLegend,
 	legend: {
 		x: legendX,
-		y: legendY
+		y: legendY,
+		font : {
+			color: foregroundColor
+		}
 	}
   };
 
@@ -185,6 +197,7 @@ function generateChart(chartData)
  * @param {string} color - dark or not dark
  */
 function changeTheme(color) {
+	setThemeColors(color);
 link = document.getElementsByTagName("link")[0];
   if (color == 'dark') {
     link.href = "Chart_dark.css";
@@ -194,6 +207,17 @@ link = document.getElementsByTagName("link")[0];
     link.href = "Chart.css";
   }
 };
+
+function setThemeColors(theme){
+	if (theme == 'dark'){
+		backgroundColor = '#2d2d30';
+		foregroundColor = 'white';
+	}
+	else {
+		backgroundColor = '#f0f0f0';
+		foregroundColor = 'black';
+	}
+}
 
 /**
  * Reload the chart with the given arguments.
@@ -206,7 +230,8 @@ function ReloadChart(showSubchart, stackDataString = false)
 {
     chartData.m_ShowSubchart = showSubchart;
     chartData.m_StackedData = stackDataString;
-    generateChart(chartData);
+	var theme = chartData.m_themeName;
+    generateChart(chartData, theme);
 }
 
 /**

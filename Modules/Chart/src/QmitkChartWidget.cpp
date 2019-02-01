@@ -66,6 +66,9 @@ public:
 
   void SetTitle(const std::string &title);
 
+  std::string GetThemeName() const;
+  void SetThemeName(ChartStyle style);
+
   void SetChartType(QmitkChartWidget::ChartType chartType);
   void SetLegendPosition(LegendPosition position);
   void SetChartTypeByLabel(const std::string &label, QmitkChartWidget::ChartType chartType);
@@ -99,10 +102,15 @@ private:
   QmitkChartData m_C3Data;
   ChartxyDataVector m_C3xyData;
   std::map<QmitkChartWidget::ChartType, std::string> m_ChartTypeToName;
+  std::map<QmitkChartWidget::ChartStyle, std::string> m_ChartStyleToName;
   std::map<QmitkChartWidget::LegendPosition, std::string> m_LegendPositionToName;
   std::map<QmitkChartWidget::LineStyle, std::string> m_LineStyleToName;
   std::map<QmitkChartWidget::AxisScale, std::string> m_AxisScaleToName;
 };
+
+std::string QmitkChartWidget::Impl::GetThemeName() const {
+  return m_C3Data.GetThemeName().toString().toStdString();
+}
 
 QmitkChartWidget::Impl::Impl(QWidget *parent)
   : m_WebChannel(new QWebChannel(parent)),
@@ -141,6 +149,9 @@ QmitkChartWidget::Impl::Impl(QWidget *parent)
 
   m_AxisScaleToName.emplace(AxisScale::linear, "");
   m_AxisScaleToName.emplace(AxisScale::log, "log");
+
+  m_ChartStyleToName.emplace(ChartStyle::lightstyle, "light");
+  m_ChartStyleToName.emplace(ChartStyle::darkstyle, "dark");
 }
 
 QmitkChartWidget::Impl::~Impl()
@@ -283,6 +294,12 @@ void QmitkChartWidget::Impl::SetYAxisLabel(const std::string &label)
 void QmitkChartWidget::Impl::SetTitle(const std::string &title)
 {
   m_C3Data.SetTitle(QString::fromStdString(title));
+}
+
+void QmitkChartWidget::Impl::SetThemeName(QmitkChartWidget::ChartStyle style)
+{
+  const std::string themeName(m_ChartStyleToName.at(style));
+  m_C3Data.SetThemeName(QString::fromStdString(themeName));
 }
 
 void QmitkChartWidget::Impl::SetChartType(QmitkChartWidget::ChartType chartType)

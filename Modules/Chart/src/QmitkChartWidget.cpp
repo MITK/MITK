@@ -94,7 +94,6 @@ private:
   std::string GetUniqueLabelName(const QList<QVariant>& labelList, const std::string& label) const;
   QmitkChartxyData* GetDataElementByLabel(const std::string& label) const;
   QList<QVariant> GetDataLabels(const ChartxyDataVector& c3xyData) const;
-  void MapTypes();
 
   QWebChannel *m_WebChannel;
   QWebEngineView *m_WebEngineView;

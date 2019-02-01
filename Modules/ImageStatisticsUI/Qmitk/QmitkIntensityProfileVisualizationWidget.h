@@ -58,7 +58,6 @@ private:
   void OnPageSuccessfullyLoaded();
 
 private:
-  void WarnQtVersionTooLow();
 
 	Ui::QmitkIntensityProfileControls m_Controls;
   QmitkChartWidget::ChartStyle m_ChartStyle = QmitkChartWidget::ChartStyle::darkstyle;

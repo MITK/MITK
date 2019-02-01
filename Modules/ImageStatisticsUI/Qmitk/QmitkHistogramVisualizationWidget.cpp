@@ -49,7 +49,7 @@ void QmitkHistogramVisualizationWidget::Reset()
 	SetGUIElementsEnabled(false);
 }
 
-void QmitkHistogramVisualizationWidget::SetTheme(QmitkChartWidget::ChartStyle style)
+void QmitkHistogramVisualizationWidget::SetTheme(QmitkChartWidget::ColorTheme style)
 {
   m_Controls.chartWidget->SetTheme(style);
 }

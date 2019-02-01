@@ -51,7 +51,7 @@ void QmitkIntensityProfileVisualizationWidget::Reset()
 	m_IntensityProfileList.clear();
 }
 
-void QmitkIntensityProfileVisualizationWidget::SetTheme(QmitkChartWidget::ChartStyle style)
+void QmitkIntensityProfileVisualizationWidget::SetTheme(QmitkChartWidget::ColorTheme style)
 {
   m_ChartStyle = style;
 }

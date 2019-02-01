@@ -172,7 +172,7 @@ std::string ChartExample::convertToText(std::vector<double> numbers, std::string
   return aString;
 }
 
-QmitkChartWidget::ChartStyle ChartExample::GetColorTheme() const
+QmitkChartWidget::ColorTheme ChartExample::GetColorTheme() const
 {
   ctkPluginContext* context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
   ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
@@ -180,11 +180,11 @@ QmitkChartWidget::ChartStyle ChartExample::GetColorTheme() const
   {
     auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
     if (styleManager->GetStyle().name == "Dark") {
-      return QmitkChartWidget::ChartStyle::darkstyle;
+      return QmitkChartWidget::ColorTheme::darkstyle;
     }
     else {
-      return QmitkChartWidget::ChartStyle::lightstyle;
+      return QmitkChartWidget::ColorTheme::lightstyle;
     }
   }
-  return QmitkChartWidget::ChartStyle::darkstyle;
+  return QmitkChartWidget::ColorTheme::darkstyle;
 }

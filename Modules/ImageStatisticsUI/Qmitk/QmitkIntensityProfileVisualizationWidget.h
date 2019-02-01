@@ -40,7 +40,7 @@ public:
 	/** \brief Clears the intensity profile and disables all GUI elements. */
 	void Reset();
 
-  void SetTheme(QmitkChartWidget::ChartStyle style);
+  void SetTheme(QmitkChartWidget::ColorTheme style);
 
 private:
 
@@ -60,7 +60,7 @@ private:
 private:
 
 	Ui::QmitkIntensityProfileControls m_Controls;
-  QmitkChartWidget::ChartStyle m_ChartStyle = QmitkChartWidget::ChartStyle::darkstyle;
+  QmitkChartWidget::ColorTheme m_ChartStyle = QmitkChartWidget::ColorTheme::darkstyle;
 
 	std::vector<double> m_IntensityProfileList;
 };

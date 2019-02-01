@@ -105,11 +105,11 @@ void QmitkImageStatisticsView::OnPageSuccessfullyLoaded()
 
   if (styleName == ":/org.blueberry.ui.qt/darkstyle.qss")
   {
-    this->m_Controls->m_JSHistogram->SetTheme(QmitkChartWidget::ChartStyle::darkstyle);
+    this->m_Controls->m_JSHistogram->SetTheme(QmitkChartWidget::ColorTheme::darkstyle);
   }
   else
   {
-    this->m_Controls->m_JSHistogram->SetTheme(QmitkChartWidget::ChartStyle::lightstyle);
+    this->m_Controls->m_JSHistogram->SetTheme(QmitkChartWidget::ColorTheme::lightstyle);
   }
 }
 

@@ -64,7 +64,7 @@ public:
   static const std::string VIEW_ID;
 
   void FillHistogramWidget(const std::vector<HistogramType::ConstPointer>& histogram, const std::vector<std::string>& dataLabels);
-  QmitkChartWidget::ChartStyle GetColorTheme() const;
+  QmitkChartWidget::ColorTheme GetColorTheme() const;
 protected:
   virtual void Activated() override;
   virtual void Deactivated() override;

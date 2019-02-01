@@ -59,7 +59,7 @@ public:
   /*!
   * \brief enum of chart style (modifies background and line color).
   */
-  enum class ChartStyle {
+  enum class ColorTheme {
     darkstyle, /*!< background color: dark gray, line color: blue */
     lightstyle /*!< background color: white, line color: blue */
   };
@@ -203,7 +203,7 @@ public:
   /*!
   * \brief Sets the theme of the widget.
   */
-  void SetTheme(ChartStyle themeEnabled);
+  void SetTheme(ColorTheme themeEnabled);
 
   /*!
   * \brief Sets whether the subchart shall be shown.

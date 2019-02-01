@@ -68,7 +68,12 @@ public:
 
   void SetTitle(const std::string &title);
 
-  void SetErrorBars(const std::string &label, const std::vector<double> &errorPlus, const std::vector<double>& errorMinus = std::vector<double>());
+  void SetXErrorBars(const std::string &label,
+                     const std::vector<double> &errorPlus,
+                     const std::vector<double> &errorMinus = std::vector<double>());
+  void SetYErrorBars(const std::string &label,
+                     const std::vector<double> &errorPlus,
+                     const std::vector<double> &errorMinus = std::vector<double>());
   void SetChartType(QmitkChartWidget::ChartType chartType);
   void SetLegendPosition(LegendPosition position);
   void SetChartTypeByLabel(const std::string &label, QmitkChartWidget::ChartType chartType);
@@ -81,6 +86,7 @@ public:
   void SetShowDataPoints(bool showDataPoints = false);
 
   void SetChartType(const std::string &label, QmitkChartWidget::ChartType chartType);
+  QList<QVariant> ConvertErrorVectorToQList(const std::vector<double> &error);
 
   std::string ConvertChartTypeToString(QmitkChartWidget::ChartType chartType) const;
 
@@ -334,7 +340,7 @@ void QmitkChartWidget::Impl::Show(bool showSubChart)
     m_C3Data.SetAppearance(showSubChart, m_C3xyData.front()->GetChartType() == QVariant("pie"));
   }
 
-    InitializeJavaScriptChart();
+  InitializeJavaScriptChart();
 }
 
 void QmitkChartWidget::Impl::SetShowLegend(bool show)
@@ -374,25 +380,44 @@ void QmitkChartWidget::Impl::SetChartType(const std::string &label, QmitkChartWi
   }
 }
 
-void QmitkChartWidget::Impl::SetErrorBars(const std::string &label, const std::vector<double> &errorPlus, const std::vector<double>& errorMinus)
+QList<QVariant> QmitkChartWidget::Impl::ConvertErrorVectorToQList(const std::vector<double> &error)
+{
+  QList<QVariant> errorConverted;
+  for (const auto &aValue : error)
+  {
+    errorConverted.append(aValue);
+  }
+
+  return errorConverted;
+}
+
+void QmitkChartWidget::Impl::SetXErrorBars(const std::string &label,
+                                           const std::vector<double> &errorPlus,
+                                           const std::vector<double> &errorMinus)
 {
   auto element = GetDataElementByLabel(label);
   if (element)
   {
-    QList<QVariant> errorConvertedPlus;
-    for (const auto &aValue : errorPlus)
-    {
-      errorConvertedPlus.append(aValue);
-    }
+    auto errorConvertedPlus = ConvertErrorVectorToQList(errorPlus);
+    auto errorConvertedMinus = ConvertErrorVectorToQList(errorMinus);
 
-    QList<QVariant> errorConvertedMinus;
-    for (const auto &aValue : errorMinus)
-    {
-      errorConvertedMinus.append(aValue);
-    }
+    element->SetXErrorDataPlus(errorConvertedPlus);
+    element->SetXErrorDataMinus(errorConvertedMinus);
+  }
+}
 
-    element->SetErrorDataPlus(errorConvertedPlus);
-    element->SetErrorDataMinus(errorConvertedMinus);
+void QmitkChartWidget::Impl::SetYErrorBars(const std::string &label,
+                                           const std::vector<double> &errorPlus,
+                                           const std::vector<double> &errorMinus)
+{
+  auto element = GetDataElementByLabel(label);
+  if (element)
+  {
+    auto errorConvertedPlus = ConvertErrorVectorToQList(errorPlus);
+    auto errorConvertedMinus = ConvertErrorVectorToQList(errorMinus);
+
+    element->SetYErrorDataPlus(errorConvertedPlus);
+    element->SetYErrorDataMinus(errorConvertedMinus);
   }
 }
 
@@ -501,9 +526,18 @@ void QmitkChartWidget::SetChartType(const std::string &label, ChartType type)
   m_Impl->SetChartType(label, type);
 }
 
-void QmitkChartWidget::SetErrorBars(const std::string &label, const std::vector<double> &errorPlus, const std::vector<double>& errorMinus) 
+void QmitkChartWidget::SetXErrorBars(const std::string &label,
+                                     const std::vector<double> &errorPlus,
+                                     const std::vector<double> &errorMinus)
 {
-  m_Impl->SetErrorBars(label, errorPlus, errorMinus);
+  m_Impl->SetXErrorBars(label, errorPlus, errorMinus);
+}
+
+void QmitkChartWidget::SetYErrorBars(const std::string &label,
+                                     const std::vector<double> &errorPlus,
+                                     const std::vector<double> &errorMinus)
+{
+  m_Impl->SetYErrorBars(label, errorPlus, errorMinus);
 }
 
 void QmitkChartWidget::SetLegendPosition(LegendPosition position)
@@ -516,8 +550,9 @@ void QmitkChartWidget::SetShowLegend(bool show)
   m_Impl->SetShowLegend(show);
 }
 
-void QmitkChartWidget::SetStackedData(bool stacked) {
-  Q_UNUSED(stacked)  //this is a temporary solution and will be changed as soon as this method is implemented
+void QmitkChartWidget::SetStackedData(bool stacked)
+{
+  Q_UNUSED(stacked) // this is a temporary solution and will be changed as soon as this method is implemented
   MITK_WARN << "not yet implemented";
 }
 
@@ -567,13 +602,13 @@ void QmitkChartWidget::SetShowSubchart(bool showSubChart)
   m_Impl->CallJavaScriptFuntion(command);
 }
 
-void QmitkChartWidget::SetShowErrorBars(bool showErrorBars) 
+void QmitkChartWidget::SetShowErrorBars(bool showErrorBars)
 {
   m_Impl->SetShowErrorBars(showErrorBars);
 
-  //QString showErrorBarsString = convertBooleanValue(showErrorBars);
-  //const QString command = QString("SetShowErrorBars(" + showErrorBarsString + ")");
-  //m_Impl->CallJavaScriptFuntion(command);
+  // QString showErrorBarsString = convertBooleanValue(showErrorBars);
+  // const QString command = QString("SetShowErrorBars(" + showErrorBarsString + ")");
+  // m_Impl->CallJavaScriptFuntion(command);
 }
 
 void QmitkChartWidget::Reload()

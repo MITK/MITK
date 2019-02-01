@@ -127,8 +127,8 @@ void ChartExample::AddData()
 
   auto errorValuesMinus = std::vector<double>(data.size());
   std::transform(data.begin(), data.end(), errorValuesMinus.begin(), [](double d) { return d / 2; });
-  m_Controls.m_Chart->SetErrorBars(dataLabel, data, errorValuesMinus);
-
+  m_Controls.m_Chart->SetXErrorBars(dataLabel, data, errorValuesMinus);
+  m_Controls.m_Chart->SetYErrorBars(dataLabel, data, errorValuesMinus);
   m_Controls.m_Chart->SetLineStyle(dataLabel, dataLineStyleType);
 
   QString dataOverview;

@@ -4,8 +4,10 @@ const minHeight = 255;
 var chart;
 
 var chartData;
-var errorValuesPlus=[];
-var errorValuesMinus=[];
+var xErrorValuesPlus=[];
+var xErrorValuesMinus=[];
+var yErrorValuesPlus=[];
+var yErrorValuesMinus=[];
 var xValues=[];
 var yValues=[];
 var dataLabels=[];
@@ -32,8 +34,10 @@ window.onload = function()
     {
         let xDataTemp = channel.objects[propertyName].m_XData;
         let yDataTemp = channel.objects[propertyName].m_YData;
-	      let errorsTempPlus = channel.objects[propertyName].m_ErrorDataPlus;
-		  let errorsTempMinus = channel.objects[propertyName].m_ErrorDataMinus;
+	    let xErrorsTempPlus = channel.objects[propertyName].m_XErrorDataPlus;
+		let xErrorsTempMinus = channel.objects[propertyName].m_XErrorDataMinus;
+		let yErrorsTempPlus = channel.objects[propertyName].m_YErrorDataPlus;
+		let yErrorsTempMinus = channel.objects[propertyName].m_YErrorDataMinus;  
         let dataLabel = channel.objects[propertyName].m_Label;
         dataLabels.push(dataLabel);
 
@@ -49,8 +53,10 @@ window.onload = function()
 
         xValues[count] = xDataTemp
         yValues[count] = yDataTemp
-        errorValuesPlus[count] = errorsTempPlus;
-		errorValuesMinus[count] = errorsTempMinus;
+        xErrorValuesPlus[count] = xErrorsTempPlus;
+		xErrorValuesMinus[count] = xErrorsTempMinus;
+		yErrorValuesPlus[count] = yErrorsTempPlus;
+		yErrorValuesMinus[count] = yErrorsTempMinus;
 		
 
         let tempLineStyle = '';
@@ -161,12 +167,21 @@ function generateChart(chartData)
       name: dataLabels[index]
     };
 
-	  if(typeof errorValuesPlus[index] !== 'undefined'){
-		  if(typeof errorValuesMinus[index] !== 'undefined' && errorValuesMinus[index].length > 0)
+	  if(typeof xErrorValuesPlus[index] !== 'undefined'){
+		  if(typeof xErrorValuesMinus[index] !== 'undefined' && xErrorValuesMinus[index].length > 0)
 		  {
-			trace["error_y"] = generateErrorBarsAsymmetric(errorValuesPlus[index], errorValuesMinus[index], chartData.m_ShowErrorBars);
+			trace["error_x"] = generateErrorBarsAsymmetric(xErrorValuesPlus[index], xErrorValuesMinus[index], chartData.m_ShowErrorBars);
 		  }else{
-			trace["error_y"] = generateErrorBars(errorValuesPlus[index], chartData.m_ShowErrorBars);
+			trace["error_x"] = generateErrorBars(xErrorValuesPlus[index], chartData.m_ShowErrorBars);
+		  }
+	  }
+	  
+	  if(typeof yErrorValuesPlus[index] !== 'undefined'){
+		  if(typeof yErrorValuesMinus[index] !== 'undefined' && yErrorValuesMinus[index].length > 0)
+		  {
+			trace["error_y"] = generateErrorBarsAsymmetric(yErrorValuesPlus[index], yErrorValuesMinus[index], chartData.m_ShowErrorBars);
+		  }else{
+			trace["error_y"] = generateErrorBars(yErrorValuesPlus[index], chartData.m_ShowErrorBars);
 		  }
 	  }
 

@@ -43,6 +43,13 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.m_buttonCreateChart, &QPushButton::clicked, this, &ChartExample::CreateChart);
   connect(m_Controls.m_buttonClearChart, &QPushButton::clicked, this, &ChartExample::ClearChart);
   connect(m_Controls.m_buttonAddData, &QPushButton::clicked, this, &ChartExample::AddData);
+  connect(m_Controls.m_checkBoxEnableErrors, &QCheckBox::toggled, this, &ChartExample::ShowErrorOptions);
+  connect(m_Controls.m_checkBoxEnableXErrors, &QCheckBox::toggled, this, &ChartExample::ShowXErrorOptions);
+  connect(m_Controls.m_checkBoxEnableYErrors, &QCheckBox::toggled, this, &ChartExample::ShowYErrorOptions);
+
+  m_Controls.m_groupBoxErrors->setVisible(false);
+  m_Controls.m_groupBoxXErrors->setVisible(false);
+  m_Controls.m_groupBoxYErrors->setVisible(false);
 
   FillRandomDataValues();
   auto chartStyle = GetColorTheme();
@@ -73,6 +80,20 @@ void ChartExample::FillRandomDataValues()
   m_Controls.m_lineEditDataVector->setText(QString::fromStdString(text));
 
   m_Controls.m_lineEditDataLabel->setText("test" + QString::number(countForUID));
+
+  numbers = generateRandomNumbers(10, 10.0);
+  text = convertToText(numbers, ";");
+  m_Controls.m_lineEditXErrorPlus->setText(QString::fromStdString(text));
+  numbers = generateRandomNumbers(10, 10.0);
+  text = convertToText(numbers, ";");
+  m_Controls.m_lineEditXErrorMinus->setText(QString::fromStdString(text));
+  numbers = generateRandomNumbers(10, 10.0);
+  text = convertToText(numbers, ";");
+  m_Controls.m_lineEditYErrorPlus->setText(QString::fromStdString(text));
+  numbers = generateRandomNumbers(10, 10.0);
+  text = convertToText(numbers, ";");
+  m_Controls.m_lineEditYErrorMinus->setText(QString::fromStdString(text));
+
   countForUID++;
 }
 
@@ -103,14 +124,25 @@ void ChartExample::ClearChart()
   m_Controls.m_plainTextEditDataView->clear();
 }
 
-void ChartExample::AddData()
+std::vector<double> ChartExample::ConvertToVector(const QString& lineEditData)
 {
-  auto lineEditData = m_Controls.m_lineEditDataVector->text();
   std::vector<double> data;
+  if (lineEditData.isEmpty())
+  {
+    return data;
+  }
+
   for(const QString entry : lineEditData.split(';'))
   {
     data.push_back(entry.toDouble());
   }
+  return data;
+}
+
+void ChartExample::AddData()
+{
+  QString lineEditData = m_Controls.m_lineEditDataVector->text();
+  auto data = ConvertToVector(lineEditData);
 
   auto chartType = m_chartNameToChartType.at(m_Controls.m_comboBoxChartType->currentText().toStdString());
   std::string dataLabel = m_Controls.m_lineEditDataLabel->text().toStdString();
@@ -122,10 +154,22 @@ void ChartExample::AddData()
     m_Controls.m_Chart->SetColor(dataLabel, dataColor);
   }
 
-  auto errorValuesMinus = std::vector<double>(data.size());
-  std::transform(data.begin(), data.end(), errorValuesMinus.begin(), [](double d) { return d / 2; });
-  m_Controls.m_Chart->SetXErrorBars(dataLabel, data, errorValuesMinus);
-  m_Controls.m_Chart->SetYErrorBars(dataLabel, data, errorValuesMinus);
+  if (m_Controls.m_checkBoxEnableErrors->isChecked())
+  {
+    if (m_Controls.m_checkBoxEnableXErrors->isChecked())
+    {
+      auto errorsPlus = ConvertToVector(m_Controls.m_lineEditXErrorPlus->text());
+      auto errorsMinus = ConvertToVector(m_Controls.m_lineEditXErrorMinus->text());
+      m_Controls.m_Chart->SetXErrorBars(m_Controls.m_lineEditDataLabel->text().toStdString(), errorsPlus, errorsMinus);
+    }
+    if (m_Controls.m_checkBoxEnableYErrors->isChecked())
+    {
+      auto errorsPlus = ConvertToVector(m_Controls.m_lineEditYErrorPlus->text());
+      auto errorsMinus = ConvertToVector(m_Controls.m_lineEditYErrorMinus->text());
+      m_Controls.m_Chart->SetYErrorBars(m_Controls.m_lineEditDataLabel->text().toStdString(), errorsPlus, errorsMinus);
+    }
+  }
+
   m_Controls.m_Chart->SetLineStyle(dataLabel, dataLineStyleType);
 
   QString dataOverview;
@@ -141,6 +185,21 @@ void ChartExample::AddData()
   m_Controls.m_plainTextEditDataView->appendPlainText(dataOverview);
 
   FillRandomDataValues();
+}
+
+void ChartExample::ShowErrorOptions(bool show)
+{
+  m_Controls.m_groupBoxErrors->setVisible(show);
+}
+
+void ChartExample::ShowXErrorOptions(bool show)
+{
+  m_Controls.m_groupBoxXErrors->setVisible(show);
+}
+
+void ChartExample::ShowYErrorOptions(bool show)
+{
+  m_Controls.m_groupBoxYErrors->setVisible(show);
 }
 
 std::vector<double> ChartExample::generateRandomNumbers(unsigned int amount, double max) const

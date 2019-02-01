@@ -28,9 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QRandomGenerator>
 
-// mitk image
-#include <mitkImage.h>
-
 
 const std::string ChartExample::VIEW_ID = "org.mitk.views.chartexample";
 

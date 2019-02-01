@@ -48,6 +48,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QShortcut>
 
 #include "tinyxml.h"
 
@@ -118,6 +119,14 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget *parent)
   m_Parent = parent;
 
   m_Controls.setupUi(parent);
+
+  // *------------------------
+  // * Shortcuts
+  // *------------------------
+  QShortcut* visibilityShortcut = new QShortcut(QKeySequence("CTRL+H"), parent);
+  connect(visibilityShortcut, &QShortcut::activated, this, &QmitkMultiLabelSegmentationView::OnVisibilityShortcutActivated);
+  QShortcut* labelToggleShortcut = new QShortcut(QKeySequence("CTRL+L"), parent);
+  connect(labelToggleShortcut, &QShortcut::activated, this, &QmitkMultiLabelSegmentationView::OnLabelToggleShortcutActivated);
 
   // *------------------------
   // * DATA SELECTION WIDGETS
@@ -303,6 +312,34 @@ int QmitkMultiLabelSegmentationView::ComputePreferredSize(bool width,
 /************************************************************************/
 /* protected slots                                                      */
 /************************************************************************/
+void QmitkMultiLabelSegmentationView::OnVisibilityShortcutActivated()
+{
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  assert(workingNode);
+
+  bool isVisible = false;
+  workingNode->GetBoolProperty("visible", isVisible);
+  workingNode->SetVisibility(!isVisible);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkMultiLabelSegmentationView::OnLabelToggleShortcutActivated()
+{
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  assert(workingNode);
+
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  assert(workingImage);
+
+  WaitCursorOn();
+  workingImage->GetActiveLabelSet()->SetNextActiveLabel();
+  workingImage->Modified();
+  WaitCursorOff();
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
 void QmitkMultiLabelSegmentationView::OnManualTool2DSelected(int id)
 {
   this->ResetMouseCursor();

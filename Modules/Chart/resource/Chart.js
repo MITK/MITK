@@ -14,6 +14,8 @@ var xs = {};
 var dataColors = {};
 var chartTypes = {};
 var lineStyle = {};
+var backgroundColor = '#f0f0f0';
+var foregroundColor = 'black';
 
 var dataProperties = {};
 
@@ -73,9 +75,9 @@ window.onload = function()
   			count++;
   		}
   	}
-
+	var theme = chartData.m_themeName;
+	setThemeColors(theme);
     generateChart(chartData);
-
   });
 }
 
@@ -183,7 +185,7 @@ function generateChart(chartData)
   }
 
   //=============================== STYLE ========================
-  let marginTop = chartData.m_diagramTitle == undefined ? 10 : 50;
+  let marginTop = chartData.m_chartTitle == undefined ? 10 : 50;
 
   if (chartData.m_LegendPosition == "bottomMiddle"){
 	  var legendX = 0.5;
@@ -206,12 +208,19 @@ function generateChart(chartData)
 	  var legendY = 0.5;
   }
   var layout = {
-    title: chartData.m_diagramTitle,
+	  paper_bgcolor : backgroundColor,
+	  plot_bgcolor : backgroundColor,
+    title:chartData.m_chartTitle,
+	titlefont: {
+		color:foregroundColor
+	},
     xaxis: {
-      title: chartData.m_xAxisLabel
+      title: chartData.m_xAxisLabel,
+	  color: foregroundColor
     },
     yaxis: {
-      title: chartData.m_yAxisLabel
+      title: chartData.m_yAxisLabel,
+	  color: foregroundColor
     },
     margin: {
       l: 50,
@@ -223,7 +232,10 @@ function generateChart(chartData)
 	showlegend: chartData.m_ShowLegend,
 	legend: {
 		x: legendX,
-		y: legendY
+		y: legendY,
+		font : {
+			color: foregroundColor
+		}
 	}
   };
 
@@ -244,6 +256,7 @@ function generateChart(chartData)
  * @param {string} color - dark or not dark
  */
 function changeTheme(color) {
+	setThemeColors(color);
 link = document.getElementsByTagName("link")[0];
   if (color == 'dark') {
     link.href = "Chart_dark.css";
@@ -254,6 +267,11 @@ link = document.getElementsByTagName("link")[0];
   }
 };
 
+/**
+ * Reload the chart with the given arguments.
+ *
+ * This method is called by C++. Changes on signature with caution.
+ */
 function Reload(){
   console.log("Reload chart");
   generateChart(chartData);
@@ -261,7 +279,18 @@ function Reload(){
 
 function SetShowSubchart(showSubchart)
 {
-  chartData.m_ShowSubchart = showSubchart;
+    chartData.m_ShowSubchart = showSubchart;
+}
+
+function setThemeColors(theme){
+	if (theme == 'dark'){
+		backgroundColor = '#2d2d30';
+		foregroundColor = 'white';
+	}
+	else {
+		backgroundColor = '#f0f0f0';
+		foregroundColor = 'black';
+	}
 }
 
 function SetStackDataString(stackDataString)

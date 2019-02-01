@@ -51,7 +51,7 @@ void QmitkHistogramVisualizationWidget::Reset()
 
 void QmitkHistogramVisualizationWidget::SetTheme(QmitkChartWidget::ChartStyle style)
 {
-  m_ChartStyle = style;
+  m_Controls.chartWidget->SetTheme(style);
 }
 
 void QmitkHistogramVisualizationWidget::CreateConnections()
@@ -60,7 +60,6 @@ void QmitkHistogramVisualizationWidget::CreateConnections()
 	connect(m_Controls.checkBoxUseDefaultNBins, &QCheckBox::clicked, this, &QmitkHistogramVisualizationWidget::OnDefaultNBinsCheckBoxChanged);
 	connect(m_Controls.spinBoxNBins, &QSpinBox::editingFinished, this, &QmitkHistogramVisualizationWidget::OnNBinsSpinBoxValueChanged);
 	connect(m_Controls.checkBoxShowSubchart, &QCheckBox::clicked, this, &QmitkHistogramVisualizationWidget::OnShowSubchartCheckBoxChanged);
-  connect(m_Controls.chartWidget, &QmitkChartWidget::PageSuccessfullyLoaded, this, &QmitkHistogramVisualizationWidget::OnPageSuccessfullyLoaded);
 }
 
 void QmitkHistogramVisualizationWidget::SetGUIElementsEnabled(bool enabled)
@@ -136,9 +135,4 @@ void QmitkHistogramVisualizationWidget::OnNBinsSpinBoxValueChanged()
 void QmitkHistogramVisualizationWidget::OnShowSubchartCheckBoxChanged()
 {
 	m_Controls.chartWidget->Show(m_Controls.checkBoxShowSubchart->isChecked());
-}
-
-void QmitkHistogramVisualizationWidget::OnPageSuccessfullyLoaded()
-{
-  m_Controls.chartWidget->SetTheme(m_ChartStyle);
 }

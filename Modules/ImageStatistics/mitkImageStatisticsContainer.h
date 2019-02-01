@@ -31,13 +31,14 @@ namespace mitk
 
    Stored statistics are:
    - for the defined statistics, see GetAllStatisticNames
-   - Histogram of Pixel Values*/
+   - Histogram of Pixel Values
+  */
   class MITKIMAGESTATISTICS_EXPORT ImageStatisticsContainer : public mitk::BaseData
   {
   public:
     mitkClassMacro(ImageStatisticsContainer, mitk::BaseData)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     using HistogramType = itk::Statistics::Histogram<double>;
     using RealType = double;
@@ -48,13 +49,13 @@ namespace mitk
     using StatisticsMapType = std::map < std::string, StatisticsVariantType>;
     using StatisticsKeyType = std::string;
 
-    virtual void SetRequestedRegionToLargestPossibleRegion() override {};
+    virtual void SetRequestedRegionToLargestPossibleRegion() override {}
 
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override { return false; };
+    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override { return false; }
 
-    virtual bool VerifyRequestedRegion() override { return true; };
+    virtual bool VerifyRequestedRegion() override { return true; }
 
-    virtual void SetRequestedRegion(const itk::DataObject*) override {};
+    virtual void SetRequestedRegion(const itk::DataObject*) override {}
 
     /**
     @brief Container class for storing the computed image statistics.
@@ -101,7 +102,7 @@ namespace mitk
       {
         auto value = GetValueNonConverted(name);
         return boost::get<TType>(value);
-      };
+      }
 
       /**
       @brief Returns the requested value

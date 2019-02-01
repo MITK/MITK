@@ -33,6 +33,7 @@ class QmitkChartData : public QObject
   Q_PROPERTY(QVariant m_chartTitle READ GetTitle WRITE SetTitle NOTIFY SignalTitleChanged);
   Q_PROPERTY(QVariant m_LegendPosition READ GetLegendPosition WRITE SetLegendPosition NOTIFY SignalLegendPositionChanged);
   Q_PROPERTY(QVariant m_ShowLegend READ GetShowLegend WRITE SetShowLegend NOTIFY SignalShowLegendChanged);
+  Q_PROPERTY(QVariant m_ShowErrorBars READ GetShowErrorBars WRITE SetShowErrorBars NOTIFY SignalShowErrorBarsChanged);
   Q_PROPERTY(QVariant m_YAxisScale READ GetYAxisScale WRITE SetYAxisScale NOTIFY SignalYAxisScaleChanged);
   Q_PROPERTY(QVariant m_ShowSubchart READ GetShowSubchart WRITE SetShowSubchart NOTIFY SignalShowSubchartChanged);
   Q_PROPERTY(QVariant m_UsePercentageInPieChart READ GetUsePercentageInPieChart WRITE SetUsePercentageInPieChart NOTIFY SignalUsePercentageInPieChartChanged);
@@ -59,6 +60,13 @@ public:
   Q_INVOKABLE QVariant GetShowLegend() const { return m_ShowLegend; };
   Q_INVOKABLE void SetShowLegend(const QVariant& show) { m_ShowLegend = show; emit SignalShowLegendChanged(show); };
 
+  Q_INVOKABLE QVariant GetShowErrorBars() const { return m_ShowErrorBars; };
+  Q_INVOKABLE void SetShowErrorBars(const QVariant &show)
+  {
+    m_ShowErrorBars = show;
+    emit SignalShowErrorBarsChanged(show);
+  };
+
   Q_INVOKABLE QVariant GetYAxisScale() const { return m_YAxisScale; };
   Q_INVOKABLE void SetYAxisScale(const QVariant& YAxisScale) { m_YAxisScale = YAxisScale; emit SignalYAxisScaleChanged(YAxisScale); };
 
@@ -79,6 +87,7 @@ signals:
   void SignalXAxisLabelChanged(const QVariant label);
   void SignalLegendPositionChanged(const QVariant legendPosition);
   void SignalShowLegendChanged(const QVariant show);
+  void SignalShowErrorBarsChanged(const QVariant show);
   void SignalYAxisScaleChanged(const QVariant YAxisScale);
   void SignalTitleChanged(const QVariant title);
   void SignalShowSubchartChanged(const QVariant showSubchart);
@@ -92,6 +101,7 @@ private:
   QVariant m_chartTitle;
 
   QVariant m_ShowLegend = true;
+  QVariant m_ShowErrorBars;
   QVariant m_LegendPosition = "topRight";
   QVariant m_ShowSubchart;
   QVariant m_YAxisScale;

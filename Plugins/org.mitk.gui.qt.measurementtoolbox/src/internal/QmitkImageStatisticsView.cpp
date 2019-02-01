@@ -148,7 +148,8 @@ void QmitkImageStatisticsView::OnDefaultNBinsSpinBoxChanged()
 void QmitkImageStatisticsView::OnShowSubchartBoxChanged()
 {
   bool showSubchart = this->m_Controls->m_ShowSubchartCheckBox->isChecked();
-  this->m_Controls->m_JSHistogram->Reload(showSubchart);
+  this->m_Controls->m_JSHistogram->SetShowSubchart(showSubchart);
+  this->m_Controls->m_JSHistogram->Reload();
 }
 
 

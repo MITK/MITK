@@ -93,6 +93,7 @@ void ChartExample::CreateChart()
   m_Controls.m_Chart->SetXAxisLabel(xAxisLabel);
   m_Controls.m_Chart->SetYAxisLabel(yAxisLabel);
   m_Controls.m_Chart->SetShowLegend(showLegend);
+  m_Controls.m_Chart->SetShowErrorBars(true);
   m_Controls.m_Chart->SetShowDataPoints(showDataPoints);
   m_Controls.m_Chart->SetStackedData(stackedData);
   m_Controls.m_Chart->Show(showSubchart);
@@ -123,6 +124,9 @@ void ChartExample::AddData()
   if (!dataColor.empty()) {
     m_Controls.m_Chart->SetColor(dataLabel, dataColor);
   }
+
+  m_Controls.m_Chart->SetErrorBars(dataLabel, data);
+
   m_Controls.m_Chart->SetLineStyle(dataLabel, dataLineStyleType);
 
   QString dataOverview;

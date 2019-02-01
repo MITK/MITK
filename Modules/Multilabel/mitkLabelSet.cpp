@@ -182,7 +182,7 @@ void mitk::LabelSet::RemoveLabel(PixelType pixelValue)
   auto it = m_LabelContainer.rbegin();
   PixelType nextActivePixelValue = it->first;
 
-  for (; it != m_LabelContainer.rend(); it++)
+  for (; it != m_LabelContainer.rend(); ++it)
   {
     if (it->first == pixelValue)
     {
@@ -215,6 +215,29 @@ void mitk::LabelSet::RemoveAllLabels()
     m_LabelContainer.erase(_it++);
   }
   AllLabelsModifiedEvent.Send();
+}
+
+void mitk::LabelSet::SetNextActiveLabel()
+{
+  auto it = m_LabelContainer.begin();
+  PixelType nextActivePixelValue = it->first;
+
+  for (; it != m_LabelContainer.end(); ++it)
+  {
+    if (it->first == m_ActiveLabelValue)
+    {
+      // go to next label
+      ++it;
+      if (it == m_LabelContainer.end())
+      {
+        // end of container; next label is first label
+        it = m_LabelContainer.begin();
+      }
+      break; // found the active label; finish loop
+    }
+  }
+
+  SetActiveLabel(it->first);
 }
 
 void mitk::LabelSet::SetAllLabelsLocked(bool value)

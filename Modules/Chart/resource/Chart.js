@@ -124,7 +124,7 @@ function generateChart(chartData)
   }
 
   //=============================== STYLE ========================
-  let marginTop = chartData.m_diagramTitle == undefined ? 10 : 50;
+  let marginTop = chartData.m_chartTitle == undefined ? 10 : 50;
 
   if (chartData.m_LegendPosition == "bottomMiddle"){
 	  var legendX = 0.5;
@@ -147,7 +147,7 @@ function generateChart(chartData)
 	  var legendY = 0.5;
   }
   var layout = {
-    title: chartData.m_diagramTitle,
+    title:chartData.m_chartTitle,
     xaxis: {
       title: chartData.m_xAxisLabel
     },

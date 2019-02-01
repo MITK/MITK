@@ -220,7 +220,6 @@ void mitk::LabelSet::RemoveAllLabels()
 void mitk::LabelSet::SetNextActiveLabel()
 {
   auto it = m_LabelContainer.begin();
-  PixelType nextActivePixelValue = it->first;
 
   for (; it != m_LabelContainer.end(); ++it)
   {

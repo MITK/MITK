@@ -166,8 +166,21 @@ public:
   * \sa DiagramType for available types
   */
   void SetChartType(const std::string& label, ChartType type);
+  /*!
+   * \brief Sets error bars for data in x direction
+   * \note If only error plus is provided, the error bars are symmetrical
+   * \param label the name of the data that is also used as identifier.
+   * \param errorPlus the error in positive direction
+   * \param errorMinus the error in negative direction. Same as error plus if omitted 
+   */
+  void SetXErrorBars(const std::string &label, const std::vector<double> &errorPlus, const std::vector<double>& errorMinus = std::vector<double>());
 
-  void SetErrorBars(const std::string &label, const std::vector<double> &errorPlus, const std::vector<double>& errorMinus = std::vector<double>());
+   /*!
+  * \brief Sets error bars for data in y direction
+  * \details for parameters, see SetXErrorBars
+  * \note If only error plus is provided, the error bars are symmetrical
+  */
+  void SetYErrorBars(const std::string &label, const std::vector<double> &errorPlus, const std::vector<double> &errorMinus = std::vector<double>());
 
   /*!
   * \brief Sets the legend position.

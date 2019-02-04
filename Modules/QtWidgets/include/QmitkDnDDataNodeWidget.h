@@ -33,9 +33,8 @@ class QDropEvent;
 *        event. If the drag event is coming from another widget and the mime data
 *        is of type 'application/x-qmitk-datanode-ptrs' the node(s) will be dropped
 *        and a signal is emitted.
-*        A class including this dnd-widget can than handle the vector of dropped nodes
+*        A class including this DnD-widget can than handle the vector of dropped nodes
 *        appropriately.
-*
 */
 class MITKQTWIDGETS_EXPORT QmitkDnDDataNodeWidget : public QFrame
 {
@@ -50,10 +49,9 @@ Q_SIGNALS:
 
   /**
   * @brief The signal will be emitted if the drag events are accepted.
-  *        It contains the sending dnd-widget and the vector of nodes that have been dropped.
-  *
+  *        It contains the vector of nodes that have been dropped.
   */
-  void NodesDropped(QmitkDnDDataNodeWidget* dnDDataNodeWidget, std::vector<mitk::DataNode*> nodes);
+  void NodesDropped(std::vector<mitk::DataNode*> nodes);
 
 private:
 

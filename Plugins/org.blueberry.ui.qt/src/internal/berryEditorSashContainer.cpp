@@ -100,7 +100,9 @@ PartStack::Pointer EditorSashContainer::NewEditorWorkbook()
 QWidget* EditorSashContainer::CreateParent(QWidget* parentWidget)
 {
   //return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->CreateComposite(parentWidget);
-  return new QtDnDControlWidget(static_cast<QWidget*>(parentWidget));
+  auto p = new QtDnDControlWidget(static_cast<QWidget*>(parentWidget));
+  p->setAutoFillBackground(true);
+  return p;
 }
 
 void EditorSashContainer::DisposeParent()

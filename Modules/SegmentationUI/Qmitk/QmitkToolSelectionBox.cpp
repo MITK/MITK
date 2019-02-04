@@ -368,6 +368,7 @@ void QmitkToolSelectionBox::RecreateButtons()
     QT_TRANSLATE_NOOP("SegmentationTool", "Live Wire"),
     QT_TRANSLATE_NOOP("SegmentationTool", "2D Fast Marching"),
     QT_TRANSLATE_NOOP("SegmentationTool", "Classic Region Growing"),
+    QT_TRANSLATE_NOOP("SegmentationTool", "Smart Brush"),
 
     // 3D Tools
     QT_TRANSLATE_NOOP("SegmentationTool", "Threshold"),

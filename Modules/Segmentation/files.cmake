@@ -58,6 +58,7 @@ set(CPP_FILES
   Interactions/mitkSegmentationsProcessingTool.cpp
   Interactions/mitkSetRegionTool.cpp
   Interactions/mitkSegTool2D.cpp
+  Interactions/mitkSmartBrushTool.cpp
   Interactions/mitkSubtractContourTool.cpp
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp
@@ -98,6 +99,8 @@ set(RESOURCE_FILES
   Pick_48x48.png
   RegionGrowing_48x48.png
   RegionGrowing_Cursor_32x32.png
+  SmartBrush_48x48.png
+  SmartBrush_Cursor_32x32.png
   Subtract_48x48.png
   Subtract_Cursor_32x32.png
   Threshold_48x48.png
@@ -109,6 +112,7 @@ set(RESOURCE_FILES
 
   Interactions/dummy.xml
   Interactions/LiveWireTool.xml
+  Interactions/SmartBrushTool.xml
   Interactions/PressMoveRelease.xml
   Interactions/PressMoveReleaseAndPointSetting.xml
   Interactions/PressMoveReleaseWithCTRLInversion.xml

@@ -17,6 +17,7 @@ Qmitk/QmitkPaintbrushToolGUI.cpp
 Qmitk/QmitkPickingToolGUI.cpp
 Qmitk/QmitkPixelManipulationToolGUI.cpp
 Qmitk/QmitkSlicesInterpolator.cpp
+Qmitk/QmitkSmartBrushToolGUI.cpp
 Qmitk/QmitkToolGUI.cpp
 Qmitk/QmitkToolGUIArea.cpp
 Qmitk/QmitkToolReferenceDataSelectionBox.cpp
@@ -45,6 +46,7 @@ Qmitk/QmitkPaintbrushToolGUI.h
 Qmitk/QmitkPickingToolGUI.h
 Qmitk/QmitkPixelManipulationToolGUI.h
 Qmitk/QmitkSlicesInterpolator.h
+Qmitk/QmitkSmartBrushToolGUI.h
 Qmitk/QmitkToolGUI.h
 Qmitk/QmitkToolGUIArea.h
 Qmitk/QmitkToolReferenceDataSelectionBox.h

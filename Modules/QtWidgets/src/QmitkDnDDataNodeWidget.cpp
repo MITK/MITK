@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkDnDDataNodeWidget::QmitkDnDDataNodeWidget(QWidget* parent /*= nullptr*/)
   : QFrame(parent)
 {
-  setAcceptDrops(true);
+  this->setAcceptDrops(true);
 }
 
 QmitkDnDDataNodeWidget::~QmitkDnDDataNodeWidget()
@@ -62,7 +62,7 @@ void QmitkDnDDataNodeWidget::dropEvent(QDropEvent* event)
   QList<mitk::DataNode*> dataNodeList = QmitkMimeTypes::ToDataNodePtrList(event->mimeData());
   if (!dataNodeList.empty())
   {
-    emit NodesDropped(this, dataNodeList.toVector().toStdVector());
+    emit NodesDropped(dataNodeList.toVector().toStdVector());
   }
 
   event->acceptProposedAction();

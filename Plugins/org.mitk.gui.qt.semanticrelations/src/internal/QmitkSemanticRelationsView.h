@@ -69,7 +69,7 @@ private Q_SLOTS:
   void OnDataNodeDoubleClicked(const mitk::DataNode*);
   void OnCaseIDSelectionChanged(const QString&);
 
-  void OnNodesAdded(QmitkDnDDataNodeWidget*, std::vector<mitk::DataNode*>);
+  void OnNodesAdded(std::vector<mitk::DataNode*>);
   void OnNodeRemoved(const mitk::DataNode*);
 
 private:

@@ -29,7 +29,8 @@ mitk::SmartBrushTool::SmartBrushTool() :
   m_WorkingImage(nullptr),
   m_ImageObserverTag(0),
   m_LastTimeStep(0),
-  m_IsReferencePointSet(false)
+  m_IsReferencePointSet(false),
+  m_Sensitivity(50)
 {
   m_MasterContour = ContourModel::New();
   m_MasterContour->Initialize();
@@ -377,7 +378,7 @@ void mitk::SmartBrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
     smartBrushStrokeFilter->SetTargetIntensity(m_OriginalImage->GetPixel(targetIndex));
     smartBrushStrokeFilter->SetCenter(globalIndexCoordinates);
     smartBrushStrokeFilter->SetDirection(m_CurrentDirection);
-    smartBrushStrokeFilter->SetSensitivity(1.f - (float)m_Sensitivity / 100.f);
+    smartBrushStrokeFilter->SetSensitivity((float)m_Sensitivity / 100.f);
     smartBrushStrokeFilter->GetOutput()->SetRequestedRegion(brushRegion);
     smartBrushStrokeFilter->Update();
 

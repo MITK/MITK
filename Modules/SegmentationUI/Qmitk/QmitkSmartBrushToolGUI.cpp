@@ -10,7 +10,7 @@ QmitkSmartBrushToolGUI::QmitkSmartBrushToolGUI() :
   QmitkToolGUI()
 {
   static const int TEXT_LABEL_SIZE = 50;
-  static const int VALUE_LABEL_SIZE = 25;
+  static const int VALUE_LABEL_SIZE = 30;
   this->setContentsMargins(0, 0, 0, 0);
   QBoxLayout* mainLayout = new QVBoxLayout(this);
 

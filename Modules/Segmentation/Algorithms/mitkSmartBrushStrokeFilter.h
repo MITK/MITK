@@ -12,8 +12,14 @@ template<typename TImageType>
 class SmartBrushStrokeFilter : public itk::InPlaceImageFilter<TImageType, itk::Image<float, 3>>
 {
 public:
+  typedef SmartBrushStrokeFilter Self;
+  typedef itk::InPlaceImageFilter<TImageType> Superclass;
+  typedef itk::SmartPointer<Self> Pointer;
+
   itkNewMacro(SmartBrushStrokeFilter);
-  itkTypeMacro(SmartBrushStrokeFilter, ImageToImageFilter);
+  itkTypeMacro(SmartBrushStrokeFilter, InPlaceImageFilter);
+
+  typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
 
   void SetRadius(int value);
   void SetTargetIntensity(float value);

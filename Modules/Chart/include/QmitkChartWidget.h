@@ -23,20 +23,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkChartExports.h>
 
 /*!
-\brief QmitkChartWidget is a widget to display various charts based on the javascript chart library C3js.
+\brief QmitkChartWidget is a widget to display various charts based on the javascript chart library plotly.
 * \details Data is added via AddData1D() or AddData2D().\n
 * There can be multiple charts (of different types with different properties) created by calling AddData1D or AddData2D multiple times.\n\n
 * The following chart types are supported:
-* * line chart: http://c3js.org/samples/simple_multiple.html
-* * bar chart: http://c3js.org/samples/chart_bar.html
-* * spline chart: http://c3js.org/samples/chart_spline.html
-* * pie chart: http://c3js.org/samples/chart_pie.html
-* * scatter chart: http://c3js.org/samples/chart_scatter.html
-* * area chart: http://c3js.org/samples/chart_area.html
-* * area spline chart: http://c3js.org/samples/chart_area.html
+* * line chart
+* * bar chart
+* * spline chart
+* * pie chart
+* * scatter chart
+* * area chart
+* * area spline chart.
 *
 * Technical details: The javascript code is embedded in a QWebEngineView. The actual js code is implemented in resource\Chart.js.
-* \sa http://c3js.org for further information about the used javaScript library.
+* \sa https://plot.ly/javascript/ for further information about the used javaScript library.
 * \ingroup Modules/Chart
 */
 class MITKCHART_EXPORT QmitkChartWidget : public QWidget
@@ -48,20 +48,20 @@ public:
   * \brief enum of diagram types.
   */
   enum class ChartType {
-    bar, /*!< bar chart, see http://c3js.org/samples/chart_bar.html */
-    line, /*!< line chart, see http://c3js.org/samples/simple_multiple.html */
-    spline, /*!< spline chart (smoothed line chart), see http://c3js.org/samples/chart_spline.html */
-    pie, /*!< pie chart, see http://c3js.org/samples/chart_pie.html*/
-    area, /*!< area chart, see http://c3js.org/samples/chart_area.html*/
-    area_spline, /*!< area-spline chart, see http://c3js.org/samples/chart_area.html*/
-    scatter /*!< scatter chart, see http://c3js.org/samples/chart_scatter.html*/
+    bar, /*!< bar chart, see https://plot.ly/javascript/bar-charts/ */
+    line, /*!< line chart, see https://plot.ly/javascript/line-charts/ */
+    spline, /*!< spline chart (smoothed line chart), see https://plot.ly/~jduelfer/23/spline/#/ */
+    pie, /*!< pie chart, see https://plot.ly/javascript/pie-charts/ */
+    area, /*!< area chart, see https://plot.ly/javascript/filled-area-plots/ */
+    area_spline, /*!< area-spline chart, similar to https://plot.ly/~jduelfer/23/spline/#/ */
+    scatter /*!< scatter chart, see https://plot.ly/javascript/line-and-scatter/ */
   };
   /*!
   * \brief enum of chart style (modifies background and line color).
   */
   enum class ColorTheme {
-    darkstyle, /*!< background color: dark gray, line color: blue */
-    lightstyle /*!< background color: white, line color: blue */
+    darkstyle, /*!< background color: dark gray, foreground color: white*/
+    lightstyle /*!< background color: white, foreground color: black */
   };
   enum class LineStyle {
     solid,
@@ -74,7 +74,7 @@ public:
 
   /*!
   * \brief enum of legend position.
-  * See http://c3js.org/reference.html#legend-position
+  * See https://plot.ly/javascript/legend/
   */
   enum class LegendPosition {
     bottomMiddle,
@@ -125,7 +125,7 @@ public:
   * \brief Sets the color of one data entry (identifier is previously assigned label)
   * \details the color name can be "red" or a hex number (#FF0000).
   * \warning Either define all data entries with a color or no data entry. If a mixed approach is used,
-  * C3 choses the color of the data entry (that could be the same as a user defined color).
+  * plotly choses the color of the data entry (that could be the same as a user defined color).
   * \note If an unknown label is given, nothing happens.
   *  \sa https://www.w3schools.com/cssref/css_colors.asp
   */
@@ -143,6 +143,7 @@ public:
 
   /*!
   * \brief Sets the axis scale to either linear (default) or logarithmic.
+  * \sa https://plot.ly/javascript/log-plot/
   */
   void SetYAxisScale(AxisScale scale);
 
@@ -167,6 +168,12 @@ public:
   */
   void SetChartType(const std::string& label, ChartType type);
 
+  /*!
+  * \brief Adds y error bars to the given label
+  * \param errorPlus the relative error value in positive y direction
+  * \param errorMinus the relative error value in negative y direction
+  * \warning the size of errorPlus and errorMinus has to be the same than size of data entry
+  */
   void SetErrorBars(const std::string &label, const std::vector<double> &errorPlus, const std::vector<double>& errorMinus = std::vector<double>());
 
   /*!
@@ -182,16 +189,16 @@ public:
 
   /*!
   * \brief Displays the chart in the widget
-  * \param showSubChart if a subchart is displayed inside the widget or not (see http://c3js.org/samples/options_subchart.html).
-  * \exception if no data has been provided (\sa AddData1D AddData2D)
+  * \param showSubChart if a subchart is displayed inside the widget or not.
+  * \note if no data has been provided, (\sa AddData1D AddData2D), an empty chart is displayed.
   */
   void Show(bool showSubChart=false);
 
   /*!
   * \brief Either displays the dataPoints or not
   * \param showDataPoints if dataPoints are displayed inside the widget or not.
-  * \details: example for not showing points: http://c3js.org/samples/point_show.html
-  * example for showing the points: http://c3js.org/samples/simple_multiple.html
+  * \details: example for not showing points: https://plot.ly/javascript/line-charts/#styling-line-plot
+  * example for showing the points: https://plot.ly/javascript/pointcloud/
   */
   void SetShowDataPoints(bool showDataPoints);
 
@@ -202,19 +209,22 @@ public:
 
   /*!
   * \brief Sets the theme of the widget.
+  * \details default is dark theme as in MITK.
+  * \warning has to be called before Show() or Reload() to work
   */
   void SetTheme(ColorTheme themeEnabled);
 
   /*!
   * \brief Sets whether the subchart shall be shown.
-  * \details Changes the state of the current chart object. Needs to be reloaded with Reload() to display changes.
-  * \param showSubChart if a subchart is displayed inside the widget or not.
+  * \details Changes the state of the current chart object. 
+  * \note Needs to be reloaded with Reload() to display changes.
   */
   void SetShowSubchart(bool showSubChart);
 
   /*!
    * \brief Sets whether the error bars shall be shown.
-   * \details Changes the state of the current chart object. Needs to be reloaded with Reload() to display changes.
+   * \details Changes the state of the current chart object. 
+   * \note Needs to be reloaded with Reload() to display changes.
    * \param showErrorBars if error bars are displayed or not.
    */
   void SetShowErrorBars(bool showErrorBars);

@@ -125,7 +125,7 @@ QmitkChartWidget::Impl::Impl(QWidget *parent)
 
   // Set the webengineview to an initial empty page. The actual chart will be loaded once the data is calculated.
 
-  m_WebEngineView->load(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
+  m_WebEngineView->load(QUrl(QStringLiteral("qrc:///Chart/empty.html")));
   m_WebEngineView->page()->setWebChannel(m_WebChannel);
 
   m_WebEngineView->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
@@ -431,7 +431,7 @@ void QmitkChartWidget::Impl::CallJavaScriptFuntion(const QString &command)
 
 void QmitkChartWidget::Impl::ClearJavaScriptChart()
 {
-  m_WebEngineView->load(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
+  m_WebEngineView->load(QUrl(QStringLiteral("qrc:///Chart/empty.html")));
 }
 
 void QmitkChartWidget::Impl::InitializeJavaScriptChart()
@@ -445,7 +445,7 @@ void QmitkChartWidget::Impl::InitializeJavaScriptChart()
     count++;
   }
 
-  m_WebEngineView->load(QUrl(QStringLiteral("qrc:///C3js/QmitkChartWidget.html")));
+  m_WebEngineView->load(QUrl(QStringLiteral("qrc:///Chart/QmitkChartWidget.html")));
 }
 
 std::string QmitkChartWidget::Impl::GetUniqueLabelName(const QList<QVariant> &labelList, const std::string &label) const

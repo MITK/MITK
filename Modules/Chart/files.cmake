@@ -17,5 +17,5 @@ set(MOC_H_FILES
 )
 
 set(QRC_FILES
-  resource/C3js.qrc
+  resource/Chart.qrc
 )

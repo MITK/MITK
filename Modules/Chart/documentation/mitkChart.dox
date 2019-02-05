@@ -12,9 +12,9 @@ The MITK chart module is able to show different types of charts in a widget with
 
 \subsection Chart_Technical Technical background 
 
-The module uses the java script library <a href="http://www.c3js.org">C3js</a> to display the chart in a <a href="http://doc.qt.io/qt-5/qwebengineview.html">QWebEngineView</a> (that renders html/js content). 
+The module uses the java script library <a href="https://plot.ly/javascript/">plotly</a> to display the chart in a <a href="http://doc.qt.io/qt-5/qwebengineview.html">QWebEngineView</a> (that renders html/js content). 
 
-For examples, please visit http://c3js.org/examples.html.
+For examples, please visit https://plot.ly/javascript/.
 
 \subsection Chart_GUI GUI
 
@@ -135,7 +135,7 @@ this is done by referencing the data entry by its label (e.g. "Heidelberg" above
 
 \note SetShowDataPoints is a global attribute and valid for all data entries due to technical reasons.
 
-Colors are chosen automatically be C3js if not given. However, if some data entries have given colors and some have not, same colors may appear for different data entries. Color can be given as strings (natural names like <i>red</i> or hexadecimal numbers like <i>#FF0000</i>. For color selection, the following reference is helpful: https://www.w3schools.com/cssref/css_colors.asp)
+Colors are chosen automatically by plotly if not given. However, if some data entries have given colors and some have not, same colors may appear for different data entries. Color can be given as strings (natural names like <i>red</i> or hexadecimal numbers like <i>#FF0000</i>. For color selection, the following reference is helpful: https://www.w3schools.com/cssref/css_colors.asp)
 
 Line style only can be set if ChartType is <code>QmitkChartWidget::ChartType::line</code>. It is ignored otherwise. Also, if a non-existing label is given, the command is ignored. The default linestyle is <code>LineStyle::solid</code>.
 

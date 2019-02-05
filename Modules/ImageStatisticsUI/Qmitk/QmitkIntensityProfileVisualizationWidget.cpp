@@ -21,12 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkIntensityProfileVisualizationWidget::QmitkIntensityProfileVisualizationWidget(QWidget* parent) : QWidget(parent)
 {
 	m_Controls.setupUi(this);
-  #if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
-    WarnQtVersionTooLow();
-  #else
-    m_Controls.labelIntensityProfileIsInvisibleWarning->setVisible(false);
-    m_Controls.checkBoxShowSubchart->setChecked(false);
-  #endif
+  m_Controls.checkBoxShowSubchart->setChecked(false);
 	CreateConnections();
 }
 
@@ -45,22 +40,18 @@ void QmitkIntensityProfileVisualizationWidget::SetIntensityProfile(mitk::Intensi
 	m_Controls.chartWidget->SetChartType(dataLabel, QmitkChartWidget::ChartType::line);
 	m_Controls.chartWidget->SetXAxisLabel("Distance");
 	m_Controls.chartWidget->SetYAxisLabel("Intensity");
-  #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-    m_Controls.chartWidget->Show(m_Controls.checkBoxShowSubchart->isChecked());
-  #endif
+  m_Controls.chartWidget->Show(m_Controls.checkBoxShowSubchart->isChecked());
 	SetGUIElementsEnabled(true);
 }
 
 void QmitkIntensityProfileVisualizationWidget::Reset()
 {
-  #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-    m_Controls.chartWidget->Clear();
-  #endif
+  m_Controls.chartWidget->Clear();
 	SetGUIElementsEnabled(false);
 	m_IntensityProfileList.clear();
 }
 
-void QmitkIntensityProfileVisualizationWidget::SetTheme(QmitkChartWidget::ChartStyle style)
+void QmitkIntensityProfileVisualizationWidget::SetTheme(QmitkChartWidget::ColorTheme style)
 {
   m_ChartStyle = style;
 }
@@ -80,7 +71,6 @@ void QmitkIntensityProfileVisualizationWidget::SetGUIElementsEnabled(bool enable
 	m_Controls.buttonCopyToClipboard->setEnabled(enabled);
 	m_Controls.checkBoxShowSubchart->setEnabled(enabled);
 	m_Controls.chartWidget->setEnabled(enabled);
-	m_Controls.labelIntensityProfileIsInvisibleWarning->setEnabled(enabled);
 	m_Controls.labelInfo->setEnabled(enabled);
 }
 
@@ -124,12 +114,4 @@ void QmitkIntensityProfileVisualizationWidget::OnShowSubchartCheckBoxChanged()
 void QmitkIntensityProfileVisualizationWidget::OnPageSuccessfullyLoaded()
 {
   m_Controls.chartWidget->SetTheme(m_ChartStyle);
-}
-
-void QmitkIntensityProfileVisualizationWidget::WarnQtVersionTooLow()
-{
-  m_Controls.labelIntensityProfileIsInvisibleWarning->setVisible(true);
-  m_Controls.labelIntensityProfileIsInvisibleWarning->setText("<font color = 'red'>Intensity profile is not visible because Qt 5.10 is required for MitkChart. You can use the button <i>Copy to Clipboard</i> below to retrieve values.< / font>");
-  m_Controls.groupBoxPlot->setVisible(false);
-  m_Controls.chartWidget->setVisible(false);
 }

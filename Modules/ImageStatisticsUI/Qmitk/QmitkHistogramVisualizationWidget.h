@@ -37,7 +37,7 @@ public:
 	/** \brief Clears the histogram and disables all GUI elements. */
 	void Reset();
   /** \brief Sets the theme (either dark or light) */
-  void SetTheme(QmitkChartWidget::ChartStyle style);
+  void SetTheme(QmitkChartWidget::ColorTheme style);
 
 signals:
 	/** \brief Signal to be emitted when the number of bins is changed by the user. The HistogramCalculator should connect to this signal and recalculate the data accordingly. */

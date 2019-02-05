@@ -60,7 +60,7 @@ private:
   void FillRandomDataValues();
   std::vector<double> generateRandomNumbers(unsigned int amount, double max) const;
   std::string convertToText(std::vector<double> numbers, std::string delimiter) const;
-  QmitkChartWidget::ChartStyle GetColorTheme() const;
+  QmitkChartWidget::ColorTheme GetColorTheme() const;
 
   std::map<std::string, QmitkChartWidget::ChartType> m_chartNameToChartType;
   std::map<std::string, QmitkChartWidget::LineStyle> m_LineNameToLineType;

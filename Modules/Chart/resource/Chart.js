@@ -225,16 +225,22 @@ function generateChart(chartData)
   var layout = {
 	  paper_bgcolor : backgroundColor,
 	  plot_bgcolor : backgroundColor,
-    title:chartData.m_chartTitle,
-	titlefont: {
-		color:foregroundColor
+    title: {
+		text:chartData.m_chartTitle,
+		font: {
+		color: foregroundColor
+		}
 	},
     xaxis: {
-      title: chartData.m_xAxisLabel,
+      title: {
+		text: chartData.m_xAxisLabel
+	  },
 	  color: foregroundColor
     },
     yaxis: {
-      title: chartData.m_yAxisLabel,
+      title: {
+		text:chartData.m_yAxisLabel
+	  },
 	  color: foregroundColor
     },
     margin: {

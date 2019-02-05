@@ -117,7 +117,7 @@ void QmitkImageStatisticsReloadedView::FillHistogramWidget(const std::vector<His
   connect(m_Controls.widget_histogram, &QmitkHistogramVisualizationWidget::RequestHistogramUpdate, this, &QmitkImageStatisticsReloadedView::OnRequestHistogramUpdate);
 }
 
-QmitkChartWidget::ChartStyle QmitkImageStatisticsReloadedView::GetColorTheme() const
+QmitkChartWidget::ColorTheme QmitkImageStatisticsReloadedView::GetColorTheme() const
 {
   ctkPluginContext* context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
   ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
@@ -125,13 +125,13 @@ QmitkChartWidget::ChartStyle QmitkImageStatisticsReloadedView::GetColorTheme() c
   {
     auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
     if (styleManager->GetStyle().name == "Dark") {
-      return QmitkChartWidget::ChartStyle::darkstyle;
+      return QmitkChartWidget::ColorTheme::darkstyle;
     }
     else {
-      return QmitkChartWidget::ChartStyle::lightstyle;
+      return QmitkChartWidget::ColorTheme::lightstyle;
     }
   }
-  return QmitkChartWidget::ChartStyle::darkstyle;
+  return QmitkChartWidget::ColorTheme::darkstyle;
 }
 
 void QmitkImageStatisticsReloadedView::OnImageSelectorChanged()

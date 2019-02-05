@@ -193,7 +193,7 @@ function generateChart(chartData)
 
     // ===================== CHART TYPE OPTIONS HANDLING ===========
     if (chartType == "scatter"){
-      trace["line"] = generateLineOptions(dataProperties[dataLabels][index]["color"])
+      trace["line"] = generateLineOptions(dataProperties[dataLabels[index]]["color"])
     }
 
     data.push(trace)

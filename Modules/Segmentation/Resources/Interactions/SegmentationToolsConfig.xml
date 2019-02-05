@@ -34,6 +34,14 @@ Global variant    Event class   Button/Key      Modifiers
     <attribute name="EventButton" value="RightMouseButton"/>
     <attribute name="Modifiers" value="shift"/>
   </event_variant>
+  <event_variant class="MousePressEvent" name="AltPrimaryButtonPressed">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="alt"/>
+  </event_variant>
+  <event_variant class="MousePressEvent" name="AltSecondaryButtonPressed">
+    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="Modifiers" value="alt"/>
+  </event_variant>
   
   <event_variant class="MouseDoubleClickEvent" name="PrimaryButtonDoubleClick">
     <attribute name="EventButton" value="LeftMouseButton" />

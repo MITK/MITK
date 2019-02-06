@@ -186,11 +186,11 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget *parent)
   {
     if (std::regex_search(tool->GetNameOfClass(), extSegTool2DRegEx))
     {
-      segTools2D.append(QString(" %1").arg(tool->GetName()));
+      segTools2D.append(QString(" '%1'").arg(tool->GetName()));
     }
     else if (std::regex_search(tool->GetNameOfClass(), extSegTool3DRegEx))
     {
-      segTools3D.append(QString(" %1").arg(tool->GetName()));
+      segTools3D.append(QString(" '%1'").arg(tool->GetName()));
     }
   }
 

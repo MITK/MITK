@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPixelType.h>
 #include <mitkFiberBundle.h>
 #include <mitkILifecycleAwarePart.h>
+#include <QmitkChartWidget.h>
 
 /*!
 \brief Weight fibers by linearly fitting them to the image data.
@@ -62,7 +63,7 @@ protected:
 
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
-  mitk::QmitkChartWidget::ColorTheme GetColorTheme();
+  QmitkChartWidget::ColorTheme GetColorTheme();
 
   Ui::QmitkTractometryViewControls* m_Controls;
 

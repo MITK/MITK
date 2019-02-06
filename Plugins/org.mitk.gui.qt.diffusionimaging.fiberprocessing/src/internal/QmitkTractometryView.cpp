@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkLookupTable.h>
 #include <QClipboard>
 #include <mitkLexicalCast.h>
-#include <QmitkChartWidget.h>
+
 
 const std::string QmitkTractometryView::VIEW_ID = "org.mitk.views.tractometry";
 using namespace mitk;
@@ -82,7 +82,7 @@ void QmitkTractometryView::CreateQtPartControl( QWidget *parent )
   }
 }
 
-mitk::QmitkChartWidget::ColorTheme QmitkTractometryView::GetColorTheme()
+QmitkChartWidget::ColorTheme QmitkTractometryView::GetColorTheme()
 {
   berry::IPreferencesService* prefService = berry::WorkbenchPlugin::GetDefault()->GetPreferencesService();
   berry::IPreferences::Pointer m_StylePref = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);

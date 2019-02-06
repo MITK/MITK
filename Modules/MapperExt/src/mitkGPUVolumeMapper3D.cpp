@@ -51,7 +51,6 @@ VTK_MODULE_INIT(vtkRenderingVolumeOpenGL);
 #include <vtkImageData.h>
 #include <vtkLODProp3D.h>
 #include <vtkImageResample.h>
-#include <vtkPlane.h>
 #include <vtkImplicitPlaneWidget.h>
 #include <vtkAssembly.h>
 
@@ -192,31 +191,26 @@ void mitk::GPUVolumeMapper3D::DeinitCPU(mitk::BaseRenderer* renderer)
   ls->m_cpuInitialized=false;
 }
 
-
 mitk::GPUVolumeMapper3D::GPUVolumeMapper3D()
-  : m_ClippingRegionPlanes{ 0, 0, 0, 0, 0, 0 },
-    m_Clipping(false)
 {
   m_VolumeNULL=0;
   m_commonInitialized=false;
+  m_ClippingPlanes = nullptr;
 }
-
 
 mitk::GPUVolumeMapper3D::~GPUVolumeMapper3D()
 {
   DeinitCommon();
 }
 
-void mitk::GPUVolumeMapper3D::setClipping(bool clipping)
+void mitk::GPUVolumeMapper3D::setClippingPlanes(vtkPlanes* planes)
 {
-  m_Clipping = clipping;
-}
-
-void mitk::GPUVolumeMapper3D::setClippingPlanes(double planes[6])
-{
-  for (int i = 0; i < 6; ++i) {
-    // Cast to int here to overcome possible rounding error, causing low bound be > high bound
-    m_ClippingRegionPlanes[i] = static_cast<int>(planes[i]);
+  if (planes) {
+    m_ClippingPlanes = vtkSmartPointer<vtkPlanes>::New();
+    m_ClippingPlanes->SetPoints(planes->GetPoints());
+    m_ClippingPlanes->SetNormals(planes->GetNormals());
+  } else {
+    m_ClippingPlanes = nullptr;
   }
 }
 
@@ -380,18 +374,18 @@ void mitk::GPUVolumeMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *rende
   // UpdateTransferFunctions
   UpdateTransferFunctions( renderer );
 
-  vtkVolumeMapper* activeMapper = nullptr;
-  if (ls->m_rayInitialized) {
-    activeMapper = ls->m_MapperRAY;
-  } else if (ls->m_gpuInitialized) {
-    activeMapper = ls->m_MapperGPU;
-  } else {
-    activeMapper = ls->m_MapperCPU;
-  }
+  if (m_ClippingPlanes) {
+    vtkVolumeMapper* activeMapper = nullptr;
+    if (ls->m_rayInitialized) {
+      activeMapper = ls->m_MapperRAY;
+    } else if (ls->m_gpuInitialized) {
+      activeMapper = ls->m_MapperGPU;
+    } else {
+      activeMapper = ls->m_MapperCPU;
+    }
 
-  activeMapper->SetCroppingRegionPlanes(m_ClippingRegionPlanes);
-  activeMapper->SetCroppingRegionFlagsToSubVolume();
-  activeMapper->SetCropping(m_Clipping);
+    activeMapper->SetClippingPlanes(m_ClippingPlanes.Get());
+  }
 }
 
 void mitk::GPUVolumeMapper3D::GenerateDataGPU( mitk::BaseRenderer *renderer )

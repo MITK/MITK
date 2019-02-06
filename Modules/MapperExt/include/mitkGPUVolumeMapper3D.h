@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageChangeInformation.h>
 #include <vtkSmartPointer.h>
 #include <vtkVersionMacros.h>
+#include <vtkPlanes.h>
 
 // Only with VTK 5.6 or above
 #if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
@@ -81,8 +82,7 @@ public:
 
   virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer) override;
 
-  void setClipping(bool clipping);
-  void setClippingPlanes(double planes[6]);
+  void setClippingPlanes(vtkPlanes* planes);
 
 protected:
 
@@ -129,8 +129,7 @@ protected:
   vtkSmartPointer<vtkPiecewiseFunction> m_BinaryGradientTransferFunction;
   vtkSmartPointer<vtkColorTransferFunction> m_BinaryColorTransferFunction;
 
-  double m_ClippingRegionPlanes[6];
-  bool m_Clipping;
+  vtkSmartPointer<vtkPlanes> m_ClippingPlanes;
 
   class LocalStorage : public mitk::Mapper::BaseLocalStorage
   {

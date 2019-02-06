@@ -75,13 +75,14 @@ void QmitkTractometryView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_ImageBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_ImageBox->SetPredicate(mitk::NodePredicateAnd::New(imageP, dimP));
 
+    m_Controls->m_ChartWidget->SetTheme(GetColorTheme());
     m_Controls->m_ChartWidget->SetXAxisLabel("Tract position");
     m_Controls->m_ChartWidget->SetYAxisLabel("Image Value");
 
   }
 }
 
-void QmitkTractometryView::OnPageSuccessfullyLoaded()
+mitk::QmitkChartWidget::ColorTheme QmitkTractometryView::GetColorTheme()
 {
   berry::IPreferencesService* prefService = berry::WorkbenchPlugin::GetDefault()->GetPreferencesService();
   berry::IPreferences::Pointer m_StylePref = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
@@ -90,11 +91,11 @@ void QmitkTractometryView::OnPageSuccessfullyLoaded()
 
   if (styleName == ":/org.blueberry.ui.qt/darkstyle.qss")
   {
-    this->m_Controls->m_ChartWidget->SetTheme(QmitkChartWidget::ChartStyle::darkstyle);
+    return mitk::QmitkChartWidget::ColorTheme::darkstyle;
   }
   else
   {
-    this->m_Controls->m_ChartWidget->SetTheme(QmitkChartWidget::ChartStyle::lightstyle);
+    return mitk::QmitkChartWidget::ColorTheme::lightstyle;
   }
 }
 

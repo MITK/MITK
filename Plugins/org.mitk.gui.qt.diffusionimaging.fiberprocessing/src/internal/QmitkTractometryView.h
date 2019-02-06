@@ -49,8 +49,6 @@ public:
 
   virtual void SetFocus() override;
 
-  void OnPageSuccessfullyLoaded();
-
   virtual void Activated() override;
   virtual void Deactivated() override;
   virtual void Visible() override;
@@ -64,6 +62,7 @@ protected:
 
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+  mitk::QmitkChartWidget::ColorTheme GetColorTheme();
 
   Ui::QmitkTractometryViewControls* m_Controls;
 

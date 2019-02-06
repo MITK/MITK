@@ -400,7 +400,7 @@ void QmitkLesionInfoWidget::OnPropagateLesion(mitk::SemanticTypes::Lesion select
   try
   {
     auto allSegmentationsOfLesion = m_SemanticRelationsDataStorageAccess->GetAllSegmentationsOfLesion(m_CaseID, selectedLesion);
-    mitk::LesionPropagation::FindClosestSegmentationMask();
+    mitk::FindClosestSegmentationMask();
   }
   catch (const mitk::SemanticRelationException& e)
   {

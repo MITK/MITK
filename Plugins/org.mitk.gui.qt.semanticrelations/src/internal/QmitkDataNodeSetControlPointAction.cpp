@@ -93,7 +93,7 @@ void QmitkDataNodeSetControlPointAction::OnActionTriggered(bool checked)
   try
   {
     m_SemanticRelationsIntegration->UnlinkImageFromControlPoint(dataNode);
-    m_SemanticRelationsIntegration->SetControlPointOfData(dataNode, controlPoint);
+    m_SemanticRelationsIntegration->SetControlPointOfImage(dataNode, controlPoint);
   }
   catch (const mitk::SemanticRelationException&)
   {

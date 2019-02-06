@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // semantic relations module
 #include <mitkDICOMHelper.h>
 #include <mitkNodePredicates.h>
-#include <mitkSemanticRelationException.h>
 #include <mitkSemanticRelationsInference.h>
 #include <mitkRelationStorage.h>
 
@@ -179,7 +178,7 @@ void QmitkSemanticRelationsView::OnCaseIDSelectionChanged(const QString& caseID)
   m_PatientTableInspector->SetCaseID(caseID.toStdString());
 }
 
-void QmitkSemanticRelationsView::OnNodesAdded(QmitkDnDDataNodeWidget* dnDDataNodeWidget, std::vector<mitk::DataNode*> nodes)
+void QmitkSemanticRelationsView::OnNodesAdded(std::vector<mitk::DataNode*> nodes)
 {
   mitk::SemanticTypes::CaseID caseID = "";
   for (mitk::DataNode* dataNode : nodes)
@@ -213,7 +212,6 @@ void QmitkSemanticRelationsView::RemoveFromComboBox(const mitk::SemanticTypes::C
   int foundIndex = m_Controls.caseIDComboBox->findText(QString::fromStdString(caseID));
   if (allControlPoints.empty() && -1 != foundIndex)
   {
-    // TODO: find new way to check for empty case id
     // caseID does not contain any control points and therefore no data
     // remove the caseID, if it is still contained
     m_Controls.caseIDComboBox->removeItem(foundIndex);

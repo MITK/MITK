@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNDIPassiveTool.h"
 #include "mitkSerialCommunication.h"
 
+#include <stdexcept>
 
 namespace mitk
 {
@@ -303,6 +304,12 @@ public:
     */
     static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);
 
+    /**
+    * \brief returns a non null exception pointer if an exception was thrown in the tracking
+    * thread main loop.
+    */
+    std::exception_ptr GetTrackingException();
+
   protected:
     NDITrackingDevice();          ///< Constructor
     ~NDITrackingDevice() override; ///< Destructor
@@ -329,6 +336,7 @@ public:
     OperationMode m_OperationMode;  ///< tracking mode (6D tool tracking, 3D marker tracking,...)
     itk::FastMutexLock::Pointer m_MarkerPointsMutex;  ///< mutex for marker point data container
     MarkerPointContainerType m_MarkerPoints;          ///< container for markers (3D point tracking mode)
+    std::exception_ptr       m_ExceptionPtr;
   };
 } // namespace mitk
 #endif /* MITKNDITRACKINGDEVICE_H_HEADER_INCLUDED_C1C2FCD2 */

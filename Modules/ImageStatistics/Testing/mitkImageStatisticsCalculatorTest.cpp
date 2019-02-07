@@ -77,8 +77,8 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
 
 public:
 
-  void setUp() override;
-  void tearDown() override;
+ // void setUp() override;
+ // void tearDown() override;
 
   void TestUninitializedImage();
 
@@ -178,7 +178,7 @@ private:
                         vnl_vector<int> minIndex,
                         vnl_vector<int> maxIndex);
 };
-
+/*
 void mitkImageStatisticsCalculatorTestSuite::tearDown()
 {
     m_TestImage = nullptr;
@@ -261,7 +261,7 @@ void mitkImageStatisticsCalculatorTestSuite::setUp()
   m_US4DPlanarFigureCoronal = mitk::IOUtil::Load<mitk::PlanarFigure>(US4DCoronalPlanarFigureFile);
   MITK_TEST_CONDITION_REQUIRED( m_US4DPlanarFigureCoronal.IsNotNull(), "Loaded US4D coronal planarFigure" );
 
-}
+} */
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase1()
 {
@@ -270,6 +270,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase1()
    * -> mean of 255 expected
    ******************************/
   MITK_INFO << std::endl << "Test case 1:-----------------------------------------------------------------------------------";
+  
+  std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+  m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
+  MITK_TEST_CONDITION_REQUIRED(m_TestImage.IsNotNull(), "Loaded an mitk::Image");
+
+  m_Geometry = m_TestImage->GetSlicedGeometry()->GetPlaneGeometry(0);
+  MITK_TEST_CONDITION_REQUIRED(m_Geometry.IsNotNull(), "Getting image geometry");
+
   mitk::PlanarPolygon::Pointer figure1 = mitk::PlanarPolygon::New();
   figure1->SetPlaneGeometry( m_Geometry );
   mitk::Point2D pnt1; pnt1[0] = 10.5 ; pnt1[1] = 3.5;
@@ -297,6 +305,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase2()
    ******************************/
   MITK_INFO << std::endl << "Test case 2:-----------------------------------------------------------------------------------";
 
+  std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+  m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
+  MITK_TEST_CONDITION_REQUIRED(m_TestImage.IsNotNull(), "Loaded an mitk::Image");
+
+  m_Geometry = m_TestImage->GetSlicedGeometry()->GetPlaneGeometry(0);
+  MITK_TEST_CONDITION_REQUIRED(m_Geometry.IsNotNull(), "Getting image geometry");
+
   mitk::PlanarPolygon::Pointer figure1 = mitk::PlanarPolygon::New();
   figure1->SetPlaneGeometry( m_Geometry );
   mitk::Point2D pnt1; pnt1[0] = 10.0 ; pnt1[1] = 3.5;
@@ -323,6 +338,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase3()
    * -> mean of 255 expected
    ******************************/
   MITK_INFO << std::endl << "Test case 3:-----------------------------------------------------------------------------------";
+  
+  std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+  m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
+  MITK_TEST_CONDITION_REQUIRED(m_TestImage.IsNotNull(), "Loaded an mitk::Image");
+
+  m_Geometry = m_TestImage->GetSlicedGeometry()->GetPlaneGeometry(0);
+  MITK_TEST_CONDITION_REQUIRED(m_Geometry.IsNotNull(), "Getting image geometry");
+
   mitk::PlanarPolygon::Pointer figure1 = mitk::PlanarPolygon::New();
   figure1->SetPlaneGeometry( m_Geometry );
   mitk::Point2D pnt1; pnt1[0] = 10.5 ; pnt1[1] = 3.5;
@@ -347,6 +370,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase4()
    * -> mean of 191.25 expected
    ******************************/
   MITK_INFO << std::endl << "Test case 4:-----------------------------------------------------------------------------------";
+  
+  std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+  m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
+  MITK_TEST_CONDITION_REQUIRED(m_TestImage.IsNotNull(), "Loaded an mitk::Image");
+
+  m_Geometry = m_TestImage->GetSlicedGeometry()->GetPlaneGeometry(0);
+  MITK_TEST_CONDITION_REQUIRED(m_Geometry.IsNotNull(), "Getting image geometry");
+
   mitk::PlanarPolygon::Pointer figure1 = mitk::PlanarPolygon::New();
   figure1->SetPlaneGeometry( m_Geometry );
   mitk::Point2D pnt1; pnt1[0] = 1.1; pnt1[1] = 1.1;
@@ -373,6 +404,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase5()
    * -> mean of 191.5 expected
    ******************************/
   MITK_INFO << std::endl << "Test case 5:-----------------------------------------------------------------------------------";
+  
+  std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+  m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
+  MITK_TEST_CONDITION_REQUIRED(m_TestImage.IsNotNull(), "Loaded an mitk::Image");
+
+  m_Geometry = m_TestImage->GetSlicedGeometry()->GetPlaneGeometry(0);
+  MITK_TEST_CONDITION_REQUIRED(m_Geometry.IsNotNull(), "Getting image geometry");
+
   mitk::PlanarPolygon::Pointer figure1 = mitk::PlanarPolygon::New();
   figure1->SetPlaneGeometry( m_Geometry );
   mitk::Point2D pnt1; pnt1[0] = 11.0; pnt1[1] = 3.5;
@@ -399,6 +438,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase6()
    * -> mean of 191.5 expected
    ******************************/
   MITK_INFO << std::endl << "Test case 6:-----------------------------------------------------------------------------------";
+  
+  std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+  m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
+  MITK_TEST_CONDITION_REQUIRED(m_TestImage.IsNotNull(), "Loaded an mitk::Image");
+
+  m_Geometry = m_TestImage->GetSlicedGeometry()->GetPlaneGeometry(0);
+  MITK_TEST_CONDITION_REQUIRED(m_Geometry.IsNotNull(), "Getting image geometry");
+
   mitk::PlanarPolygon::Pointer figure1 = mitk::PlanarPolygon::New();
   figure1->SetPlaneGeometry( m_Geometry );
   mitk::Point2D pnt1; pnt1[0] = 11.0; pnt1[1] = 3.5;
@@ -425,6 +472,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase7()
    * -> mean of 127.66 expected
    ******************************/
   MITK_INFO << std::endl << "Test case 7:-----------------------------------------------------------------------------------";
+
+  std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+  m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
+  MITK_TEST_CONDITION_REQUIRED(m_TestImage.IsNotNull(), "Loaded an mitk::Image");
+
+  m_Geometry = m_TestImage->GetSlicedGeometry()->GetPlaneGeometry(0);
+  MITK_TEST_CONDITION_REQUIRED(m_Geometry.IsNotNull(), "Getting image geometry");
 
   mitk::PlanarPolygon::Pointer figure1 = mitk::PlanarPolygon::New();
   figure1->SetPlaneGeometry( m_Geometry );
@@ -453,6 +507,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase8()
    ******************************/
   MITK_INFO << std::endl << "Test case 8:-----------------------------------------------------------------------------------";
 
+  std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+  m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
+  MITK_TEST_CONDITION_REQUIRED(m_TestImage.IsNotNull(), "Loaded an mitk::Image");
+
+  m_Geometry = m_TestImage->GetSlicedGeometry()->GetPlaneGeometry(0);
+  MITK_TEST_CONDITION_REQUIRED(m_Geometry.IsNotNull(), "Getting image geometry");
+
   mitk::PlanarPolygon::Pointer figure2 = mitk::PlanarPolygon::New();
   figure2->SetPlaneGeometry( m_Geometry );
   mitk::Point2D pnt1; pnt1[0] = 11.5; pnt1[1] = 10.5;
@@ -480,6 +541,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase9()
    ******************************/
   MITK_INFO << std::endl << "Test case 9:-----------------------------------------------------------------------------------";
 
+  std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+  m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
+  MITK_TEST_CONDITION_REQUIRED(m_TestImage.IsNotNull(), "Loaded an mitk::Image");
+
+  m_Geometry = m_TestImage->GetSlicedGeometry()->GetPlaneGeometry(0);
+  MITK_TEST_CONDITION_REQUIRED(m_Geometry.IsNotNull(), "Getting image geometry");
+
   mitk::PlanarPolygon::Pointer figure2 = mitk::PlanarPolygon::New();
   figure2->SetPlaneGeometry( m_Geometry );
   mitk::Point2D pnt1; pnt1[0] = 11.5; pnt1[1] = 10.5;
@@ -505,7 +573,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase10()
    * 2 whole pixel (white) + 2 whole pixel (black) in y-direction
    * -> mean of 127.66 expected
    ******************************/
-    MITK_INFO << std::endl << "Test case 10:-----------------------------------------------------------------------------------";
+  MITK_INFO << std::endl << "Test case 10:-----------------------------------------------------------------------------------";
+
+  std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+  m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
+  MITK_TEST_CONDITION_REQUIRED(m_TestImage.IsNotNull(), "Loaded an mitk::Image");
+
+  m_Geometry = m_TestImage->GetSlicedGeometry()->GetPlaneGeometry(0);
+  MITK_TEST_CONDITION_REQUIRED(m_Geometry.IsNotNull(), "Getting image geometry");
 
   mitk::PlanarPolygon::Pointer figure2 = mitk::PlanarPolygon::New();
   figure2->SetPlaneGeometry( m_Geometry );
@@ -535,6 +610,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase11()
    ******************************/
   MITK_INFO << std::endl << "Test case 11:-----------------------------------------------------------------------------------";
 
+  std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+  m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
+  MITK_TEST_CONDITION_REQUIRED(m_TestImage.IsNotNull(), "Loaded an mitk::Image");
+
+  m_Geometry = m_TestImage->GetSlicedGeometry()->GetPlaneGeometry(0);
+  MITK_TEST_CONDITION_REQUIRED(m_Geometry.IsNotNull(), "Getting image geometry");
+
   mitk::PlanarPolygon::Pointer figure2 = mitk::PlanarPolygon::New();
   figure2->SetPlaneGeometry( m_Geometry );
   mitk::Point2D pnt1; pnt1[0] = 0.5; pnt1[1] = 0.5;
@@ -562,6 +644,13 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase12()
    ******************************/
   MITK_INFO << std::endl << "Test case 12:-----------------------------------------------------------------------------------";
 
+  std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+  m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
+  MITK_TEST_CONDITION_REQUIRED(m_TestImage.IsNotNull(), "Loaded an mitk::Image");
+
+  m_Geometry = m_TestImage->GetSlicedGeometry()->GetPlaneGeometry(0);
+  MITK_TEST_CONDITION_REQUIRED(m_Geometry.IsNotNull(), "Getting image geometry");
+
   mitk::PlanarPolygon::Pointer figure2 = mitk::PlanarPolygon::New();
   figure2->SetPlaneGeometry( m_Geometry );
   mitk::Point2D pnt1; pnt1[0] = 9.5; pnt1[1] = 0.5;
@@ -583,6 +672,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingEmpty()
 {
   MITK_INFO << std::endl << "TestImageMaskingEmpty:-----------------------------------------------------------------------------------";
 
+  std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+  m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
+  MITK_TEST_CONDITION_REQUIRED(m_TestImage.IsNotNull(), "Loaded an mitk::Image");
+
   mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageFromReference<unsigned char>( m_TestImage->Clone(), 0 );
 
   auto statisticsContainer = ComputeStatistics( m_TestImage, mask_image );
@@ -594,6 +687,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingEmpty()
 void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingNonEmpty()
 {
   MITK_INFO << std::endl << "TestImageMaskingNonEmpty:-----------------------------------------------------------------------------------";
+
+  std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+  m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
+  MITK_TEST_CONDITION_REQUIRED(m_TestImage.IsNotNull(), "Loaded an mitk::Image");
 
   mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageFromReference<unsigned char>( m_TestImage->Clone(), 0 );
 
@@ -654,6 +751,11 @@ void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingNonEmpty()
 void mitkImageStatisticsCalculatorTestSuite::TestRecomputeOnModifiedMask()
 {
   MITK_INFO << std::endl << "TestRecomputeOnModifiedMask:-----------------------------------------------------------------------------------";
+  
+  std::string filename = this->GetTestDataFilePath("ImageStatisticsTestData/testimage.dcm");
+  m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
+  MITK_TEST_CONDITION_REQUIRED(m_TestImage.IsNotNull(), "Loaded an mitk::Image");
+
   mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageFromReference<unsigned char>( m_TestImage->Clone(), 0 );
 
   mitk::ImageStatisticsCalculator::Pointer statisticsCalculator = mitk::ImageStatisticsCalculator::New();
@@ -701,7 +803,12 @@ void mitkImageStatisticsCalculatorTestSuite::TestRecomputeOnModifiedMask()
 void mitkImageStatisticsCalculatorTestSuite::TestPic3DStatistics()
 {
     MITK_INFO << std::endl << "Test plain Pic3D:-----------------------------------------------------------------------------------";
-    unsigned long expected_N = 3211264;
+    
+	std::string Pic3DFile = this->GetTestDataFilePath("Pic3D.nrrd");
+	m_Pic3DImage = mitk::IOUtil::Load<mitk::Image>(Pic3DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_Pic3DImage.IsNotNull(), "Loaded Pic3D");
+
+	unsigned long expected_N = 3211264;
     double expected_mean = -365.80015345982144;
     double expected_MPP = 111.80226129535752;
     double expected_median = -105.16000366210938;
@@ -752,6 +859,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DStatistics()
 void mitkImageStatisticsCalculatorTestSuite::TestPic3DAxialPlanarFigureMaskStatistics()
 {
     MITK_INFO << std::endl << "Test Pic3D axial pf:-----------------------------------------------------------------------------------";
+
+	std::string Pic3DFile = this->GetTestDataFilePath("Pic3D.nrrd");
+	m_Pic3DImage = mitk::IOUtil::Load<mitk::Image>(Pic3DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_Pic3DImage.IsNotNull(), "Loaded Pic3D");
+
+	std::string Pic3DAxialPlanarFigureFile = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3DAxialPlanarFigure.pf");
+	m_Pic3DPlanarFigureAxial = mitk::IOUtil::Load<mitk::PlanarFigure>(Pic3DAxialPlanarFigureFile);
+	MITK_TEST_CONDITION_REQUIRED(m_Pic3DPlanarFigureAxial.IsNotNull(), "Loaded Pic3D axial planarFigure");
 
     double expected_entropy = 5.6719817476387417;
     double expected_kurtosis = 5.8846935191205221;
@@ -809,6 +924,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DSagittalPlanarFigureMaskSt
 {
     MITK_INFO << std::endl << "Test Pic3D sagittal pf:-----------------------------------------------------------------------------------";
 
+	std::string Pic3DFile = this->GetTestDataFilePath("Pic3D.nrrd");
+	m_Pic3DImage = mitk::IOUtil::Load<mitk::Image>(Pic3DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_Pic3DImage.IsNotNull(), "Loaded Pic3D");
+
+	std::string Pic3DSagittalPlanarFigureFile = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3DSagittalPlanarFigure.pf");
+	m_Pic3DPlanarFigureSagittal = mitk::IOUtil::Load<mitk::PlanarFigure>(Pic3DSagittalPlanarFigureFile);
+	MITK_TEST_CONDITION_REQUIRED(m_Pic3DPlanarFigureSagittal.IsNotNull(), "Loaded Pic3D sagittal planarFigure");
+
     double expected_entropy = 5.6051911962074286;
     double expected_kurtosis = 6.5814062739142338;
     double expected_MPP = 249.03202846975088;
@@ -865,6 +988,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCoronalPlanarFigureMaskSta
 {
     MITK_INFO << std::endl << "Test Pic3D coronal pf:-----------------------------------------------------------------------------------";
 
+	std::string Pic3DFile = this->GetTestDataFilePath("Pic3D.nrrd");
+	m_Pic3DImage = mitk::IOUtil::Load<mitk::Image>(Pic3DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_Pic3DImage.IsNotNull(), "Loaded Pic3D");
+
+	std::string Pic3DCoronalPlanarFigureFile = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3DCoronalPlanarFigure.pf");
+	m_Pic3DPlanarFigureCoronal = mitk::IOUtil::Load<mitk::PlanarFigure>(Pic3DCoronalPlanarFigureFile);
+	MITK_TEST_CONDITION_REQUIRED(m_Pic3DPlanarFigureCoronal.IsNotNull(), "Loaded Pic3D coronal planarFigure");
+
     double expected_entropy = 6.0677398647867449;
     double expected_kurtosis = 1.6242929941303372;
     double expected_MPP = 76.649350649350652;
@@ -920,6 +1051,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DCoronalPlanarFigureMaskSta
 void mitkImageStatisticsCalculatorTestSuite::TestPic3DImageMaskStatistics_label1()
 {
     MITK_INFO << std::endl << "Test Pic3D image mask label 1 pf:-----------------------------------------------------------------------------------";
+
+	std::string Pic3DFile = this->GetTestDataFilePath("Pic3D.nrrd");
+	m_Pic3DImage = mitk::IOUtil::Load<mitk::Image>(Pic3DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_Pic3DImage.IsNotNull(), "Loaded Pic3D");
+
+	std::string Pic3DImageMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3D-labels.nrrd");
+	m_Pic3DImageMask = mitk::IOUtil::Load<mitk::Image>(Pic3DImageMaskFile);
+	MITK_TEST_CONDITION_REQUIRED(m_Pic3DImageMask.IsNotNull(), "Loaded Pic3D image mask");
 
     double expected_entropy = 5.695858251095868;
     double expected_kurtosis = 4.2728827997815717;
@@ -979,6 +1118,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DImageMaskStatistics_label2
 {
     MITK_INFO << std::endl << "Test Pic3D image mask label 2 pf:-----------------------------------------------------------------------------------";
 
+	std::string Pic3DFile = this->GetTestDataFilePath("Pic3D.nrrd");
+	m_Pic3DImage = mitk::IOUtil::Load<mitk::Image>(Pic3DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_Pic3DImage.IsNotNull(), "Loaded Pic3D");
+
+	std::string Pic3DImageMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3D-labels.nrrd");
+	m_Pic3DImageMask = mitk::IOUtil::Load<mitk::Image>(Pic3DImageMaskFile);
+	MITK_TEST_CONDITION_REQUIRED(m_Pic3DImageMask.IsNotNull(), "Loaded Pic3D image mask");
+
     double expected_entropy = 4.3685781901212764;
     double expected_kurtosis = 9.7999112757587934;
     double expected_MPP = -nan("");
@@ -1037,6 +1184,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DIgnorePixelValueMaskStatis
 {
     MITK_INFO << std::endl << "Test Pic3D ignore zero pixels:-----------------------------------------------------------------------------------";
 
+	std::string Pic3DFile = this->GetTestDataFilePath("Pic3D.nrrd");
+	m_Pic3DImage = mitk::IOUtil::Load<mitk::Image>(Pic3DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_Pic3DImage.IsNotNull(), "Loaded Pic3D");
+
     double expected_entropy = 4.671045011438645;
     double expected_kurtosis = 1.4638176488404484;
     double expected_MPP = 111.80226129535752;
@@ -1094,6 +1245,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestPic3DIgnorePixelValueMaskStatis
 void mitkImageStatisticsCalculatorTestSuite::TestPic3DSecondaryMaskStatistics()
 {
     MITK_INFO << std::endl << "Test Pic3D ignore zero pixels AND Image mask 2:-----------------------------------------------------------------------------------";
+
+	std::string Pic3DFile = this->GetTestDataFilePath("Pic3D.nrrd");
+	m_Pic3DImage = mitk::IOUtil::Load<mitk::Image>(Pic3DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_Pic3DImage.IsNotNull(), "Loaded Pic3D");
+
+	std::string Pic3DImageMaskFile2 = this->GetTestDataFilePath("ImageStatisticsTestData/Pic3D-labels2.nrrd");
+	m_Pic3DImageMask2 = mitk::IOUtil::Load<mitk::Image>(Pic3DImageMaskFile2);
+	MITK_TEST_CONDITION_REQUIRED(m_Pic3DImageMask2.IsNotNull(), "Loaded Pic3D image secondary mask");
 
     double expected_entropy = 5.9741637167320176;
     double expected_kurtosis = 3.490663358061596;
@@ -1159,6 +1318,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylStatistics_time1()
 {
     MITK_INFO << std::endl << "Test plain US4D timeStep1:-----------------------------------------------------------------------------------";
 
+	std::string US4DFile = this->GetTestDataFilePath("US4DCyl.nrrd");
+	m_US4DImage = mitk::IOUtil::Load<mitk::Image>(US4DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_US4DImage.IsNotNull(), "Loaded US4D");
+
     double expected_entropy = 4.8272774900452502;
     double expected_kurtosis = 6.1336513352934432;
     double expected_MPP = 53.395358640738536;
@@ -1211,6 +1374,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylStatistics_time1()
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylAxialPlanarFigureMaskStatistics_time1()
 {
     MITK_INFO << std::endl << "Test US4D axial pf timeStep1:-----------------------------------------------------------------------------------";
+
+	std::string US4DFile = this->GetTestDataFilePath("US4DCyl.nrrd");
+	m_US4DImage = mitk::IOUtil::Load<mitk::Image>(US4DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_US4DImage.IsNotNull(), "Loaded US4D");
+
+	std::string US4DAxialPlanarFigureFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4DAxialPlanarFigure.pf");
+	m_US4DPlanarFigureAxial = mitk::IOUtil::Load<mitk::PlanarFigure>(US4DAxialPlanarFigureFile);
+	MITK_TEST_CONDITION_REQUIRED(m_US4DPlanarFigureAxial.IsNotNull(), "Loaded US4D axial planarFigure");
 
     double expected_entropy = 6.218151288002292;
     double expected_kurtosis = 1.7322676370242023;
@@ -1269,6 +1440,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylSagittalPlanarFigureMask
 {
     MITK_INFO << std::endl << "Test US4D sagittal pf timeStep1:-----------------------------------------------------------------------------------";
 
+	std::string US4DFile = this->GetTestDataFilePath("US4DCyl.nrrd");
+	m_US4DImage = mitk::IOUtil::Load<mitk::Image>(US4DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_US4DImage.IsNotNull(), "Loaded US4D");
+
+	std::string US4DSagittalPlanarFigureFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4DSagittalPlanarFigure.pf");
+	m_US4DPlanarFigureSagittal = mitk::IOUtil::Load<mitk::PlanarFigure>(US4DSagittalPlanarFigureFile);
+	MITK_TEST_CONDITION_REQUIRED(m_US4DPlanarFigureSagittal.IsNotNull(), "Loaded US4D sagittal planarFigure");
+
     double expected_entropy = 5.2003987046387508;
     double expected_kurtosis = 2.7574491062430142;
     double expected_MPP = 26.212534059945504;
@@ -1325,6 +1504,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylSagittalPlanarFigureMask
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylCoronalPlanarFigureMaskStatistics_time1()
 {
     MITK_INFO << std::endl << "Test US4D coronal pf timeStep1:-----------------------------------------------------------------------------------";
+
+	std::string US4DFile = this->GetTestDataFilePath("US4DCyl.nrrd");
+	m_US4DImage = mitk::IOUtil::Load<mitk::Image>(US4DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_US4DImage.IsNotNull(), "Loaded US4D");
+
+	std::string US4DCoronalPlanarFigureFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4DCoronalPlanarFigure.pf");
+	m_US4DPlanarFigureCoronal = mitk::IOUtil::Load<mitk::PlanarFigure>(US4DCoronalPlanarFigureFile);
+	MITK_TEST_CONDITION_REQUIRED(m_US4DPlanarFigureCoronal.IsNotNull(), "Loaded US4D coronal planarFigure");
 
     double expected_entropy = 5.8892941136639161;
     double expected_kurtosis = 4.6434920707409564;
@@ -1383,6 +1570,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylImageMaskStatistics_time
 {
     MITK_INFO << std::endl << "Test US4D image mask time 1 label 1:-----------------------------------------------------------------------------------";
 
+	std::string US4DFile = this->GetTestDataFilePath("US4DCyl.nrrd");
+	m_US4DImage = mitk::IOUtil::Load<mitk::Image>(US4DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_US4DImage.IsNotNull(), "Loaded US4D");
+
+	std::string US4DImageMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D-labels.nrrd");
+	m_US4DImageMask = mitk::IOUtil::Load<mitk::Image>(US4DImageMaskFile);
+	MITK_TEST_CONDITION_REQUIRED(m_US4DImageMask.IsNotNull(), "Loaded US4D image mask");
+
     double expected_entropy = 5.0082903903398677;
     double expected_kurtosis = 3.6266994778237809;
     double expected_MPP = 169.58938547486034;
@@ -1439,6 +1634,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylImageMaskStatistics_time
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylImageMaskStatistics_time2_label_1()
 {
     MITK_INFO << std::endl << "Test US4D image mask time 2 label 1:-----------------------------------------------------------------------------------";
+
+	std::string US4DFile = this->GetTestDataFilePath("US4DCyl.nrrd");
+	m_US4DImage = mitk::IOUtil::Load<mitk::Image>(US4DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_US4DImage.IsNotNull(), "Loaded US4D");
+
+	std::string US4DImageMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D-labels.nrrd");
+	m_US4DImageMask = mitk::IOUtil::Load<mitk::Image>(US4DImageMaskFile);
+	MITK_TEST_CONDITION_REQUIRED(m_US4DImageMask.IsNotNull(), "Loaded US4D image mask");
 
     double expected_entropy = 5.1857604214916506;
     double expected_kurtosis = 3.0692303858330683;
@@ -1497,6 +1700,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylImageMaskStatistics_time
 {
     MITK_INFO << std::endl << "Test US4D image mask time 1 label 2:-----------------------------------------------------------------------------------";
 
+	std::string US4DFile = this->GetTestDataFilePath("US4DCyl.nrrd");
+	m_US4DImage = mitk::IOUtil::Load<mitk::Image>(US4DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_US4DImage.IsNotNull(), "Loaded US4D");
+
+	std::string US4DImageMaskFile = this->GetTestDataFilePath("ImageStatisticsTestData/US4D-labels.nrrd");
+	m_US4DImageMask = mitk::IOUtil::Load<mitk::Image>(US4DImageMaskFile);
+	MITK_TEST_CONDITION_REQUIRED(m_US4DImageMask.IsNotNull(), "Loaded US4D image mask");
+
     double expected_entropy = 5.0822234230119001;
     double expected_kurtosis = 2.4346603343623747;
     double expected_MPP = 20.733626373626375;
@@ -1553,6 +1764,10 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylImageMaskStatistics_time
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylIgnorePixelValueMaskStatistics_time1()
 {
     MITK_INFO << std::endl << "Test US4D ignore zero pixels:-----------------------------------------------------------------------------------";
+
+	std::string US4DFile = this->GetTestDataFilePath("US4DCyl.nrrd");
+	m_US4DImage = mitk::IOUtil::Load<mitk::Image>(US4DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_US4DImage.IsNotNull(), "Loaded US4D");
 
     double expected_entropy = 5.8609813848087962;
     double expected_kurtosis = 4.7556214582883651;
@@ -1611,6 +1826,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylIgnorePixelValueMaskStat
 void mitkImageStatisticsCalculatorTestSuite::TestUS4DCylSecondaryMaskStatistics_time1()
 {
     MITK_INFO << std::endl << "Test US4d ignore zero pixels AND Image mask 2:-----------------------------------------------------------------------------------";
+
+	std::string US4DFile = this->GetTestDataFilePath("US4DCyl.nrrd");
+	m_US4DImage = mitk::IOUtil::Load<mitk::Image>(US4DFile);
+	MITK_TEST_CONDITION_REQUIRED(m_US4DImage.IsNotNull(), "Loaded US4D");
+
+	std::string US4DImageMaskFile2 = this->GetTestDataFilePath("ImageStatisticsTestData/US4D-labels2.nrrd");
+	m_US4DImageMask2 = mitk::IOUtil::Load<mitk::Image>(US4DImageMaskFile2);
+	MITK_TEST_CONDITION_REQUIRED(m_US4DImageMask2.IsNotNull(), "Loaded US4D image secondary mask");
 
     double expected_entropy = 4.9955858614274558;
     double expected_kurtosis = 17.471042803365179;

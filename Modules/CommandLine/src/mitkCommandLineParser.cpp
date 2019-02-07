@@ -261,6 +261,60 @@ namespace
     {
       text = text + ", (default: " + this->DefaultValue.ToString() + ")";
     }
+    string value_type = "Unknown";
+    switch (this->ValueType)
+    {
+    case 0:
+    {
+      value_type = "String";
+      break;
+    }
+    case 1:
+    {
+      value_type = "Bool";
+      break;
+    }
+    case 2:
+    {
+      value_type = "StringList";
+      break;
+    }
+    case 3:
+    {
+      value_type = "Int";
+      break;
+    }
+    case 4:
+    {
+      value_type = "Float";
+      break;
+    }
+    case 5:
+    {
+      value_type = "InputDirectory";
+      break;
+    }
+    case 6:
+    {
+      value_type = "InputFile";
+      break;
+    }
+    case 7:
+    {
+      value_type = "OutputDirectory";
+      break;
+    }
+    case 8:
+    {
+      value_type = "OutputFile";
+      break;
+    }
+    case 9:
+    {
+      value_type = "InputImage";
+    }
+    }
+    text = text + ", Type: " + value_type;
     text += "\n";
     return text;
   }

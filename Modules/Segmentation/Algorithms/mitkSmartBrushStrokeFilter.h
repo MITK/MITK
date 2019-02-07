@@ -27,6 +27,7 @@ public:
   void SetDirection(int value);
   void SetOriginalImage(itk::Image<float, 3>::Pointer value);
   void SetSensitivity(float value);
+  void SetImageSpacing(itk::Vector<float, 3> spacing);
 
 protected:
   static const float BETA_MIN;
@@ -52,6 +53,7 @@ protected:
   int m_Direction;
   itk::Image<float, 3>::Pointer m_OriginalImage;
   float m_Sensitivity;
+  itk::Vector<float, 3> m_ImageSpacing;
 };
 
 
@@ -62,14 +64,14 @@ template <typename TImageType>
 double SmartBrushStrokeFilter<TImageType>::Distance(itk::Image<float, 3>::IndexType a, itk::Image<float, 3>::IndexType b)
 {
   itk::Point<double, 3> p0;
-  p0[0] = a[0];
-  p0[1] = a[1];
-  p0[2] = a[2];
+  p0[0] = a[0] * m_ImageSpacing[0];
+  p0[1] = a[1] * m_ImageSpacing[1];
+  p0[2] = a[2] * m_ImageSpacing[2];
 
   itk::Point<double, 3> p1;
-  p1[0] = b[0];
-  p1[1] = b[1];
-  p1[2] = b[2];
+  p1[0] = b[0] * m_ImageSpacing[0];
+  p1[1] = b[1] * m_ImageSpacing[1];
+  p1[2] = b[2] * m_ImageSpacing[2];
 
   return p1.EuclideanDistanceTo(p0);
 }
@@ -156,6 +158,12 @@ template <typename TImageType>
 void SmartBrushStrokeFilter<TImageType>::SetSensitivity(float value)
 {
   m_Sensitivity = value;
+}
+
+template <typename TImageType>
+void SmartBrushStrokeFilter<TImageType>::SetImageSpacing(itk::Vector<float, 3> spacing)
+{
+  m_ImageSpacing = spacing;
 }
 
 }

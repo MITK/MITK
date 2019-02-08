@@ -45,7 +45,7 @@ void QmitkQuantificationPerspective::CreateInitialLayout(berry::IPageLayout::Poi
   /////////////////////////////////////////////
 
   left->AddView("org.mitk.views.diffusionquantification");
-  left->AddView("org.mitk.views.imagestatistics");
+  left->AddView("org.mitk.views.imagestatisticsReloaded");
   left->AddView("org.mitk.views.segmentation");
   left->AddView("org.mitk.views.odfdetails");
 }

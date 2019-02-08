@@ -54,6 +54,7 @@ set(MITK_MODULES
   US
   USUI
   DicomUI
+  RegistrationOntology
   Remeshing
   Python
   QtPython
@@ -71,6 +72,8 @@ set(MITK_MODULES
   BoundingShape
   RenderWindowManager
   RenderWindowManagerUI
+  SemanticRelations
+  SemanticRelationsUI
   CEST
   BasicImageProcessing
   ModelFit

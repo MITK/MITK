@@ -44,6 +44,8 @@ if(MITK_USE_MatchPoint)
          -DMAP_USE_SYSTEM_HDF5:BOOL=ON
          -DMAP_DISABLE_ITK_IO_FACTORY_AUTO_REGISTER:BOOL=ON
          -DMAP_WRAP_Plastimatch:BOOL=ON
+         -DMAP_BUILD_Ontology:BOOL=ON
+         -DMAP_BUILD_Ontology_simple:BOOL=ON
          -DGDCM_DIR:PATH=${GDCM_DIR}
          -DHDF5_DIR:PATH=${HDF5_DIR}
        CMAKE_CACHE_ARGS

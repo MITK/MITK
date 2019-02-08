@@ -26,9 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk gui common plugin
 #include <mitkDataNodeSelection.h>
 
-// berry
-#include <berryISelectionService.h>
-
 // qt
 #include <QMenu>
 

@@ -10,6 +10,7 @@ set(CPP_FILES
   QmitkDataStorageSimpleTreeModel.cpp
   QmitkDataStorageTreeModel.cpp
   QmitkDataStorageTreeModelInternalItem.cpp
+  QmitkDnDDataNodeWidget.cpp
   QmitkFileReaderOptionsDialog.cpp
   QmitkFileReaderWriterOptionsWidget.cpp
   QmitkFileWriterOptionsDialog.cpp
@@ -61,6 +62,7 @@ set(MOC_H_FILES
   include/QmitkDataStorageTreeModel.h
   include/QmitkDataStorageSimpleTreeModel.h
   include/QmitkDataStorageDefaultListModel.h
+  include/QmitkDnDDataNodeWidget.h
   include/QmitkFileReaderOptionsDialog.h
   include/QmitkFileReaderWriterOptionsWidget.h
   include/QmitkFileWriterOptionsDialog.h

@@ -230,36 +230,36 @@ void mitkImageStatisticsCalculatorTestSuite::setUp()
   MITK_TEST_OUTPUT(<< "Loading test image '" << filename << "'")
 
   m_TestImage = mitk::IOUtil::Load<mitk::Image>(filename);
-  CPPUNIT_ASSERT_MESSAGE("Loaded an mitk::Image", m_TestImage.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("Failed loading an mitk::Image", m_TestImage.IsNotNull());
 
   m_Geometry = m_TestImage->GetSlicedGeometry()->GetPlaneGeometry(0);
-  CPPUNIT_ASSERT_MESSAGE("Getting image geometry", m_Geometry.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("Failed getting image geometry", m_Geometry.IsNotNull());
 
   m_Pic3DImage = mitk::IOUtil::Load<mitk::Image>(Pic3DFile);
-  CPPUNIT_ASSERT_MESSAGE("Loaded Pic3D", m_Pic3DImage.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D", m_Pic3DImage.IsNotNull());
   m_Pic3DImageMask = mitk::IOUtil::Load<mitk::Image>(Pic3DImageMaskFile);
-  CPPUNIT_ASSERT_MESSAGE("Loaded Pic3D image mask", m_Pic3DImageMask.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D image mask", m_Pic3DImageMask.IsNotNull());
   m_Pic3DImageMask2 = mitk::IOUtil::Load<mitk::Image>(Pic3DImageMaskFile2);
-  CPPUNIT_ASSERT_MESSAGE("Loaded Pic3D image secondary mask", m_Pic3DImageMask2.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D image secondary mask", m_Pic3DImageMask2.IsNotNull());
   m_Pic3DPlanarFigureAxial = mitk::IOUtil::Load<mitk::PlanarFigure>(Pic3DAxialPlanarFigureFile);
-  CPPUNIT_ASSERT_MESSAGE("Loaded Pic3D axial planarFigure", m_Pic3DPlanarFigureAxial.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D axial planarFigure", m_Pic3DPlanarFigureAxial.IsNotNull());
   m_Pic3DPlanarFigureSagittal = mitk::IOUtil::Load<mitk::PlanarFigure>(Pic3DSagittalPlanarFigureFile);
-  CPPUNIT_ASSERT_MESSAGE("Loaded Pic3D sagittal planarFigure", m_Pic3DPlanarFigureSagittal.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D sagittal planarFigure", m_Pic3DPlanarFigureSagittal.IsNotNull());
   m_Pic3DPlanarFigureCoronal = mitk::IOUtil::Load<mitk::PlanarFigure>(Pic3DCoronalPlanarFigureFile);
-  CPPUNIT_ASSERT_MESSAGE("Loaded Pic3D coronal planarFigure", m_Pic3DPlanarFigureCoronal.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("Failed loading Pic3D coronal planarFigure", m_Pic3DPlanarFigureCoronal.IsNotNull());
 
   m_US4DImage = mitk::IOUtil::Load<mitk::Image>(US4DFile);
-  CPPUNIT_ASSERT_MESSAGE("Loaded US4D", m_US4DImage.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D", m_US4DImage.IsNotNull());
   m_US4DImageMask = mitk::IOUtil::Load<mitk::Image>(US4DImageMaskFile);
-  CPPUNIT_ASSERT_MESSAGE("Loaded US4D image mask", m_US4DImageMask.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D image mask", m_US4DImageMask.IsNotNull());
   m_US4DImageMask2 = mitk::IOUtil::Load<mitk::Image>(US4DImageMaskFile2);
-  CPPUNIT_ASSERT_MESSAGE("Loaded US4D image mask2", m_US4DImageMask2.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D image mask2", m_US4DImageMask2.IsNotNull());
   m_US4DPlanarFigureAxial = mitk::IOUtil::Load<mitk::PlanarFigure>(US4DAxialPlanarFigureFile);
-  CPPUNIT_ASSERT_MESSAGE("Loaded US4D axial planarFigure", m_US4DPlanarFigureAxial.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D axial planarFigure", m_US4DPlanarFigureAxial.IsNotNull());
   m_US4DPlanarFigureSagittal = mitk::IOUtil::Load<mitk::PlanarFigure>(US4DSagittalPlanarFigureFile);
-  CPPUNIT_ASSERT_MESSAGE("Loaded US4D sagittal planarFigure", m_US4DPlanarFigureSagittal.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D sagittal planarFigure", m_US4DPlanarFigureSagittal.IsNotNull());
   m_US4DPlanarFigureCoronal = mitk::IOUtil::Load<mitk::PlanarFigure>(US4DCoronalPlanarFigureFile);
-  CPPUNIT_ASSERT_MESSAGE("Loaded US4D coronal planarFigure", m_US4DPlanarFigureCoronal.IsNotNull());
+  CPPUNIT_ASSERT_MESSAGE("Failed loading US4D coronal planarFigure", m_US4DPlanarFigureCoronal.IsNotNull());
 
 }
 
@@ -587,7 +587,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingEmpty()
 
   auto statisticsContainer = ComputeStatistics( m_TestImage, mask_image );
   // test if no statisticsContainer for timestep 0 exists
-  CPPUNIT_ASSERT_MESSAGE("No statistics for TimeStep 0 does exist.", !statisticsContainer->TimeStepExists(0));
+  CPPUNIT_ASSERT_MESSAGE("Statistics for TimeStep 0 exist.", !statisticsContainer->TimeStepExists(0));
   CPPUNIT_ASSERT_THROW(statisticsContainer->GetStatisticsForTimeStep(0), mitk::Exception);
 }
 
@@ -667,7 +667,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestRecomputeOnModifiedMask()
   auto statisticsContainer = statisticsCalculator->GetStatistics();
 
   // test if no statisticsContainer for timestep 0 exists
-  CPPUNIT_ASSERT_MESSAGE("No statistics for TimeStep 0 does exist.", !statisticsContainer->TimeStepExists(0));
+  CPPUNIT_ASSERT_MESSAGE("Statistics for TimeStep 0 exist.", !statisticsContainer->TimeStepExists(0));
   CPPUNIT_ASSERT_THROW(statisticsContainer->GetStatisticsForTimeStep(0), mitk::Exception);
 
   // activate voxel in the mask image
@@ -1735,17 +1735,17 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
   auto mean = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::MEAN());
   int tmpMean = mean * 100;
   double calculatedMean = tmpMean / 100.0;
-  CPPUNIT_ASSERT_MESSAGE("Calculated mean grayvalue is equal to the desired value.", calculatedMean == testMean);
+  CPPUNIT_ASSERT_MESSAGE("Calculated mean grayvalue is not equal to the desired value.", calculatedMean == testMean);
 
   auto standardDeviation = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::STANDARDDEVIATION());
   int tmpSD = standardDeviation * 100;
   double calculatedSD = tmpSD / 100.0;
-  CPPUNIT_ASSERT_MESSAGE("Calculated grayvalue sd is equal to the desired value.", calculatedSD == testSD);
+  CPPUNIT_ASSERT_MESSAGE("Calculated grayvalue sd is not equal to the desired value.", calculatedSD == testSD);
 
   auto median = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::MEDIAN());
   int tmpMedian = median * 100;
   double calculatedMedian = tmpMedian / 100.0;
-  CPPUNIT_ASSERT_MESSAGE("Calculated median grayvalue is equal to the desired value.", testMedian == calculatedMedian);
+  CPPUNIT_ASSERT_MESSAGE("Calculated median grayvalue is not equal to the desired value.", testMedian == calculatedMedian);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatisticsContainer::StatisticsObject stats,
@@ -1782,31 +1782,31 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(mitk::ImageStatist
   auto entropyObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::ENTROPY());
   auto minIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MINIMUMPOSITION());
   auto maxIndexObject = stats.GetValueConverted<mitk::ImageStatisticsContainer::IndexType>(mitk::ImageStatisticsConstants::MAXIMUMPOSITION());
-  CPPUNIT_ASSERT_MESSAGE("Calculated value fits expected value", numberOfVoxelsObject - N == 0);
-  CPPUNIT_ASSERT_MESSAGE("Calculated value fits expected value", std::abs(meanObject - mean) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", numberOfVoxelsObject - N == 0);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(meanObject - mean) < mitk::eps);
   // in one test case MPP is None because the roi has no positive pixels
   if (!std::isnan(mppObject))
   {
-      CPPUNIT_ASSERT_MESSAGE("Calculated value fits expected value", std::abs(mppObject - MPP) < mitk::eps);
+      CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(mppObject - MPP) < mitk::eps);
   }
-  CPPUNIT_ASSERT_MESSAGE("Calculated value fits expected value", std::abs(medianObject - median) < mitk::eps);
-  CPPUNIT_ASSERT_MESSAGE("Calculated value fits expected value", std::abs(skewnessObject - skewness) < mitk::eps);
-  CPPUNIT_ASSERT_MESSAGE("Calculated value fits expected value", std::abs(kurtosisObject - kurtosis) < mitk::eps);
-  CPPUNIT_ASSERT_MESSAGE("Calculated value fits expected value", std::abs(uniformityObject - uniformity) < mitk::eps);
-  CPPUNIT_ASSERT_MESSAGE("Calculated value fits expected value", std::abs(uppObject - UPP) < mitk::eps);
-  CPPUNIT_ASSERT_MESSAGE("Calculated value fits expected value", std::abs(varianceObject - variance) < mitk::eps);
-  CPPUNIT_ASSERT_MESSAGE("Calculated value fits expected value", std::abs(standardDeviationObject - stdev) < mitk::eps);
-  CPPUNIT_ASSERT_MESSAGE("Calculated value fits expected value", std::abs(minObject - min) < mitk::eps);
-  CPPUNIT_ASSERT_MESSAGE("Calculated value fits expected value", std::abs(maxObject - max) < mitk::eps);
-  CPPUNIT_ASSERT_MESSAGE("Calculated value fits expected value", std::abs(rmsObject - RMS) < mitk::eps);
-  CPPUNIT_ASSERT_MESSAGE("Calculated value fits expected value", std::abs(entropyObject - entropy) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(medianObject - median) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(skewnessObject - skewness) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(kurtosisObject - kurtosis) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(uniformityObject - uniformity) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(uppObject - UPP) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(varianceObject - variance) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(standardDeviationObject - stdev) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(minObject - min) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(maxObject - max) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(rmsObject - RMS) < mitk::eps);
+  CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(entropyObject - entropy) < mitk::eps);
   for (unsigned int i = 0; i < minIndex.size(); ++i)
   {
-      CPPUNIT_ASSERT_MESSAGE("Calculated value fits expected value", std::abs(minIndexObject[i] - minIndex[i]) < mitk::eps);
+      CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(minIndexObject[i] - minIndex[i]) < mitk::eps);
   }
   for (unsigned int i = 0; i < maxIndex.size(); ++i)
   {
-      CPPUNIT_ASSERT_MESSAGE("Calculated value fits expected value", std::abs(maxIndexObject[i] - maxIndex[i]) < mitk::eps);
+      CPPUNIT_ASSERT_MESSAGE("Calculated value does not fit expected value", std::abs(maxIndexObject[i] - maxIndex[i]) < mitk::eps);
   }
 }
 

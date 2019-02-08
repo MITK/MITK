@@ -6,23 +6,23 @@
 mitk::RESTServerMicroService::RESTServerMicroService(web::uri uri) : m_Listener(uri)
 {
   m_Uri = uri;
-  m_Listener.support(MitkRESTMethods::GET, std::bind(&RESTServerMicroService::HandleGet, this, std::placeholders::_1));
-  openListener();
 }
 
 mitk::RESTServerMicroService::~RESTServerMicroService()
 {
-  closeListener();
 }
 
-pplx::task<void> mitk::RESTServerMicroService::openListener()
+void mitk::RESTServerMicroService::OpenListener()
 {
-  return m_Listener.open();
+    m_Listener = MitkListener(m_Uri);
+    m_Listener.support(web::http::methods::GET,
+                       std::bind(&mitk::RESTServerMicroService::HandleGet, this, std::placeholders::_1));
+    m_Listener.open().wait();
 }
 
-pplx::task<void> mitk::RESTServerMicroService::closeListener()
+void mitk::RESTServerMicroService::CloseListener()
 {
-  return m_Listener.close();
+  m_Listener.close().wait();
 }
 
 web::uri mitk::RESTServerMicroService::GetUri() 
@@ -39,7 +39,7 @@ void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
   utility::string_t uriStringT = build.to_uri().to_string();
 
   std::string uriString(uriStringT.begin(), uriStringT.end());
-  MITK_INFO << "Test for Server at port " << port << " Exact request uri: " << uriString;
+  MITK_INFO << "Get Request fot server at port " << port << " Exact request uri: " << uriString;
   
   web::json::value content;
   us::ModuleContext *context = us::GetModuleContext();
@@ -52,7 +52,7 @@ void mitk::RESTServerMicroService::HandleGet(MitkRequest request)
     {
       web::json::value data = request.extract_json().get();
       MITK_INFO << "Server: Data send to manager";
-      content = managerService->handle(build.to_uri(), data);
+      content = managerService->Handle(build.to_uri(), data);
       MITK_INFO << "server: Data received from manager";
     }
   }

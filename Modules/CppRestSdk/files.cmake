@@ -9,7 +9,9 @@ set(CPP_FILES
   mitkCppRestSdkActivator.cpp
   mitkIRESTManager.cpp
   mitkRESTManager.cpp
-  mitkRESTTest.cpp
-  mitkRESTTest2.cpp
   mitkIRESTObserver.cpp
+  mitkCppRestSdk.cpp
 )
+set(MOC_H_FILES
+include/mitkRESTServerMicroService.h
+include/mitkRESTManager.h)

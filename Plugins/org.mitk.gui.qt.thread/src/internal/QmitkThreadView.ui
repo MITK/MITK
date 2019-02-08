@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkThreadView</class>
+ <widget class="QWidget" name="QmitkThreadView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>220</width>
+    <height>160</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Thread View</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QPushButton" name="startPushButton">
+     <property name="text">
+      <string>Start Listening</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="stopPushButton">
+     <property name="toolTip">
+      <string>Process selected image</string>
+     </property>
+     <property name="text">
+      <string>Stop Listening</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="spacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>220</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

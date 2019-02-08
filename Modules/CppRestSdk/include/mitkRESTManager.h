@@ -1,32 +1,40 @@
 #ifndef mitkRESTManager_h
 #define mitkRESTManager_h
 
+#include <QObject>
+#include <QThread>
+
 #include <mitkIRESTManager.h>
+#include <mitkIRESTObserver.h>
 #include <mitkRESTClientMicroService.h>
 #include <mitkRESTServerMicroService.h>
-#include <mitkIRESTObserver.h>
+
+#include <MitkCppRestSdkExports.h>
 
 namespace mitk
 {
-  class RESTManager : public IRESTManager
+  class MITKCPPRESTSDK_EXPORT RESTManager : public QObject, public IRESTManager
   {
+     Q_OBJECT
+
   public:
     RESTManager();
     ~RESTManager() override;
 
-    //calls RESTClient
-    void sendRequest(RequestType type) override;
-    //calls RESTServer
-    void receiveRequest(web::uri uri, IRESTObserver *observer) override;
+    // calls RESTClient
+    void SendRequest(RequestType type) override;
+    // calls RESTServer
+    void ReceiveRequest(web::uri uri, IRESTObserver *observer) override;
 
-    web::json::value handle(web::uri, web::json::value) override;
+    web::json::value Handle(web::uri, web::json::value) override;
 
-    virtual void handleDeleteClient(IRESTObserver *observer) override;
+    virtual void HandleDeleteObserver(IRESTObserver *observer) override;
 
   private:
-    std::map<int, RESTClientMicroService*> m_ClientMap; // Map with port client pairs
-    std::map<int, RESTServerMicroService*> m_ServerMap; // Map with port server pairs
-    std::map<std::pair<int, utility::string_t>, IRESTObserver*> m_Observer; //Map with all observers
+    std::map<int, RESTClientMicroService *> m_ClientMap;                     // Map with port client pairs
+    std::map<int, RESTServerMicroService *> m_ServerMap;                     // Map with port server pairs
+    std::map<int, QThread*> m_ServerThreadMap;                               // Map with threads for servers
+    std::map<std::pair<int, utility::string_t>, IRESTObserver *> m_Observer; // Map with all observers
   };
 } // namespace mitk
 #endif // !mitkRESTManager_h

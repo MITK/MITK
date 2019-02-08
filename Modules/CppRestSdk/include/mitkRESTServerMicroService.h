@@ -1,6 +1,7 @@
 #ifndef mitkRESTServerMicroService_h
 #define mitkRESTServerMicroService_h
 
+#include <QThread>
 #include "cpprest/asyncrt_utils.h"
 #include "cpprest/containerstream.h"
 #include "cpprest/filestream.h"
@@ -23,19 +24,24 @@ typedef web::json::json_exception MitkJsonException;
 
 namespace mitk
 {
-  class RESTServerMicroService
+  class RESTServerMicroService : public QObject
   {
+    Q_OBJECT 
+
+
   public:
     RESTServerMicroService(web::uri uri);
     ~RESTServerMicroService();
     web::uri GetUri();
 
   private:
-    pplx::task<void> openListener();
-    pplx::task<void> closeListener();
     void HandleGet(MitkRequest request);
     MitkListener m_Listener;
     web::uri m_Uri;
+
+  public slots:
+    void OpenListener();
+    void CloseListener();
   };
 } // namespace mitk
 #endif

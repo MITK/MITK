@@ -2,14 +2,15 @@
 #define mitkIRESTObserver_h
 
 #include "cpprest/json.h"
+#include <MitkCppRestSdkExports.h>
 
 namespace mitk
 {
-  class IRESTObserver
+  class MITKCPPRESTSDK_EXPORT IRESTObserver
   {
   public:
     virtual ~IRESTObserver();
-    virtual web::json::value notify(web::json::value data) = 0;
+    virtual web::json::value Notify(web::json::value data) = 0;
 
 
   private:

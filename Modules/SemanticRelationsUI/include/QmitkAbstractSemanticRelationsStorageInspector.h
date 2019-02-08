@@ -35,6 +35,9 @@ class MITKSEMANTICRELATIONSUI_EXPORT QmitkAbstractSemanticRelationsStorageInspec
   Q_OBJECT
 
 public:
+
+  virtual ~QmitkAbstractSemanticRelationsStorageInspector();
+
   /**
   * @brief Extends the abstract base class to allow setting the current case ID which is needed to access the
   *        semantic relations storage. The function sets the case ID in the storage model.
@@ -50,6 +53,9 @@ public:
   */
   virtual void SetLesion(const mitk::SemanticTypes::Lesion& lesion) = 0;
 
+protected:
+
+  QmitkAbstractSemanticRelationsStorageInspector(QWidget* parent = nullptr);
 };
 
 #endif // QMITKABSTRACTSEMANTICRELATIONSSTORAGEINSPECTOR_H

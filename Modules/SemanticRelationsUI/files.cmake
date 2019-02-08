@@ -2,6 +2,7 @@ file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURREN
 
 set(CPP_FILES
   mitkModuleActivator.cpp
+  QmitkAbstractSemanticRelationsStorageInspector.cpp
   QmitkAbstractSemanticRelationsStorageModel.cpp
   QmitkControlPointDialog.cpp
   QmitkLesionTextDialog.cpp

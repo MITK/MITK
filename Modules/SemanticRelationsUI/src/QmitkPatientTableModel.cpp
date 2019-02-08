@@ -58,7 +58,7 @@ QModelIndex QmitkPatientTableModel::index(int row, int column, const QModelIndex
   return QModelIndex();
 }
 
-QModelIndex QmitkPatientTableModel::parent(const QModelIndex& child) const
+QModelIndex QmitkPatientTableModel::parent(const QModelIndex& /*child*/) const
 {
   return QModelIndex();
 }
@@ -75,6 +75,11 @@ int QmitkPatientTableModel::rowCount(const QModelIndex& parent/* = QModelIndex()
 
 int QmitkPatientTableModel::columnCount(const QModelIndex& parent/* = QModelIndex()*/) const
 {
+  if (parent.isValid())
+  {
+    return 0;
+  }
+
   return m_ControlPoints.size();
 }
 
@@ -140,7 +145,7 @@ QVariant QmitkPatientTableModel::headerData(int section, Qt::Orientation orienta
 {
   if (Qt::Vertical == orientation && Qt::DisplayRole == role)
   {
-    if (m_InformationTypes.size() > section)
+    if (static_cast<int>(m_InformationTypes.size()) > section)
     {
       mitk::SemanticTypes::InformationType currentInformationType = m_InformationTypes.at(section);
       return QVariant(QString::fromStdString(currentInformationType));

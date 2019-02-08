@@ -31,7 +31,6 @@ QmitkTableItemThumbnailDelegate::QmitkTableItemThumbnailDelegate(QObject* parent
 void QmitkTableItemThumbnailDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
   QPixmap pixmap = index.data(Qt::DecorationRole).value<QPixmap>();
-  QRect rect = option.rect;
   QPoint point = option.rect.center() - pixmap.rect().center();
   painter->save();
 

@@ -73,9 +73,9 @@ protected:
   // the following functions have to be overridden...
   virtual void NodePredicateChanged() override;
   // but are not implemented in this model
-  virtual void NodeAdded(const mitk::DataNode* node) override { }
-  virtual void NodeChanged(const mitk::DataNode* node) override { }
-  virtual void NodeRemoved(const mitk::DataNode* node) override { }
+  virtual void NodeAdded(const mitk::DataNode*) override { }
+  virtual void NodeChanged(const mitk::DataNode*) override { }
+  virtual void NodeRemoved(const mitk::DataNode*) override { }
   /**
   * @brief Overridden from 'QmitkAbstractSemanticRelationsStorageModel': This function retrieves all control points
   *        and information types of the current case and stores them to define the header of the table.

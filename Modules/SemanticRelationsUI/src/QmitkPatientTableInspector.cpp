@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSignalMapper>
 
 QmitkPatientTableInspector::QmitkPatientTableInspector(QWidget* parent/* =nullptr*/)
+  : QmitkAbstractSemanticRelationsStorageInspector(parent)
 {
   m_Controls.setupUi(this);
 

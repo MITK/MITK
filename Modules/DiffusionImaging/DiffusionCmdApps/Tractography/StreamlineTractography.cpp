@@ -249,7 +249,7 @@ int main(int argc, char* argv[])
 
   unsigned int num_samples = 0;
   if (parsedArgs.count("num_samples"))
-    num_samples = us::any_cast<unsigned int>(parsedArgs["num_samples"]);
+    num_samples = static_cast<unsigned int>(us::any_cast<int>(parsedArgs["num_samples"]));
 
   int num_seeds = 1;
   if (parsedArgs.count("seeds"))
@@ -257,7 +257,7 @@ int main(int argc, char* argv[])
 
   unsigned int trials_per_seed = 10;
   if (parsedArgs.count("trials_per_seed"))
-    trials_per_seed = us::any_cast<unsigned int>(parsedArgs["trials_per_seed"]);
+    trials_per_seed = static_cast<unsigned int>(us::any_cast<int>(parsedArgs["trials_per_seed"]));
 
   float tend_f = 1;
   if (parsedArgs.count("tend_f"))

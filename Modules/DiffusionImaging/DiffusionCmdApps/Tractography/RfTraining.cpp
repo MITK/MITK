@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
     std::string forestFile = us::any_cast<std::string>(parsedArgs["o"]);
 
     mitkCommandLineParser::StringContainerType tractogramFiles;
-    if (parsedArgs.count("tractograms"))
+    if (parsedArgs.count("t"))
         tractogramFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["t"]);
 
     int num_trees = 30;

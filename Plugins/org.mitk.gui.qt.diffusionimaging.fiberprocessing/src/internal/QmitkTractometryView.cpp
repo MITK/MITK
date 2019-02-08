@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkLookupTable.h>
 #include <QClipboard>
 #include <mitkLexicalCast.h>
+#include <QmitkChartWidget.h>
 
 
 const std::string QmitkTractometryView::VIEW_ID = "org.mitk.views.tractometry";
@@ -90,11 +91,11 @@ void QmitkTractometryView::CreateQtPartControl( QWidget *parent )
 
   if (styleName == ":/org.blueberry.ui.qt/darkstyle.qss")
   {
-    return mitk::QmitkChartWidget::ColorTheme::darkstyle;
+    return QmitkChartWidget::ColorTheme::darkstyle;
   }
   else
   {
-    return mitk::QmitkChartWidget::ColorTheme::lightstyle;
+    return QmitkChartWidget::ColorTheme::lightstyle;
   }
 }
 

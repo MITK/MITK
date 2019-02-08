@@ -292,7 +292,7 @@ void mitk::SemanticRelationsIntegration::AddControlPointAndLinkImage(const DataN
   LinkImageToControlPoint(imageNode, controlPoint, checkConsistence);
 }
 
-void mitk::SemanticRelationsIntegration::LinkImageToControlPoint(const DataNode* imageNode, const SemanticTypes::ControlPoint& controlPoint, bool checkConsistence)
+void mitk::SemanticRelationsIntegration::LinkImageToControlPoint(const DataNode* imageNode, const SemanticTypes::ControlPoint& controlPoint, bool /*checkConsistence*/)
 {
   if (nullptr == imageNode)
   {

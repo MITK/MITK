@@ -364,7 +364,7 @@ mitk::SemanticTypes::ExaminationPeriodVector mitk::RelationStorage::GetAllExamin
       SemanticTypes::ExaminationPeriod generatedExaminationPeriod;
       generatedExaminationPeriod.UID = examinationPeriodID;
       generatedExaminationPeriod.name = examinationPeriodVectorPropertyValue[0];
-      for (int i = 1; i < examinationPeriodVectorPropertyValue.size(); ++i)
+      for (size_t i = 1; i < examinationPeriodVectorPropertyValue.size(); ++i)
       {
         generatedExaminationPeriod.controlPointUIDs.push_back(examinationPeriodVectorPropertyValue[i]);
       }

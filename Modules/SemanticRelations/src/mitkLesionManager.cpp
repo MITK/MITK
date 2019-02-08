@@ -28,7 +28,7 @@ mitk::SemanticTypes::Lesion mitk::GenerateNewLesion(const std::string& lesionCla
   SemanticTypes::Lesion lesion;
   lesion.UID = mitk::UIDGeneratorBoost::GenerateUID();
   lesion.name = "New lesion";
-  lesion.lesionClass = GenerateNewLesionClass();
+  lesion.lesionClass = GenerateNewLesionClass(lesionClassType);
 
   return lesion;
 }

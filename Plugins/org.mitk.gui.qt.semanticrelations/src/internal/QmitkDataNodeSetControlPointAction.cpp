@@ -60,7 +60,7 @@ void QmitkDataNodeSetControlPointAction::InitializeAction()
   connect(this, &QAction::triggered, this, &QmitkDataNodeSetControlPointAction::OnActionTriggered);
 }
 
-void QmitkDataNodeSetControlPointAction::OnActionTriggered(bool checked)
+void QmitkDataNodeSetControlPointAction::OnActionTriggered(bool /*checked*/)
 {
   if (nullptr == m_SemanticRelationsIntegration)
   {

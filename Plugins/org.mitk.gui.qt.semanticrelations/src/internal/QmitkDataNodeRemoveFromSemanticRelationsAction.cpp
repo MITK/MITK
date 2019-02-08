@@ -124,7 +124,7 @@ void QmitkDataNodeRemoveFromSemanticRelationsAction::InitializeAction()
   connect(this, &QAction::triggered, this, &QmitkDataNodeRemoveFromSemanticRelationsAction::OnActionTriggered);
 }
 
-void QmitkDataNodeRemoveFromSemanticRelationsAction::OnActionTriggered(bool checked)
+void QmitkDataNodeRemoveFromSemanticRelationsAction::OnActionTriggered(bool /*checked*/)
 {
   auto dataNode = GetSelectedNode();
   RemoveFromSemanticRelationsAction::Run(m_SemanticRelationsIntegration.get(), dataNode);

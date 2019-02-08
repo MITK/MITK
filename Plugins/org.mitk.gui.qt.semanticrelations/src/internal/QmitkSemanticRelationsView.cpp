@@ -106,11 +106,6 @@ void QmitkSemanticRelationsView::RenderWindowPartActivated(mitk::IRenderWindowPa
   m_ContextMenu->SetControlledRenderer(controlledRenderer);
 }
 
-void QmitkSemanticRelationsView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
-{
-  // nothing here
-}
-
 void QmitkSemanticRelationsView::SetUpConnections()
 {
   connect(m_Controls.caseIDComboBox, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged), this, &QmitkSemanticRelationsView::OnCaseIDSelectionChanged);
@@ -251,7 +246,7 @@ void QmitkSemanticRelationsView::JumpToPosition(const mitk::DataNode* dataNode)
     return;
   }
 
-  int activeLayer = labelSetImage->GetActiveLayer();
+  unsigned int activeLayer = labelSetImage->GetActiveLayer();
   mitk::Label* activeLabel = labelSetImage->GetActiveLabel(activeLayer);
   labelSetImage->UpdateCenterOfMass(activeLabel->GetValue(), activeLayer);
   const mitk::Point3D& centerPosition = activeLabel->GetCenterOfMassCoordinates();

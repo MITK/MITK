@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkAbstractSemanticRelationsAction.h"
 
 // qt
-#include <QAction.h>
+#include <QAction>
 
 namespace AddToSemanticRelationsAction
 {

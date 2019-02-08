@@ -52,7 +52,7 @@ public:
   static const QBrush SELECTED_BACKGROUND_COLOR;
   static const QBrush CONNECTED_BACKGROUND_COLOR;
 
-  QmitkLesionInfoWidget::QmitkLesionInfoWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
+  QmitkLesionInfoWidget(mitk::DataStorage* dataStorage, QWidget* parent = nullptr);
   ~QmitkLesionInfoWidget();
 
   void SetCaseID(const mitk::SemanticTypes::CaseID& caseID);

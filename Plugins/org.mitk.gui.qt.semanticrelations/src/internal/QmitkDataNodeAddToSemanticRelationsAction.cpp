@@ -154,7 +154,7 @@ void QmitkDataNodeAddToSemanticRelationsAction::InitializeAction()
   connect(this, &QAction::triggered, this, &QmitkDataNodeAddToSemanticRelationsAction::OnActionTriggered);
 }
 
-void QmitkDataNodeAddToSemanticRelationsAction::OnActionTriggered(bool checked)
+void QmitkDataNodeAddToSemanticRelationsAction::OnActionTriggered(bool /*checked*/)
 {
   if (nullptr == m_SemanticRelationsIntegration)
   {

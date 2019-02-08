@@ -90,7 +90,7 @@ void QmitkDataNodeUnlinkFromLesionAction::InitializeAction()
   connect(this, &QAction::triggered, this, &QmitkDataNodeUnlinkFromLesionAction::OnActionTriggered);
 }
 
-void QmitkDataNodeUnlinkFromLesionAction::OnActionTriggered(bool checked)
+void QmitkDataNodeUnlinkFromLesionAction::OnActionTriggered(bool /*checked*/)
 {
   if (nullptr == m_SemanticRelationsIntegration)
   {

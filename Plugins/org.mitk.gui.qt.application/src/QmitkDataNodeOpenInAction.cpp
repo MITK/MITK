@@ -82,7 +82,7 @@ void QmitkDataNodeOpenInAction::OnMenuAboutToShow()
   }
 }
 
-void QmitkDataNodeOpenInAction::OnActionTriggered(bool checked)
+void QmitkDataNodeOpenInAction::OnActionTriggered(bool /*checked*/)
 {
   auto dataNode = GetSelectedNode();
   if (dataNode.IsNull())

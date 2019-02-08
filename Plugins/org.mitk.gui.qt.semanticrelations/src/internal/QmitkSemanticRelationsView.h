@@ -60,7 +60,7 @@ protected:
   virtual void CreateQtPartControl(QWidget* parent) override;
 
   virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
-  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart*) override { }
 
 private Q_SLOTS:
 

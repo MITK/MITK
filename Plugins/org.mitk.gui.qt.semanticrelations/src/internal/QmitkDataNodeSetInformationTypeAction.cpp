@@ -55,7 +55,7 @@ void QmitkDataNodeSetInformationTypeAction::InitializeAction()
   connect(this, &QAction::triggered, this, &QmitkDataNodeSetInformationTypeAction::OnActionTriggered);
 }
 
-void QmitkDataNodeSetInformationTypeAction::OnActionTriggered(bool checked)
+void QmitkDataNodeSetInformationTypeAction::OnActionTriggered(bool /*checked*/)
 {
   if (nullptr == m_SemanticRelationsIntegration)
   {

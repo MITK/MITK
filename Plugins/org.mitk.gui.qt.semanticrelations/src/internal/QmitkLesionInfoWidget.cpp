@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRelationStorage.h>
 
 // registration ontology module
-#include <mitkLesionPropagation.h>
+//#include <mitkLesionPropagation.h>
 
 // qt
 #include <QCompleter>
@@ -135,7 +135,7 @@ void QmitkLesionInfoWidget::OnAddLesionButtonClicked()
   }
 }
 
-void QmitkLesionInfoWidget::OnSelectionChanged(const QModelIndex& current, const QModelIndex& previous)
+void QmitkLesionInfoWidget::OnSelectionChanged(const QModelIndex& current, const QModelIndex& /*previous*/)
 {
   // only the UID is needed to identify a representing lesion
   QVariant data = m_StorageModel->data(current, Qt::UserRole);
@@ -399,8 +399,10 @@ void QmitkLesionInfoWidget::OnPropagateLesion(mitk::SemanticTypes::Lesion select
 
   try
   {
+    /*
     auto allSegmentationsOfLesion = m_SemanticRelationsDataStorageAccess->GetAllSegmentationsOfLesion(m_CaseID, selectedLesion);
     mitk::FindClosestSegmentationMask();
+    */
   }
   catch (const mitk::SemanticRelationException& e)
   {

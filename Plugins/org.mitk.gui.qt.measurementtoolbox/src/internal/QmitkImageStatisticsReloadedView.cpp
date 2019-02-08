@@ -150,7 +150,10 @@ void QmitkImageStatisticsReloadedView::OnImageSelectorChanged()
       //prevent triggering of computation as the predicate triggers a signalChanged event
       m_Controls.maskImageSelector->disconnect();
       m_Controls.maskImageSelector->SetPredicate(isMaskOrPlanarFigureWithGeometryPredicate);
+      //reset mask to <none>
       m_Controls.maskImageSelector->SetZeroEntryText("<none>");
+      m_selectedMaskNode = nullptr;
+      m_Controls.widget_statistics->SetMaskNodes({});
       CalculateOrGetStatistics();
       m_Controls.widget_statistics->SetImageNodes({ m_selectedImageNode.GetPointer() });
       connect(this->m_Controls.maskImageSelector,

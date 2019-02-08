@@ -82,6 +82,8 @@ namespace mitk
     itk::BinaryThresholdImageFilter<itk::Image<float, 3>, SegmentationType>::Pointer m_ThresholdFilter;
 
     int m_Radius;
+    float m_MinSpacing;
+    itk::Vector<float, 3> m_ImageSpacing;
     int m_Sensitivity;
 
     ContourModel::Pointer m_MasterContour;

@@ -7,6 +7,7 @@
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 
+#include <itkIntensityWindowingImageFilter.h>
 #include <itkPasteImageFilter.h>
 #include <itkRescaleIntensityImageFilter.h>
 
@@ -304,8 +305,12 @@ void mitk::SmartBrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
   ContourModel::VertexIterator it = m_MasterContour->Begin();
   ContourModel::VertexIterator end = m_MasterContour->End();
 
+  auto planeSpacing = planeGeometry->GetSpacing();
+
   while (it != end) {
     Point3D point = (*it)->Coordinates;
+    point[0] /= planeSpacing[0] / m_MinSpacing;
+    point[1] /= planeSpacing[1] / m_MinSpacing;
     point[0] += indexCoordinates[0];
     point[1] += indexCoordinates[1];
 
@@ -361,7 +366,8 @@ void mitk::SmartBrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
     auto smartBrushStrokeFilter = dynamic_cast<SmartBrushStrokeFilter<InternalImageType>*>(m_SmartBrushStrokeFilter.GetPointer());
     smartBrushStrokeFilter->SetInput(m_StrokeBuffer);
     smartBrushStrokeFilter->SetOriginalImage(m_OriginalImage);
-    smartBrushStrokeFilter->SetRadius(m_Radius);
+    smartBrushStrokeFilter->SetImageSpacing(m_ImageSpacing);
+    smartBrushStrokeFilter->SetRadius(m_Radius * m_MinSpacing);
     InternalImageType::IndexType targetIndex;
     if (m_IsReferencePointSet) {
       Point3D pointIndexCoordinates;
@@ -441,19 +447,45 @@ void mitk::SmartBrushTool::CheckIfCurrentSliceHasChanged(const mitk::PlaneGeomet
 
     m_WorkingImage = image;
 
+    SegmentationType::Pointer origSegmentation = SegmentationType::New();
+    mitk::CastToItkImage(m_WorkingImage, origSegmentation);
+
+    using SegInputFilterType = itk::BinaryThresholdImageFilter<SegmentationType, itk::Image<float, 3>>;
+    SegInputFilterType::Pointer inputThresholdFilter = SegInputFilterType::New();
+    inputThresholdFilter->SetLowerThreshold(1);
+    inputThresholdFilter->SetUpperThreshold(1000);
+    inputThresholdFilter->SetInsideValue(1.f);
+    inputThresholdFilter->SetOutsideValue(0.f);
+    inputThresholdFilter->SetInput(origSegmentation);
+    inputThresholdFilter->UpdateLargestPossibleRegion();
+    m_StrokeBuffer = inputThresholdFilter->GetOutput();
+
     m_OriginalImage = InternalImageType::New();
     mitk::CastToItkImage(referenceImage, m_OriginalImage);
 
-    using RescaleFilter = itk::RescaleIntensityImageFilter<InternalImageType, InternalImageType>;
+    mitk::LevelWindow levelWindow;
+    refNode->GetLevelWindow(levelWindow);
+
+    using RescaleFilter = itk::IntensityWindowingImageFilter<InternalImageType, InternalImageType>;
+    RescaleFilter::Pointer rescaleFilter = RescaleFilter::New();
+    rescaleFilter->SetInput(m_OriginalImage);
+    rescaleFilter->SetOutputMinimum(0.f);
+    rescaleFilter->SetOutputMaximum(1.f);
+    rescaleFilter->SetWindowMinimum(levelWindow.GetLowerWindowBound());
+    rescaleFilter->SetWindowMaximum(levelWindow.GetUpperWindowBound());
+    rescaleFilter->SetInPlace(true);
+    rescaleFilter->Update();
+    m_OriginalImage = rescaleFilter->GetOutput();
+
+    // Uncomment to use min max scaling
+    /*using RescaleFilter = itk::RescaleIntensityImageFilter<InternalImageType, InternalImageType>;
     RescaleFilter::Pointer rescaleFilter = RescaleFilter::New();
     rescaleFilter->SetInput(m_OriginalImage);
     rescaleFilter->SetOutputMinimum(0.f);
     rescaleFilter->SetOutputMaximum(1.f);
     rescaleFilter->SetInPlace(true);
     rescaleFilter->Update();
-    m_OriginalImage = rescaleFilter->GetOutput();
-
-    m_StrokeBuffer = itk::Image<float, 3>::New();
+    m_OriginalImage = rescaleFilter->GetOutput();*/
 
     itk::Image<float, 3>::IndexType start;
     start.Fill(0);
@@ -464,13 +496,17 @@ void mitk::SmartBrushTool::CheckIfCurrentSliceHasChanged(const mitk::PlaneGeomet
     region.SetSize(size);
     region.SetIndex(start);
 
-    m_StrokeBuffer->SetRegions(region);
-    m_StrokeBuffer->Allocate();
-    m_StrokeBuffer->FillBuffer(0.f);
-
     auto command = itk::ReceptorMemberCommand<SmartBrushTool>::New();
     command->SetCallbackFunction(this, &SmartBrushTool::OnToolManagerImageModified);
     m_ImageObserverTag = m_WorkingImage->AddObserver(itk::ModifiedEvent(), command);
+
+    auto spacing = referenceImage->GetSlicedGeometry()->GetSpacing();
+    m_MinSpacing = std::min(abs(spacing[0]), abs(spacing[1]));
+    m_MinSpacing = std::min(m_MinSpacing, (float)abs(spacing[2]));
+
+    m_ImageSpacing[0] = spacing[0];
+    m_ImageSpacing[1] = spacing[1];
+    m_ImageSpacing[2] = spacing[2];
   }
 
   if (m_CurrentPlane.IsNull() || m_WorkingSlice.IsNull()) {

@@ -477,32 +477,3 @@ bool mitk::SemanticRelationsInference::SpecificImageExists(const SemanticTypes::
   // if the vector of intersecting image IDs is empty no image exists for the given information type and control point
   return !allImageIDsIntersection.empty();
 }
-
-void mitk::SemanticRelationsInference::ClearControlPoints(const SemanticTypes::CaseID& caseID)
-{
-  SemanticTypes::ControlPointVector allControlPointsOfCase = RelationStorage::GetAllControlPointsOfCase(caseID);
-
-  std::vector<std::string> allImageIDsVectorValue = RelationStorage::GetAllImageIDsOfCase(caseID);
-  SemanticTypes::ControlPointVector referencedControlPoints;
-  for (const auto& imageID : allImageIDsVectorValue)
-  {
-    auto controlPointOfImage = RelationStorage::GetControlPointOfImage(caseID, imageID);
-    referencedControlPoints.push_back(controlPointOfImage);
-  }
-
-  std::sort(allControlPointsOfCase.begin(), allControlPointsOfCase.end());
-  std::sort(referencedControlPoints.begin(), referencedControlPoints.end());
-
-  SemanticTypes::ControlPointVector nonReferencedControlPoints;
-  std::set_difference(allControlPointsOfCase.begin(), allControlPointsOfCase.end(),
-                      referencedControlPoints.begin(), referencedControlPoints.end(),
-                      std::inserter(nonReferencedControlPoints, nonReferencedControlPoints.begin()));
-
-  auto allExaminationPeriods = RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
-  for (const auto& controlPoint : nonReferencedControlPoints)
-  {
-    const auto& examinationPeriod = FindExaminationPeriod(controlPoint, allExaminationPeriods);
-    RelationStorage::RemoveControlPointFromExaminationPeriod(caseID, controlPoint, examinationPeriod);
-    RelationStorage::RemoveControlPointFromCase(caseID, controlPoint);
-  }
-}

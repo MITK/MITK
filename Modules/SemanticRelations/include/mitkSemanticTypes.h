@@ -35,7 +35,7 @@ namespace mitk
   namespace SemanticTypes
   {
     using ID = std::string;
-    using CaseID = std::string; // an ID of the current case (e.g. the DICOM PatientID)
+    using CaseID = std::string;
     using InformationType = std::string;
 
     /*

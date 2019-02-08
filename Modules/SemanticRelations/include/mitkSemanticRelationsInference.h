@@ -285,14 +285,6 @@ namespace mitk
     * @return                 True, if the given control point contains data that is related to the given information type; false otherwise.
     */
     MITKSEMANTICRELATIONS_EXPORT bool SpecificImageExists(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType, const SemanticTypes::ControlPoint& controlPoint);
-    /**
-    * @brief Remove all control points from the storage that are not referenced by any image anymore.
-    *        This might happen if an image has been removed (and unlinked from the corresponding control point)
-    *        or if the user sets a new control point for an image manually in the GUI.
-    *
-    * @param caseID   The current case identifier is defined by the given string.
-    */
-    MITKSEMANTICRELATIONS_EXPORT void ClearControlPoints(const SemanticTypes::CaseID& caseID);
 
   } // namespace SemanticRelationsInference
 } // namespace mitk

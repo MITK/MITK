@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKSEMANTICRELATIONEXCEPTION_H
 
 // mitk core
-#include <mitkException.h>
+#include <mitkExceptionMacro.h>
 
 namespace mitk
 {

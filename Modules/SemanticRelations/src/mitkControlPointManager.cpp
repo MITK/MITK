@@ -121,7 +121,7 @@ mitk::SemanticTypes::ControlPoint mitk::FindClosestControlPoint(const SemanticTy
   }
 
   int THRESHOLD_DISTANCE_IN_DAYS = 30;
-  if (closestDistanceInDays < THRESHOLD_DISTANCE_IN_DAYS)
+  if (closestDistanceInDays <= THRESHOLD_DISTANCE_IN_DAYS)
   {
     return closestControlPoint;
   }

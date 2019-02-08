@@ -29,24 +29,25 @@ namespace mitk
     MITKSEMANTICRELATIONS_EXPORT SemanticTypes::LesionVector GetAllLesionsOfCase(const SemanticTypes::CaseID& caseID);
     SemanticTypes::Lesion GetLesionOfSegmentation(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID);
 
-    SemanticTypes::ControlPoint GetControlPointOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
     MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ControlPointVector GetAllControlPointsOfCase(const SemanticTypes::CaseID& caseID);
+    SemanticTypes::ControlPoint GetControlPointOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
 
     MITKSEMANTICRELATIONS_EXPORT SemanticTypes::ExaminationPeriodVector GetAllExaminationPeriodsOfCase(const SemanticTypes::CaseID& caseID);
 
-    SemanticTypes::InformationType GetInformationTypeOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
     MITKSEMANTICRELATIONS_EXPORT SemanticTypes::InformationTypeVector GetAllInformationTypesOfCase(const SemanticTypes::CaseID& caseID);
+    SemanticTypes::InformationType GetInformationTypeOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
 
-    SemanticTypes::IDVector GetAllImageIDsOfCase(const SemanticTypes::CaseID& caseID);
-    SemanticTypes::IDVector GetAllImageIDsOfControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
-    SemanticTypes::IDVector GetAllImageIDsOfInformationType(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType);
-    SemanticTypes::IDVector GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID);
-    SemanticTypes::IDVector GetAllSegmentationIDsOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
-    SemanticTypes::IDVector GetAllSegmentationIDsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
+    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::IDVector GetAllImageIDsOfCase(const SemanticTypes::CaseID& caseID);
+    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::IDVector GetAllImageIDsOfControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
+    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::IDVector GetAllImageIDsOfInformationType(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType);
+    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::IDVector GetAllSegmentationIDsOfCase(const SemanticTypes::CaseID& caseID);
+    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::IDVector GetAllSegmentationIDsOfImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
+    MITKSEMANTICRELATIONS_EXPORT SemanticTypes::IDVector GetAllSegmentationIDsOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion);
 
     SemanticTypes::ID GetImageIDOfSegmentation(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& segmentationID);
 
     MITKSEMANTICRELATIONS_EXPORT std::vector<SemanticTypes::CaseID> GetAllCaseIDs();
+    MITKSEMANTICRELATIONS_EXPORT bool InstanceExists(const SemanticTypes::CaseID& caseID);
 
     void AddCase(const SemanticTypes::CaseID& caseID);
     void AddImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
@@ -64,16 +65,16 @@ namespace mitk
     void AddControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
     void LinkImageToControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID, const SemanticTypes::ControlPoint& controlPoint);
     void UnlinkImageFromControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
-    void RemoveControlPointFromCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
+    void RemoveControlPoint(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint);
 
     void AddExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod& examinationPeriod);
     void AddControlPointToExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ExaminationPeriod& examinationPeriod);
     void RemoveControlPointFromExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::ExaminationPeriod& examinationPeriod);
-    void RemoveExaminationPeriodFromCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod& examinationPeriod);
+    void RemoveExaminationPeriod(const SemanticTypes::CaseID& caseID, const SemanticTypes::ExaminationPeriod& examinationPeriod);
 
     void AddInformationTypeToImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID, const SemanticTypes::InformationType& informationType);
     void RemoveInformationTypeFromImage(const SemanticTypes::CaseID& caseID, const SemanticTypes::ID& imageID);
-    void RemoveInformationTypeFromCase(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType);
+    void RemoveInformationType(const SemanticTypes::CaseID& caseID, const SemanticTypes::InformationType& informationType);
 
   } // namespace RelationStorage
 } // namespace mitk

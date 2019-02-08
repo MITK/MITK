@@ -398,7 +398,7 @@ void mitk::SemanticRelationsIntegration::RemoveInformationTypeFromImage(const Da
   }
 
   // given information type was not referred by any other image of the case -> the information type can be removed from the case
-  RelationStorage::RemoveInformationTypeFromCase(caseID, originalInformationType);
+  RelationStorage::RemoveInformationType(caseID, originalInformationType);
 }
 
 /************************************************************************/
@@ -437,6 +437,6 @@ void mitk::SemanticRelationsIntegration::ClearControlPoints(const SemanticTypes:
   {
     const auto& examinationPeriod = FindExaminationPeriod(controlPoint, allExaminationPeriods);
     RelationStorage::RemoveControlPointFromExaminationPeriod(caseID, controlPoint, examinationPeriod);
-    RelationStorage::RemoveControlPointFromCase(caseID, controlPoint);
+    RelationStorage::RemoveControlPoint(caseID, controlPoint);
   }
 }

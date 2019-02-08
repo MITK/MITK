@@ -25,7 +25,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 // c++
 #include <algorithm>
 
-mitk::SemanticTypes::ControlPoint GetControlPointFromString(const std::string& dateAsString);
+mitk::SemanticTypes::ControlPoint GetControlPointFromString(const std::string& dateAsString)
+{
+  // date expected to be YYYYMMDD (8 characters)
+  if (dateAsString.size() != 8)
+  {
+    // string does not represent a DICOM date
+    mitkThrowException(mitk::SemanticRelationException) << "Not a valid DICOM date format.";
+  }
+
+  mitk::SemanticTypes::ControlPoint controlPoint;
+  controlPoint.SetDateFromString(dateAsString);
+
+  return controlPoint;
+}
 
 mitk::SemanticTypes::CaseID mitk::GetCaseIDFromDataNode(const mitk::DataNode* dataNode)
 {
@@ -100,7 +113,18 @@ mitk::SemanticTypes::ControlPoint mitk::GetDICOMDateFromDataNode(const mitk::Dat
     mitkThrowException(SemanticRelationException) << "Not a valid DICOM property.";
   }
   std::string acquisitionDateAsString = acquisitionDateProperty->GetValueAsString();
-  return GetControlPointFromString(acquisitionDateAsString);
+
+  SemanticTypes::ControlPoint controlPoint;
+  try
+  {
+    controlPoint = GetControlPointFromString(acquisitionDateAsString);
+  }
+  catch (SemanticRelationException &e)
+  {
+    mitkReThrow(e) << "Cannot retrieve a valid DICOM date.";
+  }
+
+  return controlPoint;
 }
 
 mitk::SemanticTypes::InformationType mitk::GetDICOMModalityFromDataNode(const mitk::DataNode* dataNode)
@@ -143,19 +167,4 @@ std::string mitk::TrimDICOM(const std::string& identifier)
   // trailing whitespace
   std::size_t last = identifier.find_last_not_of(' ');
   return identifier.substr(first, last - first + 1);
-}
-
-mitk::SemanticTypes::ControlPoint GetControlPointFromString(const std::string& dateAsString)
-{
-  // date expected to be YYYYMMDD (8 characters)
-  if (dateAsString.size() != 8)
-  {
-    // string does not represent a DICOM date
-    return mitk::SemanticTypes::ControlPoint();
-  }
-
-  mitk::SemanticTypes::ControlPoint controlPoint;
-  controlPoint.SetDateFromString(dateAsString);
-
-  return controlPoint;
 }

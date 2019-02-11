@@ -212,10 +212,6 @@ void mitk::GPUVolumeMapper3D::setClippingPlanes(vtkPlanes* planes)
 {
   if (planes) {
     m_Clipping = true;
-    //if (m_ClippingPlanes) {
-    //  m_ClippingPlanes->Delete();
-    //}
-    //m_ClippingPlanes = vtkPlanes::New();
     if (m_ClippingPlanes == nullptr) {
       m_ClippingPlanes = vtkPlanes::New();
     }

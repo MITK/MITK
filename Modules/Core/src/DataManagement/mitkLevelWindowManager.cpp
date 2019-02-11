@@ -32,7 +32,7 @@ mitk::LevelWindowManager::LevelWindowManager()
   : m_DataStorage(nullptr)
   , m_LevelWindowProperty(nullptr)
   , m_AutoTopMost(true)
-  , m_SelectedImages(false)
+  , m_SelectedImagesMode(false)
   , m_IsObserverTagSet(false)
   , m_CurrentImage(nullptr)
   , m_IsPropertyModifiedTagSet(false)
@@ -99,7 +99,7 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const DataN
   }
 
   // deactivate other mode
-  m_SelectedImages = false;
+  m_SelectedImagesMode = false;
 
   if (m_IsPropertyModifiedTagSet && m_LevelWindowProperty.IsNotNull())
   {
@@ -110,7 +110,7 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const DataN
   // find topmost image in the data storage
   if (m_DataStorage.IsNull())
   {
-    itkExceptionMacro("DataStorage not set");
+    mitkThrow() << "DataStorage not set";
   }
 
   DataNode::Pointer topLevelNode;
@@ -118,11 +118,11 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const DataN
   m_LevelWindowProperty = nullptr;
   m_CurrentImage = nullptr;
 
-  DataStorage::SetOfObjects::ConstPointer all = GetRelevantNodes();
+  DataStorage::SetOfObjects::ConstPointer all = this->GetRelevantNodes();
   for (DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
     DataNode::Pointer node = it->Value();
-    if (node.IsNull() || (removedNode != nullptr && node == removedNode))
+    if (node.IsNull() || node == removedNode)
     {
       continue;
     }
@@ -131,7 +131,7 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const DataN
     node->SetBoolProperty("imageForLevelWindow", false);
     m_LevelWindowMutex = false;
 
-    if (node->IsVisible(nullptr) == false)
+    if (false == node->IsVisible(nullptr))
     {
       continue;
     }
@@ -143,50 +143,30 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const DataN
       continue;
     }
 
-    LevelWindowProperty::Pointer levelWindowProperty =
-      dynamic_cast<LevelWindowProperty *>(node->GetProperty("levelwindow"));
-    if (levelWindowProperty.IsNull())
+    bool ignore = this->IgnoreNode(node);
+    if (ignore)
     {
       continue;
     }
 
-    int nonLvlWinMode1 = RenderingModeProperty::LOOKUPTABLE_COLOR;
-    int nonLvlWinMode2 = RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR;
-
-    RenderingModeProperty::Pointer mode =
-      dynamic_cast<RenderingModeProperty *>(node->GetProperty("Image Rendering.Mode"));
-
-    if (mode.IsNotNull())
-    {
-      int currMode = mode->GetRenderingMode();
-      if (currMode == nonLvlWinMode1 || currMode == nonLvlWinMode2)
-      {
-        continue;
-      }
-    }
-    else
-    {
-      continue;
-    }
-
-    m_LevelWindowProperty = levelWindowProperty;
+    m_LevelWindowProperty = dynamic_cast<LevelWindowProperty*>(node->GetProperty("levelwindow"));
     topLevelNode = node;
     maxVisibleLayer = layer;
   }
 
   // this will set the "imageForLevelWindow" property and the 'm_CurrentImage' and call 'Modified()'
-  SetLevelWindowProperty(m_LevelWindowProperty);
+  this->SetLevelWindowProperty(m_LevelWindowProperty);
 
   if (m_LevelWindowProperty.IsNull())
   {
-    Modified();
+    this->Modified();
   }
 }
 
-void mitk::LevelWindowManager::SetSelectedImages(bool selectedImages, const DataNode *removedNode/* = nullptr*/)
+void mitk::LevelWindowManager::SetSelectedImages(bool selectedImagesMode, const DataNode *removedNode/* = nullptr*/)
 {
-  m_SelectedImages = selectedImages;
-  if (false == m_SelectedImages)
+  m_SelectedImagesMode = selectedImagesMode;
+  if (false == m_SelectedImagesMode)
   {
     return;
   }
@@ -203,14 +183,14 @@ void mitk::LevelWindowManager::SetSelectedImages(bool selectedImages, const Data
   // find selected images in the data storage
   if (m_DataStorage.IsNull())
   {
-    itkExceptionMacro("DataStorage not set");
+    mitkThrow() << "DataStorage not set";
   }
 
   DataNode::Pointer lastSelectedNode;
   m_LevelWindowProperty = nullptr;
   m_CurrentImage = nullptr;
 
-  DataStorage::SetOfObjects::ConstPointer all = GetRelevantNodes();
+  DataStorage::SetOfObjects::ConstPointer all = this->GetRelevantNodes();
   for (DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
     DataNode::Pointer node = it->Value();
@@ -223,49 +203,28 @@ void mitk::LevelWindowManager::SetSelectedImages(bool selectedImages, const Data
     node->SetBoolProperty("imageForLevelWindow", false);
     m_LevelWindowMutex = false;
 
-    bool selected = node->IsSelected();
-    if (false == selected)
+    if (false == node->IsSelected())
     {
       continue;
     }
 
-    LevelWindowProperty::Pointer levelWindowProperty =
-      dynamic_cast<LevelWindowProperty *>(node->GetProperty("levelwindow"));
-    if (levelWindowProperty.IsNull())
+    bool ignore = this->IgnoreNode(node);
+    if (ignore)
     {
       continue;
     }
 
-    int nonLvlWinMode1 = RenderingModeProperty::LOOKUPTABLE_COLOR;
-    int nonLvlWinMode2 = RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR;
-
-    RenderingModeProperty::Pointer mode =
-      dynamic_cast<RenderingModeProperty *>(node->GetProperty("Image Rendering.Mode"));
-
-    if (mode.IsNotNull())
-    {
-      int currMode = mode->GetRenderingMode();
-      if (currMode == nonLvlWinMode1 || currMode == nonLvlWinMode2)
-      {
-        continue;
-      }
-    }
-    else
-    {
-      continue;
-    }
-
-    m_LevelWindowProperty = levelWindowProperty;
+    m_LevelWindowProperty = dynamic_cast<LevelWindowProperty*>(node->GetProperty("levelwindow"));
     m_RelevantDataNodes.push_back(node);
     lastSelectedNode = node;
   }
 
   // this will set the "imageForLevelWindow" property and the 'm_CurrentImage' and call 'Modified()'
-  SetLevelWindowProperty(m_LevelWindowProperty);
+  this->SetLevelWindowProperty(m_LevelWindowProperty);
 
   if (m_LevelWindowProperty.IsNull())
   {
-    Modified();
+    this->Modified();
   }
 }
 
@@ -312,13 +271,13 @@ void mitk::LevelWindowManager::Update(const itk::EventObject &)
   m_RelevantDataNodes.clear();
   if (m_AutoTopMost)
   {
-    SetAutoTopMostImage(true);
+    this->SetAutoTopMostImage(true);
     return;
   }
 
-  if (m_SelectedImages)
+  if (m_SelectedImagesMode)
   {
-    SetSelectedImages(true);
+    this->SetSelectedImages(true);
     return;
   }
 
@@ -326,7 +285,7 @@ void mitk::LevelWindowManager::Update(const itk::EventObject &)
   DataNode::Pointer topLevelNode = nullptr;
   std::vector<DataNode::Pointer> nodesForLevelWindow;
 
-  DataStorage::SetOfObjects::ConstPointer all = GetRelevantNodes();
+  DataStorage::SetOfObjects::ConstPointer all = this->GetRelevantNodes();
   for (DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
     DataNode::Pointer node = it->Value();
@@ -370,12 +329,12 @@ void mitk::LevelWindowManager::Update(const itk::EventObject &)
   if (nodesForLevelWindowSize > 0)
   {
     // 1 or 2 nodes for level window found
-    for (std::vector<DataNode::Pointer>::const_iterator it = nodesForLevelWindow.begin(); it != nodesForLevelWindow.end(); ++it)
+    for (const auto& node : nodesForLevelWindow)
     {
-      LevelWindowProperty::Pointer newProp = dynamic_cast<LevelWindowProperty *>((*it)->GetProperty("levelwindow"));
+      LevelWindowProperty::Pointer newProp = dynamic_cast<LevelWindowProperty *>(node->GetProperty("levelwindow"));
       if (newProp != m_LevelWindowProperty)
       {
-        SetLevelWindowProperty(newProp);
+        this->SetLevelWindowProperty(newProp);
         return;
       }
     }
@@ -383,14 +342,13 @@ void mitk::LevelWindowManager::Update(const itk::EventObject &)
   else if (topLevelNode)
   {
     // no nodes for level window found
-    LevelWindowProperty::Pointer lvlProp =
-      dynamic_cast<LevelWindowProperty *>(topLevelNode->GetProperty("levelwindow"));
-    SetLevelWindowProperty(lvlProp);
+    LevelWindowProperty::Pointer lvlProp = dynamic_cast<LevelWindowProperty *>(topLevelNode->GetProperty("levelwindow"));
+    this->SetLevelWindowProperty(lvlProp);
   }
   else
   {
     // no nodes for level window found and no visible top level node found
-    Modified();
+    this->Modified();
   }
 }
 
@@ -402,9 +360,9 @@ void mitk::LevelWindowManager::UpdateSelected(const itk::EventObject &)
   }
 
   m_RelevantDataNodes.clear();
-  if (m_SelectedImages)
+  if (m_SelectedImagesMode)
   {
-    SetSelectedImages(true);
+    this->SetSelectedImages(true);
   }
 }
 
@@ -494,7 +452,7 @@ const mitk::LevelWindow &mitk::LevelWindowManager::GetLevelWindow()
   }
   else
   {
-    itkExceptionMacro("No LevelWindow available!");
+    mitkThrow() << "No LevelWindow available!";
   }
 }
 
@@ -505,16 +463,16 @@ bool mitk::LevelWindowManager::IsAutoTopMost()
 
 bool mitk::LevelWindowManager::IsSelectedImages()
 {
-  return m_SelectedImages;
+  return m_SelectedImagesMode;
 }
 
 void mitk::LevelWindowManager::DataStorageAddedNode(const DataNode *)
 {
   // update observers with new data storage
-  UpdateObservers();
+  this->UpdateObservers();
 
   // Initialize LevelWindowsManager to new image
-  SetAutoTopMostImage(true);
+  this->SetAutoTopMostImage(true);
 
   // check if everything is still ok
   if ((m_ObserverToVisibleProperty.size() != m_ObserverToLayerProperty.size()) ||
@@ -547,12 +505,12 @@ void mitk::LevelWindowManager::DataStorageRemovedNode(const DataNode *removedNod
   m_NodeMarkedToDelete = removedNode;
 
   // update observers
-  UpdateObservers();
+  this->UpdateObservers();
 
   // search image that belongs to the property
   if (m_LevelWindowProperty.IsNull())
   {
-    SetAutoTopMostImage(true, removedNode);
+    this->SetAutoTopMostImage(true, removedNode);
   }
   else
   {
@@ -561,7 +519,7 @@ void mitk::LevelWindowManager::DataStorageRemovedNode(const DataNode *removedNod
     if (n == nullptr || m_AutoTopMost) // if node was deleted, change our behavior to AutoTopMost, if AutoTopMost is
                                        // true change level window to topmost node
     {
-      SetAutoTopMostImage(true, removedNode);
+      this->SetAutoTopMostImage(true, removedNode);
     }
   }
 
@@ -578,7 +536,7 @@ void mitk::LevelWindowManager::DataStorageRemovedNode(const DataNode *removedNod
 
 void mitk::LevelWindowManager::OnPropertyModified(const itk::EventObject &)
 {
-  Modified();
+  this->Modified();
 }
 
 mitk::Image *mitk::LevelWindowManager::GetCurrentImage()
@@ -625,8 +583,8 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelev
 
 void mitk::LevelWindowManager::UpdateObservers()
 {
-  ClearPropObserverLists();  // remove old observers
-  CreatePropObserverLists(); // create new observer lists
+  this->ClearPropObserverLists();  // remove old observers
+  this->CreatePropObserverLists(); // create new observer lists
 }
 
 void mitk::LevelWindowManager::ClearPropObserverLists()
@@ -678,7 +636,7 @@ void mitk::LevelWindowManager::CreatePropObserverLists()
 {
   if (m_DataStorage.IsNull()) // check if data storage is set
   {
-    itkExceptionMacro("DataStorage not set");
+    mitkThrow() << "DataStorage not set";
   }
 
   /* add observers for all relevant nodes */
@@ -749,4 +707,35 @@ void mitk::LevelWindowManager::CreatePropObserverLists()
     unsigned long selectedIdx = selectedDataNode->AddObserver(itk::ModifiedEvent(), command5);
     m_ObserverToSelectedProperty[PropDataPair(selectedIdx, it->Value())] = it->Value()->GetProperty("selected");
   }
+}
+
+bool mitk::LevelWindowManager::IgnoreNode(const DataNode* dataNode)
+{
+  LevelWindowProperty::Pointer levelWindowProperty =
+    dynamic_cast<LevelWindowProperty*>(dataNode->GetProperty("levelwindow"));
+  if (levelWindowProperty.IsNull())
+  {
+    return true;
+  }
+
+  int nonLvlWinMode1 = RenderingModeProperty::LOOKUPTABLE_COLOR;
+  int nonLvlWinMode2 = RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR;
+
+  RenderingModeProperty::Pointer mode =
+    dynamic_cast<RenderingModeProperty*>(dataNode->GetProperty("Image Rendering.Mode"));
+
+  if (mode.IsNotNull())
+  {
+    int currMode = mode->GetRenderingMode();
+    if (currMode == nonLvlWinMode1 || currMode == nonLvlWinMode2)
+    {
+      return true;
+    }
+  }
+  else
+  {
+    return true;
+  }
+
+  return false;
 }

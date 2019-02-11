@@ -64,6 +64,7 @@ namespace mitk
     /**
     * @brief (Re-)Initialize the LevelWindowManager by setting the topmost image.
     *        Use the removedNode parameter if a node was removed.
+    *
     * @param autoTopMost    Set the topmost layer image to be affected by changes, if true.
     * @param removedNode    A node was removed from the data storage if != nullptr.
     */
@@ -71,10 +72,11 @@ namespace mitk
     /**
     * @brief (Re-)Initialize the LevelWindowManager by setting the selected images.
     *         Use the removedNode parameter if a node was removed.
-    * @param selectedImages  Set the selected images to be affected by changes, if true.
-    * @param removedNode     A node was removed from the data storage if != nullptr.
+    *
+    * @param selectedImagesMode  Set the selected images to be affected by changes, if true.
+    * @param removedNode         A node was removed from the data storage if != nullptr.
     */
-    void SetSelectedImages(bool selectedImages, const DataNode *removedNode = nullptr);
+    void SetSelectedImages(bool selectedImagesMode, const DataNode *removedNode = nullptr);
 
     void RecalculateLevelWindowForSelectedComponent(const itk::EventObject&);
     /**
@@ -158,8 +160,10 @@ namespace mitk
     int GetNumberOfObservers();
 
     /**
-    *  returns all nodes in the DataStorage that have the following properties:
-    *  "visible" == true, "binary" == false, "levelwindow", and DataType == Image
+    * @brief  Returns all nodes in the DataStorage that have the following properties:
+    *   - "binary" == false
+    *   - "levelwindow"
+    *   - DataType == Image / DiffusionImage / TensorImage / OdfImage / ShImage
     */
     DataStorage::SetOfObjects::ConstPointer GetRelevantNodes();
 
@@ -193,12 +197,15 @@ namespace mitk
     void ClearPropObserverLists();
     /// Internal help method to create both lists/maps.
     void CreatePropObserverLists();
+
+    bool IgnoreNode(const DataNode* dataNode);
+
     /// This variable holds a data node which will be deleted from the datastorage immediately
     /// Nullptr, if there is no data node to be deleted.
     const DataNode *m_NodeMarkedToDelete;
 
     bool m_AutoTopMost;
-    bool m_SelectedImages;
+    bool m_SelectedImagesMode;
     unsigned long m_ObserverTag;
     bool m_IsObserverTagSet;
     unsigned long m_PropertyModifiedTag;

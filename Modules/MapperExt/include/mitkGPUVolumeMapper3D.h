@@ -194,6 +194,8 @@ protected:
   };
 
   mitk::LocalStorageHandler<LocalStorage> m_LSH;
+  vtkVolumeMapper* m_CurrentMapper;
+  bool m_Clipping;
 };
 
 } // namespace mitk

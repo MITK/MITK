@@ -196,6 +196,8 @@ mitk::GPUVolumeMapper3D::GPUVolumeMapper3D()
   m_VolumeNULL=0;
   m_commonInitialized=false;
   m_ClippingPlanes = nullptr;
+  m_CurrentMapper = nullptr;
+  m_Clipping = false;
 }
 
 mitk::GPUVolumeMapper3D::~GPUVolumeMapper3D()
@@ -206,11 +208,18 @@ mitk::GPUVolumeMapper3D::~GPUVolumeMapper3D()
 void mitk::GPUVolumeMapper3D::setClippingPlanes(vtkPlanes* planes)
 {
   if (planes) {
+    m_Clipping = true;
     m_ClippingPlanes = vtkSmartPointer<vtkPlanes>::New();
     m_ClippingPlanes->SetPoints(planes->GetPoints());
     m_ClippingPlanes->SetNormals(planes->GetNormals());
   } else {
-    m_ClippingPlanes = nullptr;
+    m_Clipping = false;
+    if (m_ClippingPlanes) {
+      if (m_CurrentMapper) {
+        m_CurrentMapper->RemoveAllClippingPlanes();
+        m_CurrentMapper = nullptr;
+      }
+    }
   }
 }
 
@@ -220,6 +229,7 @@ void mitk::GPUVolumeMapper3D::InitCommon()
     return;
 
   m_UnitSpacingImageFilter = vtkSmartPointer<vtkImageChangeInformation>::New();
+
   m_UnitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
 
   CreateDefaultTransferFunctions();
@@ -374,7 +384,7 @@ void mitk::GPUVolumeMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *rende
   // UpdateTransferFunctions
   UpdateTransferFunctions( renderer );
 
-  if (m_ClippingPlanes) {
+  if (m_Clipping && m_ClippingPlanes) {
     vtkVolumeMapper* activeMapper = nullptr;
     if (ls->m_rayInitialized) {
       activeMapper = ls->m_MapperRAY;
@@ -384,7 +394,8 @@ void mitk::GPUVolumeMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *rende
       activeMapper = ls->m_MapperCPU;
     }
 
-    activeMapper->SetClippingPlanes(m_ClippingPlanes.Get());
+    activeMapper->SetClippingPlanes(m_ClippingPlanes);
+    m_CurrentMapper = activeMapper;
   }
 }
 

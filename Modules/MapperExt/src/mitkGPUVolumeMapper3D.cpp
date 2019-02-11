@@ -53,7 +53,7 @@ VTK_MODULE_INIT(vtkRenderingVolumeOpenGL);
 #include <vtkImageResample.h>
 #include <vtkImplicitPlaneWidget.h>
 #include <vtkAssembly.h>
-
+#include <vtkPlaneCollection.h>
 #include <vtkCubeSource.h>
 #include <vtkPolyDataMapper.h>
 
@@ -196,12 +196,15 @@ mitk::GPUVolumeMapper3D::GPUVolumeMapper3D()
   m_VolumeNULL=0;
   m_commonInitialized=false;
   m_ClippingPlanes = nullptr;
-  m_CurrentMapper = nullptr;
   m_Clipping = false;
 }
 
 mitk::GPUVolumeMapper3D::~GPUVolumeMapper3D()
 {
+  if (m_ClippingPlanes) {
+    m_ClippingPlanes->Delete();
+    m_ClippingPlanes = nullptr;
+  }
   DeinitCommon();
 }
 
@@ -209,17 +212,17 @@ void mitk::GPUVolumeMapper3D::setClippingPlanes(vtkPlanes* planes)
 {
   if (planes) {
     m_Clipping = true;
-    m_ClippingPlanes = vtkSmartPointer<vtkPlanes>::New();
+    //if (m_ClippingPlanes) {
+    //  m_ClippingPlanes->Delete();
+    //}
+    //m_ClippingPlanes = vtkPlanes::New();
+    if (m_ClippingPlanes == nullptr) {
+      m_ClippingPlanes = vtkPlanes::New();
+    }
     m_ClippingPlanes->SetPoints(planes->GetPoints());
     m_ClippingPlanes->SetNormals(planes->GetNormals());
   } else {
     m_Clipping = false;
-    if (m_ClippingPlanes) {
-      if (m_CurrentMapper) {
-        m_CurrentMapper->RemoveAllClippingPlanes();
-        m_CurrentMapper = nullptr;
-      }
-    }
   }
 }
 
@@ -384,18 +387,23 @@ void mitk::GPUVolumeMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *rende
   // UpdateTransferFunctions
   UpdateTransferFunctions( renderer );
 
+  vtkVolumeMapper* activeMapper = nullptr;
+  if (ls->m_rayInitialized) {
+    activeMapper = ls->m_MapperRAY;
+  } else if (ls->m_gpuInitialized) {
+    activeMapper = ls->m_MapperGPU;
+  } else {
+    activeMapper = ls->m_MapperCPU;
+  }
   if (m_Clipping && m_ClippingPlanes) {
-    vtkVolumeMapper* activeMapper = nullptr;
-    if (ls->m_rayInitialized) {
-      activeMapper = ls->m_MapperRAY;
-    } else if (ls->m_gpuInitialized) {
-      activeMapper = ls->m_MapperGPU;
-    } else {
-      activeMapper = ls->m_MapperCPU;
-    }
-
     activeMapper->SetClippingPlanes(m_ClippingPlanes);
-    m_CurrentMapper = activeMapper;
+  } else {
+    if (m_ClippingPlanes) {
+      auto actualPlanes = activeMapper->GetClippingPlanes();
+      if (actualPlanes && actualPlanes->GetNumberOfItems() > 0) {
+        activeMapper->RemoveAllClippingPlanes();
+      }
+    }
   }
 }
 

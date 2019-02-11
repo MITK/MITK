@@ -129,7 +129,7 @@ protected:
   vtkSmartPointer<vtkPiecewiseFunction> m_BinaryGradientTransferFunction;
   vtkSmartPointer<vtkColorTransferFunction> m_BinaryColorTransferFunction;
 
-  vtkSmartPointer<vtkPlanes> m_ClippingPlanes;
+  vtkPlanes* m_ClippingPlanes;
 
   class LocalStorage : public mitk::Mapper::BaseLocalStorage
   {
@@ -194,7 +194,6 @@ protected:
   };
 
   mitk::LocalStorageHandler<LocalStorage> m_LSH;
-  vtkVolumeMapper* m_CurrentMapper;
   bool m_Clipping;
 };
 

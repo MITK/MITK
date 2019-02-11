@@ -15,22 +15,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkLineEditLevelWindowWidget.h"
-#include "QmitkLevelWindowWidgetContextMenu.h"
 
+// mitk core
 #include <mitkRenderingManager.h>
 
+// mitk qt widgets
+#include <QmitkLevelWindowWidgetContextMenu.h>
+
+// qt
 #include <QLayout>
 #include <QLineEdit>
 #include <QValidator>
+
+// itk
 #include <itkCommand.h>
+
+// c++
 #include <limits>
 #include <sstream>
 
-using namespace std;
-
-/**
-* Constructor
-*/
 QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
   m_Manager = mitk::LevelWindowManager::New();
@@ -41,7 +44,7 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget *parent, 
   m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
   m_IsObserverTagSet = true;
 
-  m_Contextmenu = new QmitkLevelWindowWidgetContextMenu(this); // true);
+  m_Contextmenu = new QmitkLevelWindowWidgetContextMenu(this);
 
   auto layout = new QVBoxLayout(this);
   layout->setMargin(0);
@@ -50,15 +53,11 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget *parent, 
   m_LevelInput = new QLineEdit(this);
   m_LevelInput->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
   m_LevelInput->setToolTip("Edit this field to change the center of the levelwindow.");
-  // m_LevelInput->setFrameShape( QLineEdit::LineEditPanel );
-  // m_LevelInput->setFrameShadow( QLineEdit::Sunken );
 
   m_WindowInput = new QLineEdit(this);
   m_WindowInput->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
   m_WindowInput->setToolTip(
     "Edit this field to change the span of the levelwindow. This number describes the whole span around the center.");
-  // m_WindowInput->setFrameShape( QLineEdit::LineEditPanel );
-  // m_WindowInput->setFrameShadow( QLineEdit::Sunken );
 
   layout->addWidget(m_LevelInput);
   layout->addWidget(m_WindowInput);
@@ -68,14 +67,8 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget *parent, 
   connect(m_WindowInput, SIGNAL(editingFinished()), this, SLOT(SetWindowValue()));
 
   // Validator for both LineEdit-widgets, to limit the valid input-range to int.
-  // QValidator* validatorWindowInput = new QIntValidator(1, 20000000, this);
-  QValidator *validatorWindowInput = new QDoubleValidator(0, numeric_limits<double>::max(), 2, this);
+  QValidator *validatorWindowInput = new QDoubleValidator(0, std::numeric_limits<double>::max(), 2, this);
   m_WindowInput->setValidator(validatorWindowInput);
-
-  // QValidator* validatorLevelInput = new QIntValidator(-10000000, 10000000, this);
-  // QValidator* validatorLevelInput = new QDoubleValidator(numeric_limits<double>::min(),
-  // numeric_limits<double>::max(), 2, this);
-  // m_LevelInput->setValidator(validatorLevelInput);
 
   this->hide();
 }
@@ -94,7 +87,6 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject &
   try
   {
     m_LevelWindow = m_Manager->GetLevelWindow();
-    // setValidator();
     QString level;
     QString window;
     if (m_LevelWindow.IsFloatingValues())
@@ -129,7 +121,7 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject &
   }
 }
 
-void QmitkLineEditLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowManager *levelWindowManager)
+void QmitkLineEditLevelWindowWidget::SetLevelWindowManager(mitk::LevelWindowManager *levelWindowManager)
 {
   if (m_IsObserverTagSet)
   {
@@ -152,7 +144,6 @@ void QmitkLineEditLevelWindowWidget::SetDataStorage(mitk::DataStorage *ds)
   m_Manager->SetDataStorage(ds);
 }
 
-// read the levelInput and change level and slider when the button "ENTER" was pressed in the windowInput-LineEdit
 void QmitkLineEditLevelWindowWidget::SetLevelValue()
 {
   double level = m_LevelInput->text().toDouble();
@@ -161,7 +152,6 @@ void QmitkLineEditLevelWindowWidget::SetLevelValue()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-// read the windowInput and change window and slider when the button "ENTER" was pressed in the windowInput-LineEdit
 void QmitkLineEditLevelWindowWidget::SetWindowValue()
 {
   double window = m_WindowInput->text().toDouble();
@@ -172,8 +162,8 @@ void QmitkLineEditLevelWindowWidget::SetWindowValue()
 
 void QmitkLineEditLevelWindowWidget::contextMenuEvent(QContextMenuEvent *)
 {
-  m_Contextmenu->setLevelWindowManager(m_Manager.GetPointer());
-  m_Contextmenu->getContextMenu();
+  m_Contextmenu->SetLevelWindowManager(m_Manager.GetPointer());
+  m_Contextmenu->GetContextMenu();
 }
 
 mitk::LevelWindowManager *QmitkLineEditLevelWindowWidget::GetManager()

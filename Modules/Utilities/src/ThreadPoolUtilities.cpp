@@ -21,16 +21,16 @@ namespace Utilities
     : m_work(boost::in_place<boost::asio::io_service::work>(boost::ref(m_service)))
     , m_id(0)
     , m_count(0)
+    , m_init_size(boost::thread::hardware_concurrency())
   {
-    AddThreads(boost::thread::hardware_concurrency());
   }
 
   ThreadPool::ThreadPool(size_t count)
     : m_work(boost::in_place<boost::asio::io_service::work>(boost::ref(m_service)))
     , m_id(0)
     , m_count(0)
+    , m_init_size(count)
   {
-    AddThreads(count);
   }
 
   ThreadPool::~ThreadPool()
@@ -52,37 +52,62 @@ namespace Utilities
 
   void ThreadPool::Stop()
   {
-    if (!m_work) {
-      return;
+    {
+      const boost::unique_lock<boost::shared_mutex> lock(m_guard);
+      if (!m_work || m_init_size) {
+        return;
+      }
+      m_work = boost::none;
     }
-    m_work = boost::none;
     m_pool.join_all();
   }
 
   void ThreadPool::Reset()
   {
-    if (m_work) {
-      m_work = boost::none;
+    {
+      const boost::unique_lock<boost::shared_mutex> lock(m_guard);
+      if (m_work) {
+        m_work = boost::none;
+      }
+      m_service.stop();
     }
-    m_service.stop();
     m_pool.join_all();
+
+    const boost::unique_lock<boost::shared_mutex> lock(m_guard);
     m_service.reset();
     m_work = boost::in_place<boost::asio::io_service::work>(boost::ref(m_service));
+  }
+
+  void ThreadPool::AddThreadsImpl(size_t count)
+  {
+    for (size_t i = 0; i < count; ++i) {
+      m_pool.create_thread(boost::bind(&boost::asio::io_service::run, &m_service, boost::ref(m_error)));
+    }
   }
 
   void ThreadPool::AddThreads(size_t count)
   {
     const boost::unique_lock<boost::shared_mutex> lock(m_guard);
 
-    for (size_t i = 0; i < count; ++i) {
-      m_pool.create_thread(boost::bind(&boost::asio::io_service::run, &m_service, boost::ref(m_error)));
+    if (m_init_size) {
+      m_init_size += count;
+      return;
     }
+
+    AddThreadsImpl(count);
   }
 
   size_t ThreadPool::Enqueue(const Task& task, TaskPriority priority)
   {
-    if (!m_work) {
-      return 0;
+    {
+      const boost::unique_lock<boost::shared_mutex> lock(m_guard);
+      if (!m_work) {
+        return 0;
+      }
+      if (m_init_size) {
+        m_init_size = 0;
+        AddThreadsImpl(m_init_size);
+      }
     }
 
     UniqueLock lockTask(m_taskGuard);

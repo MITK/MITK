@@ -60,6 +60,8 @@ namespace Utilities
     typedef boost::unique_lock<boost::shared_mutex> UniqueLock;
     typedef boost::shared_lock<boost::shared_mutex> SharedLock;
 
+    void AddThreadsImpl(size_t count);
+
     size_t DoTask();
     template <typename TCheck>
     void Wait(const TCheck& check);
@@ -67,6 +69,7 @@ namespace Utilities
     boost::asio::io_service m_service;
     boost::optional<boost::asio::io_service::work> m_work;
     mutable boost::shared_mutex m_guard;
+    size_t m_init_size;
     boost::thread_group m_pool;
     boost::system::error_code m_error;
 

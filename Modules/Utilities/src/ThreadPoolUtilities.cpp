@@ -105,8 +105,8 @@ namespace Utilities
         return 0;
       }
       if (m_init_size) {
-        m_init_size = 0;
         AddThreadsImpl(m_init_size);
+        m_init_size = 0;
       }
     }
 

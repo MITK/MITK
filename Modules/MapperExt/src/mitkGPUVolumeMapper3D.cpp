@@ -51,10 +51,9 @@ VTK_MODULE_INIT(vtkRenderingVolumeOpenGL);
 #include <vtkImageData.h>
 #include <vtkLODProp3D.h>
 #include <vtkImageResample.h>
-#include <vtkPlane.h>
 #include <vtkImplicitPlaneWidget.h>
 #include <vtkAssembly.h>
-
+#include <vtkPlaneCollection.h>
 #include <vtkCubeSource.h>
 #include <vtkPolyDataMapper.h>
 
@@ -192,31 +191,34 @@ void mitk::GPUVolumeMapper3D::DeinitCPU(mitk::BaseRenderer* renderer)
   ls->m_cpuInitialized=false;
 }
 
-
 mitk::GPUVolumeMapper3D::GPUVolumeMapper3D()
-  : m_ClippingRegionPlanes{ 0, 0, 0, 0, 0, 0 },
-    m_Clipping(false)
 {
   m_VolumeNULL=0;
   m_commonInitialized=false;
+  m_ClippingPlanes = nullptr;
+  m_Clipping = false;
 }
-
 
 mitk::GPUVolumeMapper3D::~GPUVolumeMapper3D()
 {
+  if (m_ClippingPlanes) {
+    m_ClippingPlanes->Delete();
+    m_ClippingPlanes = nullptr;
+  }
   DeinitCommon();
 }
 
-void mitk::GPUVolumeMapper3D::setClipping(bool clipping)
+void mitk::GPUVolumeMapper3D::setClippingPlanes(vtkPlanes* planes)
 {
-  m_Clipping = clipping;
-}
-
-void mitk::GPUVolumeMapper3D::setClippingPlanes(double planes[6])
-{
-  for (int i = 0; i < 6; ++i) {
-    // Cast to int here to overcome possible rounding error, causing low bound be > high bound
-    m_ClippingRegionPlanes[i] = static_cast<int>(planes[i]);
+  if (planes) {
+    m_Clipping = true;
+    if (m_ClippingPlanes == nullptr) {
+      m_ClippingPlanes = vtkPlanes::New();
+    }
+    m_ClippingPlanes->SetPoints(planes->GetPoints());
+    m_ClippingPlanes->SetNormals(planes->GetNormals());
+  } else {
+    m_Clipping = false;
   }
 }
 
@@ -226,6 +228,7 @@ void mitk::GPUVolumeMapper3D::InitCommon()
     return;
 
   m_UnitSpacingImageFilter = vtkSmartPointer<vtkImageChangeInformation>::New();
+
   m_UnitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
 
   CreateDefaultTransferFunctions();
@@ -388,10 +391,16 @@ void mitk::GPUVolumeMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *rende
   } else {
     activeMapper = ls->m_MapperCPU;
   }
-
-  activeMapper->SetCroppingRegionPlanes(m_ClippingRegionPlanes);
-  activeMapper->SetCroppingRegionFlagsToSubVolume();
-  activeMapper->SetCropping(m_Clipping);
+  if (m_Clipping && m_ClippingPlanes) {
+    activeMapper->SetClippingPlanes(m_ClippingPlanes);
+  } else {
+    if (m_ClippingPlanes) {
+      auto actualPlanes = activeMapper->GetClippingPlanes();
+      if (actualPlanes && actualPlanes->GetNumberOfItems() > 0) {
+        activeMapper->RemoveAllClippingPlanes();
+      }
+    }
+  }
 }
 
 void mitk::GPUVolumeMapper3D::GenerateDataGPU( mitk::BaseRenderer *renderer )

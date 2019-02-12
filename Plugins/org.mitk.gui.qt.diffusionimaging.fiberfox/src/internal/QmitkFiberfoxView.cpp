@@ -742,11 +742,11 @@ void QmitkFiberfoxView::UpdateParametersFromGui()
 
     else
     {
-      MITK_WARN << "QmitkFiberfoxView.cpp: Unrecognised parameters.m_Misc.m_MotionVolumesBox: " << m_Parameters.m_Misc.m_MotionVolumesBox;
-      m_Parameters.m_Misc.m_MotionVolumesBox = "random"; // set default.
+      m_Parameters.m_Misc.m_MotionVolumesBox = ""; // set empty.
+      m_Controls->m_MotionVolumesBox->setText("");
       for (unsigned int i=0; i<m_Parameters.m_SignalGen.GetNumVolumes(); i++)
       {
-        m_Parameters.m_SignalGen.m_MotionVolumes.push_back(rand()%2);
+        m_Parameters.m_SignalGen.m_MotionVolumes.push_back(i);
       }
     }
   }

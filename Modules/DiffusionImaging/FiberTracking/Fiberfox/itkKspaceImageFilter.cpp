@@ -49,7 +49,6 @@ namespace itk {
   {
     m_Spike = vcl_complex<ScalarType>(0,0);
     m_SpikeLog = "";
-    m_RotationMatrix = mitk::imv::GetRotationMatrixItk<float>(-m_Rotation[0], -m_Rotation[1], -m_Rotation[2]);
     m_TransX = -m_Translation[0];
     m_TransY = -m_Translation[1];
     m_TransZ = -m_Translation[2];

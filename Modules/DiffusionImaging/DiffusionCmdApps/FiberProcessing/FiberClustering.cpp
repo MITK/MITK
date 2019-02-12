@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
   parser.addArgument("fiber_points", "", mitkCommandLineParser::Int, "Fiber points:", "", 12);
   parser.addArgument("min_fibers", "", mitkCommandLineParser::Int, "Min. fibers per cluster:", "", 1);
   parser.addArgument("max_clusters", "", mitkCommandLineParser::Int, "Max. clusters:", "");
-  parser.addArgument("merge_clusters", "", mitkCommandLineParser::Float, "Merge clusters:", "", -1.0);
+  parser.addArgument("merge_clusters", "", mitkCommandLineParser::Float, "Merge clusters:", "Set to 0 to avoid merging and to -1 to use the original cluster size", -1.0);
   parser.addArgument("output_centroids", "", mitkCommandLineParser::Bool, "Output centroids:", "");
   parser.addArgument("only_centroids", "", mitkCommandLineParser::Bool, "Output only centroids:", "");
   parser.addArgument("merge_centroids", "", mitkCommandLineParser::Bool, "Merge centroids:", "");

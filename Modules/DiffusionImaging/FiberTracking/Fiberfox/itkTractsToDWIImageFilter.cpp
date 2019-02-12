@@ -249,7 +249,7 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
         idft->SetCoilPosition(coilPositions.at(c));
         idft->SetFiberBundle(m_FiberBundle);
         idft->SetTranslation(m_Translations.at(g));
-        idft->SetRotation(m_Rotations.at(g));
+        idft->SetRotationMatrix(m_RotationsInv.at(g));
         idft->SetDiffusionGradientDirection(m_Parameters.m_SignalGen.GetGradientDirection(g));
         if (c==spikeCoil)
           idft->SetSpikesPerSlice(numSpikes);
@@ -640,12 +640,13 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
     else
       m_CompartmentImages.push_back(caster->GetOutput());
 
+    VectorType translation; translation.Fill(0.0);
+    MatrixType rotation; rotation.SetIdentity();
     for (unsigned int g=0; g<m_Parameters.m_SignalGen.GetNumVolumes(); g++)
     {
-      m_Rotation.Fill(0.0);
-      m_Translation.Fill(0.0);
-      m_Rotations.push_back(m_Rotation);
-      m_Translations.push_back(m_Translation);
+      m_Rotations.push_back(rotation);
+      m_RotationsInv.push_back(rotation);
+      m_Translations.push_back(translation);
     }
   }
 
@@ -760,7 +761,7 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
 
   // second upsampling needed for motion artifacts
   ImageRegion<3>      upsampledImageRegion = m_WorkingImageRegion;
-  DoubleVectorType    upsampledSpacing = m_WorkingSpacing;
+  VectorType    upsampledSpacing = m_WorkingSpacing;
   upsampledSpacing[0] /= 4;
   upsampledSpacing[1] /= 4;
   upsampledSpacing[2] /= 4;
@@ -846,7 +847,7 @@ void TractsToDWIImageFilter< PixelType >::InitializeFiberData()
   }
 
   // a second fiber bundle is needed to store the transformed version of the m_FiberBundleWorkingCopy
-  m_FiberBundleTransformed = m_FiberBundle;
+  m_FiberBundleTransformed = m_FiberBundle->GetDeepCopy();
 }
 
 
@@ -1161,8 +1162,8 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
           // get non-transformed point (remove headmotion tranformation)
           // this point lives in the volume fraction image space
-          itk::Point<double, 3> volume_fraction_point;
-          if ( m_Parameters.m_SignalGen.m_DoAddMotion && m_Parameters.m_SignalGen.m_MotionVolumes[g] )
+          itk::Point<float, 3> volume_fraction_point;
+          if ( m_Parameters.m_SignalGen.m_DoAddMotion )
             volume_fraction_point = GetMovedPoint(index, false);
           else
             m_TransformedMaskImage->TransformIndexToPhysicalPoint(index, volume_fraction_point);
@@ -1450,39 +1451,74 @@ void TractsToDWIImageFilter< PixelType >::PrintToLog(std::string m, bool addTime
 template< class PixelType >
 void TractsToDWIImageFilter< PixelType >::SimulateMotion(int g)
 {
+  if ( m_Parameters.m_SignalGen.m_DoAddMotion &&
+       m_Parameters.m_SignalGen.m_DoRandomizeMotion &&
+       g>0 &&
+       m_Parameters.m_SignalGen.m_MotionVolumes[g-1])
+  {
+    // The last volume was randomly moved, so we have to reset to fiberbundle and the mask.
+    // Without motion or with linear motion, we keep the last position --> no reset.
+    m_FiberBundleTransformed = m_FiberBundle->GetDeepCopy();
+
+    if (m_MaskImageSet)
+    {
+      auto duplicator = itk::ImageDuplicator<ItkUcharImgType>::New();
+      duplicator->SetInputImage(m_Parameters.m_SignalGen.m_MaskImage);
+      duplicator->Update();
+      m_TransformedMaskImage = duplicator->GetOutput();
+    }
+  }
+
+  VectorType rotation;
+  VectorType translation;
+
   // is motion artifact enabled?
   // is the current volume g affected by motion?
   if ( m_Parameters.m_SignalGen.m_DoAddMotion
        && m_Parameters.m_SignalGen.m_MotionVolumes[g]
        && g<static_cast<int>(m_Parameters.m_SignalGen.GetNumVolumes()) )
   {
+    // adjust motion transforms
     if ( m_Parameters.m_SignalGen.m_DoRandomizeMotion )
     {
-      // either undo last transform or work on fresh copy of untransformed fibers
-      m_FiberBundleTransformed = m_FiberBundle->GetDeepCopy();
-
-      m_Rotation[0] = m_RandGen->GetVariateWithClosedRange(m_Parameters.m_SignalGen.m_Rotation[0]*2)
+      // randomly
+      rotation[0] = m_RandGen->GetVariateWithClosedRange(m_Parameters.m_SignalGen.m_Rotation[0]*2)
           -m_Parameters.m_SignalGen.m_Rotation[0];
-      m_Rotation[1] = m_RandGen->GetVariateWithClosedRange(m_Parameters.m_SignalGen.m_Rotation[1]*2)
+      rotation[1] = m_RandGen->GetVariateWithClosedRange(m_Parameters.m_SignalGen.m_Rotation[1]*2)
           -m_Parameters.m_SignalGen.m_Rotation[1];
-      m_Rotation[2] = m_RandGen->GetVariateWithClosedRange(m_Parameters.m_SignalGen.m_Rotation[2]*2)
+      rotation[2] = m_RandGen->GetVariateWithClosedRange(m_Parameters.m_SignalGen.m_Rotation[2]*2)
           -m_Parameters.m_SignalGen.m_Rotation[2];
 
-      m_Translation[0] = m_RandGen->GetVariateWithClosedRange(m_Parameters.m_SignalGen.m_Translation[0]*2)
+      translation[0] = m_RandGen->GetVariateWithClosedRange(m_Parameters.m_SignalGen.m_Translation[0]*2)
           -m_Parameters.m_SignalGen.m_Translation[0];
-      m_Translation[1] = m_RandGen->GetVariateWithClosedRange(m_Parameters.m_SignalGen.m_Translation[1]*2)
+      translation[1] = m_RandGen->GetVariateWithClosedRange(m_Parameters.m_SignalGen.m_Translation[1]*2)
           -m_Parameters.m_SignalGen.m_Translation[1];
-      m_Translation[2] = m_RandGen->GetVariateWithClosedRange(m_Parameters.m_SignalGen.m_Translation[2]*2)
+      translation[2] = m_RandGen->GetVariateWithClosedRange(m_Parameters.m_SignalGen.m_Translation[2]*2)
           -m_Parameters.m_SignalGen.m_Translation[2];
+
+      m_FiberBundleTransformed->TransformFibers(rotation[0], rotation[1], rotation[2], translation[0], translation[1], translation[2]);
+
     }
     else
     {
-      m_Rotation = m_Parameters.m_SignalGen.m_Rotation / m_NumMotionVolumes;
-      m_Translation = m_Parameters.m_SignalGen.m_Translation / m_NumMotionVolumes;
+      // linearly
+      rotation = m_Parameters.m_SignalGen.m_Rotation / m_NumMotionVolumes;
+      translation = m_Parameters.m_SignalGen.m_Translation / m_NumMotionVolumes;
       m_MotionCounter++;
-    }
 
-    // move mask image
+      m_FiberBundleTransformed->TransformFibers(rotation[0], rotation[1], rotation[2], translation[0], translation[1], translation[2]);
+
+      rotation *= m_MotionCounter;
+      translation *= m_MotionCounter;
+    }
+    MatrixType rotationMatrix = mitk::imv::GetRotationMatrixItk(rotation[0], rotation[1], rotation[2]);
+    MatrixType rotationMatrixInv = mitk::imv::GetRotationMatrixItk(-rotation[0], -rotation[1], -rotation[2]);
+
+    m_Rotations.push_back(rotationMatrix);
+    m_RotationsInv.push_back(rotationMatrixInv);
+    m_Translations.push_back(translation);
+
+    // move mask image accoring to new transform
     if (m_MaskImageSet)
     {
       ImageRegionIterator<ItkUcharImgType> maskIt(m_UpsampledMaskImage, m_UpsampledMaskImage->GetLargestPossibleRegion());
@@ -1500,98 +1536,70 @@ void TractsToDWIImageFilter< PixelType >::SimulateMotion(int g)
         m_TransformedMaskImage->TransformPhysicalPointToIndex(GetMovedPoint(index, true), index);
 
         if (m_TransformedMaskImage->GetLargestPossibleRegion().IsInside(index))
-          m_TransformedMaskImage->SetPixel(index,100);
+          m_TransformedMaskImage->SetPixel(index, 100);
         ++maskIt;
       }
     }
-
-    if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
-    {
-      m_Rotations.push_back(m_Rotation);
-      m_Translations.push_back(m_Translation);
-
-      m_MotionLog += boost::lexical_cast<std::string>(g) + " rotation: " + boost::lexical_cast<std::string>(m_Rotation[0])
-          + "," + boost::lexical_cast<std::string>(m_Rotation[1])
-          + "," + boost::lexical_cast<std::string>(m_Rotation[2]) + ";";
-
-      m_MotionLog += " translation: " + boost::lexical_cast<std::string>(m_Translation[0])
-          + "," + boost::lexical_cast<std::string>(m_Translation[1])
-          + "," + boost::lexical_cast<std::string>(m_Translation[2]) + "\n";
-    }
-    else
-    {
-      m_Rotations.push_back(m_Rotation*m_MotionCounter);
-      m_Translations.push_back(m_Translation*m_MotionCounter);
-
-      m_MotionLog += boost::lexical_cast<std::string>(g) + " rotation: " + boost::lexical_cast<std::string>(m_Rotation[0]*m_MotionCounter)
-          + "," + boost::lexical_cast<std::string>(m_Rotation[1]*m_MotionCounter)
-          + "," + boost::lexical_cast<std::string>(m_Rotation[2]*m_MotionCounter) + ";";
-
-      m_MotionLog += " translation: " + boost::lexical_cast<std::string>(m_Translation[0]*m_MotionCounter)
-          + "," + boost::lexical_cast<std::string>(m_Translation[1]*m_MotionCounter)
-          + "," + boost::lexical_cast<std::string>(m_Translation[2]*m_MotionCounter) + "\n";
-    }
-
-    m_FiberBundleTransformed->TransformFibers(m_Rotation[0],m_Rotation[1],m_Rotation[2],m_Translation[0],m_Translation[1],m_Translation[2]);
   }
   else
   {
-    m_Rotation.Fill(0.0);
-    m_Translation.Fill(0.0);
-    m_Rotations.push_back(m_Rotation);
-    m_Translations.push_back(m_Translation);
+    if (m_Parameters.m_SignalGen.m_DoAddMotion && !m_Parameters.m_SignalGen.m_DoRandomizeMotion && g>0)
+    {
+      rotation = m_Parameters.m_SignalGen.m_Rotation / m_NumMotionVolumes;
+      rotation *= m_MotionCounter;
+      m_Rotations.push_back(m_Rotations.back());
+      m_RotationsInv.push_back(m_RotationsInv.back());
+      m_Translations.push_back(m_Translations.back());
+    }
+    else
+    {
+      rotation.Fill(0.0);
+      VectorType translation; translation.Fill(0.0);
+      MatrixType rotation_matrix; rotation_matrix.SetIdentity();
 
-    m_MotionLog += boost::lexical_cast<std::string>(g) + " rotation: " + boost::lexical_cast<std::string>(m_Rotation[0])
-        + "," + boost::lexical_cast<std::string>(m_Rotation[1])
-        + "," + boost::lexical_cast<std::string>(m_Rotation[2]) + ";";
-
-    m_MotionLog += " translation: " + boost::lexical_cast<std::string>(m_Translation[0])
-        + "," + boost::lexical_cast<std::string>(m_Translation[1])
-        + "," + boost::lexical_cast<std::string>(m_Translation[2]) + "\n";
+      m_Rotations.push_back(rotation_matrix);
+      m_RotationsInv.push_back(rotation_matrix);
+      m_Translations.push_back(translation);
+    }
   }
-  m_RotationMatrix = mitk::imv::GetRotationMatrixItk(m_Rotation[0], m_Rotation[1], m_Rotation[2]);
-  m_RotationMatrixInv = mitk::imv::GetRotationMatrixItk(-m_Rotation[0], -m_Rotation[1], -m_Rotation[2]);
+
+  if (m_Parameters.m_SignalGen.m_DoAddMotion)
+  {
+    m_MotionLog += boost::lexical_cast<std::string>(g) + " rotation: " + boost::lexical_cast<std::string>(rotation[0])
+        + "," + boost::lexical_cast<std::string>(rotation[1])
+        + "," + boost::lexical_cast<std::string>(rotation[2]) + ";";
+
+    m_MotionLog += " translation: " + boost::lexical_cast<std::string>(m_Translations.back()[0])
+        + "," + boost::lexical_cast<std::string>(m_Translations.back()[1])
+        + "," + boost::lexical_cast<std::string>(m_Translations.back()[2]) + "\n";
+  }
 }
 
 template< class PixelType >
-itk::Point<double, 3> TractsToDWIImageFilter< PixelType >::GetMovedPoint(itk::Index<3>& index, bool forward)
+itk::Point<float, 3> TractsToDWIImageFilter< PixelType >::GetMovedPoint(itk::Index<3>& index, bool forward)
 {
-  itk::Point<double, 3> transformed_point;
+  itk::Point<float, 3> transformed_point;
+  float tx = m_Translations.back()[0];
+  float ty = m_Translations.back()[1];
+  float tz = m_Translations.back()[2];
+
   if (forward)
   {
     m_UpsampledMaskImage->TransformIndexToPhysicalPoint(index, transformed_point);
-    if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
-    {
-      m_FiberBundle->TransformPoint<double>(transformed_point, m_RotationMatrix, m_Translation[0], m_Translation[1], m_Translation[2]);
-    }
-    else
-    {
-      m_FiberBundle->TransformPoint<double>(transformed_point, m_Rotation[0]*m_MotionCounter,m_Rotation[1]*m_MotionCounter,m_Rotation[2]*m_MotionCounter,
-          m_Translation[0]*m_MotionCounter,m_Translation[1]*m_MotionCounter,m_Translation[2]*m_MotionCounter);
-    }
+    m_FiberBundle->TransformPoint<>(transformed_point, m_Rotations.back(), tx, ty, tz);
   }
   else
   {
+    tx *= -1; ty *= -1; tz *= -1;
     m_TransformedMaskImage->TransformIndexToPhysicalPoint(index, transformed_point);
-    if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
-    {
-      double tx = -m_Translation[0];
-      double ty = -m_Translation[1];
-      double tz = -m_Translation[2];
-      m_FiberBundle->TransformPoint<double>( transformed_point, m_RotationMatrixInv, tx, ty, tz );
-    }
-    else
-    {
-      m_FiberBundle->TransformPoint<double>( transformed_point, -m_Rotation[0]*m_MotionCounter, -m_Rotation[1]*m_MotionCounter, -m_Rotation[2]*m_MotionCounter,
-          -m_Translation[0]*m_MotionCounter, -m_Translation[1]*m_MotionCounter, -m_Translation[2]*m_MotionCounter );
-    }
+    m_FiberBundle->TransformPoint<>(transformed_point, m_RotationsInv.back(), tx, ty, tz);
   }
   return transformed_point;
 }
 
 template< class PixelType >
 void TractsToDWIImageFilter< PixelType >::
-SimulateExtraAxonalSignal(ItkUcharImgType::IndexType& index, itk::Point<double, 3>& volume_fraction_point, double intraAxonalVolume, int g)
+SimulateExtraAxonalSignal(ItkUcharImgType::IndexType& index, itk::Point<float, 3>& volume_fraction_point, double intraAxonalVolume, int g)
 {
   int numFiberCompartments = m_Parameters.m_FiberModelList.size();
   int numNonFiberCompartments = m_Parameters.m_NonFiberModelList.size();

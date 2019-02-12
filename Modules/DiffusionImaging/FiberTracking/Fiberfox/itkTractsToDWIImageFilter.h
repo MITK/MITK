@@ -53,10 +53,10 @@ public:
     typedef itk::Image<unsigned char, 3>                                ItkUcharImgType;
     typedef mitk::FiberBundle::Pointer                                  FiberBundleType;
     typedef itk::VectorImage< double, 3 >                               DoubleDwiType;
-    typedef itk::Matrix<double, 3, 3>                                   MatrixType;
+    typedef itk::Matrix<float, 3, 3>                                    MatrixType;
     typedef itk::Image< float, 2 >                                      Float2DImageType;
     typedef itk::Image< vcl_complex< float >, 2 >                       Complex2DImageType;
-    typedef itk::Vector< double,3>                                      DoubleVectorType;
+    typedef itk::Vector< float, 3>                                      VectorType;
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
@@ -108,7 +108,7 @@ protected:
     DoubleDwiType::Pointer SimulateKspaceAcquisition(std::vector< DoubleDwiType::Pointer >& images);
 
     /** Generate signal of non-fiber compartments. */
-    void SimulateExtraAxonalSignal(ItkUcharImgType::IndexType& index, itk::Point<double, 3>& volume_fraction_point, double intraAxonalVolume, int g);
+    void SimulateExtraAxonalSignal(ItkUcharImgType::IndexType& index, itk::Point<float, 3>& volume_fraction_point, double intraAxonalVolume, int g);
 
     /** Move fibers to simulate headmotion */
     void SimulateMotion(int g=-1);
@@ -118,7 +118,7 @@ protected:
     void InitializeData();
     void InitializeFiberData();
 
-    itk::Point<double, 3> GetMovedPoint(itk::Index<3>& index, bool forward);
+    itk::Point<float, 3> GetMovedPoint(itk::Index<3>& index, bool forward);
 
     // input
     mitk::FiberfoxParameters                    m_Parameters;
@@ -152,12 +152,9 @@ protected:
     std::vector< DoubleDwiType::Pointer >       m_CompartmentImages;
     ItkUcharImgType::Pointer                    m_TransformedMaskImage;     ///< copy of mask image (changes for each motion step)
     ItkUcharImgType::Pointer                    m_UpsampledMaskImage;       ///< helper image for motion simulation
-    DoubleVectorType                            m_Rotation;
-    itk::Matrix<double, 3, 3>                   m_RotationMatrix;
-    itk::Matrix<double, 3, 3>                   m_RotationMatrixInv;
-    DoubleVectorType                            m_Translation;
-    std::vector< DoubleVectorType >             m_Rotations;                ///<stores the individual rotation of each volume (needed for k-space simulation to obtain correct frequency map position)
-    std::vector< DoubleVectorType >             m_Translations;             ///<stores the individual translation of each volume (needed for k-space simulation to obtain correct frequency map position)
+    std::vector< MatrixType >                   m_RotationsInv;
+    std::vector< MatrixType >                   m_Rotations;                ///<stores the individual rotation of each volume (needed for k-space simulation to obtain correct frequency map position)
+    std::vector< VectorType >                   m_Translations;             ///<stores the individual translation of each volume (needed for k-space simulation to obtain correct frequency map position)
     double                                      m_mmRadius;
     double                                      m_SegmentVolume;
     bool                                        m_UseRelativeNonFiberVolumeFractions;

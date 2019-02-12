@@ -26,6 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk gui common plugin
 #include <mitkDataNodeSelection.h>
 
+// mitk core
+#include <mitkTemporoSpatialStringProperty.h>
+
 // qt
 #include <QMessageBox>
 
@@ -92,21 +95,23 @@ namespace AddToSemanticRelationsAction
     mitk::DataStorage::SetOfObjects::ConstPointer parentNodes = dataStorage->GetSources(segmentation, mitk::NodePredicates::GetImagePredicate(), false);
 
     // check for already existing, identifying base properties
-    mitk::BaseProperty* caseIDProperty = baseData->GetProperty("DICOM.0010.0010");
-    mitk::BaseProperty* nodeIDProperty = baseData->GetProperty("DICOM.0020.000E");
+    auto caseIDPropertyName = mitk::GetCaseIDDICOMProperty();
+    auto nodeIDPropertyName = mitk::GetNodeIDDICOMProperty();
+    mitk::BaseProperty* caseIDProperty = baseData->GetProperty(caseIDPropertyName.c_str());
+    mitk::BaseProperty* nodeIDProperty = baseData->GetProperty(nodeIDPropertyName.c_str());
     if (nullptr == caseIDProperty || nullptr == nodeIDProperty)
     {
       MITK_INFO << "No DICOM tags for case and node identification found. Transferring DICOM tags from the parent node to the selected segmentation node.";
 
       mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(parentNodes->front());
       mitk::SemanticTypes::ID nodeID = mitk::GetIDFromDataNode(parentNodes->front());
-      // transfer DICOM tags to the segmentation node
-      mitk::StringProperty::Pointer caseIDTag = mitk::StringProperty::New(caseID);
-      baseData->SetProperty("DICOM.0010.0010", caseIDTag); // DICOM tag is "PatientName"
 
-                                                           // add UID to distinguish between different segmentations of the same parent node
-      mitk::StringProperty::Pointer nodeIDTag = mitk::StringProperty::New(nodeID + mitk::UIDGeneratorBoost::GenerateUID());
-      baseData->SetProperty("DICOM.0020.000E", nodeIDTag); // DICOM tag is "SeriesInstanceUID"
+      // transfer DICOM tags to the segmentation node
+      baseData->SetProperty(caseIDPropertyName,
+        mitk::TemporoSpatialStringProperty::New(caseID));
+      // add UID to distinguish between different segmentations of the same parent node
+      baseData->SetProperty(nodeIDPropertyName,
+        mitk::TemporoSpatialStringProperty::New(nodeID + mitk::UIDGeneratorBoost::GenerateUID()));
     }
 
     try

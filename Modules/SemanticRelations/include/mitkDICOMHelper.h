@@ -38,6 +38,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 namespace mitk
 {
+  /**
+  * @brief Creates a property name for a DICOM tag.
+  *        The tag is "0x0010, 0x0010" (PatientName)
+  */
+  MITKSEMANTICRELATIONS_EXPORT std::string GetCaseIDDICOMProperty();
+  /**
+  * @brief Creates a property name for a DICOM tag.
+  *        The tag is "0x0020, 0x000e" (SeriesInstanceUID)
+  */
+  MITKSEMANTICRELATIONS_EXPORT std::string GetNodeIDDICOMProperty();
+  /**
+  * @brief Creates a property name for a DICOM tag.
+  *        The tag is "0x0008, 0x0022" (AcquisitionDate)
+  */
+  MITKSEMANTICRELATIONS_EXPORT std::string GetDateDICOMProperty();
+  /**
+  * @brief Creates a property name for a DICOM tag.
+  *        The tag is "0x0008, 0x0060" (Modality)
+  */
+  MITKSEMANTICRELATIONS_EXPORT std::string GetModalityDICOMProperty();
   /*
   * @brief  Extracts a specific DICOM tag from the node's base data
   *         and returns the tag as a string. This tag string is used as an identifier for the patient (case).

@@ -12,7 +12,8 @@ mitkCrosshairManager::mitkCrosshairManager(const QString& parentWidget) :
   m_ShowPlanesIn3d(true),
   m_ShowPlanesIn3dWithoutCursor(true),
   m_SingleDataStorage(false),
-  m_ParentWidget(parentWidget)
+  m_ParentWidget(parentWidget),
+  m_OverwriteCrosshairMode(nullptr)
 {
   m_CrosshairPredicate = mitk::NodePredicateProperty::New("crosshair", mitk::BoolProperty::New(true));
 
@@ -46,6 +47,16 @@ void mitkCrosshairManager::setCrosshairMode(CrosshairMode mode)
 CrosshairMode mitkCrosshairManager::getCrosshairMode()
 {
   return m_CrosshairMode;
+}
+
+void mitkCrosshairManager::setOverwriteCrosshairMode(CrosshairMode* mode)
+{
+  m_OverwriteCrosshairMode = mode;
+}
+
+CrosshairMode* mitkCrosshairManager::getOverwriteCrosshairMode()
+{
+  return m_OverwriteCrosshairMode;
 }
 
 void mitkCrosshairManager::addWindow(QmitkRenderWindow* window)
@@ -236,7 +247,12 @@ void mitkCrosshairManager::addPointCrosshair(QmitkRenderWindow* window)
 
 void mitkCrosshairManager::addCrosshair(QmitkRenderWindow* window)
 {
-  switch (m_CrosshairMode)
+  CrosshairMode mode = m_CrosshairMode;
+  if (m_OverwriteCrosshairMode != nullptr) {
+    mode = *m_OverwriteCrosshairMode;
+  }
+
+  switch (mode)
   {
     case CrosshairMode::PLANE:
       addPlaneCrosshair(window, true, m_ShowPlanesIn3d);

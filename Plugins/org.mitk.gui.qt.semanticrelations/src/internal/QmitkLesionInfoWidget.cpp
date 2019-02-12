@@ -116,10 +116,9 @@ void QmitkLesionInfoWidget::OnAddLesionButtonClicked()
 {
   if (m_CaseID.empty())
   {
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("No case ID set.");
-    msgBox.setText("In order to add a lesion, please specify the current case / patient.");
-    msgBox.setIcon(QMessageBox::Warning);
+    QMessageBox msgBox(QMessageBox::Warning,
+      "No case ID set.",
+      "In order to add a lesion, please specify the current case / patient.");
     msgBox.exec();
     return;
   }

@@ -67,11 +67,10 @@ namespace AddToSemanticRelationsAction
     catch (const mitk::SemanticRelationException& e)
     {
       std::stringstream exceptionMessage; exceptionMessage << e;
-      QMessageBox msgBox;
-      msgBox.setWindowTitle("Could not add the selected image.");
-      msgBox.setText("The program wasn't able to correctly add the selected images.\n"
+      QMessageBox msgBox(QMessageBox::Warning,
+        "Could not add the selected image.",
+        "The program wasn't able to correctly add the selected images.\n"
         "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
-      msgBox.setIcon(QMessageBox::Warning);
       msgBox.exec();
       return;
     }
@@ -122,11 +121,10 @@ namespace AddToSemanticRelationsAction
     catch (const mitk::SemanticRelationException& e)
     {
       std::stringstream exceptionMessage; exceptionMessage << e;
-      QMessageBox msgBox;
-      msgBox.setWindowTitle("Could not add the selected segmentation.");
-      msgBox.setText("The program wasn't able to correctly add the selected segmentation.\n"
+      QMessageBox msgBox(QMessageBox::Warning,
+        "Could not add the selected segmentation.",
+        "The program wasn't able to correctly add the selected segmentation.\n"
         "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
-      msgBox.setIcon(QMessageBox::Warning);
       msgBox.exec();
       return;
     }

@@ -76,8 +76,8 @@ namespace itk{
     itkSetMacro( SpikesPerSlice, unsigned int )     ///< Number of spikes per slice. Corresponding parameter in fiberfox parameter object specifies the number of spikes for the whole image and can thus not be used here.
     itkSetMacro( Z, double )                        ///< Slice position, necessary for eddy current simulation.
     itkSetMacro( UseConstantRandSeed, bool )        ///< Use constant seed for random generator for reproducible results. ONLY USE FOR TESTING PURPOSES!
-    itkSetMacro( Rotation, VectorType )
     itkSetMacro( Translation, VectorType )
+    itkSetMacro( RotationMatrix, MatrixType )
     itkSetMacro( Zidx, int )
     itkSetMacro( FiberBundle, FiberBundle::Pointer )
     itkSetMacro( CoilPosition, VectorType )
@@ -113,9 +113,8 @@ namespace itk{
     unsigned int                            m_SpikesPerSlice;
     FiberBundle::Pointer                    m_FiberBundle;
     float                                   m_Gamma;
-    VectorType                              m_Rotation;     ///< used to find correct point in frequency map (head motion)
     VectorType                              m_Translation;  ///< used to find correct point in frequency map (head motion)
-    itk::Matrix<float, 3, 3>                m_RotationMatrix;
+    MatrixType                              m_RotationMatrix;
     float                                   m_TransX;
     float                                   m_TransY;
     float                                   m_TransZ;

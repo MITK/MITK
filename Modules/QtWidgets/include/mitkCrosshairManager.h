@@ -45,6 +45,11 @@ public:
   void setCrosshairMode(CrosshairMode mode);
   CrosshairMode getCrosshairMode();
 
+  // Set overwrite crosshair mode for selected windows
+  // Set null to reset
+  void setOverwriteCrosshairMode(CrosshairMode* mode);
+  CrosshairMode* getOverwriteCrosshairMode();
+
   // Adds window to managed windows
   void addWindow(QmitkRenderWindow* window);
 
@@ -117,6 +122,7 @@ private:
   void setDefaultProperties(mitk::DataNode::Pointer crosshair);
 
   CrosshairMode m_CrosshairMode;
+  CrosshairMode* m_OverwriteCrosshairMode;
   std::vector<QmitkRenderWindow*> m_ManagedWindows;
 
   QmitkRenderWindow* m_Selected;

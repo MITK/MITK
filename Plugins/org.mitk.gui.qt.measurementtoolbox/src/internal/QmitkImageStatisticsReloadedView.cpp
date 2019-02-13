@@ -251,7 +251,8 @@ void QmitkImageStatisticsReloadedView::CalculateOrGetStatistics()
     }
     //statistics already computed
     else {
-      if (!(maskPlanarFigure && maskPlanarFigure->IsClosed())) {
+      //Not an open planar figure: show histogram (intensity profile already shown)
+      if (!(maskPlanarFigure && !maskPlanarFigure->IsClosed())) {
         if (imageStatistics->TimeStepExists(0)) {
           auto histogram = imageStatistics->GetStatisticsForTimeStep(0).m_Histogram.GetPointer();
           std::string imageNodeName = m_selectedImageNode->GetName();

@@ -58,23 +58,27 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
   for (auto it = segmentationNodes->Begin(); it != segmentationNodes->End(); ++it)
   {
     DataNode* segmentationNode = it->Value();
+
+    std::string caseID;
+    std::string segmentationID;
     try
     {
       // find the corresponding segmentation node for the given segmentation ID
-      std::string nodeCaseID = GetCaseIDFromDataNode(segmentationNode);
-      std::string nodeSegmentationID = GetIDFromDataNode(segmentationNode);
-      if (nodeCaseID == caseID && (std::find(allSegmentationIDsOfCase.begin(), allSegmentationIDsOfCase.end(), nodeSegmentationID) != allSegmentationIDsOfCase.end()))
-      {
-        // found current image node in the storage, add it to the return vector
-        allSegmentationsOfCase.push_back(segmentationNode);
-      }
+      caseID = GetCaseIDFromDataNode(segmentationNode);
+      segmentationID = GetIDFromDataNode(segmentationNode);
     }
-    catch (const std::exception&)
+    catch (SemanticRelationException&)
     {
       // found a segmentation node that is not stored in the semantic relations
       // this segmentation node does not have any DICOM information --> exception thrown
       // continue with the next segmentation to compare IDs
       continue;
+    }
+
+    if (caseID == caseID && (std::find(allSegmentationIDsOfCase.begin(), allSegmentationIDsOfCase.end(), segmentationID) != allSegmentationIDsOfCase.end()))
+    {
+      // found current image node in the storage, add it to the return vector
+      allSegmentationsOfCase.push_back(segmentationNode);
     }
   }
 
@@ -126,10 +130,24 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
   for (auto it = imageNodes->Begin(); it != imageNodes->End(); ++it)
   {
     DataNode* imageNode = it->Value();
-    // find the corresponding image node for the given segmentation ID
-    std::string nodeCaseID = GetCaseIDFromDataNode(imageNode);
-    std::string nodeImageID = GetIDFromDataNode(imageNode);
-    if (nodeCaseID == caseID && (std::find(allImageIDsOfCase.begin(), allImageIDsOfCase.end(), nodeImageID) != allImageIDsOfCase.end()))
+
+    std::string caseID;
+    std::string imageID;
+    try
+    {
+      // find the corresponding image node for the given segmentation ID
+      caseID = GetCaseIDFromDataNode(imageNode);
+      imageID = GetIDFromDataNode(imageNode);
+    }
+    catch (SemanticRelationException&)
+    {
+      // found an image node that is not stored in the semantic relations
+      // this image node does not have any DICOM information --> exception thrown
+      // continue with the next image to compare IDs
+      continue;
+    }
+
+    if (caseID == caseID && (std::find(allImageIDsOfCase.begin(), allImageIDsOfCase.end(), imageID) != allImageIDsOfCase.end()))
     {
       // found current image node in the storage, add it to the return vector
       allImagesOfCase.push_back(imageNode);

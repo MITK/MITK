@@ -102,8 +102,23 @@ namespace AddToSemanticRelationsAction
     {
       MITK_INFO << "No DICOM tags for case and node identification found. Transferring DICOM tags from the parent node to the selected segmentation node.";
 
-      mitk::SemanticTypes::CaseID caseID = mitk::GetCaseIDFromDataNode(parentNodes->front());
-      mitk::SemanticTypes::ID nodeID = mitk::GetIDFromDataNode(parentNodes->front());
+      mitk::SemanticTypes::CaseID caseID;
+      mitk::SemanticTypes::ID nodeID;
+      try
+      {
+        caseID = mitk::GetCaseIDFromDataNode(parentNodes->front());
+        nodeID = mitk::GetIDFromDataNode(parentNodes->front());
+      }
+      catch (const mitk::SemanticRelationException& e)
+      {
+        std::stringstream exceptionMessage; exceptionMessage << e;
+        QMessageBox msgBox(QMessageBox::Warning,
+          "Could not add the selected segmentation.",
+          "The program wasn't able to correctly add the selected segmentation.\n"
+          "Reason:\n" + QString::fromStdString(exceptionMessage.str()));
+        msgBox.exec();
+        return;
+      }
 
       // transfer DICOM tags to the segmentation node
       baseData->SetProperty(caseIDPropertyName,

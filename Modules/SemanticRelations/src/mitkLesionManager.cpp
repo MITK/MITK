@@ -87,6 +87,8 @@ void mitk::GenerateAdditionalLesionData(LesionData& lesionData, const SemanticTy
   double volume = 0.0;
 
   SemanticTypes::ControlPointVector controlPoints = RelationStorage::GetAllControlPointsOfCase(caseID);
+  // sort the vector of control points for the timeline
+  std::sort(controlPoints.begin(), controlPoints.end());
   for (const auto& controlPoint : controlPoints)
   {
     try

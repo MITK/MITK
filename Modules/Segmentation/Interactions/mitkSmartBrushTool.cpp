@@ -198,15 +198,14 @@ void mitk::SmartBrushTool::OnAltPrimaryButtonPressed(StateMachineAction*, Intera
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
-  m_WorkingSlice->GetGeometry()->WorldToIndex(positionEvent->GetPlanePositionInWorld(), m_ReferencePoint);
+  m_WorkingImage->GetGeometry()->WorldToIndex(positionEvent->GetPlanePositionInWorld(), m_ReferencePoint);
   m_ReferencePoint[0] = ROUND(m_ReferencePoint[0]);
   m_ReferencePoint[1] = ROUND(m_ReferencePoint[1]);
   m_ReferencePoint[2] = ROUND(m_ReferencePoint[2]);
 
   mitk::Point3D pointCenter;
-  m_WorkingSlice->GetGeometry()->IndexToWorld(m_ReferencePoint, pointCenter);
+  m_WorkingImage->GetGeometry()->IndexToWorld(m_ReferencePoint, pointCenter);
 
-  m_PointSet->Clear();
   m_PointSet->InsertPoint(1, pointCenter);
   m_IsReferencePointSet = true;
 

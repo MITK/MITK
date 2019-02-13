@@ -123,12 +123,10 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
   m_KspaceImage->Allocate();
   m_KspaceImage->FillBuffer(nullPix);
 
-  std::vector< unsigned int > spikeVolume;
+  std::list< unsigned int > spikeVolume;
   if (m_Parameters.m_Misc.m_DoAddSpikes)
     for (unsigned int i=0; i<m_Parameters.m_SignalGen.m_Spikes; i++)
       spikeVolume.push_back(m_RandGen->GetIntegerVariate()%(compartment_images.at(0)->GetVectorLength()));
-  std::sort (spikeVolume.begin(), spikeVolume.end());
-  std::reverse (spikeVolume.begin(), spikeVolume.end());
 
   // calculate coil positions
   double a = m_Parameters.m_SignalGen.m_ImageRegion.GetSize(0)*m_Parameters.m_SignalGen.m_ImageSpacing[0];
@@ -176,15 +174,15 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
     if (this->GetAbortGenerateData())
       continue;
 
-    std::vector< unsigned int > spikeSlice;
+    std::list< unsigned int > spikeSlice;
 #pragma omp critical
-    while (!spikeVolume.empty() && static_cast<int>(spikeVolume.back())==g)
     {
-      spikeSlice.push_back(m_RandGen->GetIntegerVariate()%compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2));
-      spikeVolume.pop_back();
+
+      for (auto sv : spikeVolume)
+        if (sv == static_cast<unsigned int>(g))
+          spikeSlice.push_back(m_RandGen->GetIntegerVariate()%compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2));
+      spikeVolume.remove(g);
     }
-    std::sort (spikeSlice.begin(), spikeSlice.end());
-    std::reverse (spikeSlice.begin(), spikeSlice.end());
 
     for (unsigned int z=0; z<compartment_images.at(0)->GetLargestPossibleRegion().GetSize(2); z++)
     {
@@ -224,11 +222,11 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
       }
 
       int numSpikes = 0;
-      while (!spikeSlice.empty() && spikeSlice.back()==z)
-      {
-        numSpikes++;
-        spikeSlice.pop_back();
-      }
+      for (auto ss : spikeSlice)
+        if (ss == z)
+          ++numSpikes;
+      spikeSlice.remove(z);
+
       int spikeCoil = m_RandGen->GetIntegerVariate()%m_Parameters.m_SignalGen.m_NumberOfCoils;
 
       if (this->GetAbortGenerateData())

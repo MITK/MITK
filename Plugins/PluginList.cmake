@@ -72,18 +72,16 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.imagenavigator:ON
   org.mitk.gui.qt.remeshing:ON
   org.mitk.gui.qt.imagestatistics:ON
+  org.mitk.gui.qt.tofutil:OFF
+  org.mitk.gui.qt.igttracking:OFF
 )
 
 IF(MITK_USE_TOF_KINECTV2)
   list(APPEND MITK_PLUGINS
-    org.mitk.gui.qt.igttracking:ON
     org.mitk.gui.qt.aicpregistration:ON
-    org.mitk.gui.qt.tofutil:ON
   )
 ELSE(MITK_USE_TOF_KINECTV2)
   list(APPEND MITK_PLUGINS
-    org.mitk.gui.qt.igttracking:OFF
     org.mitk.gui.qt.aicpregistration:OFF
-    org.mitk.gui.qt.tofutil:OFF
   )
 ENDIF(MITK_USE_TOF_KINECTV2)

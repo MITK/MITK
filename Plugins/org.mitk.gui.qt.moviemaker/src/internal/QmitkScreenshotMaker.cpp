@@ -96,6 +96,8 @@ mitk::DataNode::Pointer QmitkScreenshotMaker::GetTopLayerNode()
   auto nodes = GetDataStorage()->GetAll();
   for (auto node = nodes->begin(); node!=nodes->end(); ++node)
   {
+    if (!(*node)->IsVisible(nullptr))
+      continue;
     int current_layer;
     (*node)->GetIntProperty("layer", current_layer);
     if (current_layer>layer)

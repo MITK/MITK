@@ -35,8 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkImageCast.h>
 #include <itkVectorImage.h>
-#include <omp.h>
-#include <mitkPreferenceListReaderOptionsFunctor.h>
 
 #include "mitkTestFixture.h"
 
@@ -63,10 +61,6 @@ public:
 
   void setUp() override
   {
-//    std::srand(0);
-    omp_set_num_threads(1);
-//    mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
-
     m_FiberBundle = mitk::IOUtil::Load<FiberBundle>(GetTestDataFilePath("DiffusionImaging/Fiberfox/SignalGen_BrainSlice.fib"));
     m_Template = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("DiffusionImaging/Fiberfox/SignalGen_BrainSliceTemplate.nii.gz"));
 
@@ -125,7 +119,7 @@ public:
         {
           short d = abs(it1.Get()[i]-it2.Get()[i]);
 
-          if (d>0)
+          if (d>1)
           {
             if (count<10)
             {

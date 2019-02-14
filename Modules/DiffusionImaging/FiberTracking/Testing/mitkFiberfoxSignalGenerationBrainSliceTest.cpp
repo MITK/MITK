@@ -64,7 +64,7 @@ public:
   void setUp() override
   {
 //    std::srand(0);
-//    omp_set_num_threads(1);
+    omp_set_num_threads(1);
 //    mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor({"Diffusion Weighted Images"}, {});
 
     m_FiberBundle = mitk::IOUtil::Load<FiberBundle>(GetTestDataFilePath("DiffusionImaging/Fiberfox/SignalGen_BrainSlice.fib"));

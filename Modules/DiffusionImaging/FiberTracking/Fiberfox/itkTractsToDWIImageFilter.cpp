@@ -159,8 +159,8 @@ SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& compartment_im
   auto max_threads = omp_get_max_threads();
   int out_threads = Math::ceil(std::sqrt(max_threads));
   int in_threads = Math::floor(std::sqrt(max_threads));
-  PrintToLog("Parallel volumes: " + boost::lexical_cast<std::string>(out_threads), false, true, false);
-  PrintToLog("Threads per slice: " + boost::lexical_cast<std::string>(in_threads), false, true, false);
+  PrintToLog("Parallel volumes: " + boost::lexical_cast<std::string>(out_threads), false, true, true);
+  PrintToLog("Threads per slice: " + boost::lexical_cast<std::string>(in_threads), false, true, true);
 
   PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false, true, false);
   PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false, false);

@@ -317,7 +317,7 @@ namespace mitk
 
     void PrintSelf();                           ///< Print parameters to stdout.
     void SaveParameters(std::string filename);  ///< Save image generation parameters to .ffp file.
-    void LoadParameters(std::string filename);  ///< Load image generation parameters from .ffp file.
+    void LoadParameters(std::string filename, bool fix_seed=false);  ///< Load image generation parameters from .ffp file.
     template< class ParameterType >
     ParameterType ReadVal(boost::property_tree::ptree::value_type const& v, std::string tag, ParameterType defaultValue, bool essential=false);
     std::string                         m_MissingTags;

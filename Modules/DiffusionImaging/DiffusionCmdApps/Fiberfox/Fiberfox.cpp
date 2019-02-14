@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
     apply_direction_matrix = false;
 
   FiberfoxParameters parameters;
-  parameters.LoadParameters(paramName);
+  parameters.LoadParameters(paramName, fix_seed);
 
   // Test if /path/dir is an existing directory:
   std::string file_extension = "";

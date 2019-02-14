@@ -6,6 +6,7 @@ SET(MODULE_CUSTOM_TESTS
   mitkFiberExtractionTest.cpp
   mitkFiberGenerationTest.cpp
   mitkFiberfoxSignalGenerationTest.cpp
+  mitkFiberfoxSignalGenerationBrainSliceTest.cpp
   mitkMachineLearningTrackingTest.cpp
   mitkFiberProcessingTest.cpp
   mitkFiberFitTest.cpp

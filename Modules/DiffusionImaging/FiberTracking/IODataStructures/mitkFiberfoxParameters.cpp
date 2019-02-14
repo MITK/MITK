@@ -619,9 +619,12 @@ void mitk::FiberfoxParameters::GenerateGradientHalfShell()
   UpdateSignalModels();
 }
 
-void mitk::FiberfoxParameters::LoadParameters(std::string filename)
+void mitk::FiberfoxParameters::LoadParameters(std::string filename, bool fix_seed)
 {
-  srand(time(0));
+  if (fix_seed)
+    srand(0);
+  else
+    srand(time(0));
   m_MissingTags = "";
   if(filename.empty()) { return; }
 

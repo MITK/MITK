@@ -120,7 +120,9 @@ void mitk::IGTLMessageSource::RegisterAsMicroservice()
 void mitk::IGTLMessageSource::UnRegisterMicroservice()
 {
   if (m_ServiceRegistration != nullptr)
-     m_ServiceRegistration.Unregister();
+  {
+    m_ServiceRegistration.Unregister();
+  }
   m_ServiceRegistration = 0;
 }
 

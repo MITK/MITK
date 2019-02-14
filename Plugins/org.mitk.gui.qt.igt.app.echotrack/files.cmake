@@ -23,7 +23,6 @@ set(INTERNAL_CPP_FILES
   Widgets/QmitkUSCombinedModalityCreationWidget.cpp
   Widgets/QmitkUSCombinedModalityEditWidget.cpp
   Widgets/QmitkUSNavigationFreezeButton.cpp
-  Widgets/QmitkUSNavigationProcessWidget.cpp
   Widgets/QmitkUSNavigationZoneDistancesWidget.cpp
   Widgets/QmitkUSZoneManagementWidget.cpp
   Widgets/QmitkZoneProgressBar.cpp
@@ -35,6 +34,7 @@ set(INTERNAL_CPP_FILES
   NavigationStepWidgets/QmitkUSNavigationStepPlacementPlanning.cpp
   NavigationStepWidgets/QmitkUSNavigationStepMarkerIntervention.cpp
   NavigationStepWidgets/QmitkUSNavigationStepPunctuationIntervention.cpp
+  NavigationStepWidgets/QmitkUSNavigationStepCtUsRegistration.cpp
 
   SettingsWidgets/QmitkUSNavigationCombinedSettingsWidget.cpp
   SettingsWidgets/QmitkUSNavigationAbstractSettingsWidget.cpp
@@ -42,6 +42,7 @@ set(INTERNAL_CPP_FILES
   Filter/mitkUSNavigationTargetOcclusionFilter.cpp
   Filter/mitkUSNavigationTargetUpdateFilter.cpp
   Filter/mitkUSNavigationTargetIntersectionFilter.cpp
+  Filter/mitkFloatingImageToUltrasoundRegistrationFilter.cpp
 
   IO/mitkUSNavigationCombinedModalityPersistence.cpp
   IO/mitkUSNavigationLoggingBackend.cpp
@@ -56,7 +57,6 @@ set(UI_FILES
 
   src/internal/Widgets/QmitkUSCombinedModalityCreationWidget.ui
   src/internal/Widgets/QmitkUSCombinedModalityEditWidget.ui
-  src/internal/Widgets/QmitkUSNavigationProcessWidget.ui
   src/internal/Widgets/QmitkUSZoneManagementWidget.ui
 
   src/internal/NavigationStepWidgets/QmitkUSAbstractNavigationStep.ui
@@ -66,13 +66,13 @@ set(UI_FILES
   src/internal/NavigationStepWidgets/QmitkUSNavigationStepPlacementPlanning.ui
   src/internal/NavigationStepWidgets/QmitkUSNavigationStepMarkerIntervention.ui
   src/internal/NavigationStepWidgets/QmitkUSNavigationStepPunctuationIntervention.ui
+  src/internal/NavigationStepWidgets/QmitkUSNavigationStepCtUsRegistration.ui
 
   src/internal/SettingsWidgets/QmitkUSNavigationCombinedSettingsWidget.ui
 )
 
 set(MOC_H_FILES
   src/internal/org_mbi_gui_qt_usnavigation_Activator.h
-  #src/internal/USNavigation.h //not functional anymore. Delete code?
   src/internal/QmitkUltrasoundCalibration.h
   src/internal/QmitkUSNavigationMarkerPlacement.h
   src/internal/QmitkUSZonesDataModel.h
@@ -86,7 +86,6 @@ set(MOC_H_FILES
   src/internal/Widgets/QmitkUSCombinedModalityCreationWidget.h
   src/internal/Widgets/QmitkUSCombinedModalityEditWidget.h
   src/internal/Widgets/QmitkUSNavigationFreezeButton.h
-  src/internal/Widgets/QmitkUSNavigationProcessWidget.h
   src/internal/Widgets/QmitkUSNavigationZoneDistancesWidget.h
   src/internal/Widgets/QmitkUSZoneManagementWidget.h
   src/internal/Widgets/QmitkZoneProgressBar.h
@@ -98,6 +97,7 @@ set(MOC_H_FILES
   src/internal/NavigationStepWidgets/QmitkUSNavigationStepPlacementPlanning.h
   src/internal/NavigationStepWidgets/QmitkUSNavigationStepMarkerIntervention.h
   src/internal/NavigationStepWidgets/QmitkUSNavigationStepPunctuationIntervention.h
+  src/internal/NavigationStepWidgets/QmitkUSNavigationStepCtUsRegistration.h
 
   src/internal/SettingsWidgets/QmitkUSNavigationCombinedSettingsWidget.h
   src/internal/SettingsWidgets/QmitkUSNavigationAbstractSettingsWidget.h

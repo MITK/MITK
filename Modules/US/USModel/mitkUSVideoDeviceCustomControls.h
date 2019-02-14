@@ -32,7 +32,7 @@ namespace mitk {
   {
   public:
     mitkClassMacro(USVideoDeviceCustomControls, USAbstractControlInterface);
-    mitkNewMacro1Param(Self, itk::SmartPointer<USVideoDevice>);
+    mitkNewMacro1Param(Self, itk::SmartPointer<USDevice>);
 
     /**
       * Activate or deactivate the custom controls. This is just for handling
@@ -96,7 +96,7 @@ namespace mitk {
       * Class needs an mitk::USImageVideoSource object for beeing constructed.
       * This object will be manipulated by the custom controls methods.
       */
-    USVideoDeviceCustomControls(itk::SmartPointer<USVideoDevice> device);
+    USVideoDeviceCustomControls(itk::SmartPointer<USDevice> device);
     ~USVideoDeviceCustomControls() override;
 
     bool                          m_IsActive;

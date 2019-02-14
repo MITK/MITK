@@ -45,7 +45,7 @@ namespace mitk {
     * \brief Writes the configuration settings of an ultrasound device to a xml-file.
     * \param config The struct containing all information of the ultrasound device.
     */
-    bool WriteUltrasoundVideoDeviceConfiguration(mitk::USDeviceReaderXML::USVideoDeviceConfigData &config);
+    bool WriteUltrasoundDeviceConfiguration(mitk::USDeviceReaderXML::USDeviceConfigData &config);
 
   protected:
     USDeviceWriterXML(const USDeviceWriterXML& other);
@@ -59,7 +59,7 @@ namespace mitk {
     */
     void CreateXmlInformationOfUltrasoundDeviceTag( TiXmlDocument &document,
                                                     TiXmlElement *ultrasoundDeviceTag,
-                                                    mitk::USDeviceReaderXML::USVideoDeviceConfigData &config);
+                                                    mitk::USDeviceReaderXML::USDeviceConfigData &config);
 
     /**
     * \brief Creates the xml GENERALSETTINGS-Tag entry of the ultrasound video device configuration file.
@@ -69,7 +69,7 @@ namespace mitk {
     */
     void CreateXmlInformationOfGeneralSettingsTag( TiXmlElement *parentTag,
                                                    TiXmlElement *generalSettingsTag,
-                                                   mitk::USDeviceReaderXML::USVideoDeviceConfigData &config);
+                                                   mitk::USDeviceReaderXML::USDeviceConfigData &config);
 
     /**
     * \brief Creates the xml PROBES-Tag entry of the ultrasound video device configuration file. All information
@@ -78,7 +78,7 @@ namespace mitk {
     * \param config The struct containing all information of the ultrasound device.
     */
     void CreateXmlInformationOfProbesTag( TiXmlElement *parentTag,
-                                          mitk::USDeviceReaderXML::USVideoDeviceConfigData &config);
+                                          mitk::USDeviceReaderXML::USDeviceConfigData &config);
   private:
     /**
     * \brief The filename of the ultrasound device configuration file which should be created.

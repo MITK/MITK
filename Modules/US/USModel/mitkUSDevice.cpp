@@ -42,6 +42,11 @@ mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
   return m_CropArea;
 }
 
+unsigned int mitk::USDevice::GetSizeOfImageVector()
+{
+  return m_ImageVector.size();
+}
+
 mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   : mitk::ImageSource(),
   m_FreezeBarrier(nullptr),

@@ -37,7 +37,7 @@ QmitkUSNavigationFreezeButton::~QmitkUSNavigationFreezeButton()
 {
 }
 
-void QmitkUSNavigationFreezeButton::SetCombinedModality(mitk::USCombinedModality::Pointer combinedModality, int outputIndex)
+void QmitkUSNavigationFreezeButton::SetCombinedModality(mitk::AbstractUltrasoundTrackerDevice::Pointer combinedModality, int outputIndex)
 {
   m_CombinedModality = combinedModality;
   m_OutputIndex = outputIndex;

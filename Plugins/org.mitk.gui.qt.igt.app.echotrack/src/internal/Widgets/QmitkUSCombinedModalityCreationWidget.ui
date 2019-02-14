@@ -88,20 +88,6 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <layout class="QFormLayout" name="formLayout">
-     <item row="1" column="0">
-      <widget class="QLabel" name="nameLineEditLabel">
-       <property name="text">
-        <string>Name</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="nameLineEdit">
-       <property name="text">
-        <string>Combined Modality</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="vendorLineEditLabel">
        <property name="text">
@@ -116,7 +102,28 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="nameLineEditLabel">
+       <property name="text">
+        <string>Name</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="nameLineEdit">
+       <property name="text">
+        <string>Combined Modality</string>
+       </property>
+      </widget>
+     </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="activateTrackedUSCheckbox">
+     <property name="text">
+      <string>Activate Tracked Ultrasound</string>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">

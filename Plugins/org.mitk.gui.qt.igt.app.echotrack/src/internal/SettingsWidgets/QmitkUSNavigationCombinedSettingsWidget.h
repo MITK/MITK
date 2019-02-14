@@ -38,9 +38,9 @@ protected slots:
 public:
   explicit QmitkUSNavigationCombinedSettingsWidget(QWidget *parent = 0);
   ~QmitkUSNavigationCombinedSettingsWidget();
+  virtual void OnSetSettingsNode(itk::SmartPointer<mitk::DataNode> settingsNode, bool overwriteValues);
 
 protected:
-  virtual void OnSetSettingsNode(itk::SmartPointer<mitk::DataNode> settingsNode, bool overwriteValues);
   virtual void OnSaveProcessing();
   virtual void OnLoadSettingsProcessing();
 

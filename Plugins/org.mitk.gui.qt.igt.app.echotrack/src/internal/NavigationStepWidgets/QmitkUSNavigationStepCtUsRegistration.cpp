@@ -88,7 +88,6 @@ bool QmitkUSNavigationStepCtUsRegistration::OnActivateStep()
 {
   MITK_INFO << "OnActivateStep()";
   ui->floatingImageComboBox->SetDataStorage(this->GetDataStorage());
-  ui->groundTruthImageComboBox->SetDataStorage(this->GetDataStorage());
   ui->ctImagesToChooseComboBox->SetDataStorage(this->GetDataStorage());
   ui->segmentationComboBox->SetDataStorage(this->GetDataStorage());
   ui->selectedSurfaceComboBox->SetDataStorage(this->GetDataStorage());
@@ -1121,94 +1120,6 @@ void QmitkUSNavigationStepCtUsRegistration::GetCentroidsOfLabeledObjects()
   //evtl. for later: itk::LabelMapOverlayImageFilter
 }
 
-void QmitkUSNavigationStepCtUsRegistration::CalculatePCA()
-{
-  //Step 1: Construct data matrix
-  int columnSize = m_CentroidsOfFiducialCandidates.size();
-  if (columnSize == 0)
-  {
-    MITK_INFO << "Cannot calculate PCA. There are no fiducial candidates.";
-    return;
-  }
-
-  vnl_matrix<double> pointSetMatrix(3, columnSize, 0.0);
-  for (int counter = 0; counter < columnSize; ++counter)
-  {
-    pointSetMatrix[0][counter] = m_CentroidsOfFiducialCandidates.at(counter)[0];
-    pointSetMatrix[1][counter] = m_CentroidsOfFiducialCandidates.at(counter)[1];
-    pointSetMatrix[2][counter] = m_CentroidsOfFiducialCandidates.at(counter)[2];
-  }
-
-  //Step 2: Remove average for each row (Mittelwertbefreiung)
-  for (int counter = 0; counter < columnSize; ++counter)
-  {
-    m_MeanCentroidFiducialCandidates += mitk::Vector3D(pointSetMatrix.get_column(counter));
-  }
-  //TODO: für später überprüfen, ob Division durch integer nicht zu Rechenproblemen führt.
-  m_MeanCentroidFiducialCandidates /= columnSize;
-  for (int counter = 0; counter < columnSize; ++counter)
-  {
-    pointSetMatrix.get_column(counter) -= m_MeanCentroidFiducialCandidates;
-  }
-
-  //Step 3: Compute covariance matrix
-  vnl_matrix<double> covarianceMatrix = (1.0 / (columnSize - 1.0)) * pointSetMatrix * pointSetMatrix.transpose();
-
-  //Step 4: Singular value composition
-  vnl_svd<double> svd(covarianceMatrix);
-
-  //Storing results:
-  for (int counter = 0; counter < 3; ++counter)
-  {
-    mitk::Vector3D eigenVector = svd.U().get_column(counter);
-    double eigenValue = sqrt(svd.W(counter));
-    m_EigenVectorsFiducialCandidates[eigenValue] = eigenVector;
-    m_EigenValuesFiducialCandidates.push_back(eigenValue);
-  }
-  std::sort( m_EigenValuesFiducialCandidates.begin(), m_EigenValuesFiducialCandidates.end() );
-
-  mitk::DataNode::Pointer axis1Node = mitk::DataNode::New();
-  axis1Node->SetName("Eigenvector 1");
-  mitk::PointSet::Pointer axis1 = mitk::PointSet::New();
-  axis1->InsertPoint(0, m_MeanCentroidFiducialCandidates);
-  axis1->InsertPoint(1, (m_MeanCentroidFiducialCandidates + m_EigenVectorsFiducialCandidates.at(m_EigenValuesFiducialCandidates.at(2))*m_EigenValuesFiducialCandidates.at(2)));
-  axis1Node->SetData(axis1);
-  axis1Node->SetBoolProperty("show contour", true);
-  axis1Node->SetColor(1, 0, 0);
-  this->GetDataStorage()->Add(axis1Node);
-
-  mitk::DataNode::Pointer axis2Node = mitk::DataNode::New();
-  axis2Node->SetName("Eigenvector 2");
-  mitk::PointSet::Pointer axis2 = mitk::PointSet::New();
-  axis2->InsertPoint(0, m_MeanCentroidFiducialCandidates);
-  axis2->InsertPoint(1, (m_MeanCentroidFiducialCandidates + m_EigenVectorsFiducialCandidates.at(m_EigenValuesFiducialCandidates.at(1))*m_EigenValuesFiducialCandidates.at(1)));
-  axis2Node->SetData(axis2);
-  axis2Node->SetBoolProperty("show contour", true);
-  axis2Node->SetColor(2, 0, 0);
-  this->GetDataStorage()->Add(axis2Node);
-
-  mitk::DataNode::Pointer axis3Node = mitk::DataNode::New();
-  axis3Node->SetName("Eigenvector 3");
-  mitk::PointSet::Pointer axis3 = mitk::PointSet::New();
-  axis3->InsertPoint(0, m_MeanCentroidFiducialCandidates);
-  axis3->InsertPoint(1, (m_MeanCentroidFiducialCandidates + m_EigenVectorsFiducialCandidates.at(m_EigenValuesFiducialCandidates.at(0))*m_EigenValuesFiducialCandidates.at(0)));
-  axis3Node->SetData(axis3);
-  axis3Node->SetBoolProperty("show contour", true);
-  axis3Node->SetColor(3, 0, 0);
-  this->GetDataStorage()->Add(axis3Node);
-
-  MITK_INFO << "Mean: " << m_MeanCentroidFiducialCandidates;
-
-  MITK_INFO << "Eigenvektor 1: " << m_EigenVectorsFiducialCandidates.at(m_EigenValuesFiducialCandidates.at(2));
-  MITK_INFO << "Eigenvektor 2: " << m_EigenVectorsFiducialCandidates.at(m_EigenValuesFiducialCandidates.at(1));
-  MITK_INFO << "Eigenvektor 3: " << m_EigenVectorsFiducialCandidates.at(m_EigenValuesFiducialCandidates.at(0));
-
-  MITK_INFO << "Eigenwert 1: " << m_EigenValuesFiducialCandidates.at(2);
-  MITK_INFO << "Eigenwert 2: " << m_EigenValuesFiducialCandidates.at(1);
-  MITK_INFO << "Eigenwert 3: " << m_EigenValuesFiducialCandidates.at(0);
-
-}
-
 void QmitkUSNavigationStepCtUsRegistration::NumerateFiducialMarks()
 {
   MITK_INFO << "NumerateFiducialMarks()";
@@ -1239,11 +1150,6 @@ void QmitkUSNavigationStepCtUsRegistration::NumerateFiducialMarks()
     return;
   }
 
-  if( ui->optimizeFiducialPositionsCheckBox->isChecked())
-  {
-    this->OptimizeFiducialPositions();
-  }
-
   if (m_MarkerFloatingImageCoordinateSystemPointSet.IsNull())
   {
     m_MarkerFloatingImageCoordinateSystemPointSet = mitk::PointSet::New();
@@ -1265,92 +1171,6 @@ void QmitkUSNavigationStepCtUsRegistration::NumerateFiducialMarks()
     //node->SetFloatProperty("pointsize", 5.0);
     this->GetDataStorage()->Add(node);
   }
-}
-
-void QmitkUSNavigationStepCtUsRegistration::ShowGroundTruthMarkerEdges()
-{
-  mitk::Point3D edge1;
-  mitk::Point3D edge2;
-  mitk::Point3D edge3;
-  mitk::Point3D edge4;
-  mitk::Point3D edge5;
-  mitk::Point3D edge6;
-  mitk::Point3D edge7;
-  mitk::Point3D edge8;
-
-  edge1[0] = -5;
-  edge1[1] = -5;
-  edge1[2] = -7.5;
-
-  edge2[0] = -5;
-  edge2[1] = 25;
-  edge2[2] = -7.5;
-
-  edge3[0] = 25;
-  edge3[1] = 25;
-  edge3[2] = -7.5;
-
-  edge4[0] = 25;
-  edge4[1] = -5;
-  edge4[2] = -7.5;
-
-  edge5[0] = -5;
-  edge5[1] = -5;
-  edge5[2] = 15;
-
-  edge6[0] = -5;
-  edge6[1] = 25;
-  edge6[2] = 15;
-
-  edge7[0] = 25;
-  edge7[1] = 25;
-  edge7[2] = 15;
-
-  edge8[0] = 25;
-  edge8[1] = -5;
-  edge8[2] = 15;
-
-  mitk::PointSet::Pointer edgePointSet = mitk::PointSet::New();
-  edgePointSet->InsertPoint(0, edge1);
-  edgePointSet->InsertPoint(1, edge2);
-  edgePointSet->InsertPoint(2, edge3);
-  edgePointSet->InsertPoint(3, edge4);
-  edgePointSet->InsertPoint(4, edge1);
-  edgePointSet->InsertPoint(5, edge5);
-  edgePointSet->InsertPoint(6, edge6);
-  edgePointSet->InsertPoint(7, edge7);
-  edgePointSet->InsertPoint(8, edge8);
-  edgePointSet->InsertPoint(9, edge5);
-  edgePointSet->InsertPoint(10, edge6);
-  edgePointSet->InsertPoint(11, edge2);
-  edgePointSet->InsertPoint(12, edge6);
-  edgePointSet->InsertPoint(13, edge7);
-  edgePointSet->InsertPoint(14, edge3);
-  edgePointSet->InsertPoint(15, edge7);
-  edgePointSet->InsertPoint(16, edge8);
-  edgePointSet->InsertPoint(17, edge4);
-
-  mitk::DataNode::Pointer node = mitk::DataNode::New();
-  node->SetData(edgePointSet);
-  node->SetName("Marker Edges PointSet");
-  node->SetBoolProperty("show contour", true);
-  node->SetFloatProperty("pointsize", 0.25);
-  this->GetDataStorage()->Add(node);
-
-  mitk::PointSet* pointSet_orig = edgePointSet;
-  mitk::PointSet::Pointer pointSet_moved = mitk::PointSet::New();
-
-  for (int i = 0; i < pointSet_orig->GetSize(); i++)
-  {
-    pointSet_moved->InsertPoint(m_TransformMarkerCSToFloatingImageCS->TransformPoint(pointSet_orig->GetPoint(i)));
-  }
-
-  pointSet_orig->Clear();
-  for (int i = 0; i < pointSet_moved->GetSize(); i++)
-    pointSet_orig->InsertPoint(pointSet_moved->GetPoint(i));
-
-  //Do a global reinit
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 }
 
 void QmitkUSNavigationStepCtUsRegistration::CalculateDistancesBetweenFiducials(std::vector<std::vector<double>>& distanceVectorsFiducials)
@@ -1646,303 +1466,6 @@ bool QmitkUSNavigationStepCtUsRegistration::FindFiducialNo8()
   return false;
 }
 
-void QmitkUSNavigationStepCtUsRegistration::OptimizeFiducialPositions()
-{
-  MITK_INFO << "OptimizeFiducialPositions()";
-  //Initialization for planes 1 - 2 - 3 - 4 and 5 - 6 - 7 - 8
-  mitk::PlaneFit::Pointer planeFit1234 = mitk::PlaneFit::New();
-  mitk::PlaneFit::Pointer planeFit5678 = mitk::PlaneFit::New();
-  mitk::PointSet::Pointer pointSet1234 = mitk::PointSet::New();
-  mitk::PointSet::Pointer pointSet5678 = mitk::PointSet::New();
-  mitk::PlaneGeometry::Pointer planeGeometry1234 = mitk::PlaneGeometry::New();
-  mitk::PlaneGeometry::Pointer planeGeometry5678 = mitk::PlaneGeometry::New();
-  for (int counter = 1; counter <= 4; ++counter)
-  {
-    pointSet1234->InsertPoint(counter - 1, m_FiducialMarkerCentroids.at(counter));
-  }
-  for (int counter = 5; counter <= 8; ++counter)
-  {
-    pointSet5678->InsertPoint(counter - 5, m_FiducialMarkerCentroids.at(counter));
-  }
-
-  //Make planes parallel
-  this->CreateParallelPlanes(planeFit1234, planeFit5678,
-                             pointSet1234, pointSet5678,
-                             planeGeometry1234, planeGeometry5678,
-                             true);
-
-
-  this->MovePlanes(planeGeometry1234, planeGeometry5678, this->GetMinimalFiducialConfigurationDistance());
-
-  //Move the points into the parallel planes
-  for (int counter = 1; counter <= 4; ++counter)
-  {
-    this->MovePoint(planeGeometry1234, counter);
-  }
-  for (int counter = 5; counter <= 8; ++counter)
-  {
-    this->MovePoint(planeGeometry5678, counter);
-  }
-  MITK_INFO << "NormalVector plane 1234 = " << planeGeometry1234->GetNormal();
-  MITK_INFO << "NormalVector plane 5678 = " << planeGeometry5678->GetNormal();
-  MITK_INFO << "Are parallel: " << planeGeometry1234->IsParallel(planeGeometry5678);
-
-  //Optimize now the positions of Fiducials 1 - 2 - 5 and 4 - 7 - 8
-  //Initialization for planes 1 - 2 - 5 and 4 - 7 - 8
-  mitk::PlaneFit::Pointer planeFit125 = mitk::PlaneFit::New();
-  mitk::PlaneFit::Pointer planeFit478 = mitk::PlaneFit::New();
-  mitk::PointSet::Pointer pointSet125 = mitk::PointSet::New();
-  mitk::PointSet::Pointer pointSet478 = mitk::PointSet::New();
-  mitk::PlaneGeometry::Pointer planeGeometry125 = mitk::PlaneGeometry::New();
-  mitk::PlaneGeometry::Pointer planeGeometry478 = mitk::PlaneGeometry::New();
-
-  pointSet125->InsertPoint(0, m_FiducialMarkerCentroids.at(1));
-  pointSet125->InsertPoint(1, m_FiducialMarkerCentroids.at(2));
-  pointSet125->InsertPoint(2, m_FiducialMarkerCentroids.at(5));
-  //Add the points projected onto the opposite (parallel) plane to the pointset
-  // By means of these projected points the calculated plane 
-  // is orthogonal  to the plane 1234 and 5678.
-  pointSet125->InsertPoint(3, planeGeometry5678->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(1)));
-  pointSet125->InsertPoint(4, planeGeometry5678->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(2)));
-  pointSet125->InsertPoint(5, planeGeometry1234->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(5)));
-
-  pointSet478->InsertPoint(0, m_FiducialMarkerCentroids.at(4));
-  pointSet478->InsertPoint(1, m_FiducialMarkerCentroids.at(7));
-  pointSet478->InsertPoint(2, m_FiducialMarkerCentroids.at(8));
-  //Add the points projected onto the opposite (parallel) plane to the pointset
-  // By means of these projected points the calculated plane 
-  // is orthogonal  to the plane 1234 and 5678.
-  pointSet478->InsertPoint(3, planeGeometry5678->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(4)));
-  pointSet478->InsertPoint(4, planeGeometry1234->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(7)));
-  pointSet478->InsertPoint(5, planeGeometry1234->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(8)));
-
-  //Make planes parallel
-  this->CreateParallelPlanes(planeFit125, planeFit478,
-                             pointSet125, pointSet478,
-                             planeGeometry125, planeGeometry478,
-                             false);
-
-  this->MovePlanes(planeGeometry125, planeGeometry478, (2 * this->GetMinimalFiducialConfigurationDistance()));
-
-  //Move the points into the parallel planes
-  this->MovePoint(planeGeometry125, 1);
-  this->MovePoint(planeGeometry125, 2);
-  this->MovePoint(planeGeometry125, 5);
-  this->MovePoint(planeGeometry478, 4);
-  this->MovePoint(planeGeometry478, 7);
-  this->MovePoint(planeGeometry478, 8);
-  MITK_INFO << "NormalVector plane 125 = " << planeGeometry125->GetNormal();
-  MITK_INFO << "NormalVector plane 478 = " << planeGeometry478->GetNormal();
-  MITK_INFO << "Are parallel: " << planeGeometry125->IsParallel(planeGeometry478);
-
-
-  //Optimize now the positions of Fiducials 1 - 3 - 8 and 4 - 5 - 6
-  //Initialization for planes 1 - 3 - 8 and 4 - 5 - 6
-  mitk::PlaneFit::Pointer planeFit138 = mitk::PlaneFit::New();
-  mitk::PlaneFit::Pointer planeFit456 = mitk::PlaneFit::New();
-  mitk::PointSet::Pointer pointSet138 = mitk::PointSet::New();
-  mitk::PointSet::Pointer pointSet456 = mitk::PointSet::New();
-  mitk::PlaneGeometry::Pointer planeGeometry138 = mitk::PlaneGeometry::New();
-  mitk::PlaneGeometry::Pointer planeGeometry456 = mitk::PlaneGeometry::New();
-
-  pointSet138->InsertPoint(0, m_FiducialMarkerCentroids.at(1));
-  pointSet138->InsertPoint(1, m_FiducialMarkerCentroids.at(3));
-  pointSet138->InsertPoint(2, m_FiducialMarkerCentroids.at(8));
-  //Add the points projected onto the opposite (parallel) plane to the pointset
-  // By means of these projected points the calculated plane 
-  // is orthogonal  to the plane 1234 and 5678.
-  pointSet138->InsertPoint(3, planeGeometry5678->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(1)));
-  pointSet138->InsertPoint(4, planeGeometry5678->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(3)));
-  pointSet138->InsertPoint(5, planeGeometry1234->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(8)));
-
-  pointSet456->InsertPoint(0, m_FiducialMarkerCentroids.at(4));
-  pointSet456->InsertPoint(1, m_FiducialMarkerCentroids.at(5));
-  pointSet456->InsertPoint(2, m_FiducialMarkerCentroids.at(6));
-  //Add the points projected onto the opposite (parallel) plane to the pointset
-  // By means of these projected points the calculated plane 
-  // is orthogonal  to the plane 1234 and 5678.
-  pointSet456->InsertPoint(3, planeGeometry5678->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(4)));
-  pointSet456->InsertPoint(4, planeGeometry1234->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(5)));
-  pointSet456->InsertPoint(5, planeGeometry1234->ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(6)));
-
-  //Make planes parallel
-  this->CreateParallelPlanes(planeFit138, planeFit456,
-                             pointSet138, pointSet456,
-                             planeGeometry138, planeGeometry456,
-                             false);
-
-  this->MovePlanes(planeGeometry138, planeGeometry456, (2 * this->GetMinimalFiducialConfigurationDistance()));
-
-  //Move the points into the parallel planes
-  this->MovePoint(planeGeometry138, 1);
-  this->MovePoint(planeGeometry138, 3);
-  this->MovePoint(planeGeometry138, 8);
-  this->MovePoint(planeGeometry456, 4);
-  this->MovePoint(planeGeometry456, 5);
-  this->MovePoint(planeGeometry456, 6);
-  MITK_INFO << "NormalVector plane 138 = " << planeGeometry138->GetNormal();
-  MITK_INFO << "NormalVector plane 456 = " << planeGeometry456->GetNormal();
-  MITK_INFO << "Are parallel: " << planeGeometry138->IsParallel(planeGeometry456);
-
-}
-
-void QmitkUSNavigationStepCtUsRegistration::CreateParallelPlanes(
-  mitk::PlaneFit::Pointer planeA, mitk::PlaneFit::Pointer planeB, 
-  mitk::PointSet::Pointer pointSetA, mitk::PointSet::Pointer pointSetB, 
-  mitk::PlaneGeometry::Pointer planeGeometryA, mitk::PlaneGeometry::Pointer planeGeometryB,
-  bool minimizeInfluenceOutliers )
-{
-  planeA->SetInput(pointSetA);
-  planeA->Update();
-  mitk::PlaneGeometry::Pointer geometryA = dynamic_cast<mitk::PlaneGeometry *>(planeA->GetOutput()->GetGeometry());
-  planeB->SetInput(pointSetB);
-  planeB->Update();
-  mitk::PlaneGeometry::Pointer geometryB = dynamic_cast<mitk::PlaneGeometry *>(planeB->GetOutput()->GetGeometry());
-  mitk::DataNode::Pointer node1 = mitk::DataNode::New();
-
-
-  MITK_INFO << "Angle before = " << geometryA->Angle(geometryB) * 57.29578; //Transform into degree
-  //Minimize influence of outliers concerning the inclination angle of the plane:
-  if (minimizeInfluenceOutliers)
-  {
-    bool minimizeA = true;
-    bool minimizeB = true;
-    while(minimizeA)
-    {
-      MITK_INFO << "Minimize A";
-      std::vector<std::pair<double, int>> distancesA;
-      distancesA.push_back(std::pair<double, int>(geometryA->Distance(m_FiducialMarkerCentroids.at(1)), 1));
-      distancesA.push_back(std::pair<double, int>(geometryA->Distance(m_FiducialMarkerCentroids.at(2)), 2));
-      distancesA.push_back(std::pair<double, int>(geometryA->Distance(m_FiducialMarkerCentroids.at(3)), 3));
-      distancesA.push_back(std::pair<double, int>(geometryA->Distance(m_FiducialMarkerCentroids.at(4)), 4));
-      std::sort(distancesA.begin(), distancesA.end());
-      for (std::vector<std::pair<double, int>>::iterator it = distancesA.begin(); it != distancesA.end(); ++it)
-      {
-        MITK_INFO << "First = " << (*it).first << " Second = " << (*it).second;
-      }
-      if ((*distancesA.rbegin()).first < 0.005)
-      {
-        minimizeA = false;
-        break;
-      }
-      std::vector<std::pair<double, int>>::reverse_iterator it = distancesA.rbegin();
-      int fiducialNoToBeMovedToPlane1 = (*it).second;
-      ++it;
-      int fiducialNoToBeMovedToPlane2 = (*it).second;
-      this->MovePoint(geometryA, fiducialNoToBeMovedToPlane1);
-      this->MovePoint(geometryA, fiducialNoToBeMovedToPlane2);
-      pointSetA->Clear();
-      for (int counter = 1; counter <= 4; ++counter)
-      {
-        pointSetA->InsertPoint(counter - 1, m_FiducialMarkerCentroids.at(counter));
-      }
-      planeA = mitk::PlaneFit::New();
-      planeA->SetInput(pointSetA);
-      planeA->Update();
-      geometryA = dynamic_cast<mitk::PlaneGeometry *>(planeA->GetOutput()->GetGeometry());
-
-    }
-    while (minimizeB)
-    {
-      MITK_INFO << "Minimize B";
-      std::vector<std::pair<double, int>> distancesB;
-      distancesB.push_back(std::pair<double, int>(geometryB->Distance(m_FiducialMarkerCentroids.at(5)), 5));
-      distancesB.push_back(std::pair<double, int>(geometryB->Distance(m_FiducialMarkerCentroids.at(6)), 6));
-      distancesB.push_back(std::pair<double, int>(geometryB->Distance(m_FiducialMarkerCentroids.at(7)), 7));
-      distancesB.push_back(std::pair<double, int>(geometryB->Distance(m_FiducialMarkerCentroids.at(8)), 8));
-      std::sort(distancesB.begin(), distancesB.end());
-      for (std::vector<std::pair<double, int>>::iterator it = distancesB.begin(); it != distancesB.end(); ++it)
-      {
-        MITK_INFO << "First = " << (*it).first << " Second = " << (*it).second;
-      }
-      if ((*distancesB.rbegin()).first < 0.005)
-      {
-        minimizeB = false;
-        break;
-      }
-      std::vector<std::pair<double, int>>::reverse_iterator it = distancesB.rbegin();
-      int fiducialNoToBeMovedToPlane1 = (*it).second;
-      ++it;
-      int fiducialNoToBeMovedToPlane2 = (*it).second;
-      this->MovePoint(geometryB, fiducialNoToBeMovedToPlane1);
-      this->MovePoint(geometryB, fiducialNoToBeMovedToPlane2);
-      pointSetB->Clear();
-      for (int counter = 5; counter <= 8; ++counter)
-      {
-        pointSetB->InsertPoint(counter - 5, m_FiducialMarkerCentroids.at(counter));
-      }
-      planeB = mitk::PlaneFit::New();
-      planeB->SetInput(pointSetB);
-      planeB->Update();
-      geometryB = dynamic_cast<mitk::PlaneGeometry *>(planeB->GetOutput()->GetGeometry());
-    }
-    MITK_INFO << "Angle after = " << geometryA->Angle(geometryB) * 57.29578; //Transform into degree
-  }
-  // End outliers minimization
-
-  mitk::Point3D originPlaneA = geometryA->GetOrigin();
-  mitk::Point3D originPlaneB = geometryB->GetOrigin();
-  mitk::Vector3D normalPlaneA = geometryA->GetNormal();
-  mitk::Vector3D normalPlaneB = geometryB->GetNormal();
-
-  double scalarProduct = (normalPlaneA * normalPlaneB) /
-    (normalPlaneA.GetNorm() * normalPlaneB.GetNorm());
-
-  double alpha = acos(scalarProduct) * 57.29578; //Transform into degree
-  if (alpha > 90)
-  {
-    normalPlaneB *= -1;
-  }
-  mitk::Vector3D combinedNormalPlaneA_B = 0.5 * (normalPlaneA + normalPlaneB);
-  combinedNormalPlaneA_B.Normalize();
-
-  planeGeometryA->InitializePlane(originPlaneA, combinedNormalPlaneA_B);
-  planeGeometryB->InitializePlane(originPlaneB, combinedNormalPlaneA_B);
-}
-
-void QmitkUSNavigationStepCtUsRegistration::MovePlanes(mitk::PlaneGeometry::Pointer planeA, mitk::PlaneGeometry::Pointer planeB, double referenceDistance)
-{
-  const mitk::PlaneGeometry *constPlaneB = planeB;
-  double distanceBetweenPlanes = planeA->DistanceFromPlane(constPlaneB);
-  MITK_INFO << "Distance between planes before moving = " << distanceBetweenPlanes;
-
-  //If distanceBetweenPlanes is > referenceDistance, the result will be negative,
-  // otherwise it will be positive:
-  double distanceToMove = 0.5 * (referenceDistance - distanceBetweenPlanes);
-  const mitk::Vector3D movingVectorPositive = distanceToMove * planeA->GetNormal();
-  const mitk::Vector3D movingVectorNegative = distanceToMove * planeA->GetNormal() * -1;
-
-  //Check, whether the planeB is above planeA
-  if (planeA->IsAbove(planeB->GetOrigin()))
-  {
-    //planeB is above planeA
-    planeA->Translate(movingVectorNegative);
-    planeB->Translate(movingVectorPositive);
-  }
-  else
-  {
-    //planeB is below planeA
-    planeA->Translate(movingVectorPositive);
-    planeB->Translate(movingVectorNegative);
-  }
-
-  const mitk::PlaneGeometry *constPlaneBMoved = planeB;
-  MITK_INFO << "Distance between planes after moving = " << planeA->DistanceFromPlane(constPlaneBMoved);
-}
-
-void QmitkUSNavigationStepCtUsRegistration::MovePoint(
-  mitk::PlaneGeometry::Pointer planeGeometry, int fiducialNo)
-{
-  MITK_INFO << "Moved Point from " << m_FiducialMarkerCentroids.at(fiducialNo);
-  //Move all points outside the plane to the plane (finally all points lie into the plane):
-  mitk::Point3D movedPoint = planeGeometry->
-    ProjectPointOntoPlane(m_FiducialMarkerCentroids.at(fiducialNo));
-  m_FiducialMarkerCentroids.at(fiducialNo)[0] = movedPoint[0];
-  m_FiducialMarkerCentroids.at(fiducialNo)[1] = movedPoint[1];
-  m_FiducialMarkerCentroids.at(fiducialNo)[2] = movedPoint[2];
-  MITK_INFO << " to " << m_FiducialMarkerCentroids.at(fiducialNo);
-}
-
 void QmitkUSNavigationStepCtUsRegistration::DefineDataStorageImageFilter()
 {
   m_IsAPointSetPredicate = mitk::TNodePredicateDataType<mitk::PointSet>::New();
@@ -1972,7 +1495,6 @@ void QmitkUSNavigationStepCtUsRegistration::CreateQtPartControl(QWidget *parent)
 {
   ui->setupUi(parent);
   ui->floatingImageComboBox->SetPredicate(m_IsAPatientImagePredicate);
-  ui->groundTruthImageComboBox->SetPredicate(m_IsAPatientImagePredicate);
   ui->ctImagesToChooseComboBox->SetPredicate(m_IsAPatientImagePredicate);
   ui->segmentationComboBox->SetPredicate(m_IsASegmentationImagePredicate);
   ui->selectedSurfaceComboBox->SetPredicate(m_IsASurfacePredicate);
@@ -1981,8 +1503,6 @@ void QmitkUSNavigationStepCtUsRegistration::CreateQtPartControl(QWidget *parent)
   // create signal/slot connections
   connect(ui->floatingImageComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
     this, SLOT(OnFloatingImageComboBoxSelectionChanged(const mitk::DataNode*)));
-  connect(ui->groundTruthImageComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
-    this, SLOT(OnGroundTruthImageComboBoxSelectionChanged(const mitk::DataNode*)));
   connect(ui->doRegistrationMarkerToImagePushButton, SIGNAL(clicked()),
     this, SLOT(OnRegisterMarkerToFloatingImageCS()));
   connect(ui->localizeFiducialMarkerPushButton, SIGNAL(clicked()),
@@ -1991,8 +1511,6 @@ void QmitkUSNavigationStepCtUsRegistration::CreateQtPartControl(QWidget *parent)
     this, SLOT(OnVisualizeCTtoUSregistration()));
   connect(ui->freezeUnfreezePushButton, SIGNAL(clicked()),
     this, SLOT(OnFreeze()));
-  connect(ui->filterImageGroundTruthEvaluationPushButton, SIGNAL(clicked()),
-    this, SLOT(OnFilterGroundTruthImage()));
   connect(ui->addCtImagePushButton, SIGNAL(clicked()),
     this, SLOT(OnAddCtImageClicked()));
   connect(ui->removeCtImagePushButton, SIGNAL(clicked()),
@@ -2043,41 +1561,6 @@ void QmitkUSNavigationStepCtUsRegistration::OnFloatingImageComboBoxSelectionChan
   m_FloatingImage = floatingImage;
   this->SetFloatingImageGeometryInformation(floatingImage.GetPointer());
 }
-
-void QmitkUSNavigationStepCtUsRegistration::OnGroundTruthImageComboBoxSelectionChanged(const mitk::DataNode* node)
-{
-  MITK_INFO << "OnGroundTruthImageComboBoxSelectionChanged()";
-
-  if (m_GroundTruthImage.IsNotNull())
-  {
-    //TODO: Define, what will happen if the imageCT is not null...
-  }
-
-  if (node == nullptr)
-  {
-    m_GroundTruthImage = nullptr;
-    return;
-  }
-
-  mitk::DataNode* selectedGroundTruthImage = ui->groundTruthImageComboBox->GetSelectedNode();
-  if (selectedGroundTruthImage == nullptr)
-  {
-    m_GroundTruthImage = nullptr;
-    return;
-  }
-
-  mitk::Image::Pointer groundTruthImage = dynamic_cast<mitk::Image*>(selectedGroundTruthImage->GetData());
-  if (groundTruthImage.IsNull())
-  {
-    MITK_WARN << "Failed to cast selected groundTruth image node to mitk::Image*";
-    m_GroundTruthImage = nullptr;
-    return;
-  }
-
-  m_GroundTruthImage = groundTruthImage;
-}
-
-
 
 void QmitkUSNavigationStepCtUsRegistration::OnRegisterMarkerToFloatingImageCS()
 {
@@ -2324,17 +1807,6 @@ void QmitkUSNavigationStepCtUsRegistration::OnFreeze()
   }
 }
 
-void QmitkUSNavigationStepCtUsRegistration::OnFilterGroundTruthImage()
-{
-  /*if (m_GroundTruthImage.IsNull())
-  {
-    return;
-  }*/
-
-  this->ShowGroundTruthMarkerEdges();
-
-}
-
 void QmitkUSNavigationStepCtUsRegistration::OnActualizeSegmentationSurfacePointSetData()
 {
   mitk::DataNode* segmentationNode = ui->segmentationComboBox->GetSelectedNode();
@@ -2377,6 +1849,14 @@ void QmitkUSNavigationStepCtUsRegistration::OnGetCursorPosition()
 void QmitkUSNavigationStepCtUsRegistration::OnCalculateTRE(mitk::Point3D centroidOfTargetInUSImage)
 {
   mitk::DataNode::Pointer pointSetNode = ui->pointSetComboBox->GetSelectedNode();
+  if (pointSetNode.IsNull())
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Cannot calculate TRE. The pointSetComboBox node returned a nullptr.");
+    msgBox.exec();
+    return;
+  }
+
   mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(pointSetNode->GetData());
   if (pointSet.IsNull())
   {
@@ -2390,6 +1870,15 @@ void QmitkUSNavigationStepCtUsRegistration::OnCalculateTRE(mitk::Point3D centroi
 void QmitkUSNavigationStepCtUsRegistration::OnCalculateCenter()
 {
   mitk::DataNode::Pointer node = ui->segmentationComboBox->GetSelectedNode();
+  if (node.IsNull())
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Cannot calculate the centroid of the segmentation."\
+                    "The segmentationComboBox node returned a nullptr.");
+    msgBox.exec();
+    return;
+  }
+
   mitk::LabelSetImage::Pointer image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
   if (image.IsNull())
   {

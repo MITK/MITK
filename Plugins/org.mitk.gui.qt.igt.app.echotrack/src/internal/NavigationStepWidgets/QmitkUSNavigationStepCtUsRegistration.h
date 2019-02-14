@@ -35,8 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVotingBinaryIterativeHoleFillingImageFilter.h"
 #include <itkBinaryImageToShapeLabelMapFilter.h>
 
-#include <itkSobelEdgeDetectionImageFilter.h>
-
 namespace itk {
 template<class T> class SmartPointer;
 
@@ -60,7 +58,6 @@ typedef itk::BinaryThresholdImageFilter <ImageType, ImageType> BinaryThresholdIm
 typedef itk::LaplacianRecursiveGaussianImageFilter<ImageType, ImageType> LaplacianRecursiveGaussianImageFilterType;
 typedef itk::VotingBinaryIterativeHoleFillingImageFilter<ImageType> VotingBinaryIterativeHoleFillingImageFilterType;
 typedef itk::BinaryImageToShapeLabelMapFilter<ImageType> BinaryImageToShapeLabelMapFilterType;
-typedef itk::SobelEdgeDetectionImageFilter<ImageType, ImageType> SobelEdgeDetectionImageFilterType;
 /**
  * \brief Navigation step for marking risk structures.
  * The user can add risk structures by interacting with the render windows. The
@@ -160,9 +157,7 @@ protected:
   bool EliminateFiducialCandidatesByEuclideanDistances();
   void ClassifyFiducialCandidates();
   void GetCentroidsOfLabeledObjects();
-  void CalculatePCA();
   void NumerateFiducialMarks();
-  void ShowGroundTruthMarkerEdges();
   void CalculateDistancesBetweenFiducials(std::vector<std::vector<double>> &distanceVectorsFiducials);
   bool FindFiducialNo1(std::vector<std::vector<double>> &distanceVectorsFiducials);
   bool FindFiducialNo2And3();
@@ -171,25 +166,15 @@ protected:
   bool FindFiducialNo6();
   bool FindFiducialNo7();
   bool FindFiducialNo8();
-  void OptimizeFiducialPositions();
-  void CreateParallelPlanes(mitk::PlaneFit::Pointer planeA, mitk::PlaneFit::Pointer planeB,
-                          mitk::PointSet::Pointer pointSetA, mitk::PointSet::Pointer pointSetB,
-                          mitk::PlaneGeometry::Pointer planeGeometryA, mitk::PlaneGeometry::Pointer planeGeometryB,
-                          bool minimizeInfluenceOutliers);
-  void MovePlanes(mitk::PlaneGeometry::Pointer planeA, mitk::PlaneGeometry::Pointer planeB,
-                  double referenceDistance);
-  void MovePoint(mitk::PlaneGeometry::Pointer planeGeometry, int fiducialNo);
   void DefineDataStorageImageFilter();
   void CreateQtPartControl(QWidget *parent);
 
 protected slots:
   void OnFloatingImageComboBoxSelectionChanged(const mitk::DataNode* node);
-  void OnGroundTruthImageComboBoxSelectionChanged(const mitk::DataNode* node);
   void OnRegisterMarkerToFloatingImageCS();
   void OnLocalizeFiducials();
   void OnVisualizeCTtoUSregistration();
   void OnFreeze();
-  void OnFilterGroundTruthImage();
   void OnActualizeSegmentationSurfacePointSetData();
   void OnGetCursorPosition();
 
@@ -211,7 +196,6 @@ private:
 
   itk::SmartPointer<mitk::NavigationDataSource> m_NavigationDataSource;
   mitk::Image::Pointer m_FloatingImage;
-  mitk::Image::Pointer m_GroundTruthImage;
   mitk::PointSet::Pointer m_MarkerModelCoordinateSystemPointSet;
   mitk::PointSet::Pointer m_MarkerFloatingImageCoordinateSystemPointSet;
 
@@ -230,8 +214,6 @@ private:
   BinaryImageToShapeLabelMapFilterType::Pointer m_BinaryImageToShapeLabelMapFilter;
 
   itk::SmartPointer<mitk::FloatingImageToUltrasoundRegistrationFilter> m_FloatingImageToUltrasoundRegistrationFilter;
-
-  SobelEdgeDetectionImageFilterType::Pointer m_SobelEdgeDetectionFilter;
 
   std::vector<mitk::Vector3D> m_CentroidsOfFiducialCandidates;
   std::map<double, mitk::Vector3D> m_EigenVectorsFiducialCandidates;

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>847</height>
+    <width>403</width>
+    <height>933</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -66,22 +66,12 @@
         </item>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="1" column="0" colspan="2">
        <widget class="QCheckBox" name="useNdiTrackerCheckBox">
         <property name="text">
-         <string>Use NDI-Tracker</string>
+         <string>Use NDI-Tracker (if unchecked, Polhemus-Tracker is assumed to be used)</string>
         </property>
         <property name="autoExclusive">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QCheckBox" name="optimizeFiducialPositionsCheckBox">
-        <property name="text">
-         <string>Optimize Fiducial Positions</string>
-        </property>
-        <property name="checked">
          <bool>false</bool>
         </property>
        </widget>
@@ -92,7 +82,7 @@
    <item>
     <widget class="QGroupBox" name="classicWayRegisteringCtImageGroupBox">
      <property name="title">
-      <string>Classic Way Of Registering CT image</string>
+      <string>Classic Way Of Registering Floating Image</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
@@ -193,7 +183,8 @@
       <item>
        <widget class="QLabel" name="distanceTRELabel">
         <property name="text">
-         <string>Distance (TRE) between centroid of CT-target and US-image target (in mm):</string>
+         <string>Distance (TRE) between centroid of FloatingImage-target and
+ US-image target (in mm):</string>
         </property>
        </widget>
       </item>
@@ -201,13 +192,6 @@
        <widget class="QLabel" name="distanceTREValue">
         <property name="text">
          <string>0.000</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="calculateCenterPushButton">
-        <property name="text">
-         <string>Calculate Center</string>
         </property>
        </widget>
       </item>
@@ -358,12 +342,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkDataStorageComboBox" name="groundTruthImageComboBox"/>
-   </item>
-   <item>
-    <widget class="QPushButton" name="filterImageGroundTruthEvaluationPushButton">
+    <widget class="QPushButton" name="calculateCenterPushButton">
      <property name="text">
-      <string>Filter Image For Ground Truth Evaluation</string>
+      <string>Calculate Centroid Of Segmentation</string>
      </property>
     </widget>
    </item>

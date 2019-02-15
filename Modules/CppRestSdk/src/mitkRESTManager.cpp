@@ -5,20 +5,39 @@ mitk::RESTManager::RESTManager() {}
 
 mitk::RESTManager::~RESTManager() {}
 
-void mitk::RESTManager::SendRequest(RequestType type)
+pplx::task<web::json::value> mitk::RESTManager::SendRequest(web::uri uri, RequestType type, web::json::value content)
 {
+  pplx::task<web::json::value> answer;
+  auto client = new RESTClientMicroService();
   switch (type)
   {
     case get:
-      // Call get in mitkRESTClientMicroService
+    {
+      answer = client->Get(uri);
       break;
+    }
     case post:
-      // Call post in mitkRESTClientMicroService
+    {
+      if (content == NULL)
+      {
+        MITK_WARN << "Content for put is empty, this will create an empty ressource";
+      }
+      answer = client->POST(uri, content);
+      break;
+    }
       break;
     case put:
-      // Call put in mitkRESTClientMicroService
+    {
+      if (content == NULL)
+      {
+        MITK_WARN << "Content for put is empty, this will empty the ressource";
+      }
+      answer = client->PUT(uri,content);
       break;
+    }
   }
+
+  return answer;
 }
 
 void mitk::RESTManager::ReceiveRequest(web::uri uri, mitk::IRESTObserver *observer)
@@ -109,46 +128,102 @@ web::json::value mitk::RESTManager::Handle(web::uri uri, web::json::value data)
   }
 }
 
-void mitk::RESTManager::HandleDeleteObserver(mitk::IRESTObserver *observer)
+//void mitk::RESTManager::HandleDeleteObserver(mitk::IRESTObserver *observer)
+//{
+//  for (auto it = m_Observer.begin(); it != m_Observer.end();)
+//  {
+//    mitk::IRESTObserver *obsMap = it->second;
+//    //Check weather observer is at this place in map
+//    if (obsMap == observer)
+//    {
+//      // if yes
+//      // 1. store port in a temporary variable
+//      int port = it->first.first;
+//      utility::string_t path = it->first.second;
+//      std::pair<int, utility::string_t> key(port, path);
+//      MITK_INFO << "Number of elements at key [ " << port << ", " << std::string(key.second.begin(), key.second.end())
+//                << "]: " << m_Observer.count(key);
+//      // 2. delete map entry
+//      it = m_Observer.erase(it);
+//      MITK_INFO << "Number of elements at key [ " << port << ", " << std::string(key.second.begin(), key.second.end())
+//                << "]: " << m_Observer.count(key);
+//      // 3. check, if there is another observer under this port in observer map (with bool flag)
+//      bool noObserverForPort = true;
+//      for (auto o : m_Observer)
+//      {
+//        if (o.first.first == port)
+//        {
+//          //there still exists an observer for this port
+//          noObserverForPort = false;
+//        }
+//      }
+//      if (noObserverForPort)
+//      {
+//        //  there isn't an observer at this port, delete m_ServerMap entry for this port  
+//        //close listener
+//        QMetaObject::invokeMethod(m_ServerMap[port], "CloseListener");
+//        //end thread
+//        m_ServerThreadMap[port]->quit();
+//        m_ServerThreadMap[port]->wait();
+//        //delete server from map
+//        m_ServerMap.erase(port);
+//      }     
+//    }
+//    else
+//    {
+//      ++it;
+//    }
+//  }
+//}
+
+void mitk::RESTManager::HandleDeleteObserver(IRESTObserver *observer, web::uri uri=L"")
 {
   for (auto it = m_Observer.begin(); it != m_Observer.end();)
   {
     mitk::IRESTObserver *obsMap = it->second;
-    //Check weather observer is at this place in map
+    // Check wether observer is at this place in map
     if (obsMap == observer)
     {
-      // if yes
-      // 1. store port in a temporary variable
-      int port = it->first.first;
-      utility::string_t path = it->first.second;
-      std::pair<int, utility::string_t> key(port, path);
-      MITK_INFO << "Number of elements at key [ " << port << ", " << std::string(key.second.begin(), key.second.end())
-                << "]: " << m_Observer.count(key);
-      // 2. delete map entry
-      it = m_Observer.erase(it);
-      MITK_INFO << "Number of elements at key [ " << port << ", " << std::string(key.second.begin(), key.second.end())
-                << "]: " << m_Observer.count(key);
-      // 3. check, if there is another observer under this port in observer map (with bool flag)
-      bool noObserverForPort = true;
-      for (auto o : m_Observer)
+      //Check wether it is the right uri to be deleted
+      if (uri==L""||it->first.second == uri.path())
       {
-        if (o.first.first == port)
+        // if yes
+        // 1. store port in a temporary variable
+        int port = it->first.first;
+        utility::string_t path = it->first.second;
+        std::pair<int, utility::string_t> key(port, path);
+        MITK_INFO << "Number of elements at key [ " << port << ", " << std::string(key.second.begin(), key.second.end())
+                  << "]: " << m_Observer.count(key);
+        // 2. delete map entry
+        it = m_Observer.erase(it);
+        MITK_INFO << "Number of elements at key [ " << port << ", " << std::string(key.second.begin(), key.second.end())
+                  << "]: " << m_Observer.count(key);
+        // 3. check, if there is another observer under this port in observer map (with bool flag)
+        bool noObserverForPort = true;
+        for (auto o : m_Observer)
         {
-          //there still exists an observer for this port
-          noObserverForPort = false;
+          if (o.first.first == port)
+          {
+            // there still exists an observer for this port
+            noObserverForPort = false;
+          }
         }
-      }
-      if (noObserverForPort)
+        if (noObserverForPort)
+        {
+          //  there isn't an observer at this port, delete m_ServerMap entry for this port
+          // close listener
+          QMetaObject::invokeMethod(m_ServerMap[port], "CloseListener");
+          // end thread
+          m_ServerThreadMap[port]->quit();
+          m_ServerThreadMap[port]->wait();
+          // delete server from map
+          m_ServerMap.erase(port);
+        }
+      } 
+      else
       {
-        //  there isn't an observer at this port, delete m_ServerMap entry for this port  
-        //close listener
-        QMetaObject::invokeMethod(m_ServerMap[port], "CloseListener");
-        //end thread
-        m_ServerThreadMap[port]->quit();
-        m_ServerThreadMap[port]->wait();
-        //delete server from map
-        m_ServerMap.erase(port);
-      }     
+        ++it;
+      }
     }
     else
     {

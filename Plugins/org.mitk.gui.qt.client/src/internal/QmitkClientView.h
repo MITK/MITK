@@ -14,16 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkThreadView_h
-#define QmitkThreadView_h
+#ifndef QmitkClientView_h
+#define QmitkClientView_h
 
 #include <QmitkAbstractView.h>
-#include <mitkIRESTObserver.h>
 #include "cpprest/uri.h"
-
+#include <future>
+#include <algorithm>
+#include <QString>
 namespace Ui
 {
-  class QmitkThreadView;
+  class QmitkClientView;
 }
 
 namespace mitk
@@ -31,30 +32,31 @@ namespace mitk
   class RESTManager;
 }
 
-class QmitkThreadView : public QmitkAbstractView, public mitk::IRESTObserver
+class QmitkClientView : public QmitkAbstractView
 {
   Q_OBJECT
 
 public:
   static const std::string VIEW_ID;
 
-  QmitkThreadView();
-  ~QmitkThreadView() override;
+  QmitkClientView();
+  ~QmitkClientView() override;
 
   void CreateQtPartControl(QWidget *parent) override;
-  web::json::value Notify(web::json::value data) override;
 
+signals:
+  void UpdateProgressBar();
+  void UpdateLabel(QString);
 private slots:
-  void OnStopAllButtonClicked();
-  void OnTestListenCheckBoxClicked();
-  void OnExampleListenCheckBoxClicked();
-  void OnPort8090ListenCheckBoxClicked();
+  void OnGetButtonClicked();
+  void OnPutButtonClicked();
+  void OnPostButtonClicked();
+  void OnUpdateProgressBar();
+  void OnUpdateLabel(QString text);
 
 private:
   void SetFocus() override;
-  void StartListening(web::uri);
-  void StopListening(web::uri);
-  Ui::QmitkThreadView *m_Ui;
+  Ui::QmitkClientView *m_Ui;
 };
 
 #endif

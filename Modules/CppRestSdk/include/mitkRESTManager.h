@@ -22,13 +22,14 @@ namespace mitk
     ~RESTManager() override;
 
     // calls RESTClient
-    void SendRequest(RequestType type) override;
+    pplx::task<web::json::value> SendRequest(web::uri uri, RequestType type = get, web::json::value = NULL) override;
     // calls RESTServer
     void ReceiveRequest(web::uri uri, IRESTObserver *observer) override;
 
     web::json::value Handle(web::uri, web::json::value) override;
 
-    virtual void HandleDeleteObserver(IRESTObserver *observer) override;
+    //virtual void HandleDeleteObserver(IRESTObserver *observer) override;
+    virtual void HandleDeleteObserver(IRESTObserver *observer, web::uri) override;
 
   private:
     std::map<int, RESTClientMicroService *> m_ClientMap;                     // Map with port client pairs

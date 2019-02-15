@@ -3,12 +3,10 @@
 
 #include "cpprest/uri.h"
 #include "cpprest/json.h"
-
 #include <MitkCoreExports.h>
 #include <mitkServiceInterface.h>
 
 #include <mitkIRESTObserver.h>
-
 namespace mitk
 {
   class IRESTManager
@@ -25,11 +23,12 @@ namespace mitk
       put
     };
 
-    virtual void SendRequest(RequestType type) = 0;
+    virtual pplx::task<web::json::value> SendRequest(web::uri uri, RequestType type = get, web::json::value = NULL) = 0;
 
     virtual void ReceiveRequest(web::uri uri, IRESTObserver *observer) = 0;
     virtual web::json::value Handle(web::uri, web::json::value) = 0;
-    virtual void HandleDeleteObserver(IRESTObserver *observer) = 0;
+    //virtual void HandleDeleteObserver(IRESTObserver *observer) = 0;
+    virtual void HandleDeleteObserver(IRESTObserver *observer, web::uri = L"") = 0;
   };
 } // namespace mitk
 

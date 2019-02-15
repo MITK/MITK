@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkThreadView</class>
- <widget class="QWidget" name="QmitkThreadView">
+ <class>QmitkClientView</class>
+ <widget class="QWidget" name="QmitkClientView">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,41 +11,44 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Thread View</string>
+   <string>Client View</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QCheckBox" name="testListenCheckBox">
+    <widget class="QLineEdit" name="uriLineEdit"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="getPushButton">
      <property name="text">
-      <string>http://localhost:8080/test</string>
+      <string>GET</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="exampleListenCheckBox">
+    <widget class="QPushButton" name="putPushButton">
      <property name="text">
-      <string>http://localhost:8080/example</string>
+      <string>PUT</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="port8090CheckBox">
+    <widget class="QPushButton" name="postPushButton">
      <property name="text">
-      <string>http://localhost:8090</string>
+      <string>POST</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="stopAllPushButton">
-     <property name="text">
-      <string>Stop Listening all</string>
+    <widget class="QProgressBar" name="progressBar">
+     <property name="value">
+      <number>24</number>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="listenerLabel">
+    <widget class="QLabel" name="responseLabel">
      <property name="text">
-      <string/>
+      <string>This label changes after request</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

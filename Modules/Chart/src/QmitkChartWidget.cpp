@@ -378,7 +378,7 @@ void QmitkChartWidget::Impl::SetShowDataPoints(bool showDataPoints)
 {
   if (showDataPoints == true)
   {
-    m_C3Data.SetDataPointSize(3);
+    m_C3Data.SetDataPointSize(6.5);
   }
   else
   {

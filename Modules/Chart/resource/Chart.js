@@ -196,6 +196,12 @@ function generatePlotData(){
       trace["line"]["shape"] = 'spline'
     }
 
+    // handle marker visibility/size
+    trace["marker"] = {size: chartData.m_DataPointSize}
+    if (chartData.m_DataPointSize == 0){
+      trace["mode"] = "lines";
+    }
+
     if (dataProperties[dataLabels[index]]["style"] == "dashed"){
       trace["line"]["dash"] = "dot"
     }

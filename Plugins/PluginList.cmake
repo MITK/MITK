@@ -74,14 +74,5 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.imagestatistics:ON
   #org.mitk.gui.qt.tofutil:OFF
   #org.mitk.gui.qt.igttracking:OFF
+  #org.mitk.gui.qt.aicpregistration:OFF
 )
-
-IF(MITK_USE_TOF_KINECTV2)
-  list(APPEND MITK_PLUGINS
-    org.mitk.gui.qt.aicpregistration:ON
-  )
-ELSE(MITK_USE_TOF_KINECTV2)
-  list(APPEND MITK_PLUGINS
-    org.mitk.gui.qt.aicpregistration:OFF
-  )
-ENDIF(MITK_USE_TOF_KINECTV2)

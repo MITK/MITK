@@ -621,10 +621,17 @@ void mitk::FiberfoxParameters::GenerateGradientHalfShell()
 
 void mitk::FiberfoxParameters::LoadParameters(std::string filename, bool fix_seed)
 {
+  itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randgen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
   if (fix_seed)
+  {
     srand(0);
+    randgen->SetSeed(0);
+  }
   else
+  {
     srand(time(0));
+    randgen->SetSeed();
+  }
   m_MissingTags = "";
   if(filename.empty()) { return; }
 
@@ -787,7 +794,6 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename, bool fix_see
         m_SignalGen.SetGradienDirections(gradients);
       }
 
-
       m_Misc.m_MotionVolumesBox = ReadVal<std::string>(v1,"artifacts.motionvolumes", m_Misc.m_MotionVolumesBox);
       m_SignalGen.m_MotionVolumes.clear();
 
@@ -796,7 +802,7 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename, bool fix_see
         m_SignalGen.m_MotionVolumes.push_back(0);
         for ( size_t i=1; i < m_SignalGen.GetNumVolumes(); ++i )
         {
-          m_SignalGen.m_MotionVolumes.push_back( bool( rand()%2 ) );
+          m_SignalGen.m_MotionVolumes.push_back( bool( randgen->GetIntegerVariate()%2 ) );
         }
         MITK_DEBUG << "mitkFiberfoxParameters.cpp: Case m_Misc.m_MotionVolumesBox == \"random\".";
       }

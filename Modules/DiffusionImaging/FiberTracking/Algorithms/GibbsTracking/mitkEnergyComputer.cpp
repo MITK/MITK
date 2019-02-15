@@ -106,7 +106,7 @@ void EnergyComputer::SetParameters(float particleWeight, float particleWidth, fl
 // draw random position from active voxels
 void EnergyComputer::DrawRandomPosition(vnl_vector_fixed<float, 3>& R)
 {
-    float r = m_RandGen->GetVariate();//m_RandGen->frand();
+    float r = static_cast<float>(m_RandGen->GetVariate());
     int j;
     int rl = 1;
     int rh = m_NumActiveVoxels;

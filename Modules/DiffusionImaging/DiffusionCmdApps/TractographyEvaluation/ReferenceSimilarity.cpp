@@ -88,16 +88,16 @@ int main(int argc, char* argv[])
       int c=0;
       for (auto ref_mask : reference_masks)
       {
-        ++disp;
-        std::streambuf *old = cout.rdbuf(); // <-- save
-        std::stringstream ss;
-        std::cout.rdbuf (ss.rdbuf());       // <-- redirect
+//        ++disp;
+//        std::streambuf *old = cout.rdbuf(); // <-- save
+//        std::stringstream ss;
+//        std::cout.rdbuf (ss.rdbuf());       // <-- redirect
         float overlap = 0;
         float directional_overlap = 0;
         std::tie(directional_overlap, overlap) = fib->GetDirectionalOverlap(ref_mask, reference_peaks.at(c));
         voxel_overlap[r][c] = overlap;
         dir_overlap[r][c] = directional_overlap;
-        std::cout.rdbuf (old);              // <-- restore
+//        std::cout.rdbuf (old);              // <-- restore
         ++c;
       }
       ++r;

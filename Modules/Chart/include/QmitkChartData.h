@@ -85,7 +85,7 @@ public:
   Q_INVOKABLE void SetUsePercentageInPieChart(const QVariant& usePercentageInPieChart) { m_UsePercentageInPieChart = usePercentageInPieChart; emit SignalUsePercentageInPieChartChanged(usePercentageInPieChart); };
 
   Q_INVOKABLE QVariant GetDataPointSize() const { return m_DataPointSize; };
-  Q_INVOKABLE void SetDataPointSize(const QVariant& showDataPoints) { if (showDataPoints > 0) { m_DataPointSize = 3; } else { m_DataPointSize = 0; } emit SignalDataPointSizeChanged(showDataPoints); };
+  Q_INVOKABLE void SetDataPointSize(const QVariant& showDataPoints) { m_DataPointSize = showDataPoints; emit SignalDataPointSizeChanged(showDataPoints); };
 
   Q_INVOKABLE QVariant GetStackedData() const { return m_StackedData; };
   Q_INVOKABLE void SetStackedData(const QVariant& stackedData) { m_StackedData = stackedData; emit SignalStackedDataChanged(m_StackedData); };

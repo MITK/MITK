@@ -32,14 +32,14 @@ window.onload = function()
 
     let count = 0;
     for(let propertyName in channel.objects) {
-    if (propertyName != 'chartData')
-    {
+      if (propertyName != 'chartData')
+      {
         let xDataTemp = channel.objects[propertyName].m_XData;
         let yDataTemp = channel.objects[propertyName].m_YData;
-	    let xErrorsTempPlus = channel.objects[propertyName].m_XErrorDataPlus;
-		let xErrorsTempMinus = channel.objects[propertyName].m_XErrorDataMinus;
-		let yErrorsTempPlus = channel.objects[propertyName].m_YErrorDataPlus;
-		let yErrorsTempMinus = channel.objects[propertyName].m_YErrorDataMinus;  
+        let xErrorsTempPlus = channel.objects[propertyName].m_XErrorDataPlus;
+        let xErrorsTempMinus = channel.objects[propertyName].m_XErrorDataMinus;
+        let yErrorsTempPlus = channel.objects[propertyName].m_YErrorDataPlus;
+        let yErrorsTempMinus = channel.objects[propertyName].m_YErrorDataMinus;  
         let dataLabel = channel.objects[propertyName].m_Label;
         dataLabels.push(dataLabel);
 
@@ -56,21 +56,21 @@ window.onload = function()
         xValues[count] = xDataTemp
         yValues[count] = yDataTemp
         xErrorValuesPlus[count] = xErrorsTempPlus;
-		xErrorValuesMinus[count] = xErrorsTempMinus;
-		yErrorValuesPlus[count] = yErrorsTempPlus;
-		yErrorValuesMinus[count] = yErrorsTempMinus;
-		
+        xErrorValuesMinus[count] = xErrorsTempMinus;
+        yErrorValuesPlus[count] = yErrorsTempPlus;
+        yErrorValuesMinus[count] = yErrorsTempMinus;
+    
 
         var tempLineStyle = '';
 
         if (channel.objects[propertyName].m_LineStyleName == "solid")
-  			{
-  			  tempLineStyle = ''
-  			}
-  			else
-  			{
-  			  tempLineStyle = "dashed"
-  			}
+        {
+          tempLineStyle = ''
+        }
+        else
+        {
+          tempLineStyle = "dashed"
+        }
 
         dataProperties[dataLabel] = {
             "color" : channel.objects[propertyName].m_Color,
@@ -78,9 +78,9 @@ window.onload = function()
             "style": tempLineStyle
         }
 
-  			count++;
-  		}
-  	}
+        count++;
+      }
+    }
 	var theme = chartData.m_themeName;
 	setThemeColors(theme);
     generateChart(chartData);
@@ -130,25 +130,23 @@ function generateErrorBarsAsymmetric(errorsPlus, errorsMinus, visible){
 	return errorObject;
 }
 
-/**
- * Here, the chart magic takes place. Plot.ly is called.
- *
- * @param {object} chartData - containing the options for plotting, not the actual values
- */
-function generateChart(chartData)
-{
-  console.log("generate chart");
-	if (chartData == undefined)
-	{
-		chartData = {}
-	}
+function generateStackPlotData(){
+  let data = [];
 
-	if (dataLabels == undefined)
-	{
-    dataLabels = []
-	}
+  for (let index = 0; index < dataLabels.length; index++){
+    let trace = {
+      x: xValues[index].slice(1),
+      y: yValues[index].slice(1),
+      stackgroup: 'one',
+      name: dataLabels[index]
+    };
 
-  //=============================== DATA ========================
+    data.push(trace);
+  }
+  return data;
+}
+
+function generatePlotData(){
   let data = [];
 
   for (let index = 0; index < dataLabels.length; index++){
@@ -199,13 +197,39 @@ function generateChart(chartData)
     }
 
     if (dataProperties[dataLabels[index]]["style"] == "dashed"){
-      console.log("use dot")
       trace["line"]["dash"] = "dot"
     }
 
     data.push(trace)
   }
+  return data;
+}
 
+/**
+ * Here, the chart magic takes place. Plot.ly is called.
+ *
+ * @param {object} chartData - containing the options for plotting, not the actual values
+ */
+function generateChart(chartData)
+{
+  console.log("generate chart");
+	if (chartData == undefined)
+	{
+		chartData = {}
+	}
+
+	if (dataLabels == undefined)
+	{
+    dataLabels = []
+	}
+
+  //=============================== DATA ========================
+  var data = [];
+  if (chartData.m_StackedData){
+    data = generateStackPlotData();
+  } else {
+    data = generatePlotData();
+  }
   //=============================== STYLE ========================
   let marginTop = chartData.m_chartTitle == undefined ? 10 : 50;
 

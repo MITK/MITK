@@ -86,6 +86,8 @@ public:
   void SetShowLegend(bool show);
   void SetShowErrorBars(bool show);
 
+  void SetStackedData(bool stacked);
+
   void SetShowDataPoints(bool showDataPoints = false);
 
   void SetChartType(const std::string &label, QmitkChartWidget::ChartType chartType);
@@ -362,6 +364,11 @@ void QmitkChartWidget::Impl::SetShowLegend(bool show)
   m_C3Data.SetShowLegend(show);
 }
 
+void QmitkChartWidget::Impl::SetStackedData(bool stacked)
+{
+  m_C3Data.SetStackedData(stacked);
+}
+
 void QmitkChartWidget::Impl::SetShowErrorBars(bool show)
 {
   m_C3Data.SetShowErrorBars(show);
@@ -568,8 +575,7 @@ void QmitkChartWidget::SetShowLegend(bool show)
 
 void QmitkChartWidget::SetStackedData(bool stacked)
 {
-  Q_UNUSED(stacked) // this is a temporary solution and will be changed as soon as this method is implemented
-  MITK_WARN << "not yet implemented";
+  m_Impl->SetStackedData(stacked);
 }
 
 void QmitkChartWidget::Show(bool showSubChart)

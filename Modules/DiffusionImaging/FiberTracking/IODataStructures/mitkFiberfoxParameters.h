@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/property_tree/xml_parser.hpp>
 #include <limits>
 #include <MitkFiberTrackingExports.h>
+#include <itkMersenneTwisterRandomVariateGenerator.h>
 
 namespace mitk
 {

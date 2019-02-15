@@ -95,7 +95,7 @@ void
 ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutputScalarType>
 ::GenerateData()
 {
-  unsigned int randSeed = time(nullptr);
+  itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randgen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
 
   if(m_InputBValueMap.empty() || m_NumGradientDirections.size()!=m_InputBValueMap.size())
     mitkThrow() << "Vector of the number of desired gradient directions contains more elements than the specified target b-value map.";
@@ -106,7 +106,7 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
   int shellCounter = 0;
   for(BValueMap::iterator it = m_InputBValueMap.begin(); it != m_InputBValueMap.end(); it++ )
   {
-    srand(randSeed);
+    randgen->SetSeed();
 
     m_UsedGradientIndices.clear();
     m_UnusedGradientIndices.clear();
@@ -144,8 +144,7 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
         while ( stagnationCount<1000 && rejectionCount<maxRejections )
         {
           // make proposal for new gradient configuration by randomly removing one of the currently used directions and instead adding one of the unused directions
-          //int iUsed = rand() % m_UsedGradientIndices.size();
-          int iUnUsed = rand() % m_UnusedGradientIndices.size();
+          int iUnUsed = randgen->GetIntegerVariate() % m_UnusedGradientIndices.size();
           int vUsed = m_UsedGradientIndices.at(iUsed);
           int vUnUsed = m_UnusedGradientIndices.at(iUnUsed);
           m_UsedGradientIndices.at(iUsed) = vUnUsed;

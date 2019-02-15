@@ -32,15 +32,15 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="m_Config">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>362</width>
-        <height>388</height>
+        <width>356</width>
+        <height>369</height>
        </rect>
       </property>
       <attribute name="label">
@@ -67,8 +67,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>362</width>
-        <height>388</height>
+        <width>340</width>
+        <height>681</height>
        </rect>
       </property>
       <attribute name="label">
@@ -78,7 +78,7 @@
        <item row="0" column="0">
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="m_Spacing">
           <attribute name="title">
@@ -444,7 +444,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. Setup the Connection to PLUS&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. Start fCal with the EchoTrackCalibration Config file&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. Start fCal with the USTrackingNavigationCalibration Config file&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;3. Connect fcal to MITK, once it connected successfully you can click the &amp;quot;Start Streaming&amp;quot; Button below&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;4. Now follow the steps in fCal and don't forget to save the Calibration in the end&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;5. Finish fCal&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -521,8 +521,8 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>352</width>
-        <height>411</height>
+        <width>339</width>
+        <height>527</height>
        </rect>
       </property>
       <attribute name="label">
@@ -779,8 +779,8 @@ p, li { white-space: pre-wrap; }
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>334</width>
-                <height>230</height>
+                <width>179</width>
+                <height>82</height>
                </rect>
               </property>
               <attribute name="label">
@@ -824,8 +824,8 @@ p, li { white-space: pre-wrap; }
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>334</width>
-                <height>269</height>
+                <width>140</width>
+                <height>220</height>
                </rect>
               </property>
               <attribute name="label">

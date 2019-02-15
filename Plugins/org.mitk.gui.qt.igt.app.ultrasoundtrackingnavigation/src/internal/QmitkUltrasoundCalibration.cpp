@@ -394,7 +394,7 @@ void QmitkUltrasoundCalibration::OnStartPlusCalibration()
 
   //setup server to send UltrasoundImages to PLUS
   mitk::IGTLServer::Pointer m_USServer = mitk::IGTLServer::New(true);
-  m_USServer->SetName("EchoTrack Image Source");
+  m_USServer->SetName("USTrackingNavigation Image Source");
   m_USServer->SetHostname("127.0.0.1");
   m_USServer->SetPortNumber(18944);
 
@@ -408,7 +408,7 @@ void QmitkUltrasoundCalibration::OnStartPlusCalibration()
 
   //setup server to send TrackingData to PLUS
   m_TrackingServer = mitk::IGTLServer::New(true);
-  m_TrackingServer->SetName("EchoTrack Tracking Source");
+  m_TrackingServer->SetName("USTrackingNavigation Tracking Source");
   m_TrackingServer->SetHostname("127.0.0.1");
   m_TrackingServer->SetPortNumber(18945);
 
@@ -928,8 +928,8 @@ void QmitkUltrasoundCalibration::Update()
   m_Controls.m_EvalTrackingStatus->SetNavigationDatas(datas);
   m_Controls.m_EvalTrackingStatus->Refresh();
 
-  
-  
+
+
   /*
   if (m_Image.IsNotNull() && m_Image->IsInitialized())
   {
@@ -940,7 +940,7 @@ void QmitkUltrasoundCalibration::Update()
     m_Image = m_CombinedModality->GetOutput();
     m_Node->SetData(m_Image);
   }*/
-  
+
   m_CombinedModality->Modified();
   m_CombinedModality->Update();
 
@@ -957,7 +957,7 @@ void QmitkUltrasoundCalibration::Update()
 
   //only update 2d window because it is faster
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
-  
+
 }
 
 void QmitkUltrasoundCalibration::SwitchFreeze()
@@ -973,7 +973,7 @@ void QmitkUltrasoundCalibration::SwitchFreeze()
     }
 
     m_CombinedModality->Update();
-    m_Image = m_CombinedModality->GetOutput(); 
+    m_Image = m_CombinedModality->GetOutput();
     if (m_Image.IsNotNull() && m_Image->IsInitialized())
     {
       m_Node->SetData(m_Image);

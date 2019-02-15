@@ -140,7 +140,7 @@ public:
   void OnStartCalibrationProcess();
 
   /**
-  *\brief Method to use the PLUS-Toolkoit for Calibration of EchoTrack
+  *\brief Method to use the PLUS-Toolkoit for Calibration of USTrackingNavigation
   */
   void OnStartPlusCalibration();
 

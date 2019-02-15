@@ -14,7 +14,7 @@ QmitkSmartBrushToolGUI::QmitkSmartBrushToolGUI() :
   this->setContentsMargins(0, 0, 0, 0);
   QBoxLayout* mainLayout = new QVBoxLayout(this);
 
-  QBoxLayout* radiusLayout = new QHBoxLayout(this);
+  QBoxLayout* radiusLayout = new QHBoxLayout();
 
   QLabel* radLabel = new QLabel(tr("Radius: "), this);
   radLabel->setFixedWidth(TEXT_LABEL_SIZE);
@@ -35,7 +35,7 @@ QmitkSmartBrushToolGUI::QmitkSmartBrushToolGUI() :
 
   mainLayout->addLayout(radiusLayout);
 
-  QBoxLayout* sensitivityLayout = new QHBoxLayout(this);
+  QBoxLayout* sensitivityLayout = new QHBoxLayout();
 
   QLabel* sensLabel = new QLabel(tr("Sensitivity: "), this);
   sensLabel->setFixedWidth(TEXT_LABEL_SIZE);

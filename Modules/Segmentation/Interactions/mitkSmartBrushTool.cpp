@@ -95,6 +95,8 @@ void mitk::SmartBrushTool::Activated()
   Superclass::Activated();
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
+  m_Radius = 10;
+  m_Sensitivity = 50;
   radiusChanged.Send(m_Radius);
   sensitivityChanged.Send(m_Sensitivity);
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<mitk::SmartBrushTool>(this, &mitk::SmartBrushTool::OnToolManagerWorkingDataModified);
@@ -206,8 +208,28 @@ void mitk::SmartBrushTool::OnAltPrimaryButtonPressed(StateMachineAction*, Intera
   mitk::Point3D pointCenter;
   m_WorkingImage->GetGeometry()->IndexToWorld(m_ReferencePoint, pointCenter);
 
-  m_PointSet->InsertPoint(1, pointCenter);
-  m_IsReferencePointSet = true;
+  // Check if new point inside the image
+  itk::Image<float, 3>::SizeType imageSize = m_OriginalImage->GetLargestPossibleRegion().GetSize();
+  bool insideImage = true;
+  for (int i = 0; i < 3; i++) {
+    if (m_ReferencePoint[i] < 0) {
+      insideImage = false;
+      break;
+    }
+
+    if (m_ReferencePoint[i] >= imageSize[i]) {
+      insideImage = false;
+      break;
+    }
+  }
+
+  if (insideImage) {
+    m_PointSet->InsertPoint(1, pointCenter);
+    m_IsReferencePointSet = true;
+  } else {
+    m_PointSet->Clear();
+    m_IsReferencePointSet = false;
+  }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -344,13 +366,13 @@ void mitk::SmartBrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
     brushStart[1] = globalIndexCoordinates[1] - m_Radius;
     brushStart[2] = globalIndexCoordinates[2] - m_Radius;
 
+    itk::Image<float, 3>::SizeType imageSize = m_OriginalImage->GetLargestPossibleRegion().GetSize();
     // Clamp region in image
     for (int i = 0; i < 3; i++) {
       if (brushStart[i] < 0) {
         brushSize[i] += brushStart[i];
         brushStart[i] = 0;
       }
-      itk::Image<float, 3>::SizeType imageSize = m_OriginalImage->GetLargestPossibleRegion().GetSize();
       if ((brushStart[i] + brushSize[i]) >= imageSize[i]) {
         brushSize[i] -= (brushStart[i] + brushSize[i]) - imageSize[i];
       }
@@ -379,7 +401,14 @@ void mitk::SmartBrushTool::MouseMovedImpl(const mitk::PlaneGeometry* planeGeomet
       targetIndex[0] = globalIndexCoordinates[0];
       targetIndex[1] = globalIndexCoordinates[1];
       targetIndex[2] = globalIndexCoordinates[2];
+
+      // Clamp current index inside image
+      for (int i = 0; i < 3; i++) {
+        targetIndex[i] = std::max((int)targetIndex[i], 0);
+        targetIndex[i] = std::min((int)targetIndex[i], (int)imageSize[i] - 1);
+      }
     }
+
     smartBrushStrokeFilter->SetTargetIntensity(m_OriginalImage->GetPixel(targetIndex));
     smartBrushStrokeFilter->SetCenter(globalIndexCoordinates);
     smartBrushStrokeFilter->SetDirection(m_CurrentDirection);

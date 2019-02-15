@@ -61,7 +61,7 @@ window.onload = function()
 		yErrorValuesMinus[count] = yErrorsTempMinus;
 		
 
-        let tempLineStyle = '';
+        var tempLineStyle = '';
 
         if (channel.objects[propertyName].m_LineStyleName == "solid")
   			{
@@ -69,7 +69,7 @@ window.onload = function()
   			}
   			else
   			{
-  			  tempLineStyle = { 'style': 'dashed' }
+  			  tempLineStyle = "dashed"
   			}
 
         dataProperties[dataLabel] = {
@@ -97,11 +97,11 @@ function initHeight() {
 }
 
 function getPlotlyChartType(inputType){
-  let plotlyType = "";
+  let plotlyType = inputType;
   if (inputType == "line"){
     plotlyType = "scatter";
-  } else if (inputType == "bar"){
-    plotlyType = "bar";
+  } else if (inputType == "scatter"){
+    plotlyType = "scatterOnly"
   }
   return plotlyType;
 }
@@ -128,12 +128,6 @@ function generateErrorBarsAsymmetric(errorsPlus, errorsMinus, visible){
 	errorObject["symmetric"] = false;
 	
 	return errorObject;
-}
-
-function generateLineOptions(options){
-  return {
-    color : options.color
-  }
 }
 
 /**
@@ -187,13 +181,26 @@ function generateChart(chartData)
 		  }
 	  }
 
-    if (dataProperties[dataLabels[index]]["style"] == "dashed"){
-      trace["line"]["dash"] = "dot"
+    // ===================== CHART TYPE OPTIONS HANDLING ===========
+    // initialize line object
+    trace["line"] = {}
+
+    if (chartType == "scatter"){
+      trace["line"]["color"] = dataProperties[dataLabels[index]]["color"]
+    } else if (chartType == "area"){
+      trace["fill"] = 'tozeroy'
+    } else if (chartType == "spline"){
+      trace["line"]["shape"] = 'spline'
+    } else if (chartType == "scatterOnly"){
+      trace["mode"] = 'markers';
+    } else if (chartType == "area-spline"){
+      trace["fill"] = 'tozeroy'
+      trace["line"]["shape"] = 'spline'
     }
 
-    // ===================== CHART TYPE OPTIONS HANDLING ===========
-    if (chartType == "scatter"){
-      trace["line"] = generateLineOptions(dataProperties[dataLabels[index]]["color"])
+    if (dataProperties[dataLabels[index]]["style"] == "dashed"){
+      console.log("use dot")
+      trace["line"]["dash"] = "dot"
     }
 
     data.push(trace)

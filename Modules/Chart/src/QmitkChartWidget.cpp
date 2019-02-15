@@ -256,12 +256,8 @@ void QmitkChartWidget::Impl::SetColor(const std::string &label, const std::strin
 void QmitkChartWidget::Impl::SetLineStyle(const std::string &label, LineStyle style)
 {
   auto element = GetDataElementByLabel(label);
-  // only has effect with chart type line
-  if (element && element->GetChartType() == QVariant(QString::fromStdString(ConvertChartTypeToString(ChartType::line))))
-  {
-    const std::string lineStyleName(m_LineStyleToName.at(style));
-    element->SetLineStyle(QVariant(QString::fromStdString(lineStyleName)));
-  }
+  const std::string lineStyleName(m_LineStyleToName.at(style));
+  element->SetLineStyle(QVariant(QString::fromStdString(lineStyleName)));
 }
 
 void QmitkChartWidget::Impl::SetYAxisScale(AxisScale scale)

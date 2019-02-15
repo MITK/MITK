@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>326</width>
-    <height>944</height>
+    <width>455</width>
+    <height>974</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -53,114 +53,6 @@
           <property name="text">
            <string>error</string>
           </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>data label</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="m_lineEditDataLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Chart type</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QComboBox" name="m_comboBoxChartType">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <item>
-           <property name="text">
-            <string>bar</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>line</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>area</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>spline</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>area-spline</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>scatter</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>Color</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QLineEdit" name="m_lineEditColor">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0">
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>Line style</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QComboBox" name="m_comboBoxLineStyle">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <item>
-           <property name="text">
-            <string>solid</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>dashed</string>
-           </property>
-          </item>
          </widget>
         </item>
         <item row="1" column="1">
@@ -293,6 +185,124 @@
            </item>
           </layout>
          </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>data label</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="m_lineEditDataLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Chart type</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QComboBox" name="m_comboBoxChartType">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <item>
+           <property name="text">
+            <string>bar</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>line</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>area</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>spline</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>area-spline</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>scatter</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Color</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="m_lineEditColor">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Line style</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QComboBox" name="m_comboBoxLineStyle">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <item>
+           <property name="text">
+            <string>solid</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>dashed</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QLabel" name="titleLabel">
+          <property name="text">
+           <string>Title</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QLineEdit" name="title"/>
         </item>
        </layout>
       </item>

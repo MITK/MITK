@@ -106,7 +106,9 @@ void ChartExample::CreateChart()
   auto showDataPoints = m_Controls.m_checkBoxShowDataPoints->isChecked();
   auto stackedData = m_Controls.m_checkBoxStackedData->isChecked();
   auto showSubchart = m_Controls.m_checkBoxShowSubchart->isChecked();
+  auto title = m_Controls.title->text().toStdString();
 
+  m_Controls.m_Chart->SetTitle(title);
   m_Controls.m_Chart->SetYAxisScale(dataYAxisScaleType);
   m_Controls.m_Chart->SetXAxisLabel(xAxisLabel);
   m_Controls.m_Chart->SetYAxisLabel(yAxisLabel);

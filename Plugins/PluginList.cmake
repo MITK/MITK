@@ -45,7 +45,7 @@ set(MITK_PLUGINS
   #org.mitk.gui.qt.segmentation:ON
   org.mitk.gui.qt.viewnavigator:ON
   org.mitk.gui.qt.registration:OFF
-  org.mitk.gui.qt.toftutorial:OFF
+  #org.mitk.gui.qt.toftutorial:OFF
   org.mitk.gui.qt.volumevisualization:OFF
   org.mitk.gui.qt.pointsetinteraction:OFF
   org.mitk.core.services:ON
@@ -72,16 +72,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.imagenavigator:ON
   org.mitk.gui.qt.remeshing:ON
   org.mitk.gui.qt.imagestatistics:ON
-  org.mitk.gui.qt.tofutil:OFF
-  org.mitk.gui.qt.igttracking:OFF
+  #org.mitk.gui.qt.tofutil:OFF
+  #org.mitk.gui.qt.igttracking:OFF
+  #org.mitk.gui.qt.aicpregistration:OFF
 )
-
-IF(MITK_USE_TOF_KINECTV2)
-  list(APPEND MITK_PLUGINS
-    org.mitk.gui.qt.aicpregistration:ON
-  )
-ELSE(MITK_USE_TOF_KINECTV2)
-  list(APPEND MITK_PLUGINS
-    org.mitk.gui.qt.aicpregistration:OFF
-  )
-ENDIF(MITK_USE_TOF_KINECTV2)

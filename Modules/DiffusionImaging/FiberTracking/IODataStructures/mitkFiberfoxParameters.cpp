@@ -398,6 +398,7 @@ void mitk::FiberfoxParameters::SaveParameters(std::string filename)
   parameters.put("fiberfox.image.artifacts.motionvolumes", m_Misc.m_MotionVolumesBox);
 
   parameters.put("fiberfox.image.artifacts.addringing", m_SignalGen.m_DoAddGibbsRinging);
+  parameters.put("fiberfox.image.artifacts.zeroringing", m_SignalGen.m_ZeroRinging);
   parameters.put("fiberfox.image.artifacts.addnoise", m_Misc.m_DoAddNoise);
   parameters.put("fiberfox.image.artifacts.addghosts", m_Misc.m_DoAddGhosts);
   parameters.put("fiberfox.image.artifacts.addaliasing", m_Misc.m_DoAddAliasing);
@@ -754,6 +755,7 @@ void mitk::FiberfoxParameters::LoadParameters(std::string filename, bool fix_see
       m_SignalGen.m_CroppingFactor = ReadVal<float>(v1,"artifacts.aliasingfactor", m_SignalGen.m_CroppingFactor);
       m_SignalGen.m_Drift = ReadVal<float>(v1,"artifacts.drift", m_SignalGen.m_Drift);
       m_SignalGen.m_DoAddGibbsRinging = ReadVal<bool>(v1,"artifacts.addringing", m_SignalGen.m_DoAddGibbsRinging);
+      m_SignalGen.m_ZeroRinging = ReadVal<int>(v1,"artifacts.zeroringing", m_SignalGen.m_ZeroRinging);
       m_SignalGen.m_DoSimulateRelaxation = ReadVal<bool>(v1,"doSimulateRelaxation", m_SignalGen.m_DoSimulateRelaxation);
       m_SignalGen.m_DoDisablePartialVolume = ReadVal<bool>(v1,"doDisablePartialVolume", m_SignalGen.m_DoDisablePartialVolume);
       m_SignalGen.m_DoAddMotion = ReadVal<bool>(v1,"artifacts.doAddMotion", m_SignalGen.m_DoAddMotion);

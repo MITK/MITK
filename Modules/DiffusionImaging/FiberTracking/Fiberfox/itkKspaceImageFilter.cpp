@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>
+#include <math.h>
 
 #include "itkKspaceImageFilter.h"
 #include <itkImageRegionConstIterator.h>
@@ -151,6 +152,23 @@ namespace itk {
         ++it;
       }
     }
+
+    kxMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(0);
+    kyMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1);
+    xMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(0); // scanner coverage in x-direction
+    yMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(1); // scanner coverage in y-direction
+    yMaxFov = yMax;
+    if (m_Parameters->m_Misc.m_DoAddAliasing)
+        yMaxFov *= m_Parameters->m_SignalGen.m_CroppingFactor;               // actual FOV in y-direction (in x-direction FOV=xMax)
+    yMaxFov_half = yMaxFov/2;
+    numPix = kxMax*kyMax;
+
+    float ringing_factor = static_cast<float>(m_Parameters->m_SignalGen.m_ZeroRinging)/100.0;
+    ringing_lines_x = static_cast<int>(ceil(kxMax/2 * ringing_factor));
+    ringing_lines_y = static_cast<int>(ceil(kyMax/2 * ringing_factor));
+
+    // Adjust noise variance since it is the intended variance in physical space and not in k-space:
+    noiseVar = m_Parameters->m_SignalGen.m_PartialFourier*m_Parameters->m_SignalGen.m_NoiseVariance/(kyMax*kxMax);
   }
 
   template< class ScalarType >
@@ -205,21 +223,45 @@ namespace itk {
 
     typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
 
-    float kxMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(0);
-    float kyMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1);
-    float xMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(0); // scanner coverage in x-direction
-    float yMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(1); // scanner coverage in y-direction
-    float yMaxFov = yMax;
-    if (m_Parameters->m_Misc.m_DoAddAliasing)
-        yMaxFov *= m_Parameters->m_SignalGen.m_CroppingFactor;               // actual FOV in y-direction (in x-direction FOV=xMax)
-
-    float numPix = kxMax*kyMax;
-    // Adjust noise variance since it is the intended variance in physical space and not in k-space:
-    float noiseVar = m_Parameters->m_SignalGen.m_PartialFourier*m_Parameters->m_SignalGen.m_NoiseVariance/(kyMax*kxMax);
-
     while( !oit.IsAtEnd() )
     {
       typename OutputImageType::IndexType out_idx = oit.GetIndex();
+
+      // get current k-space index (depends on the chosen k-space readout scheme)
+      itk::Index< 2 > kIdx = m_ReadoutScheme->GetActualKspaceIndex(out_idx);
+
+      // partial fourier
+      if (kIdx[1]>kyMax*m_Parameters->m_SignalGen.m_PartialFourier)
+      {
+        ++oit;
+        continue;
+      }
+
+      // gibbs ringing by setting high frequencies to zero (alternative to using smaller k-space than input image space)
+      if (m_Parameters->m_SignalGen.m_DoAddGibbsRinging && m_Parameters->m_SignalGen.m_ZeroRinging>0)
+      {
+        if (kIdx[0] < ringing_lines_x || kIdx[1] < ringing_lines_y ||
+            kIdx[0] >= kxMax - ringing_lines_x || kIdx[1] >= kyMax - ringing_lines_y)
+        {
+          vcl_complex<ScalarType> zero = vcl_complex<ScalarType>(0, 0);
+          oit.Set(zero);
+          ++oit;
+          continue;
+        }
+      }
+
+      // shift k for DFT: (0 -- N) --> (-N/2 -- N/2)
+      float kx = kIdx[0];
+      float ky = kIdx[1];
+      if (static_cast<int>(kxMax)%2==1)
+        kx -= (kxMax-1)/2;
+      else
+        kx -= kxMax/2;
+
+      if (static_cast<int>(kyMax)%2==1)
+        ky -= (kyMax-1)/2;
+      else
+        ky -= kyMax/2;
 
       // time from maximum echo
       float t = m_ReadoutScheme->GetTimeFromMaxEcho(out_idx);
@@ -245,127 +287,102 @@ namespace itk {
                                  * (1.0-std::exp(-(m_Parameters->m_SignalGen.m_tRep + tRf)/m_T1[i])) );
       }
 
-      // get current k-space index (depends on the chosen k-space readout scheme)
-      itk::Index< 2 > kIdx = m_ReadoutScheme->GetActualKspaceIndex(out_idx);
-
-      // partial fourier
-      bool partial_fourier_skip = false;
-      if (kIdx[1]>kyMax*m_Parameters->m_SignalGen.m_PartialFourier)
-        partial_fourier_skip = true;
-
-      if (!partial_fourier_skip)
+      // add ghosting by adding gradient delay induced offset
+      if (m_Parameters->m_Misc.m_DoAddGhosts)
       {
-        // shift k for DFT: (0 -- N) --> (-N/2 -- N/2)
-        float kx = kIdx[0];
-        float ky = kIdx[1];
-        if (static_cast<int>(kxMax)%2==1)
-          kx -= (kxMax-1)/2;
+        if (out_idx[1]%2 == 1)
+          kx -= m_Parameters->m_SignalGen.m_KspaceLineOffset;
         else
-          kx -= kxMax/2;
-
-        if (static_cast<int>(kyMax)%2==1)
-          ky -= (kyMax-1)/2;
-        else
-          ky -= kyMax/2;
-
-        // add ghosting by adding gradient delay induced offset
-        if (m_Parameters->m_Misc.m_DoAddGhosts)
-        {
-          if (out_idx[1]%2 == 1)
-            kx -= m_Parameters->m_SignalGen.m_KspaceLineOffset;
-          else
-            kx += m_Parameters->m_SignalGen.m_KspaceLineOffset;
-        }
-
-        // pull stuff out of inner loop
-        t /= 1000;
-        kx /= xMax;
-        ky /= yMaxFov;
-        auto yMaxFov_half = yMaxFov/2;
-
-        // calculate signal s at k-space position (kx, ky)
-        vcl_complex<ScalarType> s(0,0);
-        InputIteratorType it(m_CompartmentImages[0], m_CompartmentImages[0]->GetLargestPossibleRegion() );
-        while( !it.IsAtEnd() )
-        {
-          typename InputImageType::IndexType input_idx = it.GetIndex();
-
-          // shift x,y for DFT: (0 -- N) --> (-N/2 -- N/2)
-          float x = input_idx[0];
-          float y = input_idx[1];
-          if (static_cast<int>(xMax)%2==1)
-            x -= (xMax-1)/2;
-          else
-            x -= xMax/2;
-          if (static_cast<int>(yMax)%2==1)
-            y -= (yMax-1)/2;
-          else
-            y -= yMax/2;
-
-          // sum compartment signals and simulate relaxation
-          ScalarType f_real = 0;
-          for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
-            if ( m_Parameters->m_SignalGen.m_DoSimulateRelaxation)
-              f_real += m_CompartmentImages[i]->GetPixel(input_idx) * relaxFactor[i] *  m_Parameters->m_SignalGen.m_SignalScale;
-            else
-              f_real += m_CompartmentImages[i]->GetPixel(input_idx) * m_Parameters->m_SignalGen.m_SignalScale;
-
-          // vector from image center to current position (in meter)
-          // only necessary for eddy currents and non-constant coil sensitivity
-          VectorType pos;
-          if ((m_Parameters->m_Misc.m_DoAddEddyCurrents && m_Parameters->m_SignalGen.m_EddyStrength>0 && !m_IsBaseline) ||
-              m_Parameters->m_SignalGen.m_CoilSensitivityProfile!=SignalGenerationParameters::COIL_CONSTANT)
-          {
-            pos[0] = x; pos[1] = y; pos[2] = m_Z;
-            pos = m_Transform*pos;
-          }
-
-          if (m_Parameters->m_SignalGen.m_CoilSensitivityProfile!=SignalGenerationParameters::COIL_CONSTANT)
-            f_real *= CoilSensitivity(pos);
-
-          // simulate eddy currents and other distortions
-          float omega = 0;   // frequency offset
-          if (  m_Parameters->m_Misc.m_DoAddEddyCurrents && m_Parameters->m_SignalGen.m_EddyStrength>0 && !m_IsBaseline)
-            omega += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2]) * eddyDecay;
-
-          // simulate distortions
-          if (m_Parameters->m_Misc.m_DoAddDistortions)
-          {
-            if (m_MovedFmap.IsNotNull())    // if we have headmotion, use moved map
-              omega += m_MovedFmap->GetPixel(input_idx);
-            else if (m_Parameters->m_SignalGen.m_FrequencyMap.IsNotNull())
-            {
-              itk::Image<float, 3>::IndexType index; index[0] = input_idx[0]; index[1] = input_idx[1]; index[2] = m_Zidx;
-              omega += m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(index);
-            }
-          }
-
-          // if signal comes from outside FOV, mirror it back (wrap-around artifact - aliasing
-          if (m_Parameters->m_Misc.m_DoAddAliasing)
-          {
-            if (y<-yMaxFov_half)
-              y += yMaxFov;
-            else if (y>=yMaxFov_half)
-              y -= yMaxFov;
-          }
-
-          // actual DFT term
-          vcl_complex<ScalarType> f(f_real, 0);
-          s += f * std::exp( std::complex<ScalarType>(0, itk::Math::twopi * (kx*x + ky*y + omega*t )) );
-
-          ++it;
-        }
-        s /= numPix;
-
-        if (m_SpikesPerSlice>0 && sqrt(s.imag()*s.imag()+s.real()*s.real()) > sqrt(m_Spike.imag()*m_Spike.imag()+m_Spike.real()*m_Spike.real()) )
-          m_Spike = s;
-
-        if (m_Parameters->m_SignalGen.m_NoiseVariance>0 && m_Parameters->m_Misc.m_DoAddNoise)
-          s = vcl_complex<ScalarType>(s.real()+randGen->GetNormalVariate(0,noiseVar), s.imag()+randGen->GetNormalVariate(0,noiseVar));
-
-        outputImage->SetPixel(kIdx, s);
-        m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
+          kx += m_Parameters->m_SignalGen.m_KspaceLineOffset;
       }
+
+      // pull stuff out of inner loop
+      t /= 1000;
+      kx /= xMax;
+      ky /= yMaxFov;
+
+      // calculate signal s at k-space position (kx, ky)
+      vcl_complex<ScalarType> s(0,0);
+      InputIteratorType it(m_CompartmentImages[0], m_CompartmentImages[0]->GetLargestPossibleRegion() );
+      while( !it.IsAtEnd() )
+      {
+        typename InputImageType::IndexType input_idx = it.GetIndex();
+
+        // shift x,y for DFT: (0 -- N) --> (-N/2 -- N/2)
+        float x = input_idx[0];
+        float y = input_idx[1];
+        if (static_cast<int>(xMax)%2==1)
+          x -= (xMax-1)/2;
+        else
+          x -= xMax/2;
+        if (static_cast<int>(yMax)%2==1)
+          y -= (yMax-1)/2;
+        else
+          y -= yMax/2;
+
+        // sum compartment signals and simulate relaxation
+        ScalarType f_real = 0;
+        for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
+          if ( m_Parameters->m_SignalGen.m_DoSimulateRelaxation)
+            f_real += m_CompartmentImages[i]->GetPixel(input_idx) * relaxFactor[i] *  m_Parameters->m_SignalGen.m_SignalScale;
+          else
+            f_real += m_CompartmentImages[i]->GetPixel(input_idx) * m_Parameters->m_SignalGen.m_SignalScale;
+
+        // vector from image center to current position (in meter)
+        // only necessary for eddy currents and non-constant coil sensitivity
+        VectorType pos;
+        if ((m_Parameters->m_Misc.m_DoAddEddyCurrents && m_Parameters->m_SignalGen.m_EddyStrength>0 && !m_IsBaseline) ||
+            m_Parameters->m_SignalGen.m_CoilSensitivityProfile!=SignalGenerationParameters::COIL_CONSTANT)
+        {
+          pos[0] = x; pos[1] = y; pos[2] = m_Z;
+          pos = m_Transform*pos;
+        }
+
+        if (m_Parameters->m_SignalGen.m_CoilSensitivityProfile!=SignalGenerationParameters::COIL_CONSTANT)
+          f_real *= CoilSensitivity(pos);
+
+        // simulate eddy currents and other distortions
+        float omega = 0;   // frequency offset
+        if (  m_Parameters->m_Misc.m_DoAddEddyCurrents && m_Parameters->m_SignalGen.m_EddyStrength>0 && !m_IsBaseline)
+          omega += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2]) * eddyDecay;
+
+        // simulate distortions
+        if (m_Parameters->m_Misc.m_DoAddDistortions)
+        {
+          if (m_MovedFmap.IsNotNull())    // if we have headmotion, use moved map
+            omega += m_MovedFmap->GetPixel(input_idx);
+          else if (m_Parameters->m_SignalGen.m_FrequencyMap.IsNotNull())
+          {
+            itk::Image<float, 3>::IndexType index; index[0] = input_idx[0]; index[1] = input_idx[1]; index[2] = m_Zidx;
+            omega += m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(index);
+          }
+        }
+
+        // if signal comes from outside FOV, mirror it back (wrap-around artifact - aliasing
+        if (m_Parameters->m_Misc.m_DoAddAliasing)
+        {
+          if (y<-yMaxFov_half)
+            y += yMaxFov;
+          else if (y>=yMaxFov_half)
+            y -= yMaxFov;
+        }
+
+        // actual DFT term
+        vcl_complex<ScalarType> f(f_real, 0);
+        s += f * std::exp( std::complex<ScalarType>(0, itk::Math::twopi * (kx*x + ky*y + omega*t )) );
+
+        ++it;
+      }
+      s /= numPix;
+
+      if (m_SpikesPerSlice>0 && sqrt(s.imag()*s.imag()+s.real()*s.real()) > sqrt(m_Spike.imag()*m_Spike.imag()+m_Spike.real()*m_Spike.real()) )
+        m_Spike = s;
+
+      if (m_Parameters->m_SignalGen.m_NoiseVariance>0 && m_Parameters->m_Misc.m_DoAddNoise)
+        s = vcl_complex<ScalarType>(s.real()+randGen->GetNormalVariate(0,noiseVar), s.imag()+randGen->GetNormalVariate(0,noiseVar));
+
+      outputImage->SetPixel(kIdx, s);
+      m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
 
       ++oit;
     }

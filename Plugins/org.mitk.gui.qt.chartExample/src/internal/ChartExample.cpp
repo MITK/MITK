@@ -16,15 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Blueberry
 #include <berryIQtStyleManager.h>
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
 #include <berryWorkbenchPlugin.h>
 
 // Qmitk
 #include "ChartExample.h"
 
 // Qt
-#include <QMessageBox>
 #include <QRandomGenerator>
 
 const std::string ChartExample::VIEW_ID = "org.mitk.views.chartexample";

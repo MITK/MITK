@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ChartExample_h
 #define ChartExample_h
 
-#include <berryISelectionListener.h>
-
 #include <QmitkAbstractView.h>
 
 #include "ui_ChartExampleControls.h"

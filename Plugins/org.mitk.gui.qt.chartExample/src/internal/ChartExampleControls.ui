@@ -22,6 +22,12 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QToolBox" name="toolBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -29,10 +35,16 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-77</y>
+        <y>0</y>
         <width>420</width>
-        <height>389</height>
+        <height>417</height>
        </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
       <attribute name="label">
        <string>Data</string>
@@ -48,17 +60,38 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="m_lineEditDataVector">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
+          <layout class="QFormLayout" name="formLayout_6">
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="m_lineEditDataYVector"/>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="m_lineEditDataXVector">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="m_checkBoxEnableDataX">
+             <property name="text">
+              <string>x</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_13">
+             <property name="text">
+              <string>y:</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item row="1" column="0">
           <widget class="QCheckBox" name="m_checkBoxEnableErrors">
@@ -323,8 +356,14 @@
         <x>0</x>
         <y>0</y>
         <width>437</width>
-        <height>210</height>
+        <height>241</height>
        </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
       <attribute name="label">
        <string>Global options</string>
@@ -332,6 +371,19 @@
       <layout class="QVBoxLayout" name="verticalLayout_8">
        <item>
         <layout class="QFormLayout" name="formLayout_2">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="titleLabel">
+           <property name="text">
+            <string>Title</string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="1">
           <widget class="QLineEdit" name="title"/>
          </item>
@@ -410,13 +462,6 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="titleLabel">
-           <property name="text">
-            <string>Title</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
       </layout>
@@ -449,10 +494,16 @@
    </item>
    <item>
     <widget class="QStackedWidget" name="m_StatisticsWidgetStack">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>200</height>
+       <height>250</height>
       </size>
      </property>
      <property name="currentIndex">
@@ -469,7 +520,20 @@
     </widget>
    </item>
    <item>
-    <widget class="QPlainTextEdit" name="m_plainTextEditDataView"/>
+    <widget class="QPlainTextEdit" name="m_plainTextEditDataView">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>150</height>
+      </size>
+     </property>
+    </widget>
    </item>
    <item>
     <spacer name="spacer1">

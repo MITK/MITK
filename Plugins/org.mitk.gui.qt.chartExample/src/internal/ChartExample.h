@@ -50,6 +50,7 @@ protected:
   std::vector<double> ConvertToVector(const QString &lineEditData);
   void AddData();
 
+  void ShowXData(bool show);
   void ShowErrorOptions(bool show);
   void ShowXErrorOptions(bool show);
   void ShowYErrorOptions(bool show);
@@ -59,7 +60,9 @@ protected:
 private:
   void FillRandomDataValues();
   std::vector<double> generateRandomNumbers(unsigned int amount, double max) const;
-  std::string convertToText(std::vector<double> numbers, std::string delimiter) const;
+  std::map<double, double> CreateMap(std::vector<double> keys, std::vector<double> values) const;
+  std::string convertToText(std::vector<double> numbers, std::string delimiter = ";") const;
+  std::string convertToText(std::map<double, double> numbers, std::string delimiter = ";") const;
   QmitkChartWidget::ColorTheme GetColorTheme() const;
 
   std::map<std::string, QmitkChartWidget::ChartType> m_chartNameToChartType;

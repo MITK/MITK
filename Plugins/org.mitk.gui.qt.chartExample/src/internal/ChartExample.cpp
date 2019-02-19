@@ -14,12 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 // Blueberry
+#include <berryIQtStyleManager.h>
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 #include <berryWorkbenchPlugin.h>
-#include <berryIQtStyleManager.h>
 
 // Qmitk
 #include "ChartExample.h"
@@ -27,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qt
 #include <QMessageBox>
 #include <QRandomGenerator>
-
 
 const std::string ChartExample::VIEW_ID = "org.mitk.views.chartexample";
 
@@ -43,6 +41,7 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.m_buttonCreateChart, &QPushButton::clicked, this, &ChartExample::CreateChart);
   connect(m_Controls.m_buttonClearChart, &QPushButton::clicked, this, &ChartExample::ClearChart);
   connect(m_Controls.m_buttonAddData, &QPushButton::clicked, this, &ChartExample::AddData);
+  connect(m_Controls.m_checkBoxEnableDataX, &QCheckBox::toggled, this, &ChartExample::ShowXData);
   connect(m_Controls.m_checkBoxEnableErrors, &QCheckBox::toggled, this, &ChartExample::ShowErrorOptions);
   connect(m_Controls.m_checkBoxEnableXErrors, &QCheckBox::toggled, this, &ChartExample::ShowXErrorOptions);
   connect(m_Controls.m_checkBoxEnableYErrors, &QCheckBox::toggled, this, &ChartExample::ShowYErrorOptions);
@@ -50,6 +49,8 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
   m_Controls.m_groupBoxErrors->setVisible(false);
   m_Controls.m_groupBoxXErrors->setVisible(false);
   m_Controls.m_groupBoxYErrors->setVisible(false);
+  m_Controls.m_lineEditDataXVector->setVisible(false);
+  m_Controls.m_lineEditDataXVector->setText("0;1;2;3;4;5;6;7;8;9");
 
   FillRandomDataValues();
   auto chartStyle = GetColorTheme();
@@ -76,22 +77,22 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
 void ChartExample::FillRandomDataValues()
 {
   std::vector<double> numbers = generateRandomNumbers(10, 10.0);
-  std::string text = convertToText(numbers, ";");
-  m_Controls.m_lineEditDataVector->setText(QString::fromStdString(text));
+  std::string text = convertToText(numbers);
+  m_Controls.m_lineEditDataYVector->setText(QString::fromStdString(text));
 
   m_Controls.m_lineEditDataLabel->setText("test" + QString::number(countForUID));
 
   numbers = generateRandomNumbers(10, 10.0);
-  text = convertToText(numbers, ";");
+  text = convertToText(numbers);
   m_Controls.m_lineEditXErrorPlus->setText(QString::fromStdString(text));
   numbers = generateRandomNumbers(10, 10.0);
-  text = convertToText(numbers, ";");
+  text = convertToText(numbers);
   m_Controls.m_lineEditXErrorMinus->setText(QString::fromStdString(text));
   numbers = generateRandomNumbers(10, 10.0);
-  text = convertToText(numbers, ";");
+  text = convertToText(numbers);
   m_Controls.m_lineEditYErrorPlus->setText(QString::fromStdString(text));
   numbers = generateRandomNumbers(10, 10.0);
-  text = convertToText(numbers, ";");
+  text = convertToText(numbers);
   m_Controls.m_lineEditYErrorMinus->setText(QString::fromStdString(text));
 
   countForUID++;
@@ -99,7 +100,8 @@ void ChartExample::FillRandomDataValues()
 
 void ChartExample::CreateChart()
 {
-  auto dataYAxisScaleType = m_AxisScaleNameToAxisScaleType.at(m_Controls.m_comboBoxYAxisScale->currentText().toStdString());
+  auto dataYAxisScaleType =
+    m_AxisScaleNameToAxisScaleType.at(m_Controls.m_comboBoxYAxisScale->currentText().toStdString());
   auto xAxisLabel = m_Controls.m_lineEditXAxisLabel->text().toStdString();
   auto yAxisLabel = m_Controls.m_lineEditYAxisLabel->text().toStdString();
   auto showLegend = m_Controls.m_checkBoxShowLegend->isChecked();
@@ -119,14 +121,13 @@ void ChartExample::CreateChart()
   m_Controls.m_Chart->Show(showSubchart);
 }
 
-
 void ChartExample::ClearChart()
 {
   m_Controls.m_Chart->Clear();
   m_Controls.m_plainTextEditDataView->clear();
 }
 
-std::vector<double> ChartExample::ConvertToVector(const QString& lineEditData)
+std::vector<double> ChartExample::ConvertToVector(const QString &lineEditData)
 {
   std::vector<double> data;
   if (lineEditData.isEmpty())
@@ -134,7 +135,7 @@ std::vector<double> ChartExample::ConvertToVector(const QString& lineEditData)
     return data;
   }
 
-  for(const QString entry : lineEditData.split(';'))
+  for (const QString entry : lineEditData.split(';'))
   {
     data.push_back(entry.toDouble());
   }
@@ -143,18 +144,36 @@ std::vector<double> ChartExample::ConvertToVector(const QString& lineEditData)
 
 void ChartExample::AddData()
 {
-  QString lineEditData = m_Controls.m_lineEditDataVector->text();
-  auto data = ConvertToVector(lineEditData);
+  QString data = m_Controls.m_lineEditDataYVector->text();
+  auto dataY = ConvertToVector(data);
 
   auto chartType = m_chartNameToChartType.at(m_Controls.m_comboBoxChartType->currentText().toStdString());
   std::string dataLabel = m_Controls.m_lineEditDataLabel->text().toStdString();
   std::string dataColor = m_Controls.m_lineEditColor->text().toStdString();
   auto dataLineStyleType = m_LineNameToLineType.at(m_Controls.m_comboBoxLineStyle->currentText().toStdString());
-  
-  m_Controls.m_Chart->AddData1D(data, dataLabel, chartType);
-  if (!dataColor.empty()) {
+
+  if (m_Controls.m_checkBoxEnableDataX->isChecked())
+  {
+    QString lineEditDataX = m_Controls.m_lineEditDataXVector->text();
+    auto dataX = ConvertToVector(lineEditDataX);
+    if (dataX.size() != dataY.size())
+    {
+      mitkThrow() << "data x and y size have to be equal";
+    }
+    auto dataXandY = CreateMap(dataX, dataY);
+    data = QString::fromStdString(convertToText(dataXandY));
+
+    m_Controls.m_Chart->AddData2D(dataXandY, dataLabel, chartType);
+  }
+  else
+  {
+    m_Controls.m_Chart->AddData1D(dataY, dataLabel, chartType);
+  }
+  if (!dataColor.empty())
+  {
     m_Controls.m_Chart->SetColor(dataLabel, dataColor);
   }
+
 
   if (m_Controls.m_checkBoxEnableErrors->isChecked())
   {
@@ -177,16 +196,22 @@ void ChartExample::AddData()
   QString dataOverview;
   dataOverview.append(m_Controls.m_lineEditDataLabel->text());
   dataOverview.append("(").append(m_Controls.m_comboBoxChartType->currentText());
-  if (!dataColor.empty()) {
+  if (!dataColor.empty())
+  {
     dataOverview.append(", ").append(dataColor.c_str());
   }
   dataOverview.append(", ").append(m_Controls.m_comboBoxLineStyle->currentText());
   dataOverview.append(")");
-  dataOverview.append(":").append(lineEditData);
+  dataOverview.append(":").append(data);
 
   m_Controls.m_plainTextEditDataView->appendPlainText(dataOverview);
 
   FillRandomDataValues();
+}
+
+void ChartExample::ShowXData(bool show)
+{
+  m_Controls.m_lineEditDataXVector->setVisible(show);
 }
 
 void ChartExample::ShowErrorOptions(bool show)
@@ -210,11 +235,21 @@ std::vector<double> ChartExample::generateRandomNumbers(unsigned int amount, dou
   gen.seed(time(NULL));
 
   std::vector<double> data;
-  for (unsigned int i = 0; i < amount; i++) {
+  for (unsigned int i = 0; i < amount; i++)
+  {
     data.push_back(gen.bounded(max));
   }
 
   return data;
+}
+
+std::map<double, double> ChartExample::CreateMap(std::vector<double> keys,
+                                                 std::vector<double> values) const {
+  std::map<double, double> aMap;
+  std::transform(keys.begin(), keys.end(), values.begin(), std::inserter(aMap, aMap.end()), [](double a, double b) {
+    return std::make_pair(a, b);
+  });
+  return aMap;
 }
 
 std::string ChartExample::convertToText(std::vector<double> numbers, std::string delimiter) const
@@ -224,8 +259,25 @@ std::string ChartExample::convertToText(std::vector<double> numbers, std::string
 
   if (!numbers.empty())
   {
-    for (auto number : numbers) {
+    for (auto number : numbers)
+    {
       oss << number << delimiter;
+    }
+  }
+  auto aString = oss.str();
+  aString.pop_back();
+  return aString;
+}
+
+std::string ChartExample::convertToText(std::map<double, double> numbers, std::string delimiter) const {
+  std::ostringstream oss;
+  oss.precision(3);
+
+  if (!numbers.empty())
+  {
+    for (const auto keyValue : numbers)
+    {
+      oss << keyValue.first << ":" << keyValue.second << delimiter;
     }
   }
   auto aString = oss.str();
@@ -235,15 +287,17 @@ std::string ChartExample::convertToText(std::vector<double> numbers, std::string
 
 QmitkChartWidget::ColorTheme ChartExample::GetColorTheme() const
 {
-  ctkPluginContext* context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
+  ctkPluginContext *context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
   ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
   if (styleManagerRef)
   {
     auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
-    if (styleManager->GetStyle().name == "Dark") {
+    if (styleManager->GetStyle().name == "Dark")
+    {
       return QmitkChartWidget::ColorTheme::darkstyle;
     }
-    else {
+    else
+    {
       return QmitkChartWidget::ColorTheme::lightstyle;
     }
   }

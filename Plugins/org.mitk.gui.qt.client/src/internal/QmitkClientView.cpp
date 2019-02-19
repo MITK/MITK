@@ -56,7 +56,7 @@ void QmitkClientView::OnUpdateProgressBar()
   m_Ui->progressBar->setValue(m_Ui->progressBar->value() + 5);
 }
 
-void QmitkClientView::OnUpdateLabel(QString text) 
+void QmitkClientView::OnUpdateLabel(QString text)
 {
   m_Ui->responseLabel->setText(text);
 }
@@ -75,27 +75,44 @@ void QmitkClientView::OnGetButtonClicked()
     auto managerService = context->GetService(managerRef);
     if (managerService)
     {
-      std::vector < pplx::task<void>> tasks;
+      std::vector<pplx::task<void>> tasks;
       for (int i = 0; i < 20; i++)
       {
-        pplx::task<void> singleTask =
-         managerService->SendRequest(L"https://jsonplaceholder.typicode.com/photos")
-        .then([=](web::json::value result) 
-        {
-          emit UpdateProgressBar(); 
-        });
+        pplx::task<void> singleTask = managerService->SendRequest(L"https://jsonplaceholder.typicode.com/photos")
+            .then([=](pplx::task<web::json::value> resultTask) {
+          try
+          {
+            resultTask.get();
+            emit UpdateProgressBar();
+          }
+          catch (const mitk::Exception &exception)
+          {
+            MITK_ERROR << exception.what();
+            return;
+          }
+          });
         tasks.push_back(singleTask);
       }
       auto joinTask = pplx::when_all(begin(tasks), end(tasks));
-      joinTask.then([=]() { emit UpdateLabel("All tasks finished");
-      });
+      joinTask.then([=](pplx::task<void> resultTask) { 
+        try
+        {
+          resultTask.get();
+          emit UpdateLabel("All tasks finished");
+        }
+        catch (const mitk::Exception &exception)
+        {
+          MITK_ERROR << exception.what();
+          return;
+        }
+        });
       m_Ui->responseLabel->setText("Waiting for change");
     }
   }
   m_Ui->getPushButton->setEnabled(true);
 }
 
-void QmitkClientView::OnPutButtonClicked() 
+void QmitkClientView::OnPutButtonClicked()
 {
   m_Ui->putPushButton->setDisabled(true);
   us::ModuleContext *context = us::ModuleRegistry::GetModule(1)->GetModuleContext();
@@ -111,14 +128,23 @@ void QmitkClientView::OnPutButtonClicked()
       data[L"id"] = web::json::value(1);
       data[L"title"] = web::json::value(U("this is a changed title"));
       data[L"body"] = web::json::value(U("and the body is changed as well"));
-      managerService->SendRequest(L"https://jsonplaceholder.typicode.com/posts/1", mitk::IRESTManager::RequestType::put, data)
-        .then([=](web::json::value result) 
-      {
-        utility::string_t stringT = result.to_string();
-        std::string stringStd(stringT.begin(), stringT.end());
-        QString stringQ = QString::fromStdString(stringStd);
-        emit UpdateLabel(stringQ);
-      });
+      managerService->SendRequest(
+        L"https://jsonplaceholder.typicode.com/posts/1", mitk::IRESTManager::RequestType::put, data)
+        .then([=](pplx::task<web::json::value> resultTask) {
+          try
+          {
+            web::json::value result = resultTask.get();
+            utility::string_t stringT = result.to_string();
+            std::string stringStd(stringT.begin(), stringT.end());
+            QString stringQ = QString::fromStdString(stringStd);
+            emit UpdateLabel(stringQ);
+          }
+          catch (const mitk::Exception &exception)
+          {
+            MITK_ERROR << exception.what();
+            return;
+          }
+        });
     }
   }
   m_Ui->putPushButton->setEnabled(true);
@@ -139,14 +165,23 @@ void QmitkClientView::OnPostButtonClicked()
       data[L"userId"] = web::json::value(1);
       data[L"title"] = web::json::value(U("this is a new title"));
       data[L"body"] = web::json::value(U("this is a new body"));
-        managerService
-          ->SendRequest(L"https://jsonplaceholder.typicode.com/posts", mitk::IRESTManager::RequestType::post, data)
-          .then([=](web::json::value result) {
-              utility::string_t stringT = result.to_string();
-              std::string stringStd(stringT.begin(), stringT.end());
-              QString stringQ = QString::fromStdString(stringStd);
-              emit UpdateLabel(stringQ);
-          });
+      managerService
+        ->SendRequest(L"https://jsonplaceholder.typicode.com/posts", mitk::IRESTManager::RequestType::post, data)
+        .then([=](pplx::task<web::json::value> resultTask) {
+        try
+        {
+          web::json::value result = resultTask.get();
+          utility::string_t stringT = result.to_string();
+          std::string stringStd(stringT.begin(), stringT.end());
+          QString stringQ = QString::fromStdString(stringStd);
+          emit UpdateLabel(stringQ);
+        }
+        catch (const mitk::Exception &exception)
+        {
+          MITK_ERROR << exception.what();
+          return;
+        } 
+        });
     }
   }
   m_Ui->postPushButton->setEnabled(true);

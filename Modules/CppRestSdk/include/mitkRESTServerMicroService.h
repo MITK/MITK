@@ -30,17 +30,36 @@ namespace mitk
 
 
   public:
+    /**
+     * @brief Creates an server listening to the given URI
+     *
+     * @param uri the URI at which the server is listening for requests
+     */
     RESTServerMicroService(web::uri uri);
     ~RESTServerMicroService();
+
     web::uri GetUri();
 
   private:
+    /**
+     * @brief Handle for incoming GET requests
+     *
+     * @param MitkRequest incoming request object
+     */
     void HandleGet(MitkRequest request);
+
     MitkListener m_Listener;
     web::uri m_Uri;
 
   public slots:
+    /**
+     * @brief Opens the listener and starts the listening process
+     */
     void OpenListener();
+
+    /**
+     * @brief Closes the listener and stops the listening process
+     */
     void CloseListener();
   };
 } // namespace mitk

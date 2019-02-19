@@ -16,14 +16,16 @@ pplx::task<web::json::value> mitk::RESTClientMicroService::Get(web::uri uri)
   MitkRequest getRequest(MitkRESTMethods::GET);
   // getRequest.set_request_uri(uri);
 
-  return client->request(getRequest).then([=](MitkResponse response) {
+  return client->request(getRequest).then([=](pplx::task<MitkResponse> responseTask) {
+    MitkResponse response = responseTask.get();
     auto status = response.status_code();
     MITK_INFO << " status: " << status;
 
-    if (status != web::http::status_codes::OK)
+    if (status != MitkRestStatusCodes::OK)
     {
       mitkThrow() << "response was not OK";
     }
+
     return response.extract_json().get();
   });
   // answer.wait();
@@ -37,19 +39,23 @@ pplx::task<web::json::value> mitk::RESTClientMicroService::PUT(web::uri uri, web
             << mitk::RESTUtil::convertToUtf8(uri.authority().to_string());
 
   MitkRequest putRequest(MitkRESTMethods::PUT);
-  // putRequest.set_request_uri(uri);
   putRequest.set_body(content);
-
-  return client->request(putRequest).then([=](MitkResponse response) {
-    auto status = response.status_code();
-    MITK_INFO << " status: " << status;
-
-    if (status != web::http::status_codes::OK)
+  return client->request(putRequest).then([=](pplx::task<MitkResponse> responseTask) {
+    try
     {
-      mitkThrow() << "response was not OK";
-    }
+      MitkResponse response = responseTask.get();
+      auto status = response.status_code();
+      MITK_INFO << " status: " << status;
+      if (status != MitkRestStatusCodes::OK)
+      {
+        mitkThrow() << "response was not OK";
+      }
 
-    return response.extract_json().get();
+      return response.extract_json().get();
+    }
+    catch (...)
+    {
+    }
   });
 }
 
@@ -65,22 +71,16 @@ pplx::task<web::json::value> mitk::RESTClientMicroService::POST(web::uri uri, we
     postRequest.set_body(content);
   }
 
-  return client->request(postRequest).then([=](MitkResponse response) {
-    try
-    {
-      auto status = response.status_code();
-      MITK_INFO << " status: " << status;
+  return client->request(postRequest).then([=](pplx::task<MitkResponse> responseTask) {
+    MitkResponse response = responseTask.get();
+    auto status = response.status_code();
+    MITK_INFO << " status: " << status;
 
-      if (status != web::http::status_codes::Created)
-      {
-        mitkThrow() << "response was not OK";
-      }
-
-      return response.extract_json().get();
-    }
-    catch (...)
+    if (status != MitkRestStatusCodes::Created)
     {
-      MITK_WARN << "Exception in Client Class";
+      mitkThrow() << "response was not Created";
     }
+
+    return response.extract_json().get();
   });
 }

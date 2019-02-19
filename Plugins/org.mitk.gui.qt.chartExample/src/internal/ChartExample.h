@@ -17,16 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ChartExample_h
 #define ChartExample_h
 
-#include <berryISelectionListener.h>
-
 #include <QmitkAbstractView.h>
 
 #include "ui_ChartExampleControls.h"
 
 /**
-  \brief ChartExample
-
-  \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
+  \brief Basic example for use of module mitkChart
 
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
@@ -47,26 +43,29 @@ protected:
 
   void CreateChart();
   void ClearChart();
-  std::vector<double> ConvertToVector(const QString &lineEditData);
+
   void AddData();
 
+  void ShowXData(bool show);
   void ShowErrorOptions(bool show);
   void ShowXErrorOptions(bool show);
   void ShowYErrorOptions(bool show);
 
-  Ui::ChartExampleControls m_Controls;
-
 private:
   void FillRandomDataValues();
-  std::vector<double> generateRandomNumbers(unsigned int amount, double max) const;
-  std::string convertToText(std::vector<double> numbers, std::string delimiter) const;
+  std::vector<double> GenerateRandomNumbers(unsigned int amount, double max) const;
+  std::vector<double> ConvertToVector(const QString& data, QChar delimiter=';') const;
+  std::map<double, double> CreateMap(std::vector<double> keys, std::vector<double> values) const;
+  std::string ConvertToText(std::vector<double> numbers, std::string delimiter = ";") const;
+  std::string ConvertToText(std::map<double, double> numbers, std::string delimiter = ";") const;
   QmitkChartWidget::ColorTheme GetColorTheme() const;
 
-  std::map<std::string, QmitkChartWidget::ChartType> m_chartNameToChartType;
+  std::map<std::string, QmitkChartWidget::ChartType> m_ChartNameToChartType;
   std::map<std::string, QmitkChartWidget::LineStyle> m_LineNameToLineType;
   std::map<std::string, QmitkChartWidget::AxisScale> m_AxisScaleNameToAxisScaleType;
 
   unsigned int countForUID = 0;
+  Ui::ChartExampleControls m_Controls;
 };
 
 #endif // ChartExample_h

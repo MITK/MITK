@@ -56,13 +56,13 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
   m_Controls.m_lineEditXAxisLabel->setText("xLabel");
   m_Controls.m_lineEditYAxisLabel->setText("yLabel");
 
-  m_chartNameToChartType.emplace("bar", QmitkChartWidget::ChartType::bar);
-  m_chartNameToChartType.emplace("line", QmitkChartWidget::ChartType::line);
-  m_chartNameToChartType.emplace("spline", QmitkChartWidget::ChartType::spline);
-  m_chartNameToChartType.emplace("pie", QmitkChartWidget::ChartType::pie);
-  m_chartNameToChartType.emplace("area", QmitkChartWidget::ChartType::area);
-  m_chartNameToChartType.emplace("area-spline", QmitkChartWidget::ChartType::area_spline);
-  m_chartNameToChartType.emplace("scatter", QmitkChartWidget::ChartType::scatter);
+  m_ChartNameToChartType.emplace("bar", QmitkChartWidget::ChartType::bar);
+  m_ChartNameToChartType.emplace("line", QmitkChartWidget::ChartType::line);
+  m_ChartNameToChartType.emplace("spline", QmitkChartWidget::ChartType::spline);
+  m_ChartNameToChartType.emplace("pie", QmitkChartWidget::ChartType::pie);
+  m_ChartNameToChartType.emplace("area", QmitkChartWidget::ChartType::area);
+  m_ChartNameToChartType.emplace("area-spline", QmitkChartWidget::ChartType::area_spline);
+  m_ChartNameToChartType.emplace("scatter", QmitkChartWidget::ChartType::scatter);
 
   m_LineNameToLineType.emplace("solid", QmitkChartWidget::LineStyle::solid);
   m_LineNameToLineType.emplace("dashed", QmitkChartWidget::LineStyle::dashed);
@@ -73,23 +73,23 @@ void ChartExample::CreateQtPartControl(QWidget *parent)
 
 void ChartExample::FillRandomDataValues()
 {
-  std::vector<double> numbers = generateRandomNumbers(10, 10.0);
-  std::string text = convertToText(numbers);
+  std::vector<double> numbers = GenerateRandomNumbers(10, 10.0);
+  std::string text = ConvertToText(numbers);
   m_Controls.m_lineEditDataYVector->setText(QString::fromStdString(text));
 
   m_Controls.m_lineEditDataLabel->setText("test" + QString::number(countForUID));
 
-  numbers = generateRandomNumbers(10, 10.0);
-  text = convertToText(numbers);
+  numbers = GenerateRandomNumbers(10, 10.0);
+  text = ConvertToText(numbers);
   m_Controls.m_lineEditXErrorPlus->setText(QString::fromStdString(text));
-  numbers = generateRandomNumbers(10, 10.0);
-  text = convertToText(numbers);
+  numbers = GenerateRandomNumbers(10, 10.0);
+  text = ConvertToText(numbers);
   m_Controls.m_lineEditXErrorMinus->setText(QString::fromStdString(text));
-  numbers = generateRandomNumbers(10, 10.0);
-  text = convertToText(numbers);
+  numbers = GenerateRandomNumbers(10, 10.0);
+  text = ConvertToText(numbers);
   m_Controls.m_lineEditYErrorPlus->setText(QString::fromStdString(text));
-  numbers = generateRandomNumbers(10, 10.0);
-  text = convertToText(numbers);
+  numbers = GenerateRandomNumbers(10, 10.0);
+  text = ConvertToText(numbers);
   m_Controls.m_lineEditYErrorMinus->setText(QString::fromStdString(text));
 
   countForUID++;
@@ -124,19 +124,19 @@ void ChartExample::ClearChart()
   m_Controls.m_plainTextEditDataView->clear();
 }
 
-std::vector<double> ChartExample::ConvertToVector(const QString &lineEditData)
+std::vector<double> ChartExample::ConvertToVector(const QString &data, QChar delimiter) const
 {
-  std::vector<double> data;
-  if (lineEditData.isEmpty())
+  std::vector<double> output;
+  if (data.isEmpty())
   {
-    return data;
+    return output;
   }
 
-  for (const QString entry : lineEditData.split(';'))
+  for (const QString entry : data.split(delimiter))
   {
-    data.push_back(entry.toDouble());
+    output.push_back(entry.toDouble());
   }
-  return data;
+  return output;
 }
 
 void ChartExample::AddData()
@@ -144,7 +144,7 @@ void ChartExample::AddData()
   QString data = m_Controls.m_lineEditDataYVector->text();
   auto dataY = ConvertToVector(data);
 
-  auto chartType = m_chartNameToChartType.at(m_Controls.m_comboBoxChartType->currentText().toStdString());
+  auto chartType = m_ChartNameToChartType.at(m_Controls.m_comboBoxChartType->currentText().toStdString());
   std::string dataLabel = m_Controls.m_lineEditDataLabel->text().toStdString();
   std::string dataColor = m_Controls.m_lineEditColor->text().toStdString();
   auto dataLineStyleType = m_LineNameToLineType.at(m_Controls.m_comboBoxLineStyle->currentText().toStdString());
@@ -158,7 +158,7 @@ void ChartExample::AddData()
       mitkThrow() << "data x and y size have to be equal";
     }
     auto dataXandY = CreateMap(dataX, dataY);
-    data = QString::fromStdString(convertToText(dataXandY));
+    data = QString::fromStdString(ConvertToText(dataXandY));
 
     m_Controls.m_Chart->AddData2D(dataXandY, dataLabel, chartType);
   }
@@ -226,7 +226,7 @@ void ChartExample::ShowYErrorOptions(bool show)
   m_Controls.m_groupBoxYErrors->setVisible(show);
 }
 
-std::vector<double> ChartExample::generateRandomNumbers(unsigned int amount, double max) const
+std::vector<double> ChartExample::GenerateRandomNumbers(unsigned int amount, double max) const
 {
   QRandomGenerator gen;
   gen.seed(time(NULL));
@@ -249,7 +249,7 @@ std::map<double, double> ChartExample::CreateMap(std::vector<double> keys,
   return aMap;
 }
 
-std::string ChartExample::convertToText(std::vector<double> numbers, std::string delimiter) const
+std::string ChartExample::ConvertToText(std::vector<double> numbers, std::string delimiter) const
 {
   std::ostringstream oss;
   oss.precision(3);
@@ -266,7 +266,7 @@ std::string ChartExample::convertToText(std::vector<double> numbers, std::string
   return aString;
 }
 
-std::string ChartExample::convertToText(std::map<double, double> numbers, std::string delimiter) const {
+std::string ChartExample::ConvertToText(std::map<double, double> numbers, std::string delimiter) const {
   std::ostringstream oss;
   oss.precision(3);
 

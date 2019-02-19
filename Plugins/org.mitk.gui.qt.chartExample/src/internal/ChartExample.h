@@ -22,9 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_ChartExampleControls.h"
 
 /**
-  \brief ChartExample
-
-  \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
+  \brief Basic example for use of module mitkChart
 
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
